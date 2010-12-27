@@ -1,0 +1,4 @@
+# Ignore objects
+*.o
+# Ignore classes
+*.class
