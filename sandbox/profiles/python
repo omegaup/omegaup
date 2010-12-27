@@ -1,0 +1,19 @@
+-f
+-a 2
+
+-s mprotect
+-s set_robust_list
+-s futex
+-s rt_sigaction
+-s rt_sigprocmask
+-s rt_sigreturn=noret
+-s ugetrlimit
+-s socketcall
+-s getdents64
+-s getcwd
+
+-p /etc/nsswitch.conf
+-p /etc/passwd
+-p /proc/meminfo
+-p /usr/
+-p /home/
