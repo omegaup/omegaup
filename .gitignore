@@ -2,3 +2,9 @@
 *.o
 # Ignore classes
 *.class
+
+# SBT-related stuff
+target/
+lib_managed/
+src_managed/
+*/project/boot/
