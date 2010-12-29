@@ -1,0 +1,1050 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Concursos</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class Concursos</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Value Object file for table Concursos.</p>
+<p class="description"><p>Value Object file for table Concursos.
+ VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Alan Gonzalez &lt;<a href="mailto:alan@caffeina.mx">alan@caffeina.mx</a>&gt;</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_base---Concursos.vo.base.php.html">/base/Concursos.vo.base.php</a> (line <span class="field"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a11">11</a></span>)
+		</p>
+		
+				
+		<pre><a href="../openjudge/VO.html">VO</a>
+   |
+   --Concursos</pre>
+	
+			</div>
+</div>
+
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																																																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$concursoID" title="details" class="var-name">$concursoID</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$creador" title="details" class="var-name">$creador</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">tinytext</span>
+					<a href="#$descripcion" title="details" class="var-name">$descripcion</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">enum('foo')</span>
+					<a href="#$estado" title="details" class="var-name">$estado</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">enum('icpc','anpa','topcoder','codejam')</span>
+					<a href="#$estilo" title="details" class="var-name">$estilo</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">timestamp</span>
+					<a href="#$final" title="details" class="var-name">$final</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">timestamp</span>
+					<a href="#$inicio" title="details" class="var-name">$inicio</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">varchar(256)</span>
+					<a href="#$titulo" title="details" class="var-name">$titulo</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																																																														
+				<div class="method-definition">
+											<span class="method-result"><a href="../openjudge/Concursos.html">Concursos</a></span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">NULL</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getConcursoID" title="details" class="method-name">getConcursoID</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getCreador" title="details" class="method-name">getCreador</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">tinytext</span>
+										<a href="#getDescripcion" title="details" class="method-name">getDescripcion</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">enum('foo')</span>
+										<a href="#getEstado" title="details" class="method-name">getEstado</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">enum('icpc','anpa','topcoder','codejam')</span>
+										<a href="#getEstilo" title="details" class="method-name">getEstilo</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">timestamp</span>
+										<a href="#getFinal" title="details" class="method-name">getFinal</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">timestamp</span>
+										<a href="#getInicio" title="details" class="method-name">getInicio</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">varchar(256)</span>
+										<a href="#getTitulo" title="details" class="method-name">getTitulo</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setConcursoID" title="details" class="method-name">setConcursoID</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$concursoID</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setCreador" title="details" class="method-name">setCreador</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$creador</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setDescripcion" title="details" class="method-name">setDescripcion</a>
+											(<span class="var-type">tinytext</span>&nbsp;<span class="var-name">$descripcion</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setEstado" title="details" class="method-name">setEstado</a>
+											(<span class="var-type">enum('foo')</span>&nbsp;<span class="var-name">$estado</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setEstilo" title="details" class="method-name">setEstilo</a>
+											(<span class="var-type">enum('icpc','anpa','topcoder','codejam')</span>&nbsp;<span class="var-name">$estilo</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setFinal" title="details" class="method-name">setFinal</a>
+											(<span class="var-type">timestamp</span>&nbsp;<span class="var-name">$final</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setInicio" title="details" class="method-name">setInicio</a>
+											(<span class="var-type">timestamp</span>&nbsp;<span class="var-name">$inicio</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setTitulo" title="details" class="method-name">setTitulo</a>
+											(<span class="var-type">varchar(256)</span>&nbsp;<span class="var-name">$titulo</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">String</span>
+										<a href="#__toString" title="details" class="method-name">__toString</a>
+										()
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$concursoID" id="$concursoID"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$concursoID</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a83">83</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">concursoID</p>
+<p class="description"><p>concursoID
+ El identificador unico para cada concurso<br /> <strong>Llave Primaria</strong><br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$creador" id="$creador"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$creador</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a146">146</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">creador</p>
+<p class="description"><p>creador
+ el userID del usuario que creo este concurso<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$descripcion" id="$descripcion"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">tinytext</span>
+			<span class="var-name">$descripcion</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a101">101</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">descripcion</p>
+<p class="description"><p>descripcion
+ Una breve descripcion de cada concurso<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$estado" id="$estado"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">enum('foo')</span>
+			<span class="var-name">$estado</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a110">110</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">estado</p>
+<p class="description"><p>estado
+ Estado actual del concurso, tengo mis dudas<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$estilo" id="$estilo"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">enum('icpc','anpa','topcoder','codejam')</span>
+			<span class="var-name">$estilo</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a137">137</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">estilo</p>
+<p class="description"><p>estilo
+ Estilo de este concurso<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$final" id="$final"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">timestamp</span>
+			<span class="var-name">$final</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a128">128</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">final</p>
+<p class="description"><p>final
+ Hora de finalizacion de este concurso<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$inicio" id="$inicio"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">timestamp</span>
+			<span class="var-name">$inicio</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a119">119</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">inicio</p>
+<p class="description"><p>inicio
+ Hora de inicio de este concurso<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$titulo" id="$titulo"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">varchar(256)</span>
+			<span class="var-name">$titulo</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a92">92</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">titulo</p>
+<p class="description"><p>titulo
+ El titulo que aparecera en cada concurso<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a21">21</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Constructor de Concursos
+ Para construir un objeto de tipo Concursos debera llamarse a el constructor sin parametros. cuyos campos son iguales a las variables que constituyen a este objeto.</p>
+<p class="description"><p>Constructor de Concursos
+ Para construir un objeto de tipo Concursos debera llamarse a el constructor sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo cuyos campos son iguales a las variables que constituyen a este objeto.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../openjudge/Concursos.html">Concursos</a></span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">NULL</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$data</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetConcursoID" id="getConcursoID"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getConcursoID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a154">154</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getConcursoID</p>
+<p class="description"><p>getConcursoID
+ Get the <em>concursoID</em> property for this object. Donde <em>concursoID</em> es El identificador unico para cada concurso</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getConcursoID
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetCreador" id="getCreador"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getCreador</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a324">324</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getCreador</p>
+<p class="description"><p>getCreador
+ Get the <em>creador</em> property for this object. Donde <em>creador</em> es el userID del usuario que creo este concurso</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getCreador
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetDescripcion" id="getDescripcion"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getDescripcion</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a204">204</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getDescripcion</p>
+<p class="description"><p>getDescripcion
+ Get the <em>descripcion</em> property for this object. Donde <em>descripcion</em> es Una breve descripcion de cada concurso</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">tinytext</span>
+		<span class="method-name">
+			getDescripcion
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetEstado" id="getEstado"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getEstado</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a228">228</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getEstado</p>
+<p class="description"><p>getEstado
+ Get the <em>estado</em> property for this object. Donde <em>estado</em> es Estado actual del concurso, tengo mis dudas</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">enum('foo')</span>
+		<span class="method-name">
+			getEstado
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetEstilo" id="getEstilo"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getEstilo</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a300">300</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getEstilo</p>
+<p class="description"><p>getEstilo
+ Get the <em>estilo</em> property for this object. Donde <em>estilo</em> es Estilo de este concurso</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">enum('icpc','anpa','topcoder','codejam')</span>
+		<span class="method-name">
+			getEstilo
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetFinal" id="getFinal"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getFinal</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a276">276</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getFinal</p>
+<p class="description"><p>getFinal
+ Get the <em>final</em> property for this object. Donde <em>final</em> es Hora de finalizacion de este concurso</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">timestamp</span>
+		<span class="method-name">
+			getFinal
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetInicio" id="getInicio"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getInicio</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a252">252</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getInicio</p>
+<p class="description"><p>getInicio
+ Get the <em>inicio</em> property for this object. Donde <em>inicio</em> es Hora de inicio de este concurso</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">timestamp</span>
+		<span class="method-name">
+			getInicio
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetTitulo" id="getTitulo"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getTitulo</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a180">180</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getTitulo</p>
+<p class="description"><p>getTitulo
+ Get the <em>titulo</em> property for this object. Donde <em>titulo</em> es El titulo que aparecera en cada concurso</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">varchar(256)</span>
+		<span class="method-name">
+			getTitulo
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodsetConcursoID" id="setConcursoID"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setConcursoID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a169">169</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setConcursoID( $concursoID )
+ Set the <em>concursoID</em> property for this object.</p>
+<p class="description"><p>setConcursoID( $concursoID )
+ Set the <em>concursoID</em> property for this object. Donde <em>concursoID</em> es El identificador unico para cada concurso. Una validacion basica se hara aqui para comprobar que <em>concursoID</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo. <br /><br />Esta propiedad se mapea con un campo que es una <strong>Llave Primaria</strong> !<br /> No deberias usar setConcursoID( ) a menos que sepas exactamente lo que estas haciendo.<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setConcursoID
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$concursoID</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$concursoID</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetCreador" id="setCreador"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setCreador</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a337">337</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setCreador( $creador )
+ Set the <em>creador</em> property for this object.</p>
+<p class="description"><p>setCreador( $creador )
+ Set the <em>creador</em> property for this object. Donde <em>creador</em> es el userID del usuario que creo este concurso. Una validacion basica se hara aqui para comprobar que <em>creador</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setCreador
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$creador</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$creador</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetDescripcion" id="setDescripcion"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setDescripcion</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a217">217</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setDescripcion( $descripcion )
+ Set the <em>descripcion</em> property for this object.</p>
+<p class="description"><p>setDescripcion( $descripcion )
+ Set the <em>descripcion</em> property for this object. Donde <em>descripcion</em> es Una breve descripcion de cada concurso. Una validacion basica se hara aqui para comprobar que <em>descripcion</em> es de tipo <em>tinytext</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setDescripcion
+		</span>
+					(<span class="var-type">tinytext</span>&nbsp;<span class="var-name">$descripcion</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">tinytext</span>
+				<span class="var-name">$descripcion</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetEstado" id="setEstado"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setEstado</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a241">241</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setEstado( $estado )
+ Set the <em>estado</em> property for this object.</p>
+<p class="description"><p>setEstado( $estado )
+ Set the <em>estado</em> property for this object. Donde <em>estado</em> es Estado actual del concurso, tengo mis dudas. Una validacion basica se hara aqui para comprobar que <em>estado</em> es de tipo <em>enum('foo')</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setEstado
+		</span>
+					(<span class="var-type">enum('foo')</span>&nbsp;<span class="var-name">$estado</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">enum('foo')</span>
+				<span class="var-name">$estado</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetEstilo" id="setEstilo"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setEstilo</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a313">313</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setEstilo( $estilo )
+ Set the <em>estilo</em> property for this object.</p>
+<p class="description"><p>setEstilo( $estilo )
+ Set the <em>estilo</em> property for this object. Donde <em>estilo</em> es Estilo de este concurso. Una validacion basica se hara aqui para comprobar que <em>estilo</em> es de tipo <em>enum('icpc','anpa','topcoder','codejam')</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setEstilo
+		</span>
+					(<span class="var-type">enum('icpc','anpa','topcoder','codejam')</span>&nbsp;<span class="var-name">$estilo</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">enum('icpc','anpa','topcoder','codejam')</span>
+				<span class="var-name">$estilo</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetFinal" id="setFinal"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setFinal</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a289">289</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setFinal( $final )
+ Set the <em>final</em> property for this object.</p>
+<p class="description"><p>setFinal( $final )
+ Set the <em>final</em> property for this object. Donde <em>final</em> es Hora de finalizacion de este concurso. Una validacion basica se hara aqui para comprobar que <em>final</em> es de tipo <em>timestamp</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setFinal
+		</span>
+					(<span class="var-type">timestamp</span>&nbsp;<span class="var-name">$final</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">timestamp</span>
+				<span class="var-name">$final</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetInicio" id="setInicio"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setInicio</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a265">265</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setInicio( $inicio )
+ Set the <em>inicio</em> property for this object.</p>
+<p class="description"><p>setInicio( $inicio )
+ Set the <em>inicio</em> property for this object. Donde <em>inicio</em> es Hora de inicio de este concurso. Una validacion basica se hara aqui para comprobar que <em>inicio</em> es de tipo <em>timestamp</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setInicio
+		</span>
+					(<span class="var-type">timestamp</span>&nbsp;<span class="var-name">$inicio</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">timestamp</span>
+				<span class="var-name">$inicio</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetTitulo" id="setTitulo"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setTitulo</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a193">193</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setTitulo( $titulo )
+ Set the <em>titulo</em> property for this object.</p>
+<p class="description"><p>setTitulo( $titulo )
+ Set the <em>titulo</em> property for this object. Donde <em>titulo</em> es El titulo que aparecera en cada concurso. Una validacion basica se hara aqui para comprobar que <em>titulo</em> es de tipo <em>varchar(256)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setTitulo
+		</span>
+					(<span class="var-type">varchar(256)</span>&nbsp;<span class="var-name">$titulo</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">varchar(256)</span>
+				<span class="var-name">$titulo</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__toString" id="__toString"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">__toString</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseConcursos.vo.base.php.html#a59">59</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Obtener una representacion en String
+ Este metodo permite tratar a un objeto Concursos en forma de cadena.</p>
+<p class="description"><p>Obtener una representacion en String
+ Este metodo permite tratar a un objeto Concursos en forma de cadena. La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">String</span>
+		<span class="method-name">
+			__toString
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../openjudge/VO.html">VO</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../openjudge/VO.html#methodasArray">VO::asArray()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Wed, 29 Dec 2010 13:04:35 -0600 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

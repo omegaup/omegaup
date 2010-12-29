@@ -1,0 +1,1638 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Problemas</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class Problemas</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Value Object file for table Problemas.</p>
+<p class="description"><p>Value Object file for table Problemas.
+ VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Alan Gonzalez &lt;<a href="mailto:alan@caffeina.mx">alan@caffeina.mx</a>&gt;</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_base---Problemas.vo.base.php.html">/base/Problemas.vo.base.php</a> (line <span class="field"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a11">11</a></span>)
+		</p>
+		
+				
+		<pre><a href="../openjudge/VO.html">VO</a>
+   |
+   --Problemas</pre>
+	
+			</div>
+</div>
+
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																																																																																																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$aceptados" title="details" class="var-name">$aceptados</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">varchar(10)</span>
+					<a href="#$alias" title="details" class="var-name">$alias</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$autor" title="details" class="var-name">$autor</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">double</span>
+					<a href="#$dificultad" title="details" class="var-name">$dificultad</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$envios" title="details" class="var-name">$envios</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">varchar(10)</span>
+					<a href="#$id_remoto" title="details" class="var-name">$id_remoto</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$memoriaLimite" title="details" class="var-name">$memoriaLimite</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$problemaID" title="details" class="var-name">$problemaID</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">tinyint(1)</span>
+					<a href="#$publico" title="details" class="var-name">$publico</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">enum('uva','livearchive','pku','tju','spoj')</span>
+					<a href="#$servidor" title="details" class="var-name">$servidor</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$tiempoLimite" title="details" class="var-name">$tiempoLimite</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">varchar(256)</span>
+					<a href="#$titulo" title="details" class="var-name">$titulo</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">enum('remoto','literal','token','token-caseless','token-numeric')</span>
+					<a href="#$validador" title="details" class="var-name">$validador</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$vistas" title="details" class="var-name">$vistas</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																																																																																																																																																														
+				<div class="method-definition">
+											<span class="method-result"><a href="../openjudge/Problemas.html">Problemas</a></span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">NULL</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getAceptados" title="details" class="method-name">getAceptados</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">varchar(10)</span>
+										<a href="#getAlias" title="details" class="method-name">getAlias</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getAutor" title="details" class="method-name">getAutor</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">double</span>
+										<a href="#getDificultad" title="details" class="method-name">getDificultad</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getEnvios" title="details" class="method-name">getEnvios</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">varchar(10)</span>
+										<a href="#getIdRemoto" title="details" class="method-name">getIdRemoto</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getMemoriaLimite" title="details" class="method-name">getMemoriaLimite</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getProblemaID" title="details" class="method-name">getProblemaID</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">tinyint(1)</span>
+										<a href="#getPublico" title="details" class="method-name">getPublico</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">enum('uva','livearchive','pku','tju','spoj')</span>
+										<a href="#getServidor" title="details" class="method-name">getServidor</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getTiempoLimite" title="details" class="method-name">getTiempoLimite</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">varchar(256)</span>
+										<a href="#getTitulo" title="details" class="method-name">getTitulo</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">enum('remoto','literal','token','token-caseless','token-numeric')</span>
+										<a href="#getValidador" title="details" class="method-name">getValidador</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getVistas" title="details" class="method-name">getVistas</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setAceptados" title="details" class="method-name">setAceptados</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$aceptados</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setAlias" title="details" class="method-name">setAlias</a>
+											(<span class="var-type">varchar(10)</span>&nbsp;<span class="var-name">$alias</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setAutor" title="details" class="method-name">setAutor</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$autor</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setDificultad" title="details" class="method-name">setDificultad</a>
+											(<span class="var-type">double</span>&nbsp;<span class="var-name">$dificultad</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setEnvios" title="details" class="method-name">setEnvios</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$envios</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setIdRemoto" title="details" class="method-name">setIdRemoto</a>
+											(<span class="var-type">varchar(10)</span>&nbsp;<span class="var-name">$id_remoto</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setMemoriaLimite" title="details" class="method-name">setMemoriaLimite</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$memoriaLimite</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setProblemaID" title="details" class="method-name">setProblemaID</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$problemaID</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setPublico" title="details" class="method-name">setPublico</a>
+											(<span class="var-type">tinyint(1)</span>&nbsp;<span class="var-name">$publico</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setServidor" title="details" class="method-name">setServidor</a>
+											(<span class="var-type">enum('uva','livearchive','pku','tju','spoj')</span>&nbsp;<span class="var-name">$servidor</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setTiempoLimite" title="details" class="method-name">setTiempoLimite</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$tiempoLimite</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setTitulo" title="details" class="method-name">setTitulo</a>
+											(<span class="var-type">varchar(256)</span>&nbsp;<span class="var-name">$titulo</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setValidador" title="details" class="method-name">setValidador</a>
+											(<span class="var-type">enum('remoto','literal','token','token-caseless','token-numeric')</span>&nbsp;<span class="var-name">$validador</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setVistas" title="details" class="method-name">setVistas</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$vistas</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">String</span>
+										<a href="#__toString" title="details" class="method-name">__toString</a>
+										()
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$aceptados" id="$aceptados"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$aceptados</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a215">215</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">aceptados</p>
+<p class="description"><p>aceptados
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$alias" id="$alias"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">varchar(10)</span>
+			<span class="var-name">$alias</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a143">143</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">alias</p>
+<p class="description"><p>alias
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$autor" id="$autor"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$autor</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a125">125</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">autor</p>
+<p class="description"><p>autor
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$dificultad" id="$dificultad"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">double</span>
+			<span class="var-name">$dificultad</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a224">224</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">dificultad</p>
+<p class="description"><p>dificultad
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$envios" id="$envios"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$envios</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a206">206</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">envios</p>
+<p class="description"><p>envios
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$id_remoto" id="$id_remoto"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">varchar(10)</span>
+			<span class="var-name">$id_remoto</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a170">170</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">id_remoto</p>
+<p class="description"><p>id_remoto
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$memoriaLimite" id="$memoriaLimite"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$memoriaLimite</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a188">188</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">memoriaLimite</p>
+<p class="description"><p>memoriaLimite
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$problemaID" id="$problemaID"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$problemaID</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a107">107</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">problemaID</p>
+<p class="description"><p>problemaID
+  [Campo no documentado]<br /> <strong>Llave Primaria</strong><br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$publico" id="$publico"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">tinyint(1)</span>
+			<span class="var-name">$publico</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a116">116</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">publico</p>
+<p class="description"><p>publico
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$servidor" id="$servidor"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">enum('uva','livearchive','pku','tju','spoj')</span>
+			<span class="var-name">$servidor</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a161">161</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">servidor</p>
+<p class="description"><p>servidor
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$tiempoLimite" id="$tiempoLimite"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$tiempoLimite</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a179">179</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">tiempoLimite</p>
+<p class="description"><p>tiempoLimite
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$titulo" id="$titulo"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">varchar(256)</span>
+			<span class="var-name">$titulo</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a134">134</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">titulo</p>
+<p class="description"><p>titulo
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$validador" id="$validador"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">enum('remoto','literal','token','token-caseless','token-numeric')</span>
+			<span class="var-name">$validador</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a152">152</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">validador</p>
+<p class="description"><p>validador
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$vistas" id="$vistas"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$vistas</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a197">197</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">vistas</p>
+<p class="description"><p>vistas
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a21">21</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Constructor de Problemas
+ Para construir un objeto de tipo Problemas debera llamarse a el constructor sin parametros. cuyos campos son iguales a las variables que constituyen a este objeto.</p>
+<p class="description"><p>Constructor de Problemas
+ Para construir un objeto de tipo Problemas debera llamarse a el constructor sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo cuyos campos son iguales a las variables que constituyen a este objeto.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../openjudge/Problemas.html">Problemas</a></span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">NULL</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$data</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetAceptados" id="getAceptados"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getAceptados</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a522">522</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getAceptados</p>
+<p class="description"><p>getAceptados
+ Get the <em>aceptados</em> property for this object. Donde <em>aceptados</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getAceptados
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetAlias" id="getAlias"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getAlias</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a330">330</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getAlias</p>
+<p class="description"><p>getAlias
+ Get the <em>alias</em> property for this object. Donde <em>alias</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">varchar(10)</span>
+		<span class="method-name">
+			getAlias
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetAutor" id="getAutor"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getAutor</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a282">282</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getAutor</p>
+<p class="description"><p>getAutor
+ Get the <em>autor</em> property for this object. Donde <em>autor</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getAutor
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetDificultad" id="getDificultad"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getDificultad</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a546">546</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getDificultad</p>
+<p class="description"><p>getDificultad
+ Get the <em>dificultad</em> property for this object. Donde <em>dificultad</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">double</span>
+		<span class="method-name">
+			getDificultad
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetEnvios" id="getEnvios"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getEnvios</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a498">498</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getEnvios</p>
+<p class="description"><p>getEnvios
+ Get the <em>envios</em> property for this object. Donde <em>envios</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getEnvios
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetIdRemoto" id="getIdRemoto"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getIdRemoto</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a402">402</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getIdRemoto</p>
+<p class="description"><p>getIdRemoto
+ Get the <em>id_remoto</em> property for this object. Donde <em>id_remoto</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">varchar(10)</span>
+		<span class="method-name">
+			getIdRemoto
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetMemoriaLimite" id="getMemoriaLimite"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getMemoriaLimite</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a450">450</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getMemoriaLimite</p>
+<p class="description"><p>getMemoriaLimite
+ Get the <em>memoriaLimite</em> property for this object. Donde <em>memoriaLimite</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getMemoriaLimite
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetProblemaID" id="getProblemaID"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getProblemaID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a232">232</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getProblemaID</p>
+<p class="description"><p>getProblemaID
+ Get the <em>problemaID</em> property for this object. Donde <em>problemaID</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getProblemaID
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetPublico" id="getPublico"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getPublico</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a258">258</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getPublico</p>
+<p class="description"><p>getPublico
+ Get the <em>publico</em> property for this object. Donde <em>publico</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">tinyint(1)</span>
+		<span class="method-name">
+			getPublico
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetServidor" id="getServidor"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getServidor</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a378">378</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getServidor</p>
+<p class="description"><p>getServidor
+ Get the <em>servidor</em> property for this object. Donde <em>servidor</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">enum('uva','livearchive','pku','tju','spoj')</span>
+		<span class="method-name">
+			getServidor
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetTiempoLimite" id="getTiempoLimite"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getTiempoLimite</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a426">426</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getTiempoLimite</p>
+<p class="description"><p>getTiempoLimite
+ Get the <em>tiempoLimite</em> property for this object. Donde <em>tiempoLimite</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getTiempoLimite
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetTitulo" id="getTitulo"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getTitulo</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a306">306</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getTitulo</p>
+<p class="description"><p>getTitulo
+ Get the <em>titulo</em> property for this object. Donde <em>titulo</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">varchar(256)</span>
+		<span class="method-name">
+			getTitulo
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetValidador" id="getValidador"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getValidador</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a354">354</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getValidador</p>
+<p class="description"><p>getValidador
+ Get the <em>validador</em> property for this object. Donde <em>validador</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">enum('remoto','literal','token','token-caseless','token-numeric')</span>
+		<span class="method-name">
+			getValidador
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetVistas" id="getVistas"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getVistas</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a474">474</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getVistas</p>
+<p class="description"><p>getVistas
+ Get the <em>vistas</em> property for this object. Donde <em>vistas</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getVistas
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodsetAceptados" id="setAceptados"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setAceptados</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a535">535</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setAceptados( $aceptados )
+ Set the <em>aceptados</em> property for this object.</p>
+<p class="description"><p>setAceptados( $aceptados )
+ Set the <em>aceptados</em> property for this object. Donde <em>aceptados</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>aceptados</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setAceptados
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$aceptados</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$aceptados</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetAlias" id="setAlias"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setAlias</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a343">343</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setAlias( $alias )
+ Set the <em>alias</em> property for this object.</p>
+<p class="description"><p>setAlias( $alias )
+ Set the <em>alias</em> property for this object. Donde <em>alias</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>alias</em> es de tipo <em>varchar(10)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setAlias
+		</span>
+					(<span class="var-type">varchar(10)</span>&nbsp;<span class="var-name">$alias</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">varchar(10)</span>
+				<span class="var-name">$alias</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetAutor" id="setAutor"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setAutor</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a295">295</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setAutor( $autor )
+ Set the <em>autor</em> property for this object.</p>
+<p class="description"><p>setAutor( $autor )
+ Set the <em>autor</em> property for this object. Donde <em>autor</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>autor</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setAutor
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$autor</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$autor</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetDificultad" id="setDificultad"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setDificultad</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a559">559</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setDificultad( $dificultad )
+ Set the <em>dificultad</em> property for this object.</p>
+<p class="description"><p>setDificultad( $dificultad )
+ Set the <em>dificultad</em> property for this object. Donde <em>dificultad</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>dificultad</em> es de tipo <em>double</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setDificultad
+		</span>
+					(<span class="var-type">double</span>&nbsp;<span class="var-name">$dificultad</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">double</span>
+				<span class="var-name">$dificultad</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetEnvios" id="setEnvios"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setEnvios</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a511">511</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setEnvios( $envios )
+ Set the <em>envios</em> property for this object.</p>
+<p class="description"><p>setEnvios( $envios )
+ Set the <em>envios</em> property for this object. Donde <em>envios</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>envios</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setEnvios
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$envios</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$envios</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetIdRemoto" id="setIdRemoto"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setIdRemoto</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a415">415</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setIdRemoto( $id_remoto )
+ Set the <em>id_remoto</em> property for this object.</p>
+<p class="description"><p>setIdRemoto( $id_remoto )
+ Set the <em>id_remoto</em> property for this object. Donde <em>id_remoto</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>id_remoto</em> es de tipo <em>varchar(10)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setIdRemoto
+		</span>
+					(<span class="var-type">varchar(10)</span>&nbsp;<span class="var-name">$id_remoto</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">varchar(10)</span>
+				<span class="var-name">$id_remoto</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetMemoriaLimite" id="setMemoriaLimite"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setMemoriaLimite</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a463">463</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setMemoriaLimite( $memoriaLimite )
+ Set the <em>memoriaLimite</em> property for this object.</p>
+<p class="description"><p>setMemoriaLimite( $memoriaLimite )
+ Set the <em>memoriaLimite</em> property for this object. Donde <em>memoriaLimite</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>memoriaLimite</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setMemoriaLimite
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$memoriaLimite</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$memoriaLimite</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetProblemaID" id="setProblemaID"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setProblemaID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a247">247</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setProblemaID( $problemaID )
+ Set the <em>problemaID</em> property for this object.</p>
+<p class="description"><p>setProblemaID( $problemaID )
+ Set the <em>problemaID</em> property for this object. Donde <em>problemaID</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>problemaID</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo. <br /><br />Esta propiedad se mapea con un campo que es una <strong>Llave Primaria</strong> !<br /> No deberias usar setProblemaID( ) a menos que sepas exactamente lo que estas haciendo.<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setProblemaID
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$problemaID</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$problemaID</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetPublico" id="setPublico"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setPublico</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a271">271</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setPublico( $publico )
+ Set the <em>publico</em> property for this object.</p>
+<p class="description"><p>setPublico( $publico )
+ Set the <em>publico</em> property for this object. Donde <em>publico</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>publico</em> es de tipo <em>tinyint(1)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setPublico
+		</span>
+					(<span class="var-type">tinyint(1)</span>&nbsp;<span class="var-name">$publico</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">tinyint(1)</span>
+				<span class="var-name">$publico</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetServidor" id="setServidor"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setServidor</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a391">391</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setServidor( $servidor )
+ Set the <em>servidor</em> property for this object.</p>
+<p class="description"><p>setServidor( $servidor )
+ Set the <em>servidor</em> property for this object. Donde <em>servidor</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>servidor</em> es de tipo <em>enum('uva','livearchive','pku','tju','spoj')</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setServidor
+		</span>
+					(<span class="var-type">enum('uva','livearchive','pku','tju','spoj')</span>&nbsp;<span class="var-name">$servidor</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">enum('uva','livearchive','pku','tju','spoj')</span>
+				<span class="var-name">$servidor</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetTiempoLimite" id="setTiempoLimite"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setTiempoLimite</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a439">439</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setTiempoLimite( $tiempoLimite )
+ Set the <em>tiempoLimite</em> property for this object.</p>
+<p class="description"><p>setTiempoLimite( $tiempoLimite )
+ Set the <em>tiempoLimite</em> property for this object. Donde <em>tiempoLimite</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>tiempoLimite</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setTiempoLimite
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$tiempoLimite</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$tiempoLimite</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetTitulo" id="setTitulo"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setTitulo</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a319">319</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setTitulo( $titulo )
+ Set the <em>titulo</em> property for this object.</p>
+<p class="description"><p>setTitulo( $titulo )
+ Set the <em>titulo</em> property for this object. Donde <em>titulo</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>titulo</em> es de tipo <em>varchar(256)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setTitulo
+		</span>
+					(<span class="var-type">varchar(256)</span>&nbsp;<span class="var-name">$titulo</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">varchar(256)</span>
+				<span class="var-name">$titulo</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetValidador" id="setValidador"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setValidador</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a367">367</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setValidador( $validador )
+ Set the <em>validador</em> property for this object.</p>
+<p class="description"><p>setValidador( $validador )
+ Set the <em>validador</em> property for this object. Donde <em>validador</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>validador</em> es de tipo <em>enum('remoto','literal','token','token-caseless','token-numeric')</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setValidador
+		</span>
+					(<span class="var-type">enum('remoto','literal','token','token-caseless','token-numeric')</span>&nbsp;<span class="var-name">$validador</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">enum('remoto','literal','token','token-caseless','token-numeric')</span>
+				<span class="var-name">$validador</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetVistas" id="setVistas"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setVistas</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a487">487</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setVistas( $vistas )
+ Set the <em>vistas</em> property for this object.</p>
+<p class="description"><p>setVistas( $vistas )
+ Set the <em>vistas</em> property for this object. Donde <em>vistas</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>vistas</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setVistas
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$vistas</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$vistas</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__toString" id="__toString"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">__toString</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseProblemas.vo.base.php.html#a77">77</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Obtener una representacion en String
+ Este metodo permite tratar a un objeto Problemas en forma de cadena.</p>
+<p class="description"><p>Obtener una representacion en String
+ Este metodo permite tratar a un objeto Problemas en forma de cadena. La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">String</span>
+		<span class="method-name">
+			__toString
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../openjudge/VO.html">VO</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../openjudge/VO.html#methodasArray">VO::asArray()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Wed, 29 Dec 2010 13:04:52 -0600 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class UsuariosDAOBase</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class UsuariosDAOBase</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-descendents">Descendents</a>
+			|											<a href="#sec-vars">Vars</a>
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Usuarios Data Access Object (DAO) Base.</p>
+<p class="description"><p>Usuarios Data Access Object (DAO) Base.
+ Esta clase contiene toda la manipulacion de bases de datos que se necesita para almacenar de forma permanente y recuperar instancias de objetos <a href="../openjudge/Usuarios.html">Usuarios</a>.</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Alan Gonzalez &lt;<a href="mailto:alan@caffeina.mx">alan@caffeina.mx</a>&gt;</li>
+				<li><span class="field">abstract:</span> </li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_base---Usuarios.dao.base.php.html">/base/Usuarios.dao.base.php</a> (line <span class="field"><a href="../__filesource/fsource_openjudge__baseUsuarios.dao.base.php.html#a11">11</a></span>)
+		</p>
+		
+				
+		<pre><a href="../openjudge/DAO.html">DAO</a>
+   |
+   --UsuariosDAOBase</pre>
+	
+			</div>
+</div>
+
+	<a name="sec-descendents"></a>
+	<div class="info-box">
+		<div class="info-box-title">Direct descendents</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Descendents</span>
+			|												<a href="#sec-vars">Vars</a>
+								|															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../openjudge/UsuariosDAO.html">UsuariosDAO</a></td>
+					<td>
+											Usuarios Data Access Object (DAO).
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+																		<a href="#sec-vars">Vars</a>
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+										
+				<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#byRange" title="details" class="method-name">byRange</a>
+											(<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">$UsuariosA</span>, <span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">$UsuariosB</span>, [<span class="var-type">$orderBy</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">null</span>], [<span class="var-type">$orden</span>&nbsp;<span class="var-name">$orden</span> = <span class="var-default">'ASC'</span>])
+									</div>
+														
+				<div class="method-definition">
+					static 						<span class="method-result">int</span>
+										<a href="#delete" title="details" class="method-name">delete</a>
+											(<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">&$Usuarios</span>)
+									</div>
+														
+				<div class="method-definition">
+					static 						<span class="method-result">Array</span>
+										<a href="#getAll" title="details" class="method-name">getAll</a>
+											([<span class="var-type">$pagina</span>&nbsp;<span class="var-name">$pagina</span> = <span class="var-default">NULL</span>], [<span class="var-type">$columnas_por_pagina</span>&nbsp;<span class="var-name">$columnas_por_pagina</span> = <span class="var-default">NULL</span>], [<span class="var-type">$orden</span>&nbsp;<span class="var-name">$orden</span> = <span class="var-default">NULL</span>], [<span class="var-type">$tipo_de_orden</span>&nbsp;<span class="var-name">$tipo_de_orden</span> = <span class="var-default">'ASC'</span>])
+									</div>
+														
+				<div class="method-definition">
+					static 						<span class="method-result">@link</span>
+										<a href="#getByPK" title="details" class="method-name">getByPK</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$userID</span>)
+									</div>
+														
+				<div class="method-definition">
+					static 						<span class="method-result">Un</span>
+										<a href="#save" title="details" class="method-name">save</a>
+											(<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">&$Usuarios</span>)
+									</div>
+														
+				<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#search" title="details" class="method-name">search</a>
+											(<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">$Usuarios</span>, [<span class="var-type">$orderBy</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">null</span>], [<span class="var-type">$orden</span>&nbsp;<span class="var-name">$orden</span> = <span class="var-default">'ASC'</span>])
+									</div>
+																																																															</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+										<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../openjudge/DAO.html">DAO</a></span></p>
+					<blockquote>
+													<span class="var-title">
+								<span class="var-name"><a href="../openjudge/DAO.html#var$isTrans">DAO::$isTrans</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+															<a href="#sec-vars">Vars</a>
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodbyRange" id="byRange"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static byRange</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseUsuarios.dao.base.php.html#a316">316</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Buscar por rango.</p>
+<p class="description"><p>Buscar por rango.
+ Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos <a href="../openjudge/Usuarios.html">Usuarios</a> de la base de datos siempre y cuando esten dentro del rango de atributos activos de dos objetos criterio de tipo <a href="../openjudge/Usuarios.html">Usuarios</a>.
+ Aquellas variables que tienen valores NULL seran excluidos en la busqueda. No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos. Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
+ <div class="src-code"><ol><li><div class="src-line">&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
+<li><div class="src-line"><span class="src-doc">&nbsp;&nbsp;&nbsp;*&nbsp;Ejemplo&nbsp;de&nbsp;uso&nbsp;-&nbsp;buscar&nbsp;todos&nbsp;los&nbsp;clientes&nbsp;que&nbsp;tengan&nbsp;limite&nbsp;de&nbsp;credito</span></div></li>
+<li><div class="src-line"><span class="src-doc">&nbsp;&nbsp;&nbsp;*&nbsp;mayor&nbsp;a&nbsp;2000&nbsp;y&nbsp;menor&nbsp;a&nbsp;5000.&nbsp;Y&nbsp;que&nbsp;tengan&nbsp;un&nbsp;descuento&nbsp;del&nbsp;50%.</span></div></li>
+<li><div class="src-line"><span class="src-doc">&nbsp;&nbsp;&nbsp;*/</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$cr1&nbsp;</span>=&nbsp;<span class="src-key">new&nbsp;</span><span class="src-id">Cliente</span><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$cr1</span><span class="src-sym">-&gt;</span><span class="src-id">setLimiteCredito</span><span class="src-sym">(</span><span class="src-str">&quot;2000&quot;</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$cr1</span><span class="src-sym">-&gt;</span><span class="src-id">setDescuento</span><span class="src-sym">(</span><span class="src-str">&quot;50&quot;</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;</div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$cr2&nbsp;</span>=&nbsp;<span class="src-key">new&nbsp;</span><span class="src-id">Cliente</span><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$cr2</span><span class="src-sym">-&gt;</span><span class="src-id">setLimiteCredito</span><span class="src-sym">(</span><span class="src-str">&quot;5000&quot;</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$resultados&nbsp;</span>=&nbsp;<span class="src-id">ClienteDAO</span><span class="src-sym">::</span><span class="src-id">byRange</span><span class="src-sym">(</span><span class="src-var">$cr1</span><span class="src-sym">,&nbsp;</span><span class="src-var">$cr2</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;</div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">foreach</span><span class="src-sym">(</span><span class="src-var">$resultados&nbsp;</span><span class="src-key">as&nbsp;</span><span class="src-var">$c&nbsp;</span><span class="src-sym">)</span><span class="src-sym">{</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;<span class="src-var">$c</span><span class="src-sym">-&gt;</span><span class="src-id">getNombre</span><span class="src-sym">(</span><span class="src-sym">)&nbsp;</span>.&nbsp;<span class="src-str">&quot;&lt;br&gt;&quot;</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+</ol></div></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			byRange
+		</span>
+					(<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">$UsuariosA</span>, <span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">$UsuariosB</span>, [<span class="var-type">$orderBy</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">null</span>], [<span class="var-type">$orden</span>&nbsp;<span class="var-name">$orden</span> = <span class="var-default">'ASC'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>
+				<span class="var-name">$UsuariosA</span><span class="var-description">: [$Usuarios] El objeto de tipo Usuarios</span>			</li>
+					<li>
+				<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>
+				<span class="var-name">$UsuariosB</span><span class="var-description">: [$Usuarios] El objeto de tipo Usuarios</span>			</li>
+					<li>
+				<span class="var-type">$orderBy</span>
+				<span class="var-name">$orderBy</span><span class="var-description">: Debe ser una cadena con el nombre de una columna en la base de datos.</span>			</li>
+					<li>
+				<span class="var-type">$orden</span>
+				<span class="var-name">$orden</span><span class="var-description">: 'ASC' o 'DESC' el default es 'ASC'</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methoddelete" id="delete"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static delete</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseUsuarios.dao.base.php.html#a502">502</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Eliminar registros.</p>
+<p class="description"><p>Eliminar registros.
+ Este metodo eliminara la informacion de base de datos identificados por la clave primaria en el objeto Usuarios suministrado. Una vez que se ha suprimido un objeto, este no puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> El numero de filas afectadas.</li>
+				<li><span class="field">throws:</span> Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">int</span>
+		<span class="method-name">
+			delete
+		</span>
+					(<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">&$Usuarios</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>
+				<span class="var-name">&$Usuarios</span><span class="var-description">: [$Usuarios] El objeto de tipo Usuarios a eliminar</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetAll" id="getAll"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static getAll</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseUsuarios.dao.base.php.html#a73">73</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Obtener todas las filas.</p>
+<p class="description"><p>Obtener todas las filas.
+ Esta funcion leera todos los contenidos de la tabla en la base de datos y construira un vector que contiene objetos de tipo <a href="../openjudge/Usuarios.html">Usuarios</a>. Tenga en cuenta que este metodo consumen enormes cantidades de recursos si la tabla tiene muchas filas. Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Un arreglo que contiene objetos del tipo <a href="../openjudge/Usuarios.html">Usuarios</a>.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">Array</span>
+		<span class="method-name">
+			getAll
+		</span>
+					([<span class="var-type">$pagina</span>&nbsp;<span class="var-name">$pagina</span> = <span class="var-default">NULL</span>], [<span class="var-type">$columnas_por_pagina</span>&nbsp;<span class="var-name">$columnas_por_pagina</span> = <span class="var-default">NULL</span>], [<span class="var-type">$orden</span>&nbsp;<span class="var-name">$orden</span> = <span class="var-default">NULL</span>], [<span class="var-type">$tipo_de_orden</span>&nbsp;<span class="var-name">$tipo_de_orden</span> = <span class="var-default">'ASC'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">$pagina</span>
+				<span class="var-name">$pagina</span><span class="var-description">: Pagina a ver.</span>			</li>
+					<li>
+				<span class="var-type">$columnas_por_pagina</span>
+				<span class="var-name">$columnas_por_pagina</span><span class="var-description">: Columnas por pagina.</span>			</li>
+					<li>
+				<span class="var-type">$orden</span>
+				<span class="var-name">$orden</span><span class="var-description">: Debe ser una cadena con el nombre de una columna en la base de datos.</span>			</li>
+					<li>
+				<span class="var-type">$tipo_de_orden</span>
+				<span class="var-name">$tipo_de_orden</span><span class="var-description">: 'ASC' o 'DESC' el default es 'ASC'</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetByPK" id="getByPK"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static getByPK</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseUsuarios.dao.base.php.html#a47">47</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Obtener <a href="../openjudge/Usuarios.html">Usuarios</a> por llave primaria.</p>
+<p class="description"><p>Obtener <a href="../openjudge/Usuarios.html">Usuarios</a> por llave primaria.
+ Este metodo cargara un objeto <a href="../openjudge/Usuarios.html">Usuarios</a> de la base de datos usando sus llaves primarias.</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Usuarios Un objeto del tipo <a href="../openjudge/Usuarios.html">Usuarios</a>. NULL si no hay tal registro.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">@link</span>
+		<span class="method-name">
+			getByPK
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$userID</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$userID</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsave" id="save"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static save</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseUsuarios.dao.base.php.html#a27">27</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Guardar registros.</p>
+<p class="description"><p>Guardar registros.
+	Este metodo guarda el estado actual del objeto <a href="../openjudge/Usuarios.html">Usuarios</a> pasado en la base de datos. La llave    primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves    primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando    en ese objeto el ID recien creado.</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> entero mayor o igual a cero denotando las filas afectadas.</li>
+				<li><span class="field">throws:</span> Exception si la operacion fallo.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">Un</span>
+		<span class="method-name">
+			save
+		</span>
+					(<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">&$Usuarios</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>
+				<span class="var-name">&$Usuarios</span><span class="var-description">: [$Usuarios] El objeto de tipo Usuarios</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsearch" id="search"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static search</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseUsuarios.dao.base.php.html#a116">116</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Buscar registros.</p>
+<p class="description"><p>Buscar registros.
+ Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos <a href="../openjudge/Usuarios.html">Usuarios</a> de la base de datos. Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
+ <div class="src-code"><ol><li><div class="src-line">&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
+<li><div class="src-line"><span class="src-doc">&nbsp;&nbsp;&nbsp;*&nbsp;Ejemplo&nbsp;de&nbsp;uso&nbsp;-&nbsp;buscar&nbsp;todos&nbsp;los&nbsp;clientes&nbsp;que&nbsp;tengan&nbsp;limite&nbsp;de&nbsp;credito&nbsp;igual&nbsp;a&nbsp;20000</span></div></li>
+<li><div class="src-line"><span class="src-doc">&nbsp;&nbsp;&nbsp;*/</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$cliente&nbsp;</span>=&nbsp;<span class="src-key">new&nbsp;</span><span class="src-id">Cliente</span><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$cliente</span><span class="src-sym">-&gt;</span><span class="src-id">setLimiteCredito</span><span class="src-sym">(</span><span class="src-str">&quot;20000&quot;</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$resultados&nbsp;</span>=&nbsp;<span class="src-id">ClienteDAO</span><span class="src-sym">::</span><span class="src-id">search</span><span class="src-sym">(</span><span class="src-var">$cliente</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;</div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">foreach</span><span class="src-sym">(</span><span class="src-var">$resultados&nbsp;</span><span class="src-key">as&nbsp;</span><span class="src-var">$c&nbsp;</span><span class="src-sym">)</span><span class="src-sym">{</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;<span class="src-var">$c</span><span class="src-sym">-&gt;</span><span class="src-id">getNombre</span><span class="src-sym">(</span><span class="src-sym">)&nbsp;</span>.&nbsp;<span class="src-str">&quot;&lt;br&gt;&quot;</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+</ol></div></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			search
+		</span>
+					(<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>&nbsp;<span class="var-name">$Usuarios</span>, [<span class="var-type">$orderBy</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">null</span>], [<span class="var-type">$orden</span>&nbsp;<span class="var-name">$orden</span> = <span class="var-default">'ASC'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../openjudge/Usuarios.html">Usuarios</a></span>
+				<span class="var-name">$Usuarios</span><span class="var-description">: [$Usuarios] El objeto de tipo Usuarios</span>			</li>
+					<li>
+				<span class="var-type">$orderBy</span>
+				<span class="var-name">$orderBy</span><span class="var-description">: Debe ser una cadena con el nombre de una columna en la base de datos.</span>			</li>
+					<li>
+				<span class="var-type">$orden</span>
+				<span class="var-name">$orden</span><span class="var-description">: 'ASC' o 'DESC' el default es 'ASC'</span>			</li>
+				</ul>
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../openjudge/DAO.html">DAO</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../openjudge/DAO.html#methodtransBegin">DAO::transBegin()</a></span><br>
+													<span class="method-name"><a href="../openjudge/DAO.html#methodtransEnd">DAO::transEnd()</a></span><br>
+													<span class="method-name"><a href="../openjudge/DAO.html#methodtransRollback">DAO::transRollback()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Wed, 29 Dec 2010 13:04:57 -0600 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

@@ -1,0 +1,63 @@
+Esta carpeta contiene:
+	dao
+	controllers
+	
+Ninguno de estos modulos deben de ser accessible al mundo exterior, el  unico que puede llamarlos es la interfaz de usuario. Es por eso que estan debajo de la carpeta www.
+
+la carpeta 'dao'contiene las clases para la capa de accesso a datos. tiene 2 cosas que hay que conocer, los data access objects y los value objects. los value objects (VO) no son mas que clases que se mapean directamente a cada una de las tablas de la base de datos. asi entonces, ahi dentro hay una clase denominada Usuarios, ya que hay una tabla con el mismo nombre. Esta clase tiene sus setters y getters para cada uno de los campos de la base de datos.
+
+tambien contiene los data access objects (dao) que son clases estaticas para cada una de las tablas tambien, y ellas sirven para hacer obtener y persistentes los objetos vo.
+
+ejemplo: buscar todas la ejecuciones del usuario con el mail de 'alanboy@acm.org'
+
+	// crear el objeto
+	$u = new Usuarios();
+	$u->setEmail( 'alanboy@acm.org' );
+
+
+	// busca los usuarios con ese email
+	$resultados = UsuariosDAO::search( $u );
+
+	if(sizeof($resultados) != 1){
+		die('Este email no existe en nuestros registros');
+	}
+
+	// de si existir, ahora $resultados en un arreglo 
+	// de objetos 'Usuarios' que tienen ese correo
+	// solo debe haber uno, asi que agarramos el 
+	// que esta en el index 0
+	$usuario = $resultados[0];
+
+	// ahora en $usuario hay un objeto Usuarios,
+	// ahora hay que buscar en los runs
+	$e = new Ejecuciones();
+	$e->setUsuarioID( $usuario->getUsuarioID() );
+	$resultados = EjecucionesDAO::search( $e );
+
+	// ahora $resultados es un arreglo con objetos 
+	// 'Ejecuciones' de ese usuario
+	foreach($resultados as $run){
+		echo "ID: " . $run->getEjecucionID() . "<br>";
+	}
+
+
+aqui hay mas info sobre dao's : http://www.ibm.com/developerworks/java/library/j-dao/
+
+ahora, sobre los controllers:
+los controllers es donde se hace la magina. el codigo anterior iria en un controller apropiado... habria un controller por cada modulo del juez... registro, login, envio de soluciones, mensajeria, etc  etc... el controller utiliza los dao's y vo's para hacer su magina, nunca llama a la base de datos directamente. los controllers tampoco imprimen cosas en la pagina, solo hacen la magia... 
+
+a los controllers los llama, ahora si... lo que esta arriba de www que llamare 'vista'. por ejemplo, asi se registra un usuario:
+
+el wey pide 'openjuan.com/registro.php' ese archivo es la vista. cuando el le da click en 'registrar' la vista le le pide al controller que registre a estos datos, el controller busca esos datos en la base de datos mediante dao's y vo's y luego el controller registra a ese wey mediante dao's y vo's y le dice a la vista que todo salio bien, y la vista le dice al usuario.
+
+de esta manera hemos separado perfectamente: 
+
+  dao/vo                   controller						vista
+los datos <----- ----> la logica del negocio <-----  ----->la interfaz de usuario
+
+algo asi :  http://www.symfony-project.org/images/jobeet/1_4/04/mvc.png 
+
+
+de esta manera... a la par de hacer nuestro pedo, estamos haciendo el API !! El api son los controllers !! 
+	
+
