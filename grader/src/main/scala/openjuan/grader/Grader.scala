@@ -48,7 +48,7 @@ object Grader {
 			}
 		};
 
-		val server = new Server(8080)
+		val server = new Server(21680)
 		server.setHandler(handler)
 		server.start()
 	}
