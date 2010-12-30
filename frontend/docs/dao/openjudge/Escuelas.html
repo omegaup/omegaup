@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Escuelas</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class Escuelas</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Value Object file for table Escuelas.</p>
+<p class="description"><p>Value Object file for table Escuelas.
+ VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Alan Gonzalez &lt;<a href="mailto:alan@caffeina.mx">alan@caffeina.mx</a>&gt;</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_base---Escuelas.vo.base.php.html">/base/Escuelas.vo.base.php</a> (line <span class="field"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a11">11</a></span>)
+		</p>
+		
+				
+		<pre><a href="../openjudge/VO.html">VO</a>
+   |
+   --Escuelas</pre>
+	
+			</div>
+</div>
+
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																								<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$escuelaID" title="details" class="var-name">$escuelaID</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$estadoID" title="details" class="var-name">$estadoID</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">varchar(50)</span>
+					<a href="#$nombre" title="details" class="var-name">$nombre</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																														
+				<div class="method-definition">
+											<span class="method-result"><a href="../openjudge/Escuelas.html">Escuelas</a></span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">NULL</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getEscuelaID" title="details" class="method-name">getEscuelaID</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getEstadoID" title="details" class="method-name">getEstadoID</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">varchar(50)</span>
+										<a href="#getNombre" title="details" class="method-name">getNombre</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setEscuelaID" title="details" class="method-name">setEscuelaID</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$escuelaID</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setEstadoID" title="details" class="method-name">setEstadoID</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$estadoID</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setNombre" title="details" class="method-name">setNombre</a>
+											(<span class="var-type">varchar(50)</span>&nbsp;<span class="var-name">$nombre</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">String</span>
+										<a href="#__toString" title="details" class="method-name">__toString</a>
+										()
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$escuelaID" id="$escuelaID"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$escuelaID</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a63">63</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">escuelaID</p>
+<p class="description"><p>escuelaID
+  [Campo no documentado]<br /> <strong>Llave Primaria</strong><br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$estadoID" id="$estadoID"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$estadoID</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a72">72</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">estadoID</p>
+<p class="description"><p>estadoID
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$nombre" id="$nombre"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">varchar(50)</span>
+			<span class="var-name">$nombre</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a81">81</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">nombre</p>
+<p class="description"><p>nombre
+  [Campo no documentado]<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a21">21</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Constructor de Escuelas
+ Para construir un objeto de tipo Escuelas debera llamarse a el constructor sin parametros. cuyos campos son iguales a las variables que constituyen a este objeto.</p>
+<p class="description"><p>Constructor de Escuelas
+ Para construir un objeto de tipo Escuelas debera llamarse a el constructor sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo cuyos campos son iguales a las variables que constituyen a este objeto.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../openjudge/Escuelas.html">Escuelas</a></span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">NULL</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$data</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetEscuelaID" id="getEscuelaID"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getEscuelaID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a89">89</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getEscuelaID</p>
+<p class="description"><p>getEscuelaID
+ Get the <em>escuelaID</em> property for this object. Donde <em>escuelaID</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getEscuelaID
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetEstadoID" id="getEstadoID"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getEstadoID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a115">115</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getEstadoID</p>
+<p class="description"><p>getEstadoID
+ Get the <em>estadoID</em> property for this object. Donde <em>estadoID</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getEstadoID
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetNombre" id="getNombre"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getNombre</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a139">139</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getNombre</p>
+<p class="description"><p>getNombre
+ Get the <em>nombre</em> property for this object. Donde <em>nombre</em> es  [Campo no documentado]</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">varchar(50)</span>
+		<span class="method-name">
+			getNombre
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodsetEscuelaID" id="setEscuelaID"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setEscuelaID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a104">104</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setEscuelaID( $escuelaID )
+ Set the <em>escuelaID</em> property for this object.</p>
+<p class="description"><p>setEscuelaID( $escuelaID )
+ Set the <em>escuelaID</em> property for this object. Donde <em>escuelaID</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>escuelaID</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo. <br /><br />Esta propiedad se mapea con un campo que es una <strong>Llave Primaria</strong> !<br /> No deberias usar setEscuelaID( ) a menos que sepas exactamente lo que estas haciendo.<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setEscuelaID
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$escuelaID</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$escuelaID</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetEstadoID" id="setEstadoID"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setEstadoID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a128">128</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setEstadoID( $estadoID )
+ Set the <em>estadoID</em> property for this object.</p>
+<p class="description"><p>setEstadoID( $estadoID )
+ Set the <em>estadoID</em> property for this object. Donde <em>estadoID</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>estadoID</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setEstadoID
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$estadoID</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$estadoID</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetNombre" id="setNombre"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setNombre</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a152">152</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setNombre( $nombre )
+ Set the <em>nombre</em> property for this object.</p>
+<p class="description"><p>setNombre( $nombre )
+ Set the <em>nombre</em> property for this object. Donde <em>nombre</em> es  [Campo no documentado]. Una validacion basica se hara aqui para comprobar que <em>nombre</em> es de tipo <em>varchar(50)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setNombre
+		</span>
+					(<span class="var-type">varchar(50)</span>&nbsp;<span class="var-name">$nombre</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">varchar(50)</span>
+				<span class="var-name">$nombre</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__toString" id="__toString"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">__toString</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseEscuelas.vo.base.php.html#a44">44</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Obtener una representacion en String
+ Este metodo permite tratar a un objeto Escuelas en forma de cadena.</p>
+<p class="description"><p>Obtener una representacion en String
+ Este metodo permite tratar a un objeto Escuelas en forma de cadena. La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">String</span>
+		<span class="method-name">
+			__toString
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../openjudge/VO.html">VO</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../openjudge/VO.html#methodasArray">VO::asArray()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Wed, 29 Dec 2010 13:04:42 -0600 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

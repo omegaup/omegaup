@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class CambioPass</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class CambioPass</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Value Object file for table CambioPass.</p>
+<p class="description"><p>Value Object file for table CambioPass.
+ VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Alan Gonzalez &lt;<a href="mailto:alan@caffeina.mx">alan@caffeina.mx</a>&gt;</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_base---CambioPass.vo.base.php.html">/base/CambioPass.vo.base.php</a> (line <span class="field"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a11">11</a></span>)
+		</p>
+		
+				
+		<pre><a href="../openjudge/VO.html">VO</a>
+   |
+   --CambioPass</pre>
+	
+			</div>
+</div>
+
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																<div class="var-title">
+					<span class="var-type">timestamp</span>
+					<a href="#$expiracion" title="details" class="var-name">$expiracion</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">char(15)</span>
+					<a href="#$ip" title="details" class="var-name">$ip</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">char(64)</span>
+					<a href="#$token" title="details" class="var-name">$token</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">int(11)</span>
+					<a href="#$userID" title="details" class="var-name">$userID</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																														
+				<div class="method-definition">
+											<span class="method-result"><a href="../openjudge/CambioPass.html">CambioPass</a></span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">NULL</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">timestamp</span>
+										<a href="#getExpiracion" title="details" class="method-name">getExpiracion</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">char(15)</span>
+										<a href="#getIp" title="details" class="method-name">getIp</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">char(64)</span>
+										<a href="#getToken" title="details" class="method-name">getToken</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">int(11)</span>
+										<a href="#getUserID" title="details" class="method-name">getUserID</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setExpiracion" title="details" class="method-name">setExpiracion</a>
+											(<span class="var-type">timestamp</span>&nbsp;<span class="var-name">$expiracion</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setIp" title="details" class="method-name">setIp</a>
+											(<span class="var-type">char(15)</span>&nbsp;<span class="var-name">$ip</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setToken" title="details" class="method-name">setToken</a>
+											(<span class="var-type">char(64)</span>&nbsp;<span class="var-name">$token</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setUserID" title="details" class="method-name">setUserID</a>
+											(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$userID</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">String</span>
+										<a href="#__toString" title="details" class="method-name">__toString</a>
+										()
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$expiracion" id="$expiracion"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">timestamp</span>
+			<span class="var-name">$expiracion</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a94">94</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">expiracion</p>
+<p class="description"><p>expiracion
+ La fecha en que vence este token<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$ip" id="$ip"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">char(15)</span>
+			<span class="var-name">$ip</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a85">85</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">ip</p>
+<p class="description"><p>ip
+ El ip desde donde se genero este reseteo de password<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$token" id="$token"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">char(64)</span>
+			<span class="var-name">$token</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a76">76</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">token</p>
+<p class="description"><p>token
+ El token que se genera aleatoriamente para luego comparar cuando el usuario haga click en el link<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$userID" id="$userID"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">int(11)</span>
+			<span class="var-name">$userID</span>
+						(line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a67">67</a></span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">userID</p>
+<p class="description"><p>userID
+ Identificador de a que usuario pertenece este token<br /> <strong>Llave Primaria</strong><br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a21">21</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Constructor de CambioPass
+ Para construir un objeto de tipo CambioPass debera llamarse a el constructor sin parametros. cuyos campos son iguales a las variables que constituyen a este objeto.</p>
+<p class="description"><p>Constructor de CambioPass
+ Para construir un objeto de tipo CambioPass debera llamarse a el constructor sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo cuyos campos son iguales a las variables que constituyen a este objeto.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../openjudge/CambioPass.html">CambioPass</a></span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">NULL</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$data</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetExpiracion" id="getExpiracion"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getExpiracion</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a176">176</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getExpiracion</p>
+<p class="description"><p>getExpiracion
+ Get the <em>expiracion</em> property for this object. Donde <em>expiracion</em> es La fecha en que vence este token</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">timestamp</span>
+		<span class="method-name">
+			getExpiracion
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetIp" id="getIp"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getIp</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a152">152</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getIp</p>
+<p class="description"><p>getIp
+ Get the <em>ip</em> property for this object. Donde <em>ip</em> es El ip desde donde se genero este reseteo de password</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">char(15)</span>
+		<span class="method-name">
+			getIp
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetToken" id="getToken"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getToken</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a128">128</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getToken</p>
+<p class="description"><p>getToken
+ Get the <em>token</em> property for this object. Donde <em>token</em> es El token que se genera aleatoriamente para luego comparar cuando el usuario haga click en el link</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">char(64)</span>
+		<span class="method-name">
+			getToken
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetUserID" id="getUserID"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getUserID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a102">102</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getUserID</p>
+<p class="description"><p>getUserID
+ Get the <em>userID</em> property for this object. Donde <em>userID</em> es Identificador de a que usuario pertenece este token</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int(11)</span>
+		<span class="method-name">
+			getUserID
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodsetExpiracion" id="setExpiracion"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setExpiracion</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a189">189</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setExpiracion( $expiracion )
+ Set the <em>expiracion</em> property for this object.</p>
+<p class="description"><p>setExpiracion( $expiracion )
+ Set the <em>expiracion</em> property for this object. Donde <em>expiracion</em> es La fecha en que vence este token. Una validacion basica se hara aqui para comprobar que <em>expiracion</em> es de tipo <em>timestamp</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setExpiracion
+		</span>
+					(<span class="var-type">timestamp</span>&nbsp;<span class="var-name">$expiracion</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">timestamp</span>
+				<span class="var-name">$expiracion</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetIp" id="setIp"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setIp</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a165">165</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setIp( $ip )
+ Set the <em>ip</em> property for this object.</p>
+<p class="description"><p>setIp( $ip )
+ Set the <em>ip</em> property for this object. Donde <em>ip</em> es El ip desde donde se genero este reseteo de password. Una validacion basica se hara aqui para comprobar que <em>ip</em> es de tipo <em>char(15)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setIp
+		</span>
+					(<span class="var-type">char(15)</span>&nbsp;<span class="var-name">$ip</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">char(15)</span>
+				<span class="var-name">$ip</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetToken" id="setToken"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setToken</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a141">141</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setToken( $token )
+ Set the <em>token</em> property for this object.</p>
+<p class="description"><p>setToken( $token )
+ Set the <em>token</em> property for this object. Donde <em>token</em> es El token que se genera aleatoriamente para luego comparar cuando el usuario haga click en el link. Una validacion basica se hara aqui para comprobar que <em>token</em> es de tipo <em>char(64)</em>. Si esta validacion falla, se arrojara... algo.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setToken
+		</span>
+					(<span class="var-type">char(64)</span>&nbsp;<span class="var-name">$token</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">char(64)</span>
+				<span class="var-name">$token</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetUserID" id="setUserID"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">setUserID</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a117">117</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">setUserID( $userID )
+ Set the <em>userID</em> property for this object.</p>
+<p class="description"><p>setUserID( $userID )
+ Set the <em>userID</em> property for this object. Donde <em>userID</em> es Identificador de a que usuario pertenece este token. Una validacion basica se hara aqui para comprobar que <em>userID</em> es de tipo <em>int(11)</em>. Si esta validacion falla, se arrojara... algo. <br /><br />Esta propiedad se mapea con un campo que es una <strong>Llave Primaria</strong> !<br /> No deberias usar setUserID( ) a menos que sepas exactamente lo que estas haciendo.<br /></p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setUserID
+		</span>
+					(<span class="var-type">int(11)</span>&nbsp;<span class="var-name">$userID</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int(11)</span>
+				<span class="var-name">$userID</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__toString" id="__toString"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">__toString</span> (line <span class="line-number"><a href="../__filesource/fsource_openjudge__baseCambioPass.vo.base.php.html#a47">47</a></span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Obtener una representacion en String
+ Este metodo permite tratar a un objeto CambioPass en forma de cadena.</p>
+<p class="description"><p>Obtener una representacion en String
+ Este metodo permite tratar a un objeto CambioPass en forma de cadena. La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">String</span>
+		<span class="method-name">
+			__toString
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../openjudge/VO.html">VO</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../openjudge/VO.html#methodasArray">VO::asArray()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Wed, 29 Dec 2010 13:04:33 -0600 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>
