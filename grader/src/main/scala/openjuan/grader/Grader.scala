@@ -1,11 +1,55 @@
 package openjuan.grader
 
+import java.io._
+import javax.servlet._
+import javax.servlet.http._
+import org.mortbay.jetty._
+import org.mortbay.jetty.handler._
+import net.liftweb.json._
+
 object Grader {
-	def judge(id: Int) = {
+	def grade(id: Int): GraderOutputMessage = {
+		println("Judging " + id)
 		
+		new GraderOutputMessage()
 	}
 	
 	def main(args: Array[String]) = {
-		println("Hello, World!")
+		val handler = new AbstractHandler() {
+			@throws(classOf[IOException])
+			@throws(classOf[ServletException])
+			def handle(target: String, request: HttpServletRequest, response: HttpServletResponse, dispatch: Int) = {
+				implicit val formats = Serialization.formats(NoTypeHints)
+				
+				request.getPathInfo() match {
+					case "/grader/" => {
+						response.setContentType("text/json")
+						
+						Serialization.write[GraderOutputMessage, PrintWriter](
+							try {
+								val req = Serialization.read[GraderInputMessage](request.getReader())
+								response.setStatus(HttpServletResponse.SC_OK)
+								Grader.grade(req.id)
+							} catch {
+								case e: Exception => {
+									response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
+									new GraderOutputMessage(status = "error", error = Some(e.getMessage))
+								}
+							},
+							response.getWriter()
+						)
+					}
+					case _ => {
+						response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+					}
+				}
+				
+				request.asInstanceOf[Request].setHandled(true)
+			}
+		};
+
+		val server = new Server(8080)
+		server.setHandler(handler)
+		server.start()
 	}
 }

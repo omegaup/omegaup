@@ -6,7 +6,7 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 
 	override def proguardOptions = List(
 		"-keepclasseswithmembers public class * { public static void main(java.lang.String[]); }",
-		"-dontoptimize",
+		"-dontobfuscate",
 		proguardKeepLimitedSerializability,
 		"-keep interface scala.ScalaObject"
 	)
@@ -14,6 +14,9 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 	override def libraryDependencies = Set(
 		"org.squeryl" % "squeryl_2.8.1" % "0.9.4-RC3",
 		"mysql" % "mysql-connector-java" % "5.1.12",
-		"org.mortbay.jetty" % "jetty" % "6.1.26"
+		"org.mortbay.jetty" % "jetty" % "6.1.26",
+		"net.liftweb" % "lift-json_2.8.1" % "2.2-RC5"
 	) ++ super.libraryDependencies
+	
+	val scalatest = "org.scalatest" % "scalatest" % "1.2"
 }
