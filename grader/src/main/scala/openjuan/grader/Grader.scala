@@ -5,16 +5,28 @@ import javax.servlet._
 import javax.servlet.http._
 import org.mortbay.jetty._
 import org.mortbay.jetty.handler._
+import org.squeryl._
+import org.squeryl.PrimitiveTypeMode._
 import net.liftweb.json._
+import openjuan._
 
 object Grader {
 	def grade(id: Int): GraderOutputMessage = {
 		println("Judging " + id)
 		
+		from(GraderData.ejecuciones)(e => where(e.id === id) select(e)).map{println(_)}
+		
 		new GraderOutputMessage()
 	}
 	
 	def main(args: Array[String]) = {
+		
+		Class.forName("com.mysql.jdbc.Driver")
+		SessionFactory.concreteFactory = Some(()=>
+			Session.create(
+				java.sql.DriverManager.getConnection(Config.get("db.url", "jdbc:mysql://localhost/openjuan"), Config.get("db.user", "openjuan"), Config.get("db.passwd", "")),
+				new org.squeryl.adapters.MySQLAdapter))
+
 		val handler = new AbstractHandler() {
 			@throws(classOf[IOException])
 			@throws(classOf[ServletException])
