@@ -1,6 +1,10 @@
 package openjuan
 
+import java.io._
+import java.net._
+import org.slf4j.{Logger, LoggerFactory}
 import net.liftweb.json._
+import javax.net.ssl._
 
 object Config {
 	private val props = new java.util.Properties()
@@ -9,7 +13,7 @@ object Config {
 	def get[T](propname: String, default: T): T = {
 		props.getProperty(propname) match {
 			case null => default
-			case y:Any => y match {
+			case ans:Any => default match {
 				case x:String  => ans.asInstanceOf[T]
 				case x:Int     => ans.toInt.asInstanceOf[T]
 				case x:Boolean => (ans == "true").asInstanceOf[T]
@@ -60,5 +64,30 @@ class EnumerationWrapper[T](enumeration:java.util.Enumeration[T]) extends Iterat
 	
 	implicit def enumerationToEnumerationWrapper[T](enumeration:java.util.Enumeration[T]):EnumerationWrapper[T] = {
 		new EnumerationWrapper(enumeration)
+	}
+}
+
+object Https extends Object with Log {
+	val socketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
+
+	HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+		def verify(hostname:String, session:SSLSession) = {
+			debug("Verifying {}", hostname)
+			true
+		}
+	})
+	
+	def send[T, W <: AnyRef](url:String, request:W)(implicit mf: Manifest[T]):T = {
+		debug("Requesting {}", url)
+		
+		implicit val formats = Serialization.formats(NoTypeHints)
+		
+		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
+		conn.setSSLSocketFactory(socketFactory)
+		val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
+		Serialization.write[W, PrintWriter](request, writer)
+		writer.close()
+		
+		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
 	}
 }
