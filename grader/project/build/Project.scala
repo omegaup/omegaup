@@ -16,7 +16,7 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 		"mysql" % "mysql-connector-java" % "5.1.12",
 		"org.mortbay.jetty" % "jetty" % "6.1.26",
 		"net.liftweb" % "lift-json_2.8.1" % "2.2-RC5",
-		"org.clapper" %% "grizzled-slf4j" % "0.3.2"
+		"org.slf4j" % "slf4j-api" % "1.6.1" % "compile"
 	) ++ super.libraryDependencies
 	
 	val scalatest = "org.scalatest" % "scalatest" % "1.2"
