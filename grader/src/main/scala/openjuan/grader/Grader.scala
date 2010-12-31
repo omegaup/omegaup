@@ -60,7 +60,7 @@ object Grader {
 			}
 		};
 
-		val server = new Server(21680)
+		val server = new Server(Config.get[Int]("grader.port", 21680))
 		server.setHandler(handler)
 		server.start()
 	}
