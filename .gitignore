@@ -3,6 +3,11 @@
 # Ignore classes
 *.class
 
+# Ignore SSL-related stuff
+*.jks
+*.crt
+*.key
+
 # SBT-related stuff
 target/
 lib_managed/
