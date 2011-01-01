@@ -12,7 +12,7 @@ import openjuan._
 
 object Grader extends Object with Log {
 	def grade(id: Int): GradeOutputMessage = {
-		println("Judging " + id)
+		info("Judging {}", id)
 		
 		from(GraderData.ejecuciones)(e => where(e.id === id) select(e)).map{println(_)}
 		
@@ -20,6 +20,14 @@ object Grader extends Object with Log {
 	}
 	
 	def register(host: String, port: Int): RegisterOutputMessage = {
+		info("Registering {}:{}", host, port)
+		
+		new RegisterOutputMessage()
+	}
+	
+	def deregister(host: String, port: Int): RegisterOutputMessage = {
+		info("De-registering {}:{}", host, port)
+		
 		new RegisterOutputMessage()
 	}
 	
@@ -64,6 +72,18 @@ object Grader extends Object with Log {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
 							Grader.register(request.getRemoteAddr, req.port)
+						} catch {
+							case e: Exception => {
+								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
+								new RegisterOutputMessage(status = "error", error = Some(e.getMessage))
+							}
+						}
+					}
+					case "/deregister/" => {
+						try {
+							val req = Serialization.read[RegisterInputMessage](request.getReader())
+							response.setStatus(HttpServletResponse.SC_OK)
+							Grader.deregister(request.getRemoteAddr, req.port)
 						} catch {
 							case e: Exception => {
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
