@@ -7,10 +7,9 @@ if [ "bin" == "$(basename `pwd`)" ]; then
 	cd ..
 fi
 
-rm grader/openjuan.jks
-rm runner/openjuan.jks
-mkdir ssl
-rm ssl/*
+if [ -f grader/openjuan.jks ]; then rm grader/openjuan.jks; fi
+if [ -f runner/openjuan.jks ]; then rm runner/openjuan.jks; fi
+if [ -d ssl ]; then rm ssl/*; else mkdir ssl; fi
 
 $OPENSSL genrsa -out ssl/openjuan-ca.key 4096
 $OPENSSL req -new -subj '/C=MX/CN=OpenJuan Certificate Authority' -x509 -days 3650 -key ssl/openjuan-ca.key -out ssl/openjuan-ca.crt
