@@ -84,6 +84,7 @@ object Https extends Object with Log {
 		
 		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
 		conn.setSSLSocketFactory(socketFactory)
+		conn.setDoOutput(true)
 		val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
 		Serialization.write[W, PrintWriter](request, writer)
 		writer.close()
