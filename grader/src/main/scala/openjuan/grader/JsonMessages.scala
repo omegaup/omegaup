@@ -1,4 +1,7 @@
 package openjuan.grader
 
-case class GraderInputMessage(id: Int)
-case class GraderOutputMessage(status: String = "ok", error: Option[String] = None)
+case class GradeInputMessage(id: Int)
+case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
+case class RegisterInputMessage(port: Int)
+case class RegisterOutputMessage(status: String = "ok", error: Option[String] = None)
+case class NullMessage()
