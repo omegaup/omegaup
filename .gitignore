@@ -2,6 +2,8 @@
 *.o
 # Ignore classes
 *.class
+# Ignore properties
+*.properties
 
 # Ignore SSL-related stuff
 *.jks
