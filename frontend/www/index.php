@@ -5,4 +5,4 @@
 	
 ?>
 
-<h1>Welcome to OpenJuan !</h1>
+<h1>Welcome to OmegaUp !</h1>

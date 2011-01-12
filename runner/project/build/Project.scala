@@ -2,7 +2,7 @@ import sbt._
 class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProject {
 	override def proguardInJars = super.proguardInJars +++ scalaLibraryPath
 	
-	override def mainClass = Some("openjuan.runner.Runner")
+	override def mainClass = Some("omegaup.runner.Runner")
 
 	override def proguardOptions = List(
 		"-keepclasseswithmembers public class * { public static void main(java.lang.String[]); }",

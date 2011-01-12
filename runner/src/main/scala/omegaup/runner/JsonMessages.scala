@@ -1,4 +1,4 @@
-package openjuan.runner
+package omegaup.runner
 
 case class RunCaseResult(name: String, status: String, time: Int, memory: Int, output: Option[String] = None)
 case class CaseData(name: String, data: String)

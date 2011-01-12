@@ -1,4 +1,4 @@
-package openjuan.runner
+package omegaup.runner
 
 import java.io._
 import javax.servlet._
@@ -6,7 +6,7 @@ import javax.servlet.http._
 import org.mortbay.jetty._
 import org.mortbay.jetty.handler._
 import net.liftweb.json._
-import openjuan._
+import omegaup._
 
 object Runner extends Object with Log {
 	def compile(lang: String, code: List[String]): CompileOutputMessage = {
@@ -15,10 +15,10 @@ object Runner extends Object with Log {
 	
 	def main(args: Array[String]) = {
 		// Setting keystore properties
-		System.setProperty("javax.net.ssl.keyStore", Config.get("runner.keystore", "openjuan.jks"))
-		System.setProperty("javax.net.ssl.trustStore", Config.get("runner.truststore", "openjuan.jks"))
-		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("runner.keystore.password", "openjuan"))
-		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("runner.truststore.password", "openjuan"))
+		System.setProperty("javax.net.ssl.keyStore", Config.get("runner.keystore", "omegaup.jks"))
+		System.setProperty("javax.net.ssl.trustStore", Config.get("runner.truststore", "omegaup.jks"))
+		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("runner.keystore.password", "omegaup"))
+		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("runner.truststore.password", "omegaup"))
 
 		// the handler
 		val handler = new AbstractHandler() {
@@ -57,11 +57,11 @@ object Runner extends Object with Log {
 		
 		val runnerConnector = new org.mortbay.jetty.security.SslSelectChannelConnector
 		runnerConnector.setPort(Config.get("runner.port", 0))
-		runnerConnector.setKeystore(Config.get("runner.keystore", "openjuan.jks"))
-		runnerConnector.setPassword(Config.get("runner.password", "openjuan"))
-		runnerConnector.setKeyPassword(Config.get("runner.keystore.password", "openjuan"))
-		runnerConnector.setTruststore(Config.get("runner.truststore", "openjuan.jks"))
-		runnerConnector.setTrustPassword(Config.get("runner.truststore.password", "openjuan"))
+		runnerConnector.setKeystore(Config.get("runner.keystore", "omegaup.jks"))
+		runnerConnector.setPassword(Config.get("runner.password", "omegaup"))
+		runnerConnector.setKeyPassword(Config.get("runner.keystore.password", "omegaup"))
+		runnerConnector.setTruststore(Config.get("runner.truststore", "omegaup.jks"))
+		runnerConnector.setTrustPassword(Config.get("runner.truststore.password", "omegaup"))
 		runnerConnector.setNeedClientAuth(true)
 		
 		server.setConnectors(List(runnerConnector).toArray)

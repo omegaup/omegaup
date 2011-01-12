@@ -1,4 +1,4 @@
-import openjuan._
+import omegaup._
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers

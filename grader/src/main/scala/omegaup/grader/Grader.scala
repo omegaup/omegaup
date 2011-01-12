@@ -1,4 +1,4 @@
-package openjuan.grader
+package omegaup.grader
 
 import java.io._
 import javax.servlet._
@@ -8,7 +8,7 @@ import org.mortbay.jetty.handler._
 import org.squeryl._
 import org.squeryl.PrimitiveTypeMode._
 import net.liftweb.json._
-import openjuan._
+import omegaup._
 
 object Grader extends Object with Log {
 	def grade(id: Int): GradeOutputMessage = {
@@ -33,16 +33,16 @@ object Grader extends Object with Log {
 	
 	def main(args: Array[String]) = {
 		// Setting keystore properties
-		System.setProperty("javax.net.ssl.keyStore", Config.get("grader.keystore", "openjuan.jks"))
-		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "openjuan.jks"))
-		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("grader.keystore.password", "openjuan"))
-		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "openjuan"))
+		System.setProperty("javax.net.ssl.keyStore", Config.get("grader.keystore", "omegaup.jks"))
+		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "omegaup.jks"))
+		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("grader.keystore.password", "omegaup"))
+		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
 		
 		// Loading SQL connector driver
 		Class.forName("com.mysql.jdbc.Driver")
 		SessionFactory.concreteFactory = Some(()=>
 			Session.create(
-				java.sql.DriverManager.getConnection(Config.get("db.url", "jdbc:mysql://localhost/openjuan"), Config.get("db.user", "openjuan"), Config.get("db.passwd", "")),
+				java.sql.DriverManager.getConnection(Config.get("db.url", "jdbc:mysql://localhost/omegaup"), Config.get("db.user", "omegaup"), Config.get("db.passwd", "")),
 				new org.squeryl.adapters.MySQLAdapter))
 
 		// the handler
@@ -106,11 +106,11 @@ object Grader extends Object with Log {
 		
 		val runnerConnector = new org.mortbay.jetty.security.SslSelectChannelConnector
 		runnerConnector.setPort(Config.get[Int]("grader.port", 21680))
-		runnerConnector.setKeystore(Config.get[String]("grader.keystore", "openjuan.jks"))
-		runnerConnector.setPassword(Config.get[String]("grader.password", "openjuan"))
-		runnerConnector.setKeyPassword(Config.get[String]("grader.keystore.password", "openjuan"))
-		runnerConnector.setTruststore(Config.get[String]("grader.truststore", "openjuan.jks"))
-		runnerConnector.setTrustPassword(Config.get[String]("grader.truststore.password", "openjuan"))
+		runnerConnector.setKeystore(Config.get[String]("grader.keystore", "omegaup.jks"))
+		runnerConnector.setPassword(Config.get[String]("grader.password", "omegaup"))
+		runnerConnector.setKeyPassword(Config.get[String]("grader.keystore.password", "omegaup"))
+		runnerConnector.setTruststore(Config.get[String]("grader.truststore", "omegaup.jks"))
+		runnerConnector.setTrustPassword(Config.get[String]("grader.truststore.password", "omegaup"))
 		runnerConnector.setNeedClientAuth(true)
 		
 		server.setConnectors(List(runnerConnector).toArray)

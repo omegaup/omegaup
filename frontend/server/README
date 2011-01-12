@@ -48,7 +48,7 @@ los controllers es donde se hace la magina. el codigo anterior iria en un contro
 
 a los controllers los llama, ahora si... lo que esta arriba de www que llamare 'vista'. por ejemplo, asi se registra un usuario:
 
-el wey pide 'openjuan.com/registro.php' ese archivo es la vista. cuando el le da click en 'registrar' la vista le le pide al controller que registre a estos datos, el controller busca esos datos en la base de datos mediante dao's y vo's y luego el controller registra a ese wey mediante dao's y vo's y le dice a la vista que todo salio bien, y la vista le dice al usuario.
+el wey pide 'omegaup.com/registro.php' ese archivo es la vista. cuando el le da click en 'registrar' la vista le le pide al controller que registre a estos datos, el controller busca esos datos en la base de datos mediante dao's y vo's y luego el controller registra a ese wey mediante dao's y vo's y le dice a la vista que todo salio bien, y la vista le dice al usuario.
 
 de esta manera hemos separado perfectamente: 
 

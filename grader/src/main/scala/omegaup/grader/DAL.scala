@@ -1,4 +1,4 @@
-package openjuan.grader
+package omegaup.grader
 
 import java.sql._
 import org.squeryl._

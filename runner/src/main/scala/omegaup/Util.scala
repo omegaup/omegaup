@@ -1,4 +1,4 @@
-package openjuan
+package omegaup
 
 import java.io._
 import java.net._
@@ -8,7 +8,7 @@ import javax.net.ssl._
 
 object Config {
 	private val props = new java.util.Properties()
-	props.load(new java.io.FileInputStream("openjuan.properties"))
+	props.load(new java.io.FileInputStream("omegaup.properties"))
 	
 	def get[T](propname: String, default: T): T = {
 		props.getProperty(propname) match {

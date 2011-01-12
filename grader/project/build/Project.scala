@@ -2,7 +2,7 @@ import sbt._
 class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProject {
 	override def proguardInJars = super.proguardInJars +++ scalaLibraryPath
 	
-	override def mainClass = Some("openjuan.grader.Grader")
+	override def mainClass = Some("omegaup.grader.Grader")
 
 	override def proguardOptions = List(
 		"-keepclasseswithmembers public class * { public static void main(java.lang.String[]); }",
