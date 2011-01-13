@@ -2,6 +2,7 @@ package omegaup.grader
 
 import java.sql._
 import org.squeryl._
+import org.squeryl.dsl._
 import org.squeryl.annotations._
 import org.squeryl.PrimitiveTypeMode._
 
@@ -61,6 +62,15 @@ import Estado._
 import Servidor._
 import Lenguaje._
 
+object GraderData extends Schema {
+	val problemas = table[Problema]("Problemas")
+	val ejecuciones = table[Ejecucion]("Ejecuciones")
+	
+	val problemasEjecuciones =
+		oneToManyRelation(problemas, ejecuciones).
+		via((p,e) => p.id === e.problemaID)
+}
+
 class Problema(
 	@Column("problemaID")
 	val id: Int,
@@ -76,9 +86,11 @@ class Problema(
 	val vistas: Int,
 	val envios: Int,
 	val aceptados: Int,
-	val dificultad: Double) {
+	val dificultad: Double) extends KeyedEntity[Int] {
 	
 	def this() = this(0, 0, 0, "", None, Validador.TokenNumeric, None, None, Some(3000), Some(64), 0, 0, 0, 0);
+	
+	lazy val ejecuciones: OneToMany[Ejecucion] = GraderData.problemasEjecuciones.left(this)
 }
 
 class Ejecucion(
@@ -86,8 +98,7 @@ class Ejecucion(
 	val id: Int,
 	@Column("usuarioID")
 	val usuario: Int,
-	@Column("problemaID")
-	val problema: Int,
+	val problemaID: Int,
 	@Column("concursoID")
 	val concurso: Option[Int],
 	val guid: String,
@@ -98,9 +109,7 @@ class Ejecucion(
 	val memoria: Int,
 	val puntuacion: Double,
 	val ip: String,
-	val fecha: Timestamp) {}
-
-object GraderData extends Schema {
-	val problemas = table[Problema]("Problemas")
-	val ejecuciones = table[Ejecucion]("Ejecuciones")
+	val fecha: Timestamp) extends KeyedEntity[Int] {
+	
+	lazy val problema: ManyToOne[Problema] = GraderData.problemasEjecuciones.right(this)
 }

@@ -14,7 +14,7 @@ object Grader extends Object with Log {
 	def grade(id: Int): GradeOutputMessage = {
 		info("Judging {}", id)
 		
-		from(GraderData.ejecuciones)(e => where(e.id === id) select(e)).map{println(_)}
+		println( GraderData.ejecuciones.where(_.id === id).single )
 		
 		new GradeOutputMessage()
 	}
@@ -42,8 +42,14 @@ object Grader extends Object with Log {
 		Class.forName("com.mysql.jdbc.Driver")
 		SessionFactory.concreteFactory = Some(()=>
 			Session.create(
-				java.sql.DriverManager.getConnection(Config.get("db.url", "jdbc:mysql://localhost/omegaup"), Config.get("db.user", "omegaup"), Config.get("db.passwd", "")),
-				new org.squeryl.adapters.MySQLAdapter))
+				java.sql.DriverManager.getConnection(
+					Config.get("db.url", "jdbc:mysql://localhost/omegaup"),
+					Config.get("db.user", "omegaup"),
+					Config.get("db.passwd", "")
+				),
+				new org.squeryl.adapters.MySQLAdapter
+			)
+		)
 
 		// the handler
 		val handler = new AbstractHandler() {
