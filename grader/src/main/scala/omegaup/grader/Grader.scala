@@ -14,9 +14,16 @@ object Grader extends Object with Log {
 	def grade(id: Int): GradeOutputMessage = {
 		info("Judging {}", id)
 		
-		println( GraderData.ejecuciones.where(_.id === id).single )
+		transaction {
+			val ejecucion = GraderData.ejecuciones.where(_.id === id)
 		
-		new GradeOutputMessage()
+			if ( ejecucion.isEmpty ) {
+				throw new IllegalArgumentException("Id " + id + " not found")
+			} else {
+				println(ejecucion)
+				new GradeOutputMessage()
+			}
+		}
 	}
 	
 	def register(host: String, port: Int): RegisterOutputMessage = {
@@ -45,7 +52,7 @@ object Grader extends Object with Log {
 				java.sql.DriverManager.getConnection(
 					Config.get("db.url", "jdbc:mysql://localhost/omegaup"),
 					Config.get("db.user", "omegaup"),
-					Config.get("db.passwd", "")
+					Config.get("db.password", "")
 				),
 				new org.squeryl.adapters.MySQLAdapter
 			)
@@ -61,12 +68,16 @@ object Grader extends Object with Log {
 				response.setContentType("text/json")
 				
 				Serialization.write(request.getPathInfo() match {
-					case "/grader/" => {
+					case "/grade/" => {
 						try {
 							val req = Serialization.read[GradeInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
 							Grader.grade(req.id)
 						} catch {
+							case e: IllegalArgumentException => {
+								response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+								new GradeOutputMessage(status = "error", error = Some(e.getMessage))
+							}
 							case e: Exception => {
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 								new GradeOutputMessage(status = "error", error = Some(e.getMessage))

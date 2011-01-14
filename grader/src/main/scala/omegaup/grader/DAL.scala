@@ -32,7 +32,7 @@ object Lenguaje extends Enumeration {
 	val  Python = Value(4, "py")
 	val  Ruby = Value(5, "rb")
 	val  Perl = Value(6, "pl")
-	val  CSharp = Value(6, "cs")
+	val  CSharp = Value(7, "cs")
 }
 
 object Estado extends Enumeration {
@@ -51,9 +51,9 @@ object Veredicto extends Enumeration {
 	val  PresentationError = Value(3, "PE")
 	val  RuntimeError = Value(4, "RTE")
 	val  MemoryLimitExceeded = Value(5, "MLE")
-	val  TimeLimitExceeded = Value(5, "TLE")
-	val  RestrictedFunctionError = Value(5, "RFE")
-	val  JudgeError = Value(5, "JE")
+	val  TimeLimitExceeded = Value(6, "TLE")
+	val  RestrictedFunctionError = Value(7, "RFE")
+	val  JudgeError = Value(8, "JE")
 }
 
 import Validador._
@@ -73,43 +73,45 @@ object GraderData extends Schema {
 
 class Problema(
 	@Column("problemaID")
-	val id: Int,
-	val publico: Int,
-	val autor: Int,
+	val id: Long,
+	val publico: Long,
+	val autor: Long,
 	val titulo: String,
 	val alias: Option[String],
 	val validador: Validador,
 	val servidor: Option[Servidor],
 	val id_remoto: Option[String],
-	val tiempo_limite: Option[Int],
-	val memoria_limite: Option[Int],
-	val vistas: Int,
-	val envios: Int,
-	val aceptados: Int,
-	val dificultad: Double) extends KeyedEntity[Int] {
+	val tiempo_limite: Option[Long],
+	val memoria_limite: Option[Long],
+	val vistas: Long,
+	val envios: Long,
+	val aceptados: Long,
+	val dificultad: Double) extends KeyedEntity[Long] {
 	
-	def this() = this(0, 0, 0, "", None, Validador.TokenNumeric, None, None, Some(3000), Some(64), 0, 0, 0, 0);
+	def this() = this(0L, 1L, 0L, "", Some(""), Validador.TokenNumeric, Some(Servidor.UVa), Some(""), Some(3000), Some(64), 0, 0, 0, 0);
 	
 	lazy val ejecuciones: OneToMany[Ejecucion] = GraderData.problemasEjecuciones.left(this)
 }
 
 class Ejecucion(
 	@Column("ejecucionID")
-	val id: Int,
+	val id: Long,
 	@Column("usuarioID")
-	val usuario: Int,
-	val problemaID: Int,
+	val usuario: Long,
+	val problemaID: Long,
 	@Column("concursoID")
-	val concurso: Option[Int],
+	val concurso: Option[Long],
 	val guid: String,
 	val lenguaje: Lenguaje,
 	val estado: Estado,
 	val veredicto: Veredicto,
-	val tiempo: Int,
-	val memoria: Int,
+	val tiempo: Long,
+	val memoria: Long,
 	val puntuacion: Double,
 	val ip: String,
-	val fecha: Timestamp) extends KeyedEntity[Int] {
+	val fecha: Timestamp) extends KeyedEntity[Long] {
+	
+	def this() = this(0, 0, 0, Some(0L), "", Lenguaje.C, Estado.Nuevo, Veredicto.JudgeError, 0, 0, 0, "", new Timestamp(0))
 	
 	lazy val problema: ManyToOne[Problema] = GraderData.problemasEjecuciones.right(this)
 }
