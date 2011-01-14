@@ -5,6 +5,7 @@ import java.net._
 import org.slf4j.{Logger, LoggerFactory}
 import net.liftweb.json._
 import javax.net.ssl._
+import org.mortbay.jetty.client.{HttpClient, ContentExchange}
 
 object Config {
 	private val props = new java.util.Properties()
@@ -90,5 +91,90 @@ object Https extends Object with Log {
 		writer.close()
 		
 		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+	}
+}
+
+object Http extends Object with Log {
+	val client = new HttpClient()
+	client.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL)
+	
+	try {
+		client.start();
+	} catch {
+		case e: Exception => error(e.getMessage)
+	}
+	
+	def send(url: String, callback: (String)=>Unit, data: Map[String,_] = null): Unit = {
+		val exchange = new ContentExchange() {
+			@throws(classOf[IOException])
+			protected override def onResponseComplete: Unit = {
+				super.onResponseComplete()
+				error(this.getResponseContent())
+				callback(this.getResponseContent())
+			}
+		}
+		
+		exchange.addRequestHeader("User-Agent", "acm.lhchavez.com")
+		if (data == null) {
+			exchange.setMethod("GET")
+		} else {
+			exchange.setMethod("POST")
+			exchange.addRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+			error((for ((k, v) <- data) yield URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v.toString, "UTF-8") ).mkString("&"))
+			exchange.setRequestContent(
+				new org.mortbay.io.ByteArrayBuffer(
+					(for ((k, v) <- data) yield URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v.toString, "UTF-8") ).mkString("&")
+				)
+			)
+		}
+		exchange.setURL(url)
+
+		client.send(exchange)
+		
+		exchange.waitForDone
+	}
+	
+	def send_wait(url: String, data: Map[String,_] = null): String = {
+		val exchange = new ContentExchange()
+		
+		exchange.addRequestHeader("User-Agent", "acm.lhchavez.com")
+		if (data == null) {
+			exchange.setMethod("GET")
+		} else {
+			exchange.setMethod("POST")
+			exchange.addRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+
+			exchange.setRequestContent(
+				new org.mortbay.io.ByteArrayBuffer(
+					(for ((k, v) <- data) yield URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v.toString, "UTF-8") ).mkString("&")
+				)
+			)
+		}
+		exchange.setURL(url)
+
+		client.send(exchange)
+		
+		exchange.waitForDone
+		exchange.getResponseContent
+	}
+}
+
+object FileUtil {
+	@throws(classOf[IOException])
+	def read(file: String): String = {
+		val contents = new StringBuilder
+		
+		val fileReader = new BufferedReader(new FileReader(file))
+		var line: String = null
+	
+		while( { line = fileReader.readLine(); line != null} ) {
+			line = fileReader.readLine()
+			contents.append(line)
+			contents.append("\n")
+		}
+		
+		fileReader.close()
+		
+		contents.toString
 	}
 }

@@ -33,6 +33,7 @@ object Lenguaje extends Enumeration {
 	val  Ruby = Value(5, "rb")
 	val  Perl = Value(6, "pl")
 	val  CSharp = Value(7, "cs")
+	val  Pascal = Value(8, "p")
 }
 
 object Estado extends Enumeration {
@@ -51,9 +52,11 @@ object Veredicto extends Enumeration {
 	val  PresentationError = Value(3, "PE")
 	val  RuntimeError = Value(4, "RTE")
 	val  MemoryLimitExceeded = Value(5, "MLE")
-	val  TimeLimitExceeded = Value(6, "TLE")
-	val  RestrictedFunctionError = Value(7, "RFE")
-	val  JudgeError = Value(8, "JE")
+	val  OutputLimitExceeded = Value(6, "OLE")
+	val  TimeLimitExceeded = Value(7, "TLE")
+	val  RestrictedFunctionError = Value(8, "RFE")
+	val  CompileError = Value(9, "CE")
+	val  JudgeError = Value(10, "JE")
 }
 
 import Validador._
