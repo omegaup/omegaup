@@ -30,3 +30,11 @@ rm ssl/runner.csr
 /usr/bin/keytool -importkeystore -srckeystore ssl/runner.p12 -srcstoretype pkcs12 -srcstorepass omegaup -srcalias "OmegaUp Runner" -destkeystore runner/omegaup.jks -deststoretype jks -deststorepass omegaup
 /usr/bin/keytool -importcert -alias "OmegaUp Certificate Authority" -noprompt -trustcacerts -keystore runner/omegaup.jks -storepass omegaup -file ssl/omegaup-ca.crt
 rm ssl/runner.p12 ssl/runner.key ssl/runner.crt
+
+/usr/bin/openssl genrsa -out ssl/frontend.key 1024
+/usr/bin/openssl req -new -subj "/C=MX/CN=OmegaUp Frontend" -key ssl/frontend.key -out ssl/frontend.csr
+/usr/bin/openssl x509 -req -days 3650 -in ssl/frontend.csr -CA ssl/omegaup-ca.crt -CAkey ssl/omegaup-ca.key -set_serial 3 -out ssl/frontend.crt
+rm ssl/frontend.csr
+
+cat ssl/frontend.key ssl/frontend.crt ssl/omegaup-ca.crt > frontend/omegaup.pem
+rm ssl/frontend.key ssl/frontend.crt
