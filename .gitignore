@@ -1,5 +1,6 @@
 # Ignore objects
 *.o
+sandbox/box
 # Ignore classes
 *.class
 # Ignore properties
