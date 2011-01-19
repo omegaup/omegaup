@@ -1,0 +1,112 @@
+
+
+/* browser reset by the godfather (meyerweb.com/eric/tools/css/reset/) w/ help from Richard Clark (html5doctor.com/html-5-reset-stylesheet) */
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, menu, time, mark, audio, video { margin: 0; padding: 0; border: 0; outline: 0;	font-size: 100%; vertical-align: baseline; background: transparent; }
+article, aside, figure, footer, header, hgroup, nav, section { display:block; }
+nav ul { list-style:none; }
+blockquote, q { quotes: none; }
+blockquote:before, blockquote:after,
+q:before, q:after { content:''; content:none; }
+a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
+del { text-decoration: line-through; }
+abbr[title], dfn[title] { border-bottom:1px dotted #000; cursor:help; }
+ins { text-decoration: none; }
+table { border-collapse: collapse; border-spacing: 0; }
+hr { display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 0; padding:0; }
+input, select { vertical-align:middle; }
+
+/* courtesy YUI Library: developer.yahoo.com/yui/ */
+body { font-size:13px; *font-size:small; *font:x-small; line-height:1.22; }
+
+/* clear the floats */
+.clear { display: inline-block; }   
+.clear:after, .container:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+* html .clear { height: 1%; }
+.clear { display: block; }
+
+/* cool ideas from html5 boilerplate: html5boilerplate.com/ */
+h1,h2,h3,h4,h5,h6 { font-weight: bold; text-rendering: optimizeLegibility; margin-bottom:.5em; }
+html { -webkit-font-smoothing: antialiased; }
+input[type="radio"] { vertical-align: text-bottom; }
+input[type="checkbox"] { vertical-align: bottom; *vertical-align: baseline; }
+.ie6 input { vertical-align: text-bottom; }
+label, input[type=button], input[type=submit], button { cursor: pointer; }
+button {  width: auto; overflow: visible; }
+#printLogo, .hide { display:none; visibility:hidden; } /* hide from browser & screenreader */
+.browserHide { position:absolute !important; clip: rect(1px 1px 1px 1px); clip: rect(1px, 1px, 1px, 1px); } /* hide from browser, not screenreader */
+.inv { visibility: hidden; } /* hide from screenreader, not browser */
+
+/* my styles, partial credit to blueprint CSS: blueprintcss.org/ */
+a:focus, a:active, a:hover { outline:none; text-decoration:underline; }
+a 			{ color:#4059A9; text-decoration:none; }
+p 			{ margin: 0 0 1.5em; line-height:1.5em; }
+h1			{ font-size:2em; }
+h2			{ font-size:1.6em; }
+h3			{ font-size:1.2em; }
+h4			{ font-size:1.1em; }
+ul, ol 		{ margin:0 1.5em 1.5em 2em; line-height:1.5em; }
+ul 			{ list-style-type:disc; }
+ol 			{ list-style-type:decimal; }
+li 			{ margin:.3em 0; }
+dl 			{ margin:0 0 1.5em 0; }
+dl dt, strong { font-weight:bold; }
+em,dfn      { font-style: italic; }
+dfn         { font-weight: bold; font-style: italic; }
+pre,code    { margin: 1.5em 0; white-space:pre; white-space: pre-wrap; white-space: pre-line; word-wrap: break-word; }
+pre,code,tt { font: 1em 'andale mono', 'monotype.com', 'lucida console', monospace; line-height: 1.5; } 
+tt          { display: block; margin: 1.5em 0; line-height: 1.5; }
+.replace	{ display:block; text-indent:-9000px; overflow:hidden; }
+.floatLeft   { float:left; }
+.floatRight  { float:right; }
+img.floatLeft { margin:0 1.2em .5em 0; }
+img.floatRight { margin:0 0 .5em 1.2em; }
+
+/* tables */
+table   { margin-bottom: 1.5em; }
+th      { border-bottom: 1px solid #ccc; font-weight: bold; }
+td      { border-bottom: 1px solid #ccc; }
+th,td   { padding: .5em 1em; }
+caption { background: #ffc; }
+
+/* forms */
+label { font-weight: bold; }
+fieldset    { margin: 0; width:auto; }
+legend      { font-weight: bold; font-size:1.2em; }
+fieldset ul { list-style:none; }
+fieldset li label { float:left; clear:right; width:125px; }
+fieldset li input { width: 200px; margin:0; }
+fieldset li textarea { width: 300px; height: 200px;  padding:5px; font-size:1em; }
+
+/* print styles based on the lovely Hartija CSS Print Framework http://code.google.com/p/hartija/ */
+@media print {
+	header, footer { display:none; }
+	#printLogo { display:block;	float:none;	}
+	#wrap { background: none; }
+	body { width:100% !important; margin:0 !important; padding:0 !important; line-height: 1.5; word-spacing:1.1pt; letter-spacing:0.2pt; font-family: Garamond,"Times New Roman", serif; color: #000; background: none; font-size: 9pt; }
+
+	/* text */
+	h1,h2,h3,h4,h5,h6 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+	h1 { font-size:16pt; }
+	h2 { font-size:14pt; }
+	h3 { font-size:12pt; }
+	h4,h5,h6 { font-size:11pt; }
+	code { font: 9pt "Courier New", Monaco, Courier, monospace; } 
+	blockquote { margin: 1.5em; padding: 1em;  font-size: 9pt; }
+	hr { background-color: #ccc; }
+	a:link, a:visited { background: transparent; color:#666; text-decoration: underline; }
+	a:link:after, a:visited:after { content: " (" attr(href) ") "; font-size: 90%; }
+	a[href^="/"]:after { content: " (http://www.domain.com" attr(href) ") "; }
+
+	/* tables */
+	table { margin: 1px; text-align:left; }
+	th { border-bottom: 1px solid #333;  font-weight: bold; }
+	td { border-bottom: 1px solid #333; }
+	th,td { padding: 4px 10px 4px 0; }
+	tfoot { font-style: italic; }
+	caption { background: #fff; margin-bottom:2em; text-align:left; }
+	thead {display: table-header-group;}
+	tr {page-break-inside: avoid;} 
+
+	/* blog comments */
+	#comments {	page-break-before: always; }
+}
