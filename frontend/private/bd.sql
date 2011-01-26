@@ -502,6 +502,74 @@ DEFAULT CHARACTER SET = utf8
 COMMENT = 'Se guardan las clarificaciones, con un campo (Publicacble) que indica si la clarificación se publica a la banda en general o sólo le aparece al concursante que la creó.';
 
 
+-- -----------------------------------------------------
+-- Table `omegaup`.`Badges`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Badges` (
+  `idBadges` INT(11) NOT NULL ,
+  `nombre` VARCHAR(45) NOT NULL DEFAULT 'MyBadge' ,
+  `imgurl` VARCHAR(45) NOT NULL ,
+  `descripcion` VARCHAR(500) NOT NULL COMMENT 'La descripcion habla de como se obtuvo el badge, de forma corta.' ,
+  `tip` VARCHAR(100) NULL COMMENT 'Tip de como desbloquear el badge.' ,
+  PRIMARY KEY (`idBadges`) )
+ENGINE = MyISAM
+COMMENT = 'Esta tabla guarda la informacion de cada uno de los badges.';
+
+
+-- -----------------------------------------------------
+-- Table `omegaup`.`BadgesProblemas`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `omegaup`.`BadgesProblemas` (
+  `idBadge` INT(11) NOT NULL ,
+  `idProblema` INT(11) NOT NULL ,
+  PRIMARY KEY (`idBadge`, `idProblema`) ,
+  INDEX `idBadge` (`idBadge` ASC) ,
+  INDEX `idProblema` (`idProblema` ASC) ,
+  CONSTRAINT `idBadge`
+    FOREIGN KEY (`idBadge` )
+    REFERENCES `omegaup`.`Badges` (`idBadges` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `idProblema`
+    FOREIGN KEY (`idProblema` )
+    REFERENCES `omegaup`.`Problemas` (`problemaID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = MyISAM
+COMMENT = 'Incluye la relación entre 1 badge y los problemas que hay que resolver para desbloquearlo. ';
+
+
+-- -----------------------------------------------------
+-- Table `omegaup`.`BadgesConcursantes`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `omegaup`.`BadgesConcursantes` (
+  `idBadge` INT(11) NOT NULL ,
+  `idConcursante` INT(11) NOT NULL ,
+  `timestamp` TIMESTAMP NOT NULL ,
+  `idUltimoProblema` INT(11) NOT NULL COMMENT 'Este campo guarda el ultimo problema que logro que se desbloqueara el badge, just for fun.' ,
+  PRIMARY KEY (`idBadge`, `idConcursante`) ,
+  INDEX `idBadge` (`idBadge` ASC) ,
+  INDEX `idConcursante` (`idConcursante` ASC) ,
+  INDEX `idUltimoProblema` (`idUltimoProblema` ASC) ,
+  CONSTRAINT `idBadge`
+    FOREIGN KEY (`idBadge` )
+    REFERENCES `omegaup`.`Badges` (`idBadges` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `idConcursante`
+    FOREIGN KEY (`idConcursante` )
+    REFERENCES `omegaup`.`Usuarios` (`userID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `idUltimoProblema`
+    FOREIGN KEY (`idUltimoProblema` )
+    REFERENCES `omegaup`.`Problemas` (`problemaID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = MyISAM
+COMMENT = 'Esta tabla guarda los badges que han sido desbloqueados por un concursante.';
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
