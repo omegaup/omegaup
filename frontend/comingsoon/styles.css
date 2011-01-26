@@ -1,0 +1,126 @@
+
+body {
+	font-family: "Trebuchet MS", "Lucida Sans", Helvetica, Arial, sans-serif;
+	background:url(gradient.png) repeat-x 0 0,
+			   url(bg.png) repeat 0 0;
+}
+
+body.no-multiplebgs {
+	background:url(bg.png) repeat 0 0;
+}
+
+.wrap {
+	position:relative;
+	text-align:center;
+	width:960px;
+	margin:0 auto;
+	color:#373534;
+}
+
+h1 {
+	padding-top:88px;
+	width:550px;
+	height:212px;
+	margin:0 auto .3em auto;
+	background:url(logo.png) no-repeat 0 88px;
+}
+
+span.complete {
+	position:absolute;
+	display:block;
+	top:0;
+	right:8px;
+	width:105px;
+	height:106px;
+	font-size:3.3em;
+	color:#fff;
+	letter-spacing:-1px;
+	font-family:Georgia, "Times New Roman", Times, serif;
+	background:url(complete.png);
+}
+
+span.complete span {
+	position:relative;
+	top:-11px;
+	font-size:.4em;
+}
+
+span.complete em {
+	display:none;
+}
+
+h3 {
+	font-size:1.9em;
+	font-weight:normal;
+	margin-bottom:.8em;
+}
+
+h4 {
+	font-size:1.7em;
+	line-height:1.4em;
+	font-weight:normal;
+	margin:1em 0 3em 0;
+}
+
+h4 strong {
+	display:block;
+}
+
+form {
+	position:relative;
+	width:519px;
+	height:65px;
+	margin:0 auto 5em auto;
+	background:url(signup.png) no-repeat top left;
+}
+
+input#MERGE0 {
+	position:absolute;
+	top:6px;
+	left:8px;
+	width:360px;
+	font-size:2em;
+	border-radius:8px;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;
+	border:0;
+	padding:7px 0 7px 15px;
+	color:#A19E99;
+}
+
+input#signup {
+	position:absolute;
+	right:7px;
+	top:7px;
+	width:122px;
+	height:48px;
+	text-indent:-9000px;
+	border:0;
+	background:none;
+}
+
+footer {
+	padding:1.5em 0;
+	background:#F4F3F2;
+	
+}
+
+footer .wrap {
+	font-size:1.1em;
+	color:#707070;
+	width:520px;
+	line-height:24px;
+	text-align:right;
+}
+
+p {
+	display:inline;
+	text-align:left;
+}
+
+a.tw {
+	/* float:right; */
+	padding-right:42px;
+	background:url(tweet.png) no-repeat top right;
+	padding-bottom:5px;
+}
