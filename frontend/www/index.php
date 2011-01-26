@@ -1,8 +1,9 @@
 <?php
 
-	require_once('../server/config.php');
-	//require_once('../server/dao/model.inc.php');
-	
-?>
+	require_once( "../server/inc/bootstrap.php" );
 
-<h1>Welcome to OmegaUp !</h1>
+	echo GUI::getHeader();
+	
+	
+	echo GUI::getFooter();
+?>
