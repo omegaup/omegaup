@@ -100,17 +100,18 @@ input#signup {
 }
 
 footer {
+
 	padding:1.5em 0;
 	background:#F4F3F2;
 	
 }
 
 footer .wrap {
-	font-size:1.1em;
-	color:#707070;
-	width:520px;
-	line-height:24px;
-	text-align:right;
+	color: #707070;
+	font-size: 1.1em;
+	line-height: 24px;
+	text-align: left;
+	width: 520px;
 }
 
 p {
@@ -119,7 +120,7 @@ p {
 }
 
 a.tw {
-	/* float:right; */
+	float:right; 
 	padding-right:42px;
 	background:url(tweet.png) no-repeat top right;
 	padding-bottom:5px;
