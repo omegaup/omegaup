@@ -3,6 +3,7 @@ body {
 	font-family: "Trebuchet MS", "Lucida Sans", Helvetica, Arial, sans-serif;
 	background:url(gradient.png) repeat-x 0 0,
 			   url(bg.png) repeat 0 0;
+			   
 }
 
 body.no-multiplebgs {
