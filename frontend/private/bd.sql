@@ -506,7 +506,7 @@ COMMENT = 'Se guardan las clarificaciones, con un campo (Publicacble) que indica
 -- Table `omegaup`.`Badges`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Badges` (
-  `idBadges` INT(11) NOT NULL ,
+  `idBadges` INT(11) NOT NULL AUTO_INCREMENT ,
   `nombre` VARCHAR(45) NOT NULL DEFAULT 'MyBadge' ,
   `imgurl` VARCHAR(45) NOT NULL ,
   `descripcion` VARCHAR(500) NOT NULL COMMENT 'La descripcion habla de como se obtuvo el badge, de forma corta.' ,
