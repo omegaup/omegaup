@@ -154,7 +154,6 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`CambioPass` (
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
--- COMMENT = 'Cuando alguien solicita un nuevo password, se genera un token, se guarda aqui, y se le envia por correo electronico. Si coinciden despues cuando el haga click en el link, si el token es igual a este, entonces si viene de su correo, y procederemos a cambiar al pass. Agregue una fecha para invalidar reseteos despues de cierto tiempo.';
 
 
 -- -----------------------------------------------------
@@ -183,7 +182,6 @@ COMMENT = 'Sistema de mensajería dentro del sitio.';
 -- -----------------------------------------------------
 -- Table `omegaup`.`Problemas`
 -- -----------------------------------------------------
-
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Problemas` (
   `problemaID` INT(11) NOT NULL AUTO_INCREMENT ,
   `publico` TINYINT(1) NOT NULL DEFAULT '1' ,
@@ -200,7 +198,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problemas` (
   `aceptados` INT(11) NOT NULL DEFAULT '0' ,
   `dificultad` DOUBLE NOT NULL DEFAULT '0' ,
   `fechaDeCreacion` DATETIME NOT NULL ,
-  `fuente` VARCHAR(256) NULL ,
+  `fuente` VARCHAR(256) NULL DEFAULT NULL ,
   PRIMARY KEY (`problemaID`) ,
   INDEX `autorID` (`autorID` ASC) ,
   CONSTRAINT `autorID`
@@ -210,8 +208,8 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problemas` (
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
 AUTO_INCREMENT = 1
-DEFAULT CHARACTER SET = utf8;
--- COMMENT = 'Se creará un registro por cada problema que se importe de un juez externo, para beneficiar la estabilidad de las foreign keys en ProblemasConcurso; en el campo servidor se guardará la referencia para obtener la redacción.';
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'Se creará un registro por cada problema que se importe de un juez externo, para beneficiar la estabilidad de las foreign keys en ProblemasConcurso; en el campo servidor se guardará la referencia para obtener la redacción';
 
 
 -- -----------------------------------------------------
@@ -226,7 +224,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Concursos` (
   `estilo` ENUM('icpc','anpa','topcoder','codejam') NOT NULL DEFAULT 'icpc' COMMENT 'Estilo de este concurso. Si es repetición, debe ser el mismo que el original' ,
   `creadorID` INT(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso' ,
   `repeticionID` INT(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso' ,
-  `abierto` TINYINT(1)  NOT NULL DEFAULT TRUE COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso' ,
+  `abierto` TINYINT(1) NOT NULL DEFAULT TRUE COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso' ,
   PRIMARY KEY (`concursoID`) ,
   INDEX `creadorID` (`creadorID` ASC) ,
   INDEX `repeticionID` (`concursoID` ASC) ,
@@ -290,7 +288,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Ejecuciones` (
   PRIMARY KEY (`ejecucionID`) ,
   INDEX `usuarioID` (`usuarioID` ASC) ,
   INDEX `problemaID` (`problemaID` ASC) ,
-  INDEX `concursoID` () ,
+  INDEX `concursoID` (`concursoID` ASC) ,
   CONSTRAINT `usuarioID`
     FOREIGN KEY (`usuarioID` )
     REFERENCES `omegaup`.`Usuarios` (`userID` )
@@ -299,6 +297,11 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Ejecuciones` (
   CONSTRAINT `problemaID`
     FOREIGN KEY (`problemaID` )
     REFERENCES `omegaup`.`Problemas` (`problemaID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `concursoID`
+    FOREIGN KEY (`concursoID` )
+    REFERENCES `omegaup`.`Concursos` (`concursoID` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -312,9 +315,9 @@ COMMENT = 'Estado de todas las ejecuciones.';
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `omegaup`.`CoderDelMes` (
   `coderID` INT(11) NOT NULL AUTO_INCREMENT ,
-  `descripcion` TINYTEXT NULL ,
-  `fecha` DATE NOT NULL DEFAULT 1000-01-01 COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.' ,
-  `entrevistaURL` VARCHAR(256) NULL COMMENT 'Para linekar a un post del blog con entrevistas.' ,
+  `descripcion` TINYTEXT NULL DEFAULT NULL ,
+  `fecha` DATE NOT NULL DEFAULT '1-Jan-2000' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.' ,
+  `entrevistaURL` VARCHAR(256) NULL DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.' ,
   PRIMARY KEY (`coderID`) ,
   INDEX `coderDelMesID` (`coderID` ASC) ,
   CONSTRAINT `coderDelMesID`
@@ -381,7 +384,7 @@ COMMENT = 'Problemas favoritos de los usuarios';
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Tags` (
   `tagID` INT(11) NOT NULL AUTO_INCREMENT ,
   `nombre` VARCHAR(45) NOT NULL ,
-  `descripcion` TINYTEXT NULL ,
+  `descripcion` TINYTEXT NULL DEFAULT NULL ,
   PRIMARY KEY (`tagID`) )
 ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8
@@ -418,7 +421,7 @@ COMMENT = 'Guarda la relacion entre Problemas y sus Tags';
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Idiomas` (
   `idiomaID` INT(11) NOT NULL AUTO_INCREMENT ,
   `nombre` VARCHAR(45) NOT NULL ,
-  `paisID` INT(11) NULL COMMENT 'Se guarda la relación con el país para defaultear más rápido.' ,
+  `paisID` INT(11) NULL DEFAULT NULL COMMENT 'Se guarda la relación con el país para defaultear más rápido.' ,
   PRIMARY KEY (`idiomaID`) ,
   UNIQUE INDEX `nombre_UNIQUE` (`nombre` ASC) ,
   INDEX `paisID` (`paisID` ASC) ,
@@ -459,8 +462,8 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`ProblemasIdiomas` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = utf8;
---COMMENT = 'Se crea un registro aquí por cada idioma que tenga el problema. Las traducciones viven en el filesystem y no en la bdd.';
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'Se crea un registro aquí por cada idioma que tenga el problema. Las traducciones viven en el filesystem y no en la bdd.';
 
 
 -- -----------------------------------------------------
@@ -471,10 +474,10 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Clarificaciones` (
   `autorID` INT(11) NOT NULL COMMENT 'Autor de la clarificación.' ,
   `mensaje` TEXT NOT NULL ,
   `respuesta` TEXT NOT NULL ,
-  `fecha` TIMESTAMP NOT NULL DEFAULT 0000-00-00 00:00:00 ,
+  `fecha` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' ,
   `problemaID` INT(11) NOT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema.' ,
-  `concursoID` INT(11) NULL COMMENT 'Puede ser nulo si la clarificacion no se da en un concurso.' ,
-  `publicable` TINYINT(1)  NOT NULL DEFAULT FALSE COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ' ,
+  `concursoID` INT(11) NULL DEFAULT NULL COMMENT 'Puede ser nulo si la clarificacion no se da en un concurso.' ,
+  `publicable` TINYINT(1) NOT NULL DEFAULT FALSE COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ' ,
   PRIMARY KEY (`clarificacionID`) ,
   INDEX `problemaID` (`problemaID` ASC) ,
   INDEX `concursoID` (`concursoID` ASC) ,
@@ -495,8 +498,8 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Clarificaciones` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = utf8;
---COMMENT = 'Se guardan las clarificaciones, con un campo (Publicacble) que indica si la clarificación se publica a la banda en general o sólo le aparece al concursante que la creó.';
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'Se guardan las clarificaciones, con un campo (Publicacble) que indica si la clarificación se publica a la banda en general o sólo le aparece al concursante que la creó.';
 
 
 
