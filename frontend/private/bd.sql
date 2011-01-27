@@ -209,7 +209,8 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problemas` (
 ENGINE = MyISAM
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
-COMMENT = 'Se creará un registro por cada problema que se importe de un juez externo, para beneficiar la estabilidad de las foreign keys en ProblemasConcurso; en el campo servidor se guardará la referencia para obtener la redacción';
+COMMENT = 'Se crea un registro por cada prob externo.';
+
 
 
 -- -----------------------------------------------------
@@ -219,8 +220,8 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Concursos` (
   `concursoID` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador unico para cada concurso' ,
   `titulo` VARCHAR(256) NOT NULL COMMENT 'El titulo que aparecera en cada concurso' ,
   `descripcion` TINYTEXT NOT NULL COMMENT 'Una breve descripcion de cada concurso.' ,
-  `inicio` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora de inicio de este concurso' ,
-  `final` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora de finalizacion de este concurso' ,
+  `inicio` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Hora de inicio de este concurso' ,
+  `final` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Hora de finalizacion de este concurso' ,
   `estilo` ENUM('icpc','anpa','topcoder','codejam') NOT NULL DEFAULT 'icpc' COMMENT 'Estilo de este concurso. Si es repetición, debe ser el mismo que el original' ,
   `creadorID` INT(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso' ,
   `repeticionID` INT(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso' ,
@@ -316,7 +317,7 @@ COMMENT = 'Estado de todas las ejecuciones.';
 CREATE  TABLE IF NOT EXISTS `omegaup`.`CoderDelMes` (
   `coderID` INT(11) NOT NULL AUTO_INCREMENT ,
   `descripcion` TINYTEXT NULL DEFAULT NULL ,
-  `fecha` DATE NOT NULL DEFAULT '1-Jan-2000' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.' ,
+  `fecha` DATE NOT NULL DEFAULT '2000/01/01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.' ,
   `entrevistaURL` VARCHAR(256) NULL DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.' ,
   PRIMARY KEY (`coderID`) ,
   INDEX `coderDelMesID` (`coderID` ASC) ,
@@ -463,7 +464,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`ProblemasIdiomas` (
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8
-COMMENT = 'Se crea un registro aquí por cada idioma que tenga el problema. Las traducciones viven en el filesystem y no en la bdd.';
+COMMENT = 'Las traducciones viven en el filesystem y no en la bdd.';
 
 
 -- -----------------------------------------------------
@@ -474,7 +475,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Clarificaciones` (
   `autorID` INT(11) NOT NULL COMMENT 'Autor de la clarificación.' ,
   `mensaje` TEXT NOT NULL ,
   `respuesta` TEXT NOT NULL ,
-  `fecha` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' ,
+  `fecha` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `problemaID` INT(11) NOT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema.' ,
   `concursoID` INT(11) NULL DEFAULT NULL COMMENT 'Puede ser nulo si la clarificacion no se da en un concurso.' ,
   `publicable` TINYINT(1) NOT NULL DEFAULT FALSE COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ' ,
@@ -499,7 +500,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Clarificaciones` (
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8
-COMMENT = 'Se guardan las clarificaciones, con un campo (Publicacble) que indica si la clarificación se publica a la banda en general o sólo le aparece al concursante que la creó.';
+COMMENT = 'Se guardan las clarificaciones.';
 
 
 -- -----------------------------------------------------
@@ -536,7 +537,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`BadgesProblemas` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
-COMMENT = 'Incluye la relación entre 1 badge y los problemas que hay que resolver para desbloquearlo. ';
+COMMENT = 'Relación entre 1 badge y los problemas que lo desbloqueaan.';
 
 
 -- -----------------------------------------------------
@@ -567,7 +568,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`BadgesConcursantes` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
-COMMENT = 'Esta tabla guarda los badges que han sido desbloqueados por un concursante.';
+COMMENT = 'Guarda los badges que han sido desbloqueados.';
 
 
 
