@@ -9,6 +9,9 @@ import org.squeryl._
 import org.squeryl.PrimitiveTypeMode._
 import net.liftweb.json._
 import omegaup._
+import Lenguaje._
+
+case class Submission(id: Int, lang: Lenguaje, pid: Int, code: String)
 
 object Grader extends Object with Log {
 	def grade(id: Int): GradeOutputMessage = {

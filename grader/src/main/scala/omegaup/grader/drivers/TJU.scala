@@ -10,8 +10,6 @@ import Lenguaje._
 import Veredicto._
 import Estado._
 
-case class Submission(id: Int, lang: Lenguaje, pid: Int, code: String)
-
 object TJU extends Actor with Log {
 	val submit_url = "http://acm.tju.edu.cn/toj/submit_process.php"
 	val status_url = "http://acm.tju.edu.cn/toj/status.php?user=" + Config.get("driver.tju.user", "omegaup")
