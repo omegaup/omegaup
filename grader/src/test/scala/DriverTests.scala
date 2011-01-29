@@ -10,7 +10,8 @@ import org.scalatest.matchers.ShouldMatchers
 class DriverSpec extends FlatSpec with ShouldMatchers {
 
 	"TJUdriver" should "submit" in {
-		TJU.submit(Lenguaje.C, 2231, """#include <stdio.h>
+		TJU.start
+		TJU !? Submission(-1, Lenguaje.C, 2231, """#include <stdio.h>
 
 int numbers[20];
 
@@ -40,5 +41,4 @@ int main() {
 	return 0;
 }""")
 	}
-	
 }
