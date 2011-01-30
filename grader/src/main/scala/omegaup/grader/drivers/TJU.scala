@@ -24,6 +24,7 @@ object TJU extends Actor with Log {
 			case _ => -1
 		}
 	}
+	private var last_submission:Long = 0
 	private val status_mapping = Map(
 		"Received" ->			Estado.Espera,
 		"Compiling"->			Estado.Compilando,
@@ -45,6 +46,10 @@ object TJU extends Actor with Log {
 		while(true) {
 			receive {
 				case Submission(id: Int, lang: Lenguaje, pid: Int, code: String) => {
+					val time_delta = 10000 - (java.lang.System.currentTimeMillis() - last_submission)
+					if(time_delta > 0)
+						try { Thread.sleep(time_delta) }
+					
 					info("TJU Submission {} for problem {}", id, pid)
 		
 					val post_data = Map(
@@ -62,28 +67,27 @@ object TJU extends Actor with Log {
 					
 					debug("TJU Sending data: {}", post_data)
 
-					val response = try {
+					try {
 						val data = Http.send_wait(submit_url, data = post_data)
 						if(!data.contains("Your source code has been submitted")) {
 							throw new Exception("Invalid response:\n" + data)
 						}
-						readVeredict(5)
+						readVeredict(id)
 					} catch {
 						case e: Exception => {
 							error("TJU Submission {} failed for problem {}", id, pid)
 							error(e.getMessage)
-							(Estado.Listo, Some(Veredicto.JudgeError), 0, 0)
+							Grader.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 						}
 					}
 					
-					info("TJU Submission {} finished with veredict {}", id, response)
+					last_submission = java.lang.System.currentTimeMillis()
 				}
 			}
 		}
 	}
 	
-	@throws(classOf[IOException])
-	private def readVeredict(triesLeft: Int): (Estado, Option[Veredicto], Double, Int) = {
+	private def readVeredict(id: Int, triesLeft: Int = 5): Unit = {
 		if (triesLeft == 0)
 			throw new Exception("Retry limit exceeded")
 			
@@ -123,14 +127,17 @@ object TJU extends Actor with Log {
 				val runtime = 60 * minutes.toInt + seconds.toInt + fractions.toInt / 100.0
 				val memory = data(7).substring(0, data(7).length - 1).toInt
 			
-				(estado, veredicto, runtime, memory)
+				Grader.updateVeredict(id, estado, veredicto, 1, runtime, memory)
+				
+				if(estado != Estado.Listo)
+					readVeredict(id)
 			} else {
-				readVeredict(triesLeft)
+				readVeredict(id, triesLeft)
 			}
 		} catch {
 			case e: IOException => {
 				error("TJU communication error: {}", e.getMessage)
-				readVeredict(triesLeft-1)
+				readVeredict(id, triesLeft-1)
 			}
 		}
 	}

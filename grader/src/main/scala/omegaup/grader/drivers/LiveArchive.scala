@@ -25,26 +25,24 @@ object LiveArchive extends Actor with Log {
 			val TableRegex(table) = data
 			val RowRegex(rid, veredict, cpu, memory) = table
 			
-			error("last_id from the beginning: {}", rid.toInt)
-			
 			rid.toInt
 		}
 	}
 	private val status_mapping = Map(
-		"Received" ->			Estado.Espera,
-		"Compiling"->			Estado.Compilando,
-		"Running"->				Estado.Ejecutando
+		"Received" ->				Estado.Espera,
+		"Compiling"->				Estado.Compilando,
+		"Running"->					Estado.Ejecutando
 	)
 	private val veredict_mapping = Map(
-		"Compile Error"->		Veredicto.CompileError,
-		"Runtime Error"->		Veredicto.RuntimeError,
-		"Wrong Answer"->		Veredicto.WrongAnswer,
-		"Time Limit Exceed"->	Veredicto.TimeLimitExceeded,
-		"Memory Limit Exceed"->	Veredicto.MemoryLimitExceeded,
-		"Output Limit Exceed"->	Veredicto.OutputLimitExceeded,
-		"Restricted Function"->	Veredicto.RestrictedFunctionError,
-		"Presentation Error"->	Veredicto.PresentationError,
-		"Accepted"->			Veredicto.Accepted
+		"Compile Error"->			Veredicto.CompileError,
+		"Runtime Error"->			Veredicto.RuntimeError,
+		"Wrong Answer"->			Veredicto.WrongAnswer,
+		"Time Limit Exceeded"->		Veredicto.TimeLimitExceeded,
+		"Memory Limit Exceeded"->	Veredicto.MemoryLimitExceeded,
+		"Output Limit Exceeded"->	Veredicto.OutputLimitExceeded,
+		"Restricted Function"->		Veredicto.RestrictedFunctionError,
+		"Presentation Error"->		Veredicto.PresentationError,
+		"Accepted"->				Veredicto.Accepted
 	)
 	
 	def act() = {
@@ -69,28 +67,25 @@ object LiveArchive extends Actor with Log {
 					
 					debug("LA Sending data: {}", post_data)
 
-					val response = try {
+					try {
 						val data = Http.send_wait(submit_url, data = post_data)
 						if(!data.contains("Problem submitted successfully")) {
 							throw new Exception("Invalid response:\n" + data)
 						}
-						readVeredict(5)
+						readVeredict(id)
 					} catch {
 						case e: Exception => {
 							error("LA Submission {} failed for problem {}", id, pid)
 							error(e.getMessage)
-							(Estado.Listo, Some(Veredicto.JudgeError), 0, 0)
+							Grader.updateVeredict(1, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 						}
 					}
-					
-					info("LA Submission {} finished with veredict {}", id, response)
 				}
 			}
 		}
 	}
 	
-	@throws(classOf[IOException])
-	private def readVeredict(triesLeft: Int): (Estado, Option[Veredicto], Double, Int) = {
+	private def readVeredict(id: Int, triesLeft: Int = 5): Unit = {
 		if (triesLeft == 0)
 			throw new Exception("Retry limit exceeded")
 			
@@ -135,15 +130,18 @@ object LiveArchive extends Actor with Log {
 						mem.toInt
 					}
 			
-					(estado, veredicto, cpu.toFloat, memory)
+					Grader.updateVeredict(id, estado, veredicto, 1, cpu.toFloat, memory)
+					
+					if(estado != Estado.Listo)
+						readVeredict(id)
 				} else {
-					readVeredict(triesLeft)
+					readVeredict(id, triesLeft)
 				}
 			}
 		} catch {
 			case e: IOException => {
 				error("LA communication error: {}", e.getMessage)
-				readVeredict(triesLeft-1)
+				readVeredict(id, triesLeft-1)
 			}
 		}
 	}
