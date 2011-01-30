@@ -5,6 +5,7 @@ import java.net._
 import org.slf4j.{Logger, LoggerFactory}
 import net.liftweb.json._
 import javax.net.ssl._
+import org.mortbay.io._
 import org.mortbay.jetty.client.{HttpClient, ContentExchange}
 
 object Config {
@@ -97,6 +98,7 @@ object Https extends Object with Log {
 object Http extends Object with Log {
 	val client = new HttpClient()
 	client.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL)
+	val CookieRegex = """\s*([a-zA-Z0-9_-]+)\s*=\s*("(?:\\"|[^"])*"|[^;]*).*""".r
 	
 	try {
 		client.start();
@@ -104,7 +106,7 @@ object Http extends Object with Log {
 		case e: Exception => error(e.getMessage)
 	}
 	
-	def send(url: String, callback: (String)=>Unit, data: Map[String,_] = null): Unit = {
+	def send(url: String, callback: (String)=>Unit, data: Map[String,_] = null, headers: Map[String,String] = null, cookies: scala.collection.mutable.Map[String,String] = null): Unit = {
 		val exchange = new ContentExchange() {
 			@throws(classOf[IOException])
 			protected override def onResponseComplete: Unit = {
@@ -112,32 +114,49 @@ object Http extends Object with Log {
 				error(this.getResponseContent())
 				callback(this.getResponseContent())
 			}
+			
+			@throws(classOf[IOException])
+			protected override def onResponseHeader(name: Buffer, value: Buffer): Unit = {
+				if(cookies != null && name.toString == "Set-Cookie") {
+					val CookieRegex(cn, cv) = value.toString
+					cookies.put(cn, cv)
+				}
+			}
 		}
 		
-		exchange.addRequestHeader("User-Agent", "acm.lhchavez.com")
-		if (data == null) {
-			exchange.setMethod("GET")
-		} else {
-			exchange.setMethod("POST")
-			exchange.addRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-			error((for ((k, v) <- data) yield URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v.toString, "UTF-8") ).mkString("&"))
-			exchange.setRequestContent(
-				new org.mortbay.io.ByteArrayBuffer(
-					(for ((k, v) <- data) yield URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v.toString, "UTF-8") ).mkString("&")
-				)
-			)
-		}
-		exchange.setURL(url)
-
-		client.send(exchange)
-		
-		exchange.waitForDone
+		send_internal(exchange, url, data, headers, cookies)
 	}
 	
-	def send_wait(url: String, data: Map[String,_] = null): String = {
-		val exchange = new ContentExchange()
+	def send_wait(url: String, data: Map[String,_] = null, headers: Map[String,String] = null, cookies: scala.collection.mutable.Map[String,String] = null): String = {
+		var location: String = null
+		val exchange = new ContentExchange() {
+			@throws(classOf[IOException])
+			protected override def onResponseHeader(name: Buffer, value: Buffer): Unit = {
+				if(cookies != null && name.toString == "Set-Cookie") {
+					val CookieRegex(cn, cv) = value.toString
+					cookies.put(cn, cv)
+				} else if(name.toString == "Location") {
+					location = value.toString
+				}
+			}
+		}
 		
-		exchange.addRequestHeader("User-Agent", "acm.lhchavez.com")
+		send_internal(exchange, url, data, headers, cookies)
+		
+		exchange.waitForDone
+		
+		if(exchange.getResponseStatus == 301)
+			location
+		else
+			exchange.getResponseContent
+	}
+	
+	private def send_internal(exchange: ContentExchange, url: String, data: Map[String,_], headers: Map[String,String], cookies: scala.collection.mutable.Map[String,String]) = {
+		exchange.addRequestHeader("User-Agent", "OmegaUp")
+		if (headers != null)
+			headers.foreach { case (k,v) => exchange.addRequestHeader(k, v) }
+		if (cookies != null && !cookies.isEmpty)
+			exchange.addRequestHeader("Cookie", (for ((k, v) <- cookies) yield URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v.toString, "UTF-8") ).mkString("; "))
 		if (data == null) {
 			exchange.setMethod("GET")
 		} else {
@@ -145,7 +164,7 @@ object Http extends Object with Log {
 			exchange.addRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 
 			exchange.setRequestContent(
-				new org.mortbay.io.ByteArrayBuffer(
+				new ByteArrayBuffer(
 					(for ((k, v) <- data) yield URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v.toString, "UTF-8") ).mkString("&")
 				)
 			)
@@ -153,9 +172,6 @@ object Http extends Object with Log {
 		exchange.setURL(url)
 
 		client.send(exchange)
-		
-		exchange.waitForDone
-		exchange.getResponseContent
 	}
 }
 
