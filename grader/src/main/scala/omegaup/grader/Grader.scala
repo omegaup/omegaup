@@ -9,9 +9,12 @@ import org.squeryl._
 import org.squeryl.PrimitiveTypeMode._
 import net.liftweb.json._
 import omegaup._
+import Estado._
 import Lenguaje._
+import Veredicto._
 
 case class Submission(id: Int, lang: Lenguaje, pid: Int, code: String)
+case object Login
 
 object Grader extends Object with Log {
 	def grade(id: Int): GradeOutputMessage = {
@@ -39,6 +42,10 @@ object Grader extends Object with Log {
 		info("De-registering {}:{}", host, port)
 		
 		new RegisterOutputMessage()
+	}
+	
+	def updateVeredict(id: Int, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Int) = {
+		info("Veredict update: {} {} {} {} {} {}", id, e, v, points, runtime, memory)
 	}
 	
 	def main(args: Array[String]) = {
