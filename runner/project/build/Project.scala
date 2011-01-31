@@ -14,6 +14,7 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 	override def libraryDependencies = Set(
 		"org.mortbay.jetty" % "jetty" % "6.1.26",
 		"org.mortbay.jetty" % "jetty-sslengine" % "6.1.26",
+		"org.mortbay.jetty" % "jetty-client" % "6.1.26",
 		"net.liftweb" % "lift-json_2.8.1" % "2.2-RC5",
 		"org.slf4j" % "slf4j-simple" % "1.6.1" % "compile"
 	) ++ super.libraryDependencies

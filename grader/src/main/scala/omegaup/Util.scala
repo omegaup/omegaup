@@ -85,11 +85,42 @@ object Https extends Object with Log {
 		implicit val formats = Serialization.formats(NoTypeHints)
 		
 		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
+		conn.addRequestProperty("Content-Type", "text/json")
 		conn.setSSLSocketFactory(socketFactory)
 		conn.setDoOutput(true)
 		val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
 		Serialization.write[W, PrintWriter](request, writer)
 		writer.close()
+		
+		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+	}
+	
+	def zip_send[T](url:String, zipfile:String, zipname:String)(implicit mf: Manifest[T]): T = {
+		debug("Requesting {}", url)
+		
+		implicit val formats = Serialization.formats(NoTypeHints)
+		
+		val file = new File(zipfile)
+		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
+		conn.addRequestProperty("Content-Type", "application/zip")
+		conn.addRequestProperty("Content-Disposition", "attachment; filename=" + zipname + ";")
+		conn.setFixedLengthStreamingMode(file.length.toInt)
+		conn.setSSLSocketFactory(socketFactory)
+		conn.setDoOutput(true)
+		val outputStream = conn.getOutputStream
+		val inputStream = new FileInputStream(file)
+		val buffer = Array.ofDim[Byte](1024)
+		var read = 0
+		var reading = true
+		
+		while(reading) {
+			read = inputStream.read(buffer)
+			if (read == -1) reading = false
+			else outputStream.write(buffer, 0, read)
+		}
+		
+		inputStream.close
+		outputStream.close
 		
 		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
 	}

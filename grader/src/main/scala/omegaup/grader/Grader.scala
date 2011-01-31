@@ -17,6 +17,8 @@ case class Submission(id: Int, lang: Lenguaje, pid: Int, code: String)
 case object Login
 
 object Grader extends Object with Log {
+	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[(String, Int)]()
+	
 	def grade(id: Int): GradeOutputMessage = {
 		info("Judging {}", id)
 		
@@ -32,15 +34,25 @@ object Grader extends Object with Log {
 		}
 	}
 	
+	def getRunner(): (String, Int) = {
+		runnerQueue.take()
+	}
+	
+	def addRunner(host: String, port: Int) = {
+		runnerQueue.put((host, port))
+	}
+	
 	def register(host: String, port: Int): RegisterOutputMessage = {
 		info("Registering {}:{}", host, port)
-		
+	
+		addRunner(host, port)	
 		new RegisterOutputMessage()
 	}
 	
 	def deregister(host: String, port: Int): RegisterOutputMessage = {
 		info("De-registering {}:{}", host, port)
 		
+		runnerQueue.remove((host, port))
 		new RegisterOutputMessage()
 	}
 	

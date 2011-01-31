@@ -84,9 +84,9 @@ object UVa extends Actor with Log {
 					
 					info("UVa Submission {} for problem {}", id, pid)
 					
-					val response = if(!logged_in) {
+					if(!logged_in) {
 						error("UVa not logged in")
-						(Estado.Listo, Some(Veredicto.JudgeError), 0, 0)
+						Grader.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 					} else {
 						val post_data = Map(
 							"problemid" ->	"",

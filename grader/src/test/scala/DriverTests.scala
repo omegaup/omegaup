@@ -80,7 +80,6 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 		""")
 		java.lang.System.in.read()
 	}
-	*/
 	
 	"TJUdriver" should "submit" in {
 		TJU.start
@@ -127,4 +126,5 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 		""")
 		java.lang.System.in.read()
 	}
+	*/
 }
