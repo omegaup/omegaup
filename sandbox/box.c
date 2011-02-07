@@ -2,7 +2,7 @@
  *	A Simple Sandbox for Moe
  *
  *	(c) 2001--2010 Martin Mares <mj@ucw.cz>
- *	(c) 2010 Luis Hector Chavez <lhchavez@lhchavez.com>
+ *	(c) 2010--2011 Luis Hector Chavez <lhchavez@lhchavez.com>
  */
 
 #define _LARGEFILE64_SOURCE
@@ -52,6 +52,7 @@ static int verbose;
 static int allow_threads;
 static int allow_fork;
 static int memory_limit;
+static int output_limit;
 static int stack_limit;
 static char *redir_stdin, *redir_stdout, *redir_stderr, *redir_probin;
 static char *set_cwd;
@@ -1554,6 +1555,13 @@ box_inside(int argc, char **argv)
       if (setrlimit(RLIMIT_AS, &rl) < 0)
 	die("setrlimit(RLIMIT_AS): %m");
     }
+  
+  if (output_limit)
+    {
+      rl.rlim_cur = rl.rlim_max = output_limit * 1024;
+      if (setrlimit(RLIMIT_FSIZE, &rl) < 0)
+    die("setrlimit(RLIMIT_FSIZE): %m");
+    }
 
   rl.rlim_cur = rl.rlim_max = (stack_limit ? (rlim_t)stack_limit * 1024 : RLIM_INFINITY);
   if (setrlimit(RLIMIT_STACK, &rl) < 0)
@@ -1599,6 +1607,7 @@ Options:\n\
 -m <size>\tLimit address space to <size> KB\n\
 -M <file>\tOutput process information to <file> (name:value)\n\
 -o <file>\tRedirect stdout to <file>\n\
+-O <size>\tLimit output file size to <size> KB (default: 0=unlimited)\n\
 -p <path>\tPermit access to the specified path (or subtree if it ends with a `/')\n\
 -p <path>=<act>\tDefine action for the specified path (<act>=yes/no/rw)\n\
 -P <file>\tRedirect <file> as the magic file \"data.in\"\n\
@@ -1660,6 +1669,9 @@ process_option (int c, char *argument, int enable_script)
 	break;
       case 'o':
 	redir_stdout = argument;
+	break;
+	  case 'O':
+	output_limit = atol(argument);
 	break;
       case 'p':
 	if (!set_path_action(argument))
