@@ -1,6 +1,6 @@
 package omegaup.runner
 
-case class RunCaseResult(name: String, status: String, time: Int, memory: Int, output: Option[String] = None)
+case class RunCaseResult(name: String, status: String, time: Int, memory: Int, output: Option[String] = None, context: Option[String] = None)
 case class CaseData(name: String, data: String)
 
 case class CompileInputMessage(lang: String, code: List[String], master_lang: Option[String] = None, master_code: Option[List[String]] = None)
