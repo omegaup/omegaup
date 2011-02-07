@@ -92,3 +92,36 @@ object Https extends Object with Log {
 		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
 	}
 }
+
+object FileUtil {
+	@throws(classOf[IOException])
+	def read(file: String): String = {
+		val contents = new StringBuilder
+		
+		val fileReader = new BufferedReader(new FileReader(file))
+		var line: String = null
+	
+		while( { line = fileReader.readLine(); line != null} ) {
+			contents.append(line)
+			contents.append("\n")
+		}
+		
+		fileReader.close()
+		
+		contents.toString.trim
+	}
+	
+	@throws(classOf[IOException])
+	def deleteDirectory(dir: String): Boolean = {
+		FileUtil.deleteDirectory(new File(dir))
+	}
+	
+	@throws(classOf[IOException])
+	def deleteDirectory(dir: File): Boolean = {
+		if(dir.exists) {
+			dir.listFiles.foreach { _.delete }
+		}
+		
+		dir.delete
+	}
+}

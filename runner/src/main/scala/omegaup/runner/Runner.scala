@@ -7,6 +7,7 @@ import javax.servlet.http._
 import org.mortbay.jetty._
 import org.mortbay.jetty.handler._
 import net.liftweb.json._
+import scala.collection.{mutable,immutable}
 import omegaup._
 
 object Runner extends Object with Log {
@@ -14,23 +15,51 @@ object Runner extends Object with Log {
 		val compileDirectory = new File(Config.get("runner.directory", ".") + "/compile/")
 		compileDirectory.mkdirs
 		
-		var runDirectory = File.createTempFile(compileDirectory.getCanonicalPath, System.nanoTime.toString)
+		var runDirectory = File.createTempFile(System.nanoTime.toString, null, compileDirectory)
 		runDirectory.delete
 		
-		runDirectory = new File(runDirectory.getCanonicalPath + "." + lang)
+		runDirectory = new File(runDirectory.getCanonicalPath.substring(0, runDirectory.getCanonicalPath.length - 4) + "." + lang)
 		runDirectory.mkdirs
 		
 		var fileWriter = new FileWriter(runDirectory.getCanonicalPath + "/Main." + lang)
 		fileWriter.write(code(0), 0, code(0).length)
 		fileWriter.close
+		var inputFiles = mutable.ListBuffer(runDirectory.getCanonicalPath + "/Main." + lang)
 		
 		for (i <- 1 until code.length) {
 			fileWriter = new FileWriter(runDirectory.getCanonicalPath + "/f" + i + "." + lang)
+			inputFiles += runDirectory.getCanonicalPath + "/f" + i + "." + lang
 			fileWriter.write(code(i), 0, code(i).length)
 			fileWriter.close
 		}
 		
-		new CompileOutputMessage()
+		val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
+		val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
+		val runtime = Runtime.getRuntime
+		
+		val process = lang match {
+			case "java" =>
+				runtime.exec((List(sandbox, "-S", profile + "/javac", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", "/usr/bin/javac") ++ inputFiles).toArray)
+			case "c" =>
+				runtime.exec((List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", "/usr/bin/gcc", "-ansi", "-O2", "-lm") ++ inputFiles).toArray)
+			case "cpp" =>
+				runtime.exec((List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", "/usr/bin/g++", "-O2", "-lm") ++ inputFiles).toArray)
+		}
+		
+		val status = process.waitFor
+		
+		if (status == 0)
+			new CompileOutputMessage(token = Some(runDirectory.getName))
+		else {
+			val compile_error = FileUtil.read(runDirectory.getCanonicalPath + "/compile.err").replace(runDirectory.getCanonicalPath + "/", "")
+			val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
+			FileUtil.deleteDirectory(runDirectory)
+			
+			if (meta.contains("message") && meta("status") != "RE")
+				new CompileOutputMessage("compile error", error = Some(meta("message")))
+			else
+				new CompileOutputMessage("compile error", error = Some(compile_error))
+		}
 	}
 	
 	def input(request: HttpServletRequest): InputOutputMessage = {
@@ -157,5 +186,26 @@ object Runner extends Object with Log {
 		
 		server.stop()
 		server.join()
+	}
+}
+
+object MetaFile {
+	@throws(classOf[IOException])
+	def load(path: String): scala.collection.Map[String,String] = {
+		val meta = new mutable.ListMap[String,String]
+		val fileReader = new BufferedReader(new FileReader(path))
+		var line: String = null
+	
+		while( { line = fileReader.readLine(); line != null} ) {
+			val idx = line.indexOf(':')
+			
+			if(idx > 0) {
+				meta += (line.substring(0, idx) -> line.substring(idx+1))
+			}
+		}
+		
+		fileReader.close()
+		
+		meta
 	}
 }
