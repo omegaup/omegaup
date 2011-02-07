@@ -42,7 +42,7 @@
 #define UNUSED __attribute__((unused))
 #define ARRAY_SIZE(a) (int)(sizeof(a)/sizeof(a[0]))
 
-static int filter_syscalls;		/* 0=off, 1=liberal, 2=totalitarian */
+static int filter_syscalls;		/* 0=off, 1=on */
 static int timeout;			/* milliseconds */
 static int wall_timeout;
 static int extra_timeout;
@@ -172,7 +172,10 @@ box_exit(int rc)
 	  kill(-threads[t].pid, SIGKILL);
 	  kill(threads[t].pid, SIGKILL);
 	}
+	if (rc)
       meta_printf("killed:1\n");
+    else
+      meta_printf("status:OK\n");
 
       struct rusage rus;
       int p, stat;
@@ -183,7 +186,7 @@ box_exit(int rc)
           do
 	    p = wait4(-1, &stat, __WALL, &rus);
           while (p < 0 && errno == EINTR);
-          if (p < 0)
+          if (verbose >= 0 && p < 0)
 	    fprintf(stderr, "UGH: Lost track of the process (%m)\n");
 	  else if (p == box_pid)
 	    final_stats(&rus);
@@ -196,7 +199,7 @@ box_exit(int rc)
 static void
 flush_line(void)
 {
-  if (partial_line)
+  if (partial_line && verbose >= 0)
     fputc('\n', stderr);
   partial_line = 0;
 }
@@ -211,8 +214,11 @@ die(char *msg, ...)
   char buf[1024];
   vsnprintf(buf, sizeof(buf), msg, args);
   meta_printf("status:XX\nmessage:%s\n", buf);
-  fputs(buf, stderr);
-  fputc('\n', stderr);
+  if (verbose >= 0)
+    {
+      fputs(buf, stderr);
+      fputc('\n', stderr);
+    }
   box_exit(2);
 }
 
@@ -231,8 +237,11 @@ err(char *msg, ...)
   char buf[1024];
   vsnprintf(buf, sizeof(buf), msg, args);
   meta_printf("message:%s\n", buf);
-  fputs(buf, stderr);
-  fputc('\n', stderr);
+  if (verbose >= 0)
+    {
+      fputs(buf, stderr);
+      fputc('\n', stderr);
+    }
   box_exit(1);
 }
 
@@ -242,7 +251,7 @@ msg(char *msg, ...)
 {
   va_list args;
   va_start(args, msg);
-  if (verbose)
+  if (verbose > 0)
     {
       int len = strlen(msg);
       if (len > 0)
@@ -1319,6 +1328,7 @@ boxkeeper(void)
 	    }
 	  
 	  final_stats(&rus);
+	  meta_printf("syscall-count:%d\n", syscall_count);
 	  if (WEXITSTATUS(stat))
 	    {
 	      if (syscall_count)
@@ -1337,11 +1347,14 @@ boxkeeper(void)
 	  if (wall_timeout && wall_ms > wall_timeout)
 	    err("TO: Time limit exceeded (wall clock)");
 	  flush_line();
-	  fprintf(stderr, "OK (%d.%03d sec real, %d.%03d sec wall, %d MB, %d syscalls)\n",
-	      total_ms/1000, total_ms%1000,
-	      wall_ms/1000, wall_ms%1000,
-	      (mem_peak_kb + 1023) / 1024,
-	      syscall_count);
+	  if (verbose >= 0)
+	    {
+		  fprintf(stderr, "OK (%d.%03d sec real, %d.%03d sec wall, %d MB, %d syscalls)\n",
+	         total_ms/1000, total_ms%1000,
+	         wall_ms/1000, wall_ms%1000,
+	         (mem_peak_kb + 1023) / 1024,
+	         syscall_count);
+	     }
 	  box_exit(0);
 	}
       if (WIFSIGNALED(stat))
@@ -1599,7 +1612,7 @@ Options:\n\
 -e\t\tInherit full environment of the parent process\n\
 -E <var>\tInherit the environment variable <var> from the parent process\n\
 -E <var>=<val>\tSet the environment variable <var> to <val>; unset it if <var> is empty\n\
--f\t\tFilter system calls (-ff=very restricted)\n\
+-f\t\tFilter system calls\n\
 -F\t\tAllow sys_fork/sys_vfork system call to enable multiprocess applications\n\
 \t\t(like compilers)\n\
 -i <file>\tRedirect stdin from <file>\n\
@@ -1611,6 +1624,7 @@ Options:\n\
 -p <path>\tPermit access to the specified path (or subtree if it ends with a `/')\n\
 -p <path>=<act>\tDefine action for the specified path (<act>=yes/no/rw)\n\
 -P <file>\tRedirect <file> as the magic file \"data.in\"\n\
+-q\t\tBe quiet (the opposite of -v)\n\
 -r <file>\tRedirect stderr to <file>\n\
 -s <sys>\tPermit the specified syscall (be careful)\n\
 -s <sys>=<act>\tDefine action for the specified syscall (<act>=yes/no/file/noret)\n\
@@ -1680,6 +1694,9 @@ process_option (int c, char *argument, int enable_script)
       case 'P':
 	redir_probin = argument;
 	break;
+	  case 'q':
+	verbose--;
+	break;
       case 'r':
 	redir_stderr = argument;
 	break;
@@ -1739,7 +1756,7 @@ main(int argc, char **argv)
   int c, random_fd;
   uid_t uid;
   
-  while ((c = getopt(argc, argv, "a:c:CeE:fFi:k:m:M:o:p:P:r:s:S:t:Tvw:x:")) >= 0)
+  while ((c = getopt(argc, argv, "a:c:CeE:fFi:k:m:M:o:p:P:qr:s:S:t:Tvw:x:")) >= 0)
     process_option(c, optarg, 1);
   if (optind >= argc)
     usage();

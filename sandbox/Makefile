@@ -13,7 +13,7 @@ box: box.o
 box.o: syscall-table.h
 
 box: LDFLAGS+=$(BOX_CFLAGS)
-box.o: CFLAGS+=$(BOX_CFLAGS)
+box.o: CFLAGS+=$(BOX_CFLAGS) -O2
 
 syscall-table.h: mk-syscall-table
 	sh $^ >$@ $(CFLAGS) $(BOX_CFLAGS)
