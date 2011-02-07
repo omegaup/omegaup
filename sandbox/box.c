@@ -1756,7 +1756,7 @@ main(int argc, char **argv)
   int c, random_fd;
   uid_t uid;
   
-  while ((c = getopt(argc, argv, "a:c:CeE:fFi:k:m:M:o:p:P:qr:s:S:t:Tvw:x:")) >= 0)
+  while ((c = getopt(argc, argv, "a:c:CeE:fFi:k:m:M:o:O:p:P:qr:s:S:t:Tvw:x:")) >= 0)
     process_option(c, optarg, 1);
   if (optind >= argc)
     usage();
