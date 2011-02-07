@@ -317,7 +317,7 @@ static unsigned char syscall_action[NUM_ACTIONS] = {
     S(lseek) = A_YES,
     S(getpid) = A_YES,
     S(dup) = A_YES,
-    S(brk) = A_YES,
+    S(brk) = A_YES | A_SAMPLE_MEM,
     S(getuid) = A_YES,
     S(getuid32) = A_YES,
     S(getgid) = A_YES,
@@ -778,7 +778,24 @@ static void
 get_syscall_args(pid_t pid, struct syscall_args *a, int is_exit UNUSED)
 {
   if (ptrace(PTRACE_GETREGS, pid, NULL, &a->user) < 0)
-    die("ptrace(PTRACE_GETREGS, %d): %m", pid);
+    {
+      int t;
+      for(t = 0; t < nthreads; t++)
+        {
+    	  if(threads[t].pid == pid) break;
+        }
+        
+      if( !(threads[t].sys_tick & 1) && threads[t].last_sys == __NR_futex )
+        {
+          // for some weird reason, futex sometimes does not return as we'd
+          // expect. apparently the kernel decides to give control back to the
+          // process ignoring ptrace, leaving the sandbox in a weird state.
+          // sooooooo let's just pretend nothing ever happened and be happy.
+          a->result = 0;
+          return;
+        }
+      die("ptrace(PTRACE_GETREGS, %d): %m", pid);
+    }
   a->sys = a->user.regs.orig_eax;
   a->arg1 = a->user.regs.ebx;
   a->arg2 = a->user.regs.ecx;
@@ -890,7 +907,7 @@ get_filename(pid_t pid, arg_t addr, char *namebuf, int bufsize)
 static void
 valid_filename(pid_t pid, arg_t addr, arg_t flags)
 {
-  char namebuf[4096];
+  char namebuf[4096], *nameptr;
   int i;
   struct path_rule *r;
 
@@ -902,36 +919,47 @@ valid_filename(pid_t pid, arg_t addr, arg_t flags)
   enum action act = A_DEFAULT;
     
   get_filename(pid, addr, namebuf, sizeof(namebuf));
+  
+  // change the current directory into ./ for write rules
+  if(!strncmp(cwd, namebuf, strlen(cwd)))
+    {
+	  nameptr = namebuf + strlen(cwd) - 1;
+	  *nameptr = '.';
+    }
+  else
+    {
+	  nameptr = namebuf;
+    }
 
-  msg("<%s> ", namebuf);
+  msg("<%s> ", nameptr);
   if (file_access >= 3)
     return;
     
   // ".." anywhere in the path is forbidden
-  if (strstr(namebuf, ".."))
-    err("FA: Forbidden access to file `%s'", namebuf);
+  if (strstr(nameptr, ".."))
+    err("FA: Forbidden access to file `%s'", nameptr);
 
   // Scan user rules
   for (r = user_path_rules; r && !act; r=r->next)
-    act = match_path_rule(r, namebuf);
+    act = match_path_rule(r, nameptr);
 
   // Scan built-in rules
   if (file_access >= 2)
     for (i=0; i<ARRAY_SIZE(default_path_rules) && !act; i++)
-      act = match_path_rule(&default_path_rules[i], namebuf);
+      act = match_path_rule(&default_path_rules[i], nameptr);
   
   // Only allow write / read-write access if explicitly permitted
   if ((flags & O_ACCMODE) != O_RDONLY && (act & A_READ_WRITE) == 0)
-    err("FA: Forbidden write access to file `%s'", namebuf);
+    err("FA: Forbidden write access to file `%s'", nameptr);
   else
     act &= ~A_READ_WRITE;
   
   // Everything in current directory is permitted
-  if ((namebuf[0] != '/' || !strncmp(cwd, namebuf, strlen(cwd))))
+  if (nameptr[0] != '/')
     return;
     
   if (act != A_YES)
-    err("FA: Forbidden access to file `%s'", namebuf);
+    err("FA: Forbidden access to file `%s'", nameptr);
 }
 
 // Check syscall. If invalid, return -1, otherwise return the action mask.
@@ -1251,7 +1279,7 @@ trace_thread(int pid, int t)
 	    
       threads[ins].pid = pid;
       threads[ins].mem_fd = 0;
-      threads[ins].active = threads[ins].waiting = threads[ins].sys_tick = 0;
+      threads[ins].active = threads[ins].waiting = threads[ins].sys_tick = threads[ins].last_sys = 0;
 
       t = ins;
       
@@ -1426,7 +1454,11 @@ boxkeeper(void)
 		      threads[t].last_act = act;
 		      syscall_count++;
 		      if (act & A_SAMPLE_MEM)
-			sample_mem_peak();
+		        {
+				  sample_mem_peak();
+				  if (memory_limit && mem_peak_kb > memory_limit)
+				    err("ML: Memory Limit Exceeded");
+				}
 		    }
 		  else
 		    {
@@ -1507,9 +1539,14 @@ boxkeeper(void)
 	      sample_mem_peak();			/* Signal might be fatal, so update mem-peak */
 	      ptrace(PTRACE_SYSCALL, threads[t].pid, 0, sig);
 	    }
+	  else if (sig == SIGXFSZ)
+	    {
+	      meta_printf("exitsig:%d\n", sig);
+	      err("OL: Output Limit Exceeded");
+	    }
 	  else
 	    {
-	      meta_printf("exitsig:%d", sig);
+	      meta_printf("exitsig:%d\n", sig);
 	      err("SG: Received signal %d", sig);
 	    }
 	}
@@ -1564,7 +1601,7 @@ box_inside(int argc, char **argv)
 
   if (memory_limit)
     {
-      rl.rlim_cur = rl.rlim_max = memory_limit * 1024;
+      rl.rlim_cur = rl.rlim_max = (memory_limit + 32*1024) * 1024;
       if (setrlimit(RLIMIT_AS, &rl) < 0)
 	die("setrlimit(RLIMIT_AS): %m");
     }

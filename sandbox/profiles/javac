@@ -24,6 +24,7 @@
 -s sched_yield
 -s getcwd
 -s madvise
+-s kill 
 
 -p /dev/random
 -p /dev/urandom
