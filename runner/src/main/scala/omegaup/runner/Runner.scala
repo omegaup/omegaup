@@ -133,10 +133,11 @@ object Runner extends Object with Log {
 					}
 				
 					process.waitFor
+					
+					new File(casePath + ".in").delete
 				}}
 			}
 		}
-		
 		
 		val zipFile = new File(runDirectory.getCanonicalPath + "/output.zip")
 		val zipOutput = new ZipOutputStream(new FileOutputStream(zipFile.getCanonicalPath))
@@ -167,6 +168,7 @@ object Runner extends Object with Log {
 		
 				inputStream.close
 				zipOutput.closeEntry
+				
 			} else if(meta("status") == "RE" && lang == "java") {
 				inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))
 				zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
@@ -178,6 +180,10 @@ object Runner extends Object with Log {
 				inputStream.close
 				zipOutput.closeEntry
 			}
+			
+			x.delete
+			new File(x.getCanonicalPath.replace(".meta", ".err")).delete
+			new File(x.getCanonicalPath.replace(".meta", ".out")).delete
 		}}
 		
 		zipOutput.close
