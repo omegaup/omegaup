@@ -126,9 +126,10 @@ object FileUtil {
 	@throws(classOf[IOException])
 	def deleteDirectory(dir: File): Boolean = {
 		if(dir.exists) {
-			dir.listFiles.foreach { _.delete }
+			if (dir.isDirectory)
+				dir.listFiles.foreach { FileUtil.deleteDirectory(_) }
+			dir.delete
 		}
-		
-		dir.delete
+		false
 	}
 }
