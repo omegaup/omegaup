@@ -56,8 +56,8 @@ object Grader extends Object with Log {
 		new RegisterOutputMessage()
 	}
 	
-	def updateVeredict(id: Int, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Int) = {
-		info("Veredict update: {} {} {} {} {} {}", id, e, v, points, runtime, memory)
+	def updateVeredict(id: Int, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Int, compileError: Option[String] = None) = {
+		info("Veredict update: {} {} {} {} {} {} {}", id, e, v, points, runtime, memory, compileError)
 	}
 	
 	def main(args: Array[String]) = {

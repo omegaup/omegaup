@@ -12,7 +12,7 @@ import omegaup._
 
 object Runner extends Object with Log {
 	def compile(lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]): CompileOutputMessage = {
-		val compileDirectory = new File(Config.get("runner.directory", ".") + "/compile/")
+		val compileDirectory = new File(Config.get("compile.root", "."))
 		compileDirectory.mkdirs
 		
 		var runDirectory = File.createTempFile(System.nanoTime.toString, null, compileDirectory)
@@ -77,7 +77,7 @@ object Runner extends Object with Log {
 		val casesDirectory:File = input match {
 			case Some(in) => {
 				if (in.contains(".") || in.contains("/")) throw new IllegalArgumentException("Invalid input")
-				new File (Config.get("runner.directory", ".") + "/input/" + in)
+				new File (Config.get("input.root", ".") + "/" + in)
 			}
 			case None => null
 		}
@@ -85,7 +85,7 @@ object Runner extends Object with Log {
 		if(casesDirectory != null && !casesDirectory.exists) throw new RuntimeException("missing input")
 		if(token.contains("..") || token.contains("/")) throw new IllegalArgumentException("Invalid token")
 		
-		val runDirectory = new File(Config.get("runner.directory", ".") + "/compile/" + token)
+		val runDirectory = new File(Config.get("compile.root", ".") + "/" + token)
 		
 		if(!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
 		
@@ -99,7 +99,7 @@ object Runner extends Object with Log {
 		
 		if(casesDirectory != null) {
 			casesDirectory.listFiles.filter {_.getName.endsWith(".in")} .foreach { (x) => {
-				val caseName = x.getCanonicalPath.substring(0, x.getCanonicalPath.lastIndexOf('.'))
+				val caseName = runDirectory.getCanonicalPath + "/" + x.getName.substring(0, x.getName.lastIndexOf('.'))
 				
 				val process = lang match {
 					case "java" =>
@@ -192,7 +192,7 @@ object Runner extends Object with Log {
 	}
 	
 	def removeCompileDir(token: String): Unit = {
-		val runDirectory = new File(Config.get("runner.directory", ".") + "/compile/" + token)
+		val runDirectory = new File(Config.get("compile.root", ".") + "/" + token)
 		
 		if(!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
 		
@@ -210,7 +210,7 @@ object Runner extends Object with Log {
 			
 			val ContentDispositionRegex(inputName) = request.getHeader("Content-Disposition")
 			
-			val inputDirectory = new File(Config.get("runner.directory", ".") + "/input/" + inputName)
+			val inputDirectory = new File(Config.get("input.root", ".") + "/" + inputName)
 			inputDirectory.mkdirs()
 			
 			val input = new ZipInputStream(request.getInputStream)
@@ -276,7 +276,10 @@ object Runner extends Object with Log {
 						} catch {
 							case e: Exception => {
 								response.setContentType("text/json")
-								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
+								if(e.getMessage == "missing input")
+									response.setStatus(HttpServletResponse.SC_OK)
+								else
+									response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 								Serialization.write(new RunOutputMessage(status = "error", error = Some(e.getMessage)), response.getWriter())
 							}
 						}

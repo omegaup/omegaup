@@ -124,6 +124,38 @@ object Https extends Object with Log {
 		
 		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
 	}
+	
+	def receive_zip[T, W <: AnyRef](url:String, request:W, file:String)(implicit mf: Manifest[T]): Option[T] = {
+		debug("Requesting {}", url)
+		
+		implicit val formats = Serialization.formats(NoTypeHints)
+
+		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
+		conn.addRequestProperty("Content-Type", "text/json")
+		conn.setSSLSocketFactory(socketFactory)
+		conn.setDoOutput(true)
+		val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
+		Serialization.write[W, PrintWriter](request, writer)
+		writer.close()
+		
+		if (conn.getHeaderField("Content-Type") == "application/zip") {
+			val outputStream = new FileOutputStream(file)
+			val inputStream = conn.getInputStream
+			val buffer = Array.ofDim[Byte](1024)
+			var read = 0
+		
+			while( { read = inputStream.read(buffer) ; read > 0 } ) {
+				outputStream.write(buffer, 0, read)
+			}
+		
+			inputStream.close
+			outputStream.close
+			
+			None
+		} else {
+			Some(Serialization.read[T](new InputStreamReader(conn.getInputStream())))
+		}
+	}
 }
 
 object Http extends Object with Log {
@@ -215,13 +247,12 @@ object FileUtil {
 		var line: String = null
 	
 		while( { line = fileReader.readLine(); line != null} ) {
-			line = fileReader.readLine()
 			contents.append(line)
 			contents.append("\n")
 		}
 		
-		fileReader.close()
+		fileReader.close
 		
-		contents.toString
+		contents.toString.trim
 	}
 }

@@ -8,6 +8,34 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
 class DriverSpec extends FlatSpec with ShouldMatchers {
+	"OmegaUpDriver" should "login" in {
+		OmegaUp.start
+		OmegaUp ! Submission(1, Lenguaje.Cpp, 1, """
+			int main() {
+				while(true);
+			}
+		""")
+		OmegaUp ! Submission(2, Lenguaje.Cpp, 1, """
+			#include <cstdlib>
+			#include <iostream>
+			#include <map>
+			#include <unistd.h>
+
+			using namespace std;
+
+			int main(int argc, char *argv[]) {
+				int a, b;
+				cin >> a >> b;
+				cout << "Hello, World!" << endl;
+				cout << a + b << endl;
+				
+				return EXIT_SUCCESS;
+			}
+		""")
+		
+		Grader.main(Array.ofDim[String](0))
+	}
+	
 	/*
 	"UVaDriver" should "login" in {
 		UVa.start

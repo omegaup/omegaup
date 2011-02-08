@@ -32,6 +32,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers {
 	
 	"OK" should "be correctly handled" in {
 		val test1 = Runner.compile("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { int x; scanf(\"%d\", &x); switch (x) { case 0: printf(\"Hello, World!\\n\"); break; case 1: while(1); break; case 2: fork(); break; case 3: while(1) malloc(1024*1024); break; case 4: while(1) printf(\"trololololo\\n\"); break; case 5: fopen(\"/etc/passwd\", \"r\"); break; case 6: printf(\"%s\", (char*)(x-6)); break; case 7: printf(\"%d\", 1/(x-7)); break; case 8: return 1; } return 0; }"), None, None)
+		
 		test1.status should equal ("ok")
 		test1.token should not equal None
 		
