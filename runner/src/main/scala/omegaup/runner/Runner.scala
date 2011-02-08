@@ -48,9 +48,13 @@ object Runner extends Object with Log {
 		
 		val status = process.waitFor
 		
-		if (status == 0)
+		if (status == 0) {
+			new File(runDirectory.getCanonicalPath + "/compile.meta").delete
+			new File(runDirectory.getCanonicalPath + "/compile.out").delete
+			new File(runDirectory.getCanonicalPath + "/compile.err").delete
+			
 			new CompileOutputMessage(token = Some(runDirectory.getName))
-		else {
+		} else {
 			val compile_error = FileUtil.read(runDirectory.getCanonicalPath + "/compile.err").replace(runDirectory.getCanonicalPath + "/", "")
 			val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
 			FileUtil.deleteDirectory(runDirectory)
@@ -60,6 +64,114 @@ object Runner extends Object with Log {
 			else
 				new CompileOutputMessage("compile error", error = Some(compile_error))
 		}
+	}
+	
+	def run(token: String, timeLimit: Float, memoryLimit: Int, outputLimit: Int, input: Option[String], cases: Option[List[CaseData]]) : Unit = {
+		val casesDirectory:File = input match {
+			case Some(in) => {
+				if (in.contains(".") || in.contains("/")) throw new IllegalArgumentException("Invalid input")
+				new File (Config.get("runner.directory", ".") + "/input/" + in)
+			}
+			case None => null
+		}
+		
+		if(casesDirectory != null && !casesDirectory.exists) throw new RuntimeException("missing input")
+		if(token.contains("..") || token.contains("/")) throw new IllegalArgumentException("Invalid token")
+		
+		val runDirectory = new File(Config.get("runner.directory", ".") + "/compile/" + token)
+		
+		if(!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
+		
+		val lang = token.substring(token.indexOf(".")+1)
+		
+		val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
+		val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
+		val runtime = Runtime.getRuntime
+		
+		if(casesDirectory != null) {
+			casesDirectory.listFiles.filter {_.getName.endsWith(".in")} .foreach { (x) => {
+				val caseName = x.getName.substring(0, x.getName.lastIndexOf('.'))
+				
+				val process = lang match {
+					case "java" =>
+						runtime.exec((List(sandbox, "-S", profile + "/java", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/" + caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + memoryLimit + "k", "Main")).toArray)
+					case "c" =>
+						runtime.exec((List(sandbox, "-S", profile + "/c", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-i", x.getCanonicalPath, "-o", "compile.out", "-r", "compile.err", "-t", timeLimit.toString, "-O", outputLimit.toString, "-m", memoryLimit.toString, "--", "./a.out")).toArray)
+					case "cpp" =>
+						runtime.exec((List(sandbox, "-S", profile + "/c", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-i", x.getCanonicalPath, "-o", "compile.out", "-r", "compile.err", "-t", timeLimit.toString, "-O", outputLimit.toString, "-m", memoryLimit.toString, "--", "./a.out")).toArray)
+				}
+				
+				process.waitFor
+			}}
+		}
+		
+		cases match {
+			case None => {}
+			case Some(extra) => {
+				extra.foreach { (x: CaseData) => {
+					val caseName = x.name
+					val casePath = runDirectory.getCanonicalPath + "/" + caseName + ".in"
+					
+					FileUtil.write(casePath, x.data)
+				
+					val process = lang match {
+						case "java" =>
+							runtime.exec((List(sandbox, "-S", profile + "/java", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/" + caseName + ".meta", "-i", casePath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + memoryLimit + "k", "Main")).toArray)
+						case "c" =>
+							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/" + caseName + ".meta", "-i", casePath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "-m", memoryLimit.toString, "--", "./a.out")).toArray)
+						case "cpp" =>
+							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/" + caseName + ".meta", "-i", casePath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "-m", memoryLimit.toString, "--", "./a.out")).toArray)
+					}
+				
+					process.waitFor
+				}}
+			}
+		}
+		
+		val zipOutput = new ZipOutputStream(new FileOutputStream(runDirectory.getCanonicalPath + "/output.zip"))
+		
+		runDirectory.listFiles.filter { _.getName.endsWith(".meta") } .foreach { (x) => {
+			zipOutput.putNextEntry(new ZipEntry(x.getName))
+			
+			var inputStream = new FileInputStream(x.getCanonicalPath)
+			val buffer = Array.ofDim[Byte](1024)
+			var read: Int = 0
+	
+			while( { read = inputStream.read(buffer); read > 0 } ) {
+				zipOutput.write(buffer, 0, read)
+			}
+			
+			inputStream.close
+			zipOutput.closeEntry
+			
+			val meta = MetaFile.load(x.getCanonicalPath)
+			
+			if(meta("status") == "OK") {
+				inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".out"))
+				zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".out")))
+				
+				while( { read = inputStream.read(buffer); read > 0 } ) {
+					zipOutput.write(buffer, 0, read)
+				}
+		
+				inputStream.close
+				zipOutput.closeEntry
+			} else if(meta("status") == "RE" && lang == "java") {
+				inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))
+				zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
+				
+				while( { read = inputStream.read(buffer); read > 0 } ) {
+					zipOutput.write(buffer, 0, read)
+				}
+		
+				inputStream.close
+				zipOutput.closeEntry
+			}
+		}}
+		
+		zipOutput.close
+		
+		//FileUtils.deleteDirectory(runDirectory)
 	}
 	
 	def input(request: HttpServletRequest): InputOutputMessage = {

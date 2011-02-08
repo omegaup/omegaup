@@ -112,6 +112,13 @@ object FileUtil {
 	}
 	
 	@throws(classOf[IOException])
+	def write(file: String, data: String): Unit = {
+		val fileWriter = new FileWriter(file)
+		fileWriter.write(data)
+		fileWriter.close
+	}
+	
+	@throws(classOf[IOException])
 	def deleteDirectory(dir: String): Boolean = {
 		FileUtil.deleteDirectory(new File(dir))
 	}
