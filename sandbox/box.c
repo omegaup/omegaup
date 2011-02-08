@@ -1689,6 +1689,7 @@ process_option (int c, char *argument, int enable_script)
 	break;
       case 'c':
 	set_cwd = argument;
+	strcpy(cwd, argument);
 	break;
       case 'C':
         allow_threads = 1;
@@ -1793,12 +1794,12 @@ main(int argc, char **argv)
   int c, random_fd;
   uid_t uid;
   
+  getcwd(cwd, sizeof(cwd));
+  
   while ((c = getopt(argc, argv, "a:c:CeE:fFi:k:m:M:o:O:p:P:qr:s:S:t:Tvw:x:")) >= 0)
     process_option(c, optarg, 1);
   if (optind >= argc)
     usage();
-
-  getcwd(cwd, sizeof(cwd));
   
   random_fd = open("/dev/urandom", O_RDONLY);
   if (random_fd == -1)
