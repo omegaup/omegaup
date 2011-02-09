@@ -32,6 +32,23 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 				return EXIT_SUCCESS;
 			}
 		""")
+		OmegaUp ! Submission(3, Lenguaje.Java, 1, """
+			class compilehang {
+			public static void main(String[] args) {
+			  double d = 2.2250738585072012e-308;
+			  System.out.println("Value: " + d);
+			 }
+			}
+		""")
+		OmegaUp ! Submission(4, Lenguaje.Java, 1, """
+			class runhang {
+			public static void main(String[] args) {
+			  System.out.println("Test:");
+			  double d = Double.parseDouble("2.2250738585072012e-308");
+			  System.out.println("Value: " + d);
+			 }
+			}
+		""")
 		
 		Grader.main(Array.ofDim[String](0))
 	}
