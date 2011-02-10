@@ -27,7 +27,7 @@ object UVa extends Actor with Log {
 	
 	private val locks  = for (i <- 1 until 50) yield new Semaphore(1)
 	private var lock_i = 0
-	private val rids   = Array.ofDim[Int](2,50)
+	private val rids   = Array.ofDim[Long](2,50)
 	
 	private val cookies = new scala.collection.mutable.HashMap[String,String]
 	private var logged_in = false
@@ -79,8 +79,13 @@ object UVa extends Actor with Log {
 						error("UVa login failure")
 					}
 				}
-				case Submission(id: Int, lang: Lenguaje, pid: Int, code: String) => {
+				case Submission(ejecucion: Ejecucion) => {
 					locks(lock_i).acquire()
+					
+					val id   = ejecucion.id
+					val pid  = ejecucion.problema.single.id_remoto
+					val lang = ejecucion.lenguaje
+					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
 					
 					info("UVa Submission {} for problem {}", id, pid)
 					
@@ -140,7 +145,7 @@ object UVa extends Actor with Log {
 		}
 	}
 	
-	private def readVeredict(triesLeft: Int = 5): Unit = {
+	private def readVeredict(triesLeft: Long = 5): Unit = {
 		if (triesLeft == 0)
 			throw new Exception("Retry limit exceeded")
 		

@@ -48,7 +48,12 @@ object LiveArchive extends Actor with Log {
 	def act() = {
 		while(true) {
 			receive {
-				case Submission(id: Int, lang: Lenguaje, pid: Int, code: String) => {
+				case Submission(ejecucion: Ejecucion) => {
+					val id   = ejecucion.id
+					val pid  = ejecucion.problema.single.id_remoto
+					val lang = ejecucion.lenguaje
+					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
+					
 					info("LA Submission {} for problem {}", id, pid)
 		
 					val post_data = Map(
@@ -85,7 +90,7 @@ object LiveArchive extends Actor with Log {
 		}
 	}
 	
-	private def readVeredict(id: Int, triesLeft: Int = 5): Unit = {
+	private def readVeredict(id: Long, triesLeft: Int = 5): Unit = {
 		if (triesLeft == 0)
 			throw new Exception("Retry limit exceeded")
 			

@@ -15,7 +15,12 @@ object OmegaUp extends Actor with Log {
 	def act() = {
 		while(true) {
 			receive {
-				case Submission(id: Int, lang: Lenguaje, pid: Int, code: String) => {
+				case Submission(ejecucion: Ejecucion) => {
+					val id   = ejecucion.id
+					val pid  = ejecucion.problema.single.id_remoto
+					val lang = ejecucion.lenguaje
+					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
+					
 					info("OU Submission {} for problem {}", id, pid)
 					
 					val (host, port) = Manager.getRunner

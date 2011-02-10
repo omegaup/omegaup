@@ -12,8 +12,10 @@ import omegaup._
 import Estado._
 import Lenguaje._
 import Veredicto._
+import Validador._
+import Servidor._
 
-case class Submission(id: Int, lang: Lenguaje, pid: Int, code: String)
+case class Submission(ejecucion: Ejecucion)
 case object Login
 
 object Manager extends Object with Log {
@@ -28,7 +30,17 @@ object Manager extends Object with Log {
 			if ( ejecucion.isEmpty ) {
 				throw new IllegalArgumentException("Id " + id + " not found")
 			} else {
-				println(ejecucion)
+				if (ejecucion.single.problema.single.validador == Validador.Remoto) {
+					ejecucion.single.problema.single.servidor match {
+						case Some(Servidor.UVa) => drivers.UVa
+						case Some(Servidor.LiveArchive) => drivers.LiveArchive
+						case Some(Servidor.TJU) => drivers.TJU
+						case _ => null
+					}
+				} else {
+					drivers.OmegaUp
+				} ! Submission(ejecucion.single)
+				
 				new GradeOutputMessage()
 			}
 		}
@@ -56,8 +68,33 @@ object Manager extends Object with Log {
 		new RegisterOutputMessage()
 	}
 	
-	def updateVeredict(id: Int, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Int, compileError: Option[String] = None) = {
+	def updateVeredict(id: Long, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Long, compileError: Option[String] = None) = {
 		info("Veredict update: {} {} {} {} {} {} {}", id, e, v, points, runtime, memory, compileError)
+		
+		transaction {
+			if(e == Estado.Listo) {
+				update(GraderData.ejecuciones) (ej => 
+					where(ej.id === id)
+					set(
+						ej.estado    := e,
+						ej.veredicto := v.get,
+						ej.puntuacion:= points,
+						ej.tiempo    := math.round(100 * runtime),
+						ej.memoria   := memory
+					)
+				)
+			} else {
+				update(GraderData.ejecuciones) (ej => 
+					where(ej.id === id)
+					set(
+						ej.estado    := e,
+						ej.puntuacion:= points,
+						ej.tiempo    := math.round(100 * runtime),
+						ej.memoria   := memory
+					)
+				)
+			}
+		}
 	}
 	
 	def main(args: Array[String]) = {
