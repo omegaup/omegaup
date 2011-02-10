@@ -16,7 +16,7 @@ import Veredicto._
 case class Submission(id: Int, lang: Lenguaje, pid: Int, code: String)
 case object Login
 
-object Grader extends Object with Log {
+object Manager extends Object with Log {
 	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[(String, Int)]()
 	
 	def grade(id: Int): GradeOutputMessage = {
@@ -94,7 +94,7 @@ object Grader extends Object with Log {
 						try {
 							val req = Serialization.read[GradeInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							Grader.grade(req.id)
+							Manager.grade(req.id)
 						} catch {
 							case e: IllegalArgumentException => {
 								response.setStatus(HttpServletResponse.SC_NOT_FOUND)
@@ -110,7 +110,7 @@ object Grader extends Object with Log {
 						try {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							Grader.register(request.getRemoteAddr, req.port)
+							Manager.register(request.getRemoteAddr, req.port)
 						} catch {
 							case e: Exception => {
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
@@ -122,7 +122,7 @@ object Grader extends Object with Log {
 						try {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							Grader.deregister(request.getRemoteAddr, req.port)
+							Manager.deregister(request.getRemoteAddr, req.port)
 						} catch {
 							case e: Exception => {
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)

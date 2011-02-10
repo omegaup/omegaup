@@ -18,7 +18,7 @@ object OmegaUp extends Actor with Log {
 				case Submission(id: Int, lang: Lenguaje, pid: Int, code: String) => {
 					info("OU Submission {} for problem {}", id, pid)
 					
-					val (host, port) = Grader.getRunner
+					val (host, port) = Manager.getRunner
 					val url = "https://" + host + ":" + port
 					
 					try {
@@ -40,19 +40,19 @@ object OmegaUp extends Actor with Log {
 								case _ => {}
 							}
 							
-							Grader.updateVeredict(id, Estado.Listo, Some(Veredicto.Accepted), 1, 1, 1)
+							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.Accepted), 1, 1, 1)
 						} else {
-							Grader.updateVeredict(id, Estado.Listo, Some(Veredicto.CompileError), 0, 0, 0, output.error)
+							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.CompileError), 0, 0, 0, output.error)
 						}
 					} catch {
 						case e: Exception => {
 							error("OU Submission {} failed for problem {}", id, pid)
 							error(e.getMessage)
-							Grader.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 						}
 					}
 					
-					Grader.addRunner(host, port)
+					Manager.addRunner(host, port)
 				}
 			}
 		}

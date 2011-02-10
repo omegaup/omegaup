@@ -86,7 +86,7 @@ object UVa extends Actor with Log {
 					
 					if(!logged_in) {
 						error("UVa not logged in")
-						Grader.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+						Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 					} else {
 						val post_data = Map(
 							"problemid" ->	"",
@@ -115,7 +115,7 @@ object UVa extends Actor with Log {
 							case e: Exception => {
 								error("UVa Submission {} failed for problem {}", id, pid)
 								error(e.getMessage)
-								Grader.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+								Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 							}
 						}
 					}
@@ -178,7 +178,7 @@ object UVa extends Actor with Log {
 						}
 					}
 					
-					Grader.updateVeredict(rids(1)(id), estado, veredicto, 1, row(5).toDouble, 0)
+					Manager.updateVeredict(rids(1)(id), estado, veredicto, 1, row(5).toDouble, 0)
 					
 					if(estado == Estado.Listo) {
 						rids(0)(id) = 0

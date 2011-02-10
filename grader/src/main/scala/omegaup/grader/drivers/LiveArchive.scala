@@ -77,7 +77,7 @@ object LiveArchive extends Actor with Log {
 						case e: Exception => {
 							error("LA Submission {} failed for problem {}", id, pid)
 							error(e.getMessage)
-							Grader.updateVeredict(1, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+							Manager.updateVeredict(1, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 						}
 					}
 				}
@@ -130,7 +130,7 @@ object LiveArchive extends Actor with Log {
 						mem.toInt
 					}
 			
-					Grader.updateVeredict(id, estado, veredicto, 1, cpu.toFloat, memory)
+					Manager.updateVeredict(id, estado, veredicto, 1, cpu.toFloat, memory)
 					
 					if(estado != Estado.Listo)
 						readVeredict(id)

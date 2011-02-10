@@ -77,7 +77,7 @@ object TJU extends Actor with Log {
 						case e: Exception => {
 							error("TJU Submission {} failed for problem {}", id, pid)
 							error(e.getMessage)
-							Grader.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 						}
 					}
 					
@@ -127,7 +127,7 @@ object TJU extends Actor with Log {
 				val runtime = 60 * minutes.toInt + seconds.toInt + fractions.toInt / 100.0
 				val memory = data(7).substring(0, data(7).length - 1).toInt
 			
-				Grader.updateVeredict(id, estado, veredicto, 1, runtime, memory)
+				Manager.updateVeredict(id, estado, veredicto, 1, runtime, memory)
 				
 				if(estado != Estado.Listo)
 					readVeredict(id)
