@@ -50,7 +50,7 @@ object LiveArchive extends Actor with Log {
 			receive {
 				case Submission(ejecucion: Ejecucion) => {
 					val id   = ejecucion.id
-					val pid  = ejecucion.problema.single.id_remoto
+					val pid  = ejecucion.problema.id_remoto
 					val lang = ejecucion.lenguaje
 					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
 					
@@ -82,6 +82,9 @@ object LiveArchive extends Actor with Log {
 						case e: Exception => {
 							error("LA Submission {} failed for problem {}", id, pid)
 							error(e.getMessage)
+							e.getStackTrace.foreach { st =>
+								error(st.toString)
+							}
 							Manager.updateVeredict(1, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 						}
 					}

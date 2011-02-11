@@ -20,18 +20,24 @@ case object Login
 
 object Manager extends Object with Log {
 	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[(String, Int)]()
+	// Loading SQL connector driver
+	Class.forName("com.mysql.jdbc.Driver")
+	val connection = java.sql.DriverManager.getConnection(
+		Config.get("db.url", "jdbc:mysql://localhost/omegaup"),
+		Config.get("db.user", "omegaup"),
+		Config.get("db.password", "")
+	)
 	
-	def grade(id: Int): GradeOutputMessage = {
+	def grade(id: Long): GradeOutputMessage = {
 		info("Judging {}", id)
 		
-		transaction {
-			val ejecucion = GraderData.ejecuciones.where(_.id === id)
+		implicit val conn = connection
 		
-			if ( ejecucion.isEmpty ) {
-				throw new IllegalArgumentException("Id " + id + " not found")
-			} else {
-				if (ejecucion.single.problema.single.validador == Validador.Remoto) {
-					ejecucion.single.problema.single.servidor match {
+		GraderData.ejecucion(id) match {
+			case None => throw new IllegalArgumentException("Id " + id + " not found")
+			case Some(ejecucion) => {
+				if (ejecucion.problema.validador == Validador.Remoto) {
+					ejecucion.problema.servidor match {
 						case Some(Servidor.UVa) => drivers.UVa
 						case Some(Servidor.LiveArchive) => drivers.LiveArchive
 						case Some(Servidor.TJU) => drivers.TJU
@@ -39,7 +45,7 @@ object Manager extends Object with Log {
 					}
 				} else {
 					drivers.OmegaUp
-				} ! Submission(ejecucion.single)
+				} ! Submission(ejecucion)
 				
 				new GradeOutputMessage()
 			}
@@ -68,33 +74,21 @@ object Manager extends Object with Log {
 		new RegisterOutputMessage()
 	}
 	
-	def updateVeredict(id: Long, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Long, compileError: Option[String] = None) = {
+	def updateVeredict(id: Long, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Long, compileError: Option[String] = None): Ejecucion = {
 		info("Veredict update: {} {} {} {} {} {} {}", id, e, v, points, runtime, memory, compileError)
 		
-		transaction {
-			if(e == Estado.Listo) {
-				update(GraderData.ejecuciones) (ej => 
-					where(ej.id === id)
-					set(
-						ej.estado    := e,
-						ej.veredicto := v.get,
-						ej.puntuacion:= points,
-						ej.tiempo    := math.round(100 * runtime),
-						ej.memoria   := memory
-					)
-				)
-			} else {
-				update(GraderData.ejecuciones) (ej => 
-					where(ej.id === id)
-					set(
-						ej.estado    := e,
-						ej.puntuacion:= points,
-						ej.tiempo    := math.round(100 * runtime),
-						ej.memoria   := memory
-					)
-				)
-			}
-		}
+		implicit val conn = connection
+		
+		GraderData.update(
+			new Ejecucion(
+				id = id,
+				estado = e,
+				veredicto = if(v.isEmpty) { Veredicto.JudgeError } else { v.get },
+				puntuacion = points,
+				tiempo = math.round(100 * runtime),
+				memoria = memory
+			)
+		)
 	}
 	
 	def main(args: Array[String]) = {
@@ -103,19 +97,6 @@ object Manager extends Object with Log {
 		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "omegaup.jks"))
 		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("grader.keystore.password", "omegaup"))
 		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
-		
-		// Loading SQL connector driver
-		Class.forName("com.mysql.jdbc.Driver")
-		SessionFactory.concreteFactory = Some(()=>
-			Session.create(
-				java.sql.DriverManager.getConnection(
-					Config.get("db.url", "jdbc:mysql://localhost/omegaup"),
-					Config.get("db.user", "omegaup"),
-					Config.get("db.password", "")
-				),
-				new org.squeryl.adapters.MySQLAdapter
-			)
-		)
 
 		// the handler
 		val handler = new AbstractHandler() {

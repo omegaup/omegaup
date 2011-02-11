@@ -348,10 +348,13 @@ object Runner extends Object with Log {
 		
 		java.lang.System.in.read()
 		
-		Https.send[RegisterInputMessage, RegisterOutputMessage](
-			Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
-			new RegisterInputMessage(runnerConnector.getLocalPort())
-		)
+		try {
+			// well, at least try to de-register
+			Https.send[RegisterInputMessage, RegisterOutputMessage](
+				Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
+				new RegisterInputMessage(runnerConnector.getLocalPort())
+			)
+		}
 		
 		server.stop()
 		server.join()

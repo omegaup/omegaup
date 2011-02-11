@@ -8,14 +8,37 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
 class DriverSpec extends FlatSpec with ShouldMatchers {
-	"OmegaUpDriver" should "login" in {
+	"OmegaUpDriver" should "submit" in {
+		val t = new Thread() { override def run(): Unit = { Manager.main(Array.ofDim[String](0)) } } 
+		t.start
+		
+		try { Thread.sleep(1000) }
+		
 		OmegaUp.start
-		OmegaUp ! Submission(1, Lenguaje.Cpp, 1, """
+		
+		val omegaUpSubmit = (id: Long, lenguaje: Lenguaje, code: String) => {
+			val file = java.io.File.createTempFile(System.currentTimeMillis.toString, "", new java.io.File(Config.get("submissions.root", ".")))
+			
+			implicit val conn = Manager.connection
+			
+			FileUtil.write(file.getCanonicalPath, code)
+		
+			Manager.grade(
+				GraderData.insert(new Ejecucion(
+					guid = file.getName,
+					lenguaje = lenguaje,
+					problema = new Problema(id = id)
+				)).id
+			)
+		}
+		
+		omegaUpSubmit(1, Lenguaje.Cpp, """
 			int main() {
 				while(true);
 			}
 		""")
-		OmegaUp ! Submission(2, Lenguaje.Cpp, 1, """
+		
+		omegaUpSubmit(1, Lenguaje.Cpp, """
 			#include <cstdlib>
 			#include <iostream>
 			#include <map>
@@ -32,7 +55,8 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 				return EXIT_SUCCESS;
 			}
 		""")
-		OmegaUp ! Submission(3, Lenguaje.Java, 1, """
+		
+		omegaUpSubmit(1, Lenguaje.Java, """
 			class compilehang {
 			public static void main(String[] args) {
 			  double d = 2.2250738585072012e-308;
@@ -40,7 +64,8 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			 }
 			}
 		""")
-		OmegaUp ! Submission(4, Lenguaje.Java, 1, """
+		
+		omegaUpSubmit(1, Lenguaje.Java, """
 			class runhang {
 			public static void main(String[] args) {
 			  System.out.println("Test:");
@@ -50,7 +75,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			}
 		""")
 		
-		Grader.main(Array.ofDim[String](0))
+		t.join
 	}
 	
 	/*

@@ -1,10 +1,7 @@
 package omegaup.grader
 
 import java.sql._
-import org.squeryl._
-import org.squeryl.dsl._
-import org.squeryl.annotations._
-import org.squeryl.PrimitiveTypeMode._
+import omegaup.Database._
 
 object Validador extends Enumeration {
 	type Validador = Value
@@ -65,56 +62,101 @@ import Estado._
 import Servidor._
 import Lenguaje._
 
-object GraderData extends Schema {
-	val problemas = table[Problema]("Problemas")
-	val ejecuciones = table[Ejecucion]("Ejecuciones")
-	
-	val problemasEjecuciones =
-		oneToManyRelation(problemas, ejecuciones).
-		via((p,e) => p.id === e.problemaID)
-}
-
 class Problema(
-	@Column("problemaID")
 	val id: Long,
-	val publico: Long,
-	val autor: Long,
-	val titulo: String,
-	val alias: Option[String],
-	val validador: Validador,
-	val servidor: Option[Servidor],
-	val id_remoto: Option[String],
-	val tiempo_limite: Option[Long],
-	val memoria_limite: Option[Long],
-	val vistas: Long,
-	val envios: Long,
-	val aceptados: Long,
-	val dificultad: Double) extends KeyedEntity[Long] {
-	
-	def this() = this(0L, 1L, 0L, "", Some(""), Validador.TokenNumeric, Some(Servidor.UVa), Some(""), Some(3000), Some(64), 0, 0, 0, 0);
-	
-	lazy val ejecuciones: OneToMany[Ejecucion] = GraderData.problemasEjecuciones.left(this)
+	val publico: Long = 1,
+	val autor: Long = 0,
+	val titulo: String = "",
+	val alias: Option[String] = None,
+	val validador: Validador = Validador.TokenNumeric,
+	val servidor: Option[Servidor] = None,
+	val id_remoto: Option[String] = None,
+	val tiempo_limite: Option[Long] = Some(1),
+	val memoria_limite: Option[Long] = Some(64),
+	val vistas: Long = 0,
+	val envios: Long = 0,
+	val aceptados: Long = 0,
+	val dificultad: Double = 0) {
 }
 
 class Ejecucion(
-	@Column("ejecucionID")
-	val id: Long,
-	@Column("usuarioID")
-	val usuario: Long,
-	val problemaID: Long,
-	@Column("concursoID")
-	val concurso: Option[Long],
-	val guid: String,
-	val lenguaje: Lenguaje,
-	val estado: Estado,
-	val veredicto: Veredicto,
-	val tiempo: Long,
-	val memoria: Long,
-	val puntuacion: Double,
-	val ip: String,
-	val fecha: Timestamp) extends KeyedEntity[Long] {
-	
-	def this() = this(0, 0, 0, Some(0L), "", Lenguaje.C, Estado.Nuevo, Veredicto.JudgeError, 0, 0, 0, "", new Timestamp(0))
-	
-	lazy val problema: ManyToOne[Problema] = GraderData.problemasEjecuciones.right(this)
+	val id: Long = 0,
+	val usuario: Long = 0,
+	val problema: Problema = null,
+	val concurso: Option[Long] = None,
+	val guid: String = "",
+	val lenguaje: Lenguaje = Lenguaje.C,
+	val estado: Estado = Estado.Nuevo,
+	val veredicto: Veredicto = Veredicto.JudgeError,
+	val tiempo: Long = 0,
+	val memoria: Long = 0,
+	val puntuacion: Double = 0,
+	val puntuacion_concurso: Double = 0,
+	val ip: String = "127.0.0.1",
+	val fecha: Timestamp = new Timestamp(0)
+) {
+}
+
+object GraderData {
+	def ejecucion(id: Long)(implicit connection: Connection): Option[Ejecucion] =
+		query("SELECT * FROM Ejecuciones AS e, Problemas AS p WHERE p.problemaID = e.problemaID AND e.ejecucionID = " + id) { rs =>
+			new Ejecucion(
+				id = rs.getLong("ejecucionID"),
+				concurso = rs.getLong("concursoID") match {
+					case 0 => if(rs.wasNull) None else Some(0)
+					case x => Some(x)
+				},
+				guid = rs.getString("guid"),
+				lenguaje = Lenguaje.withName(rs.getString("lenguaje")),
+				estado = Estado.withName(rs.getString("estado")),
+				veredicto = Veredicto.withName(rs.getString("veredicto")),
+				problema = new Problema(
+					 id = rs.getLong("p.problemaID"),
+					 validador = Validador.withName(rs.getString("validador")),
+					 servidor = rs.getString("servidor") match {
+					 	case null => None
+					 	case x: String => Some(Servidor.withName(x))
+					 },
+					 id_remoto = rs.getString("id_remoto") match {
+					 	case null => None
+					 	case x: String => Some(x)
+					 },
+					 tiempo_limite = rs.getString("tiempo") match {
+					 	case null => None
+					 	case x: String => Some(x.toLong)
+					 },
+					 memoria_limite = rs.getString("memoria") match {
+					 	case null => None
+					 	case x: String => Some(x.toLong)
+					 }
+				)
+			)
+		}
+		
+	def update(ejecucion: Ejecucion)(implicit connection: Connection): Ejecucion = {
+		execute(
+			"UPDATE Ejecuciones SET estado = '" + ejecucion.estado + "'" +
+			", veredicto = '" + ejecucion.veredicto + "'" +
+			", tiempo = " + ejecucion.tiempo +
+			", memoria = " + ejecucion.memoria +
+			", puntuacion = " + ejecucion.puntuacion +
+			", puntuacion_concurso = " + ejecucion.puntuacion_concurso + " " +
+			"WHERE ejecucionID = " + ejecucion.id
+		)
+		ejecucion
+	}
+		
+	def insert(ej: Ejecucion)(implicit connection: Connection): Ejecucion = {
+		execute(
+			"INSERT INTO Ejecuciones (usuarioID, problemaID, guid, lenguaje, veredicto, ip) VALUES(" +
+				ej.usuario + ", " +
+				ej.problema.id + ", " +
+				"'" + ej.guid + "', " + 
+				"'" + ej.lenguaje + "', " + 
+				"'" + ej.veredicto + "', " + 
+				"'" + ej.ip + "'" + 
+			")"
+		)
+		ejecucion(query("SELECT LAST_INSERT_ID()") { rs => rs.getInt(1) }.get).get
+	}
 }

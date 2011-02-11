@@ -83,7 +83,7 @@ object UVa extends Actor with Log {
 					locks(lock_i).acquire()
 					
 					val id   = ejecucion.id
-					val pid  = ejecucion.problema.single.id_remoto
+					val pid  = ejecucion.problema.id_remoto
 					val lang = ejecucion.lenguaje
 					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
 					
@@ -120,6 +120,9 @@ object UVa extends Actor with Log {
 							case e: Exception => {
 								error("UVa Submission {} failed for problem {}", id, pid)
 								error(e.getMessage)
+								e.getStackTrace.foreach { st =>
+									error(st.toString)
+								}
 								Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 							}
 						}
@@ -199,6 +202,10 @@ object UVa extends Actor with Log {
 		} catch {
 			case e: IOException => {
 				error("UVa communication error: {}", e.getMessage)
+				error(e.getMessage)
+				e.getStackTrace.foreach { st =>
+					error(st.toString)
+				}
 				readVeredict(triesLeft-1)
 			}
 		}

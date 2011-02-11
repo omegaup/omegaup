@@ -51,7 +51,7 @@ object TJU extends Actor with Log {
 						try { Thread.sleep(time_delta) }
 					
 					val id   = ejecucion.id
-					val pid  = ejecucion.problema.single.id_remoto
+					val pid  = ejecucion.problema.id_remoto.get
 					val lang = ejecucion.lenguaje
 					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
 					
@@ -82,6 +82,9 @@ object TJU extends Actor with Log {
 						case e: Exception => {
 							error("TJU Submission {} failed for problem {}", id, pid)
 							error(e.getMessage)
+							e.getStackTrace.foreach { st =>
+								error(st.toString)
+							}
 							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
 						}
 					}

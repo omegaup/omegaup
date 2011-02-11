@@ -12,7 +12,6 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 	)
 
 	override def libraryDependencies = Set(
-		"org.squeryl" % "squeryl_2.8.1" % "0.9.4-RC3",
 		"mysql" % "mysql-connector-java" % "5.1.12",
 		"org.mortbay.jetty" % "jetty" % "6.1.26",
 		"org.mortbay.jetty" % "jetty-sslengine" % "6.1.26",

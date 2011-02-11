@@ -255,4 +255,54 @@ object FileUtil {
 		
 		contents.toString.trim
 	}
+	
+	@throws(classOf[IOException])
+	def write(file: String, data: String): Unit = {
+		val fileWriter = new FileWriter(file)
+		fileWriter.write(data)
+		fileWriter.close
+	}
+}
+
+object Database {
+	def using[Closeable <: {def close(): Unit}, B](closeable: Closeable)(getB: Closeable => B): B =
+		try {
+			getB(closeable)
+		} finally {
+			closeable.close()
+		}
+
+	def bmap[T](test: => Boolean)(block: => T): List[T] = {
+		val ret = new scala.collection.mutable.ListBuffer[T]
+		while(test) ret += block
+		ret.toList
+	}
+
+	import java.sql._
+
+	/** Executes the SQL and processes the result set using the specified function. */
+	def query[B](sql: String)(process: ResultSet => B)(implicit connection: Connection): Option[B] =
+		using (connection.createStatement) { statement =>
+			using (statement.executeQuery(sql)) { results =>
+				results.next match {
+					case true => Some(process(results))
+					case false => None
+				}
+			}
+		}
+	
+	def execute(sql: String)(implicit connection: Connection): Unit =
+		using (connection.createStatement) { statement =>
+			statement.execute(sql)
+		}
+
+	/** Executes the SQL and uses the process function to convert each row into a T. */
+	/*
+	def queryEach[T](sql: String)(process: ResultSet => T)(implicit connection: Connection): List[T] =
+		query(sql) { results =>
+			bmap(results.next) {
+				process(results)
+			}
+		}
+	*/
 }
