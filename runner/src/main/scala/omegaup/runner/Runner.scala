@@ -63,7 +63,9 @@ object Runner extends Object with Log {
 				val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
 				FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
 			
-				if (meta.contains("message") && meta("status") != "RE")
+				if (meta("status") == "TO")
+					new CompileOutputMessage("compile error", error = Some("Compilation time exceeded"))
+				else if (meta.contains("message") && meta("status") != "RE")
 					new CompileOutputMessage("compile error", error = Some(meta("message")))
 				else
 					new CompileOutputMessage("compile error", error = Some(compile_error))

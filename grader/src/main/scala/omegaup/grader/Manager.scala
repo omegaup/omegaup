@@ -74,8 +74,8 @@ object Manager extends Object with Log {
 		new RegisterOutputMessage()
 	}
 	
-	def updateVeredict(id: Long, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Long, compileError: Option[String] = None): Ejecucion = {
-		info("Veredict update: {} {} {} {} {} {} {}", id, e, v, points, runtime, memory, compileError)
+	def updateVeredict(id: Long, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Long): Ejecucion = {
+		info("Veredict update: {} {} {} {} {} {}", id, e, v, points, runtime, memory)
 		
 		implicit val conn = connection
 		

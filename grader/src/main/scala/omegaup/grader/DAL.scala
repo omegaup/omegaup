@@ -45,15 +45,16 @@ object Estado extends Enumeration {
 object Veredicto extends Enumeration {
 	type Veredicto = Value
 	val  Accepted = Value(1, "AC")
-	val  WrongAnswer = Value(2, "WA")
+	val  PartialAccepted = Value(2, "PA")
 	val  PresentationError = Value(3, "PE")
-	val  RuntimeError = Value(4, "RTE")
-	val  MemoryLimitExceeded = Value(5, "MLE")
+	val  WrongAnswer = Value(4, "WA")
+	val  TimeLimitExceeded = Value(5, "TLE")
 	val  OutputLimitExceeded = Value(6, "OLE")
-	val  TimeLimitExceeded = Value(7, "TLE")
-	val  RestrictedFunctionError = Value(8, "RFE")
-	val  CompileError = Value(9, "CE")
-	val  JudgeError = Value(10, "JE")
+	val  MemoryLimitExceeded = Value(7, "MLE")
+	val  RuntimeError = Value(8, "RTE")
+	val  RestrictedFunctionError = Value(9, "RFE")
+	val  CompileError = Value(10, "CE")
+	val  JudgeError = Value(11, "JE")
 }
 
 import Validador._

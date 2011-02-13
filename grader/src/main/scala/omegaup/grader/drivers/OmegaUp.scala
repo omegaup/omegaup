@@ -10,6 +10,7 @@ import scala.actors.Actor._
 import Lenguaje._
 import Veredicto._
 import Estado._
+import Validador._
 
 object OmegaUp extends Actor with Log {
 	def act() = {
@@ -38,16 +39,26 @@ object OmegaUp extends Actor with Log {
 							
 							Https.receive_zip[RunOutputMessage, RunInputMessage](url + "/run/", msg, zip) match {
 								case Some(x) => {
-									if(Https.zip_send[InputOutputMessage](url + "/input/", Config.get("problems.root", ".") + "/" + pid + "/cases.zip", input).status != "ok" || Https.receive_zip[RunOutputMessage, RunInputMessage](url + "/run/", msg, zip) != None) {
+									if(
+										Https.zip_send[InputOutputMessage](url + "/input/", Config.get("problems.root", ".") + "/" + pid + "/cases.zip", input).status != "ok" ||
+										Https.receive_zip[RunOutputMessage, RunInputMessage](url + "/run/", msg, zip) != None
+									) {
 										throw new RuntimeException("OU unable to run submission " + id + ". giving up.")
 									}
 								}
 								case _ => {}
 							}
 							
-							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.Accepted), 1, 1, 1)
+							ejecucion.problema.validador match {
+								case Validador.Literal => LiteralGrader.grade(ejecucion)
+								case Validador.Token => TokenGrader.grade(ejecucion)
+								case Validador.TokenCaseless => TokenCaselessGrader.grade(ejecucion)
+								case Validador.TokenNumeric => TokenNumericGrader.grade(ejecucion)
+							}
 						} else {
-							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.CompileError), 0, 0, 0, output.error)
+							val errorFile = new FileWriter(Config.get("grader.root", ".") + "/" + id + ".err")
+							errorFile.write(output.error.get)
+							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.CompileError), 0, 0, 0)
 						}
 					} catch {
 						case e: Exception => {

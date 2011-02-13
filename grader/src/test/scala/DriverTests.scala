@@ -56,8 +56,26 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			}
 		""")
 		
+		omegaUpSubmit(1, Lenguaje.Cpp, """
+			#include <cstdlib>
+			#include <iostream>
+			#include <map>
+			#include <unistd.h>
+
+			using namespace std;
+
+			int main(int argc, char *argv[]) {
+				int a, b;
+				cin >> a >> b;
+				cout << "Hello, World!" << endl;
+				cout << 3 << endl;
+				
+				return EXIT_SUCCESS;
+			}
+		""")
+		
 		omegaUpSubmit(1, Lenguaje.Java, """
-			class compilehang {
+			class Main {
 			public static void main(String[] args) {
 			  double d = 2.2250738585072012e-308;
 			  System.out.println("Value: " + d);
@@ -66,7 +84,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 		""")
 		
 		omegaUpSubmit(1, Lenguaje.Java, """
-			class runhang {
+			class Main {
 			public static void main(String[] args) {
 			  System.out.println("Test:");
 			  double d = Double.parseDouble("2.2250738585072012e-308");
