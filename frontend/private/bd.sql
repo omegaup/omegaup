@@ -230,7 +230,6 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Concursos` (
   `puntaje_parcial` TINYINT(1) NOT NULL DEFAULT TRUE COMMENT 'Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos',
   `submissions_gap` TINYINT(1) NOT NULL DEFAULT TRUE COMMENT 'Tiempo mínimo que debe de esperar un usuario despues de realizar un envío para hacer otro',
   `feedback` ENUM('no','si','parcial') NOT NULL ,
-  `scoreboard` INT(11) NOT NULL DEFAULT TRUE COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
   `penalizacion` INT(11) NOT NULL DEFAULT TRUE COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
   `inicio_tiempo` ENUM('concurso', 'problema') NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
   PRIMARY KEY (`concursoID`) ,
