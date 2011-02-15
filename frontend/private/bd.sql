@@ -9,7 +9,7 @@ USE `omegaup` ;
 -- Table `omegaup`.`Paises`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Paises` (
-  `paisID` INT(11) NOT NULL ,
+  `paisID` CHAR(3) NOT NULL ,
   `nombre` VARCHAR(50) NOT NULL ,
   PRIMARY KEY (`paisID`) )
 ENGINE = MyISAM
@@ -22,7 +22,7 @@ COMMENT = 'Catálogos para la normalización';
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Estados` (
   `estadoID` INT(11) NOT NULL ,
-  `paisID` INT(11) NOT NULL ,
+  `paisID` CHAR(3) NOT NULL ,
   `nombre` VARCHAR(50) NOT NULL ,
   PRIMARY KEY (`estadoID`) ,
   INDEX `paisID` (`paisID` ASC) ,
@@ -66,7 +66,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Usuarios` (
   `nombre` VARCHAR(256) NULL DEFAULT NULL ,
   `resueltos` INT(11) NOT NULL DEFAULT '0' ,
   `intentados` INT(11) NOT NULL DEFAULT '0' ,
-  `paisID` INT(11) NULL DEFAULT NULL ,
+  `paisID` CHAR(3) NULL DEFAULT NULL ,
   `estadoID` INT(11) NULL DEFAULT NULL ,
   `escuelaID` INT(11) NULL DEFAULT NULL ,
   `gradoestudios` VARCHAR(64) NULL DEFAULT NULL ,
@@ -222,6 +222,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Concursos` (
   `descripcion` TINYTEXT NOT NULL COMMENT 'Una breve descripcion de cada concurso.' ,
   `inicio` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Hora de inicio de este concurso' ,
   `final` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Hora de finalizacion de este concurso' ,
+  `window_lenght` INT(11) COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso' ,
   `creadorID` INT(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso' ,
   `repeticionID` INT(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso' ,
   `abierto` TINYINT(1) NOT NULL DEFAULT TRUE COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso' ,
@@ -428,7 +429,7 @@ COMMENT = 'Guarda la relacion entre Problemas y sus Tags';
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Idiomas` (
   `idiomaID` INT(11) NOT NULL AUTO_INCREMENT ,
   `nombre` VARCHAR(45) NOT NULL ,
-  `paisID` INT(11) NULL DEFAULT NULL COMMENT 'Se guarda la relación con el país para defaultear más rápido.' ,
+  `paisID` CHAR(3) NULL DEFAULT NULL COMMENT 'Se guarda la relación con el país para defaultear más rápido.' ,
   PRIMARY KEY (`idiomaID`) ,
   UNIQUE INDEX `nombre_UNIQUE` (`nombre` ASC) ,
   INDEX `paisID` (`paisID` ASC) ,
