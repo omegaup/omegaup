@@ -285,12 +285,13 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Ejecuciones` (
   `problemaID` INT(11) NOT NULL ,
   `concursoID` INT(11) NULL DEFAULT NULL ,
   `guid` CHAR(32) NOT NULL ,
-  `lenguaje` ENUM('c','cpp','java','py','rb','pl','cs') NOT NULL ,
+  `lenguaje` ENUM('c','cpp','java','py','rb','pl','cs','p') NOT NULL ,
   `estado` ENUM('nuevo','espera','compilando','ejecutando','listo') NOT NULL DEFAULT 'nuevo' ,
-  `veredicto` ENUM('AC','WA','PE','RTE','MLE','TLE','RFE','JE') NOT NULL ,
+  `veredicto` ENUM('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL ,
   `tiempo` INT(11) NOT NULL DEFAULT '0' ,
   `memoria` INT(11) NOT NULL DEFAULT '0' ,
-  `puntuacion` DOUBLE NOT NULL DEFAULT '0' ,
+  `puntuacion` DOUBLE NOT NULL DEFAULT '0' , -- proporción (entre 0 y 1) de los casos resueltos correctamente
+  `puntuacion_concurso` DOUBLE NOT NULL DEFAULT '0' , -- puntuación ajustada según las reglas del concurso
   `ip` CHAR(15) NOT NULL ,
   `fecha` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`ejecucionID`) ,
