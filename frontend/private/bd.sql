@@ -199,6 +199,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problemas` (
   `dificultad` DOUBLE NOT NULL DEFAULT '0' ,
   `fechaDeCreacion` DATETIME NOT NULL ,
   `fuente` VARCHAR(256) NULL DEFAULT NULL ,
+  `orden` ENUM('normal', 'inverso') NOT NULL DEFAULT 'normal', -- Orden normal: más puntos es mejor. Orden inverso: menos penalty es mejor.
   PRIMARY KEY (`problemaID`) ,
   INDEX `autorID` (`autorID` ASC) ,
   CONSTRAINT `autorID`
