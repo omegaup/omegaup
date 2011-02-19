@@ -73,21 +73,12 @@ object Manager extends Object with Log {
 		new RegisterOutputMessage()
 	}
 	
-	def updateVeredict(id: Long, e: Estado, v: Option[Veredicto], points: Double, runtime: Double, memory: Long): Ejecucion = {
-		info("Veredict update: {} {} {} {} {} {}", id, e, v, points, runtime, memory)
+	def updateVeredict(ej: Ejecucion): Ejecucion = {
+		info("Veredict update: {} {} {} {} {} {} {}", ej.id, ej.estado, ej.veredicto, ej.puntuacion, ej.puntuacion_concurso, ej.tiempo, ej.memoria)
 		
 		implicit val conn = connection
 		
-		GraderData.update(
-			new Ejecucion(
-				id = id,
-				estado = e,
-				veredicto = if(v.isEmpty) { Veredicto.JudgeError } else { v.get },
-				puntuacion = points,
-				tiempo = math.round(100 * runtime),
-				memoria = memory
-			)
-		)
+		GraderData.update(ej)
 	}
 	
 	def main(args: Array[String]) = {

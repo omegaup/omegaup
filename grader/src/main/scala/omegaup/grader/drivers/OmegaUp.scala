@@ -28,6 +28,8 @@ object OmegaUp extends Actor with Log {
 					val url = "https://" + host + ":" + port
 					
 					try {
+						info("OU Compiling {}", id)
+						
 						val output = Https.send[CompileOutputMessage, CompileInputMessage](url + "/compile/",
 							new CompileInputMessage(lang.toString, List(code))
 						)
@@ -58,7 +60,13 @@ object OmegaUp extends Actor with Log {
 						} else {
 							val errorFile = new FileWriter(Config.get("grader.root", ".") + "/" + id + ".err")
 							errorFile.write(output.error.get)
-							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.CompileError), 0, 0, 0)
+							
+							ejecucion.estado = Estado.Listo
+							ejecucion.veredicto = Veredicto.CompileError
+							ejecucion.memoria = 0
+							ejecucion.tiempo = 0
+							ejecucion.puntuacion = 0
+							Manager.updateVeredict(ejecucion)
 						}
 					} catch {
 						case e: Exception => {
@@ -67,7 +75,13 @@ object OmegaUp extends Actor with Log {
 							e.getStackTrace.foreach { st =>
 								error(st.toString)
 							}
-							Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+							
+							ejecucion.estado = Estado.Listo
+							ejecucion.veredicto = Veredicto.JudgeError
+							ejecucion.memoria = 0
+							ejecucion.tiempo = 0
+							ejecucion.puntuacion = 0
+							Manager.updateVeredict(ejecucion)
 						}
 					}
 					

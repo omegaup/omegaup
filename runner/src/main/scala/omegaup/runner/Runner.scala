@@ -343,23 +343,25 @@ object Runner extends Object with Log {
 		
 		info("Registering port {}", runnerConnector.getLocalPort())
 		
-		Https.send[RegisterInputMessage, RegisterOutputMessage](
-			Config.get("grader.register.url", "https://localhost:21680/register/"),
-			new RegisterInputMessage(runnerConnector.getLocalPort())
-		)
-		
-		java.lang.System.in.read()
-		
 		try {
-			// well, at least try to de-register
 			Https.send[RegisterInputMessage, RegisterOutputMessage](
-				Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
+				Config.get("grader.register.url", "https://localhost:21680/register/"),
 				new RegisterInputMessage(runnerConnector.getLocalPort())
 			)
-		}
 		
-		server.stop()
-		server.join()
+			java.lang.System.in.read()
+		
+			try {
+				// well, at least try to de-register
+				Https.send[RegisterInputMessage, RegisterOutputMessage](
+					Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
+					new RegisterInputMessage(runnerConnector.getLocalPort())
+				)
+			}
+		
+			server.stop()
+			server.join()
+		}
 	}
 }
 

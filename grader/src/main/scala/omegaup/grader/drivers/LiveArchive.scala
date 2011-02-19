@@ -77,7 +77,7 @@ object LiveArchive extends Actor with Log {
 						if(!data.contains("Problem submitted successfully")) {
 							throw new Exception("Invalid response:\n" + data)
 						}
-						readVeredict(id)
+						readVeredict(ejecucion)
 					} catch {
 						case e: Exception => {
 							error("LA Submission {} failed for problem {}", id, pid)
@@ -85,7 +85,13 @@ object LiveArchive extends Actor with Log {
 							e.getStackTrace.foreach { st =>
 								error(st.toString)
 							}
-							Manager.updateVeredict(1, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+							
+							ejecucion.estado = Estado.Listo
+							ejecucion.veredicto = Veredicto.JudgeError
+							ejecucion.tiempo = 0
+							ejecucion.memoria = 0
+							ejecucion.puntuacion = 0
+							Manager.updateVeredict(ejecucion)
 						}
 					}
 				}
@@ -93,7 +99,7 @@ object LiveArchive extends Actor with Log {
 		}
 	}
 	
-	private def readVeredict(id: Long, triesLeft: Int = 5): Unit = {
+	private def readVeredict(ejecucion: Ejecucion, triesLeft: Int = 5): Unit = {
 		if (triesLeft == 0)
 			throw new Exception("Retry limit exceeded")
 			
@@ -105,7 +111,7 @@ object LiveArchive extends Actor with Log {
 			val data = Http.send_wait(status_url)
 	
 			if(!data.contains("tr align=center")) {
-				readVeredict(triesLeft)
+				readVeredict(ejecucion, triesLeft)
 			} else {
 				val TableRegex(table) = data
 				val RowRegex(rid, veredict, cpu, mem) = table
@@ -114,42 +120,43 @@ object LiveArchive extends Actor with Log {
 				if (runId > last_id ) {
 					last_id = runId
 				
-					var estado: Estado = Estado.Listo
-					var veredicto: Option[Veredicto] = None
+					ejecucion.estado = Estado.Listo
 			
 					status_mapping find { (k) => veredict.contains(k._1) } match {
 						case Some((_, x: Estado)) => {
-							estado = x
+							ejecucion.estado = x
 						}
 						case None => veredict_mapping find { (k) => veredict.contains(k._1) } match {	
 							case Some((_, x: Veredicto)) => {
-								veredicto = Some(x)
+								ejecucion.veredicto = x
 							}
 							case None => {
 								error("LA {} no contiene un veredicto válido", data(2))
-								veredicto = Some(Veredicto.JudgeError)
+								ejecucion.veredicto = Veredicto.JudgeError
 							}
 						}
 					}
 		
-					val memory = if(mem == "Minimum") {
+					ejecucion.memoria = if(mem == "Minimum") {
 						0
 					} else {
 						mem.toInt
 					}
+					ejecucion.tiempo = math.round(cpu.toFloat * 1000)
+					ejecucion.puntuacion = if(ejecucion.veredicto == Veredicto.Accepted) 1 else 0
 			
-					Manager.updateVeredict(id, estado, veredicto, 1, cpu.toFloat, memory)
+					Manager.updateVeredict(ejecucion)
 					
-					if(estado != Estado.Listo)
-						readVeredict(id)
+					if(ejecucion.estado != Estado.Listo)
+						readVeredict(ejecucion)
 				} else {
-					readVeredict(id, triesLeft)
+					readVeredict(ejecucion, triesLeft)
 				}
 			}
 		} catch {
 			case e: IOException => {
 				error("LA communication error: {}", e.getMessage)
-				readVeredict(id, triesLeft-1)
+				readVeredict(ejecucion, triesLeft-1)
 			}
 		}
 	}

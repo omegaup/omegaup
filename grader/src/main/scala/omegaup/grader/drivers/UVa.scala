@@ -27,7 +27,8 @@ object UVa extends Actor with Log {
 	
 	private val locks  = for (i <- 1 until 50) yield new Semaphore(1)
 	private var lock_i = 0
-	private val rids   = Array.ofDim[Long](2,50)
+	private val rids   = Array.ofDim[Long](50)
+	private val ejecuciones = Array.ofDim[Ejecucion](50)
 	
 	private val cookies = new scala.collection.mutable.HashMap[String,String]
 	private var logged_in = false
@@ -91,7 +92,13 @@ object UVa extends Actor with Log {
 					
 					if(!logged_in) {
 						error("UVa not logged in")
-						Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+						
+						ejecucion.estado = Estado.Listo
+						ejecucion.veredicto = Veredicto.JudgeError
+						ejecucion.tiempo = 0
+						ejecucion.memoria = 0
+						ejecucion.puntuacion = 0
+						Manager.updateVeredict(ejecucion)
 					} else {
 						val post_data = Map(
 							"problemid" ->	"",
@@ -112,8 +119,8 @@ object UVa extends Actor with Log {
 							
 							debug("UVa received with id {}", rid)
 							
-							rids(0)(lock_i) = rid.toInt
-							rids(1)(lock_i) = id
+							rids(lock_i) = rid.toInt
+							ejecuciones(lock_i) = ejecucion
 							
 							veredictReader ! lock_i
 						} catch {
@@ -123,7 +130,13 @@ object UVa extends Actor with Log {
 								e.getStackTrace.foreach { st =>
 									error(st.toString)
 								}
-								Manager.updateVeredict(id, Estado.Listo, Some(Veredicto.JudgeError), 0, 0, 0)
+								
+								ejecucion.estado = Estado.Listo
+								ejecucion.veredicto = Veredicto.JudgeError
+								ejecucion.tiempo = 0
+								ejecucion.memoria = 0
+								ejecucion.puntuacion = 0
+								Manager.updateVeredict(ejecucion)
 							}
 						}
 					}
@@ -142,7 +155,7 @@ object UVa extends Actor with Log {
 		while(true) {
 			self.receive {
 				case x: Int => {
-					if (rids(0)(x) != 0) readVeredict()
+					if (rids(x) != 0) readVeredict()
 				}
 			}
 		}
@@ -161,11 +174,11 @@ object UVa extends Actor with Log {
 			
 			RowRegex.findAllIn(data).
 				map { (row) => { CellRegex.findAllIn(row).matchData.map { _.group(1) } .toList } }.
-				map { (row) => (row, rids(0).findIndexOf { row(0) == _.toString } ) }.
+				map { (row) => (row, rids.findIndexOf { row(0) == _.toString } ) }.
 				filter { (x) => x._2 != -1 }.
 				foreach { case (row, id) => {
 					var estado: Estado = Estado.Listo
-					var veredicto: Option[Veredicto] = None
+					var veredicto: Veredicto = Veredicto.JudgeError
 					
 					if (row(3) == "") {
 						 estado = Estado.Espera
@@ -176,27 +189,32 @@ object UVa extends Actor with Log {
 							}
 							case None => veredict_mapping find { (k) => row(3).contains(k._1) } match {	
 								case Some((_, x: Veredicto)) => {
-									veredicto = Some(x)
+									veredicto = x
 								}
 								case None => {
 									error("UVa {} no contiene un veredicto válido", data(2))
-									veredicto = Some(Veredicto.JudgeError)
+									veredicto = Veredicto.JudgeError
 								}
 							}
 						}
 					}
 					
-					Manager.updateVeredict(rids(1)(id), estado, veredicto, 1, row(5).toDouble, 0)
+					ejecuciones(id).estado = estado
+					ejecuciones(id).veredicto = veredicto
+					ejecuciones(id).puntuacion = if(ejecuciones(id).veredicto == Veredicto.Accepted) 1 else 0
+					ejecuciones(id).tiempo = math.round(1000 * row(5).toDouble)
+					ejecuciones(id).memoria = 0
+					Manager.updateVeredict(ejecuciones(id))
 					
 					if(estado == Estado.Listo) {
-						rids(0)(id) = 0
-						rids(1)(id) = 0
+						rids(id) = 0
+						ejecuciones(id) = null
 						
 						locks(id).release
 					}
 				}}
 			
-			if( rids(0) exists { _ != 0 } ) {
+			if( rids exists { _ != 0 } ) {
 				readVeredict()
 			}
 		} catch {
