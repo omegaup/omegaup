@@ -1,12 +1,11 @@
 package omegaup.grader
 
 import java.io._
+import java.util.logging._
 import javax.servlet._
 import javax.servlet.http._
 import org.mortbay.jetty._
 import org.mortbay.jetty.handler._
-import org.squeryl._
-import org.squeryl.PrimitiveTypeMode._
 import net.liftweb.json._
 import omegaup._
 import Estado._
@@ -97,6 +96,25 @@ object Manager extends Object with Log {
 		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "omegaup.jks"))
 		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("grader.keystore.password", "omegaup"))
 		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
+		
+		// logger
+		if(Config.get("grader.logging.file", "") != "") {
+			Logger.getLogger("").addHandler(new FileHandler(Config.get("grader.logfile", "")))
+		}
+		Logger.getLogger("").setLevel(
+			Config.get("grader.logging.level", "info") match {
+				case "all" => Level.ALL
+				case "finest" => Level.FINEST
+				case "finer" => Level.FINER
+				case "fine" => Level.FINE
+				case "config" => Level.CONFIG
+				case "info" => Level.INFO
+				case "warning" => Level.WARNING
+				case "severe" => Level.SEVERE
+				case "off" => Level.OFF
+			}
+		)
+		Logger.getLogger("").getHandlers.foreach { _.setFormatter(LogFormatter) }
 
 		// the handler
 		val handler = new AbstractHandler() {
