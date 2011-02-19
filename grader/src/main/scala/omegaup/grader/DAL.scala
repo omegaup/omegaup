@@ -64,37 +64,37 @@ import Servidor._
 import Lenguaje._
 
 class Problema(
-	val id: Long,
-	val publico: Long = 1,
-	val autor: Long = 0,
-	val titulo: String = "",
-	val alias: Option[String] = None,
-	val validador: Validador = Validador.TokenNumeric,
-	val servidor: Option[Servidor] = None,
-	val id_remoto: Option[String] = None,
-	val tiempo_limite: Option[Long] = Some(1),
-	val memoria_limite: Option[Long] = Some(64),
-	val vistas: Long = 0,
-	val envios: Long = 0,
-	val aceptados: Long = 0,
-	val dificultad: Double = 0) {
+	var id: Long,
+	var publico: Long = 1,
+	var autor: Long = 0,
+	var titulo: String = "",
+	var alias: Option[String] = None,
+	var validador: Validador = Validador.TokenNumeric,
+	var servidor: Option[Servidor] = None,
+	var id_remoto: Option[String] = None,
+	var tiempo_limite: Option[Long] = Some(1),
+	var memoria_limite: Option[Long] = Some(64),
+	var vistas: Long = 0,
+	var envios: Long = 0,
+	var aceptados: Long = 0,
+	var dificultad: Double = 0) {
 }
 
 class Ejecucion(
-	val id: Long = 0,
-	val usuario: Long = 0,
-	val problema: Problema = null,
-	val concurso: Option[Long] = None,
-	val guid: String = "",
-	val lenguaje: Lenguaje = Lenguaje.C,
-	val estado: Estado = Estado.Nuevo,
-	val veredicto: Veredicto = Veredicto.JudgeError,
-	val tiempo: Long = 0,
-	val memoria: Long = 0,
-	val puntuacion: Double = 0,
-	val puntuacion_concurso: Double = 0,
-	val ip: String = "127.0.0.1",
-	val fecha: Timestamp = new Timestamp(0)
+	var id: Long = 0,
+	var usuario: Long = 0,
+	var problema: Problema = null,
+	var concurso: Option[Long] = None,
+	var guid: String = "",
+	var lenguaje: Lenguaje = Lenguaje.C,
+	var estado: Estado = Estado.Nuevo,
+	var veredicto: Veredicto = Veredicto.JudgeError,
+	var tiempo: Long = 0,
+	var memoria: Long = 0,
+	var puntuacion: Double = 0,
+	var puntuacion_concurso: Double = 0,
+	var ip: String = "127.0.0.1",
+	var fecha: Timestamp = new Timestamp(0)
 ) {
 }
 
@@ -158,6 +158,7 @@ object GraderData {
 				"'" + ej.ip + "'" + 
 			")"
 		)
-		ejecucion(query("SELECT LAST_INSERT_ID()") { rs => rs.getInt(1) }.get).get
+		ej.id = query("SELECT LAST_INSERT_ID()") { rs => rs.getInt(1) }.get
+		ej
 	}
 }
