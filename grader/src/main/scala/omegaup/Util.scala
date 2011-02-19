@@ -59,6 +59,36 @@ trait Log {
 		log.error(message, error, values.map(_.asInstanceOf[Object]).toArray)
 }
 
+object LogFormatter extends java.util.logging.Formatter {
+	val dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+	val lineSep = System.getProperty("line.separator");
+	
+	override def format(record: java.util.logging.LogRecord): String = {
+		val buf = new StringBuffer(180)
+		
+		buf.append(dateFormat.format(new java.util.Date(record.getMillis)))
+		buf.append(" [")
+		buf.append(record.getThreadID)
+		buf.append("] ")
+		buf.append(record.getLevel)
+		buf.append(' ')
+		buf.append(record.getSourceClassName)
+		buf.append(" - ")
+		buf.append(formatMessage(record))
+		buf.append(lineSep)
+		
+		val throwable = record.getThrown
+		
+		if (throwable != null) {
+			val sink = new java.io.StringWriter()
+			throwable.printStackTrace(new java.io.PrintWriter(sink, true))
+			buf.append(sink.toString)
+		}
+		
+		buf.toString
+	}
+}
+
 class EnumerationWrapper[T](enumeration:java.util.Enumeration[T]) extends Iterator[T] {
 	def hasNext:Boolean = enumeration.hasMoreElements()
 	def next:T = enumeration.nextElement()
@@ -264,7 +294,7 @@ object FileUtil {
 	}
 }
 
-object Database {
+object Database extends Object with Log {
 	def using[Closeable <: {def close(): Unit}, B](closeable: Closeable)(getB: Closeable => B): B =
 		try {
 			getB(closeable)
@@ -281,7 +311,8 @@ object Database {
 	import java.sql._
 
 	/** Executes the SQL and processes the result set using the specified function. */
-	def query[B](sql: String)(process: ResultSet => B)(implicit connection: Connection): Option[B] =
+	def query[B](sql: String)(process: ResultSet => B)(implicit connection: Connection): Option[B] = {
+		debug(sql)
 		using (connection.createStatement) { statement =>
 			using (statement.executeQuery(sql)) { results =>
 				results.next match {
@@ -290,11 +321,14 @@ object Database {
 				}
 			}
 		}
+	}
 	
-	def execute(sql: String)(implicit connection: Connection): Unit =
+	def execute(sql: String)(implicit connection: Connection): Unit = {
+		debug(sql)
 		using (connection.createStatement) { statement =>
 			statement.execute(sql)
 		}
+	}
 
 	/** Executes the SQL and uses the process function to convert each row into a T. */
 	/*
