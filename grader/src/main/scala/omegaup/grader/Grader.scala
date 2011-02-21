@@ -2,6 +2,7 @@ package omegaup.grader
 
 import java.io._
 import java.util._
+import java.util.regex.Pattern
 import java.util.zip._
 import scala.collection.mutable
 import omegaup._
@@ -121,10 +122,63 @@ trait Grader extends Object with Log {
 }
 
 object LiteralGrader extends Grader {
-	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = 1
+	override def grade(ejecucion: Ejecucion): Unit = {
+		debug("Grading {}", ejecucion)
+		
+		ejecucion.estado = Estado.Listo
+		ejecucion.veredicto = Veredicto.WrongAnswer
+		ejecucion.puntuacion = try {
+			val inA = new BufferedReader(new FileReader(FileUtil.read(Config.get("problems.root", ".") + "/" + ejecucion.problema.id + "/output").trim))
+			val inB = new BufferedReader(new FileReader(FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)))
+			
+			var lineA: String = null
+			var lineB: String = null
+			
+			var points:Double = 1
+			
+			while( inA.ready && inB.ready ) {
+				lineA = inA.readLine
+				lineB = inB.readLine
+				
+				if( lineA != null && lineB != null ) {
+					if( ! lineA.trim.equals(lineB.trim) ) {				
+						debug("Mismatched input")
+						points = 0
+					}
+				} else if( lineA != null || lineB != null ) {
+					debug("Unfinished input")
+					points = 0
+				}
+			}
+			
+			if( inA.ready || inB.ready ) {
+				debug("Unfinished input")
+				points = 0
+			}
+			
+			inA.close
+			inB.close
+			
+			points
+		} catch {
+			case e: Exception => {
+				ejecucion.veredicto = Veredicto.JudgeError
+				error("", e)
+				
+				0
+			}
+		}
+		
+		if(ejecucion.puntuacion == 1) ejecucion.veredicto = Veredicto.Accepted
+		
+		Manager.updateVeredict(ejecucion)
+	}
+	
+	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = 0
 }
-object TokenGrader extends Grader {
-	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = {
+
+trait TokenComparer extends Object with Log {
+	def grade(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File, hasNext: Scanner => Boolean, next: Scanner => String, eq: (String,String) => Boolean): Double = {
 		debug("Grading {}, case {}", ejecucion, caseName)
 		try {
 			val inA = new Scanner(ejecucionOut)
@@ -132,14 +186,14 @@ object TokenGrader extends Grader {
 			
 			var points:Double = 1
 			
-			while( inA.hasNext && inB.hasNext ) {
-				if(! inA.next.equals(inB.next)) {
+			while( hasNext(inA) && hasNext(inB) ) {
+				if(! eq(next(inA), next(inB)) ) {
 					debug("Token mismatch {} {} {}", caseName, ejecucionOut.getCanonicalPath, problemOut.getCanonicalPath)
 					points = 0
 				}
 			}
 			
-			if(inA.hasNext || inB.hasNext) {
+			if( hasNext(inA) || hasNext(inB) ) {
 				debug("Unfinished input {} {} {}", caseName, ejecucionOut.getCanonicalPath, problemOut.getCanonicalPath)
 				points = 0
 			}
@@ -161,46 +215,25 @@ object TokenGrader extends Grader {
 		}
 	}
 }
-object TokenCaselessGrader extends Grader with Log {
+
+object TokenGrader extends Grader with TokenComparer {
 	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = {
-		debug("Grading {}, case {}", ejecucion, caseName)
-		try {
-			val inA = new Scanner(ejecucionOut)
-			val inB = new Scanner(problemOut)
-			
-			var points:Double = 1
-			
-			while( inA.hasNext && inB.hasNext ) {
-				if(! inA.next.equalsIgnoreCase(inB.next)) {
-					debug("Token mismatch {} {} {}", caseName, ejecucionOut.getCanonicalPath, problemOut.getCanonicalPath)
-					points = 0
-				}
-			}
-			
-			if(inA.hasNext || inB.hasNext) {
-				debug("Unfinished input {} {} {}", caseName, ejecucionOut.getCanonicalPath, problemOut.getCanonicalPath)
-				points = 0
-			}
-			
-			inA.close
-			inB.close
-			
-			debug("Grading {}, case {}. Reporting {} points", ejecucion, caseName, points)
-			points
-		} catch {
-			case e: Exception => {
-				error(e.getMessage)
-				e.getStackTrace.foreach { st =>
-					error(st.toString)
-				}
-				
-				0
-			}
-		}
+		grade(ejecucion, caseName, ejecucionOut, problemOut, _.hasNext, _.next, _.equals(_))
 	}
 }
-object TokenNumericGrader extends Grader {
-	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = 1
+
+object TokenCaselessGrader extends Grader with TokenComparer {
+	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = {
+		grade(ejecucion, caseName, ejecucionOut, problemOut, _.hasNext, _.next, _.equalsIgnoreCase(_))
+	}
+}
+
+object TokenNumericGrader extends Grader with TokenComparer {
+	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = {
+		val pattern = Pattern.compile("\\d+(?:\\.\\d*)?|\\.\\d+")
+		
+		grade(ejecucion, caseName, ejecucionOut, problemOut, _.hasNext(pattern), _.next(pattern), (a:String,b:String) => math.abs(a.toDouble - b.toDouble) <= 1e-6)
+	}
 }
 
 object MetaFile {
