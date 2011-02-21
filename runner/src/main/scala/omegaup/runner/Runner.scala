@@ -2,6 +2,7 @@ package omegaup.runner
 
 import java.io._
 import java.util.zip._
+import java.util.logging._
 import javax.servlet._
 import javax.servlet.http._
 import org.mortbay.jetty._
@@ -12,6 +13,8 @@ import omegaup._
 
 object Runner extends Object with Log {
 	def compile(lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]): CompileOutputMessage = {
+		info("compile {}", lang)
+		
 		val compileDirectory = new File(Config.get("compile.root", "."))
 		compileDirectory.mkdirs
 		
@@ -57,25 +60,32 @@ object Runner extends Object with Log {
 				new File(runDirectory.getCanonicalPath + "/compile.out").delete
 				new File(runDirectory.getCanonicalPath + "/compile.err").delete
 			
+				info("compile finished successfully")
 				new CompileOutputMessage(token = Some(runDirectory.getParentFile.getName))
 			} else {
-				val compile_error = FileUtil.read(runDirectory.getCanonicalPath + "/compile.err").replace(runDirectory.getCanonicalPath + "/", "")
 				val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
-				FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
 			
-				if (meta("status") == "TO")
-					new CompileOutputMessage("compile error", error = Some("Compilation time exceeded"))
-				else if (meta.contains("message") && meta("status") != "RE")
-					new CompileOutputMessage("compile error", error = Some(meta("message")))
-				else
-					new CompileOutputMessage("compile error", error = Some(compile_error))
+				val compileError =
+					if (meta("status") == "TO")
+						"Compilation time exceeded"
+					else if (meta.contains("message") && meta("status") != "RE")
+						meta("message")
+					else
+						FileUtil.read(runDirectory.getCanonicalPath + "/compile.err").replace(runDirectory.getCanonicalPath + "/", "")
+				
+				FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
+				
+				info("compile finished with errors: {}", compileError)
+				new CompileOutputMessage("compile error", error=Some(compileError))
 			}
 		} else {
+			info("compile finished successfully")
 			new CompileOutputMessage(token = Some(runDirectory.getParentFile.getName))
 		}
 	}
 	
 	def run(token: String, timeLimit: Float, memoryLimit: Int, outputLimit: Int, input: Option[String], cases: Option[List[CaseData]]) : File = {
+		info("run token={} timeLimit={}s memoryLimit={}kb outputLimit={}kb on input={}", token, timeLimit, memoryLimit, outputLimit, input)
 		val casesDirectory:File = input match {
 			case Some(in) => {
 				if (in.contains(".") || in.contains("/")) throw new IllegalArgumentException("Invalid input")
@@ -190,6 +200,8 @@ object Runner extends Object with Log {
 		
 		zipOutput.close
 		
+		info("run finished token={}", token)
+		
 		zipFile
 	}
 	
@@ -245,6 +257,26 @@ object Runner extends Object with Log {
 		System.setProperty("javax.net.ssl.trustStore", Config.get("runner.truststore", "omegaup.jks"))
 		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("runner.keystore.password", "omegaup"))
 		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("runner.truststore.password", "omegaup"))
+		
+		// logger
+		System.setProperty("org.mortbay.log.class", "org.mortbay.log.Slf4jLog")
+		if(Config.get("grader.logging.file", "") != "") {
+			Logger.getLogger("").addHandler(new FileHandler(Config.get("grader.logfile", "")))
+		}
+		Logger.getLogger("").setLevel(
+			Config.get("grader.logging.level", "info") match {
+				case "all" => Level.ALL
+				case "finest" => Level.FINEST
+				case "finer" => Level.FINER
+				case "fine" => Level.FINE
+				case "config" => Level.CONFIG
+				case "info" => Level.INFO
+				case "warning" => Level.WARNING
+				case "severe" => Level.SEVERE
+				case "off" => Level.OFF
+			}
+		)
+		Logger.getLogger("").getHandlers.foreach { _.setFormatter(LogFormatter) }
 
 		// the handler
 		val handler = new AbstractHandler() {
@@ -277,6 +309,7 @@ object Runner extends Object with Log {
 							Runner.removeCompileDir(req.token)
 						} catch {
 							case e: Exception => {
+								error("/run/", e)
 								response.setContentType("text/json")
 								if(e.getMessage == "missing input")
 									response.setStatus(HttpServletResponse.SC_OK)
@@ -296,6 +329,7 @@ object Runner extends Object with Log {
 									Runner.compile(req.lang, req.code, req.master_lang, req.master_code)
 								} catch {
 									case e: Exception => {
+										error("/compile/", e)
 										response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 										new CompileOutputMessage(status = "error", error = Some(e.getMessage))
 									}
@@ -303,10 +337,12 @@ object Runner extends Object with Log {
 							}
 							case "/input/" => {
 								try {
+									info("/input/")
 									response.setStatus(HttpServletResponse.SC_OK)
 									Runner.input(request)
 								} catch {
 									case e: Exception => {
+										error("/inpue/", e)
 										response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 										new InputOutputMessage(status = "error", error = Some(e.getMessage))
 									}
@@ -343,25 +379,25 @@ object Runner extends Object with Log {
 		
 		info("Registering port {}", runnerConnector.getLocalPort())
 		
+		Https.send[RegisterInputMessage, RegisterOutputMessage](
+			Config.get("grader.register.url", "https://localhost:21680/register/"),
+			new RegisterInputMessage(runnerConnector.getLocalPort())
+		)
+		
+		java.lang.System.in.read()
+		
 		try {
+			// well, at least try to de-register
 			Https.send[RegisterInputMessage, RegisterOutputMessage](
-				Config.get("grader.register.url", "https://localhost:21680/register/"),
+				Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
 				new RegisterInputMessage(runnerConnector.getLocalPort())
 			)
-		
-			java.lang.System.in.read()
-		
-			try {
-				// well, at least try to de-register
-				Https.send[RegisterInputMessage, RegisterOutputMessage](
-					Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
-					new RegisterInputMessage(runnerConnector.getLocalPort())
-				)
-			}
-		
-			server.stop()
-			server.join()
+		} catch {
+			case _ => {}
 		}
+	
+		server.stop()
+		server.join()
 	}
 }
 
