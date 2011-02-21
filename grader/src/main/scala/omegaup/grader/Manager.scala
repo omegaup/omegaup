@@ -89,6 +89,7 @@ object Manager extends Object with Log {
 		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
 		
 		// logger
+		System.setProperty("org.mortbay.log.class", "org.mortbay.log.Slf4jLog")
 		if(Config.get("grader.logging.file", "") != "") {
 			Logger.getLogger("").addHandler(new FileHandler(Config.get("grader.logfile", "")))
 		}

@@ -20,5 +20,5 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 		"org.slf4j" % "slf4j-jdk14" % "1.6.1" % "compile"
 	) ++ super.libraryDependencies
 	
-	val scalatest = "org.scalatest" % "scalatest" % "1.2"
+	val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
 }
