@@ -14,6 +14,8 @@
 
 	require_once( "../server/inc/bootstrap.php" );
 
+
+	require_once( "../server/controllers/problems.controller.php" );
 ?>  
 
 <html>  
@@ -35,25 +37,25 @@
 
 			<div class="post">
 
-	           <div class="title">Elevando el nivel de Desarrolladores</div>
+	           <div class="title">Problemas</div>
 
 				<div class="copy">
 					
-					<p>OmegaUp est&aacute; pensado como m&aacute;s que otra p&aacute;gina de concursos, otro juez en l&iacute;nea. OmegaUp tendr&aacute; muchas caracter&iacute;sticas que no se encontrar&aacute;n en ning&uacute;n otro sitio, y todo ir&aacute; enfocado para hacer realidad nuestro lema: <i>Elevando el nivel de Desarrolladores</i></p> 
-
-					<h3>New features</h3> 
-					<ul> 
-						<li>pretty</li> 
-						<li>robust</li> 
-						<li>elegant</li> 						
-					</ul>
 					
-<pre><code>//this is some code
-printf(2.14);</code></pre>
-
-				<p>keep talking</p>
-
-
+					<!-- - - - - - - - - - - - - - - - -
+						Lista de juecez
+					  - - - - - - - - - - - - - - - - - -->
+					<p id="listaDeJuez">
+					</p>
+					
+					
+					
+					<!-- - - - - - - - - - - - - - - - -
+						Lista de problemas
+					  - - - - - - - - - - - - - - - - - -->					
+					<div id="listaProblemas">
+						
+					</div>
 
 				</div>
 				<!-- .copy -->
@@ -80,6 +82,52 @@ printf(2.14);</code></pre>
 
 	</div>
 	<!-- #wrapper -->
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+	
+	<script>
+
+		
+		var JuezExterno = [];
+		
+		/** 
+		  * Fill judges list
+		  *
+		  **/
+		<?php
+			$judges = ProblemsController::getJudgesList();
+		
+			foreach( $judges as $servidor => $descripcion ){
+				echo " JuezExterno.push({ descripcion : '$descripcion', servidor : '$servidor' }); \n";
+			}
+		?>
+		
+		
+		
+	
+
+		$(document).ready(function(){
+			
+			/**
+			  * Write judges list into html
+			  **/
+			var html = '';
+			
+			for (var i = JuezExterno.length - 1; i >= 0; i--){
+				html += JuezExterno[i].descripcion;
+				if(i > 0){
+					html += " | ";
+				}
+			}
+			
+			jQuery("#listaDeJuez").html(html);
+
+
+		});
+			
+
+		
+	</script>
 
 	</body>
 </html>
