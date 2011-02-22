@@ -12,9 +12,10 @@ import scala.collection.{mutable,immutable}
 import omegaup._
 import omegaup.data._
 
-object Runner extends Object with Log {
-	def compile(lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]): CompileOutputMessage = {
-		info("compile {}", lang)
+object Runner extends RunnerService with Log {
+	def compile(message: CompileInputMessage): CompileOutputMessage = {
+		// lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]
+		info("compile {}", message.lang)
 		
 		val compileDirectory = new File(Config.get("compile.root", "."))
 		compileDirectory.mkdirs
@@ -22,18 +23,18 @@ object Runner extends Object with Log {
 		var runDirectory = File.createTempFile(System.nanoTime.toString, null, compileDirectory)
 		runDirectory.delete
 		
-		runDirectory = new File(runDirectory.getCanonicalPath.substring(0, runDirectory.getCanonicalPath.length - 4) + "." + lang + "/bin")
+		runDirectory = new File(runDirectory.getCanonicalPath.substring(0, runDirectory.getCanonicalPath.length - 4) + "." + message.lang + "/bin")
 		runDirectory.mkdirs
 		
-		var fileWriter = new FileWriter(runDirectory.getCanonicalPath + "/Main." + lang)
-		fileWriter.write(code(0), 0, code(0).length)
+		var fileWriter = new FileWriter(runDirectory.getCanonicalPath + "/Main." + message.lang)
+		fileWriter.write(message.code(0), 0, message.code(0).length)
 		fileWriter.close
-		var inputFiles = mutable.ListBuffer(runDirectory.getCanonicalPath + "/Main." + lang)
+		var inputFiles = mutable.ListBuffer(runDirectory.getCanonicalPath + "/Main." + message.lang)
 		
-		for (i <- 1 until code.length) {
-			fileWriter = new FileWriter(runDirectory.getCanonicalPath + "/f" + i + "." + lang)
-			inputFiles += runDirectory.getCanonicalPath + "/f" + i + "." + lang
-			fileWriter.write(code(i), 0, code(i).length)
+		for (i <- 1 until message.code.length) {
+			fileWriter = new FileWriter(runDirectory.getCanonicalPath + "/f" + i + "." + message.lang)
+			inputFiles += runDirectory.getCanonicalPath + "/f" + i + "." + message.lang
+			fileWriter.write(message.code(i), 0, message.code(i).length)
 			fileWriter.close
 		}
 		
@@ -41,7 +42,7 @@ object Runner extends Object with Log {
 		val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
 		val runtime = Runtime.getRuntime
 		
-		val process = lang match {
+		val process = message.lang match {
 			case "java" =>
 				runtime.exec((List(sandbox, "-S", profile + "/javac", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "--", "/usr/bin/javac") ++ inputFiles).toArray)
 			case "c" =>
@@ -85,9 +86,9 @@ object Runner extends Object with Log {
 		}
 	}
 	
-	def run(token: String, timeLimit: Float, memoryLimit: Int, outputLimit: Int, input: Option[String], cases: Option[List[CaseData]]) : File = {
-		info("run token={} timeLimit={}s memoryLimit={}kb outputLimit={}kb on input={}", token, timeLimit, memoryLimit, outputLimit, input)
-		val casesDirectory:File = input match {
+	def run(message: RunInputMessage, zipFile: File) : Option[RunOutputMessage] = {
+		info("run {}", message)
+		val casesDirectory:File = message.input match {
 			case Some(in) => {
 				if (in.contains(".") || in.contains("/")) throw new IllegalArgumentException("Invalid input")
 				new File (Config.get("input.root", ".") + "/" + in)
@@ -95,115 +96,117 @@ object Runner extends Object with Log {
 			case None => null
 		}
 		
-		if(casesDirectory != null && !casesDirectory.exists) throw new RuntimeException("missing input")
-		if(token.contains("..") || token.contains("/")) throw new IllegalArgumentException("Invalid token")
+		if(message.token.contains("..") || message.token.contains("/")) throw new IllegalArgumentException("Invalid token")
 		
-		val runDirectory = new File(Config.get("compile.root", ".") + "/" + token)
+		if(casesDirectory != null && !casesDirectory.exists) {
+			Some(new RunOutputMessage(error=Some("missing input")))
+		} else {
+			val runDirectory = new File(Config.get("compile.root", ".") + "/" + message.token)
 		
-		if(!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
+			if(!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
 		
-		val binDirectory = new File(runDirectory.getCanonicalPath + "/bin")
+			val binDirectory = new File(runDirectory.getCanonicalPath + "/bin")
 		
-		val lang = token.substring(token.indexOf(".")+1)
+			val lang = message.token.substring(message.token.indexOf(".")+1)
 		
-		val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
-		val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
-		val runtime = Runtime.getRuntime
+			val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
+			val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
+			val runtime = Runtime.getRuntime
 		
-		if(casesDirectory != null) {
-			casesDirectory.listFiles.filter {_.getName.endsWith(".in")} .foreach { (x) => {
-				val caseName = runDirectory.getCanonicalPath + "/" + x.getName.substring(0, x.getName.lastIndexOf('.'))
-				
-				val process = lang match {
-					case "java" =>
-						runtime.exec((List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + memoryLimit + "k", "Main")).toArray)
-					case "c" =>
-						runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "-m", memoryLimit.toString, "--", "./a.out")).toArray)
-					case "cpp" =>
-						runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "-m", memoryLimit.toString, "--", "./a.out")).toArray)
-				}
-				
-				process.waitFor
-			}}
-		}
-		
-		cases match {
-			case None => {}
-			case Some(extra) => {
-				extra.foreach { (x: CaseData) => {
-					val caseName = x.name
-					val casePath = runDirectory.getCanonicalPath + "/" + caseName
-					
-					FileUtil.write(casePath + ".in", x.data)
+			if(casesDirectory != null) {
+				casesDirectory.listFiles.filter {_.getName.endsWith(".in")} .foreach { (x) => {
+					val caseName = runDirectory.getCanonicalPath + "/" + x.getName.substring(0, x.getName.lastIndexOf('.'))
 				
 					val process = lang match {
 						case "java" =>
-							runtime.exec((List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + memoryLimit + "k", "Main")).toArray)
+							runtime.exec((List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")).toArray)
 						case "c" =>
-							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "-m", memoryLimit.toString, "--", "./a.out")).toArray)
+							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
 						case "cpp" =>
-							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", timeLimit.toString, "-O", outputLimit.toString, "-m", memoryLimit.toString, "--", "./a.out")).toArray)
+							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
 					}
 				
 					process.waitFor
-					
-					new File(casePath + ".in").delete
 				}}
 			}
-		}
 		
-		val zipFile = new File(runDirectory.getCanonicalPath + "/output.zip")
-		val zipOutput = new ZipOutputStream(new FileOutputStream(zipFile.getCanonicalPath))
+			message.cases match {
+				case None => {}
+				case Some(extra) => {
+					extra.foreach { (x: CaseData) => {
+						val caseName = x.name
+						val casePath = runDirectory.getCanonicalPath + "/" + caseName
+					
+						FileUtil.write(casePath + ".in", x.data)
+				
+						val process = lang match {
+							case "java" =>
+								runtime.exec((List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")).toArray)
+							case "c" =>
+								runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
+							case "cpp" =>
+								runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
+						}
+				
+						process.waitFor
+					
+						new File(casePath + ".in").delete
+					}}
+				}
+			}
 		
-		runDirectory.listFiles.filter { _.getName.endsWith(".meta") } .foreach { (x) => {
-			zipOutput.putNextEntry(new ZipEntry(x.getName))
+			val zipOutput = new ZipOutputStream(new FileOutputStream(zipFile.getCanonicalPath))
+		
+			runDirectory.listFiles.filter { _.getName.endsWith(".meta") } .foreach { (x) => {
+				zipOutput.putNextEntry(new ZipEntry(x.getName))
 			
-			var inputStream = new FileInputStream(x.getCanonicalPath)
-			val buffer = Array.ofDim[Byte](1024)
-			var read: Int = 0
+				var inputStream = new FileInputStream(x.getCanonicalPath)
+				val buffer = Array.ofDim[Byte](1024)
+				var read: Int = 0
 	
-			while( { read = inputStream.read(buffer); read > 0 } ) {
-				zipOutput.write(buffer, 0, read)
-			}
-			
-			inputStream.close
-			zipOutput.closeEntry
-			
-			val meta = MetaFile.load(x.getCanonicalPath)
-			
-			if(meta("status") == "OK") {
-				inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".out"))
-				zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".out")))
-				
 				while( { read = inputStream.read(buffer); read > 0 } ) {
 					zipOutput.write(buffer, 0, read)
 				}
-		
-				inputStream.close
-				zipOutput.closeEntry
-				
-			} else if(meta("status") == "RE" && lang == "java") {
-				inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))
-				zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
-				
-				while( { read = inputStream.read(buffer); read > 0 } ) {
-					zipOutput.write(buffer, 0, read)
-				}
-		
-				inputStream.close
-				zipOutput.closeEntry
-			}
 			
-			x.delete
-			new File(x.getCanonicalPath.replace(".meta", ".err")).delete
-			new File(x.getCanonicalPath.replace(".meta", ".out")).delete
-		}}
+				inputStream.close
+				zipOutput.closeEntry
+			
+				val meta = MetaFile.load(x.getCanonicalPath)
+			
+				if(meta("status") == "OK") {
+					inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".out"))
+					zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".out")))
+				
+					while( { read = inputStream.read(buffer); read > 0 } ) {
+						zipOutput.write(buffer, 0, read)
+					}
 		
-		zipOutput.close
+					inputStream.close
+					zipOutput.closeEntry
+				
+				} else if(meta("status") == "RE" && lang == "java") {
+					inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))
+					zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
+				
+					while( { read = inputStream.read(buffer); read > 0 } ) {
+						zipOutput.write(buffer, 0, read)
+					}
 		
-		info("run finished token={}", token)
+					inputStream.close
+					zipOutput.closeEntry
+				}
+			
+				x.delete
+				new File(x.getCanonicalPath.replace(".meta", ".err")).delete
+				new File(x.getCanonicalPath.replace(".meta", ".out")).delete
+			}}
 		
-		zipFile
+			zipOutput.close
+		
+			info("run finished token={}", message.token)
+			
+			None
+		}
 	}
 	
 	def removeCompileDir(token: String): Unit = {
@@ -214,42 +217,31 @@ object Runner extends Object with Log {
 		FileUtil.deleteDirectory(runDirectory)
 	}
 	
-	def input(request: HttpServletRequest): InputOutputMessage = {
-		if(request.getContentType() != "application/zip" || request.getHeader("Content-Disposition") == null) {
-			new InputOutputMessage(
-				status = "error",
-				error = Some("Content-Type must be \"application/zip\", Content-Disposition must be \"attachment\" and a filename must be specified")
-			)
-		} else {
-			val ContentDispositionRegex = "attachment; filename=([a-zA-Z0-9_-][a-zA-Z0-9_.-]*);.*".r
-			
-			val ContentDispositionRegex(inputName) = request.getHeader("Content-Disposition")
-			
-			val inputDirectory = new File(Config.get("input.root", ".") + "/" + inputName)
-			inputDirectory.mkdirs()
-			
-			val input = new ZipInputStream(request.getInputStream)
-			var entry: ZipEntry = input.getNextEntry
-			val buffer = Array.ofDim[Byte](1024)
-			var read: Int = 0
-			
-			while(entry != null) {
-				val outFile = new File(entry.getName())
-				val output = new FileOutputStream(inputDirectory.getCanonicalPath + "/" + outFile.getName)
+	def input(inputName: String, inputStream: InputStream, size: Int = -1): InputOutputMessage = {
+		val inputDirectory = new File(Config.get("input.root", ".") + "/" + inputName)
+		inputDirectory.mkdirs()
+		
+		val input = new ZipInputStream(inputStream)
+		var entry: ZipEntry = input.getNextEntry
+		val buffer = Array.ofDim[Byte](1024)
+		var read: Int = 0
+		
+		while(entry != null) {
+			val outFile = new File(entry.getName())
+			val output = new FileOutputStream(inputDirectory.getCanonicalPath + "/" + outFile.getName)
 
-				while( { read = input.read(buffer); read > 0 } ) {
-					output.write(buffer, 0, read)
-				}
-
-				output.close
-				input.closeEntry
-				entry = input.getNextEntry
+			while( { read = input.read(buffer); read > 0 } ) {
+				output.write(buffer, 0, read)
 			}
-			
-			input.close
-			
-			new InputOutputMessage()
+
+			output.close
+			input.closeEntry
+			entry = input.getNextEntry
 		}
+		
+		input.close
+		
+		new InputOutputMessage()
 	}
 	
 	def main(args: Array[String]) = {
@@ -291,31 +283,39 @@ object Runner extends Object with Log {
 						try {
 							val req = Serialization.read[RunInputMessage](request.getReader)
 							
-							val zipFile = Runner.run(req.token, req.timeLimit, req.memoryLimit, req.outputLimit, req.input, req.cases)
-							response.setContentType("application/zip")
-							response.setContentLength(zipFile.length.asInstanceOf[Int])
+							val zipFile = new File(Config.get("compile.root", ".") + "/" + req.token + "/output.zip")
+							Runner.run(req, zipFile) match {
+								case Some(msg: RunOutputMessage) => {
+									response.setContentType("text/json")
+									response.setStatus(HttpServletResponse.SC_OK)
+									
+									Serialization.write(msg, response.getWriter())
+								}
+								case _ => {
+									response.setContentType("application/zip")
+									response.setStatus(HttpServletResponse.SC_OK)
+									response.setContentLength(zipFile.length.asInstanceOf[Int])
 							
-							val input = new FileInputStream(zipFile)
-							val output = response.getOutputStream
-							val buffer = Array.ofDim[Byte](1024)
-							var read: Int = 0
+									val input = new FileInputStream(zipFile)
+									val output = response.getOutputStream
+									val buffer = Array.ofDim[Byte](1024)
+									var read: Int = 0
 		
-							while( { read = input.read(buffer); read > 0 } ) {
-								output.write(buffer, 0, read)
-							}
+									while( { read = input.read(buffer); read > 0 } ) {
+										output.write(buffer, 0, read)
+									}
 
-							input.close
-							output.close
+									input.close
+									output.close
 							
-							Runner.removeCompileDir(req.token)
+									Runner.removeCompileDir(req.token)
+								}
+							}
 						} catch {
 							case e: Exception => {
 								error("/run/", e)
 								response.setContentType("text/json")
-								if(e.getMessage == "missing input")
-									response.setStatus(HttpServletResponse.SC_OK)
-								else
-									response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
+								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 								Serialization.write(new RunOutputMessage(status = "error", error = Some(e.getMessage)), response.getWriter())
 							}
 						}
@@ -327,7 +327,7 @@ object Runner extends Object with Log {
 								try {
 									val req = Serialization.read[CompileInputMessage](request.getReader())
 									response.setStatus(HttpServletResponse.SC_OK)
-									Runner.compile(req.lang, req.code, req.master_lang, req.master_code)
+									Runner.compile(req)
 								} catch {
 									case e: Exception => {
 										error("/compile/", e)
@@ -339,8 +339,19 @@ object Runner extends Object with Log {
 							case "/input/" => {
 								try {
 									info("/input/")
+									
 									response.setStatus(HttpServletResponse.SC_OK)
-									Runner.input(request)
+									if(request.getContentType() != "application/zip" || request.getHeader("Content-Disposition") == null) {
+										new InputOutputMessage(
+											status = "error",
+											error = Some("Content-Type must be \"application/zip\", Content-Disposition must be \"attachment\" and a filename must be specified")
+										)
+									} else {
+										val ContentDispositionRegex = "attachment; filename=([a-zA-Z0-9_-][a-zA-Z0-9_.-]*);.*".r
+			
+										val ContentDispositionRegex(inputName) = request.getHeader("Content-Disposition")
+										Runner.input(inputName, request.getInputStream)
+									}
 								} catch {
 									case e: Exception => {
 										error("/inpue/", e)
@@ -402,23 +413,3 @@ object Runner extends Object with Log {
 	}
 }
 
-object MetaFile {
-	@throws(classOf[IOException])
-	def load(path: String): scala.collection.Map[String,String] = {
-		val meta = new mutable.ListMap[String,String]
-		val fileReader = new BufferedReader(new FileReader(path))
-		var line: String = null
-	
-		while( { line = fileReader.readLine(); line != null} ) {
-			val idx = line.indexOf(':')
-			
-			if(idx > 0) {
-				meta += (line.substring(0, idx) -> line.substring(idx+1))
-			}
-		}
-		
-		fileReader.close()
-		
-		meta
-	}
-}

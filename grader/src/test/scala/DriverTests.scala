@@ -1,4 +1,5 @@
 import omegaup._
+import omegaup.data._
 import omegaup.grader._
 import omegaup.grader.drivers._
 
@@ -9,6 +10,8 @@ import org.scalatest.matchers.ShouldMatchers
 
 class DriverSpec extends FlatSpec with ShouldMatchers {
 	"OmegaUpDriver" should "submit" in {
+		System.setProperty("grader.embedded_runner.enable", "true")
+		
 		val t = new Thread() { override def run(): Unit = { Manager.main(Array.ofDim[String](0)) } } 
 		t.start
 		

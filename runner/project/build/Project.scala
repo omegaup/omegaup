@@ -16,7 +16,6 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 		"-keep class omegaup.data.*",
 		"-keep class omegaup.runner.*",
 		"-keepclassmembers class omegaup.data.* { *; }",
-		"-keepclassmembers class omegaup.runner.Runner { *; }",
 		"-keep class scala.collection.JavaConversions",
 		"-keep class org.mortbay.log.Slf4jLog",
 		proguardKeepLimitedSerializability

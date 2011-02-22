@@ -28,26 +28,25 @@ object OmegaUp extends Actor with Log {
 					if (ejecucion.problema.validador == Validador.Literal)
 						LiteralGrader.grade(ejecucion)
 					else {
-						val (host, port) = Manager.getRunner
-						val url = "https://" + host + ":" + port
+						val service = Manager.getRunner
 					
 						try {
 							info("OU Compiling {}", id)
 						
-							val output = Https.send[CompileOutputMessage, CompileInputMessage](url + "/compile/",
+							val output = service.compile(
 								new CompileInputMessage(lang.toString, List(code))
 							)
 						
 							if(output.status == "ok") {
 								val input = FileUtil.read(Config.get("problems.root", ".") + "/" + pid + "/inputname").trim
 								val msg = new RunInputMessage(output.token.get, input = Some(input))
-								val zip = Config.get("grader.root", ".") + "/" + id + ".zip"
+								val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
 							
-								Https.receive_zip[RunOutputMessage, RunInputMessage](url + "/run/", msg, zip) match {
+								service.run(msg, zip) match {
 									case Some(x) => {
 										if(
-											Https.zip_send[InputOutputMessage](url + "/input/", Config.get("problems.root", ".") + "/" + pid + "/cases.zip", input).status != "ok" ||
-											Https.receive_zip[RunOutputMessage, RunInputMessage](url + "/run/", msg, zip) != None
+											service.input(input, new FileInputStream(zip), zip.length.toInt).status != "ok" ||
+											service.run(msg, zip) != None
 										) {
 											throw new RuntimeException("OU unable to run submission " + id + ". giving up.")
 										}
@@ -86,9 +85,9 @@ object OmegaUp extends Actor with Log {
 								ejecucion.puntuacion = 0
 								Manager.updateVeredict(ejecucion)
 							}
+						} finally {
+							Manager.addRunner(service)
 						}
-					
-						Manager.addRunner(host, port)
 					}
 				}
 			}

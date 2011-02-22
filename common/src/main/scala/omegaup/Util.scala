@@ -6,6 +6,7 @@ import java.util._
 import javax.net.ssl._
 import net.liftweb.json._
 import org.slf4j.{Logger, LoggerFactory}
+import scala.collection.mutable
 
 object Config {
 	private val props = new java.util.Properties(System.getProperties)
@@ -125,19 +126,23 @@ object Https extends Object with Log {
 	}
 	
 	def zip_send[T](url:String, zipfile:String, zipname:String)(implicit mf: Manifest[T]): T = {
+		val file = new File(zipfile)
+		
+		zip_send(url, new FileInputStream(zipfile), file.length.toInt, zipname)
+	}
+	
+	def zip_send[T](url:String, inputStream:InputStream, zipSize:Int, zipname:String)(implicit mf: Manifest[T]): T = {
 		debug("Requesting {}", url)
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 		
-		val file = new File(zipfile)
 		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
 		conn.addRequestProperty("Content-Type", "application/zip")
 		conn.addRequestProperty("Content-Disposition", "attachment; filename=" + zipname + ";")
-		conn.setFixedLengthStreamingMode(file.length.toInt)
+		conn.setFixedLengthStreamingMode(zipSize)
 		conn.setSSLSocketFactory(socketFactory)
 		conn.setDoOutput(true)
 		val outputStream = conn.getOutputStream
-		val inputStream = new FileInputStream(file)
 		val buffer = Array.ofDim[Byte](1024)
 		var read = 0
 		var reading = true
@@ -228,3 +233,28 @@ object FileUtil {
 	}	
 }
 
+object MetaFile {
+	@throws(classOf[IOException])
+	def load(path: String): scala.collection.Map[String,String] = {
+		load(new FileReader(path))
+	}
+	
+	@throws(classOf[IOException])
+	def load(reader: Reader): scala.collection.Map[String,String] = {
+		val meta = new mutable.ListMap[String,String]
+		val bReader = new BufferedReader(reader)
+		var line: String = null
+	
+		while( { line = bReader.readLine(); line != null} ) {
+			val idx = line.indexOf(':')
+			
+			if(idx > 0) {
+				meta += (line.substring(0, idx) -> line.substring(idx+1))
+			}
+		}
+		
+		bReader.close()
+		
+		meta
+	}
+}

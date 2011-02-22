@@ -236,24 +236,3 @@ object TokenNumericGrader extends Grader with TokenComparer {
 		grade(ejecucion, caseName, ejecucionOut, problemOut, _.hasNext(pattern), _.next(pattern), (a:String,b:String) => math.abs(a.toDouble - b.toDouble) <= 1e-6)
 	}
 }
-
-object MetaFile {
-	@throws(classOf[IOException])
-	def load(path: String): scala.collection.Map[String,String] = {
-		val meta = new mutable.ListMap[String,String]
-		val fileReader = new BufferedReader(new FileReader(path))
-		var line: String = null
-	
-		while( { line = fileReader.readLine(); line != null} ) {
-			val idx = line.indexOf(':')
-			
-			if(idx > 0) {
-				meta += (line.substring(0, idx) -> line.substring(idx+1))
-			}
-		}
-		
-		fileReader.close()
-		
-		meta
-	}
-}

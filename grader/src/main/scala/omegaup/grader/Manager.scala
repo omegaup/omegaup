@@ -9,6 +9,7 @@ import org.mortbay.jetty.handler._
 import net.liftweb.json._
 import omegaup._
 import omegaup.data._
+import omegaup.runner._
 import Estado._
 import Lenguaje._
 import Veredicto._
@@ -19,7 +20,7 @@ case class Submission(ejecucion: Ejecucion)
 case object Login
 
 object Manager extends Object with Log {
-	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[(String, Int)]()
+	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[RunnerService]()
 	// Loading SQL connector driver
 	Class.forName("com.mysql.jdbc.Driver")
 	val connection = java.sql.DriverManager.getConnection(
@@ -52,18 +53,18 @@ object Manager extends Object with Log {
 		}
 	}
 	
-	def getRunner(): (String, Int) = {
+	def getRunner(): RunnerService = {
 		runnerQueue.take()
 	}
 	
-	def addRunner(host: String, port: Int) = {
-		runnerQueue.put((host, port))
+	def addRunner(service: RunnerService) = {
+		runnerQueue.put(service)
 	}
 	
 	def register(host: String, port: Int): RegisterOutputMessage = {
 		info("Registering {}:{}", host, port)
 	
-		addRunner(host, port)	
+		addRunner(new RunnerProxy(host, port))
 		new RegisterOutputMessage()
 	}
 	
@@ -83,6 +84,7 @@ object Manager extends Object with Log {
 	}
 	
 	def main(args: Array[String]) = {
+import omegaup.data._
 		// Setting keystore properties
 		System.setProperty("javax.net.ssl.keyStore", Config.get("grader.keystore", "omegaup.jks"))
 		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "omegaup.jks"))
@@ -108,6 +110,11 @@ object Manager extends Object with Log {
 			}
 		)
 		Logger.getLogger("").getHandlers.foreach { _.setFormatter(LogFormatter) }
+		
+		// shall we create an embedded runner?
+		if(Config.get("grader.embedded_runner.enable", false)) {
+			Manager.addRunner(omegaup.runner.Runner)
+		}
 
 		// the handler
 		val handler = new AbstractHandler() {
