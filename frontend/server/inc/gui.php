@@ -242,13 +242,18 @@
 			//here, one might wish to display different menues
 			//wether the user is logged in or not
 			$html = "<ul >";
-			$html .= "	<li><a href=''>OmegaUp</a></li>";
-			$html .= "	<li><a href=''>Registrar</a></li>";
-			$html .= "	<li><a href=''>Problemas</a></li>";
-			$html .= "	<li><a href=''>Enviar solucion</a></li>";
+			$html .= "	<li><a href='problemas.php'>Problemas</a></li>";
+			$html .= "	<li><a href='ranking.php'>Ranking</a></li>";
+			$html .= "	<li><a href='actividad.php'>Actividad reciente</a></li>";
+			$html .= "	<li><a href='faq.php'>FAQ</a></li>";
+			$html .= "	<li><a href='about.php'>About</a></li>";
+			$html .= "	<li><a href='escuelas.php'>Escuelas</a></li>";
+			$html .= "	<li><a href='profesores.php'>Profesores</a></li>";			
+			$html .= "	<li><a href='colabora.php'>Colabora</a></li>";
+			$html .= "	<li><input type='text' placeholder='Buscar'></li>";			
 			$html .= "</ul>";
 			return $html;
-		}		
+		}
 		
 		
 		

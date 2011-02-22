@@ -35,11 +35,11 @@
 
 			<div class="post">
 
-	           <div class="title">Bienvenido a OmegaUp</div>
+	           <div class="title">Elevando el nivel de Desarrolladores</div>
 
 				<div class="copy">
 					
-					<p>Omegaup es un juez.</p> 
+					<p>OmegaUp est&aacute; pensado como m&aacute;s que otra p&aacute;gina de concursos, otro juez en l&iacute;nea. OmegaUp tendr&aacute; muchas caracter&iacute;sticas que no se encontrar&aacute;n en ning&uacute;n otro sitio, y todo ir&aacute; enfocado para hacer realidad nuestro lema: <i>Elevando el nivel de Desarrolladores</i></p> 
 
 					<h3>New features</h3> 
 					<ul> 
