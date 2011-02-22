@@ -17,7 +17,3 @@ target/
 lib_managed/
 src_managed/
 */project/boot/
-
-# Runner related stuff
-runner/compile
-runner/input

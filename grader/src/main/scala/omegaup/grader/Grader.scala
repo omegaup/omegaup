@@ -6,6 +6,7 @@ import java.util.regex.Pattern
 import java.util.zip._
 import scala.collection.mutable
 import omegaup._
+import omegaup.data._
 import Veredicto._
 
 trait Grader extends Object with Log {

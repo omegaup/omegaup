@@ -13,8 +13,10 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 		"-dontwarn",
 		"-keep interface scala.ScalaObject",
 		"-keep class omegaup.*",
+		"-keep class omegaup.data.*",
 		"-keep class omegaup.runner.*",
-		"-keepclassmembers class omegaup.runner.* { *; }",
+		"-keepclassmembers class omegaup.data.* { *; }",
+		"-keepclassmembers class omegaup.runner.Runner { *; }",
 		"-keep class scala.collection.JavaConversions",
 		"-keep class org.mortbay.log.Slf4jLog",
 		proguardKeepLimitedSerializability
@@ -29,4 +31,6 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 	) ++ super.libraryDependencies
 	
 	val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
+	
+	val common = "omegaup" % "omegaup-common" % "1.0" from "file://"+(new java.io.File("../common/target/scala_2.8.1/common_2.8.1-1.0.jar").getCanonicalPath)
 }

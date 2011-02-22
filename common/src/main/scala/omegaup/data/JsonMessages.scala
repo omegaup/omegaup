@@ -1,9 +1,5 @@
-package omegaup.grader
+package omegaup.data
 
-case class GradeInputMessage(id: Int)
-case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
-case class RegisterInputMessage(port: Int)
-case class RegisterOutputMessage(status: String = "ok", error: Option[String] = None)
 case class NullMessage()
 
 // from Runner
@@ -17,3 +13,9 @@ case class RunInputMessage(token: String, timeLimit: Float = 1, memoryLimit: Int
 case class RunOutputMessage(status: String = "ok", error: Option[String] = None, results: Option[List[RunCaseResult]] = None)
 
 case class InputOutputMessage(status: String = "ok", error: Option[String] = None)
+
+// from Grader
+case class GradeInputMessage(id: Int)
+case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
+case class RegisterInputMessage(port: Int)
+case class RegisterOutputMessage(status: String = "ok", error: Option[String] = None)

@@ -1,6 +1,7 @@
 package omegaup.grader.drivers
 
 import omegaup._
+import omegaup.data._
 import omegaup.grader._
 import java.io._
 import scala.util.matching.Regex

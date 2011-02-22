@@ -8,6 +8,7 @@ import org.mortbay.jetty._
 import org.mortbay.jetty.handler._
 import net.liftweb.json._
 import omegaup._
+import omegaup.data._
 import Estado._
 import Lenguaje._
 import Veredicto._

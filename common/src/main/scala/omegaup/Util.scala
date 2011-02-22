@@ -2,12 +2,13 @@ package omegaup
 
 import java.io._
 import java.net._
-import org.slf4j.{Logger, LoggerFactory}
-import net.liftweb.json._
+import java.util._
 import javax.net.ssl._
+import net.liftweb.json._
+import org.slf4j.{Logger, LoggerFactory}
 
 object Config {
-	private val props = new java.util.Properties()
+	private val props = new java.util.Properties(System.getProperties)
 	props.load(new java.io.FileInputStream("omegaup.properties"))
 	
 	def get[T](propname: String, default: T): T = {
@@ -107,19 +108,82 @@ object Https extends Object with Log {
 		}
 	})
 	
-	def send[W <: AnyRef, T](url:String, request:W)(implicit mf: Manifest[T]):T = {
+	def send[T, W <: AnyRef](url:String, request:W)(implicit mf: Manifest[T]):T = {
 		debug("Requesting {}", url)
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 		
 		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
-		conn.setDoOutput(true)
+		conn.addRequestProperty("Content-Type", "text/json")
 		conn.setSSLSocketFactory(socketFactory)
+		conn.setDoOutput(true)
 		val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
 		Serialization.write[W, PrintWriter](request, writer)
 		writer.close()
 		
 		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+	}
+	
+	def zip_send[T](url:String, zipfile:String, zipname:String)(implicit mf: Manifest[T]): T = {
+		debug("Requesting {}", url)
+		
+		implicit val formats = Serialization.formats(NoTypeHints)
+		
+		val file = new File(zipfile)
+		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
+		conn.addRequestProperty("Content-Type", "application/zip")
+		conn.addRequestProperty("Content-Disposition", "attachment; filename=" + zipname + ";")
+		conn.setFixedLengthStreamingMode(file.length.toInt)
+		conn.setSSLSocketFactory(socketFactory)
+		conn.setDoOutput(true)
+		val outputStream = conn.getOutputStream
+		val inputStream = new FileInputStream(file)
+		val buffer = Array.ofDim[Byte](1024)
+		var read = 0
+		var reading = true
+		
+		while(reading) {
+			read = inputStream.read(buffer)
+			if (read == -1) reading = false
+			else outputStream.write(buffer, 0, read)
+		}
+		
+		inputStream.close
+		outputStream.close
+		
+		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+	}
+	
+	def receive_zip[T, W <: AnyRef](url:String, request:W, file:String)(implicit mf: Manifest[T]): Option[T] = {
+		debug("Requesting {}", url)
+		
+		implicit val formats = Serialization.formats(NoTypeHints)
+
+		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
+		conn.addRequestProperty("Content-Type", "text/json")
+		conn.setSSLSocketFactory(socketFactory)
+		conn.setDoOutput(true)
+		val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
+		Serialization.write[W, PrintWriter](request, writer)
+		writer.close()
+		
+		if (conn.getHeaderField("Content-Type") == "application/zip") {
+			val outputStream = new FileOutputStream(file)
+			val inputStream = conn.getInputStream
+			val buffer = Array.ofDim[Byte](1024)
+			var read = 0
+		
+			while( { read = inputStream.read(buffer) ; read > 0 } ) {
+				outputStream.write(buffer, 0, read)
+			}
+		
+			inputStream.close
+			outputStream.close
+			
+			None
+		} else {
+			Some(Serialization.read[T](new InputStreamReader(conn.getInputStream())))
+		}
 	}
 }
 
@@ -136,7 +200,7 @@ object FileUtil {
 			contents.append("\n")
 		}
 		
-		fileReader.close()
+		fileReader.close
 		
 		contents.toString.trim
 	}
@@ -147,7 +211,7 @@ object FileUtil {
 		fileWriter.write(data)
 		fileWriter.close
 	}
-	
+		
 	@throws(classOf[IOException])
 	def deleteDirectory(dir: String): Boolean = {
 		FileUtil.deleteDirectory(new File(dir))
@@ -161,5 +225,6 @@ object FileUtil {
 			dir.delete
 		}
 		false
-	}
+	}	
 }
+

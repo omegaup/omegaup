@@ -10,6 +10,7 @@ import org.mortbay.jetty.handler._
 import net.liftweb.json._
 import scala.collection.{mutable,immutable}
 import omegaup._
+import omegaup.data._
 
 object Runner extends Object with Log {
 	def compile(lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]): CompileOutputMessage = {
@@ -379,7 +380,7 @@ object Runner extends Object with Log {
 		
 		info("Registering port {}", runnerConnector.getLocalPort())
 		
-		Https.send[RegisterInputMessage, RegisterOutputMessage](
+		Https.send[RegisterOutputMessage, RegisterInputMessage](
 			Config.get("grader.register.url", "https://localhost:21680/register/"),
 			new RegisterInputMessage(runnerConnector.getLocalPort())
 		)
@@ -388,7 +389,7 @@ object Runner extends Object with Log {
 		
 		try {
 			// well, at least try to de-register
-			Https.send[RegisterInputMessage, RegisterOutputMessage](
+			Https.send[RegisterOutputMessage, RegisterInputMessage](
 				Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
 				new RegisterInputMessage(runnerConnector.getLocalPort())
 			)
