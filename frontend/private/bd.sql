@@ -346,6 +346,9 @@ COMMENT = 'Guardar histórico de coders del mes de forma sencilla.';
 CREATE  TABLE IF NOT EXISTS `omegaup`.`contests_users` (
   `user_id` INT(11) NOT NULL ,
   `contest_id` INT(11) NOT NULL ,
+  `access_time` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Hora a la que entró el usuario al concurso' ,
+  `score` INT(11) NOT NULL DEFAULT TRUE COMMENT 'Índica el puntaje que obtuvo el usuario en el concurso',
+  `time` INT(11) NOT NULL DEFAULT TRUE COMMENT 'Índica el tiempo que acumulo en usuario en el concurso',  
   PRIMARY KEY (`user_id`, `contest_id`) ,
   INDEX `user_id` (`user_id` ASC) ,
   INDEX `contest_id` (`contest_id` ASC) ,
