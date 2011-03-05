@@ -1,6 +1,6 @@
 window.fbAsyncInit = function() {
   	FB.init({appId: '197705690257857', status: true, cookie: true, xfbml: true});
-
+	$(".login_bar").slideDown()
 	console.log("facebook loaded");
 	FB.getLoginStatus(function(response) {
 	  if (response.session) {

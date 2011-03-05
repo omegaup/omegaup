@@ -28,7 +28,7 @@
 	
 	<body>
 	<div id="wrapper">
-		
+		<div class="login_bar">Welcome alan bongnzalez | <a href="login.php">Login</a></div> 
 		<div id="title"><?php echo $GUI::getHeader(); ?></div>
 	    
 		<div id="content">

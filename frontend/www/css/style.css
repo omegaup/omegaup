@@ -11,7 +11,7 @@ strong {
 em { font-style: italic }
 div#title {
     height: 151px;
-    padding-top: 53px;
+	padding-top: 13px;
     background: #eceff1 url(../media/header-background.png);
 }
 div#title a {
@@ -133,3 +133,12 @@ div.post.footer p a { color: #bbc6ce }
 div.post.footer p a:hover { color: #7497af }
 /* Hide stuff */
 div#sidebar { display: none }
+
+
+div.login_bar{
+	background-color: #678DD7;
+	border-bottom: solid 1px #E7E7E7;
+	color: white;
+	padding: 5px;
+	display: none;
+}
