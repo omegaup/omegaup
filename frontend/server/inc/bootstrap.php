@@ -6,7 +6,7 @@
 	 * 
 	 * */
 	//var_dump($_SERVER);
-	$loc = $SERVER["SCRIPT_FILENAME"];
+	$loc = $_SERVER["SCRIPT_FILENAME"];
 	
 
 	/*
@@ -72,8 +72,8 @@
 	 * bug is found, they will have limited access to the database.
 	 * 
 	 * */
-	require_once('../adodb5/adodb.inc.php');
-	require_once('../adodb5/adodb-exceptions.inc.php');
+	require_once('adodb5/adodb.inc.php');
+	require_once('adodb5/adodb-exceptions.inc.php');
 
 	$conn = null;
 

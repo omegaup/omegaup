@@ -289,7 +289,6 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`runs` (
   `languaje` ENUM('c','cpp','java','py','rb','pl','cs','p') NOT NULL ,
   `status` ENUM('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new' ,
   `response` ENUM('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL ,
-  `time` INT(11) NOT NULL DEFAULT '0' ,
   `memoria` INT(11) NOT NULL DEFAULT '0' ,
   `score` DOUBLE NOT NULL DEFAULT '0' , -- proporción (entre 0 y 1) de los casos resueltos correctamente
   `contest_score` DOUBLE NOT NULL DEFAULT '0' , -- puntuación ajustada según las reglas del concurso
