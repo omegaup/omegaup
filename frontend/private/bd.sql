@@ -6,9 +6,9 @@ CREATE SCHEMA IF NOT EXISTS `omegaup` DEFAULT CHARACTER SET utf8 ;
 USE `omegaup` ;
 
 -- -----------------------------------------------------
--- Table `omegaup`.`countries`
+-- Table `omegaup`.`Countries`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`countries` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Countries` (
   `country_id` CHAR(3) NOT NULL ,
   `name` VARCHAR(50) NOT NULL ,
   PRIMARY KEY (`country_id`) )
@@ -18,9 +18,9 @@ COMMENT = 'Catálogos para la normalización';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`states`
+-- Table `omegaup`.`States`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`states` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`States` (
   `state_id` INT(11) NOT NULL ,
   `country_id` CHAR(3) NOT NULL ,
   `name` VARCHAR(50) NOT NULL ,
@@ -28,7 +28,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`states` (
   INDEX `country_id` (`country_id` ASC) ,
   CONSTRAINT `country_id`
     FOREIGN KEY (`country_id` )
-    REFERENCES `omegaup`.`countries` (`country_id` )
+    REFERENCES `omegaup`.`Countries` (`country_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -37,9 +37,9 @@ COMMENT = 'Catálogos para la normalización';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`schools`
+-- Table `omegaup`.`Schools`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`schools` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Schools` (
   `school_id` INT(11) NOT NULL ,
   `state_id` INT(11) NOT NULL ,
   `name` VARCHAR(50) NOT NULL ,
@@ -47,7 +47,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`schools` (
   INDEX `state_id` (`state_id` ASC) ,
   CONSTRAINT `state_id`
     FOREIGN KEY (`state_id` )
-    REFERENCES `omegaup`.`states` (`state_id` )
+    REFERENCES `omegaup`.`States` (`state_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -56,9 +56,9 @@ COMMENT = 'Catálogos para la normalización';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`users`
+-- Table `omegaup`.`Users`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`users` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Users` (
   `user_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `username` VARCHAR(50) NOT NULL ,
   `password` CHAR(32) NULL DEFAULT NULL ,
@@ -79,17 +79,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`users` (
   INDEX `school_id` (`school_id` ASC) ,
   CONSTRAINT `country_id`
     FOREIGN KEY (`country_id` )
-    REFERENCES `omegaup`.`countries` (`country_id` )
+    REFERENCES `omegaup`.`Countries` (`country_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `state_id`
     FOREIGN KEY (`state_id` )
-    REFERENCES `omegaup`.`states` (`state_id` )
+    REFERENCES `omegaup`.`States` (`state_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `school_id`
     FOREIGN KEY (`school_id` )
-    REFERENCES `omegaup`.`schools` (`school_id` )
+    REFERENCES `omegaup`.`Schools` (`school_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -99,16 +99,16 @@ COMMENT = 'Usuarios registrados.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`auth_tokens`
+-- Table `omegaup`.`Auth_Tokens`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`auth_tokens` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Auth_Tokens` (
   `user_id` INT(11) NOT NULL ,
   `token` VARCHAR(256) NOT NULL ,
   PRIMARY KEY (`token`) ,
   INDEX `user_id` (`user_id` ASC) ,
   CONSTRAINT `user_id`
     FOREIGN KEY (`user_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -117,9 +117,9 @@ COMMENT = 'Tokens de autorización para los logins.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`announcement`
+-- Table `omegaup`.`Announcement`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`announcement` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Announcement` (
   `announcement_id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador del aviso' ,
   `user_id` INT(11) NOT NULL COMMENT 'UserID del autor de este aviso' ,
   `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de este aviso' ,
@@ -128,7 +128,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`announcement` (
   INDEX `user_id` (`user_id` ASC) ,
   CONSTRAINT `user_id`
     FOREIGN KEY (`user_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -138,9 +138,9 @@ COMMENT = 'Sistema de mensajería dentro del sitio.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`password_change`
+-- Table `omegaup`.`Password_Change`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`password_change` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Password_Change` (
   `user_id` INT(11) NOT NULL COMMENT 'Identificador de a que usuario pertenece este token' ,
   `token` CHAR(64) NOT NULL COMMENT 'El token que se genera aleatoriamente para luego comparar cuando el usuario haga click en el link' ,
   `ip` CHAR(15) NOT NULL COMMENT 'El ip desde donde se genero este reseteo de password' ,
@@ -149,7 +149,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`password_change` (
   INDEX `user_id` (`user_id` ASC) ,
   CONSTRAINT `user_id`
     FOREIGN KEY (`user_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -157,9 +157,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`messages`
+-- Table `omegaup`.`Messages`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`messages` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Messages` (
   `message_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `read` TINYINT(1) NOT NULL DEFAULT '0' ,
   `sender_id` INT(11) NOT NULL ,
@@ -170,7 +170,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`messages` (
   INDEX `sender_id` (`sender_id` ASC, `recipient_id` ASC) ,
   CONSTRAINT `sender_id`
     FOREIGN KEY (`sender_id` , `recipient_id` )
-    REFERENCES `omegaup`.`users` (`user_id` , `user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` , `user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -180,9 +180,9 @@ COMMENT = 'Sistema de mensajería dentro del sitio.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`problems`
+-- Table `omegaup`.`Problems`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`problems` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems` (
   `problem_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `public` TINYINT(1) NOT NULL DEFAULT '1' ,
   `author_id` INT(11) NOT NULL ,
@@ -204,7 +204,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`problems` (
   INDEX `author_id` (`author_id` ASC) ,
   CONSTRAINT `author_id`
     FOREIGN KEY (`author_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -215,9 +215,9 @@ COMMENT = 'Se crea un registro por cada prob externo.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`contests`
+-- Table `omegaup`.`Contests`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`contests` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Contests` (
   `contest_id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador unico para cada concurso' ,
   `title` VARCHAR(256) NOT NULL COMMENT 'El titulo que aparecera en cada concurso' ,
   `description` TINYTEXT NOT NULL COMMENT 'Una breve descripcion de cada concurso.' ,
@@ -239,12 +239,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`contests` (
   INDEX `rerun_id` (`contest_id` ASC) ,
   CONSTRAINT `director_id`
     FOREIGN KEY (`director_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `rerun_id`
     FOREIGN KEY (`contest_id` )
-    REFERENCES `omegaup`.`contests` (`contest_id` )
+    REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -253,9 +253,9 @@ COMMENT = 'Concursos que se llevan a cabo en el juez.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`contest_problems`
+-- Table `omegaup`.`Contest_Problems`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`contest_problems` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Contest_Problems` (
   `contest_id` INT(11) NOT NULL ,
   `problem_id` INT(11) NOT NULL ,
   `points` DOUBLE NOT NULL DEFAULT '1' ,
@@ -264,12 +264,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`contest_problems` (
   INDEX `problem_id` (`problem_id` ASC) ,
   CONSTRAINT `contest_id`
     FOREIGN KEY (`contest_id` )
-    REFERENCES `omegaup`.`contests` (`contest_id` )
+    REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `problem_id`
     FOREIGN KEY (`problem_id` )
-    REFERENCES `omegaup`.`problems` (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -278,9 +278,9 @@ COMMENT = 'Relacion entre Concursos y los problemas que tiene este';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`runs`
+-- Table `omegaup`.`Runs`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`runs` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Runs` (
   `run_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `user_id` INT(11) NOT NULL ,
   `problem_id` INT(11) NOT NULL ,
@@ -300,17 +300,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`runs` (
   INDEX `contest_id` (`contest_id` ASC) ,
   CONSTRAINT `user_id`
     FOREIGN KEY (`user_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `problem_id`
     FOREIGN KEY (`problem_id` )
-    REFERENCES `omegaup`.`problems` (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `contest_id`
     FOREIGN KEY (`contest_id` )
-    REFERENCES `omegaup`.`contests` (`contest_id` )
+    REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -320,9 +320,9 @@ COMMENT = 'Estado de todas las ejecuciones.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`coder_of_the_month`
+-- Table `omegaup`.`Coder_of_the_Month`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`coder_of_the_month` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Coder_of_the_Month` (
   `coder_of_the_month_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `description` TINYTEXT NULL DEFAULT NULL ,
   `time` DATE NOT NULL DEFAULT '2000/01/01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.' ,
@@ -331,7 +331,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`coder_of_the_month` (
   INDEX `coder_of_the_month_id` (`coder_of_the_month_id` ASC) ,
   CONSTRAINT `coder_of_the_month_id`
     FOREIGN KEY (`coder_of_the_month_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -340,9 +340,9 @@ COMMENT = 'Guardar histórico de coders del mes de forma sencilla.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`contests_users`
+-- Table `omegaup`.`Contests_Users`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`contests_users` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Contests_Users` (
   `user_id` INT(11) NOT NULL ,
   `contest_id` INT(11) NOT NULL ,
   `access_time` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Hora a la que entró el usuario al concurso' ,
@@ -353,12 +353,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`contests_users` (
   INDEX `contest_id` (`contest_id` ASC) ,
   CONSTRAINT `user_id`
     FOREIGN KEY (`user_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `contest_id`
     FOREIGN KEY (`contest_id` )
-    REFERENCES `omegaup`.`contests` (`contest_id` )
+    REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -367,9 +367,9 @@ COMMENT = 'Concursantes que pueden participar en concurso cerrado.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`favorites`
+-- Table `omegaup`.`Favorites`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`favorites` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Favorites` (
   `user_id` INT(11) NOT NULL ,
   `problem_id` INT(11) NOT NULL ,
   PRIMARY KEY (`user_id`, `problem_id`) ,
@@ -377,12 +377,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`favorites` (
   INDEX `problem_id` (`problem_id` ASC) ,
   CONSTRAINT `user_id`
     FOREIGN KEY (`user_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `problem_id`
     FOREIGN KEY (`problem_id` )
-    REFERENCES `omegaup`.`problems` (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -391,9 +391,9 @@ COMMENT = 'Problemas favoritos de los usuarios';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`tags`
+-- Table `omegaup`.`Tags`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`tags` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Tags` (
   `tag_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   `description` TINYTEXT NULL DEFAULT NULL ,
@@ -404,9 +404,9 @@ COMMENT = 'Guarda los tags para los problemas';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`problems_tags`
+-- Table `omegaup`.`Problems_Tags`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`problems_tags` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Tags` (
   `problem_id` INT(11) NOT NULL ,
   `tag_id` INT(11) NOT NULL ,
   PRIMARY KEY (`problem_id`, `tag_id`) ,
@@ -414,12 +414,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`problems_tags` (
   INDEX `problem_id` (`problem_id` ASC) ,
   CONSTRAINT `tag_id`
     FOREIGN KEY (`tag_id` )
-    REFERENCES `omegaup`.`tags` (`tag_id` )
+    REFERENCES `omegaup`.`Tags` (`tag_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `problem_id`
     FOREIGN KEY (`problem_id` )
-    REFERENCES `omegaup`.`problems` (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -428,9 +428,9 @@ COMMENT = 'Guarda la relacion entre Problemas y sus Tags';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`languages`
+-- Table `omegaup`.`Languages`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`languages` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Languages` (
   `language_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   `country_id` CHAR(3) NULL DEFAULT NULL COMMENT 'Se guarda la relación con el país para defaultear más rápido.' ,
@@ -439,7 +439,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`languages` (
   INDEX `country_id` (`country_id` ASC) ,
   CONSTRAINT `country_id`
     FOREIGN KEY (`country_id` )
-    REFERENCES `omegaup`.`countries` (`country_id` )
+    REFERENCES `omegaup`.`Countries` (`country_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -448,9 +448,9 @@ COMMENT = 'Lista de idiomas que potencialmente se soportarían.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`problems_languages`
+-- Table `omegaup`.`Problems_Languages`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`problems_languages` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Languages` (
   `problem_id` INT(11) NOT NULL ,
   `language_id` INT(11) NOT NULL ,
   `translator_id` INT(11) NOT NULL ,
@@ -460,17 +460,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`problems_languages` (
   INDEX `translator_id` (`translator_id` ASC) ,
   CONSTRAINT `problem_id`
     FOREIGN KEY (`problem_id` )
-    REFERENCES `omegaup`.`problems` (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `language_id`
     FOREIGN KEY (`language_id` )
-    REFERENCES `omegaup`.`languages` (`language_id` )
+    REFERENCES `omegaup`.`Languages` (`language_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `translator_id`
     FOREIGN KEY (`translator_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -479,9 +479,9 @@ COMMENT = 'Las traducciones viven en el filesystem y no en la bdd.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`clarifications`
+-- Table `omegaup`.`Clarifications`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`clarifications` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Clarifications` (
   `clarification_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `author_id` INT(11) NOT NULL COMMENT 'Autor de la clarificación.' ,
   `message` TEXT NOT NULL ,
@@ -496,17 +496,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`clarifications` (
   INDEX `author_id` (`author_id` ASC) ,
   CONSTRAINT `problem_id`
     FOREIGN KEY (`problem_id` )
-    REFERENCES `omegaup`.`problems` (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `contest_id`
     FOREIGN KEY (`contest_id` )
-    REFERENCES `omegaup`.`contests` (`contest_id` )
+    REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `author_id`
     FOREIGN KEY (`author_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -515,9 +515,9 @@ COMMENT = 'Se guardan las clarificaciones.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`badges`
+-- Table `omegaup`.`Badges`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`badges` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Badges` (
   `badge_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL DEFAULT 'MyBadge' ,
   `image_url` VARCHAR(45) NOT NULL ,
@@ -529,9 +529,9 @@ COMMENT = 'Esta tabla guarda la informacion de cada uno de los badges.';
 
 
 -- -----------------------------------------------------
--- Table `omegaup`.`problems_badges`
+-- Table `omegaup`.`Problems_Badges`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`problems_badges` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Badges` (
   `badge_id` INT(11) NOT NULL ,
   `problem_id` INT(11) NOT NULL ,
   PRIMARY KEY (`badge_id`, `problem_id`) ,
@@ -539,12 +539,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`problems_badges` (
   INDEX `problem_id` (`problem_id` ASC) ,
   CONSTRAINT `badge_id`
     FOREIGN KEY (`badge_id` )
-    REFERENCES `omegaup`.`badges` (`badge_id` )
+    REFERENCES `omegaup`.`Badges` (`badge_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `problem_id`
     FOREIGN KEY (`problem_id` )
-    REFERENCES `omegaup`.`problems` (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
@@ -553,9 +553,9 @@ COMMENT = 'Relación entre 1 badge y los problemas que lo desbloqueaan.';
 
 -- Originalmente era `users_badges`, pero creí que se referia a los badges desblequeados por los usuarios (no necesariamente relacionados con concursos)
 -- -----------------------------------------------------
--- Table `omegaup`.`users_badges`
+-- Table `omegaup`.`Users_Badges`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `omegaup`.`users_badges` (
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Users_Badges` (
   `badge_id` INT(11) NOT NULL ,
   `user_id` INT(11) NOT NULL ,
   `time` TIMESTAMP NOT NULL ,
@@ -566,17 +566,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`users_badges` (
   INDEX `last_problem_id` (`last_problem_id` ASC) ,
   CONSTRAINT `badge_id`
     FOREIGN KEY (`badge_id` )
-    REFERENCES `omegaup`.`badges` (`badge_id` )
+    REFERENCES `omegaup`.`Badges` (`badge_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `user_id`
     FOREIGN KEY (`user_id` )
-    REFERENCES `omegaup`.`users` (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `last_problem_id`
     FOREIGN KEY (`last_problem_id` )
-    REFERENCES `omegaup`.`problems` (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = MyISAM
