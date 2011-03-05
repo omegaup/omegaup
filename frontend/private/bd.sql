@@ -197,7 +197,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems` (
   `submissions` INT(11) NOT NULL DEFAULT '0' ,
   `accepted` INT(11) NOT NULL DEFAULT '0' ,
   `difficulty` DOUBLE NOT NULL DEFAULT '0' ,
-  `creation_date` DATETIME NOT NULL ,
+  `creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `source` VARCHAR(256) NULL DEFAULT NULL ,
   `order` ENUM('normal', 'inverse') NOT NULL DEFAULT 'normal', -- Orden normal: más puntos es mejor. Orden inverso: menos penalty es mejor.
   PRIMARY KEY (`problem_id`) ,
@@ -286,14 +286,15 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Runs` (
   `problem_id` INT(11) NOT NULL ,
   `contest_id` INT(11) NULL DEFAULT NULL ,
   `guid` CHAR(32) NOT NULL ,
-  `languaje` ENUM('c','cpp','java','py','rb','pl','cs','p') NOT NULL ,
+  `language` ENUM('c','cpp','java','py','rb','pl','cs','p') NOT NULL ,
   `status` ENUM('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new' ,
-  `response` ENUM('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL ,
-  `memoria` INT(11) NOT NULL DEFAULT '0' ,
+  `veredict` ENUM('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL ,
+  `runtime` INT(11) NOT NULL DEFAULT 0, -- tiempo de ejecución
+  `memory` INT(11) NOT NULL DEFAULT 0,  -- total de memoria consumida
   `score` DOUBLE NOT NULL DEFAULT '0' , -- proporción (entre 0 y 1) de los casos resueltos correctamente
   `contest_score` DOUBLE NOT NULL DEFAULT '0' , -- puntuación ajustada según las reglas del concurso
   `ip` CHAR(15) NOT NULL ,
-  `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , -- tiempo en el que se realizó el envío
   PRIMARY KEY (`run_id`) ,
   INDEX `user_id` (`user_id` ASC) ,
   INDEX `problem_id` (`problem_id` ASC) ,
