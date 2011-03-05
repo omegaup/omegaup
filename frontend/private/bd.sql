@@ -223,7 +223,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`contests` (
   `description` TINYTEXT NOT NULL COMMENT 'Una breve descripcion de cada concurso.' ,
   `start_time` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Hora de inicio de este concurso' ,
   `finish_time` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Hora de finalizacion de este concurso' ,
-  `window_lenght` INT(11) COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso' ,
+  `window_length` INT(11) COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso' ,
   `director_id` INT(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso' ,
   `rerun_id` INT(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso' ,
   `public` TINYINT(1) NOT NULL DEFAULT TRUE COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso' ,
