@@ -216,8 +216,10 @@
 		 * */
 		public static function getFooter(){
 			
-			return "This is the footer !";
-			
+			return 	"<script type=\"text/javascript\" src=\"http://connect.facebook.net/en_US/all.js\" async=\"\"></script>"
+			 . "<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js'></script>"
+			 . "<script src='js/omegaup.js'></script>"
+			 . "<div id=\"fb-root\"></div> ";
 		}
 		
 		
