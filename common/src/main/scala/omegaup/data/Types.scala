@@ -2,16 +2,16 @@ package omegaup.data
 
 import java.sql._
 
-object Validador extends Enumeration {
-	type Validador = Value
-	val  Remoto = Value(1, "remoto")
+object Validator extends Enumeration {
+	type Validator = Value
+	val  Remote = Value(1, "remote")
 	val  Literal = Value(2, "literal")
 	val  Token = Value(3, "token")
 	val  TokenCaseless = Value(4, "token-caseless")
 	val  TokenNumeric = Value(5, "token-numeric")
 }
 
-object Servidor extends Enumeration {
+object Server extends Enumeration {
 	type Servidor = Value
 	val  UVa = Value(1, "uva")
 	val  LiveArchive = Value(2, "livearchive")
@@ -20,8 +20,8 @@ object Servidor extends Enumeration {
 	val  SPOJ = Value(5, "spoj")
 }
 
-object Lenguaje extends Enumeration {
-	type Lenguaje = Value
+object Language extends Enumeration {
+	type Language = Value
 	val  C = Value(1, "c")
 	val  Cpp = Value(2, "cpp")
 	val  Java = Value(3, "java")
@@ -32,17 +32,17 @@ object Lenguaje extends Enumeration {
 	val  Pascal = Value(8, "p")
 }
 
-object Estado extends Enumeration {
-	type Estado = Value
-	val  Nuevo = Value(1, "nuevo")
-	val  Espera = Value(2, "espera")
-	val  Compilando = Value(3, "compilando")
-	val  Ejecutando = Value(4, "ejecutando")
-	val  Listo = Value(5, "listo")
+object Status extends Enumeration {
+	type Status = Value
+	val  New = Value(1, "new")
+	val  Waiting = Value(2, "waiting")
+	val  Compiling = Value(3, "compiling")
+	val  Running = Value(4, "running")
+	val  Ready = Value(5, "ready")
 }
 
-object Veredicto extends Enumeration {
-	type Veredicto = Value
+object Veredict extends Enumeration {
+	type Veredict = Value
 	val  Accepted = Value(1, "AC")
 	val  PartialAccepted = Value(2, "PA")
 	val  PresentationError = Value(3, "PE")
@@ -56,43 +56,53 @@ object Veredicto extends Enumeration {
 	val  JudgeError = Value(11, "JE")
 }
 
-import Validador._
-import Veredicto._
-import Estado._
-import Servidor._
-import Lenguaje._
-
-class Problema(
-	var id: Long,
-	var publico: Long = 1,
-	var autor: Long = 0,
-	var titulo: String = "",
-	var alias: Option[String] = None,
-	var validador: Validador = Validador.TokenNumeric,
-	var servidor: Option[Servidor] = None,
-	var id_remoto: Option[String] = None,
-	var tiempo_limite: Option[Long] = Some(1),
-	var memoria_limite: Option[Long] = Some(64),
-	var vistas: Long = 0,
-	var envios: Long = 0,
-	var aceptados: Long = 0,
-	var dificultad: Double = 0) {
+object Order extends Enumeration {
+	type Order = Value
+	val Normal = Value(1, "normal")
+	val Inverse = Value(2, "inverse")
 }
 
-class Ejecucion(
+import Validator._
+import Veredict._
+import Status._
+import Server._
+import Language._
+import Order._
+
+class Problem(
+	var id: Long,
+	var public: Long = 1,
+	var author: Long = 0,
+	var title: String = "",
+	var alias: Option[String] = None,
+	var validator: Validator = Validator.TokenNumeric,
+	var server: Option[Servidor] = None,
+	var remote_id: Option[String] = None,
+	var time_limit: Option[Long] = Some(1),
+	var memory_limit: Option[Long] = Some(64),
+	var vists: Long = 0,
+	var submissions: Long = 0,
+	var accepted: Long = 0,
+	var difficulty: Double = 0,
+	var creation_date: Timestamp = new Timestamp(0),
+	var source: String = "",
+	var order: Order = Order.Normal) {
+}
+
+class Run(
 	var id: Long = 0,
-	var usuario: Long = 0,
-	var problema: Problema = null,
-	var concurso: Option[Long] = None,
+	var user: Long = 0,
+	var problem: Problem = null,
+	var contest: Option[Long] = None,
 	var guid: String = "",
-	var lenguaje: Lenguaje = Lenguaje.C,
-	var estado: Estado = Estado.Nuevo,
-	var veredicto: Veredicto = Veredicto.JudgeError,
-	var tiempo: Long = 0,
-	var memoria: Long = 0,
-	var puntuacion: Double = 0,
-	var puntuacion_concurso: Double = 0,
+	var language: Language = Language.C,
+	var status: Status = Status.New,
+	var veredict: Veredict = Veredict.JudgeError,
+	var runtime: Long = 0,
+	var memory: Long = 0,
+	var score: Double = 0,
+	var contest_score: Double = 0,
 	var ip: String = "127.0.0.1",
-	var fecha: Timestamp = new Timestamp(0)
+	var timestamp: Timestamp = new Timestamp(0)
 ) {
 }

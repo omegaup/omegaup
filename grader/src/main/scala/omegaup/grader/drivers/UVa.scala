@@ -8,9 +8,9 @@ import java.util.concurrent._
 import scala.util.matching.Regex
 import scala.actors.Actor
 import scala.actors.Actor._
-import Lenguaje._
-import Veredicto._
-import Estado._
+import Language._
+import Veredict._
+import Status._
 
 object UVa extends Actor with Log {
 	val home_url   = "http://uva.onlinejudge.org/index.php"
@@ -29,29 +29,29 @@ object UVa extends Actor with Log {
 	private val locks  = for (i <- 1 until 50) yield new Semaphore(1)
 	private var lock_i = 0
 	private val rids   = Array.ofDim[Long](50)
-	private val ejecuciones = Array.ofDim[Ejecucion](50)
+	private val runes = Array.ofDim[Run](50)
 	
 	private val cookies = new scala.collection.mutable.HashMap[String,String]
 	private var logged_in = false
 	private val status_mapping = Map(
-		"Sent to judge" ->			Estado.Espera,
-		"Received" ->				Estado.Espera,
-		"In judge queue" ->			Estado.Espera,
-		"Queued" ->					Estado.Espera,
-		"Compiling" ->				Estado.Compilando,
-		"Linking" ->				Estado.Compilando,
-		"Running" ->				Estado.Ejecutando
+		"Sent to judge" ->			Status.Waiting,
+		"Received" ->				Status.Waiting,
+		"In judge queue" ->			Status.Waiting,
+		"Queued" ->					Status.Waiting,
+		"Compiling" ->				Status.Compiling,
+		"Linking" ->				Status.Compiling,
+		"Running" ->				Status.Running
 	)
 	private val veredict_mapping = Map(
-		"Compilation error"->		Veredicto.CompileError,
-		"Runtime error"->			Veredicto.RuntimeError,
-		"Wrong answer"->			Veredicto.WrongAnswer,
-		"Time limit exceeded"->		Veredicto.TimeLimitExceeded,
-		"Memory limit exceeded"->	Veredicto.MemoryLimitExceeded,
-		"Output limit exceeded"->	Veredicto.OutputLimitExceeded,
-		"Restricted function"->		Veredicto.RestrictedFunctionError,
-		"Presentation error"->		Veredicto.PresentationError,
-		"Accepted"->				Veredicto.Accepted
+		"Compilation error"->		Veredict.CompileError,
+		"Runtime error"->			Veredict.RuntimeError,
+		"Wrong answer"->			Veredict.WrongAnswer,
+		"Time limit exceeded"->		Veredict.TimeLimitExceeded,
+		"Memory limit exceeded"->	Veredict.MemoryLimitExceeded,
+		"Output limit exceeded"->	Veredict.OutputLimitExceeded,
+		"Restricted function"->		Veredict.RestrictedFunctionError,
+		"Presentation error"->		Veredict.PresentationError,
+		"Accepted"->				Veredict.Accepted
 	)
 	
 	def act() = {
@@ -81,34 +81,34 @@ object UVa extends Actor with Log {
 						error("UVa login failure")
 					}
 				}
-				case Submission(ejecucion: Ejecucion) => {
+				case Submission(run: Run) => {
 					locks(lock_i).acquire()
 					
-					val id   = ejecucion.id
-					val pid  = ejecucion.problema.id_remoto
-					val lang = ejecucion.lenguaje
-					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
+					val id   = run.id
+					val pid  = run.problem.remote_id
+					val lang = run.language
+					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)
 					
 					info("UVa Submission {} for problem {}", id, pid)
 					
 					if(!logged_in) {
 						error("UVa not logged in")
 						
-						ejecucion.estado = Estado.Listo
-						ejecucion.veredicto = Veredicto.JudgeError
-						ejecucion.tiempo = 0
-						ejecucion.memoria = 0
-						ejecucion.puntuacion = 0
-						Manager.updateVeredict(ejecucion)
+						run.status = Status.Ready
+						run.veredict = Veredict.JudgeError
+						run.runtime = 0
+						run.memory = 0
+						run.score = 0
+						Manager.updateVeredict(run)
 					} else {
 						val post_data = Map(
 							"problemid" ->	"",
 							"category" ->	"",
 							"localid" ->	pid,
 							lang match {
-								case Lenguaje.C => "language" -> "1"
-								case Lenguaje.Cpp => "language" -> "3"
-								case Lenguaje.Java => "language" -> "2"
+								case Language.C => "language" -> "1"
+								case Language.Cpp => "language" -> "3"
+								case Language.Java => "language" -> "2"
 							},
 							"code" ->		code
 						)
@@ -121,7 +121,7 @@ object UVa extends Actor with Log {
 							debug("UVa received with id {}", rid)
 							
 							rids(lock_i) = rid.toInt
-							ejecuciones(lock_i) = ejecucion
+							runes(lock_i) = run
 							
 							veredictReader ! lock_i
 						} catch {
@@ -132,12 +132,12 @@ object UVa extends Actor with Log {
 									error(st.toString)
 								}
 								
-								ejecucion.estado = Estado.Listo
-								ejecucion.veredicto = Veredicto.JudgeError
-								ejecucion.tiempo = 0
-								ejecucion.memoria = 0
-								ejecucion.puntuacion = 0
-								Manager.updateVeredict(ejecucion)
+								run.status = Status.Ready
+								run.veredict = Veredict.JudgeError
+								run.runtime = 0
+								run.memory = 0
+								run.score = 0
+								Manager.updateVeredict(run)
 							}
 						}
 					}
@@ -178,38 +178,38 @@ object UVa extends Actor with Log {
 				map { (row) => (row, rids.findIndexOf { row(0) == _.toString } ) }.
 				filter { (x) => x._2 != -1 }.
 				foreach { case (row, id) => {
-					var estado: Estado = Estado.Listo
-					var veredicto: Veredicto = Veredicto.JudgeError
+					var status: Status = Status.Ready
+					var veredict: Veredict = Veredict.JudgeError
 					
 					if (row(3) == "") {
-						 estado = Estado.Espera
+						 status = Status.Waiting
 					} else {
 						status_mapping find { (k) => row(3).contains(k._1) } match {
-							case Some((_, x: Estado)) => {
-								estado = x
+							case Some((_, x: Status)) => {
+								status = x
 							}
 							case None => veredict_mapping find { (k) => row(3).contains(k._1) } match {	
-								case Some((_, x: Veredicto)) => {
-									veredicto = x
+								case Some((_, x: Veredict)) => {
+									veredict = x
 								}
 								case None => {
-									error("UVa {} no contiene un veredicto válido", data(2))
-									veredicto = Veredicto.JudgeError
+									error("UVa {} does not contain a valid veredict", data(2))
+									veredict = Veredict.JudgeError
 								}
 							}
 						}
 					}
 					
-					ejecuciones(id).estado = estado
-					ejecuciones(id).veredicto = veredicto
-					ejecuciones(id).puntuacion = if(ejecuciones(id).veredicto == Veredicto.Accepted) 1 else 0
-					ejecuciones(id).tiempo = math.round(1000 * row(5).toDouble)
-					ejecuciones(id).memoria = 0
-					Manager.updateVeredict(ejecuciones(id))
+					runes(id).status = status
+					runes(id).veredict = veredict
+					runes(id).score = if(runes(id).veredict == Veredict.Accepted) 1 else 0
+					runes(id).runtime = math.round(1000 * row(5).toDouble)
+					runes(id).memory = 0
+					Manager.updateVeredict(runes(id))
 					
-					if(estado == Estado.Listo) {
+					if(status == Status.Ready) {
 						rids(id) = 0
-						ejecuciones(id) = null
+						runes(id) = null
 						
 						locks(id).release
 					}
@@ -220,11 +220,7 @@ object UVa extends Actor with Log {
 			}
 		} catch {
 			case e: IOException => {
-				error("UVa communication error: {}", e.getMessage)
-				error(e.getMessage)
-				e.getStackTrace.foreach { st =>
-					error(st.toString)
-				}
+				error("UVa communication error", e)
 				readVeredict(triesLeft-1)
 			}
 		}

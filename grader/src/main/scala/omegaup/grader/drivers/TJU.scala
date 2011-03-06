@@ -7,9 +7,9 @@ import java.io._
 import scala.util.matching.Regex
 import scala.actors.Actor
 import scala.actors.Actor._
-import Lenguaje._
-import Veredicto._
-import Estado._
+import Language._
+import Veredict._
+import Status._
 
 object TJU extends Actor with Log {
 	val submit_url = "http://acm.tju.edu.cn/toj/submit_process.php"
@@ -27,34 +27,34 @@ object TJU extends Actor with Log {
 	}
 	private var last_submission:Long = 0
 	private val status_mapping = Map(
-		"Received" ->			Estado.Espera,
-		"Compiling"->			Estado.Compilando,
-		"Running"->				Estado.Ejecutando
+		"Received" ->			Status.Waiting,
+		"Compiling"->			Status.Compiling,
+		"Running"->				Status.Running
 	)
 	private val veredict_mapping = Map(
-		"Compilation Error"->	Veredicto.CompileError,
-		"Runtime Error"->		Veredicto.RuntimeError,
-		"Wrong Answer"->		Veredicto.WrongAnswer,
-		"Time Limit Exceed"->	Veredicto.TimeLimitExceeded,
-		"Memory Limit Exceed"->	Veredicto.MemoryLimitExceeded,
-		"Output Limit Exceed"->	Veredicto.OutputLimitExceeded,
-		"Restricted Function"->	Veredicto.RestrictedFunctionError,
-		"Presentation Error"->	Veredicto.PresentationError,
-		"Accepted"->			Veredicto.Accepted
+		"Compilation Error"->	Veredict.CompileError,
+		"Runtime Error"->		Veredict.RuntimeError,
+		"Wrong Answer"->		Veredict.WrongAnswer,
+		"Time Limit Exceed"->	Veredict.TimeLimitExceeded,
+		"Memory Limit Exceed"->	Veredict.MemoryLimitExceeded,
+		"Output Limit Exceed"->	Veredict.OutputLimitExceeded,
+		"Restricted Function"->	Veredict.RestrictedFunctionError,
+		"Presentation Error"->	Veredict.PresentationError,
+		"Accepted"->			Veredict.Accepted
 	)
 	
 	def act() = {
 		while(true) {
 			receive {
-				case Submission(ejecucion: Ejecucion) => {
+				case Submission(run: Run) => {
 					val time_delta = 10000 - (java.lang.System.currentTimeMillis() - last_submission)
 					if(time_delta > 0)
 						try { Thread.sleep(time_delta) }
 					
-					val id   = ejecucion.id
-					val pid  = ejecucion.problema.id_remoto.get
-					val lang = ejecucion.lenguaje
-					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
+					val id   = run.id
+					val pid  = run.problem.remote_id.get
+					val lang = run.language
+					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)
 					
 					info("TJU Submission {} for problem {}", id, pid)
 		
@@ -63,10 +63,10 @@ object TJU extends Actor with Log {
 						"passwd"   -> Config.get("driver.tju.password", "omegaup"),
 						"prob_id"  -> pid,
 						lang match {
-							case Lenguaje.C => "language" -> "0"
-							case Lenguaje.Cpp => "language" -> "1"
-							case Lenguaje.Java => "language" -> "2"
-							case Lenguaje.Pascal => "language" -> "4"
+							case Language.C => "language" -> "0"
+							case Language.Cpp => "language" -> "1"
+							case Language.Java => "language" -> "2"
+							case Language.Pascal => "language" -> "4"
 						},
 						"source"   -> code
 					)
@@ -78,21 +78,17 @@ object TJU extends Actor with Log {
 						if(!data.contains("Your source code has been submitted")) {
 							throw new Exception("Invalid response:\n" + data)
 						}
-						readVeredict(ejecucion)
+						readVeredict(run)
 					} catch {
 						case e: Exception => {
-							error("TJU Submission {} failed for problem {}", id, pid)
-							error(e.getMessage)
-							e.getStackTrace.foreach { st =>
-								error(st.toString)
-							}
+							error("TJU Submission {} failed for problem {}", e, id, pid)
 							
-							ejecucion.estado = Estado.Listo
-							ejecucion.veredicto = Veredicto.JudgeError
-							ejecucion.memoria = 0
-							ejecucion.tiempo = 0
-							ejecucion.puntuacion = 0
-							Manager.updateVeredict(ejecucion)
+							run.status = Status.Ready
+							run.veredict = Veredict.JudgeError
+							run.memory = 0
+							run.runtime = 0
+							run.score = 0
+							Manager.updateVeredict(run)
 						}
 					}
 					
@@ -102,7 +98,7 @@ object TJU extends Actor with Log {
 		}
 	}
 	
-	private def readVeredict(ejecucion: Ejecucion, triesLeft: Int = 5): Unit = {
+	private def readVeredict(run: Run, triesLeft: Int = 5): Unit = {
 		if (triesLeft == 0)
 			throw new Exception("Retry limit exceeded")
 			
@@ -120,40 +116,40 @@ object TJU extends Actor with Log {
 			if (runId > last_id ) {
 				last_id = runId
 				
-				ejecucion.estado = Estado.Listo
-				ejecucion.veredicto = Veredicto.JudgeError
+				run.status = Status.Ready
+				run.veredict = Veredict.JudgeError
 			
 				status_mapping find { (k) => data(2).contains(k._1) } match {
-					case Some((_, x: Estado)) => {
-						ejecucion.estado = x
+					case Some((_, x: Status)) => {
+						run.status = x
 					}
 					case None => veredict_mapping find { (k) => data(2).contains(k._1) } match {	
-						case Some((_, x: Veredicto)) => {
-							ejecucion.veredicto = x
+						case Some((_, x: Veredict)) => {
+							run.veredict = x
 						}
 						case None => {
-							error("{} no contiene un veredicto válido", data(2))
-							ejecucion.veredicto = Veredicto.JudgeError
+							error("{} does not contain a valid veredict", data(2))
+							run.veredict = Veredict.JudgeError
 						}
 					}
 				}
 		
 				val RuntimeRegex(minutes, seconds, fractions) = data(6)
-				ejecucion.tiempo = 60000 * minutes.toInt + 1000 * seconds.toInt + fractions.toInt * 10
-				ejecucion.memoria = data(7).substring(0, data(7).length - 1).toInt
-				ejecucion.puntuacion = if(ejecucion.veredicto == Veredicto.Accepted) 1 else 0
+				run.runtime = 60000 * minutes.toInt + 1000 * seconds.toInt + fractions.toInt * 10
+				run.memory = data(7).substring(0, data(7).length - 1).toInt
+				run.score = if(run.veredict == Veredict.Accepted) 1 else 0
 			
-				Manager.updateVeredict(ejecucion)
+				Manager.updateVeredict(run)
 				
-				if(ejecucion.estado != Estado.Listo)
-					readVeredict(ejecucion)
+				if(run.status != Status.Ready)
+					readVeredict(run)
 			} else {
-				readVeredict(ejecucion, triesLeft)
+				readVeredict(run, triesLeft)
 			}
 		} catch {
 			case e: IOException => {
-				error("TJU communication error: {}", e.getMessage)
-				readVeredict(ejecucion, triesLeft-1)
+				error("TJU communication error", e)
+				readVeredict(run, triesLeft-1)
 			}
 		}
 	}

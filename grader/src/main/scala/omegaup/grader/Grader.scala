@@ -7,12 +7,12 @@ import java.util.zip._
 import scala.collection.mutable
 import omegaup._
 import omegaup.data._
-import Veredicto._
+import Veredict._
 
 trait Grader extends Object with Log {
-	def grade(ejecucion: Ejecucion): Unit = {
-		val id = ejecucion.id
-		val pid = ejecucion.problema.id
+	def grade(run: Run): Unit = {
+		val id = run.id
+		val pid = run.problem.id
 		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
 		val dataDirectory = new File(zip.getParentFile.getCanonicalPath + "/" + id)
 		dataDirectory.mkdirs()
@@ -39,10 +39,10 @@ trait Grader extends Object with Log {
 		
 		zip.delete
 		
-		ejecucion.estado = Estado.Listo
-		ejecucion.veredicto = Veredicto.Accepted
-		ejecucion.tiempo = 0
-		ejecucion.memoria = 0
+		run.status = Status.Ready
+		run.veredict = Veredict.Accepted
+		run.runtime = 0
+		run.memory = 0
 		
 		val metas = dataDirectory.listFiles.filter { _.getName.endsWith(".meta") }.map{ f => (f, MetaFile.load(f.getCanonicalPath)) }
 		
@@ -77,34 +77,34 @@ trait Grader extends Object with Log {
 		}
 		
 		metas.foreach { case (f, meta) => {
-			ejecucion.tiempo += math.round(1000 * meta("time").toDouble)
-			ejecucion.memoria = math.max(ejecucion.memoria, meta("mem").toLong)
+			run.runtime += math.round(1000 * meta("time").toDouble)
+			run.memory = math.max(run.memory, meta("mem").toLong)
 			val v = meta("status") match {
-				case "XX" => Veredicto.JudgeError
-				case "OK" => Veredicto.Accepted
-				case "RE" => Veredicto.RuntimeError
-				case "TO" => Veredicto.TimeLimitExceeded
-				case "ML" => Veredicto.MemoryLimitExceeded
-				case "OL" => Veredicto.OutputLimitExceeded
-				case "FO" => Veredicto.RestrictedFunctionError
-				case "FA" => Veredicto.RestrictedFunctionError
-				case "SG" => Veredicto.RuntimeError
+				case "XX" => Veredict.JudgeError
+				case "OK" => Veredict.Accepted
+				case "RE" => Veredict.RuntimeError
+				case "TO" => Veredict.TimeLimitExceeded
+				case "ML" => Veredict.MemoryLimitExceeded
+				case "OL" => Veredict.OutputLimitExceeded
+				case "FO" => Veredict.RestrictedFunctionError
+				case "FA" => Veredict.RestrictedFunctionError
+				case "SG" => Veredict.RuntimeError
 			}
 			
-			if(ejecucion.veredicto < v) ejecucion.veredicto = v
+			if(run.veredict < v) run.veredict = v
 		}}
 		
-		if (ejecucion.veredicto == Veredicto.JudgeError) {
-			ejecucion.tiempo = 0
-			ejecucion.memoria = 0
-			ejecucion.puntuacion = 0
+		if (run.veredict == Veredict.JudgeError) {
+			run.runtime = 0
+			run.memory = 0
+			run.score = 0
 		} else {
-			ejecucion.puntuacion = metas
+			run.score = metas
 			.filter{ case (f,m) => m("status") == "OK" }
 			.map { case (f,m) =>
 				weights(f.getName.substring(0, f.getName.length - 5)) *
 				gradeCase(
-					ejecucion,
+					run,
 					f.getName.substring(0, f.getName.length - 5),
 					new File(f.getCanonicalPath.replace(".meta", ".out")),
 					new File(Config.get("problems.root", "./problems") + "/" + pid + "/cases/" + f.getName.replace(".meta", ".out"))
@@ -112,25 +112,25 @@ trait Grader extends Object with Log {
 			}
 			.foldLeft(0.0)(_+_) / weights.foldLeft(0.0)(_+_._2)
 			
-			if(ejecucion.puntuacion == 0 && ejecucion.veredicto < Veredicto.WrongAnswer) ejecucion.veredicto = Veredicto.WrongAnswer
-			else if(ejecucion.puntuacion < metas.length && ejecucion.veredicto < Veredicto.PartialAccepted) ejecucion.veredicto = Veredicto.PartialAccepted
+			if(run.score == 0 && run.veredict < Veredict.WrongAnswer) run.veredict = Veredict.WrongAnswer
+			else if(run.score < metas.length && run.veredict < Veredict.PartialAccepted) run.veredict = Veredict.PartialAccepted
 		}
 		
-		Manager.updateVeredict(ejecucion)
+		Manager.updateVeredict(run)
 	}
 	
-	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double
 }
 
 object LiteralGrader extends Grader {
-	override def grade(ejecucion: Ejecucion): Unit = {
-		debug("Grading {}", ejecucion)
+	override def grade(run: Run): Unit = {
+		debug("Grading {}", run)
 		
-		ejecucion.estado = Estado.Listo
-		ejecucion.veredicto = Veredicto.WrongAnswer
-		ejecucion.puntuacion = try {
-			val inA = new BufferedReader(new FileReader(FileUtil.read(Config.get("problems.root", ".") + "/" + ejecucion.problema.id + "/output").trim))
-			val inB = new BufferedReader(new FileReader(FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)))
+		run.status = Status.Ready
+		run.veredict = Veredict.WrongAnswer
+		run.score = try {
+			val inA = new BufferedReader(new FileReader(FileUtil.read(Config.get("problems.root", "problems") + "/" + run.problem.id + "/output").trim))
+			val inB = new BufferedReader(new FileReader(FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)))
 			
 			var lineA: String = null
 			var lineB: String = null
@@ -163,53 +163,51 @@ object LiteralGrader extends Grader {
 			points
 		} catch {
 			case e: Exception => {
-				ejecucion.veredicto = Veredicto.JudgeError
+				run.veredict = Veredict.JudgeError
 				error("", e)
 				
 				0
 			}
 		}
 		
-		if(ejecucion.puntuacion == 1) ejecucion.veredicto = Veredicto.Accepted
+		if(run.score == 1) run.veredict = Veredict.Accepted
 		
-		Manager.updateVeredict(ejecucion)
+		Manager.updateVeredict(run)
 	}
 	
-	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = 0
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0
 }
 
 trait TokenComparer extends Object with Log {
-	def grade(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File, hasNext: Scanner => Boolean, next: Scanner => String, eq: (String,String) => Boolean): Double = {
-		debug("Grading {}, case {}", ejecucion, caseName)
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File, hasNext: Scanner => Boolean, next: Scanner => String, eq: (String,String) => Boolean): Double = {
+		debug("Grading {}, case {}", run, caseName)
+
 		try {
-			val inA = new Scanner(ejecucionOut)
+			val inA = new Scanner(runOut)
 			val inB = new Scanner(problemOut)
 			
 			var points:Double = 1
 			
 			while( hasNext(inA) && hasNext(inB) ) {
 				if(! eq(next(inA), next(inB)) ) {
-					debug("Token mismatch {} {} {}", caseName, ejecucionOut.getCanonicalPath, problemOut.getCanonicalPath)
+					debug("Token mismatch {} {} {}", caseName, runOut.getCanonicalPath, problemOut.getCanonicalPath)
 					points = 0
 				}
 			}
 			
 			if( hasNext(inA) || hasNext(inB) ) {
-				debug("Unfinished input {} {} {}", caseName, ejecucionOut.getCanonicalPath, problemOut.getCanonicalPath)
+				debug("Unfinished input {} {} {}", caseName, runOut.getCanonicalPath, problemOut.getCanonicalPath)
 				points = 0
 			}
 			
 			inA.close
 			inB.close
 			
-			debug("Grading {}, case {}. Reporting {} points", ejecucion, caseName, points)
+			debug("Grading {}, case {}. Reporting {} points", run, caseName, points)
 			points
 		} catch {
 			case e: Exception => {
-				error(e.getMessage)
-				e.getStackTrace.foreach { st =>
-					error(st.toString)
-				}
+				error("", e)
 				
 				0
 			}
@@ -218,21 +216,21 @@ trait TokenComparer extends Object with Log {
 }
 
 object TokenGrader extends Grader with TokenComparer {
-	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = {
-		grade(ejecucion, caseName, ejecucionOut, problemOut, _.hasNext, _.next, _.equals(_))
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
+		gradeCase(run, caseName, runOut, problemOut, _.hasNext, _.next, _.equals(_))
 	}
 }
 
 object TokenCaselessGrader extends Grader with TokenComparer {
-	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = {
-		grade(ejecucion, caseName, ejecucionOut, problemOut, _.hasNext, _.next, _.equalsIgnoreCase(_))
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
+		gradeCase(run, caseName, runOut, problemOut, _.hasNext, _.next, _.equalsIgnoreCase(_))
 	}
 }
 
 object TokenNumericGrader extends Grader with TokenComparer {
-	def gradeCase(ejecucion: Ejecucion, caseName: String, ejecucionOut: File, problemOut: File): Double = {
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
 		val pattern = Pattern.compile("\\d+(?:\\.\\d*)?|\\.\\d+")
 		
-		grade(ejecucion, caseName, ejecucionOut, problemOut, _.hasNext(pattern), _.next(pattern), (a:String,b:String) => math.abs(a.toDouble - b.toDouble) <= 1e-6)
+		gradeCase(run, caseName, runOut, problemOut, _.hasNext(pattern), _.next(pattern), (a:String,b:String) => math.abs(a.toDouble - b.toDouble) <= 1e-6)
 	}
 }

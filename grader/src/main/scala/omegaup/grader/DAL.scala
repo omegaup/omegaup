@@ -4,40 +4,40 @@ import java.sql._
 import omegaup.data._
 import omegaup.Database._
 
-import Veredicto._
-import Validador._
-import Servidor._
-import Lenguaje._
+import Veredict._
+import Validator._
+import Server._
+import Language._
 
 object GraderData {
-	def ejecucion(id: Long)(implicit connection: Connection): Option[Ejecucion] =
-		query("SELECT * FROM Ejecuciones AS e, Problemas AS p WHERE p.problemaID = e.problemaID AND e.ejecucionID = " + id) { rs =>
-			new Ejecucion(
-				id = rs.getLong("ejecucionID"),
-				concurso = rs.getLong("concursoID") match {
+	def run(id: Long)(implicit connection: Connection): Option[Run] =
+		query("SELECT * FROM Runs AS r, Problems AS p WHERE p.problem_id = r.problem_id AND r.run_id = " + id) { rs =>
+			new Run(
+				id = rs.getLong("run_id"),
+				contest = rs.getLong("contest_id") match {
 					case 0 => if(rs.wasNull) None else Some(0)
 					case x => Some(x)
 				},
 				guid = rs.getString("guid"),
-				lenguaje = Lenguaje.withName(rs.getString("lenguaje")),
-				estado = Estado.withName(rs.getString("estado")),
-				veredicto = Veredicto.withName(rs.getString("veredicto")),
-				problema = new Problema(
-					 id = rs.getLong("p.problemaID"),
-					 validador = Validador.withName(rs.getString("validador")),
-					 servidor = rs.getString("servidor") match {
+				language = Language.withName(rs.getString("language")),
+				status = Status.withName(rs.getString("status")),
+				veredict = Veredict.withName(rs.getString("veredict")),
+				problem = new Problem(
+					 id = rs.getLong("p.problem_id"),
+					 validator = Validator.withName(rs.getString("validator")),
+					 server = rs.getString("server") match {
 					 	case null => None
-					 	case x: String => Some(Servidor.withName(x))
+					 	case x: String => Some(Server.withName(x))
 					 },
-					 id_remoto = rs.getString("id_remoto") match {
+					 remote_id = rs.getString("remote_id") match {
 					 	case null => None
 					 	case x: String => Some(x)
 					 },
-					 tiempo_limite = rs.getString("tiempo") match {
+					 time_limit = rs.getString("time_limit") match {
 					 	case null => None
 					 	case x: String => Some(x.toLong)
 					 },
-					 memoria_limite = rs.getString("memoria") match {
+					 memory_limit = rs.getString("memory_limit") match {
 					 	case null => None
 					 	case x: String => Some(x.toLong)
 					 }
@@ -45,31 +45,31 @@ object GraderData {
 			)
 		}
 		
-	def update(ejecucion: Ejecucion)(implicit connection: Connection): Ejecucion = {
+	def update(run: Run)(implicit connection: Connection): Run = {
 		execute(
-			"UPDATE Ejecuciones SET estado = '" + ejecucion.estado + "'" +
-			", veredicto = '" + ejecucion.veredicto + "'" +
-			", tiempo = " + ejecucion.tiempo +
-			", memoria = " + ejecucion.memoria +
-			", puntuacion = " + ejecucion.puntuacion +
-			", puntuacion_concurso = " + ejecucion.puntuacion_concurso + " " +
-			"WHERE ejecucionID = " + ejecucion.id
+			"UPDATE Runs SET status = '" + run.status + "'" +
+			", veredict = '" + run.veredict + "'" +
+			", runtime = " + run.runtime +
+			", memory = " + run.memory +
+			", score = " + run.score +
+			", contest_score = " + run.contest_score + " " +
+			"WHERE run_id = " + run.id
 		)
-		ejecucion
+		run
 	}
 		
-	def insert(ej: Ejecucion)(implicit connection: Connection): Ejecucion = {
+	def insert(run: Run)(implicit connection: Connection): Run = {
 		execute(
-			"INSERT INTO Ejecuciones (usuarioID, problemaID, guid, lenguaje, veredicto, ip) VALUES(" +
-				ej.usuario + ", " +
-				ej.problema.id + ", " +
-				"'" + ej.guid + "', " + 
-				"'" + ej.lenguaje + "', " + 
-				"'" + ej.veredicto + "', " + 
-				"'" + ej.ip + "'" + 
+			"INSERT INTO Runs (user_id, problem_id, guid, language, veredict, ip) VALUES(" +
+				run.user + ", " +
+				run.problem.id + ", " +
+				"'" + run.guid + "', " +
+				"'" + run.language + "', " +
+				"'" + run.veredict + "', " +
+				"'" + run.ip + "'" +
 			")"
 		)
-		ej.id = query("SELECT LAST_INSERT_ID()") { rs => rs.getInt(1) }.get
-		ej
+                run.id = query("SELECT LAST_INSERT_ID()") { rs => rs.getInt(1) }.get
+		run
 	}
 }

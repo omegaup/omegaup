@@ -3,7 +3,7 @@ import omegaup.data._
 import omegaup.grader._
 import omegaup.grader.drivers._
 
-import Lenguaje._
+import Language._
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
@@ -19,7 +19,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 		
 		OmegaUp.start
 		
-		val omegaUpSubmit = (id: Long, lenguaje: Lenguaje, code: String) => {
+		val omegaUpSubmit = (id: Long, language: Language, code: String) => {
 			val file = java.io.File.createTempFile(System.currentTimeMillis.toString, "", new java.io.File(Config.get("submissions.root", ".")))
 			
 			implicit val conn = Manager.connection
@@ -27,21 +27,21 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			FileUtil.write(file.getCanonicalPath, code)
 		
 			Manager.grade(
-				GraderData.insert(new Ejecucion(
+				GraderData.insert(new Run(
 					guid = file.getName,
-					lenguaje = lenguaje,
-					problema = new Problema(id = id)
+					language = language,
+					problem = new Problem(id = id)
 				)).id
 			)
 		}
 		
-		omegaUpSubmit(1, Lenguaje.Cpp, """
+		omegaUpSubmit(1, Language.Cpp, """
 			int main() {
 				while(true);
 			}
 		""")
 		
-		omegaUpSubmit(1, Lenguaje.Cpp, """
+		omegaUpSubmit(1, Language.Cpp, """
 			#include <cstdlib>
 			#include <iostream>
 			#include <map>
@@ -59,7 +59,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			}
 		""")
 		
-		omegaUpSubmit(1, Lenguaje.Cpp, """
+		omegaUpSubmit(1, Language.Cpp, """
 			#include <cstdlib>
 			#include <iostream>
 			#include <map>
@@ -77,7 +77,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			}
 		""")
 		
-		omegaUpSubmit(1, Lenguaje.Java, """
+		omegaUpSubmit(1, Language.Java, """
 			class Main {
 			public static void main(String[] args) {
 			  double d = 2.2250738585072012e-308;
@@ -86,7 +86,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			}
 		""")
 		
-		omegaUpSubmit(1, Lenguaje.Java, """
+		omegaUpSubmit(1, Language.Java, """
 			class Main {
 			public static void main(String[] args) {
 			  System.out.println("Test:");
@@ -103,12 +103,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 	"UVaDriver" should "login" in {
 		UVa.start
 		UVa ! Login
-		UVa ! Submission(-1, Lenguaje.Cpp, 136, """
+		UVa ! Submission(-1, Language.Cpp, 136, """
 			int main() {
 				while(true);
 			}
 		""")
-		UVa ! Submission(-1, Lenguaje.Cpp, 136, """
+		UVa ! Submission(-1, Language.Cpp, 136, """
 			#include <cstdlib>
 			#include <iostream>
 			#include <map>
@@ -122,7 +122,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 				return EXIT_SUCCESS;
 			}
 		""")
-		UVa ! Submission(-1, Lenguaje.Cpp, 136, """
+		UVa ! Submission(-1, Language.Cpp, 136, """
 			int main() {
 				while(true);
 			}
@@ -133,12 +133,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 	
 	"LiveArchiveDriver" should "submit" in {
 		LiveArchive.start
-		LiveArchive ! Submission(-1, Lenguaje.Cpp, 4212, """
+		LiveArchive ! Submission(-1, Language.Cpp, 4212, """
 			int main() {
 				while(true);
 			}
 		""")
-		LiveArchive ! Submission(-1, Lenguaje.Cpp, 4212, """
+		LiveArchive ! Submission(-1, Language.Cpp, 4212, """
 			#include <cstdio>
 			#include <algorithm>
 			#include <cstring>
@@ -164,7 +164,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 				}
 			}
 		""")
-		LiveArchive ! Submission(-1, Lenguaje.Cpp, 4212, """
+		LiveArchive ! Submission(-1, Language.Cpp, 4212, """
 			int main() {
 				while(true);
 			}
@@ -174,12 +174,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 	
 	"TJUdriver" should "submit" in {
 		TJU.start
-		TJU ! Submission(-1, Lenguaje.C, 2231, """
+		TJU ! Submission(-1, Language.C, 2231, """
 			int main() {
 				while(true);
 			}
 		""")
-		TJU ! Submission(-1, Lenguaje.C, 2231, """
+		TJU ! Submission(-1, Language.C, 2231, """
 			#include <stdio.h>
 
 			int numbers[20];
@@ -210,7 +210,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 				return 0;
 			}
 		""")
-		TJU ! Submission(-1, Lenguaje.C, 2231, """
+		TJU ! Submission(-1, Language.C, 2231, """
 			int main() {
 				while(true);
 			}

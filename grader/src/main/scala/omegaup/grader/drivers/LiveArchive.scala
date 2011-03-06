@@ -7,9 +7,9 @@ import java.io._
 import scala.util.matching.Regex
 import scala.actors.Actor
 import scala.actors.Actor._
-import Lenguaje._
-import Veredicto._
-import Estado._
+import Language._
+import Veredict._
+import Status._
 
 object LiveArchive extends Actor with Log {
 	val submit_url = "http://acmicpc-live-archive.uva.es/nuevoportal/mailer.php"
@@ -30,30 +30,30 @@ object LiveArchive extends Actor with Log {
 		}
 	}
 	private val status_mapping = Map(
-		"Received" ->				Estado.Espera,
-		"Compiling"->				Estado.Compilando,
-		"Running"->					Estado.Ejecutando
+		"Received" ->				Status.Waiting,
+		"Compiling"->				Status.Compiling,
+		"Running"->					Status.Running
 	)
 	private val veredict_mapping = Map(
-		"Compile Error"->			Veredicto.CompileError,
-		"Runtime Error"->			Veredicto.RuntimeError,
-		"Wrong Answer"->			Veredicto.WrongAnswer,
-		"Time Limit Exceeded"->		Veredicto.TimeLimitExceeded,
-		"Memory Limit Exceeded"->	Veredicto.MemoryLimitExceeded,
-		"Output Limit Exceeded"->	Veredicto.OutputLimitExceeded,
-		"Restricted Function"->		Veredicto.RestrictedFunctionError,
-		"Presentation Error"->		Veredicto.PresentationError,
-		"Accepted"->				Veredicto.Accepted
+		"Compile Error"->			Veredict.CompileError,
+		"Runtime Error"->			Veredict.RuntimeError,
+		"Wrong Answer"->			Veredict.WrongAnswer,
+		"Time Limit Exceeded"->		Veredict.TimeLimitExceeded,
+		"Memory Limit Exceeded"->	Veredict.MemoryLimitExceeded,
+		"Output Limit Exceeded"->	Veredict.OutputLimitExceeded,
+		"Restricted Function"->		Veredict.RestrictedFunctionError,
+		"Presentation Error"->		Veredict.PresentationError,
+		"Accepted"->				Veredict.Accepted
 	)
 	
 	def act() = {
 		while(true) {
 			receive {
-				case Submission(ejecucion: Ejecucion) => {
-					val id   = ejecucion.id
-					val pid  = ejecucion.problema.id_remoto
-					val lang = ejecucion.lenguaje
-					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + ejecucion.guid)
+				case Submission(run: Run) => {
+					val id   = run.id
+					val pid  = run.problem.remote_id
+					val lang = run.language
+					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)
 					
 					info("LA Submission {} for problem {}", id, pid)
 		
@@ -62,10 +62,10 @@ object LiveArchive extends Actor with Log {
 						"userid"   -> Config.get("driver.livearchive.password", "omegaup"),
 						"problem"  -> pid,
 						lang match {
-							case Lenguaje.C => "language" -> "C"
-							case Lenguaje.Cpp => "language" -> "C++"
-							case Lenguaje.Java => "language" -> "Java"
-							case Lenguaje.Pascal => "language" -> "Pascal"
+							case Language.C => "language" -> "C"
+							case Language.Cpp => "language" -> "C++"
+							case Language.Java => "language" -> "Java"
+							case Language.Pascal => "language" -> "Pascal"
 						},
 						"comment" -> "",
 						"code"    -> code
@@ -78,21 +78,17 @@ object LiveArchive extends Actor with Log {
 						if(!data.contains("Problem submitted successfully")) {
 							throw new Exception("Invalid response:\n" + data)
 						}
-						readVeredict(ejecucion)
+						readVeredict(run)
 					} catch {
 						case e: Exception => {
-							error("LA Submission {} failed for problem {}", id, pid)
-							error(e.getMessage)
-							e.getStackTrace.foreach { st =>
-								error(st.toString)
-							}
+							error("LA Submission {} failed for problem {}", e, id, pid)
 							
-							ejecucion.estado = Estado.Listo
-							ejecucion.veredicto = Veredicto.JudgeError
-							ejecucion.tiempo = 0
-							ejecucion.memoria = 0
-							ejecucion.puntuacion = 0
-							Manager.updateVeredict(ejecucion)
+							run.status = Status.Ready
+							run.veredict = Veredict.JudgeError
+							run.runtime = 0
+							run.memory = 0
+							run.score = 0
+							Manager.updateVeredict(run)
 						}
 					}
 				}
@@ -100,7 +96,7 @@ object LiveArchive extends Actor with Log {
 		}
 	}
 	
-	private def readVeredict(ejecucion: Ejecucion, triesLeft: Int = 5): Unit = {
+	private def readVeredict(run: Run, triesLeft: Int = 5): Unit = {
 		if (triesLeft == 0)
 			throw new Exception("Retry limit exceeded")
 			
@@ -112,7 +108,7 @@ object LiveArchive extends Actor with Log {
 			val data = Http.send_wait(status_url)
 	
 			if(!data.contains("tr align=center")) {
-				readVeredict(ejecucion, triesLeft)
+				readVeredict(run, triesLeft)
 			} else {
 				val TableRegex(table) = data
 				val RowRegex(rid, veredict, cpu, mem) = table
@@ -121,43 +117,43 @@ object LiveArchive extends Actor with Log {
 				if (runId > last_id ) {
 					last_id = runId
 				
-					ejecucion.estado = Estado.Listo
+					run.status = Status.Ready
 			
 					status_mapping find { (k) => veredict.contains(k._1) } match {
-						case Some((_, x: Estado)) => {
-							ejecucion.estado = x
+						case Some((_, x: Status)) => {
+							run.status = x
 						}
 						case None => veredict_mapping find { (k) => veredict.contains(k._1) } match {	
-							case Some((_, x: Veredicto)) => {
-								ejecucion.veredicto = x
+							case Some((_, x: Veredict)) => {
+								run.veredict = x
 							}
 							case None => {
-								error("LA {} no contiene un veredicto válido", data(2))
-								ejecucion.veredicto = Veredicto.JudgeError
+								error("LA {} does not contain a valid veredict", data(2))
+								run.veredict = Veredict.JudgeError
 							}
 						}
 					}
 		
-					ejecucion.memoria = if(mem == "Minimum") {
+					run.memory = if(mem == "Minimum") {
 						0
 					} else {
 						mem.toInt
 					}
-					ejecucion.tiempo = math.round(cpu.toFloat * 1000)
-					ejecucion.puntuacion = if(ejecucion.veredicto == Veredicto.Accepted) 1 else 0
+					run.runtime = math.round(cpu.toFloat * 1000)
+					run.score = if(run.veredict == Veredict.Accepted) 1 else 0
 			
-					Manager.updateVeredict(ejecucion)
+					Manager.updateVeredict(run)
 					
-					if(ejecucion.estado != Estado.Listo)
-						readVeredict(ejecucion)
+					if(run.status != Status.Ready)
+						readVeredict(run)
 				} else {
-					readVeredict(ejecucion, triesLeft)
+					readVeredict(run, triesLeft)
 				}
 			}
 		} catch {
 			case e: IOException => {
-				error("LA communication error: {}", e.getMessage)
-				readVeredict(ejecucion, triesLeft-1)
+				error("LA communication error", e)
+				readVeredict(run, triesLeft-1)
 			}
 		}
 	}

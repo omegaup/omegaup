@@ -4,19 +4,19 @@ import java.io._
 import java.util.logging._
 import javax.servlet._
 import javax.servlet.http._
-import org.mortbay.jetty._
+import org.mortbay.jetty.Request
 import org.mortbay.jetty.handler._
 import net.liftweb.json._
 import omegaup._
 import omegaup.data._
 import omegaup.runner._
-import Estado._
-import Lenguaje._
-import Veredicto._
-import Validador._
-import Servidor._
+import Status._
+import Language._
+import Veredict._
+import Validator._
+import Server._
 
-case class Submission(ejecucion: Ejecucion)
+case class Submission(run: Run)
 case object Login
 
 object Manager extends Object with Log {
@@ -34,19 +34,19 @@ object Manager extends Object with Log {
 		
 		implicit val conn = connection
 		
-		GraderData.ejecucion(id) match {
+		GraderData.run(id) match {
 			case None => throw new IllegalArgumentException("Id " + id + " not found")
-			case Some(ejecucion) => {
-				if (ejecucion.problema.validador == Validador.Remoto) {
-					ejecucion.problema.servidor match {
-						case Some(Servidor.UVa) => drivers.UVa
-						case Some(Servidor.LiveArchive) => drivers.LiveArchive
-						case Some(Servidor.TJU) => drivers.TJU
+			case Some(run) => {
+				if (run.problem.validator == Validator.Remote) {
+					run.problem.server match {
+						case Some(Server.UVa) => drivers.UVa
+						case Some(Server.LiveArchive) => drivers.LiveArchive
+						case Some(Server.TJU) => drivers.TJU
 						case _ => null
 					}
 				} else {
 					drivers.OmegaUp
-				} ! Submission(ejecucion)
+				} ! Submission(run)
 				
 				new GradeOutputMessage()
 			}
@@ -75,12 +75,12 @@ object Manager extends Object with Log {
 		new RegisterOutputMessage()
 	}
 	
-	def updateVeredict(ej: Ejecucion): Ejecucion = {
-		info("Veredict update: {} {} {} {} {} {} {}", ej.id, ej.estado, ej.veredicto, ej.puntuacion, ej.puntuacion_concurso, ej.tiempo, ej.memoria)
+	def updateVeredict(run: Run): Run = {
+		info("Veredict update: {} {} {} {} {} {} {}", run.id, run.status, run.veredict, run.score, run.contest_score, run.runtime, run.memory)
 		
 		implicit val conn = connection
 		
-		GraderData.update(ej)
+		GraderData.update(run)
 	}
 	
 	def main(args: Array[String]) = {
@@ -177,7 +177,7 @@ import omegaup.data._
 		};
 
 		// boilerplate code for jetty with https support	
-		val server = new Server()
+		val server = new org.mortbay.jetty.Server()
 		
 		val runnerConnector = new org.mortbay.jetty.security.SslSelectChannelConnector
 		runnerConnector.setPort(Config.get[Int]("grader.port", 21680))
