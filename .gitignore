@@ -11,6 +11,7 @@ box
 build.xml
 nbproject/
 manifest.mf
+build/
 
 # Ignore SSL-related stuff
 *.jks
