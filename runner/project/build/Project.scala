@@ -31,5 +31,5 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 	
 	val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
 	
-	val common = "omegaup" % "omegaup-common" % "1.0" from "file://"+(new java.io.File("../common/target/scala_2.8.1/common_2.8.1-1.0.jar").getCanonicalPath)
+	val common = "omegaup" % "omegaup-common" % "1.0" from "file://"+(new java.io.File("../common/target/scala_2.8.1/omegaup-common_2.8.1-1.0.jar").getCanonicalPath)
 }
