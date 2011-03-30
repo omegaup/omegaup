@@ -278,6 +278,38 @@ COMMENT = 'Relacion entre Concursos y los problemas que tiene este';
 
 
 -- -----------------------------------------------------
+-- Table `omegaup`.`Contest_Problem_Opened`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Contest_Problem_Opened` (
+  `contest_id` INT(11) NOT NULL ,
+  `problem_id` INT(11) NOT NULL ,
+  `user_id` INT(11) NOT NULL ,
+  `open_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`contest_id`, `problem_id`, `user_id`) ,
+  INDEX `contest_id` (`contest_id` ASC) ,
+  INDEX `problem_id` (`problem_id` ASC) ,
+  INDEX `user_id` (`user_id` ASC) ,
+  CONSTRAINT `contest_id`
+    FOREIGN KEY (`contest_id` )
+    REFERENCES `omegaup`.`Contests` (`contest_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `user_id`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `problem_id`
+    FOREIGN KEY (`problem_id` )
+    REFERENCES `omegaup`.`Problems` (`problem_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = MyISAM
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'Relacion entre Concursos y los problemas que tiene este';
+
+
+-- -----------------------------------------------------
 -- Table `omegaup`.`Runs`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Runs` (
