@@ -2,6 +2,8 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
+DROP SCHEMA `omegaup`;
+
 CREATE SCHEMA IF NOT EXISTS `omegaup` DEFAULT CHARACTER SET utf8 ;
 USE `omegaup` ;
 
@@ -77,12 +79,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Users` (
   INDEX `country_id` (`country_id` ASC) ,
   INDEX `state_id` (`state_id` ASC) ,
   INDEX `school_id` (`school_id` ASC) ,
-  CONSTRAINT `country_id`
+  CONSTRAINT `fk_country_id`
     FOREIGN KEY (`country_id` )
     REFERENCES `omegaup`.`Countries` (`country_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `state_id`
+  CONSTRAINT `fk_state_id`
     FOREIGN KEY (`state_id` )
     REFERENCES `omegaup`.`States` (`state_id` )
     ON DELETE NO ACTION
@@ -103,7 +105,7 @@ COMMENT = 'Usuarios registrados.';
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `omegaup`.`Auth_Tokens` (
   `user_id` INT(11) NOT NULL ,
-  `token` VARCHAR(256) NOT NULL ,
+  `token` VARCHAR(128) NOT NULL ,
   PRIMARY KEY (`token`) ,
   INDEX `user_id` (`user_id` ASC) ,
   CONSTRAINT `user_id`
@@ -126,7 +128,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Announcement` (
   `description` TEXT NOT NULL COMMENT 'Mensaje de texto del aviso' ,
   PRIMARY KEY (`announcement_id`) ,
   INDEX `user_id` (`user_id` ASC) ,
-  CONSTRAINT `user_id`
+  CONSTRAINT `fk_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
@@ -147,7 +149,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Password_Change` (
   `expiration_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'La fecha en que vence este token' ,
   PRIMARY KEY (`user_id`) ,
   INDEX `user_id` (`user_id` ASC) ,
-  CONSTRAINT `user_id`
+  CONSTRAINT `fk_pc_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
@@ -168,11 +170,16 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Messages` (
   `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP ,
   PRIMARY KEY (`message_id`) ,
   INDEX `sender_id` (`sender_id` ASC, `recipient_id` ASC) ,
-  CONSTRAINT `sender_id`
-    FOREIGN KEY (`sender_id` , `recipient_id` )
-    REFERENCES `omegaup`.`Users` (`user_id` , `user_id` )
+  CONSTRAINT `fk_m_sender_id`
+    FOREIGN KEY (`sender_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION ,
+  CONSTRAINT `fk_m_recipient_id`
+    FOREIGN KEY (`recipient_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION )
 ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
@@ -289,17 +296,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Contest_Problem_Opened` (
   INDEX `contest_id` (`contest_id` ASC) ,
   INDEX `problem_id` (`problem_id` ASC) ,
   INDEX `user_id` (`user_id` ASC) ,
-  CONSTRAINT `contest_id`
+  CONSTRAINT `fk_cpo_contest_id`
     FOREIGN KEY (`contest_id` )
     REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `user_id`
+  CONSTRAINT `fk_cpo_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `problem_id`
+  CONSTRAINT `fk_cpo_problem_id`
     FOREIGN KEY (`problem_id` )
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
@@ -331,17 +338,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Runs` (
   INDEX `user_id` (`user_id` ASC) ,
   INDEX `problem_id` (`problem_id` ASC) ,
   INDEX `contest_id` (`contest_id` ASC) ,
-  CONSTRAINT `user_id`
+  CONSTRAINT `fk_r_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `problem_id`
+  CONSTRAINT `fk_r_problem_id`
     FOREIGN KEY (`problem_id` )
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `contest_id`
+  CONSTRAINT `fk_r_contest_id`
     FOREIGN KEY (`contest_id` )
     REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
@@ -384,12 +391,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Contests_Users` (
   PRIMARY KEY (`user_id`, `contest_id`) ,
   INDEX `user_id` (`user_id` ASC) ,
   INDEX `contest_id` (`contest_id` ASC) ,
-  CONSTRAINT `user_id`
+  CONSTRAINT `fk_cu_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `contest_id`
+  CONSTRAINT `fk_cu_contest_id`
     FOREIGN KEY (`contest_id` )
     REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
@@ -408,12 +415,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Favorites` (
   PRIMARY KEY (`user_id`, `problem_id`) ,
   INDEX `user_id` (`user_id` ASC) ,
   INDEX `problem_id` (`problem_id` ASC) ,
-  CONSTRAINT `user_id`
+  CONSTRAINT `fk_f_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `problem_id`
+  CONSTRAINT `fk_f_problem_id`
     FOREIGN KEY (`problem_id` )
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
@@ -445,12 +452,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Tags` (
   PRIMARY KEY (`problem_id`, `tag_id`) ,
   INDEX `tag_id` (`tag_id` ASC) ,
   INDEX `problem_id` (`problem_id` ASC) ,
-  CONSTRAINT `tag_id`
+  CONSTRAINT `fk_t_tag_id`
     FOREIGN KEY (`tag_id` )
     REFERENCES `omegaup`.`Tags` (`tag_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `problem_id`
+  CONSTRAINT `fk_t_problem_id`
     FOREIGN KEY (`problem_id` )
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
@@ -470,7 +477,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Languages` (
   PRIMARY KEY (`language_id`) ,
   UNIQUE INDEX `nombre_UNIQUE` (`name` ASC) ,
   INDEX `country_id` (`country_id` ASC) ,
-  CONSTRAINT `country_id`
+  CONSTRAINT `fk_l_country_id`
     FOREIGN KEY (`country_id` )
     REFERENCES `omegaup`.`Countries` (`country_id` )
     ON DELETE NO ACTION
@@ -491,17 +498,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Languages` (
   INDEX `problem_id` (`problem_id` ASC) ,
   INDEX `language_id` (`language_id` ASC) ,
   INDEX `translator_id` (`translator_id` ASC) ,
-  CONSTRAINT `problem_id`
+  CONSTRAINT `fk_pl_problem_id`
     FOREIGN KEY (`problem_id` )
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `language_id`
+  CONSTRAINT `fk_pl_language_id`
     FOREIGN KEY (`language_id` )
     REFERENCES `omegaup`.`Languages` (`language_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `translator_id`
+  CONSTRAINT `fk_pl_translator_id`
     FOREIGN KEY (`translator_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
@@ -527,17 +534,17 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Clarifications` (
   INDEX `problem_id` (`problem_id` ASC) ,
   INDEX `contest_id` (`contest_id` ASC) ,
   INDEX `author_id` (`author_id` ASC) ,
-  CONSTRAINT `problem_id`
+  CONSTRAINT `fk_c_problem_id`
     FOREIGN KEY (`problem_id` )
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `contest_id`
+  CONSTRAINT `fk_c_contest_id`
     FOREIGN KEY (`contest_id` )
     REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `author_id`
+  CONSTRAINT `fk_c_author_id`
     FOREIGN KEY (`author_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
@@ -570,12 +577,12 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Badges` (
   PRIMARY KEY (`badge_id`, `problem_id`) ,
   INDEX `badge_id` (`badge_id` ASC) ,
   INDEX `problem_id` (`problem_id` ASC) ,
-  CONSTRAINT `badge_id`
+  CONSTRAINT `fk_pb_badge_id`
     FOREIGN KEY (`badge_id` )
     REFERENCES `omegaup`.`Badges` (`badge_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `problem_id`
+  CONSTRAINT `fk_pb_problem_id`
     FOREIGN KEY (`problem_id` )
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
@@ -597,23 +604,96 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Users_Badges` (
   INDEX `badge_id` (`badge_id` ASC) ,
   INDEX `user_id` (`user_id` ASC) ,
   INDEX `last_problem_id` (`last_problem_id` ASC) ,
-  CONSTRAINT `badge_id`
+  CONSTRAINT `fk_ub_badge_id`
     FOREIGN KEY (`badge_id` )
     REFERENCES `omegaup`.`Badges` (`badge_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `user_id`
+  CONSTRAINT `fk_ub_user_id`
     FOREIGN KEY (`user_id` )
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `last_problem_id`
+  CONSTRAINT `fk_ub_last_problem_id`
     FOREIGN KEY (`last_problem_id` )
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 COMMENT = 'Guarda los badges que han sido desbloqueados.';
+
+
+-- Permisos
+
+
+-- -----------------------------------------------------
+-- Table `omegaup`.`Permissions`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Permissions` (
+  `permission_id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(50) NOT NULL COMMENT 'El nombre corto del permiso.' ,
+  `description` VARCHAR(100) NOT NULL COMMENT 'La descripción humana del permiso.' ,
+  PRIMARY KEY (`permission_id`) )
+ENGINE = InnoDB
+COMMENT = 'Establece los permisos que se pueden dar a los roles.';
+
+
+-- -----------------------------------------------------
+-- Table `omegaup`.`Roles`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Roles` (
+  `role_id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(50) NOT NULL COMMENT 'El nombre corto del rol.' ,
+  `description` VARCHAR(100) NOT NULL COMMENT 'La descripción humana del rol.' ,
+  PRIMARY KEY (`role_id`) )
+ENGINE = InnoDB
+COMMENT = 'Establece los roles que se pueden dar a los usuarios.';
+
+
+-- -----------------------------------------------------
+-- Table `omegaup`.`Roles_Permissions`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `omegaup`.`Roles_Permissions` (
+  `role_id` INT(11) NOT NULL ,
+  `permission_id` INT(11) NOT NULL ,
+  PRIMARY KEY (`role_id`, `permission_id`) ,
+  INDEX `role_id` (`role_id` ASC) ,
+  INDEX `permission_id` (`permission_id` ASC) ,
+  CONSTRAINT `fk_rp_role_id`
+    FOREIGN KEY (`role_id` )
+    REFERENCES `omegaup`.`Roles` (`role_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_rp_permission_id`
+    FOREIGN KEY (`permission_id` )
+    REFERENCES `omegaup`.`Permissions` (`permission_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION )
+ENGINE = InnoDB
+COMMENT = 'Establece los roles que se pueden dar a los usuarios.';
+
+
+-- -----------------------------------------------------
+-- Table `omegaup`.`User_Roles`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `omegaup`.`User_Roles` (
+  `user_id` INT(11) NOT NULL ,
+  `role_id` INT(11) NOT NULL ,
+  PRIMARY KEY (`user_id`, `role_id`) ,
+  INDEX `user_id` (`user_id` ASC) ,
+  INDEX `role_id` (`role_id` ASC) ,
+  CONSTRAINT `fk_ur_user_id`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `omegaup`.`Users` (`user_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ur_role_id`
+    FOREIGN KEY (`role_id` )
+    REFERENCES `omegaup`.`Roles` (`role_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION )
+ENGINE = InnoDB
+COMMENT = 'Establece los roles que se pueden dar a los usuarios.';
 
 
 
