@@ -12,7 +12,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Countries` (
   `country_id` CHAR(3) NOT NULL ,
   `name` VARCHAR(50) NOT NULL ,
   PRIMARY KEY (`country_id`) )
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Catálogos para la normalización';
 
@@ -31,7 +31,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`States` (
     REFERENCES `omegaup`.`Countries` (`country_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Catálogos para la normalización';
 
@@ -50,7 +50,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Schools` (
     REFERENCES `omegaup`.`States` (`state_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Catálogos para la normalización';
 
@@ -92,7 +92,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Users` (
     REFERENCES `omegaup`.`Schools` (`school_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Usuarios registrados.';
@@ -111,7 +111,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Auth_Tokens` (
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Tokens de autorización para los logins.';
 
@@ -131,7 +131,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Announcement` (
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Sistema de mensajería dentro del sitio.';
@@ -152,7 +152,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Password_Change` (
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -173,7 +173,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Messages` (
     REFERENCES `omegaup`.`Users` (`user_id` , `user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Sistema de mensajería dentro del sitio.';
@@ -207,7 +207,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems` (
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Se crea un registro por cada prob externo.';
@@ -247,7 +247,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Contests` (
     REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Concursos que se llevan a cabo en el juez.';
 
@@ -272,7 +272,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Contest_Problems` (
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Relacion entre Concursos y los problemas que tiene este';
 
@@ -304,7 +304,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Contest_Problem_Opened` (
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Relacion entre Concursos y los problemas que tiene este';
 
@@ -346,7 +346,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Runs` (
     REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Estado de todas las ejecuciones.';
@@ -367,7 +367,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Coder_of_the_Month` (
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Guardar histórico de coders del mes de forma sencilla.';
 
@@ -394,7 +394,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Contests_Users` (
     REFERENCES `omegaup`.`Contests` (`contest_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Concursantes que pueden participar en concurso cerrado.';
 
@@ -418,7 +418,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Favorites` (
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Problemas favoritos de los usuarios';
 
@@ -431,7 +431,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Tags` (
   `name` VARCHAR(45) NOT NULL ,
   `description` TINYTEXT NULL DEFAULT NULL ,
   PRIMARY KEY (`tag_id`) )
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Guarda los tags para los problemas';
 
@@ -455,7 +455,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Tags` (
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Guarda la relacion entre Problemas y sus Tags';
 
@@ -475,7 +475,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Languages` (
     REFERENCES `omegaup`.`Countries` (`country_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Lista de idiomas que potencialmente se soportarían.';
 
@@ -506,7 +506,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Languages` (
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Las traducciones viven en el filesystem y no en la bdd.';
 
@@ -542,7 +542,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Clarifications` (
     REFERENCES `omegaup`.`Users` (`user_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'Se guardan las clarificaciones.';
 
@@ -557,7 +557,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Badges` (
   `description` VARCHAR(500) NOT NULL COMMENT 'La descripcion habla de como se obtuvo el badge, de forma corta.' ,
   `hint` VARCHAR(100) NULL COMMENT 'Tip de como desbloquear el badge.' ,
   PRIMARY KEY (`badge_id`) )
-ENGINE = MyISAM
+ENGINE = InnoDB
 COMMENT = 'Esta tabla guarda la informacion de cada uno de los badges.';
 
 
@@ -580,7 +580,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Problems_Badges` (
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 COMMENT = 'Relación entre 1 badge y los problemas que lo desbloqueaan.';
 
 
@@ -612,7 +612,7 @@ CREATE  TABLE IF NOT EXISTS `omegaup`.`Users_Badges` (
     REFERENCES `omegaup`.`Problems` (`problem_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = MyISAM
+ENGINE = InnoDB
 COMMENT = 'Guarda los badges que han sido desbloqueados.';
 
 
