@@ -64,8 +64,8 @@ class Contests extends VO
 			if( isset($data['feedback']) ){
 				$this->feedback = $data['feedback'];
 			}
-			if( isset($data['penality']) ){
-				$this->penality = $data['penality'];
+			if( isset($data['penalty']) ){
+				$this->penalty = $data['penalty'];
 			}
 			if( isset($data['time_start']) ){
 				$this->time_start = $data['time_start'];
@@ -97,7 +97,7 @@ class Contests extends VO
 			"partial_score" => $this->partial_score,
 			"submissions_gap" => $this->submissions_gap,
 			"feedback" => $this->feedback,
-			"penality" => $this->penality,
+			"penalty" => $this->penalty,
 			"time_start" => $this->time_start
 		); 
 	return json_encode($vec); 
@@ -232,13 +232,13 @@ class Contests extends VO
 	protected $feedback;
 
 	/**
-	  * penality
+	  * penalty
 	  * 
 	  * Entero indicando el número de minutos con que se penaliza por recibir un no-accepted<br>
 	  * @access protected
 	  * @var int(11)
 	  */
-	protected $penality;
+	protected $penalty;
 
 	/**
 	  * time_start
@@ -590,27 +590,27 @@ class Contests extends VO
 	}
 
 	/**
-	  * getPenality
+	  * getPenalty
 	  * 
-	  * Get the <i>penality</i> property for this object. Donde <i>penality</i> es Entero indicando el número de minutos con que se penaliza por recibir un no-accepted
+	  * Get the <i>penalty</i> property for this object. Donde <i>penalty</i> es Entero indicando el número de minutos con que se penaliza por recibir un no-accepted
 	  * @return int(11)
 	  */
-	final public function getPenality()
+	final public function getPenalty()
 	{
-		return $this->penality;
+		return $this->penalty;
 	}
 
 	/**
-	  * setPenality( $penality )
+	  * setPenalty( $penalty )
 	  * 
-	  * Set the <i>penality</i> property for this object. Donde <i>penality</i> es Entero indicando el número de minutos con que se penaliza por recibir un no-accepted.
-	  * Una validacion basica se hara aqui para comprobar que <i>penality</i> es de tipo <i>int(11)</i>. 
+	  * Set the <i>penalty</i> property for this object. Donde <i>penalty</i> es Entero indicando el número de minutos con que se penaliza por recibir un no-accepted.
+	  * Una validacion basica se hara aqui para comprobar que <i>penalty</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)
 	  */
-	final public function setPenality( $penality )
+	final public function setPenalty( $penalty )
 	{
-		$this->penality = $penality;
+		$this->penalty = $penalty;
 	}
 
 	/**

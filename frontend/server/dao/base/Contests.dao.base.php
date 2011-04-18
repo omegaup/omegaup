@@ -213,9 +213,9 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $Contests->getFeedback() );
 		}
 
-		if( $Contests->getPenality() != NULL){
-			$sql .= " penality = ? AND";
-			array_push( $val, $Contests->getPenality() );
+		if( $Contests->getPenalty() != NULL){
+			$sql .= " penalty = ? AND";
+			array_push( $val, $Contests->getPenalty() );
 		}
 
 		if( $Contests->getTimeStart() != NULL){
@@ -254,7 +254,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update( $Contests )
 	{
-		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, token = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penality = ?, time_start = ? WHERE  contest_id = ?;";
+		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, token = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, time_start = ? WHERE  contest_id = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -269,7 +269,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getPartialScore(), 
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
-			$Contests->getPenality(), 
+			$Contests->getPenalty(), 
 			$Contests->getTimeStart(), 
 			$Contests->getContestId(), );
 		global $conn;
@@ -294,7 +294,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function create( &$Contests )
 	{
-		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, token, scoreboard, partial_score, submissions_gap, feedback, penality, time_start ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, token, scoreboard, partial_score, submissions_gap, feedback, penalty, time_start ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->getContestId(), 
 			$Contests->getTitle(), 
@@ -310,7 +310,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getPartialScore(), 
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
-			$Contests->getPenality(), 
+			$Contests->getPenalty(), 
 			$Contests->getTimeStart(), 
 		 );
 		global $conn;
@@ -514,12 +514,12 @@ abstract class ContestsDAOBase extends DAO
 			
 		}
 
-		if( (($a = $ContestsA->getPenality()) != NULL) & ( ($b = $ContestsB->getPenality()) != NULL) ){
-				$sql .= " penality >= ? AND penality <= ? AND";
+		if( (($a = $ContestsA->getPenalty()) != NULL) & ( ($b = $ContestsB->getPenalty()) != NULL) ){
+				$sql .= " penalty >= ? AND penalty <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( $a || $b ){
-			$sql .= " penality = ? AND"; 
+			$sql .= " penalty = ? AND"; 
 			$a = $a == NULL ? $b : $a;
 			array_push( $val, $a);
 			
