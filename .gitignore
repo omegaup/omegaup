@@ -3,6 +3,7 @@
 box
 # Ignore temporary files
 *~
+*.swp
 # Ignore classes
 *.class
 # Ignore configuration files
