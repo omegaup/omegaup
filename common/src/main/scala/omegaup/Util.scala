@@ -10,11 +10,11 @@ import scala.collection.mutable
 
 object Config {
 	private val props = new java.util.Properties(System.getProperties)
-        try{
-          props.load(new java.io.FileInputStream("omegaup.conf"))
-        } catch {
-          case _ => {}
-        }
+	try{
+		props.load(new java.io.FileInputStream("omegaup.conf"))
+	} catch {
+		case _ => {}
+	}
 	
 	def get[T](propname: String, default: T): T = {
 		props.getProperty(propname) match {
