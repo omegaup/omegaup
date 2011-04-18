@@ -27,6 +27,10 @@ object Config {
 			}
 		}
 	}
+	
+	def set[T](propname: String, value: T): Unit = {
+		props.setProperty(propname, value.toString)
+	}
 }
 
 trait Log {
