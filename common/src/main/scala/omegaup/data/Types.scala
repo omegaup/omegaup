@@ -12,7 +12,7 @@ object Validator extends Enumeration {
 }
 
 object Server extends Enumeration {
-	type Servidor = Value
+	type Server = Value
 	val  UVa = Value(1, "uva")
 	val  LiveArchive = Value(2, "livearchive")
 	val  PKU = Value(3, "pku")
@@ -76,7 +76,7 @@ class Problem(
 	var title: String = "",
 	var alias: Option[String] = None,
 	var validator: Validator = Validator.TokenNumeric,
-	var server: Option[Servidor] = None,
+	var server: Option[Server] = None,
 	var remote_id: Option[String] = None,
 	var time_limit: Option[Long] = Some(1),
 	var memory_limit: Option[Long] = Some(64),
