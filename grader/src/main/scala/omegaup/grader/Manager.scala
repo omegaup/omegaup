@@ -22,9 +22,9 @@ case object Login
 object Manager extends Object with Log {
 	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[RunnerService]()
 	// Loading SQL connector driver
-	Class.forName("com.mysql.jdbc.Driver")
+	Class.forName(Config.get("db.driver", "org.h2.Driver"))
 	val connection = java.sql.DriverManager.getConnection(
-		Config.get("db.url", "jdbc:mysql://localhost/omegaup"),
+		Config.get("db.url", "jdbc:h2:file:omegaup"),
 		Config.get("db.user", "omegaup"),
 		Config.get("db.password", "")
 	)

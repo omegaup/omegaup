@@ -32,6 +32,7 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with ProguardProje
 		"org.slf4j" % "slf4j-jdk14" % "1.6.1"
 	) ++ super.libraryDependencies
 	
+	val h2 = "com.h2database" % "h2" % "1.3.153" % "runtime"
 	val mysql = "mysql" % "mysql-connector-java" % "5.1.12" % "runtime"
 	val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
 	

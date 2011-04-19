@@ -113,7 +113,12 @@ trait Grader extends Object with Log {
 			.foldLeft(0.0)(_+_) / weights.foldLeft(0.0)(_+_._2)
 			
 			if(run.score == 0 && run.veredict < Veredict.WrongAnswer) run.veredict = Veredict.WrongAnswer
-			else if(run.score < metas.length && run.veredict < Veredict.PartialAccepted) run.veredict = Veredict.PartialAccepted
+			else if(run.score < (1-1e-9) && run.veredict < Veredict.PartialAccepted) run.veredict = Veredict.PartialAccepted
+		}
+		
+		run.problem.points match {
+			case None => {}
+			case Some(factor) => run.contest_score = run.score * factor
 		}
 		
 		Manager.updateVeredict(run)

@@ -11,19 +11,42 @@ import Language._
 
 object GraderData {
 	def run(id: Long)(implicit connection: Connection): Option[Run] =
-		query("SELECT * FROM Runs AS r, Problems AS p WHERE p.problem_id = r.problem_id AND r.run_id = " + id) { rs =>
+		query("""
+			SELECT
+				r.*, p.*, cpo.open_time, cp.points, c.start_time, c.partial_score, c.feedback, c.penalty, c.time_start
+			FROM
+				Runs AS r
+			INNER JOIN
+				Problems AS p ON
+					p.problem_id = r.problem_id
+			LEFT JOIN
+				Contests AS c ON
+					c.contest_id = r.contest_id
+			LEFT JOIN
+				Contest_Problems AS cp ON
+					cp.contest_id = r.contest_id AND
+					cp.problem_id = r.problem_id
+			LEFT JOIN
+				Contest_Problem_Opened AS cpo ON
+					cpo.contest_id = r.contest_id AND
+					cpo.problem_id = r.problem_id AND
+					cpo.user_id = r.user_id
+			WHERE
+				r.run_id = ?;
+			""",
+			id
+		) { rs =>
 			new Run(
 				id = rs.getLong("run_id"),
-				contest = rs.getLong("contest_id") match {
-					case 0 => if(rs.wasNull) None else Some(0)
-					case x => Some(x)
-				},
 				guid = rs.getString("guid"),
 				language = Language.withName(rs.getString("language")),
 				status = Status.withName(rs.getString("status")),
 				veredict = Veredict.withName(rs.getString("veredict")),
+				time = new Timestamp(rs.getDate("time").getTime()),
+				score = rs.getDouble("score"),
+				contest_score = rs.getDouble("contest_score"),
 				problem = new Problem(
-					 id = rs.getLong("p.problem_id"),
+					 id = rs.getLong("problem_id"),
 					 validator = Validator.withName(rs.getString("validator")),
 					 server = rs.getString("server") match {
 					 	case null => None
@@ -40,36 +63,60 @@ object GraderData {
 					 memory_limit = rs.getString("memory_limit") match {
 					 	case null => None
 					 	case x: String => Some(x.toLong)
+					 },
+					 open_time = rs.getDate("open_time") match {
+					 	case null => None
+					 	case x: Date => Some(new Timestamp(x.getTime()))
+					 },
+					 points = rs.getString("points") match {
+					 	case null => None
+					 	case x: String => Some(x.toDouble)
 					 }
-				)
+				),
+				contest = rs.getLong("contest_id") match {
+					case 0 => None
+					case x: Long => Some(new Contest(
+						id = rs.getLong("contest_id"),
+						start_time = new Timestamp(rs.getDate("start_time").getTime()),
+						partial_score = rs.getInt("partial_score") == 1,
+						feedback = Feedback.withName(rs.getString("feedback")),
+						penalty = rs.getInt("penalty"),
+						time_start = TimeStart.withName(rs.getString("time_start"))
+					))
+				}
 			)
 		}
 		
 	def update(run: Run)(implicit connection: Connection): Run = {
 		execute(
-			"UPDATE Runs SET status = '" + run.status + "'" +
-			", veredict = '" + run.veredict + "'" +
-			", runtime = " + run.runtime +
-			", memory = " + run.memory +
-			", score = " + run.score +
-			", contest_score = " + run.contest_score + " " +
-			"WHERE run_id = " + run.id
+			"UPDATE Runs SET status = ?, veredict = ?, runtime = ?, memory = ?, score = ?, contest_score = ? WHERE run_id = ?;",
+			run.status,
+			run.veredict,
+			run.runtime,
+			run.memory,
+			run.score,
+			run.contest_score,
+			run.id
 		)
 		run
 	}
 		
 	def insert(run: Run)(implicit connection: Connection): Run = {
 		execute(
-			"INSERT INTO Runs (user_id, problem_id, guid, language, veredict, ip) VALUES(" +
-				run.user + ", " +
-				run.problem.id + ", " +
-				"'" + run.guid + "', " +
-				"'" + run.language + "', " +
-				"'" + run.veredict + "', " +
-				"'" + run.ip + "'" +
-			")"
+			"INSERT INTO Runs (user_id, problem_id, contest_id, guid, language, veredict, ip, time) VALUES(?, ?, ?, ?, ?, ?, ?, ?);",
+			run.user,
+			run.problem.id,
+			run.contest match {
+				case None => None
+				case Some(x) => Some(x.id)
+			},
+			run.guid,
+			run.language,
+			run.veredict,
+			run.ip,
+			run.time
 		)
-                run.id = query("SELECT LAST_INSERT_ID()") { rs => rs.getInt(1) }.get
+		run.id = query("SELECT LAST_INSERT_ID()") { rs => rs.getInt(1) }.get
 		run
 	}
 }

@@ -5,10 +5,60 @@ import omegaup.grader.drivers._
 
 import Language._
 
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, BeforeAndAfterAll}
 import org.scalatest.matchers.ShouldMatchers
 
-class DriverSpec extends FlatSpec with ShouldMatchers {
+class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
+	override def beforeAll() {
+		import java.io._
+		import java.util.zip._
+		
+		val root = new File("test-env")
+		root.mkdir()
+		
+		// populate temp database for problems and contests
+		Config.set("db.driver", "org.h2.Driver")
+		//Config.set("db.url", "jdbc:h2:mem:")
+		Config.set("db.url", "jdbc:h2:file:" + root.getCanonicalPath + "/omegaup")
+		Config.set("db.user", "sa")
+		Config.set("db.password", "")
+		
+		Config.set("submissions.root", root.getCanonicalPath + "/submissions")
+		Config.set("grader.root", root.getCanonicalPath + "/grader")
+		Config.set("problems.root", root.getCanonicalPath + "/problems")
+		Config.set("compile.root", root.getCanonicalPath + "/compile")
+		Config.set("input.root", root.getCanonicalPath + "/input")
+		
+		val input = new ZipInputStream(new FileInputStream("src/test/resources/omegaup-base.zip"))
+		var entry: ZipEntry = input.getNextEntry
+		val buffer = Array.ofDim[Byte](1024)
+		var read: Int = 0
+		
+		while(entry != null) {
+			val outFile = new File(root.getCanonicalPath + "/" + entry.getName)
+			
+			if(entry.getName.endsWith("/")) {
+				outFile.mkdirs()
+			} else {
+				val output = new FileOutputStream(outFile)
+				while( { read = input.read(buffer); read > 0 } ) {
+					output.write(buffer, 0, read)
+				}
+				output.close
+			}
+
+			input.closeEntry
+			entry = input.getNextEntry
+		}
+		
+		input.close
+		
+		implicit val conn = Manager.connection
+		
+		FileUtil.read("src/main/resources/h2.sql").split("\n\n").foreach { Database.execute(_) }
+		FileUtil.read("src/test/resources/h2.sql").split("\n\n").foreach { Database.execute(_) }
+	}
+	
 	"OmegaUpDriver" should "submit" in {
 		System.setProperty("grader.embedded_runner.enable", "true")
 		
@@ -19,7 +69,11 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 		
 		OmegaUp.start
 		
-		val omegaUpSubmit = (id: Long, language: Language, code: String) => {
+		val omegaUpSubmitContest = (id: Long, language: Language, code: String, user: Int, contest: Int, date: String) => {
+			import java.util.Date
+			import java.sql.Timestamp
+			import java.text.SimpleDateFormat
+			
 			val file = java.io.File.createTempFile(System.currentTimeMillis.toString, "", new java.io.File(Config.get("submissions.root", ".")))
 			
 			implicit val conn = Manager.connection
@@ -29,11 +83,23 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			Manager.grade(
 				GraderData.insert(new Run(
 					guid = file.getName,
+					user = user,
 					language = language,
-					problem = new Problem(id = id)
+					problem = new Problem(id = id),
+					contest = contest match {
+						case 0 => None
+						case x: Int => Some(new Contest(id = x))
+					},
+					time = new Timestamp(date match {
+						case null => new Date().getTime()
+						case x: String => new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(x).getTime()
+					})
 				)).id
 			)
 		}
+		
+		val omegaUpSubmit = (id: Long, language: Language, code: String) =>
+			omegaUpSubmitContest(id, language, code, 1, 0, null)
 		
 		omegaUpSubmit(1, Language.Cpp, """
 			int main() {
@@ -41,7 +107,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 			}
 		""")
 		
-		omegaUpSubmit(1, Language.Cpp, """
+		omegaUpSubmitContest(1, Language.Cpp, """
 			#include <cstdlib>
 			#include <iostream>
 			#include <map>
@@ -57,7 +123,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 				
 				return EXIT_SUCCESS;
 			}
-		""")
+		""", 1, 1, "2000-01-01 00:10:00")
 		
 		omegaUpSubmit(1, Language.Cpp, """
 			#include <cstdlib>
@@ -97,6 +163,38 @@ class DriverSpec extends FlatSpec with ShouldMatchers {
 		""")
 		
 		t.join
+		
+		implicit val conn = Manager.connection
+		
+		var run: Run = GraderData.run(1).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.TimeLimitExceeded)
+		run.score should equal (0)
+		run.contest_score should equal (0)
+		
+		run = GraderData.run(2).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.Accepted)
+		run.score should equal (1)
+		run.contest_score should equal (100)
+		
+		run = GraderData.run(3).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.PartialAccepted)
+		run.score should equal (0.5)
+		run.contest_score should equal (0)
+		
+		run = GraderData.run(4).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.CompileError)
+		run.score should equal (0)
+		run.contest_score should equal (0)
+		
+		run = GraderData.run(5).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.TimeLimitExceeded)
+		run.score should equal (0)
+		run.contest_score should equal (0)
 	}
 	
 	/*

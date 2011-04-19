@@ -44,8 +44,10 @@ object OmegaUp extends Actor with Log {
 							
 								service.run(msg, zip) match {
 									case Some(x) => {
+										info("Received a message {}, trying to send input from {}", x, zip.getCanonicalPath)
+										val inputZip = new File(Config.get("problems.root", "problems") + "/" + pid + "/cases.zip")
 										if(
-											service.input(input, new FileInputStream(zip), zip.length.toInt).status != "ok" ||
+											service.input(input, new FileInputStream(inputZip), inputZip.length.toInt).status != "ok" ||
 											service.run(msg, zip) != None
 										) {
 											throw new RuntimeException("OU unable to run submission " + id + ". giving up.")

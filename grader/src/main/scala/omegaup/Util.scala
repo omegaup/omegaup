@@ -100,12 +100,67 @@ object Database extends Object with Log {
 	}
 
 	import java.sql._
+	
+	def build(query: String, params: Any*): String = {
+		params.length match {
+			case 0 => query
+			case _ => {
+				var pqi = 0
+				var qi = -1
+				var pi = 0
+				val ans = new StringBuilder
+				
+				debug(query)
+				debug(params.toString)
+		
+				while( {qi = query.indexOf('?', pqi); qi != -1} ) {
+					ans.append(query.substring(pqi, qi))
+					
+					ans.append(params(pi) match {
+						case null => "null"
+						case None => "null"
+						case Some(x) => x match {
+							case y: Int => y.toString
+							case y: Long => y.toString
+							case y: Float => y.toString
+							case y: Double => y.toString
+							case y: Boolean => if (y) "1" else "0"
+							case y => {
+								"'" +
+								y.toString.replace("\\", "\\\\").replace("'", "''") +
+								"'"
+							}
+						}
+						case x: Int => x.toString
+						case x: Long => x.toString
+						case x: Float => x.toString
+						case x: Double => x.toString
+						case x: Boolean => if (x) "1" else "0"
+						case x => {
+							"'" +
+							x.toString.replace("\\", "\\\\").replace("'", "''") +
+							"'"
+						}
+					})
+					
+					pqi = qi + 1
+					pi += 1
+				}
+				
+				if(pqi < query.length)
+					ans.append(query.substring(pqi))
+				
+				ans.toString
+			}
+		}
+	}
 
 	/** Executes the SQL and processes the result set using the specified function. */
-	def query[B](sql: String)(process: ResultSet => B)(implicit connection: Connection): Option[B] = {
-		debug(sql)
+	def query[B](sql: String, params: Any*)(process: ResultSet => B)(implicit connection: Connection): Option[B] = {
+		val q = build(sql, params : _*)
+		debug(q)
 		using (connection.createStatement) { statement =>
-			using (statement.executeQuery(sql)) { results =>
+			using (statement.executeQuery(q)) { results =>
 				results.next match {
 					case true => Some(process(results))
 					case false => None
@@ -114,10 +169,11 @@ object Database extends Object with Log {
 		}
 	}
 	
-	def execute(sql: String)(implicit connection: Connection): Unit = {
-		debug(sql)
+	def execute(sql: String, params: Any*)(implicit connection: Connection): Unit = {
+		val q = build(sql, params : _*)
+		debug(q)
 		using (connection.createStatement) { statement =>
-			statement.execute(sql)
+			statement.execute(q)
 		}
 	}
 
