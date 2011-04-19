@@ -62,15 +62,50 @@ object Order extends Enumeration {
 	val Inverse = Value(2, "inverse")
 }
 
+object Feedback extends Enumeration {
+	type Feedback = Value
+	val Yes = Value(1, "yes")
+	val No = Value(2, "no")
+	val Partial = Value(3, "partial")
+}
+
+object TimeStart extends Enumeration {
+	type TimeStart = Value
+	val Contest = Value(1, "contest")
+	val Problem = Value(2, "problem")
+}
+
 import Validator._
 import Veredict._
 import Status._
 import Server._
 import Language._
 import Order._
+import Feedback._
+import TimeStart._
+
+class Contest(
+	var id: Long = 0,
+	var title: String = "",
+	var description: String = "",
+	var start_time: Timestamp = new Timestamp(0),
+	var finish_time: Timestamp = new Timestamp(0),
+	var window_length: Option[Int] = None,
+	var director_id: Long = 0,
+	var rerun_id: Int = 0,
+	var public: Boolean = true,
+	var token: String = "",
+	var scoreboard: Int = 80,
+	var partial_score: Boolean = true,
+	var submissions_gap: Int = 0,
+	var feedback: Feedback = Feedback.Yes,
+	var penalty: Int = 20,
+	var time_start: TimeStart = TimeStart.Contest
+) {
+}
 
 class Problem(
-	var id: Long,
+	var id: Long = 0,
 	var public: Long = 1,
 	var author: Long = 0,
 	var title: String = "",
@@ -78,22 +113,25 @@ class Problem(
 	var validator: Validator = Validator.TokenNumeric,
 	var server: Option[Server] = None,
 	var remote_id: Option[String] = None,
-	var time_limit: Option[Long] = Some(1),
+	var time_limit: Option[Long] = Some(3000),
 	var memory_limit: Option[Long] = Some(64),
-	var vists: Long = 0,
+	var visits: Long = 0,
 	var submissions: Long = 0,
 	var accepted: Long = 0,
 	var difficulty: Double = 0,
 	var creation_date: Timestamp = new Timestamp(0),
 	var source: String = "",
-	var order: Order = Order.Normal) {
+	var order: Order = Order.Normal,
+	var open_time: Option[Timestamp] = None,
+	var points: Option[Double] = None
+) {
 }
 
 class Run(
 	var id: Long = 0,
 	var user: Long = 0,
 	var problem: Problem = null,
-	var contest: Option[Long] = None,
+	var contest: Option[Contest] = None,
 	var guid: String = "",
 	var language: Language = Language.C,
 	var status: Status = Status.New,
@@ -103,6 +141,6 @@ class Run(
 	var score: Double = 0,
 	var contest_score: Double = 0,
 	var ip: String = "127.0.0.1",
-	var timestamp: Timestamp = new Timestamp(0)
+	var time: Timestamp = new Timestamp(0)
 ) {
 }
