@@ -46,6 +46,18 @@
 						Lista de juecez
 					  - - - - - - - - - - - - - - - - - -->
 					<p id="listaDeJuez">
+					<?php
+					
+					$judges = ProblemsController::getJudgesList();
+					if(sizeof($judges) == 0){
+
+					}else{
+						foreach($judges as $j){
+							echo $j . " ";
+						}
+					}					
+					
+					?>	
 					</p>
 					
 					
@@ -54,6 +66,19 @@
 						Lista de problemas
 					  - - - - - - - - - - - - - - - - - -->					
 					<div id="listaProblemas">
+					<p>
+					<?php
+							
+					$problemas = ProblemsController::getProblemList();
+					if(sizeof($problemas) == 0){
+						echo "No hay problemas !";
+						
+					}else{
+						echo "Si hay problema!";
+					}
+							
+					?>
+					</p>
 						
 					</div>
 

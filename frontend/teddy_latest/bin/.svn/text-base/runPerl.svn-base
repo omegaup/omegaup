@@ -1,0 +1,3 @@
+cd work_zone
+cd $1
+perl Main.pl USER_CODE $2

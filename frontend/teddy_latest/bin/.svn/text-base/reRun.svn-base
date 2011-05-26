@@ -1,0 +1,2 @@
+cd ../bin
+java ReJudge $1

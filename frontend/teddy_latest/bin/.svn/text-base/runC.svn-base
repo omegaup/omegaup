@@ -1,0 +1,3 @@
+cd work_zone
+cd $1
+./a.out USER_CODE $2

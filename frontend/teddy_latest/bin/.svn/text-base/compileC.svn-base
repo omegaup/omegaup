@@ -1,0 +1,4 @@
+cd ..
+cd work_zone
+cd $1
+gcc $2 -O2 -ansi -fno-asm -Wall -lm -static -DONLINE_JUDGE

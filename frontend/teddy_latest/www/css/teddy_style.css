@@ -1,0 +1,93 @@
+        * { margin: 0; padding: 0; }
+        body { color: ; font: normal 12px "Helvetica Neue", Helvetica, Arial, sans-serif; background: #fff; text-shadow:0 0 0 #FFFFFF;}
+        pre { font-size: 10px; }
+        a { color:#333; text-decoration: none; padding: 1px 2px; font-weight:bold; }
+        a:hover { color: #666; background: none; }
+
+/*        h1 { color:white; font-weight: normal; margin-bottom:0px; background-color: black;} */
+/*        h1 { color:black; font-weight: normal; margin-bottom:0px; background-color: white;}  */
+
+        h2 { color:#666; font-weight: normal; margin-bottom:2px; font-size:30px; line-height:32px; }
+        h3 { color:#666; font-weight: normal; margin-top:10px; }
+        h4 { color:#666; font-weight: normal;  }
+
+        img_border { background: #fff !important; border: 1px solid #999;  margin: 10px; }
+	
+        img a { text-decoration: none !important; background: #fff !important; margin: 0px; }
+
+        .header { margin: 10px 0 0 0; }
+        .header h1 {line-height:56px; font-size:56px; font-weight:500; letter-spacing:-2px; text-transform:uppercase; text-align:center;}
+        .header h1 a { font-weight:normal; }
+        .header h2 {font-size:18px; font-weight:200; letter-spacing:-1px; line-height:22px; text-align:center; }
+
+        .wrapper { margin-right: 50px; margin-left: 50px; margin-bottom: 25px; }
+
+        .datetime { font-size: 12px; line-height: 150%; color: #555; padding: 0 25px 45px 0; text-align: right; }
+        .datetime a { color: #555; font-weight:bold; }
+        .navleft { font-size: 12px; position: relative; float: left; }
+        .navright { font-size: 12px; position: relative; float: right; }
+        .navcenter { font-size: 12px; text-align:center;}
+        .footer {  font-size: 12px; line-height: 14px; text-align:center;  }        
+
+        .post { background: #f2f0f0; padding:10px; margin-top: 10px; 
+         -moz-border-radius: 11px;
+    -webkit-border-radius: 11px;
+    -khtml-border-radius: 11px;
+    border-radius: 11px;
+        }
+        .post_blanco { background: #white; padding:10px; margin-top: 10px;
+                 -moz-border-radius: 11px;
+    -webkit-border-radius: 11px;
+    -khtml-border-radius: 11px;
+    border-radius: 11px;
+        border:1px solid #bbb; 
+        }  
+
+        .post p { margin:14px 0 14px 0; font-size: 14px; }
+        .post ul{ list-style:circle; margin:10px 10px 10px 35px; }
+        .post ol{ list-style:decimal; margin:10px 10px 10px 35px; }
+        .post blockquote {color:#444; border-left:5px solid #ccc; margin:25px 30px 15px 10px; padding-left:20px;}        
+        .short_quote { margin: 0px; padding: 0px; font-size:48px; line-height: 110%; color: #666; } 
+        .medium_quote { margin: 0px; padding: 0px; font-size:36px; line-height: 115%; color: #666; } 
+        .long_quote { margin: 0px; padding: 0px; font-size:24px; line-height: 130%; color: #666; } 
+        .caption { margin-bottom:10px; font-size:22px; line-height:26px; }
+        a .notes { text-decoration: none !important; background: none; } 
+        .notes a { text-decoration: none !important; background: none; } 
+        img .notes { margin: 0px; padding: 3px 3px 0px 3px; border: 1px solid #999; } 
+        .notes img { margin: 0px; padding: 3px 3px 0px 3px; border: none } 
+        ol.notes { padding: 0px; margin: 25px 0px; list-style-type: none; border-bottom: solid 1px #ccc; }
+        ol.notes li.note { border-top: solid 1px #ccc; padding: 10px; }
+        ol.notes li.note img.avatar { vertical-align: -4px; margin-right: 10px; width: 16px; height: 16px; }
+        ol.notes li.note span.action { font-weight: bold; }
+        ol.notes li.note .answer_content { font-weight: normal; }
+        ol.notes li.note blockquote { border-color: #eee; padding: 4px 10px; margin: 10px 0px 0px 25px; }
+        ol.notes li.note blockquote a { text-decoration: none; }
+
+       h1{
+
+            color: black;
+            display: block;
+            font-family: ff-din-web-1, ff-din-web-2, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            font-size: 55px;
+            height: 48px;
+            left: auto;
+            letter-spacing: -3px;
+            line-height: 48px;
+            margin-bottom: 5px;
+            text-shadow: gray 1px 1px 6px;
+        }
+
+
+       .subtitle{
+
+            color: black;
+            display: block;
+            font-family: ff-din-web-1, ff-din-web-2, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            font-size: 25px;
+            height: 48px;
+            line-height: 48px;
+            margin: 0px auto;
+            text-shadow: gray 1px 1px 6px;
+        }
+
+	select { font-size: 12px; }

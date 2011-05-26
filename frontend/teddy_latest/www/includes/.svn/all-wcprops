@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/teddy/!svn/ver/21/trunk/www/includes
+END
+admin.menu.php
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/teddy/!svn/ver/17/trunk/www/includes/admin.menu.php
+END
+session_mananger.php
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/teddy/!svn/ver/21/trunk/www/includes/session_mananger.php
+END
+footer.php
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/teddy/!svn/ver/17/trunk/www/includes/footer.php
+END
+db_con.php
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/teddy/!svn/ver/17/trunk/www/includes/db_con.php
+END
+menu.php
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/teddy/!svn/ver/17/trunk/www/includes/menu.php
+END
+ga.php
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/teddy/!svn/ver/17/trunk/www/includes/ga.php
+END
+login_app.php
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/teddy/!svn/ver/17/trunk/www/includes/login_app.php
+END
