@@ -48,7 +48,7 @@
 	 * 
 	 * */
 	require_once( "gui.php" );
-	
+	require_once( "definitions.php" );
 	
 	
 	
@@ -112,4 +112,3 @@
 		//check for permissions
 		
 	}
-?>

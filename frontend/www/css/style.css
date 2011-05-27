@@ -26,7 +26,9 @@ text-shadow: black 0 1px 1px;
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var,optgroup{font-style:inherit;font-weight:inherit;}del,ins{text-decoration:none;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:baseline;}sub{vertical-align:baseline;}legend{color:#000;}input,button,textarea,select,optgroup,option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit;}input,button,textarea,select{*font-size:100%;}
 
 html {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+/*    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; */
+	font: 11px "lucida grande",tahoma,verdana,arial,sans-serif;
+
     background: #e4e8ec url(../media/background.png);
 }
 strong {
@@ -59,6 +61,8 @@ div.post {
     border-radius: 4px;
     position: relative;
     top: -31px;
+	padding-bottom :15px; 
+
 }
 div.post a {
     color: #8bb0d3;
@@ -130,6 +134,7 @@ div.post.footer {
     background: #f3f6f9;
     font-size: 12px;
     -webkit-text-stroke: 1px transparent;
+	padding-bottom :0px; 
 }
 div.post.footer a {
     color: #7497af;
@@ -169,4 +174,22 @@ div.login_bar{
 }
 
 
+.error{
+	background: #FFEBE8;
+	border: 1px solid #DD3C10;
+	line-height: 15px;
+	margin: 10px 0 0 0;
+	text-align: center;
+	height: 0;
+	overflow: hidden;
+}
 
+table{
+
+	margin: 5px;
+	padding : 5px;
+}
+
+td{
+	padding: 5px;
+}
