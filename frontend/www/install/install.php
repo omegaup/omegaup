@@ -1,0 +1,146 @@
+<?php
+
+  $args = extract_query_arguments();
+  $link = mysql_connect(
+      $args["host"]
+    , $args["db_admin"]
+    , $args["db_admin_pass"]
+  );
+  if( !$link )
+    die('Failed to connect to database: ' . mysql_error());
+  
+  // Create DB
+  $db_name  = $args["db_name"];
+  $stmt_create_db
+    = "CREATE DATABASE IF NOT EXISTS $db_name;";
+  mysql_query($stmt_create_db, $link)
+    or die('Failed to create database: ' . mysql_error());
+  
+  // Create DB user
+  $user = $args["user"];
+  $pass = $args["pass"];
+  $stmt_create_user
+    = "CREATE USER '$user'@'localhost' IDENTIFIED BY '$pass';";
+
+  mysql_query($stmt_create_user, $link)
+    or die('Failed to create user: ' . mysql_error());
+  
+  // Grant DB permissions
+  $stmt_grant
+    = "GRANT ALL ON $db_name.* TO '$user'@'localhost';";
+  mysql_query($stmt_grant, $link)
+    or die('Failed to grand user permissions: ' . mysql_error());
+  
+  $stmt_flush
+    = "FLUSH PRIVILEGES;";
+  mysql_query($stmt_flush, $link)
+    or die('Failed to reload permissions: ' . mysql_error());
+    
+  // Create DB structure
+  $script_info = run_sql_script(
+      $args["host"]
+    , $user
+    , $pass
+    , $db_name
+    , "../../private/bd.sql"
+  );
+  
+  $num_statements = $script_info["statements"];
+  $num_errors     = $script_info["errors"];
+  echo "$num_errors encountered while after running $num_statements statements.";
+
+  create_config_php($args["host"], $user, $pass, $db_name);
+
+  // @todo  notify success
+  //        instruct user to delete the folder containing this file
+
+  /**
+    * Extract POST fields and sanitize them.
+    * Perform content validation (e.g. valid chars int the db and user name)
+    *
+    * @todo Actually perform validation!
+    */
+  function extract_query_arguments(
+  ) {
+    $args = Array(
+        "host"          => "localhost"
+      , "db_admin"      => "root"
+      , "db_admin_pass" => ""
+      , "db_name"       => "omegaup"
+      , "user"          => "omegaup"
+      , "pass"          => "omegauppwd"
+      , "admin_user"    => "admin"
+      , "admin_pass"    => "admin"
+    );
+    foreach( $args as $key => $default ) {
+      if( array_key_exists($key, $_POST) ) {
+        $args[$key] = $_POST[$key];
+      }
+    }
+    return $args;
+  }
+  /**
+    * Run a SQL script
+    *
+    * @param string $host DB host
+    * @param string $user Username under which to run the script
+    * @param string $path Path of the script to run
+    */
+  function run_sql_script($host, $user, $pass, $db_name, $path) {
+    $statements = parse_sql_script($path);    
+    $link       = mysql_connect($host, $user, $pass);
+    mysql_select_db($db_name, $link);
+    
+    $errors = 0;
+    foreach( $statements as $statement ) {
+      if( !mysql_query($statement, $link) ) {
+        $errors++;
+        echo "Failed query: " . $statement . "\n" . mysql_error();
+      }
+    }
+    return Array(
+        "statements"  => count($statements)
+      , "errors"      => $errors
+    );
+  }
+  function parse_sql_script($path) {
+    $lines = file(
+        $path
+      , FILE_SKIP_EMPTY_LINES
+    );
+    $non_comments = array_filter(
+        $lines
+      , function( $line ) {
+        return (strstr($line, "-- ") !== 0);
+      }
+    );
+    $statements = explode(';', implode($non_comments));
+    return $statements;
+  }
+  /**
+    * Creates a config.php file with the credentials used to create
+    * the database.
+    */
+  function create_config_php(
+      $host
+    , $user
+    , $pass
+    , $db_name
+  ) {
+    $native_dir     = realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/../..');
+    $root_dir       = str_replace('\\', '/', $native_dir);
+    $file_contents  =
+"<?php
+  define('OMEGAUP_DB_USER', 	'$user');
+  define('OMEGAUP_DB_PASS', 	'$pass');
+  define('OMEGAUP_DB_HOST', 	'$host');
+  define('OMEGAUP_DB_NAME', 	'$db_name');	
+  define('OMEGAUP_DB_DRIVER', 'mysqlt');
+  define('OMEGAUP_DB_DEBUG', 	false);	
+  define('OMEGAUP_ROOT',      '$root_dir');
+  ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . OMEGAUP_ROOT . '/server');
+";
+    
+    file_put_contents('../../server/config.php', $file_contents);
+    /// @todo Check erorrs during writing
+  }

@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <title>Instalaci&oacute;n de OmegaUp</title>
+  </head>
+  
+  <body>
+    <form action="install.php" method="POST">
+      <fieldset><legend>Base de datos</legend>
+        <div class="field">
+          <label>Servidor:</label>
+          <input name="host" type="text" />
+        </div>
+        <div class="field">
+          <label>Administrador de la BD:</label>
+          <input name="db_admin" type="text" />
+        </div>
+        <div class="field">
+          <label>Contrase&ntilde;a:</label>
+          <input name="db_admin_pass" type="password" />
+        </div>
+        <div class="field">
+          <label>Nombre de la BD:</label>
+          <input name="db_name" type="text" />
+        </div>
+        <div class="field">
+          <label>Usuario:</label>
+          <input name="user" type="text" />
+        </div>
+        <div class="field">
+          <label>Contrase&ntilde;a:</label>
+          <input name="pass" type="password" />
+        </div>
+        <div class="field">
+          <label>Verificar contrase&ntilde;a:</label>
+          <input name="pass_confirm" type="password" />
+        </div>
+      </fieldset>
+      <fieldset><legend>Administrador</legend>
+        <div class="field">
+          <label>Usuario:</label>
+          <input name="admin_user" type="text" />
+        </div>
+        <div class="field">
+          <label>Contrase&ntilde;a:</label>
+          <input name="admin_pass" type="password" />
+        </div>
+        <div class="field">
+          <label>Verificar contrase&ntilde;a:</label>
+          <input name="admin_pass_confirm" type="password" />
+        </div>
+      </fieldset>
+      <input type="submit" value="Instalar" />
+    </form>
+  </body>
+</html>

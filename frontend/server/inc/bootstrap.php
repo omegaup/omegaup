@@ -8,13 +8,19 @@
 	//var_dump($_SERVER);
 	$loc = $_SERVER["SCRIPT_FILENAME"];
 	
-
 	/*
 	 * Load configuration file, and parse the contents needed to parse.
 	 * 
 	 * 
 	 * */
-	require_once( "../server/config.php" );
+   if( !file_exists("../server/config.php") ) {
+    header("Location: ./install/");
+    exit();
+   }
+   elseif( file_exists("install") ) {
+    /// @todo Demand that install directory be deleted
+   }
+	require_once( "../server/config.php" );  
 	
 	/*
 	 * Start and evaluate session
