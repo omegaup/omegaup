@@ -59,13 +59,20 @@ typedef uint64_t arg_t;
 typedef uint32_t arg_t;
 #endif
 
-int mem_fd = 0;
-int box_pid = 0;
-int sys_tick = 0;
-int last_sys = 0;
-int first_execve = 1;
+int mem_fd;
+int box_pid;
+int sys_tick;
+int last_sys;
+int first_execve;
+int mode;
+
+enum MODE {
+	JAVA,
+	JAVAC
+};
 
 char java_filename[10240];
+char javac_filename[10240];
 int java_envc = 0;
 char java_envv[100][10240];
 
@@ -80,8 +87,10 @@ void make_config() {
 	FILE *f;
 	FILE *conf;
 	int i, w;
-	int found = 0;
+	int java_found = 0, javac_found = 0;
 	char buffer[1024];
+	char *javac_conf = "java.compiler.path";
+	char *java_conf = "java.runtime.path";
 	
 	f = fopen("profiles/java", "w");
 	fprintf(f, 
@@ -196,9 +205,12 @@ void make_config() {
 	
 	if(conf) {
 		while(fgets(buffer, sizeof(buffer), conf)) {
-			if(strncmp(buffer, "java.compile.path", 17) == 0) {
-				found = 1;
-				fprintf(f, "java.compile.path = %s\n", java_filename);
+			if(strncmp(buffer, java_conf, sizeof(java_conf)) == 0) {
+				java_found = 1;
+				fprintf(f, "%s = %s\n", java_conf, java_filename);
+			} else if(strncmp(buffer, javac_conf, sizeof(javac_conf)) == 0) {
+				javac_found = 1;
+				fprintf(f, "%s = %s\n", javac_conf, javac_filename);
 			} else {
 				fwrite(buffer, sizeof(char), strlen(buffer), f);
 			}
@@ -207,9 +219,8 @@ void make_config() {
 		fclose(conf);
 	}
 	
-	if(!found) {
-		fprintf(f, "java.compile.path = %s\n", java_filename);
-	}
+	if(!java_found) fprintf(f, "%s = %s\n", java_conf, java_filename);
+	if(!javac_found) fprintf(f, "%s = %s\n", javac_conf, javac_filename);
 	
 	fclose(f);
 	
@@ -442,6 +453,7 @@ int outside() {
 		p = wait4(-1, &stat, WUNTRACED | __WALL, &rus);
 	
 		if(WIFEXITED(stat)) {
+			close(mem_fd);
 			kill(p, SIGKILL);
 			break;
 		} else if(WIFSIGNALED(stat)) {
@@ -459,16 +471,18 @@ int outside() {
 						if(first_execve) {
 							first_execve = 0;
 						} else {
-							read_string(p, a.arg1, java_filename, sizeof(java_filename));
+							if(mode == JAVA) {
+								arg_t envp;
+								arg_t tmp;
+								
+								read_string(p, a.arg1, java_filename, sizeof(java_filename));
 						
-							arg_t envp;
-							arg_t tmp;
-						
-							for(envp = a.arg3; read_user_mem(p, envp, (char *)&tmp, sizeof(tmp)) && tmp; envp += sizeof(char *)) {
-								read_string(p, tmp, java_envv[java_envc++], sizeof(java_envv[0]));
+								for(envp = a.arg3; read_user_mem(p, envp, (char *)&tmp, sizeof(tmp)) && tmp; envp += sizeof(char *)) {
+									read_string(p, tmp, java_envv[java_envc++], sizeof(java_envv[0]));
+								}
+							} else {
+								read_string(p, a.arg1, javac_filename, sizeof(javac_filename));
 							}
-							
-							make_config();
 						}
 					}
 				} else {
@@ -505,16 +519,46 @@ int inside(char **args) {
 	exit(0);
 }
 
+void init() {	
+	mem_fd = 0;
+	box_pid = 0;
+	sys_tick = 0;
+	last_sys = 0;
+	first_execve = 1;
+}
+
 int main(int argc, char *argv[]) {
-	int pid = fork();
+	int pid;
 	char *java[] = { "/usr/bin/java" };
-	
-	if(pid == -1)
-		perror("fork");
-	else if(pid == 0)
-		inside(java);
-	else {
-		outside();
-		exit(0);
+	char *javac[] = { "/usr/bin/javac" };
+
+	mode = JAVAC;
+	init();
+	switch(fork()) {
+		case -1:
+			perror("fork");
+			break;
+		case 0:
+			inside(javac);
+			break;
+		default:
+			outside();
 	}
+	
+	mode = JAVA;
+	init();
+	switch(fork()) {
+		case -1:
+			perror("fork");
+			break;
+		case 0:
+			inside(java);
+			break;
+		default:
+			outside();
+	}
+	
+	make_config();
+	
+	exit(0);
 }
