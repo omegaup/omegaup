@@ -36,6 +36,7 @@
 #endif
 
 #define NONRET __attribute__((noreturn))
+#define UNUSED __attribute__((unused))
 #define ARRAY_SIZE(a) (int)(sizeof(a)/sizeof(a[0]))
 
 #if defined(CONFIG_BOX_KERNEL_AMD64) && !defined(CONFIG_BOX_USER_AMD64)
@@ -78,7 +79,7 @@ struct syscall_args {
 void make_config() {
 	FILE *f;
 	FILE *conf;
-	int i;
+	int i, w;
 	int found = 0;
 	char buffer[1024];
 	
@@ -199,7 +200,7 @@ void make_config() {
 				found = 1;
 				fprintf(f, "java.compile.path = %s\n", java_filename);
 			} else {
-				fwrite(buffer, sizeof(char), sizeof(buffer), f);
+				fwrite(buffer, sizeof(char), strlen(buffer), f);
 			}
 		}
 	
