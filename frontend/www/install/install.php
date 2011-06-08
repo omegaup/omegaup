@@ -43,17 +43,22 @@
     , $pass
     , $db_name
     , "../../private/bd.sql"
+    , $args["admin_user"]
+    , $args["admin_pass"]
   );
   
   $num_statements = $script_info["statements"];
   $num_errors     = $script_info["errors"];
-  echo "$num_errors encountered while after running $num_statements statements.";
+  echo "$num_errors errors encountered while after running $num_statements statements.\n";
 
   create_config_php($args["host"], $user, $pass, $db_name);
-
+  
   // @todo  notify success
   //        instruct user to delete the folder containing this file
-
+  echo "Installation finished.";
+  
+  /* End */
+  
   /**
     * Extract POST fields and sanitize them.
     * Perform content validation (e.g. valid chars int the db and user name)
@@ -77,6 +82,19 @@
         $args[$key] = $_POST[$key];
       }
     }
+    // This should look better than just dying, but then the
+    // frontend .html should validate this before POSTing
+    if( $args["pass"] != $_POST["pass_confirm"] )
+      die("Database use passwords don't match");
+    if( $args["admin_pass"] != $_POST["admin_pass_confirm"] )
+      die("Passwords for admin user don't match");
+
+    // @todo Validate chars
+    // host:      [a-z0-9\-]
+    // db_name:   [a-z\_]
+    // user:      [a-z0-9]
+    // admin_user:[a-z\.\_]
+    
     return $args;
   }
   /**
@@ -86,7 +104,15 @@
     * @param string $user Username under which to run the script
     * @param string $path Path of the script to run
     */
-  function run_sql_script($host, $user, $pass, $db_name, $path) {
+  function run_sql_script(
+      $host
+    , $user
+    , $pass
+    , $db_name
+    , $path
+    , $admin_user
+    , $admin_pass
+  ) {
     $statements = parse_sql_script($path);    
     $link       = mysql_connect($host, $user, $pass);
     mysql_select_db($db_name, $link);
@@ -98,6 +124,7 @@
         echo "Failed query: " . $statement . "\n" . mysql_error();
       }
     }
+    register_admin_user($link, $admin_user, $admin_pass);
     return Array(
         "statements"  => count($statements)
       , "errors"      => $errors
@@ -144,3 +171,14 @@
     file_put_contents('../../server/config.php', $file_contents);
     /// @todo Check erorrs during writing
   }
+
+  /**
+    *
+    */
+  function register_admin_user($link, $admin_user, $admin_pass) {
+    $stmt_insert
+      = "INSERT INTO Users (username, password) VALUES "
+      . "('$admin_user', PASSWORD('$admin_pass'));";
+    mysql_query($stmt_insert, $link);
+  }
+  

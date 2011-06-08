@@ -30,6 +30,11 @@
 #include <linux/net.h>
 #include <linux/ptrace.h>
 
+#ifdef __amd64
+#define CONFIG_BOX_KERNEL_AMD64
+#define CONFIG_BOX_USER_AMD64
+#endif
+
 #if defined(CONFIG_BOX_KERNEL_AMD64) && !defined(CONFIG_BOX_USER_AMD64)
 #include <asm/unistd_32.h>
 #define NATIVE_NR_execve 59		/* 64-bit execve */
@@ -65,6 +70,7 @@ static volatile int timer_tick;
 static struct timeval start_time;
 static int ticks_per_sec;
 static int exec_seen;
+static int exec_remaining = 1;
 static int partial_line;
 
 static int mem_peak_kb;
@@ -319,13 +325,21 @@ static unsigned char syscall_action[NUM_ACTIONS] = {
     S(dup) = A_YES,
     S(brk) = A_YES | A_SAMPLE_MEM,
     S(getuid) = A_YES,
+#ifdef __NR_getuid32
     S(getuid32) = A_YES,
+#endif
     S(getgid) = A_YES,
+#ifdef __NR_getgid32
     S(getgid32) = A_YES,
+#endif
     S(geteuid) = A_YES,
+#ifdef __NR_geteuid32
     S(geteuid32) = A_YES,
+#endif
     S(getegid) = A_YES,
+#ifdef __NR_getegid32
     S(getegid32) = A_YES,
+#endif
     S(dup2) = A_YES,
     S(fstat) = A_YES,
     S(personality) = A_YES,
@@ -344,6 +358,12 @@ static unsigned char syscall_action[NUM_ACTIONS] = {
     S(munmap) = A_YES,
     S(ioctl) = A_YES,
     S(uname) = A_YES,
+#ifdef __NR_olduname
+    S(olduname) = A_YES,
+#endif
+#ifdef __NR_oldolduname
+    S(oldolduname) = A_YES,
+#endif
     S(gettid) = A_YES,
     S(set_thread_area) = A_YES,
     S(get_thread_area) = A_YES,
@@ -367,7 +387,11 @@ static unsigned char syscall_action[NUM_ACTIONS] = {
     S(fork) = A_YES | A_FORK,
     S(vfork) = A_YES | A_FORK,
     S(execve) = A_FILENAME | A_FORK | A_NO_RETVAL,
+#ifdef __NR_waitpid
     S(waitpid) = A_YES | A_FORK,
+#else
+    S(wait4) = A_YES | A_FORK,
+#endif
     
 #undef S
 };
@@ -425,8 +449,10 @@ set_syscall_action(char *a)
     }
 
   int sys = syscall_by_name(a);
-  if (sys < 0)
-    die("Unknown syscall `%s'", a);
+  if (sys < 0) {
+    //die("Unknown syscall `%s'", a);
+    return 1;
+  }
   if (sys >= NUM_ACTIONS)
     die("Syscall `%s' out of range", a);
   syscall_action[sys] = act;
@@ -1026,9 +1052,20 @@ static int
 syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
 {
   static char namebuf[4096];
-  
+
   switch(sys)
   {
+    case NATIVE_NR_execve:
+      if (entry == 0)
+        {
+          if (exec_remaining == 0)
+            {
+              return -1;
+            }
+          exec_remaining--;
+          return 1;
+        }
+      break;
     case __NR_setrlimit:
       if (entry == 0)
         {
@@ -1059,6 +1096,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
           set_syscall_args(pid, a);
         }
       break;
+#ifdef __NR_socketcall
     case __NR_socketcall:
       if (entry == 0)
         {
@@ -1081,6 +1119,23 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
           set_syscall_args(pid, a);
         }
       break;
+#else
+    case __NR_socket:	
+      if (entry == 0)
+        {
+          a->sys = __NR_getuid;
+          set_syscall_args(pid, a);
+          return 1;
+        }
+      else
+        {
+          a->sys = __NR_socket;
+          a->result = -1;
+          errno = EACCES;
+          set_syscall_args(pid, a);
+        }
+      break;
+#endif
     case __NR_open:
       if (entry == 0)
         {

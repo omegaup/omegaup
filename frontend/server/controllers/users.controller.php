@@ -8,8 +8,6 @@ require_once( "dao/Permissions.dao.php");
 
 class UsersController {
 
-
-
 	public static function registerNewUser($name, $email, $pwd, $print_response = null){
 		//user exists ?
 		if(UsersController::searchUserByEmail($email) != null){
@@ -79,4 +77,35 @@ class UsersController {
 		
 	}
 	
+  /**
+    *
+    */
+  public static function addEmail() {
+  }
+  /**
+    *
+    */
+  public static function setPrimaryEmail() {
+  }
+  /**
+    *
+    */
+  public static function addEmail() {
+  }
+  /**
+    *
+    */
+  public static function requestPasswordReset() {
+  }
+  /**
+    * Change a user's password. In order to change it, the user must
+    * provide his/her current password should be given or a password
+    * reset token.
+    */
+  public static function setPassword(
+      $user_id
+    , $current_password // or reset token
+    , $new_password
+  ) {
+  }
 }

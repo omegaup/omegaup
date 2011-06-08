@@ -7,6 +7,7 @@
 -s rt_sigaction
 -s gettimeofday
 -s ugetrlimit
+-s getrlimit
 -s getcwd
 -s getrusage
 -s umask
@@ -14,6 +15,7 @@
 -s chmod
 
 -p /proc/meminfo
+-p /dev/urandom
 -p /usr/
 -p /tmp/=rw
 -p ./=rw

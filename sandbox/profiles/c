@@ -1,4 +1,5 @@
 -f
 -a 2
 -s mprotect
+-p /dev/urandom
 -p /usr/lib/libstdc++.so.6

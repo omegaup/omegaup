@@ -44,11 +44,11 @@ object Runner extends RunnerService with Log {
 		
 		val process = message.lang match {
 			case "java" =>
-				runtime.exec((List(sandbox, "-S", profile + "/javac", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "--", "/usr/bin/javac") ++ inputFiles).toArray)
+				runtime.exec((List(sandbox, "-S", profile + "/javac", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "--", Config.get("java.compiler.path", "/usr/bin/javac")) ++ inputFiles).toArray)
 			case "c" =>
-				runtime.exec((List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", "/usr/bin/gcc", "-ansi", "-O2", "-lm") ++ inputFiles).toArray)
+				runtime.exec((List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-ansi", "-O2", "-lm") ++ inputFiles).toArray)
 			case "cpp" =>
-				runtime.exec((List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", "/usr/bin/g++", "-O2", "-lm") ++ inputFiles).toArray)
+				runtime.exec((List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles).toArray)
 			case _ => null
 		}
 		
@@ -119,7 +119,7 @@ object Runner extends RunnerService with Log {
 				
 					val process = lang match {
 						case "java" =>
-							runtime.exec((List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")).toArray)
+							runtime.exec((List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "--", Config.get("java.runtime.path", "/usr/bin/java"), "-Xmx" + message.memoryLimit + "k", "Main")).toArray)
 						case "c" =>
 							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
 						case "cpp" =>

@@ -1,6 +1,10 @@
 # Ignore objects
 *.o
 box
+mkprofile
+sandbox/syscall-table.h
+sandbox/profiles/java
+sandbox/profiles/javac
 # Ignore temporary files
 *~
 *.swp
