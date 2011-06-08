@@ -45,7 +45,7 @@ class UsersController {
 		
 									
 		if($print_response == JSON){
-			echo '{ "success" : true}';
+			echo '{ "success" : true }';
 		}
 		
 		return true;
