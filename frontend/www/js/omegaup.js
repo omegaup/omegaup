@@ -42,6 +42,7 @@ var LoginBar = function (){
 	var loginStatus = false;
 	
 	this.setStatus = function ( st ){
+		if(DEBUG){ console.log("Setting login status to "+ st +"!"); }
 		loginStatus = st;
 		var html;
 		if(loginStatus){
@@ -53,87 +54,17 @@ var LoginBar = function (){
 		$(".login_bar").html( html );
 	}
 	
-	this.setUser = function ( usrData ){
-		$(".login_bar").html( "Hola " + usrData.name + " ! <a href='login.php'>Cerrar sesion</a>" );
+	this.setUser = function ( usrName ){
+		$(".login_bar").html( "Hola " + usrName + " ! <a href='login.php?out=1'>Cerrar sesion</a>" );
 	}
 	
 	this.render = function (){
 		//asume not valid user
-		this.setStatus ( false );
 		$(".login_bar").slideDown()
 	}
 	
 };
 
-
-
-var Registry = function(){
-	
-	this.validate_basic_user_registration = function(name, email, password){
-		
-		if(name === undefined){
-			return {
-				valid: false,
-				reason : "no name"
-			}
-		}
-		
-		if(email === undefined){
-			return {
-				valid: false,
-				reason : "no email"
-			}
-		}
-		
-		if(password === undefined){
-			return {
-				valid: false,
-				reason : "no pass"
-			}
-		}
-		
-		if(name.length < 5){
-			return {
-				valid : false,
-				reason : "Tu nombre es muy corto."
-			}
-		}
-		
-		
-		var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$/; 
-		
-		if( !emailPattern.test(email) ){
-			return {
-				valid : false,
-				reason : "Tu email no es valido"
-			}
-		}
-	
-		if(password.length < 5){
-			return {
-				valid : false,
-				reason : "Tu pass es muy corto."
-			}
-		}
-	
-		return { valid : true };
-	};
-	
-	
-	this.send_basic_registration = function(name, email, password, callback){
-		 $.ajax({ 
-			data: {
-				action : "new_user_basic",
-				name : name,
-				email : email,
-				password : password
-			},
-			success : function(r ){
-				callback.call(null, $.parseJSON( r ));
-			}
-		});
-	};
-};
 
 
 
@@ -146,7 +77,10 @@ var Registry = function(){
   * create login bar
   *
   **/
-var lb = new LoginBar ();
+var lb = new LoginBar (   );
+
+
+
 
 /**
   * Default ajax shit
@@ -176,6 +110,5 @@ $(document).ready(function() {
 	}
 	
 	lb.render();
-	
-	
+
 });
