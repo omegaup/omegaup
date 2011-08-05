@@ -16,18 +16,23 @@
 
 
 	require_once( "../server/controllers/problems.controller.php" );
+
+
 ?>  
 
-<html>  
-	<head>
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml "
+      xmlns:fb="http://www.facebook.com/2008/fbml ">
 
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
 	<?php echo $GUI::getExternalCSS(); ?>
-	
+
 	</head>
 	
 	<body>
 	<div id="wrapper">
-		
+		<div class="login_bar"></div> 
 		<div id="title"><?php echo $GUI::getHeader(); ?></div>
 	    
 		<div id="content">
@@ -37,7 +42,7 @@
 
 			<div class="post">
 
-	           <div class="title">Problemas</div>
+	           <div class="title">Elevando el nivel de Desarrolladores</div>
 
 				<div class="copy">
 					
@@ -80,8 +85,7 @@
 					?>
 					</p>
 						
-					</div>
-
+				</div>
 				</div>
 				<!-- .copy -->
 
@@ -93,7 +97,7 @@
 		
 		    <div class="post footer">
 		        <ul>
-		            <li class="first"><a href="http://observerapp.com/about/"><?php echo $GUI::getFooter(); ?></a></li>
+		            <li class="first"><a href=""></a></li>
 		        </ul>
 		
 		        <p><?php echo $GUI::getFooter(); ?></p>
@@ -107,52 +111,6 @@
 
 	</div>
 	<!-- #wrapper -->
-
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
-	
-	<script>
-
-		
-		var JuezExterno = [];
-		
-		/** 
-		  * Fill judges list
-		  *
-		  **/
-		<?php
-			$judges = ProblemsController::getJudgesList();
-		
-			foreach( $judges as $servidor => $descripcion ){
-				echo " JuezExterno.push({ descripcion : '$descripcion', servidor : '$servidor' }); \n";
-			}
-		?>
-		
-		
-		
-	
-
-		$(document).ready(function(){
-			
-			/**
-			  * Write judges list into html
-			  **/
-			var html = '';
-			
-			for (var i = JuezExterno.length - 1; i >= 0; i--){
-				html += JuezExterno[i].descripcion;
-				if(i > 0){
-					html += " | ";
-				}
-			}
-			
-			jQuery("#listaDeJuez").html(html);
-
-
-		});
-			
-
-		
-	</script>
 
 	</body>
 </html>
