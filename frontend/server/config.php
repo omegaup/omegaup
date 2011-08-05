@@ -6,7 +6,7 @@
 	# ####################################
 	# DATABASE CONFIG
 	# ####################################	
-	define("OMEGAUP_DB_USER", 	"omegaup");
+	define("OMEGAUP_DB_USER", 	"root");
 	define("OMEGAUP_DB_PASS", 	"");
 	define("OMEGAUP_DB_HOST", 	"localhost");
 	define("OMEGAUP_DB_NAME", 	"omegaup");	
@@ -15,4 +15,6 @@
 	
 	
 	
-	ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . "/Applications/XAMPP/xamppfiles/htdocs/omegaupgit/omegaup/frontend/server");
+	ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . "/Applications/XAMPP/xamppfiles/htdocs/omegaup/frontend/server");
+	
+	
