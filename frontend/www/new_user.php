@@ -116,7 +116,7 @@
 		
 		    <div class="post footer">
 		        <ul>
-		            <li class="first"><a href=""><?php echo $GUI::getFooter(); ?></a></li>
+		            <li class="first"><a href=""></a></li>
 		        </ul>
 		
 		        <p><?php echo $GUI::getFooter(); ?></p>
