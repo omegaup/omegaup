@@ -2,7 +2,7 @@
 /** Value Object file for table Clarifications.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 
@@ -76,6 +76,7 @@ class Clarifications extends VO
 	  * 
 	  *  [Campo no documentado]<br>
 	  * <b>Llave Primaria</b><br>
+	  * <b>Auto Incremento</b><br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -84,7 +85,7 @@ class Clarifications extends VO
 	/**
 	  * author_id
 	  * 
-	  * Autor de la clarificación.<br>
+	  * Autor de la clarificaciÃ³n.<br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -138,7 +139,7 @@ class Clarifications extends VO
 	/**
 	  * public
 	  * 
-	  * Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. <br>
+	  * SÃ³lo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. <br>
 	  * @access protected
 	  * @var tinyint(1)
 	  */
@@ -161,6 +162,8 @@ class Clarifications extends VO
 	  * Set the <i>clarification_id</i> property for this object. Donde <i>clarification_id</i> es  [Campo no documentado].
 	  * Una validacion basica se hara aqui para comprobar que <i>clarification_id</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
+	  * <br><br>Esta propiedad se mapea con un campo que es de <b>Auto Incremento</b> !<br>
+	  * No deberias usar setClarificationId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
 	  * No deberias usar setClarificationId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * @param int(11)
@@ -173,7 +176,7 @@ class Clarifications extends VO
 	/**
 	  * getAuthorId
 	  * 
-	  * Get the <i>author_id</i> property for this object. Donde <i>author_id</i> es Autor de la clarificación.
+	  * Get the <i>author_id</i> property for this object. Donde <i>author_id</i> es Autor de la clarificaciÃ³n.
 	  * @return int(11)
 	  */
 	final public function getAuthorId()
@@ -184,7 +187,7 @@ class Clarifications extends VO
 	/**
 	  * setAuthorId( $author_id )
 	  * 
-	  * Set the <i>author_id</i> property for this object. Donde <i>author_id</i> es Autor de la clarificación..
+	  * Set the <i>author_id</i> property for this object. Donde <i>author_id</i> es Autor de la clarificaciÃ³n..
 	  * Una validacion basica se hara aqui para comprobar que <i>author_id</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)
@@ -317,7 +320,7 @@ class Clarifications extends VO
 	/**
 	  * getPublic
 	  * 
-	  * Get the <i>public</i> property for this object. Donde <i>public</i> es Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. 
+	  * Get the <i>public</i> property for this object. Donde <i>public</i> es SÃ³lo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. 
 	  * @return tinyint(1)
 	  */
 	final public function getPublic()
@@ -328,7 +331,7 @@ class Clarifications extends VO
 	/**
 	  * setPublic( $public )
 	  * 
-	  * Set the <i>public</i> property for this object. Donde <i>public</i> es Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. .
+	  * Set the <i>public</i> property for this object. Donde <i>public</i> es SÃ³lo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. .
 	  * Una validacion basica se hara aqui para comprobar que <i>public</i> es de tipo <i>tinyint(1)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param tinyint(1)

@@ -2,7 +2,7 @@
 /** Value Object file for table Announcement.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 

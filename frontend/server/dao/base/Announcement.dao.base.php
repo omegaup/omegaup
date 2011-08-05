@@ -3,7 +3,7 @@
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Announcement }. 
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access private
   * @abstract
   * @package docs
@@ -234,7 +234,7 @@ abstract class AnnouncementDAOBase extends DAO
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		 $Announcement->setAnnouncementId( $conn->Insert_ID() );
+		/* save autoincremented value on obj */  $Announcement->setAnnouncementId( $conn->Insert_ID() ); /*  */ 
 		return $ar;
 	}
 

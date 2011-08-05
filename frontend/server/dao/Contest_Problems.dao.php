@@ -5,7 +5,7 @@ require_once("base/Contest_Problems.dao.base.php");
 require_once("base/Contest_Problems.vo.base.php");
 /** Page-level DocBlock .
   * 
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @package docs
   * 
   */
@@ -13,7 +13,7 @@ require_once("base/Contest_Problems.vo.base.php");
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link ContestProblems }. 
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 

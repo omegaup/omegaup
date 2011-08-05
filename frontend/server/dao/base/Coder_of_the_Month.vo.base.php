@@ -2,7 +2,7 @@
 /** Value Object file for table Coder_of_the_Month.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 
@@ -60,6 +60,7 @@ class CoderOfTheMonth extends VO
 	  * 
 	  *  [Campo no documentado]<br>
 	  * <b>Llave Primaria</b><br>
+	  * <b>Auto Incremento</b><br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -77,7 +78,7 @@ class CoderOfTheMonth extends VO
 	/**
 	  * time
 	  * 
-	  * Fecha no es UNIQUE por si hay más de 1 coder de mes.<br>
+	  * Fecha no es UNIQUE por si hay mÃ¡s de 1 coder de mes.<br>
 	  * @access protected
 	  * @var date
 	  */
@@ -109,6 +110,8 @@ class CoderOfTheMonth extends VO
 	  * Set the <i>coder_of_the_month_id</i> property for this object. Donde <i>coder_of_the_month_id</i> es  [Campo no documentado].
 	  * Una validacion basica se hara aqui para comprobar que <i>coder_of_the_month_id</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
+	  * <br><br>Esta propiedad se mapea con un campo que es de <b>Auto Incremento</b> !<br>
+	  * No deberias usar setCoderOfTheMonthId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
 	  * No deberias usar setCoderOfTheMonthId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * @param int(11)
@@ -145,7 +148,7 @@ class CoderOfTheMonth extends VO
 	/**
 	  * getTime
 	  * 
-	  * Get the <i>time</i> property for this object. Donde <i>time</i> es Fecha no es UNIQUE por si hay más de 1 coder de mes.
+	  * Get the <i>time</i> property for this object. Donde <i>time</i> es Fecha no es UNIQUE por si hay mÃ¡s de 1 coder de mes.
 	  * @return date
 	  */
 	final public function getTime()
@@ -156,7 +159,7 @@ class CoderOfTheMonth extends VO
 	/**
 	  * setTime( $time )
 	  * 
-	  * Set the <i>time</i> property for this object. Donde <i>time</i> es Fecha no es UNIQUE por si hay más de 1 coder de mes..
+	  * Set the <i>time</i> property for this object. Donde <i>time</i> es Fecha no es UNIQUE por si hay mÃ¡s de 1 coder de mes..
 	  * Una validacion basica se hara aqui para comprobar que <i>time</i> es de tipo <i>date</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param date
