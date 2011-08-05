@@ -5,8 +5,13 @@
 	 * 
 	 * 
 	 * */
-	//var_dump($_SERVER);
 	$loc = $_SERVER["SCRIPT_FILENAME"];
+	
+	
+	
+	
+
+	
 	
 	/*
 	 * Load configuration file, and parse the contents needed to parse.
@@ -32,7 +37,12 @@
 
 	
 
-	
+	/*
+	 * require googleopenid lib
+	 * 
+	 * 
+	 * */
+	require_once( "libs/GoogleOpenID.php" );
 
 
 	/*
