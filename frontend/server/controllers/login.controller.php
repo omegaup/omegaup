@@ -1,7 +1,14 @@
 <?php
 
+require_once("dao/Users.dao.php");
+require_once("dao/Emails.dao.php");
 
 class LoginController{
+	
+	
+	
+	
+	
 	
 	
 	/**
@@ -14,63 +21,88 @@ class LoginController{
 		$google_token
 	){
 		
-		//ok usuario valido segun google, vamos a buscar su correo electronico
-		$u = new Users();
-		$u->setEmail($email);
+		//google says valid user, look for it in email's table
+		$email_query = new Emails();
+		$email_query->setEmail( $email );
 		
-		$res = UsuarioDAO::search( $u );
-		
-		if(sizeof($res) == 0){
-			//its his first time !
+		$result = EmailsDAO::search( $email_query );
+
+
+		if( sizeof($result) == 0)
+		{
 			
+			//first timer !
+
+			//create user
+			$this_user 	= new Users();
+			$this_user->setUsername( $email );
+			$this_user->setSolved( 0 );			
+			$this_user->setSubmissions( 0 );
+			
+			
+			
+			//save this user
+			try{
+				UsersDAO::save( $this_user );
+
+			}catch(Exception $e){
+				die($e);
+				return false;
+
+			}
+			
+			
+			//create email
+			$this_user_email = new Emails();
+			$this_user_email ->setUserId( $this_user->getUserId() );
+			$this_user_email ->setEmail( $email );
+			
+			//save this user
+			try{
+				EmailsDAO::save( $this_user_email );
+
+			}catch(Exception $e){
+				die($e);
+				return false;
+
+			}
+			
+			
+			//$this_user->setEmailId( -1 );
+						
 		}else{
-			//coming back user !
-			$u = $res[0];
 			
-			//@todo, this dont work right now
-			//$u->setLastAccess( time() );
-		}
+			// he's been here man !
+			$this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
+			
+			//save user so  his
+			//last_access gets updated
+			try{
+				UsersDAO::save( $this_user );
 
+			}catch(Exception $e){
+				
+				die($e);
+				return false;
 
-		//save for new user so he can be in 
-		//database, and for old user so his
-		//last_access gets updated
-		try{
-			UsuarioDAO::save( $u );
-			
-		}catch(Exception $e){
-			
-			/* <REMOVE FROM PRODUCTION> */	echo $e; /* </REMOVE FROM PRODUCTION> */
-			return false;
+			}
 			
 		}
 		
-		// BUG FIX para el BUG de webframework !!!
-		$b_fix_foo = new Usuario();
-		$b_fix_foo->setEmail($email);
-		$r_fix_bar = UsuarioDAO::search( $b_fix_foo );
-		$u = $r_fix_bar[0];
-		// BUG FIX para el BUG de webframework !!!
-		
-		$_SESSION["USER_ID"] 	= $u->getUserId();
+
+		$_SESSION["USER_ID"] 	= $this_user->getUserId();
 		$_SESSION["EMAIL"] 		= $email;
 		$_SESSION["LOGGED_IN"] 	= true;
-		
+
 		return true;
-	}
-	
-	
-	
-	
-	static function isUserReadyToCommit(
-		$user_id
-	){
-		$u = UsuarioDAO::getByPK($user_id);
 		
-		return $u->getSvnPass() !== NULL;
+		
+		
 	}
 	
 	
+	
+
 	
 	/**
 	 * 

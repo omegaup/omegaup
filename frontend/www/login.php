@@ -17,6 +17,7 @@
 	  	if( $googleLogin->success() )
 		{
 			LoginController::login( $googleLogin->email(), $googleLogin->identity() );
+			
 			die(header("Location: index.php"));
 	  	}
 
@@ -26,12 +27,20 @@
 	}
 	/* ************************************************************************************ */
 	
+	
+	
+	
+	
 	if(isset($_GET["out"])){
 
-		//LoginController::logout(  );
+		LoginController::logout(  );
 		
 		die(header("Location: index.php"));
 	}
+	
+	
+	
+	
 
 	$association_handle = GoogleOpenID::getAssociationHandle();
 

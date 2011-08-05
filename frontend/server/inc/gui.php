@@ -216,10 +216,18 @@
 		 * */
 		public static function getFooter(){
 			
-			return 	"<!-- <script type=\"text/javascript\" src=\"http://connect.facebook.net/en_US/all.js\" async=\"\"></script> -->"
+			$logged_js = "lb.setStatus(false)";
+			
+			if(isset($_SESSION["LOGGED_IN"]) and $_SESSION["LOGGED_IN"])
+			{
+				$logged_js = "lb.setUser('". $_SESSION["EMAIL"] ."')";
+			}
+			
+			return 	"
+				<!-- <script type=\"text/javascript\" src=\"http://connect.facebook.net/en_US/all.js\" async=\"\"></script> -->"
 			 . "<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js'></script>"
 			 . "<script src='js/omegaup.js'></script>"
-			 . "<div id=\"fb-root\"></div> ";
+			 . "<div id=\"fb-root\"></div><script>  " . $logged_js . "</script>";
 		}
 		
 		
