@@ -69,8 +69,7 @@
 		$pattern_replace_1 = '([0-9],[0-9],)';
 		$pattern_replace_2 = '(,[0-9]*,[0-9]*,[0-9]*,\"[0-9\.]*\",[0-9],[0-9],[0-9])';
 		preg_match_all($pattern, $html_code , $matches, PREG_OFFSET_CAPTURE);		
-		$size = sizeof($matches[0]);				
-		return;
+		$size = sizeof($matches[0]);
 		$remote_id = "";
 		$title = "";		
 		
@@ -83,7 +82,7 @@
 			$remote_id = $split[0];	
 			$data = getProblemData( $remote_id , $title );
 			echo $data[0];
-			$q = "INSERT INTO `problems`(`remote_id`,`title`,`time_limit`,`memory_limit`) VALUES(".$data[0].",'".$data[1]."',".$data[2].",".$data[3].")"; 
+			$q = "INSERT INTO `problems`(`remote_id`,`title`,`time_limit`,`memory_limit`,`server`) VALUES(".$data[0].",'".$data[1]."',".$data[2].",".$data[3].",'tju')"; 
 			mysql_query($q) or die(mysql_error());
 		}		
 		
