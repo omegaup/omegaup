@@ -29,3 +29,8 @@ target/
 lib_managed/
 src_managed/
 */project/boot/
+
+#ignore frontend config file
+config.php
+
+frontend/server/config.php
