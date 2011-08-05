@@ -53,8 +53,7 @@
 		
 		//The number_list is represents a "volume" of data set problem
 		
-		$number_list = $_REQUEST['l'];
-		if(!isset($number_list))$number_list=1;
+		$number_list = 1;
 		
 		$url= "http://acm.tju.edu.cn/toj/list$number_list.html";
 		$html_code = getHtmlCode($url);
@@ -70,7 +69,8 @@
 		$pattern_replace_1 = '([0-9],[0-9],)';
 		$pattern_replace_2 = '(,[0-9]*,[0-9]*,[0-9]*,\"[0-9\.]*\",[0-9],[0-9],[0-9])';
 		preg_match_all($pattern, $html_code , $matches, PREG_OFFSET_CAPTURE);		
-		$size = sizeof($matches[0]);		
+		$size = sizeof($matches[0]);				
+		return;
 		$remote_id = "";
 		$title = "";		
 		
@@ -82,7 +82,7 @@
 			$title =  preg_replace("(\")","",$split[1]);
 			$remote_id = $split[0];	
 			$data = getProblemData( $remote_id , $title );
-			
+			echo $data[0];
 			$q = "INSERT INTO `problems`(`remote_id`,`title`,`time_limit`,`memory_limit`) VALUES(".$data[0].",'".$data[1]."',".$data[2].",".$data[3].")"; 
 			mysql_query($q) or die(mysql_error());
 		}		
