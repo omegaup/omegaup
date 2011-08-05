@@ -2,7 +2,7 @@
 /** Value Object file for table Users.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 
@@ -31,8 +31,8 @@ class Users extends VO
 			if( isset($data['password']) ){
 				$this->password = $data['password'];
 			}
-			if( isset($data['email']) ){
-				$this->email = $data['email'];
+			if( isset($data['main_email_id']) ){
+				$this->main_email_id = $data['main_email_id'];
 			}
 			if( isset($data['name']) ){
 				$this->name = $data['name'];
@@ -80,7 +80,7 @@ class Users extends VO
 			"user_id" => $this->user_id,
 			"username" => $this->username,
 			"password" => $this->password,
-			"email" => $this->email,
+			"main_email_id" => $this->main_email_id,
 			"name" => $this->name,
 			"solved" => $this->solved,
 			"submissions" => $this->submissions,
@@ -100,6 +100,7 @@ class Users extends VO
 	  * 
 	  *  [Campo no documentado]<br>
 	  * <b>Llave Primaria</b><br>
+	  * <b>Auto Incremento</b><br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -124,13 +125,13 @@ class Users extends VO
 	protected $password;
 
 	/**
-	  * email
+	  * main_email_id
 	  * 
 	  *  [Campo no documentado]<br>
 	  * @access protected
-	  * @var varchar(256)
+	  * @var int(11)
 	  */
-	protected $email;
+	protected $main_email_id;
 
 	/**
 	  * name
@@ -239,6 +240,8 @@ class Users extends VO
 	  * Set the <i>user_id</i> property for this object. Donde <i>user_id</i> es  [Campo no documentado].
 	  * Una validacion basica se hara aqui para comprobar que <i>user_id</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
+	  * <br><br>Esta propiedad se mapea con un campo que es de <b>Auto Incremento</b> !<br>
+	  * No deberias usar setUserId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
 	  * No deberias usar setUserId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * @param int(11)
@@ -297,27 +300,27 @@ class Users extends VO
 	}
 
 	/**
-	  * getEmail
+	  * getMainEmailId
 	  * 
-	  * Get the <i>email</i> property for this object. Donde <i>email</i> es  [Campo no documentado]
-	  * @return varchar(256)
+	  * Get the <i>main_email_id</i> property for this object. Donde <i>main_email_id</i> es  [Campo no documentado]
+	  * @return int(11)
 	  */
-	final public function getEmail()
+	final public function getMainEmailId()
 	{
-		return $this->email;
+		return $this->main_email_id;
 	}
 
 	/**
-	  * setEmail( $email )
+	  * setMainEmailId( $main_email_id )
 	  * 
-	  * Set the <i>email</i> property for this object. Donde <i>email</i> es  [Campo no documentado].
-	  * Una validacion basica se hara aqui para comprobar que <i>email</i> es de tipo <i>varchar(256)</i>. 
+	  * Set the <i>main_email_id</i> property for this object. Donde <i>main_email_id</i> es  [Campo no documentado].
+	  * Una validacion basica se hara aqui para comprobar que <i>main_email_id</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
-	  * @param varchar(256)
+	  * @param int(11)
 	  */
-	final public function setEmail( $email )
+	final public function setMainEmailId( $main_email_id )
 	{
-		$this->email = $email;
+		$this->main_email_id = $main_email_id;
 	}
 
 	/**

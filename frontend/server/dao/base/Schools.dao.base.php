@@ -3,7 +3,7 @@
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Schools }. 
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access private
   * @abstract
   * @package docs
@@ -227,7 +227,7 @@ abstract class SchoolsDAOBase extends DAO
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		 
+		/* save autoincremented value on obj */   /*  */ 
 		return $ar;
 	}
 

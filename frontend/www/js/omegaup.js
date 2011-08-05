@@ -1,5 +1,9 @@
 var DEBUG = true;
 
+/*
+	//Fuck Facebook connect for now
+	//since it need to be run on the
+	//registered domain
 window.fbAsyncInit = function() {
 
   	FB.init({appId: '197705690257857', status: true, cookie: true, xfbml: true});
@@ -25,11 +29,15 @@ window.fbAsyncInit = function() {
 
 	});
 };
-
+*/
 
 
 
 var LoginBar = function (){
+	
+	if(DEBUG){
+		console.log("Creating login bar");
+	}
 	
 	var loginStatus = false;
 	
@@ -39,7 +47,7 @@ var LoginBar = function (){
 		if(loginStatus){
 			html = "Bienvenido de regreso !";
 		}else{
-			html = "Hello stranger ! <a href='login.php'>Iniciar sesion con facebook</a>";			
+			html = "Hello stranger ! <a href='login.php'>Iniciar sesion</a>";			
 		}
 		
 		$(".login_bar").html( html );
@@ -50,7 +58,9 @@ var LoginBar = function (){
 	}
 	
 	this.render = function (){
-			$(".login_bar").slideDown()
+		//asume not valid user
+		this.setStatus ( false );
+		$(".login_bar").slideDown()
 	}
 	
 };
@@ -133,13 +143,39 @@ var Registry = function(){
 
 
 /**
-  *
+  * create login bar
   *
   **/
 var lb = new LoginBar ();
 
+/**
+  * Default ajax shit
+  *
+  **/
 $.ajaxSetup({
   	url: 'api.php',
 	type: 'post'
 });
 
+
+
+
+
+
+/*  ***************************** ***************************** *****************************
+										OMEGA UP START 
+    ***************************** ***************************** ***************************** */
+
+/**
+  *
+  *  ON READY FOR JQUERY
+  **/
+$(document).ready(function() {
+  	if(DEBUG){
+		console.log("JS loaded ! Starting app now...");
+	}
+	
+	lb.render();
+	
+	
+});

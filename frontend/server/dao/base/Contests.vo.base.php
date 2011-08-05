@@ -2,7 +2,7 @@
 /** Value Object file for table Contests.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 
@@ -153,7 +153,7 @@ class Contests extends VO
 	/**
 	  * window_length
 	  * 
-	  * Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso<br>
+	  * Indica el tiempo que tiene el usuario para envÃ­ar soluciÃ³n, si es NULL entonces serÃ¡ durante todo el tiempo del concurso<br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -171,7 +171,7 @@ class Contests extends VO
 	/**
 	  * rerun_id
 	  * 
-	  * Este campo es para las repeticiones de algún concurso<br>
+	  * Este campo es para las repeticiones de algÃºn concurso<br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -189,7 +189,7 @@ class Contests extends VO
 	/**
 	  * token
 	  * 
-	  * Almacenará el token necesario para acceder al concurso<br>
+	  * AlmacenarÃ¡ el token necesario para acceder al concurso<br>
 	  * @access protected
 	  * @var varchar(20)
 	  */
@@ -198,7 +198,7 @@ class Contests extends VO
 	/**
 	  * scoreboard
 	  * 
-	  * Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible<br>
+	  * Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard serÃ¡ visible<br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -207,7 +207,7 @@ class Contests extends VO
 	/**
 	  * partial_score
 	  * 
-	  * Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos<br>
+	  * Verdadero si el usuario recibirÃ¡ puntaje parcial para problemas no resueltos en todos los casos<br>
 	  * @access protected
 	  * @var tinyint(1)
 	  */
@@ -216,7 +216,7 @@ class Contests extends VO
 	/**
 	  * submissions_gap
 	  * 
-	  * Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro<br>
+	  * Tiempo mÃ­nimo en segundos que debe de esperar un usuario despues de realizar un envÃ­o para hacer otro<br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -234,7 +234,7 @@ class Contests extends VO
 	/**
 	  * penalty
 	  * 
-	  * Entero indicando el número de minutos con que se penaliza por recibir un no-accepted<br>
+	  * Entero indicando el nÃºmero de minutos con que se penaliza por recibir un no-accepted<br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -376,7 +376,7 @@ class Contests extends VO
 	/**
 	  * getWindowLength
 	  * 
-	  * Get the <i>window_length</i> property for this object. Donde <i>window_length</i> es Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso
+	  * Get the <i>window_length</i> property for this object. Donde <i>window_length</i> es Indica el tiempo que tiene el usuario para envÃ­ar soluciÃ³n, si es NULL entonces serÃ¡ durante todo el tiempo del concurso
 	  * @return int(11)
 	  */
 	final public function getWindowLength()
@@ -387,7 +387,7 @@ class Contests extends VO
 	/**
 	  * setWindowLength( $window_length )
 	  * 
-	  * Set the <i>window_length</i> property for this object. Donde <i>window_length</i> es Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso.
+	  * Set the <i>window_length</i> property for this object. Donde <i>window_length</i> es Indica el tiempo que tiene el usuario para envÃ­ar soluciÃ³n, si es NULL entonces serÃ¡ durante todo el tiempo del concurso.
 	  * Una validacion basica se hara aqui para comprobar que <i>window_length</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)
@@ -424,7 +424,7 @@ class Contests extends VO
 	/**
 	  * getRerunId
 	  * 
-	  * Get the <i>rerun_id</i> property for this object. Donde <i>rerun_id</i> es Este campo es para las repeticiones de algún concurso
+	  * Get the <i>rerun_id</i> property for this object. Donde <i>rerun_id</i> es Este campo es para las repeticiones de algÃºn concurso
 	  * @return int(11)
 	  */
 	final public function getRerunId()
@@ -435,7 +435,7 @@ class Contests extends VO
 	/**
 	  * setRerunId( $rerun_id )
 	  * 
-	  * Set the <i>rerun_id</i> property for this object. Donde <i>rerun_id</i> es Este campo es para las repeticiones de algún concurso.
+	  * Set the <i>rerun_id</i> property for this object. Donde <i>rerun_id</i> es Este campo es para las repeticiones de algÃºn concurso.
 	  * Una validacion basica se hara aqui para comprobar que <i>rerun_id</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)
@@ -472,7 +472,7 @@ class Contests extends VO
 	/**
 	  * getToken
 	  * 
-	  * Get the <i>token</i> property for this object. Donde <i>token</i> es Almacenará el token necesario para acceder al concurso
+	  * Get the <i>token</i> property for this object. Donde <i>token</i> es AlmacenarÃ¡ el token necesario para acceder al concurso
 	  * @return varchar(20)
 	  */
 	final public function getToken()
@@ -483,7 +483,7 @@ class Contests extends VO
 	/**
 	  * setToken( $token )
 	  * 
-	  * Set the <i>token</i> property for this object. Donde <i>token</i> es Almacenará el token necesario para acceder al concurso.
+	  * Set the <i>token</i> property for this object. Donde <i>token</i> es AlmacenarÃ¡ el token necesario para acceder al concurso.
 	  * Una validacion basica se hara aqui para comprobar que <i>token</i> es de tipo <i>varchar(20)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param varchar(20)
@@ -496,7 +496,7 @@ class Contests extends VO
 	/**
 	  * getScoreboard
 	  * 
-	  * Get the <i>scoreboard</i> property for this object. Donde <i>scoreboard</i> es Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible
+	  * Get the <i>scoreboard</i> property for this object. Donde <i>scoreboard</i> es Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard serÃ¡ visible
 	  * @return int(11)
 	  */
 	final public function getScoreboard()
@@ -507,7 +507,7 @@ class Contests extends VO
 	/**
 	  * setScoreboard( $scoreboard )
 	  * 
-	  * Set the <i>scoreboard</i> property for this object. Donde <i>scoreboard</i> es Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible.
+	  * Set the <i>scoreboard</i> property for this object. Donde <i>scoreboard</i> es Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard serÃ¡ visible.
 	  * Una validacion basica se hara aqui para comprobar que <i>scoreboard</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)
@@ -520,7 +520,7 @@ class Contests extends VO
 	/**
 	  * getPartialScore
 	  * 
-	  * Get the <i>partial_score</i> property for this object. Donde <i>partial_score</i> es Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos
+	  * Get the <i>partial_score</i> property for this object. Donde <i>partial_score</i> es Verdadero si el usuario recibirÃ¡ puntaje parcial para problemas no resueltos en todos los casos
 	  * @return tinyint(1)
 	  */
 	final public function getPartialScore()
@@ -531,7 +531,7 @@ class Contests extends VO
 	/**
 	  * setPartialScore( $partial_score )
 	  * 
-	  * Set the <i>partial_score</i> property for this object. Donde <i>partial_score</i> es Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos.
+	  * Set the <i>partial_score</i> property for this object. Donde <i>partial_score</i> es Verdadero si el usuario recibirÃ¡ puntaje parcial para problemas no resueltos en todos los casos.
 	  * Una validacion basica se hara aqui para comprobar que <i>partial_score</i> es de tipo <i>tinyint(1)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param tinyint(1)
@@ -544,7 +544,7 @@ class Contests extends VO
 	/**
 	  * getSubmissionsGap
 	  * 
-	  * Get the <i>submissions_gap</i> property for this object. Donde <i>submissions_gap</i> es Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro
+	  * Get the <i>submissions_gap</i> property for this object. Donde <i>submissions_gap</i> es Tiempo mÃ­nimo en segundos que debe de esperar un usuario despues de realizar un envÃ­o para hacer otro
 	  * @return int(11)
 	  */
 	final public function getSubmissionsGap()
@@ -555,7 +555,7 @@ class Contests extends VO
 	/**
 	  * setSubmissionsGap( $submissions_gap )
 	  * 
-	  * Set the <i>submissions_gap</i> property for this object. Donde <i>submissions_gap</i> es Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro.
+	  * Set the <i>submissions_gap</i> property for this object. Donde <i>submissions_gap</i> es Tiempo mÃ­nimo en segundos que debe de esperar un usuario despues de realizar un envÃ­o para hacer otro.
 	  * Una validacion basica se hara aqui para comprobar que <i>submissions_gap</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)
@@ -592,7 +592,7 @@ class Contests extends VO
 	/**
 	  * getPenalty
 	  * 
-	  * Get the <i>penalty</i> property for this object. Donde <i>penalty</i> es Entero indicando el número de minutos con que se penaliza por recibir un no-accepted
+	  * Get the <i>penalty</i> property for this object. Donde <i>penalty</i> es Entero indicando el nÃºmero de minutos con que se penaliza por recibir un no-accepted
 	  * @return int(11)
 	  */
 	final public function getPenalty()
@@ -603,7 +603,7 @@ class Contests extends VO
 	/**
 	  * setPenalty( $penalty )
 	  * 
-	  * Set the <i>penalty</i> property for this object. Donde <i>penalty</i> es Entero indicando el número de minutos con que se penaliza por recibir un no-accepted.
+	  * Set the <i>penalty</i> property for this object. Donde <i>penalty</i> es Entero indicando el nÃºmero de minutos con que se penaliza por recibir un no-accepted.
 	  * Una validacion basica se hara aqui para comprobar que <i>penalty</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)
