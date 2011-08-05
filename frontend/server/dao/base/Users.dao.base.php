@@ -3,7 +3,7 @@
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Users }. 
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access private
   * @abstract
   * @package docs
@@ -158,9 +158,9 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $Users->getPassword() );
 		}
 
-		if( $Users->getEmail() != NULL){
-			$sql .= " email = ? AND";
-			array_push( $val, $Users->getEmail() );
+		if( $Users->getMainEmailId() != NULL){
+			$sql .= " main_email_id = ? AND";
+			array_push( $val, $Users->getMainEmailId() );
 		}
 
 		if( $Users->getName() != NULL){
@@ -244,11 +244,11 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function update( $Users )
 	{
-		$sql = "UPDATE Users SET  username = ?, password = ?, email = ?, name = ?, solved = ?, submissions = ?, country_id = ?, state_id = ?, school_id = ?, scholar_degree = ?, graduation_date = ?, birth_date = ?, last_access = ? WHERE  user_id = ?;";
+		$sql = "UPDATE Users SET  username = ?, password = ?, main_email_id = ?, name = ?, solved = ?, submissions = ?, country_id = ?, state_id = ?, school_id = ?, scholar_degree = ?, graduation_date = ?, birth_date = ?, last_access = ? WHERE  user_id = ?;";
 		$params = array( 
 			$Users->getUsername(), 
 			$Users->getPassword(), 
-			$Users->getEmail(), 
+			$Users->getMainEmailId(), 
 			$Users->getName(), 
 			$Users->getSolved(), 
 			$Users->getSubmissions(), 
@@ -282,12 +282,12 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function create( &$Users )
 	{
-		$sql = "INSERT INTO Users ( user_id, username, password, email, name, solved, submissions, country_id, state_id, school_id, scholar_degree, graduation_date, birth_date, last_access ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Users ( user_id, username, password, main_email_id, name, solved, submissions, country_id, state_id, school_id, scholar_degree, graduation_date, birth_date, last_access ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Users->getUserId(), 
 			$Users->getUsername(), 
 			$Users->getPassword(), 
-			$Users->getEmail(), 
+			$Users->getMainEmailId(), 
 			$Users->getName(), 
 			$Users->getSolved(), 
 			$Users->getSubmissions(), 
@@ -304,7 +304,7 @@ abstract class UsersDAOBase extends DAO
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		 
+		/* save autoincremented value on obj */  $Users->setUserId( $conn->Insert_ID() ); /*  */ 
 		return $ar;
 	}
 
@@ -379,12 +379,12 @@ abstract class UsersDAOBase extends DAO
 			
 		}
 
-		if( (($a = $UsersA->getEmail()) != NULL) & ( ($b = $UsersB->getEmail()) != NULL) ){
-				$sql .= " email >= ? AND email <= ? AND";
+		if( (($a = $UsersA->getMainEmailId()) != NULL) & ( ($b = $UsersB->getMainEmailId()) != NULL) ){
+				$sql .= " main_email_id >= ? AND main_email_id <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( $a || $b ){
-			$sql .= " email = ? AND"; 
+			$sql .= " main_email_id = ? AND"; 
 			$a = $a == NULL ? $b : $a;
 			array_push( $val, $a);
 			

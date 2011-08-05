@@ -6,7 +6,7 @@
 	# ####################################
 	# DATABASE CONFIG
 	# ####################################	
-	define("OMEGAUP_DB_USER", 	"root");
+	define("OMEGAUP_DB_USER", "root");
 	define("OMEGAUP_DB_PASS", 	"");
 	define("OMEGAUP_DB_HOST", 	"localhost");
 	define("OMEGAUP_DB_NAME", 	"omegaup");	
