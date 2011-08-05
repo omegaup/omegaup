@@ -1,5 +1,9 @@
 var DEBUG = true;
 
+/*
+	//Fuck Facebook connect for now
+	//since it need to be run on the
+	//registered domain
 window.fbAsyncInit = function() {
 
   	FB.init({appId: '197705690257857', status: true, cookie: true, xfbml: true});
@@ -25,105 +29,42 @@ window.fbAsyncInit = function() {
 
 	});
 };
-
+*/
 
 
 
 var LoginBar = function (){
 	
+	if(DEBUG){
+		console.log("Creating login bar");
+	}
+	
 	var loginStatus = false;
 	
 	this.setStatus = function ( st ){
+		if(DEBUG){ console.log("Setting login status to "+ st +"!"); }
 		loginStatus = st;
 		var html;
 		if(loginStatus){
 			html = "Bienvenido de regreso !";
 		}else{
-			html = "Hello stranger ! <a href='login.php'>Iniciar sesion con facebook</a>";			
+			html = "Hello stranger ! <a href='login.php'>Iniciar sesion</a>";			
 		}
 		
 		$(".login_bar").html( html );
 	}
 	
-	this.setUser = function ( usrData ){
-		$(".login_bar").html( "Hola " + usrData.name + " ! <a href='login.php'>Cerrar sesion</a>" );
+	this.setUser = function ( usrName ){
+		$(".login_bar").html( "Hola " + usrName + " ! <a href='login.php?out=1'>Cerrar sesion</a>" );
 	}
 	
 	this.render = function (){
-			$(".login_bar").slideDown()
+		//asume not valid user
+		$(".login_bar").slideDown()
 	}
 	
 };
 
-
-
-var Registry = function(){
-	
-	this.validate_basic_user_registration = function(name, email, password){
-		
-		if(name === undefined){
-			return {
-				valid: false,
-				reason : "no name"
-			}
-		}
-		
-		if(email === undefined){
-			return {
-				valid: false,
-				reason : "no email"
-			}
-		}
-		
-		if(password === undefined){
-			return {
-				valid: false,
-				reason : "no pass"
-			}
-		}
-		
-		if(name.length < 5){
-			return {
-				valid : false,
-				reason : "Tu nombre es muy corto."
-			}
-		}
-		
-		
-		var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$/; 
-		
-		if( !emailPattern.test(email) ){
-			return {
-				valid : false,
-				reason : "Tu email no es valido"
-			}
-		}
-	
-		if(password.length < 5){
-			return {
-				valid : false,
-				reason : "Tu pass es muy corto."
-			}
-		}
-	
-		return { valid : true };
-	};
-	
-	
-	this.send_basic_registration = function(name, email, password, callback){
-		 $.ajax({ 
-			data: {
-				action : "new_user_basic",
-				name : name,
-				email : email,
-				password : password
-			},
-			success : function(r ){
-				callback.call(null, $.parseJSON( r ));
-			}
-		});
-	};
-};
 
 
 
@@ -133,13 +74,41 @@ var Registry = function(){
 
 
 /**
-  *
+  * create login bar
   *
   **/
-var lb = new LoginBar ();
+var lb = new LoginBar (   );
 
+
+
+
+/**
+  * Default ajax shit
+  *
+  **/
 $.ajaxSetup({
   	url: 'api.php',
 	type: 'post'
 });
 
+
+
+
+
+
+/*  ***************************** ***************************** *****************************
+										OMEGA UP START 
+    ***************************** ***************************** ***************************** */
+
+/**
+  *
+  *  ON READY FOR JQUERY
+  **/
+$(document).ready(function() {
+  	if(DEBUG){
+		console.log("JS loaded ! Starting app now...");
+	}
+	
+	lb.render();
+
+});

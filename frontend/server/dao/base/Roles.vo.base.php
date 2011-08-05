@@ -2,7 +2,7 @@
 /** Value Object file for table Roles.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 
@@ -56,6 +56,7 @@ class Roles extends VO
 	  * 
 	  *  [Campo no documentado]<br>
 	  * <b>Llave Primaria</b><br>
+	  * <b>Auto Incremento</b><br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -73,7 +74,7 @@ class Roles extends VO
 	/**
 	  * description
 	  * 
-	  * La descripción humana del rol.<br>
+	  * La descripciÃ³n humana del rol.<br>
 	  * @access protected
 	  * @var varchar(100)
 	  */
@@ -96,6 +97,8 @@ class Roles extends VO
 	  * Set the <i>role_id</i> property for this object. Donde <i>role_id</i> es  [Campo no documentado].
 	  * Una validacion basica se hara aqui para comprobar que <i>role_id</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
+	  * <br><br>Esta propiedad se mapea con un campo que es de <b>Auto Incremento</b> !<br>
+	  * No deberias usar setRoleId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
 	  * No deberias usar setRoleId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * @param int(11)
@@ -132,7 +135,7 @@ class Roles extends VO
 	/**
 	  * getDescription
 	  * 
-	  * Get the <i>description</i> property for this object. Donde <i>description</i> es La descripción humana del rol.
+	  * Get the <i>description</i> property for this object. Donde <i>description</i> es La descripciÃ³n humana del rol.
 	  * @return varchar(100)
 	  */
 	final public function getDescription()
@@ -143,7 +146,7 @@ class Roles extends VO
 	/**
 	  * setDescription( $description )
 	  * 
-	  * Set the <i>description</i> property for this object. Donde <i>description</i> es La descripción humana del rol..
+	  * Set the <i>description</i> property for this object. Donde <i>description</i> es La descripciÃ³n humana del rol..
 	  * Una validacion basica se hara aqui para comprobar que <i>description</i> es de tipo <i>varchar(100)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param varchar(100)

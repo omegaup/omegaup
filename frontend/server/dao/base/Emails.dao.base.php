@@ -1,82 +1,79 @@
 <?php
-/** UsersBadges Data Access Object (DAO) Base.
+/** Emails Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link UsersBadges }. 
+  * almacenar de forma permanente y recuperar instancias de objetos {@link Emails }. 
   * @author alanboy
   * @access private
   * @abstract
   * @package docs
   * 
   */
-abstract class UsersBadgesDAOBase extends DAO
+abstract class EmailsDAOBase extends DAO
 {
 
 		private static $loadedRecords = array();
 
-		private static function recordExists(  $badge_id, $user_id ){
+		private static function recordExists(  $email_id ){
 			$pk = "";
-			$pk .= $badge_id . "-";
-			$pk .= $user_id . "-";
+			$pk .= $email_id . "-";
 			return array_key_exists ( $pk , self::$loadedRecords );
 		}
-		private static function pushRecord( $inventario,  $badge_id, $user_id){
+		private static function pushRecord( $inventario,  $email_id){
 			$pk = "";
-			$pk .= $badge_id . "-";
-			$pk .= $user_id . "-";
+			$pk .= $email_id . "-";
 			self::$loadedRecords [$pk] = $inventario;
 		}
-		private static function getRecord(  $badge_id, $user_id ){
+		private static function getRecord(  $email_id ){
 			$pk = "";
-			$pk .= $badge_id . "-";
-			$pk .= $user_id . "-";
+			$pk .= $email_id . "-";
 			return self::$loadedRecords[$pk];
 		}
 	/**
 	  *	Guardar registros. 
 	  *	
-	  *	Este metodo guarda el estado actual del objeto {@link UsersBadges} pasado en la base de datos. La llave 
+	  *	Este metodo guarda el estado actual del objeto {@link Emails} pasado en la base de datos. La llave 
 	  *	primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
 	  *	primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
 	  *	en ese objeto el ID recien creado.
 	  *	
 	  *	@static
 	  * @throws Exception si la operacion fallo.
-	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges
+	  * @param Emails [$Emails] El objeto de tipo Emails
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Users_Badges )
+	public static final function save( &$Emails )
 	{
-		if(  self::getByPK(  $Users_Badges->getBadgeId() , $Users_Badges->getUserId() ) !== NULL )
+		if(  self::getByPK(  $Emails->getEmailId() ) !== NULL )
 		{
-			try{ return UsersBadgesDAOBase::update( $Users_Badges) ; } catch(Exception $e){ throw $e; }
+			try{ return EmailsDAOBase::update( $Emails) ; } catch(Exception $e){ throw $e; }
 		}else{
-			try{ return UsersBadgesDAOBase::create( $Users_Badges) ; } catch(Exception $e){ throw $e; }
+			try{ return EmailsDAOBase::create( $Emails) ; } catch(Exception $e){ throw $e; }
 		}
 	}
 
 
 	/**
-	  *	Obtener {@link UsersBadges} por llave primaria. 
+	  *	Obtener {@link Emails} por llave primaria. 
 	  *	
-	  * Este metodo cargara un objeto {@link UsersBadges} de la base de datos 
+	  * Este metodo cargara un objeto {@link Emails} de la base de datos 
 	  * usando sus llaves primarias. 
 	  *	
 	  *	@static
-	  * @return @link UsersBadges Un objeto del tipo {@link UsersBadges}. NULL si no hay tal registro.
+	  * @return @link Emails Un objeto del tipo {@link Emails}. NULL si no hay tal registro.
 	  **/
-	public static final function getByPK(  $badge_id, $user_id )
+	public static final function getByPK(  $email_id )
 	{
-		if(self::recordExists(  $badge_id, $user_id)){
-			return self::getRecord( $badge_id, $user_id );
+		if(self::recordExists(  $email_id)){
+			return self::getRecord( $email_id );
 		}
-		$sql = "SELECT * FROM Users_Badges WHERE (badge_id = ? AND user_id = ? ) LIMIT 1;";
-		$params = array(  $badge_id, $user_id );
+		$sql = "SELECT * FROM Emails WHERE (email_id = ? ) LIMIT 1;";
+		$params = array(  $email_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0)return NULL;
-			$foo = new UsersBadges( $rs );
-			self::pushRecord( $foo,  $badge_id, $user_id );
+			$foo = new Emails( $rs );
+			self::pushRecord( $foo,  $email_id );
 			return $foo;
 	}
 
@@ -85,7 +82,7 @@ abstract class UsersBadgesDAOBase extends DAO
 	  *	Obtener todas las filas.
 	  *	
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-	  * un vector que contiene objetos de tipo {@link UsersBadges}. Tenga en cuenta que este metodo
+	  * un vector que contiene objetos de tipo {@link Emails}. Tenga en cuenta que este metodo
 	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
 	  *	
@@ -94,11 +91,11 @@ abstract class UsersBadgesDAOBase extends DAO
 	  * @param $columnas_por_pagina Columnas por pagina.
 	  * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-	  * @return Array Un arreglo que contiene objetos del tipo {@link UsersBadges}.
+	  * @return Array Un arreglo que contiene objetos del tipo {@link Emails}.
 	  **/
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
-		$sql = "SELECT * from Users_Badges";
+		$sql = "SELECT * from Emails";
 		if($orden != NULL)
 		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
 		if($pagina != NULL)
@@ -109,11 +106,10 @@ abstract class UsersBadgesDAOBase extends DAO
 		$rs = $conn->Execute($sql);
 		$allData = array();
 		foreach ($rs as $foo) {
-			$bar = new UsersBadges($foo);
+			$bar = new Emails($foo);
     		array_push( $allData, $bar);
-			//badge_id
-			//user_id
-    		self::pushRecord( $bar, $foo["badge_id"],$foo["user_id"] );
+			//email_id
+    		self::pushRecord( $bar, $foo["email_id"] );
 		}
 		return $allData;
 	}
@@ -122,7 +118,7 @@ abstract class UsersBadgesDAOBase extends DAO
 	/**
 	  *	Buscar registros.
 	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UsersBadges} de la base de datos. 
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Emails} de la base de datos. 
 	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
 	  *	
@@ -139,32 +135,27 @@ abstract class UsersBadgesDAOBase extends DAO
 	  *	  }
 	  * </code>
 	  *	@static
-	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges
+	  * @param Emails [$Emails] El objeto de tipo Emails
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Users_Badges , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Emails , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Users_Badges WHERE ("; 
+		$sql = "SELECT * from Emails WHERE ("; 
 		$val = array();
-		if( $Users_Badges->getBadgeId() != NULL){
-			$sql .= " badge_id = ? AND";
-			array_push( $val, $Users_Badges->getBadgeId() );
+		if( $Emails->getEmailId() != NULL){
+			$sql .= " email_id = ? AND";
+			array_push( $val, $Emails->getEmailId() );
 		}
 
-		if( $Users_Badges->getUserId() != NULL){
+		if( $Emails->getEmail() != NULL){
+			$sql .= " email = ? AND";
+			array_push( $val, $Emails->getEmail() );
+		}
+
+		if( $Emails->getUserId() != NULL){
 			$sql .= " user_id = ? AND";
-			array_push( $val, $Users_Badges->getUserId() );
-		}
-
-		if( $Users_Badges->getTime() != NULL){
-			$sql .= " time = ? AND";
-			array_push( $val, $Users_Badges->getTime() );
-		}
-
-		if( $Users_Badges->getLastProblemId() != NULL){
-			$sql .= " last_problem_id = ? AND";
-			array_push( $val, $Users_Badges->getLastProblemId() );
+			array_push( $val, $Emails->getUserId() );
 		}
 
 		if(sizeof($val) == 0){return array();}
@@ -177,9 +168,9 @@ abstract class UsersBadgesDAOBase extends DAO
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
-			$bar =  new UsersBadges($foo);
+			$bar =  new Emails($foo);
     		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["badge_id"],$foo["user_id"] );
+    		self::pushRecord( $bar, $foo["email_id"] );
 		}
 		return $ar;
 	}
@@ -194,15 +185,15 @@ abstract class UsersBadgesDAOBase extends DAO
 	  *	
 	  * @internal private information for advanced developers only
 	  * @return Filas afectadas o un string con la descripcion del error
-	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a actualizar.
+	  * @param Emails [$Emails] El objeto de tipo Emails a actualizar.
 	  **/
-	private static final function update( $Users_Badges )
+	private static final function update( $Emails )
 	{
-		$sql = "UPDATE Users_Badges SET  time = ?, last_problem_id = ? WHERE  badge_id = ? AND user_id = ?;";
+		$sql = "UPDATE Emails SET  email = ?, user_id = ? WHERE  email_id = ?;";
 		$params = array( 
-			$Users_Badges->getTime(), 
-			$Users_Badges->getLastProblemId(), 
-			$Users_Badges->getBadgeId(),$Users_Badges->getUserId(), );
+			$Emails->getEmail(), 
+			$Emails->getUserId(), 
+			$Emails->getEmailId(), );
 		global $conn;
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
@@ -214,23 +205,22 @@ abstract class UsersBadgesDAOBase extends DAO
 	  *	Crear registros.
 	  *	
 	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
-	  * contenidos del objeto UsersBadges suministrado. Asegurese
+	  * contenidos del objeto Emails suministrado. Asegurese
 	  * de que los valores para todas las columnas NOT NULL se ha especificado 
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
-	  * primaria generada en el objeto UsersBadges dentro de la misma transaccion.
+	  * primaria generada en el objeto Emails dentro de la misma transaccion.
 	  *	
 	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a crear.
+	  * @param Emails [$Emails] El objeto de tipo Emails a crear.
 	  **/
-	private static final function create( &$Users_Badges )
+	private static final function create( &$Emails )
 	{
-		$sql = "INSERT INTO Users_Badges ( badge_id, user_id, time, last_problem_id ) VALUES ( ?, ?, ?, ?);";
+		$sql = "INSERT INTO Emails ( email_id, email, user_id ) VALUES ( ?, ?, ?);";
 		$params = array( 
-			$Users_Badges->getBadgeId(), 
-			$Users_Badges->getUserId(), 
-			$Users_Badges->getTime(), 
-			$Users_Badges->getLastProblemId(), 
+			$Emails->getEmailId(), 
+			$Emails->getEmail(), 
+			$Emails->getUserId(), 
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}
@@ -245,8 +235,8 @@ abstract class UsersBadgesDAOBase extends DAO
 	/**
 	  *	Buscar por rango.
 	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UsersBadges} de la base de datos siempre y cuando 
-	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link UsersBadges}.
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Emails} de la base de datos siempre y cuando 
+	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Emails}.
 	  * 
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -270,54 +260,43 @@ abstract class UsersBadgesDAOBase extends DAO
 	  *	  }
 	  * </code>
 	  *	@static
-	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges
-	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges
+	  * @param Emails [$Emails] El objeto de tipo Emails
+	  * @param Emails [$Emails] El objeto de tipo Emails
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function byRange( $Users_BadgesA , $Users_BadgesB , $orderBy = null, $orden = 'ASC')
+	public static final function byRange( $EmailsA , $EmailsB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Users_Badges WHERE ("; 
+		$sql = "SELECT * from Emails WHERE ("; 
 		$val = array();
-		if( (($a = $Users_BadgesA->getBadgeId()) != NULL) & ( ($b = $Users_BadgesB->getBadgeId()) != NULL) ){
-				$sql .= " badge_id >= ? AND badge_id <= ? AND";
+		if( (($a = $EmailsA->getEmailId()) != NULL) & ( ($b = $EmailsB->getEmailId()) != NULL) ){
+				$sql .= " email_id >= ? AND email_id <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( $a || $b ){
-			$sql .= " badge_id = ? AND"; 
+			$sql .= " email_id = ? AND"; 
 			$a = $a == NULL ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $Users_BadgesA->getUserId()) != NULL) & ( ($b = $Users_BadgesB->getUserId()) != NULL) ){
+		if( (($a = $EmailsA->getEmail()) != NULL) & ( ($b = $EmailsB->getEmail()) != NULL) ){
+				$sql .= " email >= ? AND email <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( $a || $b ){
+			$sql .= " email = ? AND"; 
+			$a = $a == NULL ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( (($a = $EmailsA->getUserId()) != NULL) & ( ($b = $EmailsB->getUserId()) != NULL) ){
 				$sql .= " user_id >= ? AND user_id <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( $a || $b ){
 			$sql .= " user_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
-			array_push( $val, $a);
-			
-		}
-
-		if( (($a = $Users_BadgesA->getTime()) != NULL) & ( ($b = $Users_BadgesB->getTime()) != NULL) ){
-				$sql .= " time >= ? AND time <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " time = ? AND"; 
-			$a = $a == NULL ? $b : $a;
-			array_push( $val, $a);
-			
-		}
-
-		if( (($a = $Users_BadgesA->getLastProblemId()) != NULL) & ( ($b = $Users_BadgesB->getLastProblemId()) != NULL) ){
-				$sql .= " last_problem_id >= ? AND last_problem_id <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " last_problem_id = ? AND"; 
 			$a = $a == NULL ? $b : $a;
 			array_push( $val, $a);
 			
@@ -332,7 +311,7 @@ abstract class UsersBadgesDAOBase extends DAO
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
-    		array_push( $ar, new UsersBadges($foo));
+    		array_push( $ar, new Emails($foo));
 		}
 		return $ar;
 	}
@@ -342,20 +321,20 @@ abstract class UsersBadgesDAOBase extends DAO
 	  *	Eliminar registros.
 	  *	
 	  * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-	  * en el objeto UsersBadges suministrado. Una vez que se ha suprimido un objeto, este no 
+	  * en el objeto Emails suministrado. Una vez que se ha suprimido un objeto, este no 
 	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila 
 	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. 
 	  * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
 	  *	
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
-	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a eliminar
+	  * @param Emails [$Emails] El objeto de tipo Emails a eliminar
 	  **/
-	public static final function delete( &$Users_Badges )
+	public static final function delete( &$Emails )
 	{
-		if(self::getByPK($Users_Badges->getBadgeId(), $Users_Badges->getUserId()) === NULL) throw new Exception('Campo no encontrado.');
-		$sql = "DELETE FROM Users_Badges WHERE  badge_id = ? AND user_id = ?;";
-		$params = array( $Users_Badges->getBadgeId(), $Users_Badges->getUserId() );
+		if(self::getByPK($Emails->getEmailId()) === NULL) throw new Exception('Campo no encontrado.');
+		$sql = "DELETE FROM Emails WHERE  email_id = ?;";
+		$params = array( $Emails->getEmailId() );
 		global $conn;
 
 		$conn->Execute($sql, $params);

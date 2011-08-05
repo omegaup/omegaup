@@ -5,8 +5,13 @@
 	 * 
 	 * 
 	 * */
-	//var_dump($_SERVER);
-	$loc = $_SERVER["SCRIPT_FILENAME"];
+
+	
+	
+	
+	
+
+	
 	
 	/*
 	 * Load configuration file, and parse the contents needed to parse.
@@ -20,7 +25,32 @@
    elseif( file_exists("install") ) {
     /// @todo Demand that install directory be deleted
    }
+
+
 	require_once( "../server/config.php" );  
+	
+	
+	
+	/* ****************************************************************************************************************
+	 * Start and evaluate session
+	 * 
+	 * 
+	 * 
+	 * **************************************************************************************************************** */
+	session_start();
+
+
+
+	/*
+	 * require googleopenid lib
+	 * 
+	 * 
+	 * */
+	require_once( "libs/GoogleOpenID.php" );
+	
+	
+	
+	
 	
 	/*
 	 * Start and evaluate session
@@ -28,11 +58,11 @@
 	 * 
 	 * 
 	 * */
+	require_once("controllers/login.controller.php");
+	
+	
 	
 
-	
-
-	
 
 
 	/*

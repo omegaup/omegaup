@@ -2,7 +2,7 @@
 /** Value Object file for table Contests_Users.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 
@@ -82,7 +82,7 @@ class ContestsUsers extends VO
 	/**
 	  * access_time
 	  * 
-	  * Hora a la que entró el usuario al concurso<br>
+	  * Hora a la que entrÃ³ el usuario al concurso<br>
 	  * @access protected
 	  * @var timestamp
 	  */
@@ -91,7 +91,7 @@ class ContestsUsers extends VO
 	/**
 	  * score
 	  * 
-	  * Índica el puntaje que obtuvo el usuario en el concurso<br>
+	  * Ãndica el puntaje que obtuvo el usuario en el concurso<br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -100,7 +100,7 @@ class ContestsUsers extends VO
 	/**
 	  * time
 	  * 
-	  * Índica el tiempo que acumulo en usuario en el concurso<br>
+	  * Ãndica el tiempo que acumulo en usuario en el concurso<br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -161,7 +161,7 @@ class ContestsUsers extends VO
 	/**
 	  * getAccessTime
 	  * 
-	  * Get the <i>access_time</i> property for this object. Donde <i>access_time</i> es Hora a la que entró el usuario al concurso
+	  * Get the <i>access_time</i> property for this object. Donde <i>access_time</i> es Hora a la que entrÃ³ el usuario al concurso
 	  * @return timestamp
 	  */
 	final public function getAccessTime()
@@ -172,7 +172,7 @@ class ContestsUsers extends VO
 	/**
 	  * setAccessTime( $access_time )
 	  * 
-	  * Set the <i>access_time</i> property for this object. Donde <i>access_time</i> es Hora a la que entró el usuario al concurso.
+	  * Set the <i>access_time</i> property for this object. Donde <i>access_time</i> es Hora a la que entrÃ³ el usuario al concurso.
 	  * Una validacion basica se hara aqui para comprobar que <i>access_time</i> es de tipo <i>timestamp</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param timestamp
@@ -185,7 +185,7 @@ class ContestsUsers extends VO
 	/**
 	  * getScore
 	  * 
-	  * Get the <i>score</i> property for this object. Donde <i>score</i> es Índica el puntaje que obtuvo el usuario en el concurso
+	  * Get the <i>score</i> property for this object. Donde <i>score</i> es Ãndica el puntaje que obtuvo el usuario en el concurso
 	  * @return int(11)
 	  */
 	final public function getScore()
@@ -196,7 +196,7 @@ class ContestsUsers extends VO
 	/**
 	  * setScore( $score )
 	  * 
-	  * Set the <i>score</i> property for this object. Donde <i>score</i> es Índica el puntaje que obtuvo el usuario en el concurso.
+	  * Set the <i>score</i> property for this object. Donde <i>score</i> es Ãndica el puntaje que obtuvo el usuario en el concurso.
 	  * Una validacion basica se hara aqui para comprobar que <i>score</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)
@@ -209,7 +209,7 @@ class ContestsUsers extends VO
 	/**
 	  * getTime
 	  * 
-	  * Get the <i>time</i> property for this object. Donde <i>time</i> es Índica el tiempo que acumulo en usuario en el concurso
+	  * Get the <i>time</i> property for this object. Donde <i>time</i> es Ãndica el tiempo que acumulo en usuario en el concurso
 	  * @return int(11)
 	  */
 	final public function getTime()
@@ -220,7 +220,7 @@ class ContestsUsers extends VO
 	/**
 	  * setTime( $time )
 	  * 
-	  * Set the <i>time</i> property for this object. Donde <i>time</i> es Índica el tiempo que acumulo en usuario en el concurso.
+	  * Set the <i>time</i> property for this object. Donde <i>time</i> es Ãndica el tiempo que acumulo en usuario en el concurso.
 	  * Una validacion basica se hara aqui para comprobar que <i>time</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param int(11)

@@ -2,7 +2,7 @@
 /** Value Object file for table Languages.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alan@caffeina.mx
+  * @author alanboy
   * @access public
   * @package docs
   * 
@@ -56,6 +56,7 @@ class Languages extends VO
 	  * 
 	  *  [Campo no documentado]<br>
 	  * <b>Llave Primaria</b><br>
+	  * <b>Auto Incremento</b><br>
 	  * @access protected
 	  * @var int(11)
 	  */
@@ -73,7 +74,7 @@ class Languages extends VO
 	/**
 	  * country_id
 	  * 
-	  * Se guarda la relación con el país para defaultear más rápido.<br>
+	  * Se guarda la relaciÃ³n con el paÃ­s para defaultear mÃ¡s rÃ¡pido.<br>
 	  * @access protected
 	  * @var char(3)
 	  */
@@ -96,6 +97,8 @@ class Languages extends VO
 	  * Set the <i>language_id</i> property for this object. Donde <i>language_id</i> es  [Campo no documentado].
 	  * Una validacion basica se hara aqui para comprobar que <i>language_id</i> es de tipo <i>int(11)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
+	  * <br><br>Esta propiedad se mapea con un campo que es de <b>Auto Incremento</b> !<br>
+	  * No deberias usar setLanguageId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
 	  * No deberias usar setLanguageId( ) a menos que sepas exactamente lo que estas haciendo.<br>
 	  * @param int(11)
@@ -132,7 +135,7 @@ class Languages extends VO
 	/**
 	  * getCountryId
 	  * 
-	  * Get the <i>country_id</i> property for this object. Donde <i>country_id</i> es Se guarda la relación con el país para defaultear más rápido.
+	  * Get the <i>country_id</i> property for this object. Donde <i>country_id</i> es Se guarda la relaciÃ³n con el paÃ­s para defaultear mÃ¡s rÃ¡pido.
 	  * @return char(3)
 	  */
 	final public function getCountryId()
@@ -143,7 +146,7 @@ class Languages extends VO
 	/**
 	  * setCountryId( $country_id )
 	  * 
-	  * Set the <i>country_id</i> property for this object. Donde <i>country_id</i> es Se guarda la relación con el país para defaultear más rápido..
+	  * Set the <i>country_id</i> property for this object. Donde <i>country_id</i> es Se guarda la relaciÃ³n con el paÃ­s para defaultear mÃ¡s rÃ¡pido..
 	  * Una validacion basica se hara aqui para comprobar que <i>country_id</i> es de tipo <i>char(3)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param char(3)
