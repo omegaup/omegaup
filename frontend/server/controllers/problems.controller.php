@@ -9,20 +9,18 @@ class ProblemsController {
 	  * 
 	  *	
 	  **/
-	public static function getProblemList( $servidor = null ){
-		$prob = new Problems();
-		$prob->setPublic(1);
+	public static function getProblemList( $sizePage , $noPage , $servidor = null ,$orderBy){
 		
-		$results = ProblemsDAO::search($prob);
-		
+		$condition = "server = '$servidor' and public = 1";
+		$results = ProblemsDAO::byPage ( $sizePage , $noPage , $condition , $servidor, $orderBy);		
 		return $results;
 	}
 	
 	public static function getJudgesList(){
-		return array(  'uva' => "Universidad Valladolid",
-						'livearchive' => "Live Archive",
-						'pku' => "Pekin University",
-						'tju' => "Tianjing ",
+		return array(  'uva' => "Universidad Valladolid |",
+						'livearchive' => "Live Archive |",
+						'pku' => "Pekin University |",
+						'tju' => "<a href='?serv=tju'> Tianjing </a> |",
 						'spoj' => "SPOJ" );
 	}
 

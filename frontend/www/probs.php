@@ -73,13 +73,44 @@
 					<div id="listaProblemas">
 					<p>
 					<?php
-							
-					$problemas = ProblemsController::getProblemList();
-					if(sizeof($problemas) == 0){
+					$serv = "tju";
+					$noPage = 1;
+					$sizePage = 25;
+					$orderBy = "title";
+					if(isset($_REQUEST['serv']))$serv = $_REQUEST['serv'];
+					if(isset($_REQUEST['noPage']))$noPage = $_REQUEST['noPage'];
+					if(isset($_REQUEST['order']))$orderBy = $_REQUEST['order'];						
+					$problemas = ProblemsController::getProblemList($sizePage , $noPage , $serv, $orderBy);
+					if(sizeof($problemas) == 2){
 						echo "No hay problemas !";
 						
 					}else{
-						echo "Si hay problema!";
+						$html = "<div width='100%' align='right'>$problemas[0]</div>";
+						$html .= "</br><center>$problemas[1]</center></br>";
+						$size = sizeof($problemas);
+						$html .= "<table id='problems' width='100%'><tr>
+								<th><a href='?order=title'>Titulo</a></th>
+								<th><a href='?order=time_limit'>Tiempo limite (s)</a></th>
+								<th><a href='?order=memory_limit'>Memoria limite (Kb)</a></th>
+								<th><a href='?order=visits'>Visitas </a></th>
+								<th><a href='?order=submissions'>Envios</a></th>
+								<th><a href='?order=accepted'>Aceptados</a></th>
+								<th><a href='?order=difficulty'>Dificultad</a></th>
+								</tr>";
+						for($i=2; $i < $size; $i++){
+							$problemas[$i] = json_decode($problemas[$i]);
+							$html.= "<tr><td>".$problemas[$i]->title."</td>";
+							$html.= "<td>".$problemas[$i]->time_limit."</td>";
+							$html.= "<td>".$problemas[$i]->memory_limit."</td>";
+							$html.= "<td>".$problemas[$i]->visits."</td>";
+							$html.= "<td>".$problemas[$i]->submissions."</td>";
+							$html.= "<td>".$problemas[$i]->accepted."</td>";
+							$html.= "<td>".$problemas[$i]->difficulty."</td> </tr>";
+						}
+						$html .= "</table>";						
+						$html .= "<div width='100%' align='right'>$problemas[0]</div>";
+						$html .= "</br><center>$problemas[1]</center></br>";
+						echo $html;
 					}
 							
 					?>
