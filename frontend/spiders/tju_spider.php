@@ -49,11 +49,12 @@
 		//Main
 		
 		//database connect 
+	function main($list){
 		connect("localhost","root","","omegaup");
 		
 		//The number_list is represents a "volume" of data set problem
 		
-		$number_list = 1;
+		$number_list = $list;
 		
 		$url= "http://acm.tju.edu.cn/toj/list$number_list.html";
 		$html_code = getHtmlCode($url);
@@ -78,7 +79,7 @@
 			$matches[0][$i][0] = preg_replace($pattern_replace_2,"",$matches[0][$i][0]);
 			$matches[0][$i][0] = preg_replace("(,)","<special_tag>",$matches[0][$i][0],1);
 			$split = explode("<special_tag>",$matches[0][$i][0]);
-			$title =  preg_replace("(\")","",$split[1]);
+			$title =  mysql_real_escape_string(preg_replace("(\")","",$split[1]));
 			$remote_id = $split[0];	
 			$data = getProblemData( $remote_id , $title );
 			echo $data[0];
@@ -86,5 +87,9 @@
 			mysql_query($q) or die(mysql_error());
 		}		
 		
-		
+	}
+	
+	for($i=1; $i<=29; $i++){
+		main($i);
+	}
 ?>
