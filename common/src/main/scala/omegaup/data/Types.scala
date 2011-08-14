@@ -95,6 +95,7 @@ class Contest(
 	var rerun_id: Int = 0,
 	var public: Boolean = true,
 	var token: String = "",
+	var points_decay_factor: Double = 0,
 	var scoreboard: Int = 80,
 	var partial_score: Boolean = true,
 	var submissions_gap: Int = 0,
@@ -141,6 +142,7 @@ class Run(
 	var score: Double = 0,
 	var contest_score: Double = 0,
 	var ip: String = "127.0.0.1",
-	var time: Timestamp = new Timestamp(0)
+	var time: Timestamp = new Timestamp(0),
+	var submit_delay: Int = 0
 ) {
 }
