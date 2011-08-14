@@ -35,4 +35,5 @@ config.php
 
 frontend/server/config.php
 
-frontend/server/config.php
+#ignore runtime and test stuff
+grader/test-env
