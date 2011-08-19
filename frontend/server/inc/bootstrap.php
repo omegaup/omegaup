@@ -15,9 +15,12 @@
 	
 	/*
 	 * Load configuration file, and parse the contents needed to parse.
-	 * 
-	 * 
+	 * @todo fix this so the config file can be loaded no matter
+	 * where the bootstrap file is loaded from
 	 * */
+	/*
+	Deprecating since bootstrap is called from diferent
+	plances, and looking for config is going to depend.
    if( !file_exists("../server/config.php") ) {
     header("Location: ./install/");
     exit();
@@ -25,9 +28,19 @@
    elseif( file_exists("install") ) {
     /// @todo Demand that install directory be deleted
    }
+	*/
 
-
-	require_once( "../server/config.php" );  
+	/**
+	 *  QUICK FIX
+	 * */
+	if( file_exists("../server/config.php") ) {
+    		require_once( "../server/config.php" );
+   }else{
+    		require_once( "../../server/config.php" );
+   }
+	/**
+	 *  QUICK FIX
+	 * */	  
 	
 	
 	

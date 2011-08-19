@@ -126,11 +126,11 @@
 		 *  						
 		 * */
 		public static function getExternalCSS(){
-			$cssFiles = array( "style.css" );
+			$cssFiles = array( "css/style.css", "../css/style.css" );
 			
 			$out = "";
 			foreach($cssFiles as $cssFile ){
-				$out .= '<link href="css/' . $cssFile . '" media="screen" rel="stylesheet" type="text/css" />';
+				$out .= '<link href="' . $cssFile . '" media="screen" rel="stylesheet" type="text/css" />';
 			}
 			return $out;
 		}
