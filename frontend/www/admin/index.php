@@ -1,7 +1,8 @@
 <?php
 	define( "LEVEL_NEEDED", false );
 	
-	require_once( "/bootstrap.php" );
+	require_once( "../../server/inc/bootstrap.php" );
+
 
 	require_once( "../../server/controllers/problems.controller.php" );
 	
