@@ -139,6 +139,30 @@ if(
 }
 
 
+/**
+ * 
+ * Erase any past auth token from this user.
+ * */
+$query_auths = new AuthTokens();
+$query_auths->setUserId( $actual_user->getUserId() );
+
+$results = AuthTokensDAO::search( $query_auths );
+
+foreach( $results as $old_token ){
+	try{
+		AuthTokensDAO::delete( $old_token );
+		
+	}catch(Exception $e){
+		header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+		
+		die(json_encode(array(
+			"status" => "error",
+			"error"	 => "Whops. Ive encoutered an error while writing your session to the database.",
+			"errorcode" => 105
+		)));
+	}
+}
+
 
 /**
  * Ok, passwords match !
