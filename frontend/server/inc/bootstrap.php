@@ -35,14 +35,64 @@
 	 * */
 	if( file_exists("../server/config.php") ) {
     		require_once( "../server/config.php" );
-   }else{
+
+   }else if(file_exists("../../server/config.php")){
     		require_once( "../../server/config.php" );
+
+   }else if(file_exists("../../../server/config.php")){
+    		require_once( "../../../server/config.php" );
    }
 	/**
 	 *  QUICK FIX
 	 * */	  
 	
 	
+	/**
+	 * I am the API:
+	 * Connect to DB, and load the DAO's. 
+	 *
+	 * */
+	if(defined("WHOAMI") && WHOAMI == "API"){
+		
+		require_once('adodb5/adodb.inc.php');
+		require_once('adodb5/adodb-exceptions.inc.php');
+		require_once('dao/model.inc.php');
+		$conn = null;
+
+		try{
+		    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
+		    $conn->debug = OMEGAUP_DB_DEBUG;
+		    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+
+		    if(!$conn) {
+				/**
+				 * Dispatch missing parameters
+				 * */
+				header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+
+				die(json_encode(array(
+					"status" => "error",
+					"error"	 => "Conection to the database has failed.",
+					"errorcode" => 1
+				)));
+
+		    }
+
+		} catch (Exception $e) {
+			
+			header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+			
+			die(json_encode(array(
+				"status" => "error",
+				"error"	 => $e,
+				"errorcode" => 2
+			)));
+
+		}
+		
+		return;
+	}
+		
 	
 	/* ****************************************************************************************************************
 	 * Start and evaluate session
@@ -133,12 +183,12 @@
 
 	    if(!$conn) {
 
-			$GUI::prettyDie("No database");
+			$GUI->prettyDie("No database");
 	    }
 
 	} catch (Exception $e) {
 
-			$GUI::prettyDie("No database");
+			$GUI->prettyDie("No database");
 
 	}
 	
@@ -152,12 +202,12 @@
 	 * permissions to see this page.
 	 *
 	 * */
-	
+	/*
 	if( LEVEL_NEEDED  ){
 		//LEVEL_NEEDED WAS NOT SET !
-		$GUI::prettyDie();
+		$GUI->prettyDie("LEVEL_NEEDED WAS NOT SET");
 		
 	}else{
 		//check for permissions
 		
-	}
+	}*/
