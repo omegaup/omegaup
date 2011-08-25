@@ -16,7 +16,7 @@
  * Check for needed parameters
  * */
  if( 
-		!isset($_GET["auth_token"])
+		!isset($_POST["auth_token"])
 	)
 	{
 		/**
@@ -35,7 +35,7 @@
 /**
  * Save them 
  * */
-define("AUTH_TOKEN", $_GET["auth_token"] );
+define("AUTH_TOKEN", $_POST["auth_token"] );
 
 
 /**
