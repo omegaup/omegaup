@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS `Countries` (
 --
 
 CREATE TABLE IF NOT EXISTS `Emails` (
-  `email_id` int(11) NOT NULL,
+  `email_id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(256) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`email_id`),
