@@ -1,3 +1,0 @@
-cd work_zone
-cd $1
-python Main.py USER_CODE $2

@@ -1,4 +1,0 @@
-cd ..
-cd work_zone
-cd $1
-java Main USER_CODE $2
