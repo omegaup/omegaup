@@ -499,6 +499,21 @@ CREATE TABLE IF NOT EXISTS `User_Roles` (
   KEY `role_id` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.';
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Users_Permissions`
+--
+
+CREATE TABLE IF NOT EXISTS `Users_Permissions` (
+  `user_id` int(11) NOT NULL,
+  `permission_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`permission_id`),
+  KEY `user_id` (`user_id`),
+  KEY `permission_id` (`permission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los permisos que se pueden dar a los usuarios.';
+
+
 --
 -- Restricciones para tablas volcadas
 --
@@ -667,3 +682,11 @@ ALTER TABLE `Users_Badges`
 ALTER TABLE `User_Roles`
   ADD CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+
+--
+-- Filtros para la tabla `Users_Permissions`
+--
+ALTER TABLE `Users_Permissions`
+  ADD CONSTRAINT `fk_up_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_up_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
