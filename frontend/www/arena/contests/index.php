@@ -69,7 +69,7 @@ $user_id = null;
  * Ok, now let get them' contests !
  * 
  * */
-$contests = ContestsDAO::getAll( NULL, NULL, 'contest_id', "DESC" );
+$contests = ContestsDAO::getListOfContests( NULL, NULL, 'contest_id', "DESC" );
 
 $contest_to_show = array();
 
@@ -83,7 +83,7 @@ foreach( $contests as $c ){
 		break;
 
 	if($c->getPublic()){
-		array_push( $contest_to_show, $c->asArray() );
+		array_push( $contest_to_show, $c->asArrayWithoutNulls() );
 		continue;
 	}
 	
@@ -110,7 +110,7 @@ foreach( $contests as $c ){
 	 * He can see it !
 	 * 
 	 * */
-	array_push( $contest_to_show, $c->asArray() );
+	array_push( $contest_to_show, $c->asArrayWithoutNulls() );
 }
 
 

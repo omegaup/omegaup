@@ -81,5 +81,31 @@
 			function asArray(){
 				return get_object_vars($this);
 			}
+                  
+                  /**
+	          *	Obtener una representacion en forma de arreglo sin mostrar los campos NULL.
+	          *	
+	          * Este metodo transforma todas las propiedades este objeto en un arreglo asociativo
+                  * sin mostrar los campos NULL.
+	          *	
+	          * @returns Array Un arreglo asociativo que describe a este objeto escondiendo los NULL.
+	          **/   
+                        function asArrayWithoutNulls()
+                        {
+                            // Get the complete representation of the array
+                            $completeArray = get_object_vars($this);
+                            
+                            $returnArray = array();
+                            
+                            foreach( $completeArray as $key => $value )
+                                if(!is_null($value))
+                                {
+                                    $returnArray[$key] = $value;
+                                    
+                                }
+                            
+                            return $returnArray;
+                        
+                        }
 
 		}
