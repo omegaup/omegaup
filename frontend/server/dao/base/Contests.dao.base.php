@@ -113,6 +113,45 @@ abstract class ContestsDAOBase extends DAO
 		}
 		return $allData;
 	}
+        
+        
+        /**
+	  *	Obtener todas las requeridas por /contests/ documentadas en:
+          *     https://github.com/omegaup/omegaup/wiki/Arena
+	  *	
+	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
+	  * un vector que contiene objetos de tipo {@link Contests}. Tenga en cuenta que este metodo
+	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
+	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
+	  *	
+	  *	@static
+	  * @param $pagina Pagina a ver.
+	  * @param $columnas_por_pagina Columnas por pagina.
+	  * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+	  * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
+	  * @return Array Un arreglo que contiene objetos del tipo {@link Contests}.
+	  **/
+	public static final function getListOfContests( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
+	{
+                $sql = "SELECT contest_id, title, description, start_time, finish_time, public, token, director_id  from Contests";
+                if($orden != NULL)
+                { $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+                if($pagina != NULL)
+                {
+                        $sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
+                }
+                global $conn;
+                $rs = $conn->Execute($sql);
+                $allData = array();
+                foreach ($rs as $foo) {
+                    $bar = new Contests($foo);
+                    array_push( $allData, $bar);
+                    
+                    //contest_id
+                    self::pushRecord( $bar, $foo["contest_id"] );
+                }
+                return $allData;
+	}
 
 
 	/**
@@ -246,7 +285,7 @@ abstract class ContestsDAOBase extends DAO
 	  *	
 	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
 	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
+	  * aqui, sin embargo. El valor de retorno indica cuï¿½ntas filas se vieron afectadas.
 	  *	
 	  * @internal private information for advanced developers only
 	  * @return Filas afectadas o un string con la descripcion del error
