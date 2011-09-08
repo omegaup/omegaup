@@ -69,7 +69,11 @@ $user_id = null;
  * Ok, now let get them' contests !
  * 
  * */
-$contests = ContestsDAO::getListOfContests( NULL, NULL, 'contest_id', "DESC" );
+// Create array of relevant columns
+$relevant_columns = array("contest_id", "title", "description", "start_time", "finish_time", "public", "token", "director_id");
+
+// Get all contests using only relevan columns
+$contests = ContestsDAO::getAll( NULL, NULL, 'contest_id', "DESC", $relevant_columns );
 
 $contest_to_show = array();
 
@@ -83,7 +87,7 @@ foreach( $contests as $c ){
 		break;
 
 	if($c->getPublic()){
-		array_push( $contest_to_show, $c->asArrayWithoutNulls() );
+		array_push( $contest_to_show, $c->asFilteredArray($relevant_columns) );
 		continue;
 	}
 	
@@ -110,7 +114,7 @@ foreach( $contests as $c ){
 	 * He can see it !
 	 * 
 	 * */
-	array_push( $contest_to_show, $c->asArrayWithoutNulls() );
+	array_push( $contest_to_show, $c->asFilteredArray($relevant_columns) );
 }
 
 

@@ -107,5 +107,34 @@
                             return $returnArray;
                         
                         }
+                        
+                        
+                        
+                /**
+	          *	Obtener una representacion en forma de arreglo sólo con los campos 
+                  *     definidos en $filter 
+	          *	
+	          * Este metodo transforma todas las propiedades este objeto en un arreglo asociativo
+                  * sin mostrar los campos NULL.
+	          *	
+	          * @returns Array Un arreglo filtrado asociativo que describe a este objeto.
+	          **/   
+                        function asFilteredArray($filters)
+                        {
+                            // Get the complete representation of the array
+                            $completeArray = get_object_vars($this);
+                            
+                            // Declare an empty array to return
+                            $returnArray = array();
+                            
+                            foreach( $filters as $filter )
+                            {                                
+                                // Only return properties included in $filters array
+                                $returnArray[$filter] = $completeArray[$filter];                                
+                            }
+                            
+                            return $returnArray;
+                        
+                        }
 
 		}
