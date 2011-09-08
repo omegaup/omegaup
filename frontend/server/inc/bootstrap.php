@@ -42,6 +42,9 @@
    }else if(file_exists("../../../server/config.php")){
     		require_once( "../../../server/config.php" );
    }
+   else if(file_exists("../../../../server/config.php")){
+    		require_once( "../../../../server/config.php" );
+   }
 	/**
 	 *  QUICK FIX
 	 * */	  
@@ -60,10 +63,11 @@
 		$conn = null;
 
 		try{
-		    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
+                    
+		    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
 		    $conn->debug = OMEGAUP_DB_DEBUG;
 		    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
-
+                    
 		    if(!$conn) {
 				/**
 				 * Dispatch missing parameters
