@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  Date Range Validator
+ *  Numeric Range Validator
  * 
  */
 
@@ -9,7 +9,7 @@ require_once("validator.php");
 
 class NumericRangeValidator extends Validator
 {
-    // Reference to string
+    // Local copies of numeric data
     private $target;
     private $start;
     private $finish;
@@ -26,7 +26,7 @@ class NumericRangeValidator extends Validator
     
     public function validate()
     {
-        // Validate that is target date is inside the range
+        // Validate that is target number is inside the range
         if ( !($this->target >= $this->start && $this->target <= $this->finish))
         {
             $this->setError("Value is outside the range.");

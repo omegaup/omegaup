@@ -22,7 +22,9 @@ require_once("../../../../server/inc/bootstrap.php");
 require_once("../../../../server/libs/ApiExposedProperty.php");
 require_once("../../../../server/libs/StringValidator.php");
 require_once("../../../../server/libs/NumericRangeValidator.php");
+require_once("../../../../server/libs/NumericValidator.php");
 require_once("../../../../server/libs/DateRangeValidator.php");
+require_once("../../../../server/libs/DateValidator.php");
 require_once("../../../../server/libs/ApiHttpErrors.php");
 
 // User ID to verify permisions
@@ -57,31 +59,53 @@ $error_dispatcher = ApiHttpErrors::getInstance();
 $parameters = array(
     new ApiExposedProperty("title", true, $_POST["title"], array( 
         new StringValidator($_POST["title"]))),
+    
     new ApiExposedProperty("description", true, $_POST["description"], array( 
         new StringValidator($_POST["description"]))),
+    
     new ApiExposedProperty("start_time", true, $_POST["start_time"], array( 
+        new DateValidator($_POST["start_time"]),
         new DateRangeValidator($_POST["start_time"], $_POST["start_time"], $_POST["finish_time"] ))),
+    
     new ApiExposedProperty("finish_time", true, $_POST["finish_time"], array( 
+        new DateValidator($_POST["finish_time"]),
         new DateRangeValidator($_POST["finish_time"], $_POST["start_time"], $_POST["finish_time"] ))),
+    
     new ApiExposedProperty("window_length", false, $_POST["window_length"], array( 
+        new NumericValidator($_POST["window_length"]),
         new NumericRangeValidator($_POST["window_length"], 0, floor( strtotime($_POST["finish_time"]) - strtotime($_POST["start_time"]))/60 ))),
+    
     new ApiExposedProperty("director_id", false, $user_id),
+    
     new ApiExposedProperty("rerun_id", false, $_POST["rerun_id"]),
-    new ApiExposedProperty("public", true, $_POST["public"] ),
+    
+    new ApiExposedProperty("public", true, $_POST["public"], array(
+        new NumericValidator($_POST["public"]))),
+    
     new ApiExposedProperty("token", true, $_POST["token"], array( 
         new StringValidator($_POST["token"]))),
+    
     new ApiExposedProperty("scoreboard", true, $_POST["scoreboard"], array( 
+        new NumericValidator($_POST["scoreboard"]),
         new NumericRangeValidator($_POST["scoreboard"], 0, 100))),
+    
     new ApiExposedProperty("points_decay_factor", true, $_POST["points_decay_factor"], array( 
+        new NumericValidator($_POST["points_decay_factor"]),
         new NumericRangeValidator($_POST["points_decay_factor"], 0, 1))),
-    new ApiExposedProperty("partial_score", true, $_POST["points_decay_factor"], array( 
-        new NumericRangeValidator($_POST["points_decay_factor"], 0, 1))),
-    new ApiExposedProperty("partial_score", true, $_POST["partial_score"] ),
+    
+    new ApiExposedProperty("partial_score", true, $_POST["partial_score"], array( 
+        new NumericValidator($_POST["partial_score"]))),
+    
     new ApiExposedProperty("submissions_gap", true, $_POST["submissions_gap"], array(
+        new NumericValidator($_POST["submissions_gap"]),
         new NumericRangeValidator($_POST["submissions_gap"], 0, strtotime($_POST["finish_time"]) - strtotime($_POST["start_time"]) ))),
+    
     new ApiExposedProperty("feedback", true, $_POST["feedback"]),
+    
     new ApiExposedProperty("penalty", true, $_POST["penalty"], array(
+        new NumericValidator($_POST["penalty"]),
         new NumericRangeValidator($_POST["penalty"], 0, INF ))),
+    
     new ApiExposedProperty("time_start", true, $_POST["time_start"]) 
     );
   
