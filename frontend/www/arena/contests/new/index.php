@@ -127,7 +127,7 @@ try
 }catch(Exception $e)
 {
     header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-    var_dump($e);
+    
     die(json_encode(array(
         "status" => "error",
         "error"	 => "Whops. Ive encoutered an error while writing your session to the database.",
