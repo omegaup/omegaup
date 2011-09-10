@@ -18,13 +18,16 @@
 define("WHOAMI", "API");
 require_once("../../../../server/inc/bootstrap.php");
 
+// @TODO Reduce all these includes
 require_once("../../../../server/libs/ApiExposedProperty.php");
 require_once("../../../../server/libs/StringValidator.php");
 require_once("../../../../server/libs/NumericRangeValidator.php");
 require_once("../../../../server/libs/DateRangeValidator.php");
+require_once("../../../../server/libs/ApiHttpErrors.php");
 
 // User ID to verify permisions
 $user_id = null;
+$error_dispatcher = ApiHttpErrors::getInstance();
 
 
 // Check if we have a logged user.
@@ -41,14 +44,8 @@ $user_id = null;
 
         }else{
 
-            // We have an invalid auth token. Dying.
-            header('HTTP/1.1 401 FORBIDDEN');
-
-            die(json_encode(array(
-                    "status" => "error",
-                    "error"	 => "You supplied an invalid auth token, or maybe it expired.",
-                    "errorcode" => 500
-            )));
+            // We have an invalid auth token. Dying.            
+            die(json_encode( $error_dispatcher->invalidAuthToken() ));
 
         }
 
@@ -95,14 +92,8 @@ foreach($parameters as $parameter)
     
     if ( !$parameter->validate() )
     {
-        // In case of missing or validation failed parameters, send a BAD REQUEST
-        header('HTTP/1.1 400 BAD REQUEST');
-
-        die(json_encode(array(
-                "status" => "error",
-                "error"	 => $parameter->getError(),
-                "errorcode" => 100
-        )));   
+        // In case of missing or validation failed parameters, send a BAD REQUEST        
+        die(json_encode( $error_dispatcher->invalidParameter( $parameter->getError())));   
     }
 }
 
@@ -114,7 +105,6 @@ foreach($parameters as $parameter)
     $contests_insert_values[$parameter->getPropertyName()] = $parameter->getValue();        
 }
 
-
 // Populate a new Contests object
 $contest = new Contests($contests_insert_values);
 
@@ -125,15 +115,9 @@ try
     ContestsDAO::save($contest);
     
 }catch(Exception $e)
-{
-    header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-    
-    die(json_encode(array(
-        "status" => "error",
-        "error"	 => "Whops. Ive encoutered an error while writing your session to the database.",
-        "errorcode" => 105
-    )));
-    
+{  
+    // Operation failed in the data layer
+    die(json_encode( $error_dispatcher->invalidDatabaseOperation() ));    
 }
 
 // Happy ending.
