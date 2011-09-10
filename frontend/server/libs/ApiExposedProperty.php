@@ -13,7 +13,7 @@ class ApiExposedProperty
     private $value;
     
     
-    public function ApiExposedProperty($property_name, $isRequiredAsInput, $value, $validators = NULL)
+    public function ApiExposedProperty($property_name, $isRequiredAsInput, &$value, $validators = NULL)
     {        
         $this->validators = $validators;
         $this->property_name = $property_name;
@@ -74,7 +74,8 @@ class ApiExposedProperty
     // Run all registered validators. Returns TRUE if ALL validators registered return true. 
     public function validate()
     {
-        // If the value is required and it's null, return false
+        
+        // If the value is required and it's null, return an error
         if ($this->isRequiredAsInput && is_null($this->value))
         {
             $this->errorMessage = "Required parameter ". $this->property_name ." is missing.";
@@ -84,13 +85,18 @@ class ApiExposedProperty
         // If we don't have validators, assume that data is fine
         if (is_null($this->validators)) return true;
         
-        foreach($this->validators as $v)
+        // Only validate if value is required or is not required and contains some input
+        if( $this->isRequiredAsInput || (!$this->isRequiredAsInput && !is_null($this->value)) )
         {
-            if ( !$v->validate() )
+            foreach($this->validators as $v)
             {
-                // One validator failed, propagate error message
-                $this->errorMessage = "Validation failed for parameter " . $this->property_name . ": ". $v->getError();
-                return false;
+
+                if ( !$v->validate() )
+                {
+                    // One validator failed, propagate error message
+                    $this->errorMessage = "Validation failed for parameter " . $this->property_name . ": ". $v->getError();
+                    return false;
+                }       
             }
         }
         
