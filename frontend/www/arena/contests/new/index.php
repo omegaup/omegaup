@@ -25,6 +25,7 @@ require_once("../../../../server/libs/NumericRangeValidator.php");
 require_once("../../../../server/libs/NumericValidator.php");
 require_once("../../../../server/libs/DateRangeValidator.php");
 require_once("../../../../server/libs/DateValidator.php");
+require_once("../../../../server/libs/EnumValidator.php");
 require_once("../../../../server/libs/ApiHttpErrors.php");
 
 // User ID to verify permisions
@@ -100,13 +101,15 @@ $parameters = array(
         new NumericValidator($_POST["submissions_gap"]),
         new NumericRangeValidator($_POST["submissions_gap"], 0, strtotime($_POST["finish_time"]) - strtotime($_POST["start_time"]) ))),
     
-    new ApiExposedProperty("feedback", true, $_POST["feedback"]),
+    new ApiExposedProperty("feedback", true, $_POST["feedback"], array(
+            new EnumValidator($_POST["feedback"], array("no", "yes", "partial")))),
     
     new ApiExposedProperty("penalty", true, $_POST["penalty"], array(
         new NumericValidator($_POST["penalty"]),
         new NumericRangeValidator($_POST["penalty"], 0, INF ))),
     
-    new ApiExposedProperty("time_start", true, $_POST["time_start"]) 
+    new ApiExposedProperty("time_start", true, $_POST["time_start"], array(
+        new EnumValidator($_POST["time_start"], array("contest", "problem")))) 
     );
   
 
