@@ -45,6 +45,9 @@
    else if(file_exists("../../../../server/config.php")){
     		require_once( "../../../../server/config.php" );
    }
+   else if(file_exists("../../../../../server/config.php")){
+    		require_once( "../../../../../server/config.php" );
+   }
 	/**
 	 *  QUICK FIX
 	 * */	  
