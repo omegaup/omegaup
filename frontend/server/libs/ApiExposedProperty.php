@@ -13,7 +13,7 @@ class ApiExposedProperty
     private $value;
     
     
-    public function ApiExposedProperty($property_name, $isRequiredAsInput, &$value, $validators = NULL)
+    public function ApiExposedProperty($property_name, $isRequiredAsInput, $value, $validators = NULL)
     {        
         $this->validators = $validators;
         $this->property_name = $property_name;
