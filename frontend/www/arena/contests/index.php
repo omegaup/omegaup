@@ -20,106 +20,12 @@
 define("WHOAMI", "API");
 
 require_once("../../../server/inc/bootstrap.php");
+require_once("../../../server/api/ShowContests.php");
+
+
+$apiHandler = new ShowContests();
+$apiHandler->ExecuteApi();
 
 
 
-$user_id = null;
 
-/**
- * Check if they sent me an auth token.
- * @todo auth_token should be get or post in this case ?
- * */
- if( 
-		isset($_REQUEST["auth_token"])
-	)
-	{
-
-		/**
-		 * They sent me an auth token ! Lets look for it.
-		 * */
-		$token = AuthTokensDAO::getByPK( $_POST["auth_token"] );
-
-		if($token !== null){
-			/**
-			  *
-			  * Found it !
-			  * */
-			$user_id = $token->getUserId();
-			
-		}else{
-			/**
-			  *
-			  * They have supplied an invalid token !
-			  * */
-			header('HTTP/1.1 400 BAD REQUEST');
-
-			die(json_encode(array(
-				"status" => "error",
-				"error"	 => "You supplied an invalid auth token, or maybe it expired.",
-				"errorcode" => 500
-			)));
-			
-		}
-
-	}
-
-
-
-/**
- * Ok, now let get them' contests !
- * 
- * */
-// Create array of relevant columns
-$relevant_columns = array("contest_id", "title", "description", "start_time", "finish_time", "public", "token", "director_id");
-
-// Get all contests using only relevan columns
-$contests = ContestsDAO::getAll( NULL, NULL, 'contest_id', "DESC", $relevant_columns );
-
-$contest_to_show = array();
-
-/**
- * Ok, lets go 1 by 1, and if its public, show it,
- * if its not, check if the user has access to it.
- * */
-foreach( $contests as $c ){
-
-	if(sizeof($contest_to_show) == 10)
-		break;
-
-	if($c->getPublic()){
-		array_push( $contest_to_show, $c->asFilteredArray($relevant_columns) );
-		continue;
-	}
-	
-	/*
-	 * Ok, its not public, lets se if we have a 
-	 * valid user
-	 * */
-	if($user_id === null)
-		continue;
-	
-	/**
-	 * Ok, i have a user. Can he see this contest ?
-	 * */
-	$r = ContestsUsersDAO::getByPK( $user_id, $c->getContestId()  );
-	
-	if( $r === null ){
-		/**
-		 * Nope, he cant .
-		 * */
-		continue;
-	}
-	
-	/**
-	 * He can see it !
-	 * 
-	 * */
-	array_push( $contest_to_show, $c->asFilteredArray($relevant_columns) );
-}
-
-
-
-die(json_encode(array(
-	"status" => "ok",
-	"contests" => $contest_to_show
-)));
