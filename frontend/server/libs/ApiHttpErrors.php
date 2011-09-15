@@ -68,6 +68,22 @@ class ApiHttpErrors
     }
     
     // Sets the HTTP header and returns an array with error info
+    public function invalidFilesystemOperation($message = NULL)
+    {
+        // We have an invalid auth token. Dying.
+        header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+        
+        if ($message === NULL)
+        {
+            $message = "Whops. Ive encoutered an unspecified error. Please try again";
+        }
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 104 );
+    }    
+    
+    // Sets the HTTP header and returns an array with error info
     public function invalidDatabaseOperation($message = NULL)
     {
         // We have an invalid auth token. Dying.
@@ -75,13 +91,13 @@ class ApiHttpErrors
         
         if ($message === NULL)
         {
-            $message = "Whops. Ive encoutered an error while writing your session to the database.";
+            $message = "Whops. Ive encoutered an internal error error Please try again.";
         }
         
         return array("status" => "error",
                      "error"	 => $message,
                      "errorcode" => 105 );
-    }    
+    } 
     
 }
 

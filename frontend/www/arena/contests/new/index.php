@@ -53,6 +53,12 @@ $error_dispatcher = ApiHttpErrors::getInstance();
         }
 
     }
+  else
+  {
+      // Login is required
+      die(json_encode( $error_dispatcher->invalidAuthToken() ));
+      
+  }
 
 // @TODO Validate if the user has admin or judge roles
 
