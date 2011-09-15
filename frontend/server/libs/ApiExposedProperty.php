@@ -57,8 +57,8 @@ class ApiExposedProperty
     }
     
     public function setValue($value)
-    {
-        $this->value = $value;
+    {       
+        $this->value = $value;       
     }
     
     public function getValue()
