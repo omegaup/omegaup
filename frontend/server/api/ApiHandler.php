@@ -82,6 +82,9 @@ abstract class ApiHandler
     protected function ValidateRequest()
     {
      
+        // If we didn't get any request, asume everything is OK.
+        if(is_null($this->request)) return;
+        
         // Validate all data 
         foreach($this->request as $parameter)
         {
