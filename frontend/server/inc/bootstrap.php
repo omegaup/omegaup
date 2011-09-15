@@ -33,21 +33,11 @@
 	/**
 	 *  QUICK FIX
 	 * */
-	if( file_exists("../server/config.php") ) {
-    		require_once( "../server/config.php" );
 
-   }else if(file_exists("../../server/config.php")){
-    		require_once( "../../server/config.php" );
+   // Loads config
+   define('SERVER_PATH', dirname(__DIR__));      
+   require_once(SERVER_PATH."/config.php");
 
-   }else if(file_exists("../../../server/config.php")){
-    		require_once( "../../../server/config.php" );
-   }
-   else if(file_exists("../../../../server/config.php")){
-    		require_once( "../../../../server/config.php" );
-   }
-   else if(file_exists("../../../../../server/config.php")){
-    		require_once( "../../../../../server/config.php" );
-   }
 	/**
 	 *  QUICK FIX
 	 * */	  
@@ -63,6 +53,7 @@
 		require_once('adodb5/adodb.inc.php');
 		require_once('adodb5/adodb-exceptions.inc.php');
 		require_once('dao/model.inc.php');
+                if(file_exists('dao/model.inc.php')) echo "exists!";
 		$conn = null;
 
 		try{
