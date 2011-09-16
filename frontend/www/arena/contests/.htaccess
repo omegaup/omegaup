@@ -1,0 +1,19 @@
+# i guess this could be done more elegantly -alan
+
+RewriteEngine on
+
+Options +FollowSymlinks
+
+#	para ver el contest 
+#	arena/contest/:id/
+RewriteRule ^([0-9]*)/$ _id_/?contest_id=$1
+
+#	para ver un problema de un contest
+#	arena/contests/:id/problem/:id/
+RewriteRule ^([0-9]*)/problem/([0-9]*)/$ _id_/problem/?contest_id=$1&problem_id=$2
+
+#	para ver hacer un nuevo probmea en un contest
+# 	arena/contests/:id/problem/new/
+RewriteRule ^([0-9]*)/problem/new/$ _id_/problem/new/?contest_id=$1
+
+
