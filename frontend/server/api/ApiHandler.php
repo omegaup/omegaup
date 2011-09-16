@@ -1,8 +1,6 @@
 <?php
 
 
-if (!defined(SERVER_PATH)) { define("SERVER_PATH", dirname(__DIR__)); }
-
 require_once(SERVER_PATH ."/libs/ApiExposedProperty.php");
 require_once(SERVER_PATH ."/libs/ApiHttpErrors.php");
 
