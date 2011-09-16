@@ -33,6 +33,9 @@ abstract class ApiHandler
     
     // Holder of error dispatcher
     protected $error_dispatcher;
+    
+    // Holder of auth token
+    protected $auth_token;
      
     public function __construct() 
     {        
@@ -50,13 +53,13 @@ abstract class ApiHandler
         {
 
             // Find out the token
-            $token = AuthTokensDAO::getByPK( $_POST["auth_token"] );
+            $this->auth_token = AuthTokensDAO::getByPK( $_POST["auth_token"] );
 
-            if($token !== null)
+            if($this->auth_token !== null)
             {
 
                 // Get the user_id from the auth token    
-                $this->user_id = $token->getUserId();         
+                $this->user_id = $this->auth_token->getUserId();         
 
             }
             else
