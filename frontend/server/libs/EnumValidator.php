@@ -4,7 +4,7 @@
  *  Enum Validator
  * 
  */
-require_once("validator.php");
+require_once("Validator.php");
 
 class EnumValidator extends Validator
 {
