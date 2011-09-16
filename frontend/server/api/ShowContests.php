@@ -34,17 +34,9 @@ class ShowContests extends ApiHandler {
                  * */
                 $this->user_id = $token->getUserId();
             } else {
-                /**
-                 *
-                 * They have supplied an invalid token !
-                 * */
-                header('HTTP/1.1 400 BAD REQUEST');
-
-                die(json_encode(array(
-                            "status" => "error",
-                            "error" => "You supplied an invalid auth token, or maybe it expired.",
-                            "errorcode" => 500
-                        )));
+                
+                // We have an invalid auth token. Dying.            
+                die(json_encode( $this->error_dispatcher->invalidAuthToken() ));
             }
         }
     }
