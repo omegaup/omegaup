@@ -4,7 +4,7 @@
  *  String Validator
  * 
  */
-require_once("validator.php");
+require_once("Validator.php");
 
 class StringValidator extends Validator
 {
