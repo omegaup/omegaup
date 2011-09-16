@@ -5,7 +5,7 @@
  * 
  */
 
-require_once("validator.php");
+require_once("Validator.php");
 
 class NumericValidator extends Validator
 {
