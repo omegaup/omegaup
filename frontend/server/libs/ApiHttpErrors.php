@@ -99,6 +99,41 @@ class ApiHttpErrors
                      "errorcode" => 105 );
     } 
     
+    // Sets the HTTP header and returns an array with error info
+    public function invalidCredentials($message = NULL)
+    {
+        // We have an invalid auth token. Dying.
+        header('HTTP/1.1 400 BAD REQUEST');
+        
+        if ($message === NULL)
+        {
+            $message = "Username or password is wrong. Please check your credentials";
+        }
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 101 );
+    }
+    
+    // Sets the HTTP header and returns an array with error info
+    public function registeredViaThirdPartyNotSupported($message = NULL)
+    {
+        // We have an invalid auth token. Dying.
+        header('HTTP/1.1 400 BAD REQUEST');
+        
+        if ($message === NULL)
+        {
+            $message = "It seems you have registered via a third party (Google, Facebook, etc). To use this API you must first create an omegaup.com password.";
+        }
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 102 );
+    }
+    
+    
+    
+    
 }
 
 ?>

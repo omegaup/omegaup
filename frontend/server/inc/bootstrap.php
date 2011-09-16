@@ -87,7 +87,7 @@
 			)));
 
 		}
-		
+		$GLOBALS["conn"] = $conn;
 		return;
 	}
 		
