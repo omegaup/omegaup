@@ -2,18 +2,17 @@
 
 /**
  * 
- * Please read full (and updated) documentation at: 
- * https://github.com/omegaup/omegaup/wiki/Arena 
+ * 
+ * 
  *
  *
  * 
- * POST /contests/:id:/problem/new
- * Si el usuario tiene permisos de juez o admin, crea un nuevo problema para el concurso :id
- *
+  *
  * */
 require_once("ApiHandler.php");
 
 class Login extends ApiHandler {
+
 
     protected function CheckAuthorization() {
        
@@ -21,14 +20,23 @@ class Login extends ApiHandler {
         return true;
     }
 
+
+
+
     protected function ProcessRequest() {
         
+        
+        // must check the indexes exists before using them !
+        $username = isset($_POST["username"]) ? $_POST["username"]  : null;
+        $password = isset($_POST["password"]) ? $_POST["password"]  : null;
+        
+
         $this->request = array(
-          new ApiExposedProperty("username", true, $_POST["username"], array(
-              new StringValidator($_POST["username"])
+          new ApiExposedProperty("username", true, $username, array(
+              new StringValidator($username)
           )),
-          new ApiExposedProperty("password", true, $_POST["password"], array(
-              new StringValidator($_POST["password"])
+          new ApiExposedProperty("password", true, $password, array(
+              new StringValidator($password)
           ))  
         );
                
@@ -39,11 +47,7 @@ class Login extends ApiHandler {
         // Save USERNAME and PASSWORD in proper constants
         define("USERNAME", $_POST["username"] );
         define("PASSWORD", $_POST["password"] );
-        
-        // Ready to roll! Bootstrap
-        define("WHOAMI", "API");
-        require_once(dirname(__DIR__)."/inc/bootstrap.php");
-        
+
         
         /**
          * Lets look for this user in the user table.
@@ -83,7 +87,7 @@ class Login extends ApiHandler {
                          * He is not in the users, nor the emails list.
                          * Lets go ahead and tell him.
                          * */
-
+                        
                         die(json_encode($this->error_dispatcher->invalidCredentials()));
                 }
         }

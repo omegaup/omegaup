@@ -40,6 +40,7 @@ class ApiHttpErrors
     {
         // We have an invalid auth token. Dying.
         header('HTTP/1.1 401 FORBIDDEN');
+        header('Content-Type: application/json');
         
         if ($message === NULL)
         {
@@ -56,7 +57,8 @@ class ApiHttpErrors
     {
         // We have an invalid auth token. Dying.
         header('HTTP/1.1 400 BAD REQUEST');
-        
+        header('Content-Type: application/json');
+
         if ($message === NULL)
         {
             $message = "You supplied an invalid value for a parameter.";
@@ -72,7 +74,8 @@ class ApiHttpErrors
     {
         // We have an invalid auth token. Dying.
         header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-        
+        header('Content-Type: application/json');
+
         if ($message === NULL)
         {
             $message = "Whops. Ive encoutered an unspecified error. Please try again";
@@ -88,7 +91,8 @@ class ApiHttpErrors
     {
         // We have an invalid auth token. Dying.
         header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-        
+        header('Content-Type: application/json');
+
         if ($message === NULL)
         {
             $message = "Whops. Ive encoutered an internal error error Please try again.";
@@ -103,8 +107,9 @@ class ApiHttpErrors
     public function invalidCredentials($message = NULL)
     {
         // We have an invalid auth token. Dying.
-        header('HTTP/1.1 400 BAD REQUEST');
-        
+        header('HTTP/1.1 403 FORBIDDEN');
+        header('Content-Type: application/json');
+
         if ($message === NULL)
         {
             $message = "Username or password is wrong. Please check your credentials";
@@ -120,7 +125,8 @@ class ApiHttpErrors
     {
         // We have an invalid auth token. Dying.
         header('HTTP/1.1 400 BAD REQUEST');
-        
+        header('Content-Type: application/json');
+
         if ($message === NULL)
         {
             $message = "It seems you have registered via a third party (Google, Facebook, etc). To use this API you must first create an omegaup.com password.";
