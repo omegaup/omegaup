@@ -12,7 +12,9 @@
  *
  * */
 
-// Login will load bootstrap as needed
+
+define("WHOAMI", "API");
+require_once("../../../server/inc/bootstrap.php");
 require_once("../../../server/api/Login.php");
 
 $apiHandler = new Login();
