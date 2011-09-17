@@ -8,22 +8,20 @@ require_once("Validator.php");
 
 class HtmlValidator extends Validator
 {
-    // Reference to string
-    private $str;
-    
+        
     // Save the reference
-    public function HtmlValidator( &$string_ref )
+    public function HtmlValidator( )
     {
-        $this->str = $string_ref;
+        
         Validator::Validator();
     }
 
     
-    public function validate()
+    public function validate($string)
     {
 
-      //@TODO Copied from http://stackoverflow.com/questions/3167074/which-function-in-php-validate-if-the-string-is-valid-html
-      // Need to test thoroughly  
+      // Copied from http://stackoverflow.com/questions/3167074/which-function-in-php-validate-if-the-string-is-valid-html
+      
       $start =strpos($string, '<');
       $end  =strrpos($string, '>',$start);
       if ($end !== false) {
@@ -35,10 +33,25 @@ class HtmlValidator extends Validator
       libxml_clear_errors();
       $xml = simplexml_load_string($string);
 
-      return count(libxml_get_errors())==0;
-
+      $xmlerrors = libxml_get_errors(); 
+      
+      if( count($xmlerrors) !==0 )
+      {
+          foreach($xmlerrors as $xmlerror)
+          {
+            $this->setError($xmlerror->message); 
+          }
+              
+          return false;
+      }
+      else 
+      {
+          return true;
+      }
         
     }
+    
+
 }
 
 ?>

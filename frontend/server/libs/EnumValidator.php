@@ -8,25 +8,23 @@ require_once("Validator.php");
 
 class EnumValidator extends Validator
 {
-    // Reference to string
-    private $str;
+    
     private $enum;
     
     // Save the reference
-    public function EnumValidator( &$string_ref, $enum_array )
-    {
-        $this->str = $string_ref;
+    public function EnumValidator($enum_array )
+    {        
         $this->enum = $enum_array;
         Validator::Validator();
     }
 
     
-    public function validate()
+    public function validate($value)
     {
         // Validate that string is inside the options
         foreach($this->enum as $option)
         {
-            if ( $this->str === $option)
+            if ( $value === $option)
             {                
                 // Validation passed
                 return true;
