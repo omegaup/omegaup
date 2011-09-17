@@ -9,25 +9,24 @@ require_once("Validator.php");
 
 class DateRangeValidator extends Validator
 {
-    // Reference to string
-    private $targetDate;
+    
     private $startDate;
     private $finishDate;
     
     // Save the reference
-    public function DateRangeValidator( &$targetDate, &$startDate, &$finishDate )
+    public function DateRangeValidator( $startDate, $finishDate )
     {
-        $this->targetDate = $targetDate;
+        
         $this->startDate = $startDate;
         $this->finishDate = $finishDate;
         Validator::Validator();
     }
 
     
-    public function validate()
+    public function validate($targetDate)
     {
         // Validate that is target date is inside the range
-        if ( ! (strtotime($this->targetDate) >= strtotime($this->startDate) && strtotime($this->targetDate) <= strtotime($this->finishDate)))
+        if ( ! (strtotime($targetDate) >= strtotime($this->startDate) && strtotime($targetDate) <= strtotime($this->finishDate)))
         {
             $this->setError("Date is outside the range.");
             return false;

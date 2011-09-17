@@ -24,19 +24,14 @@ class Login extends ApiHandler {
 
 
     protected function ProcessRequest() {
-        
-        
-        // must check the indexes exists before using them !
-        $username = isset($_POST["username"]) ? $_POST["username"]  : null;
-        $password = isset($_POST["password"]) ? $_POST["password"]  : null;
-        
+                
 
         $this->request = array(
-          new ApiExposedProperty("username", true, $username, array(
-              new StringValidator($username)
+          new ApiExposedProperty("username", true, POST, array(
+              new StringValidator()
           )),
-          new ApiExposedProperty("password", true, $password, array(
-              new StringValidator($password)
+          new ApiExposedProperty("password", true, POST, array(
+              new StringValidator()
           ))  
         );
                

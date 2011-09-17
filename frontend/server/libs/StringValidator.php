@@ -8,21 +8,18 @@ require_once("Validator.php");
 
 class StringValidator extends Validator
 {
-    // Reference to string
-    private $str;
-    
+        
     // Save the reference
-    public function StringValidator( &$string_ref )
-    {
-        $this->str = $string_ref;
+    public function StringValidator( )
+    {        
         Validator::Validator();
     }
 
     
-    public function validate()
+    public function validate($value)
     {
         // Validate that is not empty
-        if ( $this->str == "")
+        if ( $value === "")
         {
             $this->setError("String cannot be empty.");
             return false;

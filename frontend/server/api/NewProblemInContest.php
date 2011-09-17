@@ -21,9 +21,9 @@ class NewProblemInContest extends ApiHandler
     {        
         // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE
         $this->request = array(
-            new ApiExposedProperty("contest_id", true, $_GET["contest_id"], array(
-                new NumericValidator($_GET["contest_id"]),
-                new CustomValidator($_GET["contest_id"], function ($value)
+            new ApiExposedProperty("contest_id", true, GET, array(
+                new NumericValidator(),
+                new CustomValidator( function ($value)
                         {
                             // Check if the contest exists
                             return ContestsDAO::getByPK($value);
@@ -34,23 +34,23 @@ class NewProblemInContest extends ApiHandler
 
             new ApiExposedProperty("author_id", true, $this->user_id),
 
-            new ApiExposedProperty("title", true, $_POST["title"], array(
-                new StringValidator($_POST["title"]))),
+            new ApiExposedProperty("title", true, POST, array(
+                new StringValidator())),
 
-            new ApiExposedProperty("alias", false, is_null($_POST["alias"]) ? substr($_POST["title"], 0, 10) : $_POST["alias"] ),
+            new ApiExposedProperty("alias", false, POST),
 
-            new ApiExposedProperty("validator", true, $_POST["validator"], array(
-                new EnumValidator($_POST["validator"], array("remote", "literal", "token", "token-caseless", "token-numeric"))
+            new ApiExposedProperty("validator", true, POST, array(
+                new EnumValidator(array("remote", "literal", "token", "token-caseless", "token-numeric"))
             )),
 
-            new ApiExposedProperty("time_limit", true, (int)$_POST["time_limit"], array(
-                new NumericValidator($_POST["time_limit"]),
-                new NumericRangeValidator($_POST["time_limit"], 0, INF)
+            new ApiExposedProperty("time_limit", true, POST, array(
+                new NumericValidator(),
+                new NumericRangeValidator(0, INF)
             )),
 
-            new ApiExposedProperty("memory_limit", true, $_POST["memory_limit"], array(
-                new NumericValidator($_POST["memory_limit"]),
-                new NumericRangeValidator($_POST["memory_limit"], 0, INF)
+            new ApiExposedProperty("memory_limit", true, POST, array(
+                new NumericValidator(),
+                new NumericRangeValidator(0, INF)
             )),
 
             new ApiExposedProperty("visits", true, 0),
@@ -58,17 +58,17 @@ class NewProblemInContest extends ApiHandler
             new ApiExposedProperty("accepted", true, 0),
             new ApiExposedProperty("difficulty", true, 0),
 
-            new ApiExposedProperty("source", true, $_POST["source"], array(
-                new HtmlValidator($_POST["source"])
+            new ApiExposedProperty("source", true, POST, array(
+                new HtmlValidator()
             )),
 
-            new ApiExposedProperty("order", true, $_POST["order"], array(
-                new EnumValidator($_POST["order"], array("normal", "inverse"))
+            new ApiExposedProperty("order", true, POST, array(
+                new EnumValidator(array("normal", "inverse"))
             )),
 
-            new ApiExposedProperty("points", true, $_POST["points"], array(
-                new NumericValidator($_POST["points"]),
-                new NumericRangeValidator($_POST["points"], 0, INF)
+            new ApiExposedProperty("points", true, POST, array(
+                new NumericValidator(),
+                new NumericRangeValidator(0, INF)
             ))
         );
         

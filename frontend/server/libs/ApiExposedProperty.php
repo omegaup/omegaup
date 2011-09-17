@@ -12,13 +12,22 @@ class ApiExposedProperty
     private $errorMessage;
     private $value;
     
-    
+    /*
     public function ApiExposedProperty($property_name, $isRequiredAsInput, $value, $validators = NULL)
     {        
         $this->validators = $validators;
         $this->property_name = $property_name;
         $this->isRequiredAsInput = $isRequiredAsInput;
         $this->value = $value;
+    }
+    */
+    public function ApiExposedProperty($property_name, $isRequiredAsInput, $valueOrSource, $validators = NULL )
+    {
+        
+        $this->validators = $validators;
+        $this->property_name = $property_name;
+        $this->isRequiredAsInput = $isRequiredAsInput;
+        $this->value = $valueOrSource;        
     }
     
     public function setPropertyName($name)
@@ -62,7 +71,16 @@ class ApiExposedProperty
     }
     
     public function getValue()
-    {        
+    {   
+        if ($this->value === POST)
+        {
+            $this->value = isset($_POST[$this->property_name]) ? $_POST[$this->property_name] : null ;            
+        }
+        else if($this->value === GET)
+        {
+            $this->value = isset($_GET[$this->property_name]) ? $_GET[$this->property_name] : null ;            
+        }
+        
         return $this->value;
     }
     
@@ -76,7 +94,7 @@ class ApiExposedProperty
     {
         
         // If the value is required and it's null, return an error
-        if ($this->isRequiredAsInput && is_null($this->value))
+        if ($this->isRequiredAsInput && is_null($this->getValue())  )
         {
             $this->errorMessage = "Required parameter ". $this->property_name ." is missing.";
             return false;
@@ -86,12 +104,12 @@ class ApiExposedProperty
         if (is_null($this->validators)) return true;
         
         // Only validate if value is required or is not required and contains some input
-        if( $this->isRequiredAsInput || (!$this->isRequiredAsInput && !is_null($this->value)) )
+        if( $this->isRequiredAsInput || (!$this->isRequiredAsInput && !is_null($this->getValue())) )
         {
             foreach($this->validators as $v)
             {
 
-                if ( !$v->validate() )
+                if ( !$v->validate($this->getValue()) )
                 {
                     // One validator failed, propagate error message
                     $this->errorMessage = "Validation failed for parameter " . $this->property_name . ": ". $v->getError();

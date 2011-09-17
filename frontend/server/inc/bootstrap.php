@@ -35,12 +35,16 @@
 	 * */
 
    // Loads config
-   define('SERVER_PATH', dirname(__DIR__));      
-
+   define('SERVER_PATH', dirname(__DIR__));     
    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
 
    require_once(SERVER_PATH."/config.php");
 
+   // Define POST and GET constants for simplicity
+   define('POST', "__ISPOST__");
+   define('GET', "__ISGET__");
+   
+   
 	/**
 	 *  QUICK FIX
 	 * */	  

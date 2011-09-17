@@ -16,7 +16,7 @@ abstract class Validator
     }
     
     // Each validator should implement validate
-    abstract public function validate();
+    abstract public function validate($value);
     
     // Add an error message 
     public function setError($msg)
