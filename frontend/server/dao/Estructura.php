@@ -117,7 +117,7 @@
                   *     definidos en $filter 
 	          *	
 	          * Este metodo transforma todas las propiedades este objeto en un arreglo asociativo
-                  * sin mostrar los campos NULL.
+                  * sólo mostrando los campos definidos por filters
 	          *	
 	          * @returns Array Un arreglo filtrado asociativo que describe a este objeto.
 	          **/   
@@ -132,7 +132,14 @@
                             foreach( $filters as $filter )
                             {                                
                                 // Only return properties included in $filters array
-                                $returnArray[$filter] = $completeArray[$filter];                                
+                                if (isset ($completeArray[$filter]))
+                                {
+                                    $returnArray[$filter] = $completeArray[$filter];                                
+                                }
+                                else
+                                {
+                                    $returnArray[$filter] = NULL;
+                                }
                             }
                             
                             return $returnArray;
