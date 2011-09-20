@@ -40,6 +40,9 @@ abstract class ApiHandler
         
         // Get an error dispatcher
         $this->error_dispatcher = ApiHttpErrors::getInstance();
+        
+        // Declare response as an array
+        $this->response = array();
     }
     
     protected function CheckAuthorization()

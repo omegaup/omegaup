@@ -121,6 +121,23 @@ class ApiHttpErrors
     }
     
     // Sets the HTTP header and returns an array with error info
+    public function forbiddenSite($message = NULL)
+    {
+        // We have an invalid auth token. Dying.
+        header('HTTP/1.1 403 FORBIDDEN');
+        header('Content-Type: application/json');
+
+        if ($message === NULL)
+        {
+            $message = "User is not allowed to view this content.";
+        }
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 106 );
+    }
+    
+    // Sets the HTTP header and returns an array with error info
     public function registeredViaThirdPartyNotSupported($message = NULL)
     {
         // We have an invalid auth token. Dying.
@@ -137,6 +154,21 @@ class ApiHttpErrors
                      "errorcode" => 102 );
     }
     
+    public function notFound($message = NULL)
+    {
+        // We have an invalid auth token. Dying.
+        header('HTTP/1.1 404 NOT FOUND');
+        header('Content-Type: application/json');
+
+        if ($message === NULL)
+        {
+            $message = "Site requested not found";
+        }
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 107 );
+    }
     
     
     
