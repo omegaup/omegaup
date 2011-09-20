@@ -43,6 +43,9 @@ abstract class ApiHandler
         
         // Declare response as an array
         $this->response = array();
+        
+        // Set JSON as output
+        header('Content-Type: application/json');
     }
     
     protected function CheckAuthorization()
@@ -120,9 +123,11 @@ abstract class ApiHandler
         // Process input
         $this->ProcessRequest();       
         $this->ValidateRequest();
-        
-        // Send output
+                        
+        // Generate output
         $this->GenerateResponse();
+        
+        // Send output        
         $this->SendResponse();        
     }
 }

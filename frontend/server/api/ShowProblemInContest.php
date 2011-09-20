@@ -21,10 +21,22 @@ class ShowProblemInContest extends ApiHandler
     {
         $this->request = array(
             "contest_id" => new ApiExposedProperty("contest_id", true, GET, array(
-                new NumericValidator()
+                new NumericValidator(),                
+                new CustomValidator( 
+                    function ($value)
+                    {
+                        // Check if the contest exists
+                        return ContestsDAO::getByPK($value);
+                    }) 
             )),
             "problem_id" => new ApiExposedProperty("problem_id", true, GET, array(
-                new NumericValidator()
+                new NumericValidator(),
+                new CustomValidator( 
+                    function ($value)
+                    {
+                        // Check if the problem exists
+                        return ProblemsDAO::getByPK($value);
+                    }) 
             ))                        
         );
                 
@@ -71,12 +83,26 @@ class ShowProblemInContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));        
+            die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));        
         
         }
         
+        // Read the file that contains the source
+        $source_path = dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'problems'.DIRECTORY_SEPARATOR.$problem->getSource();
+        
+        if(file_exists($source_path))
+        {
+            $file_handle = fopen($source_path, 'r');
+            $problem->setSource( fread($file_handle, filesize($source_path)));
+            
+        }
+        else
+        {
+           die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));                    
+        }
+        
         // Add the problem the response
-        array_push($this->response, $problem->asFilteredArray($relevant_columns));               
+        $this->response = $problem->asFilteredArray($relevant_columns);               
      
         
         // Create array of relevant columns
