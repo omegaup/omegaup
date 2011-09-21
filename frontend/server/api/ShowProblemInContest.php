@@ -139,6 +139,28 @@ class ShowProblemInContest extends ApiHandler
         // Add the procesed runs to the request
         $this->response["runs"] = $runs_filtered_array;
         
+        // As last step, register the problem as opened                
+        if (! ContestProblemOpenedDAO::getByPK($this->request["contest_id"]->getValue(), $this->request["problem_id"]->getValue(), $this->user_id ))
+        {
+            //Create temp object
+            $keyContestProblemOpened = new ContestProblemOpened( array( 
+                "contest_id" =>   $this->request["contest_id"]->getValue(),
+                "problem_id" =>   $this->request["problem_id"]->getValue(),
+                "user_id" => $this->user_id            
+            ));
+            
+            try
+            {
+                // Save object in the DB
+                ContestProblemOpenedDAO::save($keyContestProblemOpened);
+                
+            }catch (Exception $e)
+            {
+                // Operation failed in the data layer
+                die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));        
+            }                        
+        }
+        
     }
     
     protected function SendResponse() 
