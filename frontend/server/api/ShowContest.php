@@ -41,7 +41,7 @@ class ShowContest extends ApiHandler
         // If the contest is private, verify that our user is invited                
         $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());                
                 
-        if ($contest->getPublic() === 0)
+        if ($contest->getPublic() === '0')
         {        
             if (is_null(ContestsUsersDAO::getByPK($this->user_id, $this->request["contest_id"]->getValue())))
             {
