@@ -32,7 +32,15 @@ class NewProblemInContest extends ApiHandler
 
             new ApiExposedProperty("public", false, FALSE), // All problems created through this API will be private at their creation 
 
-            new ApiExposedProperty("author_id", true, $this->user_id),
+            // Author may not necesarly be the person who submits the problem
+            new ApiExposedProperty("author_id", true, POST, array(
+                new NumericValidator(),
+                new CustomValidator( function ($value)
+                        {
+                            // Check if the contest exists
+                            return UsersDAO::getByPK($value);
+                        })                
+            )),
 
             new ApiExposedProperty("title", true, POST, array(
                 new StringValidator())),
