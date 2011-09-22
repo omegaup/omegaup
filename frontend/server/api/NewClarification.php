@@ -60,6 +60,7 @@ class NewClarification extends ApiHandler
             "contest_id" => $this->request["contest_id"]->getValue(),
             "problem_id" => $this->request["problem_id"]->getValue(),
             "message" => $this->request["message"]->getValue(),
+            "public" => '0'
         ));
 
         // Insert new Clarification
