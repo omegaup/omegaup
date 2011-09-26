@@ -116,7 +116,8 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `submissions_gap` int(11) NOT NULL DEFAULT '1' COMMENT 'Tiempo mÃ­nimo en segundos que debe de esperar un usuario despues de realizar un envÃ­o para hacer otro',
   `feedback` enum('no','yes','partial') NOT NULL,
   `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el nÃºmero de minutos con que se penaliza por recibir un no-accepted',
-  `time_start` enum('contest','problem') NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
+  `penalty_time_start` enum('contest','problem', 'none') NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
+  `penalty_calc_policy` enum('sum', 'max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
   PRIMARY KEY (`contest_id`),
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`)
