@@ -81,8 +81,8 @@ class NewContest extends ApiHandler
                 new NumericValidator(),
                 new NumericRangeValidator(0, INF ))),
 
-            new ApiExposedProperty("time_start", true, POST, array(
-                new EnumValidator(array("contest", "problem")))),
+            new ApiExposedProperty("penalty_time_start", true, POST, array(
+                new EnumValidator(array("contest", "problem", "none")))),
             
             "private_users" => new ApiExposedProperty("private_users", false, POST)
             );
