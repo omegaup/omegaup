@@ -139,9 +139,12 @@ abstract class RunsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Runs , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Runs , $orderBy = null, $orden = 'ASC', $columnas = NULL)
 	{
-		$sql = "SELECT * from Runs WHERE ("; 
+                // Implode array of columns to a coma-separated string               
+                $columns_str = is_null($columnas) ? "*" : implode(",", $columnas);
+            
+		$sql = "SELECT ".$columns_str."  from Runs WHERE ("; 
 		$val = array();
 		if( $Runs->getRunId() != NULL){
 			$sql .= " run_id = ? AND";
@@ -229,14 +232,165 @@ abstract class RunsDAOBase extends DAO
 		}
 		return $ar;
 	}
+        
+        /*
+         *  SELECT DISTINCT
+         * 
+         */        
+        public static final function distinct($Runs, $orderBy = null, $orden = 'ASC', $columns = NULL )
+        {                        
+            
+            // Implode array of columns to a coma-separated string               
+            $columns_str = is_null($columns) ? "*" : implode(",", $columns);
+            
+            // Build SQL statement
+            $sql = "SELECT DISTINCT ".$columns_str." from Runs WHERE (";
+            
+            
+            // Add WHERE part
+            $val = array();
+            if( $Runs->getRunId() != NULL){
+                    $sql .= " run_id = ? AND";
+                    array_push( $val, $Runs->getRunId() );
+            }
 
+            if( $Runs->getUserId() != NULL){
+                    $sql .= " user_id = ? AND";
+                    array_push( $val, $Runs->getUserId() );
+            }
+
+            if( $Runs->getProblemId() != NULL){
+                    $sql .= " problem_id = ? AND";
+                    array_push( $val, $Runs->getProblemId() );
+            }
+
+            if( $Runs->getContestId() != NULL){
+                    $sql .= " contest_id = ? AND";
+                    array_push( $val, $Runs->getContestId() );
+            }
+
+            if( $Runs->getGuid() != NULL){
+                    $sql .= " guid = ? AND";
+                    array_push( $val, $Runs->getGuid() );
+            }
+
+            if( $Runs->getLanguage() != NULL){
+                    $sql .= " language = ? AND";
+                    array_push( $val, $Runs->getLanguage() );
+            }
+
+            if( $Runs->getStatus() != NULL){
+                    $sql .= " status = ? AND";
+                    array_push( $val, $Runs->getStatus() );
+            }
+
+            if( $Runs->getVeredict() != NULL){
+                    $sql .= " veredict = ? AND";
+                    array_push( $val, $Runs->getVeredict() );
+            }
+
+            if( $Runs->getRuntime() != NULL){
+                    $sql .= " runtime = ? AND";
+                    array_push( $val, $Runs->getRuntime() );
+            }
+
+            if( $Runs->getMemory() != NULL){
+                    $sql .= " memory = ? AND";
+                    array_push( $val, $Runs->getMemory() );
+            }
+
+            if( $Runs->getScore() != NULL){
+                    $sql .= " score = ? AND";
+                    array_push( $val, $Runs->getScore() );
+            }
+
+            if( $Runs->getContestScore() != NULL){
+                    $sql .= " contest_score = ? AND";
+                    array_push( $val, $Runs->getContestScore() );
+            }
+
+            if( $Runs->getIp() != NULL){
+                    $sql .= " ip = ? AND";
+                    array_push( $val, $Runs->getIp() );
+            }
+
+            if( $Runs->getTime() != NULL){
+                    $sql .= " time = ? AND";
+                    array_push( $val, $Runs->getTime() );
+            }
+
+            if(sizeof($val) == 0){return array();}
+            $sql = substr($sql, 0, -3) . " )";
+            if( $orderBy !== null ){
+                $sql .= " order by " . $orderBy . " " . $orden ;
+
+            }
+            
+            global $conn;
+            $rs = $conn->Execute($sql, $val);
+            
+            $ar = array();
+            foreach ($rs as $foo) {
+                    $bar =  new Runs($foo);
+            array_push( $ar,$bar);
+            }
+            
+            return $ar;
+            
+        }
+        
+        /*
+         *  GetAllRelevantUsers
+         * 
+         */
+        public static final function GetAllRelevantUsers($contest_id)
+        {
+            // Build SQL statement
+            $sql = "SELECT Users.user_id, username from Users INNER JOIN ( SELECT DISTINCT Runs.user_id from Runs WHERE ( Runs.contest_id = ? AND Runs.status = 'ready'  ) ) RunsContests ON Users.user_id = RunsContests.user_id ";
+            $val = array($contest_id);
+            
+            global $conn;
+            $rs = $conn->Execute($sql, $val);
+            
+            $ar = array();
+            foreach ($rs as $foo) {
+                    $bar =  new Users($foo);
+            array_push( $ar,$bar);
+            }
+            
+            return $ar;
+            
+            
+        }
+        
+        /*
+         * 
+         * Get best run of a user
+         * 
+         */
+        public static final function GetBestRun($contest_id, $problem_id, $user_id)
+        {
+            //Build SQL statement
+            $sql = "SELECT contest_score, submit_delay from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
+            $val = array($user_id, $contest_id, $problem_id);
+            
+            global $conn;
+            $rs = $conn->GetRow($sql, $val);            
+            
+            $bar =  new Runs($rs);
+            
+            return $bar;
+            
+        }
+        
+        
 
 	/**
 	  *	Actualizar registros.
 	  *	
 	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
 	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
+	  * aqui, sin embargo. El valor de retorno indica cuï¿½ntas filas se vieron afectadas.
 	  *	
 	  * @internal private information for advanced developers only
 	  * @return Filas afectadas o un string con la descripcion del error

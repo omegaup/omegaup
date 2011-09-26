@@ -178,6 +178,30 @@ abstract class ContestProblemsDAOBase extends DAO
 		}
 		return $ar;
 	}
+        
+        /*
+         * 
+         * Get relevant problems including contest alias
+         */
+        public static final function GetRelevantProblems($contest_id)
+        {
+            
+            // Build SQL statement
+            $sql = "SELECT Problems.problem_id, alias from Problems INNER JOIN ( SELECT Contest_Problems.problem_id from Contest_Problems WHERE ( Contest_Problems.contest_id = ? ) ) ProblemsContests ON Problems.problem_id = ProblemsContests.problem_id ";
+            $val = array($contest_id);
+            
+            global $conn;
+            $rs = $conn->Execute($sql, $val);
+            
+            $ar = array();
+            foreach ($rs as $foo) {
+                    $bar =  new Problems($foo);
+            array_push( $ar,$bar);
+            }
+            
+            return $ar;
+        }
+        
 
 
 	/**
@@ -185,7 +209,7 @@ abstract class ContestProblemsDAOBase extends DAO
 	  *	
 	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
 	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
+	  * aqui, sin embargo. El valor de retorno indica cuï¿½ntas filas se vieron afectadas.
 	  *	
 	  * @internal private information for advanced developers only
 	  * @return Filas afectadas o un string con la descripcion del error
