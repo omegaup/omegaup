@@ -172,7 +172,7 @@ class NewContest extends ApiHandler
             ContestsDAO::transEnd();
 
         }catch(Exception $e)
-        {   var_dump($e);
+        {   
             // Operation failed in the data layer
             die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));    
         }
