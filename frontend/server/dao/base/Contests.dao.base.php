@@ -1,4 +1,4 @@
-™<?php
+<?php
 /** Contests Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
