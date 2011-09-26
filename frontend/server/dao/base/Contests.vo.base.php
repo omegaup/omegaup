@@ -67,8 +67,8 @@ class Contests extends VO
 			if( isset($data['penalty']) ){
 				$this->penalty = $data['penalty'];
 			}
-			if( isset($data['time_start']) ){
-				$this->time_start = $data['time_start'];
+			if( isset($data['penalty_time_start']) ){
+				$this->penalty_time_start = $data['penalty_time_start'];
 			}
 		}
 	}
@@ -98,7 +98,7 @@ class Contests extends VO
 			"submissions_gap" => $this->submissions_gap,
 			"feedback" => $this->feedback,
 			"penalty" => $this->penalty,
-			"time_start" => $this->time_start
+			"penalty_time_start" => $this->penalty_time_start
 		); 
 	return json_encode($vec); 
 	}
@@ -241,13 +241,13 @@ class Contests extends VO
 	protected $penalty;
 
 	/**
-	  * time_start
+	  * penalty_time_start
 	  * 
 	  * Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema<br>
 	  * @access protected
 	  * @var enum('contest','problem')
 	  */
-	protected $time_start;
+	protected $penalty_time_start;
 
 	/**
 	  * getContestId
@@ -255,6 +255,9 @@ class Contests extends VO
 	  * Get the <i>contest_id</i> property for this object. Donde <i>contest_id</i> es El identificador unico para cada concurso
 	  * @return int(11)
 	  */
+        
+        protected $penalty_calc_policy;
+        
 	final public function getContestId()
 	{
 		return $this->contest_id;
@@ -616,25 +619,49 @@ class Contests extends VO
 	/**
 	  * getTimeStart
 	  * 
-	  * Get the <i>time_start</i> property for this object. Donde <i>time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema
+	  * Get the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema
 	  * @return enum('contest','problem')
 	  */
 	final public function getTimeStart()
 	{
-		return $this->time_start;
+		return $this->penalty_time_start;
 	}
 
 	/**
-	  * setTimeStart( $time_start )
+	  * setTimeStart( $penalty_time_start )
 	  * 
-	  * Set the <i>time_start</i> property for this object. Donde <i>time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema.
-	  * Una validacion basica se hara aqui para comprobar que <i>time_start</i> es de tipo <i>enum('contest','problem')</i>. 
+	  * Set the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema.
+	  * Una validacion basica se hara aqui para comprobar que <i>penalty_time_start</i> es de tipo <i>enum('contest','problem')</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param enum('contest','problem')
 	  */
-	final public function setTimeStart( $time_start )
+	final public function setTimeStart( $penalty_time_start )
 	{
-		$this->time_start = $time_start;
+		$this->penalty_time_start = $penalty_time_start;
 	}
 
+        
+        /**
+	  * getTimeStart
+	  * 
+	  * Get the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema
+	  * @return enum('contest','problem')
+	  */
+	final public function getPenaltyCalcPolicy()
+	{
+		return $this->penalty_calc_policy;
+	}
+
+	/**
+	  * setTimeStart( $penalty_time_start )
+	  * 
+	  * Set the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema.
+	  * Una validacion basica se hara aqui para comprobar que <i>penalty_time_start</i> es de tipo <i>enum('contest','problem')</i>. 
+	  * Si esta validacion falla, se arrojara... algo. 
+	  * @param enum('contest','problem')
+	  */
+	final public function setPenaltyCalcPolicy( $penalty_calc_policy )
+	{
+		$this->penalty_calc_policy = $penalty_calc_policy;
+	}
 }

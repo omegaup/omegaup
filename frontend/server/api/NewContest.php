@@ -84,6 +84,9 @@ class NewContest extends ApiHandler
             new ApiExposedProperty("penalty_time_start", true, POST, array(
                 new EnumValidator(array("contest", "problem", "none")))),
             
+            new ApiExposedProperty("penalty_calc_policy", true, POST, array(
+                new EnumValidator(array("sum", "max")))),
+            
             "private_users" => new ApiExposedProperty("private_users", false, POST)
             );
     }

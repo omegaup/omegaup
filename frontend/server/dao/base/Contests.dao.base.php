@@ -1,4 +1,4 @@
-<?php
+™<?php
 /** Contests Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
@@ -225,8 +225,13 @@ abstract class ContestsDAOBase extends DAO
 		}
 
 		if( $Contests->getTimeStart() != NULL){
-			$sql .= " time_start = ? AND";
+			$sql .= " penalty_time_start = ? AND";
 			array_push( $val, $Contests->getTimeStart() );
+		}
+                
+                if( $Contests->getPenaltyCalcPolicy() != NULL){
+			$sql .= " penalty_calc_policy = ? AND";
+			array_push( $val, $Contests->getPenaltyCalcPolicy() );
 		}
 
 		if(sizeof($val) == 0){return array();}
@@ -260,7 +265,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update( $Contests )
 	{
-		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, token = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, time_start = ? WHERE  contest_id = ?;";
+		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, token = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ? WHERE  contest_id = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -277,7 +282,8 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getFeedback(), 
 			$Contests->getPenalty(), 
 			$Contests->getTimeStart(), 
-			$Contests->getContestId(), );
+			$Contests->getContestId(),
+                        $Contests->getPenaltyCalcPolicy());
 		global $conn;
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
@@ -300,7 +306,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function create( &$Contests )
 	{
-		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, token, scoreboard, partial_score, submissions_gap, feedback, penalty, time_start ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, token, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->getContestId(), 
 			$Contests->getTitle(), 
@@ -317,7 +323,9 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
 			$Contests->getPenalty(), 
-			$Contests->getTimeStart(), 
+			$Contests->getTimeStart(),
+                        $Contests->getPenaltyCalcPolicy()   
+                    
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}
@@ -532,11 +540,11 @@ abstract class ContestsDAOBase extends DAO
 		}
 
 		if( (($a = $ContestsA->getTimeStart()) != NULL) & ( ($b = $ContestsB->getTimeStart()) != NULL) ){
-				$sql .= " time_start >= ? AND time_start <= ? AND";
+				$sql .= " penalty_time_start >= ? AND penalty_time_start <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( $a || $b ){
-			$sql .= " time_start = ? AND"; 
+			$sql .= " penalty_time_start = ? AND"; 
 			$a = $a == NULL ? $b : $a;
 			array_push( $val, $a);
 			
