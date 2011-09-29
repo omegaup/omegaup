@@ -69,19 +69,22 @@ class NewRun extends ApiHandler
         
         // Validate if contest is private then the user should be registered
         
-        // Validate if the user is allowed to submit given the window time
-       
+        // Validate if the user is allowed to submit given the submissions_gap 
+        if (!RunsDAO::IsRunInsideSubmissionGap($this->request["contest_id"]->getValue(), 
+                $this->request["problem_id"]->getValue(), 
+                $this->request["user_id"]->getValue()))
+        {
+            die(json_encode($this->error_dispatcher->notAllowedToSubmit()));
+        }
+        
+
+        
+        // Validate window_length
     }
     
     protected function GenerateResponse() 
     {
-        // Create file for the run        
-        $filename = $this->request["guid"]->getValue();
-        $fileHandle = fopen(SERVER_PATH ."/../runs/".$filename, 'w') or die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));                            
-        fwrite($fileHandle, $this->request["source"]->getValue()) or die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));        
-        fclose($fileHandle);
-        
-        
+                        
         // Fill values 
         $run_insert_values = array();
         foreach($this->request as $parameter)
@@ -90,8 +93,7 @@ class NewRun extends ApiHandler
         }
         
         // Populate new run object
-        $run = new Runs($run_insert_values);
-        
+        $run = new Runs($run_insert_values);        
         try
         {
             // Push run into DB
@@ -102,6 +104,12 @@ class NewRun extends ApiHandler
             // Operation failed in the data layer
             die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));    
         }
+        
+        // Create file for the run        
+        $filename = $this->request["guid"]->getValue();
+        $fileHandle = fopen(SERVER_PATH ."/../runs/".$filename, 'w') or die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));                            
+        fwrite($fileHandle, $this->request["source"]->getValue()) or die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));        
+        fclose($fileHandle);
         
         // @TODO Call lhchavez to evaluate run
         

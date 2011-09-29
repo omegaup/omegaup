@@ -51,6 +51,24 @@ class ApiHttpErrors
                      "error"	 => $message,
                      "errorcode" => 500 );
     }
+    
+    // Sets the HTTP header and returns an array with error info
+    public function notAllowedToSubmit($message = NULL)
+    {
+        // We have an invalid auth token. Dying.
+        header('HTTP/1.1 401 FORBIDDEN');
+        header('Content-Type: application/json');
+        
+        if ($message === NULL)
+        {
+            $message = "You're not allowed to submit yet.";
+        }
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 501 );
+    }
+    
 
     // Sets the HTTP header and returns an array with error info
     public function invalidParameter($message = NULL)
