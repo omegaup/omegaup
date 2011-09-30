@@ -55,10 +55,10 @@ abstract class ApiHandler
         // Check if we have a logged user.
         if( isset($_REQUEST["auth_token"]) )
         {
-
+                
             // Find out the token
             $this->auth_token = AuthTokensDAO::getByPK( $_POST["auth_token"] );
-
+            
             if($this->auth_token !== null)
             {
 
@@ -75,7 +75,7 @@ abstract class ApiHandler
         }
         else
         {
-            
+      
           // Login is required
           die(json_encode( $this->error_dispatcher->invalidAuthToken() ));
         }
