@@ -80,9 +80,9 @@ class NewRun extends ApiHandler
             // Validate if contest is private then the user should be registered
             $contest_temp = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
             if ( $contest_temp->getPublic() === "1" 
-                && !ContestsUsersDAO::getByPK(
-                        $this->request["user_id"]->getValue(), 
-                        $this->request["contest_id"]->getValue())
+                && is_null(ContestsUsersDAO::getByPK(
+                        $this->user_id, 
+                        $this->request["contest_id"]->getValue()))
                )
             {
                 die(json_encode($this->error_dispatcher->forbiddenSite()));
@@ -92,7 +92,7 @@ class NewRun extends ApiHandler
             if (!RunsDAO::IsRunInsideSubmissionGap(
                     $this->request["contest_id"]->getValue(), 
                     $this->request["problem_id"]->getValue(), 
-                    $this->request["user_id"]->getValue())
+                    $this->user_id)
                )
             {
                 die(json_encode($this->error_dispatcher->notAllowedToSubmit()));
