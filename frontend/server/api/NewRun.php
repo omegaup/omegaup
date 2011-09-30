@@ -65,21 +65,47 @@ class NewRun extends ApiHandler
     {
         parent::ValidateRequest();
                     
-        // Validate that the combination contest_id problem_id is valid
-        
-        // Validate if contest is private then the user should be registered
-        
-        // Validate if the user is allowed to submit given the submissions_gap 
-        if (!RunsDAO::IsRunInsideSubmissionGap($this->request["contest_id"]->getValue(), 
-                $this->request["problem_id"]->getValue(), 
-                $this->request["user_id"]->getValue()))
+        try
         {
-            die(json_encode($this->error_dispatcher->notAllowedToSubmit()));
-        }
-        
+            // Validate that the combination contest_id problem_id is valid
+            // @todo Cache this!
+            if (!ContestProblemsDAO::getByPK(
+                    $this->request["contest_id"]->getValue(), 
+                    $this->request["problem_id"]->getValue() 
+                ))
+            {
+                die(json_encode($this->error_dispatcher->invalidParameter()));
+            }
 
+            // Validate if contest is private then the user should be registered
+            $contest_temp = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
+            if ( $contest_temp->getPublic() === "1" 
+                && !ContestsUsersDAO::getByPK(
+                        $this->request["user_id"]->getValue(), 
+                        $this->request["contest_id"]->getValue())
+               )
+            {
+                die(json_encode($this->error_dispatcher->forbiddenSite()));
+            }
+
+            // Validate if the user is allowed to submit given the submissions_gap 
+            if (!RunsDAO::IsRunInsideSubmissionGap(
+                    $this->request["contest_id"]->getValue(), 
+                    $this->request["problem_id"]->getValue(), 
+                    $this->request["user_id"]->getValue())
+               )
+            {
+                die(json_encode($this->error_dispatcher->notAllowedToSubmit()));
+            }
         
-        // Validate window_length
+        
+            // Validate window_length
+        }
+        catch(Exception $e)
+        {
+            // Operation failed in the data layer
+            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));    
+        }
     }
     
     protected function GenerateResponse() 
