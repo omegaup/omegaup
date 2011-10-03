@@ -88,10 +88,9 @@ class NewProblemInContest extends ApiHandler
         try 
         {
     
-            // Create file for problem content
-            // @TODO clean the path
+            // Create file for problem content            
             $filename = md5(uniqid(rand(), true));
-            $fileHandle = fopen(SERVER_PATH ."/../problems/".$filename, 'w'); 
+            $fileHandle = fopen(PROBLEMS_PATH . $filename, 'w'); 
             fwrite($fileHandle, $_POST["source"]);
             fclose($fileHandle);
         }
@@ -147,17 +146,12 @@ class NewProblemInContest extends ApiHandler
             // Operation failed in the data layer
            throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
+        
+        // Happy ending
+        $this->response["status"] = "ok";
     }
     
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-            "status" => "ok"
-        )));        
-    }
+
 }
 
 ?>

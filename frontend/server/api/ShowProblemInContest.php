@@ -88,12 +88,13 @@ class ShowProblemInContest extends ApiHandler
         }
         
         // Read the file that contains the source
-        $source_path = dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'problems'.DIRECTORY_SEPARATOR.$problem->getSource();
+        $source_path = PROBLEMS_PATH . $problem->getSource();
         
         if(file_exists($source_path))
         {
             $file_handle = fopen($source_path, 'r');
             $problem->setSource( fread($file_handle, filesize($source_path)));
+            fclose($file_handle);
             
         }
         else
@@ -135,9 +136,7 @@ class ShowProblemInContest extends ApiHandler
                 array_push($runs_filtered_array, $run->asFilteredArray($relevant_columns));
             }
         }
-        
-        // Add the procesed runs to the request
-        $this->response["runs"] = $runs_filtered_array;
+                
         
         // As last step, register the problem as opened                
         if (! ContestProblemOpenedDAO::getByPK($this->request["contest_id"]->getValue(), $this->request["problem_id"]->getValue(), $this->user_id ))
@@ -161,19 +160,11 @@ class ShowProblemInContest extends ApiHandler
             }                        
         }
         
+        // Add the procesed runs to the request
+        $this->response["runs"] = $runs_filtered_array;
+        
     }
     
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-                    "status"  => "ok",
-                    "problem" => $this->response
-        )));
-               
-    }
 }
 
 ?>

@@ -135,7 +135,7 @@ class NewRun extends ApiHandler
         {
             // Create file for the run        
             $filename = $this->request["guid"]->getValue();
-            $fileHandle = fopen(SERVER_PATH ."/../runs/".$filename, 'w');
+            $fileHandle = fopen(RUNS_PATH . $filename, 'w');
             fwrite($fileHandle, $this->request["source"]->getValue());
             fclose($fileHandle);
         }
@@ -145,18 +145,12 @@ class NewRun extends ApiHandler
         }
         
         // @TODO Call lhchavez to evaluate run
+     
         
+        // Happy ending
+        $this->response["status"] = "ok";
     }
-    
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-            "status" => "ok"
-        )));        
-    }
+
 }
 
 ?>

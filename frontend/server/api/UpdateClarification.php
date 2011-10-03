@@ -85,18 +85,11 @@ class UpdateClarification extends ApiHandler
            throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );         
         }
         
+        // Happy ending
+        $this->response["status"] = "ok";
+        
     }
     
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-            "status"  => "ok"                    
-        )));
-               
-    }
 }
 
 ?>

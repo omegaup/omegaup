@@ -139,8 +139,8 @@ class Login extends ApiHandler {
          * Ok, passwords match !
          * Create the auth_token. Auth tokens will be valid for 24 hours.
          * */
-         $this->response = new AuthTokens();
-         $this->response->setUserId( $actual_user->getUserId() );
+         $this->auth_token = new AuthTokens();
+         $this->auth_token->setUserId( $actual_user->getUserId() );
 
          /**
           * auth token consists of:
@@ -151,29 +151,20 @@ class Login extends ApiHandler {
           * */
          $auth_str = time() . "-" . $actual_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $actual_user->getUserId() . time() );
 
-         $this->response->setToken($auth_str);
+         $this->auth_token->setToken($auth_str);
 
 
 
          try{
-                AuthTokensDAO::save( $this->response );
+                AuthTokensDAO::save( $this->auth_token );
 
          }catch(Exception $e){
 
                throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
          }
-
+                 
+         $this->response["auth_token"] = $this->auth_token->getToken();
      
-    }
-
-    protected function SendResponse() {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-                "status" => "ok",
-                "auth_token" =>  $this->response->getToken( )
-        )));
     }
 
 }

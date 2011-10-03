@@ -176,17 +176,11 @@ class NewContest extends ApiHandler
             // Operation failed in the data layer
            throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
+        
+        // Happy ending
+        $this->response["status"] = "ok";
     }
     
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-            "status" => "ok"
-        )));        
-    }
 }
 
 ?>

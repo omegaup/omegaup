@@ -77,19 +77,9 @@ class NewClarification extends ApiHandler
         }
         
         //Add the clarification id to the response
-        $this->response = $clarification->getClarificationId();
+        $this->response["clarification_id"] = $clarification->getClarificationId();
     }
     
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-            "status" => "ok",
-            "clarification_id" => $this->response
-        )));        
-    }
 }
 
 ?>
