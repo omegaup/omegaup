@@ -68,9 +68,19 @@ class ShowRun extends ApiHandler
         try
         {
             // Get source code
-            $filename = SERVER_PATH ."/../runs/".$this->myRun->getGuid();
-            $fileHandle = fopen($filename, 'r');                                    
-            $this->response["source"] = fread($fileHandle, filesize($filename));                
+            $filename = RUNS_PATH . $this->myRun->getGuid();
+            
+            if(file_exists($filename))
+            {                            
+                $fileHandle = fopen($filename, 'r');                                    
+                $this->response["source"] = fread($fileHandle, filesize($filename));                
+                fclose($fileHandle);
+            }
+            else
+            {
+                throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );
+            }
+                
         }
         catch (Exception $e)
         {
@@ -79,17 +89,7 @@ class ShowRun extends ApiHandler
         
     }
     
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-                    "status"  => "ok",
-                    "run" => $this->response
-        )));
-               
-    }
+           
 }
 
 ?>

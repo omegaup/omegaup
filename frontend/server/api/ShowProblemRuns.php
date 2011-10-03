@@ -65,17 +65,6 @@ class ShowProblemRuns extends ApiHandler
         
     }
     
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-                    "status"  => "ok",
-                    "runs" => $this->response
-        )));
-               
-    }
 }
 
 ?>

@@ -11,6 +11,7 @@ class ApiExposedProperty
     private $validators;
     private $errorMessage;
     private $value;
+    private $cacheValue;
     
     /*
     public function ApiExposedProperty($property_name, $isRequiredAsInput, $value, $validators = NULL)
@@ -28,6 +29,12 @@ class ApiExposedProperty
         $this->property_name = $property_name;
         $this->isRequiredAsInput = $isRequiredAsInput;
         $this->value = $valueOrSource;        
+        $this->cacheValue = null;
+        
+        if ($valueOrSource !== GET && $valueOrSource !== POST)
+        {
+            $this->cacheValue = $valueOrSource;
+        }
     }
     
     public function setPropertyName($name)
@@ -72,6 +79,11 @@ class ApiExposedProperty
     
     public function getValue()
     {   
+        if(!is_null($this->cacheValue))
+        {
+            return $this->cacheValue;
+        } 
+        
         if ($this->value === POST)
         {
             $this->value = isset($_POST[$this->property_name]) ? $_POST[$this->property_name] : null ;            
@@ -81,6 +93,7 @@ class ApiExposedProperty
             $this->value = isset($_GET[$this->property_name]) ? $_GET[$this->property_name] : null ;            
         }
         
+        $this->cacheValue = $this->value;
         return $this->value;
     }
     

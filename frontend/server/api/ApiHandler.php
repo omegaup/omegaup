@@ -114,8 +114,7 @@ abstract class ApiHandler
     protected abstract function GetRequest();
     
     protected abstract function GenerateResponse();
-    
-    protected abstract function SendResponse();
+        
     
     // This function should be called 
     public function ExecuteApi()

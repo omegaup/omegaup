@@ -41,19 +41,9 @@ class ShowScoreboard extends ApiHandler
          
         // Get the scoreboard        
         $this->scoreboardData = $myScoreboard->generate();
-    }
-    
         
-    protected function SendResponse() 
-    {
-        // There should not be any failing path that gets into here
-        
-        // Happy ending.
-        die(json_encode(array(
-            "status"  => "ok",
-            "scoreboard" => $this->scoreboardData
-        )));
-               
+        // Push scoreboard data in response
+        $this->response = $this->scoreboardData;
     }
     
     
