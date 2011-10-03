@@ -20,5 +20,5 @@ require_once("../../../../server/inc/bootstrap.php");
 require_once("../../../../server/api/NewRun.php");
 
 $apiHandler = new NewRun();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();
 

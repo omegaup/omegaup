@@ -16,7 +16,7 @@ require_once("ApiHandler.php");
 class UpdateClarification extends ApiHandler
 {
     
-    protected function ProcessRequest()
+    protected function GetRequest()
     {
         $this->request = array(
             "clarification_id" => new ApiExposedProperty("clarification_id", true, GET, array(

@@ -41,7 +41,7 @@ class ShowContests extends ApiHandler {
         }
     }
 
-    protected function ProcessRequest() {
+    protected function GetRequest() {
         return true;
     }
 

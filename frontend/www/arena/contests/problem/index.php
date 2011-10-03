@@ -18,4 +18,4 @@ require_once("../../../../server/api/ShowProblemInContest.php");
 
 
 $apiHandler = new ShowProblemInContest();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();

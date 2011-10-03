@@ -18,5 +18,5 @@ require_once("../../../server/inc/bootstrap.php");
 require_once("../../../server/api/Login.php");
 
 $apiHandler = new Login();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();
 

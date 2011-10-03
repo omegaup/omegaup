@@ -16,7 +16,7 @@ require_once("ApiHandler.php");
 class ShowContest extends ApiHandler
 {
     
-    protected function ProcessRequest()
+    protected function GetRequest()
     {
         $this->request = array(
             "contest_id" => new ApiExposedProperty("contest_id", true, GET, array(

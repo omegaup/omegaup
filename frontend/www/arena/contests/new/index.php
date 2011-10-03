@@ -20,6 +20,6 @@ require_once("../../../../server/inc/bootstrap.php");
 require_once("../../../../server/api/NewContest.php");
 
 $apiHandler = new NewContest();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();
 
 

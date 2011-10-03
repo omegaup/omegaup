@@ -16,7 +16,7 @@ require_once("ApiHandler.php");
 class ShowProblemRuns extends ApiHandler
 {
     
-    protected function ProcessRequest()
+    protected function GetRequest()
     {
         $this->request = array(
             "problem_id" => new ApiExposedProperty("problem_id", true, GET, array(

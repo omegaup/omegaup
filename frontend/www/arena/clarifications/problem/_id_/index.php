@@ -12,6 +12,6 @@ require_once("../../../../../server/api/ShowClarificationsInProblem.php");
 
 
 $apiHandler = new ShowClarificationsInProblem();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();
 
 

@@ -18,4 +18,4 @@ require_once("../../../../server/api/ShowScoreboard.php");
 
 
 $apiHandler = new ShowScoreboard();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();

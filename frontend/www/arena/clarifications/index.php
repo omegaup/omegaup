@@ -11,6 +11,6 @@ require_once("../../../server/api/ShowClarification.php");
 
 
 $apiHandler = new ShowClarification();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();
 
 
