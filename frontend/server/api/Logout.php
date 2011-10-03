@@ -16,7 +16,7 @@ require_once("ApiHandler.php");
 class Logout extends ApiHandler {
     
     
-    protected function ProcessRequest() {
+    protected function GetRequest() {
         
         // Only auth_token is needed for logout, which is verified in the authorization process
         return true;

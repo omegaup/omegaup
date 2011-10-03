@@ -18,7 +18,7 @@ class ShowRun extends ApiHandler
     
     private $myRun;
     
-    protected function ProcessRequest()
+    protected function GetRequest()
     {
         $this->request = array(
             "run_id" => new ApiExposedProperty("run_id", true, GET, array(

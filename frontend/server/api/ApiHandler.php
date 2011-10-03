@@ -27,13 +27,13 @@ abstract class ApiHandler
     // Containter of output parameters
     protected $response;
     
-    // User who calls the API
+    // Cache of who calls the API
     protected $user_id;
     
     // Holder of error dispatcher
     protected $error_dispatcher;
     
-    // Holder of auth token
+    // Cache of auth token
     protected $auth_token;
      
     public function __construct() 
@@ -46,10 +46,10 @@ abstract class ApiHandler
         $this->response = array();
                 
     }
-    
-    private function ApiDie($message)
+           
+    private function ApiEncode($message)
     {
-        die(json_encode($message));
+        return json_encode($message);
     }
     
     protected function CheckAuthorization()
@@ -111,7 +111,7 @@ abstract class ApiHandler
         }
     }
     
-    protected abstract function ProcessRequest();
+    protected abstract function GetRequest();
     
     protected abstract function GenerateResponse();
     
@@ -130,18 +130,17 @@ abstract class ApiHandler
             $this->CheckPermissions();
 
             // Process input
-            $this->ProcessRequest();       
+            $this->GetRequest();       
             $this->ValidateRequest();
 
             // Generate output
             $this->GenerateResponse();
 
-            // Send output        
-            $this->SendResponse();        
+            return $this->ApiEncode($this->response);       
         }
         catch (ApiException $e)
         {
-            $this->ApiDie($e->getArrayMessage());
+            return $this->ApiEncode($e->getArrayMessage());
         }
         
     }

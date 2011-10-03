@@ -19,7 +19,7 @@ class NewContest extends ApiHandler
     
     private $private_users_list;
     
-    protected function ProcessRequest()
+    protected function GetRequest()
     {  
         
         // Required parameteres to avoid Warnings

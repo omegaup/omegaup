@@ -19,6 +19,6 @@ require_once("../../../../../server/inc/bootstrap.php");
 require_once("../../../../../server/api/NewProblemInContest.php");
 
 $apiHandler = new NewProblemInContest();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();
 
 

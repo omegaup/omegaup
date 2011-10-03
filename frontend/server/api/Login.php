@@ -23,7 +23,7 @@ class Login extends ApiHandler {
 
 
 
-    protected function ProcessRequest() {
+    protected function GetRequest() {
                 
 
         $this->request = array(

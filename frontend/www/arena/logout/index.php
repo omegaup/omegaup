@@ -22,5 +22,5 @@ require_once("../../../server/api/logout.php");
 
 
 $apiHandler = new Logout();
-$apiHandler->ExecuteApi();
+echo $apiHandler->ExecuteApi();
 

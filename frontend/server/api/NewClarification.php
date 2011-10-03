@@ -17,7 +17,7 @@ require_once("ApiHandler.php");
 class NewClarification extends ApiHandler
 {
     
-    protected function ProcessRequest()
+    protected function GetRequest()
     {        
         // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE
         $this->request = array(
