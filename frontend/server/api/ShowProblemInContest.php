@@ -53,7 +53,7 @@ class ShowProblemInContest extends ApiHandler
                 ContestProblemsDAO::getByPK($this->request["contest_id"]->getValue(), 
                         $this->request["problem_id"]->getValue())))
         {
-            die(json_encode($this->error_dispatcher->notFound()));
+           throw new ApiException($this->error_dispatcher->notFound());
         }
                 
         
@@ -64,7 +64,7 @@ class ShowProblemInContest extends ApiHandler
         {        
             if (is_null(ContestsUsersDAO::getByPK($this->user_id, $this->request["contest_id"]->getValue())))
             {
-                die(json_encode($this->error_dispatcher->forbiddenSite()));
+               throw new ApiException($this->error_dispatcher->forbiddenSite());
             }        
         }
     }
@@ -83,7 +83,7 @@ class ShowProblemInContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));        
+           throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );        
         
         }
         
@@ -98,7 +98,7 @@ class ShowProblemInContest extends ApiHandler
         }
         else
         {
-           die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));                    
+          throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );                    
         }
         
         // Add the problem the response
@@ -123,7 +123,7 @@ class ShowProblemInContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));        
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
         }
         
         // Add each filtered run to an array
@@ -157,7 +157,7 @@ class ShowProblemInContest extends ApiHandler
             }catch (Exception $e)
             {
                 // Operation failed in the data layer
-                die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));        
+               throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
             }                        
         }
         

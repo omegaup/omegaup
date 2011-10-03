@@ -24,8 +24,8 @@ class NewContest extends ApiHandler
         
         // Required parameteres to avoid Warnings
         // @todo Refactor this somehow        
-        $finish_time = isset ($_POST["finish_time"]) ? $_POST["finish_time"] : die(json_encode($this->error_dispatcher->invalidParameter()));
-        $start_time = isset ($_POST["start_time"]) ? $_POST["start_time"] : die(json_encode($this->error_dispatcher->invalidParameter()));
+        $finish_time = isset ($_POST["finish_time"]) ? $_POST["finish_time"] : NULL;
+        $start_time = isset ($_POST["start_time"]) ? $_POST["start_time"] : NULL;
         
         
         
@@ -100,7 +100,7 @@ class NewContest extends ApiHandler
         {
             if(is_null($this->request["private_users"]->getValue()))
             {
-                die(json_encode( $this->error_dispatcher->invalidParameter("If the Contest is not Public, private_users is required") ));    
+               throw new ApiException( $this->error_dispatcher->invalidParameter("If the Contest is not Public, private_users is required") );    
             }
             else
             {
@@ -108,7 +108,7 @@ class NewContest extends ApiHandler
                 $this->private_users_list = json_decode($this->request["private_users"]->getValue());
                 if (is_null($this->private_users_list))
                 {
-                    die(json_encode( $this->error_dispatcher->invalidParameter("private_users is malformed") ));    
+                   throw new ApiException( $this->error_dispatcher->invalidParameter("private_users is malformed") );    
                 }
                 
                 // Validate that all users exists in the DB
@@ -116,7 +116,7 @@ class NewContest extends ApiHandler
                 {
                     if (!UsersDAO::getByPK($userkey))
                     {
-                        die(json_encode( $this->error_dispatcher->invalidParameter("private_users contains a user that doesn't exists") ));    
+                       throw new ApiException( $this->error_dispatcher->invalidParameter("private_users contains a user that doesn't exists") );    
                     }
                 }                               
             }
@@ -174,7 +174,7 @@ class NewContest extends ApiHandler
         }catch(Exception $e)
         {   
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));    
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
     }
     

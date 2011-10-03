@@ -32,7 +32,7 @@ class Logout extends ApiHandler {
                 AuthTokensDAO::delete( $this->auth_token );	
 
         }catch( Exception $e ){
-               die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));
+              throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );
         }
        
      

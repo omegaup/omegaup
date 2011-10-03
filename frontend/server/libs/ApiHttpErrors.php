@@ -39,8 +39,7 @@ class ApiHttpErrors
     public function invalidAuthToken($message = NULL)
     {
         // We have an invalid auth token. Dying.
-        header('HTTP/1.1 401 FORBIDDEN');
-        header('Content-Type: application/json');
+        header('HTTP/1.1 401 FORBIDDEN');        
         
         if ($message === NULL)
         {
@@ -57,7 +56,7 @@ class ApiHttpErrors
     {
         // We have an invalid auth token. Dying.
         header('HTTP/1.1 401 FORBIDDEN');
-        header('Content-Type: application/json');
+        
         
         if ($message === NULL)
         {
@@ -75,7 +74,7 @@ class ApiHttpErrors
     {
         // We have an invalid auth token. Dying.
         header('HTTP/1.1 400 BAD REQUEST');
-        header('Content-Type: application/json');
+        
 
         if ($message === NULL)
         {
@@ -90,9 +89,9 @@ class ApiHttpErrors
     // Sets the HTTP header and returns an array with error info
     public function invalidFilesystemOperation($message = NULL)
     {
-        // We have an invalid auth token. Dying.
+        
         header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-        header('Content-Type: application/json');
+        
 
         if ($message === NULL)
         {
@@ -107,9 +106,9 @@ class ApiHttpErrors
     // Sets the HTTP header and returns an array with error info
     public function invalidDatabaseOperation($message = NULL)
     {
-        // We have an invalid auth token. Dying.
+
         header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-        header('Content-Type: application/json');
+
 
         if ($message === NULL)
         {
@@ -124,9 +123,9 @@ class ApiHttpErrors
     // Sets the HTTP header and returns an array with error info
     public function invalidCredentials($message = NULL)
     {
-        // We have an invalid auth token. Dying.
+        
         header('HTTP/1.1 403 FORBIDDEN');
-        header('Content-Type: application/json');
+        
 
         if ($message === NULL)
         {
@@ -141,9 +140,9 @@ class ApiHttpErrors
     // Sets the HTTP header and returns an array with error info
     public function forbiddenSite($message = NULL)
     {
-        // We have an invalid auth token. Dying.
+        
         header('HTTP/1.1 403 FORBIDDEN');
-        header('Content-Type: application/json');
+        
 
         if ($message === NULL)
         {
@@ -158,9 +157,9 @@ class ApiHttpErrors
     // Sets the HTTP header and returns an array with error info
     public function registeredViaThirdPartyNotSupported($message = NULL)
     {
-        // We have an invalid auth token. Dying.
+        
         header('HTTP/1.1 400 BAD REQUEST');
-        header('Content-Type: application/json');
+        
 
         if ($message === NULL)
         {
@@ -174,9 +173,9 @@ class ApiHttpErrors
     
     public function notFound($message = NULL)
     {
-        // We have an invalid auth token. Dying.
+        
         header('HTTP/1.1 404 NOT FOUND');
-        header('Content-Type: application/json');
+        
 
         if ($message === NULL)
         {

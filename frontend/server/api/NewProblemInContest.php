@@ -84,12 +84,21 @@ class NewProblemInContest extends ApiHandler
     
     protected function GenerateResponse() 
     {
-        // Create file for problem content
-        // @TODO clean the path
-        $filename = md5(uniqid(rand(), true));
-        $fileHandle = fopen(SERVER_PATH ."/../problems/".$filename, 'w') or die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));    
-        fwrite($fileHandle, $_POST["source"]) or die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));
-        fclose($fileHandle);
+
+        try 
+        {
+    
+            // Create file for problem content
+            // @TODO clean the path
+            $filename = md5(uniqid(rand(), true));
+            $fileHandle = fopen(SERVER_PATH ."/../problems/".$filename, 'w'); 
+            fwrite($fileHandle, $_POST["source"]);
+            fclose($fileHandle);
+        }
+        catch (Exception $e)
+        {
+            throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );
+        }
         
         
         // Fill $values array with values sent to the API
@@ -136,7 +145,7 @@ class NewProblemInContest extends ApiHandler
         {  
 
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));    
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
     }
     
