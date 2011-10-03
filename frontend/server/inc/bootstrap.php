@@ -47,6 +47,13 @@
    define('POST', "__ISPOST__");
    define('GET', "__ISGET__");
    
+   // Cache of roles_id
+   define('ADMIN', '1');
+   define('CONTESTANT', '2');
+   define('JUDGE', '3');
+   define('VISITOR', '4');
+   define('BYPASS', '-1');
+   
    
 	/**
 	 *  QUICK FIX

@@ -35,6 +35,12 @@ abstract class ApiHandler
     
     // Cache of auth token
     protected $auth_token;
+    
+    // Cache of user roles
+    protected $user_roles;
+    
+    // Holder of roles of each api
+    protected $api_roles;
      
     public function __construct() 
     {        
@@ -44,6 +50,7 @@ abstract class ApiHandler
         
         // Declare response as an array
         $this->response = array();
+                
                 
     }
            
@@ -68,6 +75,13 @@ abstract class ApiHandler
 
                 // Get the user_id from the auth token    
                 $this->user_id = $this->auth_token->getUserId();         
+                                
+                // Get roles of user
+                // @todo Cache this!
+                $this->user_roles = UserRolesDAO::search(new UserRoles( array (
+                    "user_id" => $this->user_id    
+                    )));
+                
 
             }
             else
@@ -87,9 +101,30 @@ abstract class ApiHandler
     }
     
     protected function CheckPermissions()
-    {
-        // @TODO Check permssions here
-        return true;
+    {                
+        
+        if ($this->api_roles === BYPASS)
+            return true;
+        
+        foreach($this->user_roles as $rol)
+        {
+            // By default, admin rocks
+            if($rol->getRoleId() === ADMIN)
+            {
+                return true;
+            }
+                                    
+            foreach ($this->api_roles as $allowedRol)
+            {                                
+                if($allowedRol === $rol->getRoleId())
+                {
+                    return true;
+                }
+            }
+        }
+        
+        // Rol was not found
+        throw new ApiException($this->error_dispatcher->forbiddenSite());
     }
 
 
@@ -111,6 +146,8 @@ abstract class ApiHandler
         }
     }
     
+    protected abstract function DeclareAllowedRoles();    
+    
     protected abstract function GetRequest();
     
     protected abstract function GenerateResponse();
@@ -123,11 +160,14 @@ abstract class ApiHandler
         {
             // Set JSON as output
             header('Content-Type: application/json');   
-            
-            // Check authorization
+                        
             $this->CheckAuthorization();
+            
+            // Each API should declare its allowed roles            
+            $this->api_roles = $this->DeclareAllowedRoles();
+            
             $this->CheckPermissions();
-
+                        
             // Process input
             $this->GetRequest();       
             $this->ValidateRequest();

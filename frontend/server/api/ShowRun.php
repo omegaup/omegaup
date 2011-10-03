@@ -18,6 +18,11 @@ class ShowRun extends ApiHandler
     
     private $myRun;
     
+    protected function DeclareAllowedRoles() 
+    {
+        return BYPASS;
+    }
+    
     protected function GetRequest()
     {
         $this->request = array(
