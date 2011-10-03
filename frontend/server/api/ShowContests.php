@@ -7,13 +7,17 @@
  *
  *
  * 
- * POST /contests/:id:/problem/new
- * Si el usuario tiene permisos de juez o admin, crea un nuevo problema para el concurso :id
+ *
  *
  * */
 require_once("ApiHandler.php");
 
 class ShowContests extends ApiHandler {
+    
+    protected function DeclareAllowedRoles() 
+    {
+        return BYPASS;
+    }
 
     protected function CheckAuthorization() {
         // @todo this CheckAuthorization thing should be refactored 

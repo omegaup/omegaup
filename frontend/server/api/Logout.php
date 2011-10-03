@@ -15,6 +15,12 @@ require_once("ApiHandler.php");
 
 class Logout extends ApiHandler {
     
+    protected function DeclareAllowedRoles() 
+    {
+        return BYPASS;
+    }
+    
+    
     
     protected function GetRequest() {
         

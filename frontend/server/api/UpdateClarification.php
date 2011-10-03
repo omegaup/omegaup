@@ -16,6 +16,11 @@ require_once("ApiHandler.php");
 class UpdateClarification extends ApiHandler
 {
     
+    protected function DeclareAllowedRoles() 
+    {
+        return array(JUDGE);
+    }
+    
     protected function GetRequest()
     {
         $this->request = array(

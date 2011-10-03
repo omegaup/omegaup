@@ -16,6 +16,11 @@ require_once("ApiHandler.php");
 class ShowClarificationsInProblem extends ApiHandler
 {
     
+    protected function DeclareAllowedRoles() 
+    {
+        return BYPASS;
+    }
+    
     protected function GetRequest()
     {
         $this->request = array(
@@ -44,13 +49,24 @@ class ShowClarificationsInProblem extends ApiHandler
            "problem_id" => $this->request["problem_id"]->getValue()
         ));
         
-        // Get all private clarifications of the user 
-        $private_clarification_mask = new Clarifications ( array (
-           "public" => '0',
-           "problem_id" => $this->request["problem_id"]->getValue(),
-           "author_id" => $this->user_id
-            
-        ));
+        if(in_array(JUDGE, $this->user_roles) || in_array(ADMIN, $this->user_roles))
+        {
+           // Get all private clarifications 
+            $private_clarification_mask = new Clarifications ( array (
+               "public" => '0',
+               "problem_id" => $this->request["problem_id"]->getValue(),               
+            )); 
+        }
+        else
+        {        
+            // Get all private clarifications of the user 
+            $private_clarification_mask = new Clarifications ( array (
+               "public" => '0',
+               "problem_id" => $this->request["problem_id"]->getValue(),
+               "author_id" => $this->user_id
+
+            ));
+        }
         
         //@todo This query should be merged and optimized ....
         // Get our clarification given the masks

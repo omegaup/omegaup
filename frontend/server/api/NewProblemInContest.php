@@ -17,6 +17,11 @@ require_once("ApiHandler.php");
 class NewProblemInContest extends ApiHandler
 {
     
+    protected function DeclareAllowedRoles() 
+    {
+        return array(JUDGE);
+    }
+    
     protected function GetRequest()
     {        
         // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE

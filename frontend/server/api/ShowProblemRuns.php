@@ -16,6 +16,11 @@ require_once("ApiHandler.php");
 class ShowProblemRuns extends ApiHandler
 {
     
+    protected function DeclareAllowedRoles() 
+    {
+        return BYPASS;
+    }
+    
     protected function GetRequest()
     {
         $this->request = array(
@@ -35,11 +40,22 @@ class ShowProblemRuns extends ApiHandler
 
     protected function GenerateResponse() 
     {
-               
-        // Define what we are looking for        
-        $runs_mask = new Runs( array (
-            "user_id"    => $this->user_id,
-            "problem_id" => $this->request["problem_id"]->getValue()));
+        
+        $runs_mask = null;
+        
+        if (in_array(ADMIN, $this->user_roles) )
+        {
+            // Define what we are looking for        
+            $runs_mask = new Runs( array (                
+                "problem_id" => $this->request["problem_id"]->getValue()));
+        }        
+        else
+        {        
+            // Define what we are looking for        
+            $runs_mask = new Runs( array (
+                "user_id"    => $this->user_id,
+                "problem_id" => $this->request["problem_id"]->getValue()));
+        }
         
         $relevant_columns = array( "run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
         

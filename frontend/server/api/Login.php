@@ -20,6 +20,10 @@ class Login extends ApiHandler {
         return true;
     }
 
+    protected function DeclareAllowedRoles() 
+    {
+        return BYPASS;
+    }
 
 
 
