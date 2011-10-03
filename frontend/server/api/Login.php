@@ -79,11 +79,10 @@ class Login extends ApiHandler {
                 }else{
 
                         /**
-                         * He is not in the users, nor the emails list.
-                         * Lets go ahead and tell him.
+                         * He is not in the users, nor the emails
                          * */
                         
-                        die(json_encode($this->error_dispatcher->invalidCredentials()));
+                       throw new ApiException($this->error_dispatcher->invalidCredentials());
                 }
         }
         
@@ -102,7 +101,7 @@ class Login extends ApiHandler {
          *
          * */
         if($actual_user->getPassword() === NULL){
-                die(json_encode($this->error_dispatcher->registeredViaThirdPartyNotSupported()));
+               throw new ApiException($this->error_dispatcher->registeredViaThirdPartyNotSupported());
         }
         
         /**
@@ -115,7 +114,7 @@ class Login extends ApiHandler {
                 /**
                  * Passwords did not match !
                  * */
-                die(json_encode($this->error_dispatcher->invalidCredentials()));
+               throw new ApiException($this->error_dispatcher->invalidCredentials());
         }
         
         /**
@@ -132,7 +131,7 @@ class Login extends ApiHandler {
                     AuthTokensDAO::delete( $old_token );
 
                 }catch(Exception $e){
-                    die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));    
+                   throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
                 }
         }
         
@@ -161,7 +160,7 @@ class Login extends ApiHandler {
 
          }catch(Exception $e){
 
-                die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));    
+               throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
          }
 
      

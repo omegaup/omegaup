@@ -36,7 +36,7 @@ class ShowContests extends ApiHandler {
             } else {
                 
                 // We have an invalid auth token. Dying.            
-                die(json_encode( $this->error_dispatcher->invalidAuthToken() ));
+               throw new ApiException( $this->error_dispatcher->invalidAuthToken() );
             }
         }
     }

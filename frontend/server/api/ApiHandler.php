@@ -3,6 +3,7 @@
 
 require_once(SERVER_PATH ."/libs/ApiExposedProperty.php");
 require_once(SERVER_PATH ."/libs/ApiHttpErrors.php");
+require_once(SERVER_PATH ."/libs/ApiException.php");
 
 require_once(SERVER_PATH . "/libs/StringValidator.php");
 require_once(SERVER_PATH . "/libs/NumericRangeValidator.php");
@@ -43,9 +44,12 @@ abstract class ApiHandler
         
         // Declare response as an array
         $this->response = array();
-        
-        // Set JSON as output
-        header('Content-Type: application/json');
+                
+    }
+    
+    private function ApiDie($message)
+    {
+        die(json_encode($message));
     }
     
     protected function CheckAuthorization()
@@ -70,14 +74,14 @@ abstract class ApiHandler
             {
 
                 // We have an invalid auth token. Dying.            
-                die(json_encode( $this->error_dispatcher->invalidAuthToken() ));
+                throw new ApiException( $this->error_dispatcher->invalidAuthToken() );
             }
         }
         else
         {
       
           // Login is required
-          die(json_encode( $this->error_dispatcher->invalidAuthToken() ));
+          throw new ApiException( $this->error_dispatcher->invalidAuthToken() );
         }
                 
     }
@@ -102,7 +106,7 @@ abstract class ApiHandler
             if ( !$parameter->validate() )
             {
                 // In case of missing or validation failed parameters, send a BAD REQUEST        
-                die(json_encode( $this->error_dispatcher->invalidParameter( $parameter->getError())));   
+                throw new ApiException( $this->error_dispatcher->invalidParameter( $parameter->getError()) );   
             }
         }
     }
@@ -116,19 +120,30 @@ abstract class ApiHandler
     // This function should be called 
     public function ExecuteApi()
     {
-        // Check authorization
-        $this->CheckAuthorization();
-        $this->CheckPermissions();
+        try
+        {
+            // Set JSON as output
+            header('Content-Type: application/json');   
+            
+            // Check authorization
+            $this->CheckAuthorization();
+            $this->CheckPermissions();
+
+            // Process input
+            $this->ProcessRequest();       
+            $this->ValidateRequest();
+
+            // Generate output
+            $this->GenerateResponse();
+
+            // Send output        
+            $this->SendResponse();        
+        }
+        catch (ApiException $e)
+        {
+            $this->ApiDie($e->getArrayMessage());
+        }
         
-        // Process input
-        $this->ProcessRequest();       
-        $this->ValidateRequest();
-                        
-        // Generate output
-        $this->GenerateResponse();
-        
-        // Send output        
-        $this->SendResponse();        
     }
 }
 

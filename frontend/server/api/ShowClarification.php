@@ -45,7 +45,7 @@ class ShowClarification extends ApiHandler
         {        
             if ($clarification->getAuthorId() != $this->user_id )
             {
-                die(json_encode($this->error_dispatcher->forbiddenSite()));
+               throw new ApiException($this->error_dispatcher->forbiddenSite());
             }        
         }                
  
@@ -66,7 +66,7 @@ class ShowClarification extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));        
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
         
         }
         

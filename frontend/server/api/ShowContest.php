@@ -45,7 +45,7 @@ class ShowContest extends ApiHandler
         {        
             if (is_null(ContestsUsersDAO::getByPK($this->user_id, $this->request["contest_id"]->getValue())))
             {
-                die(json_encode($this->error_dispatcher->forbiddenSite()));
+               throw new ApiException($this->error_dispatcher->forbiddenSite());
             }        
         }                
  
@@ -66,7 +66,7 @@ class ShowContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));        
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
         
         }
         
@@ -85,7 +85,7 @@ class ShowContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation()));        
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation());        
         }
         
         
@@ -105,7 +105,7 @@ class ShowContest extends ApiHandler
             catch(Exception $e)
             {
                 // Operation failed in the data layer
-                die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));        
+               throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
             }
             
             // Add the 'points' value that is stored in the ContestProblem relationship

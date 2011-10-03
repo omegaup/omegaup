@@ -46,13 +46,13 @@ class ShowRun extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation()));        
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation());        
         }
         
         
         if($this->myRun->getUserId() !== $this->user_id)
         {
-            die(json_encode($this->error_dispatcher->forbiddenSite()));
+           throw new ApiException($this->error_dispatcher->forbiddenSite());
         }
     }
 
@@ -74,7 +74,7 @@ class ShowRun extends ApiHandler
         }
         catch (Exception $e)
         {
-            die(json_encode( $this->error_dispatcher->invalidFilesystemOperation() ));
+           throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );
         }
         
     }

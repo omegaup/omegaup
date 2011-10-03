@@ -73,7 +73,7 @@ class NewClarification extends ApiHandler
         }catch(Exception $e)
         {              
             // Operation failed in the data layer
-            die(json_encode( $this->error_dispatcher->invalidDatabaseOperation() ));    
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
         
         //Add the clarification id to the response
