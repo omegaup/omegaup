@@ -38,9 +38,7 @@ class ApiHttpErrors
     // Sets the HTTP header and returns an array with error info
     public function invalidAuthToken($message = NULL)
     {
-        // We have an invalid auth token. Dying.
-        header('HTTP/1.1 401 FORBIDDEN');        
-        
+                
         if ($message === NULL)
         {
             $message = "You supplied an invalid auth token, or maybe it expired.";
@@ -48,16 +46,14 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 500 );
+                     "errorcode" => 500,
+                     "header" => 'HTTP/1.1 401 FORBIDDEN');
     }
     
     // Sets the HTTP header and returns an array with error info
     public function notAllowedToSubmit($message = NULL)
     {
-        // We have an invalid auth token. Dying.
-        header('HTTP/1.1 401 FORBIDDEN');
-        
-        
+                        
         if ($message === NULL)
         {
             $message = "You're not allowed to submit yet.";
@@ -65,7 +61,8 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 501 );
+                     "errorcode" => 501,
+                     "header" => 'HTTP/1.1 401 FORBIDDEN');
     }
     
 
@@ -73,9 +70,7 @@ class ApiHttpErrors
     public function invalidParameter($message = NULL)
     {
         // We have an invalid auth token. Dying.
-        header('HTTP/1.1 400 BAD REQUEST');
         
-
         if ($message === NULL)
         {
             $message = "You supplied an invalid value for a parameter.";
@@ -83,15 +78,14 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 100 );
+                     "errorcode" => 100,
+                     "header" => 'HTTP/1.1 400 BAD REQUEST' );
     }
     
     // Sets the HTTP header and returns an array with error info
     public function invalidFilesystemOperation($message = NULL)
     {
-        
-        header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-        
+               
 
         if ($message === NULL)
         {
@@ -100,16 +94,14 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 104 );
+                     "errorcode" => 104,
+                     "header" => 'HTTP/1.1 500 INTERNAL SERVER ERROR');
     }    
     
     // Sets the HTTP header and returns an array with error info
     public function invalidDatabaseOperation($message = NULL)
     {
-
-        header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-
-
+       
         if ($message === NULL)
         {
             $message = "Whops. Ive encoutered an internal error error Please try again.";
@@ -117,15 +109,14 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 105 );
+                     "errorcode" => 105,
+                     "header" => "HTTP/1.1 500 INTERNAL SERVER ERROR");
     } 
     
     // Sets the HTTP header and returns an array with error info
     public function invalidCredentials($message = NULL)
     {
-        
-        header('HTTP/1.1 403 FORBIDDEN');
-        
+                        
 
         if ($message === NULL)
         {
@@ -134,15 +125,14 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 101 );
+                     "errorcode" => 101,
+                     "header" => "HTTP/1.1 403 FORBIDDEN");
     }
     
     // Sets the HTTP header and returns an array with error info
     public function forbiddenSite($message = NULL)
     {
-        
-        header('HTTP/1.1 403 FORBIDDEN');
-        
+                
 
         if ($message === NULL)
         {
@@ -151,15 +141,14 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 106 );
+                     "errorcode" => 106,
+                     "header" => 'HTTP/1.1 403 FORBIDDEN');
     }
     
     // Sets the HTTP header and returns an array with error info
     public function registeredViaThirdPartyNotSupported($message = NULL)
     {
-        
-        header('HTTP/1.1 400 BAD REQUEST');
-        
+                
 
         if ($message === NULL)
         {
@@ -168,13 +157,12 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 102 );
+                     "errorcode" => 102,
+                     "header" => 'HTTP/1.1 400 BAD REQUEST' );
     }
     
     public function notFound($message = NULL)
     {
-        
-        header('HTTP/1.1 404 NOT FOUND');
         
 
         if ($message === NULL)
@@ -184,7 +172,8 @@ class ApiHttpErrors
         
         return array("status" => "error",
                      "error"	 => $message,
-                     "errorcode" => 107 );
+                     "errorcode" => 107,
+                     "header" => 'HTTP/1.1 404 NOT FOUND');
     }
     
     
