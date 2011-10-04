@@ -43,16 +43,15 @@ class Login extends ApiHandler {
 
     protected function GenerateResponse() {
         
-        // Save USERNAME and PASSWORD in proper constants
-        define("USERNAME", $_POST["username"] );
-        define("PASSWORD", $_POST["password"] );
-
+        $username = $_POST["username"];
+        $password = $_POST["password"];
+                
         
         /**
          * Lets look for this user in the user table.
          * */
         $user_query = new Users();
-        $user_query->setUsername( USERNAME );
+        $user_query->setUsername( $username );
         
         $results = UsersDAO::search( $user_query );
         
@@ -60,15 +59,15 @@ class Login extends ApiHandler {
         if(sizeof($results) == 1){
                 /**
                  * Found him !
-                 * */
-                $actual_user = $results[0];
+                 * */               
+                $actual_user = $results[0];                
 
         }else{
                 /**
                  * He was not ther, maybe he sent his email instead.
                  * */	
                 $email_query = new Emails();
-                $email_query->setEmail( USERNAME );
+                $email_query->setEmail( $username );
 
                 $results = EmailsDAO::search( $email_query );
 
@@ -112,12 +111,12 @@ class Login extends ApiHandler {
          * Ok, go ahead and check the password. For now its only md5, *with out* salt.
          * */        
         if( 
-                $actual_user->getPassword() !== md5(PASSWORD)
+                $actual_user->getPassword() !== md5($password)
          ){
 
                 /**
                  * Passwords did not match !
-                 * */
+                 * */                
                throw new ApiException($this->error_dispatcher->invalidCredentials());
         }
         
@@ -138,6 +137,7 @@ class Login extends ApiHandler {
                    throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
                 }
         }
+                
         
         /**
          * Ok, passwords match !

@@ -53,11 +53,7 @@ abstract class ApiHandler
                 
                 
     }
-           
-    private function ApiEncode($message)
-    {
-        return json_encode($message);
-    }
+                      
     
     protected function CheckAuthorization()
     {
@@ -104,7 +100,9 @@ abstract class ApiHandler
     {                
         
         if ($this->api_roles === BYPASS)
+        { 
             return true;
+        }
         
         foreach($this->user_roles as $rol)
         {
@@ -157,10 +155,7 @@ abstract class ApiHandler
     public function ExecuteApi()
     {
         try
-        {
-            // Set JSON as output
-            header('Content-Type: application/json');   
-                        
+        {                                    
             $this->CheckAuthorization();
             
             // Each API should declare its allowed roles            
@@ -175,11 +170,13 @@ abstract class ApiHandler
             // Generate output
             $this->GenerateResponse();
 
-            return $this->ApiEncode($this->response);       
+            $this->response["status"] = "ok";
+            return $this->response;       
         }
         catch (ApiException $e)
         {
-            return $this->ApiEncode($e->getArrayMessage());
+            // Propagate the exception
+            throw $e;
         }
         
     }
