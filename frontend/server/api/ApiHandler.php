@@ -59,8 +59,8 @@ abstract class ApiHandler
     {
         // @TODO Idealy we should decouple the validation in delegates or something more mantainable
         
-        // Check if we have a logged user.
-        if( isset($_REQUEST["auth_token"]) )
+        // Check if we have a logged user.               
+        if( isset($_POST["auth_token"]) )
         {
                 
             // Find out the token

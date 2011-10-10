@@ -18,9 +18,12 @@
 define("WHOAMI", "API");
 
 require_once("../../../server/inc/bootstrap.php");
-require_once("../../../server/api/logout.php");
+require_once("../../../server/api/Logout.php");
+require_once("../../../server/api/ApiOutputFormatter.php");
 
 
 $apiHandler = new Logout();
-echo $apiHandler->ExecuteApi();
+
+$apiOutput = ApiOutputFormatter::getInstance();
+$apiOutput->PrintOuput($api);
 
