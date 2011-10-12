@@ -46,7 +46,9 @@
    // Define POST and GET constants for simplicity
    define('POST', "__ISPOST__");
    define('GET', "__ISGET__");
+
    
+
    // Cache of roles_id
    define('ADMIN', '1');
    define('CONTESTANT', '2');
@@ -54,6 +56,9 @@
    define('VISITOR', '4');
    define('BYPASS', '-1');
    
+
+   require_once("libs/Logger/Logger.php");
+
    
 	/**
 	 *  QUICK FIX
