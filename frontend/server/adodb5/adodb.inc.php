@@ -1029,6 +1029,8 @@
 			$this->_queryID = @$this->_query($sql,$inputarr);
 		}
 		
+		Logger::logSQL($sql);
+
 		/************************
 		// OK, query executed
 		*************************/
@@ -2015,6 +2017,7 @@
 	
 	function LogSQL($enable=true)
 	{
+
 		include_once(ADODB_DIR.'/adodb-perf.inc.php');
 		
 		if ($enable) $this->fnExecute = 'adodb_log_sql';

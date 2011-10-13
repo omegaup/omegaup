@@ -130,7 +130,10 @@ abstract class ApiHandler
     {
      
         // If we didn't get any request, asume everything is OK.
-        if(is_null($this->request)) return;
+        if(is_null($this->request)) {
+            Logger::log("We didn't get any request, asume everything is OK");
+            return;
+        }
         
         // Validate all data 
         foreach($this->request as $parameter)
@@ -138,7 +141,8 @@ abstract class ApiHandler
 
             if ( !$parameter->validate() )
             {
-                // In case of missing or validation failed parameters, send a BAD REQUEST        
+                // In case of missing or validation failed parameters, send a BAD REQUEST 
+                Logger::error( $parameter->getError() );
                 throw new ApiException( $this->error_dispatcher->invalidParameter( $parameter->getError()) );   
             }
         }
@@ -155,22 +159,27 @@ abstract class ApiHandler
     public function ExecuteApi()
     {
         try
-        {                                    
+        {   
             $this->CheckAuthorization();
-            
+           
             // Each API should declare its allowed roles            
             $this->api_roles = $this->DeclareAllowedRoles();
             
+
             $this->CheckPermissions();
                         
             // Process input
+
             $this->GetRequest();       
+
+            
             $this->ValidateRequest();
 
             // Generate output
             $this->GenerateResponse();
 
             $this->response["status"] = "ok";
+            
             return $this->response;       
         }
         catch (ApiException $e)

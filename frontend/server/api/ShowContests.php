@@ -12,6 +12,7 @@
  * */
 require_once("ApiHandler.php");
 
+
 class ShowContests extends ApiHandler {
     
     protected function DeclareAllowedRoles() 
@@ -37,6 +38,7 @@ class ShowContests extends ApiHandler {
                  * Found it !
                  * */
                 $this->user_id = $token->getUserId();
+                
             } else {
                 
                 // We have an invalid auth token. Dying.            

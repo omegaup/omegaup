@@ -12,5 +12,11 @@
 	define("OMEGAUP_DB_NAME", 	"omegaup");	
 	define("OMEGAUP_DB_DRIVER", "mysqlt");
 	define("OMEGAUP_DB_DEBUG", 	false);	
-	
+	define("OMEGAUP_MD5_SALT", 	"om3gaup");	
+
+
+	define("OMEGAUP_LOG_ACCESS_FILE", 	"/var/log/omegaup/omegaup.log");
+	define("OMEGAUP_LOG_ERROR_FILE", 	"/var/log/omegaup/omegaup.log");
+	define("OMEGAUP_LOG_TRACKBACK", false);
+	define("OMEGAUP_LOG_DB_QUERYS", false);
 

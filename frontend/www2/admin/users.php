@@ -15,5 +15,21 @@
 
 
     $page = new OmegaupAdminComponentPage();
-    $page->addComponent( new TitleComponent("Administracion de Omegaup"));
+    $page->addComponent( new TitleComponent("Usuarios de omegaup"));
+
+	
+	
+	$header = array(
+			"user_id" 	=> "Id",
+			"username" 	=> "Username",
+			"name" 		=> "name",
+			"last_access" => "last_access"
+		);
+	
+	$users = UsersDAO::getAll();
+
+	$users_table = new TableComponent( $header, $users );
+    
+    $page->addComponent( $users_table );
+    
     $page->render();

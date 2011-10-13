@@ -15,5 +15,12 @@
 
 
     $page = new OmegaupAdminComponentPage();
-    $page->addComponent( new TitleComponent("Administracion de Omegaup"));
+    $page->addComponent( new TitleComponent("Problemas"));
+
+	
+	$page->addComponent( new TitleComponent("Nuevo problema", 3));
+
+    $new_problem = new DAOFormComponent( new Problems() );
+    $page->addComponent( $new_problem );
+    
     $page->render();

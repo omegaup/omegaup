@@ -1,6 +1,17 @@
 <?php
 
 
+
+	/* *************************************************************************************
+	 * DEPRECATED, DONT BOTHER READING THIS, STILL HERE FOR REFERENCE UNTIL NEW 
+	 * LIBS ARE FULLY FUNCTIONAL
+	 * *************************************************************************************/
+
+
+
+
+
+
 	/*
 	 * Theme interface
 	 * 
