@@ -162,7 +162,6 @@ abstract class ApiHandler
         {   
             $this->CheckAuthorization();
            
-
             // Each API should declare its allowed roles            
             $this->api_roles = $this->DeclareAllowedRoles();
             
@@ -180,6 +179,7 @@ abstract class ApiHandler
             $this->GenerateResponse();
 
             $this->response["status"] = "ok";
+            
             return $this->response;       
         }
         catch (ApiException $e)
