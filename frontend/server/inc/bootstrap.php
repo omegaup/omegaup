@@ -46,7 +46,9 @@
    // Define POST and GET constants for simplicity
    define('POST', "__ISPOST__");
    define('GET', "__ISGET__");
+
    
+
    // Cache of roles_id
    define('ADMIN', '1');
    define('CONTESTANT', '2');
@@ -54,7 +56,11 @@
    define('VISITOR', '4');
    define('BYPASS', '-1');
    
-   
+
+   require_once("libs/Logger/Logger.php");
+
+
+   require_once('dao/model.inc.php');
 	/**
 	 *  QUICK FIX
 	 * */	  
@@ -69,8 +75,12 @@
 		
 		require_once('adodb5/adodb.inc.php');
 		require_once('adodb5/adodb-exceptions.inc.php');
-		require_once('dao/model.inc.php');
-                if(file_exists('dao/model.inc.php')) echo "exists!";
+		
+
+				/******  *********** WHAT IS THITS ?  ***********  ***********  *****
+                */     if(file_exists('dao/model.inc.php')) echo "exists!";        /*
+                ************  ***********  ***********  ***********  *********** ****/ 
+
 		$conn = null;
 
 		try{
@@ -162,8 +172,9 @@
 	 * 
 	 * */
 	require_once( "gui.php" );
-	require_once( "definitions.php" );
 	
+	require_once( "definitions.php" );
+	require_once( "libs/GUI/GUI.inc.php" );
 	
 	
 	/*
@@ -218,11 +229,12 @@
 	 *
 	 * */
 	/*
-	if( LEVEL_NEEDED  ){
+	if( !defined(LEVEL_NEEDED)  ){
 		//LEVEL_NEEDED WAS NOT SET !
 		$GUI->prettyDie("LEVEL_NEEDED WAS NOT SET");
 		
 	}else{
 		//check for permissions
-		
-	}*/
+
+	}
+	*/
