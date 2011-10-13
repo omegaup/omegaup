@@ -1029,7 +1029,7 @@
 			$this->_queryID = @$this->_query($sql,$inputarr);
 		}
 		
-		//Logger::logSQL($sql);
+		Logger::logSQL($sql);
 
 		/************************
 		// OK, query executed

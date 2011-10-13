@@ -147,7 +147,7 @@ class Logger
 
 	public static final function error ( $msg )
 	{
-		self::log( $msg );
+		self::log( " ERROR | " . $msg );
 	}
 
 	public static final function log( $msg, $level = 0 )
@@ -156,11 +156,11 @@ class Logger
             return;
         
         if(!file_exists(OMEGAUP_LOG_ACCESS_FILE)){
-            die("POS: Unable to open logfile:" .OMEGAUP_LOG_ACCESS_FILE );
+            die("Unable to open logfile:" .OMEGAUP_LOG_ACCESS_FILE );
         }
 
         if(!is_writable(OMEGAUP_LOG_ACCESS_FILE)){
-            die("POS: Unable to write to logfile:" .OMEGAUP_LOG_ACCESS_FILE );
+            die("Unable to write to logfile:" .OMEGAUP_LOG_ACCESS_FILE );
         }
 
 
@@ -174,26 +174,6 @@ class Logger
         $out .= " | " . $_SERVER["REMOTE_ADDR"];
 
         
-        if(isset($_SESSION["INSTANCE_ID"])){
-            $out .= " | INSTANCE:" . $_SESSION["INSTANCE_ID"];
-        }
-
-
-        if(isset($_SESSION['userid'])){
-            $out .= " | USERID:" . $_SESSION['userid'];
-        }
-
-		/*
-        if(isset($_SESSION['sucursal']) 
-			&& method_exists($_SESSION['sucursal'], '__toString') //bug #121
-		){
-			try{
-            	$out .= " | SUC:" . $_SESSION['sucursal'];
-			}catch(Exception $e){
-				return Logger::log($e);
-			}
-
-        }*/
 
 		if(OMEGAUP_LOG_TRACKBACK){
 	        $d = debug_backtrace();
