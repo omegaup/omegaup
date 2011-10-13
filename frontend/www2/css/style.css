@@ -79,6 +79,13 @@ h1{
     text-rendering: optimizeLegibility;
 }
 
+h2{
+     padding: 0px 5px 0;
+    font-size: 20px;
+    -webkit-text-stroke: 1px transparent;
+    text-rendering: optimizeLegibility;   
+}
+
 div.title {
     padding: 37px 50px 0;
     font-size: 26px;

@@ -3,25 +3,96 @@
 class OmegaupComponentPage extends StdComponentPage{
 
 	
-
+	private $user_html_menu;
 
 	function __construct()
 	{
 
+		$this->doGetRequests();
 
 		parent::__construct();
-		$this->bootstrap();
-		
+
+		$this->user_html_menu = ""; 
+
+		$this->createUserMenu();
+
 	}//__construct()
 
 
 
 
 
-	function bootstrap()
-	{
+	private function doGetRequests(){
+
+		/**
+		  *
+		  * GET Requests
+		  **/
+		if(isset($_GET["request"])){
+			switch($_GET["request"]){
+				case "logout" :
+					LoginController::logOut();
+					die(header("Location: ."));
+				break;
+
+			}			
+		}
+
+
+		/**
+		  *
+		  * POST Requests
+		  **/
+		if(isset($_POST["request"])){
+
+			switch($_POST["request"]){
+				case "login" :
+
+					if( LoginController::testUserCredentials(  $_POST["user"], $_POST["pass"]  ) ){
+						//login correcto
+						Logger::log("ok");
+						LoginController::login( $_POST["user"], null );
+
+					}else{
+						//login incorrecto
+						Logger::log("nope");
+					}
+
+					
+				break;
+			}			
+
+		}		
+
+
 
 	}
+
+
+
+
+
+	private function createUserMenu()
+	{
+
+		
+		if(LoginController::isLoggedIn()){
+			//user is NOT logged in
+			
+			
+			$this->user_html_menu = "<a href='?request=logout'>Cerrar Sesion</a>";	
+			return;
+		}
+
+		
+		//user is not logged in
+		$this->user_html_menu = "Bienvenido a Omegaup ! ";
+		$this->user_html_menu .= "<a href='nativeLogin.php'>Inicia sesion !</a>";
+
+	}
+
+
+
 
 
 
@@ -71,7 +142,9 @@ class OmegaupComponentPage extends StdComponentPage{
 			
 			<body>
 			<div id="wrapper">
-				<div class="login_bar"></div> 
+				<div class="login_bar" style="display: block">
+				<?php echo $this->user_html_menu; ?>
+				</div> 
 				<div id="title">
 					<div style="margin-left: 40%;"><img src="media/omegaup_curves.png"></div>
 				</div>

@@ -28,17 +28,13 @@
 	/* ************************************************************************************ */
 	
 	
-	
-	
-	
+
 	if(isset($_GET["out"])){
 
 		LoginController::logout(  );
 		
 		die(header("Location: index.php"));
 	}
-	
-	
 	
 	
 

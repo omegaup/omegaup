@@ -23,7 +23,15 @@ class DAOFormComponent extends FormComponent
 
 	}
 
+	public function hideFields( $field_name_array ){
+		foreach ($field_name_array as $field) {
+			$this->hideField( $field );
+		}
+	}
+
 	public function hideField( $field_name ){
+
+
 		$sof = sizeof($this->form_fields);
 		
 
@@ -40,6 +48,8 @@ class DAOFormComponent extends FormComponent
 
 		throw new Exception("Field not found in the VO object.");
 	}
+
+
 
 }
 

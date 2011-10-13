@@ -5,12 +5,34 @@ require_once("dao/Emails.dao.php");
 
 class LoginController{
 	
-	
-	
-	
-	
-	
-	
+
+	static function testUserCredentials(
+		$email, 
+		$pass
+	){
+		Logger::log("Testing user " . $email);
+		$email_query = new Emails();
+		$email_query->setEmail( $email );
+		
+		$result = EmailsDAO::search( $email_query );
+
+
+		if( sizeof($result) == 0)
+		{
+			//email does not even exist
+			return false;
+		}
+
+
+		$this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
+
+		//test passwords
+		return $this_user->getPassword() === md5( $pass ) ;
+		
+	}
+
+
+
 	/**
 	 * 
 	 * 
@@ -111,6 +133,7 @@ class LoginController{
 	 * */
 	static function isLoggedIn(
 	){
+
 		return isset($_SESSION["LOGGED_IN"]) && $_SESSION["LOGGED_IN"];
 	}
 
@@ -125,6 +148,9 @@ class LoginController{
 	 * */
 	static function logout(
 	){
+
+		Logger::log("Logout");
+
 		unset($_SESSION["USER_ID"]);
 		unset($_SESSION["EMAIL"]);
 		unset($_SESSION["LOGGED_IN"]);		
