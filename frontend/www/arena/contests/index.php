@@ -18,7 +18,7 @@ require_once("../../../server/api/ShowContests.php");
 
 
 $apiHandler = new ShowContests();
-echo $apiHandler->ExecuteApi();
+echo json_encode($apiHandler->ExecuteApi());
 
 
 

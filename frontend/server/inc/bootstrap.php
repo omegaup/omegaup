@@ -59,7 +59,8 @@
 
    require_once("libs/Logger/Logger.php");
 
-   
+
+   require_once('dao/model.inc.php');
 	/**
 	 *  QUICK FIX
 	 * */	  
@@ -74,8 +75,12 @@
 		
 		require_once('adodb5/adodb.inc.php');
 		require_once('adodb5/adodb-exceptions.inc.php');
-		require_once('dao/model.inc.php');
-                if(file_exists('dao/model.inc.php')) echo "exists!";
+		
+
+				/******  *********** WHAT IS THITS ?  ***********  ***********  *****
+                */     if(file_exists('dao/model.inc.php')) echo "exists!";        /*
+                ************  ***********  ***********  ***********  *********** ****/ 
+
 		$conn = null;
 
 		try{
@@ -167,8 +172,9 @@
 	 * 
 	 * */
 	require_once( "gui.php" );
-	require_once( "definitions.php" );
 	
+	require_once( "definitions.php" );
+	require_once( "libs/GUI/GUI.inc.php" );
 	
 	
 	/*
