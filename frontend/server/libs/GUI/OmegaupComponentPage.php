@@ -50,12 +50,13 @@ class OmegaupComponentPage extends StdComponentPage{
 
 					if( LoginController::testUserCredentials(  $_POST["user"], $_POST["pass"]  ) ){
 						//login correcto
-						Logger::log("ok");
+						
 						LoginController::login( $_POST["user"], null );
-
+						die(header("Location: home.php"));
 					}else{
 						//login incorrecto
 						Logger::log("nope");
+						
 					}
 
 					

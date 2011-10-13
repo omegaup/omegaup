@@ -13,6 +13,17 @@
 
 	require_once( "../server/inc/bootstrap.php" );
 	
+
+	/**
+	  *
+	  * If user is logged in, and somehow
+	  * reached this page, send him to home
+	  **/
+	if( LoginController::isLoggedIn() )
+		die(header("Location: home.php"));
+
+
+
     $page = new OmegaupComponentPage();
 
 
