@@ -229,11 +229,12 @@
 	 *
 	 * */
 	/*
-	if( LEVEL_NEEDED  ){
+	if( !defined(LEVEL_NEEDED)  ){
 		//LEVEL_NEEDED WAS NOT SET !
 		$GUI->prettyDie("LEVEL_NEEDED WAS NOT SET");
 		
 	}else{
 		//check for permissions
-		
-	}*/
+
+	}
+	*/
