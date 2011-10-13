@@ -5,7 +5,7 @@ require_once ("libs/GUI/Page.php");
 require_once ("libs/GUI/StdPage.php");
 require_once ("libs/GUI/StdComponentPage.php");
 require_once ("libs/GUI/OmegaupComponentPage.php");
-
+require_once ("libs/GUI/OmegaupAdminComponentPage.php");
 
 //gui components
 require_once ("libs/GUI/GuiComponent.php");

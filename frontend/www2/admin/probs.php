@@ -15,5 +15,9 @@
 
 
     $page = new OmegaupAdminComponentPage();
-    $page->addComponent( new TitleComponent("Administracion de Omegaup"));
+    $page->addComponent( new TitleComponent("Problemas"));
+
+
+    
+    
     $page->render();
