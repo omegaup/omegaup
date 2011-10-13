@@ -11,9 +11,6 @@ class UsersController {
 			throw new Exception("Este email ya ha sido registrado.");
 		}
 
-
-		
-
 		
 		DAO::transBegin();
 
@@ -77,22 +74,7 @@ class UsersController {
 	}
 	
 	
-	public static function searchUserByEmail( $email )
-	{
-		$email_query = new Emails();
-		$new_user->setMainEmailId( $mail->getEmailId() );
 
-
-		$u = new Users();
-		$u->setEmail($email);
-		$res = UsersDAO::search($u);
-		
-		if(sizeof($res) == 0){
-			return null;
-		}else{
-			return $res[0];
-		}
-	}
 	
 	public static function getUserList(){
 		
