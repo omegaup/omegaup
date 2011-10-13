@@ -71,6 +71,23 @@ div.post a {
 }
 div.post a:hover { color: #666 }
 /* 27 for baseline */
+
+h1{    
+    margin-top: 10px;
+    padding: 0px 5px 0;
+    font-size: 26px;
+    -webkit-text-stroke: 1px transparent;
+    text-rendering: optimizeLegibility;
+}
+
+h2{
+    margin-top: 10px;
+     padding: 0px 5px 0;
+    font-size: 20px;
+    -webkit-text-stroke: 1px transparent;
+    text-rendering: optimizeLegibility;   
+}
+
 div.title {
     padding: 37px 50px 0;
     font-size: 26px;
@@ -85,6 +102,7 @@ div.copy h3 {
     line-height: 18px;
     padding: 4px 0 14px;
     color: #666;
+    margin-top:10px;
 }
 div.copy p {
     font-size: 13px;
@@ -173,6 +191,10 @@ div.login_bar{
 	display: none;
 }
 
+div.login_bar a{
+    color: white;
+    text-decoration: none;
+}
 
 .error{
 	background: #FFEBE8;
