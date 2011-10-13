@@ -11,8 +11,9 @@
 	 * */
 	define( "LEVEL_NEEDED", true );
 
-	require_once( "../server/inc/bootstrap.php" );
-	
-  $page = new OmegaupComponentPage();
-  
-  $page->render();
+	require_once( "../../server/inc/bootstrap.php" );
+
+
+    $page = new OmegaupComponentPage();
+    $page->addComponent( new TitleComponent("asdf"));
+    $page->render();

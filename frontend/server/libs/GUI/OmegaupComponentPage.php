@@ -52,11 +52,12 @@ class OmegaupComponentPage extends StdComponentPage{
 						//login correcto
 						
 						LoginController::login( $_POST["user"], null );
-						die(header("Location: home.php"));
+						$this_user = LoginController::getCurrentUser();
+						die(header("Location: profile.php?id=" . $this_user->getUserId()));
 					}else{
 						//login incorrecto
 						Logger::log("nope");
-						
+
 					}
 
 					
@@ -80,8 +81,23 @@ class OmegaupComponentPage extends StdComponentPage{
 		if(LoginController::isLoggedIn()){
 			//user is NOT logged in
 			
+			$this_user = LoginController::getCurrentUser();
+			$this->user_html_menu = '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >';
+			$this->user_html_menu .= ' Hola <a href="profile.php?id='.$this_user->getUserId()  .'">' . $this_user->getUsername()  .'</a>&nbsp;';
+
+			/**
+			 *
+			 * Test if user is admin 
+			 **/
+			$test_admin = UserRolesDAO::getByPK( $this_user->getUserId(), 1 );
 			
-			$this->user_html_menu = "<a href='?request=logout'>Cerrar Sesion</a>";	
+			if(!is_null($test_admin)){
+				//he is admin !
+				$this->user_html_menu .= "| <a href='admin'>Administrar Omegaup</a>&nbsp;";					
+			}
+
+
+			$this->user_html_menu .= "| <a href='?request=logout'>Cerrar Sesion</a>&nbsp;";	
 			return;
 		}
 

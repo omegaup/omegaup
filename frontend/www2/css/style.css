@@ -188,6 +188,10 @@ div.login_bar{
 	display: none;
 }
 
+div.login_bar a{
+    color: white;
+    text-decoration: none;
+}
 
 .error{
 	background: #FFEBE8;
