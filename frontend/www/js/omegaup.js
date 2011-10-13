@@ -32,72 +32,38 @@ window.fbAsyncInit = function() {
 */
 
 
-
-var LoginBar = function (){
+var Contests = 
+{
 	
-	if(DEBUG){
-		console.log("Creating login bar");
-	}
-	
-	var loginStatus = false;
-	
-	this.setStatus = function ( st ){
-		if(DEBUG){ console.log("Setting login status to "+ st +"!"); }
-		loginStatus = st;
-		var html;
-		if(loginStatus){
-			html = "Bienvenido de regreso !";
-
-		}else{
-			html = "Hello stranger ! <a href='login.php'>Iniciar sesion</a>";	
-					
-		}
+	new_contest : function(   )
+	{
 		
-		$(".login_bar").html( html );
+	},
+
+	test_contest_valid_params : function (    )
+	{
+		
 	}
+
+
+}
+
+
+
+var ApiCall = 
+{
 	
-	this.setUser = function ( usrName ){
-		$(".login_bar").html( "Hola " + usrName + " ! <a href='login.php?out=1'>Cerrar sesion</a>" );
+	POST : function ()
+	{
+		
+	},
+
+	GET : function ()
+	{
+		
 	}
-	
-	this.render = function (){
-		//asume not valid user
-		if(loginStatus)
-			$(".login_bar").slideDown()
-		else
-			$(".login_bar").show()
-	}
-	
+
 };
-
-
-
-
-
-
-
-
-
-/**
-  * create login bar
-  *
-  **/
-var lb = new LoginBar (   );
-
-
-
-
-/**
-  * Default ajax shit
-  *
-  **/
-$.ajaxSetup({
-  	url: 'api.php',
-	type: 'post'
-});
-
-
-
 
 
 
@@ -115,6 +81,6 @@ $(document).ready(function() {
 		console.log("JS loaded ! Starting app now...");
 	}
 	
-	lb.render();
+	
 
 });
