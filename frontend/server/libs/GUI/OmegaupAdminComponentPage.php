@@ -34,7 +34,7 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 			
 			$this_user = LoginController::getCurrentUser();
 			$this->user_html_menu = '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >';
-			$this->user_html_menu .= ' Hola <a href="profile.php?id='.$this_user->getUserId()  .'">' . $this_user->getUsername()  .'</a>&nbsp;';
+			$this->user_html_menu .= ' Hola <a href="../profile.php?id='.$this_user->getUserId()  .'">' . $this_user->getUsername()  .'</a>&nbsp;';
 
 			/**
 			 *
@@ -44,11 +44,11 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 			
 			if(!is_null($test_admin)){
 				//he is admin !
-				$this->user_html_menu .= "| <a href='admin'>Administrar Omegaup</a>&nbsp;";					
+				$this->user_html_menu .= "| <a href='index.php'>Administrar Omegaup</a>&nbsp;";					
 			}
 
 
-			$this->user_html_menu .= "| <a href='?request=logout'>Cerrar Sesion</a>&nbsp;";	
+			$this->user_html_menu .= "| <a href='../?request=logout'>Cerrar Sesion</a>&nbsp;";	
 			return;
 		}
 
