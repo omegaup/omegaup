@@ -147,7 +147,7 @@
 	 * 
 	 * */
 	require_once("controllers/login.controller.php");
-	
+	require_once("controllers/users.controller.php");
 	
 	
 

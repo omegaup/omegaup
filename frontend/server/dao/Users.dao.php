@@ -20,5 +20,20 @@ require_once("base/Users.vo.base.php");
   */
 class UsersDAO extends UsersDAOBase
 {
+  
+    public function searchUserByEmail($email)
+    {
 
+      global  $conn;
+      $sql = "select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id";
+      $params = array( $email );
+
+      $rs = $conn->GetRow($sql, $params);
+      
+      if(count($rs)==0)return NULL;
+      
+      return new Users( $rs );
+      
+
+    }
 }
