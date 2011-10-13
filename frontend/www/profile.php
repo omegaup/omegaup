@@ -16,17 +16,35 @@
 
 	$page = new OmegaupComponentPage();
 
+	//id argument does not exist
 	if(!isset($_GET["id"])){
 
-		$page->addComponent( new TitleComponent("asdf") );
+		$page->addComponent( new TitleComponent("Whoops, este usuario no exite !") );
 		$page->render();
-
+		exit;
 	}
 
 	$this_user = UsersDAO::getByPK( $_GET["id"] );
 	
+	//user does not exist
+	if(is_null($this_user)){
+
+		$page->addComponent( new TitleComponent("Whoops, este usuario no exite !") );
+		$page->render();
+		exit;
+	}
+
+	//go ahead
+
+	$page->addComponent( new TitleComponent($this_user->getName(), 2) );
+
 	$html = '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=128&amp;d=identicon&amp;r=PG"  >';
 	
 	$page->addComponent( new FreeHtmlComponent($html) );
+
+	
+	$page->addComponent( new FreeHtmlComponent("<hr>") );	
+
+	
 
 	$page->render();

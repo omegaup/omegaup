@@ -14,15 +14,6 @@
 	require_once( "../server/inc/bootstrap.php" );
 	require_once( "api/ShowContests.php");
 
-	/*
-	var_dump($_SESSION);
-	if(isset($_SESSION["LOGGED_IN"]) && $_SESSION["LOGGED_IN"] )
-	echo "Ok";
-	else
-	echo "notok";
-	die("");
-	*/
-
     $page = new OmegaupComponentPage();
     $page->addComponent( new TitleComponent("Concursos en Omegaup !"));
 
@@ -30,6 +21,6 @@
     $contestApi = new ShowContests();
 	$results = $contestApi->ExecuteApi( );
 
-
+	
 
     $page->render();
