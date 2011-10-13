@@ -18,8 +18,10 @@
 define("WHOAMI", "API");
 require_once("../../../../server/inc/bootstrap.php");
 require_once("../../../../server/api/NewContest.php");
+require_once("../../../server/api/ApiOutputFormatter.php");
 
-$apiHandler = new NewContest();
-echo $apiHandler->ExecuteApi();
+$api = new NewContest();
+$apiOutput = ApiOutputFormatter::getInstance();
+$apiOutput->PrintOuput($api);
 
 
