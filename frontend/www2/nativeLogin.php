@@ -35,7 +35,6 @@
       **/
     $page->addComponent( new TitleComponent("Ya tienes cuenta ?"));
     $login_form = new FormComponent( new Users() );
-
     $login_form->addField("user", "Email o usuario", "input", "", "user" );
     $login_form->addField("pass", "Contrase&ntilde;a", "password", "", "pass" );
     $login_form->addField("", "", "hidden", "login", "request" );
@@ -55,7 +54,7 @@
       *
       **/
     $page->addComponent( new TitleComponent("&iquest; Tienes alguna cuenta en uno de estos sitios ?", 3));
-    $html = '<a ><img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50"></a>';
+    $html = '<a href="googleLoginReturn.php"><img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50"></a>';
 	$page->addComponent( new FreeHtmlComponent($html) );
 
 

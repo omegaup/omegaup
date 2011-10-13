@@ -15,5 +15,5 @@
 
 
     $page = new OmegaupComponentPage();
-    $page->addComponent( new TitleComponent("asdf"));
+    $page->addComponent( new TitleComponent("Bienvenido a Omegaup !"));
     $page->render();

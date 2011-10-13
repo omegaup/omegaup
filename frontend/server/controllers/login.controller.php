@@ -168,7 +168,7 @@ class LoginController{
 	static function getCurrentUser(
 	){
 		if(self::isLoggedIn()){
-			return UsuarioDAO::getByPK( $_SESSION["USER_ID"] );
+			return UsersDAO::getByPK( $_SESSION["USER_ID"] );
 		}else
 			return null;
 	}
