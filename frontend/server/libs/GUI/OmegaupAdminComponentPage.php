@@ -8,8 +8,6 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 	function __construct()
 	{
 
-		$this->doGetRequests();
-
 		parent::__construct();
 
 		$this->user_html_menu = ""; 

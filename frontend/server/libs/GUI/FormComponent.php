@@ -85,7 +85,7 @@ class FormComponent implements GuiComponent
 
 	}
 
-	public function addSubmit($caption, $submit_form_url, $method = "GET"){
+	public function addSubmit($caption, $submit_form_url = "", $method = "GET"){
 		$this->submit_form = array( "caption" => $caption, "submit_form_url" => $submit_form_url, "method" => $method );
 	}
 

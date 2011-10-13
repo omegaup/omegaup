@@ -15,12 +15,21 @@
 
 
     $page = new OmegaupAdminComponentPage();
-    $page->addComponent( new TitleComponent("Problemas"));
+    $page->addComponent( new TitleComponent("Usuarios de omegaup"));
 
 	
-	$page->addComponent( new TitleComponent("Nuevo problema", 3));
+	
+	$header = array(
+			"user_id" 	=> "Id",
+			"username" 	=> "Username",
+			"name" 		=> "name",
+			"last_access" => "last_access"
+		);
+	
+	$users = UsersDAO::getAll();
 
-    $new_problem = new DAOFormComponent( new Problems() );
-    $page->addComponent( $new_problem );
+	$users_table = new TableComponent( $header, $users );
+    
+    $page->addComponent( $users_table );
     
     $page->render();
