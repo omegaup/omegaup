@@ -1,54 +1,72 @@
 <?php
 
 
-require_once( "dao/Users.dao.php" );	
-require_once( "dao/Users_Badges.dao.php");
-require_once( "dao/User_Roles.dao.php");
-require_once( "dao/Permissions.dao.php");
 
 class UsersController {
 
-	public static function registerNewUser($name, $email, $pwd, $print_response = null){
+	public static function registerNewUser( $name, $email, $pwd ){
 		//user exists ?
-		if(UsersController::searchUserByEmail($email) != null){
-			//it exists !
-			if($print_response == JSON){
-				echo '{ "success" : false, "reason" : "This email is already registered" }';
-			}
-			
-			return false;
+		if(!is_null( UsersDAO::searchUserByEmail( $email )))
+		{
+			throw new Exception("Este email ya ha sido registrado.");
 		}
+
 		
+		DAO::transBegin();
+
 		//register the user
 		$new_user = new Users();
-		$new_user->setUsername($name);
-		$new_user->setPassword($pwd);
-		$new_user->setEmail($email);
+		$new_user->setUsername($email);
+		$new_user->setPassword(md5($pwd));
 		$new_user->setName($name);
 		$new_user->setSolved(0);
 		$new_user->setSubmissions(0);
+
 		try{
 			UsersDAO::save( $new_user );
+
 		}catch(Exception $e){
 			
-			if($print_response == JSON){
-				echo '{ "success" : false, "reason" : 500, "e" : "'. $e .'" }';
-			}
+			DAO::transRollback();
+			Logger::error($e);
+			throw new Exception("Error");
+
+		}
+		
+		//insert his email as primary
+		$mail = new Emails(  );
+		$mail->setEmail( $email );
+		$mail->setUserId( $new_user->getUserId() );
+
+
+		try{
+			EmailsDAO::save( $mail );
+
+		}catch(Exception $e){
+			DAO::transRollback();
+			Logger::error($e);
+			throw new Exception("Error");
+
+		}
+
+		//insert the new email id into the user
+		$new_user->setMainEmailId( $mail->getEmailId() );
+
+		try{
+			UsersDAO::save( $new_user );
+
+		}catch(Exception $e){
 			
-			return false;			
+			DAO::transRollback();
+			Logger::error($e);
+			throw new Exception("Error");
+
 		}
-		
-		
-		//now that he has been registered, lets log him in
-		
-									
-		if($print_response == JSON){
-			echo '{ "success" : true }';
-		}
-		
-		return true;
+		DAO::transEnd();
+		return $new_user->getUserId();
 
 	}
+
 
 
 	public static function registerNewUserWithFacebook(){
@@ -56,18 +74,7 @@ class UsersController {
 	}
 	
 	
-	public static function searchUserByEmail($email){
-		$u = new Users();
-		$u->setEmail($email);
-		$res = UsersDAO::search($u);
-		
-		if(sizeof($res) == 0){
-			return null;
-		}else{
-			return $res[0];
-		}
-		
-	}
+
 	
 	public static function getUserList(){
 		
@@ -87,11 +94,7 @@ class UsersController {
     */
   public static function setPrimaryEmail() {
   }
-  /**
-    *
-    */
-  public static function addEmail() {
-  }
+
   /**
     *
     */

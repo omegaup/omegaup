@@ -23,6 +23,44 @@
 		die(header("Location: home.php"));
 
 
+  /**
+    *
+    * Logic for registering a new user
+    *
+    **/
+    if(isset($_POST["request"]) && ($_POST["request"] == "register"))
+    {
+      
+
+      if( 
+             isset( $_POST["email"] )
+          && isset( $_POST["pass"] )
+          && isset( $_POST["name"] ) 
+      ){
+        
+        try{
+            UsersController::registerNewUser( $_POST["name"], $_POST["email"], $_POST["pass"] );  
+
+        }catch(Exception $e){
+            die($e);
+        }
+
+        $_POST["request"] = "login";
+        $_POST["user"]    = $_POST["email"];
+        $_POST["pass"]    = $_POST["pass"];
+
+      }
+      
+
+      //registration went ok
+      //login this user
+
+    }
+
+
+
+
+
 
     $page = new OmegaupComponentPage();
 
@@ -54,8 +92,10 @@
       *
       **/
     $page->addComponent( new TitleComponent("&iquest; Tienes alguna cuenta en uno de estos sitios ?", 3));
-    $html = '<a href="googleLoginReturn.php"><img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50"></a>';
-	$page->addComponent( new FreeHtmlComponent($html) );
+    $html = '<a href="googleLoginReturn.php">
+              <img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50">
+            </a>';
+	  $page->addComponent( new FreeHtmlComponent($html) );
 
 
 
@@ -64,10 +104,15 @@
       *
       **/
     $page->addComponent( new TitleComponent("&iquest; No es asi ? Registrate, es facil y rapido !", 3));
-    $form = new DAOFormComponent( new Users() );
-    $form->hideFields( array( "user_id", "solved", "main_email_id", "submissions", "country_id", "state_id", "school_id", "last_access" ) ) ;
-    $form->addField("a", "Escuela", "input" );
-    $page->addComponent( $form );
+    $reg_form = new FormComponent( new Users() );
+
+    $reg_form->addField("name", "Nombre", "input", "", "name" );
+    $reg_form->addField("email", "Email", "input", "", "email" );
+    $reg_form->addField("pass", "Contrase&ntilde;a", "password", "", "pass" );
+    $reg_form->addField("pass2", "De nuevo", "password", "", "pass2" );
+    $reg_form->addField("", "", "hidden", "register", "request" );
+    $reg_form->addSubmit("Registrar",  "nativeLogin.php", "POST");
+    $page->addComponent( $reg_form );
 
 
 

@@ -97,6 +97,7 @@ class NewContest extends ApiHandler
             );
     }
     
+
     protected function ValidateRequest() 
     {
         parent::ValidateRequest();
@@ -129,6 +130,7 @@ class NewContest extends ApiHandler
         }
         
     }
+    
     
     protected function GenerateResponse() 
     {
@@ -180,7 +182,8 @@ class NewContest extends ApiHandler
         }catch(Exception $e)
         {   
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
+            ContestsDAO::transRollback();
+            throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
         
         // Happy ending
