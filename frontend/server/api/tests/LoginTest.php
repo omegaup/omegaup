@@ -8,6 +8,7 @@
 define('WHOAMI', 'API');
 require_once '../../inc/bootstrap.php';
 require_once '../Login.php';
+require_once 'Utils.php';
 
 
 
@@ -18,11 +19,16 @@ class LoginTest extends PHPUnit_Framework_TestCase
     
     public function testValidLogin()
     {
+        // Sanity cleanup
+        Utils::cleanup();
+        
+        //Connect to DB
+        Utils::ConnectToDB();
+        
         $_POST["username"] = "user";
         $_POST["password"] = "password";
         
-        $loginApi = new Login();
-        
+        $loginApi = new Login();        
         $cleanValue = $loginApi->ExecuteApi();
         
         
@@ -34,6 +40,12 @@ class LoginTest extends PHPUnit_Framework_TestCase
     
     public function testInvalidPassword()
     {
+        // Sanity cleanup
+        Utils::cleanup();
+        
+        //Connect to DB
+        Utils::ConnectToDB();
+        
         $_POST["username"] = "user";
         $_POST["password"] = "badpass";
         
@@ -61,6 +73,12 @@ class LoginTest extends PHPUnit_Framework_TestCase
     
     public function testInvalidUser()
     {
+        // Sanity cleanup
+        Utils::cleanup();
+        
+        //Connect to DB
+        Utils::ConnectToDB();
+        
         $_POST["username"] = "baduser";
         $_POST["password"] = "pass";
         
@@ -87,6 +105,13 @@ class LoginTest extends PHPUnit_Framework_TestCase
     
     public function testTwoValidLogins()
     {
+        
+        // Sanity cleanup
+        Utils::cleanup();
+        
+        //Connect to DB
+        Utils::ConnectToDB();
+        
         $_POST["username"] = "user";
         $_POST["password"] = "password";
         

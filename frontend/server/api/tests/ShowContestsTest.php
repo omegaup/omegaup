@@ -67,6 +67,8 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
     
     public function testLatestPublicContest()
     {        
+        //Connect to DB
+        Utils::ConnectToDB();
                         
         // Insert new contest
         $random_title = Utils::RandomString();        
