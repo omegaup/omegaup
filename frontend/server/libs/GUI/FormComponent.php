@@ -97,6 +97,7 @@ class FormComponent implements GuiComponent
 
 
 class FormComponentField{
+
 	public $id;
 	public $caption;
 	public $type;
@@ -111,3 +112,5 @@ class FormComponentField{
 			$this->name 	= $name;
 	}
 }
+
+

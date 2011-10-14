@@ -40,5 +40,7 @@
    	$new_contest->addSubmit("Agendar concurso");
    	
    	$page->addComponent( $new_contest );
+
+   	
     
     $page->render();

@@ -46,7 +46,7 @@ class DAOFormComponent extends FormComponent
 		}
 		
 
-		throw new Exception("Field not found in the VO object.");
+		throw new Exception("Field ".$field_name." not found in the VO object.");
 	}
 
 
