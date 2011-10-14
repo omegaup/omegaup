@@ -69,7 +69,7 @@ class Utils
 	}
     }
     
-    private static function Login($username, $password)
+    static function Login($username, $password)
     {
         self::cleanup();
         $_POST["username"] = $username;

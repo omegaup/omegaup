@@ -171,7 +171,10 @@ class Logger
         //$out = date(DATE_RFC822);
         $out = date("g:i:sa j M");
 
-        $out .= " | " . $_SERVER["REMOTE_ADDR"];
+        if (isset($_SERVER["REMOTE_ADDR"]))
+        {
+            $out .= " | " . $_SERVER["REMOTE_ADDR"];
+        }
 
         
 
