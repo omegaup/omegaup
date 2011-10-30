@@ -209,7 +209,6 @@ class TableComponent implements GuiComponent{
 
 
 
-
 class SimpleTableComponent extends TableComponent{
 	
 	function __construct()
@@ -218,7 +217,7 @@ class SimpleTableComponent extends TableComponent{
 		$this->simple_render = true;
 	}
 
-	function addRow()
+	function addRow( $foo )
 	{
 		$row = array();
 		
