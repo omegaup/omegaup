@@ -37,3 +37,7 @@ frontend/server/config.php
 
 #ignore runtime and test stuff
 grader/test-env
+
+frontend/.DS_Store
+
+.DS_Store
