@@ -25,48 +25,45 @@ class Utils
     
     static function ConnectToDB()
     {
-        if(defined("WHOAMI") && WHOAMI == "API")
-        {
-		
-            require_once('adodb5/adodb.inc.php');
-            require_once('adodb5/adodb-exceptions.inc.php');
-            require_once('dao/model.inc.php');
-            if(file_exists('dao/model.inc.php')) echo "exists!";
-            $conn = null;
+       		
+        require_once('adodb5/adodb.inc.php');
+        require_once('adodb5/adodb-exceptions.inc.php');
+        require_once('dao/model.inc.php');
+        
+        $conn = null;
 
-            try{                    
-                $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
-                $conn->debug = OMEGAUP_DB_DEBUG;
-                $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+        try{                    
+            $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
+            $conn->debug = OMEGAUP_DB_DEBUG;
+            $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 
-                if(!$conn) {
-                            /**
-                             * Dispatch missing parameters
-                             * */
-                            header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+            if(!$conn) {
+                        /**
+                         * Dispatch missing parameters
+                         * */
+                        header('HTTP/1.1 500 INTERNAL SERVER ERROR');
 
-                            die(json_encode(array(
-                                    "status" => "error",
-                                    "error"	 => "Conection to the database has failed.",
-                                    "errorcode" => 1
-                            )));
-
-                }
-
-            } catch (Exception $e) {
-
-                    header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-
-                    die(json_encode(array(
-                            "status" => "error",
-                            "error"	 => $e,
-                            "errorcode" => 2
-                    )));
+                        die(json_encode(array(
+                                "status" => "error",
+                                "error"	 => "Conection to the database has failed.",
+                                "errorcode" => 1
+                        )));
 
             }
-            $GLOBALS["conn"] = $conn;
-            return;
-	}
+
+        } catch (Exception $e) {
+
+                header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+
+                die(json_encode(array(
+                        "status" => "error",
+                        "error"	 => $e,
+                        "errorcode" => 2
+                )));
+
+        }
+        $GLOBALS["conn"] = $conn;
+        return;    
     }
     
     static function Login($username, $password)
