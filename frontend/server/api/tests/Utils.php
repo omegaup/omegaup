@@ -14,6 +14,7 @@
 require_once '../Login.php';
 require_once '../Logout.php';
 
+
 class Utils
 {
     //put your code here
@@ -134,6 +135,18 @@ class Utils
         return md5(uniqid(rand(), true));
     }
     
+    static function GetValidPublicContestId()
+    {
+        return 3;
+    }
+    
+    static function GetValidProblemOfContest($contest_id)
+    {
+        if ($contest_id === 3)
+            return 22;
+        
+        throw new Exception("GetValidProblemOfContest not implemented yet for other contests");
+    }
 }
 
 ?>

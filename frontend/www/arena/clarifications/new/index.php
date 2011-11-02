@@ -9,9 +9,9 @@ Si el usuario tiene permiso, envía una clarificación sobre un problema en part
 define("WHOAMI", "API");
 require_once("../../../../server/inc/bootstrap.php");
 require_once("../../../../server/api/NewClarification.php");
+require_once("../../../server/api/ApiOutputFormatter.php");
 
 
-$apiHandler = new NewClarification();
-echo $apiHandler->ExecuteApi();
-
-
+$api = new NewClarification();
+$apiOutput = ApiOutputFormatter::getInstance();
+$apiOutput->PrintOuput($api);
