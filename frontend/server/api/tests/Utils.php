@@ -75,8 +75,16 @@ class Utils
         
         // Login                                        
         $loginApi = new Login();  
-                
-        $cleanValue = $loginApi->ExecuteApi();
+        
+        try
+        {
+            $cleanValue = $loginApi->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+        }
+        
         $auth_token = $cleanValue["auth_token"];
                 
         
@@ -122,8 +130,34 @@ class Utils
     
     static function LoginAsContestant()
     {
-        return self::Login("user", "password");
+        return self::Login(self::GetContestantUsername(), "password");
     }
+    
+    static function GetContestantUsername()
+    {
+        return "user";
+    }
+    
+    static function GetContestantUserId()
+    {
+        return 1;
+    }
+    
+    static function LoginAsContestant2()
+    {
+        return self::Login(self::GetContestant2Username(), "password");
+    }
+    
+    static function GetContestant2Username()
+    {
+        return "user2";
+    }
+    
+    static function GetContestant2UserId()
+    {
+        return 4;
+    }
+    
     
     static function SetAuthToken($auth_token)
     {
