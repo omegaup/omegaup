@@ -45,48 +45,65 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         // Assert status of new contest
         self::assertEquals("ok", $returnValue["status"]);
         
-        // Clean requests
-        Utils::cleanup();
-        Utils::Logout($auth_token);        
+        // Verify that clarification was inserted in the database
+        $clarifications = ClarificationsDAO::getAll();
+        foreach($clarifications as $c)
+        {            
+            if($c->getMessage() === $_POST["message"])
+            {
+                $this->assertEquals(Utils::GetValidPublicContestId(), $c->getContestId());
+                $this->assertEquals(Utils::GetValidProblemOfContest($_POST["contest_id"]), $c->getProblemId());
+                
+                
+                // Clean requests
+                Utils::cleanup();
+                Utils::Logout($auth_token);        
+                
+                return;
+            }
+        }
+        
+        $this->fail("Clarification was not found in database");
+        
     }
     
     
     public function testInvalidContestId()
     {
         
-      //Connect to DB
-      Utils::ConnectToDB();  
+        //Connect to DB
+        Utils::ConnectToDB();  
 
-      // Login as contestant
-      $auth_token = Utils::LoginAsContestant();  
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();  
 
-      // Set request for valid clarification
-      $_POST["contest_id"] = 1213123;
-      $_POST["problem_id"] = 1213123;
-      $_POST["message"] = Utils::RandomString();
-      Utils::SetAuthToken($auth_token);
+        // Set request for valid clarification
+        $_POST["contest_id"] = 1213123;
+        $_POST["problem_id"] = 1213123;
+        $_POST["message"] = Utils::RandomString();
+        Utils::SetAuthToken($auth_token);
 
-      // Execute API
-      $newClarification = new NewClarification();
-      try
-      {
+        // Execute API
+        $newClarification = new NewClarification();
+        try
+        {
           $returnValue = $newClarification->ExecuteApi();
-      }
-      catch(ApiException $e)            
-      {
+        }
+        catch(ApiException $e)            
+        {
           // Validate error output
           $exception_array = $e->getArrayMessage();          
           $this->assertEquals("Validation failed for parameter contest_id: Validation failed.", $exception_array["error"]);
-          
+
           // We failed, we're fine.
           return;
-      }
+        }
 
-      $this->fail("Exception was expected.");
-      
-      // Clean requests
-      Utils::cleanup();
-      Utils::Logout($auth_token);  
+        $this->fail("Exception was expected.");
+
+        // Clean requests
+        Utils::cleanup();
+        Utils::Logout($auth_token);  
 
     }
 
