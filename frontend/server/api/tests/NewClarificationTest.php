@@ -16,7 +16,7 @@ require_once 'Utils.php';
 class NewClarificationTest extends PHPUnit_Framework_TestCase
 {
     
-    public function testCreateValidClarificatoin()
+    public function testCreateValidClarification()
     {
         //Connect to DB
         Utils::ConnectToDB();
