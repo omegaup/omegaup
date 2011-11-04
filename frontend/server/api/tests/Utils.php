@@ -181,6 +181,33 @@ class Utils
         
         throw new Exception("GetValidProblemOfContest not implemented yet for other contests");
     }
+    
+    static function DeleteClarificationsFromProblem($problem_id)
+    {
+        self::ConnectToDB();
+        
+        // Get clarifications
+        $clarifications = ClarificationsDAO::getAll();
+        
+        // Delete those who belong to problem_id
+        foreach($clarifications as $c)
+        {
+            if($c->getProblemId() == $problem_id)
+            {                
+                try
+                {
+                    ClarificationsDAO::delete($c);
+                }
+                catch(ApiException $e)
+                {
+                    var_dump($e->getArrayMessage());
+                    throw $e;
+                }
+            }
+        }
+        
+        self::cleanup();
+    }
 }
 
 ?>

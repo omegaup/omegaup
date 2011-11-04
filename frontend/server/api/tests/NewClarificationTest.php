@@ -43,27 +43,25 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         }
         
         // Assert status of new contest
-        self::assertEquals("ok", $returnValue["status"]);
+        $this->assertArrayHasKey("clarification_id", $returnValue);
         
         // Verify that clarification was inserted in the database
-        $clarifications = ClarificationsDAO::getAll();
-        foreach($clarifications as $c)
-        {            
-            if($c->getMessage() === $_POST["message"])
-            {
-                $this->assertEquals(Utils::GetValidPublicContestId(), $c->getContestId());
-                $this->assertEquals(Utils::GetValidProblemOfContest($_POST["contest_id"]), $c->getProblemId());
-                
-                
-                // Clean requests
-                Utils::cleanup();
-                Utils::Logout($auth_token);        
-                
-                return;
-            }
-        }
+        $clarification = ClarificationsDAO::getByPK($returnValue["clarification_id"]);
         
-        $this->fail("Clarification was not found in database");
+        // Verify our retreived clarificatoin
+        $this->assertNotNull($clarification);
+        $this->assertEquals($_POST["message"], $clarification->getMessage());
+        $this->assertEquals(Utils::GetValidPublicContestId(), $clarification->getContestId());
+        $this->assertEquals(Utils::GetValidProblemOfContest($_POST["contest_id"]), $clarification->getProblemId());                
+
+        // Clean requests
+        Utils::cleanup();
+        Utils::Logout($auth_token);        
+        
+        // Differentiate two consecutive clarifications by time
+        sleep(1);
+        
+        return $returnValue["clarification_id"];
         
     }
     
