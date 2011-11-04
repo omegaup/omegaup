@@ -23,14 +23,16 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
 
     public function testShowClarificationAsJudge()
     {
+        
+        // As prerequisite, create a new clarification as contestant to guarantee at least one
+        $newClarificationTest = new NewClarificationTest();
+        $clarification_id = $newClarificationTest->testCreateValidClarification();
                        
         //Connect to DB
         Utils::ConnectToDB();
         
-        // Get a random clarification id
-        $clarifications = ClarificationsDAO::getAll();        
-        $clarification = $clarifications[array_rand($clarifications, 1)]; 
-        $clarification_id = $clarification->getClarificationId(); 
+        // Get our clarification from DB for comparisson        
+        $clarification = ClarificationsDAO::getByPK($clarification_id);        
         
         // Login as judge
         $auth_token = Utils::LoginAsJudge();
@@ -73,27 +75,13 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
     {
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
-        $newClarificationTest->testCreateValidClarification();
+        $clarification_id = $newClarificationTest->testCreateValidClarification();
         
         //Connect to DB
         Utils::ConnectToDB(); 
-        
-        // Get a clarification id created by the contestant
-        $clarifications = ClarificationsDAO::getAll();        
-        $clarification = null;
-        foreach($clarifications as $c)
-        {
-            if($c->getAuthorId() == Utils::GetContestantUserId() && $c->getPublic() == '0')
-            {
-                $clarification = $c;
-                break;
-            }
-        }
-        
-        if(is_null($clarification))
-        {
-            $this->fail("No clarification for user was found. Failing.");
-        }
+                
+        // Get our clarification from DB for comparisson        
+        $clarification = ClarificationsDAO::getByPK($clarification_id);
                 
         // Login as contestant
         $auth_token = Utils::LoginAsContestant();
@@ -136,27 +124,13 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
     {        
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
-        $newClarificationTest->testCreateValidClarification();        
+        $clarification_id = $newClarificationTest->testCreateValidClarification();        
         
         //Connect to DB
         Utils::ConnectToDB(); 
         
-        // Get a clarification id created by the contestant
-        $clarifications = ClarificationsDAO::getAll();
-        $clarification = null;
-        foreach($clarifications as $c)
-        {
-            if($c->getAuthorId() == Utils::GetContestantUserId() && $c->getPublic() === '0')
-            {
-                $clarification = $c;
-                break;
-            }
-        }
-        
-        if(is_null($clarification))
-        {            
-            $this->fail("No clarification for user was found. Failing.");
-        }        
+        // Get our clarification from DB for comparisson        
+        $clarification = ClarificationsDAO::getByPK($clarification_id);        
         
         // Login as a different contestant 
         $auth_token = Utils::LoginAsContestant2();
@@ -196,27 +170,13 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
     {  
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
-        $newClarificationTest->testCreateValidClarification();        
+        $clarification_id = $newClarificationTest->testCreateValidClarification();        
         
         //Connect to DB
         Utils::ConnectToDB(); 
         
-        // Get a clarification id created by the contestant
-        $clarifications = ClarificationsDAO::getAll();
-        $clarification = null;
-        foreach($clarifications as $c)
-        {
-            if($c->getAuthorId() == Utils::GetContestantUserId())
-            {
-                $clarification = $c;
-                break;
-            }
-        }
-        
-        if(is_null($clarification))
-        {            
-            $this->fail("No clarification for user was found. Failing.");
-        }        
+        // Get our clarification from DB for comparisson        
+        $clarification = ClarificationsDAO::getByPK($clarification_id);        
         
         // Make this clarification public
         $clarification->setPublic('1');

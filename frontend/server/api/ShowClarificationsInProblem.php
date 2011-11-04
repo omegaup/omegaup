@@ -49,8 +49,8 @@ class ShowClarificationsInProblem extends ApiHandler
            "problem_id" => $this->request["problem_id"]->getValue()
         ));
         
-        if(in_array(JUDGE, $this->user_roles) || in_array(ADMIN, $this->user_roles))
-        {
+        if(count(UserRolesDAO::getByPK($this->user_id, JUDGE)) || count(UserRolesDAO::getByPK($this->user_id, ADMIN)))
+        {            
            // Get all private clarifications 
             $private_clarification_mask = new Clarifications ( array (
                "public" => '0',
@@ -59,7 +59,7 @@ class ShowClarificationsInProblem extends ApiHandler
         }
         else
         {        
-            // Get all private clarifications of the user 
+            // Get private clarifications of the user 
             $private_clarification_mask = new Clarifications ( array (
                "public" => '0',
                "problem_id" => $this->request["problem_id"]->getValue(),
@@ -95,6 +95,17 @@ class ShowClarificationsInProblem extends ApiHandler
             array_push($this->response, $clarification->asFilteredArray($relevant_columns));               
         }
         
+        // Sort final array by time
+        usort($this->response, function ($a,$b) 
+            { 
+                $t1 = strtotime($a["time"]);
+                $t2 = strtotime($b["time"]);
+                
+                if($t1 == $t2)
+                    return 0;
+                
+                return ($t1 > $t2) ? -1 : 1;             
+            });
     }
         
 }
