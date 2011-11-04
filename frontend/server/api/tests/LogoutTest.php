@@ -19,21 +19,15 @@ class LogoutTest extends PHPUnit_Framework_TestCase
     public function testValidLogout()
     {
         
-        // Valid login
-        $_POST["username"] = "user";
-        $_POST["password"] = "password";
+        //Connect to DB
+        Utils::ConnectToDB();
         
-        $loginApi = new Login();        
-        $cleanValue = $loginApi->ExecuteApi();
-        
-        $this->assertNotNull($cleanValue);        
-        $this->assertArrayHasKey('auth_token', $cleanValue);                
-        
-        $auth_token = $cleanValue["auth_token"];
-        
+        // Login
+        $auth_token = Utils::LoginAsContestant();
         
         // Valid logout    
-        unset($_POST);
+        Utils::cleanup();
+        Utils::ConnectToDB();
         $_POST["auth_token"] = $auth_token;
         
         $logoutApi = new Logout();
