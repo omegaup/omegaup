@@ -19,8 +19,8 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
                 
         $_POST["title"] = $title;
         $_POST["description"] = "description";
-        $_POST["start_time"] = "02/02/2011";
-        $_POST["finish_time"] = "03/03/2011";
+        $_POST["start_time"] = "2011-02-02 10:00:00";
+        $_POST["finish_time"] = "2011-03-03 10:00:00";
         $_POST["window_length"] = "20";
         $_POST["public"] = $public;
         $_POST["token"] = "loltoken";
@@ -30,7 +30,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         $_POST["feedback"] = "yes";
         $_POST["penalty"] = 100;
         $_POST["scoreboard"] = 100;
-        $_POST["penalty_time_start"] = "problem";
+        $_POST["penalty_time_start"] = "contest";
         $_POST["penalty_calc_policy"] = "sum";
         
         // If contest is private, an array of users should be provided, in this case we add the judge
@@ -56,15 +56,13 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         catch(ApiException $e)
         {
             // Propagate exception            
-            throw $e;
-            
+            throw $e;            
         }
 
         // Assert status of new contest
         self::assertEquals("ok", $cleanValue["status"]);
         
-        // Clean requests
-        Utils::cleanup();
+        // Clean requests        
         Utils::Logout($auth_token);
         
     }  
@@ -75,11 +73,42 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         Utils::ConnectToDB();
         
         // Insert new contest
-        $random_title = Utils::RandomString();        
+        $random_title = Utils::CreateRandomString();        
         self::CreateContest($random_title, 0);
+        
+        // Validate that data was written to DB by iterating through all contests
+        $contest = null;        
+        $contests = ContestsDAO::getAll();
+        foreach($contests as $c)
+        {
+            if($c->getTitle() === $random_title)
+            {
+                $contest = $c;
+                break;
+            }
+        }
+        
+        // Assert that we found our contest
+        $this->assertNotNull($contest->getContestId());
+        
+        // Assert data was correctly saved
+        $this->assertEquals($_POST["description"], $contest->getDescription());
+        $this->assertEquals($_POST["start_time"], $contest->getStartTime());
+        $this->assertEquals($_POST["finish_time"], $contest->getFinishTime());
+        $this->assertEquals($_POST["window_length"], $contest->getWindowLength());
+        $this->assertEquals($_POST["public"], $contest->getPublic());
+        $this->assertEquals($_POST["token"], $contest->getToken());
+        $this->assertEquals($_POST["points_decay_factor"], $contest->getPointsDecayFactor());
+        $this->assertEquals($_POST["partial_score"], $contest->getPartialScore());
+        $this->assertEquals($_POST["submissions_gap"], $contest->getSubmissionsGap());
+        $this->assertEquals($_POST["feedback"], $contest->getFeedback());
+        $this->assertEquals($_POST["penalty"], $contest->getPenalty());
+        $this->assertEquals($_POST["scoreboard"], $contest->getScoreboard());
+        $this->assertEquals($_POST["penalty_time_start"], $contest->getTimeStart());
+        $this->assertEquals($_POST["penalty_calc_policy"], $contest->getPenaltyCalcPolicy());
     }
     
-    public function testInvalidTitle()
+    public function testMissingParameters()
     {
         //Connect to DB
         Utils::ConnectToDB();
@@ -102,35 +131,79 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
             "penalty_calc_policy"            
         );
         
-        // Pick one to be unset
-        $rand_key = array_rand($valid_keys, 1);
-        
-        try
-        {
-            // Insert new contest
-            $random_title = Utils::RandomString();        
-            $clean_value = self::CreateContest($random_title, 0, $valid_keys[$rand_key]);
-        }
-        catch(ApiException $e)
-        {
-                        
-            // Exception is expected
-            $exception_array = $e->getArrayMessage();            
-            
-            // Validate exception
-            $this->assertNotNull($exception_array);
-            $this->assertArrayHasKey('error', $exception_array);    
-            
-            if ($valid_keys[$rand_key] !== "start_time" )
+        foreach($valid_keys as $key)        
+        {        
+            try
             {
-                $this->assertEquals("Required parameter ". $valid_keys[$rand_key] ." is missing.", $exception_array["error"]);
+                // Insert new contest
+                $random_title = Utils::CreateRandomString();        
+                $clean_value = self::CreateContest($random_title, 0, $key);
             }
+            catch(ApiException $e)
+            {
+                // Exception is expected
+                $exception_array = $e->getArrayMessage();            
+
+                // Validate exception
+                $this->assertNotNull($exception_array);
+                $this->assertArrayHasKey('error', $exception_array);    
+
+                if ($key !== "start_time" )
+                {
+                    $this->assertEquals("Required parameter ". $key ." is missing.", $exception_array["error"]);
+                }
+
+                return;
+            }
+
+            $this->fail("Exception was expected. Parameter: ". $key);            
+        }        
+    }
+    
+    public function testCreateContestAsUser()
+    {
+        //Connect to DB
+        Utils::ConnectToDB();
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set context
+        $_POST["title"] = Utils::CreateRandomString();
+        $_POST["description"] = "description";
+        $_POST["start_time"] = "02/02/2011";
+        $_POST["finish_time"] = "03/03/2011";
+        $_POST["window_length"] = "20";
+        $_POST["public"] = "1";
+        $_POST["token"] = "loltoken";
+        $_POST["points_decay_factor"] = ".02";
+        $_POST["partial_score"] = "0";
+        $_POST["submissions_gap"] = "10";
+        $_POST["feedback"] = "yes";
+        $_POST["penalty"] = 100;
+        $_POST["scoreboard"] = 100;
+        $_POST["penalty_time_start"] = "problem";
+        $_POST["penalty_calc_policy"] = "sum";
+        
+        // Execute API
+        $newContest = new NewContest();
+        Utils::SetAuthToken($auth_token);
+        
+        try 
+        {
+            $return_array = $newContest->ExecuteApi();
+        }
+        catch (ApiException $e)
+        {
+            // Validate error
+            $exception_message = $e->getArrayMessage();            
+            $this->assertEquals("User is not allowed to view this content.", $exception_message["error"]);
+            $this->assertEquals("error", $exception_message["status"]);
+            $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);
             
             return;
-        }
-        
-        $this->fail("Exception was expected. Parameter: ". $valid_keys[$rand_key]);            
-        
-    }
+        }        
+        $this->fail("Contestant was able to insert contest.");        
+    }         
     
 }

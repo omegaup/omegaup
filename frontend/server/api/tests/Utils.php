@@ -94,9 +94,7 @@ class Utils
     }
     
     static function Logout($auth_token)
-    {
-        self::cleanup();
-        
+    {        
         // Logout            
         $_POST["auth_token"] = $auth_token;
         
@@ -108,9 +106,7 @@ class Utils
         if(sizeof($resultsDB) !== 0)
         {
             throw new Exception("User was not logged out correctly");
-        }
-        
-        self::cleanup();
+        }        
     }
     
     static function LoginAsJudge()
@@ -164,7 +160,7 @@ class Utils
         $_POST["auth_token"] = $auth_token;
     }
     
-    static function RandomString()
+    static function CreateRandomString()
     {
         return md5(uniqid(rand(), true));
     }
