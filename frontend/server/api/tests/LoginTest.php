@@ -5,11 +5,8 @@
  * and open the template in the editor.
  */
 
-define('WHOAMI', 'API');
-require_once '../../inc/bootstrap.php';
 require_once '../Login.php';
 require_once 'Utils.php';
-
 
 
 class LoginTest extends PHPUnit_Framework_TestCase

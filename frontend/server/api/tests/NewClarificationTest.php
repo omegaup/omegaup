@@ -5,12 +5,10 @@
  * and open the template in the editor.
  */
 
-define('WHOAMI', 'API');
-require_once '../../inc/bootstrap.php';
 require_once '../ShowClarification.php';
 require_once '../NewClarification.php';
-require_once 'Utils.php';
 
+require_once 'Utils.php';
 
 
 class NewClarificationTest extends PHPUnit_Framework_TestCase

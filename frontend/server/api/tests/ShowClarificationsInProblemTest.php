@@ -6,9 +6,6 @@
  */
 
 
-define('WHOAMI', 'API');
-require_once '../../inc/bootstrap.php';
-
 require_once '../ShowClarificationsInProblem.php';
 
 require_once 'NewClarificationTest.php';
