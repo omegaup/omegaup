@@ -5,9 +5,6 @@
  * and open the template in the editor.
  */
 
-define('WHOAMI', 'API');
-require_once '../../inc/bootstrap.php';
-
 require_once '../ShowContests.php';
 require_once '../NewContest.php';
 
