@@ -265,7 +265,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update( $Contests )
 	{
-		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, token = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ? WHERE  contest_id = ?;";
+		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, token = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ?, points_decay_factor = ?, penalty_calc_policy = ? WHERE  contest_id = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -281,9 +281,12 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
 			$Contests->getPenalty(), 
-			$Contests->getTimeStart(), 
-			$Contests->getContestId(),
-                        $Contests->getPenaltyCalcPolicy());
+			$Contests->getTimeStart(),                         
+                        $Contests->getPointsDecayFactor(),
+                        $Contests->getPenaltyCalcPolicy(),
+			$Contests->getContestId()
+                        
+                        );
 		global $conn;
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
@@ -306,7 +309,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function create( &$Contests )
 	{
-		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, token, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, token, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start, points_decay_factor, penalty_calc_policy) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->getContestId(), 
 			$Contests->getTitle(), 
@@ -323,10 +326,10 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
 			$Contests->getPenalty(), 
-			$Contests->getTimeStart(),
-                        $Contests->getPenaltyCalcPolicy()   
-                    
-		 );
+			$Contests->getTimeStart(),                        
+                        $Contests->getPointsDecayFactor(),
+                        $Contests->getPenaltyCalcPolicy()                    
+		 );                
 		global $conn;
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }

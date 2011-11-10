@@ -25,7 +25,7 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         // Set request for valid clarification
         $_POST["contest_id"] = Utils::GetValidPublicContestId();
         $_POST["problem_id"] = Utils::GetValidProblemOfContest($_POST["contest_id"]);
-        $_POST["message"] = Utils::RandomString();
+        $_POST["message"] = Utils::CreateRandomString();
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -76,7 +76,7 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         // Set request for valid clarification
         $_POST["contest_id"] = 1213123;
         $_POST["problem_id"] = 1213123;
-        $_POST["message"] = Utils::RandomString();
+        $_POST["message"] = Utils::CreateRandomString();
         Utils::SetAuthToken($auth_token);
 
         // Execute API

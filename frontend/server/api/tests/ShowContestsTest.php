@@ -23,7 +23,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         Utils::ConnectToDB();
                         
         // Insert new contest
-        $random_title = Utils::RandomString();        
+        $random_title = Utils::CreateRandomString();        
         NewContestsTest::CreateContest($random_title, 1);
                        
         
@@ -59,7 +59,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         Utils::ConnectToDB();
         
         // Insert new contest
-        $random_title = Utils::RandomString();        
+        $random_title = Utils::CreateRandomString();        
         NewContestsTest::CreateContest($random_title, 0);
         
         
@@ -96,7 +96,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         Utils::ConnectToDB();
         
         // Insert new contest
-        $random_title = Utils::RandomString();        
+        $random_title = Utils::CreateRandomString();        
         NewContestsTest::CreateContest($random_title, 0);
         
         

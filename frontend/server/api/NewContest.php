@@ -143,11 +143,8 @@ class NewContest extends ApiHandler
         }
 
         // Populate a new Contests object
-        $contest = new Contests($contests_insert_values);
-        
-        // If the contest is Private, add the list of allowed users that is comming from private_users
-        
-
+        $contest = new Contests($contests_insert_values);              
+                
         // Push changes
         try
         {
@@ -186,8 +183,6 @@ class NewContest extends ApiHandler
             throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
         
-        // Happy ending
-        $this->response["status"] = "ok";
     }
     
 }
