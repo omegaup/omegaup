@@ -532,6 +532,9 @@ int main(int argc, char *argv[]) {
 	char *java[] = { "/usr/bin/java" };
 	char *javac[] = { "/usr/bin/javac" };
 
+	strcpy(java_filename, java[0]);
+	strcpy(javac_filename, javac[0]);
+
 	mode = JAVAC;
 	init();
 	switch(fork()) {
