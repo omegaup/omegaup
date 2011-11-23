@@ -13,7 +13,7 @@ object GraderData {
 	def run(id: Long)(implicit connection: Connection): Option[Run] =
 		query("""
 			SELECT
-				r.*, p.*, cpo.open_time, cp.points, c.start_time, c.finish_time, c.points_decay_factor, c.partial_score, c.feedback, c.penalty, c.time_start
+				r.*, p.*, cpo.open_time, cp.points, c.start_time, c.finish_time, c.points_decay_factor, c.submit_delay, c.partial_score, c.feedback, c.penalty, c.time_start
 			FROM
 				Runs AS r
 			INNER JOIN
