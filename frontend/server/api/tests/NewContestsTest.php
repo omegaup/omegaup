@@ -39,23 +39,21 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
             $_POST["private_users"] = json_encode(array(Utils::GetJudgeUserId()));
         }
         
+        // If a key to unset is provided, unset it
         if(!is_null($key_to_unset))            
         {                        
             unset($_POST[$key_to_unset]);
         }
         
+        // Create new contest
         $newContest = new NewContest();
-        Utils::SetAuthToken($auth_token);
-        
-        
+        Utils::SetAuthToken($auth_token);                
         try
         {
-            $cleanValue = $newContest->ExecuteApi();        
-            
+            $cleanValue = $newContest->ExecuteApi();                    
         }
         catch(ApiException $e)
-        {
-            // Propagate exception            
+        {            
             throw $e;            
         }
 
@@ -67,14 +65,14 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         
     }  
     
-    public function testCreateValidContest()
+    public function testCreateValidContest($public = 1)
     {
         //Connect to DB
         Utils::ConnectToDB();
         
         // Insert new contest
         $random_title = Utils::CreateRandomString();        
-        self::CreateContest($random_title, 0);
+        self::CreateContest($random_title, $public);
         
         // Validate that data was written to DB by iterating through all contests
         $contest = null;        
@@ -106,6 +104,9 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($_POST["scoreboard"], $contest->getScoreboard());
         $this->assertEquals($_POST["penalty_time_start"], $contest->getTimeStart());
         $this->assertEquals($_POST["penalty_calc_policy"], $contest->getPenaltyCalcPolicy());
+        
+        // Return contest ID
+        return $contest->getContestId();
     }
     
     public function testMissingParameters()
@@ -137,7 +138,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
             {
                 // Insert new contest
                 $random_title = Utils::CreateRandomString();        
-                $clean_value = self::CreateContest($random_title, 0, $key);
+                $clean_value = self::CreateContest($random_title, 1, $key);
             }
             catch(ApiException $e)
             {
