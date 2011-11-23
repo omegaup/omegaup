@@ -453,6 +453,9 @@ set_syscall_action(char *a)
     //die("Unknown syscall `%s'", a);
     return 1;
   }
+  if (sys == NATIVE_NR_execve) {
+    exec_remaining = -1;
+  }
   if (sys >= NUM_ACTIONS)
     die("Syscall `%s' out of range", a);
   syscall_action[sys] = act;
