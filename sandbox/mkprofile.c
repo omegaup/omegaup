@@ -116,6 +116,7 @@ void make_config() {
 -s clock_getres\n\
 -s clock_gettime\n\
 -s gettimeofday\n\
+-s getrlimit\n\
 -s setrlimit\n\
 -s socketcall\n\
 -s getdents\n\
@@ -125,6 +126,7 @@ void make_config() {
 -s getcwd\n\
 -s madvise\n\
 -s kill\n\
+-s socket\n\
 \n\
 -p /dev/random\n\
 -p /dev/urandom\n\
