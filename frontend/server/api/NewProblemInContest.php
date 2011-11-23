@@ -111,7 +111,7 @@ class NewProblemInContest extends ApiHandler
         {
             // Replace the HTML in source with the path to the file saved 
             if ($parameter->getPropertyName() == "source")
-            {        
+            {                        
                 $parameter->setValue($filename);
             }
 
@@ -125,7 +125,7 @@ class NewProblemInContest extends ApiHandler
         
         // Populate a new Contests object
         $problem = new Problems($problems_insert_values);
-
+        
         // Insert new problem
         try
         {

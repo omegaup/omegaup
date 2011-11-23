@@ -62,54 +62,54 @@ class ShowProblemInContest extends ApiHandler
                 
         
         // If the contest is private, verify that our user is invited                
-        $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());                
-                
-        if ($contest->getPublic() === 0)
-        {        
+        $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());                                        
+        if ($contest->getPublic() == 0)
+        {                    
             if (is_null(ContestsUsersDAO::getByPK($this->user_id, $this->request["contest_id"]->getValue())))
-            {
-               throw new ApiException($this->error_dispatcher->forbiddenSite());
+            {                
+                throw new ApiException($this->error_dispatcher->forbiddenSite());
             }        
         }
     }
     
     protected function GenerateResponse() 
     {
+        
        // Create array of relevant columns
         $relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order");
         
         // Get our problem given the problem_id         
         try
-        {
-            
-            $problem = ProblemsDAO::getByPK($this->request["problem_id"]->getValue());
+        {            
+            $problem = ProblemsDAO::getByPK($this->request["problem_id"]->getValue());            
         }
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );        
-        
-        }
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
+        }        
         
         // Read the file that contains the source
         $source_path = PROBLEMS_PATH . $problem->getSource();
-        
         if(file_exists($source_path))
-        {
-            $file_handle = fopen($source_path, 'r');
-            $problem->setSource( fread($file_handle, filesize($source_path)));
-            fclose($file_handle);
-            
-        }
+        {            
+            $file_content = file_get_contents($source_path);
+            if( !$file_content )
+            {
+                throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );
+            }            
+        }        
         else
         {
-          throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );                    
-        }
+            throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );                    
+        }        
         
         // Add the problem the response
-        $this->response = $problem->asFilteredArray($relevant_columns);               
-     
+        $this->response = $problem->asFilteredArray($relevant_columns);   
         
+        // Overwrite source
+        $this->response["source"] = $file_content;
+             
         // Create array of relevant columns
         $relevant_columns = array("run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "ip", "time", "submit_delay");
         
@@ -140,8 +140,7 @@ class ShowProblemInContest extends ApiHandler
                 array_push($runs_filtered_array, $run->asFilteredArray($relevant_columns));
             }
         }
-                
-        
+                        
         // As last step, register the problem as opened                
         if (! ContestProblemOpenedDAO::getByPK($this->request["contest_id"]->getValue(), $this->request["problem_id"]->getValue(), $this->user_id ))
         {
