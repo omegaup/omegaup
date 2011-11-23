@@ -113,11 +113,15 @@ trait Grader extends Object with Log {
 			.foldLeft(0.0)(_+_) / weights.foldLeft(0.0)(_+_._2) * (run.contest match {
 				case None => 1.0
 				case Some(contest) => {
-					if (contest.points_decay_factor == 1.0 || run.submit_delay == 0.0) {
+					if (contest.points_decay_factor <= 0.0 || run.submit_delay == 0.0) {
 						1.0
 					} else {
 						var TT = (contest.finish_time.getTime() - contest.start_time.getTime()) / 60000.
 						var PT = run.submit_delay / 60.0
+
+                                                if (contest.points_decay_factor >= 1.0) {
+                                                  contest.points_decay_factor = 1.0
+                                                }
 						
 						(1 - contest.points_decay_factor) + contest.points_decay_factor * TT*TT / (10 * PT*PT + TT*TT)
 					}
