@@ -41,3 +41,4 @@ grader/test-env
 frontend/.DS_Store
 
 .DS_Store
+!/frontend/server/api/tests/config.php

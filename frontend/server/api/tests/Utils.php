@@ -94,7 +94,7 @@ class Utils
     }
     
     static function Logout($auth_token)
-    {        
+    {                        
         // Logout            
         $_POST["auth_token"] = $auth_token;
         
@@ -106,7 +106,8 @@ class Utils
         if(sizeof($resultsDB) !== 0)
         {
             throw new Exception("User was not logged out correctly");
-        }        
+        }
+                
     }
     
     static function LoginAsJudge()
@@ -203,6 +204,31 @@ class Utils
         }
         
         self::cleanup();
+    }
+    
+    static function GetDBUnixTimestamp($time = NULL)
+    {
+                
+        // Go to the DB to take the unix timestamp
+        global $conn;
+        if( is_null($time))
+        {
+            $sql = "SELECT UNIX_TIMESTAMP()";            
+            $rs = $conn->GetRow($sql);
+        }
+        else
+        {
+            $sql = "SELECT UNIX_TIMESTAMP(?)";
+            $params = array($time);
+            $rs = $conn->GetRow($sql, $params);
+        }
+                                
+        if(count($rs)===0)
+        {
+            return NULL;
+        }
+                
+        return $rs[0];        
     }
 }
 

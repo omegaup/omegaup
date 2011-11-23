@@ -17,10 +17,22 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         Utils::ConnectToDB();
     }
     
-    private static function setValidContext()
+    public function tearDown() 
+    {
+        Utils::cleanup();
+    }
+    
+    private static function setValidContext($contest_id = NULL)
     {        
         // Set context
-        $_GET["contest_id"] = Utils::GetValidPublicContestId();
+        if(is_null($contest_id))
+        {
+            $_GET["contest_id"] = Utils::GetValidPublicContestId();
+        }
+        else
+        {
+            $_GET["contest_id"] = $contest_id;
+        }
         $_POST["title"] = Utils::CreateRandomString();
         $_POST["alias"] = substr(Utils::CreateRandomString(), 0, 10);
         $_POST["author_id"] = Utils::GetContestantUserId();
@@ -32,12 +44,14 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $_POST["points"] = 1;
     }
     
-    public function testCreateValidProblem()
+    public function testCreateValidProblem($contest_id = NULL)
     {
         // Login as judge
         $auth_token = Utils::LoginAsJudge();        
         
-        self::setValidContext();
+        // Set valid context for problem creation
+        $contest_id = is_null($contest_id) ? Utils::GetValidPublicContestId() : $contest_id;
+        self::setValidContext($contest_id);
         
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -57,28 +71,33 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("ok", $return_array["status"]);
         
         // Verify data in DB
-        $problems = ProblemsDAO::getAll();
-        $problem = null;
-        foreach($problems as $p)
-        {
-            if($p->getTitle() === $_POST["title"])
-            {
-                $problem = $p;
-                break;
-            }
-        }
+        $problem_mask = new Problems();
+        $problem_mask->setTitle($_POST["title"]);
+        $problems = ProblemsDAO::search($problem_mask);
+        
+        // Check that we only retreived 1 element
+        $this->assertEquals(1, count($problems));        
+        $problem = $problems[0];
         
         // Verify contest was found
         $this->assertNotNull($problem);
+        $this->assertNotNull($problem->getProblemId());
         
         // Verify DB data
         $this->assertEquals($_POST["title"], $problem->getTitle());
         $this->assertEquals($_POST["alias"], $problem->getAlias());
         $this->assertEquals($_POST["validator"], $problem->getValidator());
         $this->assertEquals($_POST["time_limit"], $problem->getTimeLimit());
-        $this->assertEquals($_POST["memory_limit"], $problem->getMemoryLimit());      
-        $this->assertEquals($_POST["source"], $problem->getSource());
+        $this->assertEquals($_POST["memory_limit"], $problem->getMemoryLimit());                      
         $this->assertEquals($_POST["author_id"], $problem->getAuthorId());
+        $this->assertEquals($_POST["order"], $problem->getOrder());
+        
+        // Verify problem statement
+        $filename = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getSource();
+        $this->assertFileExists($filename);                        
+        
+        $fileContent = file_get_contents($filename);
+        $this->assertEquals($fileContent, $_POST["source"]);
         
         // Default data
         $this->assertEquals(0, $problem->getVisits());
@@ -87,9 +106,11 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $problem->getDifficulty());       
         
         // Get problem-contest and verify it
-        $contest_problems = ContestProblemsDAO::getByPK(Utils::GetValidPublicContestId(), $problem->getProblemId());
+        $contest_problems = ContestProblemsDAO::getByPK($contest_id, $problem->getProblemId());
         $this->assertNotNull($contest_problems);        
-        $this->assertEquals(1, $contest_problems->getPoints());        
+        $this->assertEquals($_POST["points"], $contest_problems->getPoints());        
+        
+        return $problem->getProblemId();
     }
         
     
