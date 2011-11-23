@@ -180,11 +180,13 @@ void make_config() {
 -s getcwd\n\
 -s madvise\n\
 -s kill\n\
+-s socket\n\
 \n\
 -p /dev/random\n\
 -p /dev/urandom\n\
 -p /proc/self/exe\n\
 -p /proc/self/maps\n\
+-p /proc/self/coredump_filter=rw\n\
 -p /proc/stat\n\
 -p /proc/meminfo\n\
 -p /sys/devices/system/cpu\n\
