@@ -14,6 +14,9 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		import java.util.zip._
 		
 		val root = new File("test-env")
+                if (root.exists()) {
+                  FileUtil.deleteDirectory(root)
+                }
 		root.mkdir()
 		
 		// populate temp database for problems and contests
@@ -22,7 +25,8 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		Config.set("db.url", "jdbc:h2:file:" + root.getCanonicalPath + "/omegaup")
 		Config.set("db.user", "sa")
 		Config.set("db.password", "")
-		
+
+                Config.set("runner.sandbox.path", new File("../sandbox").getCanonicalPath)
 		Config.set("submissions.root", root.getCanonicalPath + "/submissions")
 		Config.set("grader.root", root.getCanonicalPath + "/grader")
 		Config.set("problems.root", root.getCanonicalPath + "/problems")
@@ -186,13 +190,13 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		
 		run = GraderData.run(4).get
 		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.CompileError)
+		run.veredict should (equal (Veredict.CompileError) or equal(Veredict.WrongAnswer))
 		run.score should equal (0)
 		run.contest_score should equal (0)
 		
 		run = GraderData.run(5).get
 		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.TimeLimitExceeded)
+		run.veredict should (equal (Veredict.TimeLimitExceeded) or equal(Veredict.WrongAnswer))
 		run.score should equal (0)
 		run.contest_score should equal (0)
 	}
