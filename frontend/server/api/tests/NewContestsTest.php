@@ -53,9 +53,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
             $cleanValue = $newContest->ExecuteApi();                    
         }
         catch(ApiException $e)
-        {
-            // Propagate exception 
-            var_dump($cleanValue);
+        {            
             throw $e;            
         }
 
@@ -67,7 +65,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         
     }  
     
-    public function testCreateValidContest($public = 0)
+    public function testCreateValidContest($public = 1)
     {
         //Connect to DB
         Utils::ConnectToDB();
@@ -140,7 +138,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
             {
                 // Insert new contest
                 $random_title = Utils::CreateRandomString();        
-                $clean_value = self::CreateContest($random_title, 0, $key);
+                $clean_value = self::CreateContest($random_title, 1, $key);
             }
             catch(ApiException $e)
             {
