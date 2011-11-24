@@ -13,6 +13,8 @@
 
 require_once '../Login.php';
 require_once '../Logout.php';
+require_once 'NewContestsTest.php';
+require_once 'NewProblemInContestTest.php';
 
 
 class Utils
@@ -20,8 +22,14 @@ class Utils
     //put your code here
     static function cleanup()
     {
-        unset($_POST);
-        unset($_GET);
+        foreach($_POST as $p)
+        {
+            unset($p);
+        }
+        foreach($_GET as $g)
+        {
+            unset($g);
+        }        
     }
     
     static function ConnectToDB()
@@ -168,15 +176,39 @@ class Utils
     
     static function GetValidPublicContestId()
     {
-        return 3;
+        // Create a clean contest and get the ID
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
+        
+        return $contest_id;
     }
     
     static function GetValidProblemOfContest($contest_id)
     {
-        if ($contest_id === 3)
-            return 22;
+        // Create problem in our contest
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
         
-        throw new Exception("GetValidProblemOfContest not implemented yet for other contests");
+        return $problem_id;
+    }
+    
+    static function DeleteAllContests()
+    {    
+        try
+        {
+            $contests = ContestsDAO::getAll();
+            foreach($contests as $c)
+            {
+                ContestsDAO::delete($c);
+            }
+        }
+        catch(ApiException $e)
+        {
+            // Propagate exception
+            var_dump($e->getArrayMessage());
+            throw $e;
+        }
+        
     }
     
     static function DeleteClarificationsFromProblem($problem_id)
@@ -205,6 +237,7 @@ class Utils
         
         self::cleanup();
     }
+       
     
     static function GetDBUnixTimestamp($time = NULL)
     {
@@ -229,6 +262,23 @@ class Utils
         }
                 
         return $rs[0];        
+    }
+    
+    static function GetTimeFromUnixTimestam($time)
+    {        
+        // Go to the DB to take the unix timestamp
+        global $conn;
+        
+        $sql = "SELECT FROM_UNIXTIME(?)";
+        $params = array($time);
+        $rs = $conn->GetRow($sql, $params);                
+        
+        if(count($rs)===0)
+        {
+            return NULL;
+        }
+                
+        return $rs[0]; 
     }
 }
 
