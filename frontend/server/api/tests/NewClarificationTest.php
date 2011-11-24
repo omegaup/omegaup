@@ -14,7 +14,7 @@ require_once 'Utils.php';
 class NewClarificationTest extends PHPUnit_Framework_TestCase
 {
     
-    public function testCreateValidClarification()
+    public function testCreateValidClarification($contest_id = null, $problem_id = null)
     {
         //Connect to DB
         Utils::ConnectToDB();
@@ -23,8 +23,16 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set request for valid clarification
-        $_POST["contest_id"] = Utils::GetValidPublicContestId();
-        $_POST["problem_id"] = Utils::GetValidProblemOfContest($_POST["contest_id"]);
+        if(is_null($contest_id) && is_null($problem_id))
+        {
+            $_POST["contest_id"] = Utils::GetValidPublicContestId();
+            $_POST["problem_id"] = Utils::GetValidProblemOfContest($_POST["contest_id"]);
+        }
+        else
+        {
+            $_POST["contest_id"] = $contest_id;
+            $_POST["problem_id"] = $problem_id;
+        }        
         $_POST["message"] = Utils::CreateRandomString();
         Utils::SetAuthToken($auth_token);
         
@@ -49,8 +57,8 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         // Verify our retreived clarificatoin
         $this->assertNotNull($clarification);
         $this->assertEquals($_POST["message"], $clarification->getMessage());
-        $this->assertEquals(Utils::GetValidPublicContestId(), $clarification->getContestId());
-        $this->assertEquals(Utils::GetValidProblemOfContest($_POST["contest_id"]), $clarification->getProblemId());                
+        $this->assertEquals($_POST["contest_id"], $clarification->getContestId());
+        $this->assertEquals($_POST["problem_id"], $clarification->getProblemId());                
 
         // Clean requests
         Utils::cleanup();

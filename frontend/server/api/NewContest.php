@@ -103,7 +103,7 @@ class NewContest extends ApiHandler
         parent::ValidateRequest();
                     
         // Validate private_users request, only if the contest is private        
-        if($this->request["public"]->getValue() === "0")
+        if($this->request["public"]->getValue() == 0)
         {
             if(is_null($this->request["private_users"]->getValue()))
             {
@@ -153,11 +153,11 @@ class NewContest extends ApiHandler
             
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($contest);
-            
+                        
             // If the contest is private, add the list of allowed users
-            if ($this->request["public"]->getValue() === "0")
+            if ($this->request["public"]->getValue() == 0)
             {
-               
+                
                 foreach($this->private_users_list as $userkey)
                 {
                     // Create a temp DAO for the relationship
