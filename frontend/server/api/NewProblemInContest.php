@@ -42,7 +42,7 @@ class NewProblemInContest extends ApiHandler
                 new NumericValidator(),
                 new CustomValidator( function ($value)
                         {
-                            // Check if the contest exists
+                            // Check if the user exists
                             return UsersDAO::getByPK($value);
                         })                
             )),
@@ -92,7 +92,7 @@ class NewProblemInContest extends ApiHandler
 
         try 
         {
-    
+            
             // Create file for problem content            
             $filename = md5(uniqid(rand(), true));
             $fileHandle = fopen(PROBLEMS_PATH . $filename, 'w'); 
@@ -111,7 +111,7 @@ class NewProblemInContest extends ApiHandler
         {
             // Replace the HTML in source with the path to the file saved 
             if ($parameter->getPropertyName() == "source")
-            {        
+            {                        
                 $parameter->setValue($filename);
             }
 
@@ -125,7 +125,7 @@ class NewProblemInContest extends ApiHandler
         
         // Populate a new Contests object
         $problem = new Problems($problems_insert_values);
-
+        
         // Insert new problem
         try
         {
@@ -151,9 +151,7 @@ class NewProblemInContest extends ApiHandler
             // Operation failed in the data layer
            throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
-        
-        // Happy ending
-        $this->response["status"] = "ok";
+                
     }
     
 

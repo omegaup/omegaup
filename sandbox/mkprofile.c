@@ -116,6 +116,7 @@ void make_config() {
 -s clock_getres\n\
 -s clock_gettime\n\
 -s gettimeofday\n\
+-s getrlimit\n\
 -s setrlimit\n\
 -s socketcall\n\
 -s getdents\n\
@@ -125,6 +126,7 @@ void make_config() {
 -s getcwd\n\
 -s madvise\n\
 -s kill\n\
+-s socket\n\
 \n\
 -p /dev/random\n\
 -p /dev/urandom\n\
@@ -180,11 +182,13 @@ void make_config() {
 -s getcwd\n\
 -s madvise\n\
 -s kill\n\
+-s socket\n\
 \n\
 -p /dev/random\n\
 -p /dev/urandom\n\
 -p /proc/self/exe\n\
 -p /proc/self/maps\n\
+-p /proc/self/coredump_filter=rw\n\
 -p /proc/stat\n\
 -p /proc/meminfo\n\
 -p /sys/devices/system/cpu\n\
@@ -531,6 +535,9 @@ int main(int argc, char *argv[]) {
 	int pid;
 	char *java[] = { "/usr/bin/java" };
 	char *javac[] = { "/usr/bin/javac" };
+
+	strcpy(java_filename, java[0]);
+	strcpy(javac_filename, javac[0]);
 
 	mode = JAVAC;
 	init();
