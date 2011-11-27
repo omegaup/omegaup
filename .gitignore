@@ -5,13 +5,17 @@ mkprofile
 sandbox/syscall-table.h
 sandbox/profiles/java
 sandbox/profiles/javac
+
 # Ignore temporary files
 *~
 *.swp
+
 # Ignore classes
 *.class
+
 # Ignore configuration files
 *.conf
+
 # NetBeans-related stuff
 build.xml
 nbproject/
@@ -36,4 +40,8 @@ config.php
 frontend/server/config.php
 
 #ignore runtime and test stuff
-grader/test-env
+*/test-env
+
+frontend/.DS_Store
+.DS_Store
+!/frontend/server/api/tests/config.php

@@ -41,6 +41,12 @@ class ShowClarification extends ApiHandler
         // Call generic validation
         parent::ValidateRequest();
         
+        // If user is Judge or Admin, it's OK
+        if( count(UserRolesDAO::getByPK($this->user_id, JUDGE)) || count(UserRolesDAO::getByPK($this->user_id, ADMIN)) )
+        {
+            return;
+        }
+        
         
         // If the clarification is private, verify that our user is invited                
         $clarification = ClarificationsDAO::getByPK($this->request["clarification_id"]->getValue());                

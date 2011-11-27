@@ -8,9 +8,11 @@
 define("WHOAMI", "API");
 require_once("../../../server/inc/bootstrap.php");
 require_once("../../../server/api/ShowClarification.php");
+require_once("../../../server/api/ApiOutputFormatter.php");
 
 
-$apiHandler = new ShowClarification();
-echo $apiHandler->ExecuteApi();
+$api = new ShowClarification();
+$apiOutput = ApiOutputFormatter::getInstance();
+$apiOutput->PrintOuput($api);
 
 

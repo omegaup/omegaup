@@ -70,6 +70,12 @@ class Contests extends VO
 			if( isset($data['penalty_time_start']) ){
 				$this->penalty_time_start = $data['penalty_time_start'];
 			}
+                        if( isset($data['penalty_calc_policy']) ){
+				$this->penalty_calc_policy = $data['penalty_calc_policy'];
+			}                        
+                        if( isset($data['points_decay_factor']) ){
+				$this->points_decay_factor = $data['points_decay_factor'];
+			}
 		}
 	}
 
@@ -257,6 +263,8 @@ class Contests extends VO
 	  */
         
         protected $penalty_calc_policy;
+        
+        protected $points_decay_factor;
         
 	final public function getContestId()
 	{
@@ -664,4 +672,25 @@ class Contests extends VO
 	{
 		$this->penalty_calc_policy = $penalty_calc_policy;
 	}
+        
+        
+        
+        final public function getPointsDecayFactor()
+	{
+		return $this->points_decay_factor;
+	}
+
+	/**
+	  * setTimeStart( $penalty_time_start )
+	  * 
+	  * Set the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema.
+	  * Una validacion basica se hara aqui para comprobar que <i>penalty_time_start</i> es de tipo <i>enum('contest','problem')</i>. 
+	  * Si esta validacion falla, se arrojara... algo. 
+	  * @param enum('contest','problem')
+	  */
+	final public function setPointsDecayFactor( $points_decay_factor )
+	{
+		$this->points_decay_factor = $points_decay_factor;
+	}
+        
 }

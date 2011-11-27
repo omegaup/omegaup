@@ -453,6 +453,9 @@ set_syscall_action(char *a)
     //die("Unknown syscall `%s'", a);
     return 1;
   }
+  if (sys == NATIVE_NR_execve) {
+    exec_remaining = -1;
+  }
   if (sys >= NUM_ACTIONS)
     die("Syscall `%s' out of range", a);
   syscall_action[sys] = act;
@@ -906,7 +909,7 @@ get_filename(pid_t pid, arg_t addr, char *namebuf, int bufsize)
   while(*pr)
     {
       if (*pr == '/') dirs++;
-      if (!strncmp(pr, "/../", 4) && dirs >= 2)
+      if ((!strcmp(pr, "/..") || !strncmp(pr, "/../", 4)) && dirs >= 2)
         {
           dirs -= 2;
           pw--;

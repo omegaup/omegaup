@@ -64,7 +64,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $problem_id )
 	{
-		if(self::recordExists(  $problem_id)){
+		if(self::recordExists(  $problem_id)){                        
 			return self::getRecord( $problem_id );
 		}
 		$sql = "SELECT * FROM Problems WHERE (problem_id = ? ) LIMIT 1;";

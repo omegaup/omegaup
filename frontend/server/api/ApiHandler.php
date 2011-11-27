@@ -160,25 +160,29 @@ abstract class ApiHandler
     {
         try
         {   
+            // Check if the user needs to be logged in
             $this->CheckAuthorization();
            
             // Each API should declare its allowed roles            
             $this->api_roles = $this->DeclareAllowedRoles();
             
-
+            // Check if the user has a needed role
             $this->CheckPermissions();
                         
             // Process input
-
             $this->GetRequest();       
 
-            
+            // Validate input
             $this->ValidateRequest();
 
             // Generate output
             $this->GenerateResponse();
 
-            $this->response["status"] = "ok";
+            // If the request didn´t fail nor output something, we're OK
+            if(count($this->response) == 0)
+            {
+                $this->response["status"] = "ok";
+            }
             
             return $this->response;       
         }

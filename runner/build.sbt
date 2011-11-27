@@ -32,6 +32,6 @@ libraryDependencies ++= Seq(
         "org.mortbay.jetty" % "jetty-client" % "6.1.26",
         "net.liftweb" % "lift-json_2.9.1" % "2.4-M4",
         "org.slf4j" % "slf4j-jdk14" % "1.6.2",
-        "org.scalatest" % "scalatest" % "1.3" % "test",
+        "org.scalatest" % "scalatest" % "1.4.RC2" % "test",
         "omegaup" % "omegaup-common" % "1.0" from "file://"+(new java.io.File("../common/target/scala-2.9.1/common_2.9.1-1.0.jar").getCanonicalPath)
 )

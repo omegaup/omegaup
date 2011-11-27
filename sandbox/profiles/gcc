@@ -13,6 +13,7 @@
 -s umask
 -s unlink
 -s chmod
+-s execve
 
 -p /proc/meminfo
 -p /dev/urandom
