@@ -26,8 +26,15 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
         $clarification_id_1 = $newClarificationTest->testCreateValidClarification();
-        $clarification_id_2 = $newClarificationTest->testCreateValidClarification();
         
+        // Get problem id from clarification
+        $clarification_1 = ClarificationsDAO::getByPK($clarification_id_1);
+        $contest_id = $clarification_1->getContestId();
+        $problem_id = $clarification_1->getProblemId();
+        
+        // Create clarification in same problem/contest
+        $clarification_id_2 = $newClarificationTest->testCreateValidClarification($contest_id, $problem_id);                        
+                
         //Connect to DB
         Utils::ConnectToDB(); 
                 
@@ -35,7 +42,7 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set the context        
-        $_GET["problem_id"] = Utils::GetValidProblemOfContest(Utils::GetValidPublicContestId());
+        $_GET["problem_id"] = $problem_id;
                 
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -81,12 +88,22 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         // As prerequisite, create a new clarification as contestant 1
         $newClarificationTest = new NewClarificationTest();
         $clarification_id_1 = $newClarificationTest->testCreateValidClarification();
-        $clarification_id_2 = $newClarificationTest->testCreateValidClarification();
+        
+        // Get problem id from clarification
+        $clarification_1 = ClarificationsDAO::getByPK($clarification_id_1);
+        $contest_id = $clarification_1->getContestId();
+        $problem_id = $clarification_1->getProblemId();
+        
+        // Create clarification in same problem/contest
+        $clarification_id_2 = $newClarificationTest->testCreateValidClarification($contest_id, $problem_id);                        
         
         // Hack clarificatoin 2, change created user to 2
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
         $clarification_2->setAuthorId(Utils::GetContestant2UserId());
         ClarificationsDAO::save($clarification_2);
+        
+        // Get problem id
+        $problem_id = $clarification_2->getProblemId();
         
         //Connect to DB
         Utils::ConnectToDB(); 
@@ -95,7 +112,7 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant2();
         
         // Set the context        
-        $_GET["problem_id"] = Utils::GetValidProblemOfContest(Utils::GetValidPublicContestId());
+        $_GET["problem_id"] = $problem_id;
                 
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -131,13 +148,23 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         // As prerequisite, create a new clarification as contestant 1
         $newClarificationTest = new NewClarificationTest();
         $clarification_id_1 = $newClarificationTest->testCreateValidClarification();
-        $clarification_id_2 = $newClarificationTest->testCreateValidClarification();
+        
+        // Get problem id from clarification
+        $clarification_1 = ClarificationsDAO::getByPK($clarification_id_1);
+        $contest_id = $clarification_1->getContestId();
+        $problem_id = $clarification_1->getProblemId();
+        
+        // Create clarification in same problem/contest
+        $clarification_id_2 = $newClarificationTest->testCreateValidClarification($contest_id, $problem_id);                        
          
         // Hack clarificatoin 2, change created user to 2 and make it public
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
         $clarification_2->setAuthorId(Utils::GetContestant2UserId());
         $clarification_2->setPublic('1');
         ClarificationsDAO::save($clarification_2);
+        
+        // Get problem id from clarification        
+        $problem_id = $clarification_2->getProblemId();
         
         //Connect to DB
         Utils::ConnectToDB(); 
@@ -146,7 +173,7 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set the context        
-        $_GET["problem_id"] = Utils::GetValidProblemOfContest(Utils::GetValidPublicContestId());
+        $_GET["problem_id"] = $problem_id;
                 
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -192,8 +219,16 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         // As prerequisite, create a new clarification as contestant 1
         $newClarificationTest = new NewClarificationTest();
         $clarification_id_1 = $newClarificationTest->testCreateValidClarification();        
-        $clarification_id_2 = $newClarificationTest->testCreateValidClarification();
-        $clarification_id_3 = $newClarificationTest->testCreateValidClarification();
+        
+        // Get problem id from clarification
+        $clarification_1 = ClarificationsDAO::getByPK($clarification_id_1);
+        $contest_id = $clarification_1->getContestId();
+        $problem_id = $clarification_1->getProblemId();
+        
+        // Create clarification in same problem/contest
+        $clarification_id_2 = $newClarificationTest->testCreateValidClarification($contest_id, $problem_id);                        
+        $clarification_id_3 = $newClarificationTest->testCreateValidClarification($contest_id, $problem_id);                        
+        
          
         // Hack clarificatoin 2, change created user to 2 and make it public
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
@@ -201,11 +236,14 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $clarification_2->setPublic('1');        
         ClarificationsDAO::save($clarification_2);
         
+        // Get problem id from clarification        
+        $problem_id = $clarification_2->getProblemId();
+        
         // Login as contestant
         $auth_token = Utils::LoginAsJudge();
         
         // Set the context        
-        $_GET["problem_id"] = Utils::GetValidProblemOfContest(Utils::GetValidPublicContestId());
+        $_GET["problem_id"] = $problem_id;
                 
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -259,8 +297,15 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         // As prerequisite, create a new clarification as contestant 1
         $newClarificationTest = new NewClarificationTest();
         $clarification_id_1 = $newClarificationTest->testCreateValidClarification();        
-        $clarification_id_2 = $newClarificationTest->testCreateValidClarification();
-        $clarification_id_3 = $newClarificationTest->testCreateValidClarification();
+        
+        // Get problem id from clarification
+        $clarification_1 = ClarificationsDAO::getByPK($clarification_id_1);
+        $contest_id = $clarification_1->getContestId();
+        $problem_id = $clarification_1->getProblemId();
+        
+        // Create clarification in same problem/contest
+        $clarification_id_2 = $newClarificationTest->testCreateValidClarification($contest_id, $problem_id);                        
+        $clarification_id_3 = $newClarificationTest->testCreateValidClarification($contest_id, $problem_id);                                
          
         // Hack clarificatoin 2, change created user to 2 and make it public
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
@@ -268,11 +313,14 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $clarification_2->setPublic('1');        
         ClarificationsDAO::save($clarification_2);
         
+        // Get problem id from clarification        
+        $problem_id = $clarification_2->getProblemId();
+        
         // Login as contestant
         $auth_token = Utils::LoginAsAdmin();
         
         // Set the context        
-        $_GET["problem_id"] = Utils::GetValidProblemOfContest(Utils::GetValidPublicContestId());
+        $_GET["problem_id"] = $problem_id;
                 
         // Execute API
         Utils::SetAuthToken($auth_token);

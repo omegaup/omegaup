@@ -19,8 +19,8 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
                 
         $_POST["title"] = $title;
         $_POST["description"] = "description";
-        $_POST["start_time"] = "2011-02-02 10:00:00";
-        $_POST["finish_time"] = "2011-03-03 10:00:00";
+        $_POST["start_time"] = Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() - 60*60);
+        $_POST["finish_time"] = Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() + 60*60);
         $_POST["window_length"] = "20";
         $_POST["public"] = $public;
         $_POST["token"] = "loltoken";
@@ -53,7 +53,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
             $cleanValue = $newContest->ExecuteApi();                    
         }
         catch(ApiException $e)
-        {            
+        {                    
             throw $e;            
         }
 
@@ -75,18 +75,13 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         self::CreateContest($random_title, $public);
         
         // Validate that data was written to DB by iterating through all contests
-        $contest = null;        
-        $contests = ContestsDAO::getAll();
-        foreach($contests as $c)
-        {
-            if($c->getTitle() === $random_title)
-            {
-                $contest = $c;
-                break;
-            }
-        }
+        $contest = new Contests();
+        $contest->setTitle($random_title);
+        $contests = ContestsDAO::search($contest);
+        $contest = $contests[0];
         
-        // Assert that we found our contest
+        // Assert that we found our contest       
+        $this->assertNotNull($contest);
         $this->assertNotNull($contest->getContestId());
         
         // Assert data was correctly saved
