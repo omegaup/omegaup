@@ -13,11 +13,12 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 
     val root = new File("test-env")
 
-    if (!root.exists()) {
-      root.mkdir()
-
-      new File(root.getCanonicalPath + "/compile").mkdir()
+    if (root.exists()) {
+      FileUtil.deleteDirectory(root.getCanonicalPath)
     }
+
+    root.mkdir()
+    new File(root.getCanonicalPath + "/compile").mkdir()
 
     Config.set("compile.root", root.getCanonicalPath + "/compile")
     Config.set("runner.sandbox.path", new File("../sandbox").getCanonicalPath)
