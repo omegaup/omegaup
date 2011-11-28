@@ -15,12 +15,18 @@ require_once 'Utils.php';
 
 class ShowContestsTest extends PHPUnit_Framework_TestCase
 {
-                       
+    public function setUp()
+    {        
+        Utils::ConnectToDB();
+    }
+    
+    public function tearDown() 
+    {
+        Utils::cleanup();
+    }                       
     
     public function testLatestPublicContest()
-    {        
-        //Connect to DB
-        Utils::ConnectToDB();
+    {             
                         
         // Insert new contest
         $random_title = Utils::CreateRandomString();        
@@ -54,9 +60,6 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
     
     public function testPrivateContestNotSeenByOthers()
     {
-        
-        //Connect to DB
-        Utils::ConnectToDB();
         
         // Insert new contest
         $random_title = Utils::CreateRandomString();        
@@ -92,8 +95,6 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
     
     public function testPrivateContestSeenByCreator()
     {
-        //Connect to DB
-        Utils::ConnectToDB();
         
         // Insert new contest
         $random_title = Utils::CreateRandomString();        
@@ -126,7 +127,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         
     }
      
-     
+    
     
    
 }

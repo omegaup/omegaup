@@ -40,13 +40,12 @@ class ShowContest extends ApiHandler
     {
         // Call generic validation
         parent::ValidateRequest();
-        
-        
+                
         // If the contest is private, verify that our user is invited                
         $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());                
                 
-        if ($contest->getPublic() === '0')
-        {        
+        if ($contest->getPublic() === '0')            
+        {                           
             if (is_null(ContestsUsersDAO::getByPK($this->user_id, $this->request["contest_id"]->getValue())))
             {
                throw new ApiException($this->error_dispatcher->forbiddenSite());
@@ -59,7 +58,7 @@ class ShowContest extends ApiHandler
     protected function GenerateResponse() 
     {
        // Create array of relevant columns
-        $relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "token", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start");
+        $relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "token", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy");
         
         // Get our contest given the id
         try
@@ -74,7 +73,7 @@ class ShowContest extends ApiHandler
         
         }
         
-        // Add the contest the response
+        // Add the contest to the response
         $this->response = $contest->asFilteredArray($relevant_columns);               
      
         
@@ -124,8 +123,7 @@ class ShowContest extends ApiHandler
         $this->response["problems"] = $problemsResponseArray;
         
                 
-        // @TODO Add ranking here, if it should be showed (look at scoreboard property in contests)
-        
+        // @TODO Add ranking here, if it should be showed (look at scoreboard property in contests)        
     }
     
 }
