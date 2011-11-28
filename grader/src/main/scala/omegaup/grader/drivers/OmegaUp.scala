@@ -75,6 +75,7 @@ object OmegaUp extends Actor with Log {
 						} catch {
 							case e: Exception => {
 								error("OU Submission {} failed for problem {}", e, id, pid)
+                                                                error("Stack trace: {}", e.getStackTrace) 
 							
 								run.status = Status.Ready
 								run.veredict = Veredict.JudgeError
