@@ -53,6 +53,7 @@ static int probin_fd;
 static char cwd[4096];
 static int allow_fork;
 static int shutting_down;
+static int stats_printed;
 
 static pid_t box_pid;
 static volatile int timer_tick;
@@ -63,7 +64,7 @@ static int partial_line;
 static int mem_peak_kb;
 static int total_ms, wall_ms;
 
-static void die(char *msg, ...) NONRET;
+static void die(char *msg, ...);
 static int sample_mem_peak(void);
 
 /*** Meta-files ***/
@@ -105,6 +106,9 @@ meta_printf(const char *fmt, ...)
 static void
 final_stats(struct rusage *rus)
 {
+  if (stats_printed) return;
+  stats_printed = 1;
+
   struct timeval total, now, wall;
   timeradd(&rus->ru_utime, &rus->ru_stime, &total);
   total_ms = total.tv_sec*1000 + total.tv_usec/1000;
@@ -119,9 +123,10 @@ final_stats(struct rusage *rus)
 
 /*** Messages and exits ***/
 
-static void NONRET
+static void
 box_exit(int rc)
 {
+  if (shutting_down) return;
   shutting_down = 1;
 
   if (box_pid > 0)
@@ -157,11 +162,12 @@ flush_line(void)
 }
 
 /* Report an error of the sandbox itself */
-static void NONRET __attribute__((format(printf,1,2)))
+static void __attribute__((format(printf,1,2)))
 die(char *msg, ...)
 {
   va_list args;
   va_start(args, msg);
+  if (shutting_down) return;
   flush_line();
   char buf[1024];
   vsnprintf(buf, sizeof(buf), msg, args);
@@ -175,11 +181,12 @@ die(char *msg, ...)
 }
 
 /* Report an error of the program inside the sandbox */
-static void NONRET __attribute__((format(printf,1,2)))
+static void __attribute__((format(printf,1,2)))
 err(char *msg, ...)
 {
   va_list args;
   va_start(args, msg);
+  if (shutting_down) return;
   flush_line();
   if (msg[0] && msg[1] && msg[2] == ':' && msg[3] == ' ')
     {
