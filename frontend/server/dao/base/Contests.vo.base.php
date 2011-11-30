@@ -693,4 +693,14 @@ class Contests extends VO
 		$this->points_decay_factor = $points_decay_factor;
 	}
         
+        
+        final public function isInsideContest()
+        {                        
+            if( time() <= strtotime($this->getFinishTime()) && time() >= strtotime($this->getStartTime()) )
+            {
+                return true;
+            }
+            return false;            
+        }
+        
 }

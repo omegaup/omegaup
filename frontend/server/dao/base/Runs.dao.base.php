@@ -407,7 +407,10 @@ abstract class RunsDAOBase extends DAO
         {
             // SQL Statement
             $sql = "SELECT IF (
-                              (   
+                              ( (SELECT COUNT(time) from Runs where user_id = ? and contest_id = ? and problem_id = ?) =
+                                0
+                              )
+                              OR (   
                                 (SELECT UNIX_TIMESTAMP()) > 
                                 (SELECT UNIX_TIMESTAMP(time) from Runs where user_id = ? and contest_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1) 
                                     + ( SELECT submissions_gap FROM Contests WHERE contest_id = ? )
@@ -415,8 +418,9 @@ abstract class RunsDAOBase extends DAO
                               AND (
                                 (SELECT UNIX_TIMESTAMP()) < 
                                 (SELECT UNIX_TIMESTAMP(finish_time) from Contests where contest_id = ?)
-                              ),1,0 ) As 'IsValid' ;";
-            $val = array($user_id, $contest_id, $problem_id, $contest_id, $contest_id);
+                              )
+                              ,1,0 ) As 'IsValid' ;";
+            $val = array($user_id, $contest_id, $problem_id, $user_id, $contest_id, $problem_id, $contest_id, $contest_id);
             
             global $conn;
             $rs = $conn->GetRow($sql, $val); 
@@ -479,7 +483,7 @@ abstract class RunsDAOBase extends DAO
 	  **/
 	private static final function create( &$Runs )
 	{
-		$sql = "INSERT INTO Runs ( run_id, user_id, problem_id, contest_id, guid, language, status, veredict, runtime, memory, score, contest_score, ip, time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Runs ( run_id, user_id, problem_id, contest_id, guid, language, status, veredict, runtime, memory, score, contest_score, ip, time, submit_delay ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Runs->getRunId(), 
 			$Runs->getUserId(), 
@@ -495,6 +499,7 @@ abstract class RunsDAOBase extends DAO
 			$Runs->getContestScore(), 
 			$Runs->getIp(), 
 			$Runs->getTime(), 
+                        $Runs->getSubmitDelay() 
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}
