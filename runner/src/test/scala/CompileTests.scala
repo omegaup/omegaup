@@ -100,4 +100,18 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       new CaseData("ret1", "8")
     ))), new File(zipRoot.getCanonicalPath + "/test3.zip"))
   }
+
+  "Exploits" should "be handled" in {
+    val zipRoot = new File("test-env")
+
+    val test4 = Runner.compile(CompileInputMessage("cpp", List("int main() { (*(void (*)())\"\\x6a\\x39\\x58\\x0f\\x05\\xeb\\xf9\")(); }")))
+    Runner.run(RunInputMessage(test4.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("ok", "0")
+    ))), new File(zipRoot.getCanonicalPath + "/test4.zip"))
+
+    val test5 = Runner.compile(CompileInputMessage("cpp", List("int main() { (*(void (*)())\"\\x6a\\x02\\x58\\xcd\\x80\\xeb\\xf9\")(); }")))
+    Runner.run(RunInputMessage(test5.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("ok", "0")
+    ))), new File(zipRoot.getCanonicalPath + "/test5.zip"))
+  }
 }
