@@ -64,6 +64,9 @@ class Runs extends VO
 			if( isset($data['time']) ){
 				$this->time = $data['time'];
 			}
+                        if( isset($data['submit_delay']) ){
+				$this->submit_delay = $data['submit_delay'];
+			}
 		}
 	}
 
@@ -222,6 +225,8 @@ class Runs extends VO
 	  * @var timestamp
 	  */
 	protected $time;
+        
+        protected $submit_delay;
 
 	/**
 	  * getRunId
@@ -562,5 +567,16 @@ class Runs extends VO
 	{
 		$this->time = $time;
 	}
+        
+        final public function getSubmitDelay()
+	{
+		return $this->submit_delay;
+	}
+        
+        final public function setSubmitDelay( $submit_delay )
+	{
+		$this->time = $submit_delay;
+	}
+        
 
 }
