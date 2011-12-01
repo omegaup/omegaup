@@ -89,7 +89,7 @@ class ApiHttpErrors
 
         if ($message === NULL)
         {
-            $message = "Whops. Ive encoutered an unspecified error. Please try again";
+            $message = "Oops. Ive encoutered an unspecified error. Please try again";
         }
         
         return array("status" => "error",
