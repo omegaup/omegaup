@@ -42,15 +42,19 @@ object Runner extends RunnerService with Log {
 		val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
 		val runtime = Runtime.getRuntime
 		
-		val process = message.lang match {
+		val params = message.lang match {
 			case "java" =>
-				runtime.exec((List(sandbox, "-S", profile + "/javac", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "--", Config.get("java.compiler.path", "/usr/bin/javac")) ++ inputFiles).toArray)
+				List(sandbox, "-S", profile + "/javac", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "--", Config.get("java.compiler.path", "/usr/bin/javac")) ++ inputFiles
 			case "c" =>
-				runtime.exec((List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-ansi", "-O2", "-lm") ++ inputFiles).toArray)
+				List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-ansi", "-O2", "-lm") ++ inputFiles
 			case "cpp" =>
-				runtime.exec((List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles).toArray)
+				List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles
 			case _ => null
 		}
+
+		debug("Compile {}", params.mkString(" "))
+
+		val process = runtime.exec(params.toArray)
 		
 		if(process != null) {
 			val status = process.waitFor
@@ -117,16 +121,18 @@ object Runner extends RunnerService with Log {
 				casesDirectory.listFiles.filter {_.getName.endsWith(".in")} .foreach { (x) => {
 					val caseName = runDirectory.getCanonicalPath + "/" + x.getName.substring(0, x.getName.lastIndexOf('.'))
 				
-					val process = lang match {
+					val params = lang match {
 						case "java" =>
-							runtime.exec((List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "--", Config.get("java.runtime.path", "/usr/bin/java"), "-Xmx" + message.memoryLimit + "k", "Main")).toArray)
+							List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "--", Config.get("java.runtime.path", "/usr/bin/java"), "-Xmx" + message.memoryLimit + "k", "Main")
 						case "c" =>
-							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
+							List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")
 						case "cpp" =>
-							runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
+							List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")
 					}
+
+					debug("Run {}", params.mkString(" "))
 				
-					process.waitFor
+					runtime.exec(params.toArray).waitFor
 				}}
 			}
 		
@@ -139,16 +145,18 @@ object Runner extends RunnerService with Log {
 					
 						FileUtil.write(casePath + ".in", x.data)
 				
-						val process = lang match {
+						val params = lang match {
 							case "java" =>
-								runtime.exec((List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")).toArray)
+								List(sandbox, "-S", profile + "/java", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")
 							case "c" =>
-								runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
+								List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")
 							case "cpp" =>
-								runtime.exec((List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")).toArray)
+								List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")
 						}
 				
-						process.waitFor
+						debug("Run {}", params.mkString(" "))
+
+						runtime.exec(params.toArray).waitFor
 					
 						new File(casePath + ".in").delete
 					}}
