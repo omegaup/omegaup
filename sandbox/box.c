@@ -173,8 +173,9 @@ box_exit(int rc)
         {
           if (threads[t].pid == -1) continue;
           
-	  if (is_ptraced)
-	    ptrace(PTRACE_KILL, threads[t].pid);
+          // aparently this is causing a bug in the server.
+	  //if (is_ptraced)
+	  //  ptrace(PTRACE_KILL, threads[t].pid);
 	  kill(-threads[t].pid, SIGKILL);
 	  kill(threads[t].pid, SIGKILL);
 	}

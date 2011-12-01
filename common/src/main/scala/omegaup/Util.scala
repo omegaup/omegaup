@@ -23,7 +23,7 @@ object Config {
 				case x:String  => ans.asInstanceOf[T]
 				case x:Int     => ans.toInt.asInstanceOf[T]
 				case x:Boolean => (ans == "true").asInstanceOf[T]
-				case _         => null.asInstanceOf[T]
+				case _	 => null.asInstanceOf[T]
 			}
 		}
 	}
@@ -34,7 +34,7 @@ object Config {
 }
 
 trait Log {
-	private val log = LoggerFactory.getLogger(getClass)
+	private lazy val log = LoggerFactory.getLogger(getClass.getName.replace("$", "#").stripSuffix("#"))
 
 	def trace(message:String, values:Any*) = 
 		log.trace(message, values.map(_.asInstanceOf[Object]).toArray)
@@ -67,33 +67,48 @@ trait Log {
 		log.error(message, error, values.map(_.asInstanceOf[Object]).toArray)
 }
 
-object LogFormatter extends java.util.logging.Formatter {
-	val dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-	val lineSep = System.getProperty("line.separator");
-	
-	override def format(record: java.util.logging.LogRecord): String = {
-		val buf = new StringBuffer(180)
-		
-		buf.append(dateFormat.format(new java.util.Date(record.getMillis)))
-		buf.append(" [")
-		buf.append(record.getThreadID)
-		buf.append("] ")
-		buf.append(record.getLevel)
-		buf.append(' ')
-		buf.append(record.getSourceClassName)
-		buf.append(" - ")
-		buf.append(formatMessage(record))
-		buf.append(lineSep)
-		
-		val throwable = record.getThrown
-		
-		if (throwable != null) {
-			val sink = new java.io.StringWriter()
-			throwable.printStackTrace(new java.io.PrintWriter(sink, true))
-			buf.append(sink.toString)
+object Logging {
+	def init(): Unit = {
+		System.setProperty("org.mortbay.log.class", "org.mortbay.log.Slf4jLog")
+
+		val rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).asInstanceOf[ch.qos.logback.classic.Logger]
+
+		if(Config.get("logging.file", "") != "") {
+			rootLogger.detachAndStopAllAppenders
+
+			val appender = new ch.qos.logback.core.FileAppender[ch.qos.logback.classic.spi.ILoggingEvent]()
+			val encoder = new ch.qos.logback.classic.encoder.PatternLayoutEncoder()
+			val context = rootLogger.getLoggerContext
+
+			encoder.setContext(context);
+			encoder.setPattern("%-4relative [%thread] %-5level %logger{35} - %msg%n");
+			encoder.start()
+
+			appender.setAppend(true)
+			appender.setContext(context)
+			appender.setFile(Config.get("logging.file", ""))
+			appender.setEncoder(encoder)
+			appender.start
+
+			rootLogger.addAppender(appender)
 		}
-		
-		buf.toString
+
+		rootLogger.setLevel(
+			Config.get("logging.level", "info") match {
+				case "all" => ch.qos.logback.classic.Level.TRACE
+				case "finest" => ch.qos.logback.classic.Level.TRACE
+				case "finer" => ch.qos.logback.classic.Level.TRACE
+				case "trace" => ch.qos.logback.classic.Level.TRACE
+				case "fine" => ch.qos.logback.classic.Level.DEBUG
+				case "config" => ch.qos.logback.classic.Level.DEBUG
+				case "debug" => ch.qos.logback.classic.Level.DEBUG
+				case "info" => ch.qos.logback.classic.Level.INFO
+				case "warn" => ch.qos.logback.classic.Level.WARN
+				case "warning" => ch.qos.logback.classic.Level.WARN
+				case "error" => ch.qos.logback.classic.Level.ERROR
+				case "severe" => ch.qos.logback.classic.Level.ERROR
+			}
+		)
 	}
 }
 
