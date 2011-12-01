@@ -57,7 +57,7 @@ class NewRun extends ApiHandler
             "memory" => new ApiExposedProperty("memory", false, 0),
             "score" => new ApiExposedProperty("score", false, 0),
             "contest_score" => new ApiExposedProperty("contest_score", false, 0),
-            "ip" => new ApiExposedProperty("ip", false, $_SERVER['REMOTE_ADDR']),
+            "ip" => new ApiExposedProperty("ip", false, isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "no ip"),
             "submit_delay" => new ApiExposedProperty("submit_delay", false, 0),
             "guid" => new ApiExposedProperty("guid", false, md5(uniqid(rand(), true))),
             "veredict" => new ApiExposedProperty("veredict", false, "JE")
@@ -81,9 +81,17 @@ class NewRun extends ApiHandler
                throw new ApiException($this->error_dispatcher->invalidParameter());
             }
 
+            
+            $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
+            
+            // Validate that the run is inside contest
+            if( !$contest->isInsideContest())
+            {                
+                throw new ApiException($this->error_dispatcher->forbiddenSite());
+            }
+            
             // Validate if contest is private then the user should be registered
-            $contest_temp = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
-            if ( $contest_temp->getPublic() === "1" 
+            if ( $contest->getPublic() == 0 
                 && is_null(ContestsUsersDAO::getByPK(
                         $this->user_id, 
                         $this->request["contest_id"]->getValue()))
@@ -98,15 +106,20 @@ class NewRun extends ApiHandler
                     $this->request["problem_id"]->getValue(), 
                     $this->user_id)
                )
-            {
+            {                
                throw new ApiException($this->error_dispatcher->notAllowedToSubmit());
             }
         
         
             // @todo Validate window_length
         }
-        catch(Exception $e)
+        catch(ApiException $apiException)
         {
+            // Propagate ApiException
+            throw $apiException;
+        }
+        catch(Exception $e)
+        {            
             // Operation failed in the data layer
            throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
