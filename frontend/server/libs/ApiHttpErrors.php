@@ -89,7 +89,7 @@ class ApiHttpErrors
 
         if ($message === NULL)
         {
-            $message = "Whops. Ive encoutered an unspecified error. Please try again";
+            $message = "Oops. Ive encoutered an unspecified error. Please try again";
         }
         
         return array("status" => "error",
@@ -104,7 +104,7 @@ class ApiHttpErrors
        
         if ($message === NULL)
         {
-            $message = "Whops. Ive encoutered an internal error error Please try again.";
+            $message = "Whops. Ive encoutered an internal error. Please try again.";
         }
         
         return array("status" => "error",

@@ -1,7 +1,6 @@
 package omegaup.grader
 
 import java.io._
-import java.util.logging._
 import javax.servlet._
 import javax.servlet.http._
 import org.mortbay.jetty.Request
@@ -92,25 +91,8 @@ import omegaup.data._
 		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
 		
 		// logger
-		System.setProperty("org.mortbay.log.class", "org.mortbay.log.Slf4jLog")
-		if(Config.get("grader.logging.file", "") != "") {
-			Logger.getLogger("").addHandler(new FileHandler(Config.get("grader.logfile", "")))
-		}
-		Logger.getLogger("").setLevel(
-			Config.get("grader.logging.level", "info") match {
-				case "all" => Level.ALL
-				case "finest" => Level.FINEST
-				case "finer" => Level.FINER
-				case "fine" => Level.FINE
-				case "config" => Level.CONFIG
-				case "info" => Level.INFO
-				case "warning" => Level.WARNING
-				case "severe" => Level.SEVERE
-				case "off" => Level.OFF
-			}
-		)
-		Logger.getLogger("").getHandlers.foreach { _.setFormatter(LogFormatter) }
-		
+		Logging.init()
+	
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
 			Manager.addRunner(omegaup.runner.Runner)

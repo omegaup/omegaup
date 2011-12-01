@@ -9,12 +9,16 @@ class ProblemsController {
 	  * 
 	  *	
 	  **/
-	public static function getProblemList( $sizePage , $noPage , $servidor = null ,$orderBy){
+	public static function getProblemList( $pageSize = 10 , $pageNumber = 1 , $servidor = null , $orderBy = null){
 		
-		$condition = "server = '$servidor' and public = 1";
-		$results = ProblemsDAO::byPage ( $sizePage , $noPage , $condition , $servidor, $orderBy);		
-		return $results;
+		//$condition = "server = '$servidor' and public = 1";
+		//$results = ProblemsDAO::byPage ( $sizePage , $noPage , $condition , $servidor, $orderBy );		
+
+		return ProblemsDAO::getAll ( $pageNumber, $pageSize, $orderBy );
+
 	}
+
+
 	
 	public static function getJudgesList(){
 		return array(  'uva' => "Universidad Valladolid |",

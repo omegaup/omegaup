@@ -71,7 +71,7 @@
       * Login
       *
       **/
-    $page->addComponent( new TitleComponent("Ya tienes cuenta ?"));
+    $page->addComponent( new TitleComponent("&iquest; Ya tienes cuenta ?"));
     $login_form = new FormComponent( new Users() );
     $login_form->addField("user", "Email o usuario", "input", "", "user" );
     $login_form->addField("pass", "Contrase&ntilde;a", "password", "", "pass" );
