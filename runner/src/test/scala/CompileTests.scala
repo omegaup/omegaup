@@ -3,6 +3,7 @@ import java.io._
 import omegaup._
 import omegaup.data._
 import omegaup.runner._
+import org.slf4j._
 
 import org.scalatest.{FlatSpec, BeforeAndAfterAll}
 import org.scalatest.matchers.ShouldMatchers
@@ -20,8 +21,12 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
     root.mkdir()
     new File(root.getCanonicalPath + "/compile").mkdir()
 
+    Config.set("runner.preserve", true)
     Config.set("compile.root", root.getCanonicalPath + "/compile")
     Config.set("runner.sandbox.path", new File("../sandbox").getCanonicalPath)
+    Config.set("logging.level", "debug")
+
+    Logging.init()
   }
 
   "Compile error" should "be correctly handled" in {

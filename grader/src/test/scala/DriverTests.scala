@@ -32,6 +32,10 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		Config.set("problems.root", root.getCanonicalPath + "/problems")
 		Config.set("compile.root", root.getCanonicalPath + "/compile")
 		Config.set("input.root", root.getCanonicalPath + "/input")
+		Config.set("runner.preserve", "true")
+		Config.set("logging.level", "debug")
+
+		Logging.init
 		
 		val input = new ZipInputStream(new FileInputStream("src/test/resources/omegaup-base.zip"))
 		var entry: ZipEntry = input.getNextEntry

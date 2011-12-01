@@ -2,7 +2,6 @@ package omegaup.runner
 
 import java.io._
 import java.util.zip._
-import java.util.logging._
 import javax.servlet._
 import javax.servlet.http._
 import org.mortbay.jetty._
@@ -58,13 +57,17 @@ object Runner extends RunnerService with Log {
 		
 		if(process != null) {
 			val status = process.waitFor
-		
-			inputFiles.foreach { new File(_).delete }
+	
+			if (!Config.get("runner.preserve", false)) {
+				inputFiles.foreach { new File(_).delete }
+			}
 			
 			if (status == 0) {
-				new File(runDirectory.getCanonicalPath + "/compile.meta").delete
-				new File(runDirectory.getCanonicalPath + "/compile.out").delete
-				new File(runDirectory.getCanonicalPath + "/compile.err").delete
+				if (!Config.get("runner.preserve", false)) {
+					new File(runDirectory.getCanonicalPath + "/compile.meta").delete
+					new File(runDirectory.getCanonicalPath + "/compile.out").delete
+					new File(runDirectory.getCanonicalPath + "/compile.err").delete
+				}
 			
 				info("compile finished successfully")
 				new CompileOutputMessage(token = Some(runDirectory.getParentFile.getName))
@@ -79,14 +82,20 @@ object Runner extends RunnerService with Log {
 					else
 						FileUtil.read(runDirectory.getCanonicalPath + "/compile.err").replace(runDirectory.getCanonicalPath + "/", "")
 				
-				FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
+				if (!Config.get("runner.preserve", false)) {
+					FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
+				}
 				
 				info("compile finished with errors: {}", compileError)
 				new CompileOutputMessage("compile error", error=Some(compileError))
 			}
 		} else {
-			info("compile finished successfully")
-			new CompileOutputMessage(token = Some(runDirectory.getParentFile.getName))
+			if (!Config.get("runner.preserve", false)) {
+				FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
+			}
+
+			error("compiler failed to run")
+			new CompileOutputMessage("compile error", error=Some("compiler failed to run"))
 		}
 	}
 	
@@ -260,24 +269,7 @@ object Runner extends RunnerService with Log {
 		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("runner.truststore.password", "omegaup"))
 		
 		// logger
-		System.setProperty("org.mortbay.log.class", "org.mortbay.log.Slf4jLog")
-		if(Config.get("grader.logging.file", "") != "") {
-			Logger.getLogger("").addHandler(new FileHandler(Config.get("grader.logfile", "")))
-		}
-		Logger.getLogger("").setLevel(
-			Config.get("grader.logging.level", "info") match {
-				case "all" => Level.ALL
-				case "finest" => Level.FINEST
-				case "finer" => Level.FINER
-				case "fine" => Level.FINE
-				case "config" => Level.CONFIG
-				case "info" => Level.INFO
-				case "warning" => Level.WARNING
-				case "severe" => Level.SEVERE
-				case "off" => Level.OFF
-			}
-		)
-		Logger.getLogger("").getHandlers.foreach { _.setFormatter(LogFormatter) }
+		Logging.init()
 
 		// the handler
 		val handler = new AbstractHandler() {
