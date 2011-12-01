@@ -411,14 +411,10 @@ abstract class RunsDAOBase extends DAO
                                 0
                               )
                               OR (   
-                                (SELECT UNIX_TIMESTAMP()) > 
+                                (SELECT UNIX_TIMESTAMP()) >= 
                                 (SELECT UNIX_TIMESTAMP(time) from Runs where user_id = ? and contest_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1) 
                                     + ( SELECT submissions_gap FROM Contests WHERE contest_id = ? )
-                              )
-                              AND (
-                                (SELECT UNIX_TIMESTAMP()) < 
-                                (SELECT UNIX_TIMESTAMP(finish_time) from Contests where contest_id = ?)
-                              )
+                              )                             
                               ,1,0 ) As 'IsValid' ;";
             $val = array($user_id, $contest_id, $problem_id, $user_id, $contest_id, $problem_id, $contest_id, $contest_id);
             
