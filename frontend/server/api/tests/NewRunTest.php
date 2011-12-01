@@ -301,9 +301,177 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->fail("Contestant was able to submit run in an not yet started contest.");
         
     }
+    
+    public function testInvalidRunInsideSubmissionsGap()
+    {
+        // Login 
+        $auth_token = Utils::LoginAsContestant();
         
-    // submissions gap test
-    // run invalid combination prob id contest id
+        // Create public contest
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);   
+        
+        // Set submissions gap of 2 seconds
+        $contest = ContestsDAO::getByPK($contest_id);                
+        $contest->setSubmissionsGap(2);
+        ContestsDAO::save($contest);
+        
+        // Create problem in contest        
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
+        
+        // Set valid context for Run 
+        Utils::SetAuthToken($auth_token);
+        $_POST["contest_id"] = $contest_id;
+        $_POST["problem_id"] = $problem_id;        
+        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
+        $_POST["language"] = $languages[array_rand($languages, 1)];
+        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        
+        
+        $newRun = new NewRun();        
+        for($i = 0; $i < 2; $i++)
+        {
+            // Send first Run, should succeed
+            sleep(1);
+            try
+            {
+                $return_array = $newRun->ExecuteApi();
+            }
+            catch(ApiException $e)
+            {                
+                var_dump($e->getArrayMessage());            
+                $this->fail("Unexpected exception");
+            }
+
+            // Validate output
+            $this->assertEquals("ok", $return_array["status"]);
+
+            // Send second run after 1 sec, should be invalid
+            sleep(1);
+            try
+            {
+                $return_array = $newRun->ExecuteApi();
+            }
+            catch(ApiException $e)
+            {
+                // Validate exception            
+                $exception_message = $e->getArrayMessage();            
+                $this->assertEquals("You're not allowed to submit yet.", $exception_message["error"]);
+                $this->assertEquals("error", $exception_message["status"]);
+                $this->assertEquals("HTTP/1.1 401 FORBIDDEN", $exception_message["header"]);                                         
+                
+                // We're OK
+                continue;
+            }
+            var_dump($contest);
+            var_dump($return_array);
+            $this->fail("Contestant was able to submit run inside the submission gap.");
+        }
+    }
+            
+    public function testSubmissionGapIsPerProblem()
+    {
+        // Login 
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Create public contest
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);   
+        
+        // Set submissions gap of 2 seconds
+        $contest = ContestsDAO::getByPK($contest_id);                
+        $contest->setSubmissionsGap(2);
+        ContestsDAO::save($contest);
+        
+        // Create 3 problems in contest        
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id[0] = $problemCreator->testCreateValidProblem($contest_id);
+        $problem_id[1] = $problemCreator->testCreateValidProblem($contest_id);
+        $problem_id[2] = $problemCreator->testCreateValidProblem($contest_id);
+        
+        // Set valid context for Run 
+        Utils::SetAuthToken($auth_token);
+        $_POST["contest_id"] = $contest_id;        
+        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
+        $_POST["language"] = $languages[array_rand($languages, 1)];
+        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";    
+        
+        $newRun = new NewRun();        
+        
+        // Send problems
+        for($i = 0; $i < 3; $i++)
+        {
+            $_POST["problem_id"] = $problem_id[$i];        
+            try
+            {
+                $return_array = $newRun->ExecuteApi();
+            }
+            catch(ApiException $e)
+            {                
+                var_dump($e->getArrayMessage());            
+                $this->fail("Unexpected exception");
+            }
+
+            // Validate output
+            $this->assertEquals("ok", $return_array["status"]);
+        }
+        
+    }
+    
+    public function testInvalidContestProblemCombination()
+    {        
+        
+        // Login 
+        $auth_token = Utils::LoginAsContestant();                
+        
+        // Create public contest 1
+        $contestCreator = new NewContestsTest();
+        $contest_id_1 = $contestCreator->testCreateValidContest(1);   
+        
+        // Create public contest 2
+        $contestCreator = new NewContestsTest();
+        $contest_id_2 = $contestCreator->testCreateValidContest(1);   
+        
+        // Create problem in contest 2       
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id_2);
+        
+        // Set invalid context
+        Utils::SetAuthToken($auth_token);
+        $_POST["contest_id"] = $contest_id_1;
+        $_POST["problem_id"] = $problem_id;        
+        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
+        $_POST["language"] = $languages[array_rand($languages, 1)];
+        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        
+        // Execute API
+        $newRun = new NewRun();
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            // Validate exception            
+            $exception_message = $e->getArrayMessage();            
+            $this->assertEquals("problem_id and contest_id combination is invalid.", $exception_message["error"]);
+            $this->assertEquals("error", $exception_message["status"]);
+            $this->assertEquals("HTTP/1.1 400 BAD REQUEST", $exception_message["header"]);                         
+            
+            // We're OK
+            return;            
+        }
+        
+        var_dump($contest);
+        var_dump($return_array);
+        $this->fail("Contestant was able to submit run in an not yet started contest.");
+        
+    }
+        
     // run missing parameters
     // window length?
     

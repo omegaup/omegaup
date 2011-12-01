@@ -78,7 +78,7 @@ class NewRun extends ApiHandler
                     $this->request["problem_id"]->getValue() 
                 ))
             {
-               throw new ApiException($this->error_dispatcher->invalidParameter());
+               throw new ApiException($this->error_dispatcher->invalidParameter("problem_id and contest_id combination is invalid."));
             }
 
             
