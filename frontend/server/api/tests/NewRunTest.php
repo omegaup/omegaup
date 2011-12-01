@@ -49,6 +49,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $languages = array ('c','cpp','java','py','rb','pl','cs','p');
         $_POST["language"] = $languages[array_rand($languages, 1)];
         $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
         
         // Execute API
         $newRun = new NewRun();
@@ -86,7 +87,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getMemory());
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
-        $this->assertEquals("no ip", $run->getIp());
+        $this->assertEquals("123.123.123.123", $run->getIp());
         $this->assertEquals(0, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
         
@@ -118,6 +119,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $languages = array ('c','cpp','java','py','rb','pl','cs','p');
         $_POST["language"] = $languages[array_rand($languages, 1)];
         $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
         
         // Execute API
         $newRun = new NewRun();
@@ -161,6 +163,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $languages = array ('c','cpp','java','py','rb','pl','cs','p');
         $_POST["language"] = $languages[array_rand($languages, 1)];
         $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
         
         // Execute API
         $newRun = new NewRun();
@@ -198,7 +201,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getMemory());
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
-        $this->assertEquals("no ip", $run->getIp());
+        $this->assertEquals("123.123.123.123", $run->getIp());
         $this->assertEquals(0, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
     }
@@ -221,6 +224,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $languages = array ('c','cpp','java','py','rb','pl','cs','p');
         $_POST["language"] = $languages[array_rand($languages, 1)];
         $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
         
         // Execute API
         $newRun = new NewRun();
@@ -272,6 +276,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $languages = array ('c','cpp','java','py','rb','pl','cs','p');
         $_POST["language"] = $languages[array_rand($languages, 1)];
         $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
         
         // Execute API
         $newRun = new NewRun();

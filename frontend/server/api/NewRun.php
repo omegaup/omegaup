@@ -57,12 +57,12 @@ class NewRun extends ApiHandler
             "memory" => new ApiExposedProperty("memory", false, 0),
             "score" => new ApiExposedProperty("score", false, 0),
             "contest_score" => new ApiExposedProperty("contest_score", false, 0),
-            "ip" => new ApiExposedProperty("ip", false, isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "no ip"),
+            "ip" => new ApiExposedProperty("ip", false, $_SERVER['REMOTE_ADDR']),
             "submit_delay" => new ApiExposedProperty("submit_delay", false, 0),
             "guid" => new ApiExposedProperty("guid", false, md5(uniqid(rand(), true))),
-            "veredict" => new ApiExposedProperty("veredict", false, "JE")
+            "veredict" => new ApiExposedProperty("veredict", false, "JE")                                
             
-        );
+        );        
     }
     
     protected function ValidateRequest() 
@@ -136,7 +136,7 @@ class NewRun extends ApiHandler
         }
         
         // Populate new run object
-        $run = new Runs($run_insert_values);        
+        $run = new Runs($run_insert_values);                
         try
         {
             // Push run into DB
