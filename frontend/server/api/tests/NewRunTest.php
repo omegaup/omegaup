@@ -25,6 +25,16 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         Utils::cleanup();
     }
     
+    private function setValidContext($contest_id, $problem_id)
+    {
+        $_POST["contest_id"] = $contest_id;
+        $_POST["problem_id"] = $problem_id;        
+        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
+        $_POST["language"] = $languages[array_rand($languages, 1)];
+        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";        
+    }
+    
     public function testNewValidRun($contest_id = null, $problem_id = null)
     {
         // Login 
@@ -44,12 +54,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         }
         
         Utils::SetAuthToken($auth_token);
-        $_POST["contest_id"] = $contest_id;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
         $newRun = new NewRun();
@@ -114,12 +119,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Set valid context
         Utils::SetAuthToken($auth_token);
-        $_POST["contest_id"] = $contest_id;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
         $newRun = new NewRun();
@@ -158,12 +158,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsJudge();        
         Utils::SetAuthToken($auth_token);
         
-        $_POST["contest_id"] = $contest_id;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
         $newRun = new NewRun();
@@ -219,12 +214,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant2();        
         Utils::SetAuthToken($auth_token);
         
-        $_POST["contest_id"] = $contest_id;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
         $newRun = new NewRun();
@@ -271,12 +261,8 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Set valid context
         Utils::SetAuthToken($auth_token);
-        $_POST["contest_id"] = $contest_id;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        
+        $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
         $newRun = new NewRun();
@@ -322,13 +308,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Set valid context for Run 
         Utils::SetAuthToken($auth_token);
-        $_POST["contest_id"] = $contest_id;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
-        
+        $this->setValidContext($contest_id, $problem_id);
         
         $newRun = new NewRun();        
         for($i = 0; $i < 2; $i++)
@@ -393,18 +373,16 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Set valid context for Run 
         Utils::SetAuthToken($auth_token);
-        $_POST["contest_id"] = $contest_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";    
+        $this->setValidContext($contest_id, $problem_id);
         
         $newRun = new NewRun();        
         
         // Send problems
         for($i = 0; $i < 3; $i++)
         {
+            // Try different problem id
             $_POST["problem_id"] = $problem_id[$i];        
+            
             try
             {
                 $return_array = $newRun->ExecuteApi();
@@ -471,8 +449,62 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->fail("Contestant was able to submit run in an not yet started contest.");
         
     }
+            
+    public function testMissingParameters()
+    {
+        // Set context
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
         
-    // run missing parameters
-    // window length?
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
+        
+        // Login 
+        $auth_token = Utils::LoginAsJudge();        
+        Utils::SetAuthToken($auth_token);
+        
+        $this->setValidContext($contest_id, $problem_id);
+        
+        $needed_keys = array(
+            "problem_id",
+            "contest_id",
+            "language",
+            "source"                        
+        );
+        
+        foreach($needed_keys as $key)        
+        {
+            // Reset context
+            Utils::SetAuthToken($auth_token);
+            $this->setValidContext($contest_id, $problem_id);
+            
+            // Unset key
+            unset($_POST[$key]);
+            
+            // Execute API
+            $newRun = new NewRun();
+            try
+            {
+                $return_array = $newRun->ExecuteApi();
+            }
+            catch(ApiException $e)
+            {
+                // Exception is expected
+                $exception_array = $e->getArrayMessage();            
+
+                // Validate exception
+                $this->assertNotNull($exception_array);
+                $this->assertArrayHasKey('error', $exception_array);                    
+                $this->assertEquals("Required parameter ". $key ." is missing.", $exception_array["error"]);
+                
+                // We're OK
+                continue;
+            }
+            
+            $this->fail("Exception was expected. Parameter: ". $key);            
+        }
+    }
+    
+    // window length? <- OMFG, win_length requires tons of cases :)
     
 }
