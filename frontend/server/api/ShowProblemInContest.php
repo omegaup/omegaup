@@ -140,6 +140,18 @@ class ShowProblemInContest extends ApiHandler
                 array_push($runs_filtered_array, $run->asFilteredArray($relevant_columns));
             }
         }
+        
+        // At this point, contestant_user relationship should be established.        
+        try
+        {
+            $contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+                    $this->user_id, $this->request["contest_id"]->getValue());
+        }
+        catch(Exception $e)
+        {
+             // Operation failed in the data layer
+             throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
+        }                
                         
         // As last step, register the problem as opened                
         if (! ContestProblemOpenedDAO::getByPK($this->request["contest_id"]->getValue(), $this->request["problem_id"]->getValue(), $this->user_id ))

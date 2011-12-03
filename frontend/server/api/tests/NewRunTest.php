@@ -6,8 +6,9 @@
  */
 
 require_once '../NewRun.php';
+require_once '../ShowContest.php';
 
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'NewProblemInContestTest.php';
 
 require_once 'Utils.php';
@@ -25,6 +26,25 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         Utils::cleanup();
     }
     
+    public function openContestBeforeSubmit($contest_id)
+    {
+        // Set context
+        $_GET["contest_id"] = $contest_id;        
+        
+        // Execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            // Asume that the test is going to handle the exception
+        }
+        
+        unset($_GET["contest_id"]);
+    }
+    
     private function setValidContext($contest_id, $problem_id)
     {
         $_POST["contest_id"] = $contest_id;
@@ -33,6 +53,8 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $_POST["language"] = $languages[array_rand($languages, 1)];
         $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
         $_SERVER['REMOTE_ADDR'] = "123.123.123.123";        
+        
+        $this->openContestBeforeSubmit($contest_id);
     }
     
     public function testNewValidRun($contest_id = null, $problem_id = null)
@@ -418,13 +440,8 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $problem_id = $problemCreator->testCreateValidProblem($contest_id_2);
         
         // Set invalid context
-        Utils::SetAuthToken($auth_token);
-        $_POST["contest_id"] = $contest_id_1;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        Utils::SetAuthToken($auth_token);        
+        $this->setValidContext($contest_id_1, $problem_id);        
         
         // Execute API
         $newRun = new NewRun();
@@ -504,6 +521,91 @@ class NewRunTest extends PHPUnit_Framework_TestCase
             $this->fail("Exception was expected. Parameter: ". $key);            
         }
     }
+    
+    public function testNewRunInUsacoPublicContest()
+    {
+        // Login 
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set context        
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);        
+               
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
+        
+        // Alter Contest window length
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength(20);
+        ContestsDAO::save($contest);
+        
+        Utils::SetAuthToken($auth_token);
+        $this->setValidContext($contest_id, $problem_id);
+        
+        // Execute API
+        $newRun = new NewRun();
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());            
+            $this->fail("Unexpected exception");
+        }
+        
+        // Validate output
+        $this->assertEquals("ok", $return_array["status"]);
+    }
+    
+    public function testNewRunOutUsacoPublicContest()
+    {
+        // Login 
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set context        
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);        
+               
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
+        
+        // Alter Contest window length
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength(20);
+        ContestsDAO::save($contest);                
+        
+        Utils::SetAuthToken($auth_token);
+        $this->setValidContext($contest_id, $problem_id);
+        
+        // Alter first access time to make appear the run outside window length
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
+        $contest_user->setAccessTime(date("Y-m-d H:i:s", time() - 21));
+        ContestsUsersDAO::save($contest_user);
+        
+        // Execute API
+        $newRun = new NewRun();
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            // Validate exception            
+            $exception_message = $e->getArrayMessage();            
+            $this->assertEquals("User is not allowed to view this content.", $exception_message["error"]);
+            $this->assertEquals("error", $exception_message["status"]);
+            $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
+            
+            // We're OK
+            return;            
+        }
+        
+        var_dump($contest);
+        var_dump($return_array);
+        $this->fail("Contestant was able to submit run in an expired contest.");
+    }
+    
     
     // window length? <- OMFG, win_length requires tons of cases :)
     
