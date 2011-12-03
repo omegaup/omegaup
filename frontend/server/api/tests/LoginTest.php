@@ -22,11 +22,21 @@ class LoginTest extends PHPUnit_Framework_TestCase
         //Connect to DB
         Utils::ConnectToDB();
         
-        $_POST["username"] = "user";
-        $_POST["password"] = "password";
+        $_POST["username"] = Utils::GetContestantUsername();
+        $_POST["password"] = Utils::$contestant->getPassword();
         
         $loginApi = new Login();        
-        $cleanValue = $loginApi->ExecuteApi();
+        try
+        {
+            $cleanValue = $loginApi->ExecuteApi();
+        }
+        catch( ApiException $e )
+        {
+            var_dump($e->getArrayMessage());
+            var_dump($_POST);
+            var_dump($e->getTrace());
+            $this->fail("User should be able to login");
+        }
         
         
         $this->assertNotNull($cleanValue);        
@@ -43,7 +53,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
         //Connect to DB
         Utils::ConnectToDB();
         
-        $_POST["username"] = "user";
+        $_POST["username"] = Utils::GetContestantUsername();
         $_POST["password"] = "badpass";
         
         $loginApi = new Login();
@@ -109,8 +119,8 @@ class LoginTest extends PHPUnit_Framework_TestCase
         //Connect to DB
         Utils::ConnectToDB();
         
-        $_POST["username"] = "user";
-        $_POST["password"] = "password";
+        $_POST["username"] = Utils::GetContestantUsername();
+        $_POST["password"] = Utils::$contestant->getPassword();
         
         $loginApi = new Login();
         

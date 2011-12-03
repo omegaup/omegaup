@@ -21,7 +21,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         $_POST["description"] = "description";
         $_POST["start_time"] = Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() - 60*60);
         $_POST["finish_time"] = Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() + 60*60);
-        $_POST["window_length"] = "20";
+        $_POST["window_length"] = null;
         $_POST["public"] = $public;
         $_POST["token"] = "loltoken";
         $_POST["points_decay_factor"] = ".02";

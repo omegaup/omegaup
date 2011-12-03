@@ -8,7 +8,7 @@
 require_once '../ShowContests.php';
 require_once '../NewContest.php';
 
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'Utils.php';
 
 
