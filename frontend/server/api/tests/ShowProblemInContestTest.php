@@ -8,7 +8,7 @@
 require_once '../ShowProblemInContest.php';
 require_once '../NewProblemInContest.php';
 
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'NewProblemInContestTest.php';
 
 require_once 'Utils.php';
@@ -211,9 +211,45 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->fail("User was able to see problem in private contest not invited.");
     }
     
-    // @TODO Assert problem with runs
+    public function testCheckContestAccessTime()
+    {
+        // Create a clean contest and get the ID
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
+                        
+        // Create a problem in given contest
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set Context
+        $_GET["problem_id"] = $problem_id;
+        $_GET["contest_id"] = $contest_id;
+        
+        //Get API
+        $showProblemInContest = new ShowProblemInContest();
+        Utils::SetAuthToken($auth_token);
+        
+        try
+        {            
+            $return_array = $showProblemInContest->ExecuteApi();            
+        }
+        catch (ApiException $e)
+        {
+            $var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception.");
+        }
+        
+        // Check that access time was saved
+        $access_time = Utils::GetDBUnixTimestamp();
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                                
+    }
     
-    // Improve search with DAO search by object    
+    // @TODO Assert problem with runs        
 }
 
 ?>

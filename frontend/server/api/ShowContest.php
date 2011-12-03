@@ -62,20 +62,17 @@ class ShowContest extends ApiHandler
         
         // Get our contest given the id
         try
-        {
-            
+        {            
             $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
         }
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
-        
+           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );                
         }
         
         // Add the contest to the response
-        $this->response = $contest->asFilteredArray($relevant_columns);               
-     
+        $this->response = $contest->asFilteredArray($relevant_columns);                    
         
         // Get problems of the contest
         $key_problemsInContest = new ContestProblems( array(
@@ -89,8 +86,7 @@ class ShowContest extends ApiHandler
         {
             // Operation failed in the data layer
            throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation());        
-        }
-        
+        }        
         
         // Add info of each problem to the contest
         $problemsResponseArray = array();
@@ -120,9 +116,21 @@ class ShowContest extends ApiHandler
             
         }
         
-        $this->response["problems"] = $problemsResponseArray;
+        // Save the time of the first access
+        try
+        {
+            $contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+                    $this->user_id, $this->request["contest_id"]->getValue());
+        }
+        catch(Exception $e)
+        {
+             // Operation failed in the data layer
+             throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
+        }
         
-                
+        // Set response
+        $this->response["problems"] = $problemsResponseArray;
+                        
         // @TODO Add ranking here, if it should be showed (look at scoreboard property in contests)        
     }
     

@@ -13,7 +13,7 @@
 
 require_once '../Login.php';
 require_once '../Logout.php';
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'NewProblemInContestTest.php';
 
 

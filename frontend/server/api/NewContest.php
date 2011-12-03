@@ -164,6 +164,7 @@ class NewContest extends ApiHandler
                     $temp_user_contest = new ContestsUsers( array(
                         "contest_id" => $contest->getContestId(),
                         "user_id" => $userkey,
+                        "access_time" => "0000-00-00 00:00:00",
                         "score" => 0,
                         "time" => 0
                     ));                    
