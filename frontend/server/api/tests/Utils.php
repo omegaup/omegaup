@@ -19,6 +19,11 @@ require_once 'NewProblemInContestTest.php';
 
 class Utils
 {
+    static $contestant;
+    static $contestant_2;
+    static $judge;
+    
+    
     //put your code here
     static function cleanup()
     {
@@ -120,12 +125,12 @@ class Utils
     
     static function LoginAsJudge()
     {
-        return self::Login("judge", "password");
+        return self::Login(self::$judge->getUsername(), self::$judge->getPassword());
     }
     
     static function GetJudgeUserId()
     {
-        return 3;
+        return self::$judge->getUserId();
     }
     
     static function LoginAsAdmin()
@@ -135,32 +140,32 @@ class Utils
     
     static function LoginAsContestant()
     {
-        return self::Login(self::GetContestantUsername(), "password");
+        return self::Login(self::$contestant->getUsername(), self::$contestant->getPassword());
     }
     
     static function GetContestantUsername()
     {
-        return "user";
+        return self::$contestant->getUsername();
     }
     
     static function GetContestantUserId()
     {
-        return 1;
+        return self::$contestant->getUserId();
     }
     
     static function LoginAsContestant2()
     {
-        return self::Login(self::GetContestant2Username(), "password");
+        return self::Login(self::$contestant_2->getUsername(), self::$contestant_2->getPassword());
     }
     
     static function GetContestant2Username()
     {
-        return "user2";
+        return self::$contestant_2->getUsername();
     }
     
     static function GetContestant2UserId()
     {
-        return 4;
+        return self::$contestant_2->getUserId();
     }
     
     
@@ -266,6 +271,21 @@ class Utils
         }        
                 
         return $rs[0]; 
+    }
+    
+    static function CreateUser($username, $password)
+    {
+        $contestant = new Users();
+        $contestant->setUsername(Utils::CreateRandomString());
+        $contestant->setPassword(md5($password));
+        $contestant->setSolved(0);
+        $contestant->setSubmissions(0);
+        UsersDAO::save($contestant);
+        
+        // Save localy clean password
+        $contestant->setPassword($password);
+        
+        return $contestant;
     }
 }
 
