@@ -157,8 +157,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         
         // Array of valid keys
         $valid_keys = array(
-            "title",
-            "alias",
+            "title",            
             "validator",
             "time_limit",            
             "memory_limit",
@@ -171,6 +170,9 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
             // Set auth key
             Utils::SetAuthToken($auth_token);
             $newProblem = new NewProblemInContest();
+            
+            // Reset context            
+            self::setValidContext();
             
             // Unset key
             unset($_POST[$key]);
@@ -195,7 +197,8 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
                     $this->assertEquals("Required parameter ". $key ." is missing.", $exception_array["error"]);
                 }
 
-                return;
+                // We're OK
+                continue;
             }
 
             $this->fail("Exception was expected. Parameter: ". $key);            
