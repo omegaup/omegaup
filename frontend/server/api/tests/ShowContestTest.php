@@ -2,7 +2,7 @@
 
 require_once '../ShowContest.php';
 
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'NewProblemInContestTest.php';
 
 require_once 'Utils.php';
@@ -227,6 +227,119 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $this->fail("User was allowed to see private content.");
         var_dump($return_array);        
     }
-                
+    
+    public function testAccessTimeIsAlwaysFirstAccessInPublic()
+    {     
+        // Create a clean contest and get the ID
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
+        
+        // Alter contest to set Window Length
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength("20");
+        ContestsDAO::save($contest);        
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set context
+        $_GET["contest_id"] = $contest_id;
+        Utils::SetAuthToken($auth_token);
+        
+        // Execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+        
+        // Check that access time was saved
+        $access_time = Utils::GetDBUnixTimestamp();
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                
+        
+        // Guarantee different timestamp
+        sleep(1);
+        
+        // Re-execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                                
+        
+    }
+       
+    
+    public function testAccessTimeIsAlwaysFirstAccessInPrivate()
+    {     
+        // Create a clean contest and get the ID
+        $contestCreator = new NewContestsTest();
+        $contest_id = $contestCreator->testCreateValidContest(0);
+        
+        // Alter contest to set Window Length
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength("20");
+        ContestsDAO::save($contest);        
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsJudge();
+        
+        // Set context
+        $_GET["contest_id"] = $contest_id;
+        Utils::SetAuthToken($auth_token);
+        
+        // Execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+        
+        // Check that access time was saved
+        $access_time = Utils::GetDBUnixTimestamp();
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetJudgeUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                
+        
+        // Guarantee different timestamp
+        sleep(1);
+        
+        // Re-execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetJudgeUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                                
+        
+    }
+       
 }
 ?>

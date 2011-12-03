@@ -8,6 +8,7 @@
 
    // Load config globals
    require_once("config.php");
+   require_once("Utils.php");
 
    // Define POST and GET constants for simplicity
    define('POST', "__ISPOST__");
@@ -65,5 +66,16 @@
 
     }
     $GLOBALS["conn"] = $conn;
-    return;
+    
+    
+    // Create users needed for testing    
+    Utils::$contestant = Utils::CreateUser("user", "password");    
+    Utils::$contestant_2 = Utils::CreateUser("user2", "password");
+    Utils::$judge = Utils::CreateUser("judge", "password");
+    
+    // Add judge role
+    $judge_rol = new UserRoles();
+    $judge_rol->setUserId(Utils::$judge->getUserId());
+    $judge_rol->setRoleId(JUDGE);
+    UserRolesDAO::save($judge_rol);
     

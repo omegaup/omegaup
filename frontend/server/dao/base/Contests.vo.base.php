@@ -691,16 +691,41 @@ class Contests extends VO
 	final public function setPointsDecayFactor( $points_decay_factor )
 	{
 		$this->points_decay_factor = $points_decay_factor;
-	}
+	}        
         
-        
-        final public function isInsideContest()
-        {                        
-            if( time() <= strtotime($this->getFinishTime()) && time() >= strtotime($this->getStartTime()) )
+         public function isInsideContest($user_id)
+        {                      
+            if(is_null($this->getWindowLength()))
             {
-                return true;
+                if( time() <= strtotime($this->getFinishTime()) && time() >= strtotime($this->getStartTime()) )
+                {
+                    return true;
+                }
+                return false;            
             }
-            return false;            
+            else
+            {                
+                try 
+                {
+                    $contest_user = ContestsUsersDAO::getByPK($user_id, $this->getContestId());
+                    $first_access_time = $contest_user->getAccessTime();
+                }
+                catch(Exception $e)
+                {
+                    // Propagate exception
+                    throw $e;
+                }
+
+                if( time() <= strtotime($this->getFinishTime()) && 
+                        time() >= strtotime($this->getStartTime()) &&
+                        time() <= strtotime($first_access_time) + $this->getWindowLength() )
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
         }
         
 }

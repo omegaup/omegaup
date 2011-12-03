@@ -80,12 +80,17 @@ class NewRun extends ApiHandler
             {
                throw new ApiException($this->error_dispatcher->invalidParameter("problem_id and contest_id combination is invalid."));
             }
-
             
-            $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
-            
+            // Before submit something, contestant had to open the problem/contest
+            if(!ContestsUsersDAO::getByPK($this->user_id, 
+                    $this->request["contest_id"]->getValue()))
+            {
+                throw new ApiException($this->error_dispatcher->forbiddenSite());
+            }
+                                    
             // Validate that the run is inside contest
-            if( !$contest->isInsideContest())
+            $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
+            if( !$contest->isInsideContest($this->user_id))
             {                
                 throw new ApiException($this->error_dispatcher->forbiddenSite());
             }
