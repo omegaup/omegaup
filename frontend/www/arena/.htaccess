@@ -1,20 +1,20 @@
 RewriteEngine on        
 
-RewriteRule ^/arena/login/?$ /arena/CallApiLoader.php?apicmd=Login [L]
-RewriteRule ^/arena/logout/?$ /arena/CallApiLoader.php?apicmd=Logout [L]
+RewriteRule ^login/?$ CallApiLoader.php?apicmd=Login [L]
+RewriteRule ^logout/?$ CallApiLoader.php?apicmd=Logout [L]
 
-RewriteRule ^/arena/contests/?$ /arena/CallApiLoader.php?apicmd=ShowContests [L]
-RewriteRule ^/arena/contests/new/?$ /arena/CallApiLoader.php?apicmd=NewContest [L]
-RewriteRule ^/arena/contests/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowContest&contest_id=$1 [L]
-RewriteRule ^/arena/contests/([0-9]+)/ranking/?$ /arena/CallApiLoader.php?apicmd=ShowScoreboard&contest_id=$1 [L]
+RewriteRule ^contests/?$ CallApiLoader.php?apicmd=ShowContests [L]
+RewriteRule ^contests/new/?$ CallApiLoader.php?apicmd=NewContest [L]
+RewriteRule ^contests/([^/]+)/?$ CallApiLoader.php?apicmd=ShowContest&contest_id=$1 [L]
+RewriteRule ^contests/([^/]+)/ranking/?$ CallApiLoader.php?apicmd=ShowScoreboard&contest_id=$1 [L]
 
-RewriteRule ^/arena/contests/([0-9]+)/problem/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemInContest&contest_id=$1&problem_id=$2 [L]
-RewriteRule ^/arena/contests/([0-9]+)/problem/new/?$ /arena/CallApiLoader.php?apicmd=NewProblemInContest&contest_id=$1 [L]
+RewriteRule ^contests/([^/]+)/problem/([^/]+)/?$ CallApiLoader.php?apicmd=ShowProblemInContest&contest_id=$1&problem_id=$2 [L]
+RewriteRule ^contests/([^/]+)/problem/new/?$ CallApiLoader.php?apicmd=NewProblemInContest&contest_id=$1 [L]
 
-RewriteRule ^/arena/runs/new/?$ /arena/CallApiLoader.php?apicmd=NewRun [L]
-RewriteRule ^/arena/runs/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowRun&run_id=$1 [L]
-RewriteRule ^/arena/runs/problem/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemRuns&problem_id=$1 [L]
+RewriteRule ^runs/new/?$ CallApiLoader.php?apicmd=NewRun [L]
+RewriteRule ^runs/([^/]+)/?$ CallApiLoader.php?apicmd=ShowRun&run_id=$1 [L]
+RewriteRule ^runs/problem/([^/]+)/?$ CallApiLoader.php?apicmd=ShowProblemRuns&problem_id=$1 [L]
 
-RewriteRule ^/arena/clarifications/new/?$ /arena/CallApiLoader.php?apicmd=NewClarification [L]
-RewriteRule ^/arena/clarifications/problem/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowClarificationInProblem&problem_id=$1 [L]
-RewriteRule ^/arena/clarifications/show/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowClarification&clarification_id=$1 [L]
+RewriteRule ^clarifications/new/?$ CallApiLoader.php?apicmd=NewClarification [L]
+RewriteRule ^clarifications/problem/([^/]+)/?$ CallApiLoader.php?apicmd=ShowClarificationInProblem&problem_id=$1 [L]
+RewriteRule ^clarifications/show/([^/]+)/?$ CallApiLoader.php?apicmd=ShowClarification&clarification_id=$1 [L]
