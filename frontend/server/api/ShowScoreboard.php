@@ -17,12 +17,7 @@ require_once("Scoreboard.php");
 class ShowScoreboard extends ApiHandler
 {
     private $scoreboardData;
-    
-    protected function DeclareAllowedRoles() 
-    {
-        return BYPASS;
-    }
-    
+   
     protected function GetRequest()
     {
         $this->request = array(

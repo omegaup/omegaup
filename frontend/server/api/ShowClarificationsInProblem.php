@@ -16,11 +16,6 @@ require_once("ApiHandler.php");
 class ShowClarificationsInProblem extends ApiHandler
 {
     
-    protected function DeclareAllowedRoles() 
-    {
-        return BYPASS;
-    }
-    
     protected function GetRequest()
     {
         $this->request = array(

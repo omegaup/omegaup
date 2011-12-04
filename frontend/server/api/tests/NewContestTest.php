@@ -10,17 +10,17 @@ require_once '../NewContest.php';
 require_once 'Utils.php';
 
 
-class NewContestsTest extends PHPUnit_Framework_TestCase
+class NewContestTest extends PHPUnit_Framework_TestCase
 {
         
     public static function CreateContest($title, $public, $key_to_unset = NULL)
     {        
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
                 
         $_POST["title"] = $title;
         $_POST["description"] = "description";
-        $_POST["start_time"] = Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() - 60*60);
-        $_POST["finish_time"] = Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() + 60*60);
+        $_POST["start_time"] = Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() - 60*60);
+        $_POST["finish_time"] = Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 60*60);
         $_POST["window_length"] = null;
         $_POST["public"] = $public;
         $_POST["token"] = "loltoken";
@@ -36,7 +36,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         // If contest is private, an array of users should be provided, in this case we add the judge
         if($public === 0)
         {
-            $_POST["private_users"] = json_encode(array(Utils::GetJudgeUserId()));
+            $_POST["private_users"] = json_encode(array(Utils::GetContestDirectorUserId()));
         }
         
         // If a key to unset is provided, unset it
@@ -156,6 +156,7 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
         }        
     }
     
+    /*
     public function testCreateContestAsUser()
     {
         //Connect to DB
@@ -200,6 +201,8 @@ class NewContestsTest extends PHPUnit_Framework_TestCase
             return;
         }        
         $this->fail("Contestant was able to insert contest.");        
-    }         
+    }       
+     
+     */  
     
 }

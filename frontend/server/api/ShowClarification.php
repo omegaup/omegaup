@@ -15,11 +15,7 @@ require_once("ApiHandler.php");
 
 class ShowClarification extends ApiHandler
 {
-    protected function DeclareAllowedRoles() 
-    {
-        return BYPASS;
-    }
-    
+
     protected function GetRequest()
     {
         $this->request = array(

@@ -22,7 +22,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
     public function testShowValidPubicContest()
     {
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         // Create 3 problems in our contest
@@ -105,7 +105,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
     public function testShowValidPrivateContest()
     {
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         // Create 3 problems in our contest
@@ -116,7 +116,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $problem_id[2] = $problemCreator->testCreateValidProblem($contest_id);
         
         // Login as contestant
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set contest
         $_GET["contest_id"] = $contest_id;
@@ -189,7 +189,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
     public function testShowInvalidPrivateContest()
     {
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         // Create 3 problems in our contest
@@ -231,7 +231,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
     public function testAccessTimeIsAlwaysFirstAccessInPublic()
     {     
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         // Alter contest to set Window Length
@@ -259,10 +259,10 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         }
         
         // Check that access time was saved
-        $access_time = Utils::GetDBUnixTimestamp();
+        $access_time = Utils::GetPhpUnixTimestamp();
         $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
         $this->assertNotNull($contest_user);
-        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                
         
         // Guarantee different timestamp
         sleep(1);
@@ -280,7 +280,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         }
         $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
         $this->assertNotNull($contest_user);
-        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                                
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                                
         
     }
        
@@ -288,7 +288,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
     public function testAccessTimeIsAlwaysFirstAccessInPrivate()
     {     
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         // Alter contest to set Window Length
@@ -297,7 +297,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         ContestsDAO::save($contest);        
         
         // Login as contestant
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set context
         $_GET["contest_id"] = $contest_id;
@@ -316,10 +316,10 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         }
         
         // Check that access time was saved
-        $access_time = Utils::GetDBUnixTimestamp();
-        $contest_user = ContestsUsersDAO::getByPK(Utils::GetJudgeUserId(), $contest_id);
+        $access_time = Utils::GetPhpUnixTimestamp();
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestDirectorUserId(), $contest_id);
         $this->assertNotNull($contest_user);
-        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                
         
         // Guarantee different timestamp
         sleep(1);
@@ -335,9 +335,9 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
             var_dump($e->getArrayMessage());
             $this->fail("Unexpected exception");
         }
-        $contest_user = ContestsUsersDAO::getByPK(Utils::GetJudgeUserId(), $contest_id);
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestDirectorUserId(), $contest_id);
         $this->assertNotNull($contest_user);
-        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                                
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                                
         
     }
        

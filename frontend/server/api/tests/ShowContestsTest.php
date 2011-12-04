@@ -30,7 +30,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
                         
         // Insert new contest
         $random_title = Utils::CreateRandomString();        
-        NewContestsTest::CreateContest($random_title, 1);
+        NewContestTest::CreateContest($random_title, 1);
                        
         
         // Login as contestant
@@ -63,7 +63,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         
         // Insert new contest
         $random_title = Utils::CreateRandomString();        
-        NewContestsTest::CreateContest($random_title, 0);
+        NewContestTest::CreateContest($random_title, 0);
         
         
         // Login as contestant, should not see the private contest created by judge
@@ -98,11 +98,11 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         
         // Insert new contest
         $random_title = Utils::CreateRandomString();        
-        NewContestsTest::CreateContest($random_title, 0);
+        NewContestTest::CreateContest($random_title, 0);
         
         
         // Login as contestant, should not see the private contest created by judge
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Get contests, contest just created should be the first in the list
         $showContest = new ShowContests();

@@ -16,11 +16,6 @@ require_once("ApiHandler.php");
 class UpdateClarification extends ApiHandler
 {
     
-    protected function DeclareAllowedRoles() 
-    {
-        return array(JUDGE);
-    }
-    
     protected function GetRequest()
     {
         $this->request = array(
@@ -50,15 +45,29 @@ class UpdateClarification extends ApiHandler
                 
     }   
        
+    protected function ValidateRequest() 
+    {
+        parent::ValidateRequest();
+        
+        // Only contest director or problem author are allowed to update clarifications
+        $clarification = ClarificationsDAO::getByPK($this->request["clarification_id"]->getValue());
+        
+        $contest = ContestsDAO::getByPK($clarification->getContestId());                        
+        $problem = ProblemsDAO::getByPK($clarification->getProblemId());
+        
+        if(!($contest->getDirectorId() === $this->user_id || $problem->getAuthorId() === $this->user_id))
+        {            
+            throw new ApiException($this->error_dispatcher->forbiddenSite());
+        }        
 
+    }
 
     protected function GenerateResponse() 
     {
                 
         // Get our clarificatoin given the id
         try
-        {
-            
+        {            
             $clarification = ClarificationsDAO::getByPK($this->request["clarification_id"]->getValue());
         }
         catch(Exception $e)

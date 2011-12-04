@@ -15,11 +15,6 @@ require_once("ApiHandler.php");
 
 class ShowContests extends ApiHandler {
     
-    protected function DeclareAllowedRoles() 
-    {
-        return BYPASS;
-    }
-
     protected function CheckAuthorization() {
         // @todo this CheckAuthorization thing should be refactored 
 

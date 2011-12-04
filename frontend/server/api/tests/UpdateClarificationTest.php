@@ -14,27 +14,28 @@ require_once 'Utils.php';
 
 class UpdateClarificationTest extends PHPUnit_Framework_TestCase
 {        
+    public function setUp()
+    {        
+        Utils::ConnectToDB();
+    }
     
+    public function tearDown() 
+    {
+        Utils::cleanup();
+    }
     
     public function testUpdateAnswer()
-    { 
-        // Clean clarifications from test problem
-        Utils::DeleteClarificationsFromProblem(Utils::GetValidProblemOfContest(Utils::GetValidPublicContestId()));
-        
+    {               
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
         $clarification_id_1 = $newClarificationTest->testCreateValidClarification();
         
-        // Verify that the original message was not corrupted
+        // Save original message
         $clarification = ClarificationsDAO::getByPK($clarification_id_1);
         $originalMessage = $clarification->getMessage();
-        
-        
-        //Connect to DB
-        Utils::ConnectToDB(); 
-                
+                                
         // Login as contestant
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set the context
         $_GET["clarification_id"] = $clarification_id_1;
@@ -67,19 +68,13 @@ class UpdateClarificationTest extends PHPUnit_Framework_TestCase
     }
     
     public function testUpdateMessage()
-    { 
-        // Clean clarifications from test problem
-        Utils::DeleteClarificationsFromProblem(Utils::GetValidProblemOfContest(Utils::GetValidPublicContestId()));
-        
+    {                 
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
-        $clarification_id_1 = $newClarificationTest->testCreateValidClarification();
-                
-        //Connect to DB
-        Utils::ConnectToDB(); 
+        $clarification_id_1 = $newClarificationTest->testCreateValidClarification();                        
                 
         // Login as contestant
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set the context
         $_GET["clarification_id"] = $clarification_id_1;
@@ -113,18 +108,55 @@ class UpdateClarificationTest extends PHPUnit_Framework_TestCase
         
     }
     
-    public function testContestantCannotUpdateClarifications()
-    { 
-        // Clean clarifications from test problem
-        Utils::DeleteClarificationsFromProblem(Utils::GetValidProblemOfContest(Utils::GetValidPublicContestId()));
-        
+    public function testProblemAuthorCanUpdateClarifications()
+    {                
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
         $clarification_id_1 = $newClarificationTest->testCreateValidClarification();
-                
-        //Connect to DB
-        Utils::ConnectToDB(); 
-                
+        
+        // Verify that the original message was not corrupted
+        $clarification = ClarificationsDAO::getByPK($clarification_id_1);
+        $originalMessage = $clarification->getMessage();
+                                
+        // Login as contestant
+        $auth_token = Utils::LoginAsProblemAuthor();
+        
+        // Set the context
+        $_GET["clarification_id"] = $clarification_id_1;
+        $_POST["answer"] = "this is my answer";
+        $_POST["public"] = '1';
+        
+        // Execute API
+        Utils::SetAuthToken($auth_token);
+        $updateClarification = new UpdateClarification();
+        
+        try
+        {
+            $returnArray = $updateClarification->ExecuteApi();            
+        }
+        catch (ApiException $e)
+        {
+            var_dump($e->getArrayMessage());            
+            $this->fail("Unexpected exception");
+        }
+        
+        // Validate return status
+        $this->assertEquals("ok", $returnArray["status"]);
+        
+        // Validate update in DB
+        $clarification = ClarificationsDAO::getByPK($clarification_id_1);
+        
+        // Assert status of clarification
+        $this->assertEquals($clarification->getMessage(), $originalMessage);
+        $this->assertEquals($clarification->getAnswer(), "this is my answer");
+    }
+    
+    public function testContestantCannotUpdateClarifications()
+    {                 
+        // As prerequisite, create a new clarification as contestant to guarantee at least one
+        $newClarificationTest = new NewClarificationTest();
+        $clarification_id_1 = $newClarificationTest->testCreateValidClarification();
+                                     
         // Login as contestant
         $auth_token = Utils::LoginAsContestant();
         

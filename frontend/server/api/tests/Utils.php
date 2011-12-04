@@ -22,6 +22,7 @@ class Utils
     static $contestant;
     static $contestant_2;
     static $judge;
+    static $problem_author;
     
     
     //put your code here
@@ -123,12 +124,12 @@ class Utils
                 
     }
     
-    static function LoginAsJudge()
+    static function LoginAsContestDirector()
     {
         return self::Login(self::$judge->getUsername(), self::$judge->getPassword());
     }
     
-    static function GetJudgeUserId()
+    static function GetContestDirectorUserId()
     {
         return self::$judge->getUserId();
     }
@@ -143,6 +144,11 @@ class Utils
         return self::Login(self::$contestant->getUsername(), self::$contestant->getPassword());
     }
     
+    static function LoginAsProblemAuthor()
+    {
+        return self::Login(self::$problem_author->getUsername(), self::$problem_author->getPassword());
+    }
+    
     static function GetContestantUsername()
     {
         return self::$contestant->getUsername();
@@ -151,6 +157,16 @@ class Utils
     static function GetContestantUserId()
     {
         return self::$contestant->getUserId();
+    }
+    
+    static function GetProblemAuthorUsername()
+    {
+        return self::$problem_author->getUsername();
+    }
+    
+    static function GetProblemAuthorUserId()
+    {
+        return self::$problem_author->getUserId();
     }
     
     static function LoginAsContestant2()
@@ -181,9 +197,15 @@ class Utils
     
     static function GetValidPublicContestId()
     {
+        // Log in as contest creator user
+        $auth_token = Utils::LoginAsContestDirector();
+        Utils::SetAuthToken($auth_token);
+        
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
+                
+        Utils::Logout($auth_token);
         
         return $contest_id;
     }
@@ -244,7 +266,7 @@ class Utils
     }
        
     
-    static function GetDBUnixTimestamp($time = NULL)
+    static function GetPhpUnixTimestamp($time = NULL)
     {                        
         if( is_null($time))
         {

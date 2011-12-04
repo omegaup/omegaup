@@ -29,7 +29,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
     {
         
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
                         
         // Create a problem in given contest
@@ -84,7 +84,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($problem_opened);        
 
         // Verify open time 
-        $this->assertEquals(Utils::GetDBUnixTimestamp(), Utils::GetDBUnixTimestamp($problem_opened->getOpenTime()));
+        $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));
         
     }
     
@@ -92,7 +92,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
     {
         
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
                         
         // Create a problem in given contest
@@ -164,7 +164,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($problem_opened);        
 
         // Verify open time 
-        $this->assertNotEquals(Utils::GetDBUnixTimestamp(), Utils::GetDBUnixTimestamp($problem_opened->getOpenTime()));        
+        $this->assertNotEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));        
         
     }
                  
@@ -172,7 +172,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
     public function testDontShowProblemFromPrivateContest()
     {
         // Create a clean PRIVATE contest only with judge allowed to see it and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
                         
         // Create a problem in given contest
@@ -214,7 +214,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
     public function testCheckContestAccessTime()
     {
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
                         
         // Create a problem in given contest
@@ -243,10 +243,10 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         }
         
         // Check that access time was saved
-        $access_time = Utils::GetDBUnixTimestamp();
+        $access_time = Utils::GetPhpUnixTimestamp();
         $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
         $this->assertNotNull($contest_user);
-        $this->assertEquals($access_time, Utils::GetDBUnixTimestamp($contest_user->getAccessTime()));                                
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                                
     }
     
     // @TODO Assert problem with runs        
