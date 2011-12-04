@@ -34,14 +34,18 @@ lib_managed/
 src_managed/
 */project/boot/
 
-#ignore frontend config file
+# ignore frontend config file
 config.php
-
 frontend/server/config.php
+!/frontend/server/api/tests/config.php
 
-#ignore runtime and test stuff
+# and log
+omegaup.log
+frontend/log/omegaup.log
+
+# Ignore runtime and test stuff
 */test-env
 
+# Ignore Mac crap :P
 frontend/.DS_Store
 .DS_Store
-!/frontend/server/api/tests/config.php
