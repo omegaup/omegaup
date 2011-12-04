@@ -178,11 +178,11 @@
   ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . OMEGAUP_ROOT . '/server');
 ";
     
-    file_put_contents('../../server/config.php', $file_contents)
-      or die('Unable to write frontend/server/config.php. Make sure it is writable.');
+    file_put_contents("$root_dir/server/config.php", $file_contents) !== FALSE
+      or die("Unable to write $root_dir/server/config.php. Make sure it is writable.");
 
-    file_put_contents('../../log/omegaup.log', '')
-      or die('Unable to create logfile in frontend/log/omegaup.log. Make sure the server has the correct permissions.');
+    file_put_contents("$root_dir/log/omegaup.log", '') !== FALSE
+      or die("Unable to create logfile in $root_dir/log/omegaup.log. Make sure the server has the correct permissions.");
   }
 
   /**
