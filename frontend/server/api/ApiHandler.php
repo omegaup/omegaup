@@ -1,6 +1,8 @@
 <?php
 
 
+require_once('RequestContext.php');
+
 require_once(SERVER_PATH ."/libs/ApiExposedProperty.php");
 require_once(SERVER_PATH ."/libs/ApiHttpErrors.php");
 require_once(SERVER_PATH ."/libs/ApiException.php");
