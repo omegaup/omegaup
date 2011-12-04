@@ -49,7 +49,7 @@
   
   $num_statements = $script_info["statements"];
   $num_errors     = $script_info["errors"];
-  echo "$num_errors errors encountered while after running $num_statements statements.<br/>";
+  if ($num_errors > 0) die("$num_errors errors encountered while after running $num_statements statements.<br/>");
 
   create_config_php($args["host"], $user, $pass, $db_name);
   
