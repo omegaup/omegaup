@@ -29,7 +29,7 @@
   $stmt_grant
     = "GRANT ALL ON $db_name.* TO '$user'@'localhost';";
   mysql_query($stmt_grant, $link)
-    or die('Failed to grand user permissions: ' . mysql_error());
+    or die('Failed to grant user permissions: ' . mysql_error());
   
   $stmt_flush
     = "FLUSH PRIVILEGES;";
@@ -49,7 +49,7 @@
   
   $num_statements = $script_info["statements"];
   $num_errors     = $script_info["errors"];
-  echo "$num_errors errors encountered while after running $num_statements statements.\n";
+  echo "$num_errors errors encountered while after running $num_statements statements.<br/>";
 
   create_config_php($args["host"], $user, $pass, $db_name);
   
@@ -119,7 +119,7 @@
     
     $errors = 0;
     foreach( $statements as $statement ) {
-      if( trim($stament) != '' && !mysql_query($statement, $link) ) {
+      if( trim($statement) != '' && !mysql_query($statement, $link) ) {
         $errors++;
         echo "Failed query: <pre>'" . $statement . "'</pre><br/>" . mysql_error() . "<br/>";
       }
@@ -158,18 +158,31 @@
     $root_dir       = str_replace('\\', '/', $native_dir);
     $file_contents  =
 "<?php
-  define('OMEGAUP_DB_USER', 	'$user');
-  define('OMEGAUP_DB_PASS', 	'$pass');
-  define('OMEGAUP_DB_HOST', 	'$host');
-  define('OMEGAUP_DB_NAME', 	'$db_name');	
-  define('OMEGAUP_DB_DRIVER', 'mysqlt');
-  define('OMEGAUP_DB_DEBUG', 	false);	
-  define('OMEGAUP_ROOT',      '$root_dir');
+  # #####################################
+  # DATABASE CONFIG
+  # ####################################
+  define('OMEGAUP_DB_USER',         '$user');
+  define('OMEGAUP_DB_PASS',         '$pass');
+  define('OMEGAUP_DB_HOST',         '$host');
+  define('OMEGAUP_DB_NAME',         '$db_name');	
+  define('OMEGAUP_DB_DRIVER',       'mysqlt');
+  define('OMEGAUP_DB_DEBUG',        false);	
+  define('OMEGAUP_ROOT',            '$root_dir');
+
+  define('OMEGAUP_LOG_TO_FILE',     true);
+  define('OMEGAUP_LOG_ACCESS_FILE', '$root_dir/log/omegaup.log');
+  define('OMEGAUP_LOG_ERROR_FILE',  '$root_dir/log/omegaup.log');
+  define('OMEGAUP_LOG_TRACKBACK',   false);
+  define('OMEGAUP_LOG_DB_QUERYS',   true);
+
   ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . OMEGAUP_ROOT . '/server');
 ";
     
-    file_put_contents('../../server/config.php', $file_contents);
-    /// @todo Check erorrs during writing
+    file_put_contents('../../server/config.php', $file_contents)
+      or die('Unable to write frontend/server/config.php. Make sure it is writable.');
+
+    file_put_contents('../../log/omegaup.log', '')
+      or die('Unable to create logfile in frontend/log/omegaup.log. Make sure the server has the correct permissions.');
   }
 
   /**
