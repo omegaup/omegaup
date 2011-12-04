@@ -256,6 +256,22 @@ class Utils
         }                                                                              
     }
     
+    static function GetDbDatetime()
+    {
+        // Go to the DB 
+        global $conn;
+        
+        $sql = "SELECT NOW()";
+        $rs = $conn->GetRow($sql);                
+        
+        if(count($rs)===0)
+        {
+            return NULL;
+        }        
+                
+        return $rs[0]; 
+    }
+    
     static function GetTimeFromUnixTimestam($time)
     {        
         // Go to the DB to take the unix timestamp
