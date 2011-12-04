@@ -55,7 +55,7 @@
   
   // @todo  notify success
   //        instruct user to delete the folder containing this file
-  echo "Installation finished.";
+  echo "Installation finished.<br/><br/>Now delete the install folder.";
   
   /* End */
   
