@@ -35,7 +35,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         }
         $_POST["title"] = Utils::CreateRandomString();
         $_POST["alias"] = substr(Utils::CreateRandomString(), 0, 10);
-        $_POST["author_id"] = Utils::GetContestantUserId();
+        $_POST["author_id"] = Utils::GetProblemAuthorUserId();
         $_POST["validator"] = "token";
         $_POST["time_limit"] = 5000;
         $_POST["memory_limit"] = 32000;        
@@ -45,13 +45,14 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
     }
     
     public function testCreateValidProblem($contest_id = NULL)
-    {
-        // Login as judge
-        $auth_token = Utils::LoginAsJudge();        
+    {        
         
         // Set valid context for problem creation
         $contest_id = is_null($contest_id) ? Utils::GetValidPublicContestId() : $contest_id;
         self::setValidContext($contest_id);
+     
+        // Login as judge
+        $auth_token = Utils::LoginAsContestDirector();        
         
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -115,17 +116,17 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         
     
     public function testCreateProblemAsContestant()
-    {
-        // Login as judge
-        $auth_token = Utils::LoginAsContestant();
-        
+    {        
         // Set context
         self::setValidContext();
+                
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        Utils::SetAuthToken($auth_token);
         
         // Execute API
-        Utils::SetAuthToken($auth_token);
-        $newProblemInContest = new NewProblemInContest();
-        
+        $newProblemInContest = new NewProblemInContest();                
+                
         try
         {
             $return_array = $newProblemInContest->ExecuteApi();
@@ -150,7 +151,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
     public function testRequiredParameters()
     {
         // Login as judge
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set valid context
         self::setValidContext();

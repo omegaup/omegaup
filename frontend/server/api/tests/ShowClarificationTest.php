@@ -18,6 +18,16 @@ require_once 'Utils.php';
 
 class ShowClarificationTest extends PHPUnit_Framework_TestCase
 {
+    
+    public function setUp()
+    {        
+        Utils::ConnectToDB();
+    }
+    
+    public function tearDown() 
+    {
+        Utils::cleanup();
+    }
 
     public function testShowClarificationAsJudge()
     {
@@ -25,15 +35,12 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
         $clarification_id = $newClarificationTest->testCreateValidClarification();
-                       
-        //Connect to DB
-        Utils::ConnectToDB();
-        
+                                       
         // Get our clarification from DB for comparisson        
         $clarification = ClarificationsDAO::getByPK($clarification_id);        
         
         // Login as judge
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set context
         $_GET["clarification_id"] = $clarification_id;
@@ -74,10 +81,7 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
         $clarification_id = $newClarificationTest->testCreateValidClarification();
-        
-        //Connect to DB
-        Utils::ConnectToDB(); 
-                
+                                
         // Get our clarification from DB for comparisson        
         $clarification = ClarificationsDAO::getByPK($clarification_id);
                 
@@ -123,10 +127,7 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
         $clarification_id = $newClarificationTest->testCreateValidClarification();        
-        
-        //Connect to DB
-        Utils::ConnectToDB(); 
-        
+                        
         // Get our clarification from DB for comparisson        
         $clarification = ClarificationsDAO::getByPK($clarification_id);        
         
@@ -168,10 +169,7 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
     {  
         // As prerequisite, create a new clarification as contestant to guarantee at least one
         $newClarificationTest = new NewClarificationTest();
-        $clarification_id = $newClarificationTest->testCreateValidClarification();        
-        
-        //Connect to DB
-        Utils::ConnectToDB(); 
+        $clarification_id = $newClarificationTest->testCreateValidClarification();                        
         
         // Get our clarification from DB for comparisson        
         $clarification = ClarificationsDAO::getByPK($clarification_id);        

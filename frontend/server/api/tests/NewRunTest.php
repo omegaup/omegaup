@@ -65,7 +65,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         // Set context
         if(is_null($contest_id))
         {
-            $contestCreator = new NewContestsTest();
+            $contestCreator = new NewContestTest();
             $contest_id = $contestCreator->testCreateValidContest(1);
         }
         
@@ -127,12 +127,12 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Create public contest
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         // Manually expire contest
         $contest = ContestsDAO::getByPK($contest_id);                
-        $contest->setFinishTime(Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() - 1));                        
+        $contest->setFinishTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() - 1));                        
         ContestsDAO::save($contest);
         
         // Create problem in contest        
@@ -170,14 +170,14 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     public function testRunToValidPrivateContest()
     {                
         // Set context
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         $problemCreator = new NewProblemInContestTest();
         $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
         
         // Login 
-        $auth_token = Utils::LoginAsJudge();        
+        $auth_token = Utils::LoginAsContestDirector();        
         Utils::SetAuthToken($auth_token);
         
         $this->setValidContext($contest_id, $problem_id);
@@ -226,7 +226,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     public function testRunToInvalidPrivateContest()
     {                
         // Set context
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         $problemCreator = new NewProblemInContestTest();
@@ -269,12 +269,12 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Create public contest
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         // Manually expire contest
         $contest = ContestsDAO::getByPK($contest_id);                
-        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() + 1));                        
+        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 1));                        
         ContestsDAO::save($contest);
         
         // Create problem in contest        
@@ -316,7 +316,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Create public contest
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);   
         
         // Set submissions gap of 2 seconds
@@ -379,7 +379,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Create public contest
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);   
         
         // Set submissions gap of 2 seconds
@@ -428,11 +428,11 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();                
         
         // Create public contest 1
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id_1 = $contestCreator->testCreateValidContest(1);   
         
         // Create public contest 2
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id_2 = $contestCreator->testCreateValidContest(1);   
         
         // Create problem in contest 2       
@@ -470,14 +470,14 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     public function testMissingParameters()
     {
         // Set context
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         $problemCreator = new NewProblemInContestTest();
         $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
         
         // Login 
-        $auth_token = Utils::LoginAsJudge();        
+        $auth_token = Utils::LoginAsContestDirector();        
         Utils::SetAuthToken($auth_token);
         
         $this->setValidContext($contest_id, $problem_id);
@@ -528,7 +528,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set context        
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);        
                
         $problemCreator = new NewProblemInContestTest();
@@ -564,7 +564,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set context        
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);        
                
         $problemCreator = new NewProblemInContestTest();

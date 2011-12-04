@@ -72,6 +72,7 @@
     Utils::$contestant = Utils::CreateUser("user", "password");    
     Utils::$contestant_2 = Utils::CreateUser("user2", "password");
     Utils::$judge = Utils::CreateUser("judge", "password");
+    Utils::$problem_author = Utils::CreateUser("problem_author", "password");
     
     // Add judge role
     $judge_rol = new UserRoles();

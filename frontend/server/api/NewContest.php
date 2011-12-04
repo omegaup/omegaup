@@ -19,12 +19,6 @@ class NewContest extends ApiHandler
     
     private $private_users_list;
     
-    protected function DeclareAllowedRoles() 
-    {
-        return array(JUDGE);
-    }
-
-
     protected function GetRequest()
     {  
         

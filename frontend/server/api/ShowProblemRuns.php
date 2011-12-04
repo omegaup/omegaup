@@ -14,13 +14,7 @@
 require_once("ApiHandler.php");
 
 class ShowProblemRuns extends ApiHandler
-{
-    
-    protected function DeclareAllowedRoles() 
-    {
-        return BYPASS;
-    }
-    
+{   
     protected function GetRequest()
     {
         $this->request = array(

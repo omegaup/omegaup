@@ -15,18 +15,12 @@
 require_once("ApiHandler.php");
 
 class NewProblemInContest extends ApiHandler
-{
-    
-    protected function DeclareAllowedRoles() 
-    {
-        return array(JUDGE);
-    }
-    
+{            
     protected function GetRequest()
     {        
         // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE
         $this->request = array(
-            new ApiExposedProperty("contest_id", true, GET, array(
+            "contest_id" => new ApiExposedProperty("contest_id", true, GET, array(
                 new NumericValidator(),
                 new CustomValidator( function ($value)
                         {
@@ -87,9 +81,20 @@ class NewProblemInContest extends ApiHandler
         
     }
     
+    protected function ValidateRequest() 
+    {
+        parent::ValidateRequest();
+        
+        // Only director is allowed to create problems in contest
+        $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());                        
+        if($contest->getDirectorId() !== $this->user_id)
+        {
+            throw new ApiException($this->error_dispatcher->forbiddenSite());
+        }        
+    }
+    
     protected function GenerateResponse() 
     {
-
         try 
         {
             

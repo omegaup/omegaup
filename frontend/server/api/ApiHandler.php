@@ -40,20 +40,15 @@ abstract class ApiHandler
     
     // Cache of user roles
     protected $user_roles;
-    
-    // Holder of roles of each api
-    protected $api_roles;
+        
      
     public function __construct() 
-    {        
-        
+    {                
         // Get an error dispatcher
         $this->error_dispatcher = ApiHttpErrors::getInstance();
         
         // Declare response as an array
-        $this->response = array();
-                
-                
+        $this->response = array();                                
     }
                       
     
@@ -98,36 +93,6 @@ abstract class ApiHandler
                 
     }
     
-    protected function CheckPermissions()
-    {                
-        
-        if ($this->api_roles === BYPASS)
-        { 
-            return true;
-        }
-        
-        foreach($this->user_roles as $rol)
-        {
-            // By default, admin rocks
-            if($rol->getRoleId() === ADMIN)
-            {
-                return true;
-            }
-                                    
-            foreach ($this->api_roles as $allowedRol)
-            {                                
-                if($allowedRol === $rol->getRoleId())
-                {
-                    return true;
-                }
-            }
-        }
-        
-        // Rol was not found
-        throw new ApiException($this->error_dispatcher->forbiddenSite());
-    }
-
-
     protected function ValidateRequest()
     {
      
@@ -149,13 +114,10 @@ abstract class ApiHandler
             }
         }
     }
+            
+    protected abstract function GetRequest();    
     
-    protected abstract function DeclareAllowedRoles();    
-    
-    protected abstract function GetRequest();
-    
-    protected abstract function GenerateResponse();
-        
+    protected abstract function GenerateResponse();        
     
     // This function should be called 
     public function ExecuteApi()
@@ -164,13 +126,7 @@ abstract class ApiHandler
         {   
             // Check if the user needs to be logged in
             $this->CheckAuthorization();
-           
-            // Each API should declare its allowed roles            
-            $this->api_roles = $this->DeclareAllowedRoles();
-            
-            // Check if the user has a needed role
-            $this->CheckPermissions();
-                        
+                                               
             // Process input
             $this->GetRequest();       
 

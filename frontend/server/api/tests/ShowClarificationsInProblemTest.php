@@ -240,7 +240,7 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $problem_id = $clarification_2->getProblemId();
         
         // Login as contestant
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set the context        
         $_GET["problem_id"] = $problem_id;
