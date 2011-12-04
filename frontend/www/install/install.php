@@ -22,8 +22,8 @@
   $stmt_create_user
     = "CREATE USER '$user'@'localhost' IDENTIFIED BY '$pass';";
 
-  mysql_query($stmt_create_user, $link)
-    or die('Failed to create user: ' . mysql_error());
+  mysql_query($stmt_create_user, $link);
+  // Ignore error in case user already exists.
   
   // Grant DB permissions
   $stmt_grant
@@ -119,9 +119,9 @@
     
     $errors = 0;
     foreach( $statements as $statement ) {
-      if( !mysql_query($statement, $link) ) {
+      if( trim($stament) != '' && !mysql_query($statement, $link) ) {
         $errors++;
-        echo "Failed query: " . $statement . "\n" . mysql_error();
+        echo "Failed query: <pre>'" . $statement . "'</pre><br/>" . mysql_error() . "<br/>";
       }
     }
     register_admin_user($link, $admin_user, $admin_pass);
