@@ -70,37 +70,37 @@ class ApiLoader
                 $api = new ShowClarification();
                 break;
             
-            case 'ShowContest.php':
+            case 'ShowContest':
                 require_once('ShowContest.php');
                 $api = new ShowContest();
                 break;
             
-            case 'ShowContests.php':
+            case 'ShowContests':
                 require_once('ShowContests.php');
                 $api = new ShowContests();
                 break;
             
-            case 'ShowProblemInContest.php':
+            case 'ShowProblemInContest':
                 require_once('ShowProblemInContest.php');
                 $api = new ShowProblemInContest();
                 break;
             
-            case 'ShowProblemRuns.php':
+            case 'ShowProblemRuns':
                 require_once('ShowProblemRuns.php');
                 $api = new ShowProblemRuns();
                 break;
             
-            case 'ShowRun.php':
+            case 'ShowRun':
                 require_once('ShowRun.php');
                 $api = new ShowRun();
                 break;
             
-            case 'ShowScoreboard.php':
+            case 'ShowScoreboard':
                 require_once('ShowScoreboard.php');
                 $api = new ShowScoreboard();
                 break;
             
-            case 'UpdateClarification.php':
+            case 'UpdateClarification':
                 require_once('UpdateClarification.php');
                 $api = new UpdateClarification();
                 break;
