@@ -110,8 +110,8 @@ object Database extends Object with Log {
 				var pi = 0
 				val ans = new StringBuilder
 				
-				debug(query)
-				debug(params.toString)
+				trace(query)
+				trace(params.toString)
 		
 				while( {qi = query.indexOf('?', pqi); qi != -1} ) {
 					ans.append(query.substring(pqi, qi))
@@ -158,7 +158,7 @@ object Database extends Object with Log {
 	/** Executes the SQL and processes the result set using the specified function. */
 	def query[B](sql: String, params: Any*)(process: ResultSet => B)(implicit connection: Connection): Option[B] = {
 		val q = build(sql, params : _*)
-		debug(q)
+		trace(q)
 		using (connection.createStatement) { statement =>
 			using (statement.executeQuery(q)) { results =>
 				results.next match {
@@ -171,7 +171,7 @@ object Database extends Object with Log {
 	
 	def execute(sql: String, params: Any*)(implicit connection: Connection): Unit = {
 		val q = build(sql, params : _*)
-		debug(q)
+		trace(q)
 		using (connection.createStatement) { statement =>
 			statement.execute(q)
 		}
