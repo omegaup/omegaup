@@ -1080,8 +1080,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
       else
         {
           a->sys = __NR_setrlimit;
-          a->result = -1;
-          errno = EPERM;
+          a->result = -EPERM;
           set_syscall_args(pid, a);
         }
       break;
@@ -1095,8 +1094,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
       else
         {
           a->sys = __NR_mkdir;
-          a->result = -1;
-          errno = EACCES;
+          a->result = -EACCES;
           set_syscall_args(pid, a);
         }
       break;
@@ -1118,8 +1116,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
       else
         {
           a->sys = __NR_socketcall;
-          a->result = -1;
-          errno = EACCES;
+          a->result = -EACCES;
           set_syscall_args(pid, a);
         }
       break;
@@ -1134,8 +1131,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
       else
         {
           a->sys = __NR_socket;
-          a->result = -1;
-          errno = EACCES;
+          a->result = -EACCES;
           set_syscall_args(pid, a);
         }
       break;
@@ -1157,7 +1153,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
           a->result = probin_fd;
           if (a->result == -1)
             {
-              errno = EACCES;
+              a->result = -EACCES;
             }
           a->sys = __NR_open;
           set_syscall_args(pid, a);
