@@ -36,6 +36,9 @@ box-tests: $(addprefix test-sys,32-int80 64-int80 32-syscall 64-syscall 32-sysen
 
 .PHONY: box-tests
 
+test: box
+	/bin/bash test.sh
+
 test-sys32-int80: test-syscalls.c
 	$(CC) -m32 $^ -o $@ -DTEST_INT80
 
