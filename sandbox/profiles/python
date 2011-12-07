@@ -12,6 +12,7 @@
 -s getdents64
 -s getcwd
 
+-p /lib64/
 -p /etc/nsswitch.conf
 -p /etc/passwd
 -p /proc/meminfo

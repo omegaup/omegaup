@@ -39,7 +39,7 @@ EOF
 
 echo -n "Time Limit Exceeded                         "
 
-if [ "`./box -S profiles/c -t 1 -- ./.sample 2>&1` | grep Forbidden" != "" ]; then
+if [ "`./box -S profiles/c -t 1 -- ./.sample 2>&1 | grep 'Forbidden syscall' | wc -l`" -eq 1 ]; then
 	echo "[OK]"
 else
 	echo "[FAIL]"
