@@ -484,6 +484,8 @@ static struct path_rule **last_path_rule = &user_path_rules;
 static int
 set_path_action(char *a)
 {
+  static char proc_self_path[4096];
+
   char *sep = strchr(a, '=');
   enum action act = A_YES;
   if (sep)
@@ -506,6 +508,7 @@ set_path_action(char *a)
   r->next = NULL;
   *last_path_rule = r;
   last_path_rule = &r->next;
+
   return 1;
 }
 
