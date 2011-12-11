@@ -51,6 +51,21 @@
   $num_errors     = $script_info["errors"];
   if ($num_errors > 0) die("$num_errors errors encountered while after running $num_statements statements.<br/>");
 
+  // Install privileges
+  $script_info = run_sql_script(
+      $args["host"]
+    , $user
+    , $pass
+    , $db_name
+    , "../../private/Install_Permissions.sql"
+    , $args["admin_user"]
+    , $args["admin_pass"]
+  );
+  
+  $num_statements = $script_info["statements"];
+  $num_errors     = $script_info["errors"];
+  if ($num_errors > 0) die("$num_errors errors encountered while after running $num_statements statements.<br/>");
+
   create_config_php($args["host"], $user, $pass, $db_name);
   
   // @todo  notify success
