@@ -150,26 +150,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				return EXIT_SUCCESS;
 			}
 		""")
-		
-		omegaUpSubmit(1, Language.Java, """
-			class Main {
-			public static void main(String[] args) {
-			  double d = 2.2250738585072012e-308;
-			  System.out.println("Value: " + d);
-			 }
-			}
-		""")
-		
-		omegaUpSubmit(1, Language.Java, """
-			class Main {
-			public static void main(String[] args) {
-			  System.out.println("Test:");
-			  double d = Double.parseDouble("2.2250738585072012e-308");
-			  System.out.println("Value: " + d);
-			 }
-			}
-		""")
-		
+	
 		t.join
 		
 		implicit val conn = Manager.connection
@@ -190,18 +171,6 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.PartialAccepted)
 		run.score should equal (0.5)
-		run.contest_score should equal (0)
-		
-		run = GraderData.run(4).get
-		run.status should equal (Status.Ready)
-		run.veredict should (equal (Veredict.CompileError) or equal(Veredict.WrongAnswer))
-		run.score should equal (0)
-		run.contest_score should equal (0)
-		
-		run = GraderData.run(5).get
-		run.status should equal (Status.Ready)
-		run.veredict should (equal (Veredict.TimeLimitExceeded) or equal(Veredict.WrongAnswer))
-		run.score should equal (0)
 		run.contest_score should equal (0)
 	}
 	
