@@ -9,6 +9,7 @@ sandbox/profiles/javac
 # Ignore temporary files
 *~
 *.swp
+tags
 
 # Ignore classes
 *.class
