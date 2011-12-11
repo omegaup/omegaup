@@ -5,6 +5,7 @@ import java.util._
 import java.util.regex.Pattern
 import java.util.zip._
 import scala.collection.mutable
+import scala.collection.immutable.Map
 import omegaup._
 import omegaup.data._
 import Veredict._
@@ -44,12 +45,15 @@ trait Grader extends Object with Log {
 		run.runtime = 0
 		run.memory = 0
 		
-		val metas = dataDirectory.listFiles.filter { _.getName.endsWith(".meta") }.map{ f => (f, MetaFile.load(f.getCanonicalPath)) }
+                val metas = dataDirectory.listFiles
+                  .filter { _.getName.endsWith(".meta") }
+                  .map{ f => f.getName.substring(0, f.getName.length - 5)->(f, MetaFile.load(f.getCanonicalPath)) }
+                  .toMap
 		
 		val weightsFile = new File(dataDirectory.getCanonicalPath + "/testplan")
 		
-		val weights:scala.collection.Map[String,Double] = if (weightsFile.exists) {
-			val weights = new mutable.ListMap[String,Double]
+		val weights:scala.collection.Map[String,scala.collection.Map[String,Double]] = if (weightsFile.exists) {
+			val weights = new mutable.ListMap[String,mutable.ListMap[String,Double]]
 			val fileReader = new BufferedReader(new FileReader(weightsFile))
 			var line: String = null
 	
@@ -57,8 +61,25 @@ trait Grader extends Object with Log {
 				val tokens = line.split("\\s+")
 			
 				if(tokens.length == 2 && !tokens(0).startsWith("#")) {
+                                        var group:String = null
+                                        var caseName:String = null
+
+                                        val idx = tokens(0).indexOf(".")
+
+                                        if (idx != -1) {
+                                          group = tokens(0).substring(0, idx)
+                                          caseName = tokens(0).substring(idx+1)
+                                        } else {
+                                          group = tokens(0)
+                                          caseName = tokens(0)
+                                        }
+
+                                        if (!weights.contains(group)) {
+                                                weights += (group -> new mutable.ListMap[String,Double])
+                                        }
+
 					try {
-						weights += (tokens(0) -> tokens(1).toDouble)
+						weights(group) += (caseName -> tokens(1).toDouble)
 					}
 				}
 			}
@@ -71,12 +92,14 @@ trait Grader extends Object with Log {
 			.listFiles
 			.filter { _.getName.endsWith(".in") }
 			.map {  f:File =>
-				(f.getName.substring(0, f.getName.length - 3) -> 1.0)
+                                val caseName = f.getName.substring(0, f.getName.length - 3)
+
+                                (caseName -> Map(caseName -> 1.0))
 			}
 			.toMap
 		}
 		
-		metas.foreach { case (f, meta) => {
+		metas.values.foreach { case (f, meta) => {
 			run.runtime += math.round(1000 * meta("time").toDouble)
 			run.memory = math.max(run.memory, meta("mem").toLong)
 			val v = meta("status") match {
@@ -99,18 +122,33 @@ trait Grader extends Object with Log {
 			run.memory = 0
 			run.score = 0
 		} else {
-			run.score = metas
-			.filter{ case (f,m) => m("status") == "OK" }
-			.map { case (f,m) =>
-				weights(f.getName.substring(0, f.getName.length - 5)) *
-				gradeCase(
-					run,
-					f.getName.substring(0, f.getName.length - 5),
-					new File(f.getCanonicalPath.replace(".meta", ".out")),
-					new File(Config.get("problems.root", "./problems") + "/" + pid + "/cases/" + f.getName.replace(".meta", ".out"))
-				)
-			}
-			.foldLeft(0.0)(_+_) / weights.foldLeft(0.0)(_+_._2) * (run.contest match {
+			run.score = weights
+                        .map { case (group, data) => 
+                          {
+                            val scores = data
+                            .map { case (name, weight) =>
+                              if (metas.contains(name) && metas(name)._2("status") == "OK") {
+                                val f = metas(name)._1
+
+                                gradeCase(
+                                  run,
+                                  name,
+			          new File(f.getCanonicalPath.replace(".meta", ".out")),
+				  new File(Config.get("problems.root", "./problems") + "/" + pid + "/cases/" + f.getName.replace(".meta", ".out"))
+                                ) * weight
+                              } else {
+                                0.0
+                              }
+                            }
+                            
+                            if (scores.forall(_ > 0)) {
+                              scores.foldLeft(0.0)(_+_)
+                            } else {
+                              0.0
+                            }
+                          }
+                        }
+			.foldLeft(0.0)(_+_) / weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2)) * (run.contest match {
 				case None => 1.0
 				case Some(contest) => {
 					if (contest.points_decay_factor <= 0.0 || run.submit_delay == 0.0) {
