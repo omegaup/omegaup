@@ -17,6 +17,7 @@
     $page = new OmegaupAdminComponentPage();
     $page->addComponent( new TitleComponent("Problemas"));
 
+
 	
 	/**
 	  * ZIP Handling
@@ -24,11 +25,9 @@
 	  **/
 	if(isset($_POST["file_sent"])){
 		
-		$page->addComponent( new TitleComponent($_FILES["file"]["name"], 3));
-		$page->addComponent( new TitleComponent($_FILES["file"]["tmp_name"], 3));
-
 		ProblemsController::parseZip( $_FILES["file"]["tmp_name"] );
 	}
+
 
 	$page->addComponent( new TitleComponent("Nuevo problema (ZIP)", 3));
 	$page->addComponent( new SubmitFileComponent() );

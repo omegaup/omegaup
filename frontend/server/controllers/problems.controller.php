@@ -126,15 +126,29 @@ class ProblemsController {
   
   }//deflateZip()
 
+
+
+  /**
+    *
+    *
+    **/
   private static function zipCleanup($zid){
     $tmp_dir  = OMEGAUP_ROOT . "tmp/" . $zid;
     unlink( $tmp_dir );
     return;
   }
 
-  private static function parseZipContents(  ){
-    
+
+
+
+  private static function parseZipContents( $zid ){
+    $file_prefix  = OMEGAUP_ROOT . "tmp/" . $zid. "/";
+
+    //parse your files here, file absolute path must be prefixed with $file_prefix
+
   }
+
+
 
   private static function testZip( ){
     $files_needed_in_zip = array(  );
@@ -146,17 +160,24 @@ class ProblemsController {
     return true;
   }
 
+
+  /**
+    *
+    *
+    **/
   public static function parseZip( $pathToZip ){
 
     $zid = self::deflateZip( $pathToZip );
 
     if( ! self::testZip( $zid ) ){
-      //missing files in zip
+      //test missing files in zip
       throw Exception();  
     }
 
     self::parseZipContents( $zid );
     
+    //self::saveZipToDB();
+
     self::zipCleanup( $zid );
   }
 
