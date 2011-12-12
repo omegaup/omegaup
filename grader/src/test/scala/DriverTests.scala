@@ -150,6 +150,74 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				return EXIT_SUCCESS;
 			}
 		""")
+
+		omegaUpSubmit(2, Language.Cpp, """
+			#include <cstdlib>
+			#include <iostream>
+			#include <map>
+			#include <unistd.h>
+
+			using namespace std;
+
+			int main(int argc, char *argv[]) {
+				int a, b;
+				cin >> a >> b;
+				cout << a + b << endl;
+				
+				return EXIT_SUCCESS;
+			}
+		""")
+
+		omegaUpSubmit(2, Language.Cpp, """
+			#include <cstdlib>
+			#include <iostream>
+			#include <map>
+			#include <unistd.h>
+
+			using namespace std;
+
+			int main(int argc, char *argv[]) {
+				int a, b;
+				cin >> a >> b;
+				cout << 3 << endl;
+				
+				return EXIT_SUCCESS;
+			}
+		""")
+
+		omegaUpSubmit(3, Language.Cpp, """
+			#include <cstdlib>
+			#include <iostream>
+			#include <map>
+			#include <unistd.h>
+
+			using namespace std;
+
+			int main(int argc, char *argv[]) {
+				int a, b;
+				cin >> a >> b;
+				cout << a + b << endl;
+				
+				return EXIT_SUCCESS;
+			}
+		""")
+
+		omegaUpSubmit(3, Language.Cpp, """
+			#include <cstdlib>
+			#include <iostream>
+			#include <map>
+			#include <unistd.h>
+
+			using namespace std;
+
+			int main(int argc, char *argv[]) {
+				int a, b;
+				cin >> a >> b;
+				cout << 3 << endl;
+				
+				return EXIT_SUCCESS;
+			}
+		""")
 	
 		t.join
 		
@@ -171,6 +239,30 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.PartialAccepted)
 		run.score should equal (0.5)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(4).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.Accepted)
+		run.score should equal (1)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(5).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.PartialAccepted)
+		run.score should equal (0.4)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(6).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.Accepted)
+		run.score should equal (1)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(7).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.PartialAccepted)
+		run.score should equal (0.05)
 		run.contest_score should equal (0)
 	}
 	

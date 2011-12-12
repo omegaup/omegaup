@@ -50,7 +50,9 @@ trait Grader extends Object with Log {
                   .map{ f => f.getName.substring(0, f.getName.length - 5)->(f, MetaFile.load(f.getCanonicalPath)) }
                   .toMap
 		
-		val weightsFile = new File(dataDirectory.getCanonicalPath + "/testplan")
+		val weightsFile = new File(Config.get("problems.root", "./problems") + "/" + pid + "/testplan")
+
+                trace("Finding Weights file in {}", weightsFile.getCanonicalPath)
 		
 		val weights:scala.collection.Map[String,scala.collection.Map[String,Double]] = if (weightsFile.exists) {
 			val weights = new mutable.ListMap[String,mutable.ListMap[String,Double]]
@@ -62,16 +64,13 @@ trait Grader extends Object with Log {
 			
 				if(tokens.length == 2 && !tokens(0).startsWith("#")) {
                                         var group:String = null
-                                        var caseName:String = null
 
                                         val idx = tokens(0).indexOf(".")
 
                                         if (idx != -1) {
                                           group = tokens(0).substring(0, idx)
-                                          caseName = tokens(0).substring(idx+1)
                                         } else {
                                           group = tokens(0)
-                                          caseName = tokens(0)
                                         }
 
                                         if (!weights.contains(group)) {
@@ -79,7 +78,7 @@ trait Grader extends Object with Log {
                                         }
 
 					try {
-						weights(group) += (caseName -> tokens(1).toDouble)
+						weights(group) += (tokens(0) -> tokens(1).toDouble)
 					}
 				}
 			}
@@ -98,7 +97,7 @@ trait Grader extends Object with Log {
 			}
 			.toMap
 		}
-		
+
 		metas.values.foreach { case (f, meta) => {
 			run.runtime += math.round(1000 * meta("time").toDouble)
 			run.memory = math.max(run.memory, meta("mem").toLong)
