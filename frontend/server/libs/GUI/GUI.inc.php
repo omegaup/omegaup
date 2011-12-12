@@ -17,6 +17,7 @@ require_once ("libs/GUI/MessageComponent.php");
 require_once ("libs/GUI/TableComponent.php");
 require_once ("libs/GUI/TitleComponent.php");
 require_once ("libs/GUI/FreeHtmlComponent.php");
+require_once ("libs/GUI/SubmitFileComponent.php");
 
 
 
