@@ -10,7 +10,7 @@
 BEGIN;
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "UTC";
+SET time_zone = '+00:00';
 
 DROP DATABASE IF EXISTS `omegaup`;
 CREATE DATABASE IF NOT EXISTS `omegaup`;
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
 CREATE TABLE IF NOT EXISTS `Contests_Users` (
   `user_id` int(11) NOT NULL,
   `contest_id` int(11) NOT NULL,
-  `access_time` date NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora a la que entrÃ³ el usuario al concurso',  
+  `access_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora a la que entrÃ³ el usuario al concurso',  
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Ãndica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Ãndica el tiempo que acumulo en usuario en el concurso',
   PRIMARY KEY (`user_id`,`contest_id`),
