@@ -28,14 +28,10 @@ class Utils
     //put your code here
     static function cleanup()
     {
-        foreach($_POST as $p)
+        foreach($_REQUEST as $p)
         {
             unset($p);
-        }
-        foreach($_GET as $g)
-        {
-            unset($g);
-        }        
+        }       
     }
     
     static function ConnectToDB()
@@ -84,8 +80,8 @@ class Utils
     static function Login($username, $password)
     {
         self::cleanup();
-        $_POST["username"] = $username;
-        $_POST["password"] = $password;
+        RequestContext::set("username", $username);
+        RequestContext::set("password", $password);
         
         // Login                                        
         $loginApi = new Login();  
@@ -100,8 +96,7 @@ class Utils
         }
         
         $auth_token = $cleanValue["auth_token"];
-                
-        
+                        
         self::cleanup();        
         return $auth_token;
         
@@ -110,7 +105,7 @@ class Utils
     static function Logout($auth_token)
     {                        
         // Logout            
-        $_POST["auth_token"] = $auth_token;
+        RequestContext::set("auth_token", $auth_token);
         
         $logoutApi = new Logout();        
         $cleanValue = $logoutApi->ExecuteApi();
@@ -187,7 +182,7 @@ class Utils
     
     static function SetAuthToken($auth_token)
     {
-        $_POST["auth_token"] = $auth_token;
+        RequestContext::set("auth_token", $auth_token);        
     }
     
     static function CreateRandomString()

@@ -40,8 +40,8 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set Context
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("problem_id", $problem_id);
+        RequestContext::set("contest_id", $contest_id);
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
@@ -103,8 +103,8 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set Context
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("problem_id", $problem_id);
+        RequestContext::set("contest_id", $contest_id);
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
@@ -121,8 +121,8 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         }
         
         // Cleanup and reset context        
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("problem_id", $problem_id);
+        RequestContext::set("contest_id", $contest_id);
         Utils::SetAuthToken($auth_token);
         
         // Sleep 1 sec to differentiate open times
@@ -183,13 +183,12 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set Context
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("problem_id", $problem_id);
+        RequestContext::set("contest_id", $contest_id);
         
         // Execute API
         $showProblemInContest = new ShowProblemInContest();
-        Utils::SetAuthToken($auth_token);
-        
+        Utils::SetAuthToken($auth_token);        
         try
         {            
             $return_array = $showProblemInContest->ExecuteApi();                        
@@ -225,8 +224,8 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set Context
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("problem_id", $problem_id);
+        RequestContext::set("contest_id", $contest_id);
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();

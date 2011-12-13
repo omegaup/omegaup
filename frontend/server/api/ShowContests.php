@@ -15,34 +15,9 @@ require_once("ApiHandler.php");
 
 class ShowContests extends ApiHandler {
     
-    protected function CheckAuthorization() {
-        // @todo this CheckAuthorization thing should be refactored 
 
-        if (
-                isset($_REQUEST["auth_token"])
-        ) {
-
-            /**
-             * They sent me an auth token ! Lets look for it.
-             * */
-            $token = AuthTokensDAO::getByPK($_POST["auth_token"]);
-
-            if ($token !== null) {
-                /**
-                 *
-                 * Found it !
-                 * */
-                $this->user_id = $token->getUserId();
-                
-            } else {
-                
-                // We have an invalid auth token. Dying.            
-               throw new ApiException( $this->error_dispatcher->invalidAuthToken() );
-            }
-        }
-    }
-
-    protected function GetRequest() {
+    protected function RegisterValidatorsToRequest() 
+    {
         return true;
     }
 
@@ -53,20 +28,25 @@ class ShowContests extends ApiHandler {
 
         // Get all contests using only relevan columns
         $contests = ContestsDAO::getAll(NULL, NULL, 'contest_id', "DESC", $relevant_columns);
-
-        $this->response = array();
+        
 
         /**
          * Ok, lets go 1 by 1, and if its public, show it,
          * if its not, check if the user has access to it.
          * */
-        foreach ($contests as $c) {
-
-            if (sizeof($this->response) == 10)
+        $addedContests = 0;
+        foreach ($contests as $c) 
+        {
+            // At most we want 10 contests
+            if ($addedContests === 10)
+            {
                 break;
+            }
 
-            if ($c->getPublic()) {
-                array_push($this->response, $c->asFilteredArray($relevant_columns));
+            if ($c->getPublic()) 
+            {
+                $this->addResponse($addedContests, $c->asFilteredArray($relevant_columns));                
+                $addedContests++;
                 continue;
             }
 
@@ -74,15 +54,18 @@ class ShowContests extends ApiHandler {
              * Ok, its not public, lets se if we have a 
              * valid user
              * */
-            if ($this->user_id === null)
+            if ($this->_user_id === null)
+            {
                 continue;
+            }
 
             /**
              * Ok, i have a user. Can he see this contest ?
              * */
-            $r = ContestsUsersDAO::getByPK($this->user_id, $c->getContestId());
+            $r = ContestsUsersDAO::getByPK($this->_user_id, $c->getContestId());
 
-            if ($r === null) {
+            if ($r === null) 
+            {
                 /**
                  * Nope, he cant .
                  * */
@@ -93,7 +76,8 @@ class ShowContests extends ApiHandler {
              * He can see it !
              * 
              * */
-            array_push($this->response, $c->asFilteredArray($relevant_columns));
+            $this->addResponse($addedContests, $c->asFilteredArray($relevant_columns));
+            $addedContests++;
         }
     }
 

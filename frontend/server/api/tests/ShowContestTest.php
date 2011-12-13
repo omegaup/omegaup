@@ -36,7 +36,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set contest
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("contest_id", $contest_id);        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -70,7 +70,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($contest->getFeedback(), $return_array["feedback"]);
         $this->assertEquals($contest->getPenalty(), $return_array["penalty"]);
         $this->assertEquals($contest->getScoreboard(), $return_array["scoreboard"]);
-        $this->assertEquals($contest->getTimeStart(), $return_array["penalty_time_start"]);
+        $this->assertEquals($contest->getPenaltyTimeStart(), $return_array["penalty_time_start"]);
         $this->assertEquals($contest->getPenaltyCalcPolicy(), $return_array["penalty_calc_policy"]);
         
         // Assert we have our problems
@@ -119,7 +119,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestDirector();
         
         // Set contest
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("contest_id", $contest_id);
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -153,7 +153,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($contest->getFeedback(), $return_array["feedback"]);
         $this->assertEquals($contest->getPenalty(), $return_array["penalty"]);
         $this->assertEquals($contest->getScoreboard(), $return_array["scoreboard"]);
-        $this->assertEquals($contest->getTimeStart(), $return_array["penalty_time_start"]);
+        $this->assertEquals($contest->getPenaltyTimeStart(), $return_array["penalty_time_start"]);
         $this->assertEquals($contest->getPenaltyCalcPolicy(), $return_array["penalty_calc_policy"]);
         
         // Assert we have our problems
@@ -203,7 +203,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set contest
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("contest_id", $contest_id);
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -243,7 +243,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set context
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("contest_id", $contest_id);
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -300,7 +300,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestDirector();
         
         // Set context
-        $_GET["contest_id"] = $contest_id;
+        RequestContext::set("contest_id", $contest_id);
         Utils::SetAuthToken($auth_token);
         
         // Execute API

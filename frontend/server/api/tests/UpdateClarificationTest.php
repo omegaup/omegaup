@@ -38,9 +38,10 @@ class UpdateClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestDirector();
         
         // Set the context
-        $_GET["clarification_id"] = $clarification_id_1;
-        $_POST["answer"] = "this is my answer";
-        $_POST["public"] = '1';
+        RequestContext::set("clarification_id", $clarification_id_1);
+        RequestContext::set("message", $originalMessage);
+        RequestContext::set("answer", "this is my answer");
+        RequestContext::set("public", '1');
         
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -77,10 +78,10 @@ class UpdateClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestDirector();
         
         // Set the context
-        $_GET["clarification_id"] = $clarification_id_1;
-        $_POST["answer"] = "this is my answer";
-        $_POST["message"] = "this is my new message";
-        $_POST["public"] = '1';
+        RequestContext::set("clarification_id", $clarification_id_1);
+        RequestContext::set("answer", "this is my answer");
+        RequestContext::set("message", "this is my new message");
+        RequestContext::set("public", '1');
         
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -122,9 +123,9 @@ class UpdateClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsProblemAuthor();
         
         // Set the context
-        $_GET["clarification_id"] = $clarification_id_1;
-        $_POST["answer"] = "this is my answer";
-        $_POST["public"] = '1';
+        RequestContext::set("clarification_id", $clarification_id_1);
+        RequestContext::set("answer", "this is my answer");
+        RequestContext::set("public", '1');
         
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -161,10 +162,10 @@ class UpdateClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set the context
-        $_GET["clarification_id"] = $clarification_id_1;
-        $_POST["answer"] = "this is my answer";
-        $_POST["message"] = "this is my new message";
-        $_POST["public"] = '1';
+        RequestContext::set("clarification_id", $clarification_id_1);
+        RequestContext::set("answer", "this is my answer");
+        RequestContext::set("message", "this is my new message");
+        RequestContext::set("public", '1');
         
         // Execute API
         Utils::SetAuthToken($auth_token);

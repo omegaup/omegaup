@@ -27,21 +27,21 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         // Set context
         if(is_null($contest_id))
         {
-            $_GET["contest_id"] = Utils::GetValidPublicContestId();
+            RequestContext::set("contest_id", Utils::GetValidPublicContestId());
         }
         else
         {
-            $_GET["contest_id"] = $contest_id;
+            RequestContext::set("contest_id", $contest_id);
         }
-        $_POST["title"] = Utils::CreateRandomString();
-        $_POST["alias"] = substr(Utils::CreateRandomString(), 0, 10);
-        $_POST["author_id"] = Utils::GetProblemAuthorUserId();
-        $_POST["validator"] = "token";
-        $_POST["time_limit"] = 5000;
-        $_POST["memory_limit"] = 32000;        
-        $_POST["source"] = "<p>redacción</p>";
-        $_POST["order"] = "normal";
-        $_POST["points"] = 1;
+        RequestContext::set("title", Utils::CreateRandomString());
+        RequestContext::set("alias", substr(Utils::CreateRandomString(), 0, 10));
+        RequestContext::set("author_id", Utils::GetProblemAuthorUserId());
+        RequestContext::set("validator", "token");
+        RequestContext::set("time_limit", 5000);
+        RequestContext::set("memory_limit", 32000);        
+        RequestContext::set("source", "<p>redacción</p>");
+        RequestContext::set("order", "normal");
+        RequestContext::set("points", 1);
     }
     
     public function testCreateValidProblem($contest_id = NULL)
@@ -73,7 +73,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         
         // Verify data in DB
         $problem_mask = new Problems();
-        $problem_mask->setTitle($_POST["title"]);
+        $problem_mask->setTitle(RequestContext::get("title"));
         $problems = ProblemsDAO::search($problem_mask);
         
         // Check that we only retreived 1 element
@@ -85,20 +85,20 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($problem->getProblemId());
         
         // Verify DB data
-        $this->assertEquals($_POST["title"], $problem->getTitle());
-        $this->assertEquals($_POST["alias"], $problem->getAlias());
-        $this->assertEquals($_POST["validator"], $problem->getValidator());
-        $this->assertEquals($_POST["time_limit"], $problem->getTimeLimit());
-        $this->assertEquals($_POST["memory_limit"], $problem->getMemoryLimit());                      
-        $this->assertEquals($_POST["author_id"], $problem->getAuthorId());
-        $this->assertEquals($_POST["order"], $problem->getOrder());
+        $this->assertEquals(RequestContext::get("title"), $problem->getTitle());
+        $this->assertEquals(RequestContext::get("alias"), $problem->getAlias());
+        $this->assertEquals(RequestContext::get("validator"), $problem->getValidator());
+        $this->assertEquals(RequestContext::get("time_limit"), $problem->getTimeLimit());
+        $this->assertEquals(RequestContext::get("memory_limit"), $problem->getMemoryLimit());                      
+        $this->assertEquals(RequestContext::get("author_id"), $problem->getAuthorId());
+        $this->assertEquals(RequestContext::get("order"), $problem->getOrder());
         
         // Verify problem statement
         $filename = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getSource();
         $this->assertFileExists($filename);                        
         
         $fileContent = file_get_contents($filename);
-        $this->assertEquals($fileContent, $_POST["source"]);
+        $this->assertEquals($fileContent, RequestContext::get("source"));
         
         // Default data
         $this->assertEquals(0, $problem->getVisits());
@@ -109,9 +109,9 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         // Get problem-contest and verify it
         $contest_problems = ContestProblemsDAO::getByPK($contest_id, $problem->getProblemId());
         $this->assertNotNull($contest_problems);        
-        $this->assertEquals($_POST["points"], $contest_problems->getPoints());        
+        $this->assertEquals(RequestContext::get("points"), $contest_problems->getPoints());        
         
-        return $problem->getProblemId();
+        return (int)$problem->getProblemId();
     }
         
     
@@ -176,7 +176,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
             self::setValidContext();
             
             // Unset key
-            unset($_POST[$key]);
+            unset($_REQUEST[$key]);
             
             try
             {
@@ -191,21 +191,17 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
 
                 // Validate exception
                 $this->assertNotNull($exception_array);
-                $this->assertArrayHasKey('error', $exception_array);    
-
-                if ($key !== "start_time" )
-                {
-                    $this->assertEquals("Required parameter ". $key ." is missing.", $exception_array["error"]);
-                }
-
+                $this->assertEquals("error", $exception_array["status"]);
+                $this->assertEquals(100, $exception_array["errorcode"]);
+                $this->assertEquals("HTTP/1.1 400 BAD REQUEST", $exception_array["header"]);
+                $this->assertContains($key, $exception_array["error"]);
+                                
                 // We're OK
                 continue;
             }
-
+            
             $this->fail("Exception was expected. Parameter: ". $key);            
-        }   
-        
-        
+        }                   
     }
 }
 ?>

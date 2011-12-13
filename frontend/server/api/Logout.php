@@ -16,11 +16,10 @@ require_once("ApiHandler.php");
 class Logout extends ApiHandler {
     
     
-    protected function GetRequest() {
+    protected function RegisterValidatorsToRequest() {
         
         // Only auth_token is needed for logout, which is verified in the authorization process
-        return true;
-               
+        return true;               
     }
 
     protected function GenerateResponse() {
@@ -29,17 +28,15 @@ class Logout extends ApiHandler {
          * Ok, they sent a valid auth, just erase it from the database.
          * */
         try{
-                AuthTokensDAO::delete( $this->auth_token );	
-
-        }catch( Exception $e ){
-              throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );
+            AuthTokensDAO::delete( $this->_auth_token );	
+        }
+        catch( Exception $e ){
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );
         }
        
         // Happy ending
-        $this->response["status"] = "ok";
+        $this->addResponse("status", "ok");
     }
-
-
 }
 
 ?>

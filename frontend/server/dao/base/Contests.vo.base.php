@@ -625,25 +625,25 @@ class Contests extends VO
 	}
 
 	/**
-	  * getTimeStart
+	  * getPenaltyTimeStart
 	  * 
 	  * Get the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema
 	  * @return enum('contest','problem')
 	  */
-	final public function getTimeStart()
+	final public function getPenaltyTimeStart()
 	{
 		return $this->penalty_time_start;
 	}
 
 	/**
-	  * setTimeStart( $penalty_time_start )
+	  * setPenaltyTimeStart( $penalty_time_start )
 	  * 
 	  * Set the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema.
 	  * Una validacion basica se hara aqui para comprobar que <i>penalty_time_start</i> es de tipo <i>enum('contest','problem')</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param enum('contest','problem')
 	  */
-	final public function setTimeStart( $penalty_time_start )
+	final public function setPenaltyTimeStart( $penalty_time_start )
 	{
 		$this->penalty_time_start = $penalty_time_start;
 	}

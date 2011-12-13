@@ -29,7 +29,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     public function openContestBeforeSubmit($contest_id)
     {
         // Set context
-        $_GET["contest_id"] = $contest_id;        
+        RequestContext::set("contest_id", $contest_id);        
         
         // Execute API
         $showContest = new ShowContest();
@@ -38,23 +38,23 @@ class NewRunTest extends PHPUnit_Framework_TestCase
             $return_array = $showContest->ExecuteApi();
         }
         catch(ApiException $e)
-        {
+        {            
             // Asume that the test is going to handle the exception
         }
         
-        unset($_GET["contest_id"]);
+        unset($_REQUEST["contest_id"]);
     }
     
     private function setValidContext($contest_id, $problem_id)
     {
-        $_POST["contest_id"] = $contest_id;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";        
-        
         $this->openContestBeforeSubmit($contest_id);
+        
+        RequestContext::set("contest_id", $contest_id);
+        RequestContext::set("problem_id", $problem_id);        
+        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
+        RequestContext::set("language", $languages[array_rand($languages, 1)]);
+        RequestContext::set("source", "#include <stdio.h> int main() { printf(\"100\"); }");
+        $_SERVER['REMOTE_ADDR'] = "123.123.123.123"; 
     }
     
     public function testNewValidRun($contest_id = null, $problem_id = null)
@@ -64,9 +64,9 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Set context
         if(is_null($contest_id))
-        {
+        {            
             $contestCreator = new NewContestTest();
-            $contest_id = $contestCreator->testCreateValidContest(1);
+            $contest_id = $contestCreator->testCreateValidContest(1);            
         }
         
         if(is_null($problem_id))
@@ -99,14 +99,14 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($run);
         
         // Validate data        
-        $this->assertEquals($_POST["language"], $run->getLanguage());
+        $this->assertEquals(RequestContext::get("language"), $run->getLanguage());
         $this->assertNotEmpty($run->getGuid());
         
         // Validate file created
         $filename = RUNS_PATH . $run->getGuid();
         $this->assertFileExists($filename);
         $fileContent = file_get_contents($filename);
-        $this->assertEquals($_POST["source"], $fileContent);        
+        $this->assertEquals(RequestContext::get("source"), $fileContent);        
         
         // Validate defaults
         $this->assertEquals("new", $run->getStatus());
@@ -203,14 +203,14 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($run);
         
         // Validate data        
-        $this->assertEquals($_POST["language"], $run->getLanguage());
+        $this->assertEquals(RequestContext::get("language"), $run->getLanguage());
         $this->assertNotEmpty($run->getGuid());
         
         // Validate file created
         $filename = RUNS_PATH . $run->getGuid();
         $this->assertFileExists($filename);
         $fileContent = file_get_contents($filename);
-        $this->assertEquals($_POST["source"], $fileContent);        
+        $this->assertEquals(RequestContext::get("source"), $fileContent);        
         
         // Validate defaults
         $this->assertEquals("new", $run->getStatus());
@@ -403,7 +403,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         for($i = 0; $i < 3; $i++)
         {
             // Try different problem id
-            $_POST["problem_id"] = $problem_id[$i];        
+            RequestContext::set("problem_id", $problem_id[$i]);        
             
             try
             {
@@ -496,7 +496,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
             $this->setValidContext($contest_id, $problem_id);
             
             // Unset key
-            unset($_POST[$key]);
+            unset($_REQUEST[$key]);
             
             // Execute API
             $newRun = new NewRun();
@@ -512,7 +512,6 @@ class NewRunTest extends PHPUnit_Framework_TestCase
                 // Validate exception
                 $this->assertNotNull($exception_array);
                 $this->assertArrayHasKey('error', $exception_array);                    
-                $this->assertEquals("Required parameter ". $key ." is missing.", $exception_array["error"]);
                 
                 // We're OK
                 continue;
@@ -604,9 +603,5 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         var_dump($contest);
         var_dump($return_array);
         $this->fail("Contestant was able to submit run in an expired contest.");
-    }
-    
-    
-    // window length? <- OMFG, win_length requires tons of cases :)
-    
+    }               
 }

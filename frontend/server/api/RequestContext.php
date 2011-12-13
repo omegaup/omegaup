@@ -16,6 +16,6 @@ class RequestContext
     }
 }
 
-// Initialize params to $_REQUEST
-RequestContext::$params = $_REQUEST;
+// Set params referencing to $_REQUEST
+RequestContext::$params = &$_REQUEST;
 ?>
