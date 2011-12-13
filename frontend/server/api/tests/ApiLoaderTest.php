@@ -16,8 +16,8 @@ class ApiLoaderTest extends PHPUnit_Framework_TestCase
     {
         // Set context to load login
         RequestContext::set("apicmd", "Login");
-        $_POST["username"] = Utils::GetContestantUsername();
-        $_POST["password"] = Utils::$contestant->getPassword();
+        RequestContext::set("username", Utils::GetContestantUsername());
+        RequestContext::set("password", Utils::$contestant->getPassword());
         
         $return_value = ApiLoader::load('test');
                         
@@ -28,13 +28,13 @@ class ApiLoaderTest extends PHPUnit_Framework_TestCase
     {
         // Set context to load login
         RequestContext::set("apicmd", "Login");
-        $_POST["username"] = Utils::GetContestantUsername();
-        $_POST["password"] = "invalidpwd";
+        RequestContext::set("username", Utils::GetContestantUsername());
+        RequestContext::set("password", "invalidpwd");
         
         $return_value_json = ApiLoader::load('test');
                         
-        $this->assertEquals('{"status":"error","error":"Username or password is wrong. Please check your credentials","errorcode":101,"header":"HTTP\/1.1 403 FORBIDDEN"}',
-                $return_value_json);
+        $this->assertStringStartsWith("{\"status\":\"error\",", $return_value_json);
+        $this->assertStringEndsWith("\"errorcode\":101,\"header\":\"HTTP\/1.1 403 FORBIDDEN\"}", $return_value_json);
     }
     
     public function testInvalidCmd()

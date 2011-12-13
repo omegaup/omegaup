@@ -69,7 +69,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         // Login as contestant, should not see the private contest created by judge
         $auth_token = Utils::LoginAsContestant();
         
-        // Get contests, contest just created should be the first in the list
+        // Get contests
         $showContest = new ShowContests();
         Utils::SetAuthToken($auth_token);
         
@@ -82,7 +82,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
             $this->fail("Exception was unexpected: ". var_dump($e->getArrayMessage()));    
         }
         
-        // Assert our contest is there
+        // Assert our contest is NOT there
         $this->assertArrayHasKey("0", $cleanValue);    
         $this->assertArrayHasKey("title", $cleanValue[0]);    
         $this->assertNotEquals($random_title, $cleanValue[0]["title"]);
@@ -101,7 +101,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         NewContestTest::CreateContest($random_title, 0);
         
         
-        // Login as contestant, should not see the private contest created by judge
+        // Login as contests director, shoud see content
         $auth_token = Utils::LoginAsContestDirector();
         
         // Get contests, contest just created should be the first in the list
@@ -120,7 +120,7 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         // Assert our contest is there
         $this->assertArrayHasKey("0", $cleanValue);    
         $this->assertArrayHasKey("title", $cleanValue[0]);    
-        $this->assertNotEquals($random_title, $cleanValue[0]["title"]);
+        $this->assertEquals($random_title, $cleanValue[0]["title"]);
         
         // Logout the contestant
         Utils::Logout($auth_token);  

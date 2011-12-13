@@ -13,124 +13,91 @@
  * */
 
 require_once("ApiHandler.php");
+require_once(SERVER_PATH . '/libs/FileHandler.php');
 
 class NewProblemInContest extends ApiHandler
 {            
-    protected function GetRequest()
-    {        
-        // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE
-        $this->request = array(
-            "contest_id" => new ApiExposedProperty("contest_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( function ($value)
-                        {
-                            // Check if the contest exists
-                            return ContestsDAO::getByPK($value);
-                        })                        
-            )),
-
-            new ApiExposedProperty("public", false, FALSE), // All problems created through this API will be private at their creation 
-
-            // Author may not necesarly be the person who submits the problem
-            new ApiExposedProperty("author_id", true, POST, array(
-                new NumericValidator(),
-                new CustomValidator( function ($value)
-                        {
-                            // Check if the user exists
-                            return UsersDAO::getByPK($value);
-                        })                
-            )),
-
-            new ApiExposedProperty("title", true, POST, array(
-                new StringValidator())),
-
-            new ApiExposedProperty("alias", false, POST),
-
-            new ApiExposedProperty("validator", true, POST, array(
-                new EnumValidator(array("remote", "literal", "token", "token-caseless", "token-numeric"))
-            )),
-
-            new ApiExposedProperty("time_limit", true, POST, array(
-                new NumericValidator(),
-                new NumericRangeValidator(0, INF)
-            )),
-
-            new ApiExposedProperty("memory_limit", true, POST, array(
-                new NumericValidator(),
-                new NumericRangeValidator(0, INF)
-            )),
-
-            new ApiExposedProperty("visits", true, 0),
-            new ApiExposedProperty("submissions", true, 0),
-            new ApiExposedProperty("accepted", true, 0),
-            new ApiExposedProperty("difficulty", true, 0),
-
-            new ApiExposedProperty("source", true, POST, array(
-                new HtmlValidator()
-            )),
-
-            new ApiExposedProperty("order", true, POST, array(
-                new EnumValidator(array("normal", "inverse"))
-            )),
-
-            new ApiExposedProperty("points", true, POST, array(
-                new NumericValidator(),
-                new NumericRangeValidator(0, INF)
-            ))
-        );
-        
-    }
-    
-    protected function ValidateRequest() 
-    {
-        parent::ValidateRequest();
-        
+    protected function RegisterValidatorsToRequest()
+    {    
         // Only director is allowed to create problems in contest
-        $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());                        
-        if($contest->getDirectorId() !== $this->user_id)
+        $contest = ContestsDAO::getByPK(RequestContext::get("contest_id"));                        
+        if($contest->getDirectorId() !== $this->_user_id)
         {
-            throw new ApiException($this->error_dispatcher->forbiddenSite());
-        }        
-    }
+            throw new ApiException(ApiHttpErrors::forbiddenSite());
+        }
+        
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ContestsDAO::getByPK($value);
+                }, "contest_id is invalid."))
+            ->validate(RequestContext::get("contest_id"), "contest_id");
+        
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return UsersDAO::getByPK($value);
+                }, "author_id is invalid."))
+            ->validate(RequestContext::get("author_id"), "author_id");
+                
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("title"),
+                "title");
+                
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("alias"),
+                "alias");
+        
+        ValidatorFactory::enumValidator(array("remote", "literal", "token", "token-caseless", "token-numeric"))
+                ->validate(RequestContext::get("validator"), "validator");
+        
+        ValidatorFactory::numericRangeValidator(0, INF)
+                ->validate(RequestContext::get("time_limit"), "time_limit");
+        
+        ValidatorFactory::numericRangeValidator(0, INF)
+                ->validate(RequestContext::get("memory_limit"), "memory_limit");
+        
+        ValidatorFactory::htmlValidator()->validate(RequestContext::get("source"), "source");
+                
+        ValidatorFactory::enumValidator(array("normal", "inverse"))
+                ->validate(RequestContext::get("order"), "order"); 
+        
+        ValidatorFactory::numericRangeValidator(0, INF)
+                ->validate(RequestContext::get("points"), "points");
+
+    }       
     
     protected function GenerateResponse() 
     {
+        // Crete file
         try 
         {
-            
-            // Create file for problem content            
             $filename = md5(uniqid(rand(), true));
-            $fileHandle = fopen(PROBLEMS_PATH . $filename, 'w'); 
-            fwrite($fileHandle, $_POST["source"]);
-            fclose($fileHandle);
+            FileHandler::CreateFile(PROBLEMS_PATH . $filename, RequestContext::get("source"));                        
         }
         catch (Exception $e)
         {
-            throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );
         }
         
-        
-        // Fill $values array with values sent to the API
-        $problems_insert_values = array();
-        foreach($this->request as $parameter)
-        {
-            // Replace the HTML in source with the path to the file saved 
-            if ($parameter->getPropertyName() == "source")
-            {                        
-                $parameter->setValue($filename);
-            }
-
-            // Copy all except contest_id
-            if ($parameter->getPropertyName() !== "contest_id") 
-            {
-                $problems_insert_values[$parameter->getPropertyName()] = $parameter->getValue();        
-            }
-        }
-        
-        
-        // Populate a new Contests object
-        $problem = new Problems($problems_insert_values);
-        
+        // Populate a new Problem object
+        $problem = new Problems();
+        $problem->setPublic(false);
+        $problem->setAuthorId(RequestContext::get("author_id"));
+        $problem->setTitle(RequestContext::get("title"));
+        $problem->setAlias(RequestContext::get("alias"));
+        $problem->setValidator(RequestContext::get("validator"));
+        $problem->setTimeLimit(RequestContext::get("time_limit"));
+        $problem->setMemoryLimit(RequestContext::get("memory_limit"));
+        $problem->setVisits(0);
+        $problem->setSubmissions(0);
+        $problem->setAccepted(0);
+        $problem->setDifficulty(0);
+        $problem->setSource($filename);
+        $problem->setOrder(RequestContext::get("order"));                              
+                
         // Insert new problem
         try
         {
@@ -142,9 +109,9 @@ class NewProblemInContest extends ApiHandler
 
             // Save relationship between problems and contest_id
             $relationship = new ContestProblems( array(
-                "contest_id" => $_GET["contest_id"],
+                "contest_id" => RequestContext::get("contest_id"),
                 "problem_id" => $problem->getProblemId(),
-                "points"     => $_POST["points"]));
+                "points"     => RequestContext::get("points")));
             ContestProblemsDAO::save($relationship);
 
             //End transaction
@@ -152,14 +119,10 @@ class NewProblemInContest extends ApiHandler
 
         }catch(Exception $e)
         {  
-
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
-        }
-                
-    }
-    
-
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+        }                
+    }    
 }
 
 ?>

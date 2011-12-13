@@ -39,11 +39,11 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
         // Get our clarification from DB for comparisson        
         $clarification = ClarificationsDAO::getByPK($clarification_id);        
         
-        // Login as judge
+        // Login as contest director
         $auth_token = Utils::LoginAsContestDirector();
         
         // Set context
-        $_GET["clarification_id"] = $clarification_id;
+        RequestContext::set("clarification_id", $clarification_id);
         
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -89,7 +89,7 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set context
-        $_GET["clarification_id"] = $clarification->getClarificationId();
+        RequestContext::set("clarification_id", $clarification->getClarificationId());
         
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -135,7 +135,7 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant2();
         
         // Set context
-        $_GET["clarification_id"] = $clarification->getClarificationId();
+        RequestContext::set("clarification_id", $clarification->getClarificationId());
         
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -182,7 +182,7 @@ class ShowClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant2();
         
         // Set context
-        $_GET["clarification_id"] = $clarification->getClarificationId();
+        RequestContext::set("clarification_id", $clarification->getClarificationId());
         
         // Execute API
         Utils::SetAuthToken($auth_token);

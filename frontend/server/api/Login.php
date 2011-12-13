@@ -14,73 +14,65 @@ require_once("ApiHandler.php");
 class Login extends ApiHandler {
 
 
-    protected function CheckAuthorization() {
-       
+    protected function CheckAuthToken() 
+    {       
         // Bypass authorization
         return true;
     }
 
-
-    protected function GetRequest() {
-                
-
-        $this->request = array(
-          new ApiExposedProperty("username", true, POST, array(
-              new StringValidator()
-          )),
-          new ApiExposedProperty("password", true, POST, array(
-              new StringValidator()
-          ))  
-        );
-               
+    protected function RegisterValidatorsToRequest() 
+    {                                
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("username"), "username");
+        
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("password"), "password");
     }
 
-    protected function GenerateResponse() {
-        
-        $username = $_POST["username"];
-        $password = $_POST["password"];
-                
-        
+    protected function GenerateResponse() 
+    {        
+        $username = RequestContext::get("username");
+        $password = RequestContext::get("password");
+                        
         /**
          * Lets look for this user in the user table.
          * */
         $user_query = new Users();
-        $user_query->setUsername( $username );
-        
+        $user_query->setUsername( $username );        
         $results = UsersDAO::search( $user_query );
-        
-        
-        if(sizeof($results) == 1){
+                
+        if(sizeof($results) === 1)
+        {
+            /**
+             * Found him !
+             * */               
+            $actual_user = $results[0];                
+
+        }
+        else
+        {
+            /**
+             * He was not ther, maybe he sent his email instead.
+             * */	
+            $email_query = new Emails();
+            $email_query->setEmail( $username );
+            $results = EmailsDAO::search( $email_query );
+
+            if(sizeof($results) == 1)
+            {
                 /**
-                 * Found him !
-                 * */               
-                $actual_user = $results[0];                
-
-        }else{
+                 * Found his email address. Now lets look for the user
+                 * whose email is this.
+                 * */
+                $actual_user = UsersDAO::getByPK( $results[0]->getUserId() );
+            }
+            else
+            {
                 /**
-                 * He was not ther, maybe he sent his email instead.
-                 * */	
-                $email_query = new Emails();
-                $email_query->setEmail( $username );
-
-                $results = EmailsDAO::search( $email_query );
-
-                if(sizeof($results) == 1){
-                        /**
-                         * Found his email address. Now lets look for the user
-                         * whose email is this.
-                         * */
-                        $actual_user = UsersDAO::getByPK( $results[0]->getUserId() );
-
-
-                }else{
-
-                        /**
-                         * He is not in the users, nor the emails
-                         * */
-                        
-                       throw new ApiException($this->error_dispatcher->invalidCredentials());
-                }
+                 * He is not in the users, nor the emails
+                 * */
+               throw new ApiException(ApiHttpErrors::invalidCredentials());
+            }
         }
         
         /**
@@ -98,20 +90,18 @@ class Login extends ApiHandler {
          *
          * */
         if($actual_user->getPassword() === NULL){
-               throw new ApiException($this->error_dispatcher->registeredViaThirdPartyNotSupported());
+               throw new ApiException(ApiHttpErrors::registeredViaThirdPartyNotSupported());
         }
         
         /**
          * Ok, go ahead and check the password. For now its only md5, *with out* salt.
          * */        
-        if( 
-                $actual_user->getPassword() !== md5($password)
-         ){
-
-                /**
-                 * Passwords did not match !
-                 * */                
-               throw new ApiException($this->error_dispatcher->invalidCredentials());
+        if( $actual_user->getPassword() !== md5($password) )
+        {
+            /**
+             * Passwords did not match !
+             * */                
+           throw new ApiException(ApiHttpErrors::invalidCredentials());
         }
         
         /**
@@ -120,25 +110,27 @@ class Login extends ApiHandler {
          * */
         $query_auths = new AuthTokens();
         $query_auths->setUserId( $actual_user->getUserId() );
-
         $results = AuthTokensDAO::search( $query_auths );
 
-        foreach( $results as $old_token ){
-                try{
-                    AuthTokensDAO::delete( $old_token );
+        foreach( $results as $old_token )
+        {
+            try
+            {
+                AuthTokensDAO::delete( $old_token );
 
-                }catch(Exception $e){
-                   throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
-                }
+            }
+            catch(Exception $e)
+            {
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+            }
         }
-                
-        
+                        
         /**
          * Ok, passwords match !
          * Create the auth_token. Auth tokens will be valid for 24 hours.
          * */
-         $this->auth_token = new AuthTokens();
-         $this->auth_token->setUserId( $actual_user->getUserId() );
+         $this->_auth_token = new AuthTokens();
+         $this->_auth_token->setUserId( $actual_user->getUserId() );
 
          /**
           * auth token consists of:
@@ -148,23 +140,20 @@ class Login extends ApiHandler {
           * 
           * */
          $auth_str = time() . "-" . $actual_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $actual_user->getUserId() . time() );
+         $this->_auth_token->setToken($auth_str);
 
-         $this->auth_token->setToken($auth_str);
-
-
-
-         try{
-                AuthTokensDAO::save( $this->auth_token );
-
-         }catch(Exception $e){
-
-               throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
+         try
+         {
+            AuthTokensDAO::save( $this->_auth_token );
          }
-                 
-         $this->response["auth_token"] = $this->auth_token->getToken();
-     
+         catch(Exception $e)
+         {
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+         }
+          
+         // Add token to response
+         $this->addResponse("auth_token", $this->_auth_token->getToken());         
     }
-
 }
 
 ?>

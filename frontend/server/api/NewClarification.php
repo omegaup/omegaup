@@ -17,35 +17,37 @@ require_once("ApiHandler.php");
 class NewClarification extends ApiHandler
 {
     
-    protected function GetRequest()
-    {        
-        // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE
-        $this->request = array(
-            "author_id" => new ApiExposedProperty("author_id", false, $this->user_id),
-            
-            "contest_id" => new ApiExposedProperty("contest_id", true, POST, array(
-                new NumericValidator(),
-                new CustomValidator( function ($value)
-                        {
-                            // Check if the contest exists
-                            return ContestsDAO::getByPK($value);
-                        })                        
-            )),
-                               
-            "problem_id" => new ApiExposedProperty("problem_id", true, POST, array(
-                new NumericValidator(),
-                new CustomValidator( function ($value)
-                        {
-                            // Check if the problem exists
-                            return ProblemsDAO::getByPK($value);
-                        })                        
-            )),
-                                
-            "message" => new ApiExposedProperty("message", true, POST, array(
-                new StringValidator()
-            ))
-            
-        );
+    protected function RegisterValidatorsToRequest()
+    {    
+        
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ContestsDAO::getByPK($value);
+                }, "Contest requested is invalid."))
+            ->validate(RequestContext::get("contest_id"), "contest_id");
+                
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ProblemsDAO::getByPK($value);
+                }, "Problem requested is invalid."))
+            ->validate(RequestContext::get("problem_id"), "problem_id");
+                
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("message"),
+                "message");
+        
+        
+        // Is the combination contest_id and problem_id valid?        
+        if (is_null(
+                ContestProblemsDAO::getByPK(RequestContext::get("contest_id"), 
+                                            RequestContext::get("problem_id"))))
+        {
+           throw new ApiException(ApiHttpErrors::notFound());
+        }
         
     }
     
@@ -54,30 +56,28 @@ class NewClarification extends ApiHandler
         
         // Populate a new Clarification object
         $clarification = new Clarifications( array(
-            "author_id" => $this->request["author_id"]->getValue(),
-            "contest_id" => $this->request["contest_id"]->getValue(),
-            "problem_id" => $this->request["problem_id"]->getValue(),
-            "message" => $this->request["message"]->getValue(),
+            "author_id" => $this->_user_id,
+            "contest_id" => RequestContext::get("contest_id"),
+            "problem_id" => RequestContext::get("problem_id"),
+            "message" => RequestContext::get("message"),
             "public" => '0'
         ));
 
         // Insert new Clarification
         try
         {            
-
             // Save the clarification object with data sent by user to the database
             ClarificationsDAO::save($clarification);            
 
         }catch(Exception $e)
         {              
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
         }
         
         //Add the clarification id to the response
-        $this->response["clarification_id"] = $clarification->getClarificationId();
-    }
-    
+        $this->addResponse("clarification_id", $clarification->getClarificationId());
+    }    
 }
 
 ?>

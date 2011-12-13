@@ -6,14 +6,14 @@
  */
 require_once("Validator.php");
 
-class StringValidator extends Validator
+class NotEmptyValidator extends Validator
 {    
     public function validate($value)
     {
-        // Validate data is string        
-        if(!is_string($value))            
-        {            
-            $this->setError("Value is not a string.");
+        // Validate data not empty
+        if($value === "")
+        {
+            $this->setError("Value is empty.");
             return false;
         }
                 

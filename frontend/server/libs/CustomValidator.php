@@ -11,30 +11,29 @@ class CustomValidator extends Validator
 {
     
     private $callback;
+    private $message;
     
-    // Save the reference
-    public function CustomValidator($callback )
+    // Save the reference to the callback
+    public function CustomValidator($callback, $message)
     {        
-        $this->callback = $callback;
-        
-        Validator::Validator();
+        $this->callback = $callback;                
+        $this->message = $message;
     }
 
     
-    public function validate($value)
+    public function validate($data)
     {
         // Fix for bug in PHP 5.3. If we call $this->func(), PHP looks for func() inside the object
         $local_callback = $this->callback;
         
         // Delegate validation to callback
-        if ( !$local_callback($value))
+        if (!$local_callback($data))
         {
-            $this->setError("Validation failed.");
+            $this->setError($this->message);
             return false;
         }
         
-        return true;
-        
+        return true;        
     }
 }
 

@@ -126,9 +126,8 @@ class ApiLoader
     }
     
     private static function NotFound()
-    {
-        $error_dispatcher = ApiHttpErrors::getInstance();
-        $not_found = $error_dispatcher->notFound();
+    {        
+        $not_found = ApiHttpErrors::notFound();
         
         return self::$output_formatter->PrintOuput($not_found, $not_found["header"]);
     }

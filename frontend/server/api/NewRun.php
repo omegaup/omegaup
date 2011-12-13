@@ -13,101 +13,77 @@
  * */
 
 require_once("ApiHandler.php");
+require_once(SERVER_PATH . '/libs/FileHandler.php');
 
 class NewRun extends ApiHandler
 {     
-    protected function GetRequest()
-    {                  
+    protected function RegisterValidatorsToRequest()
+    {    
         
-        // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE
-        $this->request = array(
-            "user_id" => new ApiExposedProperty("user_id", false, $this->user_id),
-            "problem_id" => new ApiExposedProperty("problem_id", true, POST, array (
-                new NumericValidator(),
-                new CustomValidator( function ($value)
-                        {
-                            // Check if the problem exists
-                            return ProblemsDAO::getByPK($value);
-                        })  
-            )),
-            "contest_id" => new ApiExposedProperty("contest_id", true, POST, array(
-                new NumericValidator(),
-                new CustomValidator( function ($value)
-                        {
-                            // Check if the contest exists
-                            return ContestsDAO::getByPK($value);
-                        })                        
-            )),
-            "language" => new ApiExposedProperty("language", true, POST, array(
-                new EnumValidator(array ('c','cpp','java','py','rb','pl','cs','p'))
-            )),
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+            function ($value)
+            {
+                // Check if the contest exists
+                return ProblemsDAO::getByPK($value);
+            }, "Problem requested is invalid."))
+        ->validate(RequestContext::get("problem_id"), "problem_id");
             
-            "source" => new ApiExposedProperty("source", true, POST, array(
-                new StringValidator()
-            )),
-                                
-            // Not-required properties:                   
-            "status" => new ApiExposedProperty("status", false, "new"),
-            "runtime" => new ApiExposedProperty("runtime", false, 0),
-            "memory" => new ApiExposedProperty("memory", false, 0),
-            "score" => new ApiExposedProperty("score", false, 0),
-            "contest_score" => new ApiExposedProperty("contest_score", false, 0),
-            "ip" => new ApiExposedProperty("ip", false, $_SERVER['REMOTE_ADDR']),
-            "submit_delay" => new ApiExposedProperty("submit_delay", false, 0),
-            "guid" => new ApiExposedProperty("guid", false, md5(uniqid(rand(), true))),
-            "veredict" => new ApiExposedProperty("veredict", false, "JE")                                
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+            function ($value)
+            {
+                // Check if the contest exists
+                return ContestsDAO::getByPK($value);
+            }, "Contest requested is invalid."))
+        ->validate(RequestContext::get("contest_id"), "contest_id");
             
-        );        
-    }
-    
-    protected function ValidateRequest() 
-    {
-        parent::ValidateRequest();
-                    
+        ValidatorFactory::enumValidator(array ('c','cpp','java','py','rb','pl','cs','p'))->validate(
+            RequestContext::get("language"), "language");
+        
+        ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("source"), "source");
+        
         try
         {
-            // Validate that the combination contest_id problem_id is valid
-            // @todo Cache this!
+            // Validate that the combination contest_id problem_id is valid            
             if (!ContestProblemsDAO::getByPK(
-                    $this->request["contest_id"]->getValue(), 
-                    $this->request["problem_id"]->getValue() 
+                    RequestContext::get("contest_id"),
+                    RequestContext::get("problem_id")                    
                 ))
             {
-               throw new ApiException($this->error_dispatcher->invalidParameter("problem_id and contest_id combination is invalid."));
+               throw new ApiException(ApiHttpErrors::invalidParameter("problem_id and contest_id combination is invalid."));
             }
             
             // Before submit something, contestant had to open the problem/contest
-            if(!ContestsUsersDAO::getByPK($this->user_id, 
-                    $this->request["contest_id"]->getValue()))
+            if(!ContestsUsersDAO::getByPK($this->_user_id, 
+                    RequestContext::get("contest_id")))
             {
-                throw new ApiException($this->error_dispatcher->forbiddenSite());
+                throw new ApiException(ApiHttpErrors::forbiddenSite());
             }
                                     
             // Validate that the run is inside contest
-            $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
-            if( !$contest->isInsideContest($this->user_id))
+            $contest = ContestsDAO::getByPK(RequestContext::get("contest_id"));
+            if( !$contest->isInsideContest($this->_user_id))
             {                
-                throw new ApiException($this->error_dispatcher->forbiddenSite());
+                throw new ApiException(ApiHttpErrors::forbiddenSite());
             }
             
             // Validate if contest is private then the user should be registered
             if ( $contest->getPublic() == 0 
                 && is_null(ContestsUsersDAO::getByPK(
-                        $this->user_id, 
-                        $this->request["contest_id"]->getValue()))
+                        $this->_user_id, 
+                        RequestContext::get("contest_id")))
                )
             {
-               throw new ApiException($this->error_dispatcher->forbiddenSite());
+               throw new ApiException(ApiHttpErrors::forbiddenSite());
             }
 
             // Validate if the user is allowed to submit given the submissions_gap 
             if (!RunsDAO::IsRunInsideSubmissionGap(
-                    $this->request["contest_id"]->getValue(), 
-                    $this->request["problem_id"]->getValue(), 
-                    $this->user_id)
+                    RequestContext::get("contest_id"), 
+                    RequestContext::get("problem_id"), 
+                    $this->_user_id)
                )
             {                
-               throw new ApiException($this->error_dispatcher->notAllowedToSubmit());
+               throw new ApiException(ApiHttpErrors::notAllowedToSubmit());
             }
         
         
@@ -121,22 +97,34 @@ class NewRun extends ApiHandler
         catch(Exception $e)
         {            
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
-        }
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+        }                 
+    }
+    
+    protected function ValidateRequest() 
+    {                            
+        
     }
     
     protected function GenerateResponse() 
-    {
-                        
-        // Fill values 
-        $run_insert_values = array();
-        foreach($this->request as $parameter)
-        {
-            $run_insert_values[$parameter->getPropertyName()] = $parameter->getValue();        
-        }
-        
+    {                                        
         // Populate new run object
-        $run = new Runs($run_insert_values);                
+        $run = new Runs(array(
+            "user_id" => $this->_user_id,
+            "problem_id" => RequestContext::get("problem_id"),
+            "contest_id" => RequestContext::get("contest_id"),
+            "language" => RequestContext::get("language"),
+            "source" => RequestContext::get("source"),
+            "status" => "new",
+            "runtime" => 0,
+            "memory" => 0,
+            "score" => 0,
+            "contest_score" => 0,
+            "ip" => $_SERVER['REMOTE_ADDR'],
+            "submit_delay" => 0,
+            "guid" => md5(uniqid(rand(), true)),
+            "veredict" => "JE"
+        ));                
         try
         {
             // Push run into DB
@@ -145,29 +133,25 @@ class NewRun extends ApiHandler
         catch(Exception $e)
         {   
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
         }
         
         try
         {
             // Create file for the run        
-            $filename = $this->request["guid"]->getValue();
-            $fileHandle = fopen(RUNS_PATH . $filename, 'w');
-            fwrite($fileHandle, $this->request["source"]->getValue());
-            fclose($fileHandle);
+            $filepath = RUNS_PATH . $run->getGuid();
+            FileHandler::CreateFile($filepath, RequestContext::get("source"));            
         }
         catch (Exception $e)
         {
-            throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );                            
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );                            
         }
         
-        // @TODO Call lhchavez to evaluate run
-     
+        // @TODO Call lhchavez to evaluate run     
         
         // Happy ending
-        $this->response["status"] = "ok";
+        $this->addResponse("status", "ok");        
     }
-
 }
 
 ?>

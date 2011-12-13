@@ -224,9 +224,9 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $Contests->getPenalty() );
 		}
 
-		if( $Contests->getTimeStart() != NULL){
+		if( $Contests->getPenaltyTimeStart () != NULL){
 			$sql .= " penalty_time_start = ? AND";
-			array_push( $val, $Contests->getTimeStart() );
+			array_push( $val, $Contests->getPenaltyTimeStart() );
 		}
                 
                 if( $Contests->getPenaltyCalcPolicy() != NULL){
@@ -281,7 +281,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
 			$Contests->getPenalty(), 
-			$Contests->getTimeStart(),                         
+			$Contests->getPenaltyTimeStart(),                         
                         $Contests->getPointsDecayFactor(),
                         $Contests->getPenaltyCalcPolicy(),
 			$Contests->getContestId()
@@ -326,7 +326,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
 			$Contests->getPenalty(), 
-			$Contests->getTimeStart(),                        
+			$Contests->getPenaltyTimeStart(),                        
                         $Contests->getPointsDecayFactor(),
                         $Contests->getPenaltyCalcPolicy()                    
 		 );                
@@ -542,7 +542,7 @@ abstract class ContestsDAOBase extends DAO
 			
 		}
 
-		if( (($a = $ContestsA->getTimeStart()) != NULL) & ( ($b = $ContestsB->getTimeStart()) != NULL) ){
+		if( (($a = $ContestsA->getPenaltyTimeStart()) != NULL) & ( ($b = $ContestsB->getPenaltyTimeStart()) != NULL) ){
 				$sql .= " penalty_time_start >= ? AND penalty_time_start <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 

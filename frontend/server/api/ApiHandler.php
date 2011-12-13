@@ -7,117 +7,70 @@ require_once(SERVER_PATH ."/libs/ApiExposedProperty.php");
 require_once(SERVER_PATH ."/libs/ApiHttpErrors.php");
 require_once(SERVER_PATH ."/libs/ApiException.php");
 
-require_once(SERVER_PATH . "/libs/StringValidator.php");
-require_once(SERVER_PATH . "/libs/NumericRangeValidator.php");
-require_once(SERVER_PATH . "/libs/NumericValidator.php");
-require_once(SERVER_PATH . "/libs/DateRangeValidator.php");
-require_once(SERVER_PATH . "/libs/DateValidator.php");
-require_once(SERVER_PATH . "/libs/EnumValidator.php");
-require_once(SERVER_PATH . "/libs/HtmlValidator.php");
-require_once(SERVER_PATH . "/libs/CustomValidator.php");
-
+require_once(SERVER_PATH . "/libs/ValidatorFactory.php");
 
 /*
  * Basic Abstraction of an API
  */
-
 abstract class ApiHandler
-{
-    // Container of input parameters
-    protected $request;
-    
+{        
     // Containter of output parameters
-    protected $response;
+    private $_response = array();
     
     // Cache of who calls the API
-    protected $user_id;
-    
-    // Holder of error dispatcher
-    protected $error_dispatcher;
-    
-    // Cache of auth token
-    protected $auth_token;
-    
-    // Cache of user roles
-    protected $user_roles;
-        
-     
-    public function __construct() 
-    {                
-        // Get an error dispatcher
-        $this->error_dispatcher = ApiHttpErrors::getInstance();
-        
-        // Declare response as an array
-        $this->response = array();                                
-    }
-                      
-    
-    protected function CheckAuthorization()
-    {
-        // @TODO Idealy we should decouple the validation in delegates or something more mantainable
-        
-        // Check if we have a logged user.               
-        if( isset($_POST["auth_token"]) )
-        {
-                
-            // Find out the token
-            $this->auth_token = AuthTokensDAO::getByPK( $_POST["auth_token"] );
+    protected $_user_id;
             
-            if($this->auth_token !== null)
+    // Cache of auth token
+    protected $_auth_token;                                             
+    
+    protected function addResponse($key, $value)
+    {
+        $this->_response[$key] = $value;
+    }
+    
+    protected function addResponseArray(array $array)
+    {
+        foreach ($array as $key => $value)
+        {
+            $this->_response[$key] = $value;
+        }
+    }    
+    
+    protected function getResponse()
+    {
+        return $this->_response;
+    }
+                          
+    protected function CheckAuthToken()
+    {                
+        // Check if we have a logged user.               
+        if(!is_null(RequestContext::get("auth_token")))
+        {                
+            // Find out the token
+            $this->_auth_token = AuthTokensDAO::getByPK(RequestContext::get("auth_token"));
+            
+            if($this->_auth_token !== null)
             {
 
                 // Get the user_id from the auth token    
-                $this->user_id = $this->auth_token->getUserId();         
-                                
-                // Get roles of user
-                // @todo Cache this!
-                $this->user_roles = UserRolesDAO::search(new UserRoles( array (
-                    "user_id" => $this->user_id    
-                    )));
-                
-
+                $this->_user_id = $this->_auth_token->getUserId();         
+              
             }
             else
             {
-
                 // We have an invalid auth token. Dying.            
-                throw new ApiException( $this->error_dispatcher->invalidAuthToken() );
+                throw new ApiException( ApiHttpErrors::invalidAuthToken() );
             }
         }
         else
-        {
-      
+        {      
           // Login is required
-          throw new ApiException( $this->error_dispatcher->invalidAuthToken() );
-        }
-                
-    }
-    
-    protected function ValidateRequest()
-    {
-     
-        // If we didn't get any request, asume everything is OK.
-        if(is_null($this->request)) {
-            Logger::log("We didn't get any request, asume everything is OK");
-            return;
-        }
-        
-        // Validate all data 
-        foreach($this->request as $parameter)
-        {
-
-            if ( !$parameter->validate() )
-            {
-                // In case of missing or validation failed parameters, send a BAD REQUEST 
-                Logger::error( $parameter->getError() );
-                throw new ApiException( $this->error_dispatcher->invalidParameter( $parameter->getError()) );   
-            }
-        }
-    }
+          throw new ApiException( ApiHttpErrors::invalidAuthToken() );
+        }                
+    }        
             
-    protected abstract function GetRequest();    
-    
-    protected abstract function GenerateResponse();        
+    protected abstract function RegisterValidatorsToRequest();        
+    protected abstract function GenerateResponse();            
     
     // This function should be called 
     public function ExecuteApi()
@@ -125,31 +78,32 @@ abstract class ApiHandler
         try
         {   
             // Check if the user needs to be logged in
-            $this->CheckAuthorization();
+            $this->CheckAuthToken();
                                                
             // Process input
-            $this->GetRequest();       
-
-            // Validate input
-            $this->ValidateRequest();
+            $this->RegisterValidatorsToRequest();                               
 
             // Generate output
             $this->GenerateResponse();
 
-            // If the request didn´t fail nor output something, we're OK
-            if(count($this->response) == 0)
+            // If the request didn't fail nor output something, we're OK
+            if(count($this->getResponse()) === 0)
             {
-                $this->response["status"] = "ok";
+                $this->addResponse("status", "ok");
             }
             
-            return $this->response;       
+            return $this->getResponse();       
         }
         catch (ApiException $e)
         {
+            // Log error 
+            Logger::error( $e->getFile() );
+            Logger::error( $e->getArrayMessage() );
+            Logger::error( $e->getTraceAsString() );
+                        
             // Propagate the exception
             throw $e;
-        }
-        
+        }        
     }
 }
 

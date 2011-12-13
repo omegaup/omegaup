@@ -11,19 +11,20 @@ require_once 'Utils.php';
 
 class LoginTest extends PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {        
+        Utils::ConnectToDB();
+    }
     
-    
+    public function tearDown() 
+    {
+        Utils::cleanup();
+    }    
     
     public function testValidLogin()
-    {
-        // Sanity cleanup
-        Utils::cleanup();
-        
-        //Connect to DB
-        Utils::ConnectToDB();
-        
-        $_POST["username"] = Utils::GetContestantUsername();
-        $_POST["password"] = Utils::$contestant->getPassword();
+    {        
+        RequestContext::set("username", Utils::GetContestantUsername());
+        RequestContext::set("password", Utils::$contestant->getPassword());
         
         $loginApi = new Login();        
         try
@@ -32,9 +33,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
         }
         catch( ApiException $e )
         {
-            var_dump($e->getArrayMessage());
-            var_dump($_POST);
-            var_dump($e->getTrace());
+            var_dump($e->getArrayMessage());            
             $this->fail("User should be able to login");
         }
         
@@ -47,14 +46,9 @@ class LoginTest extends PHPUnit_Framework_TestCase
     
     public function testInvalidPassword()
     {
-        // Sanity cleanup
-        Utils::cleanup();
         
-        //Connect to DB
-        Utils::ConnectToDB();
-        
-        $_POST["username"] = Utils::GetContestantUsername();
-        $_POST["password"] = "badpass";
+        RequestContext::set("username", Utils::GetContestantUsername());
+        RequestContext::set("password", "badpass");
         
         $loginApi = new Login();
         
@@ -79,15 +73,9 @@ class LoginTest extends PHPUnit_Framework_TestCase
     
     
     public function testInvalidUser()
-    {
-        // Sanity cleanup
-        Utils::cleanup();
-        
-        //Connect to DB
-        Utils::ConnectToDB();
-        
-        $_POST["username"] = "baduser";
-        $_POST["password"] = "pass";
+    {                
+        RequestContext::set("username", "baduser");
+        RequestContext::set("password", Utils::$contestant->getPassword());
         
         $loginApi = new Login();
         
@@ -113,17 +101,10 @@ class LoginTest extends PHPUnit_Framework_TestCase
     public function testTwoValidLogins()
     {
         
-        // Sanity cleanup
-        Utils::cleanup();
+        RequestContext::set("username", Utils::GetContestantUsername());
+        RequestContext::set("password", Utils::$contestant->getPassword());        
         
-        //Connect to DB
-        Utils::ConnectToDB();
-        
-        $_POST["username"] = Utils::GetContestantUsername();
-        $_POST["password"] = Utils::$contestant->getPassword();
-        
-        $loginApi = new Login();
-        
+        $loginApi = new Login();        
         try
         {        
             $cleanValue = $loginApi->ExecuteApi();
@@ -134,8 +115,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
             
             $this->fail('Unexpected exception thrown.'. $msg["error"] );        
         }
-        
-        
+                
         try
         {        
             $cleanValue = $loginApi->ExecuteApi();
@@ -147,8 +127,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
             $this->fail('Second login failed, it should be bypassed. ' . $msg["error"]);                                
         }
                
-        return;
-        
+        return;        
     }
 }
 

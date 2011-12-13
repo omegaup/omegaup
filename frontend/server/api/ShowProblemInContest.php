@@ -13,59 +13,47 @@
  * */
 
 require_once("ApiHandler.php");
+require_once(SERVER_PATH . '/libs/FileHandler.php');
 
 class ShowProblemInContest extends ApiHandler
 {    
-    protected function GetRequest()
+    protected function RegisterValidatorsToRequest()
     {
-        $this->request = array(
-            "contest_id" => new ApiExposedProperty("contest_id", true, GET, array(
-                new NumericValidator(),                
-                new CustomValidator( 
-                    function ($value)
-                    {
-                        // Check if the contest exists
-                        return ContestsDAO::getByPK($value);
-                    }) 
-            )),
-            "problem_id" => new ApiExposedProperty("problem_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( 
-                    function ($value)
-                    {
-                        // Check if the problem exists
-                        return ProblemsDAO::getByPK($value);
-                    }) 
-            ))                        
-        );
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+            function ($value)
+            {
+                // Check if the contest exists
+                return ContestsDAO::getByPK($value);
+            }, "Contest requested is invalid."))
+        ->validate(RequestContext::get("contest_id"), "contest_id");
+            
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+            function ($value)
+            {
+                // Check if the contest exists
+                return ProblemsDAO::getByPK($value);
+            }, "Problem requested is invalid."))
+        ->validate(RequestContext::get("problem_id"), "problem_id");
                 
-    }
-    
-    protected function ValidateRequest()
-    {
-        
-        // Call parent
-        parent::ValidateRequest();
-    
         // Is the combination contest_id and problem_id valid?        
         if (is_null(
-                ContestProblemsDAO::getByPK($this->request["contest_id"]->getValue(), 
-                        $this->request["problem_id"]->getValue())))
+                ContestProblemsDAO::getByPK(RequestContext::get("contest_id"), 
+                                            RequestContext::get("problem_id"))))
         {
-           throw new ApiException($this->error_dispatcher->notFound());
+           throw new ApiException(ApiHttpErrors::notFound());
         }
-                
-        
+                        
         // If the contest is private, verify that our user is invited                
-        $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());                                        
+        $contest = ContestsDAO::getByPK(RequestContext::get("contest_id"));                                        
         if ($contest->getPublic() == 0)
         {                    
-            if (is_null(ContestsUsersDAO::getByPK($this->user_id, $this->request["contest_id"]->getValue())))
+            if (is_null(ContestsUsersDAO::getByPK($this->_user_id, RequestContext::get("contest_id"))))
             {                
-                throw new ApiException($this->error_dispatcher->forbiddenSite());
+                throw new ApiException(ApiHttpErrors::forbiddenSite());
             }        
         }
-    }
+                
+    }            
     
     protected function GenerateResponse() 
     {
@@ -76,43 +64,39 @@ class ShowProblemInContest extends ApiHandler
         // Get our problem given the problem_id         
         try
         {            
-            $problem = ProblemsDAO::getByPK($this->request["problem_id"]->getValue());            
+            $problem = ProblemsDAO::getByPK(RequestContext::get("problem_id"));            
         }
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
         }        
         
         // Read the file that contains the source
         $source_path = PROBLEMS_PATH . $problem->getSource();
-        if(file_exists($source_path))
-        {            
-            $file_content = file_get_contents($source_path);
-            if( !$file_content )
-            {
-                throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );
-            }            
-        }        
-        else
+        try
         {
-            throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );                    
+            $file_content = FileHandler::ReadFile($source_path);
+        }
+        catch(Exceptio $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );
         }        
         
         // Add the problem the response
-        $this->response = $problem->asFilteredArray($relevant_columns);   
+        $this->addResponseArray($problem->asFilteredArray($relevant_columns));   
         
         // Overwrite source
-        $this->response["source"] = $file_content;
+        $this->addResponse("source", $file_content);        
              
         // Create array of relevant columns
         $relevant_columns = array("run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "ip", "time", "submit_delay");
         
         // Search the relevant runs from the DB
         $keyrun = new Runs( array (
-            "user_id" => $this->user_id,
-            "problem_id" => $this->request["problem_id"]->getValue(),
-            "contest_id" => $this->request["contest_id"]->getValue()
+            "user_id" => $this->_user_id,
+            "problem_id" => RequestContext::get("problem_id"),
+            "contest_id" => RequestContext::get("contest_id")
         ));
         
         // Get all the available runs
@@ -123,7 +107,7 @@ class ShowProblemInContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
         }
         
         // Add each filtered run to an array
@@ -140,22 +124,23 @@ class ShowProblemInContest extends ApiHandler
         try
         {
             $contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-                    $this->user_id, $this->request["contest_id"]->getValue());
+                    $this->_user_id, RequestContext::get("contest_id"));
         }
         catch(Exception $e)
         {
              // Operation failed in the data layer
-             throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
+             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
         }                
                         
         // As last step, register the problem as opened                
-        if (! ContestProblemOpenedDAO::getByPK($this->request["contest_id"]->getValue(), $this->request["problem_id"]->getValue(), $this->user_id ))
+        if (! ContestProblemOpenedDAO::getByPK(
+                RequestContext::get("contest_id"), RequestContext::get("problem_id"), $this->_user_id ))
         {
             //Create temp object
             $keyContestProblemOpened = new ContestProblemOpened( array( 
-                "contest_id" =>   $this->request["contest_id"]->getValue(),
-                "problem_id" =>   $this->request["problem_id"]->getValue(),
-                "user_id" => $this->user_id            
+                "contest_id" => RequestContext::get("contest_id"),
+                "problem_id" => RequestContext::get("problem_id"),
+                "user_id" => $this->_user_id            
             ));
             
             try
@@ -166,15 +151,13 @@ class ShowProblemInContest extends ApiHandler
             }catch (Exception $e)
             {
                 // Operation failed in the data layer
-               throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
             }                        
         }
         
         // Add the procesed runs to the request
-        $this->response["runs"] = $runs_filtered_array;
-        
-    }
-    
+        $this->addResponse("runs",$runs_filtered_array);        
+    }    
 }
 
 ?>

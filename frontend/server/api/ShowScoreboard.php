@@ -18,35 +18,29 @@ class ShowScoreboard extends ApiHandler
 {
     private $scoreboardData;
    
-    protected function GetRequest()
+    protected function RegisterValidatorsToRequest()
     {
-        $this->request = array(
-            "contest_id" => new ApiExposedProperty("contest_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( 
-                    function ($value)
-                    {
-                        // Check if the contest exists
-                        return ContestsDAO::getByPK($value);
-                    }) 
-            ))                                 
-        );
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+            function ($value)
+            {
+                // Check if the contest exists
+                return ContestsDAO::getByPK($value);
+            }, "Contest is invalid."))
+        ->validate(RequestContext::get("contest_id"), "contest_id");
                 
     } 
     
     protected function GenerateResponse() 
     {
         // @todo validar si el concursante puede ver el contest
-        $myScoreboard = new Scoreboard($this->request["contest_id"]->getValue());
-         
+        $myScoreboard = new Scoreboard(RequestContext::get("contest_id"));
+                 
         // Get the scoreboard        
-        $this->scoreboardData = $myScoreboard->generate();
+        $this->scoreboardData = $myScoreboard->generate();        
         
         // Push scoreboard data in response
         $this->response = $this->scoreboardData;
-    }
-    
-    
+    }        
 }
 
 ?>

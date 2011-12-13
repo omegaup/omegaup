@@ -9,22 +9,21 @@ require_once("Validator.php");
 class EnumValidator extends Validator
 {
     
-    private $enum;
+    private $_enum;
     
     // Save the reference
-    public function EnumValidator($enum_array )
+    public function EnumValidator(array $enum_array)
     {        
-        $this->enum = $enum_array;
-        Validator::Validator();
+        $this->_enum = $enum_array;        
     }
 
     
     public function validate($value)
     {
-        // Validate that string is inside the options
-        foreach($this->enum as $option)
+        // Validate that value is inside the options
+        foreach($this->_enum as $option)
         {
-            if ( $value === $option)
+            if ($value === $option)
             {                
                 // Validation passed
                 return true;
@@ -34,8 +33,6 @@ class EnumValidator extends Validator
         // Validation failed
         $this->setError("Value not within valid set of options.");
         return false;
-        
-        
     }
 }
 
