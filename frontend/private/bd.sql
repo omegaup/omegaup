@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `director_id` int(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso',
   `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algÃºn concurso',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
-  `token` varchar(20) NOT NULL COMMENT 'AlmacenarÃ¡ el token necesario para acceder al concurso',
+  `alias` varchar(20) NOT NULL COMMENT 'AlmacenarÃ¡ el token necesario para acceder al concurso',
   `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard serÃ¡ visible',
   `points_decay_factor` double NOT NULL DEFAULT '0' COMMENT 'El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7',
   `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirÃ¡ puntaje parcial para problemas no resueltos en todos los casos',
@@ -129,6 +129,8 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursos que se llevan a cabo en el juez.' AUTO_INCREMENT=1 ;
+
+CREATE UNIQUE INDEX contests_alias ON Contests(`alias`);
 
 -- --------------------------------------------------------
 

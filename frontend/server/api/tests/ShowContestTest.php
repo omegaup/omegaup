@@ -35,8 +35,9 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         // Login as contestant
         $auth_token = Utils::LoginAsContestant();
         
-        // Set contest
-        RequestContext::set("contest_id", $contest_id);        
+        // Set context
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -50,9 +51,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
             var_dump($e->getArrayMessage());
             $this->fail("Unexpected exception");
         }
-        
-        // Get contest from DB to validate data       
-        $contest = ContestsDAO::getByPK($contest_id);
+
         
         // Assert that we found our contest       
         $this->assertNotNull($contest);
@@ -63,7 +62,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($contest->getStartTime(), $return_array["start_time"]);
         $this->assertEquals($contest->getFinishTime(), $return_array["finish_time"]);
         $this->assertEquals($contest->getWindowLength(), $return_array["window_length"]);        
-        $this->assertEquals($contest->getToken(), $return_array["token"]);
+        $this->assertEquals($contest->getAlias(), $return_array["alias"]);
         $this->assertEquals($contest->getPointsDecayFactor(), $return_array["points_decay_factor"]);
         $this->assertEquals($contest->getPartialScore(), $return_array["partial_score"]);
         $this->assertEquals($contest->getSubmissionsGap(), $return_array["submissions_gap"]);
@@ -119,7 +118,8 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestDirector();
         
         // Set contest
-        RequestContext::set("contest_id", $contest_id);
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -146,7 +146,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($contest->getStartTime(), $return_array["start_time"]);
         $this->assertEquals($contest->getFinishTime(), $return_array["finish_time"]);
         $this->assertEquals($contest->getWindowLength(), $return_array["window_length"]);        
-        $this->assertEquals($contest->getToken(), $return_array["token"]);
+        $this->assertEquals($contest->getAlias(), $return_array["alias"]);
         $this->assertEquals($contest->getPointsDecayFactor(), $return_array["points_decay_factor"]);
         $this->assertEquals($contest->getPartialScore(), $return_array["partial_score"]);
         $this->assertEquals($contest->getSubmissionsGap(), $return_array["submissions_gap"]);
@@ -203,7 +203,8 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set contest
-        RequestContext::set("contest_id", $contest_id);
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -242,8 +243,8 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         // Login as contestant
         $auth_token = Utils::LoginAsContestant();
         
-        // Set context
-        RequestContext::set("contest_id", $contest_id);
+        // Set context        
+        RequestContext::set("alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -299,8 +300,8 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         // Login as contestant
         $auth_token = Utils::LoginAsContestDirector();
         
-        // Set context
-        RequestContext::set("contest_id", $contest_id);
+        // Set context        
+        RequestContext::set("alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API

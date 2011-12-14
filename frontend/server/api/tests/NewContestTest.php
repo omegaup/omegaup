@@ -32,7 +32,7 @@ class NewContestTest extends PHPUnit_Framework_TestCase
         RequestContext::set("finish_time", Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 60*60));
         RequestContext::set("window_length", null);
         RequestContext::set("public", $public);
-        RequestContext::set("token", "loltoken");
+        RequestContext::set("alias", substr($title, 0, 20));
         RequestContext::set("points_decay_factor", ".02");
         RequestContext::set("partial_score", "0");
         RequestContext::set("submissions_gap", "10");
@@ -104,7 +104,7 @@ class NewContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(RequestContext::get("finish_time"), $contest->getFinishTime());
         $this->assertEquals(RequestContext::get("window_length"), $contest->getWindowLength());
         $this->assertEquals(RequestContext::get("public"), $contest->getPublic());
-        $this->assertEquals(RequestContext::get("token"), $contest->getToken());
+        $this->assertEquals(RequestContext::get("alias"), $contest->getAlias());
         $this->assertEquals(RequestContext::get("points_decay_factor"), $contest->getPointsDecayFactor());
         $this->assertEquals(RequestContext::get("partial_score"), $contest->getPartialScore());
         $this->assertEquals(RequestContext::get("submissions_gap"), $contest->getSubmissionsGap());
@@ -127,7 +127,7 @@ class NewContestTest extends PHPUnit_Framework_TestCase
             "start_time",
             "finish_time",            
             "public",
-            "token",
+            "alias",
             "points_decay_factor",
             "partial_score",
             "submissions_gap",
@@ -162,4 +162,6 @@ class NewContestTest extends PHPUnit_Framework_TestCase
             $this->fail("Exception was expected. Parameter: ". $key);            
         }        
     }            
+    
+    //@todo test duplicate key, I verified it manually only (Joe)
 }

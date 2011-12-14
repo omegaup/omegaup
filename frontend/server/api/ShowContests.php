@@ -24,7 +24,7 @@ class ShowContests extends ApiHandler {
     protected function GenerateResponse() {
 
         // Create array of relevant columns
-        $relevant_columns = array("contest_id", "title", "description", "start_time", "finish_time", "public", "token", "director_id");
+        $relevant_columns = array("contest_id", "title", "description", "start_time", "finish_time", "public", "alias", "director_id");
 
         // Get all contests using only relevan columns
         $contests = ContestsDAO::getAll(NULL, NULL, 'contest_id', "DESC", $relevant_columns);
