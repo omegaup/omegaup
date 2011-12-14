@@ -29,7 +29,8 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     public function openContestBeforeSubmit($contest_id)
     {
         // Set context
-        RequestContext::set("contest_id", $contest_id);        
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("alias", $contest->getAlias());                
         
         // Execute API
         $showContest = new ShowContest();

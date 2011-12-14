@@ -76,6 +76,26 @@ abstract class ContestsDAOBase extends DAO
 			self::pushRecord( $foo,  $contest_id );
 			return $foo;
 	}
+        
+        public static final function getByAlias($alias)
+	{
+		if(self::recordExists($alias)){
+			return self::getRecord($alias);
+		}
+		$sql = "SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;";
+		$params = array(  $alias );
+                
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);
+		if(count($rs)==0)
+                {
+                    return NULL;
+                }
+                
+                $contest = new Contests( $rs );
+                self::pushRecord( $contest,  $alias );
+                return $contest;
+	}
 
 
 	/**
@@ -194,9 +214,9 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $Contests->getPublic() );
 		}
 
-		if( $Contests->getToken() != NULL){
-			$sql .= " token = ? AND";
-			array_push( $val, $Contests->getToken() );
+		if( $Contests->getAlias() != NULL){
+			$sql .= " alias = ? AND";
+			array_push( $val, $Contests->getAlias() );
 		}
 
 		if( $Contests->getScoreboard() != NULL){
@@ -265,7 +285,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update( $Contests )
 	{
-		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, token = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ?, points_decay_factor = ?, penalty_calc_policy = ? WHERE  contest_id = ?;";
+		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, alias = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ?, points_decay_factor = ?, penalty_calc_policy = ? WHERE  contest_id = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -275,7 +295,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getDirectorId(), 
 			$Contests->getRerunId(), 
 			$Contests->getPublic(), 
-			$Contests->getToken(), 
+			$Contests->getAlias(), 
 			$Contests->getScoreboard(), 
 			$Contests->getPartialScore(), 
 			$Contests->getSubmissionsGap(), 
@@ -309,7 +329,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function create( &$Contests )
 	{
-		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, token, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start, points_decay_factor, penalty_calc_policy) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, alias, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start, points_decay_factor, penalty_calc_policy) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->getContestId(), 
 			$Contests->getTitle(), 
@@ -320,7 +340,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getDirectorId(), 
 			$Contests->getRerunId(), 
 			$Contests->getPublic(), 
-			$Contests->getToken(), 
+			$Contests->getAlias(), 
 			$Contests->getScoreboard(), 
 			$Contests->getPartialScore(), 
 			$Contests->getSubmissionsGap(), 
@@ -476,12 +496,12 @@ abstract class ContestsDAOBase extends DAO
 			
 		}
 
-		if( (($a = $ContestsA->getToken()) != NULL) & ( ($b = $ContestsB->getToken()) != NULL) ){
-				$sql .= " token >= ? AND token <= ? AND";
+		if( (($a = $ContestsA->getAlias()) != NULL) & ( ($b = $ContestsB->getAlias()) != NULL) ){
+				$sql .= " alias >= ? AND alias <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( $a || $b ){
-			$sql .= " token = ? AND"; 
+			$sql .= " alias = ? AND"; 
 			$a = $a == NULL ? $b : $a;
 			array_push( $val, $a);
 			

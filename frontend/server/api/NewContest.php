@@ -51,8 +51,8 @@ class NewContest extends ApiHandler
                 "public");
         
         ValidatorFactory::stringNotEmptyValidator()->validate(
-                RequestContext::get("token"),
-                "token");
+                RequestContext::get("alias"),
+                "alias");
         
         ValidatorFactory::numericRangeValidator(0, 100)->validate(
                 RequestContext::get("scoreboard"), 
@@ -120,7 +120,7 @@ class NewContest extends ApiHandler
         $contest->setDirectorId($this->_user_id);
         $contest->setRerunId(0);
         $contest->setPublic(RequestContext::get("public"));
-        $contest->setToken(RequestContext::get("token"));
+        $contest->setAlias(RequestContext::get("alias"));
         $contest->setScoreboard(RequestContext::get("scoreboard"));
         $contest->setPointsDecayFactor(RequestContext::get("points_decay_factor"));
         $contest->setPartialScore(RequestContext::get("partial_score"));
@@ -165,9 +165,18 @@ class NewContest extends ApiHandler
 
         }catch(Exception $e)
         {   
-            // Operation failed in the data layer
+            // Operation failed in the data layer, rollback transaction 
             ContestsDAO::transRollback();
-            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+            
+            // Alias may be duplicated, 1062 error indicates that
+            if(strpos($e->getMessage(), "1062") !== FALSE)
+            {
+                throw new ApiException( ApiHttpErrors::duplicatedEntryInDatabase("alias"));    
+            }
+            else
+            {
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+            }
         }
         
     }

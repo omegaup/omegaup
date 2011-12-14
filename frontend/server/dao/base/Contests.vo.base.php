@@ -49,8 +49,8 @@ class Contests extends VO
 			if( isset($data['public']) ){
 				$this->public = $data['public'];
 			}
-			if( isset($data['token']) ){
-				$this->token = $data['token'];
+			if( isset($data['alias']) ){
+				$this->alias = $data['alias'];
 			}
 			if( isset($data['scoreboard']) ){
 				$this->scoreboard = $data['scoreboard'];
@@ -98,7 +98,7 @@ class Contests extends VO
 			"director_id" => $this->director_id,
 			"rerun_id" => $this->rerun_id,
 			"public" => $this->public,
-			"token" => $this->token,
+			"alias" => $this->alias,
 			"scoreboard" => $this->scoreboard,
 			"partial_score" => $this->partial_score,
 			"submissions_gap" => $this->submissions_gap,
@@ -199,7 +199,7 @@ class Contests extends VO
 	  * @access protected
 	  * @var varchar(20)
 	  */
-	protected $token;
+	protected $alias;
 
 	/**
 	  * scoreboard
@@ -486,9 +486,9 @@ class Contests extends VO
 	  * Get the <i>token</i> property for this object. Donde <i>token</i> es AlmacenarÃ¡ el token necesario para acceder al concurso
 	  * @return varchar(20)
 	  */
-	final public function getToken()
+	final public function getAlias()
 	{
-		return $this->token;
+		return $this->alias;
 	}
 
 	/**
@@ -499,9 +499,9 @@ class Contests extends VO
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param varchar(20)
 	  */
-	final public function setToken( $token )
+	final public function setAlias( $alias )
 	{
-		$this->token = $token;
+		$this->alias = $alias;
 	}
 
 	/**

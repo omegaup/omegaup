@@ -61,7 +61,7 @@ class ApiHttpErrors
 
         if ($message === NULL)
         {
-            $message = "Oops. Ive encoutered an unspecified error. Please try again";
+            $message = "Oops. Ive encoutered an internal error. Please try again";
         }
         
         return array("status" => "error",
@@ -76,7 +76,7 @@ class ApiHttpErrors
        
         if ($message === NULL)
         {
-            $message = "Whops. Ive encoutered an internal error. Please try again.";
+            $message = "Oops. Ive encoutered an internal error. Please try again.";
         }
         
         return array("status" => "error",
@@ -84,6 +84,18 @@ class ApiHttpErrors
                      "errorcode" => 105,
                      "header" => "HTTP/1.1 500 INTERNAL SERVER ERROR");
     } 
+    
+    // Sets the HTTP header and returns an array with error info
+    public static function duplicatedEntryInDatabase($key)
+    {       
+        
+        $message = $key . " value already exists. Please try a different value.";        
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 106,
+                     "header" => "HTTP/1.1 500 INTERNAL SERVER ERROR");
+    }
     
     // Sets the HTTP header and returns an array with error info
     public static function invalidCredentials($message = NULL)

@@ -18,19 +18,19 @@ class ShowContest extends ApiHandler
     
     protected function RegisterValidatorsToRequest()
     {
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
                 function ($value)
                 {
                     // Check if the contest exists
-                    return ContestsDAO::getByPK($value);
+                    return ContestsDAO::getByAlias($value);
                 }, "Contest is invalid."))
-            ->validate(RequestContext::get("contest_id"), "contest_id");
+            ->validate(RequestContext::get("alias"), "alias");
         
         // If the contest is private, verify that our user is invited                
-        $contest = ContestsDAO::getByPK(RequestContext::get("contest_id"));                                
+        $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));                                
         if ($contest->getPublic() === '0')            
         {                           
-            if (is_null(ContestsUsersDAO::getByPK($this->_user_id, RequestContext::get("contest_id"))))
+            if (is_null(ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId())))
             {
                throw new ApiException(ApiHttpErrors::forbiddenSite());
             }        
@@ -41,12 +41,12 @@ class ShowContest extends ApiHandler
     protected function GenerateResponse() 
     {
        // Create array of relevant columns
-        $relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "token", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy");
+        $relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy");
         
         // Get our contest given the id
         try
         {            
-            $contest = ContestsDAO::getByPK(RequestContext::get("contest_id"));
+            $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));
         }
         catch(Exception $e)
         {
@@ -59,7 +59,7 @@ class ShowContest extends ApiHandler
         
         // Get problems of the contest
         $key_problemsInContest = new ContestProblems(
-            array("contest_id" => RequestContext::get("contest_id")));        
+            array("contest_id" => $contest->getContestId()));        
         try
         {
             $problemsInContest = ContestProblemsDAO::search($key_problemsInContest);
@@ -102,7 +102,7 @@ class ShowContest extends ApiHandler
         try
         {
             $contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-                    $this->_user_id, RequestContext::get("contest_id"));
+                    $this->_user_id, $contest->getContestId());
         }
         catch(Exception $e)
         {
@@ -114,8 +114,7 @@ class ShowContest extends ApiHandler
         $this->addResponse("problems", $problemsResponseArray);
                 
         // @TODO Add mini ranking here
-    }
-    
+    }    
 }
 
 ?>
