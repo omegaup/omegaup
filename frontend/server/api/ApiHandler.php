@@ -106,7 +106,21 @@ abstract class ApiHandler
                         
             // Propagate the exception
             throw $e;
-        }        
+        }
+        catch(Exception $e)
+        {
+            // Something VERY bad happened, log error
+            Logger::error( "FATAL ERROR: Unwrapped exception thrown, wrapping: " );
+            Logger::error( $this->_user_id );
+            Logger::error( $_REQUEST );
+            Logger::error( $e->getMessage() );
+            Logger::error( $e->getFile() );
+            Logger::error( $e->getCode() );
+            Logger::error( $e->getTraceAsString() );
+            Logger::error( $e->getPrevious() );
+            
+            throw new ApiException( ApiHttpErrors::unwrappedException() );
+        }
     }
 }
 

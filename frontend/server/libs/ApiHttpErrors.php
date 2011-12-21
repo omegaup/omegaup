@@ -61,7 +61,7 @@ class ApiHttpErrors
 
         if ($message === NULL)
         {
-            $message = "Oops. Ive encoutered an internal error. Please try again";
+            $message = "Oops. I've encoutered an internal error. Please try again.";
         }
         
         return array("status" => "error",
@@ -104,7 +104,7 @@ class ApiHttpErrors
 
         if ($message === NULL)
         {
-            $message = "Username or password is wrong. Please check your credentials";
+            $message = "Username or password is wrong. Please check your credentials.";
         }
         
         return array("status" => "error",
@@ -158,7 +158,22 @@ class ApiHttpErrors
                      "error"	 => $message,
                      "errorcode" => 107,
                      "header" => 'HTTP/1.1 404 NOT FOUND');
-    }    
+    }   
+    
+    public static function unwrappedException($message = NULL)
+    {
+        
+
+        if ($message === NULL)
+        {
+            $message = "Oops. I've encoutered an internal error. Please try again.";
+        }
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 108,
+                     "header" => 'HTTP/1.1 400 BAD REQUEST' );
+    } 
 }
 
 ?>
