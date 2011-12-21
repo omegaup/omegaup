@@ -6,34 +6,6 @@
 	 * 
 	 * */
 
-	
-	
-	
-	
-
-	
-	
-	/*
-	 * Load configuration file, and parse the contents needed to parse.
-	 * @todo fix this so the config file can be loaded no matter
-	 * where the bootstrap file is loaded from
-	 * */
-	/*
-	Deprecating since bootstrap is called from diferent
-	plances, and looking for config is going to depend.
-   if( !file_exists("../server/config.php") ) {
-    header("Location: ./install/");
-    exit();
-   }
-   elseif( file_exists("install") ) {
-    /// @todo Demand that install directory be deleted
-   }
-	*/
-
-	/**
-	 *  QUICK FIX
-	 * */
-
    // Loads config
    define('SERVER_PATH', dirname(__DIR__));     
    define('RUNS_PATH', SERVER_PATH ."/../runs/");
@@ -61,9 +33,7 @@
 
 
    require_once('dao/model.inc.php');
-	/**
-	 *  QUICK FIX
-	 * */	  
+
 	
 	
 	/**
@@ -76,11 +46,6 @@
 		require_once('adodb5/adodb.inc.php');
 		require_once('adodb5/adodb-exceptions.inc.php');
 		
-
-				/******  *********** WHAT IS THITS ?  ***********  ***********  *****
-                */     if(file_exists('dao/model.inc.php')) echo "exists!";        /*
-                ************  ***********  ***********  ***********  *********** ****/ 
-
 		$conn = null;
 
 		try{
