@@ -18,13 +18,13 @@ class ShowClarificationsInProblem extends ApiHandler
     
     protected function RegisterValidatorsToRequest()
     {
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
             function ($value)
             {
                 // Check if the contest exists
-                return ProblemsDAO::getByPK($value);
-            }, "Problem is invalid."))
-        ->validate(RequestContext::get("problem_id"), "problem_id");    
+                return ProblemsDAO::getByAlias($value);
+            }, "Problem requested is invalid."))
+        ->validate(RequestContext::get("problem_alias"), "problem_alias");        
                 
     }   
    
@@ -35,16 +35,17 @@ class ShowClarificationsInProblem extends ApiHandler
         $relevant_columns = array("message", "answer", "time");
         
         //Get all public clarifications
+        $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
         $public_clarification_mask = new Clarifications ( array (
            "public" => '1',
-           "problem_id" => RequestContext::get("problem_id")
+           "problem_id" => $problem->getProblemId()
         ));
         
         try
         {
             // Get contest to get Director Id
             $contest_problem = ContestProblemsDAO::search(new ContestProblems(array(
-                "problem_id" => RequestContext::get("problem_id")
+                "problem_id" => $problem->getProblemId()
             )));
             $contest_problem = $contest_problem[0];        
             $contest = ContestsDAO::getByPK($contest_problem->getContestId());        
@@ -60,7 +61,7 @@ class ShowClarificationsInProblem extends ApiHandler
             // Get all private clarifications 
             $private_clarification_mask = new Clarifications ( array (
                "public" => '0',
-               "problem_id" => RequestContext::get("problem_id")
+               "problem_id" => $problem->getProblemId()
             )); 
         }        
         else
@@ -68,7 +69,7 @@ class ShowClarificationsInProblem extends ApiHandler
             // Get private clarifications of the user 
             $private_clarification_mask = new Clarifications ( array (
                "public" => '0',
-               "problem_id" => RequestContext::get("problem_id"),
+               "problem_id" => $problem->getProblemId(),
                "author_id" => $this->_user_id
             ));
         }       

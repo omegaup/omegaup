@@ -48,7 +48,8 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set the context        
-        RequestContext::set("problem_id", $problem_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());
                 
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -109,13 +110,14 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         ClarificationsDAO::save($clarification_2);
         
         // Get problem id
-        $problem_id = $clarification_2->getProblemId();        
+        $problem_id = $clarification_2->getProblemId();                
                 
         // Login as contestant
         $auth_token = Utils::LoginAsContestant2();
         
         // Set the context        
-        RequestContext::set("problem_id", $problem_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());
                 
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -173,7 +175,8 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set the context        
-        RequestContext::set("problem_id", $problem_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());
                 
         // Execute API
         Utils::SetAuthToken($auth_token);
@@ -242,7 +245,8 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestDirector();
         
         // Set the context        
-        RequestContext::set("problem_id", $problem_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());
                 
         // Execute API
         Utils::SetAuthToken($auth_token);
