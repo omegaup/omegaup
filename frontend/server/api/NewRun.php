@@ -20,21 +20,21 @@ class NewRun extends ApiHandler
     protected function RegisterValidatorsToRequest()
     {    
         
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
-            function ($value)
-            {
-                // Check if the contest exists
-                return ProblemsDAO::getByPK($value);
-            }, "Problem requested is invalid."))
-        ->validate(RequestContext::get("problem_id"), "problem_id");
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ContestsDAO::getByAlias($value);
+                }, "Contest is invalid."))
+            ->validate(RequestContext::get("contest_alias"), "contest_alias");
             
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
             function ($value)
             {
                 // Check if the contest exists
-                return ContestsDAO::getByPK($value);
-            }, "Contest requested is invalid."))
-        ->validate(RequestContext::get("contest_id"), "contest_id");
+                return ProblemsDAO::getByAlias($value);
+            }, "Problem requested is invalid."))
+        ->validate(RequestContext::get("problem_alias"), "problem_alias");                  
             
         ValidatorFactory::enumValidator(array ('c','cpp','java','py','rb','pl','cs','p'))->validate(
             RequestContext::get("language"), "language");
@@ -43,10 +43,13 @@ class NewRun extends ApiHandler
         
         try
         {
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
+            $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
+            
             // Validate that the combination contest_id problem_id is valid            
             if (!ContestProblemsDAO::getByPK(
-                    RequestContext::get("contest_id"),
-                    RequestContext::get("problem_id")                    
+                    $contest->getContestId(),
+                    $problem->getProblemId()                
                 ))
             {
                throw new ApiException(ApiHttpErrors::invalidParameter("problem_id and contest_id combination is invalid."));
@@ -54,13 +57,13 @@ class NewRun extends ApiHandler
             
             // Before submit something, contestant had to open the problem/contest
             if(!ContestsUsersDAO::getByPK($this->_user_id, 
-                    RequestContext::get("contest_id")))
+                    $contest->getContestId()))
             {
                 throw new ApiException(ApiHttpErrors::forbiddenSite());
             }
                                     
             // Validate that the run is inside contest
-            $contest = ContestsDAO::getByPK(RequestContext::get("contest_id"));
+            $contest = ContestsDAO::getByPK($contest->getContestId());
             if( !$contest->isInsideContest($this->_user_id))
             {                
                 throw new ApiException(ApiHttpErrors::forbiddenSite());
@@ -70,7 +73,7 @@ class NewRun extends ApiHandler
             if ( $contest->getPublic() == 0 
                 && is_null(ContestsUsersDAO::getByPK(
                         $this->_user_id, 
-                        RequestContext::get("contest_id")))
+                        $contest->getContestId()))
                )
             {
                throw new ApiException(ApiHttpErrors::forbiddenSite());
@@ -78,8 +81,8 @@ class NewRun extends ApiHandler
 
             // Validate if the user is allowed to submit given the submissions_gap 
             if (!RunsDAO::IsRunInsideSubmissionGap(
-                    RequestContext::get("contest_id"), 
-                    RequestContext::get("problem_id"), 
+                    $contest->getContestId(), 
+                    $problem->getProblemId(), 
                     $this->_user_id)
                )
             {                
@@ -107,12 +110,22 @@ class NewRun extends ApiHandler
     }
     
     protected function GenerateResponse() 
-    {                                        
+    {          
+        try
+        {
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
+            $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation());
+        }
+        
         // Populate new run object
         $run = new Runs(array(
             "user_id" => $this->_user_id,
-            "problem_id" => RequestContext::get("problem_id"),
-            "contest_id" => RequestContext::get("contest_id"),
+            "problem_id" => $problem->getProblemId(),
+            "contest_id" => $contest->getContestId(),
             "language" => RequestContext::get("language"),
             "source" => RequestContext::get("source"),
             "status" => "new",

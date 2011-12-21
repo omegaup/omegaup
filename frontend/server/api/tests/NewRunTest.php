@@ -50,8 +50,11 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     {
         $this->openContestBeforeSubmit($contest_id);
         
-        RequestContext::set("contest_id", $contest_id);
-        RequestContext::set("problem_id", $problem_id);        
+        $contest = ContestsDAO::getByPK($contest_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        
+        RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("problem_alias", $problem->getAlias());        
         $languages = array ('c','cpp','java','py','rb','pl','cs','p');
         RequestContext::set("language", $languages[array_rand($languages, 1)]);
         RequestContext::set("source", "#include <stdio.h> int main() { printf(\"100\"); }");
@@ -396,7 +399,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Set valid context for Run 
         Utils::SetAuthToken($auth_token);
-        $this->setValidContext($contest_id, $problem_id);
+        $this->setValidContext($contest_id, $problem_id[0]);
         
         $newRun = new NewRun();        
         
@@ -404,7 +407,8 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         for($i = 0; $i < 3; $i++)
         {
             // Try different problem id
-            RequestContext::set("problem_id", $problem_id[$i]);        
+            $problem = ProblemsDAO::getByPK($problem_id[$i]);
+            RequestContext::set("problem_alias", $problem->getAlias());        
             
             try
             {
@@ -484,8 +488,8 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         $needed_keys = array(
-            "problem_id",
-            "contest_id",
+            "problem_alias",
+            "contest_alias",
             "language",
             "source"                        
         );
