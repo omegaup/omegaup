@@ -121,7 +121,9 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("123.123.123.123", $run->getIp());
         $this->assertEquals(0, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
+                
         
+        return $run->getRunId();
     }
     
     public function testRunWhenContestExpired()

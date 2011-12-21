@@ -411,6 +411,8 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   KEY `contest_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.' AUTO_INCREMENT=1 ;
 
+
+CREATE UNIQUE INDEX runs_alias ON Runs(`guid`);
 -- --------------------------------------------------------
 
 --
