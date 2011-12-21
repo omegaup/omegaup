@@ -57,13 +57,13 @@ abstract class ApiHandler
               
             }
             else
-            {
+            {                
                 // We have an invalid auth token. Dying.            
                 throw new ApiException( ApiHttpErrors::invalidAuthToken() );
             }
         }
         else
-        {      
+        {                
           // Login is required
           throw new ApiException( ApiHttpErrors::invalidAuthToken() );
         }                
