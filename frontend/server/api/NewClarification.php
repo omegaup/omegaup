@@ -40,8 +40,15 @@ class NewClarification extends ApiHandler
                 RequestContext::get("message"),
                 "message");
         
-        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
-        $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
+        try
+        {
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
+            $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation());
+        }
         
         // Is the combination contest_id and problem_id valid?        
         if (is_null(
@@ -57,8 +64,16 @@ class NewClarification extends ApiHandler
     {
         
         // Populate a new Clarification object
-        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
-        $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
+        try
+        {
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
+            $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation());
+        }
+        
         $clarification = new Clarifications( array(
             "author_id" => $this->_user_id,
             "contest_id" => $contest->getContestId(),
