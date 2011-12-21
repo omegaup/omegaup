@@ -10,7 +10,7 @@ class Logger
 	{
 
         if(!file_exists(OMEGAUP_LOG_ACCESS_FILE)){
-            die("POS: Unable to open logfile:" .OMEGAUP_LOG_ACCESS_FILE );
+			throw new Exception ("Unable to open logfile at " .OMEGAUP_LOG_ACCESS_FILE );
         }
 
 		// $file: Name of file to open
@@ -156,11 +156,11 @@ class Logger
             return;
         
         if(!file_exists(OMEGAUP_LOG_ACCESS_FILE)){
-            die("Unable to open logfile:" .OMEGAUP_LOG_ACCESS_FILE );
+			return;
         }
 
         if(!is_writable(OMEGAUP_LOG_ACCESS_FILE)){
-            die("Unable to write to logfile:" .OMEGAUP_LOG_ACCESS_FILE );
+			return;
         }
 
 
