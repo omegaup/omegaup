@@ -57,7 +57,7 @@ class NewProblemInContest extends ApiHandler
                 RequestContext::get("title"),
                 "title");
                 
-        ValidatorFactory::stringNotEmptyValidator()->validate(
+        ValidatorFactory::stringOfMaxLengthValidator(32)->validate(
                 RequestContext::get("alias"),
                 "alias");
         

@@ -41,8 +41,9 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         
         // Set Context
         $contest = ContestsDAO::getByPK($contest_id);
-        RequestContext::set("problem_id", $problem_id);        
-        RequestContext::set("alias", $contest->getAlias());
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
@@ -105,8 +106,9 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         
         // Set Context
         $contest = ContestsDAO::getByPK($contest_id);
-        RequestContext::set("problem_id", $problem_id);        
-        RequestContext::set("alias", $contest->getAlias());
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
@@ -123,8 +125,8 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         }
         
         // Cleanup and reset context                
-        RequestContext::set("problem_id", $problem_id);        
-        RequestContext::set("alias", $contest->getAlias());
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
         
         // Sleep 1 sec to differentiate open times
         sleep(1);        
@@ -185,8 +187,9 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         
         // Set Context
         $contest = ContestsDAO::getByPK($contest_id);
-        RequestContext::set("problem_id", $problem_id);        
-        RequestContext::set("alias", $contest->getAlias());
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
         
         // Execute API
         $showProblemInContest = new ShowProblemInContest();
@@ -227,8 +230,9 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         
         // Set Context
         $contest = ContestsDAO::getByPK($contest_id);
-        RequestContext::set("problem_id", $problem_id);        
-        RequestContext::set("alias", $contest->getAlias());
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();

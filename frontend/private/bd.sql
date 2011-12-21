@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `public` tinyint(1) NOT NULL DEFAULT '1',
   `author_id` int(11) NOT NULL,
   `title` varchar(256) NOT NULL,
-  `alias` varchar(10) DEFAULT NULL,
+  `alias` varchar(32) NOT NULL,
   `validator` enum('remote','literal','token','token-caseless','token-numeric') NOT NULL DEFAULT 'token-numeric',
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
@@ -309,6 +309,8 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   PRIMARY KEY (`problem_id`),
   KEY `author_id` (`author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.' AUTO_INCREMENT=1 ;
+
+CREATE UNIQUE INDEX problems_alias ON Problems(`alias`);
 
 -- --------------------------------------------------------
 
