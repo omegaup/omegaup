@@ -18,7 +18,7 @@ class StringLengthValidator extends Validator
     public function validate($value)
     {
         // Validate data is string 
-        if(!(is_string($value) && strlen($value) < $this->_length))            
+        if(!(is_string($value) && strlen($value) <= $this->_length))            
         {            
             $this->setError("Value is not a string or is larger than allowed. (".$this->_length.")");
             return false;
