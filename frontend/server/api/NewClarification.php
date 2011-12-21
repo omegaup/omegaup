@@ -20,31 +20,33 @@ class NewClarification extends ApiHandler
     protected function RegisterValidatorsToRequest()
     {    
         
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
                 function ($value)
                 {
                     // Check if the contest exists
-                    return ContestsDAO::getByPK($value);
-                }, "Contest requested is invalid."))
-            ->validate(RequestContext::get("contest_id"), "contest_id");
-                
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
-                function ($value)
-                {
-                    // Check if the contest exists
-                    return ProblemsDAO::getByPK($value);
-                }, "Problem requested is invalid."))
-            ->validate(RequestContext::get("problem_id"), "problem_id");
+                    return ContestsDAO::getByAlias($value);
+                }, "Contest is invalid."))
+            ->validate(RequestContext::get("contest_alias"), "contest_alias");
+            
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+            function ($value)
+            {
+                // Check if the contest exists
+                return ProblemsDAO::getByAlias($value);
+            }, "Problem requested is invalid."))
+        ->validate(RequestContext::get("problem_alias"), "problem_alias");                  
                 
         ValidatorFactory::stringNotEmptyValidator()->validate(
                 RequestContext::get("message"),
                 "message");
         
+        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
+        $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
         
         // Is the combination contest_id and problem_id valid?        
         if (is_null(
-                ContestProblemsDAO::getByPK(RequestContext::get("contest_id"), 
-                                            RequestContext::get("problem_id"))))
+                ContestProblemsDAO::getByPK($contest->getContestId(), 
+                                            $problem->getProblemId())))
         {
            throw new ApiException(ApiHttpErrors::notFound());
         }
@@ -55,10 +57,12 @@ class NewClarification extends ApiHandler
     {
         
         // Populate a new Clarification object
+        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
+        $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
         $clarification = new Clarifications( array(
             "author_id" => $this->_user_id,
-            "contest_id" => RequestContext::get("contest_id"),
-            "problem_id" => RequestContext::get("problem_id"),
+            "contest_id" => $contest->getContestId(),
+            "problem_id" => $problem->getProblemId(),
             "message" => RequestContext::get("message"),
             "public" => '0'
         ));
