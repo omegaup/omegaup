@@ -25,21 +25,24 @@ class ShowProblemInContest extends ApiHandler
                     // Check if the contest exists
                     return ContestsDAO::getByAlias($value);
                 }, "Contest is invalid."))
-            ->validate(RequestContext::get("alias"), "alias");
+            ->validate(RequestContext::get("contest_alias"), "contest_alias");
             
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
             function ($value)
             {
                 // Check if the contest exists
-                return ProblemsDAO::getByPK($value);
+                return ProblemsDAO::getByAlias($value);
             }, "Problem requested is invalid."))
-        ->validate(RequestContext::get("problem_id"), "problem_id");
-                
+        ->validate(RequestContext::get("problem_alias"), "problem_alias");
+         
+            
+            
         // Is the combination contest_id and problem_id valid?        
-        $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));                                        
+        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
+        $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
         if (is_null(
                 ContestProblemsDAO::getByPK($contest->getContestId(), 
-                                            RequestContext::get("problem_id"))))
+                                            $problem->getProblemId())))
         {
            throw new ApiException(ApiHttpErrors::notFound());
         }
@@ -64,7 +67,7 @@ class ShowProblemInContest extends ApiHandler
         // Get our problem given the problem_id         
         try
         {            
-            $problem = ProblemsDAO::getByPK(RequestContext::get("problem_id"));            
+            $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
         }
         catch(Exception $e)
         {
@@ -93,10 +96,10 @@ class ShowProblemInContest extends ApiHandler
         $relevant_columns = array("run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "ip", "time", "submit_delay");
         
         // Search the relevant runs from the DB
-        $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));                                        
+        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
         $keyrun = new Runs( array (
             "user_id" => $this->_user_id,
-            "problem_id" => RequestContext::get("problem_id"),
+            "problem_id" => $problem->getProblemId(),
             "contest_id" => $contest->getContestId()
         ));
         
@@ -135,12 +138,12 @@ class ShowProblemInContest extends ApiHandler
                         
         // As last step, register the problem as opened                
         if (! ContestProblemOpenedDAO::getByPK(
-                $contest->getContestId(), RequestContext::get("problem_id"), $this->_user_id ))
+                $contest->getContestId(), $problem->getProblemId(), $this->_user_id ))
         {
             //Create temp object
             $keyContestProblemOpened = new ContestProblemOpened( array( 
                 "contest_id" => $contest->getContestId(),
-                "problem_id" => RequestContext::get("problem_id"),
+                "problem_id" => $problem->getProblemId(),
                 "user_id" => $this->_user_id            
             ));
             
