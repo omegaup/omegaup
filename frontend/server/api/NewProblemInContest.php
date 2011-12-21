@@ -25,13 +25,13 @@ class NewProblemInContest extends ApiHandler
                     // Check if the contest exists
                     return ContestsDAO::getByAlias($value);
                 }, "Contest is invalid."))
-            ->validate(RequestContext::get("alias"), "alias");
+            ->validate(RequestContext::get("contest_alias"), "contest");
 
             
         // Only director is allowed to create problems in contest
         try
         {
-            $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
         }
         catch(Exception $e)
         {  
@@ -98,7 +98,7 @@ class NewProblemInContest extends ApiHandler
         $problem->setPublic(false);
         $problem->setAuthorId(RequestContext::get("author_id"));
         $problem->setTitle(RequestContext::get("title"));
-        $problem->setAlias(RequestContext::get("problem_alias"));
+        $problem->setAlias(RequestContext::get("alias"));
         $problem->setValidator(RequestContext::get("validator"));
         $problem->setTimeLimit(RequestContext::get("time_limit"));
         $problem->setMemoryLimit(RequestContext::get("memory_limit"));
@@ -113,7 +113,7 @@ class NewProblemInContest extends ApiHandler
         try
         {
             // Get contest 
-            $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
             
             //Begin transaction
             ProblemsDAO::transBegin();
@@ -134,8 +134,18 @@ class NewProblemInContest extends ApiHandler
         }
         catch(Exception $e)
         {  
-            // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+           // Operation failed in the data layer, rollback transaction 
+            ProblemsDAO::transRollback();
+            
+            // Alias may be duplicated, 1062 error indicates that
+            if(strpos($e->getMessage(), "1062") !== FALSE)
+            {
+                throw new ApiException( ApiHttpErrors::duplicatedEntryInDatabase("alias"));    
+            }
+            else
+            {
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+            }
         }                
     }    
 }
