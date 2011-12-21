@@ -17,13 +17,14 @@ class ShowProblemRuns extends ApiHandler
 {   
     protected function RegisterValidatorsToRequest()
     {
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
             function ($value)
             {
                 // Check if the contest exists
-                return ProblemsDAO::getByPK($value);
+                return ProblemsDAO::getByAlias($value);
             }, "Problem requested is invalid."))
-        ->validate(RequestContext::get("problem_id"), "problem_id");                
+        ->validate(RequestContext::get("alias"), "alias");
+         
     }   
         
     
@@ -34,8 +35,10 @@ class ShowProblemRuns extends ApiHandler
         // If user is contest director, he will be able to see all runs
         try
         {
+            $problem = ProblemsDAO::getByAlias(RequestContext::get("alias"));
+            
             $contest_problems = ContestProblemsDAO::search(new ContestProblems(array(
-                "problem_id" => RequestContext::get("problem_id")
+                "problem_id" => $problem->getProblemId()
             )));
             $contest = ContestsDAO::getByPK($contest_problems[0]->getContestId());
         }
@@ -49,14 +52,14 @@ class ShowProblemRuns extends ApiHandler
         {
             // Get all runs for problem given        
             $runs_mask = new Runs( array (                
-                "problem_id" => RequestContext::get("problem_id")));
+                "problem_id" => $problem->getProblemId()));
         }        
         else
         {        
             // Get runs only for current user 
             $runs_mask = new Runs( array (
                 "user_id"    => $this->_user_id,
-                "problem_id" => RequestContext::get("problem_id")));
+                "problem_id" => $problem->getProblemId()));
         }
         
         $relevant_columns = array( "run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
