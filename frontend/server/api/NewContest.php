@@ -50,7 +50,7 @@ class NewContest extends ApiHandler
                 RequestContext::get("public"),
                 "public");
         
-        ValidatorFactory::stringNotEmptyValidator()->validate(
+        ValidatorFactory::stringOfMaxLengthValidator(32)->validate(
                 RequestContext::get("alias"),
                 "alias");
         

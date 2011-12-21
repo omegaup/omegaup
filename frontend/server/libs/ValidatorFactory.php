@@ -10,6 +10,7 @@ require_once('NumericRangeValidator.php');
 require_once('EnumValidator.php');
 require_once('CustomValidator.php');
 require_once('HtmlValidator.php');
+require_once('StringLengthValidator.php');
 
 class ValidatorFactory 
 {
@@ -71,6 +72,17 @@ class ValidatorFactory
                       ->addValidator(new HtmlValidator());
         
         return $htmlValidator;
+    }
+    
+    public static function stringOfMaxLengthValidator($length)
+    {
+        $stringOfMaxLengthValidator = new Validator;
+        
+        $stringOfMaxLengthValidator->addValidator(new StringLengthValidator($length))
+                                    ->addValidator(new NotEmptyValidator);                        
+        
+        
+        return $stringOfMaxLengthValidator;
     }
 }
 

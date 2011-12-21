@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `director_id` int(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso',
   `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algÃºn concurso',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
-  `alias` varchar(20) NOT NULL COMMENT 'AlmacenarÃ¡ el token necesario para acceder al concurso',
+  `alias` varchar(32) NOT NULL COMMENT 'AlmacenarÃ¡ el token necesario para acceder al concurso',
   `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard serÃ¡ visible',
   `points_decay_factor` double NOT NULL DEFAULT '0' COMMENT 'El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7',
   `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirÃ¡ puntaje parcial para problemas no resueltos en todos los casos',
