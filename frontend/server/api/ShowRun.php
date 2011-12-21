@@ -21,19 +21,21 @@ class ShowRun extends ApiHandler
     
     protected function RegisterValidatorsToRequest()
     {
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
-            function ($value)
-            {
-                // Check if the contest exists
-                return RunsDAO::getByPK($value);
-            }, "Run is invalid."))
-        ->validate(RequestContext::get("run_id"), "run_id");
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return RunsDAO::getByAlias($value);
+                }, "Run is invalid."))
+            ->validate(RequestContext::get("run_alias"), "run_alias");
             
         try
-        {
+        {                        
             // If user is not judge, must be the run's owner.
-            $this->myRun = RunsDAO::getByPK(RequestContext::get("run_id"));
+            $this->myRun = RunsDAO::getByAlias(RequestContext::get("run_alias"));
+            
             $contest = ContestsDAO::getByPK($this->myRun->getContestId());
+            $problem = ProblemsDAO::getByPK($this->myRun->getProblemId());
         }
         catch(Exception $e)
         {
@@ -41,7 +43,9 @@ class ShowRun extends ApiHandler
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation());        
         }                        
         
-        if(!($this->myRun->getUserId() == $this->_user_id || $contest->getDirectorId() == $this->_user_id))
+        if(!($this->myRun->getUserId() == $this->_user_id || 
+                $contest->getDirectorId() == $this->_user_id ||
+                $problem->getAuthorId() == $this->_user_id ))
         {
            throw new ApiException(ApiHttpErrors::forbiddenSite());
         }                
@@ -51,7 +55,7 @@ class ShowRun extends ApiHandler
     {
         
         // Fill response
-        $relevant_columns = array( "run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
+        $relevant_columns = array( "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
         $this->addResponseArray($this->myRun->asFilteredArray($relevant_columns));
         
         try

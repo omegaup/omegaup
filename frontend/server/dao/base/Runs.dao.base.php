@@ -76,6 +76,26 @@ abstract class RunsDAOBase extends DAO
 			self::pushRecord( $foo,  $run_id );
 			return $foo;
 	}
+        
+        public static final function getByAlias($alias)
+	{
+		if(self::recordExists($alias)){
+			return self::getRecord($alias);
+		}
+		$sql = "SELECT * FROM Runs WHERE (guid = ? ) LIMIT 1;";
+		$params = array(  $alias );
+                
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);
+		if(count($rs)==0)
+                {
+                    return NULL;
+                }
+                
+                $contest = new Runs( $rs );
+                self::pushRecord( $contest,  $alias );
+                return $contest;
+	}
 
 
 	/**
