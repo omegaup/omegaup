@@ -62,7 +62,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
             
             $this->assertNotNull($arr);
             $this->assertArrayHasKey('error', $arr);   
-            $this->assertEquals("Username or password is wrong. Please check your credentials", $arr["error"]);            
+            $this->assertEquals("Username or password is wrong. Please check your credentials.", $arr["error"]);            
         
             // All fine :)
             return;
@@ -89,7 +89,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
             
             $this->assertNotNull($arr);
             $this->assertArrayHasKey('error', $arr);   
-            $this->assertEquals("Username or password is wrong. Please check your credentials", $arr["error"]);            
+            $this->assertEquals("Username or password is wrong. Please check your credentials.", $arr["error"]);            
         
             // All fine :)
             return;
