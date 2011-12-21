@@ -96,7 +96,10 @@ abstract class ApiHandler
         }
         catch (ApiException $e)
         {
-            // Log error 
+            // Something bad happened, log error
+            Logger::error( "ApiException thrown: " );
+            Logger::error( $this->_user_id );
+            Logger::error( $_REQUEST );
             Logger::error( $e->getFile() );
             Logger::error( $e->getArrayMessage() );
             Logger::error( $e->getTraceAsString() );

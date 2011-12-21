@@ -29,11 +29,24 @@ class ShowContest extends ApiHandler
         // If the contest is private, verify that our user is invited                
         $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));                                
         if ($contest->getPublic() === '0')            
-        {                           
-            if (is_null(ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId())))
+        {      
+            try
             {
-               throw new ApiException(ApiHttpErrors::forbiddenSite());
-            }        
+                if (is_null(ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId())))
+                {
+                    throw new ApiException(ApiHttpErrors::forbiddenSite());
+                }
+            }
+            catch(ApiException $e)
+            {
+                // Propagate exception
+                throw $e;
+            }
+            catch(Exception $e)
+            {
+                 // Operation failed in the data layer
+                 throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );                
+            }
         }                                                
     }      
 
@@ -43,7 +56,7 @@ class ShowContest extends ApiHandler
        // Create array of relevant columns
         $relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy");
         
-        // Get our contest given the id
+        // Get our contest given the alias
         try
         {            
             $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));

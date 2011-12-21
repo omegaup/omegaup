@@ -20,20 +20,31 @@ class ShowScoreboard extends ApiHandler
    
     protected function RegisterValidatorsToRequest()
     {
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
-            function ($value)
-            {
-                // Check if the contest exists
-                return ContestsDAO::getByPK($value);
-            }, "Contest is invalid."))
-        ->validate(RequestContext::get("contest_id"), "contest_id");
-                
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ContestsDAO::getByAlias($value);
+                }, "Contest is invalid."))
+            ->validate(RequestContext::get("alias"), "alias");                
     } 
     
     protected function GenerateResponse() 
     {
-        // @todo validar si el concursante puede ver el contest
-        $myScoreboard = new Scoreboard(RequestContext::get("contest_id"));
+        // Get contest
+        // Get our contest given the alias
+        try
+        {            
+            $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));
+        }
+        catch(Exception $e)
+        {
+            // Operation failed in the data layer
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );                
+        }
+        
+        // Create scoreboard
+        $myScoreboard = new Scoreboard($contest->getContestId());
                  
         // Get the scoreboard        
         $this->scoreboardData = $myScoreboard->generate();        
