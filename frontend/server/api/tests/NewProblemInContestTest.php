@@ -27,14 +27,16 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         // Set context
         if(is_null($contest_id))
         {
-            RequestContext::set("contest_id", Utils::GetValidPublicContestId());
+            $contest = ContestsDAO::getByPK(Utils::GetValidPublicContestId());
+            RequestContext::set("alias", $contest->getAlias());
         }
         else
         {
-            RequestContext::set("contest_id", $contest_id);
+            $contest = ContestsDAO::getByPK($contest_id);
+            RequestContext::set("alias", $contest->getAlias());
         }
         RequestContext::set("title", Utils::CreateRandomString());
-        RequestContext::set("alias", substr(Utils::CreateRandomString(), 0, 10));
+        RequestContext::set("problem_alias", substr(Utils::CreateRandomString(), 0, 10));
         RequestContext::set("author_id", Utils::GetProblemAuthorUserId());
         RequestContext::set("validator", "token");
         RequestContext::set("time_limit", 5000);
@@ -86,7 +88,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         
         // Verify DB data
         $this->assertEquals(RequestContext::get("title"), $problem->getTitle());
-        $this->assertEquals(RequestContext::get("alias"), $problem->getAlias());
+        $this->assertEquals(RequestContext::get("problem_alias"), $problem->getAlias());
         $this->assertEquals(RequestContext::get("validator"), $problem->getValidator());
         $this->assertEquals(RequestContext::get("time_limit"), $problem->getTimeLimit());
         $this->assertEquals(RequestContext::get("memory_limit"), $problem->getMemoryLimit());                      

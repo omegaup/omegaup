@@ -18,22 +18,33 @@ require_once(SERVER_PATH . '/libs/FileHandler.php');
 class NewProblemInContest extends ApiHandler
 {            
     protected function RegisterValidatorsToRequest()
-    {    
+    {   
+       ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ContestsDAO::getByAlias($value);
+                }, "Contest is invalid."))
+            ->validate(RequestContext::get("alias"), "alias");
+
+            
         // Only director is allowed to create problems in contest
-        $contest = ContestsDAO::getByPK(RequestContext::get("contest_id"));                        
+        try
+        {
+            $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));
+        }
+        catch(Exception $e)
+        {  
+            // Operation failed in the data layer
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+        }                
+        
         if($contest->getDirectorId() !== $this->_user_id)
         {
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }
         
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
-                function ($value)
-                {
-                    // Check if the contest exists
-                    return ContestsDAO::getByPK($value);
-                }, "contest_id is invalid."))
-            ->validate(RequestContext::get("contest_id"), "contest_id");
-        
+                
         ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
                 function ($value)
                 {
@@ -87,7 +98,7 @@ class NewProblemInContest extends ApiHandler
         $problem->setPublic(false);
         $problem->setAuthorId(RequestContext::get("author_id"));
         $problem->setTitle(RequestContext::get("title"));
-        $problem->setAlias(RequestContext::get("alias"));
+        $problem->setAlias(RequestContext::get("problem_alias"));
         $problem->setValidator(RequestContext::get("validator"));
         $problem->setTimeLimit(RequestContext::get("time_limit"));
         $problem->setMemoryLimit(RequestContext::get("memory_limit"));
@@ -101,6 +112,9 @@ class NewProblemInContest extends ApiHandler
         // Insert new problem
         try
         {
+            // Get contest 
+            $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));
+            
             //Begin transaction
             ProblemsDAO::transBegin();
 
@@ -109,7 +123,7 @@ class NewProblemInContest extends ApiHandler
 
             // Save relationship between problems and contest_id
             $relationship = new ContestProblems( array(
-                "contest_id" => RequestContext::get("contest_id"),
+                "contest_id" => $contest->getContestId(),
                 "problem_id" => $problem->getProblemId(),
                 "points"     => RequestContext::get("points")));
             ContestProblemsDAO::save($relationship);
@@ -117,7 +131,8 @@ class NewProblemInContest extends ApiHandler
             //End transaction
             ProblemsDAO::transEnd();
 
-        }catch(Exception $e)
+        }
+        catch(Exception $e)
         {  
             // Operation failed in the data layer
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
