@@ -32,14 +32,20 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         // Set request for valid clarification
         if(is_null($contest_id) && is_null($problem_id))
         {
-            RequestContext::set("contest_id", Utils::GetValidPublicContestId());
-            RequestContext::set("problem_id", Utils::GetValidProblemOfContest(
-                 RequestContext::get("contest_id")));
+            $contest = ContestsDAO::getByPK( Utils::GetValidPublicContestId());
+            $problem = ProblemsDAO::getByPK(Utils::GetValidProblemOfContest(
+                 $contest->getContestId()));
+            
+            RequestContext::set("contest_alias", $contest->getAlias());
+            RequestContext::set("problem_alias", $problem->getAlias()); 
         }
         else
         {
-            RequestContext::set("contest_id", $contest_id);
-            RequestContext::set("problem_id", $problem_id);
+            $contest = ContestsDAO::getByPK($contest_id);
+            $problem = ProblemsDAO::getByPK($problem_id);
+            
+            RequestContext::set("contest_alias", $contest->getContestId());
+            RequestContext::set("problem_alias", $problem->getProblemId());
         }        
         RequestContext::set("message", Utils::CreateRandomString());
         Utils::SetAuthToken($auth_token);
@@ -65,8 +71,8 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         // Verify our retreived clarificatoin
         $this->assertNotNull($clarification);
         $this->assertEquals(RequestContext::get("message"), $clarification->getMessage());
-        $this->assertEquals(RequestContext::get("contest_id"), $clarification->getContestId());
-        $this->assertEquals(RequestContext::get("problem_id"), $clarification->getProblemId());                
+        $this->assertEquals($contest->getContestId(), $clarification->getContestId());
+        $this->assertEquals($problem->getProblemId(), $clarification->getProblemId());                
 
         // Clean requests
         Utils::cleanup();        
@@ -86,8 +92,8 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();  
 
         // Set request for valid clarification
-        RequestContext::set("contest_id", 1213123);
-        RequestContext::set("problem_id", 1213123);
+        RequestContext::set("contest_alias", "1213123");
+        RequestContext::set("problem_alias", "1213123");
         RequestContext::set("message", Utils::CreateRandomString());
         Utils::SetAuthToken($auth_token);
 
@@ -103,7 +109,7 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
           $exception_array = $e->getArrayMessage();        
                              
           $this->assertEquals("HTTP/1.1 400 BAD REQUEST", $exception_array["header"]);
-          $this->assertEquals("Parameter contest_id is invalid: Contest requested is invalid.", $exception_array["error"]);
+          $this->assertEquals("Parameter contest_alias is invalid: Contest is invalid.", $exception_array["error"]);
 
           // We failed, we're fine.
           return;
