@@ -25,7 +25,7 @@ class NewProblemInContest extends ApiHandler
                     // Check if the contest exists
                     return ContestsDAO::getByAlias($value);
                 }, "Contest is invalid."))
-            ->validate(RequestContext::get("contest_alias"), "contest");
+            ->validate(RequestContext::get("contest_alias"), "contest_alias");
 
             
         // Only director is allowed to create problems in contest

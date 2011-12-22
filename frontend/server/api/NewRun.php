@@ -163,6 +163,7 @@ class NewRun extends ApiHandler
         // @TODO Call lhchavez to evaluate run     
         
         // Happy ending
+        $this->addResponse("run_alias", $run->getGuid());
         $this->addResponse("status", "ok");        
     }
 }
