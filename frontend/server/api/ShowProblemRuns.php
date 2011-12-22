@@ -23,7 +23,7 @@ class ShowProblemRuns extends ApiHandler
                 // Check if the contest exists
                 return ProblemsDAO::getByAlias($value);
             }, "Problem requested is invalid."))
-        ->validate(RequestContext::get("alias"), "alias");
+        ->validate(RequestContext::get("problem_alias"), "problem_alias");
          
     }   
         
@@ -35,7 +35,7 @@ class ShowProblemRuns extends ApiHandler
         // If user is contest director, he will be able to see all runs
         try
         {
-            $problem = ProblemsDAO::getByAlias(RequestContext::get("alias"));
+            $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
             
             $contest_problems = ContestProblemsDAO::search(new ContestProblems(array(
                 "problem_id" => $problem->getProblemId()

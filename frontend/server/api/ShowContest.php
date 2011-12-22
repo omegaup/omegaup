@@ -24,10 +24,10 @@ class ShowContest extends ApiHandler
                     // Check if the contest exists
                     return ContestsDAO::getByAlias($value);
                 }, "Contest is invalid."))
-            ->validate(RequestContext::get("alias"), "alias");
+            ->validate(RequestContext::get("contest_alias"), "contest_alias");
         
         // If the contest is private, verify that our user is invited                
-        $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));                                
+        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                
         if ($contest->getPublic() === '0')            
         {      
             try
@@ -59,7 +59,7 @@ class ShowContest extends ApiHandler
         // Get our contest given the alias
         try
         {            
-            $contest = ContestsDAO::getByAlias(RequestContext::get("alias"));
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
         }
         catch(Exception $e)
         {

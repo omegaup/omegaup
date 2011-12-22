@@ -37,7 +37,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         
         // Set context
         $contest = ContestsDAO::getByPK($contest_id);
-        RequestContext::set("alias", $contest->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -119,7 +119,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         
         // Set contest
         $contest = ContestsDAO::getByPK($contest_id);
-        RequestContext::set("alias", $contest->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -204,7 +204,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         
         // Set contest
         $contest = ContestsDAO::getByPK($contest_id);
-        RequestContext::set("alias", $contest->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -244,7 +244,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set context        
-        RequestContext::set("alias", $contest->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -301,7 +301,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestDirector();
         
         // Set context        
-        RequestContext::set("alias", $contest->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
