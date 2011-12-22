@@ -72,7 +72,7 @@ class ShowProblemInContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }        
         
         // Read the file that contains the source
@@ -83,7 +83,7 @@ class ShowProblemInContest extends ApiHandler
         }
         catch(Exceptio $e)
         {
-            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
         }        
         
         // Add the problem the response
@@ -111,7 +111,7 @@ class ShowProblemInContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }
         
         // Add each filtered run to an array
@@ -133,7 +133,7 @@ class ShowProblemInContest extends ApiHandler
         catch(Exception $e)
         {
              // Operation failed in the data layer
-             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
+             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }                
                         
         // As last step, register the problem as opened                
@@ -150,12 +150,12 @@ class ShowProblemInContest extends ApiHandler
             try
             {
                 // Save object in the DB
-                ContestProblemOpenedDAO::save($keyContestProblemOpened);
-                
-            }catch (Exception $e)
+                ContestProblemOpenedDAO::save($keyContestProblemOpened);                
+            }
+            catch (Exception $e)
             {
                 // Operation failed in the data layer
-               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
             }                        
         }
         

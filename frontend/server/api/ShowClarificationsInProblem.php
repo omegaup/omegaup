@@ -52,7 +52,7 @@ class ShowClarificationsInProblem extends ApiHandler
         }
         catch(Exception $e)
         {
-            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );                
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
         }
         
         // If user is the contest director, get all private clarifications        
@@ -84,7 +84,7 @@ class ShowClarificationsInProblem extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }
 
         $clarifications_array = array();

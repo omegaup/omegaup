@@ -14,8 +14,8 @@ define("OMEGAUP_MD5_SALT", 	"om3gaup");
 
 
 define("OMEGAUP_LOG_TO_FILE", true);
-define("OMEGAUP_LOG_ACCESS_FILE", 	"/var/log/omegaup/omegaup.log");
-define("OMEGAUP_LOG_ERROR_FILE", 	"/var/log/omegaup/omegaup.log");
+define("OMEGAUP_LOG_ACCESS_FILE", 	"/Applications/XAMPP/htdocs/omegaup/frontend/server/api/tests/omegaup.log");
+define("OMEGAUP_LOG_ERROR_FILE", 	"/Applications/XAMPP/htdocs/omegaup/frontend/server/api/tests/omegaup.log");
 define("OMEGAUP_LOG_TRACKBACK", false);
 define("OMEGAUP_LOG_DB_QUERYS", true);
 

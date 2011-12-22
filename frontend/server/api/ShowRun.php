@@ -40,7 +40,7 @@ class ShowRun extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation());        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
         }                        
         
         if(!($this->myRun->getUserId() == $this->_user_id || 
@@ -66,7 +66,7 @@ class ShowRun extends ApiHandler
         }
         catch (Exception $e)
         {
-           throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );
+           throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
         }        
     }
 }

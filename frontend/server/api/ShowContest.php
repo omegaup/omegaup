@@ -45,7 +45,7 @@ class ShowContest extends ApiHandler
             catch(Exception $e)
             {
                  // Operation failed in the data layer
-                 throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );                
+                 throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
             }
         }                                                
     }      
@@ -64,7 +64,7 @@ class ShowContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );                
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
         }
         
         // Add the contest to the response
@@ -80,7 +80,7 @@ class ShowContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation());        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
         }        
         
         // Add info of each problem to the contest
@@ -99,7 +99,7 @@ class ShowContest extends ApiHandler
             catch(Exception $e)
             {
                 // Operation failed in the data layer
-               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
             }
             
             // Add the 'points' value that is stored in the ContestProblem relationship
@@ -120,7 +120,7 @@ class ShowContest extends ApiHandler
         catch(Exception $e)
         {
              // Operation failed in the data layer
-             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );        
+             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }
         
         // Set response

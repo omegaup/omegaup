@@ -54,7 +54,7 @@ class UpdateClarification extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );                
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
         }
         
         // Update clarification        
@@ -71,7 +71,7 @@ class UpdateClarification extends ApiHandler
         catch( Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );         
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );         
         }
         
         // Happy ending

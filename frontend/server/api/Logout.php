@@ -27,11 +27,13 @@ class Logout extends ApiHandler {
         /*
          * Ok, they sent a valid auth, just erase it from the database.
          * */
-        try{
+        try
+        {
             AuthTokensDAO::delete( $this->_auth_token );	
         }
-        catch( Exception $e ){
-            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );
+        catch( Exception $e )
+        {
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
        
         // Happy ending
