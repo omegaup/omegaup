@@ -36,7 +36,7 @@ class NewProblemInContest extends ApiHandler
         catch(Exception $e)
         {  
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
         }                
         
         if($contest->getDirectorId() !== $this->_user_id)
@@ -134,11 +134,11 @@ class NewProblemInContest extends ApiHandler
             // Alias may be duplicated, 1062 error indicates that
             if(strpos($e->getMessage(), "1062") !== FALSE)
             {
-                throw new ApiException( ApiHttpErrors::duplicatedEntryInDatabase("alias"));    
+                throw new ApiException( ApiHttpErrors::duplicatedEntryInDatabase("alias"), $e);    
             }
             else
             {
-               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
             }
         }
         
@@ -150,7 +150,7 @@ class NewProblemInContest extends ApiHandler
         }
         catch (Exception $e)
         {
-            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
         }
     }    
 }

@@ -100,7 +100,7 @@ class Login extends ApiHandler {
         {
             /**
              * Passwords did not match !
-             * */                
+             * */                       
            throw new ApiException(ApiHttpErrors::invalidCredentials());
         }
         
@@ -121,7 +121,7 @@ class Login extends ApiHandler {
             }
             catch(Exception $e)
             {
-               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+               throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
             }
         }
                         
@@ -148,7 +148,7 @@ class Login extends ApiHandler {
          }
          catch(Exception $e)
          {
-            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
          }
           
          // Add token to response

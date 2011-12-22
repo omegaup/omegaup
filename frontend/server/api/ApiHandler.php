@@ -97,13 +97,27 @@ abstract class ApiHandler
         catch (ApiException $e)
         {
             // Something bad happened, log error
-            Logger::error( "ApiException thrown: " );
+            Logger::error( "ApiException thrown by: " );
             Logger::error( $this->_user_id );
-            Logger::error( $_REQUEST );
+            
+            Logger::error( "--Request: " );
+            Logger::error( implode("\n", $_REQUEST) );
+            
             Logger::error( $e->getFile() );
-            Logger::error( $e->getArrayMessage() );
-            Logger::error( $e->getTraceAsString() );
-                        
+            
+            Logger::error( "--ApiException contents: " );
+            Logger::error( implode("\n", $e->getArrayMessage()) );
+            
+            if(!is_null($e->getWrappedException()))
+            {
+                Logger::error( "Wrapped exception: " );
+                Logger::error( $e->getWrappedException()->getMessage() );
+                Logger::error( $e->getWrappedException()->getTraceAsString() );
+                Logger::error( $e->getWrappedException()->getFile() );
+                Logger::error( $e->getWrappedException()->getLine() );
+                Logger::error( $e->getWrappedException()->getCode() );
+            }
+            
             // Propagate the exception
             throw $e;
         }
@@ -118,7 +132,7 @@ abstract class ApiHandler
             Logger::error( $e->getCode() );
             Logger::error( $e->getTraceAsString() );
             Logger::error( $e->getPrevious() );
-            
+                        
             throw new ApiException( ApiHttpErrors::unwrappedException() );
         }
     }

@@ -47,7 +47,7 @@ class NewClarification extends ApiHandler
         }
         catch(Exception $e)
         {
-            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation());
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
         // Is the combination contest_id and problem_id valid?        
@@ -71,7 +71,7 @@ class NewClarification extends ApiHandler
         }
         catch(Exception $e)
         {
-            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation());
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
         $clarification = new Clarifications( array(
@@ -91,7 +91,7 @@ class NewClarification extends ApiHandler
         }catch(Exception $e)
         {              
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
         }
         
         //Add the clarification id to the response

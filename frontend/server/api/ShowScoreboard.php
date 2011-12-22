@@ -40,7 +40,7 @@ class ShowScoreboard extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );                
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
         }
         
         // Create scoreboard

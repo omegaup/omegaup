@@ -26,8 +26,15 @@ class ShowContests extends ApiHandler {
         // Create array of relevant columns
         $relevant_columns = array("contest_id", "title", "description", "start_time", "finish_time", "public", "alias", "director_id");
 
-        // Get all contests using only relevan columns
-        $contests = ContestsDAO::getAll(NULL, NULL, 'contest_id', "DESC", $relevant_columns);
+        try
+        {                
+            // Get all contests using only relevan columns
+            $contests = ContestsDAO::getAll(NULL, NULL, 'contest_id', "DESC", $relevant_columns);
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
+        }
         
 
         /**
@@ -62,7 +69,14 @@ class ShowContests extends ApiHandler {
             /**
              * Ok, i have a user. Can he see this contest ?
              * */
-            $r = ContestsUsersDAO::getByPK($this->_user_id, $c->getContestId());
+            try
+            {
+                $r = ContestsUsersDAO::getByPK($this->_user_id, $c->getContestId());
+            }
+            catch(Exception $e)
+            {
+                throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+            }
 
             if ($r === null) 
             {

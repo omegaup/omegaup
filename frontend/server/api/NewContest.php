@@ -171,11 +171,11 @@ class NewContest extends ApiHandler
             // Alias may be duplicated, 1062 error indicates that
             if(strpos($e->getMessage(), "1062") !== FALSE)
             {
-                throw new ApiException( ApiHttpErrors::duplicatedEntryInDatabase("alias"));    
+                throw new ApiException( ApiHttpErrors::duplicatedEntryInDatabase("alias"), $e);    
             }
             else
             {
-               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
             }
         }
         

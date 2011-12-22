@@ -46,7 +46,7 @@ class Scoreboard
         }
         catch(Exception $e)
         {
-            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation());
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
                                          
         // Save the number of problems internally
@@ -83,7 +83,7 @@ class Scoreboard
         }
         catch(Exception $e)
         {
-            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation());
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
         // @todo add support for penalties

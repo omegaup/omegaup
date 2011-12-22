@@ -100,7 +100,7 @@ class NewRun extends ApiHandler
         catch(Exception $e)
         {            
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
         }                 
     }
     
@@ -118,7 +118,7 @@ class NewRun extends ApiHandler
         }
         catch(Exception $e)
         {
-            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation());
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
         // Populate new run object
@@ -146,7 +146,7 @@ class NewRun extends ApiHandler
         catch(Exception $e)
         {   
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
         }
         
         try
@@ -157,7 +157,7 @@ class NewRun extends ApiHandler
         }
         catch (Exception $e)
         {
-            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );                            
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );                            
         }
         
         // @TODO Call lhchavez to evaluate run     
