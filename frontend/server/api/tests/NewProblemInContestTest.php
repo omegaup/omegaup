@@ -41,7 +41,8 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         RequestContext::set("validator", "token");
         RequestContext::set("time_limit", 5000);
         RequestContext::set("memory_limit", 32000);        
-        RequestContext::set("source", "<p>redacción</p>");
+        RequestContext::set("problem_statement", "<p>redacción</p>");        
+        RequestContext::set("source", "ACM");
         RequestContext::set("order", "normal");
         RequestContext::set("points", 1);
     }
@@ -94,13 +95,14 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(RequestContext::get("memory_limit"), $problem->getMemoryLimit());                      
         $this->assertEquals(RequestContext::get("author_id"), $problem->getAuthorId());
         $this->assertEquals(RequestContext::get("order"), $problem->getOrder());
+        $this->assertEquals(RequestContext::get("source"), $problem->getSource());
         
         // Verify problem statement
-        $filename = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getSource();
+        $filename = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias();
         $this->assertFileExists($filename);                        
         
         $fileContent = file_get_contents($filename);
-        $this->assertEquals($fileContent, RequestContext::get("source"));
+        $this->assertEquals($fileContent, RequestContext::get("problem_statement"));
         
         // Default data
         $this->assertEquals(0, $problem->getVisits());
@@ -165,7 +167,8 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
             "time_limit",            
             "memory_limit",
             "source",
-            "author_id",            
+            "author_id",
+            "alias"
         );
         
         foreach($valid_keys as $key)        

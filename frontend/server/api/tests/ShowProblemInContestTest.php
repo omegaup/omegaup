@@ -68,8 +68,9 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["validator"], $problem->getValidator());
         $this->assertEquals($return_array["time_limit"], $problem->getTimeLimit());
         $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
-        $this->assertEquals($return_array["author_id"], $problem->getAuthorId());        
-        $this->assertEquals($return_array["source"], "<p>redacción</p>");
+        $this->assertEquals($return_array["author_id"], $problem->getAuthorId()); 
+        $this->assertEquals($return_array["source"], $problem->getSource()); 
+        $this->assertEquals($return_array["problem_statement"], "<p>redacción</p>");
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data
@@ -150,7 +151,8 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["time_limit"], $problem->getTimeLimit());
         $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
         $this->assertEquals($return_array["author_id"], $problem->getAuthorId());        
-        $this->assertEquals($return_array["source"], "<p>redacción</p>");
+        $this->assertEquals($return_array["source"], $problem->getSource()); 
+        $this->assertEquals($return_array["problem_statement"], "<p>redacción</p>");
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data
