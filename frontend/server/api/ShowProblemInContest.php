@@ -76,7 +76,7 @@ class ShowProblemInContest extends ApiHandler
         }        
         
         // Read the file that contains the source
-        $source_path = PROBLEMS_PATH . $problem->getSource();
+        $source_path = PROBLEMS_PATH . $problem->getAlias();
         try
         {
             $file_content = FileHandler::ReadFile($source_path);
@@ -89,10 +89,10 @@ class ShowProblemInContest extends ApiHandler
         // Add the problem the response
         $this->addResponseArray($problem->asFilteredArray($relevant_columns));   
         
-        // Overwrite source
-        $this->addResponse("source", $file_content);        
+        // Add problem statement to source
+        $this->addResponse("problem_statement", $file_content);        
              
-        // Create array of relevant columns
+        // Create array of relevant columns for list of runs
         $relevant_columns = array("run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "ip", "time", "submit_delay");
         
         // Search the relevant runs from the DB

@@ -56,6 +56,10 @@ class NewProblemInContest extends ApiHandler
         ValidatorFactory::stringNotEmptyValidator()->validate(
                 RequestContext::get("title"),
                 "title");
+        
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("source"),
+                "source");
                 
         ValidatorFactory::stringOfMaxLengthValidator(32)->validate(
                 RequestContext::get("alias"),
@@ -70,7 +74,7 @@ class NewProblemInContest extends ApiHandler
         ValidatorFactory::numericRangeValidator(0, INF)
                 ->validate(RequestContext::get("memory_limit"), "memory_limit");
         
-        ValidatorFactory::htmlValidator()->validate(RequestContext::get("source"), "source");
+        ValidatorFactory::htmlValidator()->validate(RequestContext::get("problem_statement"), "problem_statement");
                 
         ValidatorFactory::enumValidator(array("normal", "inverse"))
                 ->validate(RequestContext::get("order"), "order"); 
@@ -82,17 +86,7 @@ class NewProblemInContest extends ApiHandler
     
     protected function GenerateResponse() 
     {
-        // Crete file
-        try 
-        {
-            $filename = md5(uniqid(rand(), true));
-            FileHandler::CreateFile(PROBLEMS_PATH . $filename, RequestContext::get("source"));                        
-        }
-        catch (Exception $e)
-        {
-            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );
-        }
-        
+                
         // Populate a new Problem object
         $problem = new Problems();
         $problem->setPublic(false);
@@ -106,7 +100,7 @@ class NewProblemInContest extends ApiHandler
         $problem->setSubmissions(0);
         $problem->setAccepted(0);
         $problem->setDifficulty(0);
-        $problem->setSource($filename);
+        $problem->setSource(RequestContext::get("source"));
         $problem->setOrder(RequestContext::get("order"));                              
                 
         // Insert new problem
@@ -146,7 +140,18 @@ class NewProblemInContest extends ApiHandler
             {
                throw new ApiException( ApiHttpErrors::invalidDatabaseOperation() );    
             }
-        }                
+        }
+        
+        // Create file after we know that alias is unique
+        try 
+        {
+            $filename = RequestContext::get("alias");
+            FileHandler::CreateFile(PROBLEMS_PATH . $filename, RequestContext::get("problem_statement"));                        
+        }
+        catch (Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation() );
+        }
     }    
 }
 
