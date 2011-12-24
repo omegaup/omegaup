@@ -12,6 +12,11 @@
   // Create DB
   $db_name  = $args["db_name"];
   $stmt_create_db
+    = "DROP DATABASE IF EXISTS $db_name;";
+  mysql_query($stmt_create_db, $link)
+    or die('Failed to create database: ' . mysql_error());
+
+  $stmt_create_db
     = "CREATE DATABASE IF NOT EXISTS $db_name;";
   mysql_query($stmt_create_db, $link)
     or die('Failed to create database: ' . mysql_error());
@@ -130,13 +135,14 @@
   ) {
     $statements = parse_sql_script($path);    
     $link       = mysql_connect($host, $user, $pass);
-    mysql_select_db($db_name, $link);
+    if (!$link) die("Failed to connect: $host, $user, $pass" . mysql_error());
+    mysql_select_db($db_name, $link) or die('Failed to switch database: ' . mysql_error($link));
     
     $errors = 0;
     foreach( $statements as $statement ) {
       if( trim($statement) != '' && !mysql_query($statement, $link) ) {
         $errors++;
-        echo "Failed query: <pre>'" . $statement . "'</pre><br/>" . mysql_error() . "<br/>";
+        echo "Failed query: <pre>'" . $statement . "'</pre><br/>MySQL error: " . mysql_error($link) . "<br/>";
       }
     }
     register_admin_user($link, $admin_user, $admin_pass);
