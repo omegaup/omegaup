@@ -23,57 +23,42 @@ class FormComponent implements GuiComponent
 
 	function renderCmp()
 	{
-
 		$html = "<table>";
 		if( !is_null ( $this->submit_form ) ){
-			$html .= "<form method='". $this->submit_form["method"] . "' action='". $this->submit_form["submit_form_url"] . "'>";
+			$html .= "<form method=\"{$this->submit_form["method"]}\" action=\"{$this->submit_form["submit_form_url"]}\">";
 		}else{
-			$html .= "<form >";	
+			$html .= "<form>";
 		}
 		
 
 		foreach( $this->form_fields as $f )
 		{
 			if($f->type !== "hidden"){
-				$html .= "<tr><td>";
-				
-				$html .= $f->caption;
-				
-				$html .= "</td><td>";				
+				$html .= "<tr><td>{$f->caption}</td><td>";				
 			}
 
+			if ($f->type === 'textarea') {
+				$html .= "<textarea id=\"{$f->id}\" name=\"{$f->name}\">{$f->value}</textarea>";
+			} else {
+				$html .= "<input id=\"{$f->id}\" name=\"{$f->name}\" value=\"{$f->value}\" type=\"{$f->type}\" />";
+			}
 
-			$html .= "<input name='" . $f->name .  "' value='" . $f->value .  "' type='". $f->type ."' >";
-
-			
 			if($f->type !== "hidden"){
 				$html .= "</td></tr>";	
-			}
-			
-			
+			}			
 		}
 
 		if( !is_null ( $this->submit_form ) ){
 			$html .= "<tr><td>";
-
-			$html .= "</td><td align=right>";
-
-			$html .= "<input value='" . $this->submit_form["caption"] .  "' type='submit'  >";
-
+			$html .= "</td><td align=\"right\">";
+			$html .= "<input value=\"{$this->submit_form["caption"]}\" type=\"submit\" />";
 			$html .= "</td></tr>";
 		}
 
-
-
-
 		if( !is_null ( $this->on_click ) ){
-
 			$html .= "<tr><td>";
-
-			$html .= "</td><td align=right>";
-
-			$html .= "<input value='" . $this->on_click["caption"] .  "' type='button' onClick='". $this->on_click["function"] ."' >";
-
+			$html .= "</td><td align=\"right\">";
+			$html .= "<input value=\"{$this->on_click["caption"]}\" type=\"button\" onClick=\"{$this->on_click["function"]}\" />";
 			$html .= "</td></tr>";
 		}
 
@@ -82,7 +67,6 @@ class FormComponent implements GuiComponent
 		$html .= "</table>";
 
 		return $html;
-
 	}
 
 	public function addSubmit($caption, $submit_form_url = "", $method = "GET"){
