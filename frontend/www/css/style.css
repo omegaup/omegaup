@@ -215,3 +215,14 @@ table{
 td{
 	padding: 5px;
 }
+
+#markdownSource {
+	width: 370px;
+	height: 800px;
+}
+#markdownPreview {
+	float: right;
+	width: 370px;
+	border: 1px solid #eee;
+	margin-top: 10px;
+}
