@@ -24,7 +24,7 @@
 	}
 
 	$form->addField('markdownSource', '', 'textarea', $_POST['source'], 'source');
-	$form->addSubmit('Previsualzación', 'redaccion.php', 'POST');
+	$form->addSubmit('Previsualización', 'redaccion.php', 'POST');
 	
 	$page->addComponent(new FreeHTMLComponent('<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>'));
 	$page->addComponent(new FreeHTMLComponent('<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [[\'$\',\'$\'], [\'\\\\(\',\'\\\\)\']]}});</script>'));
