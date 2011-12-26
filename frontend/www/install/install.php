@@ -71,7 +71,7 @@
   $num_errors     = $script_info["errors"];
   if ($num_errors > 0) die("$num_errors errors encountered while after running $num_statements statements.<br/>");
 
-  create_config_php($args["host"], $user, $pass, $db_name);
+  create_config_php($args["host"], $user, $pass, $db_name, $args['data_root_path']);
   
   // @todo  notify success
   //        instruct user to delete the folder containing this file
@@ -174,6 +174,7 @@
     , $user
     , $pass
     , $db_name
+    , $data_root_path
   ) {
     $native_dir     = realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/../..');
     $root_dir       = str_replace('\\', '/', $native_dir);
@@ -196,7 +197,8 @@
   define('OMEGAUP_LOG_TRACKBACK',   false);
   define('OMEGAUP_LOG_DB_QUERYS',   true);
 
-  ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . OMEGAUP_ROOT . '/server');
+  define('RUNS_PATH',               '$data_root_path/submissions');
+  define('PROBLEMS_PATH',           '$data_root_path/problems');
 ";
     
     file_put_contents("$root_dir/server/config.php", $file_contents) !== FALSE
