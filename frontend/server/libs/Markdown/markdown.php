@@ -1651,11 +1651,11 @@ class Markdown_Parser {
 				^								# Start of a line
 				(								# Capture the whole text
 					[ ]{0,'.$less_than_tab.'}	# Allowed whitespace.
-					[|]< [ ]* \n				# Input specification
+					[|][|] [ ]* input [ ]* \n	# Input specification
 					(?:.|\n)+? \n				
 				)
-				[ ]{0,'.$less_than_tab.'}	# Allowed whitespace.
-				[|][|] [ ]* \n				# Stop at final double pipe
+				[ ]{0,'.$less_than_tab.'}		# Allowed whitespace.
+				[|][|] [ ]* end [ ]* \n			# Stop at final double pipe
 			}xm',
 			array(&$this, '_doSampleIo_callback'), $text);
 
@@ -1666,15 +1666,15 @@ class Markdown_Parser {
 
 		$text = '<table class="sample_io">';
 
-		$matches = preg_split('/(?:^|\n) [ ]* [|]([<|=>]) [ ]* (?:\n|$)/xm', $input, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$matches = preg_split('/(?:^|\n) [ ]* [|][|] [ ]* (input|output|description|end) [ ]* (?:\n|$)/xm', $input, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		$first_row = false;
 
 		for ($i = 1; $i < count($matches); $i += 2) {
-			if ($matches[$i] == '=') {
+			if ($matches[$i] == 'description') {
 				$text .= "<td>" . $matches[$i+1] . "</td>";
 			} else {
-				if ($matches[$i] == '<') {
+				if ($matches[$i] == 'input') {
 					if ($first_row) $text .= '</tr>';
 					$first_row = false;
 
