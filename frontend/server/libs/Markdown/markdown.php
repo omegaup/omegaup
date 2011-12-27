@@ -546,6 +546,7 @@ class Markdown_Parser {
 		"doHorizontalRules" => 20,
 		
 		"doLists"           => 40,
+		"doSampleIo"        => 42,
 		"doTables"          => 45,
 		"doCodeBlocks"      => 50,
 		"doBlockQuotes"     => 60,
@@ -1118,21 +1119,20 @@ class Markdown_Parser {
 
 
 	var $em_relist = array(
-		''  => '(?:(?<!\*)\*(?!\*)|(?<!_)_(?!_))(?=\S|$)(?![.,:;]\s)',
+		''  => '(?:(?<!\*)\*(?!\*)|(?<![a-zA-Z0-9_])_(?!_))(?=\S|$)(?![.,:;]\s)',
 		'*' => '(?<=\S|^)(?<!\*)\*(?!\*)',
-		'_' => '(?<=\S|^)(?<!_)_(?!_)',
+		'_' => '(?<=\S|^)(?<!_)_(?![a-zA-Z0-9_])',
 		);
 	var $strong_relist = array(
-		''   => '(?:(?<!\*)\*\*(?!\*)|(?<!_)__(?!_))(?=\S|$)(?![.,:;]\s)',
+		''   => '(?:(?<!\*)\*\*(?!\*)|(?<![a-zA-Z0-9_])__(?!_))(?=\S|$)(?![.,:;]\s)',
 		'**' => '(?<=\S|^)(?<!\*)\*\*(?!\*)',
-		'__' => '(?<=\S|^)(?<!_)__(?!_)',
+		'__' => '(?<=\S|^)(?<!_)__(?![a-zA-Z0-9_])',
 		);
 	var $em_strong_relist = array(
-		''    => '(?:(?<!\*)\*\*\*(?!\*)|(?<!_)___(?!_))(?=\S|$)(?![.,:;]\s)',
+		''    => '(?:(?<!\*)\*\*\*(?!\*)|(?<![a-zA-Z0-9_])___(?!_))(?=\S|$)(?![.,:;]\s)',
 		'***' => '(?<=\S|^)(?<!\*)\*\*\*(?!\*)',
-		'___' => '(?<=\S|^)(?<!_)___(?!_)',
+		'___' => '(?<=\S|^)(?<!_)___(?![a-zA-Z0-9_])',
 		);
-	var $em_strong_prepared_relist;
 	
 	function prepareItalicsAndBold() {
 	#
@@ -1155,7 +1155,7 @@ class Markdown_Parser {
 			}
 		}
 	}
-	
+
 	function doItalicsAndBold($text) {
 		$token_stack = array('');
 		$text_stack = array('');
@@ -1277,7 +1277,6 @@ class Markdown_Parser {
 		}
 		return $text_stack[0];
 	}
-
 
 	function doBlockQuotes($text) {
 		$text = preg_replace_callback('/
@@ -1642,6 +1641,52 @@ class Markdown_Parser {
 	}
 	function _unhash_callback($matches) {
 		return $this->html_hashes[$matches[0]];
+	}
+
+
+	function doSampleIo($text) {
+		$less_than_tab = $this->tab_width - 1;
+		$text = preg_replace_callback('
+			{
+				^								# Start of a line
+				(								# Capture the whole text
+					[ ]{0,'.$less_than_tab.'}	# Allowed whitespace.
+					[|]< [ ]* \n				# Input specification
+					(?:.|\n)+? \n				
+				)
+				[ ]{0,'.$less_than_tab.'}	# Allowed whitespace.
+				[|][|] [ ]* \n				# Stop at final double pipe
+			}xm',
+			array(&$this, '_doSampleIo_callback'), $text);
+
+		return $text;
+	}
+	function _doSampleIo_callback($matches) {
+		$input		= $matches[1];
+
+		$text = '<table class="sample_io">';
+
+		$matches = preg_split('/(?:^|\n) [ ]* [|]([<|=>]) [ ]* (?:\n|$)/xm', $input, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+		$first_row = false;
+
+		for ($i = 1; $i < count($matches); $i += 2) {
+			if ($matches[$i] == '=') {
+				$text .= "<td>" . $matches[$i+1] . "</td>";
+			} else {
+				if ($matches[$i] == '<') {
+					if ($first_row) $text .= '</tr>';
+					$first_row = false;
+
+					$text .= '<tr>';
+				}
+				$text .= "<td><pre>" . $matches[$i+1] . "</pre></td>";
+			}
+		}
+
+		$text .= '</tr></table>';
+		
+		return $this->hashBlock($text) . "\n";
 	}
 
 

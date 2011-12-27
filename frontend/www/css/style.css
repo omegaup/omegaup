@@ -226,3 +226,13 @@ td{
 	border: 1px solid #eee;
 	margin-top: 10px;
 }
+table.sample_io {
+	border: 1px solid #000;
+	background: #eee;
+}
+.sample_io td {
+	background: #eee;
+	vertical-align: top;
+	padding: 10px;
+	border: 1px solid #000;
+}
