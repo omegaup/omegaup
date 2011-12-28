@@ -14,9 +14,21 @@
 
 require_once("ApiHandler.php");
 require_once(SERVER_PATH . '/libs/FileHandler.php');
+require_once(SERVER_PATH . '/libs/Grader.php');
 
 class NewRun extends ApiHandler
 {     
+    private $grader;
+    
+    public function NewRun(Grader $grader = NULL)
+    {
+        if($grader === NULL)
+        {
+            $grader = new Grader();
+        }
+        $this->grader = $grader;
+    }
+    
     protected function RegisterValidatorsToRequest()
     {    
         
@@ -88,9 +100,7 @@ class NewRun extends ApiHandler
             {                
                throw new ApiException(ApiHttpErrors::notAllowedToSubmit());
             }
-        
-        
-            // @todo Validate window_length
+                            
         }
         catch(ApiException $apiException)
         {
@@ -160,7 +170,15 @@ class NewRun extends ApiHandler
             throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );                            
         }
         
-        // @TODO Call lhchavez to evaluate run     
+        // Call Grader
+        try
+        {            
+            $this->grader->Grade($run->getRunId());
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
+        }
         
         // Happy ending
         $this->addResponse("run_alias", $run->getGuid());
