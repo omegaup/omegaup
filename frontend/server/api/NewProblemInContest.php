@@ -174,7 +174,8 @@ class NewProblemInContest extends ApiHandler
                     $file_contents = markdown($file_contents);
                     
                     // Overwrite file
-                    FileHandler::CreateFile($filepath, $file_contents);
+                    $lang = basename($statement, ".markdown");
+                    FileHandler::CreateFile($dirpath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html", $file_contents);
                 }
                 
             }
