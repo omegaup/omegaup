@@ -35,7 +35,7 @@ class NewContestTest extends PHPUnit_Framework_TestCase
         RequestContext::set("alias", substr($title, 0, 20));
         RequestContext::set("points_decay_factor", ".02");
         RequestContext::set("partial_score", "0");
-        RequestContext::set("submissions_gap", "10");
+        RequestContext::set("submissions_gap", "0");
         RequestContext::set("feedback", "yes");
         RequestContext::set("penalty", 100);
         RequestContext::set("scoreboard", 100);

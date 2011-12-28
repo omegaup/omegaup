@@ -41,7 +41,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
             $return_array = $showContest->ExecuteApi();
         }
         catch(ApiException $e)
-        {            
+        {                        
             // Asume that the test is going to handle the exception
         }
         
@@ -50,7 +50,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     
     private function setValidContext($contest_id, $problem_id)
     {
-        // User should visit contest prior submit a solution
+        // User should visit contest prior submit a solution        
         $this->openContestBeforeSubmit($contest_id);
         
         // Get contest & problem object from DB
@@ -78,10 +78,13 @@ class NewRunTest extends PHPUnit_Framework_TestCase
                 ->will($this->returnValue(true));
     }
     
-    public function testNewValidRun($contest_id = null, $problem_id = null)
+    public function testNewValidRun($contest_id = null, $problem_id = null, $auth_token = null)
     {
         // Login 
-        $auth_token = Utils::LoginAsContestant();
+        if(is_null($auth_token))
+        {
+            $auth_token = Utils::LoginAsContestant();
+        }
         
         // Set context
         if(is_null($contest_id))
@@ -113,10 +116,10 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Validate output
         $this->assertEquals("ok", $return_array["status"]);
+        $this->assertArrayHasKey("run_alias", $return_array);
         
         // Get run from DB
-        $runs = RunsDAO::search(new Runs(array('contest_id'=> $contest_id, "problem_id" => $problem_id)));
-        $run = $runs[0];
+        $run = RunsDAO::getByAlias($return_array["run_alias"]);        
         $this->assertNotNull($run);
         
         // Validate data        
@@ -218,11 +221,10 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         }
         
         // Validate output
-        $this->assertEquals("ok", $return_array["status"]);
+        $this->assertArrayHasKey("run_alias", $return_array);
         
         // Get run from DB
-        $runs = RunsDAO::search(new Runs(array('contest_id'=> $contest_id, "problem_id" => $problem_id)));
-        $run = $runs[0];
+        $run = RunsDAO::getByAlias($return_array["run_alias"]);
         $this->assertNotNull($run);
         
         // Validate data        
@@ -344,7 +346,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Set submissions gap of 2 seconds
         $contest = ContestsDAO::getByPK($contest_id);                
-        $contest->setSubmissionsGap(2);
+        $contest->setSubmissionsGap(20);
         ContestsDAO::save($contest);
         
         // Create problem in contest        
@@ -356,44 +358,38 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         $newRun = new NewRun($this->graderMock);        
-        for($i = 0; $i < 2; $i++)
+                    
+        try
         {
-            // Send first Run, should succeed
-            sleep(1);
-            try
-            {
-                $return_array = $newRun->ExecuteApi();
-            }
-            catch(ApiException $e)
-            {                
-                var_dump($e->getArrayMessage());            
-                $this->fail("Unexpected exception");
-            }
-
-            // Validate output
-            $this->assertEquals("ok", $return_array["status"]);
-
-            // Send second run after 1 sec, should be invalid
-            sleep(1);
-            try
-            {
-                $return_array = $newRun->ExecuteApi();
-            }
-            catch(ApiException $e)
-            {
-                // Validate exception            
-                $exception_message = $e->getArrayMessage();            
-                $this->assertEquals("You're not allowed to submit yet.", $exception_message["error"]);
-                $this->assertEquals("error", $exception_message["status"]);
-                $this->assertEquals("HTTP/1.1 401 FORBIDDEN", $exception_message["header"]);                                         
-                
-                // We're OK
-                continue;
-            }
-            var_dump($contest);
-            var_dump($return_array);
-            $this->fail("Contestant was able to submit run inside the submission gap.");
+            $return_array = $newRun->ExecuteApi();
         }
+        catch(ApiException $e)
+        {                
+            var_dump($e->getArrayMessage());            
+            $this->fail("Unexpected exception");
+        }
+
+        // Validate output
+        $this->assertEquals("ok", $return_array["status"]);
+
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            // Validate exception            
+            $exception_message = $e->getArrayMessage();            
+            $this->assertEquals("You're not allowed to submit yet.", $exception_message["error"]);
+            $this->assertEquals("error", $exception_message["status"]);
+            $this->assertEquals("HTTP/1.1 401 FORBIDDEN", $exception_message["header"]);                                         
+
+            // We're OK
+            return;
+        }
+        var_dump($contest);
+        var_dump($return_array);
+        $this->fail("Contestant was able to submit run inside the submission gap.");
     }
             
     public function testSubmissionGapIsPerProblem()

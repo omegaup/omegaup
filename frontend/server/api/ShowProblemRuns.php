@@ -26,13 +26,12 @@ class ShowProblemRuns extends ApiHandler
         ->validate(RequestContext::get("problem_alias"), "problem_alias");
          
     }   
-        
-    
+            
     protected function GenerateResponse() 
     {        
         $runs_mask = null;
         
-        // If user is contest director, he will be able to see all runs
+        // If user is contest director or problem author, he will be able to see all runs
         try
         {
             $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
@@ -48,7 +47,7 @@ class ShowProblemRuns extends ApiHandler
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }
 
-        if ($contest->getDirectorId() == $this->_user_id )
+        if ($contest->getDirectorId() == $this->_user_id || $problem->getAuthorId() == $this->_user_id)
         {
             // Get all runs for problem given        
             $runs_mask = new Runs( array (                
@@ -62,25 +61,33 @@ class ShowProblemRuns extends ApiHandler
                 "problem_id" => $problem->getProblemId()));
         }
         
-        $relevant_columns = array( "run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
+        // Filter relevant columns
+        $relevant_columns = array( "run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
         
-        // Get our problems given the user_id and problem_id
+        // Get our runs
         try
         {            
             $runs = RunsDAO::search($runs_mask, "time", "DESC", $relevant_columns );
         }
         catch(Exception $e)
-        {
+        { 
             // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
+        }                
         
-        }
+        // DAOs need run_id but we dont want to expose it, deleting it
+        array_shift($relevant_columns);
         
-        // Add the clarificatoin the response
+        // Add the run to the response
+        $index = 0;
         foreach($runs as $run)
         { 
-            $this->addResponse($run->getRunId(), $run->asFilteredArray($relevant_columns));               
-        }                     
+            $this->addResponse($index, $run->asFilteredArray($relevant_columns));               
+            $index++;
+        }     
+        
+        // All clear
+        $this->addResponse("status", "ok");
     }    
 }
 
