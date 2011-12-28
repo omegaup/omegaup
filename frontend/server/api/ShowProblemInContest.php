@@ -77,7 +77,7 @@ class ShowProblemInContest extends ApiHandler
         }        
         
         // Read the file that contains the source
-        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".markdown";
+        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
         try
         {            
             $file_content = FileHandler::ReadFile($source_path);                        

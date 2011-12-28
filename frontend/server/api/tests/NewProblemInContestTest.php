@@ -130,7 +130,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertFileExists($targetpath . "contents.zip");                        
         $this->assertFileExists($targetpath . "testplan");
         $this->assertFileExists($targetpath . "cases");
-        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "en.markdown");
+        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "en.html");
                 
         // Default data
         $this->assertEquals(0, $problem->getVisits());
