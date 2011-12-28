@@ -16,6 +16,8 @@ require_once 'Utils.php';
 
 class NewRunTest extends PHPUnit_Framework_TestCase
 {
+    private $graderMock;
+    
     public function setUp()
     {        
         Utils::ConnectToDB();
@@ -48,17 +50,32 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     
     private function setValidContext($contest_id, $problem_id)
     {
+        // User should visit contest prior submit a solution
         $this->openContestBeforeSubmit($contest_id);
         
+        // Get contest & problem object from DB
         $contest = ContestsDAO::getByPK($contest_id);
         $problem = ProblemsDAO::getByPK($problem_id);
         
+        // Set context
         RequestContext::set("contest_alias", $contest->getAlias());
-        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("problem_alias", $problem->getAlias());                
+        
+        // Pick a language
         $languages = array ('c','cpp','java','py','rb','pl','cs','p');
         RequestContext::set("language", $languages[array_rand($languages, 1)]);
         RequestContext::set("source", "#include <stdio.h> int main() { printf(\"100\"); }");
+        
+        // PhpUnit doesn't set a REMOTE_ADDR, doing it manually
         $_SERVER['REMOTE_ADDR'] = "123.123.123.123"; 
+        
+        // Create the Grader mock
+        $this->graderMock = $this->getMock('Grader', array('Grade'));
+        
+        // Set expectations
+        $this->graderMock->expects($this->any())
+                ->method('Grade')
+                ->will($this->returnValue(true));
     }
     
     public function testNewValidRun($contest_id = null, $problem_id = null)
@@ -83,7 +100,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -150,7 +167,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -189,7 +206,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -245,7 +262,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -293,7 +310,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -338,7 +355,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         Utils::SetAuthToken($auth_token);
         $this->setValidContext($contest_id, $problem_id);
         
-        $newRun = new NewRun();        
+        $newRun = new NewRun($this->graderMock);        
         for($i = 0; $i < 2; $i++)
         {
             // Send first Run, should succeed
@@ -403,7 +420,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         Utils::SetAuthToken($auth_token);
         $this->setValidContext($contest_id, $problem_id[0]);
         
-        $newRun = new NewRun();        
+        $newRun = new NewRun($this->graderMock);        
         
         // Send problems
         for($i = 0; $i < 3; $i++)
@@ -451,7 +468,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id_1, $problem_id);        
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -506,7 +523,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
             unset($_REQUEST[$key]);
             
             // Execute API
-            $newRun = new NewRun();
+            $newRun = new NewRun($this->graderMock);
             try
             {
                 $return_array = $newRun->ExecuteApi();
@@ -549,7 +566,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -590,7 +607,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         ContestsUsersDAO::save($contest_user);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();

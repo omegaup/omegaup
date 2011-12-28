@@ -19,6 +19,10 @@ define("OMEGAUP_LOG_ERROR_FILE", 	"/Applications/XAMPP/htdocs/omegaup/frontend/s
 define("OMEGAUP_LOG_TRACKBACK", false);
 define("OMEGAUP_LOG_DB_QUERYS", true);
 
+define("OMEGAUP_SSLCERT_URL", "/Applications/XAMPP/htdocs/omegaup/frontend/server/api/tests/omegaup.pem");
+define("OMEGAUP_CACERT_URL", "/Applications/XAMPP/htdocs/omegaup/frontend/server/apu/tests/omegaup-ca.crt");
+define("OMEGAUP_GRADER_URL", "https://localhost:21680/grade/");
+
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . "C:/XAMPP/htdocs/omegaup/frontend/server");
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . "/Applications/XAMPP/xamppfiles/htdocs/omegaup/frontend/server");	
