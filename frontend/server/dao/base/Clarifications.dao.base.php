@@ -219,7 +219,7 @@ abstract class ClarificationsDAOBase extends DAO
 			$Clarifications->getAuthorId(), 
 			$Clarifications->getMessage(), 
 			$Clarifications->getAnswer(), 
-			NULL, 
+                        $Clarifications->getTime(), 
 			$Clarifications->getProblemId(), 
 			$Clarifications->getContestId(), 
 			$Clarifications->getPublic(), 

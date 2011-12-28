@@ -13,9 +13,9 @@ require_once 'Utils.php';
 
 class NewClarificationTest extends PHPUnit_Framework_TestCase
 {
-    
+        
     public function setUp()
-    {        
+    {                
         Utils::ConnectToDB();
     }
     
@@ -73,12 +73,13 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(RequestContext::get("message"), $clarification->getMessage());
         $this->assertEquals($contest->getContestId(), $clarification->getContestId());
         $this->assertEquals($problem->getProblemId(), $clarification->getProblemId());                
-
+                
+        // Differentiate two consecutive clarifications by time
+        $clarification->setTime(Utils::getNextTime());
+        ClarificationsDAO::save($clarification);
+        
         // Clean requests
         Utils::cleanup();        
-        
-        // Differentiate two consecutive clarifications by time
-        sleep(1);
         
         return $returnValue["clarification_id"];
         

@@ -24,6 +24,9 @@ class Utils
     static $judge;
     static $problem_author;
     
+    static $inittime;
+    static $counttime;
+    
     
     //put your code here
     static function cleanup()
@@ -319,6 +322,12 @@ class Utils
         $contestant->setPassword($password);
         
         return $contestant;
+    }
+    
+    static function getNextTime()
+    {        
+        self::$counttime++;                
+        return Utils::GetTimeFromUnixTimestam(self::$inittime + self::$counttime);
     }
 }
 

@@ -162,10 +162,10 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         // Create clarification in same problem/contest
         $clarification_id_2 = $newClarificationTest->testCreateValidClarification($contest_id, $problem_id);                        
          
-        // Hack clarificatoin 2, change created user to 2 and make it public
+        // Hack clarification 2, change created user to 2 and make it public
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
         $clarification_2->setAuthorId(Utils::GetContestant2UserId());
-        $clarification_2->setPublic('1');
+        $clarification_2->setPublic('1');        
         ClarificationsDAO::save($clarification_2);
         
         // Get problem id from clarification        
@@ -260,26 +260,26 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         {
             var_dump($e->getArrayMessage());            
             $this->fail("Unexpected exception");
-        }
+        }        
         
         // Check that we have all 3 clarifications                      
         $this->assertEquals(3, count($returnArray));                                             
         
         // Check clarification #2
-        $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
-        
-        // Assert status of clarification #2 (TIMESTAM has changed)
-        $this->assertEquals($clarification_2->getMessage(), $returnArray[0]["message"]);
-        $this->assertEquals($clarification_2->getAnswer(), $returnArray[0]["answer"]);
-        $this->assertEquals($clarification_2->getTime(), $returnArray[0]["time"]);                   
-        
-        // Check clarification #3
         $clarification_3 = ClarificationsDAO::getByPK($clarification_id_3);
         
+        // Assert status of clarification #2 (TIMESTAM has changed)
+        $this->assertEquals($clarification_3->getMessage(), $returnArray[0]["message"]);
+        $this->assertEquals($clarification_3->getAnswer(), $returnArray[0]["answer"]);
+        $this->assertEquals($clarification_3->getTime(), $returnArray[0]["time"]);                   
+        
+        // Check clarification #3
+        $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
+        
         // Assert status of clarification
-        $this->assertEquals($clarification_3->getMessage(), $returnArray[1]["message"]);
-        $this->assertEquals($clarification_3->getAnswer(), $returnArray[1]["answer"]);
-        $this->assertEquals($clarification_3->getTime(), $returnArray[1]["time"]);                        
+        $this->assertEquals($clarification_2->getMessage(), $returnArray[1]["message"]);
+        $this->assertEquals($clarification_2->getAnswer(), $returnArray[1]["answer"]);
+        $this->assertEquals($clarification_2->getTime(), $returnArray[1]["time"]);                        
         
         
         // Check clarification #1
