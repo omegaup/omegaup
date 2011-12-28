@@ -34,8 +34,9 @@ class ShowProblemInContest extends ApiHandler
                 return ProblemsDAO::getByAlias($value);
             }, "Problem requested is invalid."))
         ->validate(RequestContext::get("problem_alias"), "problem_alias");
-         
-            
+                 
+        ValidatorFactory::stringOfMaxLengthValidator(2)
+            ->validate(RequestContext::get("lang"), "lang");    
             
         // Is the combination contest_id and problem_id valid?        
         $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
@@ -76,12 +77,12 @@ class ShowProblemInContest extends ApiHandler
         }        
         
         // Read the file that contains the source
-        $source_path = PROBLEMS_PATH . $problem->getAlias();
+        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".markdown";
         try
-        {
-            $file_content = FileHandler::ReadFile($source_path);
+        {            
+            $file_content = FileHandler::ReadFile($source_path);                        
         }
-        catch(Exceptio $e)
+        catch(Exception $e)
         {
             throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
         }        

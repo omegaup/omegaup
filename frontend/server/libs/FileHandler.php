@@ -1,7 +1,22 @@
 <?php
 
+require_once('FileUploader.php');
+
 class FileHandler 
 {
+    
+    protected static $fileUploader;
+    
+    static function SetFileUploader(FileUploader $fileUploader)
+    {
+        self::$fileUploader = $fileUploader;
+    }
+    
+    static function GetFileUploader()
+    {
+        return self::$fileUploader;
+    }
+        
     static function ReadFile($filepath)
     {
         if(!file_exists($filepath))
@@ -39,6 +54,23 @@ class FileHandler
         if(!fclose($handle))
         {
             throw new Exception("Not able to close recently created file. ");
+        }
+    }
+    
+    static function MoveFileFromRequestTo($fileUploadName, $targetPath)
+    {
+        if(!(static::$fileUploader->IsUploadedFile($_FILES[$fileUploadName]['tmp_name']) && 
+            static::$fileUploader->MoveUploadedFile($_FILES[$fileUploadName]['tmp_name'], $targetPath)))
+        {                  
+            throw new Exception("FATAL: Not able to move tmp_file from _FILE. ". implode('\n', $_FILES[$fileUploadName]));            
+        }
+    }
+    
+    static function MakeDir($pathName, $chmod = 0777)
+    {
+        if(!mkdir($pathName, $chmod))
+        {
+            throw new Exception("FATAL: Not able to move create dir ". $pathName . " CHMOD: " . $chmod);
         }
     }
 }

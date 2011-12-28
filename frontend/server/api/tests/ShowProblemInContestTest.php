@@ -44,6 +44,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $problem = ProblemsDAO::getByPK($problem_id);
         RequestContext::set("problem_alias", $problem->getAlias());        
         RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
@@ -70,7 +71,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
         $this->assertEquals($return_array["author_id"], $problem->getAuthorId()); 
         $this->assertEquals($return_array["source"], $problem->getSource()); 
-        $this->assertEquals($return_array["problem_statement"], "<p>redacción</p>");
+        $this->assertContains("<h1>Salida</h1>", $return_array["problem_statement"]);
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data
@@ -110,6 +111,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $problem = ProblemsDAO::getByPK($problem_id);
         RequestContext::set("problem_alias", $problem->getAlias());        
         RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
@@ -152,7 +154,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
         $this->assertEquals($return_array["author_id"], $problem->getAuthorId());        
         $this->assertEquals($return_array["source"], $problem->getSource()); 
-        $this->assertEquals($return_array["problem_statement"], "<p>redacción</p>");
+        $this->assertContains("<h1>Salida</h1>", $return_array["problem_statement"]);
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data
@@ -192,6 +194,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $problem = ProblemsDAO::getByPK($problem_id);
         RequestContext::set("problem_alias", $problem->getAlias());        
         RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
         
         // Execute API
         $showProblemInContest = new ShowProblemInContest();
@@ -235,6 +238,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $problem = ProblemsDAO::getByPK($problem_id);
         RequestContext::set("problem_alias", $problem->getAlias());        
         RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
