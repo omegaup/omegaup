@@ -101,12 +101,12 @@ class ShowClarificationsInProblem extends ApiHandler
         }
         
         // Sort final array by time
-        usort($clarifications_array, function ($a,$b) 
+        usort($clarifications_array, function($a, $b) 
             { 
                 $t1 = strtotime($a["time"]);
                 $t2 = strtotime($b["time"]);
                 
-                if($t1 == $t2)
+                if($t1 === $t2)
                     return 0;
                 
                 return ($t1 > $t2) ? -1 : 1;             

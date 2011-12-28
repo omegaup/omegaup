@@ -61,7 +61,10 @@ class UpdateClarification extends ApiHandler
         // The clarificator may opt to modify the message (typos)
         $clarification->setMessage(RequestContext::get("message"));                
         $clarification->setAnswer(RequestContext::get("answer"));
-        $clarification->setPublic(RequestContext::get("public"));
+        $clarification->setPublic(RequestContext::get("public"));                
+        
+        // Let DB handle time update
+        $clarification->setTime(NULL);
                 
         // Save the clarification
         try

@@ -74,3 +74,7 @@
     Utils::$judge = Utils::CreateUser("judge", "password");
     Utils::$problem_author = Utils::CreateUser("problem_author", "password");       
     
+    // Initialize time counters
+    Utils::$counttime = 0;
+    Utils::$inittime = Utils::GetPhpUnixTimestamp();
+    
