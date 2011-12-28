@@ -28,39 +28,37 @@ class RunsDAO extends RunsDAOBase
     public static final function GetLastRun($contest_id, $problem_id, $user_id)
     {
         //Build SQL statement
-        $sql = "SELECT time from Runs where user_id = ? and contest_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1";
+        $sql = "SELECT * from Runs where user_id = ? and contest_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1";
         $val = array($user_id, $contest_id, $problem_id);
 
         global $conn;
         $rs = $conn->GetRow($sql, $val);            
 
+        if(count($rs) === 0)
+        {
+            return null;
+        }
         $bar =  new Runs($rs);
-
+        
         return $bar;
-
     }
+        
 
     public static final function IsRunInsideSubmissionGap($contest_id, $problem_id, $user_id)
     {
-        // SQL Statement
-        $sql = "SELECT IF (
-                          ( (SELECT COUNT(time) from Runs where user_id = ? and contest_id = ? and problem_id = ?) =
-                            0
-                          )
-                          OR (   
-                            (SELECT UNIX_TIMESTAMP()) >= 
-                            (SELECT UNIX_TIMESTAMP(time) from Runs where user_id = ? and contest_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1) 
-                                + ( SELECT submissions_gap FROM Contests WHERE contest_id = ? )
-                          )                             
-                          ,1,0 ) As 'IsValid' ;";
-        $val = array($user_id, $contest_id, $problem_id, $user_id, $contest_id, $problem_id, $contest_id, $contest_id);
-
-        global $conn;
-        $rs = $conn->GetRow($sql, $val); 
-
-        if($rs["IsValid"] === '1') return true;
-
-        return false;
+        // Get last run
+        $lastrun = self::GetLastRun($contest_id, $problem_id, $user_id);
+        
+        if(is_null($lastrun))
+        {            
+            return true;
+        }
+        
+        // Get submissions gap
+        $contest = ContestsDAO::getByPK($contest_id);
+                
+        // Giving 10 secs as gift
+        return time() >= (strtotime($lastrun->getTime()) + (int)$contest->getSubmissionsGap() - 10);
     }
 
 }

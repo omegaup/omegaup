@@ -152,11 +152,7 @@ class ShowRunTest extends PHPUnit_Framework_TestCase
         var_dump($return_array);
         $this->fail("Contestant was able to submit run in an expired contest.");    
         
-    }
-    
-        
-    // create a run from user, show run from judge
-    // not show others' runs
+    }                
 }
 
 ?>
