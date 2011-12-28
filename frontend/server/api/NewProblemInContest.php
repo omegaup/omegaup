@@ -171,7 +171,7 @@ class NewProblemInContest extends ApiHandler
                     $file_contents = FileHandler::ReadFile($filepath);
                     
                     // Markup
-                    $file_contents = markdown($file_contents);
+                    $file_contents = '<div class="problem-statement">' . markdown($file_contents) . '</div>'; 
                     
                     // Overwrite file
                     $lang = basename($statement, ".markdown");

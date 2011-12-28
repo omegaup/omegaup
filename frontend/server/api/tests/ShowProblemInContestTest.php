@@ -72,6 +72,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["author_id"], $problem->getAuthorId()); 
         $this->assertEquals($return_array["source"], $problem->getSource()); 
         $this->assertContains("<h1>Salida</h1>", $return_array["problem_statement"]);
+        $this->assertContains('<div class="problem-statement">', $return_array["problem_statement"]);
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data
