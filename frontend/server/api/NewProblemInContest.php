@@ -208,7 +208,13 @@ class NewProblemInContest extends ApiHandler
             {
                throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
             }
-        }                
+        }  
+        
+        // Adding unzipped files to response
+        $this->addResponse("uploaded_files", $this->filesToUnzip);
+        
+        // All clear
+        $this->addResponse("status", "ok");
     }    
 }
 
