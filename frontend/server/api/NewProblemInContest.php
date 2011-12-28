@@ -13,10 +13,28 @@
  * */
 
 require_once("ApiHandler.php");
+
 require_once(SERVER_PATH . '/libs/FileHandler.php');
+require_once(SERVER_PATH . '/libs/FileUploader.php');
+require_once(SERVER_PATH . '/libs/ZipHandler.php');
+require_once(SERVER_PATH . '/libs/ProblemContentsZipValidator.php');
+require_once(SERVER_PATH . '/libs/Markdown/markdown.php');
 
 class NewProblemInContest extends ApiHandler
 {            
+    public function NewProblemInContest(FileUploader $fileUploader = NULL)
+    {
+        // Set file uploader to the file handler
+        if(is_null($fileUploader))
+        {
+            $fileUploader = new FileUploader();            
+        }
+        
+        FileHandler::SetFileUploader($fileUploader);
+    }
+    
+    private $filesToUnzip;
+    
     protected function RegisterValidatorsToRequest()
     {   
        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
@@ -72,16 +90,26 @@ class NewProblemInContest extends ApiHandler
                 ->validate(RequestContext::get("time_limit"), "time_limit");
         
         ValidatorFactory::numericRangeValidator(0, INF)
-                ->validate(RequestContext::get("memory_limit"), "memory_limit");
-        
-        ValidatorFactory::htmlValidator()->validate(RequestContext::get("problem_statement"), "problem_statement");
+                ->validate(RequestContext::get("memory_limit"), "memory_limit");                
                 
         ValidatorFactory::enumValidator(array("normal", "inverse"))
                 ->validate(RequestContext::get("order"), "order"); 
         
         ValidatorFactory::numericRangeValidator(0, INF)
                 ->validate(RequestContext::get("points"), "points");
-
+        
+        if(!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name']))
+        {
+            throw new ApiException(ApiHttpErrors::invalidParameter("problem_contents is missing."));
+        }
+        
+        // Validate zip contents
+        $zipValidator = new Validator();
+        $zipValidator->addValidator(new ProblemContentsZipValidator)
+                     ->validate($_FILES['problem_contents']['tmp_name'], 'problem_contents');                
+        
+        // Save files to unzip                
+        $this->filesToUnzip = $zipValidator->getValidator(0)->filesToUnzip;        
     }       
     
     protected function GenerateResponse() 
@@ -121,10 +149,49 @@ class NewProblemInContest extends ApiHandler
                 "problem_id" => $problem->getProblemId(),
                 "points"     => RequestContext::get("points")));
             ContestProblemsDAO::save($relationship);
+            
+            // Create file after we know that alias is unique
+            try 
+            {
+                // Create paths
+                $dirpath = PROBLEMS_PATH . RequestContext::get("alias");
+                $filepath = $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';                
+                
+                // Drop contents into path required
+                FileHandler::MakeDir($dirpath);                
+                FileHandler::MoveFileFromRequestTo('problem_contents', $filepath);                                
+                ZipHandler::DeflateZip($filepath, $dirpath, $this->filesToUnzip);
+                
+                // Transform statements from markdown to HTML
+                $statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $this->filesToUnzip);
+                
+                foreach($statements as $statement)
+                {
+                    $filepath = $dirpath . DIRECTORY_SEPARATOR . $statement;
+                    $file_contents = FileHandler::ReadFile($filepath);
+                    
+                    // Markup
+                    $file_contents = markdown($file_contents);
+                    
+                    // Overwrite file
+                    FileHandler::CreateFile($filepath, $file_contents);
+                }
+                
+            }
+            catch (Exception $e)
+            {
+                throw new ApiException( ApiHttpErrors::invalidFilesystemOperation("Unable to process problem_contents given. Please check the format. "), $e );
+            }
 
             //End transaction
             ProblemsDAO::transEnd();
-
+        }
+        catch(ApiException $e)
+        {
+            // Operation failed in the data layer, rollback transaction 
+            ProblemsDAO::transRollback();
+            
+            throw $e;
         }
         catch(Exception $e)
         {  
@@ -140,18 +207,7 @@ class NewProblemInContest extends ApiHandler
             {
                throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
             }
-        }
-        
-        // Create file after we know that alias is unique
-        try 
-        {
-            $filename = RequestContext::get("alias");
-            FileHandler::CreateFile(PROBLEMS_PATH . $filename, RequestContext::get("problem_statement"));                        
-        }
-        catch (Exception $e)
-        {
-            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
-        }
+        }                
     }    
 }
 

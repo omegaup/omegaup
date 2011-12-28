@@ -1,100 +1,79 @@
 <?php
 
-class ZipHandler{
-	
-	
-  /**
-    *
-    *
-    **/	
-  	private static function DeflateZip( $pathToZip ){
+require_once(SERVER_PATH . '/libs/ApiUtils.php');
 
-		if( is_null($pathToZip) ){
-			throw new Exception( "Invalid path to ZIP" );
-		}
-
-		//tmp name for deflated contents
-		$zid = time();
-
-
-		//try to read up the zip
-		try{
-			$zip = zip_open( $pathToZip );
-			
-		}catch(Exception $e){
-			Logger::error($e);
-			throw $e;
-			
-		}
-
-
-
-		//unsuccesful?
-		if (!$zip) {
-			throw new Exception("Unable to open " . $pathToZip );
-		}
-
-
-		//create tmp folder
-		$tmp_dir  = OMEGAUP_ROOT . "tmp/" . $zid;
-		
-		if(!mkdir ($tmp_dir)){
-			Logger::error("Unable to create temporary directory while trying to unzip.");
-			throw new Excepetion( "Unable to create temporary directory." );
-		}
-
-
-		//dump zipped files there
-		while ($zip_entry = zip_read($zip)) {
-			
-			$fp = @fopen( $tmp_dir . "/" . zip_entry_name($zip_entry), "w");
-			
-			if(!$fp) continue;
-			
-			if (zip_entry_open($zip, $zip_entry, "r")) {
-				
-				$buf = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
-				
-				if( fwrite($fp, "$buf") === FALSE ){
-					Logger::error("Failure while writing unziped contents of " . $pathToZip);
-					throw new Exception("Failure while writing unziped contents of " . $pathToZip);
-					
-				}
-				
-				zip_entry_close($zip_entry);
-				
-				fclose($fp);
-			}
-
-		}
-
-		zip_close($zip);
-
-		return $zid;
-
-	}//deflateZip()
-
-
-
-  /**
-    * Deletes temporary folder used by ZipHandler::DeflateZIP
-    *
-    **/
-	private static function ZipCleanup( $zid ){
-
-	    $tmp_dir  = OMEGAUP_ROOT . "tmp/" . $zid;
-	
-	    if( unlink( $tmp_dir ) === FALSE ){
-			Logger::error("Unable to remove the file " . $tmp_dir . " while doing ZipCleanup");
-			throw new Excpetion("Unable to remove the file " . $tmp_dir);
-		}
-	
-
-	}
-
-
-
-
-
-	
+class ZipHandler
+{
+    public static function DeflateZip($pathToZip, $extractToDir, array $filesArray = NULL)
+    {
+        if( is_null($pathToZip) )
+        {
+            throw new Exception( "Path to ZIP ins null" );
+        }
+        
+        $zip = new ZipArchive();        
+        $zipResource = $zip->open($pathToZip);
+        
+        if($zipResource === TRUE)
+        {
+            if(!$zip->extractTo($extractToDir, $filesArray))
+            {
+                throw new Exception("Error extracting zip.");
+            }
+            
+            $zip->close();
+        }
+        else
+        {
+            throw new Exception("Error openning zip file: " . $this->zipFileErrMsg($zipResource));
+        }                
+    }    
+        
+    public static function ZipCleanup( $tmp_dir )
+    {
+        if( unlink( $tmp_dir ) === FALSE )
+        {
+            Logger::error("Unable to remove the file " . $tmp_dir . " while doing ZipCleanup");
+            throw new Excpetion("Unable to remove the file " . $tmp_dir);
+        }
+    }	
+    
+    public static function zipFileErrMsg($errno) {
+                
+        $zipFileFunctionsErrors = array(
+            'ZIPARCHIVE::ER_MULTIDISK' => 'Multi-disk zip archives not supported.',
+            'ZIPARCHIVE::ER_RENAME' => 'Renaming temporary file failed.',
+            'ZIPARCHIVE::ER_CLOSE' => 'Closing zip archive failed', 
+            'ZIPARCHIVE::ER_SEEK' => 'Seek error',
+            'ZIPARCHIVE::ER_READ' => 'Read error',
+            'ZIPARCHIVE::ER_WRITE' => 'Write error',
+            'ZIPARCHIVE::ER_CRC' => 'CRC error',
+            'ZIPARCHIVE::ER_ZIPCLOSED' => 'Containing zip archive was closed',
+            'ZIPARCHIVE::ER_NOENT' => 'No such file.',
+            'ZIPARCHIVE::ER_EXISTS' => 'File already exists',
+            'ZIPARCHIVE::ER_OPEN' => 'Can\'t open file', 
+            'ZIPARCHIVE::ER_TMPOPEN' => 'Failure to create temporary file.', 
+            'ZIPARCHIVE::ER_ZLIB' => 'Zlib error',
+            'ZIPARCHIVE::ER_MEMORY' => 'Memory allocation failure', 
+            'ZIPARCHIVE::ER_CHANGED' => 'Entry has been changed',
+            'ZIPARCHIVE::ER_COMPNOTSUPP' => 'Compression method not supported.', 
+            'ZIPARCHIVE::ER_EOF' => 'Premature EOF',
+            'ZIPARCHIVE::ER_INVAL' => 'Invalid argument',
+            'ZIPARCHIVE::ER_NOZIP' => 'Not a zip archive',
+            'ZIPARCHIVE::ER_INTERNAL' => 'Internal error',
+            'ZIPARCHIVE::ER_INCONS' => 'Zip archive inconsistent', 
+            'ZIPARCHIVE::ER_REMOVE' => 'Can\'t remove file',
+            'ZIPARCHIVE::ER_DELETED' => 'Entry has been deleted',
+        );
+        $errmsg = 'unknown';
+        
+        foreach ($zipFileFunctionsErrors as $constName => $errorMessage) 
+        {
+            if (defined($constName) and constant($constName) === $errno) 
+            {
+                return 'Zip File Function error: '.$errorMessage;
+            }
+        }
+        return 'Zip File Function error: unknown';
+    }
 }

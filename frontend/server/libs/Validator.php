@@ -21,6 +21,11 @@ class Validator
         return $this;
     }
     
+    public function getValidator($index)
+    {
+        return $this->_validators[$index];
+    }
+    
     public function validate($value, $value_name)
     {
         foreach($this->_validators as $validator) 
