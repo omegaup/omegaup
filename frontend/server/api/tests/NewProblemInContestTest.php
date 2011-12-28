@@ -96,10 +96,12 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
             var_dump($e->getArrayMessage());
             var_dump($e->getWrappedException()->getMessage());            
             $this->fail("Unexpected exception");
-        }
+        }        
         
-        // Verify status
+        // Verify response
         $this->assertEquals("ok", $return_array["status"]);
+        $this->assertEquals("testplan", $return_array["uploaded_files"][10]);
+        
         
         // Verify data in DB
         $problem_mask = new Problems();
