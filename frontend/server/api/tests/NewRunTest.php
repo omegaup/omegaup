@@ -137,7 +137,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getMemory());
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
-        $this->assertEquals("123.123.123.123", $run->getIp());
+        $this->assertEquals("127.0.0.1", $run->getIp());
         $this->assertEquals(0, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
                 
@@ -242,7 +242,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getMemory());
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
-        $this->assertEquals("123.123.123.123", $run->getIp());
+        $this->assertEquals("127.0.0.1", $run->getIp());
         $this->assertEquals(0, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
     }
