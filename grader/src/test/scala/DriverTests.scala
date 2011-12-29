@@ -34,6 +34,8 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		Config.set("input.root", root.getCanonicalPath + "/input")
 		Config.set("runner.preserve", "true")
 		Config.set("logging.level", "debug")
+		Config.set("logging.file", "")
+		Config.set("grader.port", "21681")
 
 		Logging.init
 		

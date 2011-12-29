@@ -49,6 +49,7 @@ object GraderData {
 				problem = new Problem(
 					 id = rs.getLong("problem_id"),
 					 validator = Validator.withName(rs.getString("validator")),
+					 alias = rs.getString("alias"),
 					 server = rs.getString("server") match {
 					 	case null => None
 					 	case x: String => Some(Server.withName(x))
