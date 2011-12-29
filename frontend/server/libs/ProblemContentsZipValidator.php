@@ -8,10 +8,12 @@ require_once('Validator.php');
 class ProblemContentsZipValidator extends Validator
 {
     public $filesToUnzip;
+    public $casesFiles;
     
     public function validate($value)
     {                
         $this->filesToUnzip = array();
+        $this->casesFiles = array();
         
         $zip = new ZipArchive();        
         $resource = $zip->open($value);
@@ -22,13 +24,17 @@ class ProblemContentsZipValidator extends Validator
             for($i = 0; $i < $zip->numFiles; $i++)
             {
                 $zipFilesArray[] = $zip->getNameIndex($i);
-            }                                                        
-            
+            }
+
             // Look for testplan
             if(in_array("testplan", $zipFilesArray))
             {                
                 $returnValue =  $this->checkCasesWithTestplan($zip, $zipFilesArray);                
                 $this->filesToUnzip[] = 'testplan';
+            }
+            else
+            {
+                $returnValue = $this->checkCases($zip, $zipFilesArray);
             }            
             
             // Look for statements
@@ -61,22 +67,39 @@ class ProblemContentsZipValidator extends Validator
             $path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.in';            
             if(!$zip->getFromName($path))
             {
-                $this->setError("Not able to found ". $testplan_array[1][$i] . " in testplan.");                
+                $this->setError("Not able to find ". $testplan_array[1][$i] . " in testplan.");                
                 return false;
             }                        
-            $this->filesToUnzip[] = $path;            
+            $this->filesToUnzip[] = $path;
+            $this->casesFiles[] = $path;
             
             // Check .out file
             $path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.out';
             if(!$zip->getFromName($path))
             {
-                $this->setError("Not able to found ". $testplan_array[1][$i] . " in testplan.");
+                $this->setError("Not able to find ". $testplan_array[1][$i] . " in testplan.");
                 return false;
             }
             $this->filesToUnzip[] = $path;
+            $this->casesFiles[] = $path;
         }
         
         return true;        
+    }
+
+    private function checkCases(ZipArchive $zip, array $zipFilesArray)
+    {
+        // Add all files in cases/ that end either in .in or .out
+        for ($i = 0; $i < count($zipFilesArray); $i++)
+        {
+            $path = $zipFilesArray[$i];
+            $l = strlen($path);
+            if (strpos($path, "cases/" == 0) && (strpos($path, ".in") == $l - 3 || strpos($path, ".out") == $l - 4))
+            {
+                $this->filesToUnzip[] = $path;
+                $this->casesFiles[] = $path;
+            }
+        }
     }
     
     private function checkProblemStatements(array $zipFilesArray)
@@ -86,7 +109,7 @@ class ProblemContentsZipValidator extends Validator
                 
         if(count($statements) < 1)
         {
-            $this->setError("No statements found. ");
+            $this->setError("No statements found.");
             return false;
         }
         

@@ -34,6 +34,7 @@ class NewProblemInContest extends ApiHandler
     }
     
     private $filesToUnzip;
+    private $casesFiles;
     
     protected function RegisterValidatorsToRequest()
     {   
@@ -110,6 +111,9 @@ class NewProblemInContest extends ApiHandler
         
         // Save files to unzip                
         $this->filesToUnzip = $zipValidator->getValidator(0)->filesToUnzip;        
+        $this->casesFiles = $zipValidator->getValidator(0)->casesFiles;
+
+        sort($this->casesFiles);
     }       
     
     protected function GenerateResponse() 
@@ -177,7 +181,27 @@ class NewProblemInContest extends ApiHandler
                     $lang = basename($statement, ".markdown");
                     FileHandler::CreateFile($dirpath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html", $file_contents);
                 }
-                
+               
+                // Create cases.zip and inputname
+                $casesZip = new ZipArchive;
+                $casesZipPath = $dirpath . DIRECTORY_SEPARATOR . 'cases.zip';
+
+                if (($error = $casesZip->open($casesZipPath, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) !== TRUE)
+                {
+                    throw new Exception($error);
+                }
+
+		for ($i = 0; $i < count($this->casesFiles); $i++)
+                {
+                    if (!$casesZip->addFile($dirpath . DIRECTORY_SEPARATOR . $this->casesFiles[$i], substr($this->casesFiles[$i], strlen('cases/'))))
+                    {
+                        throw new Exception("Error trying to add {$this->casesFiles[$i]} to cases.zip");
+                    }
+                }
+
+                $casesZip->close();
+
+                file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($casesZipPath));
             }
             catch (Exception $e)
             {
