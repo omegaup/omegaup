@@ -1,4 +1,4 @@
-INSERT INTO Contests(title, description, start_time, finish_time, window_length, director_id, rerun_id, public, token, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start) VALUES ('ConTest', 'A test contest', '2000-01-01 00:00:00', '2000-01-01 06:00:00', NULL, 1, 0, 1, 'test', 80, 1, 0, 'yes', 20, 'contest');
+INSERT INTO Contests(title, description, start_time, finish_time, window_length, director_id, rerun_id, public, alias, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start) VALUES ('ConTest', 'A test contest', '2000-01-01 00:00:00', '2000-01-01 06:00:00', NULL, 1, 0, 1, 'test', 80, 1, 0, 'yes', 20, 'contest');
 
 INSERT INTO Problems(`problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `server`, `remote_id`, `time_limit`, `memory_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`) VALUES (1, 1, 1, 'Hello, World!', 'HELLO', 'token-caseless', NULL, NULL, 3000, 64, 0, 0, 0, 0, '2000-01-01 00:00:00', 'own', 'normal');
 

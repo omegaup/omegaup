@@ -159,6 +159,12 @@ object Manager extends Object with Log {
 			}
 		};
 
+		// start the drivers
+		drivers.OmegaUp.start
+		drivers.UVa.start
+		drivers.TJU.start
+		drivers.LiveArchive.start
+
 		// boilerplate code for jetty with https support	
 		val server = new org.mortbay.jetty.Server()
 		

@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `feedback` varchar(10) NOT NULL,
   `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
   `penalty_time_start` varchar(10) NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
-  `penalty_calc_policy` enum('sum', 'max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
+  `penalty_calc_policy` varchar(3) DEFAULT 'sum' NOT NULL COMMENT 'Indica como afecta el penalty al score.',
   PRIMARY KEY (`contest_id`)
 );
 
@@ -200,6 +200,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `contest_score` double NOT NULL DEFAULT '0',
   `ip` char(15) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `submit_delay` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`run_id`)
 );
 
