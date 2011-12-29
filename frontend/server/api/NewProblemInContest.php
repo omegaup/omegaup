@@ -154,9 +154,9 @@ class NewProblemInContest extends ApiHandler
             try 
             {
                 // Create paths
-                $dirpath = PROBLEMS_PATH . RequestContext::get("alias");
-                $filepath = $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';                
-                
+                $dirpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . RequestContext::get("alias");
+                $filepath = $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';
+
                 // Drop contents into path required
                 FileHandler::MakeDir($dirpath);                
                 FileHandler::MoveFileFromRequestTo('problem_contents', $filepath);                                

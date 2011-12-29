@@ -61,7 +61,7 @@ class ShowRun extends ApiHandler
         try
         {
             // Get source code
-            $filepath = RUNS_PATH . $this->myRun->getGuid();
+            $filepath = RUNS_PATH . DIRECTORY_SEPARATOR . $this->myRun->getGuid();
             RequestContext::set("source", FileHandler::ReadFile($filepath));                                        
         }
         catch (Exception $e)

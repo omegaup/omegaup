@@ -127,7 +127,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertNotEmpty($run->getGuid());
         
         // Validate file created
-        $filename = RUNS_PATH . $run->getGuid();
+        $filename = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
         $this->assertFileExists($filename);
         $fileContent = file_get_contents($filename);
         $this->assertEquals(RequestContext::get("source"), $fileContent);        
@@ -232,7 +232,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertNotEmpty($run->getGuid());
         
         // Validate file created
-        $filename = RUNS_PATH . $run->getGuid();
+        $filename = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
         $this->assertFileExists($filename);
         $fileContent = file_get_contents($filename);
         $this->assertEquals(RequestContext::get("source"), $fileContent);        

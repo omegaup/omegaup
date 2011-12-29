@@ -127,7 +127,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(RequestContext::get("source"), $problem->getSource());
         
         // Verify problem contents.zip were copied
-        $targetpath = PROBLEMS_PATH . $problem->getAlias() . DIRECTORY_SEPARATOR;        
+        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;        
         
         $this->assertFileExists($targetpath . "contents.zip");                        
         $this->assertFileExists($targetpath . "testplan");
