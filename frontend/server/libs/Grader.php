@@ -47,16 +47,18 @@ class Grader
         
         // Execute call
         $content = curl_exec($curl);
-        var_dump($content);       
-        if($content === FALSE)
-        {            
-            throw new Exception("curl_exec failed: " . curl_error($curl) . " ". curl_errno($curl));            
-        }
         
         // Close curl
         curl_close($curl);
         
-        // @todo validate $content                
+	if($content === FALSE)
+        {            
+            throw new Exception("curl_exec failed: " . curl_error($curl) . " ". curl_errno($curl));
+        }
+	else if ($content !== '{"status":"ok"}')
+	{
+            throw new Exception("Call to grader failed: $content");
+	}
     }
 }
 
