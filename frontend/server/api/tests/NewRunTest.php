@@ -63,7 +63,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Pick a language
         RequestContext::set("language", 'c');
-        RequestContext::set("source", "#include <stdio.h>\nint main() { printf(\"100\"); }");
+        RequestContext::set("source", "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }");
         
         // PhpUnit doesn't set a REMOTE_ADDR, doing it manually
         $_SERVER['REMOTE_ADDR'] = "127.0.0.1"; 

@@ -35,7 +35,9 @@ class GraderTest extends PHPUnit_Framework_TestCase
 	RunsDAO::unsetCache();
         $run = RunsDAO::getByPK($run->getRunId());
         
-        $this->assertNotEquals("new", $run->getStatus());
+        $this->assertEquals("ready", $run->getStatus());
+        $this->assertEquals("PA", $run->getVeredict());
+        $this->assertEquals(0.05, $run->getScore());
     }
 }
 
