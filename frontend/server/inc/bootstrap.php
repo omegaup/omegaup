@@ -6,34 +6,19 @@
 	 * 
 	 * */
 
+   // Set default time
+   date_default_timezone_set('UTC');
+   
    // Loads config
    define('SERVER_PATH', dirname(__DIR__));     
    
    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
 
    require_once(SERVER_PATH."/config.php");
-
-   // Define POST and GET constants for simplicity
-   define('POST', "__ISPOST__");
-   define('GET', "__ISGET__");
-
    
-
-   // Cache of roles_id
-   define('ADMIN', '1');
-   define('CONTESTANT', '2');
-   define('JUDGE', '3');
-   define('VISITOR', '4');
-   define('BYPASS', '-1');
-   
-
    require_once("libs/Logger/Logger.php");
-
-
    require_once('dao/model.inc.php');
 
-	
-	
 	/**
 	 * I am the API:
 	 * Connect to DB, and load the DAO's. 
