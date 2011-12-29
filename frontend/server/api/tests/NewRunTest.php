@@ -62,12 +62,11 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         RequestContext::set("problem_alias", $problem->getAlias());                
         
         // Pick a language
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        RequestContext::set("language", $languages[array_rand($languages, 1)]);
+        RequestContext::set("language", 'c');
         RequestContext::set("source", "#include <stdio.h> int main() { printf(\"100\"); }");
         
         // PhpUnit doesn't set a REMOTE_ADDR, doing it manually
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123"; 
+        $_SERVER['REMOTE_ADDR'] = "127.0.0.1"; 
         
         // Create the Grader mock
         $this->graderMock = $this->getMock('Grader', array('Grade'));
