@@ -51,15 +51,15 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `director_id` int(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso',
   `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
-  `token` varchar(20) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
+  `alias` varchar(20) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
   `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
   `points_decay_factor` double NOT NULL DEFAULT 0 COMMENT 'Valor de 0 a 1, indicando la tasa de decaimiento de los puntos',
-  `submit_delay` int(3) NOT NULL DEFAULT 0 COMMENT 'Número de minutos que debe esperar un concursante para poder volver a enviar un problema',
   `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos',
   `submissions_gap` int(11) NOT NULL DEFAULT '1' COMMENT 'Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro',
   `feedback` varchar(10) NOT NULL,
   `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
-  `time_start` varchar(10) NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
+  `penalty_time_start` varchar(10) NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
+  `penalty_calc_policy` enum('sum', 'max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
   PRIMARY KEY (`contest_id`)
 );
 
