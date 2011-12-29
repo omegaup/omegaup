@@ -1,5 +1,8 @@
 <?php
 
+   // Set timezone to UTC
+   date_default_timezone_set('UTC');
+
    // Loads configs
    define('SERVER_PATH', dirname(dirname(__DIR__)));     
    define('RUNS_PATH', SERVER_PATH ."/../runs/");
@@ -9,19 +12,6 @@
    // Load config globals
    require_once("config.php");
    require_once("Utils.php");
-
-   // Define POST and GET constants for simplicity
-   define('POST', "__ISPOST__");
-   define('GET', "__ISGET__");
-   
-
-   // Cache of roles_id-s
-   define('ADMIN', '1');
-   define('CONTESTANT', '2');
-   define('JUDGE', '3');
-   define('VISITOR', '4');
-   define('BYPASS', '-1');
-   
 
    require_once("libs/Logger/Logger.php");
    require_once('dao/model.inc.php');
