@@ -34,6 +34,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
         catch( ApiException $e )
         {
             var_dump($e->getArrayMessage());            
+            var_dump($e->getWrappedException()->getMessage());
             $this->fail("User should be able to login");
         }
         
@@ -112,7 +113,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
         catch(ApiException $e)
         {
             $msg = $e->getArrayMessage();
-            
+            var_dump($e->getWrappedException()->getMessage());            
             $this->fail('Unexpected exception thrown.'. $msg["error"] );        
         }
                 
