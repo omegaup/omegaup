@@ -73,10 +73,6 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		val t = new Thread() { override def run(): Unit = { Manager.main(Array.ofDim[String](0)) } } 
 		t.start
 		
-		try { Thread.sleep(1000) }
-		
-		OmegaUp.start
-		
 		val omegaUpSubmitContest = (id: Long, language: Language, code: String, user: Int, contest: Int, date: String) => {
 			import java.util.Date
 			import java.sql.Timestamp
@@ -219,7 +215,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 			}
 		""")
 	
-		t.join
+		try { Thread.sleep(30000) }
 		
 		implicit val conn = Manager.connection
 		

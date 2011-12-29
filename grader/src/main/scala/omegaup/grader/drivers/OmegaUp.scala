@@ -15,9 +15,11 @@ import Validator._
 
 object OmegaUp extends Actor with Log {
 	def act() = {
+		debug("OmegaUp loaded")
 		while(true) {
 			receive {
 				case Submission(run: Run) => {
+					debug("OmegaUp submission!")
 					val id   = run.id
 					val pid  = run.problem.id
 					val lang = run.language
