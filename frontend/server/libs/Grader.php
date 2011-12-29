@@ -20,8 +20,8 @@ class Grader
         $curl = curl_init();
         
         if($curl === FALSE)
-        {
-            throw new Exception("curl_init failed: " . implode(' ', error_get_last()));
+        {            
+            throw new Exception("curl_init failed: ". curl_error($curl));            
         }
         
         // Set URL
@@ -46,8 +46,8 @@ class Grader
         $content = curl_exec($curl);
         
         if($content === FALSE)
-        {
-            throw new Exception("curl_exec failed: " . implode(' ', error_get_last()));
+        {            
+            throw new Exception("curl_exec failed: " . curl_error($curl));            
         }
         
         // Close curl
