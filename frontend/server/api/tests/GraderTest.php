@@ -31,7 +31,8 @@ class GraderTest extends PHPUnit_Framework_TestCase
         $grader->Grade($run->getRunId());
         
         // Check that grader received run
-        sleep(2);
+        sleep(10);
+	RunsDAO::unsetCache();
         $run = RunsDAO::getByPK($run->getRunId());
         
         $this->assertNotEquals("new", $run->getStatus());

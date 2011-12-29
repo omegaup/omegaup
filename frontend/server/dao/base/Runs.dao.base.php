@@ -29,6 +29,11 @@ abstract class RunsDAOBase extends DAO
 			$pk .= $run_id . "-";
 			return self::$loadedRecords[$pk];
 		}
+
+		public static function unsetCache()
+		{
+			self::$loadedRecords = array();
+		}  		
 	/**
 	  *	Guardar registros. 
 	  *	
