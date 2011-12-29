@@ -35,19 +35,22 @@ class Grader
         
         // Set certifiate to verify peer with
         curl_setopt($curl, CURLOPT_CAINFO, OMEGAUP_CACERT_URL);
-                        
+
+        // Don't check the common name (CN) attribute
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+                       
         // Set curl HTTP header
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
         
         // Set curl Post data
-        curl_setopt($curl, CURLOPT_POSTFIELDS, "{'id': ". $runId ."}");
+        curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"id\":$runId}");
         
         // Execute call
         $content = curl_exec($curl);
-        
+        var_dump($content);       
         if($content === FALSE)
         {            
-            throw new Exception("curl_exec failed: " . curl_error($curl));            
+            throw new Exception("curl_exec failed: " . curl_error($curl) . " ". curl_errno($curl));            
         }
         
         // Close curl

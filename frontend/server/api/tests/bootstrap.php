@@ -5,8 +5,6 @@
 
    // Loads configs
    define('SERVER_PATH', dirname(dirname(__DIR__)));     
-   define('RUNS_PATH', SERVER_PATH ."/../runs/");
-   define('PROBLEMS_PATH', SERVER_PATH ."/../problems/");   
    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
 
    // Load config globals

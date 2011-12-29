@@ -162,7 +162,7 @@ class NewRun extends ApiHandler
         try
         {
             // Create file for the run        
-            $filepath = RUNS_PATH . $run->getGuid();
+            $filepath = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
             FileHandler::CreateFile($filepath, RequestContext::get("source"));            
         }
         catch (Exception $e)
