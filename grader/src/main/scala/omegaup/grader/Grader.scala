@@ -13,7 +13,7 @@ import Veredict._
 trait Grader extends Object with Log {
 	def grade(run: Run): Unit = {
 		val id = run.id
-		val pid = run.problem.id
+		val alias = run.problem.alias
 		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
 		val dataDirectory = new File(zip.getParentFile.getCanonicalPath + "/" + id)
 		dataDirectory.mkdirs()
@@ -50,7 +50,7 @@ trait Grader extends Object with Log {
                   .map{ f => f.getName.substring(0, f.getName.length - 5)->(f, MetaFile.load(f.getCanonicalPath)) }
                   .toMap
 		
-		val weightsFile = new File(Config.get("problems.root", "./problems") + "/" + pid + "/testplan")
+		val weightsFile = new File(Config.get("problems.root", "./problems") + "/" + alias + "/testplan")
 
                 trace("Finding Weights file in {}", weightsFile.getCanonicalPath)
 		
@@ -87,7 +87,7 @@ trait Grader extends Object with Log {
 		
 			weights
 		} else {
-			new File(Config.get("problems.root", "./problems") + "/" + pid + "/cases/")
+			new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/")
 			.listFiles
 			.filter { _.getName.endsWith(".in") }
 			.map {  f:File =>
@@ -133,7 +133,7 @@ trait Grader extends Object with Log {
                                   run,
                                   name,
 			          new File(f.getCanonicalPath.replace(".meta", ".out")),
-				  new File(Config.get("problems.root", "./problems") + "/" + pid + "/cases/" + f.getName.replace(".meta", ".out"))
+				  new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out"))
                                 ) * weight
                               } else {
                                 0.0
@@ -187,7 +187,7 @@ object LiteralGrader extends Grader {
 		run.status = Status.Ready
 		run.veredict = Veredict.WrongAnswer
 		run.score = try {
-			val inA = new BufferedReader(new FileReader(FileUtil.read(Config.get("problems.root", "problems") + "/" + run.problem.id + "/output").trim))
+			val inA = new BufferedReader(new FileReader(FileUtil.read(Config.get("problems.root", "problems") + "/" + run.problem.alias + "/output").trim))
 			val inB = new BufferedReader(new FileReader(FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)))
 			
 			var lineA: String = null

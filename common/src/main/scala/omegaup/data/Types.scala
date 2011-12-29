@@ -110,7 +110,7 @@ class Problem(
 	var public: Long = 1,
 	var author: Long = 0,
 	var title: String = "",
-	var alias: Option[String] = None,
+	var alias: String = "",
 	var validator: Validator = Validator.TokenNumeric,
 	var server: Option[Server] = None,
 	var remote_id: Option[String] = None,
