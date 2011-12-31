@@ -118,5 +118,23 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
     Runner.run(RunInputMessage(test5.token.get, 1, 65536, 1, None, Some(List(
       new CaseData("ok", "0")
     ))), new File(zipRoot.getCanonicalPath + "/test5.zip"))
+
+    val test6 = Runner.compile(CompileInputMessage("java", List("""
+      class Main {
+        public static void main(String[] args) {
+          double d = 2.2250738585072012e-308;
+          System.out.println("Value: " + d);
+        }
+      }""")))
+    test6.status should equal ("ok")
+
+    val test7 = Runner.compile(CompileInputMessage("java", List("""
+      class Main {
+        public static void main(String[] args) {
+          double d = Double.parseDouble("2.2250738585072012e-308");
+          System.out.println("Value: " + d);
+        }
+      }""")))
+    test7.status should equal ("ok")
   }
 }

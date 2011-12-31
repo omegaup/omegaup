@@ -14,73 +14,65 @@
 require_once("ApiHandler.php");
 
 class ShowContest extends ApiHandler
-{
-    protected function DeclareAllowedRoles() 
-    {
-        return BYPASS;
-    }
+{    
     
-    protected function GetRequest()
+    protected function RegisterValidatorsToRequest()
     {
-        $this->request = array(
-            "contest_id" => new ApiExposedProperty("contest_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( 
-                    function ($value)
-                    {
-                        // Check if the contest exists
-                        return ContestsDAO::getByPK($value);
-                    }) 
-            ))                                 
-        );
-                
-    }   
-    
-    protected function ValidateRequest() 
-    {
-        // Call generic validation
-        parent::ValidateRequest();
-                
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ContestsDAO::getByAlias($value);
+                }, "Contest is invalid."))
+            ->validate(RequestContext::get("contest_alias"), "contest_alias");
+        
         // If the contest is private, verify that our user is invited                
-        $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());                
-                
+        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                
         if ($contest->getPublic() === '0')            
-        {                           
-            if (is_null(ContestsUsersDAO::getByPK($this->user_id, $this->request["contest_id"]->getValue())))
+        {      
+            try
             {
-               throw new ApiException($this->error_dispatcher->forbiddenSite());
-            }        
-        }                
- 
-    }
+                if (is_null(ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId())))
+                {
+                    throw new ApiException(ApiHttpErrors::forbiddenSite());
+                }
+            }
+            catch(ApiException $e)
+            {
+                // Propagate exception
+                throw $e;
+            }
+            catch(Exception $e)
+            {
+                 // Operation failed in the data layer
+                 throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
+            }
+        }                                                
+    }      
 
 
     protected function GenerateResponse() 
     {
        // Create array of relevant columns
-        $relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "token", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy");
+        $relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy");
         
-        // Get our contest given the id
+        // Get our contest given the alias
         try
-        {
-            
-            $contest = ContestsDAO::getByPK($this->request["contest_id"]->getValue());
+        {            
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
         }
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
-        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
         }
         
         // Add the contest to the response
-        $this->response = $contest->asFilteredArray($relevant_columns);               
-     
+        $this->addResponseArray($contest->asFilteredArray($relevant_columns));                    
         
         // Get problems of the contest
-        $key_problemsInContest = new ContestProblems( array(
-            "contest_id" => $this->request["contest_id"]->getValue(),            
-        ));
+        $key_problemsInContest = new ContestProblems(
+            array("contest_id" => $contest->getContestId()));        
         try
         {
             $problemsInContest = ContestProblemsDAO::search($key_problemsInContest);
@@ -88,9 +80,8 @@ class ShowContest extends ApiHandler
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation());        
-        }
-        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
+        }        
         
         // Add info of each problem to the contest
         $problemsResponseArray = array();
@@ -108,7 +99,7 @@ class ShowContest extends ApiHandler
             catch(Exception $e)
             {
                 // Operation failed in the data layer
-               throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
             }
             
             // Add the 'points' value that is stored in the ContestProblem relationship
@@ -120,12 +111,23 @@ class ShowContest extends ApiHandler
             
         }
         
-        $this->response["problems"] = $problemsResponseArray;
+        // Save the time of the first access
+        try
+        {
+            $contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+                    $this->_user_id, $contest->getContestId());
+        }
+        catch(Exception $e)
+        {
+             // Operation failed in the data layer
+             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
+        }
         
+        // Set response
+        $this->addResponse("problems", $problemsResponseArray);
                 
-        // @TODO Add ranking here, if it should be showed (look at scoreboard property in contests)        
-    }
-    
+        // @TODO Add mini ranking here
+    }    
 }
 
 ?>

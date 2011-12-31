@@ -484,6 +484,8 @@ static struct path_rule **last_path_rule = &user_path_rules;
 static int
 set_path_action(char *a)
 {
+  static char proc_self_path[4096];
+
   char *sep = strchr(a, '=');
   enum action act = A_YES;
   if (sep)
@@ -506,6 +508,7 @@ set_path_action(char *a)
   r->next = NULL;
   *last_path_rule = r;
   last_path_rule = &r->next;
+
   return 1;
 }
 
@@ -1080,8 +1083,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
       else
         {
           a->sys = __NR_setrlimit;
-          a->result = -1;
-          errno = EPERM;
+          a->result = -EPERM;
           set_syscall_args(pid, a);
         }
       break;
@@ -1095,8 +1097,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
       else
         {
           a->sys = __NR_mkdir;
-          a->result = -1;
-          errno = EACCES;
+          a->result = -EACCES;
           set_syscall_args(pid, a);
         }
       break;
@@ -1118,8 +1119,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
       else
         {
           a->sys = __NR_socketcall;
-          a->result = -1;
-          errno = EACCES;
+          a->result = -EACCES;
           set_syscall_args(pid, a);
         }
       break;
@@ -1134,8 +1134,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
       else
         {
           a->sys = __NR_socket;
-          a->result = -1;
-          errno = EACCES;
+          a->result = -EACCES;
           set_syscall_args(pid, a);
         }
       break;
@@ -1157,7 +1156,7 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
           a->result = probin_fd;
           if (a->result == -1)
             {
-              errno = EACCES;
+              a->result = -EACCES;
             }
           a->sys = __NR_open;
           set_syscall_args(pid, a);

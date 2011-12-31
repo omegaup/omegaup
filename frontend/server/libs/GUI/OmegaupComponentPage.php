@@ -79,7 +79,7 @@ class OmegaupComponentPage extends StdComponentPage{
 
 		
 		if(LoginController::isLoggedIn()){
-			//user is NOT logged in
+			//user *IS* logged in
 			
 			$this_user = LoginController::getCurrentUser();
 			$this->user_html_menu = '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >';
@@ -93,18 +93,20 @@ class OmegaupComponentPage extends StdComponentPage{
 			
 			if(!is_null($test_admin)){
 				//he is admin !
-				$this->user_html_menu .= "| <a href='admin'>Administrar Omegaup</a>&nbsp;";					
+				$this->user_html_menu .= "| <a href='admin'>Administrar OmegaUp</a>&nbsp;";					
 			}
 
 
 			$this->user_html_menu .= "| <a href='?request=logout'>Cerrar Sesion</a>&nbsp;";	
 			return;
+		}else{
+			//user is *NOT* logged in
+			$this->user_html_menu = "Bienvenido a OmegaUp ! ";
+			$this->user_html_menu .= "<b><a href='nativeLogin.php'>Inicia sesion</a> !</b>";
 		}
 
 		
-		//user is not logged in
-		$this->user_html_menu = "Bienvenido a Omegaup ! ";
-		$this->user_html_menu .= "<a href='nativeLogin.php'>Inicia sesion !</a>";
+
 
 	}
 

@@ -14,121 +14,133 @@
 
 require_once("ApiHandler.php");
 
+require_once(SERVER_PATH . '/libs/FileHandler.php');
+require_once(SERVER_PATH . '/libs/FileUploader.php');
+require_once(SERVER_PATH . '/libs/ZipHandler.php');
+require_once(SERVER_PATH . '/libs/ProblemContentsZipValidator.php');
+require_once(SERVER_PATH . '/libs/Markdown/markdown.php');
+
 class NewProblemInContest extends ApiHandler
-{
-    
-    protected function DeclareAllowedRoles() 
+{            
+    public function NewProblemInContest(FileUploader $fileUploader = NULL)
     {
-        return array(JUDGE);
+        // Set file uploader to the file handler
+        if(is_null($fileUploader))
+        {
+            $fileUploader = new FileUploader();            
+        }
+        
+        FileHandler::SetFileUploader($fileUploader);
     }
     
-    protected function GetRequest()
-    {        
-        // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE
-        $this->request = array(
-            new ApiExposedProperty("contest_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( function ($value)
-                        {
-                            // Check if the contest exists
-                            return ContestsDAO::getByPK($value);
-                        })                        
-            )),
+    private $filesToUnzip;
+    private $casesFiles;
+    
+    protected function RegisterValidatorsToRequest()
+    {   
+       ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ContestsDAO::getByAlias($value);
+                }, "Contest is invalid."))
+            ->validate(RequestContext::get("contest_alias"), "contest_alias");
 
-            new ApiExposedProperty("public", false, FALSE), // All problems created through this API will be private at their creation 
-
-            // Author may not necesarly be the person who submits the problem
-            new ApiExposedProperty("author_id", true, POST, array(
-                new NumericValidator(),
-                new CustomValidator( function ($value)
-                        {
-                            // Check if the user exists
-                            return UsersDAO::getByPK($value);
-                        })                
-            )),
-
-            new ApiExposedProperty("title", true, POST, array(
-                new StringValidator())),
-
-            new ApiExposedProperty("alias", false, POST),
-
-            new ApiExposedProperty("validator", true, POST, array(
-                new EnumValidator(array("remote", "literal", "token", "token-caseless", "token-numeric"))
-            )),
-
-            new ApiExposedProperty("time_limit", true, POST, array(
-                new NumericValidator(),
-                new NumericRangeValidator(0, INF)
-            )),
-
-            new ApiExposedProperty("memory_limit", true, POST, array(
-                new NumericValidator(),
-                new NumericRangeValidator(0, INF)
-            )),
-
-            new ApiExposedProperty("visits", true, 0),
-            new ApiExposedProperty("submissions", true, 0),
-            new ApiExposedProperty("accepted", true, 0),
-            new ApiExposedProperty("difficulty", true, 0),
-
-            new ApiExposedProperty("source", true, POST, array(
-                new HtmlValidator()
-            )),
-
-            new ApiExposedProperty("order", true, POST, array(
-                new EnumValidator(array("normal", "inverse"))
-            )),
-
-            new ApiExposedProperty("points", true, POST, array(
-                new NumericValidator(),
-                new NumericRangeValidator(0, INF)
-            ))
-        );
+            
+        // Only director is allowed to create problems in contest
+        try
+        {
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+        }
+        catch(Exception $e)
+        {  
+            // Operation failed in the data layer
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
+        }                
         
-    }
+        if($contest->getDirectorId() !== $this->_user_id)
+        {
+            throw new ApiException(ApiHttpErrors::forbiddenSite());
+        }
+        
+                
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return UsersDAO::getByPK($value);
+                }, "author_id is invalid."))
+            ->validate(RequestContext::get("author_id"), "author_id");
+                
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("title"),
+                "title");
+        
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("source"),
+                "source");
+                
+        ValidatorFactory::stringOfMaxLengthValidator(32)->validate(
+                RequestContext::get("alias"),
+                "alias");
+        
+        ValidatorFactory::enumValidator(array("remote", "literal", "token", "token-caseless", "token-numeric"))
+                ->validate(RequestContext::get("validator"), "validator");
+        
+        ValidatorFactory::numericRangeValidator(0, INF)
+                ->validate(RequestContext::get("time_limit"), "time_limit");
+        
+        ValidatorFactory::numericRangeValidator(0, INF)
+                ->validate(RequestContext::get("memory_limit"), "memory_limit");                
+                
+        ValidatorFactory::enumValidator(array("normal", "inverse"))
+                ->validate(RequestContext::get("order"), "order"); 
+        
+        ValidatorFactory::numericRangeValidator(0, INF)
+                ->validate(RequestContext::get("points"), "points");
+        
+        if(!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name']))
+        {
+            throw new ApiException(ApiHttpErrors::invalidParameter("problem_contents is missing."));
+        }
+        
+        // Validate zip contents
+        $zipValidator = new Validator();
+        $zipValidator->addValidator(new ProblemContentsZipValidator)
+                     ->validate($_FILES['problem_contents']['tmp_name'], 'problem_contents');                
+        
+        // Save files to unzip                
+        $this->filesToUnzip = $zipValidator->getValidator(0)->filesToUnzip;        
+        $this->casesFiles = $zipValidator->getValidator(0)->casesFiles;
+
+        sort($this->casesFiles);
+    }       
     
     protected function GenerateResponse() 
     {
-
-        try 
-        {
-            
-            // Create file for problem content            
-            $filename = md5(uniqid(rand(), true));
-            $fileHandle = fopen(PROBLEMS_PATH . $filename, 'w'); 
-            fwrite($fileHandle, $_POST["source"]);
-            fclose($fileHandle);
-        }
-        catch (Exception $e)
-        {
-            throw new ApiException( $this->error_dispatcher->invalidFilesystemOperation() );
-        }
-        
-        
-        // Fill $values array with values sent to the API
-        $problems_insert_values = array();
-        foreach($this->request as $parameter)
-        {
-            // Replace the HTML in source with the path to the file saved 
-            if ($parameter->getPropertyName() == "source")
-            {                        
-                $parameter->setValue($filename);
-            }
-
-            // Copy all except contest_id
-            if ($parameter->getPropertyName() !== "contest_id") 
-            {
-                $problems_insert_values[$parameter->getPropertyName()] = $parameter->getValue();        
-            }
-        }
-        
-        
-        // Populate a new Contests object
-        $problem = new Problems($problems_insert_values);
-        
+                
+        // Populate a new Problem object
+        $problem = new Problems();
+        $problem->setPublic(false);
+        $problem->setAuthorId(RequestContext::get("author_id"));
+        $problem->setTitle(RequestContext::get("title"));
+        $problem->setAlias(RequestContext::get("alias"));
+        $problem->setValidator(RequestContext::get("validator"));
+        $problem->setTimeLimit(RequestContext::get("time_limit"));
+        $problem->setMemoryLimit(RequestContext::get("memory_limit"));
+        $problem->setVisits(0);
+        $problem->setSubmissions(0);
+        $problem->setAccepted(0);
+        $problem->setDifficulty(0);
+        $problem->setSource(RequestContext::get("source"));
+        $problem->setOrder(RequestContext::get("order"));                              
+                
         // Insert new problem
         try
         {
+            // Get contest 
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+            
             //Begin transaction
             ProblemsDAO::transBegin();
 
@@ -137,24 +149,97 @@ class NewProblemInContest extends ApiHandler
 
             // Save relationship between problems and contest_id
             $relationship = new ContestProblems( array(
-                "contest_id" => $_GET["contest_id"],
+                "contest_id" => $contest->getContestId(),
                 "problem_id" => $problem->getProblemId(),
-                "points"     => $_POST["points"]));
+                "points"     => RequestContext::get("points")));
             ContestProblemsDAO::save($relationship);
+            
+            // Create file after we know that alias is unique
+            try 
+            {
+                // Create paths
+                $dirpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . RequestContext::get("alias");
+                $filepath = $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';
+
+                // Drop contents into path required
+                FileHandler::MakeDir($dirpath);                
+                FileHandler::MoveFileFromRequestTo('problem_contents', $filepath);                                
+                ZipHandler::DeflateZip($filepath, $dirpath, $this->filesToUnzip);
+                
+                // Transform statements from markdown to HTML
+                $statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $this->filesToUnzip);
+                
+                foreach($statements as $statement)
+                {
+                    $filepath = $dirpath . DIRECTORY_SEPARATOR . $statement;
+                    $file_contents = FileHandler::ReadFile($filepath);
+                    
+                    // Markup
+                    $file_contents = '<div class="problem-statement">' . markdown($file_contents) . '</div>'; 
+                    
+                    // Overwrite file
+                    $lang = basename($statement, ".markdown");
+                    FileHandler::CreateFile($dirpath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html", $file_contents);
+                }
+               
+                // Create cases.zip and inputname
+                $casesZip = new ZipArchive;
+                $casesZipPath = $dirpath . DIRECTORY_SEPARATOR . 'cases.zip';
+
+                if (($error = $casesZip->open($casesZipPath, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) !== TRUE)
+                {
+                    throw new Exception($error);
+                }
+
+		for ($i = 0; $i < count($this->casesFiles); $i++)
+                {
+                    if (!$casesZip->addFile($dirpath . DIRECTORY_SEPARATOR . $this->casesFiles[$i], substr($this->casesFiles[$i], strlen('cases/'))))
+                    {
+                        throw new Exception("Error trying to add {$this->casesFiles[$i]} to cases.zip");
+                    }
+                }
+
+                $casesZip->close();
+
+                file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($casesZipPath));
+            }
+            catch (Exception $e)
+            {
+                throw new ApiException( ApiHttpErrors::invalidFilesystemOperation("Unable to process problem_contents given. Please check the format. "), $e );
+            }
 
             //End transaction
             ProblemsDAO::transEnd();
-
-        }catch(Exception $e)
-        {  
-
-            // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
         }
-                
-    }
-    
-
+        catch(ApiException $e)
+        {
+            // Operation failed in the data layer, rollback transaction 
+            ProblemsDAO::transRollback();
+            
+            throw $e;
+        }
+        catch(Exception $e)
+        {  
+           // Operation failed in the data layer, rollback transaction 
+            ProblemsDAO::transRollback();
+            
+            // Alias may be duplicated, 1062 error indicates that
+            if(strpos($e->getMessage(), "1062") !== FALSE)
+            {
+                throw new ApiException( ApiHttpErrors::duplicatedEntryInDatabase("alias"), $e);    
+            }
+            else
+            {
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
+            }
+        }  
+        
+        // Adding unzipped files to response
+        $this->addResponse("uploaded_files", $this->filesToUnzip);
+        
+        // All clear
+        $this->addResponse("status", "ok");
+    }    
 }
 
 ?>

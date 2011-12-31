@@ -1,9 +1,6 @@
 <?php
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+require_once(SERVER_PATH . '/libs/FileUploader.php');
 
 require_once '../NewProblemInContest.php';
 
@@ -22,40 +19,73 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         Utils::cleanup();
     }
     
-    private static function setValidContext($contest_id = NULL)
+    private $fileUploaderMock;
+    
+    public function IsUploadedFile($filename)
+    {        
+        return file_exists($filename);
+    }
+    
+    public function MoveUploadedFile()
+    {
+        $filename = func_get_arg(0);
+        $targetpath = func_get_arg(1);
+                        
+        return copy($filename, $targetpath);
+    }
+    
+    private function setValidContext($contest_id = NULL)
     {        
         // Set context
         if(is_null($contest_id))
         {
-            $_GET["contest_id"] = Utils::GetValidPublicContestId();
+            $contest = ContestsDAO::getByPK(Utils::GetValidPublicContestId());
+            RequestContext::set("contest_alias", $contest->getAlias());
         }
         else
         {
-            $_GET["contest_id"] = $contest_id;
+            $contest = ContestsDAO::getByPK($contest_id);
+            RequestContext::set("contest_alias", $contest->getAlias());
         }
-        $_POST["title"] = Utils::CreateRandomString();
-        $_POST["alias"] = substr(Utils::CreateRandomString(), 0, 10);
-        $_POST["author_id"] = Utils::GetContestantUserId();
-        $_POST["validator"] = "token";
-        $_POST["time_limit"] = 5000;
-        $_POST["memory_limit"] = 32000;        
-        $_POST["source"] = "<p>redacción</p>";
-        $_POST["order"] = "normal";
-        $_POST["points"] = 1;
+        RequestContext::set("title", Utils::CreateRandomString());
+        RequestContext::set("alias", substr(Utils::CreateRandomString(), 0, 10));
+        RequestContext::set("author_id", Utils::GetProblemAuthorUserId());
+        RequestContext::set("validator", "token");
+        RequestContext::set("time_limit", 5000);
+        RequestContext::set("memory_limit", 32000);                
+        RequestContext::set("source", "ACM");
+        RequestContext::set("order", "normal");
+        RequestContext::set("points", 1);
+
+        // Set file upload context
+        $_FILES['problem_contents']['tmp_name'] = 'testproblem.zip';               
+        
+        // Create fileUploader mock                        
+        $this->fileUploaderMock = $this->getMock('FileUploader', array('IsUploadedFile', 'MoveUploadedFile'));
+                        
+        $this->fileUploaderMock->expects($this->any())
+                ->method('IsUploadedFile')
+                ->will($this->returnCallback(array($this, 'IsUploadedFile')));
+        
+        $this->fileUploaderMock->expects($this->any())
+                ->method('MoveUploadedFile')
+                ->will($this->returnCallback(array($this, 'MoveUploadedFile')));                
+        
     }
     
     public function testCreateValidProblem($contest_id = NULL)
-    {
-        // Login as judge
-        $auth_token = Utils::LoginAsJudge();        
+    {        
         
         // Set valid context for problem creation
         $contest_id = is_null($contest_id) ? Utils::GetValidPublicContestId() : $contest_id;
-        self::setValidContext($contest_id);
+        $this->setValidContext($contest_id);
+     
+        // Login as judge
+        $auth_token = Utils::LoginAsContestDirector();        
         
         // Execute API
         Utils::SetAuthToken($auth_token);
-        $newProblemInContest = new NewProblemInContest();
+        $newProblemInContest = new NewProblemInContest($this->fileUploaderMock);
         
         try
         {
@@ -64,15 +94,18 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         catch(ApiException $e)
         {
             var_dump($e->getArrayMessage());
+            var_dump($e->getWrappedException()->getMessage());            
             $this->fail("Unexpected exception");
-        }
+        }        
         
-        // Verify status
+        // Verify response
         $this->assertEquals("ok", $return_array["status"]);
+        $this->assertEquals("testplan", $return_array["uploaded_files"][10]);
+        
         
         // Verify data in DB
         $problem_mask = new Problems();
-        $problem_mask->setTitle($_POST["title"]);
+        $problem_mask->setTitle(RequestContext::get("title"));
         $problems = ProblemsDAO::search($problem_mask);
         
         // Check that we only retreived 1 element
@@ -84,21 +117,23 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($problem->getProblemId());
         
         // Verify DB data
-        $this->assertEquals($_POST["title"], $problem->getTitle());
-        $this->assertEquals($_POST["alias"], $problem->getAlias());
-        $this->assertEquals($_POST["validator"], $problem->getValidator());
-        $this->assertEquals($_POST["time_limit"], $problem->getTimeLimit());
-        $this->assertEquals($_POST["memory_limit"], $problem->getMemoryLimit());                      
-        $this->assertEquals($_POST["author_id"], $problem->getAuthorId());
-        $this->assertEquals($_POST["order"], $problem->getOrder());
+        $this->assertEquals(RequestContext::get("title"), $problem->getTitle());
+        $this->assertEquals(RequestContext::get("alias"), $problem->getAlias());
+        $this->assertEquals(RequestContext::get("validator"), $problem->getValidator());
+        $this->assertEquals(RequestContext::get("time_limit"), $problem->getTimeLimit());
+        $this->assertEquals(RequestContext::get("memory_limit"), $problem->getMemoryLimit());                      
+        $this->assertEquals(RequestContext::get("author_id"), $problem->getAuthorId());
+        $this->assertEquals(RequestContext::get("order"), $problem->getOrder());
+        $this->assertEquals(RequestContext::get("source"), $problem->getSource());
         
-        // Verify problem statement
-        $filename = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getSource();
-        $this->assertFileExists($filename);                        
+        // Verify problem contents.zip were copied
+        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;        
         
-        $fileContent = file_get_contents($filename);
-        $this->assertEquals($fileContent, $_POST["source"]);
-        
+        $this->assertFileExists($targetpath . "contents.zip");                        
+        $this->assertFileExists($targetpath . "testplan");
+        $this->assertFileExists($targetpath . "cases");
+        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "en.html");
+                
         // Default data
         $this->assertEquals(0, $problem->getVisits());
         $this->assertEquals(0, $problem->getSubmissions());
@@ -108,24 +143,24 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         // Get problem-contest and verify it
         $contest_problems = ContestProblemsDAO::getByPK($contest_id, $problem->getProblemId());
         $this->assertNotNull($contest_problems);        
-        $this->assertEquals($_POST["points"], $contest_problems->getPoints());        
+        $this->assertEquals(RequestContext::get("points"), $contest_problems->getPoints());        
         
-        return $problem->getProblemId();
+        return (int)$problem->getProblemId();
     }
         
     
     public function testCreateProblemAsContestant()
-    {
-        // Login as judge
-        $auth_token = Utils::LoginAsContestant();
-        
+    {        
         // Set context
-        self::setValidContext();
+        $this->setValidContext();
+                
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        Utils::SetAuthToken($auth_token);
         
         // Execute API
-        Utils::SetAuthToken($auth_token);
-        $newProblemInContest = new NewProblemInContest();
-        
+        $newProblemInContest = new NewProblemInContest($this->fileUploaderMock);                
+                
         try
         {
             $return_array = $newProblemInContest->ExecuteApi();
@@ -150,10 +185,10 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
     public function testRequiredParameters()
     {
         // Login as judge
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set valid context
-        self::setValidContext();
+        $this->setValidContext();
         
         // Array of valid keys
         $valid_keys = array(
@@ -162,20 +197,21 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
             "time_limit",            
             "memory_limit",
             "source",
-            "author_id",            
+            "author_id",
+            "alias"
         );
         
         foreach($valid_keys as $key)        
         {        
             // Set auth key
             Utils::SetAuthToken($auth_token);
-            $newProblem = new NewProblemInContest();
+            $newProblem = new NewProblemInContest($this->fileUploaderMock);
             
             // Reset context            
-            self::setValidContext();
+            $this->setValidContext();
             
             // Unset key
-            unset($_POST[$key]);
+            unset($_REQUEST[$key]);
             
             try
             {
@@ -190,21 +226,17 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
 
                 // Validate exception
                 $this->assertNotNull($exception_array);
-                $this->assertArrayHasKey('error', $exception_array);    
-
-                if ($key !== "start_time" )
-                {
-                    $this->assertEquals("Required parameter ". $key ." is missing.", $exception_array["error"]);
-                }
-
+                $this->assertEquals("error", $exception_array["status"]);
+                $this->assertEquals(100, $exception_array["errorcode"]);
+                $this->assertEquals("HTTP/1.1 400 BAD REQUEST", $exception_array["header"]);
+                $this->assertContains($key, $exception_array["error"]);
+                                
                 // We're OK
                 continue;
             }
-
+            
             $this->fail("Exception was expected. Parameter: ". $key);            
-        }   
-        
-        
+        }                   
     }
 }
 ?>

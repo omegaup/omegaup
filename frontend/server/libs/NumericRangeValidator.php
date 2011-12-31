@@ -17,22 +17,25 @@ class NumericRangeValidator extends Validator
     public function NumericRangeValidator( $start, $finish )
     {        
         $this->start = $start;
-        $this->finish = $finish;
-        Validator::Validator();
+        $this->finish = $finish;        
     }
 
+    public function setLimits( $start, $finish )
+    {        
+        $this->start = $start;
+        $this->finish = $finish;        
+    }
     
-    public function validate($target)
+    public function validate($value)
     {
         // Validate that is target number is inside the range
-        if ( !($target >= $this->start && $target <= $this->finish))
+        if ( !($value >= $this->start && $value <= $this->finish))
         {
             $this->setError("Value is outside the range.");
             return false;
         }
         
-        return true;
-        
+        return true;        
     }
 }
 

@@ -1,42 +1,14 @@
 <?php
 
 /*
- *  Singleton that abstracts HTTP errors
+ *  Static class that abstracts HTTP errors
  * 
  */
 
 class ApiHttpErrors
-{
-    private static $instance;    
-    
-    // Hide constructor from public
-    private function __construct()
-    {
-        
-    }
-
-    public function __clone()
-    {
-        trigger_error('Clone is not allowed.', E_USER_ERROR);
-    }
-    
-    public function __wakeup() 
-    { 
-        trigger_error("Wakeup is not allowed.", E_USER_ERROR); 
-    } 
-    
-    
-    public static function getInstance()
-    {
-        if (!isset(self::$instance)) {
-                        
-            self::$instance = new self;
-        }
-        return self::$instance;
-    }
-    
+{        
     // Sets the HTTP header and returns an array with error info
-    public function invalidAuthToken($message = NULL)
+    public static function invalidAuthToken($message = NULL)
     {
                 
         if ($message === NULL)
@@ -51,7 +23,7 @@ class ApiHttpErrors
     }
     
     // Sets the HTTP header and returns an array with error info
-    public function notAllowedToSubmit($message = NULL)
+    public static function notAllowedToSubmit($message = NULL)
     {
                         
         if ($message === NULL)
@@ -67,7 +39,7 @@ class ApiHttpErrors
     
 
     // Sets the HTTP header and returns an array with error info
-    public function invalidParameter($message = NULL)
+    public static function invalidParameter($message = NULL)
     {
         // We have an invalid auth token. Dying.
         
@@ -83,13 +55,13 @@ class ApiHttpErrors
     }
     
     // Sets the HTTP header and returns an array with error info
-    public function invalidFilesystemOperation($message = NULL)
+    public static function invalidFilesystemOperation($message = NULL)
     {
                
 
         if ($message === NULL)
         {
-            $message = "Oops. Ive encoutered an unspecified error. Please try again";
+            $message = "Oops. I've encoutered an internal error. Please try again.";
         }
         
         return array("status" => "error",
@@ -99,12 +71,12 @@ class ApiHttpErrors
     }    
     
     // Sets the HTTP header and returns an array with error info
-    public function invalidDatabaseOperation($message = NULL)
+    public static function invalidDatabaseOperation($message = NULL)
     {
        
         if ($message === NULL)
         {
-            $message = "Whops. Ive encoutered an internal error. Please try again.";
+            $message = "Oops. Ive encoutered an internal error. Please try again.";
         }
         
         return array("status" => "error",
@@ -114,13 +86,25 @@ class ApiHttpErrors
     } 
     
     // Sets the HTTP header and returns an array with error info
-    public function invalidCredentials($message = NULL)
+    public static function duplicatedEntryInDatabase($key)
+    {       
+        
+        $message = $key . " value already exists. Please try a different value.";        
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 106,
+                     "header" => "HTTP/1.1 500 INTERNAL SERVER ERROR");
+    }
+    
+    // Sets the HTTP header and returns an array with error info
+    public static function invalidCredentials($message = NULL)
     {
                         
 
         if ($message === NULL)
         {
-            $message = "Username or password is wrong. Please check your credentials";
+            $message = "Username or password is wrong. Please check your credentials.";
         }
         
         return array("status" => "error",
@@ -130,7 +114,7 @@ class ApiHttpErrors
     }
     
     // Sets the HTTP header and returns an array with error info
-    public function forbiddenSite($message = NULL)
+    public static function forbiddenSite($message = NULL)
     {
                 
 
@@ -146,7 +130,7 @@ class ApiHttpErrors
     }
     
     // Sets the HTTP header and returns an array with error info
-    public function registeredViaThirdPartyNotSupported($message = NULL)
+    public static function registeredViaThirdPartyNotSupported($message = NULL)
     {
                 
 
@@ -161,7 +145,7 @@ class ApiHttpErrors
                      "header" => 'HTTP/1.1 400 BAD REQUEST' );
     }
     
-    public function notFound($message = NULL)
+    public static function notFound($message = NULL)
     {
         
 
@@ -174,10 +158,22 @@ class ApiHttpErrors
                      "error"	 => $message,
                      "errorcode" => 107,
                      "header" => 'HTTP/1.1 404 NOT FOUND');
-    }
+    }   
     
-    
-    
+    public static function unwrappedException($message = NULL)
+    {
+        
+
+        if ($message === NULL)
+        {
+            $message = "Oops. I've encoutered an internal error. Please try again.";
+        }
+        
+        return array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 108,
+                     "header" => 'HTTP/1.1 400 BAD REQUEST' );
+    } 
 }
 
 ?>

@@ -25,6 +25,7 @@ proguardOptions ++= Seq(
         "-keepclassmembers class omegaup.grader.Manager { *; }",
         "-keep class scala.collection.JavaConversions",
         "-keep class org.mortbay.log.Slf4jLog",
+	"-keep class ch.qos.logback.classic.Logger",
         keepMain("omegaup.grader.Manager"),
         keepLimitedSerializability
 )

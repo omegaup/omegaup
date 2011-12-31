@@ -8,7 +8,7 @@
 require_once '../ShowProblemInContest.php';
 require_once '../NewProblemInContest.php';
 
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'NewProblemInContestTest.php';
 
 require_once 'Utils.php';
@@ -29,7 +29,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
     {
         
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
                         
         // Create a problem in given contest
@@ -40,8 +40,11 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set Context
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
+        $contest = ContestsDAO::getByPK($contest_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
@@ -66,8 +69,10 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["validator"], $problem->getValidator());
         $this->assertEquals($return_array["time_limit"], $problem->getTimeLimit());
         $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
-        $this->assertEquals($return_array["author_id"], $problem->getAuthorId());        
-        $this->assertEquals($return_array["source"], "<p>redacción</p>");
+        $this->assertEquals($return_array["author_id"], $problem->getAuthorId()); 
+        $this->assertEquals($return_array["source"], $problem->getSource()); 
+        $this->assertContains("<h1>Salida</h1>", $return_array["problem_statement"]);
+        $this->assertContains('<div class="problem-statement">', $return_array["problem_statement"]);
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data
@@ -84,7 +89,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($problem_opened);        
 
         // Verify open time 
-        $this->assertEquals(Utils::GetDBUnixTimestamp(), Utils::GetDBUnixTimestamp($problem_opened->getOpenTime()));
+        $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));
         
     }
     
@@ -92,7 +97,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
     {
         
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
                         
         // Create a problem in given contest
@@ -103,8 +108,11 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set Context
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
+        $contest = ContestsDAO::getByPK($contest_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
         
         //Get API
         $showProblemInContest = new ShowProblemInContest();
@@ -120,10 +128,9 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
             $this->fail("Unexpected exception.");
         }
         
-        // Cleanup and reset context        
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
-        Utils::SetAuthToken($auth_token);
+        // Cleanup and reset context                
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
         
         // Sleep 1 sec to differentiate open times
         sleep(1);        
@@ -147,7 +154,8 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["time_limit"], $problem->getTimeLimit());
         $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
         $this->assertEquals($return_array["author_id"], $problem->getAuthorId());        
-        $this->assertEquals($return_array["source"], "<p>redacción</p>");
+        $this->assertEquals($return_array["source"], $problem->getSource()); 
+        $this->assertContains("<h1>Salida</h1>", $return_array["problem_statement"]);
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data
@@ -164,7 +172,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($problem_opened);        
 
         // Verify open time 
-        $this->assertNotEquals(Utils::GetDBUnixTimestamp(), Utils::GetDBUnixTimestamp($problem_opened->getOpenTime()));        
+        $this->assertNotEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));        
         
     }
                  
@@ -172,7 +180,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
     public function testDontShowProblemFromPrivateContest()
     {
         // Create a clean PRIVATE contest only with judge allowed to see it and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
                         
         // Create a problem in given contest
@@ -183,13 +191,15 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set Context
-        $_GET["problem_id"] = $problem_id;
-        $_GET["contest_id"] = $contest_id;
+        $contest = ContestsDAO::getByPK($contest_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
         
         // Execute API
         $showProblemInContest = new ShowProblemInContest();
-        Utils::SetAuthToken($auth_token);
-        
+        Utils::SetAuthToken($auth_token);        
         try
         {            
             $return_array = $showProblemInContest->ExecuteApi();                        
@@ -211,9 +221,48 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->fail("User was able to see problem in private contest not invited.");
     }
     
-    // @TODO Assert problem with runs
+    public function testCheckContestAccessTime()
+    {
+        // Create a clean contest and get the ID
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
+                        
+        // Create a problem in given contest
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set Context
+        $contest = ContestsDAO::getByPK($contest_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
+        
+        //Get API
+        $showProblemInContest = new ShowProblemInContest();
+        Utils::SetAuthToken($auth_token);
+        
+        try
+        {            
+            $return_array = $showProblemInContest->ExecuteApi();            
+        }
+        catch (ApiException $e)
+        {
+            $var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception.");
+        }
+        
+        // Check that access time was saved
+        $access_time = Utils::GetPhpUnixTimestamp();
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                                
+    }
     
-    // Improve search with DAO search by object    
+    // @TODO Assert problem with runs        
 }
 
 ?>

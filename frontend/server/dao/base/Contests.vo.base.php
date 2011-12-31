@@ -49,8 +49,8 @@ class Contests extends VO
 			if( isset($data['public']) ){
 				$this->public = $data['public'];
 			}
-			if( isset($data['token']) ){
-				$this->token = $data['token'];
+			if( isset($data['alias']) ){
+				$this->alias = $data['alias'];
 			}
 			if( isset($data['scoreboard']) ){
 				$this->scoreboard = $data['scoreboard'];
@@ -98,7 +98,7 @@ class Contests extends VO
 			"director_id" => $this->director_id,
 			"rerun_id" => $this->rerun_id,
 			"public" => $this->public,
-			"token" => $this->token,
+			"alias" => $this->alias,
 			"scoreboard" => $this->scoreboard,
 			"partial_score" => $this->partial_score,
 			"submissions_gap" => $this->submissions_gap,
@@ -199,7 +199,7 @@ class Contests extends VO
 	  * @access protected
 	  * @var varchar(20)
 	  */
-	protected $token;
+	protected $alias;
 
 	/**
 	  * scoreboard
@@ -486,9 +486,9 @@ class Contests extends VO
 	  * Get the <i>token</i> property for this object. Donde <i>token</i> es AlmacenarÃ¡ el token necesario para acceder al concurso
 	  * @return varchar(20)
 	  */
-	final public function getToken()
+	final public function getAlias()
 	{
-		return $this->token;
+		return $this->alias;
 	}
 
 	/**
@@ -499,9 +499,9 @@ class Contests extends VO
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param varchar(20)
 	  */
-	final public function setToken( $token )
+	final public function setAlias( $alias )
 	{
-		$this->token = $token;
+		$this->alias = $alias;
 	}
 
 	/**
@@ -625,25 +625,25 @@ class Contests extends VO
 	}
 
 	/**
-	  * getTimeStart
+	  * getPenaltyTimeStart
 	  * 
 	  * Get the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema
 	  * @return enum('contest','problem')
 	  */
-	final public function getTimeStart()
+	final public function getPenaltyTimeStart()
 	{
 		return $this->penalty_time_start;
 	}
 
 	/**
-	  * setTimeStart( $penalty_time_start )
+	  * setPenaltyTimeStart( $penalty_time_start )
 	  * 
 	  * Set the <i>penalty_time_start</i> property for this object. Donde <i>penalty_time_start</i> es Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema.
 	  * Una validacion basica se hara aqui para comprobar que <i>penalty_time_start</i> es de tipo <i>enum('contest','problem')</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
 	  * @param enum('contest','problem')
 	  */
-	final public function setTimeStart( $penalty_time_start )
+	final public function setPenaltyTimeStart( $penalty_time_start )
 	{
 		$this->penalty_time_start = $penalty_time_start;
 	}
@@ -691,16 +691,41 @@ class Contests extends VO
 	final public function setPointsDecayFactor( $points_decay_factor )
 	{
 		$this->points_decay_factor = $points_decay_factor;
-	}
+	}        
         
-        
-        final public function isInsideContest()
-        {                        
-            if( time() <= strtotime($this->getFinishTime()) && time() >= strtotime($this->getStartTime()) )
+         public function isInsideContest($user_id)
+        {                      
+            if(is_null($this->getWindowLength()))
             {
-                return true;
+                if( time() <= strtotime($this->getFinishTime()) && time() >= strtotime($this->getStartTime()) )
+                {
+                    return true;
+                }
+                return false;            
             }
-            return false;            
+            else
+            {                
+                try 
+                {
+                    $contest_user = ContestsUsersDAO::getByPK($user_id, $this->getContestId());
+                    $first_access_time = $contest_user->getAccessTime();
+                }
+                catch(Exception $e)
+                {
+                    // Propagate exception
+                    throw $e;
+                }
+
+                if( time() <= strtotime($this->getFinishTime()) && 
+                        time() >= strtotime($this->getStartTime()) &&
+                        time() <= strtotime($first_access_time) + $this->getWindowLength() )
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
         }
         
 }

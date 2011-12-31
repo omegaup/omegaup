@@ -20,5 +20,5 @@ require_once("base/Contests.vo.base.php");
   */
 class ContestsDAO extends ContestsDAOBase
 {
-
+   
 }

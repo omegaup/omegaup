@@ -13,7 +13,7 @@ object GraderData {
 	def run(id: Long)(implicit connection: Connection): Option[Run] =
 		query("""
 			SELECT
-				r.*, p.*, cpo.open_time, cp.points, c.start_time, c.finish_time, c.points_decay_factor, c.submit_delay, c.partial_score, c.feedback, c.penalty, c.time_start
+				r.*, p.*, cpo.open_time, cp.points, c.start_time, c.finish_time, c.points_decay_factor, r.submit_delay, c.partial_score, c.feedback, c.penalty, c.penalty_time_start, c.penalty_calc_policy
 			FROM
 				Runs AS r
 			INNER JOIN
@@ -49,6 +49,7 @@ object GraderData {
 				problem = new Problem(
 					 id = rs.getLong("problem_id"),
 					 validator = Validator.withName(rs.getString("validator")),
+					 alias = rs.getString("alias"),
 					 server = rs.getString("server") match {
 					 	case null => None
 					 	case x: String => Some(Server.withName(x))
@@ -84,7 +85,7 @@ object GraderData {
 						partial_score = rs.getInt("partial_score") == 1,
 						feedback = Feedback.withName(rs.getString("feedback")),
 						penalty = rs.getInt("penalty"),
-						time_start = TimeStart.withName(rs.getString("time_start"))
+						penalty_time_start = PenaltyTimeStart.withName(rs.getString("penalty_time_start"))
 					))
 				}
 			)

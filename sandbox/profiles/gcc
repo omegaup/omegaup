@@ -15,6 +15,7 @@
 -s chmod
 -s execve
 
+-p /lib64/
 -p /proc/meminfo
 -p /dev/urandom
 -p /usr/

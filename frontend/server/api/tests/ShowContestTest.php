@@ -2,7 +2,7 @@
 
 require_once '../ShowContest.php';
 
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'NewProblemInContestTest.php';
 
 require_once 'Utils.php';
@@ -22,7 +22,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
     public function testShowValidPubicContest()
     {
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         // Create 3 problems in our contest
@@ -35,8 +35,9 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         // Login as contestant
         $auth_token = Utils::LoginAsContestant();
         
-        // Set contest
-        $_GET["contest_id"] = $contest_id;
+        // Set context
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("contest_alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -50,9 +51,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
             var_dump($e->getArrayMessage());
             $this->fail("Unexpected exception");
         }
-        
-        // Get contest from DB to validate data       
-        $contest = ContestsDAO::getByPK($contest_id);
+
         
         // Assert that we found our contest       
         $this->assertNotNull($contest);
@@ -63,14 +62,14 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($contest->getStartTime(), $return_array["start_time"]);
         $this->assertEquals($contest->getFinishTime(), $return_array["finish_time"]);
         $this->assertEquals($contest->getWindowLength(), $return_array["window_length"]);        
-        $this->assertEquals($contest->getToken(), $return_array["token"]);
+        $this->assertEquals($contest->getAlias(), $return_array["alias"]);
         $this->assertEquals($contest->getPointsDecayFactor(), $return_array["points_decay_factor"]);
         $this->assertEquals($contest->getPartialScore(), $return_array["partial_score"]);
         $this->assertEquals($contest->getSubmissionsGap(), $return_array["submissions_gap"]);
         $this->assertEquals($contest->getFeedback(), $return_array["feedback"]);
         $this->assertEquals($contest->getPenalty(), $return_array["penalty"]);
         $this->assertEquals($contest->getScoreboard(), $return_array["scoreboard"]);
-        $this->assertEquals($contest->getTimeStart(), $return_array["penalty_time_start"]);
+        $this->assertEquals($contest->getPenaltyTimeStart(), $return_array["penalty_time_start"]);
         $this->assertEquals($contest->getPenaltyCalcPolicy(), $return_array["penalty_calc_policy"]);
         
         // Assert we have our problems
@@ -105,7 +104,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
     public function testShowValidPrivateContest()
     {
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         // Create 3 problems in our contest
@@ -116,10 +115,11 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $problem_id[2] = $problemCreator->testCreateValidProblem($contest_id);
         
         // Login as contestant
-        $auth_token = Utils::LoginAsJudge();
+        $auth_token = Utils::LoginAsContestDirector();
         
         // Set contest
-        $_GET["contest_id"] = $contest_id;
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("contest_alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -146,14 +146,14 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($contest->getStartTime(), $return_array["start_time"]);
         $this->assertEquals($contest->getFinishTime(), $return_array["finish_time"]);
         $this->assertEquals($contest->getWindowLength(), $return_array["window_length"]);        
-        $this->assertEquals($contest->getToken(), $return_array["token"]);
+        $this->assertEquals($contest->getAlias(), $return_array["alias"]);
         $this->assertEquals($contest->getPointsDecayFactor(), $return_array["points_decay_factor"]);
         $this->assertEquals($contest->getPartialScore(), $return_array["partial_score"]);
         $this->assertEquals($contest->getSubmissionsGap(), $return_array["submissions_gap"]);
         $this->assertEquals($contest->getFeedback(), $return_array["feedback"]);
         $this->assertEquals($contest->getPenalty(), $return_array["penalty"]);
         $this->assertEquals($contest->getScoreboard(), $return_array["scoreboard"]);
-        $this->assertEquals($contest->getTimeStart(), $return_array["penalty_time_start"]);
+        $this->assertEquals($contest->getPenaltyTimeStart(), $return_array["penalty_time_start"]);
         $this->assertEquals($contest->getPenaltyCalcPolicy(), $return_array["penalty_calc_policy"]);
         
         // Assert we have our problems
@@ -189,7 +189,7 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
     public function testShowInvalidPrivateContest()
     {
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         // Create 3 problems in our contest
@@ -203,7 +203,8 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Set contest
-        $_GET["contest_id"] = $contest_id;
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("contest_alias", $contest->getAlias());        
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -227,6 +228,119 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         $this->fail("User was allowed to see private content.");
         var_dump($return_array);        
     }
-                
+    
+    public function testAccessTimeIsAlwaysFirstAccessInPublic()
+    {     
+        // Create a clean contest and get the ID
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
+        
+        // Alter contest to set Window Length
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength("20");
+        ContestsDAO::save($contest);        
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set context        
+        RequestContext::set("contest_alias", $contest->getAlias());        
+        Utils::SetAuthToken($auth_token);
+        
+        // Execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+        
+        // Check that access time was saved
+        $access_time = Utils::GetPhpUnixTimestamp();
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                
+        
+        // Guarantee different timestamp
+        sleep(1);
+        
+        // Re-execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                                
+        
+    }
+       
+    
+    public function testAccessTimeIsAlwaysFirstAccessInPrivate()
+    {     
+        // Create a clean contest and get the ID
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(0);
+        
+        // Alter contest to set Window Length
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength("20");
+        ContestsDAO::save($contest);        
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestDirector();
+        
+        // Set context        
+        RequestContext::set("contest_alias", $contest->getAlias());        
+        Utils::SetAuthToken($auth_token);
+        
+        // Execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+        
+        // Check that access time was saved
+        $access_time = Utils::GetPhpUnixTimestamp();
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestDirectorUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                
+        
+        // Guarantee different timestamp
+        sleep(1);
+        
+        // Re-execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestDirectorUserId(), $contest_id);
+        $this->assertNotNull($contest_user);
+        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                                
+        
+    }
+       
 }
 ?>

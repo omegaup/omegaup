@@ -16,24 +16,15 @@ require_once("ApiHandler.php");
 class ShowClarificationsInProblem extends ApiHandler
 {
     
-    protected function DeclareAllowedRoles() 
+    protected function RegisterValidatorsToRequest()
     {
-        return BYPASS;
-    }
-    
-    protected function GetRequest()
-    {
-        $this->request = array(
-            "problem_id" => new ApiExposedProperty("problem_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( 
-                    function ($value)
-                    {
-                        // Check if the problem exists
-                        return ProblemsDAO::getByPK($value);
-                    }) 
-            ))                                 
-        );
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+            function ($value)
+            {
+                // Check if the contest exists
+                return ProblemsDAO::getByAlias($value);
+            }, "Problem requested is invalid."))
+        ->validate(RequestContext::get("problem_alias"), "problem_alias");        
                 
     }   
    
@@ -44,68 +35,85 @@ class ShowClarificationsInProblem extends ApiHandler
         $relevant_columns = array("message", "answer", "time");
         
         //Get all public clarifications
+        $problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
         $public_clarification_mask = new Clarifications ( array (
            "public" => '1',
-           "problem_id" => $this->request["problem_id"]->getValue()
+           "problem_id" => $problem->getProblemId()
         ));
         
-        if(count(UserRolesDAO::getByPK($this->user_id, JUDGE)) || count(UserRolesDAO::getByPK($this->user_id, ADMIN)))
-        {            
-           // Get all private clarifications 
+        try
+        {
+            // Get contest to get Director Id
+            $contest_problem = ContestProblemsDAO::search(new ContestProblems(array(
+                "problem_id" => $problem->getProblemId()
+            )));
+            $contest_problem = $contest_problem[0];        
+            $contest = ContestsDAO::getByPK($contest_problem->getContestId());        
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
+        }
+        
+        // If user is the contest director, get all private clarifications        
+        if($contest->getDirectorId() == $this->_user_id)
+        {                        
+            // Get all private clarifications 
             $private_clarification_mask = new Clarifications ( array (
                "public" => '0',
-               "problem_id" => $this->request["problem_id"]->getValue(),               
+               "problem_id" => $problem->getProblemId()
             )); 
-        }
+        }        
         else
         {        
             // Get private clarifications of the user 
             $private_clarification_mask = new Clarifications ( array (
                "public" => '0',
-               "problem_id" => $this->request["problem_id"]->getValue(),
-               "author_id" => $this->user_id
-
+               "problem_id" => $problem->getProblemId(),
+               "author_id" => $this->_user_id
             ));
-        }
+        }       
         
-        //@todo This query should be merged and optimized ....
-        // Get our clarification given the masks
+        //@todo This query could be merged and optimized 
+        // Get our clarifications given the masks
         try
-        {
-            
+        {               
             $clarifications_public = ClarificationsDAO::search($public_clarification_mask);
-            $clarifications_private = ClarificationsDAO::search($private_clarification_mask);
+            $clarifications_private = ClarificationsDAO::search($private_clarification_mask);            
         }
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
-        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }
-                        
-        // Filter each clarification and add it to the response
+
+        $clarifications_array = array();
+        // Filter each Public clarification and add it to the response        
         foreach($clarifications_public as $clarification)
         {
-            array_push($this->response, $clarification->asFilteredArray($relevant_columns));               
+            array_push($clarifications_array, $clarification->asFilteredArray($relevant_columns));            
         }
          
-        // Filter each clarification and add it to the response
+        // Filter each Private clarification and add it to the response
         foreach($clarifications_private as $clarification)
         {
-            array_push($this->response, $clarification->asFilteredArray($relevant_columns));               
+            array_push($clarifications_array, $clarification->asFilteredArray($relevant_columns));            
         }
         
         // Sort final array by time
-        usort($this->response, function ($a,$b) 
+        usort($clarifications_array, function($a, $b) 
             { 
                 $t1 = strtotime($a["time"]);
                 $t2 = strtotime($b["time"]);
                 
-                if($t1 == $t2)
+                if($t1 === $t2)
                     return 0;
                 
                 return ($t1 > $t2) ? -1 : 1;             
             });
+            
+        // Add response to array
+        $this->addResponseArray($clarifications_array);
     }
         
 }

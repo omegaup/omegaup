@@ -7,21 +7,11 @@
 require_once("Validator.php");
 
 class HtmlValidator extends Validator
-{
-        
-    // Save the reference
-    public function HtmlValidator( )
-    {
-        
-        Validator::Validator();
-    }
-
+{            
     
     public function validate($string)
     {
-
-      // Copied from http://stackoverflow.com/questions/3167074/which-function-in-php-validate-if-the-string-is-valid-html
-      
+      // Copied from http://stackoverflow.com/questions/3167074/which-function-in-php-validate-if-the-string-is-valid-html              
       $start =strpos($string, '<');
       $end  =strrpos($string, '>',$start);
       if ($end !== false) {

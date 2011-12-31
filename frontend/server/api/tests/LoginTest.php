@@ -11,22 +11,32 @@ require_once 'Utils.php';
 
 class LoginTest extends PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {        
+        Utils::ConnectToDB();
+    }
     
-    
+    public function tearDown() 
+    {
+        Utils::cleanup();
+    }    
     
     public function testValidLogin()
-    {
-        // Sanity cleanup
-        Utils::cleanup();
-        
-        //Connect to DB
-        Utils::ConnectToDB();
-        
-        $_POST["username"] = "user";
-        $_POST["password"] = "password";
+    {        
+        RequestContext::set("username", Utils::GetContestantUsername());
+        RequestContext::set("password", Utils::$contestant->getPassword());
         
         $loginApi = new Login();        
-        $cleanValue = $loginApi->ExecuteApi();
+        try
+        {
+            $cleanValue = $loginApi->ExecuteApi();
+        }
+        catch( ApiException $e )
+        {
+            var_dump($e->getArrayMessage());            
+            var_dump($e->getWrappedException()->getMessage());
+            $this->fail("User should be able to login");
+        }
         
         
         $this->assertNotNull($cleanValue);        
@@ -37,14 +47,9 @@ class LoginTest extends PHPUnit_Framework_TestCase
     
     public function testInvalidPassword()
     {
-        // Sanity cleanup
-        Utils::cleanup();
         
-        //Connect to DB
-        Utils::ConnectToDB();
-        
-        $_POST["username"] = "user";
-        $_POST["password"] = "badpass";
+        RequestContext::set("username", Utils::GetContestantUsername());
+        RequestContext::set("password", "badpass");
         
         $loginApi = new Login();
         
@@ -58,7 +63,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
             
             $this->assertNotNull($arr);
             $this->assertArrayHasKey('error', $arr);   
-            $this->assertEquals("Username or password is wrong. Please check your credentials", $arr["error"]);            
+            $this->assertEquals("Username or password is wrong. Please check your credentials.", $arr["error"]);            
         
             // All fine :)
             return;
@@ -69,15 +74,9 @@ class LoginTest extends PHPUnit_Framework_TestCase
     
     
     public function testInvalidUser()
-    {
-        // Sanity cleanup
-        Utils::cleanup();
-        
-        //Connect to DB
-        Utils::ConnectToDB();
-        
-        $_POST["username"] = "baduser";
-        $_POST["password"] = "pass";
+    {                
+        RequestContext::set("username", "baduser");
+        RequestContext::set("password", Utils::$contestant->getPassword());
         
         $loginApi = new Login();
         
@@ -91,7 +90,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
             
             $this->assertNotNull($arr);
             $this->assertArrayHasKey('error', $arr);   
-            $this->assertEquals("Username or password is wrong. Please check your credentials", $arr["error"]);            
+            $this->assertEquals("Username or password is wrong. Please check your credentials.", $arr["error"]);            
         
             // All fine :)
             return;
@@ -103,17 +102,10 @@ class LoginTest extends PHPUnit_Framework_TestCase
     public function testTwoValidLogins()
     {
         
-        // Sanity cleanup
-        Utils::cleanup();
+        RequestContext::set("username", Utils::GetContestantUsername());
+        RequestContext::set("password", Utils::$contestant->getPassword());        
         
-        //Connect to DB
-        Utils::ConnectToDB();
-        
-        $_POST["username"] = "user";
-        $_POST["password"] = "password";
-        
-        $loginApi = new Login();
-        
+        $loginApi = new Login();        
         try
         {        
             $cleanValue = $loginApi->ExecuteApi();
@@ -121,11 +113,10 @@ class LoginTest extends PHPUnit_Framework_TestCase
         catch(ApiException $e)
         {
             $msg = $e->getArrayMessage();
-            
+            var_dump($e->getWrappedException()->getMessage());            
             $this->fail('Unexpected exception thrown.'. $msg["error"] );        
         }
-        
-        
+                
         try
         {        
             $cleanValue = $loginApi->ExecuteApi();
@@ -137,8 +128,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
             $this->fail('Second login failed, it should be bypassed. ' . $msg["error"]);                                
         }
                
-        return;
-        
+        return;        
     }
 }
 

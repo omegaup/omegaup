@@ -6,8 +6,9 @@
  */
 
 require_once '../NewRun.php';
+require_once '../ShowContest.php';
 
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'NewProblemInContestTest.php';
 
 require_once 'Utils.php';
@@ -15,6 +16,8 @@ require_once 'Utils.php';
 
 class NewRunTest extends PHPUnit_Framework_TestCase
 {
+    private $graderMock;
+    
     public function setUp()
     {        
         Utils::ConnectToDB();
@@ -25,26 +28,68 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         Utils::cleanup();
     }
     
-    private function setValidContext($contest_id, $problem_id)
+    public function openContestBeforeSubmit($contest_id)
     {
-        $_POST["contest_id"] = $contest_id;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";        
+        // Set context
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("alias", $contest->getAlias());                
+        
+        // Execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {                        
+            // Asume that the test is going to handle the exception
+        }
+        
+        unset($_REQUEST["contest_id"]);
     }
     
-    public function testNewValidRun($contest_id = null, $problem_id = null)
+    private function setValidContext($contest_id, $problem_id)
+    {
+        // User should visit contest prior submit a solution        
+        $this->openContestBeforeSubmit($contest_id);
+        
+        // Get contest & problem object from DB
+        $contest = ContestsDAO::getByPK($contest_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        
+        // Set context
+        RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("problem_alias", $problem->getAlias());                
+        
+        // Pick a language
+        RequestContext::set("language", 'c');
+        RequestContext::set("source", "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }");
+        
+        // PhpUnit doesn't set a REMOTE_ADDR, doing it manually
+        $_SERVER['REMOTE_ADDR'] = "127.0.0.1"; 
+        
+        // Create the Grader mock
+        $this->graderMock = $this->getMock('Grader', array('Grade'));
+        
+        // Set expectations
+        $this->graderMock->expects($this->any())
+                ->method('Grade')
+                ->will($this->returnValue(true));
+    }
+    
+    public function testNewValidRun($contest_id = null, $problem_id = null, $auth_token = null)
     {
         // Login 
-        $auth_token = Utils::LoginAsContestant();
+        if(is_null($auth_token))
+        {
+            $auth_token = Utils::LoginAsContestant();
+        }
         
         // Set context
         if(is_null($contest_id))
-        {
-            $contestCreator = new NewContestsTest();
-            $contest_id = $contestCreator->testCreateValidContest(1);
+        {            
+            $contestCreator = new NewContestTest();
+            $contest_id = $contestCreator->testCreateValidContest(1);            
         }
         
         if(is_null($problem_id))
@@ -57,7 +102,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -70,21 +115,21 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Validate output
         $this->assertEquals("ok", $return_array["status"]);
+        $this->assertArrayHasKey("run_alias", $return_array);
         
         // Get run from DB
-        $runs = RunsDAO::search(new Runs(array('contest_id'=> $contest_id, "problem_id" => $problem_id)));
-        $run = $runs[0];
+        $run = RunsDAO::getByAlias($return_array["run_alias"]);        
         $this->assertNotNull($run);
         
         // Validate data        
-        $this->assertEquals($_POST["language"], $run->getLanguage());
+        $this->assertEquals(RequestContext::get("language"), $run->getLanguage());
         $this->assertNotEmpty($run->getGuid());
         
         // Validate file created
-        $filename = RUNS_PATH . $run->getGuid();
+        $filename = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
         $this->assertFileExists($filename);
         $fileContent = file_get_contents($filename);
-        $this->assertEquals($_POST["source"], $fileContent);        
+        $this->assertEquals(RequestContext::get("source"), $fileContent);        
         
         // Validate defaults
         $this->assertEquals("new", $run->getStatus());
@@ -92,10 +137,12 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getMemory());
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
-        $this->assertEquals("123.123.123.123", $run->getIp());
+        $this->assertEquals("127.0.0.1", $run->getIp());
         $this->assertEquals(0, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
+                
         
+        return $run->getRunId();
     }
     
     public function testRunWhenContestExpired()
@@ -105,12 +152,12 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Create public contest
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         // Manually expire contest
         $contest = ContestsDAO::getByPK($contest_id);                
-        $contest->setFinishTime(Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() - 1));                        
+        $contest->setFinishTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() - 1));                        
         ContestsDAO::save($contest);
         
         // Create problem in contest        
@@ -122,7 +169,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -148,20 +195,20 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     public function testRunToValidPrivateContest()
     {                
         // Set context
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         $problemCreator = new NewProblemInContestTest();
         $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
         
         // Login 
-        $auth_token = Utils::LoginAsJudge();        
+        $auth_token = Utils::LoginAsContestDirector();        
         Utils::SetAuthToken($auth_token);
         
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -173,22 +220,21 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         }
         
         // Validate output
-        $this->assertEquals("ok", $return_array["status"]);
+        $this->assertArrayHasKey("run_alias", $return_array);
         
         // Get run from DB
-        $runs = RunsDAO::search(new Runs(array('contest_id'=> $contest_id, "problem_id" => $problem_id)));
-        $run = $runs[0];
+        $run = RunsDAO::getByAlias($return_array["run_alias"]);
         $this->assertNotNull($run);
         
         // Validate data        
-        $this->assertEquals($_POST["language"], $run->getLanguage());
+        $this->assertEquals(RequestContext::get("language"), $run->getLanguage());
         $this->assertNotEmpty($run->getGuid());
         
         // Validate file created
-        $filename = RUNS_PATH . $run->getGuid();
+        $filename = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
         $this->assertFileExists($filename);
         $fileContent = file_get_contents($filename);
-        $this->assertEquals($_POST["source"], $fileContent);        
+        $this->assertEquals(RequestContext::get("source"), $fileContent);        
         
         // Validate defaults
         $this->assertEquals("new", $run->getStatus());
@@ -196,7 +242,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getMemory());
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
-        $this->assertEquals("123.123.123.123", $run->getIp());
+        $this->assertEquals("127.0.0.1", $run->getIp());
         $this->assertEquals(0, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
     }
@@ -204,7 +250,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     public function testRunToInvalidPrivateContest()
     {                
         // Set context
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
         
         $problemCreator = new NewProblemInContestTest();
@@ -217,7 +263,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -247,12 +293,12 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Create public contest
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         // Manually expire contest
         $contest = ContestsDAO::getByPK($contest_id);                
-        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetDBUnixTimestamp() + 1));                        
+        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 1));                        
         ContestsDAO::save($contest);
         
         // Create problem in contest        
@@ -265,7 +311,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -294,12 +340,12 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Create public contest
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);   
         
         // Set submissions gap of 2 seconds
         $contest = ContestsDAO::getByPK($contest_id);                
-        $contest->setSubmissionsGap(2);
+        $contest->setSubmissionsGap(20);
         ContestsDAO::save($contest);
         
         // Create problem in contest        
@@ -310,45 +356,39 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         Utils::SetAuthToken($auth_token);
         $this->setValidContext($contest_id, $problem_id);
         
-        $newRun = new NewRun();        
-        for($i = 0; $i < 2; $i++)
+        $newRun = new NewRun($this->graderMock);        
+                    
+        try
         {
-            // Send first Run, should succeed
-            sleep(1);
-            try
-            {
-                $return_array = $newRun->ExecuteApi();
-            }
-            catch(ApiException $e)
-            {                
-                var_dump($e->getArrayMessage());            
-                $this->fail("Unexpected exception");
-            }
-
-            // Validate output
-            $this->assertEquals("ok", $return_array["status"]);
-
-            // Send second run after 1 sec, should be invalid
-            sleep(1);
-            try
-            {
-                $return_array = $newRun->ExecuteApi();
-            }
-            catch(ApiException $e)
-            {
-                // Validate exception            
-                $exception_message = $e->getArrayMessage();            
-                $this->assertEquals("You're not allowed to submit yet.", $exception_message["error"]);
-                $this->assertEquals("error", $exception_message["status"]);
-                $this->assertEquals("HTTP/1.1 401 FORBIDDEN", $exception_message["header"]);                                         
-                
-                // We're OK
-                continue;
-            }
-            var_dump($contest);
-            var_dump($return_array);
-            $this->fail("Contestant was able to submit run inside the submission gap.");
+            $return_array = $newRun->ExecuteApi();
         }
+        catch(ApiException $e)
+        {                
+            var_dump($e->getArrayMessage());            
+            $this->fail("Unexpected exception");
+        }
+
+        // Validate output
+        $this->assertEquals("ok", $return_array["status"]);
+
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            // Validate exception            
+            $exception_message = $e->getArrayMessage();            
+            $this->assertEquals("You're not allowed to submit yet.", $exception_message["error"]);
+            $this->assertEquals("error", $exception_message["status"]);
+            $this->assertEquals("HTTP/1.1 401 FORBIDDEN", $exception_message["header"]);                                         
+
+            // We're OK
+            return;
+        }
+        var_dump($contest);
+        var_dump($return_array);
+        $this->fail("Contestant was able to submit run inside the submission gap.");
     }
             
     public function testSubmissionGapIsPerProblem()
@@ -357,7 +397,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();
         
         // Create public contest
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);   
         
         // Set submissions gap of 2 seconds
@@ -373,15 +413,16 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Set valid context for Run 
         Utils::SetAuthToken($auth_token);
-        $this->setValidContext($contest_id, $problem_id);
+        $this->setValidContext($contest_id, $problem_id[0]);
         
-        $newRun = new NewRun();        
+        $newRun = new NewRun($this->graderMock);        
         
         // Send problems
         for($i = 0; $i < 3; $i++)
         {
             // Try different problem id
-            $_POST["problem_id"] = $problem_id[$i];        
+            $problem = ProblemsDAO::getByPK($problem_id[$i]);
+            RequestContext::set("problem_alias", $problem->getAlias());        
             
             try
             {
@@ -406,11 +447,11 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $auth_token = Utils::LoginAsContestant();                
         
         // Create public contest 1
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id_1 = $contestCreator->testCreateValidContest(1);   
         
         // Create public contest 2
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id_2 = $contestCreator->testCreateValidContest(1);   
         
         // Create problem in contest 2       
@@ -418,16 +459,11 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $problem_id = $problemCreator->testCreateValidProblem($contest_id_2);
         
         // Set invalid context
-        Utils::SetAuthToken($auth_token);
-        $_POST["contest_id"] = $contest_id_1;
-        $_POST["problem_id"] = $problem_id;        
-        $languages = array ('c','cpp','java','py','rb','pl','cs','p');
-        $_POST["language"] = $languages[array_rand($languages, 1)];
-        $_POST["source"] = "#include <stdio.h> int main() { printf(\"100\"); }";
-        $_SERVER['REMOTE_ADDR'] = "123.123.123.123";
+        Utils::SetAuthToken($auth_token);        
+        $this->setValidContext($contest_id_1, $problem_id);        
         
         // Execute API
-        $newRun = new NewRun();
+        $newRun = new NewRun($this->graderMock);
         try
         {
             $return_array = $newRun->ExecuteApi();
@@ -453,21 +489,21 @@ class NewRunTest extends PHPUnit_Framework_TestCase
     public function testMissingParameters()
     {
         // Set context
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
         
         $problemCreator = new NewProblemInContestTest();
         $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
         
         // Login 
-        $auth_token = Utils::LoginAsJudge();        
+        $auth_token = Utils::LoginAsContestDirector();        
         Utils::SetAuthToken($auth_token);
         
         $this->setValidContext($contest_id, $problem_id);
         
         $needed_keys = array(
-            "problem_id",
-            "contest_id",
+            "problem_alias",
+            "contest_alias",
             "language",
             "source"                        
         );
@@ -479,10 +515,10 @@ class NewRunTest extends PHPUnit_Framework_TestCase
             $this->setValidContext($contest_id, $problem_id);
             
             // Unset key
-            unset($_POST[$key]);
+            unset($_REQUEST[$key]);
             
             // Execute API
-            $newRun = new NewRun();
+            $newRun = new NewRun($this->graderMock);
             try
             {
                 $return_array = $newRun->ExecuteApi();
@@ -495,7 +531,6 @@ class NewRunTest extends PHPUnit_Framework_TestCase
                 // Validate exception
                 $this->assertNotNull($exception_array);
                 $this->assertArrayHasKey('error', $exception_array);                    
-                $this->assertEquals("Required parameter ". $key ." is missing.", $exception_array["error"]);
                 
                 // We're OK
                 continue;
@@ -505,6 +540,87 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         }
     }
     
-    // window length? <- OMFG, win_length requires tons of cases :)
+    public function testNewRunInUsacoPublicContest()
+    {
+        // Login 
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set context        
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);        
+               
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
+        
+        // Alter Contest window length
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength(20);
+        ContestsDAO::save($contest);
+        
+        Utils::SetAuthToken($auth_token);
+        $this->setValidContext($contest_id, $problem_id);
+        
+        // Execute API
+        $newRun = new NewRun($this->graderMock);
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());            
+            $this->fail("Unexpected exception");
+        }
+        
+        // Validate output
+        $this->assertEquals("ok", $return_array["status"]);
+    }
     
+    public function testNewRunOutUsacoPublicContest()
+    {
+        // Login 
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set context        
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);        
+               
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
+        
+        // Alter Contest window length
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength(20);
+        ContestsDAO::save($contest);                
+        
+        Utils::SetAuthToken($auth_token);
+        $this->setValidContext($contest_id, $problem_id);
+        
+        // Alter first access time to make appear the run outside window length
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
+        $contest_user->setAccessTime(date("Y-m-d H:i:s", time() - 21));
+        ContestsUsersDAO::save($contest_user);
+        
+        // Execute API
+        $newRun = new NewRun($this->graderMock);
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            // Validate exception            
+            $exception_message = $e->getArrayMessage();            
+            $this->assertEquals("User is not allowed to view this content.", $exception_message["error"]);
+            $this->assertEquals("error", $exception_message["status"]);
+            $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
+            
+            // We're OK
+            return;            
+        }
+        
+        var_dump($contest);
+        var_dump($return_array);
+        $this->fail("Contestant was able to submit run in an expired contest.");
+    }               
 }

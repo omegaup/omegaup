@@ -13,27 +13,41 @@ require_once 'Utils.php';
 
 class NewClarificationTest extends PHPUnit_Framework_TestCase
 {
+        
+    public function setUp()
+    {                
+        Utils::ConnectToDB();
+    }
+    
+    public function tearDown() 
+    {
+        Utils::cleanup();
+    }  
     
     public function testCreateValidClarification($contest_id = null, $problem_id = null)
-    {
-        //Connect to DB
-        Utils::ConnectToDB();
-        
+    {                
         // Login as contestant
         $auth_token = Utils::LoginAsContestant();
         
         // Set request for valid clarification
         if(is_null($contest_id) && is_null($problem_id))
         {
-            $_POST["contest_id"] = Utils::GetValidPublicContestId();
-            $_POST["problem_id"] = Utils::GetValidProblemOfContest($_POST["contest_id"]);
+            $contest = ContestsDAO::getByPK( Utils::GetValidPublicContestId());
+            $problem = ProblemsDAO::getByPK(Utils::GetValidProblemOfContest(
+                 $contest->getContestId()));
+            
+            RequestContext::set("contest_alias", $contest->getAlias());
+            RequestContext::set("problem_alias", $problem->getAlias()); 
         }
         else
         {
-            $_POST["contest_id"] = $contest_id;
-            $_POST["problem_id"] = $problem_id;
+            $contest = ContestsDAO::getByPK($contest_id);
+            $problem = ProblemsDAO::getByPK($problem_id);
+            
+            RequestContext::set("contest_alias", $contest->getContestId());
+            RequestContext::set("problem_alias", $problem->getProblemId());
         }        
-        $_POST["message"] = Utils::CreateRandomString();
+        RequestContext::set("message", Utils::CreateRandomString());
         Utils::SetAuthToken($auth_token);
         
         // Execute API
@@ -56,16 +70,16 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         
         // Verify our retreived clarificatoin
         $this->assertNotNull($clarification);
-        $this->assertEquals($_POST["message"], $clarification->getMessage());
-        $this->assertEquals($_POST["contest_id"], $clarification->getContestId());
-        $this->assertEquals($_POST["problem_id"], $clarification->getProblemId());                
-
-        // Clean requests
-        Utils::cleanup();
-        Utils::Logout($auth_token);        
-        
+        $this->assertEquals(RequestContext::get("message"), $clarification->getMessage());
+        $this->assertEquals($contest->getContestId(), $clarification->getContestId());
+        $this->assertEquals($problem->getProblemId(), $clarification->getProblemId());                
+                
         // Differentiate two consecutive clarifications by time
-        sleep(1);
+        $clarification->setTime(Utils::getNextTime());
+        ClarificationsDAO::save($clarification);
+        
+        // Clean requests
+        Utils::cleanup();        
         
         return $returnValue["clarification_id"];
         
@@ -73,18 +87,15 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
     
     
     public function testInvalidContestId()
-    {
-        
-        //Connect to DB
-        Utils::ConnectToDB();  
+    {                
 
         // Login as contestant
         $auth_token = Utils::LoginAsContestant();  
 
         // Set request for valid clarification
-        $_POST["contest_id"] = 1213123;
-        $_POST["problem_id"] = 1213123;
-        $_POST["message"] = Utils::CreateRandomString();
+        RequestContext::set("contest_alias", "1213123");
+        RequestContext::set("problem_alias", "1213123");
+        RequestContext::set("message", Utils::CreateRandomString());
         Utils::SetAuthToken($auth_token);
 
         // Execute API
@@ -96,18 +107,16 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
         catch(ApiException $e)            
         {
           // Validate error output
-          $exception_array = $e->getArrayMessage();          
-          $this->assertEquals("Validation failed for parameter contest_id: Validation failed.", $exception_array["error"]);
+          $exception_array = $e->getArrayMessage();        
+                             
+          $this->assertEquals("HTTP/1.1 400 BAD REQUEST", $exception_array["header"]);
+          $this->assertEquals("Parameter contest_alias is invalid: Contest is invalid.", $exception_array["error"]);
 
           // We failed, we're fine.
           return;
         }
 
-        $this->fail("Exception was expected.");
-
-        // Clean requests
-        Utils::cleanup();
-        Utils::Logout($auth_token);  
+        $this->fail("Exception was expected.");        
 
     }
 
