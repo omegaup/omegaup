@@ -8,6 +8,8 @@ class FormComponent implements GuiComponent{
 	protected 	$send_to_api;
 	protected 	$wrap_id;
 	protected	$wrap_style;
+
+	
 	
 	private 	$send_to_api_http_method;
 	private		$send_to_api_callback;
@@ -26,6 +28,7 @@ class FormComponent implements GuiComponent{
 		//defaults
 		$this->is_editable 		= true;
 		$this->form_fields      = array(  );
+		
 
 	}
 
