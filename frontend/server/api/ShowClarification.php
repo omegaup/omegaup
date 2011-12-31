@@ -15,52 +15,30 @@ require_once("ApiHandler.php");
 
 class ShowClarification extends ApiHandler
 {
-    protected function DeclareAllowedRoles() 
+
+    protected function RegisterValidatorsToRequest()
     {
-        return BYPASS;
-    }
-    
-    protected function GetRequest()
-    {
-        $this->request = array(
-            "clarification_id" => new ApiExposedProperty("clarification_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( 
-                    function ($value)
-                    {
-                        // Check if the contest exists
-                        return ClarificationsDAO::getByPK($value);
-                    }) 
-            ))                                 
-        );
-                
-    }   
-    
-    protected function ValidateRequest() 
-    {
-        // Call generic validation
-        parent::ValidateRequest();
-        
-        // If user is Judge or Admin, it's OK
-        if( count(UserRolesDAO::getByPK($this->user_id, JUDGE)) || count(UserRolesDAO::getByPK($this->user_id, ADMIN)) )
-        {
-            return;
-        }
-        
-        
-        // If the clarification is private, verify that our user is invited                
-        $clarification = ClarificationsDAO::getByPK($this->request["clarification_id"]->getValue());                
-                
-        if ($clarification->getPublic() === '0')
-        {        
-            if ($clarification->getAuthorId() != $this->user_id )
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+            function ($value)
             {
-               throw new ApiException($this->error_dispatcher->forbiddenSite());
+                // Check if the contest exists
+                return ClarificationsDAO::getByPK($value);
+            }, "Contest is invalid."))
+        ->validate(RequestContext::get("clarification_id"), "clarification_id");    
+        
+            
+        // If the clarification is private, verify that our user is invited or is contest director               
+        $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));                                
+        if ($clarification->getPublic() === '0')
+        {
+            $contest = ContestsDAO::getByPK($clarification->getContestId());            
+            if (!($clarification->getAuthorId() == $this->_user_id || $contest->getDirectorId() == $this->_user_id))
+            {
+               throw new ApiException(ApiHttpErrors::forbiddenSite());
             }        
         }                
- 
-    }
-
+    }   
+        
 
     protected function GenerateResponse() 
     {
@@ -69,23 +47,18 @@ class ShowClarification extends ApiHandler
         
         // Get our clarificatoin given the id
         try
-        {
-            
-            $clarification = ClarificationsDAO::getByPK($this->request["clarification_id"]->getValue());
+        {            
+            $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));
         }
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
-        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
         }
         
         // Add the clarificatoin the response
-        $this->response = $clarification->asFilteredArray($relevant_columns);               
-             
-        
-    }
-        
+        $this->addResponseArray($clarification->asFilteredArray($relevant_columns));                             
+    }        
 }
 
 ?>

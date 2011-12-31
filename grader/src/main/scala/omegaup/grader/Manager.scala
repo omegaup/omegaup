@@ -83,7 +83,8 @@ object Manager extends Object with Log {
 	}
 	
 	def main(args: Array[String]) = {
-import omegaup.data._
+		import omegaup.data._
+
 		// Setting keystore properties
 		System.setProperty("javax.net.ssl.keyStore", Config.get("grader.keystore", "omegaup.jks"))
 		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "omegaup.jks"))
@@ -158,6 +159,12 @@ import omegaup.data._
 			}
 		};
 
+		// start the drivers
+		drivers.OmegaUp.start
+		drivers.UVa.start
+		drivers.TJU.start
+		drivers.LiveArchive.start
+
 		// boilerplate code for jetty with https support	
 		val server = new org.mortbay.jetty.Server()
 		
@@ -174,10 +181,13 @@ import omegaup.data._
 		
 		server.setHandler(handler)
 		server.start()
+
+		Runtime.getRuntime.addShutdownHook(new Thread() {
+			override def run() = {
+				server.stop()
+			}
+		});
 		
-		java.lang.System.in.read()
-		
-		server.stop()
 		server.join()
 	}
 }

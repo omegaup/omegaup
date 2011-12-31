@@ -19,131 +19,117 @@ class NewContest extends ApiHandler
     
     private $private_users_list;
     
-    protected function DeclareAllowedRoles() 
-    {
-        return array(JUDGE);
-    }
-
-
-    protected function GetRequest()
+    protected function RegisterValidatorsToRequest()
     {  
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("title"),
+                "title");
         
-        // Required parameteres to avoid Warnings
-        // @todo Refactor this somehow        
-        $finish_time = isset ($_POST["finish_time"]) ? $_POST["finish_time"] : NULL;
-        $start_time = isset ($_POST["start_time"]) ? $_POST["start_time"] : NULL;
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("description"),
+                "description");
         
+        ValidatorFactory::dateRangeValidator(
+                RequestContext::get("start_time"), 
+                RequestContext::get("finish_time"))
+                ->validate(RequestContext::get("start_time"), "start_time");
         
+        // Calculate contest length:
+        $contest_length = strtotime(RequestContext::get("finish_time")) - strtotime(RequestContext::get("start_time"));
         
-        // Array of parameters we're exposing through the API. If a parameter is required, maps to TRUE
-        $this->request = array(
-            new ApiExposedProperty("title", true, POST, array( 
-                new StringValidator())),
-
-            new ApiExposedProperty("description", true, POST, array( 
-                new StringValidator())),
-
-            new ApiExposedProperty("start_time", true, POST, array( 
-                new DateValidator(),
-                new DateRangeValidator($start_time, $finish_time ))),
-
-            new ApiExposedProperty("finish_time", true, POST, array( 
-                new DateValidator(),
-                new DateRangeValidator( $start_time, $finish_time ))),
-
-            new ApiExposedProperty("window_length", false, POST, array( 
-                new NumericValidator(),
-                new NumericRangeValidator( 0, floor( strtotime($finish_time) - strtotime($start_time))/60 ))),
-
-            new ApiExposedProperty("director_id", false, $this->user_id),
-
-            new ApiExposedProperty("rerun_id", false, 0),
-
-            "public" => new ApiExposedProperty("public", true, POST, array(
-                new NumericValidator())),
-
-            new ApiExposedProperty("token", true, POST, array( 
-                new StringValidator())),
-
-            new ApiExposedProperty("scoreboard", true, POST, array( 
-                new NumericValidator(),
-                new NumericRangeValidator( 0, 100))),
-
-            new ApiExposedProperty("points_decay_factor", true, POST, array( 
-                new NumericValidator(),
-                new NumericRangeValidator(0, 1))),
-
-            new ApiExposedProperty("partial_score", true, POST, array( 
-                new NumericValidator())),
-
-            new ApiExposedProperty("submissions_gap", true, POST, array(
-                new NumericValidator(),
-                new NumericRangeValidator(0, strtotime($finish_time) - strtotime($start_time) ))),
-
-            new ApiExposedProperty("feedback", true, POST, array(
-                    new EnumValidator(array("no", "yes", "partial")))),
-
-            new ApiExposedProperty("penalty", true, POST, array(
-                new NumericValidator(),
-                new NumericRangeValidator(0, INF ))),
-
-            new ApiExposedProperty("penalty_time_start", true, POST, array(
-                new EnumValidator(array("contest", "problem", "none")))),
-            
-            new ApiExposedProperty("penalty_calc_policy", true, POST, array(
-                new EnumValidator(array("sum", "max")))),
-            
-            "private_users" => new ApiExposedProperty("private_users", false, POST)
-            );
-    }
-    
-
-    protected function ValidateRequest() 
-    {
-        parent::ValidateRequest();
-                    
-        // Validate private_users request, only if the contest is private        
-        if($this->request["public"]->getValue() == 0)
+        // Window_length NULL is accepted
+        if(!is_null(RequestContext::get("window_length")))
         {
-            if(is_null($this->request["private_users"]->getValue()))
+            ValidatorFactory::numericRangeValidator(
+                    0, 
+                    floor($contest_length)/60)
+                    ->validate(RequestContext::get("window_length"), "window_length");
+        }
+
+        ValidatorFactory::numericValidator()->validate(
+                RequestContext::get("public"),
+                "public");
+        
+        ValidatorFactory::stringOfMaxLengthValidator(32)->validate(
+                RequestContext::get("alias"),
+                "alias");
+        
+        ValidatorFactory::numericRangeValidator(0, 100)->validate(
+                RequestContext::get("scoreboard"), 
+                "scoreboard");
+        
+        ValidatorFactory::numericRangeValidator(0, 1)->validate(
+                RequestContext::get("points_decay_factor"), "points_decay_factor");
+        
+        ValidatorFactory::numericValidator()->validate(
+                RequestContext::get("partial_score"), "partial_score");
+        
+        ValidatorFactory::numericRangeValidator(0, $contest_length)
+                ->validate(RequestContext::get("submissions_gap"), "submissions_gap");
+        
+        ValidatorFactory::enumValidator(array("no", "yes", "partial"))
+                ->validate(RequestContext::get("feedback"), "feedback");
+        
+        ValidatorFactory::numericRangeValidator(0, INF)
+                ->validate(RequestContext::get("penalty"), "penalty");
+        
+        ValidatorFactory::enumValidator(array("contest", "problem", "none"))
+                ->validate(RequestContext::get("penalty_time_start"), "penalty_time_start");
+        
+        ValidatorFactory::enumValidator(array("sum", "max"))
+                ->validate(RequestContext::get("penalty_calc_policy"), "penalty_calc_policy");
+                
+        // Validate private_users request, only if the contest is private        
+        if(RequestContext::get("public") == 0)
+        {
+            if(is_null(RequestContext::get("private_users")))
             {
-               throw new ApiException( $this->error_dispatcher->invalidParameter("If the Contest is not Public, private_users is required") );    
+               throw new ApiException( ApiHttpErrors::invalidParameter("If the Contest is not Public, private_users is required") );    
             }
             else
             {
                 // Validate that the request is well-formed
-                $this->private_users_list = json_decode($this->request["private_users"]->getValue());
+                $this->private_users_list = json_decode(RequestContext::get("private_users"));
                 if (is_null($this->private_users_list))
                 {
-                   throw new ApiException( $this->error_dispatcher->invalidParameter("private_users is malformed") );    
-                }
+                   throw new ApiException( ApiHttpErrors::invalidParameter("private_users is malformed") );    
+                }                
                 
                 // Validate that all users exists in the DB
                 foreach($this->private_users_list as $userkey)
                 {
-                    if (!UsersDAO::getByPK($userkey))
+                    if (is_null(UsersDAO::getByPK($userkey)))
                     {
-                       throw new ApiException( $this->error_dispatcher->invalidParameter("private_users contains a user that doesn't exists") );    
+                       throw new ApiException( ApiHttpErrors::invalidParameter("private_users contains a user that doesn't exists") );    
                     }
                 }                               
             }
         }
-        
-    }
     
+    }       
     
     protected function GenerateResponse() 
     {
+        // Create and populate a new Contests object
+        $contest = new Contests();              
+        $contest->setTitle(RequestContext::get("title"));
+        $contest->setDescription(RequestContext::get("description"));
+        $contest->setStartTime(RequestContext::get("start_time"));
+        $contest->setFinishTime(RequestContext::get("finish_time"));
+        $contest->setWindowLength(RequestContext::get("window_length"));
+        $contest->setDirectorId($this->_user_id);
+        $contest->setRerunId(0);
+        $contest->setPublic(RequestContext::get("public"));
+        $contest->setAlias(RequestContext::get("alias"));
+        $contest->setScoreboard(RequestContext::get("scoreboard"));
+        $contest->setPointsDecayFactor(RequestContext::get("points_decay_factor"));
+        $contest->setPartialScore(RequestContext::get("partial_score"));
+        $contest->setSubmissionsGap(RequestContext::get("submissions_gap"));
+        $contest->setFeedback(RequestContext::get("feedback"));
+        $contest->setPenalty(RequestContext::get("penalty"));
+        $contest->setPenaltyTimeStart(RequestContext::get("penalty_time_start"));
+        $contest->setPenaltyCalcPolicy(RequestContext::get("penalty_calc_policy"));
         
-        // Fill $values array with values sent to the API
-        $contests_insert_values = array();
-        foreach($this->request as $parameter)
-        {
-            $contests_insert_values[$parameter->getPropertyName()] = $parameter->getValue();        
-        }
-
-        // Populate a new Contests object
-        $contest = new Contests($contests_insert_values);              
                 
         // Push changes
         try
@@ -155,7 +141,7 @@ class NewContest extends ApiHandler
             ContestsDAO::save($contest);
                         
             // If the contest is private, add the list of allowed users
-            if ($this->request["public"]->getValue() == 0)
+            if (RequestContext::get("public") == 0)
             {
                 
                 foreach($this->private_users_list as $userkey)
@@ -164,6 +150,7 @@ class NewContest extends ApiHandler
                     $temp_user_contest = new ContestsUsers( array(
                         "contest_id" => $contest->getContestId(),
                         "user_id" => $userkey,
+                        "access_time" => "0000-00-00 00:00:00",
                         "score" => 0,
                         "time" => 0
                     ));                    
@@ -178,9 +165,18 @@ class NewContest extends ApiHandler
 
         }catch(Exception $e)
         {   
-            // Operation failed in the data layer
+            // Operation failed in the data layer, rollback transaction 
             ContestsDAO::transRollback();
-            throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );    
+            
+            // Alias may be duplicated, 1062 error indicates that
+            if(strpos($e->getMessage(), "1062") !== FALSE)
+            {
+                throw new ApiException( ApiHttpErrors::duplicatedEntryInDatabase("alias"), $e);    
+            }
+            else
+            {
+               throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
+            }
         }
         
     }

@@ -16,85 +16,70 @@ require_once("ApiHandler.php");
 class UpdateClarification extends ApiHandler
 {
     
-    protected function DeclareAllowedRoles() 
+    protected function RegisterValidatorsToRequest()
     {
-        return array(JUDGE);
-    }
-    
-    protected function GetRequest()
-    {
-        $this->request = array(
-            "clarification_id" => new ApiExposedProperty("clarification_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( 
-                    function ($value)
-                    {
-                        // Check if the contest exists
-                        return ClarificationsDAO::getByPK($value);
-                    }) 
-            )),
-            
-            "answer" => new ApiExposedProperty("answer", true, POST, array(
-                new StringValidator()
-            )),
-                            
-            "message" => new ApiExposedProperty("message", false, POST, array(
-                new StringValidator()
-            )),                
-                            
-            "public" => new ApiExposedProperty("public", true, POST, array(
-                new NumericValidator()
-            ))
-                            
-        );
-                
+        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+            function ($value)
+            {
+                // Check if the contest exists
+                return ClarificationsDAO::getByPK($value);
+            }, "Clarification requested is invalid."))
+        ->validate(RequestContext::get("clarification_id"), "clarification_id");
+        
+        ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("answer"), "answer");
+        
+        ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("message"), "message");
+        
+        ValidatorFactory::numericValidator()->validate(RequestContext::get("public"), "public");                
+                                
+        // Only contest director or problem author are allowed to update clarifications
+        $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));        
+        $contest = ContestsDAO::getByPK($clarification->getContestId());                        
+        $problem = ProblemsDAO::getByPK($clarification->getProblemId());
+        
+        if(!($contest->getDirectorId() === $this->_user_id || $problem->getAuthorId() === $this->_user_id))
+        {            
+            throw new ApiException(ApiHttpErrors::forbiddenSite());
+        }        
     }   
-       
-
 
     protected function GenerateResponse() 
     {
                 
         // Get our clarificatoin given the id
         try
-        {
-            
-            $clarification = ClarificationsDAO::getByPK($this->request["clarification_id"]->getValue());
+        {            
+            $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));
         }
         catch(Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );        
-        
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
         }
         
-        // Update clarification
-        if(!is_null($this->request["message"]->getValue()) )
-        {
-            // The clarificator may opt to modify the message (typos)
-            $clarification->setMessage($this->request["message"]->getValue());
-        }        
-        $clarification->setAnswer($this->request["answer"]->getValue());
-        $clarification->setPublic($this->request["public"]->getValue());
+        // Update clarification        
+        // The clarificator may opt to modify the message (typos)
+        $clarification->setMessage(RequestContext::get("message"));                
+        $clarification->setAnswer(RequestContext::get("answer"));
+        $clarification->setPublic(RequestContext::get("public"));                
         
-        
+        // Let DB handle time update
+        $clarification->setTime(NULL);
+                
         // Save the clarification
         try
-        {
-            
+        {            
             ClarificationsDAO::save($clarification);
         }
         catch( Exception $e)
         {
             // Operation failed in the data layer
-           throw new ApiException( $this->error_dispatcher->invalidDatabaseOperation() );         
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );         
         }
         
         // Happy ending
-        $this->response["status"] = "ok";
-        
-    }
-    
+        $this->addResponse("status", "ok");
+    }    
 }
 
 ?>

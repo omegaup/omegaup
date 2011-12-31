@@ -12,6 +12,11 @@
   // Create DB
   $db_name  = $args["db_name"];
   $stmt_create_db
+    = "DROP DATABASE IF EXISTS $db_name;";
+  mysql_query($stmt_create_db, $link)
+    or die('Failed to create database: ' . mysql_error());
+
+  $stmt_create_db
     = "CREATE DATABASE IF NOT EXISTS $db_name;";
   mysql_query($stmt_create_db, $link)
     or die('Failed to create database: ' . mysql_error());
@@ -22,14 +27,14 @@
   $stmt_create_user
     = "CREATE USER '$user'@'localhost' IDENTIFIED BY '$pass';";
 
-  mysql_query($stmt_create_user, $link)
-    or die('Failed to create user: ' . mysql_error());
+  mysql_query($stmt_create_user, $link);
+  // Ignore error in case user already exists.
   
   // Grant DB permissions
   $stmt_grant
     = "GRANT ALL ON $db_name.* TO '$user'@'localhost';";
   mysql_query($stmt_grant, $link)
-    or die('Failed to grand user permissions: ' . mysql_error());
+    or die('Failed to grant user permissions: ' . mysql_error());
   
   $stmt_flush
     = "FLUSH PRIVILEGES;";
@@ -49,13 +54,28 @@
   
   $num_statements = $script_info["statements"];
   $num_errors     = $script_info["errors"];
-  echo "$num_errors errors encountered while after running $num_statements statements.\n";
+  if ($num_errors > 0) die("$num_errors errors encountered while after running $num_statements statements.<br/>");
 
-  create_config_php($args["host"], $user, $pass, $db_name);
+  // Install privileges
+  $script_info = run_sql_script(
+      $args["host"]
+    , $user
+    , $pass
+    , $db_name
+    , "../../private/Install_Permissions.sql"
+    , $args["admin_user"]
+    , $args["admin_pass"]
+  );
+  
+  $num_statements = $script_info["statements"];
+  $num_errors     = $script_info["errors"];
+  if ($num_errors > 0) die("$num_errors errors encountered while after running $num_statements statements.<br/>");
+
+  create_config_php($args["host"], $user, $pass, $db_name, $args['data_root_path']);
   
   // @todo  notify success
   //        instruct user to delete the folder containing this file
-  echo "Installation finished.";
+  echo "Installation finished.<br/><br/>Now delete the install folder.";
   
   /* End */
   
@@ -115,13 +135,14 @@
   ) {
     $statements = parse_sql_script($path);    
     $link       = mysql_connect($host, $user, $pass);
-    mysql_select_db($db_name, $link);
+    if (!$link) die("Failed to connect: $host, $user, $pass" . mysql_error());
+    mysql_select_db($db_name, $link) or die('Failed to switch database: ' . mysql_error($link));
     
     $errors = 0;
     foreach( $statements as $statement ) {
-      if( !mysql_query($statement, $link) ) {
+      if( trim($statement) != '' && !mysql_query($statement, $link) ) {
         $errors++;
-        echo "Failed query: " . $statement . "\n" . mysql_error();
+        echo "Failed query: <pre>'" . $statement . "'</pre><br/>MySQL error: " . mysql_error($link) . "<br/>";
       }
     }
     register_admin_user($link, $admin_user, $admin_pass);
@@ -153,23 +174,38 @@
     , $user
     , $pass
     , $db_name
+    , $data_root_path
   ) {
     $native_dir     = realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/../..');
     $root_dir       = str_replace('\\', '/', $native_dir);
     $file_contents  =
 "<?php
-  define('OMEGAUP_DB_USER', 	'$user');
-  define('OMEGAUP_DB_PASS', 	'$pass');
-  define('OMEGAUP_DB_HOST', 	'$host');
-  define('OMEGAUP_DB_NAME', 	'$db_name');	
-  define('OMEGAUP_DB_DRIVER', 'mysqlt');
-  define('OMEGAUP_DB_DEBUG', 	false);	
-  define('OMEGAUP_ROOT',      '$root_dir');
-  ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . OMEGAUP_ROOT . '/server');
+  # #####################################
+  # DATABASE CONFIG
+  # ####################################
+  define('OMEGAUP_DB_USER',         '$user');
+  define('OMEGAUP_DB_PASS',         '$pass');
+  define('OMEGAUP_DB_HOST',         '$host');
+  define('OMEGAUP_DB_NAME',         '$db_name');	
+  define('OMEGAUP_DB_DRIVER',       'mysqlt');
+  define('OMEGAUP_DB_DEBUG',        false);	
+  define('OMEGAUP_ROOT',            '$root_dir');
+
+  define('OMEGAUP_LOG_TO_FILE',     true);
+  define('OMEGAUP_LOG_ACCESS_FILE', '$root_dir/log/omegaup.log');
+  define('OMEGAUP_LOG_ERROR_FILE',  '$root_dir/log/omegaup.log');
+  define('OMEGAUP_LOG_TRACKBACK',   false);
+  define('OMEGAUP_LOG_DB_QUERYS',   true);
+
+  define('RUNS_PATH',               '$data_root_path/submissions');
+  define('PROBLEMS_PATH',           '$data_root_path/problems');
 ";
     
-    file_put_contents('../../server/config.php', $file_contents);
-    /// @todo Check erorrs during writing
+    file_put_contents("$root_dir/server/config.php", $file_contents) !== FALSE
+      or die("Unable to write $root_dir/server/config.php. Make sure it is writable.");
+
+    file_put_contents("$root_dir/log/omegaup.log", '') !== FALSE
+      or die("Unable to create logfile in $root_dir/log/omegaup.log. Make sure the server has the correct permissions.");
   }
 
   /**

@@ -6,66 +6,20 @@
 	 * 
 	 * */
 
-	
-	
-	
-	
-
-	
-	
-	/*
-	 * Load configuration file, and parse the contents needed to parse.
-	 * @todo fix this so the config file can be loaded no matter
-	 * where the bootstrap file is loaded from
-	 * */
-	/*
-	Deprecating since bootstrap is called from diferent
-	plances, and looking for config is going to depend.
-   if( !file_exists("../server/config.php") ) {
-    header("Location: ./install/");
-    exit();
-   }
-   elseif( file_exists("install") ) {
-    /// @todo Demand that install directory be deleted
-   }
-	*/
-
-	/**
-	 *  QUICK FIX
-	 * */
-
+   // Set default time
+   date_default_timezone_set('UTC');
+   
    // Loads config
    define('SERVER_PATH', dirname(__DIR__));     
-   define('RUNS_PATH', SERVER_PATH ."/../runs/");
-   define('PROBLEMS_PATH', SERVER_PATH ."/../problems/");
    
    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
 
-   require_once(SERVER_PATH."/config.php");
-
-   // Define POST and GET constants for simplicity
-   define('POST', "__ISPOST__");
-   define('GET', "__ISGET__");
-
+   //require_once(SERVER_PATH."/config.php");
+   require_once("config.php");
    
-
-   // Cache of roles_id
-   define('ADMIN', '1');
-   define('CONTESTANT', '2');
-   define('JUDGE', '3');
-   define('VISITOR', '4');
-   define('BYPASS', '-1');
-   
-
    require_once("libs/Logger/Logger.php");
-
-
    require_once('dao/model.inc.php');
-	/**
-	 *  QUICK FIX
-	 * */	  
-	
-	
+
 	/**
 	 * I am the API:
 	 * Connect to DB, and load the DAO's. 
@@ -76,11 +30,6 @@
 		require_once('adodb5/adodb.inc.php');
 		require_once('adodb5/adodb-exceptions.inc.php');
 		
-
-				/******  *********** WHAT IS THITS ?  ***********  ***********  *****
-                */     if(file_exists('dao/model.inc.php')) echo "exists!";        /*
-                ************  ***********  ***********  ***********  *********** ****/ 
-
 		$conn = null;
 
 		try{

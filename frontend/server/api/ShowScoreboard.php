@@ -17,41 +17,41 @@ require_once("Scoreboard.php");
 class ShowScoreboard extends ApiHandler
 {
     private $scoreboardData;
-    
-    protected function DeclareAllowedRoles() 
+   
+    protected function RegisterValidatorsToRequest()
     {
-        return BYPASS;
-    }
-    
-    protected function GetRequest()
-    {
-        $this->request = array(
-            "contest_id" => new ApiExposedProperty("contest_id", true, GET, array(
-                new NumericValidator(),
-                new CustomValidator( 
-                    function ($value)
-                    {
-                        // Check if the contest exists
-                        return ContestsDAO::getByPK($value);
-                    }) 
-            ))                                 
-        );
-                
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
+                function ($value)
+                {
+                    // Check if the contest exists
+                    return ContestsDAO::getByAlias($value);
+                }, "Contest is invalid."))
+            ->validate(RequestContext::get("contest_alias"), "contest_alias");                
     } 
     
     protected function GenerateResponse() 
     {
-        // @todo validar si el concursante puede ver el contest
-        $myScoreboard = new Scoreboard($this->request["contest_id"]->getValue());
-         
+        // Get contest
+        // Get our contest given the alias
+        try
+        {            
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+        }
+        catch(Exception $e)
+        {
+            // Operation failed in the data layer
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
+        }
+        
+        // Create scoreboard
+        $myScoreboard = new Scoreboard($contest->getContestId());
+                 
         // Get the scoreboard        
-        $this->scoreboardData = $myScoreboard->generate();
+        $this->scoreboardData = $myScoreboard->generate();        
         
         // Push scoreboard data in response
         $this->response = $this->scoreboardData;
-    }
-    
-    
+    }        
 }
 
 ?>

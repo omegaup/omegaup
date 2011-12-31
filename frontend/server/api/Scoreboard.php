@@ -46,7 +46,7 @@ class Scoreboard
         }
         catch(Exception $e)
         {
-            return $this->error_dispatcher->invalidDatabaseOperation();
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
                                          
         // Save the number of problems internally
@@ -77,14 +77,20 @@ class Scoreboard
     
     protected function getScore($problem_id, $user_id)
     {
-        $bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id);        
+        try
+        {
+            $bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id);        
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+        }
         
         // @todo add support for penalties
         return array(
             "points" => (int)$bestRun->getContestScore(),
             "penalty" => 0
-        );
-        
+        );        
     }
         
     protected function getTotalScore($scores)
@@ -111,9 +117,7 @@ class Scoreboard
             return 0;
         
         return ($a[self::total_column]["points"] < $b[self::total_column]["points"]) ? 1 : -1;
-    }
-    
-    
+    }    
 }
 
 ?>

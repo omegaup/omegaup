@@ -8,11 +8,11 @@
       <fieldset><legend>Base de datos</legend>
         <div class="field">
           <label>Servidor:</label>
-          <input name="host" type="text" />
+          <input name="host" type="text" value="localhost" />
         </div>
         <div class="field">
           <label>Administrador de la BD:</label>
-          <input name="db_admin" type="text" />
+          <input name="db_admin" type="text" value="root" />
         </div>
         <div class="field">
           <label>Contrase&ntilde;a:</label>
@@ -20,11 +20,11 @@
         </div>
         <div class="field">
           <label>Nombre de la BD:</label>
-          <input name="db_name" type="text" />
+          <input name="db_name" type="text" value="omegaup" />
         </div>
         <div class="field">
           <label>Usuario:</label>
-          <input name="user" type="text" />
+          <input name="user" type="text" value="omegaup" />
         </div>
         <div class="field">
           <label>Contrase&ntilde;a:</label>
@@ -38,7 +38,7 @@
       <fieldset><legend>Administrador</legend>
         <div class="field">
           <label>Usuario:</label>
-          <input name="admin_user" type="text" />
+          <input name="admin_user" type="text" value="omegaup" />
         </div>
         <div class="field">
           <label>Contrase&ntilde;a:</label>
@@ -47,6 +47,12 @@
         <div class="field">
           <label>Verificar contrase&ntilde;a:</label>
           <input name="admin_pass_confirm" type="password" />
+        </div>
+      </fieldset>
+      <fieldset><legend>Rutas:</legend>
+        <div class="field">
+          <label>Raíz de datos:</label>
+          <input name="data_root_path" type="text" value="/opt/omegaup/omegaup" />
         </div>
       </fieldset>
       <input type="submit" value="Instalar" />

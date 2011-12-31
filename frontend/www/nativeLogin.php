@@ -20,7 +20,7 @@
 	  * reached this page, send him to home
 	  **/
 	if( LoginController::isLoggedIn() )
-		die(header("Location: home.php"));
+		die(header("Location: index.php"));
 
 
   /**
@@ -73,9 +73,9 @@
       **/
     $page->addComponent( new TitleComponent("&iquest; Ya tienes cuenta ?"));
     $login_form = new FormComponent( new Users() );
-    $login_form->addField("user", "Email o usuario", "input", "", "user" );
-    $login_form->addField("pass", "Contrase&ntilde;a", "password", "", "pass" );
-    $login_form->addField("", "", "hidden", "login", "request" );
+    $login_form->addField("user", "Email o usuario"		, "input"	, ""		, "user" );
+    $login_form->addField("pass", "Contrase&ntilde;a"	, "password", ""		, "pass" );
+    $login_form->addField(""	, ""					, "hidden"	, "login"	, "request" );
 
     $login_form->addSubmit("Iniciar sesion",  "nativeLogin.php", "POST");
 
@@ -92,10 +92,11 @@
       *
       **/
     $page->addComponent( new TitleComponent("&iquest; Tienes alguna cuenta en uno de estos sitios ?", 3));
-    $html = '<a href="googleLoginReturn.php">
+    
+	$html = '<a href="googleLoginReturn.php">
               <img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50">
             </a>';
-	  $page->addComponent( new FreeHtmlComponent($html) );
+	$page->addComponent( new FreeHtmlComponent($html) );
 
 
 

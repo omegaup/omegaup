@@ -9,26 +9,17 @@ require_once("Validator.php");
 
 class NumericValidator extends Validator
 {
-        
-    // Save the reference
-    public function NumericValidator( )
-    {        
-        
-        Validator::Validator();
-    }
-
     
-    public function validate($target)
+    public function validate($value)
     {
         // Validate that we are working with a number
-        if (!is_numeric($target))
+        if (!is_numeric($value))
         {
-            $this->setError("Value is supposed to be numeric.");
+            $this->setError("Value should be numeric.");
             return false;
         }
         
-        return true;
-        
+        return true;        
     }
 }
 

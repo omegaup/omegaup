@@ -75,6 +75,116 @@ class ProblemsController {
     , $tag_id
   ) {
   }
+
+
+
+
+
+
+
+
+
+
+  private static function deflateZip( $pathToZip ){
+
+    if(is_null($pathToZip)){
+      throw new Exception();
+    }
+    
+    //tmp name for deflated contents
+    $zid = time();
+
+
+    //try to read up the zip
+    $zip = zip_open( $pathToZip );
+
+
+    //unsuccesful?
+    if (!$zip) {
+      throw new Exception();
+    }
+
+    //create tmp folder
+    $tmp_dir  = OMEGAUP_ROOT . "tmp/" . $zid;
+    mkdir ($tmp_dir);
+  
+
+    //dump zipped files there
+    while ($zip_entry = zip_read($zip)) {
+
+      $fp = @fopen( $tmp_dir . "/" . zip_entry_name($zip_entry), "w");
+      if(!$fp) continue;
+      if (zip_entry_open($zip, $zip_entry, "r")) {
+        $buf = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
+        fwrite($fp, "$buf");
+        zip_entry_close($zip_entry);
+        fclose($fp);
+      }
+
+    }
+
+    zip_close($zip);
+  
+
+    return $zid;
+  
+  }//deflateZip()
+
+
+
+  /**
+    *
+    *
+    **/
+  private static function zipCleanup($zid){
+    $tmp_dir  = OMEGAUP_ROOT . "tmp/" . $zid;
+    unlink( $tmp_dir );
+    return;
+  }
+
+
+
+
+  private static function parseZipContents( $zid ){
+    $file_prefix  = OMEGAUP_ROOT . "tmp/" . $zid. "/";
+
+    //parse your files here, file absolute path must be prefixed with $file_prefix
+
+  }
+
+
+
+  private static function testZip( ){
+    $files_needed_in_zip = array(  );
+
+    /*foreach($files_needed_in_zip as $f){
+      
+    }*/
+
+    return true;
+  }
+
+
+  /**
+    *
+    *
+    **/
+  public static function parseZip( $pathToZip ){
+
+    $zid = self::deflateZip( $pathToZip );
+
+    if( ! self::testZip( $zid ) ){
+      //test missing files in zip
+      throw Exception();  
+    }
+
+    self::parseZipContents( $zid );
+    
+    //self::saveZipToDB();
+
+    self::zipCleanup( $zid );
+  }
+
 }
 
 

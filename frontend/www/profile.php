@@ -35,16 +35,17 @@
 	}
 
 	//go ahead
-
-	$page->addComponent( new TitleComponent($this_user->getName(), 2) );
-
-	$html = '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=128&amp;d=identicon&amp;r=PG"  >';
+	$profileCmp = new UserProfileComponent( $this_user );
 	
-	$page->addComponent( new FreeHtmlComponent($html) );
+	$luser = LoginController::getCurrentUser();
+	if( !is_null($luser) && ($luser->getUserId() == $this_user->getUserId() ) ){
+		$profileCmp->setEditable(true);
+	}
+	$page->addComponent( $profileCmp );
 
-	
-	$page->addComponent( new FreeHtmlComponent("<hr>") );	
-
+	$runs = new RunsListComponent();
+	$runs->setUser( $this_user->getUserId() );
+	$page->addComponent( $runs );
 	
 
 	$page->render();

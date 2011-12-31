@@ -15,6 +15,4 @@
  * */
 
 
-?>this should be html
-
-
+include('../ux/arena.html');

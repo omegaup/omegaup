@@ -7,12 +7,10 @@
 -- Versión del servidor: 5.1.44
 -- Versión de PHP: 5.3.1
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+BEGIN;
 
---
--- Base de datos: `omegaup`
---
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = '+00:00';
 
 -- --------------------------------------------------------
 
@@ -27,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `Announcement` (
   `description` text NOT NULL COMMENT 'Mensaje de texto del aviso',
   PRIMARY KEY (`announcement_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajerÃ­a dentro del sitio.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajería dentro del sitio.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -40,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `Auth_Tokens` (
   `token` varchar(128) NOT NULL,
   PRIMARY KEY (`token`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tokens de autorizaciÃ³n para los logins.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tokens de autorización para los logins.';
 
 -- --------------------------------------------------------
 
@@ -65,13 +63,13 @@ CREATE TABLE IF NOT EXISTS `Badges` (
 
 CREATE TABLE IF NOT EXISTS `Clarifications` (
   `clarification_id` int(11) NOT NULL AUTO_INCREMENT,
-  `author_id` int(11) NOT NULL COMMENT 'Autor de la clarificaciÃ³n.',
+  `author_id` int(11) NOT NULL COMMENT 'Autor de la clarificación.',
   `message` text NOT NULL,
   `answer` text,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `problem_id` int(11) NOT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema.',
   `contest_id` int(11) DEFAULT NULL COMMENT 'Puede ser nulo si la clarificacion no se da en un concurso.',
-  `public` tinyint(1)  NOT NULL DEFAULT '0' COMMENT 'SÃ³lo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ',
+  `public` tinyint(1)  NOT NULL DEFAULT '0' COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ',
   PRIMARY KEY (`clarification_id`),
   KEY `problem_id` (`problem_id`),
   KEY `contest_id` (`contest_id`),
@@ -87,11 +85,11 @@ CREATE TABLE IF NOT EXISTS `Clarifications` (
 CREATE TABLE IF NOT EXISTS `Coder_of_the_Month` (
   `coder_of_the_month_id` int(11) NOT NULL AUTO_INCREMENT,
   `description` tinytext,
-  `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay mÃ¡s de 1 coder de mes.',
+  `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.',
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guardar histÃ³rico de coders del mes de forma sencilla.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guardar histórico de coders del mes de forma sencilla.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -105,23 +103,25 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `description` tinytext NOT NULL COMMENT 'Una breve descripcion de cada concurso.',
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este concurso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este concurso',
-  `window_length` int(11) DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envÃ­ar soluciÃ³n, si es NULL entonces serÃ¡ durante todo el tiempo del concurso',
+  `window_length` int(11) DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso',
   `director_id` int(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso',
-  `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algÃºn concurso',
+  `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
-  `token` varchar(20) NOT NULL COMMENT 'AlmacenarÃ¡ el token necesario para acceder al concurso',
-  `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard serÃ¡ visible',
+  `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
+  `scoreboard` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
   `points_decay_factor` double NOT NULL DEFAULT '0' COMMENT 'El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7',
-  `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirÃ¡ puntaje parcial para problemas no resueltos en todos los casos',
-  `submissions_gap` int(11) NOT NULL DEFAULT '1' COMMENT 'Tiempo mÃ­nimo en segundos que debe de esperar un usuario despues de realizar un envÃ­o para hacer otro',
+  `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos',
+  `submissions_gap` int(11) NOT NULL DEFAULT '1' COMMENT 'Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro',
   `feedback` enum('no','yes','partial') NOT NULL,
-  `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el nÃºmero de minutos con que se penaliza por recibir un no-accepted',
+  `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
   `penalty_time_start` enum('contest','problem', 'none') NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
   `penalty_calc_policy` enum('sum', 'max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
   PRIMARY KEY (`contest_id`),
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursos que se llevan a cabo en el juez.' AUTO_INCREMENT=1 ;
+
+CREATE UNIQUE INDEX contests_alias ON Contests(`alias`);
 
 -- --------------------------------------------------------
 
@@ -132,9 +132,9 @@ CREATE TABLE IF NOT EXISTS `Contests` (
 CREATE TABLE IF NOT EXISTS `Contests_Users` (
   `user_id` int(11) NOT NULL,
   `contest_id` int(11) NOT NULL,
-  `access_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora a la que entrÃ³ el usuario al concurso',
-  `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Ãndica el puntaje que obtuvo el usuario en el concurso',
-  `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Ãndica el tiempo que acumulo en usuario en el concurso',
+  `access_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora a la que entró el usuario al concurso',  
+  `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Índica el puntaje que obtuvo el usuario en el concurso',
+  `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Índica el tiempo que acumulo en usuario en el concurso',
   PRIMARY KEY (`user_id`,`contest_id`),
   KEY `user_id` (`user_id`),
   KEY `contest_id` (`contest_id`)
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS `Countries` (
   `country_id` char(3) NOT NULL,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`country_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatÃ¡logos para la normalizaciÃ³n';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 
 -- --------------------------------------------------------
 
@@ -221,11 +221,11 @@ CREATE TABLE IF NOT EXISTS `Favorites` (
 CREATE TABLE IF NOT EXISTS `Languages` (
   `language_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
-  `country_id` char(3) DEFAULT NULL COMMENT 'Se guarda la relaciÃ³n con el paÃ­s para defaultear mÃ¡s rÃ¡pido.',
+  `country_id` char(3) DEFAULT NULL COMMENT 'Se guarda la relación con el país para defaultear más rápido.',
   PRIMARY KEY (`language_id`),
   UNIQUE KEY `nombre_UNIQUE` (`name`),
   KEY `country_id` (`country_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de idiomas que potencialmente se soportarÃ­an.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de idiomas que potencialmente se soportarían.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS `Messages` (
   PRIMARY KEY (`message_id`),
   KEY `sender_id` (`sender_id`,`recipient_id`),
   KEY `fk_m_recipient_id` (`recipient_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajerÃ­a dentro del sitio.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajería dentro del sitio.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS `Password_Change` (
 CREATE TABLE IF NOT EXISTS `Permissions` (
   `permission_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del permiso.',
-  `description` varchar(100) NOT NULL COMMENT 'La descripciÃ³n humana del permiso.',
+  `description` varchar(100) NOT NULL COMMENT 'La descripción humana del permiso.',
   PRIMARY KEY (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los permisos que se pueden dar a los roles.' AUTO_INCREMENT=1 ;
 
@@ -284,7 +284,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `public` tinyint(1) NOT NULL DEFAULT '1',
   `author_id` int(11) NOT NULL,
   `title` varchar(256) NOT NULL,
-  `alias` varchar(10) DEFAULT NULL,
+  `alias` varchar(32) NOT NULL,
   `validator` enum('remote','literal','token','token-caseless','token-numeric') NOT NULL DEFAULT 'token-numeric',
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
@@ -301,6 +301,8 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   KEY `author_id` (`author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.' AUTO_INCREMENT=1 ;
 
+CREATE UNIQUE INDEX problems_alias ON Problems(`alias`);
+
 -- --------------------------------------------------------
 
 --
@@ -313,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `Problems_Badges` (
   PRIMARY KEY (`badge_id`,`problem_id`),
   KEY `badge_id` (`badge_id`),
   KEY `problem_id` (`problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='RelaciÃ³n entre 1 badge y los problemas que lo desbloqueaan.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relación entre 1 badge y los problemas que lo desbloqueaan.';
 
 -- --------------------------------------------------------
 
@@ -354,7 +356,7 @@ CREATE TABLE IF NOT EXISTS `Problems_Tags` (
 CREATE TABLE IF NOT EXISTS `Roles` (
   `role_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del rol.',
-  `description` varchar(100) NOT NULL COMMENT 'La descripciÃ³n humana del rol.',
+  `description` varchar(100) NOT NULL COMMENT 'La descripción humana del rol.',
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.' AUTO_INCREMENT=1 ;
 
@@ -400,6 +402,8 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   KEY `contest_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.' AUTO_INCREMENT=1 ;
 
+
+CREATE UNIQUE INDEX runs_alias ON Runs(`guid`);
 -- --------------------------------------------------------
 
 --
@@ -412,7 +416,7 @@ CREATE TABLE IF NOT EXISTS `Schools` (
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`school_id`),
   KEY `state_id` (`state_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatÃ¡logos para la normalizaciÃ³n';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 
 -- --------------------------------------------------------
 
@@ -426,7 +430,7 @@ CREATE TABLE IF NOT EXISTS `States` (
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`state_id`),
   KEY `country_id` (`country_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CatÃ¡logos para la normalizaciÃ³n';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 
 -- --------------------------------------------------------
 
@@ -523,171 +527,173 @@ CREATE TABLE IF NOT EXISTS `Users_Permissions` (
 -- Filtros para la tabla `Announcement`
 --
 ALTER TABLE `Announcement`
-  ADD CONSTRAINT `fk_au_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_au_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Auth_Tokens`
 --
 ALTER TABLE `Auth_Tokens`
-  ADD CONSTRAINT `fk_atu_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_atu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Clarifications`
 --
 ALTER TABLE `Clarifications`
-  ADD CONSTRAINT `fk_cp_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cu_author_id` FOREIGN KEY (`author_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cp_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cu_author_id` FOREIGN KEY (`author_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Coder_of_the_Month`
 --
 ALTER TABLE `Coder_of_the_Month`
-  ADD CONSTRAINT `fk_cotmu_coder_of_the_month_id` FOREIGN KEY (`coder_of_the_month_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cotmu_coder_of_the_month_id` FOREIGN KEY (`coder_of_the_month_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Contests`
 --
 ALTER TABLE `Contests`
-  ADD CONSTRAINT `fk_cu_director_id` FOREIGN KEY (`director_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cu_director_id` FOREIGN KEY (`director_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Contests_Users`
 --
 ALTER TABLE `Contests_Users`
-  ADD CONSTRAINT `fk_cuc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cuc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Contest_Problems`
 --
 ALTER TABLE `Contest_Problems`
-  ADD CONSTRAINT `fk_cpc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cpp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cpc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cpp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Contest_Problem_Opened`
 --
 ALTER TABLE `Contest_Problem_Opened`
-  ADD CONSTRAINT `fk_cpo_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cpo_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cpo_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cpo_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cpo_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cpo_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Emails`
 --
 ALTER TABLE `Emails`
-  ADD CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Favorites`
 --
 ALTER TABLE `Favorites`
-  ADD CONSTRAINT `fk_f_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_f_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_f_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_f_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Languages`
 --
 ALTER TABLE `Languages`
-  ADD CONSTRAINT `fk_l_country_id` FOREIGN KEY (`country_id`) REFERENCES `countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_l_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Messages`
 --
 ALTER TABLE `Messages`
-  ADD CONSTRAINT `fk_m_recipient_id` FOREIGN KEY (`recipient_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_m_sender_id` FOREIGN KEY (`sender_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_m_recipient_id` FOREIGN KEY (`recipient_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_m_sender_id` FOREIGN KEY (`sender_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Password_Change`
 --
 ALTER TABLE `Password_Change`
-  ADD CONSTRAINT `fk_pc_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_pc_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problems`
 --
 ALTER TABLE `Problems`
-  ADD CONSTRAINT `author_id` FOREIGN KEY (`author_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `author_id` FOREIGN KEY (`author_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problems_Badges`
 --
 ALTER TABLE `Problems_Badges`
-  ADD CONSTRAINT `fk_pb_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`badge_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_pb_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_pb_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `Badges` (`badge_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_pb_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problems_Languages`
 --
 ALTER TABLE `Problems_Languages`
-  ADD CONSTRAINT `fk_pl_language_id` FOREIGN KEY (`language_id`) REFERENCES `languages` (`language_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_pl_translator_id` FOREIGN KEY (`translator_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_pl_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_pl_translator_id` FOREIGN KEY (`translator_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problems_Tags`
 --
 ALTER TABLE `Problems_Tags`
-  ADD CONSTRAINT `fk_t_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_t_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`tag_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_t_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_t_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `Tags` (`tag_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Roles_Permissions`
 --
 ALTER TABLE `Roles_Permissions`
-  ADD CONSTRAINT `fk_rp_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_rp_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_rp_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `Permissions` (`permission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_rp_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Runs`
 --
 ALTER TABLE `Runs`
-  ADD CONSTRAINT `fk_r_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_r_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_r_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_r_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Schools`
 --
 ALTER TABLE `Schools`
-  ADD CONSTRAINT `state_id` FOREIGN KEY (`state_id`) REFERENCES `states` (`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `state_id` FOREIGN KEY (`state_id`) REFERENCES `States` (`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `States`
 --
 ALTER TABLE `States`
-  ADD CONSTRAINT `country_id` FOREIGN KEY (`country_id`) REFERENCES `countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Users`
 --
 ALTER TABLE `Users`
-  ADD CONSTRAINT `fk_country_id` FOREIGN KEY (`country_id`) REFERENCES `countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `emails` (`email_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_state_id` FOREIGN KEY (`state_id`) REFERENCES `states` (`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `school_id` FOREIGN KEY (`school_id`) REFERENCES `schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_state_id` FOREIGN KEY (`state_id`) REFERENCES `States` (`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Users_Badges`
 --
 ALTER TABLE `Users_Badges`
-  ADD CONSTRAINT `fk_ub_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`badge_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_ub_last_problem_id` FOREIGN KEY (`last_problem_id`) REFERENCES `problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_ub_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_ub_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `Badges` (`badge_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ub_last_problem_id` FOREIGN KEY (`last_problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ub_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `User_Roles`
 --
 ALTER TABLE `User_Roles`
-  ADD CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 
 --
 -- Filtros para la tabla `Users_Permissions`
 --
 ALTER TABLE `Users_Permissions`
-  ADD CONSTRAINT `fk_up_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_up_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_up_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `Permissions` (`permission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_up_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+COMMIT;

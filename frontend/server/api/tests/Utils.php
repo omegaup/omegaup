@@ -13,23 +13,28 @@
 
 require_once '../Login.php';
 require_once '../Logout.php';
-require_once 'NewContestsTest.php';
+require_once 'NewContestTest.php';
 require_once 'NewProblemInContestTest.php';
 
 
 class Utils
 {
+    static $contestant;
+    static $contestant_2;
+    static $judge;
+    static $problem_author;
+    
+    static $inittime;
+    static $counttime;
+    
+    
     //put your code here
     static function cleanup()
     {
-        foreach($_POST as $p)
+        foreach($_REQUEST as $p)
         {
             unset($p);
-        }
-        foreach($_GET as $g)
-        {
-            unset($g);
-        }        
+        }       
     }
     
     static function ConnectToDB()
@@ -78,8 +83,8 @@ class Utils
     static function Login($username, $password)
     {
         self::cleanup();
-        $_POST["username"] = $username;
-        $_POST["password"] = $password;
+        RequestContext::set("username", $username);
+        RequestContext::set("password", $password);
         
         // Login                                        
         $loginApi = new Login();  
@@ -94,8 +99,7 @@ class Utils
         }
         
         $auth_token = $cleanValue["auth_token"];
-                
-        
+                        
         self::cleanup();        
         return $auth_token;
         
@@ -104,7 +108,7 @@ class Utils
     static function Logout($auth_token)
     {                        
         // Logout            
-        $_POST["auth_token"] = $auth_token;
+        RequestContext::set("auth_token", $auth_token);
         
         $logoutApi = new Logout();        
         $cleanValue = $logoutApi->ExecuteApi();
@@ -118,14 +122,14 @@ class Utils
                 
     }
     
-    static function LoginAsJudge()
+    static function LoginAsContestDirector()
     {
-        return self::Login("judge", "password");
+        return self::Login(self::$judge->getUsername(), self::$judge->getPassword());
     }
     
-    static function GetJudgeUserId()
+    static function GetContestDirectorUserId()
     {
-        return 3;
+        return self::$judge->getUserId();
     }
     
     static function LoginAsAdmin()
@@ -135,38 +139,53 @@ class Utils
     
     static function LoginAsContestant()
     {
-        return self::Login(self::GetContestantUsername(), "password");
+        return self::Login(self::$contestant->getUsername(), self::$contestant->getPassword());
+    }
+    
+    static function LoginAsProblemAuthor()
+    {
+        return self::Login(self::$problem_author->getUsername(), self::$problem_author->getPassword());
     }
     
     static function GetContestantUsername()
     {
-        return "user";
+        return self::$contestant->getUsername();
     }
     
     static function GetContestantUserId()
     {
-        return 1;
+        return self::$contestant->getUserId();
+    }
+    
+    static function GetProblemAuthorUsername()
+    {
+        return self::$problem_author->getUsername();
+    }
+    
+    static function GetProblemAuthorUserId()
+    {
+        return self::$problem_author->getUserId();
     }
     
     static function LoginAsContestant2()
     {
-        return self::Login(self::GetContestant2Username(), "password");
+        return self::Login(self::$contestant_2->getUsername(), self::$contestant_2->getPassword());
     }
     
     static function GetContestant2Username()
     {
-        return "user2";
+        return self::$contestant_2->getUsername();
     }
     
     static function GetContestant2UserId()
     {
-        return 4;
+        return self::$contestant_2->getUserId();
     }
     
     
     static function SetAuthToken($auth_token)
     {
-        $_POST["auth_token"] = $auth_token;
+        RequestContext::set("auth_token", $auth_token);        
     }
     
     static function CreateRandomString()
@@ -176,9 +195,15 @@ class Utils
     
     static function GetValidPublicContestId()
     {
+        // Log in as contest creator user
+        $auth_token = Utils::LoginAsContestDirector();
+        Utils::SetAuthToken($auth_token);
+        
         // Create a clean contest and get the ID
-        $contestCreator = new NewContestsTest();
+        $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
+                
+        Utils::Logout($auth_token);
         
         return $contest_id;
     }
@@ -239,7 +264,7 @@ class Utils
     }
        
     
-    static function GetDBUnixTimestamp($time = NULL)
+    static function GetPhpUnixTimestamp($time = NULL)
     {                        
         if( is_null($time))
         {
@@ -249,6 +274,22 @@ class Utils
         {
             return strtotime($time);
         }                                                                              
+    }
+    
+    static function GetDbDatetime()
+    {
+        // Go to the DB 
+        global $conn;
+        
+        $sql = "SELECT NOW()";
+        $rs = $conn->GetRow($sql);                
+        
+        if(count($rs)===0)
+        {
+            return NULL;
+        }        
+                
+        return $rs[0]; 
     }
     
     static function GetTimeFromUnixTimestam($time)
@@ -266,6 +307,27 @@ class Utils
         }        
                 
         return $rs[0]; 
+    }
+    
+    static function CreateUser($username, $password)
+    {
+        $contestant = new Users();
+        $contestant->setUsername(Utils::CreateRandomString());
+        $contestant->setPassword(md5($password));
+        $contestant->setSolved(0);
+        $contestant->setSubmissions(0);
+        UsersDAO::save($contestant);
+        
+        // Save localy clean password
+        $contestant->setPassword($password);
+        
+        return $contestant;
+    }
+    
+    static function getNextTime()
+    {        
+        self::$counttime++;                
+        return Utils::GetTimeFromUnixTimestam(self::$inittime + self::$counttime);
     }
 }
 

@@ -69,8 +69,8 @@ object Feedback extends Enumeration {
 	val Partial = Value(3, "partial")
 }
 
-object TimeStart extends Enumeration {
-	type TimeStart = Value
+object PenaltyTimeStart extends Enumeration {
+	type PenaltyTimeStart = Value
 	val Contest = Value(1, "contest")
 	val Problem = Value(2, "problem")
 }
@@ -82,7 +82,7 @@ import Server._
 import Language._
 import Order._
 import Feedback._
-import TimeStart._
+import PenaltyTimeStart._
 
 class Contest(
 	var id: Long = 0,
@@ -101,7 +101,7 @@ class Contest(
 	var submissions_gap: Int = 0,
 	var feedback: Feedback = Feedback.Yes,
 	var penalty: Int = 20,
-	var time_start: TimeStart = TimeStart.Contest
+	var penalty_time_start: PenaltyTimeStart = PenaltyTimeStart.Contest
 ) {
 }
 
@@ -110,7 +110,7 @@ class Problem(
 	var public: Long = 1,
 	var author: Long = 0,
 	var title: String = "",
-	var alias: Option[String] = None,
+	var alias: String = "",
 	var validator: Validator = Validator.TokenNumeric,
 	var server: Option[Server] = None,
 	var remote_id: Option[String] = None,

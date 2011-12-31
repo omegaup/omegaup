@@ -128,6 +128,7 @@ void make_config() {
 -s kill\n\
 -s socket\n\
 \n\
+-p /lib64/\n\
 -p /dev/random\n\
 -p /dev/urandom\n\
 -p /proc/self/exe\n\
@@ -184,6 +185,7 @@ void make_config() {
 -s kill\n\
 -s socket\n\
 \n\
+-p /lib64/\n\
 -p /dev/random\n\
 -p /dev/urandom\n\
 -p /proc/self/exe\n\

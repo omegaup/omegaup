@@ -76,6 +76,26 @@ abstract class ProblemsDAOBase extends DAO
 			self::pushRecord( $foo,  $problem_id );
 			return $foo;
 	}
+        
+        public static final function getByAlias($alias)
+	{
+		if(self::recordExists($alias)){
+			return self::getRecord($alias);
+		}
+		$sql = "SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;";
+		$params = array(  $alias );
+                
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);
+		if(count($rs)==0)
+                {
+                    return NULL;
+                }
+                
+                $contest = new Problems( $rs );
+                self::pushRecord( $contest,  $alias );
+                return $contest;
+	}
 
 
 	/**

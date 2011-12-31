@@ -15,15 +15,17 @@ import Validator._
 
 object OmegaUp extends Actor with Log {
 	def act() = {
+		debug("OmegaUp loaded")
 		while(true) {
 			receive {
 				case Submission(run: Run) => {
+					debug("OmegaUp submission!")
 					val id   = run.id
-					val pid  = run.problem.id
+					val alias  = run.problem.alias
 					val lang = run.language
 					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)
 					
-					info("OU Submission {} for problem {}", id, pid)
+					info("OU Submission {} for problem {}", id, alias)
 					
 					if (run.problem.validator == Validator.Literal)
 						LiteralGrader.grade(run)
@@ -38,14 +40,14 @@ object OmegaUp extends Actor with Log {
 							)
 						
 							if(output.status == "ok") {
-								val input = FileUtil.read(Config.get("problems.root", "problems") + "/" + pid + "/inputname").trim
+								val input = FileUtil.read(Config.get("problems.root", "problems") + "/" + alias + "/inputname").trim
 								val msg = new RunInputMessage(output.token.get, input = Some(input))
 								val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")
 							
 								service.run(msg, zip) match {
 									case Some(x) => {
 										info("Received a message {}, trying to send input from {}", x, zip.getCanonicalPath)
-										val inputZip = new File(Config.get("problems.root", "problems") + "/" + pid + "/cases.zip")
+										val inputZip = new File(Config.get("problems.root", "problems") + "/" + alias + "/cases.zip")
 										if(
 											service.input(input, new FileInputStream(inputZip), inputZip.length.toInt).status != "ok" ||
 											service.run(msg, zip) != None
@@ -74,7 +76,7 @@ object OmegaUp extends Actor with Log {
 							}
 						} catch {
 							case e: Exception => {
-								error("OU Submission {} failed for problem {}", e, id, pid)
+								error("OU Submission {} failed for problem {}", e, id, alias)
                                                                 error("Stack trace: {}", e.getStackTrace) 
 							
 								run.status = Status.Ready

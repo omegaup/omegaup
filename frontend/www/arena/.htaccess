@@ -1,0 +1,24 @@
+RewriteEngine on        
+
+RewriteRule ^login/?$ /arena/CallApiLoader.php?apicmd=Login [L]
+RewriteRule ^logout/?$ /arena/CallApiLoader.php?apicmd=Logout [L]
+
+RewriteRule ^contests/?$ /arena/CallApiLoader.php?apicmd=ShowContests [L]
+RewriteRule ^contests/new/?$ /arena/CallApiLoader.php?apicmd=NewContest [L]
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowContest&contest_alias=$1 [L]
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/?$ /arena/CallApiLoader.php?apicmd=ShowScoreboard&contest_alias=$1 [L]
+
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemInContest&contest_alias=$1&problem_alias=$2 [L]
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/new/?$ /arena/CallApiLoader.php?apicmd=NewProblemInContest&contest_alias=$1 [L]
+
+RewriteRule ^runs/new/?$ /arena/CallApiLoader.php?apicmd=NewRun [L]
+RewriteRule ^runs/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowRun&run_alias=$1 [L]
+RewriteRule ^runs/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemRuns&problem_alias=$1 [L]
+
+RewriteRule ^clarifications/new/?$ /arena/CallApiLoader.php?apicmd=NewClarification [L]
+RewriteRule ^clarifications/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowClarificationInProblem&problem_alias=$1 [L]
+RewriteRule ^clarifications/show/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowClarification&clarification_id=$1 [L]
+
+# Redirects for UX.
+RewriteRule ^[^/]/?$ index.php [L]
+RewriteRule ^[^/]/scoreboard/?$ scoreboard.php [L]
