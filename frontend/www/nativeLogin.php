@@ -92,10 +92,11 @@
       *
       **/
     $page->addComponent( new TitleComponent("&iquest; Tienes alguna cuenta en uno de estos sitios ?", 3));
-    $html = '<a href="googleLoginReturn.php">
+    
+	$html = '<a href="googleLoginReturn.php">
               <img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50">
             </a>';
-	  $page->addComponent( new FreeHtmlComponent($html) );
+	$page->addComponent( new FreeHtmlComponent($html) );
 
 
 
