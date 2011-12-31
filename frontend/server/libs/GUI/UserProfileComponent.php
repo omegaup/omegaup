@@ -4,17 +4,46 @@
 class UserProfileComponent implements GuiComponent{
 	
 	private $user;
+	private $editable;
 	
 	function __construct($user){
 		$this->user = $user;
+		$this->editable = false;		
+	}
+	
+	public function setEditable($editable){
+		$this->editable = $editable;
 	}
 	
 	public function renderCmp(){
 
-		?>
-		
+		if($this->editable){
+			?>
+				<script type="text/javascript" charset="utf-8">
+					var profile_edit = function(){
+						//hide form
+						$("#actual_form").fadeOut("slow", function(){
+							$("#editable_form").fadeIn();	
+						});
+						//show editable form
+					}
+				</script>
+				<a onClick='profile_edit()'>editar mi perfil</a>
+			<?php
 			
-			<table border="0">
+			//add editable form
+			$editable_form = new DAOFormComponent( $this->user );
+			
+			$editable_form->hideField( array("solved", "password", "user_id", "submissions" )  );
+			$editable_form->wrapWith("id", "editable_form");
+			$editable_form->wrapWith("style", "display: none;");
+			echo $editable_form->renderCmp();
+			
+		}
+		
+		?>
+			
+			<table border="0" id="actual_form">
 				<tr>
 					<td><img src="http://www.gravatar.com/avatar/<?php echo md5($this->user->getUsername()); ?>?s=128"></td>
 					<td valign=top><h1>

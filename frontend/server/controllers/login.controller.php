@@ -149,11 +149,11 @@ class LoginController{
 	static function logout(
 	){
 
-		Logger::log("Logout");
-
 		unset($_SESSION["USER_ID"]);
 		unset($_SESSION["EMAIL"]);
 		unset($_SESSION["LOGGED_IN"]);		
+		
+		return true;
 	}
 	
 	

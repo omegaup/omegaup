@@ -35,7 +35,13 @@
 	}
 
 	//go ahead
-	$page->addComponent( new UserProfileComponent( $this_user ) );
+	$profileCmp = new UserProfileComponent( $this_user );
+	
+	$luser = LoginController::getCurrentUser();
+	if( !is_null($luser) && ($luser->getUserId() == $this_user->getUserId() ) ){
+		$profileCmp->setEditable(true);
+	}
+	$page->addComponent( $profileCmp );
 
 	$runs = new RunsListComponent();
 	$runs->setUser( $this_user->getUserId() );
