@@ -35,16 +35,11 @@
 	}
 
 	//go ahead
+	$page->addComponent( new UserProfileComponent( $this_user ) );
 
-	$page->addComponent( new TitleComponent($this_user->getName(), 2) );
-
-	$html = '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=128&amp;d=identicon&amp;r=PG"  >';
-	
-	$page->addComponent( new FreeHtmlComponent($html) );
-
-	
-	$page->addComponent( new FreeHtmlComponent("<hr>") );	
-
+	$runs = new RunsListComponent();
+	$runs->setUser( $this_user->getUserId() );
+	$page->addComponent( $runs );
 	
 
 	$page->render();
