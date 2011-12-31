@@ -14,7 +14,8 @@
    
    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
 
-   require_once(SERVER_PATH."/config.php");
+   //require_once(SERVER_PATH."/config.php");
+   require_once("config.php");
    
    require_once("libs/Logger/Logger.php");
    require_once('dao/model.inc.php');
