@@ -15,7 +15,7 @@
 
 	require_once(SERVER_PATH . '/libs/Markdown/markdown.php');
 
-        $page = new OmegaupComponentPage();
+	$page = new OmegaupComponentPage();
 
 	$form = new FormComponent();
 
@@ -33,5 +33,5 @@
 	$page->addComponent($form);
 	$page->addComponent(new FreeHTMLComponent('<div style="clear: right"></div>'));
 
-        $page->render();
+	$page->render();
 
