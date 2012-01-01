@@ -21,12 +21,15 @@ class UserProfileComponent implements GuiComponent{
 			?>
 				<script type="text/javascript" charset="utf-8">
 					var profile_edit = function(){
-						//hide form
-						$("#actual_form").fadeOut("slow", function(){
-							$("#editable_form").fadeIn();	
-						});
-						//show editable form
-					}
+							//hide form
+							$("#actual_form").fadeOut("slow", function(){
+								$("#editable_form").fadeIn();	
+							});
+							//show editable form
+						},
+					
+						//list registred schools
+						current_schools = <?php echo json_encode( SchoolsDAO::getAll() ); ?>;
 				</script>
 				<a onClick='profile_edit()'>editar mi perfil</a>
 			<?php
@@ -34,7 +37,7 @@ class UserProfileComponent implements GuiComponent{
 			//add editable form
 			$editable_form = new DAOFormComponent( $this->user );
 			
-			$editable_form->hideField( array("solved", "password", "user_id", "submissions" )  );
+			$editable_form->hideField( array("solved", "password", "user_id", "submissions", "last_access" )  );
 			$editable_form->wrapWith("id", "editable_form");
 			$editable_form->wrapWith("style", "display: none;");
 			echo $editable_form->renderCmp();

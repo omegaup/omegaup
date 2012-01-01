@@ -190,14 +190,14 @@ div#sidebar { display: none }
 
 
 div.login_bar{
-	font-size: 14px;
+	font-size: 13px;
 	background-color: #678DD7;
 	border-bottom: solid 1px #E7E7E7;
 	color: white;
-	padding: 5px;
+
 	height: 25px;
 	padding-left: 120px;
-	padding-top: 8px ;
+	padding-top: 5px ;
 	display: none;
 }
 
