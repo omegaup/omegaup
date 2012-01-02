@@ -4,10 +4,13 @@ class OmegaupComponentPage extends StdComponentPage{
 
 	
 	private $user_html_menu;
+	private $title;
 
-	function __construct()
+	function __construct( $title = null )
 	{
 
+		$this->title = $title;
+		
 		$this->doGetRequests();
 
 		parent::__construct();
@@ -82,8 +85,10 @@ class OmegaupComponentPage extends StdComponentPage{
 			//user *IS* logged in
 			
 			$this_user = LoginController::getCurrentUser();
-			$this->user_html_menu = '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >';
-			$this->user_html_menu .= ' Hola <a href="profile.php?id='.$this_user->getUserId()  .'">' . $this_user->getUsername()  .'</a>&nbsp;';
+			$this->user_html_menu = '';
+			$this->user_html_menu .= '<a style="background-color: white; color: #678DD7; padding: 2px; -webkit-border-radius: 5px; padding-left: 5px;" href="profile.php?id='.$this_user->getUserId()  .'">' 
+							. '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >'
+							. '&nbsp;' . $this_user->getUsername()  .'</a>&nbsp;';
 
 			/**
 			 *
@@ -145,6 +150,9 @@ class OmegaupComponentPage extends StdComponentPage{
 	  **/
 	function render()
 	{
+		if(is_null($this->title)){
+			$this->title = "OmegaUp | Elevando el nivel de programacion";
+		}
 		
 		?>
 		<!DOCTYPE html> 
@@ -153,8 +161,8 @@ class OmegaupComponentPage extends StdComponentPage{
 
 			<head>
 			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-
-			
+			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+			<title><?php echo $this->title; ?></title>
 			<link rel="stylesheet" type="text/css" href="css/style.css">
 
 			</head>
@@ -215,7 +223,7 @@ class OmegaupComponentPage extends StdComponentPage{
 			</div>
 			<!-- #wrapper -->
 			
-			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+
 			<script type="text/javascript" src="js/omegaup.js"></script>
 			</body>
 		</html>
