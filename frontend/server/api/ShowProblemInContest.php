@@ -34,9 +34,17 @@ class ShowProblemInContest extends ApiHandler
                 return ProblemsDAO::getByAlias($value);
             }, "Problem requested is invalid."))
         ->validate(RequestContext::get("problem_alias"), "problem_alias");
-                 
-        ValidatorFactory::stringOfMaxLengthValidator(2)
-            ->validate(RequestContext::get("lang"), "lang");    
+            
+        // Lang is optional. Default is ES
+        if(!is_null(RequestContext::get("lang")))
+        {
+            ValidatorFactory::stringOfMaxLengthValidator(2)
+                ->validate(RequestContext::get("lang"), "lang");    
+        }
+        else 
+        {
+            RequestContext::set("lang", "es");
+        }
             
         // Is the combination contest_id and problem_id valid?        
         $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
