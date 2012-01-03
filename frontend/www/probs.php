@@ -20,22 +20,26 @@
 	
 	$lista = ProblemsController::getProblemList();
 
-	$page->addComponent( 
-		new TableComponent (
-			array(
-				"problem_id" 	=> "problem_id",
-				"title" 		=> "title",
-				"alias" 		=> "alias",
-				"validator" 	=> "validator",
-				"server" 		=> "server",
-				"visits" 		=> "visits",
-				"submissions" 	=> "submissions",
-				"accepted" 		=> "accepted",
-				"difficulty" 	=> "difficulty"
-			),
-			$lista
-		)
+	$tabla = new TableComponent (
+		array(
+			"problem_id" 	=> "problem_id",
+			"title" 		=> "title",
+			"alias" 		=> "alias",
+			"validator" 	=> "validator",
+			"server" 		=> "server",
+			"visits" 		=> "visits",
+			"submissions" 	=> "submissions",
+			"accepted" 		=> "accepted",
+			"difficulty" 	=> "difficulty"
+		),
+		$lista
 	);
+	
+	$page->addComponent( new FreeHtmlComponent( "<script>function ver_problema(id){ window.location='problema.php?pid='+id; }</script>" ) );
+	
+	$tabla->addOnClick("problem_id", "ver_problema");
+	
+	$page->addComponent( $tabla );
 
 	$page->render();
 

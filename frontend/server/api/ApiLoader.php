@@ -39,6 +39,11 @@ class ApiLoader
                 require_once('Login.php');
                 $api = new Login();
                 break;
+
+            case 'FbLogin':
+                require_once('FbLogin.php');
+                $api = new FbLogin();
+                break;
             
             case 'Logout':
                 require_once('Logout.php');

@@ -63,14 +63,16 @@ class NewProblemInContest extends ApiHandler
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }
         
-                
-        ValidatorFactory::numericValidator()->addValidator(new CustomValidator(
+                     
+        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
                 function ($value)
                 {
                     // Check if the contest exists
-                    return UsersDAO::getByPK($value);
-                }, "author_id is invalid."))
-            ->validate(RequestContext::get("author_id"), "author_id");
+                    $u = new Users();
+                    $u->setUsername($value);
+                    return count(UsersDAO::search($u)) === 1;
+                }, "author_username is invalid."))
+            ->validate(RequestContext::get("author_username"), "author_username");
                 
         ValidatorFactory::stringNotEmptyValidator()->validate(
                 RequestContext::get("title"),
@@ -121,8 +123,7 @@ class NewProblemInContest extends ApiHandler
                 
         // Populate a new Problem object
         $problem = new Problems();
-        $problem->setPublic(false);
-        $problem->setAuthorId(RequestContext::get("author_id"));
+        $problem->setPublic(false);        
         $problem->setTitle(RequestContext::get("title"));
         $problem->setAlias(RequestContext::get("alias"));
         $problem->setValidator(RequestContext::get("validator"));
@@ -134,6 +135,21 @@ class NewProblemInContest extends ApiHandler
         $problem->setDifficulty(0);
         $problem->setSource(RequestContext::get("source"));
         $problem->setOrder(RequestContext::get("order"));                              
+        
+        // Get user_id from username for author_id        
+        $u = new Users();
+        $u->setUsername(RequestContext::get("author_username"));        
+        try
+        {
+            $users = UsersDAO::search($u);
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );
+        }
+        
+        $problem->setAuthorId($users[0]->getUserId());
+        
                 
         // Insert new problem
         try

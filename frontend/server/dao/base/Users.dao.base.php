@@ -153,6 +153,11 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $Users->getUsername() );
 		}
 
+		if( $Users->getFacebookUserId() != NULL){
+			$sql .= " facebook_user_id = ? AND";
+			array_push( $val, $Users->getUsername() );
+		}
+
 		if( $Users->getPassword() != NULL){
 			$sql .= " password = ? AND";
 			array_push( $val, $Users->getPassword() );
@@ -243,11 +248,12 @@ abstract class UsersDAOBase extends DAO
 	  * @param Users [$Users] El objeto de tipo Users a actualizar.
 	  **/
 	private static final function update( $Users )
-	{
-		$sql = "UPDATE Users SET  username = ?, password = ?, main_email_id = ?, name = ?, solved = ?, submissions = ?, country_id = ?, state_id = ?, school_id = ?, scholar_degree = ?, graduation_date = ?, birth_date = ?, last_access = ? WHERE  user_id = ?;";
+	{ 
+		$sql = "UPDATE Users SET  username = ?, password = ?, facebook_user_id = ?, main_email_id = ?, name = ?, solved = ?, submissions = ?, country_id = ?, state_id = ?, school_id = ?, scholar_degree = ?, graduation_date = ?, birth_date = ?, last_access = ? WHERE  user_id = ?;";
 		$params = array( 
 			$Users->getUsername(), 
 			$Users->getPassword(), 
+			$Users->getFacebookUserId(),
 			$Users->getMainEmailId(), 
 			$Users->getName(), 
 			$Users->getSolved(), 
@@ -281,11 +287,12 @@ abstract class UsersDAOBase extends DAO
 	  * @param Users [$Users] El objeto de tipo Users a crear.
 	  **/
 	private static final function create( &$Users )
-	{
-		$sql = "INSERT INTO Users ( user_id, username, password, main_email_id, name, solved, submissions, country_id, state_id, school_id, scholar_degree, graduation_date, birth_date, last_access ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+	{ 
+		$sql = "INSERT INTO Users ( user_id, username, facebook_user_id, password, main_email_id, name, solved, submissions, country_id, state_id, school_id, scholar_degree, graduation_date, birth_date, last_access ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Users->getUserId(), 
 			$Users->getUsername(), 
+			$Users->getFacebookUserId(),
 			$Users->getPassword(), 
 			$Users->getMainEmailId(), 
 			$Users->getName(), 

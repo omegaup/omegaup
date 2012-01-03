@@ -21,7 +21,7 @@ require_once("base/Users.vo.base.php");
 class UsersDAO extends UsersDAOBase
 {
   
-    public function searchUserByEmail($email)
+    public static function searchUserByEmail($email)
     {
 
       global  $conn;
