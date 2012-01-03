@@ -58,7 +58,7 @@ div#title a {
 div.post {
 	width: 900px;
     nowhitespace: afterproperty;
-    margin: 0 auto 40px auto;
+    margin: 0 auto 10px auto;
     background: #fff /*url(../media/line.png)*/; -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.18);
     -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.18);
     box-shadow: 0 1px 3px rgba(0,0,0,0.18);
@@ -133,7 +133,7 @@ div.copy img {
     margin: 15px 0 20px -10px;
     -webkit-box-shadow: -1px 1px 3px rgba(0,0,0,0.2);
     -webkit-border-radius: 2px;
-    -webkit-transform: rotate(1deg);
+    /*-webkit-transform: rotate(1deg);*/
 }
 div.copy code {
     font-family: monospace;
