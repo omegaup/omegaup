@@ -37,6 +37,9 @@ class ShowContests extends ApiHandler {
         }
         
 
+        // DAO requires contest_id as relevant column but we don't want to expose it
+        array_shift($relevant_columns);
+        
         /**
          * Ok, lets go 1 by 1, and if its public, show it,
          * if its not, check if the user has access to it.

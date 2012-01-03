@@ -49,7 +49,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         }
         RequestContext::set("title", Utils::CreateRandomString());
         RequestContext::set("alias", substr(Utils::CreateRandomString(), 0, 10));
-        RequestContext::set("author_id", Utils::GetProblemAuthorUserId());
+        RequestContext::set("author_username", Utils::GetProblemAuthorUsername());
         RequestContext::set("validator", "token");
         RequestContext::set("time_limit", 5000);
         RequestContext::set("memory_limit", 32000);                
@@ -94,7 +94,10 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         catch(ApiException $e)
         {
             var_dump($e->getArrayMessage());
-            var_dump($e->getWrappedException()->getMessage());            
+            if(!is_null($e->getWrappedException()))
+            {
+                var_dump($e->getWrappedException()->getMessage());            
+            }
             $this->fail("Unexpected exception");
         }        
         
@@ -121,10 +124,13 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(RequestContext::get("alias"), $problem->getAlias());
         $this->assertEquals(RequestContext::get("validator"), $problem->getValidator());
         $this->assertEquals(RequestContext::get("time_limit"), $problem->getTimeLimit());
-        $this->assertEquals(RequestContext::get("memory_limit"), $problem->getMemoryLimit());                      
-        $this->assertEquals(RequestContext::get("author_id"), $problem->getAuthorId());
+        $this->assertEquals(RequestContext::get("memory_limit"), $problem->getMemoryLimit());                              
         $this->assertEquals(RequestContext::get("order"), $problem->getOrder());
         $this->assertEquals(RequestContext::get("source"), $problem->getSource());
+        
+        // Verify author username -> author id conversion
+        $user = UsersDAO::getByPK($problem->getAuthorId());
+        $this->assertEquals($user->getUsername(), RequestContext::get("author_username"));
         
         // Verify problem contents.zip were copied
         $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;        
@@ -197,7 +203,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
             "time_limit",            
             "memory_limit",
             "source",
-            "author_id",
+            "author_username",
             "alias"
         );
         

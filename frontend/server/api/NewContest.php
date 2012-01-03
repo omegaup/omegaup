@@ -37,7 +37,7 @@ class NewContest extends ApiHandler
         // Calculate contest length:
         $contest_length = strtotime(RequestContext::get("finish_time")) - strtotime(RequestContext::get("start_time"));
         
-        // Window_length NULL is accepted
+        // Window_length is optional
         if(!is_null(RequestContext::get("window_length")))
         {
             ValidatorFactory::numericRangeValidator(
@@ -118,7 +118,7 @@ class NewContest extends ApiHandler
         $contest->setFinishTime(RequestContext::get("finish_time"));
         $contest->setWindowLength(RequestContext::get("window_length"));
         $contest->setDirectorId($this->_user_id);
-        $contest->setRerunId(0);
+        $contest->setRerunId(0); // NYI
         $contest->setPublic(RequestContext::get("public"));
         $contest->setAlias(RequestContext::get("alias"));
         $contest->setScoreboard(RequestContext::get("scoreboard"));

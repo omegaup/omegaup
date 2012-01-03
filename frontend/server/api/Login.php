@@ -23,10 +23,14 @@ class Login extends ApiHandler {
     protected function RegisterValidatorsToRequest() 
     {                                
         ValidatorFactory::stringNotEmptyValidator()->validate(
-                RequestContext::get("username"), "username");
+                RequestContext::get("facebook_id"), "facebook_id");
         
         ValidatorFactory::stringNotEmptyValidator()->validate(
-                RequestContext::get("password"), "password");
+                RequestContext::get("email"), "email");
+
+        ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("name"), "name");
+
     }
 
     protected function GenerateResponse() 
