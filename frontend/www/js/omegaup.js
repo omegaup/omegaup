@@ -10,7 +10,7 @@ window.fbAsyncInit = function() {
 	}
 	
 	FB.getLoginStatus(function(response) {		
-		if (response.session) {
+		if (response.status == "connected") {
 			//usuario conectado, buscar informacion
 			FB.api('/me', function(response) {
 				//arrived
@@ -24,6 +24,7 @@ window.fbAsyncInit = function() {
 };
 
 
+
 var loginWithFaceook = function(  ){
 	if(DEBUG){
 		console.log("facebook is back");
@@ -31,7 +32,7 @@ var loginWithFaceook = function(  ){
 	
 	//test if he really logged in
 	FB.getLoginStatus(function(response) {		
-		if (response.session) {
+		if (response.status == "connected") {
 			//get his information
 			FB.api('/me', function(response) {
 
@@ -39,11 +40,13 @@ var loginWithFaceook = function(  ){
 				//send login to omegaup api
 				
 				$.ajax({
-					url: "arena/login/",
-					params :{
+					url: "arena/fblogin/",
+					type: "POST",
+					data :{
 						use_facebook : true,
-						facebook_id : "32984329784",
-						email		: "alskdjflasdfj"
+						facebook_id : response.id,
+						email		: response.email,
+						name		: response.name
 					},
 					success: function( response ){
 			 			//refresh the site
@@ -54,7 +57,11 @@ var loginWithFaceook = function(  ){
 			});
 	  	} else {
 			//he didnt really log in somehow
-			console.log("ntli");
+			if(DEBUG){
+				console.log("Not Logged In");
+			}
+			//show error perhaps?
+
 	  	}
 	});
 	

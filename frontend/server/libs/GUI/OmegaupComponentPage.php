@@ -235,7 +235,7 @@ class OmegaupComponentPage extends StdComponentPage{
 			
 
 			<script type="text/javascript" src="js/omegaup.js"></script>
-			<script src="http://connect.facebook.net/es_ES/all.js"></script>
+			<script src="https://connect.facebook.net/es_ES/all.js"></script>
 			</body>
 		</html>
 		<?php
