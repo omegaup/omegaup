@@ -115,6 +115,8 @@ class Users extends VO
 	  */
 	protected $username;
 
+	protected $facebook_user_id;
+	
 	/**
 	  * password
 	  * 
@@ -223,6 +225,18 @@ class Users extends VO
 	  */
 	protected $last_access;
 
+
+
+
+	final public function getFacebookUserId(){
+		return $this->facebook_user_id;
+	}
+
+	final public function setFacebookUserId($facebook_user_id){
+		$this->facebook_user_id = $facebook_user_id;
+	}
+	
+	
 	/**
 	  * getUserId
 	  * 
