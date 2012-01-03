@@ -44,7 +44,7 @@ var loginWithFaceook = function(  ){
 						use_facebook : true,
 						facebook_id : "32984329784",
 						email		: "alskdjflasdfj"
-					}
+					},
 					success: function( response ){
 			 			//refresh the site
 						console.log(response)
