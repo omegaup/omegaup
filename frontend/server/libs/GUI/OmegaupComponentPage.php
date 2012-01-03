@@ -208,10 +208,20 @@ class OmegaupComponentPage extends StdComponentPage{
 					<!-- .post -->
 				
 				    <div class="post footer">
-				        <ul>
-				            <li class="first"><a href=""></a></li>
-				        </ul>
-				        <p><?php //echo $GUI::getFooter(); ?></p>
+
+							<?php //echo $GUI::getFooter(); ?>
+							
+				
+						<div id="fb-root"></div>
+						
+						<div id="fb-login-button" style="padding:5px">
+							<fb:login-button
+								scope="email"
+								onlogin="loginWithFaceook"
+							> Iniciar sesion con Facebook </fb:login-button>
+						</div>
+						
+						
 				    </div>
 					<!-- .post footer -->
 
@@ -225,6 +235,7 @@ class OmegaupComponentPage extends StdComponentPage{
 			
 
 			<script type="text/javascript" src="js/omegaup.js"></script>
+			<script src="http://connect.facebook.net/es_ES/all.js"></script>
 			</body>
 		</html>
 		<?php

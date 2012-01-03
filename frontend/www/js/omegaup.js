@@ -1,9 +1,6 @@
 var DEBUG = true;
 
-/*
-	//Fuck Facebook connect for now
-	//since it need to be run on the
-	//registered domain
+
 window.fbAsyncInit = function() {
 
   	FB.init({appId: '197705690257857', status: true, cookie: true, xfbml: true});
@@ -12,24 +9,61 @@ window.fbAsyncInit = function() {
 		console.log("Facebook loaded", FB);
 	}
 	
-	FB.getLoginStatus(function(response) {
-
-		lb.setStatus( response.session );
-		
+	FB.getLoginStatus(function(response) {		
 		if (response.session) {
 			//usuario conectado, buscar informacion
 			FB.api('/me', function(response) {
 				//arrived
-				lb.setUser( response );
-				lb.render();
+				console.log(response);
+				//send login to omegaup api
 			});
 	  	} else {
-			lb.render();
+			console.log("ntli");
 	  	}
-
 	});
 };
-*/
+
+
+var loginWithFaceook = function(  ){
+	if(DEBUG){
+		console.log("facebook is back");
+	}
+	
+	//test if he really logged in
+	FB.getLoginStatus(function(response) {		
+		if (response.session) {
+			//get his information
+			FB.api('/me', function(response) {
+
+				console.log("back from fb query" , response);
+				//send login to omegaup api
+				
+				$.ajax({
+					url: "arena/login/",
+					params :{
+						use_facebook : true,
+						facebook_id : "32984329784",
+						email		: "alskdjflasdfj"
+					}
+					success: function( response ){
+			 			//refresh the site
+						console.log(response)
+					}
+				});
+				
+			});
+	  	} else {
+			//he didnt really log in somehow
+			console.log("ntli");
+	  	}
+	});
+	
+	//send login to omegaup
+
+}
+
+
+
 
 
 var Contests = 

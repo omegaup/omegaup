@@ -95,7 +95,9 @@
     
 	$html = '<a href="googleLoginReturn.php">
               <img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50">
-            </a>';
+            </a>
+				&nbsp;&nbsp;&nbsp;
+			<img src="http://www.clasesdeperiodismo.com/wp-content/uploads/2011/02/facebook-11.jpg" height="50">';
 	$page->addComponent( new FreeHtmlComponent($html) );
 
 
