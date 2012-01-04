@@ -86,8 +86,8 @@ abstract class ApiHandler
             // Generate output
             $this->GenerateResponse();
 
-            // If the request didn't fail nor output something, we're OK
-            if(count($this->getResponse()) === 0)
+            // If the request didn't fail or supply a status response, we're OK
+            if (count($this->getResponse()) === 0 || !isset($this->_response['status']))
             {
                 $this->addResponse("status", "ok");
             }
