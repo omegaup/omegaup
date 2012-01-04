@@ -95,7 +95,8 @@ class ShowContests extends ApiHandler {
              * */
             $this->addResponse($addedContests, $c->asFilteredArray($relevant_columns));
             $addedContests++;
-        }
+	}
+	$this->addResponse('length', $addedContests);
     }
 
 
