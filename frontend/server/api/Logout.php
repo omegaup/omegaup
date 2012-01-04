@@ -34,7 +34,9 @@ class Logout extends ApiHandler {
         catch( Exception $e )
         {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
-        }
+	}
+
+	setcookie('auth_token', '', 1);
        
         // Happy ending
         $this->addResponse("status", "ok");
