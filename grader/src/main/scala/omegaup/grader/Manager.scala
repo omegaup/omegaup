@@ -116,10 +116,12 @@ object Manager extends Object with Log {
 							Manager.grade(req.id)
 						} catch {
 							case e: IllegalArgumentException => {
+								error("Grade failed: {}", e)
 								response.setStatus(HttpServletResponse.SC_NOT_FOUND)
 								new GradeOutputMessage(status = "error", error = Some(e.getMessage))
 							}
 							case e: Exception => {
+								error("Grade failed: {}", e)
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 								new GradeOutputMessage(status = "error", error = Some(e.getMessage))
 							}
@@ -132,6 +134,7 @@ object Manager extends Object with Log {
 							Manager.register(request.getRemoteAddr, req.port)
 						} catch {
 							case e: Exception => {
+								error("Register failed: {}", e)
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 								new RegisterOutputMessage(status = "error", error = Some(e.getMessage))
 							}
