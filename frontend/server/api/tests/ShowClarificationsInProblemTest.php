@@ -65,8 +65,8 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
             $this->fail("Unexpected exception");
         }
         
-        // Check that we have 2 clarifications        
-        $this->assertEquals(2, count($returnArray));
+        // Check that we have 2 clarifications                
+        $this->assertEquals(2, $returnArray['length']);
         
         // Check clarification #2, should appear first since it earlier
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
@@ -133,8 +133,8 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
             $this->fail("Unexpected exception");
         }
         
-        // Check that we have 2 clarifications                
-        $this->assertEquals(1, count($returnArray));
+        // Check that we have 1 clarification
+        $this->assertEquals(1, $returnArray['length']);
         
         // Check clarification #2
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
@@ -193,7 +193,7 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         }
         
         // Check that we have 2 clarifications                
-        $this->assertEquals(2, count($returnArray));
+        $this->assertEquals(2, $returnArray['length']);
         
         // Check clarification #2 (TIMESTAMP has changed)
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
@@ -263,7 +263,7 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         }        
         
         // Check that we have all 3 clarifications                      
-        $this->assertEquals(3, count($returnArray));                                             
+        $this->assertEquals(3, $returnArray['length']);
         
         // Check clarification #2
         $clarification_3 = ClarificationsDAO::getByPK($clarification_id_3);

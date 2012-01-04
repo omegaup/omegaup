@@ -10,10 +10,23 @@
   *
  * */
 require_once("ApiHandler.php");
+require_once(SERVER_PATH . '/libs/SessionManager.php');
 
 class Login extends ApiHandler {
 
-
+    private $_sessionManager;
+    
+    public function Login(SessionManager $sessionManager = NULL)
+    {
+        if(is_null($sessionManager))
+        {
+            $sessionManager = new SessionManager();
+        }
+        
+        $this->_sessionManager = $sessionManager;
+    }
+    
+    
     protected function CheckAuthToken() 
     {       
         // Bypass authorization
@@ -155,8 +168,8 @@ class Login extends ApiHandler {
          {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
 	 }
-
-	 setcookie('auth_token', $auth_str, time()+60*60*24, '/');
+         
+	 $this->_sessionManager->SetCookie('auth_token', $auth_str, time()+60*60*24, '/');
           
          // Add token to response
          $this->addResponse("auth_token", $this->_auth_token->getToken());         
