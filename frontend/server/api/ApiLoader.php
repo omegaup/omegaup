@@ -50,7 +50,12 @@ class ApiLoader
                 $api = new FbLogin();
                 break;
             
-            case 'Logout':
+            case 'Authenticated':
+                require_once('Authenticated.php');
+                $api = new Authenticated();
+		break;
+
+             case 'Logout':
                 require_once('Logout.php');
                 $api = new Logout();
                 break;
