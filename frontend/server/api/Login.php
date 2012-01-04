@@ -142,8 +142,9 @@ class Login extends ApiHandler {
           * user who logged in:
           * some salted md5 string: to validate that it was me who actually made this token
           * 
-          * */
-         $auth_str = time() . "-" . $actual_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $actual_user->getUserId() . time() );
+	  * */
+	 $time = time();
+         $auth_str = $time . "-" . $actual_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $actual_user->getUserId() . $time );
          $this->_auth_token->setToken($auth_str);
 
          try
