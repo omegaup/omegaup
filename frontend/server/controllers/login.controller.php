@@ -139,7 +139,7 @@ class LoginController{
 		    throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
 		 }
 
-		 setcookie('auth_token', $auth_str);
+		 setcookie('auth_token', $auth_str, time()+60*60*24);
 		 
 		 return true;
 	}

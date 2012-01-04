@@ -154,7 +154,9 @@ class Login extends ApiHandler {
          catch(Exception $e)
          {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
-         }
+	 }
+
+	 setcookie('auth_token', $auth_str, time()+60*60*24);
           
          // Add token to response
          $this->addResponse("auth_token", $this->_auth_token->getToken());         
