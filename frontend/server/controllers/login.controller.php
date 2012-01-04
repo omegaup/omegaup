@@ -139,7 +139,7 @@ class LoginController{
 		    throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
 		 }
 
-		 setcookie('auth_token', $auth_str, time()+60*60*24);
+		 setcookie('auth_token', $auth_str, time()+60*60*24, '/');
 		 
 		 return true;
 	}
@@ -170,10 +170,11 @@ class LoginController{
 	 * */
 	static function logout(
 	){
-
 		unset($_SESSION["USER_ID"]);
 		unset($_SESSION["EMAIL"]);
 		unset($_SESSION["LOGGED_IN"]);		
+
+		setcookie('auth_token', 'deleted', 1, '/');
 		
 		return true;
 	}

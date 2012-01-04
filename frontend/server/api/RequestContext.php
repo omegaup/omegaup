@@ -13,7 +13,7 @@ class RequestContext
 		if ($key == 'auth_token') {
 			// only 'auth_token' can searched for in cookies
 			if (isset($_COOKIE[$key])) {
-				setcookie('auth_token', $_COOKIE[$key], time()+60*60*24);
+				setcookie('auth_token', $_COOKIE[$key], time()+60*60*24, '/');
 				return $_COOKIE[$key];
 			}
 		}
