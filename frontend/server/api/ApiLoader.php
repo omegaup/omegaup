@@ -35,6 +35,11 @@ class ApiLoader
 
         switch($api_name)
         {
+            case 'Time':
+                require_once('Time.php');
+                $api = new Time();
+                break;
+
             case 'Login':
                 require_once('Login.php');
                 $api = new Login();

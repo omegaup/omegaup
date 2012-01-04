@@ -1,5 +1,7 @@
 RewriteEngine on        
 
+RewriteRule ^time/?$ /arena/CallApiLoader.php?apicmd=Time [L]
+
 RewriteRule ^login/?$ /arena/CallApiLoader.php?apicmd=Login [L]
 RewriteRule ^fblogin/?$ /arena/CallApiLoader.php?apicmd=FbLogin [L]
 RewriteRule ^logout/?$ /arena/CallApiLoader.php?apicmd=Logout [L]
@@ -21,5 +23,6 @@ RewriteRule ^clarifications/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php
 RewriteRule ^clarifications/show/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowClarification&clarification_id=$1 [L]
 
 # Redirects for UX.
-RewriteRule ^[^/]/?$ index.php [L]
-RewriteRule ^[^/]/scoreboard/?$ scoreboard.php [L]
+RewriteRule ^/?$ index.php [L]
+RewriteRule ^[a-zA-Z0-9_+-]+/scoreboard/?$ scoreboard.php [L]
+RewriteRule ^[a-zA-Z0-9_+-]+/?$ contest.php [L]
