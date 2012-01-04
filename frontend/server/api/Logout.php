@@ -15,6 +15,17 @@ require_once("ApiHandler.php");
 
 class Logout extends ApiHandler {
     
+    private $_sessionManager;
+    
+    public function Logout(SessionManager $sessionManager = NULL)
+    {
+        if(is_null($sessionManager))
+        {
+            $sessionManager = new SessionManager();
+        }
+        
+        $this->_sessionManager = $sessionManager;
+    }
     
     protected function RegisterValidatorsToRequest() {
         
@@ -36,7 +47,7 @@ class Logout extends ApiHandler {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 	}
 
-	setcookie('auth_token', '', 1, '/');
+	$this->_sessionManager->SetCookie('auth_token', '', 1, '/');
        
         // Happy ending
         $this->addResponse("status", "ok");

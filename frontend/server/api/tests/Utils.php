@@ -83,11 +83,19 @@ class Utils
     static function Login($username, $password)
     {
         self::cleanup();
+
+        $mockCreator = new NewContestTest();
+        $sessionManagerMock = $mockCreator->getMock('SessionManager', array('SetCookie'));
+        
+        $sessionManagerMock->expects($mockCreator->any())
+                ->method('SetCookie')
+                ->will($mockCreator->returnValue(true));
+        
         RequestContext::set("username", $username);
         RequestContext::set("password", $password);
         
         // Login                                        
-        $loginApi = new Login();  
+        $loginApi = new Login($sessionManagerMock);  
         
         try
         {
@@ -100,17 +108,26 @@ class Utils
         
         $auth_token = $cleanValue["auth_token"];
                         
-        self::cleanup();        
+        self::cleanup();                
         return $auth_token;
         
     }
     
     static function Logout($auth_token)
     {                        
+        // Mock SessionManager
+        $mockCreator = new NewContestTest();
+        $sessionManagerMock = $mockCreator->getMock('SessionManager', array('SetCookie'));
+        
+        $sessionManagerMock->expects($mockCreator->any())
+                ->method('SetCookie')
+                ->will($mockCreator->returnValue(true));
+
+        
         // Logout            
         RequestContext::set("auth_token", $auth_token);
         
-        $logoutApi = new Logout();        
+        $logoutApi = new Logout($sessionManagerMock);        
         $cleanValue = $logoutApi->ExecuteApi();
                 
         //Validate that token isn´t there anymore        
