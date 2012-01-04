@@ -48,6 +48,7 @@ class LoginController{
 		$email_query->setEmail( $email );
 		
 		$result = EmailsDAO::search( $email_query );
+		$this_user = null;
 
 
 		if( sizeof($result) == 0)
@@ -99,27 +100,48 @@ class LoginController{
 			
 			//save user so  his
 			//last_access gets updated
-			try{
+			try {
 				UsersDAO::save( $this_user );
-
-			}catch(Exception $e){
-				
+			} catch(Exception $e) {
 				die($e);
 				return false;
-
 			}
-			
 		}
-		
 
 		$_SESSION["USER_ID"] 	= $this_user->getUserId();
 		$_SESSION["EMAIL"] 		= $email;
 		$_SESSION["LOGGED_IN"] 	= true;
+		
+		/**
+		 * Ok, passwords match !
+		 * Create the auth_token. Auth tokens will be valid for 24 hours.
+		 * */
+		 $auth_token = new AuthTokens();
+		 $auth_token->setUserId( $this_user->getUserId() );
 
-		return true;
-		
-		
-		
+		 /**
+		  * auth token consists of:
+		  * current time: to validate obsolete tokens
+		  * user who logged in:
+		  * some salted md5 string: to validate that it was me who actually made this token
+		  * 
+		  * */
+		 $time = time();
+		 $auth_str = $time . "-" . $this_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $this_user->getUserId() . $time );
+		 $auth_token->setToken($auth_str);
+
+		 try
+		 {
+		    AuthTokensDAO::save( $auth_token );
+		 }
+		 catch(Exception $e)
+		 {
+		    throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
+		 }
+
+		 setcookie('auth_token', $auth_str);
+		 
+		 return true;
 	}
 	
 	
