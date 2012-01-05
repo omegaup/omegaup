@@ -40,8 +40,9 @@ class LoginController{
 	 * */
 	static function login(
 		$email, 
-		$google_token
+		$google_token = null
 	){
+		Logger::log("Login");
 		
 		//google says valid user, look for it in email's table
 		$email_query = new Emails();
@@ -54,7 +55,7 @@ class LoginController{
 		if( sizeof($result) == 0)
 		{
 			
-			//first timer !
+		
 
 			//create user
 			$this_user 	= new Users();
@@ -94,7 +95,7 @@ class LoginController{
 			//$this_user->setEmailId( -1 );
 						
 		}else{
-			
+
 			// he's been here man !
 			$this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
 			
