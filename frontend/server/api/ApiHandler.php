@@ -29,14 +29,11 @@ abstract class ApiHandler
     }
     
     protected function addResponseArray(array $array)
-    {
-	$length = 0;
+    {	
         foreach ($array as $key => $value)
         {
-		$this->_response[$key] = $value;
-		$length++;
-	}
-	$this->_response['length'] = $length;
+            $this->_response[$key] = $value;	
+	}	
     }    
     
     protected function getResponse()

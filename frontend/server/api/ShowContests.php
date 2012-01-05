@@ -44,7 +44,7 @@ class ShowContests extends ApiHandler {
          * Ok, lets go 1 by 1, and if its public, show it,
          * if its not, check if the user has access to it.
          * */
-        $addedContests = 0;
+        $addedContests = array();
         foreach ($contests as $c) 
         {
             // At most we want 10 contests
@@ -55,8 +55,8 @@ class ShowContests extends ApiHandler {
 
             if ($c->getPublic()) 
             {
-                $this->addResponse($addedContests, $c->asFilteredArray($relevant_columns));                
-                $addedContests++;
+                $addedContests[] = $c->asFilteredArray($relevant_columns);                
+                
                 continue;
             }
 
@@ -93,10 +93,11 @@ class ShowContests extends ApiHandler {
              * He can see it !
              * 
              * */
-            $this->addResponse($addedContests, $c->asFilteredArray($relevant_columns));
-            $addedContests++;
+            $addedContests[] = $c->asFilteredArray($relevant_columns);            
 	}
-	$this->addResponse('length', $addedContests);
+        
+        $this->addResponse('contests', $addedContests);
+	$this->addResponse('length', count($addedContests));
     }
 
 

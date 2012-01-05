@@ -66,23 +66,23 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         }
         
         // Check that we have 2 clarifications                
-        $this->assertEquals(2, $returnArray['length']);
+        $this->assertEquals(2, count($returnArray['clarifications']));
         
         // Check clarification #2, should appear first since it earlier
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
         
         // Assert status of clarification
-        $this->assertEquals($clarification_2->getMessage(), $returnArray[0]["message"]);
-        $this->assertEquals($clarification_2->getAnswer(), $returnArray[0]["answer"]);
-        $this->assertEquals($clarification_2->getTime(), $returnArray[0]["time"]);           
+        $this->assertEquals($clarification_2->getMessage(), $returnArray['clarifications'][0]["message"]);
+        $this->assertEquals($clarification_2->getAnswer(), $returnArray['clarifications'][0]["answer"]);
+        $this->assertEquals($clarification_2->getTime(), $returnArray['clarifications'][0]["time"]);           
                 
         // Check clarification #1
         $clarification_1 = ClarificationsDAO::getByPK($clarification_id_1);
         
         // Assert status of clarification
-        $this->assertEquals($clarification_1->getMessage(), $returnArray[1]["message"]);
-        $this->assertEquals($clarification_1->getAnswer(), $returnArray[1]["answer"]);
-        $this->assertEquals($clarification_1->getTime(), $returnArray[1]["time"]);
+        $this->assertEquals($clarification_1->getMessage(), $returnArray['clarifications'][1]["message"]);
+        $this->assertEquals($clarification_1->getAnswer(), $returnArray['clarifications'][1]["answer"]);
+        $this->assertEquals($clarification_1->getTime(), $returnArray['clarifications'][1]["time"]);
 
     }
     
@@ -134,15 +134,15 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         }
         
         // Check that we have 1 clarification
-        $this->assertEquals(1, $returnArray['length']);
+        $this->assertEquals(1, count($returnArray['clarifications']));
         
         // Check clarification #2
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
                                        
         // Assert status of clarification
-        $this->assertEquals($clarification_2->getMessage(), $returnArray[0]["message"]);
-        $this->assertEquals($clarification_2->getAnswer(), $returnArray[0]["answer"]);
-        $this->assertEquals($clarification_2->getTime(), $returnArray[0]["time"]);                
+        $this->assertEquals($clarification_2->getMessage(), $returnArray['clarifications'][0]["message"]);
+        $this->assertEquals($clarification_2->getAnswer(), $returnArray['clarifications'][0]["answer"]);
+        $this->assertEquals($clarification_2->getTime(), $returnArray['clarifications'][0]["time"]);                
     }
     
     public function testPublicClarificatoinsAreShared()
@@ -193,24 +193,24 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         }
         
         // Check that we have 2 clarifications                
-        $this->assertEquals(2, $returnArray['length']);
+        $this->assertEquals(2, count($returnArray['clarifications']));
         
         // Check clarification #2 (TIMESTAMP has changed)
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
                                        
         // Assert status of clarification #2
-        $this->assertEquals($clarification_2->getMessage(), $returnArray[0]["message"]);
-        $this->assertEquals($clarification_2->getAnswer(), $returnArray[0]["answer"]);
-        $this->assertEquals($clarification_2->getTime(), $returnArray[0]["time"]);                   
+        $this->assertEquals($clarification_2->getMessage(), $returnArray['clarifications'][0]["message"]);
+        $this->assertEquals($clarification_2->getAnswer(), $returnArray['clarifications'][0]["answer"]);
+        $this->assertEquals($clarification_2->getTime(), $returnArray['clarifications'][0]["time"]);                   
         
         
         // Check clarification #1
         $clarification_1 = ClarificationsDAO::getByPK($clarification_id_1);
         
         // Assert status of clarification
-        $this->assertEquals($clarification_1->getMessage(), $returnArray[1]["message"]);
-        $this->assertEquals($clarification_1->getAnswer(), $returnArray[1]["answer"]);
-        $this->assertEquals($clarification_1->getTime(), $returnArray[1]["time"]);                                
+        $this->assertEquals($clarification_1->getMessage(), $returnArray['clarifications'][1]["message"]);
+        $this->assertEquals($clarification_1->getAnswer(), $returnArray['clarifications'][1]["answer"]);
+        $this->assertEquals($clarification_1->getTime(), $returnArray['clarifications'][1]["time"]);                                
         
     }
     
@@ -263,32 +263,32 @@ class ShowClarificationsInProblemTest extends PHPUnit_Framework_TestCase
         }        
         
         // Check that we have all 3 clarifications                      
-        $this->assertEquals(3, $returnArray['length']);
+        $this->assertEquals(3, count($returnArray['clarifications']));
         
         // Check clarification #2
         $clarification_3 = ClarificationsDAO::getByPK($clarification_id_3);
         
         // Assert status of clarification #2 (TIMESTAM has changed)
-        $this->assertEquals($clarification_3->getMessage(), $returnArray[0]["message"]);
-        $this->assertEquals($clarification_3->getAnswer(), $returnArray[0]["answer"]);
-        $this->assertEquals($clarification_3->getTime(), $returnArray[0]["time"]);                   
+        $this->assertEquals($clarification_3->getMessage(), $returnArray['clarifications'][0]["message"]);
+        $this->assertEquals($clarification_3->getAnswer(), $returnArray['clarifications'][0]["answer"]);
+        $this->assertEquals($clarification_3->getTime(), $returnArray['clarifications'][0]["time"]);                   
         
         // Check clarification #3
         $clarification_2 = ClarificationsDAO::getByPK($clarification_id_2);
         
         // Assert status of clarification
-        $this->assertEquals($clarification_2->getMessage(), $returnArray[1]["message"]);
-        $this->assertEquals($clarification_2->getAnswer(), $returnArray[1]["answer"]);
-        $this->assertEquals($clarification_2->getTime(), $returnArray[1]["time"]);                        
+        $this->assertEquals($clarification_2->getMessage(), $returnArray['clarifications'][1]["message"]);
+        $this->assertEquals($clarification_2->getAnswer(), $returnArray['clarifications'][1]["answer"]);
+        $this->assertEquals($clarification_2->getTime(), $returnArray['clarifications'][1]["time"]);                        
         
         
         // Check clarification #1
         $clarification_1 = ClarificationsDAO::getByPK($clarification_id_1);
         
         // Assert status of clarification
-        $this->assertEquals($clarification_1->getMessage(), $returnArray[2]["message"]);
-        $this->assertEquals($clarification_1->getAnswer(), $returnArray[2]["answer"]);
-        $this->assertEquals($clarification_1->getTime(), $returnArray[2]["time"]);                                                
+        $this->assertEquals($clarification_1->getMessage(), $returnArray['clarifications'][2]["message"]);
+        $this->assertEquals($clarification_1->getAnswer(), $returnArray['clarifications'][2]["answer"]);
+        $this->assertEquals($clarification_1->getTime(), $returnArray['clarifications'][2]["time"]);                                                
         
     }
 /*    

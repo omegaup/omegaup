@@ -113,7 +113,7 @@ class ShowClarificationsInProblem extends ApiHandler
             });
             
         // Add response to array
-        $this->addResponseArray($clarifications_array);
+        $this->addResponse('clarifications', $clarifications_array);
     }
         
 }
