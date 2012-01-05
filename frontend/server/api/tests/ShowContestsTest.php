@@ -50,8 +50,8 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         }
         
         // Assert our contest is there
-        $this->assertArrayHasKey("0", $cleanValue);        
-        $this->assertEquals($random_title, $cleanValue[0]["title"]);
+        $this->assertArrayHasKey("0", $cleanValue['contests']);        
+        $this->assertEquals($random_title, $cleanValue['contests'][0]["title"]);
         
         
         Utils::Logout($auth_token);
@@ -83,9 +83,9 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         }
         
         // Assert our contest is NOT there
-        $this->assertArrayHasKey("0", $cleanValue);    
-        $this->assertArrayHasKey("title", $cleanValue[0]);    
-        $this->assertNotEquals($random_title, $cleanValue[0]["title"]);
+        $this->assertArrayHasKey("0", $cleanValue['contests']);    
+        $this->assertArrayHasKey("title", $cleanValue['contests'][0]);    
+        $this->assertNotEquals($random_title, $cleanValue['contests'][0]["title"]);
         
         // Logout the contestant
         Utils::Logout($auth_token);                                               
@@ -118,9 +118,9 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         }
         
         // Assert our contest is there
-        $this->assertArrayHasKey("0", $cleanValue);    
-        $this->assertArrayHasKey("title", $cleanValue[0]);    
-        $this->assertEquals($random_title, $cleanValue[0]["title"]);
+        $this->assertArrayHasKey("0", $cleanValue['contests']);    
+        $this->assertArrayHasKey("title", $cleanValue['contests'][0]);    
+        $this->assertEquals($random_title, $cleanValue['contests'][0]["title"]);
         
         // Logout the contestant
         Utils::Logout($auth_token);  
