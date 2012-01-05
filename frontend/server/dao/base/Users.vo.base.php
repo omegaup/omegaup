@@ -22,6 +22,12 @@ class Users extends VO
 	{ 
 		if(isset($data))
 		{
+			
+
+
+			if( isset($data['facebook_user_id']) ){
+				$this->facebook_user_id = $data['facebook_user_id'];
+			}			
 			if( isset($data['user_id']) ){
 				$this->user_id = $data['user_id'];
 			}
@@ -77,8 +83,10 @@ class Users extends VO
 	public function __toString( )
 	{ 
 		$vec = array( 
+
 			"user_id" => $this->user_id,
 			"username" => $this->username,
+			"facebook_user_id" => $this->facebook_user_id,			
 			"password" => $this->password,
 			"main_email_id" => $this->main_email_id,
 			"name" => $this->name,
