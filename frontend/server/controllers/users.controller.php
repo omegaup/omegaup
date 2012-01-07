@@ -4,7 +4,7 @@
 
 class UsersController {
 
-	public static function registerNewUser( $name, $email, $pwd ){
+	public static function registerNewUser( $name, $email, $pwd = null, $fid = null ){
 		//user exists ?
 		if(!is_null( UsersDAO::searchUserByEmail( $email )))
 		{
@@ -17,7 +17,13 @@ class UsersController {
 		//register the user
 		$new_user = new Users();
 		$new_user->setUsername($email);
-		$new_user->setPassword(md5($pwd));
+		
+		if(!is_null($pwd))
+			$new_user->setPassword(md5($pwd));
+		
+		if(!is_null($fid))
+			$new_user->setFacebookUserId($fid);
+		
 		$new_user->setName($name);
 		$new_user->setSolved(0);
 		$new_user->setSubmissions(0);
@@ -28,8 +34,7 @@ class UsersController {
 		}catch(Exception $e){
 			
 			DAO::transRollback();
-			Logger::error($e);
-			throw new Exception("Error");
+			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 
 		}
 		
@@ -44,26 +49,30 @@ class UsersController {
 
 		}catch(Exception $e){
 			DAO::transRollback();
-			Logger::error($e);
-			throw new Exception("Error");
+			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 
 		}
 
 		//insert the new email id into the user
 		$new_user->setMainEmailId( $mail->getEmailId() );
 
+
 		try{
+
 			UsersDAO::save( $new_user );
 
 		}catch(Exception $e){
 			
 			DAO::transRollback();
-			Logger::error($e);
-			throw new Exception("Error");
+			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 
 		}
+
+		$id = $new_user->getUserId();
+		
 		DAO::transEnd();
-		return $new_user->getUserId();
+		
+		return $id;
 
 	}
 

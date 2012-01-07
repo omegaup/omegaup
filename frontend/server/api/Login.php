@@ -10,10 +10,23 @@
   *
  * */
 require_once("ApiHandler.php");
+require_once(SERVER_PATH . '/libs/SessionManager.php');
 
 class Login extends ApiHandler {
 
-
+    private $_sessionManager;
+    
+    public function Login(SessionManager $sessionManager = NULL)
+    {
+        if(is_null($sessionManager))
+        {
+            $sessionManager = new SessionManager();
+        }
+        
+        $this->_sessionManager = $sessionManager;
+    }
+    
+    
     protected function CheckAuthToken() 
     {       
         // Bypass authorization
@@ -22,14 +35,14 @@ class Login extends ApiHandler {
 
     protected function RegisterValidatorsToRequest() 
     {                                
-        ValidatorFactory::stringNotEmptyValidator()->validate(
-                RequestContext::get("facebook_id"), "facebook_id");
+        //ValidatorFactory::stringNotEmptyValidator()->validate(
+        //        RequestContext::get("facebook_id"), "facebook_id");
         
         ValidatorFactory::stringNotEmptyValidator()->validate(
-                RequestContext::get("email"), "email");
+                RequestContext::get("username"), "username");
 
         ValidatorFactory::stringNotEmptyValidator()->validate(
-                RequestContext::get("name"), "name");
+                RequestContext::get("password"), "password");
 
     }
 
@@ -44,7 +57,7 @@ class Login extends ApiHandler {
         $user_query = new Users();
         $user_query->setUsername( $username );        
         $results = UsersDAO::search( $user_query );
-                
+
         if(sizeof($results) === 1)
         {
             /**
@@ -142,8 +155,9 @@ class Login extends ApiHandler {
           * user who logged in:
           * some salted md5 string: to validate that it was me who actually made this token
           * 
-          * */
-         $auth_str = time() . "-" . $actual_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $actual_user->getUserId() . time() );
+	  	  * */
+	 	 $time = time();
+         $auth_str = $time . "-" . $actual_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $actual_user->getUserId() . $time );
          $this->_auth_token->setToken($auth_str);
 
          try
@@ -153,7 +167,9 @@ class Login extends ApiHandler {
          catch(Exception $e)
          {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
-         }
+	 }
+         
+	 $this->_sessionManager->SetCookie('auth_token', $auth_str, time()+60*60*24, '/');
           
          // Add token to response
          $this->addResponse("auth_token", $this->_auth_token->getToken());         

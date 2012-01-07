@@ -40,20 +40,22 @@ class LoginController{
 	 * */
 	static function login(
 		$email, 
-		$google_token
+		$google_token = null
 	){
+		Logger::log("Login");
 		
 		//google says valid user, look for it in email's table
 		$email_query = new Emails();
 		$email_query->setEmail( $email );
 		
 		$result = EmailsDAO::search( $email_query );
+		$this_user = null;
 
 
 		if( sizeof($result) == 0)
 		{
 			
-			//first timer !
+		
 
 			//create user
 			$this_user 	= new Users();
@@ -93,33 +95,54 @@ class LoginController{
 			//$this_user->setEmailId( -1 );
 						
 		}else{
-			
+
 			// he's been here man !
 			$this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
 			
 			//save user so  his
 			//last_access gets updated
-			try{
+			try {
 				UsersDAO::save( $this_user );
-
-			}catch(Exception $e){
-				
+			} catch(Exception $e) {
 				die($e);
 				return false;
-
 			}
-			
 		}
-		
 
 		$_SESSION["USER_ID"] 	= $this_user->getUserId();
 		$_SESSION["EMAIL"] 		= $email;
 		$_SESSION["LOGGED_IN"] 	= true;
+		
+		/**
+		 * Ok, passwords match !
+		 * Create the auth_token. Auth tokens will be valid for 24 hours.
+		 * */
+		 $auth_token = new AuthTokens();
+		 $auth_token->setUserId( $this_user->getUserId() );
 
-		return true;
-		
-		
-		
+		 /**
+		  * auth token consists of:
+		  * current time: to validate obsolete tokens
+		  * user who logged in:
+		  * some salted md5 string: to validate that it was me who actually made this token
+		  * 
+		  * */
+		 $time = time();
+		 $auth_str = $time . "-" . $this_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $this_user->getUserId() . $time );
+		 $auth_token->setToken($auth_str);
+
+		 try
+		 {
+		    AuthTokensDAO::save( $auth_token );
+		 }
+		 catch(Exception $e)
+		 {
+		    throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
+		 }
+
+		 setcookie('auth_token', $auth_str, time()+60*60*24, '/');
+		 
+		 return true;
 	}
 	
 	
@@ -148,10 +171,11 @@ class LoginController{
 	 * */
 	static function logout(
 	){
-
 		unset($_SESSION["USER_ID"]);
 		unset($_SESSION["EMAIL"]);
 		unset($_SESSION["LOGGED_IN"]);		
+
+		setcookie('auth_token', 'deleted', 1, '/');
 		
 		return true;
 	}
