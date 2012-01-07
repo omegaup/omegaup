@@ -9,6 +9,7 @@ window.fbAsyncInit = function() {
 		console.log("Facebook loaded", FB);
 	}
 	
+	/*
 	FB.getLoginStatus(function(response) {		
 		if (response.status == "connected") {
 			//usuario conectado, buscar informacion
@@ -21,17 +22,19 @@ window.fbAsyncInit = function() {
 			console.log("ntli");
 	  	}
 	});
+	*/
 };
 
 
 
 var loginWithFaceook = function(  ){
-	if(DEBUG){
-		console.log("facebook is back");
-	}
+	
 	
 	//test if he really logged in
-	FB.getLoginStatus(function(response) {		
+	FB.getLoginStatus(function(response) {	
+		if(DEBUG){
+			console.log("facebook is back");
+		}
 		if (response.status == "connected") {
 			//get his information
 			FB.api('/me', function(response) {
@@ -43,14 +46,13 @@ var loginWithFaceook = function(  ){
 					url: "arena/fblogin/",
 					type: "POST",
 					data :{
-						use_facebook : true,
 						facebook_id : response.id,
 						email		: response.email,
 						name		: response.name
 					},
 					success: function( response ){
 			 			//refresh the site
-						console.log(response)
+						location.reload(true);
 					}
 				});
 				
@@ -125,3 +127,23 @@ $(document).ready(function() {
 	
 
 });
+
+
+
+var fb_login_n = 99;
+function fb_login_test(){
+	fb_login_n++;
+	$.ajax({
+						url: "arena/fblogin/",
+						type: "POST",
+						data :{
+							facebook_id : "1792813" + fb_login_n ,
+							email		: "fb"+fb_login_n+"@itca.1com1",
+							name		: "alan gonzalez"
+						},
+						success: function( response ){
+				 			//refresh the site
+							console.log(response)
+						}
+					});
+}

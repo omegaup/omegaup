@@ -8,12 +8,22 @@
 require_once '../Login.php';
 require_once 'Utils.php';
 
+require_once(SERVER_PATH . '/libs/SessionManager.php');
 
 class LoginTest extends PHPUnit_Framework_TestCase
 {
+    
+    private $sessionManagerMock;
+    
     public function setUp()
     {        
         Utils::ConnectToDB();
+        
+        $this->sessionManagerMock = $this->getMock('SessionManager', array('SetCookie'));
+        
+        $this->sessionManagerMock->expects($this->any())
+                ->method('SetCookie')
+                ->will($this->returnValue(true));
     }
     
     public function tearDown() 
@@ -26,15 +36,18 @@ class LoginTest extends PHPUnit_Framework_TestCase
         RequestContext::set("username", Utils::GetContestantUsername());
         RequestContext::set("password", Utils::$contestant->getPassword());
         
-        $loginApi = new Login();        
+        $loginApi = new Login($this->sessionManagerMock);        
         try
         {
             $cleanValue = $loginApi->ExecuteApi();
         }
         catch( ApiException $e )
-        {
+        {            
             var_dump($e->getArrayMessage());            
-            var_dump($e->getWrappedException()->getMessage());
+            if(!is_null($e->getWrappedException()))
+            {
+                var_dump($e->getWrappedException()->getMessage());
+            }
             $this->fail("User should be able to login");
         }
         
@@ -51,7 +64,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
         RequestContext::set("username", Utils::GetContestantUsername());
         RequestContext::set("password", "badpass");
         
-        $loginApi = new Login();
+        $loginApi = new Login($this->sessionManagerMock);
         
         try
         {        
@@ -78,7 +91,7 @@ class LoginTest extends PHPUnit_Framework_TestCase
         RequestContext::set("username", "baduser");
         RequestContext::set("password", Utils::$contestant->getPassword());
         
-        $loginApi = new Login();
+        $loginApi = new Login($this->sessionManagerMock);
         
         try
         {        
@@ -105,16 +118,16 @@ class LoginTest extends PHPUnit_Framework_TestCase
         RequestContext::set("username", Utils::GetContestantUsername());
         RequestContext::set("password", Utils::$contestant->getPassword());        
         
-        $loginApi = new Login();        
+        $loginApi = new Login($this->sessionManagerMock);        
         try
         {        
             $cleanValue = $loginApi->ExecuteApi();
         }
         catch(ApiException $e)
         {
-            $msg = $e->getArrayMessage();
+            $msg = $e->getArrayMessage();            
+            $this->fail('Unexpected exception thrown.'. $msg["error"] );              
             var_dump($e->getWrappedException()->getMessage());            
-            $this->fail('Unexpected exception thrown.'. $msg["error"] );        
         }
                 
         try

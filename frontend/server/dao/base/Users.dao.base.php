@@ -155,7 +155,7 @@ abstract class UsersDAOBase extends DAO
 
 		if( $Users->getFacebookUserId() != NULL){
 			$sql .= " facebook_user_id = ? AND";
-			array_push( $val, $Users->getUsername() );
+			array_push( $val, $Users->getFacebookUserId() );
 		}
 
 		if( $Users->getPassword() != NULL){

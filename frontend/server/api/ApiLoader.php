@@ -35,6 +35,11 @@ class ApiLoader
 
         switch($api_name)
         {
+            case 'Time':
+                require_once('Time.php');
+                $api = new Time();
+                break;
+
             case 'Login':
                 require_once('Login.php');
                 $api = new Login();
@@ -45,7 +50,12 @@ class ApiLoader
                 $api = new FbLogin();
                 break;
             
-            case 'Logout':
+            case 'Authenticated':
+                require_once('Authenticated.php');
+                $api = new Authenticated();
+		break;
+
+             case 'Logout':
                 require_once('Logout.php');
                 $api = new Logout();
                 break;

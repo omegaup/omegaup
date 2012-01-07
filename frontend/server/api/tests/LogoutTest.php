@@ -11,9 +11,17 @@ require_once '../Logout.php';
 
 class LogoutTest extends PHPUnit_Framework_TestCase
 {
+    private $sessionManagerMock;
+    
     public function setUp()
     {        
         Utils::ConnectToDB();
+        
+        $this->sessionManagerMock = $this->getMock('SessionManager', array('SetCookie'));
+        
+        $this->sessionManagerMock->expects($this->any())
+                ->method('SetCookie')
+                ->will($this->returnValue(true));
     }
     
     public function tearDown() 
@@ -29,7 +37,7 @@ class LogoutTest extends PHPUnit_Framework_TestCase
         // Valid logout            
         Utils::SetAuthToken($auth_token);
         
-        $logoutApi = new Logout();
+        $logoutApi = new Logout($this->sessionManagerMock);
         try
         {        
             $cleanValue = $logoutApi->ExecuteApi();
@@ -58,7 +66,7 @@ class LogoutTest extends PHPUnit_Framework_TestCase
         unset($_POST);
         Utils::SetAuthToken("InvalidAuthToken");
         
-        $logoutApi = new Logout();
+        $logoutApi = new Logout($this->sessionManagerMock);
         try
         {        
             $cleanValue = $logoutApi->ExecuteApi();

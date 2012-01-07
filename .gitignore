@@ -38,7 +38,7 @@ src_managed/
 # ignore frontend config file
 config.php
 frontend/server/config.php
-!/frontend/server/api/tests/config.php
+frontend/server/api/tests/config.php
 
 # and log
 omegaup.log
