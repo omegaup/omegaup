@@ -18,7 +18,7 @@ class EnumValidator extends Validator
     }
 
     
-    public function validate($value)
+    public function validate($value, $value_name = null)
     {
         // Validate that value is inside the options
         foreach($this->_enum as $option)
