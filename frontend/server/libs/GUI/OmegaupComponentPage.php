@@ -265,6 +265,7 @@ class OmegaupComponentPage extends StdComponentPage{
 			</body>
 		</html>
 		<?php
+		exit;
 	}
 
 }

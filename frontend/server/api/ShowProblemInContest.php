@@ -19,6 +19,16 @@ class ShowProblemInContest extends ApiHandler
 {    
 	
 	
+	//when calling the api, from
+	//within the system, must 
+	//call the constructor of ApiHandler
+	//to load the current user
+	public function __construct(){
+		parent::__construct();
+	}
+	
+	
+	
 	protected function CheckAuthToken()
     {                
              
@@ -82,8 +92,28 @@ class ShowProblemInContest extends ApiHandler
     protected function GenerateResponse() 
     {
 
+		//does the user have access to this contest?
+		$contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+		$user = LoginController::getCurrentUser();
 		
-       // Create array of relevant columns
+		if(!$contest->getPublic()){
+			//contest is not public
+			
+			if( is_null($user )){
+				//no one is even logged in
+				throw new ApiException(ApiHttpErrors::forbiddenSite());
+			}
+			
+			if( is_null(ContestsUsersDAO::getByPK( $user->getUserId(), $contest->getContestId() ) ) ){
+				//he is not in the ContestUser list
+				throw new ApiException(ApiHttpErrors::forbiddenSite());
+			}
+			
+			//he is good to go...
+		}
+
+		
+        // Create array of relevant columns
         $relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points");
         
         // Get our problem given the problem_id         
@@ -95,7 +125,7 @@ class ShowProblemInContest extends ApiHandler
         {
             // Operation failed in the data layer
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
-        }        
+        }
         
         // Read the file that contains the source
 		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
@@ -116,10 +146,12 @@ class ShowProblemInContest extends ApiHandler
         $this->addResponse("problem_statement", $file_content);        
              
         // Create array of relevant columns for list of runs
-	$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
         
+
         // Search the relevant runs from the DB
-        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
+        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));  
+                                      
         $keyrun = new Runs( array (
             "user_id" => $this->_user_id,
             "problem_id" => $problem->getProblemId(),

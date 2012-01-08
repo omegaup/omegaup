@@ -118,7 +118,7 @@ class TableComponent implements GuiComponent{
 					$html .= '<tr style=" cursor: pointer;" onClick="' . $this->actionFunction. '( \'' . $this->renderRowIds . $a . '\' )" ';
 
 				}else{
-					$html .= '<tr style=" cursor: pointer;" onClick="' . $this->actionFunction. '( ' . $row[ $this->actionField ] . ' )" ';		
+					$html .= '<tr style=" cursor: pointer;" onClick="' . $this->actionFunction. '( \'' . $row[ $this->actionField ] . '\' )" ';		
 							
 				}
 				
