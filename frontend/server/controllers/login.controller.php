@@ -216,6 +216,7 @@ class LoginController{
 		//facebook sesions on every single petition
 		//made to the front-end
 		if(!isset($_GET["state"])){
+			Logger::log("Not logged in and no need to check for fb session");
 			return false;
 		}
 		
@@ -313,10 +314,34 @@ class LoginController{
 
 		Logger::log("LoginController::logout()");	
 		
-		setcookie('auth_token', 'deleted', 1, '/');
 		
+
+		
+		//double check that he really is logged in
+		if(self::isLoggedIn()){
+			
+			//delete the auth_token from db
+			$sm = self::getSessionManagerInstance();
+			
+			$auth_token = $sm->GetCookie( "auth_token" );
+
+			$token_to_delete = new AuthTokens(array( "token" => $auth_token ));
+			try{
+				AuthTokensDAO::delete( $token_to_delete );
+				
+			}catch(Exception $e){
+				//return false;
+			}
+			
+		}
+		
+		//unset the cookie
+		setcookie('auth_token', 'deleted', 1, '/');
+
 		if($redirect){
 			/*
+			Log out from facebook ?
+			
 			$facebook = self::getFacebookInstance();
 			
 			
