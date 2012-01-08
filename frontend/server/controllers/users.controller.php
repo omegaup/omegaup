@@ -9,10 +9,30 @@ class UsersController {
 		Logger::log("Registering new user...");
 		
 		//user exists ?
-		if(!is_null( UsersDAO::searchUserByEmail( $email )))
+		if(!is_null( $existing_user = UsersDAO::searchUserByEmail( $email ) ) )
 		{
 			//@todo throw correct Exception
-			throw new Exception("This email is already registered.");
+			//throw new Exception("This email is already registered.");
+			Logger::warn( "Email " . $email . " is already registered, merging accounts..." );
+			
+			if(!is_null($fid)){
+				//if we got here, means the user has facebook_user_id = NULL
+				//lets update that
+				$existing_user->setFacebookUserId( $fid );				
+			}
+
+			try{
+				UsersDAO::save($existing_user);
+				
+			}catch(Exception $e){
+				throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+				
+			}
+			
+			
+			Logger::log("User was merged successfully.");
+			return $existing_user;
+			
 		}
 
 		
