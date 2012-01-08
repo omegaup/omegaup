@@ -266,7 +266,7 @@ class LoginController{
 		$results = UsersDAO::search( new Users( array( "facebook_user_id" => $fb_user_profile["id"] ) ) );
 		
 		if(count($results) == 1){
-			//user has been here before !
+			//user has been here before with facebook!
 			
 		}else{
 			//the user has never been here before, lets
@@ -293,10 +293,11 @@ class LoginController{
 	
 	
 	public static function getFacebookLoginUrl(){
+		
 		$facebook = self::getFacebookInstance();
-	  	
 
-		return $facebook->getLoginUrl();
+		return $facebook->getLoginUrl(array("scope" => "email"));
+		
 	}
 	
 	
