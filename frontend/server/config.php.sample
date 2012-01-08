@@ -22,3 +22,5 @@
 	define("OMEGAUP_LOG_ERROR_FILE", 	"/var/log/omegaup/omegaup.log");
 
 
+	define("OMEGAUP_FB_APPID", 			"xxxxx");
+	define("OMEGAUP_FB_SECRET",			"xxxxx");

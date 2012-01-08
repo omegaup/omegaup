@@ -15,6 +15,7 @@ abstract class EmailsDAOBase extends DAO
 		private static $loadedRecords = array();
 
 		private static function recordExists(  $email_id ){
+			return false;			
 			$pk = "";
 			$pk .= $email_id . "-";
 			return array_key_exists ( $pk , self::$loadedRecords );

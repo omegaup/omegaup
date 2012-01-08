@@ -6,6 +6,15 @@ class SessionManager
     {
         setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
     }
+
+	public function GetCookie($name){
+		
+		if(array_key_exists($name, $_COOKIE)){
+			return $_COOKIE[$name];	
+		}
+		
+		return NULL;
+	}
 }
 
 ?>
