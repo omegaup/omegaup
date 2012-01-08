@@ -21,6 +21,18 @@ class ShowContests extends ApiHandler {
         return true;
     }
 
+
+
+    protected function CheckAuthToken()
+    {                
+		//user does not need auth_token 
+		//to view contests, unless they
+		//are private which is implemented
+		//in GenerateResponse
+    }
+
+
+
     protected function GenerateResponse() {
 
         // Create array of relevant columns
@@ -45,8 +57,9 @@ class ShowContests extends ApiHandler {
          * if its not, check if the user has access to it.
          * */
         $addedContests = array();
+
         foreach ($contests as $c) 
-        {
+        { 
             // At most we want 10 contests
             if ($addedContests === 10)
             {
@@ -56,7 +69,6 @@ class ShowContests extends ApiHandler {
             if ($c->getPublic()) 
             {
                 $addedContests[] = $c->asFilteredArray($relevant_columns);                
-                
                 continue;
             }
 
@@ -64,10 +76,13 @@ class ShowContests extends ApiHandler {
              * Ok, its not public, lets se if we have a 
              * valid user
              * */
-            if ($this->_user_id === null)
-            {
+			$current_user = LoginController::getCurrentUser();
+
+            if ($current_user === null){
                 continue;
             }
+
+			$this->_user_id = $current_user->getUserId();
 
             /**
              * Ok, i have a user. Can he see this contest ?
@@ -97,7 +112,7 @@ class ShowContests extends ApiHandler {
 	}
         
         $this->addResponse('contests', $addedContests);
-	$this->addResponse('length', count($addedContests));
+		$this->addResponse('length', count($addedContests));
     }
 
 
