@@ -103,7 +103,7 @@
     private $mode;//the mode (checkid_setup, id_res, or cancel)
     private $response_nonce;
     private $return_to;//return URL
-    private $realm ;//the realm that the user is being asked to trust
+    private $realm;//the realm that the user is being asked to trust
     private $assoc_handle;//the association handle between this service and Google
     private $claimed_id;//the id claimed by the user
     private $identity;//for google, this is the same as claimed_id
@@ -115,7 +115,7 @@
     private $require_email;
     
     //private constructor
-    private function GoogleOpenID($mode, $op_endpoint, $response_nonce, $return_to, $realm = null, $assoc_handle, $claimed_id, $signed, $sig, $email, $require_email){
+    private function GoogleOpenID($mode, $op_endpoint, $response_nonce, $return_to, $realm, $assoc_handle, $claimed_id, $signed, $sig, $email, $require_email){
 
       //if assoc_handle is null, fetch one
       if(is_null($assoc_handle))
@@ -136,17 +136,14 @@
           $return_to = "http://".$_SERVER['SERVER_NAME']."/".$return_to;
         }//else (server name not at position zero)
       }//if return_to is relative
-      
-
+        
       //if realm is null, attempt to set it via return_to
       if(is_null($realm)){
         //if return_to is set
         if(!is_null($return_to)){
           $pieces = parse_url($return_to);
           $realm = $pieces['scheme']."://".$pieces['host'];
-        }else{
-          $realm = "";	
-		}
+        }//if return_to set
       }//if realm null
     
       $this->mode = $mode;
@@ -234,23 +231,18 @@
         }//switch param
       }//loop through params
 
-		if(!isset($realm))
-			$realm = null;
-
       //if require email is not set, set it to false
-      if(!isset($require_email))
+      if(!is_bool($require_email))
         $require_email = false;
-
       //if mode is not set, set to default for redirection
       if(is_null($mode))
         $mode = "checkid_setup";
-
       //if return_to is not set and mode is checkid_setup, throw an error
       if(is_null($return_to) && $mode=="checkid_setup")
         throw new Exception("GoogleOpenID.create() needs parameter openid.return_to");
 
       //return a new GoogleOpenID with the given parameters
-      	return new GoogleOpenID($mode, $op_endpoint, $response_nonce, $return_to, $realm, $assoc_handle, $claimed_id, $signed, $sig, $email, $require_email);
+      return new GoogleOpenID($mode, $op_endpoint, $response_nonce, $return_to, $realm, $assoc_handle, $claimed_id, $signed, $sig, $email, $require_email);
     }//create
     
     //creates and returns a GoogleOpenID from the $_GET variable
@@ -483,3 +475,4 @@
       return $this->assoc_handle();
     }//assoc_handle
   }//class GoogleOpenID
+?>

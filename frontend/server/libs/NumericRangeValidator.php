@@ -26,7 +26,7 @@ class NumericRangeValidator extends Validator
         $this->finish = $finish;        
     }
     
-    public function validate($value)
+    public function validate($value, $value_name = null)
     {
         // Validate that is target number is inside the range
         if ( !($value >= $this->start && $value <= $this->finish))

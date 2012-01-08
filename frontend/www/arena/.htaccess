@@ -4,7 +4,6 @@ RewriteRule ^time/?$ /arena/CallApiLoader.php?apicmd=Time [L]
 
 RewriteRule ^authenticated/?$ /arena/CallApiLoader.php?apicmd=Authenticated [L]
 RewriteRule ^login/?$ /arena/CallApiLoader.php?apicmd=Login [L]
-RewriteRule ^fblogin/?$ /arena/CallApiLoader.php?apicmd=FbLogin [L]
 RewriteRule ^logout/?$ /arena/CallApiLoader.php?apicmd=Logout [L]
 
 RewriteRule ^contests/?$ /arena/CallApiLoader.php?apicmd=ShowContests [L]

@@ -1,8 +1,7 @@
 <?php
 
 	define( "LEVEL_NEEDED", false );
-
-
+	
 	require_once( "../server/inc/bootstrap.php" );
 
 
@@ -12,7 +11,7 @@
 	/* ************************************************************************************ */	 
 	if(isset($_GET["return_add"])){
 
-	  	$googleLogin = GoogleOpenID::getResponse();
+	  	$googleLogin = GoogleOpenID::getResponse(  );
 
 	  	if( $googleLogin->success() )
 		{
@@ -22,19 +21,11 @@
 	  	}
 
 
-		die(header("Location: index.php?s=0"));
+		die(header("Location: nativeLogin.php?whoops"));
 
 	}
 	/* ************************************************************************************ */
 	
-	
-
-	if(isset($_GET["out"])){
-
-		LoginController::logout(  );
-		
-		die(header("Location: index.php"));
-	}
 	
 	
 
@@ -51,4 +42,6 @@
 	
 	$googleLogin = GoogleOpenID::createRequest( $_SERVER["PHP_SELF"] . "?return_add=1", $association_handle, true);
 
+	/*var_dump($googleLogin);*/
+	
 	$googleLogin->redirect();

@@ -26,7 +26,7 @@ class DateRangeValidator extends Validator
         $this->finishDate = $finishDate;        
     }
     
-    public function validate($value)
+    public function validate($value, $value_name = null)
     {
         // Validate that is target date is inside the range
         if(is_null($value) || is_null($this->finishDate) || is_null($this->startDate))

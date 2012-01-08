@@ -5,10 +5,34 @@
 class UsersController {
 
 	public static function registerNewUser( $name, $email, $pwd = null, $fid = null ){
+		
+		Logger::log("Registering new user...");
+		
 		//user exists ?
-		if(!is_null( UsersDAO::searchUserByEmail( $email )))
+		if(!is_null( $existing_user = UsersDAO::searchUserByEmail( $email ) ) )
 		{
-			throw new Exception("Este email ya ha sido registrado.");
+			//@todo throw correct Exception
+			//throw new Exception("This email is already registered.");
+			Logger::warn( "Email " . $email . " is already registered, merging accounts..." );
+			
+			if(!is_null($fid)){
+				//if we got here, means the user has facebook_user_id = NULL
+				//lets update that
+				$existing_user->setFacebookUserId( $fid );				
+			}
+
+			try{
+				UsersDAO::save($existing_user);
+				
+			}catch(Exception $e){
+				throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+				
+			}
+			
+			
+			Logger::log("User was merged successfully.");
+			return $existing_user;
+			
 		}
 
 		
@@ -29,6 +53,7 @@ class UsersController {
 		$new_user->setSubmissions(0);
 
 		try{
+			Logger::log("Saving new user record....");
 			UsersDAO::save( $new_user );
 
 		}catch(Exception $e){
@@ -38,6 +63,7 @@ class UsersController {
 
 		}
 		
+		Logger::log("Saving new user's email...");
 		//insert his email as primary
 		$mail = new Emails(  );
 		$mail->setEmail( $email );
@@ -54,34 +80,29 @@ class UsersController {
 		}
 
 		//insert the new email id into the user
+		Logger::log("New users email id is " . $mail->getEmailId() . ", associating with user as main email..." );
 		$new_user->setMainEmailId( $mail->getEmailId() );
 
-
 		try{
-
 			UsersDAO::save( $new_user );
 
 		}catch(Exception $e){
-			
 			DAO::transRollback();
 			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 
 		}
-
+		
+		Logger::log("User successfully registered !");
+		
 		$id = $new_user->getUserId();
 		
 		DAO::transEnd();
 		
-		return $id;
+		return $new_user;
 
 	}
 
 
-
-	public static function registerNewUserWithFacebook(){
-		
-	}
-	
 	
 
 	

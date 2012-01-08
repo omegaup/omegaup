@@ -20,5 +20,19 @@ require_once("base/Contests.vo.base.php");
   */
 class ContestsDAO extends ContestsDAOBase
 {
-   
+	public static final function getByAlias($alias)
+	{
+
+		$sql = "SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;";
+		$params = array(  $alias );
+                
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);
+		if(count($rs)==0)return NULL;
+		                
+        $contest = new Contests( $rs );
+
+        return $contest;
+
+	}   
 }
