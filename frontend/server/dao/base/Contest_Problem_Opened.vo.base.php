@@ -196,4 +196,14 @@ class ContestProblemOpened extends VO
 		$this->open_time = $open_time;
 	}
 
+	/**
+	  * Converts date fields to timestamps
+	  * 
+	  **/
+	public function toUnixTime( array $fields = array() ){
+		if(count($fields) > 0 )
+			parent::toUnixTime( $fields );
+		else
+			parent::toUnixTime( array( "open_time" ) );
+	}
 }

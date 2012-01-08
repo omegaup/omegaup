@@ -727,5 +727,14 @@ class Contests extends VO
             }
 
         }
-        
+ 
+
+	public function toUnixTime( array $fields = array() ){
+		if(count($fields) > 0 )
+			parent::toUnixTime( $fields );
+		else
+			parent::toUnixTime( array( "start_time", "finish_time" ) );
+	}
+	
+
 }

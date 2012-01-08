@@ -6,8 +6,8 @@ require_once('RequestContext.php');
 require_once(SERVER_PATH ."/libs/ApiExposedProperty.php");
 require_once(SERVER_PATH ."/libs/ApiHttpErrors.php");
 require_once(SERVER_PATH ."/libs/ApiException.php");
-
 require_once(SERVER_PATH . "/libs/ValidatorFactory.php");
+require_once("controllers/login.controller.php");
 
 /*
  * Basic Abstraction of an API
@@ -23,6 +23,24 @@ abstract class ApiHandler
     // Cache of auth token
     protected $_auth_token;                                             
     
+	
+	/***
+	   * 
+	   *
+	   **/
+	public function __construct(){
+		
+		$current_user = LoginController::getCurrentUser();
+
+        if ($current_user === null){
+            $this->_user_id = null;
+			return;
+        }
+
+		$this->_user_id = $current_user->getUserId();
+	}
+
+
     protected function addResponse($key, $value)
     {
         $this->_response[$key] = $value;

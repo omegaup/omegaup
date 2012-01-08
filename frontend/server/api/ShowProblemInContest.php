@@ -17,6 +17,15 @@ require_once(SERVER_PATH . '/libs/FileHandler.php');
 
 class ShowProblemInContest extends ApiHandler
 {    
+	
+	
+	protected function CheckAuthToken()
+    {                
+             
+    }
+	
+	
+	
     protected function RegisterValidatorsToRequest()
     {
         ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
@@ -67,8 +76,13 @@ class ShowProblemInContest extends ApiHandler
                 
     }            
     
+
+
+
     protected function GenerateResponse() 
     {
+
+		
        // Create array of relevant columns
         $relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points");
         
@@ -84,7 +98,8 @@ class ShowProblemInContest extends ApiHandler
         }        
         
         // Read the file that contains the source
-	$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
+		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
+		
         try
         {            
             $file_content = FileHandler::ReadFile($source_path);                        
@@ -92,7 +107,7 @@ class ShowProblemInContest extends ApiHandler
         catch(Exception $e)
         {
             throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
-	}
+		}
 
         // Add the problem the response
         $this->addResponseArray($problem->asFilteredArray($relevant_columns));   

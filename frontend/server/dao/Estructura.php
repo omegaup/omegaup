@@ -146,4 +146,15 @@
                         
                         }
 
+
+			/**
+			  *
+			  *
+			  **/
+			protected function toUnixTime( Array $fields ){
+				foreach( $fields as $f ){
+					$this->$f = strtotime( $this->$f );
+				}
+			}
+
 		}
