@@ -15,6 +15,7 @@
 
 
     $page = new OmegaupAdminComponentPage();
+
     $page->addComponent( new TitleComponent("Concursos"));
 
 
@@ -22,25 +23,17 @@
 	
 	$header = array(
 			"contest_id" 	=> "Id",
-			"title" 	=> "title"
+			"title" 		=> "title"
 		);
 	
 	$contests = ContestsDAO::getAll();
 
-	$users_table = new TableComponent( $header, $contests );
+	$contests_table = new TableComponent( $header, $contests );
     
-   	$page->addComponent( $users_table );
+   	$page->addComponent( $contests_table );
 
 
+	$page->addComponent( new NewContestFormComponent() );
 
-   	$page->addComponent( new TitleComponent("Nuevo concurso", 3));	
-
-   	$new_contest = new DAOFormComponent( new Contests() );
-
-   	$new_contest->addSubmit("Agendar concurso");
-   	
-   	$page->addComponent( $new_contest );
-
-   	
-    
     $page->render();
+
