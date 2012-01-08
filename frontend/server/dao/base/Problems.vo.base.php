@@ -674,4 +674,16 @@ class Problems extends VO
 		$this->order = $order;
 	}
 
+
+
+	/**
+	  * Converts date fields to timestamps
+	  * 
+	  **/
+	public function toUnixTime( array $fields = array() ){
+		if(count($fields) > 0 )
+			parent::toUnixTime( $fields );
+		else
+			parent::toUnixTime( array( "creation_date" ) );
+	}
 }

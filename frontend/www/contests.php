@@ -21,6 +21,21 @@
     $contestApi = new ShowContests();
 	$results = $contestApi->ExecuteApi( );
 
+
+	$header = array(  
+		      "title"=>"title",
+		      "description"=>"description",
+		      "start_time"=>"start_time",
+		      "finish_time"=>"finish_time",
+		      "public"=>"public",
+		      "alias"=>"alias",
+		      "director_id"=>"director_id"
+		 );
+
+	$rows = $results["contests"];
+	
+	$page->addComponent( new TableComponent( $header, $rows ) );
+	
 	
 
     $page->render();
