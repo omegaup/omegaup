@@ -29,7 +29,7 @@
 				<li><a href="#clarifications">Clarificaciones</a></li>
 			</ul>
 			<div id="summary" class="tab">
-				Resumen
+				Resumen (gráfica de ranking y resumen de problemas resueltos)
 			</div>
 			<div id="problems" class="tab navleft">
 				<div class="navbar">
@@ -40,40 +40,73 @@
 						</div>
 					</div>
 				</div>
-				<div class="main">
-					<div id="problem">
-						<h1 class="title"></h1>
-						<table class="data">
+				<div id="problem" class="main">
+					<h1 class="title"></h1>
+					<table class="data">
+						<tr>
+							<td>Puntos</td>
+							<td class="points"></div>
+							<td>Validador</td>
+							<td class="validator"></div>
+						</tr>
+						<tr>
+							<td>Límite de tiempo</td>
+							<td class="time_limit"></td>
+							<td>Límite de memoria</td>
+							<td class="memory_limit"></td>
+						</tr>
+					</table>
+					<div class="statement"></div>
+					<hr />
+					<div class="source">Fuente: <span></span></div>
+					<table class="runs">
+						<caption>Envíos</caption>
+						<thead>
 							<tr>
-								<td>Puntos</td>
-								<td class="points"></div>
-								<td>Validador</td>
-								<td class="validator"></div>
+								<th>Problema</th>
+								<th>Lenguaje</th>
+								<th>Tiempo</th>
+								<th>Status</th>
+								<th>Puntos</th>
+								<th>Penalty</th>
 							</tr>
+						</thead>
+						<tfoot>
 							<tr>
-								<td>Límite de tiempo</td>
-								<td class="time_limit"></td>
-								<td>Límite de memoria</td>
-								<td class="memory_limit"></td>
+								<td colspan="6"><a href="#problems/run">Nuevo envío</a></td>
 							</tr>
-						</table>
-						<div class="statement"></div>
-						<hr />
-						<div class="source">Fuente: <span></span></div>
-						<div class="runs">
-							<div class="template">
-
-							</div>
-						</div>
-					</div>
+						</tfoot>
+						<tbody class="run-list">
+							<tr class="template">
+								<td class="problem"></td>
+								<td class="language"></td>
+								<td class="time"></td>
+								<td class="status"></td>
+								<td class="points"></td>
+								<td class="penalty"></td>
+							</tr>
+						</tbody>
+					</table>						
 				</div>
 			</div>
 			<div id="ranking" class="tab">
-				Ranking
+				Scoreboard fresa
 			</div>
 			<div id="clarifications" class="tab">
 				Clarificaciones
 			</div>
+		</div>
+		<div id="overlay">
+			<form id="submit" method="POST">
+				Lenguaje
+				<select name="language">
+					<option value="c">C</option>
+					<option value="cpp">C++</option>
+					<option value="pascal">Pascal</option>
+				</select><br/>
+				<textarea name="code"></textarea><br/>
+				<input type="submit" />
+			</form>
 		</div>
 		<div id="footer">
 		</div>

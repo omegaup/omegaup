@@ -104,3 +104,33 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 		'json'
 	);
 };
+
+OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, callback) {
+	var self = this;
+
+	$.post(
+		'/arena/runs/new',
+		{
+			contest_alias: contestAlias,
+			problem_alias: problemAlias,
+			language: language,
+			source: code
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
+OmegaUp.prototype.runStatus = function(guid, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/runs/' + guid + '/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};

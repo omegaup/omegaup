@@ -66,14 +66,14 @@ class NewRun extends ApiHandler
             {
                throw new ApiException(ApiHttpErrors::invalidParameter("problem_id and contest_id combination is invalid."));
             }
-            
+
             // Before submit something, contestant had to open the problem/contest
             if(!ContestsUsersDAO::getByPK($this->_user_id, 
                     $contest->getContestId()))
             {
                 throw new ApiException(ApiHttpErrors::forbiddenSite());
             }
-                                    
+
             // Validate that the run is inside contest
             $contest = ContestsDAO::getByPK($contest->getContestId());
             if( !$contest->isInsideContest($this->_user_id))
@@ -89,7 +89,7 @@ class NewRun extends ApiHandler
                )
             {
                throw new ApiException(ApiHttpErrors::forbiddenSite());
-            }
+	    }
 
             // Validate if the user is allowed to submit given the submissions_gap 
             if (!RunsDAO::IsRunInsideSubmissionGap(
@@ -181,7 +181,7 @@ class NewRun extends ApiHandler
         }
         
         // Happy ending
-        $this->addResponse("run_alias", $run->getGuid());
+        $this->addResponse("guid", $run->getGuid());
         $this->addResponse("status", "ok");        
     }
 }
