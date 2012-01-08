@@ -21,6 +21,18 @@ class ShowContests extends ApiHandler {
         return true;
     }
 
+
+
+    protected function CheckAuthToken()
+    {                
+		//user does not need auth_token 
+		//to view contests, unless they
+		//are private which is implemented
+		//in GenerateResponse
+    }
+
+
+
     protected function GenerateResponse() {
 
         // Create array of relevant columns
@@ -97,7 +109,7 @@ class ShowContests extends ApiHandler {
 	}
         
         $this->addResponse('contests', $addedContests);
-	$this->addResponse('length', count($addedContests));
+		$this->addResponse('length', count($addedContests));
     }
 
 
