@@ -22,6 +22,7 @@ require_once ("libs/GUI/UserProfileComponent.php");
 require_once ("libs/GUI/RunsListComponent.php");
 require_once ("libs/GUI/ProblemViewerComponent.php");
 require_once ("libs/GUI/SubmitSolutionComponent.php");
+require_once ("libs/GUI/NewContestFormComponent.php");
 
 
 
