@@ -200,21 +200,20 @@ class LoginController{
 			$user = AuthTokensDAO::getUserByToken($auth_token);
 			
 			if(is_null($user)){
-				Logger::log("auth token was not found in the db");
+				Logger::warn("auth_token was not found in the db, why is this?");
+				
 			}else{
-				Logger::log("auth token validated, it belongs to user_id=" . $user->getUserId());				
+				Logger::log("auth_token validated, it belongs to user_id=" . $user->getUserId());
+				return true;			
 			}
-			
-			return !is_null($user);
-
 		}
 		
 		//ok, the user does not have any auth token
 		//if he wants to test facebook login
-		//Facebook must send me the test_fb=1
+		//Facebook must send me the state=something
 		//query, so i dont have to be testing 
 		//facebook sesions on every single petition
-		//made to the front-end
+		//made from the front-end
 		if(!isset($_GET["state"])){
 			Logger::log("Not logged in and no need to check for fb session");
 			return false;
