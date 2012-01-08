@@ -150,6 +150,11 @@ class Logger
 		self::log( " ERROR | " . $msg );
 	}
 
+	public static final function warn ( $msg )
+	{
+		self::log( " WARN | " . $msg );
+	}
+
 	public static final function log( $msg, $level = 0 )
 	{
         if(!OMEGAUP_LOG_TO_FILE)

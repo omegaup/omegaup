@@ -46,18 +46,18 @@ class Grader
         curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"id\":$runId}");
         
         // Execute call
-        $content = curl_exec($curl);
-        
+	$content = curl_exec($curl);
+
         // Close curl
-        curl_close($curl);
-        
-	if($content === FALSE)
+	curl_close($curl);
+
+	if(!$content)
         {            
             throw new Exception("curl_exec failed: " . curl_error($curl) . " ". curl_errno($curl));
         }
 	else if ($content !== '{"status":"ok"}')
 	{
-            throw new Exception("Call to grader failed: $content");
+            throw new Exception("Call to grader failed: '$content'");
 	}
     }
 }

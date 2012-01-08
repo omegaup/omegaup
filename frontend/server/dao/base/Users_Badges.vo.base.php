@@ -193,4 +193,15 @@ class UsersBadges extends VO
 		$this->last_problem_id = $last_problem_id;
 	}
 
+
+	/**
+	  * Converts date fields to timestamps
+	  * 
+	  **/
+	public function toUnixTime( array $fields = array() ){
+		if(count($fields) > 0 )
+			parent::toUnixTime( $fields );
+		else
+			parent::toUnixTime( array( "time" ) );
+	}
 }

@@ -77,25 +77,7 @@ abstract class ContestsDAOBase extends DAO
 			return $foo;
 	}
         
-        public static final function getByAlias($alias)
-	{
-		if(self::recordExists($alias)){
-			return self::getRecord($alias);
-		}
-		$sql = "SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;";
-		$params = array(  $alias );
-                
-		global $conn;
-		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)
-                {
-                    return NULL;
-                }
-                
-                $contest = new Contests( $rs );
-                self::pushRecord( $contest,  $alias );
-                return $contest;
-	}
+
 
 
 	/**

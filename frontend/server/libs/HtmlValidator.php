@@ -9,7 +9,7 @@ require_once("Validator.php");
 class HtmlValidator extends Validator
 {            
     
-    public function validate($string)
+    public function validate($string, $value_name = null)
     {
       // Copied from http://stackoverflow.com/questions/3167074/which-function-in-php-validate-if-the-string-is-valid-html              
       $start =strpos($string, '<');
