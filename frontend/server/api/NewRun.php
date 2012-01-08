@@ -120,7 +120,10 @@ class NewRun extends ApiHandler
     }
     
     protected function GenerateResponse() 
-    {          
+    {   
+	
+		Logger::log("New run being submitted !!");
+		
         try
         {
             $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
@@ -131,23 +134,82 @@ class NewRun extends ApiHandler
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
+
+		//check the kind of penalty_time_start for this contest
+		$penalty_time_start = $contest->getPenaltyTimeStart();
+		
+
+		
+		switch($penalty_time_start){
+			case "contest":
+				// submit_delay is calculated from the start
+				// of the contest
+				$start = $contest->getStartTime();
+			break;
+			
+			case "problem":
+				// submit delay is calculated from the 
+				// time the user opened the problem
+				$opened = ContestProblemOpenedDAO::getByPK(
+										$contest->getContestId(), 
+										$problem->getProblemId(), 
+										$this->_user_id;
+									);
+				
+				if(is_null($opened)){
+					//holy moly, he is submitting a run 
+					//and he hasnt even opened the problem
+					//what should be done here?
+					Logger::error("User is submitting a run and he has not even opened the problem");
+					throw new Exception("User is submitting a run and he has not even opened the problem");
+				}
+				
+				$start = $opened->getOpenTime();
+			break;
+				
+			case "none":
+				//we dont care
+				$start = null;
+			break;
+			
+			default:
+				Logger::error("penalty_time_start for this contests is not a valid option, asuming `none`.");
+				$start = null;
+		}
+
+		if(!is_null($start)){
+			//ok, what time is it now?
+			$c_time = time();
+			$start = strtotime( $start );
+
+			//asuming submit_delay is in minutes
+			$submit_delay = (int)(( $c_time - $start ) / 60);
+			
+		}else{
+			$submit_delay = 0;
+		}
+
         // Populate new run object
         $run = new Runs(array(
-            "user_id" => $this->_user_id,
-            "problem_id" => $problem->getProblemId(),
-            "contest_id" => $contest->getContestId(),
-            "language" => RequestContext::get("language"),
-            "source" => RequestContext::get("source"),
-            "status" => "new",
-            "runtime" => 0,
-            "memory" => 0,
-            "score" => 0,
+            "user_id"		=> $this->_user_id,
+            "problem_id" 	=> $problem->getProblemId(),
+            "contest_id" 	=> $contest->getContestId(),
+            "language" 		=> RequestContext::get("language"),
+            "source" 		=> RequestContext::get("source"),
+            "status" 		=> "new",
+            "runtime" 		=> 0,
+            "memory" 		=> 0,
+            "score" 		=> 0,
             "contest_score" => 0,
-            "ip" => $_SERVER['REMOTE_ADDR'],
-            "submit_delay" => 0,
-            "guid" => md5(uniqid(rand(), true)),
-            "veredict" => "JE"
-        ));                
+            "ip" 			=> $_SERVER['REMOTE_ADDR'],
+            "submit_delay" 	=> $submit_delay, /* based on penalty_time_start */ 
+            "guid" 			=> md5(uniqid(rand(), true)),
+            "veredict" 		=> "JE"
+        ));
+
+
+        
+		
         try
         {
             // Push run into DB
