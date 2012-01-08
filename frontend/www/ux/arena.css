@@ -110,3 +110,58 @@ body { background: #eee; font-family: sans-serif; }
 #problem .source {
 	font-style: italic;
 }
+
+#problem .runs {
+	width: 100%;
+	border: 1px solid #ccc;
+	margin-top: 2em;
+}
+
+#problem .runs caption {
+	font-weight: bold;
+	font-size: 1.em;
+	margin-bottom: 1em;
+}
+
+#problem .runs td,
+#problem .runs th {
+	border: 1px solid #ccc;
+	border-width: 1px 0;
+	text-align: center;
+}
+
+#problem .runs tfoot td a {
+	display: block;
+	padding: 0.5em;
+	text-decoration: none;
+	color: #000;
+	background: #ccc;
+	text-align: center;
+}
+#problem .runs tfoot td a:hover {
+	background: #fff;
+}
+
+#overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(0, 0, 0, .5);
+	padding-top: 25%;
+}
+#overlay form {
+	background: #ccc;
+	width: 70em;
+	height: 28em;
+	margin: -15em auto 0 auto;
+	border: 2px solid #888;
+	border-radius: 2em;
+	padding: 1em;
+}
+#overlay form textarea {
+	width: 30em;
+	height: 20em;
+}
