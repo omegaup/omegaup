@@ -12,7 +12,8 @@
 	define( "LEVEL_NEEDED", false );
 
 	require_once( "../server/inc/bootstrap.php" );
-	
+
+
 
 	/**
 	  *
@@ -28,40 +29,38 @@
     * Logic for registering a new user
     *
     **/
-    if(isset($_POST["request"]) && ($_POST["request"] == "register"))
-    {
-      
+    if(isset($_POST["request"]) && ($_POST["request"] == "register")){
+		//test params
+		if( 
+			isset( $_POST["email"] )
+			&& isset( $_POST["pass"] )
+			&& isset( $_POST["name"] ) 
+		){
 
-      if( 
-             isset( $_POST["email"] )
-          && isset( $_POST["pass"] )
-          && isset( $_POST["name"] ) 
-      ){
-        
-        try{
-            UsersController::registerNewUser( $_POST["name"], $_POST["email"], $_POST["pass"] );  
+			try{
+				UsersController::registerNewUser( $_POST["name"], $_POST["email"], $_POST["pass"] );  
 
-        }catch(Exception $e){
-            die($e);
-        }
+			}catch(Exception $e){
+				die($e);
+			}
 
-        $_POST["request"] = "login";
-        $_POST["user"]    = $_POST["email"];
-        $_POST["pass"]    = $_POST["pass"];
+			$_POST["request"] = "login";
+			$_POST["user"]    = $_POST["email"];
+			$_POST["pass"]    = $_POST["pass"];
 
-      }
-      
+		}else{
+			
+			die;
+			
+		}
 
-      //registration went ok
-      //login this user
 
     }
 
 
 
-
-
-
+	//start creating the page,
+	//this pages handles login in
     $page = new OmegaupComponentPage();
 
 
@@ -76,28 +75,27 @@
     $login_form->addField("user", "Email o usuario"		, "input"	, ""		, "user" );
     $login_form->addField("pass", "Contrase&ntilde;a"	, "password", ""		, "pass" );
     $login_form->addField(""	, ""					, "hidden"	, "login"	, "request" );
-
     $login_form->addSubmit("Iniciar sesion",  "nativeLogin.php", "POST");
-
     $page->addComponent( $login_form );
 
 
 
-    $page->addComponent( new TitleComponent("Unete a Omegaup !"));
 
-
-    
     /**
       * Third Party Login
       *
       **/
+    $page->addComponent( new TitleComponent("Unete a Omegaup !"));
     $page->addComponent( new TitleComponent("&iquest; Tienes alguna cuenta en uno de estos sitios ?", 3));
     
 	$html = '<a href="googleLoginReturn.php">
               <img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50">
             </a>
 				&nbsp;&nbsp;&nbsp;
-			<img src="http://www.clasesdeperiodismo.com/wp-content/uploads/2011/02/facebook-11.jpg" height="50">';
+			<a href="' . LoginController::getFacebookLoginUrl() . '">
+			<img src="http://www.clasesdeperiodismo.com/wp-content/uploads/2011/02/facebook-11.jpg" height="50">
+			</a>';
+			
 	$page->addComponent( new FreeHtmlComponent($html) );
 
 

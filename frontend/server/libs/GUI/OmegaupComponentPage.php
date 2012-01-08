@@ -34,8 +34,8 @@ class OmegaupComponentPage extends StdComponentPage{
 		if(isset($_GET["request"])){
 			switch($_GET["request"]){
 				case "logout" :
-					LoginController::logOut();
-					die(header("Location: ."));
+					LoginController::logOut(  );
+					die(header("Location: ." ));
 				break;
 
 			}			
@@ -55,16 +55,16 @@ class OmegaupComponentPage extends StdComponentPage{
 						//login correcto
 						
 						LoginController::login( $_POST["user"], null );
-						$this_user = LoginController::getCurrentUser();
-						die(header("Location: profile.php?id=" . $this_user->getUserId()));
+						
+						die(header("Location: nativeLogin.php?auth=ok"));
+
 					}else{
 						//login incorrecto
-						Logger::log("nope");
+						Logger::log("invalid user credentials for user `" . $_POST["user"] . "`");
 
 					}
-
-					
 				break;
+				
 			}			
 
 		}		
@@ -85,6 +85,11 @@ class OmegaupComponentPage extends StdComponentPage{
 			//user *IS* logged in
 			
 			$this_user = LoginController::getCurrentUser();
+			
+			if(is_null($this_user)) {
+				die(header("Location: ." ));
+			}
+			
 			$this->user_html_menu = '';
 			$this->user_html_menu .= '<a style="background-color: white; color: #678DD7; padding: 2px; -webkit-border-radius: 5px; padding-left: 5px;" href="profile.php?id='.$this_user->getUserId()  .'">' 
 							. '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >'
@@ -208,10 +213,8 @@ class OmegaupComponentPage extends StdComponentPage{
 					<!-- .post -->
 				
 				    <div class="post footer">
-
-							<?php //echo $GUI::getFooter(); ?>
-							
-				
+					&nbsp;
+					<!--
 						<div id="fb-root"></div>
 						
 						<div id="fb-login-button" style="padding:5px">
@@ -220,7 +223,7 @@ class OmegaupComponentPage extends StdComponentPage{
 								onlogin="loginWithFaceook"
 							> Iniciar sesion con Facebook </fb:login-button>
 						</div>
-						
+					-->
 						
 				    </div>
 					<!-- .post footer -->
@@ -235,7 +238,30 @@ class OmegaupComponentPage extends StdComponentPage{
 			
 
 			<script type="text/javascript" src="js/omegaup.js"></script>
-			<script src="https://connect.facebook.net/es_ES/all.js"></script>
+
+			<div id="fb-root"></div>
+			    <script>               
+			      window.fbAsyncInit = function() {
+			        FB.init({
+			          appId: '<?php echo OMEGAUP_FB_APPID; ?>', 
+			          cookie: true, 
+			          xfbml: true,
+			          oauth: true
+			        });
+			        FB.Event.subscribe('auth.login', function(response) {
+			          window.location.reload();
+			        });
+			        FB.Event.subscribe('auth.logout', function(response) {
+			          window.location.reload();
+			        });
+			      };
+			      (function() {
+			        var e = document.createElement('script'); e.async = true;
+			        e.src = document.location.protocol +
+			          '//connect.facebook.net/en_US/all.js';
+			        document.getElementById('fb-root').appendChild(e);
+			      }());
+			    </script>
 			</body>
 		</html>
 		<?php
