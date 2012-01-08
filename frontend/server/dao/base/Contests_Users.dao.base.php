@@ -15,6 +15,7 @@ abstract class ContestsUsersDAOBase extends DAO
 		private static $loadedRecords = array();
 
 		private static function recordExists(  $user_id, $contest_id ){
+			return false;
 			$pk = "";
 			$pk .= $user_id . "-";
 			$pk .= $contest_id . "-";

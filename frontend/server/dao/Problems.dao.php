@@ -82,4 +82,24 @@ class ProblemsDAO extends ProblemsDAOBase
 		}
 		return $ar;
 	}
+	
+	
+	
+	public static final function getByAlias($alias)
+	{
+
+		$sql = "SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;";
+		$params = array(  $alias );
+                
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);
+		if(count($rs)==0)
+                {
+                    return NULL;
+                }
+                
+                $contest = new Problems( $rs );
+
+                return $contest;
+	}
 }

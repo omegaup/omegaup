@@ -22,5 +22,12 @@
 	define("OMEGAUP_LOG_ERROR_FILE", 	"/var/log/omegaup/omegaup.log");
 
 
+	define('OMEGAUP_GRADER_URL',      'https://localhost:21680/grade/');
+	define('OMEGAUP_SSLCERT_URL',     '/opt/omegaup/frontend/omegaup.pem');
+	define('OMEGAUP_CACERT_URL',      '/opt/omegaup/frontend/omegaup.pem');
+
+	define('RUNS_PATH',               '/opt/omegaup/omegaup/submissions');
+	define('PROBLEMS_PATH',           '/opt/omegaup/omegaup/problems');
+
 	define("OMEGAUP_FB_APPID", 			"xxxxx");
 	define("OMEGAUP_FB_SECRET",			"xxxxx");

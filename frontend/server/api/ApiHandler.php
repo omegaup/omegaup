@@ -29,7 +29,7 @@ abstract class ApiHandler
 	   *
 	   **/
 	public function __construct(){
-		
+
 		$current_user = LoginController::getCurrentUser();
 
         if ($current_user === null){
@@ -58,7 +58,10 @@ abstract class ApiHandler
     {
         return $this->_response;
     }
-                          
+    
+
+
+	//this should call LoginController
     protected function CheckAuthToken()
     {                
         // Check if we have a logged user.               
@@ -114,14 +117,21 @@ abstract class ApiHandler
         }
         catch (ApiException $e)
         {
+            Logger::error( "---------------------------------------------------" );
+	
             // Something bad happened, log error
-            Logger::error( "ApiException thrown by: " );
-            Logger::error( $this->_user_id );
+            Logger::error( "     ApiException thrown by: " );
+            Logger::error( "USER_ID: " . $this->_user_id );
             
-            Logger::error( "--Request: " );
-            Logger::error( implode("\n", $_REQUEST) );
+            Logger::error( "REQUEST PARAMS: " );
+
+			foreach($_REQUEST as $k => $v ){
+            	Logger::error( "    ". $k .": " . $v );
+			}
             
-            Logger::error( $e->getFile() );
+            Logger::error( "AT FILE:" );
+            Logger::error( "    " . $e->getFile( ));
+
             
             Logger::error( "--ApiException contents: " );
             Logger::error( implode("\n", $e->getArrayMessage()) );
@@ -135,13 +145,15 @@ abstract class ApiHandler
                 Logger::error( $e->getWrappedException()->getLine() );
                 Logger::error( $e->getWrappedException()->getCode() );
             }
-            
+
+            Logger::error( "---------------------------------------------------" );            
             // Propagate the exception
             throw $e;
         }
         catch(Exception $e)
         {
             // Something VERY bad happened, log error
+            Logger::error( "---------------------------------------------------" );
             Logger::error( "FATAL ERROR: Unwrapped exception thrown, wrapping: " );
             Logger::error( $this->_user_id );
             Logger::error( $_REQUEST );
@@ -150,6 +162,7 @@ abstract class ApiHandler
             Logger::error( $e->getCode() );
             Logger::error( $e->getTraceAsString() );
             Logger::error( $e->getPrevious() );
+            Logger::error( "---------------------------------------------------" );
                         
             throw new ApiException( ApiHttpErrors::unwrappedException() );
         }
