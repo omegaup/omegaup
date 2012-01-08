@@ -101,7 +101,7 @@ class ShowProblemInContest extends ApiHandler
         $this->addResponse("problem_statement", $file_content);        
              
         // Create array of relevant columns for list of runs
-        $relevant_columns = array("run_id", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "ip", "time", "submit_delay");
+	$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
         
         // Search the relevant runs from the DB
         $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));                                        
