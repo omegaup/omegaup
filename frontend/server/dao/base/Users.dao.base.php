@@ -15,9 +15,11 @@ abstract class UsersDAOBase extends DAO
 		private static $loadedRecords = array();
 
 		private static function recordExists(  $user_id ){
+			return false;
 			$pk = "";
 			$pk .= $user_id . "-";
 			return array_key_exists ( $pk , self::$loadedRecords );
+			
 		}
 		private static function pushRecord( $inventario,  $user_id){
 			$pk = "";
@@ -225,6 +227,7 @@ abstract class UsersDAOBase extends DAO
 		
 		}
 		global $conn;
+
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {

@@ -9,7 +9,7 @@ require_once("Validator.php");
 
 class DateValidator extends Validator
 {                  
-    public function validate($value)
+    public function validate($value, $value_name = null)
     {
         // Validate that we are working with a date
         // @TODO This strtotime() allows nice strings like "next Thursday". Is there a better way to verify Dates?

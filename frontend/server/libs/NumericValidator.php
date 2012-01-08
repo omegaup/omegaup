@@ -10,7 +10,7 @@ require_once("Validator.php");
 class NumericValidator extends Validator
 {
     
-    public function validate($value)
+    public function validate($value, $value_name = null)
     {
         // Validate that we are working with a number
         if (!is_numeric($value))

@@ -8,7 +8,7 @@ require_once("Validator.php");
 
 class NotEmptyValidator extends Validator
 {    
-    public function validate($value)
+    public function validate($value, $value_name = null)
     {
         // Validate data not empty
         if($value === "")

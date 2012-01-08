@@ -15,6 +15,7 @@ abstract class AuthTokensDAOBase extends DAO
 		private static $loadedRecords = array();
 
 		private static function recordExists(  $token ){
+			return false;
 			$pk = "";
 			$pk .= $token . "-";
 			return array_key_exists ( $pk , self::$loadedRecords );

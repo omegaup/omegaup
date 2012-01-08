@@ -21,7 +21,7 @@ class CustomValidator extends Validator
     }
 
     
-    public function validate($data)
+    public function validate($data, $value_name = null)
     {
         // Fix for bug in PHP 5.3. If we call $this->func(), PHP looks for func() inside the object
         $local_callback = $this->callback;
