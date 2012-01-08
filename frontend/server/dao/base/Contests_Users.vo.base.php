@@ -230,4 +230,16 @@ class ContestsUsers extends VO
 		$this->time = $time;
 	}
 
+
+
+	/**
+	  * Converts date fields to timestamps
+	  * 
+	  **/
+	public function toUnixTime( array $fields = array() ){
+		if(count($fields) > 0 )
+			parent::toUnixTime( $fields );
+		else
+			parent::toUnixTime( array( "access_time" ) );
+	}
 }

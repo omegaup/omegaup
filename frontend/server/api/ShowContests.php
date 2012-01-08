@@ -68,6 +68,7 @@ class ShowContests extends ApiHandler {
 
             if ($c->getPublic()) 
             {
+				$c->toUnixTime(  );
                 $addedContests[] = $c->asFilteredArray($relevant_columns);                
                 continue;
             }
@@ -76,13 +77,19 @@ class ShowContests extends ApiHandler {
              * Ok, its not public, lets se if we have a 
              * valid user
              * */
-			$current_user = LoginController::getCurrentUser();
+			/*$current_user = LoginController::getCurrentUser();
 
             if ($current_user === null){
                 continue;
             }
 
 			$this->_user_id = $current_user->getUserId();
+			*/
+            if ($this->_user_id === null){
+                continue;
+            }
+
+
 
             /**
              * Ok, i have a user. Can he see this contest ?
@@ -108,7 +115,8 @@ class ShowContests extends ApiHandler {
              * He can see it !
              * 
              * */
-            $addedContests[] = $c->asFilteredArray($relevant_columns);            
+			$c->toUnixTime(  );
+            $addedContests[ ] = $c->asFilteredArray($relevant_columns);            
 	}
         
         $this->addResponse('contests', $addedContests);
