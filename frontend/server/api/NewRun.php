@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 /**
  * 
@@ -151,9 +151,9 @@ class NewRun extends ApiHandler
 				// submit delay is calculated from the 
 				// time the user opened the problem
 				$opened = ContestProblemOpenedDAO::getByPK(
-										$contest->getContestId(), 
-										$problem->getProblemId(), 
-										$this->_user_id;
+                                                                        $contest->getContestId(), 
+                                                                        $problem->getProblemId(), 
+                                                                        $this->_user_id
 									);
 				
 				if(is_null($opened)){
