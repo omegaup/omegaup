@@ -40,7 +40,15 @@
                     )));
 
         }
-
+        
+        /*if( !initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_DB_NAME) )
+        {
+          die(json_encode(array(
+            "status" => "error",
+            "error" => "Failed to initialize the testing database from the source databse",
+            "errorcode" => 3
+          )));
+        }*/
     } 
     catch (Exception $e) {
 
@@ -66,3 +74,45 @@
     Utils::$counttime = 0;
     Utils::$inittime = Utils::GetPhpUnixTimestamp();
     
+  function initialize_db($source_db, $testing_db){
+
+    $testing = ADONewConnection(OMEGAUP_DB_DRIVER);
+    $testing->NConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, $testing_db);
+
+    $source = ADONewConnection(OMEGAUP_DB_DRIVER);
+    $source->NConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, $source_db);
+
+    $tables_recordset = $source->Execute("SHOW TABLES;");
+    $tables           = $tables_recordset->GetArray();
+
+    $testing->BeginTrans();
+    $ok = true;
+    foreach( $tables as $table_name )
+    {
+        $table_name   = $table_name[0];
+        $ok           = $ok && $testing->Execute("DROP TABLE IF EXISTS $table_name CASCADE");
+    }
+
+    if( !$ok )
+    {
+      $testing->RollbackTrans();
+      return false;
+    }
+    
+    foreach( $tables as $table_name )
+    {
+        $table_name   = $table_name[0];
+        $create       = $testing->Execute("CREATE TABLE $table_name LIKE ".$source_db.".".$table_name);
+        if(!$create) {
+            $error    = true;
+        }
+        $insert       = $testing->Execute("INSERT INTO $table_name SELECT * FROM ".$source_db.".".$table_name);
+    }
+
+    $testing->CommitTrans();
+    
+    $testing->Close();
+    $source->Close();
+    
+    return !isset($error) ? true : false;
+  }
