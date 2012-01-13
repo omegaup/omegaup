@@ -90,6 +90,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {            
             $contestCreator = new NewContestTest();
             $contest_id = $contestCreator->testCreateValidContest(1);            
+            $contest = ContestsDAO::getByPK($contest_id);
         }
         
         if(is_null($problem_id))
@@ -115,10 +116,10 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Validate output
         $this->assertEquals("ok", $return_array["status"]);
-        $this->assertArrayHasKey("run_alias", $return_array);
+        $this->assertArrayHasKey("guid", $return_array);
         
         // Get run from DB
-        $run = RunsDAO::getByAlias($return_array["run_alias"]);        
+        $run = RunsDAO::getByAlias($return_array["guid"]);        
         $this->assertNotNull($run);
         
         // Validate data        
@@ -138,7 +139,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
         $this->assertEquals("127.0.0.1", $run->getIp());
-        $this->assertEquals(0, $run->getSubmitDelay());
+        $this->assertEquals((time() - strtotime($contest->getStartTime()))/60, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
                 
         
@@ -197,6 +198,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         // Set context
         $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(0);
+        $contest = ContestsDAO::getByPK($contest_id);
         
         $problemCreator = new NewProblemInContestTest();
         $problem_id = $problemCreator->testCreateValidProblem($contest_id);        
@@ -220,10 +222,10 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         }
         
         // Validate output
-        $this->assertArrayHasKey("run_alias", $return_array);
+        $this->assertArrayHasKey("guid", $return_array);
         
         // Get run from DB
-        $run = RunsDAO::getByAlias($return_array["run_alias"]);
+        $run = RunsDAO::getByAlias($return_array["guid"]);
         $this->assertNotNull($run);
         
         // Validate data        
@@ -243,7 +245,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
         $this->assertEquals("127.0.0.1", $run->getIp());
-        $this->assertEquals(0, $run->getSubmitDelay());
+        $this->assertEquals((time() - strtotime($contest->getStartTime()))/60, $run->getSubmitDelay());
         $this->assertEquals("JE", $run->getVeredict());
     }
     
