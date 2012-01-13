@@ -17,19 +17,17 @@ require_once(SERVER_PATH . '/libs/FileHandler.php');
 
 class ShowProblemInContest extends ApiHandler
 {    
-	
-	
-	//when calling the api, from
-	//within the system, must 
-	//call the constructor of ApiHandler
-	//to load the current user
-	public function __construct(){
-		parent::__construct();
-	}
+    //when calling the api, from
+    //within the system, must 
+    //call the constructor of ApiHandler
+    //to load the current user
+    public function __construct(){
+            parent::__construct();
+    }
 	
 	
 	
-	protected function CheckAuthToken()
+    protected function CheckAuthToken()
     {                
              
     }
@@ -83,36 +81,34 @@ class ShowProblemInContest extends ApiHandler
                 throw new ApiException(ApiHttpErrors::forbiddenSite());
             }        
         }
+        
+        //does the user have access to this contest?
+        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+        $user = LoginController::getCurrentUser();
+
+        if(!$contest->getPublic())
+        {
+                //contest is not public
+
+                if( is_null($user )){
+                        //no one is even logged in
+                        throw new ApiException(ApiHttpErrors::forbiddenSite());
+                }
+
+                if( is_null(ContestsUsersDAO::getByPK( $user->getUserId(), $contest->getContestId() ) ) ){
+                        //he is not in the ContestUser list
+                        throw new ApiException(ApiHttpErrors::forbiddenSite());
+                }
+
+                //he is good to go...
+        }
                 
     }            
     
 
-
-
     protected function GenerateResponse() 
     {
-
-		//does the user have access to this contest?
-		$contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
-		$user = LoginController::getCurrentUser();
-		
-		if(!$contest->getPublic()){
-			//contest is not public
-			
-			if( is_null($user )){
-				//no one is even logged in
-				throw new ApiException(ApiHttpErrors::forbiddenSite());
-			}
-			
-			if( is_null(ContestsUsersDAO::getByPK( $user->getUserId(), $contest->getContestId() ) ) ){
-				//he is not in the ContestUser list
-				throw new ApiException(ApiHttpErrors::forbiddenSite());
-			}
-			
-			//he is good to go...
-		}
-
-		
+        		
         // Create array of relevant columns
         $relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points");
         
