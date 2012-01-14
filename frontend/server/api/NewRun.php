@@ -239,6 +239,7 @@ class NewRun extends ApiHandler
         }
         catch(Exception $e)
         {
+            Logger::error($e);
             throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
         }
         
