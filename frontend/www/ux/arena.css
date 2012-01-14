@@ -1,4 +1,4 @@
-body { background: #eee; font-family: sans-serif; }
+body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
 
 .template { display: none; }
 
@@ -31,19 +31,23 @@ body { background: #eee; font-family: sans-serif; }
 
 .tabs {
 	padding-left: 0.5em;
-	border-bottom: 1px solid #000;
+	border-bottom: 1px solid #ccc;
+        border-top: 1px solid #ccc;
+        display: block;
+        text-align: center;
+        background-color: white;
+        margin: 0.5em 0;
+}
+
+.tabs li {
+    display: inline;
 }
 
 .tabs a {
-	display: block;
-	padding: 0.5em;
-	float: left;
-	text-decoration: none;
-	color: #000;
-	margin: 0.2em 0.2em 0 0.2em;
-	border: 1px solid #000;
-	border-bottom: 0;
-	border-radius: 0.3em 0.3em 0 0;
+	display: inline-block;
+	padding: 0.5em 1em;
+        text-decoration: none;
+        color: #000;
 }
 
 .tabs a:hover {
@@ -51,13 +55,7 @@ body { background: #eee; font-family: sans-serif; }
 }
 
 .tabs a.active {
-	background-color: #ccc;
-}
-
-.tabs:after {
-	content: "";
-	display: block;
-	clear: both;
+	background-color: #ddd;
 }
 
 .navleft {
@@ -66,17 +64,23 @@ body { background: #eee; font-family: sans-serif; }
 .navleft .navbar {
 	width: 18em;
 	float: left;
-	padding: 1em;
 }
+
 .navleft .main {
 	margin-left: 20em;
 	border: 1px solid #ccc;
 	border-width: 0 0 1px 1px;
 }
 
+.tab {
+    padding: 1em;
+}
+
 #problem {
 	background: #fff;
 	padding: 1em;
+        margin-top: -1.5em;
+        margin-right: -1em;
 }
 
 #problem .title {
@@ -153,15 +157,38 @@ body { background: #eee; font-family: sans-serif; }
 	padding-top: 25%;
 }
 #overlay form {
-	background: #ccc;
-	width: 70em;
+	background: #eee;
+	width: 800px;
 	height: 28em;
 	margin: -15em auto 0 auto;
-	border: 2px solid #888;
-	border-radius: 2em;
+	border: 2px solid #ccc;
 	padding: 1em;
+        position: relative;
 }
+
 #overlay form textarea {
-	width: 30em;
-	height: 20em;
+	width: 790px;
+	height: 26em;
+        margin: 0.5em 0;
+}
+
+#overlay form #close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-width: 0 0 1px 1px;
+        font-size: 110%;
+        width: 25px;
+        height: 25px;
+}
+
+#overlay form #close:hover {
+        background-color: #eee;
+}
+
+#overlay input[type=submit] {
+        font-size: 110%;
+        padding: 0.3em 0.5em;
 }
