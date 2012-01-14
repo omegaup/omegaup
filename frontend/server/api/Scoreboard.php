@@ -5,12 +5,11 @@
  * 
  */
 
-
 class Scoreboard 
 {
     // Column to return total score per user
     const total_column = "total";
-    
+    const MEMCACHE_KEY = "scoreboard";
     
     // Contest's data
     private $data;
@@ -34,44 +33,66 @@ class Scoreboard
 
     public function generate()
     {
-        // @todo Cache goes here :D
-                                
-        try
-        {
-            // Get all distinct contestants participating in the contest given contest_id
-            $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id);                             
-                        
-            // Get all problems given contest_id
-            $contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
-        }
-        catch(Exception $e)
-        {
-            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
-        }
-                                         
-        // Save the number of problems internally
-        $this->countProblemsInContest = count($contest_problems);
-        
-        // Calculate score for each contestant x problem
-        foreach ($contest_users as $contestant)
-        {
-            $user_results = array();
-            foreach ($contest_problems as $problems)
-            {
-                $user_results[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId());                                       
-            }
-            
-            // Calculate total score for current user            
-            $user_results[self::total_column] = $this->getTotalScore($user_results);            
-            
-            // Add contestant results to scoreboard data
-            $this->data[$contestant->getUsername()] = $user_results;
-        }
-        
-        // Sort users by their total column
-        uasort($this->data, array($this, 'compareUserScores'));
-                      
-        return $this->data;                
+        $memcache = new Memcache;
+		if( !$memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
+		{
+			$memcache = null;
+		}
+
+		$result = null;
+		if( $memcache != null )
+		{
+			$result = $memcache->get(self::MEMCACHE_KEY);
+		}
+		
+		if( $result == null )
+		{
+	        try
+	        {
+	            // Get all distinct contestants participating in the contest given contest_id
+	            $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id);                             
+	                        
+	            // Get all problems given contest_id
+	            $contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
+	        }
+	        catch(Exception $e)
+	        {
+	            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+	        }
+
+	        $result = array();
+	        
+	        // Save the number of problems internally
+	        $this->countProblemsInContest = count($contest_problems);
+	        
+	        // Calculate score for each contestant x problem
+	        foreach ($contest_users as $contestant)
+	        {
+	            $user_results = array();
+	            foreach ($contest_problems as $problems)
+	            {
+	                $user_results[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId());                                       
+	            }
+	            
+	            // Calculate total score for current user            
+	            $user_results[self::total_column] = $this->getTotalScore($user_results);            
+	            
+	            // Add contestant results to scoreboard data
+	            $result[$contestant->getUsername()] = $user_results;
+	        }
+	        
+	        // Sort users by their total column
+	        uasort($result, array($this, 'compareUserScores'));
+	         
+	        // Cache scoreboard if a memcache connection is available
+	        if( $memcache )
+	        {
+	        	$memcache->set(self::MEMCACHE_KEY, $result, 0, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
+	        }
+		}
+
+	    $this->data = $result;
+		return $this->data;                
     }
     
     

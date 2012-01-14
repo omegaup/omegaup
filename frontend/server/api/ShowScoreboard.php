@@ -12,7 +12,7 @@
 
 
 require_once("ApiHandler.php");
-require_once("Scoreboard.php");
+require_once(dirname(__FILE__) . "/Scoreboard.php");
 
 class ShowScoreboard extends ApiHandler
 {
@@ -50,7 +50,7 @@ class ShowScoreboard extends ApiHandler
         $this->scoreboardData = $myScoreboard->generate();        
         
         // Push scoreboard data in response
-        $this->response = $this->scoreboardData;
+        $this->addResponseArray($this->scoreboardData);
     }        
 }
 
