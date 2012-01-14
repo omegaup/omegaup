@@ -9,7 +9,7 @@ define ('OMEGAUP_BASEPATH',       dirname(dirname(dirname(__DIR__))));
 define('OMEGAUP_DB_USER',         'omegaup_beta');
 define('OMEGAUP_DB_PASS',         'ky)yiIkm_+zMf,>qkRP@j{pflG');
 define('OMEGAUP_DB_HOST',         'localhost');
-define('OMEGAUP_DB_NAME',         'omegaup_test');
+define('OMEGAUP_TEST_DB_NAME',    'omegaup_test');
 define('OMEGAUP_DB_SOURCE',       'omegaup_beta');
 define('OMEGAUP_DB_DRIVER',       'mysqlt');
 define('OMEGAUP_DB_DEBUG',        false);	

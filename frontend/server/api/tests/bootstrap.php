@@ -24,7 +24,7 @@
     {
         $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
         $conn->debug = OMEGAUP_DB_DEBUG;
-        $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+        $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_TEST_DB_NAME);
 
         if(!$conn) 
         {
@@ -41,14 +41,14 @@
 
         }
         
-        /*if( !initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_DB_NAME) )
+        if( !initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_TEST_DB_NAME) )
         {
           die(json_encode(array(
             "status" => "error",
             "error" => "Failed to initialize the testing database from the source databse",
             "errorcode" => 3
           )));
-        }*/
+        }
     } 
     catch (Exception $e) {
 
@@ -96,17 +96,22 @@
     if( !$ok )
     {
       $testing->RollbackTrans();
+
+      $testing->Close();
+      $source->Close();
+
       return false;
     }
     
     foreach( $tables as $table_name )
     {
         $table_name   = $table_name[0];
-        $create       = $testing->Execute("CREATE TABLE $table_name LIKE ".$source_db.".".$table_name);
+        $source_name  = $source_db.".".$table_name;
+        $create       = $testing->Execute("CREATE TABLE $table_name LIKE $source_name");
         if(!$create) {
             $error    = true;
         }
-        $insert       = $testing->Execute("INSERT INTO $table_name SELECT * FROM ".$source_db.".".$table_name);
+        $insert       = $testing->Execute("INSERT INTO $table_name SELECT * FROM $source_name");
     }
 
     $testing->CommitTrans();
