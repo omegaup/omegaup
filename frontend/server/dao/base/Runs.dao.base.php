@@ -371,7 +371,7 @@ abstract class RunsDAOBase extends DAO
         public static final function GetAllRelevantUsers($contest_id)
         {
             // Build SQL statement
-            $sql = "SELECT Users.user_id, username from Users INNER JOIN ( SELECT DISTINCT Runs.user_id from Runs WHERE ( Runs.contest_id = ? AND Runs.status = 'ready'  ) ) RunsContests ON Users.user_id = RunsContests.user_id ";
+            $sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( SELECT DISTINCT Runs.user_id from Runs WHERE ( Runs.contest_id = ? AND Runs.status = 'ready'  ) ) RunsContests ON Users.user_id = RunsContests.user_id ";
             $val = array($contest_id);
             
             global $conn;

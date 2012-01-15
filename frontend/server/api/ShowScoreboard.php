@@ -50,7 +50,7 @@ class ShowScoreboard extends ApiHandler
         $this->scoreboardData = $myScoreboard->generate();        
         
         // Push scoreboard data in response
-        $this->addResponseArray($this->scoreboardData);
+        $this->addResponse('ranking', $this->scoreboardData);
     }        
 }
 

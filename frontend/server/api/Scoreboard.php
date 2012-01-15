@@ -68,14 +68,22 @@ class Scoreboard
 	        // Calculate score for each contestant x problem
 	        foreach ($contest_users as $contestant)
 	        {
-	            $user_results = array();
+		    $user_results = array();
+		    $user_problems = array();
+
 	            foreach ($contest_problems as $problems)
 	            {
-	                $user_results[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId());                                       
-	            }
+	                $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId());
+		    }
+
+		    // Add the problems' information
+		    $user_results['problems'] = $user_problems;
 	            
 	            // Calculate total score for current user            
-	            $user_results[self::total_column] = $this->getTotalScore($user_results);            
+		    $user_results[self::total_column] = $this->getTotalScore($user_problems);
+
+		    // And more information on the user
+		    $user_results['name'] = $contestant->getName() ? $contestant->getName() : $contestant->getUsername();
 	            
 	            // Add contestant results to scoreboard data
 	            $result[$contestant->getUsername()] = $user_results;
