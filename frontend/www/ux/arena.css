@@ -194,7 +194,8 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
 }
 
 #ranking {
-	width: 100%;
+	width: 98%;
+	margin: 1em auto;
 }
 
 #ranking td {
