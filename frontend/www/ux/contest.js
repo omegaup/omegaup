@@ -4,11 +4,17 @@ $(document).ready(function() {
 	var activeTab = 'summary';
 	var currentProblem = null;
 	var currentRanking = [];
+	var startTime = null;
+	var finishTime = null;
 
 	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
 	omegaup.getContest(contestAlias, function(contest) {
 		$('#title .contest-title').html(contest.title);
+
+		startTime = contest.start_time;
+		finishTime = contest.finish_time;
+
 		for (var idx in contest.problems) {
 			var problem = contest.problems[idx];
 
@@ -24,6 +30,9 @@ $(document).ready(function() {
 		}
 
 		omegaup.getRanking(contestAlias, rankingChange);
+
+		updateClock();
+		setInterval(updateClock, 1000);
 
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
@@ -186,5 +195,44 @@ $(document).ready(function() {
 		setTimeout(function() { 
 			omegaup.getRanking(contestAlias, rankingChange);
 		}, 5 * 60 * 1000);
+	}
+	
+	function updateClock() {
+			var date = new Date().getTime();
+			var clock = "";
+
+			if (date < startTime.getTime()) {
+					clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
+			} else if (date > finishTime.getTime()) {
+					clock = "00:00:00";
+			} else {
+					clock = formatDelta(finishTime.getTime() - (date + omegaup.deltaTime));
+			}
+
+			$('#title .clock').html(clock);
+	}
+
+	function formatDelta(delta) {
+			var days = Math.floor(delta / (24 * 60 * 60 * 1000));
+			delta -= days * (24 * 60 * 60 * 1000);
+			var hours = Math.floor(delta / (60 * 60 * 1000));
+			delta -= hours * (60 * 60 * 1000);
+			var minutes = Math.floor(delta / (60 * 1000));
+			delta -= minutes * (60 * 1000);
+			var seconds = Math.floor(delta / 1000);
+
+			var clock = "";
+
+			if (days > 0) {
+					clock += days + ":";
+			}
+			if (hours < 10) clock += "0";
+			clock += hours + ":";
+			if (minutes < 10) clock += "0";
+			clock += minutes + ":";
+			if (seconds < 10) clock += "0";
+			clock += seconds;
+
+			return clock;
 	}
 });
