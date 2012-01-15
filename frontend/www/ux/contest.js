@@ -11,6 +11,8 @@ $(document).ready(function() {
 
 	omegaup.getContest(contestAlias, function(contest) {
 		$('#title .contest-title').html(contest.title);
+		$('#summary .title').html(contest.title);
+		$('#summary .description').html(contest.description);
 
 		startTime = contest.start_time;
 		finishTime = contest.finish_time;
@@ -168,6 +170,7 @@ $(document).ready(function() {
 
 	function rankingChange(data) {
 		$('#ranking tbody tr.inserted').remove();
+		$('#mini-ranking tbody tr.inserted').remove();
 
 		var ranking = data.ranking;
 
@@ -188,6 +191,17 @@ $(document).ready(function() {
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
 			$('#ranking tbody').append(r);
+
+			if (i < 20) {
+				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
+
+				$('.position', r).html(i+1);
+				$('.user', r).html(rank.name);
+				$('.points', r).html(rank.total.points);
+				$('.penalty', r).html(rank.total.penalty);
+
+				$('#mini-ranking tbody').append(r);
+			}
 		}
 
 		currentRanking = ranking;

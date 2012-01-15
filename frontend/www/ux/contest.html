@@ -29,7 +29,9 @@
 				<li><a href="#clarifications">Clarificaciones</a></li>
 			</ul>
 			<div id="summary" class="tab">
-				Resumen (gráfica de ranking y resumen de problemas resueltos)
+				<h2 class="title"></h2>
+				<p class="description"></p>
+
 			</div>
 			<div id="problems" class="tab navleft">
 				<div class="navbar">
@@ -39,6 +41,23 @@
 							Some stats
 						</div>
 					</div>
+					<table id="mini-ranking">
+						<thead>
+							<tr>
+								<th></th>
+								<th>Usuario</th>
+								<th class="total" colspan="2">Puntaje</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="template">
+								<td class="position"></td>
+								<td class="user"></td>
+								<td class="points"></td>
+								<td class="penalty"></td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 				<div id="problem" class="main">
 					<h1 class="title"></h1>
