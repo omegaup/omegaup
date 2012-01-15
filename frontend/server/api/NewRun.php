@@ -15,6 +15,7 @@
 require_once("ApiHandler.php");
 require_once(SERVER_PATH . '/libs/FileHandler.php');
 require_once(SERVER_PATH . '/libs/Grader.php');
+require_once("Scoreboard.php");
 
 class NewRun extends ApiHandler
 {     
@@ -244,7 +245,20 @@ class NewRun extends ApiHandler
         
         // Happy ending
         $this->addResponse("guid", $run->getGuid());
-        $this->addResponse("status", "ok");        
+        $this->addResponse("status", "ok");
+
+        /// @todo Invalidate cache only when this run changes a user's score
+        ///       (by improving, adding penalties, etc)
+        $this->InvalidateScoreboardCache();  
+    }
+    
+    private function InvalidateScoreboardCache()
+    {
+    	$memcache = new Memcache;
+    	if( $memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
+    	{
+    		$memcache->delete(Scoreboard::MEMCACHE_KEY, 0);
+    	}
     }
 }
 
