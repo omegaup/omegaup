@@ -3,6 +3,7 @@ $(document).ready(function() {
 	var problems = {};
 	var activeTab = 'summary';
 	var currentProblem = null;
+	var currentRanking = [];
 
 	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
@@ -159,10 +160,12 @@ $(document).ready(function() {
 	function rankingChange(data) {
 		$('#ranking tbody tr.inserted').remove();
 
-		for (var i = 0; i < data.ranking.length; i++) {
-			var rank = data.ranking[i];
+		var ranking = data.ranking;
 
-			var r = $('#ranking tbody tr.template').clone().removeClass('template');
+		for (var i = 0; i < ranking.length; i++) {
+			var rank = ranking[i];
+
+			var r = $('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 			$('.position', r).html(i+1);
 			$('.user', r).html(rank.name);
 
@@ -177,5 +180,11 @@ $(document).ready(function() {
 			$('.penalty', r).html(rank.total.penalty);
 			$('#ranking tbody').append(r);
 		}
+
+		currentRanking = ranking;
+
+		setTimeout(function() { 
+			omegaup.getRanking(contestAlias, rankingChange);
+		}, 5 * 60 * 1000);
 	}
 });
