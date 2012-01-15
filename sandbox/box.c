@@ -72,6 +72,7 @@ static int ticks_per_sec;
 static int exec_seen;
 static int exec_remaining = 1;
 static int partial_line;
+static int allow_nonzero_exit;
 
 static int mem_peak_kb;
 static int total_ms, wall_ms;
@@ -1415,7 +1416,7 @@ boxkeeper(void)
 	  
 	  final_stats(&rus);
 	  meta_printf("syscall-count:%d\n", syscall_count);
-	  if (WEXITSTATUS(stat))
+	  if (!allow_nonzero_exit && WEXITSTATUS(stat))
 	    {
 	      if (syscall_count)
 		{
@@ -1714,6 +1715,7 @@ Options:\n\
 -k <size>\tLimit stack size to <size> KB (default: 0=unlimited)\n\
 -m <size>\tLimit address space to <size> KB\n\
 -M <file>\tOutput process information to <file> (name:value)\n\
+-n\t\tAllow non-zero return from the program\n\
 -o <file>\tRedirect stdout to <file>\n\
 -O <size>\tLimit output file size to <size> KB (default: 0=unlimited)\n\
 -p <path>\tPermit access to the specified path (or subtree if it ends with a `/')\n\
@@ -1777,10 +1779,13 @@ process_option (int c, char *argument, int enable_script)
       case 'M':
 	meta_open(argument);
 	break;
+      case 'n':
+	allow_nonzero_exit = 1;
+	break;
       case 'o':
 	redir_stdout = argument;
 	break;
-	  case 'O':
+      case 'O':
 	output_limit = atol(argument);
 	break;
       case 'p':
@@ -1854,7 +1859,7 @@ main(int argc, char **argv)
   
   getcwd(cwd, sizeof(cwd));
   
-  while ((c = getopt(argc, argv, "a:c:CeE:fFi:k:m:M:o:O:p:P:qr:s:S:t:Tvw:x:")) >= 0)
+  while ((c = getopt(argc, argv, "a:c:CeE:fFi:k:m:M:no:O:p:P:qr:s:S:t:Tvw:x:")) >= 0)
     process_option(c, optarg, 1);
   if (optind >= argc)
     usage();

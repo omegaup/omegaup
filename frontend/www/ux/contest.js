@@ -25,8 +25,8 @@ $(document).ready(function() {
 	        $('#root').fadeIn('slow');
 	});
 
-	$('#overlay').click(function(e) {
-		if (e.target.id == 'overlay') {
+	$('#overlay, #close').click(function(e) {
+		if (e.target.id === 'overlay' || e.target.id === 'close') {
 			$('#overlay').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
 		}
@@ -51,7 +51,7 @@ $(document).ready(function() {
 						orig_run.time = run.time;
 						orig_run.language = run.language;
 
-						$('.points', r).html(run.contest_score);
+						$('.points', r).html(run.contest_score.toFixed(2));
 						$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
 						$('.penalty', r).html(run.submit_delay);
 						$('.time', r).html(run.time);
@@ -111,9 +111,9 @@ $(document).ready(function() {
 				for (var idx in problem.runs) {
 					if (!problem.runs.hasOwnProperty(idx)) continue;
 					var run = problem.runs[idx];
-				
+
 					var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
-					$('.points', r).html(run.contest_score);
+					$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
 					$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
 					$('.penalty', r).html(run.submit_delay);
 					$('.time', r).html(run.time);
