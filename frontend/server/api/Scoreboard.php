@@ -83,14 +83,15 @@ class Scoreboard
 		    $user_results[self::total_column] = $this->getTotalScore($user_problems);
 
 		    // And more information on the user
+		    $user_results['username'] = $contestant->getUsername();
 		    $user_results['name'] = $contestant->getName() ? $contestant->getName() : $contestant->getUsername();
 	            
 	            // Add contestant results to scoreboard data
-	            $result[$contestant->getUsername()] = $user_results;
+	            array_push($result, $user_results);
 	        }
 	        
 	        // Sort users by their total column
-	        uasort($result, array($this, 'compareUserScores'));
+	        usort($result, array($this, 'compareUserScores'));
 	         
 	        // Cache scoreboard if a memcache connection is available
 	        if( $memcache )
@@ -99,7 +100,7 @@ class Scoreboard
 	        }
 		}
 
-	    $this->data = $result;
+	    	$this->data = $result;
 		return $this->data;                
     }
     

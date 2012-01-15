@@ -134,3 +134,15 @@ OmegaUp.prototype.runStatus = function(guid, callback) {
 		'json'
 	);
 };
+
+OmegaUp.prototype.getRanking = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/contests/' + contestAlias + '/ranking/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};

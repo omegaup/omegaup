@@ -16,7 +16,13 @@ $(document).ready(function() {
 			var prob = $('#problem-list .template').clone().removeClass('template');
 			$('.name', prob).attr('href', '#problems/' + problem.alias).html(problem.title);
 			$('#problem-list').append(prob);
+
+			$('<th colspan="2"></th>').html(problem.alias).insertBefore('#ranking thead th.total');
+			$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
+			$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
 		}
+
+		omegaup.getRanking(contestAlias, rankingChange);
 
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
@@ -149,4 +155,27 @@ $(document).ready(function() {
 			$('#' + activeTab).show();
 		}
 	});
+
+	function rankingChange(data) {
+		$('#ranking tbody tr.inserted').remove();
+
+		for (var i = 0; i < data.ranking.length; i++) {
+			var rank = data.ranking[i];
+
+			var r = $('#ranking tbody tr.template').clone().removeClass('template');
+			$('.position', r).html(i+1);
+			$('.user', r).html(rank.name);
+
+			for (var alias in rank.problems) {
+				if (!rank.problems.hasOwnProperty(alias)) continue;
+				
+				$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
+				$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
+			}
+
+			$('.points', r).html(rank.total.points);
+			$('.penalty', r).html(rank.total.penalty);
+			$('#ranking tbody').append(r);
+		}
+	}
 });
