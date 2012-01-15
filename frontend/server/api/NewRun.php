@@ -259,6 +259,7 @@ class NewRun extends ApiHandler
     	if( $memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
     	{
     		$memcache->delete(Scoreboard::MEMCACHE_KEY, 0);
+    		$memcache->delete(Scoreboard::MEMCACHE_EVENTS_KEY, 0);
     	}
     }
 }
