@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	var omegaup = new OmegaUp();
 	var problems = {};
-	var activeTab = 'summary';
+	var activeTab = 'problems';
 	var currentProblem = null;
 	var currentRanking = [];
 	var startTime = null;
@@ -29,7 +29,6 @@ $(document).ready(function() {
 			$('<th colspan="2"></th>').html('<a href="#problems/' + problem.alias + '">' + problem.alias + '</a>').insertBefore('#ranking thead th.total');
 			$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
 			$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
-			console.log(problem);
 		}
 
 		omegaup.getRanking(contestAlias, rankingChange);
@@ -118,6 +117,7 @@ $(document).ready(function() {
 			$('#problem-list .problem_' + problem.alias).addClass('active');
 
 			function update(problem) {
+				$('#summary').hide();
 				$('#problem').show();
 				$('#problem > .title').html(problem.title);
 				$('#problem .data .points').html(problem.points);
@@ -162,6 +162,11 @@ $(document).ready(function() {
 				$('#submit').show();
 				$('#overlay').show();
 			}
+		} else if (activeTab == 'problems') {
+			$('#problem').hide();
+			$('#summary').show();
+			$('#problem-list .active').removeClass('active');
+			$('#problem-list .summary').addClass('active');
 		}
 
 		if (tabChanged) {

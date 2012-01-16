@@ -24,19 +24,16 @@
 				<div class="clock">0:00:00</div>
 			</div>
 			<ul class="tabs">
-				<li><a href="#summary" class="active">Resumen</a></li>
-				<li><a href="#problems">Problemas</a></li>
+				<li><a href="#problems" class="active">Problemas</a></li>
 				<li><a href="#ranking">Ranking</a></li>
 				<li><a href="#clarifications">Clarificaciones</a></li>
 			</ul>
-			<div id="summary" class="tab">
-				<h2 class="title"></h2>
-				<p class="description"></p>
-				<div id="graph"></div>
-			</div>
 			<div id="problems" class="tab navleft">
 				<div class="navbar">
 					<div id="problem-list">
+						<div class="summary">
+							<a class="name" href="#problems">Resumen</a>
+						</div>
 						<div class="template">
 							<a class="name"></a>
 							<span class="solved"></span>
@@ -59,6 +56,10 @@
 							</tr>
 						</tbody>
 					</table>
+				</div>
+				<div id="summary" class="main">
+					<h1 class="title"></h1>
+					<p class="description"></p>
 				</div>
 				<div id="problem" class="main">
 					<h1 class="title"></h1>
