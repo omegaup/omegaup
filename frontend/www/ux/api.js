@@ -148,3 +148,15 @@ OmegaUp.prototype.getRanking = function(contestAlias, callback) {
 		'json'
 	);
 };
+
+OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/contests/' + contestAlias + '/ranking/events/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
