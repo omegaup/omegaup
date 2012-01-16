@@ -17,16 +17,20 @@ $(document).ready(function() {
 		startTime = contest.start_time;
 		finishTime = contest.finish_time;
 
+		var letter = 65;
+
 		for (var idx in contest.problems) {
 			var problem = contest.problems[idx];
 
 			problems[problem.alias] = problem;
 
+			problem.letter = String.fromCharCode(letter);
+
 			var prob = $('#problem-list .template').clone().removeClass('template').addClass('problem_' + problem.alias);
-			$('.name', prob).attr('href', '#problems/' + problem.alias).html(problem.title);
+			$('.name', prob).attr('href', '#problems/' + problem.alias).html(String.fromCharCode(letter) + '. ' + problem.title);
 			$('#problem-list').append(prob);
 
-			$('<th colspan="2"><a href="#problems/' + problem.alias + '">' + problem.alias + '</a></th>').insertBefore('#ranking thead th.total');
+			$('<th colspan="2"><a href="#problems/' + problem.alias + '" title="' + problem.alias + '">' + String.fromCharCode(letter++) + '</a></th>').insertBefore('#ranking thead th.total');
 			$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
 			$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
 		}
@@ -51,6 +55,7 @@ $(document).ready(function() {
 		if (e.target.id === 'overlay' || e.target.id === 'close') {
 			$('#overlay').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+			return false;
 		}
 	});
 
@@ -126,7 +131,7 @@ $(document).ready(function() {
 			function update(problem) {
 				$('#summary').hide();
 				$('#problem').show();
-				$('#problem > .title').html(problem.title);
+				$('#problem > .title').html(problem.letter + '. ' + problem.title);
 				$('#problem .data .points').html(problem.points);
 				$('#problem .validator').html(problem.validator);
 				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
