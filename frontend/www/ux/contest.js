@@ -22,13 +22,14 @@ $(document).ready(function() {
 
 			problems[problem.alias] = problem;
 
-			var prob = $('#problem-list .template').clone().removeClass('template');
+			var prob = $('#problem-list .template').clone().removeClass('template').addClass('problem_' + problem.alias);
 			$('.name', prob).attr('href', '#problems/' + problem.alias).html(problem.title);
 			$('#problem-list').append(prob);
 
-			$('<th colspan="2"></th>').html(problem.alias).insertBefore('#ranking thead th.total');
+			$('<th colspan="2"></th>').html('<a href="#problems/' + problem.alias + '">' + problem.alias + '</a>').insertBefore('#ranking thead th.total');
 			$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
 			$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
+			console.log(problem);
 		}
 
 		omegaup.getRanking(contestAlias, rankingChange);
@@ -113,10 +114,13 @@ $(document).ready(function() {
 			var newRun = problem[2];
 			currentProblem = problem = problems[problem[1]];
 
+			$('#problem-list .active').removeClass('active');
+			$('#problem-list .problem_' + problem.alias).addClass('active');
+
 			function update(problem) {
 				$('#problem').show();
 				$('#problem > .title').html(problem.title);
-				$('#problem > .points').html(problem.points);
+				$('#problem .data .points').html(problem.points);
 				$('#problem .validator').html(problem.validator);
 				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 				$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
@@ -186,13 +190,17 @@ $(document).ready(function() {
 				
 				$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
 				$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
+
+				if (rank.username == omegaup.username) {
+					$('#problems .problem_' + alias + ' .solved').html("(" + rank.problems[alias].points + " / " + problems[alias].points + ")");
+				}
 			}
 
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
 			$('#ranking tbody').append(r);
 
-			if (i < 20) {
+			if (i < 10) {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 				$('.position', r).html(i+1);

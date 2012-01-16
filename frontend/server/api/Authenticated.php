@@ -31,7 +31,9 @@ class Authenticated extends ApiHandler {
 
 	protected function GenerateResponse() 
 	{
-		if (!$this->authenticated) {
+		if ($this->authenticated) {
+			$this->addResponse('username', $this->_user_username);
+		} else {
 			$this->addResponse('login_url', '/nativeLogin.php');
 			$this->addResponse('status', 'error');
 			$this->addResponse('error', 'Not authenticated');
