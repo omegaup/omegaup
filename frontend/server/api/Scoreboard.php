@@ -5,11 +5,13 @@
  * 
  */
 
+require_once(SERVER_PATH . '/libs/Cache.php');
+
 class Scoreboard 
 {
     // Column to return total score per user
     const total_column = "total";
-    const MEMCACHE_KEY = "scoreboard";
+    const MEMCACHE_PREFIX = "scoreboard";
     
     // Contest's data
     private $data;
@@ -33,17 +35,8 @@ class Scoreboard
 
     public function generate()
     {
-        $memcache = new Memcache;
-		if( !$memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
-		{
-			$memcache = null;
-		}
-
-		$result = null;
-		if( $memcache != null )
-		{
-			$result = $memcache->get(self::MEMCACHE_KEY);
-		}
+    	$cache = new Cache(self::MEMCACHE_PREFIX);
+		$result = $cache->get($this->contest_id);
 		
 		if( $result == null )
 		{
@@ -93,14 +86,10 @@ class Scoreboard
 	        // Sort users by their total column
 	        usort($result, array($this, 'compareUserScores'));
 	         
-	        // Cache scoreboard if a memcache connection is available
-	        if( $memcache )
-	        {
-	        	$memcache->set(self::MEMCACHE_KEY, $result, 0, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
-	        }
+	        $cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
 		}
 
-	    	$this->data = $result;
+	    $this->data = $result;
 		return $this->data;                
     }
     
