@@ -10,6 +10,7 @@ RewriteRule ^contests/?$ /arena/CallApiLoader.php?apicmd=ShowContests [L]
 RewriteRule ^contests/new/?$ /arena/CallApiLoader.php?apicmd=NewContest [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowContest&contest_alias=$1 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/?$ /arena/CallApiLoader.php?apicmd=ShowScoreboard&contest_alias=$1 [L]
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/events/?$ /arena/CallApiLoader.php?apicmd=ShowScoreboardEvents&contest_alias=$1 [L]
 
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemInContest&contest_alias=$1&problem_alias=$2 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/new/?$ /arena/CallApiLoader.php?apicmd=NewProblemInContest&contest_alias=$1 [L]

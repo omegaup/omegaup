@@ -12,6 +12,7 @@ class Scoreboard
     // Column to return total score per user
     const total_column = "total";
     const MEMCACHE_PREFIX = "scoreboard";
+    const MEMCACHE_EVENTS_PREFIX = "scoreboard_events";
     
     // Contest's data
     private $data;
@@ -30,8 +31,6 @@ class Scoreboard
     {
         return $this->countProblemsInContest;
     }
-
-
 
     public function generate()
     {
@@ -86,6 +85,110 @@ class Scoreboard
 	        // Sort users by their total column
 	        usort($result, array($this, 'compareUserScores'));
 	         
+	        $cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
+		}
+
+	    $this->data = $result;
+		return $this->data;                
+    }
+
+    public function events()
+    {
+        $cache = new Cache(self::MEMCACHE_EVENTS_PREFIX);
+		$result = $cache->get($this->contest_id);
+		
+		if( $result == null )
+		{
+	        try
+	        {
+	            // Get all distinct contestants participating in the contest given contest_id
+	            $raw_contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id);                             
+	                        
+	            // Get all problems given contest_id
+		    $raw_contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
+
+		    $run = new Runs();
+		    $run->setContestId($this->contest_id);
+		    $run->setStatus('ready');
+
+		    $contest_runs = RunsDAO::search($run, 'submit_delay');
+	        }
+	        catch(Exception $e)
+	        {
+	            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+		}
+
+		$contest_users = array();
+		$contest_problems = array();
+
+		foreach ($raw_contest_users as $user)
+		{
+			$contest_users[$user->getUserId()] = $user;
+		}
+
+
+		foreach ($raw_contest_problems as $problem)
+		{
+			$contest_problems[$problem->getProblemId()] = $problem;
+		}
+
+	        $result = array();
+	        
+	        // Save the number of problems internally
+		$this->countProblemsInContest = count($contest_problems);
+
+		$user_problems_score = array();
+	        
+	        // Calculate score for each contestant x problem
+	        foreach ($contest_runs as $run)
+		{
+			if (!isset($user_problems_score[$run->getUserId()]))
+			{
+				$user_problems_score[$run->getUserId()] = array();
+			}
+
+			if (!isset($user_problems_score[$run->getUserId()][$run->getProblemId()]))
+			{
+				$user_problems_score[$run->getUserId()][$run->getProblemId()] = array('points'=>0,'penalty'=>0);
+			}
+
+			if ($user_problems_score[$run->getUserId()][$run->getProblemId()]['points'] >= $run->getContestScore())
+			{
+				continue;
+			}
+
+			$user_problems_score[$run->getUserId()][$run->getProblemId()]['points'] = $run->getContestScore();
+			$user_problems_score[$run->getUserId()][$run->getProblemId()]['penalty'] = 0;
+
+			$data = array();
+			$user = $contest_users[$run->getUserId()];
+
+			$data['name'] = $user->getName() ? $user->getName() : $user->getUsername();
+			$data['username'] = $user->getUsername();
+			$data['delta'] = (int)$run->getSubmitDelay();
+
+			$data['problem'] = array(
+				'alias' => $contest_problems[$run->getProblemId()]->getAlias(),
+				'points' => $run->getContestScore(),
+				'penalty' => 0
+			);
+
+			$data['total'] = array(
+				'points' => 0,
+				'penalty' => 0
+			);
+
+			foreach ($user_problems_score[$run->getUserId()] as $problem)
+			{
+				$data['total']['points'] += $problem['points'];
+				$data['total']['penalty'] += $problem['penalty'];
+			}
+
+	            // Add contestant results to scoreboard data
+	            array_push($result, $data);
+	        }
+	        
+	        // Cache scoreboard if a memcache connection is available
 	        $cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
 		}
 

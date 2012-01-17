@@ -107,7 +107,6 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 								<ul >
 									<li><a href='../index.php'>Regresar a omegaup</a></li>
 									<li><a href='contests.php'>Concursos</a></li>
-									<li><a href='server.php'>Servidor</a></li>
 									<li><a href='users.php'>Usuarios</a></li>
 									<li><a href='probs.php'>Problemas</a></li>
 									<li><input type='text' placeholder='Buscar'></li>

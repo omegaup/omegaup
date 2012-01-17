@@ -110,6 +110,11 @@ class ApiLoader
                 $api = new ShowScoreboard();
                 break;
             
+            case 'ShowScoreboardEvents':
+                require_once('ShowScoreboardEvents.php');
+                $api = new ShowScoreboardEvents();
+                break;
+            
             case 'UpdateClarification':
                 require_once('UpdateClarification.php');
                 $api = new UpdateClarification();

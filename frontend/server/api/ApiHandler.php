@@ -18,6 +18,7 @@ abstract class ApiHandler
     private $_response = array();
     
     // Cache of who calls the API
+    protected $_user_username;
     protected $_user_id;
             
     // Cache of auth token
@@ -37,6 +38,7 @@ abstract class ApiHandler
 			return;
         }
 
+		$this->_user_username = $current_user->getUsername();
 		$this->_user_id = $current_user->getUserId();
 	}
 

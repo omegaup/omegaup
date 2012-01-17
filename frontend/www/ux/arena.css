@@ -76,6 +76,33 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
     padding: 1em;
 }
 
+#problems #mini-ranking {
+	width: 100%;
+	margin-top: 2em;
+}
+
+#problems #mini-ranking td {
+	border: 1px solid #000;
+	padding: 0.2em;
+}
+
+#problems #mini-ranking th {
+	padding: 0.2em;
+}
+
+#problems #mini-ranking .position,
+#problems #mini-ranking .points,
+#problems #mini-ranking .penalty {
+	text-align: center;
+}
+
+#problems #mini-ranking .user {
+	max-width: 7em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 #problem {
 	background: #fff;
 	padding: 1em;

@@ -1,10 +1,12 @@
 function OmegaUp() {
 	var self = this;
+	this.username = null;
 
 	this.deltaTime = 0;
 	this.authenticated(function(data) {
 		if (data.status == 'ok') {
 			self.syncTime();
+			self.username = data.username;
 		} else {
 			window.location = data.login_url;
 		}
@@ -140,6 +142,18 @@ OmegaUp.prototype.getRanking = function(contestAlias, callback) {
 
 	$.get(
 		'/arena/contests/' + contestAlias + '/ranking/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
+OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/contests/' + contestAlias + '/ranking/events/',
 		function (data) {
 			callback(data);
 		},

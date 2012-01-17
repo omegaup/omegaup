@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	var omegaup = new OmegaUp();
 	var problems = {};
-	var activeTab = 'summary';
+	var activeTab = 'problems';
 	var currentProblem = null;
 	var currentRanking = [];
 	var startTime = null;
@@ -11,25 +11,35 @@ $(document).ready(function() {
 
 	omegaup.getContest(contestAlias, function(contest) {
 		$('#title .contest-title').html(contest.title);
+		$('#summary .title').html(contest.title);
+		$('#summary .description').html(contest.description);
 
 		startTime = contest.start_time;
 		finishTime = contest.finish_time;
+
+		var letter = 65;
 
 		for (var idx in contest.problems) {
 			var problem = contest.problems[idx];
 
 			problems[problem.alias] = problem;
 
-			var prob = $('#problem-list .template').clone().removeClass('template');
-			$('.name', prob).attr('href', '#problems/' + problem.alias).html(problem.title);
+			problem.letter = String.fromCharCode(letter);
+
+			var prob = $('#problem-list .template').clone().removeClass('template').addClass('problem_' + problem.alias);
+			$('.name', prob).attr('href', '#problems/' + problem.alias).html(String.fromCharCode(letter) + '. ' + problem.title);
 			$('#problem-list').append(prob);
 
-			$('<th colspan="2"></th>').html(problem.alias).insertBefore('#ranking thead th.total');
+			$('<th colspan="2"><a href="#problems/' + problem.alias + '" title="' + problem.alias + '">' + String.fromCharCode(letter++) + '</a></th>').insertBefore('#ranking thead th.total');
 			$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
 			$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
 		}
 
 		omegaup.getRanking(contestAlias, rankingChange);
+		setInterval(function() { omegaup.getRanking(contestAlias, rankingChange); }, 5 * 60 * 1000);
+
+		omegaup.getRankingEvents(contestAlias, rankingEvents);
+		setInterval(function() { omegaup.getRankingEvents(contestAlias, rankingEvents); }, 5 * 60 * 1000);
 
 		updateClock();
 		setInterval(updateClock, 1000);
@@ -45,6 +55,7 @@ $(document).ready(function() {
 		if (e.target.id === 'overlay' || e.target.id === 'close') {
 			$('#overlay').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+			return false;
 		}
 	});
 
@@ -73,7 +84,10 @@ $(document).ready(function() {
 						$('.time', r).html(run.time);
 						$('.language', r).html(run.language);
 
-						if (run.status != 'ready') {
+						if (run.status == 'ready') {
+							omegaup.getRanking(contestAlias, rankingChange);
+							omegaup.getRankingEvents(contestAlias, rankingEvents);
+						} else {
 							updateRun(guid, orig_run);
 						}
 					});
@@ -111,10 +125,14 @@ $(document).ready(function() {
 			var newRun = problem[2];
 			currentProblem = problem = problems[problem[1]];
 
+			$('#problem-list .active').removeClass('active');
+			$('#problem-list .problem_' + problem.alias).addClass('active');
+
 			function update(problem) {
+				$('#summary').hide();
 				$('#problem').show();
-				$('#problem > .title').html(problem.title);
-				$('#problem > .points').html(problem.points);
+				$('#problem > .title').html(problem.letter + '. ' + problem.title);
+				$('#problem .data .points').html(problem.points);
 				$('#problem .validator').html(problem.validator);
 				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 				$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
@@ -156,6 +174,11 @@ $(document).ready(function() {
 				$('#submit').show();
 				$('#overlay').show();
 			}
+		} else if (activeTab == 'problems') {
+			$('#problem').hide();
+			$('#summary').show();
+			$('#problem-list .active').removeClass('active');
+			$('#problem-list .summary').addClass('active');
 		}
 
 		if (tabChanged) {
@@ -166,8 +189,13 @@ $(document).ready(function() {
 		}
 	});
 
+	function rankingEvents(data) {
+		console.log(data);
+	}
+
 	function rankingChange(data) {
 		$('#ranking tbody tr.inserted').remove();
+		$('#mini-ranking tbody tr.inserted').remove();
 
 		var ranking = data.ranking;
 
@@ -183,18 +211,29 @@ $(document).ready(function() {
 				
 				$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
 				$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
+
+				if (rank.username == omegaup.username) {
+					$('#problems .problem_' + alias + ' .solved').html("(" + rank.problems[alias].points + " / " + problems[alias].points + ")");
+				}
 			}
 
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
 			$('#ranking tbody').append(r);
+
+			if (i < 10) {
+				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
+
+				$('.position', r).html(i+1);
+				$('.user', r).html(rank.name);
+				$('.points', r).html(rank.total.points);
+				$('.penalty', r).html(rank.total.penalty);
+
+				$('#mini-ranking tbody').append(r);
+			}
 		}
 
 		currentRanking = ranking;
-
-		setTimeout(function() { 
-			omegaup.getRanking(contestAlias, rankingChange);
-		}, 5 * 60 * 1000);
 	}
 	
 	function updateClock() {
