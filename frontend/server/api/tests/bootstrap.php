@@ -41,12 +41,14 @@
 
         }
         
-        if( !initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_TEST_DB_NAME) )
+        $errors = initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_TEST_DB_NAME); 
+        if( $errors )
         {
           die(json_encode(array(
             "status" => "error",
             "error" => "Failed to initialize the testing database from the source databse",
-            "errorcode" => 3
+            "errorcode" => 3,
+            "database_errors" => $errors
           )));
         }
     } 
@@ -86,32 +88,46 @@
     $tables           = $tables_recordset->GetArray();
 
     $testing->BeginTrans();
-    $ok = true;
+    $errors = array();
+    
     foreach( $tables as $table_name )
     {
         $table_name   = $table_name[0];
-        $ok           = $ok && $testing->Execute("DROP TABLE IF EXISTS $table_name CASCADE");
+        try
+        {
+	        $testing->Execute("DROP TABLE IF EXISTS $table_name CASCADE");
+        }
+        catch(ADODB_Exception $e)
+        {
+        	$errors[] = array('sql' => $e->sql,
+        	                  'msg' => $e->msg);
+        }
     }
 
-    if( !$ok )
+    if( $errors )
     {
       $testing->RollbackTrans();
 
       $testing->Close();
       $source->Close();
 
-      return false;
+      return $errors;
     }
     
     foreach( $tables as $table_name )
     {
         $table_name   = $table_name[0];
         $source_name  = $source_db.".".$table_name;
-        $create       = $testing->Execute("CREATE TABLE $table_name LIKE $source_name");
-        if(!$create) {
-            $error    = true;
+        try
+        {
+        	$testing->Execute("CREATE TABLE $table_name LIKE $source_name");
+        	$insert   = $testing->Execute("INSERT INTO $table_name SELECT * FROM $source_name");
         }
-        $insert       = $testing->Execute("INSERT INTO $table_name SELECT * FROM $source_name");
+     	catch(ADODB_Exception $e)
+        {
+        	$errors[] = array('sql' => $e->sql,
+        	                  'msg' => $e->msg);
+        }
     }
 
     $testing->CommitTrans();
@@ -119,5 +135,5 @@
     $testing->Close();
     $source->Close();
     
-    return !isset($error) ? true : false;
+    return $errors;
   }
