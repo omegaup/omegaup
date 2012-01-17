@@ -5,7 +5,7 @@ class Cache
 	protected $prefix;
 	protected $memcache;
 	
-	public function __construct($prefix)
+	public function __construct($prefix = '')
 	{
 		$this->prefix = $prefix;
 		
@@ -24,36 +24,37 @@ class Cache
 		}
 	}
 	
-	public function set($key, $value, $timeout)
+	public function set($key, $value, $timeout, $prefix = null)
 	{
 		if( $this->memcache != null )
 		{
-			$this->memcache->add($this->getKey($key), $value, 0, $timeout);
+			$this->memcache->add($this->getKey($key, $prefix), $value, 0, $timeout);
 		}
 	}
 	
-	public function delete($key)
+	public function delete($key, $prefix = null)
 	{
 		if( $this->memcache != null )
 		{
-			$this->memcache->delete($this->getKey($key), 0);
+			$this->memcache->delete($this->getKey($key, $prefix), 0);
 		}
 	}
 	
-	public function get($key)
+	public function get($key, $prefix = null)
 	{
 		$result = null;
 		if( $this->memcache != null )
 		{
-			$result = $this->memcache->get($this->getKey($key));
+			$result = $this->memcache->get($this->getKey($key, $prefix));
 		}
 		
 		return $result;
 	}
 	
-	private function getKey($key)
+	private function getKey($key, $prefix)
 	{
-		$prefix = $this->prefix;
+		if( $prefix == null )
+			$prefix = $this->prefix;
 		return "$prefix:$key";
 	}
 }

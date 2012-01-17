@@ -256,8 +256,9 @@ class NewRun extends ApiHandler
     
     private function InvalidateScoreboardCache($contest_id)
     {
-    	$cache = new Cache(Scoreboard::MEMCACHE_PREFIX);
-    	$cache->delete($contest_id);
+    	$cache = new Cache();
+    	$cache->delete($contest_id, Scoreboard::MEMCACHE_PREFIX);
+    	$cache->delete($contest_id, Scoreboard::MEMCACHE_EVENTS_PREFIX);
     }
 }
 

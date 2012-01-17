@@ -214,17 +214,6 @@ class OmegaupComponentPage extends StdComponentPage{
 				
 				    <div class="post footer">
 					&nbsp;
-					<!--
-						<div id="fb-root"></div>
-						
-						<div id="fb-login-button" style="padding:5px">
-							<fb:login-button
-								scope="email"
-								onlogin="loginWithFaceook"
-							> Iniciar sesion con Facebook </fb:login-button>
-						</div>
-					-->
-						
 				    </div>
 					<!-- .post footer -->
 

@@ -121,23 +121,10 @@
 	 * Load the rest of the base classes
 	 * 
 	 * */
-	require_once( "gui.php" );
-	
 	require_once( "definitions.php" );
 	require_once( "libs/GUI/GUI.inc.php" );
 	
-	
-	/*
-	 * Load theme onto $GUI which is the variable 
-	 * used in the frontend rendering, so changing
-	 * a theme would be as painless as possible.
-	 * 
-	 * @TODO this should be loaded according to the theme specified in the config file, it might even be loaded via specific user value in the database
-	 * 
-	 * */
-	$GUI = new ClassicTheme();
-	
-	
+
 	
 	
 	/*
