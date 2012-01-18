@@ -16,7 +16,10 @@ class ProblemContentsZipValidator extends Validator
         $this->casesFiles = array();
         
         $zip = new ZipArchive();        
-        $resource = $zip->open($value);
+	$resource = $zip->open($value);
+
+	$maximumSize = 256 * 1024 * 1024;
+	$size = 0;
         
         if($resource === TRUE)
         {            
@@ -24,7 +27,14 @@ class ProblemContentsZipValidator extends Validator
             for($i = 0; $i < $zip->numFiles; $i++)
             {
                 $zipFilesArray[] = $zip->getNameIndex($i);
-            }
+                $size += $zip->statIndex($i)['size'];
+	    }
+
+	    if ($size > $maximumSize)
+	    {
+                $this->setError("Extracted zip over 256MB. Rejecting.");
+                return false;
+	    }
 
             // Look for testplan
             if(in_array("testplan", $zipFilesArray))
