@@ -141,7 +141,7 @@ abstract class ClarificationsDAOBase extends DAO
 	  **/
 	public static final function search( $Clarifications , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Clarifications WHERE ("; 
+		$sql = "SELECT c.*, p.alias as problem_alias from Clarifications AS c LEFT JOIN Problems AS p ON p.problem_id = c.problem_id WHERE ("; 
 		$val = array();
 		if( $Clarifications->getClarificationId() != NULL){
 			$sql .= " clarification_id = ? AND";
@@ -149,7 +149,7 @@ abstract class ClarificationsDAOBase extends DAO
 		}
 
 		if( $Clarifications->getAuthorId() != NULL){
-			$sql .= " author_id = ? AND";
+			$sql .= " c.author_id = ? AND";
 			array_push( $val, $Clarifications->getAuthorId() );
 		}
 
@@ -179,7 +179,7 @@ abstract class ClarificationsDAOBase extends DAO
 		}
 
 		if( $Clarifications->getPublic() != NULL){
-			$sql .= " public = ? AND";
+			$sql .= " c.public = ? AND";
 			array_push( $val, $Clarifications->getPublic() );
 		}
 

@@ -3,11 +3,11 @@ $(document).ready(function() {
 	var problems = {};
 	var activeTab = 'problems';
 	var currentProblem = null;
-	var currentRanking = [];
+	var currentRanking = {};
 	var startTime = null;
 	var finishTime = null;
 
-	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+	var contestAlias = 'prueba'; // /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
 	omegaup.getContest(contestAlias, function(contest) {
 		$('#title .contest-title').html(contest.title);
@@ -21,14 +21,17 @@ $(document).ready(function() {
 
 		for (var idx in contest.problems) {
 			var problem = contest.problems[idx];
+			var problemName = String.fromCharCode(letter) + '. ' + problem.title;
 
 			problems[problem.alias] = problem;
 
 			problem.letter = String.fromCharCode(letter);
 
 			var prob = $('#problem-list .template').clone().removeClass('template').addClass('problem_' + problem.alias);
-			$('.name', prob).attr('href', '#problems/' + problem.alias).html(String.fromCharCode(letter) + '. ' + problem.title);
+			$('.name', prob).attr('href', '#problems/' + problem.alias).html(problemName);
 			$('#problem-list').append(prob);
+
+			$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
 
 			$('<th colspan="2"><a href="#problems/' + problem.alias + '" title="' + problem.alias + '">' + String.fromCharCode(letter++) + '</a></th>').insertBefore('#ranking thead th.total');
 			$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
@@ -41,6 +44,9 @@ $(document).ready(function() {
 		omegaup.getRankingEvents(contestAlias, rankingEvents);
 		setInterval(function() { omegaup.getRankingEvents(contestAlias, rankingEvents); }, 5 * 60 * 1000);
 
+		omegaup.getClarifications(contestAlias, clarificationsChange);
+		setInterval(function() { omegaup.getClarifications(contestAlias, clarificationsChange); }, 5 * 60 * 1000);
+
 		updateClock();
 		setInterval(updateClock, 1000);
 
@@ -51,9 +57,9 @@ $(document).ready(function() {
 	        $('#root').fadeIn('slow');
 	});
 
-	$('#overlay, #close').click(function(e) {
-		if (e.target.id === 'overlay' || e.target.id === 'close') {
-			$('#overlay').hide();
+	$('#overlay, .close').click(function(e) {
+		if (e.target.id === 'overlay' || e.target.className === 'close') {
+			$('#overlay, #submit #clarification').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
 			return false;
 		}
@@ -103,12 +109,22 @@ $(document).ready(function() {
 		return false;
 	});
 
+	$('#clarification').submit(function (e) {
+		omegaup.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
+			$('#overlay').hide();
+			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+			omegaup.getClarifications(contestAlias, clarificationsChange);
+		});
+
+		return false;
+	});
+
 	$(window).hashchange(function(e) {
 		var tabChanged = false;
 		var tabs = ['summary', 'problems', 'ranking', 'clarifications'];
 
 		for (var i = 0; i < 4; i++) {
-			if (window.location.hash == '#' + tabs[i]) {
+			if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
 				tabChanged = activeTab != tabs[i];
 				activeTab = tabs[i];
 
@@ -119,9 +135,6 @@ $(document).ready(function() {
 		var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
 
 		if (problem && problems[problem[1]]) {
-			tabChanged = activeTab != 'problems';
-			activeTab = 'problems';
-
 			var newRun = problem[2];
 			currentProblem = problem = problems[problem[1]];
 
@@ -179,6 +192,11 @@ $(document).ready(function() {
 			$('#summary').show();
 			$('#problem-list .active').removeClass('active');
 			$('#problem-list .summary').addClass('active');
+		} else if (activeTab == 'clarifications') {
+			if (window.location.hash == '#clarifications/new') {
+				$('#overlay form').hide();
+				$('#overlay, #clarification').show();
+			}
 		}
 
 		if (tabChanged) {
@@ -190,19 +208,28 @@ $(document).ready(function() {
 	});
 
 	function rankingEvents(data) {
-		console.log(data);
 	}
 
 	function rankingChange(data) {
-		$('#ranking tbody tr.inserted').remove();
 		$('#mini-ranking tbody tr.inserted').remove();
 
+		drawChart();
+
 		var ranking = data.ranking;
+		var newRanking = {};
 
 		for (var i = 0; i < ranking.length; i++) {
 			var rank = ranking[i];
+			newRanking[rank.name] = i;
 
-			var r = $('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
+			if (currentRanking[rank.name] === undefined) {
+				currentRanking[rank.name] = $('#ranking tbody tr.inserted').length;
+				$('#ranking tbody').append(
+					$('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
+				);
+			}
+
+			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.name]];
 			$('.position', r).html(i+1);
 			$('.user', r).html(rank.name);
 
@@ -217,9 +244,12 @@ $(document).ready(function() {
 				}
 			}
 
+			if (parseInt($('.points', r)) < parseInt(rank.total.points)) {
+				r.addClass('rank-up');
+			}
+
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
-			$('#ranking tbody').append(r);
 
 			if (i < 10) {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
@@ -233,45 +263,73 @@ $(document).ready(function() {
 			}
 		}
 
-		currentRanking = ranking;
+		currentRanking = newRanking;
 	}
 	
 	function updateClock() {
-			var date = new Date().getTime();
-			var clock = "";
+		var date = new Date().getTime();
+		var clock = "";
 
-			if (date < startTime.getTime()) {
-					clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
-			} else if (date > finishTime.getTime()) {
-					clock = "00:00:00";
-			} else {
-					clock = formatDelta(finishTime.getTime() - (date + omegaup.deltaTime));
-			}
+		if (date < startTime.getTime()) {
+				clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
+		} else if (date > finishTime.getTime()) {
+				clock = "00:00:00";
+		} else {
+				clock = formatDelta(finishTime.getTime() - (date + omegaup.deltaTime));
+		}
 
-			$('#title .clock').html(clock);
+		$('#title .clock').html(clock);
 	}
 
 	function formatDelta(delta) {
-			var days = Math.floor(delta / (24 * 60 * 60 * 1000));
-			delta -= days * (24 * 60 * 60 * 1000);
-			var hours = Math.floor(delta / (60 * 60 * 1000));
-			delta -= hours * (60 * 60 * 1000);
-			var minutes = Math.floor(delta / (60 * 1000));
-			delta -= minutes * (60 * 1000);
-			var seconds = Math.floor(delta / 1000);
+		var days = Math.floor(delta / (24 * 60 * 60 * 1000));
+		delta -= days * (24 * 60 * 60 * 1000);
+		var hours = Math.floor(delta / (60 * 60 * 1000));
+		delta -= hours * (60 * 60 * 1000);
+		var minutes = Math.floor(delta / (60 * 1000));
+		delta -= minutes * (60 * 1000);
+		var seconds = Math.floor(delta / 1000);
 
-			var clock = "";
+		var clock = "";
 
-			if (days > 0) {
-					clock += days + ":";
-			}
-			if (hours < 10) clock += "0";
-			clock += hours + ":";
-			if (minutes < 10) clock += "0";
-			clock += minutes + ":";
-			if (seconds < 10) clock += "0";
-			clock += seconds;
+		if (days > 0) {
+			clock += days + ":";
+		}
+		if (hours < 10) clock += "0";
+		clock += hours + ":";
+		if (minutes < 10) clock += "0";
+		clock += minutes + ":";
+		if (seconds < 10) clock += "0";
+		clock += seconds;
 
-			return clock;
+		return clock;
+	}
+
+	function clarificationsChange(data) {
+		$('.clarifications tr.inserted').remove();
+
+		for (var i = 0; i < data.clarifications.length; i++) {
+			var clarification = data.clarifications[i];
+
+			var r = $('.clarifications tbody tr.template').clone().removeClass('template').addClass('inserted');
+
+			$('.problem', r).html(clarification.problem_alias);
+			$('.time', r).html(clarification.time);
+			$('.message', r).html(clarification.message);
+			$('.answer', r).html(clarification.answer);
+
+			$('.clarifications tbody').append(r);
+		}
+	}
+	
+	function drawChart() {
+		drawLineChart({
+			element: 'ranking-chart',
+	    		labels: [new Date("17 Jan 2012 4:15"), new Date("17 Jan 2012 5:15"), new Date("17 Jan 2012 6:15")],
+	    		values: [1, 2, 3],
+	    		colorhue: 0,
+	    		width: 800,
+	    		height: 300
+		});
 	}
 });
