@@ -28,3 +28,11 @@ define("OMEGAUP_GRADER_URL", "https://localhost:21680/grade/");
 
 define('RUNS_PATH',               '/opt/omegaup/omegaup/submissions');	  	
 define('PROBLEMS_PATH',           '/opt/omegaup/omegaup/problems');
+
+# ####################################
+# MEMCACHE CONFIG
+# ####################################	
+define("OMEGAUP_MEMCACHE_HOST",					'localhost');
+define("OMEGAUP_MEMCACHE_PORT", 				11211);
+define("OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT",	60);	// in seconds
+define("OMEGAUP_MEMCACHE_CONTEST_TIMEOUT",		30);	// in seconds	

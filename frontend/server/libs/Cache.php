@@ -1,5 +1,7 @@
 <?php
 
+require_once(SERVER_PATH . '/libs/Logger/Logger.php');
+
 class Cache
 {
 	protected $prefix;
@@ -16,10 +18,13 @@ class Cache
 		else
 		{
 			$this->memcache = new Memcache;
-			if( !$this->memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
+			if( !@$this->memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
 			{
 				$this->memcache = null;
-				/// @todo Log failure to connect to memcache server
+				
+				$msg = "Failed to connect to Memcache server at the specified address: "
+				     . OMEGAUP_MEMCACHE_HOST . ":" .OMEGAUP_MEMCACHE_PORT;
+				Logger::error($msg);
 			}
 		}
 	}
@@ -28,7 +33,7 @@ class Cache
 	{
 		if( $this->memcache != null )
 		{
-			$this->memcache->add($this->getKey($key, $prefix), $value, 0, $timeout);
+			@$this->memcache->add($this->getKey($key, $prefix), $value, 0, $timeout);
 		}
 	}
 	
@@ -36,7 +41,7 @@ class Cache
 	{
 		if( $this->memcache != null )
 		{
-			$this->memcache->delete($this->getKey($key, $prefix), 0);
+			@$this->memcache->delete($this->getKey($key, $prefix), 0);
 		}
 	}
 	
@@ -45,7 +50,7 @@ class Cache
 		$result = null;
 		if( $this->memcache != null )
 		{
-			$result = $this->memcache->get($this->getKey($key, $prefix));
+			@$result = $this->memcache->get($this->getKey($key, $prefix));
 		}
 		
 		return $result;
