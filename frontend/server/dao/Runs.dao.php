@@ -20,6 +20,19 @@ require_once("base/Runs.vo.base.php");
   */
 class RunsDAO extends RunsDAOBase
 {
+	/*
+	 * Gets a boolean indicating whether there are runs that are not ready.
+	 */
+	public static final function PendingRuns($contest_id)
+	{
+		// Build SQL statement.
+		$sql = "SELECT COUNT(*) FROM Runs WHERE contest_id = ? AND status != 'ready'";
+		$val = array($contest_id);
+
+		global $conn;
+		return $conn->GetOne($sql, $val) === 0;
+	}
+
     /*
      * 
      * Get last run of a user
