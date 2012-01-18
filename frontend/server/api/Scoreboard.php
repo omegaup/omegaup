@@ -48,9 +48,12 @@ class Scoreboard
 		{
 	        try
 	        {
-	            // Get all distinct contestants participating in the contest given contest_id
-	            $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id);                             
+		    // Gets whether we can cache this scoreboard.
+		    $cacheable = !RunsDAO::PendingRuns($this->contest_id);
 	                        
+	            // Get all distinct contestants participating in the contest given contest_id
+		    $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id);
+
 	            // Get all problems given contest_id
 	            $contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
 	        }
@@ -93,14 +96,14 @@ class Scoreboard
 	        usort($result, array($this, 'compareUserScores'));
 	         
 	        // Cache scoreboard if a memcache connection is available
-	        if( $memcache )
+	        if( $memcache && $cacheable )
 	        {
 	        	$memcache->set(self::MEMCACHE_KEY, $result, 0, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
 	        }
-		}
+	}
 
-	    	$this->data = $result;
-		return $this->data;                
+    	$this->data = $result;
+	return $this->data;                
     }
 
     public function events()
