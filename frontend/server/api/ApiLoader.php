@@ -73,6 +73,11 @@ class ApiLoader
             case 'NewRun':
                 require_once('NewRun.php');
                 $api = new NewRun();
+		break;
+
+            case 'ShowClarificationsInContest':
+                require_once('ShowClarificationsInContest.php');
+                $api = new ShowClarificationsInContest();
                 break;
             
             case 'ShowClarification':

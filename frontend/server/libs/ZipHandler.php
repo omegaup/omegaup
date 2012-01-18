@@ -8,7 +8,7 @@ class ZipHandler
     {
         if( is_null($pathToZip) )
         {
-            throw new Exception( "Path to ZIP ins null" );
+            throw new Exception( "Path to ZIP is null" );
         }
         
         $zip = new ZipArchive();        

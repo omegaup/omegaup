@@ -46,6 +46,9 @@ class Clarifications extends VO
 			if( isset($data['public']) ){
 				$this->public = $data['public'];
 			}
+			if( isset($data['problem_alias']) ){
+				$this->problem_alias = $data['problem_alias'];
+			}
 		}
 	}
 
@@ -144,6 +147,8 @@ class Clarifications extends VO
 	  * @var tinyint(1)
 	  */
 	protected $public;
+
+	protected $problem_alias;
 
 	/**
 	  * getClarificationId
@@ -291,6 +296,12 @@ class Clarifications extends VO
 	final public function setProblemId( $problem_id )
 	{
 		$this->problem_id = $problem_id;
+	}
+
+
+	final public function getProblemAlias()
+	{
+		return $this->problem_alias;
 	}
 
 	/**

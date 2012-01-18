@@ -160,3 +160,32 @@ OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 		'json'
 	);
 };
+
+OmegaUp.prototype.getClarifications = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/contests/' + contestAlias + '/clarifications/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
+OmegaUp.prototype.newClarification = function(contestAlias, problemAlias, message, callback) {
+	var self = this;
+
+	$.post(
+		'/arena/clarifications/new',
+		{
+			contest_alias: contestAlias,
+			problem_alias: problemAlias,
+			message: message
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};

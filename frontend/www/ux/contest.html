@@ -5,8 +5,10 @@
 		<title>OmegaUp</title>
 		<script type="text/javascript" src="/js/jquery.js"></script>
 		<script type="text/javascript" src="/js/jquery.ba-hashchange.js"></script>
+		<script type="text/javascript" src="/js/jquery.tableSort.js"></script>
 		<script type="text/javascript" src="/js/raphael.js"></script>
 		<script type="text/javascript" src="/ux/api.js"></script>
+		<script type="text/javascript" src="/ux/charts.js"></script>
 		<script type="text/javascript" src="/ux/contest.js"></script>
 		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
@@ -110,30 +112,56 @@
 					</table>
 				</div>
 			</div>
-			<table id="ranking" class="tab">
-				<thead>
-					<tr>
-						<th></th>
-						<th>Usuario</th>
-						<th class="total" colspan="2">Total</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="template">
-						<td class="position"></td>
-						<td class="user"></td>
-						<td class="points"></td>
-						<td class="penalty"></td>
-					</tr>
-				</tbody>
-			</table>
+			<div id="ranking" class="tab">
+                <div id="ranking-chart"></div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Usuario</th>
+                            <th class="total" colspan="2">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="template">
+                            <td class="position"></td>
+                            <td class="user"></td>
+                            <td class="points"></td>
+                            <td class="penalty"></td>
+                        </tr>
+                    </tbody>
+				</table>
+			</div>
 			<div id="clarifications" class="tab">
-				Clarificaciones
+				<table class="clarifications">
+					<caption>Clarificaciones</caption>
+					<thead>
+						<tr>
+							<th>Problema</th>
+							<th>Tiempo</th>
+							<th>Mensaje</th>
+							<th>Respuesta</th>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<td colspan="6"><a href="#clarifications/new">Nueva clarificación</a></td>
+						</tr>
+					</tfoot>
+					<tbody class="clarification-list">
+						<tr class="template">
+							<td class="problem"></td>
+							<td class="time"></td>
+							<td class="message"></td>
+							<td class="answer"></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 		<div id="overlay">
 			<form id="submit" method="POST">
-                                <button id="close">&times;</button>
+                                <button class="close">&times;</button>
 				Lenguaje
 				<select name="language">
 					<option value="c">C</option>
@@ -141,6 +169,14 @@
 					<option value="pascal">Pascal</option>
 				</select><br/>
 				<textarea name="code"></textarea><br/>
+				<input type="submit" />
+			</form>			
+			<form id="clarification" method="POST">
+                                <button class="close">&times;</button>
+				Problema
+				<select name="problem">
+				</select><br/>
+				<textarea name="message"></textarea><br/>
 				<input type="submit" />
 			</form>
 		</div>
