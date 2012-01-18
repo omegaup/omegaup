@@ -12,10 +12,11 @@
  * */
 
 require_once("ApiHandler.php");
+require_once(SERVER_PATH . '/libs/Cache.php');
 
 class ShowContest extends ApiHandler
 {    
-    const MEMCACHE_PREFIX = 'contest_info:';
+    const MEMCACHE_PREFIX = 'contest_info';
     
     protected function RegisterValidatorsToRequest()
     {
@@ -55,18 +56,9 @@ class ShowContest extends ApiHandler
     protected function GenerateResponse() 
     {
     	// Check cache first
-    	$memcache = new Memcache;
-    	if( !$memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
-    	{
-    		$memcache = null;
-    	} 
-    	
-    	$cache_key = self::MEMCACHE_PREFIX . RequestContext::get("contest_alias");
-    	$result = null;
-    	if( $memcache != null )
-    	{
-    		$result = $memcache->get($cache_key);
-    	}
+    	$cache = new Cache(self::MEMCACHE_PREFIX);
+    	$cache_key = RequestContext::get("contest_alias");
+    	$result = $cache->get($cache_key);
     	
     	if( $result == null )
     	{
@@ -145,10 +137,7 @@ class ShowContest extends ApiHandler
 	                
 	        // @TODO Add mini ranking here
 	        
-	    	if( $memcache != null )
-	    	{
-	    		$memcache->set($cache_key, $result, 0, OMEGAUP_MEMCACHE_CONTEST_TIMEOUT);
-	    	}
+	    	$cache->set($cache_key, $result, OMEGAUP_MEMCACHE_CONTEST_TIMEOUT);
 	    	
     	}	// closes if( $result == null )
     	

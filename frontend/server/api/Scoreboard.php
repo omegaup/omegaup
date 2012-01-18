@@ -5,12 +5,14 @@
  * 
  */
 
+require_once(SERVER_PATH . '/libs/Cache.php');
+
 class Scoreboard 
 {
     // Column to return total score per user
     const total_column = "total";
-    const MEMCACHE_KEY = "scoreboard";
-    const MEMCACHE_EVENTS_KEY = "scoreboard_events";
+    const MEMCACHE_PREFIX = "scoreboard";
+    const MEMCACHE_EVENTS_PREFIX = "scoreboard_events";
     
     // Contest's data
     private $data;
@@ -32,17 +34,8 @@ class Scoreboard
 
     public function generate()
     {
-        $memcache = new Memcache;
-		if( !$memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
-		{
-			$memcache = null;
-		}
-
-		$result = null;
-		if( $memcache != null )
-		{
-			$result = $memcache->get(self::MEMCACHE_KEY);
-		}
+    	$cache = new Cache(self::MEMCACHE_PREFIX);
+		$result = $cache->get($this->contest_id);
 		
 		if( $result == null )
 		{
@@ -95,10 +88,10 @@ class Scoreboard
 	        // Sort users by their total column
 	        usort($result, array($this, 'compareUserScores'));
 	         
-	        // Cache scoreboard if a memcache connection is available
-	        if( $memcache && $cacheable )
+	        // Cache scoreboard if there are no pending runs.
+	        if( $cacheable )
 	        {
-	        	$memcache->set(self::MEMCACHE_KEY, $result, 0, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
+	        	$cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
 	        }
 	}
 
@@ -108,22 +101,16 @@ class Scoreboard
 
     public function events()
     {
-        $memcache = new Memcache;
-		if( !$memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
-		{
-			$memcache = null;
-		}
-
-		$result = null;
-		if( $memcache != null )
-		{
-			$result = $memcache->get(self::MEMCACHE_EVENTS_KEY);
-		}
+        $cache = new Cache(self::MEMCACHE_EVENTS_PREFIX);
+		$result = $cache->get($this->contest_id);
 		
 		if( $result == null )
 		{
 	        try
 	        {
+		    // Gets whether we can cache this scoreboard.
+		    $cacheable = !RunsDAO::PendingRuns($this->contest_id);
+
 	            // Get all distinct contestants participating in the contest given contest_id
 	            $raw_contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id);                             
 	                        
@@ -211,15 +198,15 @@ class Scoreboard
 	            array_push($result, $data);
 	        }
 	        
-	        // Cache scoreboard if a memcache connection is available
-	        if( $memcache )
-	        {
-	        	$memcache->set(self::MEMCACHE_EVENTS_KEY, $result, 0, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
-	        }
+		// Cache scoreboard if there are no pending runs
+		if ($cacheable)
+		{
+			$cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
 		}
+	}
 
-	    	$this->data = $result;
-		return $this->data;                
+	$this->data = $result;
+	return $this->data;                
     }
     
     

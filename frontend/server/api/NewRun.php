@@ -15,6 +15,7 @@
 require_once("ApiHandler.php");
 require_once(SERVER_PATH . '/libs/FileHandler.php');
 require_once(SERVER_PATH . '/libs/Grader.php');
+require_once(SERVER_PATH . '/libs/Cache.php');
 require_once("Scoreboard.php");
 
 class NewRun extends ApiHandler
@@ -250,17 +251,14 @@ class NewRun extends ApiHandler
 
         /// @todo Invalidate cache only when this run changes a user's score
         ///       (by improving, adding penalties, etc)
-        $this->InvalidateScoreboardCache();  
+        $this->InvalidateScoreboardCache($contest->getContestId());  
     }
     
-    private function InvalidateScoreboardCache()
+    private function InvalidateScoreboardCache($contest_id)
     {
-    	$memcache = new Memcache;
-    	if( $memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
-    	{
-    		$memcache->delete(Scoreboard::MEMCACHE_KEY, 0);
-    		$memcache->delete(Scoreboard::MEMCACHE_EVENTS_KEY, 0);
-    	}
+    	$cache = new Cache();
+    	$cache->delete($contest_id, Scoreboard::MEMCACHE_PREFIX);
+    	$cache->delete($contest_id, Scoreboard::MEMCACHE_EVENTS_PREFIX);
     }
 }
 
