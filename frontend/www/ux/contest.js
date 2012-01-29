@@ -362,7 +362,9 @@ $(document).ready(function() {
 	function createChart(series, navigatorSeries) {
         window.chart = new Highcharts.StockChart({
             chart: {
-                renderTo: 'ranking-chart'
+                renderTo: 'ranking-chart',
+                height: 300,
+                spacingTop: 20
             },
 
             xAxis: {
@@ -372,6 +374,8 @@ $(document).ready(function() {
             },
 
             yAxis: {
+                showLastLabel: true,
+                showFirstLabel: false,
                 min: 0,
                 max: (function() {
                     var total = 0;
@@ -380,8 +384,24 @@ $(document).ready(function() {
                             total += parseInt(problems[prob].points, 10);
                         }
                     }
-                    return total + 1;
+                    return total;
                 })()
+            },
+            
+            plotOptions: {
+                series: {
+                    lineWidth: 3,
+                    states: {
+                        hover: {
+                            lineWidth: 3
+                        }
+                    },
+                    marker: {
+                        radius: 5,
+                        symbol: 'circle',
+                        lineWidth: 1
+                    }
+                }
             },
 
             navigator: {
