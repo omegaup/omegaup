@@ -3,14 +3,13 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
 .template { display: none; }
 
 #root,
-#problems,
 #problem,
 #ranking,
 #clarifications {
-	display: none
+       display: none
 }
 
-#summary.active { display: block; }
+#problems.active { display: block; }
 
 #title img {
 	position: absolute;
@@ -67,13 +66,43 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
 }
 
 .navleft .main {
-	margin-left: 20em;
+	margin-left: 19em;
 	border: 1px solid #ccc;
 	border-width: 0 0 1px 1px;
 }
 
 .tab {
     padding: 1em;
+}
+
+#problem-list > div {
+		width: 19em;
+        margin-bottom: 0.5em;
+        background: #ddd;
+        border: solid 1px #ccc;
+		border-width: 1px 0 1px 1px;
+		position: relative;
+}
+
+#problem-list > div a {
+        color: #5588DD;
+		display: block;
+		padding: 0.5em;
+		width: 100%;
+}
+
+#problem-list > div.active {
+        background: white;
+}
+
+#problem-list > div.summary {
+		margin-bottom: 1em;
+}
+
+#problem-list > div .solved {
+	position: absolute;
+	top: 0.5em;
+	right: 1em;
 }
 
 #problems #mini-ranking {
@@ -103,11 +132,15 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
 	text-overflow: ellipsis;
 }
 
-#problem {
+#problem, #summary {
 	background: #fff;
 	padding: 1em;
         margin-top: -1.5em;
         margin-right: -1em;
+}
+
+#summary {
+	min-height: 10em;
 }
 
 #problem .title {
@@ -220,13 +253,33 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
         padding: 0.3em 0.5em;
 }
 
-#ranking {
-	width: 98%;
-	margin: 1em auto;
+#ranking table {
+	width: 100%;
+	margin: 0 auto;
 }
 
 #ranking td {
 	text-align: center;
 	border: 1px solid #000;
 	padding: 0.2em;
+}
+
+#ranking th {
+	padding: 0.2em;
+}
+
+#ranking td[class$='points'], #ranking td[class$='penalty'], #ranking td.position {
+	width: 2.5em;
+}
+
+#ranking td[class$='points'], #problems #mini-ranking td.points {
+	border-right-style: dotted;
+}
+
+#ranking td[class$='penalty'], #problems #mini-ranking td.penalty {
+	border-left-width: 0;
+}
+
+#ranking a {
+	color: #5588DD;
 }
