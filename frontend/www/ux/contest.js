@@ -208,12 +208,49 @@ $(document).ready(function() {
 	});
 
 	function rankingEvents(data) {
+        var dataInSeries = {};
+        var navigatorData = [[startTime.getTime(), 0]];
+        var series = [];
+        
+        // group points by person
+        for (var i = 0, l = data.events.length; i < l; i++) {
+            var curr = data.events[i];
+            if (!dataInSeries[curr.name]) {
+                dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+            }
+            dataInSeries[curr.name].push([
+                startTime.getTime() + curr.delta*60*1000,
+                curr.total.points
+            ]);
+            
+            // check if to add to navigator
+            if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
+                navigatorData.push([
+                    startTime.getTime() + curr.delta*60*1000,
+                    curr.total.points
+                ]);
+            }
+        }
+        
+        // convert datas to series
+        for (var i in dataInSeries) {
+            if (dataInSeries.hasOwnProperty(i)) {
+                dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
+                series.push({
+                    name: i,
+                    data: dataInSeries[i],
+                    step: true
+                });
+            }
+        }
+        navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
+        
+        // chart it!
+        createChart(series, navigatorData);
 	}
 
 	function rankingChange(data) {
 		$('#mini-ranking tbody tr.inserted').remove();
-
-		drawChart();
 
 		var ranking = data.ranking;
 		var newRanking = {};
@@ -322,14 +359,46 @@ $(document).ready(function() {
 		}
 	}
 	
-	function drawChart() {
-		drawLineChart({
-			element: 'ranking-chart',
-	    		labels: [new Date("17 Jan 2012 4:15"), new Date("17 Jan 2012 5:15"), new Date("17 Jan 2012 6:15")],
-	    		values: [1, 2, 3],
-	    		colorhue: 0,
-	    		width: 800,
-	    		height: 300
-		});
-	}
+	function createChart(series, navigatorSeries) {
+        window.chart = new Highcharts.StockChart({
+            chart: {
+                renderTo: 'ranking-chart'
+            },
+
+            xAxis: {
+                ordinal: false,
+                min: startTime.getTime(),
+                max: Math.min(finishTime.getTime(), Date.now())
+            },
+
+            yAxis: {
+                min: 0,
+                max: (function() {
+                    var total = 0;
+                    for (var prob in problems) {
+                        if (problems.hasOwnProperty(prob)) {
+                            total += parseInt(problems[prob].points, 10);
+                        }
+                    }
+                    return total + 1;
+                })()
+            },
+
+            navigator: {
+                series: {
+                    type: 'line',
+                    step: true,
+                    lineWidth: 3,
+                    lineColor: '#333',
+                    data: navigatorSeries
+                }
+            },
+
+            rangeSelector: {
+                enabled: false
+            },
+            
+            series: series
+        });
+    }
 });
