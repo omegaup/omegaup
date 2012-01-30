@@ -8,6 +8,12 @@ $(document).ready(function() {
 	var finishTime = null;
 
 	var contestAlias = 'prueba'; // /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+	
+	Highcharts.setOptions({
+       global: {
+          useUTC: false
+       }
+    });
 
 	omegaup.getContest(contestAlias, function(contest) {
 		$('#title .contest-title').html(contest.title);
