@@ -170,8 +170,10 @@ class ShowProblemInContest extends ApiHandler
         {
             $runs_filtered_array = array();
             foreach($runs_array as $run)
-            {
-                array_push($runs_filtered_array, $run->asFilteredArray($relevant_columns));
+	    {
+		$filtered = $run->asFilteredArray($relevant_columns);
+		$filtered['time'] = strtotime($filtered['time']);
+                array_push($runs_filtered_array, $filtered);
             }
         }
         
