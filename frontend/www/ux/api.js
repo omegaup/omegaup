@@ -65,8 +65,8 @@ OmegaUp.prototype.getContests = function(callback) {
 		function (data) {
 			for (var idx in data.contests) {
 				var contest = data.contests[idx];
-				contest.start_time = self.time(contest.start_time);
-				contest.finish_time = self.time(contest.finish_time);
+				contest.start_time = self.time(contest.start_time * 1000);
+				contest.finish_time = self.time(contest.finish_time * 1000);
 			}
 			callback(data);
 		},
@@ -81,8 +81,8 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 		'/arena/contests/' + alias + '/',
 		function (contest) {
 			if (contest.status == 'ok') {
-				contest.start_time = self.time(contest.start_time);
-				contest.finish_time = self.time(contest.finish_time);
+				contest.start_time = self.time(contest.start_time * 1000);
+				contest.finish_time = self.time(contest.finish_time * 1000);
 			}
 			callback(contest);
 		},
@@ -96,12 +96,13 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	$.post(
 		'/arena/contests/' + contestAlias + '/problem/' + problemAlias + '/',
 		{lang:"es"},
-		function (contest) {
-			if (contest.status == 'ok') {
-				contest.start_time = self.time(contest.start_time);
-				contest.finish_time = self.time(contest.finish_time);
+		function (problem) {
+			if (problem.runs) {
+				for (var i = 0; i < problem.runs.length; i++) {
+					problem.runs[i].time = self.time(problem.runs[i].time * 1000);
+				}
 			}
-			callback(contest);
+			callback(problem);
 		},
 		'json'
 	);
@@ -131,6 +132,7 @@ OmegaUp.prototype.runStatus = function(guid, callback) {
 	$.get(
 		'/arena/runs/' + guid + '/',
 		function (data) {
+			data.time = self.time(data.time * 1000);
 			callback(data);
 		},
 		'json'

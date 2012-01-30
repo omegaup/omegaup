@@ -77,8 +77,11 @@ class ShowContest extends ApiHandler
 	        }
 	        
 	        // Initialize response to be the contest information
-	        $result = $contest->asFilteredArray($relevant_columns);                    
-	        
+		$result = $contest->asFilteredArray($relevant_columns);                    
+
+		$result['start_time'] = strtotime($result['start_time']);
+		$result['finish_time'] = strtotime($result['finish_time']);
+
 	        // Get problems of the contest
 	        $key_problemsInContest = new ContestProblems(
 	            array("contest_id" => $contest->getContestId()));        

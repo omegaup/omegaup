@@ -55,8 +55,10 @@ class ShowRun extends ApiHandler
     {
         
         // Fill response
-        $relevant_columns = array( "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
-        $this->addResponseArray($this->myRun->asFilteredArray($relevant_columns));
+	$relevant_columns = array( "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
+	$filtered = $this->myRun->asFilteredArray($relevant_columns);
+	$filtered['time'] = strtotime($filtered['time']);
+        $this->addResponseArray($filtered);
         
         try
         {
