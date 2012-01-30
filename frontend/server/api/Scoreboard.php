@@ -221,10 +221,9 @@ class Scoreboard
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
-        // @todo add support for penalties
         return array(
             "points" => (int)$bestRun->getContestScore(),
-            "penalty" => 0
+            "penalty" => (int)$bestRun->getSubmitDelay()
         );        
     }
         
