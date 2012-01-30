@@ -169,7 +169,7 @@ $(document).ready(function() {
 					$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
 					$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
 					$('.penalty', r).html(run.submit_delay);
-					$('.time', r).html(run.time);
+					$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 					$('.language', r).html(run.language);
 					$('#problem .runs > tbody:last').append(r);
 				}
