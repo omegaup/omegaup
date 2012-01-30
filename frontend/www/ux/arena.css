@@ -232,7 +232,7 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
         margin: 0.5em 0;
 }
 
-#overlay form #close {
+#overlay form .close {
         position: absolute;
         top: 0;
         right: 0;
@@ -244,7 +244,7 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
         height: 25px;
 }
 
-#overlay form #close:hover {
+#overlay form .close:hover {
         background-color: #eee;
 }
 
@@ -253,7 +253,7 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
         padding: 0.3em 0.5em;
 }
 
-#ranking table {
+#ranking table, #clarifications table {
 	width: 100%;
 	margin: 0 auto;
 }
@@ -268,7 +268,7 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
 	padding: 0.2em;
 }
 
-#ranking td[class$='points'], #ranking td[class$='penalty'], #ranking td.position {
+#ranking td[class$='points'], #ranking td[class$='penalty'], #ranking td.position #ranking td.legend {
 	width: 2.5em;
 }
 
@@ -282,4 +282,28 @@ body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
 
 #ranking a {
 	color: #5588DD;
+}
+
+
+#clarifications tbody td {
+	border: 1px solid #000;
+	padding: 0.2em;
+}
+
+#clarifications tfoot td a {
+    display: block;
+	padding: 0.5em;
+	border: 1px solid #000;
+	text-decoration: none;
+	color: #000;
+	background: #ccc;
+	text-align: center;
+}
+
+#clarifications .problem {
+    width: 7em;
+}
+
+#clarifications .time {
+    width: 10em;
 }

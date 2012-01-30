@@ -117,6 +117,7 @@
                     <thead>
                         <tr>
                             <th></th>
+                            <th></th>
                             <th>Usuario</th>
                             <th class="total" colspan="2">Total</th>
                         </tr>
@@ -124,6 +125,7 @@
                     <tbody>
                         <tr class="template">
                             <td class="position"></td>
+                            <td class="legend"></td>
                             <td class="user"></td>
                             <td class="points"></td>
                             <td class="penalty"></td>
@@ -133,13 +135,12 @@
 			</div>
 			<div id="clarifications" class="tab">
 				<table class="clarifications">
-					<caption>Clarificaciones</caption>
 					<thead>
 						<tr>
-							<th>Problema</th>
-							<th>Tiempo</th>
-							<th>Mensaje</th>
-							<th>Respuesta</th>
+							<th class="problem">Problema</th>
+							<th class="time">Tiempo</th>
+							<th class="message">Mensaje</th>
+							<th class="answer">Respuesta</th>
 						</tr>
 					</thead>
 					<tfoot>
@@ -160,7 +161,7 @@
 		</div>
 		<div id="overlay">
 			<form id="submit" method="POST">
-                                <button class="close">&times;</button>
+                <button class="close">&times;</button>
 				Lenguaje
 				<select name="language">
 					<option value="c">C</option>
@@ -171,7 +172,7 @@
 				<input type="submit" />
 			</form>			
 			<form id="clarification" method="POST">
-                                <button class="close">&times;</button>
+                <button class="close">&times;</button>
 				Problema
 				<select name="problem">
 				</select><br/>
