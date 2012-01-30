@@ -4,6 +4,7 @@ $(document).ready(function() {
 	var activeTab = 'problems';
 	var currentProblem = null;
 	var currentRanking = {};
+	var currentEvents;
 	var startTime = null;
 	var finishTime = null;
 
@@ -47,9 +48,6 @@ $(document).ready(function() {
 		omegaup.getRanking(contestAlias, rankingChange);
 		setInterval(function() { omegaup.getRanking(contestAlias, rankingChange); }, 5 * 60 * 1000);
 
-		omegaup.getRankingEvents(contestAlias, rankingEvents);
-		setInterval(function() { omegaup.getRankingEvents(contestAlias, rankingEvents); }, 5 * 60 * 1000);
-
 		omegaup.getClarifications(contestAlias, clarificationsChange);
 		setInterval(function() { omegaup.getClarifications(contestAlias, clarificationsChange); }, 5 * 60 * 1000);
 
@@ -90,15 +88,14 @@ $(document).ready(function() {
 						orig_run.time = run.time;
 						orig_run.language = run.language;
 
-						$('.points', r).html(run.contest_score.toFixed(2));
+						$('.points', r).html(parseInt(run.contest_score).toFixed(2));
 						$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
 						$('.penalty', r).html(run.submit_delay);
-						$('.time', r).html(run.time);
+						$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 						$('.language', r).html(run.language);
 
 						if (run.status == 'ready') {
 							omegaup.getRanking(contestAlias, rankingChange);
-							omegaup.getRankingEvents(contestAlias, rankingEvents);
 						} else {
 							updateRun(guid, orig_run);
 						}
@@ -169,7 +166,9 @@ $(document).ready(function() {
 					$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
 					$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
 					$('.penalty', r).html(run.submit_delay);
-					$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+					if (run.time) {
+						$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+					}
 					$('.language', r).html(run.language);
 					$('#problem .runs > tbody:last').append(r);
 				}
@@ -210,10 +209,19 @@ $(document).ready(function() {
 			$('.tabs a[href="#' + activeTab + '"]').addClass('active');
 			$('.tab').hide();
 			$('#' + activeTab).show();
+			
+			if (activeTab == 'ranking') {
+                if (currentEvents) {
+                    console.log('redrawing');
+                    rankingEvents(currentEvents);
+                }
+            }
 		}
+		
 	});
 
 	function rankingEvents(data) {
+        currentEvents = data;
         var dataInSeries = {};
         var navigatorData = [[startTime.getTime(), 0]];
         var series = [];
@@ -253,6 +261,13 @@ $(document).ready(function() {
         
         // chart it!
         createChart(series, navigatorData);
+
+        // now animated sort the ranking table!
+        $("#ranking > table").sortTable({
+            onCol: 1,
+            keepRelationships: true,
+            sortType: 'numeric'
+        });
 	}
 
 	function rankingChange(data) {
@@ -264,14 +279,16 @@ $(document).ready(function() {
 		for (var i = 0; i < ranking.length; i++) {
 			var rank = ranking[i];
 			newRanking[rank.name] = i;
-
+            
+            // new user, just add row at the end
 			if (currentRanking[rank.name] === undefined) {
 				currentRanking[rank.name] = $('#ranking tbody tr.inserted').length;
 				$('#ranking tbody').append(
 					$('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
 				);
 			}
-
+            
+            // update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.name]];
 			$('.position', r).html(i+1);
 			$('.user', r).html(rank.name);
@@ -286,14 +303,16 @@ $(document).ready(function() {
 					$('#problems .problem_' + alias + ' .solved').html("(" + rank.problems[alias].points + " / " + problems[alias].points + ")");
 				}
 			}
-
+            
+            // if rank went up, add a class
 			if (parseInt($('.points', r)) < parseInt(rank.total.points)) {
 				r.addClass('rank-up');
 			}
-
+            
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
-
+            
+            // update miniranking
 			if (i < 10) {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
@@ -307,6 +326,8 @@ $(document).ready(function() {
 		}
 
 		currentRanking = newRanking;
+		
+		omegaup.getRankingEvents(contestAlias, rankingEvents);
 	}
 	
 	function updateClock() {
@@ -426,5 +447,26 @@ $(document).ready(function() {
             
             series: series
         });
+        
+        // set legend colors
+        console.log('adding colors');
+        console.log(window.chart.series);
+        for (var name in currentRanking) {
+            console.log(name);
+            if (currentRanking.hasOwnProperty(name)) {
+                var r = $('#ranking tbody tr.inserted')[currentRanking[name]];
+                var color = (function () {
+                    for (var i = 0; i < window.chart.series.length; i++) {
+                        if (window.chart.series[i].name === name) {
+                            return window.chart.series[i].color;
+                        }
+                    }
+                })();
+                
+                $('.legend', r).css({
+                    'background-color': color || 'transparent'
+                });
+            }
+        }
     }
 });
