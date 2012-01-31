@@ -3,10 +3,16 @@
 
 class UserProfileComponent implements GuiComponent{
 	
+	//is this the user objetc or id?
 	private $user;
 	private $editable;
 	
 	function __construct($user){
+		if(!($user instanceof VO)){
+			//TODO throw correct exception
+			return null;
+		}
+		
 		$this->user = $user;
 		$this->editable = false;		
 	}
@@ -32,15 +38,34 @@ class UserProfileComponent implements GuiComponent{
 						current_schools = <?php echo json_encode( SchoolsDAO::getAll() ); ?>;
 				</script>
 				<a onClick='profile_edit()'>editar mi perfil</a>
+				<div>
+					<?php
+						UsersDAO::getFullProfile( $this->user->getUserId() );
+					?>
+					Tu correo electronico:
+				</div>
+				
 			<?php
 			
 			//add editable form
+			/*
 			$editable_form = new DAOFormComponent( $this->user );
 			
-			$editable_form->hideField( array("solved", "password", "user_id", "submissions", "last_access" )  );
+			$editable_form->hideField( array("solved", "password", "user_id", "submissions", "last_access", "username" )  );
+			
+			if( sizeof( SchoolsDAO::getAll() ) == 0){
+				
+			}else{
+				$editable_form->createComboBoxJoin( "school_id", "school_id",  new Schools() );
+			}
+
 			$editable_form->wrapWith("id", "editable_form");
 			$editable_form->wrapWith("style", "display: none;");
 			echo $editable_form->renderCmp();
+			*/
+			
+			
+			
 			
 		}
 		

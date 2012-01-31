@@ -33,6 +33,7 @@ class FormComponent implements GuiComponent{
 	}
 
 
+
 	public function wrapWith($type, $val){
 		switch($type){
 			case "id" 		: $this->wrap_id = $val; break;
@@ -45,6 +46,8 @@ class FormComponent implements GuiComponent{
 		}
 	}
 
+
+
 	/**
 	 * 
 	 * 
@@ -53,13 +56,17 @@ class FormComponent implements GuiComponent{
 		$this->is_editable = $editable;
 	}
 
+
+
 	/**
 	 * 
 	 * 
 	 * */
-	function addField( $id, $caption, $type, $value = "", $name = null ){
+	public function addField( $id, $caption, $type, $value = "", $name = null ){
 		array_push( $this->form_fields, new FormComponentField($id, $caption, $type, $value, $name ) );
 	}
+
+
 
 	/**
 	 * 
@@ -79,6 +86,8 @@ class FormComponent implements GuiComponent{
 		$this->form_fields =  array_slice( $this->form_fields, 0,  $top_i+1, true);
 		
 	}
+
+
 
 	/**
 	 * 
@@ -317,13 +326,19 @@ class FormComponent implements GuiComponent{
 
 	}
 
+
+
 	public function addSubmit( $caption, $submit_form_url = "", $method = "POST"){
 		$this->submit_form = array( "caption" => $caption, "submit_form_url" => $submit_form_url, "method" => $method );
 	}
 
+
+
 	public function addOnClick( $caption, $js_function){
 		$this->on_click = array( "caption" => $caption, "function" => $js_function );
 	}
+
+
 
 	public function addApiCall( $method_name, $http_method = "POST" ){
 		if( !($http_method === "POST" || $http_method === "GET") ){
@@ -334,6 +349,8 @@ class FormComponent implements GuiComponent{
 		$this->send_to_api_http_method = $http_method;		
 		
 	}
+
+
 	
 	/**
 	 * Esta es una funcion en js que se llamara 
@@ -343,6 +360,8 @@ class FormComponent implements GuiComponent{
 	public function onApiCallSuccess( $jscallback ){
 		$this->send_to_api_callback = $jscallback;
 	}
+
+
 	
 	/**
 	 * 
@@ -352,9 +371,8 @@ class FormComponent implements GuiComponent{
 	public function onApiCallSuccessRedirect( $url, $send_param = null ){
 		$this->send_to_api_redirect = $url;		
 	}
-	
-	
-	
+
+
 	
 	public function renameField( $field_array ){
 		
@@ -379,6 +397,8 @@ class FormComponent implements GuiComponent{
 			
 		}//foreach field in the array
 	}
+
+
 
 	/**
 	  *
@@ -406,6 +426,8 @@ class FormComponent implements GuiComponent{
 		}
 	}
 
+
+
 	public function createComboBoxJoin( $field_name, $field_name_in_values, $values_array, $selected_value=null ){
 		if( sizeof( $values_array ) == 0 ){
 			//do something
@@ -425,32 +447,32 @@ class FormComponent implements GuiComponent{
 					
 					if( !($v instanceof VO)  ){
 						
-                                            if(is_array($v))
-                                            {
+						if(is_array($v))
+						{
                                                 
                             if( $selected_value == $v["id"] ){
-	                        array_push( 
-								$end_values,  
-								array( "id" => $v["id"], "caption" => $v["caption"], "selected" => true ) );
-	                    }else{
-	                        array_push( 
-								$end_values,  
-								array( "id" => $v["id"], "caption" => $v["caption"], "selected" => false ) );
-						}
-                                            }
-                                            else
-                                            {
+	                        	array_push( 
+									$end_values,  
+									array( "id" => $v["id"], "caption" => $v["caption"], "selected" => true ) );
+	                    	}else{
+	                        	array_push( 
+									$end_values,  
+									array( "id" => $v["id"], "caption" => $v["caption"], "selected" => false ) );
+							}
+							
+                       }else{
                                             
-	                    if( $selected_value == $v ){
-	                        array_push( 
-								$end_values,  
-								array( "id" => $v, "caption" => $v, "selected" => true ) );
-	                    }else{
-	                        array_push( 
-								$end_values,  
-								array( "id" => $v, "caption" => $v, "selected" => false ) );
+		                    if( $selected_value == $v ){
+		                        array_push( 
+									$end_values,  
+									array( "id" => $v, "caption" => $v, "selected" => true ) );
+		                    }else{
+		                        array_push( 
+									$end_values,  
+									array( "id" => $v, "caption" => $v, "selected" => false ) );
+							}
+							
 						}
-                                            }
 										
 					}else{
 						
@@ -481,7 +503,8 @@ class FormComponent implements GuiComponent{
 	}
         
 
-	public function createComboBoxJoinDistintName( $field_name,$table_name, $field_name_in_values, $values_array, $selected_value=null ){
+
+	public function createComboBoxJoinDistintName( $field_name, $table_name, $field_name_in_values, $values_array, $selected_value=null ){
 		if( sizeof( $values_array ) == 0 ){
 			//do something
 		}
@@ -544,23 +567,23 @@ class FormComponent implements GuiComponent{
 
 	}
 
+
+
 	public function createComboBox( $field_name, $values ){
 		
 	}
-        
-        public function setValueField( $field_name, $value )
-        {
-            $sof = sizeof( $this->form_fields );
+
+
+
+	public function setValueField( $field_name, $value ){
+		$sof = sizeof( $this->form_fields );
 
 		for ($i=0; $i < $sof; $i++) { 
-                    
-                    if( $this->form_fields[$i]->id === $field_name )
-                    {
-                        $this->form_fields[$i]->value = $value;
-                    }
-                    
-                }
-        }
+			if( $this->form_fields[$i]->id === $field_name ){
+				$this->form_fields[$i]->value = $value;
+			}
+		}
+	}
         
 
 }
