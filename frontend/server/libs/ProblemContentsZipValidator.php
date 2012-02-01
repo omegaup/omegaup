@@ -27,7 +27,8 @@ class ProblemContentsZipValidator extends Validator
             for($i = 0; $i < $zip->numFiles; $i++)
             {
                 $zipFilesArray[] = $zip->getNameIndex($i);
-                $size += $zip->statIndex($i)['size'];
+				$statI = $zip->statIndex($i);
+                $size += $statI['size'];
 	    }
 
 	    if ($size > $maximumSize)
