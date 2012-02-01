@@ -35,7 +35,7 @@ class NewContest extends ApiHandler
                 ->validate(RequestContext::get("start_time"), "start_time");
         
         // Calculate contest length:
-        $contest_length = strtotime(RequestContext::get("finish_time")) - strtotime(RequestContext::get("start_time"));
+		$contest_length = RequestContext::get("finish_time") - RequestContext::get("start_time");
         
         // Window_length is optional
         if(!is_null(RequestContext::get("window_length")))
