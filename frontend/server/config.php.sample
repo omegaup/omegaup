@@ -56,6 +56,7 @@
 	# ####################################
 	# MEMCACHE CONFIG
 	# ####################################	
+	define("OMEGAUP_MEMCACHE_DISABLED",				true);	
 	define("OMEGAUP_MEMCACHE_HOST",					'localhost');
 	define("OMEGAUP_MEMCACHE_PORT", 				11211);
 	define("OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT",	60);	// in seconds

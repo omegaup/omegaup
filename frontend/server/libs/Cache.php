@@ -11,7 +11,7 @@ class Cache
 	{
 		$this->prefix = $prefix;
 		
-		if( defined('OMEGAUP_MEMCACHE_DIABLED') )
+		if( defined('OMEGAUP_MEMCACHE_DISABLED') && OMEGAUP_MEMCACHE_DISABLED)
 		{
 			$this->memcache = null;	
 		}
