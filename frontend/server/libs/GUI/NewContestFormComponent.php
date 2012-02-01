@@ -5,6 +5,46 @@ class NewContestFormComponent implements GuiComponent{
 
 	public function renderCmp(){
 		?>
+		<script type="text/javascript" charset="utf-8">
+			var _submit_ = function(  ){
+				$.ajax({
+					url: "/arena/contests/new",
+					dataType: "json",
+					type:"POST",
+					data :{
+						"title" 				: $("#_title").val(),
+				        "description" 			: $("#_description").val(),
+				        "start_time" 			: $("#_start_time").val(),
+				        "finish_time" 			: $("#_finish_time").val(),
+				        "window_length" 		: $("#_window_length").val(),
+				        "public" 				: $("#_public").val(),
+				        "alias" 				: $("#_alias").val(),
+				        "scoreboard" 			: $("#_scoreboard").val(),
+				        "points_decay_factor" 	: $("#_points_decay_factor").val(),
+						"penalty_calc_policy"	: $("#_penalty_calc_policy").val(),
+				        "partial_score" 		: $("#_partial_score").val(),
+				        "submissions_gap"		: $("#_submissions_gap").val(),
+				        "feedback" 				: $("#_feedback").val(),
+				        "penalty" 				: $("#_penalty").val(),
+				        "penalty_time_start" 	: $("#_penalty_time_start").val()
+					},
+					beforeSend: function( xhr ) {
+					    $("#_submit_").hide(  );
+					},
+					success: function(a,b,c){
+						$("#_response_").html("OK");
+					},
+					error:function(a,b,c){
+						r = $.parseJSON( a.responseText );
+						$("#_submit_").show(  );
+						$("#_response_").html(r.error);
+					}
+					
+				});
+			}
+			
+			
+		</script>
 		<style>
 			.new_contest p{
 				color: gray !important;
@@ -23,14 +63,13 @@ class NewContestFormComponent implements GuiComponent{
 		<h3>Nuevo concurso</h3>
 		<div class="new_contest">
 			<table width='100%' border=0>
-			<form method='POST' action=''>
 				<tr>
 					<td class="info" >
 						<b>Scoreboard</b>
 						<p >Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser&aacute; visible</p>
 					</td>
 					<td >
-						<input id='scoreboard' name='scoreboard' value='' type='text'>
+						<input id='_scoreboard' name='scoreboard' value='' type='text'>
 					</td>
 					
 					<td class="info">
@@ -38,9 +77,9 @@ class NewContestFormComponent implements GuiComponent{
 						<p></p>
 					</td>
 					<td >
-						<select id='public'>
-							<option value='Si'>Si</option>
-							<option value='No'>No</option>
+						<select id='_public'>
+							<option value='1'>Si</option>
+							<option value='0'>No</option>
 						</select>
 					</td>
 				</tr>
@@ -50,7 +89,7 @@ class NewContestFormComponent implements GuiComponent{
 						<p></p>
 					</td>
 					<td  >
-						<input id='start_time' name='start_time' value='' type='text'>
+						<input id='_start_time' name='start_time' value='1328054461' type='text' >
 					</td>
 					<td class="info">
 						<b>Submissions Gap</b>
@@ -59,7 +98,7 @@ class NewContestFormComponent implements GuiComponent{
 						</p>
 					</td>
 					<td >
-						<input id='submissions_gap' name='submissions_gap' value='' type='text'>
+						<input id='_submissions_gap' name='submissions_gap' value='' type='text'>
 					</td>
 				</tr>
 				<tr>
@@ -70,7 +109,7 @@ class NewContestFormComponent implements GuiComponent{
 						</p>
 					</td>
 					<td >
-						<input id='window_length' name='window_length' value='' type='text'>
+						<input id='_window_length' name='window_length' value='' type='text'>
 					</td>
 					<td class="info">
 						<b>Title</b>
@@ -78,7 +117,7 @@ class NewContestFormComponent implements GuiComponent{
 						El titulo que aparecera en cada concurso</p>
 					</td>
 					<td >
-						<input id='title' name='title' value='' type='text'>
+						<input id='_title' name='title' value='' type='text'>
 					</td>
 				</tr>
 				<tr>
@@ -89,7 +128,7 @@ class NewContestFormComponent implements GuiComponent{
 						</p>
 					</td>
 					<td >
-						<select id='penalty_time_start'>
+						<select id='_penalty_time_start'>
 							<option value='none'>none</option>
 							<option value='problem'>problem</option>
 							<option value='contest'>contest</option>
@@ -101,7 +140,7 @@ class NewContestFormComponent implements GuiComponent{
 						Entero indicando el n&oacute;mero de minutos con que se penaliza por recibir un no-accepted</p>
 					</td>
 					<td >
-						<input id='penalty' name='penalty' value='' type='text'>
+						<input id='_penalty' name='penalty' value='' type='text'>
 					</td>
 				</tr>
 				<tr>
@@ -110,14 +149,14 @@ class NewContestFormComponent implements GuiComponent{
 						<p></p>
 					</td>
 					<td>
-						<textarea id='description' name='description' ></textarea>
+						<textarea id='_description' name='description' ></textarea>
 					</td>
 					<td class="info">
 						<b>Director</b>
 						<p></p>
 					</td>
 					<td>
-						<input id='director_id' name='director_id' value='' type='text'>
+						<input id='_director_id' name='director_id' value='' type='text'>
 					</td>
 				</tr>
 				<tr>
@@ -126,7 +165,7 @@ class NewContestFormComponent implements GuiComponent{
 						<p></p>
 					</td>
 					<td>
-						<select id='feedback'>
+						<select id='_feedback'>
 							<option value='yes'>Si</option>
 							<option value='no'>No</option>
 							<option value='partial'>Parcial</option>
@@ -138,9 +177,9 @@ class NewContestFormComponent implements GuiComponent{
 						Verdadero si el usuario recibir&aacute; puntaje parcial para problemas no resueltos en todos los casos</p>
 					</td>
 					<td>
-						<select name="partial_score" id="partial_score">
-							<option value="true">Si</option>
-							<option value="false">No</option>
+						<select name="partial_score" id="_partial_score">
+							<option value="1">Si</option>
+							<option value="0">No</option>
 						</select>
 					</td>
 				</tr>
@@ -150,7 +189,7 @@ class NewContestFormComponent implements GuiComponent{
 						<p></p>
 					</td>
 					<td>
-						<input id='finish_time' name='finish_time' value='' type='text'>
+						<input id='_finish_time' name='finish_time' value='1328133661' type='text' >
 					</td>
 					<td class="info">
 						<b>Alias</b>
@@ -158,16 +197,27 @@ class NewContestFormComponent implements GuiComponent{
 						
 					</td>
 					<td>
-						<input id='alias' name='alias' value='' type='text'>
+						<input id='_alias' name='alias' value='' type='text'>
 					</td>
 				</tr>
 				<tr>
-					<!--
-					<select id='feedback'>
-						<option value='sum'>Sum</option>
-						<option value='max'>Max</option>
-					</select>
-					-->
+					<td class="info">
+						<b>points_decay_factor</b>
+						<p></p>
+					</td>
+					<td>
+						<input id='_points_decay_factor' name='points_decay_factor' value='' type='text'>
+					</td>
+					<td class="info">
+						<b>_penalty_calc_policy</b>
+						<p></p>
+					</td>					
+					<td>
+						<select id='_penalty_calc_policy'>
+							<option value='sum'>Sum</option>
+							<option value='max'>Max</option>
+						</select>
+					</td>
 				</tr>
 				<tr>
 					<td>
@@ -175,10 +225,12 @@ class NewContestFormComponent implements GuiComponent{
 					<td>
 					</td>
 					<td align='right'>
-						<input value='Agendar concurso' type='submit'>
+						<input value='Agendar concurso' type='button' id="_submit_" onClick="_submit_();">
+						<div id="_response_">
+							
+						</div>
 					</td>
 				</tr>
-			</form>
 			</table>
 		</div>
 		
