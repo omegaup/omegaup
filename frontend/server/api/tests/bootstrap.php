@@ -9,6 +9,7 @@
 
    // Load config globals
    require_once("config.php");
+
    require_once("Utils.php");
 
    require_once("libs/Logger/Logger.php");
@@ -40,8 +41,9 @@
                     )));
 
         }
-        
+
         $errors = initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_TEST_DB_NAME); 
+
         if( $errors )
         {
           die(json_encode(array(
@@ -90,32 +92,16 @@
     $testing->BeginTrans();
     $errors = array();
     
+	$testing->Execute("DROP DATABASE `$testing_db`;");
+	$testing->Execute("CREATE DATABASE `$testing_db`;");	
+	
+	$testing = ADONewConnection(OMEGAUP_DB_DRIVER);
+    $testing->NConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, $testing_db);
+
+
     foreach( $tables as $table_name )
     {
-        $table_name   = $table_name[0];
-        try
-        {
-	        $testing->Execute("DROP TABLE IF EXISTS $table_name CASCADE");
-        }
-        catch(ADODB_Exception $e)
-        {
-        	$errors[] = array('sql' => $e->sql,
-        	                  'msg' => $e->msg);
-        }
-    }
 
-    if( $errors )
-    {
-      $testing->RollbackTrans();
-
-      $testing->Close();
-      $source->Close();
-
-      return $errors;
-    }
-    
-    foreach( $tables as $table_name )
-    {
         $table_name   = $table_name[0];
         $source_name  = $source_db.".".$table_name;
         try
@@ -134,6 +120,6 @@
     
     $testing->Close();
     $source->Close();
-    
+
     return $errors;
   }
