@@ -78,48 +78,38 @@
     Utils::$counttime = 0;
     Utils::$inittime = Utils::GetPhpUnixTimestamp();
     
-  function initialize_db($source_db, $testing_db){
-
+    
+function initialize_db($source_db, $testing_db)
+{
     $testing = ADONewConnection(OMEGAUP_DB_DRIVER);
     $testing->NConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, $testing_db);
-
-    $source = ADONewConnection(OMEGAUP_DB_DRIVER);
-    $source->NConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, $source_db);
-
-    $tables_recordset = $source->Execute("SHOW TABLES;");
-    $tables           = $tables_recordset->GetArray();
 
     $testing->BeginTrans();
     $errors = array();
     
-	$testing->Execute("DROP DATABASE `$testing_db`;");
-	$testing->Execute("CREATE DATABASE `$testing_db`;");	
-	
-	$testing = ADONewConnection(OMEGAUP_DB_DRIVER);
-    $testing->NConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, $testing_db);
-
-
-    foreach( $tables as $table_name )
+    try
     {
+        $testing->Execute("DROP DATABASE `$testing_db`;");
+        $testing->Execute("CREATE DATABASE `$testing_db`;");	
 
-        $table_name   = $table_name[0];
-        $source_name  = $source_db.".".$table_name;
-        try
-        {
-        	$testing->Execute("CREATE TABLE $table_name LIKE $source_name");
-        	$insert   = $testing->Execute("INSERT INTO $table_name SELECT * FROM $source_name");
-        }
-     	catch(ADODB_Exception $e)
-        {
-        	$errors[] = array('sql' => $e->sql,
-        	                  'msg' => $e->msg);
-        }
+        $instalation_script = file_get_contents(SERVER_PATH . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "bd.sql");
+        $testing->Execute($instalation_script);
+
+        $testing->CommitTrans();
     }
-
-    $testing->CommitTrans();
+    catch(ADODB_Exception $e)
+    {
+        $errors[] = array('sql' => $e->sql,
+                        'msg' => $e->msg);        
+    }
     
-    $testing->Close();
-    $source->Close();
-
+    if ($errors)
+    {
+        var_dump($errors);
+        $testing->RollbackTrans();
+    }
+        
+    $testing->Close();    
+    
     return $errors;
   }
