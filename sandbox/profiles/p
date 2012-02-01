@@ -1,0 +1,9 @@
+-f
+-a 2
+-E PATH=/usr/bin
+-F
+
+-s ugetrlimit
+-s rt_sigaction
+
+-p /proc/self/exe
