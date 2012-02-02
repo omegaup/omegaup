@@ -694,7 +694,7 @@ class Contests extends VO
 	}        
         
          public function isInsideContest($user_id)
-        {                      
+	 {                      
             if(is_null($this->getWindowLength()))
             {
                 if( time() <= strtotime($this->getFinishTime()) && time() >= strtotime($this->getStartTime()) )
@@ -712,14 +712,14 @@ class Contests extends VO
                 }
                 catch(Exception $e)
                 {
-                    // Propagate exception
+			// Propagate exception
                     throw $e;
-                }
+		}
 
                 if( time() <= strtotime($this->getFinishTime()) && 
                         time() >= strtotime($this->getStartTime()) &&
-                        time() <= strtotime($first_access_time) + $this->getWindowLength() )
-                {
+                        time() <= strtotime($first_access_time) + $this->getWindowLength() * 60 )
+		{
                     return true;
                 }
 
