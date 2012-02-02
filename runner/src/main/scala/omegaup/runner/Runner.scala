@@ -49,7 +49,7 @@ object Runner extends RunnerService with Log {
 			case "cpp" =>
 				List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles
 			case "p" =>
-				List(sandbox, "-S", profile + "/fpc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("cpp.compiler.path", "/usr/bin/fpc"), "-Tlinux") ++ inputFiles
+				List(sandbox, "-S", profile + "/fpc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("p.compiler.path", "/usr/bin/fpc"), "-Tlinux") ++ inputFiles
 			case _ => null
 		}
 
@@ -140,7 +140,7 @@ object Runner extends RunnerService with Log {
 						case "cpp" =>
 							List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "-n", "--", "./a.out")
 						case "p" =>
-							List(sandbox, "-S", profile + "/p", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "-n", "--", "./a.out")
+							List(sandbox, "-S", profile + "/p", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "-n", "--", "./Main")
 					}
 
 					debug("Run {}", params.mkString(" "))
@@ -400,19 +400,23 @@ object Runner extends RunnerService with Log {
 			new RegisterInputMessage(runnerConnector.getLocalPort())
 		)
 		
-		java.lang.System.in.read()
-		
-		try {
-			// well, at least try to de-register
-			Https.send[RegisterOutputMessage, RegisterInputMessage](
-				Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
-				new RegisterInputMessage(runnerConnector.getLocalPort())
-			)
-		} catch {
-			case _ => {}
-		}
+		Runtime.getRuntime.addShutdownHook(new Thread() {
+			override def run() = {
+				info("Shutting down")
+				try {
+					// well, at least try to de-register
+					Https.send[RegisterOutputMessage, RegisterInputMessage](
+					Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
+						new RegisterInputMessage(runnerConnector.getLocalPort())
+					)
+				} catch {
+					case _ => {}
+				}
+
+				server.stop()
+			}
+		});
 	
-		server.stop()
 		server.join()
 	}
 }
