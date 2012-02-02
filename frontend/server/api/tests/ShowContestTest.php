@@ -59,8 +59,8 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         
         // Assert we are getting correct data
         $this->assertEquals($contest->getDescription(), $return_array["description"]);
-        $this->assertEquals($contest->getStartTime(), $return_array["start_time"]);
-        $this->assertEquals($contest->getFinishTime(), $return_array["finish_time"]);
+        $this->assertEquals(Utils::GetPhpUnixTimestamp($contest->getStartTime()), $return_array["start_time"]);
+        $this->assertEquals(Utils::GetPhpUnixTimestamp($contest->getFinishTime()), $return_array["finish_time"]);
         $this->assertEquals($contest->getWindowLength(), $return_array["window_length"]);        
         $this->assertEquals($contest->getAlias(), $return_array["alias"]);
         $this->assertEquals($contest->getPointsDecayFactor(), $return_array["points_decay_factor"]);
@@ -143,8 +143,8 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         
         // Assert we are getting correct data
         $this->assertEquals($contest->getDescription(), $return_array["description"]);
-        $this->assertEquals($contest->getStartTime(), $return_array["start_time"]);
-        $this->assertEquals($contest->getFinishTime(), $return_array["finish_time"]);
+        $this->assertEquals(Utils::GetPhpUnixTimestamp($contest->getStartTime()), $return_array["start_time"]);
+        $this->assertEquals(Utils::GetPhpUnixTimestamp($contest->getFinishTime()), $return_array["finish_time"]);
         $this->assertEquals($contest->getWindowLength(), $return_array["window_length"]);        
         $this->assertEquals($contest->getAlias(), $return_array["alias"]);
         $this->assertEquals($contest->getPointsDecayFactor(), $return_array["points_decay_factor"]);
