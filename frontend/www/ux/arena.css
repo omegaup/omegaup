@@ -1,4 +1,4 @@
-body { background: #eee; font-family: sans-serif; overflow-y: scroll; }
+body { background: url(/media/gradient.png) repeat-x 0 0, url(/media/bg.png) repeat 0 0; font-family: sans-serif; overflow-y: scroll; }
 
 .template { display: none; }
 

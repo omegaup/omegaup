@@ -8,8 +8,8 @@ $(document).ready(function() {
 	var startTime = null;
 	var finishTime = null;
 
-	var contestAlias = 'prueba'; // /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
-	
+	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+
 	Highcharts.setOptions({
        global: {
           useUTC: false
@@ -259,15 +259,17 @@ $(document).ready(function() {
         }
         navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
         
-        // chart it!
-        createChart(series, navigatorData);
+        if (series.length > 0) {
+            // chart it!
+            createChart(series, navigatorData);
 
-        // now animated sort the ranking table!
-        $("#ranking > table").sortTable({
-            onCol: 1,
-            keepRelationships: true,
-            sortType: 'numeric'
-        });
+            // now animated sort the ranking table!
+            $("#ranking-table").sortTable({
+                onCol: 1,
+                keepRelationships: true,
+                sortType: 'numeric'
+            });
+        }
 	}
 
 	function rankingChange(data) {
@@ -387,6 +389,8 @@ $(document).ready(function() {
 	}
 	
 	function createChart(series, navigatorSeries) {
+        if (series.length == 0) return;
+	
         window.chart = new Highcharts.StockChart({
             chart: {
                 renderTo: 'ranking-chart',
