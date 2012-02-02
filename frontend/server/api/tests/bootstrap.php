@@ -19,57 +19,8 @@
     require_once('adodb5/adodb-exceptions.inc.php');
 
 
-    $conn = null;
-
-    try
-    {
-        $conn = ADONewConnection(OMEGAUP_TEST_DB_DRIVER);                    
-        $conn->debug = OMEGAUP_TEST_DB_DEBUG;
-        $conn->PConnect(OMEGAUP_TEST_DB_HOST, OMEGAUP_TEST_DB_USER, OMEGAUP_TEST_DB_PASS, OMEGAUP_TEST_DB_NAME);
-
-        if(!$conn) 
-        {
-                    /**
-                     * Dispatch missing parameters
-                     * */
-                    header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-
-                    die(json_encode(array(
-                            "status" => "error",
-                            "error"	 => "Conection to the database has failed.",
-                            "errorcode" => 1
-                    )));
-
-        }
-
-        /*
-         * TODO: Activate cleanup once we stabilize tests
-         * $errors = initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_TEST_DB_NAME); 
-         
-        if( $errors )
-        {
-          die(json_encode(array(
-            "status" => "error",
-            "error" => "Failed to initialize the testing database from the source databse",
-            "errorcode" => 3,
-            "database_errors" => $errors
-          )));
-        }
-         * 
-         */
-    } 
-    catch (Exception $e) {
-
-            header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-
-            die(json_encode(array(
-                    "status" => "error",
-                    "error"	 => $e,
-                    "errorcode" => 2
-            )));
-
-    }
-    $GLOBALS["conn"] = $conn;
+    // Connect to DB
+    Utils::ConnectToDB();
     
     
     // Create users needed for testing    
