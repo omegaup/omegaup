@@ -8,7 +8,7 @@
    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
 
    // Load config globals
-   require_once("config.php");
+   require_once(SERVER_PATH . DIRECTORY_SEPARATOR .  "config.php");
 
    require_once("Utils.php");
 
@@ -23,9 +23,9 @@
 
     try
     {
-        $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
-        $conn->debug = OMEGAUP_DB_DEBUG;
-        $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_TEST_DB_NAME);
+        $conn = ADONewConnection(OMEGAUP_TEST_DB_DRIVER);                    
+        $conn->debug = OMEGAUP_TEST_DB_DEBUG;
+        $conn->PConnect(OMEGAUP_TEST_DB_HOST, OMEGAUP_TEST_DB_USER, OMEGAUP_TEST_DB_PASS, OMEGAUP_TEST_DB_NAME);
 
         if(!$conn) 
         {
@@ -42,8 +42,10 @@
 
         }
 
-        $errors = initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_TEST_DB_NAME); 
-
+        /*
+         * TODO: Activate cleanup once we stabilize tests
+         * $errors = initialize_db(OMEGAUP_DB_SOURCE, OMEGAUP_TEST_DB_NAME); 
+         
         if( $errors )
         {
           die(json_encode(array(
@@ -53,6 +55,8 @@
             "database_errors" => $errors
           )));
         }
+         * 
+         */
     } 
     catch (Exception $e) {
 

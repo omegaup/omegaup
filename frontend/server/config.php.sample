@@ -1,6 +1,17 @@
 <?php
 
 
+        # ####################################
+	# TEST DATABASE CONFIG
+	# ####################################	
+        # PLEASE DON'T POINT IT TO THE PRODUCTION DB!!!
+        define('OMEGAUP_TEST_DB_USER',         'omegaup_beta');
+        define('OMEGAUP_TEST_DB_NAME',    'omegaup_beta');
+        define('OMEGAUP_TEST_DB_PASS',         'ky)yiIkm_+zMf,>qkRP@j{pflG');
+        define('OMEGAUP_TEST_DB_DRIVER',       'mysqlt');
+        define('OMEGAUP_TEST_DB_DEBUG',        false);
+        define('OMEGAUP_TEST_DB_HOST',         'localhost');
+
 
 
 	# ####################################
@@ -13,12 +24,7 @@
 	define("OMEGAUP_DB_DRIVER", "mysqlt");
 	define("OMEGAUP_DB_DEBUG", 	false);	
 	define("OMEGAUP_MD5_SALT", 	"om3gaup");	
-
-
-	define("OMEGAUP_TEST_DB_NAME", 	"omegaup_test");	
-	define("OMEGAUP_DB_SOURCE",     "omegaup");
-
-
+	
 	define("OMEGAUP_LOG_TO_FILE", 		false);
 	define("OMEGAUP_LOG_TRACKBACK", 	false);
 	define("OMEGAUP_LOG_DB_QUERYS", 	false);
