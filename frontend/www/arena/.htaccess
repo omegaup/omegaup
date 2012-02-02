@@ -1,5 +1,8 @@
 RewriteEngine on        
 
+RewriteCond %{SERVER_PORT} 80 
+RewriteRule ^(.*)$ https://omegaup.com/arena/$1 [R,L]
+
 RewriteRule ^time/?$ /arena/CallApiLoader.php?apicmd=Time [L]
 
 RewriteRule ^authenticated/?$ /arena/CallApiLoader.php?apicmd=Authenticated [L]

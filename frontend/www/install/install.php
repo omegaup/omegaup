@@ -190,6 +190,10 @@
   define('OMEGAUP_DB_DRIVER',       'mysqlt');
   define('OMEGAUP_DB_DEBUG',        false);	
   define('OMEGAUP_ROOT',            '$root_dir');
+  define('OMEGAUP_MD5_SALT',        'omegaup');
+  define('OMEGAUP_GRADER_URL',      'https://localhost:21680/grade/');
+  define('OMEGAUP_SSLCERT_URL',     '$root_dir/omegaup.pem');
+  define('OMEGAUP_CACERT_URL',      '$root_dir/omegaup.pem');
 
   define('OMEGAUP_LOG_TO_FILE',     true);
   define('OMEGAUP_LOG_ACCESS_FILE', '$root_dir/log/omegaup.log');
@@ -199,7 +203,9 @@
 
   define('RUNS_PATH',               '$data_root_path/submissions');
   define('PROBLEMS_PATH',           '$data_root_path/problems');
-";
+
+  define('OMEGAUP_FB_APPID',        'APPID');
+  define('OMEGAUP_FB_SECRET',	    'SECRET');";
     
     file_put_contents("$root_dir/server/config.php", $file_contents) !== FALSE
       or die("Unable to write $root_dir/server/config.php. Make sure it is writable.");

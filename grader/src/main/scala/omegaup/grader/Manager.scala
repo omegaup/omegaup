@@ -20,6 +20,7 @@ case object Login
 
 object Manager extends Object with Log {
 	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[RunnerService]()
+
 	// Loading SQL connector driver
 	Class.forName(Config.get("db.driver", "org.h2.Driver"))
 	val connection = java.sql.DriverManager.getConnection(
@@ -187,6 +188,7 @@ object Manager extends Object with Log {
 
 		Runtime.getRuntime.addShutdownHook(new Thread() {
 			override def run() = {
+				info("Shutting down")
 				server.stop()
 			}
 		});
