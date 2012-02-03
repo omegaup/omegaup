@@ -266,6 +266,8 @@ class FormComponent implements GuiComponent{
 					if( $this->is_editable === false ){
 						//$html .= "<input id='" . $f->id .  "' name='" . $f->name .  "' value='" . $f->value .  "' type='". $f->type ."' >";
 						$html .= $f->value ;
+					} else if ($f->type == 'textarea') {
+						$html .= "<textarea id='{$f->id}' name='{$f->name}'>{$f->value}</textarea>";
 					}else{
 						$html .= "<input id='" . $f->id .  "' name='" . $f->name .  "' value='" . $f->value .  "' type='". $f->type ."' >";
 					}
