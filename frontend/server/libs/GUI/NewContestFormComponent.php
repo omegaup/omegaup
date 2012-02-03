@@ -66,7 +66,7 @@ class NewContestFormComponent implements GuiComponent{
 				<tr>
 					<td class="info" >
 						<b>Scoreboard</b>
-						<p >Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser&aacute; visible</p>
+						<p>Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser&aacute; visible</p>
 					</td>
 					<td >
 						<input id='_scoreboard' name='scoreboard' value='' type='text'>
@@ -86,16 +86,14 @@ class NewContestFormComponent implements GuiComponent{
 				<tr>
 					<td class="info">
 						<b>Inicio</b>
-						<p></p>
+						<p>La fecha (en Unix time) en la que inicia el concurso</p>
 					</td>
 					<td  >
 						<input id='_start_time' name='start_time' value='1328054461' type='text' >
 					</td>
 					<td class="info">
 						<b>Submissions Gap</b>
-						<p>
-						Tiempo m&iacute;nimo en segundos que debe de esperar un usuario despues de realizar un env&iacute;o para hacer otro
-						</p>
+						<p>Tiempo m&iacute;nimo en minutos que debe de esperar un usuario despues de realizar un env&iacute;o para hacer otro.</p>
 					</td>
 					<td >
 						<input id='_submissions_gap' name='submissions_gap' value='' type='text'>
@@ -104,9 +102,7 @@ class NewContestFormComponent implements GuiComponent{
 				<tr>
 					<td class="info">
 						<b>Window Length</b>
-						<p>
-						Indica el tiempo que tiene el usuario para env&iacute;ar soluci&oacute;n, si es NULL entonces ser&aacute; durante todo el tiempo del concurso
-						</p>
+						<p>Indica el tiempo que tiene el usuario para env&iacute;ar soluci&oacute;n, si es NULL entonces ser&aacute; durante todo el tiempo del concurso.</p>
 					</td>
 					<td >
 						<input id='_window_length' name='window_length' value='' type='text'>
@@ -114,7 +110,7 @@ class NewContestFormComponent implements GuiComponent{
 					<td class="info">
 						<b>Title</b>
 						<p>
-						El titulo que aparecera en cada concurso</p>
+						El titulo que tendrá el concurso</p>
 					</td>
 					<td >
 						<input id='_title' name='title' value='' type='text'>
@@ -162,7 +158,7 @@ class NewContestFormComponent implements GuiComponent{
 				<tr>
 					<td class="info">
 						<b>Feedback</b>
-						<p></p>
+						<p>Si al usuario se le entrega retroalimentación inmediata sobre su problema</p>
 					</td>
 					<td>
 						<select id='_feedback'>
@@ -209,7 +205,7 @@ class NewContestFormComponent implements GuiComponent{
 						<input id='_points_decay_factor' name='points_decay_factor' value='' type='text'>
 					</td>
 					<td class="info">
-						<b>_penalty_calc_policy</b>
+						<b>penalty_calc_policy</b>
 						<p></p>
 					</td>					
 					<td>
