@@ -18,7 +18,7 @@
 
     $page->addComponent( new TitleComponent("Concursos"));
 
-
+/*
 	$page->addComponent( new TitleComponent("Concursos activos", 3));	
 	
 	$header = array(
@@ -31,7 +31,7 @@
 	$contests_table = new TableComponent( $header, $contests );
     
    	$page->addComponent( $contests_table );
-
+*/
 
 	$page->addComponent( new NewContestFormComponent() );
 
