@@ -63,7 +63,7 @@ class NewContestFormComponent implements GuiComponent{
 		<h3>Nuevo concurso</h3>
 		<div class="new_contest">
 			<table width='100%' border=0>
-				<tr>
+				<tr><!-- ----------------------------------------- -->
 					<td class="info" >
 						<b>Scoreboard</b>
 						<p>Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser&aacute; visible</p>
@@ -82,8 +82,8 @@ class NewContestFormComponent implements GuiComponent{
 							<option value='0'>No</option>
 						</select>
 					</td>
-				</tr>
-				<tr>
+				</tr><!-- ----------------------------------------- -->
+				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>Inicio</b>
 						<p>La fecha (en Unix time) en la que inicia el concurso</p>
@@ -98,8 +98,8 @@ class NewContestFormComponent implements GuiComponent{
 					<td >
 						<input id='_submissions_gap' name='submissions_gap' value='' type='text'>
 					</td>
-				</tr>
-				<tr>
+				</tr><!-- ----------------------------------------- -->
+				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>Window Length</b>
 						<p>Indica el tiempo que tiene el usuario para env&iacute;ar soluci&oacute;n, si es NULL entonces ser&aacute; durante todo el tiempo del concurso.</p>
@@ -115,8 +115,8 @@ class NewContestFormComponent implements GuiComponent{
 					<td >
 						<input id='_title' name='title' value='' type='text'>
 					</td>
-				</tr>
-				<tr>
+				</tr><!-- ----------------------------------------- -->
+				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>Penalty Time Start</b>
 						<p>
@@ -138,8 +138,8 @@ class NewContestFormComponent implements GuiComponent{
 					<td >
 						<input id='_penalty' name='penalty' value='' type='text'>
 					</td>
-				</tr>
-				<tr>
+				</tr><!-- ----------------------------------------- -->
+				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>Description</b>
 						<p></p>
@@ -154,8 +154,8 @@ class NewContestFormComponent implements GuiComponent{
 					<td>
 						<input id='_director_id' name='director_id' value='' type='text'>
 					</td>
-				</tr>
-				<tr>
+				</tr><!-- ----------------------------------------- -->
+				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>Feedback</b>
 						<p>Si al usuario se le entrega retroalimentación inmediata sobre su problema</p>
@@ -178,8 +178,8 @@ class NewContestFormComponent implements GuiComponent{
 							<option value="0">No</option>
 						</select>
 					</td>
-				</tr>
-				<tr>
+				</tr><!-- ----------------------------------------- -->
+				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>Finish Time</b>
 						<p></p>
@@ -195,8 +195,8 @@ class NewContestFormComponent implements GuiComponent{
 					<td>
 						<input id='_alias' name='alias' value='' type='text'>
 					</td>
-				</tr>
-				<tr>
+				</tr><!-- ----------------------------------------- -->
+				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>points_decay_factor</b>
 						<p></p>
@@ -214,8 +214,8 @@ class NewContestFormComponent implements GuiComponent{
 							<option value='max'>Max</option>
 						</select>
 					</td>
-				</tr>
-				<tr>
+				</tr><!-- ----------------------------------------- -->
+				<tr><!-- ----------------------------------------- -->
 					<td>
 					</td>
 					<td>
@@ -226,7 +226,7 @@ class NewContestFormComponent implements GuiComponent{
 							
 						</div>
 					</td>
-				</tr>
+				</tr><!-- ----------------------------------------- -->
 			</table>
 		</div>
 		
