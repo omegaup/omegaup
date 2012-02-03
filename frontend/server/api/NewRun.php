@@ -256,7 +256,7 @@ class NewRun extends ApiHandler
             }
             else
             {
-                $this->addResponse('submission_deadline', max(strtotime($contest->getFinishTime()),
+                $this->addResponse('submission_deadline', min(strtotime($contest->getFinishTime()),
                     strtotime($contest_user->getAccessTime()) + $contest->getWindowLength() * 60));
             }
         }

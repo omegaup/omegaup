@@ -145,7 +145,7 @@ class ShowContest extends ApiHandler
                 }
                 else
                 {
-                    $result['submission_deadline'] = max(strtotime($contest->getFinishTime()),
+                    $result['submission_deadline'] = min(strtotime($contest->getFinishTime()),
                     strtotime($contest_user->getAccessTime()) + $contest->getWindowLength() * 60);
                 }
 	                
