@@ -1,5 +1,9 @@
 body { background: url(/media/gradient.png) repeat-x 0 0, url(/media/bg.png) repeat 0 0; font-family: sans-serif; overflow-y: scroll; }
 
+p {
+	margin: 0.1em auto 0.5em auto;
+}
+
 .template { display: none; }
 
 #root,
@@ -141,6 +145,11 @@ body { background: url(/media/gradient.png) repeat-x 0 0, url(/media/bg.png) rep
 
 #summary {
 	min-height: 10em;
+}
+
+#summary td {
+	border: 1px solid #000;
+	padding: 0.2em;
 }
 
 #problem .title {
