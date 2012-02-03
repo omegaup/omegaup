@@ -245,6 +245,27 @@ class NewRun extends ApiHandler
             throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
         }
         
+        // Add remaining time to the response
+        try
+        {
+            $contest_user = ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId());
+           
+            if ($contest->getWindowLength() === null)
+            {
+                $this->addResponse('submission_deadline', strtotime($contest->getFinishTime()));
+            }
+            else
+            {
+                $this->addResponse('submission_deadline', max(strtotime($contest->getFinishTime()),
+                    strtotime($contest_user->getAccessTime()) + $contest->getWindowLength() * 60));
+            }
+        }
+        catch(Exception $e)
+        {            
+            // Operation failed in the data layer
+           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
+        }  
+        
         // Happy ending
         $this->addResponse("guid", $run->getGuid());
         $this->addResponse("status", "ok");
