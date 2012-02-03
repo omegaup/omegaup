@@ -173,6 +173,19 @@ p {
 	margin: 1.0em 0 0.5em 0;
 }
 
+#problem .statement table.sample_io {
+	border: 1px solid #000;
+	background: #eee;
+	margin: 5px;
+	padding : 5px;
+}
+#problem .statement .sample_io td {
+	background: #eee;
+	vertical-align: top;
+	padding: 10px;
+	border: 1px solid #000;
+}
+
 #problem hr {
 	width: 90%;
 	border: 0;
