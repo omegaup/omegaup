@@ -102,6 +102,8 @@ $(document).ready(function() {
 					omegaup.runStatus(guid, function(run) {
 						var r = $('#run_' + run.guid);
 
+						orig_run.runtime = run.runtime;
+						orig_run.memory = run.memory;
 						orig_run.contest_score = run.contest_score;
 						orig_run.status = run.status;
 						orig_run.veredict = run.veredict;
@@ -109,6 +111,8 @@ $(document).ready(function() {
 						orig_run.time = run.time;
 						orig_run.language = run.language;
 
+						$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
+						$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 						$('.points', r).html(parseInt(run.contest_score).toFixed(2));
 						$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
 						$('.penalty', r).html(run.submit_delay);
@@ -192,6 +196,8 @@ $(document).ready(function() {
 					var run = problem.runs[idx];
 
 					var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+					$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
+					$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 					$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
 					$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
 					$('.penalty', r).html(run.submit_delay);
