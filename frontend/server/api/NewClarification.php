@@ -95,31 +95,27 @@ class NewClarification extends ApiHandler
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
         }
         
+	$this->addResponse("clarification_id", $clarification->getClarificationId());
 
-
-
-		$this->addResponse("clarification_id", $clarification->getClarificationId());
-		
-		
+	try {
 		if(!OMEGAUP_EMAIL_SEND_EMAILS){
 			return;
 		}
-
 
 		// Get the contest director's email
 		$director = UsersDAO::getByPK( $contest->getDirectorId() );
 		$director_mail = EmailsDAO::getByPK($director->getMainEmailId());
 
 		// Get the problem's owner email
-		$owner = ProblemsDAO::getByPK( $problem->getAuthorId() );
+		$owner = UsersDAO::getByPK( $problem->getAuthorId() );
 		$owner_mail = EmailsDAO::getByPK( $owner->getMainEmailId() );
 
 		// Generate the email body
-		$body = "You have a new clarification message from contest `".$contest->getContestAlias()."` ";
+		$body = "You have a new clarification message from contest `".$contest->getAlias()."` ";
 
 		$body .= "\n\n\n";
-		$body .= "Problem: 		" 		. "\n";
-		$body .= "Submitter: 	"		. "\n";
+		$body .= "Problem: " . $problem->getAlias() . "\n";
+		$body .= "Submitter: 	" . $this->_user_id . "\n";
 		$body .= "Clarification body: "	. "\n";
 		$body .= "---------------------------------------------\n";
 		$body .= RequestContext::get("message");
@@ -133,47 +129,44 @@ class NewClarification extends ApiHandler
 				     'username' => OMEGAUP_EMAIL_SMTP_USER,
 				     'password' => OMEGAUP_EMAIL_SMTP_PASSWORD));
 
-
-
-
-		Logger::error("Sending email to director at " . $director_email . " ...");
+		Logger::error("Sending email to director at " . $director_mail . " ...");
 		
 		$headers = array (
 			'From' => "OmegaUp <". OMEGAUP_EMAIL_SMTP_FROM .">",
-		   	'To' => $director_email,
+		   	'To' => $director_mail,
 		   	'Subject' => "New clarification");
 		
 		
-		 $mail = $smtp->send($director_email, $headers, $body);
+		 $mail = $smtp->send($director_mail, $headers, $body);
 
 		if(PEAR::isError($mail)) {
 			echo( $mail->getMessage() . "\n");
-			Logger::error("Error while sending email to " . $director_email);			
+			Logger::error("Error while sending email to " . $director_mail);			
 			Logger::error($mail->getMessage());
 			
 		}
 		
+		if ($owner_mail != $director_mail) {
+			Logger::error("Sending email to problem owner at " . $owner_mail . " ...");
+		
+			$headers = array (
+				'From' => "OmegaUp <". OMEGAUP_EMAIL_SMTP_FROM .">",
+		   		'To' => $owner_mail,
+			   	'Subject' => "New clarification");
 		
 		
+			 $mail = $smtp->send($director_mail, $headers, $body);
 
-		Logger::error("Sending email to problem owner at " . $owner_mail . " ...");
-		
-		$headers = array (
-			'From' => "OmegaUp <". OMEGAUP_EMAIL_SMTP_FROM .">",
-		   	'To' => $owner_mail,
-		   	'Subject' => "New clarification");
-		
-		
-		 $mail = $smtp->send($director_email, $headers, $body);
-
-		if(PEAR::isError($mail)) {
-			echo( $mail->getMessage() . "\n");
-			Logger::error("Error while sending email to " . $owner_mail);			
-			Logger::error($mail->getMessage());
+			if(PEAR::isError($mail)) {
+				echo( $mail->getMessage() . "\n");
+				Logger::error("Error while sending email to " . $owner_mail);			
+				Logger::error($mail->getMessage());
 			
+			}
 		}
 
-
+	} catch (Exception $e) {
+	}
 
     }    
 }
