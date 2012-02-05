@@ -12,7 +12,11 @@
 -s socketcall
 -s getdents64
 -s getcwd
+-s time
+-s gettimeofday
 
+-p /etc/localtime
+-p /dev/urandom
 -p /usr/lib/
 -p /proc/meminfo
 -p /usr/bin/python
