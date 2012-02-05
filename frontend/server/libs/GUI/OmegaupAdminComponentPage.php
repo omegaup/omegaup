@@ -86,8 +86,11 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 			
 			<link rel="stylesheet" type="text/css" href="../css/style.css">
 
+			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+			<script type="text/javascript" src="../js/omegaup.js"></script>
 			
 
+			<title>OmegaUp</title>
 
 			</head>
 			
@@ -144,8 +147,6 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 			</div>
 			<!-- #wrapper -->
 			
-			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-			<script type="text/javascript" src="../js/omegaup.js"></script>
 			
 			</body>
 		</html>

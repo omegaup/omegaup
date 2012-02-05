@@ -5,8 +5,10 @@ $(document).ready(function() {
 	var currentProblem = null;
 	var currentRanking = {};
 	var currentEvents;
+	var currentContest = null;
 	var startTime = null;
 	var finishTime = null;
+	var submissionDeadline = null;
 
 	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
@@ -25,9 +27,11 @@ $(document).ready(function() {
 		$('#summary .finish_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
 		$('#summary .window_length').html(contest.window_length);
 
+		currentContest = contest;
+
 		startTime = contest.start_time;
 		finishTime = contest.finish_time;
-		finishTime = contest.submission_deadline;
+		submissionDeadline = contest.submission_deadline;
 
 		var letter = 65;
 
@@ -143,6 +147,7 @@ $(document).ready(function() {
 		omegaup.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
+				console.log(run);
 				$('#clarification input').removeAttr('disabled');
 				return;
 			}
@@ -247,7 +252,6 @@ $(document).ready(function() {
 			
 			if (activeTab == 'ranking') {
                 if (currentEvents) {
-                    console.log('redrawing');
                     rankingEvents(currentEvents);
                 }
             }
@@ -373,10 +377,10 @@ $(document).ready(function() {
 
 		if (date < startTime.getTime()) {
 				clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
-		} else if (date > finishTime.getTime()) {
+		} else if (date > submissionDeadline.getTime()) {
 				clock = "00:00:00";
 		} else {
-				clock = formatDelta(finishTime.getTime() - (date + omegaup.deltaTime));
+				clock = formatDelta(submissionDeadline.getTime() - (date + omegaup.deltaTime));
 		}
 
 		$('#title .clock').html(clock);
@@ -418,6 +422,29 @@ $(document).ready(function() {
 			$('.time', r).html(clarification.time);
 			$('.message', r).html(clarification.message);
 			$('.answer', r).html(clarification.answer);
+
+			if (clarification.can_answer) {
+				(function(id, answer, answerNode) {
+				 	console.log(clarification);
+				 	if (clarification.public == 1) {
+						$('input[type="checkbox"]', answer).attr('checked', 'checked');
+					}
+				 	answer.submit(function () {
+						omegaup.updateClarification(
+							id,
+							$('textarea', answer).val(),
+							$('input[type="checkbox"]', answer).attr('checked'),
+							function() {
+								answerNode.html($('textarea', answer).val());
+								$('textarea', answer).val('');
+							}
+						);
+						return false;
+					});
+
+					answerNode.append(answer);
+				})(clarification.clarification_id, $('<form><input type="checkbox" /><textarea></textarea><input type="submit" /></form>'), $('.answer', r));
+			}
 
 			$('.clarifications tbody').append(r);
 		}
@@ -488,10 +515,7 @@ $(document).ready(function() {
         });
         
         // set legend colors
-        console.log('adding colors');
-        console.log(window.chart.series);
         for (var name in currentRanking) {
-            console.log(name);
             if (currentRanking.hasOwnProperty(name)) {
                 var r = $('#ranking tbody tr.inserted')[currentRanking[name]];
                 var color = (function () {

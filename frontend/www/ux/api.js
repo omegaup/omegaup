@@ -85,7 +85,6 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 				contest.finish_time = self.time(contest.finish_time * 1000);
 				contest.submission_deadline = self.time(contest.submission_deadline * 1000);
 			}
-			console.log(contest);
 			callback(contest);
 		},
 		'json'
@@ -192,6 +191,28 @@ OmegaUp.prototype.newClarification = function(contestAlias, problemAlias, messag
 			contest_alias: contestAlias,
 			problem_alias: problemAlias,
 			message: message
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'ok', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.updateClarification = function(clarificationId, answer, public, callback) {
+	var self = this;
+
+	$.post(
+		'/arena/clarifications/update/' + clarificationId,
+		{
+			answer: answer,
+			public: public ? 1 : 0
 		},
 		function (data) {
 			callback(data);

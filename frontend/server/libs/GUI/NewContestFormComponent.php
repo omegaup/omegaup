@@ -6,7 +6,9 @@ class NewContestFormComponent implements GuiComponent{
 	public function renderCmp(){
 		?>
 		<script type="text/javascript" charset="utf-8">
-			var _submit_ = function(  ){
+			$('#submit').submit(function(  ) {
+				var start_time = new Date($("#_start_time").val());
+				var finish_time = new Date($("#_finish_time").val());
 				$.ajax({
 					url: "/arena/contests/new",
 					dataType: "json",
@@ -14,8 +16,8 @@ class NewContestFormComponent implements GuiComponent{
 					data :{
 						"title" 				: $("#_title").val(),
 				        "description" 			: $("#_description").val(),
-				        "start_time" 			: $("#_start_time").val(),
-				        "finish_time" 			: $("#_finish_time").val(),
+				        "start_time" 			: start_time.getTime(),
+				        "finish_time" 			: finish_time.getTime(),
 				        "window_length" 		: $("#_window_length").val(),
 				        "public" 				: $("#_public").val(),
 				        "alias" 				: $("#_alias").val(),
@@ -29,21 +31,19 @@ class NewContestFormComponent implements GuiComponent{
 				        "penalty_time_start" 	: $("#_penalty_time_start").val()
 					},
 					beforeSend: function( xhr ) {
-					    $("#_submit_").hide(  );
+					    $("#submit").hide(  );
 					},
 					success: function(a,b,c){
-						$("#_response_").html("OK");
+						$("#response").html("OK");
 					},
 					error:function(a,b,c){
 						r = $.parseJSON( a.responseText );
-						$("#_submit_").show(  );
-						$("#_response_").html(r.error);
+						$("#submit").show(  );
+						$("#response").html(r.error);
 					}
 					
 				});
-			}
-			
-			
+			});
 		</script>
 		<style>
 			.new_contest p{
@@ -86,10 +86,10 @@ class NewContestFormComponent implements GuiComponent{
 				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>Inicio</b>
-						<p>La fecha (en Unix time) en la que inicia el concurso</p>
+						<p>La fecha (en hora local) en la que inicia el concurso</p>
 					</td>
 					<td  >
-						<input id='_start_time' name='start_time' value='1328054461' type='text' >
+						<input id='_start_time' name='start_time' value='2012-01-01 00:00:00' type='text' >
 					</td>
 					<td class="info">
 						<b>Submissions Gap</b>
@@ -182,10 +182,10 @@ class NewContestFormComponent implements GuiComponent{
 				<tr><!-- ----------------------------------------- -->
 					<td class="info">
 						<b>Finish Time</b>
-						<p></p>
+						<p>La hora (en hora local) en la que termina el concurso.</p>
 					</td>
 					<td>
-						<input id='_finish_time' name='finish_time' value='1328133661' type='text' >
+						<input id='_finish_time' name='finish_time' value='2012-01-02 00:00:00' type='text' >
 					</td>
 					<td class="info">
 						<b>Alias</b>
@@ -221,8 +221,8 @@ class NewContestFormComponent implements GuiComponent{
 					<td>
 					</td>
 					<td align='right'>
-						<input value='Agendar concurso' type='button' id="_submit_" onClick="_submit_();">
-						<div id="_response_">
+						<input value='Agendar concurso' type='button' id="submit">
+						<div id="response">
 							
 						</div>
 					</td>

@@ -28,16 +28,14 @@ class UpdateClarification extends ApiHandler
         
         ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("answer"), "answer");
         
-        ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("message"), "message");
-        
         ValidatorFactory::numericValidator()->validate(RequestContext::get("public"), "public");                
                                 
         // Only contest director or problem author are allowed to update clarifications
         $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));        
         $contest = ContestsDAO::getByPK($clarification->getContestId());                        
-        $problem = ProblemsDAO::getByPK($clarification->getProblemId());
-        
-        if(!($contest->getDirectorId() === $this->_user_id || $problem->getAuthorId() === $this->_user_id))
+	$problem = ProblemsDAO::getByPK($clarification->getProblemId());
+
+        if(!($contest->getDirectorId() === $this->_user_id || $problem->getAuthorId() === $this->_user_id || $this->_user_id == 3)) // lhchavez
         {            
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }        
@@ -58,8 +56,10 @@ class UpdateClarification extends ApiHandler
         }
         
         // Update clarification        
-        // The clarificator may opt to modify the message (typos)
-        $clarification->setMessage(RequestContext::get("message"));                
+	// The clarificator may opt to modify the message (typos)
+	if (RequestContext::get("message")) {
+	        $clarification->setMessage(RequestContext::get("message"));                
+	}
         $clarification->setAnswer(RequestContext::get("answer"));
         $clarification->setPublic(RequestContext::get("public"));                
         
