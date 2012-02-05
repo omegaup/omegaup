@@ -50,6 +50,8 @@ object Runner extends RunnerService with Log {
 				List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles
 			case "p" =>
 				List(sandbox, "-S", profile + "/fpc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("p.compiler.path", "/usr/bin/fpc"), "-Tlinux") ++ inputFiles
+			case "py" =>
+				List(sandbox, "-S", profile + "/pyc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("py.compiler.path", "/usr/bin/python"), "-m", "py_compile") ++ inputFiles
 			case _ => null
 		}
 
@@ -141,6 +143,8 @@ object Runner extends RunnerService with Log {
 							List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "-n", "--", "./a.out")
 						case "p" =>
 							List(sandbox, "-S", profile + "/p", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "-n", "--", "./Main")
+						case "py" =>
+							List(sandbox, "-S", profile + "/py", "-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py")
 					}
 
 					debug("Run {}", params.mkString(" "))
@@ -165,6 +169,10 @@ object Runner extends RunnerService with Log {
 								List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")
 							case "cpp" =>
 								List(sandbox, "-S", profile + "/c", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "--", "./a.out")
+							case "p" =>
+								List(sandbox, "-S", profile + "/p", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath, "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "-n", "--", "./Main")
+							case "py" =>
+								List(sandbox, "-S", profile + "/py", "-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath, "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString, "-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py")
 						}
 				
 						debug("Run {}", params.mkString(" "))
