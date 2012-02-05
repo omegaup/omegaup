@@ -159,11 +159,24 @@ object Database extends Object with Log {
 	def query[B](sql: String, params: Any*)(process: ResultSet => B)(implicit connection: Connection): Option[B] = {
 		val q = build(sql, params : _*)
 		trace(q)
-		using (connection.createStatement) { statement =>
-			using (statement.executeQuery(q)) { results =>
-				results.next match {
-					case true => Some(process(results))
-					case false => None
+		try {
+			using (connection.createStatement) { statement =>
+				using (statement.executeQuery(q)) { results =>
+					results.next match {
+						case true => Some(process(results))
+						case false => None
+					}
+				}
+			}
+		} catch {
+			case _ => {
+				using (connection.createStatement) { statement =>
+					using (statement.executeQuery(q)) { results =>
+						results.next match {
+							case true => Some(process(results))
+							case false => None
+						}
+					}
 				}
 			}
 		}
@@ -172,8 +185,16 @@ object Database extends Object with Log {
 	def execute(sql: String, params: Any*)(implicit connection: Connection): Unit = {
 		val q = build(sql, params : _*)
 		trace(q)
-		using (connection.createStatement) { statement =>
-			statement.execute(q)
+		try {
+			using (connection.createStatement) { statement =>
+				statement.execute(q)
+			}
+		} catch {
+			case _ => {
+				using (connection.createStatement) { statement =>
+					statement.execute(q)
+				}
+			}
 		}
 	}
 
