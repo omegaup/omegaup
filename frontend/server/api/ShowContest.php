@@ -137,6 +137,17 @@ class ShowContest extends ApiHandler
 	        
 	        // Add problems to response
 	        $result['problems'] = $problemsResponseArray;
+                
+                // Add time left to response
+                if ($contest->getWindowLength() === null)
+                {
+                    $result['submission_deadline'] = strtotime($contest->getFinishTime());
+                }
+                else
+                {
+                    $result['submission_deadline'] = min(strtotime($contest->getFinishTime()),
+                    strtotime($contest_user->getAccessTime()) + $contest->getWindowLength() * 60);
+                }
 	                
 	        // @TODO Add mini ranking here
 	        

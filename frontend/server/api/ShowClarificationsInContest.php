@@ -32,17 +32,19 @@ class ShowClarificationsInContest extends ApiHandler
     protected function GenerateResponse() 
     {
        // Create array of relevant columns
-        $relevant_columns = array("problem_alias", "message", "answer", "time");
-        
+	$relevant_columns = array("clarification_id", "problem_alias", "message", "answer", "time", "public");
+
         //Get all public clarifications
         $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
         $public_clarification_mask = new Clarifications ( array (
            "public" => '1',
            "contest_id" => $contest->getContestId()
-        ));
+	));
+
+	$is_contest_director = ($contest->getDirectorId() == $this->_user_id || $this->_user_id == 3); // lhchavez :P
         
         // If user is the contest director, get all private clarifications        
-        if($contest->getDirectorId() == $this->_user_id)
+        if($is_contest_director)
         {                        
             // Get all private clarifications 
             $private_clarification_mask = new Clarifications ( array (
@@ -77,13 +79,19 @@ class ShowClarificationsInContest extends ApiHandler
         // Filter each Public clarification and add it to the response        
         foreach($clarifications_public as $clarification)
         {
-            array_push($clarifications_array, $clarification->asFilteredArray($relevant_columns));            
+		$clar = $clarification->asFilteredArray($relevant_columns);
+		$clar['can_answer'] = $is_contest_director;
+
+        	array_push($clarifications_array, $clar);
         }
          
         // Filter each Private clarification and add it to the response
         foreach($clarifications_private as $clarification)
-        {
-            array_push($clarifications_array, $clarification->asFilteredArray($relevant_columns));            
+	{
+		$clar = $clarification->asFilteredArray($relevant_columns);
+		$clar['can_answer'] = $is_contest_director;
+
+		array_push($clarifications_array, $clar);
         }
         
         // Sort final array by time

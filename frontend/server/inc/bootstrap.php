@@ -50,7 +50,8 @@
 				)));
 
 		    }
-
+		    $conn->SetCharSet('utf8');
+		    $conn->EXECUTE('SET NAMES \'utf8\';');
 		} catch (Exception $e) {
 			
 			header('HTTP/1.1 500 INTERNAL SERVER ERROR');

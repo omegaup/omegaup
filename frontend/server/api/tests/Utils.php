@@ -47,9 +47,10 @@ class Utils
         $conn = null;
 
         try{                    
-            $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
-            $conn->debug = OMEGAUP_DB_DEBUG;
-            $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_TEST_DB_NAME);
+           $conn = ADONewConnection(OMEGAUP_TEST_DB_DRIVER);                    
+           $conn->debug = OMEGAUP_TEST_DB_DEBUG;
+           $conn->PConnect(OMEGAUP_TEST_DB_HOST, OMEGAUP_TEST_DB_USER, OMEGAUP_TEST_DB_PASS, OMEGAUP_TEST_DB_NAME);
+
 
             if(!$conn) {
                         /**
