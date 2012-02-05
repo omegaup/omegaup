@@ -9,7 +9,7 @@
 		<script type="text/javascript" src="/js/highstock.js"></script>
 		<script type="text/javascript" src="/ux/api.js"></script>
 		<script type="text/javascript" src="/ux/contest.js"></script>
-		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		<script type="text/javascript" src="https://d3eoax9i5htok0.cloudfront.net/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
 		<link rel="stylesheet" href="/css/reset.css" />
 		<link rel="stylesheet" href="/ux/arena.css" />
@@ -61,6 +61,11 @@
 				<div id="summary" class="main">
 					<h1 class="title"></h1>
 					<p class="description"></p>
+					<table>
+						<tr><td><strong>Hora de inicio</strong></td><td class="start_time"></td></tr>
+						<tr><td><strong>Hora de fin</strong></td><td class="finish_time"></td></tr>
+						<tr><td><strong>Tiempo para resolver los problemas</strong></td><td><span class="window_length"></span> minutos</td></tr>
+					</table>
 				</div>
 				<div id="problem" class="main">
 					<h1 class="title"></h1>
@@ -85,8 +90,9 @@
 						<caption>Envíos</caption>
 						<thead>
 							<tr>
-								<th>Problema</th>
 								<th>Lenguaje</th>
+								<th>Tiempo de Ejecución</th>
+								<th>Memoria</th>
 								<th>Tiempo</th>
 								<th>Status</th>
 								<th>Puntos</th>
@@ -95,13 +101,14 @@
 						</thead>
 						<tfoot>
 							<tr>
-								<td colspan="6"><a href="#problems/run">Nuevo envío</a></td>
+								<td colspan="7"><a href="#problems/run">Nuevo envío</a></td>
 							</tr>
 						</tfoot>
 						<tbody class="run-list">
 							<tr class="template">
-								<td class="problem"></td>
 								<td class="language"></td>
+								<td class="runtime"></td>
+								<td class="memory"></td>
 								<td class="time"></td>
 								<td class="status"></td>
 								<td class="points"></td>
@@ -113,7 +120,7 @@
 			</div>
 			<div id="ranking" class="tab">
                 <div id="ranking-chart"></div>
-                <table>
+                <table id="ranking-table">
                     <thead>
                         <tr>
                             <th></th>

@@ -83,6 +83,7 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 			if (contest.status == 'ok') {
 				contest.start_time = self.time(contest.start_time * 1000);
 				contest.finish_time = self.time(contest.finish_time * 1000);
+				contest.submission_deadline = self.time(contest.submission_deadline * 1000);
 			}
 			callback(contest);
 		},
@@ -123,7 +124,13 @@ OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, 
 			callback(data);
 		},
 		'json'
-	);
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
 };
 
 OmegaUp.prototype.runStatus = function(guid, callback) {
@@ -189,5 +196,33 @@ OmegaUp.prototype.newClarification = function(contestAlias, problemAlias, messag
 			callback(data);
 		},
 		'json'
-	);
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'ok', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.updateClarification = function(clarificationId, answer, public, callback) {
+	var self = this;
+
+	$.post(
+		'/arena/clarifications/update/' + clarificationId,
+		{
+			answer: answer,
+			public: public ? 1 : 0
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
 };

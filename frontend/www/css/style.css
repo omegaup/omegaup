@@ -205,12 +205,12 @@ div.login_bar{
 
 
 
-div.login_bar a{
+div.login_bar a {
     color: white;
     text-decoration: none;
 }
 
-div.login_bar a:hover{
+div.login_bar a:hover {
     text-decoration: underline;
 }
 
@@ -225,7 +225,6 @@ div.login_bar a:hover{
 }
 
 table{
-
 	margin: 5px;
 	padding : 5px;
 }

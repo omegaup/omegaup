@@ -42,6 +42,8 @@ class ContestsUsersDAO extends ContestsUsersDAOBase
             $contest_user->setAccessTime(date("Y-m-d H:i:s"));
             
             ContestsUsersDAO::save($contest_user);            
-        } 
+        }
+        
+        return $contest_user;
     }    
 }

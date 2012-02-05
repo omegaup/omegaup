@@ -17,21 +17,15 @@
 
 	$page = new OmegaupComponentPage();
 
-	$form = new FormComponent();
-
 	if (!$_POST['source']) {
 		$_POST['source'] = "# Descripción\n\nEsta es la descripción del problema. Inventa una historia creativa. Puedes utilizar matemáticas inline para hacer \$x_i, y_i\$, o \$z_i\$ o incluso \$\$x=\\frac{b\\pm \\sqrt{b^2 -4ac}}{2a}\$\$.\n\n# Entrada\n\nAquí va la descripción de la entrada del problema.\n\n# Salida\n\nEsta es la descripción de la salida esperada.\n\n# Ejemplo\n\n||input\n1\n2\n||output\nCase #1: 3\n||description\nExplicación\n||input\n5\n10\n||output\nCase #2: 15\n||end\n\n# Límites\n\n* Aquí\n* Van\n* Los\n* Límites";
 	}
 
-	$form->addField('markdownSource', '', 'textarea', $_POST['source'], 'source');
-	$form->addSubmit('Previsualización', 'redaccion.php', 'POST');
 	
 	$page->addComponent(new FreeHTMLComponent('<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>'));
 	$page->addComponent(new FreeHTMLComponent('<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [[\'$\',\'$\'], [\'\\\\(\',\'\\\\)\']]}});</script>'));
 	$page->addComponent(new FreeHTMLComponent('<div>Explicación :P</div>'));
-	$page->addComponent(new FreeHTMLComponent('<div id="markdownPreview" class="problem-statement">' . markdown($_POST['source']) . '</div>'));
-	$page->addComponent($form);
-	$page->addComponent(new FreeHTMLComponent('<div style="clear: right"></div>'));
+	$page->addComponent(new FreeHTMLComponent("<form method='POST' action='redaccion.php'><textarea id='markdownSource' name='source'>{$_POST['source']}</textarea><div id='markdownPreview' class='problem-statement'>" . markdown($_POST['source']) . "</div><div style='clear: both;'><input value='Previsualización' type='submit'/></div></form>"));
 
 	$page->render();
 

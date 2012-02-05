@@ -28,6 +28,9 @@ class ProblemsController {
 						'spoj' => "SPOJ" );
 	}
 
+
+
+
   /**
     * Adds a problem from a remote server to the list of known
     * problems.
@@ -59,6 +62,11 @@ class ProblemsController {
     return true;
   }
   
+
+
+
+
+
   /**
     * Adds one or more tags to a problem.
     * This function should allow tagging multiple problems with multiple tags
@@ -105,7 +113,8 @@ class ProblemsController {
     }
 
     //create tmp folder
-    $tmp_dir  = OMEGAUP_ROOT . "tmp/" . $zid;
+    $tmp_dir  = SERVER_PATH  . "/../tmp/" . $zid;
+
     mkdir ($tmp_dir);
   
 
@@ -137,7 +146,7 @@ class ProblemsController {
     *
     **/
   private static function zipCleanup($zid){
-    $tmp_dir  = OMEGAUP_ROOT . "tmp/" . $zid;
+    $tmp_dir  = SERVER_PATH . "/../tmp/" . $zid;
     unlink( $tmp_dir );
     return;
   }
@@ -146,7 +155,7 @@ class ProblemsController {
 
 
   private static function parseZipContents( $zid ){
-    $file_prefix  = OMEGAUP_ROOT . "tmp/" . $zid. "/";
+    $file_prefix  = SERVER_PATH . "/../tmp/" . $zid. "/";
 
     //parse your files here, file absolute path must be prefixed with $file_prefix
 
