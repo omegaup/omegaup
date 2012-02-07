@@ -81,7 +81,7 @@ object Logging {
 			val context = rootLogger.getLoggerContext
 
 			encoder.setContext(context);
-			encoder.setPattern("%-4relative [%thread] %-5level %logger{35} - %msg%n");
+			encoder.setPattern("%date [%thread] %-5level %logger{35} - %msg%n");
 			encoder.start()
 
 			appender.setAppend(true)

@@ -45,13 +45,13 @@ object Runner extends RunnerService with Log {
 			case "java" =>
 				List(sandbox, "-S", profile + "/javac", "-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "--", Config.get("java.compiler.path", "/usr/bin/javac")) ++ inputFiles
 			case "c" =>
-				List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-ansi", "-O2", "-lm") ++ inputFiles
+				List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("c.compile.time_limit", "30"), "--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-ansi", "-O2", "-lm") ++ inputFiles
 			case "cpp" =>
-				List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles
+				List(sandbox, "-S", profile + "/gcc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("cpp.compile.time_limit", "30"), "--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles
 			case "p" =>
-				List(sandbox, "-S", profile + "/fpc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("p.compiler.path", "/usr/bin/fpc"), "-Tlinux") ++ inputFiles
+				List(sandbox, "-S", profile + "/fpc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("p.compile.time_limit", "30"), "--", Config.get("p.compiler.path", "/usr/bin/fpc"), "-Tlinux") ++ inputFiles
 			case "py" =>
-				List(sandbox, "-S", profile + "/pyc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "--", Config.get("py.compiler.path", "/usr/bin/python"), "-m", "py_compile") ++ inputFiles
+				List(sandbox, "-S", profile + "/pyc", "-c", runDirectory.getCanonicalPath, "-q", "-m", "524288", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("py.compile.time_limit", "30"), "--", Config.get("py.compiler.path", "/usr/bin/python"), "-m", "py_compile") ++ inputFiles
 			case _ => null
 		}
 
@@ -90,7 +90,7 @@ object Runner extends RunnerService with Log {
 					FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
 				}
 				
-				info("compile finished with errors: {}", compileError)
+				error("compile finished with errors: {}", compileError)
 				new CompileOutputMessage("compile error", error=Some(compileError))
 			}
 		} else {
