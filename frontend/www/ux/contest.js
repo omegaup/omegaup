@@ -147,7 +147,6 @@ $(document).ready(function() {
 		omegaup.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
-				console.log(run);
 				$('#clarification input').removeAttr('disabled');
 				return;
 			}
@@ -425,7 +424,6 @@ $(document).ready(function() {
 
 			if (clarification.can_answer) {
 				(function(id, answer, answerNode) {
-				 	console.log(clarification);
 				 	if (clarification.public == 1) {
 						$('input[type="checkbox"]', answer).attr('checked', 'checked');
 					}

@@ -58,7 +58,7 @@
 		if(is_null($relation)){
 			//nope, user cannot see it
 			$page->addComponent( new TitleComponent("Este concurso es privado", 2) );
-			$page->addComponent( new TitleComponent("No puedes ver este conrso.", 3) );
+			$page->addComponent( new TitleComponent("No puedes ver este concurso.", 3) );
 			$page->render();			
 		}
 
@@ -77,7 +77,7 @@
 		$results = $contestApi->ExecuteApi( );
 			
 	}catch(Exception $e){
-		$page->addComponent( new TitleComponent("Whoops.", 3) );
+		$page->addComponent( new TitleComponent("<a href='https://omegaup.com/arena/{$_GET['alias']}/'>Ir al concurso</a>", 3) );
 		$page->render();
 	}
 
