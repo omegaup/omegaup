@@ -15,7 +15,9 @@
 
 	  	if( $googleLogin->success() )
 		{
-			LoginController::login( $googleLogin->email(), $googleLogin->identity() );
+			Logger::log( "GoogleOpenID reports user email as " . $googleLogin->email() );
+			
+			LoginController::login( rawurldecode($googleLogin->email()), $googleLogin->identity() );
 			
 			die(header("Location: index.php"));
 	  	}
