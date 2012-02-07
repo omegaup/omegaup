@@ -79,6 +79,11 @@ class ApiLoader
                 require_once('ShowClarificationsInContest.php');
                 $api = new ShowClarificationsInContest();
                 break;
+
+            case 'ShowRunsInContest':
+                require_once('ShowRunsInContest.php');
+                $api = new ShowRunsInContest();
+                break;
             
             case 'ShowClarification':
                 require_once('ShowClarification.php');
@@ -108,6 +113,11 @@ class ApiLoader
             case 'ShowRun':
                 require_once('ShowRun.php');
                 $api = new ShowRun();
+		break;
+
+            case 'UpdateRun':
+                require_once('UpdateRun.php');
+                $api = new UpdateRun();
                 break;
             
             case 'ShowScoreboard':

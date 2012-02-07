@@ -275,7 +275,7 @@ p {
         padding: 0.3em 0.5em;
 }
 
-#ranking table, #clarifications table {
+#ranking table, table.clarifications {
 	width: 100%;
 	margin: 0 auto;
 }
@@ -307,12 +307,12 @@ p {
 }
 
 
-#clarifications tbody td {
+.clarifications tbody td {
 	border: 1px solid #000;
 	padding: 0.2em;
 }
 
-#clarifications tfoot td a {
+.clarifications tfoot td a {
     display: block;
 	padding: 0.5em;
 	border: 1px solid #000;
@@ -322,10 +322,10 @@ p {
 	text-align: center;
 }
 
-#clarifications .problem {
+.clarifications .problem {
     width: 7em;
 }
 
-#clarifications .time {
+.clarifications .time {
     width: 10em;
 }

@@ -169,7 +169,17 @@ abstract class RunsDAOBase extends DAO
                 // Implode array of columns to a coma-separated string               
                 $columns_str = is_null($columnas) ? "*" : implode(",", $columnas);
             
-		$sql = "SELECT ".$columns_str."  from Runs WHERE ("; 
+		$sql = "SELECT ".$columns_str."  from Runs ";
+
+		if ($columnas != null) {
+			if (in_array("Users.username", $columnas)) {
+				$sql .= "INNER JOIN Users ON Users.user_id = Runs.user_id ";
+			}
+			if (in_array("Problems.alias", $columnas)) {
+				$sql .= "INNER JOIN Problems ON Problems.problem_id = Runs.problem_id ";
+			}
+		}
+		$sql .= "WHERE ("; 
 		$val = array();
 		if( $Runs->getRunId() != NULL){
 			$sql .= " run_id = ? AND";
@@ -247,6 +257,7 @@ abstract class RunsDAOBase extends DAO
 		    $sql .= " order by " . $orderBy . " " . $orden ;
 		
 		}
+
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();

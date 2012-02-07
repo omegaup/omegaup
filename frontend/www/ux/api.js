@@ -109,6 +109,21 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	);
 };
 
+OmegaUp.prototype.getContestRuns = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/contests/' + contestAlias + '/runs/',
+		function (data) {
+			for (var i = 0; i < data.runs.length; i++) {
+				data.runs[i].time = self.time(data.runs[i].time * 1000);
+			}
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, callback) {
 	var self = this;
 
@@ -140,6 +155,18 @@ OmegaUp.prototype.runStatus = function(guid, callback) {
 		'/arena/runs/' + guid + '/',
 		function (data) {
 			data.time = self.time(data.time * 1000);
+			callback(data);
+		},
+		'json'
+	);
+};
+
+OmegaUp.prototype.runRejudge = function(guid, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/runs/' + guid + '/rejudge/',
+		function (data) {
 			callback(data);
 		},
 		'json'
