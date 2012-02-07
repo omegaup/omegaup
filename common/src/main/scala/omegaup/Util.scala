@@ -88,6 +88,25 @@ object Logging {
 			appender.setContext(context)
 			appender.setFile(Config.get("logging.file", ""))
 			appender.setEncoder(encoder)
+			appender.addFilter(new ch.qos.logback.core.filter.Filter[ch.qos.logback.classic.spi.ILoggingEvent]() {
+				override def decide(event: ch.qos.logback.classic.spi.ILoggingEvent): ch.qos.logback.core.spi.FilterReply = {
+					val throwable = event.getThrowableProxy()
+
+					if (throwable == null) {
+						ch.qos.logback.core.spi.FilterReply.ACCEPT
+					} else {
+						val message = throwable.getClassName()
+
+						if (message.contains("java.nio.channels.ClosedChannelException") ||
+						    message.contains("org.mortbay.jetty.EofException")
+						) {
+							ch.qos.logback.core.spi.FilterReply.DENY
+						} else {
+							ch.qos.logback.core.spi.FilterReply.ACCEPT
+						}
+					}
+				}
+			})
 			appender.start
 
 			rootLogger.addAppender(appender)
