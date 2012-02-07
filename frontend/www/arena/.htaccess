@@ -15,12 +15,14 @@ RewriteRule ^contests/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowCo
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/?$ /arena/CallApiLoader.php?apicmd=ShowScoreboard&contest_alias=$1 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/events/?$ /arena/CallApiLoader.php?apicmd=ShowScoreboardEvents&contest_alias=$1 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/clarifications/?$ /arena/CallApiLoader.php?apicmd=ShowClarificationsInContest&contest_alias=$1 [L]
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/runs/?$ /arena/CallApiLoader.php?apicmd=ShowRunsInContest&contest_alias=$1 [L]
 
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemInContest&contest_alias=$1&problem_alias=$2 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/new/?$ /arena/CallApiLoader.php?apicmd=NewProblemInContest&contest_alias=$1 [L]
 
 RewriteRule ^runs/new/?$ /arena/CallApiLoader.php?apicmd=NewRun [L]
 RewriteRule ^runs/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowRun&run_alias=$1 [L]
+RewriteRule ^runs/([a-zA-Z0-9_-]+)/rejudge/?$ /arena/CallApiLoader.php?apicmd=UpdateRun&run_alias=$1 [L]
 RewriteRule ^runs/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemRuns&problem_alias=$1 [L]
 
 RewriteRule ^clarifications/new/?$ /arena/CallApiLoader.php?apicmd=NewClarification [L]
@@ -31,4 +33,5 @@ RewriteRule ^clarifications/update/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=U
 # Redirects for UX.
 RewriteRule ^/?$ index.php [L]
 RewriteRule ^[a-zA-Z0-9_+-]+/scoreboard/?$ scoreboard.php [L]
+RewriteRule ^[a-zA-Z0-9_+-]+/admin/?$ admin.php [L]
 RewriteRule ^[a-zA-Z0-9_+-]+/?$ contest.php [L]

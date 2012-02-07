@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>OmegaUp</title>
+		<script type="text/javascript" src="/js/jquery.js"></script>
+		<script type="text/javascript" src="/js/jquery.ba-hashchange.js"></script>
+		<script type="text/javascript" src="/js/jquery.tableSort.js"></script>
+		<script type="text/javascript" src="/js/highstock.js"></script>
+		<script type="text/javascript" src="/ux/api.js"></script>
+		<script type="text/javascript" src="/ux/admin.js"></script>
+		<script type="text/javascript" src="https://d3eoax9i5htok0.cloudfront.net/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+		<link rel="stylesheet" href="/css/reset.css" />
+		<link rel="stylesheet" href="/ux/arena.css" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+	</head>
+	<body>
+		<!-- Generated from http://ajaxload.info/ -->
+		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
+		<div id="root">
+			<div id="title">
+				<img src="/media/omegaup_curves.png" height="80" alt="OmegaUp" />
+				<h1 class="contest-title"></h1>
+				<div class="clock">0:00:00</div>
+			</div>
+			<table class="runs">
+				<caption>Envíos</caption>
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Usuario</th>
+						<th>Problema</th>
+						<th>Lenguaje</th>
+						<th>Tiempo de Ejecución</th>
+						<th>Memoria</th>
+						<th>Tiempo</th>
+						<th>Status</th>
+						<th>Puntos</th>
+						<th>Penalty</th>
+						<th>Rejuecear</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="10"><a href="#problems/run">Nuevo envío</a></td>
+					</tr>
+				</tfoot>
+				<tbody class="run-list">
+					<tr class="template">
+						<td class="id"></td>
+						<td class="username"></td>
+						<td class="problem"></td>
+						<td class="language"></td>
+						<td class="runtime"></td>
+						<td class="memory"></td>
+						<td class="time"></td>
+						<td class="status"></td>
+						<td class="points"></td>
+						<td class="penalty"></td>
+						<td class="rejudge"></td>
+					</tr>
+				</tbody>
+			</table>
+	                <div id="ranking-chart"></div>
+        	        <table id="ranking" style="display: block;">
+                	    <thead>
+	                        <tr>
+        	                    <th></th>
+                	            <th></th>
+                        	    <th>Usuario</th>
+	                            <th class="total" colspan="2">Total</th>
+        	                </tr>
+                	    </thead>
+	                    <tbody>
+        	                <tr class="template">
+                	            <td class="position"></td>
+                        	    <td class="legend"></td>
+	                            <td class="user"></td>
+        	                    <td class="points"></td>
+                	            <td class="penalty"></td>
+                        	</tr>
+	                    </tbody>
+			</table>
+			<table class="clarifications">
+				<thead>
+					<tr>
+						<th class="problem">Problema</th>
+						<th class="time">Tiempo</th>
+						<th class="message">Mensaje</th>
+						<th class="answer">Respuesta</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="6"><a href="#clarifications/new">Nueva clarificación</a></td>
+					</tr>
+				</tfoot>
+				<tbody class="clarification-list">
+					<tr class="template">
+						<td class="problem"></td>
+						<td class="time"></td>
+						<td class="message"></td>
+						<td class="answer"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div id="overlay">
+			<form id="submit" method="POST">
+		                <button class="close">&times;</button>
+				Lenguaje
+				<select name="language">
+					<option value="c">C</option>
+					<option value="cpp">C++</option>
+					<option value="p">Pascal</option>
+				</select><br/>
+				<textarea name="code"></textarea><br/>
+				<input type="submit" />
+			</form>			
+			<form id="clarification" method="POST">
+		                <button class="close">&times;</button>
+				Problema
+				<select name="problem">
+				</select><br/>
+				<textarea name="message"></textarea><br/>
+				<input type="submit" />
+			</form>
+		</div>
+	</body>
+</html>
