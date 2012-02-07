@@ -197,26 +197,26 @@ p {
 	font-style: italic;
 }
 
-#problem .runs {
+.runs {
 	width: 100%;
 	border: 1px solid #ccc;
 	margin-top: 2em;
 }
 
-#problem .runs caption {
+.runs caption {
 	font-weight: bold;
 	font-size: 1.em;
 	margin-bottom: 1em;
 }
 
-#problem .runs td,
-#problem .runs th {
+.runs td,
+.runs th {
 	border: 1px solid #ccc;
 	border-width: 1px 0;
 	text-align: center;
 }
 
-#problem .runs tfoot td a {
+.runs tfoot td a {
 	display: block;
 	padding: 0.5em;
 	text-decoration: none;
@@ -224,7 +224,7 @@ p {
 	background: #ccc;
 	text-align: center;
 }
-#problem .runs tfoot td a:hover {
+.runs tfoot td a:hover {
 	background: #fff;
 }
 

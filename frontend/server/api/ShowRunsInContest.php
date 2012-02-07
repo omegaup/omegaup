@@ -68,7 +68,9 @@ class ShowRunsInContest extends ApiHandler
 	$result = array();
 
 	foreach ($runs as $run) {
-		array_push($result, $run->asFilteredArray($relevant_columns));
+		$filtered = $run->asFilteredArray($relevant_columns);
+		$filtered['time'] = strtotime($filtered['time']);
+		array_push($result, $filtered);
 	}
 
         // Add the run to the response
