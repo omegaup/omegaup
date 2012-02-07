@@ -30,10 +30,8 @@
 
 
 	$page->addComponent( new TitleComponent("Nuevo problema (ZIP)", 3));
-	$page->addComponent( new SubmitFileComponent() );
+	
+	$page->addComponent( new SubmitProblemComponent() );
 
-	$page->addComponent( new TitleComponent("Nuevo problema", 3));
-    $new_problem = new DAOFormComponent( new Problems() );
-    $page->addComponent( $new_problem );
     
     $page->render();

@@ -1,7 +1,7 @@
 <?php
 
 
-class SubmitFileComponent implements GuiComponent{
+class SubmitProblemComponent implements GuiComponent{
 	
 	private $submitTo;
 
@@ -14,13 +14,21 @@ class SubmitFileComponent implements GuiComponent{
 	}
 
 	function renderCmp(){
-		$html = "<form action='".$this->submitTo."' method='POST' enctype='multipart/form-data'>";
-		$html .= "<input name='file' type='file'>";
-		$html .= "<input name='file_sent' type='hidden'>";
-		$html .= "<input type='submit' value='Enviar'>";
-		$html .= "</form>";
+	
+	    $new_problem = new DAOFormComponent( new Problems( ) );
+		$new_problem->hideField(array( "submissions", "visits", "remote_id", "creation_date", "server", "problem_id" ));
+	
+		?>
+			<form action='<php $this->submitTo; ?>' method='POST' enctype='multipart/form-data'>
+				<input name='file' type='file'>
+				<input name='file_sent' type='hidden'>
+				<input type='submit' value='Enviar'>
+			</form>
+		<?php
 
-		return $html;
+		echo $new_problem->renderCmp();
+		
+		
 	}
 
 }

@@ -122,7 +122,10 @@ class ProblemsController {
     while ($zip_entry = zip_read($zip)) {
 
       $fp = @fopen( $tmp_dir . "/" . zip_entry_name($zip_entry), "w");
-      if(!$fp) continue;
+      if(!$fp){
+		Logger::log( "Could not open `". ($tmp_dir . "/" . zip_entry_name($zip_entry)) ."` while deflating." );
+		continue;
+		} 
       if (zip_entry_open($zip, $zip_entry, "r")) {
         $buf = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
         fwrite($fp, "$buf");
@@ -146,8 +149,8 @@ class ProblemsController {
     *
     **/
   private static function zipCleanup($zid){
-    $tmp_dir  = SERVER_PATH . "/../tmp/" . $zid;
-    unlink( $tmp_dir );
+    $tmp_dir  = SERVER_PATH . "/../tmp/" . $zid . "/";
+    rmdir( $tmp_dir );
     return;
   }
 
