@@ -15,29 +15,14 @@
 
 
     $page = new OmegaupComponentPage();
-    $page->addComponent( new TitleComponent("Bienvenido a Omegaup !"));
 
 
-	
-	//announcements
-	$page->addComponent( new TitleComponent("announcements", 2));
-	$announcements = AnnouncementDAO::getAll();
-	
-	
-	//coder of the month
-	$page->addComponent( new TitleComponent("coder of the month", 2));	
-	$coder = CoderOfTheMonthDAO::getAll();
-	
-	
-	//current contests
-	$page->addComponent( new TitleComponent("active contests", 2));	
-	$contest_query = new Contests();
-	$contest_query->setFinishTime( date("Y-m-d H:i:s", time()) );
-	$contest_query->setPublic(true);
-	
-	$contests_list = ContestsDAO::search( $contest_query );
-	
-	
+
+	$page->addComponent( new TitleComponent("Elevando el nivel de nuestros desarrolladores", 3));	
+	$page->addComponent( new FreeHtmlComponent("<img style='width: 200px; padding:0px; margin:0px; -webkit-box-shadow:0px 0px;' src='media/omegaup_curves.png'>"));
+
+
+
 	
 
     $page->render();
