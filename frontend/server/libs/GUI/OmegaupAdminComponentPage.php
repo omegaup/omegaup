@@ -112,7 +112,7 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 									<li><a href='contests.php'>Concursos</a></li>
 									<li><a href='users.php'>Usuarios</a></li>
 									<li><a href='probs.php'>Problemas</a></li>
-									<li><input type='text' placeholder='Buscar'></li>
+									<li><a href='log.php'>Log</a></li>
 								</ul>
 					</div>
 
