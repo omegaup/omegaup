@@ -178,7 +178,9 @@ class OmegaupComponentPage extends StdComponentPage{
 				<?php echo $this->user_html_menu; ?>
 				</div> 
 				<div id="title">
-					<div style="margin-left: 40%;"><img src="media/omegaup_curves.png"></div>
+					<a href="index.php">
+						<div style="margin-left: 40%;"><img src="media/omegaup_curves.png"></div>
+					</a>
 				</div>
 			    
 				<div id="content">
@@ -186,14 +188,15 @@ class OmegaupComponentPage extends StdComponentPage{
 					
 					<div class="post footer">
 								<ul >
-									<li><a href='probs.php'>Problemas</a></li>
+									<li><a href='contests.php'><b>Concursos</b></a></li>
+									<!-- <li><a href='probs.php'>Problemas</a></li> -->
 									<li><a href='rank.php'>Ranking</a></li>
 									<li><a href='recent.php'>Actividad reciente</a></li>
 									<li><a href='faq.php'>FAQ</a></li>
-									<li><a href='contests.php'>Concursos</a></li>
-									<li><a href='schools.php'>Escuelas</a></li>
+
+									<!-- <li><a href='schools.php'>Escuelas</a></li> -->
 									<li><a href='help.php'>Colabora</a></li>
-									<li><input type='text' placeholder='Buscar'></li>
+									<!-- <li><input type='text' placeholder='Buscar'></li> -->
 								</ul>
 					</div>
 
@@ -212,8 +215,9 @@ class OmegaupComponentPage extends StdComponentPage{
 					</div>
 					<!-- .post -->
 				
-				    <div class="post footer">
+				    <div class="post footer" style="padding: 5px; color:black; margin: 0px auto">
 					&nbsp;
+						<img style='width: 60px; padding:0px; margin:0px; -webkit-box-shadow:0px 0px;' src='media/omegaup_curves.png'> es un lugar para mejorar tus habilidades de desarrollo de software.
 				    </div>
 					<!-- .post footer -->
 

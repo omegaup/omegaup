@@ -47,14 +47,15 @@ div#title {
 	padding-top: 13px;
     background: #eceff1 url(../media/header-background.png);
 }
-div#title a {
+
+/*div#title a {
     display: block;
     text-indent: -999em;
     width: 600px;
     height: 71px;
     margin: 0 auto;
     background: url(../media/header.png) top center;
-}
+}*/
 div.post {
 	width: 900px;
     nowhitespace: afterproperty;
