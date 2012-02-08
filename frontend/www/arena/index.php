@@ -15,4 +15,15 @@
  * */
 
 
-include('../ux/arena.html');
+
+
+if(defined("OMEGAUP_GA_TRACK") && OMEGAUP_GA_TRACK === true){
+	include('../ux/arena.html?_ga_id=' . OMEGAUP_GA_ID);
+	
+}else{
+	include('../ux/arena.html');
+	
+}
+
+
+

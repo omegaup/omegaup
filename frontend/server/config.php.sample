@@ -49,6 +49,15 @@
 
 
 	# ####################################
+	# GOOGLE ANALYTICS
+	# ####################################
+	define("OMEGAUP_GA_TRACK", 			false);
+	define("OMEGAUP_GA_ID",				"xxxxx");
+
+
+
+
+	# ####################################
 	# EMAIL CONFIG
 	# ####################################
 	define("OMEGAUP_EMAIL_SEND_EMAILS", 		false);
