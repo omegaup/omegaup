@@ -161,6 +161,18 @@ OmegaUp.prototype.runStatus = function(guid, callback) {
 	);
 };
 
+OmegaUp.prototype.runDetails = function(guid, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/runs/' + guid + '/details/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.runRejudge = function(guid, callback) {
 	var self = this;
 

@@ -168,9 +168,24 @@ p {
 	padding: 2px;
 }
 
+#problem .statement {
+	max-width: 50em;
+}
+
 #problem .statement h1 {
 	font-size: 1.2em;
 	margin: 1.0em 0 0.5em 0;
+}
+#problem .statement p {
+	line-height: 150%;
+}
+
+#problem .statement ul {
+	list-style: disc;
+}
+
+#problem .statement ul li {
+	margin-left: 2em;
 }
 
 #problem .statement table.sample_io {
@@ -246,6 +261,7 @@ p {
 	border: 2px solid #ccc;
 	padding: 1em;
         position: relative;
+	overflow: auto;
 }
 
 #overlay form textarea {

@@ -22,6 +22,7 @@ RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/new/?$ /arena/CallApiLoader.php?a
 
 RewriteRule ^runs/new/?$ /arena/CallApiLoader.php?apicmd=NewRun [L]
 RewriteRule ^runs/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowRun&run_alias=$1 [L]
+RewriteRule ^runs/([a-zA-Z0-9_-]+)/details/?$ /arena/CallApiLoader.php?apicmd=ShowRunDetails&run_alias=$1 [L]
 RewriteRule ^runs/([a-zA-Z0-9_-]+)/rejudge/?$ /arena/CallApiLoader.php?apicmd=UpdateRun&run_alias=$1 [L]
 RewriteRule ^runs/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemRuns&problem_alias=$1 [L]
 
