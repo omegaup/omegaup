@@ -11,7 +11,7 @@ import scala.collection.{mutable,immutable}
 import omegaup._
 import omegaup.data._
 
-object Runner extends RunnerService with Log {
+object Runner extends RunnerService with Log with Using {
 	def compile(message: CompileInputMessage): CompileOutputMessage = {
 		// lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]
 		info("compile {}", message.lang)
@@ -57,50 +57,50 @@ object Runner extends RunnerService with Log {
 
 		debug("Compile {}", params.mkString(" "))
 
-		val process = runtime.exec(params.toArray)
-		
-		if(process != null) {
-			val status = process.waitFor
+		pusing (runtime.exec(params.toArray)) { process => {
+			if(process != null) {
+				val status = process.waitFor
 	
-			if (!Config.get("runner.preserve", false)) {
-				inputFiles.foreach { new File(_).delete }
-			}
-			
-			if (status == 0) {
 				if (!Config.get("runner.preserve", false)) {
-					new File(runDirectory.getCanonicalPath + "/compile.meta").delete
-					new File(runDirectory.getCanonicalPath + "/compile.out").delete
-					new File(runDirectory.getCanonicalPath + "/compile.err").delete
+					inputFiles.foreach { new File(_).delete }
 				}
 			
-				info("compile finished successfully")
-				new CompileOutputMessage(token = Some(runDirectory.getParentFile.getName))
-			} else {
-				val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
+				if (status == 0) {
+					if (!Config.get("runner.preserve", false)) {
+						new File(runDirectory.getCanonicalPath + "/compile.meta").delete
+						new File(runDirectory.getCanonicalPath + "/compile.out").delete
+						new File(runDirectory.getCanonicalPath + "/compile.err").delete
+					}
 			
-				val compileError =
-					if (meta("status") == "TO")
-						"Compilation time exceeded"
-					else if (meta.contains("message") && meta("status") != "RE")
-						meta("message")
-					else
-						FileUtil.read(runDirectory.getCanonicalPath + "/compile.err").replace(runDirectory.getCanonicalPath + "/", "")
+					info("compile finished successfully")
+					new CompileOutputMessage(token = Some(runDirectory.getParentFile.getName))
+				} else {
+					val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
+			
+					val compileError =
+						if (meta("status") == "TO")
+							"Compilation time exceeded"
+						else if (meta.contains("message") && meta("status") != "RE")
+							meta("message")
+						else
+							FileUtil.read(runDirectory.getCanonicalPath + "/compile.err").replace(runDirectory.getCanonicalPath + "/", "")
 				
+					if (!Config.get("runner.preserve", false)) {
+						FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
+					}
+				
+					error("compile finished with errors: {}", compileError)
+					new CompileOutputMessage("compile error", error=Some(compileError))
+				}
+			} else {
 				if (!Config.get("runner.preserve", false)) {
 					FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
 				}
-				
-				error("compile finished with errors: {}", compileError)
-				new CompileOutputMessage("compile error", error=Some(compileError))
-			}
-		} else {
-			if (!Config.get("runner.preserve", false)) {
-				FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)
-			}
 
-			error("compiler failed to run")
-			new CompileOutputMessage("compile error", error=Some("compiler failed to run"))
-		}
+				error("compiler failed to run")
+				new CompileOutputMessage("compile error", error=Some("compiler failed to run"))
+			}
+		}}
 	}
 	
 	def run(message: RunInputMessage, zipFile: File) : Option[RunOutputMessage] = {
@@ -149,7 +149,7 @@ object Runner extends RunnerService with Log {
 
 					debug("Run {}", params.mkString(" "))
 				
-					runtime.exec(params.toArray).waitFor
+					pusing (runtime.exec(params.toArray)) { process => process.waitFor }
 				}}
 			}
 		
@@ -177,7 +177,7 @@ object Runner extends RunnerService with Log {
 				
 						debug("Run {}", params.mkString(" "))
 
-						runtime.exec(params.toArray).waitFor
+						pusing (runtime.exec(params.toArray)) { process => process.waitFor }
 					
 						new File(casePath + ".in").delete
 					}}

@@ -8,6 +8,25 @@ import net.liftweb.json._
 import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.mutable
 
+trait Using {
+	def using[A, B <: {def close(): Unit}] (closeable: B) (f: B => A): A =
+		 try { f(closeable) } finally { closeable.close() }
+
+	def cusing[A, B <: {def disconnect(): Unit}] (closeable: B) (f: B => A): A =
+		 try { f(closeable) } finally { closeable.disconnect() }
+
+	def pusing[A] (process: Process) (f: Process => A): A =
+		 try {
+			f(process)
+		} finally {
+			if (process != null) {
+				process.getInputStream.close()
+				process.getOutputStream.close()
+				process.getErrorStream.close()
+			}
+		}
+}
+
 object Config {
 	private val props = new java.util.Properties(System.getProperties)
 	try{
@@ -141,7 +160,7 @@ class EnumerationWrapper[T](enumeration:java.util.Enumeration[T]) extends Iterat
 	}
 }
 
-object Https extends Object with Log {
+object Https extends Object with Log with Using {
 	val socketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
 
 	HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
@@ -156,15 +175,17 @@ object Https extends Object with Log {
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 		
-		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
-		conn.addRequestProperty("Content-Type", "text/json")
-		conn.setSSLSocketFactory(socketFactory)
-		conn.setDoOutput(true)
-		val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
-		Serialization.write[W, PrintWriter](request, writer)
-		writer.close()
+		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+			conn.addRequestProperty("Content-Type", "text/json")
+			conn.addRequestProperty("Connection", "close")
+			conn.setSSLSocketFactory(socketFactory)
+			conn.setDoOutput(true)
+			val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
+			Serialization.write[W, PrintWriter](request, writer)
+			writer.close()
 		
-		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+			Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+		}}
 	}
 	
 	def zip_send[T](url:String, zipfile:String, zipname:String)(implicit mf: Manifest[T]): T = {
@@ -178,27 +199,29 @@ object Https extends Object with Log {
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 		
-		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
-		conn.addRequestProperty("Content-Type", "application/zip")
-		conn.addRequestProperty("Content-Disposition", "attachment; filename=" + zipname + ";")
-		conn.setFixedLengthStreamingMode(zipSize)
-		conn.setSSLSocketFactory(socketFactory)
-		conn.setDoOutput(true)
-		val outputStream = conn.getOutputStream
-		val buffer = Array.ofDim[Byte](1024)
-		var read = 0
-		var reading = true
+		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+			conn.addRequestProperty("Content-Type", "application/zip")
+			conn.addRequestProperty("Content-Disposition", "attachment; filename=" + zipname + ";")
+			conn.addRequestProperty("Connection", "close")
+			conn.setFixedLengthStreamingMode(zipSize)
+			conn.setSSLSocketFactory(socketFactory)
+			conn.setDoOutput(true)
+			val outputStream = conn.getOutputStream
+			val buffer = Array.ofDim[Byte](1024)
+			var read = 0
+			var reading = true
 		
-		while(reading) {
-			read = inputStream.read(buffer)
-			if (read == -1) reading = false
-			else outputStream.write(buffer, 0, read)
-		}
+			while(reading) {
+				read = inputStream.read(buffer)
+				if (read == -1) reading = false
+				else outputStream.write(buffer, 0, read)
+			}
 		
-		inputStream.close
-		outputStream.close
+			inputStream.close
+			outputStream.close
 		
-		Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+			Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+		}}
 	}
 	
 	def receive_zip[T, W <: AnyRef](url:String, request:W, file:String)(implicit mf: Manifest[T]): Option[T] = {
@@ -206,57 +229,57 @@ object Https extends Object with Log {
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 
-		val conn = new URL(url).openConnection().asInstanceOf[HttpsURLConnection]
-		conn.addRequestProperty("Content-Type", "text/json")
-		conn.setSSLSocketFactory(socketFactory)
-		conn.setDoOutput(true)
-		val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
-		Serialization.write[W, PrintWriter](request, writer)
-		writer.close()
+		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+			conn.addRequestProperty("Content-Type", "text/json")
+			conn.setSSLSocketFactory(socketFactory)
+			conn.setDoOutput(true)
+			val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
+			Serialization.write[W, PrintWriter](request, writer)
+			writer.close()
 		
-		if (conn.getHeaderField("Content-Type") == "application/zip") {
-			val outputStream = new FileOutputStream(file)
-			val inputStream = conn.getInputStream
-			val buffer = Array.ofDim[Byte](1024)
-			var read = 0
+			if (conn.getHeaderField("Content-Type") == "application/zip") {
+				val outputStream = new FileOutputStream(file)
+				val inputStream = conn.getInputStream
+				val buffer = Array.ofDim[Byte](1024)
+				var read = 0
 		
-			while( { read = inputStream.read(buffer) ; read > 0 } ) {
-				outputStream.write(buffer, 0, read)
-			}
+				while( { read = inputStream.read(buffer) ; read > 0 } ) {
+					outputStream.write(buffer, 0, read)
+				}
 		
-			inputStream.close
-			outputStream.close
+				inputStream.close
+				outputStream.close
 			
-			None
-		} else {
-			Some(Serialization.read[T](new InputStreamReader(conn.getInputStream())))
-		}
+				None
+			} else {
+				Some(Serialization.read[T](new InputStreamReader(conn.getInputStream())))
+			}
+		}}
 	}
 }
 
-object FileUtil {
+object FileUtil extends Object with Using {
 	@throws(classOf[IOException])
 	def read(file: String): String = {
 		val contents = new StringBuilder
 		
-		val fileReader = new BufferedReader(new FileReader(file))
-		var line: String = null
+		using (new BufferedReader(new FileReader(file))) { fileReader => {
+			var line: String = null
 	
-		while( { line = fileReader.readLine(); line != null} ) {
-			contents.append(line)
-			contents.append("\n")
-		}
+			while( { line = fileReader.readLine(); line != null} ) {
+				contents.append(line)
+				contents.append("\n")
+			}
 		
-		fileReader.close
-		
-		contents.toString.trim
+			contents.toString.trim
+		}}
 	}
 	
 	@throws(classOf[IOException])
 	def write(file: String, data: String): Unit = {
-		val fileWriter = new FileWriter(file)
-		fileWriter.write(data)
-		fileWriter.close
+		using (new FileWriter(file)) { fileWriter =>
+			fileWriter.write(data)
+		}
 	}
 		
 	@throws(classOf[IOException])
@@ -275,28 +298,29 @@ object FileUtil {
 	}	
 }
 
-object MetaFile {
+object MetaFile extends Object with Using {
 	@throws(classOf[IOException])
 	def load(path: String): scala.collection.Map[String,String] = {
-		load(new FileReader(path))
+		using (new FileReader(path)) { reader => 
+			load(reader)
+		}
 	}
 	
 	@throws(classOf[IOException])
 	def load(reader: Reader): scala.collection.Map[String,String] = {
 		val meta = new mutable.ListMap[String,String]
-		val bReader = new BufferedReader(reader)
-		var line: String = null
+		using (new BufferedReader(reader)) { bReader => {
+			var line: String = null
 	
-		while( { line = bReader.readLine(); line != null} ) {
-			val idx = line.indexOf(':')
+			while( { line = bReader.readLine(); line != null} ) {
+				val idx = line.indexOf(':')
 			
-			if(idx > 0) {
-				meta += (line.substring(0, idx) -> line.substring(idx+1))
+				if(idx > 0) {
+					meta += (line.substring(0, idx) -> line.substring(idx+1))
+				}
 			}
-		}
 		
-		bReader.close()
-		
-		meta
+			meta
+		}}
 	}
 }
