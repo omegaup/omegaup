@@ -24,7 +24,6 @@ class ShowRunDetails extends ApiHandler
 	private $contest;
 	private $problem;
 
-
 	protected function RegisterValidatorsToRequest()
 	{    
 		ValidatorFactory::stringNotEmptyValidator()->addValidator(
@@ -48,9 +47,9 @@ class ShowRunDetails extends ApiHandler
 			throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
 		}                        
 
-		if(!(3 == $this->_user_id || 
-		     $this->contest->getDirectorId() == $this->_user_id ||
-		     $this->problem->getAuthorId() == $this->_user_id))
+		if (!(3 == $this->_user_id ||
+   		      $this->contest->getDirectorId() == $this->_user_id ||
+		      $this->problem->getAuthorId() == $this->_user_id))
 		{
 			throw new ApiException(ApiHttpErrors::forbiddenSite());
 		}
@@ -78,7 +77,7 @@ class ShowRunDetails extends ApiHandler
 
 					if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
 						$out = str_replace(".meta", ".out", $file);
-						$case['out_diff'] = `diff -wui $grade_dir/$out $problem_dir/$out | head`;
+						$case['out_diff'] = `diff -wui $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
 					}
 
 					array_push($cases, $case);

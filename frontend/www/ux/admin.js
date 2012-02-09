@@ -360,7 +360,9 @@ $(document).ready(function() {
 						$('#run-details .cases div').remove();
 						for (var i = 0; i < data.cases.length; i++) {
 							var c = data.cases[i];
-							$('#run-details .cases').append($("<div></div>").html(JSON.stringify(c)));
+							$('#run-details .cases').append($("<div></div>").append($("<h2></h2>").html(c.name)));
+							$('#run-details .cases').append($("<div></div>").html(JSON.stringify(c.meta)));
+							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff)));
 						}
 						window.location.hash = 'run/details';
 						$(window).hashchange();
