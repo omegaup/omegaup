@@ -41,7 +41,18 @@ object OmegaUp extends Actor with Log {
 						
 							if(output.status == "ok") {
 								val input = FileUtil.read(Config.get("problems.root", "problems") + "/" + alias + "/inputname").trim
-								val msg = new RunInputMessage(output.token.get, input = Some(input))
+								val msg = new RunInputMessage(
+									output.token.get,
+									timeLimit = run.problem.time_limit match {
+										case Some(x) => x / 1000.0f
+										case _ => 1.0f
+									},
+									memoryLimit = run.problem.memory_limit match {
+										case Some(x) => x.toInt
+										case _ => 65535
+									},
+									input = Some(input)
+								)
 								val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")
 							
 								service.run(msg, zip) match {
