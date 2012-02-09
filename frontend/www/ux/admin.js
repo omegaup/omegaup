@@ -180,6 +180,9 @@ $(document).ready(function() {
 				$('#overlay form').hide();
 				$('#overlay, #clarification').show();
 			}
+		} else if (window.location.hash == '#run/details') {
+			$('#run-details').show();
+			$('#overlay').show();
 		}
 
 		if (tabChanged) {
@@ -347,6 +350,24 @@ $(document).ready(function() {
 					$('.status', row).html('rejudging');
 					omegaup.runRejudge(guid, function() {
 						updateRun(guid, run);
+					});
+				}));
+			})(run.guid, run, r);
+			(function(guid, run, row) {
+				$('.details', row).append($('<input type="button" value="details" />').click(function() {
+					omegaup.runDetails(guid, function(data) {
+						$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
+						$('#run-details .cases div').remove();
+						for (var i = 0; i < data.cases.length; i++) {
+							var c = data.cases[i];
+							$('#run-details .cases').append($("<div></div>").html(JSON.stringify(c)));
+						}
+						window.location.hash = 'run/details';
+						$(window).hashchange();
+						$('#run-details').show();
+						$('#submit').hide();
+						$('#clarification').hide();
+						$('#overlay').show();
 					});
 				}));
 			})(run.guid, run, r);

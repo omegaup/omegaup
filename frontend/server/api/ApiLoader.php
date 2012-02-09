@@ -115,6 +115,11 @@ class ApiLoader
                 $api = new ShowRun();
 		break;
 
+            case 'ShowRunDetails':
+                require_once('ShowRunDetails.php');
+                $api = new ShowRunDetails();
+		break;
+
             case 'UpdateRun':
                 require_once('UpdateRun.php');
                 $api = new UpdateRun();
