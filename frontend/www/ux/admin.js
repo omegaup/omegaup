@@ -9,6 +9,18 @@ $(document).ready(function() {
 	var startTime = null;
 	var finishTime = null;
 	var submissionDeadline = null;
+	var veredicts = {
+		AC: "Accepted",
+		PA: "Partially Accepted",
+		WA: "Wrong Answer",
+		TLE: "Time Limit Exceeded",
+		MLE: "Memory Limit Exceeded",
+		OLE: "Output Limit Exceeded",
+		RTE: "Runtime Error",
+		RFE: "Restricted Function",
+		CE: "Compilation Error",
+		JE: "Judge Error" 
+	};
 
 	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
@@ -311,7 +323,7 @@ $(document).ready(function() {
 				$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 				$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 				$('.points', r).html(parseInt(run.contest_score).toFixed(2));
-				$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
+				$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 				$('.penalty', r).html(run.submit_delay);
 				$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 				$('.language', r).html(run.language);
@@ -339,7 +351,7 @@ $(document).ready(function() {
 			$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 			$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 			$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
-			$('.status', r).html(run.status == 'ready' ? run.veredict : run.status);
+			$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 			$('.penalty', r).html(run.submit_delay);
 			if (run.time) {
 				$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
