@@ -5,5 +5,7 @@
 
 -s ugetrlimit
 -s rt_sigaction
+-s rt_sigprocmask
+-s rt_sigreturn=noret
 
 -p /proc/self/exe
