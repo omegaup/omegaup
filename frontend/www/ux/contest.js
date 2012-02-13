@@ -330,18 +330,18 @@ $(document).ready(function() {
 
 		for (var i = 0; i < ranking.length; i++) {
 			var rank = ranking[i];
-			newRanking[rank.name] = i;
+			newRanking[rank.username] = i;
             
 		 	// new user, just add row at the end
-			if (currentRanking[rank.name] === undefined) {
-				currentRanking[rank.name] = $('#ranking tbody tr.inserted').length;
+			if (currentRanking[rank.username] === undefined) {
+				currentRanking[rank.username] = $('#ranking tbody tr.inserted').length;
 				$('#ranking tbody').append(
 					$('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
 				);
 			}
             
 			// update a user's row
-			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.name]];
+			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
 			$('.position', r).html(i+1);
 			$('.user', r).html(rank.name);
 
