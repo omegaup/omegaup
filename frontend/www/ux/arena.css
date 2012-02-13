@@ -3,6 +3,9 @@ body { background: url(/media/gradient.png) repeat-x 0 0, url(/media/bg.png) rep
 p {
 	margin: 0.1em auto 0.5em auto;
 }
+abbr {
+	border-bottom: 1px dotted #000;
+}
 
 .template { display: none; }
 
