@@ -66,10 +66,6 @@ object GraderData {
 					 	case null => None
 					 	case x: String => Some(x.toLong)
 					 },
-					 output_limit = rs.getString("output_limit") match {
-						case null => None
-						case x: String => Some(x.toLong)
-					 },
 					 open_time = rs.getDate("open_time") match {
 					 	case null => None
 					 	case x: Date => Some(new Timestamp(x.getTime()))

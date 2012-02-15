@@ -51,10 +51,7 @@ object OmegaUp extends Actor with Log {
 										case Some(x) => x.toInt
 										case _ => 65535
 									},
-									outputLimit = run.problem.output_limit match {
-										case Some(x) => x.toInt
-										case _ => 10
-									},
+									outputLimit = 600,
 									input = Some(input)
 								)
 								val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")
