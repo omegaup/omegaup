@@ -105,14 +105,19 @@
       *
       **/
     $page->addComponent( new TitleComponent("&iquest; No es asi ? Registrate, es facil y rapido !", 3));
-    $reg_form = new FormComponent( new Users() );
+    $reg_form = new FormComponent(  );
 
+    
+    
     $reg_form->addField("name", "Nombre", "input", "", "name" );
     $reg_form->addField("email", "Email", "input", "", "email" );
+    
     $reg_form->addField("pass", "Contrase&ntilde;a", "password", "", "pass" );
     $reg_form->addField("pass2", "De nuevo", "password", "", "pass2" );
+
     $reg_form->addField("", "", "hidden", "register", "request" );
     $reg_form->addSubmit("Registrar",  "nativeLogin.php", "POST");
+    
     $page->addComponent( $reg_form );
 
 
