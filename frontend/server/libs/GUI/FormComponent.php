@@ -230,7 +230,7 @@ class FormComponent implements GuiComponent{
                                         if($this->is_editable===false)
                                             $html .= " disabled='disabled' ";
                                         $html .= ">";
-					$html .= "<option value=''>------------</option>";
+					$html .= "<option value=''>Selecciona una opcion</option>";
 					foreach($f->value as $o){
                                         {
                                                 if($o["selected"])

@@ -40,7 +40,7 @@ class UserProfileComponent implements GuiComponent{
 				<a onClick='profile_edit()'>editar mi perfil</a>
 				<div>
 					<?php
-						UsersDAO::getFullProfile( $this->user->getUserId() );
+						//UsersDAO::getFullProfile( $this->user->getUserId() );
 					?>
 					Tu correo electronico:
 				</div>
