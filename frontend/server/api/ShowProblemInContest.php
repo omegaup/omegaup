@@ -123,26 +123,33 @@ class ShowProblemInContest extends ApiHandler
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }
         
-        // Read the file that contains the source
+	// Read the file that contains the source
+	if ($problem->getValidator() != 'remote')
+	{
 		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
 		
-        try
-        {            
-            $file_content = FileHandler::ReadFile($source_path);                        
-        }
-        catch(Exception $e)
-        {
-            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
+        	try
+	        {            
+        	    $file_content = FileHandler::ReadFile($source_path);                        
+	        }
+        	catch(Exception $e)
+	        {
+        	    throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
 		}
 
-        // Add the problem the response
-        $this->addResponseArray($problem->asFilteredArray($relevant_columns));   
+	        // Add problem statement to source
+        	$this->addResponse("problem_statement", $file_content);        
+	}
+	else if($problem->getServer() == 'uva')
+	{
+		$this->addResponse('problem_statement', '<iframe src="http://acm.uva.es/p/v' . substr($problem->getRemoteId(), 0, strlen($problem->getRemoteId()) - 2) . '/' . $problem->getRemoteId() . '.html"></iframe>');
+	}
 
-        // Add problem statement to source
-        $this->addResponse("problem_statement", $file_content);        
+	// Add the problem the response
+        $this->addResponseArray($problem->asFilteredArray($relevant_columns));   
              
         // Create array of relevant columns for list of runs
-		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+	$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
         
 
         // Search the relevant runs from the DB

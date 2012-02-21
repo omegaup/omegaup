@@ -31,6 +31,11 @@ $(document).ready(function() {
 	});
 
 	omegaup.getContest(contestAlias, function(contest) {
+		if (contest.status == 'error') {
+			$('#loading').html('404');
+			return;
+		}
+
 		$('#title .contest-title').html(contest.title);
 		$('#summary .title').html(contest.title);
 		$('#summary .description').html(contest.description);
