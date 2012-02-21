@@ -76,8 +76,11 @@ object OmegaUp extends Actor with Log {
 									case Validator.TokenNumeric => TokenNumericGrader.grade(run)
 								}
 							} else {
+								error("OU Compile error {}", output.error.get)
+
 								val errorFile = new FileWriter(Config.get("grader.root", "grader") + "/" + id + ".err")
 								errorFile.write(output.error.get)
+								errorFile.close
 							
 								run.status = Status.Ready
 								run.veredict = Veredict.CompileError
