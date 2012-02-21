@@ -16,8 +16,9 @@ require_once("ApiHandler.php");
 
 class NewContest extends ApiHandler
 {
-    
-    private $private_users_list;
+	private $private_users_list;
+	private $problems;
+
     
     protected function RegisterValidatorsToRequest()
     {  
@@ -28,17 +29,19 @@ class NewContest extends ApiHandler
         ValidatorFactory::stringNotEmptyValidator()->validate(
                 RequestContext::get("description"),
                 "description");
-        
+
+	/*	
         ValidatorFactory::dateRangeValidator(
                 RequestContext::get("start_time"), 
                 RequestContext::get("finish_time"))
-                ->validate(RequestContext::get("start_time"), "start_time");
+		->validate(RequestContext::get("start_time"), "start_time");
+	 */
         
         // Calculate contest length:
 		$contest_length = RequestContext::get("finish_time") - RequestContext::get("start_time");
-        
+
         // Window_length is optional
-        if(!is_null(RequestContext::get("window_length")))
+        if(!is_null(RequestContext::get("window_length")) && RequestContext::get("window_length") != "NULL")
         {
             ValidatorFactory::numericRangeValidator(
                     0, 
@@ -69,9 +72,11 @@ class NewContest extends ApiHandler
         
         ValidatorFactory::enumValidator(array("no", "yes", "partial"))
                 ->validate(RequestContext::get("feedback"), "feedback");
-        
+
+	/*
         ValidatorFactory::numericRangeValidator(0, INF)
-                ->validate(RequestContext::get("penalty"), "penalty");
+		->validate(RequestContext::get("penalty"), "penalty");
+	*/
         
         ValidatorFactory::enumValidator(array("contest", "problem", "none"))
                 ->validate(RequestContext::get("penalty_time_start"), "penalty_time_start");
@@ -104,8 +109,18 @@ class NewContest extends ApiHandler
                     }
                 }                               
             }
-        }
-    
+	}
+
+	$this->problems = array();
+
+	foreach (json_decode(RequestContext::get('problems')) as $problem) {
+		$p = ProblemsDAO::getByAlias($problem->problem);
+		array_push($this->problems, array(
+			'id' => $p->getProblemId(),
+			'alias' => $problem->problem,
+			'points' => $problem->points
+		));
+	}
     }       
     
     protected function GenerateResponse() 
@@ -113,10 +128,10 @@ class NewContest extends ApiHandler
         // Create and populate a new Contests object
         $contest = new Contests();              
         $contest->setTitle(RequestContext::get("title"));
-        $contest->setDescription(RequestContext::get("description"));
-        $contest->setStartTime(RequestContext::get("start_time"));
-        $contest->setFinishTime(RequestContext::get("finish_time"));
-        $contest->setWindowLength(RequestContext::get("window_length"));
+	$contest->setDescription(RequestContext::get("description"));
+        $contest->setStartTime(gmdate('Y-m-d H:i:s', RequestContext::get("start_time")));
+        $contest->setFinishTime(gmdate('Y-m-d H:i:s', RequestContext::get("finish_time")));
+        $contest->setWindowLength(RequestContext::get("window_length") == "NULL" ? NULL : RequestContext::get("window_length"));
         $contest->setDirectorId($this->_user_id);
         $contest->setRerunId(0); // NYI
         $contest->setPublic(RequestContext::get("public"));
@@ -126,10 +141,9 @@ class NewContest extends ApiHandler
         $contest->setPartialScore(RequestContext::get("partial_score"));
         $contest->setSubmissionsGap(RequestContext::get("submissions_gap"));
         $contest->setFeedback(RequestContext::get("feedback"));
-        $contest->setPenalty(RequestContext::get("penalty"));
+        $contest->setPenalty(min(0, intval(RequestContext::get("penalty"))));
         $contest->setPenaltyTimeStart(RequestContext::get("penalty_time_start"));
         $contest->setPenaltyCalcPolicy(RequestContext::get("penalty_calc_policy"));
-        
                 
         // Push changes
         try
@@ -143,7 +157,6 @@ class NewContest extends ApiHandler
             // If the contest is private, add the list of allowed users
             if (RequestContext::get("public") == 0)
             {
-                
                 foreach($this->private_users_list as $userkey)
                 {
                     // Create a temp DAO for the relationship
@@ -158,7 +171,18 @@ class NewContest extends ApiHandler
                     // Save the relationship in the DB
                     ContestsUsersDAO::save($temp_user_contest);
                 }
-            }
+	    }
+
+	    foreach ($this->problems as $problem)
+	    {
+		$contest_problem = new ContestProblems(array(
+			'contest_id' => $contest->getContestId(),
+			'problem_id' => $problem['id'],
+			'points' => $problem['points']
+		));
+
+		ContestProblemsDAO::save($contest_problem);
+	    }
             
             // End transaction transaction
             ContestsDAO::transEnd();

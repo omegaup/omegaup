@@ -98,7 +98,12 @@ class ApiLoader
             case 'ShowContests':
                 require_once('ShowContests.php');
                 $api = new ShowContests();
-                break;
+		break;
+
+	    case 'ShowProblems':
+		require_once('ShowProblems.php');
+		$api = new ShowProblems();
+		break;
             
             case 'ShowProblemInContest':
                 require_once('ShowProblemInContest.php');

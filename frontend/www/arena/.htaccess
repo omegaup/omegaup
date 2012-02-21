@@ -31,6 +31,8 @@ RewriteRule ^clarifications/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php
 RewriteRule ^clarifications/show/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=ShowClarification&clarification_id=$1 [L]
 RewriteRule ^clarifications/update/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=UpdateClarification&clarification_id=$1 [L]
 
+RewriteRule ^problems/([^/]*)/?$ /arena/CallApiLoader.php?apicmd=ShowProblems&search=$1 [L]
+
 # Redirects for UX.
 RewriteRule ^/?$ index.php [L]
 RewriteRule ^[a-zA-Z0-9_+-]+/scoreboard/?$ scoreboard.php [L]
