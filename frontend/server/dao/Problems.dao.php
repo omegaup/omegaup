@@ -102,4 +102,27 @@ class ProblemsDAO extends ProblemsDAOBase
 
                 return $contest;
 	}
+
+
+	public static final function searchByAlias($alias)
+	{
+		global $conn;
+		$quoted = $conn->Quote($alias);
+		
+		if (strpos($quoted, "'") !== FALSE) {
+			$quoted = substr($quoted, 1, strlen($quoted) - 2);
+		}
+
+		$sql = "SELECT * FROM Problems WHERE (alias LIKE '%$quoted%' OR title LIKE '%$quoted%') LIMIT 0,10;";
+		$rs = $conn->Execute($sql);
+
+
+		$result = array();
+
+		foreach ($rs as $r) {
+			array_push($result, new Problems($r));
+		}
+
+		return $result;
+	}
 }
