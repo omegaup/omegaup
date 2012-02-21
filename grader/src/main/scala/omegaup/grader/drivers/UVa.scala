@@ -114,7 +114,7 @@ object UVa extends Actor with Log {
 							
 							rids(local_lock_i) = rid.toInt
 							runes(local_lock_i) = run
-							rretries(local_lock_i) = 50
+							rretries(local_lock_i) = 20
 							
 							veredictReader ! local_lock_i
 						} catch {
@@ -182,8 +182,6 @@ object UVa extends Actor with Log {
 	private def readVeredict(triesLeft: Long = 5): Unit = {
 		if (triesLeft == 0)
 			throw new Exception("Retry limit exceeded")
-		if (!(rids exists { _ != 0 }))
-			return;
 		
 		try { Thread.sleep(10000) }
 		
@@ -249,7 +247,7 @@ object UVa extends Actor with Log {
 				readVeredict()
 			}
 		} catch {
-			case e: IOException => {
+			case e: Exception => {
 				error("UVa communication error", e)
 				readVeredict(triesLeft-1)
 			}
