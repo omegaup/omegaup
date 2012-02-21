@@ -88,7 +88,14 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 			callback(contest);
 		},
 		'json'
-	);
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+
 };
 
 OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {

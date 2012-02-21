@@ -6,6 +6,10 @@ p {
 abbr {
 	border-bottom: 1px dotted #000;
 }
+iframe {
+	width: 100%;
+	min-height: 40em;
+}
 
 .template { display: none; }
 
