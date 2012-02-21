@@ -254,3 +254,86 @@ table.sample_io {
 	padding: 10px;
 	border: 1px solid #000;
 }
+
+.new_contest button, .new_contest input[type=button] {
+    padding: 3px;
+}
+
+.new_contest table.problems {
+    border: 1px solid #000;
+}
+
+.new_contest table.problems tr.template {
+    display: none;
+}
+
+.new_contest table.problems td, .new_contest table.problems th {
+    border: 1px solid #000;
+    padding: 10px;
+    vertical-align: middle;
+}
+
+.new_contest table.problems th {
+    font-weight: bold;
+}
+
+.new_contest table.problems th, .new_contest table.problems tfoot td {
+    text-align: center;
+}
+
+.new_contest #submit-wrapper {
+    text-align: right;
+}
+
+.new_contest p {
+    color: gray !important;
+    font-size: 10px !important;
+}
+
+.new_contest .info {
+    text-align:right
+}
+
+.new_contest #main td {
+    width: 25%;
+    vertical-align:top;
+}
+
+.ui-autocomplete {
+    position: absolute; cursor: default; 
+}
+
+.ui-menu {
+	list-style:none;
+	padding: 2px;
+	margin: 0;
+	display:block;
+	float: left;
+	border: 1px solid black;
+	background-color: white;
+	color: black;
+}
+
+.ui-menu .ui-menu-item {
+	margin:0;
+	padding: 0;
+	zoom: 1;
+	float: left;
+	clear: left;
+	width: 100%;
+}
+
+.ui-menu .ui-menu-item a {
+	text-decoration:none;
+	display:block;
+	padding:.2em .4em;
+	line-height:1.5;
+	zoom: 1;
+}
+
+.ui-menu .ui-menu-item a.ui-state-hover,
+.ui-menu .ui-menu-item a.ui-state-active {
+	font-weight: normal;
+	background-color: #678DD7;
+	color: white;
+}
