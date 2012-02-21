@@ -15,9 +15,6 @@ import Veredict._
 import Validator._
 import Server._
 
-case class Submission(run: Run)
-case object Login
-
 object Manager extends Object with Log {
 	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[RunnerService]()
 
@@ -37,7 +34,7 @@ object Manager extends Object with Log {
 		GraderData.run(id) match {
 			case None => throw new IllegalArgumentException("Id " + id + " not found")
 			case Some(run) => {
-				if (run.problem.validator == Validator.Remote) {
+				val driver = if (run.problem.validator == Validator.Remote) {
 					run.problem.server match {
 						case Some(Server.UVa) => drivers.UVa
 						case Some(Server.LiveArchive) => drivers.LiveArchive
@@ -46,7 +43,11 @@ object Manager extends Object with Log {
 					}
 				} else {
 					drivers.OmegaUp
-				} ! Submission(run)
+				}
+			
+				info("Using driver {}", driver)
+
+				driver ! drivers.Submission(run)
 				
 				new GradeOutputMessage()
 			}
@@ -168,6 +169,8 @@ object Manager extends Object with Log {
 		drivers.UVa.start
 		drivers.TJU.start
 		drivers.LiveArchive.start
+
+		drivers.UVa ! drivers.Login
 
 		// boilerplate code for jetty with https support	
 		val server = new org.mortbay.jetty.Server()
