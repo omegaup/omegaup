@@ -1448,8 +1448,17 @@ boxkeeper(void)
 	{
 	  threads[t].pid = -1;
 	  meta_printf("exitsig:%d\n", WTERMSIG(stat));
-	  final_stats(&rus);
-	  err("SG: Caught fatal signal %d%s", WTERMSIG(stat), (syscall_count ? "" : " during startup"));
+	  if (WTERMSIG(stat) == 9 && !syscall_count)
+	    {
+	      mem_peak_kb = memory_limit;
+	      final_stats(&rus);
+	      err("ML: Memory Limit Exceeded");
+	    }
+	  else
+	    {
+	      final_stats(&rus);
+	      err("SG: Caught fatal signal %d%s", WTERMSIG(stat), (syscall_count ? "" : " during startup"));
+	    }
 	}
       if (WIFSTOPPED(stat))
 	{
