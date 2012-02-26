@@ -5,9 +5,11 @@ class OmegaupComponentPage extends StdComponentPage{
 	
 	private $user_html_menu;
 	private $title;
+	private $invalid_login;
 
 	function __construct( $title = null )
 	{
+		$this->invalid_login = false;
 
 		$this->title = $title;
 		
@@ -18,7 +20,6 @@ class OmegaupComponentPage extends StdComponentPage{
 		$this->user_html_menu = ""; 
 
 		$this->createUserMenu();
-
 	}//__construct()
 
 
@@ -61,6 +62,7 @@ class OmegaupComponentPage extends StdComponentPage{
 					}else{
 						//login incorrecto
 						Logger::log("invalid user credentials for user `" . $_POST["user"] . "`");
+						$this->invalid_login = true;
 
 					}
 				break;
@@ -202,7 +204,10 @@ class OmegaupComponentPage extends StdComponentPage{
 
 					<div class="post">
 						<div class="copy">
-							 <?php
+<?php
+							if ($this->invalid_login) {
+								echo "<h3 style='color: red;'>Login inv&aacute;lido</h3>";
+							}
 							 /* ----------------------------------------------------------------------
 										CONTENIDO
 							 ---------------------------------------------------------------------- */

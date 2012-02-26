@@ -11,14 +11,14 @@ $(document).ready(function() {
     var omegaup = new OmegaUp();
 
     omegaup.getContests(function(data) {
-	    var list = data.contests;
+        var list = data.contests;
         var current = $('#contest-list');
         var past = $('#past-contests');
         var now = new Date();
         
         for (var i = 0, len = list.length; i < len; i++) {
-        	var start = new Date(list[i].start_time);
-        	var end = new Date(list[i].finish_time);
+            var start = new Date(list[i].start_time);
+            var end = new Date(list[i].finish_time);
             ((end > now) ? current : past).append(
                 $('<tr>' +
                     '<td><a href="/arena/' + list[i].alias + '">' + list[i].title + '</a></td>' +
