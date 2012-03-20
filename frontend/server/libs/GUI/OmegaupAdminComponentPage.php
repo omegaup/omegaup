@@ -7,13 +7,18 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 
 	function __construct()
 	{
-
+		$this->addJs("../js/jquery-ui-1.8.16.custom.min.js");
+		$this->addJs("../js/jquery-ui-sliderAccess.js");
+		$this->addJs("../js/jquery-ui-timepicker-addon.js");
+		
 		parent::__construct();
 
 		$this->user_html_menu = ""; 
 
 		$this->createUserMenu();
 
+		
+		
 	}//__construct()
 
 
@@ -85,13 +90,24 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 
 			
 			<link rel="stylesheet" type="text/css" href="../css/style.css">
-            
+
+
             <script type="text/javascript" src="../js/jquery.js"></script>
             <script type="text/javascript" src="../js/jquery-autocomplete.js"></script>
-			<script type="text/javascript" src="../js/omegaup.js"></script>
-			
 
-			<title>OmegaUp</title>
+			<link rel="stylesheet" type="text/css" href="../css/jquery-ui-1.8.16.custom.css">
+			<link rel="stylesheet" type="text/css" href="../css/jquery-ui-timepicker-addon.css">			
+						
+
+<!--			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>-->
+			<!--<script type="text/javascript" src="../js/jquery-ui-1.8.16.custom.min.js"></script>
+			<script type="text/javascript" src="../js/jquery-ui-sliderAccess.js"></script>
+			<script type="text/javascript" src="../js/jquery-ui-timepicker-addon.js"></script>-->
+
+			<script type="text/javascript" src="../js/omegaup.js"></script>
+
+
+			<title>OmegaUp Admin Pages</title>
 
 			</head>
 			
