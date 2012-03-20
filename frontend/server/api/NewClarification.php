@@ -166,6 +166,7 @@ class NewClarification extends ApiHandler
 		}
 
 	} catch (Exception $e) {
+		Logger::error($e);
 	}
 
     }    

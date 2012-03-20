@@ -18,21 +18,6 @@
 
     $page->addComponent( new TitleComponent("Concursos"));
 
-/*
-	$page->addComponent( new TitleComponent("Concursos activos", 3));	
-	
-	$header = array(
-			"contest_id" 	=> "Id",
-			"title" 		=> "title"
-		);
-	
-	$contests = ContestsDAO::getAll();
-
-	$contests_table = new TableComponent( $header, $contests );
-    
-   	$page->addComponent( $contests_table );
-*/
-
 	$page->addComponent( new NewContestFormComponent() );
 
     $page->render();

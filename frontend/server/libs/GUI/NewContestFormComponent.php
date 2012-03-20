@@ -6,6 +6,7 @@ class NewContestFormComponent implements GuiComponent{
 	public function renderCmp(){
 		?>
 		<script type="text/javascript" charset="utf-8">
+
             
             $(function() {
                 $('.problems .add-problem').click(function() {
@@ -92,6 +93,48 @@ class NewContestFormComponent implements GuiComponent{
                     });
                 });
             });
+
+
+			var arenaContestsNew = function(  ) {
+				var start_time = new Date($("#_start_time").val());
+				var finish_time = new Date($("#_finish_time").val());
+
+				
+				$.ajax({
+					url: "../arena/contests/new",
+					dataType: "json",
+					type:"POST",
+					data :{
+						"title" 				: $("#_title").val(),
+				        "description" 			: $("#_description").val(),
+				        "start_time" 			: start_time.getTime(),
+				        "finish_time" 			: finish_time.getTime(),
+				        "window_length" 		: $("#_window_length").val(),
+				        "public" 				: $("#_public").val(),
+				        "alias" 				: $("#_alias").val(),
+				        "scoreboard" 			: $("#_scoreboard").val(),
+				        "points_decay_factor" 	: $("#_points_decay_factor").val(),
+						"penalty_calc_policy"	: $("#_penalty_calc_policy").val(),
+				        "partial_score" 		: $("#_partial_score").val(),
+				        "submissions_gap"		: $("#_submissions_gap").val(),
+				        "feedback" 				: $("#_feedback").val(),
+				        "penalty" 				: $("#_penalty").val(),
+				        "penalty_time_start" 	: $("#_penalty_time_start").val(),
+						"rnd"					: Math.random()
+					},
+					success: function(a,b,c){
+						$("#response").html("OK");
+					},
+					error:function(a,b,c){
+						console.log(a,b,c);
+						r = $.parseJSON( a.responseText );
+						$("#submit").show(  );
+						//$("#response").html(r.error);
+					}
+					
+				});
+			}
+
 		</script>
 		<hr>
 		<h3>Nuevo concurso</h3>
@@ -255,6 +298,20 @@ class NewContestFormComponent implements GuiComponent{
 						</select>
 					</td>
 				</tr><!-- ----------------------------------------- -->
+
+				<tr><!-- ----------------------------------------- -->
+					<td>
+					</td>
+					<td>
+					</td>
+					<td align='right'>
+						<input value='Agendar concurso' type='button' id="submit" onClick="arenaContestsNew()">
+						<div id="response">
+							
+						</div>
+					</td>
+				</tr><!-- ----------------------------------------- -->
+
 			</table>
 			
 			<h3>Problemas</h3>
@@ -291,27 +348,3 @@ class NewContestFormComponent implements GuiComponent{
 	}
 	
 }
-
-/*
-$new_contest = new DAOFormComponent( new Contests() );
-
-$new_contest->hideField( array( "contest_id", "rerun_id" ) );
-
-$new_contest->createComboBoxJoin( "public", "publico", array( "Si", "No" ) );
-
-$new_contest->createComboBoxJoin( "penalty_time_start", "publico", array( "none", "problem", "contest" ) );
-
-$new_contest->renameField(array(
-		"director_id" => "user_id"
-));
-
-$new_contest->createComboBoxJoin( "user_id", "username", UsersDAO::getAll() );
-
-$new_contest->addSubmit("Agendar concurso");
-
-$page->addComponent( $new_contest );
-
-
-
-$page->render();
-*/
