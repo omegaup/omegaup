@@ -38,6 +38,7 @@ class NewContestFormComponent implements GuiComponent{
                     $(this).parent().parent().remove();
                 });
                 
+
                 $('#submit').click(function() {
                     var start_time = new Date($("#_start_time").val());
                     var finish_time = new Date($("#_finish_time").val());
@@ -94,8 +95,11 @@ class NewContestFormComponent implements GuiComponent{
                 });
             });
 
-
-			var arenaContestsNew = function(  ) {
+	/*
+			function arenaContestsNew(  ) {
+				
+				console.log("Sending new contest...");
+				
 				var start_time = new Date($("#_start_time").val());
 				var finish_time = new Date($("#_finish_time").val());
 
@@ -134,6 +138,7 @@ class NewContestFormComponent implements GuiComponent{
 					
 				});
 			}
+*/
 
 		</script>
 		<hr>
@@ -305,10 +310,7 @@ class NewContestFormComponent implements GuiComponent{
 					<td>
 					</td>
 					<td align='right'>
-						<input value='Agendar concurso' type='button' id="submit" onClick="arenaContestsNew()">
-						<div id="response">
-							
-						</div>
+
 					</td>
 				</tr><!-- ----------------------------------------- -->
 
@@ -337,7 +339,12 @@ class NewContestFormComponent implements GuiComponent{
             </table>
             
             <div id="submit-wrapper">
-                <input value='Agendar concurso' type='button' id="submit">
+               <!-- <input value='Agendar concurso' type='button' id="submit">-->
+				<input value='Agendar concurso' type='button' id="submit" >
+
+				<div id="response">
+					
+				</div>
             </div>
             <div id="response">
                 
