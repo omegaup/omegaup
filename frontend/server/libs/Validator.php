@@ -31,7 +31,7 @@ class Validator
         foreach($this->_validators as $validator) 
         {
             if ($validator->validate($value) === FALSE) 
-            {                
+            {     
                 throw new ApiException(ApiHttpErrors::invalidParameter("Parameter ". $value_name . " is invalid: ". $validator->getError()));
             }
         }        

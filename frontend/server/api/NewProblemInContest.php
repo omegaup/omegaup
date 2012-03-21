@@ -101,7 +101,8 @@ class NewProblemInContest extends ApiHandler
         ValidatorFactory::numericRangeValidator(0, INF)
                 ->validate(RequestContext::get("points"), "points");
         
-        if(!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name']))
+		if(isset($_FILES['problem_contents']) &&
+			!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name']))
         {
             throw new ApiException(ApiHttpErrors::invalidParameter("problem_contents is missing."));
         }
@@ -112,15 +113,18 @@ class NewProblemInContest extends ApiHandler
                      ->validate($_FILES['problem_contents']['tmp_name'], 'problem_contents');                
         
         // Save files to unzip                
+		Logger::log("Saving files to unzip...");
         $this->filesToUnzip = $zipValidator->getValidator(0)->filesToUnzip;        
         $this->casesFiles = $zipValidator->getValidator(0)->casesFiles;
+
 
         sort($this->casesFiles);
     }       
     
     protected function GenerateResponse() 
     {
-                
+
+		
         // Populate a new Problem object
         $problem = new Problems();
         $problem->setPublic(false);        
@@ -204,19 +208,21 @@ class NewProblemInContest extends ApiHandler
 
                 if (($error = $casesZip->open($casesZipPath, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) !== TRUE)
                 {
+					Logger::error($error);
                     throw new Exception($error);
                 }
 
-		for ($i = 0; $i < count($this->casesFiles); $i++)
+				for ($i = 0; $i < count($this->casesFiles); $i++)
                 {
                     if (!$casesZip->addFile($dirpath . DIRECTORY_SEPARATOR . $this->casesFiles[$i], substr($this->casesFiles[$i], strlen('cases/'))))
                     {
+						Logger::error("Error trying to add {$this->casesFiles[$i]} to cases.zip");
                         throw new Exception("Error trying to add {$this->casesFiles[$i]} to cases.zip");
                     }
                 }
 
                 $casesZip->close();
-
+				Logger::log("Writing to : " . $dirpath . DIRECTORY_SEPARATOR . "inputname" );
                 file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($casesZipPath));
             }
             catch (Exception $e)
