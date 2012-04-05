@@ -404,12 +404,20 @@ abstract class RunsDAOBase extends DAO
          * Get best run of a user
          * 
          */
-        public static final function GetBestRun($contest_id, $problem_id, $user_id)
+            public static final function GetBestRun($contest_id, $problem_id, $user_id, $finish_time = NULL)
         {
             //Build SQL statement
-            $sql = "SELECT contest_score, submit_delay from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
-            $val = array($user_id, $contest_id, $problem_id);
-            
+            if ($finish_time)
+            {
+                $sql = "SELECT contest_score, submit_delay from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' and time <= FROM_UNIXTIME(?) ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
+                $val = array($user_id, $contest_id, $problem_id, $finish_time);
+            }
+            else
+            {
+                $sql = "SELECT contest_score, submit_delay from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
+                $val = array($user_id, $contest_id, $problem_id);
+            }
+
             global $conn;
             $rs = $conn->GetRow($sql, $val);            
             

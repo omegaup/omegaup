@@ -48,6 +48,7 @@ class ShowRunDetails extends ApiHandler
 		}                        
 
 		if (!(3 == $this->_user_id ||
+                      37 == $this->_user_id || 
    		      $this->contest->getDirectorId() == $this->_user_id ||
 		      $this->problem->getAuthorId() == $this->_user_id))
 		{
