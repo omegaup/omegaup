@@ -24,7 +24,7 @@ class ShowRunsInContest extends ApiHandler
                 // Check if the contest exists
 		$contest = ContestsDAO::getByAlias($value);
 
-		return ($contest->getDirectorId() == $user_id || $user_id == 3);
+		return ($contest->getDirectorId() == $user_id || $user_id == 3 || $user_id == 37);
             }, "Contest requested is invalid."))
         ->validate(RequestContext::get("contest_alias"), "contest_alias");
     }   

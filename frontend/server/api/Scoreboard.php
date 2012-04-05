@@ -26,24 +26,24 @@ class Scoreboard
         $this->contest_id = $contest_id;
         
     }
+
+    public static function getScoreboardTimeLimitUnixTimestamp(Contests $contest)
+    {
+        $start = strtotime($contest->getStartTime());
+        $finish = strtotime($contest->getFinishTime());
+ //       Logger::log("Start: " . $start . " Finish: " . $finish); 
+        $percentage = (double)$contest->getScoreboard() / 100.0;
+                
+        $limit = $start + (int)(($finish - $start) * $percentage);
+//Logger::log("Limit: " . $limit . " Pct: " . $percentage);        
+        return $limit;
+    }
     
     public function getCountProblemsInContest()
     {
         return $this->countProblemsInContest;
     }
     
-    public static function getScoreboardTimeLimitUnixTimestamp(Contests $contest)
-    {
-        $start = strtotime($contest->getStartTime());
-        $finish = strtotime($contest->getFinishTime());
-        
-        $percentage = (double)$contest->getScoreboard() / 100.0;
-                
-        $limit = $start + (int)(($finish - $start) * $percentage);
-        
-        return $limit;
-    }
-
     public function generate()
     {
     	$cache = new Cache(self::MEMCACHE_PREFIX);
@@ -53,6 +53,8 @@ class Scoreboard
         {
         try
         {
+	    $contest = ContestsDAO::getByPK($this->contest_id);	
+	
             // Gets whether we can cache this scoreboard.
             $cacheable = !RunsDAO::PendingRuns($this->contest_id);
 
@@ -80,7 +82,7 @@ class Scoreboard
 
             foreach ($contest_problems as $problems)
             {
-                $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId());
+                $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), self::getScoreboardTimeLimitUnixTimestamp($contest));
             }
 
             // Add the problems' information
@@ -228,13 +230,14 @@ class Scoreboard
 	return $this->data;                
     }
     
-    
-    protected function getScore($problem_id, $user_id)
+   protected function getScore($problem_id, $user_id, $limit_timestamp = NULL)
     {
         try
         {
-            $bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id);        
-        }
+            $bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id, $limit_timestamp);        
+        	//Logger::log($bestRun->__toString());
+	}
+     
         catch(Exception $e)
         {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
