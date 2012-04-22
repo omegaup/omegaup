@@ -25,10 +25,19 @@ class ShowContests extends ApiHandler {
 
     protected function CheckAuthToken()
     {                
-		//user does not need auth_token 
-		//to view contests, unless they
-		//are private which is implemented
-		//in GenerateResponse
+        // Call parent CheckAuthToken just to crack user credentials
+        try
+        {
+            parent::CheckAuthToken();
+        }
+        catch(ApiException $e)
+        {
+            if ($e->getArrayMessage() == ApiHttpErrors::invalidAuthToken())
+            {
+                // A logged user can view the list of contests
+                return;
+            }
+        }    
     }
 
 
@@ -68,7 +77,7 @@ class ShowContests extends ApiHandler {
 
             if ($c->getPublic()) 
             {
-				$c->toUnixTime(  );
+                $c->toUnixTime();
                 $addedContests[] = $c->asFilteredArray($relevant_columns);                
                 continue;
             }
@@ -76,20 +85,11 @@ class ShowContests extends ApiHandler {
             /*
              * Ok, its not public, lets se if we have a 
              * valid user
-             * */
-			/*$current_user = LoginController::getCurrentUser();
-
-            if ($current_user === null){
+             * */	
+            if ($this->_user_id === null)
+            {
                 continue;
             }
-
-			$this->_user_id = $current_user->getUserId();
-			*/
-            if ($this->_user_id === null){
-                continue;
-            }
-
-
 
             /**
              * Ok, i have a user. Can he see this contest ?

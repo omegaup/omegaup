@@ -28,8 +28,8 @@ class NewContestTest extends PHPUnit_Framework_TestCase
                 
         RequestContext::set("title", $title);
         RequestContext::set("description", "description");
-        RequestContext::set("start_time", Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() - 60*60));
-        RequestContext::set("finish_time", Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 60*60));
+        RequestContext::set("start_time", Utils::GetPhpUnixTimestamp() - 60*60);
+        RequestContext::set("finish_time", Utils::GetPhpUnixTimestamp() + 60*60);
         RequestContext::set("window_length", null);
         RequestContext::set("public", $public);
         RequestContext::set("alias", substr($title, 0, 20));
@@ -77,7 +77,7 @@ class NewContestTest extends PHPUnit_Framework_TestCase
     public function testCreateValidContest($public = 1)
     {                
         // Insert new contest
-        $random_title = Utils::CreateRandomString();        
+        $random_title = Utils::CreateRandomString();         
         try
         {            
             self::CreateContest($random_title, $public);
@@ -100,8 +100,8 @@ class NewContestTest extends PHPUnit_Framework_TestCase
         
         // Assert data was correctly saved
         $this->assertEquals(RequestContext::get("description"), $contest->getDescription());
-        $this->assertEquals(RequestContext::get("start_time"), $contest->getStartTime());
-        $this->assertEquals(RequestContext::get("finish_time"), $contest->getFinishTime());
+        $this->assertEquals(RequestContext::get("start_time"), Utils::GetPhpUnixTimestamp($contest->getStartTime()));
+        $this->assertEquals(RequestContext::get("finish_time"), Utils::GetPhpUnixTimestamp($contest->getFinishTime()));
         $this->assertEquals(RequestContext::get("window_length"), $contest->getWindowLength());
         $this->assertEquals(RequestContext::get("public"), $contest->getPublic());
         $this->assertEquals(RequestContext::get("alias"), $contest->getAlias());

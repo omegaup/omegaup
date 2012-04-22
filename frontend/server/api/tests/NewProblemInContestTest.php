@@ -189,10 +189,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
     
     
     public function testRequiredParameters()
-    {
-        // Login as judge
-        $auth_token = Utils::LoginAsContestDirector();
-        
+    {               
         // Set valid context
         $this->setValidContext();
         
@@ -209,12 +206,17 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         
         foreach($valid_keys as $key)        
         {        
-            // Set auth key
-            Utils::SetAuthToken($auth_token);
+            
             $newProblem = new NewProblemInContest($this->fileUploaderMock);
             
             // Reset context            
             $this->setValidContext();
+            
+            // Login as contest director
+            $auth_token = Utils::LoginAsContestDirector();
+            
+            // Set auth key
+            Utils::SetAuthToken($auth_token);
             
             // Unset key
             unset($_REQUEST[$key]);
@@ -226,7 +228,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
                 
             }
             catch(ApiException $e)
-            {
+            {           
                 // Exception is expected
                 $exception_array = $e->getArrayMessage();            
 

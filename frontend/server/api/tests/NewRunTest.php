@@ -89,9 +89,9 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         if(is_null($contest_id))
         {            
             $contestCreator = new NewContestTest();
-            $contest_id = $contestCreator->testCreateValidContest(1);            
-            $contest = ContestsDAO::getByPK($contest_id);
+            $contest_id = $contestCreator->testCreateValidContest(1);                        
         }
+        $contest = ContestsDAO::getByPK($contest_id);
         
         if(is_null($problem_id))
         {
@@ -139,11 +139,11 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
         $this->assertEquals("127.0.0.1", $run->getIp());
-        $this->assertEquals((time() - strtotime($contest->getStartTime()))/60, $run->getSubmitDelay());
+        $this->assertEquals((time() - strtotime($contest->getStartTime()))/60, $run->getSubmitDelay(), '', 0.5);
         $this->assertEquals("JE", $run->getVeredict());
                 
         
-        return $run->getRunId();
+        return (int)$run->getRunId();
     }
     
     public function testRunWhenContestExpired()
@@ -245,7 +245,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $run->getScore());
         $this->assertEquals(0, $run->getContestScore());
         $this->assertEquals("127.0.0.1", $run->getIp());
-        $this->assertEquals((time() - strtotime($contest->getStartTime()))/60, $run->getSubmitDelay());
+        $this->assertEquals((time() - strtotime($contest->getStartTime()))/60, $run->getSubmitDelay(), '', 0.5);
         $this->assertEquals("JE", $run->getVeredict());
     }
     
@@ -542,7 +542,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         }
     }
     
-    public function testNewRunInUsacoPublicContest()
+    public function testNewRunInWindowLengthPublicContest()
     {
         // Login 
         $auth_token = Utils::LoginAsContestant();
@@ -578,7 +578,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("ok", $return_array["status"]);
     }
     
-    public function testNewRunOutUsacoPublicContest()
+    public function testNewRunOutWindowLengthPublicContest()
     {
         // Login 
         $auth_token = Utils::LoginAsContestant();
@@ -599,8 +599,8 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $this->setValidContext($contest_id, $problem_id);
         
         // Alter first access time to make appear the run outside window length
-        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
-        $contest_user->setAccessTime(date("Y-m-d H:i:s", time() - 21));
+        $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);        
+        $contest_user->setAccessTime(date("Y-m-d H:i:s", time() - 21 * 60)); //Window length is in minutes                
         ContestsUsersDAO::save($contest_user);
         
         // Execute API

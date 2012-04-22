@@ -116,15 +116,11 @@ class NewRun extends ApiHandler
         }                 
     }
     
-    protected function ValidateRequest() 
-    {                            
-        
-    }
     
     protected function GenerateResponse() 
     {   
 	
-		Logger::log("New run being submitted !!");
+        Logger::log("New run being submitted !!");
 		
         try
         {

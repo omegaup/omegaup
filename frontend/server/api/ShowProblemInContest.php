@@ -21,18 +21,17 @@ class ShowProblemInContest extends ApiHandler
     //within the system, must 
     //call the constructor of ApiHandler
     //to load the current user
-    public function __construct(){
-            parent::__construct();
+    public function __construct()
+    {
+        parent::__construct();
     }
 	
-	
-	
+		
     protected function CheckAuthToken()
     {                
-             
+        parent::CheckAuthToken();     
     }
-	
-	
+		
 	
     protected function RegisterValidatorsToRequest()
     {
@@ -88,21 +87,21 @@ class ShowProblemInContest extends ApiHandler
 
         if(!$contest->getPublic())
         {
-                //contest is not public
+            //contest is not public
 
-                if( is_null($user )){
-                        //no one is even logged in
-                        throw new ApiException(ApiHttpErrors::forbiddenSite());
-                }
+            if( is_null($user ))
+            {
+                //no one is even logged in
+                throw new ApiException(ApiHttpErrors::forbiddenSite());
+            }
 
-                if( is_null(ContestsUsersDAO::getByPK( $user->getUserId(), $contest->getContestId() ) ) ){
-                        //he is not in the ContestUser list
-                        throw new ApiException(ApiHttpErrors::forbiddenSite());
-                }
-
-                //he is good to go...
-        }
-                
+            if( is_null(ContestsUsersDAO::getByPK( $user->getUserId(), $contest->getContestId() ) ) )
+            {
+                //he is not in the ContestUser list
+                throw new ApiException(ApiHttpErrors::forbiddenSite());
+            }
+            //he is good to go...
+        }                
     }            
     
 
@@ -119,30 +118,30 @@ class ShowProblemInContest extends ApiHandler
         }
         catch(Exception $e)
         {
-            // Operation failed in the data layer
+           // Operation failed in the data layer
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
         }
         
 	// Read the file that contains the source
 	if ($problem->getValidator() != 'remote')
 	{
-		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
-		
-        	try
-	        {            
-        	    $file_content = FileHandler::ReadFile($source_path);                        
-	        }
-        	catch(Exception $e)
-	        {
-        	    throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
-		}
+            $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
 
-	        // Add problem statement to source
-        	$this->addResponse("problem_statement", $file_content);        
+            try
+            {                            
+                $file_content = FileHandler::ReadFile($source_path);                                        
+            }
+            catch(Exception $e)
+            {
+                throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
+            }
+
+            // Add problem statement to source
+            $this->addResponse("problem_statement", $file_content);        
 	}
 	else if($problem->getServer() == 'uva')
 	{
-		$this->addResponse('problem_statement', '<iframe src="http://acm.uva.es/p/v' . substr($problem->getRemoteId(), 0, strlen($problem->getRemoteId()) - 2) . '/' . $problem->getRemoteId() . '.html"></iframe>');
+            $this->addResponse('problem_statement', '<iframe src="http://acm.uva.es/p/v' . substr($problem->getRemoteId(), 0, strlen($problem->getRemoteId()) - 2) . '/' . $problem->getRemoteId() . '.html"></iframe>');
 	}
 
 	// Add the problem the response
@@ -220,7 +219,7 @@ class ShowProblemInContest extends ApiHandler
         }
         
         // Add the procesed runs to the request
-        $this->addResponse("runs", $runs_filtered_array);        
+        $this->addResponse("runs", $runs_filtered_array);               
     }    
 }
 

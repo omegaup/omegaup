@@ -29,18 +29,20 @@ abstract class ApiHandler
 	   * 
 	   *
 	   **/
-	public function __construct(){
+    public function __construct()
+    {
 
-		$current_user = LoginController::getCurrentUser();
+        $current_user = LoginController::getCurrentUser();
 
-        if ($current_user === null){
+        if ($current_user === null)
+        {
             $this->_user_id = null;
-			return;
+            return;
         }
 
-		$this->_user_username = $current_user->getUsername();
-		$this->_user_id = $current_user->getUserId();
-	}
+        $this->_user_username = $current_user->getUsername();
+        $this->_user_id = $current_user->getUserId();
+    }
 
 
     protected function addResponse($key, $value)
@@ -81,15 +83,18 @@ abstract class ApiHandler
             }
             else
             {                
+                Logger::error("Token was not found in DB.");
                 // We have an invalid auth token. Dying.            
                 throw new ApiException( ApiHttpErrors::invalidAuthToken() );
             }
         }
         else
         {                
-          // Login is required
-          throw new ApiException( ApiHttpErrors::invalidAuthToken() );
-        }                
+            Logger::log("Token came null.");
+          
+            // Login is required
+            throw new ApiException( ApiHttpErrors::invalidAuthToken() );
+        }                 
     }        
             
     protected abstract function RegisterValidatorsToRequest();        
@@ -147,7 +152,9 @@ abstract class ApiHandler
                 Logger::error( $e->getWrappedException()->getLine() );
                 Logger::error( $e->getWrappedException()->getCode() );
             }
-
+            
+            Logger::error( "Trace: " );
+            Logger::error( $e->getTraceAsString() );
             Logger::error( "---------------------------------------------------" );            
             // Propagate the exception
             throw $e;
