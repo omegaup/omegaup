@@ -66,21 +66,21 @@ class NewRun extends ApiHandler
                     $problem->getProblemId()                
                 ))
             {
-               throw new ApiException(ApiHttpErrors::invalidParameter("problem_id and contest_id combination is invalid."));
+               throw new ApiException(ApiHttpErrors::invalidParameter("problem_alias and contest_alias combination is invalid."));
             }
 
             // Before submit something, contestant had to open the problem/contest
             if(!ContestsUsersDAO::getByPK($this->_user_id, 
                     $contest->getContestId()))
             {
-                throw new ApiException(ApiHttpErrors::forbiddenSite());
+                throw new ApiException(ApiHttpErrors::forbiddenSite("Unable to submit run: You must open the problem before trying to submit a solution."));
             }
 
-            // Validate that the run is inside contest
+            // Validate that the run is timely inside contest
             $contest = ContestsDAO::getByPK($contest->getContestId());
             if( !$contest->isInsideContest($this->_user_id))
             {                
-                throw new ApiException(ApiHttpErrors::forbiddenSite());
+                throw new ApiException(ApiHttpErrors::forbiddenSite("Unable to submit run: Contes time has expired."));
             }
             
             // Validate if contest is private then the user should be registered
@@ -90,7 +90,7 @@ class NewRun extends ApiHandler
                         $contest->getContestId()))
                )
             {
-               throw new ApiException(ApiHttpErrors::forbiddenSite());
+               throw new ApiException(ApiHttpErrors::forbiddenSite("Unable to submit run: You are not registered to this contest."));
 	    }
 
             // Validate if the user is allowed to submit given the submissions_gap 
@@ -100,7 +100,7 @@ class NewRun extends ApiHandler
                     $this->_user_id)
                )
             {                
-               throw new ApiException(ApiHttpErrors::notAllowedToSubmit());
+               throw new ApiException(ApiHttpErrors::notAllowedToSubmit("Unable to submit run: You have to wait " . $contest->getSubmissionsGap() . " minutes between consecutive submissions."));
             }
                             
         }
@@ -133,59 +133,59 @@ class NewRun extends ApiHandler
         }
         
 
-		//check the kind of penalty_time_start for this contest
-		$penalty_time_start = $contest->getPenaltyTimeStart();
-		
+        //check the kind of penalty_time_start for this contest
+        $penalty_time_start = $contest->getPenaltyTimeStart();
 
-		
-		switch($penalty_time_start){
-			case "contest":
-				// submit_delay is calculated from the start
-				// of the contest
-				$start = $contest->getStartTime();
-			break;
-			
-			case "problem":
-				// submit delay is calculated from the 
-				// time the user opened the problem
-				$opened = ContestProblemOpenedDAO::getByPK(
-                                                                        $contest->getContestId(), 
-                                                                        $problem->getProblemId(), 
-                                                                        $this->_user_id
-									);
-				
-				if(is_null($opened)){
-					//holy moly, he is submitting a run 
-					//and he hasnt even opened the problem
-					//what should be done here?
-					Logger::error("User is submitting a run and he has not even opened the problem");
-					throw new Exception("User is submitting a run and he has not even opened the problem");
-				}
-				
-				$start = $opened->getOpenTime();
-			break;
-				
-			case "none":
-				//we dont care
-				$start = null;
-			break;
-			
-			default:
-				Logger::error("penalty_time_start for this contests is not a valid option, asuming `none`.");
-				$start = null;
-		}
 
-		if(!is_null($start)){
-			//ok, what time is it now?
-			$c_time = time();
-			$start = strtotime( $start );
 
-			//asuming submit_delay is in minutes
-			$submit_delay = (int)(( $c_time - $start ) / 60);
-			
-		}else{
-			$submit_delay = 0;
-		}
+        switch($penalty_time_start){
+                case "contest":
+                        // submit_delay is calculated from the start
+                        // of the contest
+                        $start = $contest->getStartTime();
+                break;
+
+                case "problem":
+                        // submit delay is calculated from the 
+                        // time the user opened the problem
+                        $opened = ContestProblemOpenedDAO::getByPK(
+                                                                $contest->getContestId(), 
+                                                                $problem->getProblemId(), 
+                                                                $this->_user_id
+                                                                );
+
+                        if(is_null($opened)){
+                                //holy moly, he is submitting a run 
+                                //and he hasnt even opened the problem
+                                //what should be done here?
+                                Logger::error("User is submitting a run and he has not even opened the problem");
+                                throw new Exception("User is submitting a run and he has not even opened the problem");
+                        }
+
+                        $start = $opened->getOpenTime();
+                break;
+
+                case "none":
+                        //we dont care
+                        $start = null;
+                break;
+
+                default:
+                        Logger::error("penalty_time_start for this contests is not a valid option, asuming `none`.");
+                        $start = null;
+        }
+
+        if(!is_null($start)){
+                //ok, what time is it now?
+                $c_time = time();
+                $start = strtotime( $start );
+
+                //asuming submit_delay is in minutes
+                $submit_delay = (int)(( $c_time - $start ) / 60);
+
+        }else{
+                $submit_delay = 0;
+        }
 
         // Populate new run object
         $run = new Runs(array(
@@ -204,10 +204,7 @@ class NewRun extends ApiHandler
             "guid" 			=> md5(uniqid(rand(), true)),
             "veredict" 		=> "JE"
         ));
-
-
-        
-		
+        		
         try
         {
             // Push run into DB
