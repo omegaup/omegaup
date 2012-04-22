@@ -5,14 +5,14 @@
  * and open the template in the editor.
  */
 
-require_once '../AddUserToPrivateContest.php';
+require_once '../RemoveUserFromPrivateContest.php';
 
-require_once 'NewContestTest.php';
+require_once 'AddUserToPrivateContestTest.php';
 
 require_once 'Utils.php';
 
 
-class AddUserToPrivateContestTest extends PHPUnit_Framework_TestCase
+class RemoveUserToPrivateContestTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {        
@@ -24,12 +24,14 @@ class AddUserToPrivateContestTest extends PHPUnit_Framework_TestCase
         Utils::cleanup();
     }
     
-    public function testContestDirectorAddsUserToContest()
+    public function testContestDirectorRemovesUserFromContest()
     {
-        // Create our contest
-        $contestCreator = new NewContestTest();
-        $contest_id = $contestCreator->testCreateValidContest(1); 
-        $contest = ContestsDAO::getByPK($contest_id);
+        // Call the test to add user
+        $addUser = new AddUserToPrivateContestTest();
+        $addUser->testContestDirectorAddsUserToContest();
+        
+        // Get the contest
+        $contest = ContestsDAO::getByAlias(RequestContext::get('contest_alias'));
         
         // Login as a director
         $auth_token = Utils::LoginAsContestDirector();
@@ -40,7 +42,7 @@ class AddUserToPrivateContestTest extends PHPUnit_Framework_TestCase
         RequestContext::set('user_id', Utils::GetContestant2UserId());
             
         // Execute API
-        $api = new AddUserToPrivateContest();
+        $api = new RemoveUserToPrivateContest();
         try 
         {
             $return_array = $api->ExecuteApi();
@@ -50,27 +52,29 @@ class AddUserToPrivateContestTest extends PHPUnit_Framework_TestCase
             var_dump($e->getArrayMessage());            
             $this->fail("Unexpected exception");
         }
-    
+        
         // Validate output
         $this->assertEquals("ok", $return_array["status"]);
         
-        // Check the DB
-        $contest_user = ContestsUsersDAO::getByPK(RequestContext::get('user_id'), $contest_id);
-        $this->assertEquals($contest_id, $contest_user->getContestId());
-        $this->assertEquals(RequestContext::get('user_id'), $contest_user->getUserId());
-        $this->assertEquals("0000-00-00 00:00:00", $contest_user->getAccessTime());               
+        // Check DB
+        $contest_users = new ContestsUsers();
+        $contest_users->setUserId(RequestContext::get('user_id'));
+        $contest_users->setContestId($contest->getContestId());
+        $result = ContestsUsersDAO::search($contest_users);
         
-        Utils::Logout($auth_token);
+        $this->assertEmpty($result);
     }
     
-    public function testContestantNotAbleToAddUserToContest()
+    public function testContestantNotAbleToRemoveUserFromContest()
     {
-        // Create our contest
-        $contestCreator = new NewContestTest();
-        $contest_id = $contestCreator->testCreateValidContest(1); 
-        $contest = ContestsDAO::getByPK($contest_id);
+        // Call the test to add user
+        $addUser = new AddUserToPrivateContestTest();
+        $addUser->testContestDirectorAddsUserToContest();
         
-        // Login as a director
+        // Get the contest
+        $contest = ContestsDAO::getByAlias(RequestContext::get('contest_alias'));
+        
+        // Login as a contestant
         $auth_token = Utils::LoginAsContestant();
         Utils::SetAuthToken($auth_token);
         
@@ -79,7 +83,7 @@ class AddUserToPrivateContestTest extends PHPUnit_Framework_TestCase
         RequestContext::set('user_id', Utils::GetContestant2UserId());
             
         // Execute API
-        $api = new AddUserToPrivateContest();
+        $api = new RemoveUserToPrivateContest();
         try 
         {
             $return_array = $api->ExecuteApi();
@@ -96,7 +100,7 @@ class AddUserToPrivateContestTest extends PHPUnit_Framework_TestCase
             return;                        
         }
         
-        $this->fail("Contestant was able to add a user to a contest.");        
+        $this->fail("Contestant was able to add a user to a contest.");                   
     }
 }
 ?>
