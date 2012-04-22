@@ -53,17 +53,17 @@ class ShowProblemRunsTest extends PHPUnit_Framework_TestCase
             $problemCreator = new NewProblemInContestTest();
             $problem_id = $problemCreator->testCreateValidProblem($contest_id);
         }
-                
+        
         // Create 3 runs with Contestant user
         $runCreator = new NewRunTest();
         $run = array();        
         for($i = 0; $i < $n; $i++)
-        {
+        {            
             $run[$i] = RunsDAO::getByPK($runCreator->testNewValidRun($contest_id, $problem_id));                        
             
-            // Alter run timestamp
+            // Alter run timestamp            
             $run[$i]->setTime($this->getNextTime());            
-            RunsDAO::save($run[$i]);
+            RunsDAO::save($run[$i]);            
         }
         
         // Login as contestant

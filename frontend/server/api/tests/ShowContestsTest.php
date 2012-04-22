@@ -123,13 +123,8 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($random_title, $cleanValue['contests'][0]["title"]);
         
         // Logout the contestant
-        Utils::Logout($auth_token);  
-        
-    }
-     
-    
-    
-   
+        Utils::Logout($auth_token);          
+    }   
 }
 
 ?>

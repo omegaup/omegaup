@@ -47,9 +47,9 @@ class Utils
         $conn = null;
 
         try{                    
-           $conn = ADONewConnection(OMEGAUP_TEST_DB_DRIVER);                    
-           $conn->debug = OMEGAUP_TEST_DB_DEBUG;
-           $conn->PConnect(OMEGAUP_TEST_DB_HOST, OMEGAUP_TEST_DB_USER, OMEGAUP_TEST_DB_PASS, OMEGAUP_TEST_DB_NAME);
+           $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
+           $conn->debug = OMEGAUP_DB_DEBUG;
+           $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 
 
             if(!$conn) {
@@ -108,7 +108,8 @@ class Utils
         }
         
         $auth_token = $cleanValue["auth_token"];
-                        
+        Logger::log("login authtoken " . $auth_token          );
+        
         self::cleanup();                
         return $auth_token;
         
@@ -212,17 +213,11 @@ class Utils
     }
     
     static function GetValidPublicContestId()
-    {
-        // Log in as contest creator user
-        $auth_token = Utils::LoginAsContestDirector();
-        Utils::SetAuthToken($auth_token);
-        
+    {                
         // Create a clean contest and get the ID
         $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);
-                
-        Utils::Logout($auth_token);
-        
+                                
         return $contest_id;
     }
     
@@ -346,6 +341,48 @@ class Utils
     {        
         self::$counttime++;                
         return Utils::GetTimeFromUnixTimestam(self::$inittime + self::$counttime);
+    }
+    
+    static function CleanLog()
+    {
+        exec("echo -n > " . OMEGAUP_LOG_ACCESS_FILE);
+        exec("echo -n > " . OMEGAUP_LOG_ERROR_FILE);
+    }
+    
+    static function CleanProblemsPath()
+    {
+        exec("rm -r " . PROBLEMS_PATH);
+        exec("mkdir " . PROBLEMS_PATH);
+    }
+    
+    static function CleanRunsPath()
+    {
+        exec("rm -r " . RUNS_PATH);
+        exec("mkdir " . RUNS_PATH);
+    }
+    
+    static function CleanupDB()
+    {
+        global $conn;
+        
+        // Tables to truncate
+        $tables = array (
+            'Runs', 
+            'Contest_Problems', 
+            'Contests_Users', 
+            'Clarifications',
+            'contest_problem_opened',
+            'Problems', 
+            'auth_tokens',
+            'contests',
+            'Users'
+            );
+        
+        foreach($tables as $t)
+        {
+            $sql = "TRUNCATE TABLE " . $t;
+            $conn->GetRow($sql);
+        }        
     }
 }
 

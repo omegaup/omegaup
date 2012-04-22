@@ -38,7 +38,7 @@ class NewContest extends ApiHandler
 	 */
         
         // Calculate contest length:
-		$contest_length = RequestContext::get("finish_time") - RequestContext::get("start_time");
+        $contest_length = RequestContext::get("finish_time") - RequestContext::get("start_time");
 
         // Window_length is optional
         if(!is_null(RequestContext::get("window_length")) && RequestContext::get("window_length") != "NULL")
@@ -111,28 +111,32 @@ class NewContest extends ApiHandler
             }
 	}
 
-	$this->problems = array();
+        // Problems is optional
+        if (!is_null(RequestContext::get('problems')))
+        {
+            $this->problems = array();
 
-	foreach (json_decode(RequestContext::get('problems')) as $problem) {
-		$p = ProblemsDAO::getByAlias($problem->problem);
-		array_push($this->problems, array(
-			'id' => $p->getProblemId(),
-			'alias' => $problem->problem,
-			'points' => $problem->points
-		));
-	}
+            foreach (json_decode(RequestContext::get('problems')) as $problem) {
+                    $p = ProblemsDAO::getByAlias($problem->problem);
+                    array_push($this->problems, array(
+                            'id' => $p->getProblemId(),
+                            'alias' => $problem->problem,
+                            'points' => $problem->points
+                    ));
+            }
+        }
     }       
     
     protected function GenerateResponse() 
-    {
+    {        
         // Create and populate a new Contests object
         $contest = new Contests();              
         $contest->setTitle(RequestContext::get("title"));
-	$contest->setDescription(RequestContext::get("description"));
-        $contest->setStartTime(gmdate('Y-m-d H:i:s', RequestContext::get("start_time")));
+	$contest->setDescription(RequestContext::get("description"));        
+        $contest->setStartTime(gmdate('Y-m-d H:i:s', RequestContext::get("start_time")));        
         $contest->setFinishTime(gmdate('Y-m-d H:i:s', RequestContext::get("finish_time")));
         $contest->setWindowLength(RequestContext::get("window_length") == "NULL" ? NULL : RequestContext::get("window_length"));
-        $contest->setDirectorId($this->_user_id);
+        $contest->setDirectorId($this->_user_id);        
         $contest->setRerunId(0); // NYI
         $contest->setPublic(RequestContext::get("public"));
         $contest->setAlias(RequestContext::get("alias"));
@@ -141,10 +145,10 @@ class NewContest extends ApiHandler
         $contest->setPartialScore(RequestContext::get("partial_score"));
         $contest->setSubmissionsGap(RequestContext::get("submissions_gap"));
         $contest->setFeedback(RequestContext::get("feedback"));
-        $contest->setPenalty(min(0, intval(RequestContext::get("penalty"))));
+        $contest->setPenalty(max(0, intval(RequestContext::get("penalty"))));
         $contest->setPenaltyTimeStart(RequestContext::get("penalty_time_start"));
         $contest->setPenaltyCalcPolicy(RequestContext::get("penalty_calc_policy"));
-                
+        
         // Push changes
         try
         {
@@ -173,16 +177,19 @@ class NewContest extends ApiHandler
                 }
 	    }
 
-	    foreach ($this->problems as $problem)
-	    {
-		$contest_problem = new ContestProblems(array(
-			'contest_id' => $contest->getContestId(),
-			'problem_id' => $problem['id'],
-			'points' => $problem['points']
-		));
+            if (!is_null(RequestContext::get('problems')))
+            {                
+                foreach ($this->problems as $problem)
+                {
+                    $contest_problem = new ContestProblems(array(
+                            'contest_id' => $contest->getContestId(),
+                            'problem_id' => $problem['id'],
+                            'points' => $problem['points']
+                    ));
 
-		ContestProblemsDAO::save($contest_problem);
-	    }
+                    ContestProblemsDAO::save($contest_problem);
+                }
+            }
             
             // End transaction transaction
             ContestsDAO::transEnd();
@@ -203,8 +210,8 @@ class NewContest extends ApiHandler
             }
         }
         
-    }
-    
+        Logger::log("New Contest Created: ". RequestContext::get('title'));        
+    }    
 }
 
 ?>

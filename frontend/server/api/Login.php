@@ -157,22 +157,25 @@ class Login extends ApiHandler {
           * some salted md5 string: to validate that it was me who actually made this token
           * 
 	  	  * */
-	 	 $time = time();
+         $time = time();
          $auth_str = $time . "-" . $actual_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $actual_user->getUserId() . $time );
          $this->_auth_token->setToken($auth_str);
 
-		try{
-            AuthTokensDAO::save( $this->_auth_token );
+        try
+        {            
+            AuthTokensDAO::save( $this->_auth_token );            
 
-		}catch(Exception $e){
+        }
+        catch(Exception $e)
+        {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
 
-		}
+        }
          
-	 	$this->_sessionManager->SetCookie('auth_token', $auth_str, time()+60*60*24, '/');
+        $this->_sessionManager->SetCookie('auth_token', $auth_str, time()+60*60*24, '/');
           
-         // Add token to response
-         $this->addResponse("auth_token", $this->_auth_token->getToken());         
+        // Add token to response
+        $this->addResponse("auth_token", $this->_auth_token->getToken());         
     }
 }
 

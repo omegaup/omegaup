@@ -44,8 +44,8 @@ class NewClarificationTest extends PHPUnit_Framework_TestCase
             $contest = ContestsDAO::getByPK($contest_id);
             $problem = ProblemsDAO::getByPK($problem_id);
             
-            RequestContext::set("contest_alias", $contest->getContestId());
-            RequestContext::set("problem_alias", $problem->getProblemId());
+            RequestContext::set("contest_alias", $contest->getAlias());
+            RequestContext::set("problem_alias", $problem->getAlias());
         }        
         RequestContext::set("message", Utils::CreateRandomString());
         Utils::SetAuthToken($auth_token);

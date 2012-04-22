@@ -62,7 +62,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         }
         
         // Get problem id from DB to compare it
-        $problem = ProblemsDAO::getByPK($problem_id);
+        $problem = ProblemsDAO::getByPK($problem_id);               
         
         // Assert data
         $this->assertEquals($return_array["title"], $problem->getTitle());
@@ -72,8 +72,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
         $this->assertEquals($return_array["author_id"], $problem->getAuthorId()); 
         $this->assertEquals($return_array["source"], $problem->getSource()); 
-        $this->assertContains("<h1>Salida</h1>", $return_array["problem_statement"]);
-        $this->assertContains('<div class="problem-statement">', $return_array["problem_statement"]);
+        $this->assertContains("<h1>Output</h1>", $return_array["problem_statement"]);        
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data
@@ -156,7 +155,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
         $this->assertEquals($return_array["author_id"], $problem->getAuthorId());        
         $this->assertEquals($return_array["source"], $problem->getSource()); 
-        $this->assertContains("<h1>Salida</h1>", $return_array["problem_statement"]);
+        $this->assertContains("<h1>Output</h1>", $return_array["problem_statement"]);
         $this->assertEquals($return_array["order"], $problem->getOrder());
         
         // Default data

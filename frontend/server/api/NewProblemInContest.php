@@ -113,7 +113,7 @@ class NewProblemInContest extends ApiHandler
                      ->validate($_FILES['problem_contents']['tmp_name'], 'problem_contents');                
         
         // Save files to unzip                
-		Logger::log("Saving files to unzip...");
+        Logger::log("Saving files to unzip...");
         $this->filesToUnzip = $zipValidator->getValidator(0)->filesToUnzip;        
         $this->casesFiles = $zipValidator->getValidator(0)->casesFiles;
 

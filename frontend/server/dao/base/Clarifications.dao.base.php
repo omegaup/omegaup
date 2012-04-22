@@ -169,7 +169,7 @@ abstract class ClarificationsDAOBase extends DAO
 		}
 
 		if( $Clarifications->getProblemId() != NULL){
-			$sql .= " problem_id = ? AND";
+			$sql .= " c.problem_id = ? AND";
 			array_push( $val, $Clarifications->getProblemId() );
 		}
 
