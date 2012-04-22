@@ -12,35 +12,35 @@ class ProblemContentsZipValidator extends Validator
     
     public function validate($value, $value_name = null)
     {       
-		Logger::log("Validating zip...");
+        Logger::log("Validating zip...");
 		
         $this->filesToUnzip = array();
         $this->casesFiles = array();
         
         $zip = new ZipArchive();
-		Logger::log("Opening $value...");
-		$resource = $zip->open($value);
+        Logger::log("Opening $value...");
+        $resource = $zip->open($value);
 
-		$maximumSize = 256 * 1024 * 1024;
-		$size = 0;
+        $maximumSize = 100 * 1024 * 1024;
+        $size = 0;
         
         if($resource === TRUE)
         {            
             // Get list of files
             for($i = 0; $i < $zip->numFiles; $i++)
             {
-				Logger::log("Found ".$zip->getNameIndex($i));
+                Logger::log("Found ".$zip->getNameIndex($i));
                 $zipFilesArray[] = $zip->getNameIndex($i);
-				$statI = $zip->statIndex($i);
+                $statI = $zip->statIndex($i);
                 $size += $statI['size'];
-	    	}
+            }
 
-		    if ($size > $maximumSize)
-		    {
-					Logger::error("Extracted zip size ($size) over {$maximumSize}MB. Rejecting.");
-	                $this->setError("Extracted zip over 256MB. Rejecting.");
-	                return false;
-		    }
+            if ($size > $maximumSize)
+            {
+                Logger::error("Extracted zip size ($size) over {$maximumSize}MB. Rejecting.");
+                $this->setError("Extracted zip over 256MB. Rejecting.");
+                return false;
+            }
 
             // Look for testplan
             if(in_array("testplan", $zipFilesArray))
