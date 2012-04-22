@@ -80,7 +80,7 @@ class NewRun extends ApiHandler
             $contest = ContestsDAO::getByPK($contest->getContestId());
             if( !$contest->isInsideContest($this->_user_id))
             {                
-                throw new ApiException(ApiHttpErrors::forbiddenSite("Unable to submit run: Contes time has expired."));
+                throw new ApiException(ApiHttpErrors::forbiddenSite("Unable to submit run: Contes time has expired or not started yet."));
             }
             
             // Validate if contest is private then the user should be registered

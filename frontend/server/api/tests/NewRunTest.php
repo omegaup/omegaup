@@ -179,7 +179,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("User is not allowed to view this content.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: Contes time has expired or not started yet.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
             
@@ -274,7 +274,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("User is not allowed to view this content.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: You must open the problem before trying to submit a solution.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
             
@@ -322,7 +322,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("User is not allowed to view this content.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: Contes time has expired or not started yet.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
             
@@ -381,7 +381,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("You're not allowed to submit yet.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: You have to wait 20 minutes between consecutive submissions.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 401 FORBIDDEN", $exception_message["header"]);                                         
 
@@ -474,7 +474,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("problem_id and contest_id combination is invalid.", $exception_message["error"]);
+            $this->assertEquals("problem_alias and contest_alias combination is invalid.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 400 BAD REQUEST", $exception_message["header"]);                         
             
@@ -613,7 +613,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("User is not allowed to view this content.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: Contes time has expired or not started yet.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
             
