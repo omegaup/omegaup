@@ -371,18 +371,25 @@ class Utils
             'Contest_Problems', 
             'Contests_Users', 
             'Clarifications',
-            'contest_problem_opened',
+            'Contest_Problem_Opened',
             'Problems', 
-            'auth_tokens',
-            'contests',
+            'Auth_Tokens',
+            'Contests',
             'Users'
             );
         
         foreach($tables as $t)
         {
-            $sql = "TRUNCATE TABLE " . $t;
-            $conn->GetRow($sql);
-        }        
+	    try
+  	    {
+           	 $sql = "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE " . $t . "; SET FOREIGN_KEY_CHECKS=1;";
+		 $conn->GetRow($sql);
+        	}
+	    catch(Exception $e)
+	    {
+	    }	 		
+   	}
+
     }
 }
 
