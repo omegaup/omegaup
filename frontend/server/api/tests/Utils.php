@@ -384,7 +384,7 @@ class Utils
   	    {
            	 $sql = "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE " . $t . "; SET FOREIGN_KEY_CHECKS=1;";
 		 $conn->GetRow($sql);
-        	}
+            }
 	    catch(Exception $e)
 	    {
 	    }	 		
