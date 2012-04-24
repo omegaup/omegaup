@@ -300,7 +300,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Manually expire contest
         $contest = ContestsDAO::getByPK($contest_id);                
-        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 1));                        
+        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 10));                        
         ContestsDAO::save($contest);
         
         // Create problem in contest        
