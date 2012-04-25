@@ -144,6 +144,16 @@ class ApiLoader
                 require_once('UpdateClarification.php');
                 $api = new UpdateClarification();
                 break;
+            
+            case 'AddUserToPrivateContest':
+                require_once('AddUserToPrivateContest.php');
+                $api = new AddUserToPrivateContest();
+                break;
+            
+            case 'RemoveUserToPrivateContest':
+                require_once('RemoveUserToPrivateContest.php');
+                $api = new RemoveUserToPrivateContest();
+                break;
 
             default:
                 return self::NotFound();
