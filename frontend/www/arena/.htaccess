@@ -20,6 +20,9 @@ RewriteRule ^contests/([a-zA-Z0-9_-]+)/runs/?$ /arena/CallApiLoader.php?apicmd=S
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowProblemInContest&contest_alias=$1&problem_alias=$2 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/new/?$ /arena/CallApiLoader.php?apicmd=NewProblemInContest&contest_alias=$1 [L]
 
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/users/add/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=AddUserToPrivateContest&contest_alias=$1&user_id=$2 [L]
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/users/remove/([0-9]+)/?$ /arena/CallApiLoader.php?apicmd=RemoveUserToPrivateContest&contest_alias=$1&user_id=$2 [L]
+
 RewriteRule ^runs/new/?$ /arena/CallApiLoader.php?apicmd=NewRun [L]
 RewriteRule ^runs/([a-zA-Z0-9_-]+)/?$ /arena/CallApiLoader.php?apicmd=ShowRun&run_alias=$1 [L]
 RewriteRule ^runs/([a-zA-Z0-9_-]+)/details/?$ /arena/CallApiLoader.php?apicmd=ShowRunDetails&run_alias=$1 [L]
