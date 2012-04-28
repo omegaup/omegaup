@@ -100,7 +100,7 @@ class NewRun extends ApiHandler
                     $this->_user_id)
                )
             {                
-               throw new ApiException(ApiHttpErrors::notAllowedToSubmit("Unable to submit run: You have to wait " . $contest->getSubmissionsGap() . " minutes between consecutive submissions."));
+               throw new ApiException(ApiHttpErrors::notAllowedToSubmit("Unable to submit run: You have to wait " . $contest->getSubmissionsGap() . " seconds between consecutive submissions."));
             }
                             
         }

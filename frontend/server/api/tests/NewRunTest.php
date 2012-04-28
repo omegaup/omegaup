@@ -345,7 +345,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         $contestCreator = new NewContestTest();
         $contest_id = $contestCreator->testCreateValidContest(1);   
         
-        // Set submissions gap of 2 seconds
+        // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByPK($contest_id);                
         $contest->setSubmissionsGap(20);
         ContestsDAO::save($contest);
@@ -381,7 +381,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("Unable to submit run: You have to wait 20 minutes between consecutive submissions.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: You have to wait 20 seconds between consecutive submissions.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 401 FORBIDDEN", $exception_message["header"]);                                         
 
