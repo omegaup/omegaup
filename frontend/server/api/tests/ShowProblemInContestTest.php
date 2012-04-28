@@ -259,7 +259,7 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $access_time = Utils::GetPhpUnixTimestamp();
         $contest_user = ContestsUsersDAO::getByPK(Utils::GetContestantUserId(), $contest_id);
         $this->assertNotNull($contest_user);
-        $this->assertEquals($access_time, Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()));                                
+        $this->assertTrue($access_time - Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()) <= 1);
     }
     
     // @TODO Assert problem with runs        
