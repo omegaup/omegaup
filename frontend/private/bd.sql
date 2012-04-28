@@ -453,7 +453,7 @@ CREATE TABLE IF NOT EXISTS `Tags` (
 
 CREATE TABLE IF NOT EXISTS `Users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
+  `username` varchar(50) NOT NULL UNIQUE,
   `facebook_user_id` bigint(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
   `password` char(32) DEFAULT NULL,
   `main_email_id` int(11) DEFAULT NULL,
