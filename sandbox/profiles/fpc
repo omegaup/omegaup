@@ -4,6 +4,7 @@
 -F
 
 -s ugetrlimit
+-s getrlimit
 -s rt_sigaction
 -s time
 -s gettimeofday
