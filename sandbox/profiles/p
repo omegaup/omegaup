@@ -4,6 +4,7 @@
 -F
 
 -s ugetrlimit
+-s getrlimit
 -s rt_sigaction
 -s rt_sigprocmask
 -s rt_sigreturn=noret
