@@ -396,6 +396,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `ip` char(15) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',
+  `test` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`run_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),

@@ -18,13 +18,13 @@ class Scoreboard
     private $data;
     private $contest_id;
     private $countProblemsInContest;
-    
+    private $showAllRuns;
         
-    public function __construct($contest_id)
+    public function __construct($contest_id, $showAllRuns = false)
     {
         $this->data = array();
         $this->contest_id = $contest_id;
-        
+        $this->showAllRuns = $showAllRuns;
     }
 
     public static function getScoreboardTimeLimitUnixTimestamp(Contests $contest)
@@ -49,17 +49,17 @@ class Scoreboard
     	$cache = new Cache(self::MEMCACHE_PREFIX);
         $result = $cache->get($this->contest_id);
 
-        if( $result == null )
+        if( $this->showAllRuns || $result == null )
         {
         try
         {
 	    $contest = ContestsDAO::getByPK($this->contest_id);	
 	
             // Gets whether we can cache this scoreboard.
-            $cacheable = !RunsDAO::PendingRuns($this->contest_id);
+            $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
 
             // Get all distinct contestants participating in the contest given contest_id
-            $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id);
+            $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns);
 
             // Get all problems given contest_id
             $contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
@@ -118,24 +118,27 @@ class Scoreboard
         $cache = new Cache(self::MEMCACHE_EVENTS_PREFIX);
         $result = $cache->get($this->contest_id);
 
-        if( $result == null )
+        if( $this->showAllRuns || $result == null )
         {
             try
             {
                 $contest = ContestsDAO::getByPK($this->contest_id);
                     
                 // Gets whether we can cache this scoreboard.
-                $cacheable = !RunsDAO::PendingRuns($this->contest_id);
+                $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
 
                 // Get all distinct contestants participating in the contest given contest_id
-                $raw_contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id);                             
+		$raw_contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns); 
 
                 // Get all problems given contest_id
                 $raw_contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
 
                 $run = new Runs();
                 $run->setContestId($this->contest_id);
-                $run->setStatus('ready');
+		$run->setStatus('ready');
+		if (!$this->showAllRuns) {
+			$run->setTest(0);
+		}
 
                 $contest_runs = RunsDAO::search($run, 'submit_delay');
             }
@@ -189,10 +192,10 @@ class Scoreboard
                 }
 
                 $user_problems_score[$run->getUserId()][$run->getProblemId()]['points'] = $run->getContestScore();
-                $user_problems_score[$run->getUserId()][$run->getProblemId()]['penalty'] = 0;
+		$user_problems_score[$run->getUserId()][$run->getProblemId()]['penalty'] = 0;
 
                 $data = array();
-                $user = $contest_users[$run->getUserId()];
+		$user = $contest_users[$run->getUserId()];
 
                 $data['name'] = $user->getName() ? $user->getName() : $user->getUsername();
                 $data['username'] = $user->getUsername();
@@ -234,8 +237,7 @@ class Scoreboard
     {
         try
         {
-            $bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id, $limit_timestamp);        
-        	//Logger::log($bestRun->__toString());
+            $bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id, $limit_timestamp, $this->showAllRuns);
 	}
      
         catch(Exception $e)
