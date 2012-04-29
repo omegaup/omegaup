@@ -251,6 +251,12 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $Runs->getTime() );
 		}
 
+		if ($Runs->getTest() !== NULL) {
+			$sql .= " test = ?  AND";
+			array_push($val, $Runs->getTest());
+		}
+
+
 		if(sizeof($val) == 0){return array();}
 		$sql = substr($sql, 0, -3) . " )";
 		if( $orderBy !== null ){
@@ -354,6 +360,11 @@ abstract class RunsDAOBase extends DAO
                     $sql .= " time = ? AND";
                     array_push( $val, $Runs->getTime() );
             }
+		if ($Runs->getTest() != NULL) {
+			$sql .= "test = ?  AND";
+			array_push($val, $Runs->getTest());
+		}
+
 
             if(sizeof($val) == 0){return array();}
             $sql = substr($sql, 0, -3) . " )";
@@ -375,59 +386,6 @@ abstract class RunsDAOBase extends DAO
             
         }
         
-        /*
-         *  GetAllRelevantUsers
-         * 
-         */
-        public static final function GetAllRelevantUsers($contest_id)
-        {
-            // Build SQL statement
-            $sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( SELECT DISTINCT Runs.user_id from Runs WHERE ( Runs.contest_id = ? AND Runs.status = 'ready'  ) ) RunsContests ON Users.user_id = RunsContests.user_id ";
-            $val = array($contest_id);
-            
-            global $conn;
-            $rs = $conn->Execute($sql, $val);
-            
-            $ar = array();
-            foreach ($rs as $foo) {
-                    $bar =  new Users($foo);
-            array_push( $ar,$bar);
-            }
-            
-            return $ar;
-            
-            
-        }
-        
-        /*
-         * 
-         * Get best run of a user
-         * 
-         */
-            public static final function GetBestRun($contest_id, $problem_id, $user_id, $finish_time = NULL)
-        {
-            //Build SQL statement
-            if ($finish_time)
-            {
-                $sql = "SELECT contest_score, submit_delay from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' and time <= FROM_UNIXTIME(?) ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
-                $val = array($user_id, $contest_id, $problem_id, $finish_time);
-            }
-            else
-            {
-                $sql = "SELECT contest_score, submit_delay from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
-                $val = array($user_id, $contest_id, $problem_id);
-            }
-
-            global $conn;
-            $rs = $conn->GetRow($sql, $val);            
-            
-            $bar =  new Runs($rs);
-            
-            return $bar;
-            
-        }
-        
-
 	/**
 	  *	Actualizar registros.
 	  *	
@@ -441,7 +399,7 @@ abstract class RunsDAOBase extends DAO
 	  **/
 	private static final function update( $Runs )
 	{
-		$sql = "UPDATE Runs SET  user_id = ?, problem_id = ?, contest_id = ?, guid = ?, language = ?, status = ?, veredict = ?, runtime = ?, memory = ?, score = ?, contest_score = ?, ip = ?, time = ? WHERE  run_id = ?;";
+		$sql = "UPDATE Runs SET  user_id = ?, problem_id = ?, contest_id = ?, guid = ?, language = ?, status = ?, veredict = ?, runtime = ?, memory = ?, score = ?, contest_score = ?, ip = ?, time = ?, test = ? WHERE  run_id = ?;";
 		$params = array( 
 			$Runs->getUserId(), 
 			$Runs->getProblemId(), 
@@ -456,7 +414,8 @@ abstract class RunsDAOBase extends DAO
 			$Runs->getContestScore(), 
 			$Runs->getIp(), 
 			$Runs->getTime(), 
-			$Runs->getRunId(), );
+			$Runs->getRunId(),
+			$Runs->getTest());
 		global $conn;
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
@@ -479,7 +438,7 @@ abstract class RunsDAOBase extends DAO
 	  **/
 	private static final function create( &$Runs )
 	{
-		$sql = "INSERT INTO Runs ( run_id, user_id, problem_id, contest_id, guid, language, status, veredict, runtime, memory, score, contest_score, ip, time, submit_delay ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Runs ( run_id, user_id, problem_id, contest_id, guid, language, status, veredict, runtime, memory, score, contest_score, ip, time, submit_delay, test ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Runs->getRunId(), 
 			$Runs->getUserId(), 
@@ -495,7 +454,8 @@ abstract class RunsDAOBase extends DAO
 			$Runs->getContestScore(), 
 			$Runs->getIp(), 
 			$Runs->getTime(), 
-                        $Runs->getSubmitDelay() 
+			$Runs->getSubmitDelay(),
+			$Runs->getTest()
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}

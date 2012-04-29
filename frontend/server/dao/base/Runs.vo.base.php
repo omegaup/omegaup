@@ -73,6 +73,9 @@ class Runs extends VO
 			if (isset($data['alias'])) {
 				$this->alias = $data['alias'];
 			}
+			if (isset($data['test'])) {
+				$this->test = $data['test'];
+			}
 		}
 	}
 
@@ -100,6 +103,7 @@ class Runs extends VO
 			"contest_score" => $this->contest_score,
 			"ip" => $this->ip,
 			"time" => $this->time,
+			"test" => $this->test
 		); 
 	return json_encode($vec); 
 	}
@@ -236,6 +240,7 @@ class Runs extends VO
 
 	protected $username;
 	protected $alias;
+	protected $test;
 
 	/**
 	  * getRunId
@@ -585,6 +590,14 @@ class Runs extends VO
         final public function setSubmitDelay( $submit_delay )
 	{
 		$this->time = $submit_delay;
+	}
+
+	final public function setTest($test) {
+		$this->test = $test;
+	}
+
+	final public function getTest() {
+		return $this->test;
 	}
         
 

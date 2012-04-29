@@ -13,44 +13,34 @@
 
 require_once("ApiHandler.php");
 require_once(dirname(__FILE__) . "/Scoreboard.php");
+require_once(SERVER_PATH ."/libs/Authorization.php");
 
 class ShowScoreboardEvents extends ApiHandler
 {
-    private $scoreboardData;
+    private $contest;
    
     protected function RegisterValidatorsToRequest()
     {
-        ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
-                function ($value)
-                {
-                    // Check if the contest exists
-                    return ContestsDAO::getByAlias($value);
-                }, "Contest is invalid."))
-            ->validate(RequestContext::get("contest_alias"), "contest_alias");                
+    	ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("contest_alias"), "contest_alias");
+
+	try {
+		$this->contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+	} catch(Exception $e) {
+		// Operation failed in the data layer
+		throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+	}
     } 
     
     protected function GenerateResponse() 
     {
-        // Get contest
-        // Get our contest given the alias
-        try
-        {            
-            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
-        }
-        catch(Exception $e)
-        {
-            // Operation failed in the data layer
-           throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
-        }
-        
         // Create scoreboard
-        $myScoreboard = new Scoreboard($contest->getContestId());
-                 
-        // Get the scoreboard        
-        $this->scoreboardData = $myScoreboard->events();
+	$scoreboard = new Scoreboard(
+		$this->contest->getContestId(),
+		Authorization::IsContestAdmin($this->_user_id, $this->contest)
+	);
         
         // Push scoreboard data in response
-        $this->addResponse('events', $this->scoreboardData);
+        $this->addResponse('events', $scoreboard->events());
     }        
 }
 
