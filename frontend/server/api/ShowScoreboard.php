@@ -13,7 +13,7 @@
 
 require_once("ApiHandler.php");
 require_once(dirname(__FILE__) . "/Scoreboard.php");
-require_once(SERVER_PATH ."/libs/Authorization.php");
+require_once(SERVER_PATH . "/libs/Authorization.php");
 
 class ShowScoreboard extends ApiHandler
 {
@@ -43,5 +43,3 @@ class ShowScoreboard extends ApiHandler
         $this->addResponse('ranking', $scoreboard->generate());
     }        
 }
-
-?>
