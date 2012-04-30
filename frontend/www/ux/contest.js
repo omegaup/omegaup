@@ -289,31 +289,31 @@ $(document).ready(function() {
 		for (var i = 0, l = data.events.length; i < l; i++) {
 		    var curr = data.events[i];
 		    if (!dataInSeries[curr.name]) {
-			dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+                dataInSeries[curr.name] = [[startTime.getTime(), 0]];
 		    }
 		    dataInSeries[curr.name].push([
-			startTime.getTime() + curr.delta*60*1000,
-			curr.total.points
+                startTime.getTime() + curr.delta*60*1000,
+                curr.total.points
 		    ]);
 		    
 		    // check if to add to navigator
 		    if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
-			navigatorData.push([
-			    startTime.getTime() + curr.delta*60*1000,
-			    curr.total.points
-			]);
+                navigatorData.push([
+                    startTime.getTime() + curr.delta*60*1000,
+                    curr.total.points
+                ]);
 		    }
 		}
 		
 		// convert datas to series
 		for (var i in dataInSeries) {
 		    if (dataInSeries.hasOwnProperty(i)) {
-			dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
-			series.push({
-			    name: i,
-			    data: dataInSeries[i],
-			    step: true
-			});
+                dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
+                series.push({
+                    name: i,
+                    data: dataInSeries[i],
+                    step: true
+                });
 		    }
 		}
 		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
@@ -534,21 +534,20 @@ $(document).ready(function() {
         });
         
         // set legend colors
-        for (var name in currentRanking) {
-            if (currentRanking.hasOwnProperty(name)) {
-                var r = $('#ranking tbody tr.inserted')[currentRanking[name]];
-                var color = (function () {
-                    for (var i = 0; i < window.chart.series.length; i++) {
-                        if (window.chart.series[i].name === name) {
-                            return window.chart.series[i].color;
-                        }
+        var rows = $('#ranking tbody tr.inserted');
+        for (var r = 0; r < rows.length; r++) {
+            var name = $('.user', rows[r]).text();
+            var color = (function () {
+                for (var i = 0; i < window.chart.series.length; i++) {
+                    if (window.chart.series[i].name === name) {
+                        return window.chart.series[i].color;
                     }
-                })();
-                
-                $('.legend', r).css({
-                    'background-color': color || 'transparent'
-                });
-            }
+                }
+            })();
+            
+            $('.legend', rows[r]).css({
+                'background-color': color || 'transparent'
+            });
         }
     }
 });
