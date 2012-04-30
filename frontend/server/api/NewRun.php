@@ -16,6 +16,7 @@ require_once("ApiHandler.php");
 require_once(SERVER_PATH . '/libs/FileHandler.php');
 require_once(SERVER_PATH . '/libs/Grader.php');
 require_once(SERVER_PATH . '/libs/Cache.php');
+require_once(SERVER_PATH . '/libs/Authorization.php');
 require_once("Scoreboard.php");
 
 class NewRun extends ApiHandler
@@ -33,7 +34,6 @@ class NewRun extends ApiHandler
     
     protected function RegisterValidatorsToRequest()
     {    
-        
         ValidatorFactory::stringNotEmptyValidator()->addValidator(new CustomValidator(
                 function ($value)
                 {
@@ -119,7 +119,6 @@ class NewRun extends ApiHandler
     
     protected function GenerateResponse() 
     {   
-	
         Logger::log("New run being submitted !!");
 		
         try
@@ -132,11 +131,8 @@ class NewRun extends ApiHandler
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
-
         //check the kind of penalty_time_start for this contest
         $penalty_time_start = $contest->getPenaltyTimeStart();
-
-
 
         switch($penalty_time_start){
                 case "contest":
@@ -202,7 +198,8 @@ class NewRun extends ApiHandler
             "ip" 			=> $_SERVER['REMOTE_ADDR'],
             "submit_delay" 	=> $submit_delay, /* based on penalty_time_start */ 
             "guid" 			=> md5(uniqid(rand(), true)),
-            "veredict" 		=> "JE"
+	    "veredict" 		=> "JE",
+	    "test"		=> Authorization::IsContestAdmin($this->_user_id, $contest) ? 1 : 0
         ));
         		
         try

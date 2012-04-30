@@ -48,6 +48,10 @@ $(document).ready(function() {
 			problems[problem.alias] = problem;
 
 			problem.letter = String.fromCharCode(letter);
+
+			$('#submit select[name="problem"]').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
+
+			letter++;
 		}
 
 		omegaup.getRanking(contestAlias, rankingChange);
@@ -81,7 +85,7 @@ $(document).ready(function() {
 		if (!$('#submit textarea[name="code"]').val()) return false;
 
 		$('#submit input').attr('disabled', 'disabled');
-		omegaup.submit(contestAlias, currentProblem.alias, $('#submit select[name="language"]').val(), $('#submit textarea[name="code"]').val(), function (run) {
+		omegaup.submit(contestAlias, $('#submit select[name="problem"]').val(), $('#submit select[name="language"]').val(), $('#submit textarea[name="code"]').val(), function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
 				$('#submit input').removeAttr('disabled');
@@ -92,14 +96,12 @@ $(document).ready(function() {
 			run.time = new Date;
 			run.penalty = '-';
 			run.language = $('#submit select[name="language"]').val();
-			var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+			var r = $('tbody.run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
 			$('.status', r).html('new');
 			$('.points', r).html('0');
 			$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 			$('.language', r).html(run.language)
-			$('#problem .runs > tbody:last').append(r);
-			currentProblem.runs.push(run);
-
+			$('table.runs tbody').prepend(r);
 
 			updateRun(run.guid, run);
 
@@ -143,7 +145,11 @@ $(document).ready(function() {
 
 		var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
 
-		if (problem && problems[problem[1]]) {
+		if (window.location.hash == '#new-run') {
+			$('#overlay form').hide();
+			$('#submit').show();
+			$('#overlay').show();
+		} else if (problem && problems[problem[1]]) {
 			var newRun = problem[2];
 			currentProblem = problem = problems[problem[1]];
 
@@ -178,9 +184,6 @@ $(document).ready(function() {
 			}
 
 			if (newRun) {
-				$('#overlay form').hide();
-				$('#submit').show();
-				$('#overlay').show();
 			}
 		} else if (activeTab == 'problems') {
 			$('#problem').hide();
