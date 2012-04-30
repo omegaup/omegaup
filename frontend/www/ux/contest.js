@@ -21,6 +21,19 @@ $(document).ready(function() {
 		CE: "Compilation Error",
 		JE: "Judge Error" 
 	};
+	var colors = [
+        '#FB3F51',
+        '#FF5D40',
+        '#FFA240',
+        '#FFC740',
+        '#59EA3A',
+        '#37DD6F',
+        '#34D0BA',
+        '#3AAACF',
+        '#8144D6',
+        '#CD35D3',
+	];
+	var rankChartLimit = 10;
 
 	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
@@ -284,12 +297,18 @@ $(document).ready(function() {
 		var dataInSeries = {};
 		var navigatorData = [[startTime.getTime(), 0]];
 		var series = [];
+		var usernames = {};
 		
 		// group points by person
 		for (var i = 0, l = data.events.length; i < l; i++) {
 		    var curr = data.events[i];
+		    
+		    // limit chart to top n users
+		    if (currentRanking[curr.username] > rankChartLimit - 1) continue;
+		    
 		    if (!dataInSeries[curr.name]) {
                 dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+                usernames[curr.name] = curr.username;
 		    }
 		    dataInSeries[curr.name].push([
                 startTime.getTime() + curr.delta*60*1000,
@@ -311,11 +330,17 @@ $(document).ready(function() {
                 dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
                 series.push({
                     name: i,
+                    rank: currentRanking[usernames[i]],
                     data: dataInSeries[i],
                     step: true
                 });
 		    }
 		}
+		
+		series.sort(function (a, b) {
+            return a.rank - b.rank;
+		});
+		
 		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
 		
 		if (series.length > 0) {
@@ -471,6 +496,10 @@ $(document).ready(function() {
 	
 	function createChart(series, navigatorSeries) {
         if (series.length == 0) return;
+        
+        Highcharts.setOptions({
+            colors: colors
+        });
 	
         window.chart = new Highcharts.StockChart({
             chart: {
@@ -536,17 +565,8 @@ $(document).ready(function() {
         // set legend colors
         var rows = $('#ranking tbody tr.inserted');
         for (var r = 0; r < rows.length; r++) {
-            var name = $('.user', rows[r]).text();
-            var color = (function () {
-                for (var i = 0; i < window.chart.series.length; i++) {
-                    if (window.chart.series[i].name === name) {
-                        return window.chart.series[i].color;
-                    }
-                }
-            })();
-            
             $('.legend', rows[r]).css({
-                'background-color': color || 'transparent'
+                'background-color': r < rankChartLimit ? colors[r] : 'transparent'
             });
         }
     }
