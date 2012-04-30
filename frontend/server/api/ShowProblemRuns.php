@@ -76,15 +76,17 @@ class ShowProblemRuns extends ApiHandler
         }                
         
         // DAOs need run_id but we dont want to expose it, deleting it
-        array_shift($relevant_columns);
+	array_shift($relevant_columns);
+
         
         // Add the run to the response
-        $index = 0;
+	$result = array();
         foreach($runs as $run)
-        { 
-            $this->addResponse($index, $run->asFilteredArray($relevant_columns));               
-            $index++;
-        }     
+	{ 
+		array_push($result, $run->asFilteredArray($relevant_columns));               
+	}     
+
+	$this->addResponse("runs", $result);
         
         // All clear
         $this->addResponse("status", "ok");

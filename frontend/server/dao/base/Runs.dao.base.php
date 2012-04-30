@@ -415,7 +415,7 @@ abstract class RunsDAOBase extends DAO
 			$Runs->getIp(), 
 			$Runs->getTime(), 
 			$Runs->getRunId(),
-			$Runs->getTest());
+			$Runs->getTest() == 1 ? 1 : 0);
 		global $conn;
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
@@ -455,7 +455,7 @@ abstract class RunsDAOBase extends DAO
 			$Runs->getIp(), 
 			$Runs->getTime(), 
 			$Runs->getSubmitDelay(),
-			$Runs->getTest()
+			$Runs->getTest() == 1 ? 1 : 0
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}

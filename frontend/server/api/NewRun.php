@@ -1,4 +1,4 @@
-    <?php
+<?php
 
 /**
  * 
@@ -275,5 +275,3 @@ class NewRun extends ApiHandler
     	$cache->delete($contest_id, Scoreboard::MEMCACHE_EVENTS_PREFIX);
     }
 }
-
-?>
