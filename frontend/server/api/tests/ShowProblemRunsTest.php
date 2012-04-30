@@ -56,14 +56,17 @@ class ShowProblemRunsTest extends PHPUnit_Framework_TestCase
         
         // Create 3 runs with Contestant user
         $runCreator = new NewRunTest();
-        $run = array();        
+	$run = array();
+	$visited = array();
         for($i = 0; $i < $n; $i++)
         {            
-            $run[$i] = RunsDAO::getByPK($runCreator->testNewValidRun($contest_id, $problem_id));                        
+            $tmp = RunsDAO::getByPK($runCreator->testNewValidRun($contest_id, $problem_id));                        
             
             // Alter run timestamp            
-            $run[$i]->setTime($this->getNextTime());            
-            RunsDAO::save($run[$i]);            
+	    $tmp->setTime($this->getNextTime());
+	    RunsDAO::save($tmp);
+	    $visited[$tmp->getGuid()] = false;
+	    $run[$i] = $tmp;
         }
         
         // Login as contestant
@@ -72,7 +75,7 @@ class ShowProblemRunsTest extends PHPUnit_Framework_TestCase
         // Set context
         Utils::SetAuthToken($auth_token);
         
-        $problem = ProblemsDAO::getByPK($run[0]->getProblemId());        
+	$problem = ProblemsDAO::getByPK($problem_id);
         RequestContext::set("problem_alias", $problem->getAlias());
         
         // Execute API
@@ -86,20 +89,26 @@ class ShowProblemRunsTest extends PHPUnit_Framework_TestCase
             var_dump($e->getArrayMessage());            
             var_dump($e->getWrappedException()->getMessage());            
             $this->fail("Unexpected exception");
-        }
-        
+	}
+
         // Validate response
-        $this->assertEquals("ok", $return_array["status"]);
+	$this->assertEquals("ok", $return_array["status"]);
+
+        // Validate all runs are present
+	$remaining = $n;
+	for($i = 0; $i < count($return_array['runs']); $i++) {
+		if (!array_key_exists($return_array['runs'][$i]['guid'], $visited)) continue;
+
+		$this->assertEquals($visited[$return_array['runs'][$i]['guid']], false);
+		$visited[$return_array['runs'][$i]['guid']] = true;
+		$this->assertEquals($return_array['runs'][$i]['status'], "new");
+
+		$remaining--;
+	}
+
+	$this->assertEquals($remaining, 0);
         
-        // Validate runs backwards
-        $lower_limit = max(0, $n - 5);
-        for($runs_i = $n - 1, $return_i = 0; $runs_i >= $lower_limit; $runs_i--, $return_i++)
-        {
-            $this->assertEquals($run[$runs_i]->getGuid(), $return_array[$return_i]["guid"]);
-            $this->assertEquals($run[$runs_i]->getStatus(), "new");
-        }
-        
-        return $run; 
+        return $visited; 
     }
     
     public function testContestant6Runs()
@@ -146,10 +155,10 @@ class ShowProblemRunsTest extends PHPUnit_Framework_TestCase
         $auth_token_contestant2 = Utils::LoginAsContestant2();
         
         // Create 2 runs with first contestant
-        $runs[] = $this->testContestantWithNRuns(2, $contest_id, $problem_id, $auth_token_contestant);
+        $runs = $this->testContestantWithNRuns(2, $contest_id, $problem_id, $auth_token_contestant);
         
         // Create 2 runs with second contestant
-        $runs[] = $this->testContestantWithNRuns(2, $contest_id, $problem_id, $auth_token_contestant2);
+        $runs = array_merge($runs, $this->testContestantWithNRuns(2, $contest_id, $problem_id, $auth_token_contestant2));
         
         // Login as contest director
         $auth_token = Utils::LoginAsContestDirector();
@@ -174,13 +183,13 @@ class ShowProblemRunsTest extends PHPUnit_Framework_TestCase
         
         // Validate response
         $this->assertEquals("ok", $return_array["status"]);
-        $this->assertEquals(5, count($return_array));
+        $this->assertEquals(4, count($return_array['runs']));
         
         // Assert we have our runs
-        $this->assertEquals($runs[1][1]->getGuid(), $return_array[0]["guid"]);
-        $this->assertEquals($runs[1][0]->getGuid(), $return_array[1]["guid"]);
-        $this->assertEquals($runs[0][1]->getGuid(), $return_array[2]["guid"]);
-        $this->assertEquals($runs[0][0]->getGuid(), $return_array[3]["guid"]);                        
+        $this->assertTrue(array_key_exists($return_array['runs'][0]["guid"], $runs));
+        $this->assertTrue(array_key_exists($return_array['runs'][1]["guid"], $runs));
+        $this->assertTrue(array_key_exists($return_array['runs'][2]["guid"], $runs));
+        $this->assertTrue(array_key_exists($return_array['runs'][3]["guid"], $runs));
     }       
 }
 

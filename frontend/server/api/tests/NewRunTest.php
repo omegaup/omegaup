@@ -111,7 +111,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         catch(ApiException $e)
         {
             var_dump($e->getArrayMessage());            
-            $this->fail("Unexpected exception");
+            $this->fail("Unexpected exception: " . print_r($e->getArrayMessage(), true));
         }
         
         // Validate output
