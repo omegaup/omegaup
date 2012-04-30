@@ -156,6 +156,7 @@ $(document).ready(function() {
 
 			$('#overlay').hide();
 			$('#submit input').removeAttr('disabled');
+			$('#submit textarea[name="code"]').val('');
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
 		});
 
