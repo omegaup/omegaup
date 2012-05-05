@@ -179,7 +179,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("Unable to submit run: Contes time has expired or not started yet.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: Contest time has expired or not started yet.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
             
@@ -322,7 +322,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("Unable to submit run: Contes time has expired or not started yet.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: Contest time has expired or not started yet.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
             
@@ -613,7 +613,7 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         {
             // Validate exception            
             $exception_message = $e->getArrayMessage();            
-            $this->assertEquals("Unable to submit run: Contes time has expired or not started yet.", $exception_message["error"]);
+            $this->assertEquals("Unable to submit run: Contest time has expired or not started yet.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
             $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);                         
             
