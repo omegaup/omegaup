@@ -1,10 +1,59 @@
 <?php
 
+require_once(SERVER_PATH ."/libs/ApiException.php");
 
 class Logger
 {
 
 	private static $db_querys = 0;
+	
+	public static final function Exception($e) {
+		self::error( "---------------------------------------------------" );
+		self::error( "FATAL ERROR: Unwrapped exception thrown, wrapping: " );
+		self::error( $this->_user_id );
+		self::error( $_REQUEST );
+		self::error( $e->getMessage() );
+		self::error( $e->getFile() );
+		self::error( $e->getCode() );
+		self::error( $e->getTraceAsString() );
+		self::error( $e->getPrevious() );
+		self::error( "---------------------------------------------------" );
+	}
+	
+	public static final function apiException($e) {
+		self::error( "---------------------------------------------------" );
+
+        // Something bad happened, log error
+        self::error( " ApiException thrown by: " );
+        self::error( "USER_ID: " . $this->_user_id );
+        
+        self::error( "REQUEST PARAMS: " );
+
+		foreach($_REQUEST as $k => $v ){
+	         self::error( " ". $k .": " . $v );
+		}
+        
+        self::error( "AT FILE:" );
+        self::error( " " . $e->getFile( ));
+
+        
+        self::error( "--ApiException contents: " );
+        self::error( implode("\n", $e->getArrayMessage()) );
+        
+        if(!is_null($e->getWrappedException()))
+        {
+            self::error( "Wrapped exception: " );
+            self::error( $e->getWrappedException()->getMessage() );
+            self::error( $e->getWrappedException()->getTraceAsString() );
+            self::error( $e->getWrappedException()->getFile() );
+            self::error( $e->getWrappedException()->getLine() );
+            self::error( $e->getWrappedException()->getCode() );
+        }
+        
+        self::error( "Trace: " );
+        self::error( $e->getTraceAsString() );
+        self::error( "---------------------------------------------------" );
+	}
 
 	public static final function read($lines = 100)
 	{

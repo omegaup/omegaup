@@ -124,54 +124,14 @@ abstract class ApiHandler
         }
         catch (ApiException $e)
         {
-            Logger::error( "---------------------------------------------------" );
-	
-            // Something bad happened, log error
-            Logger::error( "     ApiException thrown by: " );
-            Logger::error( "USER_ID: " . $this->_user_id );
-            
-            Logger::error( "REQUEST PARAMS: " );
-
-			foreach($_REQUEST as $k => $v ){
-            	Logger::error( "    ". $k .": " . $v );
-			}
-            
-            Logger::error( "AT FILE:" );
-            Logger::error( "    " . $e->getFile( ));
-
-            
-            Logger::error( "--ApiException contents: " );
-            Logger::error( implode("\n", $e->getArrayMessage()) );
-            
-            if(!is_null($e->getWrappedException()))
-            {
-                Logger::error( "Wrapped exception: " );
-                Logger::error( $e->getWrappedException()->getMessage() );
-                Logger::error( $e->getWrappedException()->getTraceAsString() );
-                Logger::error( $e->getWrappedException()->getFile() );
-                Logger::error( $e->getWrappedException()->getLine() );
-                Logger::error( $e->getWrappedException()->getCode() );
-            }
-            
-            Logger::error( "Trace: " );
-            Logger::error( $e->getTraceAsString() );
-            Logger::error( "---------------------------------------------------" );            
+            Logger::apiException ($e);          
             // Propagate the exception
             throw $e;
         }
         catch(Exception $e)
         {
             // Something VERY bad happened, log error
-            Logger::error( "---------------------------------------------------" );
-            Logger::error( "FATAL ERROR: Unwrapped exception thrown, wrapping: " );
-            Logger::error( $this->_user_id );
-            Logger::error( $_REQUEST );
-            Logger::error( $e->getMessage() );
-            Logger::error( $e->getFile() );
-            Logger::error( $e->getCode() );
-            Logger::error( $e->getTraceAsString() );
-            Logger::error( $e->getPrevious() );
-            Logger::error( "---------------------------------------------------" );
+            Logger::Exception ($e);
                         
             throw new ApiException( ApiHttpErrors::unwrappedException() );
         }
