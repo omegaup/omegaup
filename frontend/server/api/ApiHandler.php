@@ -124,14 +124,14 @@ abstract class ApiHandler
         }
         catch (ApiException $e)
         {
-            Logger::apiException ($e);          
+            Logger::apiException ($e, $this->_user_id);          
             // Propagate the exception
             throw $e;
         }
         catch(Exception $e)
         {
             // Something VERY bad happened, log error
-            Logger::Exception ($e);
+            Logger::Exception ($e, $this->_user_id);
                         
             throw new ApiException( ApiHttpErrors::unwrappedException() );
         }
