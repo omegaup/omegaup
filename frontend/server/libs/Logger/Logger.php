@@ -7,10 +7,11 @@ class Logger
 
 	private static $db_querys = 0;
 	
-	public static final function Exception($e) {
+	public static final function Exception($e, $user_id) {
 		self::error( "---------------------------------------------------" );
 		self::error( "FATAL ERROR: Unwrapped exception thrown, wrapping: " );
-		self::error( $this->_user_id );
+		self::error( "User: ". $user_id );
+                self::error( "Request: ");
 		self::error( $_REQUEST );
 		self::error( $e->getMessage() );
 		self::error( $e->getFile() );
@@ -20,39 +21,39 @@ class Logger
 		self::error( "---------------------------------------------------" );
 	}
 	
-	public static final function apiException($e) {
-		self::error( "---------------------------------------------------" );
+	public static final function apiException($e, $user_id) {
+            self::error( "---------------------------------------------------" );
 
-        // Something bad happened, log error
-        self::error( " ApiException thrown by: " );
-        self::error( "USER_ID: " . $this->_user_id );
-        
-        self::error( "REQUEST PARAMS: " );
+            // Something bad happened, log error
+            self::error( " ApiException thrown by: " );
+            self::error( "USER_ID: " . $user_id);
 
-		foreach($_REQUEST as $k => $v ){
-	         self::error( " ". $k .": " . $v );
-		}
-        
-        self::error( "AT FILE:" );
-        self::error( " " . $e->getFile( ));
+            self::error( "REQUEST PARAMS: " );
 
-        
-        self::error( "--ApiException contents: " );
-        self::error( implode("\n", $e->getArrayMessage()) );
-        
-        if(!is_null($e->getWrappedException()))
-        {
-            self::error( "Wrapped exception: " );
-            self::error( $e->getWrappedException()->getMessage() );
-            self::error( $e->getWrappedException()->getTraceAsString() );
-            self::error( $e->getWrappedException()->getFile() );
-            self::error( $e->getWrappedException()->getLine() );
-            self::error( $e->getWrappedException()->getCode() );
-        }
-        
-        self::error( "Trace: " );
-        self::error( $e->getTraceAsString() );
-        self::error( "---------------------------------------------------" );
+                    foreach($_REQUEST as $k => $v ){
+                    self::error( " ". $k .": " . $v );
+                    }
+
+            self::error( "AT FILE:" );
+            self::error( " " . $e->getFile( ));
+
+
+            self::error( "--ApiException contents: " );
+            self::error( implode("\n", $e->getArrayMessage()) );
+
+            if(!is_null($e->getWrappedException()))
+            {
+                self::error( "Wrapped exception: " );
+                self::error( $e->getWrappedException()->getMessage() );
+                self::error( $e->getWrappedException()->getTraceAsString() );
+                self::error( $e->getWrappedException()->getFile() );
+                self::error( $e->getWrappedException()->getLine() );
+                self::error( $e->getWrappedException()->getCode() );
+            }
+
+            self::error( "Trace: " );
+            self::error( $e->getTraceAsString() );
+            self::error( "---------------------------------------------------" );
 	}
 
 	public static final function read($lines = 100)

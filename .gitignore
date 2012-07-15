@@ -39,10 +39,17 @@ src_managed/
 config.php
 frontend/server/config.php
 frontend/server/api/tests/config.php
+frontend/server/api/tests/test_config.php
+
 
 # and log
 omegaup.log
 frontend/log/omegaup.log
+
+#ignore crated-by-test stuff
+frontend/server/api/tests/problems/
+frontend/server/api/tests/submissions/
+frontend/server/api/tests/omegaup_test.log
 
 # Ignore runtime and test stuff
 */test-env
