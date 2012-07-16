@@ -29,22 +29,21 @@ class Scoreboard
 
     public static function getScoreboardTimeLimitUnixTimestamp(Contests $contest)
     {
-        // If user is admin, set limit to 100%
-        // @todo, this admin hack is coming from ShowRunDetails, fix!
-        if ((3 == $this->_user_id ||
-            37 == $this->_user_id || 
-            $this->contest->getDirectorId() == $this->_user_id ||
-            $this->problem->getAuthorId() == $this->_user_id))
-        {
-            $limit = 100;
-        }
-        else
-        {            
-            $limit = $start + (int)(($finish - $start) * $percentage);
-        }
-        
+       
         $start = strtotime($contest->getStartTime());
         $finish = strtotime($contest->getFinishTime());
+        
+        if ($this->showAllRuns)
+        {
+            // Show full scoreboard to admin users
+            $percentage = 100;
+        }
+        else
+        {
+            $percentage = (double)$contest->getScoreboard() / 100.0;
+        }
+        
+        $limit = $start + (int)(($finish - $start) * $percentage);
                                  
         return $limit;
     }
