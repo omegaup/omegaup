@@ -29,13 +29,23 @@ class Scoreboard
 
     public static function getScoreboardTimeLimitUnixTimestamp(Contests $contest)
     {
+        // If user is admin, set limit to 100%
+        // @todo, this admin hack is coming from ShowRunDetails, fix!
+        if ((3 == $this->_user_id ||
+            37 == $this->_user_id || 
+            $this->contest->getDirectorId() == $this->_user_id ||
+            $this->problem->getAuthorId() == $this->_user_id))
+        {
+            $limit = 100;
+        }
+        else
+        {            
+            $limit = $start + (int)(($finish - $start) * $percentage);
+        }
+        
         $start = strtotime($contest->getStartTime());
         $finish = strtotime($contest->getFinishTime());
- //       Logger::log("Start: " . $start . " Finish: " . $finish); 
-        $percentage = (double)$contest->getScoreboard() / 100.0;
-                
-        $limit = $start + (int)(($finish - $start) * $percentage);
-//Logger::log("Limit: " . $limit . " Pct: " . $percentage);        
+                                 
         return $limit;
     }
     
@@ -51,62 +61,62 @@ class Scoreboard
 
         if( $this->showAllRuns || $result == null )
         {
-        try
-        {
-	    $contest = ContestsDAO::getByPK($this->contest_id);	
-	
-            // Gets whether we can cache this scoreboard.
-            $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
-
-            // Get all distinct contestants participating in the contest given contest_id
-            $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns);
-
-            // Get all problems given contest_id
-            $contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
-        }
-        catch(Exception $e)
-        {
-            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
-        }
-
-        $result = array();
-
-        // Save the number of problems internally
-        $this->countProblemsInContest = count($contest_problems);
-
-        // Calculate score for each contestant x problem
-        foreach ($contest_users as $contestant)
-        {
-            $user_results = array();
-            $user_problems = array();
-
-            foreach ($contest_problems as $problems)
+            try
             {
-                $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), self::getScoreboardTimeLimitUnixTimestamp($contest));
+                $contest = ContestsDAO::getByPK($this->contest_id);	
+
+                // Gets whether we can cache this scoreboard.
+                $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
+
+                // Get all distinct contestants participating in the contest given contest_id
+                $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns);
+
+                // Get all problems given contest_id
+                $contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
+            }
+            catch(Exception $e)
+            {
+                throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
             }
 
-            // Add the problems' information
-            $user_results['problems'] = $user_problems;
+            $result = array();
 
-            // Calculate total score for current user            
-            $user_results[self::total_column] = $this->getTotalScore($user_problems);
+            // Save the number of problems internally
+            $this->countProblemsInContest = count($contest_problems);
 
-            // And more information on the user
-            $user_results['username'] = $contestant->getUsername();
-            $user_results['name'] = $contestant->getName() ? $contestant->getName() : $contestant->getUsername();
+            // Calculate score for each contestant x problem
+            foreach ($contest_users as $contestant)
+            {
+                $user_results = array();
+                $user_problems = array();
 
-            // Add contestant results to scoreboard data
-            array_push($result, $user_results);
-        }
+                foreach ($contest_problems as $problems)
+                {
+                    $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), self::getScoreboardTimeLimitUnixTimestamp($contest));
+                }
 
-        // Sort users by their total column
-        usort($result, array($this, 'compareUserScores'));
+                // Add the problems' information
+                $user_results['problems'] = $user_problems;
 
-        // Cache scoreboard if there are no pending runs.
-        if( $cacheable )
-        {
-                $cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
-        }
+                // Calculate total score for current user            
+                $user_results[self::total_column] = $this->getTotalScore($user_problems);
+
+                // And more information on the user
+                $user_results['username'] = $contestant->getUsername();
+                $user_results['name'] = $contestant->getName() ? $contestant->getName() : $contestant->getUsername();
+
+                // Add contestant results to scoreboard data
+                array_push($result, $user_results);
+            }
+
+            // Sort users by their total column
+            usort($result, array($this, 'compareUserScores'));
+
+            // Cache scoreboard if there are no pending runs.
+            if( $cacheable )
+            {
+                    $cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
+            }
 	}
 
     	$this->data = $result;
@@ -234,7 +244,7 @@ class Scoreboard
     }
     
    protected function getScore($problem_id, $user_id, $limit_timestamp = NULL)
-    {
+   {
         try
         {
             $bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id, $limit_timestamp, $this->showAllRuns);
