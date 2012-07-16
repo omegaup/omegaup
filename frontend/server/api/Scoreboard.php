@@ -27,22 +27,21 @@ class Scoreboard
         $this->showAllRuns = $showAllRuns;
     }
 
-    public static function getScoreboardTimeLimitUnixTimestamp(Contests $contest)
+    public function getScoreboardTimeLimitUnixTimestamp(Contests $contest)
     {
        
         $start = strtotime($contest->getStartTime());
         $finish = strtotime($contest->getFinishTime());
-        
         if ($this->showAllRuns)
         {
             // Show full scoreboard to admin users
             $percentage = 100;
-        }
+        	
+	}
         else
         {
             $percentage = (double)$contest->getScoreboard() / 100.0;
         }
-        
         $limit = $start + (int)(($finish - $start) * $percentage);
                                  
         return $limit;
@@ -91,7 +90,7 @@ class Scoreboard
 
                 foreach ($contest_problems as $problems)
                 {
-                    $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), self::getScoreboardTimeLimitUnixTimestamp($contest));
+                    $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), $this->getScoreboardTimeLimitUnixTimestamp($contest));
                 }
 
                 // Add the problems' information
@@ -195,7 +194,7 @@ class Scoreboard
                         continue;
                 }
                 
-                if (strtotime($run->getTime()) >= self::getScoreboardTimeLimitUnixTimestamp($contest))
+                if (strtotime($run->getTime()) >= $this->getScoreboardTimeLimitUnixTimestamp($contest))
                 {
                         continue;
                 }
