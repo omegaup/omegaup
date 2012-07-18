@@ -248,7 +248,7 @@ trait TokenComparer extends Object with Log {
 			
 			var points:Double = 1
 			
-			while( hasNext(inA) && hasNext(inB) ) {
+			while (points > 0 && hasNext(inA) && hasNext(inB)) {
 				if(! eq(next(inA), next(inB)) ) {
 					debug("Token mismatch {} {} {}", caseName, runOut.getCanonicalPath, problemOut.getCanonicalPath)
 					points = 0
