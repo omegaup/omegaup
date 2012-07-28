@@ -14,8 +14,16 @@
    
    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
 
-   require_once("config.php");
    
+   
+   if(!is_file("config.php")){
+
+   		echo "<h2>You are missing the config file.</h2>";
+   		exit;
+   }
+
+
+   require_once("config.php");
    require_once("libs/Logger/Logger.php");
    require_once('dao/model.inc.php');
 
