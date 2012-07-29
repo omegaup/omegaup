@@ -55,9 +55,8 @@ class UpdateRun extends ApiHandler
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
         }                        
 
-        if(!(   3 == $this->_user_id || 
-                $contest->getDirectorId() == $this->_user_id ||
-                $problem->getAuthorId() == $this->_user_id ))
+        if(!(Authorization::IsContestAdmin($this->_user_id, $contest) ||
+             $problem->getAuthorId() == $this->_user_id ))
         {
            throw new ApiException(ApiHttpErrors::forbiddenSite());
         }                

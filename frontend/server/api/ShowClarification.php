@@ -32,7 +32,7 @@ class ShowClarification extends ApiHandler
         if ($clarification->getPublic() === '0')
         {
             $contest = ContestsDAO::getByPK($clarification->getContestId());            
-            if (!($clarification->getAuthorId() == $this->_user_id || $contest->getDirectorId() == $this->_user_id))
+            if (!($clarification->getAuthorId() == $this->_user_id || Authorization::IsContestAdmin($this->_user_id, $contest)))
             {
                throw new ApiException(ApiHttpErrors::forbiddenSite());
             }        

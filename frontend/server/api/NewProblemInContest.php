@@ -58,7 +58,7 @@ class NewProblemInContest extends ApiHandler
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
         }                
         
-        if($contest->getDirectorId() !== $this->_user_id)
+        if(!Authorization::IsContestAdmin($this->_user_id, $contest))
         {
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }

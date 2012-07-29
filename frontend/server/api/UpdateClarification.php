@@ -35,7 +35,8 @@ class UpdateClarification extends ApiHandler
         $contest = ContestsDAO::getByPK($clarification->getContestId());                        
 	$problem = ProblemsDAO::getByPK($clarification->getProblemId());
 
-        if(!($contest->getDirectorId() === $this->_user_id || $problem->getAuthorId() === $this->_user_id || $this->_user_id == 3)) // lhchavez
+        if(!(Authorization::IsContestAdmin($this->_user_id, $contest) || 
+                $problem->getAuthorId() === $this->_user_id ))
         {            
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }        
