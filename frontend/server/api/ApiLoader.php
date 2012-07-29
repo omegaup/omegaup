@@ -45,6 +45,12 @@ class ApiLoader
                 require_once('Login.php');
                 $api = new Login();
                 break;
+
+
+            case 'UserEdit':
+                require_once('UserEdit.php');
+                $api = new UserEdit();
+                break;
             
             case 'Authenticated':
                 require_once('Authenticated.php');
