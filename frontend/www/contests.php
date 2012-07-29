@@ -19,7 +19,10 @@
 
     //get the'm contests
     $contestApi = new ShowContests();
+	
 	$results = $contestApi->ExecuteApi( );
+
+	var_dump($results);
 
 
 	$header = array(  
@@ -35,6 +38,9 @@
 	
 	$table = new TableComponent( $header, $rows );
 	
+
+	
+
 	function toDate( $unix_time ){
 		if(strlen($unix_time) == 0) return "";
 		

@@ -116,8 +116,10 @@ abstract class ApiHandler
             $response = $this->GenerateResponse();
 
             
-
-            $response = array_merge($this->_response, $response);
+            if(is_array($response))
+                $response = array_merge($this->_response, $response);
+            else
+                $response = $this->_response;
 
 
             if (!isset($response['status']))
@@ -126,7 +128,7 @@ abstract class ApiHandler
             }
 
 
-            return json_encode($response);
+            return ($response);
             
             /*
             // If the request didn't fail or supply a status response, we're OK

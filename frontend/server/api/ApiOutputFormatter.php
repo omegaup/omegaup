@@ -13,8 +13,8 @@ class ApiOutputFormatter
     {
 
 
-        //return json_encode($array);
-        return $array; 
+        return json_encode($array);
+        //return $array; 
     }
     
     protected function ContentType()
