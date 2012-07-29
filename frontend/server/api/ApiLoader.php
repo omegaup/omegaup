@@ -174,8 +174,11 @@ class ApiLoader
         catch(ApiException $e)
         {
             // If something goes wrong, set the proper header and print output
-            $exception_array = $e->getArrayMessage();                        
-            return self::$output_formatter->PrintOuput($exception_array, $exception_array["header"]);
+            $exception_array = $e->getArrayMessage();  
+
+
+
+            return json_encode( self::$output_formatter->PrintOuput($exception_array, $exception_array["header"]) );
         }
         
         // Happy ending

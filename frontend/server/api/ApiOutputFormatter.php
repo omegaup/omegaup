@@ -11,7 +11,10 @@ class ApiOutputFormatter
                
     protected function FormatOuput($array)
     {
-        return $array; //json_encode($array);
+
+
+        //return json_encode($array);
+        return $array; 
     }
     
     protected function ContentType()

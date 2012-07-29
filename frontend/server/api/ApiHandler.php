@@ -144,6 +144,8 @@ abstract class ApiHandler
             Logger::apiException ($e, $this->_user_id);          
             // Propagate the exception
             throw $e;
+
+            
         }
         catch(Exception $e)
         {
