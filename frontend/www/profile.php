@@ -17,18 +17,19 @@
 	$page = new OmegaupComponentPage();
 
 	//id argument does not exist
-	if(!isset($_GET["id"])){
+	if(isset($_GET["id"])){
+		$this_user = UsersDAO::getByPK( $_GET["id"] );	
+		
+	}else{
 
-		$page->addComponent( new TitleComponent("Whoops, este usuario no exite !") );
-		$page->render();
-		exit;
+		$this_user = LoginController::getCurrentUser();
+
 	}
 
-	$this_user = UsersDAO::getByPK( $_GET["id"] );
+	
 	
 	//user does not exist
 	if(is_null($this_user)){
-
 		$page->addComponent( new TitleComponent("Whoops, este usuario no exite !") );
 		$page->render();
 		exit;
