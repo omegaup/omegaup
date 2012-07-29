@@ -12,29 +12,19 @@ import omegaup._
 import omegaup.data._
 
 object Runner extends RunnerService with Log with Using {
-	def compile(message: CompileInputMessage): CompileOutputMessage = {
-		// lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]
-		info("compile {}", message.lang)
-		
-		val compileDirectory = new File(Config.get("compile.root", "."))
-		compileDirectory.mkdirs
-		
-		var runDirectory = File.createTempFile(System.nanoTime.toString, null, compileDirectory)
-		runDirectory.delete
-		
-		runDirectory = new File(runDirectory.getCanonicalPath.substring(0, runDirectory.getCanonicalPath.length - 4) + "." + message.lang + "/bin")
+	def compile(runDirectory: File, lang: String, code: List[String], error_string: String) = {
 		runDirectory.mkdirs
 		
-		var fileWriter = new FileWriter(runDirectory.getCanonicalPath + "/Main." + message.lang)
-		fileWriter.write(message.code(0), 0, message.code(0).length)
-		fileWriter.close
-		var inputFiles = mutable.ListBuffer(runDirectory.getCanonicalPath + "/Main." + message.lang)
+		using (new FileWriter(runDirectory.getCanonicalPath + "/Main." + lang)) { fileWriter => {
+			fileWriter.write(code(0), 0, code(0).length)
+		}}
+		val inputFiles = mutable.ListBuffer(runDirectory.getCanonicalPath + "/Main." + lang)
 		
-		for (i <- 1 until message.code.length) {
-			fileWriter = new FileWriter(runDirectory.getCanonicalPath + "/f" + i + "." + message.lang)
-			inputFiles += runDirectory.getCanonicalPath + "/f" + i + "." + message.lang
-			fileWriter.write(message.code(i), 0, message.code(i).length)
-			fileWriter.close
+		for (i <- 1 until code.length) {
+			inputFiles += runDirectory.getCanonicalPath + "/f" + i + "." + lang
+			using (new FileWriter(runDirectory.getCanonicalPath + "/f" + i + "." + lang)) { fileWriter => {
+				fileWriter.write(code(i), 0, code(i).length)
+			}}
 		}
 		
 		val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
@@ -43,7 +33,7 @@ object Runner extends RunnerService with Log with Using {
 
 		val commonParams = List("-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"))
 		
-		val params = message.lang match {
+		val params = lang match {
 			case "java" =>
 				List(sandbox, "-S", profile + "/javac") ++ commonParams ++ List("--", Config.get("java.compiler.path", "/usr/bin/javac")) ++ inputFiles
 			case "c" =>
@@ -92,7 +82,7 @@ object Runner extends RunnerService with Log with Using {
 					}
 				
 					error("compile finished with errors: {}", compileError)
-					new CompileOutputMessage("compile error", error=Some(compileError))
+					new CompileOutputMessage(error_string, error=Some(compileError))
 				}
 			} else {
 				if (!Config.get("runner.preserve", false)) {
@@ -100,9 +90,42 @@ object Runner extends RunnerService with Log with Using {
 				}
 
 				error("compiler failed to run")
-				new CompileOutputMessage("compile error", error=Some("compiler failed to run"))
+				new CompileOutputMessage(error_string, error=Some("compiler failed to run"))
 			}
 		}}
+	}
+	
+	def compile(message: CompileInputMessage): CompileOutputMessage = {
+		// lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]
+		info("compile {}", message.lang)
+		
+		val compileDirectory = new File(Config.get("compile.root", "."))
+		compileDirectory.mkdirs
+		
+		var runDirectoryFile = File.createTempFile(System.nanoTime.toString, null, compileDirectory)
+		runDirectoryFile.delete
+		
+		val runRoot = runDirectoryFile.getCanonicalPath.substring(0, runDirectoryFile.getCanonicalPath.length - 4) + "." + message.lang
+
+		message.master_lang match {
+			case Some(master_lang) => {
+				message.master_code match {
+					case Some(master_code) => {
+						val master_result = compile(new File(runRoot + "/validator"), master_lang, master_code, "judge error")
+						
+						if (master_result.status != "ok") {
+							return master_result
+						}
+					}
+					case None => {
+						return new CompileOutputMessage("judge error", error=Some("Missing code"))
+					}
+				}
+			}
+			case None => {}
+		}
+		
+		compile(new File(runRoot + "/bin"), message.lang, message.code, "compile error")
 	}
 	
 	def run(message: RunInputMessage, zipFile: File) : Option[RunOutputMessage] = {
@@ -142,13 +165,13 @@ object Runner extends RunnerService with Log with Using {
 						case "java" =>
 							List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", Config.get("java.runtime.path", "/usr/bin/java"), "-Xmx" + message.memoryLimit + "k", "Main")
 						case "c" =>
-							List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("--", "./a.out")
+							List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
 						case "cpp" =>
-							List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("--", "./a.out")
+							List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
 						case "p" =>
-							List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("--", "./Main")
+							List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main")
 						case "py" =>
-							List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("--", "/usr/bin/python", "Main.py")
+							List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "/usr/bin/python", "Main.py")
 					}
 
 					debug("Run {}", params.mkString(" "))
