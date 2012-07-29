@@ -2,6 +2,9 @@
 /**
  * Authorization.php - Contains static function calls that return true if a user is authorized to perform certain action.
  */
+
+ define('ADMIN_ROLE',  '1');
+
 class Authorization 
 {
     public static function CanViewRun($user_id, Runs $run)
@@ -77,8 +80,17 @@ class Authorization
     
     public static function IsSystemAdmin($user_id)
     {
-        return $user_id === 3 || $user_id === 37;
-    }
-    
+        try
+        {
+            $ur = UserRolesDAO::getByPK($user_id, ADMIN_ROLE);
+            
+            return !is_null($ur);
+            
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);     
+        }               
+    }    
     // @todo user in contest
 }
