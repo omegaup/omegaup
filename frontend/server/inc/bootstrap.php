@@ -16,14 +16,13 @@
 
    
    
-   if(!is_file("config.php")){
-
+   if(!is_file(SERVER_PATH . "/config.php")){
    		echo "<h2>You are missing the config file.</h2>";
    		exit;
    }
 
 
-   require_once("config.php");
+   require_once(SERVER_PATH . "/config.php");
    require_once("libs/Logger/Logger.php");
    require_once('dao/model.inc.php');
 
