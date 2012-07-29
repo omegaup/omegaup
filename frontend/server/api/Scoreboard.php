@@ -115,6 +115,7 @@ class Scoreboard
             {
                     $cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
             }
+        
 	}
 
     	$this->data = $result;
