@@ -97,7 +97,8 @@ abstract class ApiHandler
         }                 
     }        
             
-    protected abstract function RegisterValidatorsToRequest();        
+    protected abstract function RegisterValidatorsToRequest(); 
+
     protected abstract function GenerateResponse();            
     
     // This function should be called 
@@ -112,8 +113,22 @@ abstract class ApiHandler
             $this->RegisterValidatorsToRequest();                               
 
             // Generate output
-            $this->GenerateResponse();
+            $response = $this->GenerateResponse();
 
+            
+
+            $response = array_merge($this->_response, $response);
+
+
+            if (!isset($response['status']))
+            {
+                $response["status"] = "ok";            
+            }
+
+
+            return json_encode($response);
+            
+            /*
             // If the request didn't fail or supply a status response, we're OK
             if (count($this->getResponse()) === 0 || !isset($this->_response['status']))
             {
@@ -121,6 +136,8 @@ abstract class ApiHandler
             }
             
             return $this->getResponse();       
+            */
+
         }
         catch (ApiException $e)
         {

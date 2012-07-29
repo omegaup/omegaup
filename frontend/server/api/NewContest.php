@@ -132,7 +132,7 @@ class NewContest extends ApiHandler
         // Create and populate a new Contests object
         $contest = new Contests();              
         $contest->setTitle(RequestContext::get("title"));
-	$contest->setDescription(RequestContext::get("description"));        
+	    $contest->setDescription(RequestContext::get("description"));        
         $contest->setStartTime(gmdate('Y-m-d H:i:s', RequestContext::get("start_time")));        
         $contest->setFinishTime(gmdate('Y-m-d H:i:s', RequestContext::get("finish_time")));
         $contest->setWindowLength(RequestContext::get("window_length") == "NULL" ? NULL : RequestContext::get("window_length"));

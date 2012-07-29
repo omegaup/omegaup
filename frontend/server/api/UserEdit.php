@@ -20,9 +20,14 @@ class UserEdit extends ApiHandler {
 		//echo $f;
 		if(is_null($f)){
 			Logger::log("null");
+
 		}else{
-			Logger::log($f);	
+			Logger::log($f);
+
 		}
+		
+
+
 		
 
 		return array("asdf" => 23 );
