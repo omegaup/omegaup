@@ -137,4 +137,17 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       }""")))
     test7.status should equal ("ok")
   }
+
+  "Validator" should "work" in {
+    val zipRoot = new File("test-env")
+
+    val test1 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c")))
+    test1.status should equal ("judge error")
+
+    val test2 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("foo"))))
+    test2.status should equal ("judge error")
+
+    val test3 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"1\\n\"); return 0; }"))))
+    test3.status should equal ("ok")
+  }
 }
