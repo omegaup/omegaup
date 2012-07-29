@@ -51,7 +51,7 @@ class AddUserToPrivateContest extends ApiHandler
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );    
         }                
         
-        if($this->_contest->getDirectorId() !== $this->_user_id)
+        if(!Authorization::IsContestAdmin($this->_user_id, $this->_contest))
         {
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }

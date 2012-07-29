@@ -2,6 +2,7 @@
 
 require_once 'ApiHandler.php';
 require_once 'ApiOutputFormatter.php';
+require_once SERVER_PATH . '/libs/Authorization.php';
 
 class ApiLoader
 {

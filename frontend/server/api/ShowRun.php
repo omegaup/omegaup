@@ -44,7 +44,7 @@ class ShowRun extends ApiHandler
         }                        
         
         if(!($this->myRun->getUserId() == $this->_user_id || 
-                $contest->getDirectorId() == $this->_user_id ||
+                Authorization::IsContestAdmin($this->_user_id, $contest) ||
                 $problem->getAuthorId() == $this->_user_id ))
         {
            throw new ApiException(ApiHttpErrors::forbiddenSite());
