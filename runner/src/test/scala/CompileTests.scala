@@ -147,7 +147,28 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
     val test2 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("foo"))))
     test2.status should equal ("judge error")
 
-    val test3 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"1\\n\"); return 0; }"))))
+    val test3 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"0\\n\"); return 0; }"))))
     test3.status should equal ("ok")
+    test3.token should not equal None
+    
+    Runner.run(RunInputMessage(test3.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("ok", "0")
+    ))), new File(zipRoot.getCanonicalPath + "/test6.zip"))
+
+    val test4 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"foo\\n\"); return 0; }"))))
+    test4.status should equal ("ok")
+    test4.token should not equal None
+    
+    Runner.run(RunInputMessage(test4.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("ok", "0")
+    ))), new File(zipRoot.getCanonicalPath + "/test7.zip"))
+
+    val test5 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"1\\n\"); return 0; }"))))
+    test5.status should equal ("ok")
+    test5.token should not equal None
+    
+    Runner.run(RunInputMessage(test5.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("ok", "0")
+    ))), new File(zipRoot.getCanonicalPath + "/test8.zip"))
   }
 }

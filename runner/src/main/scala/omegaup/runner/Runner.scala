@@ -53,9 +53,7 @@ object Runner extends RunnerService with Log with Using {
 			if(process != null) {
 				val status = process.waitFor
 	
-				if (!Config.get("runner.preserve", false)) {
-					inputFiles.foreach { new File(_).delete }
-				}
+				if (!Config.get("runner.preserve", false)) inputFiles.foreach { new File(_).delete }
 			
 				if (status == 0) {
 					if (!Config.get("runner.preserve", false)) {
@@ -207,7 +205,7 @@ object Runner extends RunnerService with Log with Using {
 
 						pusing (runtime.exec(params.toArray)) { process => process.waitFor }
 					
-						new File(casePath + ".in").delete
+						if (!Config.get("runner.preserve", false)) new File(casePath + ".in").delete
 					}}
 				}
 			}
@@ -215,10 +213,69 @@ object Runner extends RunnerService with Log with Using {
 			val zipOutput = new ZipOutputStream(new FileOutputStream(zipFile.getCanonicalPath))
 		
 			runDirectory.listFiles.filter { _.getName.endsWith(".meta") } .foreach { (x) => {
-				zipOutput.putNextEntry(new ZipEntry(x.getName))
-			
-				var inputStream = new FileInputStream(x.getCanonicalPath)
 				val buffer = Array.ofDim[Byte](1024)
+			
+				val meta = MetaFile.load(x.getCanonicalPath)
+			
+				if(meta("status") == "OK") {
+					val validatorDirectory = new File(runDirectory.getCanonicalPath + "/validator")
+					if (validatorDirectory.exists) {
+						val caseName = x.getName
+						val commonParams = List("-c", validatorDirectory.getCanonicalPath, "-q", "-M", caseName, "-i", x.getCanonicalPath.replace(".meta", ".in"), "-o", caseName.replace(".meta", ".out"), "-r", caseName.replace(".meta", ".err"), "-P", x.getCanonicalPath.replace(".meta", ".out"), "-t", message.timeLimit.toString, "-O", message.outputLimit.toString)
+				
+						val params = lang match {
+							case "java" =>
+								List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")
+							case "c" =>
+								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
+							case "cpp" =>
+								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
+							case "p" =>
+								List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "./Main")
+							case "py" =>
+								List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py")
+						}
+				
+						debug("Validator run {}", params.mkString(" "))
+
+						pusing (runtime.exec(params.toArray)) { process => process.waitFor }
+						
+						val metaAddendum = try {
+							using (new BufferedReader(new FileReader(validatorDirectory.getCanonicalPath + "/" + caseName.replace(".meta", ".out")))) { reader => {
+								List(("score" -> reader.readLine.trim.toDouble.toString))
+							}}
+						} catch {
+							case e: Exception => List(("status", "JE"))
+						}
+						
+						MetaFile.save(x.getCanonicalPath, meta ++ metaAddendum)
+					}
+					
+					val inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".out"))
+					zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".out")))
+					var read: Int = 0
+				
+					while( { read = inputStream.read(buffer); read > 0 } ) {
+						zipOutput.write(buffer, 0, read)
+					}
+		
+					inputStream.close
+					zipOutput.closeEntry
+				} else if(meta("status") == "RE" && lang == "java") {
+					val inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))
+					zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
+					var read: Int = 0
+				
+					while( { read = inputStream.read(buffer); read > 0 } ) {
+						zipOutput.write(buffer, 0, read)
+					}
+		
+					inputStream.close
+					zipOutput.closeEntry
+				}
+				
+				val inputStream = new FileInputStream(x.getCanonicalPath)
+				zipOutput.putNextEntry(new ZipEntry(x.getName))
 				var read: Int = 0
 	
 				while( { read = inputStream.read(buffer); read > 0 } ) {
@@ -228,34 +285,11 @@ object Runner extends RunnerService with Log with Using {
 				inputStream.close
 				zipOutput.closeEntry
 			
-				val meta = MetaFile.load(x.getCanonicalPath)
-			
-				if(meta("status") == "OK") {
-					inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".out"))
-					zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".out")))
-				
-					while( { read = inputStream.read(buffer); read > 0 } ) {
-						zipOutput.write(buffer, 0, read)
-					}
-		
-					inputStream.close
-					zipOutput.closeEntry
-				
-				} else if(meta("status") == "RE" && lang == "java") {
-					inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))
-					zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
-				
-					while( { read = inputStream.read(buffer); read > 0 } ) {
-						zipOutput.write(buffer, 0, read)
-					}
-		
-					inputStream.close
-					zipOutput.closeEntry
+				if (!Config.get("runner.preserve", false)) {
+					x.delete
+					new File(x.getCanonicalPath.replace(".meta", ".err")).delete
+					new File(x.getCanonicalPath.replace(".meta", ".out")).delete
 				}
-			
-				x.delete
-				new File(x.getCanonicalPath.replace(".meta", ".err")).delete
-				new File(x.getCanonicalPath.replace(".meta", ".out")).delete
 			}}
 		
 			zipOutput.close
