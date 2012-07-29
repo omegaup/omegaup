@@ -31,12 +31,9 @@ class UpdateClarification extends ApiHandler
         ValidatorFactory::numericValidator()->validate(RequestContext::get("public"), "public");                
                                 
         // Only contest director or problem author are allowed to update clarifications
-        $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));        
-        $contest = ContestsDAO::getByPK($clarification->getContestId());                        
-	$problem = ProblemsDAO::getByPK($clarification->getProblemId());
+        $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));                
 
-        if(!(Authorization::IsContestAdmin($this->_user_id, $contest) || 
-                $problem->getAuthorId() === $this->_user_id ))
+        if(!Authorization::CanEditClarification($this->_user_id, $clarification))
         {            
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }        

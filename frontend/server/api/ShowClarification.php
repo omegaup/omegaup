@@ -26,17 +26,23 @@ class ShowClarification extends ApiHandler
             }, "Contest is invalid."))
         ->validate(RequestContext::get("clarification_id"), "clarification_id");    
         
-            
-        // If the clarification is private, verify that our user is invited or is contest director               
-        $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));                                
-        if ($clarification->getPublic() === '0')
+        try
         {
-            $contest = ContestsDAO::getByPK($clarification->getContestId());            
-            if (!($clarification->getAuthorId() == $this->_user_id || Authorization::IsContestAdmin($this->_user_id, $contest)))
+            // If the clarification is private, verify that our user is invited or is contest director               
+            $clarification = ClarificationsDAO::getByPK(RequestContext::get("clarification_id"));                                
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
+        }
+        
+        if ($clarification->getPublic() === '0')
+        {           
+            if (!(Authorization::CanViewClarification($this->_user_id, $clarification)))
             {
                throw new ApiException(ApiHttpErrors::forbiddenSite());
             }        
-        }                
+        }               
     }   
         
 
