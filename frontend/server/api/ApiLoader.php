@@ -178,7 +178,7 @@ class ApiLoader
 
 
 
-            return json_encode( self::$output_formatter->PrintOuput($exception_array, $exception_array["header"]) );
+            return ( self::$output_formatter->PrintOuput($exception_array, $exception_array["header"]) );
         }
         
         // Happy ending
