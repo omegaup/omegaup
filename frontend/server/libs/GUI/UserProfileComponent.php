@@ -32,18 +32,73 @@ class UserProfileComponent implements GuiComponent{
 								$("#editable_form").fadeIn();	
 							});
 							//show editable form
-						},
-					
+						};
+				
+					var profile_edit_cancel = function (){
+
+						$("#editable_form").fadeOut("slow", function(){
+							$("#actual_form").fadeIn();	
+
+							$("#password").val("");
+							$("#password_old").val("");
+
+						});
+
+					}
+
+
+
+					var profile_edit_ok = function(){
+
+						var toEdit = {
+
+							username : "<?php echo $this->user->getUserName(); ?>"
+
+						};
+
+						//validate, basic
+						if($("#password").val().length > 0){
+
+							//validate shit
+							if($("#password_old").val().length == 0){
+								alert("You must provide your old password");
+								return;
+							}
+
+							toEdit.password = $("#password").val();
+
+							toEdit.old_password = $("#password_old").val();
+
+						}
+
+
+
+						 
+
+						//send ajax
+						$.ajax({
+						  url: 'arena/user/edit',
+						  data: toEdit,
+						  success: function(data) {
+						    
+						    alert('Load was performed.');
+						  },
+						  error : function (data,b,c){
+						  	console.log(data,b,c);
+						  }
+						});
+
+
+						//show working gif
+
+						//notifice user of result
+					}
+
 						//list registred schools
 						current_schools = <?php echo json_encode( SchoolsDAO::getAll() ); ?>;
 				</script>
-				<a onClick='profile_edit()'>editar mi perfil</a>
-				<div>
-					<?php
-						//UsersDAO::getFullProfile( $this->user->getUserId() );
-					?>
-					Tu correo electronico:
-				</div>
+				
+				
 				
 			<?php
 			
@@ -71,7 +126,38 @@ class UserProfileComponent implements GuiComponent{
 		
 		?>
 			
+			<table border="0" id="editable_form" style="display:none;">
+				
+				<tr>
+
+					<td>Password</td>  
+					<td><input type="password" id="password" ></td>
+					<td>Old Password</td>  
+					<td><input type="password" id="password_old" ></td>
+
+				</tr>
+
+
+
+				<tr>
+					<td><a onClick='profile_edit_cancel()'>
+						<div class="Boton">Cancelar</div></a></td>
+
+					<td><a onClick='profile_edit_ok()'>
+						<div class="Boton OK">Guardar cambios</div></a></td>
+				</tr>
+
+
+
+			</table>
+
+
+
+
 			<table border="0" id="actual_form">
+				<tr>
+					<td><a onClick='profile_edit()'><div class="Boton">Editar mi perfil</div></a></td>
+				</tr>
 				<tr>
 					<td><img src="http://www.gravatar.com/avatar/<?php echo md5($this->user->getUsername()); ?>?s=128"></td>
 					<td valign=top><h1>
@@ -103,6 +189,7 @@ class UserProfileComponent implements GuiComponent{
 					</td>
 				</tr>
 				<tr>
+					<!--
 					<td>
 						<h2>Badges</h2>
 						<?php
@@ -115,6 +202,7 @@ class UserProfileComponent implements GuiComponent{
 							}
 						?>
 					</td>
+					-->
 				</tr>
 				
 				

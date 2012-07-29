@@ -44,9 +44,4 @@
 	}
 	$page->addComponent( $profileCmp );
 
-	$runs = new RunsListComponent();
-	$runs->setUser( $this_user->getUserId() );
-	$page->addComponent( $runs );
-	
-
 	$page->render();

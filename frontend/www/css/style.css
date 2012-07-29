@@ -337,3 +337,83 @@ table.sample_io {
 	background-color: #678DD7;
 	color: white;
 }
+
+
+
+
+
+
+.Boton.OK{
+    border: 1px solid #29691D;
+    color: white;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
+    background: #3D9400;
+}
+
+.Boton.BAD{
+    border: 1px solid red;
+    color: white;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
+    background: #3D9400;
+}
+
+.Boton {
+    -webkit-user-select: none;
+    background-color: whiteSmoke;
+    background-image: -webkit-linear-gradient(top, rgb(245, 245, 245), rgb(241, 241, 241));
+    border-bottom-color: rgba(0, 0, 0, 0.0976562);
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-left-color: rgba(0, 0, 0, 0.0976562);
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-right-color: rgba(0, 0, 0, 0.0976562);
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-top-color: rgba(0, 0, 0, 0.0976562);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-top-style: solid;
+    border-top-width: 1px;
+    color: #444;
+    cursor: default;
+    display: inline-block;
+    font-family: arial, sans-serif;
+    font-size: 11px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: bold;
+    height: 27px;
+    line-height: 27px;
+    margin-bottom: 2px;
+    margin-left: 0px;
+    margin-right: 16px;
+    margin-top: 0px;
+    min-width: 54px;
+    outline-color: #444;
+    outline-style: none;
+    outline-width: 0px;
+    padding-bottom: 0px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 0px;
+    position: relative;
+    text-align: center;
+    /*visibility: visible;*/
+}
+
+
+.Boton:hover {
+    background-color: #F8F8F8;
+    background-image: -webkit-linear-gradient(top,#f8f8f8,#f1f1f1);
+    background-image: -moz-linear-gradient(top,#f8f8f8,#f1f1f1);
+    background-image: -ms-linear-gradient(top,#f8f8f8,#f1f1f1);
+    background-image: -o-linear-gradient(top,#f8f8f8,#f1f1f1);
+    background-image: linear-gradient(top,#f8f8f8,#f1f1f1);
+    border: 1px solid #C6C6C6;
+    color: #333;
+}
+
+
