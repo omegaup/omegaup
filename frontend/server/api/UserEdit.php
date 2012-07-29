@@ -73,6 +73,12 @@ class UserEdit extends ApiHandler {
 		}
 
 
+		//admin wants to change password
+		if(Authorization::IsSystemAdmin($cu->getUserId()) && !is_null(RequestContext::get("password"))){
+				$userToEditVo->setPassword(md5(RequestContext::get("password")));
+		}
+
+
 
 		try{
 			UsersDAO::save( $userToEditVo );	
