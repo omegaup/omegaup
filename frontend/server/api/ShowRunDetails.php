@@ -47,8 +47,7 @@ class ShowRunDetails extends ApiHandler
 			throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
 		}                        
 
-                if (!(Authorization::IsContestAdmin($this->_user_id, $this->contest) ||
-		      $this->problem->getAuthorId() == $this->_user_id))
+                if (!(Authorization::CanEditRun($this->_user_id, $this->run)))
 		{
 			throw new ApiException(ApiHttpErrors::forbiddenSite());
 		}

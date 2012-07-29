@@ -44,10 +44,7 @@ class UpdateRun extends ApiHandler
         try
         {                        
             // If user is not judge, must be the run's owner.
-            $this->myRun = RunsDAO::getByAlias(RequestContext::get("run_alias"));
-            
-            $contest = ContestsDAO::getByPK($this->myRun->getContestId());
-            $problem = ProblemsDAO::getByPK($this->myRun->getProblemId());
+            $this->myRun = RunsDAO::getByAlias(RequestContext::get("run_alias"));            
         }
         catch(Exception $e)
         {
@@ -55,8 +52,7 @@ class UpdateRun extends ApiHandler
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
         }                        
 
-        if(!(Authorization::IsContestAdmin($this->_user_id, $contest) ||
-             $problem->getAuthorId() == $this->_user_id ))
+        if(!Authorization::CanEditRun($this->_user_id, $this->myRun))
         {
            throw new ApiException(ApiHttpErrors::forbiddenSite());
         }                
