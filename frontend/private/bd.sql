@@ -285,7 +285,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `author_id` int(11) NOT NULL,
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
-  `validator` enum('remote','literal','token','token-caseless','token-numeric') NOT NULL DEFAULT 'token-numeric',
+  `validator` enum('remote','literal','token','token-caseless','token-numeric','custom') NOT NULL DEFAULT 'token-numeric',
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
   `time_limit` int(11) DEFAULT '3000',
