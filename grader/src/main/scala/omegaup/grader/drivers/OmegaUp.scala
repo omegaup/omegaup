@@ -14,14 +14,33 @@ import Status._
 import Validator._
 
 object OmegaUp extends Actor with Log {
+	@throws(classOf[FileNotFoundException])
+	def createCompileMessage(run: Run, code: String): CompileInputMessage = {
+		if (run.problem.validator == Validator.Custom) {
+			List("c", "cpp", "py", "p", "rb").foreach(lang => {
+				val validator = new File(Config.get("problems.root", "problems") + "/" + run.problem.alias + "/validator." + lang)
+				
+				if (validator.exists) {
+					debug("OU Using custom validator {} for problem {}", validator.getCanonicalPath, run.problem.alias)
+					return new CompileInputMessage(run.language.toString, List(code), Some(lang), Some(List(FileUtil.read(validator.getCanonicalPath))))
+				}
+			})
+			
+			throw new FileNotFoundException("OU Validator for problem " + run.problem.alias + " was set to 'custom', but no validator program was found.")
+		} else {
+			debug("OU Using {} validator for problem {}", run.problem.validator, run.problem.alias)
+			new CompileInputMessage(run.language.toString, List(code))
+		}
+	}
+	
 	def act() = {
 		debug("OmegaUp loaded")
 		while(true) {
 			receive {
 				case Submission(run: Run) => {
 					debug("OmegaUp submission!")
-					val id   = run.id
-					val alias  = run.problem.alias
+					val id = run.id
+					val alias = run.problem.alias
 					val lang = run.language
 					val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)
 					
@@ -35,9 +54,7 @@ object OmegaUp extends Actor with Log {
 						try {
 							info("OU Compiling {}", id)
 						
-							val output = service.compile(
-								new CompileInputMessage(lang.toString, List(code))
-							)
+							val output = service.compile(createCompileMessage(run, code))
 						
 							if(output.status == "ok") {
 								val input = FileUtil.read(Config.get("problems.root", "problems") + "/" + alias + "/inputname").trim
@@ -71,6 +88,7 @@ object OmegaUp extends Actor with Log {
 								}
 							
 								run.problem.validator match {
+									case Validator.Custom => CustomGrader.grade(run)
 									case Validator.Token => TokenGrader.grade(run)
 									case Validator.TokenCaseless => TokenCaselessGrader.grade(run)
 									case Validator.TokenNumeric => TokenNumericGrader.grade(run)

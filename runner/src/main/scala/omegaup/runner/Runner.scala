@@ -226,7 +226,11 @@ object Runner extends RunnerService with Log with Using {
 					if (validatorDirectory.exists) {
 						val caseName = x.getName
 						val metaFile = validatorDirectory.getCanonicalPath + "/" + caseName;
-						val commonParams = List("-c", validatorDirectory.getCanonicalPath, "-q", "-M", metaFile, "-i", x.getCanonicalPath.replace(".meta", ".out"), "-o", metaFile.replace(".meta", ".out"), "-r", metaFile.replace(".meta", ".err"), "-P", x.getCanonicalPath.replace(".meta", ".in"), "-t", message.timeLimit.toString, "-O", message.outputLimit.toString)
+						var inputFile = new File(x.getCanonicalPath.replace(".meta", ".in"))
+						if (!inputFile.exists) {
+							inputFile = new File(casesDirectory.getCanonicalPath + "/" + caseName.replace(".meta", ".in"))
+						}
+						val commonParams = List("-c", validatorDirectory.getCanonicalPath, "-q", "-M", metaFile, "-i", x.getCanonicalPath.replace(".meta", ".out"), "-o", metaFile.replace(".meta", ".out"), "-r", metaFile.replace(".meta", ".err"), "-P", inputFile.getCanonicalPath, "-t", message.timeLimit.toString, "-O", message.outputLimit.toString)
 						
 						val validator_lang = using (new BufferedReader(new FileReader(validatorDirectory.getCanonicalPath + "/lang"))) { reader => reader.readLine }
 				

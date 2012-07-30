@@ -182,6 +182,178 @@ trait Grader extends Object with Log {
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double
 }
 
+object CustomGrader extends Grader {
+	override def grade(run: Run): Unit = {
+		val id = run.id
+		val alias = run.problem.alias
+		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
+		val dataDirectory = new File(zip.getParentFile.getCanonicalPath + "/" + id)
+		dataDirectory.mkdirs()
+		
+		val input = new ZipInputStream(new FileInputStream(zip.getCanonicalPath))
+		var entry: ZipEntry = input.getNextEntry
+		val buffer = Array.ofDim[Byte](1024)
+		var read: Int = 0
+		
+		while(entry != null) {
+			val outFile = new File(entry.getName())
+			val output = new FileOutputStream(dataDirectory.getCanonicalPath + "/" + outFile.getName)
+
+			while( { read = input.read(buffer); read > 0 } ) {
+				output.write(buffer, 0, read)
+			}
+
+			output.close
+			input.closeEntry
+			entry = input.getNextEntry
+		}
+		
+		input.close
+		
+		zip.delete
+		
+		run.status = Status.Ready
+		run.veredict = Veredict.Accepted
+		run.runtime = 0
+		run.memory = 0
+		
+                val metas = dataDirectory.listFiles
+                  .filter { _.getName.endsWith(".meta") }
+                  .map{ f => f.getName.substring(0, f.getName.length - 5)->(f, MetaFile.load(f.getCanonicalPath)) }
+                  .toMap
+		
+		val weightsFile = new File(Config.get("problems.root", "./problems") + "/" + alias + "/testplan")
+
+                trace("Finding Weights file in {}", weightsFile.getCanonicalPath)
+		
+		val weights:scala.collection.Map[String,scala.collection.Map[String,Double]] = if (weightsFile.exists) {
+			val weights = new mutable.ListMap[String,mutable.ListMap[String,Double]]
+			val fileReader = new BufferedReader(new FileReader(weightsFile))
+			var line: String = null
+	
+			while( { line = fileReader.readLine(); line != null} ) {
+				val tokens = line.split("\\s+")
+			
+				if(tokens.length == 2 && !tokens(0).startsWith("#")) {
+                                        var group:String = null
+
+                                        val idx = tokens(0).indexOf(".")
+
+                                        if (idx != -1) {
+                                          group = tokens(0).substring(0, idx)
+                                        } else {
+                                          group = tokens(0)
+                                        }
+
+                                        if (!weights.contains(group)) {
+                                                weights += (group -> new mutable.ListMap[String,Double])
+                                        }
+
+					try {
+						weights(group) += (tokens(0) -> tokens(1).toDouble)
+					}
+				}
+			}
+		
+			fileReader.close()
+		
+			weights
+		} else {
+			new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/")
+			.listFiles
+			.filter { _.getName.endsWith(".in") }
+			.map {  f:File =>
+                                val caseName = f.getName.substring(0, f.getName.length - 3)
+
+                                (caseName -> Map(caseName -> 1.0))
+			}
+			.toMap
+		}
+
+		metas.values.foreach { case (f, meta) => {
+			run.runtime += math.round(1000 * meta("time").toDouble)
+			run.memory = math.max(run.memory, meta("mem").toLong)
+			val v = meta("status") match {
+				case "XX" => Veredict.JudgeError
+				case "JE" => Veredict.JudgeError
+				case "OK" => Veredict.Accepted
+				case "RE" => Veredict.RuntimeError
+				case "TO" => Veredict.TimeLimitExceeded
+				case "ML" => Veredict.MemoryLimitExceeded
+				case "OL" => Veredict.OutputLimitExceeded
+				case "FO" => Veredict.RestrictedFunctionError
+				case "FA" => Veredict.RestrictedFunctionError
+				case "SG" => Veredict.RuntimeError
+			}
+			
+			if(run.veredict < v) run.veredict = v
+		}}
+		
+		if (run.veredict == Veredict.JudgeError) {
+			run.runtime = 0
+			run.memory = 0
+			run.score = 0
+		} else {
+			run.score = weights
+                        .map { case (group, data) => 
+                          {
+                            val scores = data
+                            .map { case (name, weight) =>
+                              if (metas.contains(name) && metas(name)._2("status") == "OK") {
+                                val f = metas(name)._1
+
+                                if (metas(name)._2.contains("score")) {
+                                	metas(name)._2("score").toDouble
+                                } else {
+                                	0.0
+                                } * weight
+                              } else {
+                                0.0
+                              }
+                            }
+                            
+                            if (scores.forall(_ > 0)) {
+                              scores.foldLeft(0.0)(_+_)
+                            } else {
+                              0.0
+                            }
+                          }
+                        }
+			.foldLeft(0.0)(_+_) / weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2)) * (run.contest match {
+				case None => 1.0
+				case Some(contest) => {
+					if (contest.points_decay_factor <= 0.0 || run.submit_delay == 0.0) {
+						1.0
+					} else {
+						var TT = (contest.finish_time.getTime() - contest.start_time.getTime()) / 60000.
+						var PT = run.submit_delay / 60.0
+
+                                                if (contest.points_decay_factor >= 1.0) {
+                                                  contest.points_decay_factor = 1.0
+                                                }
+						
+						(1 - contest.points_decay_factor) + contest.points_decay_factor * TT*TT / (10 * PT*PT + TT*TT)
+					}
+				}
+			})
+
+			run.score = scala.math.round(run.score * 1024) / 1024.0
+			
+			if(run.score == 0 && run.veredict < Veredict.WrongAnswer) run.veredict = Veredict.WrongAnswer
+			else if(run.score < (1-1e-9) && run.veredict < Veredict.PartialAccepted) run.veredict = Veredict.PartialAccepted
+		}
+		
+		run.problem.points match {
+			case None => {}
+			case Some(factor) => run.contest_score = run.score * factor
+		}
+		
+		Manager.updateVeredict(run)
+	}
+	
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0
+}
+
 object LiteralGrader extends Grader {
 	override def grade(run: Run): Unit = {
 		debug("Grading {}", run)
