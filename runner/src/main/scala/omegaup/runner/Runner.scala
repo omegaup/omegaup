@@ -114,6 +114,10 @@ object Runner extends RunnerService with Log with Using {
 						if (master_result.status != "ok") {
 							return master_result
 						}
+						
+						using (new PrintWriter(new FileWriter(new File(runRoot + "/validator/lang")))) { writer => {
+							writer.print(master_lang)
+						}}
 					}
 					case None => {
 						return new CompileOutputMessage("judge error", error=Some("Missing code"))
@@ -221,9 +225,12 @@ object Runner extends RunnerService with Log with Using {
 					val validatorDirectory = new File(runDirectory.getCanonicalPath + "/validator")
 					if (validatorDirectory.exists) {
 						val caseName = x.getName
-						val commonParams = List("-c", validatorDirectory.getCanonicalPath, "-q", "-M", caseName, "-i", x.getCanonicalPath.replace(".meta", ".in"), "-o", caseName.replace(".meta", ".out"), "-r", caseName.replace(".meta", ".err"), "-P", x.getCanonicalPath.replace(".meta", ".out"), "-t", message.timeLimit.toString, "-O", message.outputLimit.toString)
+						val metaFile = validatorDirectory.getCanonicalPath + "/" + caseName;
+						val commonParams = List("-c", validatorDirectory.getCanonicalPath, "-q", "-M", metaFile, "-i", x.getCanonicalPath.replace(".meta", ".out"), "-o", metaFile.replace(".meta", ".out"), "-r", metaFile.replace(".meta", ".err"), "-P", x.getCanonicalPath.replace(".meta", ".in"), "-t", message.timeLimit.toString, "-O", message.outputLimit.toString)
+						
+						val validator_lang = using (new BufferedReader(new FileReader(validatorDirectory.getCanonicalPath + "/lang"))) { reader => reader.readLine }
 				
-						val params = lang match {
+						val params = validator_lang match {
 							case "java" =>
 								List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")
 							case "c" =>
@@ -242,7 +249,7 @@ object Runner extends RunnerService with Log with Using {
 						
 						val metaAddendum = try {
 							using (new BufferedReader(new FileReader(validatorDirectory.getCanonicalPath + "/" + caseName.replace(".meta", ".out")))) { reader => {
-								List(("score" -> reader.readLine.trim.toDouble.toString))
+								List(("score" -> Math.max(0.0, Math.min(1.0, reader.readLine.trim.toDouble)).toString))
 							}}
 						} catch {
 							case e: Exception => List(("status", "JE"))
