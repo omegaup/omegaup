@@ -9,8 +9,11 @@
 -s rt_sigaction
 -s rt_sigprocmask
 -s ugetrlimit
+-s getrlimit
 -s socketcall
+-s socket
 -s getdents64
+-s getdents
 -s getcwd
 -s time
 -s gettimeofday

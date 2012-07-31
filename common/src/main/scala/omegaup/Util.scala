@@ -323,4 +323,11 @@ object MetaFile extends Object with Using {
 			meta
 		}}
 	}
+	
+	@throws(classOf[IOException])
+	def save(path: String, meta: scala.collection.Map[String,String]) = {
+		using (new PrintWriter(new FileWriter(path))) { writer => {
+			for ((key, value) <- meta) writer.printf("%s:%s\n", key, value)
+		}}
+	}
 }

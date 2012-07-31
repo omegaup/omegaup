@@ -147,7 +147,42 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
     val test2 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("foo"))))
     test2.status should equal ("judge error")
 
-    val test3 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"1\\n\"); return 0; }"))))
+    val test3 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"0\\n\"); return 0; }"))))
     test3.status should equal ("ok")
+    test3.token should not equal None
+    
+    Runner.run(RunInputMessage(test3.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("zero", "0")
+    ))), new File(zipRoot.getCanonicalPath + "/test6.zip"))
+
+    val test4 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"foo\\n\"); return 0; }"))))
+    test4.status should equal ("ok")
+    test4.token should not equal None
+    
+    Runner.run(RunInputMessage(test4.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("je", "0")
+    ))), new File(zipRoot.getCanonicalPath + "/test7.zip"))
+
+    val test5 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { double a, b; scanf(\"%lf %lf\", &a, &b); printf(\"%lf\\n\", a + b); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { FILE* data = fopen(\"data.in\", \"r\"); double a, b, answer, user; fscanf(data, \"%lf %lf\", &a, &b); scanf(\"%lf\", &user); answer = a*a + b*b; printf(\"%lf\\n\", 1.0 / (1.0 + (answer - user) * (answer - user))); return 0; }"))))
+    test5.status should equal ("ok")
+    test5.token should not equal None
+    
+    Runner.run(RunInputMessage(test5.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("one", "1 1\n"),
+      new CaseData("zero", "0 0\n"),
+      new CaseData("two", "2 2\n"),
+      new CaseData("half", "0.5 0.5\n")
+    ))), new File(zipRoot.getCanonicalPath + "/test8.zip"))
+
+    val test6 = Runner.compile(CompileInputMessage("cpp", List("#include<iostream>\nint main() { double a, b; std::cin >> a >> b; std::cout << a*a + b*b << std::endl; return 0; }"), Some("py"), Some(List("data = open(\"data.in\", \"r\")\na, b = map(float, data.readline().strip().split())\nuser = float(raw_input().strip())\nanswer = a**2 + b**2\nprint 1.0 / (1.0 + (answer - user)**2)"))))
+    test6.status should equal ("ok")
+    test6.token should not equal None
+    
+    Runner.run(RunInputMessage(test6.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("one", "1 1\n"),
+      new CaseData("zero", "0 0\n"),
+      new CaseData("two", "2 2\n"),
+      new CaseData("half", "0.5 0.5\n")
+    ))), new File(zipRoot.getCanonicalPath + "/test9.zip"))
   }
 }

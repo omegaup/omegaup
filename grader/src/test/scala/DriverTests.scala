@@ -216,6 +216,40 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				return EXIT_SUCCESS;
 			}
 		""")
+
+		omegaUpSubmit(4, Language.Cpp, """
+			#include <cstdlib>
+			#include <iostream>
+			#include <map>
+			#include <unistd.h>
+
+			using namespace std;
+
+			int main(int argc, char *argv[]) {
+				double a, b;
+				cin >> a >> b;
+				cout << a + b << endl;
+				
+				return EXIT_SUCCESS;
+			}
+		""")
+
+		omegaUpSubmit(4, Language.Cpp, """
+			#include <cstdlib>
+			#include <iostream>
+			#include <map>
+			#include <unistd.h>
+
+			using namespace std;
+
+			int main(int argc, char *argv[]) {
+				double a, b;
+				cin >> a >> b;
+				cout << a*a + b*b << endl;
+				
+				return EXIT_SUCCESS;
+			}
+		""")
 	
 		try { Thread.sleep(30000) }
 		
@@ -248,7 +282,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		run = GraderData.run(5).get
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should equal (0.4)
+		run.score should equal (0.400390625)
 		run.contest_score should equal (0)
 
 		run = GraderData.run(6).get
@@ -260,7 +294,19 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		run = GraderData.run(7).get
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should equal (0.05)
+		run.score should equal (0.0498046875)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(8).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.PartialAccepted)
+		run.score should equal (0.71484375)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(9).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.Accepted)
+		run.score should equal (1)
 		run.contest_score should equal (0)
 	}
 	
