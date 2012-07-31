@@ -22,7 +22,7 @@
 	
 	$results = $contestApi->ExecuteApi( );
 
-	var_dump($results);
+	
 
 
 	$header = array(  

@@ -26,10 +26,11 @@ class NewContest extends ApiHandler
                 RequestContext::get("title"),
                 "title");
         
+        /*
         ValidatorFactory::stringNotEmptyValidator()->validate(
                 RequestContext::get("description"),
                 "description");
-
+        */
 	/*	
         ValidatorFactory::dateRangeValidator(
                 RequestContext::get("start_time"), 
@@ -49,9 +50,12 @@ class NewContest extends ApiHandler
                     ->validate(RequestContext::get("window_length"), "window_length");
         }
 
+        
+        /*
         ValidatorFactory::numericValidator()->validate(
                 RequestContext::get("public"),
                 "public");
+                */
         
         ValidatorFactory::stringOfMaxLengthValidator(32)->validate(
                 RequestContext::get("alias"),
@@ -84,7 +88,9 @@ class NewContest extends ApiHandler
         ValidatorFactory::enumValidator(array("sum", "max"))
                 ->validate(RequestContext::get("penalty_calc_policy"), "penalty_calc_policy");
                 
-        // Validate private_users request, only if the contest is private        
+        // Validate private_users request, only if the contest is private    
+
+        /*
         if(RequestContext::get("public") == 0)
         {
             if(is_null(RequestContext::get("private_users")))
@@ -109,7 +115,7 @@ class NewContest extends ApiHandler
                     }
                 }                               
             }
-	}
+	    }*/
 
         // Problems is optional
         if (!is_null(RequestContext::get('problems')))
@@ -129,8 +135,19 @@ class NewContest extends ApiHandler
     
     protected function GenerateResponse() 
     {        
+
         // Create and populate a new Contests object
         $contest = new Contests();              
+        
+        if(is_null(RequestContext::get("public"))){
+            $contest->setPublic(0);
+
+        }else{
+            $contest->setPublic(RequestContext::get("public"));
+        }
+
+        
+        
         $contest->setTitle(RequestContext::get("title"));
 	    $contest->setDescription(RequestContext::get("description"));        
         $contest->setStartTime(gmdate('Y-m-d H:i:s', RequestContext::get("start_time")));        
@@ -138,7 +155,7 @@ class NewContest extends ApiHandler
         $contest->setWindowLength(RequestContext::get("window_length") == "NULL" ? NULL : RequestContext::get("window_length"));
         $contest->setDirectorId($this->_user_id);        
         $contest->setRerunId(0); // NYI
-        $contest->setPublic(RequestContext::get("public"));
+        
         $contest->setAlias(RequestContext::get("alias"));
         $contest->setScoreboard(RequestContext::get("scoreboard"));
         $contest->setPointsDecayFactor(RequestContext::get("points_decay_factor"));
@@ -158,7 +175,7 @@ class NewContest extends ApiHandler
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($contest);
                         
-            // If the contest is private, add the list of allowed users
+            /*// If the contest is private, add the list of allowed users
             if (RequestContext::get("public") == 0)
             {
                 foreach($this->private_users_list as $userkey)
@@ -175,7 +192,7 @@ class NewContest extends ApiHandler
                     // Save the relationship in the DB
                     ContestsUsersDAO::save($temp_user_contest);
                 }
-	    }
+	        }*/
 
             if (!is_null(RequestContext::get('problems')))
             {                
@@ -214,4 +231,3 @@ class NewContest extends ApiHandler
     }    
 }
 
-?>

@@ -17,7 +17,7 @@ class NewContestFormComponent implements GuiComponent{
                     $('.problem-id', $row).autocomplete({
                         source: function(req, res) {
                             $.getJSON(
-                                "https://omegaup.com/arena/problems/"+req.term,
+                                "arena/problems/"+req.term,
                                 function(data) {
                                     res($.map(data.problems, function(item) {
                                         return {
@@ -42,8 +42,9 @@ class NewContestFormComponent implements GuiComponent{
                 $('#submit').click(function() {
                     var start_time = new Date($("#_start_time").val());
                     var finish_time = new Date($("#_finish_time").val());
+
                     $.ajax({
-                        url: "/arena/contests/new",
+                        url: "../arena/contests/new",
                         dataType: "json",
                         type:"POST",
                         data: {
@@ -61,22 +62,7 @@ class NewContestFormComponent implements GuiComponent{
                             "submissions_gap"		: $("#_submissions_gap").val(),
                             "feedback" 				: $("#_feedback").val(),
                             "penalty" 				: $("#_penalty").val(),
-                            "penalty_time_start" 	: $("#_penalty_time_start").val(),
-                            "problems"              : (function() {
-                                var arr = [];
-                                
-                                $('.problems tbody tr:not(.template)').each(function(i) {
-                                    arr.push({
-                                        problem : $('.problem-id', this).val(),
-                                        points  : $('.problem-points', this).val()
-                                    });
-                                });
-                                
-                                var res = JSON.stringify(arr);
-                                console.log(res);
-                                
-                                return res;
-                            })()
+                            "penalty_time_start" 	: $("#_penalty_time_start").val()
                         },
                         beforeSend: function( xhr ) {
                             $("#submit").hide();
@@ -140,6 +126,19 @@ class NewContestFormComponent implements GuiComponent{
 			}
 */
 
+/*
+titulo
+Alias
+Inicio
+fin
+*/
+
+
+
+
+
+
+
 		</script>
 		<hr>
 		<h3>Nuevo concurso</h3>
@@ -163,24 +162,10 @@ class NewContestFormComponent implements GuiComponent{
 						<input id='_alias' name='alias' value='' type='text'>
 					</td>
                 </tr><!-- ----------------------------------------- -->
-				<tr><!-- ----------------------------------------- -->
-                    <td class="info">
-						<b>Descripci&oacute;n</b>
-						<p></p>
-					</td>
-					<td>
-						<textarea id='_description' name='description' ></textarea>
-					</td>
-					
-					<td class="info">
-						<b>Director</b>
-						<p></p>
-					</td>
-					<td>
-						<input id='_director_id' name='director_id' value='' type='text'>
-					</td>
-				</tr><!-- ----------------------------------------- -->
-				<tr><!-- ----------------------------------------- -->
+
+
+
+                <tr><!-- ----------------------------------------- -->
                     <td class="info">
 						<b>Inicio</b>
 						<p>La fecha (en hora local) en la que inicia el concurso</p>
@@ -197,16 +182,19 @@ class NewContestFormComponent implements GuiComponent{
 						<input id='_finish_time' name='finish_time' value='2012-01-02 00:00:00' type='text' >
 					</td>
 				</tr><!-- ----------------------------------------- -->
+
+
+				<tr>
+					<td colspan=4><hr></td>
+				</tr>
+
 				<tr><!-- ----------------------------------------- -->
-					<td class="info">
-						<b>Publico</b>
+                    <td class="info">
+						<b>Descripci&oacute;n</b>
 						<p></p>
 					</td>
-					<td >
-						<select id='_public'>
-							<option value='1'>Si</option>
-							<option value='0'>No</option>
-						</select>
+					<td>
+						<textarea id='_description' name='description' ></textarea>
 					</td>
 					
 					<td class="info">
@@ -217,6 +205,7 @@ class NewContestFormComponent implements GuiComponent{
 						<input id='_window_length' name='window_length' value='NULL' type='text'>
 					</td>
 				</tr><!-- ----------------------------------------- -->
+				
 				<tr><!-- ----------------------------------------- -->
 					<td class="info" >
 						<b>Scoreboard</b>
@@ -231,7 +220,7 @@ class NewContestFormComponent implements GuiComponent{
 						<p>Tiempo m&iacute;nimo en minutos que debe de esperar un usuario despues de realizar un env&iacute;o para hacer otro.</p>
 					</td>
 					<td >
-						<input id='_submissions_gap' name='submissions_gap' value='0' type='text'>
+						<input id='_submissions_gap' name='submissions_gap' value='1' type='text'>
 					</td>
 				</tr><!-- ----------------------------------------- -->
 				<tr><!-- ----------------------------------------- -->
@@ -315,7 +304,9 @@ class NewContestFormComponent implements GuiComponent{
 				</tr><!-- ----------------------------------------- -->
 
 			</table>
-			
+
+
+		<!--			
 			<h3>Problemas</h3>
 			
 			<table class="problems">
@@ -337,18 +328,16 @@ class NewContestFormComponent implements GuiComponent{
                     </tr>
                 </tfoot>
             </table>
-            
-            <div id="submit-wrapper">
-               <!-- <input value='Agendar concurso' type='button' id="submit">-->
-				<input value='Agendar concurso' type='button' id="submit" >
+           -->
 
-				<div id="response">
-					
-				</div>
+            <div id="submit-wrapper">
+
+				<input value='Agendar concurso' type='button' id="submit" >
+				<div id="response"></div>
+
             </div>
-            <div id="response">
-                
-            </div>
+
+            
 		</div>
 		
 		<?php

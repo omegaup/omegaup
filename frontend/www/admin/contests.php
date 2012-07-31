@@ -18,6 +18,9 @@
 
     $page->addComponent( new TitleComponent("Concursos"));
 
+    
+    
+
 	$page->addComponent( new NewContestFormComponent() );
 
     $page->render();

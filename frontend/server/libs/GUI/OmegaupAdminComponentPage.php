@@ -7,6 +7,10 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 
 	function __construct()
 	{
+
+
+		//check out permissions
+
 		$this->addJs("../js/jquery-ui-1.8.16.custom.min.js");
 		$this->addJs("../js/jquery-ui-sliderAccess.js");
 		$this->addJs("../js/jquery-ui-timepicker-addon.js");
