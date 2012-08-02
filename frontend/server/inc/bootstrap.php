@@ -24,6 +24,8 @@
    require_once("libs/Logger/Logger.php");
    require_once('dao/model.inc.php');
 
+   Logger::log("REQUEST : " . $_SERVER["SCRIPT_FILENAME"] . "?" . $_SERVER["QUERY_STRING"]);
+
 	/**
 	 * I am the API:
 	 * Connect to DB, and load the DAO's. 

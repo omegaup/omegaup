@@ -20,8 +20,85 @@ class UserProfileComponent implements GuiComponent{
 	public function setEditable($editable){
 		$this->editable = $editable;
 	}
+
+
+	private function renderFirstLogin(){
+		?>
+		<script type="text/javascript">
+		function continuar(){
+			//send to api, and move on to normal profile
+			var oU = oU || new OmegaUp (); 
+
+			oU.UserEdit(null, 
+				$("#name").val(),
+				$("#email").val(),
+				$("#birthDate").val(),
+				$("#school").val(),
+				null,
+				null,
+				function(data){ 
+					if(data.status == "error"){
+						alert(data.error);
+						return;
+					}
+
+					window.location = "profile.php?edit=ok";
+
+				});
+		}
+		</script>
+
+		<!-- @TODO move this inline styles to css -->
+		<h1 style="display:inline">Bienvenido a </h1>
+
+		<img style="width: 119px;
+					-webkit-box-shadow: 0 0 0;
+					margin-top: 5px;
+					margin-left: -5px;
+					display: inline;
+					padding: 0px;
+					background: 
+					transparent;
+					margin: 0px;
+					margin-top: 0px;" src="media/omegaup_curves.png">
+
+		<h1 style="display:inline;"><?php echo $this->user->getName(); ?></h1>
+		<br>
+		<h3>Porfavor actualiza tu informacion</h3>
+
+		<?php
+
+		$df = new FormComponent();
+
+		$pEmail = EmailsDAO::getByPK( $this->user->getMainEmailId() );
+
+		$df->addField( "name", "Nombre", "text", 					$this->user->getName() );
+		$df->addField( "email", "Correo electronico", "text", 		$pEmail->getEmail() );
+		$df->addField( "birthDate", "Fecha de nacimiento", "date", 	$this->user->getBirthDate() );
+		$df->addField( "school", "Fecha de nacimiento", "date", 	$this->user->getSchoolId() );
+		$df->addOnClick("Continuar", "continuar()");
+
+		echo $df->renderCmp();
+
+	}
 	
 	public function renderCmp(){
+
+		//test if the profile we are showing
+		//is the owners profile
+		if(LoginController::isLoggedIn()){
+			$cu = LoginController::getCurrentUser();
+
+			if(
+				$this->user->getUserId() == $cu->getUserId()
+				&& isset($_GET["fl"]) 
+				&& ($_GET["fl"] == 1)
+			){
+				return self::renderFirstLogin();
+			}
+		}
+			
+		
 
 		if($this->editable){
 			?>
@@ -40,7 +117,7 @@ class UserProfileComponent implements GuiComponent{
 							$("#actual_form").fadeIn();	
 
 							$("#password").val("");
-							$("#password_old").val("");
+							$("#oldPassword").val("");
 
 						});
 
@@ -50,31 +127,41 @@ class UserProfileComponent implements GuiComponent{
 
 					var profile_edit_ok = function(){
 
-						var toEdit = {
-
-							username : "<?php echo $this->user->getUserName(); ?>"
-
-						};
 
 						//validate, basic
 						if($("#password").val().length > 0){
 
 							//validate shit
-							if($("#password_old").val().length == 0){
+							if($("#oldPassword").val().length == 0){
 								alert("You must provide your old password");
 								return;
 							}
-
-							toEdit.password = $("#password").val();
-
-							toEdit.old_password = $("#password_old").val();
 
 						}
 
 
 
-						 
+						var oU = oU || new OmegaUp (); 
 
+						oU.UserEdit(null, 
+							null, //$("#name").val(),
+							null, //$("#email").val(),
+							null, //$("#birthDate").val(),
+							null, //$("#school").val(),
+							$("#password").val(),
+							$("#oldPassword").val(),
+
+							function(data){ 
+								if(data.status == "error"){
+									alert(data.error);
+									return;
+								}
+
+								window.location = "profile.php?edit=ok";
+
+							});
+									 
+						/*
 						//send ajax
 						$.ajax({
 						  url: 'arena/user/edit',
@@ -87,11 +174,9 @@ class UserProfileComponent implements GuiComponent{
 						  	console.log(data,b,c);
 						  }
 						});
-
-
-						//show working gif
-
-						//notifice user of result
+						*/
+		
+						
 					}
 
 						//list registred schools
@@ -133,7 +218,7 @@ class UserProfileComponent implements GuiComponent{
 					<td>Password</td>  
 					<td><input type="password" id="password" ></td>
 					<td>Old Password</td>  
-					<td><input type="password" id="password_old" ></td>
+					<td><input type="password" id="oldPassword" ></td>
 
 				</tr>
 

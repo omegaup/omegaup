@@ -377,6 +377,7 @@ class LoginController{
 			$sm = self::getSessionManagerInstance();
 			$auth_token = $sm->GetCookie( "auth_token" );
 			return AuthTokensDAO::getUserByToken($auth_token);
+			
 		}else
 			return NULL;
 	}

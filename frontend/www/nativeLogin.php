@@ -15,14 +15,8 @@
 
 
 
-	/**
-	  *
-	  * If user is logged in, and somehow
-	  * reached this page, send him to home
-	  **/
-	if( LoginController::isLoggedIn() )
-		die(header("Location: index.php"));
-
+	
+	
 
   /**
     *
@@ -42,11 +36,14 @@
 
 			}catch(Exception $e){
 				die($e);
+
 			}
 
 			$_POST["request"] = "login";
 			$_POST["user"]    = $_POST["email"];
 			$_POST["pass"]    = $_POST["pass"];
+			
+			define("FL", 1);
 
 		}else{
 			
@@ -58,12 +55,30 @@
     }
 
 
+    
+
+
+
+	/**
+	  *
+	  * If user is logged in, and somehow
+	  * reached this page, send him to home
+	  **/
+	//if( LoginController::isLoggedIn() )
+	//	die(header("Location: index.php"));
+
+
+
 
 	//start creating the page,
 	//this pages handles login in
     $page = new OmegaupComponentPage();
 
 
+    if(LoginController::isLoggedIn()){
+    	header("Location: profile.php?");
+    	exit;
+    }
 
 
     /**
@@ -74,8 +89,8 @@
     $login_form = new FormComponent( new Users() );
     $login_form->addField("user", "Email o usuario"		, "input"	, ""		, "user" );
     $login_form->addField("pass", "Contrase&ntilde;a"	, "password", ""		, "pass" );
-    $login_form->addField(""	, ""					, "hidden"	, "login"	, "request" );
     $login_form->addSubmit("Iniciar sesion",  "nativeLogin.php", "POST");
+    $login_form->addField(""	, ""					, "hidden"	, "login"	, "request" );
     $page->addComponent( $login_form );
 
 
