@@ -13,7 +13,7 @@ RewriteRule ^logout/?$ CallApiLoader.php?apicmd=Logout [L]
 RewriteRule ^user/edit/?$ CallApiLoader.php?apicmd=UserEdit&%{QUERY_STRING} [L]
 
 
-RewriteRule ^contests/?$ ?apicmd=ShowContests [L]
+RewriteRule ^contests/?$ CallApiLoader.php?apicmd=ShowContests [L]
 RewriteRule ^contests/new/?$ CallApiLoader.php?apicmd=NewContest [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowContest&contest_alias=$1 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/?$ CallApiLoader.php?apicmd=ShowScoreboard&contest_alias=$1 [L]
