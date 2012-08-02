@@ -91,7 +91,7 @@ object Manager extends Object with Log {
 		val endpoint = new RunnerEndpoint(host, port)
 		
 		synchronized (registeredEndpoints) {
-			if (!registeredEndpoints.contains(endpoint)) {
+			if (registeredEndpoints.contains(endpoint)) {
 				info("De-registering {}:{}", endpoint.host, endpoint.port)
 				registeredEndpoints -= endpoint
 				runnerQueue.remove(new RunnerProxy(endpoint.host, endpoint.port))
