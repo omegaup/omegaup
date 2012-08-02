@@ -23,6 +23,8 @@
    require_once(SERVER_PATH . "/config.php");
    require_once("libs/Logger/Logger.php");
    require_once('dao/model.inc.php');
+   require_once("libs/Authorization.php");
+
 
    Logger::log("REQUEST : " . $_SERVER["SCRIPT_FILENAME"] . "?" . $_SERVER["QUERY_STRING"]);
 

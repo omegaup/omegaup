@@ -75,7 +75,7 @@ class UserProfileComponent implements GuiComponent{
 		$df->addField( "name", "Nombre", "text", 					$this->user->getName() );
 		$df->addField( "email", "Correo electronico", "text", 		$pEmail->getEmail() );
 		$df->addField( "birthDate", "Fecha de nacimiento", "date", 	$this->user->getBirthDate() );
-		$df->addField( "school", "Fecha de nacimiento", "date", 	$this->user->getSchoolId() );
+		$df->addField( "school", "Escuela", "text", 	$this->user->getSchoolId() );
 		$df->addOnClick("Continuar", "continuar()");
 
 		echo $df->renderCmp();
