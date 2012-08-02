@@ -10,12 +10,15 @@ class UserEdit extends ApiHandler {
 
 
 	protected function generateResponse(){
-		
-		//throw new ApiException("");
-		
-		//die( RequestContext::get("username") );
 
 		$userToEdit = RequestContext::get("username");
+		
+		//var_dump($userToEdit);
+
+		if(is_null($userToEdit)){
+			//edit myself
+			$userToEdit = LoginController::getCurrentUser()->getUsername();
+		}
 
 		$userToEditVo = UsersDAO::search(new Users(array( "username" => $userToEdit )));
 
@@ -50,17 +53,17 @@ class UserEdit extends ApiHandler {
 
 
 				//he must provide the old password
-				if(is_null(RequestContext::get("old_password"))){
+				if(is_null(RequestContext::get("oldPassword"))){
 					throw new ApiException( ApiHttpErrors::invalidParameter("You must provide your old password."));
 				}
 
 
-				if(md5(RequestContext::get("old_password")) != $cu->getPassword()){
+				if(md5(RequestContext::get("oldPassword")) != $cu->getPassword()){
 					throw new ApiException( ApiHttpErrors::invalidParameter("Your old password does not match."));
 				}
 
 
-				if(RequestContext::get("password") == RequestContext::get("old_password")){
+				if(RequestContext::get("password") == RequestContext::get("oldPassword")){
 					throw new ApiException( ApiHttpErrors::invalidParameter("You provided the same password."));	
 				}
 
@@ -79,6 +82,16 @@ class UserEdit extends ApiHandler {
 		}
 
 
+		if( ($name = RequestContext::get("name")) != null ){
+			$userToEditVo->setName($name);
+		}
+
+		if( ($school = RequestContext::get("school")) != null ){
+			//look for school in schools
+			//$userToEditVo->setName($name);
+		}
+
+
 
 		try{
 			UsersDAO::save( $userToEditVo );	
@@ -93,7 +106,19 @@ class UserEdit extends ApiHandler {
 
 		// Am I Admin?
 
-		return array("asdf" => 23 );
+		return array(  );
+
+		/*
+
+		var o = o || new OmegaUp (); 
+		o.UserEdit("mm", null, null, null, null, function(data){ 
+			console.log(data);
+			if(data.status == "error"){
+				alert(data.error);
+			}
+		});
+
+		*/
 	}
 
 

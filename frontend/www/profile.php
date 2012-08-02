@@ -16,6 +16,7 @@
 
 	$page = new OmegaupComponentPage();
 
+
 	//id argument does not exist
 	if(isset($_GET["id"])){
 		$this_user = UsersDAO::getByPK( $_GET["id"] );	
@@ -26,7 +27,7 @@
 
 	}
 
-	
+
 	
 	//user does not exist
 	if(is_null($this_user)){
@@ -35,14 +36,16 @@
 		exit;
 	}
 
+
 	//go ahead
 	$profileCmp = new UserProfileComponent( $this_user );
 	
 	$luser = LoginController::getCurrentUser();
+	
 	if( !is_null($luser) && ($luser->getUserId() == $this_user->getUserId() ) ){
 		$profileCmp->setEditable(true);
 	}
-	
+
 	$page->addComponent( $profileCmp );
 
 	$page->render();
