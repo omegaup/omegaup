@@ -68,22 +68,28 @@ class FormComponent implements GuiComponent{
 
 
 
+
+
 	/**
 	 * 
 	 * 
 	 * */
 	private function removeDuplicates(){
-		usort( $this->form_fields, array( "FormComponentField", "idSort"  ));
-		$top_i = 0;
 
+		$uniques = array();
+		$out = array();
 		
-		for ($i=1; $i < sizeof( $this->form_fields ); $i++) {
-			if( ( $this->form_fields[$i]->id != $this->form_fields[$top_i]->id) ){
-				$this->form_fields[++$top_i] = $this->form_fields[$i];
-			}
+
+		for ($i=0; $i < sizeof($this->form_fields); $i++) { 
+		
+			if(!array_key_exists($this->form_fields[$i]->id, $uniques)){
+				$uniques[ $this->form_fields[$i]->id ] = true;
+				array_push($out, $this->form_fields[$i]);
+			}		
 		}
+
+		$this->form_fields = $out;
 		
-		$this->form_fields =  array_slice( $this->form_fields, 0,  $top_i+1, true);
 		
 	}
 
@@ -99,7 +105,7 @@ class FormComponent implements GuiComponent{
 		$this->removeDuplicates();
 		
 		//sort fields by the necesary attribute
-		usort( $this->form_fields, array( "FormComponentField", "obligatorySort"  ));
+		//usort( $this->form_fields, array( "FormComponentField", "obligatorySort"  ));
 		
 		$html = "";
 
