@@ -50,6 +50,7 @@ object OmegaUp extends Actor with Log {
 						LiteralGrader.grade(run)
 					else {
 						val service = Manager.getRunner
+						var shouldRequeue = true
 					
 						try {
 							info("OU Compiling {}", id)
@@ -108,6 +109,18 @@ object OmegaUp extends Actor with Log {
 								Manager.updateVeredict(run)
 							}
 						} catch {
+							case e: java.net.ConnectException => {
+								shouldRequeue = false
+								
+								error("OU Submission {} failed for problem {} - Runner unavailable", e, id, alias)
+								
+								run.status = Status.Ready
+								run.veredict = Veredict.JudgeError
+								run.memory = 0
+								run.runtime = 0
+								run.score = 0
+								Manager.updateVeredict(run)
+							}
 							case e: Exception => {
 								error("OU Submission {} failed for problem {}", e, id, alias)
                                                                 error("Stack trace: {}", e.getStackTrace) 
@@ -120,7 +133,11 @@ object OmegaUp extends Actor with Log {
 								Manager.updateVeredict(run)
 							}
 						} finally {
-							Manager.addRunner(service)
+							if (shouldRequeue) {
+								Manager.addRunner(service)
+							} else {
+								Manager.grade(run.id)
+							}
 						}
 					}
 				}

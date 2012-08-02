@@ -20,4 +20,6 @@ class RunnerProxy(val hostname: String, val port: Int) extends RunnerService wit
 	def input(inputName: String, inputStream: InputStream, size: Int = -1): InputOutputMessage = {
 		Https.zip_send[InputOutputMessage](url + "/input/", inputStream, size, inputName)
 	}
+	
+	def ==(other: RunnerProxy) = hostname == other.hostname && port == other.port
 }
