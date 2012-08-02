@@ -57,7 +57,15 @@ class OmegaupComponentPage extends StdComponentPage{
 						
 						LoginController::login( $_POST["user"], null );
 						
-						die(header("Location: nativeLogin.php?auth=ok"));
+						//
+						Logger::log("redireccionando a auth=ok");
+
+
+						if(defined("FL")) {
+							die(header("Location: profile.php?auth=ok&fl=1" ));	
+						}
+
+						die(header("Location: profile.php?auth=ok&" . $_SERVER["QUERY_STRING"] ));
 
 					}else{
 						//login incorrecto
@@ -89,7 +97,7 @@ class OmegaupComponentPage extends StdComponentPage{
 			$this_user = LoginController::getCurrentUser();
 			
 			if(is_null($this_user)) {
-				die(header("Location: ." ));
+				//die(header("Location: ." ));
 			}
 			
 			$this->user_html_menu = '';

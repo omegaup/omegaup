@@ -42,6 +42,7 @@
 	if( !is_null($luser) && ($luser->getUserId() == $this_user->getUserId() ) ){
 		$profileCmp->setEditable(true);
 	}
+	
 	$page->addComponent( $profileCmp );
 
 	$page->render();
