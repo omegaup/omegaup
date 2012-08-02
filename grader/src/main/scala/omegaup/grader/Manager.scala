@@ -17,6 +17,11 @@ import Server._
 
 class RunnerEndpoint(val host: String, val port: Int) {
 	def ==(o: RunnerEndpoint) = host == o.host && port == o.port
+	override def hashCode() = 28227 + 97 * host.hashCode + port
+	override def equals(other: Any) = other match {
+		case x:RunnerEndpoint => host == x.host && port == x.port
+		case _ => false
+	}
 }
 
 object Manager extends Object with Log {
