@@ -476,11 +476,6 @@ object Runner extends RunnerService with Log with Using {
 		
 		info("Registering port {}", runnerConnector.getLocalPort())
 		
-		Https.send[RegisterOutputMessage, RegisterInputMessage](
-			Config.get("grader.register.url", "https://localhost:21680/register/"),
-			new RegisterInputMessage(runnerConnector.getLocalPort())
-		)
-		
 		Runtime.getRuntime.addShutdownHook(new Thread() {
 			override def run() = {
 				info("Shutting down")
@@ -497,6 +492,19 @@ object Runner extends RunnerService with Log with Using {
 				server.stop()
 			}
 		});
+		
+		new Thread() {
+			override def run() = {
+				while (true) {			
+					Https.send[RegisterOutputMessage, RegisterInputMessage](
+						Config.get("grader.register.url", "https://localhost:21680/register/"),
+						new RegisterInputMessage(runnerConnector.getLocalPort())
+					)
+					
+					Thread.sleep(5 * 60 * 1000)
+				}
+			}
+		}.start()
 	
 		server.join()
 	}
