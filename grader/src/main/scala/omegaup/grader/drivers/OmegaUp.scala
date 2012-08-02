@@ -136,6 +136,10 @@ object OmegaUp extends Actor with Log {
 							if (shouldRequeue) {
 								Manager.addRunner(service)
 							} else {
+								service match {
+									case proxy: omegaup.runner.RunnerProxy => Manager.deregister(proxy.hostname, proxy.port)
+									case _ => {}
+								}
 								Manager.grade(run.id)
 							}
 						}
