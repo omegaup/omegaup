@@ -21,5 +21,9 @@ class RunnerProxy(val hostname: String, val port: Int) extends RunnerService wit
 		Https.zip_send[InputOutputMessage](url + "/input/", inputStream, size, inputName)
 	}
 	
-	def ==(other: RunnerProxy) = hostname == other.hostname && port == other.port
+	override def hashCode() = 28227 + 97 * hostname.hashCode + port
+	override def equals(other: Any) = other match {
+		case x:RunnerProxy => hostname == x.hostname && port == x.port
+		case _ => false
+	}
 }
