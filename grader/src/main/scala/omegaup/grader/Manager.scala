@@ -15,8 +15,13 @@ import Veredict._
 import Validator._
 import Server._
 
+class RunnerEndpoint(val host: String, val port: Int) {
+	def ==(o: RunnerEndpoint) = host == o.host && port == o.port
+}
+
 object Manager extends Object with Log {
-	private var runnerQueue = new java.util.concurrent.LinkedBlockingQueue[RunnerService]()
+	private val registeredEndpoints = scala.collection.mutable.HashSet.empty[RunnerEndpoint]
+	private val runnerQueue = new java.util.concurrent.LinkedBlockingQueue[RunnerService]()
 
 	// Loading SQL connector driver
 	Class.forName(Config.get("db.driver", "org.h2.Driver"))
@@ -63,16 +68,32 @@ object Manager extends Object with Log {
 	}
 	
 	def register(host: String, port: Int): RegisterOutputMessage = {
-		info("Registering {}:{}", host, port)
+		val endpoint = new RunnerEndpoint(host, port)
 	
-		addRunner(new RunnerProxy(host, port))
+		synchronized (registeredEndpoints) {
+			if (!registeredEndpoints.contains(endpoint)) {
+				info("Registering {}:{}", endpoint.host, endpoint.port)
+				registeredEndpoints += endpoint
+				addRunner(new RunnerProxy(endpoint.host, endpoint.port))
+			}
+			endpoint
+		}
+				
 		new RegisterOutputMessage()
 	}
 	
 	def deregister(host: String, port: Int): RegisterOutputMessage = {
-		info("De-registering {}:{}", host, port)
+		val endpoint = new RunnerEndpoint(host, port)
 		
-		runnerQueue.remove((host, port))
+		synchronized (registeredEndpoints) {
+			if (!registeredEndpoints.contains(endpoint)) {
+				info("De-registering {}:{}", endpoint.host, endpoint.port)
+				registeredEndpoints -= endpoint
+				runnerQueue.remove(new RunnerProxy(endpoint.host, endpoint.port))
+			}
+			endpoint
+		}
+		
 		new RegisterOutputMessage()
 	}
 	
