@@ -128,7 +128,7 @@
     $reg_form->addField("email", "Email", "input", "", "email" );
     
     $reg_form->addField("pass", "Contrase&ntilde;a", "password", "", "pass" );
-    $reg_form->addField("pass2", "De nuevo", "password", "", "pass2" );
+    $reg_form->addField("pass2", "Repetir contrase&ntilde;a", "password", "", "pass2" );
 
     $reg_form->addField("", "", "hidden", "register", "request" );
     $reg_form->addSubmit("Registrar",  "nativeLogin.php", "POST");
