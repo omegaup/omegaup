@@ -45,8 +45,14 @@
 		    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
 		    $conn->debug = OMEGAUP_DB_DEBUG;
 		    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
-                    
+            
 		    if(!$conn) {
+		    	$conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
+	    		$conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
+	    	}
+
+
+	    	if(!$conn) {
 				/**
 				 * Dispatch missing parameters
 				 * */
@@ -61,8 +67,12 @@
 		    }
 		    $conn->SetCharSet('utf8');
 		    $conn->EXECUTE('SET NAMES \'utf8\';');
+		    
 		} catch (Exception $e) {
 			
+
+				
+
 			header('HTTP/1.1 500 INTERNAL SERVER ERROR');
 			
 			die(json_encode(array(
@@ -154,8 +164,8 @@
 	    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 
 	    if(!$conn) {
-
-			$GUI->prettyDie("No database");
+			$conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
+	    	$conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
 	    }
 
 	} catch (Exception $e) {
@@ -163,8 +173,6 @@
 			$GUI->prettyDie("No database");
 
 	}
-	
-	
 	
 	
 	

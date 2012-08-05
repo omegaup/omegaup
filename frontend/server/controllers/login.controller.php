@@ -101,7 +101,7 @@ class LoginController{
 				UsersDAO::save( $this_user );
 
 			}catch(Exception $e){
-				die($e);
+				Logger::error($e);
 				return false;
 
 			}
@@ -132,10 +132,13 @@ class LoginController{
 			
 			//save user so  his
 			//last_access gets updated
+			$this_user->setLastAccess(time());
+
 			try {
 				UsersDAO::save( $this_user );
 			} catch(Exception $e) {
-				die($e);
+				Logger::error($e);
+				
 				return false;
 			}
 		}
@@ -284,9 +287,9 @@ class LoginController{
 		//if he is still logged in, and he can call
 		//the api 
 		
-		self::login($fb_user_profile["email"]);
+		return self::login($fb_user_profile["email"]);
 
-		return true;
+		
 		
 	}
 
@@ -376,6 +379,7 @@ class LoginController{
 		if(self::isLoggedIn()){
 			$sm = self::getSessionManagerInstance();
 			$auth_token = $sm->GetCookie( "auth_token" );
+			
 			return AuthTokensDAO::getUserByToken($auth_token);
 			
 		}else
