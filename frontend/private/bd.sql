@@ -386,7 +386,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `problem_id` int(11) NOT NULL,
   `contest_id` int(11) DEFAULT NULL,
   `guid` char(32) NOT NULL,
-  `language` enum('c','cpp','java','py','rb','pl','cs','p') NOT NULL,
+  `language` enum('c','cpp','java','py','rb','pl','cs','p','kp','kj') NOT NULL,
   `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
   `veredict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL,
   `runtime` int(11) NOT NULL DEFAULT '0',
