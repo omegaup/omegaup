@@ -161,6 +161,11 @@ class ApiLoader
                 require_once('RemoveUserToPrivateContest.php');
                 $api = new RemoveUserToPrivateContest();
                 break;
+            
+            case 'GenerateOmiUsers':
+                require_once('GenerateOmiUsers.php');
+                $api = new GenerateOmiUsers();
+                break;
 
             default:
                 return self::NotFound();
