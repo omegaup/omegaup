@@ -36,13 +36,14 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         
         // Execute API
         $showContest = new ShowContest();
+        
         try
         {
             $return_array = $showContest->ExecuteApi();
         }
         catch(ApiException $e)
-        {                        
-            // Asume that the test is going to handle the exception
+        {     
+            // Intentionally eat exceptions.           
         }
         
         unset($_REQUEST["contest_id"]);

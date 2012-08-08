@@ -38,24 +38,40 @@ class LoginController{
 
 
 	static function testUserCredentials(
-		$email, 
+		$email_or_username, 
 		$pass
 	){
-		Logger::log("Testing user " . $email);
-		$email_query = new Emails();
-		$email_query->setEmail( $email );
-		
-		$result = EmailsDAO::search( $email_query );
+                Logger::log("Testing user via username:" . $email_or_username);
+                $user_query = new Users();
+                $user_query->setUsername( $email_or_username );        
+                $results = UsersDAO::search( $user_query );
+
+                if(sizeof($results) === 1)
+                {
+                              
+                    Logger::log("User was found via username.");
+                    $this_user = $results[0];                
+
+                }
+                else
+                {
+                    Logger::log("Not found via username. Testing user via email" . $email_or_username);
+                    $email_query = new Emails();
+                    $email_query->setEmail( $email_or_username );
+
+                    $result = EmailsDAO::search( $email_query );
 
 
-		if( sizeof($result) == 0)
-		{
-			//email does not even exist
-			return false;
-		}
+                    if( sizeof($result) == 0)
+                    {
+                            //email does not even exist
+                            Logger::log("User was not found via email. Failing testUserCredentials()");
+                            return false;
+                    }
 
-
-		$this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
+                    Logger::log("User was found via email.");
+                    $this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
+                }
 
 		//test passwords
 		return $this_user->getPassword() === md5( $pass ) ;
@@ -70,75 +86,95 @@ class LoginController{
 	 * 
 	 * */
 	static function login(
-		$email, 
+		$email_or_username, 
 		$google_token = null
 	){
 		Logger::log("LoginController::Login() started...");
 		
-		//google says valid user, look for it in email's table
-		$email_query = new Emails();
-		$email_query->setEmail( $email );
-		
-		$result = EmailsDAO::search( $email_query );
-		$this_user = null;
+                Logger::log("Loging user via username:" . $email_or_username);
+                $user_query = new Users();
+                $user_query->setUsername( $email_or_username );        
+                $results = UsersDAO::search( $user_query );
+
+                if(sizeof($results) === 1)
+                {
+                              
+                    Logger::log("User was found via username.");
+                    $this_user = $results[0];                
+
+                }
+                else
+                {
+                
+                    //google says valid user, look for it in email's table
+                    $email_query = new Emails();
+                    $email_query->setEmail( $email_or_username );
+
+                    $result = EmailsDAO::search( $email_query );
+                    $this_user = null;
 
 
-		if( sizeof($result) == 0)
-		{
-			
-		
+                    if( sizeof($result) == 0)
+                    {
+                            // WARNING: Following code asumes that we have an email
+                            $email = $email_or_username;
 
-			//create user
-			$this_user 	= new Users();
-			$this_user->setUsername( $email );
-			$this_user->setSolved( 0 );			
-			$this_user->setSubmissions( 0 );
-			
-			
-			
-			//save this user
-			try{
-				UsersDAO::save( $this_user );
 
-			}catch(Exception $e){
-				die($e);
-				return false;
+                            //create user
+                            $this_user 	= new Users();
+                            $this_user->setUsername( $email );
+                            $this_user->setSolved( 0 );			
+                            $this_user->setSubmissions( 0 );
 
-			}
-			
-			
-			//create email
-			$this_user_email = new Emails();
-			$this_user_email ->setUserId( $this_user->getUserId() );
-			$this_user_email ->setEmail( $email );
-			
-			//save this user
-			try{
-				EmailsDAO::save( $this_user_email );
 
-			}catch(Exception $e){
-				die($e);
-				return false;
 
-			}
-			
-			
-			//$this_user->setEmailId( -1 );
-						
-		}else{
+                            //save this user
+                            try{
+                                    UsersDAO::save( $this_user );
 
-			// he's been here man !
-			$this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
-			
-			//save user so  his
-			//last_access gets updated
-			try {
-				UsersDAO::save( $this_user );
-			} catch(Exception $e) {
-				die($e);
-				return false;
-			}
-		}
+                            }catch(Exception $e){
+                                    Logger::error($e);
+                                    return false;
+
+                            }
+
+
+                            //create email
+                            $this_user_email = new Emails();
+                            $this_user_email ->setUserId( $this_user->getUserId() );
+                            $this_user_email ->setEmail( $email );
+
+                            //save this user
+                            try{
+                                    EmailsDAO::save( $this_user_email );
+
+                            }catch(Exception $e){
+                                    die($e);
+                                    return false;
+
+                            }
+
+
+                            //$this_user->setEmailId( -1 );
+
+                    }else{
+
+                            // he's been here man !
+                            $this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
+
+                            //save user so  his
+                            //last_access gets updated
+                            $this_user->setLastAccess(time());
+
+                            try {
+                                    UsersDAO::save( $this_user );
+                            } catch(Exception $e) {
+                                    Logger::error($e);
+
+                                    return false;
+                            }
+                    }
+                }
 		
 
 		/**
@@ -284,9 +320,9 @@ class LoginController{
 		//if he is still logged in, and he can call
 		//the api 
 		
-		self::login($fb_user_profile["email"]);
+		return self::login($fb_user_profile["email"]);
 
-		return true;
+		
 		
 	}
 
@@ -376,6 +412,7 @@ class LoginController{
 		if(self::isLoggedIn()){
 			$sm = self::getSessionManagerInstance();
 			$auth_token = $sm->GetCookie( "auth_token" );
+			
 			return AuthTokensDAO::getUserByToken($auth_token);
 			
 		}else

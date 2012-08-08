@@ -31,7 +31,7 @@ class UserProfileComponent implements GuiComponent{
 
 			oU.UserEdit(null, 
 				$("#name").val(),
-				$("#email").val(),
+				null, //$("#email").val(),
 				$("#birthDate").val(),
 				$("#school").val(),
 				null,
@@ -73,9 +73,9 @@ class UserProfileComponent implements GuiComponent{
 		$pEmail = EmailsDAO::getByPK( $this->user->getMainEmailId() );
 
 		$df->addField( "name", "Nombre", "text", 					$this->user->getName() );
-		$df->addField( "email", "Correo electronico", "text", 		$pEmail->getEmail() );
+		//$df->addField( "email", "Correo electronico", "text", 		$pEmail->getEmail() );
 		$df->addField( "birthDate", "Fecha de nacimiento", "date", 	$this->user->getBirthDate() );
-		$df->addField( "school", "Fecha de nacimiento", "date", 	$this->user->getSchoolId() );
+		$df->addField( "school", "Escuela", "text", 	$this->user->getSchoolId() );
 		$df->addOnClick("Continuar", "continuar()");
 
 		echo $df->renderCmp();
@@ -144,12 +144,12 @@ class UserProfileComponent implements GuiComponent{
 						var oU = oU || new OmegaUp (); 
 
 						oU.UserEdit(null, 
-							null, //$("#name").val(),
+							$("#ename").val(),
 							null, //$("#email").val(),
 							null, //$("#birthDate").val(),
-							null, //$("#school").val(),
-							$("#password").val(),
-							$("#oldPassword").val(),
+							$("#eschool").val(),
+							$("#password").val().length == 0 ? null : $("#password").val().length(),
+							$("#oldPassword").val().length == 0 ? null : $("#oldPassword").val().length(),
 
 							function(data){ 
 								if(data.status == "error"){
@@ -212,7 +212,20 @@ class UserProfileComponent implements GuiComponent{
 		?>
 			
 			<table border="0" id="editable_form" style="display:none;">
-				
+				<tr>
+
+					<td>Nombre</td>  
+					<td><input type="text" id="ename" value="<?php echo $this->user->getName(); ?>"></td>
+
+					<!--<td>Escuela</td>  
+					<td><input type="text" id="eschool" ></td>
+				-->
+				</tr>
+
+
+				<tr>
+					<td colspan=4><hr></td>
+				</tr>
 				<tr>
 
 					<td>Password</td>  

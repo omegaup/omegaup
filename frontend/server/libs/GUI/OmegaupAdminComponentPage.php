@@ -8,6 +8,19 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 	function __construct()
 	{
 
+		//must be logged in
+		if( !LoginController::isLoggedIn() ){
+			header("HTTP/1.1 403 Forbidden");
+			exit;
+		}
+
+		$user_id = LoginController::getCurrentUser()->getUserId();
+		
+		if( !Authorization::IsSystemAdmin($user_id) ){
+			header("HTTP/1.1 403 Forbidden");
+			exit;	
+		}
+
 
 		//check out permissions
 

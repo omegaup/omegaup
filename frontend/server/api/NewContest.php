@@ -16,9 +16,9 @@ require_once("ApiHandler.php");
 
 class NewContest extends ApiHandler
 {
-	private $private_users_list;
-	private $problems;
-
+    private $private_users_list;
+    private $problems;
+    private $hasPrivateUsers = false;
     
     protected function RegisterValidatorsToRequest()
     {  
@@ -90,32 +90,28 @@ class NewContest extends ApiHandler
                 
         // Validate private_users request, only if the contest is private    
 
-        /*
-        if(RequestContext::get("public") == 0)
-        {
-            if(is_null(RequestContext::get("private_users")))
+        
+        if(RequestContext::get("public") == 0 && !is_null(RequestContext::get("private_users")))
+        {            
+            // Validate that the request is well-formed
+            $this->private_users_list = json_decode(RequestContext::get("private_users"));
+            if (is_null($this->private_users_list))
             {
-               throw new ApiException( ApiHttpErrors::invalidParameter("If the Contest is not Public, private_users is required") );    
-            }
-            else
+               throw new ApiException( ApiHttpErrors::invalidParameter("private_users is malformed") );    
+            }                
+
+            // Validate that all users exists in the DB
+            foreach($this->private_users_list as $userkey)
             {
-                // Validate that the request is well-formed
-                $this->private_users_list = json_decode(RequestContext::get("private_users"));
-                if (is_null($this->private_users_list))
+                if (is_null(UsersDAO::getByPK($userkey)))
                 {
-                   throw new ApiException( ApiHttpErrors::invalidParameter("private_users is malformed") );    
-                }                
-                
-                // Validate that all users exists in the DB
-                foreach($this->private_users_list as $userkey)
-                {
-                    if (is_null(UsersDAO::getByPK($userkey)))
-                    {
-                       throw new ApiException( ApiHttpErrors::invalidParameter("private_users contains a user that doesn't exists") );    
-                    }
-                }                               
-            }
-	    }*/
+                   throw new ApiException( ApiHttpErrors::invalidParameter("private_users contains a user that doesn't exists") );    
+                }
+            }  
+            
+            // Turn on flag to add private users later
+            $this->hasPrivateUsers = true;
+        }
 
         // Problems is optional
         if (!is_null(RequestContext::get('problems')))
@@ -175,7 +171,7 @@ class NewContest extends ApiHandler
             // Save the contest object with data sent by user to the database
             ContestsDAO::save($contest);
                         
-            /*// If the contest is private, add the list of allowed users
+            // If the contest is private, add the list of allowed users
             if (RequestContext::get("public") == 0)
             {
                 foreach($this->private_users_list as $userkey)
@@ -192,9 +188,9 @@ class NewContest extends ApiHandler
                     // Save the relationship in the DB
                     ContestsUsersDAO::save($temp_user_contest);
                 }
-	        }*/
+            }
 
-            if (!is_null(RequestContext::get('problems')))
+            if (!is_null(RequestContext::get('problems')) && $this->hasPrivateUsers)
             {                
                 foreach ($this->problems as $problem)
                 {
