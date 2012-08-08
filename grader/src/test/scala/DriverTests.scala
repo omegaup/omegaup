@@ -250,6 +250,155 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				return EXIT_SUCCESS;
 			}
 		""")
+
+		omegaUpSubmit(5, Language.KarelJava, """
+class program {
+
+void turn(n) { iterate(n) turnleft(); }
+
+void avanza()
+{
+	
+
+   if (frontIsClear)
+   {
+      move();
+   }
+   else
+   {
+       turn(2);
+       while(frontIsClear)
+          move();
+       turn(3);
+       if (frontIsClear)
+       {
+          move();
+          turn(3);
+       }
+   }
+}
+
+void recur(n)
+{
+   if (notFacingNorth)
+   {
+     recuerdame(n);
+     regresa();
+   }
+   else
+   {
+     turn(3);
+     while(frontIsClear)
+     {
+         move();
+     }
+     turn(2);
+   }
+}
+
+void regresa()
+{
+  if(frontIsClear)
+  {
+     move();
+  }
+  else
+  {
+     turn(1);
+     move();
+     turnleft();
+     while(frontIsClear)
+       move();
+     turn(2);
+  }
+}
+
+void crece(n)
+{
+   if(!iszero(n))
+   {
+      iterate(4)
+      {
+         if (frontIsClear)
+         {
+             move();
+             if (notNextToABeeper)
+             {
+                putbeeper();
+             }
+             crece(pred(n));
+             turn(2);
+             move();
+             turn(2);
+         }
+         turnleft();
+      }
+   }
+}
+
+void recuerdame(n)
+{
+   if (nextToABeeper)
+   {
+      avanza();
+      recur(n);
+      crece(n);
+   }
+   else
+   {
+      avanza();
+      recur(n);
+   }
+}
+
+void cuenta(n)
+{
+   if (nextToABeeper)
+   {
+      pickbeeper();
+      cuenta(succ(n));
+   }
+   else
+   {
+      while(notFacingEast)
+         turnleft();
+      recuerdame(n);
+   }
+}
+
+void recoge()
+{
+    if (notFacingNorth)
+    {
+       avanza();
+       if (nextToABeeper)
+       {
+          pickbeeper();
+          recoge();
+          putbeeper();
+       }
+       else
+       {
+          recoge();
+       }
+    }else
+    {
+       turn(2);
+       while(frontIsClear)
+          move();
+    }
+}
+
+program() {
+    cuenta(0);
+    while(notFacingEast)
+       turnleft();
+    recoge();
+    turnoff();
+}
+
+}
+		""")
 	
 		try { Thread.sleep(30000) }
 		
@@ -304,6 +453,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		run.contest_score should equal (0)
 
 		run = GraderData.run(9).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.Accepted)
+		run.score should equal (1)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(10).get
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.Accepted)
 		run.score should equal (1)

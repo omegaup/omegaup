@@ -31,6 +31,8 @@ object Language extends Enumeration {
 	val  Perl = Value(6, "pl")
 	val  CSharp = Value(7, "cs")
 	val  Pascal = Value(8, "p")
+	val  KarelPascal = Value(9, "kp")
+	val  KarelJava = Value(10, "kj")
 }
 
 object Status extends Enumeration {

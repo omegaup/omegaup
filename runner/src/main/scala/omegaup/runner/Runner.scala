@@ -180,7 +180,7 @@ object Runner extends RunnerService with Log with Using {
 							List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", Config.get("py.runtime.path", "/usr/bin/python"), "Main.py")
 						case "kp" =>
 							List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("-p", casesDirectory.getCanonicalPath + "/", "--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-p1", x.getCanonicalPath.replace(".in", ".kw"), "-p2", "Main.kx")
-						case "kc" =>
+						case "kj" =>
 							List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("-p", casesDirectory.getCanonicalPath + "/", "--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-p1", x.getCanonicalPath.replace(".in", ".kw"), "-p2", "Main.kx")
 					}
 
