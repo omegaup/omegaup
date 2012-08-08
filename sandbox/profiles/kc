@@ -11,8 +11,6 @@
 -s getrlimit
 -s time
 -s flock
--s sched_setscheduler
--s madvise
 
 -p /proc/self/exe
 -p /etc/timezone

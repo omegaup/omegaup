@@ -17,4 +17,5 @@
 -p /proc/self/exe
 -p /etc/timezone
 -p /usr/share/zoneinfo/
+-p /dev/stdin
 -p ./=rw
