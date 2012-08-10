@@ -44,6 +44,10 @@ object Runner extends RunnerService with Log with Using {
 				List(sandbox, "-S", profile + "/fpc") ++ commonParams ++ List("--", Config.get("p.compiler.path", "/usr/bin/fpc"), "-Tlinux") ++ inputFiles
 			case "py" =>
 				List(sandbox, "-S", profile + "/pyc") ++ commonParams ++ List("--", Config.get("py.compiler.path", "/usr/bin/python"), "-m", "py_compile") ++ inputFiles
+			case "kj" =>
+				List(sandbox, "-S", profile + "/kc") ++ commonParams ++ List("--", Config.get("kcl.compiler.path", "/usr/bin/kcl"), "-lj", "-o", "Main.kx", "-c") ++ inputFiles
+			case "kp" =>
+				List(sandbox, "-S", profile + "/kc") ++ commonParams ++ List("--", Config.get("kcl.compiler.path", "/usr/bin/kcl"), "-lp", "-o", "Main.kx", "-c") ++ inputFiles
 			case _ => null
 		}
 
@@ -173,7 +177,11 @@ object Runner extends RunnerService with Log with Using {
 						case "p" =>
 							List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main")
 						case "py" =>
-							List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "/usr/bin/python", "Main.py")
+							List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", Config.get("py.runtime.path", "/usr/bin/python"), "Main.py")
+						case "kp" =>
+							List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("-p", casesDirectory.getCanonicalPath + "/", "--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-p1", x.getCanonicalPath.replace(".in", ".kw"), "-p2", "Main.kx")
+						case "kj" =>
+							List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("-p", casesDirectory.getCanonicalPath + "/", "--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-p1", x.getCanonicalPath.replace(".in", ".kw"), "-p2", "Main.kx")
 					}
 
 					debug("Run {}", params.mkString(" "))

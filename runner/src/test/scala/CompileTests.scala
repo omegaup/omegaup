@@ -163,6 +163,12 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       new CaseData("je", "0")
     ))), new File(zipRoot.getCanonicalPath + "/test7.zip"))
 
+    val test7 = Runner.compile(CompileInputMessage("kj", List("foo")))
+    test7.status should not equal ("ok")
+
+    val test8 = Runner.compile(CompileInputMessage("kj", List("class program { program() { while(notFacingEast) turnleft(); pickbeeper(); turnoff(); } }")))
+    test8.status should equal ("ok")
+
     val test5 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { double a, b; scanf(\"%lf %lf\", &a, &b); printf(\"%lf\\n\", a + b); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { FILE* data = fopen(\"data.in\", \"r\"); double a, b, answer, user; fscanf(data, \"%lf %lf\", &a, &b); scanf(\"%lf\", &user); answer = a*a + b*b; printf(\"%lf\\n\", 1.0 / (1.0 + (answer - user) * (answer - user))); return 0; }"))))
     test5.status should equal ("ok")
     test5.token should not equal None
