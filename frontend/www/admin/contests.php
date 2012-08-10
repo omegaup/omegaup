@@ -13,13 +13,48 @@
 
 	require_once( "../../server/inc/bootstrap.php" );
 
+	require_once( "api/ShowContests.php");
+
 
     $page = new OmegaupAdminComponentPage();
 
     $page->addComponent( new TitleComponent("Concursos"));
 
     
-    
+     //get the'm contests
+	$header = array( 
+		      "description"	=>"Descripcion",
+		      "start_time"	=>"Tiempo de inicio",
+		      "finish_time"	=>"Tiempo de fin"
+		      //"public"		=>"public",
+		      //"director_id"	=>"director_id"
+		 );
+
+	$rows = ContestsDAO::getAll();
+	
+	$table = new TableComponent( $header, $rows );
+	
+
+	
+
+	function toDate( $unix_time ){
+		if(strlen($unix_time) == 0) return "";
+		return $unix_time;
+		return date( "F jS h:i:s a", $unix_time);
+	}
+	
+	function toBold($f, $row){
+		
+		return "<h3 style='margin:0px; padding:0px'>" . $row["title"] . "</h3>" ;
+	}
+	
+	$table->addColRender( "start_time", 	"toDate" );
+	$table->addColRender( "finish_time", 	"toDate" );
+	$table->addColRender( "alias", 			"toBold");
+	$table->addOnClick( "alias", "(function(alias){window.location ='contest.php?alias='+alias;})" );
+	
+	$page->addComponent( $table );
+	
 
 	$page->addComponent( new NewContestFormComponent() );
 
