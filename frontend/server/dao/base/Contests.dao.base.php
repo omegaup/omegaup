@@ -12,6 +12,8 @@
 abstract class ContestsDAOBase extends DAO
 {
 
+        public static $useDAOCache = true;
+        
 		private static $loadedRecords = array();
 
 		private static function recordExists(  $contest_id ){
@@ -64,7 +66,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $contest_id )
 	{
-		if(self::recordExists(  $contest_id)){
+		if(self::recordExists(  $contest_id) && self::$useDAOCache == true){
 			return self::getRecord( $contest_id );
 		}
 		$sql = "SELECT * FROM Contests WHERE (contest_id = ? ) LIMIT 1;";

@@ -166,6 +166,11 @@ class ApiLoader
                 require_once('GenerateOmiUsers.php');
                 $api = new GenerateOmiUsers();
                 break;
+            
+            case 'UpdateContest':
+                require_once('UpdateContest.php');
+                $api = new UpdateContest();
+                break;
 
             default:
                 return self::NotFound();

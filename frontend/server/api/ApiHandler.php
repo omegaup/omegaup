@@ -7,6 +7,7 @@ require_once(SERVER_PATH ."/libs/ApiExposedProperty.php");
 require_once(SERVER_PATH ."/libs/ApiHttpErrors.php");
 require_once(SERVER_PATH ."/libs/ApiException.php");
 require_once(SERVER_PATH . "/libs/ValidatorFactory.php");
+require_once(SERVER_PATH ."/libs/Authorization.php");
 require_once("controllers/login.controller.php");
 
 /*

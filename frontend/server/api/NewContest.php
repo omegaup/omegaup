@@ -172,7 +172,7 @@ class NewContest extends ApiHandler
             ContestsDAO::save($contest);
                         
             // If the contest is private, add the list of allowed users
-            if (RequestContext::get("public") == 0)
+            if (RequestContext::get("public") == 0 && $this->hasPrivateUsers)
             {
                 foreach($this->private_users_list as $userkey)
                 {
@@ -190,7 +190,7 @@ class NewContest extends ApiHandler
                 }
             }
 
-            if (!is_null(RequestContext::get('problems')) && $this->hasPrivateUsers)
+            if (!is_null(RequestContext::get('problems')))
             {                
                 foreach ($this->problems as $problem)
                 {
@@ -223,7 +223,7 @@ class NewContest extends ApiHandler
             }
         }
         
-        Logger::log("New Contest Created: ". RequestContext::get('title'));        
+        Logger::log("New Contest Created: ". RequestContext::get('alias'));        
     }    
 }
 
