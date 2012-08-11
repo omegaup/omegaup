@@ -45,20 +45,27 @@ class UpdateContest extends ApiHandler
             throw new ApiException( ApiHttpErrors::invalidParameter("Contest alias specified does not exists.") );
         }
         
+        
         // Is the user authorized?
         if (!Authorization::IsContestAdmin($this->_user_id, $this->contest))
         {
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }
-                     
-        ValidatorFactory::stringNotEmptyValidator()->validate(
-                RequestContext::get("title"),
-                "title");        
+           
+        if (!is_null(RequestContext::get("title")))
+        {
+            ValidatorFactory::stringNotEmptyValidator()->validate(
+                    RequestContext::get("title"),
+                    "title");        
+        }
                 
-        ValidatorFactory::stringNotEmptyValidator()->validate(
-            RequestContext::get("description"),
-            "description");        
-        
+        if (!is_null(RequestContext::get("description")))
+        {
+            ValidatorFactory::stringNotEmptyValidator()->validate(
+                RequestContext::get("description"),
+                "description");        
+        }
+
         
 	/*	
         ValidatorFactory::dateRangeValidator(
@@ -68,7 +75,14 @@ class UpdateContest extends ApiHandler
 	 */
         
         // Calculate contest length:
-        $contest_length = RequestContext::get("finish_time") - RequestContext::get("start_time");
+        if (!is_null(RequestContext::get("finish_time")) && !is_null(RequestContext::get("start_time")))
+        {
+            $contest_length = RequestContext::get("finish_time") - RequestContext::get("start_time");
+        }
+        else
+        {
+            $contest_length = $this->contest->getFinishTime() - $this->contest->getStartTime();
+        }
 
         // Window_length is optional
         if(!is_null(RequestContext::get("window_length")) && RequestContext::get("window_length") != "NULL")
@@ -79,43 +93,66 @@ class UpdateContest extends ApiHandler
                     ->validate(RequestContext::get("window_length"), "window_length");
         }
 
+        if (!is_null(RequestContext::get("public")))
+        {
+            ValidatorFactory::numericValidator()->validate(
+                    RequestContext::get("public"),
+                    "public");                
+        }
                 
-        ValidatorFactory::numericValidator()->validate(
-                RequestContext::get("public"),
-                "public");                
-                
-        
-        ValidatorFactory::numericRangeValidator(0, 100)->validate(
-                RequestContext::get("scoreboard"), 
-                "scoreboard");
-        
-        ValidatorFactory::numericRangeValidator(0, 1)->validate(
-                RequestContext::get("points_decay_factor"), "points_decay_factor");
-        
-        ValidatorFactory::numericValidator()->validate(
-                RequestContext::get("partial_score"), "partial_score");
-        
-        ValidatorFactory::numericRangeValidator(0, $contest_length)
-                ->validate(RequestContext::get("submissions_gap"), "submissions_gap");
-        
-        ValidatorFactory::enumValidator(array("no", "yes", "partial"))
-                ->validate(RequestContext::get("feedback"), "feedback");
+        if (!is_null(RequestContext::get("scoreboard")))
+        {
+            ValidatorFactory::numericRangeValidator(0, 100)->validate(
+                    RequestContext::get("scoreboard"), 
+                    "scoreboard");
+        }
 
-	
-        ValidatorFactory::numericRangeValidator(0, INF)
-		->validate(RequestContext::get("penalty"), "penalty");
-	
+        if (!is_null(RequestContext::get("points_decay_factor")))
+        {
+            ValidatorFactory::numericRangeValidator(0, 1)->validate(
+                    RequestContext::get("points_decay_factor"), "points_decay_factor");
+        }
         
-        ValidatorFactory::enumValidator(array("contest", "problem", "none"))
-                ->validate(RequestContext::get("penalty_time_start"), "penalty_time_start");
+        if (!is_null(RequestContext::get("partial_score")))
+        {
+            ValidatorFactory::numericValidator()->validate(
+                    RequestContext::get("partial_score"), "partial_score");
+        }
         
-        ValidatorFactory::enumValidator(array("sum", "max"))
-                ->validate(RequestContext::get("penalty_calc_policy"), "penalty_calc_policy");
+        if (!is_null(RequestContext::get("submissions_gap")))
+        {        
+            ValidatorFactory::numericRangeValidator(0, $contest_length)
+                    ->validate(RequestContext::get("submissions_gap"), "submissions_gap");
+        }
+        
+        if (!is_null(RequestContext::get("feedback")))
+        {
+            ValidatorFactory::enumValidator(array("no", "yes", "partial"))
+                    ->validate(RequestContext::get("feedback"), "feedback");
+        }
+
+	if (!is_null(RequestContext::get("penalty")))
+        {
+            ValidatorFactory::numericRangeValidator(0, INF)
+                    ->validate(RequestContext::get("penalty"), "penalty");
+        }
+	
+        if (!is_null(RequestContext::get("penalty_time_start")))
+        {
+            ValidatorFactory::enumValidator(array("contest", "problem", "none"))
+                    ->validate(RequestContext::get("penalty_time_start"), "penalty_time_start");
+        }
+        
+        if (!is_null(RequestContext::get("penalty_calc_policy")))
+        {
+            ValidatorFactory::enumValidator(array("sum", "max"))
+                    ->validate(RequestContext::get("penalty_calc_policy"), "penalty_calc_policy");
+        }
                 
         
         // Validate private_users request, only if the contest is private            
         // If the contest is private, it may contain private users
-        if(RequestContext::get("public") == 0 && !is_null(RequestContext::get("private_users")))
+        if(!is_null(RequestContext::get("public")) && RequestContext::get("public") == 0 && !is_null(RequestContext::get("private_users")))
         {               
             // Validate that the request is well-formed
             $this->private_users_list = json_decode(RequestContext::get("private_users"));
@@ -143,7 +180,8 @@ class UpdateContest extends ApiHandler
             $this->problems = array();
             $this->problems_id = array();
             
-            foreach (json_decode(RequestContext::get('problems')) as $problem) {
+            foreach (json_decode(RequestContext::get('problems')) as $problem) 
+            {
                     $p = ProblemsDAO::getByAlias($problem->problem);
                     array_push($this->problems_id, $p->getProblemId());
                     
@@ -159,24 +197,78 @@ class UpdateContest extends ApiHandler
     {                
         
         // Update contest DAO                
-        $this->contest->setPublic(RequestContext::get("public"));
+        if (!is_null(RequestContext::get("public")))
+        {
+            $this->contest->setPublic(RequestContext::get("public"));
+        }
         
-        $this->contest->setTitle(RequestContext::get("title"));
-	$this->contest->setDescription(RequestContext::get("description"));        
-        $this->contest->setStartTime(gmdate('Y-m-d H:i:s', RequestContext::get("start_time")));        
-        $this->contest->setFinishTime(gmdate('Y-m-d H:i:s', RequestContext::get("finish_time")));
-        $this->contest->setWindowLength(RequestContext::get("window_length") == "NULL" ? NULL : RequestContext::get("window_length"));
+        if (!is_null(RequestContext::get("title")))
+        {
+            $this->contest->setTitle(RequestContext::get("title"));
+        }
+        
+        if (!is_null(RequestContext::get("description")))
+        {
+            $this->contest->setDescription(RequestContext::get("description"));        
+        }
+        
+        if (!is_null(RequestContext::get("start_time")))
+        {
+            $this->contest->setStartTime(gmdate('Y-m-d H:i:s', RequestContext::get("start_time")));        
+        }
+        
+        if (!is_null(RequestContext::get("finish_time")))
+        {        
+            $this->contest->setFinishTime(gmdate('Y-m-d H:i:s', RequestContext::get("finish_time")));
+        }
+        
+        if (!is_null(RequestContext::get("window_length")))
+        {
+            $this->contest->setWindowLength(RequestContext::get("window_length") == "NULL" ? NULL : RequestContext::get("window_length"));
+        }
+                
         $this->contest->setDirectorId($this->_user_id);        
         $this->contest->setRerunId(0); // NYI
                 
-        $this->contest->setScoreboard(RequestContext::get("scoreboard"));
-        $this->contest->setPointsDecayFactor(RequestContext::get("points_decay_factor"));
-        $this->contest->setPartialScore(RequestContext::get("partial_score"));
-        $this->contest->setSubmissionsGap(RequestContext::get("submissions_gap"));
-        $this->contest->setFeedback(RequestContext::get("feedback"));
-        $this->contest->setPenalty(max(0, intval(RequestContext::get("penalty"))));
-        $this->contest->setPenaltyTimeStart(RequestContext::get("penalty_time_start"));
-        $this->contest->setPenaltyCalcPolicy(RequestContext::get("penalty_calc_policy"));                
+        if (!is_null(RequestContext::get("scoreboard")))
+        {
+            $this->contest->setScoreboard(RequestContext::get("scoreboard"));
+        }
+        
+        if (!is_null(RequestContext::get("points_decay_factor")))
+        {
+            $this->contest->setPointsDecayFactor(RequestContext::get("points_decay_factor"));
+        }
+        
+        if (!is_null(RequestContext::get("partial_score")))
+        {
+            $this->contest->setPartialScore(RequestContext::get("partial_score"));
+        }
+        
+        if (!is_null(RequestContext::get("submissions_gap")))
+        {
+            $this->contest->setSubmissionsGap(RequestContext::get("submissions_gap"));
+        }
+        
+        if (!is_null(RequestContext::get("feedback")))
+        {
+            $this->contest->setFeedback(RequestContext::get("feedback"));
+        }
+        
+        if (!is_null(RequestContext::get("penalty")))
+        {
+            $this->contest->setPenalty(max(0, intval(RequestContext::get("penalty"))));
+        }
+        
+        if (!is_null(RequestContext::get("penalty_time_start")))
+        {            
+            $this->contest->setPenaltyTimeStart(RequestContext::get("penalty_time_start"));
+        }
+        
+        if (!is_null(RequestContext::get("penalty_calc_policy")))
+        {
+            $this->contest->setPenaltyCalcPolicy(RequestContext::get("penalty_calc_policy"));                
+        }
         
         // Push changes
         try
@@ -188,7 +280,7 @@ class UpdateContest extends ApiHandler
             ContestsDAO::save($this->contest);
                         
             // If the contest is private, add the list of allowed users
-            if (RequestContext::get("public") == 0 && $this->hasPrivateUsers)
+            if (!is_null(RequestContext::get("public")) && RequestContext::get("public") == 0 && $this->hasPrivateUsers)
             {
                 // Get current users
                 $cu_key = new ContestsUsers( array ("contest_id" => $this->contest->getContestId()));
