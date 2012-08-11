@@ -107,21 +107,93 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 
 			
 			<link rel="stylesheet" type="text/css" href="../css/style.css">
+			<style type="text/css">
+
+table.tabs{
+	margin-left: -50px !important;
+	
+}
 
 
+	table.tabs td{
+		width:84px;
+		height: 48px;
+		background-image: url(../media/tab_a.png);
+		border:0px !important;
+		margin:0px;
+		padding:0px;
+		
+	}
+
+	table.tabs td a{
+		color:black;
+		text-decoration:none;
+		padding-left:5px;
+	}
+
+	table.tabs td:hover{
+		color:white;
+		height: 48px;
+		background-image: url(../media/tab_b.png);
+		width:84px;
+	}
+
+	table.tabs td:hover a{
+		color:white;
+		text-decoration:none;
+		
+	}
+
+	table.tabs td.selected{
+		color:white;
+		height: 48px;
+		background-image: url(../media/tab_c.png);
+		width:84px;
+	}
+
+	table.tabs td.selected a{
+		color:white;
+		text-decoration:none;
+	}
+
+
+	table.tabs td.dummy{
+
+		color:white;
+		height: 48px;
+		background-image: url(../media/tab_a.png);
+		width:700px;
+	}
+
+	table.tabs td.dummy:hover{
+	
+	}
+
+</style>
+<!--
             <script type="text/javascript" src="../js/jquery.js"></script>
             <script type="text/javascript" src="../js/jquery-autocomplete.js"></script>
 
 			<link rel="stylesheet" type="text/css" href="../css/jquery-ui-1.8.16.custom.css">
 			<link rel="stylesheet" type="text/css" href="../css/jquery-ui-timepicker-addon.css">			
-						
+-->
+
+
+
+			<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+			<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+			<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+
+
+
 
 <!--			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>-->
 			<!--<script type="text/javascript" src="../js/jquery-ui-1.8.16.custom.min.js"></script>
 			<script type="text/javascript" src="../js/jquery-ui-sliderAccess.js"></script>
 			<script type="text/javascript" src="../js/jquery-ui-timepicker-addon.js"></script>-->
 
-			<script type="text/javascript" src="../js/omegaup.js"></script>
+
 
 
 			<title>OmegaUp Admin Pages</title>
@@ -195,6 +267,7 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 				</script>
 
 			<?php } ?>
+			<script type="text/javascript" src="../js/omegaup.js"></script>
 			</body>
 		</html>
 		<?php
@@ -205,3 +278,159 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ class OmegaupAdminTabPage extends OmegaupAdminComponentPage{
+ 	
+
+ 	private $tabs;
+ 	private $tab_index;
+ 	private $before_tabbing_cmps;
+ 	
+
+ 	public function __construct( $title = "OmegupAmdin" ){
+ 		parent::__construct( $title );
+ 		$this->page_title = $title;
+ 		$this->tabs = array();
+ 		$this->tab_index = -1;
+ 		$this->before_tabbing_cmps = array();
+
+ 	}
+
+ 	public function nextTab( $title, $icon = null ){
+
+ 		$this->tabs[ ++$this->tab_index ] = array( "title" => $title, "icon" => $icon, "components" => array( ) );
+ 		
+ 	}
+
+ 	public function addComponent( $cmp ){
+
+ 		if($this->tab_index == -1){
+ 			array_push( $this->before_tabbing_cmps , $cmp );
+ 			return;
+ 		}
+
+ 		if(!isset($this->tabs[$this->tab_index])){
+ 			$this->tabs[$this->tab_index] = array();
+ 		}
+ 		
+ 		array_push($this->tabs[$this->tab_index]["components"], $cmp);
+ 	}
+
+ 	public function render(){
+
+ 		
+
+ 		for ($bfi=0; $bfi < sizeof($this->before_tabbing_cmps); $bfi++) { 
+			parent::addComponent( $this->before_tabbing_cmps[$bfi] );
+ 		}
+
+ 		/**
+ 		 *
+ 		 * Create tab header
+ 		 *
+ 		 **/
+
+ 		if(sizeof($this->tabs) > 0){
+
+	 		$h = "<table style='margin-top:10px' class=\"tabs\" ><tr>";
+
+	 		for ($ti=0; $ti < sizeof($this->tabs); $ti++) { 
+				$h .= "<td style='max-width:84px' id='atab_" . $this->tabs[$ti]["title"] . "' >
+						<a href='#". $this->tabs[$ti]["title"] ."'>" . $this->tabs[$ti]["title"] . "</a>
+					</td>";
+	 		}
+
+	 		$h .= "<td class=\"dummy\"></td></tr></table>";
+				
+	 		parent::addComponent($h);
+
+ 		/**
+ 		 *
+ 		 * Actual wrapped tabs
+ 		 *
+ 		 **/
+ 		$tabs_for_js = "";
+
+ 		for ($ti=0; $ti < sizeof($this->tabs); $ti++) { 
+
+			parent::addComponent("<div class='gTab'  id='tab_" . $this->tabs[$ti]["title"] . "'>");	
+
+			$tabs_for_js .= "'" . $this->tabs[$ti]["title"] . "',";
+
+ 			for ($ti_cmps=0; $ti_cmps < sizeof( $this->tabs[$ti]["components"] ); $ti_cmps++) { 
+ 				
+
+ 				parent::addComponent($this->tabs[$ti]["components"][ $ti_cmps ]);	
+ 			}
+ 			
+
+ 			parent::addComponent("</div>");
+ 		}
+
+
+
+			$h = "<script>
+				var TabPage = TabPage || {};
+				TabPage.tabs = [$tabs_for_js];
+				
+				TabPage.currentTab = '';
+				</script>";
+
+	 		parent::addComponent($h);
+
+ 		}  //throw new Exception ("there are no tabs in your tabpage");
+
+
+
+
+ 		parent::render();		
+ 	}
+
+ }

@@ -16,11 +16,16 @@
 	require_once( "api/ShowContests.php");
 
 
-    $page = new OmegaupAdminComponentPage();
-
-    $page->addComponent( new TitleComponent("Concursos"));
-
     
+    $page = new OmegaupAdminTabPage();
+
+
+
+	$page->addComponent( new TitleComponent("Concursos"));
+
+    $page->nextTab("Actuales");
+
+
      //get the'm contests
 	$header = array( 
 		      "description"	=>"Descripcion",
@@ -53,7 +58,15 @@
 	$table->addColRender( "alias", 			"toBold");
 	$table->addOnClick( "alias", "(function(alias){window.location ='contest.php?alias='+alias;})" );
 	
-	$page->addComponent( $table );
+	$page->addComponent( $table );    
+
+
+    $page->nextTab("Nuevo");
+
+    
+
+    
+
 	
 
 	$page->addComponent( new NewContestFormComponent() );

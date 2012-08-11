@@ -20,6 +20,10 @@ class StdComponentPage extends StdPage{
 			//go ahead
 			array_push( $this->components, $cmp );
 
+		}else if( is_string($cmp)){
+			array_push( $this->components, new FreeHtmlComponent( $cmp ) );			
+			
+
 		}else{
 			throw new Exception("This is not a valid component.");
 
