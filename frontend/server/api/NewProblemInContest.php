@@ -86,6 +86,10 @@ class NewProblemInContest extends ApiHandler
                 RequestContext::get("alias"),
                 "alias");
         
+        ValidatorFactory::numericValidator()->validate(
+                    RequestContext::get("public"),
+                    "public");   
+        
         ValidatorFactory::enumValidator(array("remote", "literal", "token", "token-caseless", "token-numeric"))
                 ->validate(RequestContext::get("validator"), "validator");
         
@@ -127,7 +131,7 @@ class NewProblemInContest extends ApiHandler
 		
         // Populate a new Problem object
         $problem = new Problems();
-        $problem->setPublic(false);        
+        $problem->setPublic(RequestContext::get("public"));        
         $problem->setTitle(RequestContext::get("title"));
         $problem->setAlias(RequestContext::get("alias"));
         $problem->setValidator(RequestContext::get("validator"));

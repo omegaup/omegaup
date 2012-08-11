@@ -70,9 +70,11 @@ class Authorization
                 || Authorization::IsContestAdmin($user_id, $contest));
     }
     
-    
-    
-    
+    public static function CanEditProblem($user_id, Problems $problem)
+    {
+        return ($problem->getAuthorId() == $user_id || Authorization::IsSystemAdmin($user_id));
+    }
+        
     public static function IsContestAdmin($user_id, Contests $contest) 
     {
         return ($contest->getDirectorId() === $user_id) || self::IsSystemAdmin($user_id);

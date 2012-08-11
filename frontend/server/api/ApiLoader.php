@@ -172,6 +172,11 @@ class ApiLoader
                 $api = new UpdateContest();
                 break;
 
+            case 'UpdateProblem':
+                require_once('UpdateProblem.php');
+                $api = new UpdateProblem();
+                break;
+            
             default:
                 return self::NotFound();
                 break;

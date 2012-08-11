@@ -151,7 +151,7 @@ abstract class ProblemsDAOBase extends DAO
 		}
 
 		if( $Problems->getPublic() != NULL){
-			$sql .= " public = ? AND";
+			$sql .= " `public = ? AND";
 			array_push( $val, $Problems->getPublic() );
 		}
 
@@ -226,7 +226,7 @@ abstract class ProblemsDAOBase extends DAO
 		}
 
 		if( $Problems->getOrder() != NULL){
-			$sql .= " order = ? AND";
+			$sql .= " `order` = ? AND";
 			array_push( $val, $Problems->getOrder() );
 		}
 
@@ -257,11 +257,11 @@ abstract class ProblemsDAOBase extends DAO
 	  *	
 	  * @internal private information for advanced developers only
 	  * @return Filas afectadas o un string con la descripcion del error
-	  * @param Problems [$Problems] El objeto de tipo Problems a actualizar.
+	  * @param Problems [$Problems] El objeto de tipo Problems a actualizar.`
 	  **/
 	private static final function update( $Problems )
 	{
-		$sql = "UPDATE Problems SET  public = ?, author_id = ?, title = ?, alias = ?, validator = ?, server = ?, remote_id = ?, time_limit = ?, memory_limit = ?, visits = ?, submissions = ?, accepted = ?, difficulty = ?, creation_date = ?, source = ?, order = ? WHERE  problem_id = ?;";
+		$sql = "UPDATE Problems SET  `public` = ?, author_id = ?, title = ?, alias = ?, validator = ?, server = ?, remote_id = ?, time_limit = ?, memory_limit = ?, visits = ?, submissions = ?, accepted = ?, difficulty = ?, creation_date = ?, source = ?, `order` = ? WHERE  problem_id = ?;";
 		$params = array( 
 			$Problems->getPublic(), 
 			$Problems->getAuthorId(), 

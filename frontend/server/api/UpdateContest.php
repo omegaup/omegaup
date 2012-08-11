@@ -226,10 +226,7 @@ class UpdateContest extends ApiHandler
         {
             $this->contest->setWindowLength(RequestContext::get("window_length") == "NULL" ? NULL : RequestContext::get("window_length"));
         }
-                
-        $this->contest->setDirectorId($this->_user_id);        
-        $this->contest->setRerunId(0); // NYI
-                
+                                
         if (!is_null(RequestContext::get("scoreboard")))
         {
             $this->contest->setScoreboard(RequestContext::get("scoreboard"));

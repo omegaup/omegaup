@@ -40,6 +40,7 @@ RewriteRule ^clarifications/show/([0-9]+)/?$ CallApiLoader.php?apicmd=ShowClarif
 RewriteRule ^clarifications/update/([0-9]+)/?$ CallApiLoader.php?apicmd=UpdateClarification&clarification_id=$1 [L]
 
 RewriteRule ^problems/([^/]*)/?$ CallApiLoader.php?apicmd=ShowProblems&search=$1 [L]
+RewriteRule ^problems/([a-zA-Z0-9_-]+)/update/?$ CallApiLoader.php?apicmd=UpdateProblem&problem_alias=$1 [L]
 
 # Redirects for UX.
 RewriteRule ^/?$ index.php [L]
