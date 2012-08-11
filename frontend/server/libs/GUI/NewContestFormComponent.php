@@ -69,12 +69,15 @@ class NewContestFormComponent implements GuiComponent{
                             $("#response").html("");
                         },
                         success: function(a,b,c){
-                            $("#response").html("OK");
+                            
+                            $("<p>OK</p>").dialog(); 
+                            
                         },
                         error:function(a,b,c){
                             r = $.parseJSON(a.responseText);
                             $("#submit").show();
-                            $("#response").html(r.error);
+                            
+                            $("<p>"+r.error+"</p>").dialog(); 
                         }
                         
                     });
@@ -140,7 +143,7 @@ fin
 
 
 		</script>
-		<hr>
+		
 		<h3>Nuevo concurso</h3>
 		<div class="new_contest">
 			<table id="main" width="100%">
@@ -185,9 +188,19 @@ fin
 
 
 				<tr>
+					<td colspan=2></td>
+					<td colspan=2>
+					<input value='Agendar concurso basico' type='button' id="submit" >
+	
+					</td>
+
+
+				</tr>
+				
+				<tr>
 					<td colspan=4><hr></td>
 				</tr>
-
+				
 				<tr><!-- ----------------------------------------- -->
                     <td class="info">
 						<b>Descripci&oacute;n</b>
@@ -299,7 +312,7 @@ fin
 					<td>
 					</td>
 					<td align='right'>
-
+<input value='Agendar concurso' type='button' id="submit" >
 					</td>
 				</tr><!-- ----------------------------------------- -->
 
@@ -332,7 +345,7 @@ fin
 
             <div id="submit-wrapper">
 
-				<input value='Agendar concurso' type='button' id="submit" >
+				
 				<div id="response"></div>
 
             </div>

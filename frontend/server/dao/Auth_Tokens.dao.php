@@ -38,7 +38,8 @@ class AuthTokensDAO extends AuthTokensDAOBase
 		$params = array( $auth_token );
 
 		$rs = $conn->GetRow($sql, $params);
-
+		
+		
 		//no matches
 		if(count($rs)==0) return NULL;
 

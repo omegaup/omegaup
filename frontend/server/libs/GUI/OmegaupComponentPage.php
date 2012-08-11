@@ -176,8 +176,11 @@ class OmegaupComponentPage extends StdComponentPage{
 
 			<head>
 			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+			
 			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+			
 			<script type="text/javascript" src="ux/api.js"></script>
+
 			<title><?php echo $this->title; ?></title>
 			<link rel="stylesheet" type="text/css" href="css/style.css">
 
