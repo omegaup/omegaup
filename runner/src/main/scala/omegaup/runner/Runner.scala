@@ -31,7 +31,7 @@ object Runner extends RunnerService with Log with Using {
 		val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
 		val runtime = Runtime.getRuntime
 
-		val commonParams = List("-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"))
+		val commonParams = List("-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "-w", Config.get("java.compile.time_limit", "30"))
 		
 		val params = lang match {
 			case "java" =>
@@ -165,7 +165,7 @@ object Runner extends RunnerService with Log with Using {
 				casesDirectory.listFiles.filter {_.getName.endsWith(".in")} .foreach { (x) => {
 					val caseName = runDirectory.getCanonicalPath + "/" + x.getName.substring(0, x.getName.lastIndexOf('.'))
 
-					val commonParams = List("-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString)
+					val commonParams = List("-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-w", (message.timeLimit + 60).toString, "-O", message.outputLimit.toString)
 				
 					val params = lang match {
 						case "java" =>
@@ -196,7 +196,7 @@ object Runner extends RunnerService with Log with Using {
 					extra.foreach { (x: CaseData) => {
 						val caseName = x.name
 						val casePath = runDirectory.getCanonicalPath + "/" + caseName
-						val commonParams = List("-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-O", message.outputLimit.toString)
+						val commonParams = List("-c", binDirectory.getCanonicalPath, "-q", "-M", casePath + ".meta", "-i", casePath + ".in", "-o", casePath + ".out", "-r", casePath + ".err", "-t", message.timeLimit.toString, "-w", (message.timeLimit + 60).toString, "-O", message.outputLimit.toString)
 					
 						FileUtil.write(casePath + ".in", x.data)
 				
@@ -238,7 +238,7 @@ object Runner extends RunnerService with Log with Using {
 						if (!inputFile.exists) {
 							inputFile = new File(casesDirectory.getCanonicalPath + "/" + caseName.replace(".meta", ".in"))
 						}
-						val commonParams = List("-c", validatorDirectory.getCanonicalPath, "-q", "-M", metaFile, "-i", x.getCanonicalPath.replace(".meta", ".out"), "-o", metaFile.replace(".meta", ".out"), "-r", metaFile.replace(".meta", ".err"), "-P", inputFile.getCanonicalPath, "-t", message.timeLimit.toString, "-O", message.outputLimit.toString)
+						val commonParams = List("-c", validatorDirectory.getCanonicalPath, "-q", "-M", metaFile, "-i", x.getCanonicalPath.replace(".meta", ".out"), "-o", metaFile.replace(".meta", ".out"), "-r", metaFile.replace(".meta", ".err"), "-P", inputFile.getCanonicalPath, "-t", message.timeLimit.toString, "-w", (message.timeLimit + 60).toString, "-O", message.outputLimit.toString)
 						
 						val validator_lang = using (new BufferedReader(new FileReader(validatorDirectory.getCanonicalPath + "/lang"))) { reader => reader.readLine }
 				
