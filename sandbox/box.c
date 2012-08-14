@@ -919,7 +919,7 @@ get_filename(pid_t pid, arg_t addr, char *namebuf, int bufsize)
         {
           dirs -= 2;
           pw--;
-          while(*pw != '/') pw--;
+          while(pw >= namebuf && *pw != '/') pw--;
           pr += 3;
           continue;
         }
