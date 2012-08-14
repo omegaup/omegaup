@@ -51,6 +51,7 @@ static int filter_syscalls;		/* 0=off, 1=on */
 static int timeout;			/* milliseconds */
 static int wall_timeout;
 static int extra_timeout;
+static int wall_ticks = 0;
 static int pass_environ;
 static int file_access;
 static int verbose;
@@ -1194,6 +1195,12 @@ signal_alarm(int unused UNUSED)
   /* Time limit checks are synchronous, so we only schedule them there. */
   timer_tick = 1;
   alarm(1);
+
+  /* Make sure we terminate even if the process hangs mysteriously */
+  if (wall_timeout && 1000 * (wall_ticks++ - 10) > wall_timeout)
+  {
+    err("TO: Time limit exceeded (wall clock)");
+  }
 }
 
 static void
