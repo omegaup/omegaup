@@ -50,7 +50,7 @@ class NewRun extends ApiHandler
             }, "Problem requested is invalid."))
         ->validate(RequestContext::get("problem_alias"), "problem_alias");                  
             
-        ValidatorFactory::enumValidator(array ('c','cpp','java','py','rb','pl','cs','p'))->validate(
+        ValidatorFactory::enumValidator(array ('kp','kj','c','cpp','java','py','rb','pl','cs','p'))->validate(
             RequestContext::get("language"), "language");
         
         ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("source"), "source");
