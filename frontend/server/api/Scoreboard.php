@@ -254,13 +254,17 @@ class Scoreboard
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
-        if ($withRunDetails)
+        if ($withRunDetails && !is_null($bestRun))
         {
+	    $runDetails = array();
+
+            if ($bestRun->getGuid() != "")
+            {
             $runDetailGenerator = new ShowRunDetails();
             RequestContext::set("run_alias", $bestRun->getGuid());
             
             $runDetails = $runDetailGenerator->ExecuteApi();                        
-            
+            }
             return array(
                 "points" => (int)$bestRun->getContestScore(),
                 "penalty" => (int)$bestRun->getSubmitDelay(),

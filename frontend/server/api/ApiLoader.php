@@ -169,7 +169,7 @@ class ApiLoader
             
             case 'OmiReport':
                 require_once('OmiReport.php');
-                $api = new GenerateOmiUsers();
+                $api = new OmiReport();
                 break;
             
             case 'UpdateContest':
