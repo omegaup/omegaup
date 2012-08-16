@@ -104,11 +104,11 @@
     $page->addComponent( new TitleComponent("&iquest; Tienes alguna cuenta en uno de estos sitios ?", 3));
     
 	$html = '<a href="googleLoginReturn.php">
-              <img src="http://3.bp.blogspot.com/-fsazKKHM-kQ/TjxQgND9E_I/AAAAAAAAANU/iEQwsuALe1s/s1600/Google.png" height="50">
+              <img src="https://code.google.com/oauthplayground/assets/images/google.png" height="50">
             </a>
 				&nbsp;&nbsp;&nbsp;
 			<a href="' . LoginController::getFacebookLoginUrl() . '">
-			<img src="http://www.clasesdeperiodismo.com/wp-content/uploads/2011/02/facebook-11.jpg" height="50">
+			<img src="http://static.ak.fbcdn.net/rsrc.php/v2/yS/x/rwsSMfAU1li.png" height="50">
 			</a>';
 			
 	$page->addComponent( new FreeHtmlComponent($html) );
