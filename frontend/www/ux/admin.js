@@ -97,6 +97,7 @@ $(document).ready(function() {
 			run.penalty = '-';
 			run.language = $('#submit select[name="language"]').val();
 			var r = $('tbody.run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+			$('.guid', r).html(run.guid);
 			$('.status', r).html('new');
 			$('.points', r).html('0');
 			$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
@@ -349,6 +350,7 @@ $(document).ready(function() {
 
 			var r = $('.runs .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
 			$('.id', r).html(run.run_id);
+			$('.guid', r).html(run.guid);
 			$('.username', r).html(run.username);
 			$('.problem', r).html(run.alias);
 			$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));

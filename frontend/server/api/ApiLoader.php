@@ -157,14 +157,19 @@ class ApiLoader
                 $api = new AddUserToPrivateContest();
                 break;
             
-            case 'RemoveUserToPrivateContest':
-                require_once('RemoveUserToPrivateContest.php');
+            case 'RemoveUserFromPrivateContest':
+                require_once('RemoveUserFromPrivateContest.php');
                 $api = new RemoveUserToPrivateContest();
                 break;
             
             case 'GenerateOmiUsers':
                 require_once('GenerateOmiUsers.php');
                 $api = new GenerateOmiUsers();
+                break;
+            
+            case 'OmiReport':
+                require_once('OmiReport.php');
+                $api = new OmiReport();
                 break;
             
             case 'UpdateContest':

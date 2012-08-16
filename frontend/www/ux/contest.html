@@ -90,6 +90,7 @@
 						<caption>Envíos</caption>
 						<thead>
 							<tr>
+								<th>ID</th>
 								<th>Lenguaje</th>
 								<th>Tiempo de Ejecución</th>
 								<th>Memoria</th>
@@ -101,11 +102,12 @@
 						</thead>
 						<tfoot>
 							<tr>
-								<td colspan="7"><a href="#problems/run">Nuevo envío</a></td>
+								<td colspan="8"><a href="#problems/run">Nuevo envío</a></td>
 							</tr>
 						</tfoot>
 						<tbody class="run-list">
 							<tr class="template">
+								<td class="guid"></td>
 								<td class="language"></td>
 								<td class="runtime"></td>
 								<td class="memory"></td>
@@ -171,8 +173,8 @@
                 <button class="close">&times;</button>
 				Lenguaje
 				<select name="language">
-					<option value="c">C</option>
 					<option value="cpp">C++</option>
+					<option value="c">C</option>
 					<option value="java">Java</option>
 					<option value="p">Pascal</option>
 					<option value="kp">Karel (Pascal)</option>

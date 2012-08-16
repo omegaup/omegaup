@@ -92,12 +92,12 @@ class RunsDAO extends RunsDAOBase
             //Build SQL statement
             if ($finish_time)
             {
-                $sql = "SELECT contest_score, submit_delay from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' and time <= FROM_UNIXTIME(?) " . ($showAllRuns ? "" : " AND test = 0 ") . " ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
+                $sql = "SELECT contest_score, submit_delay, guid from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' and time <= FROM_UNIXTIME(?) " . ($showAllRuns ? "" : " AND test = 0 ") . " ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
                 $val = array($user_id, $contest_id, $problem_id, $finish_time);
             }
             else
             {
-                $sql = "SELECT contest_score, submit_delay from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' " . ($showAllRuns ? "" : " AND test = 0 ") . " ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
+                $sql = "SELECT contest_score, submit_delay, guid from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' " . ($showAllRuns ? "" : " AND test = 0 ") . " ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
                 $val = array($user_id, $contest_id, $problem_id);
             }
 

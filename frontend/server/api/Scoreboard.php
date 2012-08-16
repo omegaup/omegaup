@@ -6,6 +6,7 @@
  */
 
 require_once(SERVER_PATH . '/libs/Cache.php');
+require_once('ShowRunDetails.php');
 
 class Scoreboard 
 {
@@ -52,7 +53,7 @@ class Scoreboard
         return $this->countProblemsInContest;
     }
     
-    public function generate()
+    public function generate($withRunDetails = false)
     {
     	$cache = new Cache(self::MEMCACHE_PREFIX);
         $result = $cache->get($this->contest_id);
@@ -90,7 +91,7 @@ class Scoreboard
 
                 foreach ($contest_problems as $problems)
                 {
-                    $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), $this->getScoreboardTimeLimitUnixTimestamp($contest));
+                    $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), $this->getScoreboardTimeLimitUnixTimestamp($contest), $withRunDetails);
                 }
 
                 // Add the problems' information
@@ -241,7 +242,7 @@ class Scoreboard
 	return $this->data;                
     }
     
-   protected function getScore($problem_id, $user_id, $limit_timestamp = NULL)
+   protected function getScore($problem_id, $user_id, $limit_timestamp = NULL, $withRunDetails = false)
    {
         try
         {
@@ -253,10 +254,41 @@ class Scoreboard
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
-        return array(
-            "points" => (int)$bestRun->getContestScore(),
-            "penalty" => (int)$bestRun->getSubmitDelay()
-        );        
+        if ($withRunDetails && !is_null($bestRun))
+        {
+	    $runDetails = array();
+
+            if ($bestRun->getGuid() != "")
+            {
+                $runDetailGenerator = new ShowRunDetails();
+                RequestContext::set("run_alias", $bestRun->getGuid());
+
+                $runDetails = $runDetailGenerator->ExecuteApi();                        
+                                
+                // If STATUS="OK" and out_diff is not null, then status is WA
+                // OK just means that runner didn't crash. Grader grades after that.
+                foreach($runDetails["cases"] as $case)
+                {
+                    if ($case["meta"]["status"] == "OK" && !is_null($case["meta"]["out_diff"]))
+                    {
+                        $case["meta"]["status"] = "WA";
+                    }
+                }
+                
+            }
+            return array(
+                "points" => (int)$bestRun->getContestScore(),
+                "penalty" => (int)$bestRun->getSubmitDelay(),
+                "run_details" => $runDetails
+            );
+        }        
+        else
+        {
+            return array(
+                "points" => (int)$bestRun->getContestScore(),
+                "penalty" => (int)$bestRun->getSubmitDelay()
+            );
+        }
     }
         
     protected function getTotalScore($scores)
@@ -270,7 +302,7 @@ class Scoreboard
             $sumPoints += $score["points"];
             $sumPenalty += $score["penalty"];
         }
-        
+                        
         return array(
           "points" => $sumPoints,
           "penalty" => $sumPenalty

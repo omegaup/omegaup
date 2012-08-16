@@ -125,6 +125,39 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         // Logout the contestant
         Utils::Logout($auth_token);          
     }   
+    
+    public function testPrivateContestSeenByAdmin()
+    {
+        
+        // Insert new contest
+        $random_title = Utils::CreateRandomString();        
+        NewContestTest::CreateContest($random_title, 0);
+        
+        
+        // Login as admin, shoud see content
+        $auth_token = Utils::LoginAsAdmin();
+        
+        // Get contests, contest just created should be the first in the list
+        $showContest = new ShowContests();
+        Utils::SetAuthToken($auth_token);
+        
+        try
+        {
+            $cleanValue = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            $this->fail("Exception was unexpected: ". var_dump($e->getArrayMessage()));    
+        }
+        
+        // Assert our contest is there
+        $this->assertArrayHasKey("0", $cleanValue['contests']);    
+        $this->assertArrayHasKey("title", $cleanValue['contests'][0]);    
+        $this->assertEquals($random_title, $cleanValue['contests'][0]["title"]);
+        
+        // Logout the contestant
+        Utils::Logout($auth_token);          
+    }   
 }
 
 ?>
