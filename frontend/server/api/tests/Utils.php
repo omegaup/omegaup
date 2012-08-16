@@ -23,6 +23,7 @@ class Utils
     static $contestant_2;
     static $judge;
     static $problem_author;
+    static $admin;
     
     static $inittime;
     static $counttime;
@@ -153,7 +154,7 @@ class Utils
     
     static function LoginAsAdmin()
     {
-        return self::Login("admin", "password");
+        return self::Login(self::$admin->getUsername(), self::$admin->getPassword());
     }
     
     static function LoginAsContestant()
