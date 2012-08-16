@@ -1,7 +1,7 @@
 <?php
 
 require_once("ApiHandler.php");
-
+require_once("AddUserToPrivateContest.php");
 require_once(SERVER_PATH ."/libs/ApiException.php");
 
 class GenerateOmiUsers extends ApiHandler 
@@ -56,14 +56,13 @@ class GenerateOmiUsers extends ApiHandler
     private function AddUserToPrivateContest($user_id)
     {
         if (!is_null($this->contest_to_add))
-        {
-        
+        {            
             $userAgregator = new AddUserToPrivateContest();
-            RequestContext::set("contest_alias", $this->contest_to_add);
+	
             RequestContext::set("user_id", $user_id);
-
-            $userAgregator->ExecuteApi();
-        }
+       
+            $ret = $userAgregator->ExecuteApi();      
+	}
     }
     
     protected function RegisterValidatorsToRequest() 
@@ -96,8 +95,8 @@ class GenerateOmiUsers extends ApiHandler
         {
             $this->contest_to_add = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
         }
-
-        $keys = array(
+        
+	$keys = array(
               "AGS",
               "BC",
               "BCS",
@@ -144,7 +143,7 @@ class GenerateOmiUsers extends ApiHandler
 
                 // Create user
                 $user = $this->CreateUser($username, $password);    
-                
+               
                 // In case of contest given in request, add users to that contest
                 $this->AddUserToPrivateContest($user->getUserId());
             }
