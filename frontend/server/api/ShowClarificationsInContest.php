@@ -41,7 +41,7 @@ class ShowClarificationsInContest extends ApiHandler
            "contest_id" => $contest->getContestId()
 	));
 
-	$is_contest_director = ($contest->getDirectorId() == $this->_user_id || $this->_user_id == 3); // lhchavez :P
+	$is_contest_director = Authorization::IsContestAdmin($this->_user_id, $contest);
         
         // If user is the contest director, get all private clarifications        
         if($is_contest_director)
