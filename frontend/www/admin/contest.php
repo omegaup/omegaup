@@ -58,6 +58,7 @@
 				 var toSend = {};
 				 //upadateContes
 				 $(\"table input\").each( function (n, el ){ 
+				 		if(el.value.length == 0 ) return;
 						toSend[ el.name ] = el.value;
 				 });
 				
