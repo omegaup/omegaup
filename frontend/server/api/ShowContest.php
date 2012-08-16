@@ -34,7 +34,7 @@ class ShowContest extends ApiHandler
         {      
             try
             {
-                if (is_null(ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId())))
+                if (is_null(ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId())) && !Authorization::IsContestAdmin($this->_user_id, $contest))
                 {
                     throw new ApiException(ApiHttpErrors::forbiddenSite());
                 }
