@@ -55,11 +55,15 @@ class GenerateOmiUsers extends ApiHandler
         
     private function AddUserToPrivateContest($user_id)
     {
-        $userAgregator = new AddUserToPrivateContest();
-        RequestContext::set("contest_alias", $this->contest_to_add);
-        RequestContext::set("user_id", $user_id);
+        if (!is_null($this->contest_to_add))
+        {
+        
+            $userAgregator = new AddUserToPrivateContest();
+            RequestContext::set("contest_alias", $this->contest_to_add);
+            RequestContext::set("user_id", $user_id);
 
-        $userAgregator->ExecuteApi();
+            $userAgregator->ExecuteApi();
+        }
     }
     
     protected function RegisterValidatorsToRequest() 
