@@ -17,7 +17,7 @@
    
     require_once('adodb5/adodb.inc.php');
     require_once('adodb5/adodb-exceptions.inc.php');
-
+echo "heree";
     // Clean previous log
     Utils::CleanLog();
     
@@ -36,6 +36,14 @@
     Utils::$contestant_2 = Utils::CreateUser("user2", "password");
     Utils::$judge = Utils::CreateUser("judge", "password");
     Utils::$problem_author = Utils::CreateUser("problem_author", "password");       
+    
+    // Create an admin
+    Utils::$admin = Utils::CreateUser("admin", "password");
+    
+    $ur = new UserRoles();
+    $ur->setRoleId("1"); //admin
+    $ur->setUserId(Utils::$admin->getUserId());
+    UserRolesDAO::save($ur);
     
     // Initialize time counters
     Utils::$counttime = 0;
