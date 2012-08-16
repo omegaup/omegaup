@@ -260,10 +260,21 @@ class Scoreboard
 
             if ($bestRun->getGuid() != "")
             {
-            $runDetailGenerator = new ShowRunDetails();
-            RequestContext::set("run_alias", $bestRun->getGuid());
-            
-            $runDetails = $runDetailGenerator->ExecuteApi();                        
+                $runDetailGenerator = new ShowRunDetails();
+                RequestContext::set("run_alias", $bestRun->getGuid());
+
+                $runDetails = $runDetailGenerator->ExecuteApi();                        
+                                
+                // If STATUS="OK" and out_diff is not null, then status is WA
+                // OK just means that runner didn't crash. Grader grades after that.
+                foreach($runDetails["cases"] as $case)
+                {
+                    if ($case["meta"]["status"] == "OK" && !is_null($case["meta"]["out_diff"]))
+                    {
+                        $case["meta"]["status"] = "WA";
+                    }
+                }
+                
             }
             return array(
                 "points" => (int)$bestRun->getContestScore(),

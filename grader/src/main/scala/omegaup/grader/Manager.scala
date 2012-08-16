@@ -44,6 +44,11 @@ object Manager extends Object with Log {
 		GraderData.run(id) match {
 			case None => throw new IllegalArgumentException("Id " + id + " not found")
 			case Some(run) => {
+				run.status = Status.Compiling
+				run.veredict = Veredict.JudgeError
+
+				GraderData.update(run)
+
 				val driver = if (run.problem.validator == Validator.Remote) {
 					run.problem.server match {
 						case Some(Server.UVa) => drivers.UVa
