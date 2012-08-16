@@ -70,14 +70,32 @@ class NewContestFormComponent implements GuiComponent{
                         },
                         success: function(a,b,c){
                             
-                            $("<p>OK</p>").dialog(); 
+                            $("<p title='OmegaUp'>Success !</p>").dialog({
+								modal: true,
+								buttons: {
+									Ok: function() {
+										$( this ).dialog( "close" );
+										window.location = "contest.php?alias=" + $("#_alias").val();
+									}
+								}
+							});
                             
                         },
                         error:function(a,b,c){
                             r = $.parseJSON(a.responseText);
                             $("#submit").show();
                             
-                            $("<p>"+r.error+"</p>").dialog(); 
+
+
+
+                            $("<p title='OmegaUp'>"+r.error+"</p>").dialog({
+								modal: true,
+								buttons: {
+									Ok: function() {
+										$( this ).dialog( "close" );
+									}
+								}
+							});
                         }
                         
                     });

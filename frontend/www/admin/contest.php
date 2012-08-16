@@ -15,9 +15,9 @@
 	
 	require_once( "api/ShowProblemInContest.php");
 
-    $page = new OmegaupAdminComponentPage();
+    $page = new OmegaupAdminTabPage();
 
-    $page->addComponent( new TitleComponent("Concurso !"));
+    $page->addComponent( new TitleComponent("Concurso ". $_GET["alias"].""));
 
 
 	if(!isset($_GET["alias"])){
@@ -39,21 +39,76 @@
 		$page->render(); exit();
 	}
 
+	$page->nextTab("Detalles");
+	$page->addComponent( "<a href='../arena/{$_GET['alias']}/'>Ir al concurso</a>"  );
 
-	$params = array( "contest_alias" => "prueba",
-					 "problem_alias" => "sumas" );
 
-	RequestContext::$params = $params;
 
-	//bring the problem set
-	try{
-	    $contestApi = new ShowProblemInContest(    );
-		$results = $contestApi->ExecuteApi( );
-			
-	}catch(Exception $e){
-		$page->addComponent( new TitleComponent("<a href='../arena/{$_GET['alias']}/'>Ir al concurso</a>", 3) );
-		$page->render(); exit();
-	}
+	$aV = ContestsDAO::getByAlias($_GET["alias"]);
+	$eContest = new DAOFormComponent($aV);
+	$eContest->setEditable(false);
+	$page->addComponent($eContest);
+
+
+
+	$page->nextTab("Editar");
+
+	$page->addComponent("<script>
+		function doEditar(){
+				 var toSend = {};
+				 //upadateContes
+				 $(\"table input\").each( function (n, el ){ 
+				 		if(el.value.length == 0 ) return;
+						toSend[ el.name ] = el.value;
+				 });
+				
+
+				$.ajax({
+                        url: \"../arena/contests/\" + toSend.alias + \"/update/\",
+                        dataType: \"json\",
+                        type:\"POST\",
+                        data: toSend,
+                        beforeSend: function( xhr ) {
+                            //$(\"#submit\").hide();
+                        },
+                        success: function(a,b,c){
+                            $(\"<p title='OmegaUp'>Success !</p>\").dialog({
+								modal: true,
+								buttons: {
+									Ok: function() {
+										$( this ).dialog( \"close\" );
+										window.location = \"contest.php?alias=\" + $(\"#_alias\").val();
+									}
+								}
+							});
+                        },
+                        error:function(a,b,c){
+                            r = $.parseJSON(a.responseText);
+                            $(\"<p title='OmegaUp'>\"+r.error+\"</p>\").dialog({
+								modal: true,
+								buttons: {
+									Ok: function() {
+										$( this ).dialog( \"close\" );
+									}
+								}
+							});
+                        }
+                        
+                    });
+				console.log(toSend);
+
+		}</script>");
+
+	$eContest = new DAOFormComponent($aV);
+	$eContest->setEditable(true);
+	$eContest->hideField( "contest_id" );
+	$eContest->addOnClick( "Editar concurso", "doEditar()");
+
+
+	$page->addComponent($eContest);
+
+
+	$page->render();
 
 	
-    $page->render(); exit();
+
