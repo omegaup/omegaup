@@ -103,7 +103,8 @@ class ShowContests extends ApiHandler {
                 throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
             }
 
-            if ($r === null) 
+            // Admins can see all contests
+            if ($r === null && !Authorization::IsSystemAdmin($this->_user_id)) 
             {
                 /**
                  * Nope, he cant .
@@ -115,12 +116,12 @@ class ShowContests extends ApiHandler {
              * He can see it !
              * 
              * */
-			$c->toUnixTime(  );
+            $c->toUnixTime(  );
             $addedContests[ ] = $c->asFilteredArray($relevant_columns);            
 	}
         
         $this->addResponse('contests', $addedContests);
-		$this->addResponse('length', count($addedContests));
+        $this->addResponse('length', count($addedContests));
     }
 
 

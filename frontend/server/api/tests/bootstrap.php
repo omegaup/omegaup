@@ -37,6 +37,14 @@
     Utils::$judge = Utils::CreateUser("judge", "password");
     Utils::$problem_author = Utils::CreateUser("problem_author", "password");       
     
+    // Create an admin
+    Utils::$admin = Utils::CreateUser("admin", "password");
+    
+    $ur = new UserRoles();
+    $ur->setRoleId("1"); //admin
+    $ur->setUserId(Utils::$admin->getUserId());
+    UserRolesDAO::save($ur);
+    
     // Initialize time counters
     Utils::$counttime = 0;
     Utils::$inittime = Utils::GetPhpUnixTimestamp();
