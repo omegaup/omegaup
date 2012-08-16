@@ -124,6 +124,7 @@ $(document).ready(function() {
 			run.penalty = '-';
 			run.language = $('#submit select[name="language"]').val();
 			var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+			$('.guid', r).html(run.guid.substring(run.guid.length - 5));
 			$('.runtime', r).html('-');
 			$('.memory', r).html('-');
 			$('.status', r).html('new');
@@ -234,6 +235,7 @@ $(document).ready(function() {
 					var run = problem.runs[idx];
 
 					var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+					$('.guid', r).html(run.guid.substring(run.guid.length - 5));
 					$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 					$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 					$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
