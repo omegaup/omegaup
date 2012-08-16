@@ -17,7 +17,7 @@
    
     require_once('adodb5/adodb.inc.php');
     require_once('adodb5/adodb-exceptions.inc.php');
-echo "heree";
+
     // Clean previous log
     Utils::CleanLog();
     
