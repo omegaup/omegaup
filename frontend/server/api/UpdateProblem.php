@@ -1,6 +1,7 @@
 <?php
 
 require_once("ApiHandler.php");
+require_once("NewProblemInContest.php");
 
 require_once(SERVER_PATH . '/libs/FileHandler.php');
 require_once(SERVER_PATH . '/libs/FileUploader.php');
@@ -12,7 +13,19 @@ class UpdateProblem extends ApiHandler
 {   
     
     private $problem;
-
+    private $filesToUnzip;
+    private $casesFiles;
+    
+    public function UpdateProblem(FileUploader $fileUploader = NULL)
+    {
+        // Set file uploader to the file handler
+        if(is_null($fileUploader))
+        {
+            $fileUploader = new FileUploader();            
+        }
+        
+        FileHandler::SetFileUploader($fileUploader);
+    }
 
     protected function RegisterValidatorsToRequest()
     {   
@@ -86,27 +99,10 @@ class UpdateProblem extends ApiHandler
                     ->validate(RequestContext::get("points"), "points");
         }
         
-        /* @TODO: File update handling
-        if(isset($_FILES['problem_contents']) &&
-                !FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name']))
-        {
-            throw new ApiException(ApiHttpErrors::invalidParameter("problem_contents is missing."));
+        if (isset($_FILES['problem_contents']))            
+        {            
+            NewProblemInContest::ValidateZip($this->filesToUnzip, $this->casesFiles);                
         }
-        
-        // Validate zip contents
-        $zipValidator = new Validator();
-        $zipValidator->addValidator(new ProblemContentsZipValidator)
-                     ->validate($_FILES['problem_contents']['tmp_name'], 'problem_contents');                
-        
-        // Save files to unzip                
-        Logger::log("Saving files to unzip...");
-        $this->filesToUnzip = $zipValidator->getValidator(0)->filesToUnzip;        
-        $this->casesFiles = $zipValidator->getValidator(0)->casesFiles;
-
-
-        sort($this->casesFiles);
-         * 
-         */
         
     }       
     
@@ -124,12 +120,7 @@ class UpdateProblem extends ApiHandler
         if (!is_null(RequestContext::get("title")))
         {
             $this->problem->setTitle(RequestContext::get("title"));
-        }
-        
-        if (!is_null(RequestContext::get("alias")))
-        {
-            $this->problem->setAlias(RequestContext::get("alias"));
-        }
+        }              
         
         if (!is_null(RequestContext::get("validator")))
         {
@@ -167,64 +158,14 @@ class UpdateProblem extends ApiHandler
             // Save the contest object with data sent by user to the database
             ProblemsDAO::save($this->problem);
             
-            /* @TODO redacción handling, and flag to check which reddación to use
-             * @TODO file handling pending
-            // Create file after we know that alias is unique
-            try 
-            {
-                // Create paths
-                $dirpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . RequestContext::get("alias");
-                $filepath = $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';
-
-                // Drop contents into path required
-                FileHandler::MakeDir($dirpath);                
-                FileHandler::MoveFileFromRequestTo('problem_contents', $filepath);                                
-                ZipHandler::DeflateZip($filepath, $dirpath, $this->filesToUnzip);
+            if (isset($_FILES['problem_contents']))         
+            {                
+                // DeployProblemZip requires alias => problem_alias
+                RequestContext::set("alias", RequestContext::get("problem_alias"));
                 
-                // Transform statements from markdown to HTML
-                $statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $this->filesToUnzip);
-                
-                foreach($statements as $statement)
-                {
-                    $filepath = $dirpath . DIRECTORY_SEPARATOR . $statement;
-                    $file_contents = FileHandler::ReadFile($filepath);
-                    
-                    // Markup
-                    $file_contents = markdown($file_contents); 
-                    
-                    // Overwrite file
-                    $lang = basename($statement, ".markdown");
-                    FileHandler::CreateFile($dirpath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html", $file_contents);
-                }
-               
-                // Create cases.zip and inputname
-                $casesZip = new ZipArchive;
-                $casesZipPath = $dirpath . DIRECTORY_SEPARATOR . 'cases.zip';
-
-                if (($error = $casesZip->open($casesZipPath, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) !== TRUE)
-                {
-					Logger::error($error);
-                    throw new Exception($error);
-                }
-
-				for ($i = 0; $i < count($this->casesFiles); $i++)
-                {
-                    if (!$casesZip->addFile($dirpath . DIRECTORY_SEPARATOR . $this->casesFiles[$i], substr($this->casesFiles[$i], strlen('cases/'))))
-                    {
-						Logger::error("Error trying to add {$this->casesFiles[$i]} to cases.zip");
-                        throw new Exception("Error trying to add {$this->casesFiles[$i]} to cases.zip");
-                    }
-                }
-
-                $casesZip->close();
-				Logger::log("Writing to : " . $dirpath . DIRECTORY_SEPARATOR . "inputname" );
-                file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($casesZipPath));
+                NewProblemInContest::DeployProblemZip($this->filesToUnzip, $this->casesFiles, true); 
+                $this->addResponse("uploaded_files", $this->filesToUnzip);
             }
-            catch (Exception $e)
-            {
-                throw new ApiException( ApiHttpErrors::invalidFilesystemOperation("Unable to process problem_contents given. Please check the format. "), $e );
-            }
-             * */             
 
             //End transaction
             ProblemsDAO::transEnd();
@@ -244,13 +185,7 @@ class UpdateProblem extends ApiHandler
                        
             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
         }  
-        
-        // Adding unzipped files to response
-        /* @TODO File handling pending
-        $this->addResponse("uploaded_files", $this->filesToUnzip);
-         * 
-         */
-        
+                
         // All clear
         $this->addResponse("status", "ok");
     }  
