@@ -120,7 +120,7 @@ class GenerateOmiUsers extends ApiHandler
               "OAX",
               "PUE",
               "QRO",
-              "QROO",
+              "QIR",
               "SLP",
               "SIN",
               "SON",
