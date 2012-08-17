@@ -625,5 +625,93 @@ class NewRunTest extends PHPUnit_Framework_TestCase
         var_dump($contest);
         var_dump($return_array);
         $this->fail("Contestant was able to submit run in an expired contest.");
-    }               
+    }    
+    
+    public function testRunWhenContestNotStartedForAdmin()
+    {        
+                
+        // Create public contest
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
+        
+        // Manually expire contest
+        $contest = ContestsDAO::getByPK($contest_id);                
+        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 10));                        
+        ContestsDAO::save($contest);
+        
+        // Create problem in contest        
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
+        
+        // Set valid context        
+        $auth_token = Utils::LoginAsAdmin();        
+        Utils::SetAuthToken($auth_token);
+        
+        $this->setValidContext($contest_id, $problem_id);
+        
+        // Execute API
+        $newRun = new NewRun($this->graderMock);
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            $this->fail("Admin was not able to submit run in an not yet started contest.");
+        }
+                
+        // Validate output
+        $this->assertEquals("ok", $return_array["status"]);        
+    }
+    
+    public function testInvalidRunInsideSubmissionsGapForAdmin()
+    {
+        
+        
+        // Create public contest
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);   
+        
+        // Set submissions gap of 20 seconds
+        $contest = ContestsDAO::getByPK($contest_id);                
+        $contest->setSubmissionsGap(20);
+        ContestsDAO::save($contest);
+        
+        // Create problem in contest        
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
+        
+        // Set valid context for Run 
+        // Login 
+        $auth_token = Utils::LoginAsAdmin();
+        Utils::SetAuthToken($auth_token);
+        $this->setValidContext($contest_id, $problem_id);
+        
+        $newRun = new NewRun($this->graderMock);        
+                    
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {                
+            var_dump($e->getArrayMessage());            
+            $this->fail("Unexpected exception");
+        }
+
+        // Validate output
+        $this->assertEquals("ok", $return_array["status"]);
+
+        try
+        {
+            $return_array = $newRun->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            $this->fail("Admin was not able to bypass submission gap.");
+        }
+        
+        // Validate output
+        $this->assertEquals("ok", $return_array["status"]);        
+    }
 }
