@@ -376,11 +376,12 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         }
         catch(ApiException $e)
         {
-            // Validate error
-            $exception_message = $e->getArrayMessage();            
+            // Validate error            
+            $exception_message = $e->getArrayMessage();                        
             $this->assertEquals("Contest has not started yet.", $exception_message["error"]);
             $this->assertEquals("error", $exception_message["status"]);
-            $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]); 
+            $this->assertEquals("HTTP/1.1 412 PRECONDITION FAILED", $exception_message["header"]); 
+            $this->assertNotEmpty($exception_message["start_time"]);                        
             
             // We're OK
             return;            
