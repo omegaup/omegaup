@@ -174,6 +174,27 @@ class ApiHttpErrors
                      "errorcode" => 108,
                      "header" => 'HTTP/1.1 400 BAD REQUEST' );
     } 
+    
+    public static function preconditionFailed($message = NULL, array $customMessage = NULL)
+    {
+                        
+        if ($message === NULL)
+        {            
+            $message = "User is not allowed to view this content.";
+        }
+        
+        $ret_array = array("status" => "error",
+                     "error"	 => $message,
+                     "errorcode" => 109,
+                     "header" => 'HTTP/1.1 412 PRECONDITION FAILED');
+        
+        if ($customMessage !== NULL)
+        {
+            $ret_array = array_merge($ret_array, $customMessage);           
+        }
+        
+        return $ret_array;
+    }
 }
 
 ?>

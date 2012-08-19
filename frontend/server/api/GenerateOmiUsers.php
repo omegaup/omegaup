@@ -11,7 +11,7 @@ class GenerateOmiUsers extends ApiHandler
     
     private function rand_string( $length ) 
     {
-	$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";	
+	$chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";	
 
 	$size = strlen( $chars );
 	for( $i = 0; $i < $length; $i++ ) {
@@ -120,7 +120,7 @@ class GenerateOmiUsers extends ApiHandler
               "OAX",
               "PUE",
               "QRO",
-              "QROO",
+              "QIR",
               "SLP",
               "SIN",
               "SON",

@@ -262,7 +262,119 @@ class ShowProblemInContestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($access_time - Utils::GetPhpUnixTimestamp($contest_user->getAccessTime()) <= 1);
     }
     
-    // @TODO Assert problem with runs        
+    // Problem from private contest
+    public function testShowProblemFromPrivateContestForAdmin()
+    {
+        // Create a clean PRIVATE contest only with judge allowed to see it and get the ID
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(0);
+                        
+        // Create a problem in given contest
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
+        
+        // Login as ADMIN
+        $auth_token = Utils::LoginAsAdmin();
+        
+        // Set Context
+        $contest = ContestsDAO::getByPK($contest_id);
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
+        
+        // Execute API
+        $showProblemInContest = new ShowProblemInContest();
+        Utils::SetAuthToken($auth_token);        
+        try
+        {            
+            $return_array = $showProblemInContest->ExecuteApi();                        
+        }
+        catch (ApiException $e)
+        {            
+            
+            var_dump($return_array);
+            $this->fail("Admin was not able to see problem in private contest not invited.");            
+        }   
+        
+        // Get problem id from DB to compare it
+        $problem = ProblemsDAO::getByPK($problem_id);               
+        
+        // Assert data
+        $this->assertEquals($return_array["title"], $problem->getTitle());
+        $this->assertEquals($return_array["alias"], $problem->getAlias());
+        $this->assertEquals($return_array["validator"], $problem->getValidator());
+        $this->assertEquals($return_array["time_limit"], $problem->getTimeLimit());
+        $this->assertEquals($return_array["memory_limit"], $problem->getMemoryLimit());                      
+        $this->assertEquals($return_array["author_id"], $problem->getAuthorId()); 
+        $this->assertEquals($return_array["source"], $problem->getSource()); 
+        $this->assertContains("<h1>Output</h1>", $return_array["problem_statement"]);        
+        $this->assertEquals($return_array["order"], $problem->getOrder());
+        
+        // Default data
+        $this->assertEquals(0, $problem->getVisits());
+        $this->assertEquals(0, $problem->getSubmissions());
+        $this->assertEquals(0, $problem->getAccepted());
+        $this->assertEquals(0, $problem->getDifficulty());
+        
+        // Verify that we have an empty array of runs
+        $this->assertEmpty($return_array["runs"]);
+        
+        // Verify that problem was marked as Opened
+        $problem_opened = ContestProblemOpenedDAO::getByPK($contest_id, $problem_id, Utils::$admin->getUserId());
+        $this->assertNotNull($problem_opened);        
+
+        // Verify open time 
+        $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));        
+    }
+    
+    // Problem from private contest
+    public function testDontShowProblemFronNotStartedYetContest()
+    {
+        // Create a clean PRIVATE contest only with judge allowed to see it and get the ID
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(0);
+                        
+        // Create a problem in given contest
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set Context
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 30));                        
+        ContestsDAO::save($contest);
+        
+        $problem = ProblemsDAO::getByPK($problem_id);
+        RequestContext::set("problem_alias", $problem->getAlias());        
+        RequestContext::set("contest_alias", $contest->getAlias());
+        RequestContext::set("lang", "en");
+        
+        // Execute API
+        $showProblemInContest = new ShowProblemInContest();
+        Utils::SetAuthToken($auth_token);        
+        try
+        {            
+            $return_array = $showProblemInContest->ExecuteApi();                        
+        }
+        catch (ApiException $e)
+        {            
+            // Assert exception
+            $exception_message = $e->getArrayMessage();
+            $this->assertEquals("User is not allowed to view this content.", $exception_message["error"]);
+            $this->assertEquals("error", $exception_message["status"]);
+            $this->assertEquals(106, $exception_message["errorcode"]);
+            $this->assertEquals("HTTP/1.1 403 FORBIDDEN", $exception_message["header"]);
+            
+            // We're ok
+            return;
+        }   
+        
+        var_dump($return_array);
+        $this->fail("User was able to see problem in private contest not yet started.");
+    }
 }
 
 ?>
