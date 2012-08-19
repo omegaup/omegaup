@@ -27,11 +27,6 @@ class ShowProblemInContest extends ApiHandler
     }
 	
 		
-    protected function CheckAuthToken()
-    {                
-        parent::CheckAuthToken();     
-    }
-		
 	
     protected function RegisterValidatorsToRequest()
     {
@@ -75,33 +70,17 @@ class ShowProblemInContest extends ApiHandler
         // If the contest is private, verify that our user is invited                        
         if ($contest->getPublic() == 0)
         {                    
-            if (is_null(ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId())))
+            if (is_null(ContestsUsersDAO::getByPK($this->_user_id, $contest->getContestId())) && !Authorization::IsContestAdmin($this->_user_id, $contest))
             {                
                 throw new ApiException(ApiHttpErrors::forbiddenSite());
             }        
         }
         
-        //does the user have access to this contest?
-        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
-        $user = LoginController::getCurrentUser();
-
-        if(!$contest->getPublic())
+        // If the contest has not started, user should not see it, unless it is admin
+        if (!$contest->hasStarted($this->_user_id) && !Authorization::IsContestAdmin($this->_user_id, $contest))
         {
-            //contest is not public
-
-            if( is_null($user ))
-            {
-                //no one is even logged in
-                throw new ApiException(ApiHttpErrors::forbiddenSite());
-            }
-
-            if( is_null(ContestsUsersDAO::getByPK( $user->getUserId(), $contest->getContestId() ) ) )
-            {
-                //he is not in the ContestUser list
-                throw new ApiException(ApiHttpErrors::forbiddenSite());
-            }
-            //he is good to go...
-        }                
+            throw new ApiException(ApiHttpErrors::forbiddenSite("Contest has not started yet."));
+        }                            
     }            
     
 
@@ -209,7 +188,7 @@ class ShowProblemInContest extends ApiHandler
             try
             {
                 // Save object in the DB
-                ContestProblemOpenedDAO::save($keyContestProblemOpened);                
+                ContestProblemOpenedDAO::save($keyContestProblemOpened);                                
             }
             catch (Exception $e)
             {

@@ -105,24 +105,7 @@ class NewProblemInContest extends ApiHandler
         ValidatorFactory::numericRangeValidator(0, INF)
                 ->validate(RequestContext::get("points"), "points");
         
-		if(isset($_FILES['problem_contents']) &&
-			!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name']))
-        {
-            throw new ApiException(ApiHttpErrors::invalidParameter("problem_contents is missing."));
-        }
-        
-        // Validate zip contents
-        $zipValidator = new Validator();
-        $zipValidator->addValidator(new ProblemContentsZipValidator)
-                     ->validate($_FILES['problem_contents']['tmp_name'], 'problem_contents');                
-        
-        // Save files to unzip                
-        Logger::log("Saving files to unzip...");
-        $this->filesToUnzip = $zipValidator->getValidator(0)->filesToUnzip;        
-        $this->casesFiles = $zipValidator->getValidator(0)->casesFiles;
-
-
-        sort($this->casesFiles);
+        self::ValidateZip($this->filesToUnzip, $this->casesFiles);                
     }       
     
     protected function GenerateResponse() 
@@ -179,60 +162,7 @@ class NewProblemInContest extends ApiHandler
             ContestProblemsDAO::save($relationship);
             
             // Create file after we know that alias is unique
-            try 
-            {
-                // Create paths
-                $dirpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . RequestContext::get("alias");
-                $filepath = $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';
-
-                // Drop contents into path required
-                FileHandler::MakeDir($dirpath);                
-                FileHandler::MoveFileFromRequestTo('problem_contents', $filepath);                                
-                ZipHandler::DeflateZip($filepath, $dirpath, $this->filesToUnzip);
-                
-                // Transform statements from markdown to HTML
-                $statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $this->filesToUnzip);
-                
-                foreach($statements as $statement)
-                {
-                    $filepath = $dirpath . DIRECTORY_SEPARATOR . $statement;
-                    $file_contents = FileHandler::ReadFile($filepath);
-                    
-                    // Markup
-                    $file_contents = markdown($file_contents); 
-                    
-                    // Overwrite file
-                    $lang = basename($statement, ".markdown");
-                    FileHandler::CreateFile($dirpath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html", $file_contents);
-                }
-               
-                // Create cases.zip and inputname
-                $casesZip = new ZipArchive;
-                $casesZipPath = $dirpath . DIRECTORY_SEPARATOR . 'cases.zip';
-
-                if (($error = $casesZip->open($casesZipPath, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) !== TRUE)
-                {
-					Logger::error($error);
-                    throw new Exception($error);
-                }
-
-				for ($i = 0; $i < count($this->casesFiles); $i++)
-                {
-                    if (!$casesZip->addFile($dirpath . DIRECTORY_SEPARATOR . $this->casesFiles[$i], substr($this->casesFiles[$i], strlen('cases/'))))
-                    {
-						Logger::error("Error trying to add {$this->casesFiles[$i]} to cases.zip");
-                        throw new Exception("Error trying to add {$this->casesFiles[$i]} to cases.zip");
-                    }
-                }
-
-                $casesZip->close();
-				Logger::log("Writing to : " . $dirpath . DIRECTORY_SEPARATOR . "inputname" );
-                file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($casesZipPath));
-            }
-            catch (Exception $e)
-            {
-                throw new ApiException( ApiHttpErrors::invalidFilesystemOperation("Unable to process problem_contents given. Please check the format. "), $e );
-            }
+            self::DeployProblemZip($this->filesToUnzip, $this->casesFiles);
 
             //End transaction
             ProblemsDAO::transEnd();
@@ -266,6 +196,91 @@ class NewProblemInContest extends ApiHandler
         // All clear
         $this->addResponse("status", "ok");
     }    
+    
+    public static function ValidateZip(&$filesToUnzip, &$casesFiles)
+    {
+        if(isset($_FILES['problem_contents']) &&
+                !FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name']))
+        {
+            throw new ApiException(ApiHttpErrors::invalidParameter("problem_contents is missing."));
+        }
+        
+        // Validate zip contents
+        $zipValidator = new Validator();
+        $zipValidator->addValidator(new ProblemContentsZipValidator)
+                     ->validate($_FILES['problem_contents']['tmp_name'], 'problem_contents');                
+        
+        // Save files to unzip                
+        Logger::log("Saving files to unzip...");
+        $filesToUnzip = $zipValidator->getValidator(0)->filesToUnzip;        
+        $casesFiles = $zipValidator->getValidator(0)->casesFiles;
+
+        sort($casesFiles);
+    }
+    
+    public static function DeployProblemZip($filesToUnzip, $casesFiles, $isUpdate = false)
+    {
+        try 
+        {
+            // Create paths
+            $dirpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . RequestContext::get("alias");
+            $filepath = $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';
+
+            // Drop contents into path required
+            
+            if ($isUpdate === true)
+            {
+                FileHandler::DeleteDirRecursive($dirpath);                
+            }
+            
+            FileHandler::MakeDir($dirpath);                            
+            FileHandler::MoveFileFromRequestTo('problem_contents', $filepath);                                
+            ZipHandler::DeflateZip($filepath, $dirpath, $filesToUnzip);
+
+            // Transform statements from markdown to HTML
+            $statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $filesToUnzip);
+
+            foreach($statements as $statement)
+            {
+                $filepath = $dirpath . DIRECTORY_SEPARATOR . $statement;
+                $file_contents = FileHandler::ReadFile($filepath);
+
+                // Markup
+                $file_contents = markdown($file_contents); 
+
+                // Overwrite file
+                $lang = basename($statement, ".markdown");
+                FileHandler::CreateFile($dirpath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html", $file_contents);
+            }
+
+            // Create cases.zip and inputname
+            $casesZip = new ZipArchive;
+            $casesZipPath = $dirpath . DIRECTORY_SEPARATOR . 'cases.zip';
+
+            if (($error = $casesZip->open($casesZipPath, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) !== TRUE)
+            {
+                Logger::error($error);
+                throw new Exception($error);
+            }
+
+            for ($i = 0; $i < count($casesFiles); $i++)
+            {
+                if (!$casesZip->addFile($dirpath . DIRECTORY_SEPARATOR . $casesFiles[$i], substr($casesFiles[$i], strlen('cases/'))))
+                {
+                    Logger::error("Error trying to add {$casesFiles[$i]} to cases.zip");
+                    throw new Exception("Error trying to add {$casesFiles[$i]} to cases.zip");
+                }
+            }
+
+            $casesZip->close();
+            Logger::log("Writing to : " . $dirpath . DIRECTORY_SEPARATOR . "inputname" );
+            file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($casesZipPath));
+        }
+        catch (Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidFilesystemOperation("Unable to process problem_contents given. Please check the format. "), $e );
+        }
+    }
 }
 
 ?>

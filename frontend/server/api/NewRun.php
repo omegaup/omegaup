@@ -78,7 +78,8 @@ class NewRun extends ApiHandler
 
             // Validate that the run is timely inside contest
             $contest = ContestsDAO::getByPK($contest->getContestId());
-            if( !$contest->isInsideContest($this->_user_id))
+            if( !$contest->isInsideContest($this->_user_id) 
+                    && !Authorization::IsContestAdmin($this->_user_id, $contest))
             {                
                 throw new ApiException(ApiHttpErrors::forbiddenSite("Unable to submit run: Contest time has expired or not started yet."));
             }
@@ -88,7 +89,7 @@ class NewRun extends ApiHandler
                 && is_null(ContestsUsersDAO::getByPK(
                         $this->_user_id, 
                         $contest->getContestId()))
-               )
+                && !Authorization::IsContestAdmin($this->_user_id, $contest))
             {
                throw new ApiException(ApiHttpErrors::forbiddenSite("Unable to submit run: You are not registered to this contest."));
 	    }
@@ -98,7 +99,7 @@ class NewRun extends ApiHandler
                     $contest->getContestId(), 
                     $problem->getProblemId(), 
                     $this->_user_id)
-               )
+               && !Authorization::IsContestAdmin($this->_user_id, $contest))
             {                
                throw new ApiException(ApiHttpErrors::notAllowedToSubmit("Unable to submit run: You have to wait " . $contest->getSubmissionsGap() . " seconds between consecutive submissions."));
             }

@@ -73,6 +73,33 @@ class FileHandler
             throw new Exception("FATAL: Not able to move create dir ". $pathName . " CHMOD: " . $chmod);
         }
     }
+    
+    static function DeleteDirRecursive($pathName)
+    {
+        self::rrmdir($pathName);
+    }
+    
+    private static function rrmdir($dir) 
+    {
+        foreach(glob($dir . '/*') as $file) 
+        {
+            if(is_dir($file))
+            {
+                self::rrmdir($file);
+            }
+            else
+                if (!unlink($file))
+                {
+                    throw new Exception("FATAL: Not able to delete file ". $file);
+                }
+        }
+        
+        if (!rmdir($dir))
+        {
+            throw new Exception("FATAL: Not able to delete dir ". $dir);
+        }
+    }
+
 }
 
 ?>

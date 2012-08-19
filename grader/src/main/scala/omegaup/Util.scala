@@ -2,6 +2,7 @@ package omegaup
 
 import java.io._
 import java.net._
+import scala.xml._
 import org.mortbay.io._
 import org.mortbay.jetty.client.{HttpClient, ContentExchange}
 
@@ -207,4 +208,23 @@ object Database extends Object with Log {
 			}
 		}
 	*/
+}
+
+class XmlWalker(xml: String) {
+	val root = XML.loadString(xml)
+
+	def get(path: String): String = {
+		var node: NodeSeq = root
+		
+		for (element <- path.split("\\.")) {
+			if (element.contains("=")) {
+				val search = element.split("=")
+				node = node.filter(x => (x \\ search(0)).text == search(1))
+			} else {
+				node = node \\ element
+			}
+		}
+		
+		return node.text.trim
+	}
 }

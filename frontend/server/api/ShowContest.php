@@ -49,7 +49,13 @@ class ShowContest extends ApiHandler
                  // Operation failed in the data layer
                  throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
             }
-        }                                                
+        }  
+        
+        // If the contest has not started, user should not see it, unless it is admin
+        if (!$contest->hasStarted($this->_user_id) && !Authorization::IsContestAdmin($this->_user_id, $contest))
+        {
+            throw new ApiException(ApiHttpErrors::preconditionFailed("Contest has not started yet.", array("start_time" => strtotime($contest->getStartTime()))) );
+        }
     }      
 
 
