@@ -94,7 +94,7 @@ class ProblemContentsZipValidator extends Validator
             $path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.in';            
             if(!$zip->getFromName($path))
             {
-				Logger::error("Not able to find ". $testplan_array[1][$i] . " in testplan.");
+                Logger::error("Not able to find ". $testplan_array[1][$i] . " in testplan.");
                 $this->setError("Not able to find ". $testplan_array[1][$i] . " in testplan.");                
                 return false;
             }                        
@@ -118,18 +118,18 @@ class ProblemContentsZipValidator extends Validator
 
     private function checkCases(ZipArchive $zip, array $zipFilesArray)
     {
-        // Add all files in cases/ that end either in .in or .out
+        // Add all files in cases/ that end either in .in or .out        
         for ($i = 0; $i < count($zipFilesArray); $i++)
-        {
-            $path = $zipFilesArray[$i];
+        {            
+            $path = $zipFilesArray[$i];                       
             $l = strlen($path);
-            if (strpos($path, "cases/" == 0) && (strpos($path, ".in") == $l - 3 || strpos($path, ".out") == $l - 4))
+            if (strpos($path, "cases/") == 0 && (strpos($path, ".in") == $l - 3 || strpos($path, ".out") == $l - 4))
             {
                 $this->filesToUnzip[] = $path;
                 $this->casesFiles[] = $path;
             }
-        }
-		return true;
+        }        
+        return true;
     }
     
     private function checkProblemStatements(array $zipFilesArray)
