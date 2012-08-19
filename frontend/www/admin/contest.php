@@ -51,8 +51,23 @@
 
 
 
-	$page->nextTab("Editar");
 
+	$page->nextTab("Envios");
+
+
+
+
+
+	$page->nextTab("Chavos");
+	$page->addComponent("Enviar correos, bannear, nuevos weyes, etc");
+
+
+
+	$page->nextTab("Stats");
+	$page->addComponent("GAnalitics u otras cosas, mostrar los auth tokens de los weyes que entraron al concurso con los diferentes ip's");
+
+
+	$page->nextTab("Editar");
 	$page->addComponent("<script>
 		function doEditar(){
 				 var toSend = {};

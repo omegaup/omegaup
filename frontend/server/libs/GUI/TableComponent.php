@@ -109,6 +109,10 @@ class TableComponent implements GuiComponent{
 			}
 
 
+			if($a % 2 == 0){
+				$st = "background-color: rgba(200, 200, 200, 0.199219)";
+			}else $st = "";
+
 			if( isset($this->actionField)){
 				if($this->actionSendJSON){
 					
@@ -147,7 +151,7 @@ class TableComponent implements GuiComponent{
 					if($i++ % 2 == 0){
 						$bgc = "";
 					}else{
-						$bgc = ""; //"rgba(200, 200, 200, 0.199219)";
+						$bgc = ""; //"rgba(200, 200, 200, 0.199219)";   
 					}
 					$html .=  "<td align='left' style='background-color:".$bgc.";'>" . $column . "</td>";
 				}
