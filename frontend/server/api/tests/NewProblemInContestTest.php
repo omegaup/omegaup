@@ -34,7 +34,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         return copy($filename, $targetpath);
     }
     
-    private function setValidContext($contest_id = NULL)
+    private function setValidContext($contest_id = NULL, $zipName = 'testproblem.zip')
     {        
         // Set context
         if(is_null($contest_id))
@@ -58,7 +58,7 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         RequestContext::set("points", 1);
 
         // Set file upload context
-        $_FILES['problem_contents']['tmp_name'] = 'testproblem.zip';               
+        $_FILES['problem_contents']['tmp_name'] = $zipName;               
         
         // Create fileUploader mock                        
         $this->fileUploaderMock = $this->getMock('FileUploader', array('IsUploadedFile', 'MoveUploadedFile'));
@@ -245,6 +245,88 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
             
             $this->fail("Exception was expected. Parameter: ". $key);            
         }                   
+    }
+    
+    public function testCreateValidProblemNoTestplan($contest_id = NULL)
+    {        
+        
+        // Set valid context for problem creation
+        $contest_id = is_null($contest_id) ? Utils::GetValidPublicContestId() : $contest_id;
+        $this->setValidContext($contest_id, 'triangulos.zip');
+     
+        // Login as judge
+        $auth_token = Utils::LoginAsContestDirector();        
+        
+        // Execute API
+        Utils::SetAuthToken($auth_token);
+        $newProblemInContest = new NewProblemInContest($this->fileUploaderMock);
+        
+        try
+        {
+            $return_array = $newProblemInContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            if(!is_null($e->getWrappedException()))
+            {
+                var_dump($e->getWrappedException()->getMessage());            
+            }
+            $this->fail("Unexpected exception");
+        }        
+        
+        // Verify response
+        $this->assertEquals("ok", $return_array["status"]);        
+        $this->assertEquals("cases/1.in", $return_array["uploaded_files"][0]);
+        
+        
+        // Verify data in DB
+        $problem_mask = new Problems();
+        $problem_mask->setTitle(RequestContext::get("title"));
+        $problems = ProblemsDAO::search($problem_mask);
+        
+        // Check that we only retreived 1 element
+        $this->assertEquals(1, count($problems));        
+        $problem = $problems[0];
+        
+        // Verify contest was found
+        $this->assertNotNull($problem);
+        $this->assertNotNull($problem->getProblemId());
+        
+        // Verify DB data
+        $this->assertEquals(RequestContext::get("title"), $problem->getTitle());
+        $this->assertEquals(RequestContext::get("alias"), $problem->getAlias());
+        $this->assertEquals(RequestContext::get("validator"), $problem->getValidator());
+        $this->assertEquals(RequestContext::get("time_limit"), $problem->getTimeLimit());
+        $this->assertEquals(RequestContext::get("memory_limit"), $problem->getMemoryLimit());                              
+        $this->assertEquals(RequestContext::get("order"), $problem->getOrder());
+        $this->assertEquals(RequestContext::get("source"), $problem->getSource());
+        
+        // Verify author username -> author id conversion
+        $user = UsersDAO::getByPK($problem->getAuthorId());
+        $this->assertEquals($user->getUsername(), RequestContext::get("author_username"));
+        
+        // Verify problem contents.zip were copied
+        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;        
+        
+        $this->assertFileExists($targetpath . "contents.zip");                        
+        $this->assertFileExists($targetpath . "cases.zip");
+        $this->assertFileExists($targetpath . "cases");
+        $this->assertFileExists($targetpath . "inputname");
+        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
+                
+        // Default data
+        $this->assertEquals(0, $problem->getVisits());
+        $this->assertEquals(0, $problem->getSubmissions());
+        $this->assertEquals(0, $problem->getAccepted());
+        $this->assertEquals(0, $problem->getDifficulty());       
+        
+        // Get problem-contest and verify it
+        $contest_problems = ContestProblemsDAO::getByPK($contest_id, $problem->getProblemId());
+        $this->assertNotNull($contest_problems);        
+        $this->assertEquals(RequestContext::get("points"), $contest_problems->getPoints());        
+        
+        return (int)$problem->getProblemId();
     }
 }
 ?>
