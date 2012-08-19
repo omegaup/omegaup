@@ -47,18 +47,24 @@ class Grader
         
         // Execute call
 	$content = curl_exec($curl);
-
-        // Close curl
-	curl_close($curl);
-
+        
+        $errorMsg = NULL;
 	if(!$content)
         {            
-            throw new Exception("curl_exec failed: " . curl_error($curl) . " ". curl_errno($curl));
+            $errorMsg = "curl_exec failed: " . curl_error($curl) . " ". curl_errno($curl);            
         }
 	else if ($content !== '{"status":"ok"}')
 	{
-            throw new Exception("Call to grader failed: '$content'");
+            $errorMsg = "Call to grader failed: '$content'";            
 	}
+        
+        // Close curl
+	curl_close($curl);
+        
+        if ($errorMsg !== NULL)
+        {
+            throw new Exception($errorMsg);
+        }                
     }
 }
 
