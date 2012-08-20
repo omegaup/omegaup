@@ -26,6 +26,9 @@
    require_once("libs/Authorization.php");
 
 
+
+
+
    Logger::log("REQUEST : " . $_SERVER["SCRIPT_FILENAME"] . "?" . $_SERVER["QUERY_STRING"]);
 
 	/**
@@ -37,7 +40,6 @@
 		
 		require_once('adodb5/adodb.inc.php');
 		require_once('adodb5/adodb-exceptions.inc.php');
-		
 		$conn = null;
 
 		try{
@@ -46,10 +48,6 @@
 		    $conn->debug = OMEGAUP_DB_DEBUG;
 		    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
             
-		    if(!$conn) {
-		    	$conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
-	    		$conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
-	    	}
 
 
 	    	if(!$conn) {
@@ -70,9 +68,13 @@
 		    
 		} catch (Exception $e) {
 			
-
+	
+        	    //if(!$conn) {
+                	$conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
+               		$conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
+            		//}
 				
-
+			/*
 			header('HTTP/1.1 500 INTERNAL SERVER ERROR');
 			
 			die(json_encode(array(
@@ -80,7 +82,7 @@
 				"error"	 => $e,
 				"errorcode" => 2
 			)));
-
+			*/
 		}
 		$GLOBALS["conn"] = $conn;
 		return;
@@ -158,20 +160,20 @@
 
 	$conn = null;
 
+
 	try{
 	    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
 	    $conn->debug = OMEGAUP_DB_DEBUG;
 	    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 
-	    if(!$conn) {
-			$conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
-	    	$conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
-	    }
-
 	} catch (Exception $e) {
-
-			$GUI->prettyDie("No database");
-
+		Logger::error($e);
+            //if(!$conn) {
+                $conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
+                $conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
+            //}
+		
+		//die("error");
 	}
 	
 	
