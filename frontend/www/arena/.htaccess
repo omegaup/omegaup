@@ -9,9 +9,7 @@ RewriteRule ^authenticated/?$ CallApiLoader.php?apicmd=Authenticated [L]
 RewriteRule ^login/?$ CallApiLoader.php?apicmd=Login [L]
 RewriteRule ^logout/?$ CallApiLoader.php?apicmd=Logout [L]
 
-
 RewriteRule ^user/edit/?$ CallApiLoader.php?apicmd=UserEdit&%{QUERY_STRING} [L]
-
 
 RewriteRule ^contests/?$ CallApiLoader.php?apicmd=ShowContests [L]
 RewriteRule ^contests/new/?$ CallApiLoader.php?apicmd=NewContest [L]
@@ -41,6 +39,7 @@ RewriteRule ^clarifications/update/([0-9]+)/?$ CallApiLoader.php?apicmd=UpdateCl
 
 RewriteRule ^problems/([^/]*)/?$ CallApiLoader.php?apicmd=ShowProblems&search=$1 [L]
 RewriteRule ^problems/([a-zA-Z0-9_-]+)/update/?$ CallApiLoader.php?apicmd=UpdateProblem&problem_alias=$1 [L]
+RewriteRule ^problems/([a-zA-Z0-9_-]+)/rejudge/?$ CallApiLoader.php?apicmd=RejudgeProblem&problem_alias=$1 [L]
 
 # Redirects for UX.
 RewriteRule ^/?$ index.php [L]

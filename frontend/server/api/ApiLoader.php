@@ -137,6 +137,11 @@ class ApiLoader
                 $api = new UpdateRun();
                 break;
             
+            case 'RejudgeProblem':
+                require_once('RejudgeProblem.php');
+                $api = new RejudgeProblem();
+                break;
+            
             case 'ShowScoreboard':
                 require_once('ShowScoreboard.php');
                 $api = new ShowScoreboard();
