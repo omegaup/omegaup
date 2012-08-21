@@ -134,9 +134,7 @@ class ShowProblemInContest extends ApiHandler
                 {
                     throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
                 }
-
-                // Add problem statement to source
-                $this->addResponse("problem_statement", $file_content);        
+                
                 
                 // Add to cache
                 if (APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_PROBLEM_STATEMENT == true)
@@ -147,6 +145,9 @@ class ShowProblemInContest extends ApiHandler
                     }
                 }
             }
+            
+            // Add problem statement to source
+            $this->addResponse("problem_statement", $file_content);   
 	}
 	else if($problem->getServer() == 'uva')
 	{
