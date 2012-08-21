@@ -104,19 +104,49 @@ class ShowProblemInContest extends ApiHandler
 	// Read the file that contains the source
 	if ($problem->getValidator() != 'remote')
 	{
-            $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
-
-            try
-            {                            
-                $file_content = FileHandler::ReadFile($source_path);                                        
-            }
-            catch(Exception $e)
+            $file_content = null;
+            $from_cache = false;
+            $cache_key = $problem->getAlias() . "-" . RequestContext::get("lang");
+            
+            // check cache
+            if (APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_PROBLEM_STATEMENT == true)
             {
-                throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
+                if ($file_content = apc_fetch($cache_key))
+                {
+                    $from_cache = true;
+                }
+                else
+                {
+                    Logger::log("apc_fetch cache miss for problem key: " . $cache_key);
+                }
             }
+            
+            if ($from_cache == false)
+            {
+            
+                $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
 
-            // Add problem statement to source
-            $this->addResponse("problem_statement", $file_content);        
+                try
+                {                            
+                    $file_content = FileHandler::ReadFile($source_path);                                        
+                }
+                catch(Exception $e)
+                {
+                    throw new ApiException( ApiHttpErrors::invalidFilesystemOperation(), $e );
+                }
+
+                // Add problem statement to source
+                $this->addResponse("problem_statement", $file_content);        
+                
+                // Add to cache
+                if (APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_PROBLEM_STATEMENT == true)
+                {
+                    if ( apc_store($cache_key, $file_content, APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT) == false)
+                    {
+                        Logger::log("apc_store failed for problem key: " . $cache_key);
+                    }
+                }
+            }
 	}
 	else if($problem->getServer() == 'uva')
 	{
