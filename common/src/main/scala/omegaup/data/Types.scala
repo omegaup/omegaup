@@ -10,6 +10,7 @@ object Validator extends Enumeration {
 	val  TokenCaseless = Value(4, "token-caseless")
 	val  TokenNumeric = Value(5, "token-numeric")
 	val  Custom = Value(6, "custom")
+	val  Karel = Value(7, "karel")
 }
 
 object Server extends Enumeration {
@@ -76,6 +77,7 @@ object PenaltyTimeStart extends Enumeration {
 	type PenaltyTimeStart = Value
 	val Contest = Value(1, "contest")
 	val Problem = Value(2, "problem")
+	val NoPenalty = Value(3, "none")
 }
 
 import Validator._

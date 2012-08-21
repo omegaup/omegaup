@@ -10,6 +10,7 @@ $(document).ready(function() {
 	var finishTime = null;
 	var submissionDeadline = null;
 	var submissionGap = 0;
+	var answeredClarifications = 0;
 	var veredicts = {
 		AC: "Accepted",
 		PA: "Partially Accepted",
@@ -44,9 +45,24 @@ $(document).ready(function() {
 		}
 	});
 
-	omegaup.getContest(contestAlias, function(contest) {
+	function contestLoaded(contest) {
 		if (contest.status == 'error') {
-			$('#loading').html('404');
+			if (contest.start_time) {
+				var f = (function(x, y) {
+					return function() {
+						var t = new Date();
+						$('#loading').html(x + ' ' + formatDelta(y.getTime() - t.getTime()));
+						if (t.getTime() < y.getTime()) {
+							setTimeout(f, 1000);
+						} else {
+							omegaup.getContest(x, contestLoaded);
+						}
+					}
+				})(contestAlias, omegaup.time(contest.start_time * 1000));
+				setTimeout(f, 1000);
+			} else {
+				$('#loading').html('404');
+			}
 			return;
 		}
 
@@ -102,7 +118,9 @@ $(document).ready(function() {
 
         	$('#loading').fadeOut('slow');
 	        $('#root').fadeIn('slow');
-	});
+	}
+	
+	omegaup.getContest(contestAlias, contestLoaded);
 
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
@@ -296,10 +314,12 @@ $(document).ready(function() {
 			$('#' + activeTab).show();
 			
 			if (activeTab == 'ranking') {
-                if (currentEvents) {
-                    rankingEvents(currentEvents);
-                }
-            }
+		                if (currentEvents) {
+		                    rankingEvents(currentEvents);
+                		}
+            		} else if (activeTab == 'clarifications') {
+				$('#clarifications-count').css("font-weight", "normal");
+			}
 		}
 		
 	});
@@ -469,6 +489,12 @@ $(document).ready(function() {
 
 	function clarificationsChange(data) {
 		$('.clarifications tr.inserted').remove();
+		if (data.clarifications.length > 0) {
+			$('#clarifications-count').html("(" + data.clarifications.length + ")");
+		}
+
+		var previouslyAnswered = answeredClarifications;
+		answeredClarifications = 0;
 
 		for (var i = 0; i < data.clarifications.length; i++) {
 			var clarification = data.clarifications[i];
@@ -479,6 +505,9 @@ $(document).ready(function() {
 			$('.time', r).html(clarification.time);
 			$('.message', r).html(clarification.message);
 			$('.answer', r).html(clarification.answer);
+			if (clarification.answer) {
+				answeredClarifications++;
+			}
 
 			if (clarification.can_answer) {
 				(function(id, answer, answerNode) {
@@ -503,6 +532,10 @@ $(document).ready(function() {
 			}
 
 			$('.clarifications tbody').append(r);
+		}
+
+		if (answeredClarifications > previouslyAnswered && activeTab != 'clarifications') {
+			$('#clarifications-count').css("font-weight", "bold");
 		}
 	}
 	
