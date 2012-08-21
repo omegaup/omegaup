@@ -357,6 +357,18 @@ $(document).ready(function() {
 			$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 			$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
 			$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+			if (run.veredict == 'JE')
+			{
+				$('.status', r).css('background-color', '#f00');
+			}
+			else if (run.veredict == 'RTE' || run.veredict == 'CE' || run.veredict == 'RFE')
+			{
+				$('.status', r).css('background-color', '#ff9900');
+			}
+			else if (run.veredict == 'AC')
+			{
+				$('.status', r).css('background-color', '#CCFF66');
+			}
 			$('.penalty', r).html(run.submit_delay);
 			if (run.time) {
 				$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
