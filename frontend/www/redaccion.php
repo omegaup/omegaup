@@ -22,7 +22,7 @@
 	}
 
 	
-	$page->addComponent(new FreeHTMLComponent('<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>'));
+	$page->addComponent(new FreeHTMLComponent('<script type="text/javascript" src="https://d3eoax9i5htok0.cloudfront.net/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>'));
 	$page->addComponent(new FreeHTMLComponent('<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [[\'$\',\'$\'], [\'\\\\(\',\'\\\\)\']]}});</script>'));
 	$page->addComponent(new FreeHTMLComponent('<div>Explicación :P</div>'));
 	$page->addComponent(new FreeHTMLComponent("<form method='POST' action='redaccion.php'><textarea id='markdownSource' name='source'>{$_POST['source']}</textarea><div id='markdownPreview' class='problem-statement'>" . markdown($_POST['source']) . "</div><div style='clear: both;'><input value='Previsualización' type='submit'/></div></form>"));

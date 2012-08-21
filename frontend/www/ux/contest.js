@@ -9,6 +9,7 @@ $(document).ready(function() {
 	var startTime = null;
 	var finishTime = null;
 	var submissionDeadline = null;
+	var submissionGap = 0;
 	var veredicts = {
 		AC: "Accepted",
 		PA: "Partially Accepted",
@@ -62,6 +63,9 @@ $(document).ready(function() {
 		startTime = contest.start_time;
 		finishTime = contest.finish_time;
 		submissionDeadline = contest.submission_deadline;
+		submissionGap = parseInt(contest.submission_gap);
+
+		if (!(submissionGap > 0)) submissionGap = 0;
 
 		var letter = 65;
 
@@ -111,6 +115,11 @@ $(document).ready(function() {
 	$('#submit').submit(function(e) {
 		if (!$('#submit textarea[name="code"]').val()) return false;
 
+		if (problems[currentProblem.alias].last_submission + submissionGap * 1000 > new Date().getTime()) {
+			alert('Deben pasar ' + submissionGap + ' segundos entre envios de un mismo problema');
+			return;
+		}
+
 		$('#submit input').attr('disabled', 'disabled');
 		omegaup.submit(contestAlias, currentProblem.alias, $('#submit select[name="language"]').val(), $('#submit textarea[name="code"]').val(), function (run) {
 			if (run.status != 'ok') {
@@ -118,6 +127,7 @@ $(document).ready(function() {
 				$('#submit input').removeAttr('disabled');
 				return;
 			}
+			problems[currentProblem.alias].last_submission = new Date().getTime();
 			run.status = 'new';
 			run.contest_score = 0;
 			run.time = new Date;

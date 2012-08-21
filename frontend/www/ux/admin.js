@@ -373,6 +373,7 @@ $(document).ready(function() {
 			(function(guid, run, row) {
 				$('.details', row).append($('<input type="button" value="details" />').click(function() {
 					omegaup.runDetails(guid, function(data) {
+						$('#run-details .compile_error').html('');
 						$('#run-details .compile_error').html(data.compile_error);
 						$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
 						$('#run-details .cases div').remove();
