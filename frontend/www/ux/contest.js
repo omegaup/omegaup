@@ -45,9 +45,24 @@ $(document).ready(function() {
 		}
 	});
 
-	omegaup.getContest(contestAlias, function(contest) {
+	function contestLoaded(contest) {
 		if (contest.status == 'error') {
-			$('#loading').html('404');
+			if (contest.start_time) {
+				var f = (function(x, y) {
+					return function() {
+						var t = new Date();
+						$('#loading').html(x + ' ' + formatDelta(y.getTime() - t.getTime()));
+						if (t.getTime() < y.getTime()) {
+							setTimeout(f, 1000);
+						} else {
+							omegaup.getContest(x, contestLoaded);
+						}
+					}
+				})(contestAlias, omegaup.time(contest.start_time * 1000));
+				setTimeout(f, 1000);
+			} else {
+				$('#loading').html('404');
+			}
 			return;
 		}
 
@@ -103,7 +118,9 @@ $(document).ready(function() {
 
         	$('#loading').fadeOut('slow');
 	        $('#root').fadeIn('slow');
-	});
+	}
+	
+	omegaup.getContest(contestAlias, contestLoaded);
 
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
