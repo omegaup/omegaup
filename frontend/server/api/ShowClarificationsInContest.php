@@ -33,9 +33,17 @@ class ShowClarificationsInContest extends ApiHandler
     {
        // Create array of relevant columns
 	$relevant_columns = array("clarification_id", "problem_alias", "message", "answer", "time", "public");
-
-        //Get all public clarifications
-        $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+        
+        try
+        {
+            //Get all public clarifications
+            $contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+        }
+        catch(Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
+        }
+        
         $public_clarification_mask = new Clarifications ( array (
            "public" => '1',
            "contest_id" => $contest->getContestId()
@@ -82,6 +90,20 @@ class ShowClarificationsInContest extends ApiHandler
 		$clar = $clarification->asFilteredArray($relevant_columns);
 		$clar['can_answer'] = $is_contest_director;
 
+                // Add author in case of contest_director
+                if ($is_contest_director)
+                {
+                    try
+                    {
+                        $author_user = UsersDAO::getByPK($clarification->getAuthorId());
+                        $clar['author'] = $author_user->getUsername();
+                    }
+                    catch(Exception $e)
+                    {
+                        throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
+                    }                    
+                }
+                
         	array_push($clarifications_array, $clar);
         }
          
@@ -90,6 +112,20 @@ class ShowClarificationsInContest extends ApiHandler
 	{
 		$clar = $clarification->asFilteredArray($relevant_columns);
 		$clar['can_answer'] = $is_contest_director;
+                
+                // Add author in case of contest_director
+                if ($is_contest_director)
+                {
+                    try
+                    {
+                        $author_user = UsersDAO::getByPK($clarification->getAuthorId());
+                        $clar['author'] = $author_user->getUsername();
+                    }
+                    catch(Exception $e)
+                    {
+                        throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
+                    }                    
+                }
 
 		array_push($clarifications_array, $clar);
         }
