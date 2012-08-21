@@ -447,6 +447,24 @@ $(document).ready(function() {
 		return clock;
 	}
 
+	function notify(title, message, element) {
+		if (window.Notification) {
+			var notification = new Notification(title, {
+				body: message,
+			});
+			notification.addEventListener('click', function() {
+				if (element) {
+					window.focus();
+					element.scrollIntoView(true);
+				}
+				notification.close();
+			});
+			notification.show();
+		} else if (element) {
+			element.scrollIntoView(true);
+		}
+	}
+
 	function clarificationsChange(data) {
 		$('.clarifications tr.inserted').remove();
 
@@ -460,6 +478,10 @@ $(document).ready(function() {
 			$('.time', r).html(clarification.time);
 			$('.message', r).html(clarification.message);
 			$('.answer', r).html(clarification.answer);
+
+			if (!clarification.answer) {
+				notify(clarification.author + " - " + clarification.problem_alias, clarification.message, r[0]);
+			}
 
 			if (clarification.can_answer) {
 				(function(id, answer, answerNode) {
