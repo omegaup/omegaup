@@ -268,7 +268,7 @@ class NewRun extends ApiHandler
     
     private function InvalidateScoreboardCache($contest_id)
     {
-        $cache_key = "scoreboard-" . $this->contest_id;
+        $cache_key = "scoreboard-" . $contest_id;
         
         if (APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_SCOREBOARD == true)
         {
