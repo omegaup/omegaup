@@ -268,8 +268,14 @@ class NewRun extends ApiHandler
     
     private function InvalidateScoreboardCache($contest_id)
     {
-    	$cache = new Cache();
-    	$cache->delete($contest_id, Scoreboard::MEMCACHE_PREFIX);
-    	$cache->delete($contest_id, Scoreboard::MEMCACHE_EVENTS_PREFIX);
+        $cache_key = "scoreboard-" . $this->contest_id;
+        
+        if (APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_SCOREBOARD == true)
+        {
+            if (apc_delete($cache_key) == false)
+            {
+                Logger::log("Failed to invalidate cache for key: " . $cache_key);
+            }
+        }
     }
 }

@@ -55,10 +55,25 @@ class Scoreboard
     
     public function generate($withRunDetails = false)
     {
-    	$cache = new Cache(self::MEMCACHE_PREFIX);
-        $result = $cache->get($this->contest_id);
-
-        if( $this->showAllRuns || $result == null )
+    	$result = null;
+        $from_cache = false;
+        $cache_key = "scoreboard-" . $this->contest_id;
+        $can_use_cache = APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_SCOREBOARD == true && !$this->showAllRuns;
+        
+        // If cache is turned on and we're not looking for admin-only runs
+        if ($can_use_cache)
+        {
+            if($result = apc_fetch($cache_key))
+            {
+                $from_cache = true;
+            }
+            else
+            {
+                Logger::log("Cache miss for key: " . $cache_key );
+            }            
+        }
+        
+        if (!$from_cache)
         {
             try
             {
@@ -112,9 +127,12 @@ class Scoreboard
             usort($result, array($this, 'compareUserScores'));
 
             // Cache scoreboard if there are no pending runs.
-            if( $cacheable )
+            if( $cacheable && $can_use_cache)
             {
-                    $cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
+                if (apc_store($cache_key, $result, APC_USER_CACHE_SCOREBOARD_TIMEOUT) == false)
+                {
+                    Logger::log("apc_store failed for problem key: " . $cache_key);
+                }
             }
 	}
 
