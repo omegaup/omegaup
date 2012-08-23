@@ -7,8 +7,8 @@
  *
  *
  * 
- * POST /contests/:id:/problem/rejudge
- * Si el usuario tiene permisos de juez o admin, crea un nuevo problema para el concurso :id
+ * POST /problems/:id:/rejudge
+ * Si el usuario tiene permisos de juez o admin, rejuecea el problema :id:
  *
  * */
 
@@ -17,19 +17,9 @@ require_once(SERVER_PATH . '/libs/Grader.php');
 require_once(SERVER_PATH . '/libs/Cache.php');
 require_once("Scoreboard.php");
 
-class UpdateRun extends ApiHandler
+class RejudgeProblem extends ApiHandler
 {     
-	private $grader;
 	private $myProblem;
-    
-    public function UpdateRun(Grader $grader = NULL)
-    {
-        if($grader === NULL)
-        {
-            $grader = new Grader();
-        }
-	$this->grader = $grader;
-    }
     
     protected function RegisterValidatorsToRequest()
     {    
@@ -64,16 +54,17 @@ class UpdateRun extends ApiHandler
     protected function GenerateResponse() 
     {   
 	Logger::log("New run being submitted!!");
+	$grader = new Grader();
         
         // Call Grader
         try
 	{
             $runs = RunsDAO::search(new Runs(array(
                 "problem_id" => $this->myProblem->getProblemId()
-	)));
+	    )));
 
 	    foreach ($runs as $run) {
-		    $this->grader->Grade($run->getRunId());
+		    $grader->Grade($run->getRunId());
 	    }
         }
         catch(Exception $e)
@@ -84,7 +75,6 @@ class UpdateRun extends ApiHandler
         
         // Happy ending
 	$this->addResponse("status", "ok");
-
 
 	$cp = ContestProblemsDAO::search(new ContestProblems(array(
 		"problem_id" => $this->myProblem->getProblemId()
