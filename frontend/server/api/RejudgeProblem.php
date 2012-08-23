@@ -64,6 +64,9 @@ class RejudgeProblem extends ApiHandler
 	    )));
 
 	    foreach ($runs as $run) {
+		    $run->setStatus('new');
+		    $run->setVeredict('JE');
+		    RunsDAO::save($run);
 		    $grader->Grade($run->getRunId());
 	    }
         }

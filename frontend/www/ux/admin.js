@@ -135,7 +135,7 @@ $(document).ready(function() {
 	$('#rejudge-problem').click(function() {
 		if (confirm('Deseas rejuecear el problema ' + $('#rejudge-problem-list').val() + '?')) {
 			omegaup.rejudgeProblem($('#rejudge-problem-list').val(), function (x) {
-				console.log(x);
+				omegaup.getContestRuns(contestAlias, runsChange);
 			});
 		}
 		return false;
