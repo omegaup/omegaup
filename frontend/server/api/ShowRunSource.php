@@ -28,15 +28,10 @@ class ShowRunSource extends ApiHandler
 			throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
 		}                        
 
-                if (!Authorization::IsSystemAdmin($this->_user_id))
+                if (!Authorization::IsSystemAdmin($this->_user_id) || ($this->run->getUserId() != $this->_user_id))
 		{
                     throw new ApiException(ApiHttpErrors::forbiddenSite());
-		}
-                
-                if ($this->run->getUserId() != $this->_user_id)
-                {
-                    throw new ApiException(ApiHttpErrors::forbiddenSite());
-                }
+		}                                
 	}
 
 
