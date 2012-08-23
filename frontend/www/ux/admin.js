@@ -386,14 +386,16 @@ $(document).ready(function() {
 				$('.details', row).append($('<input type="button" value="details" />').click(function() {
 					omegaup.runDetails(guid, function(data) {
 						$('#run-details .compile_error').html('');
-						$('#run-details .compile_error').html(data.compile_error);
+						if (data.compile_error) {
+							$('#run-details .compile_error').html(data.compile_error.replace('&', '&amp;').replace('<', '&lt;'));
+						}
 						$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
 						$('#run-details .cases div').remove();
 						for (var i = 0; i < data.cases.length; i++) {
 							var c = data.cases[i];
 							$('#run-details .cases').append($("<div></div>").append($("<h2></h2>").html(c.name)));
 							$('#run-details .cases').append($("<div></div>").html(JSON.stringify(c.meta)));
-							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff)));
+							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff ? c.out_diff.replace(/&/g, '&amp;').replace(/</g, '&lt;') : "")));
 						}
 						window.location.hash = 'run/details';
 						$(window).hashchange();
