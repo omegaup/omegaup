@@ -24,12 +24,6 @@
 				<h1 class="contest-title"></h1>
 				<div class="clock">0:00:00</div>
 			</div>
-			<form enctype="multipart/form-data" action="/arena/problems/update" method="post" id="update-problem">
-				<select id="rejudge-problem-list" name="problem_alias"></select>
-				<button id="rejudge-problem" value="Rejuecear">Rejuecear</button>
-				<input name="problem_contents" type="file" />
-				<button id="upload-problem" type="submit">Actualizar</button>
-			</form>
 			<table class="runs">
 				<caption>Envíos</caption>
 				<thead>
@@ -117,6 +111,14 @@
 					</tr>
 				</tbody>
 			</table>
+			<form enctype="multipart/form-data" action="/arena/problems/update" method="post" id="update-problem">
+				<fieldset>
+					<legend>Administrar problema <select id="rejudge-problem-list" name="problem_alias"></select></legend>
+					<button id="rejudge-problem" value="Rejuecear">Rejuecear</button>
+					<input name="problem_contents" type="file" />
+					<button id="upload-problem" type="submit">Actualizar casos/redacci&oacute;n</button>
+				</fieldset>
+			</form>
 		</div>
 		<div id="overlay">
 			<form id="submit" method="POST">
