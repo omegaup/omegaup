@@ -1,5 +1,4 @@
 <?php
-
 require_once("ApiHandler.php");
 require_once("NewProblemInContest.php");
 
@@ -8,6 +7,7 @@ require_once(SERVER_PATH . '/libs/FileUploader.php');
 require_once(SERVER_PATH . '/libs/ZipHandler.php');
 require_once(SERVER_PATH . '/libs/ProblemContentsZipValidator.php');
 require_once(SERVER_PATH . '/libs/Markdown/markdown.php');
+require_once(SERVER_PATH . '/libs/Grader.php');
 
 class UpdateProblem extends ApiHandler
 {   
@@ -108,8 +108,6 @@ class UpdateProblem extends ApiHandler
     
     protected function GenerateResponse() 
     {
-
-		
         // Update the Problem object
         
         if (!is_null(RequestContext::get("public")))
@@ -151,7 +149,6 @@ class UpdateProblem extends ApiHandler
         // Insert new problem
         try
         {
-                        
             //Begin transaction
             ProblemsDAO::transBegin();
             
@@ -184,10 +181,35 @@ class UpdateProblem extends ApiHandler
             ProblemsDAO::transRollback();
                        
             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );                
-        }  
+	}  
+
+	$grader = new Grader();
+        
+        // Call Grader
+        try
+	{
+            $runs = RunsDAO::search(new Runs(array(
+                "problem_id" => $this->problem->getProblemId()
+	    )));
+
+	    foreach ($runs as $run) {
+		    $run->setStatus('new');
+		    $run->setVeredict('JE');
+		    RunsDAO::save($run);
+		    $grader->Grade($run->getRunId());
+	    }
+        }
+        catch(Exception $e)
+        {
+            Logger::error($e);
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );
+	}
+
+	if (RequestContext::get("redirect") === "true") {
+		header('Location: ' . $_SERVER['HTTP_REFERER']);
+	}
                 
         // All clear
         $this->addResponse("status", "ok");
     }  
 }
-?>

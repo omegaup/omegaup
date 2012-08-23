@@ -265,7 +265,8 @@ class NewProblemInContest extends ApiHandler
 
             for ($i = 0; $i < count($casesFiles); $i++)
             {
-                if (!$casesZip->addFile($dirpath . DIRECTORY_SEPARATOR . $casesFiles[$i], substr($casesFiles[$i], strlen('cases/'))))
+		if (substr($casesFiles[$i], -3) !== ".in") continue;
+		if (!$casesZip->addFile($dirpath . DIRECTORY_SEPARATOR . $casesFiles[$i], substr($casesFiles[$i], strlen('cases/'))))
                 {
                     Logger::error("Error trying to add {$casesFiles[$i]} to cases.zip");
                     throw new Exception("Error trying to add {$casesFiles[$i]} to cases.zip");

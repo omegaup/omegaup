@@ -141,6 +141,10 @@ $(document).ready(function() {
 		return false;
 	});
 
+	$('#update-problem').submit(function() {
+		return confirm('Deseas actualizar el problema ' + $('#rejudge-problem-list').val() + '?');
+	});
+
 	$(window).hashchange(function(e) {
 		var tabChanged = false;
 		var tabs = ['summary', 'problems', 'ranking', 'clarifications'];
