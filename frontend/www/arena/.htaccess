@@ -29,6 +29,7 @@ RewriteRule ^contests/([a-zA-Z0-9_-]+)/users/remove/([0-9]+)/?$ CallApiLoader.ph
 RewriteRule ^runs/new/?$ CallApiLoader.php?apicmd=NewRun [L]
 RewriteRule ^runs/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowRun&run_alias=$1 [L]
 RewriteRule ^runs/([a-zA-Z0-9_-]+)/details/?$ CallApiLoader.php?apicmd=ShowRunDetails&run_alias=$1 [L]
+RewriteRule ^runs/([a-zA-Z0-9_-]+)/source/?$ CallApiLoader.php?apicmd=ShowRunSource&run_alias=$1 [L]
 RewriteRule ^runs/([a-zA-Z0-9_-]+)/rejudge/?$ CallApiLoader.php?apicmd=UpdateRun&run_alias=$1 [L]
 RewriteRule ^runs/problem/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowProblemRuns&problem_alias=$1 [L]
 
