@@ -414,8 +414,8 @@ abstract class RunsDAOBase extends DAO
 			$Runs->getContestScore(), 
 			$Runs->getIp(), 
 			$Runs->getTime(), 
-			$Runs->getRunId(),
-			$Runs->getTest() == 1 ? 1 : 0);
+			$Runs->getTest() == 1 ? 1 : 0,
+			$Runs->getRunId());
 		global $conn;
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }

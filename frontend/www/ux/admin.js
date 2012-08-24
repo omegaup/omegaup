@@ -50,6 +50,7 @@ $(document).ready(function() {
 			problem.letter = String.fromCharCode(letter);
 
 			$('#submit select[name="problem"]').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
+			$('#rejudge-problem-list').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
 
 			letter++;
 		}
@@ -129,6 +130,19 @@ $(document).ready(function() {
 		});
 
 		return false;
+	});
+
+	$('#rejudge-problem').click(function() {
+		if (confirm('Deseas rejuecear el problema ' + $('#rejudge-problem-list').val() + '?')) {
+			omegaup.rejudgeProblem($('#rejudge-problem-list').val(), function (x) {
+				omegaup.getContestRuns(contestAlias, runsChange);
+			});
+		}
+		return false;
+	});
+
+	$('#update-problem').submit(function() {
+		return confirm('Deseas actualizar el problema ' + $('#rejudge-problem-list').val() + '?');
 	});
 
 	$(window).hashchange(function(e) {

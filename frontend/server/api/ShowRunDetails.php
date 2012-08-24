@@ -75,7 +75,7 @@ class ShowRunDetails extends ApiHandler
 
 					if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
 						$out = str_replace(".meta", ".out", $file);
-						$case['out_diff'] = `diff -wui $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
+						$case['out_diff'] = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
 					}
 
 					array_push($cases, $case);

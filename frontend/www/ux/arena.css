@@ -17,6 +17,15 @@ iframe {
 	width: 100%;
 	min-height: 40em;
 }
+fieldset {
+	border: 1px solid #000;
+	border-radius: 4px;
+	margin: 1em;
+	padding: 0.5em;
+}
+legend {
+	margin: 0 0.2em 0 0.2em;
+}
 
 .template { display: none; }
 

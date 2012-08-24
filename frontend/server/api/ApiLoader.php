@@ -187,6 +187,11 @@ class ApiLoader
                 $api = new UpdateProblem();
                 break;
             
+            case 'ShowRunSource':
+                require_once('ShowRunSource.php');
+                $api = new ShowRunSource();
+                break;
+            
             default:
                 return self::NotFound();
                 break;

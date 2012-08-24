@@ -192,6 +192,18 @@ OmegaUp.prototype.runRejudge = function(guid, callback) {
 	);
 };
 
+OmegaUp.prototype.rejudgeProblem = function(problemAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/problems/' + problemAlias + '/rejudge/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.getRanking = function(contestAlias, callback) {
 	var self = this;
 

@@ -111,6 +111,14 @@
 					</tr>
 				</tbody>
 			</table>
+			<form enctype="multipart/form-data" action="/arena/problems/update" method="post" id="update-problem">
+				<fieldset>
+					<legend>Administrar problema <select id="rejudge-problem-list" name="problem_alias"></select></legend>
+					<button id="rejudge-problem" value="Rejuecear">Rejuecear</button>
+					<input name="problem_contents" type="file" />
+					<button id="upload-problem" type="submit">Actualizar casos/redacci&oacute;n</button>
+				</fieldset>
+			</form>
 		</div>
 		<div id="overlay">
 			<form id="submit" method="POST">

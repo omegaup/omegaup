@@ -63,14 +63,12 @@ trait Grader extends Object with Log {
 				val tokens = line.split("\\s+")
 			
 				if(tokens.length == 2 && !tokens(0).startsWith("#")) {
-                                        var group:String = null
-
                                         val idx = tokens(0).indexOf(".")
 
-                                        if (idx != -1) {
-                                          group = tokens(0).substring(0, idx)
+                                        val group = if (idx != -1) {
+                                          	tokens(0).substring(0, idx)
                                         } else {
-                                          group = tokens(0)
+                                          	tokens(0)
                                         }
 
                                         if (!weights.contains(group)) {
@@ -87,15 +85,33 @@ trait Grader extends Object with Log {
 		
 			weights
 		} else {
-			new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/")
+			val weights = new mutable.ListMap[String,mutable.ListMap[String,Double]]
+
+			val inputs = new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/")
 			.listFiles
 			.filter { _.getName.endsWith(".in") }
-			.map {  f:File =>
+
+			for (f <- inputs) {
                                 val caseName = f.getName.substring(0, f.getName.length - 3)
 
-                                (caseName -> Map(caseName -> 1.0))
+                                val idx = caseName.indexOf(".")
+
+                                val group = if (idx != -1) {
+                                	caseName.substring(0, idx)
+                                } else {
+                                        caseName
+                                }
+
+                                if (!weights.contains(group)) {
+                                        weights += (group -> new mutable.ListMap[String,Double])
+                                }
+
+				try {
+					weights(group) += (caseName -> 1.0)
+				}
 			}
-			.toMap
+
+			weights
 		}
 
 		metas.values.foreach { case (f, meta) => {
