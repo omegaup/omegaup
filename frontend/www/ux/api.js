@@ -180,6 +180,18 @@ OmegaUp.prototype.runDetails = function(guid, callback) {
 	);
 };
 
+OmegaUp.prototype.runSource = function(guid, callback) {
+	var self = this;
+
+	$.get(
+		'/arena/runs/' + guid + '/source/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.runRejudge = function(guid, callback) {
 	var self = this;
 

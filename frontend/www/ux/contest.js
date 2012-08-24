@@ -273,6 +273,20 @@ $(document).ready(function() {
 						$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 					}
 					$('.language', r).html(run.language);
+					(function(guid) {
+						$('.code', r).append($('<input type="button" value="ver" />').click(function() {
+							omegaup.runSource(guid, function(data) {
+								$('#submit textarea[name="code"]').val(data.source);
+								$('#submit input').hide();
+								$('#submit #lang-select').hide();
+								$('#submit').show();
+								$('#clarification').hide();
+								$('#overlay').show();
+								window.location.hash += '/show-run';
+							});
+							return false;
+						}));
+					})(run.guid);
 					$('#problem .runs > tbody:last').append(r);
 				}
 
@@ -292,6 +306,8 @@ $(document).ready(function() {
 
 			if (newRun) {
 				$('#overlay form').hide();
+				$('#submit input').show();
+				$('#submit #lang-select').show();
 				$('#submit').show();
 				$('#overlay').show();
 			}
