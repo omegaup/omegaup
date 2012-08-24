@@ -53,7 +53,7 @@ class Scoreboard
         return $this->countProblemsInContest;
     }
     
-    public function generate($withRunDetails = false)
+    public function generate($withRunDetails = false, $sortByName = false)
     {
     	$result = null;
         $from_cache = false;
@@ -80,7 +80,7 @@ class Scoreboard
                 $contest = ContestsDAO::getByPK($this->contest_id);	
 
                 // Gets whether we can cache this scoreboard.
-                $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
+                $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns) && !$sortByName;
 
                 // Get all distinct contestants participating in the contest given contest_id
                 $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns);
@@ -123,8 +123,16 @@ class Scoreboard
                 array_push($result, $user_results);
             }
 
-            // Sort users by their total column
-            usort($result, array($this, 'compareUserScores'));
+            if ($sortByName == false)
+            {
+                // Sort users by their total column
+                usort($result, array($this, 'compareUserScores'));
+            }
+            else 
+            {
+                // Sort users by their name
+                usort($result, array($this, 'compareUserNames'));
+            }
 
             // Cache scoreboard if there are no pending runs.
             if( $cacheable && $can_use_cache)
@@ -339,6 +347,12 @@ class Scoreboard
         
         return ($a[self::total_column]["points"] < $b[self::total_column]["points"]) ? 1 : -1;
     }    
+    
+    
+    private function compareUserNames($a, $b)
+    {        	        
+        return strcmp($a['username'] < $b['username']);
+    }   
 }
 
 ?>

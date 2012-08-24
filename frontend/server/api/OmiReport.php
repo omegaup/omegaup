@@ -35,11 +35,11 @@ class OmiReport extends ApiHandler
         // Create scoreboard
 	$scoreboard = new Scoreboard(
 		$this->contest->getContestId(),
-		false //Show only relevant runs
+		true //Show only relevant runs
 	);
                  
         // Push ultra full scoreboard data in response
-        $this->addResponse('report', $scoreboard->generate(true)); //true == with super full run details        
+        $this->addResponse('report', $scoreboard->generate(true, true)); //true == with super full run details, and sorted by name 
     }
 }
 
