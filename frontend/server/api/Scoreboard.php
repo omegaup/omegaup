@@ -357,7 +357,7 @@ class Scoreboard
     
     private function compareUserNames($a, $b)
     {        	        
-        return strcmp($a['username'] < $b['username']);
+        return strcmp($a['username'], $b['username']);
     }   
 }
 
