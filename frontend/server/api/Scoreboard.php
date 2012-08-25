@@ -53,12 +53,16 @@ class Scoreboard
         return $this->countProblemsInContest;
     }
     
-    public function generate($withRunDetails = false, $sortByName = false)
+    public function generate($withRunDetails = false, $sortByName = false, $filterUsersBy = NULL)
     {
     	$result = null;
         $from_cache = false;
         $cache_key = "scoreboard-" . $this->contest_id;
-        $can_use_cache = APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_SCOREBOARD == true && !$this->showAllRuns;
+        $can_use_cache = APC_USER_CACHE_ENABLED == true 
+                        && APC_USER_CACHE_SCOREBOARD == true 
+                        && !$this->showAllRuns 
+                        && !$sortByName
+                        && is_null($filterUsersBy);
         
         // If cache is turned on and we're not looking for admin-only runs
         if ($can_use_cache)
@@ -80,10 +84,10 @@ class Scoreboard
                 $contest = ContestsDAO::getByPK($this->contest_id);	
 
                 // Gets whether we can cache this scoreboard.
-                $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns) && !$sortByName;
+                $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
 
                 // Get all distinct contestants participating in the contest given contest_id
-                $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns);
+                $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns, $filterUsersBy);
 
                 // Get all problems given contest_id
                 $contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
@@ -300,6 +304,8 @@ class Scoreboard
                         $case["meta"]["status"] = "WA";
                     }
                 }
+                
+                unset($runDetails["source"]);
                 
             }
             return array(
