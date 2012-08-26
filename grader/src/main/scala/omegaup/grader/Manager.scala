@@ -38,7 +38,8 @@ object Manager extends Object with Log {
 	
 	def grade(id: Long): GradeOutputMessage = {
 		info("Judging {}", id)
-		
+		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
+	
 		implicit val conn = connection
 		
 		GraderData.run(id) match {
@@ -70,10 +71,12 @@ object Manager extends Object with Log {
 	}
 	
 	def getRunner(): RunnerService = {
+		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 		runnerQueue.take()
 	}
 	
 	def addRunner(service: RunnerService) = {
+		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 		runnerQueue.put(service)
 	}
 	
@@ -88,6 +91,8 @@ object Manager extends Object with Log {
 			}
 			endpoint
 		}
+
+		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 				
 		new RegisterOutputMessage()
 	}
@@ -103,6 +108,8 @@ object Manager extends Object with Log {
 			}
 			endpoint
 		}
+
+		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 		
 		new RegisterOutputMessage()
 	}
