@@ -7,6 +7,7 @@ import java.io._
 import java.util.concurrent._
 import scala.util.matching.Regex
 import scala.actors.Actor
+import scala.actors.Scheduler
 import scala.actors.Actor._
 import Language._
 import Veredict._
@@ -14,30 +15,6 @@ import Status._
 import Validator._
 
 object OmegaUp extends Actor with Log {
-	def act() = {
-		debug("OmegaUp loaded")
-		while(true) {
-			receive {
-				case Submission(run: Run) => {
-					debug("OmegaUp submission!")
-					val id = run.id
-					val alias = run.problem.alias
-					
-					info("OU Submission {} for problem {}", id, alias)
-					
-					if (run.problem.validator == Validator.Literal) {
-						LiteralGrader.grade(run)
-					} else {
-						// Spawn a new thread and let it run.
-						new OmegaUpRunnerThread(run, Manager.getRunner).start()
-					}
-				}
-			}
-		}
-	}
-}
-
-class OmegaUpRunnerThread(run: Run, service: RunnerService) extends Thread with Log {
 	@throws(classOf[FileNotFoundException])
 	def createCompileMessage(run: Run, code: String): CompileInputMessage = {
 		if (run.problem.validator == Validator.Custom) {
@@ -57,7 +34,26 @@ class OmegaUpRunnerThread(run: Run, service: RunnerService) extends Thread with 
 		}
 	}
 
-	override def run(): Unit = {
+	def act() = {
+		debug("OmegaUp loaded")
+		loop {
+			react {
+				case Submission(run: Run) => {
+					info("OU Submission {} for problem {}", run.id, run.problem.alias)
+					
+					if (run.problem.validator == Validator.Literal) {
+						Scheduler.execute(LiteralGrader.grade(run))
+					} else {
+						Scheduler.execute(grade(run))
+					}
+				}
+			}
+		}
+	}
+
+	def grade(run: Run): Unit = {
+		// Blocks until a runner gets in the queue.
+		val service = Manager.getRunner
 		val id = run.id
 		val alias = run.problem.alias
 		val lang = run.language
