@@ -133,6 +133,11 @@ $(document).ready(function() {
 	$('#submit').submit(function(e) {
 		if (!$('#submit textarea[name="code"]').val()) return false;
 
+		if (!$('#submit select[name="language"]').val()) {
+			alert('Debes elegir un lenguaje');
+			return;
+		}
+
 		if (problems[currentProblem.alias].last_submission + submissionGap * 1000 > new Date().getTime()) {
 			alert('Deben pasar ' + submissionGap + ' segundos entre envios de un mismo problema');
 			return;
