@@ -67,8 +67,8 @@ CREATE TABLE IF NOT EXISTS `Clarifications` (
   `message` text NOT NULL,
   `answer` text,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `problem_id` int(11) NOT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema.',
-  `contest_id` int(11) DEFAULT NULL COMMENT 'Puede ser nulo si la clarificacion no se da en un concurso.',
+  `problem_id` int(11) DEFAULT NULL COMMENT 'Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.',
+  `contest_id` int(11) NOT NULL,
   `public` tinyint(1)  NOT NULL DEFAULT '0' COMMENT 'Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. ',
   PRIMARY KEY (`clarification_id`),
   KEY `problem_id` (`problem_id`),
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `Clarifications` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Coder_of_the_Month`
+-- Estructura de tabla para la tabla `CoderOfTheMonth`
 --
 
 CREATE TABLE IF NOT EXISTS `Coder_of_the_Month` (
@@ -126,7 +126,7 @@ CREATE UNIQUE INDEX contests_alias ON Contests(`alias`);
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Contests_Users`
+-- Estructura de tabla para la tabla `Contest_Users`
 --
 
 CREATE TABLE IF NOT EXISTS `Contests_Users` (
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `Contest_Problems` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Contest_Problem_Opened`
+-- Estructura de tabla para la tabla `Contest_User_OpenedProblems`
 --
 
 CREATE TABLE IF NOT EXISTS `Contest_Problem_Opened` (
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS `Messages` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Password_Change`
+-- Estructura de tabla para la tabla `PasswordChange`
 --
 
 CREATE TABLE IF NOT EXISTS `Password_Change` (
@@ -306,7 +306,7 @@ CREATE UNIQUE INDEX problems_alias ON Problems(`alias`);
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Problems_Badges`
+-- Estructura de tabla para la tabla `Problem_Badges`
 --
 
 CREATE TABLE IF NOT EXISTS `Problems_Badges` (
@@ -363,7 +363,7 @@ CREATE TABLE IF NOT EXISTS `Roles` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Roles_Permissions`
+-- Estructura de tabla para la tabla `Role_Permissions`
 --
 
 CREATE TABLE IF NOT EXISTS `Roles_Permissions` (
@@ -436,27 +436,14 @@ CREATE TABLE IF NOT EXISTS `States` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Tags`
---
-
-CREATE TABLE IF NOT EXISTS `Tags` (
-  `tag_id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
-  `description` tinytext,
-  PRIMARY KEY (`tag_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda los tags para los problemas' AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `Users`
 --
 
 CREATE TABLE IF NOT EXISTS `Users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL UNIQUE,
-  `facebook_user_id` bigint(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
-  `password` char(32) DEFAULT NULL,
+  `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
+  `password` varchar(100) DEFAULT NULL,
   `main_email_id` int(11) DEFAULT NULL,
   `name` varchar(256) DEFAULT NULL,
   `solved` int(11) NOT NULL DEFAULT '0',
@@ -478,7 +465,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Users_Badges`
+-- Estructura de tabla para la tabla `User_Badges`
 --
 
 CREATE TABLE IF NOT EXISTS `Users_Badges` (
@@ -509,12 +496,13 @@ CREATE TABLE IF NOT EXISTS `User_Roles` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Users_Permissions`
+-- Estructura de tabla para la tabla `User_Permissions`
 --
 
 CREATE TABLE IF NOT EXISTS `Users_Permissions` (
   `user_id` int(11) NOT NULL,
   `permission_id` int(11) NOT NULL,
+  `contest_id` int(11) NOT NULL COMMENT='Este permiso solo aplica en el contexto de un concurso.',
   PRIMARY KEY (`user_id`,`permission_id`),
   KEY `user_id` (`user_id`),
   KEY `permission_id` (`permission_id`)
