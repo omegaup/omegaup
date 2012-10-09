@@ -195,6 +195,9 @@ class LoginController{
 		 $auth_str = $time . "-" . $this_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $this_user->getUserId() . $time );
 		 $auth_token->setToken($auth_str);
 
+		 session_start();
+		 $_SESSION['omegaup_user'] = array('id' => $this_user->getUserId(), 'name' => $this_user->getName(), 'email' => $email_or_username);
+
 		 try
 		 {
 		    AuthTokensDAO::save( $auth_token );
