@@ -257,7 +257,7 @@ class UserProfileComponent implements GuiComponent{
 					<td><a onClick='profile_edit()'><div class="Boton">Editar mi perfil</div></a></td>
 				</tr>
 				<tr>
-					<td><img src="http://www.gravatar.com/avatar/<?php echo md5($this->user->getUsername()); ?>?s=128"></td>
+					<td><img src="https://secure.gravatar.com/avatar/<?php echo md5($this->user->getUsername()); ?>?s=128"></td>
 					<td valign=top><h1>
 						<?php 
 							if(is_null( $this->user->getName() ))

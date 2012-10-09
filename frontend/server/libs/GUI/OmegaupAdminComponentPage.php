@@ -55,7 +55,7 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 			//user is NOT logged in
 			
 			$this_user = LoginController::getCurrentUser();
-			$this->user_html_menu = '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >';
+			$this->user_html_menu = '<img src="https://secure.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >';
 			$this->user_html_menu .= ' Hola <a href="../profile.php?id='.$this_user->getUserId()  .'">' . $this_user->getUsername()  .'</a>&nbsp;';
 
 			/**
@@ -170,8 +170,8 @@ table.tabs{
 	}
 
 </style>
-<!--
             <script type="text/javascript" src="../js/jquery.js"></script>
+<!--
             <script type="text/javascript" src="../js/jquery-autocomplete.js"></script>
 
 			<link rel="stylesheet" type="text/css" href="../css/jquery-ui-1.8.16.custom.css">
@@ -181,7 +181,6 @@ table.tabs{
 
 
 			<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
-			<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
 			<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 
 

@@ -309,16 +309,16 @@ class Scoreboard
                 
             }
             return array(
-                "points" => (int)$bestRun->getContestScore(),
-                "penalty" => (int)$bestRun->getSubmitDelay(),
+                "points" => (int)round($bestRun->getContestScore()),
+                "penalty" => (int)round($bestRun->getSubmitDelay()),
                 "run_details" => $runDetails
             );
         }        
         else
         {
             return array(
-                "points" => (int)$bestRun->getContestScore(),
-                "penalty" => (int)$bestRun->getSubmitDelay()
+                "points" => (int)round($bestRun->getContestScore()),
+                "penalty" => (int)round($bestRun->getSubmitDelay())
             );
         }
     }

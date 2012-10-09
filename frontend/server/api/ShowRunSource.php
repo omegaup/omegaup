@@ -27,17 +27,17 @@ class ShowRunSource extends ApiHandler
 			// Operation failed in the data layer
 			throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);        
 		}                        
-
-                if (!Authorization::IsSystemAdmin($this->_user_id) || ($this->run->getUserId() != $this->_user_id))
+		
+		if (!(Authorization::IsSystemAdmin($this->_user_id) || ($this->run->getUserId() == $this->_user_id)))
 		{
                     throw new ApiException(ApiHttpErrors::forbiddenSite());
-		}                                
+		}
 	}
 
 
 	protected function GenerateResponse() 
-	{		
-            $this->addResponse('source', file_get_contents(RUNS_PATH . '/' . $this->run->getGuid()));
+	{	
+		$this->addResponse('source', file_get_contents(RUNS_PATH . '/' . $this->run->getGuid()));
 	}
 	
 }

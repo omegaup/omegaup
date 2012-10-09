@@ -14,7 +14,7 @@ class OmiReport extends ApiHandler
         
         ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("contest_alias"), "contest_alias");
         
-        ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("estado"), "estado");
+        //ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("estado"), "estado");
 
 	try 
         {
@@ -41,7 +41,7 @@ class OmiReport extends ApiHandler
 	);
                  
         // Push ultra full scoreboard data in response
-        $this->addResponse('report', $scoreboard->generate(true, true, RequestContext::get("estado"))); //true == with super full run details, and sorted by name 
+        $this->addResponse('report', $scoreboard->generate(true, true, (is_null(RequestContext::get("estado")) ? null : RequestContext::get("estado") )  )); //true == with super full run details, and sorted by name 
     }
 }
 

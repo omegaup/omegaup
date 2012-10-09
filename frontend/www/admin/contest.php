@@ -14,6 +14,7 @@
 	require_once( "../../server/inc/bootstrap.php" );
 	
 	require_once( "api/ShowProblemInContest.php");
+	require_once( "api/OmiReport.php");
 
     $page = new OmegaupAdminTabPage();
 
@@ -43,23 +44,9 @@
 
 	//$page->addComponent( "<a href='../arena/{$_GET['alias']}/'>Ir al concurso</a>"  );
 
-
-
-
-
-
-	$json = file_get_contents("file:///home/alanboy/Downloads/cacheado.json");
-
-
-
-
-
-
-
-
-
-
-	$djson = json_decode( $json );
+	RequestContext::set('contest_alias', $_GET['alias']);
+	$omiReport = new OmiReport();
+	$djson = json_decode(json_encode($omiReport->ExecuteApi()));
 
 	$nreports = sizeof($djson->report); 
 

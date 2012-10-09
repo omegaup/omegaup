@@ -27,7 +27,7 @@
 	if(isset($_POST["file_sent"])){
 		//var_dump($_REQUEST);
 		//var_dump($_FILES["file"]["tmp_name"]);
-		
+		$_REQUEST["public"] = "0";	
 		$api = new NewProblemInContest();
 		
 		try{

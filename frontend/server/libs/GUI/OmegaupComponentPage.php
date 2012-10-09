@@ -102,7 +102,7 @@ class OmegaupComponentPage extends StdComponentPage{
 			
 			$this->user_html_menu = '';
 			$this->user_html_menu .= '<a style="background-color: white; color: #678DD7; padding: 2px; -webkit-border-radius: 5px; padding-left: 5px;" href="profile.php?id='.$this_user->getUserId()  .'">' 
-							. '<img src="http://www.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >'
+							. '<img src="https://secure.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >'
 							. '&nbsp;' . $this_user->getUsername()  .'</a>&nbsp;';
 
 			/**
