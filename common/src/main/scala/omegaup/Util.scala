@@ -261,14 +261,12 @@ object Https extends Object with Log with Using {
 object FileUtil extends Object with Using {
 	@throws(classOf[IOException])
 	def read(file: String): String = {
-		val contents = new StringBuilder
+		val contents = new StringBuffer
+		var ch: Int = 0
 		
-		using (new BufferedReader(new FileReader(file))) { fileReader => {
-			var line: String = null
-	
-			while( { line = fileReader.readLine(); line != null} ) {
-				contents.append(line)
-				contents.append("\n")
+		using (new FileReader(file)) { fileReader => {
+			while( {ch = fileReader.read(); ch != -1} ) {
+				contents.appendCodePoint(ch)
 			}
 		
 			contents.toString.trim

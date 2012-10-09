@@ -57,12 +57,12 @@ object OmegaUp extends Actor with Log {
 		val id = run.id
 		val alias = run.problem.alias
 		val lang = run.language
-		val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)
 		var shouldRequeue = true
 	
 		try {
 			info("OU Compiling {}", id)
-		
+
+			val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)		
 			val output = service.compile(createCompileMessage(run, code))
 		
 			if(output.status == "ok") {

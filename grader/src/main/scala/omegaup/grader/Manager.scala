@@ -204,11 +204,11 @@ object Manager extends Object with Log {
 
 		// start the drivers
 		drivers.OmegaUp.start
-		drivers.UVa.start
-		drivers.TJU.start
-		drivers.LiveArchive.start
+		//drivers.UVa.start
+		//drivers.TJU.start
+		//drivers.LiveArchive.start
 
-		drivers.UVa ! drivers.Login
+		//drivers.UVa ! drivers.Login
 
 		// boilerplate code for jetty with https support	
 		val server = new org.mortbay.jetty.Server()
@@ -226,6 +226,8 @@ object Manager extends Object with Log {
 		
 		server.setHandler(handler)
 		server.start()
+
+		info("Omegaup started")
 
 		Runtime.getRuntime.addShutdownHook(new Thread() {
 			override def run() = {

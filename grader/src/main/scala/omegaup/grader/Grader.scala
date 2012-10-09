@@ -127,6 +127,7 @@ trait Grader extends Object with Log {
 				case "FO" => Veredict.RestrictedFunctionError
 				case "FA" => Veredict.RestrictedFunctionError
 				case "SG" => Veredict.RuntimeError
+				case _    => Veredict.JudgeError
 			}
 			
 			if(run.veredict < v) run.veredict = v
@@ -300,6 +301,7 @@ object CustomGrader extends Grader {
 				case "FO" => Veredict.RestrictedFunctionError
 				case "FA" => Veredict.RestrictedFunctionError
 				case "SG" => Veredict.RuntimeError
+				case _    => Veredict.JudgeError
 			}
 			
 			if(run.veredict < v) run.veredict = v
@@ -474,7 +476,7 @@ trait TokenComparer extends Object with Log {
 
 		try {
 			var points:Double = 1
-			
+
 			while (points > 0 && inA.hasNext && inB.hasNext) {
 				if (!eq(inA.next, inB.next)) {
 					debug("Token mismatch {} {} {}", caseName, inA.path, inB.path)
