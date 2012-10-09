@@ -159,13 +159,13 @@ class NewProblemInContest extends ApiHandler
                 "contest_id" => $contest->getContestId(),
                 "problem_id" => $problem->getProblemId(),
                 "points"     => RequestContext::get("points")));
-            ContestProblemsDAO::save($relationship);
-            
-            // Create file after we know that alias is unique
-            self::DeployProblemZip($this->filesToUnzip, $this->casesFiles);
+            ContestProblemsDAO::save($relationship);                        
 
             //End transaction
             ProblemsDAO::transEnd();
+            
+            // Create file after we know that alias is unique
+            self::DeployProblemZip($this->filesToUnzip, $this->casesFiles);
         }
         catch(ApiException $e)
         {

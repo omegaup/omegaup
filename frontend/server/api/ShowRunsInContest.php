@@ -17,6 +17,8 @@ require_once(SERVER_PATH ."/libs/Authorization.php");
 class ShowRunsInContest extends ApiHandler
 {
     private $contest;
+    private $offset = 0;
+    private $rowcount = 100;
 
     protected function RegisterValidatorsToRequest()
     {
@@ -38,6 +40,18 @@ class ShowRunsInContest extends ApiHandler
 		"Contest requested is invalid."
 	);
 	$customValidator->validate($this->contest, "contest_alias");
+        
+        // Check offset, is optional
+        if (!is_null(RequestContext::get("offset")))
+        {
+            ValidatorFactory::numericValidator()->validate(RequestContext::get("offset"), "offset");
+        }
+        
+        // Check rowcount, is optional
+        if (!is_null(RequestContext::get("rowcount")))
+        {
+            ValidatorFactory::numericValidator()->validate(RequestContext::get("rowcount"), "rowcount");
+        }
     }   
             
     protected function GenerateResponse() 
@@ -54,7 +68,7 @@ class ShowRunsInContest extends ApiHandler
         // Get our runs
         try
         {            
-            $runs = RunsDAO::search($runs_mask, "time", "DESC", $relevant_columns );
+            $runs = RunsDAO::search($runs_mask, "time", "DESC", $relevant_columns, $this->offset, $this->rowcount);
         }
         catch(Exception $e)
         { 

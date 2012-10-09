@@ -518,6 +518,11 @@ $(document).ready(function() {
 			var r = $('.clarifications tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 			$('.problem', r).html(clarification.problem_alias);
+                        
+                        if (clarification.can_answer) {
+                            $('.author', r).html(clarification.author);
+                        }
+                        
 			$('.time', r).html(clarification.time);
 			$('.message', r).html(clarification.message);
 			$('.answer', r).html(clarification.answer);
