@@ -45,13 +45,15 @@ class ShowRunsInContest extends ApiHandler
         if (!is_null(RequestContext::get("offset")))
         {
             ValidatorFactory::numericValidator()->validate(RequestContext::get("offset"), "offset");
-        }
+            $this->offset = RequestContext::get("offset");
+	}
         
         // Check rowcount, is optional
         if (!is_null(RequestContext::get("rowcount")))
         {
             ValidatorFactory::numericValidator()->validate(RequestContext::get("rowcount"), "rowcount");
-        }
+            $this->rowcount = RequestContext::get("rowcount");
+	}
     }   
             
     protected function GenerateResponse() 

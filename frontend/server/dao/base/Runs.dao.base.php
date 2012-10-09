@@ -164,7 +164,7 @@ abstract class RunsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Runs , $orderBy = null, $orden = 'ASC', $columnas = NULL, $offset = NULL, $rowcount = NULL )
+	public static final function search( $Runs , $orderBy = null, $orden = 'ASC', $columnas = NULL, $offset = 0, $rowcount = NULL )
 	{
                 // Implode array of columns to a coma-separated string               
                 $columns_str = is_null($columnas) ? "*" : implode(",", $columnas);
@@ -264,12 +264,12 @@ abstract class RunsDAOBase extends DAO
 		
 		}
                 
-                // Add LIMIT offset, rowcount if they are set
-                if (!(is_null($offset) || is_null($rowcount)))
+		// Add LIMIT offset, rowcount if rowcount is set
+                if (!is_null($rowcount))
                 {
                     $sql .= " LIMIT ". $offset . "," . $rowcount;
                 }
-
+		
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
