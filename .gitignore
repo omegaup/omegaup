@@ -41,7 +41,6 @@ frontend/server/config.php
 frontend/server/api/tests/config.php
 frontend/server/api/tests/test_config.php
 
-
 # and log
 omegaup.log
 frontend/log/omegaup.log
@@ -57,3 +56,6 @@ frontend/server/api/tests/omegaup_test.log
 # Ignore Mac crap :P
 frontend/.DS_Store
 .DS_Store
+
+# Ignore questions
+frontend/www/preguntas/
