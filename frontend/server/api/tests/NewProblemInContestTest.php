@@ -328,5 +328,67 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         
         return (int)$problem->getProblemId();
     }
+    
+    
+    public function testCreateValidProblemNonUtf8Statement($contest_id = NULL)
+    {        
+        
+        // Set valid context for problem creation
+        $contest_id = is_null($contest_id) ? Utils::GetValidPublicContestId() : $contest_id;
+        $this->setValidContext($contest_id, 'nonutf8stmt.zip');
+     
+        // Login as judge
+        $auth_token = Utils::LoginAsContestDirector();        
+        
+        // Execute API
+        Utils::SetAuthToken($auth_token);
+        $newProblemInContest = new NewProblemInContest($this->fileUploaderMock);
+        
+        try
+        {
+            $return_array = $newProblemInContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            if(!is_null($e->getWrappedException()))
+            {
+                var_dump($e->getWrappedException()->getMessage());            
+            }
+            $this->fail("Unexpected exception");
+        }        
+        
+        // Verify response
+        $this->assertEquals("ok", $return_array["status"]);                                        
+        
+        // Get problem info from DB
+        $problem_mask = new Problems();
+        $problem_mask->setTitle(RequestContext::get("title"));
+        $problems = ProblemsDAO::search($problem_mask);                
+        $this->assertEquals(1, count($problems));        
+        $problem = $problems[0];
+        
+        // Verify problem contents.zip were copied
+        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;                
+        $this->assertFileExists($targetpath . "contents.zip");                        
+        $this->assertFileExists($targetpath . "cases.zip");
+        $this->assertFileExists($targetpath . "cases");
+        $this->assertFileExists($targetpath . "inputname");
+        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
+        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.markdown");
+        
+        // Verify we have the accents, lol
+        $markdown_contents = file_get_contents($targetpath . "statements". DIRECTORY_SEPARATOR . "es.markdown");
+        if (strpos($markdown_contents, "ó") === false)
+        {
+            $this->fail("ó not found when expected.");
+        }          
+        
+        $html_contents = file_get_contents($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
+        if (strpos($html_contents, "ó") === false)
+        {
+            $this->fail("ó not found when expected.");
+        }
+    }
 }
 ?>
