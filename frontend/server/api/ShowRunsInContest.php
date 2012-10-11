@@ -58,9 +58,17 @@ class ShowRunsInContest extends ApiHandler
         // Check filter by status, is optional
         if (!is_null(RequestContext::get("status")))
         {
-            ValidatorFactory::enumValidator(array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE"))
+            ValidatorFactory::enumValidator(array('new','waiting','compiling','running','ready'))
                 ->validate(RequestContext::get("status"), "status");
         }
+        
+        // Check filter by veredict, is optional
+        if (!is_null(RequestContext::get("veredict")))
+        {
+            ValidatorFactory::enumValidator(array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE"))
+                ->validate(RequestContext::get("veredict"), "veredict");
+        }        
+        
     }   
             
     protected function GenerateResponse() 
@@ -70,7 +78,8 @@ class ShowRunsInContest extends ApiHandler
         // Get all runs for problem given        
         $runs_mask = new Runs( array (                
             "contest_id" => $this->contest->getContestId(),
-            "status" => RequestContext::get("status")
+            "status" => RequestContext::get("status"),
+            "veredict"=> RequestContext::get("veredict")
             ));
         
         // Filter relevant columns
