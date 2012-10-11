@@ -389,6 +389,6 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         {
             $this->fail("ó not found when expected.");
         }
-    }
+    }        
 }
 ?>

@@ -160,12 +160,12 @@ class NewProblemInContest extends ApiHandler
                 "problem_id" => $problem->getProblemId(),
                 "points"     => RequestContext::get("points")));
             ContestProblemsDAO::save($relationship);                        
-
-            //End transaction
-            ProblemsDAO::transEnd();
             
             // Create file after we know that alias is unique
             self::DeployProblemZip($this->filesToUnzip, $this->casesFiles);
+
+            //End transaction
+            ProblemsDAO::transEnd();                        
         }
         catch(ApiException $e)
         {
@@ -255,7 +255,7 @@ class NewProblemInContest extends ApiHandler
             }
 
             // Transform markdown to HTML
-            Logger::log("Transforming markdown 2 html");
+            Logger::log("Transforming markdown to html");
             $html_file_contents = markdown($markdown_file_contents); 
 
             // Get the language of this statement            
@@ -273,10 +273,11 @@ class NewProblemInContest extends ApiHandler
     
     private static function HandleCases($dirpath, $casesFiles)
     {
-        Logger::log("Handling cases...");                
+        Logger::log("Handling cases...");                                
         
         // Aplying dos2unix to cases
         $return_var = 0;
+        $output = array();
         $dos2unix_cmd = "dos2unix ". $dirpath . DIRECTORY_SEPARATOR . "cases/* 2>&1";
         Logger::log("Applying dos2unix: " . $dos2unix_cmd);                                        
         exec($dos2unix_cmd, $output, $return_var);
@@ -290,51 +291,38 @@ class NewProblemInContest extends ApiHandler
         {
             Logger::log("dos2unix succeeded");
         }
-        Logger::log(implode(" | ", $output));        
+        Logger::log(implode("\n", $output));        
+        
         
         // After dos2unixfication, we need to generate a zip file that will be
-        // passed between grader and runners with the INPUT files...
-        // 
-        // Instantiate ZipArchive helper object that will handle zip operations.
-        $casesZip = new ZipArchive;
-        
-        // Create path to cases.zip
+        // passed between grader and runners with the INPUT files...                
+        // Create path to cases.zip and proper cmds
         $cases_zip_path = $dirpath . DIRECTORY_SEPARATOR . 'cases.zip';
-        Logger::log("Zipping input cases into: ". $cases_zip_path);
+        $cases_to_be_zipped = $dirpath . DIRECTORY_SEPARATOR . "cases/*.in";
         
-        // Open the zip file
-        if (($error = $casesZip->open($cases_zip_path, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) !== TRUE)
+        // cmd to be executed in console
+        $zip_cmd = "zip -j ". $cases_zip_path . " " . $cases_to_be_zipped;
+        
+        // Execute zip command
+        $output = array();
+        Logger::log("Zipping input cases using: ". $zip_cmd);                                
+        exec($zip_cmd, $output, $return_var);
+        
+        // Check zip cmd return value
+        if ($return_var !== 0)
         {
-            Logger::error($error);
-            throw new Exception($error);
+            // D:
+            Logger::error("zipping cases failed with error: ". $return_var);
+            throw new Exception("Error creating cases.zip. Please check log for details");
         }
-
-        // For each of the cases files detected in the zip
-        for ($i = 0; $i < count($casesFiles); $i++)
+        else 
         {
-            // Ignore output cases
-            if (substr($casesFiles[$i], -3) !== ".in") 
-            {
-                continue;
-            }
-            
-            // Get paths to case and generate the actual name into the zip (localname)
-            $path_to_case = $dirpath . DIRECTORY_SEPARATOR . $casesFiles[$i];
-            $local_name = substr($casesFiles[$i], strlen('cases/'));
-            Logger::log("Adding case " . $path_to_case . " to cases.zip with local name " . $local_name);
-            
-            // Add file to zip
-            if (!$casesZip->addFile($path_to_case, $local_name))
-            {
-                Logger::error("Error trying to add {$casesFiles[$i]} to cases.zip");
-                throw new Exception("Error trying to add {$casesFiles[$i]} to cases.zip");
-            }
-        }
+            // :D
+            Logger::log("zipping cases succeeded:");
+            Logger::log(implode("\n", $output));  
+        }              
         
-        // Close the zip file        
-        $casesZip->close();
-        
-        // Generate sha1sum for checksum validation
+        // Generate sha1sum for cases.zip distribution from grader to runners
         Logger::log("Writing to : " . $dirpath . DIRECTORY_SEPARATOR . "inputname" );
         file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($cases_zip_path));        
     }
@@ -353,8 +341,13 @@ class NewProblemInContest extends ApiHandler
                 FileHandler::DeleteDirRecursive($dirpath);                
             }
             
-            FileHandler::MakeDir($dirpath);                            
+            // Making target directory
+            FileHandler::MakeDir($dirpath);     
+            
+            // Move stuff uploaded by user from PHP realm to our directory
             FileHandler::MoveFileFromRequestTo('problem_contents', $filepath);                                
+            
+            // Unzip the user's zip
             ZipHandler::DeflateZip($filepath, $dirpath, $filesToUnzip);
 
             // Handle statements
