@@ -175,7 +175,7 @@ class ShowClarificationsInContest extends ApiHandler
             });
             
         // LIMIT the array    
-        $clarifications_array_sliced = array_slice($clarifications_array, RequestContext::get("offset"), RequestContext::get("rowcount"), true);
+        $clarifications_array_sliced = array_slice($clarifications_array, RequestContext::get("offset"), RequestContext::get("rowcount"), false);
             
         // Add response to array
         $this->addResponse('clarifications', $clarifications_array_sliced);
