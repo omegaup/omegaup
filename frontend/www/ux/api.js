@@ -116,11 +116,12 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	);
 };
 
-OmegaUp.prototype.getContestRuns = function(contestAlias, callback) {
+OmegaUp.prototype.getContestRuns = function(contestAlias, offset, rowcount, callback) {
 	var self = this;
 
-	$.get(
+	$.post(
 		'/arena/contests/' + contestAlias + '/runs/',
+		{offset: offset, rowcount: rowcount},
 		function (data) {
 			for (var i = 0; i < data.runs.length; i++) {
 				data.runs[i].time = self.time(data.runs[i].time * 1000);

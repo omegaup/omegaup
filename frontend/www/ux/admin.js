@@ -9,6 +9,8 @@ $(document).ready(function() {
 	var startTime = null;
 	var finishTime = null;
 	var submissionDeadline = null;
+	var runsOffset = 0;
+	var runsRowcount = 100;
 	var veredicts = {
 		AC: "Accepted",
 		PA: "Partially Accepted",
@@ -61,8 +63,11 @@ $(document).ready(function() {
 		omegaup.getClarifications(contestAlias, clarificationsChange);
 		setInterval(function() { omegaup.getClarifications(contestAlias, clarificationsChange); }, 5 * 60 * 1000);
 
-		omegaup.getContestRuns(contestAlias, runsChange);
-		setInterval(function() { omegaup.getContestRuns(contestAlias, runsChange); }, 5 * 60 * 1000);
+		omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange);
+		setInterval(function() { 
+			runsOffset = 0; // Return pagination to start on refresh
+			omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange); 
+		}, 5 * 60 * 1000);
 
 		updateClock();
 		setInterval(updateClock, 1000);
@@ -80,6 +85,28 @@ $(document).ready(function() {
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
 			return false;
 		}
+	});
+	
+	$('.runspager .runspagerprev').click(function () {
+		if (runsOffset > 0) {
+			runsOffset -= runsRowcount;
+			if (runsOffset < 0) {
+				runsOffset = 0;
+			}
+			
+			// Refresh with previous page
+			omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange); 
+		}
+	});
+	
+	$('.runspager .runspagernext').click(function () {
+		runsOffset += runsRowcount;
+		if (runsOffset < 0) {
+			runsOffset = 0;
+		}
+		
+		// Refresh with previous page
+		omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange); 
 	});
 
 	$('#submit').submit(function(e) {
@@ -135,7 +162,7 @@ $(document).ready(function() {
 	$('#rejudge-problem').click(function() {
 		if (confirm('Deseas rejuecear el problema ' + $('#rejudge-problem-list').val() + '?')) {
 			omegaup.rejudgeProblem($('#rejudge-problem-list').val(), function (x) {
-				omegaup.getContestRuns(contestAlias, runsChange);
+				omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange);
 			});
 		}
 		return false;
