@@ -431,7 +431,7 @@ program() {
 		run = GraderData.run(5).get
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should equal (0.400390625)
+		run.score should equal (0.2001953125)
 		run.contest_score should equal (0)
 
 		run = GraderData.run(6).get

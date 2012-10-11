@@ -4,6 +4,7 @@ import java.io._
 import java.util._
 import java.util.regex.Pattern
 import java.util.zip._
+import scala.collection.Iterator
 import scala.collection.mutable
 import scala.collection.immutable.Map
 import omegaup._
@@ -428,77 +429,120 @@ object LiteralGrader extends Grader {
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0
 }
 
-trait Tokenizer {
-	def hasNext(): Boolean
-	def next(): String
-	def close(): Unit
-	def path(): String
-}
-
-class ScannerTokenizer(file: File) extends Tokenizer {
-	val reader = new BufferedReader(new FileReader(file))
-	var nextToken: StringBuilder = null
-	var eof: Boolean = false
-	var pos: Int = 0
+class Token(var nextChar: Int, reader: Reader, containedInTokenClass: (Char) => Boolean) extends Iterator[Char] {
 	def hasNext(): Boolean = {
-		var char: Int = 0
-		while (!eof && {char = reader.read; pos += 1; char != -1}) {
-			if (!Character.isWhitespace(char)) {
-				nextToken = new StringBuilder
-				nextToken.append(char.asInstanceOf[Char])
-				while ({char = reader.read; pos += 1; char != -1 && !Character.isWhitespace(char)}) {
-					nextToken.append(char.asInstanceOf[Char])
-				}
-				if (char == -1) {
-					eof = true;
-				}
-				return true;
+		return !eof && containedInTokenClass(nextChar.asInstanceOf[Char])
+	}
+
+	def eof(): Boolean = nextChar == -1
+
+	def next(): Char = {
+		val result = nextChar
+		nextChar = reader.read
+		return result.asInstanceOf[Char]
+	}
+
+	override def toString(): String = {
+		val sb = new StringBuilder
+		while (hasNext) {
+			sb.append(next)
+		}
+		return sb.toString
+	}
+
+	def toDouble(): Double = {
+		var ans: Double = 0
+		var before: Boolean = true
+		var negative: Boolean = false
+		var p: Double = 1
+
+		while (hasNext) {
+			val ch = next
+
+			if (ch == '-') {
+				negative = true
+			} else if (ch == '.') {
+				before = false
+			} else if (before) {
+				ans *= 10
+				ans += ch.asDigit
+			} else {
+				p /= 10
+				ans += p * ch.asDigit
 			}
 		}
-		eof = true
-		return false;
+
+		if (negative) ans *= -1
+		return ans
 	}
-	def next(): String = nextToken.toString
+}
+
+trait TokenComparer {
+	def equal(a: Token, b: Token): Boolean
+}
+
+class NumericTokenComparer(precision: Double) extends TokenComparer {
+	def equal(a: Token, b: Token): Boolean = {
+		val da = a.toDouble
+		val db = b.toDouble
+
+		return Math.abs(da - db) <= precision * da
+	}
+}
+
+class CharTokenComparer(equals: (Char, Char) => Boolean) extends TokenComparer {
+	def equal(a: Token, b: Token): Boolean = {
+		while (a.hasNext && b.hasNext) {
+			if (!equals(a.next, b.next)) {
+				return false
+			}
+		}
+
+		return !a.hasNext && !b.hasNext
+	}
+}
+
+class Tokenizer(file: File, containedInTokenClass: (Char) => Boolean) extends Iterator[Token] {
+	val reader = new BufferedReader(new FileReader(file))
+	var eof: Boolean = false
+	var nextToken: Token = null
+
+	def hasNext(): Boolean = {
+		if (nextToken != null) return true
+		if (eof) return false
+
+		var char: Int = 0
+		while ({char = reader.read; char != -1}) {
+			if (containedInTokenClass(char.asInstanceOf[Char])) {
+				nextToken = new Token(char, reader, containedInTokenClass)
+				eof = nextToken.eof
+				return true
+			}
+		}
+
+		eof = true
+		return false
+	}
+
+	def next(): Token = {
+		val result = nextToken
+		nextToken = null
+		return result
+	}
+
 	def close(): Unit = reader.close
 	def path(): String = file.getCanonicalPath
 }
 
-class NumericTokenizer(file: File) extends Tokenizer {
-	val reader = new BufferedReader(new FileReader(file))
-	var nextToken: StringBuilder = null
-	var eof: Boolean = false
-	def hasNext(): Boolean = {
-		var char: Int = 0
-		while (!eof && {char = reader.read; char != -1}) {
-			if (Character.isDigit(char) || char == '.') {
-				nextToken = new StringBuilder
-				nextToken.append(char.asInstanceOf[Char])
-				while (nextToken.length < 1000 && {char = reader.read; Character.isDigit(char) || char == '.'}) {
-					nextToken.append(char.asInstanceOf[Char])
-				}
-				if (char == -1) {
-					eof = true;
-				}
-				return true;
-			}
-		}
-		eof = true
-		return false;
-	}
-	def next(): String = nextToken.toString
-	def close(): Unit = reader.close
-	def path(): String = file.getCanonicalPath
-}
-
-trait TokenComparer extends Object with Log {
-	def gradeCase(run: Run, caseName: String, inA: Tokenizer, inB: Tokenizer, eq: (String,String) => Boolean): Double = {
+trait TokenizerComparer extends Object with Log {
+	def gradeCase(run: Run, caseName: String, inA: Tokenizer, inB: Tokenizer, tc: TokenComparer): Double = {
 		debug("Grading {}, case {}", run, caseName)
 
 		try {
 			var points:Double = 1
 
 			while (points > 0 && inA.hasNext && inB.hasNext) {
-				if (!eq(inA.next, inB.next)) {
+				if (!tc.equal(inA.next, inB.next)) {
 					debug("Token mismatch {} {} {}", caseName, inA.path, inB.path)
 					points = 0
 				}
@@ -513,9 +557,8 @@ trait TokenComparer extends Object with Log {
 			points
 		} catch {
 			case e => {
-				info("Error grading: {}", e)
-				error("Stack trace {}", e.getStackTrace)
 				error("Error grading: {}", e)
+				error("Stack trace {}", e.getStackTrace)
 				
 				0
 			}
@@ -527,20 +570,38 @@ trait TokenComparer extends Object with Log {
 	}
 }
 
-object TokenGrader extends Grader with TokenComparer {
+object TokenGrader extends Grader with TokenizerComparer {
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
-		gradeCase(run, caseName, new ScannerTokenizer(runOut), new ScannerTokenizer(problemOut), _.equals(_))
+		val charClass = (c: Char) => !c.isWhitespace
+		gradeCase(
+			run,
+			caseName,
+			new Tokenizer(runOut, charClass),
+			new Tokenizer(problemOut, charClass),
+			new CharTokenComparer(_ == _))
 	}
 }
 
-object TokenCaselessGrader extends Grader with TokenComparer {
+object TokenCaselessGrader extends Grader with TokenizerComparer {
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
-		gradeCase(run, caseName, new ScannerTokenizer(runOut), new ScannerTokenizer(problemOut), _.equalsIgnoreCase(_))
+		val charClass = (c: Char) => !c.isWhitespace
+		gradeCase(
+			run,
+			caseName,
+			new Tokenizer(runOut, charClass),
+			new Tokenizer(problemOut, charClass),
+			new CharTokenComparer(_.toLower == _.toLower))
 	}
 }
 
-object TokenNumericGrader extends Grader with TokenComparer {
+object TokenNumericGrader extends Grader with TokenizerComparer {
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
-		gradeCase(run, caseName, new NumericTokenizer(runOut), new NumericTokenizer(problemOut), (a:String, b:String) => math.abs(a.toDouble - b.toDouble) <= 1e-6)
+		val charClass = (c: Char) => c.isDigit || c == '.' || c == '-'
+		gradeCase(
+			run,
+			caseName,
+			new Tokenizer(runOut, charClass),
+			new Tokenizer(problemOut, charClass),
+			new NumericTokenComparer(1e-6))
 	}
 }
