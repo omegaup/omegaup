@@ -37,7 +37,15 @@ class ShowRunSource extends ApiHandler
 
 	protected function GenerateResponse() 
 	{	
-		$this->addResponse('source', file_get_contents(RUNS_PATH . '/' . $this->run->getGuid()));
+            // Get the source
+            $this->addResponse('source', file_get_contents(RUNS_PATH . '/' . $this->run->getGuid()));
+            
+            // Get the error
+            $grade_dir = RUNS_PATH . '/../grade/' . $this->run->getRunId();
+            if (file_exists("$grade_dir.err")) 
+            {
+                $this->addResponse('compile_error', file_get_contents("$grade_dir.err"));
+            }            
 	}
 	
 }

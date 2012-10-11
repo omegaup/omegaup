@@ -281,7 +281,7 @@ $(document).ready(function() {
 					(function(guid) {
 						$('.code', r).append($('<input type="button" value="ver" />').click(function() {
 							omegaup.runSource(guid, function(data) {
-								$('#submit textarea[name="code"]').val(data.source);
+								$('#submit textarea[name="code"]').val(data.source + '\n\n' + data.compile_error);
 								$('#submit input').hide();
 								$('#submit #lang-select').hide();
 								$('#submit').show();
