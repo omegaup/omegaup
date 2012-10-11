@@ -308,7 +308,11 @@ $(document).ready(function() {
 					(function(guid) {
 						$('.code', r).append($('<input type="button" value="ver" />').click(function() {
 							omegaup.runSource(guid, function(data) {
-								$('#submit textarea[name="code"]').val(data.source + '\n\n' + data.compile_error);
+								if (data.compile_error){							
+									$('#submit textarea[name="code"]').val(data.source + '\n\nCOMPILE ERROR:\n' + data.compile_error);
+								} else {
+									$('#submit textarea[name="code"]').val(data.source);
+								}
 								$('#submit input').hide();
 								$('#submit #lang-select').hide();
 								$('#submit').show();
