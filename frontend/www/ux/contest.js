@@ -430,7 +430,7 @@ $(document).ready(function() {
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
 			$('.position', r).html(i+1);
-			$('.user', r).html(rank.name);
+			$('.user', r).html(rank.name + ' (' + rank.username + ')');
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;
@@ -456,7 +456,7 @@ $(document).ready(function() {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 				$('.position', r).html(i+1);
-				$('.user', r).html(rank.name);
+				$('.user', r).html(rank.name + ' (' + rank.username + ')');
 				$('.points', r).html(rank.total.points);
 				$('.penalty', r).html(rank.total.penalty);
 
