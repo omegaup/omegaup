@@ -436,10 +436,30 @@ trait Tokenizer {
 }
 
 class ScannerTokenizer(file: File) extends Tokenizer {
-	val scanner = new Scanner(file)
-	def hasNext(): Boolean = scanner.hasNext
-	def next(): String = scanner.next
-	def close(): Unit = scanner.close
+	val reader = new BufferedReader(new FileReader(file))
+	var nextToken: StringBuilder = null
+	var eof: Boolean = false
+	var pos: Int = 0
+	def hasNext(): Boolean = {
+		var char: Int = 0
+		while (!eof && {char = reader.read; pos += 1; char != -1}) {
+			if (!Character.isWhitespace(char)) {
+				nextToken = new StringBuilder
+				nextToken.append(char.asInstanceOf[Char])
+				while ({char = reader.read; pos += 1; char != -1 && !Character.isWhitespace(char)}) {
+					nextToken.append(char.asInstanceOf[Char])
+				}
+				if (char == -1) {
+					eof = true;
+				}
+				return true;
+			}
+		}
+		eof = true
+		return false;
+	}
+	def next(): String = nextToken.toString
+	def close(): Unit = reader.close
 	def path(): String = file.getCanonicalPath
 }
 
@@ -492,12 +512,15 @@ trait TokenComparer extends Object with Log {
 			debug("Grading {}, case {}. Reporting {} points", run, caseName, points)
 			points
 		} catch {
-			case e: Exception => {
-				error("", e)
+			case e => {
+				info("Error grading: {}", e)
+				error("Stack trace {}", e.getStackTrace)
+				error("Error grading: {}", e)
 				
 				0
 			}
 		} finally {
+			debug("Finished grading {}, case {}", run, caseName)
 			inA.close
 			inB.close
 		}
