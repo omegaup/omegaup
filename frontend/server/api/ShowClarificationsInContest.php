@@ -176,10 +176,10 @@ class ShowClarificationsInContest extends ApiHandler
                 }                
             });
             
-        // LIMIT the array if rowcount !== 0
+	// LIMIT the array if rowcount !== 0
         if ($this->rowcount !== 0)
         {
-            $clarifications_array_sliced = array_slice($clarifications_array, $this->offset, $this->rowcount, true);
+            $clarifications_array_sliced = array_slice($clarifications_array, $this->offset, $this->rowcount, false);
         }
             
         // Add response to array

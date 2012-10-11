@@ -241,11 +241,12 @@ OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 	);
 };
 
-OmegaUp.prototype.getClarifications = function(contestAlias, callback) {
+OmegaUp.prototype.getClarifications = function(contestAlias, offset, rowcount, callback) {
 	var self = this;
 
-	$.get(
+	$.post(
 		'/arena/contests/' + contestAlias + '/clarifications/',
+		{offset: offset, rowcount: rowcount},
 		function (data) {
 			callback(data);
 		},

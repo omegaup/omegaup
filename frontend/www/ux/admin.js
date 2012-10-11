@@ -11,6 +11,8 @@ $(document).ready(function() {
 	var submissionDeadline = null;
 	var runsOffset = 0;
 	var runsRowcount = 100;
+	var clarificationsOffset = 0;
+	var clarificationsRowcount = 20;
 	var veredicts = {
 		AC: "Accepted",
 		PA: "Partially Accepted",
@@ -60,8 +62,11 @@ $(document).ready(function() {
 		omegaup.getRanking(contestAlias, rankingChange);
 		setInterval(function() { omegaup.getRanking(contestAlias, rankingChange); }, 5 * 60 * 1000);
 
-		omegaup.getClarifications(contestAlias, clarificationsChange);
-		setInterval(function() { omegaup.getClarifications(contestAlias, clarificationsChange); }, 5 * 60 * 1000);
+		omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
+		setInterval(function() { 
+			clarificationsOffset = 0; // Return pagination to start on refresh
+			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+		}, 5 * 60 * 1000);
 
 		omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange);
 		setInterval(function() { 
@@ -108,6 +113,28 @@ $(document).ready(function() {
 		// Refresh with previous page
 		omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange); 
 	});
+	
+	$('.clarifpager .clarifpagerprev').click(function () {
+		if (clarificationsOffset > 0) {
+			clarificationsOffset -= clarificationsRowcount;
+			if (clarificationsOffset < 0) {
+				clarificationsOffset = 0;
+			}
+			
+			// Refresh with previous page
+			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+		}
+	});
+	
+	$('.clarifpager .clarifpagernext').click(function () {
+		clarificationsOffset += clarificationsRowcount;
+		if (clarificationsOffset < 0) {
+			clarificationsOffset = 0;
+		}
+		
+		// Refresh with previous page
+		omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+	});
 
 	$('#submit').submit(function(e) {
 		if (!$('#submit textarea[name="code"]').val()) return false;
@@ -152,7 +179,7 @@ $(document).ready(function() {
 			}
 			$('#overlay').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
-			omegaup.getClarifications(contestAlias, clarificationsChange);
+			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
 			$('#clarification input').removeAttr('disabled');
 		});
 
