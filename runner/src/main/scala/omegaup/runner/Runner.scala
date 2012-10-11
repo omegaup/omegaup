@@ -76,6 +76,8 @@ object Runner extends RunnerService with Log with Using {
 							"Compilation time exceeded"
 						else if (meta.contains("message") && meta("status") != "RE")
 							meta("message")
+						else if (lang == "p")
+							FileUtil.read(runDirectory.getCanonicalPath + "/compile.out").replace(runDirectory.getCanonicalPath + "/", "")
 						else
 							FileUtil.read(runDirectory.getCanonicalPath + "/compile.err").replace(runDirectory.getCanonicalPath + "/", "")
 				
