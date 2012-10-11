@@ -25,7 +25,20 @@ class ShowClarificationsInContest extends ApiHandler
                 return ContestsDAO::getByAlias($value);
             }, "Contest requested is invalid."))
         ->validate(RequestContext::get("contest_alias"), "contest_alias");
-                
+            
+        // Check offset, is optional
+        if (!is_null(RequestContext::get("offset")))
+        {
+            ValidatorFactory::numericValidator()->validate(RequestContext::get("offset"), "offset");
+            $this->offset = RequestContext::get("offset");
+	}
+        
+        // Check rowcount, is optional
+        if (!is_null(RequestContext::get("rowcount")))
+        {
+            ValidatorFactory::numericValidator()->validate(RequestContext::get("rowcount"), "rowcount");
+            $this->rowcount = RequestContext::get("rowcount");
+	}                
     }   
    
 
@@ -84,66 +97,88 @@ class ShowClarificationsInContest extends ApiHandler
 	}
 
         $clarifications_array = array();
+        
         // Filter each Public clarification and add it to the response        
         foreach($clarifications_public as $clarification)
         {
-		$clar = $clarification->asFilteredArray($relevant_columns);
-		$clar['can_answer'] = $is_contest_director;
+            $clar = $clarification->asFilteredArray($relevant_columns);
+            $clar['can_answer'] = $is_contest_director;
 
-                // Add author in case of contest_director
-                if ($is_contest_director)
+            // Add author in case of contest_director
+            if ($is_contest_director)
+            {
+                try
                 {
-                    try
-                    {
-                        $author_user = UsersDAO::getByPK($clarification->getAuthorId());
-                        $clar['author'] = $author_user->getUsername();
-                    }
-                    catch(Exception $e)
-                    {
-                        throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
-                    }                    
+                    $author_user = UsersDAO::getByPK($clarification->getAuthorId());
+                    $clar['author'] = $author_user->getUsername();
                 }
-                
-        	array_push($clarifications_array, $clar);
+                catch(Exception $e)
+                {
+                    throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
+                }                    
+            }
+
+            array_push($clarifications_array, $clar);
         }
          
         // Filter each Private clarification and add it to the response
         foreach($clarifications_private as $clarification)
 	{
-		$clar = $clarification->asFilteredArray($relevant_columns);
-		$clar['can_answer'] = $is_contest_director;
-                
-                // Add author in case of contest_director
-                if ($is_contest_director)
-                {
-                    try
-                    {
-                        $author_user = UsersDAO::getByPK($clarification->getAuthorId());
-                        $clar['author'] = $author_user->getUsername();
-                    }
-                    catch(Exception $e)
-                    {
-                        throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
-                    }                    
-                }
+            $clar = $clarification->asFilteredArray($relevant_columns);
+            $clar['can_answer'] = $is_contest_director;
 
-		array_push($clarifications_array, $clar);
+            // Add author in case of contest_director
+            if ($is_contest_director)
+            {
+                try
+                {
+                    $author_user = UsersDAO::getByPK($clarification->getAuthorId());
+                    $clar['author'] = $author_user->getUsername();
+                }
+                catch(Exception $e)
+                {
+                    throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);
+                }                    
+            }
+
+            array_push($clarifications_array, $clar);
         }
         
         // Sort final array by time
         usort($clarifications_array, function($a, $b) 
-            { 
-                $t1 = strtotime($a["time"]);
-                $t2 = strtotime($b["time"]);
+            {
+                // First, let's order by answer
+                $a_answered = strlen($a['answer']) > 0;
+                $b_answered = strlen($b['answer']) > 0;
                 
-                if($t1 === $t2)
-                    return 0;
+                // If they have the same status, check 
+                if ($a_answered === $b_answered)
+                {
+                    $t1 = strtotime($a["time"]);
+                    $t2 = strtotime($b["time"]);
+
+                    if($t1 === $t2)
+                        return 0;
+
+                    return ($t1 > $t2) ? -1 : 1;             
+                }
                 
-                return ($t1 > $t2) ? -1 : 1;             
+                // If a is not answered, it has priority
+                if($a_answered === false)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 1;
+                }                
             });
             
+        // LIMIT the array    
+        $clarifications_array_sliced = array_slice($clarifications_array, RequestContext::get("offset"), RequestContext::get("rowcount"), true);
+            
         // Add response to array
-        $this->addResponse('clarifications', $clarifications_array);
+        $this->addResponse('clarifications', $clarifications_array_sliced);
     }
 }
 
