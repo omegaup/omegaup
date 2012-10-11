@@ -11,6 +11,8 @@ $(document).ready(function() {
 	var submissionDeadline = null;
 	var submissionGap = 0;
 	var answeredClarifications = 0;
+	var clarificationsOffset = 0;
+	var clarificationsRowcount = 20;
 	var veredicts = {
 		AC: "Accepted",
 		PA: "Partially Accepted",
@@ -107,8 +109,11 @@ $(document).ready(function() {
 		omegaup.getRanking(contestAlias, rankingChange);
 		setInterval(function() { omegaup.getRanking(contestAlias, rankingChange); }, 5 * 60 * 1000);
 
-		omegaup.getClarifications(contestAlias, clarificationsChange);
-		setInterval(function() { omegaup.getClarifications(contestAlias, clarificationsChange); }, 5 * 60 * 1000);
+		omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
+		setInterval(function() { 
+			clarificationsOffset = 0; // Return pagination to start on refresh
+			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+		}, 5 * 60 * 1000);
 
 		updateClock();
 		setInterval(updateClock, 1000);
@@ -209,6 +214,28 @@ $(document).ready(function() {
 
 		return false;
 	});
+	
+	$('.clarifpager .clarifpagerprev').click(function () {
+		if (clarificationsOffset > 0) {
+			clarificationsOffset -= clarificationsRowcount;
+			if (clarificationsOffset < 0) {
+				clarificationsOffset = 0;
+			}
+			
+			// Refresh with previous page
+			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+		}
+	});
+	
+	$('.clarifpager .clarifpagernext').click(function () {
+		clarificationsOffset += clarificationsRowcount;
+		if (clarificationsOffset < 0) {
+			clarificationsOffset = 0;
+		}
+		
+		// Refresh with previous page
+		omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+	});
 
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
@@ -220,7 +247,7 @@ $(document).ready(function() {
 			}
 			$('#overlay').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
-			omegaup.getClarifications(contestAlias, clarificationsChange);
+			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
 			$('#clarification input').removeAttr('disabled');
 		});
 
@@ -510,8 +537,10 @@ $(document).ready(function() {
 
 	function clarificationsChange(data) {
 		$('.clarifications tr.inserted').remove();
-		if (data.clarifications.length > 0) {
+		if (data.clarifications.length > 0 && data.clarifications.length < clarificationsRowcount) {
 			$('#clarifications-count').html("(" + data.clarifications.length + ")");
+		} else if (data.clarifications.length >= clarificationsRowcount) {
+			$('#clarifications-count').html("("+ data.clarifications.length + "+)");
 		}
 
 		var previouslyAnswered = answeredClarifications;
