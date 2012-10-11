@@ -15,6 +15,8 @@ require_once("ApiHandler.php");
 
 class ShowClarificationsInContest extends ApiHandler
 {
+    private $offset = 0;
+    private $rowcount = 0;
     
     protected function RegisterValidatorsToRequest()
     {
@@ -174,8 +176,11 @@ class ShowClarificationsInContest extends ApiHandler
                 }                
             });
             
-        // LIMIT the array    
-        $clarifications_array_sliced = array_slice($clarifications_array, RequestContext::get("offset"), RequestContext::get("rowcount"), true);
+        // LIMIT the array if rowcount !== 0
+        if ($this->rowcount !== 0)
+        {
+            $clarifications_array_sliced = array_slice($clarifications_array, $this->offset, $this->rowcount, true);
+        }
             
         // Add response to array
         $this->addResponse('clarifications', $clarifications_array_sliced);
