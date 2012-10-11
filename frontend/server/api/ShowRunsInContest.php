@@ -54,6 +54,13 @@ class ShowRunsInContest extends ApiHandler
             ValidatorFactory::numericValidator()->validate(RequestContext::get("rowcount"), "rowcount");
             $this->rowcount = RequestContext::get("rowcount");
 	}
+        
+        // Check filter by status, is optional
+        if (!is_null(RequestContext::get("status")))
+        {
+            ValidatorFactory::enumValidator(array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE"))
+                ->validate(RequestContext::get("status"), "status");
+        }
     }   
             
     protected function GenerateResponse() 
@@ -62,7 +69,9 @@ class ShowRunsInContest extends ApiHandler
         
         // Get all runs for problem given        
         $runs_mask = new Runs( array (                
-            "contest_id" => $this->contest->getContestId()));
+            "contest_id" => $this->contest->getContestId(),
+            "status" => RequestContext::get("status")
+            ));
         
         // Filter relevant columns
         $relevant_columns = array( "run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias" );
