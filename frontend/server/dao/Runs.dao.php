@@ -36,6 +36,71 @@ class RunsDAO extends RunsDAOBase
 		global $conn;
 		return $conn->GetOne($sql, $val) === 0;
 	}
+        
+        /*
+	 * Gets an array of the guids of the pending runs
+	 */
+	public static final function GetPendingRunsOfContest($contest_id, $showAllRuns = false)
+	{
+            // Build SQL statement.
+            $sql = "SELECT guid FROM Runs WHERE contest_id = ? AND status != 'ready'";
+            $val = array($contest_id);
+
+            if (!$showAllRuns) 
+            {
+                $sql .= ' AND test = 0';
+            }
+
+            global $conn;
+            $rs = $conn->Execute($sql, $val);
+            
+            $ar = array();
+            foreach ($rs as $foo) 
+            {                
+                array_push($ar, $foo);
+            }
+            
+            return $ar;
+	}
+        
+        /*
+	 * Gets the count of total runs sent to a given contest
+	 */
+	public static final function CountTotalRunsOfContest($contest_id, $showAllRuns = false)
+	{
+            // Build SQL statement.
+            $sql = "SELECT COUNT(*) FROM Runs WHERE contest_id = ? ";
+            $val = array($contest_id);
+
+            if (!$showAllRuns) 
+            {
+                $sql .= ' AND test = 0';
+            }
+
+            global $conn;
+            return $conn->GetOne($sql, $val);
+	}
+        
+        /*
+	 * Gets the largest queued time of a run in ms 
+	 */
+	public static final function GetLargestWaitTimeOfContest($contest_id, $showAllRuns = false)
+	{
+            // Build SQL statement.
+            $sql = "SELECT * FROM Runs WHERE contest_id = ? ORDER BY time ASC LIMIT 1";
+            $val = array($contest_id);
+
+            global $conn;
+            $rs = $conn->GetRow($sql, $val);            
+
+            if(count($rs) === 0)
+            {
+                return null;
+            }
+            
+            $run = new Runs($rs);                        
+            return array($run, time() - strtotime($run->getTime()));                        
+	}
 
         /*
          *  GetAllRelevantUsers

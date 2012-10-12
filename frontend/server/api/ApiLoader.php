@@ -192,6 +192,11 @@ class ApiLoader
                 $api = new ShowRunSource();
                 break;
             
+            case 'ShowContestStats':
+                require_once('ShowContestStats.php');
+                $api = new ShowContestStats();
+                break;
+            
             default:
                 return self::NotFound();
                 break;

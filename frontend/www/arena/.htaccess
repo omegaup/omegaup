@@ -19,6 +19,7 @@ RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/?$ CallApiLoader.php?apicmd=ShowS
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/events/?$ CallApiLoader.php?apicmd=ShowScoreboardEvents&contest_alias=$1 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/clarifications/?$ CallApiLoader.php?apicmd=ShowClarificationsInContest&contest_alias=$1 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/runs/?$ CallApiLoader.php?apicmd=ShowRunsInContest&contest_alias=$1 [L]
+RewriteRule ^contests/([a-zA-Z0-9_-]+)/stats/?$ CallApiLoader.php?apicmd=ShowContestStats&contest_alias=$1 [L]
 
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowProblemInContest&contest_alias=$1&problem_alias=$2 [L]
 RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/new/?$ CallApiLoader.php?apicmd=NewProblemInContest&contest_alias=$1 [L]
