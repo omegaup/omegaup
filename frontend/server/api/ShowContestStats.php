@@ -35,7 +35,7 @@ class ShowContestStats extends ApiHandler
 	}
 
         // This API is Contest Admin only
-        if (!Authorization::IsContestAdmin($user_id, $contest))
+        if (!Authorization::IsContestAdmin($user_id, $this->contest))
         {
             throw new ApiException(ApiHttpErrors::forbiddenSite());
         }        	                     
