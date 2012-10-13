@@ -473,6 +473,7 @@ class Token(var nextChar: Int, reader: Reader, containedInTokenClass: (Char) => 
 		}
 
 		if (negative) ans *= -1
+
 		return ans
 	}
 }
@@ -486,7 +487,7 @@ class NumericTokenComparer(precision: Double) extends TokenComparer {
 		val da = a.toDouble
 		val db = b.toDouble
 
-		return Math.abs(da - db) <= precision * da
+		return Math.abs(da - db) <= Math.abs(precision * da)
 	}
 }
 

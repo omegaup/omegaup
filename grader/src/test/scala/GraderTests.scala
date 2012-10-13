@@ -60,6 +60,10 @@ class GraderSpec extends FlatSpec with ShouldMatchers {
 					      "test",
 					      new File("src/test/resources/A/medium.01.out"),
 					      new File("src/test/resources/B/medium.01.out")) should equal (0.0)
+		TokenNumericGrader.gradeCase(null,
+					     "test",
+					     new File("src/test/resources/A/artista02.out"),
+					     new File("src/test/resources/B/artista02.out")) should equal (1.0)
 
 		TokenCaselessGrader.gradeCase(null,
 					      "test",
