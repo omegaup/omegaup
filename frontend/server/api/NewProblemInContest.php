@@ -301,7 +301,7 @@ class NewProblemInContest extends ApiHandler
         $cases_to_be_zipped = $dirpath . DIRECTORY_SEPARATOR . "cases/*.in";
         
         // cmd to be executed in console
-        $zip_cmd = "zip -j ". $cases_zip_path . " " . $cases_to_be_zipped;
+        $zip_cmd = "zip -j ". $cases_zip_path . " " . $cases_to_be_zipped . " 2>&1";
         
         // Execute zip command
         $output = array();
