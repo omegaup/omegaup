@@ -57,24 +57,43 @@ class Scoreboard
     {
     	$result = null;
         $from_cache = false;
-        $cache_key = "scoreboard-" . $this->contest_id;
-        $can_use_cache = APC_USER_CACHE_ENABLED == true 
-                        && APC_USER_CACHE_SCOREBOARD == true 
-                        && !$this->showAllRuns 
-                        && !$sortByName
-                        && is_null($filterUsersBy);
+        $cache_key_contestant = "scoreboard-" . $this->contest_id;
+        $cache_key_admin = "scoreboard-admin-" . $this->contest_id;
+        
+        $can_use_contestant_cache = APC_USER_CACHE_ENABLED == true 
+                                && APC_USER_CACHE_SCOREBOARD == true 
+                                && !$this->showAllRuns 
+                                && !$sortByName
+                                && is_null($filterUsersBy);
+        
+        $can_use_admin_cache = APC_USER_CACHE_ENABLED == true 
+                                && APC_USER_CACHE_ADMIN_SCOREBOARD == true 
+                                && $this->showAllRuns 
+                                && !$sortByName
+                                && is_null($filterUsersBy);
         
         // If cache is turned on and we're not looking for admin-only runs
-        if ($can_use_cache)
+        if ($can_use_contestant_cache)
         {
-            if($result = apc_fetch($cache_key))
+            if($result = apc_fetch($cache_key_contestant))
             {
                 $from_cache = true;
             }
             else
             {
-                Logger::log("Cache miss for key: " . $cache_key );
+                Logger::log("Cache miss for key: " . $cache_key_contestant );
             }            
+        }
+        else if ($can_use_admin_cache)
+        {
+            if($result = apc_fetch($cache_key_admin))
+            {
+                $from_cache = true;
+            }
+            else
+            {
+                Logger::log("Cache miss for key: " . $can_use_admin_cache );
+            }
         }
         
         if (!$from_cache)
@@ -83,8 +102,10 @@ class Scoreboard
             {
                 $contest = ContestsDAO::getByPK($this->contest_id);	
 
-                // Gets whether we can cache this scoreboard.
-                $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
+                // Get whether we can cache this scoreboard.
+                $pending_runs = RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
+                $cacheable_for_contestant = !$this->showAllRuns && !$pending_runs;
+                $cacheable_for_admin = $this->showAllRuns && !$pending_runs;
 
                 // Get all distinct contestants participating in the contest given contest_id
                 $contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns, $filterUsersBy);
@@ -139,11 +160,18 @@ class Scoreboard
             }
 
             // Cache scoreboard if there are no pending runs.
-            if( $cacheable && $can_use_cache)
+            if ($cacheable_for_contestant && $can_use_contestant_cache)
             {
-                if (apc_store($cache_key, $result, APC_USER_CACHE_SCOREBOARD_TIMEOUT) == false)
+                if (apc_store($cache_key_contestant, $result, APC_USER_CACHE_SCOREBOARD_TIMEOUT) == false)
                 {
-                    Logger::log("apc_store failed for problem key: " . $cache_key);
+                    Logger::log("apc_store failed for problem key: " . $cache_key_contestant);
+                }
+            }
+            else if ($cacheable_for_admin && $can_use_admin_cache)
+            {
+                if (apc_store($cache_key_admin, $result, APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT) == false)
+                {
+                    Logger::log("apc_store failed for problem key: " . $cache_key_admin);
                 }
             }
 	}
