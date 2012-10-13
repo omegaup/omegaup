@@ -230,7 +230,7 @@ class Scoreboard
                         continue;
                 }
 
-                $user_problems_score[$run->getUserId()][$run->getProblemId()]['points'] = $run->getContestScore();
+                $user_problems_score[$run->getUserId()][$run->getProblemId()]['points'] = round((float)$run->getContestScore(), 2);
 		$user_problems_score[$run->getUserId()][$run->getProblemId()]['penalty'] = 0;
 
                 $data = array();
@@ -242,7 +242,7 @@ class Scoreboard
 
                 $data['problem'] = array(
                         'alias' => $contest_problems[$run->getProblemId()]->getAlias(),
-                        'points' => $run->getContestScore(),
+                        'points' => round((float)$run->getContestScore(), 2),
                         'penalty' => 0
                 );
 
