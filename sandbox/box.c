@@ -521,7 +521,7 @@ match_path_rule(struct path_rule *r, char *path)
   while (*rr)
     if (*rr++ != *path++)
       {
-	if (rr[-1] == '/' && !path[-1])
+	if (!*rr && rr[-1] == '/' && !path[-1])
 	  break;
 	return A_DEFAULT;
       }
