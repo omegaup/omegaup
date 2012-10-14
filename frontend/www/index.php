@@ -11,7 +11,7 @@
 	 * */
 	define( "LEVEL_NEEDED", false );
 
-	require_once( "../server/inc/bootstrap.php" );
+	require_once( "../server/bootstrap.php" );
 
 
     $page = new OmegaupComponentPage();

@@ -1,199 +1,200 @@
 <?php
 
-	/*
-	 * Bootstrap file
-	 * 
-	 * 
-	 * */
+/*
+ * Bootstrap file
+ * 
+ * 
+ * */
 
-   // Set default time
-   date_default_timezone_set('UTC');
-   
-   // Loads config
-   define('SERVER_PATH', dirname(__DIR__));     
-   
-   ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
+// Set default time
+date_default_timezone_set('UTC');
 
-   if(!is_file(SERVER_PATH . "/config.php")){
+// Loads config
+define('SERVER_PATH', dirname(__DIR__));
 
-   		echo "<h2>You are missing the config file.</h2>";
-   		exit;
-   }
+ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH);
 
-   require_once(SERVER_PATH . "/config.php");
-   require_once("libs/Logger/Logger.php");
-   require_once('dao/model.inc.php');
-   require_once("libs/Authorization.php");
+if(!is_file(SERVER_PATH . "/config.php")){
 
+		?>
+		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+	<HTML>
+		<head>
+			<link rel="stylesheet" type="text/css" href="css/style.css">
+		</head>
+		<body style="padding:5px">
+			<h1>No config file.</h1>
+				<p>You are missing the config file. It must look something like this:</p>
+			<pre class="code">
+				<?php include ("config.php.sample") ; ?>
+			</pre>
+			</body>
+		</html>
+		<?php
 
-
-
-
-   Logger::log("REQUEST : " . $_SERVER["SCRIPT_FILENAME"] . "?" . $_SERVER["QUERY_STRING"]);
-
-	/**
-	 * I am the API:
-	 * Connect to DB, and load the DAO's. 
-	 *
-	 * */
-	if(defined("WHOAMI") && WHOAMI == "API"){
-		
-		require_once('adodb5/adodb.inc.php');
-		require_once('adodb5/adodb-exceptions.inc.php');
-		$conn = null;
-
-		try{
-                    
-		    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
-		    $conn->debug = OMEGAUP_DB_DEBUG;
-		    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
-            
+		exit;
+}
 
 
-	    	if(!$conn) {
-				/**
-				 * Dispatch missing parameters
-				 * */
-				header('HTTP/1.1 500 INTERNAL SERVER ERROR');
 
-				die(json_encode(array(
-					"status" => "error",
-					"error"	 => "Conection to the database has failed.",
-					"errorcode" => 1
-				)));
+require_once(SERVER_PATH . "/config.php");
+require_once("libs/Logger/Logger.php");
+require_once('dao/model.inc.php');
+require_once("libs/Authorization.php");
 
-		    }
-		    $conn->SetCharSet('utf8');
-		    $conn->EXECUTE('SET NAMES \'utf8\';');
-		    
-		} catch (Exception $e) {
-			
+
+/**
+ * I am the API:
+ * Connect to DB, and load the DAO's. 
+ *
+ * */
+if ( defined( "WHOAMI" ) && WHOAMI == "API" ){
 	
-        	    //if(!$conn) {
-                	$conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
-               		$conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
-            		//}
-				
-			/*
-			header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-			
-			die(json_encode(array(
-				"status" => "error",
-				"error"	 => $e,
-				"errorcode" => 2
-			)));
-			*/
-		}
-		$GLOBALS["conn"] = $conn;
-		return;
-	}
-		
-	
-	/* ****************************************************************************************************************
-	 * Start and evaluate session
-	 * 
-	 * 
-	 * 
-	 * **************************************************************************************************************** */
-	session_start();
-
-
-
-	/*
-	 * require googleopenid lib
-	 * 
-	 * 
-	 * */
-	require_once( "libs/GoogleOpenID.php" );
-	
-	
-	
-	
-	
-	/*
-	 * Start and evaluate session
-	 * 
-	 * 
-	 * 
-	 * */
-	require_once("controllers/login.controller.php");
-	require_once("controllers/users.controller.php");
-	require_once("controllers/problems.controller.php");
-	
-	
-
-
-
-	/*
-	 * This global variables, will be accessible trough all of the program
-	 * and will contain relevant information for the current session, and 
-	 * other handy global configuration options.
-	 * 
-	 *
-	 * */
-	$GLOBALS = array();	
-	$GLOBALS["user"] = array();
-	$GLOBALS["session"] = array();
-
-	
-	
-	
-	/*
-	 * Load the rest of the base classes
-	 * 
-	 * */
-	require_once( "definitions.php" );
-	require_once( "libs/GUI/GUI.inc.php" );
-	
-
-	
-	
-	/*
-	 * Connect to database with the appropiate permissions
-	 * based on the session retrived above. This way, a non-logged
-	 * user will have only SELECT permissions for example. If a 
-	 * bug is found, they will have limited access to the database.
-	 * 
-	 * */
 	require_once('adodb5/adodb.inc.php');
 	require_once('adodb5/adodb-exceptions.inc.php');
 
 	$conn = null;
-
 
 	try{
 	    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
 	    $conn->debug = OMEGAUP_DB_DEBUG;
 	    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 
-	} catch (Exception $e) {
-		Logger::error($e);
-            //if(!$conn) {
-                $conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
-                $conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
-            //}
-		
-		//die("error");
-	}
-	
-	
-	
-	/*
-	 * This bootstrap should be loaded via a frontend page.
-	 * All pages *must* set this variable to see if they have
-	 * permissions to see this page.
-	 *
-	 * */
-	/*
-	if( !defined(LEVEL_NEEDED)  ){
-		//LEVEL_NEEDED WAS NOT SET !
-		$GUI->prettyDie("LEVEL_NEEDED WAS NOT SET");
-		
-	}else{
-		//check for permissions
+    	if(!$conn) {
+			/**
+			 * Dispatch missing parameters
+			 * */
+			header('HTTP/1.1 500 INTERNAL SERVER ERROR');
 
+			die(json_encode(array(
+				"status" => "error",
+				"error"	 => "Conection to the database has failed.",
+				"errorcode" => 1
+			)));
+
+	    }
+	    $conn->SetCharSet('utf8');
+	    $conn->EXECUTE('SET NAMES \'utf8\';');
+	    
+	} catch (Exception $e) {
+		
+
+    	    //if(!$conn) {
+            	$conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
+           		$conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
+        		//}
+			
+		/*
+		header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+		
+		die(json_encode(array(
+			"status" => "error",
+			"error"	 => $e,
+			"errorcode" => 2
+		)));
+		*/
 	}
-	*/
+	$GLOBALS["conn"] = $conn;
+	return;
+}
+
+
+
+/*
+ * require googleopenid lib
+ * 
+ * 
+ * */
+require_once( "libs/GoogleOpenID.php" );
+
+
+
+
+
+/*
+ * Start and evaluate session
+ * 
+ * 
+ * 
+ * */
+require_once("controllers/login.controller.php");
+require_once("controllers/users.controller.php");
+require_once("controllers/problems.controller.php");
+
+
+
+
+
+/*
+ * This global variables, will be accessible trough all of the program
+ * and will contain relevant information for the current session, and 
+ * other handy global configuration options.
+ * 
+ *
+ * */
+$GLOBALS = array();	
+$GLOBALS["user"] = array();
+$GLOBALS["session"] = array();
+
+
+
+
+/*
+ * Load the rest of the base classes
+ * 
+ * */
+require_once( "definitions.php" );
+require_once( "libs/GUI/GUI.inc.php" );
+
+
+
+
+/*
+ * Connect to database with the appropiate permissions
+ * based on the session retrived above. This way, a non-logged
+ * user will have only SELECT permissions for example. If a 
+ * bug is found, they will have limited access to the database.
+ * 
+ * */
+require_once('adodb5/adodb.inc.php');
+require_once('adodb5/adodb-exceptions.inc.php');
+
+$conn = null;
+
+
+try{
+    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
+    $conn->debug = OMEGAUP_DB_DEBUG;
+    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+
+} catch (Exception $e) {
+	Logger::error($e);
+        //if(!$conn) {
+            $conn = ADONewConnection(OMEGAUP_SLAVE_DB_DRIVER);
+            $conn->PConnect(OMEGAUP_SLAVE_DB_HOST, OMEGAUP_SLAVE_DB_USER, OMEGAUP_SLAVE_DB_PASS, OMEGAUP_SLAVE_DB_NAME);
+        //}
+	
+	//die("error");
+}
+
+
+
+/*
+ * This bootstrap should be loaded via a frontend page.
+ * All pages *must* set this variable to see if they have
+ * permissions to see this page.
+ *
+ * */
+/*
+if( !defined(LEVEL_NEEDED)  ){
+	//LEVEL_NEEDED WAS NOT SET !
+	$GUI->prettyDie("LEVEL_NEEDED WAS NOT SET");
+	
+}else{
+	//check for permissions
+
+}
+*/
 
 
 function FormatTime($timestamp, $type = "FB")
