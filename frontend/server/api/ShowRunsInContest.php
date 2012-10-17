@@ -23,7 +23,7 @@ class ShowRunsInContest extends ApiHandler
     protected function RegisterValidatorsToRequest()
     {
 	$user_id = $this->_user_id;
-
+	
 	ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("contest_alias"), "contest_alias");
 
 	try {
@@ -33,14 +33,11 @@ class ShowRunsInContest extends ApiHandler
 		throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 	}
 
-	$customValidator = new CustomValidator(
-		function ($contest) use ($user_id)  {
-			return Authorization::IsContestAdmin($user_id, $contest);
-		},
-		"Contest requested is invalid."
-	);
-	$customValidator->validate($this->contest, "contest_alias");
-        
+	if(!Authorization::IsContestAdmin($this->_user_id, $this->contest))
+        {
+            throw new ApiException(ApiHttpErrors::forbiddenSite());
+        }       
+ 
         // Check offset, is optional
         if (!is_null(RequestContext::get("offset")))
         {
