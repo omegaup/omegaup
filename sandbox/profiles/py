@@ -29,3 +29,4 @@
 -p /etc/nsswitch.conf
 -p /etc/passwd
 -p /usr/local/lib/python2.6/
+-p /home/

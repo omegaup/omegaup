@@ -57,7 +57,7 @@ class RunsDAO extends RunsDAOBase
             $ar = array();
             foreach ($rs as $foo) 
             {                
-                array_push($ar, $foo);
+                array_push($ar, $foo['guid']);
             }
             
             return $ar;

@@ -189,7 +189,7 @@ $(document).ready(function() {
 						if (run.status == 'ready') {
 							$(r + ' .runtime').html((parseFloat(run.runtime) / 1000).toFixed(2));
 							$(r + ' .memory').html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-							$(r + ' .points').html(parseInt(run.contest_score).toFixed(2));
+							$(r + ' .points').html(parseFloat(run.contest_score).toFixed(2));
 							$(r + ' .penalty').html(run.submit_delay);
 						}
 						$(r + ' .status').html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
@@ -391,38 +391,38 @@ $(document).ready(function() {
 		    if (currentRanking[curr.username] > rankChartLimit - 1) continue;
 		    
 		    if (!dataInSeries[curr.name]) {
-                dataInSeries[curr.name] = [[startTime.getTime(), 0]];
-                usernames[curr.name] = curr.username;
+                	dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+	                usernames[curr.name] = curr.username;
 		    }
 		    dataInSeries[curr.name].push([
-                startTime.getTime() + curr.delta*60*1000,
-                curr.total.points
+                	startTime.getTime() + curr.delta*60*1000,
+        	        curr.total.points
 		    ]);
 		    
 		    // check if to add to navigator
 		    if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
-                navigatorData.push([
-                    startTime.getTime() + curr.delta*60*1000,
-                    curr.total.points
-                ]);
+	                navigatorData.push([
+        	            startTime.getTime() + curr.delta*60*1000,
+                	    curr.total.points
+	                ]);
 		    }
 		}
 		
 		// convert datas to series
 		for (var i in dataInSeries) {
 		    if (dataInSeries.hasOwnProperty(i)) {
-                dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
-                series.push({
-                    name: i,
-                    rank: currentRanking[usernames[i]],
-                    data: dataInSeries[i],
-                    step: true
-                });
+                	dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
+                	series.push({
+	                    name: i,
+        	            rank: currentRanking[usernames[i]],
+                	    data: dataInSeries[i],
+	                    step: true
+        	        });
 		    }
 		}
 		
 		series.sort(function (a, b) {
-            return a.rank - b.rank;
+			return a.rank - b.rank;
 		});
 		
 		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);

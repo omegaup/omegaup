@@ -104,6 +104,8 @@ class ShowRunsInContest extends ApiHandler
 	foreach ($runs as $run) {
 		$filtered = $run->asFilteredArray($relevant_columns);
 		$filtered['time'] = strtotime($filtered['time']);
+		$filtered['score'] = round((float)$filtered['score'], 4);
+		$filtered['contest_score'] = round((float)$filtered['contest_score'], 2);
 		array_push($result, $filtered);
 	}
 

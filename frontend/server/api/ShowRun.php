@@ -56,6 +56,8 @@ class ShowRun extends ApiHandler
 	$relevant_columns = array( "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay" );
 	$filtered = $this->myRun->asFilteredArray($relevant_columns);
 	$filtered['time'] = strtotime($filtered['time']);
+	$filtered['score'] = round((float)$filtered['score'], 4);
+	$filtered['contest_score'] = round((float)$filtered['contest_score'], 2);
         $this->addResponseArray($filtered);
         
         try

@@ -183,7 +183,7 @@ trait Grader extends Object with Log {
 				}
 			})
 
-			run.score = scala.math.round(run.score * 1024) / 1024.0
+			run.score = scala.math.round(run.score * 1024 * 1024) / (1024.0 * 1024.0)
 			
 			if(run.score == 0 && run.veredict < Veredict.WrongAnswer) run.veredict = Veredict.WrongAnswer
 			else if(run.score < (1-1e-9) && run.veredict < Veredict.PartialAccepted) run.veredict = Veredict.PartialAccepted
@@ -473,6 +473,7 @@ class Token(var nextChar: Int, reader: Reader, containedInTokenClass: (Char) => 
 		}
 
 		if (negative) ans *= -1
+
 		return ans
 	}
 }
@@ -486,7 +487,7 @@ class NumericTokenComparer(precision: Double) extends TokenComparer {
 		val da = a.toDouble
 		val db = b.toDouble
 
-		return Math.abs(da - db) <= precision * da
+		return Math.abs(da - db) <= Math.abs(precision * da)
 	}
 }
 
