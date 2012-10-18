@@ -93,7 +93,7 @@ class ShowContest extends ApiHandler
 	            array("contest_id" => $contest->getContestId()));        
 	        try
 	        {
-	            $problemsInContest = ContestProblemsDAO::search($key_problemsInContest);
+	            $problemsInContest = ContestProblemsDAO::search($key_problemsInContest, "order");
 	        }
 	        catch(Exception $e)
 	        {

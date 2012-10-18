@@ -12,6 +12,8 @@
 -s time
 -s flock
 
+
+-p /usr/bin/kcl
 -p /proc/self/exe
 -p /etc/timezone
 -p /usr/share/zoneinfo/

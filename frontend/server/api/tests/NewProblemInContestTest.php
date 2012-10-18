@@ -73,12 +73,17 @@ class NewProblemInContestTest extends PHPUnit_Framework_TestCase
         
     }
     
-    public function testCreateValidProblem($contest_id = NULL)
+    public function testCreateValidProblem($contest_id = NULL, $order_in_contest = NULL)
     {        
         
         // Set valid context for problem creation
         $contest_id = is_null($contest_id) ? Utils::GetValidPublicContestId() : $contest_id;
         $this->setValidContext($contest_id);
+        
+        if (!is_null($order_in_contest))
+        {
+            RequestContext::set("order_in_contest", $order_in_contest);
+        }
      
         // Login as judge
         $auth_token = Utils::LoginAsContestDirector();        

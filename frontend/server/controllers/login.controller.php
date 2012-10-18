@@ -154,11 +154,8 @@ class LoginController{
 
                             }
 
-
                             //$this_user->setEmailId( -1 );
-
                     }else{
-
                             // he's been here man !
                             $this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
 
@@ -175,7 +172,6 @@ class LoginController{
                             }
                     }
                 }
-		
 
 		/**
 		 * Ok, passwords match !
@@ -196,7 +192,11 @@ class LoginController{
 		 $auth_token->setToken($auth_str);
 
 		 session_start();
-		 $_SESSION['omegaup_user'] = array('id' => $this_user->getUserId(), 'name' => $this_user->getName(), 'email' => $email_or_username);
+		 
+		 if (!is_null($this_user))
+		 {
+			$_SESSION['omegaup_user'] = array('id' => $this_user->getUserId(), 'name' => $this_user->getName(), 'email' => $email_or_username);
+		 }
 
 		 try
 		 {
@@ -212,13 +212,7 @@ class LoginController{
 		 return true;
 	}
 	
-	
-	
-
-	
 	/**
-	 * 
-	 * 
 	 * 
 	 * */
 	static function isLoggedIn(
@@ -375,6 +369,10 @@ class LoginController{
 		
 		//unset the cookie
 		setcookie('auth_token', 'deleted', 1, '/');
+
+		session_start();
+		$_SESSION = array();
+		session_destroy();
 
 		if($redirect){
 			/*

@@ -57,5 +57,6 @@ frontend/server/api/tests/omegaup_test.log
 frontend/.DS_Store
 .DS_Store
 
-# Ignore questions
+# Ignore stuff in www
+frontend/www/apc.php
 frontend/www/preguntas/

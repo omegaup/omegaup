@@ -31,6 +31,9 @@ class ContestProblems extends VO
 			if( isset($data['points']) ){
 				$this->points = $data['points'];
 			}
+                        if( isset($data['order']) ){
+				$this->order = $data['order'];
+			}
 		}
 	}
 
@@ -79,6 +82,9 @@ class ContestProblems extends VO
 	  * @var double
 	  */
 	protected $points;
+        
+        
+        protected $order;
 
 	/**
 	  * getContestId
@@ -154,6 +160,18 @@ class ContestProblems extends VO
 	final public function setPoints( $points )
 	{
 		$this->points = $points;
+	}
+        
+        
+        
+        final public function getOrder()
+	{
+		return $this->order;
+	}
+        
+        final public function serOrder($order)
+	{
+		$this->order = $order;
 	}
 
 }
