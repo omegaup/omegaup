@@ -13,4 +13,6 @@ $smarty->assign('address', '45th & Harris');
 
 
 // display it
-$smarty->display('../templates/index.tpl');
+$smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
+
+$smarty->display( '../templates/login.tpl' );
