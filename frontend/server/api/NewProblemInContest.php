@@ -337,6 +337,73 @@ class NewProblemInContest extends ApiHandler
         file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($cases_zip_path));        
     }
     
+    
+    
+    private static function UpdateContentsDotZip($dirpath, $path_to_contents_zip)
+    {        
+        
+        // Delete whathever the user sent us
+        if (!unlink($path_to_contents_zip))
+        {
+            Logger::warn("Unable to delete contents.zip to replace with original contents!: " . $path_to_contents_zip);            
+            return;
+        }
+        
+        // Set directory to the one where contents.zip is to handle paths inside
+        // the zip correcly 
+        $original_dir = getcwd();
+        chdir($dirpath);
+        
+        // cmd to be executed in console
+        // cases/*
+        $output = array();
+        
+        $zip_cmd = "zip -r ". $path_to_contents_zip . " cases/* 2>&1";
+        Logger::log("Zipping contents.zip cases using: ". $zip_cmd);
+        exec($zip_cmd, $output, $return_var);
+        
+        // Check zip cmd return value
+        if ($return_var !== 0)
+        {
+            // D:
+            Logger::error("zipping cases/* contents.zip failed with error: ". $return_var);            
+        }
+        else 
+        {
+            // :D
+            Logger::log("zipping cases contents.zip succeeded:");
+            Logger::log(implode("\n", $output));  
+        }
+        
+        // 
+        // statements/*
+        $output = array();
+        
+        $zip_cmd = "zip -r ". $path_to_contents_zip . " statements/* 2>&1";
+        Logger::log("Zipping contents.zip statements using: ". $zip_cmd);
+        exec($zip_cmd, $output, $return_var);        
+        
+        
+        // Check zip cmd return value
+        if ($return_var !== 0)
+        {
+            // D:
+            Logger::error("zipping statements/* contents.zip failed with error: ". $return_var);            
+        }
+        else 
+        {
+            // :D
+            Logger::log("zipping statements contents.zip succeeded:");
+            Logger::log(implode("\n", $output));  
+        }
+        
+        
+        // get back to original dir
+        chdir($original_dir);
+    }
+    
+       
+    
     public static function DeployProblemZip($filesToUnzip, $casesFiles, $isUpdate = false)
     {
         try 
@@ -364,7 +431,10 @@ class NewProblemInContest extends ApiHandler
             self::HandleStatements($dirpath, $filesToUnzip);
             
             // Handle cases
-            self::HandleCases($dirpath, $casesFiles);            
+            self::HandleCases($dirpath, $casesFiles);     
+            
+            // Update contents.zip
+            self::UpdateContentsDotZip($dirpath, $filepath);
             
         }
         catch (Exception $e)
