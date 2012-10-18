@@ -116,15 +116,18 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	);
 };
 
-OmegaUp.prototype.getContestRuns = function(contestAlias, offset, rowcount, callback) {
+OmegaUp.prototype.getContestRuns = function(contestAlias, options, callback) {
+	// Opciones validas son offset, rowcount, veredict, status
+	// offset y rowcount son para paginar
+	// status y veredict son para filtrar
+	// status puede ser: 'new','waiting','compiling','running','ready'
+	// veredict puede ser: "AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE"
+
 	var self = this;
 
 	$.post(
 		'/api/contest/' + contestAlias + '/run/list/',
-		{
-			offset: offset,
-			rowcount: rowcount
-		},
+		options,
 		function (data) {
 			for (var i = 0; i < data.runs.length; i++) {
 				data.runs[i].time = self.time(data.runs[i].time * 1000);
