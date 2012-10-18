@@ -11,6 +11,8 @@ $(document).ready(function() {
 	var submissionDeadline = null;
 	var runsOffset = 0;
 	var runsRowcount = 100;
+	var runsVeredict = "";
+	var runsStatus = "";
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
 	var veredicts = {
@@ -68,10 +70,10 @@ $(document).ready(function() {
 			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
 		}, 5 * 60 * 1000);
 
-		omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange);
+		refreshRuns();
 		setInterval(function() { 
 			runsOffset = 0; // Return pagination to start on refresh
-			omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange); 
+			refreshRuns();
 		}, 5 * 60 * 1000);
 
 		updateClock();
@@ -100,7 +102,7 @@ $(document).ready(function() {
 			}
 			
 			// Refresh with previous page
-			omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange); 
+			refreshRuns();
 		}
 	});
 	
@@ -111,7 +113,14 @@ $(document).ready(function() {
 		}
 		
 		// Refresh with previous page
-		omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange); 
+		refreshRuns();
+	});
+	
+	$('select.runsveredict, select.runsstatus').change(function () {
+		runsVeredict = $('select.runsveredict option:selected').val();
+		runsStatus   = $('select.runsstatus   option:selected').val();
+		
+		refreshRuns();
 	});
 	
 	$('.clarifpager .clarifpagerprev').click(function () {
@@ -189,7 +198,7 @@ $(document).ready(function() {
 	$('#rejudge-problem').click(function() {
 		if (confirm('Deseas rejuecear el problema ' + $('#rejudge-problem-list').val() + '?')) {
 			omegaup.rejudgeProblem($('#rejudge-problem-list').val(), function (x) {
-				omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange);
+				refreshRuns();
 			});
 		}
 		return false;
@@ -407,6 +416,23 @@ $(document).ready(function() {
 				}
 			});
 		}, 5000);
+	}
+	
+	function refreshRuns() {
+		var options = {
+			offset: runsOffset, 
+			rowcount: runsRowcount
+		};
+		
+		if (runsVeredict != "") {
+			options.veredict = runsVeredict;
+		}
+		
+		if (runsStatus != "") {
+			options.status = runsStatus;
+		}
+		
+		omegaup.getContestRuns(contestAlias, options, runsChange); 
 	}
 
 	function runsChange(data) {
