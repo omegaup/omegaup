@@ -35,8 +35,12 @@ class OmegaupComponentPage extends StdComponentPage{
 		if(isset($_GET["request"])){
 			switch($_GET["request"]){
 				case "logout" :
-					LoginController::logOut(  );
-					die(header("Location: ." ));
+					LoginController::logOut();
+					if (isset($_REQUEST['redirect'])) {
+						die(header("Location: {$_REQUEST['redirect']}"));
+					} else {
+						die(header("Location: ." ));
+					}
 				break;
 
 			}			
@@ -60,12 +64,13 @@ class OmegaupComponentPage extends StdComponentPage{
 						//
 						Logger::log("redireccionando a auth=ok");
 
-
 						if(defined("FL")) {
 							die(header("Location: profile.php?auth=ok&fl=1" ));	
+						} else if (isset($_REQUEST['redirect'])) {
+							die(header("Location: {$_REQUEST['redirect']}" ));	
+						} else {
+							die(header("Location: profile.php?auth=ok&" . $_SERVER["QUERY_STRING"] ));
 						}
-
-						die(header("Location: profile.php?auth=ok&" . $_SERVER["QUERY_STRING"] ));
 
 					}else{
 						//login incorrecto
@@ -97,13 +102,16 @@ class OmegaupComponentPage extends StdComponentPage{
 			$this_user = LoginController::getCurrentUser();
 			
 			if(is_null($this_user)) {
-				//die(header("Location: ." ));
+				die(header("Location: ." ));
 			}
 			
 			$this->user_html_menu = '';
-			$this->user_html_menu .= '<a style="background-color: white; color: #678DD7; padding: 2px; -webkit-border-radius: 5px; padding-left: 5px;" href="profile.php?id='.$this_user->getUserId()  .'">' 
-							. '<img src="https://secure.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >'
-							. '&nbsp;' . $this_user->getUsername()  .'</a>&nbsp;';
+
+			if(!is_null($this_user))
+			$this->user_html_menu .= 
+				'<a style="background-color: white; color: #678DD7; padding: 2px; -webkit-border-radius: 5px; padding-left: 5px;" href="profile.php?id='.$this_user->getUserId()  .'">' 
+				. '<img src="https://secure.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >'
+				. '&nbsp;' . $this_user->getUsername()  .'</a>&nbsp;';
 
 			/**
 			 *
@@ -122,7 +130,7 @@ class OmegaupComponentPage extends StdComponentPage{
 		}else{
 			//user is *NOT* logged in
 			$this->user_html_menu = "Bienvenido a OmegaUp ! ";
-			$this->user_html_menu .= "<b><a href='nativeLogin.php'>Inicia sesion</a> !</b>";
+			$this->user_html_menu .= "<b><a href='nativeLogin.php?redirect=" . urlencode($_SERVER['REQUEST_URI']) . "'>Inicia sesion</a> !</b>";
 		}
 
 		
