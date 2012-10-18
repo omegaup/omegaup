@@ -35,11 +35,11 @@ if(!is_file(SERVER_PATH . DIRECTORY_SEPARATOR . "config.php"))
 	exit;
 }
 
-require_once(SERVER_PATH . "/config.php");
+require_once( SERVER_PATH . "/config.php" );
+
 
 /*
  * Load libraries
- * 
  * 
  * */
 require_once("libs/logger/Logger.php");
@@ -59,23 +59,30 @@ require_once("controllers/problems.controller.php");
 
 
 
-/*
- * Connect to database with the appropiate permissions
- * based on the session retrived above. This way, a non-logged
- * user will have only SELECT permissions for example. If a 
- * bug is found, they will have limited access to the database.
- * 
- * */
-require_once('libs/adodb5/adodb.inc.php');
-require_once('libs/adodb5/adodb-exceptions.inc.php');
+
+require_once("libs/adodb5/adodb.inc.php");
+require_once("libs/adodb5/adodb-exceptions.inc.php");
 
 $conn = null;
 
-try{
+try
+{
     $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
     $conn->debug = OMEGAUP_DB_DEBUG;
-    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+    if( /* site ready only? */ false )
+    {
+        $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_READONLY_USER, OMEGAUP_DB_READONLY_PASS, OMEGAUP_DB_NAME);
+    }else{
+        $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+    }
+    
 
-} catch (Exception $e) {
+} catch ( Exception $databaseConectionException ) {
 
+}
+
+
+if( /* do we need smarty to load? */ true)
+{
+    include("libs/smarty/Smarty.class.php");
 }
