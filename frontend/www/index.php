@@ -5,15 +5,10 @@
 // create object
 $smarty = new Smarty;
 
-// assign some content. This would typically come from
-// a database or other source, but we'll use static
-// values for the purpose of this example.
-$smarty->assign('name', 'george smith');
-$smarty->assign('address', '45th & Harris');
 
-
-// display it
 $smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
-$smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" );
+$smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" )->setCompileDir(  "C:\\Users\\Alan\\Desktop\\cache" );
+$smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\es.lang");
+//$smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\en.lang");
 
 $smarty->display( '../templates/login.tpl' );

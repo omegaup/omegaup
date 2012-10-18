@@ -1,4 +1,6 @@
 <!--header-->
+
+
 <!DOCTYPE html>
 
 <!-- @see this later for localization http://www.smarty.net/docs/en/language.function.config.load.tpl -->
@@ -13,7 +15,7 @@
 <body>
 <div id="wrapper">
     <div class="login_bar" style="display: block">
-         {} a OmegaUp ! <b><a href='login.php'>Inicia sesion</a> !</b>
+          a OmegaUp ! <b><a href='login.php'>Inicia sesion</a> !</b>
     </div>
     <div id="title">
         <a href="index.php">
