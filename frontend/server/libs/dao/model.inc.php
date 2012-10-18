@@ -28,6 +28,6 @@ require_once ('Runs.dao.php');
 require_once ('Schools.dao.php');
 require_once ('States.dao.php');
 require_once ('Tags.dao.php');
-//require_once ('Users.dao.php');
+require_once ('Users.dao.php');
 require_once ('Users_Badges.dao.php');
 require_once ('User_Roles.dao.php');

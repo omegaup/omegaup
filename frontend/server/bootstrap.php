@@ -44,15 +44,16 @@ require_once( SERVER_PATH . "/config.php" );
  * */
 require_once("libs/logger/Logger.php");
 require_once("libs/dao/model.inc.php");
+require_once("libs/SessionManager.php");
 
 
 /**
   * Load controllers
   *
   **/
-require_once("controllers/login.controller.php");
+
 require_once("controllers/users.controller.php");
-require_once("controllers/problems.controller.php");
+
 
 
 
@@ -78,7 +79,7 @@ try
     
 
 } catch ( Exception $databaseConectionException ) {
-
+    var_dump( $databaseConectionException );
 }
 
 
