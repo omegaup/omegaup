@@ -15,7 +15,7 @@ function OmegaUp() {
 
 OmegaUp.prototype.authenticated = function(callback) {
 	$.get(
-		'/arena/authenticated/',
+		'/api/authenticated/',
 		function (data) {
 			callback(data);
 		},
@@ -28,7 +28,7 @@ OmegaUp.prototype.syncTime = function() {
 
 	var t0 = new Date().getTime();
 	$.get(
-		'/arena/time/',
+		'/api/time/',
 		function (data) {
 			self.deltaTime = data.time * 1000 - t0;
 		},
@@ -48,7 +48,7 @@ OmegaUp.prototype.time = function(date) {
 
 OmegaUp.prototype.login = function(username, password, callback) {
 	$.post(
-		'/arena/login/',
+		'/api/login/',
 		{ username: username, password: password },
 		function (data) {
 			callback(data);
@@ -61,7 +61,7 @@ OmegaUp.prototype.getContests = function(callback) {
 	var self = this;
 
 	$.get(
-		'/arena/contests/',
+		'/api/contest/list/',
 		function (data) {
 			for (var idx in data.contests) {
 				var contest = data.contests[idx];
@@ -78,7 +78,7 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/contests/' + alias + '/',
+		'/api/contest/' + alias + '/',
 		function (contest) {
 			if (contest.status == 'ok') {
 				contest.start_time = self.time(contest.start_time * 1000);
@@ -102,7 +102,7 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	var self = this;
 
 	$.post(
-		'/arena/contests/' + contestAlias + '/problem/' + problemAlias + '/',
+		'/api/contest/' + contestAlias + '/problem/' + problemAlias + '/',
 		{lang:"es"},
 		function (problem) {
 			if (problem.runs) {
@@ -120,8 +120,11 @@ OmegaUp.prototype.getContestRuns = function(contestAlias, offset, rowcount, call
 	var self = this;
 
 	$.post(
-		'/arena/contests/' + contestAlias + '/runs/',
-		{offset: offset, rowcount: rowcount},
+		'/api/contest/' + contestAlias + '/run/list/',
+		{
+			offset: offset,
+			rowcount: rowcount
+		},
 		function (data) {
 			for (var i = 0; i < data.runs.length; i++) {
 				data.runs[i].time = self.time(data.runs[i].time * 1000);
@@ -136,7 +139,7 @@ OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, 
 	var self = this;
 
 	$.post(
-		'/arena/runs/new',
+		'/api/run/new/',
 		{
 			contest_alias: contestAlias,
 			problem_alias: problemAlias,
@@ -160,7 +163,7 @@ OmegaUp.prototype.runStatus = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/runs/' + guid + '/',
+		'/api/run/' + guid + '/',
 		function (data) {
 			data.time = self.time(data.time * 1000);
 			callback(data);
@@ -173,7 +176,7 @@ OmegaUp.prototype.runDetails = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/runs/' + guid + '/details/',
+		'/api/run/' + guid + '/details/',
 		function (data) {
 			callback(data);
 		},
@@ -185,7 +188,7 @@ OmegaUp.prototype.runSource = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/runs/' + guid + '/source/',
+		'/api/run/' + guid + '/source/',
 		function (data) {
 			callback(data);
 		},
@@ -197,7 +200,7 @@ OmegaUp.prototype.runRejudge = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/runs/' + guid + '/rejudge/',
+		'/api/run/' + guid + '/rejudge/',
 		function (data) {
 			callback(data);
 		},
@@ -209,7 +212,7 @@ OmegaUp.prototype.rejudgeProblem = function(problemAlias, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/problems/' + problemAlias + '/rejudge/',
+		'/api/problem/' + problemAlias + '/rejudge/',
 		function (data) {
 			callback(data);
 		},
@@ -221,7 +224,7 @@ OmegaUp.prototype.getRanking = function(contestAlias, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/contests/' + contestAlias + '/ranking/',
+		'/api/contest/' + contestAlias + '/ranking/',
 		function (data) {
 			callback(data);
 		},
@@ -233,7 +236,7 @@ OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/contests/' + contestAlias + '/ranking/events/',
+		'/api/contest/' + contestAlias + '/ranking/events/',
 		function (data) {
 			callback(data);
 		},
@@ -245,7 +248,7 @@ OmegaUp.prototype.getClarifications = function(contestAlias, offset, rowcount, c
 	var self = this;
 
 	$.post(
-		'/arena/contests/' + contestAlias + '/clarifications/',
+		'/api/contest/' + contestAlias + '/clarification/list/',
 		{offset: offset, rowcount: rowcount},
 		function (data) {
 			callback(data);
@@ -258,7 +261,7 @@ OmegaUp.prototype.newClarification = function(contestAlias, problemAlias, messag
 	var self = this;
 
 	$.post(
-		'/arena/clarifications/new',
+		'/api/clarification/new/',
 		{
 			contest_alias: contestAlias,
 			problem_alias: problemAlias,
@@ -281,7 +284,7 @@ OmegaUp.prototype.updateClarification = function(clarificationId, answer, public
 	var self = this;
 
 	$.post(
-		'/arena/clarifications/update/' + clarificationId,
+		'/api/clarification/' + clarificationId + '/update/',
 		{
 			answer: answer,
 			public: public ? 1 : 0
@@ -299,11 +302,9 @@ OmegaUp.prototype.updateClarification = function(clarificationId, answer, public
 	});
 };
 
-
-
-OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school, password, oldPassword, callback ){
+OmegaUp.prototype.UserEdit = function(username, name, email, birthDate, school, password, oldPassword, callback) {
 	var self = this,
-		toSend = {};
+	    toSend = {};
 
 	if(username !== null) toSend.username = username;
 	if(name !== null) toSend.name = name;
@@ -313,9 +314,8 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	if(password !== null) toSend.password = password;
 	if(oldPassword !== null) toSend.oldPassword = oldPassword;
 
-
 	$.post(
-		'/arena/user/edit/',
+		'/api/user/edit/',
 		toSend,
 		function (data) {
 			callback(data);
