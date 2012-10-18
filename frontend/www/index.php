@@ -14,5 +14,6 @@ $smarty->assign('address', '45th & Harris');
 
 // display it
 $smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
+$smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" );
 
 $smarty->display( '../templates/login.tpl' );
