@@ -68,10 +68,10 @@ $(document).ready(function() {
 			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
 		}, 5 * 60 * 1000);
 
-		omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange);
+		omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange);
 		setInterval(function() { 
 			runsOffset = 0; // Return pagination to start on refresh
-			omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange); 
+			omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange); 
 		}, 5 * 60 * 1000);
 
 		updateClock();
@@ -100,7 +100,7 @@ $(document).ready(function() {
 			}
 			
 			// Refresh with previous page
-			omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange); 
+			omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange); 
 		}
 	});
 	
@@ -111,7 +111,7 @@ $(document).ready(function() {
 		}
 		
 		// Refresh with previous page
-		omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange); 
+		omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange); 
 	});
 	
 	$('.clarifpager .clarifpagerprev').click(function () {
@@ -189,7 +189,7 @@ $(document).ready(function() {
 	$('#rejudge-problem').click(function() {
 		if (confirm('Deseas rejuecear el problema ' + $('#rejudge-problem-list').val() + '?')) {
 			omegaup.rejudgeProblem($('#rejudge-problem-list').val(), function (x) {
-				omegaup.getContestRuns(contestAlias, runsOffset, runsRowcount, runsChange);
+				omegaup.getContestRuns(contestAlias, {offset: runsOffset, rowcount: runsRowcount}, runsChange);
 			});
 		}
 		return false;
