@@ -105,6 +105,13 @@ class NewProblemInContest extends ApiHandler
         ValidatorFactory::numericRangeValidator(0, INF)
                 ->validate(RequestContext::get("points"), "points");
         
+        // order_in_contest of the problems in the contest. It's optional
+        if (!is_null(RequestContext::get("order_in_contest")))
+        {
+            ValidatorFactory::numericRangeValidator(0, INF)
+                ->validate(RequestContext::get("order_in_contest"), "order_in_contest");
+        }
+        
         self::ValidateZip($this->filesToUnzip, $this->casesFiles);                
     }       
     
@@ -158,7 +165,10 @@ class NewProblemInContest extends ApiHandler
             $relationship = new ContestProblems( array(
                 "contest_id" => $contest->getContestId(),
                 "problem_id" => $problem->getProblemId(),
-                "points"     => RequestContext::get("points")));
+                "points"     => RequestContext::get("points"),
+                "order"      => is_null(RequestContext::get("order_in_contest")) ? 
+                                    1 : RequestContext::get("order_in_contest") ));
+            
             ContestProblemsDAO::save($relationship);                        
             
             // Create file after we know that alias is unique

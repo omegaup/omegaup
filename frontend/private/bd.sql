@@ -155,6 +155,7 @@ CREATE TABLE IF NOT EXISTS `Contest_Problems` (
   KEY `problem_id` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relacion entre Concursos y los problemas que tiene este';
 
+ALTER TABLE  `Contest_Problems` ADD  `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas en un concurso'
 -- --------------------------------------------------------
 
 --

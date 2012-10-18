@@ -520,5 +520,62 @@ class ShowContestTest extends PHPUnit_Framework_TestCase
         }      
         
     }
+    
+    public function testShowProblemsInContestInOrder()
+    {
+        // Create a clean contest and get the ID
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
+        
+        // Create 3 problems in our contest
+        $problemCreator = new NewProblemInContestTest();
+        $problem_id = array();
+        $problem_id[0] = $problemCreator->testCreateValidProblem($contest_id, 3);
+        $problem_id[1] = $problemCreator->testCreateValidProblem($contest_id, 2);
+        $problem_id[2] = $problemCreator->testCreateValidProblem($contest_id, 1);
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Set context
+        $contest = ContestsDAO::getByPK($contest_id);
+        RequestContext::set("contest_alias", $contest->getAlias());        
+        Utils::SetAuthToken($auth_token);
+        
+        // Execute API
+        $showContest = new ShowContest();
+        try
+        {
+            $return_array = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            var_dump($e->getArrayMessage());
+            $this->fail("Unexpected exception");
+        }
+
+        
+        // Assert that we found our contest       
+        $this->assertNotNull($contest);
+        $this->assertNotNull($contest->getContestId());
+                    
+        
+        // Assert we have our problems
+        $this->assertEquals(count($problem_id), count($return_array["problems"]));
+                
+        
+        $i = 0;
+        foreach($return_array["problems"] as $problem_array)
+        {                        
+            // Get problem from DB            
+            $problem = ProblemsDAO::getByAlias($problem_array["alias"]);            
+            
+            $problemInContest = ContestProblemsDAO::getByPK($contest_id, $problem->getProblemId());            
+            $this->assertEquals($problemInContest->getOrder(), $i+1);                       
+            
+            $i++;
+        }        
+    }
+    
 }
 ?>
