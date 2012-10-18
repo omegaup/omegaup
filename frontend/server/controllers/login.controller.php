@@ -1,9 +1,7 @@
 <?php
 
-require_once("dao/Users.dao.php");
-require_once("dao/Emails.dao.php");
-require_once('libs/facebook-php-sdk/src/facebook.php');
-require_once('libs/SessionManager.php');
+
+
 
 class LoginController{
 

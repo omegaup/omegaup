@@ -1,6 +1,6 @@
 <?php
 
-require_once( "dao/Problems.dao.php" );	
+
 
 class ProblemsController {
 
