@@ -213,7 +213,7 @@
 				
 
 				$.ajax({
-                        url: \"../arena/contests/\" + toSend.alias + \"/update/\",
+                        url: \"../api/contest/\" + toSend.alias + \"/update/\",
                         dataType: \"json\",
                         type:\"POST\",
                         data: toSend,

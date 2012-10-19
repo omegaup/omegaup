@@ -1,5 +1,6 @@
 User-agent: *
 Disallow: /arena/
+Disallow: /api/
 Disallow: /admin/
 Disallow: /install/
 Disallow: /ux/
