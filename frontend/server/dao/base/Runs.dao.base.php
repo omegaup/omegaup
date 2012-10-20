@@ -217,8 +217,16 @@ abstract class RunsDAOBase extends DAO
 		}
 
 		if( $Runs->getVeredict() != NULL){
-			$sql .= " veredict = ? AND";
-			array_push( $val, $Runs->getVeredict() );
+                        if ($Runs->getVeredict() == "NO-AC")
+                        {
+                            $sql .= " veredict != ? AND";
+                            array_push($val, "AC");
+                        }
+                        else
+                        {
+                            $sql .= " veredict = ? AND";
+                            array_push($val, $Runs->getVeredict());
+                        }			
 		}
 
 		if( $Runs->getRuntime() != NULL){

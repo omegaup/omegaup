@@ -17,6 +17,7 @@ require_once(SERVER_PATH ."/libs/Authorization.php");
 class ShowRunsInContest extends ApiHandler
 {
     private $contest;
+    private $problem;
     private $offset = 0;
     private $rowcount = 100;
 
@@ -26,12 +27,20 @@ class ShowRunsInContest extends ApiHandler
 	
 	ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("contest_alias"), "contest_alias");
 
-	try {
-		$this->contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
-	} catch(Exception $e) {
-		// Operation failed in the data layer
-		throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+	try 
+        {
+            $this->contest = ContestsDAO::getByAlias(RequestContext::get("contest_alias"));
+	} 
+        catch(Exception $e) 
+        {
+            // Operation failed in the data layer
+            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 	}
+        
+        if (is_null($this->contest))
+        {
+            throw new ApiException(ApiHttpErrors::notFound("Contest selected not found."));
+        }
 
 	if(!Authorization::IsContestAdmin($this->_user_id, $this->contest))
         {
@@ -62,10 +71,30 @@ class ShowRunsInContest extends ApiHandler
         // Check filter by veredict, is optional
         if (!is_null(RequestContext::get("veredict")))
         {
-            ValidatorFactory::enumValidator(array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE"))
+            ValidatorFactory::enumValidator(array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"))
                 ->validate(RequestContext::get("veredict"), "veredict");
         }        
         
+        // Check filter by problem, is optional
+        if (!is_null(RequestContext::get("problem")))
+        {
+            ValidatorFactory::stringNotEmptyValidator()->validate(RequestContext::get("problem"), "problem");
+            
+            try
+            {
+                $this->problem = ProblemsDAO::getByAlias(RequestContext::get("problem"));
+            }
+            catch(Exception $e)
+            {
+                // Operation failed in the data layer
+		throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+            }
+            
+            if (is_null($this->problem))
+            {
+                throw new ApiException(ApiHttpErrors::notFound("Problem selected not found."));
+            }
+        }  
     }   
             
     protected function GenerateResponse() 
@@ -76,7 +105,8 @@ class ShowRunsInContest extends ApiHandler
         $runs_mask = new Runs( array (                
             "contest_id" => $this->contest->getContestId(),
             "status" => RequestContext::get("status"),
-            "veredict"=> RequestContext::get("veredict")
+            "veredict"=> RequestContext::get("veredict"),
+            "problem_id" => $this->problem->getProblemId(),
             ));
         
         // Filter relevant columns
