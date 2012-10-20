@@ -17,7 +17,7 @@ class NewContestFormComponent implements GuiComponent{
                     $('.problem-id', $row).autocomplete({
                         source: function(req, res) {
                             $.getJSON(
-                                "arena/problems/"+req.term,
+                                "api/problems/"+req.term,
                                 function(data) {
                                     res($.map(data.problems, function(item) {
                                         return {
@@ -44,7 +44,7 @@ class NewContestFormComponent implements GuiComponent{
                     var finish_time = new Date($("#_finish_time").val());
 
                     $.ajax({
-                        url: "../arena/contests/new",
+                        url: "../api/contest/new",
                         dataType: "json",
                         type:"POST",
                         data: {
@@ -112,7 +112,7 @@ class NewContestFormComponent implements GuiComponent{
 
 				
 				$.ajax({
-					url: "../arena/contests/new",
+					url: "../api/contest/new",
 					dataType: "json",
 					type:"POST",
 					data :{

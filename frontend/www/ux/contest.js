@@ -38,6 +38,7 @@ $(document).ready(function() {
         '#CD35D3',
 	];
 	var rankChartLimit = 10;
+	var practice = window.location.pathname.indexOf('/practice/') !== -1;
 
 	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
@@ -106,17 +107,19 @@ $(document).ready(function() {
 			$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
 		}
 
-		omegaup.getRanking(contestAlias, rankingChange);
-		setInterval(function() { omegaup.getRanking(contestAlias, rankingChange); }, 5 * 60 * 1000);
+		if (!practice) {
+			omegaup.getRanking(contestAlias, rankingChange);
+			setInterval(function() { omegaup.getRanking(contestAlias, rankingChange); }, 5 * 60 * 1000);
 
-		omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
-		setInterval(function() { 
-			clarificationsOffset = 0; // Return pagination to start on refresh
-			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
-		}, 5 * 60 * 1000);
+			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
+			setInterval(function() { 
+				clarificationsOffset = 0; // Return pagination to start on refresh
+				omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+			}, 5 * 60 * 1000);
 
-		updateClock();
-		setInterval(updateClock, 1000);
+			updateClock();
+			setInterval(updateClock, 1000);
+		}
 
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
@@ -196,7 +199,9 @@ $(document).ready(function() {
 						$(r + ' .time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 
 						if (run.status == 'ready') {
-							omegaup.getRanking(contestAlias, rankingChange);
+							if (!practice) {
+								omegaup.getRanking(contestAlias, rankingChange);
+							}
 						} else {
 							updateRun(run.guid, orig_run);
 						}
@@ -346,6 +351,7 @@ $(document).ready(function() {
 				$('#submit #lang-select').show();
 				$('#submit').show();
 				$('#overlay').show();
+				$('#submit textarea[name="code"]').val('');
 			}
 		} else if (activeTab == 'problems') {
 			$('#problem').hide();
@@ -487,7 +493,8 @@ $(document).ready(function() {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 				$('.position', r).html(i+1);
-				$('.user', r).html(rank.name + ' (' + rank.username + ')');
+				var username = rank.name + ' (' + rank.username + ')';
+				$('.user', r).html('<span title="' + username + '">' + username + '</span>');
 				$('.points', r).html(rank.total.points);
 				$('.penalty', r).html(rank.total.penalty);
 

@@ -30,20 +30,20 @@ class Scoreboard
 
     public function getScoreboardTimeLimitUnixTimestamp(Contests $contest)
     {
-       
         $start = strtotime($contest->getStartTime());
         $finish = strtotime($contest->getFinishTime());
+        
         if ($this->showAllRuns || ($contest->hasFinished() && $contest->getShowScoreboardAfter()))
         {
             // Show full scoreboard to admin users
-            // or if the contest finished and the user wants to show it at the end
+            // or if the contest finished and the creator wants to show it at the end
             $percentage = 100;
-        	
 	}
         else
         {
             $percentage = (double)$contest->getScoreboard() / 100.0;
-        }
+	}
+
         $limit = $start + (int)(($finish - $start) * $percentage);
                                  
         return $limit;
@@ -132,7 +132,7 @@ class Scoreboard
 
                 foreach ($contest_problems as $problems)
                 {
-                    $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), $this->getScoreboardTimeLimitUnixTimestamp($contest), $withRunDetails);
+                    $user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), $this->getScoreboardTimeLimitUnixTimestamp($contest), $withRunDetails, $contest->getPenalty());
                 }
 
                 // Add the problems' information
@@ -301,13 +301,17 @@ class Scoreboard
 	return $this->data;                
     }
     
-   protected function getScore($problem_id, $user_id, $limit_timestamp = NULL, $withRunDetails = false)
+   protected function getScore($problem_id, $user_id, $limit_timestamp, $withRunDetails, $penalty)
    {
         try
         {
-            $bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id, $limit_timestamp, $this->showAllRuns);
+		$bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id, $limit_timestamp, $this->showAllRuns);
+		$extra_penalty = 0;
+
+		if ($penalty > 0 && !is_null($bestRun) && $bestRun->getContestScore() > 0) {
+			$extra_penalty = $penalty * RunsDAO::GetWrongRuns($this->contest_id, $problem_id, $user_id, $bestRun->getRunId(), $this->showAllRuns);
+		}
 	}
-     
         catch(Exception $e)
         {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
@@ -339,7 +343,7 @@ class Scoreboard
             }
             return array(
                 "points" => (int)round($bestRun->getContestScore()),
-                "penalty" => (int)round($bestRun->getSubmitDelay()),
+                "penalty" => $extra_penalty + (int)round($bestRun->getSubmitDelay()),
                 "run_details" => $runDetails
             );
         }        
@@ -347,7 +351,7 @@ class Scoreboard
         {
             return array(
                 "points" => (int)round($bestRun->getContestScore()),
-                "penalty" => (int)round($bestRun->getSubmitDelay())
+                "penalty" => $extra_penalty + (int)round($bestRun->getSubmitDelay())
             );
         }
     }

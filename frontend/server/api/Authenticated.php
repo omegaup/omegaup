@@ -2,12 +2,6 @@
 
 /**
  * 
- * 
- * 
- *
- *
- * 
-  *
  * */
 require_once("ApiHandler.php");
 

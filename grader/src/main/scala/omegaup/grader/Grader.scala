@@ -116,8 +116,12 @@ trait Grader extends Object with Log {
 		}
 
 		metas.values.foreach { case (f, meta) => {
-			run.runtime += math.round(1000 * meta("time").toDouble)
-			run.memory = math.max(run.memory, meta("mem").toLong)
+			if (meta.contains("time")) {
+				run.runtime += math.round(1000 * meta("time").toDouble)
+			}
+			if (meta.contains("mem")) {
+				run.memory = math.max(run.memory, meta("mem").toLong)
+			}
 			val v = meta("status") match {
 				case "XX" => Veredict.JudgeError
 				case "OK" => Veredict.Accepted
@@ -130,8 +134,13 @@ trait Grader extends Object with Log {
 				case "SG" => Veredict.RuntimeError
 				case _    => Veredict.JudgeError
 			}
-			
-			if(run.veredict < v) run.veredict = v
+
+			if (run.language == Language.Java) {
+				val errFile = new File(f.getCanonicalPath.replace(".meta", ".err"))
+				if (errFile.exists && FileUtil.read(errFile.getCanonicalPath).contains("java.lang.OutOfMemoryError")) {
+					if (run.veredict < Veredict.MemoryLimitExceeded) run.veredict = Veredict.MemoryLimitExceeded
+				} else if(run.veredict < v) run.veredict = v
+			} else if(run.veredict < v) run.veredict = v
 		}}
 		
 		if (run.veredict == Veredict.JudgeError) {
