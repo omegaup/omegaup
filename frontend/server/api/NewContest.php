@@ -127,6 +127,13 @@ class NewContest extends ApiHandler
                     ));
             }
         }
+        
+        // show_scoreboard_after is optional
+        if (!is_null(RequestContext::get("show_scoreboard_after")))
+        {
+            ValidatorFactory::enumValidator(array("0", "1"))
+                ->validate(RequestContext::get("show_scoreboard_after"), "show_scoreboard_after");
+        }
     }       
     
     protected function GenerateResponse() 
@@ -145,7 +152,7 @@ class NewContest extends ApiHandler
         
         
         $contest->setTitle(RequestContext::get("title"));
-	    $contest->setDescription(RequestContext::get("description"));        
+        $contest->setDescription(RequestContext::get("description"));        
         $contest->setStartTime(gmdate('Y-m-d H:i:s', RequestContext::get("start_time")));        
         $contest->setFinishTime(gmdate('Y-m-d H:i:s', RequestContext::get("finish_time")));
         $contest->setWindowLength(RequestContext::get("window_length") == "NULL" ? NULL : RequestContext::get("window_length"));
@@ -161,6 +168,16 @@ class NewContest extends ApiHandler
         $contest->setPenalty(max(0, intval(RequestContext::get("penalty"))));
         $contest->setPenaltyTimeStart(RequestContext::get("penalty_time_start"));
         $contest->setPenaltyCalcPolicy(RequestContext::get("penalty_calc_policy"));
+        
+        if (!is_null(RequestContext::get("show_scoreboard_after")))
+        {
+            $contest->setShowScoreboardAfter(RequestContext::get("show_scoreboard_after"));
+        }
+        else
+        {
+            $contest->setShowScoreboardAfter("1");
+        }
+        
         
         // Push changes
         try

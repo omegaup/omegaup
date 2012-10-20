@@ -269,7 +269,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update( $Contests )
 	{
-		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, alias = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ?, points_decay_factor = ?, penalty_calc_policy = ? WHERE  contest_id = ?;";
+		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, alias = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ?, points_decay_factor = ?, penalty_calc_policy = ?, show_scoreboard_after = ? WHERE  contest_id = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -288,6 +288,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getPenaltyTimeStart(),                         
                         $Contests->getPointsDecayFactor(),
                         $Contests->getPenaltyCalcPolicy(),
+                        $Contests->getShowScoreboardAfter(),
 			$Contests->getContestId()
                         
                         );
@@ -313,7 +314,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function create( &$Contests )
 	{
-		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, alias, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start, points_decay_factor, penalty_calc_policy) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, alias, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start, points_decay_factor, penalty_calc_policy, show_scoreboard_after) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->getContestId(), 
 			$Contests->getTitle(), 
@@ -332,7 +333,8 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getPenalty(), 
 			$Contests->getPenaltyTimeStart(),                        
                         $Contests->getPointsDecayFactor(),
-                        $Contests->getPenaltyCalcPolicy()                    
+                        $Contests->getPenaltyCalcPolicy(),
+                        $Contests->getShowScoreboardAfter()
 		 );                
 		global $conn;
 		try{$conn->Execute($sql, $params);}

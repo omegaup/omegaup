@@ -123,6 +123,8 @@ CREATE TABLE IF NOT EXISTS `Contests` (
 
 CREATE UNIQUE INDEX contests_alias ON Contests(`alias`);
 
+ALTER TABLE  `Contests` ADD  `show_scoreboard_after` BOOL NOT NULL DEFAULT  '1' COMMENT  'Mostrar el scoreboard automáticamente después del concurso'
+
 -- --------------------------------------------------------
 
 --

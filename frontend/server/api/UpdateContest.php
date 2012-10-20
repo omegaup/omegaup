@@ -190,6 +190,13 @@ class UpdateContest extends ApiHandler
                             'points' => $problem->points);                    
             }
         }
+        
+        // show_scoreboard_after is optional
+        if (!is_null(RequestContext::get("show_scoreboard_after")))
+        {
+            ValidatorFactory::enumValidator(array("0", "1"))
+                ->validate(RequestContext::get("show_scoreboard_after"), "show_scoreboard_after");
+        }
     }       
    
     
@@ -265,6 +272,11 @@ class UpdateContest extends ApiHandler
         if (!is_null(RequestContext::get("penalty_calc_policy")))
         {
             $this->contest->setPenaltyCalcPolicy(RequestContext::get("penalty_calc_policy"));                
+        }
+        
+        if (!is_null(RequestContext::get("show_scoreboard_after")))
+        {
+            $contest->setShowScoreboardAfter(RequestContext::get("show_scoreboard_after"));
         }
         
         // Push changes

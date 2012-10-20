@@ -33,9 +33,10 @@ class Scoreboard
        
         $start = strtotime($contest->getStartTime());
         $finish = strtotime($contest->getFinishTime());
-        if ($this->showAllRuns)
+        if ($this->showAllRuns || ($contest->hasFinished() && $contest->getShowScoreboardAfter()))
         {
             // Show full scoreboard to admin users
+            // or if the contest finished and the user wants to show it at the end
             $percentage = 100;
         	
 	}
