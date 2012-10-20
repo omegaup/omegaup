@@ -1,7 +1,11 @@
 $(document).ready(function() {
   
     function makeWorldClockLink(date) {
-        return "http://timeanddate.com/worldclock/fixedtime.html?iso=" + date.toISOString();
+    	try {
+	        return "http://timeanddate.com/worldclock/fixedtime.html?iso=" + date.toISOString();
+	} catch (e) {
+		return '#';
+	}
     }
     function timeLeft(start) {
     	var now = new Date();

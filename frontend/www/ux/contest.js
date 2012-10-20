@@ -351,6 +351,7 @@ $(document).ready(function() {
 				$('#submit #lang-select').show();
 				$('#submit').show();
 				$('#overlay').show();
+				$('#submit textarea[name="code"]').val('');
 			}
 		} else if (activeTab == 'problems') {
 			$('#problem').hide();
@@ -492,7 +493,8 @@ $(document).ready(function() {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 				$('.position', r).html(i+1);
-				$('.user', r).html(rank.name + ' (' + rank.username + ')');
+				var username = rank.name + ' (' + rank.username + ')';
+				$('.user', r).html('<span title="' + username + '">' + username + '</span>');
 				$('.points', r).html(rank.total.points);
 				$('.penalty', r).html(rank.total.penalty);
 

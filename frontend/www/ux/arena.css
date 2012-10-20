@@ -34,7 +34,7 @@ legend {
 #problem,
 #ranking,
 #clarifications {
-       display: none
+	display: none
 }
 
 #problems.active { display: block; }
@@ -59,22 +59,22 @@ legend {
 .tabs {
 	padding-left: 0.5em;
 	border-bottom: 1px solid #ccc;
-        border-top: 1px solid #ccc;
-        display: block;
-        text-align: center;
-        background-color: white;
-        margin: 0.5em 0;
+	border-top: 1px solid #ccc;
+	display: block;
+	text-align: center;
+	background-color: white;
+	margin: 0.5em 0 0 0;
 }
 
 .tabs li {
-    display: inline;
+	display: inline;
 }
 
 .tabs a {
 	display: inline-block;
 	padding: 0.5em 1em;
-        text-decoration: none;
-        color: #000;
+	text-decoration: none;
+	color: #000;
 }
 
 .tabs a:hover {
@@ -86,6 +86,7 @@ legend {
 }
 
 .navleft {
+	overflow: hidden;
 }
 
 .navleft .navbar {
@@ -100,31 +101,31 @@ legend {
 }
 
 .tab {
-    padding: 1em;
+	padding: 1em;
 }
 
 #problem-list > div {
-		width: 19em;
-        margin-bottom: 0.5em;
-        background: #ddd;
-        border: solid 1px #ccc;
-		border-width: 1px 0 1px 1px;
-		position: relative;
+	width: 19em;
+	margin-bottom: 0.5em;
+	background: #ddd;
+	border: solid 1px #ccc;
+	border-width: 1px 0 1px 1px;
+	position: relative;
 }
 
 #problem-list > div a {
-        color: #5588DD;
-		display: block;
-		padding: 0.5em;
-		width: 100%;
+	color: #5588DD;
+	display: block;
+	padding: 0.5em;
+	width: 100%;
 }
 
 #problem-list > div.active {
-        background: white;
+	background: white;
 }
 
 #problem-list > div.summary {
-		margin-bottom: 1em;
+	margin-bottom: 1em;
 }
 
 #problem-list > div .solved {
@@ -134,7 +135,7 @@ legend {
 }
 
 #problems #mini-ranking {
-	width: 100%;
+	width: 18em;
 	margin-top: 2em;
 }
 
@@ -153,18 +154,24 @@ legend {
 	text-align: center;
 }
 
-#problems #mini-ranking .user {
-	max-width: 7em;
+#problems #mini-ranking .user,
+#problems #mini-ranking .user span {
+	width: 10em;
+	max-width: 10em;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
+#problems #mini-ranking .user span {
+	display: block;
+}
+
 #problem, #summary {
 	background: #fff;
 	padding: 1em;
-        margin-top: -1.5em;
-        margin-right: -1em;
+	margin-top: -1.5em;
+	margin-right: -1em;
 }
 
 #summary {
@@ -226,8 +233,8 @@ legend {
 }
 
 #problem .statement iframe {
-    width: 100%;
-    height: 400px;
+	width: 100%;
+	height: 400px;
 }
 
 #problem hr {
@@ -289,35 +296,41 @@ legend {
 	margin: -15em auto 0 auto;
 	border: 2px solid #ccc;
 	padding: 1em;
-        position: relative;
+	position: relative;
 	overflow: auto;
 }
 
 #overlay form textarea {
 	width: 790px;
 	height: 26em;
-        margin: 0.5em 0;
+	margin: 0.5em 0;
 }
 
 #overlay form .close {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-width: 0 0 1px 1px;
-        font-size: 110%;
-        width: 25px;
-        height: 25px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	background-color: white;
+	border: 1px solid #ccc;
+	border-width: 0 0 1px 1px;
+	font-size: 110%;
+	width: 25px;
+	height: 25px;
 }
 
 #overlay form .close:hover {
-        background-color: #eee;
+	background-color: #eee;
 }
 
 #overlay input[type=submit] {
-        font-size: 110%;
-        padding: 0.3em 0.5em;
+	font-size: 110%;
+	padding: 0.3em 0.5em;
+}
+
+.compile_error {
+	margin-top: 1em;
+	border-top: 1px dotted black;
+	padding-top: 1em;
 }
 
 #ranking table, table.clarifications {
@@ -358,7 +371,7 @@ legend {
 }
 
 .clarifications tfoot td a {
-    display: block;
+	display: block;
 	padding: 0.5em;
 	border: 1px solid #000;
 	text-decoration: none;
@@ -368,11 +381,11 @@ legend {
 }
 
 .clarifications .problem {
-    width: 7em;
+	width: 7em;
 }
 
 .clarifications .time {
-    width: 10em;
+	width: 10em;
 }
 
 table.contest-list {

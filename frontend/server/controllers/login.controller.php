@@ -41,7 +41,7 @@ class LoginController{
 		$email_or_username, 
 		$pass
 	){
-                Logger::log("Testing user via username:" . $email_or_username);
+                Logger::debug("Testing user via username:" . $email_or_username);
                 $user_query = new Users();
                 $user_query->setUsername( $email_or_username );        
                 $results = UsersDAO::search( $user_query );
@@ -49,13 +49,13 @@ class LoginController{
                 if(sizeof($results) === 1)
                 {
                               
-                    Logger::log("User was found via username.");
+                    Logger::debug("User was found via username.");
                     $this_user = $results[0];                
 
                 }
                 else
                 {
-                    Logger::log("Not found via username. Testing user via email" . $email_or_username);
+                    Logger::debug("Not found via username. Testing user via email" . $email_or_username);
                     $email_query = new Emails();
                     $email_query->setEmail( $email_or_username );
 
@@ -65,11 +65,11 @@ class LoginController{
                     if( sizeof($result) == 0)
                     {
                             //email does not even exist
-                            Logger::log("User was not found via email. Failing testUserCredentials()");
+                            Logger::debug("User was not found via email. Failing testUserCredentials()");
                             return false;
                     }
 
-                    Logger::log("User was found via email.");
+                    Logger::debug("User was found via email.");
                     $this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
                 }
 
@@ -89,9 +89,9 @@ class LoginController{
 		$email_or_username, 
 		$google_token = null
 	){
-		Logger::log("LoginController::Login() started...");
+		Logger::debug("LoginController::Login() started...");
 		
-                Logger::log("Loging user via username:" . $email_or_username);
+                Logger::debug("Loging user via username:" . $email_or_username);
                 $user_query = new Users();
                 $user_query->setUsername( $email_or_username );        
                 $results = UsersDAO::search( $user_query );
@@ -99,7 +99,7 @@ class LoginController{
                 if(sizeof($results) === 1)
                 {
                               
-                    Logger::log("User was found via username.");
+                    Logger::debug("User was found via username.");
                     $this_user = $results[0];                
 
                 }
@@ -217,7 +217,7 @@ class LoginController{
 	 * */
 	static function isLoggedIn(
 	){
-		Logger::log("isLoggedIn() started");
+		Logger::debug("isLoggedIn() started");
 		
 		//there are two ways of knowing if a user is logged in
 		//the first option is if $_SESSION["LOGGED_IN"] is 
@@ -228,7 +228,7 @@ class LoginController{
 		$auth_token = $sesion->GetCookie("auth_token");
 		
 		if( !is_null($auth_token) ) {
-			Logger::log("There is a session token in the cookie, lets test it.");
+			Logger::debug("There is a session token in the cookie, lets test it.");
 			
 			$user = AuthTokensDAO::getUserByToken($auth_token);
 			
@@ -236,7 +236,7 @@ class LoginController{
 				Logger::warn("auth_token was not found in the db, why is this?");
 				
 			}else{
-				Logger::log("auth_token validated, it belongs to user_id=" . $user->getUserId());
+				Logger::debug("auth_token validated, it belongs to user_id=" . $user->getUserId());
 				return true;			
 			}
 		}
@@ -248,12 +248,12 @@ class LoginController{
 		//facebook sesions on every single petition
 		//made from the front-end
 		if(!isset($_GET["state"])){
-			Logger::log("Not logged in and no need to check for fb session");
+			Logger::debug("Not logged in and no need to check for fb session");
 			return false;
 		}
 		
 		
-		Logger::log("There is no auth_token cookie, testing for facebook sesion.");
+		Logger::debug("There is no auth_token cookie, testing for facebook sesion.");
 
 		
 		//if that is not true, may still be logged with
@@ -285,7 +285,7 @@ class LoginController{
 		
 		// Now we know if the user is authenticated via facebook
 		if (is_null($fb_user)) {
-			Logger::log("No facebook sesion... ");
+			Logger::debug("No facebook sesion... ");
 			return false;
 		}
 
@@ -294,7 +294,7 @@ class LoginController{
 		//lets look for his information on the database
 		//if there is none, it means that its the first
 		//time the user has been here, lets register his info
-		Logger::log("User is logged in via facebook !!");
+		Logger::debug("User is logged in via facebook !!");
 		
 		$results = UsersDAO::search( new Users( array( "facebook_user_id" => $fb_user_profile["id"] ) ) );
 		
@@ -344,7 +344,7 @@ class LoginController{
 		$redirect = false
 	){
 
-		Logger::log("LoginController::logout()");	
+		Logger::debug("LoginController::logout()");	
 		
 		
 
@@ -387,7 +387,7 @@ class LoginController{
 			
 			$next_url = str_replace ( "%3Frequest%3Dlogout" , "%3Fsbso%3Dtrue" , $facebook->getLogoutUrl( ) );
 			
-			Logger::log("LoginController::logout() redirection to " . $next_url );	
+			Logger::debug("LoginController::logout() redirection to " . $next_url );	
 			
 			die(header("Location: " . $next_url ));
 			*/
@@ -408,7 +408,7 @@ class LoginController{
 	static function getCurrentUser(
 	){
 		
-		Logger::log("LoginController::getCurrentUser()");
+		Logger::debug("LoginController::getCurrentUser()");
 		
 		if(self::isLoggedIn()){
 			$sm = self::getSessionManagerInstance();
