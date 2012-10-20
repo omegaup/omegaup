@@ -42,8 +42,7 @@ class ShowContestStats extends ApiHandler
 	}   
 
 	protected function GenerateResponse() 
-	{        
-		// Get COUNT of runs != ready
+	{        		
 		try
 		{
 			// Array of GUIDs of pending runs
@@ -53,7 +52,17 @@ class ShowContestStats extends ApiHandler
 			$totalRunsCount = RunsDAO::CountTotalRunsOfContest($this->contest->getContestId());
 
 			// Wait time
-			$waitTimeArray = RunsDAO::GetLargestWaitTimeOfContest($this->contest->getContestId());            
+			$waitTimeArray = RunsDAO::GetLargestWaitTimeOfContest($this->contest->getContestId());
+                        
+                        // List of veredicts
+                        $veredicts = array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC");
+                        $veredict_counts = array();
+                        
+                        foreach ($veredicts as $veredict)
+                        {
+                            $veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfContestByVeredict($contest_id, $veredict);
+                        }
+                        
 		}
 		catch (Exception $e)
 		{
@@ -67,6 +76,7 @@ class ShowContestStats extends ApiHandler
 			"pending_runs" => $pendingRunsGuids,            
 			"max_wait_time" => is_null($waitTimeArray) ? 0 : $waitTimeArray[1],
 			"max_wait_time_guid" => is_null($waitTimeArray) ? 0 : $waitTimeArray[0]->getGuid(),
+                        "veredict_counts" => $veredict_counts,
 		);                
 	}    
 }
