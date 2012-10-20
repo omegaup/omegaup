@@ -485,6 +485,33 @@ $(document).ready(function() {
 						}
 						$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
 						$('#run-details .cases div').remove();
+
+						function isDigit(x) {
+							return '0' <= x && x <= '9';
+						}
+
+						function numericSort(x, y) {
+							var i = 0, j = 0;
+							for (; i < x.name.length && j < y.name.length; i++, j++) {
+								if (isDigit(x.name[i]) && isDigit(x.name[j])) {
+									var nx = 0, ny = 0;
+									while (i < x.name.length && isDigit(x.name[i]))
+										nx = (nx * 10) + parseInt(x.name[i++]);
+									while (j < y.name.length && isDigit(y.name[j]))
+										ny = (ny * 10) + parseInt(y.name[j++]);
+									i--; j--;
+									if (nx != ny) return nx - ny;
+								} else if (x.name[i] < y.name[j]) {
+									return -1;
+								} else if (x.name[i] > y.name[j]) {
+									return 1;
+								}
+							}
+							return (x.name.length - i) - (y.name.length - j);
+						}
+
+						data.cases.sort(numericSort);
+
 						for (var i = 0; i < data.cases.length; i++) {
 							var c = data.cases[i];
 							$('#run-details .cases').append($("<div></div>").append($("<h2></h2>").html(c.name)));
