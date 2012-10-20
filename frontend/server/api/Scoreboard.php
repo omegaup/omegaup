@@ -303,13 +303,15 @@ class Scoreboard
     
    protected function getScore($problem_id, $user_id, $limit_timestamp, $withRunDetails, $penalty)
    {
+       $wrong_runs_count = 0;
         try
         {
 		$bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id, $limit_timestamp, $this->showAllRuns);
-		$extra_penalty = 0;
+		$extra_penalty = 0;                
 
 		if ($penalty > 0 && !is_null($bestRun) && $bestRun->getContestScore() > 0) {
-			$extra_penalty = $penalty * RunsDAO::GetWrongRuns($this->contest_id, $problem_id, $user_id, $bestRun->getRunId(), $this->showAllRuns);
+                        $wrong_runs_count = RunsDAO::GetWrongRuns($this->contest_id, $problem_id, $user_id, $bestRun->getRunId(), $this->showAllRuns);
+			$extra_penalty = $penalty * $wrong_runs_count;
 		}
 	}
         catch(Exception $e)
@@ -351,7 +353,8 @@ class Scoreboard
         {
             return array(
                 "points" => (int)round($bestRun->getContestScore()),
-                "penalty" => $extra_penalty + (int)round($bestRun->getSubmitDelay())
+                "penalty" => $extra_penalty + (int)round($bestRun->getSubmitDelay()),
+                "wrong_runs_count" => $wrong_runs_count,
             );
         }
     }
