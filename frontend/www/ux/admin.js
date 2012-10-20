@@ -490,6 +490,7 @@ $(document).ready(function() {
 							$('#run-details .cases').append($("<div></div>").append($("<h2></h2>").html(c.name)));
 							$('#run-details .cases').append($("<div></div>").html(JSON.stringify(c.meta)));
 							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff ? c.out_diff.replace(/&/g, '&amp;').replace(/</g, '&lt;') : "")));
+							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.err ? c.err.replace(/&/g, '&amp;').replace(/</g, '&lt;') : "")));
 						}
 						window.location.hash = 'run/details';
 						$(window).hashchange();
