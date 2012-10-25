@@ -4,8 +4,9 @@
     require_once( "../server/bootstrap.php" );
     require_once( "../server/libs/GoogleOpenID.php" );
 
-    $user_c = new UserController( );
-    $user_c->LoginViaGoogle( "alan.gohe@gmail.com" );
+    $c_User = new SesionController( );
+    $c_User->LoginViaGoogle( "alan.gohe@gmail.com" );
+
     exit;
 
 

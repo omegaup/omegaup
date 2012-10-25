@@ -102,7 +102,7 @@ class SesionController extends Controller
 
 
 
-    private function RegisterSesion( Users $vo_User, $b_ReturnAuthTokenAsString )
+    private function RegisterSesion( Users $vo_User, $b_ReturnAuthTokenAsString = false)
     {
         //find if this user has older sessions
          $vo_AuthT = new AuthTokens( );
@@ -142,10 +142,25 @@ class SesionController extends Controller
 
 
 
-    public function ThirdPartyLogin(  )
+    public function LoginViaGoogle( $s_Email )
     {
+        //we trust this user's identity
 
-        //RegisterSesion( $user_id );
+        $c_Users = new UserController;
+
+        $vo_User = $c_Users->FindByEmail( $s_Email );
+
+        if ( is_null( $vo_User ) )
+        {
+            //user has never logged in before
+            Logger::log( "LoginViaGoogle: Creating new user for $s_Email" );
+        }
+        else
+        {
+            //user has been here before, lets just register his sesion
+            $this->RegisterSesion( $vo_User );
+        }
+
     }
 
 
