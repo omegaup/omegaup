@@ -95,6 +95,13 @@ class ShowRunsInContest extends ApiHandler
                 throw new ApiException(ApiHttpErrors::notFound("Problem selected not found."));
             }
         }  
+        
+        // Check filter by language, it is optional
+        if (!is_null(RequestContext::get("language")))
+        {
+            ValidatorFactory::enumValidator(array('c','cpp','java','py','rb','pl','cs','p','kp','kj'))
+                ->validate(RequestContext::get("language"), "language");            
+        }
     }   
             
     protected function GenerateResponse() 
@@ -107,6 +114,7 @@ class ShowRunsInContest extends ApiHandler
             "status" => RequestContext::get("status"),
             "veredict"=> RequestContext::get("veredict"),
             "problem_id" => !is_null(RequestContext::get("problem")) ? $this->problem->getProblemId() : null,
+            "language" => RequestContext::get("language")
             ));
         
         // Filter relevant columns
