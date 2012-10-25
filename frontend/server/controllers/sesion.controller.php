@@ -10,7 +10,6 @@
   **/
 class SesionController extends Controller
 {
-
     private static $current_sesion;
 
 
@@ -38,27 +37,30 @@ class SesionController extends Controller
     public function CurrentSesion( )
     {
 
-        $SesionM = $this->getSessionManagerInstance();
+        $SesionM = $this->getSessionManagerInstance( );
 
-        $s_AuthTokenInCookie = $SesionM->GetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME );
+        $s_AuthToken = $SesionM->GetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME );
 
         $vo_CurrentUser = NULL;
 
         //cookie contains an auth token
-        if( !is_null( $s_AuthTokenInCookie ) && $this->isAuthTokenValid( $s_AuthTokenInCookie ) )
+        if( !is_null( $s_AuthToken ) && $this->isAuthTokenValid( $s_AuthToken ) )
         {
-            $vo_CurrentUser = AuthTokensDAO::getUserByToken( $s_AuthTokenInCookie );
+            $vo_CurrentUser = AuthTokensDAO::getUserByToken( $s_AuthToken );
         }
-        else if ( isset( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] ) && $this->isAuthTokenValid( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] ) )
+        else if ( isset( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] ) && $this->isAuthTokenValid( $s_AuthToken = $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] ) )
         {
             $vo_CurrentUser = AuthTokensDAO::getUserByToken( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] );
-        }else
+        }
+        else
         {
             return array(
                     'valid' => false,
                     'id' => NULL,
                     'name' => NULL,
-                    'email' => NULL
+                    'username' => NULL,
+                    'email' => NULL,
+                    'auth_token' => NULL
                 );
         }
 
@@ -69,7 +71,9 @@ class SesionController extends Controller
                 'valid' => true,
                 'id' => $vo_CurrentUser->getUserId( ),
                 'name' => $vo_CurrentUser->getName( ),
-                'email' => $s_MainEmail
+                'email' => $s_MainEmail,
+                'username' => NULL,
+                'auth_token' => $s_AuthToken
             );
 
     }
@@ -79,16 +83,21 @@ class SesionController extends Controller
       * 
       *
       **/
-        private function UnRegisterSesion( AuthTokens $auth_token )
+    public function UnRegisterSesion( )
     {
-        try
-        {
-            AuthTokensDAO::delete( $auth_token );
-        }
-        catch(Exception $e)
-        {
+        $a_CurrentSesion = $this->CurrentSesion( );
+
+        $vo_AuthT = new AuthTokens( array( "token" => $a_CurrentSesion["auth_token"] ) );
+
+        try{
+            AuthTokensDAO::delete( $vo_AuthT );
+
+
+        }catch(Exception $e){
             
         }
+
+        setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
 

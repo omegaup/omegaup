@@ -14,9 +14,20 @@
 </head>
 <body>
 <div id="wrapper">
+
+    {if $LOGGED_IN eq '1'} 
+    <div class="login_bar" style="display: block">
+        WAZAAAAP <b><a href='logout.php'>Cerrar sesion</a> !</b>
+    </div>
+    {else}
     <div class="login_bar" style="display: block">
          we a OmegaUp ! <b><a href='login.php'>Inicia sesion</a> !</b>
     </div>
+    {/if}
+        
+
+
+
     <div id="title">
         <a href="index.php">
         <div style="margin-left: 40%;">

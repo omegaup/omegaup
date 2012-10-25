@@ -93,6 +93,19 @@ if( /* do we need smarty to load? */ true)
     $smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
     $smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" )->setCompileDir(  "C:\\Users\\Alan\\Desktop\\cache" );
     $smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\es.lang");
+    $smarty->assign( 'LOGGED_IN', '0' );
+
+
+    $c_Sesion = new SesionController;
+    if (  $c_Sesion->CurrentSesionAvailable( ) )
+    {
+        $smarty->assign( 'LOGGED_IN', '1' );
+
+        $a_CurrentSesion = $c_Sesion->CurrentSesion( );
+
+        $smarty->assign( 'USERNAME', $a_CurrentSesion["username"] );
+    }
+
 }
 
 
