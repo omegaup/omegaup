@@ -55,7 +55,7 @@ class UserController extends Controller
 {
 
 
-    private function FindByEmail( $email )
+    public function FindByEmail( $email )
     {
         $email_query = new Emails( );
         $email_query->setEmail( $email );
@@ -72,7 +72,7 @@ class UserController extends Controller
 
 
 
-    private function FindByUsername( $s_Username )
+    public function FindByUsername( $s_Username )
     {
         $vo_Query = new Users( array( 
             "username" => $s_Username

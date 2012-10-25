@@ -18,12 +18,9 @@ class SesionController extends Controller
 
     private function isAuthTokenValid( $s_AuthToken )
     {
+        //do some other basic testing on s_AuthToken
 
-        //do some testing on s_AuthToken
-
-        $vo_User = AuthTokensDAO::getUserByToken( $s_AuthToken );
-
-        return !is_null( $vo_User );
+        return true;
     }
 
 
@@ -40,25 +37,36 @@ class SesionController extends Controller
 
         $s_AuthTokenInCookie = $sesion->GetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME );
 
+        $vo_CurrentUser = NULL;
+
         //cookie contains an auth token
-        if( !is_null( $s_AuthTokenInCookie ) )
+        if( !is_null( $s_AuthTokenInCookie ) && $this->isAuthTokenValid( $s_AuthTokenInCookie ) )
         {
-            if ( $this->isAuthTokenValid( $s_AuthTokenInCookie ) )
-            {
-                //return data
-                return array( );
-            }
+            $vo_CurrentUser = AuthTokensDAO::getUserByToken( $s_AuthTokenInCookie );
+        }
+        else if ( isset( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] ) && $this->isAuthTokenValid( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] ) )
+        {
+            $vo_CurrentUser = AuthTokensDAO::getUserByToken( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] );
+        }else
+        {
+            return array(
+                    'valid' => false,
+                    'id' => NULL,
+                    'name' => NULL,
+                    'email' => NULL
+                );
         }
 
+        //get email via his id
+        $s_MainEmail = "alkadjflkajd@laksfjald.net";
 
-        if( isset( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] ) )
-        {
-            if ( $this->isAuthTokenValid( $s_AuthTokenInCookie ) )
-            {
-                //return data
-                return array( );
-            }
-        }
+        return array(
+                'valid' => true,
+                'id' => $vo_CurrentUser->getUserId( ),
+                'name' => $vo_CurrentUser->getName( ),
+                'email' => $s_MainEmail
+            );
+
     }
 
 
@@ -127,7 +135,13 @@ class SesionController extends Controller
     }
 
 
-
+    /**
+      *
+      *
+      *
+      *
+      *
+      **/
     public function NativeLogin( $s_UsernameOrEmail = null, $s_Password = null, $b_ReturnAuthToken = false )
     {
         $c_Users = new UserController( );
@@ -161,7 +175,7 @@ class SesionController extends Controller
         {
 
         }
-        
+
     }
 
 }
