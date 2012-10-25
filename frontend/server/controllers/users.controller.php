@@ -18,7 +18,9 @@ class SecurityTools
 
     public static function CompareEncryptedStrings( $encrypted_a, $encrypted_b )
     {
-        return strcmp( $encrypted_a, $encrypted_b );
+        Logger::log( "Comparing:" . $encrypted_a . "<->" . $encrypted_b );
+
+        return strcmp( $encrypted_a, $encrypted_b ) == 0;
     }
 
 }
@@ -190,6 +192,7 @@ class UserController extends Controller
 
         if( is_null( $vo_UserToTest ) )
         {
+            Logger::warn("User X invalid login");
             return false;
         }
 

@@ -15,7 +15,7 @@
 <body>
 <div id="wrapper">
     <div class="login_bar" style="display: block">
-          a OmegaUp ! <b><a href='login.php'>Inicia sesion</a> !</b>
+         we a OmegaUp ! <b><a href='login.php'>Inicia sesion</a> !</b>
     </div>
     <div id="title">
         <a href="index.php">
@@ -37,3 +37,10 @@
                 <!-- <li><input type='text' placeholder='Buscar'></li> -->
             </ul>
         </div>
+
+        {if $ERROR_TO_USER eq 'USER_OR_PASSWORD_WRONG'} 
+        <div class="post footer">
+            mensaje 
+        </div>
+        {/if} 
+        

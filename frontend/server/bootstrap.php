@@ -87,4 +87,12 @@ try
 if( /* do we need smarty to load? */ true)
 {
     include("libs/smarty/Smarty.class.php");
+
+    $smarty = new Smarty;
+    $smarty->assign( 'ERROR_TO_USER', '' );
+    $smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
+    $smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" )->setCompileDir(  "C:\\Users\\Alan\\Desktop\\cache" );
+    $smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\es.lang");
 }
+
+

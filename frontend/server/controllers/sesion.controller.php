@@ -24,7 +24,12 @@ class SesionController extends Controller
     }
 
 
+    public function CurrentSesionAvailable( )
+    {
+        $a_CurrentSesion = $this->CurrentSesion( );
 
+        return $a_CurrentSesion[ "valid" ] ;
+    }
 
     /**
       * Returns associative array with information about current sesion.
@@ -35,7 +40,7 @@ class SesionController extends Controller
 
         $SesionM = $this->getSessionManagerInstance();
 
-        $s_AuthTokenInCookie = $sesion->GetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME );
+        $s_AuthTokenInCookie = $SesionM->GetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME );
 
         $vo_CurrentUser = NULL;
 
@@ -100,7 +105,7 @@ class SesionController extends Controller
 
 
         $vo_AuthT = new AuthTokens();
-        $vo_AuthT->setUserId( $user_obj->getUserId( ) );
+        $vo_AuthT->setUserId( $vo_User->getUserId( ) );
         $vo_AuthT->setToken( $s_AuthT );
 
         try
@@ -169,7 +174,7 @@ class SesionController extends Controller
 
         try
         {
-            return RegisterSesion( $vo_User, $b_ReturnAuthToken );
+            return $this->RegisterSesion( $vo_User, $b_ReturnAuthToken );
         }
         catch( Exception $e )
         {

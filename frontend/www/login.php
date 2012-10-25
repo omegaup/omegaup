@@ -3,7 +3,7 @@
     require_once( "../server/bootstrap.php" );
 
 
-    if ( isset( $_POST["request"] ) && ($_POST["request"] == "login") )
+    if ( isset( $_POST["request"] ) && ( $_POST["request"] == "login" ) )
     {
       //user wants to login natively
       $c_Sesion = new SesionController;
@@ -15,14 +15,18 @@
 
 
 
+    if ( isset( $_GET["shva"] ) )
+    {
+        $c_Sesion = new SesionController;
 
-    // create object
-    $smarty = new Smarty;
+        if( !$c_Sesion->CurrentSesionAvailable( ) )
+        {
+          $smarty->assign( 'ERROR_TO_USER', 'USER_OR_PASSWORD_WRONG' );
+          Logger::log("Nouuuu");
+        }else{
+          Logger::log("Yaiiii");
+        }
 
-
-    $smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
-    $smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" )->setCompileDir(  "C:\\Users\\Alan\\Desktop\\cache" );
-    $smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\es.lang");
-    //$smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\en.lang");
+    }
 
     $smarty->display( '../templates/login.tpl' );
