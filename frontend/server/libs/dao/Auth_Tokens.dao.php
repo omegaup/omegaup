@@ -20,16 +20,11 @@ require_once("base/Auth_Tokens.vo.base.php");
   */
 class AuthTokensDAO extends AuthTokensDAOBase
 {
-	public static function isValidAuthToken($auth_token){
-		return true;
-	}
-	
-	public static function getUserByToken($auth_token){
-		//test that token
-		if(!self::isValidAuthToken($auth_token)){
-			return NULL;
-		}
-		
+
+
+	public static function getUserByToken( $auth_token )
+    {
+
 		//look for it on the database
 		global  $conn;
 		
@@ -38,8 +33,7 @@ class AuthTokensDAO extends AuthTokensDAOBase
 		$params = array( $auth_token );
 
 		$rs = $conn->GetRow($sql, $params);
-		
-		
+
 		//no matches
 		if(count($rs)==0) return NULL;
 

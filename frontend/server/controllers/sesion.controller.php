@@ -14,16 +14,51 @@ class SesionController extends Controller
     private static $current_sesion;
 
 
+
+
+    private function isAuthTokenValid( $s_AuthToken )
+    {
+
+        //do some testing on s_AuthToken
+
+        $vo_User = AuthTokensDAO::getUserByToken( $s_AuthToken );
+
+        return !is_null( $vo_User );
+    }
+
+
+
+
     /**
       * Returns associative array with information about current sesion.
       *
       **/
-    public function GetCurrentSesion( )
+    public function CurrentSesion( )
     {
-        return array(
-            "valid_session" => 1,
-            "user_id" => 1
-            );
+
+        $SesionM = $this->getSessionManagerInstance();
+
+        $s_AuthTokenInCookie = $sesion->GetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME );
+
+        //cookie contains an auth token
+        if( !is_null( $s_AuthTokenInCookie ) )
+        {
+            if ( $this->isAuthTokenValid( $s_AuthTokenInCookie ) )
+            {
+                //return data
+                return array( );
+            }
+        }
+
+
+        if( isset( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] ) )
+        {
+            if ( $this->isAuthTokenValid( $s_AuthTokenInCookie ) )
+            {
+                //return data
+                return array( );
+            }
+        }
     }
 
 
@@ -31,23 +66,16 @@ class SesionController extends Controller
       * 
       *
       **/
-
-
-
         private function UnRegisterSesion( AuthTokens $auth_token )
     {
-
         try
         {
             AuthTokensDAO::delete( $auth_token );
-
         }
         catch(Exception $e)
         {
             
-
         }
-
     }
 
 
@@ -82,11 +110,10 @@ class SesionController extends Controller
         }
         else
         {
-            $sm = self::getSessionManagerInstance();
-            // ouat stands for omegaup auth token
-            $sm->SetCookie('ouat', $s_AuthT, time()+60*60*24, '/');
-        }
+            $sm = $this->getSessionManagerInstance( );
 
+            $sm->SetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time( )+60*60*24, '/' );
+        }
     }
 
 
@@ -126,7 +153,15 @@ class SesionController extends Controller
             return false;
         }
 
-        $b_Success = RegisterSesion( $vo_User, $b_ReturnAuthToken );
+        try
+        {
+            return RegisterSesion( $vo_User, $b_ReturnAuthToken );
+        }
+        catch( Exception $e )
+        {
+
+        }
+        
     }
 
 }

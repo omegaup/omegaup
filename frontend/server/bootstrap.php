@@ -36,7 +36,7 @@ if(!is_file(SERVER_PATH . DIRECTORY_SEPARATOR . "config.php"))
 }
 
 require_once( SERVER_PATH . "/config.php" );
-
+define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
 /*
  * Load libraries

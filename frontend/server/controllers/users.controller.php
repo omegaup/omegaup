@@ -1,6 +1,13 @@
 <?php
 
-
+/**
+  * Description:
+  *     
+  *
+  * Author:
+  *     Alan Gonzalez alanboy@alanboy.net
+  *
+  **/
 class SecurityTools
 {
 
@@ -63,6 +70,8 @@ class UserController extends Controller
         return UsersDAO::getByPK( $result[0]->getUserId( ) );
     }
 
+
+
     private function FindByUsername( $s_Username )
     {
         $vo_Query = new Users( array( 
@@ -80,46 +89,67 @@ class UserController extends Controller
     }
 
 
-    public function Create( $username, $email )
+
+    /**
+      * 
+      * 
+      * 
+      */
+    public function Create( $s_Email, $s_Username = null, $s_PlainPassword = null )
     {
+
         //create user
-        $this_user  = new Users( );
-        $this_user->setUsername( $username );
-        $this_user->setSolved( 0 );
-        $this_user->setSubmissions( 0 );
+        $vo_User  = new Users( );
+        $vo_User->setSolved( 0 );
+        $vo_User->setSubmissions( 0 );
+
+
+        if ( is_null( $s_Username ) )
+        {
+            //@TODO change this
+            $vo_User->setUsername( "$" . md5( $s_Email ) );
+        }
+        else
+        {
+            $vo_User->setUsername( $s_Username );
+        }
+
+
+        if ( is_null( $s_PlainPassword ) )
+        {
+            $vo_User->setPassword( NULL );
+        }
+        else
+        {
+            $vo_User->setPassword( SecurityTools::EncryptString( $s_PlainPassword ) );
+        }
 
         DAO::transBegin( );
 
-        try
-        {
-            //save this user
-            UsersDAO::save( $this_user );
-
-        }
-        catch(Exception $e)
-        {
-            DAO::transRollback( );
-            return false;
-        }
-
         //create email
-        $this_user_email = new Emails( );
-        $this_user_email ->setUserId( $this_user->getUserId( ) );
-        $this_user_email ->setEmail( $email );
+        $vo_Email = new Emails( );
+        $vo_Email ->setUserId( $vo_User->getUserId( ) );
+        $vo_Email ->setEmail( $s_Email );
 
-        //save this user
         try
         {
-            EmailsDAO::save( $this_user_email );
+            EmailsDAO::save( $vo_Email );
+
+            $vo_User->setMainEmailId( $vo_Email->getIdEmail( ) );
+
+            UsersDAO::save( $vo_User );
         }
         catch( Exception $e )
         {
             DAO::transRollback( );
-            return false;
+            throw new Exception( "" );
         }
 
+
         DAO::transEnd( );
-        return $this_user;
+
+        return $vo_User;
+
     }
 
 
