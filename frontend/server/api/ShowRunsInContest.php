@@ -106,7 +106,7 @@ class ShowRunsInContest extends ApiHandler
             "contest_id" => $this->contest->getContestId(),
             "status" => RequestContext::get("status"),
             "veredict"=> RequestContext::get("veredict"),
-            "problem_id" => $this->problem->getProblemId(),
+            "problem_id" => !is_null(RequestContext::get("problem")) ? $this->problem->getProblemId() : null,
             ));
         
         // Filter relevant columns
