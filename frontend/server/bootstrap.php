@@ -52,8 +52,9 @@ require_once("libs/SessionManager.php");
   *
   **/
 
-require_once("controllers/users.controller.php");
 
+require_once("controllers/users.controller.php");
+require_once("controllers/sesion.controller.php");
 
 
 
