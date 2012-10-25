@@ -136,6 +136,11 @@ trait Grader extends Object with Log {
 			}
 
 			if (run.language == Language.Java) {
+				if (meta.contains("message") && meta("message").contains("ptrace")) {
+					error("Rejudging run {} due to JE-prevention.", run.id)
+					Manager.grade(run.id)
+					return
+				}
 				val errFile = new File(f.getCanonicalPath.replace(".meta", ".err"))
 				if (errFile.exists && FileUtil.read(errFile.getCanonicalPath).contains("java.lang.OutOfMemoryError")) {
 					if (run.veredict < Veredict.MemoryLimitExceeded) run.veredict = Veredict.MemoryLimitExceeded

@@ -105,16 +105,21 @@ object OmegaUp extends Actor with Log {
 			} else {
 				error("OU Compile error {}", output.error.get)
 
-				val errorFile = new FileWriter(Config.get("grader.root", "grader") + "/" + id + ".err")
-				errorFile.write(output.error.get)
-				errorFile.close
+				if (output.error.get.contains("ptrace(PTRACE_GETREGS")) {
+					error("Retrying")
+					Manager.grade(run.id)
+				} else {
+					val errorFile = new FileWriter(Config.get("grader.root", "grader") + "/" + id + ".err")
+					errorFile.write(output.error.get)
+					errorFile.close
 			
-				run.status = Status.Ready
-				run.veredict = Veredict.CompileError
-				run.memory = 0
-				run.runtime = 0
-				run.score = 0
-				Manager.updateVeredict(run)
+					run.status = Status.Ready
+					run.veredict = Veredict.CompileError
+					run.memory = 0
+					run.runtime = 0
+					run.score = 0
+					Manager.updateVeredict(run)
+				}
 			}
 		} catch {
 			case e: java.net.ConnectException => {
