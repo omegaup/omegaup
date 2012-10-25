@@ -122,7 +122,8 @@ class LoginController{
 
                             //create user
                             $this_user 	= new Users();
-                            $this_user->setUsername( $email );
+			    $dude_temp_username = strstr($email, '@', true);
+                            $this_user->setUsername( $dude_temp_username );
                             $this_user->setSolved( 0 );			
                             $this_user->setSubmissions( 0 );
 
@@ -154,7 +155,18 @@ class LoginController{
 
                             }
 
-                            //$this_user->setEmailId( -1 );
+			    // Save the email into user's main email ID
+                            $this_user->setMainEmailId($this_user_email->getEmailId());
+                            //save this user
+                            try{
+                                    UsersDAO::save( $this_user );
+
+                            }catch(Exception $e){
+                                    Logger::error($e);
+                                    return false;
+
+                            }
+
                     }else{
                             // he's been here man !
                             $this_user 	= UsersDAO::getByPK( $result[0]->getUserId() );
