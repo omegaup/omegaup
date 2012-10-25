@@ -138,6 +138,21 @@ OmegaUp.prototype.getContestRuns = function(contestAlias, options, callback) {
 	);
 };
 
+OmegaUp.prototype.getProblemRuns = function(problemAlias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/' + problemAlias + '/run/list/',
+		function (data) {
+			for (var i = 0; i < data.runs.length; i++) {
+				data.runs[i].time = self.time(data.runs[i].time * 1000);
+			}
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, callback) {
 	var self = this;
 

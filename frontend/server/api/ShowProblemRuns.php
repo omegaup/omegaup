@@ -83,7 +83,11 @@ class ShowProblemRuns extends ApiHandler
 	$result = array();
         foreach($runs as $run)
 	{ 
-		array_push($result, $run->asFilteredArray($relevant_columns));               
+		$filtered = $run->asFilteredArray($relevant_columns);
+		$filtered['time'] = strtotime($filtered['time']);
+		$filtered['contest_score'] = round($filtered['contest_score'], 2);
+		$filtered['score'] = round($filtered['score'], 4);
+		array_push($result, $filtered);               
 	}     
 
 	$this->addResponse("runs", $result);
