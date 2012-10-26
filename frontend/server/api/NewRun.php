@@ -56,6 +56,15 @@ class NewRun extends ApiHandler
 			$this->problem = ProblemsDAO::getByAlias(RequestContext::get("problem_alias"));
 
 			if (RequestContext::get("contest_alias") == "" && (Authorization::IsSystemAdmin($this->_user_id) || time() > ProblemsDAO::getPracticeDeadline($this->problem->getProblemId()))) {
+				if (!RunsDAO::IsRunInsideSubmissionGap(
+					null, 
+					$this->problem->getProblemId(), 
+					$this->_user_id)
+					&& !Authorization::IsSystemAdmin($this->_user_id))
+				{                
+					throw new ApiException(ApiHttpErrors::notAllowedToSubmit("Unable to submit run: You have to wait 120 seconds between consecutive submissions."));
+				}
+
 				$this->practice = true;
 				return;
 			}
