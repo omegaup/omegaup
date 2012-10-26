@@ -1,12 +1,15 @@
 <?php
 
-
+    /**
+      * Description:
+      *     Sesion controller handles sesions.
+      *
+      * Author:
+      *     Alan Gonzalez alanboy@alanboy.net
+      *
+      **/
     require_once( "../server/bootstrap.php" );
     require_once( "../server/libs/GoogleOpenID.php" );
-
-    $user_c = new UserController( );
-    $user_c->LoginViaGoogle( "alan.gohe@gmail.com" );
-    exit;
 
 
     //retured from google
@@ -14,25 +17,19 @@
     {
         $googleLogin = GoogleOpenID::getResponse( );
 
-		if( $googleLogin->success( ) )
+    	if( $googleLogin->success( ) )
         {
-        	$user_c = new UserController( );
-            
-            $user_c->LoginViaGoogle( $googleLogin->email( ) );
-
-            //Logger::log( "GoogleOpenID reports user email as " . $googleLogin->email( ) );
-            
-            //LoginController::login( rawurldecode( $googleLogin->email( ) ), $googleLogin->identity( ) );
-            
-            //die(header("Location: index.php"));
+            $c_Sesion = new SesionController( );
+            $c_Sesion->LoginViaGoogle( $googleLogin->email( ) );
+            die( header( "Location: index.php" ) );
         }
 
-        //die(header("Location: nativeLogin.php?whoops"));
-        die();
+        
+        die(header("Location: login.php?shva=1"));
     }
 
     $association_handle = GoogleOpenID::getAssociationHandle( );
-	
+
     //somehow, save the association handle (the below function is not real)
     //save_handle_somehow($association_handle);
 

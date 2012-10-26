@@ -1,5 +1,32 @@
 <?php
 
+/**
+  * Description:
+  *     
+  *
+  * Author:
+  *     Alan Gonzalez alanboy@alanboy.net
+  *
+  **/
+class SecurityTools
+{
+
+    public static function EncryptString( $unencrypted )
+    {
+        return $unencrypted;
+    }
+
+    public static function CompareEncryptedStrings( $encrypted_a, $encrypted_b )
+    {
+        Logger::log( "Comparing:" . $encrypted_a . "<->" . $encrypted_b );
+
+        return strcmp( $encrypted_a, $encrypted_b ) == 0;
+    }
+
+}
+
+
+
 
 class Controller
 {
@@ -11,16 +38,15 @@ class Controller
 
     private static $_sessionManager;
 
-    public static function getSessionManagerInstance()
+    public static function getSessionManagerInstance( )
     {
-        if(is_null(self::$_sessionManager))
+        if ( is_null( self::$_sessionManager ) )
         {
-            self::$_sessionManager = new SessionManager();
+            self::$_sessionManager = new SessionManager( );
         }
         
         return self::$_sessionManager;
     }
-
 
 }
 
@@ -31,7 +57,7 @@ class UserController extends Controller
 {
 
 
-    private function FindByEmail( $email )
+    public function FindByEmail( $email )
     {
         $email_query = new Emails( );
         $email_query->setEmail( $email );
@@ -46,134 +72,136 @@ class UserController extends Controller
         return UsersDAO::getByPK( $result[0]->getUserId( ) );
     }
 
+
+
+    public function FindByUsername( $s_Username )
+    {
+        $vo_Query = new Users( array( 
+            "username" => $s_Username
+            ) );
+
+        $a_Results = UsersDAO::search( $vo_Query );
+
+        if ( sizeof( $a_Results ) != 1 )
+        {
+            return NULL;
+        }
+
+        return array_pop( $a_Results );
+    }
+
+
+
     /**
+      * 
+      * 
+      * 
+      */
+    public function Create( $s_Email, $s_Username = null, $s_PlainPassword = null )
+    {
+
+        //create user
+        $vo_User  = new Users( );
+        $vo_User->setSolved( 0 );
+        $vo_User->setSubmissions( 0 );
+
+
+        if ( is_null( $s_Username ) )
+        {
+            //@TODO change this
+            $vo_User->setUsername( "$" . md5( $s_Email ) );
+        }
+        else
+        {
+            $vo_User->setUsername( $s_Username );
+        }
+
+
+        if ( is_null( $s_PlainPassword ) )
+        {
+            $vo_User->setPassword( NULL );
+        }
+        else
+        {
+            $vo_User->setPassword( SecurityTools::EncryptString( $s_PlainPassword ) );
+        }
+
+        DAO::transBegin( );
+
+        //create email
+        $vo_Email = new Emails( );
+        $vo_Email ->setUserId( $vo_User->getUserId( ) );
+        $vo_Email ->setEmail( $s_Email );
+
+        try
+        {
+            EmailsDAO::save( $vo_Email );
+
+            $vo_User->setMainEmailId( $vo_Email->getIdEmail( ) );
+
+            UsersDAO::save( $vo_User );
+        }
+        catch( Exception $e )
+        {
+            DAO::transRollback( );
+            throw new Exception( "" );
+        }
+
+
+        DAO::transEnd( );
+
+        return $vo_User;
+
+    }
+
+
+
+    /**
+      *
       * Description:
-      *     All we know from google login is the email.
+      *     Tests a if a password is valid for a given user.
+      *
+      * Returns:
+      *     Boolean
       *
       *
       **/
-    public function LoginViaGoogle( $email )
+    public function TestPassword( $user_id = null, $email = null, $username = null, $password )
     {
-        $user = $this->FindByEmail( $email );
-
-        if( is_null( $user ) )
+        if( is_null( $user_id ) && is_null( $email ) && is_null( $username ) )
         {
-            //user does not exist in omegaup
-            $this->NewUser( $email );
+            throw new Exception("You must provide either one of the following: user_id, email or username");
         }
 
-        $this->RegisterSesion( $user );
-    }
+        $vo_UserToTest = null;
 
-
-    public function NewUser( $email )
-    {
-        //create user
-        $this_user  = new Users();
-        $this_user->setUsername( $email );
-        $this_user->setSolved( 0 );
-        $this_user->setSubmissions( 0 );
-
-
-        DAO::transBegin();
-        //save this user
-        try
+        //find this user
+        if( !is_null( $user_id ) )
         {
-            UsersDAO::save( $this_user );
-
+            $vo_UserToTest = USersDAO::getByPK( $user_id );
         }
-        catch(Exception $e)
+        else if ( !is_null( $email ) )
         {
-            DAO::transRollback( );
+            $vo_UserToTest = $this->FindByEmail( );
+        }
+        else
+        {
+            $vo_UserToTest = $this->FindByUserName( );
+        }
+
+
+        if( is_null( $vo_UserToTest ) )
+        {
+            Logger::warn("User X invalid login");
             return false;
         }
 
-        //create email
-        $this_user_email = new Emails();
-        $this_user_email ->setUserId( $this_user->getUserId() );
-        $this_user_email ->setEmail( $email );
+        return SecurityTools::CompareEncryptedStrings(
+                    SecurityTools::EncryptString( $password ),
+                    $vo_UserToTest->getPassword( )
+                );
 
-        //save this user
-        try
-        {
-            EmailsDAO::save( $this_user_email );
-        }
-        catch(Exception $e)
-        {
-            DAO::transRollback( );
-            return false;
-        }
-
-        DAO::transEnd();
-        return $this_user;
-    }
-
-
-    private function UnRegisterSesion( AuthTokens $auth_token )
-    {
-
-        try{
-            AuthTokensDAO::delete( $auth_token );
-            
-        }catch(Exception $e){
-            
-        }
-
-    }
-
-
-    private function RegisterSesion( Users $user_obj )
-    {
-        //find if this user has older sessions
-         $auth_token = new AuthTokens( );
-         $auth_token->setUserId( $user_obj->getUserId( ) );
-
-        //erase them
-
-        $auth_str = time( ) . "-" . $user_obj->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $user_obj->getUserId( ) . time( ) );
-
-
-        $temp_auth_token = new AuthTokens();
-        $temp_auth_token->setUserId( $user_obj->getUserId( ) );
-        $temp_auth_token->setToken( $auth_str );
-
-        try
-        {
-            AuthTokensDAO::save( $temp_auth_token );
-        }
-        catch(Exception $e)
-        {
-            throw new ApiException(ApiHttpErrors::invalidDatabaseOperation( ), $e);
-        }
-
-        $sm = self::getSessionManagerInstance();
-
-         // ouat stands for omegaup auth token
-        $sm->SetCookie('ouat', $auth_str, time()+60*60*24, '/');
-    }
-
-
-    public function LoginViaFacebook( $email )
-    {
-        $this->FindByEmail( $email );
-    }
-
-    public function Find( $user_or_email_or_fbid )
-    {
-        
-    }
-
-    public function Login( $user_or_email, $password )
-    {
-        
     }
 }
 
 
-
-class Validators
-{
-
-
-
-}

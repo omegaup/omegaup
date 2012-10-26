@@ -36,7 +36,7 @@ if(!is_file(SERVER_PATH . DIRECTORY_SEPARATOR . "config.php"))
 }
 
 require_once( SERVER_PATH . "/config.php" );
-
+define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
 /*
  * Load libraries
@@ -52,8 +52,9 @@ require_once("libs/SessionManager.php");
   *
   **/
 
-require_once("controllers/users.controller.php");
 
+require_once("controllers/users.controller.php");
+require_once("controllers/sesion.controller.php");
 
 
 
@@ -86,4 +87,25 @@ try
 if( /* do we need smarty to load? */ true)
 {
     include("libs/smarty/Smarty.class.php");
+
+    $smarty = new Smarty;
+    $smarty->assign( 'ERROR_TO_USER', '' );
+    $smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
+    $smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" )->setCompileDir(  "C:\\Users\\Alan\\Desktop\\cache" );
+    $smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\es.lang");
+    $smarty->assign( 'LOGGED_IN', '0' );
+
+
+    $c_Sesion = new SesionController;
+    if (  $c_Sesion->CurrentSesionAvailable( ) )
+    {
+        $smarty->assign( 'LOGGED_IN', '1' );
+
+        $a_CurrentSesion = $c_Sesion->CurrentSesion( );
+
+        $smarty->assign( 'USERNAME', $a_CurrentSesion["username"] );
+    }
+
 }
+
+
