@@ -322,22 +322,7 @@ class Utils
                 
         return $rs[0]; 
     }
-    
-    static function CreateUser($username, $password)
-    {
-        $contestant = new Users();
-        $contestant->setUsername(Utils::CreateRandomString());
-        $contestant->setPassword(md5($password));
-        $contestant->setSolved(0);
-        $contestant->setSubmissions(0);
-        UsersDAO::save($contestant);
         
-        // Save localy clean password
-        $contestant->setPassword($password);
-        
-        return $contestant;
-    }
-    
     static function getNextTime()
     {        
         self::$counttime++;                

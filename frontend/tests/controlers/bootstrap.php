@@ -29,7 +29,8 @@
     
     // Clean DB
     Utils::CleanupDB();
-        
+     
+    /* @todo activar cuando sea necesario
     // Create users needed for testing    
     Utils::$contestant = Utils::CreateUser("user", "password");    
     Utils::$contestant_2 = Utils::CreateUser("user2", "password");
@@ -47,4 +48,4 @@
     // Initialize time counters
     Utils::$counttime = 0;
     Utils::$inittime = Utils::GetPhpUnixTimestamp();
-    
+    */

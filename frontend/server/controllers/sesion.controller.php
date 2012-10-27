@@ -39,7 +39,7 @@ class SesionController extends Controller
 
         $SesionM = $this->getSessionManagerInstance( );
 
-        $s_AuthToken = $SesionM->GetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME );
+        $s_AuthToken = $SesionM->getCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME );
 
         $vo_CurrentUser = NULL;
 
@@ -134,7 +134,7 @@ class SesionController extends Controller
         {
             $sm = $this->getSessionManagerInstance( );
 
-            $sm->SetCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time( )+60*60*24, '/' );
+            $sm->setCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time( )+60*60*24, '/' );
         }
     }
 

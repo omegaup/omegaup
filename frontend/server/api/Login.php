@@ -172,7 +172,7 @@ class Login extends ApiHandler {
 
         }
          
-        $this->_sessionManager->SetCookie('auth_token', $auth_str, time()+60*60*24, '/');
+        $this->_sessionManager->setCookie('auth_token', $auth_str, time()+60*60*24, '/');
           
         // Add token to response
         $this->addResponse("auth_token", $this->_auth_token->getToken());         

@@ -24,15 +24,20 @@ class LoginController{
 
 	private static $_sessionManager;
 
-    public static function getSessionManagerInstance()
-    {
-        if(is_null(self::$_sessionManager))
+        public static function getSessionManagerInstance()
         {
-            self::$_sessionManager = new SessionManager();
+            if(is_null(self::$_sessionManager))
+            {
+                self::$_sessionManager = new SessionManager();
+            }
+
+            return self::$_sessionManager;
         }
         
-        return self::$_sessionManager;
-    }
+        public static function setSessionManager(SessionManager $sessionManager)
+        {
+            self::$_sessionManager = $sessionManager;
+        }
 
 
 	static function testUserCredentials(
@@ -193,7 +198,7 @@ class LoginController{
 		 $auth_str = $time . "-" . $this_user->getUserId() . "-" . md5( OMEGAUP_MD5_SALT . $this_user->getUserId() . $time );
 		 $auth_token->setToken($auth_str);
 
-		 session_start();
+		 self::getSessionManagerInstance()->sessionStart();
 		 $_SESSION['omegaup_user'] = array('id' => $this_user->getUserId(), 'name' => $this_user->getName(), 'email' => $email_or_username);
 
 		 try
@@ -205,7 +210,7 @@ class LoginController{
 		    throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);    
 		 }
 
-		 setcookie('auth_token', $auth_str, time()+60*60*24, '/');
+                 self::getSessionManagerInstance()->setCookie('auth_token', $auth_str, time()+60*60*24, '/');		 
 		 
 		 return true;
 	}
@@ -229,7 +234,7 @@ class LoginController{
 		//var_dump($_COOKIE);
 		
 		$sesion = self::getSessionManagerInstance();
-		$auth_token = $sesion->GetCookie("auth_token");
+		$auth_token = $sesion->getCookie("auth_token");
 		
 		if( !is_null($auth_token) ) {
 			Logger::log("There is a session token in the cookie, lets test it.");
@@ -359,7 +364,7 @@ class LoginController{
 			//delete the auth_token from db
 			$sm = self::getSessionManagerInstance();
 			
-			$auth_token = $sm->GetCookie( "auth_token" );
+			$auth_token = $sm->getCookie( "auth_token" );
 
 			$token_to_delete = new AuthTokens(array( "token" => $auth_token ));
 			try{
@@ -412,7 +417,7 @@ class LoginController{
 		
 		if(self::isLoggedIn()){
 			$sm = self::getSessionManagerInstance();
-			$auth_token = $sm->GetCookie( "auth_token" );
+			$auth_token = $sm->getCookie( "auth_token" );
 			
 			return AuthTokensDAO::getUserByToken($auth_token);
 			
