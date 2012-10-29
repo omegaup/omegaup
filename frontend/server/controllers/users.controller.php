@@ -137,14 +137,14 @@ class UserController extends Controller
         {
             EmailsDAO::save( $vo_Email );
 
-            $vo_User->setMainEmailId( $vo_Email->getIdEmail( ) );
+            $vo_User->setMainEmailId( $vo_Email->getEmailId( ) );
 
             UsersDAO::save( $vo_User );
         }
         catch( Exception $e )
         {
             DAO::transRollback( );
-            throw new Exception( "" );
+            throw new Exception( "" ); //@todo dafuqqqq
         }
 
 
