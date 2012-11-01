@@ -67,6 +67,9 @@ $(document).ready(function() {
 				$('#loading').html('404');
 			}
 			return;
+		} else if (practice && contest.finish_time && new Date().getTime() < contest.finish_time.getTime()) {
+			window.location = window.location.pathname.replace(/\/practice\/.*/, '/');
+			return;
 		}
 
 		$('#title .contest-title').html(contest.title);
