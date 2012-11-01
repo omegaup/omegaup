@@ -192,12 +192,12 @@ abstract class RunsDAOBase extends DAO
 		}
 
 		if( $Runs->getProblemId() != NULL){
-			$sql .= " problem_id = ? AND";
+			$sql .= " Runs.problem_id = ? AND";
 			array_push( $val, $Runs->getProblemId() );
 		}
 
 		if( $Runs->getContestId() != NULL){
-			$sql .= " contest_id = ? AND";
+			$sql .= " Runs.contest_id = ? AND";
 			array_push( $val, $Runs->getContestId() );
 		}
 

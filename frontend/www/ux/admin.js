@@ -13,6 +13,7 @@ $(document).ready(function() {
 	var runsRowcount = 100;
 	var runsVeredict = "";
 	var runsStatus = "";
+	var runsProblem = "";
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
 	var veredicts = {
@@ -57,7 +58,9 @@ $(document).ready(function() {
 
 			$('#submit select[name="problem"]').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
 			$('#rejudge-problem-list').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
-
+			
+			$('select.runsproblem').append($('<option></option>').attr('value', problem.alias).text(problem.alias));
+			
 			letter++;
 		}
 
@@ -82,8 +85,8 @@ $(document).ready(function() {
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
 
-        	$('#loading').fadeOut('slow');
-	        $('#root').fadeIn('slow');
+		$('#loading').fadeOut('slow');
+		$('#root').fadeIn('slow');
 	});
 
 	$('#overlay, .close').click(function(e) {
@@ -116,10 +119,11 @@ $(document).ready(function() {
 		refreshRuns();
 	});
 	
-	$('select.runsveredict, select.runsstatus').change(function () {
+	$('select.runsveredict, select.runsstatus, select.runsproblem').change(function () {
 		runsVeredict = $('select.runsveredict option:selected').val();
 		runsStatus   = $('select.runsstatus   option:selected').val();
-		
+		runsProblem  = $('select.runsproblem  option:selected').val();
+		console.log("changed select");
 		refreshRuns();
 	});
 	
@@ -430,6 +434,10 @@ $(document).ready(function() {
 		
 		if (runsStatus != "") {
 			options.status = runsStatus;
+		}
+		
+		if (runsProblem != "") {
+			options.problem = runsProblem;
 		}
 		
 		omegaup.getContestRuns(contestAlias, options, runsChange); 

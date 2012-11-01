@@ -354,6 +354,7 @@ legend {
 
 #ranking td[class$='points'], #problems #mini-ranking td.points {
 	border-right-style: dotted;
+	font-weight: bold;
 }
 
 #ranking td[class$='penalty'], #problems #mini-ranking td.penalty {
@@ -363,7 +364,6 @@ legend {
 #ranking a {
 	color: #5588DD;
 }
-
 
 .clarifications tbody td {
 	border: 1px solid #000;
