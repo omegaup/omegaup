@@ -331,8 +331,8 @@ class Utils
     
     static function CleanLog()
     {
-        exec("echo -n > " . OMEGAUP_LOG_ACCESS_FILE);
-        exec("echo -n > " . OMEGAUP_LOG_ERROR_FILE);
+        file_put_contents(OMEGAUP_LOG_ACCESS_FILE, "");
+        file_put_contents(OMEGAUP_LOG_ERROR_FILE, "");        
     }
     
     static function CleanPath($path)
