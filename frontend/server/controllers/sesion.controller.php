@@ -12,7 +12,22 @@ class SesionController extends Controller
 {
     private static $current_sesion;
 
+    // Create our Application instance (replace this with your appId and secret).
+    private static $_facebook;
+    
+    
+    private static function getFacebookInstance( )
+    {
+        
+        if(is_null(self::$_facebook)){
+            self::$_facebook = new Facebook(array(
+                'appId'  => OMEGAUP_FB_APPID,
+                'secret' => OMEGAUP_FB_SECRET
+            ));
+        } 
 
+        return self::$_facebook;
+    }
 
 
     private function isAuthTokenValid( $s_AuthToken )
@@ -163,6 +178,68 @@ class SesionController extends Controller
 
     }
 
+
+
+
+    public function LoginViaFacebook( $s_Email, $s_FacebookId )
+    {
+
+        //ok, the user does not have any auth token
+        //if he wants to test facebook login
+        //Facebook must send me the state=something
+        //query, so i dont have to be testing 
+        //facebook sesions on every single petition
+        //made from the front-end
+        if(!isset($_GET["state"])){
+            Logger::log("Not logged in and no need to check for fb session");
+            return false;
+        }
+        
+        
+        Logger::log("There is no auth_token cookie, testing for facebook sesion.");
+
+        
+        //if that is not true, may still be logged with
+        //facebook, lets test that
+        $facebook = self::getFacebookInstance();
+        
+        // Get User ID
+        $fb_user = $facebook->getUser();
+
+
+        // We may or may not have this data based on whether the user is logged in.
+        //
+        // If we have a $fb_user id here, it means we know the user is logged into
+        // Facebook, but we don't know if the access token is valid. An access
+        // token is invalid if the user logged out of Facebook.
+        /*var_dump($fb_user);*/
+        
+        if ($fb_user) {
+            try {
+                // Proceed knowing you have a logged in user who's authenticated.
+                $fb_user_profile = $facebook->api('/me');
+                
+            } catch (FacebookApiException $e) {
+                $fb_user = null;
+                Logger::error("FacebookException:" . $e);
+            }
+        }
+        /*var_dump($fb_user);*/
+        
+        // Now we know if the user is authenticated via facebook
+        if (is_null($fb_user)) {
+            Logger::log("No facebook sesion... ");
+            return false;
+        }
+
+
+        //ok we know the user is logged in,
+        //lets look for his information on the database
+        //if there is none, it means that its the first
+        //time the user has been here, lets register his info
+        Logger::log("User is logged in via facebook !!");
+
+    }
 
     /**
       *
