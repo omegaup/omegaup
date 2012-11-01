@@ -152,7 +152,7 @@ $(document).ready(function() {
 		}
 
 		$('#submit input').attr('disabled', 'disabled');
-		omegaup.submit(contestAlias, currentProblem.alias, $('#submit select[name="language"]').val(), $('#submit textarea[name="code"]').val(), function (run) {
+		omegaup.submit(practice ? '' : contestAlias, currentProblem.alias, $('#submit select[name="language"]').val(), $('#submit textarea[name="code"]').val(), function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
 				$('#submit input').removeAttr('disabled');
@@ -295,40 +295,50 @@ $(document).ready(function() {
 
 				$('#problem .run-list .added').remove();
 
-				for (var idx in problem.runs) {
-					if (!problem.runs.hasOwnProperty(idx)) continue;
-					var run = problem.runs[idx];
+				function updateProblemRuns(runs, score_column, multiplier) {
+					for (var idx in runs) {
+						if (!runs.hasOwnProperty(idx)) continue;
+						var run = runs[idx];
 
-					var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
-					$('.guid', r).html(run.guid.substring(run.guid.length - 5));
-					$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-					$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-					$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
-					$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-					$('.penalty', r).html(run.submit_delay);
-					if (run.time) {
-						$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+						var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+						$('.guid', r).html(run.guid.substring(run.guid.length - 5));
+						$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
+						$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+						$('.points', r).html((parseFloat(run[score_column]) * multiplier).toFixed(2));
+						$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+						$('.penalty', r).html(run.submit_delay);
+						if (run.time) {
+							$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+						}
+						$('.language', r).html(run.language);
+						(function(guid) {
+							$('.code', r).append($('<input type="button" value="ver" />').click(function() {
+								omegaup.runSource(guid, function(data) {
+									if (data.compile_error){							
+										$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
+									} else {
+										$('#submit textarea[name="code"]').val(data.source);
+									}
+									$('#submit input').hide();
+									$('#submit #lang-select').hide();
+									$('#submit').show();
+									$('#clarification').hide();
+									$('#overlay').show();
+									window.location.hash += '/show-run';
+								});
+								return false;
+							}));
+						})(run.guid);
+						$('#problem .runs > tbody:last').append(r);
 					}
-					$('.language', r).html(run.language);
-					(function(guid) {
-						$('.code', r).append($('<input type="button" value="ver" />').click(function() {
-							omegaup.runSource(guid, function(data) {
-								if (data.compile_error){							
-									$('#submit textarea[name="code"]').val(data.source + '\n\nCOMPILE ERROR:\n' + data.compile_error);
-								} else {
-									$('#submit textarea[name="code"]').val(data.source);
-								}
-								$('#submit input').hide();
-								$('#submit #lang-select').hide();
-								$('#submit').show();
-								$('#clarification').hide();
-								$('#overlay').show();
-								window.location.hash += '/show-run';
-							});
-							return false;
-						}));
-					})(run.guid);
-					$('#problem .runs > tbody:last').append(r);
+				}
+
+				if (practice) {
+					omegaup.getProblemRuns(problem.alias, function (data) {
+						updateProblemRuns(data.runs, 'score', 100);
+					});
+				} else {
+					updateProblemRuns(problem.runs, 'contest_score', 1);
 				}
 
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);

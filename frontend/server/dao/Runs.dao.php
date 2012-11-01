@@ -158,8 +158,13 @@ class RunsDAO extends RunsDAOBase
 	public static final function GetLastRun($contest_id, $problem_id, $user_id)
 	{
 		//Build SQL statement
-		$sql = "SELECT * from Runs where user_id = ? and contest_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1";
-		$val = array($user_id, $contest_id, $problem_id);
+		if ($contest_id == null) {
+			$sql = "SELECT * from Runs where user_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1";
+			$val = array($user_id, $problem_id);
+		} else {
+			$sql = "SELECT * from Runs where user_id = ? and contest_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1";
+			$val = array($user_id, $contest_id, $problem_id);
+		}
 
 		global $conn;
 		$rs = $conn->GetRow($sql, $val);            
@@ -168,7 +173,7 @@ class RunsDAO extends RunsDAOBase
 		{
 			return null;
 		}
-		$bar =  new Runs($rs);
+		$bar = new Runs($rs);
 
 		return $bar;
 	}
@@ -215,10 +220,16 @@ class RunsDAO extends RunsDAOBase
 			return true;
 		}
 
-		// Get submissions gap
-		$contest = ContestsDAO::getByPK($contest_id);
+		if ($contest_id == null) {
+			// Default is 2 minutes.
+			$submission_gap = 120;
+		} else {
+			// Get submissions gap
+			$contest = ContestsDAO::getByPK($contest_id);
+			$submission_gap = (int)$contest->getSubmissionsGap();
+		}
 
 		// Giving 10 secs as gift
-		return time() >= (strtotime($lastrun->getTime()) + (int)$contest->getSubmissionsGap() - 10);
+		return time() >= (strtotime($lastrun->getTime()) + $submission_gap - 10);
 	}
 }

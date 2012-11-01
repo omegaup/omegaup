@@ -29,6 +29,7 @@ $(document).ready(function() {
                     '<td>' + list[i].description + '</td>' +
                     '<td><a href="' + makeWorldClockLink(start) + '">' + list[i].start_time + '</a></td>' +
                     '<td>' + list[i].finish_time + '</td>' +
+		    (end < now ? '<td><a href="/arena/' + list[i].alias + '/practice/">Práctica</a></td>' : '') + 
                 '</tr>')
             );
         }

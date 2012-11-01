@@ -40,7 +40,8 @@ class UsersController {
 
 		//register the user
 		$new_user = new Users();
-		$new_user->setUsername($email);
+		$new_user_temp_username = strstr($email, "@", true);
+		$new_user->setUsername($new_user_temp_username);
 		
 		if(!is_null($pwd))
 			$new_user->setPassword(md5($pwd));

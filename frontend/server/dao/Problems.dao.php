@@ -19,7 +19,8 @@ require_once("base/Problems.vo.base.php");
   * 
   */
 class ProblemsDAO extends ProblemsDAOBase
-{	/* byPage: search and return all the results by size and number of page and other attributes */
+{
+	/* byPage: search and return all the results by size and number of page and other attributes */
 	public static final function byPage( $sizePage , $noPage , $condition = null , $serv = null, $orderBy = null, $orden = 'ASC')
 	{	
 		global $conn;
@@ -83,11 +84,8 @@ class ProblemsDAO extends ProblemsDAOBase
 		return $ar;
 	}
 	
-	
-	
 	public static final function getByAlias($alias)
 	{
-
 		$sql = "SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;";
 		$params = array(  $alias );
                 
@@ -103,7 +101,6 @@ class ProblemsDAO extends ProblemsDAOBase
                 return $contest;
 	}
 
-
 	public static final function searchByAlias($alias)
 	{
 		global $conn;
@@ -116,7 +113,6 @@ class ProblemsDAO extends ProblemsDAOBase
 		$sql = "SELECT * FROM Problems WHERE (alias LIKE '%$quoted%' OR title LIKE '%$quoted%') LIMIT 0,10;";
 		$rs = $conn->Execute($sql);
 
-
 		$result = array();
 
 		foreach ($rs as $r) {
@@ -124,5 +120,12 @@ class ProblemsDAO extends ProblemsDAOBase
 		}
 
 		return $result;
+	}
+
+	public static final function getPracticeDeadline($id) {
+		global $conn;
+
+		$sql = "SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Contest_Problems cp USING(contest_id) WHERE cp.problem_id = ?";
+		return $conn->GetOne($sql, $id);
 	}
 }
