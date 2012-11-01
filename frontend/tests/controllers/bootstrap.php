@@ -20,32 +20,12 @@
     // Clean previous log
     Utils::CleanLog();
     
-    // Clean problems and runs path
-    Utils::CleanProblemsPath();
-    Utils::CleanRunsPath();
+    // Clean problems and runs path    
+    Utils::CleanPath(PROBLEMS_PATH);    
+    Utils::CleanPath(RUNS_PATH);    
     
     // Connect to DB
     Utils::ConnectToDB();
     
     // Clean DB
-    Utils::CleanupDB();
-     
-    /* @todo activar cuando sea necesario
-    // Create users needed for testing    
-    Utils::$contestant = Utils::CreateUser("user", "password");    
-    Utils::$contestant_2 = Utils::CreateUser("user2", "password");
-    Utils::$judge = Utils::CreateUser("judge", "password");
-    Utils::$problem_author = Utils::CreateUser("problem_author", "password");       
-    
-    // Create an admin
-    Utils::$admin = Utils::CreateUser("admin", "password");
-    
-    $ur = new UserRoles();
-    $ur->setRoleId("1"); //admin
-    $ur->setUserId(Utils::$admin->getUserId());
-    UserRolesDAO::save($ur);
-    
-    // Initialize time counters
-    Utils::$counttime = 0;
-    Utils::$inittime = Utils::GetPhpUnixTimestamp();
-    */
+    Utils::CleanupDB();         

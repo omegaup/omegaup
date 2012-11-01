@@ -335,17 +335,11 @@ class Utils
         exec("echo -n > " . OMEGAUP_LOG_ERROR_FILE);
     }
     
-    static function CleanProblemsPath()
-    {
-        exec("rm -r " . PROBLEMS_PATH);
-        exec("mkdir " . PROBLEMS_PATH);
-    }
-    
-    static function CleanRunsPath()
-    {
-        exec("rm -r " . RUNS_PATH);
-        exec("mkdir " . RUNS_PATH);
-    }
+    static function CleanPath($path)
+    {        
+        self::DeleteDirRecursive($path); 
+        mkdir($path);        
+    } 
     
     static function CleanupDB()
     {
@@ -376,6 +370,32 @@ class Utils
 	    }	 		
    	}
 
+    }
+    
+    static function DeleteDirRecursive($pathName)
+    {
+        self::rrmdir($pathName);
+    }
+    
+    private static function rrmdir($dir) 
+    {
+        foreach(glob($dir . '/*') as $file) 
+        {
+            if(is_dir($file))
+            {
+                self::rrmdir($file);
+            }
+            else
+                if (!unlink($file))
+                {
+                    throw new Exception("FATAL: Not able to delete file ". $file);
+                }
+        }
+        
+        if (!rmdir($dir))
+        {
+            throw new Exception("FATAL: Not able to delete dir ". $dir);
+        }
     }
 }
 
