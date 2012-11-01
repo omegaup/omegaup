@@ -124,7 +124,7 @@ $(document).ready(function() {
 		runsVeredict = $('select.runsveredict option:selected').val();
 		runsStatus	 = $('select.runsstatus	  option:selected').val();
 		runsProblem	 = $('select.runsproblem  option:selected').val();
-		runsLang     = $('select.runslang     option:selected').val();
+		runsLang	 = $('select.runslang	  option:selected').val();
 		console.log("changed select");
 		refreshRuns();
 	});
