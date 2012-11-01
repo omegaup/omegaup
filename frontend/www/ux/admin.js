@@ -14,6 +14,7 @@ $(document).ready(function() {
 	var runsVeredict = "";
 	var runsStatus = "";
 	var runsProblem = "";
+	var runsLang = "";
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
 	var veredicts = {
@@ -119,10 +120,11 @@ $(document).ready(function() {
 		refreshRuns();
 	});
 	
-	$('select.runsveredict, select.runsstatus, select.runsproblem').change(function () {
+	$('select.runsveredict, select.runsstatus, select.runsproblem, select.runslang').change(function () {
 		runsVeredict = $('select.runsveredict option:selected').val();
-		runsStatus   = $('select.runsstatus   option:selected').val();
-		runsProblem  = $('select.runsproblem  option:selected').val();
+		runsStatus	 = $('select.runsstatus	  option:selected').val();
+		runsProblem	 = $('select.runsproblem  option:selected').val();
+		runsLang     = $('select.runslang     option:selected').val();
 		console.log("changed select");
 		refreshRuns();
 	});
@@ -289,10 +291,10 @@ $(document).ready(function() {
 			$('#' + activeTab).show();
 			
 			if (activeTab == 'ranking') {
-                if (currentEvents) {
-                    rankingEvents(currentEvents);
-                }
-            }
+				if (currentEvents) {
+					rankingEvents(currentEvents);
+				}
+			}
 		}
 		
 	});
@@ -305,47 +307,47 @@ $(document).ready(function() {
 		
 		// group points by person
 		for (var i = 0, l = data.events.length; i < l; i++) {
-		    var curr = data.events[i];
-		    if (!dataInSeries[curr.name]) {
-			dataInSeries[curr.name] = [[startTime.getTime(), 0]];
-		    }
-		    dataInSeries[curr.name].push([
-			startTime.getTime() + curr.delta*60*1000,
-			curr.total.points
-		    ]);
-		    
-		    // check if to add to navigator
-		    if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
-			navigatorData.push([
-			    startTime.getTime() + curr.delta*60*1000,
-			    curr.total.points
+			var curr = data.events[i];
+			if (!dataInSeries[curr.name]) {
+				dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+			}
+			dataInSeries[curr.name].push([
+				startTime.getTime() + curr.delta*60*1000,
+				curr.total.points
 			]);
-		    }
+			
+			// check if to add to navigator
+			if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
+				navigatorData.push([
+					startTime.getTime() + curr.delta*60*1000,
+					curr.total.points
+				]);
+			}
 		}
 		
 		// convert datas to series
 		for (var i in dataInSeries) {
-		    if (dataInSeries.hasOwnProperty(i)) {
+			if (dataInSeries.hasOwnProperty(i)) {
 			dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
 			series.push({
-			    name: i,
-			    data: dataInSeries[i],
-			    step: true
+				name: i,
+				data: dataInSeries[i],
+				step: true
 			});
-		    }
+			}
 		}
 		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
 		
 		if (series.length > 0) {
-		    // chart it!
-		    createChart(series, navigatorData);
+			// chart it!
+			createChart(series, navigatorData);
 
-		    // now animated sort the ranking table!
-		    $("#ranking").sortTable({
+			// now animated sort the ranking table!
+			$("#ranking").sortTable({
 			onCol: 1,
 			keepRelationships: true,
 			sortType: 'numeric'
-		    });
+			});
 		}
 	}
 
@@ -356,15 +358,15 @@ $(document).ready(function() {
 		for (var i = 0; i < ranking.length; i++) {
 			var rank = ranking[i];
 			newRanking[rank.name] = i;
-            
-		 	// new user, just add row at the end
+			
+			// new user, just add row at the end
 			if (currentRanking[rank.name] === undefined) {
 				currentRanking[rank.name] = $('#ranking tbody tr.inserted').length;
 				$('#ranking tbody').append(
 					$('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
 				);
 			}
-            
+			
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.name]];
 			$('.position', r).html(i+1);
@@ -376,12 +378,12 @@ $(document).ready(function() {
 				$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
 				$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
 			}
-            
+			
 			// if rank went up, add a class
 			if (parseInt($('.points', r)) < parseInt(rank.total.points)) {
 				r.addClass('rank-up');
 			}
-            
+			
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
 		}
@@ -438,6 +440,10 @@ $(document).ready(function() {
 		
 		if (runsProblem != "") {
 			options.problem = runsProblem;
+		}
+		
+		if (runsLang != "") {
+			options.language = runsLang;
 		}
 		
 		omegaup.getContestRuns(contestAlias, options, runsChange); 
@@ -606,7 +612,7 @@ $(document).ready(function() {
 			var r = $('.clarifications tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 			$('.problem', r).html(clarification.problem_alias);
-                        $('.author', r).html(clarification.author);
+						$('.author', r).html(clarification.author);
 			$('.time', r).html(clarification.time);
 			$('.message', r).html(clarification.message);
 			$('.answer', r).html(clarification.answer);
@@ -617,10 +623,10 @@ $(document).ready(function() {
 
 			if (clarification.can_answer) {
 				(function(id, answer, answerNode) {
-				 	if (clarification.public == 1) {
+					if (clarification.public == 1) {
 						$('input[type="checkbox"]', answer).attr('checked', 'checked');
 					}
-				 	answer.submit(function () {
+					answer.submit(function () {
 						omegaup.updateClarification(
 							id,
 							$('textarea', answer).val(),
@@ -642,85 +648,85 @@ $(document).ready(function() {
 	}
 	
 	function createChart(series, navigatorSeries) {
-        if (series.length == 0) return;
+		if (series.length == 0) return;
 	
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'ranking-chart',
-                height: 300,
-                spacingTop: 20
-            },
+		window.chart = new Highcharts.StockChart({
+			chart: {
+				renderTo: 'ranking-chart',
+				height: 300,
+				spacingTop: 20
+			},
 
-            xAxis: {
-                ordinal: false,
-                min: startTime.getTime(),
-                max: Math.min(finishTime.getTime(), Date.now())
-            },
+			xAxis: {
+				ordinal: false,
+				min: startTime.getTime(),
+				max: Math.min(finishTime.getTime(), Date.now())
+			},
 
-            yAxis: {
-                showLastLabel: true,
-                showFirstLabel: false,
-                min: 0,
-                max: (function() {
-                    var total = 0;
-                    for (var prob in problems) {
-                        if (problems.hasOwnProperty(prob)) {
-                            total += parseInt(problems[prob].points, 10);
-                        }
-                    }
-                    return total;
-                })()
-            },
-            
-            plotOptions: {
-                series: {
-                    lineWidth: 3,
-                    states: {
-                        hover: {
-                            lineWidth: 3
-                        }
-                    },
-                    marker: {
-                        radius: 5,
-                        symbol: 'circle',
-                        lineWidth: 1
-                    }
-                }
-            },
+			yAxis: {
+				showLastLabel: true,
+				showFirstLabel: false,
+				min: 0,
+				max: (function() {
+					var total = 0;
+					for (var prob in problems) {
+						if (problems.hasOwnProperty(prob)) {
+							total += parseInt(problems[prob].points, 10);
+						}
+					}
+					return total;
+				})()
+			},
+			
+			plotOptions: {
+				series: {
+					lineWidth: 3,
+					states: {
+						hover: {
+							lineWidth: 3
+						}
+					},
+					marker: {
+						radius: 5,
+						symbol: 'circle',
+						lineWidth: 1
+					}
+				}
+			},
 
-            navigator: {
-                series: {
-                    type: 'line',
-                    step: true,
-                    lineWidth: 3,
-                    lineColor: '#333',
-                    data: navigatorSeries
-                }
-            },
+			navigator: {
+				series: {
+					type: 'line',
+					step: true,
+					lineWidth: 3,
+					lineColor: '#333',
+					data: navigatorSeries
+				}
+			},
 
-            rangeSelector: {
-                enabled: false
-            },
-            
-            series: series
-        });
-        
-        // set legend colors
-        for (var name in currentRanking) {
-            if (currentRanking.hasOwnProperty(name)) {
-                var r = $('#ranking tbody tr.inserted')[currentRanking[name]];
-                var color = (function () {
-                    for (var i = 0; i < window.chart.series.length; i++) {
-                        if (window.chart.series[i].name === name) {
-                            return window.chart.series[i].color;
-                        }
-                    }
-                })();
-                
-                $('.legend', r).css({
-                    'background-color': color || 'transparent'
-                });
-            }
-        }
-    }
+			rangeSelector: {
+				enabled: false
+			},
+			
+			series: series
+		});
+		
+		// set legend colors
+		for (var name in currentRanking) {
+			if (currentRanking.hasOwnProperty(name)) {
+				var r = $('#ranking tbody tr.inserted')[currentRanking[name]];
+				var color = (function () {
+					for (var i = 0; i < window.chart.series.length; i++) {
+						if (window.chart.series[i].name === name) {
+							return window.chart.series[i].color;
+						}
+					}
+				})();
+				
+				$('.legend', r).css({
+					'background-color': color || 'transparent'
+				});
+			}
+		}
+	}
 });
