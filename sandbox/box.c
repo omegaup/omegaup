@@ -715,6 +715,18 @@ get_syscall_args(pid_t pid, struct syscall_args *a, int is_exit)
   if (is_exit)
     return;
 
+  /*
+   * There is a bug with the gettimeofday syscall. Let's just pretend it
+   * was called without parameters.
+   */
+  if (a->sys == __NR_gettimeofday)
+    {
+      a->arg1 = 0;
+      a->arg2 = 0;
+      a->arg3 = 0;
+      return;
+    }
+
   int sys_type;
   uint16_t instr;
 
