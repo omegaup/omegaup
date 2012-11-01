@@ -127,16 +127,27 @@ class RunsDAO extends RunsDAOBase
 	public static final function GetAllRelevantUsers($contest_id, $showAllRuns = false, $filterUsersBy = null)
 	{
 		// Build SQL statement
-		$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( SELECT DISTINCT Runs.user_id from Runs WHERE ( Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) RunsContests ON Users.user_id = RunsContests.user_id ". (!is_null($filterUsersBy) ? "WHERE Users.username LIKE ?" : "");
+// Build SQL statement
+                if (!$showAllRuns)
+                {
+                    $sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( SELECT DISTINCT Runs.user_id from Runs WHERE ( Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) RunsContests ON Users.user_id = RunsContests.user_id ". (!is_null($filterUsersBy) ? "WHERE Users.username LIKE ?" : "");
 
-		if (is_null($filterUsersBy))
-		{
-			$val = array($contest_id);
-		}
-		else
-		{
-			$val = array($contest_id, $filterUsersBy . "%");
-		}
+                    if (is_null($filterUsersBy))
+                    {
+                            $val = array($contest_id);
+                    }
+                    else
+                    {
+                            $val = array($contest_id, $filterUsersBy . "%");
+                    }
+                }
+                else 
+                {
+                    $sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id WHERE contest_id = ?";
+                    $val = array($contest_id);
+                }
+
+
 
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
