@@ -167,7 +167,12 @@ object Runner extends RunnerService with Log with Using {
 				casesDirectory.listFiles.filter {_.getName.endsWith(".in")} .foreach { (x) => {
 					val caseName = runDirectory.getCanonicalPath + "/" + x.getName.substring(0, x.getName.lastIndexOf('.'))
 
-					val commonParams = List("-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", message.timeLimit.toString, "-w", (message.timeLimit + 60).toString, "-O", message.outputLimit.toString)
+					var timeLimit = message.timeLimit
+					if (lang == "java") {
+						timeLimit += 1
+					}
+
+					val commonParams = List("-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-w", (message.timeLimit + 60).toString, "-O", message.outputLimit.toString)
 				
 					val params = lang match {
 						case "java" =>
