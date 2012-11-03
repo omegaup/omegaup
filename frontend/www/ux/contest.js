@@ -26,16 +26,16 @@ $(document).ready(function() {
 		JE: "Judge Error" 
 	};
 	var colors = [
-        '#FB3F51',
-        '#FF5D40',
-        '#FFA240',
-        '#FFC740',
-        '#59EA3A',
-        '#37DD6F',
-        '#34D0BA',
-        '#3AAACF',
-        '#8144D6',
-        '#CD35D3',
+		'#FB3F51',
+		'#FF5D40',
+		'#FFA240',
+		'#FFC740',
+		'#59EA3A',
+		'#37DD6F',
+		'#34D0BA',
+		'#3AAACF',
+		'#8144D6',
+		'#CD35D3',
 	];
 	var rankChartLimit = 10;
 	var practice = window.location.pathname.indexOf('/practice/') !== -1;
@@ -127,8 +127,8 @@ $(document).ready(function() {
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
 
-        	$('#loading').fadeOut('slow');
-	        $('#root').fadeIn('slow');
+			$('#loading').fadeOut('slow');
+			$('#root').fadeIn('slow');
 	}
 	
 	omegaup.getContest(contestAlias, contestLoaded);
@@ -385,10 +385,10 @@ $(document).ready(function() {
 			$('#' + activeTab).show();
 			
 			if (activeTab == 'ranking') {
-		                if (currentEvents) {
-		                    rankingEvents(currentEvents);
-                		}
-            		} else if (activeTab == 'clarifications') {
+						if (currentEvents) {
+							rankingEvents(currentEvents);
+						}
+					} else if (activeTab == 'clarifications') {
 				$('#clarifications-count').css("font-weight", "normal");
 			}
 		}
@@ -404,40 +404,40 @@ $(document).ready(function() {
 		
 		// group points by person
 		for (var i = 0, l = data.events.length; i < l; i++) {
-		    var curr = data.events[i];
-		    
-		    // limit chart to top n users
-		    if (currentRanking[curr.username] > rankChartLimit - 1) continue;
-		    
-		    if (!dataInSeries[curr.name]) {
-                	dataInSeries[curr.name] = [[startTime.getTime(), 0]];
-	                usernames[curr.name] = curr.username;
-		    }
-		    dataInSeries[curr.name].push([
-                	startTime.getTime() + curr.delta*60*1000,
-        	        curr.total.points
-		    ]);
-		    
-		    // check if to add to navigator
-		    if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
-	                navigatorData.push([
-        	            startTime.getTime() + curr.delta*60*1000,
-                	    curr.total.points
-	                ]);
-		    }
+			var curr = data.events[i];
+			
+			// limit chart to top n users
+			if (currentRanking[curr.username] > rankChartLimit - 1) continue;
+			
+			if (!dataInSeries[curr.name]) {
+					dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+					usernames[curr.name] = curr.username;
+			}
+			dataInSeries[curr.name].push([
+					startTime.getTime() + curr.delta*60*1000,
+					curr.total.points
+			]);
+			
+			// check if to add to navigator
+			if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
+					navigatorData.push([
+						startTime.getTime() + curr.delta*60*1000,
+						curr.total.points
+					]);
+			}
 		}
 		
 		// convert datas to series
 		for (var i in dataInSeries) {
-		    if (dataInSeries.hasOwnProperty(i)) {
-                	dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
-                	series.push({
-	                    name: i,
-        	            rank: currentRanking[usernames[i]],
-                	    data: dataInSeries[i],
-	                    step: true
-        	        });
-		    }
+			if (dataInSeries.hasOwnProperty(i)) {
+					dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
+					series.push({
+						name: i,
+						rank: currentRanking[usernames[i]],
+						data: dataInSeries[i],
+						step: true
+					});
+			}
 		}
 		
 		series.sort(function (a, b) {
@@ -447,15 +447,15 @@ $(document).ready(function() {
 		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
 		
 		if (series.length > 0) {
-		    // chart it!
-		    createChart(series, navigatorData);
+			// chart it!
+			createChart(series, navigatorData);
 
-		    // now animated sort the ranking table!
-		    $("#ranking-table").sortTable({
+			// now animated sort the ranking table!
+			$("#ranking-table").sortTable({
 			onCol: 1,
 			keepRelationships: true,
 			sortType: 'numeric'
-		    });
+			});
 		}
 	}
 
@@ -468,19 +468,19 @@ $(document).ready(function() {
 		for (var i = 0; i < ranking.length; i++) {
 			var rank = ranking[i];
 			newRanking[rank.username] = i;
-            
-		 	// new user, just add row at the end
+			
+			// new user, just add row at the end
 			if (currentRanking[rank.username] === undefined) {
 				currentRanking[rank.username] = $('#ranking tbody tr.inserted').length;
 				$('#ranking tbody').append(
 					$('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
 				);
 			}
-            
+			
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
 			$('.position', r).html(i+1);
-			$('.user', r).html(rank.name + ' (' + rank.username + ')');
+			$('.user', r).html(rank.username + ' (' + rank.name + ')');
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;
@@ -492,22 +492,22 @@ $(document).ready(function() {
 					$('#problems .problem_' + alias + ' .solved').html("(" + rank.problems[alias].points + " / " + problems[alias].points + ")");
 				}
 			}
-            
+			
 			// if rank went up, add a class
 			if (parseInt($('.points', r).html()) < parseInt(rank.total.points)) {
 				r.addClass('rank-up');
 			}
-            
+			
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
-            
+			
 			// update miniranking
 			if (i < 10) {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 				$('.position', r).html(i+1);
-				var username = rank.name + ' (' + rank.username + ')';
-				$('.user', r).html('<span title="' + username + '">' + username + '</span>');
+				var username = rank.username + ' (' + rank.name + ')';
+				$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
 				$('.points', r).html(rank.total.points);
 				$('.penalty', r).html(rank.total.penalty);
 
@@ -576,11 +576,11 @@ $(document).ready(function() {
 			var r = $('.clarifications tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 			$('.problem', r).html(clarification.problem_alias);
-                        
-                        if (clarification.can_answer) {
-                            $('.author', r).html(clarification.author);
-                        }
-                        
+						
+						if (clarification.can_answer) {
+							$('.author', r).html(clarification.author);
+						}
+						
 			$('.time', r).html(clarification.time);
 			$('.message', r).html(clarification.message);
 			$('.answer', r).html(clarification.answer);
@@ -590,10 +590,10 @@ $(document).ready(function() {
 
 			if (clarification.can_answer) {
 				(function(id, answer, answerNode) {
-				 	if (clarification.public == 1) {
+					if (clarification.public == 1) {
 						$('input[type="checkbox"]', answer).attr('checked', 'checked');
 					}
-				 	answer.submit(function () {
+					answer.submit(function () {
 						omegaup.updateClarification(
 							id,
 							$('textarea', answer).val(),
@@ -619,79 +619,79 @@ $(document).ready(function() {
 	}
 	
 	function createChart(series, navigatorSeries) {
-        if (series.length == 0) return;
-        
-        Highcharts.setOptions({
-            colors: colors
-        });
+		if (series.length == 0) return;
+		
+		Highcharts.setOptions({
+			colors: colors
+		});
 	
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'ranking-chart',
-                height: 300,
-                spacingTop: 20
-            },
+		window.chart = new Highcharts.StockChart({
+			chart: {
+				renderTo: 'ranking-chart',
+				height: 300,
+				spacingTop: 20
+			},
 
-            xAxis: {
-                ordinal: false,
-                min: startTime.getTime(),
-                max: Math.min(finishTime.getTime(), Date.now())
-            },
+			xAxis: {
+				ordinal: false,
+				min: startTime.getTime(),
+				max: Math.min(finishTime.getTime(), Date.now())
+			},
 
-            yAxis: {
-                showLastLabel: true,
-                showFirstLabel: false,
-                min: 0,
-                max: (function() {
-                    var total = 0;
-                    for (var prob in problems) {
-                        if (problems.hasOwnProperty(prob)) {
-                            total += parseInt(problems[prob].points, 10);
-                        }
-                    }
-                    return total;
-                })()
-            },
-            
-            plotOptions: {
-                series: {
-                    lineWidth: 3,
-                    states: {
-                        hover: {
-                            lineWidth: 3
-                        }
-                    },
-                    marker: {
-                        radius: 5,
-                        symbol: 'circle',
-                        lineWidth: 1
-                    }
-                }
-            },
+			yAxis: {
+				showLastLabel: true,
+				showFirstLabel: false,
+				min: 0,
+				max: (function() {
+					var total = 0;
+					for (var prob in problems) {
+						if (problems.hasOwnProperty(prob)) {
+							total += parseInt(problems[prob].points, 10);
+						}
+					}
+					return total;
+				})()
+			},
+			
+			plotOptions: {
+				series: {
+					lineWidth: 3,
+					states: {
+						hover: {
+							lineWidth: 3
+						}
+					},
+					marker: {
+						radius: 5,
+						symbol: 'circle',
+						lineWidth: 1
+					}
+				}
+			},
 
-            navigator: {
-                series: {
-                    type: 'line',
-                    step: true,
-                    lineWidth: 3,
-                    lineColor: '#333',
-                    data: navigatorSeries
-                }
-            },
+			navigator: {
+				series: {
+					type: 'line',
+					step: true,
+					lineWidth: 3,
+					lineColor: '#333',
+					data: navigatorSeries
+				}
+			},
 
-            rangeSelector: {
-                enabled: false
-            },
-            
-            series: series
-        });
-        
-        // set legend colors
-        var rows = $('#ranking tbody tr.inserted');
-        for (var r = 0; r < rows.length; r++) {
-            $('.legend', rows[r]).css({
-                'background-color': r < rankChartLimit ? colors[r] : 'transparent'
-            });
-        }
-    }
+			rangeSelector: {
+				enabled: false
+			},
+			
+			series: series
+		});
+		
+		// set legend colors
+		var rows = $('#ranking tbody tr.inserted');
+		for (var r = 0; r < rows.length; r++) {
+			$('.legend', rows[r]).css({
+				'background-color': r < rankChartLimit ? colors[r] : 'transparent'
+			});
+		}
+	}
 });

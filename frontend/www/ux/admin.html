@@ -25,8 +25,6 @@
 				<div class="clock">0:00:00</div>
 			</div>
 			
-			
-			
 			<table class="runs">
 				<caption>
 					Envíos 
@@ -63,6 +61,21 @@
 						<label for="runsproblem">Problema: </label>
 						<select class="runsproblem" name="runsproblem">
 							<option value="">Todos</option>
+						</select>
+						
+						<label for="runslang">Lenguaje: </label>
+						<select class="runslang" name="runslang">
+							<option value="">Todos</option>
+							<option value="c">C</option>
+							<option value="cpp">C++</option>
+							<option value="java">Java</option>
+							<option value="py">Python</option>
+							<option value="rb">Ruby</option>
+							<option value="pl">Perl</option>
+							<option value="cs">C#</option>
+							<option value="p">Pascal</option>
+							<option value="kp">Karel (Pascal)</option>
+							<option value="kj">Karel (Java)</option>
 						</select>
 					</div>
 				</caption>
@@ -106,25 +119,25 @@
 					</tr>
 				</tbody>
 			</table>
-	                <div id="ranking-chart"></div>
-        	        <table id="ranking" style="display: block;">
-                	    <thead>
-	                        <tr>
-        	                    <th></th>
-                	            <th></th>
-                        	    <th>Usuario</th>
-	                            <th class="total" colspan="2">Total</th>
-        	                </tr>
-                	    </thead>
-	                    <tbody>
-        	                <tr class="template">
-                	            <td class="position"></td>
-                        	    <td class="legend"></td>
-	                            <td class="user"></td>
-        	                    <td class="points"></td>
-                	            <td class="penalty"></td>
-                        	</tr>
-	                    </tbody>
+			<div id="ranking-chart"></div>
+			<table id="ranking" style="display: block;">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Usuario</th>
+						<th class="total" colspan="2">Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="template">
+						<td class="position"></td>
+						<td class="legend"></td>
+						<td class="user"></td>
+						<td class="points"></td>
+						<td class="penalty"></td>
+					</tr>
+				</tbody>
 			</table>
 			<table class="clarifications">
 				<caption>
@@ -137,7 +150,7 @@
 				<thead>
 					<tr>
 						<th class="problem">Problema</th>
-                        <th class="author">Autor</th>
+						<th class="author">Autor</th>
 						<th class="time">Tiempo</th>
 						<th class="message">Mensaje</th>
 						<th class="answer">Respuesta</th>
@@ -151,7 +164,7 @@
 				<tbody class="clarification-list">
 					<tr class="template">
 						<td class="problem"></td>
-                                                <td class="author"></td>
+												<td class="author"></td>
 						<td class="time"></td>
 						<td class="message"></td>
 						<td class="answer"></td>
@@ -182,7 +195,7 @@
 				<input type="submit" />
 			</form>			
 			<form id="clarification" method="POST">
-		                <button class="close">&times;</button>
+				<button class="close">&times;</button>
 				Problema
 				<select name="problem">
 				</select><br/>
@@ -191,7 +204,7 @@
 			</form>
 			<form id="run-details">
 				<button class="close">&times;</button>
-
+				
 				<pre class="source"></pre>
 				<pre class="compile_error"></pre>
 				<div class="cases"></div>

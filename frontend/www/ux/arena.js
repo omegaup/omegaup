@@ -10,7 +10,7 @@ $(document).ready(function() {
 	
 	var omegaup = new OmegaUp();
 
-	omegaup.getContests(function(data) {
+	omegaup.getContests(function (data) {
 		var list = data.contests;
 		var current = $('#contest-list');
 		var past = $('#past-contests');
@@ -24,7 +24,8 @@ $(document).ready(function() {
 					'<td><a href="/arena/' + list[i].alias + '">' + list[i].title + '</a></td>' +
 					'<td>' + list[i].description + '</td>' +
 					'<td><a href="' + makeWorldClockLink(start) + '">' + start.format() + '</a></td>' +
-					'<td>' + end.format() + '</td>' + (end < now ? '<td><a href="/arena/' + list[i].alias + '/practice/">Práctica</a></td>' : '') + 
+					'<td>' + end.format() + '</td>' + 
+					(end < now ? '<td><a href="/arena/' + list[i].alias + '/practice/">Práctica</a></td>' : '') + 
 				'</tr>')
 			);
 		}

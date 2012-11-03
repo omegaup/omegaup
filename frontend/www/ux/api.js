@@ -322,7 +322,7 @@ OmegaUp.prototype.updateClarification = function(clarificationId, answer, public
 
 OmegaUp.prototype.UserEdit = function(username, name, email, birthDate, school, password, oldPassword, callback) {
 	var self = this,
-	    toSend = {};
+		toSend = {};
 
 	if(username !== null) toSend.username = username;
 	if(name !== null) toSend.name = name;
