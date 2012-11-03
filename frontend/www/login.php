@@ -13,7 +13,25 @@
       die(header("Location: " . $_SERVER["PHP_SELF"] . "?shva=1"));
     }
 
+/*
+    if ( isset( $_POST["request"] ) && ( $_POST["request"] == "register" ) )
+    {
 
+      $c_Users = new UsersController( );
+
+      if( !is_set( $_POST["name"] ) || !is_set( $_POST["email"] ) || !is_set( $_POST["pass"] ) )
+      {
+
+      }
+
+      $c_Users->Create( $_POST["name"], $_POST["email"], $_POST["pass"] );
+
+      //reload page
+      die(header("Location: " . $_SERVER["PHP_SELF"] . "?shva=1"));
+    }
+*/
+
+    
 
     if ( isset( $_GET["shva"] ) )
     {

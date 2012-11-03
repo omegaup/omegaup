@@ -67,7 +67,7 @@
         <h3 style=''>&iquest; No es asi ? Registrate, es facil y rapido !</h3>
         <div>
             <table width='100%'>
-            <form method='POST' action='nativeLogin.php?redirect=%2F'>
+            <form method='POST' action='login.php'>
                 <tr>
                     <td>
                          Nombre
@@ -107,6 +107,7 @@
                     <td>
                     </td>
                     <td align='right'>
+                        
                         <input value='Registrar' type='submit'>
                     </td>
                 </tr>

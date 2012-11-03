@@ -6,13 +6,15 @@
 
     // Load tess specific config globals
     require_once("test_config.php");
-    
+
+    define( "OMEGAUP_FRONTEND_SERVER_ROOT", "C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\server" );
+
     //set paths
     define( 'SERVER_PATH', OMEGAUP_FRONTEND_SERVER_ROOT .'/' );    
     ini_set( 'include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH );
 
     // Load log
-    require_once(OMEGAUP_FRONTEND_SERVER_ROOT."libs/logger/Logger.php");    
+    require_once(OMEGAUP_FRONTEND_SERVER_ROOT."/libs/logger/Logger.php");    
     
     // Load test utils
     require_once("Utils.php");

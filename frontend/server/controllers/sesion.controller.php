@@ -14,8 +14,11 @@ class SesionController extends Controller
 
     // Create our Application instance (replace this with your appId and secret).
     private static $_facebook;
-    
-    
+
+    /**
+      * @param string nombre Este es el nombre del dude
+      *
+      **/
     private static function getFacebookInstance( )
     {
         
