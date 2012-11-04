@@ -117,8 +117,6 @@ class NewProblemInContest extends ApiHandler
     
     protected function GenerateResponse() 
     {
-
-		
         // Populate a new Problem object
         $problem = new Problems();
         $problem->setPublic(RequestContext::get("public"));        
@@ -148,7 +146,6 @@ class NewProblemInContest extends ApiHandler
         
         $problem->setAuthorId($users[0]->getUserId());
         
-                
         // Insert new problem
         try
         {
