@@ -465,6 +465,10 @@ $(document).ready(function() {
 		var ranking = data.ranking;
 		var newRanking = {};
 
+		var place = 0;
+		var lastPoints = 1e99;
+		var lastPenalty = 0;
+
 		for (var i = 0; i < ranking.length; i++) {
 			var rank = ranking[i];
 			newRanking[rank.username] = i;
@@ -479,7 +483,6 @@ $(document).ready(function() {
 			
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
-			$('.position', r).html(i+1);
 			$('.user', r).html(rank.username + ' (' + rank.name + ')');
 
 			for (var alias in rank.problems) {
@@ -500,12 +503,19 @@ $(document).ready(function() {
 			
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
+
+			if (lastPoints != rank.total.points || lastPenalty != rank.total.penalty) {
+				lastPoints = rank.total.points;
+				lastPenalty = rank.total.penalty;
+				place = i + 1;
+			}
+			$('.position', r).html(place);
 			
 			// update miniranking
 			if (i < 10) {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
-				$('.position', r).html(i+1);
+				$('.position', r).html(place);
 				var username = rank.username + ' (' + rank.name + ')';
 				$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
 				$('.points', r).html(rank.total.points);

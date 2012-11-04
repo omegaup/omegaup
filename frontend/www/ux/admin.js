@@ -354,6 +354,9 @@ $(document).ready(function() {
 	function rankingChange(data) {
 		var ranking = data.ranking;
 		var newRanking = {};
+		var place = 0;
+		var lastScore = 1e99;
+		var lastPenalty = 0;
 
 		for (var i = 0; i < ranking.length; i++) {
 			var rank = ranking[i];
@@ -369,7 +372,6 @@ $(document).ready(function() {
 			
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.name]];
-			$('.position', r).html(i+1);
 			$('.user', r).html(rank.name);
 
 			for (var alias in rank.problems) {
@@ -383,7 +385,14 @@ $(document).ready(function() {
 			if (parseInt($('.points', r)) < parseInt(rank.total.points)) {
 				r.addClass('rank-up');
 			}
+
+			if (lastScore != rank.total.points || lastPenalty != rank.total.penalty) {
+				lastScore = rank.total.points;
+			       	lastPenalty = rank.total.penalty;
+				place = i + 1;
+			}
 			
+			$('.position', r).html(place);
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
 		}
