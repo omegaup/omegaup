@@ -29,7 +29,7 @@ class ProblemContentsZipValidator extends Validator
 			// Get list of files
 			for($i = 0; $i < $zip->numFiles; $i++)
 			{
-				Logger::log("Found ".$zip->getNameIndex($i));
+				Logger::log("Found '".$zip->getNameIndex($i)."'");
 				$zipFilesArray[] = $zip->getNameIndex($i);
 				$statI = $zip->statIndex($i);
 				$size += $statI['size'];
@@ -84,7 +84,7 @@ class ProblemContentsZipValidator extends Validator
 		$testplan_array = array();
 
 		// LOL RegEx magic to get test case names from testplan
-		preg_match_all('/^\\s*([^#]+?)\\s+(\\d+)\\s*$/m', $testplan, &$testplan_array);        
+		preg_match_all('/^\\s*([^#]+?)\\s+(\\d+)\\s*$/m', $testplan, $testplan_array);        
 
 		for($i = 0; $i < count($testplan_array[1]); $i++)
 		{                                                
@@ -114,14 +114,24 @@ class ProblemContentsZipValidator extends Validator
 		return true;        
 	}
 
+	private static function endsWith($haystack, $needle, $case) {
+		$expectedPosition = strlen($haystack) - strlen($needle);
+
+		$ans = false;
+
+		if($case)
+			return strrpos($haystack, $needle, 0) === $expectedPosition;
+		else
+			return strripos($haystack, $needle, 0) === $expectedPosition;
+	}
+
 	private function checkCases(ZipArchive $zip, array $zipFilesArray)
 	{
 		// Add all files in cases/ that end either in .in or .out        
 		for ($i = 0; $i < count($zipFilesArray); $i++)
 		{            
 			$path = $zipFilesArray[$i];                       
-			$l = strlen($path);
-			if (strpos($path, "cases/") == 0 && (strpos($path, ".in") == $l - 3 || strpos($path, ".out") == $l - 4))
+			if (strpos($path, "cases/") == 0 && (ProblemContentsZipValidator::endsWith($path, ".in", true)  || ProblemContentsZipValidator::endsWith($path, ".out", true)))
 			{
 				$this->filesToUnzip[] = $path;
 				$this->casesFiles[] = $path;
