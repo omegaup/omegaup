@@ -318,7 +318,9 @@ class Scoreboard
         {
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
-        
+       
+	$final_penalty = $extra_penalty + ( ((int)$bestRun->getContestScore() > 0) ? (int)round($bestRun->getSubmitDelay()) : 0) ;
+ 
         if ($withRunDetails && !is_null($bestRun))
         {
 	    $runDetails = array();
@@ -353,7 +355,7 @@ class Scoreboard
         {
             return array(
                 "points" => (int)round($bestRun->getContestScore()),
-                "penalty" => $extra_penalty + (int)$bestRun->getContestScore() > 0 ? (int)round($bestRun->getSubmitDelay()) : 0,
+                "penalty" => $final_penalty,
                 "wrong_runs_count" => $wrong_runs_count,
             );
         }
