@@ -319,6 +319,9 @@ class Scoreboard
             throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
         }
         
+        // Penalty should not be added if the best run was 0 pts
+        $penalty = $extra_penalty + (int)$bestRun->getContestScore() > 0 ? (int)round($bestRun->getSubmitDelay()) : 0;
+        
         if ($withRunDetails && !is_null($bestRun))
         {
 	    $runDetails = array();
@@ -345,7 +348,7 @@ class Scoreboard
             }
             return array(
                 "points" => (int)round($bestRun->getContestScore()),
-                "penalty" => $extra_penalty + (int)round($bestRun->getSubmitDelay()),
+                "penalty" => $penalty,
                 "run_details" => $runDetails
             );
         }        
@@ -353,7 +356,7 @@ class Scoreboard
         {
             return array(
                 "points" => (int)round($bestRun->getContestScore()),
-                "penalty" => $extra_penalty + (int)$bestRun->getContestScore() > 0 ? (int)round($bestRun->getSubmitDelay()) : 0,
+                "penalty" => $penalty,
                 "wrong_runs_count" => $wrong_runs_count,
             );
         }
