@@ -33,6 +33,11 @@ class ProblemContentsZipValidator extends Validator
 				$zipFilesArray[] = $zip->getNameIndex($i);
 				$statI = $zip->statIndex($i);
 				$size += $statI['size'];
+
+				if (stripos($zip->getNameIndex($i), 'validator.') === 0) {
+					$this->filesToUnzip[] = $zip->getNameIndex($i);
+					Logger::log("Validator found: " . $zip->getNameIndex($i));
+				}
 			}
 
 			if ($size > $maximumSize)
