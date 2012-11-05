@@ -187,7 +187,8 @@ try{
 
     if( $b_isExplorer )
     {
-        $smarty->assign( 'msg', 'API_EXECTUTED' );
+        $smarty->assign( 'msg', 'API_EXECUTED' );
+        $smarty->assign( 'API_RESULT', json_encode( $result ) );
         $smarty->display( '../templates/api.tpl' );
     }
     else

@@ -33,6 +33,13 @@
                         here be the controllers
                     {/if}
 
+                    {if $msg eq 'API_EXECUTED'}
+                    <code>
+                        {$API_RESULT}
+                    </code>
+                    {/if}
+                    
+
                 </div>
             </div>
         </td>

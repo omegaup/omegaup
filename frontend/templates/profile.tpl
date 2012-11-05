@@ -5,7 +5,7 @@
     <tr>
         <td>
             <div class="post footer" style="width: 130px; min-height: 300px;">
-
+                <img src="https://secure.gravatar.com/avatar/<?php echo md5($this->user->getUsername()); ?>?s=128">
             </div>
         </td>
 
