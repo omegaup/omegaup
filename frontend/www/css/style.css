@@ -50,9 +50,8 @@ div.post {
     border-radius: 4px;
     position: relative;
     top: -31px;
-	padding-bottom :15px; 
-
 }
+
 div.post a {
     color: #8bb0d3;
     text-decoration: none;
@@ -85,7 +84,9 @@ div.title {
 }
 div.title a { color: #555 }
 div.title a:hover { color: #8bb0d3 }
-div.copy { padding: 16px 50px 0 }
+
+div.copy { padding: 16px 20px 0 }
+
 div.copy h3 {
     font-size: 16px;
     line-height: 18px;
@@ -120,12 +121,10 @@ div.copy img {
 }
 div.copy code {
     font-family: monospace;
-    font-size: 11px;
 }
 pre.code{
     font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
     margin-bottom: 10px;
-
     display: block;
     margin: 0 -50px 18px;
     padding: 28px 50px;
@@ -138,15 +137,15 @@ pre.code{
 }
 div.footer {
     color: #aaa;
-    font-size: 13px;
 }
+
 div.footer div.date { padding: 1px 50px 45px }
 div.footer div.notes { display: none }
 div.post.footer {
     background: #f3f6f9;
-    font-size: 12px;
+    
     -webkit-text-stroke: 1px transparent;
-	padding-bottom :0px; 
+	
 }
 div.post.footer a {
     color: #7497af;

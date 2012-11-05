@@ -52,6 +52,21 @@ class Controller
 
 
 
+class Validators
+{
+    public static function isValidEmail( $s_Email = null )
+    {
+        if( is_null( $s_Email ) )
+        {
+            return false;
+        }
+
+        return filter_var( $s_Email, FILTER_VALIDATE_EMAIL );
+    }
+
+}
+
+
 
 class UserController extends Controller
 {
@@ -69,6 +84,7 @@ class UserController extends Controller
         }
 
         ASSERT( sizeof( $result ) == 1 );
+
         return UsersDAO::getByPK( $result[0]->getUserId( ) );
     }
 
@@ -106,11 +122,26 @@ class UserController extends Controller
     public function Create( $s_Email, $s_Username = null, $s_PlainPassword = null )
     {
 
+        if( is_null( $s_Email ) )
+        {
+            throw new ApiException( "Must provide email" );
+        }
+
+        if( !Validators::isValidEmail( $s_Email ) )
+        {
+            throw new ApiException( "Invalid Email" );
+        }
+
+        if( is_null( $this->FindByEmail( $s_Email ) ) )
+        {
+            //Email already exists
+            throw new ApiException( "Email alrady exists." );
+        }
+
         //create user
         $vo_User  = new Users( );
         $vo_User->setSolved( 0 );
         $vo_User->setSubmissions( 0 );
-
 
         if ( is_null( $s_Username ) )
         {
@@ -134,7 +165,7 @@ class UserController extends Controller
 
         DAO::transBegin( );
 
-        //create email
+        // Create email
         $vo_Email = new Emails( );
         $vo_Email ->setUserId( $vo_User->getUserId( ) );
         $vo_Email ->setEmail( $s_Email );
@@ -150,7 +181,7 @@ class UserController extends Controller
         catch( Exception $e )
         {
             DAO::transRollback( );
-            throw new Exception( "" ); //@todo dafuqqqq
+            throw new ApiException( "DB_ERROR", $e );
         }
 
 

@@ -4,36 +4,199 @@ require_once( "../../server/bootstrap.php" );
 
 
 
-var_dump($_GET);
+$b_isExplorer = $_GET["_explorer_"];
+$s_ApiAsUrl = $_GET["_api_"];
+
+$a_Args = explode( "/", $s_ApiAsUrl );
+$c_Controller = NULL;
+$s_ControllerName = ucfirst( $a_Args[ 0 ] ) . "Controller";
 
 
-//get the controller
-$i = strpos( $_GET["_api_"], "/" );
 
-$s_ControllerName = substr( $_GET["_api_"], 0, $i ) . "Controller";
-
-if( class_exists ( $s_ControllerName ) === true )
+// Just to double check that we are
+// only instatiate a controller.
+switch( $s_ControllerName )
 {
-    $c_Controller = new $s_ControllerName;
+    case "SesionController":
+    case "UserController":
+        $c_Controller = new $s_ControllerName;
+    break;
+}
 
-    var_dump($c_Controller::$metadata);
 
-    $a_Methods = get_class_methods( $c_Controller );
-
-    echo "<h2>Api Explorer</h2>";
-
-    for ($i=0; $i < sizeof( $a_Methods ); $i++)
+// No controller given
+if ( is_null( $c_Controller ) )
+{
+    if ( $b_isExplorer )
     {
-        echo "public " .  $a_Methods[ $i ] . " ( ); <br>";
+        $smarty->assign( 'msg', 'API_NO_CONTROLLER' );
+        $smarty->display( '../templates/api.tpl' );
+        exit;
+
+    }else{
+        //show404();
+        die("404");
     }
-
-
-
-    $foo = "CurrentSesionAvailable";
-
-    var_dump( $c_Controller->$foo( ) );
 }
 
 
 
-die();
+// No method
+if( sizeof( $a_Args ) == 1 )
+{
+    // no method given
+    if ( $b_isExplorer )
+    {
+        
+        $a_Methods = get_class_methods( $c_Controller );
+        $smarty->assing( "METHODS", array( $a_Methods ) );
+
+        $smarty->assign( "msg", "API_NO_METHOD" );
+        $smarty->display( "../templates/api.tpl" );
+        exit;
+    }
+    else
+    {
+        //show404();
+        die("404");
+
+    }
+}
+
+
+$s_Method = $a_Args[ 1 ];
+
+
+
+// Empty method
+if( strlen( $s_Method ) == 0 )
+{
+    // no method given
+    if ( $b_isExplorer )
+    {
+        $r_Controller = new ReflectionClass( $c_Controller );
+
+        $a_Methods = array();
+        $ar_Methods = $r_Controller->getMethods( );
+
+        $smarty->assign( "METHODS", $ar_Methods );
+
+        $smarty->assign( 'msg', 'API_NO_METHOD' );
+        $smarty->display( '../templates/api.tpl' );
+        exit;
+    }
+    else
+    {
+        //show404();
+        die("404");
+
+    }
+}
+
+
+
+
+try
+{
+    $r_Method = new ReflectionMethod( $s_ControllerName, $s_Method );
+}
+catch( ReflectionException $refEx )
+{
+    if ( $b_isExplorer )
+    {
+        $smarty->assign( 'msg', 'API_NOT_A_METHOD' );
+        $smarty->display( '../templates/api.tpl' );
+        exit;
+    }
+    else
+    {
+        //show404();
+        die("404");
+    }
+}
+
+
+
+if( ! $r_Method->isPublic( ) )
+{
+    if ( $b_isExplorer )
+    {
+        $smarty->assign( 'msg', 'API_NOT_A_METHOD' );
+        $smarty->display( '../templates/api.tpl' );
+        exit;
+    }
+    else
+    {
+        //show404();
+        die("404");
+    }
+}
+
+
+
+if( $r_Method->getNumberOfRequiredParameters( ) > ( sizeof( $a_Args ) - 2 ) )
+{
+    if ( $b_isExplorer )
+    {
+        $smarty->assign( 'msg', 'API_MISSING_PARAMS' );
+        $smarty->display( '../templates/api.tpl' );
+        exit;
+    }
+    else
+    {
+        //show404();
+        die("404");
+    }
+}
+
+//shift controller name and methods name
+array_shift( $a_Args );
+array_shift( $a_Args );
+
+
+try{
+
+    $result = call_user_func_array( array($c_Controller, $s_Method ), $a_Args );
+
+    if( $b_isExplorer )
+    {
+        $smarty->assign( 'msg', 'API_EXECTUTED' );
+        $smarty->display( '../templates/api.tpl' );
+    }
+    else
+    {
+        echo json_encode( $result );
+    }
+
+}catch( ApiException $apiException ){
+
+    Logger::ApiException( $apiException );
+
+    if( $b_isExplorer )
+    {
+        $smarty->assign( 'msg', 'API_FAILED_GRACEFULY' );
+        $smarty->display( '../templates/api.tpl' );
+    }
+    else
+    {
+        echo json_encode( array( "error" => true, "reason" => $apiException->getApiMessage( ) ) );
+    }
+
+}catch( Exception $e ){
+
+    Logger::Exception( $e );
+
+    if( $b_isExplorer )
+    {
+        $smarty->assign( 'msg', 'API_ERROR' );
+        $smarty->display( '../templates/api.tpl' );
+    }
+    else
+    {
+        echo json_encode( array( "error" => true, "reason" => "GENERIC_ERROR_REASON" ) );
+    }
+}
+
+
+
+

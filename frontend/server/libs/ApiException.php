@@ -13,18 +13,18 @@ class ApiException extends Exception
     protected $arrayMsg;
     protected $wrappedException;
     
-    function __construct(array $arrayMsg, Exception $e = NULL) 
+    function __construct( $arrayMsg, Exception $e = NULL) 
     {
         $this->wrappedException = $e;
         $this->arrayMsg = $arrayMsg;
     }
     
-    public function getArrayMessage()
+    public function getApiMessage( )
     {
         return $this->arrayMsg;
     }
     
-    public function getWrappedException()
+    public function getWrappedException( )
     {
         return $this->wrappedException;
     }

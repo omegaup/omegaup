@@ -51,16 +51,8 @@ require_once("libs/SessionManager.php");
   * Load controllers
   *
   **/
-
-
 require_once("controllers/users.controller.php");
 require_once("controllers/sesion.controller.php");
-
-
-
-
-
-
 
 require_once("libs/adodb5/adodb.inc.php");
 require_once("libs/adodb5/adodb-exceptions.inc.php");
