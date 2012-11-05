@@ -21,7 +21,6 @@ html {
 }
 strong {
     font-weight: bold;
-    background: #fffee6;
 }
 em { font-style: italic }
 div#title {
@@ -85,7 +84,7 @@ div.title {
 div.title a { color: #555 }
 div.title a:hover { color: #8bb0d3 }
 
-div.copy { padding: 16px 20px 0 }
+div.copy { padding: 15px 20px 20px; }
 
 div.copy h3 {
     font-size: 16px;
@@ -114,7 +113,7 @@ div.copy img {
     background: #fff;
     padding: 10px;
     zborder: 1px solid #eee;
-    margin: 15px 0 20px -10px;
+    margin: -10px 0 0px -10px;
     -webkit-box-shadow: -1px 1px 3px rgba(0,0,0,0.2);
     -webkit-border-radius: 2px;
     /*-webkit-transform: rotate(1deg);*/
@@ -414,4 +413,123 @@ table.sample_io {
     box-shadow: 2px 2px 4px #DDD;
     -moz-box-shadow: 2px 2px 4px #ddd;
     -webkit-box-shadow: 2px 2px 4px #DDD;
+}
+
+
+
+
+.fbSettingsList {
+
+border-top: 1px solid #AAA;
+}
+ul {
+list-style-type: none;
+margin: 0;
+padding: 0;
+}
+.clearfix::after {
+clear: both;
+content: ".";
+display: block;
+font-size: 0;
+height: 0;
+line-height: 0;
+visibility: hidden;
+}
+
+ul {
+list-style-type: none;
+}
+
+.fbSettingsList .fbSettingsListItemLabel {
+color: #333;
+float: left;
+width: 165px;
+}
+
+.fbSettingsList .fbSettingsListItemSaved, .fbSettingsList .fbSettingsListItemEdit {
+color: #3B5998;
+float: right;
+padding-left: 25px;
+padding-right: 5px;
+text-align: right;
+}
+
+._4ks > li {
+border-color: #E9E9E9;
+border-style: solid;
+border-width: 1px 0 0 0;
+}
+
+.uiListItem {
+display: block;
+}
+
+.fcg {
+color: gray;
+}
+.clearfix {
+zoom: 1;
+}
+
+.uiIconText {
+display: inline-block;
+padding-left: 21px;
+position: relative;
+}
+
+.fbSettingsList .fbSettingsListItemEdit {
+color: #3B5998;
+float: right;
+padding-left: 25px;
+padding-right: 5px;
+text-align: right;
+}
+
+#facebook .hidden_elem {
+display: none !important;
+}
+
+.fbSettingsList .fbSettingsListItemSaved {
+color: #777;
+}
+
+.clearfix::after {
+clear: both;
+content: ".";
+display: block;
+font-size: 0;
+height: 0;
+line-height: 0;
+visibility: hidden;
+}
+._4kg._6-h > li:first-child {
+padding-top: 0;
+}
+
+.uiListItem:first-child {
+border-width: 0;
+}
+.fbSettingsList a.fbSettingsListLink {
+background: transparent;
+display: block;
+text-decoration: none;
+}
+
+
+
+.pvm {
+padding-top: 10px;
+padding-bottom: 10px;
+}
+.phs {
+padding-left: 5px;
+padding-right: 5px;
+}
+
+
+
+
+ul {
+list-style-type: none;
 }

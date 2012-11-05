@@ -83,14 +83,14 @@ class SesionController extends Controller
         }
 
         //get email via his id
-        $s_MainEmail = "alkadjflkajd@laksfjald.net";
+        $vo_Email = EmailsDAO::getByPK( $vo_CurrentUser->getMainEmailId( ) );
 
         return array(
                 'valid' => true,
                 'id' => $vo_CurrentUser->getUserId( ),
                 'name' => $vo_CurrentUser->getName( ),
-                'email' => $s_MainEmail,
-                'username' => NULL,
+                'email' => $vo_Email->getEmail( ),
+                'username' => $vo_CurrentUser->getUsername( ),
                 'auth_token' => $s_AuthToken
             );
 

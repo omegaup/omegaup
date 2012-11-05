@@ -95,7 +95,10 @@ if( /* do we need smarty to load? */ true)
 
         $a_CurrentSesion = $c_Sesion->CurrentSesion( );
 
-        $smarty->assign( 'USERNAME', $a_CurrentSesion["username"] );
+        $smarty->assign( 'CURRENT_USER_USERNAME', $a_CurrentSesion["username"] );
+        $smarty->assign( 'CURRENT_USER_EMAIL', $a_CurrentSesion["email"] );
+        $smarty->assign( 'CURRENT_USER_GRAVATAR_URL_128', "<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=92'>" );
+        $smarty->assign( 'CURRENT_USER_GRAVATAR_URL_16', "<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=16'>" );
     }
 
 }
