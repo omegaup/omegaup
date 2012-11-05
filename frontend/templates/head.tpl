@@ -11,7 +11,7 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
         <script type="text/javascript" src="/js/omegaup.js"></script>
         <script type="text/javascript" src="/js/jquery.msgBox.js"></script>
-        <title>OmegaUp | Elevando el nivel de programacion</title>
+        <title>OmegaUp | {#pageTitle#}</title>
         <link rel="stylesheet" type="text/css" href="/css/style.css">
         <link rel="stylesheet" type="text/css" href="/css/msgBoxLight.css">
         
@@ -22,9 +22,9 @@
 
     <div class="login_bar" style="display: block">
         {if $LOGGED_IN eq '1'} 
-            Hola user <b><a href='/logout.php'>Cerrar sesion</a> !</b>
+            Hola user <b><a href='/logout.php'>{#logOut#}</a> !</b>
         {else}
-             OmegaUp ! <b><a href='/login.php'>Inicia sesion</a> !</b>
+             OmegaUp ! <b><a href='/login.php'>{#logIn#}</a> !</b>
         {/if}
     </div>
 
@@ -40,14 +40,12 @@
     <div id="content">
         <div class="post footer">
             <ul>
-                <li><a href='/contests.php'>Concursos</a></li>
-                <li><a href='/probs.php'>Problemas</a></li>
-                <li><a href='/rank.php'>Ranking</a></li>
-                <li><a href='/recent.php'>Actividad reciente</a></li>
-                <li><a href='/api/explorer/'>API</a></li>
-                <!-- <li><a href='schools.php'>Escuelas</a></li> -->
-                <li><a href='help.php'>Colabora</a></li>
-                <!-- <li><input type='text' placeholder='Buscar'></li> -->
+                <li><a href='/contests.php'>{#frontPageContests#}</a></li>
+                <li><a href='/probs.php'>{#frontPageProblems#}</a></li>
+                <li><a href='/rank.php'>{#frontPageRanking#}</a></li>
+                <li><a href='/recent.php'>{#frontPageRecent#}</a></li>
+                <li><a href='/api/explorer/'>{#frontPageDevelopers#}</a></li>
+                <li><a href='help.php'>{#frontPageHelp#}</a></li>
             </ul>
         </div>
 

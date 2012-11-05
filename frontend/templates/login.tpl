@@ -1,5 +1,16 @@
-{include file='head.tpl'}
+{if $LOGGED_IN eq '1'} 
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+    <html>
+    <head>
+    <title>Omegaup</title>
+    <meta http-equiv="REFRESH" content="0;url=/profile.php"></HEAD>
+        <BODY>
+            Redirectioning you.
+        </BODY>
+    </HTML>
+{/if}
 
+{include file='head.tpl'}
 
 <div class="post">
     <div class="copy">
@@ -108,7 +119,7 @@
                     </td>
                     <td align='right'>
                         
-    <input value='Registrar' type='button' onClick="omega.CreateUser( $('#reg_email').val(), $('#reg_username').val(), $('#reg_pass').val() )">
+    <input value='Registrar' type='button' onClick="omega.CreateUser( $('#reg_email').val(), $('#reg_username').val(), $('#reg_pass').val(), function(){ window.location = '/profile.php'; } )">
                     </td>
                 </tr>
             </form>

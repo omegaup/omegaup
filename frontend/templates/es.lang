@@ -4,7 +4,12 @@
 pageTitle = "Bienvenido a Omegaup"
 loginToOmegaup = "&#161; Inicia sesion en Omegaup !"
 
+logIn = "Inicia sesion"
+logOut = "Cerrar Sesion"
 
-
-
-
+frontPageContests = "Concursos"
+frontPageProblems = "Problemas"
+frontPageRanking = "Rank"
+frontPageRecent = "Actividad Reciente"
+frontPageDevelopers = "Desarrolladores"
+frontPageHelp = "Ayuda"

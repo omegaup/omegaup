@@ -159,7 +159,6 @@ class UserController extends Controller
             $vo_User->setUsername( $s_Username );
         }
 
-
         if ( is_null( $s_PlainPassword ) )
         {
             $vo_User->setPassword( NULL );

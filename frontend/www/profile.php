@@ -1,5 +1,13 @@
 <?php
 
+    require_once( "../server/bootstrap.php" );
+
+
+
+    $smarty->display( '../templates/profile.tpl' );
+
+
+    die;
 	   /*
 		* LEVEL_NEEDED defines the users who can see this page.
 		* Anyone without permission to see this page, will	
