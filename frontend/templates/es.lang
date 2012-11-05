@@ -13,3 +13,6 @@ frontPageRanking = "Rank"
 frontPageRecent = "Actividad Reciente"
 frontPageDevelopers = "Desarrolladores"
 frontPageHelp = "Ayuda"
+
+frontPageQuestions = "Preguntas"
+frontPageBlog = "Blog"

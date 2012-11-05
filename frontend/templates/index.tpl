@@ -4,11 +4,48 @@
 
 
 
-<div class="post" >
-    <div class="copy" >
-        <div id="rss_content">Loading...</div>
-    </div>
+<div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
+    <table>
+    <tr>
+        <td>
+            <div class="post footer" style="width: 560px; min-height: 300px;">
+                <div class="copy">
+
+                    <h1>Bienvenido a OmegaUP</h1>
+                    <p>
+                        asdlkfjasldk fj;laskd jf;lasj flaj
+                        asdlkfj asdlkfj aslkdfj askldfj alksjd f
+                        asjdfkl jasfklj asdlkfj as
+                        fjasl kfas
+                        lk fjaklsd jflkajdfkljasklfj asklfj 
+                        adf lasjdf klasjdflkasjd f 89awje fklas 
+                        s</p>
+
+
+                </div>
+                
+            </div>
+        </td>
+        <td >
+            <div class="post footer" style="width: 330px; min-height: 300px;">
+                <div class="copy" >
+
+
+
+                <div id="rss_content">Loading...</div>
+
+                </div>
+            </div>
+        </td>
+    </tr>
+    </table>
 </div>
+
+
+
+
+
+
 
 
 
@@ -30,10 +67,10 @@
             {
                 var entry = result.feed.entries[i];
                 
-document.createElement("a")
+
                 var div = document.createElement("div");
                 div.appendChild(document.createTextNode( entry.title ));
-                div.appendChild(document.createTextNode( entry.link ));
+                //div.appendChild(document.createTextNode( entry.link ));
                 div.appendChild(document.createTextNode( entry.publishedDate ));
                 div.appendChild(document.createTextNode( entry.contentSnippet ));
 

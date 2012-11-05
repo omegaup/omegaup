@@ -129,9 +129,9 @@ div.copy code a{
     color: #27455A;
 }
 
-div.footer {
+/*div.footer {
     color: #aaa;
-}
+}*/
 
 div.footer div.date { padding: 1px 50px 45px }
 div.footer div.notes { display: none }
@@ -159,10 +159,11 @@ div.post.footer li.first {
     border: 0;
 }
 div.post.footer p {
-    position: absolute;
+/*    position: absolute;
     right: 0;
     top: 0;
-    padding: 19px 15px 0 0;
+    padding: 19px 15px 0 0;*/
+    color:black;
 }
 div.post.footer p a { color: #bbc6ce }
 div.post.footer p a:hover { color: #7497af }

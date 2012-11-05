@@ -78,7 +78,8 @@ class SesionController extends Controller
                     'name' => NULL,
                     'username' => NULL,
                     'email' => NULL,
-                    'auth_token' => NULL
+                    'auth_token' => NULL,
+                    'is_admin' => false
                 );
         }
 
@@ -91,7 +92,8 @@ class SesionController extends Controller
                 'name' => $vo_CurrentUser->getName( ),
                 'email' => $vo_Email->getEmail( ),
                 'username' => $vo_CurrentUser->getUsername( ),
-                'auth_token' => $s_AuthToken
+                'auth_token' => $s_AuthToken,
+                'is_admin' => true// $vo_CurrentUser->isAdmin( )
             );
 
     }
