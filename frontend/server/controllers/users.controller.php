@@ -78,7 +78,7 @@ class UserController extends Controller
         $email_query->setEmail( $email );
         $result = EmailsDAO::search( $email_query );
         
-        if( sizeof( $result ) == 0)
+        if( sizeof( $result ) == 0 )
         {
             return NULL;
         }
@@ -132,10 +132,16 @@ class UserController extends Controller
             throw new ApiException( "Invalid Email" );
         }
 
-        if( is_null( $this->FindByEmail( $s_Email ) ) )
+        if( !is_null( $this->FindByEmail( $s_Email ) ) )
         {
             //Email already exists
-            throw new ApiException( "Email alrady exists." );
+            throw new ApiException( "Email already exists." );
+        }
+
+        if( !is_null( $this->FindByUsername( $s_Username ) ) )
+        {
+            //Email already exists
+            throw new ApiException( "Username already exists." );
         }
 
         //create user
@@ -167,7 +173,7 @@ class UserController extends Controller
 
         // Create email
         $vo_Email = new Emails( );
-        $vo_Email ->setUserId( $vo_User->getUserId( ) );
+
         $vo_Email ->setEmail( $s_Email );
 
         try
@@ -177,6 +183,10 @@ class UserController extends Controller
             $vo_User->setMainEmailId( $vo_Email->getEmailId( ) );
 
             UsersDAO::save( $vo_User );
+
+            $vo_Email ->setUserId( $vo_User->getUserId( ) );
+
+            EmailsDAO::save( $vo_Email );
         }
         catch( Exception $e )
         {
@@ -187,7 +197,7 @@ class UserController extends Controller
 
         DAO::transEnd( );
 
-        return $vo_User;
+        return $vo_User->asArray( );
 
     }
 

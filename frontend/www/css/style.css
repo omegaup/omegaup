@@ -10,7 +10,7 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input
 body{
 	font-family: "lucida grande",tahoma,verdana,arial,sans-serif;
 	-webkit-font-smoothing: antialiased;
-	
+	font-size:13px;
 }
 
 html {
@@ -120,21 +120,16 @@ div.copy img {
     /*-webkit-transform: rotate(1deg);*/
 }
 div.copy code {
-    font-family: monospace;
-}
-pre.code{
     font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
-    margin-bottom: 10px;
     display: block;
-    margin: 0 -50px 18px;
-    padding: 28px 50px;
-    /*background: #fcfcf5;
-    border-top: 1px solid #f3f3e3;
-    border-bottom: 1px solid #f3f3e3;
-    color: #777;
-    */
-    
+
 }
+
+div.copy code a{
+    font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+    color: #27455A;
+}
+
 div.footer {
     color: #aaa;
 }

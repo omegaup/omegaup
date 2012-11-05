@@ -6,16 +6,20 @@
 <!-- @see this later for localization http://www.smarty.net/docs/en/language.function.config.load.tpl -->
 
 <html xmlns="http://www.w3.org/1999/xhtml " xmlns:fb="http://www.facebook.com/2008/fbml ">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-<title>OmegaUp | Elevando el nivel de programacion</title>
-<link rel="stylesheet" type="text/css" href="/css/style.css">
-</head>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+        <script type="text/javascript" src="/js/omegaup.js"></script>
+        <script type="text/javascript" src="/js/jquery.msgBox.js"></script>
+        <title>OmegaUp | Elevando el nivel de programacion</title>
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <link rel="stylesheet" type="text/css" href="/css/msgBoxLight.css">
+        
+    </head>
 <body>
+
 <div id="wrapper">
 
-    
     <div class="login_bar" style="display: block">
         {if $LOGGED_IN eq '1'} 
             Hola user <b><a href='/logout.php'>Cerrar sesion</a> !</b>

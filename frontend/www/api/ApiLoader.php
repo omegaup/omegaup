@@ -13,6 +13,7 @@ $s_ControllerName = ucfirst( $a_Args[ 0 ] ) . "Controller";
 
 
 
+
 // Just to double check that we are
 // only instatiate a controller.
 switch( $s_ControllerName )
@@ -20,6 +21,7 @@ switch( $s_ControllerName )
     case "SesionController":
     case "UserController":
         $c_Controller = new $s_ControllerName;
+        $smarty->assign( 'CONTROLLER_NAME', ucfirst( $a_Args[ 0 ] ) );
     break;
 }
 
@@ -77,11 +79,36 @@ if( strlen( $s_Method ) == 0 )
         $r_Controller = new ReflectionClass( $c_Controller );
 
         $a_Methods = array();
+
         $ar_Methods = $r_Controller->getMethods( );
 
-        $smarty->assign( "METHODS", $ar_Methods );
+        foreach ($ar_Methods as $method )
+        {
+            $s_Params = "";
+
+            foreach( $method->getParameters( ) as $param )
+            {
+
+                if( $param ->isOptional( ) )
+                {
+                    $s_Params .= $param ->getName( );
+                }else{
+                    $s_Params .= "<b>" . $param ->getName( ) . "</b>";
+                }
+
+                $s_Params .= "/";
+            }
+
+            array_push( $a_Methods, array( 
+                    "name" => $method->getName( ),
+                    "params" => $s_Params
+                ) );
+        }
+
+        $smarty->assign( "METHODS", $a_Methods );
 
         $smarty->assign( 'msg', 'API_NO_METHOD' );
+
         $smarty->display( '../templates/api.tpl' );
         exit;
     }
@@ -165,6 +192,7 @@ try{
     }
     else
     {
+        $result["status"] = "ok";
         echo json_encode( $result );
     }
 
@@ -179,7 +207,7 @@ try{
     }
     else
     {
-        echo json_encode( array( "error" => true, "reason" => $apiException->getApiMessage( ) ) );
+        echo json_encode( array( "status" => "error", "reason" => $apiException->getApiMessage( ) ) );
     }
 
 }catch( Exception $e ){
@@ -193,7 +221,7 @@ try{
     }
     else
     {
-        echo json_encode( array( "error" => true, "reason" => "GENERIC_ERROR_REASON" ) );
+        echo json_encode( array( "status" => "error", "reason" => "GENERIC_ERROR_REASON" ) );
     }
 }
 

@@ -6,7 +6,7 @@
         <td>
             <div class="post footer" style="width: 130px; min-height: 300px;">
                 <div class="copy" >
-                <a href='/api/explorer/sesion/'>Sesion</a>
+                <a href='/api/explorer/sesion/'>Sesion</a><br>
                 <a href='/api/explorer/user/'>User</a>
             </div>
             </div>
@@ -22,7 +22,8 @@
 
                             {foreach from=$METHODS item=CMETHOD}
                             <tr>
-                                <td></td><td>{$CMETHOD}</td><td>()</td>
+                                <!--<td>api/controoler/</td><td>{$CMETHOD.name}</td><td>( {$CMETHOD.params} )</td>-->
+                                <td><code><a href="{$CMETHOD.name}/">omegaup.com/api/{$CONTROLLER_NAME}/{$CMETHOD.name}/{$CMETHOD.params}</a></code></td>
                             </tr>
                             {/foreach}
                         </table>

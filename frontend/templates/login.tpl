@@ -70,16 +70,16 @@
             <form method='POST' action='login.php'>
                 <tr>
                     <td>
-                         Nombre
+                         username
                     </td>
                     <td>
-                        <input id='name' name='name' value='' type='input'>
+                        <input id='reg_username' name='username' value='' type='input'>
                     </td>
                     <td>
                          Email
                     </td>
                     <td>
-                        <input id='email' name='email' value='' type='input'>
+                        <input id='reg_email' name='email' value='' type='input'>
                     </td>
                 </tr>
                 <tr>
@@ -87,13 +87,13 @@
                          Contrase&ntilde;a
                     </td>
                     <td>
-                        <input id='pass' name='pass' value='' type='password'>
+                        <input id='reg_pass' name='pass' value='' type='password'>
                     </td>
                     <td>
                          Repetir contrase&ntilde;a
                     </td>
                     <td>
-                        <input id='pass2' name='pass2' value='' type='password'>
+                        <input id='reg_pass2' name='pass2' value='' type='password'>
                     </td>
                 </tr>
                 <tr>
@@ -108,7 +108,7 @@
                     </td>
                     <td align='right'>
                         
-                        <input value='Registrar' type='submit'>
+    <input value='Registrar' type='button' onClick="omega.CreateUser( $('#reg_email').val(), $('#reg_username').val(), $('#reg_pass').val() )">
                     </td>
                 </tr>
             </form>

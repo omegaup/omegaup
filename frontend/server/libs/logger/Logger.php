@@ -19,6 +19,7 @@ class Logger
     {
         self::log("---------------------------------------------------");
         self::log("                 FATAL EXCEPTION ERROR ");
+
         // Something bad happened, log error
         self::log("REQUEST PARAMS: ");
 
