@@ -29,7 +29,7 @@ class ProblemContentsZipValidator extends Validator
 			// Get list of files
 			for($i = 0; $i < $zip->numFiles; $i++)
 			{
-				Logger::log("Found '".$zip->getNameIndex($i)."'");
+				Logger::log("Found inside zip: '".$zip->getNameIndex($i)."'");
 				$zipFilesArray[] = $zip->getNameIndex($i);
 				$statI = $zip->statIndex($i);
 				$size += $statI['size'];
@@ -60,7 +60,14 @@ class ProblemContentsZipValidator extends Validator
 				Logger::log("testplan not found");	      			
 				$returnValue = $this->checkCases($zip, $zipFilesArray);
 
-			}            
+			}   
+                        
+                        // Log files to unzip
+                        Logger::log("Files to unzip: ");
+                        foreach($this->filesToUnzip as $file)
+                        {
+                            Logger::log($file);
+                        }
 
 			// Look for statements
 			$returnValue = $this->checkProblemStatements($zipFilesArray) && $returnValue;            
