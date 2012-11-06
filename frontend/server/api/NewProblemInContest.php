@@ -166,18 +166,21 @@ class NewProblemInContest extends ApiHandler
                 "order"      => is_null(RequestContext::get("order_in_contest")) ? 
                                     1 : RequestContext::get("order_in_contest") ));
             
-            ContestProblemsDAO::save($relationship);                        
+            ContestProblemsDAO::save($relationship);                                                
+
+            //End transaction
+            ProblemsDAO::transEnd();   
             
             // Create file after we know that alias is unique
             self::DeployProblemZip($this->filesToUnzip, $this->casesFiles);
-
-            //End transaction
-            ProblemsDAO::transEnd();                        
         }
         catch(ApiException $e)
         {
             // Operation failed in the data layer, rollback transaction 
             ProblemsDAO::transRollback();
+            
+            // Rollback the problem if deployed partially
+            self::deleteProblemFromFilesystem(self::getDirpath());
             
             throw $e;
         }
@@ -185,6 +188,9 @@ class NewProblemInContest extends ApiHandler
         {  
            // Operation failed in the data layer, rollback transaction 
             ProblemsDAO::transRollback();
+            
+            // Rollback the problem if deployed partially
+            self::deleteProblemFromFilesystem(self::getDirpath());
             
             // Alias may be duplicated, 1062 error indicates that
             if(strpos($e->getMessage(), "1062") !== FALSE)
@@ -399,20 +405,29 @@ class NewProblemInContest extends ApiHandler
         chdir($original_dir);
     }
     
-       
+    private static function getDirpath(){
+        return PROBLEMS_PATH . DIRECTORY_SEPARATOR . RequestContext::get("alias");
+    }
+    
+    private static function getFilepath($dirpath){
+        return $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';
+    }
+            
+    private static function deleteProblemFromFilesystem($dirpath){
+        // Drop contents into path required
+        FileHandler::DeleteDirRecursive($dirpath);
+    }   
     
     public static function DeployProblemZip($filesToUnzip, $casesFiles, $isUpdate = false)
     {
         try 
         {
             // Create paths
-            $dirpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . RequestContext::get("alias");
-            $filepath = $dirpath . DIRECTORY_SEPARATOR . 'contents.zip';
+            $dirpath = self::getDirpath();
+            $filepath = self::getFilepath($dirpath);
             
-            if ($isUpdate === true)
-            {
-                // Drop contents into path required
-                FileHandler::DeleteDirRecursive($dirpath);                
+            if ($isUpdate === true){
+                self::deleteProblemFromFilesystem($dirpath);
             }
             
             // Making target directory
