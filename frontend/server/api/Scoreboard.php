@@ -37,7 +37,7 @@ class Scoreboard
         {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
-            $percentage = 100;
+            $percentage = 1.0;
 	}
         else
         {
