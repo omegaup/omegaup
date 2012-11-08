@@ -158,8 +158,6 @@ class Scoreboard
 
     public function events()
     {
-        $cache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
-        $result = $cache->get();
 
         if( $this->showAllRuns || is_null($result))
         {
@@ -168,7 +166,7 @@ class Scoreboard
                 $contest = ContestsDAO::getByPK($this->contest_id);
                     
                 // Gets whether we can cache this scoreboard.
-                $cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
+                //$cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
 
                 // Get all distinct contestants participating in the contest given contest_id
 		$raw_contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns); 
@@ -263,13 +261,7 @@ class Scoreboard
 
                 // Add contestant results to scoreboard data
                 array_push($result, $data);
-            }
-
-            // Cache scoreboard if there are no pending runs
-            if ($cacheable)
-            {
-                $cache->set($result, APC_USER_CACHE_SCOREBOARD_TIMEOUT);
-            }
+            }           
 	}
 
 	$this->data = $result;
