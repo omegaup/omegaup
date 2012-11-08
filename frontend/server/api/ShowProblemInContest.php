@@ -14,6 +14,7 @@
 
 require_once("ApiHandler.php");
 require_once(SERVER_PATH . '/libs/FileHandler.php');
+require_once(SERVER_PATH . '/libs/Cache.php');
 
 class ShowProblemInContest extends ApiHandler
 {    
@@ -104,24 +105,13 @@ class ShowProblemInContest extends ApiHandler
 	// Read the file that contains the source
 	if ($problem->getValidator() != 'remote')
 	{
-            $file_content = null;
-            $from_cache = false;
-            $cache_key = $problem->getAlias() . "-" . RequestContext::get("lang");
+            $statementCache = new Cache(Cache::PROBLEM_STATEMENT, $problem->getAlias() . "-" . RequestContext::get("lang"));            
+            $file_content = null;                        
             
             // check cache
-            if (APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_PROBLEM_STATEMENT == true)
-            {
-                if ($file_content = apc_fetch($cache_key))
-                {
-                    $from_cache = true;
-                }
-                else
-                {
-                    Logger::log("apc_fetch cache miss for problem key: " . $cache_key);
-                }
-            }
+            $file_content = $statementCache->get();            
             
-            if ($from_cache == false)
+            if (is_null($file_content))
             {
             
                 $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . RequestContext::get("lang") . ".html";
@@ -137,13 +127,7 @@ class ShowProblemInContest extends ApiHandler
                 
                 
                 // Add to cache
-                if (APC_USER_CACHE_ENABLED == true && APC_USER_CACHE_PROBLEM_STATEMENT == true)
-                {
-                    if ( apc_store($cache_key, $file_content, APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT) == false)
-                    {
-                        Logger::log("apc_store failed for problem key: " . $cache_key);
-                    }
-                }
+                $statementCache->set($file_content, APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);                
             }
             
             // Add problem statement to source

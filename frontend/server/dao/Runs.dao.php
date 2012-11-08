@@ -212,7 +212,7 @@ class RunsDAO extends RunsDAOBase
 	public static final function GetWrongRuns($contest_id, $problem_id, $user_id, $run_id, $showAllRuns)
 	{
 		//Build SQL statement
-		$sql = "SELECT COUNT(*) AS wrong_runs FROM Runs WHERE user_id = ? AND contest_id = ? AND problem_id = ? AND run_id < ? ". ($showAllRuns ? "" : " AND test = 0 ");
+		$sql = "SELECT COUNT(*) AS wrong_runs FROM Runs WHERE user_id = ? AND contest_id = ? AND problem_id = ? AND veredict != 'JE' AND veredict != 'CE' AND run_id < ? ". ($showAllRuns ? "" : " AND test = 0 ");
 		$val = array($user_id, $contest_id, $problem_id, $run_id);
 
 		global $conn;
