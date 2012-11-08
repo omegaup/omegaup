@@ -61,7 +61,7 @@ class ShowContest extends ApiHandler
     protected function GenerateResponse() 
     {
     	// Check cache first
-    	$cache = new Cache(Cache::$CONTEST_INFO, RequestContext::get("contest_alias"));    	
+    	$cache = new Cache(Cache::CONTEST_INFO, RequestContext::get("contest_alias"));    	
     	$result = $cache->get();
     	
     	if(is_null($result))

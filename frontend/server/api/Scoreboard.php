@@ -57,8 +57,8 @@ class Scoreboard
     {
     	$result = null;        
         
-        $contestantScoreboardCache = new Cache(Cache::$CONTESTANT_SCOREBOARD_PREFIX, $this->contest_id);
-        $adminScoreboardCache = new Cache(Cache::$ADMIN_SCOREBOARD_PREFIX, $this->contest_id);
+        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $this->contest_id);
+        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $this->contest_id);
         
         $can_use_contestant_cache = !$this->showAllRuns 
                                 && !$sortByName
@@ -158,7 +158,7 @@ class Scoreboard
 
     public function events()
     {
-        $cache = new Cache(Cache::$CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
+        $cache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
         $result = $cache->get();
 
         if( $this->showAllRuns || is_null($result))

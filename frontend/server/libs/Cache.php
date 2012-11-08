@@ -8,11 +8,11 @@ require_once(SERVER_PATH . '/libs/Logger/Logger.php');
  */
 class Cache
 {    
-    public static $CONTESTANT_SCOREBOARD_PREFIX = "scoreboard-";
-    public static $CONTESTANT_SCOREBOARD_EVENTS_PREFIX = "scoreboard-events-";
-    public static $ADMIN_SCOREBOARD_PREFIX = "scoreboard-admin-";
-    public static $PROBLEM_STATEMENT = "statement-";
-    public static $CONTEST_INFO = "contest-info-";
+    const CONTESTANT_SCOREBOARD_PREFIX = "scoreboard-";
+    const CONTESTANT_SCOREBOARD_EVENTS_PREFIX = "scoreboard-events-";
+    const ADMIN_SCOREBOARD_PREFIX = "scoreboard-admin-";
+    const PROBLEM_STATEMENT = "statement-";
+    const CONTEST_INFO = "contest-info-";
     
     
     private $enabled;

@@ -104,7 +104,7 @@ class ShowProblemInContest extends ApiHandler
 	// Read the file that contains the source
 	if ($problem->getValidator() != 'remote')
 	{
-            $statementCache = new Cache(Cache::$PROBLEM_STATEMENT, $problem->getAlias() . "-" . RequestContext::get("lang"));            
+            $statementCache = new Cache(Cache::PROBLEM_STATEMENT, $problem->getAlias() . "-" . RequestContext::get("lang"));            
             $file_content = null;                        
             
             // check cache

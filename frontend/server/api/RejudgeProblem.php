@@ -92,9 +92,13 @@ class RejudgeProblem extends ApiHandler
     
     private function InvalidateScoreboardCache($contest_id)
     {
-    	$cache = new Cache();
-    	$cache->delete($contest_id, Scoreboard::MEMCACHE_PREFIX);
-    	$cache->delete($contest_id, Scoreboard::MEMCACHE_EVENTS_PREFIX);
+    	// Invalidar cache del contestant
+        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
+        $contestantScoreboardCache->delete();
+
+        // Invalidar cache del admin
+        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
+        $adminScoreboardCache->delete(); 
     }
 }
 ?>
