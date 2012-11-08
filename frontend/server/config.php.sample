@@ -77,10 +77,10 @@
         # APC USER CACHE
         # #########################
 
-        define("APC_USER_CACHE_ENABLED", false);
-        define("APC_USER_CACHE_PROBLEM_STATEMENT", true);
+        define("APC_USER_CACHE_ENABLED", false);        
         define("APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT", 300); // in seconds
         define("APC_USER_CACHE_SCOREBOARD", true);
         define("APC_USER_CACHE_SCOREBOARD_TIMEOUT", 60); // in seconds
         define("APC_USER_CACHE_ADMIN_SCOREBOARD", true);
         define("APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT", 60); // in seconds
+        define("APC_USER_CACHE_CONTEST_INFO_TIMEOUT", 300); // in seconds

@@ -12,7 +12,6 @@ class Scoreboard
 {
     // Column to return total score per user
     const total_column = "total";
-    const MEMCACHE_PREFIX = "scoreboard";
     const MEMCACHE_EVENTS_PREFIX = "scoreboard_events";
     
     // Contest's data
@@ -56,48 +55,30 @@ class Scoreboard
     
     public function generate($withRunDetails = false, $sortByName = false, $filterUsersBy = NULL)
     {
-    	$result = null;
-        $from_cache = false;
-        $cache_key_contestant = "scoreboard-" . $this->contest_id;
-        $cache_key_admin = "scoreboard-admin-" . $this->contest_id;
+    	$result = null;        
         
-        $can_use_contestant_cache = APC_USER_CACHE_ENABLED == true 
-                                && APC_USER_CACHE_SCOREBOARD == true 
-                                && !$this->showAllRuns 
+        $contestantScoreboardCache = new Cache(Cache::$CONTESTANT_SCOREBOARD_PREFIX, $this->contest_id);
+        $adminScoreboardCache = new Cache(Cache::$ADMIN_SCOREBOARD_PREFIX, $this->contest_id);
+        
+        $can_use_contestant_cache = !$this->showAllRuns 
                                 && !$sortByName
                                 && is_null($filterUsersBy);
         
-        $can_use_admin_cache = APC_USER_CACHE_ENABLED == true 
-                                && APC_USER_CACHE_ADMIN_SCOREBOARD == true 
-                                && $this->showAllRuns 
+        $can_use_admin_cache = $this->showAllRuns 
                                 && !$sortByName
                                 && is_null($filterUsersBy);
         
         // If cache is turned on and we're not looking for admin-only runs
         if ($can_use_contestant_cache)
         {
-            if($result = apc_fetch($cache_key_contestant))
-            {
-                $from_cache = true;
-            }
-            else
-            {
-                Logger::log("Cache miss for key: " . $cache_key_contestant );
-            }            
+            $result = $contestantScoreboardCache->get();                       
         }
         else if ($can_use_admin_cache)
         {
-            if($result = apc_fetch($cache_key_admin))
-            {
-                $from_cache = true;
-            }
-            else
-            {
-                Logger::log("Cache miss for key: " . $can_use_admin_cache );
-            }
+            $result = $adminScoreboardCache->get();            
         }
         
-        if (!$from_cache)
+        if (is_null($result))
         {
             try
             {
@@ -163,17 +144,11 @@ class Scoreboard
             // Cache scoreboard if there are no pending runs.
             if ($cacheable_for_contestant && $can_use_contestant_cache)
             {
-                if (apc_store($cache_key_contestant, $result, APC_USER_CACHE_SCOREBOARD_TIMEOUT) == false)
-                {
-                    Logger::log("apc_store failed for problem key: " . $cache_key_contestant);
-                }
+                $contestantScoreboardCache->set($result, APC_USER_CACHE_SCOREBOARD_TIMEOUT);                
             }
             else if ($cacheable_for_admin && $can_use_admin_cache)
             {
-                if (apc_store($cache_key_admin, $result, APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT) == false)
-                {
-                    Logger::log("apc_store failed for problem key: " . $cache_key_admin);
-                }
+                $contestantScoreboardCache->set($result, APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT);                
             }
 	}
 
@@ -183,10 +158,10 @@ class Scoreboard
 
     public function events()
     {
-        $cache = new Cache(self::MEMCACHE_EVENTS_PREFIX);
-        $result = $cache->get($this->contest_id);
+        $cache = new Cache(Cache::$CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
+        $result = $cache->get();
 
-        if( $this->showAllRuns || $result == null )
+        if( $this->showAllRuns || is_null($result))
         {
             try
             {
@@ -293,7 +268,7 @@ class Scoreboard
             // Cache scoreboard if there are no pending runs
             if ($cacheable)
             {
-                    $cache->set($this->contest_id, $result, OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT);
+                $cache->set($result, APC_USER_CACHE_SCOREBOARD_TIMEOUT);
             }
 	}
 

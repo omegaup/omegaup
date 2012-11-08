@@ -2,64 +2,106 @@
 
 require_once(SERVER_PATH . '/libs/Logger/Logger.php');
 
+/**
+ * Maneja el acceso al cache (usando apc user cache)
+ *   
+ */
 class Cache
-{
-	protected $prefix;
-	protected $memcache;
-	
-	public function __construct($prefix = '')
-	{
-		$this->prefix = $prefix;
-		
-		if( defined('OMEGAUP_MEMCACHE_DISABLED') && OMEGAUP_MEMCACHE_DISABLED)
-		{
-			$this->memcache = null;	
-		}
-		else
-		{
-			$this->memcache = new Memcache;
-			if( !@$this->memcache->connect(OMEGAUP_MEMCACHE_HOST, OMEGAUP_MEMCACHE_PORT) )
-			{
-				$this->memcache = null;
-				
-				$msg = "Failed to connect to Memcache server at the specified address: "
-				     . OMEGAUP_MEMCACHE_HOST . ":" .OMEGAUP_MEMCACHE_PORT;
-				Logger::error($msg);
-			}
-		}
-	}
-	
-	public function set($key, $value, $timeout, $prefix = null)
-	{
-		if( $this->memcache != null )
-		{
-			@$this->memcache->add($this->getKey($key, $prefix), $value, 0, $timeout);
-		}
-	}
-	
-	public function delete($key, $prefix = null)
-	{
-		if( $this->memcache != null )
-		{
-			@$this->memcache->delete($this->getKey($key, $prefix), 0);
-		}
-	}
-	
-	public function get($key, $prefix = null)
-	{
-		$result = null;
-		if( $this->memcache != null )
-		{
-			@$result = $this->memcache->get($this->getKey($key, $prefix));
-		}
-		
-		return $result;
-	}
-	
-	private function getKey($key, $prefix)
-	{
-		if( $prefix == null )
-			$prefix = $this->prefix;
-		return "$prefix:$key";
-	}
+{    
+    public static $CONTESTANT_SCOREBOARD_PREFIX = "scoreboard-";
+    public static $CONTESTANT_SCOREBOARD_EVENTS_PREFIX = "scoreboard-events-";
+    public static $ADMIN_SCOREBOARD_PREFIX = "scoreboard-admin-";
+    public static $PROBLEM_STATEMENT = "statement-";
+    public static $CONTEST_INFO = "contest-info-";
+    
+    
+    private $enabled;
+    protected $key;
+    
+    /**
+     * Inicializa el cache para el key dado 
+     * @param string $key el id del cache
+     */
+    public function __construct($prefix, $id){
+        
+        $this->key = $prefix.$id;
+        $this->enabled = (defined('APC_USER_CACHE_ENABLED') && APC_USER_CACHE_ENABLED === true);
+        
+        if($this->enabled){
+            Logger::log("Cache enabled for " . $this->key);
+        }
+        else{
+            Logger::log("Cache DISABLED for " . $this->key);
+        }       
+        
+    }
+
+    /**
+     * set
+     *  
+     * Si el cache está prendido, guarda value en key con el timeout dado
+     *      
+     * @param string $value
+     * @param int $timeout   
+     * @return boolean
+     */
+    public function set($value, $timeout){
+        
+        if($this->enabled === true){
+            if (apc_store($this->key, $value, $timeout) === true){                
+                return true;
+            }
+            else{
+                Logger::log("apc_store failed for key: " . $this->key);
+                return false;
+            }
+        }
+        
+        return false;
+        
+    }
+
+    /**
+     * delete
+     * 
+     * Si el cache esta prendido, invalida el key del cache
+     *      
+     * @return boolean
+     */
+    public function delete()
+    {
+        if($this->enabled === true){
+            if (apc_delete($this->key) === true){
+                return true;                
+            }
+            else{
+                Logger::log("Failed to invalidate cache for key: " . $this->key);
+                return false;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * get
+     * 
+     * Si el cache está prendido y la clave está en el cache, regresa el valor. Si no está, regresa null
+     * 
+     * @return mixed 
+     */
+    public function get()
+    {        
+        if($this->enabled === true){
+            if($result = apc_fetch($this->key)){
+                return $result;
+            }
+            else{
+                Logger::log("Cache miss for key: " . $this->key);
+            }
+                
+        }
+        
+        return null;
+    }
 }
