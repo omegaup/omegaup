@@ -38,14 +38,20 @@ class Authorization
         {
            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);     
         }
-        
-        if (is_null($contest) || is_null($problem))
+	    
+    	if (is_null($problem))
         {
             return false;
         }
         
-        return Authorization::IsContestAdmin($user_id, $contest) ||
-               $problem->getAuthorId() === $user_id;
+        $isContestAdmin = false;
+        if (!is_null($contest)){
+            $isContestAdmin = Authorization::IsContestAdmin($user_id, $contest);
+        }
+        
+        return $isContestAdmin 
+               || self::IsSystemAdmin($user_id)                
+               || $problem->getAuthorId() === $user_id;
     }
     
     public static function CanViewClarification($user_id, Clarifications $clarification)
