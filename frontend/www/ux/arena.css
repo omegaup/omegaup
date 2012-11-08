@@ -393,13 +393,31 @@ table.contest-list {
 	width: 100%;
 }
 
-table.contest-list .time {
-	width: 30em;
-}
 table.contest-list td, table.contest-list th {
-	border: 1px #000 solid;
+	border: 1px #ccc solid;
 	padding: .2em;
 }
 table.contest-list th {
 	font-weight: bold;
+}
+
+table.contest-list tbody tr:nth-child(odd) {
+	background-color: #E3E8EC;
+}
+
+table.contest-list tbody tr:nth-child(even) {
+	background-color: #fff;
+}
+
+table.contest-list th#past-contests-header {
+	padding: 0.5em 0;
+}
+
+#title {
+	min-height: 80px;
+}
+
+#title h1#arena-title {
+	/*margin-top: 2em;*/
+	font-size: 3em;
 }
