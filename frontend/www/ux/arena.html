@@ -5,6 +5,7 @@
 		<title>OmegaUp</title>
 		<script type="text/javascript" src="/js/jquery.js"></script>
 		<script type="text/javascript" src="/js/sugar.js"></script>
+		<script type="text/javascript" src="/js/sugar.es.js"></script>
 		<script type="text/javascript" src="/ux/api.js"></script>
 		<script type="text/javascript" src="/ux/arena.js"></script>
 		<link rel="stylesheet" href="/css/reset.css" />
@@ -15,19 +16,10 @@
 		<!-- Generated from http://ajaxload.info/ -->
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		<div id="root" style="display: none;">
-			<h1>Arena</h1>
-			<table class="contest-list">
-				<thead><tr>
-					<th>Concurso</th>
-					<th>Descripción</th>
-					<th class="time">Inicio</th>
-					<th class="time">Fin</th>
-				</tr></thead>
-				<tbody id="contest-list">
-				</tbody>
-			</table>
-			
-			<h2>Concursos pasados</h2>
+			<div id="title">
+				<img src="/media/omegaup_curves.png" height="80" alt="OmegaUp">
+				<h1 id="arena-title">Arena</h1>
+			</div>
 			<table class="contest-list">
 				<thead><tr>
 					<th>Concurso</th>
@@ -35,6 +27,11 @@
 					<th class="time">Inicio</th>
 					<th class="time">Fin</th>
 					<th>Práctica</th>
+				</tr></thead>
+				<tbody id="current-contests">
+				</tbody>
+				<thead><tr>
+					<th colspan="5" id="past-contests-header">Concursos pasados</th>
 				</tr></thead>
 				<tbody id="past-contests">
 				</tbody>
