@@ -148,7 +148,7 @@ class Scoreboard
             }
             else if ($cacheable_for_admin && $can_use_admin_cache)
             {
-                $contestantScoreboardCache->set($result, APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT);                
+                $adminScoreboardCache->set($result, APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT);                
             }
 	}
 
