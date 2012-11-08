@@ -135,7 +135,12 @@ trait Grader extends Object with Log {
 				case _    => Veredict.JudgeError
 			}
 
-			if (run.language == Language.Java) {
+			if (run.language == Language.Cpp && meta("status") == "SG") {
+				val errFile = new File(f.getCanonicalPath.replace(".meta", ".err"))
+				if (errFile.exists && FileUtil.read(errFile.getCanonicalPath).contains("std::bad_alloc")) {
+					if (run.veredict < Veredict.MemoryLimitExceeded) run.veredict = Veredict.MemoryLimitExceeded
+				} else if(run.veredict < v) run.veredict = v
+			} else if (run.language == Language.Java) {
 				if (meta.contains("message") && meta("message").contains("ptrace")) {
 					error("Rejudging run {} due to JE-prevention.", run.id)
 					Manager.grade(run.id)

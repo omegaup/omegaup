@@ -287,7 +287,7 @@ object Runner extends RunnerService with Log with Using {
 		
 					inputStream.close
 					zipOutput.closeEntry
-				} else if(meta("status") == "RE" && lang == "java") {
+				} else if((meta("status") == "RE" && lang == "java") || (meta("status") == "SG" && lang == "cpp")) {
 					val inputStream = new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))
 					zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
 					var read: Int = 0
