@@ -8,6 +8,7 @@ require_once(SERVER_PATH . '/libs/ZipHandler.php');
 require_once(SERVER_PATH . '/libs/ProblemContentsZipValidator.php');
 require_once(SERVER_PATH . '/libs/Markdown/markdown.php');
 require_once(SERVER_PATH . '/libs/Grader.php');
+require_once(SERVER_PATH . '/libs/Cache.php');
 
 class UpdateProblem extends ApiHandler
 {   
@@ -211,5 +212,10 @@ class UpdateProblem extends ApiHandler
                 
         // All clear
         $this->addResponse("status", "ok");
+        
+        // Invalidar cache @todo invalidar todos los lenguajes
+        $statementCache = new Cache(Cache::PROBLEM_STATEMENT, $this->problem->getAlias() . "-es");
+        $statementCache->delete();
+        
     }  
 }

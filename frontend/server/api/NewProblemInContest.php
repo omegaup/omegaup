@@ -19,6 +19,7 @@ require_once(SERVER_PATH . '/libs/FileUploader.php');
 require_once(SERVER_PATH . '/libs/ZipHandler.php');
 require_once(SERVER_PATH . '/libs/ProblemContentsZipValidator.php');
 require_once(SERVER_PATH . '/libs/Markdown/markdown.php');
+require_once(SERVER_PATH . '/libs/Cache.php');
 
 class NewProblemInContest extends ApiHandler
 {            
@@ -208,6 +209,10 @@ class NewProblemInContest extends ApiHandler
         
         // All clear
         $this->addResponse("status", "ok");
+        
+        // Invalidar cache
+        $contestCache = new Cache(Cache::CONTEST_INFO, RequestContext::get("contest_alias"));
+        $contestCache->delete();
     }    
     
     public static function ValidateZip(&$filesToUnzip, &$casesFiles)
