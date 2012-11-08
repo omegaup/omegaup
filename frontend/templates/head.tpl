@@ -26,7 +26,7 @@
     <div class="login_bar" style="display: block">
         {if $LOGGED_IN eq '1'}
             {$CURRENT_USER_GRAVATAR_URL_16}
-            <a href="profile.php">{$CURRENT_USER_USERNAME}</a> <b><a href='/logout.php'>{#logOut#}</a></b>
+            <a href="/profile.php">{$CURRENT_USER_USERNAME}</a> <b><a href='/logout.php'>{#logOut#}</a></b>
         {else}
              {#pageTitle#} <b><a href='/login.php'>{#logIn#}</a> !</b>
         {/if}

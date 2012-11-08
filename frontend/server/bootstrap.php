@@ -84,6 +84,7 @@ if( /* do we need smarty to load? */ true)
     $smarty = new Smarty;
     $smarty->assign( 'ERROR_TO_USER', '' );
     $smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
+    $smarty->assign( 'CURRENT_USER_IS_ADMIN', 0 );
     $smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" )->setCompileDir(  "C:\\Users\\Alan\\Desktop\\cache" );
     $smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\es.lang");
     $smarty->assign( 'LOGGED_IN', '0' );

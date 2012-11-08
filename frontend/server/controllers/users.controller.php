@@ -18,11 +18,19 @@ class SecurityTools
 
     public static function CompareEncryptedStrings( $encrypted_a, $encrypted_b )
     {
-        Logger::log( "Comparing:" . $encrypted_a . "<->" . $encrypted_b );
-
         return strcmp( $encrypted_a, $encrypted_b ) == 0;
     }
 
+
+    public static function TestStrongPassword( $s_Password )
+    {
+        if( strlen( $s_Password ) < 4)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
 
 
@@ -142,6 +150,12 @@ class UserController extends Controller
         {
             //Email already exists
             throw new ApiException( "Username already exists." );
+        }
+
+
+        if( !SecurityTools::TestStrongPassword( $s_PlainPassword ) )
+        {
+            throw new ApiException( "Password too weak" );
         }
 
         //create user

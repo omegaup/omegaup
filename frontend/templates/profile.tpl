@@ -1,3 +1,16 @@
+{if $LOGGED_IN eq '0'} 
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+    <html>
+    <head>
+    <title>Omegaup</title>
+    <meta http-equiv="REFRESH" content="0;url=/login.php"></HEAD>
+        <BODY>
+            Redirectioning you.
+        </BODY>
+    </HTML>
+{/if}
+
+
 {include file='head.tpl'}
 
 <div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
