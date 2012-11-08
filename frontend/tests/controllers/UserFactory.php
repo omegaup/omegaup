@@ -28,7 +28,7 @@ class UserFactory {
         
         
         $uc = new UserController();
-        $user = $uc->Create($email, $username, $password);                       
+        $user = new Users($uc->Create($email, $username, $password));                       
         
         // Set password in plaintext
         $user->setPassword($password);
