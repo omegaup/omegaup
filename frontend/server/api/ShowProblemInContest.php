@@ -14,6 +14,7 @@
 
 require_once("ApiHandler.php");
 require_once(SERVER_PATH . '/libs/FileHandler.php');
+require_once(SERVER_PATH . '/libs/Cache.php');
 
 class ShowProblemInContest extends ApiHandler
 {    
