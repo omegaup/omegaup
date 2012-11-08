@@ -40,6 +40,7 @@ class Validator
     // Add an error message 
     protected function setError($msg)
     {
+        Logger::error($msg);
         $this->_errors[] = $msg;        
     }
     

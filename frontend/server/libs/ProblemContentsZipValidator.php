@@ -7,6 +7,8 @@ require_once('Validator.php');
 
 class ProblemContentsZipValidator extends Validator
 {
+        private $hasValidator = false;
+        
 	public $filesToUnzip;
 	public $casesFiles;
 
@@ -35,15 +37,15 @@ class ProblemContentsZipValidator extends Validator
 				$size += $statI['size'];
 
 				if (stripos($zip->getNameIndex($i), 'validator.') === 0) {
+                                        $this->hasValidator = true;
 					$this->filesToUnzip[] = $zip->getNameIndex($i);
 					Logger::log("Validator found: " . $zip->getNameIndex($i));
 				}
 			}
 
 			if ($size > $maximumSize)
-			{
-				Logger::error("Extracted zip size ($size) over {$maximumSize}MB. Rejecting.");
-				$this->setError("Extracted zip over 256MB. Rejecting.");
+			{			
+				$this->setError("Extracted zip size ($size) over {$maximumSize}MB. Rejecting.");
 				return false;
 			}
 
@@ -70,7 +72,7 @@ class ProblemContentsZipValidator extends Validator
                         }
 
 			// Look for statements
-			$returnValue = $this->checkProblemStatements($zipFilesArray) && $returnValue;            
+			$returnValue = $this->checkProblemStatements($zipFilesArray, $zip) && $returnValue;            
 			Logger::log("checkProblemStatements=". $returnValue . ".");
 
 			// Close zip
@@ -80,8 +82,7 @@ class ProblemContentsZipValidator extends Validator
 			return $returnValue;
 		}
 		else
-		{
-			Logger::error("Unable to open zip." . ZipHandler::zipFileErrMsg($resource));
+		{			
 			$this->setError("Unable to open zip." . ZipHandler::zipFileErrMsg($resource));
 			return false;
 		}
@@ -103,8 +104,7 @@ class ProblemContentsZipValidator extends Validator
 			// Check .in file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.in';            
 			if(!$zip->getFromName($path))
-			{
-				Logger::error("Not able to find ". $testplan_array[1][$i] . " in testplan.");
+			{				
 				$this->setError("Not able to find ". $testplan_array[1][$i] . " in testplan.");                
 				return false;
 			}                        
@@ -114,8 +114,7 @@ class ProblemContentsZipValidator extends Validator
 			// Check .out file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.out';
 			if(!$zip->getFromName($path))
-			{
-				Logger::error("Not able to find ". $testplan_array[1][$i] . " in testplan.");
+			{				
 				$this->setError("Not able to find ". $testplan_array[1][$i] . " in testplan.");
 				return false;
 			}
@@ -139,20 +138,51 @@ class ProblemContentsZipValidator extends Validator
 
 	private function checkCases(ZipArchive $zip, array $zipFilesArray)
 	{
+                // Necesitamos tener al menos 1 input
+                $inputs = 0;
+                $outputs = 0;
+                
 		// Add all files in cases/ that end either in .in or .out        
 		for ($i = 0; $i < count($zipFilesArray); $i++)
 		{            
 			$path = $zipFilesArray[$i];                       
-			if (strpos($path, "cases/") == 0 && (ProblemContentsZipValidator::endsWith($path, ".in", true)  || ProblemContentsZipValidator::endsWith($path, ".out", true)))
+			if (strpos($path, "cases/") == 0)                                
 			{
-				$this->filesToUnzip[] = $path;
-				$this->casesFiles[] = $path;
+                            $isInput = ProblemContentsZipValidator::endsWith($path, ".in", true);
+                            $isOutput = ProblemContentsZipValidator::endsWith($path, ".out", true);                                                        
+                            
+                            if ($isInput || $isOutput)
+                            {
+                                $this->filesToUnzip[] = $path;
+                                $this->casesFiles[] = $path;
+                            }
+                            
+                            if ($isInput){
+                                $inputs++;
+                            }
+                            else if($isOutput){
+                                $outputs++;
+                            }
+                                
 			}
-		}        
+		}  
+                
+                if ($inputs < 1){                    
+                    $this->setError("0 inputs found. At least 1 input is needed.");
+                    return false;
+                }
+                
+                Logger::log($inputs. " found, " . $outputs . "found ");                
+                
+                if ($this->hasValidator === false && $inputs != $outputs){                    
+                    $this->setError("Inputs/Outputs mistmatch: ". $inputs. " found, " . $outputs . "found ");
+                    return false;
+                }
+                
 		return true;
 	}
 
-	private function checkProblemStatements(array $zipFilesArray)
+	private function checkProblemStatements(array $zipFilesArray, ZipArchive $zip)
 	{
 		Logger::log("Checking problem statements...");
 
@@ -160,8 +190,7 @@ class ProblemContentsZipValidator extends Validator
 		$statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $zipFilesArray);
 
 		if(count($statements) < 1)
-		{
-			Logger::log("No statements found.");
+		{			
 			$this->setError("No statements found.");
 			return false;
 		}
@@ -169,7 +198,13 @@ class ProblemContentsZipValidator extends Validator
 		// Add statements to the files to be unzipped
 		foreach($statements as $file)
 		{
-			Logger::log("Add statements to the files to be unzipped: " . $file);
+                        // Revisar que los statements no esten vacíos                    
+                        if (strlen($zip->getFromName($file, 1)) < 1){
+                            $this->setError("Statement {$file} is empty.");
+                            return false;
+                        }                                
+                    
+			Logger::log("Adding statements to the files to be unzipped: " . $file);
 			$this->filesToUnzip[] = $file;
 		}
 
