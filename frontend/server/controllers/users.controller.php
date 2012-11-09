@@ -8,6 +8,10 @@
   *     Alan Gonzalez alanboy@alanboy.net
   *
   **/ // @todo mover este archivo a otro ladoooou D:
+
+require_once SERVER_PATH.'/controllers/controller.php';
+require_once SERVER_PATH.'/libs/validators.php';
+
 class SecurityTools
 {
 
@@ -32,49 +36,6 @@ class SecurityTools
         return true;
     }
 }
-
-
-
-//@ todo mover a otro lado
-class Controller
-{
-    protected $validator;
-
-    protected $current_user_id;
-
-    protected $current_user_obj;
-
-    private static $_sessionManager;
-
-    public static function getSessionManagerInstance( )
-    {
-        if ( is_null( self::$_sessionManager ) )
-        {
-            self::$_sessionManager = new SessionManager( );
-        }
-        
-        return self::$_sessionManager;
-    }
-
-}
-
-
-
-class Validators
-{
-    public static function isValidEmail( $s_Email = null )
-    {
-        if( is_null( $s_Email ) )
-        {
-            return false;
-        }
-
-        return filter_var( $s_Email, FILTER_VALIDATE_EMAIL );
-    }
-
-}
-
-
 
 class UserController extends Controller
 {
@@ -129,16 +90,8 @@ class UserController extends Controller
       */
     public function Create( $s_Email, $s_Username = null, $s_PlainPassword = null )
     {
-
-        if( is_null( $s_Email ) )
-        {
-            throw new ApiException( "Must provide email" );
-        }
-
-        if( !Validators::isValidEmail( $s_Email ) )
-        {
-            throw new ApiException( "Invalid Email" );
-        }
+        
+        Validators::isEmail($s_Email);        
 
         if( !is_null( $this->FindByEmail( $s_Email ) ) )
         {
