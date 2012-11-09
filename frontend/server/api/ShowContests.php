@@ -45,7 +45,7 @@ class ShowContests extends ApiHandler {
     protected function GenerateResponse() {
 
         // Create array of relevant columns
-        $relevant_columns = array("contest_id", "title", "description", "start_time", "finish_time", "public", "alias", "director_id");
+        $relevant_columns = array("contest_id", "title", "description", "start_time", "finish_time", "public", "alias", "director_id", "window_length");
 
         try
         {                
@@ -69,7 +69,7 @@ class ShowContests extends ApiHandler {
 
         foreach ($contests as $c) 
         { 
-            // At most we want 10 contests
+            // At most we want 10 contests @TODO paginar correctamente
             if ($addedContests === 10)
             {
                 break;
@@ -77,8 +77,13 @@ class ShowContests extends ApiHandler {
 
             if ($c->getPublic()) 
             {
-                $c->toUnixTime();
-                $addedContests[] = $c->asFilteredArray($relevant_columns);                
+                $c->toUnixTime();           
+                
+                $contestInfo = $c->asFilteredArray($relevant_columns);
+                $contestInfo["duration"] = (is_null($c->getWindowLength()) ? 
+                        $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength()*60));
+                
+                $addedContests[] = $contestInfo;
                 continue;
             }
 
@@ -116,8 +121,12 @@ class ShowContests extends ApiHandler {
              * He can see it !
              * 
              * */
-            $c->toUnixTime(  );
-            $addedContests[ ] = $c->asFilteredArray($relevant_columns);            
+            $contestInfo = $c->asFilteredArray($relevant_columns);
+            $contestInfo["duration"] = (is_null($c->getWindowLength()) ? 
+                        $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength()*60));
+                
+            $addedContests[] = $contestInfo;
+            
 	}
         
         $this->addResponse('contests', $addedContests);

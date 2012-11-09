@@ -158,6 +158,75 @@ class ShowContestsTest extends PHPUnit_Framework_TestCase
         // Logout the contestant
         Utils::Logout($auth_token);          
     }   
+    
+    public function testDurationNormalContest()
+    {             
+                        
+        // Insert new contest
+        $random_title = Utils::CreateRandomString();        
+        NewContestTest::CreateContest($random_title, 1);
+                       
+        
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Get contests, contest just created should be the first in the list
+        $showContest = new ShowContests();
+        Utils::SetAuthToken($auth_token);
+        
+        try
+        {
+            $cleanValue = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            $this->fail("Exception was unexpected: ". var_dump($e->getArrayMessage()));    
+        }
+        
+        // Assert our contest is there
+        $this->assertArrayHasKey("0", $cleanValue['contests']);                  
+        $this->assertEquals(60*60*2, $cleanValue['contests'][0]["duration"]);
+                
+        Utils::Logout($auth_token);
+    }
+    
+    
+    public function testDurationWindowLength()
+    {             
+        $windowLength = 300;       
+        
+        // Insert new contest //@todo do this with factories
+        ContestsDAO::$useDAOCache = false;
+        $contestCreator = new NewContestTest();
+        $contest_id = $contestCreator->testCreateValidContest(1);
+        
+        // Alter Contest window length        
+        $contest = ContestsDAO::getByPK($contest_id);
+        $contest->setWindowLength($windowLength);
+        ContestsDAO::save($contest);        
+                              
+        // Login as contestant
+        $auth_token = Utils::LoginAsContestant();
+        
+        // Get contests, contest just created should be the first in the list
+        $showContest = new ShowContests();
+        Utils::SetAuthToken($auth_token);
+        
+        try
+        {
+            $cleanValue = $showContest->ExecuteApi();
+        }
+        catch(ApiException $e)
+        {
+            $this->fail("Exception was unexpected: ". var_dump($e->getArrayMessage()));    
+        }
+        
+        // Assert our contest is there
+        $this->assertArrayHasKey("0", $cleanValue['contests']);                  
+        $this->assertEquals($windowLength*60, $cleanValue['contests'][0]["duration"]);
+                
+        Utils::Logout($auth_token);
+    }
 }
 
 ?>
