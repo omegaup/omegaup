@@ -91,7 +91,7 @@ class UserController extends Controller
     public function Create( $s_Email, $s_Username = null, $s_PlainPassword = null )
     {
         
-        Validators::isEmail($s_Email);        
+        Validators::isEmail($s_Email, "email");        
 
         if( !is_null( $this->FindByEmail( $s_Email ) ) )
         {
