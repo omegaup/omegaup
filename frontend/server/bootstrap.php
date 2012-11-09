@@ -77,7 +77,7 @@ try
 }
 
 
-if( /* do we need smarty to load? */ true)
+if( /* do we need smarty to load? */ true) // @todo skip for API
 {
     include("libs/smarty/Smarty.class.php");
 
@@ -86,7 +86,7 @@ if( /* do we need smarty to load? */ true)
     $smarty->setTemplateDir( SERVER_PATH . '\\..\\templates\\' );
     $smarty->assign( 'CURRENT_USER_IS_ADMIN', 0 );
     $smarty->setCacheDir( "C:\\Users\\Alan\\Desktop\\cache" )->setCompileDir(  "C:\\Users\\Alan\\Desktop\\cache" );
-    $smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\es.lang");
+    $smarty->configLoad("C:\\xampp\\htdocs\\omegaup\\omegaup\\frontend\\templates\\es.lang"); //@TODO fix paths
     $smarty->assign( 'LOGGED_IN', '0' );
 
 

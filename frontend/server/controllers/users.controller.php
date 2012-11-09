@@ -7,7 +7,7 @@
   * Author:
   *     Alan Gonzalez alanboy@alanboy.net
   *
-  **/
+  **/ // @todo mover este archivo a otro ladoooou D:
 class SecurityTools
 {
 
@@ -35,7 +35,7 @@ class SecurityTools
 
 
 
-
+//@ todo mover a otro lado
 class Controller
 {
     protected $validator;
@@ -252,7 +252,7 @@ class UserController extends Controller
 
         if( is_null( $vo_UserToTest ) )
         {
-            Logger::warn("User X invalid login");
+            Logger::warn("User X invalid login"); //@todo user x, poner el user de vdd
             return false;
         }
 

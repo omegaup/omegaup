@@ -185,8 +185,7 @@ try{
 
     $result = call_user_func_array( array($c_Controller, $s_Method ), $a_Args );
 
-    if( $b_isExplorer )
-    {
+    if ($b_isExplorer){
         $smarty->assign( 'msg', 'API_EXECUTED' );
         $smarty->assign( 'API_RESULT', json_encode( $result ) );
         $smarty->display( '../templates/api.tpl' );
