@@ -2,15 +2,15 @@
 
 require_once SERVER_PATH . 'controllers/users.controller.php';
 
-/*
+/**
  * @author joemmanuel
  */
 
-class UserFactory {
+class UsersFactory {
     
-   /*
+   /**
     * Crea un usuario
-    * @todo esto debería llamar a usercontroller
+    * 
     */
     public static function createUser($username = null, $password = null, $email = null){
         

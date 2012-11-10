@@ -4,7 +4,7 @@ require_once SERVER_PATH . 'controllers/users.controller.php';
 require_once SERVER_PATH . 'controllers/sesion.controller.php';
 
 require_once 'Utils.php';
-require_once 'UserFactory.php';
+require_once 'UsersFactory.php';
 
 /*
  *  Tests de LoginController
@@ -41,7 +41,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testLoginNativeByUser(){        
         // Crear el usuario        
-        $user = UserFactory::createUser();    
+        $user = UsersFactory::createUser();    
         
         $sc = new SesionController();
         
@@ -57,7 +57,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testLoginNativeByEmail(){
         // Crear el usuario
-        $user = UserFactory::createUser();        
+        $user = UsersFactory::createUser();        
         
         // Obtener el email del usuario
         $email = EmailsDAO::getByPK($user->getMainEmailId());
@@ -76,7 +76,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testLoginNative2TimesQuickly(){
         // Crear el usuario
-        $user = UserFactory::createUser();
+        $user = UsersFactory::createUser();
         
         $sc = new SesionController();       
         
@@ -94,7 +94,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testLoginNative2Times(){
         // Crear el usuario
-        $user = UserFactory::createUser();
+        $user = UsersFactory::createUser();
         
         $sc = new SesionController();       
         
@@ -113,7 +113,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testLoginBadUsername(){        
         
-        $user = UserFactory::createUser();
+        $user = UsersFactory::createUser();
         $sc = new SesionController();
         
         try{        
@@ -131,7 +131,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testLoginBadPassword(){        
         
-        $user = UserFactory::createUser();
+        $user = UsersFactory::createUser();
         $sc = new SesionController();
         
         try{        

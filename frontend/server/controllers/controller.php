@@ -9,8 +9,8 @@
 class Controller
 {
     protected $validator;
-    protected $current_user_id;
-    protected $current_user_obj;
+    public $current_user_id;
+    public $current_user_obj;
     
     private static $_sessionManager;
                     
