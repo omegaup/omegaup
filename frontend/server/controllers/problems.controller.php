@@ -7,6 +7,7 @@ require_once SERVER_PATH.'/libs/ZipHandler.php';
 require_once SERVER_PATH.'/libs/validators.php';
 require_once SERVER_PATH.'/libs/Markdown/markdown.php';
 require_once SERVER_PATH.'/libs/Cache.php';
+require_once SERVER_PATH.'/libs/Authorization.php';
 
 /**
  * ProblemsController
@@ -761,7 +762,7 @@ class ProblemsController extends Controller {
         try {
             $relationship = new ContestProblems( array(
                 "contest_id" => $this->contest->getContestId(),
-                "problem_id" => $$this->problem->getProblemId(),
+                "problem_id" => $this->problem->getProblemId(),
                 "points"     => RequestContext::get("points"),
                 "order"      => is_null(RequestContext::get("order_in_contest")) ? 
                                     1 : RequestContext::get("order_in_contest") ));

@@ -5,6 +5,9 @@
  *
  * @author joemmanuel
  */
+
+require_once SERVER_PATH.'/controllers/contest.controller.php';
+
 class ContestsFactory {
     
     public static function setContestContext($title = null, $public = 1, Users $contestDirector = null){
@@ -49,6 +52,8 @@ class ContestsFactory {
         $sc->current_user_id = $contestContext["contestDirector"]->getUserId();
         $sc->current_user_obj = $contestContext["contestDirector"];
         $sc->create();
+        
+        return array ("context" => $contestContext);
     }    
 }
 

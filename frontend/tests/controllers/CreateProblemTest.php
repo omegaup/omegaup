@@ -12,6 +12,7 @@ require_once SERVER_PATH . 'controllers/problems.controller.php';
 require_once 'Utils.php';
 require_once 'UsersFactory.php';
 require_once 'ContestsFactory.php';
+require_once 'ProblemsFactory.php';
 
 /*
  *  Tests de LoginController
@@ -36,21 +37,7 @@ class CreateProbelmTest extends PHPUnit_Framework_TestCase
     
     private function setContext($zipName = 'testproblem.zip') {
         
-        $author = UsersFactory::createUser();
-        
-        RequestContext::set("title", Utils::CreateRandomString());
-        RequestContext::set("alias", substr(Utils::CreateRandomString(), 0, 10));
-        RequestContext::set("author_username", $author->getUsername());
-        RequestContext::set("validator", "token");
-        RequestContext::set("time_limit", 5000);
-        RequestContext::set("memory_limit", 32000);                
-        RequestContext::set("source", "ACM");
-        RequestContext::set("order", "normal");
-        RequestContext::set("public", "1");
-        RequestContext::set("points", 1);
-
-        // Set file upload context
-        $_FILES['problem_contents']['tmp_name'] = $zipName;               
+        ProblemsFactory::setContext();               
         
         // Create fileUploader mock                        
         $this->fileUploaderMock = $this->getMock('FileUploader', array('IsUploadedFile', 'MoveUploadedFile'));
@@ -120,5 +107,45 @@ class CreateProbelmTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $problem->getSubmissions());
         $this->assertEquals(0, $problem->getAccepted());
         $this->assertEquals(0, $problem->getDifficulty());                      
+    }
+    
+    
+    public function testAddProblemToContest() {
+        
+        $contestDirector = UsersFactory::createUser();
+        
+        $problemTitle = Utils::CreateRandomString();
+        $problemContext = ProblemsFactory::createProblem($problemTitle);
+        
+        $contestTitle = Utils::CreateRandomString();
+        $contestContext = ContestsFactory::createContest($contestTitle, 1, $contestDirector);
+        
+        $pc = new ProblemsController();
+        $pc->current_user_id = $contestDirector->getUserId();
+        $pc->current_user_obj = $contestDirector;
+                
+        RequestContext::set("contest_alias", $contestContext["context"]["alias"]);
+        RequestContext::set("problem_alias", $problemContext["context"]["alias"]);
+        RequestContext::set("points", 100);        
+        
+        try {
+            $return_array = $pc->addToContest(); 
+        }
+        catch (Exception $e)
+        {
+            var_dump($e->getPrevious()->getLine());
+            $this->fail("Unexpected exception.");
+        }
+        
+        // Get the problem & contest
+        $problem = ProblemsDAO::getByAlias($problemContext["context"]["alias"]);
+        $contest = ContestsDAO::getByAlias($contestContext["context"]["alias"]);
+        $this->assertNotNull($problem);
+        $this->assertNotNull($contest);
+        
+        // Get problem-contest and verify it
+        $contest_problems = ContestProblemsDAO::getByPK($contest->getContestId(), $problem->getProblemId());
+        $this->assertNotNull($contest_problems);        
+        $this->assertEquals(RequestContext::get("points"), $contest_problems->getPoints()); 
     }
 }
