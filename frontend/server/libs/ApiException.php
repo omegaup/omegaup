@@ -88,12 +88,71 @@ class DuplicatedEntryInDatabaseException extends ApiException{
 class InvalidDatabaseOperation extends ApiException{
     
     /**
-     * 
-     * @param string $message
+     *  
      * @param \Exception $previous
      */ 
     function __construct(\Exception $previous = NULL) {
         parent::__construct("Oops. Ive encoutered an internal error. Please try again.", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    }
+}
+
+/**
+ * NotFoundException
+ * 
+ */
+class NotFoundException extends ApiException{
+    
+    /**
+     * 
+     * @param string $message
+     * @param \Exception $previous
+     */ 
+    function __construct($message, \Exception $previous = NULL) {
+        parent::__construct($message, 'HTTP/1.1 404 NOT FOUND', 404, $previous);
+    }
+}
+
+/**
+ * ForbiddenAccessException
+ * 
+ */
+class ForbiddenAccessException extends ApiException{
+    
+    /**
+     * 
+     * @param string $message
+     * @param \Exception $previous
+     */ 
+    function __construct($message = "User is not allowed to view this content.", \Exception $previous = NULL) {
+        parent::__construct($message, 'HTTP/1.1 403 FORBIDDEN', 403, $previous);
+    }
+}
+
+
+/**
+ * PreconditionFailed
+ * 
+ */
+class PreconditionFailedException extends ApiException{
+    
+    /**
+     * 
+     * @param string $message
+     * @param \Exception $previous
+     */ 
+    function __construct($message = "User is not allowed to view this content.", \Exception $previous = NULL) {
+        parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
+    }
+}
+
+class InvalidFilesystemOperation extends ApiException {
+    /**
+     * 
+     * @param string $message
+     * @param \Exception $previous
+     */ 
+    function __construct($message = "Oops. Ive encoutered an internal error. Please try again.", \Exception $previous = NULL) {
+        parent::__construct($message, 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
     }
 }
 

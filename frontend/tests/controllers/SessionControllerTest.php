@@ -118,7 +118,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
         
         try{        
             $auth_token = $sc->NativeLogin("badusername", $user->getPassword(), true);                        
-        }catch (ApiException $e){
+        }catch (ForbiddenAccessException $e){
             return;
         }
         
@@ -136,7 +136,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
         
         try{        
             $auth_token = $sc->NativeLogin($user->getUsername(), "badpassword", true);                        
-        }catch (ApiException $e){
+        }catch (ForbiddenAccessException $e){
             return;
         }
         
