@@ -63,7 +63,7 @@ class ShowContest extends ApiHandler
     	// Check cache first
     	$cache = new Cache(Cache::CONTEST_INFO, RequestContext::get("contest_alias"));    	
     	$result = $cache->get();
-    	
+        	
     	if(is_null($result))
     	{
             // Create array of relevant columns
@@ -137,7 +137,19 @@ class ShowContest extends ApiHandler
         
         // Adding timer info separately as it depends on the current user and we don't
         // want this to get generally cached
-                     
+	        
+	// Save the time of the first access
+        try
+        {
+	     $contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+             $this->_user_id, $this->contest->getContestId());
+        }
+        catch(Exception $e)
+        {
+             // Operation failed in the data layer
+             throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e );        
+        }
+             
         // Add time left to response
         if ($this->contest->getWindowLength() === null)
         {
