@@ -76,6 +76,9 @@ class Contests extends VO
                         if( isset($data['points_decay_factor']) ){
 				$this->points_decay_factor = $data['points_decay_factor'];
 			}
+                        if( isset($data['show_scoreboard_after']) ){
+				$this->show_scoreboard_after = $data['show_scoreboard_after'];
+			}
 		}
 	}
 
@@ -265,6 +268,8 @@ class Contests extends VO
         protected $penalty_calc_policy;
         
         protected $points_decay_factor;
+        
+        protected $show_scoreboard_after;
         
 	final public function getContestId()
 	{
@@ -693,6 +698,17 @@ class Contests extends VO
 		$this->points_decay_factor = $points_decay_factor;
 	}        
         
+        
+        final public function setShowScoreboardAfter($show_scoreboard_after)
+        {
+            $this->show_scoreboard_after = $show_scoreboard_after;
+        }
+        
+        final public function getShowScoreboardAfter()
+        {
+            return $this->show_scoreboard_after;
+        }
+        
         public function hasStarted($user_id)
         {            
             if( time() >= strtotime($this->getStartTime()) )
@@ -700,6 +716,15 @@ class Contests extends VO
                 return true;
             }
             return false;                                    
+        }
+        
+        public function hasFinished()
+        {
+            if( time() >= strtotime($this->getFinishTime()) )
+            {
+                return true;
+            }
+            return false;
         }
         
          public function isInsideContest($user_id)

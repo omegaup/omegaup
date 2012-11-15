@@ -247,19 +247,19 @@ class SesionController extends Controller
     }
 
     /**
-      *
-      *
-      *
-      *
-      *
-      **/
+     * 
+     * @param type $s_UsernameOrEmail
+     * @param type $s_Password
+     * @param type $b_ReturnAuthToken
+     * @return boolean
+     */
     public function NativeLogin( $s_UsernameOrEmail = null, $s_Password = null, $b_ReturnAuthToken = false )
     {
-        $c_Users = new UserController( );
+        $c_Users = new UserController();
 
         $vo_User = null;
 
-        if ( ( $vo_User = $c_Users->FindByEmail( $s_UsernameOrEmail ) )
+        if ( ( $vo_User = $c_Users->FindByEmail( $s_UsernameOrEmail ) ) //@todo usar is_null
                 || ( $vo_User = $c_Users->FindByUsername( $s_UsernameOrEmail ) ) )
         {
             //found user
@@ -284,7 +284,7 @@ class SesionController extends Controller
         }
         catch( Exception $e )
         {
-
+            //@TODO actuar en base a la exception
         }
 
     }

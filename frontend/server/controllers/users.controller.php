@@ -7,7 +7,11 @@
   * Author:
   *     Alan Gonzalez alanboy@alanboy.net
   *
-  **/
+  **/ // @todo mover este archivo a otro ladoooou D:
+
+require_once SERVER_PATH.'/controllers/controller.php';
+require_once SERVER_PATH.'/libs/validators.php';
+
 class SecurityTools
 {
 
@@ -33,6 +37,7 @@ class SecurityTools
     }
 }
 
+<<<<<<< HEAD
 
 
 
@@ -86,6 +91,8 @@ class Validators
 
 
 
+=======
+>>>>>>> 662b9937a0e8e6abb8dcc1f51aaab9c88804d784
 class UserController extends Controller
 {
 
@@ -174,16 +181,8 @@ class UserController extends Controller
       */
     public function Create( $s_Email, $s_Username = null, $s_PlainPassword = null )
     {
-
-        if( is_null( $s_Email ) )
-        {
-            throw new ApiException( "Must provide email" );
-        }
-
-        if( !Validators::isValidEmail( $s_Email ) )
-        {
-            throw new ApiException( "Invalid Email" );
-        }
+        
+        Validators::isEmail($s_Email, "email");        
 
         if( !is_null( $this->FindByEmail( $s_Email ) ) )
         {
@@ -298,7 +297,7 @@ class UserController extends Controller
 
         if( is_null( $vo_UserToTest ) )
         {
-            Logger::warn("User X invalid login");
+            Logger::warn("User X invalid login"); //@todo user x, poner el user de vdd
             return false;
         }
 
