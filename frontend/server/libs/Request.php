@@ -34,6 +34,8 @@ class Request {
 	 */
 	public $user = null;
 
+	public $method = null;
+
 	/**
 	 * The constructor of this class. Uses $contents as the backing for the values.
 	 *
@@ -46,6 +48,10 @@ class Request {
 		} else {
 			$this->params = array();
 		}
+	}
+
+	public function exec() {
+
 	}
 
 	/**
