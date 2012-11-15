@@ -8,6 +8,11 @@ $(document).ready(function() {
 		}
 	}
 	
+	function convertSecondsToReadableTime(seconds) {
+		var time = new Date(seconds);
+		return time.format('{h}h {mm}m', 'es');
+	}
+	
 	var omegaup = new OmegaUp();
 
 	omegaup.getContests(function (data) {
@@ -25,6 +30,7 @@ $(document).ready(function() {
 					'<td>' + list[i].description + '</td>' +
 					'<td><a href="' + makeWorldClockLink(start) + '">' + start.format('long', 'es') + '</a></td>' +
 					'<td><a href="' + makeWorldClockLink(end) + '">' + end.format('long', 'es') + '</a></td>' + 
+					'<td>' + convertSecondsToReadableTime(list[i].duration) + '</td>' +
 					'<td>' + (end < now ? '<a href="/arena/' + list[i].alias + '/practice/">Práctica</a>' : '') + '</td>' +
 				'</tr>')
 			);
