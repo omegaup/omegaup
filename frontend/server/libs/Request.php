@@ -35,6 +35,11 @@ class Request {
 	public $user = null;
 
 	/**
+	 * The method that will be called.
+	 */
+	public $method = null;
+
+	/**
 	 * The constructor of this class. Uses $contents as the backing for the values.
 	 *
 	 * @param array $contents An associative array with the values that this class
@@ -96,5 +101,12 @@ class Request {
 		$req->user = $this->user;
 		$req->renderFormat = $this->renderFormat;
 		return $req;
+	}
+
+	/**
+	 * Executes the user-provided function and returns its result.
+	 */
+	public function execute() {
+		return call_user_func($this->method, $this);
 	}
 }
