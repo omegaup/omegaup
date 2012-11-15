@@ -131,11 +131,12 @@ class CreateProbelmTest extends PHPUnit_Framework_TestCase
         try {
             $return_array = $pc->addToContest(); 
         }
-        catch (Exception $e)
-        {
+        catch (Exception $e) {
             var_dump($e->getPrevious()->getLine());
             $this->fail("Unexpected exception.");
         }
+        
+        $this->assertEquals("ok", $return_array["status"]);
         
         // Get the problem & contest
         $problem = ProblemsDAO::getByAlias($problemContext["context"]["alias"]);
