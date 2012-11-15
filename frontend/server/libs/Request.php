@@ -6,6 +6,8 @@
  * You can pass in an associative array to the constructor and that will be used
  * as a backing for the values.
  *
+ * Request also holds all global state.
+ *
  * You can use the push function to create a child Request object that will have
  * copy-on-write semantics.
  */
@@ -19,6 +21,18 @@ class Request {
 	 * The parent of this Request. This is set whenever the push function is called.
 	 */
 	private $parent = null;
+
+	/**
+	 * The format in which the request will be rendered.
+	 */
+	const JsonFormat = 0;
+	const HtmlFormat = 1;
+	public $renderFormat = Request::JsonFormat;
+
+	/**
+	 * The object of the user currently logged in.
+	 */
+	public $user = null;
 
 	/**
 	 * The constructor of this class. Uses $contents as the backing for the values.
@@ -79,6 +93,8 @@ class Request {
 	public function push($contents = null) {
 		$req = new Request($contents);
 		$req->parent = $this;
+		$req->user = $this->user;
+		$req->renderFormat = $this->renderFormat;
 		return $req;
 	}
 }
