@@ -2,7 +2,6 @@ RewriteEngine on
 
 Options +FollowSymlinks
 
-RewriteRule ^explorer/?(.*)$     ApiLoader.php?_explorer_=1&_api_=$1&%{QUERY_STRING} [L]
-RewriteRule ^/?(.*)$              ApiLoader.php?_explorer_=0&_api_=$1&%{QUERY_STRING} [L]
+RewriteRule ^(.*)$               ApiEntryPoint.php [L]
 
 

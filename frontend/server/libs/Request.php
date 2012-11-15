@@ -34,8 +34,6 @@ class Request {
 	 */
 	public $user = null;
 
-	public $method = null;
-
 	/**
 	 * The method that will be called.
 	 */
@@ -53,10 +51,6 @@ class Request {
 		} else {
 			$this->params = array();
 		}
-	}
-
-	public function exec() {
-
 	}
 
 	/**

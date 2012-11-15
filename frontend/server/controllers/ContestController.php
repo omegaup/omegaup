@@ -4,9 +4,6 @@
  * ContestController
  * 
  */
-require_once SERVER_PATH.'/controllers/controller.php';
-require_once SERVER_PATH.'/libs/RequestContext.php';
-require_once SERVER_PATH.'/libs/validators.php';
 
 class ContestController extends Controller
 {

@@ -9,9 +9,6 @@
   *
   **/ // @todo mover este archivo a otro ladoooou D:
 
-require_once SERVER_PATH.'/controllers/controller.php';
-require_once SERVER_PATH.'/libs/validators.php';
-
 class SecurityTools
 {
 
@@ -37,7 +34,6 @@ class SecurityTools
     }
 }
 
-<<<<<<< HEAD
 
 
 
@@ -91,14 +87,13 @@ class Validators
 
 
 
-=======
->>>>>>> 662b9937a0e8e6abb8dcc1f51aaab9c88804d784
 class UserController extends Controller
 {
 
 
-    public function FindByEmail( $email )
+    public static function FindByEmail( $email )
     {
+
         $email_query = new Emails( );
         $email_query->setEmail( $email );
         $result = EmailsDAO::search( $email_query );

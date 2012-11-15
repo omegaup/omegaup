@@ -3,4 +3,4 @@
 
 require_once("ApiCaller.php");
 
-ApiCaller::htmlEntryPoint();
+ApiCaller::httpEntryPoint();

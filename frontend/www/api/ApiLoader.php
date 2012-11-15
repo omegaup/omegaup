@@ -4,8 +4,9 @@ require_once( "../../server/bootstrap.php" );
 
 
 
-$b_isExplorer = $_GET["_explorer_"];
-$s_ApiAsUrl = $_GET["_api_"];
+$apiAsUrl = $_SERVER["REQUEST_URI"];
+
+var_dump($apiAsUrl);
 
 $a_Args = explode( "/", $s_ApiAsUrl );
 $c_Controller = NULL;

@@ -19,16 +19,22 @@
 
     	if( $googleLogin->success( ) )
         {
-            /*$c_Sesion = new SesionController( );
-            $c_Sesion->LoginViaGoogle( $googleLogin->email( ) );
-            */
 
-            $context = new Request( );
-            $context["email"] = $googleLogin->email( );
+            $c_Sesion = new SesionController( );
+            $c_Sesion->LoginViaGoogle( $googleLogin->email( ) );
+
+            // ---------------------------
+
+            $context = new Request(array("email" => $googleLogin->email( )));
 
             $c_Sesion = new SesionController( );
             $c_Sesion->LoginViaGoogle( $context );
 
+
+            // ---------------------------
+
+            $api = new ApiCaller();
+            $api->Exectue();
 
             die( header( "Location: index.php" ) );
 
