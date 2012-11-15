@@ -99,6 +99,7 @@ if( /* do we need smarty to load? */ true)
 
         $smarty->assign( 'CURRENT_USER_USERNAME', $a_CurrentSesion["username"] );
         $smarty->assign( 'CURRENT_USER_EMAIL', $a_CurrentSesion["email"] );
+        $smarty->assign( 'CURRENT_USER_LANG', "en" );
         $smarty->assign( 'CURRENT_USER_IS_ADMIN', $a_CurrentSesion["is_admin"] );
         $smarty->assign( 'CURRENT_USER_GRAVATAR_URL_128', "<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=92'>" );
         $smarty->assign( 'CURRENT_USER_GRAVATAR_URL_16', "<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=16'>" );

@@ -34,4 +34,20 @@ class UsersDAO extends UsersDAOBase
         return new Users( $rs );
     }
 
+    public static function getByUsername( $s_UserName )
+    {
+        $vo_Query = new Users( array( 
+            "username" => $s_Username
+            ) );
+
+        $a_Results = UsersDAO::search( $vo_Query );
+
+        if ( sizeof( $a_Results ) != 1 )
+        {
+            return NULL;
+        }
+
+        return array_pop( $a_Results );
+    }
+
 }

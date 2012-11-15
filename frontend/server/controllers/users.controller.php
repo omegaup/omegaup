@@ -72,6 +72,16 @@ class Validators
         return filter_var( $s_Email, FILTER_VALIDATE_EMAIL );
     }
 
+
+
+    public static function isValidFullName( $s_Name )
+    {
+        if ( strlen( $s_Name ) < 5 )
+        {
+             return false;
+        }
+
+    }
 }
 
 
@@ -115,10 +125,45 @@ class UserController extends Controller
     }
 
 
-    public function CreateProfile(  )
+    public function CreateProfile( )
     {
         
     }
+
+
+    /**
+      *
+      *
+      *
+      *
+      **/
+    public function Edit( $s_UserName, $s_Name = null, $s_Email = null, $s_Password = null, $s_Lang = null, $s_School = null )
+    {
+        //find user
+        $vo_User = UsersDAO::getByUserName( $s_UserName );
+
+        if( is_null( $vo_User ) )
+        {
+            throw ApiException("USER_NOT_FOUND");
+        }
+
+        if( !is_null($s_Name) )
+        {
+            if( Validators::isValidFullName( $vo_User ) )
+            {
+                $vo_User->setName( $s_Name );
+            }
+            else
+            {
+                throw new ApiException( "INVALID_NAME" );
+            }
+        }
+
+
+
+
+    }
+
 
 
 
@@ -204,6 +249,7 @@ class UserController extends Controller
         catch( Exception $e )
         {
             DAO::transRollback( );
+
             throw new ApiException( "DB_ERROR", $e );
         }
 
