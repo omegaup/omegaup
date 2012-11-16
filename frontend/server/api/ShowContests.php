@@ -121,6 +121,7 @@ class ShowContests extends ApiHandler {
              * He can see it !
              * 
              * */
+            $c->toUnixTime(); 
             $contestInfo = $c->asFilteredArray($relevant_columns);
             $contestInfo["duration"] = (is_null($c->getWindowLength()) ? 
                         $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength()*60));
