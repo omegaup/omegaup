@@ -107,6 +107,12 @@ class Request {
 	 * Executes the user-provided function and returns its result.
 	 */
 	public function execute() {
-		return call_user_func($this->method, $this);
+		$response = call_user_func($this->method, $this);
+		
+		if ($response === false) {
+			throw new NotFoundException("Api requested not found.");
+		}
+		
+		return $response;
 	}
 }

@@ -28,8 +28,9 @@ class ApiCaller{
 	public static function call(Request $request) {
             
 		try {
+			
 			$response = $request->execute();
-
+			
 		} catch (ApiException $apiException) {
 			Logger::error($e);
 			$response = $e->asArray();
@@ -100,8 +101,14 @@ class ApiCaller{
 		}
 		
 		$controllerName = ucfirst($args[2]);
-		$methodName = ucfirst($args[3]);
 		
+		// Making "view" as default method
+		if (!isset($args[3])) {
+			$methodName = "View";
+		} else {
+			$methodName = ucfirst($args[3]);
+		}
+				
 		$controllerName = str_remove(chr(0), '', $controllerName);
 		$methodName = str_remove(chr(0), '', $methodName);
 
