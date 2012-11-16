@@ -78,10 +78,16 @@ class ApiCaller{
 		if (!is_null($r) && $r->renderFormat == Request::HtmlFormat){
 			$smarty->assign("EXPLORER_RESPONSE", $response);
 			$smarty->display("../templates/explorer.tpl");
-
 		}else {
+			
+			// Set header accordingly
+			if ($response["status"] === "error" && isset($response["header"])) {
+				header($response["header"]);
+			} else {
+				header('Content-Type: application/json');
+			}
+			
 			echo json_encode($response);
-
 		}
 	}
 
