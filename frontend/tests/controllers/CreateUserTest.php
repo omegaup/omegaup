@@ -27,12 +27,12 @@ class CreateUserTest extends PHPUnit_Framework_TestCase {
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		
-		$response = json_decode(ApiCaller::httpEntryPoint(), true);	
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);	
 		
-		$this->assertEquals($response["status"], "ok");
+		$this->assertEquals("ok", $response["status"]);
 		
 		// Verify DB		
-		$user = UsersDAO::getByUsername($_REQUEST["username"]);
+		$user = UsersDAO::FindByUsername($_REQUEST["username"]);
 		$this->assertNotNull($user);
 		
 	}
@@ -46,16 +46,16 @@ class CreateUserTest extends PHPUnit_Framework_TestCase {
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		
-		$response = json_decode(ApiCaller::httpEntryPoint(), true);
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);
 		
 		// Randomize email again
 		$_REQUEST["email"] = Utils::CreateRandomString()."@".Utils::CreateRandomString().".com";
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		
-		$response = json_decode(ApiCaller::httpEntryPoint(), true);
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);
 
-		$this->assertEquals($response["status"], "error");
+		$this->assertEquals("error", $response["status"]);
 	}
 	
 	public function testDuplicatedEmails() {
@@ -67,16 +67,16 @@ class CreateUserTest extends PHPUnit_Framework_TestCase {
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		
-		$response = json_decode(ApiCaller::httpEntryPoint(), true);
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);
 		
 		// Randomize username again
 		$_REQUEST["username"] = Utils::CreateRandomString();
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		
-		$response = json_decode(ApiCaller::httpEntryPoint(), true);
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);
 		
-		$this->assertEquals($response["status"], "error");
+		$this->assertEquals("error", $response["status"]);
 		
 	}
 	
@@ -88,9 +88,9 @@ class CreateUserTest extends PHPUnit_Framework_TestCase {
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		
-		$response = json_decode(ApiCaller::httpEntryPoint(), true);	
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);	
 		
-		$this->assertEquals($response["status"], "error");
+		$this->assertEquals("error", $response["status"]);
 	}
 	
 	public function testNoEmail() {
@@ -101,9 +101,9 @@ class CreateUserTest extends PHPUnit_Framework_TestCase {
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		
-		$response = json_decode(ApiCaller::httpEntryPoint(), true);	
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);	
 		
-		$this->assertEquals($response["status"], "error");
+		$this->assertEquals("error", $response["status"]);
 	}
 	
 	public function testNoUser() {
@@ -114,9 +114,9 @@ class CreateUserTest extends PHPUnit_Framework_TestCase {
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		
-		$response = json_decode(ApiCaller::httpEntryPoint(), true);	
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);	
 		
-		$this->assertEquals($response["status"], "error");
+		$this->assertEquals("error", $response["status"]);
 		
 	}
 	

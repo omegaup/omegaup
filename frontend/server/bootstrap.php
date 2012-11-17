@@ -12,26 +12,28 @@ date_default_timezone_set('UTC');
 //set paths
 ini_set('include_path', ini_get('include_path') . ":" .  __DIR__  );
 
-if(!is_file(__DIR__ . "/config.php")) {
-	?>
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-	<HTML>
-	<head>
-		<link rel="stylesheet" type="text/css" href="css/style.css">
-	</head>
-	<body style="padding:5px">
-		<h1>No config file.</h1>
-		<p>You are missing the config file. It must look something like this:</p>
-		<pre class="code">
-		<?php include ("config.php.sample") ; ?>
-		</pre>
-	</body>
-	</html>
-	<?php
-	exit;
-}
+if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
+	if(!is_file(__DIR__ . "/config.php")) {
+		?>
+		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+		<HTML>
+		<head>
+			<link rel="stylesheet" type="text/css" href="css/style.css">
+		</head>
+		<body style="padding:5px">
+			<h1>No config file.</h1>
+			<p>You are missing the config file. It must look something like this:</p>
+			<pre class="code">
+			<?php include ("config.php.sample") ; ?>
+			</pre>
+		</body>
+		</html>
+		<?php
+		exit;
+	}
 
-require_once( "config.php" );
+	require_once( "config.php" );
+}
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
 /*
@@ -73,7 +75,7 @@ try {
 }
 
 
-if(/* do we need smarty to load? */true) {
+if(/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === TRUE)) {
 
 	include("libs/smarty/Smarty.class.php");
 

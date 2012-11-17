@@ -10,6 +10,7 @@
 	
 	// Load api caller
     require_once(OMEGAUP_ROOT."www/api/ApiCaller.php");
+	require_once("ApiCallerMock.php");
 	
     // Load test utils
     require_once("Utils.php");

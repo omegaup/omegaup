@@ -85,21 +85,30 @@ class ApiCaller{
 			$smarty->assign("EXPLORER_RESPONSE", $response);
 			$smarty->display("../templates/explorer.tpl");
 		} else {
-			self::setHttpHeaders($response);
+			static::setHttpHeaders($response);
 			$json_result = json_encode($response);
 
 			if ($json_result === false) {
 				Logger::error("json_encode failed for: ". implode(",", $response));
 				$apiException = new InternalServerError();
 				$json_result = json_encode($apiException->asArray());
-			}
-
-			if (defined('IS_TEST') && IS_TEST === TRUE) {
-				return $json_result;
-			}
+			}							
 			
-			echo $json_result;
+			// Print the result using late static binding semantics
+			// Return needed for testability purposes, for production it 
+			// returns void.
+			return static::printResult($json_result);
 		}
+	}
+	
+	/**
+	 * In production, prints the result.
+	 * Decoupled for testability purposes
+	 * 
+	 * @param string $string
+	 */
+	private static function printResult($string) {
+		echo $json_result;
 	}
 
 	/**
