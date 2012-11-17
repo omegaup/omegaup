@@ -8,14 +8,14 @@ function OmegaUp() {
 			self.syncTime();
 			self.username = data.username;
 		} else {
-			window.location = data.login_url;
+			//window.location = data.login_url;
 		}
 	});
 }
 
 OmegaUp.prototype.authenticated = function(callback) {
 	$.get(
-		'/arena/authenticated/',
+		'/api/Sesion/CurrentSesion',
 		function (data) {
 			callback(data);
 		},

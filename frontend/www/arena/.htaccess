@@ -1,47 +1,4 @@
-RewriteEngine on        
-
-#RewriteCond %{SERVER_PORT} 80 
-#RewriteRule ^(.*)$ https://omegaup.com/arena/$1 [R,L]
-
-RewriteRule ^time/?$ CallApiLoader.php?apicmd=Time [L]
-
-RewriteRule ^authenticated/?$ CallApiLoader.php?apicmd=Authenticated [L]
-RewriteRule ^login/?$ CallApiLoader.php?apicmd=Login [L]
-RewriteRule ^logout/?$ CallApiLoader.php?apicmd=Logout [L]
-
-RewriteRule ^user/edit/?$ CallApiLoader.php?apicmd=UserEdit&%{QUERY_STRING} [L]
-
-RewriteRule ^contests/?$ CallApiLoader.php?apicmd=ShowContests [L]
-RewriteRule ^contests/new/?$ CallApiLoader.php?apicmd=NewContest [L]
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowContest&contest_alias=$1 [L]
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/update/?$ CallApiLoader.php?apicmd=UpdateContest&contest_alias=$1 [L]
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/?$ CallApiLoader.php?apicmd=ShowScoreboard&contest_alias=$1 [L]
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/ranking/events/?$ CallApiLoader.php?apicmd=ShowScoreboardEvents&contest_alias=$1 [L]
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/clarifications/?$ CallApiLoader.php?apicmd=ShowClarificationsInContest&contest_alias=$1 [L]
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/runs/?$ CallApiLoader.php?apicmd=ShowRunsInContest&contest_alias=$1 [L]
-
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowProblemInContest&contest_alias=$1&problem_alias=$2 [L]
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/problem/new/?$ CallApiLoader.php?apicmd=NewProblemInContest&contest_alias=$1 [L]
-
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/users/add/([0-9]+)/?$ CallApiLoader.php?apicmd=AddUserToPrivateContest&contest_alias=$1&user_id=$2 [L]
-RewriteRule ^contests/([a-zA-Z0-9_-]+)/users/remove/([0-9]+)/?$ CallApiLoader.php?apicmd=RemoveUserFromPrivateContest&contest_alias=$1&user_id=$2 [L]
-
-RewriteRule ^runs/new/?$ CallApiLoader.php?apicmd=NewRun [L]
-RewriteRule ^runs/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowRun&run_alias=$1 [L]
-RewriteRule ^runs/([a-zA-Z0-9_-]+)/details/?$ CallApiLoader.php?apicmd=ShowRunDetails&run_alias=$1 [L]
-RewriteRule ^runs/([a-zA-Z0-9_-]+)/source/?$ CallApiLoader.php?apicmd=ShowRunSource&run_alias=$1 [L]
-RewriteRule ^runs/([a-zA-Z0-9_-]+)/rejudge/?$ CallApiLoader.php?apicmd=UpdateRun&run_alias=$1 [L]
-RewriteRule ^runs/problem/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowProblemRuns&problem_alias=$1 [L]
-
-RewriteRule ^clarifications/new/?$ CallApiLoader.php?apicmd=NewClarification [L]
-RewriteRule ^clarifications/problem/([a-zA-Z0-9_-]+)/?$ CallApiLoader.php?apicmd=ShowClarificationsInProblem&problem_alias=$1 [L]
-RewriteRule ^clarifications/show/([0-9]+)/?$ CallApiLoader.php?apicmd=ShowClarification&clarification_id=$1 [L]
-RewriteRule ^clarifications/update/([0-9]+)/?$ CallApiLoader.php?apicmd=UpdateClarification&clarification_id=$1 [L]
-
-RewriteRule ^problems/update/?$ CallApiLoader.php?apicmd=UpdateProblem&redirect=true [L]
-RewriteRule ^problems/([^/]*)/?$ CallApiLoader.php?apicmd=ShowProblems&search=$1 [L]
-RewriteRule ^problems/([a-zA-Z0-9_-]+)/update/?$ CallApiLoader.php?apicmd=UpdateProblem&problem_alias=$1 [L]
-RewriteRule ^problems/([a-zA-Z0-9_-]+)/rejudge/?$ CallApiLoader.php?apicmd=RejudgeProblem&problem_alias=$1 [L]
+RewriteEngine on
 
 # Redirects for UX.
 RewriteRule ^/?$ index.php [L]

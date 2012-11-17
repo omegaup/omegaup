@@ -41,8 +41,8 @@ class SesionController extends Controller
 	return true;
 	}
 
-	public function CurrentSesionAvailable() {
-		$a_CurrentSesion = $this->CurrentSesion();
+	public static function CurrentSesionAvailable() {
+		$a_CurrentSesion = self::apiCurrentSesion();
 		return $a_CurrentSesion[ "valid" ] ;
 	}
 
@@ -50,8 +50,8 @@ class SesionController extends Controller
 	 * Returns associative array with information about current sesion.
 	 *
 	 **/
-	public function CurrentSesion() {
-	        $SesionM = $this->getSessionManagerInstance();
+	public static function apiCurrentSesion() {
+	        $SesionM = self::getSessionManagerInstance();
 	        $s_AuthToken = $SesionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
 	        $vo_CurrentUser = NULL;
 

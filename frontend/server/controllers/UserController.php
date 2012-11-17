@@ -8,7 +8,7 @@
 class UserController extends Controller {
 
 	public static function apiCreate(Request $r) {
-				
+
 		// Validate request
 		Validators::isStringOfMinLength($r["username"], "username", 2);
 		Validators::isEmail($r["email"], "email");
