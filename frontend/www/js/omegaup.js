@@ -43,7 +43,7 @@ $(document).ajaxError(function(e, xhr, settings, exception) {
 OmegaUp.prototype.CreateUser = function(s_Email, s_Username, s_PlainPassword, callback) {
 	console.log("Creating user");
 	$.post(
-		'/api/user/create/email/' + s_Email + "/username" + s_Username + "/password" + s_PlainPassword ,
+		'/api/user/create/email/' + s_Email + "/username" + s_Username + "/password/" + s_PlainPassword ,
 		{ email: s_Email, username: s_Username, password : s_PlainPassword },
 		function (data) {
 			
