@@ -35,7 +35,7 @@ class UserController extends Controller {
 		// Prepare DAOs
 		$user = new Users(array(
 			"username" => $r["username"],
-			"password" => SecurityTools::encryptString($r["password"]),
+			"password" => SecurityTools::hashString($r["password"]),
 			"solved" => 0,
 			"submissions" => 0,
 		));
@@ -118,7 +118,7 @@ class UserController extends Controller {
 		}
 
 		return SecurityTools::CompareEncryptedStrings(
-				SecurityTools::EncryptString($password),
+				SecurityTools::hashString($password),
 				$vo_UserToTest->getPassword());
 	}
 
