@@ -21,16 +21,16 @@ class Validators
      * @return boolean
      * @throws InvalidArgumentException
      */
-    public static function isEmail($parameter, $parameterName, $required = true){    
+    public static function isEmail($parameter, $parameterName, $required = true) {
         $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
-        if ($isPresent && !filter_var($parameter, FILTER_VALIDATE_EMAIL)){
+        if ($isPresent && !filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidParameterException($parameterName.Validators::IS_INVALID);
         }
-        
+
         return true;
     }
-    
+
     /**
      * Check if string is string and not empty
      * 
@@ -80,7 +80,7 @@ class Validators
         $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
                         
         if ($isPresent && !(is_string($parameter) && strlen($parameter) >= $minLength)){
-            throw new InvalidParameterException("{$parameterName} is too short (min length: {$maxLength})");
+            throw new InvalidParameterException("{$parameterName} is too short (min length: {$minLength})");
         }
         
         return true;        

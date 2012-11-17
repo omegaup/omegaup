@@ -145,7 +145,7 @@ class ApiCaller{
 
 	
 		for ($i = 4; $i < sizeof( $args ); $i += 2) {
-			$request[$args[$i]] = $args[$i+1];
+			$request[$args[$i]] = urldecode($args[$i+1]);
 		}
 
 		$request->method = $controllerName . "::" . $methodName;

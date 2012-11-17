@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 class UserController extends Controller {
-	
+
 	public static function apiCreate(Request $r) {
 				
 		// Validate request
@@ -29,7 +29,7 @@ class UserController extends Controller {
 		}
 		
 		if (!(is_null($user) && is_null($userByEmail))) {
-			throw new DuplicatedEntryInDatabaseException("Username already exists.", $e);
+			throw new DuplicatedEntryInDatabaseException("Username already exists.");
 		}
 		
 		// Prepare DAOs
@@ -37,25 +37,25 @@ class UserController extends Controller {
 			"username" => $r["username"],
 			"password" => SecurityTools::hashString($r["password"]),
 			"solved" => 0,
-			"submissions" => 0,			
+			"submissions" => 0,
 		));
 		
 		$email = new Emails(array(
 			"email" => $r["email"],
 		));
-			
+
 		// Save objects into DB
 		try {
 			DAO::transBegin();
-			
+
 			UsersDAO::save($user);
-			
-			$email->setUserId($user->getUserId());			
-			EmailsDAO::save($email);			
+
+			$email->setUserId($user->getUserId());
+			EmailsDAO::save($email);
 			
 			$user->setMainEmailId($email->getEmailId());
-			UsersDAO::save($user);						
-			
+			UsersDAO::save($user);
+
 			DAO::transEnd();
 		} catch (Exception $e) {
 			DAO::transRollback();
