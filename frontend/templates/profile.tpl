@@ -12,6 +12,7 @@
 
 
 {include file='head.tpl'}
+{include file='mainmenu.tpl'}
 
 <div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
     <table>

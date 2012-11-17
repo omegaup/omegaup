@@ -79,7 +79,7 @@ if(/* do we need smarty to load? */true) {
 
 	$smarty = new Smarty;
 	$smarty->assign("ERROR_TO_USER", "");
-	$smarty->setTemplateDir("../templates/" );
+	$smarty->setTemplateDir( __DIR__ . "/../templates/" );
 	$smarty->assign( "CURRENT_USER_IS_ADMIN", 0 );
 	if(defined("SMARTY_CACHE_DIR")) {
 		$smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
@@ -91,7 +91,7 @@ if(/* do we need smarty to load? */true) {
 	if($c_Sesion->CurrentSesionAvailable()) {
 	$smarty->assign("LOGGED_IN", "1");
 
-	$a_CurrentSesion = $c_Sesion->CurrentSesion( );
+	$a_CurrentSesion = $c_Sesion->apiCurrentSesion( );
 	$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSesion["username"] );
 	$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSesion["email"] );
 	$smarty->assign("CURRENT_USER_LANG", "en");

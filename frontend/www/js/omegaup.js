@@ -35,8 +35,15 @@ OmegaUp.UI = {
 }
 
 $(document).ajaxError(function(e, xhr, settings, exception) {
-	var response = jQuery.parseJSON(xhr.responseText)
-	OmegaUp.UI.Error( response.error );
+	var errorToUser = "Unknown error.";
+	try{
+		var response = jQuery.parseJSON(xhr.responseText);
+		errorToUser = response.error;
+	}catch(e){
+		
+	}
+
+	OmegaUp.UI.Error( errorToUser );
 });
 
 

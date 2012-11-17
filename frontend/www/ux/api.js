@@ -1,4 +1,4 @@
-function OmegaUp() {
+/*function OmegaUp() {
 	var self = this;
 	this.username = null;
 
@@ -12,7 +12,7 @@ function OmegaUp() {
 		}
 	});
 }
-
+*/
 OmegaUp.prototype.authenticated = function(callback) {
 	$.get(
 		'/api/Sesion/CurrentSesion',
@@ -61,7 +61,7 @@ OmegaUp.prototype.getContests = function(callback) {
 	var self = this;
 
 	$.get(
-		'/arena/contests/',
+		'/api/arena/contests/',
 		function (data) {
 			for (var idx in data.contests) {
 				var contest = data.contests[idx];
@@ -78,7 +78,7 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	var self = this;
 
 	$.get(
-		'/arena/contests/' + alias + '/',
+		'/api/arena/contests/' + alias + '/',
 		function (contest) {
 			if (contest.status == 'ok') {
 				contest.start_time = self.time(contest.start_time * 1000);

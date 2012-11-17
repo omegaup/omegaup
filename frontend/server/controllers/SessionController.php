@@ -36,9 +36,9 @@ class SesionController extends Controller
 		return self::$_facebook;
 	}
 
-	private function isAuthTokenValid($s_AuthToken) {
-	//do some other basic testing on s_AuthToken
-	return true;
+	private static function isAuthTokenValid($s_AuthToken) {
+		//do some other basic testing on s_AuthToken
+		return true;
 	}
 
 	public static function CurrentSesionAvailable() {
@@ -56,10 +56,13 @@ class SesionController extends Controller
 	        $vo_CurrentUser = NULL;
 
 		//cookie contains an auth token
-	        if(!is_null($s_AuthToken) && $this->isAuthTokenValid($s_AuthToken)) {
+	        if(!is_null($s_AuthToken) && self::isAuthTokenValid($s_AuthToken)) {
 			$vo_CurrentUser = AuthTokensDAO::getUserByToken( $s_AuthToken );
-		} else if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]) && $this->isAuthTokenValid($s_AuthToken = $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
-            $vo_CurrentUser = AuthTokensDAO::getUserByToken( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] );
+
+		} else if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
+				&& self::isAuthTokenValid($s_AuthToken = $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
+			$vo_CurrentUser = AuthTokensDAO::getUserByToken( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] );
+
 		} else {
 			return array(
 				"valid" => false,
@@ -91,7 +94,7 @@ class SesionController extends Controller
 	 *
 	 **/
 	public function UnRegisterSesion() {
-	        $a_CurrentSesion = $this->CurrentSesion( );
+	        $a_CurrentSesion = self::apiCurrentSesion( );
 	        $vo_AuthT = new AuthTokens( array( "token" => $a_CurrentSesion["auth_token"] ) );
 
 	        try {
@@ -115,22 +118,22 @@ class SesionController extends Controller
 		$vo_AuthT->setToken($s_AuthT);
 
 		try {
-			AuthTokensDAO::save( $vo_AuthT );
+			AuthTokensDAO::save($vo_AuthT);
 		} catch(Exception $e) {
-			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation( ), $e);
+			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 		}
 
 		if ($b_ReturnAuthTokenAsString) {
 			return $s_AuthT;
 		} else {
-			$sm = $this->getSessionManagerInstance( );
-			$sm->setCookie( OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time( )+60*60*24, '/' );
+			$sm = $this->getSessionManagerInstance();
+			$sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time( )+60*60*24, '/');
 		}
 	}
 
 	public function LoginViaGoogle($s_Email) {
 		// We trust this user's identity
-		$vo_User = UserDAO::FindByEmail($s_Email);
+		$vo_User = UsersDAO::FindByEmail($s_Email);
 
 		if (is_null($vo_User)) {
 			//user has never logged in before

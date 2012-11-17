@@ -1,5 +1,7 @@
 {include file='head.tpl'}
 
+{include file='mainmenu.tpl'}
+
 <script src="http://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 
 

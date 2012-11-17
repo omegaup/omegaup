@@ -1,8 +1,4 @@
-<!--header-->
-
-
 <!DOCTYPE html>
-
 <!-- @see this later for localization http://www.smarty.net/docs/en/language.function.config.load.tpl -->
 
 <html xmlns="http://www.w3.org/1999/xhtml " xmlns:fb="http://www.facebook.com/2008/fbml ">
@@ -13,8 +9,14 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
         <script type="text/javascript" src="/js/omegaup.js"></script>
         <script type="text/javascript" src="/js/jquery.msgBox.js"></script>
+
+	<script type="text/javascript" src="/ux/api.js"></script>
+
         
-        
+	<!-- from arena -->
+	<!--
+	-->
+	<link rel="shortcut icon" href="/favicon.ico" />
 
         <link rel="stylesheet" type="text/css" href="/css/style.css">
         <link rel="stylesheet" type="text/css" href="/css/msgBoxLight.css">
@@ -22,7 +24,6 @@
 <body>
 
 <div id="wrapper">
-
     <div class="login_bar" style="display: block">
         {if $LOGGED_IN eq '1'}
             {$CURRENT_USER_GRAVATAR_URL_16}
@@ -32,36 +33,3 @@
         {/if}
     </div>
 
-
-
-    <div id="title">
-        <a href="index.php">
-        <div style="margin-left: 15%;">
-            <img src="/media/omegaup_curves.png">
-        </div>
-        </a>
-    </div>
-    <div id="content">
-        <div class="post footer">
-            <ul>
-                {if $CURRENT_USER_IS_ADMIN eq '1'}
-                    <li><a href='/admin/'><b>Admin</b></a></li>
-                {/if}
-                <li><a href='/contests.php'>{#frontPageContests#}</a></li>
-                <li><a href='/probs.php'>{#frontPageProblems#}</a></li>
-                <li><a href='/rank.php'>{#frontPageRanking#}</a></li>
-                <li><a href='/recent.php'>{#frontPageRecent#}</a></li>
-                <li><a href='/api/explorer/'>{#frontPageDevelopers#}</a></li>
-                <li><a href='help.php'>{#frontPageHelp#}</a></li>
-
-                <li><a href='http://blog.omegaup.com/'>{#frontPageBlog#}</a></li>
-                <li><a href='/preguntas/'>{#frontPageQuestions#}</a></li>
-            </ul>
-        </div>
-
-        {if $ERROR_TO_USER eq 'USER_OR_PASSWORD_WRONG'} 
-        <div class="post footer">
-            mensaje 
-        </div>
-        {/if} 
-        

@@ -13,34 +13,15 @@
 
 
     //retured from google
-    if( isset( $_GET["gr"] ) )
-    {
-        $googleLogin = GoogleOpenID::getResponse( );
+    if (isset($_GET["gr"])) {
+        $googleLogin = GoogleOpenID::getResponse();
 
-    	if( $googleLogin->success( ) )
-        {
-
-            $c_Sesion = new SesionController( );
-            $c_Sesion->LoginViaGoogle( $googleLogin->email( ) );
-
-            // ---------------------------
-
-            $context = new Request(array("email" => $googleLogin->email( )));
-
-            $c_Sesion = new SesionController( );
-            $c_Sesion->LoginViaGoogle( $context );
-
-
-            // ---------------------------
-
-            $api = new ApiCaller();
-            $api->Exectue();
-
+    	if($googleLogin->success()) {
+            $c_Sesion = new SesionController();
+            $c_Sesion->LoginViaGoogle($googleLogin->email());
             die( header( "Location: index.php" ) );
-
         }
 
-        
         die(header("Location: login.php?shva=1"));
     }
 
