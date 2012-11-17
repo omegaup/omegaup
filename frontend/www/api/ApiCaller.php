@@ -144,7 +144,7 @@ class ApiCaller{
 		}
 
 	
-		for ($i = 4; $i < sizeof( $args ); $i += 2) {
+		for ($i = 4; ($i+1) < sizeof( $args ); $i += 2) {
 			$request[$args[$i]] = urldecode($args[$i+1]);
 		}
 

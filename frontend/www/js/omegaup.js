@@ -34,18 +34,24 @@ OmegaUp.UI = {
 	}
 }
 
+$(document).ajaxError(function(e, xhr, settings, exception) {
+	var response = jQuery.parseJSON(xhr.responseText)
+	OmegaUp.UI.Error( response.error );
+});
+
+
 OmegaUp.prototype.CreateUser = function(s_Email, s_Username, s_PlainPassword, callback) {
 	console.log("Creating user");
 	$.post(
-		'/api/user/create/' + s_Email + "/" + s_Username + "/" + s_PlainPassword ,
-		{ s_Email: s_Email, s_Username: s_Username, s_PlainPassword : s_PlainPassword },
+		'/api/user/create/email/' + s_Email + "/username" + s_Username + "/password" + s_PlainPassword ,
+		{ email: s_Email, username: s_Username, password : s_PlainPassword },
 		function (data) {
 			
 			console.log("returned", data);
 
 			if( data.status !== undefined && data.status == "error")
 			{
-				OmegaUp.UI.Error( data.reason );
+				OmegaUp.UI.Error( data.error );
 			}else{
 				if(callback !== undefined){ callback( data ) }
 			}
