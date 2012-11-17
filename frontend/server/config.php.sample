@@ -69,3 +69,5 @@
     define("APC_USER_CACHE_ENABLED", false);
     define("APC_USER_CACHE_PROBLEM_STATEMENT", true);
     define("APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT", 300); // in seconds
+
+	define("SMARTY_CACHE_DIR", FALSE);

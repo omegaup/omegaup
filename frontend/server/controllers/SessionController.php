@@ -10,19 +10,27 @@
   **/
 class SesionController extends Controller
 {
-    private static $current_sesion;
+	private static $current_sesion;
 
-    // Create our Application instance (replace this with your appId and secret).
-    private static $_facebook;
+	private static $_sessionManager;
+	
+	public static function getSessionManagerInstance() {
+	        if(is_null(self::$_sessionManager)) {
+			self::$_sessionManager = new SessionManager( );
+		}
+	        return self::$_sessionManager;
+	}
+
+	// Create our Application instance (replace this with your appId and secret).
+	private static $_facebook;
 
     /**
       * @param string nombre Este es el nombre del dude
       *
       **/
-    private static function getFacebookInstance( )
-    {
-        
-        if(is_null(self::$_facebook)){
+	private static function getFacebookInstance() {
+
+        if(is_null(self::$_facebook)) {
             self::$_facebook = new Facebook(array(
                 'appId'  => OMEGAUP_FB_APPID,
                 'secret' => OMEGAUP_FB_SECRET
