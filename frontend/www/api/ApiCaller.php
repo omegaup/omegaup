@@ -78,16 +78,17 @@ class ApiCaller{
 		if (!is_null($r) && $r->renderFormat == Request::HtmlFormat){
 			$smarty->assign("EXPLORER_RESPONSE", $response);
 			$smarty->display("../templates/explorer.tpl");
-		}else {
+		} else {				
+			self::setHttpHeaders($response);			
+			$json_result = json_encode($response);
 			
-			// Set header accordingly
-			if ($response["status"] === "error" && isset($response["header"])) {
-				header($response["header"]);
-			} else {
-				header('Content-Type: application/json');
+			if ($json_result === false) {
+				Logger::error("json_encode failed for: ". implode(",", $response));
+				$apiException = new InternalServerError();
+				$json_result = json_encode($apiException->asArray());
 			}
 			
-			echo json_encode($response);
+			echo $json_result;						
 		}
 	}
 
@@ -103,6 +104,7 @@ class ApiCaller{
 		$args = explode("/", $apiAsUrl);
 		
 		if ($args === false || count($args) < 2) {
+			Logger::error("Api called with URI with less args than expected: ".count($args));
 			throw new NotFoundException("Api requested not found.");
 		}
 		
@@ -122,10 +124,11 @@ class ApiCaller{
 		$methodName = "api".$methodName;
 		
 		if(!class_exists($controllerName)) {
+			Logger::error("Controller name was not found: ". $controllerName);
 			throw new NotFoundException("Api requested not found.");
 		}
 
-		$request = new Request();
+		$request = new Request($_REQUEST);
 
 		// Just to double check that we are
 		// only instatiate a controller.
@@ -135,10 +138,34 @@ class ApiCaller{
 				$request->method = $controllerName . "::" . $methodName;
 				break;
 			default:
+				Logger::error("Controller name was not found: ". $controllerName);
 				throw new NotFoundException("Api requested not found.");
+				break;
 		}
 		
 		return $request;
+	}
+	
+	/**
+	 * Sets all required headers for the API called via HTTP
+	 * 
+	 * @param array $response
+	 */
+	private static function setHttpHeaders(array $response) {
+		
+		// Scumbag IE y su cache agresivo.
+		header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		
+		// Set header accordingly
+		if ($response["status"] === "error" && isset($response["header"])) {
+			header($response["header"]);
+		} else {
+			header('Content-Type: application/json');
+		}		
 	}
 }
 
