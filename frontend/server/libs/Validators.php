@@ -9,7 +9,7 @@
 class Validators
 {
     // @todo Localization
-    const IS_EMPTY = " is empty.";
+    const IS_EMPTY = " cannot be empty.";
     const IS_INVALID = " is invalid.";       
     
     /**
@@ -45,7 +45,7 @@ class Validators
         
         // Validate data is string        
         if($isPresent && (!is_string($parameter) || strlen($parameter) < 1)){ 
-            throw new InvalidParameterException($parameterName.Validators::IS_INVALID);
+            throw new InvalidParameterException($parameterName.Validators::IS_EMPTY);
         }
                 
         // Validation passed
@@ -63,7 +63,24 @@ class Validators
         $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
                         
         if ($isPresent && !(is_string($parameter) && strlen($parameter) <= $maxLength)){
-            throw new InvalidParameterException($parameterName.Validators::IS_INVALID);
+            throw new InvalidParameterException("{$parameterName} is too large (max length: {$maxLength})");
+        }
+        
+        return true;        
+    }
+	
+	/**
+     * 
+     * @param string $parameter
+     * @param string $parameterName
+     * @param int $minLength
+     * @param boolean $required
+     */
+    public static function isStringOfMinLength($parameter, $parameterName, $minLength, $required = true){
+        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+                        
+        if ($isPresent && !(is_string($parameter) && strlen($parameter) >= $minLength)){
+            throw new InvalidParameterException("{$parameterName} is too short (min length: {$maxLength})");
         }
         
         return true;        
@@ -106,7 +123,7 @@ class Validators
         
         // Validate that is target number is inside the range
         if ($isPresent && !($value >= $lowerBound && $value <= $upperBound)){
-            throw new InvalidParameterException($parameterName.Validators::IS_INVALID);            
+            throw new InvalidParameterException("{$parameterName} is outside the allowed range ({$lowerBound}, {$upperBound})");            
         }
         
         return true; 
@@ -125,7 +142,7 @@ class Validators
         
         // Validate that we are working with a number
         if ($isPresent && !is_numeric($parameter)){
-            throw new InvalidParameterException($parameterName.Validators::IS_INVALID);
+            throw new InvalidParameterException("{$parameterName} is not a number.");
         }
         
         return true;  
@@ -151,7 +168,7 @@ class Validators
                 }
             }
             
-            throw new InvalidParameterException($parameterName.Validators::IS_INVALID);
+            throw new InvalidParameterException("{$parameterName} is not in expected set: ".implode(", ", $enum));
         }
             
         return true;

@@ -10,32 +10,34 @@
 date_default_timezone_set('UTC');
 
 //set paths
-define( 'SERVER_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR . "server" );
-ini_set( 'include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH );
+define('SERVER_PATH', OMEGAUP_ROOT."server");
+ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . SERVER_PATH );
 
 
+if (defined('IS_TEST') && IS_TEST !== TRUE) {
+	if(!is_file(SERVER_PATH . DIRECTORY_SEPARATOR . "config.php"))
+	{
+		?>
+		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+		<HTML>
+		<head>
+			<link rel="stylesheet" type="text/css" href="css/style.css">
+		</head>
+		<body style="padding:5px">
+			<h1>No config file.</h1>
+				<p>You are missing the config file. It must look something like this:</p>
+			<pre class="code">
+				<?php include ("config.php.sample") ; ?>
+			</pre>
+			</body>
+		</html>
+		<?php
+		exit;
+	}
 
-if(!is_file(SERVER_PATH . DIRECTORY_SEPARATOR . "config.php"))
-{
-	?>
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-    <HTML>
-	<head>
-		<link rel="stylesheet" type="text/css" href="css/style.css">
-	</head>
-	<body style="padding:5px">
-		<h1>No config file.</h1>
-			<p>You are missing the config file. It must look something like this:</p>
-		<pre class="code">
-			<?php include ("config.php.sample") ; ?>
-		</pre>
-		</body>
-	</html>
-	<?php
-	exit;
+	require_once( SERVER_PATH . "/config.php" );
 }
 
-require_once( SERVER_PATH . "/config.php" );
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
 /*
@@ -46,11 +48,14 @@ require_once("libs/logger/Logger.php");
 require_once("libs/dao/model.inc.php");
 require_once("libs/SessionManager.php");
 require_once("libs/Request.php");
+require_once("libs/Validators.php");
+require_once("libs/SecurityTools.php");
 
 /**
   * Load controllers
   *
   **/
+require_once("controllers/Controller.php");
 require_once("controllers/UserController.php");
 require_once("controllers/SessionController.php");
 require_once("controllers/ContestController.php");
@@ -58,6 +63,7 @@ require_once("controllers/ContestController.php");
 require_once("libs/adodb5/adodb.inc.php");
 require_once("libs/adodb5/adodb-exceptions.inc.php");
 
+global $conn;
 $conn = null;
 
 try
@@ -77,7 +83,7 @@ try
 }
 
 
-if( /* do we need smarty to load? */ true) // @todo skip for API
+if(defined('IS_TEST') && IS_TEST !== TRUE && /* do we need smarty to load? */ true) // @todo skip for API
 {
     include("libs/smarty/Smarty.class.php");
 

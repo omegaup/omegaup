@@ -11,7 +11,7 @@
  * You can use the push function to create a child Request object that will have
  * copy-on-write semantics.
  */
-class Request {
+class Request extends ArrayObject {
 	/**
 	 * The parameters that can be accessed through this Request.
 	 */

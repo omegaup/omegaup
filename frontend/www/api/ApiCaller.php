@@ -1,6 +1,6 @@
 <?php
 
-require_once("..\..\server\bootstrap.php");
+require_once(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."server".DIRECTORY_SEPARATOR."bootstrap.php");
 
 /**
  * Encapsulates calls to the API and provides initialization and
@@ -31,7 +31,7 @@ class ApiCaller{
 			
 			$response = $request->execute();
 			
-		} catch (ApiException $apiException) {
+		} catch (ApiException $e) {
 			Logger::error($e);
 			$response = $e->asArray();
 
@@ -63,8 +63,14 @@ class ApiCaller{
 			$apiException = new InternalServerError($e);
 			$response = $apiException->asArray();
 		}
-
-		self::render($response, $r);
+		
+		if (is_null($response) || !is_array($response)) {
+			$apiException = new InternalServerError(new Exception("Api did not return an array."));
+			Logger::log($apiException);
+			$response = $apiException->asArray();
+		}
+		
+		return self::render($response, $r);
 	}
 
 	/**
@@ -88,6 +94,10 @@ class ApiCaller{
 				$json_result = json_encode($apiException->asArray());
 			}
 			
+			if (defined('IS_TEST') && IS_TEST === TRUE) {
+				return $json_result;
+			}			
+			
 			echo $json_result;						
 		}
 	}
@@ -108,7 +118,21 @@ class ApiCaller{
 			throw new NotFoundException("Api requested not found.");
 		}
 		
-		$controllerName = ucfirst($args[2]);
+		$controllerName = ucfirst($args[2]);				
+				
+		// Removing NULL bytes
+		$controllerName = str_replace(chr(0), '', $controllerName);
+		$methodName = str_replace(chr(0), '', $methodName);
+
+		$controllerName = $controllerName."Controller";		
+		
+		if(!class_exists($controllerName)) {
+			Logger::error("Controller name was not found: ". $controllerName);
+			throw new NotFoundException("Api requested not found.");
+		}		
+		
+		// Create request
+		$request = new Request($_REQUEST);
 		
 		// Making "view" as default method
 		if (!isset($args[3])) {
@@ -116,22 +140,24 @@ class ApiCaller{
 		} else {
 			$methodName = ucfirst($args[3]);
 		}
-				
-		$controllerName = str_remove(chr(0), '', $controllerName);
-		$methodName = str_remove(chr(0), '', $methodName);
-
-		$controllerName = $controllerName."Controller";
+		
+		// Prepend api
 		$methodName = "api".$methodName;
 		
-		if(!class_exists($controllerName)) {
-			Logger::error("Controller name was not found: ". $controllerName);
-			throw new NotFoundException("Api requested not found.");
-		}
+		// Check the method
+		if(!method_exists($controllerName, $methodName)) {
+			// Enable API calling like api/contest/IOI2012
+			if (isset($args[3])) {
+				$methodName = "apiView";
+				$request["alias"] = $args[3];
+			}
+			else {
+				Logger::error("Method name was not found: ". $controllerName."::".$methodName);
+				throw new NotFoundException("Api requested not found.");
+			}
+		}		
 
-		$request = new Request($_REQUEST);
-
-		// Just to double check that we are
-		// only instatiate a controller.
+		// Just to double check that we are only instatiate a controller.		
 		switch($controllerName) {
 			case "SesionController":
 			case "UserController":
@@ -141,7 +167,7 @@ class ApiCaller{
 				Logger::error("Controller name was not found: ". $controllerName);
 				throw new NotFoundException("Api requested not found.");
 				break;
-		}
+		}				
 		
 		return $request;
 	}
@@ -152,6 +178,11 @@ class ApiCaller{
 	 * @param array $response
 	 */
 	private static function setHttpHeaders(array $response) {
+		
+		// phpunit does not like headers
+		if (defined('IS_TEST') && IS_TEST === TRUE) {
+			return;		
+		}
 		
 		// Scumbag IE y su cache agresivo.
 		header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");

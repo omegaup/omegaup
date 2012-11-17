@@ -1,30 +1,16 @@
 <?php
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
- * Description of Utils
+ * Test utils
  *
- * @author Nancy
+ * @author joemmanuel
  */
 
-//require_once '../Login.php';
-//require_once '../Logout.php';
-//require_once 'NewContestTest.php';
-//require_once 'NewProblemInContestTest.php';
 
 
 class Utils
-{
-    static $contestant;
-    static $contestant_2;
-    static $judge;
-    static $problem_author;
-    static $admin;
-    
+{        
     static $inittime;
     static $counttime;
     
@@ -36,177 +22,7 @@ class Utils
         {
             unset($p);
         }       
-    }
-    
-    static function ConnectToDB()
-    {
-       		
-        require_once(OMEGAUP_FRONTEND_SERVER_ROOT."libs/dao/model.inc.php");   
-        require_once(OMEGAUP_FRONTEND_SERVER_ROOT."libs/adodb5/adodb.inc.php");
-        require_once(OMEGAUP_FRONTEND_SERVER_ROOT."libs/adodb5/adodb-exceptions.inc.php");
-        
-        $conn = null;
-
-        try{                    
-           $conn = ADONewConnection(OMEGAUP_DB_DRIVER);                    
-           $conn->debug = OMEGAUP_DB_DEBUG;
-           $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
-
-
-            if(!$conn) {
-                        /**
-                         * Dispatch missing parameters
-                         * */
-                        header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-
-                        die(json_encode(array(
-                                "status" => "error",
-                                "error"	 => "Conection to the database has failed.",
-                                "errorcode" => 1
-                        )));
-
-            }
-
-        } catch (Exception $e) {
-
-                header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-
-                die(json_encode(array(
-                        "status" => "error",
-                        "error"	 => $e,
-                        "errorcode" => 2
-                )));
-
-        }
-        $GLOBALS["conn"] = $conn;
-        return;    
-    }
-    
-    static function Login($username, $password)
-    {
-        self::cleanup();
-
-        $mockCreator = new NewContestTest();
-        $sessionManagerMock = $mockCreator->getMock('SessionManager', array('SetCookie'));
-        
-        $sessionManagerMock->expects($mockCreator->any())
-                ->method('SetCookie')
-                ->will($mockCreator->returnValue(true));
-        
-        RequestContext::set("username", $username);
-        RequestContext::set("password", $password);
-        
-        // Login                                        
-        $loginApi = new Login($sessionManagerMock);  
-        
-        try
-        {
-            $cleanValue = $loginApi->ExecuteApi();
-        }
-        catch(ApiException $e)
-        {
-            var_dump($e->getArrayMessage());
-        }
-        
-        $auth_token = $cleanValue["auth_token"];
-        Logger::log("login authtoken " . $auth_token          );
-        
-        self::cleanup();                
-        return $auth_token;
-        
-    }
-    
-    static function Logout($auth_token)
-    {                        
-        // Mock SessionManager
-        $mockCreator = new NewContestTest();
-        $sessionManagerMock = $mockCreator->getMock('SessionManager', array('SetCookie'));
-        
-        $sessionManagerMock->expects($mockCreator->any())
-                ->method('SetCookie')
-                ->will($mockCreator->returnValue(true));
-
-        
-        // Logout            
-        RequestContext::set("auth_token", $auth_token);
-        
-        $logoutApi = new Logout($sessionManagerMock);        
-        $cleanValue = $logoutApi->ExecuteApi();
-                
-        //Validate that token isn´t there anymore        
-        $resultsDB = AuthTokensDAO::search(new AuthTokens(array("auth_token" => $auth_token)));
-        if(sizeof($resultsDB) !== 0)
-        {
-            throw new Exception("User was not logged out correctly");
-        }
-                
-    }
-    
-    static function LoginAsContestDirector()
-    {
-        return self::Login(self::$judge->getUsername(), self::$judge->getPassword());
-    }
-    
-    static function GetContestDirectorUserId()
-    {
-        return self::$judge->getUserId();
-    }
-    
-    static function LoginAsAdmin()
-    {
-        return self::Login(self::$admin->getUsername(), self::$admin->getPassword());
-    }
-    
-    static function LoginAsContestant()
-    {
-        return self::Login(self::$contestant->getUsername(), self::$contestant->getPassword());
-    }
-    
-    static function LoginAsProblemAuthor()
-    {
-        return self::Login(self::$problem_author->getUsername(), self::$problem_author->getPassword());
-    }
-    
-    static function GetContestantUsername()
-    {
-        return self::$contestant->getUsername();
-    }
-    
-    static function GetContestantUserId()
-    {
-        return self::$contestant->getUserId();
-    }
-    
-    static function GetProblemAuthorUsername()
-    {
-        return self::$problem_author->getUsername();
-    }
-    
-    static function GetProblemAuthorUserId()
-    {
-        return self::$problem_author->getUserId();
-    }
-    
-    static function LoginAsContestant2()
-    {
-        return self::Login(self::$contestant_2->getUsername(), self::$contestant_2->getPassword());
-    }
-    
-    static function GetContestant2Username()
-    {
-        return self::$contestant_2->getUsername();
-    }
-    
-    static function GetContestant2UserId()
-    {
-        return self::$contestant_2->getUserId();
-    }
-    
-    
-    static function SetAuthToken($auth_token)
-    {
-        RequestContext::set("auth_token", $auth_token);        
-    }
+    }        
     
     static function CreateRandomString()
     {
@@ -362,9 +178,9 @@ class Utils
         {
 	    try
   	    {
-           	 $sql = "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE " . $t . "; SET FOREIGN_KEY_CHECKS=1;";
-		 $conn->GetRow($sql);
-            }
+           	$sql = "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE " . $t . "; SET FOREIGN_KEY_CHECKS=1;";
+			$conn->GetRow($sql);
+        }
 	    catch(Exception $e)
 	    {
 	    }	 		
