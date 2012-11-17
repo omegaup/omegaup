@@ -12,8 +12,7 @@ date_default_timezone_set('UTC');
 //set paths
 ini_set('include_path', ini_get('include_path') . ":" .  __DIR__  );
 
-if(!is_file(__DIR__ . "/config.php"))
-{
+if(!is_file(__DIR__ . "/config.php")) {
 	?>
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<HTML>
@@ -33,7 +32,6 @@ if(!is_file(__DIR__ . "/config.php"))
 }
 
 require_once( "config.php" );
-
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
 /*
@@ -71,7 +69,7 @@ try {
 		$conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 	}
 }catch (Exception $databaseConectionException) {
-	var_dump( $databaseConectionException );
+	var_dump($databaseConectionException);
 }
 
 
@@ -91,7 +89,7 @@ if(/* do we need smarty to load? */true) {
 
 	$c_Sesion = new SesionController;
 	if($c_Sesion->CurrentSesionAvailable()) {
-	$smarty->assign('LOGGED_IN', '1');
+	$smarty->assign("LOGGED_IN", "1");
 
 	$a_CurrentSesion = $c_Sesion->CurrentSesion( );
 	$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSesion["username"] );
@@ -102,4 +100,3 @@ if(/* do we need smarty to load? */true) {
 	$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", "<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=16'>");
 	}
 }
-

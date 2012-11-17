@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."server".DIRECTORY_SEPARATOR."bootstrap.php");
+require_once("../../server/bootstrap.php");
 
 /**
  * Encapsulates calls to the API and provides initialization and
@@ -11,7 +11,7 @@ class ApiCaller{
 
 	/**
 	 * Initializes the Request before calling API
-	 * 
+	 *
 	 * @return Request
 	 */
 	private static function init() {
@@ -21,12 +21,12 @@ class ApiCaller{
 	/**
 	 * Execute the request and return the response as associative
 	 * array.
-	 * 
+	 *
 	 * @param Request $request
 	 * @return array
 	 */
 	public static function call(Request $request) {
-            
+
 		try {
 			
 			$response = $request->execute();
@@ -51,7 +51,7 @@ class ApiCaller{
 	public static function httpEntryPoint() {
 		$r = NULL;
 		try {
-			$r = self::init();			
+			$r = self::init();
 			$response = self::call($r);
 
 		} catch (ApiException $apiException) {
@@ -84,21 +84,21 @@ class ApiCaller{
 		if (!is_null($r) && $r->renderFormat == Request::HtmlFormat){
 			$smarty->assign("EXPLORER_RESPONSE", $response);
 			$smarty->display("../templates/explorer.tpl");
-		} else {				
-			self::setHttpHeaders($response);			
+		} else {
+			self::setHttpHeaders($response);
 			$json_result = json_encode($response);
-			
+
 			if ($json_result === false) {
 				Logger::error("json_encode failed for: ". implode(",", $response));
 				$apiException = new InternalServerError();
 				$json_result = json_encode($apiException->asArray());
 			}
-			
+
 			if (defined('IS_TEST') && IS_TEST === TRUE) {
 				return $json_result;
-			}			
+			}
 			
-			echo $json_result;						
+			echo $json_result;
 		}
 	}
 
@@ -118,71 +118,48 @@ class ApiCaller{
 			throw new NotFoundException("Api requested not found.");
 		}
 		
-		$controllerName = ucfirst($args[2]);				
-				
+		$controllerName = ucfirst($args[2]);
+
 		// Removing NULL bytes
 		$controllerName = str_replace(chr(0), '', $controllerName);
-		$methodName = str_replace(chr(0), '', $methodName);
+		$methodName = str_replace(chr(0), '', $args[3]);
 
-		$controllerName = $controllerName."Controller";		
-		
+		$controllerName = $controllerName."Controller";
+
 		if(!class_exists($controllerName)) {
 			Logger::error("Controller name was not found: ". $controllerName);
 			throw new NotFoundException("Api requested not found.");
-		}		
-		
+		}
+
 		// Create request
 		$request = new Request($_REQUEST);
-		
-		// Making "view" as default method
-		if (!isset($args[3])) {
-			$methodName = "View";
-		} else {
-			$methodName = ucfirst($args[3]);
-		}
-		
+
 		// Prepend api
 		$methodName = "api".$methodName;
-		
+
 		// Check the method
 		if(!method_exists($controllerName, $methodName)) {
-			// Enable API calling like api/contest/IOI2012
-			if (isset($args[3])) {
-				$methodName = "apiView";
-				$request["alias"] = $args[3];
-			}
-			else {
-				Logger::error("Method name was not found: ". $controllerName."::".$methodName);
-				throw new NotFoundException("Api requested not found.");
-			}
-		}		
+			Logger::error("Method name was not found: ". $controllerName."::".$methodName);
+			throw new NotFoundException("Api requested not found.");
+		}
 
-		// Just to double check that we are only instatiate a controller.		
-		switch($controllerName) {
-			case "SesionController":
-			case "UserController":
-				$request->method = $controllerName . "::" . $methodName;
-				break;
-			default:
-				Logger::error("Controller name was not found: ". $controllerName);
-				throw new NotFoundException("Api requested not found.");
-				break;
-		}				
-		
+	
+		for ($i = 4; $i < sizeof( $args ); $i += 2) {
+			$request[$args[$i]] = $args[$i+1];
+		}
+
+		$request->method = $controllerName . "::" . $methodName;
+	
 		return $request;
 	}
-	
+
+
 	/**
 	 * Sets all required headers for the API called via HTTP
 	 * 
 	 * @param array $response
 	 */
 	private static function setHttpHeaders(array $response) {
-		
-		// phpunit does not like headers
-		if (defined('IS_TEST') && IS_TEST === TRUE) {
-			return;		
-		}
 		
 		// Scumbag IE y su cache agresivo.
 		header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
@@ -192,11 +169,11 @@ class ApiCaller{
 		header("Pragma: no-cache");
 		
 		// Set header accordingly
-		if ($response["status"] === "error" && isset($response["header"])) {
+		if (isset($response["header"])) {
 			header($response["header"]);
 		} else {
-			header('Content-Type: application/json');
-		}		
+			header("Content-Type: application/json");
+		}
 	}
 }
 

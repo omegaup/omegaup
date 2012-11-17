@@ -4,4 +4,3 @@ Options +FollowSymlinks
 
 RewriteRule ^(.*)$               ApiEntryPoint.php [L]
 
-
