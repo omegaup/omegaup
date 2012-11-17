@@ -1,12 +1,11 @@
 <?php
 
-require_once SERVER_PATH . 'controllers/users.controller.php';
 
 /**
  * @author joemmanuel
  */
 
-class UsersFactory {
+class UserFactory {
     
    /**
     * Crea un usuario
@@ -26,10 +25,18 @@ class UsersFactory {
             $email = Utils::CreateRandomString()."@mail.com";
         }
         
-        
-        $uc = new UserController();
-        $user = new Users($uc->Create($email, $username, $password));                       
-        
+		// Set context
+		$_REQUEST["username"] = $username;
+		$_REQUEST["password"] = $password;
+		$_REQUEST["email"] = $email;
+		
+		// Call api
+		$_SERVER["REQUEST_URI"] = "/api/user/create";		
+		$response = json_decode(ApiCallerMock::httpEntryPoint(), true);	
+                
+		// Get user from db
+		$user = UsersDAO::FindByUsername($username);
+		
         // Set password in plaintext
         $user->setPassword($password);
         return $user;
