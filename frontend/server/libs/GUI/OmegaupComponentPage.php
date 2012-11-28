@@ -117,9 +117,7 @@ class OmegaupComponentPage extends StdComponentPage{
 			 *
 			 * Test if user is admin 
 			 **/
-			$test_admin = UserRolesDAO::getByPK( $this_user->getUserId(), 1 );
-			
-			if(!is_null($test_admin)){
+			if(Authorization::IsSystemAdmin($this_user->getUserId())){
 				//he is admin !
 				$this->user_html_menu .= "| <a href='admin'>Administrar OmegaUp</a>&nbsp;";					
 			}

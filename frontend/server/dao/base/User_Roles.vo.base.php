@@ -28,6 +28,9 @@ class UserRoles extends VO
 			if( isset($data['role_id']) ){
 				$this->role_id = $data['role_id'];
 			}
+			if( isset($data['contest_id']) ){
+				$this->contest_id = $data['contest_id'];
+			}
 		}
 	}
 
@@ -42,7 +45,8 @@ class UserRoles extends VO
 	{ 
 		$vec = array( 
 			"user_id" => $this->user_id,
-			"role_id" => $this->role_id
+			"role_id" => $this->role_id,
+			"contest_id" => $this->contest_id
 		); 
 	return json_encode($vec); 
 	}
@@ -66,6 +70,16 @@ class UserRoles extends VO
 	  * @var int(11)
 	  */
 	protected $role_id;
+
+	/**
+	  * contest_id
+	  * 
+	  *  [Campo no documentado]<br>
+	  * <b>Llave Primaria</b><br>
+	  * @access protected
+	  * @var int(11)
+	  */
+	protected $contest_id;
 
 	/**
 	  * getUserId
@@ -117,6 +131,33 @@ class UserRoles extends VO
 	final public function setRoleId( $role_id )
 	{
 		$this->role_id = $role_id;
+	}
+
+
+	/**
+	  * getContestId
+	  * 
+	  * Get the <i>contest_id</i> property for this object. Donde <i>contest_id</i> es  [Campo no documentado]
+	  * @return int(11)
+	  */
+	final public function getContestId()
+	{
+		return $this->contest_id;
+	}
+
+	/**
+	  * setContestId( $contest_id )
+	  * 
+	  * Set the <i>contest_id</i> property for this object. Donde <i>contest_id</i> es  [Campo no documentado].
+	  * Una validacion basica se hara aqui para comprobar que <i>contest_id</i> es de tipo <i>int(11)</i>. 
+	  * Si esta validacion falla, se arrojara... algo. 
+	  * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
+	  * No deberias usar setContestId( ) a menos que sepas exactamente lo que estas haciendo.<br>
+	  * @param int(11)
+	  */
+	final public function setContestId( $contest_id )
+	{
+		$this->contest_id = $contest_id;
 	}
 
 }

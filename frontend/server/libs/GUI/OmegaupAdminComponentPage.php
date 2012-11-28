@@ -58,17 +58,7 @@ class OmegaupAdminComponentPage extends StdComponentPage{
 			$this->user_html_menu = '<img src="https://secure.gravatar.com/avatar/'. md5($this_user->getUsername())  .'?s=16&amp;d=identicon&amp;r=PG"  >';
 			$this->user_html_menu .= ' Hola <a href="../profile.php?id='.$this_user->getUserId()  .'">' . $this_user->getUsername()  .'</a>&nbsp;';
 
-			/**
-			 *
-			 * Test if user is admin 
-			 **/
-			$test_admin = UserRolesDAO::getByPK( $this_user->getUserId(), 1 );
-			
-			if(!is_null($test_admin)){
-				//he is admin !
-				$this->user_html_menu .= "| <a href='index.php'>Administrar Omegaup</a>&nbsp;";					
-			}
-
+			$this->user_html_menu .= "| <a href='index.php'>Administrar Omegaup</a>&nbsp;";					
 
 			$this->user_html_menu .= "| <a href='../?request=logout'>Cerrar Sesion</a>&nbsp;";	
 			return;

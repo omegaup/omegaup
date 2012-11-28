@@ -120,7 +120,18 @@ class Authorization
         if (is_null($contest) || !is_a($contest, "Contests"))
         {
             return false;
+	}
+
+        try
+        {
+		if (!is_null(UserRolesDAO::getByPK($user_id, ADMIN_ROLE, $contest->getContestId()))) {
+			return true;
+		}
         }
+        catch(Exception $e)
+        {
+            throw new ApiException( ApiHttpErrors::invalidDatabaseOperation(), $e);     
+        }               
         
         return ($contest->getDirectorId() === $user_id) || self::IsSystemAdmin($user_id);
     }
@@ -129,7 +140,7 @@ class Authorization
     {
         try
         {
-            $ur = UserRolesDAO::getByPK($user_id, ADMIN_ROLE);
+            $ur = UserRolesDAO::getByPK($user_id, ADMIN_ROLE, 0);
             
             return !is_null($ur);
             
