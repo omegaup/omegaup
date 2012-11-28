@@ -212,7 +212,7 @@ class OmegaupComponentPage extends StdComponentPage{
 									<!-- <li><a href='probs.php'>Problemas</a></li> -->
 									<li><a href='rank.php'>Ranking</a></li>
 									<li><a href='recent.php'>Actividad reciente</a></li>
-									<li><a href='faq.php'>FAQ</a></li>
+									<li><a href='/preguntas/'>Preguntas</a></li>
 
 									<!-- <li><a href='schools.php'>Escuelas</a></li> -->
 									<li><a href='help.php'>Colabora</a></li>
