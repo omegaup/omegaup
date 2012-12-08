@@ -77,7 +77,6 @@ OmegaUp.prototype.CreateUser = function(s_Email, s_Username, s_PlainPassword, ca
 	);
 };
 */
---------------------------------------------------------------------------------
 
 OmegaUp.prototype.authenticated = function(callback) {
 	$.get(

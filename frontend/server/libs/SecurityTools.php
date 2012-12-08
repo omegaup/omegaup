@@ -15,7 +15,7 @@ class SecurityTools {
 	}
 
 	public static function compareEncryptedStrings($encrypted_a, $encrypted_b) {
-		Logger::log($encrypted_a ."------". $encrypted_b);
+		Logger::log($encrypted_a ."<------>". $encrypted_b);
 		return strcmp( $encrypted_a, $encrypted_b ) == 0;
 	}
 
@@ -38,4 +38,10 @@ class SecurityTools {
 		return $hash;
 	}
 }
+
+$hasher = new PasswordHash(8, false);
+//Logger::log($hasher);
+$hash = $hasher->HashPassword("foo");
+Logger::log($hash);
+
 
