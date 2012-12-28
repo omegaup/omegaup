@@ -14,22 +14,25 @@ abstract class UserRolesDAOBase extends DAO
 
 		private static $loadedRecords = array();
 
-		private static function recordExists(  $user_id, $role_id ){
+		private static function recordExists(  $user_id, $role_id, $contest_id ){
 			$pk = "";
 			$pk .= $user_id . "-";
 			$pk .= $role_id . "-";
+			$pk .= $contest_id . "-";
 			return array_key_exists ( $pk , self::$loadedRecords );
 		}
-		private static function pushRecord( $inventario,  $user_id, $role_id){
+		private static function pushRecord( $inventario,  $user_id, $role_id, $contest_id){
 			$pk = "";
 			$pk .= $user_id . "-";
 			$pk .= $role_id . "-";
+			$pk .= $contest_id . "-";
 			self::$loadedRecords [$pk] = $inventario;
 		}
-		private static function getRecord(  $user_id, $role_id ){
+		private static function getRecord(  $user_id, $role_id, $contest_id ){
 			$pk = "";
 			$pk .= $user_id . "-";
 			$pk .= $role_id . "-";
+			$pk .= $contest_id . "-";
 			return self::$loadedRecords[$pk];
 		}
 	/**
@@ -47,7 +50,7 @@ abstract class UserRolesDAOBase extends DAO
 	  **/
 	public static final function save( &$User_Roles )
 	{
-		if(  self::getByPK(  $User_Roles->getUserId() , $User_Roles->getRoleId() ) !== NULL )
+		if(  self::getByPK(  $User_Roles->getUserId() , $User_Roles->getRoleId(), $User_Roles->getContestId() ) !== NULL )
 		{
 			try{ return UserRolesDAOBase::update( $User_Roles) ; } catch(Exception $e){ throw $e; }
 		}else{
@@ -65,18 +68,18 @@ abstract class UserRolesDAOBase extends DAO
 	  *	@static
 	  * @return @link UserRoles Un objeto del tipo {@link UserRoles}. NULL si no hay tal registro.
 	  **/
-	public static final function getByPK(  $user_id, $role_id )
+	public static final function getByPK(  $user_id, $role_id, $contest_id )
 	{
-		if(self::recordExists(  $user_id, $role_id)){
-			return self::getRecord( $user_id, $role_id );
+		if(self::recordExists(  $user_id, $role_id, $contest_id)){
+			return self::getRecord( $user_id, $role_id, $contest_id );
 		}
-		$sql = "SELECT * FROM User_Roles WHERE (user_id = ? AND role_id = ? ) LIMIT 1;";
-		$params = array(  $user_id, $role_id );
+		$sql = "SELECT * FROM User_Roles WHERE (user_id = ? AND role_id = ? AND contest_id = ? ) LIMIT 1;";
+		$params = array(  $user_id, $role_id, $contest_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0)return NULL;
 			$foo = new UserRoles( $rs );
-			self::pushRecord( $foo,  $user_id, $role_id );
+			self::pushRecord( $foo,  $user_id, $role_id, $contest_id );
 			return $foo;
 	}
 
@@ -113,7 +116,8 @@ abstract class UserRolesDAOBase extends DAO
     		array_push( $allData, $bar);
 			//user_id
 			//role_id
-    		self::pushRecord( $bar, $foo["user_id"],$foo["role_id"] );
+			//contest_id
+    		self::pushRecord( $bar, $foo["user_id"],$foo["role_id"],$foo["contest_id"] );
 		}
 		return $allData;
 	}
@@ -157,6 +161,11 @@ abstract class UserRolesDAOBase extends DAO
 			array_push( $val, $User_Roles->getRoleId() );
 		}
 
+		if( $User_Roles->getContestId() != NULL){
+			$sql .= " contest_id = ? AND";
+			array_push( $val, $User_Roles->getContestId() );
+		}
+
 		if(sizeof($val) == 0){return array();}
 		$sql = substr($sql, 0, -3) . " )";
 		if( $orderBy !== null ){
@@ -169,7 +178,7 @@ abstract class UserRolesDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar =  new UserRoles($foo);
     		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["user_id"],$foo["role_id"] );
+    		self::pushRecord( $bar, $foo["user_id"],$foo["role_id"],$foo["contest_id"] );
 		}
 		return $ar;
 	}
@@ -206,10 +215,11 @@ abstract class UserRolesDAOBase extends DAO
 	  **/
 	private static final function create( &$User_Roles )
 	{
-		$sql = "INSERT INTO User_Roles ( user_id, role_id ) VALUES ( ?, ?);";
+		$sql = "INSERT INTO User_Roles ( user_id, role_id, contest_id ) VALUES ( ?, ?);";
 		$params = array( 
 			$User_Roles->getUserId(), 
 			$User_Roles->getRoleId(), 
+			$User_Roles->getContestId(), 
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}
@@ -280,6 +290,17 @@ abstract class UserRolesDAOBase extends DAO
 			
 		}
 
+		if( (($a = $User_RolesA->getContestId()) != NULL) & ( ($b = $User_RolesB->getContestId()) != NULL) ){
+				$sql .= " contest_id >= ? AND contest_id <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( $a || $b ){
+			$sql .= " contest_id = ? AND"; 
+			$a = $a == NULL ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
 		$sql = substr($sql, 0, -3) . " )";
 		if( $orderBy !== null ){
 		    $sql .= " order by " . $orderBy . " " . $orden ;
@@ -310,9 +331,9 @@ abstract class UserRolesDAOBase extends DAO
 	  **/
 	public static final function delete( &$User_Roles )
 	{
-		if(self::getByPK($User_Roles->getUserId(), $User_Roles->getRoleId()) === NULL) throw new Exception('Campo no encontrado.');
-		$sql = "DELETE FROM User_Roles WHERE  user_id = ? AND role_id = ?;";
-		$params = array( $User_Roles->getUserId(), $User_Roles->getRoleId() );
+		if(self::getByPK($User_Roles->getUserId(), $User_Roles->getRoleId(), $User_Roles->getContestId()) === NULL) throw new Exception('Campo no encontrado.');
+		$sql = "DELETE FROM User_Roles WHERE  user_id = ? AND role_id = ? AND contest_id = ?;";
+		$params = array( $User_Roles->getUserId(), $User_Roles->getRoleId(), $User_Roles->getContestId() );
 		global $conn;
 
 		$conn->Execute($sql, $params);

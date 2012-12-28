@@ -117,9 +117,7 @@ class OmegaupComponentPage extends StdComponentPage{
 			 *
 			 * Test if user is admin 
 			 **/
-			$test_admin = UserRolesDAO::getByPK( $this_user->getUserId(), 1 );
-			
-			if(!is_null($test_admin)){
+			if(Authorization::IsSystemAdmin($this_user->getUserId())){
 				//he is admin !
 				$this->user_html_menu .= "| <a href='admin'>Administrar OmegaUp</a>&nbsp;";					
 			}
@@ -214,7 +212,7 @@ class OmegaupComponentPage extends StdComponentPage{
 									<!-- <li><a href='probs.php'>Problemas</a></li> -->
 									<li><a href='rank.php'>Ranking</a></li>
 									<li><a href='recent.php'>Actividad reciente</a></li>
-									<li><a href='faq.php'>FAQ</a></li>
+									<li><a href='/preguntas/'>Preguntas</a></li>
 
 									<!-- <li><a href='schools.php'>Escuelas</a></li> -->
 									<li><a href='help.php'>Colabora</a></li>

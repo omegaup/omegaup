@@ -43,6 +43,7 @@
     $ur = new UserRoles();
     $ur->setRoleId("1"); //admin
     $ur->setUserId(Utils::$admin->getUserId());
+    $ur->setContestId(0); // all contests
     UserRolesDAO::save($ur);
     
     // Initialize time counters

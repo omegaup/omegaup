@@ -17,7 +17,7 @@ class AuthorizationTest extends PHPUnit_Framework_TestCase
         RolesDAO::save($r);
         
         // Add user to DB
-        $ur = new UserRoles(array("user_id" => Utils::GetContestDirectorUserId(), "role_id" => '1'));
+        $ur = new UserRoles(array("user_id" => Utils::GetContestDirectorUserId(), "role_id" => '1', "contest_id" => '0'));
         UserRolesDAO::save($ur);
         
         // Check is system admin
