@@ -15,7 +15,8 @@ ini_set('include_path', ini_get('include_path') . ":" .  __DIR__  );
 if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 	if(!is_file(__DIR__ . "/config.php")) {
 		?>
-		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+									"http://www.w3.org/TR/html4/loose.dtd">
 		<HTML>
 		<head>
 			<link rel="stylesheet" type="text/css" href="css/style.css">
@@ -34,6 +35,7 @@ if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 
 	require_once( "config.php" );
 }
+
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
 /*
@@ -81,24 +83,25 @@ if(/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === T
 
 	$smarty = new Smarty;
 	$smarty->assign("ERROR_TO_USER", "");
-	$smarty->setTemplateDir( __DIR__ . "/../templates/" );
+	$smarty->setTemplateDir(__DIR__ . "/../templates/");
 	$smarty->assign( "CURRENT_USER_IS_ADMIN", 0 );
 	if(defined("SMARTY_CACHE_DIR")) {
 		$smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
 	}
 	$smarty->configLoad("../templates/es.lang");
-	$smarty->assign( "LOGGED_IN", "0" );
+	$smarty->assign("LOGGED_IN", "0");
 
 	$c_Sesion = new SesionController;
 	if($c_Sesion->CurrentSesionAvailable()) {
-	$smarty->assign("LOGGED_IN", "1");
-
-	$a_CurrentSesion = $c_Sesion->apiCurrentSesion( );
-	$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSesion["username"] );
-	$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSesion["email"] );
-	$smarty->assign("CURRENT_USER_LANG", "en");
-	$smarty->assign("CURRENT_USER_IS_ADMIN", $a_CurrentSesion["is_admin"]);
-	$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", "<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=92'>");
-	$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", "<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=16'>");
+		$smarty->assign("LOGGED_IN", "1");
+		$a_CurrentSesion = $c_Sesion->apiCurrentSesion();
+		$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSesion["username"]);
+		$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSesion["email"]);
+		$smarty->assign("CURRENT_USER_LANG", "en");
+		$smarty->assign("CURRENT_USER_IS_ADMIN", $a_CurrentSesion["is_admin"]);
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128",
+			"<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=92'>");
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16",
+			"<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=16'>");
 	}
 }

@@ -108,7 +108,7 @@ class ApiCaller{
 	 * @param string $string
 	 */
 	private static function printResult($string) {
-		echo $json_result;
+		echo $string;
 	}
 
 	/**
@@ -121,12 +121,12 @@ class ApiCaller{
 	private static function parseUrl() {
 		$apiAsUrl = $_SERVER["REQUEST_URI"];
 		$args = explode("/", $apiAsUrl);
-		
+
 		if ($args === false || count($args) < 2) {
 			Logger::error("Api called with URI with less args than expected: ".count($args));
 			throw new NotFoundException("Api requested not found.");
 		}
-		
+
 		$controllerName = ucfirst($args[2]);
 
 		// Removing NULL bytes
