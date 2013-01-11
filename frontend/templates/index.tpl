@@ -22,8 +22,6 @@
 						lk fjaklsd jflkajdfkljasklfj asklfj 
 						adf lasjdf klasjdflkasjd f 89awje fklas 
 						s</p>
-
-
 				</div>
 				
 			</div>
