@@ -1,6 +1,6 @@
 # Bienvenido a Omegaup!
 
-# Código
+## Código
 
 Estos son los directorios que estamos usando activamente en el desarrollo:
 

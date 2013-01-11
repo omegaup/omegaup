@@ -13,6 +13,7 @@
 	require_once("ApiCallerMock.php");
 	
     // Load test utils
+	require_once("OmegaupTestCase.php");
     require_once("Utils.php");
 
     // Clean previous log
