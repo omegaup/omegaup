@@ -4,19 +4,37 @@
  * Description of SecurityTools
  *
  * @author Alan Gonzalez alanboy@alanboy.net
+ * @author Joe Ponce joe@omegaup.com
  */
 
 require_once 'PasswordHash.php';
 
 class SecurityTools {
 
-	public static function encryptString($unencrypted) {
-		return $unencrypted;
-	}
-
-	public static function compareEncryptedStrings($encrypted_a, $encrypted_b) {
-		Logger::log($encrypted_a ."<------>". $encrypted_b);
-		return strcmp( $encrypted_a, $encrypted_b ) == 0;
+	// Base-2 logarithm of the iteration count used for password stretching
+	const HASH_COST = 8;
+	
+	// Do we require the hashes to be portable to older systems (less secure)?
+	const HASH_PORTABILITY = FALSE;
+		
+	// Minimum size that we like the hash strings to be. Shorter than this is 
+	// considered insecure
+	const MIN_HASHED_STRING_LENGTH = 20;
+	
+	/**
+	 * Given the plain password to check and a hash, returns true if there is 
+	 * a match.
+	 * 
+	 * @param string $passwordToCheck
+	 * @param string $hashedPassword
+	 * @return boolean
+	 */
+	public static function compareHashedStrings($passwordToCheck, $hashedPassword) {		
+		// Get an instance of the pass hasher
+		$hasher = new PasswordHash(self::HASH_COST, self::HASH_PORTABILITY);
+		
+		// Compare passwords
+		return $hasher->CheckPassword($passwordToCheck, $hashedPassword);		
 	}
 
 	public static function testStrongPassword($s_Password) {    
@@ -26,22 +44,25 @@ class SecurityTools {
 		return true;
 	}
 
-	public static function hashString($string) {
-		$hasher = new PasswordHash(8, false);
+	/**
+	 * Given a plain string, returns its hash using phpass library
+	 * 
+	 * @param string $string
+	 * @return string
+	 * @throws InternalServerError
+	 */
+	public static function hashString($string) {		
+		$hasher = new PasswordHash(self::HASH_COST, self::HASH_PORTABILITY);		
 		$hash = $hasher->HashPassword($string);
-
-		if (strlen($hash) < 20) {
-			Logger::error("Hasher returned hash too short.");
-			throw new InternalServerError();
+				
+		// Check that hashed password is not too short
+		if (strlen($hash) < MIN_HASHED_STRING_LENGTH) {			
+			throw new InternalServerError(new Exception("phpass::PasswordHash::HashPassword returned hash too short."));
 		}
 		
 		return $hash;
 	}
 }
 
-$hasher = new PasswordHash(8, false);
-//Logger::log($hasher);
-$hash = $hasher->HashPassword("foo");
-Logger::log($hash);
 
 

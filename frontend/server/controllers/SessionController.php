@@ -8,7 +8,7 @@
   *     Alan Gonzalez alanboy@alanboy.net
   *
   **/
-class SesionController extends Controller
+class SessionController extends Controller
 {
 	private static $current_sesion;
 	private static $_facebook;
@@ -116,13 +116,13 @@ class SesionController extends Controller
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
 		$vo_AuthT->setToken($s_AuthT);
-
+		
 		try {
 			AuthTokensDAO::save($vo_AuthT);
 		} catch(Exception $e) {
 			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
 		}
-
+		
 		if ($b_ReturnAuthTokenAsString) {
 			return $s_AuthT;
 		} else {
@@ -194,23 +194,25 @@ class SesionController extends Controller
 	}
 
 	/**
-	 *
-	 * @param type $usernameOrEmail
-	 * @param type $password
-	 * @param type $returnAuthToken
+	 * Does login for a user given username or email and password.
+	 * Expects in request:
+	 * usernameOrEmail
+	 * password
+	 * 
+	 * @param Request $r
 	 * @return boolean
-	 **/
+	 */
 	public function NativeLogin(Request $r) {
 		Logger::log("Testing native login for " . $r["usernameOrEmail"]);
 
 		$c_Users = new UserController();
 		$vo_User = null;
-
-		if (array_key_exists("returnAuthToken", $r)) {
+				
+		if (isset($r["returnAuthToken"])) {
 			$returnAuthToken = $r["returnAuthToken"];
 		} else {
-			$resturnAuthToken = false;
-		}
+			$returnAuthToken = false;
+		}		
 
 		if (!is_null( $vo_User = UsersDAO::FindByEmail($r["usernameOrEmail"]))
 			|| !is_null($vo_User = UsersDAO::FindByUsername($r["usernameOrEmail"]))) {
@@ -219,19 +221,20 @@ class SesionController extends Controller
 		} else {
 			return false;
 		}
-
+		
 		$b_Valid = $c_Users->TestPassword($r);
-
+		
 		if (!$b_Valid) {
 			Logger::warn("User " . $r["usernameOrEmail"] . " has introduced invalid credentials.");
 			return false;
 		}
 
 		Logger::log("User " . $r["usernameOrEmail"] . " has loged in natively.");
-
+		
 		try {
-			return $this->RegisterSesion( $vo_User, $returnAuthToken );
+			return $this->RegisterSesion($vo_User, $returnAuthToken);
 		} catch( Exception $e ) {
+			return false;
 			//@TODO actuar en base a la exception
 		}
 	}

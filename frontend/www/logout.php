@@ -3,7 +3,7 @@
 
     require_once( "../server/bootstrap.php" );
 
-    $c_Sesion = new SesionController;
+    $c_Sesion = new SessionController;
 
     if( $c_Sesion->CurrentSesionAvailable( ) )
     {

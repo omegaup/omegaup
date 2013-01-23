@@ -17,7 +17,7 @@
         $googleLogin = GoogleOpenID::getResponse();
 
     	if($googleLogin->success()) {
-            $c_Sesion = new SesionController();
+            $c_Sesion = new SessionController();
             $c_Sesion->LoginViaGoogle($googleLogin->email());
             die( header( "Location: index.php" ) );
         }

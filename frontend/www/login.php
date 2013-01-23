@@ -4,7 +4,7 @@
 
 	if (isset($_POST["request"]) && ($_POST["request"] == "login")) {
 		//user wants to login natively
-		$c_Sesion = new SesionController;
+		$c_Sesion = new SessionController;
 		$r = new Request;
 		$r["usernameOrEmail"] = $_POST["user"];
 		$r["password"] = $_POST["pass"];
@@ -15,7 +15,7 @@
 	}
 
 	if (isset($_GET["shva"])) {
-		$c_Sesion = new SesionController;
+		$c_Sesion = new SessionController;
 		if(!$c_Sesion->CurrentSesionAvailable()) {
 			$smarty->assign( 'ERROR_TO_USER', 'USER_OR_PASSWORD_WRONG' );
 		}

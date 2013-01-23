@@ -43,7 +43,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
         // Crear el usuario        
         $user = UsersFactory::createUser();    
         
-        $sc = new SesionController();
+        $sc = new SessionController();
         
         $auth_token = $sc->NativeLogin($user->getUsername(), $user->getPassword(), true);        
         
@@ -62,7 +62,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
         // Obtener el email del usuario
         $email = EmailsDAO::getByPK($user->getMainEmailId());
         
-        $sc = new SesionController();
+        $sc = new SessionController();
         
         // Login por email
         $auth_token = $sc->NativeLogin($user->getUsername(), $user->getPassword(), true);        
@@ -78,7 +78,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
         // Crear el usuario
         $user = UsersFactory::createUser();
         
-        $sc = new SesionController();       
+        $sc = new SessionController();       
         
         // Login
         $auth_token_1 = $sc->NativeLogin($user->getUsername(), $user->getPassword(), true);     
@@ -96,7 +96,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
         // Crear el usuario
         $user = UsersFactory::createUser();
         
-        $sc = new SesionController();       
+        $sc = new SessionController();       
         
         // Login
         $auth_token_1 = $sc->NativeLogin($user->getUsername(), $user->getPassword(), true);   
@@ -114,7 +114,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
     public function testLoginBadUsername(){        
         
         $user = UsersFactory::createUser();
-        $sc = new SesionController();
+        $sc = new SessionController();
         
         try{        
             $auth_token = $sc->NativeLogin("badusername", $user->getPassword(), true);                        
@@ -132,7 +132,7 @@ class SessionControllerTest extends PHPUnit_Framework_TestCase
     public function testLoginBadPassword(){        
         
         $user = UsersFactory::createUser();
-        $sc = new SesionController();
+        $sc = new SessionController();
         
         try{        
             $auth_token = $sc->NativeLogin($user->getUsername(), "badpassword", true);                        

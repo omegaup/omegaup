@@ -45,13 +45,13 @@ class UserFactory {
 		
 		// If status is not OK
 		if (strcasecmp($response["status"], "ok") !== 0) {
-			throw new Exception ("createUser failed");
+			throw new Exception ("UserFactory::createUser failed");
 		}
                 
 		// Get user from db
 		$user = UsersDAO::FindByUsername($username);
 		
-        // Set password in plaintext
+        // Password came hashed from DB. Set password in plaintext
         $user->setPassword($password);
         return $user;
     }                        

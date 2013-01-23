@@ -145,6 +145,10 @@ class PreconditionFailedException extends ApiException{
     }
 }
 
+/**
+ * Filesystem operation failed
+ * 
+ */
 class InvalidFilesystemOperation extends ApiException {
     /**
      * 
@@ -156,6 +160,10 @@ class InvalidFilesystemOperation extends ApiException {
     }
 }
 
+/**
+ * Default for unexpected errors
+ * 
+ */
 class InternalServerError extends ApiException {
     /**
      * 
@@ -164,4 +172,21 @@ class InternalServerError extends ApiException {
     function __construct(Exception $previous = NULL) {
         parent::__construct("Oops. Ive encoutered an internal error. Please try again.", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
     }
+}
+
+
+/**
+ * Login failed exception
+ * 
+ */
+class InvalidCredentialsException extends ApiException {
+	
+	/**
+	 * 
+	 * @param string $message
+	 * @param Exception $previous
+	 */
+	function __construct(Exception $previous = NULL) {
+		parent::__construct("Username or password is wrong. Please check your credentials.", "HTTP/1.1 403 FORBIDDEN", 101, $previous);
+	}
 }

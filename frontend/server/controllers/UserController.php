@@ -5,6 +5,9 @@
  *
  * @author joemmanuel
  */
+
+require_once 'SessionController.php';
+
 class UserController extends Controller {
 
 	public static function apiCreate(Request $r) {
@@ -116,10 +119,43 @@ class UserController extends Controller {
 			//user does not even exist
 			return false;
 		}
-
-		return SecurityTools::CompareEncryptedStrings(
-				SecurityTools::hashString($password),
+		
+		return SecurityTools::compareHashedStrings(
+				$password,
 				$vo_UserToTest->getPassword());
+	}
+	
+	
+	/**
+	 * Exposes API /user/login
+	 * Expects in request:
+	 * user
+	 * password 
+	 *
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiLogin(Request $r) {
+		
+		// Create a SessionController to perform login
+		$sessionController = new SessionController();
+		
+		// Require the auth_token back
+		$r["returnAuthToken"] = true;
+		
+		// Get auth_token
+		$auth_token = $sessionController->NativeLogin($r);
+		
+		// If user was correctly logged in
+		if ($auth_token !== false) {			
+			return array (
+				"status" => "ok",
+				"auth_token" => $auth_token);
+		} else {
+			throw new InvalidCredentialsException();
+		}
+			
+		
 	}
 
 }

@@ -91,7 +91,7 @@ if(/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === T
 	$smarty->configLoad("../templates/es.lang");
 	$smarty->assign("LOGGED_IN", "0");
 
-	$c_Sesion = new SesionController;
+	$c_Sesion = new SessionController;
 	if($c_Sesion->CurrentSesionAvailable()) {
 		$smarty->assign("LOGGED_IN", "1");
 		$a_CurrentSesion = $c_Sesion->apiCurrentSesion();
