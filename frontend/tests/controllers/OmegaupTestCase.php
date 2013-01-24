@@ -43,6 +43,32 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 
 		// @todo check last access time
 	}
+	
+	/**
+	 * Logs in a user an returns the auth_token
+	 * 
+	 * @param Users $user
+	 * @return string auth_token
+	 */	
+	public function login(Users $user) {
+		
+		// Inflate request with user data
+		$r = new Request(array(
+			"usernameOrEmail" => $user->getUsername(),
+			"password" => $user->getPassword()
+		));
+		
+		// Call the API
+		$response = UserController::apiLogin($r);
+		
+		// Sanity check
+		$this->assertEquals("ok", $response["status"]);
+		
+		// Clean up leftovers of Login API
+		unset($_REQUEST);
+		
+		return $response["auth_token"];
+	}
 		
 }
 
