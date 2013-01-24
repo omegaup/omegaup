@@ -140,6 +140,35 @@ class LoginTest extends OmegaupTestCase {
 		// Validate output
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertLogin($user, $response["auth_token"]);
-	}		
+	}	
+	
+	/**
+	 * Test 2 consecutive logins, auth tokens should be different
+	 * 
+	 */
+	public function test2ConsecutiveLogins() {
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser();
+		
+		// Inflate request with user data
+		$r = new Request(array(
+			"usernameOrEmail" => $user->getUsername(),
+			"password" => $user->getPassword()
+		));
+		
+		// Call the API
+		$response1 = UserController::apiLogin($r);						
+		$this->assertEquals("ok", $response1["status"]);
+		$this->assertLogin($user, $response1["auth_token"]);
+		
+		// Call the API for 2nd time
+		$response2 = UserController::apiLogin($r);		
+		$this->assertEquals("ok", $response2["status"]);
+		$this->assertLogin($user, $response2["auth_token"]);
+		
+		$this->assertNotEquals($response1["auth_token"], $response2["auth_token"]);
+		
+	}
 }
 

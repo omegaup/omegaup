@@ -10,6 +10,9 @@
   **/
 class SessionController extends Controller
 {
+		
+	const AUTH_TOKEN_ENTROPY_SIZE = 15;
+	
 	private static $current_sesion;
 	private static $_facebook;
 	private static $_sessionManager;
@@ -112,7 +115,24 @@ class SessionController extends Controller
 		$vo_AuthT->setUserId($vo_User->getUserId());
 
 		//erase them
-		$s_AuthT = time() . "-" . $vo_User->getUserId() . "-" . md5(OMEGAUP_MD5_SALT . $vo_User->getUserId() . time());
+		try {
+			$existingTokens = AuthTokensDAO::search($vo_AuthT);
+			
+			if ($existingTokens !== null) {				
+				foreach ($existingTokens as $token) {					
+					AuthTokensDAO::delete($token);
+				}
+			}
+			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperation($e);
+		}
+		
+		
+		// Create the new token
+		$entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));
+		$s_AuthT = $entropy . "-" . $vo_User->getUserId() . "-" . hash("sha256", OMEGAUP_MD5_SALT . $vo_User->getUserId() . $entropy);
+
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
 		$vo_AuthT->setToken($s_AuthT);

@@ -32,7 +32,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 		));
 		$auth_token_bd = AuthTokensDAO::search($authTokenKey);       
 
-		// Checar que tenemos al menos 1 token
+		// Checar que tenemos exactamente 1 token vivo
 		$this->assertEquals(1, count($auth_token_bd));        
 		
 		// Validar que el token que esta en la DB es el mismo que tenemos por 
