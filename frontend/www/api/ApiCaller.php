@@ -37,7 +37,7 @@ class ApiCaller{
 
 		} catch (Exception $e){
 			Logger::error($e);
-			$apiException = new InternalServerError($e);
+			$apiException = new InternalServerErrorException($e);
 			$response = $apiException->asArray();
 		}
 
@@ -60,12 +60,12 @@ class ApiCaller{
 
 		} catch (Exception $e){
 			Logger::error($e);
-			$apiException = new InternalServerError($e);
+			$apiException = new InternalServerErrorException($e);
 			$response = $apiException->asArray();
 		}
 		
 		if (is_null($response) || !is_array($response)) {
-			$apiException = new InternalServerError(new Exception("Api did not return an array."));
+			$apiException = new InternalServerErrorException(new Exception("Api did not return an array."));
 			Logger::log($apiException);
 			$response = $apiException->asArray();
 		}
@@ -90,7 +90,7 @@ class ApiCaller{
 
 			if ($json_result === false) {
 				Logger::error("json_encode failed for: ". implode(",", $response));
-				$apiException = new InternalServerError();
+				$apiException = new InternalServerErrorException();
 				$json_result = json_encode($apiException->asArray());
 			}							
 			

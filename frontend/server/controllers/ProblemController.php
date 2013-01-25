@@ -391,7 +391,7 @@ class ProblemsController extends Controller {
      * 
      * @throws ApiException
      * @throws DuplicatedEntryInDatabaseException
-     * @throws InvalidDatabaseOperation
+     * @throws InvalidDatabaseOperationException
      */
     public function create(){
         
@@ -445,7 +445,7 @@ class ProblemsController extends Controller {
                 throw new DuplicatedEntryInDatabaseException("contest_alias already exists.", $e);
             }
             else {
-                throw new InvalidDatabaseOperation($e);
+                throw new InvalidDatabaseOperationException($e);
             }
         }  
         
@@ -520,7 +520,7 @@ class ProblemsController extends Controller {
      * 
      * @param string $dirpath
      * @param array $casesFiles
-     * @throws InvalidFilesystemOperation
+     * @throws InvalidFilesystemOperationException
      */
     private function handleCases($dirpath, array $casesFiles) {
         
@@ -561,7 +561,7 @@ class ProblemsController extends Controller {
         if ($return_var !== 0) {
             // D:
             Logger::error("zipping cases failed with error: ". $return_var);
-            throw new InvalidFilesystemOperation("Error creating cases.zip. Please check log for details");            
+            throw new InvalidFilesystemOperationException("Error creating cases.zip. Please check log for details");            
         }
         else {
             // :D
@@ -697,14 +697,14 @@ class ProblemsController extends Controller {
             
         }
         catch (Exception $e) {
-            throw new InvalidFilesystemOperation("Unable to process problem_contents given. Please check the format. ", $e);            
+            throw new InvalidFilesystemOperationException("Unable to process problem_contents given. Please check the format. ", $e);            
         }
     }
     
     /**
      * Validates the request for AddToContest
      * 
-     * @throws InvalidDatabaseOperation
+     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -718,7 +718,7 @@ class ProblemsController extends Controller {
         }
         catch(Exception $e){  
             // Operation failed in the data layer
-           throw new InvalidDatabaseOperation($e);
+           throw new InvalidDatabaseOperationException($e);
         }
         
         if (is_null($this->contest)) {
@@ -738,7 +738,7 @@ class ProblemsController extends Controller {
         }
         catch(Exception $e){  
             // Operation failed in the data layer
-           throw new InvalidDatabaseOperation($e);
+           throw new InvalidDatabaseOperationException($e);
         }
         
         if (is_null($this->problem)) {
@@ -753,7 +753,7 @@ class ProblemsController extends Controller {
     /**
      * Entry point for add problem to contest API
      * 
-     * @throws InvalidDatabaseOperation
+     * @throws InvalidDatabaseOperationException
      */
     public function addToContest() {
         
@@ -770,7 +770,7 @@ class ProblemsController extends Controller {
             ContestProblemsDAO::save($relationship); 
         } 
         catch (Exception $e) {
-            throw new InvalidDatabaseOperation($e);
+            throw new InvalidDatabaseOperationException($e);
         }
         
         return array("status" => "ok");

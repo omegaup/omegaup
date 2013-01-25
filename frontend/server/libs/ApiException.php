@@ -89,7 +89,7 @@ class DuplicatedEntryInDatabaseException extends ApiException {
  * DuplicatedEntryInDatabaseException
  * 
  */
-class InvalidDatabaseOperation extends ApiException {
+class InvalidDatabaseOperationException extends ApiException {
 
 	/**
 	 *  
@@ -156,7 +156,7 @@ class PreconditionFailedException extends ApiException {
  * Filesystem operation failed
  * 
  */
-class InvalidFilesystemOperation extends ApiException {
+class InvalidFilesystemOperationException extends ApiException {
 
 	/**
 	 * 
@@ -173,7 +173,7 @@ class InvalidFilesystemOperation extends ApiException {
  * Default for unexpected errors
  * 
  */
-class InternalServerError extends ApiException {
+class InternalServerErrorException extends ApiException {
 
 	/**
 	 * 

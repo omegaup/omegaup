@@ -16,7 +16,7 @@ class ContestController extends Controller {
 	 * @param Request $r
 	 * @return array
 	 * @throws DuplicatedEntryInDatabaseException
-	 * @throws InvalidDatabaseOperation
+	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiCreate(Request $r) {
 
@@ -101,7 +101,7 @@ class ContestController extends Controller {
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
 				throw new DuplicatedEntryInDatabaseException("alias already exists. Please choose a different alias.", $e);
 			} else {
-				throw new InvalidDatabaseOperation($e);
+				throw new InvalidDatabaseOperationException($e);
 			}
 		}
 

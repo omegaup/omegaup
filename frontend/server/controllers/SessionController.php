@@ -125,7 +125,7 @@ class SessionController extends Controller
 			}
 			
 		} catch (Exception $e) {
-			throw new InvalidDatabaseOperation($e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 		
 		

@@ -28,7 +28,7 @@ class UserController extends Controller {
 			$user = UsersDAO::FindByUsername($r["username"]);
 			$userByEmail = UsersDAO::FindByEmail($r["email"]);
 		} catch (Exception $e) {
-			throw new InvalidDatabaseOperation($e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 		
 		if (!(is_null($user) && is_null($userByEmail))) {
@@ -62,7 +62,7 @@ class UserController extends Controller {
 			DAO::transEnd();
 		} catch (Exception $e) {
 			DAO::transRollback();
-			throw new InvalidDatabaseOperation($e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 		
 		return array ("status" => "ok");

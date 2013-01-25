@@ -49,7 +49,7 @@ class SecurityTools {
 	 * 
 	 * @param string $string
 	 * @return string
-	 * @throws InternalServerError
+	 * @throws InternalServerErrorException
 	 */
 	public static function hashString($string) {		
 		$hasher = new PasswordHash(self::HASH_COST, self::HASH_PORTABILITY);		
@@ -57,7 +57,7 @@ class SecurityTools {
 				
 		// Check that hashed password is not too short
 		if (strlen($hash) < MIN_HASHED_STRING_LENGTH) {			
-			throw new InternalServerError(new Exception("phpass::PasswordHash::HashPassword returned hash too short."));
+			throw new InternalServerErrorException(new Exception("phpass::PasswordHash::HashPassword returned hash too short."));
 		}
 		
 		return $hash;

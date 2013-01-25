@@ -12,7 +12,7 @@ class Controller {
 	 * looking at the auth_token
 	 * 
 	 * @param Request $r
-	 * @throws InvalidDatabaseOperation
+	 * @throws InvalidDatabaseOperationException
 	 * @throws ForbiddenAccessException
 	 */
 	protected static function authenticateRequest(Request $r) {
@@ -22,7 +22,7 @@ class Controller {
 		try {
 			$user = AuthTokensDAO::getUserByToken($r["auth_token"]);
 		} catch (Exception $e) {
-			throw new InvalidDatabaseOperation($e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 		
 		if (is_null($user)) {
