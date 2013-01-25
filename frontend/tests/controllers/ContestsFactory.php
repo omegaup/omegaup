@@ -17,7 +17,7 @@ class ContestsFactory {
 	 * @param Users $contestDirector
 	 * @return Request
 	 */
-	public static function getContestContext($title = null, $public = 1, Users $contestDirector = null) {
+	public static function getRequest($title = null, $public = 1, Users $contestDirector = null) {
 
 		if (is_null($contestDirector)) {
 			$contestDirector = UserFactory::createUser();
@@ -50,7 +50,7 @@ class ContestsFactory {
 
 	public static function createContest($title = null, $public = 1, Users $contestDirector = null) {
 
-		$contestContext = self::getContestContext($title, $public, $contestDirector);
+		$contestContext = self::getRequest($title, $public, $contestDirector);
 
 		$sc = new ContestController();
 		$sc->current_user_id = $contestContext["contestDirector"]->getUserId();

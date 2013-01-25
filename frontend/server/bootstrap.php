@@ -48,6 +48,8 @@ require_once("libs/SessionManager.php");
 require_once("libs/Request.php");
 require_once("libs/Validators.php");
 require_once("libs/SecurityTools.php");
+require_once("libs/Cache.php");
+require_once("libs/Authorization.php");
 
 /**
   * Load controllers
@@ -57,6 +59,7 @@ require_once("controllers/Controller.php");
 require_once("controllers/UserController.php");
 require_once("controllers/SessionController.php");
 require_once("controllers/ContestController.php");
+require_once("controllers/ProblemController.php");
 
 require_once("libs/adodb5/adodb.inc.php");
 require_once("libs/adodb5/adodb-exceptions.inc.php");

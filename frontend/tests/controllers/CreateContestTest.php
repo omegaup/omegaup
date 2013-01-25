@@ -19,7 +19,7 @@ class CreateContestTest extends OmegaupTestCase {
 		$contestDirector = UserFactory::createUser();
 
 		// Create a valid contest Request object
-		$r = ContestsFactory::getContestContext();
+		$r = ContestsFactory::getRequest();
 
 		// Log in the user and set the auth token in the new request
 		$r["auth_token"] = $this->login($contestDirector);
@@ -85,7 +85,7 @@ class CreateContestTest extends OmegaupTestCase {
 
 		foreach ($valid_keys as $key) {
 			// Create a valid contest Request object
-			$r = ContestsFactory::getContestContext();
+			$r = ContestsFactory::getRequest();
 
 			// unset the current key from request
 			unset($r[$key]);
@@ -117,7 +117,7 @@ class CreateContestTest extends OmegaupTestCase {
 		$contestDirector = UserFactory::createUser();
 
 		// Create a valid contest Request object
-		$r = ContestsFactory::getContestContext();
+		$r = ContestsFactory::getRequest();
 
 		// Log in the user and set the auth token in the new request
 		$r["auth_token"] = $this->login($contestDirector);
