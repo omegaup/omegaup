@@ -119,7 +119,7 @@ class ContestController extends Controller {
 	private static function validateCreateRequest(Request $r) {
 
 		Validators::isStringNonEmpty($r["title"], "title");
-		Validators::isStringNonEmpty($r["description"], "description", false);
+		Validators::isStringNonEmpty($r["description"], "description");
 
 		Validators::isNumber($r["start_time"], "start_time");
 		Validators::isNumber($r["finish_time"], "finish_time");
@@ -142,9 +142,9 @@ class ContestController extends Controller {
 		Validators::isInEnum($r["partial_score"], "partial_score", array("0", "1"));
 		Validators::isNumberInRange($r["submissions_gap"], "submissions_gap", 0, $contest_length);
 
-		Validators::isInEnum($r["feedback"], "feedback", array("no", "yes", "partial"), false);
-		Validators::isInEnum($r["penalty_time_start"], "penalty_time_start", array("contest", "problem", "none"), false);
-		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"), false);
+		Validators::isInEnum($r["feedback"], "feedback", array("no", "yes", "partial"));
+		Validators::isInEnum($r["penalty_time_start"], "penalty_time_start", array("contest", "problem", "none"));
+		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"));
 
 
 		if ($r["public"] == 0 && !is_null($r["private_users"])) {
