@@ -11,6 +11,29 @@ class ContestController extends Controller {
 	private static $problems;
 
 	/**
+	 *
+	 * List contests
+	 */
+	public static function apiList(Request $r = null) {
+		$result = ContestsDAO::search(new Contests(array(
+					"public" => 1
+				)));
+
+		$array_result = array();
+
+		// @TODO make daos return associative arrays
+		// if requestes in order to discard this loop
+		foreach( $result as $r ) {
+			array_push($array_result, $r->asArray() );
+		}
+
+		return array(
+				"number_of_results" => sizeof($array_result),
+				"results" => $array_result
+			);
+	}
+
+	/**
 	 * Creates a new contest
 	 * 
 	 * @param Request $r

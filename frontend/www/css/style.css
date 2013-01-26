@@ -13,6 +13,12 @@ body{
 	font-size:13px;
 }
 
+.wait_for_ajax{
+	background-image: url(../media/wait.gif);
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
 html {
 /*    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; */
 
