@@ -122,7 +122,7 @@ class Validators
         self::isNumber($parameter, $parameterName, $required);
         
         // Validate that is target number is inside the range
-        if ($isPresent && !($value >= $lowerBound && $value <= $upperBound)){
+        if ($isPresent && !($parameter >= $lowerBound && $parameter <= $upperBound)){
             throw new InvalidParameterException("{$parameterName} is outside the allowed range ({$lowerBound}, {$upperBound})");            
         }
         

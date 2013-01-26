@@ -7,7 +7,9 @@
 
     // Load tess specific config globals
     require_once("test_config.php");
-	
+
+	define("OMEGAUP_ROOT", __DIR__ . "/../../" );
+
 	// Load api caller
     require_once(OMEGAUP_ROOT."www/api/ApiCaller.php");
 	require_once("ApiCallerMock.php");
