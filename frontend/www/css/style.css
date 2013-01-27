@@ -93,11 +93,16 @@ div.title a:hover { color: #8bb0d3 }
 div.copy { padding: 15px 20px 20px; }
 
 div.copy h3 {
-    font-size: 16px;
-    line-height: 18px;
-    padding: 4px 0 14px;
-    color: #666;
-    margin-top:10px;
+font-size: 20px;
+line-height: 0px;
+font-weight: normal;
+background-color: #678DD7;
+padding: 15px;
+margin-left: -10px;
+margin-top: -10px;
+color: white;
+border-radius: 3px;
+
 }
 div.copy p {
     font-size: 13px;

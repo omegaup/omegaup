@@ -2,4 +2,8 @@
 
 	require_once( "../server/bootstrap.php" );
 
-	$smarty->display( '../templates/index.tpl' );
+	$contes_alias = $_REQUEST["alias"];
+
+	
+
+	$smarty->display( '../templates/contest.details.tpl' );
