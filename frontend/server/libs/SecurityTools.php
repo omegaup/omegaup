@@ -56,7 +56,7 @@ class SecurityTools {
 		$hash = $hasher->HashPassword($string);
 				
 		// Check that hashed password is not too short
-		if (strlen($hash) < MIN_HASHED_STRING_LENGTH) {			
+		if (strlen($hash) < self::MIN_HASHED_STRING_LENGTH) {			
 			throw new InternalServerErrorException(new Exception("phpass::PasswordHash::HashPassword returned hash too short."));
 		}
 		
