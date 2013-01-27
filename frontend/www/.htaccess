@@ -1,0 +1,6 @@
+
+RewriteEngine on
+
+Options +FollowSymlinks
+
+RewriteRule ^contest/(.*)$               contest.php?alias=$1 [L]
