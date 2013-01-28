@@ -33,6 +33,17 @@ class ContestController extends Controller {
 			);
 	}
 
+	public static function apiDetails(Request $r) {
+		$result = ContestsDAO::getByAlias( $r["alias"]  );
+
+		if(is_null($result)){
+			return array();
+		}
+
+		return $result->asArray();
+	}
+
+
 	/**
 	 * Creates a new contest
 	 * 
