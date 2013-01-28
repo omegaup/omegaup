@@ -1,7 +1,14 @@
 <?php
 
 /**
+ * Problem: PHPUnit does not support is_uploaded_file and move_uploaded_file 
+ * native functions of PHP to move files around needed for store zip contents
+ * in the required places.
  * 
+ * Solution: We abstracted those PHP native functions in an object FileUploader.
+ * We need to create a new FileUploader object that uses our own implementations.
+ * 
+ */
 class FileUploaderMock extends FileUploader {
     
     public function IsUploadedFile($filename) {        
@@ -15,8 +22,7 @@ class FileUploaderMock extends FileUploader {
         return copy($filename, $targetpath);
     }
 }
- * 
- */
+
 
 
 /**
@@ -27,11 +33,12 @@ class FileUploaderMock extends FileUploader {
 class ProblemsFactory {
          
 	/**
-	 * Returns a Request object with valid info to create a problem
+	 * Returns a Request object with valid info to create a problem and the 
+	 * author of the problem
 	 * 
 	 * @param string $title
 	 * @param string $zipName
-	 * @return Request
+	 * @return Array
 	 */
     public static function getRequest($zipName = 'testproblem.zip', $title = null) {
         
@@ -56,26 +63,35 @@ class ProblemsFactory {
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = $zipName; 
         
-        return $r;
+        return array ("request" => $r,
+			"author" => $author);
     }
     
     /**
      * 
      */
-    public static function createProblem($title, $zipName = 'testproblem.zip') {
+    public static function createProblem($zipName = 'testproblem.zip', $title = null) {
         
-        $problemCreator = UsersFactory::createUser();
-        $context = self::getRequest();
-        
-        $pc = new ProblemsController(new FileUploaderMock());
-        $pc->current_user_id = $problemCreator->getUserId();
-        $pc->current_user_obj = $problemCreator;
-                
-        $pc->create();        
-        
+		// Get a user
+        $problemData = self::getRequest($zipName, $title);
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];				
+		
+		// Login user
+		$r["auth_token"] = OmegaupTestCase::login($problemAuthor);
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader(new FileUploaderMock());
+
+		// Call the API				
+		ProblemsController::apiCreate($r);						
+        		
+		// Clean up our mess
+        unset($_REQUEST);
+		
         return array (
-            "context" => $context, 
-            "problemCreator" => $problemCreator,
+            "request" => $r, 
+            "author" => $problemAuthor,
             );
     }
 }

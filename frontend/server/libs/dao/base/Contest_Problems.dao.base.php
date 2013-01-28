@@ -164,10 +164,12 @@ abstract class ContestProblemsDAOBase extends DAO
 
 		if(sizeof($val) == 0){return array();}
 		$sql = substr($sql, 0, -3) . " )";
+                                
 		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 		
 		}
+                               
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
@@ -217,10 +219,11 @@ abstract class ContestProblemsDAOBase extends DAO
 	  **/
 	private static final function update( $Contest_Problems )
 	{
-		$sql = "UPDATE Contest_Problems SET  points = ? WHERE  contest_id = ? AND problem_id = ?;";
+		$sql = "UPDATE Contest_Problems SET  points = ? WHERE  contest_id = ? AND problem_id = ? AND `order` = ?;";
 		$params = array( 
 			$Contest_Problems->getPoints(), 
-			$Contest_Problems->getContestId(),$Contest_Problems->getProblemId(), );
+			$Contest_Problems->getContestId(),$Contest_Problems->getProblemId(), 
+                        $Contest_Problems->getOrder());
 		global $conn;
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
@@ -243,11 +246,12 @@ abstract class ContestProblemsDAOBase extends DAO
 	  **/
 	private static final function create( &$Contest_Problems )
 	{
-		$sql = "INSERT INTO Contest_Problems ( contest_id, problem_id, points ) VALUES ( ?, ?, ?);";
+		$sql = "INSERT INTO Contest_Problems ( contest_id, problem_id, points, `order` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
 			$Contest_Problems->getContestId(), 
 			$Contest_Problems->getProblemId(), 
 			$Contest_Problems->getPoints(), 
+                        $Contest_Problems->getOrder()
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}

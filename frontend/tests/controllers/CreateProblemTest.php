@@ -16,14 +16,13 @@ class CreateProblemTest extends OmegaupTestCase {
 	 */
 	public function testCreateValidContest() {
 
-		// Create a problem creator & login
-		$problemCreator = UserFactory::createUser();
-
-		// Get request with problem info
-		$r = ProblemsFactory::getRequest();
+		// Get the problem data
+        $problemData = ProblemsFactory::getRequest();
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
 
 		// Login user
-		$r["auth_token"] = $this->login($problemCreator);
+		$r["auth_token"] = $this->login($problemAuthor);
 
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -82,11 +81,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	 * Test that sends incomplete requests
 	 */
 	public function testRequiredParameters() {
-
-		// Create a problem creator & login
-		$problemCreator = UserFactory::createUser();
-		$auth_token = $this->login($problemCreator);
-
+		
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
@@ -104,9 +99,13 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		foreach ($valid_keys as $key) {
 
-			// Get request with problem info
-			$r = ProblemsFactory::getRequest();
-			$r["auth_token"] = $auth_token;
+			// Get the problem data
+			$problemData = ProblemsFactory::getRequest();
+			$r = $problemData["request"];
+			$problemAuthor = $problemData["author"];
+						
+			// Login user
+			$r["auth_token"] = $this->login($problemAuthor);
 
 			// Unset key
 			unset($r[$key]);
@@ -130,14 +129,13 @@ class CreateProblemTest extends OmegaupTestCase {
 	 */
 	public function testValidProblemNoTestplan() {
 
-		// Create a problem creator & login
-		$problemCreator = UserFactory::createUser();
-
-		// Get request with problem info
-		$r = ProblemsFactory::getRequest("triangulos.zip");
+		// Get the problem data
+        $problemData = ProblemsFactory::getRequest("triangulos.zip");
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
 
 		// Login user
-		$r["auth_token"] = $this->login($problemCreator);
+		$r["auth_token"] = $this->login($problemAuthor);
 
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -197,14 +195,13 @@ class CreateProblemTest extends OmegaupTestCase {
 	 */
 	public function testValidProblemWithNonUTF8CharsInStmt() {
 
-		// Create a problem creator & login
-		$problemCreator = UserFactory::createUser();
-
-		// Get request with problem info
-		$r = ProblemsFactory::getRequest("nonutf8stmt.zip");
+		// Get the problem data
+        $problemData = ProblemsFactory::getRequest("nonutf8stmt.zip");
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
 
 		// Login user
-		$r["auth_token"] = $this->login($problemCreator);
+		$r["auth_token"] = $this->login($problemAuthor);
 
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
