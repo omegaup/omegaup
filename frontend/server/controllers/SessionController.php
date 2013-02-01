@@ -54,9 +54,9 @@ class SessionController extends Controller
 	 *
 	 **/
 	public static function apiCurrentSesion() {
-	        $SesionM = self::getSessionManagerInstance();
-	        $s_AuthToken = $SesionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
-	        $vo_CurrentUser = NULL;
+		$SesionM = self::getSessionManagerInstance();
+		$s_AuthToken = $SesionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
+		$vo_CurrentUser = NULL;
 
 		//cookie contains an auth token
 	        if(!is_null($s_AuthToken) && self::isAuthTokenValid($s_AuthToken)) {
@@ -67,6 +67,21 @@ class SessionController extends Controller
 			$vo_CurrentUser = AuthTokensDAO::getUserByToken( $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] );
 
 		} else {
+			return array(
+				"valid" => false,
+				"id" => NULL,
+				"name" => NULL,
+				"username" => NULL,
+				"email" => NULL,
+				"auth_token" => NULL,
+				"is_admin" => false
+			);
+	}
+
+	if (is_null($vo_CurrentUser) ) {
+		// Means user has auth token, but at
+		// does not exist in DB
+		
 			return array(
 				"valid" => false,
 				"id" => NULL,

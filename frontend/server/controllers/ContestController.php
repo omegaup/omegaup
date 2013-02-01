@@ -55,8 +55,8 @@ class ContestController extends Controller {
 	public static function apiCreate(Request $r) {
 
 		// Authenticate user
-		self::authenticateRequest($r);		
-		
+		self::authenticateRequest($r);
+
 		// Validate request
 		self::validateCreateRequest($r);
 
@@ -164,7 +164,7 @@ class ContestController extends Controller {
 		// Calculate contest length:
 		$contest_length = $r["finish_time"] - $r["start_time"];
 
-		// Window_length is optional        
+		// Window_length is optional
 		Validators::isNumberInRange(
 				$r["window_length"], "window_length", 0, floor($contest_length) / 60, false
 		);
@@ -180,8 +180,9 @@ class ContestController extends Controller {
 		Validators::isInEnum($r["penalty_time_start"], "penalty_time_start", array("contest", "problem", "none"));
 		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"));
 
-
+Logger::log("-----");
 		if ($r["public"] == 0 && !is_null($r["private_users"])) {
+Logger::log("/////");
 			// Validate that the request is well-formed
 			//  @todo move $this
 			self::$private_users_list= json_decode($r["private_users"]);

@@ -1,8 +1,7 @@
 <div class="post">
-<div class="copy">
-
+	<div class="copy">
 					<h3>Nuevo concurso</h3>
-					<div class="new_contest">
+					<div class="new_contest_form">
 						<table id="main" width="100%">
 						<tr>
 							<!-- ----------------------------------------- -->
@@ -221,5 +220,5 @@
 						</div>
 					</div>
 				
-</div>
+	</div>
 </div>

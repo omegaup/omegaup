@@ -24,7 +24,7 @@ class Controller {
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+	Logger::log($user)	;
 		if (is_null($user)) {
 			throw new ForbiddenAccessException();
 		}
