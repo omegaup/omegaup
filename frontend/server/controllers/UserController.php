@@ -30,8 +30,12 @@ class UserController extends Controller {
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
+
+		if (!is_null($userByEmail)) {
+			throw new DuplicatedEntryInDatabaseException("email already exists");
+		}
 		
-		if (!(is_null($user) && is_null($userByEmail))) {
+		if (!is_null($user)) {
 			throw new DuplicatedEntryInDatabaseException("Username already exists.");
 		}
 		
