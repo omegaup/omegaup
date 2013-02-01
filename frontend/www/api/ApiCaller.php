@@ -119,6 +119,7 @@ class ApiCaller{
 	 * @throws NotFoundException
 	 */
 	private static function parseUrl() {
+
 		$apiAsUrl = $_SERVER["REQUEST_URI"];
 		$args = explode("/", $apiAsUrl);
 
@@ -152,10 +153,22 @@ class ApiCaller{
 			throw new NotFoundException("Api requested not found.");
 		}
 
-	
-		for ($i = 4; ($i+1) < sizeof( $args ); $i += 2) {
-			$request[$args[$i]] = urldecode($args[$i+1]);
+		$cs = SessionController::apiCurrentSesion();
+		$request["auth_token"] = $cs["auth_token"];
+
+		// Figure out if its POST or GET
+		switch( $_SERVER['REQUEST_METHOD'] ) {
+			case 'GET':
+				for ($i = 4; ($i+1) < sizeof( $args ); $i += 2) {
+					$request[$args[$i]] = urldecode($args[$i+1]);
+				}
+			break;
+			case 'POST':
+				// Parameters are already in the Request object
+			break;
 		}
+	
+
 
 		$request->method = $controllerName . "::" . $methodName;
 	

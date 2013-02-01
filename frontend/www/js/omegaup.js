@@ -65,6 +65,61 @@ OmegaUp.prototype.CreateUser = function(s_Email, s_Username, s_PlainPassword, ca
 		'json'
 	);
 };
+
+
+// http://192.168.2.13:8080/api/contest/create/auth_token/ee44aab2f5b31a7b726787133f31f4-386-3fb3d7fb685b3dfa0b2cbf1e6138023edcee372048c5e416d8f0e961ea89d578/alias/154c8df00fedbe424efc/public/1/
+OmegaUp.prototype.CreateContest = function(
+					title,
+					description,
+					start_time,
+					finish_time,
+					window_length,
+					alias,
+					points_decay_factor,
+					partial_score, 
+					submissions_gap,
+					feedback, 
+					penalty,
+					public,
+					scoreboard, 
+					penalty_time_start, 
+					penalty_calc_policy, 
+					callback
+				) {
+	console.log("Creating contest", penalty_time_start);
+	$.post(
+		'/api/contest/create/' ,
+		{
+			title				: title,
+			description			: description,
+			start_time			: start_time,
+			finish_time			: finish_time,
+			window_length		: window_length,
+			public				: public,
+			alias				: alias,
+			points_decay_factor	: points_decay_factor,
+			partial_score		: partial_score ,
+			submissions_gap		: submissions_gap,
+			feedback			: feedback, 
+			penalty				: penalty , 
+			public				: public,
+			scoreboard			: scoreboard, 
+			penalty_time_start	: penalty_time_start, 
+			penalty_calc_policy	: penalty_calc_policy 
+		},
+		function (data) {
+			if( data.status !== undefined && data.status == "error") {
+				OmegaUp.UI.Error( data.error );
+			}else{
+				if(callback !== undefined){ callback( data ) }
+			}
+		},
+		'json'
+	);
+};
+
+
+
 /*
 OmegaUp.prototype.CreateUser = function(s_Email, s_Username, s_PlainPassword, callback) {
 	$.post(
