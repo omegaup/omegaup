@@ -217,5 +217,86 @@ Logger::log("/////");
 
 		Validators::isInEnum($r["show_scoreboard_after"], "show_scoreboard_after", array("0", "1"), false);
 	}
+	
+	/**
+	 * Adds a problem to a contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiAddProblem(Request $r) {
+		
+		// Authenticate user
+		self::authenticateRequest($r);
+		
+		// Validate the request and get the problem and the contest in an array
+		$params = self::validateAddToContestRequest($r);
+
+		try {
+			$relationship = new ContestProblems(array(
+						"contest_id" => $params["contest"]->getContestId(),
+						"problem_id" => $params["problem"]->getProblemId(),
+						"points" => $r["points"],
+						"order" => is_null($r["order_in_contest"]) ?
+								1 : $r["order_in_contest"]));
+
+			ContestProblemsDAO::save($relationship);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array("status" => "ok");
+	}
+	
+	/**
+	 * Validates the request for AddToContest and returns an array with 
+	 * the problem and contest DAOs
+	 * 
+	 * @throws InvalidDatabaseOperationException
+	 * @throws InvalidParameterException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateAddToContestRequest(Request $r) {
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		// Only director is allowed to create problems in contest
+		try {
+			$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($contest)) {
+			throw new InvalidParameterException("Contest not found");
+		}
+
+		// Only contest admin is allowed to create problems in contest
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $contest)) {
+			throw new ForbiddenAccessException("Cannot add problem. You are not the contest director.");
+		}
+
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+		
+		try {
+			$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($problem)) {
+			throw new InvalidParameterException("Problem not found");
+		}
+
+		Validators::isNumberInRange($r["points"], "points", 0, INF);
+		Validators::isNumberInRange($r["order_in_contest"], "order_in_contest", 0, INF, false);
+		
+		return array (
+			"contest" => $contest,
+			"problem" => $problem);
+	}
 
 }

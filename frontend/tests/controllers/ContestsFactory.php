@@ -45,19 +45,28 @@ class ContestsFactory {
 		$r["penalty_time_start"] = "contest";
 		$r["penalty_calc_policy"] = "sum";
 
-		return $r;
+		return array (
+			"request" => $r,
+			"director" => $contestDirector);
 	}
 
-	public static function createContest($title = null, $public = 1, Users $contestDirector = null) {
+	public static function createContest($title = null, $public = 1, Users $contestDirector = null) {		
+		
+		// Create a valid contest Request object
+		$contestData = ContestsFactory::getRequest($title, $public, $contestDirector);
+		$r = $contestData["request"];
+		$contestDirector = $contestData["director"];
 
-		$contestContext = self::getRequest($title, $public, $contestDirector);
+		// Log in the user and set the auth token in the new request
+		$r["auth_token"] = OmegaupTestCase::login($contestDirector);
 
-		$sc = new ContestController();
-		$sc->current_user_id = $contestContext["contestDirector"]->getUserId();
-		$sc->current_user_obj = $contestContext["contestDirector"];
-		$sc->create();
-
-		return array("context" => $contestContext);
+		// Call the API
+		$response = ContestController::apiCreate($r);		
+		
+		return array(
+			"director" => $contestData["director"],
+			"request" => $r,
+			);
 	}
 
 }

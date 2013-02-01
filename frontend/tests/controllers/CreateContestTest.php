@@ -13,13 +13,13 @@ class CreateContestTest extends OmegaupTestCase {
 	 * Basic Create Contest scenario
 	 * 
 	 */
-	public function testCreateContestPositive() {
-
-		// Create a contest director
-		$contestDirector = UserFactory::createUser();
+	public function testCreateContestPositive() {		
 
 		// Create a valid contest Request object
-		$r = ContestsFactory::getRequest();
+		$contestData = ContestsFactory::getRequest();
+		$r = $contestData["request"];
+		$contestDirector = $contestData["director"];
+		
 
 		// Log in the user and set the auth token in the new request
 		$r["auth_token"] = $this->login($contestDirector);
@@ -79,13 +79,14 @@ class CreateContestTest extends OmegaupTestCase {
 			"penalty_calc_policy"
 		);
 
-		// Create a contest director and log in
-		$contestDirector = UserFactory::createUser();
-		$auth_token = $this->login($contestDirector);
-
 		foreach ($valid_keys as $key) {
+			
 			// Create a valid contest Request object
-			$r = ContestsFactory::getRequest();
+			$contestData = ContestsFactory::getRequest();
+			$r = $contestData["request"];
+			$contestDirector = $contestData["director"];
+			
+			$this->login($contestDirector);
 
 			// unset the current key from request
 			unset($r[$key]);
@@ -113,11 +114,10 @@ class CreateContestTest extends OmegaupTestCase {
 	 */
 	public function testCreate2ContestsWithSameAlias() {
 
-		// Create a contest director
-		$contestDirector = UserFactory::createUser();
-
 		// Create a valid contest Request object
-		$r = ContestsFactory::getRequest();
+		$contestData = ContestsFactory::getRequest();
+		$r = $contestData["request"];
+		$contestDirector = $contestData["director"];		
 
 		// Log in the user and set the auth token in the new request
 		$r["auth_token"] = $this->login($contestDirector);
