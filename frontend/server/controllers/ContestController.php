@@ -9,6 +9,7 @@ class ContestController extends Controller {
 	private static $private_users_list;
 	private static $hasPrivateUsers;
 	private static $problems;
+	private static $contest;
 
 	/**
 	 *
@@ -16,33 +17,152 @@ class ContestController extends Controller {
 	 */
 	public static function apiList(Request $r = null) {
 		$result = ContestsDAO::search(new Contests(array(
-					"public" => 1
-				)));
+							"public" => 1
+						)));
 
 		$array_result = array();
 
 		// @TODO make daos return associative arrays
 		// if requestes in order to discard this loop
-		foreach( $result as $r ) {
-			array_push($array_result, $r->asArray() );
+		foreach ($result as $r) {
+			array_push($array_result, $r->asArray());
 		}
 
 		return array(
-				"number_of_results" => sizeof($array_result),
-				"results" => $array_result
-			);
+			"number_of_results" => sizeof($array_result),
+			"results" => $array_result
+		);
+	}
+
+	public static function validateDetails(Request $r) {
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		// If the contest is private, verify that our user is invited
+		try {
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null(self::$contest)) {
+			throw new NotFoundException("Contest not found");
+		}
+
+
+		if (self::$contest->getPublic() === '0') {
+			try {
+				if (is_null(ContestsUsersDAO::getByPK($r["current__user_id"], self::$contest->getContestId())) && !Authorization::IsContestAdmin($r["current__user_id"], self::$contest)) {
+					throw new ForbiddenAccessException();
+				}
+			} catch (ApiException $e) {
+				// Propagate exception
+				throw $e;
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+		}
+
+		// If the contest has not started, user should not see it, unless it is admin
+		if (!self::$contest->hasStarted($r["current__user_id"]) && !Authorization::IsContestAdmin($r["current__user_id"], self::$contest)) {
+			$exception = new PreconditionFailedException("Contest has not started yet.");
+			$exception->addCustomMessageToArray("start_time", strtotime(self::$contest->getStartTime()));
+
+			throw $exception;
+		}
 	}
 
 	public static function apiDetails(Request $r) {
-		$result = ContestsDAO::getByAlias( $r["alias"]  );
 
-		if(is_null($result)){
-			return array();
+		// Crack the request to get the current user
+		self::authenticateRequest($r);
+
+		self::validateDetails($r);
+
+		// Check cache first
+		$cache = new Cache(Cache::CONTEST_INFO, $r["contest_alias"]);
+		$result = $cache->get();
+
+		if (is_null($result)) {
+			// Create array of relevant columns
+			$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy");
+
+			// Initialize response to be the contest information
+			$result = self::$contest->asFilteredArray($relevant_columns);
+
+			$result['start_time'] = strtotime($result['start_time']);
+			$result['finish_time'] = strtotime($result['finish_time']);
+
+			// Get problems of the contest
+			$key_problemsInContest = new ContestProblems(
+							array("contest_id" => self::$contest->getContestId()));
+			try {
+				$problemsInContest = ContestProblemsDAO::search($key_problemsInContest, "order");
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			// Add info of each problem to the contest
+			$problemsResponseArray = array();
+
+			// Set of columns that we want to show through this API. Doesn't include the SOURCE
+			$relevant_columns = array("title", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "dificulty", "order");
+
+			foreach ($problemsInContest as $problemkey) {
+				try {
+					// Get the data of the problem
+					$temp_problem = ProblemsDAO::getByPK($problemkey->getProblemId());
+				} catch (Exception $e) {
+					// Operation failed in the data layer
+					throw new InvalidDatabaseOperationException($e);
+				}
+
+				// Add the 'points' value that is stored in the ContestProblem relationship
+				$temp_array = $temp_problem->asFilteredArray($relevant_columns);
+				$temp_array["points"] = $problemkey->getPoints();
+
+				// Save our array into the response
+				array_push($problemsResponseArray, $temp_array);
+			}
+
+			// Save the time of the first access
+			try {
+				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+								$r["current_user_id"], self::$contest->getContestId());
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			// Add problems to response
+			$result['problems'] = $problemsResponseArray;
+
+			$cache->set($result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
+		}// closes if( $result == null )
+		// Adding timer info separately as it depends on the current user and we don't
+		// want this to get generally cached for everybody
+		// Save the time of the first access
+		try {
+			$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+							$r["current_user_id"], self::$contest->getContestId());
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
 		}
 
-		return $result->asArray();
-	}
+		// Add time left to response
+		if (self::$contest->getWindowLength() === null) {
+			$result['submission_deadline'] = strtotime(self::$contest->getFinishTime());
+		} else {
+			$result['submission_deadline'] = min(
+					strtotime(self::$contest->getFinishTime()), strtotime($contest_user->getAccessTime()) + self::$contest->getWindowLength() * 60);
+		}
 
+		$result["status"] = "ok";
+		return $result;
+	}
 
 	/**
 	 * Creates a new contest
@@ -180,12 +300,12 @@ class ContestController extends Controller {
 		Validators::isInEnum($r["penalty_time_start"], "penalty_time_start", array("contest", "problem", "none"));
 		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"));
 
-Logger::log("-----");
+		Logger::log("-----");
 		if ($r["public"] == 0 && !is_null($r["private_users"])) {
-Logger::log("/////");
+			Logger::log("/////");
 			// Validate that the request is well-formed
 			//  @todo move $this
-			self::$private_users_list= json_decode($r["private_users"]);
+			self::$private_users_list = json_decode($r["private_users"]);
 			if (is_null(self::$private_users_list)) {
 				throw new InvalidParameterException("private_users" . Validators::IS_INVALID);
 			}
@@ -217,7 +337,7 @@ Logger::log("/////");
 
 		Validators::isInEnum($r["show_scoreboard_after"], "show_scoreboard_after", array("0", "1"), false);
 	}
-	
+
 	/**
 	 * Adds a problem to a contest
 	 * 
@@ -226,10 +346,10 @@ Logger::log("/////");
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiAddProblem(Request $r) {
-		
+
 		// Authenticate user
 		self::authenticateRequest($r);
-		
+
 		// Validate the request and get the problem and the contest in an array
 		$params = self::validateAddToContestRequest($r);
 
@@ -248,7 +368,7 @@ Logger::log("/////");
 
 		return array("status" => "ok");
 	}
-	
+
 	/**
 	 * Validates the request for AddToContest and returns an array with 
 	 * the problem and contest DAOs
@@ -279,7 +399,7 @@ Logger::log("/////");
 		}
 
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
-		
+
 		try {
 			$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
 		} catch (Exception $e) {
@@ -293,8 +413,8 @@ Logger::log("/////");
 
 		Validators::isNumberInRange($r["points"], "points", 0, INF);
 		Validators::isNumberInRange($r["order_in_contest"], "order_in_contest", 0, INF, false);
-		
-		return array (
+
+		return array(
 			"contest" => $contest,
 			"problem" => $problem);
 	}

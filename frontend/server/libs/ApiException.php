@@ -10,6 +10,7 @@
 class ApiException extends Exception {
 
 	protected $header;
+	private $customMessage;
 
 	/**
 	 * Builds an api exception
@@ -23,6 +24,7 @@ class ApiException extends Exception {
 		parent::__construct($message, $code, $previous);
 
 		$this->header = $header;
+		$this->customMessage = array();
 	}
 
 	/**
@@ -33,13 +35,23 @@ class ApiException extends Exception {
 	public function getHeader() {
 		return $this->header;
 	}
+	
+	/**
+	 * Adds a custom field to the asArray representation of this exception
+	 * 
+	 * @param string $key
+	 * @param type $value
+	 */
+	public function addCustomMessageToArray($key, $value) {
+		$this->customMessage[$key] = $value;
+	}
 
 	/**
 	 * 
 	 * @return array
 	 */
 	public function asArray() {
-		return array(
+		$arrayToReturn =  array(
 			"status" => "error",
 			"error" => $this->message,
 			"errorcode" => $this->code,
@@ -47,6 +59,8 @@ class ApiException extends Exception {
 			"cause" => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : NULL,
 			"trace" => $this->getTraceAsString(),
 		);
+		
+		return array_merge($arrayToReturn, $this->customMessage);
 	}
 
 }
@@ -200,4 +214,11 @@ class InvalidCredentialsException extends ApiException {
 		parent::__construct("Username or password is wrong. Please check your credentials.", "HTTP/1.1 403 FORBIDDEN", 101, $previous);
 	}
 
+}
+
+class NotAllowedToSubmitException extends ApiException {
+	
+	function __construct(Exception $previous = NULL) {
+		parent::__construct("You're not allowed to submit yet.", "HTTP/1.1 401 FORBIDDEN", 501, $previous);
+	}
 }

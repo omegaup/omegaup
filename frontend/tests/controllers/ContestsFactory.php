@@ -6,6 +6,7 @@
  * @author joemmanuel
  */
 require_once 'UserFactory.php';
+require_once 'OmegaupTestCase.php';
 
 class ContestsFactory {
 
@@ -45,13 +46,13 @@ class ContestsFactory {
 		$r["penalty_time_start"] = "contest";
 		$r["penalty_calc_policy"] = "sum";
 
-		return array (
+		return array(
 			"request" => $r,
 			"director" => $contestDirector);
 	}
 
-	public static function createContest($title = null, $public = 1, Users $contestDirector = null) {		
-		
+	public static function createContest($title = null, $public = 1, Users $contestDirector = null) {
+
 		// Create a valid contest Request object
 		$contestData = ContestsFactory::getRequest($title, $public, $contestDirector);
 		$r = $contestData["request"];
@@ -61,12 +62,33 @@ class ContestsFactory {
 		$r["auth_token"] = OmegaupTestCase::login($contestDirector);
 
 		// Call the API
-		$response = ContestController::apiCreate($r);		
-		
+		$response = ContestController::apiCreate($r);
+
 		return array(
 			"director" => $contestData["director"],
 			"request" => $r,
-			);
+		);
+	}
+
+	public static function addProblemToContest($problemData, $contestData) {
+		
+		// Create an empty request
+		$r = new Request();
+		
+		// Log in as contest director		
+		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);
+		
+		// Build request
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r["points"] = 100;
+		$r["order_in_contest"] = 1;				
+		
+		// Call API
+		$response = ContestController::apiAddProblem($r);				
+		
+		// Clean up
+		unset($_REQUEST);
 	}
 
 }

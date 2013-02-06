@@ -5,8 +5,8 @@
  *
  * @author joemmanuel
  */
-require 'ProblemsFactory.php';
-require 'ContestsFactory.php';
+require_once 'ProblemsFactory.php';
+require_once 'ContestsFactory.php';
 
 class AddProblemToContestTest extends OmegaupTestCase {
 	
