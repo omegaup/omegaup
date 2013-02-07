@@ -18,7 +18,6 @@ class ProblemsController extends Controller {
 	private static $hasValidator = false;
 	private static $filesToUnzip;
 	private static $casesFiles;
-		
 
 	/**
 	 * 
@@ -358,7 +357,7 @@ class ProblemsController extends Controller {
 	public static function apiCreate(Request $r) {
 
 		self::authenticateRequest($r);
-		
+
 		// Validates request
 		self::validateCreateRequest($r);
 
@@ -386,7 +385,6 @@ class ProblemsController extends Controller {
 
 			// Create file after we know that alias is unique
 			self::deployProblemZip(self::$filesToUnzip, self::$casesFiles, $r);
-			
 		} catch (ApiException $e) {
 
 			// Operation failed in the data layer, rollback transaction 
@@ -652,10 +650,172 @@ class ProblemsController extends Controller {
 
 			// Update contents.zip
 			self::updateContentsDotZip($dirpath, $filepath);
-		} catch (Exception $e) {			
+		} catch (Exception $e) {
 			throw new InvalidFilesystemOperationException("Unable to process problem_contents given. Please check the format. ", $e);
 		}
-	}	
-	
+	}
+
+	/**
+	 * 
+	 * @param Request $r
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateDetails(Request $r) {
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		// Lang is optional. Default is ES
+		if (!is_null($r["lang"])) {
+			Validators::isStringOfMaxLength($r["lang"], "lang", 2);
+		} else {
+			$r["lang"] = "es";
+		}
+
+		// Is the combination contest_id and problem_id valid?        
+		try {
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+
+			if (is_null(ContestProblemsDAO::getByPK(self::$contest->getContestId(), self::$problem->getProblemId()))) {
+				throw new NotFoundException();
+			}
+		} catch (ApiException $apiException) {
+			throw $apiException;
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+
+		// If the contest is private, verify that our user is invited                        
+		if (self::$contest->getPublic() == 0) {
+			if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+				throw new ForbiddenAccessException();
+			}
+		}
+
+		// If the contest has not started, user should not see it, unless it is admin
+		if (!self::$contest->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+			throw new ForbiddenAccessException("Contest has not started yet.");
+		}
+	}
+
+	/**
+	 * 
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiDetails(Request $r) {
+
+		// Get user
+		self::authenticateRequest($r);
+
+		// Validate request
+		self::validateDetails($r);
+		
+		$response = array();
+
+		// Create array of relevant columns
+		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points");
+		
+		// Read the file that contains the source
+		if (self::$problem->getValidator() != 'remote') {
+			$statementCache = new Cache(Cache::PROBLEM_STATEMENT, self::$problem->getAlias() . "-" . $r["lang"]);
+			$file_content = null;
+
+			// check cache
+			$file_content = $statementCache->get();
+
+			if (is_null($file_content)) {
+
+				$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . self::$problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r["lang"] . ".html";
+
+				try {
+					$file_content = FileHandler::ReadFile($source_path);
+				} catch (Exception $e) {
+					throw new InvalidFilesystemOperationException($e);
+				}
+
+				// Add to cache
+				$statementCache->set($file_content, APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
+			}
+
+			// Add problem statement to source
+			$response["problem_statement"] = $file_content;
+		} else if (self::$problem->getServer() == 'uva') {
+			$response["problem_statement"] = '<iframe src="http://acm.uva.es/p/v' . substr(self::$problem->getRemoteId(), 0, strlen(self::$problem->getRemoteId()) - 2) . '/' . self::$problem->getRemoteId() . '.html"></iframe>';
+		}
+
+		// Add the problem the response
+		$response = array_merge($response, self::$problem->asFilteredArray($relevant_columns));
+
+		// Create array of relevant columns for list of runs
+		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+
+		// Search the relevant runs from the DB
+		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+
+		$keyrun = new Runs(array(
+					"user_id" => $r["current_user_id"],
+					"problem_id" => self::$problem->getProblemId(),
+					"contest_id" => self::$contest->getContestId()
+				));
+
+		// Get all the available runs
+		try {
+			$runs_array = RunsDAO::search($keyrun);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// Add each filtered run to an array
+		if (count($runs_array) >= 0) {
+			$runs_filtered_array = array();
+			foreach ($runs_array as $run) {
+				$filtered = $run->asFilteredArray($relevant_columns);
+				$filtered['time'] = strtotime($filtered['time']);
+				array_push($runs_filtered_array, $filtered);
+			}
+		}
+
+		// At this point, contestant_user relationship should be established.        
+		try {
+			$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+							$r["current_user_id"], self::$contest->getContestId());
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// As last step, register the problem as opened                
+		if (!ContestProblemOpenedDAO::getByPK(
+						self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"])) {
+			//Create temp object
+			$keyContestProblemOpened = new ContestProblemOpened(array(
+						"contest_id" => self::$contest->getContestId(),
+						"problem_id" => self::$problem->getProblemId(),
+						"user_id" => $r["current_user_id"]
+					));
+
+			try {
+				// Save object in the DB
+				ContestProblemOpenedDAO::save($keyContestProblemOpened);
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+		}
+
+		// Add the procesed runs to the request
+		$response["runs"] = $runs_filtered_array;
+		$response["status"] = "ok";
+		return $response;
+	}
+
 }
 
