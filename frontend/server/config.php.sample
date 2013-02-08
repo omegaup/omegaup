@@ -63,11 +63,16 @@
     define("OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT",    60); // in seconds
     define("OMEGAUP_MEMCACHE_CONTEST_TIMEOUT",        30); // in seconds
 
-    # #########################
-    # APC USER CACHE
-    # #########################
-    define("APC_USER_CACHE_ENABLED", false);
-    define("APC_USER_CACHE_PROBLEM_STATEMENT", true);
-    define("APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT", 300); // in seconds
+	# #########################
+	# APC USER CACHE
+	# #########################
+
+	define("APC_USER_CACHE_ENABLED", false);
+	define("APC_USER_CACHE_PROBLEM_STATEMENT", false);
+	define("APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT", 60); // in seconds        
+	define("APC_USER_CACHE_SCOREBOARD", false);
+	define("APC_USER_CACHE_SCOREBOARD_TIMEOUT", 60); // in seconds
+	define("APC_USER_CACHE_ADMIN_SCOREBOARD", false);
+	define("APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT", 60); // in seconds
 
 	define("SMARTY_CACHE_DIR", FALSE);
