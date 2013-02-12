@@ -10,6 +10,7 @@
 		abstract class DAO
 		{
 
+		public static $useDAOCache = true;
 		protected static $isTrans = false;
 		protected static $transCount = 0;
 		

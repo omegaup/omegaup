@@ -16,8 +16,8 @@ class RunController extends Controller {
 
 		if (is_null(self::$grader)) {
 			// Create new grader
-			self::$grader = new Grader();	
-		}		
+			self::$grader = new Grader();
+		}
 
 		self::$practice = false;
 	}
@@ -75,17 +75,17 @@ class RunController extends Controller {
 				throw new ForbiddenAccessException("Unable to submit run: You are not registered to this contest.");
 			}
 
-			// Validate if the user is allowed to submit given the submissions_gap 
+			// Validate if the user is allowed to submit given the submissions_gap 			
 			if (!RunsDAO::IsRunInsideSubmissionGap(
 							self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"])
-					&& !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+					&& !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {				
 				throw new NotAllowedToSubmitException("Unable to submit run: You have to wait " . self::$contest->getSubmissionsGap() . " seconds between consecutive submissions.");
 			}
 		} catch (ApiException $apiException) {
 			// Propagate ApiException
 			throw $apiException;
 		} catch (Exception $e) {
-			// Operation failed in the data layer
+			// Operation failed in the data layer			
 			throw new InvalidDatabaseOperationException($e);
 		}
 	}
@@ -186,7 +186,7 @@ class RunController extends Controller {
 			RunsDAO::save($run);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
-			throw new InvalidDatabaseOperationException($e);			
+			throw new InvalidDatabaseOperationException($e);
 		}
 
 		try {
@@ -194,7 +194,7 @@ class RunController extends Controller {
 			$filepath = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
 			FileHandler::CreateFile($filepath, $r["source"]);
 		} catch (Exception $e) {
-			throw new InvalidFilesystemOperationException($e);			
+			throw new InvalidFilesystemOperationException($e);
 		}
 
 		// Call Grader
@@ -203,7 +203,7 @@ class RunController extends Controller {
 		} catch (Exception $e) {
 			Logger::error("Call to Grader::grade() failed:");
 			Logger::error($e);
-			throw new InvalidFilesystemOperationException($e);			
+			throw new InvalidFilesystemOperationException($e);
 		}
 
 		if (self::$practice) {
@@ -220,7 +220,7 @@ class RunController extends Controller {
 				}
 			} catch (Exception $e) {
 				// Operation failed in the data layer
-				throw new InvalidDatabaseOperationException($e);				
+				throw new InvalidDatabaseOperationException($e);
 			}
 		}
 
@@ -233,7 +233,7 @@ class RunController extends Controller {
 			///       (by improving, adding penalties, etc)
 			self::InvalidateScoreboardCache(self::$contest->getContestId());
 		}
-		
+
 		return $response;
 	}
 
@@ -246,4 +246,6 @@ class RunController extends Controller {
 		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
 		$adminScoreboardCache->delete();
 	}
-}	
+
+}
+

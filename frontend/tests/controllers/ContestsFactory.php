@@ -35,7 +35,7 @@ class ContestsFactory {
 		$r["start_time"] = Utils::GetPhpUnixTimestamp() - 60 * 60;
 		$r["finish_time"] = Utils::GetPhpUnixTimestamp() + 60 * 60;
 		$r["window_length"] = null;
-		$r["public"] = 1;
+		$r["public"] = $public;
 		$r["alias"] = substr($title, 0, 20);
 		$r["points_decay_factor"] = ".02";
 		$r["partial_score"] = "0";
@@ -122,6 +122,22 @@ class ContestsFactory {
 		ProblemsController::apiDetails($r);
 		
 		unset($_REQUEST);
+	}
+	
+	public static function addUser($contestData, $user) {
+		
+		// Prepare our request
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		$r["user_id"] = $user->getUserId();
+		
+		// Log in the contest director
+		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);
+		
+		// Call api
+		ContestController::apiAddUser($r);
+		
+		unset($_REQUEST);		
 	}
 
 }

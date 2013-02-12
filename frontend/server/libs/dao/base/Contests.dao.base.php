@@ -11,9 +11,7 @@
   */
 abstract class ContestsDAOBase extends DAO
 {
-
-        public static $useDAOCache = true;
-        
+               
 		private static $loadedRecords = array();
 
 		private static function recordExists(  $contest_id ){

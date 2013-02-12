@@ -52,7 +52,7 @@ class ContestController extends Controller {
 
 		if (self::$contest->getPublic() === '0') {
 			try {
-				if (is_null(ContestsUsersDAO::getByPK($r["current__user_id"], self::$contest->getContestId())) && !Authorization::IsContestAdmin($r["current__user_id"], self::$contest)) {
+				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) && !Authorization::IsContestAdmin($r["current__user_id"], self::$contest)) {
 					throw new ForbiddenAccessException();
 				}
 			} catch (ApiException $e) {
@@ -419,4 +419,64 @@ class ContestController extends Controller {
 			"problem" => $problem);
 	}
 
+	/**
+	 * Adds a user to a contest.
+	 * By default, any user can view details of public contests.
+	 * Only users added through this API can view private contests
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiAddUser(Request $r) {
+		
+		// Authenticate logged user
+		self::authenticateRequest($r);
+		
+		
+		$user_to_add  = null;
+		
+		// Check contest_alias        
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+		Validators::isNumber($r["user_id"], "user_id");                                
+
+        try
+        {
+            self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+			$user_to_add = UsersDAO::getByPK($r["user_id"]);
+        }
+        catch(Exception $e)
+        {  
+            // Operation failed in the data layer
+           throw new InvalidDatabaseOperationException($e);
+        }                
+        
+		// Only director is allowed to create problems in contest
+        if(!Authorization::IsContestAdmin($r["current_user_id"], self::$contest))
+        {
+            throw new ForbiddenAccessException();
+        }		
+		
+		$contest_user = new ContestsUsers();
+        $contest_user->setContestId(self::$contest->getContestId());
+        $contest_user->setUserId($r["user_id"]);
+        $contest_user->setAccessTime("0000-00-00 00:00:00");
+        $contest_user->setScore("0");
+        $contest_user->setTime("0");
+        
+        // Save the contest to the DB
+        try
+        {
+            ContestsUsersDAO::save($contest_user);
+        }
+        catch(Exception $e)
+        {
+           // Operation failed in the data layer
+           throw new InvalidDatabaseOperationException($e);
+        }
+		
+		return array("status" => "ok");
+		
+	}
 }

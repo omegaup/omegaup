@@ -218,7 +218,7 @@ class InvalidCredentialsException extends ApiException {
 
 class NotAllowedToSubmitException extends ApiException {
 	
-	function __construct(Exception $previous = NULL) {
-		parent::__construct("You're not allowed to submit yet.", "HTTP/1.1 401 FORBIDDEN", 501, $previous);
+	function __construct($message = "You're not allowed to submit yet.", Exception $previous = NULL) {
+		parent::__construct($message, "HTTP/1.1 401 FORBIDDEN", 501, $previous);
 	}
 }
