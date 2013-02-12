@@ -90,6 +90,39 @@ class ContestsFactory {
 		// Clean up
 		unset($_REQUEST);
 	}
+	
+	public static function openContest($contestData, $user) {
+		
+		// Create an empty request
+		$r = new Request();
+		
+		// Log in as contest director		
+		$r["auth_token"] = OmegaupTestCase::login($user);
+		
+		// Prepare our request
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		
+		// Call api
+		ContestController::apiDetails($r);
+		
+		unset($_REQUEST);
+	}
+	
+	public static function openProblemInContest($contestData, $problemData, $user) {
+		
+		// Prepare our request
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		$r["problem_alias"] = $problemData["request"]["alias"];
+
+		// Log in the user
+		$r["auth_token"] = OmegaupTestCase::login($user);
+		
+		// Call api
+		ProblemsController::apiDetails($r);
+		
+		unset($_REQUEST);
+	}
 
 }
 
