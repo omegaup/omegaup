@@ -56,31 +56,30 @@ class RunController extends Controller {
 				throw new InvalidParameterException("problem_alias and contest_alias combination is invalid.");
 			}
 
-			// Before submit something, contestant had to open the problem/contest
-			if (!ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())
-					&& !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
-				throw new ForbiddenAccessException("Unable to submit run: You must open the problem before trying to submit a solution.");
-			}
+			// Contest admins can skip following checks
+			if (!Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+				// Before submit something, contestant had to open the problem/contest
+				if (!ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) {
+					throw new ForbiddenAccessException("Unable to submit run: You must open the problem before trying to submit a solution.");
+				}
 
-			// Validate that the run is timely inside contest
-			if (!self::$contest->isInsideContest($r["current_user_id"])
-					&& !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
-				throw new ForbiddenAccessException("Unable to submit run: Contest time has expired or not started yet.");
-			}
+				// Validate that the run is timely inside contest
+				if (!self::$contest->isInsideContest($r["current_user_id"])) {
+					throw new ForbiddenAccessException("Unable to submit run: Contest time has expired or not started yet.");
+				}
 
-			// Validate if contest is private then the user should be registered
-			if (self::$contest->getPublic() == 0
-					&& is_null(ContestsUsersDAO::getByPK(
-									$r["current_user_id"], self::$contest->getContestId()))
-					&& !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
-				throw new ForbiddenAccessException("Unable to submit run: You are not registered to this contest.");
-			}
+				// Validate if contest is private then the user should be registered
+				if (self::$contest->getPublic() == 0
+						&& is_null(ContestsUsersDAO::getByPK(
+									$r["current_user_id"], self::$contest->getContestId()))) {
+					throw new ForbiddenAccessException("Unable to submit run: You are not registered to this contest.");
+				}
 
-			// Validate if the user is allowed to submit given the submissions_gap 			
-			if (!RunsDAO::IsRunInsideSubmissionGap(
-							self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"])
-					&& !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {				
-				throw new NotAllowedToSubmitException("Unable to submit run: You have to wait " . self::$contest->getSubmissionsGap() . " seconds between consecutive submissions.");
+				// Validate if the user is allowed to submit given the submissions_gap 			
+				if (!RunsDAO::IsRunInsideSubmissionGap(
+								self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"])) {				
+					throw new NotAllowedToSubmitException("Unable to submit run: You have to wait " . self::$contest->getSubmissionsGap() . " seconds between consecutive submissions.");
+				}
 			}
 		} catch (ApiException $apiException) {
 			// Propagate ApiException
