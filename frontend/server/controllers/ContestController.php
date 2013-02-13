@@ -15,22 +15,93 @@ class ContestController extends Controller {
 	 *
 	 * List contests
 	 */
-	public static function apiList(Request $r = null) {
-		$result = ContestsDAO::search(new Contests(array(
-							"public" => 1
-						)));
+	public static function apiList(Request $r) {
 
-		$array_result = array();
+		// Check who is visiting, but a not logged user can still view
+		// the list of contests
+		try {
+			self::authenticateRequest($r);
+		} catch (ForbiddenAccessException $e) {
+			// Do nothing
+		}
 
-		// @TODO make daos return associative arrays
-		// if requestes in order to discard this loop
-		foreach ($result as $r) {
-			array_push($array_result, $r->asArray());
+		// Create array of relevant columns
+		$relevant_columns = array("contest_id", "title", "description", "start_time", "finish_time", "public", "alias", "director_id", "window_length");
+
+		try {
+			// Get all contests using only relevan columns
+			$contests = ContestsDAO::getAll(NULL, NULL, 'contest_id', "DESC", $relevant_columns);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// DAO requires contest_id as relevant column but we don't want to expose it
+		array_shift($relevant_columns);
+
+		/**
+		 * Ok, lets go 1 by 1, and if its public, show it,
+		 * if its not, check if the user has access to it.
+		 * */
+		$addedContests = array();
+
+		foreach ($contests as $c) {
+			// At most we want 10 contests @TODO paginar correctamente
+			if ($addedContests === 10) {
+				break;
+			}
+
+			if ($c->getPublic()) {
+
+				$c->toUnixTime();
+
+				$contestInfo = $c->asFilteredArray($relevant_columns);
+				$contestInfo["duration"] = (is_null($c->getWindowLength()) ?
+								$c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength() * 60));
+
+				$addedContests[] = $contestInfo;
+				continue;
+			}
+
+			/*
+			 * Ok, its not public, lets se if we have a 
+			 * valid user
+			 * */
+			if ($r["current_user_id"] === null) {
+				continue;
+			}
+
+			/**
+			 * Ok, i have a user. Can he see this contest ?
+			 * */
+			try {
+				$contestUser = ContestsUsersDAO::getByPK($r["current_user_id"], $c->getContestId());
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			// Admins can see all contests
+			if ($contestUser === null && !Authorization::IsSystemAdmin($r["current_user_id"])) {
+				/**
+				 * Nope, he cant .
+				 * */
+				continue;
+			}
+
+			/**
+			 * He can see it !
+			 * 
+			 * */
+			$c->toUnixTime();
+			$contestInfo = $c->asFilteredArray($relevant_columns);
+			$contestInfo["duration"] = (is_null($c->getWindowLength()) ?
+							$c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength() * 60));
+
+			$addedContests[] = $contestInfo;
 		}
 
 		return array(
-			"number_of_results" => sizeof($array_result),
-			"results" => $array_result
+			"number_of_results" => sizeof($addedContests),
+			"results" => $addedContests
 		);
 	}
 
@@ -430,53 +501,46 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiAddUser(Request $r) {
-		
+
 		// Authenticate logged user
 		self::authenticateRequest($r);
-		
-		
-		$user_to_add  = null;
-		
+
+
+		$user_to_add = null;
+
 		// Check contest_alias        
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
-		Validators::isNumber($r["user_id"], "user_id");                                
+		Validators::isNumber($r["user_id"], "user_id");
 
-        try
-        {
-            self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		try {
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
 			$user_to_add = UsersDAO::getByPK($r["user_id"]);
-        }
-        catch(Exception $e)
-        {  
-            // Operation failed in the data layer
-           throw new InvalidDatabaseOperationException($e);
-        }                
-        
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
 		// Only director is allowed to create problems in contest
-        if(!Authorization::IsContestAdmin($r["current_user_id"], self::$contest))
-        {
-            throw new ForbiddenAccessException();
-        }		
-		
+		if (!Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+			throw new ForbiddenAccessException();
+		}
+
 		$contest_user = new ContestsUsers();
-        $contest_user->setContestId(self::$contest->getContestId());
-        $contest_user->setUserId($r["user_id"]);
-        $contest_user->setAccessTime("0000-00-00 00:00:00");
-        $contest_user->setScore("0");
-        $contest_user->setTime("0");
-        
-        // Save the contest to the DB
-        try
-        {
-            ContestsUsersDAO::save($contest_user);
-        }
-        catch(Exception $e)
-        {
-           // Operation failed in the data layer
-           throw new InvalidDatabaseOperationException($e);
-        }
-		
+		$contest_user->setContestId(self::$contest->getContestId());
+		$contest_user->setUserId($r["user_id"]);
+		$contest_user->setAccessTime("0000-00-00 00:00:00");
+		$contest_user->setScore("0");
+		$contest_user->setTime("0");
+
+		// Save the contest to the DB
+		try {
+			ContestsUsersDAO::save($contest_user);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
 		return array("status" => "ok");
-		
 	}
+
 }

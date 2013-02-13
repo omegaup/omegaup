@@ -17,14 +17,18 @@ class Controller {
 	 */
 	protected static function authenticateRequest(Request $r) {
 		
-		Validators::isStringNonEmpty($r["auth_token"], "auth_token");
+		try {
+			Validators::isStringNonEmpty($r["auth_token"], "auth_token");
+		} catch(Exception $e) {
+			throw new ForbiddenAccessException();
+		}
 		
 		try {
 			$user = AuthTokensDAO::getUserByToken($r["auth_token"]);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-	Logger::log($user)	;
+	
 		if (is_null($user)) {
 			throw new ForbiddenAccessException();
 		}

@@ -86,7 +86,7 @@ class CreateContestTest extends OmegaupTestCase {
 			$r = $contestData["request"];
 			$contestDirector = $contestData["director"];
 			
-			$this->login($contestDirector);
+			$auth_token = $this->login($contestDirector);
 
 			// unset the current key from request
 			unset($r[$key]);
