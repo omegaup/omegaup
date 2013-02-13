@@ -57,7 +57,8 @@ class RunController extends Controller {
 			}
 
 			// Before submit something, contestant had to open the problem/contest
-			if (!ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) {
+			if (!ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())
+					&& !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
 				throw new ForbiddenAccessException("Unable to submit run: You must open the problem before trying to submit a solution.");
 			}
 

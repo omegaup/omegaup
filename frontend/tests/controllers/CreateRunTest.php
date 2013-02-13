@@ -12,6 +12,7 @@ class CreateRun extends OmegaupTestCase {
 
 	private $graderMock;
 	private $contestData;
+	private $contestant;
 
 	/**
 	 * Prepares the context to submit a run to a problem. Creates the contest,
@@ -20,7 +21,7 @@ class CreateRun extends OmegaupTestCase {
 	 * @return Request
 	 */
 	private function setValidRequest($contest_public = 1) {
-		
+
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
@@ -31,24 +32,24 @@ class CreateRun extends OmegaupTestCase {
 		ContestsFactory::addProblemToContest($problemData, $this->contestData);
 
 		// Create our contestant
-		$contestant = UserFactory::createUser();
-		
+		$this->contestant = UserFactory::createUser();
+
 		// If the contest is private, add the user
 		if ($contest_public === 0) {
-			ContestsFactory::addUser($this->contestData, $contestant);
+			ContestsFactory::addUser($this->contestData, $this->contestant);
 		}
 
 		// Our contestant has to open the contest before sending a run
-		ContestsFactory::openContest($this->contestData, $contestant);
+		ContestsFactory::openContest($this->contestData, $this->contestant);
 
 		// Then we need to open the problem
-		ContestsFactory::openProblemInContest($this->contestData, $problemData, $contestant);
+		ContestsFactory::openProblemInContest($this->contestData, $problemData, $this->contestant);
 
 		// Create an empty request
 		$r = new Request();
 
 		// Log in as contest director
-		$r["auth_token"] = $this->login($contestant);
+		$r["auth_token"] = $this->login($this->contestant);
 
 		// Build request
 		$r["contest_alias"] = $this->contestData["request"]["alias"];
@@ -57,11 +58,11 @@ class CreateRun extends OmegaupTestCase {
 		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 
 		//PHPUnit does not set IP address, doing it manually
-		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";						
-		
+		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
+
 		return $r;
 	}
-	
+
 	/**
 	 * Detours the Grader calls.
 	 * Problem: Submiting a new run invokes the Grader::grade() function which makes 
@@ -76,11 +77,11 @@ class CreateRun extends OmegaupTestCase {
 	 *
 	 */
 	private function detourGraderCalls($times = null) {
-		
+
 		if (is_null($times)) {
 			$times = $this->once();
 		}
-		
+
 		// Create a fake Grader object which will always return true (see
 		// next line)
 		$this->graderMock = $this->getMock('Grader', array('Grade'));
@@ -93,7 +94,7 @@ class CreateRun extends OmegaupTestCase {
 		// Detour all Grader::grade() calls to our mock
 		RunController::$grader = $this->graderMock;
 	}
-	
+
 	/**
 	 * Validate a run
 	 * 
@@ -101,7 +102,7 @@ class CreateRun extends OmegaupTestCase {
 	 * @param type $response
 	 */
 	private function assertRun($r, $response) {
-		
+
 		// Validate
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertArrayHasKey("guid", $response);
@@ -109,9 +110,9 @@ class CreateRun extends OmegaupTestCase {
 		// Get run from DB
 		$run = RunsDAO::getByAlias($response["guid"]);
 		$this->assertNotNull($run);
-		
+
 		// Get contest from DB to check times with respect to contest start
-		$contest = ContestsDAO::getByAlias($r["contest_alias"]);		
+		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
 
 		// Validate data        
 		$this->assertEquals($r["language"], $run->getLanguage());
@@ -132,9 +133,8 @@ class CreateRun extends OmegaupTestCase {
 		$this->assertEquals("127.0.0.1", $run->getIp());
 		$this->assertEquals((time() - strtotime($contest->getStartTime())) / 60, $run->getSubmitDelay(), '', 0.5);
 		$this->assertEquals("JE", $run->getVeredict());
-		
 	}
-	
+
 	/**
 	 * Basic new run test
 	 */
@@ -148,31 +148,31 @@ class CreateRun extends OmegaupTestCase {
 
 		$this->assertRun($r, $response);
 	}
-	
+
 	/**
 	 * Cannot submit run when contest ended
 	 * 
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testRunWhenContestExpired() {
-		
+
 		$r = $this->setValidRequest();
-		
+
 		// Manually expire the contest		
-        $contest = ContestsDAO::getByAlias($r["contest_alias"]);
-        $contest->setFinishTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() - 1));                        
-        ContestsDAO::save($contest);
-		
+		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		$contest->setFinishTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() - 1));
+		ContestsDAO::save($contest);
+
 		// Call API
 		RunController::apiCreate($r);
 	}
-	
+
 	/**
 	 * Test a valid submission to a private contest
 	 */
 	public function testRunToValidPrivateContest() {
-		
-		$r = $this->setValidRequest(0 /*private contest*/);
+
+		$r = $this->setValidRequest(0 /* private contest */);
 		$this->detourGraderCalls();
 
 		// Call API
@@ -181,46 +181,45 @@ class CreateRun extends OmegaupTestCase {
 		// Validate
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertArrayHasKey("guid", $response);
-		
 	}
-	
+
 	/**
 	 * Test a invalid submission to a private contest
 	 * 
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testRunPrivateContestWithUserNotRegistred() {
-		
-		$r = $this->setValidRequest(0 /*private contest*/);		
-		
+
+		$r = $this->setValidRequest(0 /* private contest */);
+
 		// Create a second user not regitered to private contest
 		$contestant2 = UserFactory::createUser();
-		
+
 		// Log in this second user
 		$r["auth_token"] = self::login($contestant2);
 
 		// Call API
-		RunController::apiCreate($r);				
+		RunController::apiCreate($r);
 	}
-	
+
 	/**
 	 * Cannot submit run when contest not started yet
 	 * 
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testRunWhenContestNotStarted() {
-		
+
 		$r = $this->setValidRequest();
-		
+
 		// Manually expire contest
-        $contest = ContestsDAO::getByAlias($r["contest_alias"]);                
-        $contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 10));                        
-        ContestsDAO::save($contest);
-		
+		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		$contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 10));
+		ContestsDAO::save($contest);
+
 		// Call API
 		RunController::apiCreate($r);
 	}
-	
+
 	/**
 	 * Test that a user cannot submit once he has already submitted something
 	 * and the submissions gap time has not expired
@@ -228,59 +227,222 @@ class CreateRun extends OmegaupTestCase {
 	 * @expectedException NotAllowedToSubmitException 
 	 */
 	public function testInvalidRunInsideSubmissionsGap() {
-		
+
 		// This API requires DAO cache be turned off 
 		ContestsDAO::$useDAOCache = false;
-		
+
 		// Set the context
 		$r = $this->setValidRequest();
-		$this->detourGraderCalls();		
-		
+		$this->detourGraderCalls();
+
 		// Set submissions gap of 20 seconds
-        $contest = ContestsDAO::getByAlias($r["contest_alias"]);		
-        $contest->setSubmissionsGap(20);
-        ContestsDAO::save($contest);
-		
+		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		$contest->setSubmissionsGap(20);
+		ContestsDAO::save($contest);
+
 		// Call API
 		$response = RunController::apiCreate($r);
 
 		// Validate the run
 		$this->assertRun($r, $response);
-		
+
 		// Send a second run. This one should fail
-		$response = RunController::apiCreate($r);		
+		$response = RunController::apiCreate($r);
 	}
-	
+
 	/**
 	 * Submission gap is per problem, not per contest
 	 */
 	public function testSubmissionGapIsPerProblem() {
-		
+
 		// Set the context
 		$r = $this->setValidRequest();
-		
+
 		// Prepare the Grader mock, validate that grade is called 2 times
 		// (we will use 2 problems for this test)
-		$this->detourGraderCalls($this->exactly(2));		
-		
+		$this->detourGraderCalls($this->exactly(2));
+
 		// Add a second problem to the contest
 		$problemData2 = ProblemsFactory::createProblem();
 		ContestsFactory::addProblemToContest($problemData2, $this->contestData);
-				
+
 		// Set submissions gap of 20 seconds
-        $contest = ContestsDAO::getByAlias($r["contest_alias"]);		
-        $contest->setSubmissionsGap(20);
-        ContestsDAO::save($contest);
-		
+		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		$contest->setSubmissionsGap(20);
+		ContestsDAO::save($contest);
+
 		// Call API, send a run for the first problem
 		$response = RunController::apiCreate($r);
 		$this->assertRun($r, $response);
-		
+
 		// Set the second problem as the target
 		$r["problem_alias"] = $problemData2["request"]["alias"];
+
+		// Send a run to the 2nd problem
 		$response = RunController::apiCreate($r);
-		$this->assertRun($r, $response);		
+		$this->assertRun($r, $response);
 	}
 
+	/**
+	 * Test that grabbing a problem from a contest A and using it as
+	 * parameter of contest B does not work
+	 * 
+	 * @expectedException InvalidParameterException
+	 */
+	public function testInvalidContestProblemCombination() {
+		// Set the context for the first contest
+		$r1 = $this->setValidRequest();
+
+		// Set the context for the second contest
+		$r2 = $this->setValidRequest();
+
+		// Mix problems
+		$r2["problem_alias"] = $r1["problem_alias"];
+
+		// Call API
+		$response = RunController::apiCreate($r2);
+	}
+
+	/**
+	 * Test that a run can't be send with missing parameters
+	 */
+	public function testMissingParameters() {
+
+		// Set the context for the first contest
+		$original_r = $this->setValidRequest();
+		$this->detourGraderCalls($this->any());
+
+		$needed_keys = array(
+			"problem_alias",
+			"contest_alias",
+			"language",
+			"source"
+		);
+
+		foreach ($needed_keys as $key) {
+			// Make a copy of the array
+			$r = $original_r;
+
+			// Erase the key
+			UNSET($r[$key]);
+
+			try {
+
+				// Call API
+				$response = RunController::apiCreate($r);
+			} catch (InvalidParameterException $e) {
+				// The API should throw this exception, in this case
+				// we continue
+				continue;
+			}
+
+			$this->fail("apiCreate did not return expected exception");
+		}
+	}
+	
+	/**
+	 * Test valid window length
+	 */
+	public function testNewRunInWindowLengthPublicContest() {
+		
+		// Set the context for the first contest
+		$r = $this->setValidRequest();
+		$this->detourGraderCalls();
+		
+		// Alter Contest window length to 20
+		// This means: once I started the contest, I have 20 more mins
+		// to finish it.
+        $contest = ContestsDAO::getByAlias($r["contest_alias"]);
+        $contest->setWindowLength(20);
+        ContestsDAO::save($contest);
+		
+		// Call API
+		$response = RunController::apiCreate($r);
+
+		$this->assertRun($r, $response);
+	}
+	
+	/**
+	 * Test sending runs after the window length expired
+	 * 
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testNewRunOutWindowLengthPublicContest() {
+		
+		// Set the context for the first contest
+		$r = $this->setValidRequest();		
+		
+		// Alter Contest window length to 20
+		// This means: once I started the contest, I have 20 more mins
+		// to finish it.
+        $contest = ContestsDAO::getByAlias($r["contest_alias"]);
+        $contest->setWindowLength(20);
+        ContestsDAO::save($contest);
+		
+		 // Alter first access time of our contestant such that he started
+		// 21 minutes ago, this is, window length has expired by 1 minute
+        $contest_user = ContestsUsersDAO::getByPK($this->contestant->getUserId(), $contest->getContestId());        
+        $contest_user->setAccessTime(date("Y-m-d H:i:s", time() - 21 * 60)); //Window length is in minutes                
+        ContestsUsersDAO::save($contest_user);
+		
+		// Call API
+		RunController::apiCreate($r);
+	}
+
+	
+	/**
+	 * Admin is god, is able to submit even when contest has not started yet
+	 */
+	public function testRunWhenContestNotStartedForContestDirector() {
+		
+		// Set the context for the first contest
+		$r = $this->setValidRequest();
+		$this->detourGraderCalls();
+		
+		// Log as contest director
+		$r["auth_token"] = $this->login($this->contestData["director"]);
+		
+		// Manually set the contest	start 10 mins in the future
+		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		$contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 10));
+		ContestsDAO::save($contest);
+		
+		// Call API
+		$response = RunController::apiCreate($r);
+		
+		$this->assertRun($r, $response);		
+	}
+	
+	/**
+	 * Contest director is god, should be able to submit whenever he wants
+	 * for testing purposes
+	 */
+	public function testInvalidRunInsideSubmissionsGapForContestDirector() {
+		
+		// Set the context for the first contest
+		$r = $this->setValidRequest();
+		$this->detourGraderCalls($this->exactly(2));
+		
+		// Log as contest director
+		$r["auth_token"] = $this->login($this->contestData["director"]);
+		
+		// Set submissions gap of 20 seconds
+		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		$contest->setSubmissionsGap(20);
+		ContestsDAO::save($contest);
+
+		// Call API
+		$response = RunController::apiCreate($r);
+
+		// Validate the run
+		$this->assertRun($r, $response);
+
+		// Send a second run. This one should not fail
+		$response = RunController::apiCreate($r);	
+		
+		// Validate the run
+		$this->assertRun($r, $response);
+		
+	}
 }
 
