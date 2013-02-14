@@ -62,6 +62,7 @@ require_once("controllers/SessionController.php");
 require_once("controllers/ContestController.php");
 require_once("controllers/ProblemController.php");
 require_once("controllers/RunController.php");
+require_once("controllers/ClarificationController.php");
 
 require_once("libs/adodb5/adodb.inc.php");
 require_once("libs/adodb5/adodb-exceptions.inc.php");
