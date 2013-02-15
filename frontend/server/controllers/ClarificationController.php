@@ -9,6 +9,7 @@ class ClarificationController extends Controller {
 
 	private static $contest;
 	private static $problem;
+	private static $clarification;
 
 	/**
 	 * Validate the request of apiCreate
@@ -17,7 +18,7 @@ class ClarificationController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
 	 */
-	public static function validateCreate(Request $r) {
+	private static function validateCreate(Request $r) {
 
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
@@ -57,10 +58,10 @@ class ClarificationController extends Controller {
 		self::authenticateRequest($r);
 
 		// Validate request
-		self::validateCreate($r);		
+		self::validateCreate($r);
 
 		$response = array();
-		
+
 		$clarification = new Clarifications(array(
 					"author_id" => $r["current_user_id"],
 					"contest_id" => self::$contest->getContestId(),
@@ -80,7 +81,48 @@ class ClarificationController extends Controller {
 
 		$response["clarification_id"] = $clarification->getClarificationId();
 		$response["status"] = "ok";
-		
+
+		return $response;
+	}
+
+	private static function validateDetails(Request $r) {
+
+		Validators::isNumber($r["clarification_id"], "clarification_id");
+
+		// Check that the clarification actually exists
+		try {
+			self::$clarification = ClarificationsDAO::getByPK($r["clarification_id"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null(self::$clarification)) {
+			throw new NotFoundException();
+		}
+
+		// If the clarification is private, verify that our user is invited or is contest director               
+		if (self::$clarification->getPublic() === '0') {
+			if (!(Authorization::CanViewClarification($r["current_user_id"], self::$clarification))) {
+				throw new ForbiddenAccessException();
+			}
+		}
+	}
+
+	public static function apiDetails(Request $r) {
+
+		// Authenticate the user
+		self::authenticateRequest($r);
+
+		// Validate request
+		self::validateDetails($r);
+
+		// Create array of relevant columns
+		$relevant_columns = array("message", "answer", "time", "problem_id", "contest_id");
+
+		// Add the clarificatoin the response
+		$response = self::$clarification->asFilteredArray($relevant_columns);
+		$response["status"] = "ok";
+
 		return $response;
 	}
 
