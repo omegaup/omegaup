@@ -11,6 +11,7 @@ class RunController extends Controller {
 	private static $practice = false;
 	private static $problem = null;
 	private static $contest = null;
+	private static $run = null;
 
 	/**
 	 * Creates an instance of Grader if not already created
@@ -279,42 +280,50 @@ class RunController extends Controller {
 	}
 
 	/**
-	 * Gets details of a run
+	 * Validate request of details
 	 * 
 	 * @param Request $r
-	 * @return array
-	 * @throws ApiException
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
 	 * @throws ForbiddenAccessException
+	 */
+	public static function validateDetailsRequest(Request $r) {
+		Validators::isStringNonEmpty($r["run_alias"], "run_alias");
+
+		try {
+			// If user is not judge, must be the run's owner.
+			self::$run = RunsDAO::getByAlias($r["run_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null(self::$run)) {
+			throw new NotFoundException();
+		}
+
+		if (!(Authorization::CanViewRun($r["current_user_id"], self::$run))) {
+			throw new ForbiddenAccessException();
+		}
+	}
+
+	/**
+	 * Get basic details of a run
+	 * 
+	 * @param Request $r
+	 * @return array
 	 * @throws InvalidFilesystemOperationException
 	 */
 	public static function apiDetails(Request $r) {
 
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
-		
-		Validators::isStringNonEmpty($r["run_alias"], "run_alias");
 
-		try {
-			// If user is not judge, must be the run's owner.
-			$myRun = RunsDAO::getByAlias($r["run_alias"]);
-		} catch (Exception $e) {
-			// Operation failed in the data layer
-			throw new InvalidDatabaseOperationException($e);
-		}
-
-		if (is_null($myRun)) {
-			throw new NotFoundException();
-		}
-
-		if (!(Authorization::CanViewRun($r["current_user_id"], $myRun))) {
-			throw new ForbiddenAccessException();
-		}
+		self::validateDetailsRequest($r);
 
 		// Fill response
 		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
-		$filtered = $myRun->asFilteredArray($relevant_columns);
+		$filtered = self::$run->asFilteredArray($relevant_columns);
 		$filtered['time'] = strtotime($filtered['time']);
 		$filtered['score'] = round((float) $filtered['score'], 4);
 		$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
@@ -323,13 +332,90 @@ class RunController extends Controller {
 
 		try {
 			// Get source code
-			$filepath = RUNS_PATH . DIRECTORY_SEPARATOR . $myRun->getGuid();
+			$filepath = RUNS_PATH . DIRECTORY_SEPARATOR . self::$run->getGuid();
 			$response["source"] = FileHandler::ReadFile($filepath);
 		} catch (Exception $e) {
 			throw new InvalidFilesystemOperationException($e);
 		}
-		
+
 		return $response;
+	}
+
+	/**
+	 * Gets the full details of a run. Includes diff of cases
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiAdminDetails(Request $r) {
+
+		// Get the user who is calling this API
+		self::authenticateRequest($r);
+
+		self::validateDetailsRequest($r);
+
+		// Get the problem
+		try {
+			$problem = ProblemsDAO::getByPK(self::$run->getProblemId());
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$response = array();
+
+		$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
+		$grade_dir = RUNS_PATH . '/../grade/' . self::$run->getRunId();
+
+		$cases = array();
+
+		if (file_exists("$grade_dir.err")) {
+			$response['compile_error'] = file_get_contents("$grade_dir.err");
+		} else if (is_dir($grade_dir)) {
+			if ($dir = opendir($grade_dir)) {
+				while (($file = readdir($dir)) !== false) {
+					if ($file == '.' || $file == '..' || !strstr($file, ".meta"))
+						continue;
+
+					$case = array('name' => str_replace(".meta", "", $file), 'meta' => self::ParseMeta(file_get_contents("$grade_dir/$file")));
+
+					if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
+						$out = str_replace(".meta", ".out", $file);
+						$case['out_diff'] = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
+					}
+
+					if (file_exists("$grade_dir/" . str_replace(".meta", ".err", $file))) {
+						$err = "$grade_dir/" . str_replace(".meta", ".err", $file);
+						$case['err'] = file_get_contents($err);
+					}
+
+					array_push($cases, $case);
+				}
+				closedir($dir);
+			}
+		}
+
+		usort($cases, array($this, "MetaCompare"));
+
+		$response ['cases'] = $cases;
+		$response ['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
+	}
+
+	private static function ParseMeta($meta) {
+		$ans = array();
+
+		foreach (explode("\n", trim($meta)) as $line) {
+			list($key, $value) = explode(":", trim($line));
+			$ans[$key] = $value;
+		}
+
+		return $ans;
+	}
+
+	private static function MetaCompare($a, $b) {
+		if ($a['name'] == $b['name'])
+			return 0;
+
+		return ($a['name'] < $b['name']) ? -1 : 1;
 	}
 
 }
