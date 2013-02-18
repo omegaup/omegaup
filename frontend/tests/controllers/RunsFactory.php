@@ -75,6 +75,24 @@ class RunsFactory {
 			"response" => $response
 		);
 	}
+	
+	/**
+	 * Given a run id, set a score to a given run
+	 * 
+	 * @param type $runData
+	 * @param int $points
+	 * @param string $veredict
+	 */
+	public static function gradeRun($runData, $points = 100, $veredict = "AC") {
+		
+		$run = RunsDAO::getByAlias($runData["response"]["guid"]);
+		
+		$run->setVeredict($veredict);
+		$run->setContestScore($points);
+		$run->setStatus("ready");
+		
+		RunsDAO::save($run);				
+	}
 
 }
 

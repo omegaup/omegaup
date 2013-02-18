@@ -400,8 +400,11 @@ class RunController extends Controller {
 
 		usort($cases, array($this, "MetaCompare"));
 
-		$response ['cases'] = $cases;
-		$response ['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
+		$response['cases'] = $cases;
+		$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
+		$response["status"] = "ok";
+		
+		return $response;
 	}
 
 	private static function ParseMeta($meta) {
@@ -450,6 +453,9 @@ class RunController extends Controller {
 		if (file_exists("$grade_dir.err")) {
 			$response['compile_error'] = file_get_contents("$grade_dir.err");
 		}
+		
+		$response["status"] = "ok";
+		return $response;
 	}
 
 }

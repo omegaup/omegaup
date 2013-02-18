@@ -572,6 +572,8 @@ class ContestController extends Controller {
 
 	/**
 	 * 
+	 * Get clarifications of a contest
+	 * 
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -697,6 +699,37 @@ class ContestController extends Controller {
 		$response['clarifications'] = $clarifications_array;
 		$response['status'] = "ok";
 
+		return $response;
+	}
+
+	public static function apiScoreboard(Request $r) {
+
+		// Get the current user
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		try {
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		if (is_null(self::$contest)) {
+			throw new NotFoundException();
+		}
+
+		// Create scoreboard
+		$scoreboard = new Scoreboard(
+						self::$contest->getContestId(),
+						Authorization::IsContestAdmin($r["current_user_id"], self::$contest)
+		);
+
+		// Push scoreboard data in response
+		$response = array();
+		$response["ranking"] = $scoreboard->generate();
+		
 		return $response;
 	}
 
