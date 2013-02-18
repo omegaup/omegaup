@@ -12,6 +12,9 @@ class RunController extends Controller {
 	private static $problem = null;
 	private static $contest = null;
 
+	/**
+	 * Creates an instance of Grader if not already created
+	 */
 	private static function initialize() {
 
 		if (is_null(self::$grader)) {
@@ -19,9 +22,22 @@ class RunController extends Controller {
 			self::$grader = new Grader();
 		}
 
+		// Set practice mode OFF by default
 		self::$practice = false;
 	}
 
+	/**
+	 * 
+	 * Validates Create Run request 
+	 * 
+	 * @param Request $r
+	 * @return type
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotAllowedToSubmitException
+	 * @throws InvalidParameterException
+	 * @throws ForbiddenAccessException
+	 */
 	private static function validateCreateRequest(Request $r) {
 
 		try {
@@ -71,13 +87,13 @@ class RunController extends Controller {
 				// Validate if contest is private then the user should be registered
 				if (self::$contest->getPublic() == 0
 						&& is_null(ContestsUsersDAO::getByPK(
-									$r["current_user_id"], self::$contest->getContestId()))) {
+										$r["current_user_id"], self::$contest->getContestId()))) {
 					throw new ForbiddenAccessException("Unable to submit run: You are not registered to this contest.");
 				}
 
 				// Validate if the user is allowed to submit given the submissions_gap 			
 				if (!RunsDAO::IsRunInsideSubmissionGap(
-								self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"])) {				
+								self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"])) {
 					throw new NotAllowedToSubmitException("Unable to submit run: You have to wait " . self::$contest->getSubmissionsGap() . " seconds between consecutive submissions.");
 				}
 			}
@@ -90,6 +106,15 @@ class RunController extends Controller {
 		}
 	}
 
+	/**
+	 * Create a new run 
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws Exception
+	 * @throws InvalidDatabaseOperationException
+	 * @throws InvalidFilesystemOperationException
+	 */
 	public static function apiCreate(Request $r) {
 
 		// Init
@@ -237,6 +262,12 @@ class RunController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Any new run can potentially change the scoreboard.
+	 * When a new run is submitted, the scoreboard cache snapshot is deleted
+	 * 
+	 * @param int $contest_id
+	 */
 	private static function InvalidateScoreboardCache($contest_id) {
 		// Invalidar cache del contestant
 		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
@@ -245,6 +276,60 @@ class RunController extends Controller {
 		// Invalidar cache del admin
 		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
 		$adminScoreboardCache->delete();
+	}
+
+	/**
+	 * Gets details of a run
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 * @throws InvalidFilesystemOperationException
+	 */
+	public static function apiDetails(Request $r) {
+
+		// Get the user who is calling this API
+		self::authenticateRequest($r);
+		
+		Validators::isStringNonEmpty($r["run_alias"], "run_alias");
+
+		try {
+			// If user is not judge, must be the run's owner.
+			$myRun = RunsDAO::getByAlias($r["run_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($myRun)) {
+			throw new NotFoundException();
+		}
+
+		if (!(Authorization::CanViewRun($r["current_user_id"], $myRun))) {
+			throw new ForbiddenAccessException();
+		}
+
+		// Fill response
+		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+		$filtered = $myRun->asFilteredArray($relevant_columns);
+		$filtered['time'] = strtotime($filtered['time']);
+		$filtered['score'] = round((float) $filtered['score'], 4);
+		$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
+
+		$response = $filtered;
+
+		try {
+			// Get source code
+			$filepath = RUNS_PATH . DIRECTORY_SEPARATOR . $myRun->getGuid();
+			$response["source"] = FileHandler::ReadFile($filepath);
+		} catch (Exception $e) {
+			throw new InvalidFilesystemOperationException($e);
+		}
+		
+		return $response;
 	}
 
 }
