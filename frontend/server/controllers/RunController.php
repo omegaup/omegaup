@@ -301,10 +301,6 @@ class RunController extends Controller {
 		if (is_null(self::$run)) {
 			throw new NotFoundException();
 		}
-
-		if (!(Authorization::CanViewRun($r["current_user_id"], self::$run))) {
-			throw new ForbiddenAccessException();
-		}
 	}
 
 	/**
@@ -320,6 +316,10 @@ class RunController extends Controller {
 		self::authenticateRequest($r);
 
 		self::validateDetailsRequest($r);
+
+		if (!(Authorization::CanViewRun($r["current_user_id"], self::$run))) {
+			throw new ForbiddenAccessException();
+		}
 
 		// Fill response
 		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
@@ -353,6 +353,10 @@ class RunController extends Controller {
 		self::authenticateRequest($r);
 
 		self::validateDetailsRequest($r);
+
+		if (!(Authorization::CanEditRun($r["current_user_id"], self::$run))) {
+			throw new ForbiddenAccessException();
+		}
 
 		// Get the problem
 		try {
@@ -416,6 +420,36 @@ class RunController extends Controller {
 			return 0;
 
 		return ($a['name'] < $b['name']) ? -1 : 1;
+	}
+
+	/**
+	 * Given the run alias, returns the source code and any compile errors if any
+	 * Used in the arena, any contestant can view its own codes and compile errors
+	 * 
+	 * @param Request $r
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiSource(Request $r) {
+
+		// Get the user who is calling this API
+		self::authenticateRequest($r);
+
+		self::validateDetailsRequest($r);
+
+		if (!(Authorization::CanViewRun($r["current_user_id"], self::$run))) {
+			throw new ForbiddenAccessException();
+		}
+
+		$response = array();
+
+		// Get the source
+		$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
+
+		// Get the error
+		$grade_dir = RUNS_PATH . '/../grade/' . self::$run->getRunId();
+		if (file_exists("$grade_dir.err")) {
+			$response['compile_error'] = file_get_contents("$grade_dir.err");
+		}
 	}
 
 }
