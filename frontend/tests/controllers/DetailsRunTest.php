@@ -12,6 +12,10 @@ require_once 'RunsFactory.php';
 
 class DetailsRunTest extends OmegaupTestCase {
 	
+	/**
+	 * Basic test of viewing run details
+	 * 
+	 */
 	public function testShowRunDetailsValid() {
 		
 		// Get a problem
