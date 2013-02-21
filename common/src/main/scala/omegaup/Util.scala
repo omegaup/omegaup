@@ -29,10 +29,14 @@ trait Using {
 
 object Config {
 	private val props = new java.util.Properties(System.getProperties)
-	try{
-		props.load(new java.io.FileInputStream("omegaup.conf"))
-	} catch {
-		case _ => {}
+	load()
+
+	def load(): Unit = {
+		try{
+			props.load(new java.io.FileInputStream("omegaup.conf"))
+		} catch {
+			case _ => {}
+		}
 	}
 	
 	def get[T](propname: String, default: T): T = {

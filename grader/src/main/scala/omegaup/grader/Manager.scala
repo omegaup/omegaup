@@ -71,13 +71,23 @@ object Manager extends Object with Log {
 	}
 	
 	def getRunner(): RunnerService = {
-		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
-		runnerQueue.take()
+		var r: RunnerService = null
+
+		while (r == null) {
+			info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
+			r = runnerQueue.take()
+			if (!Config.get("grader.embedded_runner.enable", false) && r == omegaup.runner.Runner) {
+				// don't put this runner back in the queue.
+				r = null
+			}
+		}
+
+		r
 	}
 	
 	def addRunner(service: RunnerService) = {
-		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 		runnerQueue.put(service)
+		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 	}
 	
 	def register(host: String, port: Int): RegisterOutputMessage = {
@@ -149,6 +159,18 @@ object Manager extends Object with Log {
 				response.setContentType("text/json")
 				
 				Serialization.write(request.getPathInfo() match {
+					case "/reload-config/" => {
+						val embeddedRunner = Config.get("grader.embedded_runner.enable", false)
+						Config.load()
+						info("Configuration reloaded")
+
+						if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
+							Manager.addRunner(omegaup.runner.Runner)
+						}
+
+						response.setStatus(HttpServletResponse.SC_OK)
+						new ReloadConfigOutputMessage()
+					}
 					case "/grade/" => {
 						try {
 							val req = Serialization.read[GradeInputMessage](request.getReader())
