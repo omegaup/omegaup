@@ -12,8 +12,11 @@ class ContestController extends Controller {
 	private static $contest;
 
 	/**
-	 *
-	 * List contests
+	 * Returns a list of contests
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiList(Request $r) {
 
@@ -105,6 +108,16 @@ class ContestController extends Controller {
 		);
 	}
 
+	/**
+	 * Validate request of a details contest
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws Exception
+	 * @throws ForbiddenAccessException
+	 * @throws PreconditionFailedException
+	 */
 	public static function validateDetails(Request $r) {
 
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
@@ -144,6 +157,13 @@ class ContestController extends Controller {
 		}
 	}
 
+	/**
+	 * Returns details of a Contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
 	public static function apiDetails(Request $r) {
 
 		// Crack the request to get the current user
@@ -212,6 +232,7 @@ class ContestController extends Controller {
 
 			$cache->set($result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
 		}// closes if( $result == null )
+		
 		// Adding timer info separately as it depends on the current user and we don't
 		// want this to get generally cached for everybody
 		// Save the time of the first access
@@ -702,6 +723,14 @@ class ContestController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Returns the Scoreboard
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 */
 	public static function apiScoreboard(Request $r) {
 
 		// Get the current user
