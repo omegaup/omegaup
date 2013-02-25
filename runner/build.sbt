@@ -21,15 +21,16 @@ proguardOptions ++= Seq(
         "-keep class omegaup.runner.*",
         "-keepclassmembers class omegaup.data.* { *; }",
         "-keep class scala.collection.JavaConversions",
-        "-keep class org.mortbay.log.Slf4jLog",
+        "-keep class org.eclipse.jetty.util.log.Slf4jLog",
         keepMain("omegaup.runner.Runner"),
         keepLimitedSerializability
 )
 
 libraryDependencies ++= Seq(
-        "org.mortbay.jetty" % "jetty" % "6.1.26",
-        "org.mortbay.jetty" % "jetty-sslengine" % "6.1.26",
-        "org.mortbay.jetty" % "jetty-client" % "6.1.26",
+        "org.eclipse.jetty" % "jetty-server" % "8.1.9.v20130131",
+	"org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" artifacts(Artifact("javax.servlet", "jar", "jar")),
+        "org.eclipse.jetty" % "jetty-client" % "8.1.9.v20130131",
+        "org.eclipse.jetty" % "jetty-security" % "8.1.9.v20130131",
         "net.liftweb" % "lift-json_2.9.1" % "2.4-M4",
         "org.slf4j" % "log4j-over-slf4j" % "1.6.2",
 	"ch.qos.logback" % "logback-core" % "0.9.24",

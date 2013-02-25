@@ -431,7 +431,7 @@ program() {
 		run = GraderData.run(5).get
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should equal (0.2001953125)
+		run.score should be (0.2 plusOrMinus 0.001)
 		run.contest_score should equal (0)
 
 		run = GraderData.run(6).get
@@ -443,13 +443,13 @@ program() {
 		run = GraderData.run(7).get
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should equal (0.0498046875)
+		run.score should be (0.05 plusOrMinus 0.001)
 		run.contest_score should equal (0)
 
 		run = GraderData.run(8).get
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should equal (0.71484375)
+		run.score should be (0.71 plusOrMinus 0.01)
 		run.contest_score should equal (0)
 
 		run = GraderData.run(9).get

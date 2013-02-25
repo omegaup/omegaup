@@ -3,8 +3,8 @@ package omegaup.grader
 import java.io._
 import javax.servlet._
 import javax.servlet.http._
-import org.mortbay.jetty.Request
-import org.mortbay.jetty.handler._
+import org.eclipse.jetty.server.Request
+import org.eclipse.jetty.server.handler._
 import net.liftweb.json._
 import omegaup._
 import omegaup.data._
@@ -153,7 +153,7 @@ object Manager extends Object with Log {
 		val handler = new AbstractHandler() {
 			@throws(classOf[IOException])
 			@throws(classOf[ServletException])
-			def handle(target: String, request: HttpServletRequest, response: HttpServletResponse, dispatch: Int) = {
+			override def handle(target: String, baseRequest: Request, request: HttpServletRequest, response: HttpServletResponse): Unit = {
 				implicit val formats = Serialization.formats(NoTypeHints)
 				
 				response.setContentType("text/json")
@@ -220,7 +220,7 @@ object Manager extends Object with Log {
 					}
 				}, response.getWriter())
 				
-				request.asInstanceOf[Request].setHandled(true)
+				baseRequest.setHandled(true)
 			}
 		};
 
@@ -233,18 +233,19 @@ object Manager extends Object with Log {
 		//drivers.UVa ! drivers.Login
 
 		// boilerplate code for jetty with https support	
-		val server = new org.mortbay.jetty.Server()
-		
-		val runnerConnector = new org.mortbay.jetty.security.SslSelectChannelConnector
-		runnerConnector.setPort(Config.get[Int]("grader.port", 21680))
-		runnerConnector.setKeystore(Config.get[String]("grader.keystore", "omegaup.jks"))
-		runnerConnector.setPassword(Config.get[String]("grader.password", "omegaup"))
-		runnerConnector.setKeyPassword(Config.get[String]("grader.keystore.password", "omegaup"))
-		runnerConnector.setTruststore(Config.get[String]("grader.truststore", "omegaup.jks"))
-		runnerConnector.setTrustPassword(Config.get[String]("grader.truststore.password", "omegaup"))
-		runnerConnector.setNeedClientAuth(true)
-		
-		server.setConnectors(List(runnerConnector).toArray)
+		val server = new org.eclipse.jetty.server.Server()
+	
+		val sslContext = new org.eclipse.jetty.util.ssl.SslContextFactory(Config.get[String]("grader.keystore", "omegaup.jks"))
+		sslContext.setKeyManagerPassword(Config.get[String]("grader.password", "omegaup"))
+		sslContext.setKeyStorePassword(Config.get[String]("grader.keystore.password", "omegaup"))
+		sslContext.setTrustStore(Config.get[String]("grader.truststore", "omegaup.jks"))
+		sslContext.setTrustStorePassword(Config.get[String]("grader.truststore.password", "omegaup"))
+		sslContext.setNeedClientAuth(true)
+	
+		val graderConnector = new org.eclipse.jetty.server.ssl.SslSelectChannelConnector(sslContext)
+		graderConnector.setPort(Config.get[Int]("grader.port", 21680))
+				
+		server.setConnectors(List(graderConnector).toArray)
 		
 		server.setHandler(handler)
 		server.start()

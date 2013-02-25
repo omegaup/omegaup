@@ -3,8 +3,8 @@ package omegaup
 import java.io._
 import java.net._
 import scala.xml._
-import org.mortbay.io._
-import org.mortbay.jetty.client.{HttpClient, ContentExchange}
+import org.eclipse.jetty.io._
+import org.eclipse.jetty.client.{HttpClient, ContentExchange}
 
 object Http extends Object with Log {
 	val client = new HttpClient()
@@ -28,8 +28,8 @@ object Http extends Object with Log {
 			
 			@throws(classOf[IOException])
 			protected override def onResponseHeader(name: Buffer, value: Buffer): Unit = {
-				if(cookies != null && name.toString == "Set-Cookie") {
-					val CookieRegex(cn, cv) = value.toString
+				if(cookies != null && name.toString("US-ASCII") == "Set-Cookie") {
+					val CookieRegex(cn, cv) = value.toString("US-ASCII")
 					cookies.put(cn, cv)
 				}
 			}
@@ -43,11 +43,11 @@ object Http extends Object with Log {
 		val exchange = new ContentExchange() {
 			@throws(classOf[IOException])
 			protected override def onResponseHeader(name: Buffer, value: Buffer): Unit = {
-				if(cookies != null && name.toString == "Set-Cookie") {
-					val CookieRegex(cn, cv) = value.toString
+				if(cookies != null && name.toString("US-ASCII") == "Set-Cookie") {
+					val CookieRegex(cn, cv) = value.toString("US-ASCII")
 					cookies.put(cn, cv)
-				} else if(name.toString == "Location") {
-					location = value.toString
+				} else if(name.toString("US-ASCII") == "Location") {
+					location = value.toString("US-ASCII")
 				}
 			}
 		}
