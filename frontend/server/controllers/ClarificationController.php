@@ -85,6 +85,14 @@ class ClarificationController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Validate Details API request
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 */
 	private static function validateDetails(Request $r) {
 
 		Validators::isNumber($r["clarification_id"], "clarification_id");
@@ -108,6 +116,12 @@ class ClarificationController extends Controller {
 		}
 	}
 
+	/**
+	 * API for getting a clarification
+	 * 
+	 * @param Request $r
+	 * @return array
+	 */
 	public static function apiDetails(Request $r) {
 
 		// Authenticate the user
@@ -124,7 +138,7 @@ class ClarificationController extends Controller {
 		$response["status"] = "ok";
 
 		return $response;
-	}
+	}	
 
 }
 
