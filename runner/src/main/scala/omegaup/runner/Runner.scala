@@ -37,7 +37,7 @@ object Runner extends RunnerService with Log with Using {
 			case "java" =>
 				List(sandbox, "-S", profile + "/javac") ++ commonParams ++ List("--", Config.get("java.compiler.path", "/usr/bin/javac")) ++ inputFiles
 			case "c" =>
-				List(sandbox, "-S", profile + "/gcc") ++ commonParams ++ List("--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-ansi", "-O2", "-lm") ++ inputFiles
+				List(sandbox, "-S", profile + "/gcc") ++ commonParams ++ List("--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-std=c99", "-O2", "-lm") ++ inputFiles
 			case "cpp" =>
 				List(sandbox, "-S", profile + "/gcc") ++ commonParams ++ List("--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles
 			case "p" =>
