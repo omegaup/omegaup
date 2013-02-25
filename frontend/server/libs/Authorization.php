@@ -27,7 +27,7 @@ class Authorization {
 			$contest = ContestsDAO::getByPK($run->getContestId());
 			$problem = ProblemsDAO::getByPK($run->getProblemId());
 		} catch (Exception $e) {
-			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 
 		if (is_null($problem)) {
@@ -52,7 +52,7 @@ class Authorization {
 		try {
 			$contest = ContestsDAO::getByPK($clarification->getContestId());
 		} catch (Exception $e) {
-			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 
 		if (is_null($contest)) {
@@ -72,7 +72,7 @@ class Authorization {
 			$contest = ContestsDAO::getByPK($clarification->getContestId());
 			$problem = ProblemsDAO::getByPK($clarification->getProblemId());
 		} catch (Exception $e) {
-			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 
 		if (is_null($contest) || is_null($problem)) {
@@ -105,9 +105,8 @@ class Authorization {
 
 			return !is_null($ur);
 		} catch (Exception $e) {
-			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 	}
-
-	// @todo user in contest
+	
 }
