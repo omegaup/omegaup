@@ -96,7 +96,13 @@ class ProblemsController extends Controller {
 		
 	}
 
-	private static function validateCreateRequest($r) {
+	/**
+	 * Validates a Create Problem API request
+	 * 
+	 * @param Request $r
+	 * @throws NotFoundException
+	 */
+	private static function validateCreateRequest(Request $r) {
 
 		Validators::isStringNonEmpty($r["author_username"], "author_username");
 
@@ -656,6 +662,7 @@ class ProblemsController extends Controller {
 	}
 
 	/**
+	 * Validate problem Details API
 	 * 
 	 * @param Request $r
 	 * @throws ApiException
@@ -704,6 +711,7 @@ class ProblemsController extends Controller {
 	}
 
 	/**
+	 * Entry point for Problem Details API
 	 * 
 	 * @param Request $r
 	 * @throws InvalidFilesystemOperationException

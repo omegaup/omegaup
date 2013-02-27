@@ -118,7 +118,7 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 * @throws PreconditionFailedException
 	 */
-	public static function validateDetails(Request $r) {
+	private static function validateDetails(Request $r) {
 
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 

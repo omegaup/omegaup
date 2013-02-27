@@ -147,7 +147,7 @@ class ClarificationController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 * @throws ForbiddenAccessException
 	 */
-	public static function validateUpdate(Request $r) {
+	private static function validateUpdate(Request $r) {
 
 		Validators::isNumber($r["clarification_id"], "clarificaion_id");
 		Validators::isStringNonEmpty($r["answer"], "answer", false /* not required */);

@@ -10,6 +10,14 @@ require_once 'SessionController.php';
 
 class UserController extends Controller {
 
+	/**
+	 * Entry point for Create a User API
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws DuplicatedEntryInDatabaseException
+	 */
 	public static function apiCreate(Request $r) {
 
 		// Validate request
