@@ -76,7 +76,7 @@
 								</p>
 							</td>
 							<td>
-								<input id='window_length' name='window_length' value='0' type='text'>
+								<input id='window_length' name='window_length' value='NULL' type='text'>
 							</td>
 						</tr>
 						<!-- ----------------------------------------- -->

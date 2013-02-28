@@ -9,6 +9,85 @@
 		</script>
 	</div>
 </div>
+
+
+
+
+
+<div class="post">
+	<div class="copy">
+
+		<form enctype="multipart/form-data" id="myfile">
+		<input name="problem_contents" type="file" />
+		<input type="button" value="Upload" />
+		</form>
+		<progress></progress>
+
+
+<div class="POS Boton" onClick="foo(3)">Enviar Problema</div>
+
+
+<script type="text/javascript">
+
+$(':file').change(function(){
+    var file = this.files[0];
+    name = file.name;
+    size = file.size;
+    type = file.type;
+    //validate here
+    console.log( file.name, file.size, file.type);
+});
+
+
+function progressHandlingFunction(e){
+
+}
+
+function beforeSendHandler (){}
+
+function foo(){
+   var formData = new FormData($('#myfile')[0]);
+   formData.append("author_username", "alanboy");
+   formData.append("title", "tit" + parseInt( Math.random() * 100 ));
+   formData.append("alias", "ali" +  parseInt( Math.random() * 100 ));
+   formData.append("source", "asdf");
+   formData.append("public", "1");
+   formData.append("validator", "literal"); // //remote, literal, token, token-caseless, token-numeric
+   formData.append("time_limit", "2");
+   formData.append("memory_limit", "2");
+   formData.append("order", "normal");
+
+    $.ajax({
+        url: '/api/problem/create',  //server script to process data
+        type: 'POST',
+        xhr: function() {  // custom xhr
+            myXhr = $.ajaxSettings.xhr();
+            if(myXhr.upload){ // check if upload property exists
+                myXhr.upload.addEventListener('progress',progressHandlingFunction, false); // for handling the progress of the upload
+            }
+            return myXhr;
+        },
+        //Ajax events
+        //beforeSend: beforeSendHandler,
+        //success: completeHandler,
+        //error: errorHandler,
+        // Form data
+        data: formData,
+        //Options to tell JQuery not to process data or worry about content-type
+        cache: false,
+        contentType: false,
+        processData: false
+    });
+
+}
+</script>
+	</div>
+</div>
+
+
+
+
+
 <div class="post">
 	<div class="copy wait_for_ajax" id="contest_details" >
 <table id="main" width="100%">
