@@ -5,7 +5,7 @@
 </div>
 <script>
 	(function(){
-		omega.getContests(function(contests){
+		omegaup.getContests(function(contests){
 			// Got the contests, lets draw them
 
 			var html = "<h3>Concursos</h3><table><tr>"

@@ -7,7 +7,7 @@ function OmegaUp() {
 
 	this.deltaTime = 0;
 	this.authenticated(function(data) {
-		if (data.status == 'ok') {
+		if (data.valid) {
 			self.syncTime();
 			self.username = data.username;
 		} else {
@@ -42,7 +42,6 @@ $(document).ajaxError(function(e, xhr, settings, exception) {
 });
 
 OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, callback) {
-	console.log("Creating user");
 	$.post(
 		'/api/user/create/email/' + s_Email + "/username" + s_Username + "/password/" + s_PlainPassword ,
 		{ email: s_Email, username: s_Username, password : s_PlainPassword },
@@ -109,7 +108,7 @@ OmegaUp.prototype.createContest = function(
 
 OmegaUp.prototype.authenticated = function(callback) {
 	$.get(
-		'/api/session/currentsession',
+		'/api/session/currentsession/',
 		function (data) {
 			callback(data);
 		},
@@ -425,4 +424,4 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	});
 };
 
-omega = new OmegaUp();
+var omegaup = new OmegaUp();

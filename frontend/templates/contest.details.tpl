@@ -233,14 +233,13 @@
 	(function(){
 		//Load Contest details
 		var a = window.location.pathname.split("/");
-		omega.getContest(a[a.length-1], function(data){
-				var html = "";
-				$("#contest_details").removeClass("wait_for_ajax").append(html);
-				for(var i in data) {
-					$("#main #" + i).val( data[i] )
-				}
-
-			})
+		omegaup.getContest(a[a.length-1], function(data){
+			var html = "";
+			$("#contest_details").removeClass("wait_for_ajax").append(html);
+			for(var i in data) {
+				$("#main #" + i).val(data[i])
+			}
+		});
 	})();
 </script>
 {include file='footer.tpl'}
