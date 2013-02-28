@@ -10,7 +10,7 @@ class TimeTest extends OmegaupTestCase {
 	public function testTimeApi() {
 						
 		// Call API
-		$response = TimeController::apiList();
+		$response = TimeController::apiGet();
 		
 		// Validate result
 		$time = time();
