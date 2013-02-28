@@ -454,11 +454,13 @@ $(document).ready(function() {
 		if (runsLang != "") {
 			options.language = runsLang;
 		}
-		
+	
+		console.log(contestAlias);	
 		omegaup.getContestRuns(contestAlias, options, runsChange); 
 	}
 
 	function runsChange(data) {
+		console.log(data);
 		$('.runs .run-list .added').remove();
 
 		for (var idx in data.runs) {

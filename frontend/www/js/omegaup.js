@@ -122,7 +122,7 @@ OmegaUp.prototype.syncTime = function() {
 
 	var t0 = new Date().getTime();
 	$.get(
-		'/api/controllername/time/',
+		'/api/time/get/',
 		function (data) {
 			self.deltaTime = data.time * 1000 - t0;
 		},
@@ -155,7 +155,7 @@ OmegaUp.prototype.getContests = function(callback) {
 	var self = this;
 
 	$.get(
-		'/api/contest/list',
+		'/api/contest/list/',
 		function (data) {
 			for (var idx in data.contests) {
 				var contest = data.contests[idx];
@@ -214,9 +214,10 @@ OmegaUp.prototype.getContestRuns = function(contestAlias, offset, rowcount, call
 	var self = this;
 
 	$.post(
-		'/api/controllername/contests/' + contestAlias + '/runs/',
+		'/api/contest/runs/contest_alias/' + contestAlias + '/',
 		{offset: offset, rowcount: rowcount},
 		function (data) {
+			console.log(data);
 			for (var i = 0; i < data.runs.length; i++) {
 				data.runs[i].time = self.time(data.runs[i].time * 1000);
 			}
@@ -230,7 +231,7 @@ OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, 
 	var self = this;
 
 	$.post(
-		'/api/controllername/runs/new',
+		'/api/run/create/',
 		{
 			contest_alias: contestAlias,
 			problem_alias: problemAlias,
@@ -254,7 +255,7 @@ OmegaUp.prototype.runStatus = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/api/controllername/runs/' + guid + '/',
+		'/api/run/status/run_alias/' + guid + '/',
 		function (data) {
 			data.time = self.time(data.time * 1000);
 			callback(data);
@@ -267,7 +268,7 @@ OmegaUp.prototype.runDetails = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/api/controllername/runs/' + guid + '/details/',
+		'/api/run/details/run_alias/' + guid + '/',
 		function (data) {
 			callback(data);
 		},
@@ -279,7 +280,7 @@ OmegaUp.prototype.runSource = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/api/controllername/runs/' + guid + '/source/',
+		'/api/run/source/run_alias/' + guid + '/',
 		function (data) {
 			callback(data);
 		},
@@ -291,7 +292,7 @@ OmegaUp.prototype.runRejudge = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/api/controllername/runs/' + guid + '/rejudge/',
+		'/api/run/rejudge/run_alias/' + guid + '/',
 		function (data) {
 			callback(data);
 		},
@@ -303,7 +304,7 @@ OmegaUp.prototype.rejudgeProblem = function(problemAlias, callback) {
 	var self = this;
 
 	$.get(
-		'/api/controllername/problems/' + problemAlias + '/rejudge/',
+		'/api/problems/problem_alias/' + problemAlias + '/',
 		function (data) {
 			callback(data);
 		},
@@ -339,7 +340,7 @@ OmegaUp.prototype.getClarifications = function(contestAlias, offset, count, call
 	var self = this;
 
 	$.get(
-		'/api/contest/clarifications/contest_alias/' + contestAlias + '/offset/' + offset + '/rowcount/' + count,
+		'/api/contest/clarifications/contest_alias/' + contestAlias + '/offset/' + offset + '/rowcount/' + count + '/',
 		function (data) {
 			callback(data);
 		},
