@@ -1,5 +1,4 @@
 $(document).ready(function() {
-	var omegaup = new OmegaUp();
 	var problems = {};
 	var activeTab = 'problems';
 	var currentProblem = null;
@@ -454,7 +453,7 @@ $(document).ready(function() {
 		if (runsLang != "") {
 			options.language = runsLang;
 		}
-		
+	
 		omegaup.getContestRuns(contestAlias, options, runsChange); 
 	}
 

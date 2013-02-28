@@ -1,5 +1,4 @@
 <?php
-
 /**
  * RunController
  *
@@ -310,7 +309,6 @@ class RunController extends Controller {
 	 * @throws InvalidFilesystemOperationException
 	 */
 	public static function apiDetails(Request $r) {
-
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
@@ -445,7 +443,6 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiSource(Request $r) {
-
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
@@ -469,6 +466,4 @@ class RunController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
-
 }
-

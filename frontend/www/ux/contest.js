@@ -1,5 +1,4 @@
 $(document).ready(function() {
-	var omegaup = new OmegaUp();
 	var problems = {};
 	var activeTab = 'problems';
 	var currentProblem = null;
@@ -85,6 +84,7 @@ $(document).ready(function() {
 		startTime = contest.start_time;
 		finishTime = contest.finish_time;
 		submissionDeadline = contest.submission_deadline;
+
 		submissionGap = parseInt(contest.submission_gap);
 
 		if (!(submissionGap > 0)) submissionGap = 0;
