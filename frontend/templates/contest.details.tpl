@@ -2,6 +2,14 @@
 {include file='mainmenu.tpl'}
 
 <div class="post">
+	<div class="copy">
+		<script type="text/javascript">
+			var a = window.location.pathname.split("/");
+			document.write('<a href="/arena/'+ a[a.length-1] +'"><div class="POS Boton" >Ir al concurso</div></a>');
+		</script>
+	</div>
+</div>
+<div class="post">
 	<div class="copy wait_for_ajax" id="contest_details" >
 <table id="main" width="100%">
 			<tr>
@@ -226,14 +234,9 @@
 		//Load Contest details
 		var a = window.location.pathname.split("/");
 		omega.getContest(a[a.length-1], function(data){
-				
 				var html = "";
 				$("#contest_details").removeClass("wait_for_ajax").append(html);
-
-				
-				for(var i in data)
-				{
-					
+				for(var i in data) {
 					$("#main #" + i).val( data[i] )
 				}
 
