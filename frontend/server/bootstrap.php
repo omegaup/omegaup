@@ -10,7 +10,7 @@
 date_default_timezone_set('UTC');
 
 //set paths
-ini_set('include_path', ini_get('include_path') . ":" .  __DIR__  );
+ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR .  __DIR__  );
 
 if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 	if(!is_file(__DIR__ . "/config.php")) {
@@ -30,10 +30,11 @@ if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 		</body>
 		</html>
 		<?php
-		exit;
-	}
 
-	require_once( "config.php" );
+		exit;
+	}else{
+		require_once( __DIR__ . "/config.php" );
+	}
 }
 
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
