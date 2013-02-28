@@ -105,7 +105,7 @@ class Authorization {
 
 			return !is_null($ur);
 		} catch (Exception $e) {
-			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 	}
 

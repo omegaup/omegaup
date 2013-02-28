@@ -216,8 +216,7 @@ class Logger
     
     public static final function log($msg, $level = 0)
     {
-        if (!OMEGAUP_LOG_TO_FILE) {
-            die("OMEGAUP_LOG_TO_FILE");
+        if (!OMEGAUP_LOG_TO_FILE) {            
             return;
         }
         
