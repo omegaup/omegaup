@@ -95,7 +95,7 @@ if(/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === T
 	if(defined("SMARTY_CACHE_DIR")) {
 		$smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
 	}
-	$smarty->configLoad("../templates/es.lang");
+	$smarty->configLoad(__DIR__ . "/../templates/es.lang");
 	$smarty->assign("LOGGED_IN", "0");
 
 	$c_Sesion = new SessionController;

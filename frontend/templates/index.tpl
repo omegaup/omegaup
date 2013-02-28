@@ -13,7 +13,7 @@
 			<div class="post footer" style="width: 560px; min-height: 300px;">
 				<div class="copy">
 
-					<h1>Bienvenido a OmegaUP</h1>
+					<h1>Bienvenido a OmegaUP 2.0</h1>
 					<p>
 						asdlkfjasldk fj;laskd jf;lasj flaj
 						asdlkfj asdlkfj aslkdfj askldfj alksjd f
