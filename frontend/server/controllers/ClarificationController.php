@@ -6,7 +6,6 @@
  * @author joemmanuel
  */
 class ClarificationController extends Controller {
-
 	private static $contest;
 	private static $problem;
 	private static $clarification;
@@ -19,7 +18,6 @@ class ClarificationController extends Controller {
 	 * @throws NotFoundException
 	 */
 	private static function validateCreate(Request $r) {
-
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 		Validators::isStringNonEmpty($r["message"], "message");
@@ -53,7 +51,6 @@ class ClarificationController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiCreate(Request $r) {
-
 		// Authenticate user
 		self::authenticateRequest($r);
 
@@ -86,7 +83,6 @@ class ClarificationController extends Controller {
 	}
 
 	private static function validateDetails(Request $r) {
-
 		Validators::isNumber($r["clarification_id"], "clarification_id");
 
 		// Check that the clarification actually exists
@@ -109,7 +105,6 @@ class ClarificationController extends Controller {
 	}
 
 	public static function apiDetails(Request $r) {
-
 		// Authenticate the user
 		self::authenticateRequest($r);
 
@@ -125,6 +120,4 @@ class ClarificationController extends Controller {
 
 		return $response;
 	}
-
 }
-

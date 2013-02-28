@@ -84,7 +84,7 @@ class ProblemsFactory {
 		FileHandler::SetFileUploader(new FileUploaderMock());
 
 		// Call the API				
-		ProblemsController::apiCreate($r);						
+		ProblemController::apiCreate($r);						
         		
 		// Clean up our mess
         unset($_REQUEST);

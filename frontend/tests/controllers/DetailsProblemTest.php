@@ -37,7 +37,7 @@ class DetailsProblem extends OmegaupTestCase {
 		$r["auth_token"] = $this->login($contestant);
 		
 		// Call api
-		$response = ProblemsController::apiDetails($r);
+		$response = ProblemController::apiDetails($r);
 		
 		// Get problem and contest from DB to check it
         $problemDAO = ProblemsDAO::getByAlias($problemData["request"]["alias"]);               

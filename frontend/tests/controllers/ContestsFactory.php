@@ -119,7 +119,7 @@ class ContestsFactory {
 		$r["auth_token"] = OmegaupTestCase::login($user);
 		
 		// Call api
-		ProblemsController::apiDetails($r);
+		ProblemController::apiDetails($r);
 		
 		unset($_REQUEST);
 	}

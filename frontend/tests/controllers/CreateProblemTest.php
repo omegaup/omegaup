@@ -28,7 +28,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
 		// Call the API				
-		$response = ProblemsController::apiCreate($r);
+		$response = ProblemController::apiCreate($r);
 
 		// Validate
 		// Verify response
@@ -113,7 +113,7 @@ class CreateProblemTest extends OmegaupTestCase {
 			try {
 
 				// Call the API				
-				$response = ProblemsController::apiCreate($r);
+				$response = ProblemController::apiCreate($r);
 			} catch (InvalidParameterException $e) {
 				// We're OK, clean up our mess and continue
 				unset($_REQUEST);
@@ -141,7 +141,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
 		// Call the API				
-		$response = ProblemsController::apiCreate($r);
+		$response = ProblemController::apiCreate($r);
 
 		// Validate
 		// Verify response		
@@ -207,7 +207,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
 		// Call the API				
-		$response = ProblemsController::apiCreate($r);
+		$response = ProblemController::apiCreate($r);
 
 		// Verify response
 		$this->assertEquals("ok", $response["status"]);

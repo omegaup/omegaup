@@ -5,9 +5,9 @@ require_once 'libs/ZipHandler.php';
 require_once 'libs/Markdown/markdown.php';
 
 /**
- * ProblemsController
+ * ProblemController
  */
-class ProblemsController extends Controller {
+class ProblemController extends Controller {
 
 	private static $contest;
 	private static $author;
@@ -710,7 +710,6 @@ class ProblemsController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiDetails(Request $r) {
-
 		// Get user
 		self::authenticateRequest($r);
 

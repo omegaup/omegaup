@@ -196,7 +196,7 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	var self = this;
 
 	$.post(
-		'/api/contests/' + contestAlias + '/problem/' + problemAlias + '/',
+		'/api/problem/details/contest_alias/' + contestAlias + '/problem_alias/' + problemAlias + '/',
 		{lang:"es"},
 		function (problem) {
 			if (problem.runs) {
@@ -351,7 +351,7 @@ OmegaUp.prototype.newClarification = function(contestAlias, problemAlias, messag
 	var self = this;
 
 	$.post(
-		'/api/controllername/clarifications/new',
+		'/api/clarification/create/',
 		{
 			contest_alias: contestAlias,
 			problem_alias: problemAlias,
@@ -374,7 +374,7 @@ OmegaUp.prototype.updateClarification = function(clarificationId, answer, public
 	var self = this;
 
 	$.post(
-		'/api/controllername/clarifications/update/' + clarificationId,
+		'/api/clarification/update/clarification_id/' + clarificationId,
 		{
 			answer: answer,
 			public: public ? 1 : 0

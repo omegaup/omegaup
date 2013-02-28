@@ -26,15 +26,11 @@ class ApiCaller{
 	 * @return array
 	 */
 	public static function call(Request $request) {
-
 		try {
-			
 			$response = $request->execute();
-			
 		} catch (ApiException $e) {
 			Logger::error($e);
 			$response = $e->asArray();
-
 		} catch (Exception $e){
 			Logger::error($e);
 			$apiException = new InternalServerErrorException($e);
@@ -53,7 +49,6 @@ class ApiCaller{
 		try {
 			$r = self::init();
 			$response = self::call($r);
-
 		} catch (ApiException $apiException) {
 			Logger::error($apiException);
 			$response = $apiException->asArray();
