@@ -209,14 +209,13 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	);
 };
 
-OmegaUp.prototype.getContestRuns = function(contestAlias, offset, rowcount, callback) {
+OmegaUp.prototype.getContestRuns = function(contestAlias, options, callback) {
 	var self = this;
 
 	$.post(
 		'/api/contest/runs/contest_alias/' + contestAlias + '/',
-		{offset: offset, rowcount: rowcount},
+		options,
 		function (data) {
-			console.log(data);
 			for (var i = 0; i < data.runs.length; i++) {
 				data.runs[i].time = self.time(data.runs[i].time * 1000);
 			}
