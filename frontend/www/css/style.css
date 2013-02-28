@@ -18,6 +18,52 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input
 }
 
 
+.POS.Boton {
+-webkit-user-select: none;
+background-color: whiteSmoke;
+background-image: -webkit-linear-gradient(top, rgb(245, 245, 245), rgb(241, 241, 241));
+border-bottom-color: rgba(0, 0, 0, 0.0976562);
+border-bottom-left-radius: 2px;
+border-bottom-right-radius: 2px;
+border-bottom-style: solid;
+border-bottom-width: 1px;
+border-left-color: rgba(0, 0, 0, 0.0976562);
+border-left-style: solid;
+border-left-width: 1px;
+border-right-color: rgba(0, 0, 0, 0.0976562);
+border-right-style: solid;
+border-right-width: 1px;
+border-top-color: rgba(0, 0, 0, 0.0976562);
+border-top-left-radius: 2px;
+border-top-right-radius: 2px;
+border-top-style: solid;
+border-top-width: 1px;
+color: #444;
+cursor: default;
+display: inline-block;
+font-family: arial, sans-serif;
+font-size: 11px;
+font-style: normal;
+font-variant: normal;
+font-weight: bold;
+height: 27px;
+line-height: 27px;
+margin-bottom: 2px;
+margin-left: 0px;
+margin-right: 16px;
+margin-top: 0px;
+min-width: 54px;
+outline-color: #444;
+outline-style: none;
+outline-width: 0px;
+padding-bottom: 0px;
+padding-left: 8px;
+padding-right: 8px;
+padding-top: 0px;
+position: relative;
+text-align: center;
+}
+
 body{
 	font-family: "lucida grande",tahoma,verdana,arial,sans-serif;
 	-webkit-font-smoothing: antialiased;
