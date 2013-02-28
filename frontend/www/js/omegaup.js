@@ -374,8 +374,9 @@ OmegaUp.prototype.updateClarification = function(clarificationId, answer, public
 	var self = this;
 
 	$.post(
-		'/api/clarification/update/clarification_id/' + clarificationId,
+		'/api/clarification/update/',
 		{
+			clarification_id: clarificationId,
 			answer: answer,
 			public: public ? 1 : 0
 		},

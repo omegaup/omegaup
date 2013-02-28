@@ -120,4 +120,71 @@ class ClarificationController extends Controller {
 
 		return $response;
 	}
+
+	/**
+	 * Validate update API request
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateUpdate(Request $r) {
+		Validators::isNumber($r["clarification_id"], "clarification_id");
+		Validators::isStringNonEmpty($r["answer"], "answer", false /* not required */);
+		Validators::isInEnum($r["public"], "public", array('0', '1'), false /* not required */);
+		Validators::isStringNonEmpty($r["message"], "message", false /* not required */);
+
+		// Check that clarification exists
+		try {
+			$r["clarification"] = ClarificationsDAO::getByPK($r["clarification_id"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (!Authorization::CanEditClarification($r["current_user_id"], $r["clarification"])) {
+			throw new ForbiddenAccessException();
+		}
+	}
+
+	/**
+	 * Update a clarification
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiUpdate(Request $r) {
+		// Authenticate user
+		self::authenticateRequest($r);
+
+		// Validate request 
+		self::validateUpdate($r);
+
+		// Update clarification        		
+		if (!is_null($r["message"])) {
+			$r["clarification"]->setMessage($r["message"]);
+		}
+		if (!is_null($r["answer"])) {
+			$r["clarification"]->setAnswer($r["answer"]);
+		}
+		if (!is_null($r["clarification"])) {
+			$r["clarification"]->setPublic($r["public"]);
+		}
+
+		// Let DB handle time update
+		$r["clarification"]->setTime(NULL);
+
+		// Save the clarification
+		try {
+			ClarificationsDAO::save($r["clarification"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$response = array();
+		$response["status"] = "ok";
+
+		return $response;
+	}
 }
