@@ -262,9 +262,9 @@
 					$(".new_contest_form #penalty_time_start").val(), 
 					$(".new_contest_form #penalty_calc_policy").val(), 
 					function(data){
-						console.log("im back", data);
+						
 						if(data.status == "ok"){
-							
+							window.location = "/contest/" + $(".new_contest_form #alias").val()
 						}
 					}
 			);
