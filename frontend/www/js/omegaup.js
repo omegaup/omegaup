@@ -266,7 +266,7 @@ OmegaUp.prototype.runDetails = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/api/run/details/run_alias/' + guid + '/',
+		'/api/run/admindetails/run_alias/' + guid + '/',
 		function (data) {
 			callback(data);
 		},
