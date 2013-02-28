@@ -53,6 +53,7 @@ omegaup_test.log
 # Ignore runtime and test stuff
 */test-env
 frontend/www/templates_c
+omegaup/
 
 # Ignore Mac crap :P
 frontend/.DS_Store
