@@ -115,15 +115,13 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `feedback` enum('no','yes','partial') NOT NULL,
   `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
   `penalty_time_start` enum('contest','problem', 'none') NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
-  `penalty_calc_policy` enum('sum', 'max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
+ `penalty_calc_policy` enum('sum', 'max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
+ `show_scoreboard_after` BOOL NOT NULL DEFAULT  '1' COMMENT  'Mostrar el scoreboard automáticamente después del concurso',
   PRIMARY KEY (`contest_id`),
   KEY `director_id` (`director_id`),
-  KEY `rerun_id` (`contest_id`)
+  KEY `rerun_id` (`contest_id`),
+  UNIQUE KEY `contests_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursos que se llevan a cabo en el juez.' AUTO_INCREMENT=1 ;
-
-CREATE UNIQUE INDEX contests_alias ON Contests(`alias`);
-
-ALTER TABLE  `Contests` ADD  `show_scoreboard_after` BOOL NOT NULL DEFAULT  '1' COMMENT  'Mostrar el scoreboard automáticamente después del concurso'
 
 -- --------------------------------------------------------
 
@@ -135,8 +133,8 @@ CREATE TABLE IF NOT EXISTS `Contests_Users` (
   `user_id` int(11) NOT NULL,
   `contest_id` int(11) NOT NULL,
   `access_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora a la que entró el usuario al concurso',  
-  `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Índica el puntaje que obtuvo el usuario en el concurso',
-  `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Índica el tiempo que acumulo en usuario en el concurso',
+  `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
+  `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
   PRIMARY KEY (`user_id`,`contest_id`),
   KEY `user_id` (`user_id`),
   KEY `contest_id` (`contest_id`)
@@ -152,12 +150,12 @@ CREATE TABLE IF NOT EXISTS `Contest_Problems` (
   `contest_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
   `points` double NOT NULL DEFAULT '1',
+  `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas en un concurso',
   PRIMARY KEY (`contest_id`,`problem_id`),
   KEY `contest_id` (`contest_id`),
   KEY `problem_id` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relacion entre Concursos y los problemas que tiene este';
 
-ALTER TABLE  `Contest_Problems` ADD  `order` INT NOT NULL DEFAULT  '1' COMMENT 'Define el orden de aparición de los problemas en un concurso'
 -- --------------------------------------------------------
 
 --
@@ -301,10 +299,9 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `source` varchar(256) DEFAULT NULL,
   `order` enum('normal','inverse') NOT NULL DEFAULT 'normal',
   PRIMARY KEY (`problem_id`),
-  KEY `author_id` (`author_id`)
+  KEY `author_id` (`author_id`),
+  UNIQUE KEY `problems_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.' AUTO_INCREMENT=1 ;
-
-CREATE UNIQUE INDEX problems_alias ON Problems(`alias`);
 
 -- --------------------------------------------------------
 
@@ -403,11 +400,11 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   PRIMARY KEY (`run_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
-  KEY `contest_id` (`contest_id`)
+  KEY `contest_id` (`contest_id`),
+  UNIQUE KEY `runs_alias` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.' AUTO_INCREMENT=1 ;
 
 
-CREATE UNIQUE INDEX runs_alias ON Runs(`guid`);
 -- --------------------------------------------------------
 
 --
@@ -491,9 +488,11 @@ CREATE TABLE IF NOT EXISTS `Users_Badges` (
 CREATE TABLE IF NOT EXISTS `User_Roles` (
   `user_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`role_id`),
+  `contest_id` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`user_id`,`role_id`,`contest_id`),
   KEY `user_id` (`user_id`),
-  KEY `role_id` (`role_id`)
+  KEY `role_id` (`role_id`),
+  KEY `contest_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.';
 
 -- --------------------------------------------------------
@@ -505,7 +504,7 @@ CREATE TABLE IF NOT EXISTS `User_Roles` (
 CREATE TABLE IF NOT EXISTS `Users_Permissions` (
   `user_id` int(11) NOT NULL,
   `permission_id` int(11) NOT NULL,
-  `contest_id` int(11) NOT NULL COMMENT='Este permiso solo aplica en el contexto de un concurso.',
+  `contest_id` int(11) NOT NULL COMMENT 'Este permiso solo aplica en el contexto de un concurso.',
   PRIMARY KEY (`user_id`,`permission_id`),
   KEY `user_id` (`user_id`),
   KEY `permission_id` (`permission_id`)

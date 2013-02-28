@@ -2,7 +2,7 @@
 
 /**
   * Description:
-  *     Sesion controller handles sesions.
+  *     Session controller handles sessions.
   *
   * Author:
   *     Alan Gonzalez alanboy@alanboy.net
@@ -13,7 +13,7 @@ class SessionController extends Controller
 		
 	const AUTH_TOKEN_ENTROPY_SIZE = 15;
 	
-	private static $current_sesion;
+	private static $current_session;
 	private static $_facebook;
 	private static $_sessionManager;
 
@@ -44,18 +44,18 @@ class SessionController extends Controller
 		return true;
 	}
 
-	public static function CurrentSesionAvailable() {
-		$a_CurrentSesion = self::apiCurrentSesion();
-		return $a_CurrentSesion[ "valid" ] ;
+	public static function CurrentSessionAvailable() {
+		$a_CurrentSession = self::apiCurrentSession();
+		return $a_CurrentSession[ "valid" ] ;
 	}
 
 	/**
-	 * Returns associative array with information about current sesion.
+	 * Returns associative array with information about current session.
 	 *
 	 **/
-	public static function apiCurrentSesion() {
-		$SesionM = self::getSessionManagerInstance();
-		$s_AuthToken = $SesionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
+	public static function apiCurrentSession() {
+		$SessionM = self::getSessionManagerInstance();
+		$s_AuthToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
 		$vo_CurrentUser = NULL;
 
 		//cookie contains an auth token
@@ -111,9 +111,9 @@ class SessionController extends Controller
 	 *
 	 *
 	 **/
-	public function UnRegisterSesion() {
-	        $a_CurrentSesion = self::apiCurrentSesion( );
-	        $vo_AuthT = new AuthTokens( array( "token" => $a_CurrentSesion["auth_token"] ) );
+	public function UnRegisterSession() {
+	        $a_CurrentSession = self::apiCurrentSession( );
+	        $vo_AuthT = new AuthTokens( array( "token" => $a_CurrentSession["auth_token"] ) );
 
 	        try {
 			AuthTokensDAO::delete( $vo_AuthT );
@@ -124,7 +124,7 @@ class SessionController extends Controller
 	}
 
 
-	private function RegisterSesion( Users $vo_User, $b_ReturnAuthTokenAsString = false) {
+	private function RegisterSession( Users $vo_User, $b_ReturnAuthTokenAsString = false) {
 		//find if this user has older sessions
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
@@ -174,8 +174,8 @@ class SessionController extends Controller
 			//user has never logged in before
 			Logger::log("LoginViaGoogle: Creating new user for $s_Email");
 		} else {
-			//user has been here before, lets just register his sesion
-			$this->RegisterSesion($vo_User);
+			//user has been here before, lets just register his session
+			$this->RegisterSession($vo_User);
         	}
 	}
 
@@ -185,13 +185,13 @@ class SessionController extends Controller
 		//if he wants to test facebook login
 		//Facebook must send me the state=something
 		//query, so i dont have to be testing 
-		//facebook sesions on every single petition
+		//facebook sessions on every single petition
 		//made from the front-end
 		if(!isset($_GET["state"])) {
 			Logger::log("Not logged in and no need to check for fb session");
 			return false;
 		}
-		Logger::log("There is no auth_token cookie, testing for facebook sesion.");
+		Logger::log("There is no auth_token cookie, testing for facebook session.");
 
 		//if that is not true, may still be logged with
 		//facebook, lets test that
@@ -216,7 +216,7 @@ class SessionController extends Controller
 
 		// Now we know if the user is authenticated via facebook
 		if (is_null($fb_user)) {
-			Logger::log("No facebook sesion... ");
+			Logger::log("No facebook session... ");
 			return false;
 		}
 
@@ -267,7 +267,7 @@ class SessionController extends Controller
 		Logger::log("User " . $r["usernameOrEmail"] . " has loged in natively.");
 		
 		try {
-			return $this->RegisterSesion($vo_User, $returnAuthToken);
+			return $this->RegisterSession($vo_User, $returnAuthToken);
 		} catch( Exception $e ) {
 			return false;
 			//@TODO actuar en base a la exception

@@ -2,7 +2,7 @@
 
     /**
       * Description:
-      *     Sesion controller handles sesions.
+      *     Session controller handles sessions.
       *
       * Author:
       *     Alan Gonzalez alanboy@alanboy.net
@@ -17,8 +17,8 @@
         $googleLogin = GoogleOpenID::getResponse();
 
     	if($googleLogin->success()) {
-            $c_Sesion = new SessionController();
-            $c_Sesion->LoginViaGoogle($googleLogin->email());
+            $c_Session = new SessionController();
+            $c_Session->LoginViaGoogle($googleLogin->email());
             die( header( "Location: index.php" ) );
         }
 

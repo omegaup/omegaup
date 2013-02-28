@@ -1,13 +1,7 @@
 var DEBUG = true;
 
 
-function OmegaUp( ) {
-	var self = this;
-	this.username = null;
-	this.deltaTime = 0;
-}
-
-/*function OmegaUp() {
+function OmegaUp() {
 	var self = this;
 	this.username = null;
 
@@ -21,8 +15,6 @@ function OmegaUp( ) {
 		}
 	});
 }
-*/
-
 
 OmegaUp.UI = {
 	Error : function ( reason ){
@@ -49,8 +41,7 @@ $(document).ajaxError(function(e, xhr, settings, exception) {
 	OmegaUp.UI.Error( errorToUser );
 });
 
-
-OmegaUp.prototype.CreateUser = function(s_Email, s_Username, s_PlainPassword, callback) {
+OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, callback) {
 	console.log("Creating user");
 	$.post(
 		'/api/user/create/email/' + s_Email + "/username" + s_Username + "/password/" + s_PlainPassword ,
@@ -66,9 +57,7 @@ OmegaUp.prototype.CreateUser = function(s_Email, s_Username, s_PlainPassword, ca
 	);
 };
 
-
-// http://192.168.2.13:8080/api/contest/create/auth_token/ee44aab2f5b31a7b726787133f31f4-386-3fb3d7fb685b3dfa0b2cbf1e6138023edcee372048c5e416d8f0e961ea89d578/alias/154c8df00fedbe424efc/public/1/
-OmegaUp.prototype.CreateContest = function(
+OmegaUp.prototype.createContest = function(
 					title,
 					description,
 					start_time,
@@ -118,24 +107,9 @@ OmegaUp.prototype.CreateContest = function(
 	);
 };
 
-
-
-/*
-OmegaUp.prototype.CreateUser = function(s_Email, s_Username, s_PlainPassword, callback) {
-	$.post(
-		'/api/user/create',
-		{ s_Email: s_Email, s_Username: s_Username, s_PlainPassword : s_PlainPassword },
-		function (data) {
-			callback(data);
-		},
-		'json'
-	);
-};
-*/
-
 OmegaUp.prototype.authenticated = function(callback) {
 	$.get(
-		'/api/Sesion/CurrentSesion',
+		'/api/session/currentsession',
 		function (data) {
 			callback(data);
 		},
@@ -168,7 +142,7 @@ OmegaUp.prototype.time = function(date) {
 
 OmegaUp.prototype.login = function(username, password, callback) {
 	$.post(
-		'/api/sesion/login/',
+		'/api/session/login/',
 		{ username: username, password: password },
 		function (data) {
 			callback(data);
@@ -453,5 +427,4 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	});
 };
 
-var omega = new OmegaUp( );
-
+omega = new OmegaUp();
