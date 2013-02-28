@@ -153,7 +153,7 @@ class ApiCaller{
 			throw new NotFoundException("Api requested not found.");
 		}
 
-		$cs = SessionController::apiCurrentSesion();
+		$cs = SessionController::apiCurrentSession();
 		$request["auth_token"] = $cs["auth_token"];
 
 		// Figure out if its POST or GET

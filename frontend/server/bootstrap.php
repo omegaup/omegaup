@@ -98,17 +98,17 @@ if(/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === T
 	$smarty->configLoad(__DIR__ . "/../templates/es.lang");
 	$smarty->assign("LOGGED_IN", "0");
 
-	$c_Sesion = new SessionController;
-	if($c_Sesion->CurrentSesionAvailable()) {
+	$c_Session = new SessionController;
+	if($c_Session->CurrentSessionAvailable()) {
 		$smarty->assign("LOGGED_IN", "1");
-		$a_CurrentSesion = $c_Sesion->apiCurrentSesion();
-		$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSesion["username"]);
-		$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSesion["email"]);
+		$a_CurrentSession = $c_Session->apiCurrentSession();
+		$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSession["username"]);
+		$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSession["email"]);
 		$smarty->assign("CURRENT_USER_LANG", "en");
-		$smarty->assign("CURRENT_USER_IS_ADMIN", $a_CurrentSesion["is_admin"]);
+		$smarty->assign("CURRENT_USER_IS_ADMIN", $a_CurrentSession["is_admin"]);
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128",
-			"<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=92'>");
+			"<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSession["email"] ) . "?s=92'>");
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16",
-			"<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSesion["email"] ) . "?s=16'>");
+			"<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSession["email"] ) . "?s=16'>");
 	}
 }

@@ -27,4 +27,3 @@
 			mensaje 
 		</div>
 		{/if} 
-		

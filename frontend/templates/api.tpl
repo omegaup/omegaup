@@ -6,7 +6,7 @@
 		<td>
 			<div class="post footer" style="width: 130px; min-height: 300px;">
 				<div class="copy" >
-				<a href='/api/explorer/sesion/'>Sesion</a><br>
+				<a href='/api/explorer/session/'>Session</a><br>
 				<a href='/api/explorer/user/'>User</a>
 			</div>
 			</div>

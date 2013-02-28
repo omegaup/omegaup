@@ -3,11 +3,11 @@
 
     require_once( "../server/bootstrap.php" );
 
-    $c_Sesion = new SessionController;
+    $c_Session = new SessionController;
 
-    if( $c_Sesion->CurrentSesionAvailable( ) )
+    if( $c_Session->CurrentSessionAvailable( ) )
     {
-        $c_Sesion->UnRegisterSesion( );
+        $c_Session->UnRegisterSession( );
     }
 
     die(header("Location: login.php"));
