@@ -12,8 +12,11 @@ class ContestController extends Controller {
 	private static $contest;
 
 	/**
-	 *
-	 * List contests
+	 * Returns a list of contests
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiList(Request $r) {
 
@@ -105,7 +108,17 @@ class ContestController extends Controller {
 		);
 	}
 
-	public static function validateDetails(Request $r) {
+	/**
+	 * Validate request of a details contest
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws Exception
+	 * @throws ForbiddenAccessException
+	 * @throws PreconditionFailedException
+	 */
+	private static function validateDetails(Request $r) {
 
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
@@ -144,6 +157,13 @@ class ContestController extends Controller {
 		}
 	}
 
+	/**
+	 * Returns details of a Contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
 	public static function apiDetails(Request $r) {
 
 		// Crack the request to get the current user
@@ -249,7 +269,7 @@ class ContestController extends Controller {
 		self::authenticateRequest($r);
 
 		// Validate request
-		self::validateCreateRequest($r);
+		self::validateCreateOrUpdate($r);
 
 		// Create and populate a new Contests object
 		$contest = new Contests();
@@ -335,47 +355,72 @@ class ContestController extends Controller {
 	}
 
 	/**
-	 * Validates that Request contains expected data. In case of error, this 
-	 * function throws.
+	 * Validates that Request contains expected data to create or update a contest
+	 * In case of update, everything is optional except the contest_alias
+	 * In case of error, this function throws.
 	 * 
 	 * @param Request $r
 	 * @throws InvalidParameterException
 	 */
-	private static function validateCreateRequest(Request $r) {
+	private static function validateCreateOrUpdate(Request $r, $is_update = false) {
 
-		Validators::isStringNonEmpty($r["title"], "title");
-		Validators::isStringNonEmpty($r["description"], "description");
+		// Is the parameter required? 
+		$is_required = true;
 
-		Validators::isNumber($r["start_time"], "start_time");
-		Validators::isNumber($r["finish_time"], "finish_time");
-		if ($r["start_time"] > $r["finish_time"]) {
+		if ($is_update === true) {
+
+			// In case of Update API, required parameters for Create API are not required
+			$is_required = false;
+
+			try {
+				$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			if (is_null($r["contest_alias"])) {
+				throw new NotFoundException();
+			}
+		}
+
+		Validators::isStringNonEmpty($r["title"], "title", $is_required);
+		Validators::isStringNonEmpty($r["description"], "description", $is_required);
+
+		Validators::isNumber($r["start_time"], "start_time", $is_required);
+		Validators::isNumber($r["finish_time"], "finish_time", $is_required);
+
+		// Get the actual start and finish time of the contest, considering that
+		// in case of update, parameters can be optional
+		$start_time = !is_null($r["start_time"]) ? $r["start_time"] : $r["contest"]->getStartTime();
+		$finish_time = !is_null($r["finish_time"]) ? $r["finish_time"] : $r["contest"]->getFinishTime();
+
+		// Validate start & finish time
+		if ($start_time > $finish_time) {
 			throw new InvalidParameterException("start_time cannot be after finish_time");
 		}
 
-		// Calculate contest length:
-		$contest_length = $r["finish_time"] - $r["start_time"];
+		// Calculate the actual contest length
+		$contest_length = $finish_time - $start_time;
 
 		// Window_length is optional
 		Validators::isNumberInRange(
 				$r["window_length"], "window_length", 0, floor($contest_length) / 60, false
 		);
 
-		Validators::isInEnum($r["public"], "public", array("0", "1"));
-		Validators::isStringOfMaxLength($r["alias"], "alias", 32);
-		Validators::isNumberInRange($r["scoreboard"], "scoreboard", 0, 100);
-		Validators::isNumberInRange($r["points_decay_factor"], "points_decay_factor", 0, 1);
-		Validators::isInEnum($r["partial_score"], "partial_score", array("0", "1"));
-		Validators::isNumberInRange($r["submissions_gap"], "submissions_gap", 0, $contest_length);
+		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
+		Validators::isStringOfMaxLength($r["alias"], "alias", 32, $is_required);
+		Validators::isNumberInRange($r["scoreboard"], "scoreboard", 0, 100, $is_required);
+		Validators::isNumberInRange($r["points_decay_factor"], "points_decay_factor", 0, 1, $is_required);
+		Validators::isInEnum($r["partial_score"], "partial_score", array("0", "1"), $is_required);
+		Validators::isNumberInRange($r["submissions_gap"], "submissions_gap", 0, $contest_length, $is_required);
 
-		Validators::isInEnum($r["feedback"], "feedback", array("no", "yes", "partial"));
-		Validators::isInEnum($r["penalty_time_start"], "penalty_time_start", array("contest", "problem", "none"));
-		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"));
+		Validators::isInEnum($r["feedback"], "feedback", array("no", "yes", "partial"), $is_required);
+		Validators::isInEnum($r["penalty_time_start"], "penalty_time_start", array("contest", "problem", "none"), $is_required);
+		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"), $is_required);
 
-		Logger::log("-----");
-		if ($r["public"] == 0 && !is_null($r["private_users"])) {
-			Logger::log("/////");
-			// Validate that the request is well-formed
-			//  @todo move $this
+		// Check that the users passed through the private_users parameter are valid
+		if (!is_null($r["public"]) && $r["public"] == 0 && !is_null($r["private_users"])) {
+			// Validate that the request is well-formed			
 			self::$private_users_list = json_decode($r["private_users"]);
 			if (is_null(self::$private_users_list)) {
 				throw new InvalidParameterException("private_users" . Validators::IS_INVALID);
@@ -406,6 +451,7 @@ class ContestController extends Controller {
 			}
 		}
 
+		// Show scoreboard is always optional
 		Validators::isInEnum($r["show_scoreboard_after"], "show_scoreboard_after", array("0", "1"), false);
 	}
 
@@ -702,6 +748,14 @@ class ContestController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Returns the Scoreboard
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 */
 	public static function apiScoreboard(Request $r) {
 
 		// Get the current user
@@ -715,7 +769,7 @@ class ContestController extends Controller {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		if (is_null(self::$contest)) {
 			throw new NotFoundException();
 		}
@@ -729,6 +783,236 @@ class ContestController extends Controller {
 		// Push scoreboard data in response
 		$response = array();
 		$response["ranking"] = $scoreboard->generate();
+
+		return $response;
+	}
+
+	/**
+	 * Returns ALL users participating in a contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiUsers(Request $r) {
+
+		// Authenticate request
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		try {
+			$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $contest)) {
+			throw new ForbiddenAccessException();
+		}
+
+		// Get users from DB
+		$contest_user_key = new ContestsUsers();
+		$contest_user_key->setContestId($contest->getContestId());
+
+		try {
+			$db_results = ContestsUsersDAO::search($contest_user_key);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$users = array();
+
+		// Add all users to an array
+		foreach ($db_results as $result) {
+			$user_id = $result->getUserId();
+			$user = UsersDAO::getByPK($user_id);
+			$users[] = array("user_id" => $user_id, "username" => $user->getUsername());
+		}
+
+		$response = array();
+		$response["users"] = $users;
+		$response["status"] = "ok";
+
+		return $response;
+	}
+
+	/**
+	 * Update a Contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiUpdate(Request $r) {
+
+		// Authenticate request
+		self::authenticateRequest($r);
+
+		// Validate request
+		self::validateCreateOrUpdate($r, true /* is update */);
+
+		// Update contest DAO                
+		if (!is_null($r["public"])) {
+			$r["contest"]->setPublic($r["public"]);
+		}
+
+		if (!is_null($r["title"])) {
+			$r["contest"]->setTitle($r["title"]);
+		}
+
+		if (!is_null($r["description"])) {
+			$r["contest"]->setDescription($r["description"]);
+		}
+
+		if (!is_null($r["start_time"])) {
+			$r["contest"]->setStartTime(gmdate('Y-m-d H:i:s', $r["start_time"]));
+		}
+
+		if (!is_null($r["finish_time"])) {
+			$r["contest"]->setFinishTime(gmdate('Y-m-d H:i:s', $r["finish_time"]));
+		}
+
+		if (!is_null($r["window_length"])) {
+			$r["contest"]->setWindowLength($r["window_length"] == "NULL" ? NULL : $r["window_length"]);
+		}
+
+		if (!is_null($r["scoreboard"])) {
+			$r["contest"]->setScoreboard($r["scoreboard"]);
+		}
+
+		if (!is_null($r["points_decay_factor"])) {
+			$r["contest"]->setPointsDecayFactor($r["points_decay_factor"]);
+		}
+
+		if (!is_null($r["partial_score"])) {
+			$r["contest"]->setPartialScore($r["partial_score"]);
+		}
+
+		if (!is_null($r["submissions_gap"])) {
+			$r["contest"]->setSubmissionsGap($r["submissions_gap"]);
+		}
+
+		if (!is_null($r["feedback"])) {
+			$r["contest"]->setFeedback($r["feedback"]);
+		}
+
+		if (!is_null($r["penalty"])) {
+			$r["contest"]->setPenalty(max(0, intval($r["penalty"])));
+		}
+
+		if (!is_null($r["penalty_time_start"])) {
+			$r["contest"]->setPenaltyTimeStart($r["penalty_time_start"]);
+		}
+
+		if (!is_null($r["penalty_calc_policy"])) {
+			$r["contest"]->setPenaltyCalcPolicy($r["penalty_calc_policy"]);
+		}
+
+		if (!is_null($r["show_scoreboard_after"])) {
+			$contest->setShowScoreboardAfter($r["show_scoreboard_after"]);
+		}
+
+		// Push changes
+		try {
+			// Begin a new transaction
+			ContestsDAO::transBegin();
+
+			// Save the contest object with data sent by user to the database
+			ContestsDAO::save($r["contest"]);
+
+			// If the contest is private, add the list of allowed users
+			if (!is_null($r["public"]) && $r["public"] == 0 && self::$hasPrivateUsers) {
+				// Get current users
+				$cu_key = new ContestsUsers(array("contest_id" => $r["contest"]->getContestId()));
+				$current_users = ContestsUsersDAO::search($cu_key);
+				$current_users_id = array();
+
+				foreach ($current_users as $cu) {
+					array_push($current_users_id, $current_users->getUserId());
+				}
+
+				// Check who needs to be deleted and who needs to be added
+				$to_delete = array_diff($current_users_id, self::$private_users_list);
+				$to_add = array_diff(self::$private_users_list, $current_users_id);
+
+				// Add users in the request
+				foreach ($to_add as $userkey) {
+					// Create a temp DAO for the relationship
+					$temp_user_contest = new ContestsUsers(array(
+								"contest_id" => $r["contest"]->getContestId(),
+								"user_id" => $userkey,
+								"access_time" => "0000-00-00 00:00:00",
+								"score" => 0,
+								"time" => 0
+							));
+
+					// Save the relationship in the DB
+					ContestsUsersDAO::save($temp_user_contest);
+				}
+
+				// Delete users 
+				foreach ($to_delete as $userkey) {
+					// Create a temp DAO for the relationship
+					$temp_user_contest = new ContestsUsers(array(
+								"contest_id" => $r["contest"]->getContestId(),
+								"user_id" => $userkey,
+							));
+
+					// Delete the relationship in the DB
+					ContestsUsersDAO::delete(ContestProblemsDAO::search($temp_user_contest));
+				}
+			}
+
+			if (!is_null($r['problems'])) {
+				// Get current problems
+				$p_key = new Problems(array("contest_id" => $r["contest"]->getContestId()));
+				$current_problems = ProblemsDAO::search($p_key);
+				$current_problems_id = array();
+
+				foreach ($current_problems as $p) {
+					array_push($current_problems_id, $p->getProblemId());
+				}
+
+				// Check who needs to be deleted and who needs to be added
+				$to_delete = array_diff($current_problems_id, self::$problems_id);
+				$to_add = array_diff(self::$problems_id, $current_problems_id);
+
+				foreach ($to_add as $problem) {
+					$contest_problem = new ContestProblems(array(
+								'contest_id' => $r["contest"]->getContestId(),
+								'problem_id' => $problem,
+								'points' => self::$problems[$problem]['points']
+							));
+
+					ContestProblemsDAO::save($contest_problem);
+				}
+
+				foreach ($to_delete as $problem) {
+					$contest_problem = new ContestProblems(array(
+								'contest_id' => $r["contest"]->getContestId(),
+								'problem_id' => $problem,
+							));
+
+					ContestProblemsDAO::delete(ContestProblemsDAO::search($contest_problem));
+				}
+			}
+
+			// End transaction 
+			ContestsDAO::transEnd();
+		} catch (Exception $e) {
+			// Operation failed in the data layer, rollback transaction 
+			ContestsDAO::transRollback();
+
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// Happy ending
+		$response = array();
+		$response["status"] = 'ok';				
+
+		Logger::log("Contest updated (alias): " . $r['contest_alias']);
 		
 		return $response;
 	}

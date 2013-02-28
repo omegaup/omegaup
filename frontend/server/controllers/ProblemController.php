@@ -5,7 +5,7 @@ require_once 'libs/ZipHandler.php';
 require_once 'libs/Markdown/markdown.php';
 
 /**
- * ProblemController
+ * ProblemsController
  */
 class ProblemController extends Controller {
 
@@ -96,7 +96,13 @@ class ProblemController extends Controller {
 		
 	}
 
-	private static function validateCreateRequest($r) {
+	/**
+	 * Validates a Create Problem API request
+	 * 
+	 * @param Request $r
+	 * @throws NotFoundException
+	 */
+	private static function validateCreateRequest(Request $r) {
 
 		Validators::isStringNonEmpty($r["author_username"], "author_username");
 
@@ -656,6 +662,7 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Validate problem Details API
 	 * 
 	 * @param Request $r
 	 * @throws ApiException
@@ -704,12 +711,14 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Entry point for Problem Details API
 	 * 
 	 * @param Request $r
 	 * @throws InvalidFilesystemOperationException
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiDetails(Request $r) {
+
 		// Get user
 		self::authenticateRequest($r);
 
@@ -817,4 +826,3 @@ class ProblemController extends Controller {
 	}
 
 }
-

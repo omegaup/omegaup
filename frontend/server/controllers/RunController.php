@@ -32,7 +32,6 @@ class RunController extends Controller {
 	 * Validates Create Run request 
 	 * 
 	 * @param Request $r
-	 * @return type
 	 * @throws ApiException
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotAllowedToSubmitException
@@ -287,7 +286,7 @@ class RunController extends Controller {
 	 * @throws NotFoundException
 	 * @throws ForbiddenAccessException
 	 */
-	public static function validateDetailsRequest(Request $r) {
+	private static function validateDetailsRequest(Request $r) {
 		Validators::isStringNonEmpty($r["run_alias"], "run_alias");
 
 		try {
@@ -407,6 +406,12 @@ class RunController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Parses Run metadata
+	 * 
+	 * @param string $meta
+	 * @return array
+	 */
 	private static function ParseMeta($meta) {
 		$ans = array();
 
@@ -418,6 +423,13 @@ class RunController extends Controller {
 		return $ans;
 	}
 
+	/**
+	 * Compare two Run metadata
+	 * 
+	 * @param array $a
+	 * @param array $b
+	 * @return boolean
+	 */
 	private static function MetaCompare($a, $b) {
 		if ($a['name'] == $b['name'])
 			return 0;

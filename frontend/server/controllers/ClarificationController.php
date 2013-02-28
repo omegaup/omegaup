@@ -6,6 +6,7 @@
  * @author joemmanuel
  */
 class ClarificationController extends Controller {
+
 	private static $contest;
 	private static $problem;
 	private static $clarification;
@@ -18,6 +19,7 @@ class ClarificationController extends Controller {
 	 * @throws NotFoundException
 	 */
 	private static function validateCreate(Request $r) {
+
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 		Validators::isStringNonEmpty($r["message"], "message");
@@ -82,6 +84,14 @@ class ClarificationController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Validate Details API request
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 */
 	private static function validateDetails(Request $r) {
 		Validators::isNumber($r["clarification_id"], "clarification_id");
 
@@ -104,6 +114,12 @@ class ClarificationController extends Controller {
 		}
 	}
 
+	/**
+	 * API for getting a clarification
+	 * 
+	 * @param Request $r
+	 * @return array
+	 */
 	public static function apiDetails(Request $r) {
 		// Authenticate the user
 		self::authenticateRequest($r);
@@ -129,7 +145,8 @@ class ClarificationController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateUpdate(Request $r) {
-		Validators::isNumber($r["clarification_id"], "clarification_id");
+
+		Validators::isNumber($r["clarification_id"], "clarificaion_id");
 		Validators::isStringNonEmpty($r["answer"], "answer", false /* not required */);
 		Validators::isInEnum($r["public"], "public", array('0', '1'), false /* not required */);
 		Validators::isStringNonEmpty($r["message"], "message", false /* not required */);
@@ -154,6 +171,7 @@ class ClarificationController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiUpdate(Request $r) {
+
 		// Authenticate user
 		self::authenticateRequest($r);
 
@@ -187,4 +205,5 @@ class ClarificationController extends Controller {
 
 		return $response;
 	}
+
 }
