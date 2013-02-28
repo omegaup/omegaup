@@ -157,13 +157,11 @@ OmegaUp.prototype.getContests = function(callback) {
 	$.get(
 		'/api/contest/list',
 		function (data) {
-			/*
 			for (var idx in data.contests) {
 				var contest = data.contests[idx];
 				contest.start_time = self.time(contest.start_time * 1000);
 				contest.finish_time = self.time(contest.finish_time * 1000);
 			}
-			*/
 			callback(data);
 		},
 		'json'
@@ -174,15 +172,13 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	var self = this;
 
 	$.get(
-		'/api/contest/details/alias/' + alias + '/',
+		'/api/contest/details/contest_alias/' + alias + '/',
 		function (contest) {
-			/*
 			if (contest.status == 'ok') {
 				contest.start_time = self.time(contest.start_time * 1000);
 				contest.finish_time = self.time(contest.finish_time * 1000);
 				contest.submission_deadline = self.time(contest.submission_deadline * 1000);
 			}
-			*/
 			callback(contest);
 		},
 		'json'
@@ -200,7 +196,7 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	var self = this;
 
 	$.post(
-		'/api/controllername/contests/' + contestAlias + '/problem/' + problemAlias + '/',
+		'/api/contests/' + contestAlias + '/problem/' + problemAlias + '/',
 		{lang:"es"},
 		function (problem) {
 			if (problem.runs) {
@@ -319,7 +315,7 @@ OmegaUp.prototype.getRanking = function(contestAlias, callback) {
 	var self = this;
 
 	$.get(
-		'/api/controllername/contests/' + contestAlias + '/ranking/',
+		'/api/contest/scoreboard/contest_alias/' + contestAlias + '/',
 		function (data) {
 			callback(data);
 		},
@@ -331,7 +327,7 @@ OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 	var self = this;
 
 	$.get(
-		'/api/controllername/contests/' + contestAlias + '/ranking/events/',
+		'/api/contest/scoreboardevents/contest_alias/' + contestAlias + '/',
 		function (data) {
 			callback(data);
 		},
@@ -339,11 +335,11 @@ OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 	);
 };
 
-OmegaUp.prototype.getClarifications = function(contestAlias, callback) {
+OmegaUp.prototype.getClarifications = function(contestAlias, offset, count, callback) {
 	var self = this;
 
 	$.get(
-		'/api/controllername/contests/' + contestAlias + '/clarifications/',
+		'/api/contest/clarifications/contest_alias/' + contestAlias + '/offset/' + offset + '/rowcount/' + count,
 		function (data) {
 			callback(data);
 		},

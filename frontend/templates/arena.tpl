@@ -1,21 +1,6 @@
-<!--<!DOCTYPE html>
-<html>
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<title>OmegaUp</title>
-		<script type="text/javascript" src="/js/jquery.js"></script>
-		<script type="text/javascript" src="/ux/api.js"></script>
-		<script type="text/javascript" src="/ux/arena.js"></script>
-		<link rel="stylesheet" href="/css/reset.css" />
-		<link rel="stylesheet" href="/ux/arena.css" />
-		<link rel="shortcut icon" href="/favicon.ico" />
-	</head>
-	<body>
--->
-	<script type="text/javascript" src="/ux/arena.js"></script>
-	<link rel="stylesheet" href="/css/reset.css" />
-	<link rel="stylesheet" href="/ux/arena.css" />
 {include file='head.tpl'}
+		<script type="text/javascript" src="/js/sugar.js"></script>
+		<script type="text/javascript" src="/ux/arena.js"></script>
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		<div id="root" style="display: none;">
 				<h1>Arena</h1>

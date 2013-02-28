@@ -1,5 +1,4 @@
 $(document).ready(function() {
-  
 	function makeWorldClockLink(date) {
 		try {
 			return "http://timeanddate.com/worldclock/fixedtime.html?iso=" + date.toISOString();
@@ -16,11 +15,11 @@ $(document).ready(function() {
 	var omegaup = new OmegaUp();
 
 	omegaup.getContests(function (data) {
-		var list = data.contests;
+		var list = data.results;
 		var current = $('#current-contests');
 		var past = $('#past-contests');
 		var now = new Date();
-		
+
 		for (var i = 0, len = list.length; i < len; i++) {
 			var start = new Date(list[i].start_time);
 			var end = new Date(list[i].finish_time);
