@@ -1,7 +1,7 @@
 <div class="post">
 	<div class="copy">
 		<h3>Nuevo concurso</h3>
-		<div class="new_contest_form">
+		<form class="new_contest_form">
 			<table id="main" width="100%">
 			<tr>
 			<!-- ----------------------------------------- -->
@@ -51,7 +51,7 @@
 							<td colspan=2>
 							</td>
 							<td colspan=2>
-								<input value='Agendar concurso basico' type='button' id="submit">
+								<input value='Agendar concurso basico' type='submit'>
 							</td>
 						</tr>
 						<tr>
@@ -209,7 +209,7 @@
 							<td>
 							</td>
 							<td align='right'>
-								<input value='Agendar concurso' type='button' id="submit">
+								<input value='Agendar concurso' type='submit'>
 							</td>
 						</tr>
 						<!-- ----------------------------------------- -->
@@ -240,13 +240,12 @@
 							<div id="response">
 							</div>
 						</div>
-					</div>
-				
+					</form>
 	</div>
 </div>
 <script>
-	function send(){
-		omega.CreateContest(
+	$('.new_contest_form').submit(function() {
+		omega.createContest(
 					$(".new_contest_form #title").val(),
 					$(".new_contest_form #description").val(),
 					$(".new_contest_form #start_time").val(),
@@ -269,6 +268,6 @@
 						}
 					}
 			);
-
-	}
+		return false;
+	});
 </script>

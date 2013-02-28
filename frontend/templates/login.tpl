@@ -116,7 +116,7 @@
 					</td>
 					<td align='right'>
 						
-	<input value='Registrar' type='button' onClick="omega.CreateUser( $('#reg_email').val(), $('#reg_username').val(), $('#reg_pass').val(), function(){ window.location = '/login.php'; } )">
+	<input value='Registrar' type='button' onClick="omega.createUser( $('#reg_email').val(), $('#reg_username').val(), $('#reg_pass').val(), function(){ window.location = '/login.php'; } )">
 					</td>
 				</tr>
 			</form>
