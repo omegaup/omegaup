@@ -1,4 +1,3 @@
-<<<<<<< HEAD:frontend/server/dao/Problems.dao.php
 <?php
 
 require_once ('Estructura.php');

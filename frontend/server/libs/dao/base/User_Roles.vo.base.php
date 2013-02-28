@@ -1,4 +1,3 @@
-<<<<<<< HEAD:frontend/server/dao/base/User_Roles.vo.base.php
 <?php
 /** Value Object file for table User_Roles.
   * 
