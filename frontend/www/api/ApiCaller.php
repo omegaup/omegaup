@@ -151,19 +151,9 @@ class ApiCaller{
 		$cs = SessionController::apiCurrentSession();
 		$request["auth_token"] = $cs["auth_token"];
 
-		// Figure out if its POST or GET
-		switch( $_SERVER['REQUEST_METHOD'] ) {
-			case 'GET':
-				for ($i = 4; ($i+1) < sizeof( $args ); $i += 2) {
-					$request[$args[$i]] = urldecode($args[$i+1]);
-				}
-			break;
-			case 'POST':
-				// Parameters are already in the Request object
-			break;
+		for ($i = 4; ($i+1) < sizeof( $args ); $i += 2) {
+			$request[$args[$i]] = urldecode($args[$i+1]);
 		}
-	
-
 
 		$request->method = $controllerName . "::" . $methodName;
 	
