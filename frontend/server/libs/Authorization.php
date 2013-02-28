@@ -101,10 +101,10 @@ class Authorization {
 
 	public static function IsSystemAdmin($user_id) {
 		try {
-			$ur = UserRolesDAO::getByPK($user_id, ADMIN_ROLE);
+			$ur = UserRolesDAO::getByPK($user_id, ADMIN_ROLE, NULL /* general admin */);
 
 			return !is_null($ur);
-		} catch (Exception $e) {
+		} catch (Exception $e) {			
 			throw new InvalidDatabaseOperationException($e);
 		}
 	}
