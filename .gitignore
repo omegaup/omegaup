@@ -38,6 +38,7 @@ src_managed/
 # ignore frontend config file
 config.php
 frontend/server/config.php
+frontend/server/api/tests/config.php
 test_config.php
 
 # and log
@@ -51,6 +52,7 @@ omegaup_test.log
 
 # Ignore runtime and test stuff
 */test-env
+frontend/www/templates_c
 
 # Ignore Mac crap :P
 frontend/.DS_Store

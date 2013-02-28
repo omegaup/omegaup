@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * Description of ClarificationsFactory
+ *
+ * @author joemmanuel
+ */
+require_once 'UserFactory.php';
+require_once 'OmegaupTestCase.php';
+
+class ClarificationsFactory {
+
+	/**
+	 * Creates a clarification in a problem inside a contest
+	 * 
+	 * @param type $problemData
+	 * @param type $contestData
+	 * @param type $contestant
+	 */
+	public static function createClarification($problemData, $contestData, $contestant) {
+
+		// Our contestant has to open the contest before sending a clarification
+		ContestsFactory::openContest($contestData, $contestant);
+
+		// Then we need to open the problem
+		ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
+
+		// Create the request for our api
+		$r = new Request();
+		$r["message"] = Utils::CreateRandomString();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		$r["problem_alias"] = $problemData["request"]["alias"];
+
+		// Log in our user and set the auth_token properly
+		$r["auth_token"] = OmegaupTestCase::login($contestant);
+
+		// Call the API
+		$response = ClarificationController::apiCreate($r);
+
+		// Clean up stuff
+		unset($_REQUEST);
+
+		return array(
+			"request" => $r,
+			"response" => $response
+		);
+	}
+
+}
+
