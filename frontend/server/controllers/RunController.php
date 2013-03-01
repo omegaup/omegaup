@@ -227,7 +227,6 @@ class RunController extends Controller {
 		} catch (Exception $e) {
 			Logger::error("Call to Grader::grade() failed:");
 			Logger::error($e);
-			throw new InvalidFilesystemOperationException($e);
 		}
 
 		if (self::$practice) {
@@ -308,7 +307,7 @@ class RunController extends Controller {
 	 * @return array
 	 * @throws InvalidFilesystemOperationException
 	 */
-	public static function apiDetails(Request $r) {
+	public static function apiStatus(Request $r) {
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
@@ -326,14 +325,6 @@ class RunController extends Controller {
 		$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
 
 		$response = $filtered;
-
-		try {
-			// Get source code
-			$filepath = RUNS_PATH . DIRECTORY_SEPARATOR . self::$run->getGuid();
-			$response["source"] = FileHandler::ReadFile($filepath);
-		} catch (Exception $e) {
-			throw new InvalidFilesystemOperationException($e);
-		}
 
 		return $response;
 	}
