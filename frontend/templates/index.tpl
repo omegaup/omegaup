@@ -1,53 +1,26 @@
 {include file='head.tpl'}
-
 {include file='mainmenu.tpl'}
 
 <script src="http://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
-
-
-
 <div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
 	<table>
 	<tr>
 		<td>
 			<div class="post footer" style="width: 560px; min-height: 300px;">
 				<div class="copy">
-
-					<h1>Bienvenido a OmegaUP 2.0</h1>
-					<p>
-						asdlkfjasldk fj;laskd jf;lasj flaj
-						asdlkfj asdlkfj aslkdfj askldfj alksjd f
-						asjdfkl jasfklj asdlkfj as
-						fjasl kfas
-						lk fjaklsd jflkajdfkljasklfj asklfj 
-						adf lasjdf klasjdflkasjd f 89awje fklas 
-						s</p>
 				</div>
-				
 			</div>
 		</td>
 		<td >
 			<div class="post footer" style="width: 330px; min-height: 300px;">
 				<div class="copy" >
-
-
-
-				<div id="rss_content">Loading...</div>
-
+					<div id="rss_content">Loading...</div>
 				</div>
 			</div>
 		</td>
 	</tr>
 	</table>
 </div>
-
-
-
-
-
-
-
-
 
 <script type="text/javascript">
 	google.load("feeds", "1");

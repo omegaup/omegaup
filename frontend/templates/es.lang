@@ -1,8 +1,16 @@
-
 #this is config file comment
 
 pageTitle = "Bienvenido a Omegaup"
-loginToOmegaup = "&#161; Inicia sesion en Omegaup !"
+loginHeader = "&#161;Inicia sesion en Omegaup!"
+loginFederated = "Cuenta en otros sitios"
+loginNative = "Cuenta OmegaUp"
+loginEmailUsername = "E-mail o usuario"
+loginPassword = "Contrase&ntilde;a"
+loginRecover = "Olvid&eacute; mis datos"
+loginSignupHeader = "&iquest;No es as&iacute;? Reg&iacute;strate, es f&aacute;cil y r&aacute;pido!"
+loginUsername = "Usuario"
+loginEmail = "E-mail"
+loginRepeatPassword = "Repetir contrase&ntilde;a"
 
 logIn = "Inicia sesion"
 logOut = "Cerrar Sesion"
