@@ -749,6 +749,44 @@ class ContestController extends Controller {
 	}
 
 	/**
+	 * Returns the Scoreboard events
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 */
+	public static function apiScoreboardEvents(Request $r) {
+		// Get the current user
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		try {
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null(self::$contest)) {
+			throw new NotFoundException();
+		}
+
+		// Create scoreboard
+		$scoreboard = new Scoreboard(
+						self::$contest->getContestId(),
+						Authorization::IsContestAdmin($r["current_user_id"], self::$contest)
+		);
+
+		// Push scoreboard data in response
+		$response = array();
+		$response["events"] = $scoreboard->events();
+
+		return $response;
+	}
+
+	/**
 	 * Returns the Scoreboard
 	 * 
 	 * @param Request $r
