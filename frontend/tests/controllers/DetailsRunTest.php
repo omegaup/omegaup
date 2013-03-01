@@ -39,7 +39,7 @@ class DetailsRunTest extends OmegaupTestCase {
 		$r["run_alias"] = $runData["response"]["guid"];
 		
 		// Call API
-		$response = RunController::apiDetails($r);
+		$response = RunController::apiStatus($r);
 		
 		$this->assertEquals($r["run_alias"], $response["guid"]);
         $this->assertEquals("JE", $response["veredict"]);

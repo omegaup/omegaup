@@ -170,21 +170,23 @@ class Utils
             'Contest_Problem_Opened',
             'Problems', 
             'Auth_Tokens',
-            'Contests',
-            'Users'
+            'Contests',			
             );
         
         foreach($tables as $t)
         {
-	    try
-  	    {
-           	$sql = "SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE " . $t . "; SET FOREIGN_KEY_CHECKS=1;";
-			$conn->GetRow($sql);
-        }
-	    catch(Exception $e)
-	    {
-	    }	 		
-   	}
+			try
+			{				
+				$sql = "TRUNCATE TABLE `" . $t . "`; ";
+				$conn->GetRow($sql);
+			}
+			catch(Exception $e)
+			{
+				echo "Cleanup DB error. Tests will continue anyways:";
+				var_dump($sql);
+				var_dump($e->getMessage());
+			}	 		
+		}
 
     }
     
