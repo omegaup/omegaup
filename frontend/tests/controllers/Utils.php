@@ -138,15 +138,23 @@ class Utils {
 			'Contests',
 		);
 
-		foreach ($tables as $t) {
-			try {
+		try {
+			// Disable foreign checks 
+			$conn->Execute("SET foreign_key_checks = 0;");
+			
+			foreach ($tables as $t) {
 				$sql = "TRUNCATE TABLE `" . $t . "`; ";
-				$conn->GetRow($sql);
-			} catch (Exception $e) {
-				echo "Cleanup DB error. Tests will continue anyways:";
-				var_dump($sql);
-				var_dump($e->getMessage());
+				$conn->Execute($sql);
 			}
+			
+			// Enabling them again
+			$conn->Execute("SET foreign_key_checks = 1;");
+		} catch (Exception $e) {
+			echo "Cleanup DB error. Tests will continue anyways:";
+			var_dump($sql);
+			var_dump($e->getMessage());
+			
+			$conn->Execute("SET foreign_key_checks = 1;");
 		}
 	}
 
