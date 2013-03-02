@@ -241,7 +241,7 @@ class ProblemController extends Controller {
 	 * @param ZipArchive $zip
 	 * @return boolean
 	 */
-	private function checkProblemStatements(array $zipFilesArray, ZipArchive $zip) {
+	private static function checkProblemStatements(array $zipFilesArray, ZipArchive $zip) {
 		Logger::log("Checking problem statements...");
 
 		// We need at least one statement
