@@ -15,7 +15,7 @@ class FileUploaderMock extends FileUploader {
         return file_exists($filename);
     }
     
-    public function MoveUploadedFile() {
+    public function MoveUploadedFile($filename, $targetPath) {
         $filename = func_get_arg(0);
         $targetpath = func_get_arg(1);
                         

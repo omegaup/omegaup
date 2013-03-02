@@ -196,7 +196,7 @@ class ProblemController extends Controller {
 	 * @return boolean
 	 * @throws InvalidParameterException
 	 */
-	private function checkCases(ZipArchive $zip, array $zipFilesArray) {
+	private static function checkCases(ZipArchive $zip, array $zipFilesArray) {
 		// Necesitamos tener al menos 1 input
 		$inputs = 0;
 		$outputs = 0;
