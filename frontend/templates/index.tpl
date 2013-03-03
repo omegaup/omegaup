@@ -42,10 +42,25 @@
 				
 
 				var div = document.createElement("div");
-				div.appendChild(document.createTextNode( entry.title ));
-				//div.appendChild(document.createTextNode( entry.link ));
-				div.appendChild(document.createTextNode( entry.publishedDate ));
-				div.appendChild(document.createTextNode( entry.contentSnippet ));
+				div.className = "rss_element";
+
+				var title = document.createElement("div");
+				title.className = "title";
+				var a = document.createElement('a');
+				a.href = entry.link;
+				a.appendChild(document.createTextNode( entry.title ));
+				title.appendChild(a);
+				div.appendChild(title);
+
+				var publishedDate = document.createElement("div");
+				publishedDate.className = "date";
+				publishedDate.appendChild(document.createTextNode( entry.publishedDate ));
+				div.appendChild(publishedDate);
+
+				var body = document.createElement("div");
+				body.className = "body";
+				body.appendChild(document.createTextNode( entry.contentSnippet ));
+				div.appendChild(body);
 
 				container.appendChild(div);
 			}

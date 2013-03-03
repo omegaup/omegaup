@@ -117,6 +117,22 @@ div.post a {
 div.post a:hover { color: #666 }
 /* 27 for baseline */
 
+div.rss_element:first-child div.title {
+	margin-top: 0;
+}
+div.rss_element div.title { 
+	font-size: 12pt;
+	margin: 0.5em 0 0.25em 0;
+	padding: 0;
+}
+div.rss_element div.date {
+	margin: 0 0 0.1em 0;
+	padding: 0 !important;
+}
+div.rss_element div.body {
+	padding-left: 1em;
+}
+
 h1{    
     margin-top: 10px;
     padding: 0px 5px 0;
@@ -141,7 +157,7 @@ div.title {
 }
 div.title a { color: #555 }
 div.title a:hover { color: #8bb0d3 }
-div.copy { padding: 16px 50px 0 }
+div.copy { padding: 16px; }
 div.copy h3 {
 font-size: 20px;
 line-height: 0px;
@@ -198,10 +214,10 @@ div.footer {
 div.footer div.date { padding: 1px 50px 45px }
 div.footer div.notes { display: none }
 div.post.footer {
-    background: #f3f6f9;
-    font-size: 12px;
-    -webkit-text-stroke: 1px transparent;
-	padding-bottom :0px; 
+	background: #f3f6f9;
+	font-size: 12px;
+	-webkit-text-stroke: 1px transparent;
+	padding-bottom: 0px; 
 }
 div.post.footer a {
     color: #7497af;
