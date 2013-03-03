@@ -1,31 +1,38 @@
-
 <div class="post">
 	<div class="copy wait_for_ajax" id="contest_list" >
 	</div>
 </div>
 <script>
 	(function(){
-		omegaup.getContests(function(contests){
+		function makeWorldClockLink(date) {
+			try {
+				return "http://timeanddate.com/worldclock/fixedtime.html?iso=" + date.toISOString();
+			} catch (e) {
+				return '#';
+			}
+		}
+	
+		omegaup.getContests(function(contests) {
 			// Got the contests, lets draw them
 
 			var html = "<h3>Concursos</h3><table><tr>"
 					+ "<td>Title</td>"
 					+ "<td>Descripcion</td>"
 					+ "<td>Inicio</td>"
-					+ "<td>fin</td>"
+					+ "<td>Fin</td>"
 					+ "<td></td>"
 					+ "</tr>";
 
-			for( i = 0 ; i < contests.number_of_results; i++ ) {
+			for (var i = 0; i < contests.results.length; i++) {
+				var startDate = new Date(contests.results[i].start_time * 1000);
+				var endDate = new Date(contests.results[i].finish_time * 1000);
 				html += "<tr>"
 					+ "<td>" + contests.results[i].title + "</td>"
 					+ "<td>" + contests.results[i].description + "</td>"
-					+ "<td>" + contests.results[i].start_time + "</td>"
-					+ "<td>" + contests.results[i].finish_time + "</td>"
-					+ "<td>"
-						+ "<button "
-						+ " onclick='window.location = \"contest/"+ contests.results[i].alias  +"\"' "
-						+ " value='Ver concurso'>Ir al concurso</button></td>"
+					+ '<td><a href="' + makeWorldClockLink(startDate) + '">' + startDate.format("long", "es") + "</a></td>"
+					+ '<td><a href="' + makeWorldClockLink(endDate) + '">' + endDate.format("long", "es") + "</a></td>"
+					+ '<td><a href="/contest/' + contests.results[i].alias  + '">Detalles</a></td>'
+					+ '<td><a href="/arena/' + contests.results[i].alias  + '">Ir al concurso</a></td>'
 					+ "</tr>";
 			}
 

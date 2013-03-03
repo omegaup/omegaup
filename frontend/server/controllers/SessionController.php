@@ -73,37 +73,40 @@ class SessionController extends Controller
 				"name" => NULL,
 				"username" => NULL,
 				"email" => NULL,
+				"email_md5" => NULL,
 				"auth_token" => NULL,
 				"is_admin" => false
 			);
-	}
+		}
 
-	if (is_null($vo_CurrentUser) ) {
-		// Means user has auth token, but at
-		// does not exist in DB
-		
+		if (is_null($vo_CurrentUser)) {
+			// Means user has auth token, but at
+			// does not exist in DB
+			
 			return array(
 				"valid" => false,
 				"id" => NULL,
 				"name" => NULL,
 				"username" => NULL,
 				"email" => NULL,
+				"email_md5" => NULL,
 				"auth_token" => NULL,
 				"is_admin" => false
 			);
-	}
+		}
 
-	//get email via his id
-	$vo_Email = EmailsDAO::getByPK( $vo_CurrentUser->getMainEmailId( ) );
+		// Get email via his id
+		$vo_Email = EmailsDAO::getByPK($vo_CurrentUser->getMainEmailId());
 
-	return array(
-		'valid' => true,
-		'id' => $vo_CurrentUser->getUserId( ),
-		'name' => $vo_CurrentUser->getName( ),
-		'email' => $vo_Email->getEmail( ),
-		'username' => $vo_CurrentUser->getUsername( ),
-		'auth_token' => $s_AuthToken,
-		'is_admin' => true// $vo_CurrentUser->isAdmin( )
+		return array(
+			'valid' => true,
+			'id' => $vo_CurrentUser->getUserId(),
+			'name' => $vo_CurrentUser->getName(),
+			'email' => $vo_Email->getEmail(),
+			'email_md5' => md5($vo_Email->getEmail()),
+			'username' => $vo_CurrentUser->getUsername(),
+			'auth_token' => $s_AuthToken,
+			'is_admin' => true//$vo_CurrentUser->isAdmin()
 		);
 	}
 

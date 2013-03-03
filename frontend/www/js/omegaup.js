@@ -10,6 +10,8 @@ function OmegaUp() {
 		if (data.valid) {
 			self.syncTime();
 			self.username = data.username;
+			self.email = data.email;
+			self.email_md5 = data.email_md5;
 		} else {
 			//window.location = data.login_url;
 		}

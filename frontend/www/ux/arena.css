@@ -30,6 +30,27 @@ legend {
 
 .template { display: none; }
 
+div#login_bar{
+	font-size: 13px;
+	background-color: #678DD7;
+	border-bottom: solid 1px #E7E7E7;
+	color: white;
+
+	height: 25px;
+	padding-left: 120px;
+	padding-top: 5px ;
+	padding-right: 20px; 
+}
+
+div#login_bar a {
+    color: white;
+    text-decoration: none;
+}
+
+div#login_bar a:hover {
+    text-decoration: underline;
+}
+
 #root,
 #problem,
 #ranking,
@@ -42,7 +63,7 @@ legend {
 #title img {
 	position: absolute;
 	right: 1em;
-	top: 1em;
+	top: 2em;
 }
 
 #title h1 {

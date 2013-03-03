@@ -1,5 +1,4 @@
 {include file='head.tpl'}
-		<script type="text/javascript" src="/js/sugar.js"></script>
 		<script type="text/javascript" src="/ux/arena.js"></script>
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		<div id="root" style="display: none;">

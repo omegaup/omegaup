@@ -71,6 +71,9 @@ $(document).ready(function() {
 			return;
 		}
 
+		$('#login_bar a.user').append(omegaup.username);
+		$('#login_bar img').attr('src', 'https://secure.gravatar.com/avatar/' + omegaup.email_md5 + '?s=16');
+
 		$('#title .contest-title').html(contest.title);
 		$('#summary .title').html(contest.title);
 		$('#summary .description').html(contest.description);

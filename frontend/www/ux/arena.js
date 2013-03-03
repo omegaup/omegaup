@@ -40,6 +40,5 @@ $(document).ready(function() {
 	});
 
 	$('#contest-list tr').live('click', function() {
-
 	});
 });
