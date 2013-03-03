@@ -15,8 +15,7 @@ ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR .  __DIR__  );
 if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 	if(!is_file(__DIR__ . "/config.php")) {
 		?>
-		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-									"http://www.w3.org/TR/html4/loose.dtd">
+		<!doctype html>
 		<HTML>
 		<head>
 			<link rel="stylesheet" type="text/css" href="css/style.css">
@@ -109,8 +108,13 @@ if(/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === T
 		$smarty->assign("CURRENT_USER_LANG", "en");
 		$smarty->assign("CURRENT_USER_IS_ADMIN", $a_CurrentSession["is_admin"]);
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128",
-			"<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSession["email"] ) . "?s=92'>");
+			'<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=92">');
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16",
-			"<img src='https://secure.gravatar.com/avatar/" . md5( $a_CurrentSession["email"] ) . "?s=16'>");
+			'<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=16">');
+	} else {
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128",
+			'<img src="/media/avatar_92.png">');
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16",
+			'<img src="/media/avatar_16.png">');
 	}
 }
