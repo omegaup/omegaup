@@ -5,7 +5,6 @@
  * @author joemmanuel
  */
 class RunController extends Controller {
-
 	public static $grader = null;
 	private static $practice = false;
 	private static $problem = null;
@@ -16,7 +15,6 @@ class RunController extends Controller {
 	 * Creates an instance of Grader if not already created
 	 */
 	private static function initialize() {
-
 		if (is_null(self::$grader)) {
 			// Create new grader
 			self::$grader = new Grader();
@@ -38,7 +36,6 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateCreateRequest(Request $r) {
-
 		try {
 			Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
@@ -115,7 +112,6 @@ class RunController extends Controller {
 	 * @throws InvalidFilesystemOperationException
 	 */
 	public static function apiCreate(Request $r) {
-
 		// Init
 		self::initialize();
 
@@ -330,13 +326,44 @@ class RunController extends Controller {
 	}
 
 	/**
+	 * Re-sends a problem to Grader.
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRejudge(Request $r) {
+		// Init
+		self::initialize();
+
+		// Get the user who is calling this API
+		self::authenticateRequest($r);
+
+		self::validateDetailsRequest($r);
+
+		if (!(Authorization::CanEditRun($r["current_user_id"], self::$run))) {
+			throw new ForbiddenAccessException();
+		}
+
+		try {
+			self::$grader->Grade(self::$run->getRunId());
+		} catch (Exception $e) {
+			Logger::error("Call to Grader::grade() failed:");
+			Logger::error($e);
+		}
+
+		$response = array();
+		$response['status'] = 'ok';
+
+		return $response;
+	}
+
+	/**
 	 * Gets the full details of a run. Includes diff of cases
 	 * 
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiAdminDetails(Request $r) {
-
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 

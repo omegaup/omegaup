@@ -1,7 +1,5 @@
 <?php
-
 class Grader {
-
 	private $graderUrl;
 
 	public function Grader($graderUrl = NULL) {
@@ -58,7 +56,4 @@ class Grader {
 			throw new Exception($errorMsg);
 		}
 	}
-
 }
-
-?>

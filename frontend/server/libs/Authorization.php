@@ -6,16 +6,15 @@
 define('ADMIN_ROLE', '1');
 
 class Authorization {
-
 	public static function CanViewRun($user_id, Runs $run) {
 		if (is_null($run) || !is_a($run, "Runs")) {
 			return false;
 		}
 
 		return (
-				$run->getUserId() === $user_id ||
-				Authorization::CanEditRun($user_id, $run)
-				);
+			$run->getUserId() === $user_id ||
+			Authorization::CanEditRun($user_id, $run)
+		);
 	}
 
 	public static function CanEditRun($user_id, Runs $run) {
@@ -40,8 +39,8 @@ class Authorization {
 		}
 
 		return $isContestAdmin
-				|| self::IsSystemAdmin($user_id)
-				|| $problem->getAuthorId() === $user_id;
+			|| self::IsSystemAdmin($user_id)
+			|| $problem->getAuthorId() === $user_id;
 	}
 
 	public static function CanViewClarification($user_id, Clarifications $clarification) {
@@ -108,5 +107,4 @@ class Authorization {
 			throw new InvalidDatabaseOperationException($e);
 		}
 	}
-	
 }
