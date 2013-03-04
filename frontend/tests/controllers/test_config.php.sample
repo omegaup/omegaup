@@ -17,6 +17,17 @@
     define("OMEGAUP_SLAVE_DB_NAME",     	"omegaup");
     define("OMEGAUP_SLAVE_DB_DRIVER",     	"mysqlt");
 
+	# ####################################
+	# TEST CONFIG
+	# ####################################
+	define('OMEGAUP_FRONTEND_SERVER_ROOT', OMEGAUP_ROOT . 'server/');
+	define('OMEGAUP_TEST_ROOT', '/Users/joemmanuel/Documents/omegaup/omegaup/frontend/tests/controllers/');
+	define('OMEGAUP_BASE_URL', 'http://localhost');
+
+	
+	# ####################################
+	# LOG CONFIG
+	# ####################################	
     define("OMEGAUP_LOG_TO_FILE",         	true);
     define("OMEGAUP_LOG_TRACKBACK",     	false);
     define("OMEGAUP_LOG_DB_QUERYS",     	true);
@@ -70,4 +81,7 @@
     define("APC_USER_CACHE_PROBLEM_STATEMENT", true);
     define("APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT", 300); // in seconds
 
+    # #########################
+    # SMARTY USER CACHE
+    # #########################
 	define("SMARTY_CACHE_DIR", "/var/tmp/omegaup/");
