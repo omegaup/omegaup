@@ -155,7 +155,7 @@ class SessionController extends Controller {
 		try {
 			AuthTokensDAO::save($vo_AuthT);
 		} catch (Exception $e) {
-			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 		
 		if ($b_ReturnAuthTokenAsString) {
