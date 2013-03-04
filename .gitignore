@@ -10,6 +10,7 @@ sandbox/profiles/javac
 *~
 *.swp
 tags
+nohup.out
 
 # Ignore classes
 *.class
@@ -22,6 +23,7 @@ build.xml
 nbproject/
 manifest.mf
 build/
+grader/lib/
 
 # Ignore SSL-related stuff
 *.jks
@@ -54,6 +56,7 @@ omegaup_test.log
 */test-env
 frontend/www/templates_c
 omegaup/
+bin/grader.sh
 
 # Ignore Mac crap :P
 frontend/.DS_Store
