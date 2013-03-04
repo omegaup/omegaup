@@ -71,6 +71,21 @@ $(document).ready(function() {
 			return;
 		}
 
+		var loc = window.location, new_uri;
+		if (loc.protocol === "https:") {
+			new_uri = "wss:";
+		} else {
+			new_uri = "ws:";
+		}
+		new_uri += "//" + loc.host;
+		new_uri += "/api/contest/events/" + contest.alias + "/";
+
+		var ws = new WebSocket(new_uri, "omegaup.com.events");
+		ws.onopen = function(e) { console.log(e); };
+		ws.onclose = function(e) { console.log(e); };
+		ws.onmessage = function(e) { console.log(e); };
+		ws.onerror = function(e) { console.log(e); };
+
 		$('#login_bar a.user').append(omegaup.username);
 		$('#login_bar img').attr('src', 'https://secure.gravatar.com/avatar/' + omegaup.email_md5 + '?s=16');
 

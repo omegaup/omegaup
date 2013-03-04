@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
 	"org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" artifacts(Artifact("javax.servlet", "jar", "jar")),
         "org.eclipse.jetty" % "jetty-client" % "8.1.9.v20130131",
         "org.eclipse.jetty" % "jetty-security" % "8.1.9.v20130131",
+	"org.eclipse.jetty" % "jetty-websocket" % "8.1.9.v20130131",
         "net.liftweb" % "lift-json_2.9.1" % "2.4-M4",
 	"org.slf4j" % "log4j-over-slf4j" % "1.6.2",
 	"ch.qos.logback" % "logback-core" % "0.9.24",
@@ -38,11 +39,11 @@ proguardOptions ++= Seq(
         "-keep class omegaup.runner.*",
         "-keepclassmembers class omegaup.data.* { *; }",
         "-keepclassmembers class omegaup.runner.* { *; }",
-        "-keepclassmembers class omegaup.grader.Manager { *; }",
+        "-keepclassmembers class omegaup.Service { *; }",
         "-keep class scala.collection.JavaConversions",
         "-keep class org.eclipse.jetty.util.log.Slf4jLog",
 	"-keep class ch.qos.logback.classic.Logger",
-        keepMain("omegaup.grader.Manager"),
+        keepMain("omegaup.Service"),
         keepLimitedSerializability
 )
 
