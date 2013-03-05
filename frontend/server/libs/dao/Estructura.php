@@ -59,6 +59,7 @@
 			self::$transCount = 0;
 			global $conn;
 			$conn->FailTrans();
+			$conn->CompleteTrans();
 			Logger::log("Transaccion rollback !");
 			self::$isTrans = false;
 		}

@@ -5,23 +5,17 @@
  *
  * @author joemmanuel
  */
-require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 require_once 'ContestsFactory.php';
 
-class ArenaTest extends PHPUnit_Extensions_SeleniumTestCase {
-
-	protected function setUp() {
-		$this->setBrowser('*firefox');
-		$this->setBrowserUrl(OMEGAUP_BASE_URL);
-	}
-
+class ArenaTest extends OmegaupUITestCase {
+	
 	public function testArenaRoot() {
 		
 		// Create a contest
 		$contestData = ContestsFactory::createContest();
 		
 		// Open URL
-		$this->open(OMEGAUP_BASE_URL . '/arena');
+		$this->open('/arena');
 		
 		// Sanity check: Arena at leasts says 'Arena', it is not badly broken
 		$this->assertElementContainsText('//*[@id="root"]/h1', 'Arena');

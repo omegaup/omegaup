@@ -77,6 +77,7 @@ class UserController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 		
+		Logger::log("User ". $user->getUsername() ." created");
 		return array ("status" => "ok");
 	}
 

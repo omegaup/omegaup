@@ -254,6 +254,7 @@ class SessionController extends Controller {
 			//found user
 			$r["user_id"] = $vo_User->getUserId();
 		} else {
+			Logger::warn("User " . $r["usernameOrEmail"] . " not found.");
 			return false;
 		}
 		

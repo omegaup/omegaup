@@ -136,6 +136,8 @@ class Utils {
 			'Problems',
 			'Auth_Tokens',
 			'Contests',
+			'Emails',
+			'Users',
 		);
 
 		try {
