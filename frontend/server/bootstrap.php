@@ -81,7 +81,7 @@ try {
 		$conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 	}
 }catch (Exception $databaseConectionException) {
-	var_dump($databaseConectionException);
+	Logger::error($databaseConectionException);
 }
 
 
