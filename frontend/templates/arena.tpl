@@ -10,7 +10,7 @@
 						<th class="time">Inicio</th>
 						<th class="time">Fin</th>
 					</tr></thead>
-					<tbody id="contest-list">
+					<tbody id="current-contests">
 					</tbody>
 			</table>
 				
