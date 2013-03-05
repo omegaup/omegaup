@@ -1,10 +1,12 @@
 <?php
+
 /**
  * RunController
  *
  * @author joemmanuel
  */
 class RunController extends Controller {
+
 	public static $grader = null;
 	private static $practice = false;
 	private static $problem = null;
@@ -263,6 +265,9 @@ class RunController extends Controller {
 	 * @param int $contest_id
 	 */
 	private static function InvalidateScoreboardCache($contest_id) {
+		
+		Logger::log("Invalidating scoreboard cache.");
+		
 		// Invalidar cache del contestant
 		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
 		$contestantScoreboardCache->delete();
@@ -344,6 +349,19 @@ class RunController extends Controller {
 			throw new ForbiddenAccessException();
 		}
 
+		Logger::log("Run being rejudged!!");
+
+		// Try to delete compile message, if exists.
+		try {
+			$grade_err = RUNS_PATH . '/../grade/' . self::$run->getRunId() . '.err';
+			if (file_exists($grade_err)) {
+				unlink($grade_err);
+			}
+		} catch (Exception $e) {
+			// Soft error :P
+			Logger::warn($e);
+		}
+
 		try {
 			self::$grader->Grade(self::$run->getRunId());
 		} catch (Exception $e) {
@@ -353,8 +371,20 @@ class RunController extends Controller {
 
 		$response = array();
 		$response['status'] = 'ok';
+		
+		// If the run belongs to a contest, we need to invalidate that cache		
+		try {
+			$contest = ContestsDAO::getByPK(self::$run->getContestId());
+			
+			if (!is_null($contest)) {
+				self::InvalidateScoreboardCache($contest->getContestId());
+			}
+		} catch (Exception $e) {
+			// We did our best effort to invalidate the cache...
+			Logger::error($e);			
+		}
 
-		return $response;
+		return $response;	
 	}
 
 	/**
@@ -418,7 +448,7 @@ class RunController extends Controller {
 		$response['cases'] = $cases;
 		$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
 		$response["status"] = "ok";
-		
+
 		return $response;
 	}
 
@@ -480,8 +510,9 @@ class RunController extends Controller {
 		if (file_exists("$grade_dir.err")) {
 			$response['compile_error'] = file_get_contents("$grade_dir.err");
 		}
-		
+
 		$response["status"] = "ok";
 		return $response;
 	}
+
 }

@@ -10,7 +10,7 @@ require_once 'ProblemsFactory.php';
 require_once 'ContestsFactory.php';
 require_once 'RunsFactory.php';
 
-class DetailsRunTest extends OmegaupTestCase {
+class RunStatusTest extends OmegaupTestCase {
 	
 	/**
 	 * Basic test of viewing run details
