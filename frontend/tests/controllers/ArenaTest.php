@@ -21,8 +21,8 @@ class ArenaTest extends OmegaupUITestCase {
 		$this->assertElementContainsText('//*[@id="root"]/h1', 'Arena');
 		
 		// Check that our latest contest is there
-		$this->waitForElementPresent('//*[@id="past-contests"]/tr[1]/td[1]/a');
-		$this->assertElementContainsText('//*[@id="past-contests"]/tr[1]/td[1]/a', $contestData["request"]["title"]);		
+		$this->waitForElementPresent('//*[@id="current-contests"]/tr/td[1]/a');
+		$this->assertElementContainsText('//*[@id="current-contests"]/tr/td[1]/a', $contestData["request"]["title"]);		
 	}
 
 }
