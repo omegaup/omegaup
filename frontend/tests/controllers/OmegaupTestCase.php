@@ -103,5 +103,92 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($r["penalty_calc_policy"], $contest->getPenaltyCalcPolicy());
 	}
 
+	/**
+	 * Problem: PHPUnit does not support is_uploaded_file and move_uploaded_file
+	 * native functions of PHP to move files around needed for store zip contents
+	 * in the required places.
+	 * 
+	 * Solution: We abstracted those PHP native functions in an object FileUploader.
+	 * We need to create a new FileUploader object that uses our own implementations.
+	 * 
+	 * Here we create a FileUploader and set our own implementations of is_uploaded_file 
+	 * and move_uploaded_file. PHPUnit will intercept those calls and use our owns instead (mock). 
+	 * Moreover, it will validate that they were actually called.
+	 * 
+	 * @return $fileUploaderMock
+	 */
+	public function createFileUploaderMock() {
+
+		// Create fileUploader mock                        
+		$fileUploaderMock = $this->getMock('FileUploader', array('IsUploadedFile', 'MoveUploadedFile'));
+
+		// Detour IsUploadedFile function inside FileUploader to our own IsUploadedFile
+		$fileUploaderMock->expects($this->any())
+				->method('IsUploadedFile')
+				->will($this->returnCallback(array($this, 'IsUploadedFile')));
+
+		// Detour MoveUploadedFile function inside FileUploader to our own MoveUploadedFile
+		$fileUploaderMock->expects($this->any())
+				->method('MoveUploadedFile')
+				->will($this->returnCallback(array($this, 'MoveUploadedFile')));
+
+		return $fileUploaderMock;
+	}
+
+	/**
+	 * Redefinition of IsUploadedFile
+	 * 
+	 * @param string $filename
+	 * @return type
+	 */
+	public function IsUploadedFile($filename) {
+		return file_exists($filename);
+	}
+
+	/**
+	 * Redefinition of MoveUploadedFile
+	 * 
+	 * @return type
+	 */
+	public function MoveUploadedFile() {
+		$filename = func_get_arg(0);
+		$targetpath = func_get_arg(1);
+
+		return copy($filename, $targetpath);
+	}
+	
+	/**
+	 * Detours the Grader calls.
+	 * Problem: Submiting a new run invokes the Grader::grade() function which makes 
+	 * a HTTP call to official grader using CURL. This call will fail if grader is
+	 * not turned on. We are not testing the Grader functionallity itself, we are
+	 * only validating that we populate the DB correctly and that we make a call
+	 * to the function Grader::grade(), without executing the contents.
+	 * 
+	 * Solution: We create a phpunit mock of the Grader class. We create a fake 
+	 * object Grader with the function grade() which will always return true
+	 * and expects to be excecuted once.	 
+	 *
+	 */
+	public function detourGraderCalls($times = null) {
+
+		if (is_null($times)) {
+			$times = $this->once();
+		}
+
+		// Create a fake Grader object which will always return true (see
+		// next line)
+		$graderMock = $this->getMock('Grader', array('Grade'));
+
+		// Set expectations: 
+		$graderMock->expects($times)
+				->method('Grade')
+				->will($this->returnValue(true));
+
+		// Detour all Grader::grade() calls to our mock
+		RunController::$grader = $graderMock;
+		ProblemController::$grader = $graderMock;
+	}
+
 }
 

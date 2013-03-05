@@ -240,61 +240,6 @@ class CreateProblemTest extends OmegaupTestCase {
         {
             $this->fail("ó not found when expected.");
         }
-	}
-
-	/**
-	 * Problem: PHPUnit does not support is_uploaded_file and move_uploaded_file
-	 * native functions of PHP to move files around needed for store zip contents
-	 * in the required places.
-	 * 
-	 * Solution: We abstracted those PHP native functions in an object FileUploader.
-	 * We need to create a new FileUploader object that uses our own implementations.
-	 * 
-	 * Here we create a FileUploader and set our own implementations of is_uploaded_file 
-	 * and move_uploaded_file. PHPUnit will intercept those calls and use our owns instead (mock). 
-	 * Moreover, it will validate that they were actually called.
-	 * 
-	 * @return $fileUploaderMock
-	 */
-	private function createFileUploaderMock() {
-
-		// Create fileUploader mock                        
-		$fileUploaderMock = $this->getMock('FileUploader', array('IsUploadedFile', 'MoveUploadedFile'));
-
-		// Detour IsUploadedFile function inside FileUploader to our own IsUploadedFile
-		$fileUploaderMock->expects($this->any())
-				->method('IsUploadedFile')
-				->will($this->returnCallback(array($this, 'IsUploadedFile')));
-
-		// Detour MoveUploadedFile function inside FileUploader to our own MoveUploadedFile
-		$fileUploaderMock->expects($this->any())
-				->method('MoveUploadedFile')
-				->will($this->returnCallback(array($this, 'MoveUploadedFile')));
-
-		return $fileUploaderMock;
-	}
-
-	/**
-	 * Redefinition of IsUploadedFile
-	 * 
-	 * @param string $filename
-	 * @return type
-	 */
-	public function IsUploadedFile($filename) {
-		return file_exists($filename);
-	}
-
-	/**
-	 * Redefinition of MoveUploadedFile
-	 * 
-	 * @return type
-	 */
-	public function MoveUploadedFile() {
-		$filename = func_get_arg(0);
-		$targetpath = func_get_arg(1);
-
-		return copy($filename, $targetpath);
-	}
-
+	}	
 }
 
