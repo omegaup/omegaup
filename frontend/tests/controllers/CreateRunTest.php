@@ -195,7 +195,7 @@ class CreateRun extends OmegaupTestCase {
 	 */
 	public function testInvalidRunInsideSubmissionsGap() {
 
-		// This API requires DAO cache be turned off 
+		// This API test requires DAO cache be turned off 
 		ContestsDAO::$useDAOCache = false;
 
 		// Set the context
