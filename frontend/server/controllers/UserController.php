@@ -131,11 +131,32 @@ class UserController extends Controller {
 		if (is_null($vo_UserToTest)) {
 			//user does not even exist
 			return false;
-		}
-		
-		return SecurityTools::compareHashedStrings(
+		}	
+
+		$newPasswordCheck = SecurityTools::compareHashedStrings(
 				$password,
 				$vo_UserToTest->getPassword());
+		
+		// We are OK
+		if ($newPasswordCheck === true) {
+			return true;
+		}
+		
+		// It might be an old password
+		if (strcmp($vo_UserToTest->getPassword(), md5($password)) === 0) {
+			try {			
+				// It is an old password, need to update
+				$vo_UserToTest->setPassword(SecurityTools::hashString($password));			
+				UsersDAO::save($vo_UserToTest);
+			} catch (Exception $e) {
+				// We did our best effort, log that user update failed
+				Logger::warn("Failed to update user password!!");
+			}
+			
+			return true;
+		} else {
+			return false;
+		}						
 	}
 	
 	

@@ -170,5 +170,37 @@ class LoginTest extends OmegaupTestCase {
 		$this->assertNotEquals($response1["auth_token"], $response2["auth_token"]);
 		
 	}
+	
+	/**
+	 * Test user login with valid credentials, username and password
+	 * 
+	 */	
+	public function testNativeLoginWithOldPassword() {
+		
+		DAO::$useDAOCache = false;
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser();
+		
+		$plainPassword = $user->getPassword();
+		// Set old password		
+		$user->setPassword(md5($plainPassword));
+		UsersDAO::save($user);
+		
+		// Let's put back plain password
+		$user->setPassword($plainPassword);		
+		
+		// Inflate request with user data
+		$r = new Request(array(
+			"usernameOrEmail" => $user->getUsername(),
+			"password" => $user->getPassword()
+		));
+		
+		// Call the API
+		$response = UserController::apiLogin($r);
+						
+		$this->assertEquals("ok", $response["status"]);
+		$this->assertLogin($user, $response["auth_token"]);
+	}
 }
 
