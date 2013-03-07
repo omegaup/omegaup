@@ -84,6 +84,9 @@ $(document).ready(function() {
 		}
 		uri += "//" + window.location.host + "/api/contest/events/" + currentContest.alias + "/";
 
+		// temporarily disable websockets.
+		return false;
+
 		try {
 			socket = new WebSocket(uri, "omegaup.com.events");
 			socket.onclose = function(e) { socket = null; console.log(e); };
