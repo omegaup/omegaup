@@ -232,11 +232,15 @@
       }//loop through params
 
       //if require email is not set, set it to false
-      if(!is_bool($require_email))
+      if(!isset($require_email) || !is_bool($require_email))
         $require_email = false;
       //if mode is not set, set to default for redirection
       if(is_null($mode))
         $mode = "checkid_setup";
+
+      if(!isset($realm))
+        $realm = null;
+
       //if return_to is not set and mode is checkid_setup, throw an error
       if(is_null($return_to) && $mode=="checkid_setup")
         throw new Exception("GoogleOpenID.create() needs parameter openid.return_to");
@@ -323,9 +327,22 @@
       
       //close the CURL session
       curl_close($c);
-      
+
+
+      if( $request_contents === FALSE )
+      {
+        $request_contents = file_get_contents( $request_url );
+      }
+
+      if ( $request_contents === FALSE )
+      {
+        //nothing else i can do
+        die("0x8937");
+      }
+
       //create a DOM document so we can extract the URI element
       $domdoc = new DOMDocument();
+
       $domdoc->loadXML($request_contents);
       
       //fetch the contents of the URI element

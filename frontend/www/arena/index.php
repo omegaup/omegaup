@@ -1,29 +1,3 @@
 <?php
-
-/**
- * 
- * Please read full (and updated) documentation at: 
- * https://github.com/omegaup/omegaup/wiki/Arena
- * 
- *
- * GET /arena/
- * Regresa el HTML de la arena. Si el usuario no esta loggeado, 
- * muestra el login. Si está loggeado, por el momento muestra 
- * la lista de concursos obtenida por /contests/
- *
- *
- * */
-
-
-
-
-if(defined("OMEGAUP_GA_TRACK") && OMEGAUP_GA_TRACK === true){
-	include('../ux/arena.html?_ga_id=' . OMEGAUP_GA_ID);
-	
-}else{
-	include('../ux/arena.html');
-	
-}
-
-
-
+	require_once("../../server/bootstrap.php");
+	$smarty->display( '../../templates/arena.tpl' );

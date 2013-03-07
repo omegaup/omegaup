@@ -1,7 +1,5 @@
 <?php
 
-require_once(SERVER_PATH . '/libs/Logger/Logger.php');
-
 /**
  * Maneja el acceso al cache (usando apc user cache)
  *   

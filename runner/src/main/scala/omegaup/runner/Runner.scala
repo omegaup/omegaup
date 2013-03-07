@@ -4,8 +4,8 @@ import java.io._
 import java.util.zip._
 import javax.servlet._
 import javax.servlet.http._
-import org.mortbay.jetty._
-import org.mortbay.jetty.handler._
+import org.eclipse.jetty.server.Request
+import org.eclipse.jetty.server.handler._
 import net.liftweb.json._
 import scala.collection.{mutable,immutable}
 import omegaup._
@@ -37,7 +37,7 @@ object Runner extends RunnerService with Log with Using {
 			case "java" =>
 				List(sandbox, "-S", profile + "/javac") ++ commonParams ++ List("--", Config.get("java.compiler.path", "/usr/bin/javac")) ++ inputFiles
 			case "c" =>
-				List(sandbox, "-S", profile + "/gcc") ++ commonParams ++ List("--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-ansi", "-O2", "-lm") ++ inputFiles
+				List(sandbox, "-S", profile + "/gcc") ++ commonParams ++ List("--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-std=c99", "-O2", "-lm") ++ inputFiles
 			case "cpp" =>
 				List(sandbox, "-S", profile + "/gcc") ++ commonParams ++ List("--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles
 			case "p" =>
@@ -375,7 +375,7 @@ object Runner extends RunnerService with Log with Using {
 		val handler = new AbstractHandler() {
 			@throws(classOf[IOException])
 			@throws(classOf[ServletException])
-			def handle(target: String, request: HttpServletRequest, response: HttpServletResponse, dispatch: Int) = {
+			override def handle(target: String, baseRequest: Request, request: HttpServletRequest, response: HttpServletResponse) = {
 				implicit val formats = Serialization.formats(NoTypeHints)
 				
 				request.getPathInfo() match {
@@ -468,21 +468,22 @@ object Runner extends RunnerService with Log with Using {
 					}
 				}
 				
-				request.asInstanceOf[Request].setHandled(true)
+				baseRequest.setHandled(true)
 			}
 		};
 
 		// boilerplate code for jetty with https support	
-		val server = new Server()
+		val server = new org.eclipse.jetty.server.Server()
 		
-		val runnerConnector = new org.mortbay.jetty.security.SslSelectChannelConnector
-		runnerConnector.setPort(Config.get("runner.port", 0))
-		runnerConnector.setKeystore(Config.get("runner.keystore", "omegaup.jks"))
-		runnerConnector.setPassword(Config.get("runner.password", "omegaup"))
-		runnerConnector.setKeyPassword(Config.get("runner.keystore.password", "omegaup"))
-		runnerConnector.setTruststore(Config.get("runner.truststore", "omegaup.jks"))
-		runnerConnector.setTrustPassword(Config.get("runner.truststore.password", "omegaup"))
-		runnerConnector.setNeedClientAuth(true)
+		val sslContext = new org.eclipse.jetty.util.ssl.SslContextFactory(Config.get[String]("runner.keystore", "omegaup.jks"))
+		sslContext.setKeyManagerPassword(Config.get[String]("runner.password", "omegaup"))
+		sslContext.setKeyStorePassword(Config.get[String]("runner.keystore.password", "omegaup"))
+		sslContext.setTrustStore(Config.get[String]("runner.truststore", "omegaup.jks"))
+		sslContext.setTrustStorePassword(Config.get[String]("runner.truststore.password", "omegaup"))
+		sslContext.setNeedClientAuth(true)
+	
+		val runnerConnector = new org.eclipse.jetty.server.ssl.SslSelectChannelConnector(sslContext)
+		runnerConnector.setPort(Config.get[Int]("runner.port", 0))
 		
 		server.setConnectors(List(runnerConnector).toArray)
 		
