@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Bootstrap file
  *
@@ -10,28 +9,27 @@
 date_default_timezone_set('UTC');
 
 //set paths
-ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR .  __DIR__  );
+ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . __DIR__);
 
 if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
-	if(!is_file(__DIR__ . "/config.php")) {
+	if (!is_file(__DIR__ . "/config.php")) {
 		?>
 		<!doctype html>
 		<HTML>
-		<head>
-			<link rel="stylesheet" type="text/css" href="css/style.css">
-		</head>
-		<body style="padding:5px">
-			<h1>No config file.</h1>
-			<p>You are missing the config file. It must look something like this:</p>
-			<pre class="code">
-			<?php include ("config.php.sample") ; ?>
-			</pre>
-		</body>
+			<head>
+				<link rel="stylesheet" type="text/css" href="css/style.css">
+			</head>
+			<body style="padding:5px">
+				<h1>No config file.</h1>
+				<p>You are missing the config file. It must look something like this:</p>
+				<pre class="code">
+					<?php include ("config.php.sample"); ?>
+				</pre>
+			</body>
 		</html>
 		<?php
-
 		exit;
-	}else{
+	} else {
 		require_once( __DIR__ . "/config.php" );
 	}
 }
@@ -54,9 +52,9 @@ require_once("libs/Grader.php");
 require_once("libs/Scoreboard.php");
 
 /**
-  * Load controllers
-  *
-  **/
+ * Load controllers
+ *
+ * */
 require_once("controllers/Controller.php");
 require_once("controllers/UserController.php");
 require_once("controllers/SessionController.php");
@@ -75,46 +73,58 @@ $conn = null;
 try {
 	$conn = ADONewConnection(OMEGAUP_DB_DRIVER);
 	$conn->debug = OMEGAUP_DB_DEBUG;
-	if(/* site ready only? */ false) {
+	if (/* site ready only? */ false) {
 		$conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_READONLY_USER, OMEGAUP_DB_READONLY_PASS, OMEGAUP_DB_NAME);
-	}else{
+	} else {
 		$conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 	}
-}catch (Exception $databaseConectionException) {
+} catch (Exception $databaseConectionException) {
 	Logger::error($databaseConectionException);
+
+	if (!$conn) {
+		/**
+		 * Dispatch missing parameters
+		 * */
+		header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+
+		die(json_encode(array(
+					"status" => "error",
+					"error" => "Conection to the database has failed.",
+					"errorcode" => 1
+				)));
+	}
 }
 
+$conn->SetCharSet('utf8');
+$conn->EXECUTE('SET NAMES \'utf8\';');
 
-if(/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === TRUE)) {
+
+if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === TRUE)) {
 
 	include("libs/smarty/Smarty.class.php");
 
 	$smarty = new Smarty;
 	$smarty->assign("ERROR_TO_USER", "");
 	$smarty->setTemplateDir(__DIR__ . "/../templates/");
-	$smarty->assign( "CURRENT_USER_IS_ADMIN", 0 );
-	if(defined("SMARTY_CACHE_DIR")) {
+	$smarty->assign("CURRENT_USER_IS_ADMIN", 0);
+	if (defined("SMARTY_CACHE_DIR")) {
 		$smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
 	}
 	$smarty->configLoad(__DIR__ . "/../templates/es.lang");
 	$smarty->assign("LOGGED_IN", "0");
 
 	$c_Session = new SessionController;
-	if($c_Session->CurrentSessionAvailable()) {
+	if ($c_Session->CurrentSessionAvailable()) {
 		$smarty->assign("LOGGED_IN", "1");
 		$a_CurrentSession = $c_Session->apiCurrentSession();
 		$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSession["username"]);
 		$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSession["email"]);
 		$smarty->assign("CURRENT_USER_LANG", "en");
 		$smarty->assign("CURRENT_USER_IS_ADMIN", $a_CurrentSession["is_admin"]);
-		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128",
-			'<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=92">');
-		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16",
-			'<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=16">');
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", '<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=92">');
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", '<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=16">');
 	} else {
-		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128",
-			'<img src="/media/avatar_92.png">');
-		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16",
-			'<img src="/media/avatar_16.png">');
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", '<img src="/media/avatar_92.png">');
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", '<img src="/media/avatar_16.png">');
 	}
 }
