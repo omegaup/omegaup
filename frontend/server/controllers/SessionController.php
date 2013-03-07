@@ -1,39 +1,47 @@
 <?php
 
 /**
-  * Description:
-  *     Session controller handles sessions.
-  *
-  * Author:
-  *     Alan Gonzalez alanboy@alanboy.net
-  *
-  **/
+ * Description:
+ *     Session controller handles sessions.
+ *
+ * Author:
+ *     Alan Gonzalez alanboy@alanboy.net
+ *
+ * */
 class SessionController extends Controller {
+
 	const AUTH_TOKEN_ENTROPY_SIZE = 15;
-	
+
 	private static $current_session;
 	private static $_facebook;
 	private static $_sessionManager;
 
 	public static function getSessionManagerInstance() {
-	        if (is_null(self::$_sessionManager)) {
+		if (is_null(self::$_sessionManager)) {
 			self::$_sessionManager = new SessionManager();
 		}
-	        return self::$_sessionManager;
+		return self::$_sessionManager;
 	}
 
 	/**
 	 * @param string nombre Este es el nombre del dude
 	 *
-	 **/
+	 * */
 	private static function getFacebookInstance() {
 		if (is_null(self::$_facebook)) {
 			self::$_facebook = new Facebook(array(
-			'appId'  => OMEGAUP_FB_APPID,
-			'secret' => OMEGAUP_FB_SECRET
-			));
+						'appId' => OMEGAUP_FB_APPID,
+						'secret' => OMEGAUP_FB_SECRET
+					));
 		}
 		return self::$_facebook;
+	}
+
+	public static function getFacebookLoginUrl() {
+
+		$facebook = self::getFacebookInstance();
+
+		return $facebook->getLoginUrl(array("scope" => "email"));
 	}
 
 	private static function isAuthTokenValid($s_AuthToken) {
@@ -43,26 +51,24 @@ class SessionController extends Controller {
 
 	public static function CurrentSessionAvailable() {
 		$a_CurrentSession = self::apiCurrentSession();
-		return $a_CurrentSession[ "valid" ] ;
+		return $a_CurrentSession["valid"];
 	}
 
 	/**
 	 * Returns associative array with information about current session.
 	 *
-	 **/
+	 * */
 	public static function apiCurrentSession() {
 		$SessionM = self::getSessionManagerInstance();
 		$s_AuthToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
 		$vo_CurrentUser = NULL;
 
 		//cookie contains an auth token
-	        if (!is_null($s_AuthToken) && self::isAuthTokenValid($s_AuthToken)) {
+		if (!is_null($s_AuthToken) && self::isAuthTokenValid($s_AuthToken)) {
 			$vo_CurrentUser = AuthTokensDAO::getUserByToken($s_AuthToken);
-
 		} else if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
 				&& self::isAuthTokenValid($s_AuthToken = $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
 			$vo_CurrentUser = AuthTokensDAO::getUserByToken($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
-
 		} else {
 			return array(
 				"valid" => false,
@@ -79,7 +85,7 @@ class SessionController extends Controller {
 		if (is_null($vo_CurrentUser)) {
 			// Means user has auth token, but at
 			// does not exist in DB
-			
+
 			return array(
 				"valid" => false,
 				"id" => NULL,
@@ -110,19 +116,19 @@ class SessionController extends Controller {
 	/**
 	 *
 	 *
-	 **/
+	 * */
 	public function UnRegisterSession() {
-	        $a_CurrentSession = self::apiCurrentSession();
-	        $vo_AuthT = new AuthTokens(array("token" => $a_CurrentSession["auth_token"]));
+		$a_CurrentSession = self::apiCurrentSession();
+		$vo_AuthT = new AuthTokens(array("token" => $a_CurrentSession["auth_token"]));
 
-	        try {
+		try {
 			AuthTokensDAO::delete($vo_AuthT);
-	        } catch (Exception $e){
-	        }
+		} catch (Exception $e) {
+			
+		}
 
 		setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
 	}
-
 
 	private function RegisterSession(Users $vo_User, $b_ReturnAuthTokenAsString = false) {
 		//find if this user has older sessions
@@ -132,18 +138,17 @@ class SessionController extends Controller {
 		//erase them
 		try {
 			$existingTokens = AuthTokensDAO::search($vo_AuthT);
-			
-			if ($existingTokens !== null) {				
-				foreach ($existingTokens as $token) {					
+
+			if ($existingTokens !== null) {
+				foreach ($existingTokens as $token) {
 					AuthTokensDAO::delete($token);
 				}
 			}
-			
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
-		
+
+
 		// Create the new token
 		$entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));
 		$s_AuthT = $entropy . "-" . $vo_User->getUserId() . "-" . hash("sha256", OMEGAUP_MD5_SALT . $vo_User->getUserId() . $entropy);
@@ -151,18 +156,18 @@ class SessionController extends Controller {
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
 		$vo_AuthT->setToken($s_AuthT);
-		
+
 		try {
 			AuthTokensDAO::save($vo_AuthT);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		if ($b_ReturnAuthTokenAsString) {
 			return $s_AuthT;
 		} else {
 			$sm = $this->getSessionManagerInstance();
-			$sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time()+60*60*24, '/');
+			$sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time() + 60 * 60 * 24, '/');
 		}
 	}
 
@@ -176,7 +181,7 @@ class SessionController extends Controller {
 		} else {
 			//user has been here before, lets just register his session
 			$this->RegisterSession($vo_User);
-        	}
+		}
 	}
 
 	public function LoginViaFacebook( ) {
@@ -278,31 +283,31 @@ class SessionController extends Controller {
 
 		$c_Users = new UserController();
 		$vo_User = null;
-				
+
 		if (isset($r["returnAuthToken"])) {
 			$returnAuthToken = $r["returnAuthToken"];
 		} else {
 			$returnAuthToken = false;
-		}		
+		}
 
 		if (!is_null($vo_User = UsersDAO::FindByEmail($r["usernameOrEmail"]))
-			|| !is_null($vo_User = UsersDAO::FindByUsername($r["usernameOrEmail"]))) {
+				|| !is_null($vo_User = UsersDAO::FindByUsername($r["usernameOrEmail"]))) {
 			//found user
 			$r["user_id"] = $vo_User->getUserId();
 		} else {
 			Logger::warn("User " . $r["usernameOrEmail"] . " not found.");
 			return false;
 		}
-		
+
 		$b_Valid = $c_Users->TestPassword($r);
-		
+
 		if (!$b_Valid) {
 			Logger::warn("User " . $r["usernameOrEmail"] . " has introduced invalid credentials.");
 			return false;
 		}
 
 		Logger::log("User " . $r["usernameOrEmail"] . " has loged in natively.");
-		
+
 		try {
 			return $this->RegisterSession($vo_User, $returnAuthToken);
 		} catch (Exception $e) {
@@ -310,4 +315,5 @@ class SessionController extends Controller {
 			//@TODO actuar en base a la exception
 		}
 	}
+
 }

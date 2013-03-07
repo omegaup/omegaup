@@ -37,11 +37,13 @@
 						<ul class="uiList fbSettingsList _4kg _6-h _4ks ">
 
 							<li class="fbSettingsListItem clearfix uiListItem">
+							<!--
 								<a class="pvm phs fbSettingsListLink clearfix" >
 									<span class="pls fbSettingsListItemLabel"><strong>Name</strong></span>
 									<span class="fbSettingsListItemContent fcg"><strong>Alan Gonzalez</strong>
 									</span>
 								</a>
+							-->
 							<div class="content">
 
 							</div>
@@ -50,12 +52,12 @@
 							<div class="content">
 							</div>
 							</li>
-							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>Email</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong>alanboy@alanboy.net</strong>&nbsp;</span></a>
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>Email</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong>{$CURRENT_USER_EMAIL}</strong>&nbsp;</span></a>
 							<div class="content">
 							</div>
 							</li>
 
-							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Language</strong></span><span class="fbSettingsListItemContent fcg"><strong>English (US)</strong></span></a>
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Language</strong></span><span class="fbSettingsListItemContent fcg"><strong>Español (MX)</strong></span></a>
 							<div class="content">
 							</div>
 							</li>
@@ -66,7 +68,7 @@
 		</div>
 
 
-
+			<!--
 			<div class="post" style="width: 760px; min-height: 300px;">
 				<div class="copy" >
 
@@ -85,7 +87,7 @@
 
 							</div>
 							</li>
-							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" rel="async"><span class="pls fbSettingsListItemLabel"><strong>Username</strong></span><span class="fbSettingsListItemContent fcg"> http://www.omegaup.com/<strong><input type="text" value="{$CURRENT_USER_USERNAME}"></strong></span></a>
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" rel="async"><span class="pls fbSettingsListItemLabel"><strong>Username</strong></span><span class="fbSettingsListItemContent fcg"> https://omegaup.com/<strong><input type="text" value="{$CURRENT_USER_USERNAME}"></strong></span></a>
 							<div class="content">
 							</div>
 							</li>
@@ -109,6 +111,7 @@
 				</div>
 
 			</div>
+			-->
 		</td>
 	</tr>
 	</table>

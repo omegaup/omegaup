@@ -24,8 +24,8 @@
 					+ "</tr>";
 
 			for (var i = 0; i < contests.results.length; i++) {
-				var startDate = new Date(contests.results[i].start_time * 1000);
-				var endDate = new Date(contests.results[i].finish_time * 1000);
+				var startDate = contests.results[i].start_time;
+				var endDate = contests.results[i].finish_time;
 				html += "<tr>"
 					+ "<td>" + contests.results[i].title + "</td>"
 					+ "<td>" + contests.results[i].description + "</td>"

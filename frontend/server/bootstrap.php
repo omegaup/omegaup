@@ -114,6 +114,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	}
 	$smarty->configLoad(__DIR__ . "/../templates/es.lang");
 	$smarty->assign("LOGGED_IN", "0");
+	$smarty->assign("FB_URL", SessionController::getFacebookLoginUrl());
 
 	$c_Session = new SessionController;
 	if ($c_Session->CurrentSessionAvailable()) {
