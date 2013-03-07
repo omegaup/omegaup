@@ -67,6 +67,8 @@ require_once("controllers/TimeController.php");
 require_once("libs/adodb5/adodb.inc.php");
 require_once("libs/adodb5/adodb-exceptions.inc.php");
 
+require_once("libs/facebook-php-sdk/facebook.php");
+
 global $conn;
 $conn = null;
 
@@ -112,6 +114,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	}
 	$smarty->configLoad(__DIR__ . "/../templates/es.lang");
 	$smarty->assign("LOGGED_IN", "0");
+	$smarty->assign("FB_URL", SessionController::getFacebookLoginUrl());
 
 	$c_Session = new SessionController;
 	if ($c_Session->CurrentSessionAvailable()) {
