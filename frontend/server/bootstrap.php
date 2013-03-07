@@ -67,6 +67,8 @@ require_once("controllers/TimeController.php");
 require_once("libs/adodb5/adodb.inc.php");
 require_once("libs/adodb5/adodb-exceptions.inc.php");
 
+require_once("libs/facebook-php-sdk/facebook.php");
+
 global $conn;
 $conn = null;
 

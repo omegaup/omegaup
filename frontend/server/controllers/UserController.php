@@ -78,7 +78,11 @@ class UserController extends Controller {
 		}
 		
 		Logger::log("User ". $user->getUsername() ." created");
-		return array ("status" => "ok");
+
+		return array (
+					"status" => "ok",
+					"user_id" => $user->getUserId()
+				);
 	}
 
 

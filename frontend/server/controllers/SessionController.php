@@ -179,8 +179,7 @@ class SessionController extends Controller {
         	}
 	}
 
-
-	public function LoginViaFacebook($s_Email, $s_FacebookId) {
+	public function LoginViaFacebook( ) {
 		//ok, the user does not have any auth token
 		//if he wants to test facebook login
 		//Facebook must send me the state=something
@@ -191,33 +190,35 @@ class SessionController extends Controller {
 			Logger::log("Not logged in and no need to check for fb session");
 			return false;
 		}
-		Logger::log("There is no auth_token cookie, testing for facebook session.");
 
 		//if that is not true, may still be logged with
 		//facebook, lets test that
 		$facebook = self::getFacebookInstance();
+
 		// Get User ID
 		$fb_user = $facebook->getUser();
+
+		if($fb_user == 0){
+				return false;
+		}
+
 
 		// We may or may not have this data based on whether the user is logged in.
 		//
 		// If we have a $fb_user id here, it means we know the user is logged into
 		// Facebook, but we don't know if the access token is valid. An access
 		// token is invalid if the user logged out of Facebook.
+
 		if ($fb_user) {
 			try {
 				// Proceed knowing you have a logged in user who's authenticated.
 				$fb_user_profile = $facebook->api('/me');
+
 			} catch (FacebookApiException $e) {
 				$fb_user = null;
 				Logger::error("FacebookException:" . $e);
+				return false;
 			}
-		}
-
-		// Now we know if the user is authenticated via facebook
-		if (is_null($fb_user)) {
-			Logger::log("No facebook session... ");
-			return false;
 		}
 
 		//ok we know the user is logged in,
@@ -225,6 +226,41 @@ class SessionController extends Controller {
 		//if there is none, it means that its the first
 		//time the user has been here, lets register his info
 		Logger::log("User is logged in via facebook !!");
+
+		$results = UsersDAO::search( 
+								new Users( array( 
+									"facebook_user_id" => $fb_user_profile["id"] 
+								) ) );
+	
+		if( count( $results ) == 1 ){
+			    //user has been here before with facebook!
+				$vo_User = $results[0];
+
+		}else{
+				//the user has never been here before, lets
+				//register him
+				//
+				//TODO use UsersDAO::FindByEmail( $s_Email );
+				// to see if user has loged in by other methods
+				$r = new Request(
+								array(
+									"name" => $fb_user_profile["name"],
+									"email" => $fb_user_profile["email"],
+									"fbid" => $fb_user_profile["id"]
+								)
+							);
+				$res = UsersController::apiCreate($r);
+
+				$vo_User = UsersDAO::getByPK( $res["id_user"] );
+
+		}
+
+		//since we got here, this user does not have
+		//any auth token, lets give him one
+		//so we dont have to call facebook to see
+		//if he is still logged in, and he can call
+		//the api 
+		$this->RegisterSession( $vo_User );
 
 	}
 

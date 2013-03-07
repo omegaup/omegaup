@@ -21,4 +21,9 @@
 		}
 	}
 
+	if(isset($_GET["state"])) {
+		$c_Session = new SessionController;
+		$c_Session->LoginViaFacebook();
+	}
+
 	$smarty->display( '../templates/login.tpl' );
