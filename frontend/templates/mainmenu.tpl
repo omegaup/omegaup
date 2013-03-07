@@ -15,11 +15,10 @@
 				<li><a href='/probs.php'>{#frontPageProblems#}</a></li>
 				<li><a href='/rank.php'>{#frontPageRanking#}</a></li>
 				<li><a href='/recent.php'>{#frontPageRecent#}</a></li>
-				<li><a href='/api/explorer/'>{#frontPageDevelopers#}</a></li>
-				<li><a href='help.php'>{#frontPageHelp#}</a></li>
-
+				<li><a href='https://github.com/omegaup/omegaup/'>{#frontPageDevelopers#}</a></li>
+				<li><a href='/help.php'>{#frontPageHelp#}</a></li>
 				<li><a href='http://blog.omegaup.com/'>{#frontPageBlog#}</a></li>
-				<li><a href='/preguntas/'>{#frontPageQuestions#}</a></li>
+				<li><a href='https://omegaup.com/preguntas/'>{#frontPageQuestions#}</a></li>
 			</ul>
 		</div>
 		{if $ERROR_TO_USER eq 'USER_OR_PASSWORD_WRONG'} 

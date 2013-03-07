@@ -80,7 +80,7 @@ class Scoreboard {
 				// Get all problems given contest_id
 				$contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
 			} catch (Exception $e) {
-				throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+				throw new InvalidDatabaseOperationException($e);				
 			}
 
 			$result = array();
@@ -154,7 +154,7 @@ class Scoreboard {
 
 				$contest_runs = RunsDAO::search($run, 'submit_delay');
 			} catch (Exception $e) {
-				throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+				throw new InvalidDatabaseOperationException($e);
 			}
 
 			$contest_users = array();
@@ -240,7 +240,7 @@ class Scoreboard {
 				$extra_penalty = $penalty * $wrong_runs_count;
 			}
 		} catch (Exception $e) {
-			throw new ApiException(ApiHttpErrors::invalidDatabaseOperation(), $e);
+			throw new InvalidDatabaseOperationException($e);
 		}
 
 		// Penalty should not be added if the best run was 0 pts       

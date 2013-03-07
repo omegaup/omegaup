@@ -1,53 +1,26 @@
 {include file='head.tpl'}
-
 {include file='mainmenu.tpl'}
 
-<script src="http://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
-
-
-
+<script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 <div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
 	<table>
 	<tr>
 		<td>
 			<div class="post footer" style="width: 560px; min-height: 300px;">
 				<div class="copy">
-
-					<h1>Bienvenido a OmegaUP 2.0</h1>
-					<p>
-						asdlkfjasldk fj;laskd jf;lasj flaj
-						asdlkfj asdlkfj aslkdfj askldfj alksjd f
-						asjdfkl jasfklj asdlkfj as
-						fjasl kfas
-						lk fjaklsd jflkajdfkljasklfj asklfj 
-						adf lasjdf klasjdflkasjd f 89awje fklas 
-						s</p>
 				</div>
-				
 			</div>
 		</td>
 		<td >
 			<div class="post footer" style="width: 330px; min-height: 300px;">
 				<div class="copy" >
-
-
-
-				<div id="rss_content">Loading...</div>
-
+					<div id="rss_content">Loading...</div>
 				</div>
 			</div>
 		</td>
 	</tr>
 	</table>
 </div>
-
-
-
-
-
-
-
-
 
 <script type="text/javascript">
 	google.load("feeds", "1");
@@ -69,10 +42,25 @@
 				
 
 				var div = document.createElement("div");
-				div.appendChild(document.createTextNode( entry.title ));
-				//div.appendChild(document.createTextNode( entry.link ));
-				div.appendChild(document.createTextNode( entry.publishedDate ));
-				div.appendChild(document.createTextNode( entry.contentSnippet ));
+				div.className = "rss_element";
+
+				var title = document.createElement("div");
+				title.className = "title";
+				var a = document.createElement('a');
+				a.href = entry.link;
+				a.appendChild(document.createTextNode( entry.title ));
+				title.appendChild(a);
+				div.appendChild(title);
+
+				var publishedDate = document.createElement("div");
+				publishedDate.className = "date";
+				publishedDate.appendChild(document.createTextNode( entry.publishedDate ));
+				div.appendChild(publishedDate);
+
+				var body = document.createElement("div");
+				body.className = "body";
+				body.appendChild(document.createTextNode( entry.contentSnippet ));
+				div.appendChild(body);
 
 				container.appendChild(div);
 			}

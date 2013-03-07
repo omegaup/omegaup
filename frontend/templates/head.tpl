@@ -7,8 +7,9 @@
 		<title>OmegaUp | {#pageTitle#}</title>
 
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-		<script type="text/javascript" src="/js/omegaup.js"></script>
 		<script type="text/javascript" src="/js/jquery.msgBox.js"></script>
+		<script type="text/javascript" src="/js/omegaup.js"></script>
+		<script type="text/javascript" src="/js/sugar.js"></script>
 
 		<!-- from arena -->
 		<link rel="shortcut icon" href="/favicon.ico" />
@@ -19,10 +20,10 @@
 	<body>
 		<div id="wrapper">
 			<div class="login_bar" style="display: block">
+				{$CURRENT_USER_GRAVATAR_URL_16}
 				{if $LOGGED_IN eq '1'}
-					{$CURRENT_USER_GRAVATAR_URL_16}
-					<a href="/profile.php">{$CURRENT_USER_USERNAME}</a> <b><a href='/logout.php'>{#logOut#}</a></b>
+					 <a href="/profile.php">{$CURRENT_USER_USERNAME}</a> <b><a href='/logout.php'>{#logOut#}</a></b>
 				{else}
-					 {#pageTitle#} <b><a href='/login.php'>{#logIn#}</a> !</b>
+					{#pageTitle#} <b><a href='/login.php'>{#logIn#}</a>!</b>
 				{/if}
 			</div>

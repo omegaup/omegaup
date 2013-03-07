@@ -15,14 +15,11 @@ class TimeController extends Controller {
 	 * @param Request $r
 	 * @return array
 	 */
-	public static function apiList(Request $r = null) {
-
+	public static function apiGet(Request $r = null) {
 		$response = array();
 		$response['time'] = time();
 		$response['status'] = 'ok';
 
 		return $response;
 	}
-
 }
-

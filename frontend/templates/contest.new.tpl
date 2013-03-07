@@ -245,7 +245,7 @@
 </div>
 <script>
 	$('.new_contest_form').submit(function() {
-		omega.createContest(
+		omegaup.createContest(
 					$(".new_contest_form #title").val(),
 					$(".new_contest_form #description").val(),
 					$(".new_contest_form #start_time").val(),

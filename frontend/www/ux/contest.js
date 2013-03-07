@@ -1,5 +1,4 @@
 $(document).ready(function() {
-	var omegaup = new OmegaUp();
 	var problems = {};
 	var activeTab = 'problems';
 	var currentProblem = null;
@@ -13,6 +12,7 @@ $(document).ready(function() {
 	var answeredClarifications = 0;
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
+	var socket = null;
 	var veredicts = {
 		AC: "Accepted",
 		PA: "Partially Accepted",
@@ -48,6 +48,62 @@ $(document).ready(function() {
 		}
 	});
 
+	function updateRunFallback(guid, orig_run) {
+		setTimeout(function() { omegaup.runStatus(guid, updateRun); }, 5000);
+	}
+
+	function updateRun(run) {
+		var r = '#run_' + run.guid;
+
+		if (run.status == 'ready') {
+			$(r + ' .runtime').html((parseFloat(run.runtime) / 1000).toFixed(2));
+			$(r + ' .memory').html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+			$(r + ' .points').html(parseFloat(run.contest_score).toFixed(2));
+			$(r + ' .penalty').html(run.submit_delay);
+		}
+		$(r + ' .status').html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+		$(r + ' .time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+
+		if (socket == null) {
+			if (run.status == 'ready') {
+				if (!practice) {
+					omegaup.getRanking(contestAlias, rankingChange);
+				}
+			} else {
+				updateRunFallback(run.guid, run);
+			}
+		}
+	}
+
+	function connectSocket() {
+		var uri;
+		if (window.location.protocol === "https:") {
+			uri = "wss:";
+		} else {
+			uri = "ws:";
+		}
+		uri += "//" + window.location.host + "/api/contest/events/" + currentContest.alias + "/";
+
+		// temporarily disable websockets.
+		return false;
+
+		try {
+			socket = new WebSocket(uri, "omegaup.com.events");
+			socket.onclose = function(e) { socket = null; console.log(e); };
+			socket.onmessage = function(message) {
+				var data = JSON.parse(message.data);
+
+				if (data.message == "/run/status/") {
+					data.run.time = new Date(data.run.time * 1000);
+					updateRun(data.run);
+				}
+			};
+			socket.onerror = function(e) { console.log(e); };
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
 	function contestLoaded(contest) {
 		if (contest.status == 'error') {
 			if (contest.start_time) {
@@ -72,6 +128,9 @@ $(document).ready(function() {
 			return;
 		}
 
+		$('#login_bar a.user').append(omegaup.username);
+		$('#login_bar img').attr('src', 'https://secure.gravatar.com/avatar/' + omegaup.email_md5 + '?s=16');
+
 		$('#title .contest-title').html(contest.title);
 		$('#summary .title').html(contest.title);
 		$('#summary .description').html(contest.description);
@@ -85,6 +144,7 @@ $(document).ready(function() {
 		startTime = contest.start_time;
 		finishTime = contest.finish_time;
 		submissionDeadline = contest.submission_deadline;
+
 		submissionGap = parseInt(contest.submission_gap);
 
 		if (!(submissionGap > 0)) submissionGap = 0;
@@ -127,8 +187,10 @@ $(document).ready(function() {
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
 
-			$('#loading').fadeOut('slow');
-			$('#root').fadeIn('slow');
+		$('#loading').fadeOut('slow');
+		$('#root').fadeIn('slow');
+
+		connectSocket();
 	}
 	
 	omegaup.getContest(contestAlias, contestLoaded);
@@ -178,41 +240,10 @@ $(document).ready(function() {
 			$('#problem .runs > tbody:last').append(r);
 			currentProblem.runs.push(run);
 
-			function updateRun(guid, orig_run) {
-				setTimeout(function() {
-					omegaup.runStatus(guid, function(run) {
-						var r = '#run_' + run.guid;
 
-						orig_run.runtime = run.runtime;
-						orig_run.memory = run.memory;
-						orig_run.contest_score = run.contest_score;
-						orig_run.status = run.status;
-						orig_run.veredict = run.veredict;
-						orig_run.submit_delay = run.submit_delay;
-						orig_run.time = run.time;
-						orig_run.language = run.language;
-
-						if (run.status == 'ready') {
-							$(r + ' .runtime').html((parseFloat(run.runtime) / 1000).toFixed(2));
-							$(r + ' .memory').html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-							$(r + ' .points').html(parseFloat(run.contest_score).toFixed(2));
-							$(r + ' .penalty').html(run.submit_delay);
-						}
-						$(r + ' .status').html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-						$(r + ' .time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
-
-						if (run.status == 'ready') {
-							if (!practice) {
-								omegaup.getRanking(contestAlias, rankingChange);
-							}
-						} else {
-							updateRun(run.guid, orig_run);
-						}
-					});
-				}, 5000);
+			if (socket == null) {
+				updateRunFallback(run.guid, run);
 			}
-
-			updateRun(run.guid, run);
 
 			$('#overlay').hide();
 			$('#submit input').removeAttr('disabled');

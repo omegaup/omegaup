@@ -16,6 +16,7 @@
 	
     // Load test utils
 	require_once("OmegaupTestCase.php");
+	require_once("OmegaupUITestCase.php");
     require_once("Utils.php");
 
     // Clean previous log

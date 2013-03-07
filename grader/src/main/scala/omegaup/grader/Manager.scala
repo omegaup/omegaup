@@ -9,6 +9,7 @@ import net.liftweb.json._
 import omegaup._
 import omegaup.data._
 import omegaup.runner._
+import omegaup.broadcaster.Broadcaster
 import Status._
 import Language._
 import Veredict._
@@ -129,21 +130,13 @@ object Manager extends Object with Log {
 		
 		implicit val conn = connection
 		
+		Broadcaster.update(run)
 		GraderData.update(run)
 	}
 	
-	def main(args: Array[String]) = {
+	def init() = {
 		import omegaup.data._
-
-		// Setting keystore properties
-		System.setProperty("javax.net.ssl.keyStore", Config.get("grader.keystore", "omegaup.jks"))
-		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "omegaup.jks"))
-		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("grader.keystore.password", "omegaup"))
-		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
 		
-		// logger
-		Logging.init()
-	
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
 			Manager.addRunner(omegaup.runner.Runner)
@@ -251,6 +244,21 @@ object Manager extends Object with Log {
 		server.start()
 
 		info("Omegaup started")
+		
+		server
+	}
+	
+	def main(args: Array[String]) = {
+		// Setting keystore properties
+		System.setProperty("javax.net.ssl.keyStore", Config.get("grader.keystore", "omegaup.jks"))
+		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "omegaup.jks"))
+		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("grader.keystore.password", "omegaup"))
+		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
+		
+		// logger
+		Logging.init()
+		
+		val server = init()
 
 		Runtime.getRuntime.addShutdownHook(new Thread() {
 			override def run() = {

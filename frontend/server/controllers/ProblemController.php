@@ -18,6 +18,17 @@ class ProblemController extends Controller {
 	private static $hasValidator = false;
 	private static $filesToUnzip;
 	private static $casesFiles;
+	public static $grader = null;
+
+	/**
+	 * Creates an instance of Grader if not already created
+	 */
+	private static function initializeGrader() {
+		if (is_null(self::$grader)) {
+			// Create new grader
+			self::$grader = new Grader();
+		}
+	}
 
 	/**
 	 * 
@@ -97,35 +108,65 @@ class ProblemController extends Controller {
 	}
 
 	/**
-	 * Validates a Create Problem API request
+	 * Validates a Create or Update Problem API request
 	 * 
 	 * @param Request $r
 	 * @throws NotFoundException
 	 */
-	private static function validateCreateRequest(Request $r) {
+	private static function validateCreateOrUpdate(Request $r, $is_update = false) {
 
-		Validators::isStringNonEmpty($r["author_username"], "author_username");
+		$is_required = true;
 
-		// Check if author_username actually exists
-		$u = new Users();
-		$u->setUsername($r["author_username"]);
-		$users = UsersDAO::search($u);
-		if (count($users) !== 1) {
-			throw new NotFoundException("author_username not found");
+		// In case of update, params are optional
+		if ($is_update) {
+			$is_required = false;
+
+			// We need to check problem_alias
+			Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+			try {
+				$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			if (is_null($r["problem"])) {
+				throw new NotFoundException();
+			}
+
+			// We need to check that the user can actually edit the problem
+			if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
+				throw new ForbiddenAccessException();
+			}
 		}
 
-		self::$author = $users[0];
+		Validators::isStringNonEmpty($r["author_username"], "author_username", $is_required);
 
-		Validators::isStringNonEmpty($r["title"], "title");
-		Validators::isStringNonEmpty($r["source"], "source");
-		Validators::isStringNonEmpty($r["alias"], "alias");
-		Validators::isInEnum($r["public"], "public", array("0", "1"));
-		Validators::isInEnum($r["validator"], "validator", array("remote", "literal", "token", "token-caseless", "token-numeric"));
-		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF);
-		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF);
-		Validators::isInEnum($r["order"], "order", array("normal", "inverse"));
+		if (!$is_update) {
+			// Check if author_username actually exists
+			$u = new Users();
+			$u->setUsername($r["author_username"]);
+			$users = UsersDAO::search($u);
+			if (count($users) !== 1) {
+				throw new NotFoundException("author_username not found");
+			}
 
-		self::validateZip();
+			$r["author"] = $users[0];
+		}
+
+		Validators::isStringNonEmpty($r["title"], "title", $is_required);
+		Validators::isStringNonEmpty($r["source"], "source", $is_required);
+		Validators::isStringNonEmpty($r["alias"], "alias", $is_required);
+		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
+		Validators::isInEnum($r["validator"], "validator", array("remote", "literal", "token", "token-caseless", "token-numeric"), $is_required);
+		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
+		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
+		Validators::isInEnum($r["order"], "order", array("normal", "inverse"), $is_required);
+
+		// If create, we require the zip validation. Otherwise it is optional
+		if (!$is_update || isset($_FILES['problem_contents'])) {
+			self::validateZip();
+		}
 	}
 
 	/**
@@ -374,7 +415,7 @@ class ProblemController extends Controller {
 		self::authenticateRequest($r);
 
 		// Validates request
-		self::validateCreateRequest($r);
+		self::validateCreateOrUpdate($r);
 
 		// Populate a new Problem object
 		$problem = new Problems();
@@ -390,7 +431,7 @@ class ProblemController extends Controller {
 		$problem->setDifficulty(0);
 		$problem->setSource($r["source"]);
 		$problem->setOrder($r["order"]);
-		$problem->setAuthorId(self::$author->getUserId());
+		$problem->setAuthorId($r["author"]->getUserId());
 
 		// Insert new problem
 		try {
@@ -435,6 +476,116 @@ class ProblemController extends Controller {
 		DAO::transEnd();
 
 		return $result;
+	}
+
+	/**
+	 * Update problem contents
+	 * 
+	 * @param Request $r
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiUpdate(Request $r) {
+
+		self::authenticateRequest($r);
+
+		self::validateCreateOrUpdate($r, true /*is update*/);
+
+		// Update the Problem object        
+		if (!is_null($r["public"])) {
+			$r["problem"]->setPublic($r["public"]);
+		}
+
+		if (!is_null($r["title"])) {
+			$r["problem"]->setTitle($r["title"]);
+		}
+
+		if (!is_null($r["validator"])) {
+			$r["problem"]->setValidator($r["validator"]);
+		}
+
+		if (!is_null($r["time_limit"])) {
+			$r["problem"]->setTimeLimit($r["time_limit"]);
+		}
+
+		if (!is_null($r["memory_limit"])) {
+			$r["problem"]->setMemoryLimit($r["memory_limit"]);
+		}
+
+		if (!is_null($r["source"])) {
+			$r["problem"]->setSource($r["source"]);
+		}
+
+		if (!is_null($r["order"])) {
+			$r["problem"]->setOrder($r["order"]);
+		}
+
+		$response = array();
+
+		// Insert new problem
+		try {
+			//Begin transaction
+			ProblemsDAO::transBegin();
+
+			// Save the contest object with data sent by user to the database
+			ProblemsDAO::save($r["problem"]);
+
+			if (isset($_FILES['problem_contents'])) {
+
+				// DeployProblemZip requires alias => problem_alias
+				$r["alias"] = $r["problem_alias"];
+
+				self::DeployProblemZip(self::$filesToUnzip, self::$casesFiles, $r, true /* is update */);
+				$response["uploaded_files"] = self::$filesToUnzip;
+			}
+
+			//End transaction
+			ProblemsDAO::transEnd();
+		} catch (ApiException $e) {
+			// Operation failed in the data layer, rollback transaction 
+			ProblemsDAO::transRollback();
+
+			throw $e;
+		} catch (Exception $e) {
+			// Operation failed in the data layer, rollback transaction 
+			ProblemsDAO::transRollback();
+
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// We need to rejudge runs after an update, let's initialize the grader
+		self::initializeGrader();		
+
+		// Call Grader
+		try {
+			$runs = RunsDAO::search(new Runs(array(
+								"problem_id" => $r["problem"]->getProblemId()
+							)));
+
+			foreach ($runs as $run) {
+				$run->setStatus('new');
+				$run->setVeredict('JE');
+				RunsDAO::save($run);
+				self::$grader->Grade($run->getRunId());
+			}
+		} catch (Exception $e) {
+			Logger::error("Failed to rejudge runs after problem update");
+			Logger::error($e);
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if ($r["redirect"] === true) {
+			header('Location: ' . $_SERVER['HTTP_REFERER']);
+		}
+
+		// All clear
+		$response["status"] = "ok";
+
+		// Invalidar cache @todo invalidar todos los lenguajes
+		$statementCache = new Cache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");
+		$statementCache->delete();
+		
+		return $response;
 	}
 
 	/**
@@ -734,12 +885,12 @@ class ProblemController extends Controller {
 
 		// Validate request
 		self::validateDetails($r);
-		
+
 		$response = array();
 
 		// Create array of relevant columns
 		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points");
-		
+
 		// Read the file that contains the source
 		if (self::$problem->getValidator() != 'remote') {
 			$statementCache = new Cache(Cache::PROBLEM_STATEMENT, self::$problem->getAlias() . "-" . $r["lang"]);

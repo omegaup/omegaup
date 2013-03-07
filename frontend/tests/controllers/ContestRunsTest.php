@@ -1,22 +1,20 @@
 <?php
 
 /**
- * Description of DetailsRunTest
+ * Description of ContestRunsTest
  *
  * @author joemmanuel
  */
-
 require_once 'ProblemsFactory.php';
 require_once 'ContestsFactory.php';
 require_once 'RunsFactory.php';
 
-class DetailsRunTest extends OmegaupTestCase {
+class ContestRunsTest extends OmegaupTestCase {
 	
 	/**
-	 * Basic test of viewing run details
-	 * 
+	 * Contestant submits runs and admin is able to get them
 	 */
-	public function testShowRunDetailsValid() {
+	public function testGetRunsForContest() {
 		
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
@@ -33,17 +31,20 @@ class DetailsRunTest extends OmegaupTestCase {
 		// Create a run
 		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
 		
-		// Prepare request
+		// Grade the run
+		RunsFactory::gradeRun($runData);
+				
+		// Create request
 		$r = new Request();
-		$r["auth_token"] = $this->login($contestant);
-		$r["run_alias"] = $runData["response"]["guid"];
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		$r["auth_token"] = $this->login($contestData["director"]);
 		
 		// Call API
-		$response = RunController::apiDetails($r);
+		$response = ContestController::apiRuns($r);						
 		
-		$this->assertEquals($r["run_alias"], $response["guid"]);
-        $this->assertEquals("JE", $response["veredict"]);
-        $this->assertEquals("new", $response["status"]);
+		// Assert
+		$this->assertEquals(1, count($response["runs"]));
+		$this->assertEquals($runData["response"]["guid"], $response["runs"][0]["guid"]);
 		
 	}
 }

@@ -17,7 +17,6 @@ class RunController extends Controller {
 	 * Creates an instance of Grader if not already created
 	 */
 	private static function initialize() {
-
 		if (is_null(self::$grader)) {
 			// Create new grader
 			self::$grader = new Grader();
@@ -39,7 +38,6 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateCreateRequest(Request $r) {
-
 		try {
 			Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
@@ -116,7 +114,6 @@ class RunController extends Controller {
 	 * @throws InvalidFilesystemOperationException
 	 */
 	public static function apiCreate(Request $r) {
-
 		// Init
 		self::initialize();
 
@@ -228,7 +225,6 @@ class RunController extends Controller {
 		} catch (Exception $e) {
 			Logger::error("Call to Grader::grade() failed:");
 			Logger::error($e);
-			throw new InvalidFilesystemOperationException($e);
 		}
 
 		if (self::$practice) {
@@ -269,6 +265,9 @@ class RunController extends Controller {
 	 * @param int $contest_id
 	 */
 	private static function InvalidateScoreboardCache($contest_id) {
+		
+		Logger::log("Invalidating scoreboard cache.");
+		
 		// Invalidar cache del contestant
 		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
 		$contestantScoreboardCache->delete();
@@ -309,8 +308,7 @@ class RunController extends Controller {
 	 * @return array
 	 * @throws InvalidFilesystemOperationException
 	 */
-	public static function apiDetails(Request $r) {
-
+	public static function apiStatus(Request $r) {
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
@@ -329,15 +327,64 @@ class RunController extends Controller {
 
 		$response = $filtered;
 
-		try {
-			// Get source code
-			$filepath = RUNS_PATH . DIRECTORY_SEPARATOR . self::$run->getGuid();
-			$response["source"] = FileHandler::ReadFile($filepath);
-		} catch (Exception $e) {
-			throw new InvalidFilesystemOperationException($e);
+		return $response;
+	}
+
+	/**
+	 * Re-sends a problem to Grader.
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRejudge(Request $r) {
+		// Init
+		self::initialize();
+
+		// Get the user who is calling this API
+		self::authenticateRequest($r);
+
+		self::validateDetailsRequest($r);
+
+		if (!(Authorization::CanEditRun($r["current_user_id"], self::$run))) {
+			throw new ForbiddenAccessException();
 		}
 
-		return $response;
+		Logger::log("Run being rejudged!!");
+
+		// Try to delete compile message, if exists.
+		try {
+			$grade_err = RUNS_PATH . '/../grade/' . self::$run->getRunId() . '.err';
+			if (file_exists($grade_err)) {
+				unlink($grade_err);
+			}
+		} catch (Exception $e) {
+			// Soft error :P
+			Logger::warn($e);
+		}
+
+		try {
+			self::$grader->Grade(self::$run->getRunId());
+		} catch (Exception $e) {
+			Logger::error("Call to Grader::grade() failed:");
+			Logger::error($e);
+		}
+
+		$response = array();
+		$response['status'] = 'ok';
+		
+		// If the run belongs to a contest, we need to invalidate that cache		
+		try {
+			$contest = ContestsDAO::getByPK(self::$run->getContestId());
+			
+			if (!is_null($contest)) {
+				self::InvalidateScoreboardCache($contest->getContestId());
+			}
+		} catch (Exception $e) {
+			// We did our best effort to invalidate the cache...
+			Logger::error($e);			
+		}
+
+		return $response;	
 	}
 
 	/**
@@ -347,7 +394,6 @@ class RunController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiAdminDetails(Request $r) {
-
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
@@ -402,7 +448,7 @@ class RunController extends Controller {
 		$response['cases'] = $cases;
 		$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
 		$response["status"] = "ok";
-		
+
 		return $response;
 	}
 
@@ -445,7 +491,6 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiSource(Request $r) {
-
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
@@ -465,10 +510,9 @@ class RunController extends Controller {
 		if (file_exists("$grade_dir.err")) {
 			$response['compile_error'] = file_get_contents("$grade_dir.err");
 		}
-		
+
 		$response["status"] = "ok";
 		return $response;
 	}
 
 }
-

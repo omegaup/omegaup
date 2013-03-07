@@ -15,7 +15,10 @@ abstract class ContestsUsersDAOBase extends DAO
 		private static $loadedRecords = array();
 
 		private static function recordExists(  $user_id, $contest_id ){
-			return false;
+			if (self::$useDAOCache !== true) {
+				return false;
+			}
+			
 			$pk = "";
 			$pk .= $user_id . "-";
 			$pk .= $contest_id . "-";
@@ -196,7 +199,7 @@ abstract class ContestsUsersDAOBase extends DAO
 	  *	
 	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
 	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
+	  * aqui, sin embargo. El valor de retorno indica cuï¿½ntas filas se vieron afectadas.
 	  *	
 	  * @internal private information for advanced developers only
 	  * @return Filas afectadas o un string con la descripcion del error

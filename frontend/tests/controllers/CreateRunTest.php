@@ -9,8 +9,7 @@ require_once 'ProblemsFactory.php';
 require_once 'ContestsFactory.php';
 
 class CreateRun extends OmegaupTestCase {
-
-	private $graderMock;
+	
 	private $contestData;
 	private $contestant;
 
@@ -61,39 +60,7 @@ class CreateRun extends OmegaupTestCase {
 		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
 
 		return $r;
-	}
-
-	/**
-	 * Detours the Grader calls.
-	 * Problem: Submiting a new run invokes the Grader::grade() function which makes 
-	 * a HTTP call to official grader using CURL. This call will fail if grader is
-	 * not turned on. We are not testing the Grader functionallity itself, we are
-	 * only validating that we populate the DB correctly and that we make a call
-	 * to the function Grader::grade(), without executing the contents.
-	 * 
-	 * Solution: We create a phpunit mock of the Grader class. We create a fake 
-	 * object Grader with the function grade() which will always return true
-	 * and expects to be excecuted once.	 
-	 *
-	 */
-	private function detourGraderCalls($times = null) {
-
-		if (is_null($times)) {
-			$times = $this->once();
-		}
-
-		// Create a fake Grader object which will always return true (see
-		// next line)
-		$this->graderMock = $this->getMock('Grader', array('Grade'));
-
-		// Set expectations: 
-		$this->graderMock->expects($times)
-				->method('Grade')
-				->will($this->returnValue(true));
-
-		// Detour all Grader::grade() calls to our mock
-		RunController::$grader = $this->graderMock;
-	}
+	}	
 
 	/**
 	 * Validate a run
@@ -228,7 +195,7 @@ class CreateRun extends OmegaupTestCase {
 	 */
 	public function testInvalidRunInsideSubmissionsGap() {
 
-		// This API requires DAO cache be turned off 
+		// This API test requires DAO cache be turned off 
 		ContestsDAO::$useDAOCache = false;
 
 		// Set the context

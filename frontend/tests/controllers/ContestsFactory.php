@@ -139,6 +139,13 @@ class ContestsFactory {
 		
 		unset($_REQUEST);		
 	}
+	
+	public static function makeContestWindowLength($contestData, $windowLength = 20) {
+		
+		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
+        $contest->setWindowLength($windowLength);
+        ContestsDAO::save($contest);		
+	}
 
 }
 

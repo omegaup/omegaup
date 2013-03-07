@@ -749,6 +749,44 @@ class ContestController extends Controller {
 	}
 
 	/**
+	 * Returns the Scoreboard events
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 */
+	public static function apiScoreboardEvents(Request $r) {
+		// Get the current user
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		try {
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null(self::$contest)) {
+			throw new NotFoundException();
+		}
+
+		// Create scoreboard
+		$scoreboard = new Scoreboard(
+						self::$contest->getContestId(),
+						Authorization::IsContestAdmin($r["current_user_id"], self::$contest)
+		);
+
+		// Push scoreboard data in response
+		$response = array();
+		$response["events"] = $scoreboard->events();
+
+		return $response;
+	}
+
+	/**
 	 * Returns the Scoreboard
 	 * 
 	 * @param Request $r
@@ -1010,10 +1048,122 @@ class ContestController extends Controller {
 
 		// Happy ending
 		$response = array();
-		$response["status"] = 'ok';				
+		$response["status"] = 'ok';
 
 		Logger::log("Contest updated (alias): " . $r['contest_alias']);
-		
+
+		return $response;
+	}
+
+	/**
+	 * Validates runs API
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateRuns(Request $r) {
+
+		$r["offset"] = 0;
+		$r["rowcount"] = 100;
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		try {
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["contest"])) {
+			throw new NotFoundException("Contest not found.");
+		}
+
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			throw new ForbiddenAccessException();
+		}
+
+		Validators::isNumber($r["offset"], "offset", false);
+		Validators::isNumber($r["rowcount"], "rowcount", false);
+		Validators::isInEnum($r["status"], "status", array('new', 'waiting', 'compiling', 'running', 'ready'), false);
+		Validators::isInEnum($r["veredict"], "veredict", array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"), false);
+
+
+		// Check filter by problem, is optional
+		if (!is_null($r["problem_alias"])) {
+			Validators::isStringNonEmpty($r["problem_alias"], "problem");
+
+			try {
+				$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			if (is_null($r["problem"])) {
+				throw new NotFoundException("Problem not found.");
+			}
+		}
+
+		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj'), false);
+	}
+
+	/**
+	 * Returns all runs for a contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRuns(Request $r) {
+
+		// Authenticate request
+		self::authenticateRequest($r);
+
+		// Validate request
+		self::validateRuns($r);
+
+		$runs_mask = null;
+
+		// Get all runs for problem given        
+		$runs_mask = new Runs(array(
+					"contest_id" => $r["contest"]->getContestId(),
+					"status" => $r["status"],
+					"veredict" => $r["veredict"],
+					"problem_id" => !is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
+					"language" => $r["language"]
+				));
+
+		// Filter relevant columns
+		$relevant_columns = array("run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
+
+		// Get our runs
+		try {
+			$runs = RunsDAO::search($runs_mask, "time", "DESC", $relevant_columns, $r["offset"], $r["rowcount"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}				
+
+		$relevant_columns[11] = 'username';
+		$relevant_columns[12] = 'alias';
+
+		$result = array();
+
+		foreach ($runs as $run) {
+			$filtered = $run->asFilteredArray($relevant_columns);
+			$filtered['time'] = strtotime($filtered['time']);
+			$filtered['score'] = round((float) $filtered['score'], 4);
+			$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
+			array_push($result, $filtered);
+		}
+
+		$response = array();
+		$response["runs"] = $result;
+		$response["status"] = "ok";
+
 		return $response;
 	}
 

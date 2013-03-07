@@ -39,6 +39,7 @@ object GraderData {
 			new Run(
 				id = rs.getLong("run_id"),
 				guid = rs.getString("guid"),
+				user = rs.getLong("user_id"),
 				language = Language.withName(rs.getString("language")),
 				status = Status.withName(rs.getString("status")),
 				veredict = Veredict.withName(rs.getString("veredict")),
