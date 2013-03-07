@@ -410,8 +410,6 @@ class ProblemController extends Controller {
 	 */
 	public static function apiCreate(Request $r) {
 
-		DAO::transBegin();
-
 		self::authenticateRequest($r);
 
 		// Validates request
@@ -472,8 +470,7 @@ class ProblemController extends Controller {
 
 		// Invalidar cache
 		$contestCache = new Cache(Cache::CONTEST_INFO, $r["contest_alias"]);
-		$contestCache->delete();
-		DAO::transEnd();
+		$contestCache->delete();		
 
 		return $result;
 	}
