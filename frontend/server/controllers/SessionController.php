@@ -191,8 +191,9 @@ class SessionController extends Controller {
 		//query, so i dont have to be testing 
 		//facebook sessions on every single petition
 		//made from the front-end
-		if (!isset($_GET["state"])) {
-			Logger::log("Not logged in and no need to check for fb session");
+		if (isset($_GET["state"])) {
+			Logger::log("Checking for fb session");
+		}else{
 			return false;
 		}
 
@@ -203,7 +204,9 @@ class SessionController extends Controller {
 		// Get User ID
 		$fb_user = $facebook->getUser();
 
+
 		if($fb_user == 0){
+				Logger::log("FB session unavailable.");
 				return false;
 		}
 
@@ -214,16 +217,15 @@ class SessionController extends Controller {
 		// Facebook, but we don't know if the access token is valid. An access
 		// token is invalid if the user logged out of Facebook.
 
-		if ($fb_user) {
-			try {
-				// Proceed knowing you have a logged in user who's authenticated.
-				$fb_user_profile = $facebook->api('/me');
+		try {
+			// Proceed knowing you have a logged in user who's authenticated.
+			$fb_user_profile = $facebook->api('/me');
 
-			} catch (FacebookApiException $e) {
-				$fb_user = null;
-				Logger::error("FacebookException:" . $e);
-				return false;
-			}
+		} catch (FacebookApiException $e) {
+			$fb_user = null;
+			Logger::error("FacebookException:" . $e);
+			return false;
+
 		}
 
 		//ok we know the user is logged in,

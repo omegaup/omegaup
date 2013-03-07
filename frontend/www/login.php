@@ -24,6 +24,8 @@
 	if(isset($_GET["state"])) {
 		$c_Session = new SessionController;
 		$c_Session->LoginViaFacebook();
+
+		//die(header("Location: " . $_SERVER["PHP_SELF"] . "?shva=1"));
 	}
 
 	$smarty->display( '../templates/login.tpl' );
