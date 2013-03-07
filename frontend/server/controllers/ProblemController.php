@@ -315,13 +315,20 @@ class ProblemController extends Controller {
 	private static function validateZip() {
 
 		Logger::log("Validating zip...");
+
+		if(!array_key_exists("problem_contents", $_FILES)) {
+			throw new InvalidParameterException("problem_contents is invalid.");
+		}
+
 		if (isset($_FILES['problem_contents']) &&
 				!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
 			throw new InvalidParameterException("problem_contents is invalid.");
 		}
 
+
 		self::$filesToUnzip = array();
 		self::$casesFiles = array();
+
 		$value = $_FILES['problem_contents']['tmp_name'];
 
 
@@ -403,6 +410,8 @@ class ProblemController extends Controller {
 	 */
 	public static function apiCreate(Request $r) {
 
+		DAO::transBegin();
+
 		self::authenticateRequest($r);
 
 		// Validates request
@@ -464,6 +473,7 @@ class ProblemController extends Controller {
 		// Invalidar cache
 		$contestCache = new Cache(Cache::CONTEST_INFO, $r["contest_alias"]);
 		$contestCache->delete();
+		DAO::transEnd();
 
 		return $result;
 	}

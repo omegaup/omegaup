@@ -9,9 +9,169 @@
 		</script>
 	</div>
 </div>
+
+
+
+
+
+<div class="post">
+	<div class="copy">
+
+		<progress></progress>
+
+		<h2>Nuevo problema</h2>
+
+		<form enctype="multipart/form-data" id="newProbForm">
+		<table id="newprob" width="100%">
+		<tr>
+		<td class="info">
+			<b>Title</b>
+			<p>El titulo que tendrá el problema</p>
+		</td>
+		<td>
+			<input id="title" type="text">
+		</td>
+		<td class="info">
+			<b>Alias</b>
+			<p>Almacenar&aacute; el token necesario para acceder al problema</p>
+		</td>
+		<td>
+			<input id='alias' name='alias' value='' type='text'>
+		</td>
+		</tr>
+		<tr>
+		<td class="info">
+			<b>Public</b>
+			
+		</td>
+		<td>
+			<select id="public">
+				<option value="1">Si</option>
+				<option value="0">No</option>
+			</select>
+		</td>
+		<td class="info">
+			<b>Validator</b>
+			
+		</td>
+		<td>
+			<select id="validator">
+				<option>remote</option>
+				<option>literal</option>
+				<option>token</option>
+				<option>token-caseless</option>
+				<option>token-numeric</option>
+			</select>
+		</td>
+		</tr>
+		<tr>
+		<td class="info">
+			<b>time_limit</b>
+			
+		</td>
+		<td>
+			<input id="time_limit" type="text">
+		</td>
+		<td class="info">
+			<b>memory limit</b>
+		</td>
+		<td>
+			<input id="memory_limit" type="text">
+		</td>
+		</tr>
+		<tr>
+		<td class="info">
+			<b>source</b>
+			
+		</td>
+		<td>
+			<input id="source" type="text">
+		</td>
+		<td class="info">
+			<b>zip</b>
+		</td>
+		<td>
+			<input name="problem_contents" type="file" />
+		</td>
+		</tr>
+		<tr>
+		<td class="info">
+		</td>
+		<td>
+		</td>
+		<td class="info">
+		</td>
+		<td>
+			<div class="POS Boton" onClick="sendProb()">Enviar Problema</div>
+		</td>
+		</tr>
+	</table>
+	<input id="order" type="hidden" value="normal">
+</form>
+
+		<script type="text/javascript">
+
+			$(':file').change(function() {
+			    var file = this.files[0];
+			    name = file.name;
+			    size = file.size;
+			    type = file.type;
+			});
+
+
+			function progressHandlingFunction(e) {
+
+			}
+
+			function beforeSendHandler () {
+
+			}
+
+			function sendProb(){
+			   var formData = new FormData($('#newProbForm')[0]);
+			   formData.append("author_username", "alanboy");
+			   formData.append("title", "tit" + parseInt( Math.random() * 100 ));
+			   formData.append("alias", "ali" +  parseInt( Math.random() * 100 ));
+			   formData.append("source", "asdf");
+			   formData.append("public", "1");
+			   formData.append("validator", "literal"); // //remote, literal, token, token-caseless, token-numeric
+			   formData.append("time_limit", "2");
+			   formData.append("memory_limit", "2");
+			   formData.append("order", "normal");
+
+			    $.ajax({
+			        url: '/api/problem/create',  //server script to process data
+			        type: 'POST',
+			        xhr: function() {  // custom xhr
+			            myXhr = $.ajaxSettings.xhr();
+			            if(myXhr.upload){ // check if upload property exists
+			                myXhr.upload.addEventListener('progress',progressHandlingFunction, false); // for handling the progress of the upload
+			            }
+			            return myXhr;
+			        },
+			        //beforeSend: beforeSendHandler,
+			        //success: completeHandler,
+			        //error: errorHandler,
+			        // Form data
+			        data: formData,
+			        //Options to tell JQuery not to process data or worry about content-type
+			        cache: false,
+			        contentType: false,
+			        processData: false
+			    });
+
+			}
+		</script>
+	</div>
+</div>
+
+
+
+
+
 <div class="post">
 	<div class="copy wait_for_ajax" id="contest_details" >
-<table id="main" width="100%">
+		<table id="main" width="100%">
 			<tr>
 			<!-- ----------------------------------------- -->
 				<td class="info">

@@ -11,6 +11,9 @@ class FileHandler {
 	}
 
 	static function GetFileUploader() {
+		if(is_null(self::$fileUploader)){
+			self::$fileUploader = new FileUploader();
+		}
 		return self::$fileUploader;
 	}
 
@@ -82,5 +85,3 @@ class FileHandler {
 	}
 
 }
-
-?>

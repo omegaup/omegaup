@@ -190,7 +190,6 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 			callback({status:'error', 'error':undefined});
 		}
 	});
-
 };
 
 OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
@@ -199,6 +198,26 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	$.post(
 		'/api/problem/details/contest_alias/' + contestAlias + '/problem_alias/' + problemAlias + '/',
 		{lang:"es"},
+		function (problem) {
+			if (problem.runs) {
+				for (var i = 0; i < problem.runs.length; i++) {
+					problem.runs[i].time = self.time(problem.runs[i].time * 1000);
+				}
+			}
+			callback(problem);
+		},
+		'json'
+	);
+};
+
+OmegaUp.prototype.createProblem = function(contestAlias, problemAlias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/create/',
+		{
+			"author_username" : 0
+		},
 		function (problem) {
 			if (problem.runs) {
 				for (var i = 0; i < problem.runs.length; i++) {

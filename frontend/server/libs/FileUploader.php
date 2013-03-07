@@ -13,5 +13,3 @@ class FileUploader
         return move_uploaded_file($filename, $targetPath);
     }
 }
-
-?>
