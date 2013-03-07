@@ -55,7 +55,7 @@ omegaup_test.log
 # Ignore runtime and test stuff
 */test-env
 frontend/www/templates_c
-omegaup/
+/omegaup/
 bin/grader.sh
 
 # Ignore Mac crap :P
