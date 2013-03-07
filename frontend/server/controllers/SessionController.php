@@ -99,8 +99,8 @@ class SessionController extends Controller {
 			'valid' => true,
 			'id' => $vo_CurrentUser->getUserId(),
 			'name' => $vo_CurrentUser->getName(),
-			'email' => $vo_Email->getEmail(),
-			'email_md5' => md5($vo_Email->getEmail()),
+			'email' => !is_null($vo_Email->getEmail()) ? $vo_Email->getEmail() : '',
+			'email_md5' => !is_null($vo_Email->getEmail()) ? md5($vo_Email->getEmail()) : '',
 			'username' => $vo_CurrentUser->getUsername(),
 			'auth_token' => $s_AuthToken,
 			'is_admin' => Authorization::IsSystemAdmin($vo_CurrentUser->getUserId())
