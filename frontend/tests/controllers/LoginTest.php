@@ -201,6 +201,11 @@ class LoginTest extends OmegaupTestCase {
 						
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertLogin($user, $response["auth_token"]);
+		
+		$response = UserController::apiLogin($r);
+		
+		$this->assertEquals("ok", $response["status"]);
+		$this->assertLogin($user, $response["auth_token"]);
 	}
 }
 
