@@ -433,12 +433,17 @@ class ProblemController extends Controller {
 
 		// Insert new problem
 		try {
+			
+			ProblemsDAO::transBegin();
 
 			// Save the contest object with data sent by user to the database
 			ProblemsDAO::save($problem);
 
 			// Create file after we know that alias is unique
 			self::deployProblemZip(self::$filesToUnzip, self::$casesFiles, $r);
+			
+			ProblemsDAO::transEnd();
+			
 		} catch (ApiException $e) {
 
 			// Operation failed in the data layer, rollback transaction 
