@@ -48,18 +48,6 @@
 						</tr>
 						<!-- ----------------------------------------- -->
 						<tr>
-							<td colspan=2>
-							</td>
-							<td colspan=2>
-								<input value='Agendar concurso basico' type='submit'>
-							</td>
-						</tr>
-						<tr>
-							<td colspan=4>
-								<hr>
-							</td>
-						</tr>
-						<tr>
 							<!-- ----------------------------------------- -->
 							<td class="info">
 								<b>Descripci&oacute;n</b>
@@ -209,7 +197,7 @@
 							<td>
 							</td>
 							<td align='right'>
-								<input value='Agendar concurso' type='submit'>
+								<input value='Agendar concurso' type='submit' class="OK">
 							</td>
 						</tr>
 						<!-- ----------------------------------------- -->
