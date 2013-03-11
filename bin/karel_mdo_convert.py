@@ -3,6 +3,10 @@
 import struct
 import sys
 
+if len(sys.argv) == 1:
+	print "python karel_mdo_convert.py mundo.mdo"
+	sys.exit(1)
+
 f = open(sys.argv[1], "rb")
 data = f.read()
 f.close()
@@ -21,8 +25,8 @@ for extension in ("kec", "KEC"):
 		kec = f.read()
 		f.close()
 		break
-	except Exception, e:
-		print e
+	except Exception:
+		pass
 
 if not kec:
 	print "%s.kec not found" % worldname
