@@ -244,6 +244,7 @@
 	</div>
 </div>
 <script>
+	$("#start_time, #finish_time").datetimepicker();
 	$('.new_contest_form').submit(function() {
 		omegaup.createContest(
 					$(".new_contest_form #title").val(),

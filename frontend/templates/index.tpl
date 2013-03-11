@@ -6,8 +6,9 @@
 	<table>
 	<tr>
 		<td>
-			<div class="post footer" style="width: 560px; min-height: 300px;">
+			<div class="post footer" style="width: 560px; min-height: 400px;">
 				<div class="copy">
+					omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en America Latina mediante la resolucion de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.
 				</div>
 			</div>
 		</td>

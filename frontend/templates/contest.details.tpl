@@ -7,6 +7,7 @@
 			var a = window.location.pathname.split("/");
 			document.write('<a href="/arena/'+ a[a.length-1] +'"><div class="POS Boton" >Ir al concurso</div></a>');
 		</script>
+		<div class="POS Boton">Agregar problema</div>
 	</div>
 </div>
 
@@ -14,7 +15,7 @@
 
 
 
-<div class="post">
+<div class="post" style="display:none;" id="problem_upload_window">
 	<div class="copy">
 
 		<progress></progress>

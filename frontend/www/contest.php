@@ -4,6 +4,4 @@
 
 	$contes_alias = $_REQUEST["alias"];
 
-	
-
 	$smarty->display( '../templates/contest.details.tpl' );

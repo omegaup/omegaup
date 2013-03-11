@@ -106,9 +106,8 @@ div.post {
     border-radius: 4px;
     position: relative;
     top: -31px;
-	padding-bottom :15px; 
-
 }
+
 div.post a {
     color: #8bb0d3;
     text-decoration: none;
@@ -208,7 +207,6 @@ div.copy pre code {
     color: #777;
 }
 div.footer {
-    color: #aaa;
     font-size: 13px;
 }
 div.footer div.date { padding: 1px 50px 45px }
@@ -290,6 +288,10 @@ table{
 
 td{
 	padding: 5px;
+}
+
+tr{
+	vertical-align: top
 }
 
 #markdownSource {
