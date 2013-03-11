@@ -22,8 +22,8 @@ if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 			<body style="padding:5px">
 				<h1>No config file.</h1>
 				<p>You are missing the config file. It must look something like this:</p>
-				<pre class="code">
-					<?php include ("config.php.sample"); ?>
+				<pre class="code" style="margin: 3em; border: 1px solid #000; background: #ccc;">
+<?php echo htmlspecialchars(file_get_contents(__DIR__ . "/config.php.sample")); ?>
 				</pre>
 			</body>
 		</html>
