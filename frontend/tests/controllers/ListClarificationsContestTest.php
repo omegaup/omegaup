@@ -5,9 +5,6 @@
  *
  * @author joemmanuel
  */
-require_once 'ProblemsFactory.php';
-require_once 'ContestsFactory.php';
-require_once 'ClarificationsFactory.php';
 
 class ListClarificationsContest extends OmegaupTestCase {
 

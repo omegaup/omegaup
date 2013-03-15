@@ -5,7 +5,6 @@
  *
  * @author joemmanuel
  */
-require_once 'ContestsFactory.php';
 
 class ArenaTest extends OmegaupUITestCase {
 	

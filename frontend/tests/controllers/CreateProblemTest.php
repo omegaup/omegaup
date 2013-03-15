@@ -5,8 +5,7 @@
  *
  * @author joemmanuel
  */
-require_once 'UserFactory.php';
-require_once 'ProblemsFactory.php';
+
 require_once 'libs/FileHandler.php';
 
 class CreateProblemTest extends OmegaupTestCase {

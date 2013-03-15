@@ -5,7 +5,6 @@
  *
  * @author joemmanuel
  */
-require_once 'UserFactory.php';
 
 class LoginUITest extends OmegaupUITestCase {
 

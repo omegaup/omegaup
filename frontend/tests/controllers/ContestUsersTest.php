@@ -6,7 +6,6 @@
  * @author joemmanuel
  */
 
-require_once 'ContestsFactory.php';
 
 class ContestUsersTest extends OmegaupTestCase {
 	

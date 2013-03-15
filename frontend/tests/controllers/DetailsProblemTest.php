@@ -6,9 +6,6 @@
  * @author joemmanuel
  */
 
-require_once 'ProblemsFactory.php';
-require_once 'ContestsFactory.php';
-require_once 'UserFactory.php';
 class DetailsProblem extends OmegaupTestCase {
 	
 	/**
