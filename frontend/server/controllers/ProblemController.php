@@ -988,6 +988,28 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Validate problem Details API
+	 * 
+	 * @param Request $r
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateRuns(Request $r) {
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		// Is the problem valid?
+		try {
+			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (ApiException $apiException) {
+			throw $apiException;
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+	}
+
+	/**
 	 * Entry point for Problem runs API
 	 * 
 	 * @param Request $r
@@ -999,7 +1021,7 @@ class ProblemController extends Controller {
 		self::authenticateRequest($r);
 
 		// Validate request
-		self::validateDetails($r);
+		self::validateRuns($r);
 
 		$response = array();
 
