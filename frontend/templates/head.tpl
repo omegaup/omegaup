@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <!-- @see this later for localization http://www.smarty.net/docs/en/language.function.config.load.tpl -->
-
-<html xmlns="http://www.w3.org/1999/xhtml " xmlns:fb="http://www.facebook.com/2008/fbml ">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<title>OmegaUp | {#pageTitle#}</title>
@@ -20,6 +19,12 @@
 
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.16.custom.css">
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-timepicker-addon.css">
+{if $LOAD_MATHJAX}
+{literal}
+		<script type="text/javascript" src="https://d3eoax9i5htok0.cloudfront.net/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+{/literal}
+{/if}
 	</head>
 	<body>
 		<div id="wrapper">
