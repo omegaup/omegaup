@@ -22,6 +22,7 @@
 	# ####################################
 	define('OMEGAUP_FRONTEND_SERVER_ROOT', OMEGAUP_ROOT . 'server/');
 	define('OMEGAUP_TEST_ROOT', '/Users/joemmanuel/Documents/omegaup/omegaup/frontend/tests/controllers/');
+	define('OMEGAUP_RESOURCES_ROOT', '/Users/joemmanuel/Documents/omegaup/omegaup/frontend/tests/resources/');
 	define('OMEGAUP_BASE_URL', 'http://localhost');
 
 	

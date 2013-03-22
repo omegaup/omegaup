@@ -129,7 +129,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	public function testValidProblemNoTestplan() {
 
 		// Get the problem data
-        $problemData = ProblemsFactory::getRequest("triangulos.zip");
+        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT."triangulos.zip");
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];
 
@@ -195,7 +195,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	public function testValidProblemWithNonUTF8CharsInStmt() {
 
 		// Get the problem data
-        $problemData = ProblemsFactory::getRequest("nonutf8stmt.zip");
+        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT."nonutf8stmt.zip");
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];
 

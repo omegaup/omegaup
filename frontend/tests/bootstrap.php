@@ -8,23 +8,23 @@
     // Load tess specific config globals
     require_once("test_config.php");
 
-	define("OMEGAUP_ROOT", __DIR__ . "/../../" );
+	define("OMEGAUP_ROOT", __DIR__ . "/../" );
 
 	// Load api caller
     require_once(OMEGAUP_ROOT."www/api/ApiCaller.php");
-	require_once("ApiCallerMock.php");
+	require_once("controllers/ApiCallerMock.php");
 	
     // Load test utils
-	require_once("OmegaupTestCase.php");
-	require_once("OmegaupUITestCase.php");
-    require_once("Utils.php");
+	require_once("controllers/OmegaupTestCase.php");
+	require_once("ui/OmegaupUITestCase.php");
+    require_once("common/Utils.php");
 	
 	// Load Factories
-	require_once '../factories/ProblemsFactory.php';
-	require_once '../factories/ContestsFactory.php';
-	require_once '../factories/ClarificationsFactory.php';
-	require_once '../factories/UserFactory.php';
-	require_once '../factories/RunsFactory.php';
+	require_once 'factories/ProblemsFactory.php';
+	require_once 'factories/ContestsFactory.php';
+	require_once 'factories/ClarificationsFactory.php';
+	require_once 'factories/UserFactory.php';
+	require_once 'factories/RunsFactory.php';
 
     // Clean previous log
     Utils::CleanLog();

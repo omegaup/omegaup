@@ -46,7 +46,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$r["problem_alias"] = $problemData["request"]["alias"];
 		
 		// Set file upload context
-        $_FILES['problem_contents']['tmp_name'] = "triangulos.zip";
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT."triangulos.zip";
 		
 		// Log in as contest director
 		$r["auth_token"] = $this->login($problemData["author"]);

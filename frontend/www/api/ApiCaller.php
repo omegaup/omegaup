@@ -1,6 +1,6 @@
 <?php
 
-require_once("../../server/bootstrap.php");
+require_once(__DIR__."/../../server/bootstrap.php");
 
 /**
  * Encapsulates calls to the API and provides initialization and

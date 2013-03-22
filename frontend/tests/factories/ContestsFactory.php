@@ -5,8 +5,6 @@
  *
  * @author joemmanuel
  */
-require_once 'UserFactory.php';
-require_once 'OmegaupTestCase.php';
 
 class ContestsFactory {
 

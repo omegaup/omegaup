@@ -40,13 +40,18 @@ class ProblemsFactory {
 	 * @param string $zipName
 	 * @return Array
 	 */
-    public static function getRequest($zipName = 'testproblem.zip', $title = null) {
+    public static function getRequest($zipName = null, $title = null) {
         
         $author = UserFactory::createUser();
         
         if (is_null($title)){
             $title = Utils::CreateRandomString();       
         }
+		
+		if (is_null($zipName)) {
+			$zipName = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
+		}
+		
         $alias = substr(Utils::CreateRandomString(), 0, 10);
         
 		$r = new Request();
@@ -70,8 +75,12 @@ class ProblemsFactory {
     /**
      * 
      */
-    public static function createProblem($zipName = 'testproblem.zip', $title = null) {
+    public static function createProblem($zipName = null, $title = null) {
         
+		if (is_null($zipName)) {
+			$zipName = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
+		}
+		
 		// Get a user
         $problemData = self::getRequest($zipName, $title);
 		$r = $problemData["request"];
