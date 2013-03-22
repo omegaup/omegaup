@@ -210,6 +210,23 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	);
 };
 
+OmegaUp.prototype.getProblemRuns = function(problemAlias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/runs/problem_alias/' + problemAlias + '/',
+		function (problem) {
+			if (problem.runs) {
+				for (var i = 0; i < problem.runs.length; i++) {
+					problem.runs[i].time = self.time(problem.runs[i].time * 1000);
+				}
+			}
+			callback(problem);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.createProblem = function(contestAlias, problemAlias, callback) {
 	var self = this;
 

@@ -48,18 +48,6 @@
 						</tr>
 						<!-- ----------------------------------------- -->
 						<tr>
-							<td colspan=2>
-							</td>
-							<td colspan=2>
-								<input value='Agendar concurso basico' type='submit'>
-							</td>
-						</tr>
-						<tr>
-							<td colspan=4>
-								<hr>
-							</td>
-						</tr>
-						<tr>
 							<!-- ----------------------------------------- -->
 							<td class="info">
 								<b>Descripci&oacute;n</b>
@@ -209,37 +197,17 @@
 							<td>
 							</td>
 							<td align='right'>
-								<input value='Agendar concurso' type='submit'>
+								<input value='Agendar concurso' type='submit' class="OK">
 							</td>
 						</tr>
 						<!-- ----------------------------------------- -->
 						</table>
-						<!--			
-								<h3>Problemas</h3>
-								<table class="problems">
-					                <thead><tr>
-					                    <th>Problema</th>
-					                    <th>Puntos</th>
-					                    <th></th>
-					                </tr></thead>
-					                <tbody>
-					                    <tr class="problem template">
-					                        <td><input type="text" class="problem-id" /></td>
-					                        <td><input type="number" class="problem-points" value="1" /></td>
-					                        <td><button class="problem-delete">&times; Borrar</button></td>
-					                    </tr>
-					                </tbody>
-					                <tfoot>
-					                    <tr>
-					                        <td colspan="3"><button class="add-problem">+ Agregar problema</button></td>
-					                    </tr>
-					                </tfoot>
-					            </table>
-					           -->
+						<!--
 						<div id="submit-wrapper">
 							<div id="response">
 							</div>
 						</div>
+						-->
 					</form>
 	</div>
 </div>
@@ -249,8 +217,8 @@
 		omegaup.createContest(
 					$(".new_contest_form #title").val(),
 					$(".new_contest_form #description").val(),
-					$(".new_contest_form #start_time").val(),
-					$(".new_contest_form #finish_time").val(),
+					(new Date($(".new_contest_form #start_time").val()).getTime()) / 1000,
+					(new Date($(".new_contest_form #finish_time").val()).getTime()) / 1000,
 					$(".new_contest_form #window_length").val(),
 					$(".new_contest_form #alias").val(),
 					$(".new_contest_form #points_decay_factor").val(),

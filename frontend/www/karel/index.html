@@ -1,0 +1,1086 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Karel</title>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+		<script src="jquery-ui-1.10.2.custom.min.js" ></script>
+		<script src="codemirror.js" ></script>
+		<script src="codemirror-karelpascal.js" ></script>
+		<link rel="stylesheet" href="codemirror.css">
+		<link rel="stylesheet" href="jquery-ui-1.10.2.custom.min.css">
+		<script src="karelpascal.js" ></script>
+		<script type="text/javascript">
+			var arrows = ['&#8678;', '&#8679;', '&#8680;', '&#8681;'];
+
+			var Karel = function(world) {
+				this.world = world;
+				
+				this.startstate = {
+					i: 0,
+					j: 0,
+					orientation: 0,
+					buzzers: 0
+				};
+				
+				this.state = {
+					i: 0,
+					j: 0,
+					orientation: 0,
+					buzzers: 0
+				};
+				
+				this.debug = false;
+			};
+
+			Karel.prototype.move = function(i, j) {
+				this.state.i = this.startstate.i = parseInt(i);
+				this.state.j = this.startstate.j = parseInt(j);
+			};
+
+			Karel.prototype.rotate = function(orientation) {
+				var orientations = ['OESTE', 'NORTE', 'ESTE', 'SUR'];
+				this.state.orientation = this.startstate.orientation = Math.max(0, orientations.indexOf(orientation));
+			};
+			
+			Karel.prototype.setBuzzers = function(buzzers) {
+				this.state.buzzers = this.startstate.buzzers = buzzers;
+			};
+			
+			Karel.prototype.load = function(opcodes) {
+				this.program = opcodes;
+				this.state = {
+					i: this.startstate.i,
+					j: this.startstate.j,
+					pc: 0,
+					sp: -1,
+					line: 0,
+					stack: [],
+					orientation: this.startstate.orientation,
+					buzzers: this.startstate.buzzers,
+					
+					// Flags
+					jumped: false,
+					running: true
+				};
+				if (this.debug) {
+					$('#log').append('<div>' + JSON.stringify(this.program) + '</div>');
+				}
+			};
+			
+			Karel.prototype.step = function() {
+				while (this.state.running) {
+					this.next();
+					
+					if (this.state.running && this.program[this.state.pc][0] == 'LINE') {
+						this.state.line = this.program[this.state.pc][1];
+						break;
+					}
+				}
+				
+				return this.state.running;
+			};
+			
+			Karel.prototype.next = function() {
+				if (!this.state.running) return;
+				
+				var world = this.world;
+				
+				var opcodes = {
+					'HALT': function(state, params) {
+						state.running = false;
+					},
+					
+					'LINE': function(state, params) {
+						state.line = params[0];
+					},
+					
+					'LEFT': function(state, params) {
+						state.orientation--;
+						if (state.orientation < 0) {
+							state.orientation = 3;
+						}
+					},
+					
+					'WORLDWALLS': function(state, params) {
+						state.stack.push(world.walls(state.i, state.j));
+					},
+					
+					'ORIENTATION': function(state, params) {
+						state.stack.push(state.orientation);
+					},
+					
+					'ROTL': function(state, params) {
+						var rot = state.stack.pop() - 1;
+						if (rot < 0) {
+							rot = 3;
+						}						
+						state.stack.push(rot);
+					},
+					
+					'ROTR': function(state, params) {
+						var rot = state.stack.pop() + 1;
+						if (rot > 3) {
+							rot = 0;
+						}						
+						state.stack.push(rot);
+					},
+					
+					'MASK': function(state, params) {
+						state.stack.push(1 << state.stack.pop());
+					},
+					
+					'NOT': function(state, params) {
+						state.stack.push((state.stack.pop() == 0) ? 1 : 0);
+					},
+					
+					'AND': function(state, params) {
+						state.stack.push((state.stack.pop() & state.stack.pop()) ? 1 : 0);
+					},
+					
+					'OR': function(state, params) {
+						state.stack.push((state.stack.pop() | state.stack.pop()) ? 1 : 0);
+					},
+					
+					'EQ': function(state, params) {
+						state.stack.push((state.stack.pop() == state.stack.pop()) ? 1 : 0);
+					},
+					
+					'EZ': function(state, params) {
+						if (state.stack.pop() == 0) {
+							state.error = params[0];
+							state.running = false;
+						}
+					},
+					
+					'JZ': function(state, params) {
+						if (state.stack.pop() == 0) {
+							state.pc += params[0];
+						}
+					},
+					
+					'JNZ': function(state, params) {
+						if (state.stack.pop() != 0) {
+							state.pc += params[0];
+						}
+					},
+					
+					'JLEZ': function(state, params) {
+						if (state.stack.pop() <= 0) {
+							state.pc += params[0];
+						}
+					},
+					
+					'JMP': function(state, params) {
+						state.pc += params[0];
+					},
+					
+					'FORWARD': function(state, params) {
+						var di = [0, 1, 0, -1];
+						var dj = [-1, 0, 1, 0];
+						
+						state.i += di[state.orientation];
+						state.j += dj[state.orientation];
+					},
+					
+					'WORLDBUZZERS': function(state, params) {
+						state.stack.push(world.buzzers(state.i, state.j));
+					},
+					
+					'BAGBUZZERS': function(state, params) {
+						state.stack.push(state.buzzers);
+					},
+					
+					'PICKBUZZER': function(state, params) {
+						world.pickBuzzer(state.i, state.j);
+						if (state.buzzers != -1) {
+							state.buzzers++;
+						}
+					},
+					
+					'LEAVEBUZZER': function(state, params) {
+						world.leaveBuzzer(state.i, state.j);
+						if (state.buzzers != -1) {
+							state.buzzers--;
+						}
+					},
+					
+					'LOAD': function(state, params) {
+						state.stack.push(params[0]);
+					},
+					
+					'POP': function(state, params) {
+						state.stack.pop();
+					},
+					
+					'DUP': function(state, params) {
+						state.stack.push(state.stack[state.stack.length - 1]);
+					},
+					
+					'DEC': function(state, params) {
+						state.stack.push(state.stack.pop() - 1);
+					},
+					
+					'INC': function(state, params) {
+						state.stack.push(state.stack.pop() + 1);
+					},
+					
+					'CALL': function(state, params) {
+						// sp, pc, param
+						var param = state.stack.pop();
+						var newSP = state.stack.length;
+						
+						state.stack.push(state.sp);
+						state.stack.push(state.pc);
+						state.stack.push(param);
+						
+						state.sp = newSP;
+						state.pc = params[0];
+						state.jumped = true;
+					},
+					
+					'RET': function(state, params) {
+						var oldSP = state.sp;
+						state.pc = state.stack[state.sp + 1];
+						state.sp = state.stack[state.sp];
+						
+						while (state.stack.length > oldSP) {
+							state.stack.pop();
+						}
+					},
+					
+					'PARAM': function(state, params) {
+						state.stack.push(state.stack[state.sp + 2 + params[0]]);
+					},
+				};
+				
+				try {
+					var opcode = this.program[this.state.pc];
+					if (!opcodes[opcode[0]]) {
+						this.state.running = false;
+						if (this.debug) {
+							$('#log').append('<div class="opcode">Missing opcode ' + opcode[0] + '</div>');
+							$("#log").scrollTop($("#log")[0].scrollHeight);
+						}
+						return false;
+					}
+					
+					opcodes[opcode[0]](this.state, opcode.slice(1));
+				
+					if (this.state.jumped) {
+						this.state.jumped = false;
+					} else {
+						this.state.pc += 1;
+					}
+					
+					if (this.debug) {
+						$('#log').append('<div class="opcode">' + JSON.stringify(opcode) + ')</div>');
+						$('#log').append('<div>' + JSON.stringify(this.state) + '</div>');
+						$("#log").scrollTop($("#log")[0].scrollHeight);
+					}
+				} catch (e) {
+					this.state.running = false;
+					throw e;
+				}
+				
+				return true;
+			};
+
+			var World = function(elem, code, w, h) {
+				this.w = w;
+				this.h = h;
+				this.di = 0;
+				this.dj = 0;
+				this.karel = new Karel(this);
+				this.map = new Int16Array(new ArrayBuffer(100 * 100 * 2));
+				this.currentMap = new Int16Array(new ArrayBuffer(100 * 100 * 2));
+				this.wallmap = new Uint8Array(new ArrayBuffer(100 * 100));
+				this.dirty = true;
+				
+				this.root = $(elem);
+				
+				var self = this;
+				self.running = false;
+				self.interval = null;
+				self.lastActiveLine = 0;
+				self.breakpoints = {};
+				
+				self.editor = CodeMirror.fromTextArea(code, {
+					mode: 'text/x-karelpascal',
+					lineNumbers: true,
+					tabSize: 4,
+					gutters: ["CodeMirror-linenumbers", "breakpoints"]
+				});
+				
+				self.editor.on("gutterClick", function(cm, n) {
+					var info = cm.lineInfo(n);
+					cm.setGutterMarker(n, "breakpoints", info.gutterMarkers ? null : makeMarker());
+					self.breakpoints[n] = info.gutterMarkers ? false : true;
+				});
+
+				function makeMarker() {
+					var marker = document.createElement("div");
+					marker.innerHTML = "&#9679;";
+					marker.className = "breakpoint";
+					return marker;
+				}
+				
+				function step() {
+					if (!self.karel.step()) {
+						clearInterval(self.interval);
+						self.interval = null;
+						self.running = false;
+						
+						$('.toolbar .play', self.root).button("option", { label: 'play', icons: {primary: 'ui-icon-play'}});
+					}
+					
+					self.redraw();
+				
+					self.editor.removeLineClass(self.lastActiveLine, 'text', 'active');
+					self.lastActiveLine = self.karel.state.line;
+					self.editor.addLineClass(self.lastActiveLine, 'text', 'active');
+					self.editor.scrollIntoView({line: self.lastActiveLine, pos: 0}, 5);
+					
+					if (self.breakpoints[self.lastActiveLine] || self.karel.debug) { 
+						clearInterval(self.interval);
+						self.interval = null;
+					}
+				}
+				
+				self.root.append(
+					$('<div>')
+						.attr('class', "toolbar ui-widget-header ui-corner-all")
+						.append($('<button>')
+							.addClass('play')
+							.button({
+								text: false,
+								label: 'play',
+								icons: {
+									primary: "ui-icon-play"
+								}
+							})
+							.click(function() {
+								if (!self.running) {
+									$(this).button("option", { label: 'pause', icons: {primary: 'ui-icon-pause'}});
+									
+									self.reset();
+									self.karel.load(new karelpascal.Parser().parse(self.editor.getValue()));
+									self.running = true;
+					
+									self.interval = setInterval(step, 50);
+								} else {
+									$(this).button("option", { label: 'play', icons: {primary: 'ui-icon-play'}});
+									
+									if (self.interval) {
+										clearInterval(self.interval);
+										self.interval = null;
+									}
+								}
+							})
+						)
+						.append($('<button>')
+							.addClass('step')
+							.button({
+								text: false,
+								label: 'step',
+								icons: {
+									primary: "ui-icon-seek-end"
+								}
+							})
+							.click(function() {
+								if (!self.running) {
+									self.reset();
+									self.karel.load(new karelpascal.Parser().parse(self.editor.getValue()));
+									self.running = true;
+								}
+								
+								$('.toolbar .play', self.root).button("option", { label: 'play', icons: {primary: 'ui-icon-play'}});
+					
+								step();
+							})
+						)
+						.append($('<button>')
+							.addClass('run')
+							.button({
+								text: false,
+								label: 'run',
+								icons: {
+									primary: "ui-icon-seek-next"
+								}
+							})
+							.click(function() {
+								if (!self.running) {
+									self.reset();
+									self.karel.load(new karelpascal.Parser().parse(self.editor.getValue()));
+									self.running = true;
+								}
+					
+								while (self.karel.step() && !self.breakpoints[self.karel.state.line]);
+								self.redraw();
+								self.running = self.karel.state.running;
+																
+								$('.toolbar .play', self.root).button("option", { label: 'play', icons: {primary: 'ui-icon-play'}});
+					
+								self.editor.removeLineClass(self.lastActiveLine, 'text', 'active');
+								self.lastActiveLine = self.karel.state.line;
+								self.editor.addLineClass(self.lastActiveLine, 'text', 'active');
+								self.editor.scrollIntoView({line: self.lastActiveLine, pos: 0}, 5);
+							})
+						)
+						.append($('<button>')
+							.addClass('stop')
+							.button({
+								text: false,
+								label: 'stop',
+								icons: {
+									primary: "ui-icon-stop"
+								}
+							})
+							.click(function() {
+								self.running = false;
+								$('.toolbar .play', self.root).button("option", { label: 'play', icons: {primary: 'ui-icon-play'}});
+								if (self.interval) {
+									clearInterval(self.interval);
+									self.interval = null;
+								}
+								self.reset();
+							})
+						)
+						.append($('<input>')
+							.attr({'id': 'world_edit', 'type': 'checkbox'})
+							.click(function() {
+								var worldTable = $('table', self.root);
+								
+								if (!$(this).prop('checked')) {
+									worldTable.off('click');
+									worldTable.off('mousemove');
+							
+									worldTable.removeClass('edit');
+								} else {
+									worldTable.on('click', function (ev) {
+										var dx = ev.clientX - worldTable.offset().left;
+										var dy = ev.clientY - worldTable.offset().top;
+										var jj = Math.floor(dx / 31) - 1 - self.dj;
+										var ii = (20 - Math.floor(dy / 31) - 1) - self.di;
+
+										var orientation = 4;
+
+										if (ev.offsetX <= 10) {
+											orientation = 0;
+										} else if (ev.offsetY <= 10) {
+											orientation = 1;
+										} else if (ev.offsetX >= 20) {
+											orientation = 2;
+										} else if (ev.offsetY >= 20) {
+											orientation = 3;
+										}
+									
+										if (orientation != 4) {	
+											self.toggleWall(ii, jj, orientation);
+											self.dirty = true;
+											self.redraw();
+										} else {
+											(function(ii, jj, target, self) {
+												var buzzers = target.html();
+												target.html('');
+												var input = $('<input>')
+													.addClass('buzzer-edit')
+													.attr('type', 'text')
+													.val(buzzers)
+													.blur(function() {
+														self.setBuzzers(ii, jj, parseInt($(this).val()));
+														target.empty();
+														self.redraw();
+													})
+													.keypress(function(ev) {
+														if(!(0x30 <= ev.which && ev.which <= 0x39)) {
+															self.setBuzzers(ii, jj, parseInt($(this).val()));
+															target.empty();
+															self.redraw();
+														}
+													});
+												target.append(input);
+												input.focus().select();
+											})(ii, jj, $(ev.target), self);
+										}
+									});
+		
+									worldTable.on('mousemove', function (ev) {
+										var orientation = 4;
+
+										if (ev.offsetX <= 10) orientation = 0;
+										else if (ev.offsetY % 31 <= 10) orientation = 1;
+										else if (ev.offsetX >= 20) orientation = 2;
+										else if (ev.offsetY >= 20) orientation = 3;
+
+										var target = ev.target;
+										$(target).removeClass('west north east south none').addClass(['west', 'north', 'east', 'south', 'none'][orientation]);
+									});
+							
+									worldTable.addClass('edit');
+								}
+							})
+						)
+						.append($('<label for="world_edit">Editar</label>'))
+						.append($('<input>')
+							.attr('type', 'file')
+							.button()
+							.change(function (evt) {
+								var reader = new FileReader();
+								reader.onload = function(e) {
+									self.load(e.target.result);
+								};
+								reader.readAsText(evt.target.files[0], 'UTF-8');
+							})
+						)
+						.append($('<button>')
+							.addClass('export')
+							.button({
+								text: false,
+								label: 'export',
+								icons: {
+									primary: "ui-icon-copy"
+								}
+							})
+							.click(function() {
+								console.log(self.save());
+							})
+						)
+						.append($('<button>')
+							.addClass('left')
+							.button({
+								text: false,
+								label: 'left',
+								icons: {
+									primary: "ui-icon-arrowthick-1-w"
+								}
+							})
+							.click(function() {
+								self.dj++;
+								self.dirty = true;
+								self.redraw();
+							})
+						)
+						.append($('<button>')
+							.addClass('down')
+							.button({
+								text: false,
+								label: 'down',
+								icons: {
+									primary: "ui-icon-arrowthick-1-s"
+								}
+							})
+							.click(function() {
+								self.di++;
+								self.dirty = true;
+								self.redraw();
+							})
+						)
+						.append($('<button>')
+							.addClass('up')
+							.button({
+								text: false,
+								label: 'up',
+								icons: {
+									primary: "ui-icon-arrowthick-1-n"
+								}
+							})
+							.click(function() {
+								self.di--;
+								self.dirty = true;
+								self.redraw();
+							})
+						)
+						.append($('<button>')
+							.addClass('right')
+							.button({
+								text: false,
+								label: 'right',
+								icons: {
+									primary: "ui-icon-arrowthick-1-e"
+								}
+							})
+							.click(function() {
+								self.dj--;
+								self.dirty = true;
+								self.redraw();
+							})
+						)
+				);
+				
+				$('#world_edit	').button();
+				
+				var table = $('<table>');
+				
+				for (var i = 0; i < this.h; i++) {
+					var tr = $('<tr>');
+					tr.append($('<th>').addClass('row' + (this.h - i - 1)));
+					for (var j = 0; j < this.w; j++) {
+						var td = $('<td>').addClass('c' + (this.h - i - 1) + '_' + j).addClass('cell');
+						tr.append(td);
+					}
+					table.append(tr);
+				}
+				
+				var tr = $('<tr>');
+				tr.append($('<th>'));
+				for (var j = 0; j < this.w; j++) {
+					tr.append($('<th>').addClass('col' + j));
+				}
+				table.append(tr);
+				
+				this.root.append(table);
+				this.root.append($('<div>').addClass('karel'));
+				this.load($('script', this.root)[0].textContent);
+			};
+
+			World.prototype.cell = function(i, j) {
+				var ii = parseInt(i) + this.di;
+				var jj = parseInt(j) + this.dj;
+				if (0 <= ii && ii < this.h && 0 <= jj && jj < this.w) {
+					return $('.c' + ii + '_' + jj, this.root);
+				} else {
+					return null;
+				}
+			};
+			
+			World.prototype.walls = function(i, j) {
+				if (0 > i || i >= 100 || 0 > j || j >= 100) return 0;
+				return this.wallmap[100 * i + j];
+			};
+			
+			World.prototype.toggleWall = function(i, j, orientation) {
+				if (orientation < 0 || orientation >= 4 || 0 > i || i >= 100 || 0 > j || j >= 100) return;
+				this.wallmap[100 * i + j] ^= (1 << orientation);
+				
+				if (orientation == 0 && j > 1) {
+					this.wallmap[100 * i + (j - 1)] ^= (1 << 2);
+				} else if (orientation == 1 && i < 100) {
+					this.wallmap[100 * (i + 1) + j] ^= (1 << 3);
+				} else if (orientation == 2 && j < 100) {
+					this.wallmap[100 * i + (j + 1)] ^= (1 << 0);
+				} else if (orientation == 3 && i > 1) {
+					this.wallmap[100 * (i - 1) + j] ^= (1 << 1);
+				}
+				
+				this.dirty = true;
+			};
+			
+			World.prototype.addWall = function(i, j, orientation) {
+				if (orientation < 0 || orientation >= 4 || 0 > i || i >= 100 || 0 > j || j >= 100) return;
+				this.wallmap[100 * i + j] |= (1 << orientation);
+				
+				if (orientation == 0 && j > 1) this.wallmap[100 * i + (j - 1)] |= (1 << 2);
+				else if (orientation == 1 && i < 100) this.wallmap[100 * (i + 1) + j] |= (1 << 3);
+				else if (orientation == 2 && j < 100) this.wallmap[100 * i + (j + 1)] |= (1 << 0);
+				else if (orientation == 3 && i > 1) this.wallmap[100 * (i - 1) + j] |= (1 << 1);
+				
+				this.dirty = true;
+			};
+			
+			World.prototype.setBuzzers = function(i, j, count) {
+				if (0 > i || i >= 100 || 0 > j || j >= 100) return;
+				this.map[100 * i + j] = this.currentMap[100 * i + j] = count;
+				this.dirty = true;
+			};
+			
+			World.prototype.buzzers = function(i, j) {
+				if (0 > i || i >= 100 || 0 > j || j >= 100) return 0;
+				return this.currentMap[100 * i + j];
+			};
+			
+			World.prototype.pickBuzzer = function(i, j) {
+				if (0 > i || i >= 100 || 0 > j || j >= 100) return;
+				if (this.currentMap[100 * i + j] != -1)
+					this.currentMap[100 * i + j]--;
+				this.dirty = true;
+			};
+			
+			World.prototype.leaveBuzzer = function(i, j) {
+				if (0 > i || i >= 100 || 0 > j || j >= 100) return;
+				if (this.currentMap[100 * i + j] != -1)
+					this.currentMap[100 * i + j]++;
+				this.dirty = true;
+			};
+			
+			World.prototype.load = function(text) {
+				var self = this;
+				self.xml = $.parseXML(text);
+				
+				for (var i = 0; i < self.wallmap.length; i++) {
+					self.wallmap[i] = 0;
+				}
+				
+				for (var i = 0; i < self.map.length; i++) {
+					self.map[i] = self.currentMap[i] = 0;
+				}
+				
+				for (var i = 0; i < 100; i++) {
+					self.addWall(1, i, 3);
+					self.addWall(i, 1, 0);
+					self.addWall(99, i, 1);
+					self.addWall(i, 99, 2);
+				}
+				
+				$('monton', self.xml).each(function(index) {
+					var monton = $(this);
+					var i = parseInt(monton.attr('y'));
+					var j = parseInt(monton.attr('x'));
+					self.setBuzzers(i, j, parseInt(monton.attr('zumbadores')));
+				});
+				
+				$('pared', self.xml).each(function(index) {
+					var pared = $(this);
+					var i = parseInt(pared.attr('y1')) + 1;
+					var j = parseInt(pared.attr('x1')) + 1;
+					
+					if (pared.attr('x2')) {
+						var j2 = parseInt(pared.attr('x2')) + 1;
+						
+						if (j2 > j) self.addWall(i, j, 3);
+						else self.addWall(i, j2, 3);
+					} else if(pared.attr('y2')) {
+						var i2 = parseInt(pared.attr('y2')) + 1;
+						
+						if (i2 > i) self.addWall(i, j, 0);
+						else self.addWall(i2, j, 0);
+					}
+				});
+				
+				var programa = $('programa', this.xml);
+				self.di = self.h / 2 - parseInt(programa.attr('yKarel'));
+				self.dj = self.w / 2 - parseInt(programa.attr('xKarel'));
+				self.karel.rotate(programa.attr('direccionKarel'));
+				self.karel.move(parseInt(programa.attr('yKarel')), parseInt(programa.attr('xKarel')));
+				
+				self.reset();
+			};
+			
+			World.prototype.save = function() {
+				var root = this.xml;
+				var mundo = $('mundo', this.xml).empty();
+				
+				for (var i = 0; i < this.h; i++) {
+					for (var j = 0; j < this.w; j++) {
+						var buzzers = this.buzzers(i, j);
+						if (buzzers == -1) {
+							mundo.append($('<' + 'monton x="' + j + '" y="' + i + '" zumbadores="INFINITO" /' + '>'));
+						} else if (buzzers > 0) {
+							mundo.append($('<' + 'monton x="' + j + '" y="' + i + '" zumbadores="' + buzzers + '" /' + '>'));
+						}
+					}
+				}
+				
+				for (var i = 0; i < this.h; i++) {
+					for (var j = 0; j < this.w; j++) {
+						var walls = this.walls(i, j);
+						for (var k = 1; k < 16; k <<= 1) {
+							if ((walls & k) == k) {
+								mundo.append($('<' + 'pared x1="' + j + '" y1="' + i + '" zumbadores="INFINITO" /' + '>'));
+							}
+						}
+					}
+				}
+				
+				function serialize(xml, indentation) {
+					if (xml.nodeType == xml.TEXT_NODE) return "";
+					
+					var result = "";
+					for (var i = 0; i < indentation; i++) {
+						result += "\t";
+					}
+					var childResult = "";
+					
+					for (var i = 0; i < xml.childNodes.length; i++) {
+						childResult += serialize(xml.childNodes[i], indentation + 1);
+					}
+					
+					result += "&lt;" + xml.nodeName;
+					
+					for (var i = 0; i < xml.attributes.length; i++) {
+						result += ' ' + xml.attributes[i].name + '="' + xml.attributes[i].value + '"';
+					}
+					
+					if (childResult == "") {
+						result += " /&gt;\n";
+					} else {
+						result += ">\n";
+						result += childResult;
+						for (var i = 0; i < indentation; i++) {
+							result += "\t";
+						}
+						result += "&lt;/" + xml.nodeName + "&gt;\n";
+					}
+					return result;
+				}
+				
+				$('body').append($('<pre>').html(serialize(root.documentElement, 0)));
+			};
+			
+			World.prototype.reset = function() {
+				var self = this;
+				
+				self.di = self.h / 2 - this.karel.startstate.i;
+				self.dj = self.w / 2 - this.karel.startstate.j;
+				self.karel.state.orientation = self.karel.startstate.orientation;
+				self.karel.move(self.karel.startstate.i, self.karel.startstate.j);
+				
+				for (var i = 0; i < self.currentMap.length; i++) {
+					self.currentMap[i] = self.map[i];
+				}
+				
+				self.dirty = true;
+				self.redraw();
+			};
+
+			World.prototype.redraw = function() {
+				var self = this;
+				
+				var ii = self.karel.state.i + self.di;
+				var jj = self.karel.state.j + self.dj;
+				
+				if (ii < 3 || (ii + 3) >= self.h) {
+					self.di = self.h / 2 - self.karel.state.i;
+					self.dirty = true;
+				}
+				if (jj < 3 || (jj + 3) >= self.w) {
+					self.dj = self.w / 2 - self.karel.state.j;
+					self.dirty = true;
+				}
+
+				if (self.dirty) {
+					for (var i = 0; i < self.h; i++) {
+						$('.row' + i, self.root).html(i - self.di);
+						for (var j = 0; j < self.w; j++) {
+							var cell = $('.c' + i + '_' + j, self.root);
+							var ii = i - self.di;
+							var jj = j - self.dj;
+							var buzzers = self.buzzers(ii, jj);
+							if (buzzers == 0) {
+								cell.html('');
+							} else if (buzzers == -1) {
+								cell.html('&infin;');
+							} else {
+								cell.html(buzzers);
+							}
+							var walls = self.walls(ii, jj);
+							cell.css('border-left-color', (walls & 0x1) ? '#000' : '#ccc');
+							cell.css('border-top-color', (walls & 0x2) ? '#000' : '#ccc');
+							cell.css('border-right-color', (walls & 0x4) ? '#000' : '#ccc');
+							cell.css('border-bottom-color', (walls & 0x8) ? '#000' : '#ccc');
+						}
+					}
+					for (var j = 0; j < self.w; j++) {
+						$('.col' + j, self.root).html(j - self.dj);
+					}
+					self.dirty = false;
+				}
+
+				$('.karel', this.root).html(arrows[self.karel.state.orientation]);
+				var cell = self.cell(self.karel.state.i, self.karel.state.j);
+				if (cell) {
+					$('.karel', this.root).offset(cell.offset()).show();
+				} else {
+					$('.karel', this.root).hide();
+				}
+			};
+
+			$('body').ready(function() {
+				var world = new World(document.getElementById('world'), document.getElementById('source'), 20, 20);
+			});
+		</script>
+		<style type="text/css">
+			#world table { border-collapse: collapse; }
+			#world table, #world th, #world td { border: 1px solid #ccc; }
+			#world td { min-width: 30px; height: 30px; font-size: 10px; line-height: 30px; text-align: center; padding: 0; background: #eee; }
+			#world th { min-width: 30px; height: 30px; font-size: 10px; line-height: 30px; text-align: center; padding: 0; background: #fff; }
+			#world table.edit td.west:hover { background: url("data:image/png;encoding=utf-8;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QMQARM5SuUrswAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANUlEQVQI1y3HwQ0AIAgEwT2BxALov1ETzwfOb+RubEbVQvqXsBcRZGITASR7c84ESKoA7p0/Y+cNYdZpjgAAAAAASUVORK5CYII=") repeat-y; background-position: 0 0; }
+			#world table.edit td.north:hover { background: url("data:image/png;encoding=utf-8;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QMQARM5SuUrswAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANUlEQVQI1y3HwQ0AIAgEwT2BxALov1ETzwfOb+RubEbVQvqXsBcRZGITASR7c84ESKoA7p0/Y+cNYdZpjgAAAAAASUVORK5CYII=") repeat-x; background-position: 0 0; }
+			#world table.edit td.east:hover { background: url("data:image/png;encoding=utf-8;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QMQARM5SuUrswAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANUlEQVQI1y3HwQ0AIAgEwT2BxALov1ETzwfOb+RubEbVQvqXsBcRZGITASR7c84ESKoA7p0/Y+cNYdZpjgAAAAAASUVORK5CYII=") repeat-y; background-position: 100% 0;  }
+			#world table.edit td.south:hover { background: url("data:image/png;encoding=utf-8;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QMQARM5SuUrswAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANUlEQVQI1y3HwQ0AIAgEwT2BxALov1ETzwfOb+RubEbVQvqXsBcRZGITASR7c84ESKoA7p0/Y+cNYdZpjgAAAAAASUVORK5CYII=") repeat-x; background-position: 0 100%;  }
+			#world table.edit td.none:hover { background: #ccc; }
+			#world .buzzer-edit { width: 26px; height: 26px; margin: 0; padding: 0; border: 0; }
+			#world div.karel { position: absolute; font-size: 34px; line-height: 34px; min-width: 34px; text-align: center; }
+			#world .toolbar { padding: 4px; display: inline-block; font-size: 10px; }
+			/* support: IE7 */
+			*+html #world .toolbar { display: inline; }
+			
+			#source, .CodeMirror { position: absolute; top: 0px; left: 700px; width: 600px; height: 600px; }
+			#log { position: absolute; top: 610px; left: 700px; width: 600px; height: 100px; border: 1px solid #000; font-family: monospace; overflow-y: auto; }
+			.opcode { background: #eee; }
+			.down { font-weight: bold; }
+			
+			.breakpoints {width: .8em;}
+			.breakpoint { color: #822; }
+			.CodeMirror {border: 1px solid #aaa;}
+			.CodeMirror .active { background: #ff9; }
+			span.cm-builtin { color: #060 !important; }
+			span.cm-operator { color: #900 !important; }
+		</style>
+	</head>
+	<body>
+		<div id="world">
+		<script type="application/x-karel-input"><ejecucion>
+  <condiciones instruccionesMaximasAEjecutar="10000000" longitudStack="65000" />
+  <mundos>
+    <mundo nombre="mundo_0" ancho="100" alto="100">
+      <monton x="11" y="6" zumbadores="1"/>
+      <monton x="11" y="7" zumbadores="1"/>
+      <monton x="11" y="8" zumbadores="1"/>
+      <monton x="11" y="9" zumbadores="1"/>
+      <monton x="11" y="10" zumbadores="1"/>
+      <monton x="11" y="11" zumbadores="1"/>
+      <monton x="11" y="12" zumbadores="1"/>
+      <monton x="11" y="13" zumbadores="1"/>
+      <monton x="11" y="14" zumbadores="1"/>
+      <monton x="11" y="15" zumbadores="1"/>
+      <monton x="11" y="16" zumbadores="1"/>
+      <monton x="12" y="6" zumbadores="1"/>
+      <monton x="12" y="7" zumbadores="2"/>
+      <monton x="12" y="16" zumbadores="1"/>
+      <monton x="13" y="6" zumbadores="1"/>
+      <monton x="13" y="8" zumbadores="1"/>
+      <monton x="13" y="9" zumbadores="1"/>
+      <monton x="13" y="10" zumbadores="1"/>
+      <monton x="13" y="11" zumbadores="1"/>
+      <monton x="13" y="12" zumbadores="1"/>
+      <monton x="13" y="13" zumbadores="1"/>
+      <monton x="13" y="14" zumbadores="1"/>
+      <monton x="13" y="16" zumbadores="1"/>
+      <monton x="14" y="6" zumbadores="1"/>
+      <monton x="14" y="8" zumbadores="1"/>
+      <monton x="14" y="14" zumbadores="1"/>
+      <monton x="14" y="16" zumbadores="1"/>
+      <monton x="15" y="6" zumbadores="1"/>
+      <monton x="15" y="8" zumbadores="1"/>
+      <monton x="15" y="10" zumbadores="1"/>
+      <monton x="15" y="11" zumbadores="1"/>
+      <monton x="15" y="12" zumbadores="1"/>
+      <monton x="15" y="14" zumbadores="1"/>
+      <monton x="15" y="16" zumbadores="1"/>
+      <monton x="16" y="6" zumbadores="1"/>
+      <monton x="16" y="8" zumbadores="1"/>
+      <monton x="16" y="10" zumbadores="1"/>
+      <monton x="16" y="11" zumbadores="2"/>
+      <monton x="16" y="12" zumbadores="1"/>
+      <monton x="16" y="14" zumbadores="1"/>
+      <monton x="16" y="16" zumbadores="1"/>
+      <monton x="17" y="6" zumbadores="1"/>
+      <monton x="17" y="8" zumbadores="1"/>
+      <monton x="17" y="10" zumbadores="1"/>
+      <monton x="17" y="11" zumbadores="1"/>
+      <monton x="17" y="12" zumbadores="1"/>
+      <monton x="17" y="14" zumbadores="1"/>
+      <monton x="17" y="16" zumbadores="1"/>
+      <monton x="18" y="6" zumbadores="1"/>
+      <monton x="18" y="8" zumbadores="1"/>
+      <monton x="18" y="14" zumbadores="1"/>
+      <monton x="18" y="16" zumbadores="1"/>
+      <monton x="19" y="6" zumbadores="1"/>
+      <monton x="19" y="8" zumbadores="1"/>
+      <monton x="19" y="9" zumbadores="1"/>
+      <monton x="19" y="10" zumbadores="1"/>
+      <monton x="19" y="11" zumbadores="1"/>
+      <monton x="19" y="12" zumbadores="1"/>
+      <monton x="19" y="13" zumbadores="1"/>
+      <monton x="19" y="14" zumbadores="1"/>
+      <monton x="19" y="16" zumbadores="1"/>
+      <monton x="20" y="6" zumbadores="1"/>
+      <monton x="20" y="16" zumbadores="1"/>
+      <monton x="21" y="6" zumbadores="1"/>
+      <monton x="21" y="7" zumbadores="1"/>
+      <monton x="21" y="8" zumbadores="1"/>
+      <monton x="21" y="9" zumbadores="1"/>
+      <monton x="21" y="10" zumbadores="1"/>
+      <monton x="21" y="11" zumbadores="1"/>
+      <monton x="21" y="12" zumbadores="1"/>
+      <monton x="21" y="13" zumbadores="1"/>
+      <monton x="21" y="14" zumbadores="1"/>
+      <monton x="21" y="15" zumbadores="1"/>
+      <monton x="21" y="16" zumbadores="1"/>
+      <posicionDump x="16" y="11" />
+    </mundo>
+  </mundos>
+  <programas tipoEjecucion="CONTINUA" intruccionesCambioContexto="1" milisegundosParaPasoAutomatico="0">
+    <programa nombre="p1" ruta="{$2$}" mundoDeEjecucion="mundo_0" xKarel="12" yKarel="15" direccionKarel="ESTE" mochilaKarel="0" >
+      <despliega tipo="MUNDO" />
+    </programa>
+  </programas>
+</ejecucion></script></div>
+		<textarea id="source">iniciar-programa
+    define-nueva-instruccion gira-derecha como inicio
+        repetir 3 veces gira-izquierda;
+    fin;
+    
+    define-nueva-instruccion lado como inicio
+        mientras no-junto-a-zumbador hacer inicio
+            avanza;
+            si junto-a-zumbador entonces inicio
+            	coge-zumbador;
+                si junto-a-zumbador entonces inicio
+                    coge-zumbador;
+                fin sino inicio
+                    gira-izquierda;
+                    gira-izquierda;
+                    avanza;
+                    gira-izquierda;
+                    deja-zumbador;
+                fin;
+            fin;
+        fin;
+        avanza;
+    fin;
+    
+    define-nueva-instruccion cuadro como inicio
+        si junto-a-zumbador entonces inicio
+            coge-zumbador;
+            coge-zumbador;
+        fin;
+        
+        { Detecta si se est&aacute; en el centro de la diana. }
+        avanza;
+        si junto-a-zumbador entonces inicio
+            coge-zumbador;
+            si junto-a-zumbador entonces inicio
+                coge-zumbador;
+            fin sino inicio
+                deja-zumbador;
+                gira-izquierda;
+                gira-izquierda;
+                avanza;
+                mientras algun-zumbador-en-la-mochila hacer inicio
+                    deja-zumbador;
+            	    avanza;
+            	    deja-zumbador;
+            	    gira-izquierda;
+            	    gira-izquierda;
+            	    avanza;
+                fin;
+                apagate;
+            fin;
+        fin;
+        
+        repetir 4 veces inicio
+            si junto-a-zumbador entonces inicio
+               coge-zumbador;
+               coge-zumbador;
+            fin;
+            lado;
+        fin;
+        
+        { Avanza al siguiente nivel de la diana. }
+        avanza;
+        gira-derecha;
+        avanza;
+        avanza;
+        gira-izquierda;
+        
+        { Recursividad para hacer un ciclo infinito. }
+        cuadro;
+    fin;
+              
+    inicia-ejecucion
+        cuadro;
+    termina-ejecucion
+finalizar-programa</textarea>
+	</body>
+</html>
