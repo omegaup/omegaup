@@ -51,10 +51,10 @@ class ProblemController extends Controller {
 	 * @return type
 	 */
 	public static function getJudgesList() {
-		return array('uva' => "Universidad Valladolid |",
-			'livearchive' => "Live Archive |",
+		return array('uva' => "Universidad de Valladolid |",
+			'livearchive' => "ICPC Live Archive |",
 			'pku' => "Pekin University |",
-			'tju' => "<a href='?serv=tju'> Tianjing </a> |",
+			'tju' => " Tianjing University |",
 			'spoj' => "SPOJ");
 	}
 
@@ -881,7 +881,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiDetails(Request $r) {
-
 		// Get user
 		self::authenticateRequest($r);
 
@@ -984,6 +983,63 @@ class ProblemController extends Controller {
 
 		// Add the procesed runs to the request
 		$response["runs"] = $runs_filtered_array;
+		$response["status"] = "ok";
+		return $response;
+	}
+
+	/**
+	 * Validate problem Details API
+	 * 
+	 * @param Request $r
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateRuns(Request $r) {
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		// Is the problem valid?
+		try {
+			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (ApiException $apiException) {
+			throw $apiException;
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+	}
+
+	/**
+	 * Entry point for Problem runs API
+	 * 
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRuns(Request $r) {
+		// Get user
+		self::authenticateRequest($r);
+
+		// Validate request
+		self::validateRuns($r);
+
+		$response = array();
+
+		$keyrun = new Runs(array(
+					"user_id" => $r["current_user_id"],
+					"problem_id" => self::$problem->getProblemId()
+				));
+
+		// Get all the available runs
+		try {
+			$runs_array = RunsDAO::search($keyrun);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// Add the procesed runs to the request
+		$response["runs"] = $runs_array;
 		$response["status"] = "ok";
 		return $response;
 	}

@@ -238,10 +238,11 @@ class SessionController extends Controller {
 								new Users( array( 
 									"facebook_user_id" => $fb_user_profile["id"] 
 								) ) );
-	
-		if( count( $results ) == 1 ){
+		$results = UsersDAO::FindByEmail( $fb_user_profile["email"] );	
+
+		if( !is_null( $results ) ){
 			    //user has been here before with facebook!
-				$vo_User = $results[0];
+		   	$vo_User = $results;
 
 		}else{
 				//the user has never been here before, lets
@@ -252,12 +253,13 @@ class SessionController extends Controller {
 				$r = new Request(
 								array(
 									"name" => $fb_user_profile["name"],
+									"username" => str_replace(" ", "_", $fb_user_profile["name"] ),
 									"email" => $fb_user_profile["email"],
-									"fbid" => $fb_user_profile["id"]
+									"fbid" => $fb_user_profile["id"],
+									"password" => md5(time())
 								)
 							);
-				$res = UsersController::apiCreate($r);
-
+				$res = UserController::apiCreate($r);
 				$vo_User = UsersDAO::getByPK( $res["id_user"] );
 
 		}

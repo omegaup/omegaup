@@ -1,7 +1,7 @@
 	<div id="title">
 		<a href="index.php">
 		<div style="margin-left: 15%;">
-			<img src="/media/omegaup_curves.png">
+			<img src="/media/omegaup_curves.png" alt="OmegaUp">
 		</div>
 		</a>
 	</div>
