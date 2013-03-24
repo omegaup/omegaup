@@ -135,6 +135,7 @@ class SessionController extends Controller {
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
 
+		/*
 		//erase them
 		try {
 			$existingTokens = AuthTokensDAO::search($vo_AuthT);
@@ -147,7 +148,7 @@ class SessionController extends Controller {
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-
+		*/
 
 		// Create the new token
 		$entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));
