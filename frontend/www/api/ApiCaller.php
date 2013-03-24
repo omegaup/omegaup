@@ -30,7 +30,7 @@ class ApiCaller{
 			$response = $request->execute();
 		} catch (ApiException $e) {
 			Logger::error($e);
-			$response = $e->asArray();
+			$response = $e->asResponseArray();
 		} catch (Exception $e){
 			Logger::error($e);
 			$apiException = new InternalServerErrorException($e);
@@ -51,7 +51,7 @@ class ApiCaller{
 			$response = self::call($r);
 		} catch (ApiException $apiException) {
 			Logger::error($apiException);
-			$response = $apiException->asArray();
+			$response = $apiException->asResponseArray();
 
 		} catch (Exception $e){
 			Logger::error($e);

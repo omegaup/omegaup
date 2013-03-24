@@ -62,6 +62,22 @@ class ApiException extends Exception {
 		
 		return array_merge($arrayToReturn, $this->customMessage);
 	}
+	
+	/**
+	 * Returns exception info intended for public error msgs in http responses
+	 * 
+	 * @return array
+	 */
+	public function asResponseArray() {
+		$arrayToReturn =  array(
+			"status" => "error",
+			"error" => $this->message,
+			"errorcode" => $this->code,
+			"header" => $this->header,			
+		);
+		
+		return array_merge($arrayToReturn, $this->customMessage);
+	}
 
 }
 
