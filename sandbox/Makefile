@@ -36,7 +36,7 @@ box-tests: $(addprefix test-sys,32-int80 64-int80 32-syscall 64-syscall 32-sysen
 
 .PHONY: box-tests
 
-test: box
+test: box profiles/java profiles/javac
 	/bin/bash test.sh
 
 test-sys32-int80: test-syscalls.c

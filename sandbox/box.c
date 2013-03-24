@@ -672,7 +672,7 @@ setup_environment(void)
 
 static int read_user_mem(pid_t pid, arg_t addr, char *buf, int len)
 {
-  int t;
+  int t, ret;
   
   for (t = 0; t < nthreads; t++)
     if (threads[t].pid == pid) break;
@@ -687,7 +687,8 @@ static int read_user_mem(pid_t pid, arg_t addr, char *buf, int len)
     }
   if (lseek64(threads[t].mem_fd, addr, SEEK_SET) < 0)
     die("lseek64(mem): %m");
-  return read(threads[t].mem_fd, buf, len);
+  ret = read(threads[t].mem_fd, buf, len);
+  return ret;
 }
 
 #ifdef CONFIG_BOX_KERNEL_AMD64
@@ -1488,7 +1489,15 @@ boxkeeper(void)
 		msg("[ptrace status %08x] ", stat);
 	      static int stop_count;
 	      if (!stop_count++)		/* Traceme request */
-		msg(">> Traceme request caught\n");
+		{
+		  // After the new program starts executing, the user mem fd must be reopened.
+		  if (threads[t].mem_fd)
+		    {
+		      close(threads[t].mem_fd);
+		      threads[t].mem_fd = 0;
+		    }
+		  msg(">> Traceme request caught\n");
+		}
 	      else if(!allow_fork)
 		err("SG: Breakpoint");
 	      if (p == box_pid)

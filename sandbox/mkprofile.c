@@ -466,7 +466,11 @@ int outside() {
 		} else if(WIFSTOPPED(stat)) {
 			int sig = WSTOPSIG(stat);
 			
-			if(sig == SIGTRAP) {			
+			if(sig == SIGTRAP) {
+				// After the new program has executed, the memory fd must be closed
+				// and re-opened.
+				close(mem_fd);
+				mem_fd = 0;
 			} else if(sig == (SIGTRAP | 0x80)) {
 				
 				if( !(sys_tick++ & 1) ) {
