@@ -136,7 +136,7 @@ class ContestController extends Controller {
 
 		if (self::$contest->getPublic() === '0') {
 			try {
-				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) && !Authorization::IsContestAdmin($r["current__user_id"], self::$contest)) {
+				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
 					throw new ForbiddenAccessException();
 				}
 			} catch (ApiException $e) {
