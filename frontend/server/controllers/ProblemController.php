@@ -13,7 +13,7 @@ class ProblemController extends Controller {
 	private static $author;
 	private static $problem;
 
-	const MAX_ZIP_FILESIZE = 104857600; //100 * 1024 * 1024;
+	const MAX_ZIP_FILESIZE = 209715200; //200 * 1024 * 1024;
 
 	private static $hasValidator = false;
 	private static $filesToUnzip;
