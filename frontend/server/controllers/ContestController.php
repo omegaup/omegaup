@@ -483,6 +483,10 @@ class ContestController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
+		// Invalidar cache
+		$contestCache = new Cache(Cache::CONTEST_INFO, $r["contest_alias"]);
+		$contestCache->delete();				
+		
 		return array("status" => "ok");
 	}
 

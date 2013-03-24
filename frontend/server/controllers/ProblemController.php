@@ -473,10 +473,6 @@ class ProblemController extends Controller {
 		$result["uploaded_files"] = self::$filesToUnzip;
 		$result["status"] = "ok";
 
-		// Invalidar cache
-		$contestCache = new Cache(Cache::CONTEST_INFO, $r["contest_alias"]);
-		$contestCache->delete();		
-
 		return $result;
 	}
 

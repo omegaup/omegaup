@@ -148,8 +148,13 @@ class ApiCaller{
 			throw new NotFoundException("Api requested not found.");
 		}
 
+		// Get the auth_token and user data from cookies
 		$cs = SessionController::apiCurrentSession();
-		$request["auth_token"] = $cs["auth_token"];
+		
+		// If we got an auth_token from cookies, replace it
+		if (!is_null($cs["auth_token"])) {
+			$request["auth_token"] = $cs["auth_token"];
+		}
 
 		for ($i = 4; ($i+1) < sizeof( $args ); $i += 2) {
 			$request[$args[$i]] = urldecode($args[$i+1]);
