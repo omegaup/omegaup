@@ -208,10 +208,12 @@ class Logger
     {
         self::log(" ERROR | " . $msg);
 		
-		if (!is_null($_REQUEST))
-		{
-			self::log(" REQUEST | ". $_REQUEST);
-		}
+		self::log("REQUEST PARAMS: ");
+
+        foreach ( $_REQUEST as $k => $v )
+        {
+            self::log("   " . $k . ": " . $v);
+        }
     }
     
     public static final function warn($msg)
