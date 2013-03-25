@@ -149,7 +149,7 @@ class ContestController extends Controller {
 		}
 
 		// If the contest has not started, user should not see it, unless it is admin
-		if (!self::$contest->hasStarted($r["current__user_id"]) && !Authorization::IsContestAdmin($r["current__user_id"], self::$contest)) {
+		if (!self::$contest->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
 			$exception = new PreconditionFailedException("Contest has not started yet.");
 			$exception->addCustomMessageToArray("start_time", strtotime(self::$contest->getStartTime()));
 
