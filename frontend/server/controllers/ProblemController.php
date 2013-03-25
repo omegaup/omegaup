@@ -456,15 +456,16 @@ class ProblemController extends Controller {
 		} catch (Exception $e) {
 
 			// Operation failed in the data layer, rollback transaction 
-			ProblemsDAO::transRollback();
-
-			// Rollback the problem if deployed partially
-			self::deleteProblemFromFilesystem(self::getDirpath($r));
+			ProblemsDAO::transRollback();			
 
 			// Alias may be duplicated, 1062 error indicates that
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
 				throw new DuplicatedEntryInDatabaseException("contest_alias already exists.", $e);
 			} else {
+				
+				// Rollback the problem if deployed partially
+				self::deleteProblemFromFilesystem(self::getDirpath($r));
+				
 				throw new InvalidDatabaseOperationException($e);
 			}
 		}
