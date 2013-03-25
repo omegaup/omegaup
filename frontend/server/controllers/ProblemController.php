@@ -478,6 +478,79 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Validates a Rejudge Problem API request
+	 * 
+	 * @param Request $r
+	 * @throws NotFoundException
+	 */
+	private static function validateRejudge(Request $r) {
+		// We need to check problem_alias
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		try {
+			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["problem"])) {
+			throw new NotFoundException();
+		}
+
+		// We need to check that the user can actually edit the problem
+		if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
+			throw new ForbiddenAccessException();
+		}
+	}
+
+	/**
+	 * Rejudge problem
+	 * 
+	 * @param Request $r
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRejudge(Request $r) {
+		self::authenticateRequest($r);
+
+		self::validateRejudge($r);
+
+		// We need to rejudge runs after an update, let's initialize the grader
+		self::initializeGrader();		
+
+		// Call Grader
+		try {
+			$runs = RunsDAO::search(new Runs(array(
+								"problem_id" => $r["problem"]->getProblemId()
+							)));
+
+			foreach ($runs as $run) {
+				$run->setStatus('new');
+				$run->setVeredict('JE');
+				$run->setScore(0);
+				$run->setContestScore(0);
+				RunsDAO::save($run);
+				self::$grader->Grade($run->getRunId());
+			}
+		} catch (Exception $e) {
+			Logger::error("Failed to rejudge runs after problem update");
+			Logger::error($e);
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$response = array();
+
+		// All clear
+		$response["status"] = "ok";
+
+		// Invalidar cache @todo invalidar todos los lenguajes
+		$statementCache = new Cache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");
+		$statementCache->delete();
+		
+		return $response;
+	}
+
+	/**
 	 * Update problem contents
 	 * 
 	 * @param Request $r

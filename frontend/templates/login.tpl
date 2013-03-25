@@ -5,7 +5,6 @@
 	<title>Omegaup</title>
 	<meta http-equiv="REFRESH" content="0;url=/profile.php"></HEAD>
 		<body>
-			Redirecting you.
 		</body>
 	</HTML>
 {/if}

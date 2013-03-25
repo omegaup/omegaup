@@ -340,7 +340,7 @@ OmegaUp.prototype.rejudgeProblem = function(problemAlias, callback) {
 	var self = this;
 
 	$.get(
-		'/api/problems/problem_alias/' + problemAlias + '/',
+		'/api/problem/rejudge/problem_alias/' + problemAlias + '/',
 		function (data) {
 			callback(data);
 		},
