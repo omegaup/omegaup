@@ -919,6 +919,10 @@ class ProblemController extends Controller {
 		try {
 			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
 			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+			
+			if (is_null(self::$contest) || is_null(self::$problem)) {
+				throw new NotFoundException();
+			}
 
 			if (is_null(ContestProblemsDAO::getByPK(self::$contest->getContestId(), self::$problem->getProblemId()))) {
 				throw new NotFoundException();
@@ -931,7 +935,7 @@ class ProblemController extends Controller {
 
 
 		// If the contest is private, verify that our user is invited                        
-		if (self::$contest->getPublic() == 0) {
+		if (self::$contest->getPublic() === 0) {
 			if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
 				throw new ForbiddenAccessException();
 			}
