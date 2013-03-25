@@ -447,7 +447,7 @@ $(document).ready(function() {
 		}
 		
 		if (runsProblem != "") {
-			options.problem = runsProblem;
+			options.problem_alias = runsProblem;
 		}
 		
 		if (runsLang != "") {
