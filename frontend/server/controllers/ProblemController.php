@@ -1108,8 +1108,20 @@ class ProblemController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		// Add the procesed runs to the request
-		$response["runs"] = $runs_array;
+		// Create array of relevant columns for list of runs
+		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+
+		// Add each filtered run to an array
+		$response["runs"] = array();
+		if (count($runs_array) >= 0) {
+			$runs_filtered_array = array();
+			foreach ($runs_array as $run) {
+				$filtered = $run->asFilteredArray($relevant_columns);
+				$filtered['time'] = strtotime($filtered['time']);
+				array_push($response['runs'], $filtered);
+			}
+		}
+
 		$response["status"] = "ok";
 		return $response;
 	}
