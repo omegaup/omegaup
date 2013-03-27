@@ -48,8 +48,8 @@ class ContestController extends Controller {
 		$addedContests = array();
 
 		foreach ($contests as $c) {
-			// At most we want 10 contests @TODO paginar correctamente
-			if ( sizeof($addedContests) == 10 ) {
+			// At most we want 30 contests @TODO paginar correctamente
+			if ( sizeof($addedContests) == 30 ) {
 				break;
 			}
 
@@ -1069,8 +1069,13 @@ class ContestController extends Controller {
 	 */
 	private static function validateRuns(Request $r) {
 
-		$r["offset"] = 0;
-		$r["rowcount"] = 100;
+		// Defaults for offset and rowcount
+		if (!isset($r["offset"])) {
+			$r["offset"] = 0;
+		}
+		if (!isset($r["rowcount"])) {
+			$r["rowcount"] = 100;
+		}		
 
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 

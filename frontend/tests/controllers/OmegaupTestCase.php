@@ -29,16 +29,24 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 		$authTokenKey = new AuthTokens(array(
 					"user_id" => $user->getUserId()
 				));
-		$auth_token_bd = AuthTokensDAO::search($authTokenKey);
-
-		// Checar que tenemos exactamente 1 token vivo
-		//$this->assertEquals(1, count($auth_token_bd));
-
-		// Validar que el token que esta en la DB es el mismo que tenemos por 
-		// parametro
+		$auth_tokens_bd = AuthTokensDAO::search($authTokenKey);
+		
+		
+		// Validar que el token se guardó en la BDD		
 		if (!is_null($auth_token)) {
-			$this->assertEquals($auth_token, $auth_token_bd[0]->getToken());
-		}
+			$exists = false;
+			foreach($auth_tokens_bd as $token_db) {												
+				if (strcmp($token_db->getToken(), $auth_token) === 0) {
+					$exists = true;
+					break;
+				}
+			}
+			
+			if ($exists === false) {
+				$this->fail("Token not in DB.");
+			}			
+		}		
+		
 
 		// @todo check last access time
 	}

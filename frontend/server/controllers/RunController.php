@@ -443,7 +443,7 @@ class RunController extends Controller {
 			}
 		}
 
-		usort($cases, array($this, "MetaCompare"));
+		usort($cases, array("RunController", "MetaCompare"));
 
 		$response['cases'] = $cases;
 		$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
@@ -476,7 +476,7 @@ class RunController extends Controller {
 	 * @param array $b
 	 * @return boolean
 	 */
-	private static function MetaCompare($a, $b) {
+	public static function MetaCompare($a, $b) {
 		if ($a['name'] == $b['name'])
 			return 0;
 

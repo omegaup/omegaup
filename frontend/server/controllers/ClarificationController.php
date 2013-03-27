@@ -32,11 +32,11 @@ class ClarificationController extends Controller {
 		}
 
 		if (is_null(self::$contest)) {
-			throw new NotFoundException("Contest provided does not exists");
+			throw new NotFoundException("Contest provided does not exist");
 		}
 
 		if (is_null(self::$problem)) {
-			throw new NotFoundException("Problem provided does not exists");
+			throw new NotFoundException("Problem provided does not exist");
 		}
 
 		// Is the combination contest_id and problem_id valid?        
