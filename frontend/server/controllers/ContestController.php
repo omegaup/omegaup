@@ -49,7 +49,7 @@ class ContestController extends Controller {
 
 		foreach ($contests as $c) {
 			// At most we want 30 contests @TODO paginar correctamente
-			if ( sizeof($addedContests) == 30 ) {
+			if (sizeof($addedContests) == 30) {
 				break;
 			}
 
@@ -485,8 +485,8 @@ class ContestController extends Controller {
 
 		// Invalidar cache
 		$contestCache = new Cache(Cache::CONTEST_INFO, $r["contest_alias"]);
-		$contestCache->delete();				
-		
+		$contestCache->delete();
+
 		return array("status" => "ok");
 	}
 
@@ -1075,7 +1075,7 @@ class ContestController extends Controller {
 		}
 		if (!isset($r["rowcount"])) {
 			$r["rowcount"] = 100;
-		}		
+		}
 
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
@@ -1154,7 +1154,7 @@ class ContestController extends Controller {
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
-		}				
+		}
 
 		$relevant_columns[11] = 'username';
 		$relevant_columns[12] = 'alias';
@@ -1174,6 +1174,58 @@ class ContestController extends Controller {
 		$response["status"] = "ok";
 
 		return $response;
+	}
+
+	public static function apiStats(Request $r) {
+
+		// Get user
+		self::authenticateRequest($r);
+
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		try {
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// This API is Contest Admin only
+		if (is_null($r["contest"]) || !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			throw new ForbiddenAccessException();
+		}
+
+		try {
+			// Array of GUIDs of pending runs
+			$pendingRunsGuids = RunsDAO::GetPendingRunsOfContest($r["contest"]->getContestId());
+
+			// Count of pending runs (int)
+			$totalRunsCount = RunsDAO::CountTotalRunsOfContest($r["contest"]->getContestId());
+
+			// Wait time
+			$waitTimeArray = RunsDAO::GetLargestWaitTimeOfContest($r["contest"]->getContestId());
+
+			// List of veredicts
+			$veredicts = array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC");
+			$veredict_counts = array();
+
+			foreach ($veredicts as $veredict) {
+				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfContestByVeredict($r["contest"]->getContestId(), $veredict);
+			}
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// Para darle gusto al Alanboy, regresando array
+		return array(
+			"total_runs" => $totalRunsCount,
+			"pending_runs" => $pendingRunsGuids,
+			"max_wait_time" => is_null($waitTimeArray) ? 0 : $waitTimeArray[1],
+			"max_wait_time_guid" => is_null($waitTimeArray) ? 0 : $waitTimeArray[0]->getGuid(),
+			"veredict_counts" => $veredict_counts,
+		);
 	}
 
 }
