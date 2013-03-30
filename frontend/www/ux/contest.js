@@ -106,7 +106,9 @@ $(document).ready(function() {
 
 	function contestLoaded(contest) {
 		if (contest.status == 'error') {
-			if (contest.start_time) {
+			if (!omegaup.loggedIn) {
+				window.location = omegaup.login_url + "?redirect=" + escape(window.location);
+			} else if (contest.start_time) {
 				var f = (function(x, y) {
 					return function() {
 						var t = new Date();

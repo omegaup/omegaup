@@ -1,6 +1,5 @@
 var DEBUG = true;
 
-
 function OmegaUp() {
 	var self = this;
 	this.username = null;
@@ -8,12 +7,14 @@ function OmegaUp() {
 	this.deltaTime = 0;
 	this.authenticated(function(data) {
 		if (data.valid) {
+			self.loggedIn = true;
 			self.syncTime();
 			self.username = data.username;
 			self.email = data.email;
 			self.email_md5 = data.email_md5;
 		} else {
-			//window.location = data.login_url;
+			self.loggedIn = false;
+			self.login_url = data.login_url;
 		}
 	});
 }
@@ -76,7 +77,6 @@ OmegaUp.prototype.createContest = function(
 					penalty_calc_policy, 
 					callback
 				) {
-	console.log("Creating contest", penalty_time_start);
 	$.post(
 		'/api/contest/create/' ,
 		{

@@ -38,7 +38,6 @@ class SessionController extends Controller {
 	}
 
 	public static function getFacebookLoginUrl() {
-
 		$facebook = self::getFacebookInstance();
 
 		return $facebook->getLoginUrl(array("scope" => "email"));
@@ -78,7 +77,8 @@ class SessionController extends Controller {
 				"email" => NULL,
 				"email_md5" => NULL,
 				"auth_token" => NULL,
-				"is_admin" => false
+				"is_admin" => false,
+				"login_url" => "/login.php"
 			);
 		}
 
@@ -94,7 +94,8 @@ class SessionController extends Controller {
 				"email" => NULL,
 				"email_md5" => NULL,
 				"auth_token" => NULL,
-				"is_admin" => false
+				"is_admin" => false,
+				"login_url" => "/login.php"
 			);
 		}
 
