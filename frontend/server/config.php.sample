@@ -74,6 +74,7 @@
 	define("APC_USER_CACHE_ADMIN_SCOREBOARD",			false);
 	define("APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT",	60); // in seconds
 	define("APC_USER_CACHE_CONTEST_INFO_TIMEOUT",		10);
+	define("APC_USER_CACHE_PROBLEM_STATS_TIMEOUT", 0); // in seconds
 
 	define("SMARTY_CACHE_DIR",							FALSE);
 	define("IS_TEST",									FALSE);

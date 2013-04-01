@@ -1168,7 +1168,7 @@ class ProblemController extends Controller {
 			
 			// Array to count AC stats per case
 			// Lets try to get last picture from catch
-			$problemStatsCache = new Cache(Cache::PROBLEM_STATEMENT, self::$problem->getAlias());
+			$problemStatsCache = new Cache(Cache::PROBLEM_STATS, self::$problem->getAlias());
 			$cases_stats = $problemStatsCache->get();
 			if (is_null($cases_stats)) {
 				
