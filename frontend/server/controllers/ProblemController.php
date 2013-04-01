@@ -1129,5 +1129,120 @@ class ProblemController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
+	
+	/**
+	 * Stats of a problem
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws ForbiddenAccessException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiStats(Request $r) {
+		
+		// Get user
+		self::authenticateRequest($r);
+		
+		// Validate request
+		self::validateRuns($r);
+		
+		// We need to check that the user has priviledges on the problem
+		if (!Authorization::CanEditProblem($r["current_user_id"], self::$problem)) {
+			throw new ForbiddenAccessException();
+		}
+		
+		try {
+			
+			// Array of GUIDs of pending runs
+			$pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem(self::$problem->getProblemId());
+			
+			// Count of pending runs (int)
+			$totalRunsCount = RunsDAO::CountTotalRunsOfProblem(self::$problem->getProblemId());
+			
+			// List of veredicts			
+			$veredict_counts = array();
+
+			foreach (self::$veredicts as $veredict) {
+				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfProblemByVeredict(self::$problem->getProblemId(), $veredict);
+			}
+			
+			// Array to count AC stats per case
+			$cases_stats = array();
+			
+			// Get all runs of this problem
+			$runs = RunsDAO::search(new Runs(array("problem_id" => self::$problem->getProblemId())));
+			
+			// Build problem dir
+			$problem_dir = PROBLEMS_PATH . '/' . self::$problem->getAlias() . '/cases/';
+			
+			// Get list of cases
+			$dir = opendir($problem_dir);
+			if (is_dir($problem_dir)) {
+				while (($file = readdir($dir)) !== false) {
+
+					// If we have an input
+					if (strstr($file, ".in")) {
+
+						// Initialize it to 0
+						$cases_stats[str_replace(".in", "", $file)] = 0;
+					}
+				}
+				closedir($dir);
+			}
+			
+			// For each 
+			foreach($runs as $run) {
+				
+				// Build grade dir
+				$grade_dir = RUNS_PATH . '/../grade/' . $run->getRunId();								
+				
+				// Skip it if it didn't produce outputs 
+				if (file_exists("$grade_dir.err")) {
+					continue;
+				} else if (is_dir($grade_dir)) {
+					
+					if ($dir = opendir($grade_dir)) {
+						// Read all files in this run dirrectory
+						while (($file = readdir($dir)) !== false) {
+
+							// Skip non output cases
+							if ($file == '.' || $file == '..' || !strstr($file, ".meta")) {
+								continue;	
+							}
+
+							// Get the case name
+							$case_name = str_replace(".meta", "", $file);
+
+							// If we have an output
+							if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
+
+								// Get the output of this case
+								$out = str_replace(".meta", ".out", $file);
+								$case_out = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
+
+								// If the output was empty
+								if ($case_out === "") {
+									$cases_stats[$case_name]++;
+								}
+							}
+						}
+
+						// Close this run dir
+						closedir($dir);
+					}
+				}								
+			}			
+			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+				
+		return array(
+			"total_runs" => $totalRunsCount,
+			"pending_runs" => $pendingRunsGuids,
+			"veredict_counts" => $veredict_counts,
+			"cases_stats" => $cases_stats
+		);
+	}
 
 }

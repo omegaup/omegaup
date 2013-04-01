@@ -62,6 +62,32 @@ class RunsDAO extends RunsDAOBase
 
 		return $ar;
 	}
+	
+	/*
+	 * Gets an array of the guids of the pending runs
+	 */
+	public static final function GetPendingRunsOfProblem($problem_id, $showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT guid FROM Runs WHERE problem_id = ? AND status != 'ready'";
+		$val = array($problem_id);
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		$rs = $conn->Execute($sql, $val);
+
+		$ar = array();
+		foreach ($rs as $foo) 
+		{                
+			array_push($ar, $foo['guid']);
+		}
+
+		return $ar;
+	}
 
 	/*
 	 * Gets the count of total runs sent to a given contest
@@ -80,8 +106,26 @@ class RunsDAO extends RunsDAOBase
 		global $conn;
 		return $conn->GetOne($sql, $val);
 	}
+	
+	/*
+	 * Gets the count of total runs sent to a given problem
+	 */
+	public static final function CountTotalRunsOfProblem($problem_id, $showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT COUNT(*) FROM Runs WHERE problem_id = ? ";
+		$val = array($problem_id);
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		return $conn->GetOne($sql, $val);
+	}
         
-        /*
+    /*
 	 * Gets the count of total runs sent to a given contest by veredict
 	 */
 	public static final function CountTotalRunsOfContestByVeredict($contest_id, $veredict, $showAllRuns = false)
@@ -89,6 +133,24 @@ class RunsDAO extends RunsDAOBase
 		// Build SQL statement.
 		$sql = "SELECT COUNT(*) FROM Runs WHERE contest_id = ? AND veredict = ? ";
 		$val = array($contest_id, $veredict);
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		return $conn->GetOne($sql, $val);
+	}
+	
+	/*
+	 * Gets the count of total runs sent to a given contest by veredict
+	 */
+	public static final function CountTotalRunsOfProblemByVeredict($problem_id, $veredict, $showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND veredict = ? ";
+		$val = array($problem_id, $veredict);
 
 		if (!$showAllRuns) 
 		{
