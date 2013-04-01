@@ -1167,30 +1167,43 @@ class ProblemController extends Controller {
 			}
 			
 			// Array to count AC stats per case
-			$cases_stats = array();
-			
-			// Get all runs of this problem
-			$runs = RunsDAO::search(new Runs(array("problem_id" => self::$problem->getProblemId())));
-			
-			// Build problem dir
-			$problem_dir = PROBLEMS_PATH . '/' . self::$problem->getAlias() . '/cases/';
-			
-			// Get list of cases
-			$dir = opendir($problem_dir);
-			if (is_dir($problem_dir)) {
-				while (($file = readdir($dir)) !== false) {
+			// Lets try to get last picture from catch
+			$problemStatsCache = new Cache(Cache::PROBLEM_STATEMENT, self::$problem->getAlias());
+			$cases_stats = $problemStatsCache->get();
+			if (is_null($cases_stats)) {
+				
+				// Initialize the array at counts = 0
+				$cases_stats = array();
+				$cases_stats["counts"] = array();
+				
+				// We need to save the last_id that we processed, so next time we do not repeat this
+				$cases_stats["last_id"] = 0;							
+				
+				// Build problem dir
+				$problem_dir = PROBLEMS_PATH . '/' . self::$problem->getAlias() . '/cases/';
 
-					// If we have an input
-					if (strstr($file, ".in")) {
+				// Get list of cases
+				$dir = opendir($problem_dir);
+				if (is_dir($problem_dir)) {
+					while (($file = readdir($dir)) !== false) {
 
-						// Initialize it to 0
-						$cases_stats[str_replace(".in", "", $file)] = 0;
+						// If we have an input
+						if (strstr($file, ".in")) {
+
+							// Initialize it to 0
+							$cases_stats["counts"][str_replace(".in", "", $file)] = 0;
+						}
 					}
+					closedir($dir);
 				}
-				closedir($dir);
 			}
 			
-			// For each 
+			// Get all runs of this problem after the last id we had
+			$runs = RunsDAO::searchRunIdGreaterThan(new Runs(array("problem_id" => self::$problem->getProblemId())), 
+					$cases_stats["last_id"], 
+					"run_id");
+									
+			// For each run we got
 			foreach($runs as $run) {
 				
 				// Build grade dir
@@ -1222,7 +1235,7 @@ class ProblemController extends Controller {
 
 								// If the output was empty
 								if (strcmp($case_out, "") === 0) {
-									$cases_stats[$case_name]++;
+									$cases_stats["counts"][$case_name]++;
 								}
 							}
 						}
@@ -1237,11 +1250,17 @@ class ProblemController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 				
+		// Save the last id we saw
+		$cases_stats["last_id"] = is_null($runs) ? 0 : $runs[count($runs) - 1]->getRunId();
+		
+		// Save in cache what we got
+		$problemStatsCache->set($cases_stats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
+		
 		return array(
 			"total_runs" => $totalRunsCount,
 			"pending_runs" => $pendingRunsGuids,
 			"veredict_counts" => $veredict_counts,
-			"cases_stats" => $cases_stats
+			"cases_stats" => $cases_stats["counts"],						
 		);
 	}
 
