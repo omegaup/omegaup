@@ -1250,8 +1250,10 @@ class ProblemController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 				
-		// Save the last id we saw
-		$cases_stats["last_id"] = is_null($runs) ? 0 : $runs[count($runs) - 1]->getRunId();
+		// Save the last id we saw in case we saw something
+		if (!is_null($runs) && count($runs) > 0) {
+			$cases_stats["last_id"] = $runs[count($runs) - 1]->getRunId();
+		}
 		
 		// Save in cache what we got
 		$problemStatsCache->set($cases_stats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
