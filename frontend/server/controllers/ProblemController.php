@@ -1221,7 +1221,7 @@ class ProblemController extends Controller {
 								$case_out = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
 
 								// If the output was empty
-								if ($case_out === "") {
+								if (strcmp($case_out, "") === 0) {
 									$cases_stats[$case_name]++;
 								}
 							}
