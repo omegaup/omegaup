@@ -519,6 +519,7 @@ class ProblemController extends Controller {
 		self::initializeGrader();		
 
 		// Call Grader
+		$runs = array();
 		try {
 			$runs = RunsDAO::search(new Runs(array(
 								"problem_id" => $r["problem"]->getProblemId()
@@ -542,10 +543,11 @@ class ProblemController extends Controller {
 
 		// All clear
 		$response["status"] = "ok";
-
-		// Invalidar cache @todo invalidar todos los lenguajes
-		$statementCache = new Cache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");
-		$statementCache->delete();
+		
+		// Invalidate caches
+		if (!is_null($runs) && count($runs) > 0) {
+			RunController::invalidateCacheOnRejudge($runs[0]);
+		}
 		
 		return $response;
 	}

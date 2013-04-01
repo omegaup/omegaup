@@ -372,19 +372,41 @@ class RunController extends Controller {
 		$response = array();
 		$response['status'] = 'ok';
 		
-		// If the run belongs to a contest, we need to invalidate that cache		
+		
+		self::invalidateCacheOnRejudge(self::$run);				
+
+		return $response;	
+	}
+	
+	/**
+	 * Invalidates relevant caches on run rejudge
+	 * 
+	 * @param RunsDAO $run
+	 */
+	public static function invalidateCacheOnRejudge(Runs $run) {
+		
 		try {
-			$contest = ContestsDAO::getByPK(self::$run->getContestId());
+			$contest = ContestsDAO::getByPK($run->getContestId());
 			
+			// If the run belongs to a contest, we need to invalidate that cache		
 			if (!is_null($contest)) {
 				self::InvalidateScoreboardCache($contest->getContestId());
 			}
+			
+			// Now we need to invalidate problem stats
+			$problem = ProblemsDAO::getByPK($run->getProblemId());
+			
+			if (!is_null($problem)) {
+				// Invalidar cache stats
+				$problemStatsCache = new Cache(Cache::PROBLEM_STATS, $problem->getAlias());
+				$problemStatsCache->delete();
+			}
+			
 		} catch (Exception $e) {
 			// We did our best effort to invalidate the cache...
-			Logger::error($e);			
+			Logger::warn("Failed to invalidate cache on Rejudge, skipping: ");
+			Logger::warn($e);			
 		}
-
-		return $response;	
 	}
 
 	/**
