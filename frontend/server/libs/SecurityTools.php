@@ -38,9 +38,11 @@ class SecurityTools {
 	}
 
 	public static function testStrongPassword($s_Password) {    
-		if(strlen($s_Password) < 4) {
-			return false;
-		}
+		
+		// Setting max passwd length to 72 to avoid DoS attacks
+		Validators::isStringOfMinLength($s_Password, "password", 8);
+		Validators::isStringOfMaxLength($s_Password, "password", 72);
+		
 		return true;
 	}
 
