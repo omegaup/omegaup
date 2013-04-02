@@ -1154,7 +1154,6 @@ class ProblemController extends Controller {
 		}
 		
 		try {
-			
 			// Array of GUIDs of pending runs
 			$pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem(self::$problem->getProblemId());
 			
@@ -1168,12 +1167,11 @@ class ProblemController extends Controller {
 				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfProblemByVeredict(self::$problem->getProblemId(), $veredict);
 			}
 			
-			// Array to count AC stats per case
-			// Lets try to get last picture from catch
+			// Array to count AC stats per case.
+			// Let's try to get the last snapshot from cache.
 			$problemStatsCache = new Cache(Cache::PROBLEM_STATS, self::$problem->getAlias());
 			$cases_stats = $problemStatsCache->get();
 			if (is_null($cases_stats)) {
-				
 				// Initialize the array at counts = 0
 				$cases_stats = array();
 				$cases_stats["counts"] = array();
@@ -1188,10 +1186,8 @@ class ProblemController extends Controller {
 				$dir = opendir($problem_dir);
 				if (is_dir($problem_dir)) {
 					while (($file = readdir($dir)) !== false) {
-
 						// If we have an input
 						if (strstr($file, ".in")) {
-
 							// Initialize it to 0
 							$cases_stats["counts"][str_replace(".in", "", $file)] = 0;
 						}
@@ -1207,7 +1203,6 @@ class ProblemController extends Controller {
 									
 			// For each run we got
 			foreach($runs as $run) {
-				
 				// Build grade dir
 				$grade_dir = RUNS_PATH . '/../grade/' . $run->getRunId();								
 				
@@ -1215,9 +1210,18 @@ class ProblemController extends Controller {
 				if (file_exists("$grade_dir.err")) {
 					continue;
 				} else if (is_dir($grade_dir)) {
-					
-					if ($dir = opendir($grade_dir)) {
-						// Read all files in this run dirrectory
+					// Try to open the details file.
+					if (file_exists("$grade_dir/details.json")) {
+						$details = json_decode(file_get_contents("$grade_dir/details.json"));
+						foreach ($details as $group) {
+							foreach ($group->cases as $case) {
+									if ($case->score > 0) {
+										$cases_stats["counts"][$case->name]++;
+									}
+							}
+						}
+					} else if ($dir = opendir($grade_dir)) {
+						// Read all files in this run directory
 						while (($file = readdir($dir)) !== false) {
 
 							// Skip non output cases
