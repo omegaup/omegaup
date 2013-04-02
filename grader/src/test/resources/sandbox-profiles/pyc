@@ -1,0 +1,29 @@
+-f
+-a 2
+-E PATH=/usr/bin
+-F
+
+-s mprotect 
+-s set_robust_list
+-s futex
+-s rt_sigaction
+-s rt_sigprocmask
+-s ugetrlimit
+-s getrlimit
+-s socketcall
+-s socket
+-s getdents64
+-s getdents
+-s getcwd
+
+-p /usr/
+-p /proc/meminfo
+-p /usr/bin/python
+-p /usr/bin/python2.6
+-p /usr/bin/Modules/Setup
+-p /usr/bin/lib/python2.6/
+-p /etc/nsswitch.conf
+-p /etc/passwd
+-p /usr/local/lib/python2.6/
+-p /home/
+-p ./=rw

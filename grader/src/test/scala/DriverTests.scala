@@ -27,6 +27,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		Config.set("db.password", "")
 
                 Config.set("runner.sandbox.path", new File("../sandbox").getCanonicalPath)
+                Config.set("runner.sandbox.profiles.path", new File("src/test/resources/sandbox-profiles").getCanonicalPath)
 		Config.set("submissions.root", root.getCanonicalPath + "/submissions")
 		Config.set("grader.root", root.getCanonicalPath + "/grader")
 		Config.set("problems.root", root.getCanonicalPath + "/problems")

@@ -28,7 +28,7 @@ object Runner extends RunnerService with Log with Using {
 		}
 		
 		val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
-		val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
+		val profile = Config.get("runner.sandbox.profiles.path", Config.get("runner.sandbox.path", ".") + "/profiles")
 		val runtime = Runtime.getRuntime
 
 		val commonParams = List("-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "-w", Config.get("java.compile.time_limit", "30"))
