@@ -201,7 +201,19 @@ class UserController extends Controller {
 		SecurityTools::testStrongPassword($r["password"]);
 		
 		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {					
+			
 			$user = $r["current_user"];
+			
+			// Check the old password
+			Validators::isStringNonEmpty($r["old_password"], "old_password");
+			
+			$old_password_valid = SecurityTools::compareHashedStrings(
+						$r["old_password"], $user->getPassword());
+			
+			if ($old_password_valid === false) {
+				throw new InvalidParameterException("old_password".Validators::IS_INVALID);
+			}						
+			
 		} else {		
 			// System admin can force reset passwords 
 			try {

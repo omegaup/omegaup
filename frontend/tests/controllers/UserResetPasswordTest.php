@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class UserResetPassword extends OmegaupTestCase {		
+class UserResetPasswordTest extends OmegaupTestCase {		
 	
 	/**
 	 * Reset password via admin
@@ -55,6 +55,7 @@ class UserResetPassword extends OmegaupTestCase {
 		$r["auth_token"] = $this->login($user);
 		$r["username"] = $user->getUsername();
 		$r["password"] = Utils::CreateRandomString();
+		$r["old_password"] = $user->getPassword();
 		
 		// Call api
 		UserController::apiResetPassword($r);
@@ -70,6 +71,27 @@ class UserResetPassword extends OmegaupTestCase {
 		// Set new password and try again, should succeed
 		$user->setPassword($r["password"]);
 		$this->login($user);
+		
+	} 
+	
+	/**
+	 * Reset my password
+	 * 
+	 * @expectedException InvalidParameterException
+	 */
+	public function testResetMyPasswordBadOldPassword() {
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser();						
+		
+		$r = new Request();
+		$r["auth_token"] = $this->login($user);
+		$r["username"] = $user->getUsername();
+		$r["password"] = Utils::CreateRandomString();
+		$r["old_password"] = "bad old password";
+				
+		// Call api
+		UserController::apiResetPassword($r);						
 		
 	} 
 }
