@@ -75,15 +75,6 @@ location = /50x.html {
     root   html;
 }
 
-# WebSockets.
-location ^~ /api/contest/events/ {
-    proxy_pass http://localhost:39613;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade \$http_upgrade;
-    proxy_set_header Connection "upgrade";
-    proxy_set_header Host \$host;
-}
-
 location /api/ {
     rewrite ^/api/(.*)$ /api/ApiEntryPoint.php last;
 }
@@ -112,7 +103,7 @@ location ~ /\.ht {
 }
 }
 EOF
-	sudo mv .omegaup-conf /etc/nginx/sites-enabled/default
+	sudo mv .omegaup-conf /etc/nginx/conf.d/default.conf
 	sudo /etc/init.d/nginx restart
 fi
 
