@@ -40,25 +40,30 @@ fi
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
 	curl http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add -
+	cat > dotdeb.list << EOF
+deb http://packages.dotdeb.org squeeze all
+deb-src http://packages.dotdeb.org squeeze all
+EOF
+	sudo mv dotdeb.list /etc/apt/sources.list.d
 	sudo apt-get update -q -y
 	sudo apt-get upgrade -q -y
-	sudo apt-get install -q -y nginx mysql-server mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client
+	sudo apt-get install -q -y nginx mysql-server mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make
 fi
 
 # Install SBT.
 if [ ! -f /usr/bin/sbt ]; then
 	sudo wget http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch//0.12.3/sbt-launch.jar -O /usr/bin/sbt-launch.jar
-	cat > .sbt << EOF
+	cat > sbt << EOF
 #!/bin/sh
 java -Xms512M -Xmx1536M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$0\`/sbt-launch.jar "\$@"
 EOF
-	sudo mv .sbt /usr/bin/sbt
+	sudo mv sbt /usr/bin/
 	sudo chmod +x /usr/bin/sbt
 fi
 
 # Add ngnix configuration.
 if [ "$SKIP_NGINX" != "1" ]; then
-	cat > .omegaup-conf << EOF
+	cat > defalut.conf << EOF
 server {
 listen       80;
 server_name  localhost;
@@ -103,14 +108,14 @@ location ~ /\.ht {
 }
 }
 EOF
-	sudo mv .omegaup-conf /etc/nginx/conf.d/default.conf
+	sudo mv default.conf /etc/nginx/conf.d/
 	sudo /etc/init.d/nginx restart
 fi
 
 # Set up ssh/git.
 if [ ! -f ~/.ssh/github.com ]; then
 	mkdir ~/.ssh
-	cat >> ~./ssh/config << EOF
+	cat >> ~/.ssh/config << EOF
 Host github.com
 IdentityFile /home/$USER/.ssh/github.com
 User git
@@ -133,6 +138,7 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
 
 	# Link the frontend to nginx.
+	sudo mkdir -p /var/www/
 	sudo ln -s $OMEGAUP_ROOT/frontend/www /var/www/omegaup.com
 
 	# Generate the certificates required.
