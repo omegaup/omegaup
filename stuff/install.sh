@@ -49,7 +49,7 @@ EOF
 	sudo mv dotdeb.list /etc/apt/sources.list.d
 	sudo apt-get update -q -y
 	sudo apt-get upgrade -q -y
-	sudo apt-get install -q -y nginx mysql-server mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make
+	sudo apt-get install -q -y nginx mysql-server mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make wget curl
 fi
 
 # Install SBT.
