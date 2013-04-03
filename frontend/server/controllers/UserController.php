@@ -196,25 +196,24 @@ class UserController extends Controller {
 	public static function apiResetPassword(Request $r) {
 
 		self::authenticateRequest($r);
-		
+
 		Validators::isStringNonEmpty($r["username"], "username");
 		SecurityTools::testStrongPassword($r["password"]);
-		
-		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {					
-			
+
+		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+
 			$user = $r["current_user"];
-			
+
 			// Check the old password
 			Validators::isStringNonEmpty($r["old_password"], "old_password");
-			
+
 			$old_password_valid = SecurityTools::compareHashedStrings(
-						$r["old_password"], $user->getPassword());
-			
+							$r["old_password"], $user->getPassword());
+
 			if ($old_password_valid === false) {
-				throw new InvalidParameterException("old_password".Validators::IS_INVALID);
-			}						
-			
-		} else {		
+				throw new InvalidParameterException("old_password" . Validators::IS_INVALID);
+			}
+		} else {
 			// System admin can force reset passwords 
 			try {
 				$user = UsersDAO::FindByUsername($r["username"]);
@@ -226,11 +225,138 @@ class UserController extends Controller {
 				throw new InvalidDatabaseOperationException($e);
 			}
 		}
-		
+
 		$user->setPassword(SecurityTools::hashString($r["password"]));
 		UsersDAO::save($user);
 
 		return array("status" => "ok");
-	}	
+	}
+
+	/**
+	 * Retunrs a random string of size $length
+	 * 
+	 * @param string $length
+	 * @return string
+	 */
+	private static function randomString($length) {
+		$chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+		$size = strlen($chars);
+		for ($i = 0; $i < $length; $i++) {
+			$str .= $chars[rand(0, $size - 1)];
+		}
+
+		return $str;
+	}
+
+	/**
+	 * Resets the password of the OMI user and adds the user to the private 
+	 * contest
+	 * 
+	 * @param Request $r
+	 * @param string $username
+	 * @param string $password
+	 */
+	private static function omiPrepareUser(Request $r, $username, $password) {
+
+		$resetRequest = new Request();
+		$resetRequest["auth_token"] = $r["auth_token"];
+		$resetRequest["username"] = $username;
+		$resetRequest["password"] = $password;
+		self::apiResetPassword($resetRequest);
+		
+		try {
+			$user = UsersDAO::FindByUsername($username);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$addUserRequest = new Request();
+		$addUserRequest["auth_token"] = $r["auth_token"];
+		$addUserRequest["user_id"] = $user->getUserId();
+		$addUserRequest["contest_alias"] = $r["contest_alias"];		
+		ContestController::apiAddUser($addUserRequest);
+		
+	}
+
+	/**
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiGenerateOmiUsers(Request $r) {
+
+		self::authenticateRequest($r);
+
+		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+			throw new ForbiddenAccessException();
+		}
+
+		$response = array();
+
+		// Arreglo de estados de MX
+		$keys = array(
+			"AGS",
+			"BC",
+			"BCS",
+			"CAM",
+			"COAH",
+			"COL",
+			"CHI",
+			"CHIH",
+			"DF",
+			"DUR",
+			"GTO",
+			"GRO",
+			"HDG",
+			"JAL",
+			"MEX",
+			"MICH",
+			"MOR",
+			"NAY",
+			"NL",
+			"OAX",
+			"PUE",
+			"QRO",
+			"QIR",
+			"SLP",
+			"SIN",
+			"SON",
+			"TAB",
+			"TAM",
+			"TLAX",
+			"VER",
+			"YUC",
+			"ZAC"
+		);
+
+
+		foreach ($keys as $k) {
+			for ($i = 1; $i <= 4; $i++) {
+
+				$username = $k . "-" . $i;
+				$password = self::randomString(8);
+
+				self::omiPrepareUser($r, $username, $password);
+				$response[$username] = $password;
+				// @TODO add to private contest
+			}
+
+			// El estado sede tiene 4 usuarios más
+			if ($k == "MEX") {
+				for ($i = 5; $i <= 8; $i++) {
+					$username = $k . "-" . $i;
+					$password = self::randomString(8);
+
+					self::omiPrepareUser($r, $username, $password);
+					$response[$username] = $password;
+				}
+			}
+		}
+		
+		return $response;
+	}
+
 }
 
