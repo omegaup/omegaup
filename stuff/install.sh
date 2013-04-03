@@ -3,7 +3,7 @@
 # Helper functions
 show_help() {
 	echo "OmegaUp Installation script"
-	echo -e "\t$0 -u git_username -m git_email"
+	echo -e "\t$0 -u git_username -m git_email [-p path_para_omegaup]"
 	exit 1
 }
 
@@ -13,8 +13,11 @@ USER=`whoami`
 MYSQL_PASSWORD=dd if=/dev/urandom count=1 bs=9 2>/dev/null | base64
 
 # Get parameters
-while getopts "u:m:01" optname; do
+while getopts "u:m:p:01" optname; do
 	case "$optname" in
+		"p")
+			OMEGAUP_ROOT=$OPTARG
+			;;
 		"u")
 			GIT_USERNAME=$OPTARG
 			;;

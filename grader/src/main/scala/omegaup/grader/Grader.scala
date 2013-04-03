@@ -196,6 +196,7 @@ trait Grader extends Object with Log {
                         implicit val formats = Serialization.formats(NoTypeHints)
                         
 			val details = new File(Config.get("grader.root", "./grader") + "/" + run.id + "/details.json")
+                        debug("Writing details into {}.", details.getCanonicalPath)
 			Serialization.write(caseScores, new FileWriter(details))
                         
 			run.score = caseScores.foldLeft(0.0)(_+_.score) / weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2)) * (run.contest match {
