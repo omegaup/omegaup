@@ -20,3 +20,7 @@ case class GradeInputMessage(id: Int)
 case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
 case class RegisterInputMessage(port: Int)
 case class RegisterOutputMessage(status: String = "ok", error: Option[String] = None)
+
+// for serializing judgement details
+case class CaseVeredictMessage(name: String, veredict:String, score: Double)
+case class GroupVeredictMessage(group: String, cases: List[CaseVeredictMessage], score: Double)

@@ -8,6 +8,13 @@
 class Controller {
 	
 	/**
+	 * List of veredicts
+	 * 
+	 * @var array 
+	 */
+	public static $veredicts = array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC");
+	
+	/**
 	 * Given the request, returns what user is performing the request by
 	 * looking at the auth_token
 	 * 

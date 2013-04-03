@@ -11,6 +11,7 @@ class Cache
     const ADMIN_SCOREBOARD_PREFIX = "scoreboard-admin-";
     const PROBLEM_STATEMENT = "statement-";
     const CONTEST_INFO = "contest-info-";
+	const PROBLEM_STATS = "problem-stats-";
     
     
     private $enabled;

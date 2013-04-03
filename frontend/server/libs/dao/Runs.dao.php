@@ -62,6 +62,32 @@ class RunsDAO extends RunsDAOBase
 
 		return $ar;
 	}
+	
+	/*
+	 * Gets an array of the guids of the pending runs
+	 */
+	public static final function GetPendingRunsOfProblem($problem_id, $showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT guid FROM Runs WHERE problem_id = ? AND status != 'ready'";
+		$val = array($problem_id);
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		$rs = $conn->Execute($sql, $val);
+
+		$ar = array();
+		foreach ($rs as $foo) 
+		{                
+			array_push($ar, $foo['guid']);
+		}
+
+		return $ar;
+	}
 
 	/*
 	 * Gets the count of total runs sent to a given contest
@@ -80,8 +106,26 @@ class RunsDAO extends RunsDAOBase
 		global $conn;
 		return $conn->GetOne($sql, $val);
 	}
+	
+	/*
+	 * Gets the count of total runs sent to a given problem
+	 */
+	public static final function CountTotalRunsOfProblem($problem_id, $showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT COUNT(*) FROM Runs WHERE problem_id = ? ";
+		$val = array($problem_id);
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		return $conn->GetOne($sql, $val);
+	}
         
-        /*
+    /*
 	 * Gets the count of total runs sent to a given contest by veredict
 	 */
 	public static final function CountTotalRunsOfContestByVeredict($contest_id, $veredict, $showAllRuns = false)
@@ -89,6 +133,24 @@ class RunsDAO extends RunsDAOBase
 		// Build SQL statement.
 		$sql = "SELECT COUNT(*) FROM Runs WHERE contest_id = ? AND veredict = ? ";
 		$val = array($contest_id, $veredict);
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		return $conn->GetOne($sql, $val);
+	}
+	
+	/*
+	 * Gets the count of total runs sent to a given contest by veredict
+	 */
+	public static final function CountTotalRunsOfProblemByVeredict($problem_id, $veredict, $showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND veredict = ? ";
+		$val = array($problem_id, $veredict);
 
 		if (!$showAllRuns) 
 		{
@@ -242,5 +304,132 @@ class RunsDAO extends RunsDAOBase
 			
 		// Giving 10 secs as gift
 		return time() >= (strtotime($lastrun->getTime()) + $submission_gap - 10);
+	}
+	
+	
+	public static final function searchRunIdGreaterThan( $Runs , $greaterThan, $orderBy = null, $orden = 'ASC', $columnas = NULL, $offset = 0, $rowcount = NULL )
+	{
+		// Implode array of columns to a coma-separated string               
+		$columns_str = is_null($columnas) ? "*" : implode(",", $columnas);
+            
+		$sql = "SELECT ".$columns_str."  from Runs ";
+
+		if ($columnas != null) {
+			if (in_array("Users.username", $columnas)) {
+				$sql .= "INNER JOIN Users ON Users.user_id = Runs.user_id ";
+			}
+			if (in_array("Problems.alias", $columnas)) {
+				$sql .= "INNER JOIN Problems ON Problems.problem_id = Runs.problem_id ";
+			}
+		}
+		$sql .= "WHERE ("; 
+		$val = array();
+		if( $Runs->getRunId() != NULL){
+			$sql .= " run_id = ? AND";
+			array_push( $val, $Runs->getRunId() );
+		}
+
+		if( $Runs->getUserId() != NULL){
+			$sql .= " user_id = ? AND";
+			array_push( $val, $Runs->getUserId() );
+		}
+
+		if( $Runs->getProblemId() != NULL){
+			$sql .= " Runs.problem_id = ? AND";
+			array_push( $val, $Runs->getProblemId() );
+		}
+
+		if( $Runs->getContestId() != NULL){
+			$sql .= " Runs.contest_id = ? AND";
+			array_push( $val, $Runs->getContestId() );
+		}
+
+		if( $Runs->getGuid() != NULL){
+			$sql .= " guid = ? AND";
+			array_push( $val, $Runs->getGuid() );
+		}
+
+		if( $Runs->getLanguage() != NULL){
+			$sql .= " language = ? AND";
+			array_push( $val, $Runs->getLanguage() );
+		}
+
+		if( $Runs->getStatus() != NULL){
+			$sql .= " status = ? AND";
+			array_push( $val, $Runs->getStatus() );
+		}
+
+		if( $Runs->getVeredict() != NULL){
+                        if ($Runs->getVeredict() == "NO-AC")
+                        {
+                            $sql .= " veredict != ? AND";
+                            array_push($val, "AC");
+                        }
+                        else
+                        {
+                            $sql .= " veredict = ? AND";
+                            array_push($val, $Runs->getVeredict());
+                        }			
+		}
+
+		if( $Runs->getRuntime() != NULL){
+			$sql .= " runtime = ? AND";
+			array_push( $val, $Runs->getRuntime() );
+		}
+
+		if( $Runs->getMemory() != NULL){
+			$sql .= " memory = ? AND";
+			array_push( $val, $Runs->getMemory() );
+		}
+
+		if( $Runs->getScore() != NULL){
+			$sql .= " score = ? AND";
+			array_push( $val, $Runs->getScore() );
+		}
+
+		if( $Runs->getContestScore() != NULL){
+			$sql .= " contest_score = ? AND";
+			array_push( $val, $Runs->getContestScore() );
+		}
+
+		if( $Runs->getIp() != NULL){
+			$sql .= " ip = ? AND";
+			array_push( $val, $Runs->getIp() );
+		}
+
+		if( $Runs->getTime() != NULL){
+			$sql .= " time = ? AND";
+			array_push( $val, $Runs->getTime() );
+		}
+
+		if ($Runs->getTest() !== NULL) {
+			$sql .= " test = ?  AND";
+			array_push($val, $Runs->getTest());
+		}
+
+		$sql .= " run_id > ?  AND";
+		array_push($val, $greaterThan);
+
+		if(sizeof($val) == 0){return array();}
+		$sql = substr($sql, 0, -3) . " )";
+		if( $orderBy !== null ){
+		    $sql .= " order by " . $orderBy . " " . $orden ;
+		
+		}
+                
+		// Add LIMIT offset, rowcount if rowcount is set
+                if (!is_null($rowcount))
+                {
+                    $sql .= " LIMIT ". $offset . "," . $rowcount;
+                }
+		
+		global $conn;
+		$rs = $conn->Execute($sql, $val);
+		$ar = array();
+		foreach ($rs as $foo) {
+			$bar =  new Runs($foo);
+    		array_push( $ar,$bar);    		
+		}
+		return $ar;
 	}
 }

@@ -519,6 +519,7 @@ class ProblemController extends Controller {
 		self::initializeGrader();		
 
 		// Call Grader
+		$runs = array();
 		try {
 			$runs = RunsDAO::search(new Runs(array(
 								"problem_id" => $r["problem"]->getProblemId()
@@ -542,10 +543,11 @@ class ProblemController extends Controller {
 
 		// All clear
 		$response["status"] = "ok";
-
-		// Invalidar cache @todo invalidar todos los lenguajes
-		$statementCache = new Cache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");
-		$statementCache->delete();
+		
+		// Invalidate caches
+		if (!is_null($runs) && count($runs) > 0) {
+			RunController::invalidateCacheOnRejudge($runs[0]);
+		}
 		
 		return $response;
 	}
@@ -1128,6 +1130,146 @@ class ProblemController extends Controller {
 
 		$response["status"] = "ok";
 		return $response;
+	}
+	
+	/**
+	 * Stats of a problem
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws ForbiddenAccessException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiStats(Request $r) {
+		
+		// Get user
+		self::authenticateRequest($r);
+		
+		// Validate request
+		self::validateRuns($r);
+		
+		// We need to check that the user has priviledges on the problem
+		if (!Authorization::CanEditProblem($r["current_user_id"], self::$problem)) {
+			throw new ForbiddenAccessException();
+		}
+		
+		try {
+			// Array of GUIDs of pending runs
+			$pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem(self::$problem->getProblemId());
+			
+			// Count of pending runs (int)
+			$totalRunsCount = RunsDAO::CountTotalRunsOfProblem(self::$problem->getProblemId());
+			
+			// List of veredicts			
+			$veredict_counts = array();
+
+			foreach (self::$veredicts as $veredict) {
+				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfProblemByVeredict(self::$problem->getProblemId(), $veredict);
+			}
+			
+			// Array to count AC stats per case.
+			// Let's try to get the last snapshot from cache.
+			$problemStatsCache = new Cache(Cache::PROBLEM_STATS, self::$problem->getAlias());
+			$cases_stats = $problemStatsCache->get();
+			if (is_null($cases_stats)) {
+				// Initialize the array at counts = 0
+				$cases_stats = array();
+				$cases_stats["counts"] = array();
+				
+				// We need to save the last_id that we processed, so next time we do not repeat this
+				$cases_stats["last_id"] = 0;							
+				
+				// Build problem dir
+				$problem_dir = PROBLEMS_PATH . '/' . self::$problem->getAlias() . '/cases/';
+
+				// Get list of cases
+				$dir = opendir($problem_dir);
+				if (is_dir($problem_dir)) {
+					while (($file = readdir($dir)) !== false) {
+						// If we have an input
+						if (strstr($file, ".in")) {
+							// Initialize it to 0
+							$cases_stats["counts"][str_replace(".in", "", $file)] = 0;
+						}
+					}
+					closedir($dir);
+				}
+			}
+			
+			// Get all runs of this problem after the last id we had
+			$runs = RunsDAO::searchRunIdGreaterThan(new Runs(array("problem_id" => self::$problem->getProblemId())), 
+					$cases_stats["last_id"], 
+					"run_id");
+									
+			// For each run we got
+			foreach($runs as $run) {
+				// Build grade dir
+				$grade_dir = RUNS_PATH . '/../grade/' . $run->getRunId();								
+				
+				// Skip it if it didn't produce outputs 
+				if (file_exists("$grade_dir.err")) {
+					continue;
+				} else if (is_dir($grade_dir)) {
+					// Try to open the details file.
+					if (file_exists("$grade_dir/details.json")) {
+						$details = json_decode(file_get_contents("$grade_dir/details.json"));
+						foreach ($details as $group) {
+							foreach ($group->cases as $case) {
+									if ($case->score > 0) {
+										$cases_stats["counts"][$case->name]++;
+									}
+							}
+						}
+					} else if ($dir = opendir($grade_dir)) {
+						// Read all files in this run directory
+						while (($file = readdir($dir)) !== false) {
+
+							// Skip non output cases
+							if ($file == '.' || $file == '..' || !strstr($file, ".meta")) {
+								continue;	
+							}
+
+							// Get the case name
+							$case_name = str_replace(".meta", "", $file);
+
+							// If we have an output
+							if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
+
+								// Get the output of this case
+								$out = str_replace(".meta", ".out", $file);
+								$case_out = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
+
+								// If the output was empty
+								if (strcmp($case_out, "") === 0) {
+									$cases_stats["counts"][$case_name]++;
+								}
+							}
+						}
+
+						// Close this run dir
+						closedir($dir);
+					}
+				}								
+			}			
+			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+				
+		// Save the last id we saw in case we saw something
+		if (!is_null($runs) && count($runs) > 0) {
+			$cases_stats["last_id"] = $runs[count($runs) - 1]->getRunId();
+		}
+		
+		// Save in cache what we got
+		$problemStatsCache->set($cases_stats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
+		
+		return array(
+			"total_runs" => $totalRunsCount,
+			"pending_runs" => $pendingRunsGuids,
+			"veredict_counts" => $veredict_counts,
+			"cases_stats" => $cases_stats["counts"],						
+		);
 	}
 
 }

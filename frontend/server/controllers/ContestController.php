@@ -10,7 +10,7 @@ class ContestController extends Controller {
 	private static $hasPrivateUsers;
 	private static $problems;
 	private static $contest;
-
+		
 	/**
 	 * Returns a list of contests
 	 * 
@@ -49,7 +49,7 @@ class ContestController extends Controller {
 
 		foreach ($contests as $c) {
 			// At most we want 30 contests @TODO paginar correctamente
-			if (sizeof($addedContests) == 30) {
+			if (sizeof($addedContests) == 100) {
 				break;
 			}
 
@@ -1176,6 +1176,14 @@ class ContestController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Stats of a problem
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
 	public static function apiStats(Request $r) {
 
 		// Get user
@@ -1206,11 +1214,10 @@ class ContestController extends Controller {
 			// Wait time
 			$waitTimeArray = RunsDAO::GetLargestWaitTimeOfContest($r["contest"]->getContestId());
 
-			// List of veredicts
-			$veredicts = array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC");
+			// List of veredicts			
 			$veredict_counts = array();
 
-			foreach ($veredicts as $veredict) {
+			foreach (self::$veredicts as $veredict) {
 				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfContestByVeredict($r["contest"]->getContestId(), $veredict);
 			}
 		} catch (Exception $e) {

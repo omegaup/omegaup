@@ -7,6 +7,7 @@ import java.util.zip._
 import scala.collection.Iterator
 import scala.collection.mutable
 import scala.collection.immutable.Map
+import net.liftweb.json._
 import omegaup._
 import omegaup.data._
 import Veredict._
@@ -158,33 +159,46 @@ trait Grader extends Object with Log {
 			run.memory = 0
 			run.score = 0
 		} else {
-			run.score = weights
-                        .map { case (group, data) => 
-                          {
+			val caseScores = weights.map {
+			  case (group, data) => {
                             val scores = data
                             .map { case (name, weight) =>
-                              if (metas.contains(name) && metas(name)._2("status") == "OK") {
-                                val f = metas(name)._1
+                              new CaseVeredictMessage(
+                                name,
+                                metas(name)._2("status"),
+                                if (metas.contains(name) && metas(name)._2("status") == "OK") {
+                                  val f = metas(name)._1
 
-                                gradeCase(
-                                  run,
-                                  name,
-			          new File(f.getCanonicalPath.replace(".meta", ".out")),
-				  new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out"))
-                                ) * weight
+                                  gradeCase(
+                                    run,
+                                    name,
+			            new File(f.getCanonicalPath.replace(".meta", ".out")),
+				    new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out"))
+                                  ) * weight
+                                } else {
+                                  0.0
+                                }
+                              )
+                            }
+                            
+                            new GroupVeredictMessage(
+                              group,
+                              scores.toList,
+                              if (scores.forall(_.score > 0)) {
+                                scores.foldLeft(0.0)(_+_.score)
                               } else {
                                 0.0
                               }
-                            }
-                            
-                            if (scores.forall(_ > 0)) {
-                              scores.foldLeft(0.0)(_+_)
-                            } else {
-                              0.0
-                            }
+                            )
                           }
                         }
-			.foldLeft(0.0)(_+_) / weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2)) * (run.contest match {
+                        
+                        implicit val formats = Serialization.formats(NoTypeHints)
+                        
+			val details = new File(Config.get("grader.root", "./grader") + "/" + run.id + "/details.json")
+			Serialization.write(caseScores, new FileWriter(details))
+                        
+			run.score = caseScores.foldLeft(0.0)(_+_.score) / weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2)) * (run.contest match {
 				case None => 1.0
 				case Some(contest) => {
 					if (contest.points_decay_factor <= 0.0 || run.submit_delay == 0.0) {

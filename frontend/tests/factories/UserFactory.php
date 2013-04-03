@@ -54,7 +54,29 @@ class UserFactory {
         // Password came hashed from DB. Set password in plaintext
         $user->setPassword($password);
         return $user;
-    }                        
+    } 
+	
+	/**
+	 * Creates a new user and elevates his priviledges
+	 * 
+	 * @param string $username
+	 * @param string $password
+	 * @param string $email
+	 * @return User
+	 */
+	public static function createAdminUser($username = null, $password = null, $email = null) {
+		
+		$user = self::createUser();
+		
+		$userRoles = new UserRoles(array(
+			"user_id" => $user->getUserId(),
+			"role_id" => ADMIN_ROLE,
+			"contest_id" => 0,
+		));
+		UserRolesDAO::save($userRoles);
+		
+		return $user;
+	}
 }
 
 

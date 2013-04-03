@@ -1,14 +1,3 @@
-{if $LOGGED_IN eq '1'} 
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-	<html>
-	<head>
-	<title>Omegaup</title>
-	<meta http-equiv="REFRESH" content="0;url=/profile.php"></HEAD>
-		<body>
-		</body>
-	</HTML>
-{/if}
-
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 <div class="post">
@@ -18,14 +7,14 @@
 		<tr >
 			<td valign=top>
 				<h3>{#loginFederated#}</h3>
-				<a href="google.php" title="log in with Google" style="background: #fff url(https://cdn.sstatic.net/Img/openid/openid-logos.png?v=8); background-position: -1px -1px" class="google openid_large_btn"></a>
+				<a href="google.php{if $smarty.server.QUERY_STRING}?{$smarty.server.QUERY_STRING}{/if}" title="log in with Google" style="background: #fff url(https://cdn.sstatic.net/Img/openid/openid-logos.png?v=8); background-position: -1px -1px" class="google openid_large_btn"></a>
 				&nbsp;&nbsp;&nbsp; <a href="{$FB_URL}" title="log in with Facebook" style="background: #fff url(https://cdn.sstatic.net/Img/openid/openid-logos.png?v=8); background-position: -1px -456px" class="facebook openid_large_btn"></a><a style="float:right"></a><br>
 			</td>
 
 			<td>
 				<h3>{#loginNative#}</h3>
 				<div>
-					<form method='POST' action='login.php'>
+					<form method='POST' action='{$smarty.server.REQUEST_URI}'>
 					<table width='100%' >
 						<tr>
 							<td>{#loginEmailUsername#}</td>

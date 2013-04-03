@@ -1,0 +1,18 @@
+-f
+-a 3
+-E PATH=/usr/bin
+-F
+
+-s ugetrlimit
+-s getrlimit
+-s rt_sigaction
+-s time
+-s gettimeofday
+-s getcwd
+-s getdents64
+-s execve
+-s mprotect
+-s getrusage
+-s unlink
+-s umask
+-s chmod
