@@ -130,7 +130,7 @@ EOF
 	echo -e "Go to https://github.com/settings/ssh, click on \"Add SSH Key\" and enter:\n"
 	cat ~/.ssh/github.com.pub
 	echo -e "\n"
-	read -s -n 1 -p "Press any key to continue"
+	read -n 1 -p "Press any key to continue"
 fi
 
 # Clone repository.
