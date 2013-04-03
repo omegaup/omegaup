@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash
+set -e
 
 # Helper functions
 show_help() {
@@ -36,6 +37,7 @@ done
 if [ "$GIT_USERNAME" == "" -o "$GIT_EMAIL" == "" ]; then
 	show_help
 fi
+
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
