@@ -76,5 +76,5 @@
 	define("APC_USER_CACHE_CONTEST_INFO_TIMEOUT",		10);
 	define("APC_USER_CACHE_PROBLEM_STATS_TIMEOUT", 0); // in seconds
 
-	define("SMARTY_CACHE_DIR",							FALSE);
+	define("SMARTY_CACHE_DIR",							"/var/tmp");
 	define("IS_TEST",									FALSE);

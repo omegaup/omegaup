@@ -147,7 +147,7 @@ EOF
 	echo -e "Go to https://github.com/settings/ssh, click on \"Add SSH Key\" and enter:\n"
 	cat ~/.ssh/github.com.pub
 	echo -e "\n"
-	read -n 1 -p "Press any key to continue"
+	read -p "Press Enter to continue"
 fi
 
 # Clone repository.
@@ -195,6 +195,7 @@ fi
 #chek php config.ini, set values for development
 
 #check writable folders
+
 
 #check and write config
 
