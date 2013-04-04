@@ -19,8 +19,7 @@
 
 	# ####################################
 	# TEST CONFIG
-	# ####################################
-	define('OMEGAUP_ROOT', '/opt/omegaup/frontend/');
+	# ####################################	
 	define('OMEGAUP_FRONTEND_SERVER_ROOT', OMEGAUP_ROOT . 'server/');
 	define('OMEGAUP_TEST_ROOT', '/opt/omegaup/frontend/tests/controllers/');
 	define('OMEGAUP_RESOURCES_ROOT', '/opt/omegaup/frontend/tests/resources/');
@@ -30,11 +29,11 @@
 	# ####################################
 	# LOG CONFIG
 	# ####################################	
-    define("OMEGAUP_LOG_TO_FILE",         	true);
-    define("OMEGAUP_LOG_TRACKBACK",     	false);
-    define("OMEGAUP_LOG_DB_QUERYS",     	true);
-    define("OMEGAUP_LOG_ACCESS_FILE",     	"/opt/omegaup/omegaup/omegaup.log");
-    define("OMEGAUP_LOG_ERROR_FILE",     	"/opt/omegaup/omegaup/omegaup.log");
+    define('OMEGAUP_LOG_TO_FILE', true);
+	define('OMEGAUP_LOG_ACCESS_FILE', OMEGAUP_TEST_ROOT . 'omegaup.log');
+	define('OMEGAUP_LOG_ERROR_FILE', OMEGAUP_TEST_ROOT . 'omegaup.log');
+	define('OMEGAUP_LOG_TRACKBACK', false);
+	define('OMEGAUP_LOG_DB_QUERYS', false);
 
     # ####################################
     # GRADER CONFIG
@@ -42,8 +41,8 @@
     define('OMEGAUP_GRADER_URL',      		'https://localhost:21680/grade/');
     define('OMEGAUP_SSLCERT_URL',     		'/opt/omegaup/frontend/omegaup.pem');
     define('OMEGAUP_CACERT_URL',      		'/opt/omegaup/frontend/omegaup.pem');
-    define('RUNS_PATH',               		'/opt/omegaup/omegaup/submissions');
-    define('PROBLEMS_PATH',           		'/opt/omegaup/omegaup/problems');
+    define('RUNS_PATH', OMEGAUP_TEST_ROOT . 'submissions');
+	define('PROBLEMS_PATH', OMEGAUP_TEST_ROOT . 'problems');
 
     # ####################################
     # FACEBOOK LOGIN CONFIG
