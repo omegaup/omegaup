@@ -40,7 +40,7 @@ if [ "$GIT_USERNAME" == "" -o "$GIT_EMAIL" == "" ]; then
 fi
 
 if [ "`which curl`" == "" ]; then
-	sudo apt-get install -q -y curl
+	sudo apt-get install -qq -y curl
 fi
 
 # Install everything needed.
@@ -52,8 +52,17 @@ deb-src http://packages.dotdeb.org squeeze all
 EOF
 	sudo mv dotdeb.list /etc/apt/sources.list.d
 	sudo apt-get update -qq -y
-	#sudo apt-get upgrade -q -y
-	sudo apt-get install -q -y nginx mysql-server mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make wget curl
+	sudo apt-get install -qq -y expect
+	VAR=$(expect -c '
+spawn apt-get -qq -y install mysql-server
+expect "New password for the MySQL \"root\" user:"
+send "$MYSQL_PASSWORD\r"
+expect "Repeat password for the MySQL \"root\" user:"
+send "$MYSQL_PASSWORD\r"
+expect eof
+	')
+	echo "$VAR"
+	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make vim
 fi
 
 # Install SBT.
