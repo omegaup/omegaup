@@ -10,6 +10,7 @@ show_help() {
 
 # Configuration.
 OMEGAUP_ROOT=/opt/omegaup
+WWW_ROOT=/var/www/omegaup.com
 USER=`whoami`
 MYSQL_PASSWORD=dd if=/dev/urandom count=1 bs=9 2>/dev/null | base64
 
@@ -135,14 +136,10 @@ EOF
 fi
 
 # Clone repository.
-if [ ! -d $OMEGAUP_ROOT ]; then
+if [ ! -d $WWW_ROOT ]; then
 	sudo mkdir $OMEGAUP_ROOT
 	sudo chown $USER -R $OMEGAUP_ROOT
 	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
-
-	# Link the frontend to nginx.
-	sudo mkdir -p /var/www/
-	sudo ln -s $OMEGAUP_ROOT/frontend/www /var/www/omegaup.com
 
 	# Generate the certificates required.
 	cd $OMEGAUP_ROOT
@@ -163,6 +160,12 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	# Build grader
 	cd $OMEGAUP_ROOT/grader
 	sbt proguard
+
+	# Link the frontend to nginx.
+	if [ ! -d `dirname $WWW_ROOT` ]; then
+		sudo mkdir -p `dirname $WWW_ROOT`
+	fi
+	sudo ln -s $OMEGAUP_ROOT/frontend/www $WWW_ROOT
 fi
 
 # check mysql
