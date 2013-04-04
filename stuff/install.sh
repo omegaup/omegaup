@@ -65,7 +65,7 @@ fi
 
 # Add ngnix configuration.
 if [ "$SKIP_NGINX" != "1" ]; then
-	cat > defalut.conf << EOF
+	cat > default.conf << EOF
 server {
 listen       80;
 server_name  localhost;
