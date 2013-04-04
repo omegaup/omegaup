@@ -13,6 +13,7 @@ OMEGAUP_ROOT=/opt/omegaup
 WWW_ROOT=/var/www/omegaup.com
 USER=`whoami`
 MYSQL_PASSWORD=omegaup
+MYSQL_DB_NAME=omegaup
 
 # Get parameters
 while getopts "u:m:p:01" optname; do
@@ -199,11 +200,12 @@ fi
 #check and write config
 
 #install database Omegaup
-mysql -uroot -pomegaup -e "CREATE DATABASE omegaup;" 
-mysql -uroot -pomegaup omegaup < $OMEGAUP_ROOT/frontend/private/bd.sql
-mysql -uroot -pomegaup -e " SET GLOBAL time_zone = '+00:00'; "
+if [ ! mysql -uroot -p$MYSQL_PASSWORD -e 'use $MYSQL_DB_NAME;' ]; then
+	mysql -uroot -p$MYSQL_PASSWORD -e "CREATE DATABASE $MYSQL_DB_NAME;" 
+	mysql -uroot -pMYSQL_PASSWORD $MYSQL_DB_NAME < $OMEGAUP_ROOT/frontend/private/bd.sql
+fi
+mysql -uroot -p$MYSQL_PASSWORD -e " SET GLOBAL time_zone = '+00:00'; "
 
-#install user and db
 
 #update config.php
 
@@ -215,14 +217,15 @@ mysql -uroot -pomegaup -e " SET GLOBAL time_zone = '+00:00'; "
 cp $OMEGAUP_ROOT/frontend/tests/test_config.php.sample $OMEGAUP_ROOT/frontend/tests/test_config.php
 touch $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log
 
-if [ ! -d `dirname $OMEGAUP_ROOT/frontend/tests/controllers/problems` ]; then
+if [ ! -d $OMEGAUP_ROOT/frontend/tests/controllers/problems ]; then
 	mkdir $OMEGAUP_ROOT/frontend/tests/controllers/problems
 fi
 
-if [ ! -d `dirname $OMEGAUP_ROOT/frontend/tests/controllers/submissions` ]; then
+if [ ! -d $OMEGAUP_ROOT/frontend/tests/controllers/submissions ]; then
 	mkdir $OMEGAUP_ROOT/frontend/tests/controllers/submissions
 fi
 
+#Execute tests
 OLDPATH=`pwd`
 cd $OMEGAUP_ROOT/frontend/tests/
 phpunit controllers/
