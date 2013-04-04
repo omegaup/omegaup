@@ -217,5 +217,6 @@ touch $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log
 mkdir $OMEGAUP_ROOT/frontend/tests/controllers/problems
 mkdir $OMEGAUP_ROOT/frontend/tests/controllers/submissions
 pushd $OMEGAUP_ROOT/frontend/tests/
-phpunit ./
+phpunit controllers/
+phpunit server/
 popd
