@@ -53,14 +53,13 @@ EOF
 	sudo mv dotdeb.list /etc/apt/sources.list.d
 	sudo apt-get update -qq -y
 	sudo apt-get install -qq -y expect
-	VAR=$(expect -c '
+	VAR=$(sudo expect -c "
 spawn apt-get -qq -y install mysql-server
-expect "New password for the MySQL \"root\" user:"
-send "$MYSQL_PASSWORD\r"
-expect "Repeat password for the MySQL \"root\" user:"
-send "$MYSQL_PASSWORD\r"
-expect eof
-	')
+expect \"New password for the MySQL \\\"root\\\" user:\"
+send \"$MYSQL_PASSWORD\\r\"
+expect \"Repeat password for the MySQL \\\"root\\\" user:\"
+send \"$MYSQL_PASSWORD\\r\"
+expect eof")
 	echo "$VAR"
 	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make vim
 fi
