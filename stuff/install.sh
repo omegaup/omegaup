@@ -214,8 +214,14 @@ mysql -uroot -pomegaup -e " SET GLOBAL time_zone = '+00:00'; "
 #setup tests
 cp $OMEGAUP_ROOT/frontend/tests/test_config.php.sample $OMEGAUP_ROOT/frontend/tests/test_config.php
 touch $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log
-mkdir $OMEGAUP_ROOT/frontend/tests/controllers/problems
-mkdir $OMEGAUP_ROOT/frontend/tests/controllers/submissions
+
+if [ ! -d `dirname $OMEGAUP_ROOT/frontend/tests/controllers/problems` ]; then
+	mkdir $OMEGAUP_ROOT/frontend/tests/controllers/problems
+fi
+
+if [ ! -d `dirname $OMEGAUP_ROOT/frontend/tests/controllers/submissions` ]; then
+	mkdir $OMEGAUP_ROOT/frontend/tests/controllers/submissions
+fi
 
 OLDPATH=`pwd`
 cd $OMEGAUP_ROOT/frontend/tests/
