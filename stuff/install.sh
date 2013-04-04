@@ -55,7 +55,7 @@ EOF
 	sudo apt-get install -qq -y expect
 	if [ ! -f /usr/sbin/mysqld ]; then
 		VAR=$(sudo expect -c "
-spawn apt-get -qq -y install mysql-server
+spawn sudo apt-get -qq -y install mysql-server
 expect \"New password for the MySQL \\\"root\\\" user:\"
 send \"$MYSQL_PASSWORD\\r\"
 expect \"Repeat password for the MySQL \\\"root\\\" user:\"
