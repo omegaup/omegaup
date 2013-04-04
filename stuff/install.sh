@@ -39,6 +39,9 @@ if [ "$GIT_USERNAME" == "" -o "$GIT_EMAIL" == "" ]; then
 	show_help
 fi
 
+if [ "`which curl`" == "" ]; then
+	sudo apt-get install -q -y curl
+fi
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
