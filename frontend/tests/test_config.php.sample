@@ -4,7 +4,7 @@
     # DATABASE CONFIG
     # ####################################
 	define("OMEGAUP_DB_USER",				"root");
-	define("OMEGAUP_DB_PASS",				"git ");
+	define("OMEGAUP_DB_PASS",				"root");
 	define("OMEGAUP_DB_HOST",				"localhost");
 	define("OMEGAUP_DB_NAME",				"omegaup");
 	define("OMEGAUP_DB_DRIVER",				"mysqlt");
@@ -41,8 +41,8 @@
     define('OMEGAUP_GRADER_URL',      		'https://localhost:21680/grade/');
     define('OMEGAUP_SSLCERT_URL',     		'/opt/omegaup/frontend/omegaup.pem');
     define('OMEGAUP_CACERT_URL',      		'/opt/omegaup/frontend/omegaup.pem');
-    define('RUNS_PATH',               		'/opt/omegaup/omegaup/submissions');
-    define('PROBLEMS_PATH',           		'/opt/omegaup/omegaup/problems');
+    define('RUNS_PATH', OMEGAUP_TEST_ROOT . 'submissions');
+	define('PROBLEMS_PATH', OMEGAUP_TEST_ROOT . 'problems');
 
     # ####################################
     # FACEBOOK LOGIN CONFIG
