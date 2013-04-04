@@ -12,7 +12,7 @@ show_help() {
 OMEGAUP_ROOT=/opt/omegaup
 WWW_ROOT=/var/www/omegaup.com
 USER=`whoami`
-MYSQL_PASSWORD=dd if=/dev/urandom count=1 bs=9 2>/dev/null | base64
+MYSQL_PASSWORD=omegaup
 
 # Get parameters
 while getopts "u:m:p:01" optname; do
