@@ -1,6 +1,5 @@
 <?php
 
-require_once 'Utils.php';
 
 class DbConfigTest extends PHPUnit_Framework_TestCase
 {

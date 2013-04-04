@@ -96,7 +96,7 @@ class CreateRun extends OmegaupTestCase {
 		$this->assertEquals(0, $run->getScore());
 		$this->assertEquals(0, $run->getContestScore());
 		$this->assertEquals("127.0.0.1", $run->getIp());
-		$this->assertEquals((time() - strtotime($contest->getStartTime())) / 60, $run->getSubmitDelay(), '', 0.5);
+		$this->assertEquals((time() - intval(strtotime($contest->getStartTime()))) / 60, $run->getSubmitDelay(), '', 0.5);
 		$this->assertEquals("JE", $run->getVeredict());
 	}
 

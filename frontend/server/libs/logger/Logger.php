@@ -206,14 +206,16 @@ class Logger
     
     public static final function error($msg)
     {
-        self::log(" ERROR | " . $msg);
-		
-		self::log("REQUEST PARAMS: ");
+        self::log(" ERROR | " . $msg);			
 
-        foreach ( $_REQUEST as $k => $v )
-        {
-            self::log("   " . $k . ": " . $v);
-        }
+		if (isset($_REQUEST)) {
+			
+			self::log("REQUEST PARAMS: ");
+			foreach ( $_REQUEST as $k => $v )
+			{
+				self::log("   " . $k . ": " . $v);
+			}
+		}
     }
     
     public static final function warn($msg)

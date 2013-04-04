@@ -206,6 +206,7 @@ fi
 #install database Omegaup
 mysql -uroot -pomegaup -e "CREATE DATABASE omegaup;" 
 mysql -uroot -pomegaup omegaup < $OMEGAUP_ROOT/frontend/private/bd.sql
+mysql -uroot -pomegaup -e " SET GLOBAL time_zone = '+00:00'; "
 
 #install user and db
 
