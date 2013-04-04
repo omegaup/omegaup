@@ -208,4 +208,11 @@ fi
 
 #test index with curl
 
-#look for phpunit
+#setup tests
+cp $OMEGAUP_ROOT/frontend/tests/test_config.php.sample $OMEGAUP_ROOT/frontend/tests/test_config.php
+touch $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log
+mkdir $OMEGAUP_ROOT/frontend/tests/controllers/problems
+mkdir $OMEGAUP_ROOT/frontend/tests/controllers/submissions
+pushd $OMEGAUP_ROOT/frontend/tests/
+phpunit ./
+popd
