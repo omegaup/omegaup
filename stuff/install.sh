@@ -12,7 +12,7 @@ show_help() {
 OMEGAUP_ROOT=/opt/omegaup
 WWW_ROOT=/var/www/omegaup.com
 USER=`whoami`
-MYSQL_PASSWORD=dd if=/dev/urandom count=1 bs=9 2>/dev/null | base64
+MYSQL_PASSWORD=omegaup
 
 # Get parameters
 while getopts "u:m:p:01" optname; do
@@ -45,7 +45,7 @@ fi
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
-	curl http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add -
+	curl -s http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add - > /dev/null
 	cat > dotdeb.list << EOF
 deb http://packages.dotdeb.org squeeze all
 deb-src http://packages.dotdeb.org squeeze all
@@ -53,14 +53,16 @@ EOF
 	sudo mv dotdeb.list /etc/apt/sources.list.d
 	sudo apt-get update -qq -y
 	sudo apt-get install -qq -y expect
-	VAR=$(sudo expect -c "
-spawn apt-get -qq -y install mysql-server
+	if [ ! -f /usr/sbin/mysqld ]; then
+		VAR=$(sudo expect -c "
+spawn sudo apt-get -qq -y install mysql-server
 expect \"New password for the MySQL \\\"root\\\" user:\"
 send \"$MYSQL_PASSWORD\\r\"
 expect \"Repeat password for the MySQL \\\"root\\\" user:\"
 send \"$MYSQL_PASSWORD\\r\"
 expect eof")
-	echo "$VAR"
+		echo "$VAR"
+	fi
 	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make vim
 fi
 
@@ -133,7 +135,9 @@ fi
 
 # Set up ssh/git.
 if [ ! -f ~/.ssh/github.com ]; then
-	mkdir ~/.ssh
+	if [ ! -d ~/.ssh ]; then
+		mkdir ~/.ssh
+	fi
 	cat >> ~/.ssh/config << EOF
 Host github.com
 IdentityFile /home/$USER/.ssh/github.com
@@ -143,7 +147,7 @@ EOF
 	git config --global user.email "$GIT_EMAIL"
 	git config --global credential.helper cache
 	git config --global credential.helper 'cache --timeout=3600'
-	ssh-keygen -t rsa -C "$GIT_EMAIL" -f ~/.ssh/github.com
+	ssh-keygen -t rsa -C "$GIT_EMAIL" -f ~/.ssh/github.com -N "" > /dev/null
 	echo -e "Go to https://github.com/settings/ssh, click on \"Add SSH Key\" and enter:\n"
 	cat ~/.ssh/github.com.pub
 	echo -e "\n"
