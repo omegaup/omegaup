@@ -4,7 +4,7 @@
     # DATABASE CONFIG
     # ####################################
 	define("OMEGAUP_DB_USER",				"root");
-	define("OMEGAUP_DB_PASS",				"root");
+	define("OMEGAUP_DB_PASS",				"git ");
 	define("OMEGAUP_DB_HOST",				"localhost");
 	define("OMEGAUP_DB_NAME",				"omegaup");
 	define("OMEGAUP_DB_DRIVER",				"mysqlt");
@@ -19,8 +19,7 @@
 
 	# ####################################
 	# TEST CONFIG
-	# ####################################
-	define('OMEGAUP_ROOT', '/opt/omegaup/frontend/');
+	# ####################################	
 	define('OMEGAUP_FRONTEND_SERVER_ROOT', OMEGAUP_ROOT . 'server/');
 	define('OMEGAUP_TEST_ROOT', '/opt/omegaup/frontend/tests/controllers/');
 	define('OMEGAUP_RESOURCES_ROOT', '/opt/omegaup/frontend/tests/resources/');
