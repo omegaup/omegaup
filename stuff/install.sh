@@ -111,7 +111,7 @@ location ~ /\.ht {
 }
 EOF
 	sudo mv default.conf /etc/nginx/conf.d/
-	sudo mv /etc/ngnix/sites-enabled/default /etc/ngnix/sites-disabled
+	sudo mv /etc/nginx/sites-enabled/default /etc/nginx/sites-disabled
 	sudo /etc/init.d/nginx restart
 fi
 
