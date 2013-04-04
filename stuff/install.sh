@@ -54,14 +54,9 @@ EOF
 	sudo apt-get update -qq -y
 	sudo apt-get install -qq -y expect
 	if [ ! -f /usr/sbin/mysqld ]; then
-		VAR=$(sudo expect -c "
-spawn sudo apt-get -qq -y install mysql-server
-expect \"New password for the MySQL \\\"root\\\" user:\"
-send \"$MYSQL_PASSWORD\\r\"
-expect \"Repeat password for the MySQL \\\"root\\\" user:\"
-send \"$MYSQL_PASSWORD\\r\"
-expect eof")
-		echo "$VAR"
+		sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server
+		sleep 5
+		mysqladmin -u root password $MYSQL_PASSWORD
 	fi
 	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make vim zip
 	sudo /etc/init.d/php5-fpm restart
