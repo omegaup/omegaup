@@ -81,7 +81,7 @@ class CreateRun extends OmegaupTestCase {
 
 		// Validate data        
 		$this->assertEquals($r["language"], $run->getLanguage());
-		$this->assertNotEmpty($run->getGuid());
+		$this->assertNotNull($run->getGuid());
 
 		// Validate file created
 		$filename = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
