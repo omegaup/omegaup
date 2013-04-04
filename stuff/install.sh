@@ -202,7 +202,9 @@ fi
 
 #check and write config
 
-#check db connection
+#install database Omegaup
+mysql -uroot -pomegaup -e "CREATE DATABASE omegaup;" 
+mysql -uroot -pomegaup omegaup < $OMEGAUP_ROOT/frontend/private/bd.sql
 
 #install user and db
 

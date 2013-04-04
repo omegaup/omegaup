@@ -356,7 +356,7 @@ class ProblemController extends Controller {
 			}
 
 			if ($size > self::MAX_ZIP_FILESIZE) {
-				throw new InvalidParameterException("Extracted zip size ($size) over {$maximumSize}MB. Rejecting.");
+				throw new InvalidParameterException("Extracted zip size ($size) over max allowed MB. Rejecting.");
 			}
 
 			try {
@@ -364,7 +364,7 @@ class ProblemController extends Controller {
 				// Look for testplan
 				if (in_array("testplan", $zipFilesArray)) {
 
-					self::checkCasesWithTestplan($zip, $zipFilesArray);
+					$returnValue = self::checkCasesWithTestplan($zip, $zipFilesArray);
 					Logger::log("testplan found, checkCasesWithTestPlan=" . $returnValue);
 					self::$filesToUnzip[] = 'testplan';
 				} else {
