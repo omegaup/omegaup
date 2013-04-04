@@ -60,7 +60,7 @@ class DetailsProblem extends OmegaupTestCase {
         $this->assertEquals(0, $problemDAO->getDifficulty());
         
         // Verify that we have an empty array of runs
-        $this->assertEmpty($response["runs"]);
+        $this->assertEquals(0, count($response["runs"]));
         
         // Verify that problem was marked as Opened
         $problem_opened = ContestProblemOpenedDAO::getByPK($contestDAO->getContestId(), $problemDAO->getProblemId(), $contestantDAO->getUserId());
