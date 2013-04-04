@@ -216,7 +216,9 @@ cp $OMEGAUP_ROOT/frontend/tests/test_config.php.sample $OMEGAUP_ROOT/frontend/te
 touch $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log
 mkdir $OMEGAUP_ROOT/frontend/tests/controllers/problems
 mkdir $OMEGAUP_ROOT/frontend/tests/controllers/submissions
-pushd $OMEGAUP_ROOT/frontend/tests/
+
+OLDPATH=`pwd`
+cd $OMEGAUP_ROOT/frontend/tests/
 phpunit controllers/
 phpunit server/
-popd
+cd $OLDPATH
