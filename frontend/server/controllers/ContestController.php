@@ -83,7 +83,7 @@ class ContestController extends Controller {
 			}
 
 			// Admins can see all contests
-			if ($contestUser === null && !Authorization::IsSystemAdmin($r["current_user_id"])) {
+			if ($contestUser === null && !Authorization::IsContestAdmin($r["current_user_id"], $c)) {
 				/**
 				 * Nope, he cant .
 				 * */

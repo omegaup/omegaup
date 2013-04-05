@@ -138,6 +138,22 @@ class ContestsFactory {
 		unset($_REQUEST);		
 	}
 	
+	public static function addAdminUser($contestData, $user) {
+		
+		// Prepare our request
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		$r["usernameOrEmail"] = $user->getUsername();
+		
+		// Log in the contest director
+		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);
+		
+		// Call api
+		ContestController::apiAddAdmin($r);
+		
+		unset($_REQUEST);		
+	}
+	
 	public static function makeContestWindowLength($contestData, $windowLength = 20) {
 		
 		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
