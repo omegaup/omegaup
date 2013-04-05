@@ -381,6 +381,10 @@ class ContestController extends Controller {
 			if (is_null($r["contest_alias"])) {
 				throw new NotFoundException();
 			}
+			
+			if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+				throw new ForbiddenAccessException();
+			}
 		}
 
 		Validators::isStringNonEmpty($r["title"], "title", $is_required);
@@ -555,17 +559,15 @@ class ContestController extends Controller {
 		// Authenticate logged user
 		self::authenticateRequest($r);
 
-
 		$user_to_add = null;
 
 		// Check contest_alias        
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
-		Validators::isNumber($r["user_id"], "user_id");
+		$user_to_add = UserController::resolveUser($r["usernameOrEmail"]);
 
 		try {
-			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
-			$user_to_add = UsersDAO::getByPK($r["user_id"]);
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);			
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
@@ -582,7 +584,7 @@ class ContestController extends Controller {
 
 		$contest_user = new ContestsUsers();
 		$contest_user->setContestId(self::$contest->getContestId());
-		$contest_user->setUserId($r["user_id"]);
+		$contest_user->setUserId($user_to_add->getUserId());
 		$contest_user->setAccessTime("0000-00-00 00:00:00");
 		$contest_user->setScore("0");
 		$contest_user->setTime("0");
@@ -590,6 +592,52 @@ class ContestController extends Controller {
 		// Save the contest to the DB
 		try {
 			ContestsUsersDAO::save($contest_user);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array("status" => "ok");
+	}
+	
+	/**
+	 * Adds an admin to a contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiAddAdmin(Request $r) {
+
+		// Authenticate logged user
+		self::authenticateRequest($r);		
+
+		// Check contest_alias        
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");				
+
+		$user = UserController::resolveUser($r["usernameOrEmail"]);
+		
+		try {
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);			
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}		
+
+		// Only director is allowed to create problems in contest
+		if (!Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+			throw new ForbiddenAccessException();
+		}
+
+		$contest_user = new UserRoles();
+		$contest_user->setContestId(self::$contest->getContestId());
+		$contest_user->setUserId($user->getUserId());
+		$contest_user->setRoleId(CONTEST_ADMIN_ROLE);
+		
+		// Save the contest to the DB
+		try {
+			UserRolesDAO::save($contest_user);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);

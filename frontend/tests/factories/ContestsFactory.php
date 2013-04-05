@@ -127,7 +127,7 @@ class ContestsFactory {
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
-		$r["user_id"] = $user->getUserId();
+		$r["usernameOrEmail"] = $user->getUsername();
 		
 		// Log in the contest director
 		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);

@@ -296,15 +296,14 @@ class SessionController extends Controller {
 			$returnAuthToken = false;
 		}
 
-		if (!is_null($vo_User = UsersDAO::FindByEmail($r["usernameOrEmail"]))
-				|| !is_null($vo_User = UsersDAO::FindByUsername($r["usernameOrEmail"]))) {
-			//found user
+		try {			
+			$vo_User = UserController::resolveUser($r["usernameOrEmail"]);			
 			$r["user_id"] = $vo_User->getUserId();
-		} else {
+		} catch (NotFoundException $e) {
 			Logger::warn("User " . $r["usernameOrEmail"] . " not found.");
 			return false;
 		}
-
+ 		
 		$b_Valid = $c_Users->TestPassword($r);
 
 		if (!$b_Valid) {

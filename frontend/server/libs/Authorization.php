@@ -4,6 +4,7 @@
  * Authorization.php - Contains static function calls that return true if a user is authorized to perform certain action.
  */
 define('ADMIN_ROLE', '1');
+define('CONTEST_ADMIN_ROLE', '2');
 
 class Authorization {
 	public static function CanViewRun($user_id, Runs $run) {
@@ -95,6 +96,17 @@ class Authorization {
 			return false;
 		}
 
+		try {
+			$ur = UserRolesDAO::getByPK($user_id, CONTEST_ADMIN_ROLE, $contest->getContestId());
+			
+			if (!is_null($ur)) {
+				return true;
+			}
+			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
 		return ($contest->getDirectorId() === $user_id) || self::IsSystemAdmin($user_id);
 	}
 

@@ -682,13 +682,7 @@ ALTER TABLE `Users_Permissions`
   ADD CONSTRAINT `fk_up_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 
-INSERT INTO  `Roles` (
-`role_id` ,
-`name` ,
-`description`
-)
-VALUES (
-1 ,  'ADMIN',  'Admin'
-);
+INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (1 ,  'ADMIN',  'Admin');
+INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (2 ,  'CONTEST_ADMIN',  'Contest admin');
 
 COMMIT;

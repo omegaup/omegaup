@@ -231,6 +231,37 @@ class UserController extends Controller {
 
 		return array("status" => "ok");
 	}
+	
+	/**
+	 * Given a username or a email, returns the user object
+	 * 
+	 * @param type $userOrEmail
+	 * @return User
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws InvalidParameterException
+	 */
+	public static function resolveUser($userOrEmail) {
+		
+		Validators::isStringNonEmpty($userOrEmail, "Username or email not found");
+		
+		$user = null;
+		
+		try {
+			if (!is_null($user = UsersDAO::FindByEmail($userOrEmail)) 
+					|| !is_null($user = UsersDAO::FindByUsername($userOrEmail))) {
+				return $user;
+			} else {
+				throw new NotFoundException("Username or email not found");
+			}			
+		} catch (ApiException $apiException) {
+			throw $apiException;
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		return $user;		
+	}
 
 	/**
 	 * Retunrs a random string of size $length
