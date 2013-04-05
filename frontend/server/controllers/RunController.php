@@ -373,7 +373,11 @@ class RunController extends Controller {
 		$response['status'] = 'ok';
 		
 		
-		self::invalidateCacheOnRejudge(self::$run);				
+		self::invalidateCacheOnRejudge(self::$run);	
+		
+		// Expire details of the run
+		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, self::$run->getRunId());
+		$runAdminDetailsCache->delete();
 
 		return $response;	
 	}
@@ -384,11 +388,11 @@ class RunController extends Controller {
 	 * @param RunsDAO $run
 	 */
 	public static function invalidateCacheOnRejudge(Runs $run) {
-		
+						
 		try {
 			$contest = ContestsDAO::getByPK($run->getContestId());
 			
-			// If the run belongs to a contest, we need to invalidate that cache		
+			// If the run belongs to a contest, we need to invalidate that scoreboard
 			if (!is_null($contest)) {
 				self::InvalidateScoreboardCache($contest->getContestId());
 			}
@@ -430,46 +434,55 @@ class RunController extends Controller {
 			$problem = ProblemsDAO::getByPK(self::$run->getProblemId());
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
-		}
+		}		
+		
+		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, self::$run->getRunId());
+		$response = $runAdminDetailsCache->get();
+		
+		if (is_null($response))
+		{
+			$response = array();		
 
-		$response = array();
+			$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
+			$grade_dir = RUNS_PATH . '/../grade/' . self::$run->getRunId();
 
-		$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
-		$grade_dir = RUNS_PATH . '/../grade/' . self::$run->getRunId();
+			$cases = array();
 
-		$cases = array();
+			if (file_exists("$grade_dir.err")) {
+				$response['compile_error'] = file_get_contents("$grade_dir.err");
+			} else if (is_dir($grade_dir)) {
+				if ($dir = opendir($grade_dir)) {
+					while (($file = readdir($dir)) !== false) {
+						if ($file == '.' || $file == '..' || !strstr($file, ".meta"))
+							continue;
 
-		if (file_exists("$grade_dir.err")) {
-			$response['compile_error'] = file_get_contents("$grade_dir.err");
-		} else if (is_dir($grade_dir)) {
-			if ($dir = opendir($grade_dir)) {
-				while (($file = readdir($dir)) !== false) {
-					if ($file == '.' || $file == '..' || !strstr($file, ".meta"))
-						continue;
+						$case = array('name' => str_replace(".meta", "", $file), 'meta' => self::ParseMeta(file_get_contents("$grade_dir/$file")));
 
-					$case = array('name' => str_replace(".meta", "", $file), 'meta' => self::ParseMeta(file_get_contents("$grade_dir/$file")));
+						if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
+							$out = str_replace(".meta", ".out", $file);
+							$case['out_diff'] = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
+						}
 
-					if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
-						$out = str_replace(".meta", ".out", $file);
-						$case['out_diff'] = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
+						if (file_exists("$grade_dir/" . str_replace(".meta", ".err", $file))) {
+							$err = "$grade_dir/" . str_replace(".meta", ".err", $file);
+							$case['err'] = file_get_contents($err);
+						}
+
+						array_push($cases, $case);
 					}
-
-					if (file_exists("$grade_dir/" . str_replace(".meta", ".err", $file))) {
-						$err = "$grade_dir/" . str_replace(".meta", ".err", $file);
-						$case['err'] = file_get_contents($err);
-					}
-
-					array_push($cases, $case);
+					closedir($dir);
 				}
-				closedir($dir);
 			}
+
+			usort($cases, array("RunController", "MetaCompare"));
+
+			$response['cases'] = $cases;
+			$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
+			$response["status"] = "ok";
+			
+			// Save cache
+			$runAdminDetailsCache->set($response, 0);
 		}
-
-		usort($cases, array("RunController", "MetaCompare"));
-
-		$response['cases'] = $cases;
-		$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
-		$response["status"] = "ok";
 
 		return $response;
 	}

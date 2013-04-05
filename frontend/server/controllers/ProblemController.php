@@ -532,6 +532,10 @@ class ProblemController extends Controller {
 				$run->setContestScore(0);
 				RunsDAO::save($run);
 				self::$grader->Grade($run->getRunId());
+				
+				// Expire details of the run
+				$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());
+				$runAdminDetailsCache->delete();
 			}
 		} catch (Exception $e) {
 			Logger::error("Failed to rejudge runs after problem update");
@@ -544,7 +548,7 @@ class ProblemController extends Controller {
 		// All clear
 		$response["status"] = "ok";
 		
-		// Invalidate caches
+		// Invalidate contest & problem caches
 		if (!is_null($runs) && count($runs) > 0) {
 			RunController::invalidateCacheOnRejudge($runs[0]);
 		}
