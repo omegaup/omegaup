@@ -41,8 +41,13 @@ if [ "$GIT_USERNAME" == "" -o "$GIT_EMAIL" == "" ]; then
 	show_help
 fi
 
+# Install _crucial_ stuff first.
 if [ ! -f /usr/bin/curl ]; then
 	sudo apt-get install -qq -y curl
+fi
+
+if [ ! -f /usr/bin/vim ]; then
+	sudo apt-get install -qq -y vim
 fi
 
 # Install everything needed.
@@ -62,12 +67,20 @@ EOF
 	fi
 	
 	sudo apt-get update -qq -y
+	
+	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make zip
+	
 	if [ ! -f /usr/sbin/mysqld ]; then
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server
 		sleep 5
 		mysqladmin -u root password $MYSQL_PASSWORD
 	fi
-	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make vim zip
+	
+	if [ "$UBUNTU" == "1" ]; then
+		sudo apt-get install -qq -y phpunit-selenium
+	fi
+	
+	# Restart php-fpm so it picks php5-curl and php5-mcrypt.
 	sudo /etc/init.d/php5-fpm restart
 fi
 
@@ -225,8 +238,13 @@ mysql -uroot -p$MYSQL_PASSWORD -e " SET GLOBAL time_zone = '+00:00'; "
 #test index with curl
 
 #setup tests
-cp $OMEGAUP_ROOT/frontend/tests/test_config.php.sample $OMEGAUP_ROOT/frontend/tests/test_config.php
-touch $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log
+if [ ! -f $OMEGAUP_ROOT/frontend/tests/test_config.php ]; then
+	cp $OMEGAUP_ROOT/frontend/tests/test_config.php.sample $OMEGAUP_ROOT/frontend/tests/test_config.php
+fi
+
+if [ ! -f $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log ]; then
+	touch $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log
+fi
 
 if [ ! -d $OMEGAUP_ROOT/frontend/tests/controllers/problems ]; then
 	mkdir $OMEGAUP_ROOT/frontend/tests/controllers/problems
