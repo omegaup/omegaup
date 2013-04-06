@@ -633,6 +633,8 @@ $(document).ready(function() {
 		});
 
 		currentNotifications[id] = gid;
+
+		document.getElementById('notification_audio').play();
 	}
 
 	function clarificationsChange(data) {
