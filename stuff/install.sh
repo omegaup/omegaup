@@ -40,7 +40,7 @@ if [ "$GIT_USERNAME" == "" -o "$GIT_EMAIL" == "" ]; then
 	show_help
 fi
 
-if [ "`which curl`" == "" ]; then
+if [ ! -f /usr/bin/curl ]; then
 	sudo apt-get install -qq -y curl
 fi
 
@@ -148,7 +148,7 @@ EOF
 	echo -e "Go to https://github.com/settings/ssh, click on \"Add SSH Key\" and enter:\n"
 	cat ~/.ssh/github.com.pub
 	echo -e "\n"
-	read -p "Press Enter to continue"
+	read -p "Press Enter to continue" line
 fi
 
 # Clone repository.
@@ -196,7 +196,6 @@ fi
 #chek php config.ini, set values for development
 
 #check writable folders
-
 
 #check and write config
 
