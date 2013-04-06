@@ -5,6 +5,7 @@ $(document).ready(function() {
 	var currentRanking = {};
 	var currentEvents;
 	var currentContest = null;
+	var currentNotifications = {count: 0, timer: null};
 	var startTime = null;
 	var finishTime = null;
 	var submissionDeadline = null;
@@ -250,7 +251,6 @@ $(document).ready(function() {
 				$('#problem .statement').html(problem.problem_statement);
 				$('#problem .source span').html(problem.source);
 				$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
-
 
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 			}
@@ -593,22 +593,46 @@ $(document).ready(function() {
 		return clock;
 	}
 
-	function notify(title, message, element) {
-		if (window.Notification) {
-			var notification = new Notification(title, {
-				body: message,
-			});
-			notification.addEventListener('click', function() {
+	function flashTitle(reset) {
+		if (document.title.indexOf("!") === 0) {
+			document.title = document.title.substring(2);
+		} else if (!reset) {
+			document.title = "! " + document.title;
+		}
+	}
+
+	function notify(title, message, element, id) {
+		if (currentNotifications.hasOwnProperty(id)) {
+			return;
+		}
+
+		if (currentNotifications.timer == null) {
+			currentNotifications.timer = setInterval(flashTitle, 1000);
+		}
+
+		currentNotifications.count++;
+
+		var gid = $.gritter.add({
+			title: title,
+			text: message,
+			sticky: true,
+			before_close: function() {
 				if (element) {
 					window.focus();
 					element.scrollIntoView(true);
 				}
-				notification.close();
-			});
-			notification.show();
-		} else if (element) {
-			element.scrollIntoView(true);
-		}
+				delete currentNotifications[id];
+
+				currentNotifications.count--;
+				if (currentNotifications.count == 0) {
+					clearInterval(currentNotifications.timer);
+					currentNotifications.timer = null;
+					flashTitle(true);
+				}
+			}
+		});
+
+		currentNotifications[id] = gid;
 	}
 
 	function clarificationsChange(data) {
@@ -620,13 +644,13 @@ $(document).ready(function() {
 			var r = $('.clarifications tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 			$('.problem', r).html(clarification.problem_alias);
-						$('.author', r).html(clarification.author);
+			$('.author', r).html(clarification.author);
 			$('.time', r).html(clarification.time);
 			$('.message', r).html(clarification.message);
 			$('.answer', r).html(clarification.answer);
 
 			if (!clarification.answer) {
-				notify(clarification.author + " - " + clarification.problem_alias, clarification.message, r[0]);
+				notify(clarification.author + " - " + clarification.problem_alias, clarification.message, r[0], clarification.clarification_id);
 			}
 
 			if (clarification.can_answer) {
