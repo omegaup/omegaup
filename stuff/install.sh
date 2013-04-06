@@ -14,6 +14,7 @@ WWW_ROOT=/var/www/omegaup.com
 USER=`whoami`
 MYSQL_PASSWORD=omegaup
 MYSQL_DB_NAME=omegaup
+UBUNTU=`uname -a | grep ubuntu | wc -l`
 
 # Get parameters
 while getopts "u:m:p:01" optname; do
@@ -40,20 +41,27 @@ if [ "$GIT_USERNAME" == "" -o "$GIT_EMAIL" == "" ]; then
 	show_help
 fi
 
-if [ "`which curl`" == "" ]; then
+if [ ! -f /usr/bin/curl ]; then
 	sudo apt-get install -qq -y curl
 fi
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
-	curl -s http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add - > /dev/null
-	cat > dotdeb.list << EOF
+	if [ "$UBUNTU" == "1" ]; then
+		if [ "`cat /etc/apt/sources.list | grep universe | wc -l `" -eq 0 ]; then
+			sed -e "s/http.*/& universe/" /etc/apt/sources.list > sources.list
+			sudo mv sources.list /etc/apt/sources.list
+		fi
+	else
+		curl -s http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add - > /dev/null
+		cat > dotdeb.list << EOF
 deb http://packages.dotdeb.org squeeze all
 deb-src http://packages.dotdeb.org squeeze all
 EOF
-	sudo mv dotdeb.list /etc/apt/sources.list.d
+		sudo mv dotdeb.list /etc/apt/sources.list.d
+	fi
+	
 	sudo apt-get update -qq -y
-	sudo apt-get install -qq -y expect
 	if [ ! -f /usr/sbin/mysqld ]; then
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server
 		sleep 5
@@ -148,7 +156,7 @@ EOF
 	echo -e "Go to https://github.com/settings/ssh, click on \"Add SSH Key\" and enter:\n"
 	cat ~/.ssh/github.com.pub
 	echo -e "\n"
-	read -p "Press Enter to continue"
+	read -p "Press Enter to continue" line
 fi
 
 # Clone repository.
@@ -196,7 +204,6 @@ fi
 #chek php config.ini, set values for development
 
 #check writable folders
-
 
 #check and write config
 
