@@ -53,7 +53,6 @@ deb-src http://packages.dotdeb.org squeeze all
 EOF
 	sudo mv dotdeb.list /etc/apt/sources.list.d
 	sudo apt-get update -qq -y
-	sudo apt-get install -qq -y expect
 	if [ ! -f /usr/sbin/mysqld ]; then
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server
 		sleep 5
