@@ -16,11 +16,13 @@ class Scoreboard {
 	private $contest_id;
 	private $countProblemsInContest;
 	private $showAllRuns;
+	private $auth_token;
 
-	public function __construct($contest_id, $showAllRuns = false) {
+	public function __construct($contest_id, $showAllRuns = false, $auth_token = null) {
 		$this->data = array();
 		$this->contest_id = $contest_id;
 		$this->showAllRuns = $showAllRuns;
+		$this->auth_token = null;
 	}
 
 	public function getScoreboardTimeLimitUnixTimestamp(Contests $contest) {
@@ -253,7 +255,8 @@ class Scoreboard {
 			if ($bestRun->getGuid() != "") {
 								
 				$runDetailsRequest = new Request(array(
-					"run_alias" => $bestRun->getGuid()
+					"run_alias" => $bestRun->getGuid(),
+					"auth_token" => $this->auth_token,
 				));
 				$runDetails = RunController::apiAdminDetails($runDetailsRequest);
 				

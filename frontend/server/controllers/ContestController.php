@@ -1308,16 +1308,15 @@ class ContestController extends Controller {
 
 		$scoreboard = new Scoreboard(
 						$r["contest"]->getContestId(),
-						true //Show only relevant runs
+						true, //Show only relevant runs
+						$r["auth_token"]
 		);
-		
-		// Check the filter if we have one
-		Validators::isStringNonEmpty($r["filterBy"], "filterBy", false /*not required*/);
 
-		$contestReport = $scoreboard->generate(true /*with run details for reporting*/, 
-				true /*sort contestants by name*/, 
-				(isset($r["filterBy"]) ? null : $r["filterBy"]));
-		
+		// Check the filter if we have one
+		Validators::isStringNonEmpty($r["filterBy"], "filterBy", false /* not required */);
+
+		$contestReport = $scoreboard->generate(true /* with run details for reporting */, true /* sort contestants by name */, (isset($r["filterBy"]) ? null : $r["filterBy"]));
+
 		return $contestReport;
 	}
 
