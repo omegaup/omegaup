@@ -10,7 +10,7 @@ class ContestController extends Controller {
 	private static $hasPrivateUsers;
 	private static $problems;
 	private static $contest;
-		
+
 	/**
 	 * Returns a list of contests
 	 * 
@@ -381,7 +381,7 @@ class ContestController extends Controller {
 			if (is_null($r["contest_alias"])) {
 				throw new NotFoundException();
 			}
-			
+
 			if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				throw new ForbiddenAccessException();
 			}
@@ -567,7 +567,7 @@ class ContestController extends Controller {
 		$user_to_add = UserController::resolveUser($r["usernameOrEmail"]);
 
 		try {
-			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);			
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
@@ -599,7 +599,7 @@ class ContestController extends Controller {
 
 		return array("status" => "ok");
 	}
-	
+
 	/**
 	 * Adds an admin to a contest
 	 * 
@@ -611,19 +611,19 @@ class ContestController extends Controller {
 	public static function apiAddAdmin(Request $r) {
 
 		// Authenticate logged user
-		self::authenticateRequest($r);		
+		self::authenticateRequest($r);
 
 		// Check contest_alias        
-		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");				
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		$user = UserController::resolveUser($r["usernameOrEmail"]);
-		
+
 		try {
-			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);			
+			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
-		}		
+		}
 
 		// Only director is allowed to create problems in contest
 		if (!Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
@@ -634,7 +634,7 @@ class ContestController extends Controller {
 		$contest_user->setContestId(self::$contest->getContestId());
 		$contest_user->setUserId($user->getUserId());
 		$contest_user->setRoleId(CONTEST_ADMIN_ROLE);
-		
+
 		// Save the contest to the DB
 		try {
 			UserRolesDAO::save($contest_user);
@@ -1225,18 +1225,13 @@ class ContestController extends Controller {
 	}
 
 	/**
-	 * Stats of a problem
+	 * Validates that request contains contest_alias and the api is contest-admin only
 	 * 
 	 * @param Request $r
-	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 * @throws ForbiddenAccessException
 	 */
-	public static function apiStats(Request $r) {
-
-		// Get user
-		self::authenticateRequest($r);
-
+	private static function validateStats(Request $r) {
 
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
@@ -1251,6 +1246,22 @@ class ContestController extends Controller {
 		if (is_null($r["contest"]) || !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException();
 		}
+	}
+
+	/**
+	 * Stats of a problem
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiStats(Request $r) {
+
+		// Get user
+		self::authenticateRequest($r);
+
+		self::validateStats($r);
 
 		try {
 			// Array of GUIDs of pending runs
@@ -1281,6 +1292,33 @@ class ContestController extends Controller {
 			"max_wait_time_guid" => is_null($waitTimeArray) ? 0 : $waitTimeArray[0]->getGuid(),
 			"veredict_counts" => $veredict_counts,
 		);
+	}
+
+	/**
+	 * Returns a detailed report of the contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 */
+	public static function apiReport(Request $r) {
+
+		self::authenticateRequest($r);
+
+		self::validateStats($r);
+
+		$scoreboard = new Scoreboard(
+						$r["contest"]->getContestId(),
+						true //Show only relevant runs
+		);
+		
+		// Check the filter if we have one
+		Validators::isStringNonEmpty($r["filterBy"], "filterBy", false /*not required*/);
+
+		$contestReport = $scoreboard->generate(true /*with run details for reporting*/, 
+				true /*sort contestants by name*/, 
+				(isset($r["filterBy"]) ? null : $r["filterBy"]));
+		
+		return $contestReport;
 	}
 
 }
