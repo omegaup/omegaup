@@ -22,7 +22,7 @@ class Scoreboard {
 		$this->data = array();
 		$this->contest_id = $contest_id;
 		$this->showAllRuns = $showAllRuns;
-		$this->auth_token = null;
+		$this->auth_token = $auth_token;
 	}
 
 	public function getScoreboardTimeLimitUnixTimestamp(Contests $contest) {
