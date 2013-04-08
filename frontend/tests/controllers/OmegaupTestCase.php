@@ -30,23 +30,23 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 					"user_id" => $user->getUserId()
 				));
 		$auth_tokens_bd = AuthTokensDAO::search($authTokenKey);
-		
-		
+
+
 		// Validar que el token se guardó en la BDD		
 		if (!is_null($auth_token)) {
 			$exists = false;
-			foreach($auth_tokens_bd as $token_db) {												
+			foreach ($auth_tokens_bd as $token_db) {
 				if (strcmp($token_db->getToken(), $auth_token) === 0) {
 					$exists = true;
 					break;
 				}
 			}
-			
+
 			if ($exists === false) {
 				$this->fail("Token not in DB.");
-			}			
-		}		
-		
+			}
+		}
+
 
 		// @todo check last access time
 	}
@@ -164,7 +164,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 
 		return copy($filename, $targetpath);
 	}
-	
+
 	/**
 	 * Detours the Grader calls.
 	 * Problem: Submiting a new run invokes the Grader::grade() function which makes 
@@ -196,6 +196,15 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 		// Detour all Grader::grade() calls to our mock
 		RunController::$grader = $graderMock;
 		ProblemController::$grader = $graderMock;
+	}
+
+	/**
+	 * Log a message to STDERR
+	 *
+	 * @param string $message Message to log
+	 */
+	public static function log($message) {
+		fwrite(STDERR, $message . "\n");
 	}
 
 }
