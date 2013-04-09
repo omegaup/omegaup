@@ -1321,18 +1321,41 @@ class ContestController extends Controller {
 	}
 	
 	
+	/**
+	 * Generates a CSV for contest report
+	 * 
+	 * @param Request $r
+	 * @return array
+	 */
 	public static function apiCsvReport(Request $r) {
 		
 		self::authenticateRequest($r);
 
 		self::validateStats($r);
 		
-		// Call Report API
+		// Get full Report API of the contest
 		$reportRequest = new Request(array(
 			"contest_alias" => $r["contest_alias"],
 			"auth_token" => $r["auth_token"],
 		));
 		$contestReport = self::apiReport($reportRequest);
+		
+		// Get problem stats for each contest problem so we can
+		// have the full list of cases
+		$problemStats = array();
+		$i = 0;
+		foreach($contestReport["problems"] as $problemData) {
+			$problem_alias = $contestReport["problems"][$i];
+			$problemStatsRequest = new Request(array(
+				"problem_alias" => $problem_alias,
+				"auth_token" => $r["auth_token"],
+			));
+			
+			$problemStats[$problem_alias] = ProblemController::apiStats($problemStatsRequest); 
+			
+			$i++;
+		}
+		
 		
 		// Build a csv
 		$csvData = array();
@@ -1341,20 +1364,34 @@ class ContestController extends Controller {
 			$csvRow = array();
 			$csvRow[] = $userData["username"];
 			
+			$currentProblem = 0;
 			foreach($userData["problems"] as $problemData) {
 				
-				// for each case
-				foreach($problemData["run_details"]["cases"] as $caseData) {
+				// If the user don't have these details then he didn't submit,
+				// we need to fill the report with 0s for completeness
+				if (!isset($problemData["run_details"]["cases"]) || count($problemData["run_details"]["cases"]) === 0) {
 					
-					// If case is correct
-					if (strcmp($caseData["meta"]["status"], "OK") === 0 && strcmp($case_out, "") === 0) {
-						$csvRow[] = '1';
-					} else {
+					for($i = 0; $i < count($problemStats[$userData["problems"][$currentProblem]]["cases_stats"]); $i++) {
 						$csvRow[] = '0';
-					}										
+					}
+					
+					// And adding the total for this problem
+					$csvRow[] = '0';
+				} else {
+					// for each case
+					foreach($problemData["run_details"]["cases"] as $caseData) {
+
+						// If case is correct
+						if (strcmp($caseData["meta"]["status"], "OK") === 0 && strcmp($case_out, "") === 0) {
+							$csvRow[] = '1';
+						} else {
+							$csvRow[] = '0';
+						}										
+					}
+
+					$csvRow[] = $problemData["points"];
+					$currentProblem++;
 				}
-				
-				$csvRow[] = $problemData["points"];
 			}
 			$csvRow[] = $userData["total"]["points"];
 			$csvData[] = $csvRow;
