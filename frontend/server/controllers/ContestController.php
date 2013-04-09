@@ -1344,8 +1344,8 @@ class ContestController extends Controller {
 		// have the full list of cases
 		$problemStats = array();
 		$i = 0;
-		foreach($contestReport["problems"] as $problemData) {
-			$problem_alias = $contestReport["problems"][$i];
+		foreach($contestReport[0]["problems"] as $key => $problemData) {
+			$problem_alias = $key;
 			$problemStatsRequest = new Request(array(
 				"problem_alias" => $problem_alias,
 				"auth_token" => $r["auth_token"],
@@ -1363,15 +1363,14 @@ class ContestController extends Controller {
 		foreach($contestReport as $userData) {
 			$csvRow = array();
 			$csvRow[] = $userData["username"];
-			
-			$currentProblem = 0;
-			foreach($userData["problems"] as $problemData) {
+						
+			foreach($userData["problems"] as $key => $problemData) {
 				
 				// If the user don't have these details then he didn't submit,
 				// we need to fill the report with 0s for completeness
 				if (!isset($problemData["run_details"]["cases"]) || count($problemData["run_details"]["cases"]) === 0) {
 					
-					for($i = 0; $i < count($problemStats[$userData["problems"][$currentProblem]]["cases_stats"]); $i++) {
+					for($i = 0; $i < count($problemStats[$userData["problems"][$key]]["cases_stats"]); $i++) {
 						$csvRow[] = '0';
 					}
 					
@@ -1389,8 +1388,7 @@ class ContestController extends Controller {
 						}										
 					}
 
-					$csvRow[] = $problemData["points"];
-					$currentProblem++;
+					$csvRow[] = $problemData["points"];					
 				}
 			}
 			$csvRow[] = $userData["total"]["points"];
