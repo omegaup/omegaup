@@ -1393,7 +1393,23 @@ class ContestController extends Controller {
 			$csvRow[] = $userData["total"]["points"];
 			$csvData[] = $csvRow;
 		}
-		
+		ob_start();
+		$out = fopen('php://output', 'w');
+		foreach ($csvData as $csvRow) {
+			fputcsv($out, $csvRow);
+		}
+		fclose($out);
+		$rawOutput = ob_get_clean();
+		header("Pragma: public");
+		    header("Expires: 0");
+    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+    header("Content-Type: application/force-download");
+    header("Content-Type: application/octet-stream");
+    header("Content-Type: application/download");
+    header("Content-Disposition: attachment;filename=report.csv");
+    header("Content-Transfer-Encoding: binary");
+   echo $rawOutput;
+	die();	
 		return $csvData;
 	}
 
