@@ -1319,8 +1319,7 @@ class ContestController extends Controller {
 
 		return $contestReport;
 	}
-	
-	
+
 	/**
 	 * Generates a CSV for contest report
 	 * 
@@ -1328,71 +1327,86 @@ class ContestController extends Controller {
 	 * @return array
 	 */
 	public static function apiCsvReport(Request $r) {
-		
+
 		self::authenticateRequest($r);
 
 		self::validateStats($r);
-		
+
 		// Get full Report API of the contest
 		$reportRequest = new Request(array(
-			"contest_alias" => $r["contest_alias"],
-			"auth_token" => $r["auth_token"],
-		));
+					"contest_alias" => $r["contest_alias"],
+					"auth_token" => $r["auth_token"],
+				));
 		$contestReport = self::apiReport($reportRequest);
-		
+
 		// Get problem stats for each contest problem so we can
 		// have the full list of cases
 		$problemStats = array();
 		$i = 0;
-		foreach($contestReport[0]["problems"] as $key => $problemData) {
+		foreach ($contestReport[0]["problems"] as $key => $problemData) {
 			$problem_alias = $key;
 			$problemStatsRequest = new Request(array(
-				"problem_alias" => $problem_alias,
-				"auth_token" => $r["auth_token"],
-			));
-			
-			$problemStats[$problem_alias] = ProblemController::apiStats($problemStatsRequest); 
-			
+						"problem_alias" => $problem_alias,
+						"auth_token" => $r["auth_token"],
+					));
+
+			$problemStats[$problem_alias] = ProblemController::apiStats($problemStatsRequest);
+
 			$i++;
 		}
-		
-		
+
+
 		// Build a csv
 		$csvData = array();
 		
-		foreach($contestReport as $userData) {
+		// Build titles
+		$csvRow = array();
+		$csvRow[] = "username";
+		foreach ($contestReport[0]["problems"] as $key => $problemData) {
+			foreach($problemStats[$key]["cases_stats"] as $caseName => $counts) {
+				$csvRow[] = $caseName;
+			}
+			$csvRow[] = $key." total";
+			
+		}
+		$csvRow[] = "total";
+		$csvData[] = $csvRow;
+
+		foreach ($contestReport as $userData) {
 			$csvRow = array();
 			$csvRow[] = $userData["username"];
-						
-			foreach($userData["problems"] as $key => $problemData) {
-				
+
+			foreach ($userData["problems"] as $key => $problemData) {
+
 				// If the user don't have these details then he didn't submit,
 				// we need to fill the report with 0s for completeness
 				if (!isset($problemData["run_details"]["cases"]) || count($problemData["run_details"]["cases"]) === 0) {
-					for($i = 0; $i < count($problemStats[$key]["cases_stats"]); $i++) {
+					for ($i = 0; $i < count($problemStats[$key]["cases_stats"]); $i++) {
 						$csvRow[] = '0';
 					}
-					
+
 					// And adding the total for this problem
 					$csvRow[] = '0';
 				} else {
 					// for each case
-					foreach($problemData["run_details"]["cases"] as $caseData) {
+					foreach ($problemData["run_details"]["cases"] as $caseData) {
 
 						// If case is correct
 						if (strcmp($caseData["meta"]["status"], "OK") === 0 && strcmp($case_out, "") === 0) {
 							$csvRow[] = '1';
 						} else {
 							$csvRow[] = '0';
-						}										
+						}
 					}
 
-					$csvRow[] = $problemData["points"];					
+					$csvRow[] = $problemData["points"];
 				}
 			}
 			$csvRow[] = $userData["total"]["points"];
 			$csvData[] = $csvRow;
 		}
+
+		// Write contents to a csv raw string
 		ob_start();
 		$out = fopen('php://output', 'w');
 		foreach ($csvData as $csvRow) {
@@ -1400,16 +1414,20 @@ class ContestController extends Controller {
 		}
 		fclose($out);
 		$rawOutput = ob_get_clean();
+
+		// Set headers to auto-download file	
 		header("Pragma: public");
-		    header("Expires: 0");
-    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-    header("Content-Type: application/force-download");
-    header("Content-Type: application/octet-stream");
-    header("Content-Type: application/download");
-    header("Content-Disposition: attachment;filename=report.csv");
-    header("Content-Transfer-Encoding: binary");
-   echo $rawOutput;
-	die();	
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Content-Type: application/force-download");
+		header("Content-Type: application/octet-stream");
+		header("Content-Type: application/download");
+		header("Content-Disposition: attachment;filename=" . $r["contest_alias"] . "_report.csv");
+		header("Content-Transfer-Encoding: binary");
+		echo $rawOutput;
+
+		// X_X
+		die();
 		return $csvData;
 	}
 
