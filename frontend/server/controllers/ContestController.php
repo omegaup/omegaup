@@ -1319,5 +1319,48 @@ class ContestController extends Controller {
 
 		return $contestReport;
 	}
+	
+	
+	public static function apiCsvReport(Request $r) {
+		
+		self::authenticateRequest($r);
+
+		self::validateStats($r);
+		
+		// Call Report API
+		$reportRequest = new Request(array(
+			"contest_alias" => $r["contest_alias"],
+			"auth_token" => $r["auth_token"],
+		));
+		$contestReport = self::apiReport($reportRequest);
+		
+		// Build a csv
+		$csvData = array();
+		
+		foreach($contestReport as $userData) {
+			$csvRow = array();
+			$csvRow[] = $userData["username"];
+			
+			foreach($userData["problems"] as $problemData) {
+				
+				// for each case
+				foreach($problemData["run_details"]["cases"] as $caseData) {
+					
+					// If case is correct
+					if (strcmp($caseData["meta"]["status"], "OK") === 0 && strcmp($case_out, "") === 0) {
+						$csvRow[] = '1';
+					} else {
+						$csvRow[] = '0';
+					}										
+				}
+				
+				$csvRow[] = $problemData["points"];
+			}
+			$csvRow[] = $userData["total"]["points"];
+			$csvData[] = $csvRow;
+		}
+		
+		return $csvData;
+	}
 
 }
