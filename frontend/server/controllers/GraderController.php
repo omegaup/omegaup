@@ -79,7 +79,7 @@ class GraderController extends Controller {
 		
 		self::validateRequest($r);
 		
-		self::setEmbeddedRunners(false);
+		self::setEmbeddedRunners(true);
 		
 		return array("status" => "ok");
 		
