@@ -10,7 +10,14 @@ class Grader {
 		$this->graderUrl = $graderUrl;
 	}
 
-	public function Grade($runId) {
+	/**
+	 * Initializes curl with JSON headers to call grader
+	 * 
+	 * @return curl_session
+	 * @throws Exception
+	 */
+	private function initGraderCall($url) {
+		
 		// Initialize CURL
 		$curl = curl_init();
 
@@ -19,7 +26,7 @@ class Grader {
 		}
 
 		// Set URL
-		curl_setopt($curl, CURLOPT_URL, $this->graderUrl);
+		curl_setopt($curl, CURLOPT_URL, $url);
 
 		// Get response from curl_exec() in string
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -35,25 +42,76 @@ class Grader {
 
 		// Set curl HTTP header
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
-
-		// Set curl Post data
-		curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"id\":$runId}");
-
-		// Execute call
-		$content = curl_exec($curl);
-
+		
+		return $curl;
+		
+	}
+	
+	/**
+	 * Closes curl session
+	 * 
+	 * @param curl_session $curl
+	 */
+	private function terminateGraderCall($curl) {
+		
+		// Close curl
+		curl_close($curl);	
+		
+	}
+	
+	private function verifyResponse($curl, $content) {
+		
 		$errorMsg = NULL;
 		if (!$content) {
 			$errorMsg = "curl_exec failed: " . curl_error($curl) . " " . curl_errno($curl);
 		} else if ($content !== '{"status":"ok"}') {
 			$errorMsg = "Call to grader failed: '$content'";
 		}
-
-		// Close curl
-		curl_close($curl);
-
+		
 		if ($errorMsg !== NULL) {
+			$this->terminateGraderCall($curl);
 			throw new Exception($errorMsg);
 		}
+	}
+	
+	/**
+	 * Call /grade endpoint with run id as paraemeter 
+	 * 
+	 * @param int $runId
+	 * @throws Exception
+	 */
+	public function Grade($runId) {
+		
+		$curl = $this->initGraderCall($this->graderUrl);
+		
+		// Set curl Post data
+		curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"id\":$runId}");
+
+		// Execute call
+		$content = curl_exec($curl);
+				
+		$this->verifyResponse($curl, $content);			
+		
+		$this->terminateGraderCall($curl);
+	}
+	
+	
+	/**
+	 * Call /reload-config endpoint
+	 * 
+	 * @return string
+	 */
+	public function reloadConfig() {
+		
+		$curl = $this->initGraderCall(OMEGAUP_GRADER_CONFIG_PATH);
+		
+		// Execute call
+		$content = curl_exec($curl);
+		
+		$this->verifyResponse($content);
+		
+		$this->terminateGraderCall($curl);	
+		
+		return $content;
 	}
 }

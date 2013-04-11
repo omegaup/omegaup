@@ -30,6 +30,8 @@
 	define('OMEGAUP_CACERT_URL',					'/opt/omegaup/frontend/omegaup.pem');
 	define('RUNS_PATH',								'/opt/omegaup/omegaup/submissions');
 	define('PROBLEMS_PATH',							'/opt/omegaup/omegaup/problems');
+	define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
+	define('OMEGAUP_RELOAD_CONFIG_URL',				'https://localhost:21680/reload-config/');
 
 	# ####################################
 	# FACEBOOK LOGIN CONFIG
