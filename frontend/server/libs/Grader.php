@@ -59,6 +59,13 @@ class Grader {
 		
 	}
 	
+	/**
+	 * Error checking after curl_exec
+	 * 
+	 * @param curl_session $curl
+	 * @param string $content
+	 * @throws Exception
+	 */
 	private function verifyResponse($curl, $content) {
 		
 		$errorMsg = NULL;
@@ -99,13 +106,33 @@ class Grader {
 	/**
 	 * Call /reload-config endpoint
 	 * 
+	 * @param array $request
 	 * @return string
 	 */
-	public function reloadConfig() {
+	public function reloadConfig($request) {
 		
-		$curl = $this->initGraderCall(OMEGAUP_GRADER_CONFIG_PATH);
+		$curl = $this->initGraderCall(OMEGAUP_GRADER_RELOAD_CONFIG_URL);
 		
-		// Execute call
+		// Execute call		
+		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));
+		$content = curl_exec($curl);
+		
+		$this->verifyResponse($content);
+		
+		$this->terminateGraderCall($curl);	
+		
+		return $content;
+	}
+	
+	/**
+	 * Returns the response of the /status entry point
+	 * 
+	 * @return array json array
+	 */
+	public function status() {
+		
+		$curl = $this->initGraderCall(OMEGAUP_GRADER_STATUS_URL);
+		
 		$content = curl_exec($curl);
 		
 		$this->verifyResponse($content);
