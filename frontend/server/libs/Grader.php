@@ -66,19 +66,22 @@ class Grader {
 	 * @param string $content
 	 * @throws Exception
 	 */
-	private function verifyResponse($curl, $content) {
+	private function executeCurl($curl, $content) {
+		
+		// Execute call
+		$content = curl_exec($curl);
 		
 		$errorMsg = NULL;
 		if (!$content) {
 			$errorMsg = "curl_exec failed: " . curl_error($curl) . " " . curl_errno($curl);
-		} else if ($content !== '{"status":"ok"}') {
-			$errorMsg = "Call to grader failed: '$content'";
 		}
 		
 		if ($errorMsg !== NULL) {
 			$this->terminateGraderCall($curl);
 			throw new Exception($errorMsg);
 		}
+		
+		return $content;
 	}
 	
 	/**
@@ -93,13 +96,14 @@ class Grader {
 		
 		// Set curl Post data
 		curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"id\":$runId}");
-
-		// Execute call
-		$content = curl_exec($curl);
-				
-		$this->verifyResponse($curl, $content);			
+						
+		$content = $this->executeCurl($curl);	
 		
 		$this->terminateGraderCall($curl);
+		
+		if ($content !== '{"status":"ok"}') {			
+			throw new Exception("Grader did not return status OK: ". $content);
+		}		
 	}
 	
 	
@@ -114,10 +118,9 @@ class Grader {
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_RELOAD_CONFIG_URL);
 		
 		// Execute call		
-		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));
-		$content = curl_exec($curl);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));		
 		
-		$this->verifyResponse($content);
+		$content = $this->executeCurl($content);
 		
 		$this->terminateGraderCall($curl);	
 		
@@ -133,11 +136,9 @@ class Grader {
 		
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_STATUS_URL);
 		
-		$content = curl_exec($curl);
+		$content = $this->executeCurl($content);
 		
-		$this->verifyResponse($content);
-		
-		$this->terminateGraderCall($curl);	
+		$this->terminateGraderCall($curl);							
 		
 		return $content;
 	}
