@@ -41,6 +41,8 @@ class GraderController extends Controller {
 				));
 
 		Logger::log("Reload config response: " . $response);
+		
+		return $response;
 	}
 
 	/**
@@ -51,11 +53,9 @@ class GraderController extends Controller {
 	 */
 	public static function apiScaleIn(GRequest $r) {
 
-		self::validateRequest($r);
+		self::validateRequest($r);		
 
-		self::setEmbeddedRunners("true");
-
-		return array("status" => "ok");
+		return self::setEmbeddedRunners("true");
 	}
 
 	/**
@@ -68,9 +68,7 @@ class GraderController extends Controller {
 
 		self::validateRequest($r);
 
-		self::setEmbeddedRunners("false");
-
-		return array("status" => "ok");
+		return self::setEmbeddedRunners("false");
 	}
 
 	/**
