@@ -164,6 +164,11 @@ object Manager extends Object with Log {
 						response.setStatus(HttpServletResponse.SC_OK)
 						new ReloadConfigOutputMessage()
 					}
+					case "/status/" => {
+												
+						response.setStatus(HttpServletResponse.SC_OK)
+						new StatusOutputMessage(embedded_runner = Config.get("grader.embedded_runner.enable", false), runnerQueue.size, registeredEndpoints.size)
+					}
 					case "/grade/" => {
 						try {
 							val req = Serialization.read[GradeInputMessage](request.getReader())

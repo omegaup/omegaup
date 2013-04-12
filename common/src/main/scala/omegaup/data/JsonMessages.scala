@@ -16,6 +16,7 @@ case class InputOutputMessage(status: String = "ok", error: Option[String] = Non
 
 // from Grader
 case class ReloadConfigOutputMessage(status: String = "ok")
+case class StatusOutputMessage(embedded_runner: Boolean = true, runner_queue_length: Int = 0, runners: Int = 0)
 case class GradeInputMessage(id: Int)
 case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
 case class RegisterInputMessage(port: Int)
