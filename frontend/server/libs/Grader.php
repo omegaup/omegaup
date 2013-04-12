@@ -81,11 +81,11 @@ class Grader {
 			$ex = new Exception($errorMsg);
 		}
 
-		$response_array = json_encode($content);
+		$response_array = json_decode($content);
 		if ($response_array === FALSE) {
 			$ex = new Exception("json_encode failed with: " . json_last_error() . "for : " . $content);
 		}
-
+		
 		if ($response_array["status"] !== "ok") {
 			$this->terminateGraderCall($curl);
 			$ex = new Exception("Grader did not return status OK: " . $content);
