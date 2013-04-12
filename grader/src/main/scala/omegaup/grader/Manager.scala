@@ -153,16 +153,32 @@ object Manager extends Object with Log {
 				
 				Serialization.write(request.getPathInfo() match {
 					case "/reload-config/" => {
-						val embeddedRunner = Config.get("grader.embedded_runner.enable", false)
-						Config.load()
-						info("Configuration reloaded")
+						try {
+							val req = Serialization.read[ReloadConfigInputMessage](request.getReader())
+							val embeddedRunner = Config.get("grader.embedded_runner.enable", false)
+							Config.load()
 
-						if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
-							Manager.addRunner(omegaup.runner.Runner)
+							req.overrides match {
+								case Some(x) => {
+									info("Configuration reloaded {}", x)
+									x.foreach { case (k, v) => Config.set(k, v) }
+								}
+								case None => info("Configuration reloaded")
+							}	
+
+							if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
+								Manager.addRunner(omegaup.runner.Runner)
+							}
+
+							response.setStatus(HttpServletResponse.SC_OK)
+							new ReloadConfigOutputMessage()
+						} catch {
+							case e: Exception => {
+								error("Reload config: {}", e)
+								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
+								new ReloadConfigOutputMessage(status = "error", error = Some(e.getMessage))
+							}
 						}
-
-						response.setStatus(HttpServletResponse.SC_OK)
-						new ReloadConfigOutputMessage()
 					}
 					case "/grade/" => {
 						try {

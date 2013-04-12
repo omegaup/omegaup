@@ -15,7 +15,8 @@ case class RunOutputMessage(status: String = "ok", error: Option[String] = None,
 case class InputOutputMessage(status: String = "ok", error: Option[String] = None)
 
 // from Grader
-case class ReloadConfigOutputMessage(status: String = "ok")
+case class ReloadConfigInputMessage(overrides: Option[Map[String, String]] = None)
+case class ReloadConfigOutputMessage(status: String = "ok", error: Option[String] = None)
 case class GradeInputMessage(id: Int)
 case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
 case class RegisterInputMessage(port: Int)
