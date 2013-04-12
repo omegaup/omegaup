@@ -182,7 +182,7 @@ object Manager extends Object with Log {
 					}
 					case "/status/" => {
 						response.setStatus(HttpServletResponse.SC_OK)
-						new StatusOutputMessage(embedded_runner = Config.get("grader.embedded_runner.enable", false), runnerQueue.size, registeredEndpoints.size)
+						new StatusOutputMessage(embedded_runner = Config.get("grader.embedded_runner.enable", false), runner_queue_length = runnerQueue.size, runners = registeredEndpoints.size)
 					}
 					case "/grade/" => {
 						try {
