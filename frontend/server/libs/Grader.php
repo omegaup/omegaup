@@ -66,7 +66,7 @@ class Grader {
 	 * @param string $content
 	 * @throws Exception
 	 */
-	private function executeCurl($curl, $content) {
+	private function executeCurl($curl) {
 		
 		// Execute call
 		$content = curl_exec($curl);
