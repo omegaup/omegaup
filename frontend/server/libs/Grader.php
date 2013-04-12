@@ -124,14 +124,21 @@ class Grader {
 	public function reloadConfig($request) {
 
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_RELOAD_CONFIG_URL);
-
 		// Execute call		
-		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $this->escapeJsonString(json_encode($request)));
 
 		$content = $this->executeCurl($content);
 
 		return $content;
 	}
+
+	private function escapeJsonString($value) {
+    		// list from www.json.org: (\b backspace, \f formfeed)    
+    		$escapers =     array("\\",     "/",   "\"",  "\n",  "\r",  "\t", "\x08", "\x0c");
+   		$replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t",  "\\f",  "\\b");
+		$result = str_replace($escapers, $replacements, $value);
+   		return $result;
+  	}
 
 	/**
 	 * Returns the response of the /status entry point

@@ -51,7 +51,7 @@ class GraderController extends Controller {
 	 * @param Request $r
 	 * @return type
 	 */
-	public static function apiScaleIn(GRequest $r) {
+	public static function apiScaleIn(Request $r) {
 
 		self::validateRequest($r);		
 
