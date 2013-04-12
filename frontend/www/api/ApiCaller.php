@@ -34,7 +34,7 @@ class ApiCaller{
 		} catch (Exception $e){
 			Logger::error($e);
 			$apiException = new InternalServerErrorException($e);
-			$response = $apiException->asArray();
+			$response = $apiException->asResponseArray();
 		}
 
 		return $response;
@@ -56,13 +56,13 @@ class ApiCaller{
 		} catch (Exception $e){
 			Logger::error($e);
 			$apiException = new InternalServerErrorException($e);
-			$response = $apiException->asArray();
+			$response = $apiException->asResponseArray();
 		}
 		
 		if (is_null($response) || !is_array($response)) {
 			$apiException = new InternalServerErrorException(new Exception("Api did not return an array."));
 			Logger::log($apiException);
-			$response = $apiException->asArray();
+			$response = $apiException->asResponseArray();
 		}
 		
 		return self::render($response, $r);
@@ -86,7 +86,7 @@ class ApiCaller{
 			if ($json_result === false) {
 				Logger::error("json_encode failed for: ". implode(",", $response));
 				$apiException = new InternalServerErrorException();
-				$json_result = json_encode($apiException->asArray());
+				$json_result = json_encode($apiException->asResponseArray());
 			}							
 			
 			// Print the result using late static binding semantics
