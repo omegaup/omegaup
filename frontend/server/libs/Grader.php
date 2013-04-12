@@ -136,7 +136,7 @@ class Grader {
 		
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_STATUS_URL);
 		
-		$content = $this->executeCurl($content);
+		$content = $this->executeCurl($curl);
 		
 		$this->terminateGraderCall($curl);							
 		
