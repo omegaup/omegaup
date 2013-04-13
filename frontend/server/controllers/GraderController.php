@@ -87,7 +87,21 @@ class GraderController extends Controller {
 		$grader = new Grader();
 		$response["grader"] = $grader->status();
 		
-		Logger::log("Getting EC2 status");
+		Logger::log("Getting EC2 status");		
+		$response["cloud"] = self::getEc2Status();
+		
+		return $response;
+	}
+	
+	/**
+	 * Use ec2-describe-instances cmd tool to check the status of the images in
+	 * ec2
+	 * 
+	 * @return array
+	 * @throws InvalidFilesystemOperationException
+	 */
+	private static function getEc2Status() {
+		
 		$ec2_describe_output = array();
 		$return_var = 0;
 		exec("ec2-describe-instances --region us-west-1 --simple", $ec2_describe_output, $return_var);
@@ -97,8 +111,31 @@ class GraderController extends Controller {
 			throw new InvalidFilesystemOperationException("Error executing ec2-describe-instances. Please check log for details");
 		}
 		
-		$response["cloud"] = $ec2_describe_output;
-		return $response;
+		return self::parseEc2CmdOutput($ec2_describe_output);
+	}
+	
+	/**
+	 * Organizes nicely the tab separated string from ec2 cmd tool
+	 * 
+	 * @param array $string
+	 * @return array
+	 */
+	private static function parseEc2CmdOutput($ec2_describe_output) {
+		
+		$instances = array();		
+		foreach($ec2_describe_output as $instance_data) {			
+			$contents_array = explode("\t", $instance_data);
+			
+			$values = array();
+			$values["instance"] = $contents_array[0];
+			$values["status"] = $contents_array[1];
+			$values["endpoint"] = $contents_array[2];
+			$values["sg"] = $contents_array[3];
+			
+			$instances[$values["instance"]] = $values;
+		}
+		
+		return $instances;
 	}
 
 }
