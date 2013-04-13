@@ -379,7 +379,7 @@ class ContestController extends Controller {
 			}
 
 			if (is_null($r["contest_alias"])) {
-				throw new NotFoundException();
+				throw new NotFoundException("Contest not found");
 			}
 
 			if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
@@ -822,7 +822,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null(self::$contest)) {
-			throw new NotFoundException();
+			throw new NotFoundException("Contest not found");
 		}
 
 		// Create scoreboard
@@ -861,7 +861,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null(self::$contest)) {
-			throw new NotFoundException();
+			throw new NotFoundException("Contest not found");
 		}
 
 		// Create scoreboard

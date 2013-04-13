@@ -131,7 +131,7 @@ class ProblemController extends Controller {
 			}
 
 			if (is_null($r["problem"])) {
-				throw new NotFoundException();
+				throw new NotFoundException("Problem not found");
 			}
 
 			// We need to check that the user can actually edit the problem
@@ -494,7 +494,7 @@ class ProblemController extends Controller {
 		}
 
 		if (is_null($r["problem"])) {
-			throw new NotFoundException();
+			throw new NotFoundException("Problem not found");
 		}
 
 		// We need to check that the user can actually edit the problem
@@ -926,12 +926,15 @@ class ProblemController extends Controller {
 			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
 			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
 			
-			if (is_null(self::$contest) || is_null(self::$problem)) {
-				throw new NotFoundException();
+			if (is_null(self::$contest)) {
+				throw new NotFoundException("Contest not found");
+			}
+			if (is_null(self::$problem)) {
+				throw new NotFoundException("Problem not found");
 			}
 
 			if (is_null(ContestProblemsDAO::getByPK(self::$contest->getContestId(), self::$problem->getProblemId()))) {
-				throw new NotFoundException();
+				throw new NotFoundException("Problem not found in contest given");
 			}
 		} catch (ApiException $apiException) {
 			throw $apiException;

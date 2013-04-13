@@ -297,7 +297,7 @@ class RunController extends Controller {
 		}
 
 		if (is_null(self::$run)) {
-			throw new NotFoundException();
+			throw new NotFoundException("Run not found");
 		}
 	}
 

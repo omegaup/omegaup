@@ -41,7 +41,7 @@ class ClarificationController extends Controller {
 
 		// Is the combination contest_id and problem_id valid?        
 		if (is_null(ContestProblemsDAO::getByPK(self::$contest->getContestId(), self::$problem->getProblemId()))) {
-			throw new NotFoundException();
+			throw new NotFoundException("Problem does not exists in the contest given.");
 		}
 	}
 
@@ -103,7 +103,7 @@ class ClarificationController extends Controller {
 		}
 
 		if (is_null(self::$clarification)) {
-			throw new NotFoundException();
+			throw new NotFoundException("Clarification not found");
 		}
 
 		// If the clarification is private, verify that our user is invited or is contest director               
