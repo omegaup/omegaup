@@ -19,7 +19,6 @@ class Grader {
 	 * @throws Exception
 	 */
 	private function initGraderCall($url) {
-
 		// Initialize CURL
 		$curl = curl_init();
 
@@ -54,7 +53,6 @@ class Grader {
 	 * @param curl_session $curl
 	 */
 	private function terminateGraderCall($curl) {
-
 		// Close curl
 		curl_close($curl);
 	}
@@ -67,7 +65,6 @@ class Grader {
 	 * @throws Exception
 	 */
 	private function executeCurl($curl) {
-
 		// Execute call
 		$content = curl_exec($curl);
 
@@ -106,7 +103,6 @@ class Grader {
 	 * @throws Exception
 	 */
 	public function Grade($runId) {
-
 		$curl = $this->initGraderCall($this->graderUrl);
 
 		// Set curl Post data
@@ -122,12 +118,11 @@ class Grader {
 	 * @return string
 	 */
 	public function reloadConfig($request) {
-
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_RELOAD_CONFIG_URL);
 		// Execute call		
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $this->escapeJsonString(json_encode($request)));
+		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));
 
-		$content = $this->executeCurl($content);
+		$content = $this->executeCurl($curl);
 
 		return $content;
 	}
