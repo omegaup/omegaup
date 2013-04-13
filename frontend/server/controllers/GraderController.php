@@ -81,8 +81,24 @@ class GraderController extends Controller {
 
 		self::validateRequest($r);
 
+		$response = array();
+		
+		Logger::log("Getting grader /status");
 		$grader = new Grader();
-		return $grader->status();
+		$response["grader"] = $grader->status();
+		
+		Logger::log("Getting EC2 status");
+		$ec2_describe_output = array();
+		$return_var = 0;
+		exec("ec2-describe-instances --region us-west-1 --simple", $ec2_describe_output, $return_var);
+		if ($return_var !== 0) {
+			// D:
+			Logger::error("ec2-describe-instances --region us-west-1 --simple " . $return_var);
+			throw new InvalidFilesystemOperationException("Error executing ec2-describe-instances. Please check log for details");
+		}
+		
+		$response["cloud"] = $ec2_describe_output;
+		return $response;
 	}
 
 }
