@@ -299,7 +299,7 @@ class SessionController extends Controller {
 		try {			
 			$vo_User = UserController::resolveUser($r["usernameOrEmail"]);			
 			$r["user_id"] = $vo_User->getUserId();
-		} catch (NotFoundException $e) {
+		} catch (ApiException $e) {
 			Logger::warn("User " . $r["usernameOrEmail"] . " not found.");
 			return false;
 		}
