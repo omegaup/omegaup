@@ -29,18 +29,17 @@ class GraderController extends Controller {
 	 * @throws InvalidFilesystemOperationException
 	 * @throws InvalidParameterException
 	 */
-	private static function setEmbeddedRunners($value) {
-
+	private static function setEmbeddedRunners($value) {	
+		
 		Logger::log("Calling grader/reload-config");
-
 		$grader = new Grader();
 		$response = $grader->reloadConfig(array(
 			"overrides" => array(
 				"grader.embedded_runner.enable" => $value
 			)
-				));
+		));
 
-		Logger::log("Reload config response: " . $response);
+		Logger::log("Reload config response: " . $response);				
 		
 		return $response;
 	}
@@ -55,7 +54,32 @@ class GraderController extends Controller {
 
 		self::validateRequest($r);		
 
-		return self::setEmbeddedRunners("true");
+		$response["grader"] = self::setEmbeddedRunners("true");
+		
+		// Get ec2 machines to terminate
+		$instances_array = self::getEc2Status();
+		$instances_string = "";
+		foreach($instances_array as $instance => $value) {
+			Logger::log("Detecting instance: ". $value);
+			$instances_string = $instances_string. " " . $instance . " ";			
+		}
+		
+		Logger::log("Terminating EC2 instances");
+		$ec2_cmd_output = array();
+		$return_var = 0;
+		$cmd = "ec2-terminate-instances ". $instances_string ." --region us-west-1"; 
+		
+		Logger::log("Executing: ". $cmd);
+		exec($cmd, $ec2_cmd_output, $return_var);
+		if ($return_var !== 0) {
+			// D:
+			Logger::error($cmd . " returned: " .$return_var);
+			throw new InvalidFilesystemOperationException("Error executing ec2-terminate-instances. Please check log for details");
+		}
+		
+		$response["ec2-terminate-instances"] = $ec2_cmd_output;
+		
+		return $response;
 	}
 
 	/**
@@ -67,8 +91,28 @@ class GraderController extends Controller {
 	public static function apiScaleOut(Request $r) {
 
 		self::validateRequest($r);
+		
+		Validators::isNumber($r["count"], "count");
 
-		return self::setEmbeddedRunners("false");
+		$response["grader"] = self::setEmbeddedRunners("false");
+		
+		Logger::log("Bootstrapping more instances: ");
+		$ec2_cmd_output = array();
+		$return_var = 0;
+		
+		$cmd = "ec2-run-instances ami-3e123e7b -i m1.medium -n ". $r["count"]. " --region us-west-1"; 
+		
+		Logger::log("Executing: ". $cmd);
+		exec($cmd, $ec2_cmd_output, $return_var);
+		if ($return_var !== 0) {
+			// D:
+			Logger::error($cmd . " returned: " .$return_var);
+			throw new InvalidFilesystemOperationException("Error executing ec2-run-instances. Please check log for details");
+		}
+		
+		$response["ec2-run-instances"] = $ec2_cmd_output;
+		
+		return $response;
 	}
 
 	/**
@@ -111,7 +155,7 @@ class GraderController extends Controller {
 			throw new InvalidFilesystemOperationException("Error executing ec2-describe-instances. Please check log for details");
 		}
 		
-		return self::parseEc2CmdOutput($ec2_describe_output);
+		return self::parseEc2DescribeCmdOutput($ec2_describe_output);
 	}
 	
 	/**
@@ -120,7 +164,7 @@ class GraderController extends Controller {
 	 * @param array $string
 	 * @return array
 	 */
-	private static function parseEc2CmdOutput($ec2_describe_output) {
+	private static function parseEc2DescribeCmdOutput($ec2_describe_output) {
 		
 		$instances = array();		
 		foreach($ec2_describe_output as $instance_data) {			
