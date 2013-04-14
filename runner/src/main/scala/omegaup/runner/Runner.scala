@@ -362,6 +362,21 @@ object Runner extends RunnerService with Log with Using {
 	}
 
 	def main(args: Array[String]) = {
+		// Parse command-line options.
+		var configPath = "omegaup.conf"
+		var i = 0
+		while (i < args.length) {
+			if (args(i) == "--config" && i + 1 < args.length) {
+				i += 1
+				configPath = args(i)
+				Config.load(configPath)
+			} else if (args(i) == "--output" && i + 1 < args.length) {
+				i += 1
+				System.setOut(new java.io.PrintStream(new java.io.FileOutputStream(args(i))))
+			}
+			i += 1
+		}
+
 		// Setting keystore properties
 		System.setProperty("javax.net.ssl.keyStore", Config.get("runner.keystore", "omegaup.jks"))
 		System.setProperty("javax.net.ssl.trustStore", Config.get("runner.truststore", "omegaup.jks"))
@@ -369,7 +384,7 @@ object Runner extends RunnerService with Log with Using {
 		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("runner.truststore.password", "omegaup"))
 		
 		// logger
-		Logging.init()
+		Logging.init
 
 		// the handler
 		val handler = new AbstractHandler() {

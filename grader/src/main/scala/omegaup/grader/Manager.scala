@@ -134,9 +134,9 @@ object Manager extends Object with Log {
 		GraderData.update(run)
 	}
 	
-	def init() = {
+	def init(configPath: String) = {
 		import omegaup.data._
-		
+
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
 			Manager.addRunner(omegaup.runner.Runner)
@@ -156,7 +156,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[ReloadConfigInputMessage](request.getReader())
 							val embeddedRunner = Config.get("grader.embedded_runner.enable", false)
-							Config.load()
+							Config.load(configPath)
 
 							req.overrides match {
 								case Some(x) => {
@@ -164,7 +164,9 @@ object Manager extends Object with Log {
 									x.foreach { case (k, v) => Config.set(k, v) }
 								}
 								case None => info("Configuration reloaded")
-							}	
+							}
+
+							Logging.init()
 
 							if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
 								Manager.addRunner(omegaup.runner.Runner)
@@ -275,10 +277,25 @@ object Manager extends Object with Log {
 		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("grader.keystore.password", "omegaup"))
 		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
 		
+		// Parse command-line options.
+		var configPath = "omegaup.conf"
+		var i = 0
+		while (i < args.length) {
+			if (args(i) == "--config" && i + 1 < args.length) {
+				i += 1
+				configPath = args(i)
+				Config.load(configPath)
+			} else if (args(i) == "--output" && i + 1 < args.length) {
+				i += 1
+				System.setOut(new java.io.PrintStream(new java.io.FileOutputStream(args(i))))
+			}
+			i += 1
+		}
+
 		// logger
 		Logging.init()
 		
-		val server = init()
+		val server = init(configPath)
 
 		Runtime.getRuntime.addShutdownHook(new Thread() {
 			override def run() = {

@@ -31,9 +31,9 @@ object Config {
 	private val props = new java.util.Properties(System.getProperties)
 	load()
 
-	def load(): Unit = {
+	def load(path: String = "omegaup.conf"): Unit = {
 		try{
-			props.load(new java.io.FileInputStream("omegaup.conf"))
+			props.load(new java.io.FileInputStream(path))
 		} catch {
 			case _ => {}
 		}
@@ -62,78 +62,88 @@ trait Log {
 	def trace(message:String, values:Any*) = 
 		log.trace(message, values.map(_.asInstanceOf[Object]).toArray)
 	def trace(message:String, error:Throwable) = log.trace(message, error)
-	def trace(message:String, error:Throwable, values:Any*) =
-		log.trace(message, error, values.map(_.asInstanceOf[Object]).toArray)
 
 	def debug(message:String, values:Any*) =
 		log.debug(message, values.map(_.asInstanceOf[Object]).toArray)
 	def debug(message:String, error:Throwable) = log.debug(message, error)
-	def debug(message:String, error:Throwable, values:Any*) = 
-		log.debug(message, error, values.map(_.asInstanceOf[Object]).toArray)
 
 	def info(message:String, values:Any*) =
 		log.info(message, values.map(_.asInstanceOf[Object]).toArray)
 	def info(message:String, error:Throwable) = log.info(message, error)
-	def info(message:String, error:Throwable, values:Any*) = 
-		log.info(message, error, values.map(_.asInstanceOf[Object]).toArray)
 
 	def warn(message:String, values:Any*) =
 		log.warn(message, values.map(_.asInstanceOf[Object]).toArray)
 	def warn(message:String, error:Throwable) = log.warn(message, error)
-	def warn(message:String, error:Throwable, values:Any*) = 
-		log.warn(message, error, values.map(_.asInstanceOf[Object]).toArray)
 
 	def error(message:String, values:Any*) = 
 		log.error(message, values.map(_.asInstanceOf[Object]).toArray)
 	def error(message:String, error:Throwable) = log.error(message, error)
-	def error(message:String, error:Throwable, values:Any*) =
-		log.error(message, error, values.map(_.asInstanceOf[Object]).toArray)
 }
 
-object Logging {
+object Logging extends Object with Log {
 	def init(): Unit = {
 		System.setProperty("org.mortbay.log.class", "org.mortbay.log.Slf4jLog")
 
 		val rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).asInstanceOf[ch.qos.logback.classic.Logger]
 
-		if(Config.get("logging.file", "") != "") {
-			rootLogger.detachAndStopAllAppenders
+		rootLogger.detachAndStopAllAppenders
 
-			val appender = new ch.qos.logback.core.FileAppender[ch.qos.logback.classic.spi.ILoggingEvent]()
+		val context = rootLogger.getLoggerContext
+		var appender: ch.qos.logback.core.Appender[ch.qos.logback.classic.spi.ILoggingEvent] = null
+		val encoderPattern = "%date [%thread] %-5level %logger{35} - %msg%n"
+
+		if (Config.get("logging.file", "") == "syslog") {
+			val syslogAppender = new ch.qos.logback.classic.net.SyslogAppender()
+			syslogAppender.setFacility("SYSLOG")
+
+			appender = syslogAppender
+		} else if (Config.get("logging.file", "") != "") {
 			val encoder = new ch.qos.logback.classic.encoder.PatternLayoutEncoder()
-			val context = rootLogger.getLoggerContext
-
-			encoder.setContext(context);
-			encoder.setPattern("%date [%thread] %-5level %logger{35} - %msg%n");
+			encoder.setContext(context)
+			encoder.setPattern(encoderPattern)
 			encoder.start()
 
-			appender.setAppend(true)
-			appender.setContext(context)
-			appender.setFile(Config.get("logging.file", ""))
-			appender.setEncoder(encoder)
-			appender.addFilter(new ch.qos.logback.core.filter.Filter[ch.qos.logback.classic.spi.ILoggingEvent]() {
-				override def decide(event: ch.qos.logback.classic.spi.ILoggingEvent): ch.qos.logback.core.spi.FilterReply = {
-					val throwable = event.getThrowableProxy()
+			val fileAppender = new ch.qos.logback.core.FileAppender[ch.qos.logback.classic.spi.ILoggingEvent]()
+			fileAppender.setAppend(true)
+			fileAppender.setFile(Config.get("logging.file", ""))
+			fileAppender.setEncoder(encoder)
 
-					if (throwable == null) {
-						ch.qos.logback.core.spi.FilterReply.ACCEPT
+			appender = fileAppender
+		} else {
+			val encoder = new ch.qos.logback.classic.encoder.PatternLayoutEncoder()
+			encoder.setContext(context)
+			encoder.setPattern(encoderPattern)
+			encoder.start()
+
+			val consoleAppender = new ch.qos.logback.core.ConsoleAppender[ch.qos.logback.classic.spi.ILoggingEvent]()
+			consoleAppender.setEncoder(encoder)
+
+			appender = consoleAppender
+		}
+
+		appender.setContext(context)
+		appender.addFilter(new ch.qos.logback.core.filter.Filter[ch.qos.logback.classic.spi.ILoggingEvent]() {
+			override def decide(event: ch.qos.logback.classic.spi.ILoggingEvent): ch.qos.logback.core.spi.FilterReply = {
+				val throwable = event.getThrowableProxy()
+
+				if (throwable == null) {
+					ch.qos.logback.core.spi.FilterReply.ACCEPT
+				} else {
+					val message = throwable.getClassName()
+
+					if (message.contains("java.nio.channels.ClosedChannelException") ||
+					    message.contains("org.mortbay.jetty.EofException")
+					) {
+						ch.qos.logback.core.spi.FilterReply.DENY
 					} else {
-						val message = throwable.getClassName()
-
-						if (message.contains("java.nio.channels.ClosedChannelException") ||
-						    message.contains("org.mortbay.jetty.EofException")
-						) {
-							ch.qos.logback.core.spi.FilterReply.DENY
-						} else {
-							ch.qos.logback.core.spi.FilterReply.ACCEPT
-						}
+						ch.qos.logback.core.spi.FilterReply.ACCEPT
 					}
 				}
-			})
-			appender.start
+			}
+		})
+		appender.start
 
-			rootLogger.addAppender(appender)
-		}
+		rootLogger.addAppender(appender)
 
 		rootLogger.setLevel(
 			Config.get("logging.level", "info") match {
@@ -151,6 +161,8 @@ object Logging {
 				case "severe" => ch.qos.logback.classic.Level.ERROR
 			}
 		)
+
+		info("Logger loaded for {}", Config.get("logging.file", ""))
 	}
 }
 
