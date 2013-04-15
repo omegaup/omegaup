@@ -231,7 +231,7 @@ class UserController extends Controller {
 
 		return array("status" => "ok");
 	}
-	
+
 	/**
 	 * Given a username or a email, returns the user object
 	 * 
@@ -242,25 +242,25 @@ class UserController extends Controller {
 	 * @throws InvalidParameterException
 	 */
 	public static function resolveUser($userOrEmail) {
-		
+
 		Validators::isStringNonEmpty($userOrEmail, "Username or email not found");
-		
+
 		$user = null;
-		
+
 		try {
-			if (!is_null($user = UsersDAO::FindByEmail($userOrEmail)) 
+			if (!is_null($user = UsersDAO::FindByEmail($userOrEmail))
 					|| !is_null($user = UsersDAO::FindByUsername($userOrEmail))) {
 				return $user;
 			} else {
 				throw new NotFoundException("Username or email not found");
-			}			
+			}
 		} catch (ApiException $apiException) {
 			throw $apiException;
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
-		return $user;		
+
+		return $user;
 	}
 
 	/**
@@ -282,7 +282,8 @@ class UserController extends Controller {
 
 	/**
 	 * Resets the password of the OMI user and adds the user to the private 
-	 * contest
+	 * contest.
+	 * If the user does not exists, we create him.
 	 * 
 	 * @param Request $r
 	 * @param string $username
@@ -290,24 +291,33 @@ class UserController extends Controller {
 	 */
 	private static function omiPrepareUser(Request $r, $username, $password) {
 
-		$resetRequest = new Request();
-		$resetRequest["auth_token"] = $r["auth_token"];
-		$resetRequest["username"] = $username;
-		$resetRequest["password"] = $password;
-		self::apiResetPassword($resetRequest);
-		
 		try {
 			$user = UsersDAO::FindByUsername($username);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
+		if (is_null($user)) {
+			Logger::log("Creating user: " . $username);
+			$createRequest = new Request(array(
+						"username" => $username,
+						"password" => $password,
+						"email" => $username . "@omi.com",
+					));
+			self::apiCreate($createRequest);
+		} else {
+			$resetRequest = new Request();
+			$resetRequest["auth_token"] = $r["auth_token"];
+			$resetRequest["username"] = $username;
+			$resetRequest["password"] = $password;
+			self::apiResetPassword($resetRequest);
+		}
+
 		$addUserRequest = new Request();
 		$addUserRequest["auth_token"] = $r["auth_token"];
 		$addUserRequest["user_id"] = $user->getUserId();
-		$addUserRequest["contest_alias"] = $r["contest_alias"];		
+		$addUserRequest["contest_alias"] = $r["contest_alias"];
 		ContestController::apiAddUser($addUserRequest);
-		
 	}
 
 	/**
@@ -328,35 +338,35 @@ class UserController extends Controller {
 
 		// Arreglo de estados de MX
 		$keys = array(
-			"AGS",
-			"BC",
+			"AGU",
+			"BCN",
 			"BCS",
 			"CAM",
-			"COAH",
+			"COA",
 			"COL",
-			"CHI",
-			"CHIH",
-			"DF",
+			"CHP",
+			"CHH",
+			"DIF",
 			"DUR",
-			"GTO",
+			"GUA",
 			"GRO",
-			"HDG",
+			"HID",
 			"JAL",
 			"MEX",
-			"MICH",
+			"MIC",
 			"MOR",
 			"NAY",
-			"NL",
+			"NLE",
 			"OAX",
 			"PUE",
-			"QRO",
-			"QIR",
+			"QUE",
+			"ROO",
 			"SLP",
 			"SIN",
 			"SON",
 			"TAB",
 			"TAM",
-			"TLAX",
+			"TLA",
 			"VER",
 			"YUC",
 			"ZAC"
@@ -364,7 +374,12 @@ class UserController extends Controller {
 
 
 		foreach ($keys as $k) {
-			for ($i = 1; $i <= 4; $i++) {
+			$n = 4;
+			// El estado sede tiene 4 usuarios más
+			if ($k == "MEX") {
+				$n = 8;
+			}
+			for ($i = 1; $i <= $n; $i++) {
 
 				$username = $k . "-" . $i;
 				$password = self::randomString(8);
@@ -373,19 +388,8 @@ class UserController extends Controller {
 				$response[$username] = $password;
 				// @TODO add to private contest
 			}
-
-			// El estado sede tiene 4 usuarios más
-			if ($k == "MEX") {
-				for ($i = 5; $i <= 8; $i++) {
-					$username = $k . "-" . $i;
-					$password = self::randomString(8);
-
-					self::omiPrepareUser($r, $username, $password);
-					$response[$username] = $password;
-				}
-			}
 		}
-		
+
 		return $response;
 	}
 
