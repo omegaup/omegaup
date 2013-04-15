@@ -316,7 +316,7 @@ class UserController extends Controller {
 		if (!is_null($r["contest_alias"])) {
 			$addUserRequest = new Request();
 			$addUserRequest["auth_token"] = $r["auth_token"];
-			$addUserRequest["user_id"] = $user->getUserId();
+			$addUserRequest["usernameOrEmail"] = $username;
 			$addUserRequest["contest_alias"] = $r["contest_alias"];
 			ContestController::apiAddUser($addUserRequest);
 		}
