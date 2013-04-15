@@ -313,11 +313,13 @@ class UserController extends Controller {
 			self::apiResetPassword($resetRequest);
 		}
 
-		$addUserRequest = new Request();
-		$addUserRequest["auth_token"] = $r["auth_token"];
-		$addUserRequest["user_id"] = $user->getUserId();
-		$addUserRequest["contest_alias"] = $r["contest_alias"];
-		ContestController::apiAddUser($addUserRequest);
+		if (!is_null($r["contest_alias"])) {
+			$addUserRequest = new Request();
+			$addUserRequest["auth_token"] = $r["auth_token"];
+			$addUserRequest["user_id"] = $user->getUserId();
+			$addUserRequest["contest_alias"] = $r["contest_alias"];
+			ContestController::apiAddUser($addUserRequest);
+		}
 	}
 
 	/**
