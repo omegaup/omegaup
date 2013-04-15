@@ -125,6 +125,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 		$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSession["email"]);
 		$smarty->assign("CURRENT_USER_LANG", "en");
 		$smarty->assign("CURRENT_USER_IS_ADMIN", $a_CurrentSession["is_admin"]);
+		$smarty->assign("CURRENT_USER_AUTH_TOKEN", $a_CurrentSession["auth_token"]);
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", '<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=92">');
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", '<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=16">');
 	} else {
