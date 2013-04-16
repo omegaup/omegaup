@@ -143,8 +143,8 @@ OmegaUp.prototype.time = function(date) {
 
 OmegaUp.prototype.login = function(username, password, callback) {
 	$.post(
-		'/api/session/login/',
-		{ username: username, password: password },
+		'/api/user/login/',
+		{ usernameOrEmail: username, password: password },
 		function (data) {
 			callback(data);
 		},

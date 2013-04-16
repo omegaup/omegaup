@@ -14,7 +14,7 @@
 			<td>
 				<h3>{#loginNative#}</h3>
 				<div>
-					<form method='POST' action='{$smarty.server.REQUEST_URI}'>
+					<form method='POST' action='{$smarty.server.REQUEST_URI}' id='login_form'>
 					<table width='100%' >
 						<tr>
 							<td>{#loginEmailUsername#}</td>
@@ -82,7 +82,22 @@
 					<td>
 					</td>
 					<td align='right'>
-						<input value='Registrar' type='button' onClick="omegaup.createUser( $('#reg_email').val(), $('#reg_username').val(), $('#reg_pass').val(), function(){ window.location = '/login.php'; } )">
+						<script>
+							function registerAndLogin(){
+								omegaup.createUser(
+									$('#reg_email').val(),
+									$('#reg_username').val(),
+									$('#reg_pass').val(),
+									function( data ){ 
+										//registration callback
+										//test data ok
+										$("#user").val($('#reg_email').val());
+										$("#pass").val($('#reg_pass').val());
+										$("#login_form").submit();
+									})
+								}
+						</script>
+						<input value='Registrar' type='button' onClick="registerAndLogin()">
 					</td>
 				</tr>
 			</table>
