@@ -19,7 +19,7 @@
 
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.16.custom.css">
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-timepicker-addon.css">
-{if $LOAD_MATHJAX}
+{if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
 {literal}
 		<script type="text/javascript" src="https://d3eoax9i5htok0.cloudfront.net/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>

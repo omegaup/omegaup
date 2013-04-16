@@ -1301,7 +1301,6 @@ class ContestController extends Controller {
 	 * @return array
 	 */
 	public static function apiReport(Request $r) {
-
 		self::authenticateRequest($r);
 
 		self::validateStats($r);
@@ -1315,7 +1314,10 @@ class ContestController extends Controller {
 		// Check the filter if we have one
 		Validators::isStringNonEmpty($r["filterBy"], "filterBy", false /* not required */);
 
-		$contestReport = $scoreboard->generate(true /* with run details for reporting */, true /* sort contestants by name */, (isset($r["filterBy"]) ? null : $r["filterBy"]));
+		$contestReport = $scoreboard->generate(
+			true, // with run details for reporting
+			true, // sort contestants by name,
+			(isset($r["filterBy"]) ? null : $r["filterBy"]));
 
 		$contestReport["status"] = "ok";
 		return $contestReport;

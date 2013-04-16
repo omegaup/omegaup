@@ -134,8 +134,7 @@ class Scoreboard {
 	}
 
 	public function events() {
-
-		if ($this->showAllRuns || is_null($result)) {
+		if ($this->showAllRuns || !isset($result) || is_null($result)) {
 			try {
 				$contest = ContestsDAO::getByPK($this->contest_id);
 
