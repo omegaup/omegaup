@@ -192,6 +192,23 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	});
 };
 
+OmegaUp.prototype.addProblemToContest = function(contestAlias, authorUsername, problemAlias, points, callback) {
+	var self = this;
+
+	$.post(
+		'/api/contest/addProblem/contest_alias/' + contestAlias + '/problem_alias/' + problemAlias + '/',
+		{
+			author_username : authorUsername,
+			problem_alias : problemAlias,
+			points : points
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	var self = this;
 

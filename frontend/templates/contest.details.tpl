@@ -1,7 +1,86 @@
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 
-<div class="post">
+
+<script type="text/javascript">
+
+	$(':file').change(function() {
+		var file = this.files[0];
+		name = file.name;
+		size = file.size;
+		type = file.type;
+	});
+
+
+	function progressHandlingFunction(e) {
+	}
+	
+
+	var formData;
+
+	function addProblemToContest(){
+
+		var a = window.location.pathname.split("/");
+
+		omegaup.addProblemToContest(
+				a[a.length-1],
+				"alanboy",
+				$("#problem_upload_window #alias").val(),
+				100,
+				function(data){
+					console.log("ya llegue de addproblem");
+				}
+		);
+	}
+
+	function sendProb(){
+	   formData = new FormData($('#newProbForm')[0]);
+	   formData.append("author_username", "alanboy");
+	   formData.append("title", $("#problem_upload_window #title").val());
+	   formData.append("alias", $("#problem_upload_window #alias").val());
+	   formData.append("source",  $("#problem_upload_window #source").val());
+	   formData.append("public", "1");
+	   formData.append("validator", "token"); // //remote, literal, token, token-caseless, token-numeric
+	   formData.append("time_limit",  $("#problem_upload_window #time_limit").val());
+	   formData.append("memory_limit", $("#problem_upload_window #memory_limit").val());
+	   formData.append("order", "normal");
+		console.log (formData);
+		$.ajax({
+			url: '/api/problem/create',
+			type: 'POST',
+			xhr: function() {  // custom xhr
+				myXhr = $.ajaxSettings.xhr();
+				if(myXhr.upload){ // check if upload property exists
+					myXhr.upload.addEventListener('progress',progressHandlingFunction, false); // for handling the progress of the upload
+				}
+				return myXhr;
+			},
+			beforeSend: function(){
+				console.log("voy a enviar");
+			},
+			success: function (){
+				console.log("ya llegue");
+					addProblemToContest();
+			},
+			//error: errorHandler,
+			// Form data
+			data: formData,
+			//Options to tell JQuery not to process data or worry about content-type
+			cache: false,
+			contentType: false,
+			processData: false
+		});
+
+	}
+</script>
+
+
+
+
+
+
+<!--
+<div class="post hiddeable_on_error">
 	<div class="copy">
 		<script type="text/javascript">
 			var a = window.location.pathname.split("/");
@@ -10,168 +89,16 @@
 		<div class="POS Boton">Agregar problema</div>
 	</div>
 </div>
+-->
 
 
 
 
 
-<div class="post" style="display:none;" id="problem_upload_window">
-	<div class="copy">
 
-		<progress></progress>
-
-		<h2>Nuevo problema</h2>
-
-		<form enctype="multipart/form-data" id="newProbForm">
-		<table id="newprob" width="100%">
-		<tr>
-		<td class="info">
-			<b>Title</b>
-			<p>El titulo que tendrá el problema</p>
-		</td>
-		<td>
-			<input id="title" type="text">
-		</td>
-		<td class="info">
-			<b>Alias</b>
-			<p>Almacenar&aacute; el token necesario para acceder al problema</p>
-		</td>
-		<td>
-			<input id='alias' name='alias' value='' type='text'>
-		</td>
-		</tr>
-		<tr>
-		<td class="info">
-			<b>Public</b>
-			
-		</td>
-		<td>
-			<select id="public">
-				<option value="1">Si</option>
-				<option value="0">No</option>
-			</select>
-		</td>
-		<td class="info">
-			<b>Validator</b>
-			
-		</td>
-		<td>
-			<select id="validator">
-				<option>remote</option>
-				<option>literal</option>
-				<option>token</option>
-				<option>token-caseless</option>
-				<option>token-numeric</option>
-			</select>
-		</td>
-		</tr>
-		<tr>
-		<td class="info">
-			<b>time_limit</b>
-			
-		</td>
-		<td>
-			<input id="time_limit" type="text">
-		</td>
-		<td class="info">
-			<b>memory limit</b>
-		</td>
-		<td>
-			<input id="memory_limit" type="text">
-		</td>
-		</tr>
-		<tr>
-		<td class="info">
-			<b>source</b>
-			
-		</td>
-		<td>
-			<input id="source" type="text">
-		</td>
-		<td class="info">
-			<b>zip</b>
-		</td>
-		<td>
-			<input name="problem_contents" type="file" />
-		</td>
-		</tr>
-		<tr>
-		<td class="info">
-		</td>
-		<td>
-		</td>
-		<td class="info">
-		</td>
-		<td>
-			<div class="POS Boton" onClick="sendProb()">Enviar Problema</div>
-		</td>
-		</tr>
-	</table>
-	<input id="order" type="hidden" value="normal">
-</form>
-
-		<script type="text/javascript">
-
-			$(':file').change(function() {
-			    var file = this.files[0];
-			    name = file.name;
-			    size = file.size;
-			    type = file.type;
-			});
-
-
-			function progressHandlingFunction(e) {
-
-			}
-
-			function beforeSendHandler () {
-
-			}
-
-			function sendProb(){
-			   var formData = new FormData($('#newProbForm')[0]);
-			   formData.append("author_username", "alanboy");
-			   formData.append("title", "tit" + parseInt( Math.random() * 100 ));
-			   formData.append("alias", "ali" +  parseInt( Math.random() * 100 ));
-			   formData.append("source", "asdf");
-			   formData.append("public", "1");
-			   formData.append("validator", "literal"); // //remote, literal, token, token-caseless, token-numeric
-			   formData.append("time_limit", "2");
-			   formData.append("memory_limit", "2");
-			   formData.append("order", "normal");
-
-			    $.ajax({
-			        url: '/api/problem/create',  //server script to process data
-			        type: 'POST',
-			        xhr: function() {  // custom xhr
-			            myXhr = $.ajaxSettings.xhr();
-			            if(myXhr.upload){ // check if upload property exists
-			                myXhr.upload.addEventListener('progress',progressHandlingFunction, false); // for handling the progress of the upload
-			            }
-			            return myXhr;
-			        },
-			        //beforeSend: beforeSendHandler,
-			        //success: completeHandler,
-			        //error: errorHandler,
-			        // Form data
-			        data: formData,
-			        //Options to tell JQuery not to process data or worry about content-type
-			        cache: false,
-			        contentType: false,
-			        processData: false
-			    });
-
-			}
-		</script>
-	</div>
-</div>
-
-
-
-
-
-<div class="post">
+<div class="post hiddeable_on_error">
 	<div class="copy wait_for_ajax" id="contest_details" >
+		<h2>Detalles del concurso</h2>
 		<table id="main" width="100%">
 			<tr>
 			<!-- ----------------------------------------- -->
@@ -387,18 +314,172 @@
 	</div>
 </div>
 
+<div class="post hiddeable_on_error" >
+	<div class="copy wait_for_ajax" id="problem_details">
+		<h2>Problemas en este concurso</h2>
+		<div class="POS Boton" onClick="$('#problem_upload_window').toggle()">Agregar problema</div>
+	</div>
+</div>
 
+<div class="post hiddeable_on_error" style="display:none;" id="problem_upload_window">
+	<div class="copy">
+		<!-- <progress></progress> -->
+		<h2>Nuevo problema</h2>
+
+		<form enctype="multipart/form-data" id="newProbForm">
+		<table id="newprob" width="100%">
+		<tr>
+		<td class="info">
+			<b>Title</b>
+			<p>El titulo que tendr&aacute; el problema</p>
+		</td>
+		<td>
+			<input id="title" type="text">
+		</td>
+		<td class="info">
+			<b>Alias</b>
+			<p>Almacenar&aacute; el token necesario para acceder al problema</p>
+		</td>
+		<td>
+			<input id='alias' name='alias' value='' type='text'>
+		</td>
+		</tr>
+		<tr>
+		<td class="info">
+			<b>Public</b>
+			
+		</td>
+		<td>
+			<select id="public">
+				<option value="1">Si</option>
+				<option value="0">No</option>
+			</select>
+		</td>
+		<td class="info">
+			<b>Validator</b>
+			
+		</td>
+		<td>
+			<select id="validator">
+				<option>token</option>
+				<option>remote</option>
+				<option>literal</option>
+				<option>token-caseless</option>
+				<option>token-numeric</option>
+			</select>
+		</td>
+		</tr>
+		<tr>
+		<td class="info">
+			<b>time_limit</b>	
+		</td>
+		<td>
+			<input id="time_limit" type="text">
+		</td>
+		<td class="info">
+			<b>memory limit</b>
+		</td>
+		<td>
+			<input id="memory_limit" type="text">
+		</td>
+		</tr>
+		<tr>
+		<td class="info">
+			<b>source</b>
+			
+		</td>
+		<td>
+			<input id="source" type="text">
+		</td>
+		<td class="info">
+			<b>zip</b>
+		</td>
+		<td>
+			<input name="problem_contents" type="file" />
+		</td>
+		</tr>
+		<tr>
+		<td class="info">
+		</td>
+		<td>
+		</td>
+		<td class="info">
+		</td>
+		<td>
+			<div class="POS Boton" onClick="sendProb()">Enviar Problema</div>
+		</td>
+		</tr>
+	</table>
+	<input id="order" type="hidden" value="normal">
+</form>
+	</div>
+</div>
+
+<div class="post showable_on_error">
+	<div class="copy">
+		UPS error
+	</div>
+</div>
+
+<style>
+.showable_on_error{
+	display:none;
+}
+
+div.problem-row div {
+	float:left
+}
+
+
+div.problem-row div.ptitle {
+	color: blue
+}
+</style>
 
 
 <script>
+	function rendeProblemRow(title, alias, time_limit, memory_limit){
+		var html = "";
+		html = "<div class='problem-row'>"
+				+ "<div class='ptitle'>" + title + "</div>"
+				+ "<div class='alias'>" + alias + "</div>"
+				+ "<div class='time_limit'>" + time_limit + "</div>"
+				+ "<div class='memory_limit'>" + memory_limit + "</div>"
+			+ "</div>";
+		return html;
+	}
+
 	(function(){
 		//Load Contest details
 		var a = window.location.pathname.split("/");
 		omegaup.getContest(a[a.length-1], function(data){
-			var html = "";
-			$("#contest_details").removeClass("wait_for_ajax").append(html);
-			for(var i in data) {
-				$("#main #" + i).val(data[i])
+			console.log(data);
+			if( data.status == "error" ){
+					switch(data.errorcode){
+						case 403:
+								$(".hiddeable_on_error").hide();
+								$(".showable_on_error").show();
+						break;
+						default:
+					}
+			}else{
+					var html = "";
+					$("#contest_details").removeClass("wait_for_ajax").append(html);
+					for(var i in data) {
+						$("#main #" + i).val(data[i])
+					}
+
+					$("#problem_details").removeClass("wait_for_ajax");
+					for(var i in data.problems){
+						console.log("agregando problema", data.problems[i]);
+						$("#problem_details").append(rendeProblemRow( 
+														data.problems[i].title,
+														data.problems[i].alias,
+														data.problems[i].time_limit,
+														data.problems[i].memory_limit
+													));
+					}
+
 			}
 		});
 	})();

@@ -117,6 +117,13 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	$smarty->assign("LOGGED_IN", "0");
 	$smarty->assign("FB_URL", SessionController::getFacebookLoginUrl());
 
+	if(defined("OMEGAUP_GA_TRACK")  && OMEGAUP_GA_TRACK ){
+		$smarty->assign("OMEGAUP_GA_TRACK", 1 );
+		$smarty->assign("OMEGAUP_GA_ID", OMEGAUP_GA_ID );
+	}else{
+		$smarty->assign("OMEGAUP_GA_TRACK", 0 );
+	}
+
 	$c_Session = new SessionController;
 	if ($c_Session->CurrentSessionAvailable()) {
 		$smarty->assign("LOGGED_IN", "1");
