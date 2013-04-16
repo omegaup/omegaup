@@ -460,7 +460,7 @@ class ProblemController extends Controller {
 
 			// Alias may be duplicated, 1062 error indicates that
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
-				throw new DuplicatedEntryInDatabaseException("contest_alias already exists.", $e);
+				throw new DuplicatedEntryInDatabaseException("problem_alias already exists.", $e);
 			} else {
 				
 				// Rollback the problem if deployed partially
