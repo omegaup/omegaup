@@ -153,7 +153,9 @@ class Scoreboard {
 					$run->setTest(0);
 				}
 
-				$contest_runs = RunsDAO::search($run, 'submit_delay');
+				$usePenalty = $contest->getPenaltyTimeStart() != 'none';
+
+				$contest_runs = RunsDAO::search($run, $usePenalty ? 'submit_delay' : 'time');
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
@@ -176,6 +178,8 @@ class Scoreboard {
 			$this->countProblemsInContest = count($contest_problems);
 
 			$user_problems_score = array();
+
+			$contestStart = strtotime($contest->getStartTime());
 
 			// Calculate score for each contestant x problem
 			foreach ($contest_runs as $run) {
@@ -203,7 +207,7 @@ class Scoreboard {
 
 				$data['name'] = $user->getName() ? $user->getName() : $user->getUsername();
 				$data['username'] = $user->getUsername();
-				$data['delta'] = (int) $run->getSubmitDelay();
+				$data['delta'] = $usePenalty ? (int)$run->getSubmitDelay() : (strtotime($run->getTime()) - $contestStart) / 60;
 
 				$data['problem'] = array(
 					'alias' => $contest_problems[$run->getProblemId()]->getAlias(),
