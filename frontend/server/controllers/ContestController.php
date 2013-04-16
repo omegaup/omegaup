@@ -1317,6 +1317,7 @@ class ContestController extends Controller {
 
 		$contestReport = $scoreboard->generate(true /* with run details for reporting */, true /* sort contestants by name */, (isset($r["filterBy"]) ? null : $r["filterBy"]));
 
+		$contestReport["status"] = "ok";
 		return $contestReport;
 	}
 
