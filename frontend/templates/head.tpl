@@ -5,8 +5,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<title>OmegaUp | {#pageTitle#}</title>
 
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="/js/jquery.js"></script>
+		<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="/js/jquery.msgBox.js"></script>
 		<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js"></script>
 		<script type="text/javascript" src="/js/omegaup.js"></script>
