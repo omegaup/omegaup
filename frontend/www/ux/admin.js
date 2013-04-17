@@ -62,6 +62,10 @@ $(document).ready(function() {
 			
 			$('select.runsproblem').append($('<option></option>').attr('value', problem.alias).text(problem.alias));
 			
+			$('<th colspan="2"><a href="#problems/' + problem.alias + '" title="' + problem.alias + '">' + String.fromCharCode(letter++) + '</a></th>').insertBefore('#ranking thead th.total');
+			$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
+			$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
+				
 			letter++;
 		}
 
@@ -353,54 +357,59 @@ $(document).ready(function() {
 	function rankingChange(data) {
 		var ranking = data.ranking;
 		var newRanking = {};
+
 		var place = 0;
-		var lastScore = 1e99;
+		var lastPoints = 1e99;
 		var lastPenalty = 0;
 
 		for (var i = 0; i < ranking.length; i++) {
 			var rank = ranking[i];
-			newRanking[rank.name] = i;
+			newRanking[rank.username] = i;
 			
 			// new user, just add row at the end
-			if (currentRanking[rank.name] === undefined) {
-				currentRanking[rank.name] = $('#ranking tbody tr.inserted').length;
+			if (currentRanking[rank.username] === undefined) {
+				currentRanking[rank.username] = $('#ranking tbody tr.inserted').length;
 				$('#ranking tbody').append(
 					$('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
 				);
 			}
 			
 			// update a user's row
-			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.name]];
-			$('.user', r).html(rank.name);
+			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
+			$('.user', r).html(rank.username + ' (' + rank.name + ')');
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;
 				
 				$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
 				$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
+
+				if (rank.username == omegaup.username) {
+					$('#problems .problem_' + alias + ' .solved').html("(" + rank.problems[alias].points + " / " + problems[alias].points + ")");
+				}
 			}
 			
 			// if rank went up, add a class
-			if (parseInt($('.points', r)) < parseInt(rank.total.points)) {
+			if (parseInt($('.points', r).html()) < parseInt(rank.total.points)) {
 				r.addClass('rank-up');
 			}
-
-			if (lastScore != rank.total.points || lastPenalty != rank.total.penalty) {
-				lastScore = rank.total.points;
-			       	lastPenalty = rank.total.penalty;
-				place = i + 1;
-			}
 			
-			$('.position', r).html(place);
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
+
+			if (lastPoints != rank.total.points || lastPenalty != rank.total.penalty) {
+				lastPoints = rank.total.points;
+				lastPenalty = rank.total.penalty;
+				place = i + 1;
+			}
+			$('.position', r).html(place);						
 		}
 
 		currentRanking = newRanking;
 		
 		omegaup.getRankingEvents(contestAlias, rankingEvents);
-	}
 
+	}
 	function updateRun(guid, orig_run) {
 		setTimeout(function() {
 			omegaup.runStatus(guid, function(run) {
