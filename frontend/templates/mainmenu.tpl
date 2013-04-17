@@ -23,6 +23,8 @@
 		</div>
 		{if $ERROR_TO_USER eq 'USER_OR_PASSWORD_WRONG'} 
 		<div class="post footer">
-			mensaje 
+			<div class="copy">
+				Your credentials are wrong
+			</div>
 		</div>
 		{/if} 

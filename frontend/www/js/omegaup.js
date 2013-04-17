@@ -143,8 +143,8 @@ OmegaUp.prototype.time = function(date) {
 
 OmegaUp.prototype.login = function(username, password, callback) {
 	$.post(
-		'/api/session/login/',
-		{ username: username, password: password },
+		'/api/user/login/',
+		{ usernameOrEmail: username, password: password },
 		function (data) {
 			callback(data);
 		},
@@ -190,6 +190,23 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 			callback({status:'error', 'error':undefined});
 		}
 	});
+};
+
+OmegaUp.prototype.addProblemToContest = function(contestAlias, authorUsername, problemAlias, points, callback) {
+	var self = this;
+
+	$.post(
+		'/api/contest/addProblem/contest_alias/' + contestAlias + '/problem_alias/' + problemAlias + '/',
+		{
+			author_username : authorUsername,
+			problem_alias : problemAlias,
+			points : points
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
 };
 
 OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
