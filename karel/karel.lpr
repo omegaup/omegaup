@@ -354,7 +354,9 @@ begin
 
               _maxInstrucciones:=nodo.ReadAttributeInteger('instruccionesMaximasAEjecutar',10000000);
               escribeBitacora('... maximo de instrucciones a ejecutar: ' + IntToStr(_maxInstrucciones));
-
+              
+              for i:=MINCMD to MAXCMD do _maxEjecucionesComando[i]:=_maxInstrucciones;
+              
               for i:=0 to nodo.NodeCount - 1 do begin
                   nodoa:=nodo.Nodes[i];
                   if nodoa.Name = 'comando' then begin
@@ -376,7 +378,7 @@ begin
                 escribeBitacora('LEYENDO condiciones ... DEFAULT');
                 _tamStack:=10000;
                 _maxInstrucciones:=10000000;
-                for i:=MINCMD to MAXCMD do _maxEjecucionesComando[i]:=0;
+                for i:=MINCMD to MAXCMD do _maxEjecucionesComando[i]:=_maxInstrucciones;
            end;
 
            // LEE Y CARGA LOS MUNDOS
@@ -483,7 +485,7 @@ begin
 
                               entorno:=TKEntornoEjecucion.Create(programa,mundo,_xKarel,_yKarel,
                                                                  _iDirKarel,StrToIntDef(_mochilaKarel,$FFFF),
-                                                                 _tamStack);
+                                                                 _tamStack, _maxInstrucciones, _maxEjecucionesComando);
                               _listaEntornos.AddObject(_nombre,entorno);
                               escribeBitacora('... se agrego entorno de ejecucion para programa ' + _nombre);
                            end

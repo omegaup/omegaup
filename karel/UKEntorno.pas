@@ -30,6 +30,7 @@ const
      RESEJE_HEAPOVERFLOW         = 7;
      RESEJE_COUNTUNDERFLOW       = 8;
      RESEJE_COUNTOVERFLOW        = 9;
+     RESEJE_LIMITEINSTRUCCIONES  = 10;
 
 type
     TKEntornoEjecucion = class
@@ -49,6 +50,9 @@ type
       _callStack : TStringList;
 
       _cuentaInstrucciones : array [MINCMD..MAXCMD] of integer;
+      _cuentaTotalInstrucciones: integer;
+      _maxInstrucciones : integer;
+      _maxEjecucionesComando : array [MINCMD..MAXCMD] of integer;
 
       _breakPoint : boolean;
       _ultimaLineaDepuracion : integer;
@@ -57,7 +61,7 @@ type
     public
       constructor Create(unPrograma : TKProgramaCompilado; unMundo : TKMundo;
                          xInicioKarel, yInicioKarel, dirInicioKarel, mochilaInicioKarel : integer;
-                         unTamanoStack : integer);
+                         unTamanoStack : integer; maxInstrucciones : integer; maxEjecucionesComando : array of integer);
       destructor Destroy; override;
 
       function dumpEstadoEntorno(unNodo : TXMLNode; banderas : integer) : integer;
@@ -96,6 +100,7 @@ begin
           RESEJE_STACKUNDERFLOW       : result:='STACK UNDERFLOW';
           RESEJE_HEAPUNDERFLOW        : result:='HEAP UNDERFLOW';
           RESEJE_HEAPOVERFLOW         : result:='HEAP OVERFLOW';
+          RESEJE_LIMITEINSTRUCCIONES  : result:='LIMITE DE INSTRUCCIONES';
      end;
 end;
 
@@ -113,7 +118,7 @@ end;
 
 constructor TKEntornoEjecucion.Create(unPrograma : TKProgramaCompilado; unMundo : TKMundo;
                          xInicioKarel, yInicioKarel, dirInicioKarel, mochilaInicioKarel : integer;
-                         unTamanoStack : integer);
+                         unTamanoStack : integer; maxInstrucciones : integer; maxEjecucionesComando : array of integer);
 var
    i : integer;
 begin
@@ -138,9 +143,13 @@ begin
 
      _callStack:=TStringList.Create;
 
+     _cuentaTotalInstrucciones:=0;
+     _maxInstrucciones:=maxInstrucciones;
      for i:=MINCMD to MAXCMD do begin
          _cuentaInstrucciones[i]:=0;
+         _maxEjecucionesComando[i]:=maxEjecucionesComando[i-MINCMD];
      end;
+     
 end;
 
 destructor TKEntornoEjecucion.Destroy;
@@ -215,7 +224,12 @@ begin
 
      comando:=programa.comando[PC];
      _cuentaInstrucciones[comando^.Comando]:=_cuentaInstrucciones[comando^.Comando] + 1;
-
+     _cuentaTotalInstrucciones:=_cuentaTotalInstrucciones + 1;
+     
+     if (_cuentaTotalInstrucciones > _maxInstrucciones) or (_cuentaInstrucciones[comando^.Comando] > _maxEjecucionesComando[comando^.Comando]) then begin
+         result:=RESEJE_LIMITEINSTRUCCIONES;
+     end
+     else begin
      case comando^.Comando of
           CMD_EOP,
           CMD_APAGATE : begin   // EL APAGATE ES EQUIVALENTE AL FIN DE PROGRAMA
@@ -591,8 +605,9 @@ begin
           end;
      end;
 
+     end;
+     
      resultadoUltimaEjecucion:=result;
-
 end;
 
 
