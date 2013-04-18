@@ -189,8 +189,8 @@ class ProblemController extends Controller {
 		for ($i = 0; $i < count($testplan_array[1]); $i++) {
 			// Check .in file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.in';
-			if (!$zip->getFromName($path)) {
-				throw new InvalidParameterException("Not able to find " . $testplan_array[1][$i] . " in testplan.");
+			if ($zip->getFromName($path) === FALSE) {
+				throw new InvalidParameterException("Not able to find " . $testplan_array[1][$i] . " input in testplan.");
 			}
 
 			self::$filesToUnzip[] = $path;
@@ -198,8 +198,8 @@ class ProblemController extends Controller {
 
 			// Check .out file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.out';
-			if (!$zip->getFromName($path)) {
-				throw new InvalidParameterException("Not able to find " . $testplan_array[1][$i] . " in testplan.");
+			if ($zip->getFromName($path) === FALSE) {
+				throw new InvalidParameterException("Not able to find " . $testplan_array[1][$i] . " output in testplan.");
 			}
 
 			self::$filesToUnzip[] = $path;
