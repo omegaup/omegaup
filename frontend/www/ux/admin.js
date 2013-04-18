@@ -516,6 +516,7 @@ $(document).ready(function() {
 						}
 						$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
 						$('#run-details .cases div').remove();
+						$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
 
 						function isDigit(x) {
 							return '0' <= x && x <= '9';

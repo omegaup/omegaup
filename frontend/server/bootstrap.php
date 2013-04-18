@@ -50,6 +50,7 @@ require_once("libs/Cache.php");
 require_once("libs/Authorization.php");
 require_once("libs/Grader.php");
 require_once("libs/Scoreboard.php");
+require_once("libs/ZipStream.php");
 
 /**
  * Load controllers

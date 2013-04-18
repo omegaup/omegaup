@@ -550,4 +550,46 @@ class RunController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Given the run alias, returns a .zip file with all the .out files generated for a run.
+	 * 
+	 * @param Request $r
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiDownload(Request $r) {
+		// Get the user who is calling this API
+		self::authenticateRequest($r);
+
+		self::validateDetailsRequest($r);
+
+		self::$contest = ContestsDAO::getByPK(self::$run->getContestId());
+
+		if (!Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+			throw new ForbiddenAccessException();
+		}
+
+		$problem = ProblemsDAO::getByPK(self::$run->getProblemId());
+
+		$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
+		$grade_dir = RUNS_PATH . '/../grade/' . self::$run->getRunId();
+
+		$cases = array();
+
+		$zip = new ZipStream(self::$run->getGuid() . '.zip');
+
+		if (is_dir($grade_dir)) {
+			if ($dir = opendir($grade_dir)) {
+				while (($file = readdir($dir)) !== false) {
+					if ($file == '.' || $file == '..' || !strstr($file, ".out"))
+						continue;
+
+					$zip->add_file("$file", "$grade_dir/$file");
+				}
+				closedir($dir);
+			}
+		}
+
+		$zip->finish();
+		die();
+	}
 }
