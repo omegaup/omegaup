@@ -13,6 +13,7 @@
 -s flock
 -s sched_setscheduler
 -s madvise
+-s mremap
 
 -p /proc/self/exe
 -p /etc/timezone
