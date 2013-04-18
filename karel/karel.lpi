@@ -1,0 +1,263 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <ProjectOptions>
+    <PathDelim Value="\"/>
+    <Version Value="7"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+      </Flags>
+      <MainUnit Value="0"/>
+      <TargetFileExt Value=""/>
+      <Icon Value="0"/>
+      <UseXPManifest Value="True"/>
+      <ActiveEditorIndexAtStart Value="0"/>
+    </General>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
+      <ExcludeFileFilter Value="*.(bak|ppu|o|so);*~;backup"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <FormatVersion Value="1"/>
+        <LaunchingApplication PathPlusParams="\usr\bin\xterm -T 'Lazarus Run Output' -e $(LazarusDir)\tools\runwait.sh $(TargetCmdLine)"/>
+      </local>
+    </RunParams>
+    <Units Count="11">
+      <Unit0>
+        <Filename Value="karel.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="karel"/>
+        <CursorPos X="53" Y="71"/>
+        <TopLine Value="41"/>
+        <EditorIndex Value="0"/>
+        <UsageCount Value="58"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="NativeXml.pas"/>
+        <UnitName Value="NativeXml"/>
+        <CursorPos X="2" Y="69"/>
+        <TopLine Value="49"/>
+        <UsageCount Value="7"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="UKMundo.pas"/>
+        <UnitName Value="UKMundo"/>
+        <CursorPos X="63" Y="475"/>
+        <TopLine Value="463"/>
+        <EditorIndex Value="1"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="UKEntorno.pas"/>
+        <UnitName Value="UKEntorno"/>
+        <CursorPos X="39" Y="549"/>
+        <TopLine Value="529"/>
+        <UsageCount Value="7"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\SistemaOperativo\Historial de versiones.txt"/>
+        <CursorPos X="24" Y="14"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="7"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="sdStringTable.pas"/>
+        <UnitName Value="sdStringTable"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="7"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="sdDebug.pas"/>
+        <UnitName Value="sdDebug"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="7"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="sdSortedLists.pas"/>
+        <UnitName Value="sdSortedLists"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="7"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="sdStreams.pas"/>
+        <UnitName Value="sdStreams"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="7"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="NativeXmlWin32Compat.pas"/>
+        <UnitName Value="NativeXmlWin32Compat"/>
+        <CursorPos X="33" Y="348"/>
+        <TopLine Value="315"/>
+        <UsageCount Value="7"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="NativeXml.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="NativeXml"/>
+        <CursorPos X="23" Y="1864"/>
+        <TopLine Value="1845"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="54"/>
+        <Loaded Value="True"/>
+      </Unit10>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="UKMundo.pas"/>
+        <Caret Line="236" Column="18" TopLine="217"/>
+      </Position1>
+      <Position2>
+        <Filename Value="UKMundo.pas"/>
+        <Caret Line="325" Column="36" TopLine="306"/>
+      </Position2>
+      <Position3>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="396" Column="49" TopLine="377"/>
+      </Position3>
+      <Position4>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="406" Column="34" TopLine="387"/>
+      </Position4>
+      <Position5>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="170" Column="35" TopLine="151"/>
+      </Position5>
+      <Position6>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="401" Column="21" TopLine="376"/>
+      </Position6>
+      <Position7>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="225" Column="1" TopLine="188"/>
+      </Position7>
+      <Position8>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="234" Column="10" TopLine="210"/>
+      </Position8>
+      <Position9>
+        <Filename Value="NativeXml.pas"/>
+        <Caret Line="10" Column="25" TopLine="1"/>
+      </Position9>
+      <Position10>
+        <Filename Value="NativeXml.pas"/>
+        <Caret Line="78" Column="53" TopLine="59"/>
+      </Position10>
+      <Position11>
+        <Filename Value="NativeXml.pas"/>
+        <Caret Line="119" Column="38" TopLine="100"/>
+      </Position11>
+      <Position12>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1364" Column="76" TopLine="1345"/>
+      </Position12>
+      <Position13>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1506" Column="23" TopLine="1487"/>
+      </Position13>
+      <Position14>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1508" Column="23" TopLine="1487"/>
+      </Position14>
+      <Position15>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1510" Column="22" TopLine="1487"/>
+      </Position15>
+      <Position16>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1511" Column="31" TopLine="1487"/>
+      </Position16>
+      <Position17>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1512" Column="58" TopLine="1487"/>
+      </Position17>
+      <Position18>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1514" Column="23" TopLine="1487"/>
+      </Position18>
+      <Position19>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1515" Column="66" TopLine="1487"/>
+      </Position19>
+      <Position20>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1518" Column="56" TopLine="1487"/>
+      </Position20>
+      <Position21>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1519" Column="23" TopLine="1487"/>
+      </Position21>
+      <Position22>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1568" Column="43" TopLine="1549"/>
+      </Position22>
+      <Position23>
+        <Filename Value="nativexml.pas"/>
+        <Caret Line="1839" Column="55" TopLine="1820"/>
+      </Position23>
+      <Position24>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="309" Column="20" TopLine="302"/>
+      </Position24>
+      <Position25>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="263" Column="33" TopLine="251"/>
+      </Position25>
+      <Position26>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="40" Column="27" TopLine="35"/>
+      </Position26>
+      <Position27>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="332" Column="44" TopLine="313"/>
+      </Position27>
+      <Position28>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="210" Column="67" TopLine="210"/>
+      </Position28>
+      <Position29>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="478" Column="52" TopLine="449"/>
+      </Position29>
+      <Position30>
+        <Filename Value="karel.lpr"/>
+        <Caret Line="63" Column="4" TopLine="44"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="8"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="karel"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)\"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Other>
+      <CompilerPath Value="$(CompPath)"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>
