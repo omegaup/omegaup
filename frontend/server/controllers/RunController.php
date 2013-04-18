@@ -583,7 +583,7 @@ class RunController extends Controller {
 					if ($file == '.' || $file == '..' || !strstr($file, ".out"))
 						continue;
 
-					$zip->add_file("$file", "$grade_dir/$file");
+					$zip->add_file_from_path("$file", "$grade_dir/$file");
 				}
 				closedir($dir);
 			}
