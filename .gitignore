@@ -5,6 +5,9 @@ mkprofile
 sandbox/syscall-table.h
 sandbox/profiles/java
 sandbox/profiles/javac
+karel/lib/x86_64-linux/*
+karel/karel
+karel/kcl
 
 # Ignore temporary files
 *~
