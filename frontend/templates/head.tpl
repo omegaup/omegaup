@@ -21,8 +21,8 @@
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-timepicker-addon.css">
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
 {literal}
-		<script type="text/javascript" src="https://d3eoax9i5htok0.cloudfront.net/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+	<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>	
+	<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
 {/literal}
 {/if}
 	</head>

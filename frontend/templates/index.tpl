@@ -13,12 +13,12 @@
 			</div>
 		</td>
 		<td >
-			<div class="post footer" style="width: 330px; min-height: 300px;">
+<!--Comentando esto a request de la OMI			<div class="post footer" style="width: 330px; min-height: 300px;">
 				<div class="copy" >
 					<div id="rss_content">Loading...</div>
 				</div>
 			</div>
-		</td>
+-->		</td>
 	</tr>
 	</table>
 </div>
