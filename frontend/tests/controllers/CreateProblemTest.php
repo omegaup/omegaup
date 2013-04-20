@@ -13,7 +13,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	/**
 	 * Basic test for creating a problem
 	 */
-	public function testCreateValidContest() {
+	public function testCreateValidProblem() {
 
 		// Get the problem data
         $problemData = ProblemsFactory::getRequest();
@@ -74,6 +74,43 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals(0, $problem->getSubmissions());
 		$this->assertEquals(0, $problem->getAccepted());
 		$this->assertEquals(0, $problem->getDifficulty());
+	}
+	
+	/**
+	 * Basic test for creating a problem
+	 */
+	public function testCreateValidProblemWithINCases() {
+
+		// Get the problem data
+        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT.'mrkareltastic.zip');
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
+
+		// Login user
+		$r["auth_token"] = $this->login($problemAuthor);
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+		// Call the API				
+		$response = ProblemController::apiCreate($r);
+
+		// Validate
+		// Verify response
+		$this->assertEquals("ok", $response["status"]);		
+		$this->assertEquals("cases/g1.train0.in", $response["uploaded_files"][0]);
+		$this->assertEquals("cases/g1.train0.out", $response["uploaded_files"][1]);
+		
+		// Verify problem contents.zip were copied
+		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["alias"] . DIRECTORY_SEPARATOR;
+
+		$this->assertFileExists($targetpath . "contents.zip");
+		$this->assertFileExists($targetpath . "testplan");
+		$this->assertFileExists($targetpath . "cases" . DIRECTORY_SEPARATOR . "g1.train0.in");
+		$this->assertFileExists($targetpath . "cases" . DIRECTORY_SEPARATOR . "g1.train0.out");
+		$this->assertFileExists($targetpath . "cases");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		
 	}
 
 	/**
