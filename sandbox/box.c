@@ -154,6 +154,10 @@ final_stats(struct rusage *rus)
   timersub(&now, &start_time, &wall);
   wall_ms = wall.tv_sec*1000 + wall.tv_usec/1000;
 
+  if (timeout && total_ms > timeout) total_ms = timeout;
+  if (wall_timeout && wall_ms > wall_timeout) wall_ms = wall_timeout;
+  if (memory_limit && mem_peak_kb > memory_limit) mem_peak_kb = memory_limit;
+
   meta_printf("time:%d.%03d\n", total_ms/1000, total_ms%1000);
   meta_printf("time-wall:%d.%03d\n", wall_ms/1000, wall_ms%1000);
   meta_printf("mem:%llu\n", (unsigned long long) mem_peak_kb * 1024);
