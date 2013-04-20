@@ -1376,6 +1376,11 @@ class ContestController extends Controller {
 		$csvData[] = $csvRow;
 
 		foreach ($contestReport as $userData) {
+			
+			if ($userData === "ok") {
+				continue;
+			}
+
 			$csvRow = array();
 			$csvRow[] = $userData["username"];
 
@@ -1395,7 +1400,7 @@ class ContestController extends Controller {
 					foreach ($problemData["run_details"]["cases"] as $caseData) {
 
 						// If case is correct
-						if (strcmp($caseData["meta"]["status"], "OK") === 0 && strcmp($case_out, "") === 0) {
+						if (strcmp($caseData["meta"]["status"], "OK") === 0 && strcmp($caseData["out_diff"], "") === 0) {
 							$csvRow[] = '1';
 						} else {
 							$csvRow[] = '0';
