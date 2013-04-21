@@ -41,7 +41,7 @@ object Runner extends RunnerService with Log with Using {
 			case "cpp" =>
 				List(sandbox, "-S", profile + "/gcc") ++ commonParams ++ List("--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++ inputFiles
 			case "p" =>
-				List(sandbox, "-S", profile + "/fpc") ++ commonParams ++ List("--", Config.get("p.compiler.path", "/usr/bin/fpc"), "-Tlinux") ++ inputFiles
+				List(sandbox, "-S", profile + "/fpc") ++ commonParams ++ List("--", Config.get("p.compiler.path", "/usr/bin/fpc"), "-Tlinux", "-O2", "-Mobjfpc", "-Sc", "-Sh") ++ inputFiles
 			case "py" =>
 				List(sandbox, "-S", profile + "/pyc") ++ commonParams ++ List("--", Config.get("py.compiler.path", "/usr/bin/python"), "-m", "py_compile") ++ inputFiles
 			case "kj" =>

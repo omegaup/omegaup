@@ -8,5 +8,8 @@
 -s rt_sigaction
 -s rt_sigprocmask
 -s rt_sigreturn=noret
+-s time
 
 -p /proc/self/exe
+-p /etc/timezone
+-p /usr/share/zoneinfo/
