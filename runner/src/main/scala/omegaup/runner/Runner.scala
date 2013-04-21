@@ -168,7 +168,7 @@ object Runner extends RunnerService with Log with Using {
 					val caseName = runDirectory.getCanonicalPath + "/" + x.getName.substring(0, x.getName.lastIndexOf('.'))
 
 					var timeLimit = message.timeLimit
-					if (lang == "java") {
+					if (lang == "java" || lang == "p") {
 						timeLimit += 1
 					}
 
