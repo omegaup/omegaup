@@ -1453,9 +1453,9 @@ boxkeeper(void)
 		  box_exit(2);
 		}
 	    }
-	  if (timeout && total_ms > timeout)
+	  if (timeout && total_ms >= timeout)
 	    err("TO: Time limit exceeded");
-	  if (wall_timeout && wall_ms > wall_timeout)
+	  if (wall_timeout && wall_ms >= wall_timeout)
 	    err("TO: Time limit exceeded (wall clock)");
 	  flush_line();
 	  if (verbose >= 0)
