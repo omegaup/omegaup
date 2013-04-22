@@ -1,8 +1,49 @@
+/**
+  * A class that implements the W3C DOM's EventTarget interface.
+  * http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget
+  */
+var EventTarget = function() {
+	var self = this;
+	self.listeners = {};
+};
+
+EventTarget.prototype.addEventListener = function(type, listener, useCapture) {
+	var self = this;
+	if (!self.listeners.hasOwnProperty(type)) {
+		self.listeners[type] = [];
+	}
+	self.listeners[type].push(listener);
+};
+
+EventTarget.prototype.removeEventListener = function(type, listener, useCapture) {
+	var self = this;
+	if (self.listeners.hasOwnProperty(type)) {
+		var index = self.listeners.indexOf(listener);
+		if (index > -1) {
+			self.listeners.splice(index, 1);
+		}
+	}
+};
+
+EventTarget.prototype.dispatchEvent = function(evt) {
+	var self = this;
+	if (self.listeners.hasOwnProperty(evt.type)) {
+		for (var i = 0; i < self.listeners[evt.type].length; i++) {
+			self.listeners[evt.type][i](evt);
+		}
+	}
+};
+
+/**
+  * A class that holds the state of computation and executes opcodes.
+  */
 var Karel = function(world) {
 	var self = this;
 
+	self.debug = false;
 	self.world = world;
 	
+	self.program = [['HALT']];
 	self.startstate = {
 		i: 0,
 		j: 0,
@@ -10,15 +51,10 @@ var Karel = function(world) {
 		buzzers: 0
 	};
 	
-	self.state = {
-		i: 0,
-		j: 0,
-		orientation: 0,
-		buzzers: 0
-	};
-	
-	self.debug = false;
+	self.reset();
 };
+
+Karel.prototype = new EventTarget();
 
 Karel.prototype.move = function(i, j) {
 	var self = this;
@@ -44,6 +80,12 @@ Karel.prototype.load = function(opcodes) {
 	var self = this;
 
 	self.program = opcodes;
+	self.reset();
+};
+
+Karel.prototype.reset = function() {
+	var self = this;
+
 	self.state = {
 		i: self.startstate.i,
 		j: self.startstate.j,
@@ -58,8 +100,12 @@ Karel.prototype.load = function(opcodes) {
 		jumped: false,
 		running: true
 	};
+
 	if (self.debug) {
-		$('#log').append('<div>' + JSON.stringify(self.program) + '</div>');
+		var ev = new Event('debug');
+		ev.target = self;
+		ev.message = JSON.stringify(self.program);
+		self.dispatchEvent(ev);
 	}
 };
 
@@ -258,8 +304,11 @@ Karel.prototype.next = function() {
 		if (!opcodes[opcode[0]]) {
 			self.state.running = false;
 			if (self.debug) {
-				$('#log').append('<div class="opcode">Missing opcode ' + opcode[0] + '</div>');
-				$("#log").scrollTop($("#log")[0].scrollHeight);
+				var ev = new Event('debug');
+				ev.target = self;
+				ev.message = 'Missing opcode ' + opcode[0];
+				ev.debugType = 'opcode';
+				self.dispatchEvent(ev);
 			}
 			return false;
 		}
@@ -273,9 +322,16 @@ Karel.prototype.next = function() {
 		}
 		
 		if (self.debug) {
-			$('#log').append('<div class="opcode">' + JSON.stringify(opcode) + ')</div>');
-			$('#log').append('<div>' + JSON.stringify(self.state) + '</div>');
-			$("#log").scrollTop($("#log")[0].scrollHeight);
+			var ev = new Event('debug');
+			ev.target = self;
+			ev.message = JSON.stringify(opcode);
+			ev.debugType = 'opcode';
+			self.dispatchEvent(ev);
+
+			var ev2 = new Event('debug');
+			ev2.target = self;
+			ev2.message = JSON.stringify(self.state);
+			self.dispatchEvent(ev2);
 		}
 	} catch (e) {
 		self.state.running = false;
@@ -498,7 +554,7 @@ World.prototype.save = function() {
 		return result;
 	}
 
-	$('body').append($('<pre>').html(serialize(root.documentElement, 0)));
+	return serialize(root.documentElement, 0);
 };
 
 World.prototype.reset = function() {

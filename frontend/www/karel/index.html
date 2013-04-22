@@ -6,9 +6,11 @@
 		<script src="jquery-ui-1.10.2.custom.min.js" ></script>
 		<script src="codemirror.js" ></script>
 		<script src="codemirror-karelpascal.js" ></script>
+		<script src="codemirror-karelruby.js" ></script>
 		<link rel="stylesheet" href="codemirror.css">
 		<link rel="stylesheet" href="jquery-ui-1.10.2.custom.min.css">
-		<script src="karelpascal.js"></script>
+		<script type="text/javascript" src="karelpascal.js"></script>
+		<script type="text/javascript" src="karelruby.js"></script>
 		<script type="text/javascript" src="karel.js"></script>
 		<script type="text/javascript" src="karelide.js"></script>
 		<style type="text/css">
@@ -129,7 +131,36 @@
     </programa>
   </programas>
 </ejecucion></script></div>
-		<textarea id="source">iniciar-programa
+		<textarea id="source">#!ruby
+
+def gira-derecha
+    3 veces
+        gira-izquierda
+    fin
+fin
+
+def toma-todo
+    mientras junto-a-zumbador
+        coge-zumbador
+    fin
+fin
+
+def gira(n)
+    n veces
+        gira-izquierda
+    fin
+fin
+
+si orientado-al-norte y no-junto-a-zumbador
+    avanza
+    gira-izquierda
+    mientras frente-libre y (orientado-al-norte u orientado-al-sur)
+        avanza
+    fin
+    gira(10)
+fin
+</textarea>
+<!--iniciar-programa
     define-nueva-instruccion gira-derecha como inicio
         repetir 3 veces gira-izquierda;
     fin;
@@ -204,6 +235,6 @@
     inicia-ejecucion
         cuadro;
     termina-ejecucion
-finalizar-programa</textarea>
+finalizar-programa-->
 	</body>
 </html>

@@ -17,7 +17,7 @@ var KarelIDE = function(elem, code, w, h) {
 	self.dj = 0;
 	
 	self.editor = CodeMirror.fromTextArea(code, {
-		mode: 'text/x-karelpascal',
+		mode: 'text/x-karelruby',
 		lineNumbers: true,
 		tabSize: 4,
 		gutters: ["CodeMirror-linenumbers", "breakpoints"]
@@ -75,7 +75,7 @@ var KarelIDE = function(elem, code, w, h) {
 						$(this).button("option", { label: 'pause', icons: {primary: 'ui-icon-pause'}});
 						
 						self.reset();
-						self.karel.load(new karelpascal.Parser().parse(self.editor.getValue()));
+						self.karel.load(new karelruby.Parser().parse(self.editor.getValue()));
 						self.running = true;
 		
 						self.interval = setInterval(step, 50);
@@ -101,7 +101,7 @@ var KarelIDE = function(elem, code, w, h) {
 				.click(function() {
 					if (!self.running) {
 						self.reset();
-						self.karel.load(new karelpascal.Parser().parse(self.editor.getValue()));
+						self.karel.load(new karelruby.Parser().parse(self.editor.getValue()));
 						self.running = true;
 					}
 					
@@ -122,7 +122,7 @@ var KarelIDE = function(elem, code, w, h) {
 				.click(function() {
 					if (!self.running) {
 						self.reset();
-						self.karel.load(new karelpascal.Parser().parse(self.editor.getValue()));
+						self.karel.load(new karelruby.Parser().parse(self.editor.getValue()));
 						self.running = true;
 					}
 		
