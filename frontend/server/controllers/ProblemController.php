@@ -923,17 +923,17 @@ class ProblemController extends Controller {
 
 		// Is the combination contest_id and problem_id valid?        
 		try {
-			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
-			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
 			
-			if (is_null(self::$contest)) {
+			if (is_null($r["contest"])) {
 				throw new NotFoundException("Contest not found");
 			}
-			if (is_null(self::$problem)) {
+			if (is_null($r["problem"])) {
 				throw new NotFoundException("Problem not found");
 			}
 
-			if (is_null(ContestProblemsDAO::getByPK(self::$contest->getContestId(), self::$problem->getProblemId()))) {
+			if (is_null(ContestProblemsDAO::getByPK($r["contest"]->getContestId(), $r["problem"]->getProblemId()))) {
 				throw new NotFoundException("Problem not found in contest given");
 			}
 		} catch (ApiException $apiException) {
@@ -944,14 +944,14 @@ class ProblemController extends Controller {
 
 
 		// If the contest is private, verify that our user is invited                        
-		if (self::$contest->getPublic() === 0) {
-			if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+		if ($r["contest"]->getPublic() === 0) {
+			if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				throw new ForbiddenAccessException();
 			}
 		}
 
 		// If the contest has not started, user should not see it, unless it is admin
-		if (!self::$contest->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+		if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException("Contest has not started yet.");
 		}
 	}
@@ -976,8 +976,8 @@ class ProblemController extends Controller {
 		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points");
 
 		// Read the file that contains the source
-		if (self::$problem->getValidator() != 'remote') {
-			$statementCache = new Cache(Cache::PROBLEM_STATEMENT, self::$problem->getAlias() . "-" . $r["lang"]);
+		if ($r["problem"]->getValidator() != 'remote') {
+			$statementCache = new Cache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"]);
 			$file_content = null;
 
 			// check cache
@@ -985,7 +985,7 @@ class ProblemController extends Controller {
 
 			if (is_null($file_content)) {
 
-				$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . self::$problem->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r["lang"] . ".html";
+				$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem"]->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r["lang"] . ".html";
 
 				try {
 					$file_content = FileHandler::ReadFile($source_path);
@@ -999,12 +999,12 @@ class ProblemController extends Controller {
 
 			// Add problem statement to source
 			$response["problem_statement"] = $file_content;
-		} else if (self::$problem->getServer() == 'uva') {
-			$response["problem_statement"] = '<iframe src="http://acm.uva.es/p/v' . substr(self::$problem->getRemoteId(), 0, strlen(self::$problem->getRemoteId()) - 2) . '/' . self::$problem->getRemoteId() . '.html"></iframe>';
+		} else if ($r["problem"]->getServer() == 'uva') {
+			$response["problem_statement"] = '<iframe src="http://acm.uva.es/p/v' . substr($r["problem"]->getRemoteId(), 0, strlen($r["problem"]->getRemoteId()) - 2) . '/' . $r["problem"]->getRemoteId() . '.html"></iframe>';
 		}
 
 		// Add the problem the response
-		$response = array_merge($response, self::$problem->asFilteredArray($relevant_columns));
+		$response = array_merge($response, $r["problem"]->asFilteredArray($relevant_columns));
 
 		// Create array of relevant columns for list of runs
 		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
@@ -1014,8 +1014,8 @@ class ProblemController extends Controller {
 
 		$keyrun = new Runs(array(
 					"user_id" => $r["current_user_id"],
-					"problem_id" => self::$problem->getProblemId(),
-					"contest_id" => self::$contest->getContestId()
+					"problem_id" => $r["problem"]->getProblemId(),
+					"contest_id" => $r["contest"]->getContestId()
 				));
 
 		// Get all the available runs
@@ -1039,7 +1039,7 @@ class ProblemController extends Controller {
 		// At this point, contestant_user relationship should be established.        
 		try {
 			$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-							$r["current_user_id"], self::$contest->getContestId());
+							$r["current_user_id"], $r["contest"]->getContestId());
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
@@ -1047,11 +1047,11 @@ class ProblemController extends Controller {
 
 		// As last step, register the problem as opened                
 		if (!ContestProblemOpenedDAO::getByPK(
-						self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"])) {
+						$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"])) {
 			//Create temp object
 			$keyContestProblemOpened = new ContestProblemOpened(array(
-						"contest_id" => self::$contest->getContestId(),
-						"problem_id" => self::$problem->getProblemId(),
+						"contest_id" => $r["contest"]->getContestId(),
+						"problem_id" => $r["problem"]->getProblemId(),
 						"user_id" => $r["current_user_id"]
 					));
 
@@ -1084,7 +1084,7 @@ class ProblemController extends Controller {
 
 		// Is the problem valid?
 		try {
-			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
 		} catch (ApiException $apiException) {
 			throw $apiException;
 		} catch (Exception $e) {
@@ -1110,7 +1110,7 @@ class ProblemController extends Controller {
 
 		$keyrun = new Runs(array(
 					"user_id" => $r["current_user_id"],
-					"problem_id" => self::$problem->getProblemId()
+					"problem_id" => $r["problem"]->getProblemId()
 				));
 
 		// Get all the available runs
@@ -1156,27 +1156,27 @@ class ProblemController extends Controller {
 		self::validateRuns($r);
 		
 		// We need to check that the user has priviledges on the problem
-		if (!Authorization::CanEditProblem($r["current_user_id"], self::$problem)) {
+		if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 			throw new ForbiddenAccessException();
 		}
 		
 		try {
 			// Array of GUIDs of pending runs
-			$pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem(self::$problem->getProblemId());
+			$pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem($r["problem"]->getProblemId());
 			
 			// Count of pending runs (int)
-			$totalRunsCount = RunsDAO::CountTotalRunsOfProblem(self::$problem->getProblemId());
+			$totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r["problem"]->getProblemId());
 			
 			// List of veredicts			
 			$veredict_counts = array();
 
 			foreach (self::$veredicts as $veredict) {
-				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfProblemByVeredict(self::$problem->getProblemId(), $veredict);
+				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfProblemByVeredict($r["problem"]->getProblemId(), $veredict);
 			}
 			
 			// Array to count AC stats per case.
 			// Let's try to get the last snapshot from cache.
-			$problemStatsCache = new Cache(Cache::PROBLEM_STATS, self::$problem->getAlias());
+			$problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r["problem"]->getAlias());
 			$cases_stats = $problemStatsCache->get();
 			if (is_null($cases_stats)) {
 				// Initialize the array at counts = 0
@@ -1187,7 +1187,7 @@ class ProblemController extends Controller {
 				$cases_stats["last_id"] = 0;							
 				
 				// Build problem dir
-				$problem_dir = PROBLEMS_PATH . '/' . self::$problem->getAlias() . '/cases/';
+				$problem_dir = PROBLEMS_PATH . '/' . $r["problem"]->getAlias() . '/cases/';
 
 				// Get list of cases
 				$dir = opendir($problem_dir);
@@ -1204,7 +1204,7 @@ class ProblemController extends Controller {
 			}
 			
 			// Get all runs of this problem after the last id we had
-			$runs = RunsDAO::searchRunIdGreaterThan(new Runs(array("problem_id" => self::$problem->getProblemId())), 
+			$runs = RunsDAO::searchRunIdGreaterThan(new Runs(array("problem_id" => $r["problem"]->getProblemId())), 
 					$cases_stats["last_id"], 
 					"run_id");
 									

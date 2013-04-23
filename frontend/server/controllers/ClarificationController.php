@@ -7,10 +7,6 @@
  */
 class ClarificationController extends Controller {
 
-	private static $contest;
-	private static $problem;
-	private static $clarification;
-
 	/**
 	 * Validate the request of apiCreate
 	 * 
@@ -25,22 +21,22 @@ class ClarificationController extends Controller {
 		Validators::isStringNonEmpty($r["message"], "message");
 
 		try {
-			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
-			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		if (is_null(self::$contest)) {
+		if (is_null($r["contest"])) {
 			throw new NotFoundException("Contest provided does not exist");
 		}
 
-		if (is_null(self::$problem)) {
+		if (is_null($r["problem"])) {
 			throw new NotFoundException("Problem provided does not exist");
 		}
 
 		// Is the combination contest_id and problem_id valid?        
-		if (is_null(ContestProblemsDAO::getByPK(self::$contest->getContestId(), self::$problem->getProblemId()))) {
+		if (is_null(ContestProblemsDAO::getByPK($r["contest"]->getContestId(), $r["problem"]->getProblemId()))) {
 			throw new NotFoundException("Problem does not exists in the contest given.");
 		}
 	}
@@ -63,8 +59,8 @@ class ClarificationController extends Controller {
 
 		$clarification = new Clarifications(array(
 					"author_id" => $r["current_user_id"],
-					"contest_id" => self::$contest->getContestId(),
-					"problem_id" => self::$problem->getProblemId(),
+					"contest_id" => $r["contest"]->getContestId(),
+					"problem_id" => $r["problem"]->getProblemId(),
 					"message" => $r["message"],
 					"public" => '0'
 				));
@@ -97,18 +93,18 @@ class ClarificationController extends Controller {
 
 		// Check that the clarification actually exists
 		try {
-			self::$clarification = ClarificationsDAO::getByPK($r["clarification_id"]);
+			$r["clarification"] = ClarificationsDAO::getByPK($r["clarification_id"]);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		if (is_null(self::$clarification)) {
+		if (is_null($r["clarification"])) {
 			throw new NotFoundException("Clarification not found");
 		}
 
 		// If the clarification is private, verify that our user is invited or is contest director               
-		if (self::$clarification->getPublic() === '0') {
-			if (!(Authorization::CanViewClarification($r["current_user_id"], self::$clarification))) {
+		if ($r["clarification"]->getPublic() === '0') {
+			if (!(Authorization::CanViewClarification($r["current_user_id"], $r["clarification"]))) {
 				throw new ForbiddenAccessException();
 			}
 		}
@@ -131,7 +127,7 @@ class ClarificationController extends Controller {
 		$relevant_columns = array("message", "answer", "time", "problem_id", "contest_id");
 
 		// Add the clarificatoin the response
-		$response = self::$clarification->asFilteredArray($relevant_columns);
+		$response = $r["clarification"]->asFilteredArray($relevant_columns);
 		$response["status"] = "ok";
 
 		return $response;
