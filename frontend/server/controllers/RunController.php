@@ -477,8 +477,10 @@ class RunController extends Controller {
 			$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
 			$response["status"] = "ok";
 			
-			// Save cache
-			$runAdminDetailsCache->set($response, 0);
+			// Save cache only if run was already graded
+			if ($r["run"]->getStatus() === 'ready') {
+				$runAdminDetailsCache->set($response, 0);
+			}
 		}
 
 		return $response;
