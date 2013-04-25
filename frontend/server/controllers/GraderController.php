@@ -100,7 +100,7 @@ class GraderController extends Controller {
 		$ec2_cmd_output = array();
 		$return_var = 0;
 		
-		$cmd = "ec2-run-instances ami-3e123e7b -i m1.medium -n ". $r["count"]. " --region us-west-1"; 
+		$cmd = "ec2-run-instances ami-3e123e7b -k omegaup_backend_test_key -i m1.medium -n ". $r["count"]. " --region us-west-1"; 
 		
 		Logger::log("Executing: ". $cmd);
 		exec($cmd, $ec2_cmd_output, $return_var);
