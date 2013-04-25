@@ -1164,6 +1164,11 @@ class ContestController extends Controller {
 		}
 
 		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj'), false);
+		
+		// Get user if we have something in username
+		if (!is_null($r["username"])) {
+			$r["user"] = UserController::resolveUser($r["username"]);
+		}
 	}
 
 	/**
@@ -1189,7 +1194,8 @@ class ContestController extends Controller {
 					"status" => $r["status"],
 					"veredict" => $r["veredict"],
 					"problem_id" => !is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
-					"language" => $r["language"]
+					"language" => $r["language"],
+					"user_id" => !is_null($r["user"]) ? $r["user"]->getUserId() : null,
 				));
 
 		// Filter relevant columns
