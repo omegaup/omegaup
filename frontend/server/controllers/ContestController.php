@@ -762,17 +762,21 @@ class ContestController extends Controller {
 					// First, let's order by answer
 					$a_answered = strlen($a['answer']) > 0;
 					$b_answered = strlen($b['answer']) > 0;
-
-					// If they have the same status, check 
-					if ($a_answered === $b_answered) {
+					
+					if ($a_answered === $b_answered) {						
 						$t1 = strtotime($a["time"]);
 						$t2 = strtotime($b["time"]);
 
 						if ($t1 === $t2)
 							return 0;
-
-						return ($t1 > $t2) ? 1 : -1;
-					}
+						
+						// If answered, then older goes first
+						if ($a_answered === false) {							
+							return ($t1 > $t2) ? 1 : -1;
+						} else {
+							return ($t1 > $t2) ? -1 : 1;
+						}
+					} 
 
 					// If a is not answered, it has priority
 					if ($a_answered === false) {
