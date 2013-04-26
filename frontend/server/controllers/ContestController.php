@@ -76,7 +76,7 @@ class ContestController extends Controller {
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
-
+			
 			// Admins can see all contests
 			if ($contestUser === null && !Authorization::IsContestAdmin($r["current_user_id"], $c)) {
 				/**
@@ -540,6 +540,41 @@ class ContestController extends Controller {
 	}
 
 	/**
+	 * Validates add/remove user request
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws InvalidParameterException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateAddUser(Request $r) {
+		
+		$r["user"] = null;
+
+		// Check contest_alias        
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		$r["user"] = UserController::resolveUser($r["usernameOrEmail"]);
+
+		try {
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["user"])) {
+			throw new InvalidParameterException("User provided does not exists");
+		}
+
+		// Only director is allowed to create problems in contest
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			throw new ForbiddenAccessException();
+		}
+		
+	}
+	
+	/**
 	 * Adds a user to a contest.
 	 * By default, any user can view details of public contests.
 	 * Only users added through this API can view private contests
@@ -554,32 +589,11 @@ class ContestController extends Controller {
 		// Authenticate logged user
 		self::authenticateRequest($r);
 
-		$user_to_add = null;
-
-		// Check contest_alias        
-		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
-
-		$user_to_add = UserController::resolveUser($r["usernameOrEmail"]);
-
-		try {
-			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
-		} catch (Exception $e) {
-			// Operation failed in the data layer
-			throw new InvalidDatabaseOperationException($e);
-		}
-
-		if (is_null($user_to_add)) {
-			throw new InvalidParameterException("User provided does not exists");
-		}
-
-		// Only director is allowed to create problems in contest
-		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-			throw new ForbiddenAccessException();
-		}
+		self::validateAddUser($r);
 
 		$contest_user = new ContestsUsers();
 		$contest_user->setContestId($r["contest"]->getContestId());
-		$contest_user->setUserId($user_to_add->getUserId());
+		$contest_user->setUserId($r["user"]->getUserId());
 		$contest_user->setAccessTime("0000-00-00 00:00:00");
 		$contest_user->setScore("0");
 		$contest_user->setTime("0");
@@ -592,6 +606,33 @@ class ContestController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
+		return array("status" => "ok");
+	}
+	
+	/**
+	 * Remove a user from a private contest
+	 * 
+	 * @param Request $r
+	 * @return type
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRemoveUser(Request $r) {
+		
+		// Authenticate logged user
+		self::authenticateRequest($r);
+		
+		self::validateAddUser($r);
+		
+		$contest_user = new ContestsUsers();
+		$contest_user->setContestId($r["contest"]->getContestId());
+		$contest_user->setUserId($r["user"]->getUserId());
+		
+		try {
+			ContestsUsersDAO::delete($contest_user);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
 		return array("status" => "ok");
 	}
 
