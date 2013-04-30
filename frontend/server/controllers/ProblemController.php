@@ -804,5 +804,46 @@ class ProblemController extends Controller {
 			"cases_stats" => $cases_stats["counts"],						
 		);
 	}
+	
+	
+	/**
+	 * List of public problems
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiList(Request $r) {
+		
+		// Authenticate request
+		self::authenticateRequest($r);
+		
+		// Defaults for offset and rowcount
+		if (!isset($r["offset"])) {
+			$r["offset"] = 0;
+		}
+		if (!isset($r["rowcount"])) {
+			$r["rowcount"] = 100;
+		}
+		
+		try {
+			$problem_mask = new Problems(array(
+				"public" => 1
+			));
+			
+			$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
+			
+		} catch(Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$response = array();
+		
+		foreach($problems as $problem) {
+			array_push($response, $problem->asArray());
+		}
+		
+		$response["status"] = "ok";
+		return $response;
+	}
 
 }

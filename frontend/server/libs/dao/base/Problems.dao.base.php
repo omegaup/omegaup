@@ -141,7 +141,7 @@ abstract class ProblemsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Problems , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Problems , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL)
 	{
 		$sql = "SELECT * from Problems WHERE ("; 
 		$val = array();
@@ -151,7 +151,7 @@ abstract class ProblemsDAOBase extends DAO
 		}
 
 		if( $Problems->getPublic() != NULL){
-			$sql .= " `public = ? AND";
+			$sql .= " `public` = ? AND";
 			array_push( $val, $Problems->getPublic() );
 		}
 
@@ -236,6 +236,13 @@ abstract class ProblemsDAOBase extends DAO
 		    $sql .= " order by " . $orderBy . " " . $orden ;
 		
 		}
+		
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount))
+		{
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
+		}
+		
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();

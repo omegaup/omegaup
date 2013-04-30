@@ -40,7 +40,7 @@ class ProblemsFactory {
 	 * @param string $zipName
 	 * @return Array
 	 */
-    public static function getRequest($zipName = null, $title = null) {
+    public static function getRequest($zipName = null, $title = null, $public = 1) {
         
         $author = UserFactory::createUser();
         
@@ -63,7 +63,7 @@ class ProblemsFactory {
         $r["memory_limit"] = 32000;                
         $r["source"] = "yo";
         $r["order"] = "normal";
-        $r["public"] = "1";        
+        $r["public"] = $public;        
         
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = $zipName; 
@@ -75,14 +75,14 @@ class ProblemsFactory {
     /**
      * 
      */
-    public static function createProblem($zipName = null, $title = null) {
+    public static function createProblem($zipName = null, $title = null, $public = 1) {
         
 		if (is_null($zipName)) {
 			$zipName = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
 		}
 		
 		// Get a user
-        $problemData = self::getRequest($zipName, $title);
+        $problemData = self::getRequest($zipName, $title, $public);
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];				
 		
