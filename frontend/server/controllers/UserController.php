@@ -407,6 +407,7 @@ class UserController extends Controller {
 		self::authenticateRequest($r);
 		
 		$response = array();
+		$response["contests"] = array();
 		
 		try {
 			
@@ -448,5 +449,41 @@ class UserController extends Controller {
 		return $response;		
 	}
 
+	/**
+	 * Get list of my editable problems
+	 * 
+	 * @param Request $r
+	 * @return string
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiProblems(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		$response = array();
+		$response["problems"] = array();
+		
+		try {
+			$problems_key = new Problems(array(
+				"author_id" => $r["current_user_id"]
+			));
+			
+			$problems = ProblemsDAO::search($problems_key);
+			
+			foreach($problems as $problem) {
+				$response["problems"][] = $problem->asArray();
+			}
+			
+			usort($response["problems"], function ($a, $b) {
+				return ($a["problem_id"] > $b["problem_id"]) ? -1 : 1;
+			});
+			
+		} catch(Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$response["status"] = "ok";
+		return $response;		
+	}
 }
 
