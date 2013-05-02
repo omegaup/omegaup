@@ -394,6 +394,59 @@ class UserController extends Controller {
 
 		return $response;
 	}
+	
+	/**
+	 * Get list of contests where the user has admin priviledges
+	 * 
+	 * @param Request $r
+	 * @return string
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiContests(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		$response = array();
+		
+		try {
+			
+			$contest_director_key = new Contests(array(
+				"director_id" => $r["current_user_id"]
+			));			
+			$contests_director = ContestsDAO::search($contest_director_key);
+			
+			foreach($contests_director as $contest) {
+				$response["contests"][] = $contest->asArray();
+			}
+			
+			$contest_admin_key = new UserRoles(array(
+				"user_id" => $r["current_user_id"],
+				"role_id" => CONTEST_ADMIN_ROLE,
+			));			
+			$contests_admin = UserRolesDAO::search($contest_admin_key);
+			
+			foreach($contests_admin as $contest_key) {
+				$contest = ContestsDAO::getByPK($contest_key->getContestId());	
+				
+				if (is_null($contest)) {
+					Logger::error("UserRoles has a invalid contest: {$contest->getContestId()}");
+					continue;
+				}
+				
+				$response["contests"][] = $contest->asArray();
+			}
+			
+			usort($response["contests"], function ($a, $b) {
+				return ($a["contest_id"] > $b["contest_id"]) ? -1 : 1;
+			});
+			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$response["status"] = "ok";
+		return $response;		
+	}
 
 }
 
