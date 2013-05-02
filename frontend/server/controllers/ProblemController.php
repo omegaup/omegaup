@@ -817,6 +817,9 @@ class ProblemController extends Controller {
 		// Authenticate request
 		self::authenticateRequest($r);
 		
+		Validators::isNumber($r["offset"], "offset", false);
+		Validators::isNumber($r["rowcount"], "rowcount", false);
+		
 		// Defaults for offset and rowcount
 		if (!isset($r["offset"])) {
 			$r["offset"] = 0;
@@ -824,7 +827,7 @@ class ProblemController extends Controller {
 		if (!isset($r["rowcount"])) {
 			$r["rowcount"] = 100;
 		}
-		
+						
 		try {
 			$problem_mask = new Problems(array(
 				"public" => 1
