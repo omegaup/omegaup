@@ -136,20 +136,15 @@ class SessionController extends Controller {
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
 
-		/*
-		//erase them
+		
+		//erase expired tokens
 		try {
-			$existingTokens = AuthTokensDAO::search($vo_AuthT);
-
-			if ($existingTokens !== null) {
-				foreach ($existingTokens as $token) {
-					AuthTokensDAO::delete($token);
-				}
-			}
-		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
+			$tokens_erased = AuthTokensDAO::expireAuthTokens($vo_User->getUserId());
+		} catch (Exception $e) {			
+			// Best effort
+			Logger::error("Failed to delete expired tokens: $e->getMessage()");
 		}
-		*/
+		
 
 		// Create the new token
 		$entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));

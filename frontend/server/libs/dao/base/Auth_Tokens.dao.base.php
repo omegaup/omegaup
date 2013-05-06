@@ -177,7 +177,7 @@ abstract class AuthTokensDAOBase extends DAO
 	  *	
 	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
 	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
+	  * aqui, sin embargo. El valor de retorno indica cuï¿½ntas filas se vieron afectadas.
 	  *	
 	  * @internal private information for advanced developers only
 	  * @return Filas afectadas o un string con la descripcion del error
@@ -185,9 +185,10 @@ abstract class AuthTokensDAOBase extends DAO
 	  **/
 	private static final function update( $Auth_Tokens )
 	{
-		$sql = "UPDATE Auth_Tokens SET  user_id = ? WHERE  token = ?;";
+		$sql = "UPDATE Auth_Tokens SET  user_id = ?, create_time = ? WHERE  token = ?;";
 		$params = array( 
-			$Auth_Tokens->getUserId(), 
+			$Auth_Tokens->getUserId(),
+			$Auth_Tokens->getCreateTime(),
 			$Auth_Tokens->getToken(), );
 		global $conn;
 		try{$conn->Execute($sql, $params);}

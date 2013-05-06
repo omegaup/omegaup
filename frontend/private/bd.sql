@@ -685,4 +685,7 @@ ALTER TABLE `Users_Permissions`
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (1 ,  'ADMIN',  'Admin');
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (2 ,  'CONTEST_ADMIN',  'Contest admin');
 
+
+ALTER TABLE  `Auth_Tokens` ADD  `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
+
 COMMIT;

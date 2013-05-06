@@ -43,7 +43,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 			}
 
 			if ($exists === false) {
-				$this->fail("Token not in DB.");
+				$this->fail("Token $auth_token not in DB.");
 			}
 		}
 

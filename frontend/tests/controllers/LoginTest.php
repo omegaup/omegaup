@@ -206,5 +206,49 @@ class LoginTest extends OmegaupTestCase {
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertLogin($user, $response["auth_token"]);
 	}
+	
+	
+	/**
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testTokenExpired() {
+		DAO::$useDAOCache = false;
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser();
+		
+		$auth_token = self::login($user);
+		
+		// Expire token manually
+		$auth_token_dao = AuthTokensDAO::getByPK($auth_token);				
+		
+		$auth_token_dao->setCreateTime(date('Y-m-d H:i:s', strtotime($auth_token_dao->getCreateTime() . ' - 9 hour')));
+		AuthTokensDAO::save($auth_token_dao);
+		
+		// Call to api should fail
+		ProblemController::apiList(new Request(array(
+			"auth_token" => $auth_token
+		)));
+	}
+	
+	public function testDeleteTokenExpired() {
+		
+		DAO::$useDAOCache = false;
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser();
+		
+		$auth_token = self::login($user);
+		
+		// Expire token manually
+		$auth_token_dao = AuthTokensDAO::getByPK($auth_token);
+		$auth_token_dao->setCreateTime(date('Y-m-d H:i:s', strtotime($auth_token_dao->getCreateTime() . ' - 9 hour')));
+		AuthTokensDAO::save($auth_token_dao);
+		
+		$auth_token_2 = self::login($user);
+		
+		$existingTokens = AuthTokensDAO::getByPK($auth_token);
+		$this->assertNull($existingTokens);
+	}
 }
 

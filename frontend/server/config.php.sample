@@ -21,6 +21,7 @@
 	define("OMEGAUP_LOG_DB_QUERYS",					false);
 	define("OMEGAUP_LOG_ACCESS_FILE",				"/var/log/omegaup/omegaup.log");
 	define("OMEGAUP_LOG_ERROR_FILE",				"/var/log/omegaup/omegaup.log");
+	define("OMEGAUP_EXPIRE_TOKEN_AFTER",			"8 HOUR");
 
 	# ####################################
 	# GRADER CONFIG
