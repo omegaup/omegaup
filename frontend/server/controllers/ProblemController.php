@@ -8,8 +8,7 @@ require_once 'libs/Markdown/markdown.php';
  * ProblemsController
  */
 class ProblemController extends Controller {
-	
-	
+
 	public static $grader = null;
 
 	/**
@@ -154,9 +153,8 @@ class ProblemController extends Controller {
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
 		Validators::isInEnum($r["order"], "order", array("normal", "inverse"), $is_required);
-	}		
+	}
 
-	
 	/**
 	 * Create a new problem
 	 * 
@@ -188,21 +186,20 @@ class ProblemController extends Controller {
 		$problem->setAuthorId($r["author"]->getUserId());
 
 		$problemDeployer = new ProblemDeployer();
-		
+
 		// Insert new problem
 		try {
-			
+
 			ProblemsDAO::transBegin();
 
 			// Save the contest object with data sent by user to the database
 			ProblemsDAO::save($problem);
 
 			// Create file after we know that alias is unique			
-			$problemDeployer->deploy($r);			
-			
+			$problemDeployer->deploy($r);
+
 			ProblemsDAO::transEnd();
-			
-		} catch (ApiException $e) {			
+		} catch (ApiException $e) {
 			// Operation failed in something we know it could fail, rollback transaction 
 			ProblemsDAO::transRollback();
 
@@ -213,16 +210,16 @@ class ProblemController extends Controller {
 		} catch (Exception $e) {
 
 			// Operation failed unexpectedly, rollback transaction 
-			ProblemsDAO::transRollback();			
+			ProblemsDAO::transRollback();
 
 			// Alias may be duplicated, 1062 error indicates that
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
 				throw new DuplicatedEntryInDatabaseException("problem_alias already exists.", $e);
 			} else {
-				
+
 				// Rollback the problem if deployed partially
 				$problemDeployer->deleteProblemFromFilesystem($r);
-				
+
 				throw new InvalidDatabaseOperationException($e);
 			}
 		}
@@ -273,7 +270,7 @@ class ProblemController extends Controller {
 		self::validateRejudge($r);
 
 		// We need to rejudge runs after an update, let's initialize the grader
-		self::initializeGrader();		
+		self::initializeGrader();
 
 		// Call Grader
 		$runs = array();
@@ -289,7 +286,7 @@ class ProblemController extends Controller {
 				$run->setContestScore(0);
 				RunsDAO::save($run);
 				self::$grader->Grade($run->getRunId());
-				
+
 				// Expire details of the run
 				$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());
 				$runAdminDetailsCache->delete();
@@ -304,12 +301,12 @@ class ProblemController extends Controller {
 
 		// All clear
 		$response["status"] = "ok";
-		
+
 		// Invalidate contest & problem caches
 		if (!is_null($runs) && count($runs) > 0) {
 			RunController::invalidateCacheOnRejudge($runs[0]);
 		}
-		
+
 		return $response;
 	}
 
@@ -324,7 +321,7 @@ class ProblemController extends Controller {
 
 		self::authenticateRequest($r);
 
-		self::validateCreateOrUpdate($r, true /*is update*/);
+		self::validateCreateOrUpdate($r, true /* is update */);
 
 		// Update the Problem object        
 		if (!is_null($r["public"])) {
@@ -357,7 +354,7 @@ class ProblemController extends Controller {
 
 		$response = array();
 		$problemDeployer = new ProblemDeployer();
-		
+
 		// Insert new problem
 		try {
 			//Begin transaction
@@ -390,7 +387,7 @@ class ProblemController extends Controller {
 		}
 
 		// We need to rejudge runs after an update, let's initialize the grader
-		self::initializeGrader();		
+		self::initializeGrader();
 
 		// Call Grader
 		try {
@@ -420,11 +417,9 @@ class ProblemController extends Controller {
 		// Invalidar cache @todo invalidar todos los lenguajes
 		$statementCache = new Cache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");
 		$statementCache->delete();
-		
+
 		return $response;
 	}
-
-	
 
 	/**
 	 * Validate problem Details API
@@ -437,7 +432,7 @@ class ProblemController extends Controller {
 	 */
 	private static function validateDetails(Request $r) {
 
-		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias", false);
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
 		// Lang is optional. Default is ES
@@ -447,38 +442,55 @@ class ProblemController extends Controller {
 			$r["lang"] = "es";
 		}
 
-		// Is the combination contest_id and problem_id valid?        
 		try {
-			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
 			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
-			
-			if (is_null($r["contest"])) {
-				throw new NotFoundException("Contest not found");
-			}
-			if (is_null($r["problem"])) {
-				throw new NotFoundException("Problem not found");
-			}
-
-			if (is_null(ContestProblemsDAO::getByPK($r["contest"]->getContestId(), $r["problem"]->getProblemId()))) {
-				throw new NotFoundException("Problem not found in contest given");
-			}
-		} catch (ApiException $apiException) {
-			throw $apiException;
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-
-		// If the contest is private, verify that our user is invited                        
-		if ($r["contest"]->getPublic() === 0) {
-			if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-				throw new ForbiddenAccessException();
-			}
+		if (is_null($r["problem"])) {
+			throw new NotFoundException("Problem not found");
 		}
 
-		// If the contest has not started, user should not see it, unless it is admin
-		if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-			throw new ForbiddenAccessException("Contest has not started yet.");
+		// If we request a problem inside a contest
+		if (!is_null($r["contest_alias"])) {
+			// Is the combination contest_id and problem_id valid?        
+			try {
+				$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+
+				if (is_null($r["contest"])) {
+					throw new NotFoundException("Contest not found");
+				}
+
+				if (is_null(ContestProblemsDAO::getByPK($r["contest"]->getContestId(), $r["problem"]->getProblemId()))) {
+					throw new NotFoundException("Problem not found in contest given");
+				}
+			} catch (ApiException $apiException) {
+				throw $apiException;
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+
+			// If the contest is private, verify that our user is invited                        
+			if ($r["contest"]->getPublic() === 0) {
+				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+					throw new ForbiddenAccessException();
+				}
+			}
+
+			// If the contest has not started, user should not see it, unless it is admin
+			if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+				throw new ForbiddenAccessException("Contest has not started yet.");
+			}
+		} else {
+			
+			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+				// If the problem is requested outside a contest, we need to check that it is not private
+				if ($r["problem"]->getPublic() == "0") {
+					throw new ForbiddenAccessException("Problem is marked as private.");
+				}
+			}
 		}
 	}
 
@@ -541,7 +553,7 @@ class ProblemController extends Controller {
 		$keyrun = new Runs(array(
 					"user_id" => $r["current_user_id"],
 					"problem_id" => $r["problem"]->getProblemId(),
-					"contest_id" => $r["contest"]->getContestId()
+					"contest_id" => is_null($r["contest"]) ? null : $r["contest"]->getContestId()
 				));
 
 		// Get all the available runs
@@ -562,31 +574,33 @@ class ProblemController extends Controller {
 			}
 		}
 
-		// At this point, contestant_user relationship should be established.        
-		try {
-			$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-							$r["current_user_id"], $r["contest"]->getContestId());
-		} catch (Exception $e) {
-			// Operation failed in the data layer
-			throw new InvalidDatabaseOperationException($e);
-		}
-
-		// As last step, register the problem as opened                
-		if (!ContestProblemOpenedDAO::getByPK(
-						$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"])) {
-			//Create temp object
-			$keyContestProblemOpened = new ContestProblemOpened(array(
-						"contest_id" => $r["contest"]->getContestId(),
-						"problem_id" => $r["problem"]->getProblemId(),
-						"user_id" => $r["current_user_id"]
-					));
-
+		if (!is_null($r["contest"])) {
+			// At this point, contestant_user relationship should be established.        
 			try {
-				// Save object in the DB
-				ContestProblemOpenedDAO::save($keyContestProblemOpened);
+				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+								$r["current_user_id"], $r["contest"]->getContestId());
 			} catch (Exception $e) {
 				// Operation failed in the data layer
 				throw new InvalidDatabaseOperationException($e);
+			}
+
+			// As last step, register the problem as opened                
+			if (!ContestProblemOpenedDAO::getByPK(
+							$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"])) {
+				//Create temp object
+				$keyContestProblemOpened = new ContestProblemOpened(array(
+							"contest_id" => $r["contest"]->getContestId(),
+							"problem_id" => $r["problem"]->getProblemId(),
+							"user_id" => $r["current_user_id"]
+						));
+
+				try {
+					// Save object in the DB
+					ContestProblemOpenedDAO::save($keyContestProblemOpened);
+				} catch (Exception $e) {
+					// Operation failed in the data layer
+					throw new InvalidDatabaseOperationException($e);
+				}
 			}
 		}
 
@@ -664,7 +678,7 @@ class ProblemController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
-	
+
 	/**
 	 * Stats of a problem
 	 * 
@@ -674,32 +688,32 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiStats(Request $r) {
-		
+
 		// Get user
 		self::authenticateRequest($r);
-		
+
 		// Validate request
 		self::validateRuns($r);
-		
+
 		// We need to check that the user has priviledges on the problem
 		if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 			throw new ForbiddenAccessException();
 		}
-		
+
 		try {
 			// Array of GUIDs of pending runs
 			$pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem($r["problem"]->getProblemId());
-			
+
 			// Count of pending runs (int)
 			$totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r["problem"]->getProblemId());
-			
+
 			// List of veredicts			
 			$veredict_counts = array();
 
 			foreach (self::$veredicts as $veredict) {
 				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfProblemByVeredict($r["problem"]->getProblemId(), $veredict);
 			}
-			
+
 			// Array to count AC stats per case.
 			// Let's try to get the last snapshot from cache.
 			$problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r["problem"]->getAlias());
@@ -708,10 +722,10 @@ class ProblemController extends Controller {
 				// Initialize the array at counts = 0
 				$cases_stats = array();
 				$cases_stats["counts"] = array();
-				
+
 				// We need to save the last_id that we processed, so next time we do not repeat this
-				$cases_stats["last_id"] = 0;							
-				
+				$cases_stats["last_id"] = 0;
+
 				// Build problem dir
 				$problem_dir = PROBLEMS_PATH . '/' . $r["problem"]->getAlias() . '/cases/';
 
@@ -728,17 +742,15 @@ class ProblemController extends Controller {
 					closedir($dir);
 				}
 			}
-			
+
 			// Get all runs of this problem after the last id we had
-			$runs = RunsDAO::searchRunIdGreaterThan(new Runs(array("problem_id" => $r["problem"]->getProblemId())), 
-					$cases_stats["last_id"], 
-					"run_id");
-									
+			$runs = RunsDAO::searchRunIdGreaterThan(new Runs(array("problem_id" => $r["problem"]->getProblemId())), $cases_stats["last_id"], "run_id");
+
 			// For each run we got
-			foreach($runs as $run) {
+			foreach ($runs as $run) {
 				// Build grade dir
-				$grade_dir = RUNS_PATH . '/../grade/' . $run->getRunId();								
-				
+				$grade_dir = RUNS_PATH . '/../grade/' . $run->getRunId();
+
 				// Skip it if it didn't produce outputs 
 				if (file_exists("$grade_dir.err")) {
 					continue;
@@ -748,9 +760,9 @@ class ProblemController extends Controller {
 						$details = json_decode(file_get_contents("$grade_dir/details.json"));
 						foreach ($details as $group) {
 							foreach ($group->cases as $case) {
-									if ($case->score > 0) {
-										$cases_stats["counts"][$case->name]++;
-									}
+								if ($case->score > 0) {
+									$cases_stats["counts"][$case->name]++;
+								}
 							}
 						}
 					} else if ($dir = opendir($grade_dir)) {
@@ -759,7 +771,7 @@ class ProblemController extends Controller {
 
 							// Skip non output cases
 							if ($file == '.' || $file == '..' || !strstr($file, ".meta")) {
-								continue;	
+								continue;
 							}
 
 							// Get the case name
@@ -782,30 +794,28 @@ class ProblemController extends Controller {
 						// Close this run dir
 						closedir($dir);
 					}
-				}								
-			}			
-			
+				}
+			}
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-				
+
 		// Save the last id we saw in case we saw something
 		if (!is_null($runs) && count($runs) > 0) {
 			$cases_stats["last_id"] = $runs[count($runs) - 1]->getRunId();
 		}
-		
+
 		// Save in cache what we got
 		$problemStatsCache->set($cases_stats, APC_USER_CACHE_PROBLEM_STATS_TIMEOUT);
-		
+
 		return array(
 			"total_runs" => $totalRunsCount,
 			"pending_runs" => $pendingRunsGuids,
 			"veredict_counts" => $veredict_counts,
-			"cases_stats" => $cases_stats["counts"],						
+			"cases_stats" => $cases_stats["counts"],
 		);
 	}
-	
-	
+
 	/**
 	 * List of public problems
 	 * 
@@ -813,13 +823,13 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiList(Request $r) {
-		
+
 		// Authenticate request
 		self::authenticateRequest($r);
-		
+
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
-		
+
 		// Defaults for offset and rowcount
 		if (!isset($r["offset"])) {
 			$r["offset"] = 0;
@@ -827,24 +837,23 @@ class ProblemController extends Controller {
 		if (!isset($r["rowcount"])) {
 			$r["rowcount"] = 100;
 		}
-						
+
 		try {
 			$problem_mask = new Problems(array(
-				"public" => 1
-			));
-			
+						"public" => 1
+					));
+
 			$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
-			
-		} catch(Exception $e) {
+		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		$response = array();
-		
-		foreach($problems as $problem) {
+
+		foreach ($problems as $problem) {
 			array_push($response, $problem->asArray());
 		}
-		
+
 		$response["status"] = "ok";
 		return $response;
 	}
