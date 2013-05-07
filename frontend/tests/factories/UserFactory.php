@@ -18,8 +18,9 @@ class UserFactory {
     * @param string $email optional
     * @return user (DAO)
     */
-    public static function createUser($username = null, $password = null, $email = null) {
-        
+    public static function createUser($username = null, $password = null, $email = null, $verify = true) {
+        DAO::$useDAOCache = false;
+		
 		// If data is not provided, generate it randomly
         if (is_null($username)) {
             $username = Utils::CreateRandomString();
@@ -40,7 +41,7 @@ class UserFactory {
 				"email" => $email)
 				);
 		
-		// Call the API
+		// Call the API		
 		$response = UserController::apiCreate($r);
 		
 		// If status is not OK
@@ -51,10 +52,32 @@ class UserFactory {
 		// Get user from db
 		$user = UsersDAO::FindByUsername($username);
 		
-        // Password came hashed from DB. Set password in plaintext
+		if ($verify) {
+			UserController::$redirectOnVerify = false;
+			$user = self::verifyUser($user);
+		}
+						
+		// Password came hashed from DB. Set password in plaintext
         $user->setPassword($password);
+		
         return $user;
     } 
+	
+	/**
+	 * Verifies a user and returns its DAO
+	 * 
+	 * @param Users $user
+	 * @return type
+	 */
+	public static function verifyUser(Users $user) {
+		
+		UserController::apiVerifyEmail(new Request(array(
+			"id" => $user->getVerificationId()
+		)));
+		
+		// Get user from db again to pick up verification changes
+		return UsersDAO::FindByUsername($user->getUsername());
+	}
 	
 	/**
 	 * Creates a new user and elevates his priviledges

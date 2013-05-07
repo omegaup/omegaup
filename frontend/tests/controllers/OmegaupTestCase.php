@@ -12,7 +12,10 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 	 * setUp function gets executed before each test (thanks to phpunit)
 	 */
 	public function setUp() {
-
+		
+		UserController::$sendEmailOnVerify = false;
+		SessionController::$setCookieOnRegisterSession = false;
+		
 		//Clean $_REQUEST before each test
 		unset($_REQUEST);
 	}
@@ -59,6 +62,12 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 	 */
 	public static function login(Users $user) {
 
+		UserController::$sendEmailOnVerify = false;
+		
+		// Deactivate cookie setting
+		$oldCookieSetting = SessionController::$setCookieOnRegisterSession;
+		SessionController::$setCookieOnRegisterSession = false;
+		
 		// Inflate request with user data
 		$r = new Request(array(
 					"usernameOrEmail" => $user->getUsername(),
@@ -73,7 +82,10 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 
 		// Clean up leftovers of Login API
 		unset($_REQUEST);
-
+		
+		// Set cookie setting as it was before the login
+		SessionController::$setCookieOnRegisterSession = $oldCookieSetting;
+		
 		return $response["auth_token"];
 	}
 

@@ -23,8 +23,15 @@
 		</div>
 		{if $ERROR_TO_USER eq 'USER_OR_PASSWORD_WRONG'} 
 		<div class="post footer">
-			<div class="copy">
+			<div class="copy error">
 				Your credentials are wrong
+			</div>
+		</div>
+		{/if} 
+		{if $ERROR_TO_USER eq 'EMAIL_NOT_VERIFIED'} 
+		<div class="post footer">
+			<div class="copy error">
+				Your email is not verified yet. Please check your e-mail.
 			</div>
 		</div>
 		{/if} 

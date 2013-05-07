@@ -21,7 +21,7 @@ class CreateUserTest extends OmegaupTestCase {
 			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
 		));
 		
-		// Call API
+		// Call API		
 		$response = UserController::apiCreate($r);
 		
 		// Check response
@@ -46,7 +46,7 @@ class CreateUserTest extends OmegaupTestCase {
 			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
 		));
 		
-		// Call API
+		// Call API		
 		$response = UserController::apiCreate($r);
 		
 		// Randomize email again

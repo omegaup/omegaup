@@ -688,4 +688,7 @@ INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (2 ,  'CONTEST_AD
 
 ALTER TABLE  `Auth_Tokens` ADD  `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
 
+ALTER TABLE  `Users` ADD  `verified` BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE  `Users` ADD  `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL;
+
 COMMIT;

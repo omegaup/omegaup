@@ -70,6 +70,12 @@ class Users extends VO
 			if( isset($data['last_access']) ){
 				$this->last_access = $data['last_access'];
 			}
+			if( isset($data['verified']) ){
+				$this->verified = $data['verified'];
+			}
+			if( isset($data['verification_id']) ){
+				$this->verification_id = $data['verification_id'];
+			}
 		}
 	}
 
@@ -232,6 +238,9 @@ class Users extends VO
 	  * @var timestamp
 	  */
 	protected $last_access;
+	
+	protected $verified;
+	protected $verification_id;
 
 
 
@@ -585,6 +594,21 @@ class Users extends VO
 		$this->last_access = $last_access;
 	}
 
+	final public function setVerified($verified) {
+		$this->verified = $verified;
+	}
+	
+	final public function getVerified() {
+		return $this->verified;
+	}
+	
+	final public function setVerificationId($verification_id) {
+		$this->verification_id = $verification_id;
+	}
+	
+	final public function getVerificationId() {
+		return $this->verification_id;
+	}
 
 
 	/**

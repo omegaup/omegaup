@@ -250,5 +250,35 @@ class LoginTest extends OmegaupTestCase {
 		$existingTokens = AuthTokensDAO::getByPK($auth_token);
 		$this->assertNull($existingTokens);
 	}
+	
+	/**
+	 * @expectedException EmailNotVerifiedException
+	 */
+	public function testLoginUserNotVerifiedWithVerificationId() {
+				
+		// Create an user in omegaup
+		$user = UserFactory::createUser(null,null,null,false/*verified*/);
+		
+		$auth_token = self::login($user);
+		
+	}
+	
+	/**
+	 * @expectedException EmailNotVerifiedException
+	 */
+	public function testLoginUserNotVerifiedWithoutVerificationId() {
+		DAO::$useDAOCache = false;		
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser(null,null,null,false/*verified*/);
+		$plainPass = $user->getPassword();
+		$user->setVerificationId(null);
+		$user->setPassword(md5($plainPass));
+		UsersDAO::save($user);		
+		
+		$user->setPassword($plainPass);
+		
+		$auth_token = self::login($user);		
+	}
 }
 

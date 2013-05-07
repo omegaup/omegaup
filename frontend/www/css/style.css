@@ -155,6 +155,10 @@ div.copy pre code {
     border-bottom: 1px solid #f3f3e3;
     color: #777;
 }
+div.copy.error { 
+	padding: 16px; 
+	background-color: #ffffff;
+}
 div.footer {
     font-size: 13px;
 }

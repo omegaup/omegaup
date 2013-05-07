@@ -15,6 +15,7 @@ class SessionController extends Controller {
 	private static $current_session;
 	private static $_facebook;
 	private static $_sessionManager;
+	public static $setCookieOnRegisterSession = true;
 
 	public static function getSessionManagerInstance() {
 		if (is_null(self::$_sessionManager)) {
@@ -61,12 +62,12 @@ class SessionController extends Controller {
 		$SessionM = self::getSessionManagerInstance();
 		$s_AuthToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
 		$vo_CurrentUser = NULL;
-
+				
 		//cookie contains an auth token
 		if (!is_null($s_AuthToken) && self::isAuthTokenValid($s_AuthToken)) {
 			$vo_CurrentUser = AuthTokensDAO::getUserByToken($s_AuthToken);
 		} else if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
-				&& self::isAuthTokenValid($s_AuthToken = $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
+				&& self::isAuthTokenValid($s_AuthToken = $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {			
 			$vo_CurrentUser = AuthTokensDAO::getUserByToken($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
 		} else {
 			return array(
@@ -159,12 +160,14 @@ class SessionController extends Controller {
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-
+			
+		if (self::$setCookieOnRegisterSession) {
+			$sm = $this->getSessionManagerInstance();
+			$sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time() + 60 * 60 * 24, '/');		
+		}		
+		
 		if ($b_ReturnAuthTokenAsString) {
 			return $s_AuthT;
-		} else {
-			$sm = $this->getSessionManagerInstance();
-			$sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time() + 60 * 60 * 24, '/');
 		}
 	}
 
@@ -294,6 +297,7 @@ class SessionController extends Controller {
 		try {			
 			$vo_User = UserController::resolveUser($r["usernameOrEmail"]);			
 			$r["user_id"] = $vo_User->getUserId();
+			$r["user"] = $vo_User;
 		} catch (ApiException $e) {
 			Logger::warn("User " . $r["usernameOrEmail"] . " not found.");
 			return false;
@@ -307,7 +311,9 @@ class SessionController extends Controller {
 		}
 
 		Logger::log("User " . $r["usernameOrEmail"] . " has loged in natively.");
-
+		
+		UserController::checkEmailVerification($r);
+		
 		try {
 			return $this->RegisterSession($vo_User, $returnAuthToken);
 		} catch (Exception $e) {
