@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class LoginUITest extends OmegaupUITestCase {
+class EmailVerificationUITest extends OmegaupUITestCase {
 
 	public function testLogin() {
 
