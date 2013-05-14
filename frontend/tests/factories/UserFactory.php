@@ -64,6 +64,15 @@ class UserFactory {
     } 
 	
 	/**
+	 * Creates a user using self::createUser with verify = false
+	 * 
+	 * @return user (DAO)
+	 */
+	public static function createUserWithoutVerify() {
+		return self::createUser(null, null, null, false);
+	}
+	
+	/**
 	 * Verifies a user and returns its DAO
 	 * 
 	 * @param Users $user
