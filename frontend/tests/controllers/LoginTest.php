@@ -225,10 +225,19 @@ class LoginTest extends OmegaupTestCase {
 		$auth_token_dao->setCreateTime(date('Y-m-d H:i:s', strtotime($auth_token_dao->getCreateTime() . ' - 9 hour')));
 		AuthTokensDAO::save($auth_token_dao);
 		
-		// Call to api should fail
-		ProblemController::apiList(new Request(array(
-			"auth_token" => $auth_token
-		)));
+		// Call to api that requires logged in user should fail
+		// Get a contest 
+		$contestData = ContestsFactory::createContest();
+		// Prepare our request
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+
+		// Log in the user
+		$r["auth_token"] = $auth_token;
+
+		// Call api
+		$response = ContestController::apiDetails($r);
+		
 	}
 	
 	public function testDeleteTokenExpired() {

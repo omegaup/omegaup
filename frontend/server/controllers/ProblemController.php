@@ -825,7 +825,11 @@ class ProblemController extends Controller {
 	public static function apiList(Request $r) {
 
 		// Authenticate request
-		self::authenticateRequest($r);
+		try {
+			self::authenticateRequest($r);
+		} catch (ForbiddenAccessException $e) {
+			// Do nothing
+		}
 
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
@@ -849,12 +853,13 @@ class ProblemController extends Controller {
 		}
 
 		$response = array();
+		$response["results"] = array();
 
 		foreach ($problems as $problem) {
-			array_push($response, $problem->asArray());
+			array_push($response["results"], $problem->asArray());
 		}
 
-		$response["status"] = "ok";
+		$response["status"] = "ok";		
 		return $response;
 	}
 

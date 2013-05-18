@@ -195,7 +195,7 @@ class UserController extends Controller {
 			$mail->AddAddress($email->getEmail());
 			$mail->isHTML(true);
 			$mail->Subject = "Bienvenido a Omegaup!";
-			$mail->Body = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para verificar tu email: <a href="https://omegaup.com/api/user/verifyemail/id/' . $r["user"]->getVerificationId() . '"> https://omegaup.com/api/user/verifyemail/id/' . $r["user"]->getVerificationId() . '</a>';
+			$mail->Body = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email: <a href="https://omegaup.com/api/user/verifyemail/id/' . $r["user"]->getVerificationId() . '"> https://omegaup.com/api/user/verifyemail/id/' . $r["user"]->getVerificationId() . '</a>';
 
 			if (!$mail->Send()) {
 				Logger::error("Failed to send mail: " . $mail->ErrorInfo);
