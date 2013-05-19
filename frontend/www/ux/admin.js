@@ -425,7 +425,7 @@ $(document).ready(function() {
 				orig_run.language = run.language;
 
 				$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-				$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+				$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 				$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
 				$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 				$('.penalty', r).html(run.submit_delay);
@@ -479,7 +479,7 @@ $(document).ready(function() {
 			$('.username', r).html(run.username);
 			$('.problem', r).html(run.alias);
 			$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-			$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+			$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 			$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
 			$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 			if (run.veredict == 'JE')

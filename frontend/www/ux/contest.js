@@ -57,7 +57,7 @@ $(document).ready(function() {
 
 		if (run.status == 'ready') {
 			$(r + ' .runtime').html((parseFloat(run.runtime) / 1000).toFixed(2));
-			$(r + ' .memory').html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+			$(r + ' .memory').html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 			$(r + ' .points').html(parseFloat(run.contest_score).toFixed(2));
 			$(r + ' .penalty').html(run.submit_delay);
 		}
@@ -339,7 +339,7 @@ $(document).ready(function() {
 						var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
 						$('.guid', r).html(run.guid.substring(run.guid.length - 5));
 						$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-						$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+						$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 						$('.points', r).html((parseFloat(run[score_column]) * multiplier).toFixed(2));
 						$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 						$('.penalty', r).html(run.submit_delay);
