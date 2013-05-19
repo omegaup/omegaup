@@ -8,15 +8,12 @@
 class RunController extends Controller {
 
 	public static $grader = null;
-	private static $practice = false;
-	private static $problem = null;
-	private static $contest = null;
-	private static $run = null;
+	private static $practice = false;		
 
 	/**
 	 * Creates an instance of Grader if not already created
 	 */
-	private static function initialize() {
+	private static function initializeGrader() {
 		if (is_null(self::$grader)) {
 			// Create new grader
 			self::$grader = new Grader();
@@ -42,15 +39,15 @@ class RunController extends Controller {
 			Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
 			// Check that problem exists
-			self::$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
 
 			Validators::isInEnum($r["language"], "language", array('kp', 'kj', 'c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p'));
 			Validators::isStringNonEmpty($r["source"], "source");
 
 			// Check for practice, there is no contest info in this scenario
-			if ($r["contest_alias"] == "" && (Authorization::IsSystemAdmin($r["current_user_id"]) || time() > ProblemsDAO::getPracticeDeadline(self::$problem->getProblemId()))) {
+			if ($r["contest_alias"] == "" && (Authorization::IsSystemAdmin($r["current_user_id"]) || time() > ProblemsDAO::getPracticeDeadline($r["problem"]->getProblemId()))) {
 				if (!RunsDAO::IsRunInsideSubmissionGap(
-								null, self::$problem->getProblemId(), $r["current_user_id"])
+								null, $r["problem"]->getProblemId(), $r["current_user_id"])
 						&& !Authorization::IsSystemAdmin($r["current_user_id"])) {
 					throw new NotAllowedToSubmitException();
 				}
@@ -61,38 +58,38 @@ class RunController extends Controller {
 
 			// Validate contest
 			Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
-			self::$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
 
 			// Validate that the combination contest_id problem_id is valid            
 			if (!ContestProblemsDAO::getByPK(
-							self::$contest->getContestId(), self::$problem->getProblemId()
+							$r["contest"]->getContestId(), $r["problem"]->getProblemId()
 			)) {
 				throw new InvalidParameterException("problem_alias and contest_alias combination is invalid.");
 			}
 
 			// Contest admins can skip following checks
-			if (!Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+			if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				// Before submit something, contestant had to open the problem/contest
-				if (!ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId())) {
+				if (!ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) {
 					throw new ForbiddenAccessException("Unable to submit run: You must open the problem before trying to submit a solution.");
 				}
 
 				// Validate that the run is timely inside contest
-				if (!self::$contest->isInsideContest($r["current_user_id"])) {
+				if (!$r["contest"]->isInsideContest($r["current_user_id"])) {
 					throw new ForbiddenAccessException("Unable to submit run: Contest time has expired or not started yet.");
 				}
 
 				// Validate if contest is private then the user should be registered
-				if (self::$contest->getPublic() == 0
+				if ($r["contest"]->getPublic() == 0
 						&& is_null(ContestsUsersDAO::getByPK(
-										$r["current_user_id"], self::$contest->getContestId()))) {
+										$r["current_user_id"], $r["contest"]->getContestId()))) {
 					throw new ForbiddenAccessException("Unable to submit run: You are not registered to this contest.");
 				}
 
 				// Validate if the user is allowed to submit given the submissions_gap 			
 				if (!RunsDAO::IsRunInsideSubmissionGap(
-								self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"])) {
-					throw new NotAllowedToSubmitException("Unable to submit run: You have to wait " . self::$contest->getSubmissionsGap() . " seconds between consecutive submissions.");
+								$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"])) {
+					throw new NotAllowedToSubmitException("Unable to submit run: You have to wait " . $r["contest"]->getSubmissionsGap() . " seconds between consecutive submissions.");
 				}
 			}
 		} catch (ApiException $apiException) {
@@ -115,7 +112,7 @@ class RunController extends Controller {
 	 */
 	public static function apiCreate(Request $r) {
 		// Init
-		self::initialize();
+		self::initializeGrader();
 
 		// Authenticate user
 		self::authenticateRequest($r);
@@ -132,20 +129,20 @@ class RunController extends Controller {
 			$test = 0;
 		} else {
 			//check the kind of penalty_time_start for this contest
-			$penalty_time_start = self::$contest->getPenaltyTimeStart();
+			$penalty_time_start = $r["contest"]->getPenaltyTimeStart();
 
 			switch ($penalty_time_start) {
 				case "contest":
 					// submit_delay is calculated from the start
 					// of the contest
-					$start = self::$contest->getStartTime();
+					$start = $r["contest"]->getStartTime();
 					break;
 
 				case "problem":
 					// submit delay is calculated from the 
 					// time the user opened the problem
 					$opened = ContestProblemOpenedDAO::getByPK(
-									self::$contest->getContestId(), self::$problem->getProblemId(), $r["current_user_id"]
+									$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"]
 					);
 
 					if (is_null($opened)) {
@@ -180,14 +177,14 @@ class RunController extends Controller {
 				$submit_delay = 0;
 			}
 
-			$contest_id = self::$contest->getContestId();
-			$test = Authorization::IsContestAdmin($r["current_user_id"], self::$contest) ? 1 : 0;
+			$contest_id = $r["contest"]->getContestId();
+			$test = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]) ? 1 : 0;
 		}
 
 		// Populate new run object
 		$run = new Runs(array(
 					"user_id" => $r["current_user_id"],
-					"problem_id" => self::$problem->getProblemId(),
+					"problem_id" => $r["problem"]->getProblemId(),
 					"contest_id" => $contest_id,
 					"language" => $r["language"],
 					"source" => $r["source"],
@@ -232,12 +229,12 @@ class RunController extends Controller {
 		} else {
 			// Add remaining time to the response
 			try {
-				$contest_user = ContestsUsersDAO::getByPK($r["current_user_id"], self::$contest->getContestId());
+				$contest_user = ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId());
 
-				if (self::$contest->getWindowLength() === null) {
-					$response['submission_deadline'] = strtotime(self::$contest->getFinishTime());
+				if ($r["contest"]->getWindowLength() === null) {
+					$response['submission_deadline'] = strtotime($r["contest"]->getFinishTime());
 				} else {
-					$response['submission_deadline'] = min(strtotime(self::$contest->getFinishTime()), strtotime($contest_user->getAccessTime()) + self::$contest->getWindowLength() * 60);
+					$response['submission_deadline'] = min(strtotime($r["contest"]->getFinishTime()), strtotime($contest_user->getAccessTime()) + $r["contest"]->getWindowLength() * 60);
 				}
 			} catch (Exception $e) {
 				// Operation failed in the data layer
@@ -252,7 +249,7 @@ class RunController extends Controller {
 		if (!self::$practice) {
 			/// @todo Invalidate cache only when this run changes a user's score
 			///       (by improving, adding penalties, etc)
-			self::InvalidateScoreboardCache(self::$contest->getContestId());
+			self::InvalidateScoreboardCache($r["contest"]->getContestId());
 		}
 
 		return $response;
@@ -290,13 +287,13 @@ class RunController extends Controller {
 
 		try {
 			// If user is not judge, must be the run's owner.
-			self::$run = RunsDAO::getByAlias($r["run_alias"]);
+			$r["run"] = RunsDAO::getByAlias($r["run_alias"]);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		if (is_null(self::$run)) {
+		if (is_null($r["run"])) {
 			throw new NotFoundException("Run not found");
 		}
 	}
@@ -314,13 +311,13 @@ class RunController extends Controller {
 
 		self::validateDetailsRequest($r);
 
-		if (!(Authorization::CanViewRun($r["current_user_id"], self::$run))) {
+		if (!(Authorization::CanViewRun($r["current_user_id"], $r["run"]))) {
 			throw new ForbiddenAccessException();
 		}
 
 		// Fill response
 		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
-		$filtered = self::$run->asFilteredArray($relevant_columns);
+		$filtered = $r["run"]->asFilteredArray($relevant_columns);
 		$filtered['time'] = strtotime($filtered['time']);
 		$filtered['score'] = round((float) $filtered['score'], 4);
 		$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
@@ -338,14 +335,14 @@ class RunController extends Controller {
 	 */
 	public static function apiRejudge(Request $r) {
 		// Init
-		self::initialize();
+		self::initializeGrader();
 
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
 		self::validateDetailsRequest($r);
 
-		if (!(Authorization::CanEditRun($r["current_user_id"], self::$run))) {
+		if (!(Authorization::CanEditRun($r["current_user_id"], $r["run"]))) {
 			throw new ForbiddenAccessException();
 		}
 
@@ -353,7 +350,7 @@ class RunController extends Controller {
 
 		// Try to delete compile message, if exists.
 		try {
-			$grade_err = RUNS_PATH . '/../grade/' . self::$run->getRunId() . '.err';
+			$grade_err = RUNS_PATH . '/../grade/' . $r["run"]->getRunId() . '.err';
 			if (file_exists($grade_err)) {
 				unlink($grade_err);
 			}
@@ -363,7 +360,7 @@ class RunController extends Controller {
 		}
 
 		try {
-			self::$grader->Grade(self::$run->getRunId());
+			self::$grader->Grade($r["run"]->getRunId());
 		} catch (Exception $e) {
 			Logger::error("Call to Grader::grade() failed:");
 			Logger::error($e);
@@ -373,10 +370,10 @@ class RunController extends Controller {
 		$response['status'] = 'ok';
 		
 		
-		self::invalidateCacheOnRejudge(self::$run);	
+		self::invalidateCacheOnRejudge($r["run"]);	
 		
 		// Expire details of the run
-		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, self::$run->getRunId());
+		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId());
 		$runAdminDetailsCache->delete();
 
 		return $response;	
@@ -425,18 +422,18 @@ class RunController extends Controller {
 
 		self::validateDetailsRequest($r);
 
-		if (!(Authorization::CanEditRun($r["current_user_id"], self::$run))) {
+		if (!(Authorization::CanEditRun($r["current_user_id"], $r["run"]))) {
 			throw new ForbiddenAccessException();
 		}
 
 		// Get the problem
 		try {
-			$problem = ProblemsDAO::getByPK(self::$run->getProblemId());
+			$problem = ProblemsDAO::getByPK($r["run"]->getProblemId());
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}		
 		
-		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, self::$run->getRunId());
+		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId());
 		$response = $runAdminDetailsCache->get();
 		
 		if (is_null($response))
@@ -444,7 +441,7 @@ class RunController extends Controller {
 			$response = array();		
 
 			$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
-			$grade_dir = RUNS_PATH . '/../grade/' . self::$run->getRunId();
+			$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
 
 			$cases = array();
 
@@ -477,11 +474,13 @@ class RunController extends Controller {
 			usort($cases, array("RunController", "MetaCompare"));
 
 			$response['cases'] = $cases;
-			$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
+			$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
 			$response["status"] = "ok";
 			
-			// Save cache
-			$runAdminDetailsCache->set($response, 0);
+			// Save cache only if run was already graded
+			if ($r["run"]->getStatus() === 'ready') {
+				$runAdminDetailsCache->set($response, 0);
+			}
 		}
 
 		return $response;
@@ -531,17 +530,17 @@ class RunController extends Controller {
 
 		self::validateDetailsRequest($r);
 
-		if (!(Authorization::CanViewRun($r["current_user_id"], self::$run))) {
+		if (!(Authorization::CanViewRun($r["current_user_id"], $r["run"]))) {
 			throw new ForbiddenAccessException();
 		}
 
 		$response = array();
 
 		// Get the source
-		$response['source'] = file_get_contents(RUNS_PATH . '/' . self::$run->getGuid());
+		$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
 
 		// Get the error
-		$grade_dir = RUNS_PATH . '/../grade/' . self::$run->getRunId();
+		$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
 		if (file_exists("$grade_dir.err")) {
 			$response['compile_error'] = file_get_contents("$grade_dir.err");
 		}
@@ -562,20 +561,20 @@ class RunController extends Controller {
 
 		self::validateDetailsRequest($r);
 
-		self::$contest = ContestsDAO::getByPK(self::$run->getContestId());
+		$r["contest"] = ContestsDAO::getByPK($r["run"]->getContestId());
 
-		if (!Authorization::IsContestAdmin($r["current_user_id"], self::$contest)) {
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException();
 		}
 
-		$problem = ProblemsDAO::getByPK(self::$run->getProblemId());
+		$problem = ProblemsDAO::getByPK($r["run"]->getProblemId());
 
 		$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
-		$grade_dir = RUNS_PATH . '/../grade/' . self::$run->getRunId();
+		$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
 
 		$cases = array();
 
-		$zip = new ZipStream(self::$run->getGuid() . '.zip');
+		$zip = new ZipStream($r["run"]->getGuid() . '.zip');
 
 		if (is_dir($grade_dir)) {
 			if ($dir = opendir($grade_dir)) {

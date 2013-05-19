@@ -238,3 +238,31 @@ class NotAllowedToSubmitException extends ApiException {
 		parent::__construct($message, "HTTP/1.1 401 FORBIDDEN", 501, $previous);
 	}
 }
+
+
+class EmailNotVerifiedException extends ApiException {
+
+	/**
+	 * 
+	 * @param string $message
+	 * @param Exception $previous
+	 */
+	function __construct(Exception $previous = NULL) {
+		parent::__construct("Your email is not verified yet. Please check your e-mail.", "HTTP/1.1 403 FORBIDDEN", 600, $previous);
+	}
+
+}
+
+
+class EmailVerificationSendException extends ApiException {
+
+	/**
+	 * 
+	 * @param string $message
+	 * @param Exception $previous
+	 */
+	function __construct(Exception $previous = NULL) {
+		parent::__construct("There was an error sending the verification email. Please try again later. Your email is not verified yet.", "HTTP/1.1 403 FORBIDDEN", 601, $previous);
+	}
+
+}

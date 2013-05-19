@@ -8,6 +8,9 @@
 require_once 'SessionController.php';
 
 class UserController extends Controller {
+	
+	public static $sendEmailOnVerify = true;
+	public static $redirectOnVerify = true;
 
 	/**
 	 * Entry point for Create a User API
@@ -48,6 +51,8 @@ class UserController extends Controller {
 					"password" => SecurityTools::hashString($r["password"]),
 					"solved" => 0,
 					"submissions" => 0,
+					"verified" => 0,
+					"verification_id" => self::randomString(50),
 				));
 
 		$email = new Emails(array(
@@ -72,7 +77,10 @@ class UserController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		Logger::log("User " . $user->getUsername() . " created");
+		Logger::log("User " . $user->getUsername() . " created, sending verification mail");
+		
+		$r["user"] = $user;
+		self::sendVerificationEmail($r);
 
 		return array(
 			"status" => "ok",
@@ -157,6 +165,80 @@ class UserController extends Controller {
 	}
 
 	/**
+	 * Send the mail with verification link to the user in the Request
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws EmailVerificationSendException
+	 */
+	private static function sendVerificationEmail(Request $r) {
+
+		try {
+			$email = EmailsDAO::getByPK($r["user"]->getMainEmailId());
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		Logger::log("Sending email to user.");
+		if (self::$sendEmailOnVerify) {
+			$mail = new PHPMailer();
+			$mail->IsSMTP();
+			$mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
+			$mail->SMTPAuth = true;
+			$mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
+			$mail->From = OMEGAUP_EMAIL_SMTP_FROM;
+			$mail->Port = 465;
+			$mail->SMTPSecure = 'ssl';
+			$mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+
+			$mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
+			$mail->AddAddress($email->getEmail());
+			$mail->isHTML(true);
+			$mail->Subject = "Bienvenido a Omegaup!";
+			$mail->Body = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email: <a href="https://omegaup.com/api/user/verifyemail/id/' . $r["user"]->getVerificationId() . '"> https://omegaup.com/api/user/verifyemail/id/' . $r["user"]->getVerificationId() . '</a>';
+
+			if (!$mail->Send()) {
+				Logger::error("Failed to send mail: " . $mail->ErrorInfo);
+				throw new EmailVerificationSendException();
+			}
+		}
+	}
+
+	/**
+	 * Check if email of user in request has been verified
+	 * 
+	 * @param Request $r
+	 * @throws EmailNotVerifiedException
+	 */
+	public static function checkEmailVerification(Request $r) {
+		
+		if (OMEGAUP_FORCE_EMAIL_VERIFICATION) {
+			// Check if he has been verified				
+			if ($r["user"]->getVerified() == '0') {
+				Logger::log("User not verified.");
+
+				if ($r["user"]->getVerificationId() == null) {
+					
+					Logger::log("User does not have verification id. Generating.");
+
+					try {
+						$r["user"]->setVerificationId(self::randomString(50));
+						UsersDAO::save($r["user"]);
+					} catch (Exception $e) {
+						// best effort, eat exception
+					}
+
+					self::sendVerificationEmail($r);
+				}
+
+				throw new EmailNotVerifiedException();
+			} else {
+				Logger::log("User already verified.");
+			}
+		}
+	}
+
+	/**
 	 * Exposes API /user/login
 	 * Expects in request:
 	 * user
@@ -175,9 +257,9 @@ class UserController extends Controller {
 
 		// Get auth_token
 		$auth_token = $sessionController->NativeLogin($r);
-
+		
 		// If user was correctly logged in
-		if ($auth_token !== false) {
+		if ($auth_token !== false) {			
 			return array(
 				"status" => "ok",
 				"auth_token" => $auth_token);
@@ -219,7 +301,7 @@ class UserController extends Controller {
 				$user = UsersDAO::FindByUsername($r["username"]);
 
 				if (is_null($user)) {
-					throw NotFoundException();
+					throw new NotFoundException("User does not exists");
 				}
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
@@ -229,6 +311,46 @@ class UserController extends Controller {
 		$user->setPassword(SecurityTools::hashString($r["password"]));
 		UsersDAO::save($user);
 
+		return array("status" => "ok");
+	}
+
+	/**
+	 * Verifies the user given its verification id
+	 * 
+	 * @param Request $r
+	 * @return type
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 */
+	public static function apiVerifyEmail(Request $r) {
+
+		Validators::isStringNonEmpty($r["id"], "id");
+
+		try {
+			$users = UsersDAO::search(new Users(array(
+								"verification_id" => $r["id"]
+							)));
+
+			$user = $users[0];
+			if (is_null($user)) {
+				throw new NotFoundException("Verification id is invalid.");
+			}
+
+			$user->setVerified(1);
+			$user->setVerificationId('');
+			UsersDAO::save($user);
+		} catch (ApiException $e) {
+			throw $e;
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		Logger::log("User verification complete.");
+		
+		if (self::$redirectOnVerify) {
+			die(header('Location: /login.php'));
+		}
 		return array("status" => "ok");
 	}
 
@@ -304,6 +426,8 @@ class UserController extends Controller {
 						"password" => $password,
 						"email" => $username . "@omi.com",
 					));
+			
+			UserController::$sendEmailOnVerify = false;
 			self::apiCreate($createRequest);
 		} else {
 			$resetRequest = new Request();
@@ -392,6 +516,95 @@ class UserController extends Controller {
 			}
 		}
 
+		return $response;
+	}
+
+	/**
+	 * Get list of contests where the user has admin priviledges
+	 * 
+	 * @param Request $r
+	 * @return string
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiContests(Request $r) {
+
+		self::authenticateRequest($r);
+
+		$response = array();
+		$response["contests"] = array();
+
+		try {
+
+			$contest_director_key = new Contests(array(
+						"director_id" => $r["current_user_id"]
+					));
+			$contests_director = ContestsDAO::search($contest_director_key);
+
+			foreach ($contests_director as $contest) {
+				$response["contests"][] = $contest->asArray();
+			}
+
+			$contest_admin_key = new UserRoles(array(
+						"user_id" => $r["current_user_id"],
+						"role_id" => CONTEST_ADMIN_ROLE,
+					));
+			$contests_admin = UserRolesDAO::search($contest_admin_key);
+
+			foreach ($contests_admin as $contest_key) {
+				$contest = ContestsDAO::getByPK($contest_key->getContestId());
+
+				if (is_null($contest)) {
+					Logger::error("UserRoles has a invalid contest: {$contest->getContestId()}");
+					continue;
+				}
+
+				$response["contests"][] = $contest->asArray();
+			}
+
+			usort($response["contests"], function ($a, $b) {
+						return ($a["contest_id"] > $b["contest_id"]) ? -1 : 1;
+					});
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$response["status"] = "ok";
+		return $response;
+	}
+
+	/**
+	 * Get list of my editable problems
+	 * 
+	 * @param Request $r
+	 * @return string
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiProblems(Request $r) {
+
+		self::authenticateRequest($r);
+
+		$response = array();
+		$response["problems"] = array();
+
+		try {
+			$problems_key = new Problems(array(
+						"author_id" => $r["current_user_id"]
+					));
+
+			$problems = ProblemsDAO::search($problems_key);
+
+			foreach ($problems as $problem) {
+				$response["problems"][] = $problem->asArray();
+			}
+
+			usort($response["problems"], function ($a, $b) {
+						return ($a["problem_id"] > $b["problem_id"]) ? -1 : 1;
+					});
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$response["status"] = "ok";
 		return $response;
 	}
 

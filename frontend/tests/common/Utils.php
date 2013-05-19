@@ -137,7 +137,8 @@ class Utils {
 			'Auth_Tokens',
 			'Contests',
 			'Emails',
-			'Users',
+			'User_Roles',
+			'Users',			
 		);
 
 		try {

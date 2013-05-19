@@ -209,11 +209,25 @@ OmegaUp.prototype.addProblemToContest = function(contestAlias, authorUsername, p
 	);
 };
 
+OmegaUp.prototype.getProblems = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/problem/list/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 	var self = this;
 
 	$.post(
-		'/api/problem/details/contest_alias/' + contestAlias + '/problem_alias/' + problemAlias + '/',
+		contestAlias === null ? 
+			'/api/problem/details/problem_alias/' + problemAlias + '/' :
+			'/api/problem/details/contest_alias/' + contestAlias + '/problem_alias/' + problemAlias + '/',
 		{lang:"es"},
 		function (problem) {
 			if (problem.runs) {

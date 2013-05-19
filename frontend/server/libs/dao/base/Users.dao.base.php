@@ -219,6 +219,11 @@ abstract class UsersDAOBase extends DAO
 			$sql .= " last_access = ? AND";
 			array_push( $val, $Users->getLastAccess() );
 		}
+		
+		if ($Users->getVerificationId() != NULL) {
+			$sql .= " verification_id = ? AND";
+			array_push( $val, $Users->getVerificationId() );
+		}
 
 		if(sizeof($val) == 0){return array();}
 		$sql = substr($sql, 0, -3) . " )";
@@ -252,7 +257,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function update( $Users )
 	{ 
-		$sql = "UPDATE Users SET  username = ?, password = ?, facebook_user_id = ?, main_email_id = ?, name = ?, solved = ?, submissions = ?, country_id = ?, state_id = ?, school_id = ?, scholar_degree = ?, graduation_date = ?, birth_date = ?, last_access = ? WHERE  user_id = ?;";
+		$sql = "UPDATE Users SET  username = ?, password = ?, facebook_user_id = ?, main_email_id = ?, name = ?, solved = ?, submissions = ?, country_id = ?, state_id = ?, school_id = ?, scholar_degree = ?, graduation_date = ?, birth_date = ?, last_access = ?, verified = ?, verification_id = ? WHERE  user_id = ?;";
 		$params = array( 
 			$Users->getUsername(), 
 			$Users->getPassword(), 
@@ -268,8 +273,11 @@ abstract class UsersDAOBase extends DAO
 			$Users->getGraduationDate(), 
 			$Users->getBirthDate(), 
 			$Users->getLastAccess(), 
-			$Users->getUserId(), );
-		global $conn;
+			$Users->getVerified(),
+			$Users->getVerificationId(),
+			$Users->getUserId(),
+			);
+		global $conn;		
 		try{$conn->Execute($sql, $params);}
 		catch(Exception $e){ throw new Exception ($e->getMessage()); }
 		return $conn->Affected_Rows();
@@ -291,7 +299,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function create( &$Users )
 	{ 
-		$sql = "INSERT INTO Users ( user_id, username, facebook_user_id, password, main_email_id, name, solved, submissions, country_id, state_id, school_id, scholar_degree, graduation_date, birth_date, last_access ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Users ( user_id, username, facebook_user_id, password, main_email_id, name, solved, submissions, country_id, state_id, school_id, scholar_degree, graduation_date, birth_date, last_access, verified, verification_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Users->getUserId(), 
 			$Users->getUsername(), 
@@ -308,6 +316,8 @@ abstract class UsersDAOBase extends DAO
 			$Users->getGraduationDate(), 
 			$Users->getBirthDate(), 
 			$Users->getLastAccess(), 
+			$Users->getVerified(),
+			$Users->getVerificationId(),
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}

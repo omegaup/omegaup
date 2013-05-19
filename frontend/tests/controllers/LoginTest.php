@@ -206,5 +206,88 @@ class LoginTest extends OmegaupTestCase {
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertLogin($user, $response["auth_token"]);
 	}
+	
+	
+	/**
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testTokenExpired() {
+		DAO::$useDAOCache = false;
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser();
+		
+		$auth_token = self::login($user);
+		
+		// Expire token manually
+		$auth_token_dao = AuthTokensDAO::getByPK($auth_token);				
+		
+		$auth_token_dao->setCreateTime(date('Y-m-d H:i:s', strtotime($auth_token_dao->getCreateTime() . ' - 9 hour')));
+		AuthTokensDAO::save($auth_token_dao);
+		
+		// Call to api that requires logged in user should fail
+		// Get a contest 
+		$contestData = ContestsFactory::createContest();
+		// Prepare our request
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+
+		// Log in the user
+		$r["auth_token"] = $auth_token;
+
+		// Call api
+		$response = ContestController::apiDetails($r);
+		
+	}
+	
+	public function testDeleteTokenExpired() {
+		
+		DAO::$useDAOCache = false;
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser();
+		
+		$auth_token = self::login($user);
+		
+		// Expire token manually
+		$auth_token_dao = AuthTokensDAO::getByPK($auth_token);
+		$auth_token_dao->setCreateTime(date('Y-m-d H:i:s', strtotime($auth_token_dao->getCreateTime() . ' - 9 hour')));
+		AuthTokensDAO::save($auth_token_dao);
+		
+		$auth_token_2 = self::login($user);
+		
+		$existingTokens = AuthTokensDAO::getByPK($auth_token);
+		$this->assertNull($existingTokens);
+	}
+	
+	/**
+	 * @expectedException EmailNotVerifiedException
+	 */
+	public function testLoginUserNotVerifiedWithVerificationId() {
+				
+		// Create an user in omegaup
+		$user = UserFactory::createUser(null,null,null,false/*verified*/);
+		
+		$auth_token = self::login($user);
+		
+	}
+	
+	/**
+	 * @expectedException EmailNotVerifiedException
+	 */
+	public function testLoginUserNotVerifiedWithoutVerificationId() {
+		DAO::$useDAOCache = false;		
+		
+		// Create an user in omegaup
+		$user = UserFactory::createUser(null,null,null,false/*verified*/);
+		$plainPass = $user->getPassword();
+		$user->setVerificationId(null);
+		$user->setPassword(md5($plainPass));
+		UsersDAO::save($user);		
+		
+		$user->setPassword($plainPass);
+		
+		$auth_token = self::login($user);		
+	}
 }
 

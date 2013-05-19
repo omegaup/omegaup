@@ -10,8 +10,9 @@ class ListClarificationsContest extends OmegaupTestCase {
 
 	/**
 	 * Basic test for getting the list of clarifications of a contest.
-	 * Create 3 clarifications in a contest with one user, then another 3 clarifications
-	 * with another user. Get the list for the first user, will see only his 3
+	 * Create 4 clarifications in a contest with one user, then another 3 clarifications
+	 * with another user. 
+	 * Get the list for the first user, will see only his 4
 	 */
 	public function testListPublicClarificationsForContestant() {
 
@@ -27,14 +28,19 @@ class ListClarificationsContest extends OmegaupTestCase {
 		// Create our contestant who will submit the clarification
 		$contestant1 = UserFactory::createUser();
 
-		// Create 3 clarifications with this contestant
+		// Create 4 clarifications with this contestant
 		$clarificationData1 = array();
-		for ($i = 0; $i < 2; $i++) {
+		for ($i = 0; $i < 4; $i++) {
 			$clarificationData1[$i] = ClarificationsFactory::createClarification($problemData, $contestData, $contestant1);			
 			
 			// We need to sleep a little bit to separate the times
 			sleep(1);
 		}
+		
+		// Answer clarification 0 and 2
+		ClarificationsFactory::answer($clarificationData1[0], $contestData);
+		sleep(1);
+		ClarificationsFactory::answer($clarificationData1[2], $contestData);
 
 		// Create another contestant
 		$contestant2 = UserFactory::createUser();
@@ -56,14 +62,16 @@ class ListClarificationsContest extends OmegaupTestCase {
 		$response = ContestController::apiClarifications($r);
 
 		// Check that we got our 3 clarifications
-		$this->assertEquals(2, count($response["clarifications"]));
+		$this->assertEquals(count($clarificationData1), count($response["clarifications"]));
 		
-		// Check that the clarifications came in reverse order as we inserted. T
-		$i = 0;
-		foreach($response["clarifications"] as $c) {
-			$this->assertEquals($clarificationData1[$i]["request"]["message"], $c["message"]);
-			$i++;
-		}
+		// Check that the clarifications came in the order we expect
+		// First we expect clarifications not answered
+		$this->assertEquals($clarificationData1[1]["request"]["message"], $response["clarifications"][0]["message"]);
+		$this->assertEquals($clarificationData1[3]["request"]["message"], $response["clarifications"][1]["message"]);
+		
+		// Then clarifications answered, newer first
+		$this->assertEquals($clarificationData1[2]["request"]["message"], $response["clarifications"][2]["message"]);
+		$this->assertEquals($clarificationData1[0]["request"]["message"], $response["clarifications"][3]["message"]);
 	}
 
 }

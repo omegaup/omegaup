@@ -10,9 +10,12 @@ class LoginUITest extends OmegaupUITestCase {
 
 	public function testLogin() {
 
+		// Turn off sending email on usere creation
+		UserController::$sendEmailOnVerify = false;
+		
 		// Create a user
 		$contestant = UserFactory::createUser();
-
+					
 		// Open index
 		$this->open('/');
 

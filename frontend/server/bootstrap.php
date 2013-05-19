@@ -51,6 +51,8 @@ require_once("libs/Authorization.php");
 require_once("libs/Grader.php");
 require_once("libs/Scoreboard.php");
 require_once("libs/ZipStream.php");
+require_once("libs/ProblemDeployer.php");
+require_once('libs/phpmailer/class.phpmailer.php');
 
 /**
  * Load controllers

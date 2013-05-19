@@ -28,6 +28,9 @@ class AuthTokens extends VO
 			if( isset($data['token']) ){
 				$this->token = $data['token'];
 			}
+			if( isset($data['create_time']) ){
+				$this->create_time = $data['create_time'];
+			}
 		}
 	}
 
@@ -42,7 +45,8 @@ class AuthTokens extends VO
 	{ 
 		$vec = array( 
 			"user_id" => $this->user_id,
-			"token" => $this->token
+			"token" => $this->token,
+			"create_time" => $this->create_time
 		); 
 	return json_encode($vec); 
 	}
@@ -65,6 +69,8 @@ class AuthTokens extends VO
 	  * @var varchar(128)
 	  */
 	protected $token;
+	
+	protected $create_time;
 
 	/**
 	  * getUserId
@@ -114,6 +120,14 @@ class AuthTokens extends VO
 	final public function setToken( $token )
 	{
 		$this->token = $token;
+	}
+	
+	final public function setCreateTime($create_time) {
+		$this->create_time = $create_time;		
+	}
+	
+	final public function getCreateTime() {
+		return $this->create_time;
 	}
 
 }

@@ -43,6 +43,29 @@ class ClarificationsFactory {
 			"response" => $response
 		);
 	}
+	
+	/**
+	 * Answer a clarification
+	 * 
+	 * @param type $clarificationData
+	 * @param type $contestData
+	 * @param type $message
+	 */
+	public static function answer($clarificationData, $contestData, $message = 'lol') {
+		
+		// Prepare request
+		$r = new Request();
+		$r["clarification_id"] = $clarificationData["response"]["clarification_id"];
+		
+		// Log in the user
+		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);
+		
+		// Update answer
+		$r["answer"] = $message;
+		
+		// Call api
+		ClarificationController::apiUpdate($r);		
+	}
 
 }
 

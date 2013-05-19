@@ -70,6 +70,48 @@ class DetailsProblem extends OmegaupTestCase {
         $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));
 
 	}
+
+	public function testProblemDetailsNotInContest() {
+		
+		// Get 1 problem public
+		$problemData = ProblemsFactory::createProblem(null, null, 1 /* public */);
+				
+		// Get a user for our scenario
+		$contestant = UserFactory::createUser();
+		
+		// Prepare our request
+		$r = new Request();		
+		$r["problem_alias"] = $problemData["request"]["alias"];
+
+		// Log in the user
+		$r["auth_token"] = $this->login($contestant);
+		
+		// Call api
+		$response = ProblemController::apiDetails($r);
+		
+		$this->assertEquals($response["alias"], $problemData["request"]["alias"]);
+	}
 	
+	/**
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testPrivateProblemDetailsNotInContest() {
+		
+		// Get 1 problem public
+		$problemData = ProblemsFactory::createProblem(null, null, 0 /* private */);
+				
+		// Get a user for our scenario
+		$contestant = UserFactory::createUser();
+		
+		// Prepare our request
+		$r = new Request();		
+		$r["problem_alias"] = $problemData["request"]["alias"];
+
+		// Log in the user
+		$r["auth_token"] = $this->login($contestant);
+		
+		// Call api
+		$response = ProblemController::apiDetails($r);				
+	}
 }
 
