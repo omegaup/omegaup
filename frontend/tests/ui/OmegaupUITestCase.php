@@ -14,5 +14,36 @@ class OmegaupUITestCase extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->setBrowser('*firefox');
 		$this->setBrowserUrl(OMEGAUP_BASE_URL);
 	}
+	
+	protected function createUserAndLogin() {
+		
+		// Turn off sending email on usere creation
+		UserController::$sendEmailOnVerify = false;
+		
+		// Create a user
+		$contestant = UserFactory::createUser();
+					
+		// Open index
+		$this->open('/');
+
+		// Click in Iniciar Sesion
+		$this->clickAndWait('link=Inicia sesion');
+
+		// Type login data
+		$this->type('user', $contestant->getUsername());
+		$this->type('pass', $contestant->getPassword());
+
+		// Click inicia sesion		
+		$this->clickAndWait("//input[@value='Inicia sesion']");
+
+		// Sanity check that we are logged in
+		$this->waitForElementPresent('//*[@id="wrapper"]/div[1]/a');
+		$this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->getUsername());
+		
+		// Back to index
+		$this->open('/');
+		
+		return $contestant;
+	}
 }
 
