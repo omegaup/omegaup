@@ -16,7 +16,7 @@
 			// Got the problems, lets draw them
 
 			var html = "<h3>Problemas</h3><table><tr>"
-					+ "<td>Titulo</td>"	
+					+ "<td>Título</td>"	
 					+ "<td>Envíos</td>"
 					+ "<td>Resueltos</td>"
 					+ "</tr>";
