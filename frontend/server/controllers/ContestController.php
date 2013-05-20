@@ -1507,9 +1507,14 @@ class ContestController extends Controller {
 		// Add runs to zip
 		$table = "guid,user,problem,veredict,points\n";		
 		foreach($runs as $run) {
-			$zip->add_file_from_path("runs/".$run->getGuid(), RUNS_PATH . '/' . $r["run"]->getGuid());
+
+			$zip->add_file_from_path("runs/".$run->getGuid(), RUNS_PATH . '/' . $run->getGuid());
 			
-			$table .= $run->getGuid() .",". $run->getUsername() .",". $run->getAlias() .",". $run->getVeredict() .",". $run->getContestScore();			
+			$columns[0] = 'username';
+			$columns[1] = 'alias';
+			$usernameProblemData = $run->asFilteredArray($columns);
+			
+			$table .= $run->getGuid() .",". $usernameProblemData['username'] .",". $usernameProblemData['alias'] .",". $run->getVeredict() .",". $run->getContestScore();				
 			$table .= "\n";
 		}
 		
