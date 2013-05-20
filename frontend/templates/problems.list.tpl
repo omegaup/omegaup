@@ -16,12 +16,16 @@
 			// Got the problems, lets draw them
 
 			var html = "<h3>Problemas</h3><table><tr>"
-					+ "<td>Titulo</td>"					
+					+ "<td>Titulo</td>"	
+					+ "<td>Envíos</td>"
+					+ "<td>Resueltos</td>"
 					+ "</tr>";
 
 			for (var i = 0; i < problems.results.length; i++) {
 				html += "<tr>"
-					+ '<td><a href="/arena/problem/' + problems.results[i].alias  + '">' + problems.results[i].title + "</a></td>"					
+					+ '<td><a href="/arena/problem/' + problems.results[i].alias  + '">' + problems.results[i].title + "</a></td>"
+					+ "<td>" + problems.results[i].submissions + "</td>"
+					+ "<td>" + problems.results[i].accepted + "</td>"
 					+ "</tr>";
 			}
 
