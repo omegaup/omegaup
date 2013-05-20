@@ -839,7 +839,7 @@ class ProblemController extends Controller {
 			$r["offset"] = 0;
 		}
 		if (!isset($r["rowcount"])) {
-			$r["rowcount"] = 100;
+			$r["rowcount"] = 200;
 		}
 
 		try {

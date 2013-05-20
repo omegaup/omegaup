@@ -1485,4 +1485,44 @@ class ContestController extends Controller {
 		return $csvData;
 	}
 
+	public static function apiDownload(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		self::validateStats($r);
+		
+		// Get our runs
+		$relevant_columns = array("run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
+		try {
+			$runs = RunsDAO::search(new Runs(array(
+				"contest_id" => $r["contest"]->getContestId()
+			)),"time", "DESC", $relevant_columns);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$zip = new ZipStream($r["contest_alias"] . '.zip');
+				
+		// Add runs to zip
+		$table = "guid,user,problem,veredict,points\n";		
+		foreach($runs as $run) {
+			$zip->add_file_from_path("runs/".$run->getGuid(), RUNS_PATH . '/' . $r["run"]->getGuid());
+			
+			$table .= $run->getGuid() .",". $run->getUsername() .",". $run->getAlias() .",". $run->getVeredict() .",". $run->getContestScore();			
+			$table .= "\n";
+		}
+		
+		$zip->add_file("summary.csv", $table);
+		
+		// Add problem cases to zip
+		$contest_problems = ContestProblemsDAO::GetRelevantProblems($r["contest"]->getContestId());
+		foreach($contest_problems as $problem) {
+			$zip->add_file_from_path($problem->getAlias()."_cases.zip", PROBLEMS_PATH . "/" . $problem->getAlias() ."/cases.zip");
+		}
+		
+		// Return zip
+		$zip->finish();
+		die();
+	}
 }
