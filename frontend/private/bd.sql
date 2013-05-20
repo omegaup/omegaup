@@ -691,4 +691,15 @@ ALTER TABLE  `Auth_Tokens` ADD  `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIM
 ALTER TABLE  `Users` ADD  `verified` BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE  `Users` ADD  `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL;
 
+--
+-- Update AC Count on grade
+--
+CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs` FOR EACH ROW UPDATE  `Problems` SET  `Problems`.`accepted` = (
+	SELECT COUNT( * ) 
+		FROM  `Runs` 
+		WHERE  `Runs`.`veredict` =  'AC'
+		AND NEW.`problem_id` =  `Runs`.`problem_id`
+		)
+WHERE NEW.problem_id =  `Problems`.`problem_id`
+
 COMMIT;
