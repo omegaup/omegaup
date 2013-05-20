@@ -203,6 +203,11 @@ class RunController extends Controller {
 		try {
 			// Push run into DB
 			RunsDAO::save($run);
+			
+			// Update submissions counter++
+			$r["problem"]->setSubmissions($r["problem"]->getSubmissions() + 1);
+			ProblemsDAO::save($r["problem"]);
+			
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);

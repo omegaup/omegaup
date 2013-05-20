@@ -112,6 +112,10 @@ class CreateRun extends OmegaupTestCase {
 		$response = RunController::apiCreate($r);
 
 		$this->assertRun($r, $response);
+		
+		// Check problem submissions (1)
+		$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+		$this->assertEquals(1, $problem->getSubmissions());
 	}
 
 	/**
