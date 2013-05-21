@@ -596,4 +596,30 @@ class RunController extends Controller {
 		$zip->finish();
 		die();
 	}
+	
+	/**
+	 * Get total of last 15 days
+	 * 
+	 * @param Request $r
+	 * @return type
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiCounts(Request $r) {
+		
+		$totals = array();
+		try {
+			
+			// I don't like this approach but adodb didn't like too much to execute
+			// store procedures. anyways we will cache the totals
+			$date = date('Y-m-d', strtotime('1 days'));
+			for ($i = 0; $i < 30; $i++) {
+				$totals[$date] = RunsDAO::GetRunCountsToDate($date);			
+				$date = date('Y-m-d', strtotime('-'.$i.' days'));
+			}
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+						
+		return $totals;
+	}
 }

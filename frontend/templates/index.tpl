@@ -10,15 +10,16 @@
 				<div class="copy">
 					omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en America Latina mediante la resolucion de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.
 				</div>
+				<div id="ranking-chart"></div>
 			</div>
 		</td>
 		<td >
-<!--Comentando esto a request de la OMI			<div class="post footer" style="width: 330px; min-height: 300px;">
+<div class="post footer" style="width: 330px; min-height: 300px;">
 				<div class="copy" >
 					<div id="rss_content">Loading...</div>
 				</div>
 			</div>
--->		</td>
+		</td>
 	</tr>
 	</table>
 </div>
@@ -74,9 +75,90 @@
 
 	  // Calling load sends the request off.  It requires a callback function.
 	  feed.load(feedLoaded);
+	  
+	  omegaup.runCounts(createChart);
+	}
+	
+	function createChart(series) {
+	
+		if (series.length == 0) return;	
+		
+		var dataInSeries = [];
+		for(var i in series) {
+			if (series.hasOwnProperty(i)) {
+				dataInSeries.push(parseInt(series[i]));
+			}
+		}		
+	
+		var minDate = new Date(Date.now());
+		minDate.setDate(minDate.getDate()-30);
+		
+		window.chart = new Highcharts.Chart({			
+			chart: {
+				renderTo: 'ranking-chart',
+				height: 300,
+				spacingTop: 20
+			},
+			title: {
+				text: 'Envíos totales'
+			},
+			xAxis: {
+				type: 'datetime',                
+                title: {
+                    text: null
+                }
+			},
+			yAxis: {
+                title: {
+                    text: 'Envíos'
+                },
+				min: 0
+            },
+			legend: {
+                enabled: false
+            },
+			plotOptions: {
+                area: {
+                    fillColor: {
+                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    },
+                    lineWidth: 1,
+                    marker: {
+                        enabled: false
+                    },
+                    shadow: false,
+                    states: {
+                        hover: {
+                            lineWidth: 1
+                        }
+                    },
+                    threshold: null
+                }
+            },
+			series: [{
+				type: 'area',
+				pointInterval: 24 * 3600 * 1000,
+                pointStart: minDate.getTime(),
+				data: dataInSeries.reverse()
+				}
+			]
+		});
+		
+		// set legend colors
+		/*var rows = $('#ranking tbody tr.inserted');
+		for (var r = 0; r < rows.length; r++) {
+			$('.legend', rows[r]).css({
+				'background-color': r < rankChartLimit ? colors[r] : 'transparent'
+			});
+		}*/
 	}
 
 	google.setOnLoadCallback(OnLoad);
+		
 </script>
 
 ​

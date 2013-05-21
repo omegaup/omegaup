@@ -349,6 +349,18 @@ OmegaUp.prototype.runDetails = function(guid, callback) {
 	);
 };
 
+OmegaUp.prototype.runCounts = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/run/counts/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.runSource = function(guid, callback) {
 	var self = this;
 

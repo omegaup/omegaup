@@ -306,6 +306,16 @@ class RunsDAO extends RunsDAOBase
 		return time() >= (strtotime($lastrun->getTime()) + $submission_gap - 10);
 	}
 	
+	public static function GetRunCountsToDate($date) {
+		
+		$sql = "select count(*) as total from Runs where time <= ?";
+		$val = array($date);
+		
+		global $conn;	
+		$rs = $conn->GetRow($sql, $val);
+
+		return $rs['total'];		
+	}
 	
 	public static final function searchRunIdGreaterThan( $Runs , $greaterThan, $orderBy = null, $orden = 'ASC', $columnas = NULL, $offset = 0, $rowcount = NULL )
 	{

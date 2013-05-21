@@ -11,6 +11,7 @@
 		<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js"></script>
 		<script type="text/javascript" src="/js/omegaup.js"></script>
 		<script type="text/javascript" src="/js/sugar.js"></script>
+		<script type="text/javascript" src="/js/highstock.js"></script>
 
 		<!-- from arena -->
 		<link rel="shortcut icon" href="/favicon.ico" />
