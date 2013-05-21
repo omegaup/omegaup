@@ -606,18 +606,25 @@ class RunController extends Controller {
 	 */
 	public static function apiCounts(Request $r) {
 		
-		$totals = array();
-		try {
-			
-			// I don't like this approach but adodb didn't like too much to execute
-			// store procedures. anyways we will cache the totals
-			$date = date('Y-m-d', strtotime('1 days'));
-			for ($i = 0; $i < 30; $i++) {
-				$totals[$date] = RunsDAO::GetRunCountsToDate($date);			
-				$date = date('Y-m-d', strtotime('-'.$i.' days'));
+		$totalsCache = new Cache(Cache::RUN_COUNTS, "");
+		$totals = $totalsCache->get();
+		
+		if (is_null($totals)) {
+			$totals = array();
+			try {
+
+				// I don't like this approach but adodb didn't like too much to execute
+				// store procedures. anyways we will cache the totals
+				$date = date('Y-m-d', strtotime('1 days'));
+				for ($i = 0; $i < 30; $i++) {
+					$totals[$date] = RunsDAO::GetRunCountsToDate($date);			
+					$date = date('Y-m-d', strtotime('-'.$i.' days'));
+				}
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
 			}
-		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
+			
+			$totalsCache->set($totals, 24*60*60);
 		}
 						
 		return $totals;

@@ -13,6 +13,7 @@ class Cache
     const CONTEST_INFO = "contest-info-";
 	const PROBLEM_STATS = "problem-stats-";
 	const RUN_ADMIN_DETAILS = "run-admin-details-";
+	const RUN_COUNTS = "run-counts-";
     
     
     private $enabled;
