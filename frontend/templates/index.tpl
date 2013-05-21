@@ -93,6 +93,7 @@
 		var minDate = new Date(Date.now());
 		minDate.setDate(minDate.getDate()-30);
 		
+		var minY = dataInSeries[0] - (dataInSeries[0] * 0.10);
 		window.chart = new Highcharts.Chart({			
 			chart: {
 				renderTo: 'ranking-chart',
@@ -112,7 +113,7 @@
                 title: {
                     text: 'Envíos'
                 },
-				min: 0
+				min: minY
             },
 			legend: {
                 enabled: false
