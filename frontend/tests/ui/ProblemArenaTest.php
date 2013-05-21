@@ -47,5 +47,24 @@ class ProblemArenaTest extends OmegaupUITestCase {
 		$this->waitForElementPresent('//*[@id="run_'.$runs["runs"][0]["guid"].'"]/td[2]');
 		
 	}
+	
+	public function testProblemRedirectsToLogin() {
+		
+		// Create a problem
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Open index
+		$this->open('/');
+		
+		// Click in Problems
+		$this->clickAndWait('link=Problemas');
+		
+		// Click in Problem $problemData
+		$this->waitForElementPresent('//*[@id="problems_list"]/table/tbody/tr[2]/td/a');		
+		$this->clickAndWait('link='.$problemData["request"]["title"]);
+		
+		// Verify we are in login page
+		$this->waitForElementPresent("//input[@value='Inicia sesion']");
+	}	
 
 }
