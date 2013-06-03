@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>OmegaUp</title>
+		<script type="text/javascript" src="/js/jquery.js"></script>
+		<script type="text/javascript" src="/js/jquery.ba-hashchange.js"></script>
+		<script type="text/javascript" src="/js/jquery.tableSort.js"></script>
+		<script type="text/javascript" src="/js/jquery.msgBox.js"></script>
+		<script type="text/javascript" src="/js/jquery.gritter.min.js"></script>
+		<script type="text/javascript" src="/js/highstock.js"></script>
+		<script type="text/javascript" src="/js/omegaup.js"></script>
+		<script type="text/javascript" src="/ux/admin.js"></script>
+		<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+		<link rel="stylesheet" href="/css/reset.css" />
+		<link rel="stylesheet" href="/css/jquery.gritter.css" />
+		<link rel="stylesheet" href="/ux/arena.css" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+	</head>
+	<body>
+		<audio id="notification_audio">
+			<source src="/media/notification.mp3" type="audio/mpeg" />
+		</audio>
+		<!-- Generated from http://ajaxload.info/ -->
+		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
+		<div id="root">
+			<div id="title">
+				<img src="/media/omegaup_curves.png" height="80" alt="OmegaUp" />
+				<h1 class="contest-title"></h1>
+				<div class="clock">0:00:00</div>
+			</div>
+			
+			<table class="runs">
+				<caption>
+					Envíos 
+					<div class="runspager">
+						<button class="runspagerprev">&lt;</button>
+						<button class="runspagernext">&gt;</button>
+						
+						<label for="runsveredict">Veredicto: </label>
+						<select class="runsveredict" name="runsveredict">
+							<option value="">Todos</option>
+							<option value="AC">AC</option>
+							<option value="PA">PA</option>
+							<option value="WA">WA</option>
+							<option value="TLE">TLE</option>
+							<option value="MLE">MLE</option>
+							<option value="OLE">OLE</option>
+							<option value="RTE">RTE</option>
+							<option value="RFE">RFE</option>
+							<option value="CE">CE</option>
+							<option value="JE">JE</option>
+							<option value="NO-AC">No AC</option>
+						</select>
+						
+						<label for="runsstatus">Status: </label>
+						<select class="runsstatus" name="runsstatus">
+							<option value="">Todos</option>
+							<option value="new">new</option>
+							<option value="waiting">waiting</option>
+							<option value="compiling">compiling</option>
+							<option value="running">running</option>
+							<option value="ready">ready</option>
+						</select>
+						
+						<label for="runsproblem">Problema: </label>
+						<select class="runsproblem" name="runsproblem">
+							<option value="">Todos</option>
+						</select>
+						
+						<label for="runslang">Lenguaje: </label>
+						<select class="runslang" name="runslang">
+							<option value="">Todos</option>
+							<option value="c">C</option>
+							<option value="cpp">C++</option>
+							<option value="java">Java</option>
+							<option value="py">Python</option>
+							<option value="rb">Ruby</option>
+							<option value="pl">Perl</option>
+							<option value="cs">C#</option>
+							<option value="p">Pascal</option>
+							<option value="kp">Karel (Pascal)</option>
+							<option value="kj">Karel (Java)</option>
+						</select>
+					</div>
+				</caption>
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>GUID</th>
+						<th>Usuario</th>
+						<th>Problema</th>
+						<th>Lenguaje</th>
+						<th>Tiempo de Ejecución</th>
+						<th>Memoria</th>
+						<th>Tiempo</th>
+						<th>Status</th>
+						<th>Puntos</th>
+						<th>Penalty</th>
+						<th>Rejuecear</th>
+						<th>Detalles</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="13"><a href="#new-run">Nuevo envío</a></td>
+					</tr>
+				</tfoot>
+				<tbody class="run-list">
+					<tr class="template">
+						<td class="id"></td>
+						<td class="guid"></td>
+						<td class="username"></td>
+						<td class="problem"></td>
+						<td class="language"></td>
+						<td class="runtime"></td>
+						<td class="memory"></td>
+						<td class="time"></td>
+						<td class="status"></td>
+						<td class="points"></td>
+						<td class="penalty"></td>
+						<td class="rejudge"></td>
+						<td class="details"></td>
+					</tr>
+				</tbody>
+			</table>
+					
+		</div>
+		<div id="overlay">			
+			<form id="run-details">
+				<button class="close">&times;</button>
+				
+				<pre class="source"></pre>
+				<pre class="compile_error"></pre>
+				<div class="download"><a href="#">Bajar salida</a></div>
+				<div class="cases"></div>
+			</form>
+		</div>
+	</body>
+</html>

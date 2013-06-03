@@ -45,5 +45,19 @@ class OmegaupUITestCase extends PHPUnit_Extensions_SeleniumTestCase {
 		
 		return $contestant;
 	}
+	
+	protected function createAdminUserAndLogin() {
+		
+		$contestant = $this->createUserAndLogin();
+		
+		$userRoles = new UserRoles(array(
+			"user_id" => $contestant->getUserId(),
+			"role_id" => ADMIN_ROLE,
+			"contest_id" => 0,
+		));
+		UserRolesDAO::save($userRoles);
+		
+		return $contestant;
+	}
 }
 

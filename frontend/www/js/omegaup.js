@@ -300,6 +300,28 @@ OmegaUp.prototype.getContestRuns = function(contestAlias, options, callback) {
 	);
 };
 
+OmegaUp.prototype.getRuns = function(options, callback) {
+	var self = this;
+
+	$.post(
+		'/api/run/list/',
+		options,
+		function (data) {
+			for (var i = 0; i < data.runs.length; i++) {
+				data.runs[i].time = self.time(data.runs[i].time * 1000);
+			}
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, callback) {
 	var self = this;
 

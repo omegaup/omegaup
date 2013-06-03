@@ -265,13 +265,17 @@ abstract class RunsDAOBase extends DAO
 		}
 
 
-		if(sizeof($val) == 0){return array();}
-		$sql = substr($sql, 0, -3) . " )";
+		if(sizeof($val) == 0){
+			//remove where (
+			$sql = substr($sql, 0, -7);
+		} else {
+			$sql = substr($sql, 0, -3) . " )";
+		}
 		if( $orderBy !== null ){
 		    $sql .= " order by " . $orderBy . " " . $orden ;
 		
 		}
-                
+        
 		// Add LIMIT offset, rowcount if rowcount is set
                 if (!is_null($rowcount))
                 {

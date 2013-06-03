@@ -629,4 +629,113 @@ class RunController extends Controller {
 						
 		return $totals;
 	}
+	
+	/**
+	 * Validator for List API
+	 * 
+	 * @param Request $r
+	 * @throws ForbiddenAccessException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 */
+	private static function validateList(Request $r) {
+		
+		// Defaults for offset and rowcount
+		if (!isset($r["offset"])) {
+			$r["offset"] = 0;
+		}
+		if (!isset($r["rowcount"])) {
+			$r["rowcount"] = 100;
+		}
+		
+		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+			throw new ForbiddenAccessException();
+		}
+
+		Validators::isNumber($r["offset"], "offset", false);
+		Validators::isNumber($r["rowcount"], "rowcount", false);
+		Validators::isInEnum($r["status"], "status", array('new', 'waiting', 'compiling', 'running', 'ready'), false);
+		Validators::isInEnum($r["veredict"], "veredict", array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"), false);
+
+
+		// Check filter by problem, is optional
+		if (!is_null($r["problem_alias"])) {
+			Validators::isStringNonEmpty($r["problem_alias"], "problem");
+
+			try {
+				$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			if (is_null($r["problem"])) {
+				throw new NotFoundException("Problem not found.");
+			}
+		}
+
+		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj'), false);
+		
+		// Get user if we have something in username
+		if (!is_null($r["username"])) {
+			$r["user"] = UserController::resolveUser($r["username"]);
+		}
+		
+	}
+	
+	/**
+	 * Gets a list of latest runs overall
+	 * 
+	 * @param Request $r
+	 * @return string
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiList(Request $r) {
+		
+		// Authenticate request
+		self::authenticateRequest($r);
+		
+		self::validateList($r);
+		
+		$runs_mask = null;
+
+		// Get all runs for problem given        
+		$runs_mask = new Runs(array(					
+					"status" => $r["status"],
+					"veredict" => $r["veredict"],
+					"problem_id" => !is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
+					"language" => $r["language"],
+					"user_id" => !is_null($r["user"]) ? $r["user"]->getUserId() : null,
+				));
+		
+		// Filter relevant columns
+		$relevant_columns = array("run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
+
+		// Get our runs
+		try {
+			$runs = RunsDAO::search($runs_mask, "time", "DESC", $relevant_columns, $r["offset"], $r["rowcount"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$relevant_columns[11] = 'username';
+		$relevant_columns[12] = 'alias';
+
+		$result = array();
+
+		foreach ($runs as $run) {
+			$filtered = $run->asFilteredArray($relevant_columns);
+			$filtered['time'] = strtotime($filtered['time']);
+			$filtered['score'] = round((float) $filtered['score'], 4);
+			$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
+			array_push($result, $filtered);
+		}
+
+		$response = array();
+		$response["runs"] = $result;
+		$response["status"] = "ok";
+
+		return $response;
+	}
 }
