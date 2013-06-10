@@ -282,6 +282,28 @@ class RunsDAO extends RunsDAOBase
 
 		return $rs['wrong_runs'];
 	}
+	
+	/*
+	 * Get runs of a user with veredict eq AC
+	 */
+	public static final function GetRunsByUser($user_id)
+	{
+		// SQL sentence
+		$sql = "SELECT DISTINCT * FROM Runs WHERE user_id = ? AND veredict = 'AC'";
+		$val = array($user_id);
+		
+		global $conn;
+		//Get the rows
+		$rs = $conn->Execute($sql, $val);
+		
+		$ar = array();
+		//Wrap every row in a Runs object 
+		foreach ($rs as $iter) {
+			$run =  new Runs($iter);
+			array_push( $ar,$run);
+		}
+		return $ar;
+	}
 
 	public static final function IsRunInsideSubmissionGap($contest_id, $problem_id, $user_id)
 	{

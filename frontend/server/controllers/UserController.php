@@ -393,7 +393,7 @@ class UserController extends Controller {
 	 */
 	private static function randomString($length) {
 		$chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
+		$str = "";
 		$size = strlen($chars);
 		for ($i = 0; $i < $length; $i++) {
 			$str .= $chars[rand(0, $size - 1)];
@@ -608,5 +608,102 @@ class UserController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Get general user info
+	 * 
+	 * @param Request $r
+	 * @return response array with user info
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiProfile(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		$response = array();
+		$response["userinfo"] = array();
+		$response["problems"] = array();
+		
+		$user = $r["current_user"];
+		$response["userinfo"]["user_id"] = $user -> getUserId();
+		$response["userinfo"]["username"] = $user -> getUsername();
+		$response["userinfo"]["facebook_user_id"] = $user -> getFacebookUserId();
+		$response["userinfo"]["name"] = $user -> getName();
+		$response["userinfo"]["solved"] = $user -> getSolved();
+		$response["userinfo"]["submissions"] = $user -> getSubmissions();
+		
+		try {
+			$response["userinfo"]["email"] = EmailsDAO::getByPK($user -> getMainEmailId()) -> getEmail();
+			$country = CountriesDAO::getByPK($user -> getCountryId());
+			$response["userinfo"]["country"] = is_null($country) ? null : $country -> getName();
+			$state = StatesDAO::getByPK($user -> getStateId());
+			$response["userinfo"]["state"] = is_null($state) ? null : $state -> getName();
+			$school = SchoolsDAO::getByPK($user -> getSchoolId());
+			$response["userinfo"]["school"] = is_null($school) ? null : $school -> getName();
+		} catch(Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		$response["status"] = "ok";
+		return $response;		
+	}
+	
+	/**
+	 * Get Contests which a certain user has participated in
+	 * 
+	 * @param Request $r
+	 * @return Contests array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiContestUsers(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		$response = array();
+		$response["contests"] = array();
+		
+		$user = $r["current_user"];
+		$contest_user_key = new ContestsUsers();
+		$contest_user_key->setUserId($user->getUserId());
+		
+		try {
+			$db_results = ContestsUsersDAO::search($contest_user_key);			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$contests = array();
+		foreach ($db_results as $result) {
+			$contest_id = $result->getContestId();
+			$contest = ContestsDAO::getByPK($contest_id);
+			$contests[] = $contest->asArray(); 
+		}
+		
+		$response["contests"] = $contests;
+		$response["status"] = "ok";
+		return $response;
+	}
+	/**
+	 * Get Problems solved by user
+	 * 
+	 * @param Request $r
+	 * @return Problems array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiProblemsSolved(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		$response = array();
+		$response["runs"] = array();
+		
+		$user = $r["current_user"];
+		try {
+			$response["runs"] = RunsDAO::GetRunsByUser($user->getUserId());	
+		} catch(Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$response["status"] = "ok";
+		return $response;
+	}
 }
 
