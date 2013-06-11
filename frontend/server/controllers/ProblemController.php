@@ -828,7 +828,7 @@ class ProblemController extends Controller {
 		try {
 			self::authenticateRequest($r);
 		} catch (ForbiddenAccessException $e) {
-			// Do nothing
+			// Do nothing, we allow unauthenticated users to use this API
 		}
 
 		Validators::isNumber($r["offset"], "offset", false);
@@ -842,24 +842,39 @@ class ProblemController extends Controller {
 			$r["rowcount"] = 200;
 		}
 
-		try {
-			$problem_mask = new Problems(array(
-						"public" => 1
-					));
-
-			$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
-		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
-		}
-
 		$response = array();
 		$response["results"] = array();
-
-		foreach ($problems as $problem) {
-			array_push($response["results"], $problem->asArray());
+		for ($i = 0; $i < 2; $i++) {
+		
+			// Add public in the first pass, private in the second
+			try {
+				$problem_mask = NULL;
+				if ($i == 0 && !is_null($r["current_user_id"])) {
+					$problem_mask = new Problems(array(
+								"private" => 0,
+								"author_id" => $r["current_user_id"]
+							));
+					
+				} else if($i == 1) {
+					$problem_mask = new Problems(array(
+								"public" => 1
+							));										
+				}
+				
+				if (!is_null($problem_mask)) {
+					$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);										
+					
+					foreach ($problems as $problem) {
+						array_push($response["results"], $problem->asArray());
+					}
+				}
+				
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}			
 		}
 
-		$response["status"] = "ok";		
+		$response["status"] = "ok";				
 		return $response;
 	}
 

@@ -29,11 +29,11 @@ class ProblemList extends OmegaupTestCase {
 		// Check that all public problems are there
 		for ($i = 0; $i < $n; $i++) {
 			$exists = false;
-			foreach ($response as $problemResponse) {
+			foreach ($response["results"] as $problemResponse) {
 				if ($problemResponse === "ok") {
 					continue;
 				}
-
+				
 				if ($problemResponse['alias'] === $problemData[$i]["request"]["alias"]) {
 					$exists = true;
 					break;
@@ -81,9 +81,27 @@ class ProblemList extends OmegaupTestCase {
 
 		$response = ProblemController::apiList($r);
 
-		$this->assertEquals(1+1/* status ok*/, count($response));
-		$this->assertEquals($problemData[1]["request"]["alias"], $response[0]["alias"]);
+		$this->assertEquals(1, count($response["results"]));
+		$this->assertEquals($problemData[1]["request"]["alias"], $response["results"][0]["alias"]);
 	}
 
+	/**
+	 * The author should see his problems as well
+	 *
+	 */
+	public function testPrivateProblemsShowToAuthor() {
+		
+		$author = UserFactory::createUser();
+		
+		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
+		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);		
+		
+		$r = new Request();
+		$r["auth_token"] = $this->login($author);
+		
+		$response = ProblemController::apiList($r);
+				
+		$this->assertEquals($problemDataPrivate["request"]["alias"], $response["results"][0]["alias"]);		
+	}
 }
 
