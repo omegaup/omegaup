@@ -18,6 +18,7 @@ trait Grader extends Object with Log {
 		val alias = run.problem.alias
 		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
 		val dataDirectory = new File(zip.getParentFile.getCanonicalPath + "/" + id)
+		FileUtil.deleteDirectory(dataDirectory)
 		dataDirectory.mkdirs()
 		
 		val input = new ZipInputStream(new FileInputStream(zip.getCanonicalPath))
