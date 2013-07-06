@@ -4,5 +4,7 @@ if [ "bin" == "$(basename `pwd`)" ]; then
 	cd ..
 fi
 
-cd sandbox
+cd bin
+make
+cd ../sandbox
 make
