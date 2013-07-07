@@ -44,8 +44,9 @@
     define('OMEGAUP_SSLCERT_URL',     		'/opt/omegaup/frontend/omegaup.pem');
     define('OMEGAUP_CACERT_URL',      		'/opt/omegaup/frontend/omegaup.pem');
     define('RUNS_PATH', OMEGAUP_TEST_ROOT . 'submissions');
-	define('PROBLEMS_PATH', OMEGAUP_TEST_ROOT . 'problems');
-	define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
+    define('PROBLEMS_PATH', OMEGAUP_TEST_ROOT . 'problems');
+    define('BIN_PATH', '/opt/omegaup/bin');
+    define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
 
     # ####################################
     # FACEBOOK LOGIN CONFIG

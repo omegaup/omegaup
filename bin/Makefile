@@ -4,7 +4,7 @@ CFLAGS=-O2
 all: normalizr
 
 normalizr: normalizr.cpp
-	$(CC) $^ $(CFLAGS) -o $@
+	$(CC) -Wall $^ $(CFLAGS) -o $@
 
 clean:
 	rm normalizr

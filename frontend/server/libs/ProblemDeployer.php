@@ -291,23 +291,22 @@ class ProblemDeployer {
 
 		Logger::log("Handling cases...");
 
-		// Aplying dos2unix to cases
+		// Aplying normalizr to cases
 		$return_var = 0;
 		$output = array();
-		$dos2unix_cmd = "dos2unix " . $dirpath . DIRECTORY_SEPARATOR . "cases/* 2>&1";
-		Logger::log("Applying dos2unix: " . $dos2unix_cmd);
-		exec($dos2unix_cmd, $output, $return_var);
+		$normalizr_cmd = BIN_PATH . "/normalizr " . $dirpath . DIRECTORY_SEPARATOR . "cases/* 2>&1";
+		Logger::log("Applying normalizr: " . $normalizr_cmd);
+		exec($normalizr_cmd, $output, $return_var);
 
 		// Log errors
 		if ($return_var !== 0) {
-			Logger::warn("dos2unix failed with error: " . $return_var);
+			Logger::warn("normalizr failed with error: " . $return_var);
 		} else {
-			Logger::log("dos2unix succeeded");
+			Logger::log("normalizr succeeded");
 		}
 		Logger::log(implode("\n", $output));
 
-
-		// After dos2unixfication, we need to generate a zip file that will be
+		// After normalizrfication, we need to generate a zip file that will be
 		// passed between grader and runners with the INPUT files...                
 		// Create path to cases.zip and proper cmds
 		$cases_zip_path = $dirpath . DIRECTORY_SEPARATOR . 'cases.zip';
