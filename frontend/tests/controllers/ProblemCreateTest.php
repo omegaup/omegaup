@@ -5,7 +5,6 @@
  *
  * @author joemmanuel
  */
-
 require_once 'libs/FileHandler.php';
 
 class CreateProblemTest extends OmegaupTestCase {
@@ -16,7 +15,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	public function testCreateValidProblem() {
 
 		// Get the problem data
-        $problemData = ProblemsFactory::getRequest();
+		$problemData = ProblemsFactory::getRequest();
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];
 
@@ -75,14 +74,14 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals(0, $problem->getAccepted());
 		$this->assertEquals(0, $problem->getDifficulty());
 	}
-	
+
 	/**
 	 * Basic test for creating a problem
 	 */
 	public function testCreateValidProblemWithINCases() {
 
 		// Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT.'mrkareltastic.zip');
+		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . 'mrkareltastic.zip');
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];
 
@@ -97,10 +96,10 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Validate
 		// Verify response
-		$this->assertEquals("ok", $response["status"]);		
+		$this->assertEquals("ok", $response["status"]);
 		$this->assertEquals("cases/g1.train0.in", $response["uploaded_files"][0]);
 		$this->assertEquals("cases/g1.train0.out", $response["uploaded_files"][1]);
-		
+
 		// Verify problem contents.zip were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["alias"] . DIRECTORY_SEPARATOR;
 
@@ -110,14 +109,13 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertFileExists($targetpath . "cases" . DIRECTORY_SEPARATOR . "g1.train0.out");
 		$this->assertFileExists($targetpath . "cases");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
-		
 	}
 
 	/**
 	 * Test that sends incomplete requests
 	 */
 	public function testRequiredParameters() {
-		
+
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
@@ -139,7 +137,7 @@ class CreateProblemTest extends OmegaupTestCase {
 			$problemData = ProblemsFactory::getRequest();
 			$r = $problemData["request"];
 			$problemAuthor = $problemData["author"];
-						
+
 			// Login user
 			$r["auth_token"] = $this->login($problemAuthor);
 
@@ -166,7 +164,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	public function testValidProblemNoTestplan() {
 
 		// Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT."triangulos.zip");
+		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "triangulos.zip");
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];
 
@@ -232,7 +230,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	public function testValidProblemWithNonUTF8CharsInStmt() {
 
 		// Get the problem data
-        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT."nonutf8stmt.zip");
+		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "nonutf8stmt.zip");
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];
 
@@ -247,36 +245,34 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Verify response
 		$this->assertEquals("ok", $response["status"]);
-		
+
 		// Get problem info from DB
-        $problem_mask = new Problems();
-        $problem_mask->setTitle($r["title"]);
-        $problems = ProblemsDAO::search($problem_mask);                
-        $this->assertEquals(1, count($problems));        
-        $problem = $problems[0];
-        
-        // Verify problem contents.zip were copied
-        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;                
-        $this->assertFileExists($targetpath . "contents.zip");                        
-        $this->assertFileExists($targetpath . "cases.zip");
-        $this->assertFileExists($targetpath . "cases");
-        $this->assertFileExists($targetpath . "inputname");
-        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
-        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.markdown");
-        
-        // Verify we have the accents, lol
-        $markdown_contents = file_get_contents($targetpath . "statements". DIRECTORY_SEPARATOR . "es.markdown");
-        if (strpos($markdown_contents, "ó") === false)
-        {
-            $this->fail("ó not found when expected.");
-        }          
-        
-        $html_contents = file_get_contents($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
-        if (strpos($html_contents, "ó") === false)
-        {
-            $this->fail("ó not found when expected.");
-        }
-	}	
+		$problem_mask = new Problems();
+		$problem_mask->setTitle($r["title"]);
+		$problems = ProblemsDAO::search($problem_mask);
+		$this->assertEquals(1, count($problems));
+		$problem = $problems[0];
+
+		// Verify problem contents.zip were copied
+		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;
+		$this->assertFileExists($targetpath . "contents.zip");
+		$this->assertFileExists($targetpath . "cases.zip");
+		$this->assertFileExists($targetpath . "cases");
+		$this->assertFileExists($targetpath . "inputname");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
+
+		// Verify we have the accents, lol
+		$markdown_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
+		if (strpos($markdown_contents, "ó") === false) {
+			$this->fail("ó not found when expected.");
+		}
+
+		$html_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		if (strpos($html_contents, "ó") === false) {
+			$this->fail("ó not found when expected.");
+		}
+	}
 
 	/**
 	 * Test that image upload works.
@@ -287,7 +283,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		$imageAbsoluteUrl = 'http://i.imgur.com/fUkvDkw.png';
 
 		// Get the problem data
-	        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT."imagetest.zip");
+		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "imagetest.zip");
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];
 
@@ -302,31 +298,31 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Verify response
 		$this->assertEquals("ok", $response["status"]);
-		
-        	// Verify problem contents.zip were copied
-	        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["alias"] . DIRECTORY_SEPARATOR;                
-	        $this->assertFileExists($targetpath . "contents.zip");                        
-	        $this->assertFileExists($targetpath . "cases.zip");
-	        $this->assertFileExists($targetpath . "cases");
-	        $this->assertFileExists($targetpath . "inputname");
-	        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
-	        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.markdown");
-	        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "bunny.jpg");
-        
-	        // Verify that all the images are there.
-		$html_contents = file_get_contents($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
-	        if (strpos($html_contents, "<img src=\"$imageSha1.$imageExtension\"") === false) {
+
+		// Verify problem contents.zip were copied
+		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["alias"] . DIRECTORY_SEPARATOR;
+		$this->assertFileExists($targetpath . "contents.zip");
+		$this->assertFileExists($targetpath . "cases.zip");
+		$this->assertFileExists($targetpath . "cases");
+		$this->assertFileExists($targetpath . "inputname");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "bunny.jpg");
+
+		// Verify that all the images are there.
+		$html_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		if (strpos($html_contents, "<img src=\"$imageSha1.$imageExtension\"") === false) {
 			$this->fail("No uploaded image found.");
 		}
 		// And the direct URL.
-	        if (strpos($html_contents, "<img src=\"$imageAbsoluteUrl\"") === false) {
+		if (strpos($html_contents, "<img src=\"$imageAbsoluteUrl\"") === false) {
 			$this->fail("No absolute image found.");
 		}
 		// And the unmodified, not found image.
-	        if (strpos($html_contents, "<img src=\"notfound.jpg\"") === false) {
+		if (strpos($html_contents, "<img src=\"notfound.jpg\"") === false) {
 			$this->fail("No non-found image found.");
 		}
+	}
 
-	}	
 }
 
