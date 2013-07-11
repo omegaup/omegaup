@@ -277,5 +277,56 @@ class CreateProblemTest extends OmegaupTestCase {
             $this->fail("ó not found when expected.");
         }
 	}	
+
+	/**
+	 * Test that image upload works.
+	 */
+	public function testImageUpload() {
+		$imageSha1 = '27938919b32434b39486d04db57d5b8dccbe881b';
+		$imageExtension = 'jpg';
+		$imageAbsoluteUrl = 'http://i.imgur.com/fUkvDkw.png';
+
+		// Get the problem data
+	        $problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT."imagetest.zip");
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
+
+		// Login user
+		$r["auth_token"] = $this->login($problemAuthor);
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+		// Call the API				
+		$response = ProblemController::apiCreate($r);
+
+		// Verify response
+		$this->assertEquals("ok", $response["status"]);
+		
+        	// Verify problem contents.zip were copied
+	        $targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["alias"] . DIRECTORY_SEPARATOR;                
+	        $this->assertFileExists($targetpath . "contents.zip");                        
+	        $this->assertFileExists($targetpath . "cases.zip");
+	        $this->assertFileExists($targetpath . "cases");
+	        $this->assertFileExists($targetpath . "inputname");
+	        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
+	        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "es.markdown");
+	        $this->assertFileExists($targetpath . "statements". DIRECTORY_SEPARATOR . "bunny.jpg");
+        
+	        // Verify that all the images are there.
+		$html_contents = file_get_contents($targetpath . "statements". DIRECTORY_SEPARATOR . "es.html");
+	        if (strpos($html_contents, "<img src=\"$imageSha1.$imageExtension\"") === false) {
+			$this->fail("No uploaded image found.");
+		}
+		// And the direct URL.
+	        if (strpos($html_contents, "<img src=\"$imageAbsoluteUrl\"") === false) {
+			$this->fail("No absolute image found.");
+		}
+		// And the unmodified, not found image.
+	        if (strpos($html_contents, "<img src=\"notfound.jpg\"") === false) {
+			$this->fail("No non-found image found.");
+		}
+
+	}	
 }
 

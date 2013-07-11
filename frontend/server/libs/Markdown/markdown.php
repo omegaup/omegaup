@@ -40,19 +40,19 @@ define( 'MARKDOWN_VERSION',  "1.0.1n" ); # Sat 10 Oct 2009
 
 @define( 'MARKDOWN_PARSER_CLASS',  'Markdown_Parser' );
 
-function Markdown($text) {
+function Markdown($text, $image_callback = 'identity_callback') {
 #
 # Initialize the parser and return the result of its transform method.
 #
-	# Setup static parser variable.
-	static $parser;
-	if (!isset($parser)) {
-		$parser_class = MARKDOWN_PARSER_CLASS;
-		$parser = new $parser_class;
-	}
+	$parser_class = MARKDOWN_PARSER_CLASS;
+	$parser = new $parser_class($image_callback);
 
 	# Transform text using parser.
 	return $parser->transform($text);
+}
+
+function identity_callback($x) {
+	return $x;
 }
 
 
@@ -214,11 +214,14 @@ class Markdown_Parser {
 	var $predef_urls = array();
 	var $predef_titles = array();
 
+	# A callback function to handle images.
+	var $image_callback = null;
 
-	function Markdown_Parser() {
-	#
-	# Constructor function. Initialize appropriate member variables.
-	#
+	function Markdown_Parser($image_callback) {
+		#
+		# Constructor function. Initialize appropriate member variables.
+		#
+		$this->image_callback = $image_callback;
 		$this->_initDetab();
 		$this->prepareItalicsAndBold();
 	
@@ -839,6 +842,7 @@ class Markdown_Parser {
 		$alt_text = $this->encodeAttribute($alt_text);
 		if (isset($this->urls[$link_id])) {
 			$url = $this->encodeAttribute($this->urls[$link_id]);
+			$url = call_user_func($this->image_callback, $url);
 			$result = "<img src=\"$url\" alt=\"$alt_text\"";
 			if (isset($this->titles[$link_id])) {
 				$title = $this->titles[$link_id];
@@ -863,6 +867,7 @@ class Markdown_Parser {
 
 		$alt_text = $this->encodeAttribute($alt_text);
 		$url = $this->encodeAttribute($url);
+		$url = call_user_func($this->image_callback, $url);
 		$result = "<img src=\"$url\" alt=\"$alt_text\"";
 		if (isset($title)) {
 			$title = $this->encodeAttribute($title);

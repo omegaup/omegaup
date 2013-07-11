@@ -10,6 +10,7 @@ class ProblemDeployer {
 	const MAX_ZIP_FILESIZE = 209715200; //200 * 1024 * 1024;
 	
 	public $filesToUnzip;
+	private $imageHashes;
 	private $casesFiles;
 	private $hasValidator = false;	
 	
@@ -38,6 +39,15 @@ class ProblemDeployer {
 
 			Logger::log("Adding statements to the files to be unzipped: " . $file);
 			$this->filesToUnzip[] = $file;
+		}
+
+		// Also extract any images in the statements directory.
+		$images = preg_grep('/^statements\/.*\.(gif|jpg|jpeg)$/', $zipFilesArray);
+
+		// Add images to the files to be unzipped.
+		foreach ($images as $file) {
+			$this->filesToUnzip[] = $file;
+			$this->imageHashes[substr($file, strlen('statements/'))] = true;
 		}
 
 		return true;
@@ -149,12 +159,11 @@ class ProblemDeployer {
 			throw new InvalidParameterException("problem_contents is invalid.");
 		}
 
-
 		$this->filesToUnzip = array();
+		$this->imageHashes = array();
 		$this->casesFiles = array();
 
 		$value = $_FILES['problem_contents']['tmp_name'];
-
 
 		Logger::log("Opening $value...");
 		$zip = new ZipArchive();
@@ -267,7 +276,7 @@ class ProblemDeployer {
 
 			// Transform markdown to HTML
 			Logger::log("Transforming markdown to html");
-			$html_file_contents = markdown($markdown_file_contents);
+			$html_file_contents = Markdown($markdown_file_contents, array($this, 'imageMarkdownCallback'));
 
 			// Get the language of this statement            
 			$lang = basename($statement, ".markdown");
@@ -277,6 +286,20 @@ class ProblemDeployer {
 			// Save the HTML file in the path .../problem_alias/statements/lang.html            
 			Logger::log("Saving HTML statement in " . $html_filepath);
 			FileHandler::CreateFile($html_filepath, $html_file_contents);
+		}
+	}
+
+	public function imageMarkdownCallback($imagepath) {
+		if (array_key_exists($imagepath, $this->imageHashes)) {
+			if (is_bool($this->imageHashes[$imagepath])) {
+				// TODO: copy the image to somewhere in /var/www, get its SHA-1 sum,
+				// and store it in the imageHashes array.
+				$this->imageHashes[$imagepath] = "27938919b32434b39486d04db57d5b8dccbe881b.jpg";
+			}
+			return $this->imageHashes[$imagepath];
+		} else {
+			// Also support absolute urls.
+			return $imagepath;
 		}
 	}
 
