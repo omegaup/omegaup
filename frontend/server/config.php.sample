@@ -33,6 +33,7 @@
 	define('RUNS_PATH',								'/opt/omegaup/omegaup/submissions');
 	define('PROBLEMS_PATH',							'/opt/omegaup/omegaup/problems');
 	define('BIN_PATH',							'/opt/omegaup/bin');
+	define('IMAGES_PATH',							'/opt/omegaup/frontend/www/img/');
 	define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
 	define('OMEGAUP_GRADER_RELOAD_CONFIG_URL',		'https://localhost:21680/reload-config/');
 	define('OMEGAUP_GRADER_STATUS_URL',				'https://localhost:21680/status/');

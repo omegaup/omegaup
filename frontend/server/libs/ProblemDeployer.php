@@ -12,7 +12,8 @@ class ProblemDeployer {
 	public $filesToUnzip;
 	private $imageHashes;
 	private $casesFiles;
-	private $hasValidator = false;	
+	private $hasValidator = false;
+	private $problemDirPath;
 	
 	/**
 	 * 
@@ -292,9 +293,19 @@ class ProblemDeployer {
 	public function imageMarkdownCallback($imagepath) {
 		if (array_key_exists($imagepath, $this->imageHashes)) {
 			if (is_bool($this->imageHashes[$imagepath])) {
-				// TODO: copy the image to somewhere in /var/www, get its SHA-1 sum,
-				// and store it in the imageHashes array.
-				$this->imageHashes[$imagepath] = "27938919b32434b39486d04db57d5b8dccbe881b.jpg";
+				
+				// copy the image to somewhere in IMAGES_PATH, get its SHA-1 sum,
+				// and store it in the imageHashes array.				
+				
+				$source = $this->problemDirPath . "/statements/" . $imagepath;
+				$hash = sha1_file($source);
+				$extension = substr($imagepath, strpos($imagepath, "."));
+				$destination = IMAGES_PATH . "$hash$extension";
+				
+				Logger::log("Deploying image: copying $source to $destination");
+				
+				FileHandler::Copy($source, $destination);				
+				$this->imageHashes[$imagepath] = $destination;
 			}
 			return $this->imageHashes[$imagepath];
 		} else {
@@ -480,8 +491,9 @@ class ProblemDeployer {
 		$this->validateZip();
 		
 		try {
-			// Create paths
+			// Create paths			
 			$dirpath = $this->getDirpath($r);
+			$this->problemDirPath = $dirpath;
 			$filepath = $this->getFilepath($dirpath);
 
 			if ($isUpdate === true) {

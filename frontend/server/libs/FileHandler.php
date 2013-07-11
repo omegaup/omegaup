@@ -83,5 +83,12 @@ class FileHandler {
 			throw new Exception("FATAL: Not able to delete dir " . $dir);
 		}
 	}
+	
+	static public function Copy($source, $dest) {
+		if(!@copy($source, $dest)) {
+			$errors = error_get_last();
+			throw new Exception("FATAL: Unable to copy $source to $dest: ". $errors['type']." ". $errors["message"]);
+		}
+	}
 
 }

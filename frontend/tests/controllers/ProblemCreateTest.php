@@ -311,7 +311,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Verify that all the images are there.
 		$html_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
-		if (strpos($html_contents, "<img src=\"$imageSha1.$imageExtension\"") === false) {
+		if (strpos($html_contents, "<img src=\"". IMAGES_PATH ."$imageSha1.$imageExtension\"") === false) {
 			$this->fail("No uploaded image found.");
 		}
 		// And the direct URL.

@@ -53,6 +53,7 @@ frontend/log/omegaup.log
 #ignore crated-by-test stuff
 frontend/server/api/tests/problems/
 frontend/server/api/tests/submissions/
+frontend/www/img/
 omegaup_test.log
 
 # Ignore runtime and test stuff

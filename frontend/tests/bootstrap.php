@@ -31,6 +31,7 @@ Utils::CleanLog();
 // Clean problems and runs path    
 Utils::CleanPath(PROBLEMS_PATH);
 Utils::CleanPath(RUNS_PATH);
+Utils::CleanPath(IMAGES_PATH);
 
 // Clean DB
 Utils::CleanupDB();
