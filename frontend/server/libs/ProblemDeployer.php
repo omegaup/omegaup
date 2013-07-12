@@ -300,12 +300,13 @@ class ProblemDeployer {
 				$source = $this->problemDirPath . "/statements/" . $imagepath;
 				$hash = sha1_file($source);
 				$extension = substr($imagepath, strpos($imagepath, "."));
-				$destination = IMAGES_PATH . "$hash$extension";
+				$hashedFilename =  "$hash$extension";
+				$copyDestination = IMAGES_PATH . $hashedFilename;
 				
-				Logger::log("Deploying image: copying $source to $destination");
+				Logger::log("Deploying image: copying $source to $copyDestination");
 				
-				FileHandler::Copy($source, $destination);				
-				$this->imageHashes[$imagepath] = $destination;
+				FileHandler::Copy($source, $copyDestination);				
+				$this->imageHashes[$imagepath] = IMAGES_URL_PATH . $hashedFilename;
 			}
 			return $this->imageHashes[$imagepath];
 		} else {

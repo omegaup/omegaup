@@ -47,6 +47,7 @@
     define('RUNS_PATH', OMEGAUP_TEST_ROOT . 'submissions');
     define('PROBLEMS_PATH', OMEGAUP_TEST_ROOT . 'problems');
 	define('IMAGES_PATH',							OMEGAUP_ROOT. 'www/img/');
+	define('IMAGES_URL_PATH',							'https://omegaup.com/img/');
     define('BIN_PATH', '/opt/omegaup/bin');
     define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
 
