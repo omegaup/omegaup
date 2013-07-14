@@ -166,11 +166,14 @@ class Utils {
 	}
 
 	private static function rrmdir($dir) {
+		if (!file_exists($dir)) {
+			return;
+		}
+
 		foreach (glob($dir . '/*') as $file) {
 			if (is_dir($file)) {
 				self::rrmdir($file);
-			} else
-			if (!unlink($file)) {
+			} else if (!unlink($file)) {
 				throw new Exception("FATAL: Not able to delete file " . $file);
 			}
 		}
@@ -179,7 +182,6 @@ class Utils {
 			throw new Exception("FATAL: Not able to delete dir " . $dir);
 		}
 	}
-
 }
 
 ?>
