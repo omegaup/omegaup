@@ -1,101 +1,100 @@
 <?php
 
-    # ####################################
-    # DATABASE CONFIG
-    # ####################################
-	define("OMEGAUP_DB_USER",				"root");
-	define("OMEGAUP_DB_PASS",				"omegaup");
-	define("OMEGAUP_DB_HOST",				"localhost");
-	define("OMEGAUP_DB_NAME",				"omegaup");
-	define("OMEGAUP_DB_DRIVER",				"mysqlt");
-	define("OMEGAUP_DB_DEBUG",				false);
-	define("OMEGAUP_MD5_SALT",				"om3gaup");	
-	
-    define("OMEGAUP_SLAVE_DB_USER",     	"omegaup");
-    define("OMEGAUP_SLAVE_DB_PASS",     	"");
-    define("OMEGAUP_SLAVE_DB_HOST",     	"8.8.8.8");
-    define("OMEGAUP_SLAVE_DB_NAME",     	"omegaup");
-    define("OMEGAUP_SLAVE_DB_DRIVER",     	"mysqlt");
-	define("OMEGAUP_EXPIRE_TOKEN_AFTER",			"8 HOUR");
-	define("OMEGAUP_FORCE_EMAIL_VERIFICATION",		true);
-	define('BIN_PATH',							'/opt/omegaup/bin');
+# ####################################
+# DATABASE CONFIG
+# ####################################
+define('OMEGAUP_DB_USER',			'root');
+define('OMEGAUP_DB_PASS',			'omegaup');
+define('OMEGAUP_DB_HOST',			'localhost');
+define('OMEGAUP_DB_NAME',			'omegaup');
+define('OMEGAUP_DB_DRIVER',			'mysqlt');
+define('OMEGAUP_DB_DEBUG',			false);
+define('OMEGAUP_MD5_SALT',			'om3gaup');
 
-	# ####################################
-	# TEST CONFIG
-	# ####################################	
-	define('OMEGAUP_FRONTEND_SERVER_ROOT', OMEGAUP_ROOT . 'server/');
-	define('OMEGAUP_TEST_ROOT', '/opt/omegaup/frontend/tests/controllers/');
-	define('OMEGAUP_RESOURCES_ROOT', '/opt/omegaup/frontend/tests/resources/');
-	define('OMEGAUP_BASE_URL', 'http://localhost');
+define('OMEGAUP_SLAVE_DB_USER',			'omegaup');
+define('OMEGAUP_SLAVE_DB_PASS',			'');
+define('OMEGAUP_SLAVE_DB_HOST',			'8.8.8.8');
+define('OMEGAUP_SLAVE_DB_NAME',			'omegaup');
+define('OMEGAUP_SLAVE_DB_DRIVER',		'mysqlt');
+define('OMEGAUP_EXPIRE_TOKEN_AFTER',		'8 HOUR');
+define('OMEGAUP_FORCE_EMAIL_VERIFICATION',	true);
+define('BIN_PATH',				'/opt/omegaup/bin');
 
-	
-	# ####################################
-	# LOG CONFIG
-	# ####################################	
-    define('OMEGAUP_LOG_TO_FILE', true);
-	define('OMEGAUP_LOG_ACCESS_FILE', OMEGAUP_TEST_ROOT . 'omegaup.log');
-	define('OMEGAUP_LOG_ERROR_FILE', OMEGAUP_TEST_ROOT . 'omegaup.log');
-	define('OMEGAUP_LOG_TRACKBACK', false);
-	define('OMEGAUP_LOG_DB_QUERYS', false);
+# ####################################
+# TEST CONFIG
+# ####################################
+define('OMEGAUP_FRONTEND_SERVER_ROOT',		OMEGAUP_ROOT . 'server/');
+define('OMEGAUP_TEST_ROOT',			'/opt/omegaup/frontend/tests/controllers/');
+define('OMEGAUP_RESOURCES_ROOT',		'/opt/omegaup/frontend/tests/resources/');
+define('OMEGAUP_BASE_URL',			'http://localhost');
 
-    # ####################################
-    # GRADER CONFIG
-    # ####################################
-    define('OMEGAUP_GRADER_URL',      		'https://localhost:21680/grade/');
-    define('OMEGAUP_SSLCERT_URL',     		'/opt/omegaup/frontend/omegaup.pem');
-    define('OMEGAUP_CACERT_URL',      		'/opt/omegaup/frontend/omegaup.pem');
-    define('RUNS_PATH', OMEGAUP_TEST_ROOT . 'submissions');
-    define('PROBLEMS_PATH', OMEGAUP_TEST_ROOT . 'problems');
-	define('IMAGES_PATH',							OMEGAUP_ROOT. 'www/img/');
-	define('IMAGES_URL_PATH',							'https://omegaup.com/img/');
-    define('BIN_PATH', '/opt/omegaup/bin');
-    define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
+# ####################################
+# LOG CONFIG
+# ####################################
+define('OMEGAUP_LOG_TO_FILE',			true);
+define('OMEGAUP_LOG_ACCESS_FILE',		OMEGAUP_TEST_ROOT . 'omegaup.log');
+define('OMEGAUP_LOG_ERROR_FILE',		OMEGAUP_TEST_ROOT . 'omegaup.log');
+define('OMEGAUP_LOG_TRACKBACK',			false);
+define('OMEGAUP_LOG_DB_QUERYS',			false);
 
-    # ####################################
-    # FACEBOOK LOGIN CONFIG
-    # ####################################
-    define("OMEGAUP_FB_APPID",             "xxxxx");
-    define("OMEGAUP_FB_SECRET",            "xxxxx");
+# ####################################
+# GRADER CONFIG
+# ####################################
+define('OMEGAUP_GRADER_URL',			'https://localhost:21680/grade/');
+define('OMEGAUP_SSLCERT_URL',			'/opt/omegaup/frontend/omegaup.pem');
+define('OMEGAUP_CACERT_URL',			'/opt/omegaup/frontend/omegaup.pem');
+define('RUNS_PATH',				OMEGAUP_TEST_ROOT . 'submissions');
+define('PROBLEMS_PATH',				OMEGAUP_TEST_ROOT . 'problems');
+define('IMAGES_PATH',				OMEGAUP_ROOT. 'www/img/');
+define('IMAGES_URL_PATH',			'/img/');
+define('BIN_PATH',				'/opt/omegaup/bin');
+define('OMEGAUP_GRADER_CONFIG_PATH',		'/opt/omegaup/grader/omegaup.conf');
 
-    # ####################################
-    # GOOGLE ANALYTICS
-    # ####################################
-    define("OMEGAUP_GA_TRACK",             false);
-    define("OMEGAUP_GA_ID",                "xxxxx");
+# ####################################
+# FACEBOOK LOGIN CONFIG
+# ####################################
+define('OMEGAUP_FB_APPID',			'xxxxx');
+define('OMEGAUP_FB_SECRET',			'xxxxx');
 
-    # ####################################
-    # EMAIL CONFIG
-    # ####################################
-    define("OMEGAUP_EMAIL_SEND_EMAILS",		false);
-    define("OMEGAUP_EMAIL_SMTP_HOST",		"smtp.gmail.com");
-    define("OMEGAUP_EMAIL_SMTP_USER",		"no-reply@omegaup.com");
-    define("OMEGAUP_EMAIL_SMTP_PASSWORD",	"");
-    define("OMEGAUP_EMAIL_SMTP_PORT",		"587");
-    define("OMEGAUP_EMAIL_SMTP_FROM",		"no-reply@omegaup.com");
+# ####################################
+# GOOGLE ANALYTICS
+# ####################################
+define('OMEGAUP_GA_TRACK',			false);
+define('OMEGAUP_GA_ID',				'xxxxx');
 
-    # ####################################
-    # MEMCACHE CONFIG
-    # ####################################
-    define("OMEGAUP_MEMCACHE_DISABLED",		true);
-    define("OMEGAUP_MEMCACHE_HOST",			'localhost');
-    define("OMEGAUP_MEMCACHE_PORT",			11211);
-    define("OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT",    60); // in seconds
-    define("OMEGAUP_MEMCACHE_CONTEST_TIMEOUT",        30); // in seconds
+# ####################################
+# EMAIL CONFIG
+# ####################################
+define('OMEGAUP_EMAIL_SEND_EMAILS',		false);
+define('OMEGAUP_EMAIL_SMTP_HOST',		'smtp.gmail.com');
+define('OMEGAUP_EMAIL_SMTP_USER',		'no-reply@omegaup.com');
+define('OMEGAUP_EMAIL_SMTP_PASSWORD',		'');
+define('OMEGAUP_EMAIL_SMTP_PORT',		'587');
+define('OMEGAUP_EMAIL_SMTP_FROM',		'no-reply@omegaup.com');
 
-    # #########################
-    # APC USER CACHE
-    # #########################
-    define("APC_USER_CACHE_ENABLED",					false);
-	define("APC_USER_CACHE_PROBLEM_STATEMENT",			false);
-	define("APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT",	60); // in seconds
-	define("APC_USER_CACHE_SCOREBOARD",					false);
-	define("APC_USER_CACHE_SCOREBOARD_TIMEOUT",			60); // in seconds
-	define("APC_USER_CACHE_ADMIN_SCOREBOARD",			false);
-	define("APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT",	60); // in seconds
-	define("APC_USER_CACHE_CONTEST_INFO_TIMEOUT",		10);
-	define("APC_USER_CACHE_PROBLEM_STATS_TIMEOUT", 0); // in seconds
+# ####################################
+# MEMCACHE CONFIG
+# ####################################
+define('OMEGAUP_MEMCACHE_DISABLED',		true);
+define('OMEGAUP_MEMCACHE_HOST',			'localhost');
+define('OMEGAUP_MEMCACHE_PORT',			11211);
+define('OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT',	60); // in seconds
+define('OMEGAUP_MEMCACHE_CONTEST_TIMEOUT',	30); // in seconds
 
-    # #########################
-    # SMARTY USER CACHE
-    # #########################
-	define("SMARTY_CACHE_DIR", "/var/tmp/omegaup/");
+# #########################
+# APC USER CACHE
+# #########################
+define('APC_USER_CACHE_ENABLED',		false);
+define('APC_USER_CACHE_PROBLEM_STATEMENT',	false);
+define('APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT',60); // in seconds
+define('APC_USER_CACHE_SCOREBOARD',		false);
+define('APC_USER_CACHE_SCOREBOARD_TIMEOUT',	60); // in seconds
+define('APC_USER_CACHE_ADMIN_SCOREBOARD',	false);
+define('APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT',60); // in seconds
+define('APC_USER_CACHE_CONTEST_INFO_TIMEOUT',	10);
+define('APC_USER_CACHE_PROBLEM_STATS_TIMEOUT',	0); // in seconds
+
+# #########################
+# SMARTY USER CACHE
+# #########################
+define('SMARTY_CACHE_DIR',			'/var/tmp/omegaup/');

@@ -1,88 +1,90 @@
 <?php
-	# ####################################
-	# DATABASE CONFIG
-	# ####################################
-	define("OMEGAUP_DB_USER",						"omegaup");
-	define("OMEGAUP_DB_PASS",						"");
-	define("OMEGAUP_DB_HOST",						"localhost");
-	define("OMEGAUP_DB_NAME",						"omegaup");
-	define("OMEGAUP_DB_DRIVER",						"mysqlt");
-	define("OMEGAUP_DB_DEBUG",						false);
-	define("OMEGAUP_MD5_SALT",						"omegaup");
+# ####################################
+# DATABASE CONFIG
+# ####################################
+define('OMEGAUP_DB_USER',				'omegaup');
+define('OMEGAUP_DB_PASS',				'');
+define('OMEGAUP_DB_HOST',				'localhost');
+define('OMEGAUP_DB_NAME',				'omegaup');
+define('OMEGAUP_DB_DRIVER',				'mysqlt');
+define('OMEGAUP_DB_DEBUG',				false);
+define('OMEGAUP_MD5_SALT',				'omegaup');
 
-	define("OMEGAUP_SLAVE_DB_USER",					"omegaup");
-	define("OMEGAUP_SLAVE_DB_PASS",					"");
-	define("OMEGAUP_SLAVE_DB_HOST",					"8.8.8.8");
-	define("OMEGAUP_SLAVE_DB_NAME",					"omegaup");
-	define("OMEGAUP_SLAVE_DB_DRIVER",				"mysqlt");
+define('OMEGAUP_SLAVE_DB_USER',				'omegaup');
+define('OMEGAUP_SLAVE_DB_PASS',				'');
+define('OMEGAUP_SLAVE_DB_HOST',				'8.8.8.8');
+define('OMEGAUP_SLAVE_DB_NAME',				'omegaup');
+define('OMEGAUP_SLAVE_DB_DRIVER',			'mysqlt');
 
-	define("OMEGAUP_LOG_TO_FILE",					false);
-	define("OMEGAUP_LOG_TRACKBACK",					false);
-	define("OMEGAUP_LOG_DB_QUERYS",					false);
-	define("OMEGAUP_LOG_ACCESS_FILE",				"/var/log/omegaup/omegaup.log");
-	define("OMEGAUP_LOG_ERROR_FILE",				"/var/log/omegaup/omegaup.log");
-	define("OMEGAUP_EXPIRE_TOKEN_AFTER",			"8 HOUR");
-	define("OMEGAUP_FORCE_EMAIL_VERIFICATION",		false);
+define('OMEGAUP_LOG_TO_FILE',				false);
+define('OMEGAUP_LOG_TRACKBACK',				false);
+define('OMEGAUP_LOG_DB_QUERYS',				false);
+define('OMEGAUP_LOG_ACCESS_FILE',			'/var/log/omegaup/omegaup.log');
+define('OMEGAUP_LOG_ERROR_FILE',			'/var/log/omegaup/omegaup.log');
+define('OMEGAUP_EXPIRE_TOKEN_AFTER',			'8 HOUR');
+define('OMEGAUP_FORCE_EMAIL_VERIFICATION',		false);
 
-	# ####################################
-	# GRADER CONFIG
-	# ####################################
-	define('OMEGAUP_GRADER_URL',					'https://localhost:21680/grade/');
-	define('OMEGAUP_SSLCERT_URL',					'/opt/omegaup/frontend/omegaup.pem');
-	define('OMEGAUP_CACERT_URL',					'/opt/omegaup/frontend/omegaup.pem');
-	define('RUNS_PATH',								'/opt/omegaup/omegaup/submissions');
-	define('PROBLEMS_PATH',							'/opt/omegaup/omegaup/problems');
-	define('BIN_PATH',							'/opt/omegaup/bin');
-	define('IMAGES_PATH',							'/opt/omegaup/frontend/www/img/');
-	define('IMAGES_URL_PATH',							'https://omegaup.com/img/');	
-	define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
-	define('OMEGAUP_GRADER_RELOAD_CONFIG_URL',		'https://localhost:21680/reload-config/');
-	define('OMEGAUP_GRADER_STATUS_URL',				'https://localhost:21680/status/');
+# ####################################
+# GRADER CONFIG
+# ####################################
+define('OMEGAUP_GRADER_URL',				'https://localhost:21680/grade/');
+define('OMEGAUP_SSLCERT_URL',				'/opt/omegaup/frontend/omegaup.pem');
+define('OMEGAUP_CACERT_URL',				'/opt/omegaup/frontend/omegaup.pem');
+define('RUNS_PATH',					'/opt/omegaup/omegaup/submissions');
+define('PROBLEMS_PATH',					'/opt/omegaup/omegaup/problems');
+define('BIN_PATH',					'/opt/omegaup/bin');
+define('IMAGES_PATH',					'/opt/omegaup/frontend/www/img/');
+define('IMAGES_URL_PATH',				'/img/');
+define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
+define('OMEGAUP_GRADER_RELOAD_CONFIG_URL',		'https://localhost:21680/reload-config/');
+define('OMEGAUP_GRADER_STATUS_URL',			'https://localhost:21680/status/');
 
-	# ####################################
-	# FACEBOOK LOGIN CONFIG
-	# ####################################
-	define("OMEGAUP_FB_APPID",						"xxxxx");
-	define("OMEGAUP_FB_SECRET",						"xxxxx");
+# ####################################
+# FACEBOOK LOGIN CONFIG
+# ####################################
+define('OMEGAUP_FB_APPID',				'xxxxx');
+define('OMEGAUP_FB_SECRET',				'xxxxx');
 
-	# ####################################
-	# GOOGLE ANALYTICS
-	# ####################################
-	define("OMEGAUP_GA_TRACK",						false);
-	define("OMEGAUP_GA_ID",							"xxxxx");
+# ####################################
+# GOOGLE ANALYTICS
+# ####################################
+define('OMEGAUP_GA_TRACK',				false);
+define('OMEGAUP_GA_ID',					'xxxxx');
 
-	# ####################################
-	# EMAIL CONFIG
-	# ####################################
-	define("OMEGAUP_EMAIL_SEND_EMAILS",				false);
-	define("OMEGAUP_EMAIL_SMTP_HOST",				"xxxx");
-	define("OMEGAUP_EMAIL_SMTP_USER",				"xxxx");
-	define("OMEGAUP_EMAIL_SMTP_PASSWORD",			"xxxx");
-	define("OMEGAUP_EMAIL_SMTP_PORT",				"xxxx");
-	define("OMEGAUP_EMAIL_SMTP_FROM",				"xxxx");
+# ####################################
+# EMAIL CONFIG
+# ####################################
+define('OMEGAUP_EMAIL_SEND_EMAILS',			false);
+define('OMEGAUP_EMAIL_SMTP_HOST',			'xxxx');
+define('OMEGAUP_EMAIL_SMTP_USER',			'xxxx');
+define('OMEGAUP_EMAIL_SMTP_PASSWORD',			'xxxx');
+define('OMEGAUP_EMAIL_SMTP_PORT',			'xxxx');
+define('OMEGAUP_EMAIL_SMTP_FROM',			'xxxx');
 
-	# ####################################
-	# MEMCACHE CONFIG
-	# ####################################
-	define("OMEGAUP_MEMCACHE_DISABLED",				true);
-	define("OMEGAUP_MEMCACHE_HOST",					'localhost');
-	define("OMEGAUP_MEMCACHE_PORT",					11211);
-	define("OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT",	60); // in seconds
-	define("OMEGAUP_MEMCACHE_CONTEST_TIMEOUT",		30); // in seconds
+# ####################################
+# MEMCACHE CONFIG
+# ####################################
+define('OMEGAUP_MEMCACHE_DISABLED',			true);
+define('OMEGAUP_MEMCACHE_HOST',				'localhost');
+define('OMEGAUP_MEMCACHE_PORT',				11211);
+define('OMEGAUP_MEMCACHE_SCOREBOARD_TIMEOUT',		60); // in seconds
+define('OMEGAUP_MEMCACHE_CONTEST_TIMEOUT',		30); // in seconds
 
-	# #########################
-	# APC USER CACHE
-	# #########################
+# #########################
+# APC USER CACHE
+# #########################
+define('APC_USER_CACHE_ENABLED',			false);
+define('APC_USER_CACHE_PROBLEM_STATEMENT',		false);
+define('APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT',	60); // in seconds
+define('APC_USER_CACHE_SCOREBOARD',			false);
+define('APC_USER_CACHE_SCOREBOARD_TIMEOUT',		60); // in seconds
+define('APC_USER_CACHE_ADMIN_SCOREBOARD',		false);
+define('APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT',	60); // in seconds
+define('APC_USER_CACHE_CONTEST_INFO_TIMEOUT',		10);
+define('APC_USER_CACHE_PROBLEM_STATS_TIMEOUT',		 0); // in seconds
 
-	define("APC_USER_CACHE_ENABLED",					false);
-	define("APC_USER_CACHE_PROBLEM_STATEMENT",			false);
-	define("APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT",	60); // in seconds
-	define("APC_USER_CACHE_SCOREBOARD",					false);
-	define("APC_USER_CACHE_SCOREBOARD_TIMEOUT",			60); // in seconds
-	define("APC_USER_CACHE_ADMIN_SCOREBOARD",			false);
-	define("APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT",	60); // in seconds
-	define("APC_USER_CACHE_CONTEST_INFO_TIMEOUT",		10);
-	define("APC_USER_CACHE_PROBLEM_STATS_TIMEOUT", 0); // in seconds
-
-	define("SMARTY_CACHE_DIR",							"/var/tmp");
-	define("IS_TEST",									FALSE);
+# #########################
+# SMARTY
+# #########################
+define('SMARTY_CACHE_DIR',				'/var/tmp');
+define('IS_TEST',					FALSE);
