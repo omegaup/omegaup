@@ -152,11 +152,13 @@ class ProblemDeployer {
 		Logger::log("Validating zip...");
 
 		if (!array_key_exists("problem_contents", $_FILES)) {
+			Logger::error("\$_FILES global does not contain problem_contents.");
 			throw new InvalidParameterException("problem_contents is invalid.");
 		}
 
 		if (isset($_FILES['problem_contents']) &&
 				!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
+			Logger::error("GetFileUploader()->IsUploadedFile() check failed for \$_FILES['problem_contents']['tmp_name'].");
 			throw new InvalidParameterException("problem_contents is invalid.");
 		}
 
@@ -164,11 +166,11 @@ class ProblemDeployer {
 		$this->imageHashes = array();
 		$this->casesFiles = array();
 
-		$value = $_FILES['problem_contents']['tmp_name'];
+		$originalZip = $_FILES['problem_contents']['tmp_name'];
 
-		Logger::log("Opening $value...");
+		Logger::log("Opening $originalZip...");
 		$zip = new ZipArchive();
-		$resource = $zip->open($value);
+		$resource = $zip->open($originalZip);
 
 		$size = 0;
 		if ($resource === TRUE) {
@@ -218,7 +220,7 @@ class ProblemDeployer {
 			} catch (ApiException $e) {
 
 				// Close zip
-				Logger::log("Validation Failed. Closing zip");
+				Logger::error("Validation Failed. Closing zip");
 				$zip->close();
 
 				throw $e;
