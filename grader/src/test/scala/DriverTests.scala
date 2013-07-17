@@ -252,7 +252,20 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 			}
 		""")
 
-		omegaUpSubmit(5, Language.KarelJava, """
+		omegaUpSubmit(5, Language.Cpp, """
+			#include "solve.h"
+
+			long long solve(long long a, long long b) { return a + b; }
+		""")
+
+		omegaUpSubmit(5, Language.Cpp, """long long solve(long long a, long long b) { return 0; }""")
+
+		omegaUpSubmit(5, Language.Cpp, """
+			#include <stdio.h>
+			int main() { printf("Hello, World!\n3\n"); }
+		""")
+
+		omegaUpSubmit(6, Language.KarelJava, """
 class program {
 
 void turn(n) { iterate(n) turnleft(); }
@@ -460,6 +473,24 @@ program() {
 		run.contest_score should equal (0)
 
 		run = GraderData.run(10).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.Accepted)
+		run.score should equal (1)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(11).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.WrongAnswer)
+		run.score should equal (0)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(12).get
+		run.status should equal (Status.Ready)
+		run.veredict should equal (Veredict.CompileError)
+		run.score should equal (0)
+		run.contest_score should equal (0)
+
+		run = GraderData.run(13).get
 		run.status should equal (Status.Ready)
 		run.veredict should equal (Veredict.Accepted)
 		run.score should equal (1)

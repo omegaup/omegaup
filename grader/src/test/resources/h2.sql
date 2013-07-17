@@ -8,7 +8,9 @@ INSERT INTO Problems(`problem_id`, `public`, `author_id`, `title`, `alias`, `val
 
 INSERT INTO Problems(`problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `server`, `remote_id`, `time_limit`, `memory_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`) VALUES (4, 1, 1, 'Hello, World!', 'HELLO4', 'custom', NULL, NULL, 3000, 65536, 0, 0, 0, 0, '2000-01-01 00:00:00', 'own', 'normal');
 
-INSERT INTO Problems(`problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `server`, `remote_id`, `time_limit`, `memory_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`) VALUES (5, 1, 1, 'Hello, Karel!', 'KAREL', 'token-caseless', NULL, NULL, 3000, 65536, 0, 0, 0, 0, '2000-01-01 00:00:00', 'own', 'normal');
+INSERT INTO Problems(`problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `server`, `remote_id`, `time_limit`, `memory_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`) VALUES (5, 1, 1, 'Hello, World!', 'HELLO5', 'token-caseless', NULL, NULL, 3000, 65536, 0, 0, 0, 0, '2000-01-01 00:00:00', 'own', 'normal');
+
+INSERT INTO Problems(`problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `server`, `remote_id`, `time_limit`, `memory_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`) VALUES (6, 1, 1, 'Hello, Karel!', 'KAREL', 'token-caseless', NULL, NULL, 3000, 65536, 0, 0, 0, 0, '2000-01-01 00:00:00', 'own', 'normal');
 
 INSERT INTO Contest_Problems(contest_id, problem_id, points) VALUES(1, 1, 100);
 INSERT INTO Contest_Problems(contest_id, problem_id, points) VALUES(1, 2, 100);

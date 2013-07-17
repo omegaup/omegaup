@@ -9,6 +9,7 @@ import scala.util.matching.Regex
 import scala.actors.Actor
 import scala.actors.Scheduler
 import scala.actors.Actor._
+import scala.collection.mutable.ListMap
 import Language._
 import Veredict._
 import Status._
@@ -17,25 +18,66 @@ import Validator._
 object OmegaUp extends Actor with Log {
 	@throws(classOf[FileNotFoundException])
 	def createCompileMessage(run: Run, code: String): CompileInputMessage = {
+		var validatorLang: Option[String] = None
+		var validatorCode: Option[Map[String, String]] = None
+
 		if (run.problem.validator == Validator.Custom) {
-			List("c", "cpp", "py", "p", "rb").foreach(lang => {
-				val validator = new File(Config.get("problems.root", "problems") + "/" + run.problem.alias + "/validator." + lang)
-				
-				if (validator.exists) {
-					debug("OU Using custom validator {} for problem {}", validator.getCanonicalPath, run.problem.alias)
-					return new CompileInputMessage(run.language.toString,
-					                               Map("Main." + run.language.toString -> code),
-					                               Some(lang),
-					                               Some(Map("Main." + lang -> FileUtil.read(validator.getCanonicalPath))))
+			List("c", "cpp", "py", "p", "rb").map(lang => {
+				(lang -> new File(Config.get("problems.root", "problems") + "/" + run.problem.alias + "/validator." + lang))
+			}).find(_._2.exists) match {
+				case Some((lang, validator)) => {
+					debug("OU Using custom validator {} for problem {}",
+					      validator.getCanonicalPath,
+					      run.problem.alias)
+					validatorLang = Some(lang)
+					validatorCode = Some(Map("Main." + lang -> FileUtil.read(validator.getCanonicalPath)))
 				}
-			})
-			
-			throw new FileNotFoundException("OU Validator for problem " + run.problem.alias + " was set to 'custom', but no validator program was found.")
+
+				case _ => {
+					throw new FileNotFoundException("OU Validator for problem " + run.problem.alias +
+				                                        " was set to 'custom', but no validator program was found.")
+				}
+			}
 		} else {
 			debug("OU Using {} validator for problem {}", run.problem.validator, run.problem.alias)
-			new CompileInputMessage(run.language.toString,
-			                        Map("Main." + run.language.toString -> code))
 		}
+
+		val codes = new ListMap[String,String]
+		val interactiveRoot = new File(Config.get("problems.root", "problems") + "/" + run.problem.alias + "/interactive")
+
+		if (interactiveRoot.isDirectory) {
+			debug("OU Using interactive mode problem {}", run.problem.alias)
+
+			val unitNameFile = new File(interactiveRoot, "unitname")
+			if (!unitNameFile.isFile) {
+				throw new FileNotFoundException(unitNameFile.getCanonicalPath)
+			}
+
+			val langDir = new File(interactiveRoot, run.language.toString)
+			if (!langDir.isDirectory) {
+				throw new FileNotFoundException(langDir.getCanonicalPath)
+			}
+
+			val unitName = FileUtil.read(unitNameFile.getCanonicalPath)
+			codes += unitName + "." + run.language.toString -> code
+			
+			langDir
+				.list
+				.map(new File(langDir, _))
+				.filter(_.isFile)
+				.foreach(file => { codes += file.getName -> FileUtil.read(file.getCanonicalPath) })
+
+			if (codes.size < 2) {
+				throw new FileNotFoundException(langDir.getCanonicalPath)
+			}
+		} else {
+			codes += "Main." + run.language.toString -> code
+		}
+
+		new CompileInputMessage(run.language.toString,
+		                        codes.toMap,
+		                        validatorLang,
+		                        validatorCode)
 	}
 
 	def act() = {
