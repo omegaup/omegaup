@@ -147,12 +147,38 @@ class ProblemController extends Controller {
 
 		Validators::isStringNonEmpty($r["title"], "title", $is_required);
 		Validators::isStringNonEmpty($r["source"], "source", $is_required);
-		Validators::isStringNonEmpty($r["alias"], "alias", $is_required);
 		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
 		Validators::isInEnum($r["validator"], "validator", array("remote", "literal", "token", "token-caseless", "token-numeric"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
 		Validators::isInEnum($r["order"], "order", array("normal", "inverse"), $is_required);
+	}
+	
+	/**
+	 * Builds a problem alias from a problem title
+	 * 
+	 * @param string $title
+	 */
+	private static function buildAlias($title) {
+
+		$alias = "";
+
+		// Remove accents				
+		$alias = ApiUtils::RemoveAccents($title);		
+
+		// To lower-case
+		$alias = strtolower($alias);
+
+		// Replace - for space		
+		$alias = str_replace(' ', '-', $alias);
+		
+		// Sanity url encode
+		$alias = urlencode($alias);
+
+		// Limit result to 32 chars
+		$alias = substr($alias, 0, 32);
+								
+		return $alias;
 	}
 
 	/**
@@ -173,7 +199,6 @@ class ProblemController extends Controller {
 		$problem = new Problems();
 		$problem->setPublic($r["public"]);
 		$problem->setTitle($r["title"]);
-		$problem->setAlias($r["alias"]);
 		$problem->setValidator($r["validator"]);
 		$problem->setTimeLimit($r["time_limit"]);
 		$problem->setMemoryLimit($r["memory_limit"]);
@@ -184,6 +209,9 @@ class ProblemController extends Controller {
 		$problem->setSource($r["source"]);
 		$problem->setOrder($r["order"]);
 		$problem->setAuthorId($r["author"]->getUserId());
+
+		$r["alias"] = self::buildAlias($r["title"]);
+		$problem->setAlias($r["alias"]);
 
 		$problemDeployer = new ProblemDeployer();
 
@@ -214,7 +242,7 @@ class ProblemController extends Controller {
 
 			// Alias may be duplicated, 1062 error indicates that
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
-				throw new DuplicatedEntryInDatabaseException("problem_alias already exists.", $e);
+				throw new DuplicatedEntryInDatabaseException("Problem title already exists. Please try a different one.", $e);
 			} else {
 
 				// Rollback the problem if deployed partially
@@ -227,6 +255,7 @@ class ProblemController extends Controller {
 		// Adding unzipped files to response
 		$result["uploaded_files"] = $problemDeployer->filesToUnzip;
 		$result["status"] = "ok";
+		$result["alias"] = $r["alias"];
 
 		return $result;
 	}
@@ -484,7 +513,7 @@ class ProblemController extends Controller {
 				throw new ForbiddenAccessException("Contest has not started yet.");
 			}
 		} else {
-			
+
 			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
 				// If the problem is requested outside a contest, we need to check that it is not private
 				if ($r["problem"]->getPublic() == "0") {
@@ -845,7 +874,7 @@ class ProblemController extends Controller {
 		$response = array();
 		$response["results"] = array();
 		for ($i = 0; $i < 2; $i++) {
-		
+
 			// Add public in the first pass, private in the second
 			try {
 				$problem_mask = NULL;
@@ -854,27 +883,25 @@ class ProblemController extends Controller {
 								"private" => 0,
 								"author_id" => $r["current_user_id"]
 							));
-					
-				} else if($i == 1) {
+				} else if ($i == 1) {
 					$problem_mask = new Problems(array(
 								"public" => 1
-							));										
+							));
 				}
-				
+
 				if (!is_null($problem_mask)) {
-					$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);										
-					
+					$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
+
 					foreach ($problems as $problem) {
 						array_push($response["results"], $problem->asArray());
 					}
 				}
-				
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
-			}			
+			}
 		}
 
-		$response["status"] = "ok";				
+		$response["status"] = "ok";
 		return $response;
 	}
 
