@@ -23,14 +23,18 @@ object OmegaUp extends Actor with Log {
 				
 				if (validator.exists) {
 					debug("OU Using custom validator {} for problem {}", validator.getCanonicalPath, run.problem.alias)
-					return new CompileInputMessage(run.language.toString, List(code), Some(lang), Some(List(FileUtil.read(validator.getCanonicalPath))))
+					return new CompileInputMessage(run.language.toString,
+					                               Map("Main." + run.language.toString -> code),
+					                               Some(lang),
+					                               Some(Map("Main." + lang -> FileUtil.read(validator.getCanonicalPath))))
 				}
 			})
 			
 			throw new FileNotFoundException("OU Validator for problem " + run.problem.alias + " was set to 'custom', but no validator program was found.")
 		} else {
 			debug("OU Using {} validator for problem {}", run.problem.validator, run.problem.alias)
-			new CompileInputMessage(run.language.toString, List(code))
+			new CompileInputMessage(run.language.toString,
+			                        Map("Main." + run.language.toString -> code))
 		}
 	}
 
