@@ -12,18 +12,18 @@ import omegaup._
 import omegaup.data._
 
 object Runner extends RunnerService with Log with Using {
-	def compile(runDirectory: File, lang: String, code: List[String], error_string: String) = {
+	def compile(runDirectory: File, lang: String, codes: Map[String, String], error_string: String): CompileOutputMessage = {
 		runDirectory.mkdirs
 		
-		using (new FileWriter(runDirectory.getCanonicalPath + "/Main." + lang)) { fileWriter => {
-			fileWriter.write(code(0), 0, code(0).length)
-		}}
-		val inputFiles = mutable.ListBuffer(runDirectory.getCanonicalPath + "/Main." + lang)
+		val inputFiles = new mutable.ListBuffer[String]
 		
-		for (i <- 1 until code.length) {
-			inputFiles += runDirectory.getCanonicalPath + "/f" + i + "." + lang
-			using (new FileWriter(runDirectory.getCanonicalPath + "/f" + i + "." + lang)) { fileWriter => {
-				fileWriter.write(code(i), 0, code(i).length)
+		for ((name, code) <- codes) {
+			if (name.contains("/")) {
+				return new CompileOutputMessage(error_string, error=Some("invalid filenames"))
+			}
+			inputFiles += runDirectory.getCanonicalPath + "/" + name
+			using (new FileWriter(runDirectory.getCanonicalPath + "/" + name)) { fileWriter => {
+				fileWriter.write(code, 0, code.length)
 			}}
 		}
 		
@@ -100,7 +100,7 @@ object Runner extends RunnerService with Log with Using {
 	}
 	
 	def compile(message: CompileInputMessage): CompileOutputMessage = {
-		// lang: String, code: List[String], master_lang: Option[String], master_code: Option[List[String]]
+		// lang: String, code: Map[String, String], master_lang: Option[String], master_code: Option[Map[String, String]]
 		info("compile {}", message.lang)
 		
 		val compileDirectory = new File(Config.get("compile.root", "."))

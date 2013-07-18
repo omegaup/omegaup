@@ -70,6 +70,10 @@ class FileHandler {
 	}
 
 	private static function rrmdir($dir) {
+		if (!is_dir($dir)) {
+			return;
+		}
+
 		foreach (glob($dir . '/*') as $file) {
 			if (is_dir($file)) {
 				self::rrmdir($file);

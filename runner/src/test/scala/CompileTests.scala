@@ -30,32 +30,32 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
   }
 
   "Compile error" should "be correctly handled" in {
-    val test1 = Runner.compile(CompileInputMessage("c", List("foo")))
+    val test1 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "foo")))
     test1.status should equal ("compile error")
     
-    val test2 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>")))
+    val test2 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "#include<stdio.h>")))
     test2.status should equal ("compile error")
     
-    val test3 = Runner.compile(CompileInputMessage("c", List("#include</dev/urandom>")))
+    val test3 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "#include</dev/urandom>")))
     test3.status should equal ("compile error")
     
-    val test4 = Runner.compile(CompileInputMessage("cpp", List("foo")))
+    val test4 = Runner.compile(CompileInputMessage("cpp", Map("Main.cpp" -> "foo")))
     test4.status should equal ("compile error")
     
-    val test5 = Runner.compile(CompileInputMessage("cpp", List("#include<stdio.h>")))
+    val test5 = Runner.compile(CompileInputMessage("cpp", Map("Main.cpp" -> "#include<stdio.h>")))
     test5.status should equal ("compile error")
     
-    val test6 = Runner.compile(CompileInputMessage("cpp", List("#include</dev/urandom>")))
+    val test6 = Runner.compile(CompileInputMessage("cpp", Map("Main.cpp" -> "#include</dev/urandom>")))
     test6.status should equal ("compile error")
     
-    val test7 = Runner.compile(CompileInputMessage("java", List("foo")))
+    val test7 = Runner.compile(CompileInputMessage("java", Map("Main.java" -> "foo")))
     test7.status should equal ("compile error")
   }
   
   "OK" should "be correctly handled" in {
     val zipRoot = new File("test-env")
 
-    val test1 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { int x; scanf(\"%d\", &x); switch (x) { case 0: printf(\"Hello, World!\\n\"); break; case 1: while(1); break; case 2: fork(); break; case 3: while(1) malloc(1024*1024); break; case 4: while(1) printf(\"trololololo\\n\"); break; case 5: fopen(\"/etc/passwd\", \"r\"); break; case 6: printf(\"%s\", (char*)(x-6)); break; case 7: printf(\"%d\", 1/(x-7)); break; case 8: return 1; } return 0; }")))
+    val test1 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { int x; scanf(\"%d\", &x); switch (x) { case 0: printf(\"Hello, World!\\n\"); break; case 1: while(1); break; case 2: fork(); break; case 3: while(1) malloc(1024*1024); break; case 4: while(1) printf(\"trololololo\\n\"); break; case 5: fopen(\"/etc/passwd\", \"r\"); break; case 6: printf(\"%s\", (char*)(x-6)); break; case 7: printf(\"%d\", 1/(x-7)); break; case 8: return 1; } return 0; }")))
     
     test1.status should equal ("ok")
     test1.token should not equal None
@@ -73,7 +73,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       new CaseData("ret1", "8")
     ))), new File(zipRoot.getCanonicalPath + "/test1.zip"))
     
-    val test2 = Runner.compile(CompileInputMessage("cpp", List("#include<cstdio>\n#include<cstdlib>\n#include <unistd.h>\nusing namespace std;\nint main() { int x; scanf(\"%d\", &x); switch (x) { case 0: printf(\"Hello, World!\\n\"); break; case 1: while(1); break; case 2: fork(); break; case 3: while(1) malloc(1024*1024); break; case 4: while(1) printf(\"trololololo\\n\"); break; case 5: fopen(\"/etc/passwd\", \"r\"); break; case 6: printf(\"%s\", (char*)(x-6)); break; case 7: printf(\"%d\", 1/(x-7)); break; case 8: return 1;} return 0; }")))
+    val test2 = Runner.compile(CompileInputMessage("cpp", Map("Main.cpp" -> "#include<cstdio>\n#include<cstdlib>\n#include <unistd.h>\nusing namespace std;\nint main() { int x; scanf(\"%d\", &x); switch (x) { case 0: printf(\"Hello, World!\\n\"); break; case 1: while(1); break; case 2: fork(); break; case 3: while(1) malloc(1024*1024); break; case 4: while(1) printf(\"trololololo\\n\"); break; case 5: fopen(\"/etc/passwd\", \"r\"); break; case 6: printf(\"%s\", (char*)(x-6)); break; case 7: printf(\"%d\", 1/(x-7)); break; case 8: return 1;} return 0; }")))
     test2.status should equal ("ok")
     test2.token should not equal None
     
@@ -89,7 +89,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       new CaseData("ret1", "8")
     ))), new File(zipRoot.getCanonicalPath + "/test2.zip"))
     
-    val test3 = Runner.compile(CompileInputMessage("java", List("import java.io.*;\nimport java.util.*;\nclass Main {public static void main(String[] args) throws Exception{Scanner in = new Scanner(System.in); List l = new ArrayList(); switch(in.nextInt()){case 0: System.out.println(\"Hello, World!\\n\"); break; case 1: while(true) {} case 2: Runtime.getRuntime().exec(\"/bin/ls\").waitFor(); break; case 3: while(true) {l.add(new ArrayList(1024*1024));} case 4: while(true) {System.out.println(\"trololololo\");} case 5: new FileInputStream(\"/etc/shadow\"); break; case 6: System.out.println(l.get(0)); break; case 7: System.out.println(1 / (int)(Math.sin(0.1))); break; case 8: System.exit(1); break; }}}")))
+    val test3 = Runner.compile(CompileInputMessage("java", Map("Main.java" -> "import java.io.*;\nimport java.util.*;\nclass Main {public static void main(String[] args) throws Exception{Scanner in = new Scanner(System.in); List l = new ArrayList(); switch(in.nextInt()){case 0: System.out.println(\"Hello, World!\\n\"); break; case 1: while(true) {} case 2: Runtime.getRuntime().exec(\"/bin/ls\").waitFor(); break; case 3: while(true) {l.add(new ArrayList(1024*1024));} case 4: while(true) {System.out.println(\"trololololo\");} case 5: new FileInputStream(\"/etc/shadow\"); break; case 6: System.out.println(l.get(0)); break; case 7: System.out.println(1 / (int)(Math.sin(0.1))); break; case 8: System.exit(1); break; }}}")))
     test3.status should equal ("ok")
     test3.token should not equal None
     
@@ -109,17 +109,17 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
   "Exploits" should "be handled" in {
     val zipRoot = new File("test-env")
 
-    val test4 = Runner.compile(CompileInputMessage("cpp", List("int main() { (*(void (*)())\"\\x6a\\x39\\x58\\x0f\\x05\\xeb\\xf9\")(); }")))
+    val test4 = Runner.compile(CompileInputMessage("cpp", Map("Main.cpp" -> "int main() { (*(void (*)())\"\\x6a\\x39\\x58\\x0f\\x05\\xeb\\xf9\")(); }")))
     Runner.run(RunInputMessage(test4.token.get, 1, 65536, 1, None, Some(List(
       new CaseData("ok", "0")
     ))), new File(zipRoot.getCanonicalPath + "/test4.zip"))
 
-    val test5 = Runner.compile(CompileInputMessage("cpp", List("int main() { (*(void (*)())\"\\x6a\\x02\\x58\\xcd\\x80\\xeb\\xf9\")(); }")))
+    val test5 = Runner.compile(CompileInputMessage("cpp", Map("Main.cpp" -> "int main() { (*(void (*)())\"\\x6a\\x02\\x58\\xcd\\x80\\xeb\\xf9\")(); }")))
     Runner.run(RunInputMessage(test5.token.get, 1, 65536, 1, None, Some(List(
       new CaseData("ok", "0")
     ))), new File(zipRoot.getCanonicalPath + "/test5.zip"))
 
-    val test6 = Runner.compile(CompileInputMessage("java", List("""
+    val test6 = Runner.compile(CompileInputMessage("java", Map("Main.java" -> """
       class Main {
         public static void main(String[] args) {
           double d = 2.2250738585072012e-308;
@@ -128,7 +128,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       }""")))
     test6.status should equal ("ok")
 
-    val test7 = Runner.compile(CompileInputMessage("java", List("""
+    val test7 = Runner.compile(CompileInputMessage("java", Map("Main.java" -> """
       class Main {
         public static void main(String[] args) {
           double d = Double.parseDouble("2.2250738585072012e-308");
@@ -141,13 +141,13 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
   "Validator" should "work" in {
     val zipRoot = new File("test-env")
 
-    val test1 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c")))
+    val test1 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c")))
     test1.status should equal ("judge error")
 
-    val test2 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("foo"))))
+    val test2 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(Map("validator.c" -> "foo"))))
     test2.status should equal ("judge error")
 
-    val test3 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"0\\n\"); return 0; }"))))
+    val test3 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(Map("validator.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"0\\n\"); return 0; }"))))
     test3.status should equal ("ok")
     test3.token should not equal None
     
@@ -155,7 +155,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       new CaseData("zero", "0")
     ))), new File(zipRoot.getCanonicalPath + "/test6.zip"))
 
-    val test4 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"foo\\n\"); return 0; }"))))
+    val test4 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"100\\n\"); return 0; }"), Some("c"), Some(Map("validator.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { printf(\"foo\\n\"); return 0; }"))))
     test4.status should equal ("ok")
     test4.token should not equal None
     
@@ -163,13 +163,13 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       new CaseData("je", "0")
     ))), new File(zipRoot.getCanonicalPath + "/test7.zip"))
 
-    val test7 = Runner.compile(CompileInputMessage("kj", List("foo")))
+    val test7 = Runner.compile(CompileInputMessage("kj", Map("Main.kj" -> "foo")))
     test7.status should not equal ("ok")
 
-    val test8 = Runner.compile(CompileInputMessage("kj", List("class program { program() { while(notFacingEast) turnleft(); pickbeeper(); turnoff(); } }")))
+    val test8 = Runner.compile(CompileInputMessage("kj", Map("Main.kj" -> "class program { program() { while(notFacingEast) turnleft(); pickbeeper(); turnoff(); } }")))
     test8.status should equal ("ok")
 
-    val test5 = Runner.compile(CompileInputMessage("c", List("#include<stdio.h>\n#include<stdlib.h>\nint main() { double a, b; scanf(\"%lf %lf\", &a, &b); printf(\"%lf\\n\", a + b); return 0; }"), Some("c"), Some(List("#include<stdio.h>\n#include<stdlib.h>\nint main() { FILE* data = fopen(\"data.in\", \"r\"); double a, b, answer, user; fscanf(data, \"%lf %lf\", &a, &b); scanf(\"%lf\", &user); answer = a*a + b*b; printf(\"%lf\\n\", 1.0 / (1.0 + (answer - user) * (answer - user))); return 0; }"))))
+    val test5 = Runner.compile(CompileInputMessage("c", Map("Main.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { double a, b; scanf(\"%lf %lf\", &a, &b); printf(\"%lf\\n\", a + b); return 0; }"), Some("c"), Some(Map("validator.c" -> "#include<stdio.h>\n#include<stdlib.h>\nint main() { FILE* data = fopen(\"data.in\", \"r\"); double a, b, answer, user; fscanf(data, \"%lf %lf\", &a, &b); scanf(\"%lf\", &user); answer = a*a + b*b; printf(\"%lf\\n\", 1.0 / (1.0 + (answer - user) * (answer - user))); return 0; }"))))
     test5.status should equal ("ok")
     test5.token should not equal None
     
@@ -180,7 +180,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
       new CaseData("half", "0.5 0.5\n")
     ))), new File(zipRoot.getCanonicalPath + "/test8.zip"))
 
-    val test6 = Runner.compile(CompileInputMessage("cpp", List("#include<iostream>\nint main() { double a, b; std::cin >> a >> b; std::cout << a*a + b*b << std::endl; return 0; }"), Some("py"), Some(List("data = open(\"data.in\", \"r\")\na, b = map(float, data.readline().strip().split())\nuser = float(raw_input().strip())\nanswer = a**2 + b**2\nprint 1.0 / (1.0 + (answer - user)**2)"))))
+    val test6 = Runner.compile(CompileInputMessage("cpp", Map("Main.cpp" -> "#include<iostream>\nint main() { double a, b; std::cin >> a >> b; std::cout << a*a + b*b << std::endl; return 0; }"), Some("py"), Some(Map("validator.py" -> "data = open(\"data.in\", \"r\")\na, b = map(float, data.readline().strip().split())\nuser = float(raw_input().strip())\nanswer = a**2 + b**2\nprint 1.0 / (1.0 + (answer - user)**2)"))))
     test6.status should equal ("ok")
     test6.token should not equal None
     

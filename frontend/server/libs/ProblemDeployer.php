@@ -189,6 +189,11 @@ class ProblemDeployer {
 					$this->filesToUnzip[] = $zip->getNameIndex($i);
 					Logger::log("Validator found: " . $zip->getNameIndex($i));
 				}
+
+				// Interactive problems.
+				if (stripos($zip->getNameIndex($i), 'interactive/') === 0) {
+					$this->filesToUnzip[] = $zip->getNameIndex($i);
+				}
 			}
 
 			if ($size > ProblemDeployer::MAX_ZIP_FILESIZE) {
