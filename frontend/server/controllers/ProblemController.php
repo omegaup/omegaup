@@ -130,15 +130,15 @@ class ProblemController extends Controller {
 				throw new ForbiddenAccessException();
 			}
 		}
-		
+
 		Validators::isStringNonEmpty($r["title"], "title", $is_required);
-		Validators::isStringNonEmpty($r["source"], "source", $is_required);		
+		Validators::isStringNonEmpty($r["source"], "source", $is_required);
 		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
 		Validators::isInEnum($r["validator"], "validator", array("remote", "literal", "token", "token-caseless", "token-numeric"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
-		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);		
+		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
 	}
-	
+
 	/**
 	 * Builds a problem alias from a problem title
 	 * 
@@ -149,20 +149,20 @@ class ProblemController extends Controller {
 		$alias = "";
 
 		// Remove accents				
-		$alias = ApiUtils::RemoveAccents($title);		
+		$alias = ApiUtils::RemoveAccents($title);
 
 		// To lower-case
 		$alias = strtolower($alias);
 
 		// Replace spaces for -
 		$alias = str_replace(' ', '-', $alias);
-		
+
 		// Sanity url encode
 		$alias = urlencode($alias);
 
 		// Limit result to 32 chars
 		$alias = substr($alias, 0, 32);
-								
+
 		return $alias;
 	}
 
@@ -831,6 +831,25 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Validate list request
+	 * 
+	 * @param Request $r
+	 */
+	private static function validateList(Request $r) {
+
+		Validators::isNumber($r["offset"], "offset", false);
+		Validators::isNumber($r["rowcount"], "rowcount", false);
+
+		// Defaults for offset and rowcount
+		if (!isset($r["offset"])) {
+			$r["offset"] = 0;
+		}
+		if (!isset($r["rowcount"])) {
+			$r["rowcount"] = 200;
+		}
+	}
+
+	/**
 	 * List of public and user's private problems
 	 * 
 	 * @param Request $r
@@ -845,16 +864,7 @@ class ProblemController extends Controller {
 			// Do nothing, we allow unauthenticated users to use this API
 		}
 
-		Validators::isNumber($r["offset"], "offset", false);
-		Validators::isNumber($r["rowcount"], "rowcount", false);
-
-		// Defaults for offset and rowcount
-		if (!isset($r["offset"])) {
-			$r["offset"] = 0;
-		}
-		if (!isset($r["rowcount"])) {
-			$r["rowcount"] = 200;
-		}
+		self::validateList($r);
 
 		$response = array();
 		$response["results"] = array();
@@ -886,6 +896,36 @@ class ProblemController extends Controller {
 			}
 		}
 
+		$response["status"] = "ok";
+		return $response;
+	}
+
+	/**
+	 * 
+	 * Gets a list of problems where current user is the owner
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiMyList(Request $r) {
+
+		self::authenticateRequest($r);
+		self::validateList($r);
+
+		$response = array();
+		$response["results"] = array();
+		
+		try {
+			$problem_mask = new Problems(array(
+						"author_id" => $r["current_user_id"]
+					));
+			$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
+			foreach ($problems as $problem) {
+				array_push($response["results"], $problem->asArray());
+			}
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
 		$response["status"] = "ok";
 		return $response;
 	}

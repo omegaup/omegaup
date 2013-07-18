@@ -103,5 +103,25 @@ class ProblemList extends OmegaupTestCase {
 				
 		$this->assertEquals($problemDataPrivate["request"]["alias"], $response["results"][0]["alias"]);		
 	}
+	
+	/**
+	 * Test myList API
+	 */
+	public function testMyList() {
+		
+		// Get 3 problems
+		$author = UserFactory::createUser();
+		$n = 3;
+		for ($i = 0; $i < $n; $i++) {
+			$problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
+		}
+		
+		$r = new Request();
+		$r["auth_token"] = $this->login($author);		
+
+		$response = ProblemController::apiMyList($r);		
+		$this->assertEquals(3, count($response["results"]));
+		$this->assertEquals($problemData[2]["request"]["alias"], $response["results"][0]["alias"]);
+	}
 }
 
