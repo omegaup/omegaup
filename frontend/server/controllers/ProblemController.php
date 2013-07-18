@@ -130,28 +130,13 @@ class ProblemController extends Controller {
 				throw new ForbiddenAccessException();
 			}
 		}
-
-		Validators::isStringNonEmpty($r["author_username"], "author_username", $is_required);
-
-		if (!$is_update) {
-			// Check if author_username actually exists
-			$u = new Users();
-			$u->setUsername($r["author_username"]);
-			$users = UsersDAO::search($u);
-			if (count($users) !== 1) {
-				throw new NotFoundException("author_username not found");
-			}
-
-			$r["author"] = $users[0];
-		}
-
+		
 		Validators::isStringNonEmpty($r["title"], "title", $is_required);
-		Validators::isStringNonEmpty($r["source"], "source", $is_required);
+		Validators::isStringNonEmpty($r["source"], "source", $is_required);		
 		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
 		Validators::isInEnum($r["validator"], "validator", array("remote", "literal", "token", "token-caseless", "token-numeric"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
-		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
-		Validators::isInEnum($r["order"], "order", array("normal", "inverse"), $is_required);
+		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);		
 	}
 	
 	/**
@@ -169,7 +154,7 @@ class ProblemController extends Controller {
 		// To lower-case
 		$alias = strtolower($alias);
 
-		// Replace - for space		
+		// Replace spaces for -
 		$alias = str_replace(' ', '-', $alias);
 		
 		// Sanity url encode
@@ -197,7 +182,7 @@ class ProblemController extends Controller {
 
 		// Populate a new Problem object
 		$problem = new Problems();
-		$problem->setPublic($r["public"]);
+		$problem->setPublic($r["public"]); /* private by default */
 		$problem->setTitle($r["title"]);
 		$problem->setValidator($r["validator"]);
 		$problem->setTimeLimit($r["time_limit"]);
@@ -207,8 +192,8 @@ class ProblemController extends Controller {
 		$problem->setAccepted(0);
 		$problem->setDifficulty(0);
 		$problem->setSource($r["source"]);
-		$problem->setOrder($r["order"]);
-		$problem->setAuthorId($r["author"]->getUserId());
+		$problem->setOrder("normal"); /* defaulting to normal */
+		$problem->setAuthorId($r["current_user_id"]);
 
 		$r["alias"] = self::buildAlias($r["title"]);
 		$problem->setAlias($r["alias"]);

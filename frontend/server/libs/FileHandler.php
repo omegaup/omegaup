@@ -74,12 +74,12 @@ class FileHandler {
 			if (is_dir($file)) {
 				self::rrmdir($file);
 			} else
-			if (!unlink($file)) {
+			if (!@unlink($file)) {
 				throw new Exception("FATAL: Not able to delete file " . $file);
 			}
 		}
 
-		if (!rmdir($dir)) {
+		if (!@rmdir($dir)) {
 			throw new Exception("FATAL: Not able to delete dir " . $dir);
 		}
 	}

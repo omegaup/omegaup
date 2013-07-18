@@ -68,7 +68,8 @@ class ProblemsFactory {
         $_FILES['problem_contents']['tmp_name'] = $zipName; 
         
         return array ("request" => $r,
-			"author" => $author);
+			"author" => $author,
+			"zip_path" => $zipName);
     }
     
 	public static function createProblemWithAuthor(Users $author) {

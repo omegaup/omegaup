@@ -126,8 +126,7 @@ class CreateProblemTest extends OmegaupTestCase {
 			"validator",
 			"time_limit",
 			"memory_limit",
-			"source",
-			"author_username",			
+			"source",			
 		);
 
 		foreach ($valid_keys as $key) {
