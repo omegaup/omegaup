@@ -32,7 +32,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "create")) {
 		$smarty->assign('MEMORY_LIMIT', $_POST["memory_limit"]);
 		$smarty->assign('SOURCE', $_POST["source"]);
 	} else if ($response["status"] == "ok") {
-		$smarty->assign('STATUS', "New problem created succesfully!");
+		$smarty->assign('STATUS', "New problem created succesfully! Alias: " . $response["alias"]);
 	}
 }
 

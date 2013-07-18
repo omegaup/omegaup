@@ -25,7 +25,7 @@ class ProblemCreateUITest extends OmegaupUITestCase {
 		// Click inicia sesion		
 		$this->clickAndWait("//input[@value='Crear problema']");
 		
-		$this->assertElementContainsText('//*[@id="content"]/div[2]/div', "New problem created succesfully!");
+		$this->assertElementContainsText('//*[@id="content"]/div[2]/div', "New problem created succesfully! Alias: " . $problemData["request"]["alias"]);
 	}
 	
 	public function testCreateProblemMissingParameters() {

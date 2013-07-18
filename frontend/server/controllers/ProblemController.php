@@ -831,7 +831,7 @@ class ProblemController extends Controller {
 	}
 
 	/**
-	 * List of public problems
+	 * List of public and user's private problems
 	 * 
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
@@ -860,7 +860,7 @@ class ProblemController extends Controller {
 		$response["results"] = array();
 		for ($i = 0; $i < 2; $i++) {
 
-			// Add public in the first pass, private in the second
+			// Add private in the first pass, public in the second
 			try {
 				$problem_mask = NULL;
 				if ($i == 0 && !is_null($r["current_user_id"])) {
