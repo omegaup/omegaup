@@ -915,10 +915,16 @@ class ProblemController extends Controller {
 		$response["results"] = array();
 		
 		try {
-			$problem_mask = new Problems(array(
-						"author_id" => $r["current_user_id"]
+			$problems = NULL;
+			if (Authorization::IsSystemAdmin($r["current_user_id"])) {
+				$problems = ProblemsDAO::getAll(NULL, NULL, "problem_id", 'DESC');	
+			} else {			
+				$problem_mask = new Problems(array(
+							"author_id" => $r["current_user_id"]
 					));
-			$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
+				$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
+			}
+			
 			foreach ($problems as $problem) {
 				array_push($response["results"], $problem->asArray());
 			}
