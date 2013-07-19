@@ -377,7 +377,7 @@ class ProblemController extends Controller {
 			// Save the contest object with data sent by user to the database
 			ProblemsDAO::save($r["problem"]);
 
-			if (isset($_FILES['problem_contents'])) {
+			if (isset($_FILES['problem_contents']) && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
 
 				// DeployProblemZip requires alias => problem_alias
 				$r["alias"] = $r["problem_alias"];
@@ -499,7 +499,7 @@ class ProblemController extends Controller {
 			}
 		} else {
 
-			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+			if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 				// If the problem is requested outside a contest, we need to check that it is not private
 				if ($r["problem"]->getPublic() == "0") {
 					throw new ForbiddenAccessException("Problem is marked as private.");

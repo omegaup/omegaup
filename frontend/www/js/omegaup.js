@@ -218,7 +218,31 @@ OmegaUp.prototype.getProblems = function(callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getMyProblems = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/problem/mylist/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
 };
 
 OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
