@@ -9,6 +9,26 @@
 class AddProblemToContestTest extends OmegaupTestCase {
 	
 	/**
+	 * Check in DB for problem added to contest
+	 * 
+	 * @param array $problemData
+	 * @param array $contestData
+	 * @param Request $r
+	 */
+	public static function assertProblemAddedToContest($problemData, $contestData, $r) {
+		
+		// Get problem and contest from DB
+		$problem = ProblemsDAO::getByAlias($problemData["request"]["alias"]);
+		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
+		
+		// Get problem-contest and verify it
+        $contest_problems = ContestProblemsDAO::getByPK($contest->getContestId(), $problem->getProblemId());
+        self::assertNotNull($contest_problems);        
+        self::assertEquals($r["points"], $contest_problems->getPoints());    		
+		self::assertEquals($r["order_in_contest"], $contest_problems->getOrder());		
+	}
+	
+	/**
 	 * Add a problem to contest with valid params
 	 */
 	public function testAddProblemToContestPositive() {				
@@ -37,15 +57,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 		// Validate
 		$this->assertEquals("ok", $response["status"]);
 		
-		// Get problem and contest from DB
-		$problem = ProblemsDAO::getByAlias($problemData["request"]["alias"]);
-		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
-		
-		// Get problem-contest and verify it
-        $contest_problems = ContestProblemsDAO::getByPK($contest->getContestId(), $problem->getProblemId());
-        $this->assertNotNull($contest_problems);        
-        $this->assertEquals($r["points"], $contest_problems->getPoints());    		
-		$this->assertEquals($r["order_in_contest"], $contest_problems->getOrder());
+		self::assertProblemAddedToContest($problemData, $contestData, $r);
 		
 	}
 	

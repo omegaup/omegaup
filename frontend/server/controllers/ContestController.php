@@ -5,7 +5,7 @@
  * 
  */
 class ContestController extends Controller {
-	
+
 	/**
 	 * Returns a list of contests
 	 * 
@@ -76,7 +76,7 @@ class ContestController extends Controller {
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
-			
+
 			// Admins can see all contests
 			if ($contestUser === null && !Authorization::IsContestAdmin($r["current_user_id"], $c)) {
 				/**
@@ -101,6 +101,51 @@ class ContestController extends Controller {
 			"number_of_results" => sizeof($addedContests),
 			"results" => $addedContests
 		);
+	}
+
+	/**
+	 * Returls a list of contests where current user is the director
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiMyList(Request $r) {
+
+		self::authenticateRequest($r);
+
+		// Create array of relevant columns
+		$relevant_columns = array("title", "alias");
+		$contests = null;
+		try {
+
+			$contests = ContestsDAO::getAll(NULL, NULL, "contest_id", 'DESC');
+
+			// If current user is not sys admin, then we need to filter out the contests where
+			// the current user is not contest admin			
+			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+				$contests_all = $contests;
+				$contests = array();
+				
+				foreach ($contests_all as $c) {
+					if (Authorization::IsContestAdmin($r["current_user_id"], $c)) {
+						$contests[] = $c;
+					}
+				}				
+			}
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$addedContests = array();
+		foreach ($contests as $c) {
+			$contestInfo = $c->asFilteredArray($relevant_columns);
+			$addedContests[] = $contestInfo;
+		}
+
+		$response["results"] = $addedContests;
+		$response["status"] = "ok";
+		return $response;
 	}
 
 	/**
@@ -548,7 +593,7 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateAddUser(Request $r) {
-		
+
 		$r["user"] = null;
 
 		// Check contest_alias        
@@ -571,9 +616,8 @@ class ContestController extends Controller {
 		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException();
 		}
-		
 	}
-	
+
 	/**
 	 * Adds a user to a contest.
 	 * By default, any user can view details of public contests.
@@ -608,7 +652,7 @@ class ContestController extends Controller {
 
 		return array("status" => "ok");
 	}
-	
+
 	/**
 	 * Remove a user from a private contest
 	 * 
@@ -617,22 +661,22 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiRemoveUser(Request $r) {
-		
+
 		// Authenticate logged user
 		self::authenticateRequest($r);
-		
+
 		self::validateAddUser($r);
-		
+
 		$contest_user = new ContestsUsers();
 		$contest_user->setContestId($r["contest"]->getContestId());
 		$contest_user->setUserId($r["user"]->getUserId());
-		
+
 		try {
 			ContestsUsersDAO::delete($contest_user);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		return array("status" => "ok");
 	}
 
@@ -803,21 +847,21 @@ class ContestController extends Controller {
 					// First, let's order by answer
 					$a_answered = strlen($a['answer']) > 0;
 					$b_answered = strlen($b['answer']) > 0;
-					
-					if ($a_answered === $b_answered) {						
+
+					if ($a_answered === $b_answered) {
 						$t1 = strtotime($a["time"]);
 						$t2 = strtotime($b["time"]);
 
 						if ($t1 === $t2)
 							return 0;
-						
+
 						// If answered, then older goes first
-						if ($a_answered === false) {							
+						if ($a_answered === false) {
 							return ($t1 > $t2) ? 1 : -1;
 						} else {
 							return ($t1 > $t2) ? -1 : 1;
 						}
-					} 
+					}
 
 					// If a is not answered, it has priority
 					if ($a_answered === false) {
@@ -1205,7 +1249,7 @@ class ContestController extends Controller {
 		}
 
 		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj'), false);
-		
+
 		// Get user if we have something in username
 		if (!is_null($r["username"])) {
 			$r["user"] = UserController::resolveUser($r["username"]);
@@ -1361,9 +1405,9 @@ class ContestController extends Controller {
 		Validators::isStringNonEmpty($r["filterBy"], "filterBy", false /* not required */);
 
 		$contestReport = $scoreboard->generate(
-			true, // with run details for reporting
-			true, // sort contestants by name,
-			(isset($r["filterBy"]) ? null : $r["filterBy"]));
+				true, // with run details for reporting
+				true, // sort contestants by name,
+				(isset($r["filterBy"]) ? null : $r["filterBy"]));
 
 		$contestReport["status"] = "ok";
 		return $contestReport;
@@ -1407,22 +1451,21 @@ class ContestController extends Controller {
 
 		// Build a csv
 		$csvData = array();
-		
+
 		// Build titles
 		$csvRow = array();
 		$csvRow[] = "username";
 		foreach ($contestReport[0]["problems"] as $key => $problemData) {
-			foreach($problemStats[$key]["cases_stats"] as $caseName => $counts) {
+			foreach ($problemStats[$key]["cases_stats"] as $caseName => $counts) {
 				$csvRow[] = $caseName;
 			}
-			$csvRow[] = $key." total";
-			
+			$csvRow[] = $key . " total";
 		}
 		$csvRow[] = "total";
 		$csvData[] = $csvRow;
 
 		foreach ($contestReport as $userData) {
-			
+
 			if ($userData === "ok") {
 				continue;
 			}
@@ -1486,48 +1529,49 @@ class ContestController extends Controller {
 	}
 
 	public static function apiDownload(Request $r) {
-		
+
 		self::authenticateRequest($r);
-		
+
 		self::validateStats($r);
-		
+
 		// Get our runs
 		$relevant_columns = array("run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
 		try {
 			$runs = RunsDAO::search(new Runs(array(
-				"contest_id" => $r["contest"]->getContestId()
-			)),"time", "DESC", $relevant_columns);
+								"contest_id" => $r["contest"]->getContestId()
+							)), "time", "DESC", $relevant_columns);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
-		$zip = new ZipStream($r["contest_alias"] . '.zip');
-				
-		// Add runs to zip
-		$table = "guid,user,problem,veredict,points\n";		
-		foreach($runs as $run) {
 
-			$zip->add_file_from_path("runs/".$run->getGuid(), RUNS_PATH . '/' . $run->getGuid());
-			
+		$zip = new ZipStream($r["contest_alias"] . '.zip');
+
+		// Add runs to zip
+		$table = "guid,user,problem,veredict,points\n";
+		foreach ($runs as $run) {
+
+			$zip->add_file_from_path("runs/" . $run->getGuid(), RUNS_PATH . '/' . $run->getGuid());
+
 			$columns[0] = 'username';
 			$columns[1] = 'alias';
 			$usernameProblemData = $run->asFilteredArray($columns);
-			
-			$table .= $run->getGuid() .",". $usernameProblemData['username'] .",". $usernameProblemData['alias'] .",". $run->getVeredict() .",". $run->getContestScore();				
+
+			$table .= $run->getGuid() . "," . $usernameProblemData['username'] . "," . $usernameProblemData['alias'] . "," . $run->getVeredict() . "," . $run->getContestScore();
 			$table .= "\n";
 		}
-		
+
 		$zip->add_file("summary.csv", $table);
-		
+
 		// Add problem cases to zip
 		$contest_problems = ContestProblemsDAO::GetRelevantProblems($r["contest"]->getContestId());
-		foreach($contest_problems as $problem) {
-			$zip->add_file_from_path($problem->getAlias()."_cases.zip", PROBLEMS_PATH . "/" . $problem->getAlias() ."/cases.zip");
+		foreach ($contest_problems as $problem) {
+			$zip->add_file_from_path($problem->getAlias() . "_cases.zip", PROBLEMS_PATH . "/" . $problem->getAlias() . "/cases.zip");
 		}
-		
+
 		// Return zip
 		$zip->finish();
 		die();
 	}
+
 }
