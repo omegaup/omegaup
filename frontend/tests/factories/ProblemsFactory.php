@@ -53,12 +53,9 @@ class ProblemsFactory {
 		if (is_null($zipName)) {
 			$zipName = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
 		}
-		
-        $alias = substr(Utils::CreateRandomString(), 0, 10);
-        
+		                
 		$r = new Request();
-        $r["title"] = $title;
-        $r["alias"] = $alias;
+        $r["title"] = $title;        
         $r["author_username"] = $author->getUsername();
         $r["validator"] = "token";
         $r["time_limit"] = 5000;
@@ -71,7 +68,8 @@ class ProblemsFactory {
         $_FILES['problem_contents']['tmp_name'] = $zipName; 
         
         return array ("request" => $r,
-			"author" => $author);
+			"author" => $author,
+			"zip_path" => $zipName);
     }
     
 	public static function createProblemWithAuthor(Users $author) {

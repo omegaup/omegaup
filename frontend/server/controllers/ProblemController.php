@@ -131,28 +131,39 @@ class ProblemController extends Controller {
 			}
 		}
 
-		Validators::isStringNonEmpty($r["author_username"], "author_username", $is_required);
-
-		if (!$is_update) {
-			// Check if author_username actually exists
-			$u = new Users();
-			$u->setUsername($r["author_username"]);
-			$users = UsersDAO::search($u);
-			if (count($users) !== 1) {
-				throw new NotFoundException("author_username not found");
-			}
-
-			$r["author"] = $users[0];
-		}
-
 		Validators::isStringNonEmpty($r["title"], "title", $is_required);
 		Validators::isStringNonEmpty($r["source"], "source", $is_required);
-		Validators::isStringNonEmpty($r["alias"], "alias", $is_required);
 		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
 		Validators::isInEnum($r["validator"], "validator", array("remote", "literal", "token", "token-caseless", "token-numeric"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
-		Validators::isInEnum($r["order"], "order", array("normal", "inverse"), $is_required);
+	}
+
+	/**
+	 * Builds a problem alias from a problem title
+	 * 
+	 * @param string $title
+	 */
+	private static function buildAlias($title) {
+
+		$alias = "";
+
+		// Remove accents				
+		$alias = ApiUtils::RemoveAccents($title);
+
+		// To lower-case
+		$alias = strtolower($alias);
+
+		// Replace spaces for -
+		$alias = str_replace(' ', '-', $alias);
+
+		// Sanity url encode
+		$alias = urlencode($alias);
+
+		// Limit result to 32 chars
+		$alias = substr($alias, 0, 32);
+
+		return $alias;
 	}
 
 	/**
@@ -171,9 +182,8 @@ class ProblemController extends Controller {
 
 		// Populate a new Problem object
 		$problem = new Problems();
-		$problem->setPublic($r["public"]);
+		$problem->setPublic($r["public"]); /* private by default */
 		$problem->setTitle($r["title"]);
-		$problem->setAlias($r["alias"]);
 		$problem->setValidator($r["validator"]);
 		$problem->setTimeLimit($r["time_limit"]);
 		$problem->setMemoryLimit($r["memory_limit"]);
@@ -182,8 +192,11 @@ class ProblemController extends Controller {
 		$problem->setAccepted(0);
 		$problem->setDifficulty(0);
 		$problem->setSource($r["source"]);
-		$problem->setOrder($r["order"]);
-		$problem->setAuthorId($r["author"]->getUserId());
+		$problem->setOrder("normal"); /* defaulting to normal */
+		$problem->setAuthorId($r["current_user_id"]);
+
+		$r["alias"] = self::buildAlias($r["title"]);
+		$problem->setAlias($r["alias"]);
 
 		$problemDeployer = new ProblemDeployer();
 
@@ -214,7 +227,7 @@ class ProblemController extends Controller {
 
 			// Alias may be duplicated, 1062 error indicates that
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
-				throw new DuplicatedEntryInDatabaseException("problem_alias already exists.", $e);
+				throw new DuplicatedEntryInDatabaseException("Problem title already exists. Please try a different one.", $e);
 			} else {
 
 				// Rollback the problem if deployed partially
@@ -227,6 +240,7 @@ class ProblemController extends Controller {
 		// Adding unzipped files to response
 		$result["uploaded_files"] = $problemDeployer->filesToUnzip;
 		$result["status"] = "ok";
+		$result["alias"] = $r["alias"];
 
 		return $result;
 	}
@@ -363,7 +377,7 @@ class ProblemController extends Controller {
 			// Save the contest object with data sent by user to the database
 			ProblemsDAO::save($r["problem"]);
 
-			if (isset($_FILES['problem_contents'])) {
+			if (isset($_FILES['problem_contents']) && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
 
 				// DeployProblemZip requires alias => problem_alias
 				$r["alias"] = $r["problem_alias"];
@@ -484,8 +498,8 @@ class ProblemController extends Controller {
 				throw new ForbiddenAccessException("Contest has not started yet.");
 			}
 		} else {
-			
-			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+
+			if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 				// If the problem is requested outside a contest, we need to check that it is not private
 				if ($r["problem"]->getPublic() == "0") {
 					throw new ForbiddenAccessException("Problem is marked as private.");
@@ -817,7 +831,26 @@ class ProblemController extends Controller {
 	}
 
 	/**
-	 * List of public problems
+	 * Validate list request
+	 * 
+	 * @param Request $r
+	 */
+	private static function validateList(Request $r) {
+
+		Validators::isNumber($r["offset"], "offset", false);
+		Validators::isNumber($r["rowcount"], "rowcount", false);
+
+		// Defaults for offset and rowcount
+		if (!isset($r["offset"])) {
+			$r["offset"] = 0;
+		}
+		if (!isset($r["rowcount"])) {
+			$r["rowcount"] = 200;
+		}
+	}
+
+	/**
+	 * List of public and user's private problems
 	 * 
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
@@ -831,22 +864,13 @@ class ProblemController extends Controller {
 			// Do nothing, we allow unauthenticated users to use this API
 		}
 
-		Validators::isNumber($r["offset"], "offset", false);
-		Validators::isNumber($r["rowcount"], "rowcount", false);
-
-		// Defaults for offset and rowcount
-		if (!isset($r["offset"])) {
-			$r["offset"] = 0;
-		}
-		if (!isset($r["rowcount"])) {
-			$r["rowcount"] = 200;
-		}
+		self::validateList($r);
 
 		$response = array();
 		$response["results"] = array();
 		for ($i = 0; $i < 2; $i++) {
-		
-			// Add public in the first pass, private in the second
+
+			// Add private in the first pass, public in the second
 			try {
 				$problem_mask = NULL;
 				if ($i == 0 && !is_null($r["current_user_id"])) {
@@ -854,27 +878,61 @@ class ProblemController extends Controller {
 								"private" => 0,
 								"author_id" => $r["current_user_id"]
 							));
-					
-				} else if($i == 1) {
+				} else if ($i == 1) {
 					$problem_mask = new Problems(array(
 								"public" => 1
-							));										
+							));
 				}
-				
+
 				if (!is_null($problem_mask)) {
-					$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);										
-					
+					$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
+
 					foreach ($problems as $problem) {
 						array_push($response["results"], $problem->asArray());
 					}
 				}
-				
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
-			}			
+			}
 		}
 
-		$response["status"] = "ok";				
+		$response["status"] = "ok";
+		return $response;
+	}
+
+	/**
+	 * 
+	 * Gets a list of problems where current user is the owner
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiMyList(Request $r) {
+
+		self::authenticateRequest($r);
+		self::validateList($r);
+
+		$response = array();
+		$response["results"] = array();
+		
+		try {
+			$problems = NULL;
+			if (Authorization::IsSystemAdmin($r["current_user_id"])) {
+				$problems = ProblemsDAO::getAll(NULL, NULL, "problem_id", 'DESC');	
+			} else {			
+				$problem_mask = new Problems(array(
+							"author_id" => $r["current_user_id"]
+					));
+				$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
+			}
+			
+			foreach ($problems as $problem) {
+				array_push($response["results"], $problem->asArray());
+			}
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$response["status"] = "ok";
 		return $response;
 	}
 

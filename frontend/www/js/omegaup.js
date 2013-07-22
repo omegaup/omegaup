@@ -192,21 +192,27 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	});
 };
 
-OmegaUp.prototype.addProblemToContest = function(contestAlias, authorUsername, problemAlias, points, callback) {
+OmegaUp.prototype.addProblemToContest = function(contestAlias, order, problemAlias, points, callback) {
 	var self = this;
 
 	$.post(
 		'/api/contest/addProblem/contest_alias/' + contestAlias + '/problem_alias/' + problemAlias + '/',
-		{
-			author_username : authorUsername,
+		{			
 			problem_alias : problemAlias,
-			points : points
+			points : points,
+			order_in_contest : order
 		},
 		function (data) {
 			callback(data);
 		},
 		'json'
-	);
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
 };
 
 OmegaUp.prototype.getProblems = function(callback) {
@@ -218,7 +224,49 @@ OmegaUp.prototype.getProblems = function(callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getMyProblems = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/problem/mylist/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getMyContests = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/mylist/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
 };
 
 OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {

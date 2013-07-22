@@ -49,7 +49,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Verify DB data
 		$this->assertEquals($r["title"], $problem->getTitle());
-		$this->assertEquals($r["alias"], $problem->getAlias());
+		$this->assertEquals(substr($r["title"], 0, 32), $problem->getAlias());
 		$this->assertEquals($r["validator"], $problem->getValidator());
 		$this->assertEquals($r["time_limit"], $problem->getTimeLimit());
 		$this->assertEquals($r["memory_limit"], $problem->getMemoryLimit());
@@ -126,9 +126,7 @@ class CreateProblemTest extends OmegaupTestCase {
 			"validator",
 			"time_limit",
 			"memory_limit",
-			"source",
-			"author_username",
-			"alias"
+			"source",			
 		);
 
 		foreach ($valid_keys as $key) {
@@ -197,7 +195,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Verify DB data
 		$this->assertEquals($r["title"], $problem->getTitle());
-		$this->assertEquals($r["alias"], $problem->getAlias());
+		$this->assertEquals(substr($r["title"], 0, 32), $problem->getAlias());
 		$this->assertEquals($r["validator"], $problem->getValidator());
 		$this->assertEquals($r["time_limit"], $problem->getTimeLimit());
 		$this->assertEquals($r["memory_limit"], $problem->getMemoryLimit());
@@ -324,5 +322,59 @@ class CreateProblemTest extends OmegaupTestCase {
 		}
 	}
 
+		
+	/**
+	 * Test that we can produce a valid alias from the title
+	 */
+	public function testBuildAlias() {
+
+		// Get the problem data
+		$problemData = ProblemsFactory::getRequest();
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
+		
+		// Set a valid "complex" title
+		$r["title"] = "Lá Venganza Del Malvado Dr. Liraaa";
+
+		// Login user
+		$r["auth_token"] = $this->login($problemAuthor);
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+		// Call the API				
+		$response = ProblemController::apiCreate($r);
+
+		// Validate
+		// Verify response
+		$this->assertEquals("ok", $response["status"]);
+		$this->assertEquals("testplan", $response["uploaded_files"][10]);
+
+
+		// Verify data in DB
+		$problem_mask = new Problems();
+		$problem_mask->setTitle($r["title"]);
+		$problems = ProblemsDAO::search($problem_mask);
+
+		// Check that we only retreived 1 element
+		$this->assertEquals(1, count($problems));
+		$problem = $problems[0];
+
+		// Verify contest was found
+		$this->assertNotNull($problem);
+		$this->assertNotNull($problem->getProblemId());
+
+		// Verify DB data
+		$this->assertEquals($r["title"], $problem->getTitle());
+		$this->assertEquals("la-venganza-del-malvado-dr.-lira", $problem->getAlias());
+		
+		// Verify problem contents.zip were copied
+		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;
+
+		$this->assertFileExists($targetpath . "contents.zip");
+		$this->assertFileExists($targetpath . "testplan");
+		$this->assertFileExists($targetpath . "cases");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "en.html");						
+	}
 }
 
