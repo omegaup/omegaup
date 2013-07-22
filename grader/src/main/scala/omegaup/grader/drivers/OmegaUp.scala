@@ -9,7 +9,7 @@ import scala.util.matching.Regex
 import scala.actors.Actor
 import scala.actors.Scheduler
 import scala.actors.Actor._
-import scala.collection.mutable.ListMap
+import scala.collection.mutable.ListBuffer
 import Language._
 import Veredict._
 import Status._
@@ -19,7 +19,7 @@ object OmegaUp extends Actor with Log {
 	@throws(classOf[FileNotFoundException])
 	def createCompileMessage(run: Run, code: String): CompileInputMessage = {
 		var validatorLang: Option[String] = None
-		var validatorCode: Option[Map[String, String]] = None
+		var validatorCode: Option[List[(String, String)]] = None
 
 		if (run.problem.validator == Validator.Custom) {
 			List("c", "cpp", "py", "p", "rb").map(lang => {
@@ -30,7 +30,7 @@ object OmegaUp extends Actor with Log {
 					      validator.getCanonicalPath,
 					      run.problem.alias)
 					validatorLang = Some(lang)
-					validatorCode = Some(Map("Main." + lang -> FileUtil.read(validator.getCanonicalPath)))
+					validatorCode = Some(List(("Main." + lang, FileUtil.read(validator.getCanonicalPath))))
 				}
 
 				case _ => {
@@ -42,7 +42,7 @@ object OmegaUp extends Actor with Log {
 			debug("OU Using {} validator for problem {}", run.problem.validator, run.problem.alias)
 		}
 
-		val codes = new ListMap[String,String]
+		val codes = new ListBuffer[(String,String)]
 		val interactiveRoot = new File(Config.get("problems.root", "problems") + "/" + run.problem.alias + "/interactive")
 
 		if (interactiveRoot.isDirectory) {
@@ -75,7 +75,7 @@ object OmegaUp extends Actor with Log {
 		}
 
 		new CompileInputMessage(run.language.toString,
-		                        codes.toMap,
+		                        codes.result,
 		                        validatorLang,
 		                        validatorCode)
 	}

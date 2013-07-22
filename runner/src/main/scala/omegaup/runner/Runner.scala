@@ -12,7 +12,7 @@ import omegaup._
 import omegaup.data._
 
 object Runner extends RunnerService with Log with Using {
-	def compile(runDirectory: File, lang: String, codes: Map[String, String], error_string: String): CompileOutputMessage = {
+	def compile(runDirectory: File, lang: String, codes: List[(String, String)], error_string: String): CompileOutputMessage = {
 		runDirectory.mkdirs
 		
 		val inputFiles = new mutable.ListBuffer[String]
