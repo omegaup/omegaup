@@ -26,13 +26,55 @@ object Runner extends RunnerService with Log with Using {
 				fileWriter.write(code, 0, code.length)
 			}}
 		}
-		
+
 		val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
 		val profile = Config.get("runner.sandbox.profiles.path", Config.get("runner.sandbox.path", ".") + "/profiles")
 		val runtime = Runtime.getRuntime
 
 		val commonParams = List("-c", runDirectory.getCanonicalPath, "-q", "-M", runDirectory.getCanonicalPath + "/compile.meta", "-o", "compile.out", "-r", "compile.err", "-t", Config.get("java.compile.time_limit", "30"), "-w", Config.get("java.compile.time_limit", "30"))
-		
+
+		// Store the first compilation error for multi-file Pascal.
+		var previousError: String = null
+	
+		// Workaround for fpc's weird rules regarding compilation order.
+		var pascalMain = runDirectory.getCanonicalPath + "/" + "Main.p"
+		if (inputFiles.contains(pascalMain) && inputFiles.size > 1) {
+			// Exclude Main.p
+			inputFiles -= pascalMain
+
+			// Files need to be compiled individually.
+			for (inputFile <- inputFiles) {
+				val params = List(sandbox, "-S", profile + "/fpc") ++
+					commonParams ++
+					List("--", Config.get("p.compiler.path", "/usr/bin/fpc"), "-Tlinux",
+						"-O2", "-Mobjfpc", "-Sc", "-Sh", inputFile)
+				debug("Compile {}", params.mkString(" "))
+
+				pusing (runtime.exec(params.toArray)) { process => {
+					if(process != null) {
+						val status = process.waitFor
+
+						val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
+
+						if (status != 0 && previousError == null) {
+							previousError = 
+								if (meta("status") == "TO")
+									"Compilation time exceeded"
+								else
+									FileUtil.read(runDirectory.getCanonicalPath + "/compile.out")
+										.replace(runDirectory.getCanonicalPath + "/", "")
+						}
+					} else {
+						previousError = "Unable to compile " + inputFile
+					}
+				}}
+			}
+
+			// Now use the regular case to compile Main.
+			inputFiles.clear
+			inputFiles += pascalMain
+		}		
+	
 		val params = lang match {
 			case "java" =>
 				List(sandbox, "-S", profile + "/javac") ++ commonParams ++ List("--", Config.get("java.compiler.path", "/usr/bin/javac")) ++ inputFiles
@@ -59,7 +101,7 @@ object Runner extends RunnerService with Log with Using {
 	
 				if (!Config.get("runner.preserve", false)) inputFiles.foreach { new File(_).delete }
 			
-				if (status == 0 && (lang != "p" || new File(binDirectory, "Main").exists())) {
+				if (previousError == null && status == 0 && (lang != "p" || new File(runDirectory, "Main").exists())) {
 					if (!Config.get("runner.preserve", false)) {
 						new File(runDirectory.getCanonicalPath + "/compile.meta").delete
 						new File(runDirectory.getCanonicalPath + "/compile.out").delete
@@ -72,7 +114,9 @@ object Runner extends RunnerService with Log with Using {
 					val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
 			
 					val compileError =
-						if (meta("status") == "TO")
+						if (previousError != null)
+							previousError
+						else if (meta("status") == "TO")
 							"Compilation time exceeded"
 						else if (meta.contains("message") && meta("status") != "RE")
 							meta("message")
