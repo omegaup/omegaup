@@ -58,15 +58,15 @@ object OmegaUp extends Actor with Log {
 				throw new FileNotFoundException(langDir.getCanonicalPath)
 			}
 
-			val unitName = FileUtil.read(unitNameFile.getCanonicalPath)
-			codes += unitName + "." + run.language.toString -> code
-			
 			langDir
 				.list
 				.map(new File(langDir, _))
 				.filter(_.isFile)
 				.foreach(file => { codes += file.getName -> FileUtil.read(file.getCanonicalPath) })
 
+			val unitName = FileUtil.read(unitNameFile.getCanonicalPath)
+			codes += unitName + "." + run.language.toString -> code
+	
 			if (codes.size < 2) {
 				throw new FileNotFoundException(langDir.getCanonicalPath)
 			}

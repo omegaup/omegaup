@@ -59,7 +59,7 @@ object Runner extends RunnerService with Log with Using {
 	
 				if (!Config.get("runner.preserve", false)) inputFiles.foreach { new File(_).delete }
 			
-				if (status == 0) {
+				if (status == 0 && (lang != "p" || new File(binDirectory, "Main").exists())) {
 					if (!Config.get("runner.preserve", false)) {
 						new File(runDirectory.getCanonicalPath + "/compile.meta").delete
 						new File(runDirectory.getCanonicalPath + "/compile.out").delete
