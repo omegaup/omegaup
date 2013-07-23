@@ -31,6 +31,7 @@ class ProblemEditUITest extends OmegaupUITestCase {
 		$this->type('time_limit', '666');
 		$this->type('memory_limit', '1234');
 		$this->type('validator', 'token-caseless');
+		$this->type('public', '1');
 		
 		// Click inicia sesion		
 		$this->clickAndWait("//input[@value='Actualizar problema']");
@@ -49,6 +50,7 @@ class ProblemEditUITest extends OmegaupUITestCase {
 		$this->assertEquals(666, $problems[0]->getTimeLimit());
 		$this->assertEquals(1234, $problems[0]->getMemoryLimit());
 		$this->assertEquals('token-caseless', $problems[0]->getValidator());
+		$this->assertEquals('1', $problems[0]->getPublic());
 		
 	}
 

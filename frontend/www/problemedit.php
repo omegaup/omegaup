@@ -12,7 +12,8 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 				"validator" => $_POST["validator"],
 				"time_limit" => $_POST["time_limit"],
 				"memory_limit" => $_POST["memory_limit"],
-				"source" => $_POST["source"],				
+				"source" => $_POST["source"],
+				"public" => $_POST["public"],
 			));
 	$r->method = "ProblemController::apiUpdate";
 
@@ -25,6 +26,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 		$smarty->assign('TIME_LIMIT', $_POST["time_limit"]);
 		$smarty->assign('MEMORY_LIMIT', $_POST["memory_limit"]);
 		$smarty->assign('SOURCE', $_POST["source"]);
+		$smarty->assign('PUBLIC', $_POST["public"]);
 	} else if ($response["status"] == "ok") {
 		$smarty->assign('STATUS', "Problem updated succesfully!");
 	}
