@@ -1,242 +1,333 @@
+{include file='redirect.tpl'}
+{include file='head.tpl'}
+{include file='mainmenu.tpl'}
+{include file='status.tpl'}
+
+
 <div class="post">
 	<div class="copy">
 		<h3>Nuevo concurso</h3>
+		<div>
+			<div class="POS Boton" id='omi' name='omi'>Estilo OMI - IOI</div>
+			<div class="POS Boton" id='preioi' name='preioi'>Estilo Preselectivo IOI</div>
+			<div class="POS Boton" id='conacup' name='conacup'>Estilo CONACUP</div>
+		</div>
 		<form class="new_contest_form">
 			<table id="main" width="100%">
-			<tr>
-			<!-- ----------------------------------------- -->
-				<td class="info">
-					<b>Title</b>
-					<p>
-					 El titulo que tendrá el concurso
-								</p>
-							</td>
-							<td>
-								<input id='title' name='title' value='' type='text'>
-							</td>
-							<td class="info">
-								<b>Alias</b>
-								<p>
-									Almacenar&aacute; el token necesario para acceder al concurso
-								</p>
-							</td>
-							<td>
-								<input id='alias' name='alias' value='' type='text'>
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						<tr>
-							<!-- ----------------------------------------- -->
-							<td class="info">
-								<b>Inicio</b>
-								<p>
-									La fecha (en hora local) en la que inicia el concurso
-								</p>
-							</td>
-							<td>
-								<input id='start_time' name='start_time' value='1359702610' type='text'>
-							</td>
-							<td class="info">
-								<b>Fin</b>
-								<p>
-									La hora (en hora local) en la que termina el concurso.
-								</p>
-							</td>
-							<td>
-								<input id='finish_time' name='finish_time' value='1359749410' type='text'>
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						<tr>
-							<!-- ----------------------------------------- -->
-							<td class="info">
-								<b>Descripci&oacute;n</b>
-								<p>
-								</p>
-							</td>
-							<td>
-								<textarea id='description' name='description'></textarea>
-							</td>
-							<td class="info">
-								<b>Window Length</b>
-								<p>
-									Indica el tiempo que tiene el usuario para env&iacute;ar soluci&oacute;n, si es NULL entonces ser&aacute; durante todo el tiempo del concurso.
-								</p>
-							</td>
-							<td>
-								<input id='window_length' name='window_length' value='NULL' type='text'>
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						<tr>
-							<!-- ----------------------------------------- -->
-							<td class="info">
-								<b>Scoreboard</b>
-								<p>
-									Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser&aacute; visible
-								</p>
-							</td>
-							<td>
-								<input id='scoreboard' name='scoreboard' value='100' type='text'>
-							</td>
-							<td class="info">
-								<b>Submissions Gap</b>
-								<p>
-									Tiempo m&iacute;nimo en minutos que debe de esperar un usuario despues de realizar un env&iacute;o para hacer otro.
-								</p>
-							</td>
-							<td>
-								<input id='submissions_gap' name='submissions_gap' value='1' type='text'>
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						<tr>
-							<!-- ----------------------------------------- -->
-							<td class="info">
-								<b>Penalty Time Start</b>
-								<p>
-									 Indica el momento cuando se inicia a contar el tiempo: cuando inicia el concurso o cuando se abre el problema
-								</p>
-							</td>
-							<td>
-								<select name='penalty_time_start' id='penalty_time_start'>
-									<option value='none'>none</option>
-									<option value='problem'>problem</option>
-									<option value='contest'>contest</option>
-								</select>
-							</td>
-							<td class="info">
-								<b>Penalty</b>
-								<p>
-									 Entero indicando el n&uacute;mero de minutos con que se penaliza por recibir un no-accepted
-								</p>
-							</td>
-							<td>
-								<input id='penalty' name='penalty' value='0' type='text'>
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						<tr>
-							<!-- ----------------------------------------- -->
-							<td class="info">
-								<b>Feedback</b>
-								<p>
-									Si al usuario se le entrega retroalimentación inmediata sobre su problema
-								</p>
-							</td>
-							<td>
-								<select name='feedback' id='feedback'>
-									<option value='yes'>Si</option>
-									<option value='no'>No</option>
-									<option value='partial'>Parcial</option>
-								</select>
-							</td>
-							<td class="info">
-								<b>Partial Score</b>
-								<p>
-									 Verdadero si el usuario recibir&aacute; puntaje parcial para problemas no resueltos en todos los casos
-								</p>
-							</td>
-							<td>
-								<select name="partial_score" id="partial_score">
-									<option value="0">No</option>
-									<option value="1">Si</option>
-								</select>
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						<tr>
-							<!-- ----------------------------------------- -->
-							<td class="info">
-								<b>points_decay_factor</b>
-								<p>
-								</p>
-							</td>
-							<td>
-								<input id='points_decay_factor' name='points_decay_factor' value='0' type='text'>
-							</td>
-							<td class="info">
-								<b>penalty_calc_policy</b>
-								<p>
-								</p>
-							</td>
-							<td>
-								<select name='penalty_calc_policy' id='penalty_calc_policy'>
-									<option value='sum'>Sum</option>
-									<option value='max'>Max</option>
-								</select>
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						<tr>
-							<!-- ----------------------------------------- -->
-							<td class="info">
-								<b></b>
-								<p>
-								</p>
-							</td>
-							<td>
-							</td>
-							<td class="info">
-								<b>public</b>
-								<p>
-								</p>
-							</td>
-							<td>
-								<select name='public' id='public'>
-									<option value='1'>si</option>
-									<option value='0'>no</option>
-								</select>
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						<tr>
-							<!-- ----------------------------------------- -->
-							<td>
-							</td>
-							<td>
-							</td>
-							<td align='right'>
-								<input value='Agendar concurso' type='submit' class="OK">
-							</td>
-						</tr>
-						<!-- ----------------------------------------- -->
-						</table>
-						<!--
-						<div id="submit-wrapper">
-							<div id="response">
-							</div>
-						</div>
-						-->
-					</form>
+				<tr>
+					<!-- ----------------------------------------- -->
+					<td class="info">
+						<b>Título</b>
+						<p>							
+						</p>
+					</td>
+					<td>
+						<input id='title' name='title' value='' type='text' size='30'>
+					</td>
+					<td class="info">
+						<b>Título corto (alias):</b>
+						<p>
+							El título corto se usa para construir la URL del concurso (ejemplos: ANPA2010, CONACUP2012, OMI2013, etc..)
+						</p>
+					</td>
+					<td>
+						<input id='alias' name='alias' value='' type='text'>
+					</td>
+				</tr>
+				<!-- ----------------------------------------- -->
+				<tr>
+					<!-- ----------------------------------------- -->
+					<td class="info">
+						<b>Fecha de Inicio</b>
+						<p>
+							La fecha (en hora local) en la que inicia el concurso
+						</p>
+					</td>
+					<td>
+						<input id='start_time' name='start_time' value='' type='text' size ='16'>
+					</td>
+					<td class="info">
+						<b>Fecha de Fin</b>
+						<p>
+							La hora (en hora local) en la que termina el concurso.
+						</p>
+					</td>
+					<td>
+						<input id='finish_time' name='finish_time' value='' type='text' size='16'>
+					</td>
+				</tr>
+				<!-- ----------------------------------------- -->
+				<tr>
+					<!-- ----------------------------------------- -->
+					<td class="info">
+						<b>Descripci&oacute;n del concurso</b>
+						<p>
+						</p>
+					</td>
+					<td>
+						<textarea id='description' name='description' cols="30" rows="10"></textarea>
+					</td>
+					<td class="info">
+						<b><input type='checkbox' id='window_length_enabled' name='window_length_enabled'> Inicios Diferentes</b>
+						<p>
+							Si está activo, indica el tiempo en minutos que tiene el usuario para concursar y env&iacute;ar soluciones a partir de que entra al concurso en la arena (estilo USACO/Preselectivo IOI). 
+							Si Inicios Diferentes está desactivado, entonces el concursante tendrá todo el tiempo entre la Fecha de Inicio y la Fecha de Fin para concursar.
+						</p>
+					</td>
+					<td>
+						<input id='window_length' name='window_length' value='' type='text' disabled="true" size='3'>
+					</td>
+				</tr>
+				<!-- ----------------------------------------- -->
+				<tr>
+					<!-- ----------------------------------------- -->
+					<td class="info">
+						<b>¿Cuánto tiempo se mostrará el Scoreboard? (%)</b>
+						<p>
+							Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser&aacute; visible.
+						</p>
+					</td>
+					<td>
+						<input id='scoreboard' name='scoreboard' value='100' type='text' size='3'>
+					</td>
+					<td class="info">
+						<b>Separación de envios</b>
+						<p>
+							Tiempo m&iacute;nimo en minutos que debe de esperar un concursante despues de realizar un env&iacute;o para hacer otro.
+						</p>
+					</td>
+					<td>
+						<input id='submissions_gap' name='submissions_gap' value='1' type='text' size='2'>
+					</td>
+				</tr>
+				<!-- ----------------------------------------- -->
+				<tr>
+					<!-- ----------------------------------------- -->
+					<td class="info">
+						<b>Tipo de Penalty</b>
+						<p>
+							Indica el momento cuando se inicia a contar el tiempo: cuando inicia el concurso o cuando se abre el problema.
+						</p>
+					</td>
+					<td>
+						<select name='penalty_time_start' id='penalty_time_start'>
+							<option value='none'>Sin Penalty</option>
+							<option value='problem'>Por problema</option>
+							<option value='contest'>Por concurso</option>
+						</select>
+					</td>
+					<td class="info">
+						<b>Penalty</b>
+						<p>
+							Entero indicando el n&uacute;mero de minutos con que se penaliza por enviar una respuesta incorrecta.
+						</p>
+					</td>
+					<td>
+						<input id='penalty' name='penalty' value='0' type='text' size='2'>
+					</td>
+				</tr>
+				<!-- ----------------------------------------- -->
+				<tr>
+					<!-- ----------------------------------------- -->
+					<td class="info">
+						<b>Feedback</b>
+						<p>
+							Si al usuario se le entrega retroalimentación inmediata sobre su problema
+						</p>
+					</td>
+					<td>
+						<select name='feedback' id='feedback'>
+							<option value='yes'>Sí</option>
+							<option value='no'>No</option>
+							<option value='partial'>Parcial</option>
+						</select>
+					</td>
+					<td class="info">
+						<b>Factor de Decrecimiento de Puntaje</b>
+						<p>
+							Un número entre 0 y 1 inclusive. Si este número es distinto de cero, el puntaje que se obtiene al resolver correctamente un problema decae conforme pasa el tiempo. El valor del puntaje estará dado por (1 - points_decay_factor) + points_decay_factor * TT^2 / (10 * PT^2 + TT^2), donde PT es el penalty en minutos del envío y TT el tiempo total del concurso, en minutos.
+						</p>
+					</td>
+					<td>
+						<input id='points_decay_factor' name='points_decay_factor' value='0.0' type='text' size='4'>
+					</td>
+				</tr>
+				<!-- ----------------------------------------- -->
+				<tr>
+					<!-- ----------------------------------------- -->
+					
+					<td class="info">
+						<b>Scoreboard al finalizar el concurso</b>
+						<p>
+							Mostrar automáticamente el scoreboard completo al finalizar el concurso.
+						</p>
+					</td>
+					<td>
+						<select id='show_scoreboard_after' name='show_scoreboard_after'>
+							<option value='1'>Sí</option>
+							<option value='0'>No</option>
+						</select>
+					</td>
+					<td class="info">
+						<b>Público</b>
+						<p>
+							Mostrar el concurso en el listado público.
+						</p>
+					</td>
+					<td>
+						<select name='public' id='public'>
+							<option value='1'>Sí</option>
+							<option value='0'>No</option>
+						</select>
+					</td>
+				</tr>
+				<!-- ----------------------------------------- -->
+				<tr>
+					<!-- ----------------------------------------- -->
+					<td class="info">
+						<b></b>
+						<p>
+						</p>
+					</td>
+					<td>
+					</td>
+					
+				</tr>
+				<!-- ----------------------------------------- -->
+				<tr>
+					<!-- ----------------------------------------- -->
+					<td>
+					</td>
+					<td>
+					</td>
+					<td align='right'>
+						<input value='Agendar concurso' type='submit' class="OK">
+					</td>
+				</tr>
+				<!-- ----------------------------------------- -->
+			</table>
+			<!--
+			<div id="submit-wrapper">
+				<div id="response">
+				</div>
+			</div>
+			-->
+		</form>
 	</div>
 </div>
 <script>
+	
+	function dateToString(currentdate) {
+		var result = "" + (currentdate.getMonth()+1) + "/"
+                + currentdate.getDate()  + "/" 
+                + currentdate.getFullYear() + " "  
+                + ((currentdate.getHours() < 10) ? "0" + currentdate.getHours() : + currentdate.getHours()) + ":"  
+                + ((currentdate.getMinutes() < 10) ? "0" + currentdate.getMinutes() : + currentdate.getMinutes());
+			
+		return result;
+	}
+	
 	$("#start_time, #finish_time").datetimepicker();
+	
+	// Defaults for start_time and end_time	
+	var defaultDate = new Date(Date.now());
+	$('#start_time').val(dateToString(defaultDate));	
+	defaultDate.setHours(defaultDate.getHours() + 5);
+	$('#finish_time').val(dateToString(defaultDate));
+	
+	
+	// Toggle on/off window length on checkbox change
+	$('#window_length_enabled').change(function() {
+		if($(this).is(':checked')) {
+			// Enable
+			$('#window_length').removeAttr('disabled');			
+		} else {
+			// Disable
+			$('#window_length').attr('disabled','disabled');
+		}
+	});
+	
+	// Defaults for OMI
+	$('#omi').click(function() {
+		$('#window_length_enabled').removeAttr('checked');
+		$('#window_length').attr('disabled','disabled');
+		$('#window_length').val('');
+		
+		$(".new_contest_form #public").val('1');
+		$(".new_contest_form #scoreboard").val('0');
+		$(".new_contest_form #points_decay_factor").val('0');		
+		$(".new_contest_form #submissions_gap").val('1');
+		$(".new_contest_form #feedback").val('yes');
+		$(".new_contest_form #penalty").val('0');
+		$(".new_contest_form #penalty_time_start").val('none');
+		$(".new_contest_form #show_scoreboard_after").val('1');		
+	});
+	
+	// Defaults for preselectivos IOI
+	$('#preioi').click(function() {
+		$('#window_length_enabled').attr('checked', 'checked');
+		$('#window_length').removeAttr('disabled');
+		$('#window_length').val('180');
+		
+		$(".new_contest_form #public").val('1');
+		$(".new_contest_form #scoreboard").val('0');
+		$(".new_contest_form #points_decay_factor").val('0');		
+		$(".new_contest_form #submissions_gap").val('0');
+		$(".new_contest_form #feedback").val('yes');
+		$(".new_contest_form #penalty").val('0');
+		$(".new_contest_form #penalty_time_start").val('none');
+		$(".new_contest_form #show_scoreboard_after").val('1');		
+	});
+	
+	// Defaults for CONACUP
+	$('#conacup').click(function() {
+		$('#window_length_enabled').removeAttr('checked');
+		$('#window_length').attr('disabled','disabled');
+		$('#window_length').val('');
+		
+		$(".new_contest_form #public").val('1');
+		$(".new_contest_form #scoreboard").val('75');
+		$(".new_contest_form #points_decay_factor").val('0');		
+		$(".new_contest_form #submissions_gap").val('1');
+		$(".new_contest_form #feedback").val('yes');
+		$(".new_contest_form #penalty").val('20');
+		$(".new_contest_form #penalty_time_start").val('contest');
+		$(".new_contest_form #show_scoreboard_after").val('1');		
+	});
+	
 	$('.new_contest_form').submit(function() {
+	
+		var window_length_value = $('#window_length_enabled').is(':checked') ? 
+				$('#window_length').val() : 
+				'NULL';
+		
 		omegaup.createContest(
-					$(".new_contest_form #title").val(),
-					$(".new_contest_form #description").val(),
-					(new Date($(".new_contest_form #start_time").val()).getTime()) / 1000,
-					(new Date($(".new_contest_form #finish_time").val()).getTime()) / 1000,
-					$(".new_contest_form #window_length").val(),
-					$(".new_contest_form #alias").val(),
-					$(".new_contest_form #points_decay_factor").val(),
-					$(".new_contest_form #partial_score").val(), 
-					$(".new_contest_form #submissions_gap").val(),
-					$(".new_contest_form #feedback").val(), 
-					$(".new_contest_form #penalty").val(), 
-					$(".new_contest_form #public").val(),
-					$(".new_contest_form #scoreboard").val(), 
-					$(".new_contest_form #penalty_time_start").val(), 
-					$(".new_contest_form #penalty_calc_policy").val(), 
-					function(data){
-						
-						if(data.status == "ok"){
-							window.location = "/contest/" + $(".new_contest_form #alias").val()
-						}
-					}
-			);
+			$(".new_contest_form #title").val(),
+			$(".new_contest_form #description").val(),
+			(new Date($(".new_contest_form #start_time").val()).getTime()) / 1000,
+			(new Date($(".new_contest_form #finish_time").val()).getTime()) / 1000,
+			window_length_value,
+			$(".new_contest_form #alias").val(),
+			$(".new_contest_form #points_decay_factor").val(),			
+			$(".new_contest_form #submissions_gap").val() * 60,
+			$(".new_contest_form #feedback").val(), 
+			$(".new_contest_form #penalty").val(), 
+			$(".new_contest_form #public").val(),
+			$(".new_contest_form #scoreboard").val(), 
+			$(".new_contest_form #penalty_time_start").val(),
+			$(".new_contest_form #show_scoreboard_after").val(),
+			function(data) {
+
+				if(data.status == "ok"){
+					$('div.copy.error').html("Contest successfully created!");
+					$('div.post.footer').show();
+					window.scrollTo(0,0);
+					return;
+				}
+			}
+		);
 		return false;
 	});
 </script>
+
+{include file='footer.tpl'}

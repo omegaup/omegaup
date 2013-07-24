@@ -319,18 +319,18 @@ class ContestController extends Controller {
 		$contest->setDescription($r["description"]);
 		$contest->setStartTime(gmdate('Y-m-d H:i:s', $r["start_time"]));
 		$contest->setFinishTime(gmdate('Y-m-d H:i:s', $r["finish_time"]));
-		$contest->setWindowLength($r["window_length"] == "NULL" ? NULL : $r["window_length"]);
+		$contest->setWindowLength($r["window_length"] === "NULL" ? NULL : $r["window_length"]);
 		$contest->setDirectorId($r["current_user_id"]);
 		$contest->setRerunId(0); // NYI
 		$contest->setAlias($r["alias"]);
 		$contest->setScoreboard($r["scoreboard"]);
 		$contest->setPointsDecayFactor($r["points_decay_factor"]);
-		$contest->setPartialScore($r["partial_score"]);
+		$contest->setPartialScore(is_null($r["partial_score"]) ? "1" : $r["partial_score"]);
 		$contest->setSubmissionsGap($r["submissions_gap"]);
 		$contest->setFeedback($r["feedback"]);
 		$contest->setPenalty(max(0, intval($r["penalty"])));
 		$contest->setPenaltyTimeStart($r["penalty_time_start"]);
-		$contest->setPenaltyCalcPolicy($r["penalty_calc_policy"]);
+		$contest->setPenaltyCalcPolicy(is_null($r["penalty_calc_policy"]) ? "sum" : $r["penalty_calc_policy"]);
 
 		if (!is_null($r["show_scoreboard_after"])) {
 			$contest->setShowScoreboardAfter($r["show_scoreboard_after"]);
@@ -447,20 +447,22 @@ class ContestController extends Controller {
 		$contest_length = $finish_time - $start_time;
 
 		// Window_length is optional
-		Validators::isNumberInRange(
-				$r["window_length"], "window_length", 0, floor($contest_length) / 60, false
-		);
+		if (!is_null($r["window_length"]) && $r["window_length"] !== "NULL") {
+			Validators::isNumberInRange(
+					$r["window_length"], "window_length", 0, floor($contest_length) / 60, false
+			);
+		}
 
 		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
 		Validators::isStringOfMaxLength($r["alias"], "alias", 32, $is_required);
 		Validators::isNumberInRange($r["scoreboard"], "scoreboard", 0, 100, $is_required);
 		Validators::isNumberInRange($r["points_decay_factor"], "points_decay_factor", 0, 1, $is_required);
-		Validators::isInEnum($r["partial_score"], "partial_score", array("0", "1"), $is_required);
+		Validators::isInEnum($r["partial_score"], "partial_score", array("0", "1"), false);
 		Validators::isNumberInRange($r["submissions_gap"], "submissions_gap", 0, $contest_length, $is_required);
 
 		Validators::isInEnum($r["feedback"], "feedback", array("no", "yes", "partial"), $is_required);
 		Validators::isInEnum($r["penalty_time_start"], "penalty_time_start", array("contest", "problem", "none"), $is_required);
-		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"), $is_required);
+		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"), false);
 
 		// Check that the users passed through the private_users parameter are valid
 		if (!is_null($r["public"]) && $r["public"] == 0 && !is_null($r["private_users"])) {

@@ -47,12 +47,10 @@ class CreateContestTest extends OmegaupTestCase {
 			"public",
 			"alias",
 			"points_decay_factor",
-			"partial_score",
 			"submissions_gap",
 			"feedback",
 			"scoreboard",
-			"penalty_time_start",
-			"penalty_calc_policy"
+			"penalty_time_start",			
 		);
 
 		foreach ($valid_keys as $key) {
