@@ -14,7 +14,7 @@ class SessionController extends Controller {
 
 	private static $current_session;
 	private static $_facebook;
-	private static $_sessionManager;
+	public static $_sessionManager;
 	public static $setCookieOnRegisterSession = true;
 
 	public static function getSessionManagerInstance() {
