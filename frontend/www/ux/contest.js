@@ -300,21 +300,16 @@ $(document).ready(function() {
 			file = file.files[0];
 			var reader = new FileReader();
 
+			reader.onload = function(e) {
+				submitRun((practice || onlyProblem)? '' : contestAlias,
+					  currentProblem.alias,
+					  $('#submit select[name="language"]').val(),
+					  e.target.result);
+			};
+
 			if (file.type.indexOf('text/') === 0) {
-				reader.onload = function(e) {
-					submitRun((practice || onlyProblem)? '' : contestAlias,
-						  currentProblem.alias,
-						  $('#submit select[name="language"]').val(),
-						  e.target.result);
-				};
 				reader.readAsText(file, 'UTF-8');
 			} else {
-				reader.onload = function(e) {
-					submitRun((practice || onlyProblem)? '' : contestAlias,
-						  currentProblem.alias,
-						  $('#submit select[name="language"]').val(),
-						  e.target.result.split(',')[1]);
-				};
 				reader.readAsDataURL(file);
 			}
 
