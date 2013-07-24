@@ -295,6 +295,20 @@ object FileUtil extends Object with Using {
 			fileWriter.write(data)
 		}
 	}
+
+	@throws(classOf[IOException])
+	def copy(src: File, dest: File): Unit = {
+		val buffer = Array.ofDim[Byte](1024)
+		var read = 0
+
+		using (new FileInputStream(src)) { inputStream => {
+			using (new FileOutputStream(dest)) { outputStream => {
+				while( { read = inputStream.read(buffer) ; read > 0 } ) {
+					outputStream.write(buffer, 0, read)
+				}
+			}}
+		}}
+	}
 		
 	@throws(classOf[IOException])
 	def deleteDirectory(dir: String): Boolean = {
