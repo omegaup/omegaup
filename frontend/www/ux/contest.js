@@ -234,25 +234,15 @@ $(document).ready(function() {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
 			$('#overlay, #submit #clarification').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+			var code_file = $('#code_file');
+			code_file.replaceWith(code_file = code_file.clone(true));
 			return false;
 		}
 	});
 
-	$('#submit').submit(function(e) {
-		if (!$('#submit textarea[name="code"]').val()) return false;
-
-		if (!$('#submit select[name="language"]').val()) {
-			alert('Debes elegir un lenguaje');
-			return;
-		}
-
-		if (!onlyProblem && (problems[currentProblem.alias].last_submission + submissionGap * 1000 > new Date().getTime())) {
-			alert('Deben pasar ' + submissionGap + ' segundos entre envios de un mismo problema');
-			return;
-		}
-
+	function submitRun(contestAlias, problemAlias, lang, code) {
 		$('#submit input').attr('disabled', 'disabled');
-		omegaup.submit((practice || onlyProblem)? '' : contestAlias, currentProblem.alias, $('#submit select[name="language"]').val(), $('#submit textarea[name="code"]').val(), function (run) {
+		omegaup.submit(contestAlias, problemAlias, lang, code, function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
 				$('#submit input').removeAttr('disabled');
@@ -287,8 +277,48 @@ $(document).ready(function() {
 			$('#overlay').hide();
 			$('#submit input').removeAttr('disabled');
 			$('#submit textarea[name="code"]').val('');
+			var code_file = $('#code_file');
+			code_file.replaceWith(code_file = code_file.clone(true));
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
 		});
+	}
+
+	$('#submit').submit(function(e) {
+		if (!onlyProblem && (problems[currentProblem.alias].last_submission + submissionGap * 1000 > new Date().getTime())) {
+			alert('Deben pasar ' + submissionGap + ' segundos entre envios de un mismo problema');
+			return false;
+		}
+
+		if (!$('#submit select[name="language"]').val()) {
+			alert('Debes elegir un lenguaje');
+			return false;
+		}
+
+		var code = $('#submit textarea[name="code"]').val();
+		var file = $('#code_file')[0];
+		if (file && file.files && file.files.length > 0) {
+			file = file.files[0];
+			var reader = new FileReader();
+
+			reader.onload = function(e) {
+				submitRun((practice || onlyProblem)? '' : contestAlias,
+					  currentProblem.alias,
+					  $('#submit select[name="language"]').val(),
+					  e.target.result);
+			};
+
+			if (file.type.indexOf('text/') === 0) {
+				reader.readAsText(file, 'UTF-8');
+			} else {
+				reader.readAsDataURL(file);
+			}
+
+			return false;
+		}
+
+		if (!code) return false;
+
+		submitRun((practice || onlyProblem)? '' : contestAlias, currentProblem.alias, $('#submit select[name="language"]').val(), code);
 
 		return false;
 	});

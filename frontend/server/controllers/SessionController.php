@@ -60,6 +60,7 @@ class SessionController extends Controller {
 	 * */
 	public static function apiCurrentSession() {
 		$SessionM = self::getSessionManagerInstance();
+		$SessionM->sessionStart();
 		$s_AuthToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
 		$vo_CurrentUser = NULL;
 				
@@ -103,6 +104,11 @@ class SessionController extends Controller {
 		// Get email via his id
 		$vo_Email = EmailsDAO::getByPK($vo_CurrentUser->getMainEmailId());
 
+		$_SESSION['omegaup_user'] = array(
+			'name' => $vo_CurrentUser->getUsername(),
+			'email' => !is_null($vo_Email) ? $vo_Email->getEmail() : ''
+		);
+
 		return array(
 			'valid' => true,
 			'id' => $vo_CurrentUser->getUserId(),
@@ -129,6 +135,7 @@ class SessionController extends Controller {
 			
 		}
 
+		unset($_SESSION['omegaup_user']);
 		setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
 	}
 

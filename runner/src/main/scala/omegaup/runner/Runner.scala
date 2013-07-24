@@ -27,6 +27,12 @@ object Runner extends RunnerService with Log with Using {
 			}}
 		}
 
+		if (lang == "cat") {
+			// Literal. We're done.
+			info("compile finished successfully")
+			return new CompileOutputMessage(token = Some(runDirectory.getParentFile.getName))
+		}
+
 		val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
 		val profile = Config.get("runner.sandbox.profiles.path", Config.get("runner.sandbox.path", ".") + "/profiles")
 		val runtime = Runtime.getRuntime
@@ -211,33 +217,39 @@ object Runner extends RunnerService with Log with Using {
 				casesDirectory.listFiles.filter {_.getName.endsWith(".in")} .foreach { (x) => {
 					val caseName = runDirectory.getCanonicalPath + "/" + x.getName.substring(0, x.getName.lastIndexOf('.'))
 
-					var timeLimit = message.timeLimit
-					if (lang == "java" || lang == "p") {
-						timeLimit += 1
-					}
+					if (lang == "cat") {
+						// Literal. Just copy the "program" as the output and produce a fake .meta.
+						FileUtil.copy(new File(binDirectory, "Main.cat"), new File(caseName + ".out"))
+						FileUtil.write(caseName + ".meta", "time:0\ntime-wall:0\nmem:0\nsyscall-count:0\nstatus:OK")
+					} else {
+						var timeLimit = message.timeLimit
+						if (lang == "java" || lang == "p") {
+							timeLimit += 1
+						}
 
-					val commonParams = List("-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-w", (message.timeLimit + 60).toString, "-O", message.outputLimit.toString)
-				
-					val params = lang match {
-						case "java" =>
-							List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", Config.get("java.runtime.path", "/usr/bin/java"), "-Xmx" + message.memoryLimit + "k", "Main")
-						case "c" =>
-							List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
-						case "cpp" =>
-							List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
-						case "p" =>
-							List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main")
-						case "py" =>
-							List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", Config.get("py.runtime.path", "/usr/bin/python"), "Main.py")
-						case "kp" =>
-							List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-q", "-p2", "Main.kx")
-						case "kj" =>
-							List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-q", "-p2", "Main.kx")
-					}
+						val commonParams = List("-c", binDirectory.getCanonicalPath, "-q", "-M", caseName + ".meta", "-i", x.getCanonicalPath, "-o", caseName + ".out", "-r", caseName + ".err", "-t", timeLimit.toString, "-w", (message.timeLimit + 60).toString, "-O", message.outputLimit.toString)
+					
+						val params = lang match {
+							case "java" =>
+								List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", Config.get("java.runtime.path", "/usr/bin/java"), "-Xmx" + message.memoryLimit + "k", "Main")
+							case "c" =>
+								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
+							case "cpp" =>
+								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
+							case "p" =>
+								List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main")
+							case "py" =>
+								List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", Config.get("py.runtime.path", "/usr/bin/python"), "Main.py")
+							case "kp" =>
+								List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-q", "-p2", "Main.kx")
+							case "kj" =>
+								List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-q", "-p2", "Main.kx")
+						}
 
-					debug("Run {}", params.mkString(" "))
-				
-					pusing (runtime.exec(params.toArray)) { process => process.waitFor }
+						debug("Run {}", params.mkString(" "))
+					
+						pusing (runtime.exec(params.toArray)) { process => process.waitFor }
+					}
 				}}
 			}
 		
