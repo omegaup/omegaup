@@ -19,6 +19,18 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 		//Clean $_REQUEST before each test
 		unset($_REQUEST);
 	}
+	
+	/**
+	 * Override session_start, phpunit doesn't like it, but we still validate that it is called once
+	 */
+	public function mockSessionManager() {
+						
+		$sessionManagerMock = $this->getMock('SessionManager', array('sessionStart'));
+		$sessionManagerMock->expects($this->once())
+				->method('sessionStart')
+				->will($this->returnValue(''));		
+		SessionController::$_sessionManager = $sessionManagerMock;
+	}
 
 	/**
 	 * Given an User, checks that login let state as supposed

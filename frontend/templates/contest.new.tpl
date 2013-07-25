@@ -27,7 +27,7 @@
 					<td class="info">
 						<b>Título corto (alias):</b>
 						<p>
-							El título corto se usa para construir la URL del concurso (ejemplos: ANPA2010, CONACUP2012, OMI2013, etc..)
+							El título corto se usa para construir la URL del concurso (ejemplos: ANPA2010, CONACUP2012, OMI2013, etc..). No puede contener espacios.
 						</p>
 					</td>
 					<td>
@@ -249,6 +249,7 @@
 	
 	// Defaults for OMI
 	$('#omi').click(function() {
+		$(".new_contest_form #title").val('Estilo OMI aplicado. **Tu título aquí**');
 		$('#window_length_enabled').removeAttr('checked');
 		$('#window_length').attr('disabled','disabled');
 		$('#window_length').val('');
@@ -265,6 +266,7 @@
 	
 	// Defaults for preselectivos IOI
 	$('#preioi').click(function() {
+		$(".new_contest_form #title").val('Estilo Preselectivo aplicado. **Tu título aquí**');
 		$('#window_length_enabled').attr('checked', 'checked');
 		$('#window_length').removeAttr('disabled');
 		$('#window_length').val('180');
@@ -281,6 +283,7 @@
 	
 	// Defaults for CONACUP
 	$('#conacup').click(function() {
+		$(".new_contest_form #title").val('Estilo CONCACUP aplicado. **Tu título aquí**');
 		$('#window_length_enabled').removeAttr('checked');
 		$('#window_length').attr('disabled','disabled');
 		$('#window_length').val('');
@@ -318,8 +321,8 @@
 			$(".new_contest_form #show_scoreboard_after").val(),
 			function(data) {
 
-				if(data.status == "ok"){
-					$('div.copy.error').html("Contest successfully created!");
+				if(data.status == "ok") {
+					$('div.copy.error').html("Tu concurso ha sido creado! <a href='addproblemtocontest.php'>Agrégale problemas!</a> <a href='/arena/"+ $('.new_contest_form #alias').val() + "'>Ver Concurso</a>");
 					$('div.post.footer').show();
 					window.scrollTo(0,0);
 					return;

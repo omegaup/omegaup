@@ -129,11 +129,7 @@ class LoginTest extends OmegaupTestCase {
 		$_REQUEST["returnAuthToken"] = true;
 
 		// Override session_start, phpunit doesn't like it, but we still validate that it is called once
-		$sessionManagerMock = $this->getMock('SessionManager', array('sessionStart'));
-		$sessionManagerMock->expects($this->once())
-				->method('sessionStart')
-				->will($this->returnValue(''));		
-		SessionController::$_sessionManager = $sessionManagerMock;
+		$this->mockSessionManager();
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/login";

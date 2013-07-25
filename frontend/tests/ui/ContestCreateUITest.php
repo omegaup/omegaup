@@ -27,7 +27,7 @@ class ContestCreateUITest extends OmegaupUITestCase {
 		// Submit
 		$this->click("//input[@value='Agendar concurso']");
 		sleep(1);
-		$this->assertElementContainsText('//*[@id="content"]/div[2]/div', "Contest successfully created!");
+		$this->assertElementContainsText('//*[@id="content"]/div[2]/div', "Tu concurso ha sido creado!");
 		
 	}	
 }

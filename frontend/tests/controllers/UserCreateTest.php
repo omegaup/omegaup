@@ -144,6 +144,9 @@ class CreateUserTest extends OmegaupTestCase {
 		$_REQUEST["username"] = Utils::CreateRandomString();
 		$_REQUEST["password"] = Utils::CreateRandomString();
 		$_REQUEST["email"] = Utils::CreateRandomString()."@".Utils::CreateRandomString().".com";
+
+		// Override session_start, phpunit doesn't like it, but we still validate that it is called once
+		$this->mockSessionManager();
 		
 		// Call api
 		$_SERVER["REQUEST_URI"] = "/api/user/create";		

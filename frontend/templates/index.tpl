@@ -109,7 +109,7 @@
 				spacingTop: 20
 			},
 			title: {
-				text: 'Envíos totales'
+				text: 'Envíos totales evaluados por omegaUp'
 			},
 			xAxis: {
 				type: 'datetime',                
@@ -150,6 +150,7 @@
             },
 			series: [{
 				type: 'area',
+				name: 'Envíos',
 				pointInterval: 24 * 3600 * 1000,
                 pointStart: minDate.getTime(),
 				data: dataInSeries.reverse()
