@@ -10,6 +10,9 @@
 				<div class="copy">
 					omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en America Latina mediante la resolucion de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.
 				</div>
+				<div class="copy button" id="contest-create">
+					Crea tu propio concurso en omegaUp!
+				</div>
 				<div id="ranking-chart"></div>
 			</div>
 		</td>
@@ -70,6 +73,11 @@
 	}
 
 	function OnLoad() {
+	
+	  $('#contest-create').click(function() {
+		window.location.assign("contestcreate.php");
+	  });
+	
 	  // Create a feed instance that will grab Digg's feed.
 	  var feed = new google.feeds.Feed("http://blog.omegaup.com/rss");
 

@@ -159,6 +159,63 @@ div.copy.error {
 	padding: 16px; 
 	background-color: #ffffff;
 }
+div.copy.button { 
+	background-color: rgba(0, 0, 0, 0);
+	background-image: -webkit-linear-gradient(top, rgb(0, 192, 9) 0px, rgb(5, 122, 1) 100%);
+	
+	background-origin: padding-box;
+	background-size: auto;
+	border-bottom-color: rgb(2, 107, 0);
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-image-outset: 0px;
+	border-image-repeat: stretch;
+	border-image-slice: 100%;
+	border-image-source: none;
+	border-image-width: 1;
+	border-left-color: rgb(2, 107, 0);
+	border-left-style: solid;
+	border-left-width: 1px;
+	border-right-color: rgb(2, 107, 0);
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-top-color: rgb(2, 107, 0);
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-top-style: solid;
+	border-top-width: 1px;
+	
+	display: block;
+	line-height: 1.25;
+	padding: 7px 20px 7px;
+	border: 1px solid;
+	border-color: #026b00;
+	border-radius: 5px;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.75),inset 0 -1px 1px rgba(255,255,255,.3);	
+	font-size: 1.13em;
+	color: #fff;
+	font-weight: bold;
+	text-align: center;
+	cursor: pointer;
+	
+	height: 22px;
+	line-height: 22px;
+	overflow-x: visible;
+	overflow-y: visible;
+	padding-bottom: 7px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-top: 7px;
+	text-align: center;
+	text-shadow: rgb(5, 116, 0) 1px 1px 2px;
+	width: 302px;
+	
+	margin-left: auto ;
+	margin-right: auto ;
+	margin-bottom: 10px;	
+}
 div.footer {
     font-size: 13px;
 }
