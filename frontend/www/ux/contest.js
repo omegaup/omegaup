@@ -300,6 +300,12 @@ $(document).ready(function() {
 			file = file.files[0];
 			var reader = new FileReader();
 
+			if (file.size >= 10240) {
+				// 10kb should be enough for anybody.
+				alert('El límite para subir archivos son 10kB');
+				return false;
+			}
+
 			reader.onload = function(e) {
 				submitRun((practice || onlyProblem)? '' : contestAlias,
 					  currentProblem.alias,
