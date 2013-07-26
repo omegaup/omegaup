@@ -217,7 +217,7 @@ class ContestController extends Controller {
 
 		if (is_null($result)) {
 			// Create array of relevant columns
-			$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy");
+			$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy", "public", "show_scoreboard_after");
 
 			// Initialize response to be the contest information
 			$result = $r["contest"]->asFilteredArray($relevant_columns);
@@ -1087,7 +1087,7 @@ class ContestController extends Controller {
 		}
 
 		if (!is_null($r["show_scoreboard_after"])) {
-			$contest->setShowScoreboardAfter($r["show_scoreboard_after"]);
+			$r["contest"]->setShowScoreboardAfter($r["show_scoreboard_after"]);
 		}
 
 		// Push changes

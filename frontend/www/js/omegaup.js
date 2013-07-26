@@ -105,6 +105,54 @@ OmegaUp.prototype.createContest = function(
 	);
 };
 
+OmegaUp.prototype.updateContest = function(
+					contest_alias,
+					title,
+					description,
+					start_time,
+					finish_time,
+					window_length,
+					alias,
+					points_decay_factor,					 
+					submissions_gap,
+					feedback, 
+					penalty,
+					public,
+					scoreboard, 
+					penalty_time_start, 					
+					show_scoreboard_after,
+					callback
+				) {
+	$.post(
+		'/api/contest/update/contest_alias/' + contest_alias + '/' ,
+		{
+			contest_alias       : contest_alias,
+			title				: title,
+			description			: description,
+			start_time			: start_time,
+			finish_time			: finish_time,
+			window_length		: window_length,
+			public				: public,
+			alias				: alias,
+			points_decay_factor	: points_decay_factor,			
+			submissions_gap		: submissions_gap,
+			feedback			: feedback, 
+			penalty				: penalty , 			
+			scoreboard			: scoreboard, 
+			penalty_time_start	: penalty_time_start, 
+			show_scoreboard_after	: show_scoreboard_after 
+		},
+		function (data) {
+			if( data.status !== undefined && data.status == "error") {
+				OmegaUp.UI.Error( data.error );
+			}else{
+				if(callback !== undefined){ callback( data ) }
+			}
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.authenticated = function(callback) {
 	$.get(
 		'/api/session/currentsession/',

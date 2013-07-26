@@ -120,8 +120,13 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 
 		// Assert data was correctly saved
 		$this->assertEquals($r["description"], $contest->getDescription());
-		$this->assertEquals($r["start_time"], Utils::GetPhpUnixTimestamp($contest->getStartTime()));
-		$this->assertEquals($r["finish_time"], Utils::GetPhpUnixTimestamp($contest->getFinishTime()));
+		
+		$this->assertGreaterThanOrEqual($r["start_time"] - 1, Utils::GetPhpUnixTimestamp($contest->getStartTime()));
+		$this->assertGreaterThanOrEqual($r["start_time"], Utils::GetPhpUnixTimestamp($contest->getStartTime()) + 1);
+		
+		$this->assertGreaterThanOrEqual($r["finish_time"] - 1, Utils::GetPhpUnixTimestamp($contest->getFinishTime()));
+		$this->assertGreaterThanOrEqual($r["finish_time"], Utils::GetPhpUnixTimestamp($contest->getFinishTime()) + 1);
+		
 		$this->assertEquals($r["window_length"], $contest->getWindowLength());
 		$this->assertEquals($r["public"], $contest->getPublic());
 		$this->assertEquals($r["alias"], $contest->getAlias());
