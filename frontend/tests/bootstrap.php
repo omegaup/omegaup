@@ -36,3 +36,6 @@ Utils::CleanPath(IMAGES_PATH);
 // Clean DB
 Utils::CleanupDB();
 
+// Create a test default user for manual UI operations
+UserFactory::createUser("test", "testtesttest");
+
