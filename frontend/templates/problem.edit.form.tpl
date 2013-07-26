@@ -12,7 +12,8 @@
 			<option value="token-caseless">Token por Token, ignorando diferencias en mayúsculas/minúsculas (default)</option>
 			<option value="token-numeric">Tokens numéricos con tolerancia</option>		
 			<option value="token">Token por Token</option>		
-			<option value="literal">Sólo salida, comparación literal</option>				
+			<option value="literal">Sólo salida, comparación literal</option>
+			<option value="custom">Validador personalizado (validator.$lang$)</option>
 		</select></legend>
 	<legend>Tiempo límite: (ms)<input id='time_limit' name='time_limit' value='{$TIME_LIMIT}' type='text'></legend>
 	<legend>Memory limit: (KB)<input id='memory_limit' name='memory_limit' value='{$MEMORY_LIMIT}' type='text'></legend>
