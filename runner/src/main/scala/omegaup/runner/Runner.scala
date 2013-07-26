@@ -105,7 +105,7 @@ object Runner extends RunnerService with Log with Using {
 			if(process != null) {
 				val status = process.waitFor
 	
-				if (!Config.get("runner.preserve", false)) inputFiles.foreach { new File(_).delete }
+				if (lang != "py" && !Config.get("runner.preserve", false)) inputFiles.foreach { new File(_).delete }
 			
 				if (previousError == null && status == 0 && (lang != "p" || new File(runDirectory, "Main").exists())) {
 					if (!Config.get("runner.preserve", false)) {

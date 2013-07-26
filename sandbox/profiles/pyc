@@ -16,6 +16,7 @@
 -s getdents
 -s getcwd
 
+-p /usr
 -p /usr/lib/
 -p /proc/meminfo
 -p /usr/bin/python

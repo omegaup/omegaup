@@ -18,6 +18,7 @@
 -s time
 -s gettimeofday
 
+-p /usr
 -p /etc/localtime
 -p /dev/urandom
 -p /usr/lib/
