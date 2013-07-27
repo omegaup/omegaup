@@ -89,21 +89,26 @@
 	
 	function createChart(series) {
 	
-		if (series.length == 0) return;	
+		if (series.total.length == 0) return;	
 		
 		var dataInSeries = [];
-		for(var i in series) {
-			if (series.hasOwnProperty(i)) {
-				dataInSeries.push(parseInt(series[i]));
+		var acInSeries = [];
+		for(var i in series.total) {
+			if (series.total.hasOwnProperty(i)) {
+				dataInSeries.push(parseInt(series.total[i]));
 			}
-		}		
+			if (series.ac.hasOwnProperty(i)) {
+				acInSeries.push(parseInt(series.ac[i]));
+			}
+		}
 	
 		var minDate = new Date(Date.now());
 		minDate.setDate(minDate.getDate()-30);
 		
-		var minY = dataInSeries[0] - (dataInSeries[0] * 0.10);
+		var minY = acInSeries[0] - (acInSeries[0] * 0.50);
 		window.chart = new Highcharts.Chart({			
 			chart: {
+				type: 'area',
 				renderTo: 'ranking-chart',
 				height: 300,
 				spacingTop: 20
@@ -127,14 +132,7 @@
                 enabled: false
             },
 			plotOptions: {
-                area: {
-                    fillColor: {
-                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
-                        stops: [
-                            [0, Highcharts.getOptions().colors[0]],
-                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                        ]
-                    },
+                area: {                    
                     lineWidth: 1,
                     marker: {
                         enabled: false
@@ -153,7 +151,28 @@
 				name: 'Envíos',
 				pointInterval: 24 * 3600 * 1000,
                 pointStart: minDate.getTime(),
-				data: dataInSeries.reverse()
+				data: dataInSeries.reverse(),
+				fillColor: {
+                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+                        stops: [ 
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    }
+				},
+				{
+				type: 'area',
+				name: 'ACs',
+				pointInterval: 24 * 3600 * 1000,
+                pointStart: minDate.getTime(),
+				data: acInSeries.reverse(),
+				fillColor: {
+                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+                        stops: [ 
+                            [0, Highcharts.getOptions().colors[1]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[1]).setOpacity(0).get('rgba')]
+                        ]
+                    }
 				}
 			]
 		});

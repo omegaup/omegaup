@@ -339,6 +339,17 @@ class RunsDAO extends RunsDAOBase
 		return $rs['total'];		
 	}
 	
+	public static function GetAcRunCountsToDate($date) {
+		
+		$sql = "select count(*) as total from Runs where veredict = 'AC' and time <= ?";
+		$val = array($date);
+		
+		global $conn;	
+		$rs = $conn->GetRow($sql, $val);
+
+		return $rs['total'];		
+	}
+	
 	public static final function searchRunIdGreaterThan( $Runs , $greaterThan, $orderBy = null, $orden = 'ASC', $columnas = NULL, $offset = 0, $rowcount = NULL )
 	{
 		// Implode array of columns to a coma-separated string               

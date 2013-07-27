@@ -611,13 +611,16 @@ class RunController extends Controller {
 		
 		if (is_null($totals)) {
 			$totals = array();
+			$totals["total"] = array();
+			$totals["ac"] = array();
 			try {
 
 				// I don't like this approach but adodb didn't like too much to execute
 				// store procedures. anyways we will cache the totals
 				$date = date('Y-m-d', strtotime('1 days'));
 				for ($i = 0; $i < 30; $i++) {
-					$totals[$date] = RunsDAO::GetRunCountsToDate($date);			
+					$totals["total"][$date] = RunsDAO::GetRunCountsToDate($date);
+					$totals["ac"][$date] = RunsDAO::GetAcRunCountsToDate($date);
 					$date = date('Y-m-d', strtotime('-'.$i.' days'));
 				}
 			} catch (Exception $e) {
