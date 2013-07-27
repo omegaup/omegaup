@@ -126,7 +126,7 @@ class InvalidDatabaseOperationException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("Oops. Ive encoutered an internal error. Please try again.", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+		parent::__construct("Oops. I've encountered an internal error. Please try again.", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
 	}
 
 }
@@ -193,7 +193,7 @@ class InvalidFilesystemOperationException extends ApiException {
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	function __construct($message = "Oops. Ive encoutered an internal error. Please try again.", Exception $previous = NULL) {
+	function __construct($message = "Oops. I've encountered an internal error. Please try again.", Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
 	}
 
@@ -210,7 +210,7 @@ class InternalServerErrorException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("Oops. Ive encoutered an internal error. Please try again.", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
+		parent::__construct("Oops. I've encountered an internal error. Please try again.", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
 	}
 
 }
