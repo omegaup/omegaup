@@ -103,7 +103,7 @@
 		}
 	
 		var minDate = new Date(Date.now());
-		minDate.setDate(minDate.getDate()-30);
+		minDate.setDate(minDate.getDate()-(30*6));
 		
 		var minY = acInSeries[0] - (acInSeries[0] * 0.50);
 		window.chart = new Highcharts.Chart({			
