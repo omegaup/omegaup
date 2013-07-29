@@ -302,6 +302,11 @@ OmegaUp.prototype.getMyContests = function(callback) {
 	$.get(
 		'/api/contest/mylist/',
 		function (data) {
+			for (var idx in data.results) {
+				var contest = data.results[idx];
+				contest.start_time = self.time(contest.start_time * 1000);
+				contest.finish_time = self.time(contest.finish_time * 1000);
+			}
 			callback(data);
 		},
 		'json'

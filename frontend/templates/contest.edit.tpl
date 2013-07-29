@@ -12,13 +12,26 @@
 		for (var i = 0; i < contests.results.length; i++) {
 			contest = contests.results[i];							
 			$('select.contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
-		}							
-	});
-
-	$('select.contests').change(function () {					
-		$('div.post.footer').hide();
-		refreshEditForm($('select.contests option:selected').val());
-	});
+		}
+		
+		// Fill form on drop down change
+		$('select.contests').change(function () {					
+			$('div.post.footer').hide();
+			refreshEditForm($('select.contests option:selected').val());
+		});
+		
+		// If we have a contest in GET, then get it
+		{IF isset($smarty.get.contest)}
+		$('select.contests').each(function() {
+			$('option', this).each(function() {
+				if($(this).val() == "{$smarty.get.contest}") {
+					$(this).attr('selected', 'selected');
+					$('select.contests').trigger('change');
+				}
+			});
+		});
+		{/IF}
+	});			
 	
 	$('.new_contest_form').submit(function() {
 		

@@ -1,3 +1,4 @@
+{include file='redirect.tpl'}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 
@@ -10,10 +11,8 @@
 </div>
 -->
 <div class="post">
-	<div class="copy">
-		<div class="POS Boton">Concursos activos</div>
-		<div class="POS Boton">Todos los concursos</div>
-		<div class="POS Boton">Crear un concurso</div>
+	<div class="copy">		
+		<div class="POS Boton" id="contest-create">Crear un concurso</div>
 	</div>
 </div>
 
@@ -21,4 +20,10 @@
 	{include file='contest.list.tpl'}
 </div>
 
+<script>
+	$('#contest-create').click(function() {
+		window.location.assign("/contestcreate.php");
+	});
+</script>
+	
 {include file='footer.tpl'}

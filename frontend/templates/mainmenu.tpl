@@ -10,8 +10,11 @@
 			<ul>
 				{if $CURRENT_USER_IS_ADMIN eq '1'}
 					<li><a href='/admin/'><b>Admin</b></a></li>
+				{/if}				
+				<li><a href='/arena'><b>{#frontPageArena#}</b></a></li>
+				{if $LOGGED_IN eq '1'}
+					<li><a href='/contests.php'><b>{#frontPageMyContests#}</b></a></li>
 				{/if}
-				<li><a href='/contests.php'>{#frontPageContests#}</a></li>
 				<li><a href='/probs.php'>{#frontPageProblems#}</a></li>
 				<li><a href='/rank.php'>{#frontPageRanking#}</a></li>
 				<li><a href='/recent.php'>{#frontPageRecent#}</a></li>

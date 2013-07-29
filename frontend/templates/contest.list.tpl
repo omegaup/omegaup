@@ -12,14 +12,15 @@
 			}
 		}
 	
-		omegaup.getContests(function(contests) {
+		omegaup.getMyContests(function(contests) {
 			// Got the contests, lets draw them
 
 			var html = "<h3>Concursos</h3><table><tr>"
-					+ "<td>Title</td>"
-					+ "<td>Descripcion</td>"
+					+ "<td>Título</td>"					
 					+ "<td>Inicio</td>"
 					+ "<td>Fin</td>"
+					+ "<td></td>"
+					+ "<td></td>"
 					+ "<td></td>"
 					+ "</tr>";
 
@@ -27,12 +28,11 @@
 				var startDate = contests.results[i].start_time;
 				var endDate = contests.results[i].finish_time;
 				html += "<tr>"
-					+ "<td>" + contests.results[i].title + "</td>"
-					+ "<td>" + contests.results[i].description + "</td>"
+					+ "<td>" + contests.results[i].title + "</td>"					
 					+ '<td><a href="' + makeWorldClockLink(startDate) + '">' + startDate.format("long", "es") + "</a></td>"
 					+ '<td><a href="' + makeWorldClockLink(endDate) + '">' + endDate.format("long", "es") + "</a></td>"
-					+ '<td><a href="/contest/' + contests.results[i].alias  + '">Detalles</a></td>'
-					+ '<td><a href="/arena/' + contests.results[i].alias  + '">Ir al concurso</a></td>'
+					+ '<td><a href="/contestedit.php?contest=' + contests.results[i].alias  + '">Editar</a></td>'
+					+ '<td><a href="/addproblemtocontest?contest=' + contests.results[i].alias  + '">Agregar problemas</a></td>'
 					+ "</tr>";
 			}
 
