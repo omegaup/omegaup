@@ -16,7 +16,7 @@
 			// Got the contests, lets draw them
 
 			var html = "<h3>Concursos</h3><table><tr>"
-					+ "<td><Título</td>"					
+					+ "<td>Título</td>"					
 					+ "<td>Inicio</td>"
 					+ "<td>Fin</td>"
 					+ "<td>Público</td>"
