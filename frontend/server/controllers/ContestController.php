@@ -129,6 +129,7 @@ class ContestController extends Controller {
 				
 				foreach ($contests_all as $c) {
 					if (Authorization::IsContestAdmin($r["current_user_id"], $c)) {
+						$c->toUnixTime();
 						$contests[] = $c;
 					}
 				}				
