@@ -58,7 +58,19 @@
 				for (var i = 0; i < contests.results.length; i++) {
 					contest = contests.results[i];							
 					$('select.contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
-				}							
+				}
+				
+				// If we have a contest in GET, then get it
+				{IF isset($smarty.get.contest)}
+				$('select.contests').each(function() {
+					$('option', this).each(function() {
+						if($(this).val() == "{$smarty.get.contest}") {
+							$(this).attr('selected', 'selected');
+							$('select.contests').trigger('change');
+						}
+					});
+				});
+				{/IF}
 			});	
 						
 			$("#problems_list").removeClass("wait_for_ajax");

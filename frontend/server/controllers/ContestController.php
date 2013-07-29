@@ -115,7 +115,7 @@ class ContestController extends Controller {
 		self::authenticateRequest($r);
 
 		// Create array of relevant columns
-		$relevant_columns = array("title", "alias", "start_time", "finish_time");
+		$relevant_columns = array("title", "alias", "start_time", "finish_time", "public");
 		$contests = null;
 		try {
 
