@@ -16,10 +16,11 @@
 			// Got the contests, lets draw them
 
 			var html = "<h3>Concursos</h3><table><tr>"
-					+ "<td>Título</td>"					
+					+ "<td><Título</td>"					
 					+ "<td>Inicio</td>"
 					+ "<td>Fin</td>"
 					+ "<td>Público</td>"
+					+ "<td></td>"
 					+ "<td></td>"
 					+ "<td></td>"
 					+ "<td></td>"
@@ -35,6 +36,7 @@
 					+ '<td>'+ ((contests.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
 					+ '<td><a href="/contestedit.php?contest=' + contests.results[i].alias  + '">Editar</a></td>'
 					+ '<td><a href="/addproblemtocontest.php?contest=' + contests.results[i].alias  + '">Agregar problemas</a></td>'
+					+ "<td><a href='/arena/" + contests.results[i].alias  + "/admin/'>Envíos</a></td>"
 					+ "</tr>";
 			}
 
