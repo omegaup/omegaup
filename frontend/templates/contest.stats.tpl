@@ -29,7 +29,7 @@
 	
 	
 	function getStats() {
-		omegaup.getContestStats('{$smarty.get.contest}', function (s) { stats = s; drawCharts(); });
+		omegaup.getContestStats('{$smarty.get.contest}', function (s) { if( s.status == "ok" ) { stats = s; drawCharts(); } });
 		updateStats();
 	}
 	

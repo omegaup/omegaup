@@ -1384,6 +1384,7 @@ class ContestController extends Controller {
 			"max_wait_time" => is_null($waitTimeArray) ? 0 : $waitTimeArray[1],
 			"max_wait_time_guid" => is_null($waitTimeArray) ? 0 : $waitTimeArray[0]->getGuid(),
 			"veredict_counts" => $veredict_counts,
+			"status" => "ok",
 		);
 	}
 
