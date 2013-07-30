@@ -119,11 +119,7 @@
 		var separator = 0;		
 		for (var val in stats.distribution) {
 		
-			if (val % 10 == 0) {
-				categories_vals[val] = separator;
-			} else {
-				categories_vals[val] = ' ';
-			}
+			categories_vals[val] = separator;
 				
 			separator += stats.size_of_bucket;			
 		}
@@ -138,10 +134,21 @@
                 text: 'Distribución de puntajes del concurso {$smarty.get.contest}'
             },            
             xAxis: {
-                categories: categories_vals,
+               categories: categories_vals,
 				title: {
 					text: 'Distribución de puntos en 100'
-				}
+				},
+		labels: {
+                    formatter: function() {
+                        if (this.value % 10 == 0) {
+				return this.value;
+                    	
+			}
+			else {
+				return '';
+			}
+		    }
+                }
             },
             yAxis: {
                 min: 0,
