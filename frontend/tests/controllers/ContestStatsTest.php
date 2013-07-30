@@ -72,6 +72,7 @@ class ContestStatsTest extends OmegaupTestCase {
 		$this->assertEquals($maxWaitRunData["response"]["guid"], $response["max_wait_time_guid"]);
 
 		$this->assertEquals($pendingRunsCount + $ACRunsCount + $WARunsCount + 1, $response["total_runs"]);
+		$this->assertEquals(1, $response["distribution"][100]);
 	}
 
 	/**

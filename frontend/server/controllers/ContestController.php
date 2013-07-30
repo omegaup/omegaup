@@ -950,11 +950,21 @@ class ContestController extends Controller {
 		if (is_null($r["contest"])) {
 			throw new NotFoundException("Contest not found");
 		}
-
+		
+		// Create scoreboard
+		$include_admins = false;		
+		if (Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			if (!is_null($r["include_admins"]) && $r["include_admins"] == false) {
+				$include_admins = false;
+			} else {
+				$include_admins = true;
+			}
+		}
+		
 		// Create scoreboard
 		$scoreboard = new Scoreboard(
 						$r["contest"]->getContestId(),
-						Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])
+						$include_admins
 		);
 
 		// Push scoreboard data in response
@@ -1372,6 +1382,29 @@ class ContestController extends Controller {
 			foreach (self::$veredicts as $veredict) {
 				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfContestByVeredict($r["contest"]->getContestId(), $veredict);
 			}
+			
+			// Get max points posible for contest
+			$key = new ContestProblems(array("contest_id" => $r["contest"]->getContestId()));
+			$contestProblems = ContestProblemsDAO::search($key);
+			$totalPoints = 0;
+			foreach($contestProblems as $cP) {
+				$totalPoints += $cP->getPoints();
+			} 
+			
+			
+			// Get scoreboard to calculate distribution
+			$distribution = array();			
+			for ($i = 0; $i < 101; $i++) {
+				$distribution[$i] = 0;
+			}
+			
+			$sizeOfBucket = $totalPoints / 100;
+			$r["include_admins"] = false;
+			$scoreboardResponse = self::apiScoreboard($r);
+			foreach($scoreboardResponse["ranking"] as $results) {
+				$distribution[(int)($results["total"]["points"] / $sizeOfBucket)]++;
+			}						
+			
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
@@ -1384,6 +1417,9 @@ class ContestController extends Controller {
 			"max_wait_time" => is_null($waitTimeArray) ? 0 : $waitTimeArray[1],
 			"max_wait_time_guid" => is_null($waitTimeArray) ? 0 : $waitTimeArray[0]->getGuid(),
 			"veredict_counts" => $veredict_counts,
+			"distribution" => $distribution,
+			"size_of_bucket" => $sizeOfBucket,
+			"total_points" => $totalPoints,
 			"status" => "ok",
 		);
 	}

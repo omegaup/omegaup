@@ -7,6 +7,7 @@
 	<div class="copy">
 		<h1>Estadísticas en vivo</h1>				
 		<div id="veredict-chart"></div>
+		<div id="distribution-chart"></div>
 		<div id="pending-runs-chart" style="width: 560px; height: 250px; margin-left: auto ; margin-right: auto ;"></div>
 	</div>
 </div>
@@ -25,7 +26,7 @@
 	var stats = null;
 	var callStatsApiTimeout = 10 * 1000;
 	var updateRunCountsChart = callStatsApiTimeout;
-	var updatePendingRunsChart = callStatsApiTimeout;
+	var updatePendingRunsChart = callStatsApiTimeout / 2;
 	
 	
 	function getStats() {
@@ -56,8 +57,18 @@
 			];	
 	}
 	
+	function getDistribution() {
+		var distribution = [];
+		for (var val in stats.distribution) {
+			distribution.push(parseInt(stats.distribution[val]));
+		}
+		
+		return distribution;
+	}
+	
 	function updateRunCountsData() {		
 		window.run_counts_chart.series[0].setData(getRunCountsNormalizedData());
+		window.distribution_chart.series[0].setData(getDistribution());
 		setTimeout(updateRunCountsData, updateRunCountsChart);
 	}
 	
@@ -102,7 +113,57 @@
 				name: 'Proporción',
 				data: getRunCountsNormalizedData()
 			}]
-		});													
+		});	
+				
+		var categories_vals = [];
+		var separator = 0;		
+		for (var val in stats.distribution) {
+		
+			if (val % 10 == 0) {
+				categories_vals[val] = separator;
+			} else {
+				categories_vals[val] = ' ';
+			}
+				
+			separator += stats.size_of_bucket;			
+		}
+		
+		
+		window.distribution_chart = new Highcharts.Chart ({
+			chart: {
+                type: 'column',
+				renderTo: 'distribution-chart'
+            },
+            title: {
+                text: 'Distribución de puntajes del concurso {$smarty.get.contest}'
+            },            
+            xAxis: {
+                categories: categories_vals,
+				title: {
+					text: 'Distribución de puntos en 100'
+				}
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '# Concursantes'
+                }
+            },
+            tooltip: {
+				
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'Número de concursantes',
+                data: getDistribution()
+    
+            }]
+        });
 	}		
 			
 	getStats();
@@ -178,7 +239,7 @@
 				return data;
 			})()
 		}]
-	});    
+	});
 
 	
 	{/IF}
