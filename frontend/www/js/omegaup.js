@@ -398,6 +398,25 @@ OmegaUp.prototype.getContestRuns = function(contestAlias, options, callback) {
 	);
 };
 
+OmegaUp.prototype.getContestStats = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/stats/contest_alias/' + contestAlias + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+
 OmegaUp.prototype.getRuns = function(options, callback) {
 	var self = this;
 
