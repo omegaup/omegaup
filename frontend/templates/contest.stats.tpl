@@ -136,7 +136,7 @@
             xAxis: {
                categories: categories_vals,
 				title: {
-					text: 'Distribución de puntos en 100'
+					text: 'Distribución de puntos en 100 intervalos'
 				},
 		labels: {
                     formatter: function() {
