@@ -24,8 +24,8 @@
 	
 	var stats = null;
 	var callStatsApiTimeout = 10 * 1000;
-	var updateRunCountsChart = 10 * 1000;
-	var updatePendingRunsChart = 2000;
+	var updateRunCountsChart = callStatsApiTimeout;
+	var updatePendingRunsChart = callStatsApiTimeout;
 	
 	
 	function getStats() {
