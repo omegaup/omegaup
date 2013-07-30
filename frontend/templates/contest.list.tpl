@@ -24,6 +24,7 @@
 					+ "<td></td>"
 					+ "<td></td>"
 					+ "<td></td>"
+					+ "<td></td>"
 					+ "</tr>";
 
 			for (var i = 0; i < contests.results.length; i++) {
@@ -37,6 +38,7 @@
 					+ '<td><a href="/contestedit.php?contest=' + contests.results[i].alias  + '">Editar</a></td>'
 					+ '<td><a href="/addproblemtocontest.php?contest=' + contests.results[i].alias  + '">Agregar problemas</a></td>'
 					+ "<td><a href='/arena/" + contests.results[i].alias  + "/admin/'>Envíos</a></td>"
+					+ '<td><a href="/conteststats.php?contest=' + contests.results[i].alias  + '">Estadísticas</a></td>'
 					+ "</tr>";
 			}
 
