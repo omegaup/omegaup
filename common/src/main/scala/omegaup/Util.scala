@@ -6,6 +6,7 @@ import java.util._
 import javax.net.ssl._
 import net.liftweb.json._
 import org.slf4j.{Logger, LoggerFactory}
+import org.apache.commons.codec.binary.Base64InputStream
 import scala.collection.mutable
 
 trait Using {
@@ -298,16 +299,21 @@ object FileUtil extends Object with Using {
 
 	@throws(classOf[IOException])
 	def copy(src: File, dest: File): Unit = {
+		using (new FileInputStream(src)) { inputStream => {
+			using (new FileOutputStream(dest)) { outputStream => {
+				copy(inputStream, outputStream)
+			}}
+		}}
+	}
+
+	@throws(classOf[IOException])
+	def copy(src: InputStream, dest: OutputStream): Unit = {
 		val buffer = Array.ofDim[Byte](1024)
 		var read = 0
 
-		using (new FileInputStream(src)) { inputStream => {
-			using (new FileOutputStream(dest)) { outputStream => {
-				while( { read = inputStream.read(buffer) ; read > 0 } ) {
-					outputStream.write(buffer, 0, read)
-				}
-			}}
-		}}
+		while( { read = src.read(buffer) ; read > 0 } ) {
+			dest.write(buffer, 0, read)
+		}
 	}
 		
 	@throws(classOf[IOException])
@@ -323,7 +329,16 @@ object FileUtil extends Object with Using {
 			dir.delete
 		}
 		false
-	}	
+	}
+
+	def removeExtension(name: String): String = {
+		val extension = name.lastIndexOf('.')
+		if (extension != -1) {
+			return name.substring(0, extension)
+		} else {
+			return name
+		}
+	}
 }
 
 object MetaFile extends Object with Using {
@@ -359,3 +374,41 @@ object MetaFile extends Object with Using {
 		}}
 	}
 }
+
+object DataUriStream extends Object with Log {
+	def apply(stream: InputStream) = {
+		System.out.println(stream)
+		debug("Reading data URI")
+
+		val buffer = Array.ofDim[Byte](1024)
+		var bytesRead = 0
+		var ch = 0
+		
+		bytesRead = stream.read(buffer, 0, 5)
+
+		if (bytesRead != 5 || new String(buffer, 0, bytesRead) != "data:") {
+			debug("Illegal data URI: No \"data\"")
+			throw new IOException("Illegal data uri stream")
+		}
+
+		while ({ch = stream.read ; bytesRead < buffer.length && ch != -1 && ch != ','}) {
+			buffer(bytesRead) = ch.toByte
+			bytesRead += 1
+		}
+
+		if (ch == -1) {
+			debug("Illegal data URI: No comma")
+			throw new IOException("Illegal data uri stream")
+		}
+
+		if (new String(buffer, 0, bytesRead).contains("base64")) {
+			debug("Using base64")
+			new Base64InputStream(stream)
+		} else {
+			debug("Using regular stream")
+			stream
+		}
+	}
+}
+
+class DataUriInputStream(stream: InputStream) extends FilterInputStream(DataUriStream(stream)) with Log {}

@@ -16,6 +16,7 @@ libraryDependencies ++= Seq(
 	"org.slf4j" % "log4j-over-slf4j" % "1.7.5",
 	"ch.qos.logback" % "logback-core" % "1.0.11",
 	"ch.qos.logback" % "logback-classic" % "1.0.11",
+	"commons-codec" % "commons-codec" % "1.8",
         "org.scalatest" %% "scalatest" % "1.9.1" % "test",
         "com.h2database" % "h2" % "1.3.153" % "runtime",
         "mysql" % "mysql-connector-java" % "5.1.12" % "runtime",

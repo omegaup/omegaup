@@ -17,7 +17,9 @@
 -s getcwd
 
 -p /usr
+-p /usr/local
 -p /usr/lib/
+-p /usr/local/lib/
 -p /proc/meminfo
 -p /usr/bin/python
 -p /usr/bin/python2.6

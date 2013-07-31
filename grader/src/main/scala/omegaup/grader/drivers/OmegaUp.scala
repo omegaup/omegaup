@@ -180,7 +180,7 @@ object OmegaUp extends Actor with Log {
 				run.score = 0
 				Manager.updateVeredict(run)
 			}
-			case e: Exception => {
+			case e: Any => {
 				error("OU Submission {} failed for problem {}", e, id, alias)
 				error("Stack trace: {}", e.getStackTrace) 
 			

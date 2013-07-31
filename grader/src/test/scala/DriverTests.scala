@@ -5,6 +5,7 @@ import omegaup.grader.drivers._
 
 import Language._
 
+import scala.collection.mutable._
 import org.scalatest.{FlatSpec, BeforeAndAfterAll}
 import org.scalatest.matchers.ShouldMatchers
 
@@ -75,8 +76,11 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		
 		val t = new Thread() { override def run(): Unit = { Manager.main(Array.ofDim[String](0)) } } 
 		t.start
+
+		val tests = new ListBuffer[() => Unit]
+		implicit val conn = Manager.connection
 		
-		val omegaUpSubmitContest = (id: Long, language: Language, code: String, user: Int, contest: Int, date: String) => {
+		def omegaUpSubmitContest(id: Long, language: Language, code: String, user: Int, contest: Int, date: String)(test: (Run) => Unit) = {
 			import java.util.Date
 			import java.sql.Timestamp
 			import java.text.SimpleDateFormat
@@ -87,32 +91,39 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 			
 			FileUtil.write(file.getCanonicalPath, code)
 		
-			Manager.grade(
-				GraderData.insert(new Run(
-					guid = file.getName,
-					user = user,
-					language = language,
-					problem = new Problem(id = id),
-					contest = contest match {
-						case 0 => None
-						case x: Int => Some(new Contest(id = x))
-					},
-					time = new Timestamp(date match {
-						case null => new Date().getTime()
-						case x: String => new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(x).getTime()
-					})
-				)).id
-			)
+			val submit_id = GraderData.insert(new Run(
+				guid = file.getName,
+				user = user,
+				language = language,
+				problem = new Problem(id = id),
+				contest = contest match {
+					case 0 => None
+					case x: Int => Some(new Contest(id = x))
+				},
+				time = new Timestamp(date match {
+					case null => new Date().getTime()
+					case x: String => new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(x).getTime()
+				})
+			)).id
+			Manager.grade(submit_id)
+
+			tests += (() => test(GraderData.run(submit_id).get))
 		}
-		
-		val omegaUpSubmit = (id: Long, language: Language, code: String) =>
-			omegaUpSubmitContest(id, language, code, 1, 0, null)
+
+		def omegaUpSubmit (problem_id: Long, language: Language, code: String)(test: (Run) => Unit) = {
+			omegaUpSubmitContest(problem_id, language, code, 1, 0, null) { test }
+		}
 		
 		omegaUpSubmit(1, Language.Cpp, """
 			int main() {
 				while(true);
 			}
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.TimeLimitExceeded)
+			run.score should equal (0)
+			run.contest_score should equal (0)
+		}}
 		
 		omegaUpSubmitContest(1, Language.Cpp, """
 			#include <cstdlib>
@@ -130,7 +141,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				
 				return EXIT_SUCCESS;
 			}
-		""", 1, 1, "2000-01-01 00:10:00")
+		""", 1, 1, "2000-01-01 00:10:00") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.Accepted)
+			run.score should equal (1)
+			run.contest_score should equal (100)
+		}}
 		
 		omegaUpSubmit(1, Language.Cpp, """
 			#include <cstdlib>
@@ -148,7 +164,49 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				
 				return EXIT_SUCCESS;
 			}
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.PartialAccepted)
+			run.score should equal (0.5)
+			run.contest_score should equal (0)
+		}}
+
+		omegaUpSubmit(1, Language.Literal, "") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.WrongAnswer)
+			run.score should equal (0.0)
+			run.contest_score should equal (0)
+		}}
+
+		omegaUpSubmit(1, Language.Literal,
+			"""data:application/x-zip;base64,
+			UEsDBAoAAAAAAKis/kI1yT8dEAAAABAAAAAGABwAMDAub3V0VVQJAAN7lPhRe5T4UXV4CwABBOgD
+			AAAE6AMAAEhlbGxvLCBXb3JsZCEKMwpQSwMEFAAAAAgAqaz+Qrbi9zMUAAAAFgAAAAYAHAAwMS5v
+			dXRVVAkAA32U+FF9lPhRdXgLAAEE6AMAAAToAwAA80jNycnXUQjPL8pJUeQyMgADLgBQSwECHgMK
+			AAAAAACorP5CNck/HRAAAAAQAAAABgAYAAAAAAABAAAApIEAAAAAMDAub3V0VVQFAAN7lPhRdXgL
+			AAEE6AMAAAToAwAAUEsBAh4DFAAAAAgAqaz+Qrbi9zMUAAAAFgAAAAYAGAAAAAAAAQAAAKSBUAAA
+			ADAxLm91dFVUBQADfZT4UXV4CwABBOgDAAAE6AMAAFBLBQYAAAAAAgACAJgAAACkAAAAAAA=
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.Accepted)
+			run.score should equal (1.0)
+			run.contest_score should equal (0)
+		}}
+
+		omegaUpSubmit(1, Language.Literal,
+			"""data:application/x-zip;base64,
+			UEsDBAoAAAAAAKis/kI1yT8dEAAAABAAAAAGABwAMDAub3V0VVQJAAN7lPhRe5T4UXV4CwABBOgD
+			AAAE6AMAAEhlbGxvLCBXb3JsZCEKMwpQSwMECgAAAAAASwb/QvaaEjYQAAAAEAAAAAYAHAAwMS5v
+			dXRVVAkAA73B+FGGlPhRdXgLAAEE6AMAAAToAwAASGVsbG8sIFdvcmxkIQowClBLAQIeAwoAAAAA
+			AKis/kI1yT8dEAAAABAAAAAGABgAAAAAAAEAAACkgQAAAAAwMC5vdXRVVAUAA3uU+FF1eAsAAQTo
+			AwAABOgDAABQSwECHgMKAAAAAABLBv9C9poSNhAAAAAQAAAABgAYAAAAAAABAAAApIFQAAAAMDEu
+			b3V0VVQFAAO9wfhRdXgLAAEE6AMAAAToAwAAUEsFBgAAAAACAAIAmAAAAKAAAAAAAA==
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.PartialAccepted)
+			run.score should equal (0.5)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(2, Language.Cpp, """
 			#include <cstdlib>
@@ -165,7 +223,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				
 				return EXIT_SUCCESS;
 			}
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.Accepted)
+			run.score should equal (1)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(2, Language.Cpp, """
 			#include <cstdlib>
@@ -182,7 +245,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				
 				return EXIT_SUCCESS;
 			}
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.PartialAccepted)
+			run.score should be (0.2 plusOrMinus 0.001)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(3, Language.Cpp, """
 			#include <cstdlib>
@@ -199,7 +267,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				
 				return EXIT_SUCCESS;
 			}
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.Accepted)
+			run.score should equal (1)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(3, Language.Cpp, """
 			#include <cstdlib>
@@ -216,7 +289,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				
 				return EXIT_SUCCESS;
 			}
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.PartialAccepted)
+			run.score should be (0.05 plusOrMinus 0.001)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(4, Language.Cpp, """
 			#include <cstdlib>
@@ -233,7 +311,12 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				
 				return EXIT_SUCCESS;
 			}
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.PartialAccepted)
+			run.score should be (0.71 plusOrMinus 0.01)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(4, Language.Cpp, """
 			#include <cstdlib>
@@ -250,251 +333,197 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 				
 				return EXIT_SUCCESS;
 			}
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.Accepted)
+			run.score should equal (1)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(5, Language.Cpp, """
 			#include "solve.h"
 
 			long long solve(long long a, long long b) { return a + b; }
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.Accepted)
+			run.score should equal (1)
+			run.contest_score should equal (0)
+		}}
 
-		omegaUpSubmit(5, Language.Cpp, """long long solve(long long a, long long b) { return 0; }""")
+		omegaUpSubmit(5, Language.Cpp, """
+			long long solve(long long a, long long b) { return 0; }
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.WrongAnswer)
+			run.score should equal (0)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(5, Language.Cpp, """
 			#include <stdio.h>
 			int main() { printf("Hello, World!\n3\n"); }
-		""")
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.CompileError)
+			run.score should equal (0)
+			run.contest_score should equal (0)
+		}}
 
 		omegaUpSubmit(6, Language.KarelJava, """
-class program {
+			class program {
+			void turn(n) { iterate(n) turnleft(); }
 
-void turn(n) { iterate(n) turnleft(); }
+			void avanza()
+			{
+			   if (frontIsClear)
+			   {
+			      move();
+			   }
+			   else
+			   {
+			       turn(2);
+			       while(frontIsClear)
+				  move();
+			       turn(3);
+			       if (frontIsClear)
+			       {
+				  move();
+				  turn(3);
+			       }
+			   }
+			}
 
-void avanza()
-{
-	
+			void recur(n)
+			{
+			   if (notFacingNorth)
+			   {
+			     recuerdame(n);
+			     regresa();
+			   }
+			   else
+			   {
+			     turn(3);
+			     while(frontIsClear)
+			     {
+				 move();
+			     }
+			     turn(2);
+			   }
+			}
 
-   if (frontIsClear)
-   {
-      move();
-   }
-   else
-   {
-       turn(2);
-       while(frontIsClear)
-          move();
-       turn(3);
-       if (frontIsClear)
-       {
-          move();
-          turn(3);
-       }
-   }
-}
+			void regresa()
+			{
+			  if(frontIsClear)
+			  {
+			     move();
+			  }
+			  else
+			  {
+			     turn(1);
+			     move();
+			     turnleft();
+			     while(frontIsClear)
+			       move();
+			     turn(2);
+			  }
+			}
 
-void recur(n)
-{
-   if (notFacingNorth)
-   {
-     recuerdame(n);
-     regresa();
-   }
-   else
-   {
-     turn(3);
-     while(frontIsClear)
-     {
-         move();
-     }
-     turn(2);
-   }
-}
+			void crece(n)
+			{
+			   if(!iszero(n))
+			   {
+			      iterate(4)
+			      {
+				 if (frontIsClear)
+				 {
+				     move();
+				     if (notNextToABeeper)
+				     {
+					putbeeper();
+				     }
+				     crece(pred(n));
+				     turn(2);
+				     move();
+				     turn(2);
+				 }
+				 turnleft();
+			      }
+			   }
+			}
 
-void regresa()
-{
-  if(frontIsClear)
-  {
-     move();
-  }
-  else
-  {
-     turn(1);
-     move();
-     turnleft();
-     while(frontIsClear)
-       move();
-     turn(2);
-  }
-}
+			void recuerdame(n)
+			{
+			   if (nextToABeeper)
+			   {
+			      avanza();
+			      recur(n);
+			      crece(n);
+			   }
+			   else
+			   {
+			      avanza();
+			      recur(n);
+			   }
+			}
 
-void crece(n)
-{
-   if(!iszero(n))
-   {
-      iterate(4)
-      {
-         if (frontIsClear)
-         {
-             move();
-             if (notNextToABeeper)
-             {
-                putbeeper();
-             }
-             crece(pred(n));
-             turn(2);
-             move();
-             turn(2);
-         }
-         turnleft();
-      }
-   }
-}
+			void cuenta(n)
+			{
+			   if (nextToABeeper)
+			   {
+			      pickbeeper();
+			      cuenta(succ(n));
+			   }
+			   else
+			   {
+			      while(notFacingEast)
+				 turnleft();
+			      recuerdame(n);
+			   }
+			}
 
-void recuerdame(n)
-{
-   if (nextToABeeper)
-   {
-      avanza();
-      recur(n);
-      crece(n);
-   }
-   else
-   {
-      avanza();
-      recur(n);
-   }
-}
+			void recoge()
+			{
+			    if (notFacingNorth)
+			    {
+			       avanza();
+			       if (nextToABeeper)
+			       {
+				  pickbeeper();
+				  recoge();
+				  putbeeper();
+			       }
+			       else
+			       {
+				  recoge();
+			       }
+			    }else
+			    {
+			       turn(2);
+			       while(frontIsClear)
+				  move();
+			    }
+			}
 
-void cuenta(n)
-{
-   if (nextToABeeper)
-   {
-      pickbeeper();
-      cuenta(succ(n));
-   }
-   else
-   {
-      while(notFacingEast)
-         turnleft();
-      recuerdame(n);
-   }
-}
+			program() {
+			    cuenta(0);
+			    while(notFacingEast)
+			       turnleft();
+			    recoge();
+			    turnoff();
+			}
 
-void recoge()
-{
-    if (notFacingNorth)
-    {
-       avanza();
-       if (nextToABeeper)
-       {
-          pickbeeper();
-          recoge();
-          putbeeper();
-       }
-       else
-       {
-          recoge();
-       }
-    }else
-    {
-       turn(2);
-       while(frontIsClear)
-          move();
-    }
-}
-
-program() {
-    cuenta(0);
-    while(notFacingEast)
-       turnleft();
-    recoge();
-    turnoff();
-}
-
-}
-		""")
+			}
+		""") { run => {
+			run.status should equal (Status.Ready)
+			run.veredict should equal (Veredict.Accepted)
+			run.score should equal (1)
+			run.contest_score should equal (0)
+		}}
 	
 		try { Thread.sleep(30000) }
-		
-		implicit val conn = Manager.connection
-		
-		var run: Run = GraderData.run(1).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.TimeLimitExceeded)
-		run.score should equal (0)
-		run.contest_score should equal (0)
-		
-		run = GraderData.run(2).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.Accepted)
-		run.score should equal (1)
-		run.contest_score should equal (100)
-		
-		run = GraderData.run(3).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should equal (0.5)
-		run.contest_score should equal (0)
 
-		run = GraderData.run(4).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.Accepted)
-		run.score should equal (1)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(5).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should be (0.2 plusOrMinus 0.001)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(6).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.Accepted)
-		run.score should equal (1)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(7).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should be (0.05 plusOrMinus 0.001)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(8).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.PartialAccepted)
-		run.score should be (0.71 plusOrMinus 0.01)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(9).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.Accepted)
-		run.score should equal (1)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(10).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.Accepted)
-		run.score should equal (1)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(11).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.WrongAnswer)
-		run.score should equal (0)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(12).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.CompileError)
-		run.score should equal (0)
-		run.contest_score should equal (0)
-
-		run = GraderData.run(13).get
-		run.status should equal (Status.Ready)
-		run.veredict should equal (Veredict.Accepted)
-		run.score should equal (1)
-		run.contest_score should equal (0)
+		tests.foreach { _() }
 	}
 	
 	/*

@@ -173,7 +173,11 @@ trait Grader extends Object with Log {
                             .map { case (name, weight) =>
                               new CaseVeredictMessage(
                                 name,
-                                metas(name)._2("status"),
+                                if (metas.contains(name)) {
+					metas(name)._2("status")
+				} else {
+					"OK"
+				},
                                 if (metas.contains(name) && metas(name)._2("status") == "OK") {
                                   val f = metas(name)._1
 
