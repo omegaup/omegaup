@@ -322,27 +322,37 @@ object Runner extends RunnerService with Log with Using {
 				if(meta("status") == "OK") {
 					val validatorDirectory = new File(runDirectory.getCanonicalPath + "/validator")
 					if (validatorDirectory.exists) {
-						val caseName = x.getName
-						val metaFile = validatorDirectory.getCanonicalPath + "/" + caseName;
-						var inputFile = new File(x.getCanonicalPath.replace(".meta", ".in"))
+						val caseName = FileUtil.removeExtension(x.getName)
+						val caseFile = new File(validatorDirectory, caseName).getCanonicalPath;
+						var inputFile = new File(FileUtil.removeExtension(x.getCanonicalPath) + ".in")
 						if (!inputFile.exists) {
-							inputFile = new File(casesDirectory.getCanonicalPath + "/" + caseName.replace(".meta", ".in"))
+							inputFile = new File(casesDirectory, caseName + ".in")
 						}
-						val commonParams = List("-c", validatorDirectory.getCanonicalPath, "-q", "-M", metaFile, "-i", x.getCanonicalPath.replace(".meta", ".out"), "-o", metaFile.replace(".meta", ".out"), "-r", metaFile.replace(".meta", ".err"), "-P", inputFile.getCanonicalPath, "-t", message.timeLimit.toString, "-w", (message.timeLimit + 60).toString, "-O", message.outputLimit.toString)
+						val commonParams = List(
+							"-c", validatorDirectory.getCanonicalPath,
+							"-q",
+							"-M", caseFile + ".meta",
+							"-i", FileUtil.removeExtension(x.getCanonicalPath) + ".out",
+							"-o", caseFile + ".out",
+							"-r", caseFile + ".err",
+							"-P", inputFile.getCanonicalPath,
+							"-t", message.timeLimit.toString,
+							"-w", (message.timeLimit + 60).toString,
+							"-O", message.outputLimit.toString)
 						
-						val validator_lang = using (new BufferedReader(new FileReader(validatorDirectory.getCanonicalPath + "/lang"))) { reader => reader.readLine }
+						val validator_lang = using (new BufferedReader(new FileReader(new File(validatorDirectory, "lang")))) { reader => reader.readLine }
 				
 						val params = validator_lang match {
 							case "java" =>
-								List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")
+								List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main", caseName)
 							case "c" =>
-								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
+								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out", caseName)
 							case "cpp" =>
-								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out")
+								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out", caseName)
 							case "p" =>
-								List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "./Main")
+								List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "./Main", caseName)
 							case "py" =>
-								List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py")
+								List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py", caseName)
 						}
 				
 						debug("Validator run {}", params.mkString(" "))
@@ -350,7 +360,7 @@ object Runner extends RunnerService with Log with Using {
 						pusing (runtime.exec(params.toArray)) { process => process.waitFor }
 						
 						val metaAddendum = try {
-							using (new BufferedReader(new FileReader(validatorDirectory.getCanonicalPath + "/" + caseName.replace(".meta", ".out")))) { reader => {
+							using (new BufferedReader(new FileReader(caseFile + ".out"))) { reader => {
 								List(("score" -> Math.max(0.0, Math.min(1.0, reader.readLine.trim.toDouble)).toString))
 							}}
 						} catch {
