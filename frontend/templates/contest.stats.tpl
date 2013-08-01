@@ -8,7 +8,7 @@
 		<h1>Estadísticas en vivo</h1>				
 		<div id="veredict-chart"></div>
 		<div id="distribution-chart"></div>
-		<div id="pending-runs-chart" style="width: 560px; height: 250px; margin-left: auto ; margin-right: auto ;"></div>
+		<div id="pending-runs-chart"></div>
 	</div>
 </div>
 
@@ -204,7 +204,7 @@
 		},
 		xAxis: {
 			type: 'datetime',
-			tickPixelInterval: 150
+			tickPixelInterval: 200
 		},
 		yAxis: {
 			title: {
@@ -237,7 +237,7 @@
 					time = (new Date()).getTime(),
 					i;
 
-				for (i = -2; i <= 0; i++) {
+				for (i = -5; i <= 0; i++) {
 					data.push({
 						x: time + i * 1000,
 						y: 0
