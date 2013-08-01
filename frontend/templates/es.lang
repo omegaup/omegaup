@@ -17,6 +17,7 @@ logOut = "Cerrar Sesion"
 
 frontPageContests = "Concursos"
 frontPageMyContests = "Mis concursos"
+frontPageMyProblems = "Mis problemas"
 frontPageArena = "Arena"
 frontPageProblems = "Problemas"
 frontPageRanking = "Rank"

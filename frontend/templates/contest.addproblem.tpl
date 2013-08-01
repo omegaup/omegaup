@@ -71,6 +71,18 @@
 					});
 				});
 				{/IF}
+		
+				// If we have a problem in GET, then get it
+				{IF isset($smarty.get.problem)}
+				$('select.problems').each(function() {
+					$('option', this).each(function() {
+						if($(this).val() == "{$smarty.get.problem}") {
+							$(this).attr('selected', 'selected');
+							$('select.problems').trigger('change');
+						}
+					});
+				});
+				{/IF}
 			});	
 						
 			$("#problems_list").removeClass("wait_for_ajax");

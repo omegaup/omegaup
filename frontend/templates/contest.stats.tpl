@@ -138,17 +138,17 @@
 				title: {
 					text: 'Distribución de puntos en 100 intervalos'
 				},
-		labels: {
-                    formatter: function() {
-                        if (this.value % 10 == 0) {
-				return this.value;
-                    	
-			}
-			else {
-				return '';
-			}
-		    }
-                }
+				labels: {
+					formatter: function() {
+						if (this.value % 10 == 0) {
+							return this.value;
+
+						}
+						else {
+							return '';
+						}
+					}
+				}
             },
             yAxis: {
                 min: 0,

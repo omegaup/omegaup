@@ -14,10 +14,10 @@
 				<li><a href='/arena'><b>{#frontPageArena#}</b></a></li>
 				{if $LOGGED_IN eq '1'}
 					<li><a href='/contests.php'><b>{#frontPageMyContests#}</b></a></li>
+					<li><a href='/myproblems.php'><b>{#frontPageMyProblems#}</b></a></li>
 				{/if}
 				<li><a href='/probs.php'>{#frontPageProblems#}</a></li>
-				<li><a href='/rank.php'>{#frontPageRanking#}</a></li>
-				<li><a href='/recent.php'>{#frontPageRecent#}</a></li>
+				<li><a href='/rank.php'>{#frontPageRanking#}</a></li>				
 				<li><a href='https://github.com/omegaup/omegaup/'>{#frontPageDevelopers#}</a></li>
 				<li><a href='/help.php'>{#frontPageHelp#}</a></li>
 				<li><a href='http://blog.omegaup.com/'>{#frontPageBlog#}</a></li>

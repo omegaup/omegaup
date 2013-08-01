@@ -17,7 +17,7 @@
 		$('select.edit-problem-list').change(function () {			
 			console.log("changed select");
 			refreshEditForm($('select.edit-problem-list option:selected').val());
-		});
+		});				
 	
 		omegaup.getMyProblems(function(problems) {					
 			// Got the problems, lets populate the dropdown with them			
@@ -27,6 +27,18 @@
 			}			
 
 			$("#problems_list").removeClass("wait_for_ajax");
+			
+			// If we have a problem in GET, then get it
+			{IF isset($smarty.get.problem)}
+			$('select.edit-problem-list').each(function() {
+				$('option', this).each(function() {
+					if($(this).val() == "{$smarty.get.problem}") {
+						$(this).attr('selected', 'selected');
+						$('select.edit-problem-list').trigger('change');
+					}
+				});
+			});
+			{/IF}
 		});
 	})();
 	
