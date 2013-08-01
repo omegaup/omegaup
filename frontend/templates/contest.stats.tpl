@@ -6,6 +6,7 @@
 <div class="post">
 	<div class="copy">
 		<h1>Estadísticas en vivo</h1>				
+		<h2><div id="total-runs"></div> </h2>
 		<div id="veredict-chart"></div>
 		<div id="distribution-chart"></div>
 		<div id="pending-runs-chart"></div>
@@ -72,7 +73,9 @@
 		setTimeout(updateRunCountsData, updateRunCountsChart);
 	}
 	
-	function drawCharts() {		
+	function drawCharts() {	
+
+		$('#total-runs').html('Total de envíos: ' + stats.total_runs);	
 	
 		if (window.run_counts_chart != null) {
 			return;
@@ -90,7 +93,7 @@
 			},
 			tooltip: {
 				formatter: function() {
-								return '<b>'+ this.series.name +'</b>: '+ this.percentage.toFixed(2) +' %';
+								return '<b>Envíos</b>: '+ stats.veredict_counts[this.point.name] ;
 						}
 
 			},
@@ -103,7 +106,7 @@
 						color: '#000000',
 						connectorColor: '#000000',					
 						formatter: function() {
-								return '<b>'+ this.point.name +'</b>: '+ this.percentage.toFixed(2) +' %';
+								return '<b>'+ this.point.name +'</b>: '+ this.percentage.toFixed(2) +' % ('+ stats.veredict_counts[this.point.name] +')' ;
 						}
 					}
 				}
