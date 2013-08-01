@@ -417,6 +417,25 @@ OmegaUp.prototype.getContestStats = function(contestAlias, callback) {
 };
 
 
+OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/problem/stats/problem_alias/' + problemAlias + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+
 OmegaUp.prototype.getRuns = function(options, callback) {
 	var self = this;
 

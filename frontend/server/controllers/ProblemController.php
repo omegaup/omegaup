@@ -827,6 +827,7 @@ class ProblemController extends Controller {
 			"pending_runs" => $pendingRunsGuids,
 			"veredict_counts" => $veredict_counts,
 			"cases_stats" => $cases_stats["counts"],
+			"status" => "ok"
 		);
 	}
 

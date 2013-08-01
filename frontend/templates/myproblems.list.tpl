@@ -53,7 +53,7 @@
 					+ '<td>'+ ((problems.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
 					+ '<td><a href="/problemedit.php?problem=' + problems.results[i].alias  + '">Editar</a></td>'
 					+ '<td><a href="/addproblemtocontest.php?problem=' + problems.results[i].alias  + '">Agregar a concurso</a></td>'					
-					+ '<td><a href="/problemstats.php?problems=' + problems.results[i].alias  + '">Estadísticas</a></td>'
+					+ '<td><a href="/problemstats.php?problem=' + problems.results[i].alias  + '">Estadísticas</a></td>'
 					+ "</tr>";
 			}
 
