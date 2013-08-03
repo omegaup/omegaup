@@ -181,11 +181,11 @@ trait Grader extends Object with Log {
                                 if (metas.contains(name) && metas(name)._2("status") == "OK") {
                                   val f = metas(name)._1
 
-                                  gradeCase(
-                                    run,
+													       gradeCase(
+															     run,
                                     name,
-			            new File(f.getCanonicalPath.replace(".meta", ".out")),
-				    new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out"))
+				    new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out")),
+			            new File(f.getCanonicalPath.replace(".meta", ".out"))
                                   ) * weight
                                 } else {
                                   0.0
@@ -533,7 +533,7 @@ class NumericTokenComparer(precision: Double) extends TokenComparer {
 		val da = a.toDouble
 		val db = b.toDouble
 
-		return Math.abs(da - db) <= Math.abs(precision * da)
+		return Math.abs(da - db) <= Math.abs(precision * Math.max(1, da))
 	}
 }
 
