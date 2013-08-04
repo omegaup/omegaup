@@ -533,7 +533,11 @@ $(document).ready(function() {
 						if (data.compile_error) {
 							$('#run-details .compile_error').html(data.compile_error.replace('&', '&amp;').replace('<', '&lt;'));
 						}
-						$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
+						if (data.source.indexOf('data:') === 0) {
+							$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">descarga</a>');
+						} else {
+							$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
+						}
 						$('#run-details .cases div').remove();
 						$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
 

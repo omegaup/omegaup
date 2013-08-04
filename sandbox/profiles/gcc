@@ -4,6 +4,7 @@
 -F
 
 -s mprotect
+-s mremap
 -s rt_sigaction
 -s gettimeofday
 -s ugetrlimit
