@@ -984,13 +984,12 @@ class ContestController extends Controller {
 		// Get the current user
 		self::authenticateRequest($r);
 		
-		if (!is_array($r["contest_aliases"])) {
-			throw new InvalidParameterException("contest_aliases is not an array");
-		}
+		Validators::isStringNonEmpty($r["contest_aliases"], "contest_aliases");
+		$contest_aliases = explode(",", $r["contest_aliases"]);
 		
 		// Validate all contest alias
 		$contests = array();
-		foreach ($r["contest_aliases"] as $contest_alias) {
+		foreach ($contest_aliases as $contest_alias) {
 			try {
 				$contest = ContestsDAO::getByAlias($contest_alias);				
 			} catch (Exception $e) {

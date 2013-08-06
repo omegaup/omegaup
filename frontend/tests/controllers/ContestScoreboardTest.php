@@ -193,8 +193,8 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		
 		// Create request
 		$r = new Request();
-		$r["contest_aliases"] = array($contestData["request"]["alias"], $contestData2["request"]["alias"]);
-		$r["auth_token"] = $this->login($contestant);
+		$r["contest_aliases"] = $contestData["request"]["alias"] . "," . $contestData2["request"]["alias"];
+		$r["auth_token"] = $this->login($contestant);		
 				
 		// Create API
 		$response = ContestController::apiScoreboardMerge($r);								
