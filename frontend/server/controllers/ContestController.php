@@ -1039,6 +1039,16 @@ class ContestController extends Controller {
 			}
 		}
 		
+		// Normalize user["contests"] entries so all contain the same contests
+		foreach($merged_scoreboard as $username => $entry) {
+			foreach($contests as $contest) {
+				if (!isset($entry["contests"][$contest->getAlias()]["points"])) {
+					$merged_scoreboard[$username]["contests"][$contest->getAlias()]["points"] = 0;
+					$merged_scoreboard[$username]["contests"][$contest->getAlias()]["penalty"] = 0;
+				}
+			}
+		}
+		
 		// Sort merged_scoreboard
 		usort($merged_scoreboard, array('self', 'compareUserScores'));
 		

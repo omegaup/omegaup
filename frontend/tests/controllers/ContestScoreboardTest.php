@@ -200,7 +200,8 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$response = ContestController::apiScoreboardMerge($r);								
 		
 		$this->assertEquals(200, $response["ranking"][0]["total"]["points"]);
-		$this->assertEquals(100, $response["ranking"][1]["total"]["points"]);		
+		$this->assertEquals(100, $response["ranking"][1]["total"]["points"]);
+		$this->assertEquals(0, $response["ranking"][1]["contests"][$contestData2["request"]["alias"]]["points"]);
 	}
 }
 
