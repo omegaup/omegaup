@@ -158,6 +158,49 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$this->assertEquals(100, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
 		$this->assertEquals(60, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
 		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["wrong_runs_count"]);
-	}		
+	}
+	
+	
+	/**
+	 * Scoreboard merge basic test
+	 */
+	public function testScoreboardMerge() {
+		
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+
+		// Get contests
+		$contestData = ContestsFactory::createContest();
+		$contestData2 = ContestsFactory::createContest();
+
+		// Add the problem to the contest
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+		ContestsFactory::addProblemToContest($problemData, $contestData2);
+
+		// Create our contestants
+		$contestant = UserFactory::createUser();
+		$contestant2 = UserFactory::createUser();
+		
+		// Create a run
+		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+		$runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);
+		$runData3 = RunsFactory::createRun($problemData, $contestData2, $contestant2);
+		
+		// Grade the run
+		RunsFactory::gradeRun($runData);
+		RunsFactory::gradeRun($runData2);
+		RunsFactory::gradeRun($runData3);
+		
+		// Create request
+		$r = new Request();
+		$r["contest_aliases"] = array($contestData["request"]["alias"], $contestData2["request"]["alias"]);
+		$r["auth_token"] = $this->login($contestant);
+				
+		// Create API
+		$response = ContestController::apiScoreboardMerge($r);								
+		
+		$this->assertEquals(200, $response["ranking"][0]["total"]["points"]);
+		$this->assertEquals(100, $response["ranking"][1]["total"]["points"]);		
+	}
 }
 

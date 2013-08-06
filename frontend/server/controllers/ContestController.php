@@ -973,6 +973,100 @@ class ContestController extends Controller {
 
 		return $response;
 	}
+	
+	/**
+	 * Gets the accomulative scoreboard for an array of contests
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiScoreboardMerge(Request $r) {
+	
+		// Get the current user
+		self::authenticateRequest($r);
+		
+		if (!is_array($r["contest_aliases"])) {
+			throw new InvalidParameterException("contest_aliases is not an array");
+		}
+		
+		// Validate all contest alias
+		$contests = array();
+		foreach ($r["contest_aliases"] as $contest_alias) {
+			try {
+				$contest = ContestsDAO::getByAlias($contest_alias);				
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			if (is_null($contest)) {
+				throw new NotFoundException("Contest {$contest_alias} not found");
+			}
+			
+			array_push($contests, $contest);												
+		}		
+				
+		// Get all scoreboards
+		$scoreboards = array();
+		foreach($contests as $contest) {
+			$s = new Scoreboard(
+					$contest->getContestId(), 
+					Authorization::IsContestAdmin($r["current_user_id"], $contest)
+					);
+			
+			$scoreboards[$contest->getAlias()] = $s->generate();
+		}
+			
+		$merged_scoreboard = array();
+		
+		// Merge
+		foreach($scoreboards as $contest_alias => $scoreboard) {
+			foreach($scoreboard as $user_results) {
+				//var_dump($user_results);
+				
+				// If user haven't been added to the merged scoredboard, add him
+				if (!isset($merged_scoreboard[$user_results["username"]])) {
+					$merged_scoreboard[$user_results["username"]] = array();
+					$merged_scoreboard[$user_results["username"]]["name"] = $user_results["name"];
+					$merged_scoreboard[$user_results["username"]]["username"] = $user_results["username"];
+					$merged_scoreboard[$user_results["username"]]["total"]["points"] = 0;
+					$merged_scoreboard[$user_results["username"]]["total"]["penalty"] = 0;
+				}
+				
+				$merged_scoreboard[$user_results["username"]]["contests"][$contest_alias]["points"] = $user_results["total"]["points"];
+				$merged_scoreboard[$user_results["username"]]["contests"][$contest_alias]["penalty"] = $user_results["total"]["penalty"];
+				
+				$merged_scoreboard[$user_results["username"]]["total"]["points"] += $user_results["total"]["points"];
+				$merged_scoreboard[$user_results["username"]]["total"]["penalty"] += $user_results["total"]["penalty"];
+			}
+		}
+		
+		// Sort merged_scoreboard
+		usort($merged_scoreboard, array('self', 'compareUserScores'));
+		
+		$response = array();
+		$response["ranking"] = $merged_scoreboard;
+		$response["status"] = "ok";
+		
+		return $response;
+	}
+	
+	/**
+	 * Compares results of 2 contestants to sort them in the scoreboard
+	 * 
+	 * @param type $a
+	 * @param type $b
+	 * @return int
+	 */
+	private static function compareUserScores($a, $b) {
+		if ($a["total"]["points"] == $b["total"]["points"]) {
+			if ($a["total"]["penalty"] == $b["total"]["penalty"])
+				return 0;
+
+			return ($a["total"]["penalty"] > $b["total"]["penalty"]) ? 1 : -1;
+		}
+
+		return ($a["total"]["points"] < $b["total"]["points"]) ? 1 : -1;
+	}
 
 	/**
 	 * Returns ALL users participating in a contest
