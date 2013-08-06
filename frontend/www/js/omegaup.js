@@ -579,6 +579,18 @@ OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 	);
 };
 
+OmegaUp.prototype.getScoreboardMerge = function(contestAliases, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/scoreboardmerge/contest_aliases/' + contestAliases.join(',') + '/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	);
+};
+
 OmegaUp.prototype.getClarifications = function(contestAlias, offset, count, callback) {
 	var self = this;
 
