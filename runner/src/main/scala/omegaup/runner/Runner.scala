@@ -225,9 +225,9 @@ object Runner extends RunnerService with Log with Using {
 			
 							while(entry != null) {
 								debug("Literal stream: {}", entry.getName)
-								val caseName = FileUtil.removeExtension(entry.getName)
+								val caseName = FileUtil.removeExtension(FileUtil.basename(entry.getName))
 								if (entry.getName.endsWith(".out") && inputFiles.contains(caseName + ".in")) {
-									using (new FileOutputStream(new File(runDirectory, entry.getName))) {
+									using (new FileOutputStream(new File(runDirectory, caseName + ".out"))) {
 										FileUtil.copy(stream, _)
 									}
 									FileUtil.write(new File(runDirectory, caseName + ".meta").getCanonicalPath,

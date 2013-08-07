@@ -339,6 +339,15 @@ object FileUtil extends Object with Using {
 			return name
 		}
 	}
+
+	def basename(path: String): String = {
+		val sep = path.lastIndexOf('/')
+		if (sep != -1) {
+			return path.substring(sep + 1)
+		} else {
+			return path
+		}
+	}
 }
 
 object MetaFile extends Object with Using {
