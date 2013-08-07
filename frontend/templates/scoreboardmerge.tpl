@@ -33,9 +33,11 @@
 		omegaup.getScoreboardMerge(contestAliases, function(scoreboard) {
 			var html = "<table><tr><td></td><td><b>Username</b></td>";
 			
+			var contests = [];
 			for (var alias in scoreboard["ranking"][0]["contests"]) {
 				html += "<td><b>" + alias + "</b></td>";
 				html += "<td> </td>";
+				contests.push(alias);
 			}	
 						
 			html += "<td><b>Total</b></td>";
@@ -52,9 +54,9 @@
 				html += "<td><b>" + (place) + "</b></td>" 
 				html += "<td>" + data["username"] + " (" + data["name"] + ")</td>";
 				
-				for (var contest in data["contests"]) {
-					html += "<td>" + data["contests"][contest]["points"] + "</td>";
-					html += "<td>" + data["contests"][contest]["penalty"] + "</td>";
+				for (var c in contests) {
+					html += "<td>" + data["contests"][contests[c]]["points"] + "</td>";
+					html += "<td>" + data["contests"][contests[c]]["penalty"] + "</td>";
 				}
 				
 				html += "<td>" + data["total"]["points"] + "</td>";
