@@ -13,6 +13,7 @@
 <div class="post">
 	<div class="copy">		
 		<div class="POS Boton" id="contest-create">Crear un concurso</div>
+		<div class="POS Boton" id="scoreboard-merge">Unir scoreboards</div>
 	</div>
 </div>
 
@@ -23,6 +24,10 @@
 <script>
 	$('#contest-create').click(function() {
 		window.location.assign("/contestcreate.php");
+	});
+	
+	$('#scoreboard-merge').click(function() {
+		window.location.assign("/scoreboardmerge.php");
 	});
 </script>
 	
