@@ -260,6 +260,27 @@ OmegaUp.prototype.addProblemToContest = function(contestAlias, order, problemAli
 	});
 };
 
+OmegaUp.prototype.addUserToContest = function(contestAlias, username, callback) {
+	var self = this;
+
+	$.post(
+		'/api/contest/addUser/contest_alias/' + contestAlias + '/',
+		{			
+			usernameOrEmail : username			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getProblems = function(callback) {
 	var self = this;
 

@@ -44,5 +44,20 @@ class UsersDAO extends UsersDAOBase
 
 		return array_pop( $a_Results );
 	}
+	
+	public static function FindByUsernameOrName($usernameOrName) {
+		
+		global  $conn;
+		$escapedStr = mysql_real_escape_string($usernameOrName);
+		$sql = "select DISTINCT u.* from Users u where u.username LIKE '%{$escapedStr}%' or u.name LIKE '%{$escapedStr}%' LIMIT 10";				
+		
+		$rs = $conn->Execute($sql);
+		$ar = array();
+		foreach ($rs as $foo) {
+			$bar =  new Users($foo);
+    		array_push( $ar,$bar);    		
+		}
+		return $ar;		
+	}
 
 }

@@ -681,6 +681,7 @@ class UserController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
+	
 	/**
 	 * Get Problems solved by user
 	 * 
@@ -703,6 +704,32 @@ class UserController extends Controller {
 		}
 		
 		$response["status"] = "ok";
+		return $response;
+	}
+	
+	/**
+	 * Gets a list of users 
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiList(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		Validators::isStringNonEmpty($r["term"], "term");
+		
+		try {
+			$users = UsersDAO::FindByUsernameOrName($r["term"]);
+		} catch(Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$response = array();		
+		foreach($users as $user) {			
+			$entry = array("label" => $user->getUsername(), "value" => $user->getUsername());			
+			array_push($response, $entry);
+		}
+		
 		return $response;
 	}
 }
