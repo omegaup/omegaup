@@ -437,6 +437,24 @@ OmegaUp.prototype.getContestStats = function(contestAlias, callback) {
 	});
 };
 
+OmegaUp.prototype.getContestUsers = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/users/contest_alias/' + contestAlias + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 
 OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 	var self = this;

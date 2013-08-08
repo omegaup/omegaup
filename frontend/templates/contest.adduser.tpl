@@ -18,16 +18,33 @@
 		</legend>
 
 		<legend>Usuario: <input id='username' name='username' value='' type='text' size='20' />
-		</legend>
+		</legend>				
 
 		<input id='user' name='user' value='' type='hidden'>
 
 		<input value='Agregar usuario' type='submit' class="OK">
+		
+		<legend>Usuarios registrados: <select class="contest-users" name='contest-users' id='contest-users' multiple="multiple" size="10">				
+		</select></legend>
 
 	</div>
 </div>
 
 <script>
+	
+	function updateContestUsers() {
+	
+		contestAlias = $('select.contests').val();
+		
+		omegaup.getContestUsers(contestAlias, function(users) {					
+			// Got the contests, lets populate the dropdown with them			
+			for (var i = 0; i < users.users.length; i++) {
+				user = users.users[i];							
+				$('select.contest-users').append($('<option></option>').attr('value', user.username).text(user.username));
+			}
+		});	
+	}
+	
 	
 	omegaup.getMyContests(function(contests) {					
 		// Got the contests, lets populate the dropdown with them			
@@ -36,12 +53,17 @@
 			$('select.contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
 		}				
 		
-		// If we have a contest in GET, then get it
+		$('select.contests').change(function () {					
+			updateContestUsers();
+		});
+		
+		// If we have a contest in GET, then select it
 		{IF isset($smarty.get.contest)}
 		$('select.contests').each(function() {
 			$('option', this).each(function() {
 				if($(this).val() == "{$smarty.get.contest}") {
-					$(this).attr('selected', 'selected');					
+					$(this).attr('selected', 'selected');
+					$('select.contests').trigger('change');
 				}
 			});
 		});
@@ -64,6 +86,9 @@
 			if (response.status == "ok") {
 				$('div.copy.error').html("User successfully added!");
 				$('div.post.footer').show();
+				
+				updateContestUsers();
+				
 				return;
 			}
 		});
