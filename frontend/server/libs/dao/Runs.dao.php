@@ -36,6 +36,31 @@ class RunsDAO extends RunsDAOBase
 		global $conn;
 		return $conn->GetOne($sql, $val) === 0;
 	}
+	
+	/*
+	 * Gets an array of the guids of the pending runs
+	 */
+	public static final function GetPendingRuns($showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT guid FROM Runs WHERE status != 'ready'";		
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		$rs = $conn->Execute($sql);
+
+		$ar = array();
+		foreach ($rs as $foo) 
+		{                
+			array_push($ar, $foo['guid']);
+		}
+
+		return $ar;
+	}
 
 	/*
 	 * Gets an array of the guids of the pending runs

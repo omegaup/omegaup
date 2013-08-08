@@ -598,7 +598,7 @@ class RunController extends Controller {
 	}
 	
 	/**
-	 * Get total of last 15 days
+	 * Get total of last 6 months
 	 * 
 	 * @param Request $r
 	 * @return type

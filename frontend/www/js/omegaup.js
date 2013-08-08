@@ -630,6 +630,25 @@ OmegaUp.prototype.getScoreboardMerge = function(contestAliases, callback) {
 	);
 };
 
+
+OmegaUp.prototype.getGraderStats = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/grader/status/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'ok', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getClarifications = function(contestAlias, offset, count, callback) {
 	var self = this;
 

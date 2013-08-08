@@ -134,6 +134,16 @@ class GraderController extends Controller {
 		Logger::log("Getting EC2 status");		
 		$response["cloud"] = self::getEc2Status();
 		
+		Logger::log("Getting pending runs");
+		$response["pending_runs"] = array();
+		try {
+			$runsGuids = RunsDAO::GetPendingRuns();
+			$response["pending_runs"] = $runsGuids;
+		} catch (Exception $e) {
+			Logger::Exception($e);
+		}
+		
+		$response["status"] = "ok";
 		return $response;
 	}
 	
