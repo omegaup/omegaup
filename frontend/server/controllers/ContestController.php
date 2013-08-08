@@ -1001,7 +1001,7 @@ class ContestController extends Controller {
 				throw new NotFoundException("Contest {$contest_alias} not found");
 			}
 			
-			array_push($contests, $contest);												
+			array_push($contests, $contest);
 		}		
 				
 		// Get all scoreboards
@@ -1009,8 +1009,7 @@ class ContestController extends Controller {
 		foreach($contests as $contest) {
 			$s = new Scoreboard(
 					$contest->getContestId(), 
-					Authorization::IsContestAdmin($r["current_user_id"], $contest)
-					);
+					false);
 			
 			$scoreboards[$contest->getAlias()] = $s->generate();
 		}
