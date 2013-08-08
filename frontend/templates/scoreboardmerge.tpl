@@ -35,32 +35,50 @@
 			
 			var contests = [];
 			for (var alias in scoreboard["ranking"][0]["contests"]) {
-				html += "<td><b>" + alias + "</b></td>";
-				html += "<td> </td>";
+				html += "<td colspan=\"2\"><b>" + alias + "</b></td>";
 				contests.push(alias);
 			}	
 						
-			html += "<td><b>Total</b></td>";
-			html += "<td><b>Penalty</b></td>";
+			html += "<td colspan=\"2\"><b>Total</b></td>";
 			html += "</tr>"
 			
 			ranking = scoreboard["ranking"];
+			var showPenalty = false;
 			for (var entry in ranking) {
-				
+				if (!ranking.hasOwnProperty(entry)) continue;
+				data = ranking[entry];
+				showPenalty |= !!data["total"]["penalty"];
+			}
+
+			for (var entry in ranking) {
+				if (!ranking.hasOwnProperty(entry)) continue;
 				data = ranking[entry];
 				place = parseInt(entry) + 1;
 				
 				html += "<tr>";
-				html += "<td><b>" + (place) + "</b></td>" 
-				html += "<td>" + data["username"] + " (" + data["name"] + ")</td>";
-				
-				for (var c in contests) {
-					html += "<td>" + data["contests"][contests[c]]["points"] + "</td>";
-					html += "<td>" + data["contests"][contests[c]]["penalty"] + "</td>";
+				html += "<td><strong>" + (place) + "</strong></td>";
+				html += "<td><div class=\"username\">" + data["username"] + "</div>";
+				if (data["username"] != data["name"]) {
+					html += "<div class=\"name\">" + data["name"] + "</div></td>";
+				} else {
+					html += "<div class=\"name\">&nbsp;</div></td>";
 				}
 				
-				html += "<td>" + data["total"]["points"] + "</td>";
-				html += "<td>" + data["total"]["penalty"] + "</td>";
+				for (var c in contests) {
+					if (showPenalty) {
+						html += "<td class=\"numeric\">" + data["contests"][contests[c]]["points"] + "</td>";
+						html += "<td class=\"numeric\">" + data["contests"][contests[c]]["penalty"] + "</td>";
+					} else {
+						html += "<td class=\"numeric\" colspan=\"2\">" + data["contests"][contests[c]]["points"] + "</td>";
+					}
+				}
+				
+				if (showPenalty) {
+					html += "<td class=\"numeric\">" + data["total"]["points"] + "</td>";
+					html += "<td class=\"numeric\">" + data["total"]["penalty"] + "</td>";
+				} else {
+					html += "<td class=\"numeric\" colspan=\"2\">" + data["total"]["points"] + "</td>";
+				}
 				
 				html += "</tr>";
 			}			
@@ -68,7 +86,6 @@
 			html += "</table>"
 			
 			$("#ranking").html(html);	
-
 		});
 	});
 </script>

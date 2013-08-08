@@ -324,8 +324,26 @@ table.sample_io {
 	padding: 10px;
 	border: 1px solid #000;
 }
+table.merged-scoreboard td {
+	vertical-align: middle;
+}
 table.merged-scoreboard tr:nth-child(even) {
 	background: #eee;
+}
+table.merged-scoreboard td div.username {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+table.merged-scoreboard td div.name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: smaller;
+	color: #888;
+}
+td.numeric {
+	text-align: right;
 }
 
 .new_contest button, .new_contest input[type=button] {
