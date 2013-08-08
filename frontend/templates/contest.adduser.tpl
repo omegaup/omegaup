@@ -36,6 +36,11 @@
 	
 		contestAlias = $('select.contests').val();
 		
+		// Reset multi select
+		$('select.contest-users option').each(function(index, option) {
+			$(option).remove();
+		});
+		
 		omegaup.getContestUsers(contestAlias, function(users) {					
 			// Got the contests, lets populate the dropdown with them			
 			for (var i = 0; i < users.users.length; i++) {
