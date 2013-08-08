@@ -324,6 +324,9 @@ table.sample_io {
 	padding: 10px;
 	border: 1px solid #000;
 }
+table.merged-scoreboard tr:nth-child(even) {
+	background: #eee;
+}
 
 .new_contest button, .new_contest input[type=button] {
     padding: 3px;

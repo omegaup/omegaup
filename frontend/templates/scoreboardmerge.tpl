@@ -31,7 +31,7 @@
 	$('#get-merged-scoreboard').click(function() {
 		contestAliases = $('select.contests option:selected').map(function(){ return this.value }).get();
 		omegaup.getScoreboardMerge(contestAliases, function(scoreboard) {
-			var html = "<table><tr><td></td><td><b>Username</b></td>";
+			var html = "<table class=\"merged-scoreboard\"><tr><td></td><td><b>Username</b></td>";
 			
 			var contests = [];
 			for (var alias in scoreboard["ranking"][0]["contests"]) {
