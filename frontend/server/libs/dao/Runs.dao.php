@@ -133,6 +133,24 @@ class RunsDAO extends RunsDAOBase
 	}
 	
 	/*
+	 * Gets the count of total runs sent by an user
+	 */
+	public static final function CountTotalRunsOfUser($user_id, $showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT COUNT(*) FROM Runs WHERE user_id = ? ";
+		$val = array($user_id);
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		return $conn->GetOne($sql, $val);
+	}
+	
+	/*
 	 * Gets the count of total runs sent to a given problem
 	 */
 	public static final function CountTotalRunsOfProblem($problem_id, $showAllRuns = false)

@@ -742,7 +742,10 @@ class UserController extends Controller {
 		
 		self::authenticateRequest($r);
 		
-		try {			
+		try {
+			
+			$totalRunsCount = RunsDAO::CountTotalRunsOfUser($r["current_user_id"]);
+			
 			// List of veredicts			
 			$veredict_counts = array();
 			
@@ -756,6 +759,7 @@ class UserController extends Controller {
 		
 		return array(
 			"veredict_counts" => $veredict_counts,
+			"total_runs" => $totalRunsCount,
 			"status" => "ok"
 		);
 	}
