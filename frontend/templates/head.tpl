@@ -39,11 +39,10 @@
 			</div>
 				{if $CURRENT_USER_IS_ADMIN eq '1'}
 				<div class="status_bar" style="display: block; background-color: #00aa33;">
-					<img src="/media/wait.gif" />
+					<img src="/media/waitcircle.gif" />
 				</div>
 				<script>
-				
-					setInterval(function() {
+					function updateGraderStatus() {
 						$("div.status_bar").html("<img src='/media/waitcircle.gif' />");
 						
 						omegaup.getGraderStats(function(stats){
@@ -67,12 +66,15 @@
 							}
 							else {
 								$("div.status_bar").css("background-color","red");
-								html = "<b>Grader down D: </b>";
+								html = "<b>Grader down D: API api/grader/status call failed:  </b>";
 								html += stats.error;							
 							}
 
 							$("div.status_bar").html(html);
-						})},
-						30000);									
+						});
+					}
+				
+					updateGraderStatus();
+					setInterval(updateGraderStatus,	30000);									
 				</script>
 				{/if}

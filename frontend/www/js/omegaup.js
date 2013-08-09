@@ -41,7 +41,9 @@ $(document).ajaxError(function(e, xhr, settings, exception) {
 		
 	}
 
-	OmegaUp.UI.Error( errorToUser );
+	if (settings.url != "/api/grader/status/") {
+		OmegaUp.UI.Error( errorToUser );
+	}
 });
 
 OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, callback) {
