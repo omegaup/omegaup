@@ -120,7 +120,7 @@
 
 	<script>
 		
-		var status = null;
+		var stats = null;
 		
 		function getRunCountsNormalizedData() {
 			return [

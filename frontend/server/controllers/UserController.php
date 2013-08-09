@@ -747,7 +747,7 @@ class UserController extends Controller {
 			$veredict_counts = array();
 			
 			foreach (self::$veredicts as $veredict) {
-				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfContestByVeredict($r["current_user_id"], $veredict);
+				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfUserByVeredict($r["current_user_id"], $veredict);
 			}			
 			
 		} catch (Exception $e) {
