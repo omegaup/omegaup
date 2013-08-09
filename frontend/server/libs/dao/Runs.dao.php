@@ -185,6 +185,24 @@ class RunsDAO extends RunsDAOBase
 		global $conn;
 		return $conn->GetOne($sql, $val);
 	}
+	
+	/*
+	 * Gets the count of total runs sent to a given contest by veredict
+	 */
+	public static final function CountTotalRunsOfUserByVeredict($user_id, $veredict, $showAllRuns = false)
+	{
+		// Build SQL statement.
+		$sql = "SELECT COUNT(*) FROM Runs WHERE user_id = ? AND veredict = ? ";
+		$val = array($user_id, $veredict);
+
+		if (!$showAllRuns) 
+		{
+			$sql .= ' AND test = 0';
+		}
+
+		global $conn;
+		return $conn->GetOne($sql, $val);
+	}
 
 	/*
 	 * Gets the largest queued time of a run in ms 

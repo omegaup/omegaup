@@ -199,6 +199,22 @@ OmegaUp.prototype.login = function(username, password, callback) {
 	);
 };
 
+OmegaUp.prototype.getUserStats = function(callback) {
+	$.get(
+		'/api/user/stats/',		
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getContests = function(callback) {
 	var self = this;
 

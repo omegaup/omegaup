@@ -732,6 +732,33 @@ class UserController extends Controller {
 
 		return $response;
 	}
+	
+	/**
+	 * Get stats 
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiStats(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		try {			
+			// List of veredicts			
+			$veredict_counts = array();
+			
+			foreach (self::$veredicts as $veredict) {
+				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfContestByVeredict($r["current_user_id"], $veredict);
+			}			
+			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		return array(
+			"veredict_counts" => $veredict_counts,
+			"status" => "ok"
+		);
+	}
 
 }
 
