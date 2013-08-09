@@ -5,7 +5,7 @@
 
 <style>
 	.ui-autocomplete-loading {
-		background: white url('img/ajax_wait_autocomplete.gif') right center no-repeat;
+		background: white url('/media/wait.gif') right center no-repeat;
 	}
 </style>
 

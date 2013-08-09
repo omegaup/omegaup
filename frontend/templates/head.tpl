@@ -39,35 +39,37 @@
 			</div>
 				{if $CURRENT_USER_IS_ADMIN eq '1'}
 				<div class="status_bar" style="display: block; background-color: #00aa33;">
-					
+					<img src="/media/wait.gif" />
 				</div>
 				<script>
 				
-					omegaup.getGraderStats(function(stats){
-						if (stats.status == "ok") {
-							graderInfo = stats.grader;
-							
-							if (graderInfo.status == "ok") {
-								html = "Grader OK ";
-								html += "<b>Embedded runner: </b>" + graderInfo.embedded_runner + " ";
-								html += "<b>Queue length: </b>" + graderInfo.runner_queue_length + " ";
-								html += "<b>Runners: </b>" + graderInfo.runners + " ";
-							} 
-							else {
-								$("div.status_bar").css("background-color","red");
-								html = "Grader down D: ";
-							}
-							
-							html += "<b>Pending runs: " + stats.pending_runs.length; + "</b>";
-						}
-						else {
-							$("div.status_bar").css("background-color","red");							
-							html = stats.error;							
-						}
+					setInterval(function() {
+						$("div.status_bar").html("<img src='/media/wait.gif' />");
 						
-						$("div.status_bar").html(html);
-					});
-				
-					
+						omegaup.getGraderStats(function(stats){
+							if (stats.status == "ok") {
+								graderInfo = stats.grader;
+
+								if (graderInfo.status == "ok") {
+									html = "Grader OK ";
+									html += "<b>Embedded runner: </b>" + graderInfo.embedded_runner + " ";
+									html += "<b>Queue length: </b>" + graderInfo.runner_queue_length + " ";
+									html += "<b>Runners: </b>" + graderInfo.runners + " ";
+								} 
+								else {
+									$("div.status_bar").css("background-color","red");
+									html = "Grader down D: ";
+								}
+
+								html += "<b>Pending runs: " + stats.pending_runs.length; + "</b>";
+							}
+							else {
+								$("div.status_bar").css("background-color","red");							
+								html = stats.error;							
+							}
+
+							$("div.status_bar").html(html);
+						})},
+						5000);									
 				</script>
 				{/if}
