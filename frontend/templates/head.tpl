@@ -44,32 +44,35 @@
 				<script>
 				
 					setInterval(function() {
-						$("div.status_bar").html("<img src='/media/wait.gif' />");
+						$("div.status_bar").html("<img src='/media/waitcircle.gif' />");
 						
 						omegaup.getGraderStats(function(stats){
 							if (stats.status == "ok") {
+							
+								$("div.status_bar").css("background-color","#00aa33");
 								graderInfo = stats.grader;
 
 								if (graderInfo.status == "ok") {
-									html = "Grader OK ";
-									html += "<b>Embedded runner: </b>" + graderInfo.embedded_runner + " ";
-									html += "<b>Queue length: </b>" + graderInfo.runner_queue_length + " ";
-									html += "<b>Runners: </b>" + graderInfo.runners + " ";
+									html = "Grader OK | ";
+									html += "<b>Embedded runner: </b>" + graderInfo.embedded_runner + " | ";
+									html += "<b>Queue length: </b>" + graderInfo.runner_queue_length + " | ";
+									html += "<b>Runners: </b>" + graderInfo.runners + " | ";
 								} 
 								else {
 									$("div.status_bar").css("background-color","red");
-									html = "Grader down D: ";
+									html = "<b>Grader down D: </b>";
 								}
 
 								html += "<b>Pending runs: " + stats.pending_runs.length; + "</b>";
 							}
 							else {
-								$("div.status_bar").css("background-color","red");							
-								html = stats.error;							
+								$("div.status_bar").css("background-color","red");
+								html = "<b>Grader down D: </b>";
+								html += stats.error;							
 							}
 
 							$("div.status_bar").html(html);
 						})},
-						5000);									
+						30000);									
 				</script>
 				{/if}
