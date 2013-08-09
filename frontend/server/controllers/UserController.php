@@ -8,7 +8,7 @@
 require_once 'SessionController.php';
 
 class UserController extends Controller {
-	
+
 	public static $sendEmailOnVerify = true;
 	public static $redirectOnVerify = true;
 
@@ -78,7 +78,7 @@ class UserController extends Controller {
 		}
 
 		Logger::log("User " . $user->getUsername() . " created, sending verification mail");
-		
+
 		$r["user"] = $user;
 		self::sendVerificationEmail($r);
 
@@ -211,14 +211,14 @@ class UserController extends Controller {
 	 * @throws EmailNotVerifiedException
 	 */
 	public static function checkEmailVerification(Request $r) {
-		
+
 		if (OMEGAUP_FORCE_EMAIL_VERIFICATION) {
 			// Check if he has been verified				
 			if ($r["user"]->getVerified() == '0') {
 				Logger::log("User not verified.");
 
 				if ($r["user"]->getVerificationId() == null) {
-					
+
 					Logger::log("User does not have verification id. Generating.");
 
 					try {
@@ -257,9 +257,9 @@ class UserController extends Controller {
 
 		// Get auth_token
 		$auth_token = $sessionController->NativeLogin($r);
-		
+
 		// If user was correctly logged in
-		if ($auth_token !== false) {			
+		if ($auth_token !== false) {
 			return array(
 				"status" => "ok",
 				"auth_token" => $auth_token);
@@ -347,7 +347,7 @@ class UserController extends Controller {
 		}
 
 		Logger::log("User verification complete.");
-		
+
 		if (self::$redirectOnVerify) {
 			die(header('Location: /login.php'));
 		}
@@ -426,7 +426,7 @@ class UserController extends Controller {
 						"password" => $password,
 						"email" => $username . "@omi.com",
 					));
-			
+
 			UserController::$sendEmailOnVerify = false;
 			self::apiCreate($createRequest);
 		} else {
@@ -616,36 +616,36 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiProfile(Request $r) {
-		
+
 		self::authenticateRequest($r);
-		
+
 		$response = array();
 		$response["userinfo"] = array();
 		$response["problems"] = array();
-		
+
 		$user = $r["current_user"];
-		$response["userinfo"]["user_id"] = $user -> getUserId();
-		$response["userinfo"]["username"] = $user -> getUsername();
-		$response["userinfo"]["facebook_user_id"] = $user -> getFacebookUserId();
-		$response["userinfo"]["name"] = $user -> getName();
-		$response["userinfo"]["solved"] = $user -> getSolved();
-		$response["userinfo"]["submissions"] = $user -> getSubmissions();
-		
+		$response["userinfo"]["user_id"] = $user->getUserId();
+		$response["userinfo"]["username"] = $user->getUsername();
+		$response["userinfo"]["facebook_user_id"] = $user->getFacebookUserId();
+		$response["userinfo"]["name"] = $user->getName();
+		$response["userinfo"]["solved"] = $user->getSolved();
+		$response["userinfo"]["submissions"] = $user->getSubmissions();
+
 		try {
-			$response["userinfo"]["email"] = EmailsDAO::getByPK($user -> getMainEmailId()) -> getEmail();
-			$country = CountriesDAO::getByPK($user -> getCountryId());
-			$response["userinfo"]["country"] = is_null($country) ? null : $country -> getName();
-			$state = StatesDAO::getByPK($user -> getStateId());
-			$response["userinfo"]["state"] = is_null($state) ? null : $state -> getName();
-			$school = SchoolsDAO::getByPK($user -> getSchoolId());
-			$response["userinfo"]["school"] = is_null($school) ? null : $school -> getName();
-		} catch(Exception $e) {
+			$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+			$country = CountriesDAO::getByPK($user->getCountryId());
+			$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
+			$state = StatesDAO::getByPK($user->getStateId());
+			$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
+			$school = SchoolsDAO::getByPK($user->getSchoolId());
+			$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
+		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
 		$response["status"] = "ok";
-		return $response;		
+		return $response;
 	}
-	
+
 	/**
 	 * Get Contests which a certain user has participated in
 	 * 
@@ -654,34 +654,34 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiContestUsers(Request $r) {
-		
+
 		self::authenticateRequest($r);
-		
+
 		$response = array();
 		$response["contests"] = array();
-		
+
 		$user = $r["current_user"];
 		$contest_user_key = new ContestsUsers();
 		$contest_user_key->setUserId($user->getUserId());
-		
+
 		try {
-			$db_results = ContestsUsersDAO::search($contest_user_key);			
+			$db_results = ContestsUsersDAO::search($contest_user_key);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		$contests = array();
 		foreach ($db_results as $result) {
 			$contest_id = $result->getContestId();
 			$contest = ContestsDAO::getByPK($contest_id);
-			$contests[] = $contest->asArray(); 
+			$contests[] = $contest->asArray();
 		}
-		
+
 		$response["contests"] = $contests;
 		$response["status"] = "ok";
 		return $response;
 	}
-	
+
 	/**
 	 * Get Problems solved by user
 	 * 
@@ -690,47 +690,48 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiProblemsSolved(Request $r) {
-		
+
 		self::authenticateRequest($r);
-		
+
 		$response = array();
 		$response["runs"] = array();
-		
+
 		$user = $r["current_user"];
 		try {
-			$response["runs"] = RunsDAO::GetRunsByUser($user->getUserId());	
-		} catch(Exception $e) {
+			$response["runs"] = RunsDAO::GetRunsByUser($user->getUserId());
+		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		$response["status"] = "ok";
 		return $response;
 	}
-	
+
 	/**
 	 * Gets a list of users 
 	 * 
 	 * @param Request $r
 	 */
 	public static function apiList(Request $r) {
-		
+
 		self::authenticateRequest($r);
-		
+
 		Validators::isStringNonEmpty($r["term"], "term");
-		
+
 		try {
 			$users = UsersDAO::FindByUsernameOrName($r["term"]);
-		} catch(Exception $e) {
+		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
-		$response = array();		
-		foreach($users as $user) {			
-			$entry = array("label" => $user->getUsername(), "value" => $user->getUsername());			
+
+		$response = array();
+		foreach ($users as $user) {
+			$entry = array("label" => $user->getUsername(), "value" => $user->getUsername());
 			array_push($response, $entry);
 		}
-		
+
 		return $response;
 	}
+
 }
 
