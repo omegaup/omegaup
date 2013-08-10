@@ -128,8 +128,7 @@ class ContestController extends Controller {
 				$contests = array();
 				
 				foreach ($contests_all as $c) {
-					if (Authorization::IsContestAdmin($r["current_user_id"], $c)) {
-						$c->toUnixTime();
+					if (Authorization::IsContestAdmin($r["current_user_id"], $c)) {						
 						$contests[] = $c;
 					}
 				}				
@@ -140,6 +139,7 @@ class ContestController extends Controller {
 
 		$addedContests = array();
 		foreach ($contests as $c) {
+			$c->toUnixTime();
 			$contestInfo = $c->asFilteredArray($relevant_columns);
 			$addedContests[] = $contestInfo;
 		}
