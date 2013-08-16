@@ -31,7 +31,6 @@ class FileUploaderMock extends FileUploader {
  * @author joemmanuel
  */
 class ProblemsFactory {
-         
 	/**
 	 * Returns a Request object with valid info to create a problem and the 
 	 * author of the problem
@@ -62,7 +61,8 @@ class ProblemsFactory {
         $r["memory_limit"] = 32000;                
         $r["source"] = "yo";
         $r["order"] = "normal";
-        $r["public"] = $public;        
+	$r["public"] = $public;        
+	$r["alias"] = uniqid();
         
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = $zipName; 
