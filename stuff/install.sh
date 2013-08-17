@@ -15,6 +15,7 @@ USER=`whoami`
 MYSQL_PASSWORD=omegaup
 MYSQL_DB_NAME=omegaup
 UBUNTU=`uname -a | grep ubuntu | wc -l`
+WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
 
 # Get parameters
 while getopts "u:m:p:01" optname; do
@@ -57,7 +58,7 @@ if [ "$SKIP_INSTALL" != "1" ]; then
 			sed -e "s/http.*/& universe/" /etc/apt/sources.list > sources.list
 			sudo mv sources.list /etc/apt/sources.list
 		fi
-	else
+	elif [ "$WHEEZY" != "1" ]; then
 		curl -s http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add - > /dev/null
 		cat > dotdeb.list << EOF
 deb http://packages.dotdeb.org squeeze all
@@ -68,7 +69,8 @@ EOF
 	
 	sudo apt-get update -qq -y
 	
-	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openjdk-6-jdk openssh-client make zip
+	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openssh-client make zip
+	sudo apt-get install -qq -y openjdk-7-jdk || sudo apt-get install -qq -y openjdk-6-jdk
 	
 	if [ ! -f /usr/sbin/mysqld ]; then
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server
@@ -76,9 +78,7 @@ EOF
 		mysqladmin -u root password $MYSQL_PASSWORD
 	fi
 	
-	if [ "$UBUNTU" == "1" ]; then
-		sudo apt-get install -qq -y phpunit-selenium
-	fi
+	sudo apt-get install -qq -y phpunit-selenium || echo 'Selenium unavailable'
 	
 	# Restart php-fpm so it picks php5-curl and php5-mcrypt.
 	sudo /etc/init.d/php5-fpm restart
