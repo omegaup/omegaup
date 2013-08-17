@@ -46,11 +46,7 @@ class ProblemList extends OmegaupTestCase {
 
 		// Check private problem is not there
 		$exists = false;
-		foreach ($response as $problemResponse) {
-			if ($problemResponse === "ok") {
-					continue;
-			}
-			
+		foreach ($response['results'] as $problemResponse) {
 			if ($problemResponse["alias"] === $privateProblemData["request"]["alias"]) {
 				$exists = true;
 				break;
