@@ -61,8 +61,7 @@ class ProblemsFactory {
         $r["memory_limit"] = 32000;                
         $r["source"] = "yo";
         $r["order"] = "normal";
-	$r["public"] = $public;        
-	$r["alias"] = uniqid();
+		$r["public"] = $public;        	
         
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = $zipName; 
