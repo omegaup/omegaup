@@ -130,6 +130,74 @@ OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
 		}]
 	});
 };
+
+OmegaupGraph.prototype.getDistribution = function(stats) {
+	var distribution = [];
+
+	for (var val in stats.distribution) {
+		distribution.push(parseInt(stats.distribution[val]));
+	}
+		
+	return distribution;
+};
+
+OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
+	var categories_vals = [];
+	var separator = 0;		
+	for (var val in stats.distribution) {
+		categories_vals[val] = separator;
+		separator += stats.size_of_bucket;			
+	}
+	
+	return new Highcharts.Chart ({
+		chart: {
+			type: 'column',
+			renderTo: renderTo
+		},
+		title: {
+			text: 'Distribución de puntajes del concurso ' + title
+		},            
+		xAxis: {
+		   categories: categories_vals,
+			title: {
+				text: 'Distribución de puntos en 100 intervalos'
+			},
+			labels: {
+				formatter: function() {
+					if (this.value % 10 == 0) {
+						return this.value;
+
+					}
+					else {
+						return '';
+					}
+				}
+			}
+		},
+		yAxis: {
+			min: 0,
+			title: {
+				text: '# Concursantes'
+			}
+		},
+		tooltip: {
+
+		},
+		plotOptions: {
+			column: {
+				pointPadding: 0.2,
+				borderWidth: 0
+			}
+		},
+		series: [{
+			name: 'Número de concursantes',
+			data: this.getDistribution(stats)
+
+		}]
+	});
+		
+		
+};
 		
 
 

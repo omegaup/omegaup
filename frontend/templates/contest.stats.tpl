@@ -40,18 +40,9 @@
 	}
 	
 	
-	function getDistribution() {
-		var distribution = [];
-		for (var val in stats.distribution) {
-			distribution.push(parseInt(stats.distribution[val]));
-		}
-		
-		return distribution;
-	}
-	
 	function updateRunCountsData() {		
 		window.run_counts_chart.series[0].setData(oGraph.normalizeRunCounts(stats));
-		window.distribution_chart.series[0].setData(getDistribution());
+		window.distribution_chart.series[0].setData(oGraph.getDistribution(stats));
 		setTimeout(updateRunCountsData, updateRunCountsChartTimeout);
 	}
 	
@@ -59,6 +50,7 @@
 
 		$('#total-runs').html('Total de envíos: ' + stats.total_runs);	
 	
+		// This function is called after we call getStats multiple times. We just need to draw once.
 		if (window.run_counts_chart != null) {
 			return;
 		}
@@ -66,62 +58,8 @@
 		// Draw veredict counts pie chart
 		window.run_counts_chart = oGraph.veredictCounts('veredict-chart', '{$smarty.get.contest}', stats);
 				
-		var categories_vals = [];
-		var separator = 0;		
-		for (var val in stats.distribution) {
-		
-			categories_vals[val] = separator;
-				
-			separator += stats.size_of_bucket;			
-		}
-		
-		
-		window.distribution_chart = new Highcharts.Chart ({
-			chart: {
-                type: 'column',
-				renderTo: 'distribution-chart'
-            },
-            title: {
-                text: 'Distribución de puntajes del concurso {$smarty.get.contest}'
-            },            
-            xAxis: {
-               categories: categories_vals,
-				title: {
-					text: 'Distribución de puntos en 100 intervalos'
-				},
-				labels: {
-					formatter: function() {
-						if (this.value % 10 == 0) {
-							return this.value;
-
-						}
-						else {
-							return '';
-						}
-					}
-				}
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: '# Concursantes'
-                }
-            },
-            tooltip: {
-				
-            },
-            plotOptions: {
-                column: {
-                    pointPadding: 0.2,
-                    borderWidth: 0
-                }
-            },
-            series: [{
-                name: 'Número de concursantes',
-                data: getDistribution()
-    
-            }]
-        });
+		// Draw distribution of scores chart
+		window.distribution_chart = oGraph.distributionChart('distribution-chart', '{$smarty.get.contest}', stats);
 	}		
 			
 	getStats();
