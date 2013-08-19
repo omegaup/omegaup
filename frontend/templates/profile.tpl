@@ -122,7 +122,7 @@
 		
 		omegaup.getUserStats(function(data) {
 		
-			window.run_counts_chart = oGraph.runCounts('veredict-chart', '{$CURRENT_USER_USERNAME}', data);	
+			window.run_counts_chart = oGraph.veredictCounts('veredict-chart', '{$CURRENT_USER_USERNAME}', data);	
 		});
 	
 	</script>
