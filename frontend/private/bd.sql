@@ -703,6 +703,6 @@ CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs` FOR EACH ROW UPDATE  `Problems
 		WHERE  `Runs`.`veredict` =  'AC'
 		AND NEW.`problem_id` =  `Runs`.`problem_id`
 		)
-WHERE NEW.problem_id =  `Problems`.`problem_id`
+WHERE NEW.problem_id =  `Problems`.`problem_id`;
 
 COMMIT;

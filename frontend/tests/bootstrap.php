@@ -37,5 +37,7 @@ Utils::CleanPath(IMAGES_PATH);
 Utils::CleanupDB();
 
 // Create a test default user for manual UI operations
+UserController::$sendEmailOnVerify = false;
 UserFactory::createUser("test", "testtesttest");
+UserController::$sendEmailOnVerify = true;
 
