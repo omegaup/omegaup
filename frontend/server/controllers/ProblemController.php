@@ -337,6 +337,8 @@ class ProblemController extends Controller {
 
 		self::validateCreateOrUpdate($r, true /* is update */);
 
+		$requiresRejudge = false;
+
 		// Update the Problem object        
 		if (!is_null($r["public"])) {
 			$r["problem"]->setPublic($r["public"]);
@@ -347,14 +349,26 @@ class ProblemController extends Controller {
 		}
 
 		if (!is_null($r["validator"])) {
+			if ($r["validator"] != $r["problem"]->getValidator()) {
+				$requiresRejudge = true;
+			}
+
 			$r["problem"]->setValidator($r["validator"]);
 		}
 
 		if (!is_null($r["time_limit"])) {
+			if ($r["time_limit"] != $r["problem"]->getTimeLimit()) {
+				$requiresRejudge = true;
+			}
+
 			$r["problem"]->setTimeLimit($r["time_limit"]);
 		}
 
 		if (!is_null($r["memory_limit"])) {
+			if ($r["memory_limit"] != $r["problem"]->getMemoryLimit()) {
+				$requiresRejudge = true;
+			}
+
 			$r["problem"]->setMemoryLimit($r["memory_limit"]);
 		}
 
@@ -378,6 +392,7 @@ class ProblemController extends Controller {
 			ProblemsDAO::save($r["problem"]);
 
 			if (isset($_FILES['problem_contents']) && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
+				$requiresRejudge = true;
 
 				// DeployProblemZip requires alias => problem_alias
 				$r["alias"] = $r["problem_alias"];
@@ -400,25 +415,28 @@ class ProblemController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		// We need to rejudge runs after an update, let's initialize the grader
-		self::initializeGrader();
+		if (($requiresRejudge === true) && (OMEGAUP_FORCE_REJUDGE_ON_PROBLEM_UPDATE === true)) {
 
-		// Call Grader
-		try {
-			$runs = RunsDAO::search(new Runs(array(
-								"problem_id" => $r["problem"]->getProblemId()
-							)));
+			// We need to rejudge runs after an update, let's initialize the grader
+			self::initializeGrader();
 
-			foreach ($runs as $run) {
-				$run->setStatus('new');
-				$run->setVeredict('JE');
-				RunsDAO::save($run);
-				self::$grader->Grade($run->getRunId());
+			// Call Grader
+			try {
+				$runs = RunsDAO::search(new Runs(array(
+									"problem_id" => $r["problem"]->getProblemId()
+								)));
+
+				foreach ($runs as $run) {
+					$run->setStatus('new');
+					$run->setVeredict('JE');
+					RunsDAO::save($run);
+					self::$grader->Grade($run->getRunId());
+				}
+			} catch (Exception $e) {
+				Logger::error("Failed to rejudge runs after problem update");
+				Logger::error($e);
+				throw new InvalidDatabaseOperationException($e);
 			}
-		} catch (Exception $e) {
-			Logger::error("Failed to rejudge runs after problem update");
-			Logger::error($e);
-			throw new InvalidDatabaseOperationException($e);
 		}
 
 		if ($r["redirect"] === true) {
@@ -914,25 +932,25 @@ class ProblemController extends Controller {
 
 		$response = array();
 		$response["results"] = array();
-		
+
 		try {
 			$problems = NULL;
 			if (Authorization::IsSystemAdmin($r["current_user_id"])) {
-				$problems = ProblemsDAO::getAll(NULL, NULL, "problem_id", 'DESC');	
-			} else {			
+				$problems = ProblemsDAO::getAll(NULL, NULL, "problem_id", 'DESC');
+			} else {
 				$problem_mask = new Problems(array(
 							"author_id" => $r["current_user_id"]
-					));
+						));
 				$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
 			}
-			
+
 			foreach ($problems as $problem) {
 				array_push($response["results"], $problem->asArray());
 			}
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		$response["status"] = "ok";
 		return $response;
 	}

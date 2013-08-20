@@ -23,6 +23,7 @@ define('OMEGAUP_LOG_ACCESS_FILE',			'/var/log/omegaup/omegaup.log');
 define('OMEGAUP_LOG_ERROR_FILE',			'/var/log/omegaup/omegaup.log');
 define('OMEGAUP_EXPIRE_TOKEN_AFTER',			'8 HOUR');
 define('OMEGAUP_FORCE_EMAIL_VERIFICATION',		false);
+define('OMEGAUP_FORCE_REJUDGE_ON_PROBLEM_UPDATE',		true);
 
 # ####################################
 # GRADER CONFIG
