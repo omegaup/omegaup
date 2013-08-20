@@ -691,6 +691,9 @@ ALTER TABLE  `Auth_Tokens` ADD  `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIM
 ALTER TABLE  `Users` ADD  `verified` BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE  `Users` ADD  `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL;
 
+ALTER TABLE  `States` ADD  `state_code` CHAR( 3 ) NOT NULL AFTER  `country_id`;
+ALTER TABLE  `States` CHANGE  `state_id`  `state_id` INT( 11 ) NOT NULL AUTO_INCREMENT;
+
 --
 -- Update AC Count on grade
 --

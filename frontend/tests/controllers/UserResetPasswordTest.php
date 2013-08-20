@@ -24,7 +24,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
 		$r["password"] = Utils::CreateRandomString();
 		
 		// Call api
-		UserController::apiResetPassword($r);
+		UserController::apiChangePassword($r);
 		
 		// Try to login with old password, should fail
 		try {
@@ -58,7 +58,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
 		$r["old_password"] = $user->getPassword();
 		
 		// Call api
-		UserController::apiResetPassword($r);
+		UserController::apiChangePassword($r);
 		
 		// Try to login with old password, should fail
 		try {
@@ -91,7 +91,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
 		$r["old_password"] = "bad old password";
 				
 		// Call api
-		UserController::apiResetPassword($r);						
+		UserController::apiChangePassword($r);						
 		
 	} 
 }

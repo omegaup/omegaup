@@ -269,13 +269,13 @@ class UserController extends Controller {
 	}
 
 	/**
-	 * Resets the password of a user
+	 * Changes the password of a user
 	 * 
 	 * @param Request $rﬁ
 	 * @return array
 	 * @throws ForbiddenAccessException
 	 */
-	public static function apiResetPassword(Request $r) {
+	public static function apiChangePassword(Request $r) {
 
 		self::authenticateRequest($r);
 
@@ -434,7 +434,7 @@ class UserController extends Controller {
 			$resetRequest["auth_token"] = $r["auth_token"];
 			$resetRequest["username"] = $username;
 			$resetRequest["password"] = $password;
-			self::apiResetPassword($resetRequest);
+			self::apiChangePassword($resetRequest);
 		}
 
 		if (!is_null($r["contest_alias"])) {
@@ -762,6 +762,100 @@ class UserController extends Controller {
 			"total_runs" => $totalRunsCount,
 			"status" => "ok"
 		);
+	}
+	
+	/**
+	 * Update user profile
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws InvalidParameterException
+	 */
+	public static function apiUpdate(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		Validators::isStringNonEmpty($r["name"], "name", false);
+		Validators::isStringNonEmpty($r["country_id"], "country_id", false);
+		
+		if (!is_null($r["country_id"])) {
+			try {
+				$r["country"] = CountriesDAO::getByPK($r["country_id"]);	
+			} catch(Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+			
+			if (is_null($r["country"])) {
+				throw new InvalidParameterException("Country not found");
+			}
+		}
+		
+		Validators::isNumber($r["state_id"], "state_id", false);
+		
+		if (!is_null($r["state_id"])) {
+			try {
+				$r["state"] = StatesDAO::getByPK($r["state_id"]);
+			} catch (Exception $e) { 
+				throw new InvalidDatabaseOperationException($e);
+			}
+			
+			if (is_null($r["state"])) {
+				throw new InvalidParameterException("State not found");
+			}
+		}
+		
+		if (!is_null($r["school_id"])) {
+			try {
+				$r["school"] = SchoolsDAO::getByPK($r["school_id"]);	
+			} catch(Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+			
+			if (is_null($r["school"])) {
+				throw new InvalidParameterException("School not found");
+			}
+		}
+		
+		Validators::isStringNonEmpty($r["scholar_degree"], "scholar_degree", false);
+		Validators::isDate($r["graduation_date"], "graduation_date", false);
+		Validators::isDate($r["birth_date"], "birth_date", false);
+		
+		if (!is_null($r["name"])) {
+			$r["current_user"]->setName($r["name"]);
+		}
+		
+		if (!is_null($r["country_id"])) {
+			$r["current_user"]->setCountryId($r["country_id"]);
+		}
+		
+		if (!is_null($r["state_id"])) {
+			$r["current_user"]->setStateId($r["state_id"]);
+		}
+		
+		if (!is_null($r["scholar_degree"])) {
+			$r["current_user"]->setScholarDegree($r["scholar_degree"]);
+		}
+			
+		if (!is_null($r["school_id"])) {
+			$r["current_user"]->setSchoolId($r["school_id"]);
+		}
+		
+		if (!is_null($r["graduation_date"])) {			
+			$r["current_user"]->setGraduationDate($r["graduation_date"]);
+		}
+		
+		if (!is_null($r["birth_date"])) {
+			$r["current_user"]->setBirthDate($r["birth_date"]);
+		}
+		
+		try {
+			UsersDAO::save($r["current_user"]);			
+		} catch(Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		return array("status" => "ok");
 	}
 
 }
