@@ -58,6 +58,7 @@
 			$('input[name=memory_limit]').val(problem.memory_limit);
 			$('input[name=source]').val(problem.source);
 			$('select[name=validator]').val(problem.validator);
+			$('select[name=public]').val(problem.public);
 		});
 	}
 	
