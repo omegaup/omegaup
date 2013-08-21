@@ -255,6 +255,56 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	});
 };
 
+OmegaUp.prototype.getProfile = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/user/profile/',
+		function (data) {
+			if (data.status == 'ok') {
+				data.userinfo.birth_date = self.time(data.userinfo.birth_date * 1000);
+				data.userinfo.graduation_date = self.time(data.userinfo.graduation_date * 1000);
+			}
+			
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+
+OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, callback) {
+	var self = this;
+
+	$.post(
+		'/api/user/update/',
+		{
+			name: name,
+			birth_date: birth_date,
+			country_id: country_id,
+			state_id: state_id,
+			scholar_degree: scholar_degree,
+			graduation_date: graduation_date
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.addProblemToContest = function(contestAlias, order, problemAlias, points, callback) {
 	var self = this;
 
@@ -757,3 +807,22 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 };
 
 var omegaup = new OmegaUp();
+
+function dateToString(currentdate) {
+		var result = "" + (currentdate.getMonth()+1) + "/"
+                + currentdate.getDate()  + "/" 
+                + currentdate.getFullYear() + " "  
+                + ((currentdate.getHours() < 10) ? "0" + currentdate.getHours() : + currentdate.getHours()) + ":"  
+                + ((currentdate.getMinutes() < 10) ? "0" + currentdate.getMinutes() : + currentdate.getMinutes()) + ":"
+			    + ((currentdate.getSeconds() < 10) ? "0" + currentdate.getSeconds() : + currentdate.getSeconds());
+			
+		return result;
+}
+
+function onlyDateToString(currentdate) {
+		var result = "" + (currentdate.getMonth()+1) + "/"
+                + currentdate.getDate()  + "/" 
+                + currentdate.getFullYear();
+			
+		return result;
+}

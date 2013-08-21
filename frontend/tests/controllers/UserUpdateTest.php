@@ -24,7 +24,7 @@ class UserUpdateTest extends OmegaupTestCase {
 		$r["country_id"] = 'MX';
 		$r["state_id"] = 3;
 		$r["scholar_degree"] = 'Maestría';
-		$r["birth_date"] = '1988-01-01';
+		$r["birth_date"] = strtotime('1988-01-01');
 		$r["graduation_date"] = '2016-02-02';
 		
 		// Call api
@@ -36,7 +36,7 @@ class UserUpdateTest extends OmegaupTestCase {
 		$this->assertEquals($user_db->getCountryId(), $r["country_id"]);
 		$this->assertEquals($user_db->getStateId(), $r["state_id"]);
 		$this->assertEquals($user_db->getScholarDegree(), $r["scholar_degree"]);
-		$this->assertEquals($user_db->getBirthDate(), $r["birth_date"]);
-		$this->assertEquals($user_db->getGraduationDate(), $r["graduation_date"]);			
+		$this->assertEquals($user_db->getBirthDate(), gmdate('Y-m-d', $r["birth_date"]));
+		$this->assertEquals($user_db->getGraduationDate(), gmdate('Y-m-d', $r["graduation_date"]));			
 	}
 }

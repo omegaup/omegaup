@@ -18,8 +18,7 @@ class UserProfileTest extends OmegaupTestCase {
 			"auth_token" => self::login($user)
 		));
 		$response = UserController::apiProfile($r);
-		
-		$this->assertNotNull($response["userinfo"]["user_id"]);
+				
 		$this->assertArrayNotHasKey("password",$response["userinfo"]);
 		$this->assertEquals($user->getUsername(), $response["userinfo"]["username"]);
 	}

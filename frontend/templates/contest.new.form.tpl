@@ -229,18 +229,7 @@
 		</form>
 	</div>
 </div>
-<script>
-	
-	function dateToString(currentdate) {
-		var result = "" + (currentdate.getMonth()+1) + "/"
-                + currentdate.getDate()  + "/" 
-                + currentdate.getFullYear() + " "  
-                + ((currentdate.getHours() < 10) ? "0" + currentdate.getHours() : + currentdate.getHours()) + ":"  
-                + ((currentdate.getMinutes() < 10) ? "0" + currentdate.getMinutes() : + currentdate.getMinutes()) + ":"
-			    + ((currentdate.getSeconds() < 10) ? "0" + currentdate.getSeconds() : + currentdate.getSeconds());
-			
-		return result;
-	}
+<script>		
 	
 	$("#start_time, #finish_time").datetimepicker();
 	

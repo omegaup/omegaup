@@ -623,20 +623,26 @@ class UserController extends Controller {
 		$response["userinfo"] = array();
 		$response["problems"] = array();
 
-		$user = $r["current_user"];
-		$response["userinfo"]["user_id"] = $user->getUserId();
-		$response["userinfo"]["username"] = $user->getUsername();
-		$response["userinfo"]["facebook_user_id"] = $user->getFacebookUserId();
+		$user = $r["current_user"];		
+		$response["userinfo"]["username"] = $user->getUsername();		
 		$response["userinfo"]["name"] = $user->getName();
 		$response["userinfo"]["solved"] = $user->getSolved();
 		$response["userinfo"]["submissions"] = $user->getSubmissions();
+		$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
+		$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
+		$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
 
 		try {
 			$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+			
 			$country = CountriesDAO::getByPK($user->getCountryId());
 			$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
+			$response["userinfo"]["country_id"] = $user->getCountryId();
+			
 			$state = StatesDAO::getByPK($user->getStateId());
 			$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
+			$response["userinfo"]["state_id"] = $user->getStateId();
+			
 			$school = SchoolsDAO::getByPK($user->getSchoolId());
 			$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
 		} catch (Exception $e) {
@@ -791,6 +797,10 @@ class UserController extends Controller {
 			}
 		}
 		
+		if ($r["state_id"] === 'null') {
+			$r["state_id"] = null;
+		}
+		
 		Validators::isNumber($r["state_id"], "state_id", false);
 		
 		if (!is_null($r["state_id"])) {
@@ -842,11 +852,11 @@ class UserController extends Controller {
 		}
 		
 		if (!is_null($r["graduation_date"])) {			
-			$r["current_user"]->setGraduationDate($r["graduation_date"]);
+			$r["current_user"]->setGraduationDate(gmdate('Y-m-d', $r["graduation_date"]));
 		}
 		
 		if (!is_null($r["birth_date"])) {
-			$r["current_user"]->setBirthDate($r["birth_date"]);
+			$r["current_user"]->setBirthDate(gmdate('Y-m-d', $r["birth_date"]));
 		}
 		
 		try {

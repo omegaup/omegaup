@@ -11,6 +11,7 @@
 {else}
 	{include file='head.tpl'}
 	{include file='mainmenu.tpl'}
+	{include file='status.tpl'}
 
 	<div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
 		<table>
@@ -29,7 +30,7 @@
 			<td >
 				<div class="post" style="width: 760px; min-height: 300px;">
 					<div class="copy" >
-
+						{block name="content"}
 						<h1>{$CURRENT_USER_USERNAME}</h1>
 						<div id="SettingsPage_Content">
 							<ul class="uiList fbSettingsList _4kg _6-h _4ks ">
@@ -64,6 +65,7 @@
 								
 						<h1>Estadísticas</h1>
 						<div id="veredict-chart"><img src="/media/wait.gif" /></div>
+						{/block}
 					</div>
 
 			</div>
