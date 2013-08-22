@@ -21,7 +21,7 @@
 					<div class="copy">
 						{$CURRENT_USER_GRAVATAR_URL_128}
 						<div style="color:black">
-							<input value='Editar perfil' type='submit' class="OK">
+							<input value='Editar perfil' type='submit' class="user-edit">
 						</div>
 					</div>
 					
@@ -122,7 +122,7 @@
 
 	<script>
 		
-		$('input.OK').click(function() {
+		$('input.user-edit').click(function() {
 			window.location.assign("useredit.php");
 		});
 		

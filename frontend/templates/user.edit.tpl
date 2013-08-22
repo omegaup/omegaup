@@ -443,7 +443,7 @@
 									if (response.status == "ok") {
 										$('div.copy.error').html("Perfil actualizado correctamente!");
 										$('div.post.footer').show();
-										return;
+										return false;
 									}		
 			});
 		});
