@@ -705,4 +705,7 @@ CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs` FOR EACH ROW UPDATE  `Problems
 		)
 WHERE NEW.problem_id =  `Problems`.`problem_id`;
 
+ALTER TABLE  `Schools` CHANGE  `state_id`  `state_id` INT( 11 ) NULL;
+ALTER TABLE  `Schools` CHANGE  `school_id`  `school_id` INT( 11 ) NOT NULL AUTO_INCREMENT;
+
 COMMIT;

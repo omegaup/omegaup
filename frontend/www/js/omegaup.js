@@ -279,7 +279,7 @@ OmegaUp.prototype.getProfile = function(callback) {
 };
 
 
-OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, callback) {
+OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, school_id, school_name, callback) {
 	var self = this;
 
 	$.post(
@@ -290,7 +290,9 @@ OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_i
 			country_id: country_id,
 			state_id: state_id,
 			scholar_degree: scholar_degree,
-			graduation_date: graduation_date
+			graduation_date: graduation_date,
+			school_id : school_id,
+			school_name : school_name
 		},
 		function (data) {
 			callback(data);

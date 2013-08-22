@@ -21,7 +21,7 @@
 					<div class="copy">
 						{$CURRENT_USER_GRAVATAR_URL_128}
 						<div style="color:black">
-							<div>Editar</div>
+							<input value='Editar perfil' type='submit' class="OK">
 						</div>
 					</div>
 					
@@ -121,6 +121,10 @@
 	</div>
 
 	<script>
+		
+		$('input.OK').click(function() {
+			window.location.assign("useredit.php");
+		});
 		
 		omegaup.getUserStats(function(data) {
 		

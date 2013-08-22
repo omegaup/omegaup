@@ -644,6 +644,7 @@ class UserController extends Controller {
 			$response["userinfo"]["state_id"] = $user->getStateId();
 			
 			$school = SchoolsDAO::getByPK($user->getSchoolId());
+			$response["userinfo"]["school_id"] = $user->getSchoolId();
 			$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
@@ -816,14 +817,26 @@ class UserController extends Controller {
 		}
 		
 		if (!is_null($r["school_id"])) {
-			try {
-				$r["school"] = SchoolsDAO::getByPK($r["school_id"]);	
-			} catch(Exception $e) {
-				throw new InvalidDatabaseOperationException($e);
-			}
 			
-			if (is_null($r["school"])) {
-				throw new InvalidParameterException("School not found");
+			if ($r["school_id"] == -1) {
+				// UI sets -1 if school does not exists.
+				try {
+					$schoolR = new Request(array("name" => $r["school_name"], "state_id" => $r["state_id"], "auth_token" => $r["auth_token"]));
+					$response = SchoolController::apiCreate($schoolR);
+					$r["school_id"] = $response["school_id"];
+				} catch (Exception $e) {
+					throw new InvalidParameterException("School creation failed.", $e);
+				}
+			} else {			
+				try {
+					$r["school"] = SchoolsDAO::getByPK($r["school_id"]);	
+				} catch(Exception $e) {
+					throw new InvalidDatabaseOperationException($e);
+				}
+
+				if (is_null($r["school"])) {
+					throw new InvalidParameterException("School not found");
+				}
 			}
 		}
 		
@@ -847,7 +860,7 @@ class UserController extends Controller {
 			$r["current_user"]->setScholarDegree($r["scholar_degree"]);
 		}
 			
-		if (!is_null($r["school_id"])) {
+		if (!is_null($r["school_id"])) {			
 			$r["current_user"]->setSchoolId($r["school_id"]);
 		}
 		

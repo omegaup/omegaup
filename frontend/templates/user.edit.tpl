@@ -254,6 +254,8 @@
 			<option value="ZW">Zimbabwe</option>
 		</select></legend>
 	<legend>Estado: <select name='state_id' id='state_id' disabled="true"></select></legend>
+	<legend>Escuela: <input id='school' name='school' value='' type='text' size='20' /> <p id="school-found"></p></legend>
+	<input id='school_id' name='school_id' value='' type='hidden'>
 	<legend>Grado escolar: <select name='scholar_degree' id='scholar_degree'>			
 			<option value='Primaria'>Primaria</option>
 			<option value='Secundaria'>Secundaria</option>
@@ -262,7 +264,7 @@
 			<option value='Maestría'>Maestría</option>
 			<option value='Doctorado'>Doctorado</option>
 			<option value='Post-doc'>Post-doc</option>
-	</select></legend>
+	</select></legend>	
 	<legend>Fecha de graduación: <input id='graduation_date' name='graduation_date' value='' type='text' size ='10'></legend>
 	<legend>Imagen de perfil: <b><a href="http://www.gravatar.com" target="_blank">Sube tu imagen en Gravatar.com usando tu email: {$CURRENT_USER_EMAIL}</a></b></legend>	
 	
@@ -279,6 +281,22 @@
 			changeMonth: true,
 			changeYear: true,
 			yearRange: "-20:+20"
+		});
+		
+		$( "#school" ).autocomplete({
+			source: "/api/school/list/",
+			minLength: 2,
+			select: function( event, ui ) {
+					$("#school_id").val(ui.item.id);											
+				},
+			response: function(event, ui) {
+				if (ui.content.length === 0) {
+					$("#school-found").text("Tu escuela aún no existe en OmegaUp. Será agregada cuando guardes tus cambios.");
+					$("#school_id").val(-1);
+				} else {
+					$("#school-found").empty();
+				}
+			}
 		});
 		
 		$('#country_id').change(function () {
@@ -398,7 +416,9 @@
 			$('#country_id').trigger('change');
 			
 			$("#state_id").val(data.userinfo.state_id);
-			$("#scholar_degree").val(data.userinfo.scholar_degree);						
+			$("#scholar_degree").val(data.userinfo.scholar_degree);
+			$("#school_id").val(data.userinfo.school_id);
+			$("#school").val(data.userinfo.school);
 		});
 		
 		
@@ -415,7 +435,9 @@
 								  $("#country_id").val(), 
 								  $("#state_id").val(), 
 								  $("#scholar_degree").val(), 
-								  graduation_date.getTime() / 1000, 
+								  graduation_date.getTime() / 1000,
+								  $("#school_id").val(),
+								  $("#school").val(),
 								  function(response){
 								  
 									if (response.status == "ok") {

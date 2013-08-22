@@ -20,5 +20,26 @@ require_once("base/Schools.vo.base.php");
   */
 class SchoolsDAO extends SchoolsDAOBase
 {
+	/**
+	 * Finds schools that cotains 'name'
+	 * 
+	 * @global type $conn
+	 * @param string $name
+	 * @return array Schools
+	 */
+	public static function findByName($name) {
+		
+		global  $conn;
+		$escapedStr = mysql_real_escape_string($name);
+		$sql = "select DISTINCT s.* from Schools s where s.name LIKE '%{$escapedStr}%' LIMIT 10";				
+		
+		$rs = $conn->Execute($sql);
+		$ar = array();
+		foreach ($rs as $foo) {
+			$bar =  new Users($foo);
+    		array_push( $ar,$bar);    		
+		}
+		return $ar;		
+	}
 
 }
