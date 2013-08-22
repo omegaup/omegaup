@@ -827,6 +827,8 @@ class UserController extends Controller {
 				} catch (Exception $e) {
 					throw new InvalidParameterException("School creation failed.", $e);
 				}
+			} else if ($r["school_id"] == "") {
+				$r["school_id"] = null;
 			} else {			
 				try {
 					$r["school"] = SchoolsDAO::getByPK($r["school_id"]);	
