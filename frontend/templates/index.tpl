@@ -17,8 +17,26 @@
 			</div>
 		</td>
 		<td >
-<div class="post footer" style="width: 330px; min-height: 300px;">
+			<div class="post footer" style="width: 330px; min-height: 150px;">
 				<div class="copy" >
+						<h2>Coder del mes de Julio</h2>
+						<br/>
+						<div id="coder_of_the_month">
+							<div class="rss_element">
+								<div class="title"><a href="/profile.php?username=charlyhlms">charlyhlms</a></div>
+								<div class="body"><a href="/profile.php?username=charlyhlms"><img src="https://secure.gravatar.com/avatar/shalala?s=92"/></a></div>
+								<div class="body"><b>Carlos Galeana</b></div>
+								<div class="body">Colegio Carol Baur</div>
+								<div class="body">Distrito Federal, México</div>
+								<div class="body">12 problemas resueltos en Julio</div>
+							</div>
+						</div>
+				</div>
+			</div>
+<div class="post footer" style="width: 330px; min-height: 300px;">				
+				<div class="copy" >					
+					<h2>Últimos blog posts</h2>
+					<br/>
 					<div id="rss_content">Loading...</div>
 				</div>
 			</div>
@@ -84,7 +102,7 @@
 	  // Calling load sends the request off.  It requires a callback function.
 	  feed.load(feedLoaded);
 	  
-	  omegaup.runCounts(createChart);
+	  omegaup.runCounts(createChart);	  	  
 	}
 	
 	function createChart(series) {

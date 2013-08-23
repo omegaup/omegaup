@@ -618,12 +618,29 @@ class UserController extends Controller {
 	public static function apiProfile(Request $r) {
 
 		self::authenticateRequest($r);
+		
+		// By default use current user		
+		$user = $r["current_user"];	 
+		
+		if (!is_null($r["username"])) {
+			
+			Validators::isStringNonEmpty($r["username"], "username");
+			
+			try {
+				$user = UsersDAO::FindByUsername($r["username"]);
+
+				if (is_null($user)) {
+					throw new NotFoundException("User does not exists");
+				}
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}			
+		}
 
 		$response = array();
 		$response["userinfo"] = array();
 		$response["problems"] = array();
-
-		$user = $r["current_user"];		
+		
 		$response["userinfo"]["username"] = $user->getUsername();		
 		$response["userinfo"]["name"] = $user->getName();
 		$response["userinfo"]["solved"] = $user->getSolved();
@@ -649,6 +666,9 @@ class UserController extends Controller {
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
+		
+		$response["userinfo"]["gravatar_92"] = 'https://secure.gravatar.com/avatar/' . md5($response["userinfo"]["email"]) . '?s=92';
+		
 		$response["status"] = "ok";
 		return $response;
 	}
@@ -749,15 +769,33 @@ class UserController extends Controller {
 		
 		self::authenticateRequest($r);
 		
+		// By default use current user		
+		$user = $r["current_user"];	 
+		
+		if (!is_null($r["username"])) {
+			
+			Validators::isStringNonEmpty($r["username"], "username");
+			
+			try {
+				$user = UsersDAO::FindByUsername($r["username"]);
+
+				if (is_null($user)) {
+					throw new NotFoundException("User does not exists");
+				}
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}			
+		}
+		
 		try {
 			
-			$totalRunsCount = RunsDAO::CountTotalRunsOfUser($r["current_user_id"]);
+			$totalRunsCount = RunsDAO::CountTotalRunsOfUser($user->getUserId());
 			
 			// List of veredicts			
 			$veredict_counts = array();
 			
 			foreach (self::$veredicts as $veredict) {
-				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfUserByVeredict($r["current_user_id"], $veredict);
+				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfUserByVeredict($user->getUserId(), $veredict);
 			}			
 			
 		} catch (Exception $e) {

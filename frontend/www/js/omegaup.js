@@ -199,9 +199,9 @@ OmegaUp.prototype.login = function(username, password, callback) {
 	);
 };
 
-OmegaUp.prototype.getUserStats = function(callback) {
+OmegaUp.prototype.getUserStats = function(username, callback) {
 	$.get(
-		'/api/user/stats/',		
+		username == null ? '/api/user/stats/' : '/api/user/stats/' + username,		
 		function (data) {
 			callback(data);
 		},
@@ -255,11 +255,11 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	});
 };
 
-OmegaUp.prototype.getProfile = function(callback) {
+OmegaUp.prototype.getProfile = function(username, callback) {
 	var self = this;
 
 	$.get(
-		'/api/user/profile/',
+		username == null ? '/api/user/profile/' : '/api/user/profile/username/' + username,
 		function (data) {
 			if (data.status == 'ok') {
 				data.userinfo.birth_date = self.time(data.userinfo.birth_date * 1000);

@@ -18,11 +18,7 @@
 		<tr>
 			<td>
 				<div class="post footer" style="width: 130px; min-height: 300px;">
-					<div class="copy">
-						{$CURRENT_USER_GRAVATAR_URL_128}
-						<div style="color:black">
-							<input value='Editar perfil' type='submit' class="user-edit">
-						</div>
+					<div class="copy" id="profile-picture">																			
 					</div>
 					
 				</div>
@@ -31,7 +27,12 @@
 				<div class="post" style="width: 760px; min-height: 300px;">
 					<div class="copy" >
 						{block name="content"}
-						<h1>{$CURRENT_USER_USERNAME}</h1>
+						<h1 id="username">
+							
+						</h1>
+						{IF !isset($smarty.get.username)}
+							<input value='Editar perfil' type='submit' class="user-edit">
+						{/IF}
 						<div id="SettingsPage_Content">
 							<ul class="uiList fbSettingsList _4kg _6-h _4ks ">
 
@@ -47,19 +48,37 @@
 
 								</div>
 								</li>
-								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Username</strong></span><span class="fbSettingsListItemContent fcg"> http://www.omegaup.com/<strong>{$CURRENT_USER_USERNAME}</strong></span></a>
+								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Username</strong></span><span class="fbSettingsListItemContent fcg"> http://www.omegaup.com/profile.php?username=<strong id="username-link">{IF !isset($smarty.get.username)}{$CURRENT_USER_USERNAME}{/IF}</strong></span></a>
 								<div class="content">
 								</div>
 								</li>
+								{IF !isset($smarty.get.username)}
 								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>Email</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong>{$CURRENT_USER_EMAIL}</strong>&nbsp;</span></a>
 								<div class="content">
 								</div>
 								</li>
+								{/IF}
 
-								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Language</strong></span><span class="fbSettingsListItemContent fcg"><strong>Español (MX)</strong></span></a>
+								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>País</strong></span><span class="fbSettingsListItemContent fcg"><strong id="country"></strong></span></a>
 								<div class="content">
 								</div>
 								</li>
+								
+								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Estado</strong></span><span class="fbSettingsListItemContent fcg"><strong id="state"></strong></span></a>
+								<div class="content">
+								</div>
+								</li>
+								
+								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Escuela</strong></span><span class="fbSettingsListItemContent fcg"><strong id="school"></strong></span></a>
+								<div class="content">
+								</div>
+								</li>
+								
+								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Fecha de Graduación</strong></span><span class="fbSettingsListItemContent fcg"><strong id="graduation_date"></strong></span></a>
+								<div class="content">
+								</div>
+								</li>
+																
 							</ul>
 						</div>
 								
@@ -126,10 +145,26 @@
 			window.location.assign("useredit.php");
 		});
 		
-		omegaup.getUserStats(function(data) {
+		{IF isset($smarty.get.username)}
+		var username = "{$smarty.get.username}";
+		{ELSE}
+		var username = null
+		{/IF}
 		
-			window.run_counts_chart = oGraph.veredictCounts('veredict-chart', '{$CURRENT_USER_USERNAME}', data);	
+		omegaup.getUserStats(username, function(data) {		
+			window.run_counts_chart = oGraph.veredictCounts('veredict-chart', username, data);	
 		});
+				
+		omegaup.getProfile(username, function(data) {
+			$('#profile-picture').html("<img src=" + data.userinfo.gravatar_92 + "/>");
+			$('#username').html(data.userinfo.username);
+			$('#username-link').html(data.userinfo.username);
+			$('#country').html(data.userinfo.country == null ? "" : data.userinfo.country);
+			$('#state').html(data.userinfo.state == null ? "" : data.userinfo.state);
+			$('#school').html(data.userinfo.school == null ? "" : data.userinfo.school);
+			$('#graduation_date').html(data.userinfo.graduation_date == null ? "" : onlyDateToString(data.userinfo.graduation_date));
+		});
+		
 	
 	</script>
 								

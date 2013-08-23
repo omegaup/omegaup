@@ -405,7 +405,7 @@
 			}			
 		});
 		
-		omegaup.getProfile(function(data) {
+		omegaup.getProfile(null, function(data) {
 			$("#username").html(data.userinfo.username);
 			$("#name").val(data.userinfo.name);
 			$("#birth_date").val(onlyDateToString(data.userinfo.birth_date));

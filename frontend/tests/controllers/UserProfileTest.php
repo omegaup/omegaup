@@ -24,6 +24,24 @@ class UserProfileTest extends OmegaupTestCase {
 	}
 	
 	/*
+	 * Test for the function which returns the general user info
+	 */
+	public function testUserDataAnotherUser() {
+		
+		$user = UserFactory::createUser("testuser3");
+		$user2 = UserFactory::createUser("testuser4");
+		
+		$r = new Request(array(
+			"auth_token" => self::login($user),
+			"username" => $user2->getUsername()
+		));
+		$response = UserController::apiProfile($r);
+				
+		$this->assertArrayNotHasKey("password",$response["userinfo"]);
+		$this->assertEquals($user2->getUsername(), $response["userinfo"]["username"]);
+	}
+	
+	/*
 	 * Test the contest which a certain user has participated
 	 */
 	public function testUserContests() {
