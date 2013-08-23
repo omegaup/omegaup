@@ -48,7 +48,7 @@
 
 								</div>
 								</li>
-								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Username</strong></span><span class="fbSettingsListItemContent fcg"> http://www.omegaup.com/profile.php?username=<strong id="username-link">{IF !isset($smarty.get.username)}{$CURRENT_USER_USERNAME}{/IF}</strong></span></a>
+								<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>Username</strong></span><span class="fbSettingsListItemContent fcg"> http://www.omegaup.com/profile/<strong id="username-link">{IF !isset($smarty.get.username)}{$CURRENT_USER_USERNAME}{/IF}</strong></span></a>
 								<div class="content">
 								</div>
 								</li>
@@ -152,7 +152,7 @@
 		{/IF}
 		
 		omegaup.getUserStats(username, function(data) {		
-			window.run_counts_chart = oGraph.veredictCounts('veredict-chart', username, data);	
+			window.run_counts_chart = oGraph.veredictCounts('veredict-chart', (username == null) ? "{$smarty.get.username}" : username, data);	
 		});
 				
 		omegaup.getProfile(username, function(data) {
