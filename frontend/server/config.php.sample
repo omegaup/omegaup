@@ -16,7 +16,7 @@ define('OMEGAUP_SLAVE_DB_HOST',				'8.8.8.8');
 define('OMEGAUP_SLAVE_DB_NAME',				'omegaup');
 define('OMEGAUP_SLAVE_DB_DRIVER',			'mysqlt');
 
-define('OMEGAUP_LOG_TO_FILE',				false);
+define('OMEGAUP_LOG_TO_FILE',				true);
 define('OMEGAUP_LOG_TRACKBACK',				false);
 define('OMEGAUP_LOG_DB_QUERYS',				false);
 define('OMEGAUP_LOG_ACCESS_FILE',			'/var/log/omegaup/omegaup.log');

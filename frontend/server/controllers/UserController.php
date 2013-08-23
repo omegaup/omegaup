@@ -172,6 +172,7 @@ class UserController extends Controller {
 	 * @throws EmailVerificationSendException
 	 */
 	private static function sendVerificationEmail(Request $r) {
+		if (!OMEGAUP_EMAIL_SEND_EMAILS) return;
 
 		try {
 			$email = EmailsDAO::getByPK($r["user"]->getMainEmailId());

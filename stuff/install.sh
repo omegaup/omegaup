@@ -14,12 +14,16 @@ WWW_ROOT=/var/www/omegaup.com
 USER=`whoami`
 MYSQL_PASSWORD=omegaup
 MYSQL_DB_NAME=omegaup
-UBUNTU=`uname -a | grep ubuntu | wc -l`
+UBUNTU=`uname -a | grep -i ubuntu | wc -l`
 WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
+HOSTNAME=localhost
 
 # Get parameters
-while getopts "u:m:p:01" optname; do
+while getopts "h:u:m:p:01" optname; do
 	case "$optname" in
+		"h")
+			HOSTNAME=$OPTARG
+			;;
 		"p")
 			OMEGAUP_ROOT=$OPTARG
 			;;
@@ -38,7 +42,7 @@ while getopts "u:m:p:01" optname; do
 	esac
 done
 
-if [ "$GIT_USERNAME" == "" -o "$GIT_EMAIL" == "" ]; then
+if [ "$GIT_USERNAME" = "" -o "$GIT_EMAIL" = "" ]; then
 	show_help
 fi
 
@@ -53,7 +57,7 @@ fi
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
-	if [ "$UBUNTU" == "1" ]; then
+	if [ "$UBUNTU" = "1" ]; then
 		if [ "`cat /etc/apt/sources.list | grep universe | wc -l `" -eq 0 ]; then
 			sed -e "s/http.*/& universe/" /etc/apt/sources.list > sources.list
 			sudo mv sources.list /etc/apt/sources.list
@@ -100,7 +104,7 @@ if [ "$SKIP_NGINX" != "1" ]; then
 	cat > default.conf << EOF
 server {
 listen       80;
-server_name  localhost;
+server_name  .$HOSTNAME;
 
 location / {
     root   /var/www/omegaup.com;
@@ -173,7 +177,7 @@ EOF
 fi
 
 # Clone repository.
-if [ ! -d $WWW_ROOT ]; then
+if [ ! -d $OMEGAUP_ROOT ]; then
 	sudo mkdir $OMEGAUP_ROOT
 	sudo chown $USER -R $OMEGAUP_ROOT
 	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
@@ -197,7 +201,10 @@ if [ ! -d $WWW_ROOT ]; then
 	# Build grader
 	cd $OMEGAUP_ROOT/grader
 	sbt proguard
+fi
 
+# Set up the www root.
+if [ ! -d $WWW_ROOT ]; then
 	# Link the frontend to nginx.
 	if [ ! -d `dirname $WWW_ROOT` ]; then
 		sudo mkdir -p `dirname $WWW_ROOT`
@@ -210,8 +217,15 @@ fi
 # Install config.php
 if [ ! -f $OMEGAUP_ROOT/frontend/server/config.php ]; then
 	cd $OMEGAUP_ROOT/frontend/server/
-	cp config.php.sample config.php
-	cat config.php | grep -v OMEGAUP_DB_ > config.pre1
+	sed -e "s/\(.*OMEGAUP_DB_USER.*\)'.*'.*$/\1'root');/;s/\(.*OMEGAUP_DB_PASS.*\)'.*'.*/\1'$MYSQL_PASSWORD');/" config.php.sample > config.php
+	grep -v OMEGAUP_DB_ config.php > config.pre1
+fi
+
+# Set up the log.
+if [ ! -f /var/log/omegaup/omegaup.log ]; then
+	sudo mkdir -p /var/log/omegaup/
+	sudo touch /var/log/omegaup/omegaup.log
+	sudo chown www-data.www-data /var/log/omegaup/omegaup.log
 fi
 
 #chek php config.ini, set values for development
