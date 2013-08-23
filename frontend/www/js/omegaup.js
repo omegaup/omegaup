@@ -201,7 +201,7 @@ OmegaUp.prototype.login = function(username, password, callback) {
 
 OmegaUp.prototype.getUserStats = function(username, callback) {
 	$.get(
-		username == null ? '/api/user/stats/' : '/api/user/stats/' + username,		
+		username == null ? '/api/user/stats/' : '/api/user/stats/username/' + username,		
 		function (data) {
 			callback(data);
 		},

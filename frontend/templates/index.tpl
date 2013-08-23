@@ -24,7 +24,7 @@
 						<div id="coder_of_the_month">
 							<div class="rss_element">
 								<div class="title"><a href="/profile.php?username=charlyhlms">charlyhlms</a></div>
-								<div class="body"><a href="/profile.php?username=charlyhlms"><img src="https://secure.gravatar.com/avatar/shalala?s=92"/></a></div>
+								<div class="body"><a href="/profile.php?username=charlyhlms"><img src="https://secure.gravatar.com/avatar/7df78198980cb6d47468da1cd95f5695?s=92/"></a></div>
 								<div class="body"><b>Carlos Galeana</b></div>
 								<div class="body">Colegio Carol Baur</div>
 								<div class="body">Distrito Federal, México</div>
