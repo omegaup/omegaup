@@ -608,17 +608,17 @@ class UserController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
-
+	
 	/**
-	 * Get general user info
+	 * Resolves the target user for the API. If a username is provided in
+	 * the request, then we use that one. Otherwise, we use currently logged user
 	 * 
 	 * @param Request $r
-	 * @return response array with user info
+	 * @return Users
 	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
 	 */
-	public static function apiProfile(Request $r) {
-
-		self::authenticateRequest($r);
+	private static function resolveTargetUser(Request $r) {
 		
 		// By default use current user		
 		$user = $r["current_user"];	 
@@ -637,6 +637,22 @@ class UserController extends Controller {
 				throw new InvalidDatabaseOperationException($e);
 			}			
 		}
+		
+		return $user;
+	}
+
+	/**
+	 * Get general user info
+	 * 
+	 * @param Request $r
+	 * @return response array with user info
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiProfile(Request $r) {
+
+		self::authenticateRequest($r);
+				
+		$user = self::resolveTargetUser($r);
 
 		$response = array();
 		$response["userinfo"] = array();
@@ -688,21 +704,53 @@ class UserController extends Controller {
 		$response = array();
 		$response["contests"] = array();
 
-		$user = $r["current_user"];
+		$user = self::resolveTargetUser($r);
+		
 		$contest_user_key = new ContestsUsers();
 		$contest_user_key->setUserId($user->getUserId());
 
 		try {
-			$db_results = ContestsUsersDAO::search($contest_user_key);
+			$db_results = ContestsUsersDAO::search($contest_user_key, "contest_id", 'DESC');
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
 		$contests = array();
 		foreach ($db_results as $result) {
+			
+			// Get contest data
 			$contest_id = $result->getContestId();
 			$contest = ContestsDAO::getByPK($contest_id);
-			$contests[] = $contest->asArray();
+			$contests[$contest->getAlias()]["data"] = $contest->asArray();
+			
+			// Get user ranking
+			$scoreboardR = new Request(array("auth_token" => $r["auth_token"], "contest_alias" => $contest->getAlias()));
+			$scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
+			
+			// TODO: sanking logic shoud go into the scoreboard itself
+			$currentPoints = -1;
+			$currentPenalty = -1;
+			$place = 1;
+			foreach($scoreboardResponse["ranking"] as $userData) {
+				if ($userData["username"] == $user->getUsername()) {
+					break;
+				} else {
+					if ($currentPoints === -1) {
+						$currentPoints = $userData["total"]["points"];
+						$currentPenalty = $userData["total"]["penalty"];
+					} else {
+						// If not in draw
+						if ($userData["total"]["points"] < $currentPoints || $userData["total"]["penalty"] > $currentPenalty) {
+							$currentPoints = $userData["total"]["points"];
+							$currentPenalty = $userData["total"]["penalty"];
+							
+							$place++;
+						}
+					}
+				}
+			}
+			
+			$contests[$contest->getAlias()]["place"] = $place;			
 		}
 
 		$response["contests"] = $contests;
@@ -769,24 +817,8 @@ class UserController extends Controller {
 	public static function apiStats(Request $r) {
 		
 		self::authenticateRequest($r);
-		
-		// By default use current user		
-		$user = $r["current_user"];	 
-		
-		if (!is_null($r["username"])) {
-			
-			Validators::isStringNonEmpty($r["username"], "username");
-			
-			try {
-				$user = UsersDAO::FindByUsername($r["username"]);
-
-				if (is_null($user)) {
-					throw new NotFoundException("User does not exists");
-				}
-			} catch (Exception $e) {
-				throw new InvalidDatabaseOperationException($e);
-			}			
-		}
+					
+		$user = resolveTargetUser($r);
 		
 		try {
 			
