@@ -16,14 +16,15 @@ define('OMEGAUP_SLAVE_DB_HOST',				'8.8.8.8');
 define('OMEGAUP_SLAVE_DB_NAME',				'omegaup');
 define('OMEGAUP_SLAVE_DB_DRIVER',			'mysqlt');
 
+# ####################################
+# LOG CONFIG
+# ####################################
 define('OMEGAUP_LOG_TO_FILE',				true);
 define('OMEGAUP_LOG_TRACKBACK',				false);
 define('OMEGAUP_LOG_DB_QUERYS',				false);
 define('OMEGAUP_LOG_ACCESS_FILE',			'/var/log/omegaup/omegaup.log');
 define('OMEGAUP_LOG_ERROR_FILE',			'/var/log/omegaup/omegaup.log');
 define('OMEGAUP_EXPIRE_TOKEN_AFTER',			'8 HOUR');
-define('OMEGAUP_FORCE_EMAIL_VERIFICATION',		false);
-define('OMEGAUP_FORCE_REJUDGE_ON_PROBLEM_UPDATE',		true);
 
 # ####################################
 # GRADER CONFIG
@@ -39,6 +40,7 @@ define('IMAGES_URL_PATH',				'/img/');
 define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
 define('OMEGAUP_GRADER_RELOAD_CONFIG_URL',		'https://localhost:21680/reload-config/');
 define('OMEGAUP_GRADER_STATUS_URL',			'https://localhost:21680/status/');
+define('OMEGAUP_FORCE_REJUDGE_ON_PROBLEM_UPDATE',	true);
 
 # ####################################
 # FACEBOOK LOGIN CONFIG
@@ -56,6 +58,7 @@ define('OMEGAUP_GA_ID',					'xxxxx');
 # EMAIL CONFIG
 # ####################################
 define('OMEGAUP_EMAIL_SEND_EMAILS',			false);
+define('OMEGAUP_FORCE_EMAIL_VERIFICATION',		false);
 define('OMEGAUP_EMAIL_SMTP_HOST',			'xxxx');
 define('OMEGAUP_EMAIL_SMTP_USER',			'xxxx');
 define('OMEGAUP_EMAIL_SMTP_PASSWORD',			'xxxx');

@@ -17,9 +17,7 @@ define('OMEGAUP_SLAVE_DB_HOST',			'8.8.8.8');
 define('OMEGAUP_SLAVE_DB_NAME',			'omegaup');
 define('OMEGAUP_SLAVE_DB_DRIVER',		'mysqlt');
 define('OMEGAUP_EXPIRE_TOKEN_AFTER',		'8 HOUR');
-define('OMEGAUP_FORCE_EMAIL_VERIFICATION',	true);
 define('OMEGAUP_FORCE_REJUDGE_ON_PROBLEM_UPDATE',		true);
-define('BIN_PATH',				'/opt/omegaup/bin');
 
 # ####################################
 # TEST CONFIG
@@ -67,6 +65,7 @@ define('OMEGAUP_GA_ID',				'xxxxx');
 # EMAIL CONFIG
 # ####################################
 define('OMEGAUP_EMAIL_SEND_EMAILS',		false);
+define('OMEGAUP_FORCE_EMAIL_VERIFICATION',	false);
 define('OMEGAUP_EMAIL_SMTP_HOST',		'smtp.gmail.com');
 define('OMEGAUP_EMAIL_SMTP_USER',		'no-reply@omegaup.com');
 define('OMEGAUP_EMAIL_SMTP_PASSWORD',		'');
