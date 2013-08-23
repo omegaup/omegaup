@@ -108,6 +108,9 @@ if [ "$SKIP_NGINX" != "1" ]; then
 	if [ "$FPM_PORT" = "" ]; then
 		FPM_PORT=127.0.0.1:9000
 	fi
+	if [ "`echo $FPM_PORT | grep '/' | wc -l `" != "0" ]; then
+		FPM_PORT=unix:$FPM_PORT
+	fi
 	cat > default.conf << EOF
 server {
 listen       80;
