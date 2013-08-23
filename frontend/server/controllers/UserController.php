@@ -731,6 +731,7 @@ class UserController extends Controller {
 			$currentPoints = -1;
 			$currentPenalty = -1;
 			$place = 1;
+			$draws = 1;
 			foreach($scoreboardResponse["ranking"] as $userData) {
 				if ($userData["username"] == $user->getUsername()) {
 					break;
@@ -743,8 +744,12 @@ class UserController extends Controller {
 						if ($userData["total"]["points"] < $currentPoints || $userData["total"]["penalty"] > $currentPenalty) {
 							$currentPoints = $userData["total"]["points"];
 							$currentPenalty = $userData["total"]["penalty"];
+														
+							$place += $draws;
+							$draws = 1;
 							
-							$place++;
+						} else if ($userData["total"]["points"] == $currentPoints && $userData["total"]["penalty"] == $currentPenalty) {							
+							$draws++;
 						}
 					}
 				}
