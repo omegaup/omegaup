@@ -39,6 +39,9 @@ while getopts "h:u:m:p:01" optname; do
 		"1")
 			SKIP_NGINX=1
 			;;
+		"2")
+			SKIP_GRADER=1
+			;;
 	esac
 done
 
@@ -101,6 +104,10 @@ fi
 
 # Add ngnix configuration.
 if [ "$SKIP_NGINX" != "1" ]; then
+	FPM_PORT=`grep '^listen\b' /etc/php5/fpm/pool.d/www.conf 2>/dev/null | sed -e 's/.*=\s*//'`
+	if [ "$FPM_PORT" = "" ]; then
+		FPM_PORT=127.0.0.1:9000
+	fi
 	cat > default.conf << EOF
 server {
 listen       80;
@@ -130,10 +137,10 @@ rewrite ^/arena/[a-zA-Z0-9_+-]+/scoreboard/?$ /arena/scoreboard.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/admin.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/practice/?$ /arena/practice.php last;
 
-# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+# pass the PHP scripts to FastCGI server listening on $FPM_PORT.
 location ~ \.php$ {
     root           /var/www/omegaup.com;
-    fastcgi_pass   127.0.0.1:9000;
+    fastcgi_pass   $FPM_PORT;
     fastcgi_index  index.php;
     fastcgi_param  SCRIPT_FILENAME  /var/www/omegaup.com\$fastcgi_script_name;
     include        fastcgi_params;
@@ -190,17 +197,19 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	cd $OMEGAUP_ROOT/sandbox
 	make
 
-	# Build common
-	cd $OMEGAUP_ROOT/common
-	sbt package
+	if [ "$SKIP_GRADER" != "1" ]; then 
+		# Build common
+		cd $OMEGAUP_ROOT/common
+		sbt package
 
-	# Build runner
-	cd $OMEGAUP_ROOT/runner
-	sbt proguard
+		# Build runner
+		cd $OMEGAUP_ROOT/runner
+		sbt proguard
 
-	# Build grader
-	cd $OMEGAUP_ROOT/grader
-	sbt proguard
+		# Build grader
+		cd $OMEGAUP_ROOT/grader
+		sbt proguard
+	fi
 fi
 
 # Set up the www root.
@@ -272,8 +281,10 @@ if [ ! -d $OMEGAUP_ROOT/frontend/tests/controllers/submissions ]; then
 fi
 
 #Execute tests
-OLDPATH=`pwd`
-cd $OMEGAUP_ROOT/frontend/tests/
-phpunit controllers/
-phpunit server/
-cd $OLDPATH
+if [ "$SKIP_PHPUNIT" != "1" ]; then
+	OLDPATH=`pwd`
+	cd $OMEGAUP_ROOT/frontend/tests/
+	phpunit controllers/
+	phpunit server/
+	cd $OLDPATH
+fi
