@@ -280,7 +280,7 @@ if [ ! -d $OMEGAUP_ROOT/frontend/tests/controllers/submissions ]; then
 	mkdir $OMEGAUP_ROOT/frontend/tests/controllers/submissions
 fi
 
-#Execute tests
+# Execute tests
 if [ "$SKIP_PHPUNIT" != "1" ]; then
 	OLDPATH=`pwd`
 	cd $OMEGAUP_ROOT/frontend/tests/
@@ -288,3 +288,5 @@ if [ "$SKIP_PHPUNIT" != "1" ]; then
 	phpunit server/
 	cd $OLDPATH
 fi
+
+echo SUCCESS
