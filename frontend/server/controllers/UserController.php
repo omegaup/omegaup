@@ -825,7 +825,7 @@ class UserController extends Controller {
 		
 		self::authenticateRequest($r);
 					
-		$user = resolveTargetUser($r);
+		$user = self::resolveTargetUser($r);
 		
 		try {
 			
