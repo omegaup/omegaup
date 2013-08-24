@@ -133,7 +133,7 @@ location /api/ {
 }
 
 # rewrites.
-rewrite ^/contest/(.*)$ /contest.php?alias=$1 last;
+rewrite ^/contest/(.*)$ /contest.php?alias=\$1 last;
 rewrite ^/arena/admin/?$ /arena/adminpractice.php last;
 rewrite ^/arena/?$ /arena/index.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/?$ /arena/contest.php last;
@@ -141,7 +141,7 @@ rewrite ^/arena/[a-zA-Z0-9_+-]+/scoreboard/?$ /arena/scoreboard.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/admin.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/practice/?$ /arena/practice.php last;
 rewrite ^/arena/problem/[a-zA-Z0-9_+-]+/?$ /arena/problem.php last;
-rewrite ^/profile/(.*)$ /profile.php?username=$1 last;
+rewrite ^/profile/(.*)$ /profile.php?username=\$1 last;
 
 # pass the PHP scripts to FastCGI server listening on $FPM_PORT.
 location ~ \.php$ {
