@@ -1,38 +1,12 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<title>OmegaUp</title>
-		<script type="text/javascript" src="/js/jquery.js"></script>
-		<script type="text/javascript" src="/js/jquery.ba-hashchange.js"></script>
-		<script type="text/javascript" src="/js/jquery.tableSort.js"></script>
-		<script type="text/javascript" src="/js/jquery.msgBox.js"></script>
-		<script type="text/javascript" src="/js/jquery.gritter.min.js"></script>
-		<script type="text/javascript" src="/js/highstock.js"></script>
-		<script type="text/javascript" src="/js/omegaup.js"></script>
-		<script type="text/javascript" src="/ux/admin.js"></script>
-{literal}
-		<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
-{/literal}
-		<link rel="stylesheet" href="/css/reset.css" />
-		<link rel="stylesheet" href="/css/jquery.gritter.css" />
-		<link rel="stylesheet" href="/ux/arena.css" />
-		<link rel="shortcut icon" href="/favicon.ico" />
-	</head>
-	<body>
-		<audio id="notification_audio">
-			<source src="/media/notification.mp3" type="audio/mpeg" />
-		</audio>
-		<!-- Generated from http://ajaxload.info/ -->
-		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
-		<div id="root">
+{include file='arena.head.tpl' jsfile='/ux/admin.js'}
+			<audio id="notification_audio">
+				<source src="/media/notification.mp3" type="audio/mpeg" />
+			</audio>
 			<div id="title">
 				<img src="/media/omegaup_curves.png" height="80" alt="OmegaUp" />
 				<h1 class="contest-title"></h1>
 				<div class="clock">0:00:00</div>
 			</div>
-			
 			<table class="runs">
 				<caption>
 					Envíos 

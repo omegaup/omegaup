@@ -30,7 +30,7 @@
 	</head>
 	<body>
 		<div id="wrapper">
-			<div class="login_bar" style="display: block">
+			<div class="login_bar">
 				{$CURRENT_USER_GRAVATAR_URL_16}
 				{if $LOGGED_IN eq '1'}
 					 <a href="/profile.php">{$CURRENT_USER_USERNAME}</a> <b><a href='/logout.php'>{#logOut#}</a></b>
