@@ -23,7 +23,7 @@
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-timepicker-addon.css">
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
 {literal}
-	<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>	
+	<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 	<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
 {/literal}
 {/if}
@@ -45,10 +45,10 @@
 				<script>
 					function updateGraderStatus() {
 						$("div.status_bar").html("<img src='/media/waitcircle.gif' />");
-						
+
 						omegaup.getGraderStats(function(stats){
 							if (stats.status == "ok") {
-							
+
 								$("div.status_bar").css("background-color","#00aa33");
 								graderInfo = stats.grader;
 
@@ -57,7 +57,7 @@
 									html += "<b>Embedded runner: </b>" + graderInfo.embedded_runner + " | ";
 									html += "<b>Queue length: </b>" + graderInfo.runner_queue_length + " | ";
 									html += "<b>Runners: </b>" + graderInfo.runners + " | ";
-								} 
+								}
 								else {
 									$("div.status_bar").css("background-color","red");
 									html = "<b>Grader down D: </b>";
@@ -68,14 +68,14 @@
 							else {
 								$("div.status_bar").css("background-color","red");
 								html = "<b>Grader down D: API api/grader/status call failed:  </b>";
-								html += stats.error;							
+								html += stats.error;
 							}
 
 							$("div.status_bar").html(html);
 						});
 					}
-				
+
 					updateGraderStatus();
-					setInterval(updateGraderStatus,	30000);									
+					setInterval(updateGraderStatus,	30000);
 				</script>
 				{/if}
