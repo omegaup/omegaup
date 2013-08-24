@@ -255,8 +255,7 @@ div.post.footer p a:hover { color: #7497af }
 /* Hide stuff */
 div#sidebar { display: none }
 
-
-div.login_bar{
+#login_bar {
 	font-size: 13px;
 	background-color: #678DD7;
 	border-bottom: solid 1px #E7E7E7;
@@ -266,18 +265,14 @@ div.login_bar{
 	padding-left: 120px;
 	padding-top: 5px ;
 	padding-right: 20px; 
-	display: none;
 }
 
-
-
-
-div.login_bar a {
+#login_bar a {
     color: white;
     text-decoration: none;
 }
 
-div.login_bar a:hover {
+#login_bar a:hover {
     text-decoration: underline;
 }
 

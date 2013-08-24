@@ -25,12 +25,4 @@
 		<!-- Generated from http://ajaxload.info/ -->
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		<div id="root">
-			<div id="login_bar">
-				{$CURRENT_USER_GRAVATAR_URL_16}
-				{if $LOGGED_IN eq '1'}
-					 <a href="/profile.php">{$CURRENT_USER_USERNAME}</a> <b><a href='/logout.php'>{#logOut#}</a></b>
-				{else}
-					{#pageTitle#} <b><a href='/login.php'>{#logIn#}</a>!</b>
-				{/if}
-			</div>
-
+{include file='common.login_bar.tpl'}

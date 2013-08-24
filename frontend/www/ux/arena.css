@@ -30,7 +30,7 @@ legend {
 
 .template { display: none; }
 
-div#login_bar{
+#login_bar {
 	font-size: 13px;
 	background-color: #678DD7;
 	border-bottom: solid 1px #E7E7E7;
@@ -42,12 +42,12 @@ div#login_bar{
 	padding-right: 20px; 
 }
 
-div#login_bar a {
+#login_bar a {
     color: white;
     text-decoration: none;
 }
 
-div#login_bar a:hover {
+#login_bar a:hover {
     text-decoration: underline;
 }
 
