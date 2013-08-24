@@ -1,4 +1,3 @@
 <?php
-
-
-include('../ux/problem.html');
+require_once('../../server/bootstrap.php');
+$smarty->display('../../templates/arena.problem.tpl');

@@ -9,13 +9,15 @@
 		<script type="text/javascript" src="/js/highstock.js"></script>
 		<script type="text/javascript" src="/js/omegaup.js"></script>
 		<script type="text/javascript" src="/ux/contest.js"></script>
+{literal}
 		<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+{/literal}
 		<link rel="stylesheet" href="/css/reset.css" />
 		<link rel="stylesheet" href="/ux/arena.css" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 	</head>
-	<body id="practice">
+	<body>
 		<!-- Generated from http://ajaxload.info/ -->
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		<div id="root">
@@ -24,27 +26,7 @@
 				<h1 class="contest-title"></h1>
 				<div class="clock" style="font-size: 5em; line-height: .4em; margin-bottom: .2em;">&infin;</div>
 			</div>
-			<div id="problems" class="tab navleft">
-				<div class="navbar">
-					<div id="problem-list">
-						<div class="summary">
-							<a class="name" href="#problems">Resumen</a>
-						</div>
-						<div class="template">
-							<a class="name"></a>
-							<span class="solved"></span>
-						</div>
-					</div>
-				</div>
-				<div id="summary" class="main">
-					<h1 class="title"></h1>
-					<p class="description"></p>
-					<table>
-						<tr><td><strong>Hora de inicio</strong></td><td class="start_time"></td></tr>
-						<tr><td><strong>Hora de fin</strong></td><td class="finish_time"></td></tr>
-						<tr><td><strong>Tiempo para resolver los problemas</strong></td><td><span class="window_length"></span> minutos</td></tr>
-					</table>
-				</div>
+			<div id="problems" class="tab navleft">								
 				<div id="problem" class="main">
 					<h1 class="title"></h1>
 					<table class="data">
@@ -112,7 +94,6 @@
 						<option value="c">C</option>
 						<option value="java">Java</option>
 						<option value="p">Pascal</option>
-						<option value="cat">Solo Salida</option>
 						<option value="kp">Karel (Pascal)</option>
 						<option value="kj">Karel (Java)</option>
 					</select>

@@ -11,8 +11,10 @@
 		<script type="text/javascript" src="/js/highstock.js"></script>
 		<script type="text/javascript" src="/js/omegaup.js"></script>
 		<script type="text/javascript" src="/ux/admin.js"></script>
+{literal}
 		<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+{/literal}
 		<link rel="stylesheet" href="/css/reset.css" />
 		<link rel="stylesheet" href="/css/jquery.gritter.css" />
 		<link rel="stylesheet" href="/ux/arena.css" />
@@ -125,9 +127,89 @@
 					</tr>
 				</tbody>
 			</table>
-					
+			<div id="ranking-chart"></div>
+			<table id="ranking" style="display: block;">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Usuario</th>
+						<th class="total" colspan="2">Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="template">
+						<td class="position"></td>
+						<td class="legend"></td>
+						<td class="user"></td>
+						<td class="points"></td>
+						<td class="penalty"></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="clarifications">
+				<caption>
+					Clarificaciones 
+					<div class="clarifpager">
+						<button class="clarifpagerprev">&lt;</button>
+						<button class="clarifpagernext">&gt;</button>
+					</div>
+				</caption>
+				<thead>
+					<tr>
+						<th class="problem">Problema</th>
+						<th class="author">Autor</th>
+						<th class="time">Tiempo</th>
+						<th class="message">Mensaje</th>
+						<th class="answer">Respuesta</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="6"><a href="#clarifications/new">Nueva clarificación</a></td>
+					</tr>
+				</tfoot>
+				<tbody class="clarification-list">
+					<tr class="template">
+						<td class="problem"></td>
+												<td class="author"></td>
+						<td class="time"></td>
+						<td class="message"></td>
+						<td class="answer"></td>
+					</tr>
+				</tbody>
+			</table>
+			<form enctype="multipart/form-data" action="/api/problem/update" method="post" id="update-problem">
+				<fieldset>
+					<legend>Administrar problema <select id="rejudge-problem-list" name="problem_alias"></select></legend>
+					<button id="rejudge-problem" value="Rejuecear">Rejuecear</button>
+					<input name="problem_contents" type="file" />
+					<button id="upload-problem" type="submit">Actualizar casos/redacci&oacute;n</button>
+				</fieldset>
+			</form>
 		</div>
-		<div id="overlay">			
+		<div id="overlay">
+			<form id="submit" method="POST">
+				<button class="close">&times;</button>
+				Problema
+				<select name="problem"></select>
+				Lenguaje
+				<select name="language">
+					<option value="c">C</option>
+					<option value="cpp">C++</option>
+					<option value="p">Pascal</option>
+				</select><br/>
+				<textarea name="code"></textarea><br/>
+				<input type="submit" />
+			</form>			
+			<form id="clarification" method="POST">
+				<button class="close">&times;</button>
+				Problema
+				<select name="problem">
+				</select><br/>
+				<textarea name="message"></textarea><br/>
+				<input type="submit" />
+			</form>
 			<form id="run-details">
 				<button class="close">&times;</button>
 				
