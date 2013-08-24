@@ -1,16 +1,11 @@
-body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var,optgroup{font-style:inherit;font-weight:inherit;}del,ins{text-decoration:none;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:baseline;}sub{vertical-align:baseline;}legend{color:#000;}input,button,textarea,select,optgroup,option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit;}input,button,textarea,select{*font-size:100%;}
-
-
-
+html { height: 100%; }
 
 body {
-	font-family: "lucida grande",tahoma,verdana,arial,sans-serif;
+	height: 100%;
+	margin: 0;
+	/*font: 13px "lucida grande",tahoma,verdana,arial,sans-serif;*/
+	background: #e4e8ec linear-gradient(to top, #e4e8ec, #f3f6f9) fixed no-repeat;
 	-webkit-font-smoothing: antialiased;
-}
-
-html {
-	font: 13px "lucida grande",tahoma,verdana,arial,sans-serif;
-	background: #e4e8ec url(../media/background.png);
 }
 
 strong {
@@ -22,7 +17,9 @@ em { font-style: italic }
 div#title {
     height: 151px;
 	padding-top: 13px;
-    background: #eceff1 url(../media/header-background.png);
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .openid_large_btn {
@@ -41,28 +38,29 @@ div#title {
     -webkit-box-shadow: 2px 2px 4px #DDD;
 }
 
+#status {
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+}
 
 
 div.post {
-	width: 900px;
-    nowhitespace: afterproperty;
-    margin: 0 auto 10px auto;
     background: #fff /*url(../media/line.png)*/; -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.18);
     -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.18);
     box-shadow: 0 1px 3px rgba(0,0,0,0.18);
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    position: relative;
-    top: -31px;
+    padding-top: 20px;
 }
 
-div.post a {
+a {
     color: #8bb0d3;
     text-decoration: none;
     -webkit-transition: color 0.1s ease;
 }
-div.post a:hover { color: #666 }
+a:hover { color: #666 }
 /* 27 for baseline */
 
 div.rss_element:first-child div.title {
@@ -87,14 +85,6 @@ h1{
     font-size: 26px;
     -webkit-text-stroke: 1px transparent;
     text-rendering: optimizeLegibility;
-}
-
-h2{
-    margin-top: 10px;
-     padding: 0px 5px 0;
-    font-size: 20px;
-    -webkit-text-stroke: 1px transparent;
-    text-rendering: optimizeLegibility;   
 }
 
 div.title {
@@ -122,16 +112,6 @@ div.copy p {
     line-height: 18px;
     padding-bottom: 18px;
     color: #888;
-}
-div.copy ul {
-    font-size: 13px;
-    padding-bottom: 18px;
-    color: #888;
-}
-div.copy li {
-    line-height: 18px;
-    list-style-type: disc;
-    margin-left: 20px;
 }
 div.copy img {
     background: #fff;
@@ -233,17 +213,7 @@ div.post.footer a {
     -webkit-transition: color 0.1s ease;
 }
 div.post.footer a:hover { color: #4f758f }
-div.post.footer ul { padding: 19px 0 19px 15px }
-div.post.footer li {
-    display: inline;
-    padding-left: 12px;
-    margin-right: 12px;
-    border-left: 1px solid #eef0f1;
-}
-div.post.footer li.first {
-    padding-left: 0;
-    border: 0;
-}
+
 div.post.footer p {
     position: absolute;
     right: 0;
@@ -255,25 +225,32 @@ div.post.footer p a:hover { color: #7497af }
 /* Hide stuff */
 div#sidebar { display: none }
 
-#login_bar {
+div#login-bar{
 	font-size: 13px;
 	background-color: #678DD7;
-	border-bottom: solid 1px #E7E7E7;
 	color: white;
-
-	height: 25px;
-	padding-left: 120px;
-	padding-top: 5px ;
-	padding-right: 20px; 
+	min-height: 30px;
+	max-height: 30px;
+	padding-top: 5px;
+	margin: 0;
+	
+	background-image:linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
+	border-color:transparent;
 }
 
-#login_bar a {
-    color: white;
-    text-decoration: none;
+div#login-bar .navbar-inner {
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 }
 
-#login_bar a:hover {
-    text-decoration: underline;
+div#login-bar .navbar-inner .container {
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .error{
@@ -385,47 +362,6 @@ td.numeric {
     vertical-align:top;
 }
 
-.ui-autocomplete {
-    position: absolute; cursor: default; 
-}
-
-.ui-menu {
-	list-style:none;
-	padding: 2px;
-	margin: 0;
-	display:block;
-	float: left;
-	border: 1px solid black;
-	background-color: white;
-	color: black;
-}
-
-.ui-menu .ui-menu-item {
-	margin:0;
-	padding: 0;
-	zoom: 1;
-	float: left;
-	clear: left;
-	width: 100%;
-}
-
-.ui-menu .ui-menu-item a {
-	text-decoration:none;
-	display:block;
-	padding:.2em .4em;
-	line-height:1.5;
-	zoom: 1;
-}
-
-.ui-menu .ui-menu-item a.ui-state-hover,
-.ui-menu .ui-menu-item a.ui-state-active {
-	font-weight: normal;
-	background-color: #678DD7;
-	color: white;
-}
-
-
-
 input[type=submit],
 input[type=button],
 .POS.Boton,
@@ -527,18 +463,6 @@ input[type=button]:hover,
     -webkit-box-shadow: 2px 2px 4px #DDD;
 }
 
-
-
-
-.fbSettingsList {
-
-border-top: 1px solid #AAA;
-}
-ul {
-list-style-type: none;
-margin: 0;
-padding: 0;
-}
 .clearfix::after {
 clear: both;
 content: ".";
@@ -548,11 +472,6 @@ height: 0;
 line-height: 0;
 visibility: hidden;
 }
-
-ul {
-list-style-type: none;
-}
-
 .fbSettingsList .fbSettingsListItemLabel {
 color: #333;
 float: left;
@@ -570,7 +489,7 @@ text-align: right;
 ._4ks > li {
 border-color: #E9E9E9;
 border-style: solid;
-border-width: 1px 0 0 0;
+border-width: 0 0 1px 0;
 }
 
 .uiListItem {
@@ -639,9 +558,23 @@ padding-left: 5px;
 padding-right: 5px;
 }
 
+#content { width: 900px; margin-left: auto; margin-right: auto; }
+#content > .navbar { border-radius: 4px; }
+#inner-content { margin-left: 0; margin-right: 0; }
 
+#userbox { padding: 0 10px 0 0; }
+#userbox-inner { padding: 15px; margin: 0; text-align: center;}
+#userbox-inner > div { margin-bottom: 15px;}
 
+#login-bar ul > li { margin-left: 15px; }
+#login-bar ul > li:first-child { margin-left: 0; }
+#login-bar .btn { padding: 0 5px; }
 
-ul {
-list-style-type: none;
-}   
+.post { padding-left: 15px; padding-right: 15px; }
+
+#login-page > row { margin: 0; }
+#login-page form { padding-top: 10px; padding-bottom: 10px; }
+#login-page > h3 { border-color: #E9E9E9; border-style: solid; border-width: 0 0 1px 0; font-size: 20px; padding-bottom: 5px; }
+
+#footer { padding: 5px; color:black; margin: 10px auto 20px auto; }
+#footer .logo { width: 60px; padding:0px; margin:0px; -webkit-box-shadow:0px 0px; }

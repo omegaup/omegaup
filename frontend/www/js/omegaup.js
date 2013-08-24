@@ -48,12 +48,12 @@ $(document).ajaxError(function(e, xhr, settings, exception) {
 
 OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, callback) {
 	$.post(
-		'/api/user/create/email/' + s_Email + "/username" + s_Username + "/password/" + s_PlainPassword ,
+		'/api/user/create/',
 		{ email: s_Email, username: s_Username, password : s_PlainPassword },
 		function (data) {
 			if( data.status !== undefined && data.status == "error") {
 				OmegaUp.UI.Error( data.error );
-			}else{
+			} else {
 				if(callback !== undefined){ callback( data ) }
 			}
 		},

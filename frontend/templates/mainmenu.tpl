@@ -6,8 +6,8 @@
 		</a>
 	</div>
 	<div id="content">
-		<div class="post footer">
-			<ul>
+		<div class="navbar">
+			<ul class="nav navbar-nav">
 				{if $CURRENT_USER_IS_ADMIN eq '1'}
 					<li><a href='/admin/'><b>Admin</b></a></li>
 				{/if}				

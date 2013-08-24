@@ -17,6 +17,29 @@
 		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
 {/literal}
 		<link rel="stylesheet" href="/css/reset.css" />
+
+		<!-- Bootstrap from CDN -->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
+		<link rel="stylesheet" href="/css/bootstrap-select.min.css">
+		<script type="text/javascript" src="/js/bootstrap-select.min.js"></script>
+		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
+		<link rel="stylesheet" href="/css/bootstrap-datepicker.css">
+		<script type="text/javascript" src="/js/bootstrap-datepicker.js"></script>
+		<!-- Bootstrap typeahead plugin from https://github.com/tcrosen/twitter-bootstrap-typeahead -->
+		<script type="text/javascript" src="/js/bootstrap-typeahead.js"></script>
+		<!-- Bootstrap timepicker plugin from https://github.com/jdewit/bootstrap-timepicker
+		<link rel="stylesheet" href="/css/bootstrap-timepicker.min.css">
+		<script type="text/javascript" src="/js/bootstrap-timepicker.min.js"></script> -->
+		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
+		<link rel="stylesheet" href="/css/bootstrap-datetimepicker.css">
+		<script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js"></script>
+
 		<link rel="stylesheet" href="/css/jquery.gritter.css" />
 		<link rel="stylesheet" href="/ux/arena.css" />
 		<link rel="shortcut icon" href="/favicon.ico" />

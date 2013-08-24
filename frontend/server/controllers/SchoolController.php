@@ -13,13 +13,19 @@ class SchoolController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiList(Request $r) {
-
 		self::authenticateRequest($r);
-
-		Validators::isStringNonEmpty($r["term"], "term");
+		
+		$param = "";
+		if (!is_null($r["term"])) {
+			$param = "term";
+		} else if (!is_null($r["query"])) {
+			$param = "query";
+		} else {
+			throw new InvalidParameterException("query".Validators::IS_EMPTY);
+		}
 
 		try {
-			$schools = SchoolsDAO::findByName($r["term"]);			
+			$schools = SchoolsDAO::findByName($r[$param]);			
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -42,7 +48,6 @@ class SchoolController extends Controller {
 	 * @throws InvalidParameterException
 	 */
 	public static function apiCreate(Request $r) {
-		
 		self::authenticateRequest($r);
 		
 		Validators::isStringNonEmpty($r["name"], "name");
@@ -71,6 +76,4 @@ class SchoolController extends Controller {
 		
 		return array("status" => "ok", "school_id" => $school->getSchoolId());
 	}
-	
 }
-

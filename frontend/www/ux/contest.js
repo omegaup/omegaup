@@ -122,9 +122,6 @@ $(document).ready(function() {
 		
 		currentProblem = problem;
 		
-		$('#login_bar a.user').append(omegaup.username);
-		$('#login_bar img').attr('src', 'https://secure.gravatar.com/avatar/' + omegaup.email_md5 + '?s=16');
-						
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
 
@@ -157,9 +154,6 @@ $(document).ready(function() {
 			window.location = window.location.pathname.replace(/\/practice\/.*/, '/');
 			return;
 		}
-
-		$('#login_bar a.user').append(omegaup.username);
-		$('#login_bar img').attr('src', 'https://secure.gravatar.com/avatar/' + omegaup.email_md5 + '?s=16');
 
 		$('#title .contest-title').html(contest.title);
 		$('#summary .title').html(contest.title);

@@ -30,26 +30,36 @@ legend {
 
 .template { display: none; }
 
-#login_bar {
+div#login-bar{
 	font-size: 13px;
 	background-color: #678DD7;
-	border-bottom: solid 1px #E7E7E7;
 	color: white;
-
-	height: 25px;
-	padding-left: 120px;
-	padding-top: 5px ;
-	padding-right: 20px; 
+	min-height: 30px;
+	max-height: 30px;
+	padding-top: 5px;
+	margin: 0;
+	
+	background-image:linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
+	border-color:transparent;
 }
 
-#login_bar a {
-    color: white;
-    text-decoration: none;
+div#login-bar .navbar-inner {
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 }
 
-#login_bar a:hover {
-    text-decoration: underline;
+div#login-bar .navbar-inner .container {
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 0;
+	padding-right: 0;
 }
+#login-bar ul > li { margin-left: 15px; }
+#login-bar ul > li:first-child { margin-left: 0; }
+#login-bar .btn { padding: 0 5px; }
 
 #root,
 #problem,

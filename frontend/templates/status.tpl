@@ -1,12 +1,8 @@
 {if $STATUS neq ''} 
-	<div class="post footer">
-		<div class="copy error" id='status'>
-			{$STATUS}
-		</div>
+	<div class="alert" id='status'>
+		{$STATUS}
 	</div>
 {else}
-	<div class="post footer" style="display: none;">
-		<div class="copy error" id='status'>			
-		</div>
+	<div class="alert" id='status' style="display: none;">			
 	</div>
 {/if} 
