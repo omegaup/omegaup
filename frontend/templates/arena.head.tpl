@@ -13,7 +13,7 @@
 		<script type="text/javascript" src="/js/omegaup.js"></script>
 		<script type="text/javascript" src="{$jsfile}"></script>
 {literal}
-		<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
 {/literal}
 		<link rel="stylesheet" href="/css/reset.css" />
