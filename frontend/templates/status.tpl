@@ -1,5 +1,5 @@
 {if $STATUS neq ''} 
-	<div class="alert" id='status'>
+	<div class="alert alert-danger" id='status'>
 		{$STATUS}
 	</div>
 {else}

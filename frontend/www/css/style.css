@@ -585,3 +585,5 @@ padding-right: 5px;
 
 #footer { padding: 5px; color:black; margin: 10px auto 20px auto; }
 #footer .logo { width: 60px; padding:0px; margin:0px; -webkit-box-shadow:0px 0px; }
+
+.bottom-margin { margin-bottom: 15px; }

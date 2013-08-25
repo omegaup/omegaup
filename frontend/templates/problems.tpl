@@ -5,5 +5,8 @@
 	{include file='problems.list.tpl'}
 </div>
 
+<script>
+	$(".navbar #nav-problems").addClass("active");
+</script>
 
 {include file='footer.tpl'}

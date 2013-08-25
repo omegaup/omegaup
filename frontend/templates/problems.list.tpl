@@ -1,5 +1,18 @@
 <div class="post">
-	<div class="copy wait_for_ajax" id="problems_list" >
+	<div class="wait_for_ajax panel panel-default" id="problems_list" >
+		<div class="panel-heading">
+			<h3 class="panel-title">Problemas</h3>
+		</div>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>T&iacute;tulo</th>
+					<th>Env&iacute;os</th>
+					<th>Resueltos</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
 	</div>
 </div>
 <script>
@@ -15,11 +28,7 @@
 		omegaup.getProblems(function(problems) {
 			// Got the problems, lets draw them
 
-			var html = "<h3>Problemas</h3><table><tr>"
-					+ "<td>Título</td>"	
-					+ "<td>Envíos</td>"
-					+ "<td>Resueltos</td>"
-					+ "</tr>";
+			var html = "";
 
 			for (var i = 0; i < problems.results.length; i++) {
 				html += "<tr>"
@@ -29,9 +38,8 @@
 					+ "</tr>";
 			}
 
-			html += "</table>";
-
-			$("#problems_list").removeClass("wait_for_ajax").append(html);
+			$("#problems_list").removeClass("wait_for_ajax");
+			$("#problems_list tbody").append(html);
 		});
 	})();
 </script>

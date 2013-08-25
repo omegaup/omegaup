@@ -1,33 +1,65 @@
-<form method='POST' action='{$smarty.server.REQUEST_URI}' id='problem_form' enctype="multipart/form-data">			
-	
+<form method='POST' action='{$smarty.server.REQUEST_URI}' id='problem_form' class="form" enctype="multipart/form-data">	
 	{if $IS_UPDATE eq 1}
-		<legend>Problema: <select class="edit-problem-list" name='edit-problem-list' id='problem_alias'>
-				<option></option>
-		</select></legend>
+		<div class="form-group">
+			<label for="problem_alias">Problema</label>
+			<select class="edit-problem-list" name='edit-problem-list' id='problem_alias' class="form-control">
+					<option></option>
+			</select>
+		</div>
 	{/if}
-
-	<legend>Archivo: <input name="problem_contents" type="file" /></legend>
-	<legend>Título: <input id='title' name='title' value='{$TITLE}' type='text'></legend>
-	<legend>Tipo de validador: <select name='validator' id='validator'>
-			<option value="token-caseless">Token por Token, ignorando diferencias en mayúsculas/minúsculas (default)</option>
-			<option value="token-numeric">Tokens numéricos con tolerancia</option>		
-			<option value="token">Token por Token</option>		
-			<option value="literal">Sólo salida, comparación literal</option>
-			<option value="custom">Validador personalizado (validator.$lang$)</option>
-		</select></legend>
-	<legend>Tiempo límite: (ms)<input id='time_limit' name='time_limit' value='{$TIME_LIMIT}' type='text'></legend>
-	<legend>Memory limit: (KB)<input id='memory_limit' name='memory_limit' value='{$MEMORY_LIMIT}' type='text'></legend>
-	<legend>Fuente: <input id='source' name='source' value='{$SOURCE}' type='text'>	</legend>
-	<legend>Aparece en el listado público: <select name='public' id='public'>
+	
+	<div class="form-group">
+		<label for="problem_contents">Archivo</label>
+		<input name="problem_contents" id="problem_contents" type="file" class="form-control" />
+	</div>
+	
+	<div class="form-group">
+		<label for="title">Título</label>
+		<input id='title' name='title' value='{$TITLE}' type='text' class="form-control" />
+	</div>
+	
+	<div class="form-group">
+		<label for="validator">Tipo de validador</label>
+		<select name='validator' id='validator' class="form-control" >
+				<option value="token-caseless">Token por Token, ignorando diferencias en mayúsculas/minúsculas (default)	</option>
+				<option value="token-numeric">Tokens numéricos con tolerancia</option>		
+				<option value="token">Token por Token</option>		
+				<option value="literal">Sólo salida, comparación literal</option>
+				<option value="custom">Validador personalizado (validator.$lang$)</option>
+		</select>
+	</div>
+	
+	<div class="form-group">
+		<label for="time_limit">Tiempo límite (ms)</label>
+		<input id='time_limit' name='time_limit' value='{$TIME_LIMIT}' type='text' class="form-control" />
+	</div>
+	
+	<div class="form-group">
+		<label for="memory_limit">Memory limit (KB)</label>
+		<input id='memory_limit' name='memory_limit' value='{$MEMORY_LIMIT}' type='text' class="form-control" />
+	</div>
+	
+	<div class="form-group">
+		<label for="source">Fuente</label>
+		<input id='source' name='source' value='{$SOURCE}' type='text' class="form-control" />
+	</div>
+	
+	<div class="form-group">
+		<label for="public">Aparece en el listado público</label>
+		<select name='public' id='public' class="form-control">
 			<option value="0">No</option>
 			<option value="1">Sí</option>
-		</select></legend>
+		</select>
+	</div>
+	
 	<input id='' name='request' value='submit' type='hidden'>
 	
+	<div class="form-group">
 	{if $IS_UPDATE eq 1}
-		<input value='Actualizar problema' type='submit' class="OK">			
+		<button type='submit' class="btn btn-primary">Actualizar problema</button>	
 	{else}
-		<input value='Crear problema' type='submit' class="OK">			
+		<button type='submit' class="btn btn-primary">Crear problema</button>	
 	{/if}
+	</div>
 	
 </form>

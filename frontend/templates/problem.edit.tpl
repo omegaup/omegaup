@@ -4,16 +4,22 @@
 {include file='status.tpl'}
 
 <div class="post">
-	<div class="copy wait_for_ajax" id="problems_list" >
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h3 class="panel-title">Editar Problema</h3>
+		</div>
+		<div class="panel-body">
+			<div class="wait_for_ajax" id="problems_list">
+			</div>
+			<div>				
+				{include file='problem.edit.form.tpl'}
+			</div>
+		</div>
 	</div>
-	<div class="copy">				
-		{include file='problem.edit.form.tpl'}
-	</div>	
 </div>
 			
 <script>
-	(function(){		
-	
+	(function(){
 		$('select.edit-problem-list').change(function () {			
 			console.log("changed select");
 			refreshEditForm($('select.edit-problem-list option:selected').val());
@@ -27,23 +33,22 @@
 			}			
 
 			$("#problems_list").removeClass("wait_for_ajax");
-			
+				
 			// If we have a problem in GET, then get it
 			{IF isset($smarty.get.problem)}
-			$('select.edit-problem-list').each(function() {
-				$('option', this).each(function() {
-					if($(this).val() == "{$smarty.get.problem}") {
-						$(this).attr('selected', 'selected');
-						$('select.edit-problem-list').trigger('change');
-					}
+				$('select.edit-problem-list').each(function() {
+					$('option', this).each(function() {
+						if($(this).val() == "{$smarty.get.problem}") {
+							$(this).attr('selected', 'selected');
+							$('select.edit-problem-list').trigger('change');
+						}
+					});
 				});
-			});
 			{/IF}
 		});
 	})();
 	
 	function refreshEditForm(problemAlias) {
-		
 		if (problemAlias === "") {
 			$('input[name=title]').val('');
 			$('input[name=time_limit]').val('');
@@ -61,7 +66,6 @@
 			$('select[name=public]').val(problem.public);
 		});
 	}
-	
 </script>
 
 {include file='footer.tpl'}
