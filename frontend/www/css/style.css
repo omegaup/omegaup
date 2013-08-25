@@ -225,28 +225,25 @@ div.post.footer p a:hover { color: #7497af }
 /* Hide stuff */
 div#sidebar { display: none }
 
-div#login-bar{
-	font-size: 13px;
-	background-color: #678DD7;
-	color: white;
+#header {
 	min-height: 30px;
-	max-height: 30px;
-	padding-top: 5px;
-	margin: 0;
-	
+	max-height: 40px;
+	background-color: #678DD7;
 	background-image:linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
 	border-color:transparent;
+	margin: 0;
 }
 
-div#login-bar .navbar-inner {
+#header .navbar-inner {
 	width: 900px;
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
 }
 
-div#login-bar .navbar-inner .container {
+#header .navbar-inner .container {
 	width: 900px;
+	text-align: left;
 	margin-left: auto;
 	margin-right: auto;
 	padding-left: 0;
@@ -566,9 +563,22 @@ padding-right: 5px;
 #userbox-inner { padding: 15px; margin: 0; text-align: center;}
 #userbox-inner > div { margin-bottom: 15px;}
 
-#login-bar ul > li { margin-left: 15px; }
-#login-bar ul > li:first-child { margin-left: 0; }
-#login-bar .btn { padding: 0 5px; }
+#header .navbar-text,
+#header .navbar-nav > li > a {
+	color: #fff;
+	margin: 0px;
+	padding: 5px;
+}
+#header .navbar-nav > li > a:hover,
+.nav .open>a, .nav .open>a:hover, .nav .open>a:focus {
+	background-color: #577DC7;
+}
+#header #grader-status a {
+	background-color: #fff;
+}
+#header #grader-status .label {
+	min-width: 50px;
+}
 
 .post { padding-left: 15px; padding-right: 15px; }
 

@@ -11,6 +11,7 @@ loginSignupHeader = "&iquest;No es as&iacute;? Reg&iacute;strate, es f&aacute;ci
 loginUsername = "Usuario"
 loginEmail = "E-mail"
 loginRepeatPassword = "Repetir contrase&ntilde;a"
+loginEditProfile = "Editar perfil"
 
 logIn = "Inicia sesion"
 logOut = "Cerrar Sesion"
