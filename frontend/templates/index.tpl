@@ -2,47 +2,41 @@
 {include file='mainmenu.tpl'}
 
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
-<div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
-	<table>
-	<tr>
-		<td>
-			<div class="post footer" style="width: 560px; min-height: 400px;">
-				<div class="copy">
-					omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en America Latina mediante la resolucion de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.
-				</div>
-				<div class="copy button" id="contest-create">
-					Crea tu propio concurso en omegaUp!
-				</div>
-				<div id="ranking-chart"></div>
+<div class="row">
+	<div class="col-md-8">
+		<div class="post">
+			<p>
+				omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en America Latina mediante la resolucion de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.
+			</p>
+			<div class="text-center">
+				<a href="contestcreate.php" class="btn btn-primary" id="contest-create">&iexcl;Crea tu propio concurso en omegaUp!</a>
 			</div>
-		</td>
-		<td >
-			<div class="post footer" style="width: 330px; min-height: 150px;">
-				<div class="copy" >
-						<h2>Coder del mes de Julio</h2>
-						<br/>
-						<div id="coder_of_the_month">
-							<div class="rss_element">
-								<div class="title"><a href="/profile/charlyhlms">charlyhlms</a></div>
-								<div class="body"><a href="/profile/charlyhlms"><img src="https://secure.gravatar.com/avatar/7df78198980cb6d47468da1cd95f5695?s=92/"></a></div>
-								<div class="body"><b>Carlos Galeana</b></div>
-								<div class="body">Colegio Carol Baur</div>
-								<div class="body">Distrito Federal, México</div>
-								<div class="body">12 problemas resueltos en Julio</div>
-							</div>
-						</div>
+			<div id="ranking-chart"></div>
+		</div>
+	</div>
+	
+	<div class="col-md-4">
+		<div class="post">
+			<h3>Coder del mes de Julio</h3>
+			<div id="coder_of_the_month">
+				<div class="rss_element">
+					<div class="title"><a href="/profile/charlyhlms">charlyhlms</a></div>
+					<div class="body"><a href="/profile/charlyhlms"><img src="https://secure.gravatar.com/avatar/7df78198980cb6d47468da1cd95f5695?s=92/"></a></div>
+					<div class="body"><b>Carlos Galeana</b></div>
+					<div class="body">Colegio Carol Baur</div>
+					<div class="body">Distrito Federal, México</div>
+					<div class="body">12 problemas resueltos en Julio</div>
 				</div>
 			</div>
-<div class="post footer" style="width: 330px; min-height: 300px;">				
-				<div class="copy" >					
-					<h2>Últimos blog posts</h2>
-					<br/>
-					<div id="rss_content">Loading...</div>
-				</div>
+		</div>
+		<div class="post">				
+			<div>					
+				<h3>Últimos blog posts</h3>
+				<br/>
+				<div id="rss_content">Loading...</div>
 			</div>
-		</td>
-	</tr>
-	</table>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
@@ -91,11 +85,6 @@
 	}
 
 	function OnLoad() {
-	
-	  $('#contest-create').click(function() {
-		window.location.assign("contestcreate.php");
-	  });
-	
 	  // Create a feed instance that will grab Digg's feed.
 	  var feed = new google.feeds.Feed("http://blog.omegaup.com/rss");
 
@@ -205,8 +194,6 @@
 	}
 
 	google.setOnLoadCallback(OnLoad);
-		
 </script>
 
-​
 {include file='footer.tpl'}
