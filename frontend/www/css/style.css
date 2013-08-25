@@ -229,7 +229,7 @@ div#sidebar { display: none }
 	min-height: 30px;
 	max-height: 40px;
 	background-color: #678DD7;
-	background-image:linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
+	background-image: linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
 	border-color:transparent;
 	margin: 0;
 }
@@ -238,14 +238,9 @@ div#sidebar { display: none }
 	width: 900px;
 	margin-left: auto;
 	margin-right: auto;
-	text-align: center;
 }
 
 #header .navbar-inner .container {
-	width: 900px;
-	text-align: left;
-	margin-left: auto;
-	margin-right: auto;
 	padding-left: 0;
 	padding-right: 0;
 }
@@ -581,6 +576,8 @@ padding-right: 5px;
 }
 
 .post { padding-left: 15px; padding-right: 15px; padding-bottom: 5px; }
+
+#header .caret { border-top-color: white; border-bottom-color: white; }
 
 #login-page > row { margin: 0; }
 #login-page form { padding-top: 10px; padding-bottom: 10px; }
