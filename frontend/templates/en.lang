@@ -2,7 +2,7 @@
 #this is config file comment
 
 pageTitle = "Welcome to Omegaup"
-loginToOmegaup = "Login to omegaup !"
+loginViewProfile = "My profile"
 
 
 logIn = "Log in"

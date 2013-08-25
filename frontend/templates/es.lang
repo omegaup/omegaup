@@ -11,7 +11,7 @@ loginSignupHeader = "&iquest;No es as&iacute;? Reg&iacute;strate, es f&aacute;ci
 loginUsername = "Usuario"
 loginEmail = "E-mail"
 loginRepeatPassword = "Repetir contrase&ntilde;a"
-loginEditProfile = "Editar perfil"
+loginViewProfile = "Mi perfil"
 
 logIn = "Inicia sesion"
 logOut = "Cerrar Sesion"
@@ -28,3 +28,11 @@ frontPageHelp = "Ayuda"
 
 frontPageQuestions = "Preguntas"
 frontPageBlog = "Blog"
+
+profileEdit = "Editar perfil"
+profileUsername = "Nombre de usuario"
+profileEmail = "Correo"
+profileCountry = "País"
+profileState = "Estado"
+profileSchool = "Escuela"
+profileGraduationDate = "Fecha de graduación"

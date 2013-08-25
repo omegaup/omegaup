@@ -6,7 +6,7 @@
 							<li class="dropdown">
 						    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="label">{$CURRENT_USER_GRAVATAR_URL_16}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
 								<ul class="dropdown-menu">
-								 <li><a href='/profile.php'>{#loginEditProfile#}</a></li>
+								 <li><a href='/profile.php'>{#loginViewProfile#}</a></li>
 								 <li><a href='/logout.php'>{#logOut#}</a></li>
 								</ul>
 							</li>	
