@@ -6,7 +6,6 @@
 {include file='contest.new.form.tpl'}
 
 <script>
-	
 	$('.new_contest_form').submit(function() {
 	
 		var window_length_value = $('#window_length_enabled').is(':checked') ? 
@@ -32,7 +31,6 @@
 
 				if(data.status == "ok") {
 					$('div.copy.error').html("Tu concurso ha sido creado! <a href='addproblemtocontest.php'>Agrégale problemas!</a> <a href='/arena/"+ $('.new_contest_form #alias').val() + "'>Ver Concurso</a>");
-					$('div.post.footer').show();
 					window.scrollTo(0,0);
 					return;
 				}

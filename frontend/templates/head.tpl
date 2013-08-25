@@ -29,6 +29,12 @@
 		<script type="text/javascript" src="/js/bootstrap-datepicker.js"></script>
 		<!-- Bootstrap typeahead plugin from https://github.com/tcrosen/twitter-bootstrap-typeahead -->
 		<script type="text/javascript" src="/js/bootstrap-typeahead.js"></script>
+		<!-- Bootstrap timepicker plugin from https://github.com/jdewit/bootstrap-timepicker
+		<link rel="stylesheet" href="/css/bootstrap-timepicker.min.css">
+		<script type="text/javascript" src="/js/bootstrap-timepicker.min.js"></script> -->
+		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
+		<link rel="stylesheet" href="/css/bootstrap-datetimepicker.css">
+		<script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js"></script>
 
 		<!-- from arena -->
 		<link rel="shortcut icon" href="/favicon.ico" />

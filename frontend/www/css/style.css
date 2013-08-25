@@ -580,7 +580,7 @@ padding-right: 5px;
 	min-width: 50px;
 }
 
-.post { padding-left: 15px; padding-right: 15px; }
+.post { padding-left: 15px; padding-right: 15px; padding-bottom: 5px; }
 
 #login-page > row { margin: 0; }
 #login-page form { padding-top: 10px; padding-bottom: 10px; }

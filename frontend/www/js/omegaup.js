@@ -810,21 +810,10 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 
 var omegaup = new OmegaUp();
 
-function dateToString(currentdate) {
-		var result = "" + (currentdate.getMonth()+1) + "/"
-                + currentdate.getDate()  + "/" 
-                + currentdate.getFullYear() + " "  
-                + ((currentdate.getHours() < 10) ? "0" + currentdate.getHours() : + currentdate.getHours()) + ":"  
-                + ((currentdate.getMinutes() < 10) ? "0" + currentdate.getMinutes() : + currentdate.getMinutes()) + ":"
-			    + ((currentdate.getSeconds() < 10) ? "0" + currentdate.getSeconds() : + currentdate.getSeconds());
-			
-		return result;
+function dateToString(currentDate) {
+	return currentDate.format("{MM}/{dd}/{yyyy} {HH}:{mm}");
 }
 
-function onlyDateToString(currentdate) {
-		var result = "" + (currentdate.getMonth()+1) + "/"
-                + currentdate.getDate()  + "/" 
-                + currentdate.getFullYear();
-			
-		return result;
+function onlyDateToString(currentDate) {
+	return currentDate.format("{MM}/{dd}/{yyyy}");
 }

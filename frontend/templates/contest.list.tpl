@@ -1,6 +1,24 @@
-<div class="post">
-	<div class="copy wait_for_ajax" id="contest_list" >
+<div class="wait_for_ajax panel panel-default" id="contest_list">
+	<div class="panel-heading">
+		<h3 class="panel-title">Concursos</h3>
 	</div>
+	
+	<table class="table">
+		<thead>
+			<th>Título</th>
+			<th>Inicio</th>
+			<th>Fin</th>
+			<th>Público</th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+		</thead>
+		<tbody>
+		<tbody>
+	</table>
 </div>
 <script>
 	(function(){
@@ -15,18 +33,7 @@
 		omegaup.getMyContests(function(contests) {
 			// Got the contests, lets draw them
 
-			var html = "<h3>Concursos</h3><table><tr>"
-					+ "<td>Título</td>"					
-					+ "<td>Inicio</td>"
-					+ "<td>Fin</td>"
-					+ "<td>Público</td>"
-					+ "<td></td>"
-					+ "<td></td>"
-					+ "<td></td>"
-					+ "<td></td>"
-					+ "<td></td>"
-					+ "<td></td>"
-					+ "</tr>";
+			var html = "";
 
 			for (var i = 0; i < contests.results.length; i++) {
 				var startDate = contests.results[i].start_time;
@@ -44,9 +51,8 @@
 					+ "</tr>";
 			}
 
-			html += "</table>";
-
-			$("#contest_list").removeClass("wait_for_ajax").append(html);
+			$("#contest_list").removeClass("wait_for_ajax");
+			$("#contest_list > table > tbody").empty().append(html);
 		});
 	})();
 </script>
