@@ -1,4 +1,4 @@
-# Bienvenido a omegaup!
+# Bienvenido a omegaUp!
 
 ## Código
 
