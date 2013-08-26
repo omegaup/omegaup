@@ -65,7 +65,7 @@
 											}
 											html += "<li><a href=\"#\">Grader OK</a></li>";
 											html += "<li><a href=\"#\">Embedded runner: " + graderInfo.embedded_runner + "</a></li>";
-											html += "<li><a href=\"#\">Runners: " + graderInfo.runners + "</a></li>";
+											html += "<li><a href=\"#\">Runners: " + ((graderInfo.embedded_runner ? 1 : 0) + graderInfo.runners) + "</a></li>";
 											html += "<li><a href=\"#\">Idle runners: " + graderInfo.runner_queue_length + "</a></li>";
 										} else {
 											$("#grader-status > a").addClass("grader-error");
