@@ -345,7 +345,7 @@
 		$("#school").typeahead({
 			ajax: {
 				url: "/api/school/list/",
-				preProcess: function(data) {
+				preProcess: function (data) {
 					if (data.length === 0) {
 						$("#school-found").slideDown();
 						$("#school_id").val(-1);
@@ -357,8 +357,8 @@
 			},
 			display: 'label',
 			minLength: 2,
-			select: function( event, ui ) {
-				$("#school_id").val(ui.item.id);											
+			itemSelected: function (item, val, text) {
+				$("#school_id").val(val);											
 			}
 		});
 		

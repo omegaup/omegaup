@@ -5,4 +5,4 @@
 {else}
 	<div class="alert" id='status' style="display: none;">			
 	</div>
-{/if} 
+{/if}

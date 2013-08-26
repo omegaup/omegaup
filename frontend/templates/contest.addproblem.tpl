@@ -3,70 +3,91 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<div class="post">
-	<div class="copy wait_for_ajax" id="problems_list" >
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		<h2 class="panel-title">Agregar Problema</h2>
 	</div>
-	<div class="copy">						
-		<legend>Concursos: <select class='contests' name='contests' id='contest_alias'>
-			<option value=""></option>				
-		</select></legend>
-
-		<legend>Problemas: <select class='problems' name='problems' id='problem_alias'>
-			<option value=""></option>				
-		</select></legend>
-		
-		<legend> Puntos que vale el problema: <input id='points' name='points' class='points' size="3" value="100">
-		</legend>
-		
-		<legend> Orden en el concurso: <input id='order' name='order' class='order' value='1' size="2">
-		</legend>
-
-		<input id='' name='request' value='submit' type='hidden'>
-		<input value='Agregar problema' type='submit' class="OK">		
+	<div class="panel-body">
+		<div class="wait_for_ajax" id="problems_list" >
+		</div>
+		<form class="form" id="add-problem-form">
+			<div class="form-group">
+				<label for="contests">Concursos</label>
+				<select class='form-control' name='contests' id='contests'>
+					<option value=""></option>				
+				</select>
+			</div>
+			
+			<div class="form-group">
+				<label for="problems">Problemas</label>
+				<select class='form-control' name='problems' id='problems'>
+					<option value=""></option>				
+				</select>
+			</div>
+			
+			<div class="form-group">
+				<label for="points">Puntos que vale el problema</label>
+				<input id='points' name='points' size="3" value="100" class="form-control" />
+			</div>
+			
+			<div class="form-group">
+				<label for="order">Orden en el concurso</label>
+				<input id='order' name='order' value='1' size="2" class="form-control" />
+			</div>
+			
+			<div class="form-group">
+				<input id='' name='request' value='submit' type='hidden'>
+				<button type='submit' class="btn btn-primary">Agregar problema</button>
+			</div>
+		</form>
 	</div>	
 </div>
 			
 <script>	
 	(function(){		
-	
-		$('input.OK').click(function() {
-			contestAlias = $('select.contests').val();
-			problemAlias = $('select.problems').val();
-			points = $('input[name=points]').val();
-			order = $('input[name=order]').val();
+		$('#add-problem-form').submit(function() {
+			contestAlias = $('select#contests').val();
+			problemAlias = $('select#problems').val();
+			points = $('input#points').val();
+			order = $('input#order').val();
 			
 			omegaup.addProblemToContest(contestAlias, order, problemAlias, points, function(response){
 				if (response.status == "ok") {
-					$('div.copy.error').html("Problem successfully added!");
-					$('div.post.footer').show();
+					$('#status').text("Problema agregado con éxito");
+					$('#status').addClass("alert-success");
+					$('#status').slideDown();
 					return;
+				} else {
+					$('#status').text("Error agregando problema: " + response.error);
+					$('#status').addClass("alert-danger");
+					$('#status').slideDown();
 				}
-			
-				
 			});
+			
+			return false; // Prevent page refresh
 		});
 	
 		omegaup.getProblems(function(problems) {					
 			// Got the problems, lets populate the dropdown with them			
 			for (var i = 0; i < problems.results.length; i++) {
 				problem = problems.results[i];							
-				$('select.problems').append($('<option></option>').attr('value', problem.alias).text(problem.title));
+				$('select#problems').append($('<option></option>').attr('value', problem.alias).text(problem.title));
 			}			
 			
 			omegaup.getMyContests(function(contests) {					
 				// Got the contests, lets populate the dropdown with them			
 				for (var i = 0; i < contests.results.length; i++) {
 					contest = contests.results[i];							
-					$('select.contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
+					$('select#contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
 				}
 				
 				// If we have a contest in GET, then get it
 				{IF isset($smarty.get.contest)}
-				$('select.contests').each(function() {
+				$('select#contests').each(function() {
 					$('option', this).each(function() {
 						if($(this).val() == "{$smarty.get.contest}") {
 							$(this).attr('selected', 'selected');
-							$('select.contests').trigger('change');
+							$('select#contests').trigger('change');
 						}
 					});
 				});
@@ -74,11 +95,11 @@
 		
 				// If we have a problem in GET, then get it
 				{IF isset($smarty.get.problem)}
-				$('select.problems').each(function() {
+				$('select#problems').each(function() {
 					$('option', this).each(function() {
 						if($(this).val() == "{$smarty.get.problem}") {
 							$(this).attr('selected', 'selected');
-							$('select.problems').trigger('change');
+							$('select#problems').trigger('change');
 						}
 					});
 				});

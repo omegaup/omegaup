@@ -778,10 +778,17 @@ class UserController extends Controller {
 
 		self::authenticateRequest($r);
 
-		Validators::isStringNonEmpty($r["term"], "term");
-
+		$param = "";
+		if (!is_null($r["term"])) {
+			$param = "term";
+		} else if (!is_null($r["query"])) {
+			$param = "query";
+		} else {
+			throw new InvalidParameterException("query".Validators::IS_EMPTY);
+		}
+		
 		try {
-			$users = UsersDAO::FindByUsernameOrName($r["term"]);
+			$users = UsersDAO::FindByUsernameOrName($r[$param]);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
