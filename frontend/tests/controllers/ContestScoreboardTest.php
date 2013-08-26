@@ -24,14 +24,20 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
 
-		// Create our contestant
+		// Create our contestants
 		$contestant = UserFactory::createUser();
+		$contestant2 = UserFactory::createUser();
+		$contestant3 = UserFactory::createUser();
 		
-		// Create a run
+		// Create runs
 		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+		$runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);
+		$runData3 = RunsFactory::createRun($problemData, $contestData, $contestant3);
 		
-		// Grade the run
+		// Grade the runs
 		RunsFactory::gradeRun($runData);
+		RunsFactory::gradeRun($runData2, 90);
+		RunsFactory::gradeRun($runData3, 100);
 		
 		// Create request
 		$r = new Request();
@@ -42,13 +48,18 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$response = ContestController::apiScoreboard($r);								
 		
 		// Validate that we have ranking
-		$this->assertEquals(1, count($response["ranking"]));
+		$this->assertEquals(3, count($response["ranking"]));
 		
 		$this->assertEquals($contestant->getUsername(), $response["ranking"][0]["username"]);
 		
 		//Check totals
 		$this->assertEquals(100, $response["ranking"][0]["total"]["points"]);
 		$this->assertEquals(60, $response["ranking"][0]["total"]["penalty"]); /* 60 because contest started 60 mins ago in the default factory */
+		
+		// Check places
+		$this->assertEquals(1, $response["ranking"][0]["place"]);
+		$this->assertEquals(1, $response["ranking"][1]["place"]);
+		$this->assertEquals(3, $response["ranking"][2]["place"]);
 		
 		// Check data per problem
 		$this->assertEquals(100, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);

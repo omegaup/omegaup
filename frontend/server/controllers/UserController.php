@@ -724,40 +724,17 @@ class UserController extends Controller {
 			$contests[$contest->getAlias()]["data"] = $contest->asArray();
 			
 			// Get user ranking
-			$scoreboardR = new Request(array("auth_token" => $r["auth_token"], "contest_alias" => $contest->getAlias()));
+			$scoreboardR = new Request(array("auth_token" => $r["auth_token"], "contest_alias" => $contest->getAlias(), "include_admins" => false));
 			$scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
 			
-			// TODO: sanking logic shoud go into the scoreboard itself
-			$currentPoints = -1;
-			$currentPenalty = -1;
-			$place = 1;
-			$draws = 1;
-			foreach($scoreboardResponse["ranking"] as $userData) {
-				
-				if ($currentPoints === -1) {
-					$currentPoints = $userData["total"]["points"];
-					$currentPenalty = $userData["total"]["penalty"];
-				} else {
-					// If not in draw
-					if ($userData["total"]["points"] < $currentPoints || $userData["total"]["penalty"] > $currentPenalty) {
-						$currentPoints = $userData["total"]["points"];
-						$currentPenalty = $userData["total"]["penalty"];
-													
-						$place += $draws;
-						$draws = 1;
-						
-					} else if ($userData["total"]["points"] == $currentPoints && $userData["total"]["penalty"] == $currentPenalty) {							
-						$draws++;
-					}
-				}
-
+			// Grab the place of the current user in the given contest	
+			$contests[$contest->getAlias()]["place"]  = null;
+			foreach($scoreboardResponse["ranking"] as $userData) {								
 				if ($userData["username"] == $user->getUsername()) {
+					$contests[$contest->getAlias()]["place"] = $userData["place"];
 					break;
-				}
-				
-			}
-			
-			$contests[$contest->getAlias()]["place"] = $place;			
+				}				
+			}									
 		}
 
 		$response["contests"] = $contests;

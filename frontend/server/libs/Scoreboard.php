@@ -120,7 +120,35 @@ class Scoreboard {
 				// Sort users by their name
 				usort($result, array($this, 'compareUserNames'));
 			}
+			
+			// Append the place for each user
+			$currentPoints = -1;
+			$currentPenalty = -1;
+			$place = 1;
+			$draws = 1;
+			foreach($result as &$userData) {
+				
+				if ($currentPoints === -1) {
+					$currentPoints = $userData["total"]["points"];
+					$currentPenalty = $userData["total"]["penalty"];
+				} else {
+					// If not in draw
+					if ($userData["total"]["points"] < $currentPoints || $userData["total"]["penalty"] > $currentPenalty) {
+						$currentPoints = $userData["total"]["points"];
+						$currentPenalty = $userData["total"]["penalty"];
+													
+						$place += $draws;
+						$draws = 1;
+						
+					} else if ($userData["total"]["points"] == $currentPoints && $userData["total"]["penalty"] == $currentPenalty) {							
+						$draws++;
+					}
+				}
 
+				// Set the place for the current user
+				$userData["place"] = $place;								
+			}
+			
 			// Cache scoreboard if there are no pending runs.
 			if ($cacheable_for_contestant && $can_use_contestant_cache) {
 				$contestantScoreboardCache->set($result, APC_USER_CACHE_SCOREBOARD_TIMEOUT);
