@@ -721,8 +721,6 @@ class UserController extends Controller {
 			// Get contest data
 			$contest_id = $result->getContestId();
 			$contest = ContestsDAO::getByPK($contest_id);
-			$contest->toUnixTime();
-			$contests[$contest->getAlias()]["data"] = $contest->asArray();
 			
 			// Get user ranking
 			$scoreboardR = new Request(array("auth_token" => $r["auth_token"], "contest_alias" => $contest->getAlias(), "include_admins" => false));
@@ -735,7 +733,10 @@ class UserController extends Controller {
 					$contests[$contest->getAlias()]["place"] = $userData["place"];
 					break;
 				}				
-			}									
+			}
+			
+			$contest->toUnixTime();
+			$contests[$contest->getAlias()]["data"] = $contest->asArray();									
 		}
 
 		$response["contests"] = $contests;
