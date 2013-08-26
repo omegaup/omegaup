@@ -525,6 +525,8 @@ class ProblemDeployer {
 
 			// Update contents.zip
 			$this->updateContentsDotZip($dirpath, $filepath);
+		} catch (RuntimeException $e) {
+			throw new InvalidFilesystemOperationException("Unable to install problem. Please check permissions. ", $e);
 		} catch (Exception $e) {
 			throw new InvalidFilesystemOperationException("Unable to process problem_contents given. Please check the format. ", $e);
 		}
