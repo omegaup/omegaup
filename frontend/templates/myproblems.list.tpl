@@ -2,29 +2,31 @@
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 
-<div class="post">
-	<div class="bottom-margin">
-		<a href="/problemcreate.php" class="btn btn-primary" id="problem-create">Crear un problema</a>
-	</div>
-	<div id="parent_problem_list">
-		<div class="wait_for_ajax panel panel-default" id="problem_list">
-			<div class="panel-heading">
-				<h3 class="panel-title">Mis Problemas</h3>
+<div class="panel panel-default">
+	<div class="panel-body">
+		<div class="bottom-margin">
+			<a href="/problemcreate.php" class="btn btn-primary" id="problem-create">Crear un problema</a>
+		</div>
+		<div id="parent_problem_list">
+			<div class="wait_for_ajax panel panel-default no-bottom-margin" id="problem_list">
+				<div class="panel-heading">
+					<h3 class="panel-title">Mis Problemas</h3>
+				</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>T&iacute;tulo</th>
+							<th>P&uacute;blico</th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
 			</div>
-			<table class="table">
-				<thead>
-					<tr>
-						<th>T&iacute;tulo</th>
-						<th>P&uacute;blico</th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
 		</div>
 	</div>
 </div>

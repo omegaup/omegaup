@@ -36,3 +36,5 @@ profileCountry = "Pa&iacute;s"
 profileState = "Estado"
 profileSchool = "Escuela"
 profileGraduationDate = "Fecha de graduaci&oacute;n"
+
+locale = "es"

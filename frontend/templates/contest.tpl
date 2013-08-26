@@ -2,14 +2,16 @@
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 
-<div class="post">
-	<div class="bottom-margin">
-		<a href="/contestcreate.php" class="btn btn-primary" id="contest-create">Crear un concurso</a>
-		<a href="/scoreboardmerge.php" class="btn btn-default" id="scoreboard-merge">Unir scoreboards</a>
-	</div>
+<div class="panel panel-default">
+	<div class="panel-body">
+		<div class="bottom-margin">
+			<a href="/contestcreate.php" class="btn btn-primary" id="contest-create">Crear un concurso</a>
+			<a href="/scoreboardmerge.php" class="btn btn-default" id="scoreboard-merge">Unir scoreboards</a>
+		</div>
 
-	<div id="parent_contest_list">
-		{include file='contest.list.tpl'}
+		<div id="parent_contest_list">
+			{include file='contest.list.tpl'}
+		</div>
 	</div>
 </div>
 

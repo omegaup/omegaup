@@ -1,4 +1,4 @@
-<div class="wait_for_ajax panel panel-default" id="contest_list">
+<div class="wait_for_ajax panel panel-default no-bottom-margin" id="contest_list">
 	<div class="panel-heading">
 		<h3 class="panel-title">Concursos</h3>
 	</div>
@@ -14,10 +14,9 @@
 			<th></th>
 			<th></th>
 			<th></th>
-			<th></th>
 		</thead>
 		<tbody>
-		<tbody>
+		</tbody>
 	</table>
 </div>
 <script>

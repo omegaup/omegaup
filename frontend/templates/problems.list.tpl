@@ -1,19 +1,17 @@
-<div class="post">
-	<div class="wait_for_ajax panel panel-default" id="problems_list" >
-		<div class="panel-heading">
-			<h3 class="panel-title">Problemas</h3>
-		</div>
-		<table class="table">
-			<thead>
-				<tr>
-					<th>T&iacute;tulo</th>
-					<th>Env&iacute;os</th>
-					<th>Resueltos</th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
+<div class="wait_for_ajax panel panel-default" id="problems_list" >
+	<div class="panel-heading">
+		<h3 class="panel-title">Problemas</h3>
 	</div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>T&iacute;tulo</th>
+				<th>Env&iacute;os</th>
+				<th>Resueltos</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
 </div>
 <script>
 	(function(){

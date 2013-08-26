@@ -13,60 +13,76 @@
 	{include file='status.tpl'}
 
 	<div class="row" id="inner-content">
-		<div class="col-md-2" id="userbox">
-			<div class="post" id="userbox-inner">
-				<h2>{$CURRENT_USER_USERNAME}</h2>
-				<div class="thumbnail">{$CURRENT_USER_GRAVATAR_URL_128}</div>
-				<div id="profile-edit"><a href="useredit.php" class="btn btn-default">{#profileEdit#}</a></div>
-			</div>
-		</div>
-		<div class="post col-md-10">
-			<div>
-				{block name="content"}
-				<div id="SettingsPage_Content">
-					<ul class="uiList fbSettingsList _4kg _6-h _4ks ">
-						<li class="fbSettingsListItem clearfix uiListItem">
-						<!--
-							<a class="pvm phs fbSettingsListLink clearfix" >
-								<span class="pls fbSettingsListItemLabel"><strong>Name</strong></span>
-								<span class="fbSettingsListItemContent fcg"><strong>Alan Gonzalez</strong>
-								</span>
-							</a>
-						-->
-						<div class="content">
-
-						</div>
-						</li>
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileUsername#}</strong></span><span class="fbSettingsListItemContent fcg">https://omegaup.com/<strong id="username-link">{$CURRENT_USER_USERNAME}</strong></span></a>
-						<div class="content">
-						</div>
-						</li>
-						<li id="user-email-wrapper" class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>{#profileEmail#}</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong id="user-email">{$CURRENT_USER_EMAIL}</strong>&nbsp;</span></a>
-						<div class="content">
-						</div>
-						</li>
-
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileCountry#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-country">MX</strong></span></a>
-						<div class="content">
-						</div>
-						</li>
-
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileState#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-state"></strong></span></a>
-
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileSchool#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-school"></strong></span></a>
-
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileGraduationDate#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-graduation-date"></strong></span></a>
-						<div class="content">
-						</div>
-						</li>
-					</ul>
+		<div class="col-md-2 no-right-padding" id="userbox">
+			<div class="panel panel-default" id="userbox-inner">
+				<div class="panel-heading">
+					<h2 class="panel-title">{$CURRENT_USER_USERNAME}</h2>
 				</div>
-						
-				<h2>Estadísticas</h2>
-				<div id="veredict-chart"><img src="/media/wait.gif" /></div>
-				{/block}
+				<div class="panel-body">
+					<div class="thumbnail bottom-margin">{$CURRENT_USER_GRAVATAR_URL_128}</div>
+					<div id="profile-edit"><a href="useredit.php" class="btn btn-default">{#profileEdit#}</a></div>
+				</div>
 			</div>
 		</div>
+		
+		{block name="content"}
+		<div class="col-md-10 no-right-padding">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title">Mi info</h2>
+				</div>
+				<div class="panel-body">
+					<div id="SettingsPage_Content">
+						<ul class="uiList fbSettingsList _4kg _6-h _4ks ">
+							<li class="fbSettingsListItem clearfix uiListItem">
+							<!--
+								<a class="pvm phs fbSettingsListLink clearfix" >
+									<span class="pls fbSettingsListItemLabel"><strong>Name</strong></span>
+									<span class="fbSettingsListItemContent fcg"><strong>Alan Gonzalez</strong>
+									</span>
+								</a>
+							-->
+							<div class="content">
+
+							</div>
+							</li>
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileUsername#}</strong></span><span class="fbSettingsListItemContent fcg">https://omegaup.com/<strong id="username-link">{$CURRENT_USER_USERNAME}</strong></span></a>
+							<div class="content">
+							</div>
+							</li>
+							<li id="user-email-wrapper" class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>{#profileEmail#}</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong id="user-email">{$CURRENT_USER_EMAIL}</strong>&nbsp;</span></a>
+							<div class="content">
+							</div>
+							</li>
+
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileCountry#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-country">MX</strong></span></a>
+							<div class="content">
+							</div>
+							</li>
+
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileState#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-state"></strong></span></a>
+
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileSchool#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-school"></strong></span></a>
+
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileGraduationDate#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-graduation-date"></strong></span></a>
+							<div class="content">
+							</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div class="panel panel-default no-bottom-margin">
+				<div class="panel-heading">
+					<h2 class="panel-title">Estadísticas</h2>
+				</div>
+				<div class="panel-body">
+					<div id="veredict-chart"><img src="/media/wait.gif" /></div>
+				</div>
+			</div>
+		</div>
+		{/block}
 		<!--
 		<div class="post" style="width: 760px; min-height: 300px;">
 			<div class="copy" >

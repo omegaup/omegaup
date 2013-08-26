@@ -18,3 +18,5 @@ frontPageHelp = "Help"
 
 frontPageQuestions = "Questions"
 frontPageBlog = "Blog"
+
+locale = "en"
