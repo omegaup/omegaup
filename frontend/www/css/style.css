@@ -196,54 +196,8 @@ div.copy.button {
 	margin-right: auto ;
 	margin-bottom: 10px;	
 }
-div.footer {
-    font-size: 13px;
-}
-div.footer div.date { padding: 1px 50px 45px }
-div.footer div.notes { display: none }
-div.post.footer {
-	background: #f3f6f9;
-	font-size: 12px;
-	-webkit-text-stroke: 1px transparent;
-	padding-bottom: 0px; 
-}
-div.post.footer a {
-    color: #7497af;
-    text-decoration: none;
-    -webkit-transition: color 0.1s ease;
-}
-div.post.footer a:hover { color: #4f758f }
-
-div.post.footer p {
-    position: absolute;
-    right: 0;
-    top: 0;
-    padding: 19px 15px 0 0;
-}
-div.post.footer p a { color: #bbc6ce }
-div.post.footer p a:hover { color: #7497af }
 /* Hide stuff */
 div#sidebar { display: none }
-
-#header {
-	min-height: 30px;
-	max-height: 40px;
-	background-color: #678DD7;
-	background-image: linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
-	border-color:transparent;
-	margin: 0;
-}
-
-#header .navbar-inner {
-	width: 900px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-#header .navbar-inner .container {
-	padding-left: 0;
-	padding-right: 0;
-}
 
 .error{
 	background: #FFEBE8;
@@ -558,32 +512,17 @@ padding-right: 5px;
 #userbox-inner { padding: 15px; margin: 0; text-align: center;}
 #userbox-inner > div { margin-bottom: 15px;}
 
-#header .navbar-text,
-#header .navbar-nav > li > a {
-	color: #fff;
-	margin: 0px;
-	padding: 5px;
-}
-#header .navbar-nav > li > a:hover,
-.nav .open>a, .nav .open>a:hover, .nav .open>a:focus {
-	background-color: #577DC7;
-}
-#header #grader-status a {
-	background-color: #fff;
-}
-#header #grader-status .label {
-	min-width: 50px;
-}
-
 .post { padding-left: 15px; padding-right: 15px; padding-bottom: 5px; margin-bottom: 15px; }
 
-#header .caret { border-top-color: white; border-bottom-color: white; }
+#content { margin-top: 15px; }
 
 #login-page > row { margin: 0; }
 #login-page form { padding-top: 10px; padding-bottom: 10px; }
 #login-page > h3 { border-color: #E9E9E9; border-style: solid; border-width: 0 0 1px 0; font-size: 20px; padding-bottom: 5px; }
 
-#footer { padding: 5px; color:black; margin: 10px auto 20px auto; }
+#footer { color:black; margin: 10px auto 20px auto; max-height:50px; }
 #footer .logo { width: 60px; padding:0px; margin:0px; -webkit-box-shadow:0px 0px; }
+#footer .navbar-brand { font-size: 14px; }
+#footer .navbar-nav a {  }
 
 .bottom-margin { margin-bottom: 15px; }

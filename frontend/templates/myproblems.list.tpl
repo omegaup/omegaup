@@ -31,7 +31,7 @@
 
 <script>
 	(function(){
-		$(".navbar #nav-myproblems").addClass("active");
+		$(".navbar #nav-problems").addClass("active");
 		
 		function makeWorldClockLink(date) {
 			try {

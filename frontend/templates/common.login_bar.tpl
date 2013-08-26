@@ -1,56 +1,80 @@
 			<div id="header" class="navbar navbar-static-top" role="navigation">
 				<div class="navbar-inner">
 					<div class="container">
+						<div class="navbar-header">
+							<a class="navbar-brand" href="/index.php">
+								<img src="/media/omegaup_curves.png" alt="OmegaUp" />
+							</a>
+						</div>
 						<ul class="nav navbar-nav">
+							<li id="nav-arena"><a href='/arena'>{#frontPageArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
-							<li class="dropdown">
-						    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="label">{$CURRENT_USER_GRAVATAR_URL_16}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
-								<ul class="dropdown-menu">
-								 <li><a href='/profile.php'>{#loginViewProfile#}</a></li>
-								 <li><a href='/logout.php'>{#logOut#}</a></li>
-								</ul>
-							</li>	
+								<li id="nav-contests"><a href='/contests.php'>{#frontPageMyContests#}</a></li>
+								<li id="nav-problems">
+									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#frontPageProblems#}</span><span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><a href="/myproblems.php">{#frontPageMyProblems#}</a></li>
+										<li><a href="/probs.php">{#frontPageProblems#}</a></li>
+									</ul>
+								</li>
 							{else}
-							<li><p class="navbar-text"><strong>{#pageTitle#}</strong></p></li>
-							<li><a href='/login.php'>{#logIn#}</a></li>
+								<li id="nav-problems"><a href='/probs.php'>{#frontPageProblems#}</a></li>
+							{/if}
+							<li id="nav-rank"><a href='/rank.php'>{#frontPageRanking#}</a></li>
+							<li><a href='http://blog.omegaup.com/'>{#frontPageBlog#}</a></li>
+							<li><a href='https://omegaup.com/preguntas/'>{#frontPageQuestions#}</a></li>
+						</ul>
+						
+						<ul class="nav navbar-nav navbar-right">
+							{if $LOGGED_IN eq '1'}
+								<li class="dropdown">
+								<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown"><span>{$CURRENT_USER_GRAVATAR_URL_32}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
+									<ul class="dropdown-menu">
+									 <li><a href='/profile.php'>{#loginViewProfile#}</a></li>
+									 <li><a href='/logout.php'>{#logOut#}</a></li>
+									</ul>
+								</li>	
+							{else}
+								<li><a href='/login.php'>{#logIn#}</a></li>
+							{/if}
+							
+							{if $CURRENT_USER_IS_ADMIN eq '1'}
+								<li id="grader-status" class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span><img src="/media/waitcircle.gif" /></span> <span class="caret"></span></a>
+									<ul class="dropdown-menu">
+									</ul>
+								</li>
 							{/if}
 						</ul>
 						{if $CURRENT_USER_IS_ADMIN eq '1'}
-						<ul class="nav navbar-nav navbar-right">
-							<li id="grader-status" class="dropdown">
-						    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="label"><img src="/media/waitcircle.gif" /></span> <span class="caret"></span></a>
-								<ul class="dropdown-menu">
-								</ul>
-							</li>
-						</ul>
 						<script>
 							function updateGraderStatus() {
-								$("#grader-status a").css("background-color","#ffffff");
-								$("#grader-status .label").html("<img src='/media/waitcircle.gif' />");
+								$("#grader-status > a").removeClass("grader-error grader-ok grader-warning grader-notice");
+								$("#grader-status > a > span:first-child").html("<img src='/media/waitcircle.gif' />");
+								var html = "<li><a href='/admin/'>Admin</a></li>";
 								omegaup.getGraderStats(function(stats){	
 									if (stats && stats.status == "ok") {
 										var graderInfo = stats.grader;
 
 										if (graderInfo.status == "ok") {
-											$("#grader-status a").css("background-color","#00aa33");
-											html = "<li><a href=\"#\">Grader OK</a></li>";
+											$("#grader-status > a").addClass("grader-ok");
+											html += "<li><a href=\"#\">Grader OK</a></li>";
 											html += "<li><a href=\"#\">Embedded runner: " + graderInfo.embedded_runner + "</a></li>";
 											html += "<li><a href=\"#\">Runners: " + graderInfo.runners + "</a></li>";
 											html += "<li><a href=\"#\">Idle runners: " + graderInfo.runner_queue_length + "</a></li>";
-										}
-										else {
-											$("#grader-status a").css("background-color","red");
-											html = "<li><a href=\"#\">Grader DOWN</a></li>";
+										} else {
+											$("#grader-status > a").addClass("grader-error");
+											html += "<li><a href=\"#\">Grader DOWN</a></li>";
 										}
 
-										$("#grader-status .label").html(stats.pending_runs.length);
+										$("#grader-status > a > span:fist-child").html(stats.pending_runs.length);
 									} else {
-										$("#grader-status a").css("background-color","red");
-										html = "<li><a href=\"#\">Grader DOWN</a></li>";
+										$("#grader-status > a").addClass("grader-error");
+										html += "<li><a href=\"#\">Grader DOWN</a></li>";
 										html += "<li><a href=\"#\">API api/grader/status call failed:";
 										html += stats.error;
 										html += "</a></li>";
-										$("#grader-status .label").html('?');
+										$("#grader-status > a > span:first-child").text('?');
 									}
 									$("#grader-status .dropdown-menu").html(html);
 								});

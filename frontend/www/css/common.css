@@ -1,0 +1,40 @@
+#header { border-bottom-width: 0; }
+#header .caret { border-top-color: white; border-bottom-color: white; }
+#header .active > a { background-color: #5F87D4; }
+#header #user-dropdown img { width: 20px; height: 20px; }
+#header .navbar-header img { height: 20px; }
+#header .navbar-header .navbar-brand { background-color: white; background-image: linear-gradient(to bottom,white 0,#ddd 100%); }
+
+#header .navbar-text,
+#header .navbar-nav > li > a {
+	color: #fff;
+}
+#header .navbar-nav > li > a:hover,
+.nav .open>a, .nav .open>a:hover, .nav .open>a:focus {
+	background-color: #577DC7;
+}
+
+#header {
+	background-color: #678DD7;
+	background-image: linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
+	border-color:transparent;
+	margin: 0;
+}
+
+#header .navbar-inner {
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#header .navbar-inner .container {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+#header #grader-status > a { background-color: white; color: black; }
+#header #grader-status .caret { border-top-color: black; border-bottom-color: black; }
+#header #grader-status > a.grader-error { color: rgb(185, 74, 72); background-image: linear-gradient(rgb(242, 222, 222) 0px, rgb(231, 195, 195) 100%); background-color: rgb(242, 222, 222); }
+#header #grader-status > a.grader-ok { color: rgb(70, 136, 71); background-image: linear-gradient(rgb(223, 240, 216) 0px, rgb(200, 229, 188) 100%); background-color: rgb(223, 240, 216); }
+#header #grader-status > a.grader-warning { color: #c09853; background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%); border-color: #f5e79e; }
+

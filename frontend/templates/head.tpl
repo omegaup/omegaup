@@ -39,6 +39,7 @@
 		<!-- from arena -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="/css/style.css">
+		<link rel="stylesheet" type="text/css" href="/css/common.css">
 		<link rel="stylesheet" type="text/css" href="/css/msgBoxLight.css">
 		<!--
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.16.custom.css">

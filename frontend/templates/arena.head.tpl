@@ -41,6 +41,7 @@
 		<script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js"></script>
 
 		<link rel="stylesheet" href="/css/jquery.gritter.css" />
+		<link rel="stylesheet" href="/css/common.css" />
 		<link rel="stylesheet" href="/ux/arena.css" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 	</head>

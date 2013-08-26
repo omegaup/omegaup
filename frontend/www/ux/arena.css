@@ -30,48 +30,6 @@ legend {
 
 .template { display: none; }
 
-#header {
-	min-height: 30px;
-	max-height: 40px;
-	background-color: #678DD7;
-	background-image:linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
-	border-color:transparent;
-	margin: 0;
-}
-
-#header .navbar-inner {
-	width: 900px;
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
-}
-
-#header .navbar-inner .container {
-	width: 900px;
-	text-align: left;
-	margin-left: auto;
-	margin-right: auto;
-	padding-left: 0;
-	padding-right: 0;
-}
-
-#header .navbar-text,
-#header .navbar-nav > li > a {
-	color: #fff;
-	margin: 0px;
-	padding: 5px;
-}
-#header .navbar-nav > li > a:hover,
-.nav .open>a, .nav .open>a:hover, .nav .open>a:focus {
-	background-color: #577DC7;
-}
-#header #grader-status a {
-	background-color: #fff;
-}
-#header #grader-status .label {
-	min-width: 50px;
-}
-
 #root,
 #problem,
 #ranking,

@@ -1,29 +1,4 @@
-	<div id="title">
-		<a href="index.php">
-		<div style="margin-left: 15%;">
-			<img src="/media/omegaup_curves.png" alt="OmegaUp">
-		</div>
-		</a>
-	</div>
 	<div id="content">
-		<div class="navbar">
-			<ul class="nav navbar-nav">
-				{if $CURRENT_USER_IS_ADMIN eq '1'}
-					<li id="nav-admin"><a href='/admin/'><b>Admin</b></a></li>
-				{/if}				
-				<li id="nav-arena"><a href='/arena'><b>{#frontPageArena#}</b></a></li>
-				{if $LOGGED_IN eq '1'}
-					<li id="nav-contests"><a href='/contests.php'><b>{#frontPageMyContests#}</b></a></li>
-					<li id="nav-myproblems"><a href='/myproblems.php'><b>{#frontPageMyProblems#}</b></a></li>
-				{/if}
-				<li id="nav-problems"><a href='/probs.php'>{#frontPageProblems#}</a></li>
-				<li id="nav-rank"><a href='/rank.php'>{#frontPageRanking#}</a></li>				
-				<li><a href='https://github.com/omegaup/omegaup/'>{#frontPageDevelopers#}</a></li>
-				<li><a href='http://blog.omegaup.com/'>{#frontPageBlog#}</a></li>
-				<li><a href='https://omegaup.com/preguntas/'>{#frontPageQuestions#}</a></li>
-			</ul>
-		</div>
-		
 		{if $ERROR_TO_USER eq 'USER_OR_PASSWORD_WRONG'} 
 			<div class="alert alert-danger">
 				Your credentials are wrong
