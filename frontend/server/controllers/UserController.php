@@ -697,7 +697,7 @@ class UserController extends Controller {
 	 * @return Contests array
 	 * @throws InvalidDatabaseOperationException
 	 */
-	public static function apiContestUsers(Request $r) {
+	public static function apiContestStats(Request $r) {
 
 		self::authenticateRequest($r);
 

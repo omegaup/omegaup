@@ -59,7 +59,7 @@ class UserProfileTest extends OmegaupTestCase {
 			"auth_token" => self::login($contestant)
 		));
 		
-		$response = UserController::apiContestUsers($r);
+		$response = UserController::apiContestStats($r);
 		
 		$this->assertEquals(count($contests), count($response["contests"]));
 	}

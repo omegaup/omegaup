@@ -46,7 +46,7 @@
 
 							</div>
 							</li>
-							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileUsername#}</strong></span><span class="fbSettingsListItemContent fcg">https://omegaup.com/<strong id="username-link">{$CURRENT_USER_USERNAME}</strong></span></a>
+							<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileUsername#}</strong></span><span class="fbSettingsListItemContent fcg">https://omegaup.com/profile/<strong id="username-link">{$CURRENT_USER_USERNAME}</strong></span></a>
 							<div class="content">
 							</div>
 							</li>
@@ -72,6 +72,24 @@
 					</div>
 				</div>
 			</div>
+							
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title">Resultados</h2>
+				</div>
+				<div id="contest-results-wait"><img src="/media/wait.gif" /></div>
+				<table class="table" id="contest-results">
+					<thead>
+						<tr>
+							<th>Concurso</th>
+							<th>Lugar</th>							
+						</tr>						
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>				
+			</div>
 			
 			<div class="panel panel-default no-bottom-margin">
 				<div class="panel-heading">
@@ -80,7 +98,8 @@
 				<div class="panel-body">
 					<div id="veredict-chart"><img src="/media/wait.gif" /></div>
 				</div>
-			</div>
+			</div>				
+										
 		</div>
 		{/block}
 		<!--
@@ -152,6 +171,19 @@
 			$('#user-state').html(data.userinfo.state == null ? "" : data.userinfo.state);
 			$('#user-school').html(data.userinfo.school == null ? "" : data.userinfo.school);
 			$('#user-graduation-date').html(data.userinfo.graduation_date == null ? "" : onlyDateToString(data.userinfo.graduation_date));
+		});
+		
+		omegaup.getContestStatsForUser(username, function(data){
+			$('#contest-results-wait').hide();
+			
+			for (var contest_alias in data["contests"]) {
+				if (data["contests"][contest_alias]["place"] != null) {
+					var title = data["contests"][contest_alias]["data"]["title"];
+					var place = data["contests"][contest_alias]["place"];
+					var content = "<tr><td><a href='/arena/ " + contest_alias + "'>" + title + "</a></td><td><b>" + place + "</b></td></tr>";  
+					$('#contest-results tbody').append(content);
+				}
+			}
 		});
 	</script>
 	
