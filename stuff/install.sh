@@ -225,6 +225,15 @@ if [ ! -d $WWW_ROOT ]; then
 		sudo mkdir -p `dirname $WWW_ROOT`
 	fi
 	sudo ln -s $OMEGAUP_ROOT/frontend/www $WWW_ROOT
+	# Images directory
+	sudo mkdir $WWW_ROOT/img
+	sudo chown www-data.www-data $WWW_ROOT/img
+fi
+
+# Set up runtime directories.
+if [ ! -d /var/lib/omegaup ]; then
+	sudo mkdir -p /var/lib/omegaup/{compile,grade,input,problems,submissions}
+	sudo chown www-data.www-data /var/lib/omegaup/problems
 fi
 
 # check mysql
