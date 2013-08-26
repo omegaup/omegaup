@@ -548,7 +548,7 @@ OmegaUp.prototype.getContestStatsForUser = function(username, callback) {
 	var self = this;
 
 	$.get(
-		username == null ? '/api/user/conteststats/username/' : '/api/user/conteststats/username/' + username + '/' ,
+		username == null ? '/api/user/conteststats/' : '/api/user/conteststats/username/' + username + '/' ,
 		function (data) {
 			callback(data);
 		},

@@ -721,6 +721,7 @@ class UserController extends Controller {
 			// Get contest data
 			$contest_id = $result->getContestId();
 			$contest = ContestsDAO::getByPK($contest_id);
+			$contest->toUnixTime();
 			$contests[$contest->getAlias()]["data"] = $contest->asArray();
 			
 			// Get user ranking

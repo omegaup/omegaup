@@ -177,10 +177,14 @@
 			$('#contest-results-wait').hide();
 			
 			for (var contest_alias in data["contests"]) {
-				if (data["contests"][contest_alias]["place"] != null) {
+				
+				var now = new Date();
+				var end = omegaup.time(data["contests"][contest_alias]["data"]["finish_time"] * 1000);
+			
+				if (data["contests"][contest_alias]["place"] != null && now > end) {
 					var title = data["contests"][contest_alias]["data"]["title"];
 					var place = data["contests"][contest_alias]["place"];
-					var content = "<tr><td><a href='/arena/ " + contest_alias + "'>" + title + "</a></td><td><b>" + place + "</b></td></tr>";  
+					var content = "<tr><td><a href='/arena/" + contest_alias + "'>" + title + "</a></td><td><b>" + place + "</b></td></tr>";  
 					$('#contest-results tbody').append(content);
 				}
 			}
