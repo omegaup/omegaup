@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<title>OmegaUp | {#pageTitle#}</title>
+		<title>omegaUp | {#pageTitle#}</title>
 
 		<script type="text/javascript" src="/js/jquery.js"></script>
 		<!--<script type="text/javascript" src="/js/jquery-ui.min.js"></script>-->
@@ -56,4 +56,4 @@
 	<body>
 		<div id="wrapper">
 
-{include file='common.login_bar.tpl'}
+{include file='common.navbar.tpl'}

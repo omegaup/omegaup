@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<title>OmegaUp</title>
+		<title>omegaUp</title>
 		<script type="text/javascript" src="/js/jquery.js"></script>
 		<script type="text/javascript" src="/js/jquery.ba-hashchange.js"></script>
 		<script type="text/javascript" src="/js/jquery.gritter.min.js"></script>
@@ -49,4 +49,4 @@
 		<!-- Generated from http://ajaxload.info/ -->
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		<div id="root">
-{include file='common.login_bar.tpl'}
+{include file='common.navbar.tpl' currentSection='arena'}

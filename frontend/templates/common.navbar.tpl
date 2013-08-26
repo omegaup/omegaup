@@ -7,7 +7,7 @@
 							</a>
 						</div>
 						<ul class="nav navbar-nav">
-							<li id="nav-arena"><a href='/arena'>{#frontPageArena#}</a></li>
+							<li id="nav-arena"{if $currentSection == 'arena'} class="active"{/if}><a href='/arena'>{#frontPageArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
 								<li id="nav-contests"><a href='/contests.php'>{#frontPageMyContests#}</a></li>
 								<li id="nav-problems">
@@ -40,7 +40,7 @@
 							
 							{if $CURRENT_USER_IS_ADMIN eq '1'}
 								<li id="grader-status" class="dropdown">
-									<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span><img src="/media/waitcircle.gif" /></span> <span class="caret"></span></a>
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="grader-count"><img src="/media/waitcircle.gif" /></span> <span class="caret"></span></a>
 									<ul class="dropdown-menu">
 									</ul>
 								</li>
@@ -49,15 +49,20 @@
 						{if $CURRENT_USER_IS_ADMIN eq '1'}
 						<script>
 							function updateGraderStatus() {
-								$("#grader-status > a").removeClass("grader-error grader-ok grader-warning grader-notice");
-								$("#grader-status > a > span:first-child").html("<img src='/media/waitcircle.gif' />");
+								$("#grader-status > a").removeClass("grader-error grader-ok grader-warning grader-unknown");
+								$("#grader-count").html("<img src='/media/waitcircle.gif' />");
 								var html = "<li><a href='/admin/'>Admin</a></li>";
 								omegaup.getGraderStats(function(stats){	
 									if (stats && stats.status == "ok") {
 										var graderInfo = stats.grader;
 
 										if (graderInfo.status == "ok") {
-											$("#grader-status > a").addClass("grader-ok");
+											var now = new Date().getTime() / 1000;
+											if (stats.pending_runs.length == 0 || (now - stats.pending_runs[0].time) < 10 * 60) {
+												$("#grader-status > a").addClass("grader-ok");
+											} else {
+												$("#grader-status > a").addClass("grader-warning");
+											}
 											html += "<li><a href=\"#\">Grader OK</a></li>";
 											html += "<li><a href=\"#\">Embedded runner: " + graderInfo.embedded_runner + "</a></li>";
 											html += "<li><a href=\"#\">Runners: " + graderInfo.runners + "</a></li>";
@@ -67,14 +72,14 @@
 											html += "<li><a href=\"#\">Grader DOWN</a></li>";
 										}
 
-										$("#grader-status > a > span:fist-child").html(stats.pending_runs.length);
+										$("#grader-count").html(stats.pending_runs.length);
 									} else {
-										$("#grader-status > a").addClass("grader-error");
+										$("#grader-status > a").addClass("grader-unknown");
 										html += "<li><a href=\"#\">Grader DOWN</a></li>";
 										html += "<li><a href=\"#\">API api/grader/status call failed:";
-										html += stats.error;
+										html += stats.error.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 										html += "</a></li>";
-										$("#grader-status > a > span:first-child").text('?');
+										$("#grader-count").html('?');
 									}
 									$("#grader-status .dropdown-menu").html(html);
 								});

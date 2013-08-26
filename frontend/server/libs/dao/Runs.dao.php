@@ -43,20 +43,22 @@ class RunsDAO extends RunsDAOBase
 	public static final function GetPendingRuns($showAllRuns = false)
 	{
 		// Build SQL statement.
-		$sql = "SELECT guid FROM Runs WHERE status != 'ready'";		
+		$sql = "SELECT guid, UNIX_TIMESTAMP(time) AS time FROM Runs WHERE status != 'ready'";		
 
 		if (!$showAllRuns) 
 		{
 			$sql .= ' AND test = 0';
 		}
 
+		$sql .= ' ORDER BY run_id;';
+
 		global $conn;
 		$rs = $conn->Execute($sql);
 
 		$ar = array();
-		foreach ($rs as $foo) 
+		foreach ($rs as $row) 
 		{                
-			array_push($ar, $foo['guid']);
+			array_push($ar, array('guid'=>$row['guid'], 'time'=>intval($row['time'])));
 		}
 
 		return $ar;
