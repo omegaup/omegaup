@@ -1,7 +1,9 @@
 $(document).ready(function() {
+	Date.setLocale("es");
+	
 	function makeWorldClockLink(date) {
 		try {
-			return "http://timeanddate.com/worldclock/fixedtime.html?iso=" + date.toISOString();
+			return "http://timeanddate.com/worldclock/fixedtime.html?iso=" + date.short();
 		} catch (e) {
 			return '#';
 		}
@@ -27,9 +29,9 @@ $(document).ready(function() {
 				$('<tr>' +
 					'<td><a href="/arena/' + list[i].alias + '">' + list[i].title + '</a></td>' +
 					'<td>' + list[i].description + '</td>' +
-					'<td><a href="' + makeWorldClockLink(start) + '">' + start.format('long', 'es') + '</a></td>' +
-					'<td><a href="' + makeWorldClockLink(end) + '">' + end.format('long', 'es') + '</a></td>' + 
-					'<td>' + convertSecondsToReadableTime(list[i].duration) + '</td>' +
+					'<td class="no-wrap"><a href="' + makeWorldClockLink(start) + '">' + start.format('long', 'es') + '</a></td>' +
+					'<td class="no-wrap"><a href="' + makeWorldClockLink(end) + '">' + end.format('long', 'es') + '</a></td>' + 
+					'<td class="no-wrap">' + convertSecondsToReadableTime(list[i].duration) + '</td>' +
 					'<td>' + (end < now ? '<a href="/arena/' + list[i].alias + '/practice/">Práctica</a>' : '') + '</td>' +
 				'</tr>')
 			);

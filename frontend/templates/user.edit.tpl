@@ -322,7 +322,7 @@
 					<div class="form-group">
 						<label class="col-md-3 control-label">Imagen de perfil</label>
 						<div class="col-md-7">
-							<a href="http://www.gravatar.com" target="_blank" class="btn btn-default col-md-12">Súbela en Gravatar.com usando tu email: {$CURRENT_USER_EMAIL}</a>
+							<a href="http://www.gravatar.com" target="_blank" class="btn btn-link">Súbela en Gravatar.com usando tu email: {$CURRENT_USER_EMAIL}</a>
 						</div>
 					</div>
 					

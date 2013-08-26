@@ -1,5 +1,5 @@
 body#practice { background: #668 url(/media/gradient.png) repeat-x 0 0; font-family: sans-serif; overflow-y: scroll; }
-body { background: url(/media/gradient.png) repeat-x 0 0, url(/media/bg.png) repeat 0 0; font-family: sans-serif; overflow-y: scroll; }
+body { background: #e4e8ec linear-gradient(to top, #e4e8ec, #f3f6f9) fixed no-repeat; font-family: sans-serif; overflow-y: scroll; }
 
 h1 {
 	margin: 1em auto 1em auto;
@@ -389,31 +389,6 @@ legend {
 	width: 10em;
 }
 
-table.contest-list {
-	border: 1px solid #000;
-	width: 100%;
-}
-
-table.contest-list td, table.contest-list th {
-	border: 1px #ccc solid;
-	padding: .2em;
-}
-table.contest-list th {
-	font-weight: bold;
-}
-
-table.contest-list tbody tr:nth-child(odd) {
-	background-color: #E3E8EC;
-}
-
-table.contest-list tbody tr:nth-child(even) {
-	background-color: #fff;
-}
-
-table.contest-list th#past-contests-header {
-	padding: 0.5em 0;
-}
-
 #title {
 	min-height: 80px;
 }
@@ -422,3 +397,7 @@ table.contest-list th#past-contests-header {
 	/*margin-top: 2em;*/
 	font-size: 3em;
 }
+
+#main.container { margin-top: 20px; max-width: 930px; }
+
+.no-wrap { white-space: nowrap; }

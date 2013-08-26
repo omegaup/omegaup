@@ -10,6 +10,7 @@
 		<script type="text/javascript" src="/js/jquery.msgBox.js"></script>
 		<script type="text/javascript" src="/js/highstock.js"></script>
 		<script type="text/javascript" src="/js/sugar.js"></script>
+		<script type="text/javascript" src="/js/sugar.es.js"></script>
 		<script type="text/javascript" src="/js/omegaup.js"></script>
 		<script type="text/javascript" src="{$jsfile}"></script>
 {literal}

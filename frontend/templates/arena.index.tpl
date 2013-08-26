@@ -1,27 +1,41 @@
 {include file='arena.head.tpl' jsfile='/ux/arena.js'}
-			<h1>Arena</h1>
-			<table class="contest-list">
-				<thead><tr>
-					<th>Concurso</th>
-					<th>Descripción</th>
-					<th class="time">Inicio</th>
-					<th class="time">Fin</th>
-				</tr></thead>
-				<tbody id="current-contests">
-				</tbody>
-			</table>
+			<div class="container" id="main">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h2 class="panel-title">Concursos actuales</h2>
+					</div>
+					<table class="contest-list table table-striped table-hover">
+						<thead><tr>
+							<th>Concurso</th>
+							<th>Descripción</th>
+							<th class="time">Inicio</th>
+							<th class="time">Fin</th>
+							<th></th>
+							<th></th>
+						</tr></thead>
+						<tbody id="current-contests">
+						</tbody>
+					</table>
+				</div>
 				
-			<h2>Concursos pasados</h2>
-			<table class="contest-list">
-				<thead><tr>
-					<th>Concurso</th>
-					<th>Descripción</th>
-					<th class="time">Inicio</th>
-					<th class="time">Fin</th>
-				</tr></thead>
-				<tbody id="past-contests">
-				</tbody>
-			</table>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h2 class="panel-title">Concursos pasados</h2>
+					</div>
+					<table class="contest-list table table-striped table-hover">
+						<thead><tr>
+							<th>Concurso</th>
+							<th>Descripción</th>
+							<th class="time">Inicio</th>
+							<th class="time">Fin</th>
+							<th></th>
+							<th></th>
+						</tr></thead>
+						<tbody id="past-contests">
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 		{if $OMEGAUP_GA_TRACK eq 1}
 		<script type="text/javascript">
