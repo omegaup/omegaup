@@ -3,17 +3,15 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<div class="post">
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<h3 class="panel-title">Editar Problema</h3>
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		<h3 class="panel-title">Editar Problema</h3>
+	</div>
+	<div class="panel-body">
+		<div class="wait_for_ajax" id="problems_list">
 		</div>
-		<div class="panel-body">
-			<div class="wait_for_ajax" id="problems_list">
-			</div>
-			<div>				
-				{include file='problem.edit.form.tpl'}
-			</div>
+		<div>				
+			{include file='problem.edit.form.tpl'}
 		</div>
 	</div>
 </div>
