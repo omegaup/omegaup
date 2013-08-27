@@ -756,13 +756,20 @@ class UserController extends Controller {
 		self::authenticateRequest($r);
 
 		$response = array();
-		$response["runs"] = array();
-
-		$user = $r["current_user"];
+		$response["problems"] = array();
+		
+		$user = self::resolveTargetUser($r);
+		
 		try {
-			$response["runs"] = RunsDAO::GetRunsByUser($user->getUserId());
+			$db_results = ProblemsDAO::getProblemsSolved($user->getUserId());
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		if (!is_null($db_results)) {
+			foreach($db_results as $problem) {
+				array_push($response["problems"], $problem->asArray());
+			}
 		}
 
 		$response["status"] = "ok";

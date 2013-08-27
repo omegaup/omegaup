@@ -76,9 +76,8 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h2 class="panel-title">Resultados</h2>
-				</div>
-				<div id="contest-results-wait"><img src="/media/wait.gif" /></div>
-				<table class="table" id="contest-results">
+				</div>				
+				<table class="table table-striped" id="contest-results">
 					<thead>
 						<tr>
 							<th>Concurso</th>
@@ -89,6 +88,7 @@
 						
 					</tbody>
 				</table>				
+				<div id="contest-results-wait"><img src="/media/wait.gif" /></div>
 			</div>
 			
 			<div class="panel panel-default no-bottom-margin">

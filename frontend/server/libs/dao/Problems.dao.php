@@ -128,4 +128,20 @@ class ProblemsDAO extends ProblemsDAOBase
 		$sql = "SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Contest_Problems cp USING(contest_id) WHERE cp.problem_id = ?";
 		return $conn->GetOne($sql, $id);
 	}
+	
+	public static final function getProblemsSolved($id) {
+		global $conn;
+		
+		$sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.veredict = 'AC'and `Runs`.user_id = ?";
+		$val = array($id);
+		$rs = $conn->Execute($sql, $val);
+		
+		$result = array();
+
+		foreach ($rs as $r) {
+			array_push($result, new Problems($r));
+		}
+
+		return $result;		
+	}
 }
