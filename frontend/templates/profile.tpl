@@ -194,7 +194,7 @@
 		
 		omegaup.getContestStatsForUser(username, function(data){
 			$('#contest-results-wait').hide();
-			
+			t=0;	
 			for (var contest_alias in data["contests"]) {
 				
 				var now = new Date();
@@ -205,10 +205,11 @@
 					var place = data["contests"][contest_alias]["place"];
 					var content = "<tr><td><a href='/arena/" + contest_alias + "'>" + title + "</a></td><td><b>" + place + "</b></td></tr>";  
 					$('#contest-results tbody').append(content);
+					t++;
 				}
 			}
 			
-			$('#contests-total').html(data["contests"].length);
+			$('#contests-total').html(t);
 		});
 		
 		omegaup.getProblemsSolved(username, function(data){
@@ -221,6 +222,7 @@
 				{
 					content += "<td><a href='/arena/problem" + data["problems"][i]["alias"] + "'>" + data["problems"][i]["title"] + "</a></td>";  
 				}
+				i--;
 				
 				content += "</tr>";
 				
