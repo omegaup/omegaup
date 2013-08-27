@@ -75,7 +75,7 @@
 							
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h2 class="panel-title">Resultados</h2>
+					<h2 class="panel-title">Concursos <span class="badge" id="contests-total">0</span></h2>
 				</div>				
 				<table class="table table-striped" id="contest-results">
 					<thead>
@@ -90,6 +90,23 @@
 				</table>				
 				<div id="contest-results-wait"><img src="/media/wait.gif" /></div>
 			</div>
+							
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title">Problemas resueltos <span class="badge" id="problems-solved-total">0</span></h2>
+				</div>				
+				<table class="table table-striped" id="problems-solved">
+					<thead>
+						<tr>
+							<th>Título</th>							
+						</tr>						
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>				
+				<div id="problems-solved-wait"><img src="/media/wait.gif" /></div>
+			</div>
 			
 			<div class="panel panel-default no-bottom-margin">
 				<div class="panel-heading">
@@ -98,8 +115,8 @@
 				<div class="panel-body">
 					<div id="veredict-chart"><img src="/media/wait.gif" /></div>
 				</div>
-			</div>				
-										
+			</div>
+																				
 		</div>
 		{/block}
 		<!--
@@ -188,7 +205,21 @@
 					$('#contest-results tbody').append(content);
 				}
 			}
+			
+			$('#contests-solved-total').html(data["contests"].length);
 		});
+		
+		omegaup.getProblemsSolved(username, function(data){
+			$('#problems-solved-wait').hide();
+			
+			for (var i in data["problems"]) {
+				var content = "<tr><td><a href='/arena/problem" + data["problems"][i]["alias"] + "'>" + data["problems"][i]["title"] + "</a></td></tr>";  
+				$('#problems-solved tbody').append(content);
+			}
+			
+			$('#problems-solved-total').html(data["problems"].length);
+		});
+		
 	</script>
 	
 	{include file='footer.tpl'}

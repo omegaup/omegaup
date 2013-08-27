@@ -562,6 +562,24 @@ OmegaUp.prototype.getContestStatsForUser = function(username, callback) {
 	});
 };
 
+OmegaUp.prototype.getProblemsSolved = function(username, callback) {
+	var self = this;
+
+	$.get(
+		username == null ? '/api/user/problemssolved/' : '/api/user/problemssolved/username/' + username + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 
 OmegaUp.prototype.getRuns = function(options, callback) {
 	var self = this;
