@@ -102,72 +102,6 @@ EOF
 	sudo chmod +x /usr/bin/sbt
 fi
 
-# Add ngnix configuration.
-if [ "$SKIP_NGINX" != "1" ]; then
-	FPM_PORT=`grep '^listen\b' /etc/php5/fpm/pool.d/www.conf 2>/dev/null | sed -e 's/.*=\s*//'`
-	if [ "$FPM_PORT" = "" ]; then
-		FPM_PORT=127.0.0.1:9000
-	fi
-	if [ "`echo $FPM_PORT | grep '/' | wc -l `" != "0" ]; then
-		FPM_PORT=unix:$FPM_PORT
-	fi
-	cat > default.conf << EOF
-server {
-listen       80;
-server_name  .$HOSTNAME;
-
-location / {
-    root   /var/www/omegaup.com;
-    index  index.php index.html;
-}
-
-# redirect server error pages to the static page /50x.html
-#
-error_page   500 502 503 504  /50x.html;
-location = /50x.html {
-    root   html;
-}
-
-location /api/ {
-    rewrite ^/api/(.*)$ /api/ApiEntryPoint.php last;
-}
-
-# rewrites.
-rewrite ^/contest/(.*)$ /contest.php?alias=\$1 last;
-rewrite ^/arena/admin/?$ /arena/adminpractice.php last;
-rewrite ^/arena/?$ /arena/index.php last;
-rewrite ^/arena/[a-zA-Z0-9_+-]+/?$ /arena/contest.php last;
-rewrite ^/arena/[a-zA-Z0-9_+-]+/scoreboard/?$ /arena/scoreboard.php last;
-rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/admin.php last;
-rewrite ^/arena/[a-zA-Z0-9_+-]+/practice/?$ /arena/practice.php last;
-rewrite ^/arena/problem/[a-zA-Z0-9_+-]+/?$ /arena/problem.php last;
-rewrite ^/profile/(.*)$ /profile.php?username=\$1 last;
-
-# pass the PHP scripts to FastCGI server listening on $FPM_PORT.
-location ~ \.php$ {
-    root           /var/www/omegaup.com;
-    fastcgi_pass   $FPM_PORT;
-    fastcgi_index  index.php;
-    fastcgi_param  SCRIPT_FILENAME  /var/www/omegaup.com\$fastcgi_script_name;
-    include        fastcgi_params;
-}
-
-# deny access to .htaccess files, if Apache's document root
-# concurs with nginx's one
-location ~ /\.ht {
-    deny  all;
-}
-}
-EOF
-	sudo mv default.conf /etc/nginx/conf.d/
-	
-	if [ -f /etc/nginx/sites-enabled/default ]; then
-		sudo mv /etc/nginx/sites-enabled/default /etc/nginx/sites-disabled
-	fi
-	
-	sudo /etc/init.d/nginx restart
-fi
-
 # Set up ssh/git.
 if [ ! -f ~/.ssh/github.com ]; then
 	if [ ! -d ~/.ssh ]; then
@@ -228,6 +162,59 @@ if [ ! -d $WWW_ROOT ]; then
 	# Images directory
 	sudo mkdir $WWW_ROOT/img
 	sudo chown www-data.www-data $WWW_ROOT/img
+fi
+
+# Add ngnix configuration.
+if [ "$SKIP_NGINX" != "1" ]; then
+	FPM_PORT=`grep '^listen\b' /etc/php5/fpm/pool.d/www.conf 2>/dev/null | sed -e 's/.*=\s*//'`
+	if [ "$FPM_PORT" = "" ]; then
+		FPM_PORT=127.0.0.1:9000
+	fi
+	if [ "`echo $FPM_PORT | grep '/' | wc -l `" != "0" ]; then
+		FPM_PORT=unix:$FPM_PORT
+	fi
+	cat > default.conf << EOF
+server {
+listen       80;
+server_name  .$HOSTNAME;
+
+location / {
+    root   $WWW_ROOT;
+    index  index.php index.html;
+}
+
+# redirect server error pages to the static page /50x.html
+#
+error_page   500 502 503 504  /50x.html;
+location = /50x.html {
+    root   html;
+}
+
+include $OMEGAUP_ROOT/frontend/server/nginx.rewrites;
+
+# pass the PHP scripts to FastCGI server listening on $FPM_PORT.
+location ~ \.php$ {
+    root           $WWW_ROOT;
+    fastcgi_pass   $FPM_PORT;
+    fastcgi_index  index.php;
+    fastcgi_param  SCRIPT_FILENAME  $WWW_ROOT\$fastcgi_script_name;
+    include        fastcgi_params;
+}
+
+# deny access to .htaccess files, if Apache's document root
+# concurs with nginx's one
+location ~ /\.ht {
+    deny  all;
+}
+}
+EOF
+	sudo mv default.conf /etc/nginx/conf.d/
+	
+	if [ -f /etc/nginx/sites-enabled/default ]; then
+		sudo mv /etc/nginx/sites-enabled/default /etc/nginx/sites-disabled
+	fi
+	
+	sudo /etc/init.d/nginx restart
 fi
 
 # Set up runtime directories.
