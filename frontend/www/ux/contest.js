@@ -263,7 +263,6 @@ $(document).ready(function() {
 			$('#problem .runs > tbody:last').append(r);
 			currentProblem.runs.push(run);
 
-
 			if (socket == null) {
 				updateRunFallback(run.guid, run);
 			}
@@ -525,7 +524,7 @@ $(document).ready(function() {
 					MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 				}
 
-				if (problem.problem_statement) {
+				if (problem.problem_statement === undefined) {
 					update(problem);
 				} else {
 					omegaup.getProblem(contestAlias, problem.alias, function (problem_ext) {
@@ -662,7 +661,8 @@ $(document).ready(function() {
 			
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
-			$('.user', r).html(rank.username + ' (' + rank.name + ')');
+			$('.user', r).html(rank.username +
+				((rank.name == rank.username) ? '' : (' (' + rank.name + ')')));
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;
@@ -695,7 +695,8 @@ $(document).ready(function() {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 				$('.position', r).html(place);
-				var username = rank.username + ' (' + rank.name + ')';
+				var username = rank.username +
+					((rank.name == rank.username) ? '' : (' (' + rank.name + ')'));
 				$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
 				$('.points', r).html(rank.total.points);
 				$('.penalty', r).html(rank.total.penalty);
@@ -714,11 +715,11 @@ $(document).ready(function() {
 		var clock = "";
 
 		if (date < startTime.getTime()) {
-				clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
+			clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
 		} else if (date > submissionDeadline.getTime()) {
-				clock = "00:00:00";
+			clock = "00:00:00";
 		} else {
-				clock = formatDelta(submissionDeadline.getTime() - (date + omegaup.deltaTime));
+			clock = formatDelta(submissionDeadline.getTime() - (date + omegaup.deltaTime));
 		}
 
 		$('#title .clock').html(clock);

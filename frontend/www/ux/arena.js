@@ -37,8 +37,8 @@ $(document).ready(function() {
 			);
 		}
 
+		$('#root').show();
 		$('#loading').fadeOut('slow');
-		$('#root').fadeIn('slow');
 	});
 
 	$('#contest-list tr').live('click', function() {

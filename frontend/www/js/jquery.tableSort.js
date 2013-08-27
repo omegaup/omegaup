@@ -31,6 +31,7 @@ jQuery.fn.sortTable = function(params) {
 	else if ($(this).find('td:nth-child('+params.onCol+')').length == 0) { error = "The requested column wasn't found in the table"; complain = true; }
 	if (error) { if (complain) alert(error); return; }
 	if (!params.sortType || params.sortType != 'numeric') params.sortType = 'ascii';
+	if (params.regexp) params.regexp = new RegExp(params.regexp);
 
 
 	/*-----------
@@ -63,9 +64,9 @@ jQuery.fn.sortTable = function(params) {
 		if ($(this).is('.sortOnThisCol') || (!params.onCol && !params.keepRelationships)) {
 			var valForSort = !params.child ? $(this).text() : (params.child != 'input' ? $(this).find(params.child).text() : $(this).find(params.child).val());
 			if (params.regexp) {
-				valForSort = valForSort.match(new RegExp(params.regexp))[!params.regexpIndex ? 0 : params.regexpIndex];
+				valForSort = valForSort.match(params.regexp)[!params.regexpIndex ? 0 : params.regexpIndex];
 			}
-			valuesToSort.push(valForSort);
+			valuesToSort.push([valForSort, $(this)]);
 		}
 		var thisTDHTMLHolder = document.createElement('div');
 		with($(thisTDHTMLHolder)) {
@@ -85,7 +86,9 @@ jQuery.fn.sortTable = function(params) {
 	|	- If descending == true, reverse after sort
 	-----------*/
 
-	params.sortType == 'numeric' ? valuesToSort.sort(function(a, b) { return (a.replace(/[^\d\.]/g, '', a)-b.replace(/[^\d\.]/g, '', b)); }) : valuesToSort.sort();
+	valuesToSort.sort((params.sortType == 'numeric') ?
+		function(a, b) { return (a[0].replace(/[^\d\.]/g, '', a[0])-b[0].replace(/[^\d\.]/g, '', b[0])); } :
+		function(a, b) { return a[0] - b[0]; });
 	if (params.sortDesc) {
 		valuesToSort_tempCopy = [];
 		for(var u=valuesToSort.length; u--; u>=0) valuesToSort_tempCopy.push(valuesToSort[u]);
@@ -102,48 +105,7 @@ jQuery.fn.sortTable = function(params) {
 	for(var k in valuesToSort) {
 		
 		//establish current <td> relating to this value of the array
-		var currTD = $($(this).find(tdSelectorText).filter(function() {
-			return (
-				(
-					!params.regexp
-					&&
-					(
-						(
-							params.child
-							&&
-							(
-								(
-									params.child != 'input'
-									&&
-									valuesToSort[k] == $(this).find(params.child).text()
-								)
-								||
-								params.child == 'input'
-								&&
-								valuesToSort[k] == $(this).find(params.child).val()
-							)
-						)
-						||
-						(
-							!params.child
-							&&
-							valuesToSort[k] == $(this).children('div').html()
-						)
-					)
-				)
-				||
-				(
-					params.regexp
-					&&
-					$(this).children('div').html().match(new RegExp(params.regexp))[!params.regexpIndex ? 0 : params.regexpIndex] == valuesToSort[k]
-				)
-			)
-			&&
-			!$(this).hasClass('tableSort_TDRepopulated');
-		}).get(0));
-		
-		//give current <td> a class to mark it as having been used, so we don't get confused with duplicate values
-		currTD.addClass('tableSort_TDRepopulated');
+		var currTD = valuesToSort[k][1];
 		
 		//establish target <td> for this value and store as a node reference on this <td>
 		var targetTD = $($(this).find(tdSelectorText).get(k));
