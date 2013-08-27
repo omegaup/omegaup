@@ -132,7 +132,7 @@ class ProblemsDAO extends ProblemsDAOBase
 	public static final function getProblemsSolved($id) {
 		global $conn;
 		
-		$sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.veredict = 'AC'and `Runs`.user_id = ?";
+		$sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.veredict = 'AC'and `Runs`.user_id = ? ORDER BY `Problems`.problem_id DESC";
 		$val = array($id);
 		$rs = $conn->Execute($sql, $val);
 		
