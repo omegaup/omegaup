@@ -7,7 +7,6 @@
 
 		<script type="text/javascript" src="/js/jquery.js"></script>
 		<!--<script type="text/javascript" src="/js/jquery-ui.min.js"></script>-->
-		<script type="text/javascript" src="/js/jquery.msgBox.js"></script>
 		<!--<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js"></script>-->
 		<script type="text/javascript" src="/js/omegaup.js?ts=5"></script>
 		<script type="text/javascript" src="/js/sugar.js"></script>
@@ -41,7 +40,6 @@
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="/css/style.css">
 		<link rel="stylesheet" type="text/css" href="/css/common.css">
-		<link rel="stylesheet" type="text/css" href="/css/msgBoxLight.css">
 		<!--
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.16.custom.css">
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-timepicker-addon.css">

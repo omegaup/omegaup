@@ -21,14 +21,8 @@ function OmegaUp() {
 
 OmegaUp.UI = {
 	Error : function ( reason ){
-		$.msgBox({
-		    title: "Error",
-		    content: reason,
-		    type: "error",
-		    showButtons: false,
-		    opacity: 0.9,
-		    autoClose:false
-		});
+		window.scroll(0,0);
+		$("#OmegaupUIError").html(reason).fadeIn();
 	}
 }
 
