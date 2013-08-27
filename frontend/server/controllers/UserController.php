@@ -768,7 +768,9 @@ class UserController extends Controller {
 		
 		if (!is_null($db_results)) {
 			foreach($db_results as $problem) {
-				array_push($response["problems"], $problem->asArray());
+				if ($problem->getPublic() == 1) {
+					array_push($response["problems"], $problem->asArray());
+				}
 			}
 		}
 
