@@ -98,6 +98,8 @@
 				<table class="table table-striped" id="problems-solved">
 					<thead>
 						<tr>
+							<th>Título</th>
+							<th>Título</th>
 							<th>Título</th>							
 						</tr>						
 					</thead>
@@ -206,14 +208,22 @@
 				}
 			}
 			
-			$('#contests-solved-total').html(data["contests"].length);
+			$('#contests-total').html(data["contests"].length);
 		});
 		
 		omegaup.getProblemsSolved(username, function(data){
 			$('#problems-solved-wait').hide();
 			
-			for (var i in data["problems"]) {
-				var content = "<tr><td><a href='/arena/problem" + data["problems"][i]["alias"] + "'>" + data["problems"][i]["title"] + "</a></td></tr>";  
+			for (var i = 0; i < data["problems"].length; i++) {
+				var content = "<tr>"; 
+				
+				for (var j = 0; j < 3 && i < data["problems"].length; j++, i++)
+				{
+					content += "<td><a href='/arena/problem" + data["problems"][i]["alias"] + "'>" + data["problems"][i]["title"] + "</a></td>";  
+				}
+				
+				content += "</tr>";
+				
 				$('#problems-solved tbody').append(content);
 			}
 			
