@@ -3,7 +3,6 @@
 				<source src="/media/notification.mp3" type="audio/mpeg" />
 			</audio>
 			<div id="title">
-				<img src="/media/omegaup_curves.png" height="80" alt="OmegaUp" />
 				<h1 class="contest-title"></h1>
 				<div class="clock">0:00:00</div>
 			</div>

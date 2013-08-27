@@ -1,6 +1,5 @@
 {include file='arena.head.tpl' jsfile='/ux/contest.js'}
 			<div id="title">
-				<img src="/media/omegaup_curves.png" height="80" alt="OmegaUp" />
 				<h1 class="contest-title"></h1>
 				<div class="clock" style="font-size: 5em; line-height: .4em; margin-bottom: .2em;">&infin;</div>
 			</div>
