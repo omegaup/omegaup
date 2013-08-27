@@ -251,6 +251,8 @@ $(document).ready(function() {
 			run.contest_score = 0;
 			run.time = new Date;
 			run.penalty = '-';
+			run.runtime = 0;
+			run.memory = 0;
 			run.language = $('#submit select[name="language"]').val();
 			var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
 			$('.guid', r).html(run.guid.substring(run.guid.length - 5));
@@ -524,7 +526,7 @@ $(document).ready(function() {
 					MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 				}
 
-				if (problem.problem_statement === undefined) {
+				if (problem.problem_statement !== undefined) {
 					update(problem);
 				} else {
 					omegaup.getProblem(contestAlias, problem.alias, function (problem_ext) {

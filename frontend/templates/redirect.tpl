@@ -5,7 +5,6 @@
 	<title>Omegaup</title>
 	<meta http-equiv="REFRESH" content="0;url=/login.php?redirect={$smarty.server.REQUEST_URI}"></HEAD>
 		<BODY>
-			Redirectioning you.
 		</BODY>
 	</HTML>
 {/if}
