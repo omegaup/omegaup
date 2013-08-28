@@ -574,6 +574,24 @@ OmegaUp.prototype.getRankByProblemsSolved = function(callback) {
 	});
 };
 
+OmegaUp.prototype.getContestStatsForUser = function(username, callback) {
+	var self = this;
+
+	$.get(
+		username == null ? '/api/user/conteststats/' : '/api/user/conteststats/username/' + username + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getProblemsSolved = function(username, callback) {
 	var self = this;
 
