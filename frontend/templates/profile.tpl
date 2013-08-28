@@ -169,7 +169,7 @@
 
 	<script>
 		{IF isset($smarty.get.username)}
-		var username = "{$smarty.get.username}";
+		var username = "{$smarty.get.username|replace:"\\":""}";
 		{ELSE}
 		var username = null;
 		{/IF}
