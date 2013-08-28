@@ -948,6 +948,47 @@ class UserController extends Controller {
 		
 		return array("status" => "ok");
 	}
+	
+	/**
+	 * Gets the top N users who have solved more problems
+	 * 
+	 * @param Request $r
+	 * @return string
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRankByProblemsSolved(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		Validators::isNumber($r["offset"], "offset", false);
+		Validators::isNumber($r["rowcount"], "rowcount", false);
+
+		// Defaults for offset and rowcount
+		if (!isset($r["offset"])) {
+			$r["offset"] = 0;
+		}
+		if (!isset($r["rowcount"])) {
+			$r["rowcount"] = 100;
+		}
+		
+		$response = array();
+		$response["rank"] = array();
+		try {
+			$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		if (!is_null($db_results)) {
+			foreach ($db_results as $userEntry) {
+				$user = $userEntry["user"];
+				array_push($response["rank"], array("username" => $user->getUsername(), "name" => $user->getName(), "problems_solved" => $userEntry["problems_solved"]));
+			}
+		}
+		
+		$response["status"] = "ok";
+		return $response;
+	}
 
 }
 

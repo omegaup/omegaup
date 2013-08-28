@@ -59,5 +59,33 @@ class UsersDAO extends UsersDAOBase
 		}
 		return $ar;		
 	}
-
+	
+	public static function GetRankByProblemsSolved($limit = 100, $offset = 0) {
+		
+		global  $conn;
+		
+		$sql = "SELECT COUNT( * ) AS ProblemsSolved, Users . * 
+				FROM Users
+				INNER JOIN (
+					SELECT COUNT( * ) AS TotalPerProblem, problem_id, user_id
+					FROM Runs
+					WHERE Runs.veredict =  'AC'
+					AND Runs.test =0
+					GROUP BY user_id, problem_id
+					ORDER BY TotalPerProblem DESC
+				) AS p ON p.user_id = Users.user_id
+				WHERE Users.main_email_id IS NOT NULL 
+				GROUP BY user_id
+				ORDER BY ProblemsSolved DESC 
+				LIMIT $offset , $limit";
+		
+		$rs = $conn->Execute($sql);
+		$ar = array();
+		foreach ($rs as $foo) {			
+			$bar =  new Users($foo);
+			$result = array("user" => $bar, "problems_solved" =>  $foo["ProblemsSolved"]);
+    		array_push( $ar, $result);    		
+		}
+		return $ar;	
+	}
 }
