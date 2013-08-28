@@ -538,11 +538,29 @@ OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 	});
 };
 
-OmegaUp.prototype.getContestStatsForUser = function(username, callback) {
+OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 	var self = this;
 
 	$.get(
-		username == null ? '/api/user/conteststats/' : '/api/user/conteststats/username/' + username + '/' ,
+		'/api/problem/stats/problem_alias/' + problemAlias + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).error(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getRankByProblemsSolved = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/user/rankbyproblemssolved/',
 		function (data) {
 			callback(data);
 		},

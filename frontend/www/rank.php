@@ -4,4 +4,4 @@
 
 
 
-    $smarty->display( '../templates/index.tpl' );
+    $smarty->display( '../templates/rank.tpl' );
