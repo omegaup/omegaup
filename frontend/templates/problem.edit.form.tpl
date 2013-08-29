@@ -18,7 +18,7 @@
 		
 		<div class="form-group  col-md-6">
 			<label for="title">Título</label>
-			<input id='title' name='title' value='{$TITLE}' type='text' class="form-control" />
+			<input id='title' name='title' value='{$TITLE|htmlspecialchars}' type='text' class="form-control" />
 		</div>
 	</div>
 	
@@ -48,7 +48,7 @@
 		
 		<div class="form-group  col-md-6">
 			<label for="source">Fuente</label>
-			<input id='source' name='source' value='{$SOURCE}' type='text' class="form-control" />
+			<input id='source' name='source' value='{$SOURCE|htmlspecialchars}' type='text' class="form-control" />
 		</div>
 	</div>
 	

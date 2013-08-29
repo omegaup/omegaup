@@ -157,6 +157,9 @@ class ProblemController extends Controller {
 		// Replace spaces for -
 		$alias = str_replace(' ', '-', $alias);
 
+		// Remove any non-alnum character.
+		$alias = preg_replace('/[^a-zA-Z0-9_+-]/', '', $alias);
+
 		// Sanity url encode
 		$alias = urlencode($alias);
 

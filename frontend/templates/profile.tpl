@@ -188,7 +188,7 @@
 			}
 			$('#user-country').html(data.userinfo.country == null ? "" : data.userinfo.country);
 			$('#user-state').html(data.userinfo.state == null ? "" : data.userinfo.state);
-			$('#user-school').html(data.userinfo.school == null ? "" : data.userinfo.school);
+			$('#user-school').html(data.userinfo.school == null ? "" : omegaup.escape(data.userinfo.school));
 			$('#user-graduation-date').html(data.userinfo.graduation_date == null ? "" : onlyDateToString(data.userinfo.graduation_date));
 		});
 		

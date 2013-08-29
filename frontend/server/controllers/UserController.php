@@ -24,6 +24,8 @@ class UserController extends Controller {
 
 		// Validate request
 		Validators::isStringOfMinLength($r["username"], "username", 2);
+		$r['username'] = preg_replace('/[^a-zA-Z0-9_-]/', '', $r['username']);
+		Validators::isStringOfMinLength($r["username"], "username", 2);
 		Validators::isEmail($r["email"], "email");
 
 		// Check password

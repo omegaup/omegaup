@@ -323,7 +323,7 @@ class ContestController extends Controller {
 		$contest->setWindowLength($r["window_length"] === "NULL" ? NULL : $r["window_length"]);
 		$contest->setDirectorId($r["current_user_id"]);
 		$contest->setRerunId(0); // NYI
-		$contest->setAlias($r["alias"]);
+		$contest->setAlias(preg_replace('/[^a-zA-Z0-9_-]/', '', $r["alias"]));
 		$contest->setScoreboard($r["scoreboard"]);
 		$contest->setPointsDecayFactor($r["points_decay_factor"]);
 		$contest->setPartialScore(is_null($r["partial_score"]) ? "1" : $r["partial_score"]);

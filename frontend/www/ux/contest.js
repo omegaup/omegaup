@@ -376,7 +376,7 @@ $(document).ready(function() {
 				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 				$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
 				$('#problem .statement').html(problem.problem_statement);
-				$('#problem .source span').html(problem.source);
+				$('#problem .source span').html(omegaup.escape(problem.source));
 				$('#problem .runs tfoot td a').attr('href', '#new-run');
 
 				$('#problem .run-list .added').remove();
@@ -472,7 +472,7 @@ $(document).ready(function() {
 					$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 					$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
 					$('#problem .statement').html(problem.problem_statement);
-					$('#problem .source span').html(problem.source);
+					$('#problem .source span').html(omegaup.escape(problem.source));
 					$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
 
 					$('#problem .run-list .added').remove();

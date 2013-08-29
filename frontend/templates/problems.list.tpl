@@ -30,7 +30,7 @@
 
 			for (var i = 0; i < problems.results.length; i++) {
 				html += "<tr>"
-					+ '<td><a href="/arena/problem/' + problems.results[i].alias  + '">' + problems.results[i].title + "</a></td>"
+					+ '<td><a href="/arena/problem/' + problems.results[i].alias  + '">' + omegaup.escape(problems.results[i].title) + "</a></td>"
 					+ "<td>" + problems.results[i].submissions + "</td>"
 					+ "<td>" + problems.results[i].accepted + "</td>"
 					+ "</tr>";
