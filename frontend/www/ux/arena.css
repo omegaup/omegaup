@@ -232,6 +232,14 @@ legend {
 	padding: 10px;
 	border: 1px solid #000;
 }
+#problem .statement .sample_io pre {
+	word-break: normal;
+	word-wrap: normal;
+	background: transparent;
+	border: 0px;
+	padding: 0px;
+	margin: inherit;
+}
 
 #problem .statement iframe {
 	width: 100%;
