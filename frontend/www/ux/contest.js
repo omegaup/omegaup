@@ -663,8 +663,9 @@ $(document).ready(function() {
 			
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
-			$('.user', r).html(rank.username +
-				((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')')));
+			var username = rank.username +
+				((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
+			$('.user', r).html(username);
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;

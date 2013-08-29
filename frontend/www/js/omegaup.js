@@ -19,8 +19,8 @@ function OmegaUp() {
 	});
 }
 
-OmegaUp.prototype.escape = function(text) {
-	return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+OmegaUp.prototype.escape = function(s) {
+	return (typeof s === 'string') ? s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
 };
 
 OmegaUp.UI = {
