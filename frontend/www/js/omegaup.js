@@ -19,6 +19,10 @@ function OmegaUp() {
 	});
 }
 
+OmegaUp.prototype.escape = function(text) {
+	return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
 OmegaUp.UI = {
 	Error : function ( reason ){
 		window.scroll(0,0);

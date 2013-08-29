@@ -27,8 +27,8 @@ $(document).ready(function() {
 			var end = list[i].finish_time;
 			((end > now) ? current : past).append(
 				$('<tr>' +
-					'<td><a href="/arena/' + list[i].alias + '">' + list[i].title + '</a></td>' +
-					'<td>' + list[i].description + '</td>' +
+					'<td><a href="/arena/' + list[i].alias + '">' + omegaup.escape(list[i].title) + '</a></td>' +
+					'<td>' + omegaup.escape(list[i].description) + '</td>' +
 					'<td class="no-wrap"><a href="' + makeWorldClockLink(start) + '">' + start.long() + '</a></td>' +
 					'<td class="no-wrap"><a href="' + makeWorldClockLink(end) + '">' + end.long() + '</a></td>' + 
 					'<td class="no-wrap">' + convertSecondsToReadableTime(list[i].duration) + '</td>' +

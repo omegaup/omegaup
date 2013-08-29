@@ -155,9 +155,9 @@ $(document).ready(function() {
 			return;
 		}
 
-		$('#title .contest-title').html(contest.title);
-		$('#summary .title').html(contest.title);
-		$('#summary .description').html(contest.description);
+		$('#title .contest-title').html(omegaup.escape(contest.title));
+		$('#summary .title').html(omegaup.escape(contest.title));
+		$('#summary .description').html(omegaup.escape(contest.description));
 					
 		$('#summary .start_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
 		$('#summary .finish_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
@@ -177,7 +177,7 @@ $(document).ready(function() {
 
 		for (var idx in contest.problems) {
 			var problem = contest.problems[idx];
-			var problemName = String.fromCharCode(letter) + '. ' + problem.title;
+			var problemName = String.fromCharCode(letter) + '. ' + omegaup.escape(problem.title);
 
 			problems[problem.alias] = problem;
 
@@ -370,7 +370,7 @@ $(document).ready(function() {
 			function updateOnlyProblem(problem) {
 				$('#summary').hide();
 				$('#problem').show();
-				$('#problem > .title').html(problem.title);
+				$('#problem > .title').html(omegaup.escape(problem.title));
 				$('#problem .data .points').html(problem.points);
 				$('#problem .validator').html(problem.validator);
 				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
@@ -466,7 +466,7 @@ $(document).ready(function() {
 				function update(problem) {
 					$('#summary').hide();
 					$('#problem').show();
-					$('#problem > .title').html(problem.letter + '. ' + problem.title);
+					$('#problem > .title').html(problem.letter + '. ' + omegaup.escape(problem.title));
 					$('#problem .data .points').html(problem.points);
 					$('#problem .validator').html(problem.validator);
 					$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
@@ -664,7 +664,7 @@ $(document).ready(function() {
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
 			$('.user', r).html(rank.username +
-				((rank.name == rank.username) ? '' : (' (' + rank.name + ')')));
+				((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')')));
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;
@@ -697,8 +697,6 @@ $(document).ready(function() {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 				$('.position', r).html(place);
-				var username = rank.username +
-					((rank.name == rank.username) ? '' : (' (' + rank.name + ')'));
 				$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
 				$('.points', r).html(rank.total.points);
 				$('.penalty', r).html(rank.total.penalty);
@@ -774,8 +772,8 @@ $(document).ready(function() {
 						}
 						
 			$('.time', r).html(clarification.time);
-			$('.message', r).html(clarification.message);
-			$('.answer', r).html(clarification.answer);
+			$('.message', r).html(omegaup.escape(clarification.message));
+			$('.answer', r).html(omegaup.escape(clarification.answer));
 			if (clarification.answer) {
 				answeredClarifications++;
 			}
