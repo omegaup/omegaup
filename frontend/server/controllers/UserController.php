@@ -990,23 +990,78 @@ class UserController extends Controller {
 			$r["rowcount"] = 100;
 		}
 		
-		$response = array();
-		$response["rank"] = array();
-		try {
-			$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"]);
-		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
-		}
+		$rankCacheName = $r["offset"] + '-' + $r["rowcount"];
+		$rankCache = new Cache(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName);
+		$response = $rankCache->get();
 		
-		if (!is_null($db_results)) {
-			foreach ($db_results as $userEntry) {
-				$user = $userEntry["user"];
-				array_push($response["rank"], array("username" => $user->getUsername(), "name" => $user->getName(), "problems_solved" => $userEntry["problems_solved"]));
+		if (is_null($response)) {
+			$response = array();
+			$response["rank"] = array();
+			try {
+				$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"]);
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
 			}
+
+			if (!is_null($db_results)) {
+				foreach ($db_results as $userEntry) {
+					$user = $userEntry["user"];
+					array_push($response["rank"], array("username" => $user->getUsername(), "name" => $user->getName(), "problems_solved" => $userEntry["problems_solved"]));
+				}
+			}
+			
+			// Save cache
+			$rankCache->set($response, 0);
+			self::setProblemsSolvedRankCacheList($rankCacheName);
+			
 		}
 		
 		$response["status"] = "ok";
 		return $response;
+	}
+	
+	/**
+	 * Adds the rank name to a list of stored ranks so we know we ranks to delete
+	 * after
+	 * 
+	 * @param string $rankCacheName
+	 */
+	private static function setProblemsSolvedRankCacheList($rankCacheName) {
+		
+		// Save the instance of the rankName in a key/value array, so we know all ranks to 
+		// expire
+		$rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, "");
+		$ranksList = $rankCacheList->get();
+
+		if (is_null($ranksList)) {
+			// Simulating a set
+			$ranksList = array($rankCacheName => 1);				
+		} else {
+			$ranksList[$rankCacheName] = 1;
+		}
+
+		$rankCacheList->set($ranksList, 0);
+	}
+	
+	/**
+	 * Expires the known ranks
+	 * @TODO: This should be called only in the grader->frontend callback and only IFF 
+	 * veredict = AC (and not test run)
+	 */
+	public static function deleteProblemsSolvedRankCacheList() {
+		
+		$rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, "");
+		$ranksList = $rankCacheList->get();
+		
+		if (!is_null($ranksList)) {
+			
+			$rankCacheList->delete();
+			
+			foreach($ranksList as $key => $value) {
+				$rankCache = new Cache(Cache::PROBLEMS_SOLVED_RANK, $key);
+				$rankCache->delete();
+			}
+		}
 	}
 
 }

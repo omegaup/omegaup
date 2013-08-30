@@ -15,6 +15,8 @@ class Cache
 	const RUN_ADMIN_DETAILS = "run-admin-details-";
 	const RUN_COUNTS = "run-counts-";
 	const USER_PROFILE = "profile-";
+	const PROBLEMS_SOLVED_RANK = "problems-solved-rank-";
+	const PROBLEMS_SOLVED_RANK_LIST = "problems-solved-rank-list";
     
     
     private $enabled;
