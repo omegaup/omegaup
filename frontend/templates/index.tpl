@@ -19,6 +19,15 @@
 		<div class="panel panel-default">
 			<div id="ranking-chart"></div>
 		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">					
+				<h3 class="panel-title">Últimos blog posts</h3>
+			</div>
+			<div class="panel-body">
+				<div id="blog-posts" class="media">Cargando...</div>
+			</div>
+		</div>
 	</div>
 	
 	<div class="col-md-4">
@@ -37,14 +46,11 @@
 				</div>
 			</div>
 		</div>
-		<div class="panel panel-default">
-			<div class="panel-heading">					
-				<h3 class="panel-title">Últimos blog posts</h3>
-			</div>
-			<div class="panel-body">
-				<div id="blog-posts" class="media">Cargando...</div>
-			</div>
-		</div>
+		
+		{if $LOGGED_IN eq '1'} 
+			{include file='rank.table.tpl' count=5}
+		{/if}
+		
 	</div>
 </div>
 

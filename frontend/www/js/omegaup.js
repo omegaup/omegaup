@@ -560,11 +560,11 @@ OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 	});
 };
 
-OmegaUp.prototype.getRankByProblemsSolved = function(callback) {
+OmegaUp.prototype.getRankByProblemsSolved = function(rowcount, callback) {
 	var self = this;
 
 	$.get(
-		'/api/user/rankbyproblemssolved/',
+		'/api/user/rankbyproblemssolved/rowcount/' + rowcount,
 		function (data) {
 			callback(data);
 		},
