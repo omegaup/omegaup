@@ -180,6 +180,9 @@ $(document).ready(function() {
 			var problemName = String.fromCharCode(letter) + '. ' + omegaup.escape(problem.title);
 
 			problems[problem.alias] = problem;
+			if (!problems[problem.alias].runs) {
+				problems[problem.alias].runs = [];
+			}
 
 			problem.letter = String.fromCharCode(letter);
 
@@ -263,6 +266,9 @@ $(document).ready(function() {
 			$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 			$('.language', r).html(run.language)
 			$('#problem .runs > tbody:last').append(r);
+			if (!currentProblem.runs) {
+				currentProblem.runs = [];
+			}
 			currentProblem.runs.push(run);
 
 			if (socket == null) {

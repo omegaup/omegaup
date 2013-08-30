@@ -71,7 +71,15 @@ OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, ca
 			}
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.createContest = function(
@@ -112,12 +120,19 @@ OmegaUp.prototype.createContest = function(
 		function(data) {
 			if (data.status !== undefined && data.status == "error") {
 				OmegaUp.ui.error(data.error);
-			} else {
-				if (callback !== undefined) { callback(data); }
 			}
+			if (callback !== undefined) { callback(data); }
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.updateContest = function(
@@ -165,7 +180,15 @@ OmegaUp.prototype.updateContest = function(
 			}
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.authenticated = function(callback) {
@@ -175,7 +198,15 @@ OmegaUp.prototype.authenticated = function(callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.syncTime = function() {
@@ -188,7 +219,15 @@ OmegaUp.prototype.syncTime = function() {
 			self.deltaTime = data.time * 1000 - t0;
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.time = function(date) {
@@ -209,7 +248,15 @@ OmegaUp.prototype.login = function(username, password, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.getUserStats = function(username, callback) {
@@ -219,7 +266,7 @@ OmegaUp.prototype.getUserStats = function(username, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -242,7 +289,15 @@ OmegaUp.prototype.getContests = function(callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.getContest = function(alias, callback) {
@@ -259,7 +314,7 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 			callback(contest);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -282,7 +337,7 @@ OmegaUp.prototype.getProfile = function(username, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -311,7 +366,7 @@ OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_i
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -334,7 +389,7 @@ OmegaUp.prototype.addProblemToContest = function(contestAlias, order, problemAli
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -355,7 +410,7 @@ OmegaUp.prototype.addUserToContest = function(contestAlias, username, callback) 
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -373,7 +428,7 @@ OmegaUp.prototype.getProblems = function(callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -391,7 +446,7 @@ OmegaUp.prototype.getMyProblems = function(callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -414,7 +469,7 @@ OmegaUp.prototype.getMyContests = function(callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -440,7 +495,7 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
 			callback(problem);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -463,7 +518,15 @@ OmegaUp.prototype.getProblemRuns = function(problemAlias, callback) {
 			callback(problem);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.createProblem = function(contestAlias, problemAlias, callback) {
@@ -483,7 +546,15 @@ OmegaUp.prototype.createProblem = function(contestAlias, problemAlias, callback)
 			callback(problem);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.getContestRuns = function(contestAlias, options, callback) {
@@ -499,7 +570,15 @@ OmegaUp.prototype.getContestRuns = function(contestAlias, options, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.getContestStats = function(contestAlias, callback) {
@@ -511,7 +590,7 @@ OmegaUp.prototype.getContestStats = function(contestAlias, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -529,7 +608,7 @@ OmegaUp.prototype.getContestUsers = function(contestAlias, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -548,7 +627,7 @@ OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -566,7 +645,7 @@ OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -584,7 +663,7 @@ OmegaUp.prototype.getRankByProblemsSolved = function(rowcount, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -602,7 +681,7 @@ OmegaUp.prototype.getContestStatsForUser = function(username, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -620,7 +699,7 @@ OmegaUp.prototype.getProblemsSolved = function(username, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -643,7 +722,7 @@ OmegaUp.prototype.getRuns = function(options, callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -667,7 +746,7 @@ OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, 
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -686,7 +765,15 @@ OmegaUp.prototype.runStatus = function(guid, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.runDetails = function(guid, callback) {
@@ -698,7 +785,15 @@ OmegaUp.prototype.runDetails = function(guid, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.runCounts = function(callback) {
@@ -710,7 +805,15 @@ OmegaUp.prototype.runCounts = function(callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.runSource = function(guid, callback) {
@@ -722,7 +825,15 @@ OmegaUp.prototype.runSource = function(guid, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.runRejudge = function(guid, callback) {
@@ -734,7 +845,15 @@ OmegaUp.prototype.runRejudge = function(guid, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.rejudgeProblem = function(problemAlias, callback) {
@@ -746,7 +865,15 @@ OmegaUp.prototype.rejudgeProblem = function(problemAlias, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.getRanking = function(contestAlias, callback) {
@@ -758,7 +885,15 @@ OmegaUp.prototype.getRanking = function(contestAlias, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
@@ -770,7 +905,15 @@ OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.getScoreboardMerge = function(contestAliases, callback) {
@@ -782,7 +925,15 @@ OmegaUp.prototype.getScoreboardMerge = function(contestAliases, callback) {
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 
@@ -795,7 +946,7 @@ OmegaUp.prototype.getGraderStats = function(callback) {
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -813,7 +964,15 @@ OmegaUp.prototype.getClarifications = function(contestAlias, offset, count, call
 			callback(data);
 		},
 		'json'
-	);
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
 };
 
 OmegaUp.prototype.newClarification = function(contestAlias, problemAlias, message, callback) {
@@ -830,7 +989,7 @@ OmegaUp.prototype.newClarification = function(contestAlias, problemAlias, messag
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -853,7 +1012,7 @@ OmegaUp.prototype.updateClarification = function(clarificationId, answer, public
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
@@ -884,7 +1043,7 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 			callback(data);
 		},
 		'json'
-	).error(function(j, status, errorThrown) {
+	).fail(function(j, status, errorThrown) {
 		try {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {

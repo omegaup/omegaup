@@ -7,7 +7,6 @@
 
 <script>
 	$('.new_contest_form').submit(function() {
-	
 		var window_length_value = $('#window_length_enabled').is(':checked') ? 
 				$('#window_length').val() : 
 				'NULL';

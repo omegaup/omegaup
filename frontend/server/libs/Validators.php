@@ -97,6 +97,7 @@ class Validators
                         
 	if ($isPresent &&
 			!(is_string($parameter) &&
+			  strlen($parameter) > 0 &&
 			  strlen($parameter) <= 32 &&
 			  preg_match('/^[a-zA-Z0-9-_]+$/', $parameter) === 1)){
 		throw new InvalidParameterException("{$parameterName} is not a valid alias");

@@ -323,7 +323,7 @@ class ContestController extends Controller {
 		$contest->setWindowLength($r["window_length"] === "NULL" ? NULL : $r["window_length"]);
 		$contest->setDirectorId($r["current_user_id"]);
 		$contest->setRerunId(0); // NYI
-		$contest->setAlias(preg_replace('/[^a-zA-Z0-9_-]/', '', $r["alias"]));
+		$contest->setAlias($r["alias"]);
 		$contest->setScoreboard($r["scoreboard"]);
 		$contest->setPointsDecayFactor($r["points_decay_factor"]);
 		$contest->setPartialScore(is_null($r["partial_score"]) ? "1" : $r["partial_score"]);
@@ -455,7 +455,7 @@ class ContestController extends Controller {
 		}
 
 		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
-		Validators::isStringOfMaxLength($r["alias"], "alias", 32, $is_required);
+		Validators::isValidAlias($r["alias"], "alias", $is_required);
 		Validators::isNumberInRange($r["scoreboard"], "scoreboard", 0, 100, $is_required);
 		Validators::isNumberInRange($r["points_decay_factor"], "points_decay_factor", 0, 1, $is_required);
 		Validators::isInEnum($r["partial_score"], "partial_score", array("0", "1"), false);
