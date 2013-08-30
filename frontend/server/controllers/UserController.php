@@ -990,7 +990,7 @@ class UserController extends Controller {
 			$r["rowcount"] = 100;
 		}
 		
-		$rankCacheName = $r["offset"] + '-' + $r["rowcount"];
+		$rankCacheName =  $r["offset"] . '-' . $r["rowcount"];
 		$rankCache = new Cache(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName);
 		$response = $rankCache->get();
 		
