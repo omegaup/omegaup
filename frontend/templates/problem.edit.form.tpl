@@ -23,6 +23,11 @@
 	</div>
 	
 	<div class="row">
+		<div class="form-group  col-md-6">
+			<label for="alias">Alias</label>
+			<input id='alias' name='alias' value='{$ALIAS|htmlspecialchars}' type='text' class="form-control"{if !$new} disabled="disabled"{/if}/>
+		</div>
+
 		<div class="form-group col-md-6">
 			<label for="validator">Tipo de validador</label>
 			<select name='validator' id='validator' class="form-control" >
@@ -33,26 +38,26 @@
 					<option value="custom">Validador personalizado (validator.$lang$)</option>
 			</select>
 		</div>
-		
+	</div>
+	
+	<div class="row">
 		<div class="form-group  col-md-6">
 			<label for="time_limit">Tiempo límite (ms)</label>
 			<input id='time_limit' name='time_limit' value='{$TIME_LIMIT}' type='text' class="form-control" />
 		</div>
+
+		<div class="form-group  col-md-6">
+			<label for="memory_limit">Límite de memoria (KB)</label>
+			<input id='memory_limit' name='memory_limit' value='{$MEMORY_LIMIT}' type='text' class="form-control" />
+		</div>
 	</div>
 	
 	<div class="row">
-		<div class="form-group  col-md-6">
-			<label for="memory_limit">Memory limit (KB)</label>
-			<input id='memory_limit' name='memory_limit' value='{$MEMORY_LIMIT}' type='text' class="form-control" />
-		</div>
-		
 		<div class="form-group  col-md-6">
 			<label for="source">Fuente</label>
 			<input id='source' name='source' value='{$SOURCE|htmlspecialchars}' type='text' class="form-control" />
 		</div>
-	</div>
-	
-	<div class="row">
+		
 		<div class="form-group col-md-6">
 			<label for="public">Aparece en el listado público</label>
 			<select name='public' id='public' class="form-control">

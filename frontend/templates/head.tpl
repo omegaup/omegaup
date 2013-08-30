@@ -13,6 +13,7 @@
 		<script type="text/javascript" src="/js/sugar.es.js"></script>
 		<script type="text/javascript" src="/js/highstock.js"></script>
 		<script type="text/javascript" src="/js/omegaup-graph.js"></script>
+		<script type="text/javascript" src="/js/langtools.js"></script>
 		
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->

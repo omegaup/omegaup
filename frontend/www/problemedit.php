@@ -20,7 +20,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 	$response = ApiCaller::call($r);
 
 	if ($response["status"] == "error") {
-		$smarty->assign('STATUS', $response["error"]);
+		$smarty->assign('STATUS_ERROR', $response["error"]);
 		$smarty->assign('TITLE', $_POST["title"]);
 		$smarty->assign('VALIDATOR', $_POST["validator"]);
 		$smarty->assign('TIME_LIMIT', $_POST["time_limit"]);
@@ -28,7 +28,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 		$smarty->assign('SOURCE', $_POST["source"]);
 		$smarty->assign('PUBLIC', $_POST["public"]);
 	} else if ($response["status"] == "ok") {
-		$smarty->assign('STATUS', "Problem updated succesfully!");
+		$smarty->assign('STATUS_SUCCESS', "Problem updated succesfully!");
 	}
 }
 

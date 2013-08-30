@@ -23,36 +23,51 @@ OmegaUp.prototype.escape = function(s) {
 	return (typeof s === 'string') ? s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
 };
 
-OmegaUp.UI = {
-	Error : function ( reason ){
-		window.scroll(0,0);
-		$("#OmegaupUIError").html(reason).fadeIn();
-	}
-}
+OmegaUp.ui = {
+	error: function(reason) {
+		window.scroll(0, 0);
+		$('#status .message').html(reason);
+		$('#status')
+			.removeClass('alert-success')
+			.removeClass('alert-info')
+			.addClass('alert-danger')
+			.fadeIn();
+	},
 
-$(document).ajaxError(function(e, xhr, settings, exception) {
-	var errorToUser = "Unknown error.";
-	try{
-		var response = jQuery.parseJSON(xhr.responseText);
-		errorToUser = response.error;
-	}catch(e){
-		
-	}
+	info: function(message) {
+		window.scroll(0, 0);
+		$('#status .message').html(message);
+		$('#status')
+			.removeClass('alert-danger')
+			.removeClass('alert-info')
+			.addClass('alert-info')
+			.fadeIn();
+	},
 
-	if (settings.url != "/api/grader/status/") {
-		OmegaUp.UI.Error( errorToUser );
+	success: function(message) {
+		window.scroll(0, 0);
+		$('#status .message').html(message);
+		$('#status')
+			.removeClass('alert-danger')
+			.removeClass('alert-success')
+			.addClass('alert-success')
+			.fadeIn();
+	},
+	
+	dismissNotifications: function() {
+		$('#status').fadeOut();
 	}
-});
+};
 
 OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, callback) {
 	$.post(
 		'/api/user/create/',
-		{ email: s_Email, username: s_Username, password : s_PlainPassword },
+		{ email: s_Email, username: s_Username, password: s_PlainPassword },
 		function (data) {
-			if( data.status !== undefined && data.status == "error") {
-				OmegaUp.UI.Error( data.error );
+			if (data.status !== undefined && data.status == "error") {
+				OmegaUp.ui.error(data.error);
 			} else {
-				if(callback !== undefined){ callback( data ) }
+				if (callback !== undefined){ callback(data); }
 			}
 		},
 		'json'
@@ -94,11 +109,11 @@ OmegaUp.prototype.createContest = function(
 			penalty_time_start	: penalty_time_start, 
 			show_scoreboard_after	: show_scoreboard_after 
 		},
-		function (data) {
-			if( data.status !== undefined && data.status == "error") {
-				OmegaUp.UI.Error( data.error );
-			}else{
-				if(callback !== undefined){ callback( data ) }
+		function(data) {
+			if (data.status !== undefined && data.status == "error") {
+				OmegaUp.ui.error(data.error);
+			} else {
+				if (callback !== undefined) { callback(data); }
 			}
 		},
 		'json'
@@ -142,11 +157,11 @@ OmegaUp.prototype.updateContest = function(
 			penalty_time_start	: penalty_time_start, 
 			show_scoreboard_after	: show_scoreboard_after 
 		},
-		function (data) {
-			if( data.status !== undefined && data.status == "error") {
-				OmegaUp.UI.Error( data.error );
-			}else{
-				if(callback !== undefined){ callback( data ) }
+		function(data) {
+			if (data.status !== undefined && data.status == "error") {
+				OmegaUp.ui.error(data.error);
+			} else {
+				if (callback !== undefined) { callback(data); }
 			}
 		},
 		'json'
@@ -887,3 +902,12 @@ function dateToString(currentDate) {
 function onlyDateToString(currentDate) {
 	return currentDate.format("{MM}/{dd}/{yyyy}");
 }
+
+$(document).ajaxError(function(e, xhr, settings, exception) {
+	try {
+		var response = jQuery.parseJSON(xhr.responseText);
+		console.error(settings.url, xhr.status, response.error, response);
+	} catch(e) {
+		console.error(settings.url, xhr.status, xhr.responseText);
+	}
+});

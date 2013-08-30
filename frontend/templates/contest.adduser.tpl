@@ -89,12 +89,12 @@
 		username = $("#user").val();
 		omegaup.addUserToContest(contestAlias, username, function(response) {
 			if (response.status == "ok") {
-				$('div.copy.error').html("User successfully added!");
+				OmegaUp.ui.success("User successfully added!");
 				$('div.post.footer').show();
 				
 				updateContestUsers();
-				
-				return;
+			} else {
+				OmegaUp.ui.error(response.error || 'error');
 			}
 		});
 	});

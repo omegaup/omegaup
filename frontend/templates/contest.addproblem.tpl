@@ -37,12 +37,12 @@
 			
 			omegaup.addProblemToContest(contestAlias, order, problemAlias, points, function(response){
 				if (response.status == "ok") {
-					$('div.copy.error').html("Problem successfully added!");
+					OmegaUp.ui.success("Problem successfully added!");
 					$('div.post.footer').show();
 					return;
+				} else {
+					OmegaUp.ui.error(response.error || 'Error');
 				}
-			
-				
 			});
 		});
 	

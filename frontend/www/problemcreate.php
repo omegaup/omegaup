@@ -15,6 +15,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 	$r = new Request(array(
 				"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 				"title" => $_POST["title"],
+				"alias" => $_POST["alias"],
 				"validator" => $_POST["validator"],
 				"time_limit" => $_POST["time_limit"],
 				"memory_limit" => $_POST["memory_limit"],
@@ -26,15 +27,16 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 	$response = ApiCaller::call($r);
 
 	if ($response["status"] == "error") {
-		$smarty->assign('STATUS', $response["error"]);
+		$smarty->assign('STATUS_ERROR', $response["error"]);
 		$smarty->assign('TITLE', $_POST["title"]);
+		$smarty->assign('ALIAS', $_POST["alias"]);
 		$smarty->assign('VALIDATOR', $_POST["validator"]);
 		$smarty->assign('TIME_LIMIT', $_POST["time_limit"]);
 		$smarty->assign('MEMORY_LIMIT', $_POST["memory_limit"]);
 		$smarty->assign('SOURCE', $_POST["source"]);
 		$smarty->assign('PUBLIC', $_POST["public"]);
 	} else if ($response["status"] == "ok") {
-		$smarty->assign('STATUS', "New problem created succesfully! Alias: " . $response["alias"]);
+		$smarty->assign('STATUS_SUCCESS', "New problem created succesfully! Alias: " . $response["alias"]);
 	}
 }
 

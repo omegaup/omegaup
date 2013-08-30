@@ -28,11 +28,11 @@
 			$(".new_contest_form #penalty_time_start").val(),
 			$(".new_contest_form #show_scoreboard_after").val(),
 			function(data) {
-
 				if(data.status == "ok") {
-					$('div.copy.error').html("Tu concurso ha sido creado! <a href='addproblemtocontest.php'>Agrégale problemas!</a> <a href='/arena/"+ $('.new_contest_form #alias').val() + "'>Ver Concurso</a>");
+					OmegaUp.ui.success("Tu concurso ha sido creado! <a href='addproblemtocontest.php'>Agrégale problemas!</a> <a href='/arena/"+ $('.new_contest_form #alias').val() + "'>Ver Concurso</a>");
 					window.scrollTo(0,0);
-					return;
+				} else {
+					OmegaUp.ui.error(data.error || 'error');
 				}
 			}
 		);

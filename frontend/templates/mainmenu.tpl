@@ -9,6 +9,3 @@
 				Your email is not verified yet. Please check your e-mail.
 			</div>
 		{/if} 
-		<div style="display:none" id="OmegaupUIError" class="alert alert-danger">
-			<!-- generic error messages -->
-		</div>

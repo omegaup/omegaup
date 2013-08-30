@@ -366,7 +366,6 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Verify DB data
 		$this->assertEquals($r["title"], $problem->getTitle());
-		$this->assertEquals("la-venganza-del-malvado-dr-liraa", $problem->getAlias());
 		
 		// Verify problem contents.zip were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;
