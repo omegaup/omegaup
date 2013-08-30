@@ -4,7 +4,7 @@
 	<div class="panel-heading">
 		<h3 class="panel-title">Top {$count} usuarios con más problemas resueltos</h3>
 	</div>
-	<table class="table" id="rank-by-problems-solved">
+	<table class="table table-striped table-hover" id="rank-by-problems-solved">
 		<thead>
 			<tr>
 				<th>Username</th>				
@@ -13,6 +13,9 @@
 		</thead>
 		<tbody></tbody>
 	</table>
+	<div class="panel-body">
+		<a href='rank.php'>Ver rank completo</a>
+	</div>
 	<div id="rank-wait"><img src="/media/wait.gif" /></div>
 </div>
 

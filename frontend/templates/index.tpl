@@ -47,6 +47,14 @@
 			</div>
 		</div>
 		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Próximos concursos</h3>
+			</div>
+			<ul class="list-group" id="next-contests-list">			
+		    </ul>
+		</div>
+		
 		{if $LOGGED_IN eq '1'} 
 			{include file='rank.table.tpl' count=5}
 		{/if}
@@ -103,7 +111,22 @@
 	  // Calling load sends the request off.  It requires a callback function.
 	  feed.load(feedLoaded);
 	  
-	  omegaup.runCounts(createChart);	  	  
+	  omegaup.runCounts(createChart);
+	  
+	  omegaup.getContests(function (data) {
+		var list = data.results;
+		var now = new Date();
+		
+		for (var i = 0, len = list.length; i < len && i < 10; i++) {
+			var start = list[i].start_time;
+			var end = list[i].finish_time;
+			
+			if (end > now) {
+				$('#next-contests-list').append('<a href="/arena" class="list-group-item">' + omegaup.escape(list[i].title) + '</a>');
+			}
+		}
+	  
+	  });
 	}
 	
 	function createChart(series) {
