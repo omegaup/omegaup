@@ -13,11 +13,14 @@
 		</thead>
 		<tbody></tbody>
 	</table>
+	<div id="rank-wait"><img src="/media/wait.gif" /></div>
 </div>
 
 <script>
 
 	omegaup.getRankByProblemsSolved({$count}, function(data) {
+		$('#rank-wait').hide();
+		
 		var rank = data["rank"];
 		for (var i in rank) {
 			var username = rank[i].username;
