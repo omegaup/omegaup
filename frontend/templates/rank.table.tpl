@@ -17,7 +17,7 @@
 
 <script>
 
-	omegaup.getRankByProblemsSolved(function(data) {
+	omegaup.getRankByProblemsSolved({$count}, function(data) {
 		var rank = data["rank"];
 		for (var i in rank) {
 			var username = rank[i].username;
