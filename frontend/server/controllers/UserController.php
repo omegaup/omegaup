@@ -656,37 +656,50 @@ class UserController extends Controller {
 				
 		$user = self::resolveTargetUser($r);
 
-		$response = array();
-		$response["userinfo"] = array();
-		$response["problems"] = array();
+		$profileCache = new Cache(Cache::USER_PROFILE, $user->getUsername());
+		$response = $profileCache->get();
 		
-		$response["userinfo"]["username"] = $user->getUsername();		
-		$response["userinfo"]["name"] = $user->getName();
-		$response["userinfo"]["solved"] = $user->getSolved();
-		$response["userinfo"]["submissions"] = $user->getSubmissions();
-		$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
-		$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
-		$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
+		if (is_null($response)) {
+			$response = array();
+			$response["userinfo"] = array();
+			$response["problems"] = array();
 
-		try {
-			$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+			$response["userinfo"]["username"] = $user->getUsername();		
+			$response["userinfo"]["name"] = $user->getName();
+			$response["userinfo"]["solved"] = $user->getSolved();
+			$response["userinfo"]["submissions"] = $user->getSubmissions();
+			$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
+			$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
+			$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
+
+			try {
+				$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+
+				$country = CountriesDAO::getByPK($user->getCountryId());
+				$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
+				$response["userinfo"]["country_id"] = $user->getCountryId();
+
+				$state = StatesDAO::getByPK($user->getStateId());
+				$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
+				$response["userinfo"]["state_id"] = $user->getStateId();
+
+				$school = SchoolsDAO::getByPK($user->getSchoolId());
+				$response["userinfo"]["school_id"] = $user->getSchoolId();
+				$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			$response["userinfo"]["gravatar_92"] = 'https://secure.gravatar.com/avatar/' . md5($response["userinfo"]["email"]) . '?s=92';
 			
-			$country = CountriesDAO::getByPK($user->getCountryId());
-			$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
-			$response["userinfo"]["country_id"] = $user->getCountryId();
-			
-			$state = StatesDAO::getByPK($user->getStateId());
-			$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
-			$response["userinfo"]["state_id"] = $user->getStateId();
-			
-			$school = SchoolsDAO::getByPK($user->getSchoolId());
-			$response["userinfo"]["school_id"] = $user->getSchoolId();
-			$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
-		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
+			// Save cache with infinity timeout
+			$profileCache->set($response, 0);
 		}
 		
-		$response["userinfo"]["gravatar_92"] = 'https://secure.gravatar.com/avatar/' . md5($response["userinfo"]["email"]) . '?s=92';
+		// Do not leak plain emails
+		if ($user->getUserId() !== $r['current_user_id']) {
+			unset($response["userinfo"]["email"]);
+		}
 		
 		$response["status"] = "ok";
 		return $response;
@@ -947,6 +960,10 @@ class UserController extends Controller {
 		} catch(Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
+		
+		// Expire profile cache
+		$profileCache = new Cache(Cache::USER_PROFILE, $r["current_user"]->getUsername());
+		$profileCache->delete();
 		
 		return array("status" => "ok");
 	}
