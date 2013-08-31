@@ -38,7 +38,7 @@
 				var startDate = contests.results[i].start_time;
 				var endDate = contests.results[i].finish_time;
 				html += "<tr>"
-					+ "<td><b><a href='/arena/" + contests.results[i].alias  + "/'>" + contests.results[i].title + "</a></b></td>"					
+					+ "<td><b><a href='/arena/" + contests.results[i].alias  + "/'>" + omegaup.escape(contests.results[i].title) + "</a></b></td>"					
 					+ '<td><a href="' + makeWorldClockLink(startDate) + '">' + startDate.format("long", "es") + "</a></td>"
 					+ '<td><a href="' + makeWorldClockLink(endDate) + '">' + endDate.format("long", "es") + "</a></td>"
 					+ '<td>'+ ((contests.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'

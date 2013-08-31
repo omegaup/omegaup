@@ -24,6 +24,8 @@ class UserController extends Controller {
 
 		// Validate request
 		Validators::isStringOfMinLength($r["username"], "username", 2);
+		$r['username'] = preg_replace('/[^a-zA-Z0-9_-]/', '', $r['username']);
+		Validators::isStringOfMinLength($r["username"], "username", 2);
 		Validators::isEmail($r["email"], "email");
 
 		// Check password
@@ -654,37 +656,50 @@ class UserController extends Controller {
 				
 		$user = self::resolveTargetUser($r);
 
-		$response = array();
-		$response["userinfo"] = array();
-		$response["problems"] = array();
+		$profileCache = new Cache(Cache::USER_PROFILE, $user->getUsername());
+		$response = $profileCache->get();
 		
-		$response["userinfo"]["username"] = $user->getUsername();		
-		$response["userinfo"]["name"] = $user->getName();
-		$response["userinfo"]["solved"] = $user->getSolved();
-		$response["userinfo"]["submissions"] = $user->getSubmissions();
-		$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
-		$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
-		$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
+		if (is_null($response)) {
+			$response = array();
+			$response["userinfo"] = array();
+			$response["problems"] = array();
 
-		try {
-			$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+			$response["userinfo"]["username"] = $user->getUsername();		
+			$response["userinfo"]["name"] = $user->getName();
+			$response["userinfo"]["solved"] = $user->getSolved();
+			$response["userinfo"]["submissions"] = $user->getSubmissions();
+			$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
+			$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
+			$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
+
+			try {
+				$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+
+				$country = CountriesDAO::getByPK($user->getCountryId());
+				$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
+				$response["userinfo"]["country_id"] = $user->getCountryId();
+
+				$state = StatesDAO::getByPK($user->getStateId());
+				$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
+				$response["userinfo"]["state_id"] = $user->getStateId();
+
+				$school = SchoolsDAO::getByPK($user->getSchoolId());
+				$response["userinfo"]["school_id"] = $user->getSchoolId();
+				$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			$response["userinfo"]["gravatar_92"] = 'https://secure.gravatar.com/avatar/' . md5($response["userinfo"]["email"]) . '?s=92';
 			
-			$country = CountriesDAO::getByPK($user->getCountryId());
-			$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
-			$response["userinfo"]["country_id"] = $user->getCountryId();
-			
-			$state = StatesDAO::getByPK($user->getStateId());
-			$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
-			$response["userinfo"]["state_id"] = $user->getStateId();
-			
-			$school = SchoolsDAO::getByPK($user->getSchoolId());
-			$response["userinfo"]["school_id"] = $user->getSchoolId();
-			$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
-		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
+			// Save cache with infinity timeout
+			$profileCache->set($response, 0);
 		}
 		
-		$response["userinfo"]["gravatar_92"] = 'https://secure.gravatar.com/avatar/' . md5($response["userinfo"]["email"]) . '?s=92';
+		// Do not leak plain emails
+		if ($user->getUserId() !== $r['current_user_id']) {
+			unset($response["userinfo"]["email"]);
+		}
 		
 		$response["status"] = "ok";
 		return $response;
@@ -756,13 +771,22 @@ class UserController extends Controller {
 		self::authenticateRequest($r);
 
 		$response = array();
-		$response["runs"] = array();
-
-		$user = $r["current_user"];
+		$response["problems"] = array();
+		
+		$user = self::resolveTargetUser($r);
+		
 		try {
-			$response["runs"] = RunsDAO::GetRunsByUser($user->getUserId());
+			$db_results = ProblemsDAO::getProblemsSolved($user->getUserId());
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		if (!is_null($db_results)) {
+			foreach($db_results as $problem) {
+				if ($problem->getPublic() == 1) {
+					array_push($response["problems"], $problem->asArray());
+				}
+			}
 		}
 
 		$response["status"] = "ok";
@@ -944,7 +968,107 @@ class UserController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 		
+		// Expire profile cache
+		$profileCache = new Cache(Cache::USER_PROFILE, $r["current_user"]->getUsername());
+		$profileCache->delete();
+		
 		return array("status" => "ok");
+	}
+	
+	/**
+	 * Gets the top N users who have solved more problems
+	 * 
+	 * @param Request $r
+	 * @return string
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRankByProblemsSolved(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		Validators::isNumber($r["offset"], "offset", false);
+		Validators::isNumber($r["rowcount"], "rowcount", false);
+
+		// Defaults for offset and rowcount
+		if (!isset($r["offset"])) {
+			$r["offset"] = 0;
+		}
+		if (!isset($r["rowcount"])) {
+			$r["rowcount"] = 100;
+		}
+		
+		$rankCacheName =  $r["offset"] . '-' . $r["rowcount"];
+		$rankCache = new Cache(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName);
+		$response = $rankCache->get();
+		
+		if (is_null($response)) {
+			$response = array();
+			$response["rank"] = array();
+			try {
+				$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"]);
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+
+			if (!is_null($db_results)) {
+				foreach ($db_results as $userEntry) {
+					$user = $userEntry["user"];
+					array_push($response["rank"], array("username" => $user->getUsername(), "name" => $user->getName(), "problems_solved" => $userEntry["problems_solved"]));
+				}
+			}
+			
+			// Save cache
+			$rankCache->set($response, 0);
+			self::setProblemsSolvedRankCacheList($rankCacheName);
+			
+		}
+		
+		$response["status"] = "ok";
+		return $response;
+	}
+	
+	/**
+	 * Adds the rank name to a list of stored ranks so we know we ranks to delete
+	 * after
+	 * 
+	 * @param string $rankCacheName
+	 */
+	private static function setProblemsSolvedRankCacheList($rankCacheName) {
+		
+		// Save the instance of the rankName in a key/value array, so we know all ranks to 
+		// expire
+		$rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, "");
+		$ranksList = $rankCacheList->get();
+
+		if (is_null($ranksList)) {
+			// Simulating a set
+			$ranksList = array($rankCacheName => 1);				
+		} else {
+			$ranksList[$rankCacheName] = 1;
+		}
+
+		$rankCacheList->set($ranksList, 0);
+	}
+	
+	/**
+	 * Expires the known ranks
+	 * @TODO: This should be called only in the grader->frontend callback and only IFF 
+	 * veredict = AC (and not test run)
+	 */
+	public static function deleteProblemsSolvedRankCacheList() {
+		
+		$rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, "");
+		$ranksList = $rankCacheList->get();
+		
+		if (!is_null($ranksList)) {
+			
+			$rankCacheList->delete();
+			
+			foreach($ranksList as $key => $value) {
+				$rankCache = new Cache(Cache::PROBLEMS_SOLVED_RANK, $key);
+				$rankCache->delete();
+			}
+		}
 	}
 
 }

@@ -256,6 +256,9 @@ class RunController extends Controller {
 			///       (by improving, adding penalties, etc)
 			self::InvalidateScoreboardCache($r["contest"]->getContestId());
 		}
+		
+		// Expire rank cache
+		UserController::deleteProblemsSolvedRankCacheList();
 
 		return $response;
 	}
@@ -380,6 +383,9 @@ class RunController extends Controller {
 		// Expire details of the run
 		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId());
 		$runAdminDetailsCache->delete();
+		
+		// Expire ranks
+		UserController::deleteProblemsSolvedRankCacheList();
 
 		return $response;	
 	}

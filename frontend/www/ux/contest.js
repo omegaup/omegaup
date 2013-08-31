@@ -155,9 +155,9 @@ $(document).ready(function() {
 			return;
 		}
 
-		$('#title .contest-title').html(contest.title);
-		$('#summary .title').html(contest.title);
-		$('#summary .description').html(contest.description);
+		$('#title .contest-title').html(omegaup.escape(contest.title));
+		$('#summary .title').html(omegaup.escape(contest.title));
+		$('#summary .description').html(omegaup.escape(contest.description));
 					
 		$('#summary .start_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
 		$('#summary .finish_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
@@ -177,9 +177,12 @@ $(document).ready(function() {
 
 		for (var idx in contest.problems) {
 			var problem = contest.problems[idx];
-			var problemName = String.fromCharCode(letter) + '. ' + problem.title;
+			var problemName = String.fromCharCode(letter) + '. ' + omegaup.escape(problem.title);
 
 			problems[problem.alias] = problem;
+			if (!problems[problem.alias].runs) {
+				problems[problem.alias].runs = [];
+			}
 
 			problem.letter = String.fromCharCode(letter);
 
@@ -251,6 +254,8 @@ $(document).ready(function() {
 			run.contest_score = 0;
 			run.time = new Date;
 			run.penalty = '-';
+			run.runtime = 0;
+			run.memory = 0;
 			run.language = $('#submit select[name="language"]').val();
 			var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
 			$('.guid', r).html(run.guid.substring(run.guid.length - 5));
@@ -261,8 +266,10 @@ $(document).ready(function() {
 			$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 			$('.language', r).html(run.language)
 			$('#problem .runs > tbody:last').append(r);
+			if (!currentProblem.runs) {
+				currentProblem.runs = [];
+			}
 			currentProblem.runs.push(run);
-
 
 			if (socket == null) {
 				updateRunFallback(run.guid, run);
@@ -369,13 +376,13 @@ $(document).ready(function() {
 			function updateOnlyProblem(problem) {
 				$('#summary').hide();
 				$('#problem').show();
-				$('#problem > .title').html(problem.title);
+				$('#problem > .title').html(omegaup.escape(problem.title));
 				$('#problem .data .points').html(problem.points);
 				$('#problem .validator').html(problem.validator);
 				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 				$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
 				$('#problem .statement').html(problem.problem_statement);
-				$('#problem .source span').html(problem.source);
+				$('#problem .source span').html(omegaup.escape(problem.source));
 				$('#problem .runs tfoot td a').attr('href', '#new-run');
 
 				$('#problem .run-list .added').remove();
@@ -465,13 +472,13 @@ $(document).ready(function() {
 				function update(problem) {
 					$('#summary').hide();
 					$('#problem').show();
-					$('#problem > .title').html(problem.letter + '. ' + problem.title);
+					$('#problem > .title').html(problem.letter + '. ' + omegaup.escape(problem.title));
 					$('#problem .data .points').html(problem.points);
 					$('#problem .validator').html(problem.validator);
 					$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 					$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
 					$('#problem .statement').html(problem.problem_statement);
-					$('#problem .source span').html(problem.source);
+					$('#problem .source span').html(omegaup.escape(problem.source));
 					$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
 
 					$('#problem .run-list .added').remove();
@@ -525,7 +532,7 @@ $(document).ready(function() {
 					MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 				}
 
-				if (problem.problem_statement) {
+				if (problem.problem_statement !== undefined) {
 					update(problem);
 				} else {
 					omegaup.getProblem(contestAlias, problem.alias, function (problem_ext) {
@@ -662,7 +669,9 @@ $(document).ready(function() {
 			
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
-			$('.user', r).html(rank.username + ' (' + rank.name + ')');
+			var username = rank.username +
+				((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
+			$('.user', r).html(username);
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;
@@ -695,7 +704,6 @@ $(document).ready(function() {
 				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
 
 				$('.position', r).html(place);
-				var username = rank.username + ' (' + rank.name + ')';
 				$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
 				$('.points', r).html(rank.total.points);
 				$('.penalty', r).html(rank.total.penalty);
@@ -714,11 +722,11 @@ $(document).ready(function() {
 		var clock = "";
 
 		if (date < startTime.getTime()) {
-				clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
+			clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
 		} else if (date > submissionDeadline.getTime()) {
-				clock = "00:00:00";
+			clock = "00:00:00";
 		} else {
-				clock = formatDelta(submissionDeadline.getTime() - (date + omegaup.deltaTime));
+			clock = formatDelta(submissionDeadline.getTime() - (date + omegaup.deltaTime));
 		}
 
 		$('#title .clock').html(clock);
@@ -771,8 +779,8 @@ $(document).ready(function() {
 						}
 						
 			$('.time', r).html(clarification.time);
-			$('.message', r).html(clarification.message);
-			$('.answer', r).html(clarification.answer);
+			$('.message', r).html(omegaup.escape(clarification.message));
+			$('.answer', r).html(omegaup.escape(clarification.answer));
 			if (clarification.answer) {
 				answeredClarifications++;
 			}

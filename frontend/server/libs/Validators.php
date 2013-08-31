@@ -85,6 +85,26 @@ class Validators
         
         return true;        
     }
+	
+   /**
+     * 
+     * @param string $parameter
+     * @param string $parameterName
+     * @param boolean $required
+     */
+    public static function isValidAlias($parameter, $parameterName, $required = true){
+        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+                        
+	if ($isPresent &&
+			!(is_string($parameter) &&
+			  strlen($parameter) > 0 &&
+			  strlen($parameter) <= 32 &&
+			  preg_match('/^[a-zA-Z0-9-_]+$/', $parameter) === 1)){
+		throw new InvalidParameterException("{$parameterName} is not a valid alias");
+        }
+        
+        return true;        
+    }
     
     /**
      * 

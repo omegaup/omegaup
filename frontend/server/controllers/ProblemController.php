@@ -105,7 +105,6 @@ class ProblemController extends Controller {
 	 * @throws NotFoundException
 	 */
 	private static function validateCreateOrUpdate(Request $r, $is_update = false) {
-
 		$is_required = true;
 
 		// In case of update, params are optional
@@ -129,6 +128,8 @@ class ProblemController extends Controller {
 			if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 				throw new ForbiddenAccessException();
 			}
+		} else {
+			Validators::isValidAlias($r['alias'], 'alias');
 		}
 
 		Validators::isStringNonEmpty($r["title"], "title", $is_required);
@@ -137,33 +138,6 @@ class ProblemController extends Controller {
 		Validators::isInEnum($r["validator"], "validator", array("remote", "literal", "token", "token-caseless", "token-numeric", "custom"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
-	}
-
-	/**
-	 * Builds a problem alias from a problem title
-	 * 
-	 * @param string $title
-	 */
-	private static function buildAlias($title) {
-
-		$alias = "";
-
-		// Remove accents				
-		$alias = ApiUtils::RemoveAccents($title);
-
-		// To lower-case
-		$alias = strtolower($alias);
-
-		// Replace spaces for -
-		$alias = str_replace(' ', '-', $alias);
-
-		// Sanity url encode
-		$alias = urlencode($alias);
-
-		// Limit result to 32 chars
-		$alias = substr($alias, 0, 32);
-
-		return $alias;
 	}
 
 	/**
@@ -194,8 +168,6 @@ class ProblemController extends Controller {
 		$problem->setSource($r["source"]);
 		$problem->setOrder("normal"); /* defaulting to normal */
 		$problem->setAuthorId($r["current_user_id"]);
-
-		$r["alias"] = self::buildAlias($r["title"]);
 		$problem->setAlias($r["alias"]);
 
 		$problemDeployer = new ProblemDeployer();

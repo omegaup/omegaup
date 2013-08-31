@@ -7,7 +7,7 @@
 							</a>
 						</div>
 						<ul class="nav navbar-nav">
-							<li id="nav-arena"{if $currentSection == 'arena'} class="active"{/if}><a href='/arena'>{#frontPageArena#}</a></li>
+							<li id="nav-arena"{if isset($currentSection) && $currentSection == 'arena'} class="active"{/if}><a href='/arena'>{#frontPageArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
 								<li id="nav-contests"><a href='/contests.php'>{#frontPageMyContests#}</a></li>
 								<li id="nav-problems">

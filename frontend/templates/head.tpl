@@ -7,13 +7,13 @@
 
 		<script type="text/javascript" src="/js/jquery.js"></script>
 		<!--<script type="text/javascript" src="/js/jquery-ui.min.js"></script>-->
-		<script type="text/javascript" src="/js/jquery.msgBox.js"></script>
 		<!--<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js"></script>-->
-		<script type="text/javascript" src="/js/omegaup.js?ts=4"></script>
+		<script type="text/javascript" src="/js/omegaup.js?ts=9"></script>
 		<script type="text/javascript" src="/js/sugar.js"></script>
 		<script type="text/javascript" src="/js/sugar.es.js"></script>
 		<script type="text/javascript" src="/js/highstock.js"></script>
 		<script type="text/javascript" src="/js/omegaup-graph.js"></script>
+		<script type="text/javascript" src="/js/langtools.js"></script>
 		
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
@@ -41,7 +41,6 @@
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="/css/style.css">
 		<link rel="stylesheet" type="text/css" href="/css/common.css">
-		<link rel="stylesheet" type="text/css" href="/css/msgBoxLight.css">
 		<!--
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.16.custom.css">
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-timepicker-addon.css">

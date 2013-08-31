@@ -84,9 +84,11 @@ class UserProfileTest extends OmegaupTestCase {
 		$runs = array();
 		$runs[0] = RunsFactory::createRun($problemOne, $contest, $user);
 		$runs[1] = RunsFactory::createRun($problemTwo, $contest, $user);
+		$runs[2] = RunsFactory::createRun($problemOne, $contest, $user);
 		
 		RunsFactory::gradeRun($runs[0]);
 		RunsFactory::gradeRun($runs[1]);
+		RunsFactory::gradeRun($runs[2]);
 		
 		$r = new Request(array(
 			"auth_token" => self::login($user)
@@ -94,6 +96,6 @@ class UserProfileTest extends OmegaupTestCase {
 		
 		$response = UserController::apiProblemsSolved($r);
 		
-		$this->assertEquals(count($runs), count($response["runs"]));
+		$this->assertEquals(2, count($response["problems"]));
 	}
 }

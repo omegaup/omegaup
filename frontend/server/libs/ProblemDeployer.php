@@ -63,40 +63,37 @@ class ProblemDeployer {
 	 * @throws InvalidParameterException
 	 */
 	private function checkCases(ZipArchive $zip, array $zipFilesArray) {
-		// Necesitamos tener al menos 1 input
-		$inputs = 0;
-		$outputs = 0;
+		// Necesitamos tener al menos 1 caso
+		$cases = 0;
 
-		// Add all files in cases/ that end either in .in or .out        
+		// Add all files in cases/ that end either in .in or .out
 		for ($i = 0; $i < count($zipFilesArray); $i++) {
 			$path = $zipFilesArray[$i];
 
 			if (strpos($path, "cases/") == 0) {
-				$isInput = $this->endsWith($path, ".in", true);
-				$isOutput = $this->endsWith($path, ".out", true);
+				if ($this->endsWith($path, ".in", true)) {
+					$outPath = substr($path, 0, strlen($path) - 3) . ".out";
+					$idx = $zip->locateName($outPath, ZipArchive::FL_NOCASE);
 
-				if ($isInput || $isOutput) {
-					$this->filesToUnzip[] = $path;
-					$this->casesFiles[] = $path;
-				}
-
-				if ($isInput) {
-					$inputs++;
-				} else if ($isOutput) {
-					$outputs++;
+					if ($idx !== FALSE) {
+						$cases++;
+						$this->filesToUnzip[] = $path;
+						$this->casesFiles[] = $path;
+						$this->filesToUnzip[] = $zipFilesArray[$idx];
+						$this->casesFiles[] = $zipFilesArray[$idx];
+					} else {
+						throw new InvalidParameterException(
+							"Output for \"$path\" not found.");
+					}
 				}
 			}
 		}
 
-		if ($inputs < 1) {
-			throw new InvalidParameterException("0 inputs found. At least 1 input is needed.");
+		if ($cases == 0) {
+			throw new InvalidParameterException("No cases found.");
 		}
 
-		Logger::log($inputs . " found, " . $outputs . "found ");
-
-		if ($this->hasValidator === false && $inputs != $outputs) {
-			throw new InvalidParameterException("Inputs/Outputs mistmatch: " . $inputs . " found, " . $outputs . "found ");
-		}
+		Logger::log($cases . " cases found.");
 
 		return true;
 	}

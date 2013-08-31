@@ -48,7 +48,7 @@
 			var html = "";
 			for (var i = 0; i < problems.results.length; i++) {
 				html += "<tr>"
-					+ "<td><b><a href='/arena/problem/" + problems.results[i].alias  + "/'>" + problems.results[i].title + "</a></b></td>"										
+					+ "<td><b><a href='/arena/problem/" + problems.results[i].alias  + "/'>" + omegaup.escape(problems.results[i].title) + "</a></b></td>"										
 					+ '<td>'+ ((problems.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
 					+ '<td><a href="/problemedit.php?problem=' + problems.results[i].alias  + '">Editar</a></td>'
 					+ '<td><a href="/addproblemtocontest.php?problem=' + problems.results[i].alias  + '">Agregar a concurso</a></td>'					

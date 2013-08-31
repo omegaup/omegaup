@@ -101,15 +101,12 @@
 		username = $("#user").val();
 		omegaup.addUserToContest(contestAlias, username, function(response) {
 			if (response.status == "ok") {
-				$('#status').text("Usuario agregado con éxito");
-				$('#status').removeClass("alert-danger").addClass("alert-success");
-				$('#status').slideDown();
+				OmegaUp.ui.success("User successfully added!");
+				$('div.post.footer').show();
 				
 				updateContestUsers();
 			} else {
-				$('#status').text("Error aregando usuario: " + response.error);
-				$('#status').removeClass("alert-success").addClass("alert-danger");
-				$('#status').slideDown();
+				OmegaUp.ui.error(response.error || 'error');
 			}
 		});
 		return false; // Prevent refresh

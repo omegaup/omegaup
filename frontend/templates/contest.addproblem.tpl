@@ -53,14 +53,11 @@
 			
 			omegaup.addProblemToContest(contestAlias, order, problemAlias, points, function(response){
 				if (response.status == "ok") {
-					$('#status').text("Problema agregado con éxito");
-					$('#status').addClass("alert-success");
-					$('#status').slideDown();
+					OmegaUp.ui.success("Problem successfully added!");
+					$('div.post.footer').show();
 					return;
 				} else {
-					$('#status').text("Error agregando problema: " + response.error);
-					$('#status').addClass("alert-danger");
-					$('#status').slideDown();
+					OmegaUp.ui.error(response.error || 'Error');
 				}
 			});
 			

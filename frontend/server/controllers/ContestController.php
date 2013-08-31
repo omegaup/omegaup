@@ -455,7 +455,7 @@ class ContestController extends Controller {
 		}
 
 		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
-		Validators::isStringOfMaxLength($r["alias"], "alias", 32, $is_required);
+		Validators::isValidAlias($r["alias"], "alias", $is_required);
 		Validators::isNumberInRange($r["scoreboard"], "scoreboard", 0, 100, $is_required);
 		Validators::isNumberInRange($r["points_decay_factor"], "points_decay_factor", 0, 1, $is_required);
 		Validators::isInEnum($r["partial_score"], "partial_score", array("0", "1"), false);

@@ -19,6 +19,15 @@
 		<div class="panel panel-default">
 			<div id="ranking-chart"></div>
 		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">					
+				<h3 class="panel-title">Últimos blog posts</h3>
+			</div>
+			<div class="panel-body">
+				<div id="blog-posts" class="media">Cargando...</div>
+			</div>
+		</div>
 	</div>
 	
 	<div class="col-md-4">
@@ -37,14 +46,19 @@
 				</div>
 			</div>
 		</div>
+		
 		<div class="panel panel-default">
-			<div class="panel-heading">					
-				<h3 class="panel-title">Últimos blog posts</h3>
+			<div class="panel-heading">
+				<h3 class="panel-title">Próximos concursos</h3>
 			</div>
-			<div class="panel-body">
-				<div id="blog-posts" class="media">Cargando...</div>
-			</div>
+			<ul class="list-group" id="next-contests-list">			
+		    </ul>
 		</div>
+		
+		{if $LOGGED_IN eq '1'} 
+			{include file='rank.table.tpl' count=5}
+		{/if}
+		
 	</div>
 </div>
 
@@ -97,7 +111,22 @@
 	  // Calling load sends the request off.  It requires a callback function.
 	  feed.load(feedLoaded);
 	  
-	  omegaup.runCounts(createChart);	  	  
+	  omegaup.runCounts(createChart);
+	  
+	  omegaup.getContests(function (data) {
+		var list = data.results;
+		var now = new Date();
+		
+		for (var i = 0, len = list.length; i < len && i < 10; i++) {
+			var start = list[i].start_time;
+			var end = list[i].finish_time;
+			
+			if (end > now) {
+				$('#next-contests-list').append('<a href="/arena" class="list-group-item">' + omegaup.escape(list[i].title) + '</a>');
+			}
+		}
+	  
+	  });
 	}
 	
 	function createChart(series) {

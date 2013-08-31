@@ -151,9 +151,26 @@ class Scoreboard {
 			
 			// Cache scoreboard if there are no pending runs.
 			if ($cacheable_for_contestant && $can_use_contestant_cache) {
-				$contestantScoreboardCache->set($result, APC_USER_CACHE_SCOREBOARD_TIMEOUT);
+				
+				$timeout = APC_USER_CACHE_SCOREBOARD_TIMEOUT;
+				
+				if ($contest->hasFinished()) {
+					// Cache the scoreboard until the end of time (or a redjudge, whatever happens first)
+					$timeout = 0;
+				}
+				
+				$contestantScoreboardCache->set($result, $timeout);
+				
 			} else if ($cacheable_for_admin && $can_use_admin_cache) {
-				$adminScoreboardCache->set($result, APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT);
+				
+				$timeout = APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT;
+				
+				if ($contest->hasFinished()) {
+					// Cache the scoreboard until the end of time (or a redjudge, whatever happens first)
+					$timeout = 0;
+				}
+				
+				$adminScoreboardCache->set($result, $timeout);
 			}
 		}
 

@@ -52,7 +52,7 @@ $(document).ready(function() {
 		$('#root').fadeIn('slow');
 	} else {
 		omegaup.getContest(contestAlias, function(contest) {
-			$('#title .contest-title').html(contest.title);
+			$('#title .contest-title').html(omegaup.escape(contest.title));
 
 			currentContest = contest;
 
@@ -64,7 +64,7 @@ $(document).ready(function() {
 
 			for (var idx in contest.problems) {
 				var problem = contest.problems[idx];
-				var problemName = String.fromCharCode(letter) + '. ' + problem.title;
+				var problemName = String.fromCharCode(letter) + '. ' + omegaup.escape(problem.title);
 
 				problems[problem.alias] = problem;
 
@@ -261,13 +261,13 @@ $(document).ready(function() {
 			function update(problem) {
 				$('#summary').hide();
 				$('#problem').show();
-				$('#problem > .title').html(problem.letter + '. ' + problem.title);
+				$('#problem > .title').html(problem.letter + '. ' + omegaup.escape(problem.title));
 				$('#problem .data .points').html(problem.points);
 				$('#problem .validator').html(problem.validator);
 				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 				$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
 				$('#problem .statement').html(problem.problem_statement);
-				$('#problem .source span').html(problem.source);
+				$('#problem .source span').html(omegaup.escape(problem.source));
 				$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
 
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
@@ -390,7 +390,7 @@ $(document).ready(function() {
 			
 			// update a user's row
 			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
-			$('.user', r).html(rank.username + ' (' + rank.name + ')');
+			$('.user', r).html(rank.username + ' (' + omegaup.escape(rank.name) + ')');
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;
@@ -681,11 +681,11 @@ $(document).ready(function() {
 			$('.problem', r).html(clarification.problem_alias);
 			$('.author', r).html(clarification.author);
 			$('.time', r).html(clarification.time);
-			$('.message', r).html(clarification.message);
-			$('.answer', r).html(clarification.answer);
+			$('.message', r).html(omegaup.escape(clarification.message));
+			$('.answer', r).html(omegaup.escape(clarification.answer));
 
 			if (!clarification.answer) {
-				notify(clarification.author + " - " + clarification.problem_alias, clarification.message, r[0], clarification.clarification_id);
+				notify(clarification.author + " - " + clarification.problem_alias, omegaup.escape(clarification.message), r[0], clarification.clarification_id);
 			}
 
 			if (clarification.can_answer) {

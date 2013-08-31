@@ -1,6 +1,5 @@
 <?php
-class SessionManager
-{
+class SessionManager {
 	public function setCookie($name, $value = null, $expire = null, $path = null, $domain = null, $secure = null, $httponly = null) {
 		$_COOKIE[$name] = $value;
 		setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
@@ -16,6 +15,6 @@ class SessionManager
 	}
 
 	public function sessionStart() {
-		session_start();
+		@session_start();
 	}
 }

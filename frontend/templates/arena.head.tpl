@@ -7,7 +7,6 @@
 		<script type="text/javascript" src="/js/jquery.ba-hashchange.js"></script>
 		<script type="text/javascript" src="/js/jquery.gritter.min.js"></script>
 		<script type="text/javascript" src="/js/jquery.tableSort.js"></script>
-		<script type="text/javascript" src="/js/jquery.msgBox.js"></script>
 		<script type="text/javascript" src="/js/highstock.js"></script>
 		<script type="text/javascript" src="/js/sugar.js"></script>
 		<script type="text/javascript" src="/js/sugar.es.js"></script>
