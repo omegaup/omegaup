@@ -31,7 +31,7 @@ OmegaUp.ui = {
 			.removeClass('alert-success')
 			.removeClass('alert-info')
 			.addClass('alert-danger')
-			.fadeIn();
+			.slideDown();
 	},
 
 	info: function(message) {
@@ -41,7 +41,7 @@ OmegaUp.ui = {
 			.removeClass('alert-danger')
 			.removeClass('alert-info')
 			.addClass('alert-info')
-			.fadeIn();
+			.slideDown();
 	},
 
 	success: function(message) {
@@ -51,11 +51,11 @@ OmegaUp.ui = {
 			.removeClass('alert-danger')
 			.removeClass('alert-success')
 			.addClass('alert-success')
-			.fadeIn();
+			.slideDown();
 	},
 	
 	dismissNotifications: function() {
-		$('#status').fadeOut();
+		$('#status').slideUp();
 	}
 };
 
