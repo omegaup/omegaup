@@ -2,6 +2,8 @@
 
 locale = "es"
 
+
+# Login page - login.tpl
 loginHeader = "Inicia sesi&oacute;n en omegaUp"
 loginFederated = "Cuenta en otros sitios"
 loginNative = "Cuenta omegaUp"
@@ -12,24 +14,26 @@ loginSignupHeader = "Crea una cuenta omegaUp, &#161;es f&aacute;cil y r&aacute;p
 loginUsername = "Usuario"
 loginEmail = "E-mail"
 loginRepeatPassword = "Repetir contrase&ntilde;a"
-loginViewProfile = "Mi perfil"
+loginLogIn = "Inicia sesi&oacute;n"
+loginSignUp = "Registrar"
 
-logIn = "Inicia sesion"
-logOut = "Cerrar Sesion"
+# Navbar - common.navbar.tpl
+navContests = "Concursos"
+navMyContests = "Mis concursos"
+navMyProblems = "Mis problemas"
+navArena = "Arena"
+navProblems = "Problemas"
+navRanking = "Rank"
+navRecent = "Actividad Reciente"
+navDevelopers = "Desarrolladores"
+navHelp = "Ayuda"
+navQuestions = "Preguntas"
+navBlog = "Blog"
+navLogIn = "Inicia sesi&oacute;n"
+navLogOut = "Cerrar sesi&oacute;n"
+navViewProfile = "Mi perfil"
 
-frontPageContests = "Concursos"
-frontPageMyContests = "Mis concursos"
-frontPageMyProblems = "Mis problemas"
-frontPageArena = "Arena"
-frontPageProblems = "Problemas"
-frontPageRanking = "Rank"
-frontPageRecent = "Actividad Reciente"
-frontPageDevelopers = "Desarrolladores"
-frontPageHelp = "Ayuda"
-
-frontPageQuestions = "Preguntas"
-frontPageBlog = "Blog"
-
+# Index - index.tpl
 frontPageWelcome = "&iexcl;Bienvenido!"
 frontPageDescription = "omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en America Latina mediante la resolucion de problemas de algoritmos, con un enfoque competitivo y divertido a la vez."
 frontPageCreateContestButton = "&iexcl;Crea tu propio concurso en omegaUp!"
@@ -37,14 +41,14 @@ frontPageLoading = "Cargando..."
 frontPageBlogPosts = "Últimos blog posts"
 frontPageNextContests = "Próximos concursos"
 
+# Rank - rank.table.tpl
 rankHeaderPreCount = "Top"
 rankHeaderPostCount = "usuarios con más problemas resueltos"
 rankUser = "Usuario"
 rankSolved = "Problemas Resueltos"
 rankViewFull = "Ver rank completo"
 
-
-
+# Profile - profile.tpl
 profileEdit = "Editar perfil"
 profileInfo = "Info"
 profileContests = "Concursos"
@@ -60,3 +64,10 @@ profileSchool = "Escuela"
 profileGraduationDate = "Fecha de graduaci&oacute;n"
 profileStatistics = "Estadísticas"
 
+# Contests - contest.tpl & contest.list.tpl
+contestsCreateNew = "Crear un concurso"
+contestsJoinScoreboards = "Unir scoreboards"
+contestsTableTitle = "T&iacute;tulo"
+contestsTableStart = "Inicio"
+contestsTableEnd = "Fin"
+contestsTablePublic = "P&uacute;blico"

@@ -7,22 +7,22 @@
 							</a>
 						</div>
 						<ul class="nav navbar-nav">
-							<li id="nav-arena"{if isset($currentSection) && $currentSection == 'arena'} class="active"{/if}><a href='/arena'>{#frontPageArena#}</a></li>
+							<li id="nav-arena"{if isset($currentSection) && $currentSection == 'arena'} class="active"{/if}><a href='/arena'>{#navArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
-								<li id="nav-contests"><a href='/contests.php'>{#frontPageMyContests#}</a></li>
+								<li id="nav-contests"><a href='/contests.php'>{#navMyContests#}</a></li>
 								<li id="nav-problems">
-									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#frontPageProblems#}</span><span class="caret"></span></a>
+									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#navProblems#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
-										<li><a href="/myproblems.php">{#frontPageMyProblems#}</a></li>
-										<li><a href="/probs.php">{#frontPageProblems#}</a></li>
+										<li><a href="/myproblems.php">{#navMyProblems#}</a></li>
+										<li><a href="/probs.php">{#navProblems#}</a></li>
 									</ul>
 								</li>
 							{else}
-								<li id="nav-problems"><a href='/probs.php'>{#frontPageProblems#}</a></li>
+								<li id="nav-problems"><a href='/probs.php'>{#navProblems#}</a></li>
 							{/if}
-							<li id="nav-rank"><a href='/rank.php'>{#frontPageRanking#}</a></li>
-							<li><a href='http://blog.omegaup.com/'>{#frontPageBlog#}</a></li>
-							<li><a href='https://omegaup.com/preguntas/'>{#frontPageQuestions#}</a></li>
+							<li id="nav-rank"><a href='/rank.php'>{#navRanking#}</a></li>
+							<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
+							<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
 						</ul>
 						
 						<ul class="nav navbar-nav navbar-right">
@@ -30,12 +30,12 @@
 								<li class="dropdown">
 								<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown"><span>{$CURRENT_USER_GRAVATAR_URL_32}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
 									<ul class="dropdown-menu">
-									 <li><a href='/profile.php'>{#loginViewProfile#}</a></li>
-									 <li><a href='/logout.php'>{#logOut#}</a></li>
+									 <li><a href='/profile.php'>{#navViewProfile#}</a></li>
+									 <li><a href='/logout.php'>{#navLogOut#}</a></li>
 									</ul>
 								</li>	
 							{else}
-								<li><a href='/login.php'>{#logIn#}</a></li>
+								<li><a href='/login.php'>{#navLogIn#}</a></li>
 							{/if}
 							
 							{if $CURRENT_USER_IS_ADMIN eq '1'}

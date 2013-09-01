@@ -5,10 +5,10 @@
 	
 	<table class="table">
 		<thead>
-			<th>Título</th>
-			<th>Inicio</th>
-			<th>Fin</th>
-			<th>Público</th>
+			<th>{#contestsTableTitle#}</th>
+			<th>{#contestsTableStart#}</th>
+			<th>{#contestsTableEnd#}</th>
+			<th>{#contestsTablePublic#}</th>
 			<th></th>
 			<th></th>
 			<th></th>

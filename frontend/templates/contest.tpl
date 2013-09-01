@@ -5,8 +5,8 @@
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="bottom-margin">
-			<a href="/contestcreate.php" class="btn btn-primary" id="contest-create">Crear un concurso</a>
-			<a href="/scoreboardmerge.php" class="btn btn-default" id="scoreboard-merge">Unir scoreboards</a>
+			<a href="/contestcreate.php" class="btn btn-primary" id="contest-create">{#contestsCreateNew#}</a>
+			<a href="/scoreboardmerge.php" class="btn btn-default" id="scoreboard-merge">{#contestsJoinScoreboards#}</a>
 		</div>
 
 		<div id="parent_contest_list">

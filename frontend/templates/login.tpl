@@ -35,7 +35,7 @@
 							<a href="login.php" class="btn btn-link col-md-4">{#loginRecover#}</a>
 						</div>
 						<div class="col-md-6">
-							<button class="btn btn-primary form-control" type='submit'>{#logIn#}</button>
+							<button class="btn btn-primary form-control" type='submit'>{#loginLogIn#}</button>
 						</div>
 					</div>
 				</form>
@@ -84,7 +84,7 @@
 				<div class="row">
 					<div class="col-md-4 col-md-offset-6">
 						<div class="form-group">
-							<button class="btn btn-primary form-control" type='submit'>Registrar</button>
+							<button class="btn btn-primary form-control" type='submit'>{#loginSignUp#}</button>
 							<input id='' name='request' value='register' type='hidden'>
 						</div>
 					</div>
