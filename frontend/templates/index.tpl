@@ -6,12 +6,10 @@
 	<div class="col-md-8">
 		<div class="panel panel-default">
 			<div class="jumbotron no-bottom-margin">
-				<h1>&iexcl;Bienvenido!</h1>
-				<p>
-					omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en America Latina mediante la resolucion de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.
-				</p>
+				<h1>{#frontPageWelcome#}</h1>
+				<p>{#frontPageDescription#}</p>
 				<div class="text-center">
-					<a href="contestcreate.php" class="btn btn-primary btn-lg" id="contest-create">&iexcl;Crea tu propio concurso en omegaUp!</a>
+					<a href="contestcreate.php" class="btn btn-primary btn-lg" id="contest-create">{#frontPageCreateContestButton#}</a>
 				</div>
 			</div>
 		</div>
@@ -22,10 +20,10 @@
 		
 		<div class="panel panel-default">
 			<div class="panel-heading">					
-				<h3 class="panel-title">Últimos blog posts</h3>
+				<h3 class="panel-title">{#frontPageBlogPosts#}</h3>
 			</div>
 			<div class="panel-body">
-				<div id="blog-posts" class="media">Cargando...</div>
+				<div id="blog-posts" class="media">{#frontPageLoading#}</div>
 			</div>
 		</div>
 	</div>
@@ -49,7 +47,7 @@
 		
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title">Próximos concursos</h3>
+				<h3 class="panel-title">{#frontPageNextContests#}</h3>
 			</div>
 			<ul class="list-group" id="next-contests-list">			
 		    </ul>

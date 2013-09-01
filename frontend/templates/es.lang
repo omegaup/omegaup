@@ -1,6 +1,7 @@
 #this is config file comment
 
-pageTitle = "Bienvenido a omegaUp"
+locale = "es"
+
 loginHeader = "Inicia sesi&oacute;n en omegaUp"
 loginFederated = "Cuenta en otros sitios"
 loginNative = "Cuenta omegaUp"
@@ -29,12 +30,33 @@ frontPageHelp = "Ayuda"
 frontPageQuestions = "Preguntas"
 frontPageBlog = "Blog"
 
+frontPageWelcome = "&iexcl;Bienvenido!"
+frontPageDescription = "omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en America Latina mediante la resolucion de problemas de algoritmos, con un enfoque competitivo y divertido a la vez."
+frontPageCreateContestButton = "&iexcl;Crea tu propio concurso en omegaUp!"
+frontPageLoading = "Cargando..."
+frontPageBlogPosts = "Últimos blog posts"
+frontPageNextContests = "Próximos concursos"
+
+rankHeaderPreCount = "Top"
+rankHeaderPostCount = "usuarios con más problemas resueltos"
+rankUser = "Usuario"
+rankSolved = "Problemas Resueltos"
+rankViewFull = "Ver rank completo"
+
+
+
 profileEdit = "Editar perfil"
+profileInfo = "Info"
+profileContests = "Concursos"
+profileContestsTableContest = "Concurso"
+profileContestsTablePlace = "Lugar"
+profileSolvedProblems = "Problemas resueltos"
+profileSolvedProblemsTableTitle = "T&iacute;tulo"
 profileUsername = "Nombre de usuario"
 profileEmail = "Correo"
 profileCountry = "Pa&iacute;s"
 profileState = "Estado"
 profileSchool = "Escuela"
 profileGraduationDate = "Fecha de graduaci&oacute;n"
+profileStatistics = "Estadísticas"
 
-locale = "es"

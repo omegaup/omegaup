@@ -20,7 +20,7 @@
 	<div class="col-md-10 no-right-padding">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h2 class="panel-title">Mi info</h2>
+				<h2 class="panel-title">{#profileInfo#}</h2>
 			</div>
 			<div class="panel-body">
 				<div id="SettingsPage_Content">
@@ -66,14 +66,14 @@
 						
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h2 class="panel-title">Concursos <span class="badge" id="contests-total">0</span></h2>
+				<h2 class="panel-title">{#profileContests#} <span class="badge" id="contests-total">0</span></h2>
 			</div>				
 			<table class="table table-striped" id="contest-results">
 				<thead>
 					<tr>
-						<th>Concurso</th>
-						<th>Lugar</th>							
-					</tr>						
+						<th>{#profileContestsTableContest#}</th>
+						<th>{#profileContestsTablePlace#}</th>							
+					</tr>
 				</thead>
 				<tbody>
 					
@@ -84,14 +84,14 @@
 						
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h2 class="panel-title">Problemas resueltos <span class="badge" id="problems-solved-total">0</span></h2>
+				<h2 class="panel-title">{#profileSolvedProblems#} <span class="badge" id="problems-solved-total">0</span></h2>
 			</div>				
 			<table class="table table-striped" id="problems-solved">
 				<thead>
 					<tr>
-						<th>Título</th>
-						<th>Título</th>
-						<th>Título</th>							
+						<th>{#profileSolvedProblemsTableTitle#}</th>
+						<th>{#profileSolvedProblemsTableTitle#}</th>
+						<th>{#profileSolvedProblemsTableTitle#}</th>							
 					</tr>						
 				</thead>
 				<tbody>
@@ -103,7 +103,7 @@
 		
 		<div class="panel panel-default no-bottom-margin">
 			<div class="panel-heading">
-				<h2 class="panel-title">Estadísticas</h2>
+				<h2 class="panel-title">{#profileStatistics#}</h2>
 			</div>
 			<div class="panel-body">
 				<div id="veredict-chart"><img src="/media/wait.gif" /></div>
