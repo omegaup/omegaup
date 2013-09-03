@@ -31,7 +31,7 @@ $(document).ready(function() {
 					'<td>' + omegaup.escape(list[i].description) + '</td>' +
 					'<td class="no-wrap"><a href="' + makeWorldClockLink(start) + '">' + start.long() + '</a></td>' +
 					'<td class="no-wrap"><a href="' + makeWorldClockLink(end) + '">' + end.long() + '</a></td>' + 
-					'<td class="no-wrap">' + convertSecondsToReadableTime(list[i].duration) + '</td>' +
+					'<td class="no-wrap">' + toHHMM(list[i].duration) + '</td>' +
 					'<td>' + (end < now ? '<a href="/arena/' + list[i].alias + '/practice/">Práctica</a>' : '') + '</td>' +
 				'</tr>')
 			);

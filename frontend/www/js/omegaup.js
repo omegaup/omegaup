@@ -1070,3 +1070,17 @@ $(document).ajaxError(function(e, xhr, settings, exception) {
 		console.error(settings.url, xhr.status, xhr.responseText);
 	}
 });
+
+// From http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
+function toHHMM(duration) {
+    var sec_num = parseInt(duration, 10); 
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+    
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+	
+    var time    = hours+'h '+minutes+'m';
+    return time;
+}
