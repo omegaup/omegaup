@@ -31,16 +31,15 @@
 	<div class="col-md-4">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title">Coder del mes de Julio</h3>
+				<h3 class="panel-title">Coder del mes de Agosto</h3>
 			</div>
 			<div id="coder_of_the_month" class="panel-body">
 				<div class="rss_element">
-					<h4 class="text-center"><a href="/profile/charlyhlms">charlyhlms</a></h4>
-					<div class="text-center"><a href="/profile/charlyhlms"><img src="https://secure.gravatar.com/avatar/7df78198980cb6d47468da1cd95f5695?s=92/"></a></div>
-					<div><b>Carlos Galeana</b></div>
-					<div>Colegio Carol Baur</div>
-					<div>Distrito Federal, México</div>
-					<div>12 problemas resueltos en Julio</div>
+					<h4 class="text-center"><a href="/profile/andreaacevedomejia">andreaacevedomejia</a></h4>
+					<div class="text-center"><a href="/profile/andreaacevedomejia"><img src="https://secure.gravatar.com/avatar/d9fed22ef4367ee8447702b409347947?s=92/"></a></div>
+					<div><b>Andrea Acevedo Mejía</b></div>					
+					<div>Aguascalientes, México</div>
+					<div>12 problemas resueltos en Agosto</div>
 				</div>
 			</div>
 		</div>
