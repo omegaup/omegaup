@@ -6,7 +6,9 @@
  * @author joemmanuel
  */
 class UITools {
-	
+
+	public static $IsLoggedIn = false;
+
 	/**
 	 * Set rank by problems solved
 	 * 
@@ -15,12 +17,37 @@ class UITools {
 	 * @param int $rowcount
 	 */
 	public static function setRankByProblemsSolved(Smarty $smarty, $offset, $rowcount) {
-		
+
 		$rankRequest = new Request(array("offset" => $offset, "rowcount" => $rowcount));
-		$response = UserController::getRankByProblemsSolved($rankRequest);	
-		
+		$response = UserController::getRankByProblemsSolved($rankRequest);
+
 		$smarty->assign('rank', $response);
-		
 	}
+
+	/**
+	 * If user is not logged in, redirect to login page
+	 */
+	public static function redirectToLoginIfNotLoggedIn() {
+
+		if (self::$IsLoggedIn === false) {
+			header("Location: /login.php?redirect=" . $_SERVER["REQUEST_URI"]);
+			die();
+		}
+	}
+
+	/**
+	 * Set profile in smarty var
+	 * 
+	 * @param Smarty $smarty
+	 */
+	public static function setProfile(Smarty $smarty) {
+		$profileRequest = new Request(array(
+					"username" => $_REQUEST["username"],
+					"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN')
+				));
+		$response = UserController::apiProfile($profileRequest);
+		$smarty->assign('profile', $response);
+	}
+
 }
 

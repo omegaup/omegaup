@@ -7,11 +7,13 @@
 	<div class="col-md-2 no-right-padding" id="userbox">
 		<div class="panel panel-default" id="userbox-inner">
 			<div class="panel-heading">
-				<h2 class="panel-title">{$CURRENT_USER_USERNAME}</h2>
+				<h2 class="panel-title">{$profile.userinfo.username}</h2>
 			</div>
 			<div class="panel-body">
-				<div class="thumbnail bottom-margin">{$CURRENT_USER_GRAVATAR_URL_128}</div>
+				<div class="thumbnail bottom-margin"> <img src="{$profile.userinfo.gravatar_92}"/></div>
+				{if isset($profile.userinfo.email)}
 				<div id="profile-edit"><a href="useredit.php" class="btn btn-default">{#profileEdit#}</a></div>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -37,25 +39,26 @@
 
 						</div>
 						</li>
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileUsername#}</strong></span><span class="fbSettingsListItemContent fcg">https://omegaup.com/profile/<strong id="username-link">{$CURRENT_USER_USERNAME}</strong></span></a>
+						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileUsername#}</strong></span><span class="fbSettingsListItemContent fcg">https://omegaup.com/profile/<strong id="username-link">{$profile.userinfo.username}</strong></span></a>
 						<div class="content">
 						</div>
 						</li>
-						<li id="user-email-wrapper" class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>{#profileEmail#}</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong id="user-email">{$CURRENT_USER_EMAIL}</strong>&nbsp;</span></a>
+						{if isset($profile.userinfo.email)}
+						<li id="user-email-wrapper" class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>{#profileEmail#}</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong id="user-email">{$profile.userinfo.email}</strong>&nbsp;</span></a>
+						<div class="content">
+						</div>
+						</li>
+						{/if}
+						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileCountry#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-country">{$profile.userinfo.country}</strong></span></a>
 						<div class="content">
 						</div>
 						</li>
 
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileCountry#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-country">MX</strong></span></a>
-						<div class="content">
-						</div>
-						</li>
+						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileState#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-state">{$profile.userinfo.state}</strong></span></a>
 
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileState#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-state"></strong></span></a>
+						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileSchool#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-school">{$profile.userinfo.school}</strong></span></a>
 
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileSchool#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-school"></strong></span></a>
-
-						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileGraduationDate#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-graduation-date"></strong></span></a>
+						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profileGraduationDate#}</strong></span><span class="fbSettingsListItemContent fcg"><strong id="user-graduation-date">{$profile.userinfo.graduation_date}</strong></span></a>
 						<div class="content">
 						</div>
 						</li>
@@ -112,50 +115,7 @@
 																			
 	</div>
 	{/block}
-	<!--
-	<div class="post" style="width: 760px; min-height: 300px;">
-		<div class="copy" >
-
-			<h1>{$CURRENT_USER_USERNAME}</h1>
-			<div id="SettingsPage_Content">
-				<ul class="uiList fbSettingsList _4kg _6-h _4ks ">
-
-					<li class="fbSettingsListItem clearfix uiListItem">
-						<a class="pvm phs fbSettingsListLink clearfix" >
-							<span class="pls fbSettingsListItemLabel"><strong>Name</strong></span>
-							<span class="fbSettingsListItemContent fcg">
-								<input type="text" value="Alan">
-							</span>
-						</a>
-					<div class="content">
-
-					</div>
-					</li>
-					<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" rel="async"><span class="pls fbSettingsListItemLabel"><strong>Username</strong></span><span class="fbSettingsListItemContent fcg"> https://omegaup.com/<strong><input type="text" value="{$CURRENT_USER_USERNAME}"></strong></span></a>
-					<div class="content">
-					</div>
-					</li>
-					<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" rel="async"><span class="pls fbSettingsListItemLabel"><strong>Email</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong><input type="text" value="{$CURRENT_USER_EMAIL}"></strong>&nbsp;</span></a>
-					<div class="content">
-					</div>
-					</li>
-
-					<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>Language</strong></span><span class="fbSettingsListItemContent fcg">
-
-						<select>
-							<option>asdf</option>
-							<option>asdf</option>
-						</select>
-					</span></a>
-					<div class="content">
-					</div>
-					</li>
-				</ul>
-			</div>
-		</div>
-
-	</div>
-	-->
+	
 </div>
 
 <script>
@@ -168,7 +128,8 @@
 	omegaup.getUserStats(username, function(data) {		
 		window.run_counts_chart = oGraph.veredictCounts('veredict-chart', (username == null) ? "{$CURRENT_USER_USERNAME}" : username, data);	
 	});
-			
+	
+/*	
 	omegaup.getProfile(username, function(data) {
 		$('#userbox-inner .thumbnail').html("<img src=" + data.userinfo.gravatar_92 + "/>");
 		$('#userbox-inner h2').html(data.userinfo.username);
@@ -182,7 +143,7 @@
 		$('#user-school').html(data.userinfo.school == null ? "" : omegaup.escape(data.userinfo.school));
 		$('#user-graduation-date').html(data.userinfo.graduation_date == null ? "" : onlyDateToString(data.userinfo.graduation_date));
 	});
-	
+*/	
 	omegaup.getContestStatsForUser(username, function(data){
 		$('#contest-results-wait').hide();
 		t=0;	

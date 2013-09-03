@@ -120,6 +120,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	}
 	$smarty->configLoad(__DIR__ . "/../templates/es.lang");
 	$smarty->assign("LOGGED_IN", "0");
+	UITools::$IsLoggedIn = false;
 	$smarty->assign("FB_URL", SessionController::getFacebookLoginUrl());
 
 	if(defined("OMEGAUP_GA_TRACK")  && OMEGAUP_GA_TRACK ){
@@ -132,6 +133,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	$c_Session = new SessionController;
 	if ($c_Session->CurrentSessionAvailable()) {
 		$smarty->assign("LOGGED_IN", "1");
+		UITools::$IsLoggedIn = true;
 		$a_CurrentSession = $c_Session->apiCurrentSession();
 		$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSession["username"]);
 		$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSession["email"]);
