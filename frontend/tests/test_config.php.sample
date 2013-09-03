@@ -17,7 +17,7 @@ define('OMEGAUP_SLAVE_DB_HOST',			'8.8.8.8');
 define('OMEGAUP_SLAVE_DB_NAME',			'omegaup');
 define('OMEGAUP_SLAVE_DB_DRIVER',		'mysqlt');
 define('OMEGAUP_EXPIRE_TOKEN_AFTER',		'8 HOUR');
-define('OMEGAUP_FORCE_REJUDGE_ON_PROBLEM_UPDATE',		true);
+define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE',		true);
 
 # ####################################
 # TEST CONFIG

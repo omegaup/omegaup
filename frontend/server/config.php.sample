@@ -40,7 +40,7 @@ define('IMAGES_URL_PATH',				'/img/');
 define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
 define('OMEGAUP_GRADER_RELOAD_CONFIG_URL',		'https://localhost:21680/reload-config/');
 define('OMEGAUP_GRADER_STATUS_URL',			'https://localhost:21680/status/');
-define('OMEGAUP_FORCE_REJUDGE_ON_PROBLEM_UPDATE',	true);
+define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE',	true);
 
 # ####################################
 # FACEBOOK LOGIN CONFIG

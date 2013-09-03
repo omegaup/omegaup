@@ -387,7 +387,7 @@ class ProblemController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		if (($requiresRejudge === true) && (OMEGAUP_FORCE_REJUDGE_ON_PROBLEM_UPDATE === true)) {
+		if (($requiresRejudge === true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE === true)) {
 
 			// We need to rejudge runs after an update, let's initialize the grader
 			self::initializeGrader();
