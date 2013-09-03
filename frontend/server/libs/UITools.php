@@ -46,6 +46,8 @@ class UITools {
 					"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN')
 				));
 		$response = UserController::apiProfile($profileRequest);
+		$response["userinfo"]["graduation_date"] = gmdate('d/m/Y', $response["userinfo"]["graduation_date"]);
+		$response["userinfo"]["birth_date"] = gmdate('d/m/Y', $response["userinfo"]["birth_date"]);
 		$smarty->assign('profile', $response);
 	}
 

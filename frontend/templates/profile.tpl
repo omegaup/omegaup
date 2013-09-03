@@ -129,21 +129,6 @@
 		window.run_counts_chart = oGraph.veredictCounts('veredict-chart', (username == null) ? "{$CURRENT_USER_USERNAME}" : username, data);	
 	});
 	
-/*	
-	omegaup.getProfile(username, function(data) {
-		$('#userbox-inner .thumbnail').html("<img src=" + data.userinfo.gravatar_92 + "/>");
-		$('#userbox-inner h2').html(data.userinfo.username);
-		$('#username-link').html(data.userinfo.username);
-		if (data.userinfo.username != '{$CURRENT_USER_USERNAME}') {
-			$('#user-email-wrapper').hide();
-			$('#profile-edit').hide();
-		}
-		$('#user-country').html(data.userinfo.country == null ? "" : data.userinfo.country);
-		$('#user-state').html(data.userinfo.state == null ? "" : data.userinfo.state);
-		$('#user-school').html(data.userinfo.school == null ? "" : omegaup.escape(data.userinfo.school));
-		$('#user-graduation-date').html(data.userinfo.graduation_date == null ? "" : onlyDateToString(data.userinfo.graduation_date));
-	});
-*/	
 	omegaup.getContestStatsForUser(username, function(data){
 		$('#contest-results-wait').hide();
 		t=0;	
