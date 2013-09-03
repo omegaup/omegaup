@@ -996,6 +996,18 @@ class UserController extends Controller {
 		if (!isset($r["rowcount"])) {
 			$r["rowcount"] = 100;
 		}
+				
+		return self::getRankByProblemsSolved($r);
+	}
+	
+	/**
+	 * Get rank by problems solved logic. It has its own func so 
+	 * it can be accesed internally without authentication
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function getRankByProblemsSolved(Request $r) {
 		
 		$rankCacheName =  $r["offset"] . '-' . $r["rowcount"];
 		$rankCache = new Cache(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName);

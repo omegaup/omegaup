@@ -52,10 +52,8 @@
 			<ul class="list-group" id="next-contests-list">			
 		    </ul>
 		</div>
-		
-		{if $LOGGED_IN eq '1'} 
-			{include file='rank.table.tpl' count=5}
-		{/if}
+				
+		{include file='rank.table.tpl' rank=$rank}		
 		
 	</div>
 </div>
