@@ -1,6 +1,6 @@
 <div class="wait_for_ajax panel panel-default" id="problems_list" >
 	<div class="panel-heading">
-		<h3 class="panel-title">{#rankHeaderPreCount#} {$count} {#rankHeaderPostCount#}</h3>
+		<h3 class="panel-title">{#rankHeaderPreCount#} {$rank.rank|@count} {#rankHeaderPostCount#}</h3>
 	</div>
 	<table class="table table-striped table-hover" id="rank-by-problems-solved">
 		<thead>
