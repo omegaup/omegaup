@@ -84,11 +84,45 @@ class UserController extends Controller {
 		$r["user"] = $user;
 		self::sendVerificationEmail($r);
 
+		self::registerToMailchimp($r);
+		
 		return array(
 			"status" => "ok",
 			"user_id" => $user->getUserId()
 		);
 	}
+	
+	
+	/**
+	 * Registers a user to Mailchimp
+	 * 
+	 * @param Request r
+	 */
+	private static function registerToMailchimp(Request $r) {			
+		
+		if (OMEGAUP_EMAIL_MAILCHIMP_ENABLE === true) {
+		
+			Logger::log("Adding user to Mailchimp.");
+
+			$MailChimp = new MailChimp(OMEGAUP_EMAIL_MAILCHIMP_API_KEY);
+			$result = $MailChimp->call('lists/subscribe', array(
+					'id'                => OMEGAUP_EMAIL_MAILCHIMP_LIST_ID,
+					'email'             => array('email'=> $r["email"]),
+					'merge_vars'        => array('FNAME'=>$r["user"]->getUsername()),
+					'double_optin'      => false,
+					'update_existing'   => true,
+					'replace_interests' => false,
+					'send_welcome'      => false,
+				));						
+			
+			if (array_key_exists("status", $result) && $result["status"] == "error") {
+				Logger::error("Mailchimp error result: " . implode(" | ", $result));
+			} else {
+				Logger::log("Mailchimp success result: " . implode(" | ", $result));
+			}				
+		}
+	}
+	
 
 	/**
 	 *

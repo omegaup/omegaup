@@ -54,6 +54,7 @@ require_once("libs/ZipStream.php");
 require_once("libs/ProblemDeployer.php");
 require_once('libs/phpmailer/class.phpmailer.php');
 require_once('libs/UITools.php');
+require_once('libs/Mailchimp/Mailchimp.php');
 
 /**
  * Load controllers

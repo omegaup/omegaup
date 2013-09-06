@@ -64,6 +64,9 @@ define('OMEGAUP_EMAIL_SMTP_USER',			'xxxx');
 define('OMEGAUP_EMAIL_SMTP_PASSWORD',			'xxxx');
 define('OMEGAUP_EMAIL_SMTP_PORT',			'xxxx');
 define('OMEGAUP_EMAIL_SMTP_FROM',			'xxxx');
+define('OMEGAUP_EMAIL_MAILCHIMP_ENABLE', false);
+define('OMEGAUP_EMAIL_MAILCHIMP_API_KEY', 'xxxx');
+define('OMEGAUP_EMAIL_MAILCHIMP_LIST_ID', 'xxxx');
 
 # ####################################
 # MEMCACHE CONFIG
