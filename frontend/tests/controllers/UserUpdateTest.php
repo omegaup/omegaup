@@ -25,7 +25,7 @@ class UserUpdateTest extends OmegaupTestCase {
 		$r["state_id"] = 3;
 		$r["scholar_degree"] = 'Maestría';
 		$r["birth_date"] = strtotime('1988-01-01');
-		$r["graduation_date"] = '2016-02-02';
+		$r["graduation_date"] = strtotime('2016-02-02');
 		
 		// Call api
 		$response = UserController::apiUpdate($r);
