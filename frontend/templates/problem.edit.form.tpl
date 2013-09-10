@@ -1,3 +1,7 @@
+{if !isset($IS_UPDATE)}
+	{assign "IS_UPDATE" 0}
+{/if}
+
 <form method='POST' action='{$smarty.server.REQUEST_URI}' id='problem_form' class="form" enctype="multipart/form-data">	
 	{if $IS_UPDATE eq 1}
 		<div class="row">

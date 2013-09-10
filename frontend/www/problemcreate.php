@@ -4,6 +4,7 @@ require_once("../server/bootstrap.php");
 require_once("api/ApiCaller.php");
 
 $smarty->assign('TITLE', "");
+$smarty->assign('ALIAS', "");
 $smarty->assign('VALIDATOR', "token-caseless");
 $smarty->assign('TIME_LIMIT', "1000");
 $smarty->assign('MEMORY_LIMIT', "32768");

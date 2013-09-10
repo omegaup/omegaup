@@ -1,3 +1,8 @@
+{if !isset($IS_UPDATE)}
+	{assign "IS_UPDATE" 0}
+{/if}
+
+
 <div class="panel panel-primary	">
 	<div class="panel-heading">
 		<h3 class="panel-title">
