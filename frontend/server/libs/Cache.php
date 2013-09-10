@@ -108,4 +108,36 @@ class Cache
         
         return null;
     }
+	
+	/**
+	 * 
+	 * If value exists from cache, get it from cache.
+	 * Otherwise, executes the $setFunc to generate a value that will be
+	 * stored in the cache and it will return it.
+	 * 
+	 * Returns true if cache was used, false if it had to be set
+	 * 
+	 * @param string $prefix
+	 * @param string $id
+	 * @param Request $r
+	 * @param callable $setFunc
+	 * @param int $timeout
+	 * @return boolean
+	 */
+	public static function getFromCacheOrSet($prefix, $id, Request $r, callable $setFunc, &$returnValue, $timeout = 0) {
+		
+		$cache = new Cache($prefix, $id); 
+		$returnValue = $cache->get(); 
+		
+		if (is_null($returnValue)) {
+			
+			$returnValue = $setFunc($r);			
+			$cache->set($returnValue, $timeout);
+			
+			return false;
+						
+		}
+		
+		return true;
+	}
 }

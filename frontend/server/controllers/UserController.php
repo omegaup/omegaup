@@ -688,37 +688,35 @@ class UserController extends Controller {
 
 		self::authenticateRequest($r);
 				
-		$user = self::resolveTargetUser($r);
-
-		$profileCache = new Cache(Cache::USER_PROFILE, $user->getUsername());
-		$response = $profileCache->get();
+		$r["user"] = self::resolveTargetUser($r);
 		
-		if (is_null($response)) {
+		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 
+										
 			$response = array();
 			$response["userinfo"] = array();
 			$response["problems"] = array();
 
-			$response["userinfo"]["username"] = $user->getUsername();		
-			$response["userinfo"]["name"] = $user->getName();
-			$response["userinfo"]["solved"] = $user->getSolved();
-			$response["userinfo"]["submissions"] = $user->getSubmissions();
-			$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
-			$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
-			$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
+			$response["userinfo"]["username"] = $r["user"]->getUsername();		
+			$response["userinfo"]["name"] = $r["user"]->getName();
+			$response["userinfo"]["solved"] = $r["user"]->getSolved();
+			$response["userinfo"]["submissions"] = $r["user"]->getSubmissions();
+			$response["userinfo"]["birth_date"] = is_null($r["user"]->getBirthDate()) ? null : strtotime($r["user"]->getBirthDate());
+			$response["userinfo"]["graduation_date"] = is_null($r["user"]->getGraduationDate()) ? null : strtotime($r["user"]->getGraduationDate());
+			$response["userinfo"]["scholar_degree"] = $r["user"]->getScholarDegree();
 
 			try {
-				$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+				$response["userinfo"]["email"] = EmailsDAO::getByPK($r["user"]->getMainEmailId())->getEmail();
 
-				$country = CountriesDAO::getByPK($user->getCountryId());
+				$country = CountriesDAO::getByPK($r["user"]->getCountryId());
 				$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
-				$response["userinfo"]["country_id"] = $user->getCountryId();
+				$response["userinfo"]["country_id"] = $r["user"]->getCountryId();
 
-				$state = StatesDAO::getByPK($user->getStateId());
+				$state = StatesDAO::getByPK($r["user"]->getStateId());
 				$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
-				$response["userinfo"]["state_id"] = $user->getStateId();
+				$response["userinfo"]["state_id"] = $r["user"]->getStateId();
 
-				$school = SchoolsDAO::getByPK($user->getSchoolId());
-				$response["userinfo"]["school_id"] = $user->getSchoolId();
+				$school = SchoolsDAO::getByPK($r["user"]->getSchoolId());
+				$response["userinfo"]["school_id"] = $r["user"]->getSchoolId();
 				$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
@@ -726,12 +724,11 @@ class UserController extends Controller {
 
 			$response["userinfo"]["gravatar_92"] = 'https://secure.gravatar.com/avatar/' . md5($response["userinfo"]["email"]) . '?s=92';
 			
-			// Save cache with infinity timeout
-			$profileCache->set($response, 0);
-		}
+			return $response;
+		}, $response);
 		
 		// Do not leak plain emails
-		if ($user->getUserId() !== $r['current_user_id']) {
+		if ($r["user"]->getUserId() !== $r['current_user_id']) {
 			unset($response["userinfo"]["email"]);
 		}
 		
@@ -1044,10 +1041,9 @@ class UserController extends Controller {
 	public static function getRankByProblemsSolved(Request $r) {
 		
 		$rankCacheName =  $r["offset"] . '-' . $r["rowcount"];
-		$rankCache = new Cache(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName);
-		$response = $rankCache->get();
 		
-		if (is_null($response)) {
+		$cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function(Response $r) {
+		
 			$response = array();
 			$response["rank"] = array();
 			try {
@@ -1063,11 +1059,14 @@ class UserController extends Controller {
 				}
 			}
 			
-			// Save cache
-			$rankCache->set($response, 0);
+			return $response;			
+		}, $response); 
+		
+		// If cache was set, we need to maintain a list of different ranks in the cache
+		// (A different rank means different offset and rowcount params
+		if ($cacheUsed === false) {
 			self::setProblemsSolvedRankCacheList($rankCacheName);
-			
-		}
+		}		
 		
 		$response["status"] = "ok";
 		return $response;
