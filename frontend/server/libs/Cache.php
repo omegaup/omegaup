@@ -124,7 +124,7 @@ class Cache
 	 * @param int $timeout
 	 * @return boolean
 	 */
-	public static function getFromCacheOrSet($prefix, $id, Request $r, callable $setFunc, &$returnValue, $timeout = 0) {
+	public static function getFromCacheOrSet($prefix, $id, Request $r, $setFunc, &$returnValue, $timeout = 0) {
 		
 		$cache = new Cache($prefix, $id); 
 		$returnValue = $cache->get(); 
