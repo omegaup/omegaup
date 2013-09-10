@@ -472,15 +472,7 @@ class UserController extends Controller {
 			$resetRequest["username"] = $username;
 			$resetRequest["password"] = $password;
 			self::apiChangePassword($resetRequest);
-		}
-
-		if (!is_null($r["contest_alias"])) {
-			$addUserRequest = new Request();
-			$addUserRequest["auth_token"] = $r["auth_token"];
-			$addUserRequest["usernameOrEmail"] = $username;
-			$addUserRequest["contest_alias"] = $r["contest_alias"];
-			ContestController::apiAddUser($addUserRequest);
-		}
+		}		
 	}
 
 	/**
@@ -491,65 +483,92 @@ class UserController extends Controller {
 	 */
 	public static function apiGenerateOmiUsers(Request $r) {
 
-		self::authenticateRequest($r);
-
-		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
-			throw new ForbiddenAccessException();
-		}
+		self::authenticateRequest($r);		
 
 		$response = array();
 
-		// Arreglo de estados de MX
-		$keys = array(
-			"AGU",
-			"BCN",
-			"BCS",
-			"CAM",
-			"COA",
-			"COL",
-			"CHP",
-			"CHH",
-			"DIF",
-			"DUR",
-			"GUA",
-			"GRO",
-			"HID",
-			"JAL",
-			"MEX",
-			"MIC",
-			"MOR",
-			"NAY",
-			"NLE",
-			"OAX",
-			"PUE",
-			"QUE",
-			"ROO",
-			"SLP",
-			"SIN",
-			"SON",
-			"TAB",
-			"TAM",
-			"TLA",
-			"VER",
-			"YUC",
-			"ZAC"
-		);
-
-
-		foreach ($keys as $k) {
-			$n = 4;
-			// El estado sede tiene 4 usuarios más
-			if ($k == "MEX") {
-				$n = 8;
+		if ($r["contest_type"] == "OMI") {
+			
+			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+				throw new ForbiddenAccessException();
 			}
+			
+			// Arreglo de estados de MX
+			$keys = array(
+				"AGU" => 4,
+				"BCN" => 4,
+				"BCS" => 4,
+				"CAM" => 4,
+				"COA" => 4,
+				"COL" => 4,
+				"CHP" => 4,
+				"CHH" => 4,
+				"DIF" => 4,
+				"DUR" => 4,
+				"GUA" => 4,
+				"GRO" => 4,
+				"HID" => 4,
+				"JAL" => 4,
+				"MEX" => 8,
+				"MIC" => 4,
+				"MOR" => 4,
+				"NAY" => 4,
+				"NLE" => 4,
+				"OAX" => 4,
+				"PUE" => 4,
+				"QUE" => 4,
+				"ROO" => 4,
+				"SLP" => 4,
+				"SIN" => 4,
+				"SON" => 4,
+				"TAB" => 4,
+				"TAM" => 4,
+				"TLA" => 4,
+				"VER" => 4,
+				"YUC" => 4,
+				"ZAC" => 4,
+			);
+		} else if ($r["contest_type"] == "ORIG") {
+			
+			if (!($r["current_user"]->getUsername() == "kuko.coder" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
+				throw new ForbiddenAccessException();
+			}
+			
+			$keys = array (				
+				"GTO-SFR" => 17,
+				"GTO-URI" => 25,
+				"GTO-IRA" => 19,
+				"GTO-LEO" => 22,
+				"GTO-VDS" => 17,
+				"GTO-GTO" => 13,
+				"GTO-CEL" => 14,
+				"GTO-SIL" => 19,
+				"GTO-PEN" => 19,
+			);
+			
+		} else {
+			throw new InvalidParameterException("Invalid contest_type");
+		}
+			
+		foreach ($keys as $k => $n) {
+						
 			for ($i = 1; $i <= $n; $i++) {
 
 				$username = $k . "-" . $i;
 				$password = self::randomString(8);
 
 				self::omiPrepareUser($r, $username, $password);
-				$response[$username] = $password;
-				// @TODO add to private contest
+		
+				// Add user to contest if needed
+				if (!is_null($r["contest_alias"])) {
+					$addUserRequest = new Request();
+					$addUserRequest["auth_token"] = $r["auth_token"];
+					$addUserRequest["usernameOrEmail"] = $username;
+					$addUserRequest["contest_alias"] = $r["contest_alias"];
+					ContestController::apiAddUser($addUserRequest);
+				}
+				
+				$response[$username] = $password;			
 			}
 		}
 
@@ -1042,7 +1061,7 @@ class UserController extends Controller {
 		
 		$rankCacheName =  $r["offset"] . '-' . $r["rowcount"];
 		
-		$cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function(Response $r) {
+		$cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function(Request $r) {
 		
 			$response = array();
 			$response["rank"] = array();
