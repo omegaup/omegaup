@@ -519,14 +519,9 @@ class ProblemController extends Controller {
 
 		// Read the file that contains the source
 		if ($r["problem"]->getValidator() != 'remote') {
-			$statementCache = new Cache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"]);
-			$file_content = null;
-
-			// check cache
-			$file_content = $statementCache->get();
-
-			if (is_null($file_content)) {
-
+			
+			Cache::getFromCacheOrSet(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"], $r, function(Request $r) {
+				
 				$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem"]->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r["lang"] . ".html";
 
 				try {
@@ -534,13 +529,14 @@ class ProblemController extends Controller {
 				} catch (Exception $e) {
 					throw new InvalidFilesystemOperationException($e);
 				}
-
-				// Add to cache
-				$statementCache->set($file_content, APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
-			}
+				
+				return $file_content;
+				
+			}, $file_content, APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);																
 
 			// Add problem statement to source
-			$response["problem_statement"] = $file_content;
+			$response["problem_statement"] = $file_content;						
+			
 		} else if ($r["problem"]->getServer() == 'uva') {
 			$response["problem_statement"] = '<iframe src="http://acm.uva.es/p/v' . substr($r["problem"]->getRemoteId(), 0, strlen($r["problem"]->getRemoteId()) - 2) . '/' . $r["problem"]->getRemoteId() . '.html"></iframe>';
 		}

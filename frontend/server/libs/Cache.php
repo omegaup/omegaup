@@ -21,6 +21,8 @@ class Cache
     
     private $enabled;
     protected $key;
+	
+	public static $cacheResults = true;
     
     /**
      * Inicializa el cache para el key dado 
@@ -129,15 +131,27 @@ class Cache
 		$cache = new Cache($prefix, $id); 
 		$returnValue = $cache->get(); 
 		
+		// If there wasn't a value in the cache for the key ($prefix, $id)
 		if (is_null($returnValue)) {
 			
-			$returnValue = $setFunc($r);			
-			$cache->set($returnValue, $timeout);
+			// Get the value from the function provided
+			$returnValue = $setFunc($r);
 			
+			// If the $setFunc() didn't disable the cache
+			if (self::$cacheResults === true) {
+				$cache->set($returnValue, $timeout);
+			} else {
+				// Reset value				
+				self::$cacheResults = true;
+			}
+			
+			// Cache was not used
 			return false;
 						
 		}
 		
+		// Cache was used
 		return true;
 	}
+	
 }

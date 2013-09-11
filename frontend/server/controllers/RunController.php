@@ -444,11 +444,8 @@ class RunController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}		
 		
-		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId());
-		$response = $runAdminDetailsCache->get();
-		
-		if (is_null($response))
-		{
+		Cache::getFromCacheOrSet(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId(), $r, function(Request $r) {
+			
 			$response = array();		
 
 			$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
@@ -489,10 +486,14 @@ class RunController extends Controller {
 			$response["status"] = "ok";
 			
 			// Save cache only if run was already graded
-			if ($r["run"]->getStatus() === 'ready') {
-				$runAdminDetailsCache->set($response, 0);
+			if ($r["run"]->getStatus() != 'ready') {
+				Cache::$cacheResults = false;
 			}
-		}
+			
+			return $response;;
+			
+		}, $response);
+		
 
 		return $response;
 	}
@@ -612,30 +613,31 @@ class RunController extends Controller {
 	 */
 	public static function apiCounts(Request $r) {
 		
-		$totalsCache = new Cache(Cache::RUN_COUNTS, "");
-		$totals = $totalsCache->get();
+		$totals = array();
 		
-		if (is_null($totals)) {
+		Cache::getFromCacheOrSet(Cache::RUN_COUNTS, "", $r, function(Request $r) {
+			
 			$totals = array();
 			$totals["total"] = array();
 			$totals["ac"] = array();
 			try {
 
-				// I don't like this approach but adodb didn't like too much to execute
-				// store procedures. anyways we will cache the totals
 				$date = date('Y-m-d', strtotime('1 days'));
-				for ($i = 0; $i < 30 * 6; $i++) {
+				
+				for ($i = 0; $i < 30 * 6 /*about 6 months*/; $i++) {
 					$totals["total"][$date] = RunsDAO::GetRunCountsToDate($date);
 					$totals["ac"][$date] = RunsDAO::GetAcRunCountsToDate($date);
 					$date = date('Y-m-d', strtotime('-'.$i.' days'));
 				}
+				
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
 			
-			$totalsCache->set($totals, 24*60*60);
-		}
-						
+			return $totals;
+			
+		}, $totals, 24*60*60 /*1 day*/);
+										
 		return $totals;
 	}
 	

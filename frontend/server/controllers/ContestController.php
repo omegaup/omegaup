@@ -211,12 +211,9 @@ class ContestController extends Controller {
 		self::authenticateRequest($r);
 
 		self::validateDetails($r);
-
-		// Check cache first
-		$cache = new Cache(Cache::CONTEST_INFO, $r["contest_alias"]);
-		$result = $cache->get();
-
-		if (is_null($result)) {
+		
+		Cache::getFromCacheOrSet(Cache::CONTEST_INFO, $r["contest_alias"], $r, function(Request $r) {
+			
 			// Create array of relevant columns
 			$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy", "public", "show_scoreboard_after");
 
@@ -270,9 +267,11 @@ class ContestController extends Controller {
 
 			// Add problems to response
 			$result['problems'] = $problemsResponseArray;
-
-			$cache->set($result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
-		}// closes if( $result == null )
+			
+			return $result;
+			
+		}, $result);
+																
 		// Adding timer info separately as it depends on the current user and we don't
 		// want this to get generally cached for everybody
 		// Save the time of the first access
