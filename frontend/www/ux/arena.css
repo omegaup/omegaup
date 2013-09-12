@@ -233,7 +233,8 @@ legend {
 	border: 1px solid #000;
 }
 #problem .statement .sample_io pre {
-	word-break: normal;
+	white-space: pre;
+	word-break: keep-all;
 	word-wrap: normal;
 	background: transparent;
 	border: 0px;
