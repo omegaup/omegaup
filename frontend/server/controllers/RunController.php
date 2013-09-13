@@ -274,12 +274,11 @@ class RunController extends Controller {
 		Logger::log("Invalidating scoreboard cache.");
 		
 		// Invalidar cache del contestant
-		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
-		$contestantScoreboardCache->delete();
+		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);		
 
 		// Invalidar cache del admin
-		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
-		$adminScoreboardCache->delete();
+		Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
+		
 	}
 
 	/**
@@ -381,8 +380,7 @@ class RunController extends Controller {
 		self::invalidateCacheOnRejudge($r["run"]);	
 		
 		// Expire details of the run
-		$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId());
-		$runAdminDetailsCache->delete();
+		Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId());		
 		
 		// Expire ranks
 		UserController::deleteProblemsSolvedRankCacheList();
@@ -410,8 +408,7 @@ class RunController extends Controller {
 			
 			if (!is_null($problem)) {
 				// Invalidar cache stats
-				$problemStatsCache = new Cache(Cache::PROBLEM_STATS, $problem->getAlias());
-				$problemStatsCache->delete();
+				Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->getAlias());				
 			}
 			
 		} catch (Exception $e) {

@@ -154,4 +154,16 @@ class Cache
 		return true;
 	}
 	
+	/**
+	 * Delete the entry defined by $prefix-$id
+	 * 
+	 * @param string $prefix
+	 * @param string $id
+	 */
+	public static function deleteFromCache($prefix, $id) {
+		
+		$cache = new Cache($prefix, $id);
+		$cache->delete();
+	}
+	
 }

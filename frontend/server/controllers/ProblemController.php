@@ -274,8 +274,8 @@ class ProblemController extends Controller {
 				self::$grader->Grade($run->getRunId());
 
 				// Expire details of the run
-				$runAdminDetailsCache = new Cache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());
-				$runAdminDetailsCache->delete();
+				Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());
+				
 			}
 		} catch (Exception $e) {
 			Logger::error("Failed to rejudge runs after problem update");
@@ -419,8 +419,7 @@ class ProblemController extends Controller {
 		$response["status"] = "ok";
 
 		// Invalidar cache @todo invalidar todos los lenguajes
-		$statementCache = new Cache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");
-		$statementCache->delete();
+		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");		
 
 		return $response;
 	}

@@ -530,8 +530,7 @@ class ContestController extends Controller {
 		}
 
 		// Invalidar cache
-		$contestCache = new Cache(Cache::CONTEST_INFO, $r["contest_alias"]);
-		$contestCache->delete();
+		Cache::deleteFromCache(Cache::CONTEST_INFO, $r["contest_alias"]);		
 
 		return array("status" => "ok");
 	}

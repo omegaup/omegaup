@@ -1019,8 +1019,7 @@ class UserController extends Controller {
 		}
 		
 		// Expire profile cache
-		$profileCache = new Cache(Cache::USER_PROFILE, $r["current_user"]->getUsername());
-		$profileCache->delete();
+		Cache::deleteFromCache(Cache::USER_PROFILE, $r["current_user"]->getUsername());		
 		
 		return array("status" => "ok");
 	}
@@ -1129,8 +1128,7 @@ class UserController extends Controller {
 			$rankCacheList->delete();
 			
 			foreach($ranksList as $key => $value) {
-				$rankCache = new Cache(Cache::PROBLEMS_SOLVED_RANK, $key);
-				$rankCache->delete();
+				Cache::deleteFromCache(Cache::PROBLEMS_SOLVED_RANK, $key);				
 			}
 		}
 	}
