@@ -1143,14 +1143,29 @@ class UserController extends Controller {
 		self::authenticateRequest($r);
 		
 		Validators::isEmail($r["email"], "email");
-		
-		// Get email of user
+				
 		try {
-			$email = EmailsDAO::getByPK($r["current_user"]->getMainEmailId());
-			
-			$email->setEmail($r["email"]);
-			
+			// Update email
+			$email = EmailsDAO::getByPK($r["current_user"]->getMainEmailId());			
+			$email->setEmail($r["email"]);			
 			EmailsDAO::save($email);
+			
+			// Add verification_id if not there
+			if ($r["current_user"]->getVerified() == '0') {
+				Logger::log("User not verified.");
+
+				if ($r["current_user"]->getVerificationId() == null) {
+
+					Logger::log("User does not have verification id. Generating.");
+
+					try {
+						$r["current_user"]->setVerificationId(self::randomString(50));
+						UsersDAO::save($r["current_user"]);
+					} catch (Exception $e) {
+						// best effort, eat exception
+					}					
+				}				
+			} 
 			
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
