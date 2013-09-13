@@ -439,7 +439,7 @@ class RunController extends Controller {
 
 		// Get the problem
 		try {
-			$problem = ProblemsDAO::getByPK($r["run"]->getProblemId());
+			$r["problem"] = ProblemsDAO::getByPK($r["run"]->getProblemId());
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}		
@@ -448,7 +448,7 @@ class RunController extends Controller {
 			
 			$response = array();		
 
-			$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
+			$problem_dir = PROBLEMS_PATH . '/' . $r["problem"]->getAlias() . '/cases/';
 			$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
 
 			$cases = array();
@@ -461,7 +461,7 @@ class RunController extends Controller {
 						if ($file == '.' || $file == '..' || !strstr($file, ".meta"))
 							continue;
 
-						$case = array('name' => str_replace(".meta", "", $file), 'meta' => self::ParseMeta(file_get_contents("$grade_dir/$file")));
+						$case = array('name' => str_replace(".meta", "", $file), 'meta' => RunController::ParseMeta(file_get_contents("$grade_dir/$file")));
 
 						if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
 							$out = str_replace(".meta", ".out", $file);
@@ -504,7 +504,7 @@ class RunController extends Controller {
 	 * @param string $meta
 	 * @return array
 	 */
-	private static function ParseMeta($meta) {
+	public static function ParseMeta($meta) {
 		$ans = array();
 
 		foreach (explode("\n", trim($meta)) as $line) {
