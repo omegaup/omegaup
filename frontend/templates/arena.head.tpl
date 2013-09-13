@@ -45,8 +45,9 @@
 		<link rel="stylesheet" href="/ux/arena.css" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 	</head>
-	<body{if $bodyid} id="{$bodyid}"{/if}>
+	<body{if isset($bodyid) and $bodyid} id="{$bodyid}"{/if}>
 		<!-- Generated from http://ajaxload.info/ -->
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		<div id="root">
 {include file='common.navbar.tpl' currentSection='arena'}
+{include file='status.tpl'}

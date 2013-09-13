@@ -1,6 +1,7 @@
 {include file='redirect.tpl'}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
+{include file='status.tpl'}
 
 <div class="panel panel-default">
 	<div class="panel-body">

@@ -1,5 +1,6 @@
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
+{include file='status.tpl'}
 
 <div id="parent_problems_list">
 	{include file='problems.list.tpl'}

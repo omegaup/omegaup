@@ -98,4 +98,22 @@ class UserProfileTest extends OmegaupTestCase {
 		
 		$this->assertEquals(2, count($response["problems"]));
 	}
+	
+	/**
+	 * Test update main email api
+	 */
+	public function testUpdateMainEmail() {
+		
+		$user = UserFactory::createUser();
+		
+		$r = new Request(array(
+			"auth_token" => self::login($user),
+			"email" => "new@email.com"
+		));
+		$response = UserController::apiUpdateMainEmail($r);
+		
+		// Check email in db
+		$user_in_db = UsersDAO::FindByEmail("new@email.com");
+		$this->assertEquals($user->getUserId(), $user_in_db->getUserId());		
+	}
 }

@@ -375,6 +375,28 @@ OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_i
 	});
 };
 
+OmegaUp.prototype.updateMainEmail = function(email, callback) {
+	
+	var self = this;
+
+	$.post(
+		'/api/user/updateMainEmail/',
+		{
+			email: email			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});	
+};
+
 OmegaUp.prototype.addProblemToContest = function(contestAlias, order, problemAlias, points, callback) {
 	var self = this;
 

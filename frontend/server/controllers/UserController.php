@@ -1132,6 +1132,37 @@ class UserController extends Controller {
 			}
 		}
 	}
-
+	
+	/**
+	 * Updates the main email of the current user
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiUpdateMainEmail(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		Validators::isEmail($r["email"], "email");
+		
+		// Get email of user
+		try {
+			$email = EmailsDAO::getByPK($r["current_user"]->getMainEmailId());
+			
+			$email->setEmail($r["email"]);
+			
+			EmailsDAO::save($email);
+			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		// Send verification email 
+		$r["user"] = $r["current_user"];
+		self::sendVerificationEmail($r);
+				
+		return array("status" => "ok");
+		
+	}
+	
 }
 

@@ -262,7 +262,7 @@ class EmailVerificationSendException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("There was an error sending the verification email. Please try again later. Your email is not verified yet.", "HTTP/1.1 403 FORBIDDEN", 601, $previous);
+		parent::__construct("There was an error sending the verification email. Please try again later or contact joe@omegaup.com for support. Your email is not verified yet.", "HTTP/1.1 403 FORBIDDEN", 601, $previous);
 	}
 
 }

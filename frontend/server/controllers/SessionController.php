@@ -117,6 +117,7 @@ class SessionController extends Controller {
 			'email_md5' => !is_null($vo_Email) ? md5($vo_Email->getEmail()) : '',
 			'username' => $vo_CurrentUser->getUsername(),
 			'auth_token' => $s_AuthToken,
+			'is_email_verified' => $vo_CurrentUser->getVerified(),
 			'is_admin' => Authorization::IsSystemAdmin($vo_CurrentUser->getUserId())
 		);
 	}
