@@ -1171,6 +1171,9 @@ class UserController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 		
+		// Delete profile cache 
+		Cache::deleteFromCache(Cache::USER_PROFILE, $r["current_user"]->getUsername());
+		
 		// Send verification email 
 		$r["user"] = $r["current_user"];
 		self::sendVerificationEmail($r);
