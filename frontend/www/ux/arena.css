@@ -297,14 +297,13 @@ legend {
 	left: 0;
 	right: 0;
 	background: rgba(0, 0, 0, .5);
-	padding-top: 25%;
 	z-index: 9999999 !important;
 }
 #overlay form {
 	background: #eee;
 	width: 850px;
 	height: 38em;
-	margin: -22em auto 0 auto;
+	margin: 2em auto 0 auto;
 	border: 2px solid #ccc;
 	padding: 1em;
 	position: relative;
