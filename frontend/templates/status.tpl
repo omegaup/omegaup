@@ -1,4 +1,4 @@
-{if $CURRENT_USER_IS_EMAIL_VERIFIED eq 0}
+{if $LOGGED_IN eq 1 and $CURRENT_USER_IS_EMAIL_VERIFIED eq 0}
 	<div class="alert alert-danger" id='email-verification-alert'>
 		<button type="button" class="close" id="email-verification-alert-close">&times;</button>
 		<span class="message">
