@@ -46,6 +46,17 @@
 		
 		<div class="panel panel-default">
 			<div class="panel-heading">
+				<h3 class="panel-title">{#frontPageMaterial#}</h3>
+			</div>
+			<div id="coder_of_the_month" class="panel-body">
+				<a href="https://omegaup.com/img/libropre3.pdf">Descarga en PDF aquí:
+				<img src="https://omegaup.com/img/libroluis.gif" width="75%"/>				
+				</a>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
 				<h3 class="panel-title">{#frontPageNextContests#}</h3>
 			</div>
 			<ul class="list-group" id="next-contests-list">			

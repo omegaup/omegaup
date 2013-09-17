@@ -16,6 +16,8 @@ frontPageRecent = "Recent Activity"
 frontPageDevelopers = "Developers"
 frontPageHelp = "Help"
 
+frontPageMaterial = "Suggested book"
+
 frontPageQuestions = "Questions"
 frontPageBlog = "Blog"
 

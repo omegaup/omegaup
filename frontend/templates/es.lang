@@ -40,6 +40,7 @@ frontPageCreateContestButton = "&iexcl;Crea tu propio concurso en omegaUp!"
 frontPageLoading = "Cargando..."
 frontPageBlogPosts = "Últimos blog posts"
 frontPageNextContests = "Próximos concursos"
+frontPageMaterial = "Material Recomendado"
 
 # Rank - rank.table.tpl
 rankHeaderPreCount = "Top"
