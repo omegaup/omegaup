@@ -270,7 +270,7 @@ class ContestController extends Controller {
 			
 			return $result;
 			
-		}, $result);
+		}, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
 																
 		// Adding timer info separately as it depends on the current user and we don't
 		// want this to get generally cached for everybody
