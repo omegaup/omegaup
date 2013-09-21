@@ -1168,7 +1168,12 @@ class UserController extends Controller {
 			} 
 			
 		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
+			// If duplicate in DB
+			if (strpos($e->getMessage(), "1062") !== FALSE) {
+				throw new DuplicatedEntryInDatabaseException("El email seleccionado ya está ocupado. Intenta con otro email válido.", $e);
+			} else {
+				throw new InvalidDatabaseOperationException($e);
+			}
 		}
 		
 		// Delete profile cache 

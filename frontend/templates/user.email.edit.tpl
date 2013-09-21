@@ -40,6 +40,8 @@
 					
 					$('#wait').hide();
 					return false;
+				} else {
+					OmegaUp.ui.error(response.error || 'error');					
 				}
 				
 				$('#wait').hide();

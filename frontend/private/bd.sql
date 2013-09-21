@@ -196,6 +196,7 @@ CREATE TABLE IF NOT EXISTS `Emails` (
   `email` varchar(256) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`email_id`),
+  UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Esta tabla permite tener varios emails por persona';
 
