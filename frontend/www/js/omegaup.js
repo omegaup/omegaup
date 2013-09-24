@@ -346,6 +346,29 @@ OmegaUp.prototype.getProfile = function(username, callback) {
 	});
 };
 
+OmegaUp.prototype.getCoderOfTheMonth = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/user/coderofthemonth/',
+		function (data) {
+			if (data.status == 'ok') {
+				data.userinfo.birth_date = self.time(data.userinfo.birth_date * 1000);
+				data.userinfo.graduation_date = self.time(data.userinfo.graduation_date * 1000);
+			}
+			
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 
 OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, school_id, school_name, callback) {
 	var self = this;

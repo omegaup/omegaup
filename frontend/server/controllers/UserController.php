@@ -771,7 +771,15 @@ class UserController extends Controller {
 		return $response;
 	}
 	
-	
+	/**
+	 * Get coder of the month by trying to find it in the table using the first 
+	 * day of the current month. If there's no coder of the month for the given 
+	 * date, calculate it and save it.
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
 	public static function apiCoderOfTheMonth(Request $r) {				
 
 		// Get first day of the current month
@@ -791,6 +799,15 @@ class UserController extends Controller {
 				// Generate the coder
 				$retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);				
 				$user = $retArray["user"];
+				
+				// Save it
+				$c = new CoderOfTheMonth(array(
+					"coder_of_the_month_id" => $user->getUserId(),
+					"time" => $firstDay,
+					
+				));
+				CoderOfTheMonthDAO::save($c);
+				
 				
 			} else {
 				

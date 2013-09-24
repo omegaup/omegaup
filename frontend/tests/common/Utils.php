@@ -138,6 +138,7 @@ class Utils {
 			'Contests',
 			'Emails',
 			'User_Roles',
+			'Coder_of_the_Month',
 			'Users',			
 		);
 

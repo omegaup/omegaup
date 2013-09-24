@@ -35,11 +35,11 @@
 			</div>
 			<div id="coder_of_the_month" class="panel-body">
 				<div class="rss_element">
-					<h4 class="text-center"><a href="/profile/andreaacevedomejia">andreaacevedomejia</a></h4>
-					<div class="text-center"><a href="/profile/andreaacevedomejia"><img src="https://secure.gravatar.com/avatar/d9fed22ef4367ee8447702b409347947?s=92/"></a></div>
-					<div><b>Andrea Acevedo Mejía</b></div>					
-					<div>Aguascalientes, México</div>
-					<div>12 problemas resueltos en Agosto</div>
+					<h4 class="text-center" id="coder-of-the-month-username"></h4>
+					<div class="text-center" id="coder-of-the-month-img"></a></div>
+					<div id="coder-of-the-month-name"></div>
+					<div id="coder-of-the-month-school"></div>
+					<div id="coder-of-the-month-place"></div>					
 				</div>
 			</div>
 		</div>
@@ -132,7 +132,15 @@
 			}
 		}
 	  
-	  });
+	   });
+	   
+	   omegaup.getCoderOfTheMonth(function (data){ 
+		$('#coder-of-the-month-username').append('<a href="/profile/' + data.userinfo.username + '">' + data.userinfo.username + '</a>');
+		$('#coder-of-the-month-img').append('<a href="/profile/' + data.userinfo.username + '"><img src=" ' + data.userinfo.gravatar_92 + '">');
+		$('#coder-of-the-month-name').append('<b>' + (data.userinfo.name == null ) ? '' : data.userinfo.name + '</b>');
+		$('#coder-of-the-month-school').append((data.userinfo.school == null) ? '' : data.userinfo.school);
+		$('#coder-of-the-month-place').append( ((data.userinfo.state == null) ? '' : (data.userinfo.state + ",")) + (data.userinfo.country == null) ? '' : data.userinfo.country);
+	   });
 	}
 	
 	function createChart(series) {
