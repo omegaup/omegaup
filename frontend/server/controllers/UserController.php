@@ -695,7 +695,53 @@ class UserController extends Controller {
 		
 		return $user;
 	}
+	
+	
+	/**
+	 * Returns the profile of the user given
+	 * 
+	 * @param Users $user
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	private static function getProfile(Users $user) {
+		
+		$response = array();
+		$response["userinfo"] = array();
+		$response["problems"] = array();
 
+		$response["userinfo"]["username"] = $user->getUsername();		
+		$response["userinfo"]["name"] = $user->getName();
+		$response["userinfo"]["solved"] = $user->getSolved();
+		$response["userinfo"]["submissions"] = $user->getSubmissions();
+		$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
+		$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
+		$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
+
+		try {
+			$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+
+			$country = CountriesDAO::getByPK($user->getCountryId());
+			$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
+			$response["userinfo"]["country_id"] = $user->getCountryId();
+
+			$state = StatesDAO::getByPK($user->getStateId());
+			$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
+			$response["userinfo"]["state_id"] = $user->getStateId();
+
+			$school = SchoolsDAO::getByPK($user->getSchoolId());
+			$response["userinfo"]["school_id"] = $user->getSchoolId();
+			$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$response["userinfo"]["gravatar_92"] = 'https://secure.gravatar.com/avatar/' . md5($response["userinfo"]["email"]) . '?s=92';
+
+		return $response;
+	}
+
+	
 	/**
 	 * Get general user info
 	 * 
@@ -711,42 +757,12 @@ class UserController extends Controller {
 		
 		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 
 										
-			$response = array();
-			$response["userinfo"] = array();
-			$response["problems"] = array();
-
-			$response["userinfo"]["username"] = $r["user"]->getUsername();		
-			$response["userinfo"]["name"] = $r["user"]->getName();
-			$response["userinfo"]["solved"] = $r["user"]->getSolved();
-			$response["userinfo"]["submissions"] = $r["user"]->getSubmissions();
-			$response["userinfo"]["birth_date"] = is_null($r["user"]->getBirthDate()) ? null : strtotime($r["user"]->getBirthDate());
-			$response["userinfo"]["graduation_date"] = is_null($r["user"]->getGraduationDate()) ? null : strtotime($r["user"]->getGraduationDate());
-			$response["userinfo"]["scholar_degree"] = $r["user"]->getScholarDegree();
-
-			try {
-				$response["userinfo"]["email"] = EmailsDAO::getByPK($r["user"]->getMainEmailId())->getEmail();
-
-				$country = CountriesDAO::getByPK($r["user"]->getCountryId());
-				$response["userinfo"]["country"] = is_null($country) ? null : $country->getName();
-				$response["userinfo"]["country_id"] = $r["user"]->getCountryId();
-
-				$state = StatesDAO::getByPK($r["user"]->getStateId());
-				$response["userinfo"]["state"] = is_null($state) ? null : $state->getName();
-				$response["userinfo"]["state_id"] = $r["user"]->getStateId();
-
-				$school = SchoolsDAO::getByPK($r["user"]->getSchoolId());
-				$response["userinfo"]["school_id"] = $r["user"]->getSchoolId();
-				$response["userinfo"]["school"] = is_null($school) ? null : $school->getName();
-			} catch (Exception $e) {
-				throw new InvalidDatabaseOperationException($e);
-			}
-
-			$response["userinfo"]["gravatar_92"] = 'https://secure.gravatar.com/avatar/' . md5($response["userinfo"]["email"]) . '?s=92';
+			return self::getProfile($r["user"]);
 			
-			return $response;
 		}, $response);
 		
-		// Do not leak plain emails
+		// Do not leak plain emails in case the request is for a profile other than 
+		// the logged user's one
 		if ($r["user"]->getUserId() !== $r['current_user_id']) {
 			unset($response["userinfo"]["email"]);
 		}
@@ -754,6 +770,45 @@ class UserController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
+	
+	
+	public static function apiCoderOfTheMonth(Request $r) {				
+
+		// Get first day of the current month
+		$firstDay = date('Y-m-01');
+		
+		try {
+			
+			$coderOfTheMonth = null;
+			
+			$codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(array("time" => $firstDay)));
+			if (count($codersOfTheMonth) > 0) {
+				$coderOfTheMonth = $codersOfTheMonth[0];
+			}
+								
+			if (is_null($coderOfTheMonth)) {				
+				
+				// Generate the coder
+				$retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);				
+				$user = $retArray["user"];
+				
+			} else {
+				
+				// Grab the user info
+				$user = UsersDAO::getByPK($coderOfTheMonth->getCoderOfTheMonthId());
+			}			
+							
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		// Get the profile of the coder of the month
+		$response = self::getProfile($user);		
+		
+		$response["status"] = "ok";		
+		return $response;
+	}
+	
 
 	/**
 	 * Get Contests which a certain user has participated in
