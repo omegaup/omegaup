@@ -704,7 +704,7 @@ class UserController extends Controller {
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 */
-	private static function getProfile(Users $user) {
+	public static function getProfile(Users $user) {
 		
 		$response = array();
 		$response["userinfo"] = array();
@@ -757,7 +757,7 @@ class UserController extends Controller {
 		
 		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 
 										
-			return self::getProfile($r["user"]);
+			return UserController::getProfile($r["user"]);
 			
 		}, $response);
 		
