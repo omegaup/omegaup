@@ -83,3 +83,6 @@
 		</div>
 	</div>
 </form>
+	<p>
+		<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup">Ayuda</a>
+	</p>
