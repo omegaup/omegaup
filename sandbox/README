@@ -1,0 +1,30 @@
+================================================================================
+
+			  Moe Contest Environment @VERSION@
+
+		    (c) 2001--2012 Martin Mares <mj@ucw.cz>
+			     and other contributors
+
+================================================================================
+
+
+This is the programming contest environment used by the Czech Programming Olympiad
+and some other competitions.
+
+You will find a brief documentation in the doc/ directory inside the package (start
+with doc/index.html) or on-line at http://www.ucw.cz/moe/.
+
+The whole package can be distributed and used under the terms of the GNU General
+Public License version 2.
+
+If you have any suggestions, bug reports or improvements you would like to share
+with others, please send them to mj@ucw.cz.
+
+** How to build Moe **
+
+First of all, edit default.cfg to choose which components should be built.
+
+Then run "./configure" and "make". This will place all compiled binaries in "run/".
+
+By default, documentation is built, which requires AsciiDoc to be present.
+You can skip documentation by "./configure -CONFIG_DOC".
