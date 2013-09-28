@@ -131,7 +131,8 @@ class Problem(
 	var source: String = "",
 	var order: Order = Order.Normal,
 	var open_time: Option[Timestamp] = None,
-	var points: Option[Double] = None
+	var points: Option[Double] = None,
+	var tolerance: Double = 1e-6
 ) {
 }
 
