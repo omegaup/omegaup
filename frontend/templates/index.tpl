@@ -31,7 +31,7 @@
 	<div class="col-md-4">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title">Coder del mes de Agosto</h3>
+				<h3 class="panel-title">Coder del mes</h3>
 			</div>
 			<div id="coder_of_the_month" class="panel-body">
 				<div class="rss_element">
@@ -137,9 +137,9 @@
 	   omegaup.getCoderOfTheMonth(function (data){ 
 		$('#coder-of-the-month-username').append('<a href="/profile/' + data.userinfo.username + '">' + data.userinfo.username + '</a>');
 		$('#coder-of-the-month-img').append('<a href="/profile/' + data.userinfo.username + '"><img src=" ' + data.userinfo.gravatar_92 + '">');
-		$('#coder-of-the-month-name').append('<b>' + (data.userinfo.name == null ) ? '' : data.userinfo.name + '</b>');
+		$('#coder-of-the-month-name').append('<b>' + ((data.userinfo.name == null ) ? '' : data.userinfo.name) + '</b>');
 		$('#coder-of-the-month-school').append((data.userinfo.school == null) ? '' : data.userinfo.school);
-		$('#coder-of-the-month-place').append( ((data.userinfo.state == null) ? '' : (data.userinfo.state + ",")) + (data.userinfo.country == null) ? '' : data.userinfo.country);
+		$('#coder-of-the-month-place').append( ((data.userinfo.state == null) ? '' : (data.userinfo.state + ",")) + ((data.userinfo.country == null) ? '' : data.userinfo.country));
 	   });
 	}
 	
