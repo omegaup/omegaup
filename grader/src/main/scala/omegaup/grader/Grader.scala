@@ -649,6 +649,6 @@ object TokenNumericGrader extends Grader with TokenizerComparer {
 			caseName,
 			new Tokenizer(runOut, charClass),
 			new Tokenizer(problemOut, charClass),
-			new NumericTokenComparer(1e-6))
+			new NumericTokenComparer(run.problem.tolerance))
 	}
 }

@@ -582,11 +582,14 @@ $(document).ready(function() {
 	});
 
 	function rankingEvents(data) {
+		console.time("rankingEvents");
 		currentEvents = data;
 		var dataInSeries = {};
 		var navigatorData = [[startTime.getTime(), 0]];
 		var series = [];
 		var usernames = {};
+
+		console.time("calculate data series");
 		
 		// group points by person
 		for (var i = 0, l = data.events.length; i < l; i++) {
@@ -631,22 +634,24 @@ $(document).ready(function() {
 		});
 		
 		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
-		
+		console.timeEnd("calculate data series");
+		console.time("chart data series");	
 		if (series.length > 0) {
 			// chart it!
 			createChart(series, navigatorData);
 
 			// now animated sort the ranking table!
-			$("#ranking-table").sortTable({
-			onCol: 1,
-			keepRelationships: true,
-			sortType: 'numeric'
-			});
 		}
+		console.timeEnd("chart data series");
+		console.timeEnd("rankingEvents");
+		console.timeEnd("whole ranking");
 	}
 
 	function rankingChange(data) {
+		console.time("whole ranking");
+		console.time("rankingChange");
 		$('#mini-ranking tbody tr.inserted').remove();
+		$('#ranking tbody tr.inserted').remove();
 
 		var ranking = data.ranking;
 		var newRanking = {};
@@ -659,16 +664,8 @@ $(document).ready(function() {
 			var rank = ranking[i];
 			newRanking[rank.username] = i;
 			
-			// new user, just add row at the end
-			if (currentRanking[rank.username] === undefined) {
-				currentRanking[rank.username] = $('#ranking tbody tr.inserted').length;
-				$('#ranking tbody').append(
-					$('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
-				);
-			}
+			var r = $('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
 			
-			// update a user's row
-			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
 			var username = rank.username +
 				((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
 			$('.user', r).html(username);
@@ -698,6 +695,8 @@ $(document).ready(function() {
 				place = i + 1;
 			}
 			$('.position', r).html(place);
+
+			$('#ranking tbody').append(r);
 			
 			// update miniranking
 			if (i < 10) {
@@ -713,8 +712,9 @@ $(document).ready(function() {
 		}
 
 		currentRanking = newRanking;
-		
+
 		omegaup.getRankingEvents(contestAlias, rankingEvents);
+		console.timeEnd("rankingChange");
 	}
 	
 	function updateClock() {

@@ -299,6 +299,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `source` varchar(256) DEFAULT NULL,
   `order` enum('normal','inverse') NOT NULL DEFAULT 'normal',
+  `tolerance` double NOT NULL DEFAULT 1e-9,
   PRIMARY KEY (`problem_id`),
   KEY `author_id` (`author_id`),
   UNIQUE KEY `problems_alias` (`alias`)

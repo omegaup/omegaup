@@ -17,6 +17,7 @@ $(document).ready(function() {
 	var runsLang = "";
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
+	var rankChartLimit = 1e99;
 	var veredicts = {
 		AC: "Accepted",
 		PA: "Partially Accepted",
@@ -317,58 +318,77 @@ $(document).ready(function() {
 	});
 
 	function rankingEvents(data) {
+		console.time("rankingEvents");
 		currentEvents = data;
 		var dataInSeries = {};
 		var navigatorData = [[startTime.getTime(), 0]];
 		var series = [];
+		var usernames = {};
+
+		console.time("calculate data series");
 		
 		// group points by person
 		for (var i = 0, l = data.events.length; i < l; i++) {
 			var curr = data.events[i];
+			
+			// limit chart to top n users
+			if (currentRanking[curr.username] > rankChartLimit - 1) continue;
+			
 			if (!dataInSeries[curr.name]) {
-				dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+					dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+					usernames[curr.name] = curr.username;
 			}
 			dataInSeries[curr.name].push([
-				startTime.getTime() + curr.delta*60*1000,
-				curr.total.points
+					startTime.getTime() + curr.delta*60*1000,
+					curr.total.points
 			]);
 			
 			// check if to add to navigator
 			if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
-				navigatorData.push([
-					startTime.getTime() + curr.delta*60*1000,
-					curr.total.points
-				]);
+					navigatorData.push([
+						startTime.getTime() + curr.delta*60*1000,
+						curr.total.points
+					]);
 			}
 		}
 		
 		// convert datas to series
 		for (var i in dataInSeries) {
 			if (dataInSeries.hasOwnProperty(i)) {
-			dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
-			series.push({
-				name: i,
-				data: dataInSeries[i],
-				step: true
-			});
+					dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
+					series.push({
+						name: i,
+						rank: currentRanking[usernames[i]],
+						data: dataInSeries[i],
+						step: true
+					});
 			}
 		}
-		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
 		
+		series.sort(function (a, b) {
+			return a.rank - b.rank;
+		});
+		
+		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
+		console.timeEnd("calculate data series");
+		console.time("chart data series");	
 		if (series.length > 0) {
 			// chart it!
 			createChart(series, navigatorData);
 
 			// now animated sort the ranking table!
-			$("#ranking").sortTable({
-			onCol: 1,
-			keepRelationships: true,
-			sortType: 'numeric'
-			});
 		}
+		console.timeEnd("chart data series");
+		console.timeEnd("rankingEvents");
+		console.timeEnd("whole ranking");
 	}
 
 	function rankingChange(data) {
+		console.time("whole ranking");
+		console.time("rankingChange");
+		$('#mini-ranking tbody tr.inserted').remove();
+		$('#ranking tbody tr.inserted').remove();
+
 		var ranking = data.ranking;
 		var newRanking = {};
 
@@ -380,17 +400,11 @@ $(document).ready(function() {
 			var rank = ranking[i];
 			newRanking[rank.username] = i;
 			
-			// new user, just add row at the end
-			if (currentRanking[rank.username] === undefined) {
-				currentRanking[rank.username] = $('#ranking tbody tr.inserted').length;
-				$('#ranking tbody').append(
-					$('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
-				);
-			}
+			var r = $('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
 			
-			// update a user's row
-			var r = $('#ranking tbody tr.inserted')[currentRanking[rank.username]];
-			$('.user', r).html(rank.username + ' (' + omegaup.escape(rank.name) + ')');
+			var username = rank.username +
+				((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
+			$('.user', r).html(username);
 
 			for (var alias in rank.problems) {
 				if (!rank.problems.hasOwnProperty(alias)) continue;
@@ -416,14 +430,29 @@ $(document).ready(function() {
 				lastPenalty = rank.total.penalty;
 				place = i + 1;
 			}
-			$('.position', r).html(place);						
+			$('.position', r).html(place);
+
+			$('#ranking tbody').append(r);
+			
+			// update miniranking
+			if (i < 10) {
+				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
+
+				$('.position', r).html(place);
+				$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
+				$('.points', r).html(rank.total.points);
+				$('.penalty', r).html(rank.total.penalty);
+
+				$('#mini-ranking tbody').append(r);
+			}
 		}
 
 		currentRanking = newRanking;
-		
-		omegaup.getRankingEvents(contestAlias, rankingEvents);
 
+		omegaup.getRankingEvents(contestAlias, rankingEvents);
+		console.timeEnd("rankingChange");
 	}
+
 	function updateRun(guid, orig_run) {
 		setTimeout(function() {
 			omegaup.runStatus(guid, function(run) {

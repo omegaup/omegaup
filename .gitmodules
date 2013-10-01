@@ -1,0 +1,3 @@
+[submodule "frontend/www/js/mathjax"]
+	path = frontend/www/js/mathjax
+	url = https://github.com/mathjax/MathJax.git
