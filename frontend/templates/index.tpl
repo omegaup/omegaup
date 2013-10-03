@@ -35,11 +35,13 @@
 			</div>
 			<div id="coder_of_the_month" class="panel-body">
 				<div class="rss_element">
-					<h4 class="text-center" id="coder-of-the-month-username"></h4>
-					<div class="text-center" id="coder-of-the-month-img"></a></div>
-					<div id="coder-of-the-month-name"></div>
-					<div id="coder-of-the-month-school"></div>
-					<div id="coder-of-the-month-place"></div>					
+					<h4 class="text-center" id="coder-of-the-month-username"><a href="/profile/{$coderOfTheMonthData.username|htmlspecialchars}">{$coderOfTheMonthData.username|htmlspecialchars}</a></h4>
+					<div class="text-center" id="coder-of-the-month-img"><a href="/profile/{$coderOfTheMonthData.username|htmlspecialchars}"><img src="{$coderOfTheMonthData.gravatar_92}"></a></div>
+					<div id="coder-of-the-month-name">{$coderOfTheMonthData.name|htmlspecialchars}</div>
+					<div id="coder-of-the-month-school">{$coderOfTheMonthData.school|htmlspecialchars}</div>
+					<div id="coder-of-the-month-place">
+						{if isset($coderOfTheMonthData.state)} {$coderOfTheMonthData.state|htmlspecialchars}, {/if}{$coderOfTheMonthData.country|htmlspecialchars}
+					</div>					
 				</div>
 			</div>
 		</div>
@@ -132,15 +134,7 @@
 			}
 		}
 	  
-	   });
-	   
-	   omegaup.getCoderOfTheMonth(function (data){ 
-		$('#coder-of-the-month-username').append('<a href="/profile/' + data.userinfo.username + '">' + data.userinfo.username + '</a>');
-		$('#coder-of-the-month-img').append('<a href="/profile/' + data.userinfo.username + '"><img src=" ' + data.userinfo.gravatar_92 + '">');
-		$('#coder-of-the-month-name').append('<b>' + ((data.userinfo.name == null ) ? '' : data.userinfo.name) + '</b>');
-		$('#coder-of-the-month-school').append((data.userinfo.school == null) ? '' : data.userinfo.school);
-		$('#coder-of-the-month-place').append( ((data.userinfo.state == null) ? '' : (data.userinfo.state + ",")) + ((data.userinfo.country == null) ? '' : data.userinfo.country));
-	   });
+	   });	   
 	}
 	
 	function createChart(series) {

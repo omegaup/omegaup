@@ -12,7 +12,7 @@
 		<tbody>
 			{foreach from=$rank.rank item=data}
 				<tr>
-					<td><b><a href='/profile/{$data.username}'>{$data.username}</a></b></td>
+					<td><b><a href='/profile/{$data.username|htmlspecialchars}'>{$data.username|htmlspecialchars}</a></b></td>
 					<td>{$data.problems_solved}</td>
 				</tr>
 			{/foreach}
