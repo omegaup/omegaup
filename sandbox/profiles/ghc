@@ -1,0 +1,45 @@
+-f
+-a 2
+-E PATH=/usr/bin
+-F
+-C
+
+-s mprotect
+-s mremap
+-s rt_sigaction
+-s getppid
+-s ugetrlimit
+-s getrlimit
+-s getcwd
+-s getrusage
+-s umask
+-s unlink
+-s chmod
+-s execve
+-s set_robust_list
+-s futex
+-s rt_sigprocmask
+-s timer_create
+-s timer_settime
+-s clock_gettime
+-s clone
+-s pipe
+-s select
+-s rt_sigreturn=noret
+-s mkdir
+-s sched_yield
+-s madvise
+-s timer_delete
+-s utimensat
+-s getdents
+-s rmdir
+-s ftruncate
+
+-p /etc/ld.so.conf
+-p /etc/ld.so.conf.d/
+-p /lib64/
+-p /proc/meminfo
+-p /dev/urandom
+-p /usr/
+-p /tmp/=rw
+-p ./=rw
