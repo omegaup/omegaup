@@ -4,6 +4,9 @@
 -F
 -C
 
+-s mkdir=file
+-s rmdir=file
+-s unlink=file
 -s mprotect
 -s mremap
 -s rt_sigaction
@@ -13,7 +16,6 @@
 -s getcwd
 -s getrusage
 -s umask
--s unlink
 -s chmod
 -s execve
 -s set_robust_list
@@ -26,13 +28,11 @@
 -s pipe
 -s select
 -s rt_sigreturn=noret
--s mkdir
 -s sched_yield
 -s madvise
 -s timer_delete
 -s utimensat
 -s getdents
--s rmdir
 -s ftruncate
 
 -p /etc/ld.so.conf

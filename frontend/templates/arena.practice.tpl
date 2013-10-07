@@ -94,6 +94,7 @@
 						<option value="cat">Solo Salida</option>
 						<option value="kp">Karel (Pascal)</option>
 						<option value="kj">Karel (Java)</option>
+						<option value="hs">Haskell</option>
 					</select>
 				</div>
 				<textarea name="code"></textarea><br/>

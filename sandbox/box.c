@@ -2,7 +2,7 @@
  *	A Simple Sandbox for Moe
  *
  *	(c) 2001--2010 Martin Mares <mj@ucw.cz>
- *	(c) 2010--2011 Luis Hector Chavez <lhchavez@lhchavez.com>
+ *	(c) 2010--2013 Luis Hector Chavez <lhchavez@lhchavez.com>
  */
 
 #define _LARGEFILE64_SOURCE
@@ -1103,20 +1103,6 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
         {
           a->sys = __NR_setrlimit;
           a->result = -EPERM;
-          set_syscall_args(pid, a);
-        }
-      break;
-    case __NR_mkdir:
-      if (entry == 0)
-        {
-	  a->sys = __NR_getuid;
-	  set_syscall_args(pid, a);
-	  return 1;
-        }
-      else
-        {
-          a->sys = __NR_mkdir;
-          a->result = -EACCES;
           set_syscall_args(pid, a);
         }
       break;

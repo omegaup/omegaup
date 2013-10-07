@@ -104,6 +104,7 @@ void make_config() {
 	fprintf(f,
 "-a 2\n\
 \n\
+-s mkdir=file\n\
 -s mprotect\n\
 -s get_robust_list\n\
 -s set_robust_list\n\
@@ -120,7 +121,6 @@ void make_config() {
 -s setrlimit\n\
 -s socketcall\n\
 -s getdents\n\
--s mkdir\n\
 -s sched_getaffinity\n\
 -s sched_yield\n\
 -s getcwd\n\
@@ -142,6 +142,7 @@ void make_config() {
 -p /etc/nsswitch.conf\n\
 -p /etc/passwd\n\
 -p /etc/localtime\n\
+-p /tmp/hsperfdata_grader/=rw\n\
 -p /tmp/\n\
 -p /home/\n\
 -p ./\n");
@@ -161,6 +162,8 @@ void make_config() {
 "-a 2\n\
 -F\n\
 \n\
+-s mkdir=file\n\
+-s unlink=file\n\
 -s mprotect\n\
 -s get_robust_list\n\
 -s set_robust_list\n\
@@ -177,7 +180,6 @@ void make_config() {
 -s setrlimit\n\
 -s socketcall\n\
 -s getdents\n\
--s mkdir\n\
 -s sched_getaffinity\n\
 -s sched_yield\n\
 -s getcwd\n\
@@ -200,6 +202,7 @@ void make_config() {
 -p /etc/nsswitch.conf\n\
 -p /etc/passwd\n\
 -p /etc/localtime\n\
+-p /tmp/hsperfdata_grader/=rw\n\
 -p /tmp/\n\
 -p /home/\n\
 -p ./=rw\n");

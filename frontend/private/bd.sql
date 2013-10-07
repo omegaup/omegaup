@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `problem_id` int(11) NOT NULL,
   `contest_id` int(11) DEFAULT NULL,
   `guid` char(32) NOT NULL,
-  `language` enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat') NOT NULL,
+  `language` enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs') NOT NULL,
   `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
   `veredict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL,
   `runtime` int(11) NOT NULL DEFAULT '0',
@@ -709,5 +709,6 @@ WHERE NEW.problem_id =  `Problems`.`problem_id`;
 
 ALTER TABLE  `Schools` CHANGE  `state_id`  `state_id` INT( 11 ) NULL;
 ALTER TABLE  `Schools` CHANGE  `school_id`  `school_id` INT( 11 ) NOT NULL AUTO_INCREMENT;
+ALTER TABLE Runs CHANGE COLUMN language language enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs') NOT NULL;
 
 COMMIT;

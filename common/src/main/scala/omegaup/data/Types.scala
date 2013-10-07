@@ -35,6 +35,7 @@ object Language extends Enumeration {
 	val  KarelPascal = Value(9, "kp")
 	val  KarelJava = Value(10, "kj")
 	val  Literal = Value(11, "cat")
+	val  Haslell = Value(12, "hs")
 }
 
 object Status extends Enumeration {

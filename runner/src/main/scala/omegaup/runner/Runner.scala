@@ -96,6 +96,8 @@ object Runner extends RunnerService with Log with Using {
 				List(sandbox, "-S", profile + "/kc") ++ commonParams ++ List("--", Config.get("kcl.compiler.path", "/usr/bin/kcl"), "-lj", "-o", "Main.kx", "-c") ++ inputFiles
 			case "kp" =>
 				List(sandbox, "-S", profile + "/kc") ++ commonParams ++ List("--", Config.get("kcl.compiler.path", "/usr/bin/kcl"), "-lp", "-o", "Main.kx", "-c") ++ inputFiles
+			case "hs" =>
+				List(sandbox, "-S", profile + "/ghc") ++ commonParams ++ List("--", Config.get("ghc.compiler.path", "/usr/bin/ghc"), "-O2", "-o", "Main") ++ inputFiles
 			case _ => null
 		}
 
@@ -273,6 +275,8 @@ object Runner extends RunnerService with Log with Using {
 								List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-q", "-p2", "Main.kx")
 							case "kj" =>
 								List(sandbox, "-S", profile + "/kx") ++ commonParams ++ List("--", Config.get("karel.runtime.path", "/usr/bin/karel"), "/dev/stdin", "-oi", "-q", "-p2", "Main.kx")
+							case "hs" =>
+								List(sandbox, "-S", profile + "/hs") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main")
 						}
 
 						debug("Run {}", params.mkString(" "))
@@ -302,6 +306,8 @@ object Runner extends RunnerService with Log with Using {
 									List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "./Main")
 								case "py" =>
 									List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py")
+								case "hs" =>
+									List(sandbox, "-S", profile + "/hs") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main")
 							}
 					
 							debug("Run {}", params.mkString(" "))
@@ -353,6 +359,8 @@ object Runner extends RunnerService with Log with Using {
 								List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "./Main", caseName)
 							case "py" =>
 								List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py", caseName)
+							case "hs" =>
+								List(sandbox, "-S", profile + "/hs") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main", caseName)
 						}
 				
 						debug("Validator run {}", params.mkString(" "))
