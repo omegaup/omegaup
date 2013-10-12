@@ -288,6 +288,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
   `validator` enum('remote','literal','token','token-caseless','token-numeric','custom') NOT NULL DEFAULT 'token-numeric',
+  `languages` set('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,p,hs',
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
   `time_limit` int(11) DEFAULT '3000',
@@ -710,5 +711,6 @@ WHERE NEW.problem_id =  `Problems`.`problem_id`;
 ALTER TABLE  `Schools` CHANGE  `state_id`  `state_id` INT( 11 ) NULL;
 ALTER TABLE  `Schools` CHANGE  `school_id`  `school_id` INT( 11 ) NOT NULL AUTO_INCREMENT;
 ALTER TABLE Runs CHANGE COLUMN language language enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs') NOT NULL;
+ALTER TABLE Problems ADD COLUMN languages SET('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,p,hs' AFTER validator;
 
 COMMIT;
