@@ -58,6 +58,10 @@ if [ ! -f /usr/bin/vim ]; then
 	sudo apt-get install -qq -y vim
 fi
 
+# Ensure users have been added.
+useradd -m omegaup || echo
+useradd -m www-data || echo
+
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
 	if [ "$UBUNTU" = "1" ]; then
@@ -220,7 +224,8 @@ fi
 # Set up runtime directories.
 if [ ! -d /var/lib/omegaup ]; then
 	sudo mkdir -p /var/lib/omegaup/{compile,grade,input,problems,submissions}
-	sudo chown www-data.www-data /var/lib/omegaup/problems
+	sudo chown www-data.www-data /var/lib/omegaup/{problems,submissions}
+	sudo chown omegaup.omegaup /var/lib/omegaup/{compile,grade,input}
 fi
 
 # check mysql
