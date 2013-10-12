@@ -154,7 +154,6 @@ class UserController extends Controller {
 			$password = $r["password"];
 		}
 
-
 		if (is_null($user_id) && is_null($email) && is_null($username)) {
 			throw new Exception("You must provide either one of the following: user_id, email or username");
 		}
@@ -797,7 +796,11 @@ class UserController extends Controller {
 			if (is_null($coderOfTheMonth)) {				
 				
 				// Generate the coder
-				$retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);				
+				$retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
+				if ($retArray == null) {
+					throw new InvalidParameterException("No coders.");
+				}
+
 				$user = $retArray["user"];
 				
 				// Save it
@@ -818,7 +821,7 @@ class UserController extends Controller {
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		// Get the profile of the coder of the month
 		$response = self::getProfile($user);		
 		
