@@ -1,5 +1,7 @@
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
+{include file='status.tpl'}
+
 <div id="login-page">
 	<div class="panel panel-default">
 		<div class="panel-heading">
@@ -102,10 +104,13 @@
 			$('#reg_pass').val(),
 			function (data) { 
 				//registration callback
-				//test data ok
-				$("#user").val($('#reg_email').val());
-				$("#pass").val($('#reg_pass').val());
-				$("#login_form").submit();
+				if (data.status != 'ok') {
+					OmegaUp.ui.error(data.error);	
+				} else {
+					$("#user").val($('#reg_email').val());
+					$("#pass").val($('#reg_pass').val());
+					$("#login_form").submit();
+				}
 			}
 		);
 		return false; // Prevent form submission

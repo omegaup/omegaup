@@ -310,7 +310,7 @@ class SessionController extends Controller {
 			Logger::warn("User " . $r["usernameOrEmail"] . " not found.");
 			return false;
 		}
- 		
+
 		$b_Valid = $c_Users->TestPassword($r);
 
 		if (!$b_Valid) {
