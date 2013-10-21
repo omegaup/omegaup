@@ -11,14 +11,14 @@
 							{if $LOGGED_IN eq '1'}
 								<li id="nav-contests"><a href='/contests.php'>{#navMyContests#}</a></li>
 								<li id="nav-problems">
-									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#navProblems#}</span><span class="caret"></span></a>
+									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
 										<li><a href="/myproblems.php">{#navMyProblems#}</a></li>
-										<li><a href="/probs.php">{#navProblems#}</a></li>
+										<li><a href="/probs.php">{#wordsProblems#}</a></li>
 									</ul>
 								</li>
 							{else}
-								<li id="nav-problems"><a href='/probs.php'>{#navProblems#}</a></li>
+								<li id="nav-problems"><a href='/probs.php'>{#wordsProblems#}</a></li>
 							{/if}
 							<li id="nav-rank"><a href='/rank.php'>{#navRanking#}</a></li>
 							<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>

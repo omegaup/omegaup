@@ -6,10 +6,10 @@
 					</div>
 					<table class="contest-list table table-striped table-hover">
 						<thead><tr>
-							<th>Concurso</th>
-							<th>Descripción</th>
-							<th class="time">Inicio</th>
-							<th class="time">Fin</th>
+							<th>{#wordsContest#}</th>
+							<th>{#wordsDescription#}</th>
+							<th class="time">{#wordsStartTime#}</th>
+							<th class="time">{#wordsEndTime#}</th>
 							<th></th>
 							<th></th>
 						</tr></thead>
@@ -20,14 +20,14 @@
 				
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h2 class="panel-title">Concursos pasados</h2>
+						<h2 class="panel-title">{#arenaOldContests#}</h2>
 					</div>
 					<table class="contest-list table table-striped table-hover">
 						<thead><tr>
-							<th>Concurso</th>
-							<th>Descripción</th>
-							<th class="time">Inicio</th>
-							<th class="time">Fin</th>
+							<th>{#wordsContest#}</th>
+							<th>{#wordsDescription#}</th>
+							<th class="time">{#wordsStartTime#}</th>
+							<th class="time">{#wordsEndTime#}</th>
 							<th></th>
 							<th></th>
 						</tr></thead>

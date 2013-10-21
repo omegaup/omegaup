@@ -1,13 +1,13 @@
 <div class="wait_for_ajax panel panel-default" id="problems_list" >
 	<div class="panel-heading">
-		<h3 class="panel-title">Problemas</h3>
+		<h3 class="panel-title">{#wordProblems#}</h3>
 	</div>
 	<table class="table">
 		<thead>
 			<tr>
-				<th>T&iacute;tulo</th>
-				<th>Env&iacute;os</th>
-				<th>Resueltos</th>
+				<th>{#wordsTitle#}</th>
+				<th>{#wordsRuns#}</th>
+				<th>{#wordsSolved#}</th>
 			</tr>
 		</thead>
 		<tbody></tbody>

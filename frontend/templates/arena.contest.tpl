@@ -4,15 +4,15 @@
 				<div class="clock">0:00:00</div>
 			</div>
 			<ul class="tabs">
-				<li><a href="#problems" class="active">Problemas</a></li>
-				<li><a href="#ranking">Ranking</a></li>
-				<li><a href="#clarifications">Clarificaciones <span id="clarifications-count"></span></a></li>
+				<li><a href="#problems" class="active">{#wordsProblems#}</a></li>
+				<li><a href="#ranking">{#wordsRanking#}</a></li>
+				<li><a href="#clarifications">{#wordsClarifications#}<span id="clarifications-count"></span></a></li>
 			</ul>
 			<div id="problems" class="tab navleft">
 				<div class="navbar">
 					<div id="problem-list">
 						<div class="summary">
-							<a class="name" href="#problems">Resumen</a>
+							<a class="name" href="#problems">{#wordsSummary#}</a>
 						</div>
 						<div class="template">
 							<a class="name"></a>
@@ -23,8 +23,8 @@
 						<thead>
 							<tr>
 								<th></th>
-								<th>Usuario</th>
-								<th class="total" colspan="2">Total</th>
+								<th>{#wordsUser#}</th>
+								<th class="total" colspan="2">{#wordsTotal#}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -41,8 +41,8 @@
 					<h1 class="title"></h1>
 					<p class="description"></p>
 					<table>
-						<tr><td><strong>Hora de inicio</strong></td><td class="start_time"></td></tr>
-						<tr><td><strong>Hora de fin</strong></td><td class="finish_time"></td></tr>
+						<tr><td><strong>{#contestsTableStart#}</strong></td><td class="start_time"></td></tr>
+						<tr><td><strong>{#contestsTableEnd#}</strong></td><td class="finish_time"></td></tr>
 						<tr><td><strong>Tiempo para resolver los problemas</strong></td><td><span class="window_length"></span> minutos</td></tr>
 					</table>
 				</div>
@@ -56,9 +56,9 @@
 							<td class="validator"></div>
 						</tr>
 						<tr>
-							<td>Límite de tiempo</td>
+							<td>{#arenaCommonTimeLimit#}</td>
 							<td class="time_limit"></td>
-							<td>Límite de memoria</td>
+							<td>{#arenaCommonMemoryLimit#}</td>
 							<td class="memory_limit"></td>
 						</tr>
 					</table>
