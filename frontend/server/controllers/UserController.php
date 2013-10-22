@@ -694,8 +694,25 @@ class UserController extends Controller {
 		
 		return $user;
 	}
-	
-	
+
+
+	/**
+	 * Returns the prefered language as a string (en,es,fra) of the user given
+	 * If no user is give, language is retrived from the browser.
+	 * 
+	 * @param Users $user
+	 * @return String
+	 */
+	public static function getPreferredLanguage(Users $user = NULL) {
+		// For debugging 
+		if (isset($_GET["lang"])) {
+			return $_GET["lang"];
+		}
+
+		return "es";
+	}
+
+
 	/**
 	 * Returns the profile of the user given
 	 * 

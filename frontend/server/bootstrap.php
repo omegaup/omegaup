@@ -119,7 +119,22 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	if (defined("SMARTY_CACHE_DIR")) {
 		$smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
 	}
-	$smarty->configLoad(__DIR__ . "/../templates/es.lang");
+
+	switch(UserController::getPreferredLanguage(NULL))
+	{
+		// supported languages
+		case "en":
+		case "es":
+		case "hacker-boy":
+			$smarty->configLoad(__DIR__ . "/../templates/". UserController::getPreferredLanguage(NULL) . ".lang");
+		break;
+
+		// fall back to spanish
+		default:
+			$smarty->configLoad(__DIR__ . "/../templates/es.lang");
+		break;
+	}
+
 	$smarty->assign("LOGGED_IN", "0");
 	UITools::$IsLoggedIn = false;
 	$smarty->assign("FB_URL", SessionController::getFacebookLoginUrl());
