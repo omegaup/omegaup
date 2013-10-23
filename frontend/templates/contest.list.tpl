@@ -1,6 +1,6 @@
 <div class="wait_for_ajax panel panel-default no-bottom-margin" id="contest_list">
 	<div class="panel-heading">
-		<h3 class="panel-title">Concursos</h3>
+		<h3 class="panel-title">{#wordsContests#}</h3>
 	</div>
 	
 	<table class="table">

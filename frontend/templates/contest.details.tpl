@@ -84,9 +84,9 @@
 	<div class="copy">
 		<script type="text/javascript">
 			var a = window.location.pathname.split("/");
-			document.write('<a href="/arena/'+ a[a.length-1] +'"><div class="POS Boton" >Ir al concurso</div></a>');
+			document.write('<a href="/arena/'+ a[a.length-1] +'"><div class="POS Boton" >{#ContestDetailsGoToContest#}</div></a>');
 		</script>
-		<div class="POS Boton">Agregar problema</div>
+		<div class="POS Boton">{#wordsAddProblem#}</div>
 	</div>
 </div>
 -->
@@ -103,7 +103,7 @@
 			<tr>
 			<!-- ----------------------------------------- -->
 				<td class="info">
-					<b>Title</b>
+					<b>{#wordsTitle#}</b>
 					<p>
 					 El titulo que tendrá el concurso
 								</p>
@@ -112,7 +112,7 @@
 								<input id='title' name='title' value='' type='text'>
 							</td>
 							<td class="info">
-								<b>Alias</b>
+								<b>{#wordsAlias#}</b>
 								<p>
 									Almacenar&aacute; el token necesario para acceder al concurso
 								</p>
@@ -125,7 +125,7 @@
 						<tr>
 							<!-- ----------------------------------------- -->
 							<td class="info">
-								<b>Inicio</b>
+								<b>{#wordsStartTime#}</b>
 								<p>
 									La fecha (en hora local) en la que inicia el concurso
 								</p>
@@ -134,7 +134,7 @@
 								<input id='start_time' name='start_time' value='1359702610' type='text'>
 							</td>
 							<td class="info">
-								<b>Fin</b>
+								<b>{#wordsEnd#}</b>
 								<p>
 									La hora (en hora local) en la que termina el concurso.
 								</p>
@@ -169,7 +169,7 @@
 							<td class="info">
 								<b>Window Length</b>
 								<p>
-									Indica el tiempo que tiene el usuario para env&iacute;ar soluci&oacute;n, si es NULL entonces ser&aacute; durante todo el tiempo del concurso.
+									Indica el tiempo que tiene el {#wordsUser#} para env&iacute;ar soluci&oacute;n, si es NULL entonces ser&aacute; durante todo el tiempo del concurso.
 								</p>
 							</td>
 							<td>
@@ -191,7 +191,7 @@
 							<td class="info">
 								<b>Submissions Gap</b>
 								<p>
-									Tiempo m&iacute;nimo en minutos que debe de esperar un usuario despues de realizar un env&iacute;o para hacer otro.
+									Tiempo m&iacute;nimo en minutos que debe de esperar un {#wordsUser#} despues de realizar un env&iacute;o para hacer otro.
 								</p>
 							</td>
 							<td>
@@ -215,7 +215,7 @@
 								</select>
 							</td>
 							<td class="info">
-								<b>Penalty</b>
+								<b>{#wordsPenalty#}</b>
 								<p>
 									 Entero indicando el n&uacute;mero de minutos con que se penaliza por recibir un no-accepted
 								</p>
@@ -228,9 +228,9 @@
 						<tr>
 							<!-- ----------------------------------------- -->
 							<td class="info">
-								<b>Feedback</b>
+								<b>{#wordsFeedback#}</b>
 								<p>
-									Si al usuario se le entrega retroalimentación inmediata sobre su problema
+									Si al {#wordsUser#} se le entrega retroalimentación inmediata sobre su problema
 								</p>
 							</td>
 							<td>
@@ -243,7 +243,7 @@
 							<td class="info">
 								<b>Partial Score</b>
 								<p>
-									 Verdadero si el usuario recibir&aacute; puntaje parcial para problemas no resueltos en todos los casos
+									 Verdadero si el {#wordsUser#} recibir&aacute; puntaje parcial para problemas no resueltos en {#wordsAll#} los casos
 								</p>
 							</td>
 							<td>
@@ -316,8 +316,8 @@
 
 <div class="post hiddeable_on_error" >
 	<div class="copy wait_for_ajax" id="problem_details">
-		<h2>Problemas en este concurso</h2>
-		<div class="POS Boton" onClick="$('#problem_upload_window').toggle()">Agregar problema</div>
+		<h2>problemas en este concurso</h2>
+		<div class="POS Boton" onClick="$('#problem_upload_window').toggle()">{#wordsAddProblem#}</div>
 	</div>
 </div>
 
@@ -330,14 +330,14 @@
 		<table id="newprob" width="100%">
 		<tr>
 		<td class="info">
-			<b>Title</b>
+			<b>{#wordsTitle#}</b>
 			<p>El titulo que tendr&aacute; el problema</p>
 		</td>
 		<td>
 			<input id="title" type="text">
 		</td>
 		<td class="info">
-			<b>Alias</b>
+			<b>{#wordsAlias#}</b>
 			<p>Almacenar&aacute; el token necesario para acceder al problema</p>
 		</td>
 		<td>
@@ -356,7 +356,7 @@
 			</select>
 		</td>
 		<td class="info">
-			<b>Validator</b>
+			<b>{#wordsValidator#}</b>
 			
 		</td>
 		<td>
@@ -406,7 +406,7 @@
 		<td class="info">
 		</td>
 		<td>
-			<div class="POS Boton" onClick="sendProb()">Enviar Problema</div>
+			<div class="POS Boton" onClick="sendProb()">Enviar problema</div>
 		</td>
 		</tr>
 	</table>

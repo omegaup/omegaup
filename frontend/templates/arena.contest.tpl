@@ -50,9 +50,9 @@
 					<h1 class="title"></h1>
 					<table class="data">
 						<tr>
-							<td>Puntos</td>
+							<td>{#wordsPoints#}</td>
 							<td class="points"></div>
-							<td>Validador</td>
+							<td>{#wordsValidator#}</td>
 							<td class="validator"></div>
 						</tr>
 						<tr>
@@ -66,17 +66,17 @@
 					<hr />
 					<div class="source">Fuente: <span></span></div>
 					<table class="runs">
-						<caption>Envíos</caption>
+						<caption>{#wordsSubmissions#}</caption>
 						<thead>
 							<tr>
 								<th>ID</th>
-								<th>Lenguaje</th>
-								<th>Tiempo de Ejecución</th>
-								<th>Memoria</th>
-								<th>Tiempo</th>
+								<th>{#wordsLanguage#}</th>
+								<th>{#wordsRuntime#}</th>
+								<th>{#wordsMemoria#}</th>
+								<th>{#wordsTime#}</th>
 								<th>Status</th>
-								<th>Puntos</th>
-								<th>Penalty</th>
+								<th>{#wordsPoints#}</th>
+								<th>{#wordsPenalty#}</th>
 								<th>C&oacute;digo</th>
 							</tr>
 						</thead>
@@ -108,7 +108,7 @@
 						<tr>
 							<th></th>
 							<th></th>
-							<th>Usuario</th>
+							<th>{#wordsUser#}</th>
 							<th class="total" colspan="2">Total</th>
 						</tr>
 					</thead>
@@ -134,11 +134,11 @@
 					</caption>
 					<thead>
 						<tr>
-							<th class="problem">Problema</th>
-							 <th class="author">Autor</th>
-							<th class="time">Tiempo</th>
-							<th class="message">Mensaje</th>
-							<th class="answer">Respuesta</th>
+							<th class="problem">{#wordsProblem#}</th>
+							 <th class="author">{#wordsAuthor#}</th>
+							<th class="time">{#wordsTime#}</th>
+							<th class="message">{#wordsMessage#}</th>
+							<th class="answer">{#wordsResult#}</th>
 						</tr>
 					</thead>
 					<tfoot>
@@ -169,7 +169,7 @@
 						<option value="c">C</option>
 						<option value="java">Java</option>
 						<option value="p">Pascal</option>
-						<option value="cat">Solo Salida</option>
+						<option value="cat">{#wordsJustOutput#}</option>
 						<option value="kp">Karel (Pascal)</option>
 						<option value="kj">Karel (Java)</option>
 						<option value="hs">Haskell</option>
@@ -183,7 +183,7 @@
 			</form>			
 			<form id="clarification" method="POST">
 				<button class="close">&times;</button>
-				Problema
+				{#wordsProblems#}
 				<select name="problem">
 				</select><br/>
 				<textarea name="message"></textarea><br/>

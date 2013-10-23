@@ -25,7 +25,7 @@
 				{if $IS_UPDATE eq 1}
 					<div class="row">
 						<div class="form-group col-md-6">
-							<label for="contests">Concurso a editar</label>
+							<label for="contests">{#contestNewFormContestToEdit#}</label>
 							<select class='contests form-control' name='contests' id='contest_alias'>
 								<option value=""></option>				
 							</select>
@@ -35,7 +35,7 @@
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="title">Título</label>
+						<label for="title">{#wordsTitle#}</label>
 						<input id='title' name='title' value='' type='text' size='30' class="form-control">
 					</div>
 					
@@ -74,7 +74,7 @@
 							</label>
 						</div>
 						<input id='window_length' name='window_length' value='' type='text' disabled="true" size='3' class="form-control">
-						<p class="help-block">Si está activo, indica el tiempo en minutos que tiene el usuario para concursar y env&iacute;ar soluciones a partir de que entra al concurso en la arena (estilo USACO/Preselectivo IOI).
+						<p class="help-block">Si está activo, indica el tiempo en minutos que tiene el {#wordsUser#} para concursar y env&iacute;ar soluciones a partir de que entra al concurso en la arena (estilo USACO/Preselectivo IOI).
 						Si Inicios Diferentes está desactivado, entonces el concursante tendrá todo el tiempo entre la Fecha de Inicio y la Fecha de Fin para concursar.</p>
 					</div>
 				</div>
@@ -105,7 +105,7 @@
 					</div>
 					
 					<div class="form-group col-md-6">
-						<label for="penalty">Penalty</label>
+						<label for="penalty">{#wordsPenalty#}</label>
 						<input id='penalty' name='penalty' value='0' type='text' size='2' class="form-control">
 						<p class="help-block">Entero indicando el n&uacute;mero de minutos con que se penaliza por enviar una respuesta incorrecta.</p>
 					</div>
@@ -113,13 +113,13 @@
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="feedback">Feedback</label>
+						<label for="feedback">{#wordsFeedback#}</label>
 						<select name='feedback' id='feedback' class="form-control">
 							<option value='yes'>Sí</option>
 							<option value='no'>No</option>
 							<option value='partial'>Parcial</option>
 						</select>
-						<p class="help-block">Si al usuario se le entrega retroalimentación inmediata sobre su problema</p>
+						<p class="help-block">Si al {#wordsUser#} se le entrega retroalimentación inmediata sobre su problema</p>
 					</div>
 					
 					<div class="form-group col-md-6">

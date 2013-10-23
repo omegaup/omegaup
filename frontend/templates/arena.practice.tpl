@@ -19,8 +19,8 @@
 					<h1 class="title"></h1>
 					<p class="description"></p>
 					<table>
-						<tr><td><strong>Hora de inicio</strong></td><td class="start_time"></td></tr>
-						<tr><td><strong>Hora de fin</strong></td><td class="finish_time"></td></tr>
+						<tr><td><strong>{#wordsStartTime#}</strong></td><td class="start_time"></td></tr>
+						<tr><td><strong>{#wordsEndTime#}</strong></td><td class="finish_time"></td></tr>
 						<tr><td><strong>Tiempo para resolver los problemas</strong></td><td><span class="window_length"></span> minutos</td></tr>
 					</table>
 				</div>
@@ -28,15 +28,15 @@
 					<h1 class="title"></h1>
 					<table class="data">
 						<tr>
-							<td>Puntos</td>
+							<td>{#wordsPoints#}</td>
 							<td class="points"></div>
-							<td>Validador</td>
+							<td>{#wordsValidator#}</td>
 							<td class="validator"></div>
 						</tr>
 						<tr>
-							<td>Límite de tiempo</td>
+							<td>{#wordsTimeLimit#}</td>
 							<td class="time_limit"></td>
-							<td>Límite de memoria</td>
+							<td>{#wordsMemoryLimit#}</td>
 							<td class="memory_limit"></td>
 						</tr>
 					</table>
@@ -44,17 +44,17 @@
 					<hr />
 					<div class="source">Fuente: <span></span></div>
 					<table class="runs">
-						<caption>Envíos</caption>
+						<caption>{#wordsSubmissions#}</caption>
 						<thead>
 							<tr>
 								<th>ID</th>
-								<th>Lenguaje</th>
-								<th>Tiempo de Ejecución</th>
-								<th>Memoria</th>
-								<th>Tiempo</th>
+								<th>{#wordsLanguage#}</th>
+								<th>{#wordsRuntime#}</th>
+								<th>{#wordsMemoria#}</th>
+								<th>{#wordsTime#}</th>
 								<th>Status</th>
-								<th>Puntos</th>
-								<th>Penalty</th>
+								<th>{#wordsPoints#}</th>
+								<th>{#wordsPenalty#}</th>
 								<th>C&oacute;digo</th>
 							</tr>
 						</thead>
@@ -91,7 +91,7 @@
 						<option value="c">C</option>
 						<option value="java">Java</option>
 						<option value="p">Pascal</option>
-						<option value="cat">Solo Salida</option>
+						<option value="cat">{#wordsJustOutput#}</option>
 						<option value="kp">Karel (Pascal)</option>
 						<option value="kj">Karel (Java)</option>
 						<option value="hs">Haskell</option>

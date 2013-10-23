@@ -16,27 +16,27 @@
 	<div class="panel-body">
 		<form class="form bottom-margin" id="add-user-form">
 			<div class="form-group">
-				<label for="contests">Concurso</label>
+				<label for="contests">{#wordsContest#}</label>
 				<select class='form-control' name='contests' id='contests'>
 					<option value=""></option>				
 				</select>
 			</div>
 			
 			<div class="form-group">
-				<label for="username">Usuario</label>
+				<label for="username">{#wordsUser#}</label>
 				<input id='username' name='username' value='' type='text' size='20' class="form-control" />
 			</div>
 
 			<input id='user' name='user' value='' type='hidden'>
 
-			<button class="btn btn-primary" type='submit'>Agregar usuario</button>
+			<button class="btn btn-primary" type='submit'>Agregar {#wordsUser#}</button>
 		</form>
 		
 		<div class="row">
 			<div class="col-md-5">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h3 class="panel-title">Usuarios ya registrados</h3>
+						<h3 class="panel-title">{#wordsUser#}s ya registrados</h3>
 					</div>
 					<ul class="list-group" id="contest-users">
 					</ul>

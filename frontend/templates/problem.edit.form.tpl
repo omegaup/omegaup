@@ -6,7 +6,7 @@
 	{if $IS_UPDATE eq 1}
 		<div class="row">
 			<div class="form-group col-md-6">
-				<label for="problem_alias">Problema</label>
+				<label for="problem_alias">{#wordsProblem#}</label>
 				<select class="edit-problem-list" name='edit-problem-list' id='problem_alias' class="form-control">
 						<option></option>
 				</select>
@@ -21,19 +21,19 @@
 		</div>
 		
 		<div class="form-group  col-md-6">
-			<label for="title">Título</label>
+			<label for="title">{#wordsTitle#}</label>
 			<input id='title' name='title' value='{$TITLE|htmlspecialchars}' type='text' class="form-control" />
 		</div>
 	</div>
 	
 	<div class="row">
 		<div class="form-group  col-md-6">
-			<label for="alias">Alias</label>
+			<label for="alias">{#wordsAlias#}</label>
 			<input id='alias' name='alias' value='{$ALIAS|htmlspecialchars}' type='text' class="form-control"{if !$new} disabled="disabled"{/if}/>
 		</div>
 
 		<div class="form-group col-md-6">
-			<label for="validator">Tipo de validador</label>
+			<label for="validator">{#problemEditFormValidatorType#}</label>
 			<select name='validator' id='validator' class="form-control" >
 					<option value="token-caseless">Token por Token, ignorando diferencias en mayúsculas/minúsculas (default)	</option>
 					<option value="token-numeric">Tokens numéricos con tolerancia</option>		
@@ -58,12 +58,12 @@
 	
 	<div class="row">
 		<div class="form-group  col-md-6">
-			<label for="source">Fuente</label>
+			<label for="source">{#wordsSource#}</label>
 			<input id='source' name='source' value='{$SOURCE|htmlspecialchars}' type='text' class="form-control" />
 		</div>
 		
 		<div class="form-group col-md-6">
-			<label for="public">Aparece en el listado público</label>
+			<label for="public">{#problemEditorFormAppearsAsPublic#}</label>
 			<select name='public' id='public' class="form-control">
 				<option value="0">No</option>
 				<option value="1">Sí</option>

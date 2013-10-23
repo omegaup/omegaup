@@ -15,7 +15,7 @@
 						
 						<label for="runsveredict">Veredicto: </label>
 						<select class="runsveredict" name="runsveredict">
-							<option value="">Todos</option>
+							<option value="">{#wordsAll#}</option>
 							<option value="AC">AC</option>
 							<option value="PA">PA</option>
 							<option value="WA">WA</option>
@@ -31,7 +31,7 @@
 						
 						<label for="runsstatus">Status: </label>
 						<select class="runsstatus" name="runsstatus">
-							<option value="">Todos</option>
+							<option value="">{#wordsAll#}</option>
 							<option value="new">new</option>
 							<option value="waiting">waiting</option>
 							<option value="compiling">compiling</option>
@@ -39,14 +39,14 @@
 							<option value="ready">ready</option>
 						</select>
 						
-						<label for="runsproblem">Problema: </label>
+						<label for="runsproblem">{#wordsProblem#}: </label>
 						<select class="runsproblem" name="runsproblem">
-							<option value="">Todos</option>
+							<option value="">{#wordsAll#}</option>
 						</select>
 						
-						<label for="runslang">Lenguaje: </label>
+						<label for="runslang">{#wordsLanguage#}: </label>
 						<select class="runslang" name="runslang">
-							<option value="">Todos</option>
+							<option value="">{#wordsAll#}</option>
 							<option value="c">C</option>
 							<option value="cpp">C++</option>
 							<option value="java">Java</option>
@@ -64,17 +64,17 @@
 					<tr>
 						<th>Id</th>
 						<th>GUID</th>
-						<th>Usuario</th>
-						<th>Problema</th>
-						<th>Lenguaje</th>
-						<th>Tiempo de Ejecución</th>
-						<th>Memoria</th>
-						<th>Tiempo</th>
+						<th>{#wordsUser#}</th>
+						<th>{#wordsProblem#}</th>
+						<th>{#wordsLanguage#}</th>
+						<th>{#wordsRuntime#}</th>
+						<th>{#wordsMemoria#}</th>
+						<th>{#wordsTime#}</th>
 						<th>Status</th>
-						<th>Puntos</th>
-						<th>Penalty</th>
+						<th>{#wordsPoints#}</th>
+						<th>{#wordsPenalty#}</th>
 						<th>Rejuecear</th>
-						<th>Detalles</th>
+						<th>{#wordsDetails#}</th>
 					</tr>
 				</thead>
 				<tfoot>
@@ -106,7 +106,7 @@
 					<tr>
 						<th></th>
 						<th></th>
-						<th>Usuario</th>
+						<th>{#wordsUser#}</th>
 						<th class="total" colspan="2">Total</th>
 					</tr>
 				</thead>
@@ -130,11 +130,11 @@
 				</caption>
 				<thead>
 					<tr>
-						<th class="problem">Problema</th>
-						<th class="author">Autor</th>
-						<th class="time">Tiempo</th>
-						<th class="message">Mensaje</th>
-						<th class="answer">Respuesta</th>
+						<th class="problem">{#wordsProblem#}</th>
+						<th class="author">{#wordsAuthor#}</th>
+						<th class="time">{#wordsTime#}</th>
+						<th class="message">{#wordsMessage#}</th>
+						<th class="answer">{#wordsResult#}</th>
 					</tr>
 				</thead>
 				<tfoot>
@@ -164,9 +164,9 @@
 		<div id="overlay">
 			<form id="submit" method="POST">
 				<button class="close">&times;</button>
-				Problema
+				{#wordsProblem#}
 				<select name="problem"></select>
-				Lenguaje
+				{#wordsLanguage#}
 				<select name="language">
 					<option value="c">C</option>
 					<option value="cpp">C++</option>
@@ -177,7 +177,7 @@
 			</form>			
 			<form id="clarification" method="POST">
 				<button class="close">&times;</button>
-				Problema
+				{#wordsProblem#}
 				<select name="problem">
 				</select><br/>
 				<textarea name="message"></textarea><br/>

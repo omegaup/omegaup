@@ -28,13 +28,6 @@
 				<div id="SettingsPage_Content">
 					<ul class="uiList fbSettingsList _4kg _6-h _4ks ">
 						<li class="fbSettingsListItem clearfix uiListItem">
-						<!--
-							<a class="pvm phs fbSettingsListLink clearfix" >
-								<span class="pls fbSettingsListItemLabel"><strong>Name</strong></span>
-								<span class="fbSettingsListItemContent fcg"><strong>Alan Gonzalez</strong>
-								</span>
-							</a>
-						-->
 						<div class="content">
 
 						</div>

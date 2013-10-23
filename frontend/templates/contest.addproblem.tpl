@@ -5,21 +5,21 @@
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
-		<h2 class="panel-title">Agregar Problema</h2>
+		<h2 class="panel-title">{#wordsAddProblem#}</h2>
 	</div>
 	<div class="panel-body">
 		<div class="wait_for_ajax" id="problems_list" >
 		</div>
 		<form class="form" id="add-problem-form">
 			<div class="form-group">
-				<label for="contests">Concursos</label>
+				<label for="contests">{#wordsContests#}</label>
 				<select class='form-control' name='contests' id='contests'>
 					<option value=""></option>				
 				</select>
 			</div>
 			
 			<div class="form-group">
-				<label for="problems">Problemas</label>
+				<label for="problems">{#wordsProblems#}</label>
 				<select class='form-control' name='problems' id='problems'>
 					<option value=""></option>				
 				</select>
@@ -37,7 +37,7 @@
 			
 			<div class="form-group">
 				<input id='' name='request' value='submit' type='hidden'>
-				<button type='submit' class="btn btn-primary">Agregar problema</button>
+				<button type='submit' class="btn btn-primary">{#wordsAddProblem#}</button>
 			</div>
 		</form>
 	</div>	

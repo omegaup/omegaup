@@ -8,15 +8,15 @@
 					<h1 class="title"></h1>
 					<table class="data">
 						<tr>
-							<td>Puntos</td>
+							<td>{#wordsPoints#}</td>
 							<td class="points"></div>
-							<td>Validador</td>
+							<td>{#wordsValidator#}</td>
 							<td class="validator"></div>
 						</tr>
 						<tr>
-							<td>Límite de tiempo</td>
+							<td>{#wordsTimeLimit#}</td>
 							<td class="time_limit"></td>
-							<td>Límite de memoria</td>
+							<td>{#wordsMemoryLimit#}</td>
 							<td class="memory_limit"></td>
 						</tr>
 					</table>
@@ -24,17 +24,17 @@
 					<hr />
 					<div class="source">Fuente: <span></span></div>
 					<table class="runs">
-						<caption>Envíos</caption>
+						<caption>{#wordsSubmissions#}</caption>
 						<thead>
 							<tr>
 								<th>ID</th>
-								<th>Lenguaje</th>
-								<th>Tiempo de Ejecución</th>
-								<th>Memoria</th>
-								<th>Tiempo</th>
+								<th>{#wordsLanguage#}</th>
+								<th>{#wordsRuntime#}</th>
+								<th>{#wordsMemoria#}</th>
+								<th>{#wordsTime#}</th>
 								<th>Status</th>
-								<th>Puntos</th>
-								<th>Penalty</th>
+								<th>{#wordsPoints#}</th>
+								<th>{#wordsPenalty#}</th>
 								<th>C&oacute;digo</th>
 							</tr>
 						</thead>

@@ -15,7 +15,7 @@
 						
 						<label for="runsveredict">Veredicto: </label>
 						<select class="runsveredict" name="runsveredict">
-							<option value="">Todos</option>
+							<option value="">{#wordsAll#}</option>
 							<option value="AC">AC</option>
 							<option value="PA">PA</option>
 							<option value="WA">WA</option>
@@ -31,7 +31,7 @@
 						
 						<label for="runsstatus">Status: </label>
 						<select class="runsstatus" name="runsstatus">
-							<option value="">Todos</option>
+							<option value="">{#wordsAll#}</option>
 							<option value="new">new</option>
 							<option value="waiting">waiting</option>
 							<option value="compiling">compiling</option>
@@ -39,14 +39,14 @@
 							<option value="ready">ready</option>
 						</select>
 						
-						<label for="runsproblem">Problema: </label>
+						<label for="runsproblem">{#wordsProblem#}: </label>
 						<select class="runsproblem" name="runsproblem">
-							<option value="">Todos</option>
+							<option value="">{#wordsAll#}</option>
 						</select>
 						
 						<label for="runslang">Lenguaje: </label>
 						<select class="runslang" name="runslang">
-							<option value="">Todos</option>
+							<option value="">{#wordsAll#}</option>
 							<option value="c">C</option>
 							<option value="cpp">C++</option>
 							<option value="java">Java</option>
@@ -64,17 +64,17 @@
 					<tr>
 						<th>Id</th>
 						<th>GUID</th>
-						<th>Usuario</th>
-						<th>Problema</th>
-						<th>Lenguaje</th>
-						<th>Tiempo de Ejecución</th>
-						<th>Memoria</th>
-						<th>Tiempo</th>
+						<th>{#wordsUser#}</th>
+						<th>{#wordsProblem#}</th>
+						<th>{#wordsLanguage#}</th>
+						<th>{#wordsRuntime#}</th>
+						<th>{#wordsMemoria#}</th>
+						<th>{#wordsTime#}</th>
 						<th>Status</th>
-						<th>Puntos</th>
-						<th>Penalty</th>
+						<th>{#wordsPoints#}</th>
+						<th>{#wordsPenalty#}</th>
 						<th>Rejuecear</th>
-						<th>Detalles</th>
+						<th>{#wordsDetails#}</th>
 					</tr>
 				</thead>
 				<tfoot>
