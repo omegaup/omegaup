@@ -370,7 +370,7 @@ OmegaUp.prototype.getCoderOfTheMonth = function(callback) {
 };
 
 
-OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, school_id, school_name, callback) {
+OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, school_id, school_name, locale, callback) {
 	var self = this;
 
 	$.post(
@@ -383,7 +383,8 @@ OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_i
 			scholar_degree: scholar_degree,
 			graduation_date: graduation_date,
 			school_id : school_id,
-			school_name : school_name
+			school_name : school_name,
+			locale : locale
 		},
 		function (data) {
 			callback(data);

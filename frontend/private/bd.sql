@@ -455,6 +455,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `state_id` int(11) DEFAULT NULL,
   `school_id` int(11) DEFAULT NULL,
   `scholar_degree` varchar(64) DEFAULT NULL,
+  `locale` varchar(5) DEFAULT 'es',
   `graduation_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
   `last_access` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

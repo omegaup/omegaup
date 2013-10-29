@@ -703,13 +703,79 @@ class UserController extends Controller {
 	 * @param Users $user
 	 * @return String
 	 */
-	public static function getPreferredLanguage(Users $user = NULL) {
-		// For debugging 
+	public static function getPreferredLanguage(Request $r = NULL) {
+
+		$found = FALSE;
+		$result = "es";
+
+		// for quick debugging 
 		if (isset($_GET["lang"])) {
-			return $_GET["lang"];
+			$result = $_GET["lang"];
+			$found = TRUE;
 		}
 
-		return "es";
+		if (!$found) {
+			$user = self::resolveTargetUser($r);
+			if (!is_null($user) && !is_null($user->getLocale())) {
+				$result =$user->getLocale(); 
+				$found = true;
+			}
+			
+		}
+
+		if (!$found) {
+			$langs = array();
+
+			if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+				// break up string into pieces (languages and q factors)
+				preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+
+				if (count($lang_parse[1])) {
+					// create a list like "en" => 0.8
+					$langs = array_combine($lang_parse[1], $lang_parse[4]);
+
+					// set default to 1 for any without q factor
+					foreach ($langs as $lang => $val) {
+						if ($val === '') $langs[$lang] = 1;
+					}
+
+					// sort list based on value	
+					arsort($langs, SORT_NUMERIC);
+				}
+			}
+
+			foreach ($langs as $langCode => $langWeight) {
+				switch (substr($langCode, 0, 2)) {
+					case "en":
+						$result = "en";
+						$found = true;
+					break;
+
+					case "es":
+						$result = "es";
+						$found = true;
+					break;
+				}
+			}
+		}
+
+		switch ($result) {
+			case "en":
+			case "en-us":
+				$result = "en";
+				break;
+
+			case "es":
+			case "es-mx":
+				$result = "mx";
+				break;
+
+			case "ps":
+			case "ps-ps":
+				$result = "hacker-boy";
+				break;
+		}
+		return $result;
 	}
 
 
@@ -733,6 +799,7 @@ class UserController extends Controller {
 		$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
 		$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
 		$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
+		$response["userinfo"]["locale"] = $user->getLocale();
 
 		try {
 			$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
@@ -1076,6 +1143,10 @@ class UserController extends Controller {
 		Validators::isDate($r["graduation_date"], "graduation_date", false);
 		Validators::isDate($r["birth_date"], "birth_date", false);
 		
+		if (!is_null($r["locale"])) {
+			$r["current_user"]->setLocale($r["locale"]);
+		}
+
 		if (!is_null($r["name"])) {
 			$r["current_user"]->setName($r["name"]);
 		}

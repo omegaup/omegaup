@@ -290,10 +290,23 @@
 						</div>
 						<input id='school_id' name='school_id' value='' type='hidden'>
 					</div>
-					
+
 					<div class="form-group" id="school-found">
 						<div class="col-md-offset-3 col-md-7">
 							<div class="alert alert-info">Tu escuela aún no existe en OmegaUp. Será agregada cuando guardes tus cambios.</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="locale" class="col-md-3 control-label">Lenguaje</label>
+						<div class="col-md-7">
+						<select id="locale" name='locale' class="form-control" >
+							<option value="es">espa&ntilde;ol</option>
+							<option value="en">english</option>
+							{if $CURRENT_USER_IS_ADMIN eq '1'}
+							<option value="ps-ps">pseudo-loc (hackerboy)</option>
+							{/if}
+						</select>
 						</div>
 					</div>
 					
@@ -473,6 +486,7 @@
 			$("#birth_date").val(onlyDateToString(data.userinfo.birth_date));
 			$("#graduation_date").val(onlyDateToString(data.userinfo.graduation_date));
 			$("#country_id").val(data.userinfo.country_id);
+			$("#locale").val(data.userinfo.locale);
 			
 			// Update state dropdown status
 			$('#country_id').trigger('change');
@@ -498,6 +512,7 @@
 								  graduation_date.getTime() / 1000,
 								  $("#school_id").val(),
 								  $("#school").val(),
+								  $("#locale").val(),
 								  function(response){
 								  
 									if (response.status == "ok") {

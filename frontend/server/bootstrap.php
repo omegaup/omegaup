@@ -120,20 +120,6 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 		$smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
 	}
 
-	switch(UserController::getPreferredLanguage(NULL))
-	{
-		// supported languages
-		case "en":
-		case "es":
-		case "hacker-boy":
-			$smarty->configLoad(__DIR__ . "/../templates/". UserController::getPreferredLanguage(NULL) . ".lang");
-		break;
-
-		// fall back to spanish
-		default:
-			$smarty->configLoad(__DIR__ . "/../templates/es.lang");
-		break;
-	}
 
 	$smarty->assign("LOGGED_IN", "0");
 	UITools::$IsLoggedIn = false;
@@ -165,4 +151,12 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", '<img src="/media/avatar_92.png">');
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", '<img src="/media/avatar_16.png">');
 	}
+
+	$userRequest = new Request();
+	if ($c_Session->CurrentSessionAvailable()) {
+		$userRequest["username"] = $a_CurrentSession["username"];
+	}
+
+	$lang = UserController::getPreferredLanguage($userRequest);
+	$smarty->configLoad(__DIR__ . "/../templates/". $lang . ".lang");
 }

@@ -22,9 +22,6 @@ class Users extends VO
 	{ 
 		if(isset($data))
 		{
-			
-
-
 			if( isset($data['facebook_user_id']) ){
 				$this->facebook_user_id = $data['facebook_user_id'];
 			}			
@@ -60,6 +57,9 @@ class Users extends VO
 			}
 			if( isset($data['scholar_degree']) ){
 				$this->scholar_degree = $data['scholar_degree'];
+			}
+			if( isset($data['locale']) ){
+				$this->locale = $data['locale'];
 			}
 			if( isset($data['graduation_date']) ){
 				$this->graduation_date = $data['graduation_date'];
@@ -102,6 +102,7 @@ class Users extends VO
 			"state_id" => $this->state_id,
 			"school_id" => $this->school_id,
 			"scholar_degree" => $this->scholar_degree,
+			"locale" => $this->locale,
 			"graduation_date" => $this->graduation_date,
 			"birth_date" => $this->birth_date,
 			"last_access" => $this->last_access
@@ -211,6 +212,15 @@ class Users extends VO
 	  * @var varchar(64)
 	  */
 	protected $scholar_degree;
+
+	/**
+	  * locale
+	  * 
+	  *  [Campo no documentado]<br>
+	  * @access public
+	  * @var varchar(5)
+	  */
+	protected $locale;
 
 	/**
 	  * graduation_date
@@ -520,6 +530,30 @@ class Users extends VO
 	final public function setScholarDegree( $scholar_degree )
 	{
 		$this->scholar_degree = $scholar_degree;
+	}
+
+	/**
+	  * getLocale
+	  * 
+	  * Get the <i>locale</i> property for this object. Donde <i>locale</i> es  [Campo no documentado]
+	  * @return varchar(5)
+	  */
+	final public function getLocale()
+	{
+		return $this->locale;
+	}
+
+	/**
+	  * setLocale( $locale )
+	  * 
+	  * Set the <i>locale</i> property for this object. Donde <i>locale</i> es  [Campo no documentado].
+	  * Una validacion basica se hara aqui para comprobar que <i>locale</i> es de tipo <i>varchar(5)</i>. 
+	  * Si esta validacion falla, se arrojara... algo. 
+	  * @param varchar(5)
+	  */
+	final public function setLocale( $locale )
+	{
+		$this->locale = $locale;
 	}
 
 	/**
