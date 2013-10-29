@@ -713,14 +713,17 @@ class UserController extends Controller {
 			$result = $_GET["lang"];
 			$found = TRUE;
 		}
-
 		if (!$found) {
 			$user = self::resolveTargetUser($r);
-			if (!is_null($user) && !is_null($user->getLocale())) {
-				$result =$user->getLocale(); 
-				$found = true;
-			}
-			
+			if (!is_null($user) && !is_null($user->getLanguageId())) {
+					$result = LanguagesDAO::getByPK( $user->getLanguageId() );
+					if (is_null($result)) {
+						Logger::warn("Invalid language id for user");
+					} else {
+						$result = $result->getName();
+						$found = true;
+					}
+				}
 		}
 
 		if (!$found) {
@@ -767,7 +770,7 @@ class UserController extends Controller {
 
 			case "es":
 			case "es-mx":
-				$result = "mx";
+				$result = "es";
 				break;
 
 			case "ps":
@@ -799,7 +802,13 @@ class UserController extends Controller {
 		$response["userinfo"]["birth_date"] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
 		$response["userinfo"]["graduation_date"] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
 		$response["userinfo"]["scholar_degree"] = $user->getScholarDegree();
-		$response["userinfo"]["locale"] = $user->getLocale();
+
+		if (!is_null($user->getLanguageId())) {
+			$query = LanguagesDAO::getByPK($user->getLanguageId());	
+			if (!is_null($query)) {
+				$response["userinfo"]["locale"] = $query->getName();
+			}
+		}
 
 		try {
 			$response["userinfo"]["email"] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
@@ -1144,7 +1153,11 @@ class UserController extends Controller {
 		Validators::isDate($r["birth_date"], "birth_date", false);
 		
 		if (!is_null($r["locale"])) {
-			$r["current_user"]->setLocale($r["locale"]);
+			// find language in Language
+			$query = LanguagesDAO::search(new Languages( array( "name" => $r["locale"])));
+			if (sizeof($query) == 1) {
+				$r["current_user"]->setLanguageId($query[0]->getLanguageId());
+			}
 		}
 
 		if (!is_null($r["name"])) {

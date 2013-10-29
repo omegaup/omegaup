@@ -205,9 +205,9 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $Users->getScholarDegree() );
 		}
 
-		if( ! is_null( $Users->getLocale() ) ){
-			$sql .= " `locale` = ? AND";
-			array_push( $val, $Users->getLocale() );
+		if( ! is_null( $Users->getLanguageId() ) ){
+			$sql .= " `language_id` = ? AND";
+			array_push( $val, $Users->getLanguageId() );
 		}
 
 		if( $Users->getGraduationDate() != NULL){
@@ -262,7 +262,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function update( $Users )
 	{ 
-		$sql = "UPDATE Users SET  username = ?, password = ?, facebook_user_id = ?, main_email_id = ?, name = ?, solved = ?, submissions = ?, country_id = ?, state_id = ?, school_id = ?, scholar_degree = ?, `locale` = ?, graduation_date = ?, birth_date = ?, last_access = ?, verified = ?, verification_id = ? WHERE  user_id = ?;";
+		$sql = "UPDATE Users SET  username = ?, password = ?, facebook_user_id = ?, main_email_id = ?, name = ?, solved = ?, submissions = ?, country_id = ?, state_id = ?, school_id = ?, scholar_degree = ?, `language_id` = ?, graduation_date = ?, birth_date = ?, last_access = ?, verified = ?, verification_id = ? WHERE  user_id = ?;";
 		$params = array( 
 			$Users->getUsername(), 
 			$Users->getPassword(), 
@@ -275,7 +275,7 @@ abstract class UsersDAOBase extends DAO
 			$Users->getStateId(), 
 			$Users->getSchoolId(), 
 			$Users->getScholarDegree(), 
-			$Users->getLocale(), 
+			$Users->getLanguageId(), 
 			$Users->getGraduationDate(), 
 			$Users->getBirthDate(), 
 			$Users->getLastAccess(), 
@@ -305,7 +305,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function create( &$Users )
 	{ 
-		$sql = "INSERT INTO Users ( user_id, username, facebook_user_id, password, main_email_id, name, solved, submissions, country_id, state_id, school_id, scholar_degree, `locale`, graduation_date, birth_date, last_access, verified, verification_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Users ( user_id, username, facebook_user_id, password, main_email_id, name, solved, submissions, country_id, state_id, school_id, scholar_degree, `language_id`, graduation_date, birth_date, last_access, verified, verification_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Users->getUserId(), 
 			$Users->getUsername(), 
@@ -319,7 +319,7 @@ abstract class UsersDAOBase extends DAO
 			$Users->getStateId(), 
 			$Users->getSchoolId(), 
 			$Users->getScholarDegree(), 
-			$Users->getLocale(), 
+			$Users->getLanguageId(), 
 			$Users->getGraduationDate(), 
 			$Users->getBirthDate(), 
 			$Users->getLastAccess(), 
@@ -505,12 +505,12 @@ abstract class UsersDAOBase extends DAO
 			
 		}
 
-		if( ( !is_null (($a = $UsersA->getLocale()) ) ) & ( ! is_null ( ($b = $UsersB->getLocale()) ) ) ){
-				$sql .= " `locale` >= ? AND `locale` <= ? AND";
+		if( ( !is_null (($a = $UsersA->getLanguageId()) ) ) & ( ! is_null ( ($b = $UsersB->getLanguageId()) ) ) ){
+				$sql .= " `language_id` >= ? AND `language_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `locale` = ? AND"; 
+			$sql .= " `language_id` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

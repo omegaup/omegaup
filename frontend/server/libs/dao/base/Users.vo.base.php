@@ -58,8 +58,8 @@ class Users extends VO
 			if( isset($data['scholar_degree']) ){
 				$this->scholar_degree = $data['scholar_degree'];
 			}
-			if( isset($data['locale']) ){
-				$this->locale = $data['locale'];
+			if( isset($data['language_id']) ){
+				$this->language_id = $data['language_id'];
 			}
 			if( isset($data['graduation_date']) ){
 				$this->graduation_date = $data['graduation_date'];
@@ -102,7 +102,7 @@ class Users extends VO
 			"state_id" => $this->state_id,
 			"school_id" => $this->school_id,
 			"scholar_degree" => $this->scholar_degree,
-			"locale" => $this->locale,
+			"language_id" => $this->language_id,
 			"graduation_date" => $this->graduation_date,
 			"birth_date" => $this->birth_date,
 			"last_access" => $this->last_access
@@ -214,13 +214,13 @@ class Users extends VO
 	protected $scholar_degree;
 
 	/**
-	  * locale
+	  * language_id
 	  * 
 	  *  [Campo no documentado]<br>
 	  * @access public
-	  * @var varchar(5)
+	  * @var int(1)
 	  */
-	protected $locale;
+	protected $language_id;
 
 	/**
 	  * graduation_date
@@ -533,27 +533,27 @@ class Users extends VO
 	}
 
 	/**
-	  * getLocale
+	  * getLanguageId
 	  * 
-	  * Get the <i>locale</i> property for this object. Donde <i>locale</i> es  [Campo no documentado]
+	  * Get the <i>language_id</i> property for this object. Donde <i>language_id</i> es  [Campo no documentado]
 	  * @return varchar(5)
 	  */
-	final public function getLocale()
+	final public function getLanguageId()
 	{
-		return $this->locale;
+		return $this->language_id;
 	}
 
 	/**
-	  * setLocale( $locale )
+	  * setLanguageId( $language_id )
 	  * 
-	  * Set the <i>locale</i> property for this object. Donde <i>locale</i> es  [Campo no documentado].
-	  * Una validacion basica se hara aqui para comprobar que <i>locale</i> es de tipo <i>varchar(5)</i>. 
+	  * Set the <i>language_id</i> property for this object. Donde <i>language_id</i> es  [Campo no documentado].
+	  * Una validacion basica se hara aqui para comprobar que <i>language_id</i> es de tipo <i>varchar(5)</i>. 
 	  * Si esta validacion falla, se arrojara... algo. 
-	  * @param varchar(5)
+	  * @param int(11)
 	  */
-	final public function setLocale( $locale )
+	final public function setLanguageId( $language_id )
 	{
-		$this->locale = $locale;
+		$this->language_id = $language_id;
 	}
 
 	/**
