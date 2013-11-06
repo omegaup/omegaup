@@ -374,7 +374,6 @@ class UserController extends Controller {
 			}
 
 			$user->setVerified(1);
-			$user->setVerificationId('');
 			UsersDAO::save($user);
 		} catch (ApiException $e) {
 			throw $e;
