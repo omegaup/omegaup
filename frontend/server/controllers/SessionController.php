@@ -263,12 +263,12 @@ class SessionController extends Controller {
 									"name" => $fb_user_profile["name"],
 									"username" => str_replace(" ", "_", $fb_user_profile["name"] ),
 									"email" => $fb_user_profile["email"],
-									"fbid" => $fb_user_profile["id"],
+									"facebook_user_id" => $fb_user_profile["id"],
 									"password" => md5(time())
 								)
 							);
 				$res = UserController::apiCreate($r);
-				$vo_User = UsersDAO::getByPK( $res["id_user"] );
+				$vo_User = UsersDAO::getByPK( $res["user_id"] );
 
 		}
 

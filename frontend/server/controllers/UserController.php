@@ -48,14 +48,21 @@ class UserController extends Controller {
 		}
 
 		// Prepare DAOs
-		$user = new Users(array(
-					"username" => $r["username"],
-					"password" => SecurityTools::hashString($r["password"]),
-					"solved" => 0,
-					"submissions" => 0,
-					"verified" => 0,
-					"verification_id" => self::randomString(50),
-				));
+		$user_data = array(
+			"username" => $r["username"],
+			"password" => SecurityTools::hashString($r["password"]),
+			"solved" => 0,
+			"submissions" => 0,
+			"verified" => 0,
+			"verification_id" => self::randomString(50),
+		);
+		if (isset($r['name'])) {
+			$user_data['name'] = $r['name'];
+		}
+		if (isset($r['facebook_user_id'])) {
+			$user_data['facebook_user_id'] = $r['facebook_user_id'];
+		}
+		$user = new Users($user_data);
 
 		$email = new Emails(array(
 					"email" => $r["email"],
