@@ -375,7 +375,7 @@ class UserController extends Controller {
 								"verification_id" => $r["id"]
 							)));
 
-			$user = $users[0];
+			$user = (is_array($users) && count($users) > 0) ? $users[0] : null;
 			if (is_null($user)) {
 				throw new NotFoundException("Verification id is invalid.");
 			}
