@@ -31,7 +31,7 @@
 	<th>Time-wall (Sec)</th>
 	<th>Memory (MB)</th>
 	<th>Syscall count</th>
-	<th>Status</th>
+	<th>{#wordsStatus#}</th>
 	<th>Diff</th>
 	</tr>
 	{if isset($item.run_details) && isset($item.run_details.cases)}

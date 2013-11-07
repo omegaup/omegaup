@@ -98,7 +98,7 @@
 
 <div class="post hiddeable_on_error">
 	<div class="copy wait_for_ajax" id="contest_details" >
-		<h2>Detalles del concurso</h2>
+		<h2>{#contestDetailsContestDetails#}</h2>
 		<table id="main" width="100%">
 			<tr>
 			<!-- ----------------------------------------- -->
@@ -167,7 +167,7 @@
 								<textarea id='description' name='description'></textarea>
 							</td>
 							<td class="info">
-								<b>Window Length</b>
+								<b>{#contestDetailsWindowLength#}</b>
 								<p>
 									Indica el tiempo que tiene el {#wordsUser#} para env&iacute;ar soluci&oacute;n, si es NULL entonces ser&aacute; durante todo el tiempo del concurso.
 								</p>
@@ -180,7 +180,7 @@
 						<tr>
 							<!-- ----------------------------------------- -->
 							<td class="info">
-								<b>Scoreboard</b>
+								<b>{#contestDetailsScoreboard#}</b>
 								<p>
 									Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser&aacute; visible
 								</p>
@@ -189,7 +189,7 @@
 								<input id='scoreboard' name='scoreboard' value='100' type='text'>
 							</td>
 							<td class="info">
-								<b>Submissions Gap</b>
+								<b>{#contestDetailsSubmissionsGap#}</b>
 								<p>
 									Tiempo m&iacute;nimo en minutos que debe de esperar un {#wordsUser#} despues de realizar un env&iacute;o para hacer otro.
 								</p>
@@ -202,7 +202,7 @@
 						<tr>
 							<!-- ----------------------------------------- -->
 							<td class="info">
-								<b>Penalty Time Start</b>
+								<b>{#contestDetailsPenaltyTimeStart#}</b>
 								<p>
 									 Indica el momento cuando se inicia a contar el tiempo: cuando inicia el concurso o cuando se abre el problema
 								</p>
@@ -230,26 +230,26 @@
 							<td class="info">
 								<b>{#wordsFeedback#}</b>
 								<p>
-									Si al {#wordsUser#} se le entrega retroalimentación inmediata sobre su problema
+									{#contestDetailsYes#} al {#wordsUser#} se le entrega retroalimentación inmediata sobre su problema
 								</p>
 							</td>
 							<td>
 								<select name='feedback' id='feedback'>
-									<option value='yes'>Si</option>
-									<option value='no'>No</option>
-									<option value='partial'>Parcial</option>
+									<option value='yes'>{#contestDetailsYes#}</option>
+									<option value='no'>{#wordsNo#}</option>
+									<option value='partial'>{#wordsPartial#}</option>
 								</select>
 							</td>
 							<td class="info">
-								<b>Partial Score</b>
+								<b>{#contestDetailsPartialScore#}</b>
 								<p>
 									 Verdadero si el {#wordsUser#} recibir&aacute; puntaje parcial para problemas no resueltos en {#wordsAll#} los casos
 								</p>
 							</td>
 							<td>
 								<select name="partial_score" id="partial_score">
-									<option value="0">No</option>
-									<option value="1">Si</option>
+									<option value="0">{#wordsNo#}</option>
+									<option value="1">{#contestDetailsYes#}</option>
 								</select>
 							</td>
 						</tr>
@@ -271,8 +271,8 @@
 							</td>
 							<td>
 								<select name='penalty_calc_policy' id='penalty_calc_policy'>
-									<option value='sum'>Sum</option>
-									<option value='max'>Max</option>
+									<option value='sum'>{#contestDetailsSum#}</option>
+									<option value='max'>{#contestDetailsMax#}</option>
 								</select>
 							</td>
 						</tr>
@@ -324,7 +324,7 @@
 <div class="post hiddeable_on_error" style="display:none;" id="problem_upload_window">
 	<div class="copy">
 		<!-- <progress></progress> -->
-		<h2>Nuevo problema</h2>
+		<h2>{#contestDetailsNewProblem#}</h2>
 
 		<form enctype="multipart/form-data" id="newProbForm">
 		<table id="newprob" width="100%">
@@ -351,8 +351,8 @@
 		</td>
 		<td>
 			<select id="public">
-				<option value="1">Si</option>
-				<option value="0">No</option>
+				<option value="1">{#contestDetailsYes#}</option>
+				<option value="0">{#wordsNo#}</option>
 			</select>
 		</td>
 		<td class="info">

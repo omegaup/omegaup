@@ -31,7 +31,7 @@
 			</div>
 			
 			<div class="form-group">
-				<label for="order">Orden en el concurso</label>
+				<label for="order">{#contestAddproblemContestOrder#}</label>
 				<input id='order' name='order' value='1' size="2" class="form-control" />
 			</div>
 			

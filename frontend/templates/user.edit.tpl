@@ -3,19 +3,19 @@
 	<div class="col-md-10">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h2 class="panel-title">Edita tu perfil</h2>
+				<h2 class="panel-title">{#userEditEditProfile#}</h2>
 			</div>
 			<div class="panel-body">
 				<form id="user_profile_form" class="form-horizontal" role="form">
 					<div class="form-group">
-						<label for="name" class="col-md-3 control-label">Nombre</label>
+						<label for="name" class="col-md-3 control-label">{#profile#}</label>
 						<div class="col-md-7">
 							<input id='name' name='name' value='' type='text' size='30' class="form-control">
 						</div>
 					</div>
 					
 					<div class="form-group">
-						<label for="birth_date" class="col-md-3 control-label">Fecha de nacimiento</label>
+						<label for="birth_date" class="col-md-3 control-label">{#userEditBirthDate#}</label>
 						<div class="col-md-7">
 							<input id='birth_date' name='birth_date' value='' type='text' size ='10' class="form-control">
 						</div>
@@ -277,14 +277,14 @@
 					</div>
 					
 					<div class="form-group">
-						<label for="state_id" class="col-md-3 control-label">Estado</label>
+						<label for="state_id" class="col-md-3 control-label">{#profileState#}</label>
 						<div class="col-md-7">
 							<select name='state_id' id='state_id' disabled="true" class="form-control"></select>
 						</div>
 					</div>
 					
 					<div class="form-group">
-						<label for="school" class="col-md-3 control-label">Escuela</label>
+						<label for="school" class="col-md-3 control-label">{#profileSchool#}</label>
 						<div class="col-md-7">
 							<input id='school' name='school' value='' type='text' size='20' class="form-control" /> 
 						</div>
@@ -298,7 +298,7 @@
 					</div>
 
 					<div class="form-group">
-						<label for="locale" class="col-md-3 control-label">Lenguaje</label>
+						<label for="locale" class="col-md-3 control-label">{#wordsLanguage#}</label>
 						<div class="col-md-7">
 						<select id="locale" name='locale' class="form-control" >
 							<option value="es">espa&ntilde;ol</option>
@@ -311,15 +311,15 @@
 					</div>
 					
 					<div class="form-group">
-						<label for="scholar_degree" class="col-md-3 control-label">Grado escolar</label>
+						<label for="scholar_degree" class="col-md-3 control-label">{#userEditSchoolGrade#}</label>
 						<div class="col-md-7">
 							<select name='scholar_degree' id='scholar_degree' class="form-control">			
-								<option value='Primaria'>Primaria</option>
-								<option value='Secundaria'>Secundaria</option>
-								<option value='Preparatoria'>Preparatoria</option>
-								<option value='Licenciatura'>Licenciatura</option>
+								<option value='{#userEditElementary#}'>{#userEditElementary#}</option>
+								<option value='{#userEditMiddleSchool#}'>{#userEditMiddleSchool#}</option>
+								<option value='{#userEditHighSchool#}'>{#userEditHighSchool#}</option>
+								<option value='{#userEditBachelors#}'>{#userEditBachelors#}</option>
 								<option value='Maestría'>Maestría</option>
-								<option value='Doctorado'>Doctorado</option>
+								<option value='{#userEditDoctorate#}'>{#userEditDoctorate#}</option>
 								<option value='Post-doc'>Post-doc</option>
 							</select>
 						</div>
@@ -333,7 +333,7 @@
 					</div>
 					
 					<div class="form-group">
-						<label class="col-md-3 control-label">Imagen de perfil</label>
+						<label class="col-md-3 control-label">{#userEditProfileImage#}</label>
 						<div class="col-md-7">
 							<a href="http://www.gravatar.com" target="_blank" class="btn btn-link">Súbela en Gravatar.com usando tu email: {$CURRENT_USER_EMAIL}</a>
 						</div>
@@ -341,7 +341,7 @@
 					
 					<div class="form-group">
 						<div class="col-md-offset-3 col-md-7">
-							<button type='submit' class="btn btn-primary">Guardar cambios</button>
+							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
 						</div>
 					</div>
 				</form>

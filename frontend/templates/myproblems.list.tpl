@@ -6,12 +6,12 @@
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="bottom-margin">
-			<a href="/problemcreate.php" class="btn btn-primary" id="problem-create">Crear un problema</a>
+			<a href="/problemcreate.php" class="btn btn-primary" id="problem-create">{#myproblemsListCreateProblem#}</a>
 		</div>
 		<div id="parent_problem_list">
 			<div class="wait_for_ajax panel panel-default no-bottom-margin" id="problem_list">
 				<div class="panel-heading">
-					<h3 class="panel-title">Mis Problemas</h3>
+					<h3 class="panel-title">{#myproblemsListMyProblems#}</h3>
 				</div>
 				<table class="table">
 					<thead>
@@ -51,8 +51,8 @@
 				html += "<tr>"
 					+ "<td><b><a href='/arena/problem/" + problems.results[i].alias  + "/'>" + omegaup.escape(problems.results[i].title) + "</a></b></td>"										
 					+ '<td>'+ ((problems.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
-					+ '<td><a href="/problemedit.php?problem=' + problems.results[i].alias  + '">Editar</a></td>'
-					+ '<td><a href="/addproblemtocontest.php?problem=' + problems.results[i].alias  + '">Agregar a concurso</a></td>'					
+					+ '<td><a href="/problemedit.php?problem=' + problems.results[i].alias  + '">{#wordsEdit#}</a></td>'
+					+ '<td><a href="/addproblemtocontest.php?problem=' + problems.results[i].alias  + '">{#myproblemsListAddContests#}</a></td>'					
 					+ '<td><a href="/problemstats.php?problem=' + problems.results[i].alias  + '">Estadísticas</a></td>'
 					+ "</tr>";
 			}

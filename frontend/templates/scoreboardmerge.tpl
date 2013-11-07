@@ -39,7 +39,7 @@
 				contests.push(alias);
 			}	
 						
-			html += "<td colspan=\"2\"><b>Total</b></td>";
+			html += "<td colspan=\"2\"><b>{#wordsTotal#}</b></td>";
 			html += "</tr>"
 			
 			ranking = scoreboard["ranking"];

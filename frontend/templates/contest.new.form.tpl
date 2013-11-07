@@ -17,8 +17,8 @@
 		{if $IS_UPDATE neq 1}
 		<div class="btn-group bottom-margin">
 			<button class="btn btn-default" id='omi' name='omi'>Estilo OMI - IOI</button>
-			<button class="btn btn-default" id='preioi' name='preioi'>Estilo Preselectivo IOI</button>
-			<button class="btn btn-default" id='conacup' name='conacup'>Estilo CONACUP</button>
+			<button class="btn btn-default" id='preioi' name='preioi'>{#contestNewForm#}</button>
+			<button class="btn btn-default" id='conacup' name='conacup'>{#contestNewFormConacupStyle#}</button>
 		</div>		
 		{/if}
 		<form class="new_contest_form">
@@ -42,19 +42,19 @@
 					<div class="form-group col-md-6">
 						<label for="alias">Título corto (alias)</label>
 						<input id='alias' name='alias' value='' type='text' class="form-control" {IF $IS_UPDATE eq 1} disabled="true" {/if}>
-						<p class="help-block">El título corto se usa para construir la URL del concurso (ejemplos: ANPA2010, CONACUP2012, OMI2013, etc..). No puede contener espacios.</p>
+						<p class="help-block">El título corto se usa para construir la URL del concurso (ejemplos: ANPA2010, CONACUP2012, OMI2013, etc..). {#wordsNo#} puede contener espacios.</p>
 					</div>
 				</div>
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="start_time">Fecha de Inicio</label>
+						<label for="start_time">{#contestNewFormStartDate#}</label>
 						<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
 						<p class="help-block">La fecha (en hora local) en la que inicia el concurso</p>
 					</div>
 					
 					<div class="form-group col-md-6">
-						<label for="finish_time">Fecha de Fin</label>
+						<label for="finish_time">{#contestNewFormEndDate#}</label>
 						<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
 						<p class="help-block">La hora (en hora local) en la que termina el concurso.
 					</div>
@@ -75,7 +75,7 @@
 						</div>
 						<input id='window_length' name='window_length' value='' type='text' disabled="true" size='3' class="form-control">
 						<p class="help-block">Si está activo, indica el tiempo en minutos que tiene el {#wordsUser#} para concursar y env&iacute;ar soluciones a partir de que entra al concurso en la arena (estilo USACO/Preselectivo IOI).
-						Si Inicios Diferentes está desactivado, entonces el concursante tendrá todo el tiempo entre la Fecha de Inicio y la Fecha de Fin para concursar.</p>
+						Si Inicios Diferentes está desactivado, entonces el concursante tendrá todo el tiempo entre la {#contestNewFormStartDate#} y la {#contestNewFormEndDate#} para concursar.</p>
 					</div>
 				</div>
 				
@@ -95,11 +95,11 @@
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="penalty_time_start">Tipo de Penalty</label>
+						<label for="penalty_time_start">{#contestNewFormPenaltyType#}</label>
 						<select name='penalty_time_start' id='penalty_time_start' class="form-control">
-							<option value='none'>Sin Penalty</option>
-							<option value='problem'>Por problema</option>
-							<option value='contest'>Por concurso</option>
+							<option value='none'>{#contestNewFormNoPenalty#}</option>
+							<option value='problem'>{#contestNewFormByProblem#}</option>
+							<option value='contest'>{#contestNewFormByContests#}</option>
 						</select>
 						<p class="help-block">Indica el momento cuando se inicia a contar el tiempo: cuando inicia el concurso o cuando se abre el problema.</p>
 					</div>
@@ -116,8 +116,8 @@
 						<label for="feedback">{#wordsFeedback#}</label>
 						<select name='feedback' id='feedback' class="form-control">
 							<option value='yes'>Sí</option>
-							<option value='no'>No</option>
-							<option value='partial'>Parcial</option>
+							<option value='no'>{#wordsNo#}</option>
+							<option value='partial'>{#wordsPartial#}</option>
 						</select>
 						<p class="help-block">Si al {#wordsUser#} se le entrega retroalimentación inmediata sobre su problema</p>
 					</div>
@@ -134,7 +134,7 @@
 						<label for="show_scoreboard_after">Scoreboard al finalizar el concurso</label>
 						<select id='show_scoreboard_after' name='show_scoreboard_after' class="form-control">
 							<option value='1'>Sí</option>
-							<option value='0'>No</option>
+							<option value='0'>{#wordsNo#}</option>
 						</select>
 						<p class="help-block">Mostrar automáticamente el scoreboard completo al finalizar el concurso.</p>
 					</div>
@@ -143,7 +143,7 @@
 						<label for="public">Público</label>
 						<select name='public' id='public' class="form-control">
 							<option value='1'>Sí</option>
-							<option value='0'>No</option>
+							<option value='0'>{#wordsNo#}</option>
 						</select>
 						<p class="help-block">Mostrar el concurso en el listado público.</p>
 					</div>
@@ -151,9 +151,9 @@
 				
 				<div class="form-group">
 				{if $IS_UPDATE eq 1}
-					<button type='submit' class="btn btn-primary">Actualizar concurso</button>
+					<button type='submit' class="btn btn-primary">{#contestNewFormUpdateContest#}</button>
 				{else}
-					<button type='submit' class="btn btn-primary">Agendar concurso</button>
+					<button type='submit' class="btn btn-primary">{#contestNewFormScheduleContest#}</button>
 				{/if}
 				</div>
 		</form>

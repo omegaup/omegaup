@@ -16,7 +16,7 @@
 	
 	<div class="row">
 		<div class="form-group col-md-6">
-			<label for="problem_contents">Archivo</label>
+			<label for="problem_contents">{#problemEditFormFile#}</label>
 			<input name="problem_contents" id="problem_contents" type="file" class="form-control" />
 		</div>
 		
@@ -35,9 +35,9 @@
 		<div class="form-group col-md-6">
 			<label for="validator">{#problemEditFormValidatorType#}</label>
 			<select name='validator' id='validator' class="form-control" >
-					<option value="token-caseless">Token por Token, ignorando diferencias en mayúsculas/minúsculas (default)	</option>
+					<option value="token-caseless">{#problemEditFormTokenByToken#}, ignorando diferencias en mayúsculas/minúsculas (default)	</option>
 					<option value="token-numeric">Tokens numéricos con tolerancia</option>		
-					<option value="token">Token por Token</option>		
+					<option value="token">{#problemEditFormTokenByToken#}</option>		
 					<option value="literal">Sólo salida, comparación literal</option>
 					<option value="custom">Validador personalizado (validator.$lang$)</option>
 			</select>
@@ -65,7 +65,7 @@
 		<div class="form-group col-md-6">
 			<label for="public">{#problemEditorFormAppearsAsPublic#}</label>
 			<select name='public' id='public' class="form-control">
-				<option value="0">No</option>
+				<option value="0">{#wordsNo#}</option>
 				<option value="1">Sí</option>
 			</select>
 		</div>
@@ -76,13 +76,13 @@
 	<div class="row">
 		<div class="form-group col-md-6 no-bottom-margin">
 		{if $IS_UPDATE eq 1}
-			<button type='submit' class="btn btn-primary">Actualizar problema</button>	
+			<button type='submit' class="btn btn-primary">{#problemEditFormUpdateProblem#}</button>	
 		{else}
-			<button type='submit' class="btn btn-primary">Crear problema</button>	
+			<button type='submit' class="btn btn-primary">{#problemEditFormCreateProblem#}</button>	
 		{/if}
 		</div>
 	</div>
 </form>
 	<p>
-		<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup">Ayuda</a>
+		<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup">{#navHelp#}</a>
 	</p>

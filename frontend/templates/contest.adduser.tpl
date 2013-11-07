@@ -11,7 +11,7 @@
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
-		<h2 class="panel-title">Agregar concursante</h2>
+		<h2 class="panel-title">{#contestAdduserAddContestant#}</h2>
 	</div>
 	<div class="panel-body">
 		<form class="form bottom-margin" id="add-user-form">

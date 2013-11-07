@@ -5,7 +5,7 @@
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
-		<h3 class="panel-title">Editar Problema</h3>
+		<h3 class="panel-title">{#problemEditEditProblem#}</h3>
 	</div>
 	<div class="panel-body">
 		<div class="wait_for_ajax" id="problems_list">

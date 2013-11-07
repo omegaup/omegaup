@@ -29,7 +29,7 @@
 							<option value="NO-AC">No AC</option>
 						</select>
 						
-						<label for="runsstatus">Status: </label>
+						<label for="runsstatus">{#wordsStatus#}: </label>
 						<select class="runsstatus" name="runsstatus">
 							<option value="">{#wordsAll#}</option>
 							<option value="new">new</option>
@@ -70,7 +70,7 @@
 						<th>{#wordsRuntime#}</th>
 						<th>{#wordsMemoria#}</th>
 						<th>{#wordsTime#}</th>
-						<th>Status</th>
+						<th>{#wordsStatus#}</th>
 						<th>{#wordsPoints#}</th>
 						<th>{#wordsPenalty#}</th>
 						<th>Rejuecear</th>

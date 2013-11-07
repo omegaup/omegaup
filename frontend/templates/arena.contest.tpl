@@ -69,12 +69,12 @@
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>
 							<tr>
-								<th>ID</th>
+								<th>{#wordsID#}</th>
 								<th>{#wordsLanguage#}</th>
 								<th>{#wordsRuntime#}</th>
 								<th>{#wordsMemoria#}</th>
 								<th>{#wordsTime#}</th>
-								<th>Status</th>
+								<th>{#wordsStatus#}</th>
 								<th>{#wordsPoints#}</th>
 								<th>{#wordsPenalty#}</th>
 								<th>C&oacute;digo</th>
@@ -109,7 +109,7 @@
 							<th></th>
 							<th></th>
 							<th>{#wordsUser#}</th>
-							<th class="total" colspan="2">Total</th>
+							<th class="total" colspan="2">{#wordsTotal#}</th>
 						</tr>
 					</thead>
 					<tbody>

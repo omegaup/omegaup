@@ -1,4 +1,4 @@
 <html>
-	<head>Scoreboard</head>
+	<head>{#contestDetailsScoreboard#}</head>
 	<body>Hello, chap!</body>
 </html>

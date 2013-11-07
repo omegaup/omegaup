@@ -31,7 +31,7 @@
 	<div class="col-md-4">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title">Coder del mes</h3>
+				<h3 class="panel-title">{#index#}</h3>
 			</div>
 			<div id="coder_of_the_month" class="panel-body">
 				<div class="rss_element">

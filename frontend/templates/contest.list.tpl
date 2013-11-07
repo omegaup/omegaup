@@ -42,9 +42,9 @@
 					+ '<td><a href="' + makeWorldClockLink(startDate) + '">' + startDate.format("long", "es") + "</a></td>"
 					+ '<td><a href="' + makeWorldClockLink(endDate) + '">' + endDate.format("long", "es") + "</a></td>"
 					+ '<td>'+ ((contests.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
-					+ '<td><a href="/contestedit.php?contest=' + contests.results[i].alias  + '">Editar</a></td>'
+					+ '<td><a href="/contestedit.php?contest=' + contests.results[i].alias  + '">{#wordsEdit#}</a></td>'
 					+ '<td><a href="/addproblemtocontest.php?contest=' + contests.results[i].alias  + '">Agregar problemas</a></td>'
-					+ '<td><a href="/addusertoprivatecontest.php?contest=' + contests.results[i].alias  + '">Agregar concursantes</a></td>'
+					+ '<td><a href="/addusertoprivatecontest.php?contest=' + contests.results[i].alias  + '">{#contestListAddContestants#}</a></td>'
 					+ "<td><a href='/arena/" + contests.results[i].alias  + "/admin/'>Envíos</a></td>"
 					+ '<td><a href="/conteststats.php?contest=' + contests.results[i].alias  + '">Estadísticas</a></td>'
 					+ "</tr>";

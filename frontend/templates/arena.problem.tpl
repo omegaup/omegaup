@@ -27,12 +27,12 @@
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>
 							<tr>
-								<th>ID</th>
+								<th>{#wordsID#}</th>
 								<th>{#wordsLanguage#}</th>
 								<th>{#wordsRuntime#}</th>
 								<th>{#wordsMemoria#}</th>
 								<th>{#wordsTime#}</th>
-								<th>Status</th>
+								<th>{#wordsStatus#}</th>
 								<th>{#wordsPoints#}</th>
 								<th>{#wordsPenalty#}</th>
 								<th>C&oacute;digo</th>
