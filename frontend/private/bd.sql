@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS `Countries` (
 
 CREATE TABLE IF NOT EXISTS `Emails` (
   `email_id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(256) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`email_id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
@@ -712,6 +712,6 @@ WHERE NEW.problem_id =  `Problems`.`problem_id`;
 ALTER TABLE  `Schools` CHANGE  `state_id`  `state_id` INT( 11 ) NULL;
 ALTER TABLE  `Schools` CHANGE  `school_id`  `school_id` INT( 11 ) NOT NULL AUTO_INCREMENT;
 ALTER TABLE Runs CHANGE COLUMN language language enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs') NOT NULL;
-ALTER TABLE Problems ADD COLUMN languages SET('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,cs,p,hs' AFTER validator;
+
 
 COMMIT;
