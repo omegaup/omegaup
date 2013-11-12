@@ -7,7 +7,29 @@ class Logger
 
 
     private static $db_querys = 0;
+	
+	private static function PrintRequest()
+	{		
+		if (isset($_REQUEST))
+		{
+			self::log("REQUEST PARAMS: ");
 
+			foreach ( $_REQUEST as $k => $v )
+			{
+				// Avoid leaking passwords in log
+				if ($k === "password")
+				{
+					$v = "*****";
+				}
+				self::log("   " . $k . ": " . $v);
+			}
+		}
+		else
+		{
+			self::log("$_REQUEST not set");
+		}	
+			
+	}
 
     /**
       *
@@ -20,13 +42,7 @@ class Logger
         self::log("---------------------------------------------------");
         self::log("                 FATAL EXCEPTION ERROR ");
 
-        // Something bad happened, log error
-        self::log("REQUEST PARAMS: ");
-
-        foreach ( $_REQUEST as $k => $v )
-        {
-            self::log(" " . $k . ": " . $v);
-        }
+        self::PrintRequest();
 
         self::log( $e->getMessage( ) );
         self::error("AT FILE:");
@@ -48,13 +64,8 @@ class Logger
     {
         self::log("---------------------------------------------------");
         self::log( "   " . $e->getMessage() );
-        // Something bad happened, log error
-        self::log("REQUEST PARAMS: ");
-
-        foreach ( $_REQUEST as $k => $v )
-        {
-            self::log("   " . $k . ": " . $v);
-        }
+        
+        self::PrintRequest();
         
         self::log("AT FILE:");
         self::log(" " . $e->getFile( ) );
@@ -208,14 +219,7 @@ class Logger
     {
         self::log(" ERROR | " . $msg);			
 
-		if (isset($_REQUEST)) {
-			
-			self::log("REQUEST PARAMS: ");
-			foreach ( $_REQUEST as $k => $v )
-			{
-				self::log("   " . $k . ": " . $v);
-			}
-		}
+		self::PrintRequest();
     }
     
     public static final function warn($msg)
