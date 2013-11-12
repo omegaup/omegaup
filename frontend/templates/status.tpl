@@ -4,7 +4,7 @@
 	<div class="alert alert-danger" id='email-verification-alert'>
 		<button type="button" class="close" id="email-verification-alert-close">&times;</button>
 		<span class="message">
-			A partir del 1ro de Octubre no podrás loggearte con este usuario si 
+			A partir del 15 de Noviembre no podrás loggearte con este usuario si 
 			no verificas tu correo. Actualiza tu email <b><a href="/useremailedit.php">aquí</a></b>
 			y responde el correo de verificación. Si tienes dudas contáctanos en joe@omegaup.com .
 		</span>
