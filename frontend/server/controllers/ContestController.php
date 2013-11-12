@@ -28,7 +28,7 @@ class ContestController extends Controller {
 
 		try {
 			// Get all contests using only relevan columns
-			$contests = ContestsDAO::getAll(NULL, NULL, 'contest_id', "DESC", $relevant_columns);
+			$contests = ContestsDAO::getAll(NULL, NULL, 'finish_time', "DESC", $relevant_columns);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -43,7 +43,7 @@ class ContestController extends Controller {
 		$addedContests = array();
 
 		foreach ($contests as $c) {
-			// At most we want 30 contests @TODO paginar correctamente
+			// At most we want 100 contests @TODO paginar correctamente
 			if (sizeof($addedContests) == 100) {
 				break;
 			}

@@ -6,7 +6,24 @@
  * @author joemmanuel
  */
 
-class ListContests extends OmegaupTestCase {
+class ContestListTest extends OmegaupTestCase {
+	
+	private function assertTitleInList($response, $contestData, $inverse = false) {
+	
+		// Assert our contest is there
+		$titles = array();
+		foreach ($response['results'] as $entry) {
+			$titles[] = $entry["title"];
+		}
+		
+        $this->assertArrayHasKey("0", $response['results']);     
+		
+		if ($inverse === true) {
+			$this->assertNotContains($contestData["request"]["title"], $titles);
+		} else {		
+			$this->assertContains($contestData["request"]["title"], $titles);
+		}
+	}
 	
 	/** 
 	 * Basic test. Check that most recent contest is at the top of the list
@@ -41,10 +58,8 @@ class ListContests extends OmegaupTestCase {
 		$contestData = ContestsFactory::createContest();						
 		
 		$response = ContestController::apiList($r);
-		
-		// Assert our contest is there
-        $this->assertArrayHasKey("0", $response['results']);        
-        $this->assertEquals($contestData["request"]["title"], $response['results'][0]["title"]);
+				
+		$this->assertTitleInList($response, $contestData);
 	}	
 	
 	
@@ -68,9 +83,7 @@ class ListContests extends OmegaupTestCase {
 		
 		$response = ContestController::apiList($r);
 		
-		// Assert our contest is there
-        $this->assertArrayHasKey("0", $response['results']);        
-        $this->assertEquals($contestData["request"]["title"], $response['results'][0]["title"]);
+		$this->assertTitleInList($response, $contestData);
 	}
 	
 	/** 
@@ -94,8 +107,7 @@ class ListContests extends OmegaupTestCase {
 		$response = ContestController::apiList($r);
 		
 		// Assert our contest is not there
-        $this->assertArrayHasKey("0", $response['results']);        
-        $this->assertNotEquals($contestData["request"]["title"], $response['results'][0]["title"]);
+        $this->assertTitleInList($response, $contestData, true /*assertNoContains*/);	
 	}
 	
 	
@@ -114,8 +126,7 @@ class ListContests extends OmegaupTestCase {
 		$response = ContestController::apiList($r);
 		
 		// Assert our contest is there
-        $this->assertArrayHasKey("0", $response['results']);        
-        $this->assertEquals($contestData["request"]["title"], $response['results'][0]["title"]);
+        $this->assertTitleInList($response, $contestData);
 	}
 	
 	/** 
@@ -140,8 +151,7 @@ class ListContests extends OmegaupTestCase {
 		$response = ContestController::apiList($r);
 		
 		// Assert our contest is there
-        $this->assertArrayHasKey("0", $response['results']);        
-        $this->assertEquals($contestData["request"]["title"], $response['results'][0]["title"]);
+        $this->assertTitleInList($response, $contestData);
 	}
 }
 
