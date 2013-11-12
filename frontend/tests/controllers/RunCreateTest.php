@@ -125,7 +125,7 @@ class CreateRun extends OmegaupTestCase {
 	/**
 	 * Cannot submit run when contest ended
 	 * 
-	 * @expectedException ForbiddenAccessException
+	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testRunWhenContestExpired() {
 
@@ -159,7 +159,7 @@ class CreateRun extends OmegaupTestCase {
 	/**
 	 * Test a invalid submission to a private contest
 	 * 
-	 * @expectedException ForbiddenAccessException
+	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testRunPrivateContestWithUserNotRegistred() {
 
@@ -178,7 +178,7 @@ class CreateRun extends OmegaupTestCase {
 	/**
 	 * Cannot submit run when contest not started yet
 	 * 
-	 * @expectedException ForbiddenAccessException
+	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testRunWhenContestNotStarted() {
 
@@ -338,7 +338,7 @@ class CreateRun extends OmegaupTestCase {
 	/**
 	 * Test sending runs after the window length expired
 	 * 
-	 * @expectedException ForbiddenAccessException
+	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testNewRunOutWindowLengthPublicContest() {
 		
@@ -462,7 +462,7 @@ class CreateRun extends OmegaupTestCase {
 	 * User cannot send runs to a private problem, regardless of it being 
 	 * in a contest
 	 * 
-	 * @expectedException ForbiddenAccessException
+	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testRunToPrivateProblemWhileInsideAContest()
 	{
@@ -495,6 +495,45 @@ class CreateRun extends OmegaupTestCase {
 		
 		// Call API
 		$response = RunController::apiCreate($r);		
+	}
+	
+	/**
+	 * User can send runs to a public problem, regardless of it being 
+	 * in a contest
+	 * 
+	 * @expectedException NotAllowedToSubmitException
+	 */
+	public function testRunsToPublicProblemInsideSubmissionGap()
+	{
+		// Create public problem
+		$problemData = ProblemsFactory::createProblem();
+				
+		// Create our contestant
+		$this->contestant = UserFactory::createUser();
+		
+		// Create an empty request
+		$r = new Request();
+
+		// Log in as contest director
+		$r["auth_token"] = $this->login($this->contestant);
+
+		// Build request
+		$r["contest_alias"] = ""; // Not inside a contest
+		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r["language"] = "c";
+		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+
+		//PHPUnit does not set IP address, doing it manually
+		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
+		
+		// Call API
+		$response = RunController::apiCreate($r);
+
+		// Validate the run
+		$this->assertRun($r, $response);
+				
+		// Call API
+		$response = RunController::apiCreate($r);
 	}
 }
 

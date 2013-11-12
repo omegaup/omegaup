@@ -7,6 +7,7 @@
  */
 class RunController extends Controller {
 
+	public static $defaultSubmissionGap = 60; /*seconds*/
 	public static $grader = null;
 	private static $practice = false;		
 
@@ -52,14 +53,14 @@ class RunController extends Controller {
 									$r["problem"]->getProblemId(),
 									$r["current_user_id"])
 							&& !Authorization::IsSystemAdmin($r["current_user_id"])) {
-						throw new NotAllowedToSubmitException();
+							throw new NotAllowedToSubmitException("You have to wait " . self::$defaultSubmissionGap . " between submissions");
 					}
 
 					self::$practice = true;
 					return;
 				} else 
 				{
-					throw new ForbiddenAccessException("Unable to submit run: The problem is not public.");
+					throw new NotAllowedToSubmitException("The problem is not public.");
 				}
 			}
 
@@ -78,25 +79,25 @@ class RunController extends Controller {
 			if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				// Before submit something, contestant had to open the problem/contest
 				if (!ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) {
-					throw new ForbiddenAccessException("Unable to submit run: You must open the problem before trying to submit a solution.");
+					throw new NotAllowedToSubmitException("You must open the problem before trying to submit a solution.");
 				}
 
 				// Validate that the run is timely inside contest
 				if (!$r["contest"]->isInsideContest($r["current_user_id"])) {
-					throw new ForbiddenAccessException("Unable to submit run: Contest time has expired or not started yet.");
+					throw new NotAllowedToSubmitException("Contest time has expired or not started yet.");
 				}
 
 				// Validate if contest is private then the user should be registered
 				if ($r["contest"]->getPublic() == 0
 						&& is_null(ContestsUsersDAO::getByPK(
 										$r["current_user_id"], $r["contest"]->getContestId()))) {
-					throw new ForbiddenAccessException("Unable to submit run: You are not registered to this contest.");
+					throw new NotAllowedToSubmitException("You are not registered to this contest.");
 				}
 
 				// Validate if the user is allowed to submit given the submissions_gap 			
 				if (!RunsDAO::IsRunInsideSubmissionGap(
 								$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"])) {
-					throw new NotAllowedToSubmitException("Unable to submit run: You have to wait " . $r["contest"]->getSubmissionsGap() . " seconds between consecutive submissions.");
+					throw new NotAllowedToSubmitException("You have to wait " . $r["contest"]->getSubmissionsGap() . " seconds between consecutive submissions.");
 				}
 			}
 		} catch (ApiException $apiException) {

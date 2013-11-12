@@ -20,6 +20,9 @@ require_once("base/Runs.vo.base.php");
  */
 class RunsDAO extends RunsDAOBase
 {
+	const DEFAULT_SUBMISSION_GAP = 120;
+
+
 	/*
 	 * Gets a boolean indicating whether there are runs that are not ready.
 	 */
@@ -378,9 +381,8 @@ class RunsDAO extends RunsDAOBase
 			return true;
 		}
 
-		if ($contest_id == null) {
-			// Default is 2 minutes.
-			$submission_gap = 120;
+		if ($contest_id == null) {			
+			$submission_gap = RunController::$defaultSubmissionGap;
 		} else {
 			// Get submissions gap
 			$contest = ContestsDAO::getByPK($contest_id);
