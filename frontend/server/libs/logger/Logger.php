@@ -26,7 +26,7 @@ class Logger
 		}
 		else
 		{
-			self::log("$_REQUEST not set");
+			self::log("_REQUEST not set");
 		}	
 			
 	}

@@ -44,16 +44,23 @@ class RunController extends Controller {
 			Validators::isInEnum($r["language"], "language", array('kp', 'kj', 'c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'cat', 'hs'));
 			Validators::isStringNonEmpty($r["source"], "source");
 
-			// Check for practice, there is no contest info in this scenario
-			if ($r["contest_alias"] == "" && (Authorization::IsSystemAdmin($r["current_user_id"]) || time() > ProblemsDAO::getPracticeDeadline($r["problem"]->getProblemId()))) {
-				if (!RunsDAO::IsRunInsideSubmissionGap(
-								null, $r["problem"]->getProblemId(), $r["current_user_id"])
-						&& !Authorization::IsSystemAdmin($r["current_user_id"])) {
-					throw new NotAllowedToSubmitException();
-				}
+			// Check for practice or public problem, there is no contest info in this scenario
+			if ($r["contest_alias"] == "") {
+				if (Authorization::IsSystemAdmin($r["current_user_id"]) || time() > ProblemsDAO::getPracticeDeadline($r["problem"]->getProblemId()) || $r["problem"]->getPublic() == true) {					
+					if (!RunsDAO::IsRunInsideSubmissionGap(
+									null, 
+									$r["problem"]->getProblemId(),
+									$r["current_user_id"])
+							&& !Authorization::IsSystemAdmin($r["current_user_id"])) {
+						throw new NotAllowedToSubmitException();
+					}
 
-				self::$practice = true;
-				return;
+					self::$practice = true;
+					return;
+				} else 
+				{
+					throw new ForbiddenAccessException("Unable to submit run: The problem is not public.");
+				}
 			}
 
 			// Validate contest
