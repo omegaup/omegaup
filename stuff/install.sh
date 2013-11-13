@@ -59,8 +59,8 @@ if [ ! -f /usr/bin/vim ]; then
 fi
 
 # Ensure users have been added.
-useradd -m omegaup || echo
-useradd -m www-data || echo
+useradd omegaup || echo
+useradd www-data || echo
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
@@ -90,6 +90,7 @@ EOF
 	fi
 	
 	sudo apt-get install -qq -y phpunit-selenium || echo 'Selenium unavailable'
+	sudo apt-get install -qq -y php5-json || echo
 	
 	# Restart php-fpm so it picks php5-curl and php5-mcrypt.
 	sudo /etc/init.d/php5-fpm restart
