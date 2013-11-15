@@ -5,6 +5,17 @@
  *
  * @author joemmanuel
  */
+
+/**
+ * Types of problems
+ */
+class ProblemType {	
+	const InputOutput = 1;
+	const Interactive = 2;
+	const CustomValidator = 3;
+}
+
+
 class ProblemDeployer {
 	
 	const MAX_ZIP_FILESIZE = 209715200; //200 * 1024 * 1024;
@@ -14,6 +25,7 @@ class ProblemDeployer {
 	private $casesFiles;
 	private $hasValidator = false;
 	private $problemDirPath;
+	private $problemType = ProblemType::InputOutput; 
 	
 	/**
 	 * 
@@ -63,15 +75,24 @@ class ProblemDeployer {
 	 * @throws InvalidParameterException
 	 */
 	private function checkCases(ZipArchive $zip, array $zipFilesArray) {
+			
+		Logger::log("Validating /cases");
+		
 		// Necesitamos tener al menos 1 caso
 		$cases = 0;
+		$inCasesCount = 0;
+		$outCasesCount = 0;
 
 		// Add all files in cases/ that end either in .in or .out
 		for ($i = 0; $i < count($zipFilesArray); $i++) {
 			$path = $zipFilesArray[$i];
 
 			if (strpos($path, "cases/") == 0) {
-				if ($this->endsWith($path, ".in", true)) {
+				// If we find a .in case
+				if ($this->endsWith($path, ".in", true)) {					
+					$inCasesCount++;
+					
+					// Look for the .out pair
 					$outPath = substr($path, 0, strlen($path) - 3) . ".out";
 					$idx = $zip->locateName($outPath, ZipArchive::FL_NOCASE);
 
@@ -82,15 +103,24 @@ class ProblemDeployer {
 						$this->filesToUnzip[] = $zipFilesArray[$idx];
 						$this->casesFiles[] = $zipFilesArray[$idx];
 					} else {
-						throw new InvalidParameterException(
-							"Output for \"$path\" not found.");
+						throw new InvalidParameterException(".out for case \"$path\" not found.");
 					}
+				} else if ($this->endsWith($path, ".out", true)) {
+					$outCasesCount++;
 				}
 			}
 		}
 
-		if ($cases == 0) {
+		if ($cases === 0) {
 			throw new InvalidParameterException("No cases found.");
+		}
+		
+		if ($this->problemType == ProblemType::InputOutput || $this->problemType == ProblemType::Interactive )
+		{
+			// Check that each .out 
+			if ($inCasesCount !== $outCasesCount) {
+				throw new InvalidParameterException("Equal number of .in and .out files expected. .in found: $inCasesCount, .out found: $outCasesCount");
+			}
 		}
 
 		Logger::log($cases . " cases found.");
@@ -140,6 +170,7 @@ class ProblemDeployer {
 
 	/**
 	 * Entry point for zip validation
+	 * Determines the type of problem we are deploying
 	 * 
 	 * @return boolean
 	 * @throws InvalidParameterException
@@ -184,12 +215,17 @@ class ProblemDeployer {
 				if (stripos($zip->getNameIndex($i), 'validator.') === 0) {
 					$this->hasValidator = true;
 					$this->filesToUnzip[] = $zip->getNameIndex($i);
+					
+					$this->problemType = ProblemType::CustomValidator;					
 					Logger::log("Validator found: " . $zip->getNameIndex($i));
 				}
 
 				// Interactive problems.
 				if (stripos($zip->getNameIndex($i), 'interactive/') === 0) {
 					$this->filesToUnzip[] = $zip->getNameIndex($i);
+					
+					$this->problemType = ProblemType::Interactive;
+					Logger::log("Interactive folder found: " . $zip->getNameIndex($i));
 				}
 			}
 
@@ -219,15 +255,15 @@ class ProblemDeployer {
 				// Look for statements
 				$returnValue = $this->checkProblemStatements($zipFilesArray, $zip);
 				Logger::log("checkProblemStatements=" . $returnValue . ".");
-			} catch (ApiException $e) {
+			} catch (Exception $e) {
 
 				// Close zip
 				Logger::error("Validation Failed. Closing zip");
 				$zip->close();
 
 				throw $e;
-			}
-
+			}			
+			
 			// Close zip
 			Logger::log("closing zip");
 			$zip->close();
@@ -492,10 +528,10 @@ class ProblemDeployer {
 	 * @throws InvalidFilesystemOperationException
 	 */
 	public function deploy(Request $r, $isUpdate = false) {
-
-		$this->validateZip();
-		
-		try {
+				
+		try {			
+			$this->validateZip();
+			
 			// Create paths			
 			$dirpath = $this->getDirpath($r);
 			$this->problemDirPath = $dirpath;
@@ -522,11 +558,9 @@ class ProblemDeployer {
 
 			// Update contents.zip
 			$this->updateContentsDotZip($dirpath, $filepath);
-		} catch (RuntimeException $e) {
-			throw new InvalidFilesystemOperationException("Unable to install problem. Please check permissions. ", $e);
 		} catch (Exception $e) {
-			throw new InvalidFilesystemOperationException("Unable to process problem_contents given. Please check the format. ", $e);
-		}
+			throw new ProblemDeploymentFailedException($e);
+		} 
 	}
 
 }

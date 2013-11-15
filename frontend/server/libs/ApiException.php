@@ -266,3 +266,20 @@ class EmailVerificationSendException extends ApiException {
 	}
 
 }
+
+/**
+ * ProblemDeploymentFailedException
+ * 
+ */
+class ProblemDeploymentFailedException extends ApiException {
+
+	/**
+	 * 
+	 * @param string $message
+	 * @param Exception $previous
+	 */
+	function __construct(Exception $previous = NULL) {
+		parent::__construct("Unable to deploy problem, please check your zip: " . $previous->getMessage(), 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);		
+	}
+
+}

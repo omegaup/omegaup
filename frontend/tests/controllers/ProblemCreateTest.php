@@ -326,7 +326,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	/**
 	 * Test that we can produce a valid alias from the title
 	 */
-	public function testBuildAlias() {
+	public function testConstructAliasFromTitle() {
 
 		// Get the problem data
 		$problemData = ProblemsFactory::getRequest();
@@ -374,6 +374,72 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertFileExists($targetpath . "testplan");
 		$this->assertFileExists($targetpath . "cases");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "en.html");						
+	}
+	
+	/**
+	 * Basic test for uploadin problem without statement
+	 * 
+	 * @expectedException ProblemDeploymentFailedException
+	 */
+	public function testCreateProblemWithoutStatement() {
+
+		// Get the problem data
+		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "nostmt.zip");
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
+
+		// Login user
+		$r["auth_token"] = $this->login($problemAuthor);
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+		// Call the API				
+		$response = ProblemController::apiCreate($r);			
+	}
+	
+	/**
+	 * Basic test for uploadin problem missing inputs
+	 * 
+	 * @expectedException ProblemDeploymentFailedException
+	 */
+	public function testCreateProblemMissingInput() {
+
+		// Get the problem data
+		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "missingin.zip");
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
+
+		// Login user
+		$r["auth_token"] = $this->login($problemAuthor);
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+		// Call the API				
+		$response = ProblemController::apiCreate($r);	
+	}
+	
+	/**
+	 * Basic test for uploadin problem missing outputs
+	 * 
+	 * @expectedException ProblemDeploymentFailedException
+	 */
+	public function testCreateProblemMissingOutput() {
+
+		// Get the problem data
+		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "missingout.zip");
+		$r = $problemData["request"];
+		$problemAuthor = $problemData["author"];
+
+		// Login user
+		$r["auth_token"] = $this->login($problemAuthor);
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+		// Call the API				
+		$response = ProblemController::apiCreate($r);	
 	}
 }
 
