@@ -153,9 +153,9 @@
 		}
 	
 		var minDate = new Date(Date.now());
-		minDate.setDate(minDate.getDate()-(30*6));
+		minDate.setDate(minDate.getDate()-(30*3));
 		
-		var minY = acInSeries[0] - (acInSeries[0] * 0.50);
+		var minY = dataInSeries[0] - (dataInSeries[0] * 0.50);
 		window.chart = new Highcharts.Chart({			
 			chart: {
 				type: 'area',
@@ -209,21 +209,7 @@
                             [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
                         ]
                     }
-				},
-				{
-				type: 'area',
-				name: 'ACs',
-				pointInterval: 24 * 3600 * 1000,
-                pointStart: minDate.getTime(),
-				data: acInSeries.reverse(),
-				fillColor: {
-                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
-                        stops: [ 
-                            [0, Highcharts.getOptions().colors[1]],
-                            [1, Highcharts.Color(Highcharts.getOptions().colors[1]).setOpacity(0).get('rgba')]
-                        ]
-                    }
-				}
+				}				
 			]
 		});
 		
