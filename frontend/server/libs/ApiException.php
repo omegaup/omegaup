@@ -248,7 +248,7 @@ class EmailNotVerifiedException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("Your email is not verified yet. Please check your e-mail.", "HTTP/1.1 403 FORBIDDEN", 600, $previous);
+		parent::__construct("Your email is not verified yet. Please look for the verification email in your inbox and spam folder. If you still have problems, please contact joe@omegaup.com for support.", "HTTP/1.1 403 FORBIDDEN", 600, $previous);
 	}
 
 }
