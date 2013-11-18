@@ -41,10 +41,11 @@
 		}
 	} else if ($triedToLogin) {
 		if (!$emailVerified) {
-			$smarty->assign('ERROR_TO_USER', 'EMAIL_NOT_VERIFIED');
+			$smarty->assign('ERROR_TO_USER', 'EMAIL_NOT_VERIFIED');			
 		} else {
-			$smarty->assign('ERROR_TO_USER', 'USER_OR_PASSWORD_WRONG');
+			$smarty->assign('ERROR_TO_USER', 'USER_OR_PASSWORD_WRONG');			
 		}
+		$smarty->assign('ERROR_MESSAGE', $response["error"]);
 	}
 
 	$smarty->display('../templates/login.tpl');

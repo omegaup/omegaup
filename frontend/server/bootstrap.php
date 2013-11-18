@@ -112,8 +112,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 
 	include("libs/smarty/Smarty.class.php");
 
-	$smarty = new Smarty;
-	$smarty->assign("ERROR_TO_USER", "");
+	$smarty = new Smarty;	
 	$smarty->setTemplateDir(__DIR__ . "/../templates/");
 	$smarty->assign("CURRENT_USER_IS_ADMIN", 0);
 	if (defined("SMARTY_CACHE_DIR")) {
