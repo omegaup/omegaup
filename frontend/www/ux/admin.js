@@ -80,6 +80,8 @@ $(document).ready(function() {
 				$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
 				$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
 
+				$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
+
 				letter++;
 			}
 
