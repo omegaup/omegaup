@@ -29,7 +29,7 @@
 	<div class="row">
 		<div class="form-group  col-md-6">
 			<label for="alias">{#wordsAlias#}</label>
-			<input id='alias' name='alias' value='{$ALIAS|htmlspecialchars}' type='text' class="form-control"{if !$new} disabled="disabled"{/if}/>
+			<input id='alias' name='alias' value='{$ALIAS|htmlspecialchars}' type='text' class="form-control"{if $IS_UPDATE eq 1} disabled="disabled"{/if}/>
 		</div>
 
 		<div class="form-group col-md-6">
@@ -63,7 +63,7 @@
 		</div>
 		
 		<div class="form-group col-md-6">
-			<label for="public">{#problemEditorFormAppearsAsPublic#}</label>
+			<label for="public">{#problemEditFormAppearsAsPublic#}</label>
 			<select name='public' id='public' class="form-control">
 				<option value="0">{#wordsNo#}</option>
 				<option value="1">Sí</option>

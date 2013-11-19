@@ -22,6 +22,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 	if ($response["status"] == "error") {
 		$smarty->assign('STATUS_ERROR', $response["error"]);
 		$smarty->assign('TITLE', $_POST["title"]);
+		$smarty->assign('ALIAS', $_POST["edit-problem-list"]);
 		$smarty->assign('VALIDATOR', $_POST["validator"]);
 		$smarty->assign('TIME_LIMIT', $_POST["time_limit"]);
 		$smarty->assign('MEMORY_LIMIT', $_POST["memory_limit"]);

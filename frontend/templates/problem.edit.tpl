@@ -62,6 +62,7 @@
 			$('input[name=source]').val(problem.source);
 			$('select[name=validator]').val(problem.validator);
 			$('select[name=public]').val(problem.public);
+			$('input[name=alias]').val(problemAlias);
 		});
 	}
 </script>

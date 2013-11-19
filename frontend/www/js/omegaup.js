@@ -56,6 +56,31 @@ OmegaUp.ui = {
 	
 	dismissNotifications: function() {
 		$('#status').slideUp();
+	},
+	
+	bulkOperation: function (operation, onOperationFinished) {
+		var success = true;
+		var error = null;
+		
+		handleError = function(data) {
+			if(data.status != "ok") {
+				success = false;
+				error = data.error;
+			} 
+		};
+				
+		$('input[type=checkbox]').each(function() {
+			if (this.checked) {
+				operation(this.id, handleError);
+			}
+			if (success == false) {
+				OmegaUp.ui.error("Error actualizando " + this.id + ":" + error);
+				return;
+			}
+		});
+				
+		onOperationFinished();
+		OmegaUp.ui.success("Todos los items han sido actualizados");
 	}
 };
 
@@ -369,6 +394,27 @@ OmegaUp.prototype.getCoderOfTheMonth = function(callback) {
 	});
 };
 
+OmegaUp.prototype.updateProblem = function(alias, public, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/update/',
+		{
+			problem_alias: alias,
+			public: public			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
 
 OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, school_id, school_name, locale, callback) {
 	var self = this;
