@@ -87,7 +87,7 @@ class Request extends ArrayObject {
 	 * @param string $key The key.
 	 */
 	public function offsetGet($key) {
-		return isset($this->params[$key]) ? $this->params[$key] : ($this->parent != null ? $this->parent[$key] : null);
+		return (isset($this->params[$key]) && $this->params[$key] !== "null") ? $this->params[$key] : ($this->parent != null ? $this->parent[$key] : null);
 	}
 
 	/**

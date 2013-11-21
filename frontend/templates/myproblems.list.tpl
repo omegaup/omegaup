@@ -80,8 +80,8 @@
 		
 		$("#bulk-make-public").click(function() {
 			OmegaUp.ui.bulkOperation(
-				function(alias, handleError) {
-					omegaup.updateProblem(alias, 1 /*public*/, handleError);
+				function(alias, handleResponseCallback) {
+					omegaup.updateProblem(alias, 1 /*public*/, handleResponseCallback);
 				},
 				function() {
 					fillProblemsTable();
@@ -92,7 +92,7 @@
 		$("#bulk-make-private").click(function() {
 			OmegaUp.ui.bulkOperation(
 				function(alias, handleError) {
-					omegaup.updateProblem(alias, 0 /*public*/, handleError);
+					omegaup.updateProblem(alias, 0 /*public*/, handleResponseCallback);
 				},
 				function() {
 					fillProblemsTable();

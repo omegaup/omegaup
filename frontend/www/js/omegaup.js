@@ -59,28 +59,40 @@ OmegaUp.ui = {
 	},
 	
 	bulkOperation: function (operation, onOperationFinished) {
+		var isStopExecuted = false;
 		var success = true;
 		var error = null;
 		
-		handleError = function(data) {
-			if(data.status != "ok") {
+		handleResponseCallback = function(data) {
+			if(data.status !== "ok") {
 				success = false;
 				error = data.error;
 			} 
-		};
-				
+		};				
 		$('input[type=checkbox]').each(function() {
 			if (this.checked) {
-				operation(this.id, handleError);
-			}
-			if (success == false) {
-				OmegaUp.ui.error("Error actualizando " + this.id + ":" + error);
-				return;
-			}
+				operation(this.id, handleResponseCallback);
+			}		
 		});
+		
+		// Wait for all
+		$(document).ajaxStop(function() {			
+			if (!isStopExecuted) {
 				
-		onOperationFinished();
-		OmegaUp.ui.success("Todos los items han sido actualizados");
+				// Make sure we execute this block once. onOperationFinish might have
+				// async calls that would fire ajaxStop event 
+				isStopExecuted = true;
+				$(document).off("ajaxStop");
+				
+				onOperationFinished();
+
+				if (success === false) {
+					OmegaUp.ui.error("Error actualizando items: " + error);				
+				} else {
+					OmegaUp.ui.success("Todos los items han sido actualizados");
+				}		
+			}
+		});						
 	}
 };
 
