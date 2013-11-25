@@ -18,7 +18,19 @@
 			Tienes <b>{$CURRENT_USER_PRIVATE_CONTESTS_COUNT} concurso{if $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 1}s{/if} 
 			privado{if $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 1}s{/if}</b> registrado{if $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 1}s{/if} 
 			en omegaUp.						
-			Por favor revisa <a href="/contests.php">aquí</a> si alguno de tus concursos ya puede ser <b>público</b> para ayudar a la comunidad.
+			Por favor revisa <a href="/contests.php">aquí</a> si alguno de tus concursos ya puede ser <b>público</b> para ayudar a la comunidad =).
+		</span>
+	</div>
+{/if}
+
+{if $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 0}
+	<div class="alert alert-info" id='private-problems-count-alert'>
+		<button type="button" class="close" id="private-problems-count-alert-close">&times;</button>
+		<span class="message">			
+			Tienes <b>{$CURRENT_USER_PRIVATE_PROBLEMS_COUNT} problema{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if} 
+			privado{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if}</b> registrado{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if} 
+			en omegaUp.						
+			Por favor revisa <a href="/myproblems.php">aquí</a> si alguno de tus problemas ya puede ser <b>público</b> para ayudar a la comunidad =).
 		</span>
 	</div>
 {/if}
@@ -48,5 +60,13 @@
 	
 	$("#email-verification-alert-close").click(function () {
 		$("#email-verification-alert").slideUp();
+	});
+	
+	$("#private-contests-count-alert-close").click(function () {
+		$("private-contests-count-alert").slideUp();
+	});
+	
+	$("#private-problems-count-alert-close").click(function () {
+		$("#private-problems-count-alert").slideUp();
 	});
 </script>

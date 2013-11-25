@@ -119,7 +119,8 @@ class SessionController extends Controller {
 			'auth_token' => $s_AuthToken,
 			'is_email_verified' => $vo_CurrentUser->getVerified(),
 			'is_admin' => Authorization::IsSystemAdmin($vo_CurrentUser->getUserId()),
-			'private_contests_count' => ContestsDAO::getPrivateContestsCount($vo_CurrentUser)
+			'private_contests_count' => ContestsDAO::getPrivateContestsCount($vo_CurrentUser),
+			'private_problems_count' => ProblemsDAO::getPrivateCount($vo_CurrentUser)
 		);
 	}
 

@@ -144,4 +144,18 @@ class ProblemsDAO extends ProblemsDAOBase
 
 		return $result;		
 	}
+	
+	public static function getPrivateCount(Users $user) {
+		$sql = "SELECT count(*) as Total FROM Problems WHERE public = 0 and (author_id = ?);";		
+		$params = array($user->getUserId());
+                
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);				                        
+		
+		if (!array_key_exists("Total", $rs)) {
+			return 0;
+		}
+ 		
+        return $rs["Total"];
+	}
 }

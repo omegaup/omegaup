@@ -354,6 +354,76 @@ class LoginTest extends OmegaupTestCase {
 		
 		$this->assertEquals(0, $response["private_contests_count"]);
 	}
+	
+	/**
+	 * Test SessionController::apiCurrentSession private_problems_count
+	 * when there's 1 private problem
+	 */
+	public function testSessionControlerPrivateProblemsCount() {
+		
+		// Create private problem
+		$problemData = ProblemsFactory::createProblem(null, null, 0 /*public*/);
+		$user = $problemData["author"];
+		
+		$this->mockSessionManager();
+		
+		// Login 
+		$auth_token = $this->login($user);
+		
+		// Prepare COOKIE as SessionMannager->getCookie expects
+		$_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+		
+		// Call CurrentSession api
+		$response = SessionController::apiCurrentSession();
+		
+		$this->assertEquals(1, $response["private_problems_count"]);
+	}
+	
+	/**
+	 * Test SessionController::apiCurrentSession private_problems_count
+	 * when there's 1 public problem
+	 */
+	public function testSessionControlerPrivateProblemsCountWithPublicProblem() {
+		
+		// Create public problem
+		$problemData = ProblemsFactory::createProblem(null, null, 1 /*public*/);
+		$user = $problemData["author"];
+		
+		$this->mockSessionManager();
+		
+		// Login 
+		$auth_token = $this->login($user);
+		
+		// Prepare COOKIE as SessionMannager->getCookie expects
+		$_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+		
+		// Call CurrentSession api
+		$response = SessionController::apiCurrentSession();
+		
+		$this->assertEquals(0, $response["private_problems_count"]);
+	}
+	
+	/**
+	 * Test SessionController::apiCurrentSession private_problems_count
+	 * when there's 0 problems
+	 */
+	public function testSessionControlerPrivateProblemsCountWithNoProblems() {
+		
+		$user = UserFactory::createUser();
+		
+		$this->mockSessionManager();
+		
+		// Login 
+		$auth_token = $this->login($user);
+		
+		// Prepare COOKIE as SessionMannager->getCookie expects
+		$_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+		
+		// Call CurrentSession api
+		$response = SessionController::apiCurrentSession();
+		
+		$this->assertEquals(0, $response["private_problems_count"]);
+	}
 
 }
 
