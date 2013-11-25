@@ -34,5 +34,20 @@ class ContestsDAO extends ContestsDAOBase
 
         return $contest;
 
-	}   
+	}
+	
+	public static function getPrivateContestsCount(Users $user) {
+		
+		$sql = "SELECT count(*) as Total FROM Contests WHERE public = 0 and (director_id = ?);";		
+		$params = array($user->getUserId());
+                
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);				                        
+		
+		if (!array_key_exists("Total", $rs)) {
+			return 0;
+		}
+ 		
+        return $rs["Total"];		
+	}
 }

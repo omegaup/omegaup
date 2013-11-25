@@ -284,6 +284,76 @@ class LoginTest extends OmegaupTestCase {
 
 		$auth_token = self::login($user);
 	}
+	
+	/**
+	 * Test SessionController::apiCurrentSession private_contests_count
+	 * when there's 1 private contest count
+	 */
+	public function testSessionControlerPrivateContestsCount() {
+		
+		// Create private contest		
+		$contestData = ContestsFactory::createContest(null, 0 /*public*/);		
+		$user = $contestData["director"];
+		
+		$this->mockSessionManager();
+		
+		// Login 
+		$auth_token = $this->login($user);
+		
+		// Prepare COOKIE as SessionMannager->getCookie expects
+		$_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+		
+		// Call CurrentSession api
+		$response = SessionController::apiCurrentSession();
+		
+		$this->assertEquals(1, $response["private_contests_count"]);
+	}
+	
+	/**
+	 * Test SessionController::apiCurrentSession private_contests_count
+	 * when there's 1 public contest 
+	 */
+	public function testSessionControlerPrivateContestsCountWithPublicContest() {
+		
+		// Create private contest		
+		$contestData = ContestsFactory::createContest(null, 1 /*public*/);		
+		$user = $contestData["director"];
+		
+		$this->mockSessionManager();
+		
+		// Login 
+		$auth_token = $this->login($user);
+		
+		// Prepare COOKIE as SessionMannager->getCookie expects
+		$_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+		
+		// Call CurrentSession api
+		$response = SessionController::apiCurrentSession();
+		
+		$this->assertEquals(0, $response["private_contests_count"]);
+	}
+	
+	/**
+	 * Test SessionController::apiCurrentSession private_contests_count
+	 * when there's 0 contests created
+	 */
+	public function testSessionControlerPrivateContestsCountWithNoContests() {
+						
+		$user = UserFactory::createUser();
+		
+		$this->mockSessionManager();
+		
+		// Login 
+		$auth_token = $this->login($user);
+		
+		// Prepare COOKIE as SessionMannager->getCookie expects
+		$_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+		
+		// Call CurrentSession api
+		$response = SessionController::apiCurrentSession();
+		
+		$this->assertEquals(0, $response["private_contests_count"]);
+	}
 
 }
 
