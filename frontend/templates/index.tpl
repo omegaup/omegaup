@@ -44,6 +44,9 @@
 					</div>					
 				</div>
 			</div>
+			<div class="panel-body">
+				<a href='codersofthemonth.php'>{#coderOfTheMonthFullList#}</a>
+			</div>	
 		</div>
 		
 		<div class="panel panel-default">

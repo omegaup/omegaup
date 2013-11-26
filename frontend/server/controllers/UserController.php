@@ -928,6 +928,38 @@ class UserController extends Controller {
 		return $response;
 	}
 	
+	/**
+	 * Returns the list of coders of the month
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiCoderOfTheMonthList(Request $r) {
+	
+		self::authenticateRequest($r);
+				
+		$response = array();
+		$response["coders"] = array();
+		try {
+			$coders = CoderOfTheMonthDAO::getAll(null,null,"time", "DESC");
+			
+			foreach ($coders as $c) {
+				$user = UsersDAO::getByPK($c->getCoderOfTheMonthId());
+				$email = EmailsDAO::getByPK($user->getMainEmailId());
+				$response["coders"][] = array(
+					"username" => $user->getUsername(),
+					"gravatar_32" => "https://secure.gravatar.com/avatar/" . md5($email->getEmail()) . "?s=32",
+					"date" => $c->getTime()
+				);
+			}
+			
+		} catch (Exception $ex) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		$response["status"] = "ok";
+		return $response;
+	}
+	
 
 	/**
 	 * Get Contests which a certain user has participated in
