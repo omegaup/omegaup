@@ -3,6 +3,8 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
+{if !isset($STATUS_ERROR)} 
+
 <div class="row" id="inner-content">
 	<div class="col-md-2 no-right-padding" id="userbox">
 		<div class="panel panel-default" id="userbox-inner">
@@ -110,6 +112,7 @@
 	{/block}
 	
 </div>
+{/if}
 
 <script>
 	{IF isset($smarty.get.username)}

@@ -5,6 +5,9 @@
  *
  * @author joemmanuel
  */
+
+require_once(OMEGAUP_ROOT . "/www/api/ApiCaller.php");
+
 class UITools {
 
 	public static $IsLoggedIn = false;
@@ -44,15 +47,21 @@ class UITools {
 		$profileRequest = new Request(array(
 					"username" => array_key_exists("username", $_REQUEST) ? $_REQUEST["username"] : null,
 					"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN')
-				));
-		$response = UserController::apiProfile($profileRequest);
-		$response["userinfo"]["graduation_date"] = is_null($response["userinfo"]["graduation_date"]) ? 
-				null : gmdate('d/m/Y', $response["userinfo"]["graduation_date"]);
+				));		
+		$profileRequest->method = "UserController::apiProfile";
+		$response = ApiCaller::call($profileRequest);
 		
-		$response["userinfo"]["birth_date"] = is_null($response["userinfo"]["birth_date"]) ? 
-				null : gmdate('d/m/Y', $response["userinfo"]["birth_date"]);
-		
-		$smarty->assign('profile', $response);
+		if ($response["status"] === "ok") {
+			$response["userinfo"]["graduation_date"] = is_null($response["userinfo"]["graduation_date"]) ? 
+					null : gmdate('d/m/Y', $response["userinfo"]["graduation_date"]);
+
+			$response["userinfo"]["birth_date"] = is_null($response["userinfo"]["birth_date"]) ? 
+					null : gmdate('d/m/Y', $response["userinfo"]["birth_date"]);
+
+			$smarty->assign('profile', $response);
+		} else {
+			$smarty->assign('STATUS_ERROR', $response["error"]);
+		}
 	}
 
 }

@@ -693,7 +693,11 @@ class UserController extends Controller {
 				if (is_null($user)) {
 					throw new NotFoundException("User does not exists");
 				}
-			} catch (Exception $e) {
+			} 
+			catch (ApiException $e) {
+				throw $e;
+			}
+			catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}			
 		}
