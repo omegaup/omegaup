@@ -150,7 +150,7 @@
 			
 			for (var j = 0; j < 3 && i < data["problems"].length; j++, i++)
 			{
-				content += "<td><a href='/arena/problem" + data["problems"][i]["alias"] + "'>" + data["problems"][i]["title"] + "</a></td>";  
+				content += "<td><a href='/arena/problem/" + data["problems"][i]["alias"] + "'>" + data["problems"][i]["title"] + "</a></td>";  
 			}
 			i--;
 			
