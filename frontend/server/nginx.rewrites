@@ -10,4 +10,4 @@ rewrite ^/arena/[a-zA-Z0-9_+-]+/scoreboard/?$ /arena/scoreboard.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/admin.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/practice/?$ /arena/practice.php last;
 rewrite ^/arena/problem/[a-zA-Z0-9_+-]+/?$ /arena/problem.php last;
-rewrite ^/profile/([a-zA-Z0-9_+-]+)/?$ /profile.php?username=$1 last;
+rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
