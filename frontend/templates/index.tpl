@@ -11,6 +11,10 @@
 				<div class="text-center">
 					<a href="contestcreate.php" class="btn btn-primary btn-lg" id="contest-create">{#frontPageCreateContestButton#}</a>
 				</div>
+				<p>{#frontPageIntroduction#}</p>
+				<div class="text-center">
+					<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
+				</div>
 			</div>
 		</div>
 

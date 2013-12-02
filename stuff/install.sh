@@ -16,6 +16,7 @@ MYSQL_PASSWORD=omegaup
 MYSQL_DB_NAME=omegaup
 UBUNTU=`uname -a | grep -i ubuntu | wc -l`
 WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
+SAUCY=`grep 'Ubuntu 13.10' /etc/issue | wc -l`
 HOSTNAME=localhost
 
 # Get parameters
@@ -59,8 +60,8 @@ if [ ! -f /usr/bin/vim ]; then
 fi
 
 # Ensure users have been added.
-useradd omegaup || echo
-useradd www-data || echo
+useradd omegaup >/dev/null 2>&1 || echo
+useradd www-data >/dev/null 2>&1 || echo
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
@@ -93,7 +94,21 @@ EOF
 	sudo apt-get install -qq -y php5-json || echo
 	
 	# Restart php-fpm so it picks php5-curl and php5-mcrypt.
-	sudo /etc/init.d/php5-fpm restart
+	if [ "$SAUCY" = "1" ]; then
+		# Saucy has some bugs with the installation of these packages :(
+		if [ ! -f /etc/php5/fpm/conf.d/20-curl.ini ]; then
+			echo "extension=curl.so" > 20-curl.ini
+			sudo mv 20-curl.ini /etc/php5/fpm/conf.d
+		fi
+		if [ ! -f /etc/php5/fpm/conf.d/20-mcrypt.ini ]; then
+			echo "extension=mcrypt.so" > 20-mcrypt.ini
+			sudo mv 20-mcrypt.ini /etc/php5/fpm/conf.d
+		fi
+		sudo service php5-fpm restart
+		sudo service nginx restart
+	else
+		sudo /etc/init.d/php5-fpm restart
+	fi
 fi
 
 # Install SBT.
