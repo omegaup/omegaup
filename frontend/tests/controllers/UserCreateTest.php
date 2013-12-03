@@ -160,5 +160,22 @@ class CreateUserTest extends OmegaupTestCase {
 		
 	}
 	
+	/**
+	 * Tests usernames with invalid chars. Exception is expected
+	 * 
+	 * @expectedException InvalidParameterException
+	 */
+	public function testUsernameWithInvalidChars() {
+		
+		// Inflate request 
+		$r = new Request(array(
+			"username" => "ínvalid username",
+			"password" => Utils::CreateRandomString(),
+			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
+		));
+		
+		// Call API		
+		$response = UserController::apiCreate($r);				
+	}
 }
 

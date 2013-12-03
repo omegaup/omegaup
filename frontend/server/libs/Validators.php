@@ -104,6 +104,24 @@ class Validators {
 
 		return true;
 	}
+	
+	/**
+	 * Enforces username requirements
+	 * 
+	 * @param string $parameter
+	 * @param string $parameterName
+	 * @param boolean $required
+	 * @throws InvalidParameterException
+	 */
+	public static function isValidUsername($parameter, $parameterName, $required = true) {
+		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+		
+		if ($isPresent && preg_match("/[^a-zA-Z0-9_.-]/", $parameter)) {
+			throw new InvalidParameterException("{$parameterName} can only contain letters, numbers and '.', '-' and '_'");			
+		}
+		
+		Validators::isStringOfMinLength($parameter, $parameterName, 2);
+	}
 
 	/**
 	 * 

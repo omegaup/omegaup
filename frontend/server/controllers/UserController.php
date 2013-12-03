@@ -23,9 +23,8 @@ class UserController extends Controller {
 	public static function apiCreate(Request $r) {
 
 		// Validate request
-		Validators::isStringOfMinLength($r["username"], "username", 2);
-		$r['username'] = preg_replace('/[^a-zA-Z0-9_.-]/', '', $r['username']);
-		Validators::isStringOfMinLength($r["username"], "username", 2);
+		Validators::isValidUsername($r["username"], "username");		
+		
 		Validators::isEmail($r["email"], "email");
 
 		// Check password
