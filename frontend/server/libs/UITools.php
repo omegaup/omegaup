@@ -11,6 +11,7 @@ require_once(OMEGAUP_ROOT . "/www/api/ApiCaller.php");
 class UITools {
 
 	public static $IsLoggedIn = false;
+	public static $isAdmin = false;
 
 	/**
 	 * Set rank by problems solved
@@ -34,6 +35,17 @@ class UITools {
 
 		if (self::$IsLoggedIn === false) {
 			header("Location: /login.php?redirect=" . $_SERVER["REQUEST_URI"]);
+			die();
+		}
+	}
+	
+	/**
+	 * If user is not logged in, redirect to login page
+	 */
+	public static function redirectIfNoAdmin() {
+
+		if (self::$isAdmin !== true) {
+			header("Location: /");
 			die();
 		}
 	}

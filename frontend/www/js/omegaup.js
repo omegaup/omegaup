@@ -1156,6 +1156,28 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	});
 };
 
+OmegaUp.prototype.forceChangePassword = function(username, newpassword, callback) {
+	var self = this;
+
+	$.post(
+		'/api/user/changepassword/',
+		{
+			username: username,
+			password: newpassword			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 var omegaup = new OmegaUp();
 
 function dateToString(currentDate) {
