@@ -338,6 +338,9 @@ class ContestController extends Controller {
 			$contest->setShowScoreboardAfter("1");
 		}
 
+		if ($r["public"] == 1) {
+			self::validateContestCanBePublic($contest);
+		}
 
 		// Push changes
 		try {
@@ -1124,6 +1127,20 @@ class ContestController extends Controller {
 
 		return $response;
 	}
+	
+	/**
+	 * Enforces rules to avoid having invalid/unactionable public contests
+	 * 
+	 * @param Contests $contest
+	 */
+	private static function validateContestCanBePublic(Contests $contest) {
+		
+		// Check that contest has some problems at least 1 problem
+		$problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->getContestId());
+		if (count($problemsInContest) < 1) {
+			throw new InvalidParameterException("Public contest must have at least 1 problem added");
+		}
+	}
 
 	/**
 	 * Update a Contest
@@ -1142,6 +1159,12 @@ class ContestController extends Controller {
 
 		// Update contest DAO                
 		if (!is_null($r["public"])) {
+			
+			// If going public
+			if ($r["public"] == 1) {				
+				self::validateContestCanBePublic($r["contest"]);								
+			}
+			
 			$r["contest"]->setPublic($r["public"]);
 		}
 

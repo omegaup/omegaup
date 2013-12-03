@@ -16,7 +16,7 @@ class ContestsFactory {
 	 * @param Users $contestDirector
 	 * @return Request
 	 */
-	public static function getRequest($title = null, $public = 1, Users $contestDirector = null) {
+	public static function getRequest($title = null, $public = 0, Users $contestDirector = null) {
 
 		if (is_null($contestDirector)) {
 			$contestDirector = UserFactory::createUser();
@@ -52,7 +52,7 @@ class ContestsFactory {
 	public static function createContest($title = null, $public = 1, Users $contestDirector = null) {
 
 		// Create a valid contest Request object
-		$contestData = ContestsFactory::getRequest($title, $public, $contestDirector);
+		$contestData = ContestsFactory::getRequest($title, 0, $contestDirector);
 		$r = $contestData["request"];
 		$contestDirector = $contestData["director"];
 
@@ -62,6 +62,11 @@ class ContestsFactory {
 		// Call the API
 		$response = ContestController::apiCreate($r);
 
+		if ($public === 1) {
+			self::forcePublic($contestData);
+			$r["public"] = 1;
+		}
+		
 		return array(
 			"director" => $contestData["director"],
 			"request" => $r,
@@ -158,6 +163,12 @@ class ContestsFactory {
 		
 		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
         $contest->setWindowLength($windowLength);
+        ContestsDAO::save($contest);		
+	}
+	
+	public static function forcePublic($contestData) {
+		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
+        $contest->setPublic(1);
         ContestsDAO::save($contest);		
 	}
 

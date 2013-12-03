@@ -58,5 +58,60 @@ class UpdateContestTest extends OmegaupTestCase {
 		ContestController::apiUpdate($r);		
 	}
 
+	/**
+	 * Update from private to public. Should fail if no problems in contest
+	 * 
+	 * @expectedException InvalidParameterException	 
+	 */
+	public function testUpdatePrivateContestToPublicWithoutProblems() {
+
+		// Get a contest 
+		$contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+		// Prepare request
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+
+		// Log in with contest director
+		$r["auth_token"] = $this->login($contestData["director"]);
+
+		// Update public
+		$r["public"] = 1;
+
+		// Call API
+		$response = ContestController::apiUpdate($r);
+	}
+	
+	/**
+	 * Update from private to public with problems added
+	 * 
+	 */
+	public function testUpdatePrivateContestToPublicWithProblems() {
+
+		// Get a contest 
+		$contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Add the problem to the contest
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+		
+		// Prepare request
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+
+		// Log in with contest director
+		$r["auth_token"] = $this->login($contestData["director"]);
+
+		// Update public
+		$r["public"] = 1;
+
+		// Call API
+		$response = ContestController::apiUpdate($r);
+		
+		$contestData["request"]["public"] = $r["public"];
+		$this->assertContest($contestData["request"]);
+	}
 }
 
