@@ -452,6 +452,7 @@ class CreateRun extends OmegaupTestCase {
 		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
 		
 		// Call API
+		$this->detourGraderCalls($this->exactly(1));
 		$response = RunController::apiCreate($r);
 
 		// Validate the run
@@ -498,8 +499,7 @@ class CreateRun extends OmegaupTestCase {
 	}
 	
 	/**
-	 * User can send runs to a public problem, regardless of it being 
-	 * in a contest
+	 * User should wait between consecutive runs.	 
 	 * 
 	 * @expectedException NotAllowedToSubmitException
 	 */
@@ -527,6 +527,7 @@ class CreateRun extends OmegaupTestCase {
 		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
 		
 		// Call API
+		$this->detourGraderCalls($this->exactly(1));
 		$response = RunController::apiCreate($r);
 
 		// Validate the run
