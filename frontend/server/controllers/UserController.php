@@ -320,8 +320,7 @@ class UserController extends Controller {
 	public static function apiChangePassword(Request $r) {
 
 		self::authenticateRequest($r);
-
-		Validators::isStringNonEmpty($r["username"], "username");
+		
 		SecurityTools::testStrongPassword($r["password"]);
 
 		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
@@ -338,7 +337,9 @@ class UserController extends Controller {
 				throw new InvalidParameterException("old_password" . Validators::IS_INVALID);
 			}
 		} else {
-			// System admin can force reset passwords 
+			// System admin can force reset passwords for any user
+			Validators::isStringNonEmpty($r["username"], "username");
+			
 			try {
 				$user = UsersDAO::FindByUsername($r["username"]);
 

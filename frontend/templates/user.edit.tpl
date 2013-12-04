@@ -344,6 +344,41 @@
 							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
 						</div>
 					</div>
+				</form>				
+			</div>
+			
+		</div>
+						
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h2 class="panel-title">{#userEditChangePassword#}</h2>
+			</div>
+			<div class="panel-body">
+				<form id="change-password-form" class="form-horizontal" role="form">
+					<div class="form-group">
+						<label for="name" class="col-md-3 control-label">{#userEditChangePasswordOldPassword#}</label>
+						<div class="col-md-7">
+							<input id='old-password' name='name' value='' type='password' size='30' class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="col-md-3 control-label">{#userEditChangePasswordNewPassword#}</label>
+						<div class="col-md-7">
+							<input id='new-password-1' name='name' value='' type='password' size='30' class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="col-md-3 control-label">{#userEditChangePasswordRepeatNewPassword#}</label>
+						<div class="col-md-7">
+							<input id='new-password-2' name='name' value='' type='password' size='30' class="form-control">
+						</div>
+					</div>
+						
+					<div class="form-group">
+						<div class="col-md-offset-3 col-md-7">
+							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -528,6 +563,29 @@
 		
 		
 		$('form#user_profile_form').submit(formSubmit);
+		
+		$('form#change-password-form').submit(function() {
+			var newPassword = $('#new-password-1').val();
+			var newPassword2 = $('#new-password-2').val();
+			if (newPassword != newPassword2) {
+				OmegaUp.ui.error("Los passwords nuevos deben ser iguales.");
+				return false;
+			}
+		
+			var oldPassword = $('#old-password').val();
+			
+			omegaup.changePassword(oldPassword, newPassword, function(data) {
+				if (data.status == "ok") {
+					OmegaUp.ui.success("Password cambiado correctamente.");
+				} else {
+					OmegaUp.ui.error(data.error);
+				}
+			});
+			
+			// Prevent page refresh on submit
+			return false;
+			
+		});
 {/literal}		
 	</script>
 	

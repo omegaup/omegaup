@@ -1178,6 +1178,28 @@ OmegaUp.prototype.forceChangePassword = function(username, newpassword, callback
 	});
 };
 
+OmegaUp.prototype.changePassword = function(oldPassword, newPassword, callback) {
+	var self = this;
+
+	$.post(
+		'/api/user/changepassword/',
+		{
+			old_password: oldPassword,
+			password: newPassword			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 var omegaup = new OmegaUp();
 
 function dateToString(currentDate) {
