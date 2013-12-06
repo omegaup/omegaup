@@ -181,27 +181,61 @@ class SessionController extends Controller {
 		}
 	}
 
+	private static function getUniqueUsernameFromEmail($s_Email) {
+		$idx = strpos($s_Email, '@');
+		$username = substr($s_Email, 0, $idx);
+
+		try{
+			Validators::isValidUsername($username, "username");
+		} catch (InvalidParameterException $e) {
+			// How can we know whats wrong with the username?
+			// Things that could go wrong:
+			//		generated email is too short
+			$username = "OmegaupUser";
+		}
+
+		$suffix = "";
+		for (;;) {
+			// Maybe we can bring all records from db 
+			// with prefix $username, beacuse this:
+			$userexists = UsersDAO::FindByUsername($username . $suffix);
+			// will query db every single time probably.
+
+			if (empty($userexists)) {
+				break;
+			}
+
+			$suffix++;
+		}
+		$username .= $suffix;
+
+		return $username;
+	}
+
 	public function LoginViaGoogle($s_Email) {
 		// We trust this user's identity
 		$vo_User = UsersDAO::FindByEmail($s_Email);
 
 		if (is_null($vo_User)) {
-			//user has never logged in before
+			// This email does not exist in omegaup
 			Logger::log("LoginViaGoogle: Creating new user for $s_Email");
-			$idx = strpos($s_Email, '@');
-			$username = substr($s_Email, 0, $idx);
-				$r = new Request(
-								array(
-									"name" => $username,
-									"username" => $username,
-									"email" => $s_Email,
-									"password" => NULL,
-									"ignore_password" => true
-								)
-							);
-				$res = UserController::apiCreate($r);
+
+			$username = self::getUniqueUsernameFromEmail($s_Email);
+
+			$r = new Request(
+							array(
+								"name" => $username,
+								"username" => $username,
+								"email" => $s_Email,
+								"password" => NULL,
+								"ignore_password" => true
+							)
+						);
+
+			$res = UserController::apiCreate($r);
+
 		} else {
-			//user has been here before, lets just register his session
+			//user has been here before, lets just register the session
 			$this->RegisterSession($vo_User);
 		}
 	}
@@ -213,9 +247,7 @@ class SessionController extends Controller {
 		//query, so i dont have to be testing 
 		//facebook sessions on every single petition
 		//made from the front-end
-		if (isset($_GET["state"])) {
-			Logger::log("Checking for fb session");
-		}else{
+		if (!isset($_GET["state"])) {
 			return false;
 		}
 
@@ -226,15 +258,12 @@ class SessionController extends Controller {
 		// Get User ID
 		$fb_user = $facebook->getUser();
 
-
-		if($fb_user == 0){
-				Logger::log("FB session unavailable.");
-				return false;
+		if($fb_user == 0) {
+			Logger::log("FB session unavailable.");
+			return false;
 		}
 
-
 		// We may or may not have this data based on whether the user is logged in.
-		//
 		// If we have a $fb_user id here, it means we know the user is logged into
 		// Facebook, but we don't know if the access token is valid. An access
 		// token is invalid if the user logged out of Facebook.
@@ -259,15 +288,22 @@ class SessionController extends Controller {
 		$results = UsersDAO::FindByEmail( $fb_user_profile["email"] );	
 
 		if (!is_null($results)) {
-			    //user has been here before with facebook!
-		   	$vo_User = $results;
+			//user has been here before with facebook!
+			$vo_User = $results;
 		} else {
-				//the user has never been here before, let's
-				//register him
+				// The user has never been here before, let's register him
+
+				// I have a problem with this:
+				$username = self::getUniqueUsernameFromEmail($fb_user_profile["email"]);
+				// Even if the user gave us his/her email, we should not
+				// just go ahead and assume its ok to share with the world
+				// maybe we could do:
+				// $username = str_replace(" ", "_", $fb_user_profile["name"] ),
+
 				$r = new Request(
 								array(
 									"name" => $fb_user_profile["name"],
-									"username" => str_replace(" ", "_", $fb_user_profile["name"] ),
+									"username" => $username,
 									"email" => $fb_user_profile["email"],
 									"facebook_user_id" => $fb_user_profile["id"],
 									"password" => NULL,
