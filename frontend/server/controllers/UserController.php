@@ -28,7 +28,11 @@ class UserController extends Controller {
 		Validators::isEmail($r["email"], "email");
 
 		// Check password
-		SecurityTools::testStrongPassword($r["password"]);
+		$hashedPassword = NULL;
+		if (!isset($r["ignore_password"])) {
+			SecurityTools::testStrongPassword($r["password"]);
+			$hashedPassword = SecurityTools::hashString($r["password"]);
+		}
 
 		// Does user or email already exists?
 		try {
@@ -49,7 +53,7 @@ class UserController extends Controller {
 		// Prepare DAOs
 		$user_data = array(
 			"username" => $r["username"],
-			"password" => SecurityTools::hashString($r["password"]),
+			"password" => $hashedPassword,
 			"solved" => 0,
 			"submissions" => 0,
 			"verified" => 0,

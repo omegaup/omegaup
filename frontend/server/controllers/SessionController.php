@@ -266,7 +266,8 @@ class SessionController extends Controller {
 									"username" => str_replace(" ", "_", $fb_user_profile["name"] ),
 									"email" => $fb_user_profile["email"],
 									"facebook_user_id" => $fb_user_profile["id"],
-									"password" => md5(time())
+									"password" => NULL,
+									"ignore_password" => true
 								)
 							);
 				$res = UserController::apiCreate($r);
