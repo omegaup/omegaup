@@ -188,6 +188,18 @@ class SessionController extends Controller {
 		if (is_null($vo_User)) {
 			//user has never logged in before
 			Logger::log("LoginViaGoogle: Creating new user for $s_Email");
+			$idx = strpos($s_Email, '@');
+			$username = substr($s_Email, 0, $idx);
+				$r = new Request(
+								array(
+									"name" => $username,
+									"username" => $username,
+									"email" => $s_Email,
+									"password" => NULL,
+									"ignore_password" => true
+								)
+							);
+				$res = UserController::apiCreate($r);
 		} else {
 			//user has been here before, lets just register his session
 			$this->RegisterSession($vo_User);
@@ -244,22 +256,14 @@ class SessionController extends Controller {
 		//time the user has been here, lets register his info
 		Logger::log("User is logged in via facebook !!");
 
-		$results = UsersDAO::search( 
-								new Users( array( 
-									"facebook_user_id" => $fb_user_profile["id"] 
-								) ) );
 		$results = UsersDAO::FindByEmail( $fb_user_profile["email"] );	
 
-		if( !is_null( $results ) ){
+		if (!is_null($results)) {
 			    //user has been here before with facebook!
 		   	$vo_User = $results;
-
-		}else{
-				//the user has never been here before, lets
+		} else {
+				//the user has never been here before, let's
 				//register him
-				//
-				//TODO use UsersDAO::FindByEmail( $s_Email );
-				// to see if user has loged in by other methods
 				$r = new Request(
 								array(
 									"name" => $fb_user_profile["name"],
@@ -271,8 +275,7 @@ class SessionController extends Controller {
 								)
 							);
 				$res = UserController::apiCreate($r);
-				$vo_User = UsersDAO::getByPK( $res["user_id"] );
-
+				$vo_User = UsersDAO::getByPK($res["user_id"]);
 		}
 
 		//since we got here, this user does not have

@@ -324,23 +324,9 @@ class UserController extends Controller {
 	public static function apiChangePassword(Request $r) {
 
 		self::authenticateRequest($r);
-		
-		SecurityTools::testStrongPassword($r["password"]);
 
-		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
-
-			$user = $r["current_user"];
-
-			// Check the old password
-			Validators::isStringNonEmpty($r["old_password"], "old_password");
-
-			$old_password_valid = SecurityTools::compareHashedStrings(
-							$r["old_password"], $user->getPassword());
-
-			if ($old_password_valid === false) {
-				throw new InvalidParameterException("old_password" . Validators::IS_INVALID);
-			}
-		} else {
+		$hashedPassword = NULL;
+		if (Authorization::IsSystemAdmin($r["current_user_id"]) && isset($r["username"])) {
 			// System admin can force reset passwords for any user
 			Validators::isStringNonEmpty($r["username"], "username");
 			
@@ -353,9 +339,31 @@ class UserController extends Controller {
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
+
+			if (isset($r['password']) && $r['password'] != '') {
+				SecurityTools::testStrongPassword($r["password"]);
+				$hashedPassword = SecurityTools::hashString($r["password"]);
+			}
+		} else {
+			$user = $r["current_user"];
+
+			if ($user->getPassword() != NULL) {
+				// Check the old password
+				Validators::isStringNonEmpty($r["old_password"], "old_password");
+
+				$old_password_valid = SecurityTools::compareHashedStrings(
+								$r["old_password"], $user->getPassword());
+
+				if ($old_password_valid === false) {
+					throw new InvalidParameterException("old_password" . Validators::IS_INVALID);
+				}
+			}
+
+			SecurityTools::testStrongPassword($r["password"]);
+			$hashedPassword = SecurityTools::hashString($r["password"]);
 		}
 
-		$user->setPassword(SecurityTools::hashString($r["password"]));
+		$user->setPassword($hashedPassword);
 		UsersDAO::save($user);
 
 		return array("status" => "ok");
