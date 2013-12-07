@@ -98,6 +98,17 @@
 
 <script>
 	function registerAndLogin(){
+
+		if ($('#reg_pass').val() != $('#reg_pass2').val()) {
+			OmegaUp.ui.error("{#loginPasswordNotEqual#}");
+			return false;
+		}
+
+		if ($('#reg_pass').val().length < 8) {
+			OmegaUp.ui.error("{#loginPasswordTooShort#}");
+			return false;
+		}
+
 		omegaup.createUser(
 			$('#reg_email').val(),
 			$('#reg_username').val(),
