@@ -60,9 +60,9 @@ static int allow_fork;
 static int memory_limit;
 static int output_limit;
 static int stack_limit;
-static char *redir_stdin, *redir_stdout, *redir_stderr, *redir_probin;
+static char *redir_stdin, *redir_stdout, *redir_stderr, *redir_probin, *redir_meta;
 static char *set_cwd;
-static int probin_fd;
+static int probin_fd, meta_fd;
 static char cwd[4096];
 
 static pid_t box_pid;
@@ -1155,17 +1155,31 @@ syscall_intercept(int pid, int sys, struct syscall_args *a, int entry)
               set_syscall_args(pid, a);
               return 1;
             }
+          if (redir_meta && !strcmp(namebuf, "./meta.in"))
+            {
+              a->sys = __NR_getuid;
+              set_syscall_args(pid, a);
+              return 1;
+            }
         }
       else
         {
-          a->result = probin_fd;
+	  if (!strcmp(namebuf, "./meta.in"))
+  	    {
+              a->result = meta_fd;
+              meta_fd = -1;
+	    }
+	  else if(!strcmp(namebuf, "./data.in"))
+	    {
+              a->result = probin_fd;
+              probin_fd = -1;
+	    }
           if (a->result == -1)
             {
               a->result = -EACCES;
             }
           a->sys = __NR_open;
           set_syscall_args(pid, a);
-          probin_fd = -1;
         }
       break;
     case __NR_clone:
@@ -1677,11 +1691,26 @@ box_inside(int argc, char **argv)
       int fd;
       if ((fd = open(redir_probin, O_RDONLY)) == -1)
         die("open(\"%s\"): %m", redir_probin);
+     
+      if (fd != probin_fd) {
+        if (dup2(fd, probin_fd) == -1)
+          die("dup2: %m");
+        
+        close(fd);
+      }
+    }
+  if (redir_meta)
+    {
+      int fd;
+      if ((fd = open(redir_meta, O_RDONLY)) == -1)
+        die("open(\"%s\"): %m", redir_meta);
+     
+      if (fd != meta_fd) {
+        if (dup2(fd, meta_fd) == -1)
+          die("dup2: %m");
       
-      if (dup2(fd, probin_fd) == -1)
-        die("dup2: %m");
-      
-      close(fd);
+        close(fd);
+      }
     }
   setpgrp();
 
@@ -1732,6 +1761,7 @@ Options:\n\
 -c <dir>\tChange directory to <dir> first\n\
 -C\t\tAllow sys_clone system call to enable multithreaded applications\n\
 \t\t(and runtimes like Java, Mono and Ruby)\n\
+-D <file>\tRedirect <file> as the magic file \"meta.in\"\n\
 -e\t\tInherit full environment of the parent process\n\
 -E <var>\tInherit the environment variable <var> from the parent process\n\
 -E <var>=<val>\tSet the environment variable <var> to <val>; unset it if <var> is empty\n\
@@ -1781,6 +1811,9 @@ process_option (int c, char *argument, int enable_script)
       case 'C':
         allow_threads = 1;
         break;
+      case 'D':
+	redir_meta = argument;
+	break;
       case 'e':
 	pass_environ = 1;
 	break;
@@ -1886,7 +1919,7 @@ main(int argc, char **argv)
   
   getcwd(cwd, sizeof(cwd));
   
-  while ((c = getopt(argc, argv, "a:c:CeE:fFi:k:m:M:no:O:p:P:qr:s:S:t:Tvw:x:")) >= 0)
+  while ((c = getopt(argc, argv, "a:c:CD:eE:fFi:k:m:M:no:O:p:P:qr:s:S:t:Tvw:x:")) >= 0)
     process_option(c, optarg, 1);
   if (optind >= argc)
     usage();
@@ -1902,6 +1935,7 @@ main(int argc, char **argv)
       close(random_fd);      
     }
   probin_fd = 100 + probin_fd & 0x7F;
+  meta_fd = probin_fd + 1;
 
   sanity_check();
   uid = geteuid();

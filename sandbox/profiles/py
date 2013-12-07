@@ -17,8 +17,11 @@
 -s getcwd
 -s time
 -s gettimeofday
+-s openat
+-s mremap
 
 -p /usr
+-p /usr/bin/
 -p /usr/local
 -p /etc/localtime
 -p /dev/urandom
@@ -27,9 +30,12 @@
 -p /proc/meminfo
 -p /usr/bin/python
 -p /usr/bin/python2.6
+-p /usr/bin/python2.7
 -p /usr/bin/Modules/Setup
 -p /usr/bin/lib/python2.6/
+-p /usr/bin/lib/python2.7/
 -p /etc/nsswitch.conf
 -p /etc/passwd
 -p /usr/local/lib/python2.6/
+-p /usr/local/lib/python2.7/
 -p /home/

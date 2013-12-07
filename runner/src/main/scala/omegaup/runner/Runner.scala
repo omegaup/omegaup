@@ -342,6 +342,7 @@ object Runner extends RunnerService with Log with Using {
 							"-o", caseFile + ".out",
 							"-r", caseFile + ".err",
 							"-P", inputFile.getCanonicalPath,
+							"-D", x.getCanonicalPath,
 							"-t", message.timeLimit.toString,
 							"-w", (message.timeLimit + 60).toString,
 							"-O", message.outputLimit.toString)
@@ -350,17 +351,17 @@ object Runner extends RunnerService with Log with Using {
 				
 						val params = validator_lang match {
 							case "java" =>
-								List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main", caseName)
+								List(sandbox, "-S", profile + "/java") ++ commonParams ++ List("--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main", caseName, lang)
 							case "c" =>
-								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out", caseName)
+								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out", caseName, lang)
 							case "cpp" =>
-								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out", caseName)
+								List(sandbox, "-S", profile + "/c") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./a.out", caseName, lang)
 							case "p" =>
-								List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "./Main", caseName)
+								List(sandbox, "-S", profile + "/p") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "./Main", caseName, lang)
 							case "py" =>
-								List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py", caseName)
+								List(sandbox, "-S", profile + "/py") ++ commonParams ++ List("-m", message.memoryLimit.toString, "-n", "--", "/usr/bin/python", "Main.py", caseName, lang)
 							case "hs" =>
-								List(sandbox, "-S", profile + "/hs") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main", caseName)
+								List(sandbox, "-S", profile + "/hs") ++ commonParams ++ List("-m", message.memoryLimit.toString, "--", "./Main", caseName, lang)
 						}
 				
 						debug("Validator run {}", params.mkString(" "))
