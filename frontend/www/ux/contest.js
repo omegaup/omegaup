@@ -59,6 +59,18 @@ $(document).ready(function() {
 	}
 
 	function updateRun(run) {
+		// Actualiza el objeto en los problemas. 
+		for (p in problems) {
+			if (!problems.hasOwnProperty(p)) continue;
+			for (r in problems[p].runs) {
+				if (!problems[p].runs.hasOwnProperty(r)) continue;
+
+				if (problems[p].runs[r].guid == run.guid) {
+					problems[p].runs[r] = run;
+					break;
+				}
+			}
+		}
 		var r = '#run_' + run.guid;
 
 		if (run.status == 'ready') {
@@ -249,7 +261,7 @@ $(document).ready(function() {
 			if (!onlyProblem) {
 				problems[currentProblem.alias].last_submission = new Date().getTime();
 			}
-			
+		
 			run.status = 'new';
 			run.contest_score = 0;
 			run.time = new Date;
