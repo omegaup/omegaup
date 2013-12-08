@@ -63,17 +63,26 @@ class SchoolController extends Controller {
 			if (is_null($r["state"])) {
 				throw new InvalidParameterException("State not found");
 			}
-		}
+		}				
 		
-		// Create school
+		// Create school object
 		$school = new Schools(array("name" => $r["name"], "state_id" => $r["state_id"]));
 		
+		$school_id = 0;
 		try {			
-			SchoolsDAO::save($school);
+			
+			$existing = SchoolsDAO::findByName($r["name"]);
+			if (count($existing) > 0) {
+				$school_id = $existing[0]->getSchoolId();
+			} else {
+				// Save in db
+				SchoolsDAO::save($school);
+				$school_id = $school->getSchoolId();
+			}						
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		} 
 		
-		return array("status" => "ok", "school_id" => $school->getSchoolId());
+		return array("status" => "ok", "school_id" => $school_id);
 	}
 }
