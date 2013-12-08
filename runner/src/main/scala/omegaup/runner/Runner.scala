@@ -373,7 +373,10 @@ object Runner extends RunnerService with Log with Using {
 								List(("score" -> Math.max(0.0, Math.min(1.0, reader.readLine.trim.toDouble)).toString))
 							}}
 						} catch {
-							case e: Exception => List(("status", "JE"))
+							case e: Exception => {
+								error("validador", caseFile + ".out", e)
+								List(("status", "JE"))
+							}
 						}
 						
 						MetaFile.save(x.getCanonicalPath, meta ++ metaAddendum)
