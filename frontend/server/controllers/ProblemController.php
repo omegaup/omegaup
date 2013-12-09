@@ -859,20 +859,27 @@ class ProblemController extends Controller {
 			// Add private in the first pass, public in the second
 			try {
 				$problem_mask = NULL;
-				if ($i == 0 && !is_null($r["current_user_id"])) {
-					$problem_mask = new Problems(array(
-								"private" => 0,
+				if ($i === 0 && !is_null($r["current_user_id"])) {					
+					if (Authorization::IsSystemAdmin($r["current_user_id"])) {						
+						$problem_mask = new Problems(array(
+								"public" => "0"
+							));							
+					} else {						
+						// Sys admin can see al private problems
+						$problem_mask = new Problems(array(
+								"public" => "0",
 								"author_id" => $r["current_user_id"]
 							));
-				} else if ($i == 1) {
+					}					
+				} else if ($i === 1) {
 					$problem_mask = new Problems(array(
 								"public" => 1
 							));
 				}
 
-				if (!is_null($problem_mask)) {
+				if (!is_null($problem_mask)) {					
 					$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
-
+					
 					foreach ($problems as $problem) {
 						array_push($response["results"], $problem->asArray());
 					}
@@ -882,6 +889,11 @@ class ProblemController extends Controller {
 			}
 		}
 
+		// Sort result by name 
+		usort($response["results"], function($a, $b) {			
+			return strcmp($a["title"], $b["title"]);
+		});
+		
 		$response["status"] = "ok";
 		return $response;
 	}

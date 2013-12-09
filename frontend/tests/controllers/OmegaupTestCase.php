@@ -139,6 +139,23 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($r["penalty_time_start"], $contest->getPenaltyTimeStart());
 		$this->assertEquals($r["penalty_calc_policy"], $contest->getPenaltyCalcPolicy());
 	}
+	
+	
+	/**
+	 * Find a string into a keyed array
+	 * 
+	 * @param array $array
+	 * @param string $key
+	 * @param string $needle	 
+	 */
+	public function assertArrayContainsInKey($array, $key, $needle) {		
+		foreach ($array as $a) {			
+			if ($a[$key] === $needle) {
+				return;
+			} 						
+		}
+		$this->fail("$needle not found in array");
+	}
 
 	/**
 	 * Problem: PHPUnit does not support is_uploaded_file and move_uploaded_file

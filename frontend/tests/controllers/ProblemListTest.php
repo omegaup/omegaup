@@ -88,16 +88,39 @@ class ProblemList extends OmegaupTestCase {
 	public function testPrivateProblemsShowToAuthor() {
 		
 		$author = UserFactory::createUser();
+		$anotherAuthor = UserFactory::createUser();
 		
 		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
 		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);		
+		$anotherProblemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $anotherAuthor);		
 		
 		$r = new Request();
 		$r["auth_token"] = $this->login($author);
 		
 		$response = ProblemController::apiList($r);
-				
-		$this->assertEquals($problemDataPrivate["request"]["alias"], $response["results"][0]["alias"]);		
+		
+		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPrivate["request"]["alias"]);
+	}
+	
+	/**
+	 * The author should see his problems as well
+	 *
+	 */
+	public function testAllPrivateProblemsShowToAdmin() {
+		
+		$author = UserFactory::createUser();
+		
+		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
+		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);		
+		
+		$admin = UserFactory::createAdminUser();
+		
+		$r = new Request();
+		$r["auth_token"] = $this->login($admin);
+		
+		$response = ProblemController::apiList($r);
+		
+		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPrivate["request"]["alias"]);
 	}
 	
 	/**
