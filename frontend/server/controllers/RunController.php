@@ -277,7 +277,7 @@ class RunController extends Controller {
 	 * 
 	 * @param int $contest_id
 	 */
-	private static function InvalidateScoreboardCache($contest_id) {
+	public static function InvalidateScoreboardCache($contest_id) {
 		
 		Logger::log("Invalidating scoreboard cache.");
 		

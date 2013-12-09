@@ -1318,6 +1318,12 @@ class ContestController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
+		// Expire contest-info cache		
+		Cache::deleteFromCache(Cache::CONTEST_INFO, $r["contest_alias"]);
+		
+		// Expire contest scoreboard cache
+		RunController::InvalidateScoreboardCache($r["contest"]->getContestId());
+		
 		// Happy ending
 		$response = array();
 		$response["status"] = 'ok';
