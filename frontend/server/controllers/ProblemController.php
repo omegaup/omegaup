@@ -273,9 +273,8 @@ class ProblemController extends Controller {
 				RunsDAO::save($run);
 				self::$grader->Grade($run->getRunId());
 
-				// Expire details of the run
-				Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());
-				
+				// Expire details of the run				
+				RunController::invalidateCacheOnRejudge($run);				
 			}
 		} catch (Exception $e) {
 			Logger::error("Failed to rejudge runs after problem update");
@@ -286,12 +285,7 @@ class ProblemController extends Controller {
 		$response = array();
 
 		// All clear
-		$response["status"] = "ok";
-
-		// Invalidate contest & problem caches
-		if (!is_null($runs) && count($runs) > 0) {
-			RunController::invalidateCacheOnRejudge($runs[0]);
-		}
+		$response["status"] = "ok";				
 
 		return $response;
 	}
@@ -388,26 +382,12 @@ class ProblemController extends Controller {
 		}
 
 		if (($requiresRejudge === true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE === true)) {
-
-			// We need to rejudge runs after an update, let's initialize the grader
-			self::initializeGrader();
-
-			// Call Grader
+			Logger::log("Calling ProblemController::apiRejudge");
 			try {
-				$runs = RunsDAO::search(new Runs(array(
-									"problem_id" => $r["problem"]->getProblemId()
-								)));
-
-				foreach ($runs as $run) {
-					$run->setStatus('new');
-					$run->setVeredict('JE');
-					RunsDAO::save($run);
-					self::$grader->Grade($run->getRunId());
-				}
+				self::apiRejudge($r);
 			} catch (Exception $e) {
-				Logger::error("Failed to rejudge runs after problem update");
-				Logger::error($e);
-				throw new InvalidDatabaseOperationException($e);
+				Logger::warn("Best efort ProblemController::apiRejudge failed");
+				Logger::Exception($e);
 			}
 		}
 
@@ -418,8 +398,8 @@ class ProblemController extends Controller {
 		// All clear
 		$response["status"] = "ok";
 
-		// Invalidar cache @todo invalidar todos los lenguajes
-		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");		
+		// Invalidar problem statement cache @todo invalidar todos los lenguajes
+		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");						
 
 		return $response;
 	}

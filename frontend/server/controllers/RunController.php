@@ -365,12 +365,8 @@ class RunController extends Controller {
 
 		$response = array();
 		$response['status'] = 'ok';
-		
-		
-		self::invalidateCacheOnRejudge($r["run"]);	
-		
-		// Expire details of the run
-		Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId());		
+				
+		self::invalidateCacheOnRejudge($r["run"]);					
 		
 		// Expire ranks
 		UserController::deleteProblemsSolvedRankCacheList();
@@ -386,6 +382,9 @@ class RunController extends Controller {
 	public static function invalidateCacheOnRejudge(Runs $run) {
 						
 		try {
+			// Expire details of the run
+			Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());		
+			
 			$contest = ContestsDAO::getByPK($run->getContestId());
 			
 			// If the run belongs to a contest, we need to invalidate that scoreboard
