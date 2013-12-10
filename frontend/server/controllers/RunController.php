@@ -262,32 +262,14 @@ class RunController extends Controller {
 		if (!self::$practice) {
 			/// @todo Invalidate cache only when this run changes a user's score
 			///       (by improving, adding penalties, etc)
-			self::InvalidateScoreboardCache($r["contest"]->getContestId());
+			Scoreboard::InvalidateScoreboardCache($r["contest"]->getContestId());
 		}
 		
 		// Expire rank cache
 		UserController::deleteProblemsSolvedRankCacheList();
 
 		return $response;
-	}
-
-	/**
-	 * Any new run can potentially change the scoreboard.
-	 * When a new run is submitted, the scoreboard cache snapshot is deleted
-	 * 
-	 * @param int $contest_id
-	 */
-	public static function InvalidateScoreboardCache($contest_id) {
-		
-		Logger::log("Invalidating scoreboard cache.");
-		
-		// Invalidar cache del contestant
-		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);		
-
-		// Invalidar cache del admin
-		Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
-		
-	}
+	}	
 
 	/**
 	 * Validate request of details
@@ -408,7 +390,7 @@ class RunController extends Controller {
 			
 			// If the run belongs to a contest, we need to invalidate that scoreboard
 			if (!is_null($contest)) {
-				self::InvalidateScoreboardCache($contest->getContestId());
+				Scoreboard::InvalidateScoreboardCache($contest->getContestId());
 			}
 			
 			// Now we need to invalidate problem stats

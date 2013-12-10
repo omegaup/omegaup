@@ -1322,7 +1322,7 @@ class ContestController extends Controller {
 		Cache::deleteFromCache(Cache::CONTEST_INFO, $r["contest_alias"]);
 		
 		// Expire contest scoreboard cache
-		RunController::InvalidateScoreboardCache($r["contest"]->getContestId());
+		Scoreboard::InvalidateScoreboardCache($r["contest"]->getContestId());
 		
 		// Happy ending
 		$response = array();

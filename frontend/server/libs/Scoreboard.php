@@ -364,5 +364,22 @@ class Scoreboard {
 		return strcmp($a['username'], $b['username']);
 	}
 
+	/**
+	 * Any new run can potentially change the scoreboard.
+	 * When a new run is submitted, the scoreboard cache snapshot is deleted
+	 * 
+	 * @param int $contest_id
+	 */
+	public static function InvalidateScoreboardCache($contest_id) {
+		
+		Logger::log("Invalidating scoreboard cache.");
+		
+		// Invalidar cache del contestant
+		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);		
+
+		// Invalidar cache del admin
+		Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
+		
+	}
 }
 
