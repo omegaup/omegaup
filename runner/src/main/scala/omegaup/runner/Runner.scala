@@ -12,6 +12,8 @@ import omegaup._
 import omegaup.data._
 
 object Runner extends RunnerService with Log with Using {
+  def isInterpreted(lang: String) = lang == "py"
+
   def compile(runDirectory: File,
               lang: String,
               codes: List[(String, String)],
@@ -36,21 +38,6 @@ object Runner extends RunnerService with Log with Using {
       return new CompileOutputMessage(token = Some(runDirectory.getParentFile.getName))
     }
 
-    val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
-    val profile = Config.get("runner.sandbox.profiles.path",
-                             Config.get("runner.sandbox.path", ".") + "/profiles")
-    val runtime = Runtime.getRuntime
-
-    val commonParams = List(
-      "-c", runDirectory.getCanonicalPath,
-      "-q",
-      "-M", runDirectory.getCanonicalPath + "/compile.meta",
-      "-o", "compile.out",
-      "-r", "compile.err",
-      "-t", Config.get("java.compile.time_limit", "30"),
-      "-w", Config.get("java.compile.time_limit", "30")
-    )
-
     // Store the first compilation error for multi-file Pascal.
     var previousError: String = null
   
@@ -62,24 +49,15 @@ object Runner extends RunnerService with Log with Using {
 
       // Files need to be compiled individually.
       for (inputFile <- inputFiles) {
-        val params = List(sandbox, "-S", profile + "/fpc") ++
-          commonParams ++
-          List(
-            "--",
-            Config.get("p.compiler.path", "/usr/bin/fpc"),
-            "-Tlinux",
-            "-O2",
-            "-Mobjfpc",
-            "-Sc",
-            "-Sh",
-            inputFile
-          )
-        debug("Compile {}", params.mkString(" "))
-
-        pusing (runtime.exec(params.toArray)) { process => {
-          if(process != null) {
-            val status = process.waitFor
-
+        Sandbox.compile(
+          "p",
+          List(inputFile),
+          chdir = runDirectory.getCanonicalPath,
+          metaFile = runDirectory.getCanonicalPath + "/compile.meta",
+          outputFile = "compile.out",
+          errorFile = "compile.err"
+        ) { status => {
+          if(status >= 0) {
             val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
 
             if (status != 0 && previousError == null) {
@@ -100,80 +78,17 @@ object Runner extends RunnerService with Log with Using {
       inputFiles.clear
       inputFiles += pascalMain
     }
-  
-    val params = lang match {
-      case "java" =>
-        List(sandbox, "-S", profile + "/javac") ++
-        commonParams ++
-        List("--", Config.get("java.compiler.path", "/usr/bin/javac")) ++
-        inputFiles
-      case "c" =>
-        List(sandbox, "-S", profile + "/gcc") ++
-        commonParams ++
-        List("--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-std=c99", "-O2", "-lm") ++
-        inputFiles
-      case "cpp" =>
-        List(sandbox, "-S", profile + "/gcc") ++
-        commonParams ++
-        List("--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++
-        inputFiles
-      case "p" =>
-        List(sandbox, "-S", profile + "/fpc") ++
-        commonParams ++
-        List(
-          "--",
-          Config.get("p.compiler.path", "/usr/bin/fpc"),
-          "-Tlinux",
-          "-O2",
-          "-Mobjfpc",
-          "-Sc",
-          "-Sh"
-        ) ++
-        inputFiles
-      case "py" =>
-        List(sandbox, "-S", profile + "/pyc") ++
-        commonParams ++
-        List("--", Config.get("py.compiler.path", "/usr/bin/python"), "-m", "py_compile") ++
-        inputFiles
-      case "kj" =>
-        List(sandbox, "-S", profile + "/kc") ++
-        commonParams ++
-        List(
-          "--",
-          Config.get("kcl.compiler.path", "/usr/bin/kcl"),
-          "-lj",
-          "-o",
-          "Main.kx",
-          "-c"
-        ) ++
-        inputFiles
-      case "kp" =>
-        List(sandbox, "-S", profile + "/kc") ++
-        commonParams ++
-        List(
-          "--",
-          Config.get("kcl.compiler.path", "/usr/bin/kcl"),
-          "-lp",
-          "-o",
-          "Main.kx",
-          "-c"
-        ) ++
-        inputFiles
-      case "hs" =>
-        List(sandbox, "-S", profile + "/ghc") ++
-        commonParams ++
-        List("--", Config.get("ghc.compiler.path", "/usr/bin/ghc"), "-O2", "-o", "Main") ++
-        inputFiles
-      case _ => null
-    }
-
-    debug("Compile {}", params.mkString(" "))
-
-    pusing (runtime.exec(params.toArray)) { process => {
-      if(process != null) {
-        val status = process.waitFor
-  
-        if (lang != "py" && !Config.get("runner.preserve", false)) {
+ 
+    Sandbox.compile(
+      lang,
+      inputFiles,
+      chdir = runDirectory.getCanonicalPath,
+      metaFile = runDirectory.getCanonicalPath + "/compile.meta",
+      outputFile = "compile.out",
+      errorFile = "compile.err"
+    ) { status => {
+      if(status >= 0) {
+        if (!isInterpreted(lang) && !Config.get("runner.preserve", false)) {
           inputFiles.foreach { new File(_).delete }
         }
       
@@ -266,7 +181,7 @@ object Runner extends RunnerService with Log with Using {
     
     compile(new File(runRoot + "/bin"), message.lang, message.code, "compile error")
   }
-  
+
   def run(message: RunInputMessage, zipFile: File) : Option[RunOutputMessage] = {
     info("run {}", message)
     val casesDirectory:File = message.input match {
@@ -293,10 +208,6 @@ object Runner extends RunnerService with Log with Using {
       val binDirectory = new File(runDirectory.getCanonicalPath + "/bin")
     
       val lang = message.token.substring(message.token.indexOf(".")+1)
-    
-      val sandbox = Config.get("runner.sandbox.path", ".") + "/box"
-      val profile = Config.get("runner.sandbox.path", ".") + "/profiles"
-      val runtime = Runtime.getRuntime
 
       if (lang == "cat") {
         // Literal. Just copy the "program" as the output and produce a fake .meta.
@@ -341,87 +252,14 @@ object Runner extends RunnerService with Log with Using {
                            "/" +
                            FileUtil.removeExtension(x.getName)
 
-            var timeLimit = message.timeLimit
-            if (lang == "java" || lang == "p") {
-              timeLimit += 1
-            }
-
-            val commonParams = List(
-              "-c", binDirectory.getCanonicalPath,
-              "-q",
-              "-M", caseName + ".meta",
-              "-i", x.getCanonicalPath,
-              "-o", caseName + ".out",
-              "-r", caseName + ".err",
-              "-t", timeLimit.toString,
-              "-w", (message.timeLimit + 60).toString,
-              "-O", message.outputLimit.toString
+            Sandbox.run(message,
+                        lang,
+                        chdir = binDirectory.getCanonicalPath,
+                        metaFile = caseName + ".meta",
+                        inputFile = x.getCanonicalPath,
+                        outputFile = caseName + ".out",
+                        errorFile = caseName + ".err"
             )
-          
-            val params = lang match {
-              case "java" =>
-                List(sandbox, "-S", profile + "/java") ++
-                commonParams ++
-                List(
-                  "--",
-                  Config.get("java.runtime.path", "/usr/bin/java"),
-                  "-Xmx" + message.memoryLimit + "k",
-                  "Main"
-                )
-              case "c" =>
-                List(sandbox, "-S", profile + "/c") ++
-                commonParams ++
-                List("-m", message.memoryLimit.toString, "--", "./a.out")
-              case "cpp" =>
-                List(sandbox, "-S", profile + "/c") ++
-                commonParams ++
-                List("-m", message.memoryLimit.toString, "--", "./a.out")
-              case "p" =>
-                List(sandbox, "-S", profile + "/p") ++
-                commonParams ++
-                List("-m", message.memoryLimit.toString, "--", "./Main")
-              case "py" =>
-                List(sandbox, "-S", profile + "/py") ++
-                commonParams ++
-                List(
-                  "-m",
-                  message.memoryLimit.toString,
-                  "--",
-                  Config.get("py.runtime.path", "/usr/bin/python"), "Main.py"
-                )
-              case "kp" =>
-                List(sandbox, "-S", profile + "/kx") ++
-                commonParams ++
-                List(
-                  "--",
-                  Config.get("karel.runtime.path", "/usr/bin/karel"),
-                  "/dev/stdin",
-                  "-oi",
-                  "-q",
-                  "-p2",
-                  "Main.kx"
-                )
-              case "kj" =>
-                List(sandbox, "-S", profile + "/kx") ++
-                commonParams ++
-                List(
-                  "--",
-                  Config.get("karel.runtime.path", "/usr/bin/karel"),
-                  "/dev/stdin",
-                  "-oi",
-                  "-q",
-                  "-p2",
-                  "Main.kx"
-                )
-              case "hs" =>
-                List(sandbox, "-S", profile + "/hs") ++
-                commonParams ++
-                List("-m", message.memoryLimit.toString, "--", "./Main")
-            }
-
-            debug("Run {}", params.mkString(" "))
-          
-            pusing (runtime.exec(params.toArray)) { process => process.waitFor }
           }}
         }
       
@@ -431,59 +269,17 @@ object Runner extends RunnerService with Log with Using {
             extra.foreach { (x: CaseData) => {
               val caseName = x.name
               val casePath = runDirectory.getCanonicalPath + "/" + caseName
-              val commonParams = List(
-                "-c", binDirectory.getCanonicalPath,
-                "-q",
-                "-M", casePath + ".meta",
-                "-i", casePath + ".in",
-                "-o", casePath + ".out",
-                "-r", casePath + ".err",
-                "-t", message.timeLimit.toString,
-                "-w", (message.timeLimit + 60).toString,
-                "-O", message.outputLimit.toString
-              )
             
               FileUtil.write(casePath + ".in", x.data)
-          
-              val params = lang match {
-                case "java" =>
-                  List(sandbox, "-S", profile + "/java") ++
-                  commonParams ++
-                  List("--", "/usr/bin/java", "-Xmx" + message.memoryLimit + "k", "Main")
-                case "c" =>
-                  List(sandbox, "-S", profile + "/c") ++
-                  commonParams ++
-                  List("-m", message.memoryLimit.toString, "--", "./a.out")
-                case "cpp" =>
-                  List(sandbox, "-S", profile + "/c") ++
-                  commonParams ++
-                  List("-m", message.memoryLimit.toString, "--", "./a.out")
-                case "p" =>
-                  List(sandbox, "-S", profile + "/p") ++
-                  commonParams ++
-                  List("-m", message.memoryLimit.toString, "-n", "--", "./Main")
-                case "py" =>
-                  List(sandbox, "-S", profile + "/py") ++
-                  commonParams ++
-                  List(
-                    "-m",
-                    message.memoryLimit.toString,
-                    "-n",
-                    "--",
-                    "/usr/bin/python",
-                    "Main.py"
-                  )
-                case "hs" =>
-                  List(sandbox, "-S", profile + "/hs") ++
-                  commonParams ++
-                  List("-m", message.memoryLimit.toString, "--", "./Main")
-              }
-          
-              debug("Run {}", params.mkString(" "))
-
-              pusing (runtime.exec(params.toArray)) {
-                process => process.waitFor
-              }
+         
+              Sandbox.run(message,
+                           lang,
+                           chdir = binDirectory.getCanonicalPath,
+                           metaFile = casePath + ".meta",
+                           inputFile = casePath + ".in",
+                           outputFile = casePath + ".out",
+                           errorFile = casePath + ".err"
+              )
             
               if (!Config.get("runner.preserve", false)) new File(casePath + ".in").delete
             }}
@@ -505,75 +301,30 @@ object Runner extends RunnerService with Log with Using {
             if (!inputFile.exists) {
               inputFile = new File(casesDirectory, caseName + ".in")
             }
-            val commonParams = List(
-              "-c", validatorDirectory.getCanonicalPath,
-              "-q",
-              "-M", caseFile + ".meta",
-              "-i", FileUtil.removeExtension(x.getCanonicalPath) + ".out",
-              "-o", caseFile + ".out",
-              "-r", caseFile + ".err",
-              "-P", inputFile.getCanonicalPath,
-              "-D", x.getCanonicalPath,
-              "-t", message.timeLimit.toString,
-              "-w", (message.timeLimit + 60).toString,
-              "-O", message.outputLimit.toString
-            )
             
             val validator_lang =
               using (new BufferedReader(new FileReader(new File(validatorDirectory, "lang")))) {
                 reader => reader.readLine
               }
-        
-            val params = validator_lang match {
-              case "java" =>
-                List(sandbox, "-S", profile + "/java") ++
-                commonParams ++
-                List(
-                  "--",
-                  "/usr/bin/java",
-                  "-Xmx" + message.memoryLimit + "k",
-                  "Main",
-                  caseName,
-                  lang
-                )
-              case "c" =>
-                List(sandbox, "-S", profile + "/c") ++
-                commonParams ++
-                List("-m", message.memoryLimit.toString, "--", "./a.out", caseName, lang)
-              case "cpp" =>
-                List(sandbox, "-S", profile + "/c") ++
-                commonParams ++
-                List("-m", message.memoryLimit.toString, "--", "./a.out", caseName, lang)
-              case "p" =>
-                List(sandbox, "-S", profile + "/p") ++
-                commonParams ++
-                List("-m", message.memoryLimit.toString, "-n", "--", "./Main", caseName, lang)
-              case "py" =>
-                List(sandbox, "-S", profile + "/py") ++
-                commonParams ++
-                List(
-                  "-m",
-                  message.memoryLimit.toString,
-                  "-n",
-                  "--",
-                  "/usr/bin/python",
-                  "Main.py",
-                  caseName,
-                  lang)
-              case "hs" =>
-                List(sandbox, "-S", profile + "/hs") ++
-                commonParams ++
-                List("-m", message.memoryLimit.toString, "--", "./Main", caseName, lang)
-            }
-        
-            debug("Validator run {}", params.mkString(" "))
 
-            pusing (runtime.exec(params.toArray)) { process => process.waitFor }
+            Sandbox.run(message,
+                        validator_lang,
+                        logTag = "Validator run",
+                        extraParams = List(caseName, lang),
+                        chdir = validatorDirectory.getCanonicalPath,
+                        metaFile = caseFile + ".meta",
+                        inputFile = FileUtil.removeExtension(x.getCanonicalPath) + ".out",
+                        outputFile = caseFile + ".out",
+                        errorFile = caseFile + ".err",
+                        originalInputFile = Some(inputFile.getCanonicalPath),
+                        runMetaFile = Some(x.getCanonicalPath)
+            )
             
             val metaAddendum = try {
               using (new BufferedReader(new FileReader(caseFile + ".out"))) { reader => {
-                List((
-                  "score" -> Math.max(0.0, Math.min(1.0, reader.readLine.trim.toDouble)).toString))
+                List(
+                  ("score" -> Math.max(0.0, Math.min(1.0, reader.readLine.trim.toDouble)).toString)
+                )
               }}
             } catch {
               case e: Exception => {
@@ -655,13 +406,14 @@ object Runner extends RunnerService with Log with Using {
       if (args(i) == "--config" && i + 1 < args.length) {
         i += 1
         configPath = args(i)
-        Config.load(configPath)
       } else if (args(i) == "--output" && i + 1 < args.length) {
         i += 1
         System.setOut(new java.io.PrintStream(new java.io.FileOutputStream(args(i))))
       }
       i += 1
     }
+
+    Config.load(configPath)
 
     // Setting keystore properties
     System.setProperty("javax.net.ssl.keyStore",
@@ -764,7 +516,7 @@ object Runner extends RunnerService with Log with Using {
                   }
                 } catch {
                   case e: Exception => {
-                    error("/inpue/", e)
+                    error("/input/", e)
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
                     new InputOutputMessage(status = "error", error = Some(e.getMessage))
                   }
@@ -820,7 +572,7 @@ object Runner extends RunnerService with Log with Using {
 
         server.stop()
       }
-    });
+    })
     
     new Thread() {
       override def run() = {
