@@ -380,22 +380,43 @@ class UserController extends Controller {
 	 */
 	public static function apiVerifyEmail(Request $r) {
 
-		Validators::isStringNonEmpty($r["id"], "id");
-
-		try {
-			$users = UsersDAO::search(new Users(array(
-								"verification_id" => $r["id"]
-							)));
-
-			$user = (is_array($users) && count($users) > 0) ? $users[0] : null;
-			if (is_null($user)) {
-				throw new NotFoundException("Verification id is invalid.");
+		$user = null;
+		
+		// Admin can override verification by sending username
+		if (isset($r["usernameOrEmail"])) {
+			self::authenticateRequest($r);
+			
+			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+				throw new ForbiddenAccessException();
 			}
+			
+			Validators::isStringNonEmpty($r["usernameOrEmail"], "usernameOrEmail");
+			
+			$user = self::resolveUser($r["usernameOrEmail"]);
+			
+			Logger::log("Admin verifiying user..." . $user->getUsername());
+		} else {
+			// Normal user verification path
+			Validators::isStringNonEmpty($r["id"], "id");
+			
+			try {
+				$users = UsersDAO::search(new Users(array(
+									"verification_id" => $r["id"]
+								)));
 
+				$user = (is_array($users) && count($users) > 0) ? $users[0] : null;
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}
+		}			
+		
+		if (is_null($user)) {
+			throw new NotFoundException("Verification id is invalid.");
+		}
+				
+		try {
 			$user->setVerified(1);
 			UsersDAO::save($user);
-		} catch (ApiException $e) {
-			throw $e;
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}

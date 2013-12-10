@@ -177,5 +177,70 @@ class CreateUserTest extends OmegaupTestCase {
 		// Call API		
 		$response = UserController::apiCreate($r);				
 	}
+	
+	
+	/**
+	 * Admin can verify users only with username
+	 */
+	public function testUsernameVerificationByAdmin() {
+	
+		// User to be verified
+		$user = UserFactory::createUser(null, null, null, false /*not verified*/);
+		
+		// Admin will verify $user
+		$admin = UserFactory::createAdminUser();
+		
+		// Call api using admin 		
+		$response = UserController::apiVerifyEmail(new Request(array(
+			"auth_token" => $this->login($admin),
+			"usernameOrEmail" => $user->getUsername()
+		)));
+		
+		// Get user from db again to pick up verification changes
+		$userdb = UsersDAO::FindByUsername($user->getUsername());
+		
+		$this->assertEquals(1, $userdb->getVerified());
+		$this->assertEquals("ok", $response["status"]);
+	}
+	
+	/**
+	 * Admin can verify users only with username
+	 * Testing invalid username
+	 * 
+	 * @expectedException NotFoundException
+	 */
+	public function testUsernameVerificationByAdminInvalidUsername() {
+			
+		
+		// Admin will verify $user
+		$admin = UserFactory::createAdminUser();
+		
+		// Call api using admin 		
+		$response = UserController::apiVerifyEmail(new Request(array(
+			"auth_token" => $this->login($admin),
+			"usernameOrEmail" => Utils::CreateRandomString()
+		)));		
+	}
+	
+	/**
+	 * Normal user trying to go the admin path
+	 * 
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testUsernameVerificationByAdminNotAdmin() {
+		
+		// User to be verified
+		$user = UserFactory::createUser(null, null, null, false /*not verified*/);
+		
+		// Another user will try to verify $user
+		$user2 = UserFactory::createUser();
+		
+		// Call api using admin 		
+		$response = UserController::apiVerifyEmail(new Request(array(
+			"auth_token" => $this->login($user2),
+			"usernameOrEmail" => $user->getUsername()
+		)));
+		
+	}
 }
 
