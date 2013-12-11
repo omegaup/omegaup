@@ -205,7 +205,11 @@ class SessionController extends Controller {
 				break;
 			}
 
-			$suffix++;
+			if (empty($suffix)) {
+				$suffix = 1;
+			}else{
+				$suffix++;
+			}
 		}
 		$username .= $suffix;
 
