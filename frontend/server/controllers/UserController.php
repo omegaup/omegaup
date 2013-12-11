@@ -389,12 +389,15 @@ class UserController extends Controller {
 			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
 				throw new ForbiddenAccessException();
 			}
+
+			Logger::log("Admin verifiying user..." . $r["usernameOrEmail"]);
 			
 			Validators::isStringNonEmpty($r["usernameOrEmail"], "usernameOrEmail");
 			
 			$user = self::resolveUser($r["usernameOrEmail"]);
 			
-			Logger::log("Admin verifiying user..." . $user->getUsername());
+			self::$redirectOnVerify = false;
+			
 		} else {
 			// Normal user verification path
 			Validators::isStringNonEmpty($r["id"], "id");
