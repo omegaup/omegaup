@@ -79,6 +79,12 @@ class Contests extends VO
                         if( isset($data['show_scoreboard_after']) ){
 				$this->show_scoreboard_after = $data['show_scoreboard_after'];
 			}
+			if( isset($data['scoreboard_url']) ){
+				$this->scoreboard_url = $data['scoreboard_url'];
+			}
+			if( isset($data['scoreboard_url_admin']) ){
+				$this->scoreboard_url_admin = $data['scoreboard_url_admin'];
+			}
 		}
 	}
 
@@ -107,7 +113,9 @@ class Contests extends VO
 			"submissions_gap" => $this->submissions_gap,
 			"feedback" => $this->feedback,
 			"penalty" => $this->penalty,
-			"penalty_time_start" => $this->penalty_time_start
+			"penalty_time_start" => $this->penalty_time_start,
+			"scoreboard_url" => $this->scoreboard_url,
+			"scoreboard_url_admin" => $this->scoreboard_url_admin
 		); 
 	return json_encode($vec); 
 	}
@@ -270,6 +278,8 @@ class Contests extends VO
         protected $points_decay_factor;
         
         protected $show_scoreboard_after;
+		protected $scoreboard_url;
+		protected $scoreboard_url_admin;
         
 	final public function getContestId()
 	{
@@ -683,6 +693,24 @@ class Contests extends VO
         final public function getPointsDecayFactor()
 	{
 		return $this->points_decay_factor;
+	}
+	
+	final public function getScoreboardUrl() 
+	{
+		return $this->scoreboard_url;	
+	}
+	final public function setScoreboardUrl($scoreboard_url)
+	{
+		$this->scoreboard_url = $scoreboard_url;
+	}
+	
+	final public function getScoreboardUrlAdmin() 
+	{
+		return $this->scoreboard_url_admin;	
+	}
+	final public function setScoreboardUrlAdmin($scoreboard_url_admin)
+	{
+		$this->scoreboard_url_admin = $scoreboard_url_admin;
 	}
 
 	/**

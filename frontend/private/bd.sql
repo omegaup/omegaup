@@ -713,5 +713,7 @@ ALTER TABLE  `Schools` CHANGE  `state_id`  `state_id` INT( 11 ) NULL;
 ALTER TABLE  `Schools` CHANGE  `school_id`  `school_id` INT( 11 ) NOT NULL AUTO_INCREMENT;
 ALTER TABLE Runs CHANGE COLUMN language language enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs') NOT NULL;
 
+ALTER TABLE  `Contests` ADD  `scoreboard_url` VARCHAR( 30 ) NULL DEFAULT NULL;
+ALTER TABLE  `Contests` ADD  `scoreboard_url_admin` VARCHAR( 30 ) NULL DEFAULT NULL;
 
 COMMIT;

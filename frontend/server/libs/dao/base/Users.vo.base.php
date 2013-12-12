@@ -105,7 +105,9 @@ class Users extends VO
 			"language_id" => $this->language_id,
 			"graduation_date" => $this->graduation_date,
 			"birth_date" => $this->birth_date,
-			"last_access" => $this->last_access
+			"last_access" => $this->last_access,
+			"verified" => $this->verified,
+			"verification_id" => $this->verification_id
 		); 
 	return json_encode($vec); 
 	}

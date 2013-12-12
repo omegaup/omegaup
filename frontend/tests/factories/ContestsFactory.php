@@ -171,6 +171,12 @@ class ContestsFactory {
         $contest->setPublic(1);
         ContestsDAO::save($contest);		
 	}
+	
+	public static function setScoreboardPercenage($contestData, $percentage) {
+		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
+		$contest->setScoreboard($percentage);
+		ContestsDAO::save($contest);
+	}
 
 }
 

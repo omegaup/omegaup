@@ -80,9 +80,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$contestData = ContestsFactory::createContest();
 		
 		// Set 0% of scoreboard show
-		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
-		$contest->setScoreboard(0);
-		ContestsDAO::save($contest);		
+		ContestsFactory::setScoreboardPercenage($contestData, 0);		
 
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -132,9 +130,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$contestData = ContestsFactory::createContest();
 		
 		// Set 0% of scoreboard show
-		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
-		$contest->setScoreboard(0);
-		ContestsDAO::save($contest);		
+		ContestsFactory::setScoreboardPercenage($contestData, 0);		
 
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -213,6 +209,82 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$this->assertEquals(200, $response["ranking"][0]["total"]["points"]);
 		$this->assertEquals(100, $response["ranking"][1]["total"]["points"]);
 		$this->assertEquals(0, $response["ranking"][1]["contests"][$contestData2["request"]["alias"]]["points"]);
+	}
+	
+	/**
+	 * Basic tests for shareable scoreboard url
+	 */
+	public function testScoreboardUrl() {
+		
+		// Get a contest with 0% of scoreboard show percentage
+		$contestData = ContestsFactory::createContest();
+		ContestsFactory::setScoreboardPercenage($contestData, 0);
+	
+		// Create our user not added to the contest
+		$externalUser = UserFactory::createUser();
+		
+		// Create our contestant, will submit 1 run
+		$contestant = UserFactory::createUser();
+		$problemData = ProblemsFactory::createProblem();
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+		RunsFactory::gradeRun($runData);
+				
+		// Get the scoreboard url by using the MyList api being the
+		// contest director
+		$response = ContestController::apiMyList(new Request(array(
+			"auth_token" => $this->login($contestData["director"])
+		)));	
+		
+		$scoreboard_url = null;
+		$scoreboard_admin_url = null;
+		foreach ($response["results"] as $c) {			
+			if ($c["alias"] === $contestData["request"]["alias"]) {
+				$scoreboard_url = $c["scoreboard_url"];
+				$scoreboard_admin_url = $c["scoreboard_url_admin"];
+				break;
+			}
+		}
+		$this->assertNotNull($scoreboard_url);					
+		
+		// Call scoreboard api from the user
+		$scoreboardResponse = ContestController::apiScoreboard(new Request(array(
+			"auth_token" => $this->login($externalUser),
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => $scoreboard_url
+		)));
+				
+		$this->assertEquals("0", $scoreboardResponse["ranking"][0]["total"]["points"]);		
+		
+		// Call scoreboard api from the user
+		$scoreboardResponse = ContestController::apiScoreboard(new Request(array(
+			"auth_token" => $this->login($externalUser),
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => $scoreboard_admin_url
+		)));
+				
+		$this->assertEquals("100", $scoreboardResponse["ranking"][0]["total"]["points"]);	
+	}
+	
+	/**
+	 * Test invalid token
+	 * 
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testScoreboardUrlInvalidToken() {
+		
+		// Create our user not added to the contest
+		$externalUser = UserFactory::createUser();
+		
+		// Get a contest with 0% of scoreboard show percentage
+		$contestData = ContestsFactory::createContest();
+		
+		// Call scoreboard api from the user
+		$scoreboardResponse = ContestController::apiScoreboard(new Request(array(
+			"auth_token" => $this->login($externalUser),
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => "invalid token"
+		)));
 	}
 }
 

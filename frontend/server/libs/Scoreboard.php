@@ -77,7 +77,7 @@ class Scoreboard {
 				$cacheable_for_admin = $this->showAllRuns && !$pending_runs;
 
 				// Get all distinct contestants participating in the contest given contest_id
-				$contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns, $filterUsersBy);
+				$contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, false /*show all runs*/, $filterUsersBy);
 
 				// Get all problems given contest_id
 				$contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);

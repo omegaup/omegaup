@@ -115,7 +115,7 @@ class ContestController extends Controller {
 		self::authenticateRequest($r);
 
 		// Create array of relevant columns
-		$relevant_columns = array("title", "alias", "start_time", "finish_time", "public");
+		$relevant_columns = array("title", "alias", "start_time", "finish_time", "public", "scoreboard_url", "scoreboard_url_admin");
 		$contests = null;
 		try {
 
@@ -150,6 +150,41 @@ class ContestController extends Controller {
 	}
 
 	/**
+	 * Checks if user can access contests: If the contest is private then the user
+	 * must be added to the contest (an entry ContestUsers must exists) OR the user 
+	 * should be a Contest Admin.
+	 * 
+	 * Expects $r["contest"] to contain the contest to check against.
+	 * 
+	 * In case of access check failed, an exception is thrown.	 
+	 * 
+	 * @param Request $r
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function canAccessContest(Request $r) {
+		
+		if (!isset($r["contest"]) || is_null($r["contest"])) {
+			throw new NotFoundException("Contest not found");
+		}
+		
+		if ($r["contest"]->getPublic() === '0') {
+			try {
+				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+					throw new ForbiddenAccessException();
+				}
+			} catch (ApiException $e) {
+				// Propagate exception
+				throw $e;
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+		}
+	}
+	
+	/**
 	 * Validate request of a details contest
 	 * 
 	 * @param Request $r
@@ -174,20 +209,7 @@ class ContestController extends Controller {
 			throw new NotFoundException("Contest not found");
 		}
 
-
-		if ($r["contest"]->getPublic() === '0') {
-			try {
-				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-					throw new ForbiddenAccessException();
-				}
-			} catch (ApiException $e) {
-				// Propagate exception
-				throw $e;
-			} catch (Exception $e) {
-				// Operation failed in the data layer
-				throw new InvalidDatabaseOperationException($e);
-			}
-		}
+		self::canAccessContest($r);
 
 		// If the contest has not started, user should not see it, unless it is admin
 		if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
@@ -225,7 +247,9 @@ class ContestController extends Controller {
 
 			// Get problems of the contest
 			$key_problemsInContest = new ContestProblems(
-							array("contest_id" => $r["contest"]->getContestId()));
+					array(
+						"contest_id" => $r["contest"]->getContestId()
+			));
 			try {
 				$problemsInContest = ContestProblemsDAO::search($key_problemsInContest, "order");
 			} catch (Exception $e) {
@@ -331,6 +355,8 @@ class ContestController extends Controller {
 		$contest->setPenalty(max(0, intval($r["penalty"])));
 		$contest->setPenaltyTimeStart($r["penalty_time_start"]);
 		$contest->setPenaltyCalcPolicy(is_null($r["penalty_calc_policy"]) ? "sum" : $r["penalty_calc_policy"]);
+		$contest->setScoreboardUrl(self::randomString(30));
+		$contest->setScoreboardUrlAdmin(self::randomString(30));
 
 		if (!is_null($r["show_scoreboard_after"])) {
 			$contest->setShowScoreboardAfter($r["show_scoreboard_after"]);
@@ -947,25 +973,30 @@ class ContestController extends Controller {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
-
-		if (is_null($r["contest"])) {
-			throw new NotFoundException("Contest not found");
-		}
 		
-		// Create scoreboard
-		$include_admins = false;		
-		if (Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-			if (!is_null($r["include_admins"]) && $r["include_admins"] == false) {
-				$include_admins = false;
+		// If true, will override Scoreboard Pertentage to 100% 
+		$showAllRuns = false;
+		
+		if (is_null($r["token"])) {
+			self::canAccessContest($r);
+			
+			if (Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+				$showAllRuns = true;
+			}
+		} else {
+			if ($r["token"] === $r["contest"]->getScoreboardUrl()) {				
+				$showAllRuns = false;
+			} else if ($r["token"] === $r["contest"]->getScoreboardUrlAdmin()) {
+				$showAllRuns = true;
 			} else {
-				$include_admins = true;
+				throw new ForbiddenAccessException("Invalid scoreboard url.");
 			}
 		}
 		
 		// Create scoreboard
 		$scoreboard = new Scoreboard(
 						$r["contest"]->getContestId(),
-						$include_admins
+						$showAllRuns
 		);
 
 		// Push scoreboard data in response
@@ -1527,8 +1558,7 @@ class ContestController extends Controller {
 				$distribution[$i] = 0;
 			}
 			
-			$sizeOfBucket = $totalPoints / 100;
-			$r["include_admins"] = false;
+			$sizeOfBucket = $totalPoints / 100;			
 			$scoreboardResponse = self::apiScoreboard($r);
 			foreach($scoreboardResponse["ranking"] as $results) {
 				$distribution[(int)($results["total"]["points"] / $sizeOfBucket)]++;

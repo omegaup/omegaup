@@ -44,5 +44,21 @@ class Controller {
 		$r["current_user_id"] = $user->getUserId();
 	}
 	
+	/**
+	 * Retunrs a random string of size $length
+	 * 
+	 * @param string $length
+	 * @return string
+	 */
+	public static function randomString($length) {
+		$chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+		$str = "";
+		$size = strlen($chars);
+		for ($i = 0; $i < $length; $i++) {
+			$str .= $chars[rand(0, $size - 1)];
+		}
+
+		return $str;
+	}
 }
 

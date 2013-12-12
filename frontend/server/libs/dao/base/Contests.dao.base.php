@@ -267,7 +267,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update( $Contests )
 	{
-		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, alias = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ?, points_decay_factor = ?, penalty_calc_policy = ?, show_scoreboard_after = ? WHERE  contest_id = ?;";
+		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, alias = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ?, points_decay_factor = ?, penalty_calc_policy = ?, show_scoreboard_after = ?, scoreboard_url = ?, scoreboard_url_admin = ? WHERE  contest_id = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -287,6 +287,8 @@ abstract class ContestsDAOBase extends DAO
                         $Contests->getPointsDecayFactor(),
                         $Contests->getPenaltyCalcPolicy(),
                         $Contests->getShowScoreboardAfter(),
+			$Contests->getScoreboardUrl(),
+			$Contests->getScoreboardUrlAdmin(),
 			$Contests->getContestId()
                         
                         );
@@ -312,7 +314,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function create( &$Contests )
 	{
-		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, alias, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start, points_decay_factor, penalty_calc_policy, show_scoreboard_after) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, alias, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start, points_decay_factor, penalty_calc_policy, show_scoreboard_after, scoreboard_url, scoreboard_url_admin) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->getContestId(), 
 			$Contests->getTitle(), 
@@ -332,7 +334,9 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getPenaltyTimeStart(),                        
                         $Contests->getPointsDecayFactor(),
                         $Contests->getPenaltyCalcPolicy(),
-                        $Contests->getShowScoreboardAfter()
+                        $Contests->getShowScoreboardAfter(),
+			$Contests->getScoreboardUrl(),
+			$Contests->getScoreboardUrlAdmin()
 		 );                
 		global $conn;
 		try{$conn->Execute($sql, $params);}

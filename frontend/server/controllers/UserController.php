@@ -462,24 +462,7 @@ class UserController extends Controller {
 
 		return $user;
 	}
-
-	/**
-	 * Retunrs a random string of size $length
-	 * 
-	 * @param string $length
-	 * @return string
-	 */
-	private static function randomString($length) {
-		$chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-		$str = "";
-		$size = strlen($chars);
-		for ($i = 0; $i < $length; $i++) {
-			$str .= $chars[rand(0, $size - 1)];
-		}
-
-		return $str;
-	}
-
+	
 	/**
 	 * Resets the password of the OMI user and adds the user to the private 
 	 * contest.
@@ -1034,7 +1017,7 @@ class UserController extends Controller {
 			$contest = ContestsDAO::getByPK($contest_id);
 			
 			// Get user ranking
-			$scoreboardR = new Request(array("auth_token" => $r["auth_token"], "contest_alias" => $contest->getAlias(), "include_admins" => false));
+			$scoreboardR = new Request(array("auth_token" => $r["auth_token"], "contest_alias" => $contest->getAlias()));
 			$scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
 			
 			// Grab the place of the current user in the given contest	
