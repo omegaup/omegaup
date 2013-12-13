@@ -8,8 +8,8 @@
 				</button>
 				<ul class="dropdown-menu" role="menu">
 				  <li><a id="bulk-make-public">{#makePublic#}</a></li>
-				  <li><a id="bulk-make-private">{#makePrivate#}</a></li>				  
-				  <li class="divider"></li>				  
+				  <li><a id="bulk-make-private">{#makePrivate#}</a></li>
+				  <li class="divider"></li>
 				</ul>
 			  </div>
 	</div>
@@ -21,9 +21,9 @@
 	<table class="table">
 		<thead>
 			<th></th>
-			<th>{#contestsTableTitle#}</th>
-			<th>{#contestsTableStart#}</th>
-			<th>{#contestsTableEnd#}</th>
+			<th>{#wordsTitle#}</th>
+			<th>{#arenaPracticeStartTime#}</th>
+			<th>{#arenaPracticeEndtime#}</th>
 			<th>{#contestsTablePublic#}</th>
 			<th></th>
 			<th></th>
@@ -56,15 +56,15 @@
 					var endDate = contests.results[i].finish_time;
 					html += "<tr>"
 						+ "<td><input type='checkbox' id='" + contests.results[i].alias + "'/></td>" 
-						+ "<td><b><a href='/arena/" + contests.results[i].alias  + "/'>" + omegaup.escape(contests.results[i].title) + "</a></b></td>"					
+						+ "<td><b><a href='/arena/" + contests.results[i].alias  + "/'>" + omegaup.escape(contests.results[i].title) + "</a></b></td>"
 						+ '<td><a href="' + makeWorldClockLink(startDate) + '">' + startDate.format("long", "es") + "</a></td>"
 						+ '<td><a href="' + makeWorldClockLink(endDate) + '">' + endDate.format("long", "es") + "</a></td>"
-						+ '<td>'+ ((contests.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
+						+ '<td>'+ ((contests.results[i].public == '1') ? '{#wordsYes#}' : '{#wordsNo#}')  + '</td>'
 						+ '<td><a href="/contestedit.php?contest=' + contests.results[i].alias  + '">{#wordsEdit#}</a></td>'
-						+ '<td><a href="/addproblemtocontest.php?contest=' + contests.results[i].alias  + '">Agregar problemas</a></td>'
+						+ '<td><a href="/addproblemtocontest.php?contest=' + contests.results[i].alias  + '">{#contestEditAddProblems#}</a></td>'
 						+ '<td><a href="/addusertoprivatecontest.php?contest=' + contests.results[i].alias  + '">{#contestListAddContestants#}</a></td>'
-						+ "<td><a href='/arena/" + contests.results[i].alias  + "/admin/'>Envíos</a></td>"
-						+ '<td><a href="/conteststats.php?contest=' + contests.results[i].alias  + '">Estadísticas</a></td>'
+						+ "<td><a href='/arena/" + contests.results[i].alias  + "/admin/'>{#contestListSubmissions#}</a></td>"
+						+ '<td><a href="/conteststats.php?contest=' + contests.results[i].alias  + '">{#profileStatistics#}</a></td>'
 						+ "</tr>";
 				}
 

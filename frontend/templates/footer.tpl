@@ -1,6 +1,6 @@
 		<div class="footer navbar" id="footer">
 			<div class="navbar-header">
-				<span class="navbar-brand"><img alt="OmegaUp" class="logo" src='/media/omegaup_curves.png'> es un lugar para mejorar tus habilidades de desarrollo de software.</span>
+				<span class="navbar-brand"><img alt="OmegaUp" class="logo" src='/media/omegaup_curves.png'>{#frontPageFooter#}</span>
 			</div>
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href='https://github.com/omegaup/omegaup/'>{#frontPageDevelopers#}</a></li>

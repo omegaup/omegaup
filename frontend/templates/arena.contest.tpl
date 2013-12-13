@@ -41,9 +41,9 @@
 					<h1 class="title"></h1>
 					<p class="description"></p>
 					<table>
-						<tr><td><strong>{#contestsTableStart#}</strong></td><td class="start_time"></td></tr>
-						<tr><td><strong>{#contestsTableEnd#}</strong></td><td class="finish_time"></td></tr>
-						<tr><td><strong>Tiempo para resolver los problemas</strong></td><td><span class="window_length"></span> minutos</td></tr>
+						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td class="start_time"></td></tr>
+						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td class="finish_time"></td></tr>
+						<tr><td><strong>Tiempo para resolver los problemas</strong></td><td> {#wordsMinutes#}</td></tr>
 					</table>
 				</div>
 				<div id="problem" class="main">
@@ -126,7 +126,7 @@
 			<div id="clarifications" class="tab">
 				<table class="clarifications">
 					<caption>
-						Clarificaciones 
+						{#wordsClarifications#} 
 						<div class="clarifpager">
 							<button class="clarifpagerprev">&lt;</button>
 							<button class="clarifpagernext">&gt;</button>
@@ -143,7 +143,7 @@
 					</thead>
 					<tfoot>
 						<tr>
-							<td colspan="6"><a href="#clarifications/new">Nueva clarificación</a></td>
+							<td colspan="6"><a href="#clarifications/new">{#wordsNewClarification#}</a></td>
 						</tr>
 					</tfoot>
 					<tbody class="clarification-list">

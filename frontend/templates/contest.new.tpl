@@ -18,7 +18,7 @@
 			(new Date($(".new_contest_form #finish_time").val()).getTime()) / 1000,
 			window_length_value,
 			$(".new_contest_form #alias").val(),
-			$(".new_contest_form #points_decay_factor").val(),			
+			$(".new_contest_form #points_decay_factor").val(),
 			$(".new_contest_form #submissions_gap").val() * 60,
 			$(".new_contest_form #feedback").val(), 
 			$(".new_contest_form #penalty").val(), 
@@ -28,7 +28,7 @@
 			$(".new_contest_form #show_scoreboard_after").val(),
 			function(data) {
 				if(data.status == "ok") {
-					OmegaUp.ui.success("Tu concurso ha sido creado! <a href='addproblemtocontest.php'>Agrégale problemas!</a> <a href='/arena/"+ $('.new_contest_form #alias').val() + "'>{#contestEditGoToContest#}</a>");
+					OmegaUp.ui.success("{#contestNewCreatedContestSuccesfully#} <a href='addproblemtocontest.php'>{#contestEditAddProblems#}</a> <a href='/arena/"+ $('.new_contest_form #alias').val() + "'>{#contestEditGoToContest#}</a>");
 					window.scrollTo(0,0);
 				} else {
 					OmegaUp.ui.error(data.error || 'error');
@@ -42,7 +42,7 @@
 	$('#window_length_enabled').change(function() {
 		if($(this).is(':checked')) {
 			// Enable
-			$('#window_length').removeAttr('disabled');			
+			$('#window_length').removeAttr('disabled');	
 		} else {
 			// Disable
 			$('#window_length').attr('disabled','disabled');

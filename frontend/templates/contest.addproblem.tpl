@@ -26,7 +26,7 @@
 			</div>
 			
 			<div class="form-group">
-				<label for="points">Puntos que vale el problema</label>
+				<label for="points">{#contestAddproblemProblemPoints#}</label>
 				<input id='points' name='points' size="3" value="100" class="form-control" />
 			</div>
 			
