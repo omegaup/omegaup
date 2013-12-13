@@ -1,4 +1,5 @@
 {include file='redirect.tpl'}
+{assign var="htmlTitle" value="{#omegaupTitleMyProblemsList#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
@@ -30,8 +31,8 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>T&iacute;tulo</th>
-							<th>P&uacute;blico</th>
+							<th>{#wordsTitle#}</th>
+							<th>{#contestNewFormPublic#}</th>
 							<th></th>
 							<th></th>
 							<th></th>

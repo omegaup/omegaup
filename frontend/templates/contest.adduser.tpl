@@ -1,4 +1,5 @@
 {include file='redirect.tpl'}
+{assign var="htmlTitle" value="{#omegaupTitleContestAdduser#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
