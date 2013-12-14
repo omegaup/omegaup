@@ -30,6 +30,8 @@
 			<th></th>
 			<th></th>
 			<th></th>
+			<th></th>
+			<th></th>
 		</thead>
 		<tbody>
 		</tbody>
@@ -64,6 +66,8 @@
 						+ '<td><a href="/addproblemtocontest.php?contest=' + contests.results[i].alias  + '">{#contestEditAddProblems#}</a></td>'
 						+ '<td><a href="/addusertoprivatecontest.php?contest=' + contests.results[i].alias  + '">{#contestListAddContestants#}</a></td>'
 						+ "<td><a href='/arena/" + contests.results[i].alias  + "/admin/'>{#contestListSubmissions#}</a></td>"
+						+ "<td>" + ((contests.results[i].scoreboard_url == null) ? "" : "<a href='/arena/" + contests.results[i].alias  + "/scoreboard/" + contests.results[i].scoreboard_url + "'>{#contestScoreboardLink#}</a></td>")
+						+ "<td>" + ((contests.results[i].scoreboard_url == null) ? "" : "<a href='/arena/" + contests.results[i].alias  + "/scoreboard/" + contests.results[i].scoreboard_url_admin + "'>{#contestScoreboardAdminLink#}</a></td>")
 						+ '<td><a href="/conteststats.php?contest=' + contests.results[i].alias  + '">{#profileStatistics#}</a></td>'
 						+ "</tr>";
 				}

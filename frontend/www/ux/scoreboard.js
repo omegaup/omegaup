@@ -36,12 +36,15 @@ $(document).ready(function() {
 			// Take problems from the first user
 			var rank = ranking[0];
 			var letter = 65;
-			for (var alias in rank.problems) {				
-				$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' + String.fromCharCode(letter++) + '</a></th>').insertBefore('#ranking thead th.total');
-				$('<td class="prob_' + alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
-				$('<td class="prob_' + alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
-			}				
 			
+			if (rank != null && rank.problems != null) {
+				for (var alias in rank.problems) {				
+					$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' + String.fromCharCode(letter++) + '</a></th>').insertBefore('#ranking thead th.total');
+					$('<td class="prob_' + alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
+					$('<td class="prob_' + alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');			
+				}
+			}
+						
 			$('#title .contest-title').html(data.title);
 			
 			isTableHeadSet = true;			
