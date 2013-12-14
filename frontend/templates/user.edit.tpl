@@ -303,9 +303,7 @@
 						<select id="locale" name='locale' class="form-control" >
 							<option value="es">espa&ntilde;ol</option>
 							<option value="en">english</option>
-							{if $CURRENT_USER_IS_ADMIN eq '1'}
-							<option value="ps-ps">pseudo-loc (hackerboy)</option>
-							{/if}
+							<option value="ps-ps">pseudo</option>
 						</select>
 						</div>
 					</div>

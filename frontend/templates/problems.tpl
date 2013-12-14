@@ -1,4 +1,5 @@
 {include file='head.tpl'}
+{assign var="htmlTitle" value="{#omegaupTitleProblems#}"}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 

@@ -1,4 +1,5 @@
 {include file='redirect.tpl'}
+{assign var="htmlTitle" value="{#omegaupTitleContestAdduser#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
@@ -36,7 +37,7 @@
 			<div class="col-md-5">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h3 class="panel-title">{#wordsUser#}s ya registrados</h3>
+						<h3 class="panel-title">{#contestAdduserRegisteredUsers#}</h3>
 					</div>
 					<ul class="list-group" id="contest-users">
 					</ul>

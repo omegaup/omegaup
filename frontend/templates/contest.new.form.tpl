@@ -7,9 +7,9 @@
 	<div class="panel-heading">
 		<h3 class="panel-title">
 			{if $IS_UPDATE neq 1}
-				Nuevo concurso
+				{#contestNew#}
 			{else}
-				Editar concurso
+				{#contestEdit#}
 			{/if}
 		</h3>
 	</div>
@@ -27,7 +27,7 @@
 						<div class="form-group col-md-6">
 							<label for="contests">{#contestNewFormContestToEdit#}</label>
 							<select class='contests form-control' name='contests' id='contest_alias'>
-								<option value=""></option>				
+								<option value=""></option>
 							</select>
 						</div>
 					</div>
@@ -40,56 +40,55 @@
 					</div>
 					
 					<div class="form-group col-md-6">
-						<label for="alias">Título corto (alias)</label>
+						<label for="alias">{#contestNewFormShortTitle_alias_#}</label>
 						<input id='alias' name='alias' value='' type='text' class="form-control" {IF $IS_UPDATE eq 1} disabled="true" {/if}>
-						<p class="help-block">El título corto se usa para construir la URL del concurso (ejemplos: ANPA2010, CONACUP2012, OMI2013, etc..). {#wordsNo#} puede contener espacios.</p>
+						<p class="help-block">{#contestNewFormShortTitle_alias_Desc#}</p>
 					</div>
 				</div>
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="start_time">{#contestNewFormStartDate#}</label>
+						<label for="start_time">{#contestNewFormNewFormStartDate#}</label>
 						<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
-						<p class="help-block">La fecha (en hora local) en la que inicia el concurso</p>
+						<p class="help-block">{#contestNewFormStartDateDesc#}</p>
 					</div>
 					
 					<div class="form-group col-md-6">
 						<label for="finish_time">{#contestNewFormEndDate#}</label>
 						<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
-						<p class="help-block">La hora (en hora local) en la que termina el concurso.
+						<p class="help-block">{#contestNewFormEndDateDesc#}</p>
 					</div>
 				</div>
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="description">Descripci&oacute;n del concurso</label>
+						<label for="description">{#contestNewFormDescription#}</label>
 						<textarea id='description' name='description' cols="30" rows="10" class="form-control"></textarea>
 					</div>
 					
 					<div class="form-group col-md-6">
-						<label for="window_length_enabled">Inicios Diferentes</label>
+						<label for="window_length_enabled">{#contestNewFormDifferentStarts#}</label>
 						<div class="checkbox">
 							<label>
 								<input type='checkbox' id='window_length_enabled' name='window_length_enabled'>	Habilitar
 							</label>
 						</div>
 						<input id='window_length' name='window_length' value='' type='text' disabled="true" size='3' class="form-control">
-						<p class="help-block">Si está activo, indica el tiempo en minutos que tiene el {#wordsUser#} para concursar y env&iacute;ar soluciones a partir de que entra al concurso en la arena (estilo USACO/Preselectivo IOI).
-						Si Inicios Diferentes está desactivado, entonces el concursante tendrá todo el tiempo entre la {#contestNewFormStartDate#} y la {#contestNewFormEndDate#} para concursar.</p>
+						<p class="help-block">{#contestNewFormDifferentStartsDesc#}</p>
 					</div>
 				</div>
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="scoreboard">¿Cuánto tiempo se mostrará el Scoreboard? (%)</label>
+						<label for="scoreboard">{#contestNewFormScoreboardTimePercent#}</label>
 						<input id='scoreboard' name='scoreboard' value='100' type='text' size='3' class="form-control">
-						<p class="help-block">Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser&aacute; visible.</p>
+						<p class="help-block">{#contestNewFormScoreboardTimePercentDesc#}</p>
 					</div>
 					
 					<div class="form-group col-md-6">
-						<label for="submissions_gap">Separación de envios</label>
+						<label for="submissions_gap">{#contestNewFormSubmissionsSeparation#}</label>
 						<input id='submissions_gap' name='submissions_gap' value='1' type='text' size='2' class="form-control">
-						<p class="help-block">Tiempo m&iacute;nimo en minutos que debe de esperar un concursante despues de realizar un env&iacute;o para hacer otro.</p>
+						<p class="help-block">{#contestNewFormDifferentStartsDesc#}</p>
 					</div>
 				</div>
 				
@@ -107,7 +106,7 @@
 					<div class="form-group col-md-6">
 						<label for="penalty">{#wordsPenalty#}</label>
 						<input id='penalty' name='penalty' value='0' type='text' size='2' class="form-control">
-						<p class="help-block">Entero indicando el n&uacute;mero de minutos con que se penaliza por enviar una respuesta incorrecta.</p>
+						<p class="help-block">{#contestNewFormPenaltyDesc#}</p>
 					</div>
 				</div>
 				
@@ -115,17 +114,17 @@
 					<div class="form-group col-md-6">
 						<label for="feedback">{#wordsFeedback#}</label>
 						<select name='feedback' id='feedback' class="form-control">
-							<option value='yes'>Sí</option>
+							<option value='yes'>{#wordsYes#}</option>
 							<option value='no'>{#wordsNo#}</option>
 							<option value='partial'>{#wordsPartial#}</option>
 						</select>
-						<p class="help-block">Si al {#wordsUser#} se le entrega retroalimentación inmediata sobre su problema</p>
+						<p class="help-block">{#contestNewFormImmediateFeedbackDesc#}</p>
 					</div>
 					
 					<div class="form-group col-md-6">
-						<label for="points_decay_factor">Factor de Decrecimiento de Puntaje</label>
+						<label for="points_decay_factor">{#contestNewFormPintDecrementFactor#}</label>
 						<input id='points_decay_factor' name='points_decay_factor' value='0.0' type='text' size='4' class="form-control">
-						<p class="help-block">Un número entre 0 y 1 inclusive. Si este número es distinto de cero, el puntaje que se obtiene al resolver correctamente un problema decae conforme pasa el tiempo. El valor del puntaje estará dado por (1 - points_decay_factor) + points_decay_factor * TT^2 / (10 * PT^2 + TT^2), donde PT es el penalty en minutos del envío y TT el tiempo total del concurso, en minutos.</p>
+						<p class="help-block">{#contestNewFormPintDecrementFactorDesc#}</p>
 					</div>
 				</div>
 				
@@ -133,19 +132,19 @@
 					<div class="form-group col-md-6">
 						<label for="show_scoreboard_after">Scoreboard al finalizar el concurso</label>
 						<select id='show_scoreboard_after' name='show_scoreboard_after' class="form-control">
-							<option value='1'>Sí</option>
+							<option value='1'>{#wordsYes#}</option>
 							<option value='0'>{#wordsNo#}</option>
 						</select>
-						<p class="help-block">Mostrar automáticamente el scoreboard completo al finalizar el concurso.</p>
+						<p class="help-block">{#contestNewFormScoreboardAtEndDesc#}</p>
 					</div>
 					
 					<div class="form-group col-md-6">
 						<label for="public">Público</label>
 						<select name='public' id='public' class="form-control">
-							<option value='1'>Sí</option>
+							<option value='1'>{#wordsYes#}</option>
 							<option value='0'>{#wordsNo#}</option>
 						</select>
-						<p class="help-block">Mostrar el concurso en el listado público.</p>
+						<p class="help-block">{#contestNewFormPublicDesc#}</p>
 					</div>
 				</div>
 				

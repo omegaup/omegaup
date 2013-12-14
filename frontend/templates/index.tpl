@@ -1,3 +1,4 @@
+{assign var="htmlTitle" value="{#omegaupTitleIndex#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 
