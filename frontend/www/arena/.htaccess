@@ -4,7 +4,7 @@ RewriteEngine on
 RewriteRule ^/?$ index.php [L]
 RewriteRule ^admin/?$ adminpractice.php [L]
 RewriteRule ^[a-zA-Z0-9_+-]+/?$ contest.php [L]
-RewriteRule ^[a-zA-Z0-9_+-]+/scoreboard/?$ scoreboard.php [L]
+RewriteRule ^[a-zA-Z0-9_+-]+/scoreboard/[a-zA-Z0-9_+-]+/?$ scoreboard.php [L]
 RewriteRule ^[a-zA-Z0-9_+-]+/admin/?$ admin.php [L]
 RewriteRule ^[a-zA-Z0-9_+-]+/practice/?$ practice.php [L]
 RewriteRule ^[a-zA-Z0-9_+-]+/practice/?$ practice.php [L]

@@ -1002,6 +1002,11 @@ class ContestController extends Controller {
 		// Push scoreboard data in response
 		$response = array();
 		$response["ranking"] = $scoreboard->generate();
+		
+		// Add time left to response
+		$response['start_time'] = strtotime($r["contest"]->getStartTime());		
+		$response['submission_deadline'] = strtotime($r["contest"]->getFinishTime());		
+		$response['title'] = $r["contest"]->getTitle();		
 
 		return $response;
 	}

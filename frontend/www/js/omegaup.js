@@ -1000,6 +1000,29 @@ OmegaUp.prototype.getRanking = function(contestAlias, callback) {
 	});
 };
 
+
+OmegaUp.prototype.getRankingByToken = function(contestAlias, token, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/scoreboard/contest_alias/' + encodeURIComponent(contestAlias) + '/token' + encodeURIComponent(token),
+		function (data) {
+			data.start_time = self.time(data.start_time * 1000);
+			data.submission_deadline = self.time(data.submission_deadline * 1000);
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
 OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 	var self = this;
 
