@@ -1,5 +1,3 @@
-var DEBUG = true;
-
 function OmegaUp() {
 	var self = this;
 	this.username = null;
