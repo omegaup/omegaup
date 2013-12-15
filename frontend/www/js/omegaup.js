@@ -1008,7 +1008,7 @@ OmegaUp.prototype.getRankingByToken = function(contestAlias, token, callback) {
 		'/api/contest/scoreboard/contest_alias/' + encodeURIComponent(contestAlias) + '/token' + encodeURIComponent(token),
 		function (data) {
 			data.start_time = self.time(data.start_time * 1000);
-			data.submission_deadline = self.time(data.submission_deadline * 1000);
+			data.finish_time = self.time(data.finish_time * 1000);
 			callback(data);
 		},
 		'json'

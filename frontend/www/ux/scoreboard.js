@@ -1,29 +1,21 @@
 $(document).ready(function() {
-	
+	var arena = new Arena();
 	var params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(window.location.pathname);
 	var contestAlias = params[1];
 	var token = params[2];
 	var isTableHeadSet = false;
 	var getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
-	var updateClockRefresh = 1000; // 1 sec
-	var startTime = null;
-	var submissionDeadline = null;
 	
 	// Update scoreboard
 	omegaup.getRankingByToken(contestAlias, token, rankingChange);
 	setInterval(function() { omegaup.getRankingByToken(contestAlias, token, rankingChange); }, getRankingByTokenRefresh);
 	$('#ranking').show();
 	
-	// Update time left
-	updateClock();
-	setInterval(updateClock, updateClockRefresh);		
-	
 	function rankingChange(data) {		
 		console.time("rankingChange");		
 		
 		// Set global start and submission deadline times out of result data
-		startTime = data.start_time;
-		submissionDeadline = data.submission_deadline;		
+		arena.initClock(data.start_time, data.finish_time);
 		
 		$('#ranking tbody tr.inserted').remove();
 
@@ -85,50 +77,6 @@ $(document).ready(function() {
 		
 		$('#root').fadeIn('slow');
 		$('#loading').fadeOut('slow');
-	}
-	
-	function updateClock() {
-		
-		if (startTime === null || submissionDeadline === null) {
-			return;
-		}
-		
-		var date = new Date().getTime();
-		var clock = "";
-
-		if (date < startTime.getTime()) {
-			clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
-		} else if (date > submissionDeadline.getTime()) {
-			clock = "00:00:00";
-		} else {
-			clock = formatDelta(submissionDeadline.getTime() - (date + omegaup.deltaTime));
-		}
-
-		$('#title .clock').html(clock);
-	}
-	
-	function formatDelta(delta) {
-		var days = Math.floor(delta / (24 * 60 * 60 * 1000));
-		delta -= days * (24 * 60 * 60 * 1000);
-		var hours = Math.floor(delta / (60 * 60 * 1000));
-		delta -= hours * (60 * 60 * 1000);
-		var minutes = Math.floor(delta / (60 * 1000));
-		delta -= minutes * (60 * 1000);
-		var seconds = Math.floor(delta / 1000);
-
-		var clock = "";
-
-		if (days > 0) {
-			clock += days + ":";
-		}
-		if (hours < 10) clock += "0";
-		clock += hours + ":";
-		if (minutes < 10) clock += "0";
-		clock += minutes + ":";
-		if (seconds < 10) clock += "0";
-		clock += seconds;
-
-		return clock;
 	}
 });
 

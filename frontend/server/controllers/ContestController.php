@@ -1005,7 +1005,7 @@ class ContestController extends Controller {
 		
 		// Add time left to response
 		$response['start_time'] = strtotime($r["contest"]->getStartTime());		
-		$response['submission_deadline'] = strtotime($r["contest"]->getFinishTime());		
+		$response['finish_time'] = strtotime($r["contest"]->getFinishTime());		
 		$response['title'] = $r["contest"]->getTitle();		
 
 		return $response;

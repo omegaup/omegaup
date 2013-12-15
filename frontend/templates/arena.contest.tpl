@@ -1,7 +1,7 @@
 {include file='arena.head.tpl' jsfile='/ux/contest.js'}
 			<div id="title">
 				<h1 class="contest-title"></h1>
-				<div class="clock">0:00:00</div>
+				<div class="clock">00:00:00</div>
 			</div>
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblems#}</a></li>

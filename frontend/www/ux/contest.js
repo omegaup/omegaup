@@ -1,42 +1,16 @@
 $(document).ready(function() {
+	var arena = new Arena();
 	var problems = {};
 	var activeTab = 'problems';	
 	var currentProblem = null;
 	var currentRanking = {};
 	var currentEvents;
 	var currentContest = null;
-	var startTime = null;
-	var finishTime = null;
-	var submissionDeadline = null;
 	var submissionGap = 0;
 	var answeredClarifications = 0;
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
 	var socket = null;
-	var veredicts = {
-		AC: "Accepted",
-		PA: "Partially Accepted",
-		WA: "Wrong Answer",
-		TLE: "Time Limit Exceeded",
-		MLE: "Memory Limit Exceeded",
-		OLE: "Output Limit Exceeded",
-		RTE: "Runtime Error",
-		RFE: "Restricted Function",
-		CE: "Compilation Error",
-		JE: "Judge Error" 
-	};
-	var colors = [
-		'#FB3F51',
-		'#FF5D40',
-		'#FFA240',
-		'#FFC740',
-		'#59EA3A',
-		'#37DD6F',
-		'#34D0BA',
-		'#3AAACF',
-		'#8144D6',
-		'#CD35D3',
-	];
 	var rankChartLimit = 10;
 	var practice = window.location.pathname.indexOf('/practice/') !== -1;
 	var onlyProblem = window.location.pathname.indexOf('/problem/') !== -1;
@@ -79,7 +53,7 @@ $(document).ready(function() {
 			$(r + ' .points').html(parseFloat(run.contest_score).toFixed(2));
 			$(r + ' .penalty').html(run.submit_delay);
 		}
-		$(r + ' .status').html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+		$(r + ' .status').html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 		$(r + ' .time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 
 		if (socket == null) {
@@ -90,35 +64,6 @@ $(document).ready(function() {
 			} else {
 				updateRunFallback(run.guid, run);
 			}
-		}
-	}
-
-	function connectSocket() {
-		var uri;
-		if (window.location.protocol === "https:") {
-			uri = "wss:";
-		} else {
-			uri = "ws:";
-		}
-		uri += "//" + window.location.host + "/api/contest/events/" + currentContest.alias + "/";
-
-		// temporarily disable websockets.
-		return false;
-
-		try {
-			socket = new WebSocket(uri, "omegaup.com.events");
-			socket.onclose = function(e) { socket = null; console.log(e); };
-			socket.onmessage = function(message) {
-				var data = JSON.parse(message.data);
-
-				if (data.message == "/run/status/") {
-					data.run.time = new Date(data.run.time * 1000);
-					updateRun(data.run);
-				}
-			};
-			socket.onerror = function(e) { console.log(e); };
-		} catch (e) {
-			console.log(e);
 		}
 	}
 
@@ -177,9 +122,7 @@ $(document).ready(function() {
 
 		currentContest = contest;
 
-		startTime = contest.start_time;
-		finishTime = contest.finish_time;
-		submissionDeadline = contest.submission_deadline;
+		arena.initClock(contest.start_time, contest.finish_time, contest.submission_deadline);
 
 		submissionGap = parseInt(contest.submission_gap);
 
@@ -218,9 +161,6 @@ $(document).ready(function() {
 				clarificationsOffset = 0; // Return pagination to start on refresh
 				omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
 			}, 5 * 60 * 1000);
-
-			updateClock();
-			setInterval(updateClock, 1000);
 		}
 
 		// Trigger the event (useful on page load).
@@ -229,7 +169,7 @@ $(document).ready(function() {
 		$('#loading').fadeOut('slow');
 		$('#root').fadeIn('slow');
 
-		connectSocket();
+		arena.connectSocket();
 	}
 	
 	if (onlyProblem) {
@@ -409,7 +349,7 @@ $(document).ready(function() {
 						$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 						$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 						$('.points', r).html((parseFloat(run[score_column]) * multiplier).toFixed(2));
-						$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+						$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 						$('.penalty', r).html(run.submit_delay);
 						if (run.time) {
 							$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
@@ -505,7 +445,7 @@ $(document).ready(function() {
 							$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 							$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 							$('.points', r).html((parseFloat(run[score_column]) * multiplier).toFixed(2));
-							$('.status', r).html(run.status == 'ready' ? (veredicts[run.veredict] ? "<abbr title=\"" + veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+							$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 							$('.penalty', r).html(run.submit_delay);
 							if (run.time) {
 								$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
@@ -597,7 +537,7 @@ $(document).ready(function() {
 		console.time("rankingEvents");
 		currentEvents = data;
 		var dataInSeries = {};
-		var navigatorData = [[startTime.getTime(), 0]];
+		var navigatorData = [[arena.startTime.getTime(), 0]];
 		var series = [];
 		var usernames = {};
 
@@ -611,18 +551,18 @@ $(document).ready(function() {
 			if (currentRanking[curr.username] > rankChartLimit - 1) continue;
 			
 			if (!dataInSeries[curr.name]) {
-					dataInSeries[curr.name] = [[startTime.getTime(), 0]];
+					dataInSeries[curr.name] = [[arena.startTime.getTime(), 0]];
 					usernames[curr.name] = curr.username;
 			}
 			dataInSeries[curr.name].push([
-					startTime.getTime() + curr.delta*60*1000,
+					arena.startTime.getTime() + curr.delta*60*1000,
 					curr.total.points
 			]);
 			
 			// check if to add to navigator
 			if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
 					navigatorData.push([
-						startTime.getTime() + curr.delta*60*1000,
+						arena.startTime.getTime() + curr.delta*60*1000,
 						curr.total.points
 					]);
 			}
@@ -631,7 +571,7 @@ $(document).ready(function() {
 		// convert datas to series
 		for (var i in dataInSeries) {
 			if (dataInSeries.hasOwnProperty(i)) {
-					dataInSeries[i].push([Math.min(finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
+					dataInSeries[i].push([Math.min(arena.finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
 					series.push({
 						name: i,
 						rank: currentRanking[usernames[i]],
@@ -645,7 +585,7 @@ $(document).ready(function() {
 			return a.rank - b.rank;
 		});
 		
-		navigatorData.push([Math.min(finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
+		navigatorData.push([Math.min(arena.finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
 		console.timeEnd("calculate data series");
 		console.time("chart data series");	
 		if (series.length > 0) {
@@ -729,45 +669,6 @@ $(document).ready(function() {
 		console.timeEnd("rankingChange");
 	}
 	
-	function updateClock() {
-		var date = new Date().getTime();
-		var clock = "";
-
-		if (date < startTime.getTime()) {
-			clock = "-" + formatDelta(startTime.getTime() - (date + omegaup.deltaTime));
-		} else if (date > submissionDeadline.getTime()) {
-			clock = "00:00:00";
-		} else {
-			clock = formatDelta(submissionDeadline.getTime() - (date + omegaup.deltaTime));
-		}
-
-		$('#title .clock').html(clock);
-	}
-
-	function formatDelta(delta) {
-		var days = Math.floor(delta / (24 * 60 * 60 * 1000));
-		delta -= days * (24 * 60 * 60 * 1000);
-		var hours = Math.floor(delta / (60 * 60 * 1000));
-		delta -= hours * (60 * 60 * 1000);
-		var minutes = Math.floor(delta / (60 * 1000));
-		delta -= minutes * (60 * 1000);
-		var seconds = Math.floor(delta / 1000);
-
-		var clock = "";
-
-		if (days > 0) {
-			clock += days + ":";
-		}
-		if (hours < 10) clock += "0";
-		clock += hours + ":";
-		if (minutes < 10) clock += "0";
-		clock += minutes + ":";
-		if (seconds < 10) clock += "0";
-		clock += seconds;
-
-		return clock;
-	}
-
 	function clarificationsChange(data) {
 		$('.clarifications tr.inserted').remove();
 		if (data.clarifications.length > 0 && data.clarifications.length < clarificationsRowcount) {
@@ -831,7 +732,7 @@ $(document).ready(function() {
 		if (series.length == 0) return;
 		
 		Highcharts.setOptions({
-			colors: colors
+			colors: Arena.scoreboardColors
 		});
 	
 		window.chart = new Highcharts.StockChart({
@@ -843,8 +744,8 @@ $(document).ready(function() {
 
 			xAxis: {
 				ordinal: false,
-				min: startTime.getTime(),
-				max: Math.min(finishTime.getTime(), Date.now())
+				min: arena.startTime.getTime(),
+				max: Math.min(arena.finishTime.getTime(), Date.now())
 			},
 
 			yAxis: {
@@ -899,7 +800,7 @@ $(document).ready(function() {
 		var rows = $('#ranking tbody tr.inserted');
 		for (var r = 0; r < rows.length; r++) {
 			$('.legend', rows[r]).css({
-				'background-color': r < rankChartLimit ? colors[r] : 'transparent'
+				'background-color': r < rankChartLimit ? arena.scoreboardColors[r] : 'transparent'
 			});
 		}
 	}

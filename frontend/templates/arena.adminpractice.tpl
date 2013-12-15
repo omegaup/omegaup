@@ -4,7 +4,7 @@
 			</audio>
 			<div id="title">
 				<h1 class="contest-title"></h1>
-				<div class="clock">0:00:00</div>
+				<div class="clock">00:00:00</div>
 			</div>
 			<table class="runs">
 				<caption>
