@@ -280,15 +280,6 @@ class ContestController extends Controller {
 				array_push($problemsResponseArray, $temp_array);
 			}
 
-			// Save the time of the first access
-			try {
-				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-								$r["current_user_id"], $r["contest"]->getContestId());
-			} catch (Exception $e) {
-				// Operation failed in the data layer
-				throw new InvalidDatabaseOperationException($e);
-			}
-
 			// Add problems to response
 			$result['problems'] = $problemsResponseArray;
 			
