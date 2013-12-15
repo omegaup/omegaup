@@ -209,14 +209,21 @@ class ContestController extends Controller {
 			throw new NotFoundException("Contest not found");
 		}
 
-		self::canAccessContest($r);
 
-		// If the contest has not started, user should not see it, unless it is admin
-		if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-			$exception = new PreconditionFailedException("Contest has not started yet.");
-			$exception->addCustomMessageToArray("start_time", strtotime($r["contest"]->getStartTime()));
+		// If the contest has not started, user should not see it, unless it is admin or has a token.
+		if (is_null($r['token'])) {
+			self::canAccessContest($r);
+			if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+				$exception = new PreconditionFailedException("Contest has not started yet.");
+				$exception->addCustomMessageToArray("start_time", strtotime($r["contest"]->getStartTime()));
 
-			throw $exception;
+				throw $exception;
+			}
+		} else {
+			if ($r["token"] !== $r["contest"]->getScoreboardUrl() &&
+			    $r["token"] !== $r["contest"]->getScoreboardUrlAdmin()) {
+				throw new ForbiddenAccessException("Invalid scoreboard url.");
+			}
 		}
 	}
 
@@ -262,6 +269,7 @@ class ContestController extends Controller {
 
 			// Set of columns that we want to show through this API. Doesn't include the SOURCE
 			$relevant_columns = array("title", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "dificulty", "order");
+			$letter = ord('A');
 
 			foreach ($problemsInContest as $problemkey) {
 				try {
@@ -275,6 +283,7 @@ class ContestController extends Controller {
 				// Add the 'points' value that is stored in the ContestProblem relationship
 				$temp_array = $temp_problem->asFilteredArray($relevant_columns);
 				$temp_array["points"] = $problemkey->getPoints();
+				$temp_array['letter'] = chr($letter++);
 
 				// Save our array into the response
 				array_push($problemsResponseArray, $temp_array);
@@ -299,11 +308,13 @@ class ContestController extends Controller {
 		}
 
 		// Add time left to response
-		if ($r["contest"]->getWindowLength() === null) {
-			$result['submission_deadline'] = strtotime($r["contest"]->getFinishTime());
-		} else {
-			$result['submission_deadline'] = min(
-					strtotime($r["contest"]->getFinishTime()), strtotime($contest_user->getAccessTime()) + $r["contest"]->getWindowLength() * 60);
+		if (is_null($r['token'])) {
+			if ($r["contest"]->getWindowLength() === null) {
+				$result['submission_deadline'] = strtotime($r["contest"]->getFinishTime());
+			} else {
+				$result['submission_deadline'] = min(
+						strtotime($r["contest"]->getFinishTime()), strtotime($contest_user->getAccessTime()) + $r["contest"]->getWindowLength() * 60);
+			}
 		}
 
 		$result["status"] = "ok";

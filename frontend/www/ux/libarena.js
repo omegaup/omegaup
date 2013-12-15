@@ -28,6 +28,10 @@ function Arena() {
 
 	// True if this is a practice session.
 	this.practice = false;
+
+	this.currentRanking = {};
+
+	this.problems = {};
 };
 
 Arena.veredicts = {
@@ -96,6 +100,17 @@ Arena.prototype.initClock = function(start, finish, deadline) {
 	}
 };
 
+Arena.prototype.initProblems = function(problems) {
+	for (var i = 0; i < problems.length; i++) {
+		var alias = problems[i].alias;
+		this.problems[alias] = problems[i];
+
+		$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' + problems[i].letter + '</a></th>').insertBefore('#ranking thead th.total');
+		$('<td class="prob_' + alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
+		$('<td class="prob_' + alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');			
+	}
+};
+
 Arena.prototype.updateClock = function() {
 	var countdownTime = this.submissionDeadline || this.finishTime;
 	if (this.startTime === null || countdownTime === null) {
@@ -140,4 +155,65 @@ Arena.prototype.formatDelta = function(delta) {
 	clock += seconds;
 
 	return clock;
+};
+
+Arena.prototype.onRankingChanged = function(data) {
+	$('#mini-ranking tbody tr.inserted').remove();
+	$('#ranking tbody tr.inserted').remove();
+
+	var ranking = data.ranking;
+	var newRanking = {};		
+	
+	// Push data to ranking table
+	for (var i = 0; i < ranking.length; i++) {
+		var rank = ranking[i];
+		newRanking[rank.username] = i;
+		
+		var r = $('#ranking tbody tr.template')
+			.clone()
+			.removeClass('template')
+			.addClass('inserted')
+			.addClass('rank-new');
+		
+		var username = rank.username +
+			((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
+		$('.user', r).html(username);
+
+		// Update problem scores.
+		for (var alias in rank.problems) {
+			if (!rank.problems.hasOwnProperty(alias)) continue;
+			
+			$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
+			$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
+			if (this.problems[alias]) {
+				if (rank.username == omegaup.username) {
+					$('#problems .problem_' + alias + ' .solved')
+						.html("(" + rank.problems[alias].points + " / " + this.problems[alias].points + ")");
+				}
+			}
+		}
+
+		$('.points', r).html(rank.total.points);
+		$('.penalty', r).html(rank.total.penalty);
+		$('.position', r).html(rank.place);
+
+		$('#ranking tbody').append(r);
+
+		// update miniranking
+		if (i < 10) {
+			r = $('#mini-ranking tbody tr.template')
+				.clone()
+				.removeClass('template')
+				.addClass('inserted');
+
+			$('.position', r).html(rank.place);
+			$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
+			$('.points', r).html(rank.total.points);
+			$('.penalty', r).html(rank.total.penalty);
+
+			$('#mini-ranking tbody').append(r);
+		}
+	}
+
+	this.currentRanking = newRanking;
 };

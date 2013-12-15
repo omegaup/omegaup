@@ -3,80 +3,23 @@ $(document).ready(function() {
 	var params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(window.location.pathname);
 	var contestAlias = params[1];
 	var token = params[2];
-	var isTableHeadSet = false;
 	var getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
 	
 	// Update scoreboard
-	omegaup.getRankingByToken(contestAlias, token, rankingChange);
-	setInterval(function() { omegaup.getRankingByToken(contestAlias, token, rankingChange); }, getRankingByTokenRefresh);
-	$('#ranking').show();
-	
-	function rankingChange(data) {		
-		console.time("rankingChange");		
-		
-		// Set global start and submission deadline times out of result data
-		arena.initClock(data.start_time, data.finish_time);
-		
-		$('#ranking tbody tr.inserted').remove();
+	omegaup.getContestByToken(contestAlias, token, function(contest) {
+		arena.initProblems(contest.problems);
+		arena.initClock(contest.start_time, contest.finish_time);
+		$('#title .contest-title').html(contest.title);
 
-		var ranking = data.ranking;
-		var newRanking = {};		
-		
-		// Set table headings
-		if (isTableHeadSet === false) {
-			
-			// Take problems from the first user
-			var rank = ranking[0];
-			var letter = 65;
-			
-			if (rank != null && rank.problems != null) {
-				for (var alias in rank.problems) {				
-					$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' + String.fromCharCode(letter++) + '</a></th>').insertBefore('#ranking thead th.total');
-					$('<td class="prob_' + alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
-					$('<td class="prob_' + alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');			
-				}
-			}
-						
-			$('#title .contest-title').html(data.title);
-			
-			isTableHeadSet = true;			
+		omegaup.getRankingByToken(contestAlias, token, arena.onRankingChanged.bind(arena));
+		if (new Date() < contest.finish_time) {
+			setInterval(function() {
+				omegaup.getRankingByToken(contestAlias, token, arena.onRankingChanged.bind(arena));
+			}, getRankingByTokenRefresh);
 		}
 
-		// Push data to ranking table
-		for (var i = 0; i < ranking.length; i++) {
-			var rank = ranking[i];
-			newRanking[rank.username] = i;
-			
-			var r = $('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
-			
-			var username = rank.username +
-				((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
-			$('.user', r).html(username);
-
-			for (var alias in rank.problems) {
-				if (!rank.problems.hasOwnProperty(alias)) continue;
-				
-				$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
-				$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
-			}
-			
-			// if rank went up, add a class
-			if (parseInt($('.points', r).html()) < parseInt(rank.total.points)) {
-				r.addClass('rank-up');
-			}
-			
-			$('.points', r).html(rank.total.points);
-			$('.penalty', r).html(rank.total.penalty);
-			
-			$('.position', r).html(rank.place);
-
-			$('#ranking tbody').append(r);						
-		}		
-		
-		console.timeEnd("rankingChange");	
-		
+		$('#ranking').show();
 		$('#root').fadeIn('slow');
 		$('#loading').fadeOut('slow');
-	}
+	});
 });
-

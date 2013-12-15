@@ -3,7 +3,6 @@ $(document).ready(function() {
 	var problems = {};
 	var activeTab = 'problems';
 	var currentProblem = null;
-	var currentRanking = {};
 	var currentEvents;
 	var currentContest = null;
 	var currentNotifications = {count: 0, timer: null};
@@ -43,29 +42,22 @@ $(document).ready(function() {
 			currentContest = contest;
 
 			arena.initClock(contest.start_time, contest.finish_time);
-
-			var letter = 65;
+			arena.initProblems(contest.problems);
 
 			for (var idx in contest.problems) {
 				var problem = contest.problems[idx];
-				var problemName = String.fromCharCode(letter) + '. ' + omegaup.escape(problem.title);
+				var problemName = String.fromCharCode(problem.letter) + '. ' + omegaup.escape(problem.title);
 
 				problems[problem.alias] = problem;
 
-				problem.letter = String.fromCharCode(letter);
 
 				$('#submit select[name="problem"]').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
 				$('#rejudge-problem-list').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
 
 				$('select.runsproblem').append($('<option></option>').attr('value', problem.alias).text(problem.alias));
 
-				$('<th colspan="2"><a href="#problems/' + problem.alias + '" title="' + problem.alias + '">' + String.fromCharCode(letter++) + '</a></th>').insertBefore('#ranking thead th.total');
-				$('<td class="prob_' + problem.alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
-				$('<td class="prob_' + problem.alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');
 
 				$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
-
-				letter++;
 			}
 
 			omegaup.getRanking(contestAlias, rankingChange);
@@ -314,7 +306,7 @@ $(document).ready(function() {
 			var curr = data.events[i];
 			
 			// limit chart to top n users
-			if (currentRanking[curr.username] > rankChartLimit - 1) continue;
+			if (arena.currentRanking[curr.username] > rankChartLimit - 1) continue;
 			
 			if (!dataInSeries[curr.name]) {
 					dataInSeries[curr.name] = [[arena.startTime.getTime(), 0]];
@@ -340,7 +332,7 @@ $(document).ready(function() {
 					dataInSeries[i].push([Math.min(arena.finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
 					series.push({
 						name: i,
-						rank: currentRanking[usernames[i]],
+						rank: arena.currentRanking[usernames[i]],
 						data: dataInSeries[i],
 						step: true
 					});
@@ -366,73 +358,8 @@ $(document).ready(function() {
 	}
 
 	function rankingChange(data) {
-		console.time("whole ranking");
-		console.time("rankingChange");
-		$('#mini-ranking tbody tr.inserted').remove();
-		$('#ranking tbody tr.inserted').remove();
-
-		var ranking = data.ranking;
-		var newRanking = {};
-
-		var place = 0;
-		var lastPoints = 1e99;
-		var lastPenalty = 0;
-
-		for (var i = 0; i < ranking.length; i++) {
-			var rank = ranking[i];
-			newRanking[rank.username] = i;
-			
-			var r = $('#ranking tbody tr.template').clone().removeClass('template').addClass('inserted').addClass('rank-new')
-			
-			var username = rank.username +
-				((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
-			$('.user', r).html(username);
-
-			for (var alias in rank.problems) {
-				if (!rank.problems.hasOwnProperty(alias)) continue;
-				
-				$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
-				$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
-
-				if (rank.username == omegaup.username) {
-					$('#problems .problem_' + alias + ' .solved').html("(" + rank.problems[alias].points + " / " + problems[alias].points + ")");
-				}
-			}
-			
-			// if rank went up, add a class
-			if (parseInt($('.points', r).html()) < parseInt(rank.total.points)) {
-				r.addClass('rank-up');
-			}
-			
-			$('.points', r).html(rank.total.points);
-			$('.penalty', r).html(rank.total.penalty);
-
-			if (lastPoints != rank.total.points || lastPenalty != rank.total.penalty) {
-				lastPoints = rank.total.points;
-				lastPenalty = rank.total.penalty;
-				place = i + 1;
-			}
-			$('.position', r).html(place);
-
-			$('#ranking tbody').append(r);
-			
-			// update miniranking
-			if (i < 10) {
-				r = $('#mini-ranking tbody tr.template').clone().removeClass('template').addClass('inserted');
-
-				$('.position', r).html(place);
-				$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
-				$('.points', r).html(rank.total.points);
-				$('.penalty', r).html(rank.total.penalty);
-
-				$('#mini-ranking tbody').append(r);
-			}
-		}
-
-		currentRanking = newRanking;
-
+		arena.onRankingChanged(data);
 		omegaup.getRankingEvents(contestAlias, rankingEvents);
-		console.timeEnd("rankingChange");
 	}
 
 	function updateRun(guid, orig_run) {
@@ -751,9 +678,9 @@ $(document).ready(function() {
 		});
 		
 		// set legend colors
-		for (var name in currentRanking) {
-			if (currentRanking.hasOwnProperty(name)) {
-				var r = $('#ranking tbody tr.inserted')[currentRanking[name]];
+		for (var name in arena.currentRanking) {
+			if (arena.currentRanking.hasOwnProperty(name)) {
+				var r = $('#ranking tbody tr.inserted')[arena.currentRanking[name]];
 				var color = (function () {
 					for (var i = 0; i < window.chart.series.length; i++) {
 						if (window.chart.series[i].name === name) {

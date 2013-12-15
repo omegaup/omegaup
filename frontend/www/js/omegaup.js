@@ -360,6 +360,28 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	});
 };
 
+OmegaUp.prototype.getContestByToken = function(alias, token, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/details/contest_alias/' + encodeURIComponent(alias) + '/token/' + encodeURIComponent(token) + '/',
+		function (contest) {
+			if (contest.status == 'ok') {
+				contest.start_time = self.time(contest.start_time * 1000);
+				contest.finish_time = self.time(contest.finish_time * 1000);
+			}
+			callback(contest);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getProfile = function(username, callback) {
 	var self = this;
 
