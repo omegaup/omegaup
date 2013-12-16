@@ -318,6 +318,78 @@ class DetailsContest extends OmegaupTestCase {
 		// Call api
 		$response = ContestController::apiDetails($r);
 	}
+	
+	/**
+	 * Tests that user can get contest details with the scoreboard token
+	 */
+	public function testDetailsUsingToken() {
+		
+		// Get a private contest
+		$contestData = ContestsFactory::createContest(null, 0);
+		
+		// Create our user not added to the contest
+		$externalUser = UserFactory::createUser();
+
+		// Get the scoreboard url by using the MyList api being the
+		// contest director
+		$response = ContestController::apiMyList(new Request(array(
+			"auth_token" => $this->login($contestData["director"])
+		)));
+		
+		// Look for our contest from the list and save the scoreboard tokens
+		$scoreboard_url = null;
+		$scoreboard_admin_url = null;
+		foreach ($response["results"] as $c) {			
+			if ($c["alias"] === $contestData["request"]["alias"]) {
+				$scoreboard_url = $c["scoreboard_url"];
+				$scoreboard_admin_url = $c["scoreboard_url_admin"];
+				break;
+			}
+		}
+		$this->assertNotNull($scoreboard_url);
+		$this->assertNotNull($scoreboard_admin_url);					
+		
+		// Call details using token
+		$detailsResponse = ContestController::apiDetails(new Request(array(
+			"auth_token" => $this->login($externalUser),
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => $scoreboard_url
+		)));
+				
+		$this->assertContestDetails($contestData, array(), $detailsResponse);
+		
+		// Call details using admin token
+		$detailsResponse = ContestController::apiDetails(new Request(array(
+			"auth_token" => $this->login($externalUser),
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => $scoreboard_admin_url
+		)));
+				
+		$this->assertContestDetails($contestData, array(), $detailsResponse);
+		
+	}
+	
+	/**
+	 * Test accesing api with invalid scoreboard token. Should fail.
+	 * 
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testDetailsUsingInvalidToken() {
+		
+		// Get a private contest
+		$contestData = ContestsFactory::createContest(null, 0);
+		
+		// Create our user not added to the contest
+		$externalUser = UserFactory::createUser();
+		
+		// Call details using token
+		$detailsResponse = ContestController::apiDetails(new Request(array(
+			"auth_token" => $this->login($externalUser),
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => "invalid token"
+		)));
+		
+	}
 
 }
 
