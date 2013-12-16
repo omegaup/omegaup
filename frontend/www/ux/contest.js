@@ -3,7 +3,6 @@ $(document).ready(function() {
 	var problems = {};
 	var activeTab = 'problems';	
 	var currentProblem = null;
-	var currentEvents;
 	var currentContest = null;
 	var submissionGap = 0;
 	var answeredClarifications = 0;
@@ -515,10 +514,10 @@ $(document).ready(function() {
 				$('#' + activeTab).show();
 
 				if (activeTab == 'ranking') {
-							if (currentEvents) {
-								rankingEvents(currentEvents);
+							if (arena.currentEvents) {
+								arena.onRankingEvents(arena.currentEvents);
 							}
-						} else if (activeTab == 'clarifications') {
+				} else if (activeTab == 'clarifications') {
 					$('#clarifications-count').css("font-weight", "normal");
 				}
 			}
@@ -526,75 +525,9 @@ $(document).ready(function() {
 		
 	});
 
-	function rankingEvents(data) {
-		console.time("rankingEvents");
-		currentEvents = data;
-		var dataInSeries = {};
-		var navigatorData = [[arena.startTime.getTime(), 0]];
-		var series = [];
-		var usernames = {};
-
-		console.time("calculate data series");
-		
-		// group points by person
-		for (var i = 0, l = data.events.length; i < l; i++) {
-			var curr = data.events[i];
-			
-			// limit chart to top n users
-			if (arena.currentRanking[curr.username] > rankChartLimit - 1) continue;
-			
-			if (!dataInSeries[curr.name]) {
-					dataInSeries[curr.name] = [[arena.startTime.getTime(), 0]];
-					usernames[curr.name] = curr.username;
-			}
-			dataInSeries[curr.name].push([
-					arena.startTime.getTime() + curr.delta*60*1000,
-					curr.total.points
-			]);
-			
-			// check if to add to navigator
-			if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
-					navigatorData.push([
-						arena.startTime.getTime() + curr.delta*60*1000,
-						curr.total.points
-					]);
-			}
-		}
-		
-		// convert datas to series
-		for (var i in dataInSeries) {
-			if (dataInSeries.hasOwnProperty(i)) {
-					dataInSeries[i].push([Math.min(arena.finishTime.getTime(), Date.now()), dataInSeries[i][dataInSeries[i].length - 1][1]]);
-					series.push({
-						name: i,
-						rank: arena.currentRanking[usernames[i]],
-						data: dataInSeries[i],
-						step: true
-					});
-			}
-		}
-		
-		series.sort(function (a, b) {
-			return a.rank - b.rank;
-		});
-		
-		navigatorData.push([Math.min(arena.finishTime.getTime(), Date.now()), navigatorData[navigatorData.length - 1][1]]);
-		console.timeEnd("calculate data series");
-		console.time("chart data series");	
-		if (series.length > 0) {
-			// chart it!
-			createChart(series, navigatorData);
-
-			// now animated sort the ranking table!
-		}
-		console.timeEnd("chart data series");
-		console.timeEnd("rankingEvents");
-		console.timeEnd("whole ranking");
-	}
-
 	function rankingChange(data) {
 		arena.onRankingChanged(data);
-		omegaup.getRankingEvents(contestAlias, rankingEvents);
+		omegaup.getRankingEvents(contestAlias, arena.onRankingEvents.bind(arena));
 	}
 	
 	function clarificationsChange(data) {
@@ -653,83 +586,6 @@ $(document).ready(function() {
 
 		if (answeredClarifications > previouslyAnswered && activeTab != 'clarifications') {
 			$('#clarifications-count').css("font-weight", "bold");
-		}
-	}
-	
-	function createChart(series, navigatorSeries) {
-		if (series.length == 0) return;
-		
-		Highcharts.setOptions({
-			colors: Arena.scoreboardColors
-		});
-	
-		window.chart = new Highcharts.StockChart({
-			chart: {
-				renderTo: 'ranking-chart',
-				height: 300,
-				spacingTop: 20
-			},
-
-			xAxis: {
-				ordinal: false,
-				min: arena.startTime.getTime(),
-				max: Math.min(arena.finishTime.getTime(), Date.now())
-			},
-
-			yAxis: {
-				showLastLabel: true,
-				showFirstLabel: false,
-				min: 0,
-				max: (function() {
-					var total = 0;
-					for (var prob in problems) {
-						if (problems.hasOwnProperty(prob)) {
-							total += parseInt(problems[prob].points, 10);
-						}
-					}
-					return total;
-				})()
-			},
-			
-			plotOptions: {
-				series: {
-					lineWidth: 3,
-					states: {
-						hover: {
-							lineWidth: 3
-						}
-					},
-					marker: {
-						radius: 5,
-						symbol: 'circle',
-						lineWidth: 1
-					}
-				}
-			},
-
-			navigator: {
-				series: {
-					type: 'line',
-					step: true,
-					lineWidth: 3,
-					lineColor: '#333',
-					data: navigatorSeries
-				}
-			},
-
-			rangeSelector: {
-				enabled: false
-			},
-			
-			series: series
-		});
-		
-		// set legend colors
-		var rows = $('#ranking tbody tr.inserted');
-		for (var r = 0; r < rows.length; r++) {
-			$('.legend', rows[r]).css({
-				'background-color': r < rankChartLimit ? Arena.scoreboardColors[r] : 'transparent'
-			});
 		}
 	}
 });

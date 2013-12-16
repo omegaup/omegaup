@@ -23,14 +23,13 @@ function Arena() {
 	// WebSocket for real-time updates.
 	this.socket = null;
 
-	// True if this is an admin session. Does not give you extra permissions, sorry :P
-	this.admin = false;
-
-	// True if this is a practice session.
-	this.practice = false;
-
+	// The offset of each user into the ranking table.
 	this.currentRanking = {};
 
+	// The last known scoreboard event stream.
+	this.currentEvents = null;
+
+	// A mapping from problem aliases to problem information.
 	this.problems = {};
 };
 
@@ -105,9 +104,12 @@ Arena.prototype.initProblems = function(problems) {
 		var alias = problems[i].alias;
 		this.problems[alias] = problems[i];
 
-		$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' + problems[i].letter + '</a></th>').insertBefore('#ranking thead th.total');
-		$('<td class="prob_' + alias + '_points"></td>').insertBefore('#ranking tbody .template td.points');
-		$('<td class="prob_' + alias + '_penalty"></td>').insertBefore('#ranking tbody .template td.points');			
+		$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' +
+				problems[i].letter + '</a></th>').insertBefore('#ranking thead th.total');
+		$('<td class="prob_' + alias + '_points"></td>')
+			.insertBefore('#ranking tbody .template td.points');
+		$('<td class="prob_' + alias + '_penalty"></td>')
+			.insertBefore('#ranking tbody .template td.points');
 	}
 };
 
@@ -216,4 +218,141 @@ Arena.prototype.onRankingChanged = function(data) {
 	}
 
 	this.currentRanking = newRanking;
+};
+
+Arena.prototype.onRankingEvents = function(data) {
+	var dataInSeries = {};
+	var navigatorData = [[this.startTime.getTime(), 0]];
+	var series = [];
+	var usernames = {};
+	this.currentEvents = data;
+
+	// group points by person
+	for (var i = 0, l = data.events.length; i < l; i++) {
+		var curr = data.events[i];
+		
+		// limit chart to top n users
+		if (this.currentRanking[curr.username] > Arena.scoreboardColors.length - 1) continue;
+		
+		if (!dataInSeries[curr.name]) {
+				dataInSeries[curr.name] = [[this.startTime.getTime(), 0]];
+				usernames[curr.name] = curr.username;
+		}
+		dataInSeries[curr.name].push([
+				this.startTime.getTime() + curr.delta*60*1000,
+				curr.total.points
+		]);
+		
+		// check if to add to navigator
+		if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
+				navigatorData.push([
+					this.startTime.getTime() + curr.delta*60*1000,
+					curr.total.points
+				]);
+		}
+	}
+	
+	// convert datas to series
+	for (var i in dataInSeries) {
+		if (dataInSeries.hasOwnProperty(i)) {
+				dataInSeries[i].push([
+					Math.min(this.finishTime.getTime(), Date.now()),
+					dataInSeries[i][dataInSeries[i].length - 1][1]
+				]);
+				series.push({
+					name: i,
+					rank: this.currentRanking[usernames[i]],
+					data: dataInSeries[i],
+					step: true
+				});
+		}
+	}
+	
+	series.sort(function (a, b) {
+		return a.rank - b.rank;
+	});
+	
+	navigatorData.push([
+			Math.min(this.finishTime.getTime(), Date.now()),
+			navigatorData[navigatorData.length - 1][1]
+	]);
+	this.createChart(series, navigatorData);
+};
+
+Arena.prototype.createChart = function(series, navigatorSeries) {
+	if (series.length == 0) return;
+	
+	Highcharts.setOptions({
+		colors: Arena.scoreboardColors
+	});
+
+	window.chart = new Highcharts.StockChart({
+		chart: {
+			renderTo: 'ranking-chart',
+			height: 300,
+			spacingTop: 20
+		},
+
+		xAxis: {
+			ordinal: false,
+			min: this.startTime.getTime(),
+			max: Math.min(this.finishTime.getTime(), Date.now())
+		},
+
+		yAxis: {
+			showLastLabel: true,
+			showFirstLabel: false,
+			min: 0,
+			max: (function(problems) {
+				var total = 0;
+				for (var prob in problems) {
+					if (!problems.hasOwnProperty(prob)) continue;
+					total += parseInt(problems[prob].points, 10);
+				}
+				return total;
+			})(this.problems)
+		},
+		
+		plotOptions: {
+			series: {
+				lineWidth: 3,
+				states: {
+					hover: {
+						lineWidth: 3
+					}
+				},
+				marker: {
+					radius: 5,
+					symbol: 'circle',
+					lineWidth: 1
+				}
+			}
+		},
+
+		navigator: {
+			series: {
+				type: 'line',
+				step: true,
+				lineWidth: 3,
+				lineColor: '#333',
+				data: navigatorSeries
+			}
+		},
+
+		rangeSelector: {
+			enabled: false
+		},
+		
+		series: series
+	});
+	
+	// set legend colors
+	var rows = $('#ranking tbody tr.inserted');
+	for (var r = 0; r < rows.length; r++) {
+		$('.legend', rows[r]).css({
+			'background-color': (r < Arena.scoreboardColors.length) ?
+				Arena.scoreboardColors[r] :
+				'transparent'
+		});
+	}
 };
