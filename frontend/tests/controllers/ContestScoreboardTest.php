@@ -292,5 +292,61 @@ class ContestScoreboardTest extends OmegaupTestCase {
 			"token" => "invalid token"
 		)));
 	}
+	
+	/**
+	 * Basic tests for shareable scoreboard url
+	 */
+	public function testScoreboardUrlNoLogin() {
+		
+		// Get a private contest with 0% of scoreboard show percentage
+		$contestData = ContestsFactory::createContest(null, 0);
+		ContestsFactory::setScoreboardPercentage($contestData, 0);
+		
+		// Create problem
+		$problemData = ProblemsFactory::createProblem();
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+			
+		// Create our contestant, will submit 1 run
+		$contestant = UserFactory::createUser();		
+		
+		ContestsFactory::addUser($contestData, $contestant);		
+		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+		RunsFactory::gradeRun($runData);
+				
+		// Get the scoreboard url by using the MyList api being the
+		// contest director
+		$response = ContestController::apiMyList(new Request(array(
+			"auth_token" => $this->login($contestData["director"])
+		)));	
+		
+		// Look for our contest from the list and save the scoreboard tokens
+		$scoreboard_url = null;
+		$scoreboard_admin_url = null;
+		foreach ($response["results"] as $c) {			
+			if ($c["alias"] === $contestData["request"]["alias"]) {
+				$scoreboard_url = $c["scoreboard_url"];
+				$scoreboard_admin_url = $c["scoreboard_url_admin"];
+				break;
+			}
+		}
+		$this->assertNotNull($scoreboard_url);					
+		$this->assertNotNull($scoreboard_admin_url);					
+		
+		// Call scoreboard api from the user
+		$scoreboardResponse = ContestController::apiScoreboard(new Request(array(			
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => $scoreboard_url
+		)));
+				
+		$this->assertEquals("0", $scoreboardResponse["ranking"][0]["total"]["points"]);		
+		
+		// Call scoreboard api from the user with admin token
+		$scoreboardResponse = ContestController::apiScoreboard(new Request(array(			
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => $scoreboard_admin_url
+		)));
+				
+		$this->assertEquals("100", $scoreboardResponse["ranking"][0]["total"]["points"]);
+	}
 }
 

@@ -212,7 +212,11 @@ class ContestController extends Controller {
 
 		// If the contest has not started, user should not see it, unless it is admin or has a token.
 		if (is_null($r['token'])) {
+			// Crack the request to get the current user
+			self::authenticateRequest($r);
+			
 			self::canAccessContest($r);
+			
 			if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				$exception = new PreconditionFailedException("Contest has not started yet.");
 				$exception->addCustomMessageToArray("start_time", strtotime($r["contest"]->getStartTime()));
@@ -234,10 +238,7 @@ class ContestController extends Controller {
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 */
-	public static function apiDetails(Request $r) {
-
-		// Crack the request to get the current user
-		self::authenticateRequest($r);
+	public static function apiDetails(Request $r) {		
 
 		self::validateDetails($r);
 		
@@ -295,20 +296,21 @@ class ContestController extends Controller {
 			return $result;
 			
 		}, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
-																
-		// Adding timer info separately as it depends on the current user and we don't
-		// want this to get generally cached for everybody
-		// Save the time of the first access
-		try {
-			$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-							$r["current_user_id"], $r["contest"]->getContestId());
-		} catch (Exception $e) {
-			// Operation failed in the data layer
-			throw new InvalidDatabaseOperationException($e);
-		}
-
-		// Add time left to response
+												
+				
 		if (is_null($r['token'])) {
+			// Adding timer info separately as it depends on the current user and we don't
+			// want this to get generally cached for everybody
+			// Save the time of the first access
+			try {
+				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+								$r["current_user_id"], $r["contest"]->getContestId());
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+			
+			// Add time left to response
 			if ($r["contest"]->getWindowLength() === null) {
 				$result['submission_deadline'] = strtotime($r["contest"]->getFinishTime());
 			} else {
@@ -963,10 +965,7 @@ class ContestController extends Controller {
 	 * @throws NotFoundException
 	 */
 	public static function apiScoreboard(Request $r) {
-
-		// Get the current user
-		self::authenticateRequest($r);
-
+		
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		try {
@@ -980,6 +979,9 @@ class ContestController extends Controller {
 		$showAllRuns = false;
 		
 		if (is_null($r["token"])) {
+			// Get the current user
+			self::authenticateRequest($r);
+			
 			self::canAccessContest($r);
 			
 			if (Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {

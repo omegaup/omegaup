@@ -390,6 +390,51 @@ class DetailsContest extends OmegaupTestCase {
 		)));
 		
 	}
+	
+	/**
+	 * Tests that user can get contest details with the scoreboard token
+	 */
+	public function testDetailsNoLoginUsingToken() {
+		
+		// Get a private contest
+		$contestData = ContestsFactory::createContest(null, 0);
+		
+		// Get the scoreboard url by using the MyList api being the
+		// contest director
+		$response = ContestController::apiMyList(new Request(array(
+			"auth_token" => $this->login($contestData["director"])
+		)));
+		
+		// Look for our contest from the list and save the scoreboard tokens
+		$scoreboard_url = null;
+		$scoreboard_admin_url = null;
+		foreach ($response["results"] as $c) {			
+			if ($c["alias"] === $contestData["request"]["alias"]) {
+				$scoreboard_url = $c["scoreboard_url"];
+				$scoreboard_admin_url = $c["scoreboard_url_admin"];
+				break;
+			}
+		}
+		$this->assertNotNull($scoreboard_url);
+		$this->assertNotNull($scoreboard_admin_url);					
+		
+		// Call details using token
+		$detailsResponse = ContestController::apiDetails(new Request(array(			
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => $scoreboard_url
+		)));
+				
+		$this->assertContestDetails($contestData, array(), $detailsResponse);
+		
+		// Call details using admin token
+		$detailsResponse = ContestController::apiDetails(new Request(array(			
+			"contest_alias" => $contestData["request"]["alias"],
+			"token" => $scoreboard_admin_url
+		)));
+				
+		$this->assertContestDetails($contestData, array(), $detailsResponse);
+		
+	}
 
 }
 
