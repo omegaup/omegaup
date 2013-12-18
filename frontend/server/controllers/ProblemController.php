@@ -585,6 +585,13 @@ class ProblemController extends Controller {
 
 		// Add the procesed runs to the request
 		$response["runs"] = $runs_filtered_array;
+		
+		if (!is_null($contest)) {
+			
+		} else {
+			$response["score"] = Runs
+		}
+		
 		$response["status"] = "ok";
 		return $response;
 	}
@@ -811,7 +818,7 @@ class ProblemController extends Controller {
 			$r["offset"] = 0;
 		}
 		if (!isset($r["rowcount"])) {
-			$r["rowcount"] = 200;
+			$r["rowcount"] = 400;
 		}
 	}
 
