@@ -142,5 +142,71 @@ class ProblemList extends OmegaupTestCase {
 		$this->assertEquals(3, count($response["results"]));
 		$this->assertEquals($problemData[2]["request"]["alias"], $response["results"][0]["alias"]);
 	}
+		
+	/**
+	 * Logged-in users will have their best scores for all problems
+	 */
+	public function testListContainsScores() {
+		
+		$contestant = UserFactory::createUser();
+		
+		$problemData = ProblemsFactory::createProblem();
+		$problemDataNoRun = ProblemsFactory::createProblem();
+		$problemDataDecimal = ProblemsFactory::createProblem();
+		
+		// We'll send consecutive runs, changing submission gap to 0 to avoid waiting
+		RunController::$defaultSubmissionGap = 0;
+		
+		$runData = RunsFactory::createRunToProblem($problemData, $contestant);
+		RunsFactory::gradeRun($runData);				
+		
+		$runDataDecimal = RunsFactory::createRunToProblem($problemDataDecimal, $contestant);
+		RunsFactory::gradeRun($runDataDecimal, ".123456", "PA");
+		
+		
+		RunController::$defaultSubmissionGap = 100;
+		
+		$r = new Request(array(
+			"auth_token" => $this->login($contestant)
+		));
+		
+		$response = ProblemController::apiList($r);
+		
+		// Validate results
+		foreach ($response['results'] as $responseProblem) {
+			if ($responseProblem['alias'] === $problemData['request']['alias']) {
+				if ($responseProblem['score'] != 100.00) {
+					$this->fail("Expected to see 100 score for this problem");
+				}
+			} else if ($responseProblem['alias'] === $problemDataDecimal['request']['alias']){
+				if ($responseProblem['score'] != 12.35) {
+					$this->fail("Expected to see 12.34 score for this problem");
+				}
+			} else {
+				if ($responseProblem['score'] != 0) {
+					$this->fail("Expected to see 0 score for this problem");
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Test that non-logged in users dont have score set
+	 */
+	public function testListScoresForNonLoggedIn() {				
+		
+		$problemData = ProblemsFactory::createProblem();						
+		
+		$r = new Request();
+		
+		$response = ProblemController::apiList($r);
+		
+		// Validate results
+		foreach ($response['results'] as $responseProblem) {
+			if ($responseProblem['score'] != "0") {
+				$this->fail('Expecting score to be not set for non-logged in users');
+			}			
+		}
+	}
 }
 

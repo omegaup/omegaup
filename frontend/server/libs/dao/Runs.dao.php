@@ -333,6 +333,27 @@ class RunsDAO extends RunsDAOBase
 
 		return new Runs($rs);
 	}
+	
+	/*
+	 * 
+	 * Get best score of a user for a given problem
+	 * 
+	 */
+	public static final function GetBestScore($problem_id, $user_id)
+	{
+		//Build SQL statement
+		$sql = "SELECT score from Runs where user_id = ? and problem_id = ? and status = 'ready' ORDER BY score DESC, submit_delay ASC  LIMIT 1";
+		$val = array($user_id, $problem_id);
+
+		global $conn;
+		$rs = $conn->GetRow($sql, $val);
+		
+		if (count($rs) === 0) {
+			return 0;
+		} else {		
+			return $rs['score'];
+		}
+	}
 
 	/*
 	 * Get number of runs before current.

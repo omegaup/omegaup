@@ -873,6 +873,17 @@ class ProblemController extends Controller {
 		usort($response["results"], function($a, $b) {			
 			return strcmp($a["title"], $b["title"]);
 		});
+				
+		// Add users' best scores to the list
+		foreach ($response["results"] as &$problemData) {
+			// If we have a logged-in user (this API can be accessed by non-logged in users)
+			if (!is_null($r['current_user_id'])) {
+				$problemData['score'] = number_format(RunsDAO::GetBestScore($problemData['problem_id'], $r['current_user_id']) * 100, 2);
+			} else {
+				$problemData['score'] = 0;
+			}
+		}
+		
 		
 		$response["status"] = "ok";
 		return $response;

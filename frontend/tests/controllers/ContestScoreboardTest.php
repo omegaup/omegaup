@@ -36,8 +36,8 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		
 		// Grade the runs
 		RunsFactory::gradeRun($runData);
-		RunsFactory::gradeRun($runData2, 90);
-		RunsFactory::gradeRun($runData3, 100);
+		RunsFactory::gradeRun($runData2, .9, "PA");
+		RunsFactory::gradeRun($runData3, 1.0);
 		
 		// Create request
 		$r = new Request();

@@ -30,6 +30,37 @@ class GraderMock extends Grader {
 class RunsFactory {
 
 	/**
+	 * Builds and returns a request object to be used for RunController::apiCreate
+	 * 
+	 * @param type $problemData
+	 * @param type $contestData
+	 * @param type $contestant
+	 * @return Request
+	 */
+	private static function createRequestComon($problemData, $contestData, $contestant) {
+		
+		// Create an empty request
+		$r = new Request();
+
+		// Log in as contestant
+		$r["auth_token"] = OmegaupTestCase::login($contestant);
+
+		// Build request
+		if (!is_null($contestData)) {
+			$r["contest_alias"] = $contestData["request"]["alias"];
+		}
+		
+		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r["language"] = "c";
+		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+
+		//PHPUnit does not set IP address, doing it manually
+		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
+		
+		return $r;
+	}
+	
+	/**
 	 * Creates a run
 	 * 
 	 * @param type $problemData
@@ -45,20 +76,7 @@ class RunsFactory {
 		// Then we need to open the problem
 		ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
 
-		// Create an empty request
-		$r = new Request();
-
-		// Log in as contest director
-		$r["auth_token"] = OmegaupTestCase::login($contestant);
-
-		// Build request
-		$r["contest_alias"] = $contestData["request"]["alias"];
-		$r["problem_alias"] = $problemData["request"]["alias"];
-		$r["language"] = "c";
-		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
-
-		//PHPUnit does not set IP address, doing it manually
-		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
+		$r = self::createRequestComon($problemData, $contestData, $contestant);
 
 		// Call API
 		RunController::$grader = new GraderMock();
@@ -75,18 +93,43 @@ class RunsFactory {
 	}
 	
 	/**
+	 * Creates a run to the given problem
+	 * 
+	 * @param type $problemData
+	 * @param type $contestant
+	 */
+	public static function createRunToProblem($problemData, $contestant) {
+		
+		$r = self::createRequestComon($problemData, null, $contestant);
+		
+		// Call API
+		RunController::$grader = new GraderMock();
+		$response = RunController::apiCreate($r);
+
+		// Clean up
+		unset($_REQUEST);
+		
+		return array(
+			"request" => $r,
+			"contestant" => $contestant,
+			"response" => $response
+		);		
+	}
+	
+	/**
 	 * Given a run id, set a score to a given run
 	 * 
 	 * @param type $runData
 	 * @param int $points
 	 * @param string $veredict
 	 */
-	public static function gradeRun($runData, $points = 100, $veredict = "AC") {
+	public static function gradeRun($runData, $points = 1, $veredict = "AC") {
 		
 		$run = RunsDAO::getByAlias($runData["response"]["guid"]);
 		
 		$run->setVeredict($veredict);
-		$run->setContestScore($points);
+		$run->setScore($points);
+		$run->setContestScore($points * 100);
 		$run->setStatus("ready");
 		
 		RunsDAO::save($run);				
