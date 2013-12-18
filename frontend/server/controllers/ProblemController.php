@@ -584,14 +584,7 @@ class ProblemController extends Controller {
 		}
 
 		// Add the procesed runs to the request
-		$response["runs"] = $runs_filtered_array;
-		
-		if (!is_null($contest)) {
-			
-		} else {
-			$response["score"] = Runs
-		}
-		
+		$response["runs"] = $runs_filtered_array;				
 		$response["status"] = "ok";
 		return $response;
 	}
