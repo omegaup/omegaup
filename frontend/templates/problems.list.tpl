@@ -34,7 +34,7 @@
 					+ '<td><a href="/arena/problem/' + problems.results[i].alias  + '">' + omegaup.escape(problems.results[i].title) + "</a></td>"
 					+ "<td>" + problems.results[i].submissions + "</td>"
 					+ "<td>" + problems.results[i].accepted + "</td>"
-					+ "<td>" + problems.results[i].score + "</td>"
+					+ "<td><b>" + problems.results[i].score + "</b></td>"
 					+ "</tr>";
 			}
 
