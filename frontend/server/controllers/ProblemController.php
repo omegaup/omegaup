@@ -535,7 +535,7 @@ class ProblemController extends Controller {
 					"contest_id" => is_null($r["contest"]) ? null : $r["contest"]->getContestId()
 				));
 
-		// Get all the available runs
+		// Get all the available runs done by the current_user
 		try {
 			$runs_array = RunsDAO::search($keyrun);
 		} catch (Exception $e) {
@@ -581,6 +581,18 @@ class ProblemController extends Controller {
 					throw new InvalidDatabaseOperationException($e);
 				}
 			}
+		}
+		
+		try {
+			// Add best score info
+			if (is_null($r["contest"])) {
+				$response["score"] = RunsDAO::GetBestScore($r["problem"]->getProblemId(), $r["current_user_id"]);
+			} else {
+				$bestRun = RunsDAO::GetBestRun($r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"], strtotime($r["contest"]->getFinishTime()), false /*showAllRuns*/);								
+				$response["score"] = is_null($bestRun->getContestScore()) ? 0 : $bestRun->getContestScore();
+			}				
+		} catch(Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
 		}
 
 		// Add the procesed runs to the request
@@ -878,7 +890,7 @@ class ProblemController extends Controller {
 		foreach ($response["results"] as &$problemData) {
 			// If we have a logged-in user (this API can be accessed by non-logged in users)
 			if (!is_null($r['current_user_id'])) {
-				$problemData['score'] = number_format(RunsDAO::GetBestScore($problemData['problem_id'], $r['current_user_id']) * 100, 2);
+				$problemData['score'] = RunsDAO::GetBestScore($problemData['problem_id'], $r['current_user_id']);
 			} else {
 				$problemData['score'] = 0;
 			}

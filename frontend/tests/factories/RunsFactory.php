@@ -37,7 +37,7 @@ class RunsFactory {
 	 * @param type $contestant
 	 * @return Request
 	 */
-	private static function createRequestComon($problemData, $contestData, $contestant) {
+	private static function createRequestCommon($problemData, $contestData, $contestant) {
 		
 		// Create an empty request
 		$r = new Request();
@@ -76,7 +76,7 @@ class RunsFactory {
 		// Then we need to open the problem
 		ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
 
-		$r = self::createRequestComon($problemData, $contestData, $contestant);
+		$r = self::createRequestCommon($problemData, $contestData, $contestant);
 
 		// Call API
 		RunController::$grader = new GraderMock();
@@ -100,7 +100,7 @@ class RunsFactory {
 	 */
 	public static function createRunToProblem($problemData, $contestant) {
 		
-		$r = self::createRequestComon($problemData, null, $contestant);
+		$r = self::createRequestCommon($problemData, null, $contestant);
 		
 		// Call API
 		RunController::$grader = new GraderMock();

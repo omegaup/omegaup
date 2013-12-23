@@ -52,6 +52,7 @@ class DetailsProblem extends OmegaupTestCase {
         $this->assertEquals($response["source"], $problemDAO->getSource()); 
         $this->assertContains("<h1>Entrada</h1>", $response["problem_statement"]);        
         $this->assertEquals($response["order"], $problemDAO->getOrder());
+		$this->assertEquals($response["score"], 0);
         
         // Default data
         $this->assertEquals(0, $problemDAO->getVisits());
@@ -93,6 +94,8 @@ class DetailsProblem extends OmegaupTestCase {
 	}
 	
 	/**
+	 * User not invited to private contest can't see problem details
+	 * 
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testPrivateProblemDetailsNotInContest() {
@@ -112,6 +115,65 @@ class DetailsProblem extends OmegaupTestCase {
 		
 		// Call api
 		$response = ProblemController::apiDetails($r);				
+	}
+	
+	/**
+	 * Best score is returned
+	 */
+	public function testScoreInDetailsOutsideContest() {
+		
+		// Create problem
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Create contestant
+		$contestant = UserFactory::createUser();
+		
+		// Create 2 runs, 100 and 50.
+		RunController::$defaultSubmissionGap = 0;
+		$runData = RunsFactory::createRunToProblem($problemData, $contestant);
+		$runDataPA = RunsFactory::createRunToProblem($problemData, $contestant);
+		RunsFactory::gradeRun($runData);
+		RunsFactory::gradeRun($runDataPA, 0.5, "PA");
+		RunController::$defaultSubmissionGap = 60;
+		
+		// Call API
+		$response = ProblemController::apiDetails(new Request(array(
+			"auth_token" => $this->login($contestant),
+			"problem_alias" => $problemData["request"]["alias"]
+		)));
+		
+		$this->assertEquals(100.00, $response["score"]);
+	}
+	
+	/**
+	 * Best score is returned, problem inside a contest
+	 */
+	public function testScoreInDetailsInsideContest() {
+		
+		// Create problem and contest
+		$problemData = ProblemsFactory::createProblem();
+		$contestData = ContestsFactory::createContest();
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+		
+		// Create contestant
+		$contestant = UserFactory::createUser();
+		
+		// Create 2 runs, 100 and 50.
+		RunController::$defaultSubmissionGap = 0;
+		$runDataOutsideContest = RunsFactory::createRunToProblem($problemData, $contestant);
+		$runDataInsideContest = RunsFactory::createRun($problemData, $contestData, $contestant);
+		RunsFactory::gradeRun($runDataOutsideContest);
+		RunsFactory::gradeRun($runDataInsideContest, 0.5, "PA");
+		RunController::$defaultSubmissionGap = 60;
+		
+		// Call API
+		$response = ProblemController::apiDetails(new Request(array(
+			"auth_token" => $this->login($contestant),
+			"problem_alias" => $problemData["request"]["alias"],
+			"contest_alias" => $contestData["request"]["alias"]
+		))); 
+		
+		$this->assertEquals(50.00, $response["score"]);
 	}
 }
 

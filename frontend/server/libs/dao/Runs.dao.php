@@ -334,10 +334,13 @@ class RunsDAO extends RunsDAOBase
 		return new Runs($rs);
 	}
 	
-	/*
+	/**
+	 * Returns best score for the given user and problem, between 0 and 100
 	 * 
-	 * Get best score of a user for a given problem
-	 * 
+	 * @global type $conn
+	 * @param type $problem_id
+	 * @param type $user_id
+	 * @return int
 	 */
 	public static final function GetBestScore($problem_id, $user_id)
 	{
@@ -351,7 +354,7 @@ class RunsDAO extends RunsDAOBase
 		if (count($rs) === 0) {
 			return 0;
 		} else {		
-			return $rs['score'];
+			return number_format($rs['score'] * 100, 2);
 		}
 	}
 
