@@ -1,16 +1,5 @@
 
 
-{if $LOGGED_IN eq 1 and $CURRENT_USER_IS_EMAIL_VERIFIED eq 0}
-	<div class="alert alert-danger" id='email-verification-alert'>
-		<button type="button" class="close" id="email-verification-alert-close">&times;</button>
-		<span class="message">
-			No podrás loggearte con este usuario si no verificas tu correo. 
-			Actualiza tu email <b><a href="/useremailedit.php">aquí</a></b>
-			y responde el correo de verificación. Si tienes dudas contáctanos en joe@omegaup.com .
-		</span>
-	</div>
-{/if}
-
 {if $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 0}
 	<div class="alert alert-info" id='private-contests-count-alert'>
 		<button type="button" class="close" id="private-contests-count-alert-close">&times;</button>
@@ -63,7 +52,7 @@
 	});
 	
 	$("#private-contests-count-alert-close").click(function () {
-		$("private-contests-count-alert").slideUp();
+		$("#private-contests-count-alert").slideUp();
 	});
 	
 	$("#private-problems-count-alert-close").click(function () {
