@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class DetailsProblem extends OmegaupTestCase {
+class ProblemDetailsTest extends OmegaupTestCase {
 	
 	/**
 	 * 

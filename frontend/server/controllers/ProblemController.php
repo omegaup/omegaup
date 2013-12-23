@@ -581,22 +581,11 @@ class ProblemController extends Controller {
 					throw new InvalidDatabaseOperationException($e);
 				}
 			}
-		}
+		}						
 		
-		try {
-			// Add best score info
-			if (is_null($r["contest"])) {
-				$response["score"] = RunsDAO::GetBestScore($r["problem"]->getProblemId(), $r["current_user_id"]);
-			} else {
-				$bestRun = RunsDAO::GetBestRun($r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"], strtotime($r["contest"]->getFinishTime()), false /*showAllRuns*/);								
-				$response["score"] = is_null($bestRun->getContestScore()) ? 0 : $bestRun->getContestScore();
-			}				
-		} catch(Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
-		}
-
 		// Add the procesed runs to the request
-		$response["runs"] = $runs_filtered_array;				
+		$response["runs"] = $runs_filtered_array;		
+		$response["score"] = self::bestScore($r);
 		$response["status"] = "ok";
 		return $response;
 	}
@@ -935,6 +924,53 @@ class ProblemController extends Controller {
 
 		$response["status"] = "ok";
 		return $response;
+	}
+	
+	/**
+	 * Returns the best score for a problem
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiBestScore(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		// Uses same params as apiDetails, except for lang, which is optional
+		self::validateDetails($r);
+		
+		$response["score"] = self::bestScore($r);
+		$response["status"] = "ok";
+		return $response;
+	}
+	
+	/**
+	 * Returns the best score of a problem.
+	 * Problem must be loadad in $r["problem"]
+	 * Contest could be loadad in $r["contest"]. If set, will only look for
+	 * runs inside that contest.
+	 * 
+	 * Authentication is expected to be performed earlier.
+	 * 
+	 * @param Request $r
+	 * @return float
+	 * @throws InvalidDatabaseOperationException
+	 */
+	private static function bestScore(Request $r) {
+		
+		$score = 0;
+		try {
+			// Add best score info
+			if (is_null($r["contest"])) {
+				$score = RunsDAO::GetBestScore($r["problem"]->getProblemId(), $r["current_user_id"]);
+			} else {
+				$bestRun = RunsDAO::GetBestRun($r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"], strtotime($r["contest"]->getFinishTime()), false /*showAllRuns*/);								
+				$score = is_null($bestRun->getContestScore()) ? 0 : $bestRun->getContestScore();
+			}				
+		} catch(Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		return $score;
 	}
 
 }
