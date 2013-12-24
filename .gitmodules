@@ -4,3 +4,6 @@
 [submodule "minijail"]
 	path = minijail
 	url = https://github.com/omegaup/minijail.git
+[submodule "karel"]
+	path = karel
+	url = https://github.com/omegaup/karel.git
