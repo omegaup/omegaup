@@ -52,12 +52,7 @@ object Manager extends Object with Log {
 				GraderData.update(run)
 
 				val driver = if (run.problem.validator == Validator.Remote) {
-					run.problem.server match {
-						case Some(Server.UVa) => drivers.UVa
-						case Some(Server.LiveArchive) => drivers.LiveArchive
-						case Some(Server.TJU) => drivers.TJU
-						case _ => null
-					}
+          throw new UnsupportedOperationException("Remote validators not supported anymore")
 				} else {
 					drivers.OmegaUp
 				}

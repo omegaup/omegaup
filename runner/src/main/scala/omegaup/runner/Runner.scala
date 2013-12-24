@@ -323,7 +323,7 @@ object Runner extends RunnerService with Log with Using {
             val metaAddendum = try {
               using (new BufferedReader(new FileReader(caseFile + ".out"))) { reader => {
                 List(
-                  ("score" -> Math.max(0.0, Math.min(1.0, reader.readLine.trim.toDouble)).toString)
+                  ("score" -> math.max(0.0, math.min(1.0, reader.readLine.trim.toDouble)).toString)
                 )
               }}
             } catch {

@@ -533,7 +533,7 @@ class NumericTokenComparer(precision: Double) extends TokenComparer {
 		val da = a.toDouble
 		val db = b.toDouble
 
-		return Math.abs(da - db) <= Math.abs(precision * Math.max(1, da))
+		return math.abs(da - db) <= math.abs(precision * math.max(1, da))
 	}
 }
 
