@@ -27,17 +27,20 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		Config.set("db.user", "sa")
 		Config.set("db.password", "")
 
-                Config.set("runner.sandbox.path", new File("../sandbox").getCanonicalPath)
-                Config.set("runner.sandbox.profiles.path", new File("src/test/resources/sandbox-profiles").getCanonicalPath)
-		Config.set("submissions.root", root.getCanonicalPath + "/submissions")
+		Config.set("grader.port", "21681")
+    Config.set("grader.embedded_runner.enable", "true")
 		Config.set("grader.root", root.getCanonicalPath + "/grader")
+    Config.set("runner.sandbox.path", new File("../sandbox").getCanonicalPath)
+    Config.set("runner.minijail.path", "/var/lib/minijail")
+    Config.set("runner.sandbox.profiles.path", new File("src/test/resources/sandbox-profiles").getCanonicalPath)
+		Config.set("submissions.root", root.getCanonicalPath + "/submissions")
 		Config.set("problems.root", root.getCanonicalPath + "/problems")
 		Config.set("compile.root", root.getCanonicalPath + "/compile")
 		Config.set("input.root", root.getCanonicalPath + "/input")
+    Config.set("runner.sandbox", "minijail")
 		Config.set("runner.preserve", "true")
 		Config.set("logging.level", "debug")
 		Config.set("logging.file", "")
-		Config.set("grader.port", "21681")
 
 		Logging.init
 		
@@ -124,7 +127,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 			run.score should equal (0)
 			run.contest_score should equal (0)
 		}}
-		
+
 		omegaUpSubmitContest(1, Language.Cpp, """
 			#include <cstdlib>
 			#include <iostream>
@@ -521,7 +524,7 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 			run.contest_score should equal (0)
 		}}
 	
-		try { Thread.sleep(30000) }
+		try { Thread.sleep(20000) }
 
 		tests.foreach { _() }
 	}

@@ -119,15 +119,18 @@ with Chroot('root', '/') as root:
 			'root:x:0:0:root:/:/bin/false\n' + \
 	    'nobody:x:65534:65534:nobody:/nonexistent:/bin/false')
 
-	root.mkdir('/usr/lib/ruby/1.9.1/')
-	root.mkdir('/usr/lib/python2.7/')
+	# Other miscellaneous mountpoints
 	root.mkdir('/dev/')
 	root.mkdir('/proc/')
-	root.mkdir('/opt/java/')
-	root.mkdir('/opt/nodejs/')
 	root.mkdir('/tmp/')
 	root.mkdir('/home/')
 	root.mkdir('/sys/')
+
+	# Mountpoints for libraries
+	root.mkdir('/usr/lib/ruby/1.9.1/')
+	root.mkdir('/usr/lib/python2.7/')
+	root.mkdir('/opt/java/')
+	root.mkdir('/opt/nodejs/')
 
 	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
 	root.symlink('/usr/bin/node', '/opt/nodejs/bin/node')
@@ -138,6 +141,7 @@ with Chroot('root', '/') as root:
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
 
 	root.install('/usr/bin/ldwrapper', 'bin/ldwrapper')
+	root.install('/usr/bin/karel', 'bin/karel')
 	root.install('/lib/libminijailpreload.so', 'bin/libminijailpreload.so')
 
 with Chroot('root-compilers', '/') as root:
@@ -211,14 +215,29 @@ with Chroot('root-compilers', '/') as root:
 			'root:x:0:0:root:/:/bin/false\n' + \
 	    'nobody:x:65534:65534:nobody:/nonexistent:/bin/false')
 
+	# Mountpoints for libraries
+	root.mkdir('/usr/lib/ruby/1.9.1/')
+	root.mkdir('/usr/lib/python2.7/')
+	root.mkdir('/opt/java/')
+	root.mkdir('/opt/nodejs/')
+
+	# Miscellaneous mountpoints
 	root.mkdir('/dev/')
 	root.mkdir('/proc/')
 	root.mkdir('/tmp/')
 	root.mkdir('/home/')
 	root.mkdir('/sys/')
-	root.mkdir('/usr/lib/ghc/')
+
+	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
+	root.symlink('/usr/bin/node', '/opt/nodejs/bin/node')
+	root.symlink('/usr/bin/javac', '/opt/java/bin/javac')
+	root.symlink('/usr/bin/java', '/opt/java/bin/java')
+	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/1.9.1/ruby')
+	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
+	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
 
 	root.install('/usr/bin/ldwrapper', 'bin/ldwrapper')
+	root.install('/usr/bin/kcl', 'bin/kcl')
 	root.install('/lib/libminijailpreload.so', 'bin/libminijailpreload.so')
 
 with Chroot('root-oraclejdk', '/usr/lib/java/') as root:

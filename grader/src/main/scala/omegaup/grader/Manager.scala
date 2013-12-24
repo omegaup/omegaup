@@ -72,7 +72,7 @@ object Manager extends Object with Log {
 		while (r == null) {
 			info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 			r = runnerQueue.take()
-			if (!Config.get("grader.embedded_runner.enable", false) && r == omegaup.runner.Runner) {
+			if (!Config.get("grader.embedded_runner.enable", false) && r.isInstanceOf[omegaup.runner.Runner]) {
 				// don't put this runner back in the queue.
 				r = null
 			}
@@ -134,7 +134,12 @@ object Manager extends Object with Log {
 
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
-			Manager.addRunner(omegaup.runner.Runner)
+      // Choose a sandbox instance
+      val sandbox = Config.get("runner.sandbox", "box") match {
+        case "box" => Box
+        case "minijail" => Minijail
+      }
+			Manager.addRunner(new omegaup.runner.Runner(sandbox))
 		}
 
 		// the handler
@@ -164,7 +169,12 @@ object Manager extends Object with Log {
 							Logging.init()
 
 							if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
-								Manager.addRunner(omegaup.runner.Runner)
+                // Choose a sandbox instance
+                val sandbox = Config.get("runner.sandbox", "box") match {
+                  case "box" => Box
+                  case "minijail" => Minijail
+                }
+                Manager.addRunner(new omegaup.runner.Runner(sandbox))
 							}
 
 							response.setStatus(HttpServletResponse.SC_OK)
