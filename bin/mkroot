@@ -1,0 +1,240 @@
+#!/usr/bin/python
+
+import os
+import os.path
+import shutil
+import sys
+import tarfile
+
+# Utilities to set up a chroot jail filesystem for minijail.
+# * Files are hardlinked instead of copied when possible.
+# * Symlinks of files that exist within the chroot at __exit__ are preserved,
+#   otherwise they are converted to hard links.
+class Chroot:
+	def __init__(self, path, mountpoint):
+		self.chroot = path
+		self.mountpoint = mountpoint
+		if not self.mountpoint.endswith('/'):
+			self.mountpoint += '/'
+		if os.path.exists(path):
+			shutil.rmtree(path, True)
+		os.mkdir(path)
+	
+	def __chroot_path(self, path):
+		return self.chroot + path[len(self.mountpoint)-1:]
+
+	def mkdir(self, path):
+		if not os.path.isdir(self.__chroot_path(path)):
+			os.makedirs(self.__chroot_path(path))
+
+	def copyfromhost(self, path, exclude=[]):
+		self.mkdir(os.path.dirname(path))
+		if os.path.isdir(os.path.realpath(path)):
+			for root, dirs, files in os.walk(path):
+				if any([root.startswith(e) for e in exclude]): continue
+				self.mkdir(root)
+				for f in files:
+					filepath = os.path.join(root, f)
+					if os.path.islink(filepath):
+						target = os.readlink(filepath)
+						abspath = os.path.realpath(os.path.join(os.path.dirname(filepath), target))
+						if abspath.startswith(self.mountpoint):
+							self.symlink(filepath, target)
+						else:
+							os.link(abspath, self.__chroot_path(filepath))
+					else:
+						os.link(os.path.realpath(filepath), self.__chroot_path(filepath))
+				for d in dirs:
+					dirpath = os.path.join(root, d)
+					if os.path.islink(dirpath):
+						target = os.readlink(dirpath)
+						abspath = os.path.realpath(os.path.join(os.path.dirname(dirpath), target))
+						if abspath.startswith(self.mountpoint):
+							self.symlink(dirpath, target)
+						else:
+							self.copyfromhost(abspath, exclude)
+		else:
+			os.link(os.path.realpath(path), self.__chroot_path(path))
+	
+	def install(self, path, source):
+		self.mkdir(os.path.dirname(path))
+		shutil.copy(source, self.__chroot_path(path))
+
+	def symlink(self, path, destination):
+		self.mkdir(os.path.dirname(path))
+		os.symlink(destination, self.__chroot_path(path))
+
+	def write(self, path, contents):
+		self.mkdir(os.path.dirname(path))
+		f = open(self.__chroot_path(path), 'w')
+		f.write(contents)
+		f.close()
+	
+	def extract(self, archive, sha1, skipprefix, exclude=[]):
+		with tarfile.open(archive) as tar:
+			for member in tar.getmembers():
+				path = os.path.normpath(member.name)
+				if not path.startswith(skipprefix): continue
+				path = self.mountpoint + path[len(skipprefix):]
+				if any([path.startswith(e) for e in exclude]): continue
+				if member.issym():
+					self.symlink(path, member.linkname)
+				elif member.isfile():
+					self.mkdir(os.path.dirname(path))
+					with open(self.__chroot_path(path), 'w') as dst:
+						shutil.copyfileobj(tar.extractfile(member), dst, member.size)
+					os.chmod(self.__chroot_path(path), member.mode)
+
+	# __enter__ and __exit__ are just provided to support with for clarity of code.
+	def __enter__(self):
+		return self
+
+	def __exit__(self, type, value, traceback):
+		pass
+
+with Chroot('root', '/') as root:
+	# This has to go in the final release.
+	root.copyfromhost('/usr/bin/strace')
+
+	root.copyfromhost('/usr/lib/locale/locale-archive')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libffi.so.6')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libstdc++.so.6')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libgmp.so.10')
+	root.copyfromhost('/etc/localtime')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libcap.so.2')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libutil.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libm.so.6')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libpthread.so.0')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libgcc_s.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libtinfo.so.5')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libcrypt.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libc.so.6')
+	root.copyfromhost('/lib/x86_64-linux-gnu/librt.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libdl.so.2')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libz.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libc-2.17.so')
+	root.copyfromhost('/lib64/ld-linux-x86-64.so.2')
+
+	root.write('/etc/passwd',
+			'root:x:0:0:root:/:/bin/false\n' + \
+	    'nobody:x:65534:65534:nobody:/nonexistent:/bin/false')
+
+	root.mkdir('/usr/lib/ruby/1.9.1/')
+	root.mkdir('/usr/lib/python2.7/')
+	root.mkdir('/dev/')
+	root.mkdir('/proc/')
+	root.mkdir('/opt/java/')
+	root.mkdir('/opt/nodejs/')
+	root.mkdir('/tmp/')
+	root.mkdir('/home/')
+	root.mkdir('/sys/')
+
+	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
+	root.symlink('/usr/bin/node', '/opt/nodejs/bin/node')
+	root.symlink('/usr/bin/javac', '/opt/java/bin/javac')
+	root.symlink('/usr/bin/java', '/opt/java/bin/java')
+	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/1.9.1/ruby')
+	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
+	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
+
+	root.install('/usr/bin/ldwrapper', 'bin/ldwrapper')
+	root.install('/lib/libminijailpreload.so', 'bin/libminijailpreload.so')
+
+with Chroot('root-compilers', '/') as root:
+	# This has to go in the final release.
+	root.copyfromhost('/usr/bin/strace')
+
+	root.copyfromhost('/usr/bin/gcc')
+	root.copyfromhost('/usr/bin/g++')
+	root.copyfromhost('/usr/bin/as')
+	root.copyfromhost('/usr/lib/libopcodes-2.23.52-system.20130913.so')
+	root.copyfromhost('/usr/lib/libbfd-2.23.52-system.20130913.so')
+	root.copyfromhost('/usr/bin/fpc')
+	root.copyfromhost('/usr/bin/ld')
+	root.copyfromhost('/usr/bin/ld.bfd')
+	root.copyfromhost('/usr/bin/ppcx64')
+
+	root.copyfromhost('/usr/lib/gcc/x86_64-linux-gnu/4.8')
+	root.symlink('/usr/lib/gcc/x86_64-linux-gnu/ld', '/usr/bin/ld')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libcloog-isl.so.4')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libisl.so.10')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libmpc.so.3')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libmpfr.so.4')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libasan.so.0')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libatomic.so.1')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libgfortran.so.3')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libgomp.so.1')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libquadmath.so.0')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libtsan.so.0')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libm.a')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libm.so')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libc.a')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libc_nonshared.a')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libc.so')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libitm.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2')
+
+	root.copyfromhost('/usr/lib/locale/locale-archive')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libffi.so.6')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libstdc++.so.6')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libgmp.so.10')
+	root.copyfromhost('/etc/localtime')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libcap.so.2')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libutil.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libm.so.6')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libpthread.so.0')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libgcc_s.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libtinfo.so.5')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libcrypt.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libc.so.6')
+	root.copyfromhost('/lib/x86_64-linux-gnu/librt.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libdl.so.2')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libz.so.1')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libc-2.17.so')
+	root.copyfromhost('/lib64/ld-linux-x86-64.so.2')
+
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/crtn.o')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/crti.o')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/crt1.o')
+
+	# For ghc
+	root.symlink('/usr/lib/x86_64-linux-gnu/libgmp.so', 'libgmp.so.10')
+	root.symlink('/usr/lib/x86_64-linux-gnu/librt.so', '/lib/x86_64-linux-gnu/librt.so.1')
+	root.symlink('/usr/lib/x86_64-linux-gnu/libdl.so', '/lib/x86_64-linux-gnu/libdl.so.2')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libffi.so')
+
+	root.copyfromhost('/usr/lib/fpc/')
+
+	root.copyfromhost('/usr/include/')
+
+	root.write('/etc/passwd',
+			'root:x:0:0:root:/:/bin/false\n' + \
+	    'nobody:x:65534:65534:nobody:/nonexistent:/bin/false')
+
+	root.mkdir('/dev/')
+	root.mkdir('/proc/')
+	root.mkdir('/tmp/')
+	root.mkdir('/home/')
+	root.mkdir('/sys/')
+	root.mkdir('/usr/lib/ghc/')
+
+	root.install('/usr/bin/ldwrapper', 'bin/ldwrapper')
+	root.install('/lib/libminijailpreload.so', 'bin/libminijailpreload.so')
+
+with Chroot('root-oraclejdk', '/usr/lib/java/') as root:
+	root.extract('dist/jdk-7u45-linux-x64.tar.gz', '1c8cb229e2f7f0a3e5e798a3008c5a1f7c604934', 'jdk1.7.0_45/', exclude=['/usr/lib/java/src.jar', '/usr/lib/java/lib/missioncontrol', '/usr/lib/java/lib/visualvm'])
+
+with Chroot('root-nodejs', '/opt/nodejs/') as root:
+	root.extract('dist/node-v0.10.22-linux-x64.tar.gz', '739f75bbb85c920a237ceb1c34cb872409d61f7', 'node-v0.10.22-linux-x64')
+
+with Chroot('root-python', '/usr/lib/python2.7/') as root:
+	root.copyfromhost('/usr/lib/python2.7', exclude=['/usr/lib/python2.7/dist-packages', '/usr/lib/python2.7/config-x86_64-linux-gnu'])
+	root.install('/usr/lib/python2.7/python', '/usr/bin/python')
+
+with Chroot('root-ruby', '/usr/lib/ruby/') as root:
+	root.copyfromhost('/usr/lib/ruby')
+	root.install('/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9', '/usr/lib/libruby-1.9.1.so.1.9')
+	root.install('/usr/lib/ruby/1.9.1/ruby', '/usr/bin/ruby')
+
+with Chroot('root-hs', '/usr/lib/ghc/') as root:
+	root.copyfromhost('/usr/lib/ghc')
