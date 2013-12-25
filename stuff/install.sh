@@ -28,12 +28,6 @@ while getopts "h:u:m:p:01" optname; do
 		"p")
 			OMEGAUP_ROOT=$OPTARG
 			;;
-		"u")
-			GIT_USERNAME=$OPTARG
-			;;
-		"m")
-			GIT_EMAIL=$OPTARG
-			;;
 		"0")
 			SKIP_INSTALL=1
 			;;
@@ -43,12 +37,11 @@ while getopts "h:u:m:p:01" optname; do
 		"2")
 			SKIP_GRADER=1
 			;;
+		"h")
+			show_help
+			;;
 	esac
 done
-
-if [ "$GIT_USERNAME" = "" -o "$GIT_EMAIL" = "" ]; then
-	show_help
-fi
 
 # Install _crucial_ stuff first.
 if [ ! -f /usr/bin/curl ]; then
@@ -122,27 +115,6 @@ java -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$
 EOF
 	sudo mv sbt /usr/bin/
 	sudo chmod +x /usr/bin/sbt
-fi
-
-# Set up ssh/git.
-if [ ! -f ~/.ssh/github.com ]; then
-	if [ ! -d ~/.ssh ]; then
-		mkdir ~/.ssh
-	fi
-	cat >> ~/.ssh/config << EOF
-Host github.com
-IdentityFile /home/$USER/.ssh/github.com
-User git
-EOF
-	git config --global user.name "$GIT_USERNAME"
-	git config --global user.email "$GIT_EMAIL"
-	git config --global credential.helper cache
-	git config --global credential.helper 'cache --timeout=3600'
-	ssh-keygen -t rsa -C "$GIT_EMAIL" -f ~/.ssh/github.com -N "" > /dev/null
-	echo -e "Go to https://github.com/settings/ssh, click on \"Add SSH Key\" and enter:\n"
-	cat ~/.ssh/github.com.pub
-	echo -e "\n"
-	read -p "Press Enter to continue" line
 fi
 
 # Clone repository.
