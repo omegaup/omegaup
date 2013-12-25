@@ -1,0 +1,20 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "omegaup"
+  config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/saucy/current/saucy-server-cloudimg-amd64-vagrant-disk1.box"
+
+  # Redirige localhost:8080 hacia el puerto 80 de la VM
+  config.vm.network :forwarded_port, guest: 80, host: 8080
+
+  config.vm.provider :virtualbox do |vb|
+		# Compilar grader y runner necesita al menos 1GB de memoria
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
+  end
+  
+	# Instala todo usando el script.
+	config.vm.provision :shell, :privileged => false, :path => "https://raw.github.com/omegaup/omegaup/master/stuff/install.sh"
+end
