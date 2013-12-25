@@ -1,0 +1,17 @@
+open: 1
+close: 1
+dup: 1
+read: 1
+brk: 1
+write: 1
+rt_sigreturn: 1
+exit: 1
+fcntl: arg1 == F_GETFL
+fstat: 1
+mmap: 1
+lseek: 1
+socket: return ENETDOWN
+munmap: 1
+exit_group: 1
+gettimeofday: 1
+times: 1

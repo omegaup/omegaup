@@ -1,0 +1,24 @@
+socket: return ENETDOWN
+mmap: 1
+munmap: 1
+brk: 1
+fstat: 1
+readlink: 1
+stat: 1
+write: 1
+rt_sigaction: 1
+exit_group: 1
+open: 1
+read: 1
+close: 1
+futex: 1
+lstat: 1
+openat: 1
+getdents: 1
+getcwd: 1
+lseek: 1
+getuid: 1
+getgid: 1
+geteuid: 1
+getegid: 1
+ioctl: return ENOTTY

@@ -1,0 +1,23 @@
+open: 1
+close: 1
+read: 1
+write: 1
+exit: 1
+exit_group: 1
+getrlimit: 1
+rt_sigaction: 1
+rt_sigprocmask: 1
+rt_sigreturn: 1
+ioctl: 1
+readlink: 1
+stat: 1
+fstat: 1
+lstat: 1
+mmap: 1
+munmap: 1
+time: 1
+access: 1
+lseek: 1
+
+# For ld-wrapper
+execve: 1
