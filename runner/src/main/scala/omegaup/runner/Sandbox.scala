@@ -253,7 +253,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         List("/usr/bin/sudo", minijail, "-S", scripts + "/javac") ++
         commonParams ++
         List(
-          "-b", Config.get("runner.minijail.path", ".") + "/root-oraclejdk,/opt/java",
+          "-b", Config.get("runner.minijail.path", ".") + "/root-openjdk,/usr/lib/jvm",
           "-b", "/sys/,/sys"
         ) ++
         List("--", Config.get("java.compiler.path", "/usr/bin/javac"), "-J-Xmx512M") ++
@@ -382,7 +382,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         List("/usr/bin/sudo", minijail, "-S", scripts + "/java") ++
         commonParams ++
         List(
-          "-b", Config.get("runner.minijail.path", ".") + "/root-oraclejdk,/opt/java",
+          "-b", Config.get("runner.minijail.path", ".") + "/root-openjdk,/usr/lib/jvm",
           "-b", "/sys/,/sys"
         ) ++
         List("--", "/usr/bin/java", "-Xmx" + memoryLimit, "Main")

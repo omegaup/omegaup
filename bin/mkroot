@@ -1,10 +1,12 @@
 #!/usr/bin/python
 
+import hashlib
 import os
 import os.path
 import shutil
 import sys
 import tarfile
+import urllib
 
 # Utilities to set up a chroot jail filesystem for minijail.
 # * Files are hardlinked instead of copied when possible.
@@ -52,7 +54,7 @@ class Chroot:
 						if abspath.startswith(self.mountpoint):
 							self.symlink(dirpath, target)
 						else:
-							self.copyfromhost(abspath, exclude)
+							shutil.copytree(abspath, self.__chroot_path(dirpath))
 		else:
 			os.link(os.path.realpath(path), self.__chroot_path(path))
 	
@@ -70,7 +72,11 @@ class Chroot:
 		f.write(contents)
 		f.close()
 	
-	def extract(self, archive, sha1, skipprefix, exclude=[]):
+	def extract(self, archive, sha1, skipprefix, url, exclude=[]):
+		if not os.path.exists(archive):
+			urllib.urlretrieve(url, archive)
+		with open(archive, 'rb') as f:
+			assert(sha1 == hashlib.sha1(f.read()).hexdigest())
 		with tarfile.open(archive) as tar:
 			for member in tar.getmembers():
 				path = os.path.normpath(member.name)
@@ -116,8 +122,8 @@ with Chroot('root', '/') as root:
 	root.copyfromhost('/lib64/ld-linux-x86-64.so.2')
 
 	root.write('/etc/passwd',
-			'root:x:0:0:root:/:/bin/false\n' + \
-	    'nobody:x:65534:65534:nobody:/nonexistent:/bin/false')
+		'root:x:0:0:root:/:/bin/false\n' + \
+		'nobody:x:65534:65534:nobody:/nonexistent:/bin/false')
 
 	# Other miscellaneous mountpoints
 	root.mkdir('/dev/')
@@ -129,13 +135,12 @@ with Chroot('root', '/') as root:
 	# Mountpoints for libraries
 	root.mkdir('/usr/lib/ruby/1.9.1/')
 	root.mkdir('/usr/lib/python2.7/')
-	root.mkdir('/opt/java/')
+	root.mkdir('/usr/lib/jvm/')
 	root.mkdir('/opt/nodejs/')
 
 	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
 	root.symlink('/usr/bin/node', '/opt/nodejs/bin/node')
-	root.symlink('/usr/bin/javac', '/opt/java/bin/javac')
-	root.symlink('/usr/bin/java', '/opt/java/bin/java')
+	root.symlink('/usr/bin/java', '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java')
 	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/1.9.1/ruby')
 	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
@@ -218,7 +223,7 @@ with Chroot('root-compilers', '/') as root:
 	# Mountpoints for libraries
 	root.mkdir('/usr/lib/ruby/1.9.1/')
 	root.mkdir('/usr/lib/python2.7/')
-	root.mkdir('/opt/java/')
+	root.mkdir('/usr/lib/jvm/')
 	root.mkdir('/opt/nodejs/')
 
 	# Miscellaneous mountpoints
@@ -230,8 +235,7 @@ with Chroot('root-compilers', '/') as root:
 
 	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
 	root.symlink('/usr/bin/node', '/opt/nodejs/bin/node')
-	root.symlink('/usr/bin/javac', '/opt/java/bin/javac')
-	root.symlink('/usr/bin/java', '/opt/java/bin/java')
+	root.symlink('/usr/bin/javac', '/usr/lib/jvm/java-7-openjdk-amd64/bin/javac')
 	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/1.9.1/ruby')
 	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
@@ -240,11 +244,11 @@ with Chroot('root-compilers', '/') as root:
 	root.install('/usr/bin/kcl', 'bin/kcl')
 	root.install('/lib/libminijailpreload.so', 'bin/libminijailpreload.so')
 
-with Chroot('root-oraclejdk', '/usr/lib/java/') as root:
-	root.extract('dist/jdk-7u45-linux-x64.tar.gz', '1c8cb229e2f7f0a3e5e798a3008c5a1f7c604934', 'jdk1.7.0_45/', exclude=['/usr/lib/java/src.jar', '/usr/lib/java/lib/missioncontrol', '/usr/lib/java/lib/visualvm'])
+with Chroot('root-openjdk', '/usr/lib/jvm/') as root:
+	root.copyfromhost('/usr/lib/jvm')
 
 with Chroot('root-nodejs', '/opt/nodejs/') as root:
-	root.extract('dist/node-v0.10.22-linux-x64.tar.gz', '739f75bbb85c920a237ceb1c34cb872409d61f7', 'node-v0.10.22-linux-x64')
+	root.extract('dist/node-v0.10.24-linux-x64.tar.gz', '423018f6a60b18d0dddf3007c325e0cc8cf55099', 'node-v0.10.24-linux-x64', 'http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-x64.tar.gz')
 
 with Chroot('root-python', '/usr/lib/python2.7/') as root:
 	root.copyfromhost('/usr/lib/python2.7', exclude=['/usr/lib/python2.7/dist-packages', '/usr/lib/python2.7/config-x86_64-linux-gnu'])

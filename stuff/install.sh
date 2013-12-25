@@ -18,6 +18,7 @@ UBUNTU=`uname -a | grep -i ubuntu | wc -l`
 WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
 SAUCY=`grep 'Ubuntu 13.10' /etc/issue | wc -l`
 HOSTNAME=localhost
+MINIJAIL_ROOT=/var/lib/minijail
 
 # Get parameters
 while getopts "h:u:m:p:01" optname; do
@@ -74,7 +75,7 @@ EOF
 	
 	sudo apt-get update -qq -y
 	
-	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openssh-client make zip
+	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openssh-client make zip libcap-dev ghc
 	sudo apt-get install -qq -y openjdk-7-jdk || sudo apt-get install -qq -y openjdk-6-jdk
 	
 	if [ ! -f /usr/sbin/mysqld ]; then
@@ -123,12 +124,20 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	sudo chown $USER -R $OMEGAUP_ROOT
 	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
 
+	# Update the submodules
+	cd $OMEGAUP_ROOT
+	git submodule upadte --init
+
 	# Generate the certificates required.
 	cd $OMEGAUP_ROOT
 	bin/gencerts.sh
 
 	# Build the sandbox
 	cd $OMEGAUP_ROOT/sandbox
+	make
+
+	# Build minijail
+	cd $OMEGAUP_ROOT/minijail
 	make
 
 	if [ "$SKIP_GRADER" != "1" ]; then 
@@ -144,6 +153,26 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 		cd $OMEGAUP_ROOT/grader
 		sbt proguard
 	fi
+fi
+
+# Set up the minijail.
+if [ ! -d $MINIJAIL_ROOT ]; then
+	sudo mkdir -p $MINIJAIL_ROOT/{bin,dist,scripts}
+	sudo cp $OMEGAUP_ROOT/bin/{karel,kcl} $MINIJAIL_ROOT/bin/
+	sudo cp $OMEGAUP_ROOT/minijail/{minijail0,libminijailpreload.so,ldwrapper} $MINIJAIL_ROOT/bin/
+	sudo cp $OMEGAUP_ROOT/stuff/minijail-scripts/* $MINIJAIL_ROOT/scripts/
+	cd $MINIJAIL_ROOT
+	sudo python $OMEGAUP_ROOT/bin/mkroot
+fi
+
+# Install the grader service.
+if [ ! -d /etc/init.d/omegaup ]; then
+	cp $OMEGAUP_ROOT/grader/target/scala-2.9.1/grader_2.9.1-1.0.min.jar $OMEGAUP_ROOT/bin/grader.jar
+	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
+	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/" $OMEGAUP_ROOT/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
+	sudo update-rc.d omegaup defaults
+	cp $OMEGAUP_ROOT/grader/omegaup.jks $OMEGAUP_ROOT/bin
+	sudo service omegaup start
 fi
 
 # Set up the www root.
