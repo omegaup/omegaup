@@ -60,8 +60,8 @@ if [ ! -f /usr/bin/vim ]; then
 fi
 
 # Ensure users have been added.
-useradd omegaup >/dev/null 2>&1 || echo
-useradd www-data >/dev/null 2>&1 || echo
+sudo useradd omegaup >/dev/null 2>&1 || echo
+sudo useradd www-data >/dev/null 2>&1 || echo
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
@@ -98,10 +98,12 @@ EOF
 		# Saucy has some bugs with the installation of these packages :(
 		if [ ! -f /etc/php5/fpm/conf.d/20-curl.ini ]; then
 			echo "extension=curl.so" > 20-curl.ini
+			sudo cp 20-curl.ini /etc/php5/cli/conf.d
 			sudo mv 20-curl.ini /etc/php5/fpm/conf.d
 		fi
 		if [ ! -f /etc/php5/fpm/conf.d/20-mcrypt.ini ]; then
 			echo "extension=mcrypt.so" > 20-mcrypt.ini
+			sudo cp 20-mcrypt.ini /etc/php5/cli/conf.d
 			sudo mv 20-mcrypt.ini /etc/php5/fpm/conf.d
 		fi
 		sudo service php5-fpm restart
@@ -116,7 +118,7 @@ if [ ! -f /usr/bin/sbt ]; then
 	sudo wget -q http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch//0.12.3/sbt-launch.jar -O /usr/bin/sbt-launch.jar
 	cat > sbt << EOF
 #!/bin/sh
-java -Xms512M -Xmx1536M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$0\`/sbt-launch.jar "\$@"
+java -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$0\`/sbt-launch.jar "\$@"
 EOF
 	sudo mv sbt /usr/bin/
 	sudo chmod +x /usr/bin/sbt
