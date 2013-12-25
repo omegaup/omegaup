@@ -126,7 +126,7 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 
 	# Update the submodules
 	cd $OMEGAUP_ROOT
-	git submodule upadte --init
+	git submodule update --init
 
 	# Generate the certificates required.
 	cd $OMEGAUP_ROOT
