@@ -22,7 +22,8 @@ class GraderSpec extends FlatSpec with ShouldMatchers {
 		tok.hasNext should equal (true)
 		tok.next.toString should equal ("-3.0.0")
 		tok.hasNext should equal (true)
-		tok.next.toString should equal ("1234567890123456789012345678901234567890.1234567890123456789012345678901234567890")
+		tok.next.toString should equal ("1234567890123456789012345678901234567890." +
+      "1234567890123456789012345678901234567890")
 		tok.hasNext should equal (false)
 
 		tok = new Tokenizer(new File("src/test/resources/token_test.txt"),
