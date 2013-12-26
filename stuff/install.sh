@@ -125,11 +125,10 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
 
 	# Update the submodules
-	cd $OMEGAUP_ROOT
+	pushd $OMEGAUP_ROOT
 	git submodule update --init
 
 	# Generate the certificates required.
-	cd $OMEGAUP_ROOT
 	bin/gencerts.sh
 
 	# Build the sandbox
@@ -153,6 +152,7 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 		cd $OMEGAUP_ROOT/grader
 		sbt proguard
 	fi
+	popd
 fi
 
 # Set up the minijail.
@@ -161,8 +161,10 @@ if [ ! -d $MINIJAIL_ROOT ]; then
 	sudo cp $OMEGAUP_ROOT/bin/{karel,kcl} $MINIJAIL_ROOT/bin/
 	sudo cp $OMEGAUP_ROOT/minijail/{minijail0,libminijailpreload.so,ldwrapper} $MINIJAIL_ROOT/bin/
 	sudo cp $OMEGAUP_ROOT/stuff/minijail-scripts/* $MINIJAIL_ROOT/scripts/
-	cd $MINIJAIL_ROOT
+
+	pushd $MINIJAIL_ROOT
 	sudo python $OMEGAUP_ROOT/bin/mkroot
+	popd
 fi
 
 # Install the grader service.
@@ -251,9 +253,9 @@ fi
 
 # Install config.php
 if [ ! -f $OMEGAUP_ROOT/frontend/server/config.php ]; then
-	cd $OMEGAUP_ROOT/frontend/server/
+	pushd $OMEGAUP_ROOT/frontend/server/
 	sed -e "s/\(.*OMEGAUP_DB_USER.*\)'.*'.*$/\1'root');/;s/\(.*OMEGAUP_DB_PASS.*\)'.*'.*/\1'$MYSQL_PASSWORD');/" config.php.sample > config.php
-	grep -v OMEGAUP_DB_ config.php > config.pre1
+	popd
 fi
 
 # Set up the log.
@@ -308,11 +310,10 @@ fi
 
 # Execute tests
 if [ "$SKIP_PHPUNIT" != "1" ]; then
-	OLDPATH=`pwd`
-	cd $OMEGAUP_ROOT/frontend/tests/
+	pushd $OMEGAUP_ROOT/frontend/tests/
 	phpunit controllers/
 	phpunit server/
-	cd $OLDPATH
+	popd
 fi
 
 echo SUCCESS
