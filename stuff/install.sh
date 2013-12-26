@@ -175,6 +175,7 @@ if [ ! -f /etc/init.d/omegaup ]; then
 	sudo update-rc.d omegaup defaults
 	cp ~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.12.jar $OMEGAUP_ROOT/bin
 	cp $OMEGAUP_ROOT/grader/omegaup.jks $OMEGAUP_ROOT/bin
+	sudo mkdir -p /var/log/omegaup
 	sudo touch /var/log/omegaup/service.log
 	sudo chown omegaup.omegaup /var/log/omegaup/service.log
 	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0" >> /etc/sudoers'
