@@ -20,7 +20,7 @@ NAME=omegaup
 LOGFILE=/var/log/omegaup/service.log
 DAEMON=/usr/bin/java
 DAEMON_ROOT=/opt/omegaup/bin
-DAEMON_ARGS="-Xmx1024 -cp $DAEMON_ROOT/mysql-connector-java-5.1.12.jar:$DAEMON_ROOT/grader.jar -Dactors.corePoolSize=10 -Dactors.maxPoolSize=10 omegaup.Service --config $DAEMON_ROOT/omegaup.conf --output $LOGFILE"
+DAEMON_ARGS="-cp $DAEMON_ROOT/mysql-connector-java-5.1.12.jar:$DAEMON_ROOT/grader.jar -Dactors.corePoolSize=10 -Dactors.maxPoolSize=10 omegaup.Service --config $DAEMON_ROOT/omegaup.conf --output $LOGFILE"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 USER=omegaup

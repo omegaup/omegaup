@@ -168,12 +168,20 @@ if [ ! -d $MINIJAIL_ROOT ]; then
 fi
 
 # Install the grader service.
-if [ ! -d /etc/init.d/omegaup ]; then
+if [ ! -f /etc/init.d/omegaup ]; then
 	cp $OMEGAUP_ROOT/grader/target/scala-2.9.1/grader_2.9.1-1.0.min.jar $OMEGAUP_ROOT/bin/grader.jar
 	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
 	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/" $OMEGAUP_ROOT/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
 	sudo update-rc.d omegaup defaults
+	cp ~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.12.jar $OMEGAUP_ROOT/bin
 	cp $OMEGAUP_ROOT/grader/omegaup.jks $OMEGAUP_ROOT/bin
+	sudo touch /var/log/omegaup/service.log
+	sudo chown omegaup.omegaup /var/log/omegaup/service.log
+	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0" >> /etc/sudoers'
+	if [ "`grep '\/lib\/security\/nss.cfg' /etc/java-7-openjdk/security/java.security`" != "" ]; then
+		sed -e 's/.*\/lib\/security\/nss.cfg/security.provider.9=sun.security.ec.SunEC/' /etc/java-7-openjdk/security/java.security > ~/.java.security
+		sudo mv ~/.java.security /etc/java-7-openjdk/security/java.security
+	fi
 	sudo service omegaup start
 fi
 
@@ -202,6 +210,7 @@ if [ "$SKIP_NGINX" != "1" ]; then
 server {
 listen       80;
 server_name  .$HOSTNAME;
+client_max_body_size 0;
 
 location / {
     root   $WWW_ROOT;
@@ -280,9 +289,18 @@ if [ ! `mysql -uroot -p$MYSQL_PASSWORD --batch --skip-column-names -e "SHOW DATA
 	echo "Installing DB"
 	mysql -uroot -p$MYSQL_PASSWORD -e "CREATE DATABASE $MYSQL_DB_NAME;" 
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME < $OMEGAUP_ROOT/frontend/private/bd.sql
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'INSERT INTO Users(username, name, password, verified) VALUES("omegaup", "omegaUp admin", "$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a", 1), ("user", "omegaUp user", "$2a$08$wxJh5voFPGuP8fUEthTSvutdb1OaWOa8ZCFQOuU/ZxcsOuHGw0Cqy", 1);'
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'INSERT INTO Emails (email, user_id) VALUES("admin@omegaup.com", 1), ("user@omegaup.com", 2);'
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'UPDATE Users SET main_email_id=user_id;'
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'INSERT INTO User_Roles VALUES(1, 1, 0);'
 	
 	echo "Installing States and Countries"
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME < $OMEGAUP_ROOT/frontend/private/countries_and_states.sql
+
+	echo "Installing test db"
+	mysql -uroot -p$MYSQL_PASSWORD -e "CREATE DATABASE \`$MYSQL_DB_NAME-test\`;" 
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME-test < $OMEGAUP_ROOT/frontend/private/bd.sql
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME-test < $OMEGAUP_ROOT/frontend/private/countries_and_states.sql
 fi
 
 #update config.php
