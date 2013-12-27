@@ -397,7 +397,9 @@ class Runner(sandbox: Sandbox) extends RunnerService with Log with Using {
     
     new InputOutputMessage()
   }
+}
 
+object Service extends Object with Log with Using {
   def main(args: Array[String]) = {
     // Parse command-line options.
     var configPath = "omegaup.conf"
