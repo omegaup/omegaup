@@ -362,7 +362,7 @@ object Minijail extends Object with Sandbox with Log with Using {
       "-2", errorFile,
       "-M", metaFile,
       "-t", (timeLimit * 1000).toInt.toString,
-      "-O", message.outputLimit.toString
+      "-O", "5500000"
     )
 
     originalInputFile match {
@@ -457,6 +457,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         case "11" => "SG" // SIGSEGV
         case "24" => "TO" // SIGXCPU
         case "30" => "TO" // SIGXCPU
+        case "31" => "FO" // SIGSYS
         case "25" => "OL" // SIGFSZ
         case "35" => "OL" // SIGFSZ
         case _ => "JE"
