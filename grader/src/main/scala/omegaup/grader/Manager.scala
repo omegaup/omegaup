@@ -38,11 +38,13 @@ object Manager extends Object with Log {
 	)
 
 	def recoverQueue() = {
-		info("Recovering previous queue")
-
 		implicit val conn = connection
 
-		GraderData.pendingRuns() map grade
+		val pendingRuns = GraderData.pendingRuns
+
+		info("Recovering previous queue: {} runs re-added", pendingRuns.size)
+		
+		pendingRuns map grade
 	}
 
 	def grade(run: Run): GradeOutputMessage = {
