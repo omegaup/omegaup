@@ -72,6 +72,15 @@ class GLogger
 		}
 		self::$logger->info($s);
 	}
+
+	public static function error($s)
+	{
+		if (self::$logger == NULL)
+		{
+			self::$logger = Logger::getLogger("myLogger");
+		}
+		self::$logger->error($s);
+	}
 }
 
 /**

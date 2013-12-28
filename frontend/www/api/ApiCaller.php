@@ -29,10 +29,10 @@ class ApiCaller{
 		try {
 			$response = $request->execute();
 		} catch (ApiException $e) {
-			Logger::error($e);
+			GLogger::error($e);
 			$response = $e->asResponseArray();
 		} catch (Exception $e){
-			Logger::error($e);
+			GLogger::error($e);
 			$apiException = new InternalServerErrorException($e);
 			$response = $apiException->asResponseArray();
 		}
@@ -50,18 +50,18 @@ class ApiCaller{
 			$r = self::init();
 			$response = self::call($r);
 		} catch (ApiException $apiException) {
-			Logger::error($apiException);
+			GLogger::error($apiException);
 			$response = $apiException->asResponseArray();
 
 		} catch (Exception $e){
-			Logger::error($e);
+			GLogger::error($e);
 			$apiException = new InternalServerErrorException($e);
 			$response = $apiException->asResponseArray();
 		}
 		
 		if (is_null($response) || !is_array($response)) {
 			$apiException = new InternalServerErrorException(new Exception("Api did not return an array."));
-			Logger::log($apiException);
+			GLogger::log($apiException);
 			$response = $apiException->asResponseArray();
 		}
 		
@@ -84,7 +84,7 @@ class ApiCaller{
 			$json_result = json_encode($response);
 
 			if ($json_result === false) {
-				Logger::error("json_encode failed for: ". implode(",", $response));
+				GLogger::error("json_encode failed for: ". implode(",", $response));
 				$apiException = new InternalServerErrorException();
 				$json_result = json_encode($apiException->asResponseArray());
 			}							
@@ -119,7 +119,7 @@ class ApiCaller{
 		$args = explode("/", $apiAsUrl);
 
 		if ($args === false || count($args) < 2) {
-			Logger::error("Api called with URI with less args than expected: ".count($args));
+			GLogger::error("Api called with URI with less args than expected: ".count($args));
 			throw new NotFoundException("Api requested not found.");
 		}
 
@@ -132,7 +132,7 @@ class ApiCaller{
 		$controllerName = $controllerName."Controller";
 
 		if(!class_exists($controllerName)) {
-			Logger::error("Controller name was not found: ". $controllerName);
+			GLogger::error("Controller name was not found: ". $controllerName);
 			throw new NotFoundException("Api requested not found.");
 		}
 
@@ -144,7 +144,7 @@ class ApiCaller{
 
 		// Check the method
 		if(!method_exists($controllerName, $methodName)) {
-			Logger::error("Method name was not found: ". $controllerName."::".$methodName);
+			GLogger::error("Method name was not found: ". $controllerName."::".$methodName);
 			throw new NotFoundException("Api requested not found.");
 		}
 
