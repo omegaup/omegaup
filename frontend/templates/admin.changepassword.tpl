@@ -2,6 +2,7 @@
 {assign var="htmlTitle" value="{#omegaupTitleAdminChangePassword#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
+{include file='admin.mainmenu.tpl'}
 {include file='status.tpl'}
 
 <div class="panel panel-primary">
@@ -11,7 +12,7 @@
 	<div class="panel-body">
 		<form class="form bottom-margin" id="change-password-form">	
 			<div class="form-group">
-				<label for="username">Username</label>
+				<label for="username">{#profileUsername#}</label>
 				<input id='username' name='username' value='' type='text' size='20' class="form-control" />
 			</div>
 			<input id='user' name='user' value='' type='hidden'>

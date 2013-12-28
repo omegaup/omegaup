@@ -24,16 +24,21 @@
 		$triedToLogin = true;
 	}
 
-	if (isset($_GET["state"])) {		
-		$c_Session->LoginViaFacebook();
+	if (isset($_GET["state"])) {
+		$success = $c_Session->LoginViaFacebook();
+		$triedToLogin = true;
+		if (!$success) {
+			$smarty->assign('ERROR_MESSAGE', "fb no nos dio permisos");
+			$smarty->display('../templates/login.tpl');
+			return;
+		}
+	}
+
+	if (isset($_GET["shva"])) {
 		$triedToLogin = true;
 	}
 
-	if (isset($_GET["shva"])) {		
-		$triedToLogin = true;
-	}
-
-	if ($c_Session->CurrentSessionAvailable()) {		
+	if ($c_Session->CurrentSessionAvailable()) {
 		if (isset($_GET['redirect'])) {
 			die(header('Location: ' . $_GET['redirect']));
 		} else {			
@@ -41,9 +46,9 @@
 		}
 	} else if ($triedToLogin) {
 		if (!$emailVerified) {
-			$smarty->assign('ERROR_TO_USER', 'EMAIL_NOT_VERIFIED');			
+			$smarty->assign('ERROR_TO_USER', 'EMAIL_NOT_VERIFIED');
 		} else {
-			$smarty->assign('ERROR_TO_USER', 'USER_OR_PASSWORD_WRONG');			
+			$smarty->assign('ERROR_TO_USER', 'USER_OR_PASSWORD_WRONG');
 		}
 		$smarty->assign('ERROR_MESSAGE', $response["error"]);
 	}
