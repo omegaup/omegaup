@@ -111,9 +111,6 @@ object Database extends Object with Log {
 				var pi = 0
 				val ans = new StringBuilder
 				
-				trace(query)
-				trace(params.toString)
-		
 				while( {qi = query.indexOf('?', pqi); qi != -1} ) {
 					ans.append(query.substring(pqi, qi))
 					
@@ -200,14 +197,19 @@ object Database extends Object with Log {
 	}
 
 	/** Executes the SQL and uses the process function to convert each row into a T. */
-	/*
-	def queryEach[T](sql: String)(process: ResultSet => T)(implicit connection: Connection): List[T] =
-		query(sql) { results =>
-			bmap(results.next) {
-				process(results)
+	def queryEach[T](sql: String, params: Any*)(process: ResultSet => T)(implicit connection: Connection): Iterable[T] = {
+		val q = build(sql, params : _*)
+		trace(q)
+		val ret = new scala.collection.mutable.ListBuffer[T]
+		using (connection.createStatement) { statement =>
+			using (statement.executeQuery(q)) { results =>
+				while (results.next) {
+					ret += process(results)
+				}
 			}
 		}
-	*/
+		ret
+	}
 }
 
 class XmlWalker(xml: String) {

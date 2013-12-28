@@ -36,33 +36,44 @@ object Manager extends Object with Log {
 		Config.get("db.user", "omegaup"),
 		Config.get("db.password", "")
 	)
+
+	def recoverQueue() = {
+		info("Recovering previous queue")
+
+		implicit val conn = connection
+
+		GraderData.pendingRuns() map grade
+	}
+
+	def grade(run: Run): GradeOutputMessage = {
+		info("Judging {}", run.id)
+
+		implicit val conn = connection
+
+		run.status = Status.Waiting
+		run.veredict = Veredict.JudgeError
+
+		GraderData.update(run)
+
+		val driver = if (run.problem.validator == Validator.Remote) {
+			throw new UnsupportedOperationException("Remote validators not supported anymore")
+		} else {
+			drivers.OmegaUp
+		}
+	
+		info("Using driver {}", driver)
+
+		driver ! drivers.Submission(run)
+		
+		new GradeOutputMessage()
+	}
 	
 	def grade(id: Long): GradeOutputMessage = {
-		info("Judging {}", id)
-		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
-	
 		implicit val conn = connection
 		
 		GraderData.run(id) match {
 			case None => throw new IllegalArgumentException("Id " + id + " not found")
-			case Some(run) => {
-				run.status = Status.Compiling
-				run.veredict = Veredict.JudgeError
-
-				GraderData.update(run)
-
-				val driver = if (run.problem.validator == Validator.Remote) {
-          throw new UnsupportedOperationException("Remote validators not supported anymore")
-				} else {
-					drivers.OmegaUp
-				}
-			
-				info("Using driver {}", driver)
-
-				driver ! drivers.Submission(run)
-				
-				new GradeOutputMessage()
-			}
+			case Some(run) => grade(run)
 		}
 	}
 	
@@ -271,6 +282,8 @@ object Manager extends Object with Log {
 		server.start()
 
 		info("Omegaup started")
+
+		Manager.recoverQueue
 		
 		server
 	}

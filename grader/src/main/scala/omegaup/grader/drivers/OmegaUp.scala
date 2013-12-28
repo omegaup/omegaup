@@ -108,6 +108,8 @@ object OmegaUp extends Actor with Log {
 		try {
 			info("OU Compiling {}", id)
 
+			run.status = Status.Compiling
+
 			val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)		
 			val output = service.compile(createCompileMessage(run, code))
 		
@@ -131,6 +133,8 @@ object OmegaUp extends Actor with Log {
 				)
 				val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")
 			
+				run.status = Status.Compiling
+
 				service.run(msg, zip) match {
 					case Some(x) => {
 						info("Received a message {}, trying to send input from {}", x, zip.getCanonicalPath)
@@ -156,7 +160,7 @@ object OmegaUp extends Actor with Log {
 
 				if (output.error.get.contains("ptrace(PTRACE_GETREGS")) {
 					error("Retrying")
-					Manager.grade(run.id)
+					Manager.grade(run)
 				} else {
 					val errorFile = new FileWriter(Config.get("grader.root", "grader") + "/" + id + ".err")
 					errorFile.write(output.error.get)
@@ -202,7 +206,7 @@ object OmegaUp extends Actor with Log {
 					case proxy: omegaup.runner.RunnerProxy => Manager.deregister(proxy.hostname, proxy.port)
 					case _ => {}
 				}
-				Manager.grade(run.id)
+				Manager.grade(run)
 			}
 		}
 	}
