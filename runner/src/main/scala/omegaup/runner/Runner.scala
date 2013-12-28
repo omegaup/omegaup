@@ -584,7 +584,8 @@ object Service extends Object with Log with Using {
         server.stop()
       }
     })
-    
+
+    // Send a heartbeat every 5 minutes to register
     new Thread() {
       override def run() = {
         while (true) {      

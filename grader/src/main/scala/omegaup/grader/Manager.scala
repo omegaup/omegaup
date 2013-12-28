@@ -26,7 +26,7 @@ class RunnerEndpoint(val host: String, val port: Int) {
 }
 
 object Manager extends Object with Log {
-	private val registeredEndpoints = scala.collection.mutable.HashSet.empty[RunnerEndpoint]
+	private val registeredEndpoints = scala.collection.mutable.HashMap.empty[RunnerEndpoint, Long]
 	private val runnerQueue = new java.util.concurrent.LinkedBlockingQueue[RunnerService]()
 
 	// Loading SQL connector driver
@@ -96,16 +96,28 @@ object Manager extends Object with Log {
 		runnerQueue.put(service)
 		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 	}
+
+	def pruneEndpointsLocked() = {
+		registeredEndpoints.keys foreach { endpoint => {
+			// Remove any endpoint that hasn't called back in more than 10 minutes.
+			if (registeredEndpoints(endpoint) < System.currentTimeMillis - 10 * 60 * 1000) {
+				info("Expiring {}:{}", endpoint.host, endpoint.port)
+				registeredEndpoints -= endpoint
+			}
+		}}
+	}
 	
 	def register(host: String, port: Int): RegisterOutputMessage = {
 		val endpoint = new RunnerEndpoint(host, port)
 	
 		synchronized (registeredEndpoints) {
+			pruneEndpointsLocked
 			if (!registeredEndpoints.contains(endpoint)) {
 				info("Registering {}:{}", endpoint.host, endpoint.port)
-				registeredEndpoints += endpoint
+				registeredEndpoints += endpoint -> 0
 				addRunner(new RunnerProxy(endpoint.host, endpoint.port))
 			}
+			registeredEndpoints(endpoint) = System.currentTimeMillis
 			endpoint
 		}
 
@@ -118,6 +130,7 @@ object Manager extends Object with Log {
 		val endpoint = new RunnerEndpoint(host, port)
 		
 		synchronized (registeredEndpoints) {
+			pruneEndpointsLocked
 			if (registeredEndpoints.contains(endpoint)) {
 				info("De-registering {}:{}", endpoint.host, endpoint.port)
 				registeredEndpoints -= endpoint
