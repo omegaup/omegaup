@@ -195,6 +195,11 @@ abstract class ProblemsDAOBase extends DAO
 			array_push( $val, $Problems->getMemoryLimit() );
 		}
 
+		if( $Problems->getOutputLimit() != NULL){
+			$sql .= " output_limit = ? AND";
+			array_push( $val, $Problems->getOutputLimit() );
+		}
+
 		if( $Problems->getVisits() != NULL){
 			$sql .= " visits = ? AND";
 			array_push( $val, $Problems->getVisits() );
@@ -268,7 +273,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function update( $Problems )
 	{
-		$sql = "UPDATE Problems SET  `public` = ?, author_id = ?, title = ?, alias = ?, validator = ?, server = ?, remote_id = ?, time_limit = ?, memory_limit = ?, visits = ?, submissions = ?, accepted = ?, difficulty = ?, creation_date = ?, source = ?, `order` = ? WHERE  problem_id = ?;";
+		$sql = "UPDATE Problems SET  `public` = ?, author_id = ?, title = ?, alias = ?, validator = ?, server = ?, remote_id = ?, time_limit = ?, memory_limit = ?, output_limit = ?, visits = ?, submissions = ?, accepted = ?, difficulty = ?, creation_date = ?, source = ?, `order` = ? WHERE  problem_id = ?;";
 		$params = array( 
 			$Problems->getPublic(), 
 			$Problems->getAuthorId(), 
@@ -279,6 +284,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getRemoteId(), 
 			$Problems->getTimeLimit(), 
 			$Problems->getMemoryLimit(), 
+			$Problems->getOutputLimit(), 
 			$Problems->getVisits(), 
 			$Problems->getSubmissions(), 
 			$Problems->getAccepted(), 
@@ -309,7 +315,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function create( &$Problems )
 	{
-		$sql = "INSERT INTO Problems ( problem_id, public, author_id, title, alias, validator, server, remote_id, time_limit, memory_limit, visits, submissions, accepted, difficulty, creation_date, source, `order` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Problems ( problem_id, public, author_id, title, alias, validator, server, remote_id, time_limit, memory_limit, output_limit, visits, submissions, accepted, difficulty, creation_date, source, `order` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Problems->getProblemId(), 
 			$Problems->getPublic(), 
@@ -321,6 +327,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getRemoteId(), 
 			$Problems->getTimeLimit(), 
 			$Problems->getMemoryLimit(), 
+			$Problems->getOutputLimit(), 
 			$Problems->getVisits(), 
 			$Problems->getSubmissions(), 
 			$Problems->getAccepted(), 
@@ -481,6 +488,17 @@ abstract class ProblemsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( $a || $b ){
 			$sql .= " memory_limit = ? AND"; 
+			$a = $a == NULL ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( (($a = $ProblemsA->getOutputLimit()) != NULL) & ( ($b = $ProblemsB->getOutputLimit()) != NULL) ){
+				$sql .= " output_limit >= ? AND output_limit <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( $a || $b ){
+			$sql .= " output_limit = ? AND"; 
 			$a = $a == NULL ? $b : $a;
 			array_push( $val, $a);
 			

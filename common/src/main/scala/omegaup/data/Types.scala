@@ -123,7 +123,7 @@ class Problem(
 	var remote_id: Option[String] = None,
 	var time_limit: Option[Long] = Some(3000),
 	var memory_limit: Option[Long] = Some(64),
-	var output_limit: Option[Long] = Some(10),
+	var output_limit: Option[Long] = Some(10240),
 	var visits: Long = 0,
 	var submissions: Long = 0,
 	var accepted: Long = 0,

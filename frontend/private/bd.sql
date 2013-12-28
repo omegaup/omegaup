@@ -293,6 +293,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `remote_id` varchar(10) DEFAULT NULL,
   `time_limit` int(11) DEFAULT '3000',
   `memory_limit` int(11) DEFAULT '64',
+  `output_limit` int(11) NOT NULL DEFAULT '10240',
   `visits` int(11) NOT NULL DEFAULT '0',
   `submissions` int(11) NOT NULL DEFAULT '0',
   `accepted` int(11) NOT NULL DEFAULT '0',
