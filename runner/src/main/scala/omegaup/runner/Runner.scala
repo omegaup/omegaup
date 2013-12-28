@@ -567,38 +567,49 @@ object Service extends Object with Log with Using {
     server.start()
     
     info("Registering port {}", runnerConnector.getLocalPort())
-    
+
+    // Send a heartbeat every 5 minutes to register
+    val registerThread = new Thread() {
+      override def run() = {
+        while (true) {
+          try {
+            Https.send[RegisterOutputMessage, RegisterInputMessage](
+              Config.get("grader.register.url", "https://localhost:21680/register/"),
+              new RegisterInputMessage(runnerConnector.getLocalPort())
+            )
+          } catch {
+            case e: IOException => {
+              error("Failed to register", e)
+            }
+          }
+
+          Thread.sleep(5 * 60 * 1000)
+        }
+      }
+    }
+
     Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() = {
         info("Shutting down")
         try {
           // well, at least try to de-register
           Https.send[RegisterOutputMessage, RegisterInputMessage](
-          Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
+            Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
             new RegisterInputMessage(runnerConnector.getLocalPort())
           )
         } catch {
-          case _ => {}
+          case _ => {
+            // Best effort is best effort.
+          }
         }
 
-        server.stop()
+        server.stop
+        registerThread.stop
       }
     })
+		
+    registerThread.start()
 
-    // Send a heartbeat every 5 minutes to register
-    new Thread() {
-      override def run() = {
-        while (true) {      
-          Https.send[RegisterOutputMessage, RegisterInputMessage](
-            Config.get("grader.register.url", "https://localhost:21680/register/"),
-            new RegisterInputMessage(runnerConnector.getLocalPort())
-          )
-          
-          Thread.sleep(5 * 60 * 1000)
-        }
-      }
-    }.start()
-  
     server.join()
   }
 }
