@@ -120,7 +120,8 @@ class SessionController extends Controller {
 			'is_email_verified' => $vo_CurrentUser->getVerified(),
 			'is_admin' => Authorization::IsSystemAdmin($vo_CurrentUser->getUserId()),
 			'private_contests_count' => ContestsDAO::getPrivateContestsCount($vo_CurrentUser),
-			'private_problems_count' => ProblemsDAO::getPrivateCount($vo_CurrentUser)
+			'private_problems_count' => ProblemsDAO::getPrivateCount($vo_CurrentUser),
+			'needs_basic_info' =>$vo_CurrentUser->getPassword() == NULL 
 		);
 	}
 
@@ -294,6 +295,8 @@ class SessionController extends Controller {
 		if (!is_null($results)) {
 			//user has been here before with facebook!
 			$vo_User = $results;
+			GLogger::log("user has been here before with facebook!");
+
 		} else {
 				// The user has never been here before, let's register him
 

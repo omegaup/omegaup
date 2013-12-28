@@ -477,6 +477,29 @@ OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_i
 	});
 };
 
+OmegaUp.prototype.updateBasicProfile = function(username, name, password, callback) {
+	var self = this;
+
+	$.post(
+		'/api/user/updatebasicinfo/',
+		{
+			username: username,
+			name: name,
+			password : password
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.updateMainEmail = function(email, callback) {
 	
 	var self = this;

@@ -1137,6 +1137,36 @@ class UserController extends Controller {
 			"status" => "ok"
 		);
 	}
+
+	/**
+	 * Update basic user profile info when logged with fb/gool
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws InvalidParameterException
+	 */
+	public static function apiUpdateBasicInfo(Request $r) {
+		self::authenticateRequest($r);
+
+		//Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
+		if ($r["username"] != $r["current_user"]->getUsername()) {
+			$testu = UsersDAO::FindByUsername($r["username"]);
+
+			if (!is_null($testu)) {
+				throw new InvalidParameterException("Este nombre de usuario ya esta tomado.");
+			}
+		}
+
+		SecurityTools::testStrongPassword($r["password"]);
+		$hashedPassword = SecurityTools::hashString($r["password"]);
+		$r["current_user"]->setPassword($hashedPassword);
+
+		$r["current_user"]->setUsername($r["username"]);
+		UsersDAO::save($r["current_user"]);
+
+		return array("status" => "ok");
+	}
 	
 	/**
 	 * Update user profile
@@ -1257,7 +1287,7 @@ class UserController extends Controller {
 		
 		// Expire profile cache
 		Cache::deleteFromCache(Cache::USER_PROFILE, $r["current_user"]->getUsername());		
-		
+
 		return array("status" => "ok");
 	}
 	
