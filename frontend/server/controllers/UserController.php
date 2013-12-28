@@ -89,7 +89,7 @@ class UserController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		Logger::log("User " . $user->getUsername() . " created, sending verification mail");
+		GLogger::log("User " . $user->getUsername() . " created, sending verification mail");
 
 		$r["user"] = $user;
 		self::sendVerificationEmail($r);
@@ -112,7 +112,7 @@ class UserController extends Controller {
 		
 		if (OMEGAUP_EMAIL_MAILCHIMP_ENABLE === true) {
 		
-			Logger::log("Adding user to Mailchimp.");
+			GLogger::log("Adding user to Mailchimp.");
 
 			$MailChimp = new MailChimp(OMEGAUP_EMAIL_MAILCHIMP_API_KEY);
 			$result = $MailChimp->call('lists/subscribe', array(
@@ -126,9 +126,9 @@ class UserController extends Controller {
 				));						
 			
 			if (array_key_exists("status", $result) && $result["status"] == "error") {
-				Logger::error("Mailchimp error result: " . implode(" | ", $result));
+				GLogger::error("Mailchimp error result: " . implode(" | ", $result));
 			} else {
-				Logger::log("Mailchimp success result: " . implode(" | ", $result));
+				GLogger::log("Mailchimp success result: " . implode(" | ", $result));
 			}				
 		}
 	}
@@ -200,7 +200,7 @@ class UserController extends Controller {
 				UsersDAO::save($vo_UserToTest);
 			} catch (Exception $e) {
 				// We did our best effort, log that user update failed
-				Logger::warn("Failed to update user password!!");
+				GLogger::warn("Failed to update user password!!");
 			}
 
 			return true;
@@ -225,7 +225,7 @@ class UserController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		Logger::log("Sending email to user.");
+		GLogger::log("Sending email to user.");
 		if (self::$sendEmailOnVerify) {
 			$mail = new PHPMailer();
 			$mail->IsSMTP();
@@ -244,7 +244,7 @@ class UserController extends Controller {
 			$mail->Body = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email: <a href="https://omegaup.com/api/user/verifyemail/id/' . $r["user"]->getVerificationId() . '"> https://omegaup.com/api/user/verifyemail/id/' . $r["user"]->getVerificationId() . '</a>';
 
 			if (!$mail->Send()) {
-				Logger::error("Failed to send mail: " . $mail->ErrorInfo);
+				GLogger::error("Failed to send mail: " . $mail->ErrorInfo);
 				throw new EmailVerificationSendException();
 			}
 		}
@@ -261,11 +261,11 @@ class UserController extends Controller {
 		if (OMEGAUP_FORCE_EMAIL_VERIFICATION) {
 			// Check if he has been verified				
 			if ($r["user"]->getVerified() == '0') {
-				Logger::log("User not verified.");
+				GLogger::log("User not verified.");
 
 				if ($r["user"]->getVerificationId() == null) {
 
-					Logger::log("User does not have verification id. Generating.");
+					GLogger::log("User does not have verification id. Generating.");
 
 					try {
 						$r["user"]->setVerificationId(self::randomString(50));
@@ -279,7 +279,7 @@ class UserController extends Controller {
 
 				throw new EmailNotVerifiedException();
 			} else {
-				Logger::log("User already verified.");
+				GLogger::log("User already verified.");
 			}
 		}
 	}
@@ -390,7 +390,7 @@ class UserController extends Controller {
 				throw new ForbiddenAccessException();
 			}
 
-			Logger::log("Admin verifiying user..." . $r["usernameOrEmail"]);
+			GLogger::log("Admin verifiying user..." . $r["usernameOrEmail"]);
 			
 			Validators::isStringNonEmpty($r["usernameOrEmail"], "usernameOrEmail");
 			
@@ -424,7 +424,7 @@ class UserController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		Logger::log("User verification complete.");
+		GLogger::log("User verification complete.");
 
 		if (self::$redirectOnVerify) {
 			die(header('Location: /login.php'));
@@ -481,7 +481,7 @@ class UserController extends Controller {
 		}
 
 		if (is_null($user)) {
-			Logger::log("Creating user: " . $username);
+			GLogger::log("Creating user: " . $username);
 			$createRequest = new Request(array(
 						"username" => $username,
 						"password" => $password,
@@ -634,7 +634,7 @@ class UserController extends Controller {
 				$contest = ContestsDAO::getByPK($contest_key->getContestId());
 
 				if (is_null($contest)) {
-					Logger::error("UserRoles has a invalid contest: {$contest->getContestId()}");
+					GLogger::error("UserRoles has a invalid contest: {$contest->getContestId()}");
 					continue;
 				}
 
@@ -747,7 +747,7 @@ class UserController extends Controller {
 			if (!is_null($user) && !is_null($user->getLanguageId())) {
 					$result = LanguagesDAO::getByPK( $user->getLanguageId() );
 					if (is_null($result)) {
-						Logger::warn("Invalid language id for user");
+						GLogger::warn("Invalid language id for user");
 					} else {
 						$result = $result->getName();
 						$found = true;
@@ -1389,11 +1389,11 @@ class UserController extends Controller {
 			
 			// Add verification_id if not there
 			if ($r["current_user"]->getVerified() == '0') {
-				Logger::log("User not verified.");
+				GLogger::log("User not verified.");
 
 				if ($r["current_user"]->getVerificationId() == null) {
 
-					Logger::log("User does not have verification id. Generating.");
+					GLogger::log("User does not have verification id. Generating.");
 
 					try {
 						$r["current_user"]->setVerificationId(self::randomString(50));

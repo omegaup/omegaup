@@ -40,7 +40,6 @@ define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
  * Load libraries
  *
  * */
-require_once("libs/logger/Logger.php");
 require_once("libs/dao/model.inc.php");
 require_once("libs/SessionManager.php");
 require_once("libs/Request.php");
@@ -55,6 +54,25 @@ require_once("libs/ProblemDeployer.php");
 require_once('libs/phpmailer/class.phpmailer.php');
 require_once('libs/UITools.php');
 require_once('libs/Mailchimp/Mailchimp.php');
+require_once('libs/ApiException.php' );
+
+require_once('libs/log4php/Logger.php' );
+
+Logger::configure( __DIR__ . '/log4php.xml');
+
+class GLogger
+{
+	static $logger;
+
+	public static function Log($s)
+	{
+		if (self::$logger == NULL)
+		{
+			self::$logger = Logger::getLogger("myLogger");
+		}
+		self::$logger->info($s);
+	}
+}
 
 /**
  * Load controllers
