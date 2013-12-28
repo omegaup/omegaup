@@ -43,8 +43,8 @@ object Manager extends Object with Log {
 		val pendingRuns = GraderData.pendingRuns
 
 		info("Recovering previous queue: {} runs re-added", pendingRuns.size)
-		
-		pendingRuns map grade
+	
+		pendingRuns foreach grade
 	}
 
 	def grade(run: Run): GradeOutputMessage = {
@@ -52,22 +52,20 @@ object Manager extends Object with Log {
 
 		implicit val conn = connection
 
-		run.status = Status.Waiting
-		run.veredict = Veredict.JudgeError
+		if (run.problem.validator == Validator.Remote) {
+			run.status = Status.Ready
+			run.veredict = Veredict.JudgeError
+			GraderData.update(run)
 
-		GraderData.update(run)
-
-		val driver = if (run.problem.validator == Validator.Remote) {
-			throw new UnsupportedOperationException("Remote validators not supported anymore")
+			new GradeOutputMessage(status = "error", error = Some("Remote validators not supported anymore"))
 		} else {
-			drivers.OmegaUp
-		}
-	
-		info("Using driver {}", driver)
+			run.status = Status.Waiting
+			run.veredict = Veredict.JudgeError
+			GraderData.update(run)
 
-		driver ! drivers.Submission(run)
-		
-		new GradeOutputMessage()
+			drivers.OmegaUp ! drivers.Submission(run)
+			new GradeOutputMessage()
+		}
 	}
 	
 	def grade(id: Long): GradeOutputMessage = {
