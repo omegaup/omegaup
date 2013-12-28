@@ -451,8 +451,10 @@ object Minijail extends Object with Sandbox with Log with Using {
     }
     if (meta.contains("signal")) {
       meta("status") = meta("signal") match {
-        case "6" => "SG"  // SIGABRT
-        case "8" => "SG"  // SIGFPE
+        case "4" => "FO"  // SIGILL
+        case "6" => "RE"  // SIGABRT
+        case "7" => "SG"  // SIGBUS
+        case "8" => "RE"  // SIGFPE
         case "9" => "FO"  // SIGKILL
         case "11" => "SG" // SIGSEGV
         case "14" => "TO" // SIGALRM
