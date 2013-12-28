@@ -52,6 +52,9 @@ class Problems extends VO
 			if( isset($data['memory_limit']) ){
 				$this->memory_limit = $data['memory_limit'];
 			}
+			if( isset($data['output_limit']) ){
+				$this->output_limit = $data['output_limit'];
+			}
 			if( isset($data['visits']) ){
 				$this->visits = $data['visits'];
 			}
@@ -96,6 +99,7 @@ class Problems extends VO
 			"remote_id" => $this->remote_id,
 			"time_limit" => $this->time_limit,
 			"memory_limit" => $this->memory_limit,
+			"output_limit" => $this->output_limit,
 			"visits" => $this->visits,
 			"submissions" => $this->submissions,
 			"accepted" => $this->accepted,
@@ -198,6 +202,15 @@ class Problems extends VO
 	  * @var int(11)
 	  */
 	protected $memory_limit;
+
+	/**
+	  * output_limit
+	  * 
+	  *  [Campo no documentado]<br>
+	  * @access protected
+	  * @var int(11)
+	  */
+	protected $output_limit = 10240;
 
 	/**
 	  * visits
@@ -504,6 +517,30 @@ class Problems extends VO
 	final public function setMemoryLimit( $memory_limit )
 	{
 		$this->memory_limit = $memory_limit;
+	}
+
+	/**
+	  * getOutputLimit
+	  * 
+	  * Get the <i>output_limit</i> property for this object. Donde <i>output_limit</i> es  [Campo no documentado]
+	  * @return int(11)
+	  */
+	final public function getOutputLimit()
+	{
+		return $this->output_limit;
+	}
+
+	/**
+	  * setOutputLimit( $output_limit )
+	  * 
+	  * Set the <i>output_limit</i> property for this object. Donde <i>output_limit</i> es  [Campo no documentado].
+	  * Una validacion basica se hara aqui para comprobar que <i>output_limit</i> es de tipo <i>int(11)</i>. 
+	  * Si esta validacion falla, se arrojara... algo. 
+	  * @param int(11)
+	  */
+	final public function setOutputLimit( $output_limit )
+	{
+		$this->output_limit = $output_limit;
 	}
 
 	/**

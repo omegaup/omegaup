@@ -162,7 +162,7 @@ class GraderController extends Controller {
 		if ($return_var !== 0) {
 			// D:
 			Logger::error("ec2-describe-instances --region us-west-1 --simple " . $return_var);
-			throw new InvalidFilesystemOperationException("Error executing ec2-describe-instances. Please check log for details");
+			return array("error"=>"error calling ec2-describe-instances");
 		}
 		
 		return self::parseEc2DescribeCmdOutput($ec2_describe_output);

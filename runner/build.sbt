@@ -36,7 +36,7 @@ proguardOptions ++= Seq(
 		"-keepclassmembers class omegaup.data.* { *; }",
 		"-keep class scala.collection.JavaConversions",
 		"-keep class org.eclipse.jetty.util.log.Slf4jLog",
-		keepMain("omegaup.runner.Runner"),
+		keepMain("omegaup.runner.Service"),
 		keepLimitedSerializability
 )
 

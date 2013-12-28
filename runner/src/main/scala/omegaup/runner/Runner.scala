@@ -11,7 +11,7 @@ import scala.collection.{mutable,immutable}
 import omegaup._
 import omegaup.data._
 
-object Runner extends RunnerService with Log with Using {
+class Runner(sandbox: Sandbox) extends RunnerService with Log with Using {
   def isInterpreted(lang: String) = lang == "py"
 
   def compile(runDirectory: File,
@@ -49,7 +49,7 @@ object Runner extends RunnerService with Log with Using {
 
       // Files need to be compiled individually.
       for (inputFile <- inputFiles) {
-        Sandbox.compile(
+        sandbox.compile(
           "p",
           List(inputFile),
           chdir = runDirectory.getCanonicalPath,
@@ -79,7 +79,7 @@ object Runner extends RunnerService with Log with Using {
       inputFiles += pascalMain
     }
  
-    Sandbox.compile(
+    sandbox.compile(
       lang,
       inputFiles,
       chdir = runDirectory.getCanonicalPath,
@@ -252,7 +252,7 @@ object Runner extends RunnerService with Log with Using {
                            "/" +
                            FileUtil.removeExtension(x.getName)
 
-            Sandbox.run(message,
+            sandbox.run(message,
                         lang,
                         chdir = binDirectory.getCanonicalPath,
                         metaFile = caseName + ".meta",
@@ -272,13 +272,13 @@ object Runner extends RunnerService with Log with Using {
             
               FileUtil.write(casePath + ".in", x.data)
          
-              Sandbox.run(message,
-                           lang,
-                           chdir = binDirectory.getCanonicalPath,
-                           metaFile = casePath + ".meta",
-                           inputFile = casePath + ".in",
-                           outputFile = casePath + ".out",
-                           errorFile = casePath + ".err"
+              sandbox.run(message,
+                          lang,
+                          chdir = binDirectory.getCanonicalPath,
+                          metaFile = casePath + ".meta",
+                          inputFile = casePath + ".in",
+                          outputFile = casePath + ".out",
+                          errorFile = casePath + ".err"
               )
             
               if (!Config.get("runner.preserve", false)) new File(casePath + ".in").delete
@@ -307,7 +307,7 @@ object Runner extends RunnerService with Log with Using {
                 reader => reader.readLine
               }
 
-            Sandbox.run(message,
+            sandbox.run(message,
                         validator_lang,
                         logTag = "Validator run",
                         extraParams = List(caseName, lang),
@@ -397,7 +397,9 @@ object Runner extends RunnerService with Log with Using {
     
     new InputOutputMessage()
   }
+}
 
+object Service extends Object with Log with Using {
   def main(args: Array[String]) = {
     // Parse command-line options.
     var configPath = "omegaup.conf"
@@ -428,6 +430,15 @@ object Runner extends RunnerService with Log with Using {
     // logger
     Logging.init
 
+    // Choose a sandbox instance
+    val sandbox = Config.get("runner.sandbox", "box") match {
+      case "box" => Box
+      case "minijail" => Minijail
+    }
+
+    // And build a runner instance
+    val runner = new Runner(sandbox)
+
     // the handler
     val handler = new AbstractHandler() {
       @throws(classOf[IOException])
@@ -444,7 +455,7 @@ object Runner extends RunnerService with Log with Using {
               val req = Serialization.read[RunInputMessage](request.getReader)
               
               val zipFile = new File(Config.get("compile.root", "."), req.token + "/output.zip")
-              Runner.run(req, zipFile) match {
+              runner.run(req, zipFile) match {
                 case Some(msg: RunOutputMessage) => {
                   response.setContentType("text/json")
                   response.setStatus(HttpServletResponse.SC_OK)
@@ -462,7 +473,7 @@ object Runner extends RunnerService with Log with Using {
                     }}
                   }}
               
-                  Runner.removeCompileDir(req.token)
+                  runner.removeCompileDir(req.token)
                 }
               }
             } catch {
@@ -483,7 +494,7 @@ object Runner extends RunnerService with Log with Using {
                 try {
                   val req = Serialization.read[CompileInputMessage](request.getReader())
                   response.setStatus(HttpServletResponse.SC_OK)
-                  Runner.compile(req)
+                  runner.compile(req)
                 } catch {
                   case e: Exception => {
                     error("/compile/", e)
@@ -512,7 +523,7 @@ object Runner extends RunnerService with Log with Using {
       
                     val ContentDispositionRegex(inputName) =
                       request.getHeader("Content-Disposition")
-                    Runner.input(inputName, request.getInputStream)
+                    runner.input(inputName, request.getInputStream)
                   }
                 } catch {
                   case e: Exception => {

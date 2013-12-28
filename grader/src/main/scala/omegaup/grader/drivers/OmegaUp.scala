@@ -123,7 +123,10 @@ object OmegaUp extends Actor with Log {
 						case Some(x) => x.toInt
 						case _ => 65535
 					},
-					outputLimit = Config.get("grader.memory_limit", 1024),
+					outputLimit = run.problem.output_limit match {
+						case Some(x) => x.toLong
+						case _ => 10240
+					},
 					input = Some(input)
 				)
 				val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")

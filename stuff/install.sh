@@ -18,6 +18,7 @@ UBUNTU=`uname -a | grep -i ubuntu | wc -l`
 WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
 SAUCY=`grep 'Ubuntu 13.10' /etc/issue | wc -l`
 HOSTNAME=localhost
+MINIJAIL_ROOT=/var/lib/minijail
 
 # Get parameters
 while getopts "h:u:m:p:01" optname; do
@@ -28,12 +29,6 @@ while getopts "h:u:m:p:01" optname; do
 		"p")
 			OMEGAUP_ROOT=$OPTARG
 			;;
-		"u")
-			GIT_USERNAME=$OPTARG
-			;;
-		"m")
-			GIT_EMAIL=$OPTARG
-			;;
 		"0")
 			SKIP_INSTALL=1
 			;;
@@ -43,12 +38,11 @@ while getopts "h:u:m:p:01" optname; do
 		"2")
 			SKIP_GRADER=1
 			;;
+		"h")
+			show_help
+			;;
 	esac
 done
-
-if [ "$GIT_USERNAME" = "" -o "$GIT_EMAIL" = "" ]; then
-	show_help
-fi
 
 # Install _crucial_ stuff first.
 if [ ! -f /usr/bin/curl ]; then
@@ -60,8 +54,8 @@ if [ ! -f /usr/bin/vim ]; then
 fi
 
 # Ensure users have been added.
-useradd omegaup >/dev/null 2>&1 || echo
-useradd www-data >/dev/null 2>&1 || echo
+sudo useradd omegaup >/dev/null 2>&1 || echo
+sudo useradd www-data >/dev/null 2>&1 || echo
 
 # Install everything needed.
 if [ "$SKIP_INSTALL" != "1" ]; then
@@ -81,7 +75,7 @@ EOF
 	
 	sudo apt-get update -qq -y
 	
-	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openssh-client make zip
+	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openssh-client make zip libcap-dev libgfortran3 ghc
 	sudo apt-get install -qq -y openjdk-7-jdk || sudo apt-get install -qq -y openjdk-6-jdk
 	
 	if [ ! -f /usr/sbin/mysqld ]; then
@@ -98,10 +92,12 @@ EOF
 		# Saucy has some bugs with the installation of these packages :(
 		if [ ! -f /etc/php5/fpm/conf.d/20-curl.ini ]; then
 			echo "extension=curl.so" > 20-curl.ini
+			sudo cp 20-curl.ini /etc/php5/cli/conf.d
 			sudo mv 20-curl.ini /etc/php5/fpm/conf.d
 		fi
 		if [ ! -f /etc/php5/fpm/conf.d/20-mcrypt.ini ]; then
 			echo "extension=mcrypt.so" > 20-mcrypt.ini
+			sudo cp 20-mcrypt.ini /etc/php5/cli/conf.d
 			sudo mv 20-mcrypt.ini /etc/php5/fpm/conf.d
 		fi
 		sudo service php5-fpm restart
@@ -116,31 +112,10 @@ if [ ! -f /usr/bin/sbt ]; then
 	sudo wget -q http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch//0.12.3/sbt-launch.jar -O /usr/bin/sbt-launch.jar
 	cat > sbt << EOF
 #!/bin/sh
-java -Xms512M -Xmx1536M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$0\`/sbt-launch.jar "\$@"
+java -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$0\`/sbt-launch.jar "\$@"
 EOF
 	sudo mv sbt /usr/bin/
 	sudo chmod +x /usr/bin/sbt
-fi
-
-# Set up ssh/git.
-if [ ! -f ~/.ssh/github.com ]; then
-	if [ ! -d ~/.ssh ]; then
-		mkdir ~/.ssh
-	fi
-	cat >> ~/.ssh/config << EOF
-Host github.com
-IdentityFile /home/$USER/.ssh/github.com
-User git
-EOF
-	git config --global user.name "$GIT_USERNAME"
-	git config --global user.email "$GIT_EMAIL"
-	git config --global credential.helper cache
-	git config --global credential.helper 'cache --timeout=3600'
-	ssh-keygen -t rsa -C "$GIT_EMAIL" -f ~/.ssh/github.com -N "" > /dev/null
-	echo -e "Go to https://github.com/settings/ssh, click on \"Add SSH Key\" and enter:\n"
-	cat ~/.ssh/github.com.pub
-	echo -e "\n"
-	read -p "Press Enter to continue" line
 fi
 
 # Clone repository.
@@ -149,12 +124,19 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	sudo chown $USER -R $OMEGAUP_ROOT
 	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
 
+	# Update the submodules
+	pushd $OMEGAUP_ROOT
+	git submodule update --init
+
 	# Generate the certificates required.
-	cd $OMEGAUP_ROOT
 	bin/gencerts.sh
 
 	# Build the sandbox
 	cd $OMEGAUP_ROOT/sandbox
+	make
+
+	# Build minijail
+	cd $OMEGAUP_ROOT/minijail
 	make
 
 	if [ "$SKIP_GRADER" != "1" ]; then 
@@ -170,6 +152,38 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 		cd $OMEGAUP_ROOT/grader
 		sbt proguard
 	fi
+	popd
+fi
+
+# Set up the minijail.
+if [ ! -d $MINIJAIL_ROOT ]; then
+	sudo mkdir -p $MINIJAIL_ROOT/{bin,dist,scripts}
+	sudo cp $OMEGAUP_ROOT/bin/{karel,kcl} $MINIJAIL_ROOT/bin/
+	sudo cp $OMEGAUP_ROOT/minijail/{minijail0,libminijailpreload.so,ldwrapper} $MINIJAIL_ROOT/bin/
+	sudo cp $OMEGAUP_ROOT/stuff/minijail-scripts/* $MINIJAIL_ROOT/scripts/
+
+	pushd $MINIJAIL_ROOT
+	sudo python $OMEGAUP_ROOT/bin/mkroot
+	popd
+fi
+
+# Install the grader service.
+if [ ! -f /etc/init.d/omegaup ]; then
+	cp $OMEGAUP_ROOT/grader/target/scala-2.9.1/grader_2.9.1-1.0.min.jar $OMEGAUP_ROOT/bin/grader.jar
+	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
+	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/" $OMEGAUP_ROOT/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
+	sudo update-rc.d omegaup defaults
+	cp ~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.12.jar $OMEGAUP_ROOT/bin
+	cp $OMEGAUP_ROOT/grader/omegaup.jks $OMEGAUP_ROOT/bin
+	sudo mkdir -p /var/log/omegaup
+	sudo touch /var/log/omegaup/service.log
+	sudo chown omegaup.omegaup /var/log/omegaup/service.log
+	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0" >> /etc/sudoers'
+	if [ "`grep '\/lib\/security\/nss.cfg' /etc/java-7-openjdk/security/java.security`" != "" ]; then
+		sed -e 's/.*\/lib\/security\/nss.cfg/security.provider.9=sun.security.ec.SunEC/' /etc/java-7-openjdk/security/java.security > ~/.java.security
+		sudo mv ~/.java.security /etc/java-7-openjdk/security/java.security
+	fi
+	sudo service omegaup start
 fi
 
 # Set up the www root.
@@ -197,6 +211,7 @@ if [ "$SKIP_NGINX" != "1" ]; then
 server {
 listen       80;
 server_name  .$HOSTNAME;
+client_max_body_size 0;
 
 location / {
     root   $WWW_ROOT;
@@ -248,9 +263,9 @@ fi
 
 # Install config.php
 if [ ! -f $OMEGAUP_ROOT/frontend/server/config.php ]; then
-	cd $OMEGAUP_ROOT/frontend/server/
+	pushd $OMEGAUP_ROOT/frontend/server/
 	sed -e "s/\(.*OMEGAUP_DB_USER.*\)'.*'.*$/\1'root');/;s/\(.*OMEGAUP_DB_PASS.*\)'.*'.*/\1'$MYSQL_PASSWORD');/" config.php.sample > config.php
-	grep -v OMEGAUP_DB_ config.php > config.pre1
+	popd
 fi
 
 # Set up the log.
@@ -275,9 +290,18 @@ if [ ! `mysql -uroot -p$MYSQL_PASSWORD --batch --skip-column-names -e "SHOW DATA
 	echo "Installing DB"
 	mysql -uroot -p$MYSQL_PASSWORD -e "CREATE DATABASE $MYSQL_DB_NAME;" 
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME < $OMEGAUP_ROOT/frontend/private/bd.sql
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'INSERT INTO Users(username, name, password, verified) VALUES("omegaup", "omegaUp admin", "$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a", 1), ("user", "omegaUp user", "$2a$08$wxJh5voFPGuP8fUEthTSvutdb1OaWOa8ZCFQOuU/ZxcsOuHGw0Cqy", 1);'
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'INSERT INTO Emails (email, user_id) VALUES("admin@omegaup.com", 1), ("user@omegaup.com", 2);'
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'UPDATE Users SET main_email_id=user_id;'
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'INSERT INTO User_Roles VALUES(1, 1, 0);'
 	
 	echo "Installing States and Countries"
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME < $OMEGAUP_ROOT/frontend/private/countries_and_states.sql
+
+	echo "Installing test db"
+	mysql -uroot -p$MYSQL_PASSWORD -e "CREATE DATABASE \`$MYSQL_DB_NAME-test\`;" 
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME-test < $OMEGAUP_ROOT/frontend/private/bd.sql
+	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME-test < $OMEGAUP_ROOT/frontend/private/countries_and_states.sql
 fi
 
 #update config.php
@@ -305,11 +329,10 @@ fi
 
 # Execute tests
 if [ "$SKIP_PHPUNIT" != "1" ]; then
-	OLDPATH=`pwd`
-	cd $OMEGAUP_ROOT/frontend/tests/
+	pushd $OMEGAUP_ROOT/frontend/tests/
 	phpunit controllers/
 	phpunit server/
-	cd $OLDPATH
+	popd
 fi
 
 echo SUCCESS

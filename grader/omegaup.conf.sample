@@ -1,0 +1,46 @@
+# Logging
+logging.file=/var/log/omegaup/service.log
+logging.level=info
+
+# Database settings
+db.driver=com.mysql.jdbc.Driver
+db.url=jdbc:mysql://localhost/omegaup?autoReconnect=true
+db.user=
+db.password=
+
+# Compiler settings
+c.compiler.path=/usr/bin/gcc
+cpp.compiler.path=/usr/bin/g++
+java.compiler.path=/usr/bin/javac
+java.runtime.path=/usr/bin/java
+
+# Paths
+compile.root=/var/lib/omegaup/compile
+grader.root=/var/lib/omegaup/grade
+input.root=/var/lib/omegaup/input
+problems.root=/var/lib/omegaup/problems
+submissions.root=/var/lib/omegaup/submissions
+runner.sandbox.path=/opt/omegaup/sandbox
+runner.minijail.path=/var/lib/minijail
+runner.sandbox=minijail
+
+# Grader
+grader.deregister.url=https://localhost:21680/deregister/
+grader.embedded_runner.enable=true
+grader.keystore.password=omegaup
+grader.keystore=/opt/omegaup/bin/omegaup.jks
+grader.memory_limit=2048
+grader.password=omegaup
+grader.port=21680
+grader.register.url=https://localhost:21680/register/
+grader.truststore.password=omegaup
+grader.truststore=/opt/omegaup/bin/omegaup.jks
+
+# Runner
+runner.keystore.password=omegaup
+runner.keystore=/opt/omegaup/bin/omegaup.jks
+runner.password=omegaup
+runner.port=0
+runner.preserve=false
+runner.truststore.password=omegaup
+runner.truststore=/opt/omegaup/bin/omegaup.jks

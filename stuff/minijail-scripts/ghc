@@ -1,0 +1,58 @@
+access: 1
+open: 1
+write: 1
+read: 1
+close: 1
+brk: 1
+set_robust_list: 1
+futex: 1
+getrlimit: 1
+shmctl: 1
+clock_gettime: 1
+mmap: 1
+lseek: 1
+munmap: 1
+timer_create: 1
+rt_sigaction: 1
+timer_settime: 1
+epoll_create: 1
+fcntl: arg1 == F_GETFD || arg1 == F_GETFL || arg1 == F_SETFD || arg1 == F_SETFL
+pipe: 1
+mprotect: 1
+clone: 1
+eventfd2: 1
+rt_sigreturn: 1
+epoll_ctl: 1
+epoll_wait: 1
+rt_sigprocmask: 1
+getrusage: 1
+getpid: 1
+# arg1 == SNDCTL_TMR_TIMEBASE or SNDRV_TIMER_IOCTL_NEXT_DEVICE or TCGETS
+ioctl: 1
+select: 1
+madvise: 1
+timer_delete: 1
+exit: 1
+sched_yield: 1
+fstat: 1
+lstat: 1
+readlink: 1
+stat: 1
+exit_group: 1
+writev: 1
+pause: 1
+umask: 1
+chmod: 1
+getcwd: 1
+
+mkdir: 1
+shmctl: 1
+unlink: 1
+vfork: 1
+dup2: 1
+ftruncate: 1
+rmdir: 1
+setrlimit: arg0 == RLIMIT_STACK; return EPERM
+execve: 1
+wait4: 1
+arch_prctl: arg0 == ARCH_SET_FS
