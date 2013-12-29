@@ -239,8 +239,6 @@ trait Grader extends Object with Log {
 			case None => {}
 			case Some(factor) => run.contest_score = run.score * factor
 		}
-		
-		Manager.updateVeredict(run)
 	}
 	
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double
@@ -412,8 +410,6 @@ object CustomGrader extends Grader {
 			case None => {}
 			case Some(factor) => run.contest_score = run.score * factor
 		}
-		
-		Manager.updateVeredict(run)
 	}
 	
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0
@@ -468,8 +464,6 @@ object LiteralGrader extends Grader {
 		}
 		
 		if (run.score == 1) run.veredict = Veredict.Accepted
-		
-		Manager.updateVeredict(run)
 	}
 	
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0

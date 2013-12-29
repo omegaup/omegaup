@@ -83,8 +83,25 @@ object Manager extends Object with Log {
 			case Some(run) => grade(run)
 		}
 	}
-	
-	def getRunner(): RunnerService = {
+
+	def leaseRunner[A](f: RunnerService => A): A = {
+		val runner = getRunner
+		try {
+			f(runner)
+		} catch {
+			case e: java.net.SocketException => {
+				runner match {
+					case proxy: omegaup.runner.RunnerProxy => Manager.deregister(proxy.hostname, proxy.port)
+					case _ => {}
+				}
+				throw e
+			}
+		} finally {
+			addRunner(runner)
+		}
+	}
+
+	private def getRunner(): RunnerService = {
 		var runner: RunnerService = null
 
 		while (runner == null) {
@@ -111,7 +128,7 @@ object Manager extends Object with Log {
 		runner
 	}
 	
-	def addRunner(service: RunnerService): Unit = {
+	private def addRunner(service: RunnerService): Unit = {
 		registeredEndpoints.synchronized {
 			service match {
 				case r: RunnerProxy => {

@@ -16,6 +16,8 @@ import Status._
 import Validator._
 
 object OmegaUp extends Actor with Log {
+	private class CompileException(val message: CompileOutputMessage) extends RuntimeException { }
+
 	@throws(classOf[FileNotFoundException])
 	def createCompileMessage(run: Run, code: String): CompileInputMessage = {
 		var validatorLang: Option[String] = None
@@ -98,24 +100,27 @@ object OmegaUp extends Actor with Log {
 	}
 
 	def grade(run: Run): Unit = {
-		// Blocks until a runner gets in the queue.
 		val id = run.id
 		val alias = run.problem.alias
 		val lang = run.language
-		var shouldRequeue = true
-		val service = Manager.getRunner
+		var shouldRequeue = false
 
 		try {
-			info("OU Compiling {}", id)
+			// Blocks until a runner gets in the queue.
+			Manager.leaseRunner { service: RunnerService => {
+				info("OU Compiling {} on {}", id, service.name)
 
-			run.status = Status.Compiling
-			run.judged_by = Some(service.name)
-			Manager.updateVeredict(run)
+				run.status = Status.Compiling
+				run.judged_by = Some(service.name)
+				Manager.updateVeredict(run)
 
-			val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)		
-			val output = service.compile(createCompileMessage(run, code))
-		
-			if(output.status == "ok") {
+				val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)		
+				val output = service.compile(createCompileMessage(run, code))
+			
+				if(output.status != "ok") {
+					throw new CompileException(output)
+				}
+
 				val input = FileUtil.read(Config.get("problems.root", "problems") + "/" + alias + "/inputname").trim
 				val msg = new RunInputMessage(
 					output.token.get,
@@ -133,11 +138,11 @@ object OmegaUp extends Actor with Log {
 					},
 					input = Some(input)
 				)
-				val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")
 			
 				run.status = Status.Running
 				Manager.updateVeredict(run)
 
+				val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")
 				service.run(msg, zip) match {
 					case Some(x) => {
 						info("Received a message {}, trying to send input from {}", x, zip.getCanonicalPath)
@@ -146,69 +151,56 @@ object OmegaUp extends Actor with Log {
 							service.input(input, new FileInputStream(inputZip), inputZip.length.toInt).status != "ok" ||
 							service.run(msg, zip) != None
 						) {
-							throw new RuntimeException("OU unable to run submission " + id + ". giving up.")
+							throw new RuntimeException("OU unable to run submission after sending input. giving up.")
 						}
 					}
 					case _ => {}
 				}
-			
-				run.problem.validator match {
-					case Validator.Custom => CustomGrader.grade(run)
-					case Validator.Token => TokenGrader.grade(run)
-					case Validator.TokenCaseless => TokenCaselessGrader.grade(run)
-					case Validator.TokenNumeric => TokenNumericGrader.grade(run)
-				}
-			} else {
-				error("OU Compile error {}", output.error.get)
-
-				if (output.error.get.contains("ptrace(PTRACE_GETREGS")) {
-					error("Retrying")
-					Manager.grade(run)
-				} else {
-					val errorFile = new FileWriter(Config.get("grader.root", "grader") + "/" + id + ".err")
-					errorFile.write(output.error.get)
-					errorFile.close
-			
-					run.status = Status.Ready
-					run.veredict = Veredict.CompileError
-					run.memory = 0
-					run.runtime = 0
-					run.score = 0
-					Manager.updateVeredict(run)
-				}
+			}}
+		
+			run.problem.validator match {
+				case Validator.Custom => CustomGrader.grade(run)
+				case Validator.Token => TokenGrader.grade(run)
+				case Validator.TokenCaseless => TokenCaselessGrader.grade(run)
+				case Validator.TokenNumeric => TokenNumericGrader.grade(run)
 			}
 		} catch {
-			case e: java.net.ConnectException => {
-				shouldRequeue = false
-				
-				error("OU Submission {} failed for problem {} - Runner unavailable", e, id, alias)
-				
+			case e: CompileException => {
+				error("OU Submission {} failed for problem {} - Compile error: {}", id, alias, e.message.error.get)
+
+				val errorFile = new FileWriter(Config.get("grader.root", "grader") + "/" + id + ".err")
+				errorFile.write(e.message.error.get)
+				errorFile.close
+		
 				run.status = Status.Ready
+				run.veredict = Veredict.CompileError
+				run.memory = 0
+				run.runtime = 0
+				run.score = 0
+			}
+			case e: java.net.SocketException => {
+				error("OU Submission {} failed for problem {} - Runner unavailable: {}", id, alias, e.getMessage)
+				
+				run.status = Status.Waiting
 				run.veredict = Veredict.JudgeError
 				run.memory = 0
 				run.runtime = 0
 				run.score = 0
-				Manager.updateVeredict(run)
+
+				shouldRequeue = true
 			}
 			case e: Any => {
-				error("OU Submission {} failed for problem {}", e, id, alias)
-				error("Stack trace: {}", e.getStackTrace) 
+				error("OU Submission {} failed for problem {}: {} {}", id, alias, e.getMessage, e.getStackTrace)
 			
 				run.status = Status.Ready
 				run.veredict = Veredict.JudgeError
 				run.memory = 0
 				run.runtime = 0
 				run.score = 0
-				Manager.updateVeredict(run)
 			}
 		} finally {
+			Manager.updateVeredict(run)
 			if (shouldRequeue) {
-				Manager.addRunner(service)
-			} else {
-				service match {
-					case proxy: omegaup.runner.RunnerProxy => Manager.deregister(proxy.hostname, proxy.port)
-					case _ => {}
-				}
 				Manager.grade(run)
 			}
 		}
