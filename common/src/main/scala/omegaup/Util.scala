@@ -61,23 +61,23 @@ trait Log {
 	private lazy val log = LoggerFactory.getLogger(getClass.getName.replace("$", "#").stripSuffix("#"))
 
 	def trace(message:String, values:Any*) = 
-		log.trace(message, values.map(_.asInstanceOf[Object]).toArray)
+		log.trace(message, values.map(_.asInstanceOf[Object]).toArray:_*)
 	def trace(message:String, error:Throwable) = log.trace(message, error)
 
 	def debug(message:String, values:Any*) =
-		log.debug(message, values.map(_.asInstanceOf[Object]).toArray)
+		log.debug(message, values.map(_.asInstanceOf[Object]).toArray:_*)
 	def debug(message:String, error:Throwable) = log.debug(message, error)
 
 	def info(message:String, values:Any*) =
-		log.info(message, values.map(_.asInstanceOf[Object]).toArray)
+		log.info(message, values.map(_.asInstanceOf[Object]).toArray:_*)
 	def info(message:String, error:Throwable) = log.info(message, error)
 
 	def warn(message:String, values:Any*) =
-		log.warn(message, values.map(_.asInstanceOf[Object]).toArray)
+		log.warn(message, values.map(_.asInstanceOf[Object]).toArray:_*)
 	def warn(message:String, error:Throwable) = log.warn(message, error)
 
 	def error(message:String, values:Any*) = 
-		log.error(message, values.map(_.asInstanceOf[Object]).toArray)
+		log.error(message, values.map(_.asInstanceOf[Object]).toArray:_*)
 	def error(message:String, error:Throwable) = log.error(message, error)
 }
 
