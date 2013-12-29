@@ -191,12 +191,12 @@ object Manager extends Object with Log {
 	}
 	
 	def updateVeredict(run: Run): Run = {
-		info("Veredict update: {} {} {} {} {} {} {}", run.id, run.status, run.veredict, run.score, run.contest_score, run.runtime, run.memory)
-		
 		implicit val conn = connection
 	
 		GraderData.update(run)
 		if (run.status == Status.Ready) {
+			info("Veredict update: {} {} {} {} {} {} {}",
+				run.id, run.status, run.veredict, run.score, run.contest_score, run.runtime, run.memory)
 			Broadcaster.update(run)
 			listeners foreach { listener => listener(run) }
 		}
