@@ -85,21 +85,47 @@ object Manager extends Object with Log {
 	}
 	
 	def getRunner(): RunnerService = {
-		var r: RunnerService = null
+		var runner: RunnerService = null
 
-		while (r == null) {
+		while (runner == null) {
 			info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
-			r = runnerQueue.take()
-			if (!Config.get("grader.embedded_runner.enable", false) && r.isInstanceOf[omegaup.runner.Runner]) {
-				// don't put this runner back in the queue.
-				r = null
+			runner = runnerQueue.take()
+			registeredEndpoints.synchronized {
+				runner match {
+					case r: omegaup.runner.Runner => {
+						if (!Config.get("grader.embedded_runner.enable", false)) {
+							// Embedded runner has been disabled. Try again.
+							runner = null
+						}
+					}
+					case r: RunnerProxy => {
+						if (!registeredEndpoints.contains(new RunnerEndpoint(r.host, r.port))) {
+							// This runner has been de-registered. Try again.
+							runner = null
+						}
+					}
+				}
 			}
 		}
 
-		r
+		runner
 	}
 	
-	def addRunner(service: RunnerService) = {
+	def addRunner(service: RunnerService): Unit = {
+		registeredEndpoints.synchronized {
+			service match {
+				case r: RunnerProxy => {
+					val endpoint = new RunnerEndpoint(r.host, r.port)
+					if (!registeredEndpoints.contains(endpoint)) {
+						// Don't add the service back into the queue
+						return
+					}
+					// Refresh the registration time.
+					registeredEndpoints(endpoint) = System.currentTimeMillis
+				}
+				case _ => {}
+			}
+		}
 		runnerQueue.put(service)
 		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
 	}
@@ -117,15 +143,13 @@ object Manager extends Object with Log {
 	def register(hostname: String, host: String, port: Int): RegisterOutputMessage = {
 		val endpoint = new RunnerEndpoint(host, port)
 	
-		synchronized (registeredEndpoints) {
+		registeredEndpoints.synchronized {
 			pruneEndpointsLocked
 			if (!registeredEndpoints.contains(endpoint)) {
 				info("Registering {}({}):{}", endpoint.host, hostname, endpoint.port)
 				registeredEndpoints += endpoint -> 0
 				addRunner(new RunnerProxy(hostname, endpoint.host, endpoint.port))
 			}
-			registeredEndpoints(endpoint) = System.currentTimeMillis
-			endpoint
 		}
 
 		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
@@ -136,13 +160,12 @@ object Manager extends Object with Log {
 	def deregister(host: String, port: Int): RegisterOutputMessage = {
 		val endpoint = new RunnerEndpoint(host, port)
 		
-		synchronized (registeredEndpoints) {
+		registeredEndpoints.synchronized {
 			pruneEndpointsLocked
 			if (registeredEndpoints.contains(endpoint)) {
 				info("De-registering {}:{}", endpoint.host, endpoint.port)
 				registeredEndpoints -= endpoint
 			}
-			endpoint
 		}
 
 		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)

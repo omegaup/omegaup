@@ -99,11 +99,11 @@ object OmegaUp extends Actor with Log {
 
 	def grade(run: Run): Unit = {
 		// Blocks until a runner gets in the queue.
-		val service = Manager.getRunner
 		val id = run.id
 		val alias = run.problem.alias
 		val lang = run.language
 		var shouldRequeue = true
+		val service = Manager.getRunner
 
 		try {
 			info("OU Compiling {}", id)
