@@ -250,6 +250,14 @@ object CustomGrader extends Grader {
 		val alias = run.problem.alias
 		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
 		val dataDirectory = new File(zip.getParentFile.getCanonicalPath + "/" + id)
+
+		// Cleanup previous invocations in case of re-judge.
+		FileUtil.deleteDirectory(dataDirectory)
+		val compileError = new File(zip.getParentFile, id + ".err")
+		if (compileError.exists) {
+			compileError.delete
+		}
+
 		dataDirectory.mkdirs()
 		
 		val input = new ZipInputStream(new FileInputStream(zip.getCanonicalPath))
