@@ -179,7 +179,7 @@ object OmegaUp extends Actor with Log {
 				run.score = 0
 			}
 			case e: java.net.SocketException => {
-				error("OU Submission {} failed for problem {} - Runner unavailable: {}", id, alias, e.getMessage)
+				error("OU Submission {} failed for problem {} - Runner unavailable: {}", id, alias, e.toString)
 				
 				run.status = Status.Waiting
 				run.veredict = Veredict.JudgeError
@@ -190,7 +190,7 @@ object OmegaUp extends Actor with Log {
 				shouldRequeue = true
 			}
 			case e: Any => {
-				error("OU Submission {} failed for problem {}: {} {}", id, alias, e.getMessage, e.getStackTrace)
+				error("OU Submission {} failed for problem {}: {} {}", id, alias, e.toString, e.getStackTrace)
 			
 				run.status = Status.Ready
 				run.veredict = Veredict.JudgeError
