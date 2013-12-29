@@ -104,11 +104,13 @@ object OmegaUp extends Actor with Log {
 		val alias = run.problem.alias
 		val lang = run.language
 		var shouldRequeue = true
-	
+
 		try {
 			info("OU Compiling {}", id)
 
 			run.status = Status.Compiling
+			run.judged_by = Some(service.name)
+			Manager.updateVeredict(run)
 
 			val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)		
 			val output = service.compile(createCompileMessage(run, code))
@@ -133,7 +135,8 @@ object OmegaUp extends Actor with Log {
 				)
 				val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")
 			
-				run.status = Status.Compiling
+				run.status = Status.Running
+				Manager.updateVeredict(run)
 
 				service.run(msg, zip) match {
 					case Some(x) => {

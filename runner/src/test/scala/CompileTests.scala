@@ -31,7 +31,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
   }
 
   "Compile error" should "be correctly handled" in {
-    val runner = new Runner(Minijail)
+    val runner = new Runner("test", Minijail)
 
     val test1 = runner.compile(CompileInputMessage("c", List(("Main.c", """
       foo
@@ -70,7 +70,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
   }
   
   "OK" should "be correctly handled" in {
-    val runner = new Runner(Minijail)
+    val runner = new Runner("test", Minijail)
 
     val zipRoot = new File("test-env")
 
@@ -233,7 +233,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
   }
 
   "Exploits" should "be handled" in {
-    val runner = new Runner(Minijail)
+    val runner = new Runner("test", Minijail)
 
     val zipRoot = new File("test-env")
 
@@ -277,7 +277,7 @@ class CompileSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
   }
 
   "Validator" should "work" in {
-    val runner = new Runner(Minijail)
+    val runner = new Runner("test", Minijail)
 
     val zipRoot = new File("test-env")
 

@@ -10,6 +10,70 @@ import Server._
 import Language._
 
 object GraderData {
+	def hydrateRun(rs: ResultSet) =
+		new Run(
+			id = rs.getLong("run_id"),
+			guid = rs.getString("guid"),
+			user = rs.getLong("user_id"),
+			language = Language.withName(rs.getString("language")),
+			status = Status.withName(rs.getString("status")),
+			veredict = Veredict.withName(rs.getString("veredict")),
+			time = new Timestamp(rs.getDate("time").getTime()),
+			submit_delay = rs.getInt("submit_delay"),
+			score = rs.getDouble("score"),
+			contest_score = rs.getDouble("contest_score"),
+			judged_by = rs.getString("judged_by") match {
+				case null => None
+				case x: String => Some(x)
+			},
+			problem = new Problem(
+				id = rs.getLong("problem_id"),
+				validator = Validator.withName(rs.getString("validator")),
+				alias = rs.getString("alias"),
+				server = rs.getString("server") match {
+					case null => None
+					case x: String => Some(Server.withName(x))
+				},
+				remote_id = rs.getString("remote_id") match {
+					case null => None
+					case x: String => Some(x)
+				},
+				time_limit = rs.getString("time_limit") match {
+					case null => None
+					case x: String => Some(x.toLong)
+				},
+				memory_limit = rs.getString("memory_limit") match {
+					case null => None
+					case x: String => Some(x.toLong)
+				},
+				output_limit = rs.getString("output_limit") match {
+					case null => None
+					case x: String => Some(x.toLong)
+				},
+				open_time = rs.getDate("open_time") match {
+					case null => None
+					case x: Date => Some(new Timestamp(x.getTime()))
+				},
+				points = rs.getString("points") match {
+					case null => None
+					case x: String => Some(x.toDouble)
+				}
+			),
+			contest = rs.getLong("contest_id") match {
+				case 0 => None
+				case x: Long => Some(new Contest(
+					id = rs.getLong("contest_id"),
+					start_time = new Timestamp(rs.getDate("start_time").getTime()),
+					finish_time = new Timestamp(rs.getDate("finish_time").getTime()),
+					points_decay_factor = rs.getDouble("points_decay_factor"),
+					partial_score = rs.getInt("partial_score") == 1,
+					feedback = Feedback.withName(rs.getString("feedback")),
+					penalty = rs.getInt("penalty"),
+					penalty_time_start = PenaltyTimeStart.withName(rs.getString("penalty_time_start"))
+				))
+			}
+		)
+
 	def run(id: Long)(implicit connection: Connection): Option[Run] =
 		query("""
 			SELECT
@@ -35,66 +99,7 @@ object GraderData {
 				r.run_id = ?;
 			""",
 			id
-		) { rs =>
-			new Run(
-				id = rs.getLong("run_id"),
-				guid = rs.getString("guid"),
-				user = rs.getLong("user_id"),
-				language = Language.withName(rs.getString("language")),
-				status = Status.withName(rs.getString("status")),
-				veredict = Veredict.withName(rs.getString("veredict")),
-				time = new Timestamp(rs.getDate("time").getTime()),
-				submit_delay = rs.getInt("submit_delay"),
-				score = rs.getDouble("score"),
-				contest_score = rs.getDouble("contest_score"),
-				problem = new Problem(
-					 id = rs.getLong("problem_id"),
-					 validator = Validator.withName(rs.getString("validator")),
-					 alias = rs.getString("alias"),
-					 server = rs.getString("server") match {
-					 	case null => None
-					 	case x: String => Some(Server.withName(x))
-					 },
-					 remote_id = rs.getString("remote_id") match {
-					 	case null => None
-					 	case x: String => Some(x)
-					 },
-					 time_limit = rs.getString("time_limit") match {
-					 	case null => None
-					 	case x: String => Some(x.toLong)
-					 },
-					 memory_limit = rs.getString("memory_limit") match {
-					 	case null => None
-					 	case x: String => Some(x.toLong)
-					 },
-					 output_limit = rs.getString("output_limit") match {
-					 	case null => None
-					 	case x: String => Some(x.toLong)
-					 },
-					 open_time = rs.getDate("open_time") match {
-					 	case null => None
-					 	case x: Date => Some(new Timestamp(x.getTime()))
-					 },
-					 points = rs.getString("points") match {
-					 	case null => None
-					 	case x: String => Some(x.toDouble)
-					 }
-				),
-				contest = rs.getLong("contest_id") match {
-					case 0 => None
-					case x: Long => Some(new Contest(
-						id = rs.getLong("contest_id"),
-						start_time = new Timestamp(rs.getDate("start_time").getTime()),
-						finish_time = new Timestamp(rs.getDate("finish_time").getTime()),
-						points_decay_factor = rs.getDouble("points_decay_factor"),
-						partial_score = rs.getInt("partial_score") == 1,
-						feedback = Feedback.withName(rs.getString("feedback")),
-						penalty = rs.getInt("penalty"),
-						penalty_time_start = PenaltyTimeStart.withName(rs.getString("penalty_time_start"))
-					))
-				}
-			)
-		}
+		) { hydrateRun }
 		
 	def pendingRuns()(implicit connection: Connection): Iterable[Run] =
 		queryEach("""
@@ -120,76 +125,18 @@ object GraderData {
 			WHERE
 				r.status != 'ready';
 			"""
-		) { rs =>
-			new Run(
-				id = rs.getLong("run_id"),
-				guid = rs.getString("guid"),
-				user = rs.getLong("user_id"),
-				language = Language.withName(rs.getString("language")),
-				status = Status.withName(rs.getString("status")),
-				veredict = Veredict.withName(rs.getString("veredict")),
-				time = new Timestamp(rs.getDate("time").getTime()),
-				submit_delay = rs.getInt("submit_delay"),
-				score = rs.getDouble("score"),
-				contest_score = rs.getDouble("contest_score"),
-				problem = new Problem(
-					 id = rs.getLong("problem_id"),
-					 validator = Validator.withName(rs.getString("validator")),
-					 alias = rs.getString("alias"),
-					 server = rs.getString("server") match {
-					 	case null => None
-					 	case x: String => Some(Server.withName(x))
-					 },
-					 remote_id = rs.getString("remote_id") match {
-					 	case null => None
-					 	case x: String => Some(x)
-					 },
-					 time_limit = rs.getString("time_limit") match {
-					 	case null => None
-					 	case x: String => Some(x.toLong)
-					 },
-					 memory_limit = rs.getString("memory_limit") match {
-					 	case null => None
-					 	case x: String => Some(x.toLong)
-					 },
-					 output_limit = rs.getString("output_limit") match {
-					 	case null => None
-					 	case x: String => Some(x.toLong)
-					 },
-					 open_time = rs.getDate("open_time") match {
-					 	case null => None
-					 	case x: Date => Some(new Timestamp(x.getTime()))
-					 },
-					 points = rs.getString("points") match {
-					 	case null => None
-					 	case x: String => Some(x.toDouble)
-					 }
-				),
-				contest = rs.getLong("contest_id") match {
-					case 0 => None
-					case x: Long => Some(new Contest(
-						id = rs.getLong("contest_id"),
-						start_time = new Timestamp(rs.getDate("start_time").getTime()),
-						finish_time = new Timestamp(rs.getDate("finish_time").getTime()),
-						points_decay_factor = rs.getDouble("points_decay_factor"),
-						partial_score = rs.getInt("partial_score") == 1,
-						feedback = Feedback.withName(rs.getString("feedback")),
-						penalty = rs.getInt("penalty"),
-						penalty_time_start = PenaltyTimeStart.withName(rs.getString("penalty_time_start"))
-					))
-				}
-			)
-		}
+		) { hydrateRun }
 		
 	def update(run: Run)(implicit connection: Connection): Run = {
 		execute(
-			"UPDATE Runs SET status = ?, veredict = ?, runtime = ?, memory = ?, score = ?, contest_score = ? WHERE run_id = ?;",
+			"UPDATE Runs SET status = ?, veredict = ?, runtime = ?, memory = ?, score = ?, contest_score = ?, judged_by = ? WHERE run_id = ?;",
 			run.status,
 			run.veredict,
 			run.runtime,
 			run.memory,
 			run.score,
 			run.contest_score,
+			run.judged_by,
 			run.id
 		)
 		run

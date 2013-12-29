@@ -15,15 +15,15 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		import java.util.zip._
 		
 		val root = new File("test-env")
-                if (root.exists()) {
-                  FileUtil.deleteDirectory(root)
-                }
+		if (root.exists()) {
+			FileUtil.deleteDirectory(root)
+		}
 		root.mkdir()
 		
 		// populate temp database for problems and contests
 		Config.set("db.driver", "org.h2.Driver")
 		//Config.set("db.url", "jdbc:h2:mem:")
-		Config.set("db.url", "jdbc:h2:file:" + root.getCanonicalPath + "/omegaup")
+		Config.set("db.url", "jdbc:h2:file:" + root.getCanonicalPath + "/omegaup;DB_CLOSE_ON_EXIT=FALSE")
 		Config.set("db.user", "sa")
 		Config.set("db.password", "")
 
@@ -80,8 +80,25 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 		val t = new Thread() { override def run(): Unit = { Manager.main(Array.ofDim[String](0)) } } 
 		t.start
 
-		val tests = new ListBuffer[() => Unit]
+		val tests = new ListBuffer[Run => Unit]
+		tests += null
 		implicit val conn = Manager.connection
+
+		val lock = new Object
+		var ready = false
+		var exception: Exception = null
+
+		Manager.addListener {
+			run => {
+				try {
+					tests(run.id.toInt)(run)
+				} catch {
+					case e: Exception => { exception = e }
+				}
+				ready = true
+				lock.synchronized { lock.notify }
+			}
+		}
 		
 		def omegaUpSubmitContest(id: Long, language: Language, code: String, user: Int, contest: Int, date: String)(test: (Run) => Unit) = {
 			import java.util.Date
@@ -108,9 +125,18 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 					case x: String => new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(x).getTime()
 				})
 			)).id
+
+			ready = false
+			tests += test
 			Manager.grade(submit_id)
 
-			tests += (() => test(GraderData.run(submit_id).get))
+			lock.synchronized {
+				while (!ready) {
+					lock.wait
+				}
+			}
+
+			if (exception != null) throw exception;
 		}
 
 		def omegaUpSubmit (problem_id: Long, language: Language, code: String)(test: (Run) => Unit) = {
@@ -523,9 +549,5 @@ class DriverSpec extends FlatSpec with ShouldMatchers with BeforeAndAfterAll {
 			run.score should equal (1)
 			run.contest_score should equal (0)
 		}}
-	
-		try { Thread.sleep(20000) }
-
-		tests.foreach { _() }
 	}
 }

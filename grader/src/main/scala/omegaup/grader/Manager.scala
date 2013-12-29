@@ -26,6 +26,7 @@ class RunnerEndpoint(val host: String, val port: Int) {
 }
 
 object Manager extends Object with Log {
+	private val listeners = scala.collection.mutable.ListBuffer.empty[Run => Unit]
 	private val registeredEndpoints = scala.collection.mutable.HashMap.empty[RunnerEndpoint, Long]
 	private val runnerQueue = new java.util.concurrent.LinkedBlockingQueue[RunnerService]()
 
@@ -36,6 +37,10 @@ object Manager extends Object with Log {
 		Config.get("db.user", "omegaup"),
 		Config.get("db.password", "")
 	)
+
+	def addListener(listener: Run => Unit) = listeners += listener
+
+	def removeListener(listener: Run => Unit) = listeners -= listener
 
 	def recoverQueue() = {
 		implicit val conn = connection
@@ -55,12 +60,14 @@ object Manager extends Object with Log {
 		if (run.problem.validator == Validator.Remote) {
 			run.status = Status.Ready
 			run.veredict = Veredict.JudgeError
+			run.judged_by = Some("Grader")
 			GraderData.update(run)
 
 			new GradeOutputMessage(status = "error", error = Some("Remote validators not supported anymore"))
 		} else {
 			run.status = Status.Waiting
 			run.veredict = Veredict.JudgeError
+			run.judged_by = None
 			GraderData.update(run)
 
 			drivers.OmegaUp ! drivers.Submission(run)
@@ -107,15 +114,15 @@ object Manager extends Object with Log {
 		}}
 	}
 	
-	def register(host: String, port: Int): RegisterOutputMessage = {
+	def register(hostname: String, host: String, port: Int): RegisterOutputMessage = {
 		val endpoint = new RunnerEndpoint(host, port)
 	
 		synchronized (registeredEndpoints) {
 			pruneEndpointsLocked
 			if (!registeredEndpoints.contains(endpoint)) {
-				info("Registering {}:{}", endpoint.host, endpoint.port)
+				info("Registering {}({}):{}", endpoint.host, hostname, endpoint.port)
 				registeredEndpoints += endpoint -> 0
-				addRunner(new RunnerProxy(endpoint.host, endpoint.port))
+				addRunner(new RunnerProxy(hostname, endpoint.host, endpoint.port))
 			}
 			registeredEndpoints(endpoint) = System.currentTimeMillis
 			endpoint
@@ -134,7 +141,6 @@ object Manager extends Object with Log {
 			if (registeredEndpoints.contains(endpoint)) {
 				info("De-registering {}:{}", endpoint.host, endpoint.port)
 				registeredEndpoints -= endpoint
-				runnerQueue.remove(new RunnerProxy(endpoint.host, endpoint.port))
 			}
 			endpoint
 		}
@@ -148,22 +154,29 @@ object Manager extends Object with Log {
 		info("Veredict update: {} {} {} {} {} {} {}", run.id, run.status, run.veredict, run.score, run.contest_score, run.runtime, run.memory)
 		
 		implicit val conn = connection
-		
-		Broadcaster.update(run)
+	
 		GraderData.update(run)
+		if (run.status == Status.Ready) {
+			Broadcaster.update(run)
+			listeners foreach { listener => listener(run) }
+		}
+
+		run
 	}
 	
 	def init(configPath: String) = {
 		import omegaup.data._
 
+		Manager.recoverQueue
+
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
-      // Choose a sandbox instance
-      val sandbox = Config.get("runner.sandbox", "box") match {
-        case "box" => Box
-        case "minijail" => Minijail
-      }
-			Manager.addRunner(new omegaup.runner.Runner(sandbox))
+			// Choose a sandbox instance
+			val sandbox = Config.get("runner.sandbox", "box") match {
+				case "box" => Box
+				case "minijail" => Minijail
+			}
+			Manager.addRunner(new omegaup.runner.Runner("embedded-runner", sandbox))
 		}
 
 		// the handler
@@ -193,12 +206,12 @@ object Manager extends Object with Log {
 							Logging.init()
 
 							if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
-                // Choose a sandbox instance
-                val sandbox = Config.get("runner.sandbox", "box") match {
-                  case "box" => Box
-                  case "minijail" => Minijail
-                }
-                Manager.addRunner(new omegaup.runner.Runner(sandbox))
+								// Choose a sandbox instance
+								val sandbox = Config.get("runner.sandbox", "box") match {
+									case "box" => Box
+									case "minijail" => Minijail
+								}
+								Manager.addRunner(new omegaup.runner.Runner("embedded-runner", sandbox))
 							}
 
 							response.setStatus(HttpServletResponse.SC_OK)
@@ -237,7 +250,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							Manager.register(request.getRemoteAddr, req.port)
+							Manager.register(req.hostname, request.getRemoteAddr, req.port)
 						} catch {
 							case e: Exception => {
 								error("Register failed: {}", e)
@@ -296,8 +309,6 @@ object Manager extends Object with Log {
 
 		info("Omegaup started")
 
-		Manager.recoverQueue
-		
 		server
 	}
 	

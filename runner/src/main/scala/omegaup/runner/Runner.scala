@@ -11,7 +11,9 @@ import scala.collection.{mutable,immutable}
 import omegaup._
 import omegaup.data._
 
-class Runner(sandbox: Sandbox) extends RunnerService with Log with Using {
+class Runner(hostname: String, sandbox: Sandbox) extends RunnerService with Log with Using {
+  def name() = hostname
+
   def isInterpreted(lang: String) = lang == "py"
 
   def compile(runDirectory: File,
@@ -427,6 +429,11 @@ object Service extends Object with Log with Using {
     System.setProperty("javax.net.ssl.trustStorePassword",
                        Config.get("runner.truststore.password", "omegaup"))
     
+    // Get local hostname
+    val hostname = pusing(Runtime.getRuntime.exec("/bin/hostname")) {
+      p => new BufferedReader(new InputStreamReader(p.getInputStream)).readLine
+    }
+    
     // logger
     Logging.init
 
@@ -437,7 +444,7 @@ object Service extends Object with Log with Using {
     }
 
     // And build a runner instance
-    val runner = new Runner(sandbox)
+    val runner = new Runner(hostname, sandbox)
 
     // the handler
     val handler = new AbstractHandler() {
@@ -566,7 +573,7 @@ object Service extends Object with Log with Using {
     server.setHandler(handler)
     server.start()
     
-    info("Registering port {}", runnerConnector.getLocalPort())
+    info("Runner {} registering port {}", hostname, runnerConnector.getLocalPort())
 
     // Send a heartbeat every 5 minutes to register
     val registerThread = new Thread() {
@@ -575,7 +582,7 @@ object Service extends Object with Log with Using {
           try {
             Https.send[RegisterOutputMessage, RegisterInputMessage](
               Config.get("grader.register.url", "https://localhost:21680/register/"),
-              new RegisterInputMessage(runnerConnector.getLocalPort())
+              new RegisterInputMessage(hostname, runnerConnector.getLocalPort())
             )
           } catch {
             case e: IOException => {
@@ -595,7 +602,7 @@ object Service extends Object with Log with Using {
           // well, at least try to de-register
           Https.send[RegisterOutputMessage, RegisterInputMessage](
             Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
-            new RegisterInputMessage(runnerConnector.getLocalPort())
+            new RegisterInputMessage(hostname, runnerConnector.getLocalPort())
           )
         } catch {
           case _ => {

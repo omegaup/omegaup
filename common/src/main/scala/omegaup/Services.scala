@@ -7,6 +7,7 @@ abstract class RunnerService {
 	def compile(message: CompileInputMessage): CompileOutputMessage
 	def run(message: RunInputMessage, zipFile: File) : Option[RunOutputMessage]
 	def input(inputName: String, inputStream: InputStream, size: Int = -1): InputOutputMessage
+	def name(): String
 }
 
 abstract class GraderService {

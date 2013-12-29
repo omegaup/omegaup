@@ -152,6 +152,7 @@ class Run(
 	var contest_score: Double = 0,
 	var ip: String = "127.0.0.1",
 	var time: Timestamp = new Timestamp(0),
-	var submit_delay: Int = 0
+	var submit_delay: Int = 0,
+	var judged_by: Option[String] = None
 ) {
 }
