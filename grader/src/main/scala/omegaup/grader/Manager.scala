@@ -190,8 +190,6 @@ object Manager extends Object with Log {
 	def init(configPath: String) = {
 		import omegaup.data._
 
-		Manager.recoverQueue
-
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
 			// Choose a sandbox instance
@@ -331,6 +329,8 @@ object Manager extends Object with Log {
 		server.start()
 
 		info("Omegaup started")
+
+		Manager.recoverQueue
 
 		server
 	}
