@@ -136,6 +136,7 @@ with Chroot('root', '/') as root:
 	root.mkdir('/usr/lib/ruby/1.9.1/')
 	root.mkdir('/usr/lib/python2.7/')
 	root.mkdir('/usr/lib/jvm/')
+	root.mkdir('/usr/lib/ghc/')
 	root.mkdir('/opt/nodejs/')
 
 	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
@@ -224,6 +225,7 @@ with Chroot('root-compilers', '/') as root:
 	root.mkdir('/usr/lib/ruby/1.9.1/')
 	root.mkdir('/usr/lib/python2.7/')
 	root.mkdir('/usr/lib/jvm/')
+	root.mkdir('/usr/lib/ghc/')
 	root.mkdir('/opt/nodejs/')
 
 	# Miscellaneous mountpoints

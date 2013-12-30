@@ -315,7 +315,13 @@ object Minijail extends Object with Sandbox with Log with Using {
         List("/usr/bin/sudo", minijail, "-S", scripts + "/ghc") ++
         commonParams ++
         List("-b", Config.get("runner.minijail.path", ".") + "/root-hs,/usr/lib/ghc") ++
-        List("--", Config.get("ghc.compiler.path", "/usr/bin/ghc"), "-O2", "-o", "Main") ++
+        List(
+          "--",
+          Config.get("ghc.compiler.path", "/usr/lib/ghc/lib/ghc"), "-B/usr/lib/ghc",
+          "-O2",
+          "-o",
+          "Main"
+        ) ++
         chrootedInputFiles
       case _ => null
     }
@@ -325,7 +331,7 @@ object Minijail extends Object with Sandbox with Log with Using {
     pusing (runtime.exec(params.toArray)) { process => {
       if (process != null) {
         val status = process.waitFor
-        patchMetaFile(metaFile)
+        patchMetaFile(lang, None, metaFile)
         callback(status)
       } else {
         callback(-1)
@@ -375,7 +381,8 @@ object Minijail extends Object with Sandbox with Log with Using {
       case None => {}
     }
 
-    val memoryLimit = message.memoryLimit * 1024
+    // 16MB + memory limit to prevent some RTE
+    val memoryLimit = (16 * 1024 + message.memoryLimit) * 1024
 
     val params = (lang match {
       case "java" =>
@@ -437,18 +444,20 @@ object Minijail extends Object with Sandbox with Log with Using {
     debug("{} {}", logTag, params.mkString(" "))
     pusing (runtime.exec(params.toArray)) { process =>
       if (process != null) process.waitFor
-      patchMetaFile(metaFile)
+      patchMetaFile(lang, Some(message), metaFile)
     }
   }
 
-  def patchMetaFile(metaFile: String) = {
+  def patchMetaFile(lang: String, message: Option[RunInputMessage], metaFile: String) = {
     val meta = try {
       collection.mutable.Map(MetaFile.load(metaFile).toSeq: _*)
     } catch {
       case e: java.io.FileNotFoundException => collection.mutable.Map("time" -> "0",
                                                                       "time-wall" -> "0",
+                                                                      "mem" -> "0",
                                                                       "signal" -> "-1")
     }
+
     if (meta.contains("signal")) {
       meta("status") = meta("signal") match {
         case "4" => "FO"  // SIGILL
@@ -473,8 +482,22 @@ object Minijail extends Object with Sandbox with Log with Using {
         meta("status") = "RE"
       }
     }
-    meta("time") = (meta("time").toInt / 1e6).toString
-    meta("time-wall") = (meta("time-wall").toInt / 1e6).toString
+
+    message match {
+      case Some(m) => {
+        if (lang == "java") {
+          // TODO: ML detection for Java
+        } else if (meta("status") != "JE" &&
+                   meta("mem").toLong > m.memoryLimit * 1024) {
+          meta("status") = "ML"
+          meta("mem") = (m.memoryLimit * 1024).toString
+        }
+      }
+      case _ => {}
+    }
+
+    meta("time") = "%.3f" format (meta("time").toInt / 1e6)
+    meta("time-wall") = "%.3f" format (meta("time-wall").toInt / 1e6)
     MetaFile.save(metaFile, meta)
   }
 }
