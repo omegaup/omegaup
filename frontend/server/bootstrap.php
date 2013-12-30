@@ -56,7 +56,8 @@ require_once('libs/UITools.php');
 require_once('libs/Mailchimp/Mailchimp.php');
 require_once('libs/ApiException.php' );
 
-require_once('libs/log4php/Logger.php' );
+require_once('libs/log4php/src/main/php/Logger.php');
+
 
 Logger::configure( __DIR__ . '/log4php.xml');
 
