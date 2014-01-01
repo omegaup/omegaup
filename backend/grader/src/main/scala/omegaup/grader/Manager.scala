@@ -135,13 +135,18 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 				future.get(Config.get("grader.runner.timeout", 10 * 60) * 1000, TimeUnit.MILLISECONDS)
 			} catch {
 				case e: ExecutionException => {
-					error("Submission {} {} failed - {} {}", r.problem.alias, r.id, e.toString, e.getStackTrace)
+					error("Submission {} {} failed - {} {}",
+						r.problem.alias,
+						r.id,
+						e.getCause.toString,
+						e.getCause.getStackTrace
+					)
 
 					e.getCause match {
 						case inner: java.net.SocketException => {
 							// Probably a network error of some sort. No use in re-queueing the runner.
 							runner match {
-								case proxy: omegaup.runner.RunnerProxy => dispatcher.deregister(proxy.hostname, proxy.port)
+								case proxy: omegaup.runner.RunnerProxy => dispatcher.deregister(proxy.host, proxy.port)
 								case _ => {}
 							}
 
@@ -166,7 +171,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 
 					// Probably a network error of some sort. No use in re-queueing the runner.
 					runner match {
-						case proxy: omegaup.runner.RunnerProxy => dispatcher.deregister(proxy.hostname, proxy.port)
+						case proxy: omegaup.runner.RunnerProxy => dispatcher.deregister(proxy.host, proxy.port)
 						case _ => {}
 					}
 
@@ -216,7 +221,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 		runnerQueue.dropWhile (
 			_ match {
 				case proxy: omegaup.runner.RunnerProxy => {
-					val endpoint = new RunnerEndpoint(proxy.hostname, proxy.port)
+					val endpoint = new RunnerEndpoint(proxy.host, proxy.port)
 					!registeredEndpoints.contains(endpoint) || registeredEndpoints(endpoint) <
 					System.currentTimeMillis - Config.get("grader.runner.queue_timeout", 10 * 60 * 1000)
 				}
