@@ -160,6 +160,7 @@ object Database extends Object with Log with Using {
 				}
 			}
 		} catch {
+
 			case e: Exception => {
 				susing (connection.createStatement) { statement =>
 					rusing (statement.executeQuery(q)) { results =>

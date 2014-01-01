@@ -1,6 +1,16 @@
 parallelExecution in Global := false
 
-lazy val root = project.in(file(".")).aggregate(runner, grader)
+name := "omegaUp"
+
+version := "1.1"
+
+organization := "omegaup"
+
+scalaVersion := "2.10.3"
+
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+
+lazy val backend = project.in(file(".")).aggregate(runner, grader)
 
 lazy val common = project
 

@@ -8,6 +8,11 @@ scalaVersion := "2.10.3"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
+exportJars := true
+
+packageOptions in (Compile, packageBin) +=
+    Package.ManifestAttributes( java.util.jar.Attributes.Name.MAIN_CLASS -> "omegaup.runner.Service" )
+
 libraryDependencies ++= Seq(
   "org.eclipse.jetty" % "jetty-server" % "8.1.9.v20130131",
   "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" artifacts(Artifact("javax.servlet", "jar", "jar")),
@@ -47,6 +52,7 @@ ProguardKeys.options in Proguard ++= Seq(
 
 ProguardKeys.inputFilter in Proguard := { file =>
   file.name match {
+    case "runner_2.10-1.1.jar" => None
     case _ => Some("!**/ECLIPSEF.RSA,!**/ECLIPSEF.SF,!about.html,!META-INF/MANIFEST.MF,!rootdoc.txt")
   }
 }
