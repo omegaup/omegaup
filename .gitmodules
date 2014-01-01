@@ -10,6 +10,3 @@
 [submodule "sandbox"]
 	path = sandbox
 	url = https://github.com/omegaup/box.git
-[submodule "frontend/server/libs/log4php"]
-	path = frontend/server/libs/log4php
-	url = git://git.apache.org/logging-log4php.git

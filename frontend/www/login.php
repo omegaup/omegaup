@@ -14,8 +14,8 @@
 		$r["password"] = $_POST["pass"];
 		$r->method = "UserController::apiLogin";
 		$response = ApiCaller::call($r);
-
-		if ($response["status"] === "error") {
+				
+		if ($response["status"] === "error") {						
 			if ($response["errorcode"] === 600 || $response["errorcode"] === 601) {
 				$emailVerified = false;
 			} 
@@ -27,6 +27,11 @@
 	if (isset($_GET["state"])) {
 		$success = $c_Session->LoginViaFacebook();
 		$triedToLogin = true;
+		if (!$success) {
+			$smarty->assign('ERROR_MESSAGE', "fb no nos dio permisos");
+			$smarty->display('../templates/login.tpl');
+			return;
+		}
 	}
 
 	if (isset($_GET["shva"])) {
@@ -36,7 +41,7 @@
 	if ($c_Session->CurrentSessionAvailable()) {
 		if (isset($_GET['redirect'])) {
 			die(header('Location: ' . $_GET['redirect']));
-		} else {
+		} else {			
 			die(header('Location: /profile.php'));
 		}
 	} else if ($triedToLogin) {

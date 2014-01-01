@@ -34,10 +34,10 @@ class Cache
         $this->enabled = (defined('APC_USER_CACHE_ENABLED') && APC_USER_CACHE_ENABLED === true);
         
         if($this->enabled){
-            GLogger::log("Cache enabled for " . $this->key);
+            Logger::log("Cache enabled for " . $this->key);
         }
         else{
-            GLogger::log("Cache DISABLED for " . $this->key);
+            Logger::log("Cache DISABLED for " . $this->key);
         }       
         
     }
@@ -58,7 +58,7 @@ class Cache
                 return true;
             }
             else{
-                GLogger::log("apc_store failed for key: " . $this->key);
+                Logger::log("apc_store failed for key: " . $this->key);
                 return false;
             }
         }
@@ -81,7 +81,7 @@ class Cache
                 return true;                
             }
             else{
-                GLogger::log("Failed to invalidate cache for key: " . $this->key);
+                Logger::log("Failed to invalidate cache for key: " . $this->key);
                 return false;
             }
         }
@@ -103,7 +103,7 @@ class Cache
                 return $result;
             }
             else{
-                GLogger::log("Cache miss for key: " . $this->key);
+                Logger::log("Cache miss for key: " . $this->key);
             }
                 
         }

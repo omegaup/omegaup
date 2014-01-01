@@ -372,7 +372,7 @@ class Scoreboard {
 	 */
 	public static function InvalidateScoreboardCache($contest_id) {
 		
-		GLogger::log("Invalidating scoreboard cache.");
+		Logger::log("Invalidating scoreboard cache.");
 		
 		// Invalidar cache del contestant
 		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);		
