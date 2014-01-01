@@ -163,10 +163,10 @@ fi
 if [ ! -f /etc/init.d/omegaup ]; then
 	cp $OMEGAUP_ROOT/backend/grader/target/scala-2.10/proguard/grader_2.10-1.1.jar $OMEGAUP_ROOT/bin/grader.jar
 	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
-	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/" $OMEGAUP_ROOT/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
+	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/" $OMEGAUP_ROOT/backend/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
 	sudo update-rc.d omegaup defaults
 	cp ~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.12.jar $OMEGAUP_ROOT/bin
-	cp $OMEGAUP_ROOT/grader/omegaup.jks $OMEGAUP_ROOT/bin
+	cp $OMEGAUP_ROOT/backend/grader/omegaup.jks $OMEGAUP_ROOT/bin
 	sudo mkdir -p /var/log/omegaup
 	sudo touch /var/log/omegaup/service.log
 	sudo chown omegaup.omegaup /var/log/omegaup/service.log
