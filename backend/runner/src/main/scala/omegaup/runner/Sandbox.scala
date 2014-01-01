@@ -486,7 +486,8 @@ object Minijail extends Object with Sandbox with Log with Using {
     message match {
       case Some(m) => {
         if (lang == "java") {
-          // TODO: ML detection for Java
+          // Subtract the core JVM memory consumption. 
+          meta("mem") = (meta("mem").toLong - 14000 * 1024).toString
         } else if (meta("status") != "JE" &&
                    meta("mem").toLong > m.memoryLimit * 1024) {
           meta("status") = "ML"
