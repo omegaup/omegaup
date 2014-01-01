@@ -423,7 +423,7 @@ class ContestController extends Controller {
 			}
 		}
 
-		Logger::log("New Contest Created: " . $r['alias']);
+		GLogger::log("New Contest Created: " . $r['alias']);
 		return array("status" => "ok");
 	}
 
@@ -1368,7 +1368,7 @@ class ContestController extends Controller {
 		$response = array();
 		$response["status"] = 'ok';
 
-		Logger::log("Contest updated (alias): " . $r['contest_alias']);
+		GLogger::log("Contest updated (alias): " . $r['contest_alias']);
 
 		return $response;
 	}
