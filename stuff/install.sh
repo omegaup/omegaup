@@ -109,7 +109,7 @@ fi
 
 # Install SBT.
 if [ ! -f /usr/bin/sbt ]; then
-	sudo wget -q http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch//0.12.3/sbt-launch.jar -O /usr/bin/sbt-launch.jar
+	sudo wget -q http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.1/sbt-launch.jar -O /usr/bin/sbt-launch.jar
 	cat > sbt << EOF
 #!/bin/sh
 java -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$0\`/sbt-launch.jar "\$@"
@@ -141,16 +141,8 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 
 	if [ "$SKIP_GRADER" != "1" ]; then 
 		# Build common
-		cd $OMEGAUP_ROOT/common
-		sbt package
-
-		# Build runner
-		cd $OMEGAUP_ROOT/runner
-		sbt proguard
-
-		# Build grader
-		cd $OMEGAUP_ROOT/grader
-		sbt proguard
+		cd $OMEGAUP_ROOT/backend
+		sbt proguard:proguard
 	fi
 	popd
 fi
@@ -169,7 +161,7 @@ fi
 
 # Install the grader service.
 if [ ! -f /etc/init.d/omegaup ]; then
-	cp $OMEGAUP_ROOT/grader/target/scala-2.9.1/grader_2.9.1-1.0.min.jar $OMEGAUP_ROOT/bin/grader.jar
+	cp $OMEGAUP_ROOT/backend/grader/target/scala-2.10/proguard/grader_2.10-1.1.jar $OMEGAUP_ROOT/bin/grader.jar
 	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
 	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/" $OMEGAUP_ROOT/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
 	sudo update-rc.d omegaup defaults

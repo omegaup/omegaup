@@ -34,7 +34,7 @@ grader/lib/
 target/
 lib_managed/
 src_managed/
-*/project/boot/
+project/
 
 # ignore frontend config file
 config.php
@@ -53,7 +53,7 @@ frontend/www/img/
 omegaup_test.log
 
 # Ignore runtime and test stuff
-*/test-env
+test-env
 frontend/www/templates_c
 /omegaup/
 bin/grader.sh
