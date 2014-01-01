@@ -110,6 +110,26 @@ class Contest(
 	var penalty: Int = 20,
 	var penalty_time_start: PenaltyTimeStart = PenaltyTimeStart.Contest
 ) {
+  def copy() =
+    new Contest(
+      id = this.id,
+      title = this.title,
+      description = this.description,
+      start_time = this.start_time,
+      finish_time = this.finish_time,
+      window_length = this.window_length,
+      director_id = this.director_id,
+      rerun_id = this.rerun_id,
+      public = this.public,
+      token = this.token,
+      points_decay_factor = this.points_decay_factor,
+      scoreboard = this.scoreboard,
+      partial_score = this.partial_score,
+      submissions_gap = this.submissions_gap,
+      feedback = this.feedback,
+      penalty = this.penalty,
+      penalty_time_start = this.penalty_time_start
+    )
 }
 
 class Problem(
@@ -135,6 +155,30 @@ class Problem(
 	var points: Option[Double] = None,
 	var tolerance: Double = 1e-6
 ) {
+  def copy() =
+    new Problem(
+      id = this.id,
+      public = this.public,
+      author = this.author,
+      title = this.title,
+      alias = this.alias,
+      validator = this.validator,
+      server = this.server,
+      remote_id = this.remote_id,
+      time_limit = this.time_limit,
+      memory_limit = this.memory_limit,
+      output_limit = this.output_limit,
+      visits = this.visits,
+      submissions = this.submissions,
+      accepted = this.accepted,
+      difficulty = this.difficulty,
+      creation_date = this.creation_date,
+      source = this.source,
+      order = this.order,
+      open_time = this.open_time,
+      points = this.points,
+      tolerance = this.tolerance
+    )
 }
 
 class Run(
@@ -155,4 +199,23 @@ class Run(
 	var submit_delay: Int = 0,
 	var judged_by: Option[String] = None
 ) {
+  def copy() =
+    new Run(
+      id = this.id,
+      user = this.user,
+      problem = this.problem.copy,
+      contest = this.contest map(_.copy),
+      guid = this.guid,
+      language = this.language,
+      status = this.status,
+      veredict = this.veredict,
+      runtime = this.runtime,
+      memory = this.memory,
+      score = this.score,
+      contest_score = this.contest_score,
+      ip = this.ip,
+      time = this.time,
+      submit_delay = this.submit_delay,
+      judged_by = this.judged_by
+    )
 }

@@ -261,13 +261,13 @@ object Minijail extends Object with Sandbox with Log with Using {
       case "c" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/gcc") ++
         commonParams ++
-        List("--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-std=c99", "-O2", "-lm") ++
-        chrootedInputFiles
+        List("--", Config.get("c.compiler.path", "/usr/bin/gcc"), "-std=c99", "-O2") ++
+        chrootedInputFiles ++ List("-lm")
       case "cpp" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/gcc") ++
         commonParams ++
-        List("--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-lm") ++
-        chrootedInputFiles
+        List("--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2") ++
+        chrootedInputFiles ++ List("-lm")
       case "p" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/fpc") ++
         commonParams ++

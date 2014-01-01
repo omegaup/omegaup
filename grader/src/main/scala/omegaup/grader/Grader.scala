@@ -13,7 +13,7 @@ import omegaup.data._
 import Veredict._
 
 trait Grader extends Object with Log {
-	def grade(run: Run): Unit = {
+	def grade(run: Run): Run = {
 		val id = run.id
 		val alias = run.problem.alias
 		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
@@ -151,9 +151,10 @@ trait Grader extends Object with Log {
 				} else if(run.veredict < v) run.veredict = v
 			} else if (run.language == Language.Java) {
 				if (meta.contains("message") && meta("message").contains("ptrace")) {
+					// TODO(lhchavez): Remove when minijail is a thing.
 					error("Rejudging run {} due to JE-prevention.", run.id)
 					Manager.grade(run.id)
-					return
+					throw new RuntimeException("Please rejudge me.")
 				}
 				val errFile = new File(f.getCanonicalPath.replace(".meta", ".err"))
 				if (errFile.exists && FileUtil.read(errFile.getCanonicalPath).contains("java.lang.OutOfMemoryError")) {
@@ -239,13 +240,15 @@ trait Grader extends Object with Log {
 			case None => {}
 			case Some(factor) => run.contest_score = run.score * factor
 		}
+
+		run
 	}
 	
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double
 }
 
 object CustomGrader extends Grader {
-	override def grade(run: Run): Unit = {
+	override def grade(run: Run): Run = {
 		val id = run.id
 		val alias = run.problem.alias
 		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
@@ -418,13 +421,15 @@ object CustomGrader extends Grader {
 			case None => {}
 			case Some(factor) => run.contest_score = run.score * factor
 		}
+
+		run
 	}
 	
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0
 }
 
 object LiteralGrader extends Grader {
-	override def grade(run: Run): Unit = {
+	override def grade(run: Run): Run = {
 		debug("Grading {}", run)
 		
 		run.status = Status.Ready
@@ -472,6 +477,8 @@ object LiteralGrader extends Grader {
 		}
 		
 		if (run.score == 1) run.veredict = Veredict.Accepted
+
+		run
 	}
 	
 	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0

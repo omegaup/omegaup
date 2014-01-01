@@ -3,5 +3,7 @@ package omegaup.grader.drivers
 import omegaup._
 import omegaup.data._
 
-case object Login
-case class Submission(run: Run)
+trait Driver {
+  def run(run: Run, runner: RunnerService): Run
+  def grade(run: Run): Run
+}

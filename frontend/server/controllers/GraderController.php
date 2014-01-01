@@ -122,7 +122,6 @@ class GraderController extends Controller {
 	 * @return array
 	 */
 	public static function apiStatus(Request $r) {
-
 		self::validateRequest($r);
 
 		$response = array();
@@ -133,15 +132,6 @@ class GraderController extends Controller {
 		
 		GLogger::log("Getting EC2 status");		
 		$response["cloud"] = self::getEc2Status();
-		
-		GLogger::log("Getting pending runs");
-		$response["pending_runs"] = array();
-		try {
-			$runsGuids = RunsDAO::GetPendingRuns();
-			$response["pending_runs"] = $runsGuids;
-		} catch (Exception $e) {
-			GLogger::Exception($e);
-		}
 		
 		$response["status"] = "ok";
 		return $response;
