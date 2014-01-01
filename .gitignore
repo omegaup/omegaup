@@ -34,7 +34,8 @@ grader/lib/
 target/
 lib_managed/
 src_managed/
-project/
+project/target
+project/classes
 
 # ignore frontend config file
 config.php
