@@ -69,7 +69,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 		lock.synchronized {
 			if (!registeredEndpoints.contains(endpoint)) {
 				info("Registering {}({}):{}", endpoint.host, hostname, endpoint.port)
-				registeredEndpoints += endpoint -> 0
+				registeredEndpoints += endpoint -> System.currentTimeMillis
 				addRunner(new RunnerProxy(hostname, endpoint.host, endpoint.port))
 			}
 			registeredEndpoints(endpoint) = System.currentTimeMillis
@@ -218,7 +218,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 	private def dispatchLocked() = {
 		// Prune any runners that are not registered or haven't communicated in a while.
 		debug("Before pruning the queue {}", status)
-		runnerQueue.dropWhile (
+		runnerQueue.dequeueAll (
 			_ match {
 				case proxy: omegaup.runner.RunnerProxy => {
 					val endpoint = new RunnerEndpoint(proxy.host, proxy.port)
