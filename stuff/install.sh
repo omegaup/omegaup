@@ -155,7 +155,7 @@ if [ ! -d $MINIJAIL_ROOT ]; then
 	sudo cp $OMEGAUP_ROOT/stuff/minijail-scripts/* $MINIJAIL_ROOT/scripts/
 
 	pushd $MINIJAIL_ROOT
-	sudo python $OMEGAUP_ROOT/bin/mkroot
+		sudo python $OMEGAUP_ROOT/stuff/mkroot
 	popd
 fi
 

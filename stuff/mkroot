@@ -99,9 +99,6 @@ class Chroot:
 		pass
 
 with Chroot('root', '/') as root:
-	# This has to go in the final release.
-	root.copyfromhost('/usr/bin/strace')
-
 	root.copyfromhost('/usr/lib/locale/locale-archive')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libffi.so.6')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libstdc++.so.6')
@@ -151,9 +148,6 @@ with Chroot('root', '/') as root:
 	root.install('/lib/libminijailpreload.so', 'bin/libminijailpreload.so')
 
 with Chroot('root-compilers', '/') as root:
-	# This has to go in the final release.
-	root.copyfromhost('/usr/bin/strace')
-
 	root.copyfromhost('/usr/bin/gcc')
 	root.copyfromhost('/usr/bin/g++')
 	root.copyfromhost('/usr/bin/as')

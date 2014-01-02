@@ -58,6 +58,7 @@ test-env
 frontend/www/templates_c
 /omegaup/
 bin/grader.sh
+frontend/www/runner-deploy.sh
 
 # Ignore Mac crap :P
 frontend/.DS_Store
