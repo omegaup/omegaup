@@ -6,7 +6,7 @@ if [ $# -lt 1 ]; then
 fi
 
 ROOT=`dirname $0`/..
-TARGET=$ROOT/frontend/www/runner-deploy.sh
+TARGET=$ROOT/frontend/www/runner-distrib.sh
 HOSTNAME=$1
 
 pushd $ROOT/minijail
