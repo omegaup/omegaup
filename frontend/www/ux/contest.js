@@ -258,7 +258,15 @@ $(document).ready(function() {
 					  e.target.result);
 			};
 
-			if (file.type.indexOf('text/') === 0) {
+			var extension = file.name.split(/\./);
+			extension = extension[extension.length - 1];
+
+			if (file.type.indexOf('text/') === 0 ||
+					extension == 'cpp' || extension == 'c' ||
+					extension == 'java' || extension == 'txt' ||
+					extension == 'hs' || extension == 'kp' ||
+					extension == 'p' || extension == 'pas' ||
+					extension == 'py' || extension == 'rb') {
 				reader.readAsText(file, 'UTF-8');
 			} else {
 				reader.readAsDataURL(file);
