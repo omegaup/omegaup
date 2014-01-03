@@ -40,6 +40,7 @@ chown -R omegaup.omegaup nohup.out || true
 
 exit
 EOF
+chmod +x $TMPDIR/distrib/runner.sh
 
 cat > $TMPDIR/distrib/omegaup.conf <<EOF
 # Logging

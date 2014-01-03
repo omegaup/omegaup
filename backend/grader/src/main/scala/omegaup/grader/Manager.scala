@@ -276,10 +276,12 @@ object Manager extends Object with Log {
 
 			new GradeOutputMessage(status = "error", error = Some("Remote validators not supported anymore"))
 		} else {
-			run.status = Status.Waiting
-			run.veredict = Veredict.JudgeError
-			run.judged_by = None
-			GraderData.update(run)
+			if (run.status != Status.Waiting) {
+				run.status = Status.Waiting
+				run.veredict = Veredict.JudgeError
+				run.judged_by = None
+				GraderData.update(run)
+			}
 
 			RunnerRouter.addRun(run)
 			new GradeOutputMessage()
