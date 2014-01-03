@@ -274,6 +274,13 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       }
     """))))
     test7.status should equal ("ok")
+
+    // 2^200 error messages
+    val test8 = runner.compile(CompileInputMessage("c", List(("Main.c", """
+      #include "Main.c"
+      #include "Main.c"
+    """))))
+    test8.error should not equal (None)
   }
 
   "Validator" should "work" in {

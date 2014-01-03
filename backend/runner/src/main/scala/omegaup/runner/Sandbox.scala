@@ -238,7 +238,8 @@ object Minijail extends Object with Sandbox with Log with Using {
       "-1", chdir + "/" + outputFile,
       "-2", chdir + "/" + errorFile,
       "-M", metaFile,
-      "-t", (Config.get("java.compile.time_limit", 30) * 1000).toString
+      "-t", (Config.get("java.compile.time_limit", 30) * 1000).toString,
+      "-O", Config.get("runner.compile.output_limit", 5 * 1024 * 1024).toString
     )
 
     val chrootedInputFiles = inputFiles.map(file => {
