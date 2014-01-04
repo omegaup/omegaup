@@ -239,7 +239,7 @@ object Minijail extends Object with Sandbox with Log with Using {
       "-2", chdir + "/" + errorFile,
       "-M", metaFile,
       "-t", (Config.get("java.compile.time_limit", 30) * 1000).toString,
-      "-O", Config.get("runner.compile.output_limit", 5 * 1024 * 1024).toString
+      "-O", Config.get("runner.compile.output_limit", 64 * 1024 * 1024).toString
     )
 
     val chrootedInputFiles = inputFiles.map(file => {
@@ -332,6 +332,17 @@ object Minijail extends Object with Sandbox with Log with Using {
     pusing (runtime.exec(params.toArray)) { process => {
       if (process != null) {
         val status = process.waitFor
+        val errorPath = chdir + "/" + errorFile
+        // Truncate the compiler error to 8k
+        try {
+          val outChan = new java.io.FileOutputStream(errorPath, true).getChannel()
+          outChan.truncate(8192)
+          outChan.close()
+        } catch {
+          case e: Exception => {
+            error("Unable to truncate {}: {}", errorPath, e)
+          }
+        }
         patchMetaFile(lang, None, metaFile)
         callback(status)
       } else {

@@ -225,7 +225,6 @@ with Chroot('root-compilers', '/') as root:
 	# Miscellaneous mountpoints
 	root.mkdir('/dev/')
 	root.mkdir('/proc/')
-	root.mkdir('/tmp/')
 	root.mkdir('/home/')
 	root.mkdir('/sys/')
 
@@ -235,6 +234,7 @@ with Chroot('root-compilers', '/') as root:
 	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/1.9.1/ruby')
 	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
+	root.symlink('/tmp', '/home')
 
 	root.install('/usr/bin/ldwrapper', 'bin/ldwrapper')
 	root.install('/usr/bin/kcl', 'bin/kcl')
