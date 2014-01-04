@@ -18,7 +18,13 @@ case class InputOutputMessage(status: String = "ok", error: Option[String] = Non
 case class ReloadConfigInputMessage(overrides: Option[Map[String, String]] = None)
 case class ReloadConfigOutputMessage(status: String = "ok", error: Option[String] = None)
 case class StatusOutputMessage(status: String = "ok", embedded_runner: Boolean = true, queues: Map[String, QueueStatus])
-case class QueueStatus(run_queue_length: Int = 0, runner_queue_length: Int = 0, runners: Int = 0, running_runs: Int = 0)
+case class Running(name: String, id: Int)
+case class QueueStatus(
+  run_queue_length: Int,
+  runner_queue_length: Int,
+  runners: List[String],
+  running: List[Running]
+)
 case class GradeInputMessage(id: Int)
 case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
 case class RegisterInputMessage(hostname: String, port: Int)

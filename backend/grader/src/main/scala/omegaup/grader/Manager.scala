@@ -48,29 +48,42 @@ object RunnerRouter extends Object with Log {
 }
 
 class RunnerDispatcher(val name: String) extends Object with Log {
+	private case class InFlightRun(service: RunnerService, run: Run, timestamp: Long)
 	private val registeredEndpoints = scala.collection.mutable.HashMap.empty[RunnerEndpoint, Long]
 	private val runnerQueue = scala.collection.mutable.Queue.empty[RunnerService]
 	private val runQueue = scala.collection.mutable.Queue.empty[Run]
-	private val runsInFlight = scala.collection.mutable.ListBuffer.empty[(RunnerService,Run)]
+	private val runsInFlight = scala.collection.mutable.HashMap.empty[Long, InFlightRun]
 	private val executor = Executors.newCachedThreadPool
+	private var flightIndex: Long = 0
 	private val lock = new Object
 
-	def status() =
+	private val pruner = new java.util.Timer("Flight pruner", true)
+	pruner.scheduleAtFixedRate(
+		new java.util.TimerTask() {
+			override def run(): Unit = pruneFlights
+		},
+		Config.get("grader.flight_pruner.interval", 60) * 1000,
+		Config.get("grader.flight_pruner.interval", 60) * 1000
+	)
+
+	def status() = lock.synchronized {
 		QueueStatus(
 			run_queue_length = runQueue.size,
 			runner_queue_length = runnerQueue.size,
-			runners = registeredEndpoints.size,
-			running_runs = runsInFlight.size
+			runners = registeredEndpoints.keys.map(_.toString).toList,
+			running = runsInFlight.values.map(ifr => new Running(ifr.service.name, ifr.run.id.toInt)).toList
 		)
+	}
 
 	def register(hostname: String, host: String, port: Int): RegisterOutputMessage = {
 		val endpoint = new RunnerEndpoint(host, port)
 
 		lock.synchronized {
 			if (!registeredEndpoints.contains(endpoint)) {
-				info("Registering {}({}):{}", endpoint.host, hostname, endpoint.port)
+				val proxy = new RunnerProxy(hostname, endpoint.host, endpoint.port) 
+				info("Registering {}", proxy)
 				registeredEndpoints += endpoint -> System.currentTimeMillis
-				addRunner(new RunnerProxy(hostname, endpoint.host, endpoint.port))
+				addRunner(proxy)
 			}
 			registeredEndpoints(endpoint) = System.currentTimeMillis
 		}
@@ -80,14 +93,18 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 		new RegisterOutputMessage()
 	}
 
+	private def deregisterLocked(endpoint: RunnerEndpoint) = {
+		if (registeredEndpoints.contains(endpoint)) {
+			info("De-registering {}", endpoint)
+			registeredEndpoints -= endpoint
+		}
+	}
+
 	def deregister(host: String, port: Int): RegisterOutputMessage = {
 		val endpoint = new RunnerEndpoint(host, port)
 
 		lock.synchronized {
-			if (registeredEndpoints.contains(endpoint)) {
-				info("De-registering {}:{}", endpoint.host, endpoint.port)
-				registeredEndpoints -= endpoint
-			}
+			deregisterLocked(endpoint)
 		}
 
 		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
@@ -116,10 +133,12 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 			case x:RunnerEndpoint => host == x.host && port == x.port
 			case _ => false
 		}
+		override def toString() = "RunnerEndpoint(%s:%d)".format(host, port)
 	}
 
 	private class GradeTask(
 		dispatcher: RunnerDispatcher,
+		flightIndex: Long,
 		var r: Run,
 		runner: RunnerService,
 		driver: Driver
@@ -178,7 +197,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 					r
 				}
 			} finally {
-				dispatcher.addRunner(runner)
+				dispatcher.flightFinished(flightIndex)
 			}
 
 			Manager.updateVeredict(
@@ -206,7 +225,35 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 		val runner = runnerQueue.dequeue
 		val run = runQueue.dequeue
 
-		executor.submit(new GradeTask(this, run, runner, OmegaUpDriver))
+		runsInFlight += flightIndex -> InFlightRun(runner, run, System.currentTimeMillis)
+		executor.submit(new GradeTask(this, flightIndex, run, runner, OmegaUpDriver))
+
+		flightIndex += 1
+	}
+
+	private def pruneFlights() = lock.synchronized {
+		var cutoffTime = System.currentTimeMillis - Config.get("grader.runner.timeout", 10 * 60) * 1000
+		runsInFlight.foreach { case (i, flightInfo) => {
+			if (flightInfo.timestamp < cutoffTime) {
+				warn("Expiring stale flight {}, run {}", flightInfo.service, flightInfo.run.id)
+				flightInfo.service match {
+					case proxy: RunnerProxy => deregisterLocked(new RunnerEndpoint(proxy.host, proxy.port))
+					case _ => {}
+				}
+				runsInFlight -= i
+			}
+		}}
+	}
+
+	private def flightFinished(flightIndex: Long) = lock.synchronized {
+		if (runsInFlight.contains(flightIndex)) {
+			var flightRun = runsInFlight(flightIndex)
+			runsInFlight -= flightIndex
+			addRunnerLocked(flightRun.service)
+		} else {
+			error("Lost track of flight {}!", flightIndex)
+			throw new RuntimeException("Flight corrupted, bail out")
+		}
 	}
 
 	private def addRunnerLocked(runner: RunnerService) = {
@@ -218,12 +265,19 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 	private def dispatchLocked() = {
 		// Prune any runners that are not registered or haven't communicated in a while.
 		debug("Before pruning the queue {}", status)
+		var cutoffTime = System.currentTimeMillis -
+			Config.get("grader.runner.queue_timeout", 10 * 60 * 1000)
 		runnerQueue.dequeueAll (
 			_ match {
 				case proxy: omegaup.runner.RunnerProxy => {
 					val endpoint = new RunnerEndpoint(proxy.host, proxy.port)
-					!registeredEndpoints.contains(endpoint) || registeredEndpoints(endpoint) <
-					System.currentTimeMillis - Config.get("grader.runner.queue_timeout", 10 * 60 * 1000)
+					// Also expire stale endpoints.
+					if (registeredEndpoints.contains(endpoint) &&
+							registeredEndpoints(endpoint) < cutoffTime) {
+						warn("Stale endpoint {}", proxy)
+						deregister(endpoint.host, endpoint.port)
+					}
+					!registeredEndpoints.contains(endpoint)
 				}
 				case _ => false
 			}
@@ -321,7 +375,7 @@ object Manager extends Object with Log {
 				case "box" => Box
 				case "minijail" => Minijail
 			}
-			RunnerRouter.addRunner(new omegaup.runner.Runner("embedded-runner", sandbox))
+			RunnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", sandbox))
 		}
 
 		// the handler
@@ -361,7 +415,7 @@ object Manager extends Object with Log {
 									case "box" => Box
 									case "minijail" => Minijail
 								}
-								RunnerRouter.addRunner(new omegaup.runner.Runner("embedded-runner", sandbox))
+								RunnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", sandbox))
 							}
 
 							response.setStatus(HttpServletResponse.SC_OK)

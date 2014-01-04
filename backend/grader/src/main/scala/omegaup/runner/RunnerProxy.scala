@@ -9,6 +9,8 @@ class RunnerProxy(val hostname: String, val host: String, val port: Int) extends
 
 	def name() = hostname
 
+	override def toString() = "RunnerProxy(%s, %s:%d)".format(hostname, host, port)
+
 	def compile(message: CompileInputMessage): CompileOutputMessage = {
 		Https.send[CompileOutputMessage, CompileInputMessage](url + "/compile/",
 			message
