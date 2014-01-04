@@ -27,7 +27,7 @@ case class QueueStatus(
 )
 case class GradeInputMessage(id: Int)
 case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
-case class RegisterInputMessage(hostname: String, port: Int)
+case class RegisterInputMessage(name: String, port: Int)
 case class RegisterOutputMessage(status: String = "ok", error: Option[String] = None)
 
 // for serializing judgement details

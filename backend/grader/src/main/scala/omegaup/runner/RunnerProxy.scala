@@ -4,12 +4,12 @@ import omegaup._
 import omegaup.data._
 import java.io._
 
-class RunnerProxy(val hostname: String, val host: String, val port: Int) extends RunnerService with Log {
+class RunnerProxy(name: String, val host: String, val port: Int) extends RunnerService with Log {
 	private val url = "https://" + host + ":" + port
 
-	def name() = hostname
+	def name() = name
 
-	override def toString() = "RunnerProxy(%s, %s:%d)".format(hostname, host, port)
+	override def toString() = "RunnerProxy(%s, %s:%d)".format(name, host, port)
 
 	def compile(message: CompileInputMessage): CompileOutputMessage = {
 		Https.send[CompileOutputMessage, CompileInputMessage](url + "/compile/",

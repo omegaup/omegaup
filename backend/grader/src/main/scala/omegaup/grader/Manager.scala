@@ -24,14 +24,10 @@ object RunnerRouter extends Object with Log {
 		defaultQueueName -> new RunnerDispatcher(defaultQueueName)
 	)
 
-	def status() =
-		StatusOutputMessage(
-			embedded_runner = false,
-			queues = dispatchers.toMap.map(entry => {entry._1 -> entry._2.status()})
-		)
+	def status() = dispatchers.toMap.map(entry => {entry._1 -> entry._2.status()})
 
-	def register(hostname: String, host: String, port: Int): RegisterOutputMessage = {
-		dispatchers(defaultQueueName).register(hostname, host, port)
+	def register(name: String, host: String, port: Int): RegisterOutputMessage = {
+		dispatchers(defaultQueueName).register(name, host, port)
 	}
 
 	def deregister(host: String, port: Int): RegisterOutputMessage = {
@@ -70,17 +66,17 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 		QueueStatus(
 			run_queue_length = runQueue.size,
 			runner_queue_length = runnerQueue.size,
-			runners = registeredEndpoints.keys.map(_.toString).toList,
+			runners = registeredEndpoints.keys.map(_.name).toList,
 			running = runsInFlight.values.map(ifr => new Running(ifr.service.name, ifr.run.id.toInt)).toList
 		)
 	}
 
-	def register(hostname: String, host: String, port: Int): RegisterOutputMessage = {
-		val endpoint = new RunnerEndpoint(host, port)
+	def register(name: String, host: String, port: Int): RegisterOutputMessage = {
+		val endpoint = new RunnerEndpoint(name, host, port)
 
 		lock.synchronized {
 			if (!registeredEndpoints.contains(endpoint)) {
-				val proxy = new RunnerProxy(hostname, endpoint.host, endpoint.port) 
+				val proxy = new RunnerProxy(name, endpoint.host, endpoint.port) 
 				info("Registering {}", proxy)
 				registeredEndpoints += endpoint -> System.currentTimeMillis
 				addRunner(proxy)
@@ -101,7 +97,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 	}
 
 	def deregister(host: String, port: Int): RegisterOutputMessage = {
-		val endpoint = new RunnerEndpoint(host, port)
+		val endpoint = new RunnerEndpoint("", host, port)
 
 		lock.synchronized {
 			deregisterLocked(endpoint)
@@ -126,14 +122,14 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 		}
 	}
 
-	private class RunnerEndpoint(val host: String, val port: Int) {
+	private class RunnerEndpoint(val name: String, val host: String, val port: Int) {
 		def ==(o: RunnerEndpoint) = host == o.host && port == o.port
 		override def hashCode() = 28227 + 97 * host.hashCode + port
 		override def equals(other: Any) = other match {
 			case x:RunnerEndpoint => host == x.host && port == x.port
 			case _ => false
 		}
-		override def toString() = "RunnerEndpoint(%s:%d)".format(host, port)
+		override def toString() = "RunnerEndpoint(%s, %s:%d)".format(name, host, port)
 	}
 
 	private class GradeTask(
@@ -170,7 +166,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 							}
 
 							// But do re-queue the run
-							dispatcher.addRun(r)
+							RunnerRouter.addRun(r)
 
 							// And commit suicide
 							throw e
@@ -237,7 +233,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 			if (flightInfo.timestamp < cutoffTime) {
 				warn("Expiring stale flight {}, run {}", flightInfo.service, flightInfo.run.id)
 				flightInfo.service match {
-					case proxy: RunnerProxy => deregisterLocked(new RunnerEndpoint(proxy.host, proxy.port))
+					case proxy: RunnerProxy => deregisterLocked(new RunnerEndpoint(proxy.name, proxy.host, proxy.port))
 					case _ => {}
 				}
 				runsInFlight -= i
@@ -270,7 +266,7 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 		runnerQueue.dequeueAll (
 			_ match {
 				case proxy: omegaup.runner.RunnerProxy => {
-					val endpoint = new RunnerEndpoint(proxy.host, proxy.port)
+					val endpoint = new RunnerEndpoint(proxy.name, proxy.host, proxy.port)
 					// Also expire stale endpoints.
 					if (registeredEndpoints.contains(endpoint) &&
 							registeredEndpoints(endpoint) < cutoffTime) {
@@ -430,7 +426,10 @@ object Manager extends Object with Log {
 					}
 					case "/status/" => {
 						response.setStatus(HttpServletResponse.SC_OK)
-            RunnerRouter.status
+						new StatusOutputMessage(
+							embedded_runner = Config.get("grader.embedded_runner.enable", false),
+							queues = RunnerRouter.status
+						)
 					}
 					case "/grade/" => {
 						try {
@@ -454,7 +453,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							RunnerRouter.register(req.hostname, request.getRemoteAddr, req.port)
+							RunnerRouter.register(req.name, request.getRemoteAddr, req.port)
 						} catch {
 							case e: Exception => {
 								error("Register failed: {}", e)
