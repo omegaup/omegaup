@@ -35,7 +35,6 @@ class LoginTest extends OmegaupTestCase {
 	 */
 	public function testNativeLoginByEmailPositive() {
 
-		self::log("Create a new user with a random valid email");
 		$email = Utils::CreateRandomString() . "@mail.com";
 		$user = UserFactory::createUser(null, null, $email);
 
@@ -45,10 +44,8 @@ class LoginTest extends OmegaupTestCase {
 					"password" => $user->getPassword()
 				));
 
-		self::log("Calling Login API");
 		$response = UserController::apiLogin($r);
 
-		self::log("Validate response");
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertLogin($user, $response["auth_token"]);
 	}
