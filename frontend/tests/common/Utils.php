@@ -114,8 +114,7 @@ class Utils {
 	}
 
 	static function CleanLog() {
-		file_put_contents(OMEGAUP_LOG_ACCESS_FILE, "");
-		file_put_contents(OMEGAUP_LOG_ERROR_FILE, "");
+		file_put_contents(OMEGAUP_LOG_FILE, "");
 	}
 
 	static function CleanPath($path) {

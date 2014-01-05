@@ -1,9 +1,0 @@
-<configuration xmlns="http://logging.apache.org/log4php/">
-    <appender name="myAppender" class="LoggerAppenderFile">
-        <param name="file" value="/var/log/omegaup/omegaup.log" />
-    </appender>
-    <root>
-        <level value="INFO" />
-        <appender_ref ref="myAppender" />
-    </root>
-</configuration>

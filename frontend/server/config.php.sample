@@ -25,10 +25,9 @@ define('OMEGAUP_SLAVE_DB_DRIVER',			'mysqlt');
 # LOG CONFIG
 # ####################################
 define('OMEGAUP_LOG_TO_FILE',				true);
-define('OMEGAUP_LOG_TRACKBACK',				false);
 define('OMEGAUP_LOG_DB_QUERYS',				false);
-define('OMEGAUP_LOG_ACCESS_FILE',			'/var/log/omegaup/omegaup.log');
-define('OMEGAUP_LOG_ERROR_FILE',			'/var/log/omegaup/omegaup.log');
+define('OMEGAUP_LOG_LEVEL',				"info");
+define('OMEGAUP_LOG_FILE',				'/var/log/omegaup/omegaup.log');
 define('OMEGAUP_EXPIRE_TOKEN_AFTER',			'8 HOUR');
 
 # ####################################

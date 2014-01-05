@@ -31,10 +31,10 @@ define('OMEGAUP_BASE_URL',			'http://localhost');
 # LOG CONFIG
 # ####################################
 define('OMEGAUP_LOG_TO_FILE',			true);
-define('OMEGAUP_LOG_ACCESS_FILE',		OMEGAUP_TEST_ROOT . 'omegaup.log');
-define('OMEGAUP_LOG_ERROR_FILE',		OMEGAUP_TEST_ROOT . 'omegaup.log');
+define('OMEGAUP_LOG_FILE',				OMEGAUP_TEST_ROOT . 'omegaup.log');
 define('OMEGAUP_LOG_TRACKBACK',			false);
 define('OMEGAUP_LOG_DB_QUERYS',			false);
+define('OMEGAUP_LOG_LEVEL',				"info");
 
 # ####################################
 # GRADER CONFIG

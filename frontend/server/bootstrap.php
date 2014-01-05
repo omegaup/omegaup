@@ -55,11 +55,36 @@ require_once('libs/phpmailer/class.phpmailer.php');
 require_once('libs/UITools.php');
 require_once('libs/Mailchimp/Mailchimp.php');
 require_once('libs/ApiException.php' );
-
 require_once('libs/log4php/src/main/php/Logger.php');
 
-
-Logger::configure( __DIR__ . '/log4php.xml');
+/*
+ * Configurar log4php
+ *
+ *
+ * @todo Email unknown excpetions
+ * @todo Print args in call (but don't reveal password in log)
+ *
+ * */
+Logger::configure(array(
+		'rootLogger' => array(
+			'appenders' => array('default'),
+		),
+		'appenders' => array(
+			'default' => array(
+				'class' => 'LoggerAppenderFile',
+				'layout' => array(
+					'class' => 'LoggerLayoutPattern',
+					'params' => array(
+						'conversionPattern' => '%date [%logger] %level: %message%newline',
+					)
+				),
+				'params' => array(
+					'file' => OMEGAUP_LOG_FILE,
+					'append' => true
+				)
+			)
+		)
+	));
 
 class GLogger
 {
@@ -69,7 +94,7 @@ class GLogger
 	{
 		if (self::$logger == NULL)
 		{
-			self::$logger = Logger::getLogger("myLogger");
+			self::$logger = Logger::getLogger("GLogger");
 		}
 		self::$logger->info($s);
 	}

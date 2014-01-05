@@ -386,8 +386,7 @@ class ProblemController extends Controller {
 			try {
 				self::apiRejudge($r);
 			} catch (Exception $e) {
-				GLogger::warn("Best efort ProblemController::apiRejudge failed");
-				GLogger::Exception($e);
+				GLogger::error("Best efort ProblemController::apiRejudge failed", $e);
 			}
 		}
 
