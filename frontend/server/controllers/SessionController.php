@@ -154,7 +154,7 @@ class SessionController extends Controller {
 			$tokens_erased = AuthTokensDAO::expireAuthTokens($vo_User->getUserId());
 		} catch (Exception $e) {			
 			// Best effort
-			GLogger::error("Failed to delete expired tokens: $e->getMessage()");
+			self::$log->error("Failed to delete expired tokens: $e->getMessage()");
 		}
 		
 
@@ -223,7 +223,7 @@ class SessionController extends Controller {
 
 		if (is_null($vo_User)) {
 			// This email does not exist in omegaup
-			GLogger::log("LoginViaGoogle: Creating new user for $s_Email");
+			self::$log->info("LoginViaGoogle: Creating new user for $s_Email");
 
 			$username = self::getUniqueUsernameFromEmail($s_Email);
 
@@ -264,7 +264,7 @@ class SessionController extends Controller {
 		$fb_user = $facebook->getUser();
 
 		if($fb_user == 0) {
-			GLogger::log("FB session unavailable.");
+			self::$log->info("FB session unavailable.");
 			return false;
 		}
 
@@ -279,7 +279,7 @@ class SessionController extends Controller {
 
 		} catch (FacebookApiException $e) {
 			$fb_user = null;
-			GLogger::error("FacebookException:" . $e);
+			self::$log->error("FacebookException:" . $e);
 			return false;
 
 		}
@@ -288,14 +288,14 @@ class SessionController extends Controller {
 		//lets look for his information on the database
 		//if there is none, it means that its the first
 		//time the user has been here, lets register his info
-		GLogger::log("User is logged in via facebook !!");
+		self::$log->info("User is logged in via facebook !!");
 
 		$results = UsersDAO::FindByEmail( $fb_user_profile["email"] );	
 
 		if (!is_null($results)) {
 			//user has been here before with facebook!
 			$vo_User = $results;
-			GLogger::log("user has been here before with facebook!");
+			self::$log->info("user has been here before with facebook!");
 
 		} else {
 				// The user has never been here before, let's register him
@@ -340,7 +340,7 @@ class SessionController extends Controller {
 	 * @return boolean
 	 */
 	public function NativeLogin(Request $r) {
-		GLogger::log("Testing native login for " . $r["usernameOrEmail"]);
+		self::$log->info("Testing native login for " . $r["usernameOrEmail"]);
 
 		$c_Users = new UserController();
 		$vo_User = null;
@@ -356,18 +356,18 @@ class SessionController extends Controller {
 			$r["user_id"] = $vo_User->getUserId();
 			$r["user"] = $vo_User;
 		} catch (ApiException $e) {
-			GLogger::warn("User " . $r["usernameOrEmail"] . " not found.");
+			self::$log->warn("User " . $r["usernameOrEmail"] . " not found.");
 			return false;
 		}
 
 		$b_Valid = $c_Users->TestPassword($r);
 
 		if (!$b_Valid) {
-			GLogger::warn("User " . $r["usernameOrEmail"] . " has introduced invalid credentials.");
+			self::$log->warn("User " . $r["usernameOrEmail"] . " has introduced invalid credentials.");
 			return false;
 		}
 
-		GLogger::log("User " . $r["usernameOrEmail"] . " has loged in natively.");
+		self::$log->info("User " . $r["usernameOrEmail"] . " has loged in natively.");
 		
 		UserController::checkEmailVerification($r);
 		

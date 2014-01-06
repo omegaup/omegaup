@@ -277,8 +277,8 @@ class ProblemController extends Controller {
 				RunController::invalidateCacheOnRejudge($run);				
 			}
 		} catch (Exception $e) {
-			GLogger::error("Failed to rejudge runs after problem update");
-			GLogger::error($e);
+			self::$log->error("Failed to rejudge runs after problem update");
+			self::$log->error($e);
 			throw new InvalidDatabaseOperationException($e);
 		}
 
@@ -382,11 +382,11 @@ class ProblemController extends Controller {
 		}
 
 		if (($requiresRejudge === true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE === true)) {
-			GLogger::log("Calling ProblemController::apiRejudge");
+			self::$log->info("Calling ProblemController::apiRejudge");
 			try {
 				self::apiRejudge($r);
 			} catch (Exception $e) {
-				GLogger::error("Best efort ProblemController::apiRejudge failed", $e);
+				self::$log->error("Best efort ProblemController::apiRejudge failed", $e);
 			}
 		}
 

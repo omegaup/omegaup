@@ -5,6 +5,7 @@ require_once('FileUploader.php');
 class FileHandler {
 
 	protected static $fileUploader;
+	public static $log;
 
 	static function SetFileUploader(FileUploader $fileUploader) {
 		self::$fileUploader = $fileUploader;
@@ -58,14 +59,14 @@ class FileHandler {
 	}
 
 	static function MakeDir($pathName, $chmod = 0777) {
-		GLogger::log("Trying to create directory: " . $pathName);
+		self::$log->info("Trying to create directory: " . $pathName);
 		if (!mkdir($pathName, $chmod)) {
 			throw new RuntimeException("FATAL: Not able to move create dir " . $pathName . " CHMOD: " . $chmod);
 		}
 	}
 
 	static function DeleteDirRecursive($pathName) {
-		GLogger::log("Trying to delete recursively dir: " . $pathName);
+		self::$log->info("Trying to delete recursively dir: " . $pathName);
 		self::rrmdir($pathName);
 	}
 
@@ -96,3 +97,6 @@ class FileHandler {
 	}
 
 }
+
+FileHandler::$log = Logger::getLogger("FileHandler");
+

@@ -9,20 +9,20 @@
 		  */
 		abstract class DAO
 		{
-
 		public static $useDAOCache = true;
 		protected static $isTrans = false;
 		protected static $transCount = 0;
+		public static $log;
 		
 		public static function transBegin (){
 			
 			self::$transCount ++;
 			
             // @TODO Reactivate this
-            GLogger::log("Iniciando transaccion (".self::$transCount.")");
-			
+			self::$log->debug("Iniciando transaccion (".self::$transCount.")");
+
 			if(self::$isTrans){
-				GLogger::log("Transaccion ya ha sido iniciada antes.");
+				self::$log->debug("Transaccion ya ha sido iniciada antes.");
 				return;
 			}
 			
@@ -35,24 +35,24 @@
 		public static function transEnd (  ){
 			
 			if(!self::$isTrans){
-				GLogger::log("Transaccion commit pero no hay transaccion activa !!.");
+				self::$log->debug("Transaccion commit pero no hay transaccion activa !!.");
 				return;
 			}
 			
 			self::$transCount --;
-			GLogger::log("Terminando transaccion (".self::$transCount.")");
+			self::$log->debug("Terminando transaccion (".self::$transCount.")");
 			
 			if(self::$transCount > 0){
 				return;
 			}
 			global $conn;
 			$conn->CompleteTrans();
-			GLogger::log("Transaccion commit !!");
+			self::$log->debug("Transaccion commit !!");
 			self::$isTrans = false;
 		}
 		public static function transRollback (  ){
 			if(!self::$isTrans){
-				GLogger::log("Transaccion rollback pero no hay transaccion activa !!.");
+				self::$log->debug("Transaccion rollback pero no hay transaccion activa !!.");
 				return;
 			}
 			
@@ -60,7 +60,7 @@
 			global $conn;
 			$conn->FailTrans();
 			$conn->CompleteTrans();
-			GLogger::log("Transaccion rollback !");
+			self::$log->debug("Transaccion rollback !");
 			self::$isTrans = false;
 		}
 		}
@@ -160,3 +160,5 @@
 			}
 
 		}
+
+		DAO::$log = Logger::getLogger("dao");

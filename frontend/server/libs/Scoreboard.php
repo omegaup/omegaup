@@ -17,12 +17,14 @@ class Scoreboard {
 	private $countProblemsInContest;
 	private $showAllRuns;
 	private $auth_token;
+	public $log;
 
 	public function __construct($contest_id, $showAllRuns = false, $auth_token = null) {
 		$this->data = array();
 		$this->contest_id = $contest_id;
 		$this->showAllRuns = $showAllRuns;
 		$this->auth_token = $auth_token;
+		$this->log = Logger::getLogger("Scoreboard");
 	}
 
 	public function getScoreboardTimeLimitUnixTimestamp(Contests $contest) {
@@ -372,8 +374,9 @@ class Scoreboard {
 	 */
 	public static function InvalidateScoreboardCache($contest_id) {
 		
-		GLogger::log("Invalidating scoreboard cache.");
-		
+		$log = Logger::getLogger("Scoreboard");
+		$log->info("Invalidating scoreboard cache.");
+
 		// Invalidar cache del contestant
 		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);		
 
@@ -382,4 +385,6 @@ class Scoreboard {
 		
 	}
 }
+
+
 

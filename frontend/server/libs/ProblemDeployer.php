@@ -19,14 +19,19 @@ class ProblemType {
 class ProblemDeployer {
 	
 	const MAX_ZIP_FILESIZE = 209715200; //200 * 1024 * 1024;
-	
+
 	public $filesToUnzip;
 	private $imageHashes;
 	private $casesFiles;
 	private $hasValidator = false;
 	private $problemDirPath;
 	private $problemType = ProblemType::InputOutput; 
-	
+	private $log;
+
+	public function __construct() {
+		$this->log = Logger::getLogger("ProblemDeployer");
+	}
+
 	/**
 	 * 
 	 * @param array $zipFilesArray
@@ -34,7 +39,7 @@ class ProblemDeployer {
 	 * @return boolean
 	 */
 	private function checkProblemStatements(array $zipFilesArray, ZipArchive $zip) {
-		GLogger::log("Checking problem statements...");
+		$this->log->info("Checking problem statements...");
 
 		// We need at least one statement
 		$statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $zipFilesArray);
@@ -50,7 +55,7 @@ class ProblemDeployer {
 				throw new InvalidParameterException("Statement {$file} is empty.");
 			}
 
-			GLogger::log("Adding statements to the files to be unzipped: " . $file);
+			$this->log->info("Adding statements to the files to be unzipped: " . $file);
 			$this->filesToUnzip[] = $file;
 		}
 
@@ -76,7 +81,7 @@ class ProblemDeployer {
 	 */
 	private function checkCases(ZipArchive $zip, array $zipFilesArray) {
 			
-		GLogger::log("Validating /cases");
+		$this->log->info("Validating /cases");
 		
 		// Necesitamos tener al menos 1 caso
 		$cases = 0;
@@ -123,7 +128,7 @@ class ProblemDeployer {
 			}
 		}
 
-		GLogger::log($cases . " cases found.");
+		$this->log->info($cases . " cases found.");
 
 		return true;
 	}
@@ -177,16 +182,16 @@ class ProblemDeployer {
 	 */
 	private function validateZip() {
 
-		GLogger::log("Validating zip...");
+		$this->log->info("Validating zip...");
 
 		if (!array_key_exists("problem_contents", $_FILES)) {
-			GLogger::error("\$_FILES global does not contain problem_contents.");
+			$this->log->error("\$_FILES global does not contain problem_contents.");
 			throw new InvalidParameterException("problem_contents is invalid.");
 		}
 
 		if (isset($_FILES['problem_contents']) &&
 				!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
-			GLogger::error("GetFileUploader()->IsUploadedFile() check failed for \$_FILES['problem_contents']['tmp_name'].");
+			$this->log->error("GetFileUploader()->IsUploadedFile() check failed for \$_FILES['problem_contents']['tmp_name'].");
 			throw new InvalidParameterException("problem_contents is invalid.");
 		}
 
@@ -196,7 +201,7 @@ class ProblemDeployer {
 
 		$originalZip = $_FILES['problem_contents']['tmp_name'];
 
-		GLogger::log("Opening $originalZip...");
+		$this->log->info("Opening $originalZip...");
 		$zip = new ZipArchive();
 		$resource = $zip->open($originalZip);
 
@@ -204,7 +209,7 @@ class ProblemDeployer {
 		if ($resource === TRUE) {
 			// Get list of files
 			for ($i = 0; $i < $zip->numFiles; $i++) {
-				GLogger::log("Found inside zip: '" . $zip->getNameIndex($i) . "'");
+				$this->log->info("Found inside zip: '" . $zip->getNameIndex($i) . "'");
 				$zipFilesArray[] = $zip->getNameIndex($i);
 
 				// Sum up the size
@@ -217,7 +222,7 @@ class ProblemDeployer {
 					$this->filesToUnzip[] = $zip->getNameIndex($i);
 					
 					$this->problemType = ProblemType::CustomValidator;					
-					GLogger::log("Validator found: " . $zip->getNameIndex($i));
+					$this->log->info("Validator found: " . $zip->getNameIndex($i));
 				}
 
 				// Interactive problems.
@@ -225,7 +230,7 @@ class ProblemDeployer {
 					$this->filesToUnzip[] = $zip->getNameIndex($i);
 					
 					$this->problemType = ProblemType::Interactive;
-					GLogger::log("Interactive folder found: " . $zip->getNameIndex($i));
+					$this->log->info("Interactive folder found: " . $zip->getNameIndex($i));
 				}
 			}
 
@@ -239,33 +244,33 @@ class ProblemDeployer {
 				if (in_array("testplan", $zipFilesArray)) {
 
 					$returnValue = $this->checkCasesWithTestplan($zip, $zipFilesArray);
-					GLogger::log("testplan found, checkCasesWithTestPlan=" . $returnValue);
+					$this->log->info("testplan found, checkCasesWithTestPlan=" . $returnValue);
 					$this->filesToUnzip[] = 'testplan';
 				} else {
-					GLogger::log("testplan not found");
+					$this->log->info("testplan not found");
 					$this->checkCases($zip, $zipFilesArray);
 				}
 
 				// Log files to unzip
-				GLogger::log("Files to unzip: ");
+				$this->log->info("Files to unzip: ");
 				foreach ($this->filesToUnzip as $file) {
-					GLogger::log($file);
+					$this->log->info($file);
 				}
 
 				// Look for statements
 				$returnValue = $this->checkProblemStatements($zipFilesArray, $zip);
-				GLogger::log("checkProblemStatements=" . $returnValue . ".");
+				$this->log->info("checkProblemStatements=" . $returnValue . ".");
 			} catch (Exception $e) {
 
 				// Close zip
-				GLogger::error("Validation Failed. Closing zip");
+				$this->log->error("Validation Failed. Closing zip");
 				$zip->close();
 
 				throw $e;
 			}			
 			
 			// Close zip
-			GLogger::log("closing zip");
+			$this->log->info("closing zip");
 			$zip->close();
 
 			return $returnValue;
@@ -287,14 +292,14 @@ class ProblemDeployer {
 		// Get a list of all available statements.
 		// At this point, zip is validated and it has at least 1 statement. No need to check
 		$statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $filesToUnzip);
-		GLogger::log("Handling statements...");
+		$this->log->info("Handling statements...");
 
 		// Transform statements from markdown to HTML  
 		foreach ($statements as $statement) {
 
 			// Get the path to the markdown unzipped file
 			$markdown_filepath = $dirpath . DIRECTORY_SEPARATOR . $statement;
-			GLogger::log("Reading file " . $markdown_filepath);
+			$this->log->info("Reading file " . $markdown_filepath);
 
 			// Read the contents of the original markdown file
 			$markdown_file_contents = FileHandler::ReadFile($markdown_filepath);
@@ -302,21 +307,21 @@ class ProblemDeployer {
 			// Fix for Windows Latin-1 statements:
 			// For now, assume that if it is not UTF-8, then it is Windows Latin-1 and then convert
 			if (!mb_check_encoding($markdown_file_contents, "UTF-8")) {
-				GLogger::log("File is not UTF-8.");
+				$this->log->info("File is not UTF-8.");
 
 				// Convert from ISO-8859-1 (Windows Latin1) to UTF-8
-				GLogger::log("Converting encoding from ISO-8859-1 to UTF-8 (Windows Latin1 to UTF-8, fixing accents)");
+				$this->log->info("Converting encoding from ISO-8859-1 to UTF-8 (Windows Latin1 to UTF-8, fixing accents)");
 				$markdown_file_contents = mb_convert_encoding($markdown_file_contents, "UTF-8", "ISO-8859-1");
 
 				// Then overwrite it into the statement file
-				GLogger::log("Overwriting file after encoding conversion: " . $markdown_filepath);
+				$this->log->info("Overwriting file after encoding conversion: " . $markdown_filepath);
 				FileHandler::CreateFile($markdown_filepath, $markdown_file_contents);
 			} else {
-				GLogger::log("File is UTF-8. Nice :)");
+				$this->log->info("File is UTF-8. Nice :)");
 			}
 
 			// Transform markdown to HTML
-			GLogger::log("Transforming markdown to html");
+			$this->log->info("Transforming markdown to html");
 			$html_file_contents = Markdown($markdown_file_contents, array($this, 'imageMarkdownCallback'));
 
 			// Get the language of this statement            
@@ -325,7 +330,7 @@ class ProblemDeployer {
 			$html_filepath = $dirpath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html";
 
 			// Save the HTML file in the path .../problem_alias/statements/lang.html            
-			GLogger::log("Saving HTML statement in " . $html_filepath);
+			$this->log->info("Saving HTML statement in " . $html_filepath);
 			FileHandler::CreateFile($html_filepath, $html_file_contents);
 		}
 	}
@@ -343,7 +348,7 @@ class ProblemDeployer {
 				$hashedFilename =  "$hash$extension";
 				$copyDestination = IMAGES_PATH . $hashedFilename;
 				
-				GLogger::log("Deploying image: copying $source to $copyDestination");
+				$this->log->info("Deploying image: copying $source to $copyDestination");
 				
 				FileHandler::Copy($source, $copyDestination);				
 				$this->imageHashes[$imagepath] = IMAGES_URL_PATH . $hashedFilename;
@@ -364,22 +369,22 @@ class ProblemDeployer {
 	 */
 	private function handleCases($dirpath, array $casesFiles) {
 
-		GLogger::log("Handling cases...");
+		$this->log->info("Handling cases...");
 
 		// Aplying normalizr to cases
 		$return_var = 0;
 		$output = array();
 		$normalizr_cmd = BIN_PATH . "/normalizr " . $dirpath . DIRECTORY_SEPARATOR . "cases/* 2>&1";
-		GLogger::log("Applying normalizr: " . $normalizr_cmd);
+		$this->log->info("Applying normalizr: " . $normalizr_cmd);
 		exec($normalizr_cmd, $output, $return_var);
 
 		// Log errors
 		if ($return_var !== 0) {
-			GLogger::warn("normalizr failed with error: " . $return_var);
+			$this->log->warn("normalizr failed with error: " . $return_var);
 		} else {
-			GLogger::log("normalizr succeeded");
+			$this->log->info("normalizr succeeded");
 		}
-		GLogger::log(implode("\n", $output));
+		$this->log->info(implode("\n", $output));
 
 		// After normalizrfication, we need to generate a zip file that will be
 		// passed between grader and runners with the INPUT files...                
@@ -392,22 +397,22 @@ class ProblemDeployer {
 
 		// Execute zip command
 		$output = array();
-		GLogger::log("Zipping input cases using: " . $zip_cmd);
+		$this->log->info("Zipping input cases using: " . $zip_cmd);
 		exec($zip_cmd, $output, $return_var);
 
 		// Check zip cmd return value
 		if ($return_var !== 0) {
 			// D:
-			GLogger::error("zipping cases failed with error: " . $return_var);
+			$this->log->error("zipping cases failed with error: " . $return_var);
 			throw new InvalidFilesystemOperationException("Error creating cases.zip. Please check log for details");
 		} else {
 			// :D
-			GLogger::log("zipping cases succeeded:");
-			GLogger::log(implode("\n", $output));
+			$this->log->info("zipping cases succeeded:");
+			$this->log->info(implode("\n", $output));
 		}
 
 		// Generate sha1sum for cases.zip distribution from grader to runners
-		GLogger::log("Writing to : " . $dirpath . DIRECTORY_SEPARATOR . "inputname");
+		$this->log->info("Writing to : " . $dirpath . DIRECTORY_SEPARATOR . "inputname");
 		file_put_contents($dirpath . DIRECTORY_SEPARATOR . "inputname", sha1_file($cases_zip_path));
 	}
 
@@ -421,7 +426,7 @@ class ProblemDeployer {
 
 		// Delete whathever the user sent us
 		if (!unlink($path_to_contents_zip)) {
-			GLogger::warn("Unable to delete contents.zip to replace with original contents!: " . $path_to_contents_zip);
+			$this->log->warn("Unable to delete contents.zip to replace with original contents!: " . $path_to_contents_zip);
 			return;
 		}
 
@@ -435,17 +440,17 @@ class ProblemDeployer {
 		$output = array();
 
 		$zip_cmd = "zip -r " . $path_to_contents_zip . " cases/* 2>&1";
-		GLogger::log("Zipping contents.zip cases using: " . $zip_cmd);
+		$this->log->info("Zipping contents.zip cases using: " . $zip_cmd);
 		exec($zip_cmd, $output, $return_var);
 
 		// Check zip cmd return value
 		if ($return_var !== 0) {
 			// D:
-			GLogger::error("zipping cases/* contents.zip failed with error: " . $return_var);
+			$this->log->error("zipping cases/* contents.zip failed with error: " . $return_var);
 		} else {
 			// :D
-			GLogger::log("zipping cases contents.zip succeeded:");
-			GLogger::log(implode("\n", $output));
+			$this->log->info("zipping cases contents.zip succeeded:");
+			$this->log->info(implode("\n", $output));
 		}
 
 		// 
@@ -453,18 +458,18 @@ class ProblemDeployer {
 		$output = array();
 
 		$zip_cmd = "zip -r " . $path_to_contents_zip . " statements/* 2>&1";
-		GLogger::log("Zipping contents.zip statements using: " . $zip_cmd);
+		$this->log->info("Zipping contents.zip statements using: " . $zip_cmd);
 		exec($zip_cmd, $output, $return_var);
 
 
 		// Check zip cmd return value
 		if ($return_var !== 0) {
 			// D:
-			GLogger::error("zipping statements/* contents.zip failed with error: " . $return_var);
+			$this->log->error("zipping statements/* contents.zip failed with error: " . $return_var);
 		} else {
 			// :D
-			GLogger::log("zipping statements contents.zip succeeded:");
-			GLogger::log(implode("\n", $output));
+			$this->log->info("zipping statements contents.zip succeeded:");
+			$this->log->info(implode("\n", $output));
 		}
 
 		// get back to original dir

@@ -40,6 +40,7 @@ define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
  * Load libraries
  *
  * */
+require_once('libs/log4php/src/main/php/Logger.php');
 require_once("libs/dao/model.inc.php");
 require_once("libs/SessionManager.php");
 require_once("libs/Request.php");
@@ -55,7 +56,7 @@ require_once('libs/phpmailer/class.phpmailer.php');
 require_once('libs/UITools.php');
 require_once('libs/Mailchimp/Mailchimp.php');
 require_once('libs/ApiException.php' );
-require_once('libs/log4php/src/main/php/Logger.php');
+
 
 /*
  * Configurar log4php
@@ -75,7 +76,7 @@ Logger::configure(array(
 				'layout' => array(
 					'class' => 'LoggerLayoutPattern',
 					'params' => array(
-						'conversionPattern' => '%date [%logger] %level: %message%newline',
+						'conversionPattern' => '%date [%level]: %message (at %F line %L) %newline',
 					)
 				),
 				'params' => array(
@@ -86,37 +87,6 @@ Logger::configure(array(
 		)
 	));
 
-class GLogger
-{
-	static $logger;
-
-	public static function Log($s)
-	{
-		if (self::$logger == NULL)
-		{
-			self::$logger = Logger::getLogger("GLogger");
-		}
-		self::$logger->info($s);
-	}
-
-	public static function error($s)
-	{
-		if (self::$logger == NULL)
-		{
-			self::$logger = Logger::getLogger("myLogger");
-		}
-		self::$logger->error($s);
-	}
-
-	public static function warn($s)
-	{
-		if (self::$logger == NULL)
-		{
-			self::$logger = Logger::getLogger("myLogger");
-		}
-		self::$logger->warn($s);
-	}
-}
 
 /**
  * Load controllers

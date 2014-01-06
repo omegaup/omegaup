@@ -6,7 +6,11 @@
  * @author joemmanuel
  */
 class Controller {
-	
+
+	// If we turn this into protected,
+	// how are we going to initialize?
+	public static $log;
+
 	/**
 	 * List of veredicts
 	 * 
@@ -61,4 +65,6 @@ class Controller {
 		return $str;
 	}
 }
+
+Controller::$log = Logger::getLogger("controller");
 

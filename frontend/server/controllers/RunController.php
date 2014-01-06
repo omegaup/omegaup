@@ -128,7 +128,7 @@ class RunController extends Controller {
 		// Validate request
 		self::validateCreateRequest($r);
 
-		GLogger::log("New run being submitted !!");
+		self::$log->info("New run being submitted !!");
 		$response = array();
 
 		if (self::$practice) {
@@ -157,7 +157,7 @@ class RunController extends Controller {
 						//holy moly, he is submitting a run 
 						//and he hasnt even opened the problem
 						//what should be done here?
-						GLogger::error("User is submitting a run and he has not even opened the problem");
+						self::$log->error("User is submitting a run and he has not even opened the problem");
 						throw new Exception("User is submitting a run and he has not even opened the problem");
 					}
 
@@ -170,7 +170,7 @@ class RunController extends Controller {
 					break;
 
 				default:
-					GLogger::error("penalty_time_start for this contests is not a valid option, asuming `none`.");
+					self::$log->error("penalty_time_start for this contests is not a valid option, asuming `none`.");
 					$start = null;
 			}
 
@@ -233,8 +233,8 @@ class RunController extends Controller {
 		try {
 			self::$grader->Grade($run->getRunId());
 		} catch (Exception $e) {
-			GLogger::error("Call to Grader::grade() failed:");
-			GLogger::error($e);
+			self::$log->error("Call to Grader::grade() failed:");
+			self::$log->error($e);
 		}
 
 		if (self::$practice) {
@@ -343,7 +343,7 @@ class RunController extends Controller {
 			throw new ForbiddenAccessException();
 		}
 
-		GLogger::log("Run being rejudged!!");
+		self::$log->info("Run being rejudged!!");
 
 		// Try to delete compile message, if exists.
 		try {
@@ -353,14 +353,14 @@ class RunController extends Controller {
 			}
 		} catch (Exception $e) {
 			// Soft error :P
-			GLogger::warn($e);
+			self::$log->warn($e);
 		}
 
 		try {
 			self::$grader->Grade($r["run"]->getRunId());
 		} catch (Exception $e) {
-			GLogger::error("Call to Grader::grade() failed:");
-			GLogger::error($e);
+			self::$log->error("Call to Grader::grade() failed:");
+			self::$log->error($e);
 		}
 
 		$response = array();
@@ -402,8 +402,8 @@ class RunController extends Controller {
 			
 		} catch (Exception $e) {
 			// We did our best effort to invalidate the cache...
-			GLogger::warn("Failed to invalidate cache on Rejudge, skipping: ");
-			GLogger::warn($e);			
+			self::$log->warn("Failed to invalidate cache on Rejudge, skipping: ");
+			self::$log->warn($e);			
 		}
 	}
 
