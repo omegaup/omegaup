@@ -13,3 +13,6 @@
 [submodule "frontend/server/libs/log4php"]
 	path = frontend/server/libs/log4php
 	url = https://github.com/omegaup/logging-log4php.git
+[submodule "frontend/server/libs/adodb"]
+	path = frontend/server/libs/adodb
+	url = git://git.code.sf.net/p/adodb/git
