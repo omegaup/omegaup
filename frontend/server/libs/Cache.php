@@ -36,10 +36,10 @@ class Cache
 		$this->log = Logger::getLogger("cache");
         
         if($this->enabled){
-            $this->log->info("Cache enabled for " . $this->key);
+            $this->log->debug("Cache enabled for " . $this->key);
         }
         else{
-            $this->log->info("Cache DISABLED for " . $this->key);
+            $this->log->debug("Cache DISABLED for " . $this->key);
         }       
         
     }

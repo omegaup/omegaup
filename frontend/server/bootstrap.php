@@ -69,6 +69,7 @@ require_once('libs/ApiException.php' );
 Logger::configure(array(
 		'rootLogger' => array(
 			'appenders' => array('default'),
+			'level' => OMEGAUP_LOG_LEVEL
 		),
 		'appenders' => array(
 			'default' => array(
