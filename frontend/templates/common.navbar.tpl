@@ -55,10 +55,14 @@
 								omegaup.getGraderStats(function(stats){	
 									if (stats && stats.status == "ok") {
 										var graderInfo = stats.grader;
+										var queueLength = -1;
 
 										if (graderInfo.status == "ok") {
 											var now = new Date().getTime() / 1000;
-											if (graderInfo.queues['#default'].run_queue_length < 5) {
+											if (graderInfo.queues) {
+												queueLength = graderInfo.queues['#default'].run_queue_length;
+											}
+											if (queueLength < 5) {
 												$("#grader-status > a").addClass("grader-ok");
 											} else {
 												$("#grader-status > a").addClass("grader-warning");
@@ -72,7 +76,7 @@
 											html += "<li><a href=\"#\">Grader DOWN</a></li>";
 										}
 
-										$("#grader-count").html(graderInfo.queues['#default'].run_queue_length);
+										$("#grader-count").html(queueLength);
 									} else {
 										$("#grader-status > a").addClass("grader-unknown");
 										html += "<li><a href=\"#\">Grader DOWN</a></li>";

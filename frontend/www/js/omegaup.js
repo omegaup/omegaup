@@ -94,7 +94,7 @@ OmegaUp.ui = {
 	},
 
 	prettyPrintJSON: function(json) {
-		return OmegaUp.ui.syntaxHighlight(JSON.stringify(json, undefined, 4));
+		return OmegaUp.ui.syntaxHighlight(JSON.stringify(json, undefined, 4) || "");
 	},
 
 	syntaxHighlight: function(json) {
