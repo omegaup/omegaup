@@ -93,10 +93,16 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
         if (!isInterpreted(lang) && !Config.get("runner.preserve", false)) {
           inputFiles.foreach { new File(_).delete }
         }
+
+        val missingMainClass = lang match {
+          case "p" => !(new File(runDirectory, "Main").exists())
+          case "java" => !(new File(runDirectory, "Main.class").exists())
+          case _ => false
+        }
       
         if (previousError == null &&
             status == 0 &&
-            (lang != "p" || new File(runDirectory, "Main").exists())) {
+            !missingMainClass) {
           if (!Config.get("runner.preserve", false)) {
             new File(runDirectory.getCanonicalPath + "/compile.meta").delete
             new File(runDirectory.getCanonicalPath + "/compile.out").delete
@@ -108,7 +114,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
         } else {
           val meta = MetaFile.load(runDirectory.getCanonicalPath + "/compile.meta")
       
-          val compileError =
+          var compileError =
             if (previousError != null)
               previousError
             else if (meta("status") == "TO")
@@ -123,6 +129,10 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
               FileUtil
                 .read(runDirectory.getCanonicalPath + "/compile.err")
                 .replace(runDirectory.getCanonicalPath + "/", "")
+
+          if (compileError == "") {
+            compileError = "Class should be called \"Main\"."
+          }
         
           if (!Config.get("runner.preserve", false)) {
             FileUtil.deleteDirectory(runDirectory.getParentFile.getCanonicalPath)

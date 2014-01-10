@@ -67,6 +67,17 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       foo
     """))))
     test7.status should equal ("compile error")
+    test7.error should not equal (Some("Class should be called \"Main\"."))
+    
+    val test8 = runner.compile(CompileInputMessage("java", List(("Main.java", """
+      class Foo {
+        public static void main(String[] args) {
+          System.out.println("Hello, World!\n");
+        }
+      }
+    """))))
+    test8.status should equal ("compile error")
+    test8.error should equal (Some("Class should be called \"Main\"."))
   }
   
   "OK" should "be correctly handled" in {
