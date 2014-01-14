@@ -23,7 +23,13 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 		$n = 10;
 		
 		$lastMonth = intval(date('m')) - 1;
-		$runCreationDate = date('Y-' . $lastMonth . '-01');
+		$runCreationDate = null;
+		if ($lastMonth == 0) {
+			$runCreationDate = date(intval((date('Y')) - 1) . '-12-01');
+		} else {
+			$runCreationDate = date('Y-' . $lastMonth . '-01');
+		}		
+		
 		
 		for ($i = 0; $i < $n; $i++) {
 			$runData = RunsFactory::createRun($problem, $contest, $user);

@@ -31,9 +31,17 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 	public static function calculateCoderOfTheMonth($firstDay) {
 
 		$endTime = $firstDay;
-
-		$lastMonth = intval(date('m')) - 1;
-		$startTime = date('Y-' . $lastMonth . '-01');
+		$startTime = null;
+		
+		$lastMonth = intval(date('m')) - 1;		
+		
+		if ($lastMonth === 0) {
+			// First month of the year, we need to check into last month of last year.
+			$lastYear = intval(date('Y')) - 1;
+			$startTime = date($lastYear . '-12-01');
+		} else {			
+			$startTime = date('Y-' . $lastMonth . '-01');
+		}
 		
 		$sql = "
 			SELECT COUNT( * ) TotalSolved, Users . user_id 
