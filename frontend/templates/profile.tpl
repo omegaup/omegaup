@@ -15,7 +15,7 @@
 			<div class="panel-body">
 				<div class="thumbnail bottom-margin"> <img src="{$profile.userinfo.gravatar_92}"/></div>
 				{if isset($profile.userinfo.email)}
-				<div id="profile-edit"><a href="useredit.php" class="btn btn-default">{#profileEdit#}</a></div>
+				<div id="profile-edit"><a href="/useredit.php" class="btn btn-default">{#profileEdit#}</a></div>
 				{/if}
 			</div>
 		</div>
