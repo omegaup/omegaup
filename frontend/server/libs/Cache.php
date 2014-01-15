@@ -105,7 +105,7 @@ class Cache
                 return $result;
             }
             else{
-                $this->log->info("Cache miss for key: " . $this->key);
+                $this->log->debug("Cache miss for key: " . $this->key);
             }
                 
         }

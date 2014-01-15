@@ -77,7 +77,7 @@ Logger::configure(array(
 				'layout' => array(
 					'class' => 'LoggerLayoutPattern',
 					'params' => array(
-						'conversionPattern' => '%date [%level]: %message (at %F line %L) %newline',
+						'conversionPattern' => '%date [%level]: %server{REQUEST_URI} %message (%F:%L) %newline',
 					)
 				),
 				'params' => array(

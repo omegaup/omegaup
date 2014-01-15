@@ -710,7 +710,7 @@ class UserController extends Controller {
 				$user = UsersDAO::FindByUsername($r["username"]);
 
 				if (is_null($user)) {
-					throw new NotFoundException("User does not exists");
+					throw new NotFoundException("User does not exist");
 				}
 			} 
 			catch (ApiException $e) {
