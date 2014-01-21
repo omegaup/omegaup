@@ -17,11 +17,7 @@
 					<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
 				</div>
 			</div>
-		</div>
-
-		<div class="panel panel-default">
-			<div id="ranking-chart"></div>
-		</div>
+		</div>		
 		
 		<div class="panel panel-default">
 			<div class="panel-heading">					
@@ -58,7 +54,7 @@
 			<div class="panel-heading">
 				<h3 class="panel-title">{#frontPageMaterial#}</h3>
 			</div>
-			<div id="coder_of_the_month" class="panel-body">
+			<div id="recommended_material" class="panel-body">
 				<a href="https://omegaup.com/img/libropre3.pdf">Descarga en PDF aquí:
 				<img src="https://omegaup.com/img/libroluis.gif" width="75%"/>				
 				</a>
@@ -71,9 +67,13 @@
 			</div>
 			<ul class="list-group" id="next-contests-list">			
 		    </ul>
-		</div>
+		</div>					
 				
-		{include file='rank.table.tpl' rank=$rank}		
+		{include file='rank.table.tpl' rank=$rank}
+		
+		<div class="panel panel-default">
+			<div id="runs-chart"></div>
+		</div>
 		
 	</div>
 </div>
@@ -87,12 +87,20 @@
 			// Grab the container we will put the results into
 			var container = document.getElementById("blog-posts");
 			container.innerHTML = '';
+			
+			var bootstrap_ul = document.createElement("ul");
+			bootstrap_ul.className = 'list-group';
+			
+			container.appendChild(bootstrap_ul);
 
 			// Loop through the feeds, putting the titles onto the page.
 			// Check out the result object for a list of properties returned in each entry.
 			// http://code.google.com/apis/ajaxfeeds/documentation/reference.html#JSON
 			for (var i = 0; i < result.feed.entries.length; i++) {
 				var entry = result.feed.entries[i];
+				
+				var bootstrap_li = document.createElement("li");
+				bootstrap_li.className = "list-group-item";
 				
 				var div = document.createElement("div");
 				div.className = "media-body";
@@ -111,12 +119,13 @@
 				div.appendChild(publishedDate);
 
 				var body = document.createElement("p");
-				body.className = "body";
-				body.appendChild(document.createTextNode( entry.contentSnippet ));
-				div.appendChild(body);
+				body.className = "body";								
+				body.innerHTML = "<br>" + entry.content.slice(0,entry.content.indexOf("</p>") - 1) + "<b><a href='" + entry.link + "'>... Ver más > </a></b>";					
+				div.appendChild(body);								
 
-				container.appendChild(div);
-			}
+				bootstrap_li.appendChild(div);
+				bootstrap_ul.appendChild(bootstrap_li);
+			}						
 		}
 	}
 
@@ -124,7 +133,7 @@
 	  // Create a feed instance that will grab Digg's feed.
 	  var feed = new google.feeds.Feed("http://blog.omegaup.com/rss");
 
-	  // Calling load sends the request off.  It requires a callback function.
+	  // Calling load sends the request off.  It requires a callback function.	  
 	  feed.load(feedLoaded);
 	  
 	  omegaup.runCounts(createChart);
@@ -167,12 +176,12 @@
 		window.chart = new Highcharts.Chart({			
 			chart: {
 				type: 'area',
-				renderTo: 'ranking-chart',
+				renderTo: 'runs-chart',
 				height: 300,
 				spacingTop: 20
 			},
 			title: {
-				text: 'Envíos totales evaluados por omegaUp'
+				text: 'Envíos totales'
 			},
 			xAxis: {
 				type: 'datetime',                
