@@ -556,7 +556,7 @@ class ProblemController extends Controller {
 			// At this point, contestant_user relationship should be established.        
 			try {
 				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-								$r["current_user_id"], $r["contest"]->getContestId());
+									$r["current_user_id"], $r["contest"]->getContestId());
 			} catch (Exception $e) {
 				// Operation failed in the data layer
 				throw new InvalidDatabaseOperationException($e);
@@ -937,7 +937,11 @@ class ProblemController extends Controller {
 		// Uses same params as apiDetails, except for lang, which is optional
 		self::validateDetails($r);
 		
-		$response["score"] = self::bestScore($r);
+		// If username is set in the request, we use that user as target.
+		// else, we query using current_user
+		$user = self::resolveTargetUser($r);
+		
+		$response["score"] = self::bestScore($r, $user);
 		$response["status"] = "ok";
 		return $response;
 	}
@@ -954,15 +958,17 @@ class ProblemController extends Controller {
 	 * @return float
 	 * @throws InvalidDatabaseOperationException
 	 */
-	private static function bestScore(Request $r) {
+	private static function bestScore(Request $r, Users $user = null) {
+		
+		$current_user_id = (is_null($user) ? $r["current_user_id"] : $user->getUserId());
 		
 		$score = 0;
 		try {
 			// Add best score info
 			if (is_null($r["contest"])) {
-				$score = RunsDAO::GetBestScore($r["problem"]->getProblemId(), $r["current_user_id"]);
+				$score = RunsDAO::GetBestScore($r["problem"]->getProblemId(), $current_user_id);
 			} else {
-				$bestRun = RunsDAO::GetBestRun($r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"], strtotime($r["contest"]->getFinishTime()), false /*showAllRuns*/);								
+				$bestRun = RunsDAO::GetBestRun($r["contest"]->getContestId(), $r["problem"]->getProblemId(), $current_user_id, strtotime($r["contest"]->getFinishTime()), false /*showAllRuns*/);								
 				$score = is_null($bestRun->getContestScore()) ? 0 : $bestRun->getContestScore();
 			}				
 		} catch(Exception $e) {

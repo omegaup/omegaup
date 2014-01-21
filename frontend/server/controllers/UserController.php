@@ -687,44 +687,8 @@ class UserController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
+		
 	
-	/**
-	 * Resolves the target user for the API. If a username is provided in
-	 * the request, then we use that one. Otherwise, we use currently logged user
-	 * 
-	 * @param Request $r
-	 * @return Users
-	 * @throws InvalidDatabaseOperationException
-	 * @throws NotFoundException
-	 */
-	private static function resolveTargetUser(Request $r) {
-		
-		// By default use current user		
-		$user = $r["current_user"];	 
-		
-		if (!is_null($r["username"])) {
-			
-			Validators::isStringNonEmpty($r["username"], "username");
-			
-			try {
-				$user = UsersDAO::FindByUsername($r["username"]);
-
-				if (is_null($user)) {
-					throw new NotFoundException("User does not exist");
-				}
-			} 
-			catch (ApiException $e) {
-				throw $e;
-			}
-			catch (Exception $e) {
-				throw new InvalidDatabaseOperationException($e);
-			}			
-		}
-		
-		return $user;
-	}
-
-
 	/**
 	 * Returns the prefered language as a string (en,es,fra) of the user given
 	 * If no user is give, language is retrived from the browser.

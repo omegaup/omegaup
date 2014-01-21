@@ -7,7 +7,7 @@
 class ProblemBestScoreTest extends OmegaupTestCase {
 
 	/**
-	 * Test apiBestScore for submits in a problem
+	 * Test apiBestScore for submits in a problem for current user
 	 */
 	public function testBestScoreInProblem() {
 		
@@ -63,6 +63,38 @@ class ProblemBestScoreTest extends OmegaupTestCase {
 		))); 
 		
 		$this->assertEquals(50.00, $response["score"]);
+	}
+	
+	/**
+	 * Test apiBestScore for submits in a problem for other user
+	 */
+	public function testBestScoreInProblemOtherUser() {
+		
+		// Create problem
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Create contestant
+		$contestant = UserFactory::createUser();
+		
+		// Create user who will use the API
+		$user = UserFactory::createUser();
+		
+		// Create 2 runs, 100 and 50.
+		RunController::$defaultSubmissionGap = 0;
+		$runData = RunsFactory::createRunToProblem($problemData, $contestant);
+		$runDataPA = RunsFactory::createRunToProblem($problemData, $contestant);
+		RunsFactory::gradeRun($runData);
+		RunsFactory::gradeRun($runDataPA, 0.5, "PA");
+		RunController::$defaultSubmissionGap = 60;
+		
+		// Call API
+		$response = ProblemController::apiBestScore(new Request(array(
+			"auth_token" => $this->login($user),
+			"problem_alias" => $problemData["request"]["alias"],
+			"username" => $contestant->getUsername()
+		)));
+		
+		$this->assertEquals(100.00, $response["score"]);
 	}
 }
 	
