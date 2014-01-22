@@ -49,6 +49,45 @@ class Controller {
 	}
 	
 	/**
+	 * Resolves the target user for the API. If a username is provided in
+	 * the request, then we use that one. Otherwise, we use currently logged-in
+	 * user.
+	 * 
+	 * Request must be authenticated before this function is called.
+	 * 
+	 * @param Request $r
+	 * @return Users
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 */
+	protected static function resolveTargetUser(Request $r) {
+		
+		// By default use current user		
+		$user = $r["current_user"];	 
+		
+		if (!is_null($r["username"])) {
+			
+			Validators::isStringNonEmpty($r["username"], "username");
+			
+			try {
+				$user = UsersDAO::FindByUsername($r["username"]);
+
+				if (is_null($user)) {
+					throw new NotFoundException("User does not exist");
+				}
+			} 
+			catch (ApiException $e) {
+				throw $e;
+			}
+			catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}			
+		}
+		
+		return $user;
+	}
+	
+	/**
 	 * Retunrs a random string of size $length
 	 * 
 	 * @param string $length
