@@ -98,6 +98,7 @@
 					</select>
 				</div>
 				<textarea name="code"></textarea><br/>
+				<input type="file" id="code_file" /><br/>
 				<input type="submit" />
 			</form>			
 		</div>
