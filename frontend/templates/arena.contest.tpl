@@ -166,6 +166,7 @@
 					<select name="language">
 						<option value=""></option>
 						<option value="cpp">C++</option>
+						<option value="cpp11">C++11</option>
 						<option value="c">C</option>
 						<option value="java">Java</option>
 						<option value="p">Pascal</option>

@@ -42,7 +42,7 @@ class RunController extends Controller {
 			// Check that problem exists
 			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
 
-			Validators::isInEnum($r["language"], "language", array('kp', 'kj', 'c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'cat', 'hs'));
+			Validators::isInEnum($r["language"], "language", array('kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'cat', 'hs'));
 			Validators::isStringNonEmpty($r["source"], "source");
 
 			// Check for practice or public problem, there is no contest info in this scenario
@@ -671,7 +671,7 @@ class RunController extends Controller {
 			}
 		}
 
-		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj', 'cat', 'hs'), false);
+		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj', 'cat', 'hs'), false);
 		
 		// Get user if we have something in username
 		if (!is_null($r["username"])) {

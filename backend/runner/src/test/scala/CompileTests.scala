@@ -241,6 +241,59 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       new CaseData("zerodiv", "7"),
       new CaseData("ret1", "8")
     ))), new File(zipRoot.getCanonicalPath + "/test3.zip"))
+
+    val test4 = runner.compile(CompileInputMessage("cpp11", List(("Main.cpp", """
+      #include<stdio.h>
+      #include<stdlib.h>
+      #include<unistd.h>
+      int main() {
+        int x;
+        (void)scanf("%d", &x);
+        switch (x) {
+          case 0:
+            (void)printf("Hello, World!\n");
+            break;
+          case 1:
+            while(1);
+            break;
+          case 2:
+            fork();
+            break;
+          case 3:
+            while(1) (void) malloc(1024*1024);
+            break;
+          case 4:
+            while(1) printf("trololololo\n");
+            break;
+          case 5:
+            (void)fopen("/etc/shadow", "r");
+            break;
+          case 6:
+            printf("%d", *reinterpret_cast<int*>(x-6));
+            break;
+          case 7:
+            printf("%d", 1/(x-7));
+            break;
+          case 8:
+            return 1;
+        }
+        return 0;
+      }
+    """))))
+    test4.status should equal ("ok")
+    test4.token should not equal None
+    
+    runner.run(RunInputMessage(test4.token.get, 1, 65536, 1, None, Some(List(
+      new CaseData("ok", "0"),
+      new CaseData("tle", "1"),
+      new CaseData("rfe", "2"),
+      new CaseData("mle", "3"),
+      new CaseData("ole", "4"),
+      new CaseData("ae", "5"),
+      new CaseData("segfault", "6"),
+      new CaseData("zerodiv", "7"),
+      new CaseData("ret1", "8")
+    ))), new File(zipRoot.getCanonicalPath + "/test2.zip"))
   }
 
   "Exploits" should "be handled" in {
