@@ -568,5 +568,45 @@ class ProblemDeployer {
 		} 
 	}
 
+	/**
+	 * Gets the maximum output file size. Returns -1 if there is a
+	 * custom validator.
+	 * 
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 */
+	public function getOutputLimit(Request $r) {
+		$dirpath = $this->getDirpath($r);
+		$has_validator = false;
+
+		if ($handle = opendir($dirpath)) {
+			while (false !== ($entry = readdir($handle))) {
+				if (stripos($entry, 'validator.') === 0) {
+					$has_validator = true;
+					break;
+				}
+			}
+			closedir($handle);
+		}
+
+		if ($has_validator) {
+			return -1;
+		}
+
+		$dirpath .= '/cases';
+
+		$output_limit = 10240;
+
+		if ($handle = opendir($dirpath)) {
+			while (false !== ($entry = readdir($handle))) {
+				if (!$this->endsWith($entry, '.out', true)) continue;
+
+				$output_limit = max($output_limit, filesize("$dirpath/$entry"));
+			}
+			closedir($handle);
+		}
+
+		return (int)(($output_limit + 4095) / 4096 + 1) * 4096;
+	}
 }
 
