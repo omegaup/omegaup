@@ -125,7 +125,8 @@
 
 				var publishedDate = document.createElement("div");
 				publishedDate.className = "date";
-				publishedDate.appendChild(document.createTextNode(Date.create(entry.publishedDate).short("es")));
+				publishedDate.appendChild(document.createTextNode("Por: " + entry.author));
+				publishedDate.appendChild(document.createTextNode(" - " + Date.create(entry.publishedDate).short("es")));
 				div.appendChild(publishedDate);
 
 				var body = document.createElement("p");
