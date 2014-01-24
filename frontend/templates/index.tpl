@@ -31,6 +31,16 @@
 	
 	<div class="col-md-4">
 		<div class="panel panel-default">
+			<div class="panel-body">
+				<!-- Facebook like button -->
+				<div class="fb-like" data-href="https://www.facebook.com/omegaup" data-width="5" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>
+				<br/>
+				<!-- Twitter follow -->
+				<a href="https://twitter.com/omegaup" class="twitter-follow-button" data-show-count="true" data-lang="en">Follow @omegaup</a>
+				<script>!function(d,s,id){ var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){ js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs); } }(document,"script","twitter-wjs");</script>
+			</div>	
+		</div>
+		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">{#index#}</h3>
 			</div>

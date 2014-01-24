@@ -55,6 +55,18 @@
 		<script type="text/javascript"> /* Set sugarjs date locale globally */ Date.setLocale("{#locale#}");</script>
 	</head>
 	<body>
+		
+		<!-- Facebook like stuff -->
+		<div id="fb-root"></div>
+		<script>
+			(function(d, s, id) {
+			  var js, fjs = d.getElementsByTagName(s)[0];
+			  if (d.getElementById(id)) return;
+			  js = d.createElement(s); js.id = id;
+			  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=197705690257857";
+			  fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
+		</script>
 		<div id="wrapper">
 
 {include file='common.navbar.tpl'}
