@@ -186,7 +186,7 @@ class ProblemController extends Controller {
 			$output_limit = $problemDeployer->getOutputLimit($r);
 
 			if ($output_limit != -1) {
-				$r['problem']->setOutputLimit($output_limit);
+				$problem->setOutputLimit($output_limit);
 			}
 
 			// Save the contest object with data sent by user to the database

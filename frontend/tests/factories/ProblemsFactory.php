@@ -63,6 +63,7 @@ class ProblemsFactory {
         $r["source"] = "yo";
         $r["order"] = "normal";
 		$r["public"] = $public;        	
+		$r["output_limit"] = 10240;        	
         
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = $zipName; 
