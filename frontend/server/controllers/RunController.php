@@ -561,7 +561,7 @@ class RunController extends Controller {
 
 		$r["contest"] = ContestsDAO::getByPK($r["run"]->getContestId());
 
-		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+		if (!Authorization::IsSystemAdmin($r['current_user_id']) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException();
 		}
 
@@ -693,8 +693,6 @@ class RunController extends Controller {
 		self::authenticateRequest($r);
 		
 		self::validateList($r);
-		
-		$runs_mask = null;
 
 		// Get all runs for problem given        
 		$runs_mask = new Runs(array(					
