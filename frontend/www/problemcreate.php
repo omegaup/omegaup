@@ -20,7 +20,8 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 				"validator" => $_POST["validator"],
 				"time_limit" => $_POST["time_limit"],
 				"memory_limit" => $_POST["memory_limit"],
-				"source" => $_POST["source"],				
+				"output_limit" => $_POST["output_limit"],
+ 				"source" => $_POST["source"],				
 				"public" => $_POST["public"],
 			));
 	$r->method = "ProblemController::apiCreate";

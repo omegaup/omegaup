@@ -73,6 +73,7 @@
 						<th>{#wordsTime#}</th>
 						<th>{#wordsStatus#}</th>
 						<th>{#wordsPoints#}</th>
+						<th>%</th>
 						<th>{#wordsPenalty#}</th>
 						<th>Rejuecear</th>
 						<th>{#wordsDetails#}</th>
@@ -95,6 +96,7 @@
 						<td class="time"></td>
 						<td class="status"></td>
 						<td class="points"></td>
+						<td class="percentage"></td>
 						<td class="penalty"></td>
 						<td class="rejudge"></td>
 						<td class="details"></td>

@@ -371,6 +371,7 @@ $(document).ready(function() {
 			$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 			$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 			$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
+			$('.percentage', r).html((parseFloat(run.score) * 100).toFixed(2) + '%');
 			$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
 			if (run.veredict == 'JE')
 			{
