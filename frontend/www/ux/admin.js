@@ -403,12 +403,12 @@ $(document).ready(function() {
 					omegaup.runDetails(guid, function(data) {
 						$('#run-details .compile_error').html('');
 						if (data.compile_error) {
-							$('#run-details .compile_error').html(data.compile_error.replace('&', '&amp;').replace('<', '&lt;'));
+							$('#run-details .compile_error').html(omegaup.escape(data.compile_error));
 						}
 						if (data.source.indexOf('data:') === 0) {
 							$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">descarga</a>');
 						} else {
-							$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
+							$('#run-details .source').html(omegaup.escape(data.source));
 						}
 						$('#run-details .cases div').remove();
 						$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
@@ -443,8 +443,8 @@ $(document).ready(function() {
 							var c = data.cases[i];
 							$('#run-details .cases').append($("<div></div>").append($("<h2></h2>").html(c.name)));
 							$('#run-details .cases').append($("<div></div>").html(JSON.stringify(c.meta)));
-							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff ? c.out_diff.replace(/&/g, '&amp;').replace(/</g, '&lt;') : "")));
-							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.err ? c.err.replace(/&/g, '&amp;').replace(/</g, '&lt;') : "")));
+							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff ? omegaup.escape(c.out_diff) : "")));
+							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.err ? omegaup.escape(c.err) : "")));
 						}
 						window.location.hash = 'run/details';
 						$(window).hashchange();
