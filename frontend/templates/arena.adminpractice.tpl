@@ -59,6 +59,10 @@
 							<option value="kp">Karel (Pascal)</option>
 							<option value="kj">Karel (Java)</option>
 						</select>
+							
+						<label for="runsusername">Usuario: </label>
+						<input id="runsusername" type="text"  size='20'/>
+						<input id='user' name='user' value='' type='hidden'>
 					</div>
 				</caption>
 				<thead>

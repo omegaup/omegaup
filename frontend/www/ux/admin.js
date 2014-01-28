@@ -11,6 +11,7 @@ $(document).ready(function() {
 	var runsStatus = "";
 	var runsProblem = "";
 	var runsLang = "";
+	var runsUsername = "";
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
 	var rankChartLimit = 1e99;
@@ -81,7 +82,7 @@ $(document).ready(function() {
 			$('#root').fadeIn('slow');
 		});
 	}
-
+	
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
 			$('#overlay, #submit #clarification').hide();
@@ -111,6 +112,20 @@ $(document).ready(function() {
 		// Refresh with previous page
 		refreshRuns();
 	});
+	
+	$("#runsusername").typeahead({
+		ajax: "/api/user/list/",
+		display: 'label',
+		val: 'label',
+		minLength: 2,
+		itemSelected: function (item, val, text) {
+			$("#user").val(val);
+			
+			// Refresh runs by calling change func
+			runsUsername = val;
+			$('select.runsveredict').change();
+		}
+    });
 	
 	$('select.runsveredict, select.runsstatus, select.runsproblem, select.runslang').change(function () {
 		runsVeredict = $('select.runsveredict option:selected').val();
@@ -346,6 +361,10 @@ $(document).ready(function() {
 		
 		if (runsLang != "") {
 			options.language = runsLang;
+		}
+		
+		if (runsUsername != "") {
+			options.username = runsUsername;
 		}
 	
 		if (contestAlias === "admin") {
