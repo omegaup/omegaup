@@ -187,7 +187,7 @@ abstract class RunsDAOBase extends DAO
 		}
 
 		if( $Runs->getUserId() != NULL){
-			$sql .= " user_id = ? AND";
+			$sql .= " Runs.user_id = ? AND";
 			array_push( $val, $Runs->getUserId() );
 		}
 
