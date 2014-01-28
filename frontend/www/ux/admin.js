@@ -118,14 +118,18 @@ $(document).ready(function() {
 		display: 'label',
 		val: 'label',
 		minLength: 2,
-		itemSelected: function (item, val, text) {
-			$("#user").val(val);
-			
+		itemSelected: function (item, val, text) {						
 			// Refresh runs by calling change func
 			runsUsername = val;
 			$('select.runsveredict').change();
 		}
     });
+	
+	$('#runsusername-clear').click(function() {
+		runsUsername = "";
+		$("#runsusername").val('');
+		$('select.runsveredict').change();
+	});
 	
 	$('select.runsveredict, select.runsstatus, select.runsproblem, select.runslang').change(function () {
 		runsVeredict = $('select.runsveredict option:selected').val();
