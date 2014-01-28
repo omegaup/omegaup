@@ -210,7 +210,7 @@ class Problems extends VO
 	  * @access protected
 	  * @var int(11)
 	  */
-	protected $output_limit = 10240;
+	protected $output_limit;
 
 	/**
 	  * visits

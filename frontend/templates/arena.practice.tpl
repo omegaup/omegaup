@@ -88,6 +88,7 @@
 					<select name="language">
 						<option value=""></option>
 						<option value="cpp">C++</option>
+						<option value="cpp11">C++11</option>
 						<option value="c">C</option>
 						<option value="java">Java</option>
 						<option value="p">Pascal</option>
@@ -98,6 +99,7 @@
 					</select>
 				</div>
 				<textarea name="code"></textarea><br/>
+				<input type="file" id="code_file" /><br/>
 				<input type="submit" />
 			</form>			
 		</div>

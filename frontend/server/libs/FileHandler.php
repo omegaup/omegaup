@@ -69,6 +69,13 @@ class FileHandler {
 		self::$log->info("Trying to delete recursively dir: " . $pathName);
 		self::rrmdir($pathName);
 	}
+	
+	static function DeleteFile($pathName) {
+		self::$log->info("Trying to delete file: " . $pathName);
+		if (!@unlink($pathName)) {
+			throw new RuntimeException("FATAL: Not able to delete file " . $pathName);
+		}
+	}
 
 	private static function rrmdir($dir) {
 		if (!is_dir($dir)) {

@@ -52,6 +52,7 @@
 			$('input[name=title]').val('');
 			$('input[name=time_limit]').val('');
 			$('input[name=memory_limit]').val('');
+			$('input[name=output_limit]').val('');
 			$('input[name=source]').val('');
 			return;
 		}
@@ -60,6 +61,7 @@
 			$('input[name=title]').val(problem.title);
 			$('input[name=time_limit]').val(problem.time_limit);
 			$('input[name=memory_limit]').val(problem.memory_limit);
+			$('input[name=output_limit]').val(problem.output_limit);
 			$('input[name=source]').val(problem.source);
 			$('select[name=validator]').val(problem.validator);
 			$('select[name=public]').val(problem.public);

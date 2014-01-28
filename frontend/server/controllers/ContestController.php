@@ -1392,7 +1392,7 @@ class ContestController extends Controller {
 			}
 		}
 
-		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj'), false);
+		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj'), false);
 
 		// Get user if we have something in username
 		if (!is_null($r["username"])) {

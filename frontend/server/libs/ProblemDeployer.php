@@ -283,6 +283,8 @@ class ProblemDeployer {
 
 	
 	/**
+	 * Read already deployed statements from filesystem and apply transformations
+	 * $lang.markdown => statements/$lang.html as well as encoding checks
 	 * 
 	 * @param string $dirpath
 	 * @param array $filesToUnzip
@@ -304,37 +306,61 @@ class ProblemDeployer {
 			// Read the contents of the original markdown file
 			$markdown_file_contents = FileHandler::ReadFile($markdown_filepath);
 
-			// Fix for Windows Latin-1 statements:
-			// For now, assume that if it is not UTF-8, then it is Windows Latin-1 and then convert
-			if (!mb_check_encoding($markdown_file_contents, "UTF-8")) {
-				$this->log->info("File is not UTF-8.");
-
-				// Convert from ISO-8859-1 (Windows Latin1) to UTF-8
-				$this->log->info("Converting encoding from ISO-8859-1 to UTF-8 (Windows Latin1 to UTF-8, fixing accents)");
-				$markdown_file_contents = mb_convert_encoding($markdown_file_contents, "UTF-8", "ISO-8859-1");
-
-				// Then overwrite it into the statement file
-				$this->log->info("Overwriting file after encoding conversion: " . $markdown_filepath);
-				FileHandler::CreateFile($markdown_filepath, $markdown_file_contents);
-			} else {
-				$this->log->info("File is UTF-8. Nice :)");
-			}
-
-			// Transform markdown to HTML
-			$this->log->info("Transforming markdown to html");
-			$html_file_contents = Markdown($markdown_file_contents, array($this, 'imageMarkdownCallback'));
-
-			// Get the language of this statement            
-			$lang = basename($statement, ".markdown");
-
-			$html_filepath = $dirpath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html";
-
-			// Save the HTML file in the path .../problem_alias/statements/lang.html            
-			$this->log->info("Saving HTML statement in " . $html_filepath);
-			FileHandler::CreateFile($html_filepath, $html_file_contents);
+			// Deploy statement raw (.markdown) and transformed (.html)
+			$this->HTMLizeStatement($dirpath, $statement, $markdown_file_contents);
 		}
 	}
+	
+	/**
+	 * Given the $lang.markdown contents, deploys the .markdown file and creates the .html file
+	 * 
+	 * @param string $problemBasePath
+	 * @param string $statementFileName
+	 * @param string $markdown_file_contents
+	 */
+	private function HTMLizeStatement($problemBasePath, $statementFileName, $markdown_file_contents) {
+		$this->log->info("HTMLizing statement: " . $statementFileName);
+		
+		// Path used to deploy the raw problem statement (.markdown)
+		$markdown_filepath = $problemBasePath . DIRECTORY_SEPARATOR . $statementFileName;
+		
+		// Fix for Windows Latin-1 statements:
+		// For now, assume that if it is not UTF-8, then it is Windows Latin-1 and then convert
+		if (!mb_check_encoding($markdown_file_contents, "UTF-8")) {
+			$this->log->info("File is not UTF-8.");
 
+			// Convert from ISO-8859-1 (Windows Latin1) to UTF-8
+			$this->log->info("Converting encoding from ISO-8859-1 to UTF-8 (Windows Latin1 to UTF-8, fixing accents)");
+			$markdown_file_contents = mb_convert_encoding($markdown_file_contents, "UTF-8", "ISO-8859-1");
+
+			// Then overwrite it into the statement file
+			$this->log->info("Overwriting file after encoding conversion: " . $markdown_filepath);
+			FileHandler::CreateFile($markdown_filepath, $markdown_file_contents);
+		} else {
+			$this->log->info("File is UTF-8. Nice :)");
+		}
+
+		// Transform markdown to HTML
+		$this->log->info("Transforming markdown to html");
+		$html_file_contents = Markdown($markdown_file_contents, array($this, 'imageMarkdownCallback'));
+
+		// Get the language of this statement            
+		$lang = basename($statementFileName, ".markdown");
+
+		$html_filepath = $problemBasePath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html";
+
+		// Save the HTML file in the path .../problem_alias/statements/lang.html            
+		$this->log->info("Saving HTML statement in " . $html_filepath);
+		FileHandler::CreateFile($html_filepath, $html_file_contents);
+	}
+
+	
+	/**
+	 * Deploys the given image when present in the statement contents
+	 * 
+	 * @param type $imagepath
+	 * @return type
+	 */
 	public function imageMarkdownCallback($imagepath) {
 		if (array_key_exists($imagepath, $this->imageHashes)) {
 			if (is_bool($this->imageHashes[$imagepath])) {
@@ -526,6 +552,43 @@ class ProblemDeployer {
 	}
 
 	/**
+	 * Updates an statement.
+	 * Assumes $r["lang"] and $r["statement"] are set
+	 * $r["alias"] should contain the problem alias
+	 * 
+	 * @param Request $r
+	 * @throws ProblemDeploymentFailedException
+	 */
+	public function updateStatement(Request $r) {
+		
+		try {
+			$this->log->info("Starting statement update, lang: " . $r["lang"]);
+			
+			// Delete statement files
+			$markdownFile = $this->getDirpath($r) . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $r["lang"] . ".markdown";
+			$htmlFile = $this->getDirpath($r) . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $r["lang"] . ".html";
+			FileHandler::DeleteFile($markdownFile);
+			FileHandler::DeleteFile($htmlFile);
+			
+			// Deploy statement
+			FileHandler::CreateFile($markdownFile, $r["statement"]);
+			$this->HTMLizeStatement($this->getDirpath($r), $r["lang"] . ".markdown", $r["statement"]);
+			
+		} catch (Exception $e) {
+			throw new ProblemDeploymentFailedException($e);
+		}
+	}
+	
+	/**
+	 * Validates zip contents and updates the problem
+	 * 
+	 * @param Request $r
+	 */
+	public function update(Request $r) {
+		$this->deploy($r, true);
+	}		
+	
+	/**
 	 * Validates zip contents and deploys the problem
 	 * 
 	 * @param Request $r
@@ -568,5 +631,45 @@ class ProblemDeployer {
 		} 
 	}
 
+	/**
+	 * Gets the maximum output file size. Returns -1 if there is a
+	 * custom validator.
+	 * 
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 */
+	public function getOutputLimit(Request $r) {
+		$dirpath = $this->getDirpath($r);
+		$has_validator = false;
+
+		if ($handle = opendir($dirpath)) {
+			while (false !== ($entry = readdir($handle))) {
+				if (stripos($entry, 'validator.') === 0) {
+					$has_validator = true;
+					break;
+				}
+			}
+			closedir($handle);
+		}
+
+		if ($has_validator) {
+			return -1;
+		}
+
+		$dirpath .= '/cases';
+
+		$output_limit = 10240;
+
+		if ($handle = opendir($dirpath)) {
+			while (false !== ($entry = readdir($handle))) {
+				if (!$this->endsWith($entry, '.out', true)) continue;
+
+				$output_limit = max($output_limit, filesize("$dirpath/$entry"));
+			}
+			closedir($handle);
+		}
+
+		return (int)(($output_limit + 4095) / 4096 + 1) * 4096;
+	}
 }
 

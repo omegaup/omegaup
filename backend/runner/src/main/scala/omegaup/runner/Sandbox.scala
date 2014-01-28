@@ -269,6 +269,11 @@ object Minijail extends Object with Sandbox with Log with Using {
         commonParams ++
         List("--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2") ++
         chrootedInputFiles ++ List("-lm")
+      case "cpp11" =>
+        List("/usr/bin/sudo", minijail, "-S", scripts + "/gcc") ++
+        commonParams ++
+        List("--", Config.get("cpp.compiler.path", "/usr/bin/g++"), "-O2", "-std=c++11", "-xc++") ++
+        chrootedInputFiles ++ List("-lm")
       case "p" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/fpc") ++
         commonParams ++
@@ -410,6 +415,10 @@ object Minijail extends Object with Sandbox with Log with Using {
         commonParams ++
         List("-m", memoryLimit.toString, "--", "./a.out")
       case "cpp" =>
+        List("/usr/bin/sudo", minijail, "-S", scripts + "/cpp") ++
+        commonParams ++
+        List("-m", memoryLimit.toString, "--", "./a.out")
+      case "cpp11" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/cpp") ++
         commonParams ++
         List("-m", memoryLimit.toString, "--", "./a.out")

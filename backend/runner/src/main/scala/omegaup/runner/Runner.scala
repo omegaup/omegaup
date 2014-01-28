@@ -354,7 +354,8 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
           }
           zipOutput.closeEntry
         } else if((meta("status") == "RE" && lang == "java") ||
-                  (meta("status") == "SG" && lang == "cpp")) {
+                  (meta("status") == "SG" && lang == "cpp") ||
+                  (meta("status") == "SG" && lang == "cpp11")) {
           zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
           using (new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))) {
             inputStream => FileUtil.copy(inputStream, zipOutput)

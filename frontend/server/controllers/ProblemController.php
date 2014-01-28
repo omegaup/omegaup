@@ -138,6 +138,7 @@ class ProblemController extends Controller {
 		Validators::isInEnum($r["validator"], "validator", array("remote", "literal", "token", "token-caseless", "token-numeric", "custom"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
+		Validators::isNumberInRange($r["output_limit"], "output_limit", 0, INF, $is_required);
 	}
 
 	/**
@@ -161,6 +162,7 @@ class ProblemController extends Controller {
 		$problem->setValidator($r["validator"]);
 		$problem->setTimeLimit($r["time_limit"]);
 		$problem->setMemoryLimit($r["memory_limit"]);
+		$problem->setOutputLimit($r["output_limit"]);
 		$problem->setVisits(0);
 		$problem->setSubmissions(0);
 		$problem->setAccepted(0);
@@ -177,11 +179,18 @@ class ProblemController extends Controller {
 
 			ProblemsDAO::transBegin();
 
-			// Save the contest object with data sent by user to the database
-			ProblemsDAO::save($problem);
-
 			// Create file after we know that alias is unique			
 			$problemDeployer->deploy($r);
+
+			// Calculate output limit.
+			$output_limit = $problemDeployer->getOutputLimit($r);
+
+			if ($output_limit != -1) {
+				$problem->setOutputLimit($output_limit);
+			}
+
+			// Save the contest object with data sent by user to the database
+			ProblemsDAO::save($problem);
 
 			ProblemsDAO::transEnd();
 		} catch (ApiException $e) {
@@ -323,18 +332,26 @@ class ProblemController extends Controller {
 			//Begin transaction
 			ProblemsDAO::transBegin();
 
-			// Save the contest object with data sent by user to the database
-			ProblemsDAO::save($r["problem"]);
-
 			if (isset($_FILES['problem_contents']) && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
 				$requiresRejudge = true;
 
 				// DeployProblemZip requires alias => problem_alias
 				$r["alias"] = $r["problem_alias"];
 
-				$problemDeployer->deploy($r, true /* is update */);
+				$problemDeployer->update($r);
+
+				// Calculate output limit.
+				$output_limit = $problemDeployer->getOutputLimit($r);
+
+				if ($output_limit != -1) {
+					$r['problem']->setOutputLimit($output_limit);
+				}
+
 				$response["uploaded_files"] = $problemDeployer->filesToUnzip;
 			}
+
+			// Save the contest object with data sent by user to the database
+			ProblemsDAO::save($r["problem"]);
 
 			//End transaction
 			ProblemsDAO::transEnd();
@@ -369,6 +386,52 @@ class ProblemController extends Controller {
 		// Invalidar problem statement cache @todo invalidar todos los lenguajes
 		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");						
 
+		return $response;
+	}
+		
+	/**
+	 * Updates problem statement only	 
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiUpdateStatement(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		self::validateCreateOrUpdate($r, true);
+		
+		// Validate statement
+		Validators::isStringNonEmpty($r["statement"], "statement");
+		
+		// Check lang, default is "es", more languages to come...
+		Validators::isInEnum($r["lang"], "lang", array("en", "es"), false /* is_required */);
+		if (is_null($r["lang"])) {
+			$r["lang"] = "es";
+		}				
+		
+		try {			
+			
+			// DeployProblemZip requires alias => problem_alias
+			$r["alias"] = $r["problem_alias"];
+			
+			$problemDeployer = new ProblemDeployer();
+			
+			$problemDeployer->updateStatement($r);
+			
+			// Invalidar problem statement cache
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"]);			
+			
+		} catch (ApiException $e) {
+			throw $e;
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		// All clear
+		$response["status"] = "ok";
 		return $response;
 	}
 
@@ -462,7 +525,7 @@ class ProblemController extends Controller {
 		$response = array();
 
 		// Create array of relevant columns
-		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points", "public");
+		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "output_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points", "public");
 
 		// Read the file that contains the source
 		if ($r["problem"]->getValidator() != 'remote') {

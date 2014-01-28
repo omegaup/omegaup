@@ -51,22 +51,29 @@
 		</div>
 
 		<div class="form-group  col-md-6">
-			<label for="memory_limit">Límite de memoria (KB)</label>
+			<label for="memory_limit">Límite de memoria (kB)</label>
 			<input id='memory_limit' name='memory_limit' value='{$MEMORY_LIMIT}' type='text' class="form-control" />
 		</div>
 	</div>
 	
 	<div class="row">
 		<div class="form-group  col-md-6">
+			<label for="output_limit">Límite de salida (bytes)</label>
+			<input id="output_limit" name="output_limit" value="{$OUTPUT_LIMIT}" type='text' class="form-control" />
+		</div>
+
+		<div class="form-group  col-md-6">
 			<label for="source">{#wordsSource#}</label>
 			<input id='source' name='source' value='{$SOURCE|htmlspecialchars}' type='text' class="form-control" />
 		</div>
+	</div>
 		
+	<div class="row">
 		<div class="form-group col-md-6">
 			<label for="public">{#problemEditFormAppearsAsPublic#}</label>
 			<select name='public' id='public' class="form-control">
 				<option value="0">{#wordsNo#}</option>
-				<option value="1">Sí</option>
+				<option value="1" selected="selected">Sí</option>
 			</select>
 		</div>
 	</div>

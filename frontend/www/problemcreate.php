@@ -7,6 +7,7 @@ $smarty->assign('TITLE', "");
 $smarty->assign('ALIAS', "");
 $smarty->assign('VALIDATOR', "token-caseless");
 $smarty->assign('TIME_LIMIT', "1000");
+$smarty->assign('OUTPUT_LIMIT', "10240");
 $smarty->assign('MEMORY_LIMIT', "32768");
 $smarty->assign('SOURCE', "");
 $smarty->assign('PUBLIC', "0");
@@ -20,7 +21,8 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 				"validator" => $_POST["validator"],
 				"time_limit" => $_POST["time_limit"],
 				"memory_limit" => $_POST["memory_limit"],
-				"source" => $_POST["source"],				
+				"output_limit" => $_POST["output_limit"],
+ 				"source" => $_POST["source"],				
 				"public" => $_POST["public"],
 			));
 	$r->method = "ProblemController::apiCreate";
@@ -33,6 +35,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 		$smarty->assign('ALIAS', $_POST["alias"]);
 		$smarty->assign('VALIDATOR', $_POST["validator"]);
 		$smarty->assign('TIME_LIMIT', $_POST["time_limit"]);
+		$smarty->assign('OUTPUT_LIMIT', $_POST["output_limit"]);
 		$smarty->assign('MEMORY_LIMIT', $_POST["memory_limit"]);
 		$smarty->assign('SOURCE', $_POST["source"]);
 		$smarty->assign('PUBLIC', $_POST["public"]);

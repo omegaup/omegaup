@@ -1025,9 +1025,10 @@ class UserController extends Controller {
 		}
 		
 		if (!is_null($db_results)) {
+			$relevant_columns = array("title", "alias", "submissions", "accepted");
 			foreach($db_results as $problem) {
 				if ($problem->getPublic() == 1) {
-					array_push($response["problems"], $problem->asArray());
+					array_push($response["problems"], $problem->asFilteredArray($relevant_columns));
 				}
 			}
 		}
