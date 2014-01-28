@@ -1215,33 +1215,16 @@ class UserController extends Controller {
 			}
 		}
 
-		if (!is_null($r["name"])) {
-			$r["current_user"]->setName($r["name"]);
-		}
-		
-		if (!is_null($r["country_id"])) {
-			$r["current_user"]->setCountryId($r["country_id"]);
-		}
-		
-		if (!is_null($r["state_id"])) {
-			$r["current_user"]->setStateId($r["state_id"]);
-		}
-		
-		if (!is_null($r["scholar_degree"])) {
-			$r["current_user"]->setScholarDegree($r["scholar_degree"]);
-		}
-			
-		if (!is_null($r["school_id"])) {			
-			$r["current_user"]->setSchoolId($r["school_id"]);
-		}
-		
-		if (!is_null($r["graduation_date"])) {			
-			$r["current_user"]->setGraduationDate(gmdate('Y-m-d', $r["graduation_date"]));
-		}
-		
-		if (!is_null($r["birth_date"])) {
-			$r["current_user"]->setBirthDate(gmdate('Y-m-d', $r["birth_date"]));
-		}
+		$valueProperties = array(
+			"name",
+			"country_id",
+			"state_id",
+			"scholar_degree",
+			"school_id",
+			"graduation_date" => ["GraduationDate", false, function($value) { return gmdate('Y-m-d', $value); }],
+			"birth_date"			=> ["BirthDate", false, function($value) { return gmdate('Y-m-d', $value); }],
+		);
+		self::updateValueProperties($r, $r["current_user"], $valueProperties);
 		
 		try {
 			UsersDAO::save($r["current_user"]);			

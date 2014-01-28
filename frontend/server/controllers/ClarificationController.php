@@ -35,7 +35,7 @@ class ClarificationController extends Controller {
 			throw new NotFoundException("Problem provided does not exist");
 		}
 
-		// Is the combination contest_id and problem_id valid?        
+		// Is the combination contest_id and problem_id valid?
 		if (is_null(ContestProblemsDAO::getByPK($r["contest"]->getContestId(), $r["problem"]->getProblemId()))) {
 			throw new NotFoundException("Problem does not exists in the contest given.");
 		}
@@ -102,7 +102,7 @@ class ClarificationController extends Controller {
 			throw new NotFoundException("Clarification not found");
 		}
 
-		// If the clarification is private, verify that our user is invited or is contest director               
+		// If the clarification is private, verify that our user is invited or is contest director 
 		if ($r["clarification"]->getPublic() === '0') {
 			if (!(Authorization::CanViewClarification($r["current_user_id"], $r["clarification"]))) {
 				throw new ForbiddenAccessException();
@@ -174,16 +174,13 @@ class ClarificationController extends Controller {
 		// Validate request 
 		self::validateUpdate($r);
 
-		// Update clarification        		
-		if (!is_null($r["message"])) {
-			$r["clarification"]->setMessage($r["message"]);
-		}
-		if (!is_null($r["answer"])) {
-			$r["clarification"]->setAnswer($r["answer"]);
-		}
-		if (!is_null($r["clarification"])) {
-			$r["clarification"]->setPublic($r["public"]);
-		}
+		// Update clarification
+		$valueProperties = array(
+			"message",
+			"answer",
+			"public",
+		);
+		self::updateValueProperties($r, $r["clarification"], $valueProperties);
 
 		// Let DB handle time update
 		$r["clarification"]->setTime(NULL);

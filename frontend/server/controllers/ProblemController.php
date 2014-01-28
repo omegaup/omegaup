@@ -303,48 +303,17 @@ class ProblemController extends Controller {
 
 		self::validateCreateOrUpdate($r, true /* is update */);
 
-		$requiresRejudge = false;
-
-		// Update the Problem object        
-		if (!is_null($r["public"])) {
-			$r["problem"]->setPublic($r["public"]);
-		}
-
-		if (!is_null($r["title"])) {
-			$r["problem"]->setTitle($r["title"]);
-		}
-
-		if (!is_null($r["validator"])) {
-			if ($r["validator"] != $r["problem"]->getValidator()) {
-				$requiresRejudge = true;
-			}
-
-			$r["problem"]->setValidator($r["validator"]);
-		}
-
-		if (!is_null($r["time_limit"])) {
-			if ($r["time_limit"] != $r["problem"]->getTimeLimit()) {
-				$requiresRejudge = true;
-			}
-
-			$r["problem"]->setTimeLimit($r["time_limit"]);
-		}
-
-		if (!is_null($r["memory_limit"])) {
-			if ($r["memory_limit"] != $r["problem"]->getMemoryLimit()) {
-				$requiresRejudge = true;
-			}
-
-			$r["problem"]->setMemoryLimit($r["memory_limit"]);
-		}
-
-		if (!is_null($r["source"])) {
-			$r["problem"]->setSource($r["source"]);
-		}
-
-		if (!is_null($r["order"])) {
-			$r["problem"]->setOrder($r["order"]);
-		}
+		// Update the Problem object
+		$valueProperties = array(
+			"public",
+			"title",
+			"validator"			=> ["Validator", true /* requires rejudge */],
+			"time_limit"		=> ["TimeLimit", true /* requires rejudge */],
+			"memory_limit"	=> ["MemoryLimit", true /* requires rejudge */],
+			"source",
+			"order",
+		);
+		$requiresRejudge = self::updateValueProperties($r, $r["problem"], $valueProperties);
 
 		$response = array();
 		$problemDeployer = new ProblemDeployer();
@@ -436,7 +405,7 @@ class ProblemController extends Controller {
 
 		// If we request a problem inside a contest
 		if (!is_null($r["contest_alias"])) {
-			// Is the combination contest_id and problem_id valid?        
+			// Is the combination contest_id and problem_id valid?
 			try {
 				$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
 
@@ -454,7 +423,7 @@ class ProblemController extends Controller {
 			}
 
 
-			// If the contest is private, verify that our user is invited                        
+			// If the contest is private, verify that our user is invited
 			if ($r["contest"]->getPublic() === 0) {
 				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 					throw new ForbiddenAccessException();
@@ -553,7 +522,7 @@ class ProblemController extends Controller {
 		}
 
 		if (!is_null($r["contest"])) {
-			// At this point, contestant_user relationship should be established.        
+			// At this point, contestant_user relationship should be established.
 			try {
 				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
 									$r["current_user_id"], $r["contest"]->getContestId());
@@ -562,7 +531,7 @@ class ProblemController extends Controller {
 				throw new InvalidDatabaseOperationException($e);
 			}
 
-			// As last step, register the problem as opened                
+			// As last step, register the problem as opened
 			if (!ContestProblemOpenedDAO::getByPK(
 							$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"])) {
 				//Create temp object

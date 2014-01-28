@@ -28,7 +28,8 @@ class ClarificationsFactory {
 		$r["message"] = Utils::CreateRandomString();
 		$r["contest_alias"] = $contestData["request"]["alias"];
 		$r["problem_alias"] = $problemData["request"]["alias"];
-
+    $r["public"] = '0';
+    
 		// Log in our user and set the auth_token properly
 		$r["auth_token"] = OmegaupTestCase::login($contestant);
 

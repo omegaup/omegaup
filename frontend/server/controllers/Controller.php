@@ -103,6 +103,47 @@ class Controller {
 
 		return $str;
 	}
+
+	/**
+	 *
+	 * @param Request $request
+	 * @param object $object
+	 * @param array $properties
+	 * @return boolean
+	 */
+	protected static function updateValueProperties($request, $object, $properties) {
+		$importantChange = false;
+		foreach ($properties as $source => $info) {
+			if (is_int($source)) {
+				// Simple property:
+				$source = $info;
+				$info = [preg_replace_callback(
+					'|_(\w)|',
+					function($matches) { return ucfirst($matches[1]); },
+					ucfirst($source))
+				];
+			}
+			if (is_null($request[$source])) {
+				continue;
+			}
+			// Get or calculate new value.
+			$value = $request[$source];
+			if (count($info) >= 3) {
+				$transform = $info[2];
+				$value = $transform($value);
+			}
+			// Important property, so check if it changes.
+			if (count($info) >= 2 && $info[1]) {
+				$getter = "get" . $info[0];
+				if ($value != $object->$getter()) {
+					$importantChange = true;
+				}
+			}
+			$setter = "set" . $info[0];
+			$object->$setter($value);
+		}
+		return $importantChange;
+	}
 }
 
 Controller::$log = Logger::getLogger("controller");
