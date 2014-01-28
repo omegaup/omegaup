@@ -377,7 +377,7 @@ class ProblemController extends Controller {
 				// DeployProblemZip requires alias => problem_alias
 				$r["alias"] = $r["problem_alias"];
 
-				$problemDeployer->deploy($r, true /* is update */);
+				$problemDeployer->update($r);
 
 				// Calculate output limit.
 				$output_limit = $problemDeployer->getOutputLimit($r);
@@ -425,6 +425,52 @@ class ProblemController extends Controller {
 		// Invalidar problem statement cache @todo invalidar todos los lenguajes
 		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");						
 
+		return $response;
+	}
+		
+	/**
+	 * Updates problem statement only	 
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiUpdateStatement(Request $r) {
+		
+		self::authenticateRequest($r);
+		
+		self::validateCreateOrUpdate($r, true);
+		
+		// Validate statement
+		Validators::isStringNonEmpty($r["statement"], "statement");
+		
+		// Check lang, default is "es", more languages to come...
+		Validators::isInEnum($r["lang"], "lang", array("en", "es"), false /* is_required */);
+		if (is_null($r["lang"])) {
+			$r["lang"] = "es";
+		}				
+		
+		try {			
+			
+			// DeployProblemZip requires alias => problem_alias
+			$r["alias"] = $r["problem_alias"];
+			
+			$problemDeployer = new ProblemDeployer();
+			
+			$problemDeployer->updateStatement($r);
+			
+			// Invalidar problem statement cache
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"]);			
+			
+		} catch (ApiException $e) {
+			throw $e;
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		// All clear
+		$response["status"] = "ok";
 		return $response;
 	}
 

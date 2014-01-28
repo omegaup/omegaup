@@ -78,8 +78,34 @@ class UpdateProblemTest extends OmegaupTestCase {
 		// Check update in statements
 		$statement = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		$this->assertContains("perímetro", $statement);
+				
+	}
+	
+	/**
+	 * Test apiUpdateStatement
+	 */
+	public function testProblemStatementUpdate() {
 		
+		// Get a problem (with 'es' statements)
+		$problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . "triangulos.zip");
 		
+		// Update statement
+		$statement = "This is the new statement \$x\$";
+		$response = ProblemController::apiUpdateStatement(new Request(array(
+			"auth_token" => $this->login($problemData["author"]),
+			"problem_alias" => $problemData["request"]["alias"],
+			"statement" => $statement
+		)));
+		
+		$this->assertEquals($response["status"], "ok");	
+
+		// Check statment contents
+		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problemData["request"]["alias"] . DIRECTORY_SEPARATOR;
+		$statementHtmlContents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		$statementMarkdownContents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
+		
+		$this->assertContains("<p>This is the new statement \$x\$</p>", $statementHtmlContents);
+		$this->assertContains($statement, $statementMarkdownContents);		
 	}
 }
 
