@@ -316,9 +316,9 @@ class ProblemController extends Controller {
 		$valueProperties = array(
 			"public",
 			"title",
-			"validator"			=> array("important" => true), // requires rejudge
-			"time_limit"		=> array("important" => true), // requires rejudge
-			"memory_limit"	=> array("important" => true), // requires rejudge
+			"validator"     => array("important" => true), // requires rejudge
+			"time_limit"    => array("important" => true), // requires rejudge
+			"memory_limit"  => array("important" => true), // requires rejudge
 			"source",
 			"order",
 		);
