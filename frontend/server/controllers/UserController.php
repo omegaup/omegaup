@@ -1222,8 +1222,8 @@ class UserController extends Controller {
 			"state_id",
 			"scholar_degree",
 			"school_id",
-			"graduation_date" => ["GraduationDate", false, function($value) { return gmdate('Y-m-d', $value); }],
-			"birth_date"			=> ["BirthDate", false, function($value) { return gmdate('Y-m-d', $value); }],
+			"graduation_date" => array("transform" => function($value) { return gmdate('Y-m-d', $value); }),
+			"birth_date"			=> array("transform" => function($value) { return gmdate('Y-m-d', $value); }),
 		);
 		self::updateValueProperties($r, $r["current_user"], $valueProperties);
 		

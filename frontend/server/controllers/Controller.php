@@ -105,11 +105,38 @@ class Controller {
 	}
 
 	/**
-	 *
+	 * Converts underscore property names into camel case method names:
+	 * 'contest_id' => 'ContestId'
+   *
+	 * @param string $name
+	 */
+	protected static function toCamelCase($name) {
+		return preg_replace_callback(
+			'|_(\w)|',                      // Match letters following an underscore.
+			function($matches) {
+        return ucfirst($matches[1]);  // Convert every matching letter to upper case.
+      },
+			ucfirst($name));                // Converts the first letter in the name to upper case.
+	}
+
+	/**
+	 * Update properties of $object based on what is provided in $request.
+   * $properties can have 'simple' and 'complex' properties.
+   * - A simple property is just a name using underscores, and it's getter and setter methods should
+   *   be the camel case version of the property name.
+   * - An advanced property can have:
+   *   > A getter/setter base name
+   *   > A flag indicating it is important. Important properties are checked to determined if they
+   *     really changed. For example: properties that should cause a problem to be rejudged,
+   *     like time limits or memory constraints.
+   *   > A transform method that takes the new property value stored in the request and transforms
+   *     it into the proper form that should be stored in $object. For example:
+   *     function($value) { return gmdate('Y-m-d H:i:s', $value); }
+   *
 	 * @param Request $request
 	 * @param object $object
 	 * @param array $properties
-	 * @return boolean
+	 * @return boolean True if there were changes to any property marked as 'important'.
 	 */
 	protected static function updateValueProperties($request, $object, $properties) {
 		$importantChange = false;
@@ -117,29 +144,34 @@ class Controller {
 			if (is_int($source)) {
 				// Simple property:
 				$source = $info;
-				$info = [preg_replace_callback(
-					'|_(\w)|',
-					function($matches) { return ucfirst($matches[1]); },
-					ucfirst($source))
-				];
+				$info = [Controller::toCamelCase($source)];
 			}
 			if (is_null($request[$source])) {
 				continue;
 			}
+      // Get the base name for the property accessors.
+      if (isset($info[0]) || isset($info['accessor'])) {
+        $accessor = isset($info[0]) ? $info[0] : $info['accessor'];
+      } else {
+        $accessor = Controller::toCamelCase($source);
+      }
 			// Get or calculate new value.
 			$value = $request[$source];
-			if (count($info) >= 3) {
-				$transform = $info[2];
+			if (isset($info[2]) || isset($info['transform'])) {
+				$transform = isset($info[2]) ? $info[2] : $info['transform'];
 				$value = $transform($value);
 			}
 			// Important property, so check if it changes.
-			if (count($info) >= 2 && $info[1]) {
-				$getter = "get" . $info[0];
-				if ($value != $object->$getter()) {
-					$importantChange = true;
-				}
+			if (isset($info[1]) || isset($info['important'])) {
+        $important = isset($info[1]) ? $info[1] : $info['important'];
+        if ($important) {
+          $getter = "get" . $accessor;
+          if ($value != $object->$getter()) {
+            $importantChange = true;
+          }
+        }
 			}
-			$setter = "set" . $info[0];
+			$setter = "set" . $accessor;
 			$object->$setter($value);
 		}
 		return $importantChange;
