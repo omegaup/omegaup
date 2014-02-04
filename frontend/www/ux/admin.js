@@ -42,7 +42,7 @@ $(document).ready(function() {
 			currentContest = contest;
 
 			arena.initClock(contest.start_time, contest.finish_time);
-			arena.initProblems(contest.problems);
+			arena.initProblems(contest);
 
 			for (var idx in contest.problems) {
 				var problem = contest.problems[idx];

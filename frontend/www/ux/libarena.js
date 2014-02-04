@@ -99,7 +99,8 @@ Arena.prototype.initClock = function(start, finish, deadline) {
 	}
 };
 
-Arena.prototype.initProblems = function(problems) {
+Arena.prototype.initProblems = function(contest) {
+	var problems = contest.problems;
 	for (var i = 0; i < problems.length; i++) {
 		var alias = problems[i].alias;
 		this.problems[alias] = problems[i];
@@ -108,8 +109,14 @@ Arena.prototype.initProblems = function(problems) {
 				problems[i].letter + '</a></th>').insertBefore('#ranking thead th.total');
 		$('<td class="prob_' + alias + '_points"></td>')
 			.insertBefore('#ranking tbody .template td.points');
-		$('<td class="prob_' + alias + '_penalty"></td>')
-			.insertBefore('#ranking tbody .template td.points');
+		if (contest.show_penalty) {
+			$('<td class="prob_' + alias + '_penalty"></td>')
+				.insertBefore('#ranking tbody .template td.points');
+		}
+	}
+	if (!contest.show_penalty) {
+		$('#ranking thead th').attr('colspan', '');
+		$('#ranking tbody .template .penalty').remove();
 	}
 };
 
