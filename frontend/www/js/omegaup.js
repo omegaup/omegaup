@@ -368,6 +368,7 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 				contest.start_time = self.time(contest.start_time * 1000);
 				contest.finish_time = self.time(contest.finish_time * 1000);
 				contest.submission_deadline = self.time(contest.submission_deadline * 1000);
+				contest.show_penalty = (contest.penalty != 0 || contest.penalty_time_start != "none");
 			}
 			callback(contest);
 		},
@@ -390,6 +391,7 @@ OmegaUp.prototype.getContestByToken = function(alias, token, callback) {
 			if (contest.status == 'ok') {
 				contest.start_time = self.time(contest.start_time * 1000);
 				contest.finish_time = self.time(contest.finish_time * 1000);
+				contest.show_penalty = (contest.penalty || contest.penalty_time_start != "none");
 			}
 			callback(contest);
 		},

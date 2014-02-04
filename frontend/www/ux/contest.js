@@ -126,7 +126,7 @@ $(document).ready(function() {
 
 		if (!(submissionGap > 0)) submissionGap = 0;
 
-		arena.initProblems(contest.problems);
+		arena.initProblems(contest);
 
 		for (var idx in contest.problems) {
 			var problem = contest.problems[idx];

@@ -7,7 +7,7 @@ $(document).ready(function() {
 	
 	// Update scoreboard
 	omegaup.getContestByToken(contestAlias, token, function(contest) {
-		arena.initProblems(contest.problems);
+		arena.initProblems(contest);
 		arena.initClock(contest.start_time, contest.finish_time);
 		$('#title .contest-title').html(contest.title);
 
