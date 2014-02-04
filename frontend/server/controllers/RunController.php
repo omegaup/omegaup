@@ -675,7 +675,13 @@ class RunController extends Controller {
 		
 		// Get user if we have something in username
 		if (!is_null($r["username"])) {
-			$r["user"] = UserController::resolveUser($r["username"]);
+			try {
+				$r["user"] = UserController::resolveUser($r["username"]);
+			} catch (NotFoundException $e) {
+				// If not found, simply ignore it
+				$r["username"] = null;
+				$r["user"] = null;
+			}
 		}
 		
 	}

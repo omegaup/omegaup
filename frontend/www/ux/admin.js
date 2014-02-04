@@ -11,6 +11,7 @@ $(document).ready(function() {
 	var runsStatus = "";
 	var runsProblem = "";
 	var runsLang = "";
+	var runsUsername = "";
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
 	var rankChartLimit = 1e99;
@@ -81,7 +82,7 @@ $(document).ready(function() {
 			$('#root').fadeIn('slow');
 		});
 	}
-
+	
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
 			$('#overlay, #submit #clarification').hide();
@@ -110,6 +111,24 @@ $(document).ready(function() {
 		
 		// Refresh with previous page
 		refreshRuns();
+	});
+	
+	$("#runsusername").typeahead({
+		ajax: "/api/user/list/",
+		display: 'label',
+		val: 'label',
+		minLength: 2,
+		itemSelected: function (item, val, text) {						
+			// Refresh runs by calling change func
+			runsUsername = val;
+			$('select.runsveredict').change();
+		}
+    });
+	
+	$('#runsusername-clear').click(function() {
+		runsUsername = "";
+		$("#runsusername").val('');
+		$('select.runsveredict').change();
 	});
 	
 	$('select.runsveredict, select.runsstatus, select.runsproblem, select.runslang').change(function () {
@@ -347,6 +366,10 @@ $(document).ready(function() {
 		if (runsLang != "") {
 			options.language = runsLang;
 		}
+		
+		if (runsUsername != "") {
+			options.username = runsUsername;
+		}
 	
 		if (contestAlias === "admin") {
 			omegaup.getRuns(options, runsChange);
@@ -403,12 +426,12 @@ $(document).ready(function() {
 					omegaup.runDetails(guid, function(data) {
 						$('#run-details .compile_error').html('');
 						if (data.compile_error) {
-							$('#run-details .compile_error').html(data.compile_error.replace('&', '&amp;').replace('<', '&lt;'));
+							$('#run-details .compile_error').html(omegaup.escape(data.compile_error));
 						}
 						if (data.source.indexOf('data:') === 0) {
 							$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">descarga</a>');
 						} else {
-							$('#run-details .source').html(data.source.replace(/</g, "&lt;"));
+							$('#run-details .source').html(omegaup.escape(data.source));
 						}
 						$('#run-details .cases div').remove();
 						$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
@@ -443,8 +466,8 @@ $(document).ready(function() {
 							var c = data.cases[i];
 							$('#run-details .cases').append($("<div></div>").append($("<h2></h2>").html(c.name)));
 							$('#run-details .cases').append($("<div></div>").html(JSON.stringify(c.meta)));
-							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff ? c.out_diff.replace(/&/g, '&amp;').replace(/</g, '&lt;') : "")));
-							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.err ? c.err.replace(/&/g, '&amp;').replace(/</g, '&lt;') : "")));
+							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff ? omegaup.escape(c.out_diff) : "")));
+							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.err ? omegaup.escape(c.err) : "")));
 						}
 						window.location.hash = 'run/details';
 						$(window).hashchange();
