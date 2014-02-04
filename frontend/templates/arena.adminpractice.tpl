@@ -39,10 +39,9 @@
 							<option value="ready">ready</option>
 						</select>
 						
-						<label for="runsproblem">{#wordsProblem#}: </label>
-						<select class="runsproblem" name="runsproblem">
-							<option value="">{#wordsAll#}</option>
-						</select>
+						<label for="runsproblem">Problema: </label>
+						<input id="runsproblem" type="text"  size='20'/>
+						<button type="button" class="close" id="runsproblem-clear" style="float: none;">&times;</button>
 						
 						<label for="runslang">Lenguaje: </label>
 						<select class="runslang" name="runslang">
