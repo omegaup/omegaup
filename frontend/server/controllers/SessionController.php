@@ -12,7 +12,7 @@ class SessionController extends Controller {
 
 	const AUTH_TOKEN_ENTROPY_SIZE = 15;
 
-	private static $current_session;
+	private static $current_session = null;
 	private static $_facebook;
 	public static $_sessionManager;
 	public static $setCookieOnRegisterSession = true;
@@ -58,10 +58,16 @@ class SessionController extends Controller {
 	 * Returns associative array with information about current session.
 	 *
 	 * */
-	public static function apiCurrentSession() {
+	public static function apiCurrentSession(Request $r = null) {
+		if (!is_null(self::$current_session)) return self::$current_session;
+
 		$SessionM = self::getSessionManagerInstance();
 		$SessionM->sessionStart();
-		$s_AuthToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
+		if (!is_null($r)) {
+			$s_AuthToken = $r['auth_token'];
+		} else {
+			$s_AuthToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
+		}
 		$vo_CurrentUser = NULL;
 				
 		//cookie contains an auth token
@@ -71,7 +77,7 @@ class SessionController extends Controller {
 				&& self::isAuthTokenValid($s_AuthToken = $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {			
 			$vo_CurrentUser = AuthTokensDAO::getUserByToken($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
 		} else {
-			return array(
+			self::$current_session = array(
 				"valid" => false,
 				"id" => NULL,
 				"name" => NULL,
@@ -82,13 +88,14 @@ class SessionController extends Controller {
 				"is_admin" => false,
 				"login_url" => "/login.php"
 			);
+			return self::$current_session;
 		}
 
 		if (is_null($vo_CurrentUser)) {
 			// Means user has auth token, but at
 			// does not exist in DB
 
-			return array(
+			self::$current_session = array(
 				"valid" => false,
 				"id" => NULL,
 				"name" => NULL,
@@ -99,6 +106,7 @@ class SessionController extends Controller {
 				"is_admin" => false,
 				"login_url" => "/login.php"
 			);
+			return self::$current_session;
 		}
 
 		// Get email via his id
@@ -109,12 +117,13 @@ class SessionController extends Controller {
 			'email' => !is_null($vo_Email) ? $vo_Email->getEmail() : ''
 		);
 
-		return array(
+		self::$current_session = array(
 			'valid' => true,
 			'id' => $vo_CurrentUser->getUserId(),
 			'name' => $vo_CurrentUser->getName(),
 			'email' => !is_null($vo_Email) ? $vo_Email->getEmail() : '',
 			'email_md5' => !is_null($vo_Email) ? md5($vo_Email->getEmail()) : '',
+			'user' => $vo_CurrentUser,
 			'username' => $vo_CurrentUser->getUsername(),
 			'auth_token' => $s_AuthToken,
 			'is_email_verified' => $vo_CurrentUser->getVerified(),
@@ -123,6 +132,7 @@ class SessionController extends Controller {
 			'private_problems_count' => ProblemsDAO::getPrivateCount($vo_CurrentUser),
 			'needs_basic_info' =>$vo_CurrentUser->getPassword() == NULL 
 		);
+		return self::$current_session;
 	}
 
 	/**
