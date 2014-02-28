@@ -43,8 +43,8 @@ class ContestController extends Controller {
 		$addedContests = array();
 
 		foreach ($contests as $c) {
-			// At most we want 100 contests @TODO paginar correctamente
-			if (sizeof($addedContests) == 100) {
+			// At most we want 1000 contests @TODO paginar correctamente
+			if (sizeof($addedContests) == 1000) {
 				break;
 			}
 
