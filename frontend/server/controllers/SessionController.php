@@ -143,6 +143,9 @@ class SessionController extends Controller {
 		$a_CurrentSession = self::apiCurrentSession();
 		$vo_AuthT = new AuthTokens(array("token" => $a_CurrentSession["auth_token"]));
 
+		// Expire the local session cache.
+		self::$current_session = null;
+
 		try {
 			AuthTokensDAO::delete($vo_AuthT);
 		} catch (Exception $e) {
@@ -154,10 +157,12 @@ class SessionController extends Controller {
 	}
 
 	private function RegisterSession(Users $vo_User, $b_ReturnAuthTokenAsString = false) {
+		// Expire the local session cache.
+		self::$current_session = null;
+
 		//find if this user has older sessions
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
-
 		
 		//erase expired tokens
 		try {
@@ -166,7 +171,6 @@ class SessionController extends Controller {
 			// Best effort
 			self::$log->error("Failed to delete expired tokens: $e->getMessage()");
 		}
-		
 
 		// Create the new token
 		$entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));
