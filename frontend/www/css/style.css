@@ -203,9 +203,10 @@ div#sidebar { display: none }
 }
 #wmd-preview {
 	float: right;
-	width: 440px;
+	width: 420px;
 	border: 1px solid #eee;
-	margin-top: 10px;
+	margin-top: 35px;
+	padding: 20px;
 }
 table.sample_io {
 	border: 1px solid #000;

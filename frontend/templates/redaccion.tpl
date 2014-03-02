@@ -7,7 +7,7 @@
 <link rel="stylesheet" type="text/css" href="/js/pagedown/demo/browser/demo.css" />
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 
-<div style="width: 920px; position: relative; margin: 0 auto 0 auto; " class="post">
+<div class="post">
 <div id="wmd-preview" class="problem-statement"></div>
 <div id="wmd-panel">
 	<div id="wmd-button-bar"></div>
