@@ -16,3 +16,6 @@
 [submodule "frontend/server/libs/adodb"]
 	path = frontend/server/libs/adodb
 	url = git://git.code.sf.net/p/adodb/git
+[submodule "frontend/www/js/pagedown"]
+	path = frontend/www/js/pagedown
+	url = https://github.com/omegaup/pagedown.git

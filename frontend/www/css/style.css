@@ -193,13 +193,17 @@ div#sidebar { display: none }
 	overflow: hidden;
 }
 
-#markdownSource {
-	width: 370px;
-	height: 800px;
+#wmd-panel {
+	width: 440px;
 }
-#markdownPreview {
+#wmd-input {
+	height: 800px;
+	background-color: #fff;
+	font-family: monospace;
+}
+#wmd-preview {
 	float: right;
-	width: 370px;
+	width: 440px;
 	border: 1px solid #eee;
 	margin-top: 10px;
 }
