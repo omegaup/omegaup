@@ -35,7 +35,7 @@ class RunController extends Controller {
 	 * @throws InvalidParameterException
 	 * @throws ForbiddenAccessException
 	 */
-	private static function validateCreateRequest(Request $r) {
+	private static function validateCreateRequest(Request &$r) {
 		try {
 			Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
@@ -214,7 +214,8 @@ class RunController extends Controller {
 			
 			// Update submissions counter++
 			$r["problem"]->setSubmissions($r["problem"]->getSubmissions() + 1);
-			ProblemsDAO::save($r["problem"]);
+			$problem = $r['problem'];
+			ProblemsDAO::save($problem);
 			
 		} catch (Exception $e) {
 			// Operation failed in the data layer
