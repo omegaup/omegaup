@@ -506,3 +506,5 @@ padding-right: 5px;
 .no-right-padding { padding-right: 0; }
 
 #problem .statement p { text-align: justify; }
+#problem .statement li { text-align: justify; }
+#problem .statement h1 { font-weight: bold; }
