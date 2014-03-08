@@ -206,7 +206,7 @@ div#sidebar { display: none }
 	width: 420px;
 	border: 1px solid #eee;
 	margin-top: 35px;
-	padding: 20px;
+	padding: 15px;
 }
 table.sample_io {
 	border: 1px solid #000;
@@ -504,3 +504,5 @@ padding-right: 5px;
 .bottom-margin { margin-bottom: 15px; }
 .no-bottom-margin { margin-bottom: 0; }
 .no-right-padding { padding-right: 0; }
+
+#problem .statement p { text-align: justify; }

@@ -8,7 +8,8 @@
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 
 <div class="post">
-<div id="wmd-preview" class="problem-statement"></div>
+<div id="problem">
+<div id="wmd-preview" class="statement"></div>
 <div id="wmd-panel">
 	<div id="wmd-button-bar"></div>
 	<textarea class="wmd-input" id="wmd-input"># Descripción
@@ -57,5 +58,6 @@ Case #2: 15
 		{rdelim})();
 </script>
 <div style='clear: both;'></div>
+</div>
 </div>
 {include file='footer.tpl'}
