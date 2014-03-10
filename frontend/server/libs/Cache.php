@@ -6,6 +6,7 @@
  */
 class Cache
 {    
+    const SESSION_PREFIX = "session-";
     const CONTESTANT_SCOREBOARD_PREFIX = "scoreboard-";
     const CONTESTANT_SCOREBOARD_EVENTS_PREFIX = "scoreboard-events-";
     const ADMIN_SCOREBOARD_PREFIX = "scoreboard-admin-";
