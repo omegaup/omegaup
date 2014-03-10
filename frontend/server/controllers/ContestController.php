@@ -1270,7 +1270,8 @@ class ContestController extends Controller {
 			ContestsDAO::transBegin();
 
 			// Save the contest object with data sent by user to the database
-			ContestsDAO::save($r["contest"]);
+			$contest = $r['contest'];
+			ContestsDAO::save($contest);
 
 			// If the contest is private, add the list of allowed users
 			if (!is_null($r["public"]) && $r["public"] == 0 && $r["hasPrivateUsers"]) {
