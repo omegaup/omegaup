@@ -22,20 +22,17 @@ class Scoreboard {
 		$this->log = Logger::getLogger("Scoreboard");
 	}
 
-	public function generate($withRunDetails = false, $sortByName = false,
-	                         $filterUsersBy = NULL, $forceRefresh = false) {
+	public function generate($withRunDetails = false, $sortByName = false, $filterUsersBy = NULL) {
 		$result = null;
 
 		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $this->contest_id);
 		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $this->contest_id);
 
-		$can_use_contestant_cache = !$forceRefresh &&
-			!$this->showAllRuns &&
+		$can_use_contestant_cache = !$this->showAllRuns &&
 			!$sortByName &&
 			is_null($filterUsersBy);
 
-		$can_use_admin_cache = !$forceRefresh &&
-			$this->showAllRuns &&
+		$can_use_admin_cache = $this->showAllRuns &&
 			!$sortByName &&
 			is_null($filterUsersBy);
 
@@ -60,13 +57,12 @@ class Scoreboard {
 				// Get all problems given contest_id
 				$raw_contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
 
-				$run = new Runs();
-				$run->setContestId($this->contest_id);
-				$run->setStatus('ready');
-
 				$use_penalty = $contest->getPenaltyTimeStart() != 'none';
 
-				$contest_runs = RunsDAO::search($run, $use_penalty ? 'submit_delay' : 'time');
+				$contest_runs = RunsDAO::GetContestRuns(
+					$this->contest_id,
+					$use_penalty ? 'submit_delay' : 'run_id'
+				);
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
@@ -85,27 +81,28 @@ class Scoreboard {
 				$problem_mapping,
 				$contest->getPenalty(),
 				$scoreboardLimit,
-				$this->showAllRuns
+				$this->showAllRuns,
+				$sortByName
 			);
 
-			if ($this->showAllRuns) {
-				$adminScoreboardCache->set($result);
-			} else {
+			if ($can_use_contestant_cache) {
 				$contestantScoreboardCache->set($result);
+			} else if ($can_use_admin_cache) {
+				$adminScoreboardCache->set($result);
 			}
 		}
 
 		return $result;
 	}
 
-	public function events($forceRefresh = false) {
+	public function events() {
 		$result = null;
 
 		$contestantEventsCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
 		$adminEventsCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
 
-		$can_use_contestant_cache = !$forceRefresh && !$this->showAllRuns;
-		$can_use_admin_cache = !$forceRefresh && $this->showAllRuns;
+		$can_use_contestant_cache = !$this->showAllRuns;
+		$can_use_admin_cache = $this->showAllRuns;
 
 		// If cache is turned on and we're not looking for admin-only runs
 		if ($can_use_contestant_cache) {
@@ -128,18 +125,11 @@ class Scoreboard {
 				$raw_contest_problems =
 					ContestProblemsDAO::GetRelevantProblems($this->contest_id);
 
-				$run = new Runs();
-				$run->setContestId($this->contest_id);
-				$run->setStatus('ready');
-				if (!$this->showAllRuns) {
-					$run->setTest(0);
-				}
-
 				$use_penalty = $contest->getPenaltyTimeStart() != 'none';
 
-				$contest_runs = RunsDAO::search(
-					$run,
-					$use_penalty ? 'submit_delay' : 'time'
+				$contest_runs = RunsDAO::GetContestRuns(
+					$this->contest_id,
+					$use_penalty ? 'submit_delay' : 'run_id'
 				);
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
@@ -158,10 +148,10 @@ class Scoreboard {
 			                                      $problem_mapping,
 			                                      $this->showAllRuns);
 
-			if ($this->showAllRuns) {
-				$adminEventsCache->set($result);
-			} else {
+			if ($can_use_contestant_cache) {
 				$contestantEventsCache->set($result);
+			} else if ($can_use_admin_cache) {
+				$adminEventsCache->set($result);
 			}
 		}
 
@@ -180,9 +170,11 @@ class Scoreboard {
 
 		// Invalidar cache del contestant
 		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
+		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest_id);
 
 		// Invalidar cache del admin
 		Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
+		Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest_id);
 	}
 
 	public static function RefreshScoreboardCache($contest_id) {
@@ -195,13 +187,12 @@ class Scoreboard {
 			// Get all problems given contest_id
 			$raw_contest_problems = ContestProblemsDAO::GetRelevantProblems($contest_id);
 
-			$run = new Runs();
-			$run->setContestId($contest_id);
-			$run->setStatus('ready');
-
 			$use_penalty = $contest->getPenaltyTimeStart() != 'none';
 
-			$contest_runs = RunsDAO::search($run, $use_penalty ? 'submit_delay' : 'time');
+			$contest_runs = RunsDAO::GetContestRuns(
+				$this->contest_id,
+				$use_penalty ? 'submit_delay' : 'run_id'
+			);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -222,7 +213,8 @@ class Scoreboard {
 			$problem_mapping,
 			$contest->getPenalty(),
 			$scoreboardLimit,
-			false
+			false, /* showAllRuns */
+			false  /* sortByName */
 		));
 		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
 		$adminScoreboardCache->set(Scoreboard::getScoreboardFromRuns(
@@ -231,7 +223,8 @@ class Scoreboard {
 			$problem_mapping,
 			$contest->getPenalty(),
 			$scoreboardLimit,
-			true
+			true, /* showAllRuns */
+			false /* sortByName */
 		));
 
 		$contestantEventCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest_id);
@@ -241,7 +234,7 @@ class Scoreboard {
 			$use_penalty,
 			$raw_contest_users,
 			$problem_mapping,
-			false
+			false /* showAllRuns */
 		));
 
 		$adminEventCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest_id);
@@ -251,7 +244,7 @@ class Scoreboard {
 			$use_penalty,
 			$raw_contest_users,
 			$problem_mapping,
-			true
+			true /* showAllRuns */
 		));
 	}
 
@@ -289,7 +282,8 @@ class Scoreboard {
 	}
 
 	private static function getScoreboardFromRuns($runs, $raw_contest_users, $problem_mapping,
-	                                              $contest_penalty, $scoreboard_limit, $showAllRuns = false) {
+	                                              $contest_penalty, $scoreboard_time_limit,
+	                                              $showAllRuns, $sortByName) {
 		$test_only = array();
 		$users_info = array();
 
@@ -318,15 +312,20 @@ class Scoreboard {
 		}
 
 		foreach ($runs as $run) {
-			$problem =
-				&$users_info[$run->getUserId()]['problems'][$problem_mapping[$run->getProblemId()]];
+			$user_id = $run->getUserId();
+			$problem_id = $run->getProblemId();
+			$contest_score = $run->getContestScore();
+			$is_test = $run->getTest() != 0;
 
-			$test_only[$run->getUserId()] = $run->getTest() != 0;
+			$problem =
+				&$users_info[$user_id]['problems'][$problem_mapping[$problem_id]];
+
+			$test_only[$user_id] = $is_test;
 			if (!$showAllRuns) {
-				if ($run->getTest() != 0) {
+				if ($is_test) {
 					continue;
 				}
-				if (strtotime($run->getTime()) >= $scoreboard_limit) {
+				if (strtotime($run->getTime()) >= $scoreboard_time_limit) {
 					$problem['runs']++;
 					continue;
 				}
@@ -334,9 +333,9 @@ class Scoreboard {
 
 			$totalPenalty = $run->getSubmitDelay() +
 				$problem['runs'] * $contest_penalty;
-			if ($problem['points'] < $run->getContestScore() ||
-			    $problem['points'] == $run->getContestScore() && $problem['penalty'] > $totalPenalty) {
-				$problem['points'] = $run->getContestScore();
+			if ($problem['points'] < $contest_score ||
+			    $problem['points'] == $contest_score && $problem['penalty'] > $totalPenalty) {
+				$problem['points'] = $contest_score;
 				$problem['penalty'] = $totalPenalty;
 			}
 			$problem['runs']++;
@@ -353,7 +352,7 @@ class Scoreboard {
 			array_push($result, $info);
 		}
 
-		Scoreboard::sortScoreboard($result, false);
+		Scoreboard::sortScoreboard($result, $sortByName);
 		return $result;
 	}
 

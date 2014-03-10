@@ -31,11 +31,13 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		
 		// Create runs
 		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+		$runData1 = RunsFactory::createRun($problemData, $contestData, $contestant);
 		$runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);
 		$runData3 = RunsFactory::createRun($problemData, $contestData, $contestant3);
 		
 		// Grade the runs
-		RunsFactory::gradeRun($runData);
+		RunsFactory::gradeRun($runData, 0, "CE");
+		RunsFactory::gradeRun($runData1);
 		RunsFactory::gradeRun($runData2, .9, "PA");
 		RunsFactory::gradeRun($runData3, 1.0);
 		

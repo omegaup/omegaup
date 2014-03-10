@@ -289,6 +289,21 @@ class RunsDAO extends RunsDAOBase
 		return $ar;
 	}
 
+	public static final function GetContestRuns($contest_id, $order_by_column) {
+		$sql = "SELECT contest_score, problem_id, user_id, test, time, submit_delay FROM Runs WHERE contest_id = ? AND status = 'ready' AND veredict NOT IN ('CE', 'JE') ORDER BY ?;";
+		$val = array($contest_id, $order_by_column);
+
+		global $conn;
+		$rs = $conn->Execute($sql, $val);
+
+		$ar = array();
+		foreach ($rs as $foo) {
+			array_push($ar, new Runs($foo));
+		}
+
+		return $ar;
+	}
+
 	/*
 	 * 
 	 * Get last run of a user
