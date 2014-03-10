@@ -259,12 +259,6 @@ class RunController extends Controller {
 		// Happy ending
 		$response["guid"] = $run->getGuid();
 		$response["status"] = "ok";
-
-		if (!self::$practice) {
-			/// @todo Invalidate cache only when this run changes a user's score
-			///       (by improving, adding penalties, etc)
-			Scoreboard::InvalidateScoreboardCache($r["contest"]->getContestId());
-		}
 		
 		// Expire rank cache
 		UserController::deleteProblemsSolvedRankCacheList();
@@ -381,26 +375,19 @@ class RunController extends Controller {
 	 * @param RunsDAO $run
 	 */
 	public static function invalidateCacheOnRejudge(Runs $run) {
-						
 		try {
 			// Expire details of the run
 			Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());		
 			
 			$contest = ContestsDAO::getByPK($run->getContestId());
 			
-			// If the run belongs to a contest, we need to invalidate that scoreboard
-			if (!is_null($contest)) {
-				Scoreboard::InvalidateScoreboardCache($contest->getContestId());
-			}
-			
 			// Now we need to invalidate problem stats
 			$problem = ProblemsDAO::getByPK($run->getProblemId());
 			
 			if (!is_null($problem)) {
 				// Invalidar cache stats
-				Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->getAlias());				
+				Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->getAlias());
 			}
-			
 		} catch (Exception $e) {
 			// We did our best effort to invalidate the cache...
 			self::$log->warn("Failed to invalidate cache on Rejudge, skipping: ");

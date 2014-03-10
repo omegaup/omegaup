@@ -64,7 +64,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		// Check data per problem
 		$this->assertEquals(100, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
 		$this->assertEquals(60, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["wrong_runs_count"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
 	}
 	
 	/**
@@ -114,7 +114,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		// Check data per problem
 		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
 		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["wrong_runs_count"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
 	}
 	
 	/**
@@ -164,7 +164,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		// Check data per problem
 		$this->assertEquals(100, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
 		$this->assertEquals(60, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["wrong_runs_count"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
 	}
 	
 	
