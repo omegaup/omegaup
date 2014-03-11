@@ -1,8 +1,7 @@
 <?php
 
-require_once ('Estructura.php');
-require_once("base/Coder_of_the_Month.dao.base.php");
-require_once("base/Coder_of_the_Month.vo.base.php");
+require_once("base/Coder_Of_The_Month.dao.base.php");
+require_once("base/Coder_Of_The_Month.vo.base.php");
 /** Page-level DocBlock .
  * 
  * @author alanboy

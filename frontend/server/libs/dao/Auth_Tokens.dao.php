@@ -1,5 +1,4 @@
 <?php
-require_once ('Estructura.php');
 require_once("base/Auth_Tokens.dao.base.php");
 require_once("base/Auth_Tokens.vo.base.php");
 /** Page-level DocBlock .

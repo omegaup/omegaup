@@ -1,6 +1,5 @@
 <?php
 
-require_once ('Estructura.php');
 require_once("base/Announcement.dao.base.php");
 require_once("base/Announcement.vo.base.php");
 /** Page-level DocBlock .
