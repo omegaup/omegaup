@@ -48,7 +48,7 @@
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="start_time">{#contestNewFormNewFormStartDate#}</label>
+						<label for="start_time">{#contestNewFormStartDate#}</label>
 						<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
 						<p class="help-block">{#contestNewFormStartDateDesc#}</p>
 					</div>
@@ -139,7 +139,7 @@
 					</div>
 					
 					<div class="form-group col-md-6">
-						<label for="public">Público</label>
+						<label for="public">{#contestNewFormPublic#}</label>
 						<select name='public' id='public' class="form-control">
 							<option value='1'>{#wordsYes#}</option>
 							<option value='0'>{#wordsNo#}</option>
