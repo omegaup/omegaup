@@ -225,7 +225,7 @@ class ContestController extends Controller {
 			}
 		} else {
 			if ($r["token"] !== $r["contest"]->getScoreboardUrl() &&
-			    $r["token"] !== $r["contest"]->getScoreboardUrlAdmin()) {
+					$r["token"] !== $r["contest"]->getScoreboardUrlAdmin()) {
 				throw new ForbiddenAccessException("Invalid scoreboard url.");
 			}
 		}
@@ -630,7 +630,7 @@ class ContestController extends Controller {
 
 		$r["user"] = null;
 
-		// Check contest_alias        
+		// Check contest_alias
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		$r["user"] = UserController::resolveUser($r["usernameOrEmail"]);
@@ -727,7 +727,7 @@ class ContestController extends Controller {
 		// Authenticate logged user
 		self::authenticateRequest($r);
 
-		// Check contest_alias        
+		// Check contest_alias
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		$user = UserController::resolveUser($r["usernameOrEmail"]);
@@ -768,7 +768,7 @@ class ContestController extends Controller {
 	 */
 	private static function validateClarifications(Request $r) {
 
-		// Check contest_alias        
+		// Check contest_alias
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		try {
@@ -812,7 +812,7 @@ class ContestController extends Controller {
 
 		$is_contest_director = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]);
 
-		// If user is the contest director, get all private clarifications        
+		// If user is the contest director, get all private clarifications
 		if ($is_contest_director) {
 			// Get all private clarifications 
 			$private_clarification_mask = new Clarifications(array(
@@ -840,7 +840,7 @@ class ContestController extends Controller {
 
 		$clarifications_array = array();
 
-		// Filter each Public clarification and add it to the response        
+		// Filter each Public clarification and add it to the response
 		foreach ($clarifications_public as $clarification) {
 			$clar = $clarification->asFilteredArray($relevant_columns);
 			$clar['can_answer'] = $is_contest_director;
@@ -1197,7 +1197,7 @@ class ContestController extends Controller {
 		// Validate request
 		self::validateCreateOrUpdate($r, true /* is update */);
 
-		// Update contest DAO                
+		// Update contest DAO
 		if (!is_null($r["public"])) {
 			
 			// If going public
@@ -1208,61 +1208,23 @@ class ContestController extends Controller {
 			$r["contest"]->setPublic($r["public"]);
 		}
 
-		if (!is_null($r["title"])) {
-			$r["contest"]->setTitle($r["title"]);
-		}
-
-		if (!is_null($r["description"])) {
-			$r["contest"]->setDescription($r["description"]);
-		}
-
-		if (!is_null($r["start_time"])) {
-			$r["contest"]->setStartTime(gmdate('Y-m-d H:i:s', $r["start_time"]));
-		}
-
-		if (!is_null($r["finish_time"])) {
-			$r["contest"]->setFinishTime(gmdate('Y-m-d H:i:s', $r["finish_time"]));
-		}
-
-		if (!is_null($r["window_length"])) {
-			$r["contest"]->setWindowLength($r["window_length"] == "NULL" ? NULL : $r["window_length"]);
-		}
-
-		if (!is_null($r["scoreboard"])) {
-			$r["contest"]->setScoreboard($r["scoreboard"]);
-		}
-
-		if (!is_null($r["points_decay_factor"])) {
-			$r["contest"]->setPointsDecayFactor($r["points_decay_factor"]);
-		}
-
-		if (!is_null($r["partial_score"])) {
-			$r["contest"]->setPartialScore($r["partial_score"]);
-		}
-
-		if (!is_null($r["submissions_gap"])) {
-			$r["contest"]->setSubmissionsGap($r["submissions_gap"]);
-		}
-
-		if (!is_null($r["feedback"])) {
-			$r["contest"]->setFeedback($r["feedback"]);
-		}
-
-		if (!is_null($r["penalty"])) {
-			$r["contest"]->setPenalty(max(0, intval($r["penalty"])));
-		}
-
-		if (!is_null($r["penalty_time_start"])) {
-			$r["contest"]->setPenaltyTimeStart($r["penalty_time_start"]);
-		}
-
-		if (!is_null($r["penalty_calc_policy"])) {
-			$r["contest"]->setPenaltyCalcPolicy($r["penalty_calc_policy"]);
-		}
-
-		if (!is_null($r["show_scoreboard_after"])) {
-			$r["contest"]->setShowScoreboardAfter($r["show_scoreboard_after"]);
-		}
+		$valueProperties = array(
+			"title",
+			"description",
+			"start_time"		=> array("transform" => function($value) { return gmdate('Y-m-d H:i:s', $value); }),
+			"finish_time"		=> array("transform" => function($value) { return gmdate('Y-m-d H:i:s', $value); }),
+			"window_length" => array("transform" => function($value) { return $value == "NULL" ? NULL : $value; }),
+			"scoreboard",
+			"points_decay_factor",
+			"partial_score",
+			"submissions_gap",
+			"feedback",
+			"penalty"				=> array("transform" => function($value) { return max(0, intval($value)); }),
+			"penalty_time_start",
+			"penalty_calc_policy",
+			"show_scoreboard_after",
+		);
+		self::updateValueProperties($r, $r["contest"], $valueProperties);
 
 		// Push changes
 		try {
@@ -1456,7 +1418,7 @@ class ContestController extends Controller {
 
 		$runs_mask = null;
 
-		// Get all runs for problem given        
+		// Get all runs for problem given
 		$runs_mask = new Runs(array(
 					"contest_id" => $r["contest"]->getContestId(),
 					"status" => $r["status"],

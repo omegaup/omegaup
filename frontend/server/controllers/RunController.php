@@ -68,7 +68,7 @@ class RunController extends Controller {
 			Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
 
-			// Validate that the combination contest_id problem_id is valid            
+			// Validate that the combination contest_id problem_id is valid
 			if (!ContestProblemsDAO::getByPK(
 							$r["contest"]->getContestId(), $r["problem"]->getProblemId()
 			)) {
@@ -223,7 +223,7 @@ class RunController extends Controller {
 		}
 
 		try {
-			// Create file for the run        
+			// Create file for the run
 			$filepath = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
 			FileHandler::CreateFile($filepath, $r["source"]);
 		} catch (Exception $e) {
@@ -688,7 +688,7 @@ class RunController extends Controller {
 		
 		self::validateList($r);
 
-		// Get all runs for problem given        
+		// Get all runs for problem given
 		$runs_mask = new Runs(array(					
 					"status" => $r["status"],
 					"veredict" => $r["veredict"],
