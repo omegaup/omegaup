@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Roles Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Roles }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class RolesDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $role_id ){
-			$pk = "";
-			$pk .= $role_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $role_id){
-			$pk = "";
-			$pk .= $role_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $role_id ){
-			$pk = "";
-			$pk .= $role_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -44,11 +34,11 @@ abstract class RolesDAOBase extends DAO
 	  **/
 	public static final function save( &$Roles )
 	{
-		if(  self::getByPK(  $Roles->getRoleId() ) !== NULL )
+		if (!is_null(self::getByPK( $Roles->getRoleId() )))
 		{
-			try{ return RolesDAOBase::update( $Roles) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return RolesDAOBase::create( $Roles) ; } catch(Exception $e){ throw $e; }
+			return RolesDAOBase::update( $Roles);
+		} else {
+			return RolesDAOBase::create( $Roles);
 		}
 	}
 
@@ -64,19 +54,17 @@ abstract class RolesDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $role_id )
 	{
-		if(self::recordExists(  $role_id)){
-			return self::getRecord( $role_id );
+		if(  is_null( $role_id )  ){ return NULL; }
+			return new Roles($obj);
 		}
 		$sql = "SELECT * FROM Roles WHERE (role_id = ? ) LIMIT 1;";
 		$params = array(  $role_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Roles( $rs );
-			self::pushRecord( $foo,  $role_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Roles( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -96,9 +84,9 @@ abstract class RolesDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Roles";
-		if($orden != NULL)
+		if( ! is_null ( $orden ) )
 		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -108,8 +96,6 @@ abstract class RolesDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Roles($foo);
     		array_push( $allData, $bar);
-			//role_id
-    		self::pushRecord( $bar, $foo["role_id"] );
 		}
 		return $allData;
 	}
@@ -141,65 +127,58 @@ abstract class RolesDAOBase extends DAO
 	  **/
 	public static final function search( $Roles , $orderBy = null, $orden = 'ASC')
 	{
+		if (!($Roles instanceof Roles)) {
+			return self::search(new Roles($Roles));
+		}
+
 		$sql = "SELECT * from Roles WHERE ("; 
 		$val = array();
-		if( $Roles->getRoleId() != NULL){
-			$sql .= " role_id = ? AND";
+		if (!is_null( $Roles->getRoleId())) {
+			$sql .= " `role_id` = ? AND";
 			array_push( $val, $Roles->getRoleId() );
 		}
-
-		if( $Roles->getName() != NULL){
-			$sql .= " name = ? AND";
+		if (!is_null( $Roles->getName())) {
+			$sql .= " `name` = ? AND";
 			array_push( $val, $Roles->getName() );
 		}
-
-		if( $Roles->getDescription() != NULL){
-			$sql .= " description = ? AND";
+		if (!is_null( $Roles->getDescription())) {
+			$sql .= " `description` = ? AND";
 			array_push( $val, $Roles->getDescription() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " order by " . $orderBy . " " . $orden ;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Roles($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["role_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Roles [$Roles] El objeto de tipo Roles a actualizar.
 	  **/
-	private static final function update( $Roles )
+	private static final function update($Roles)
 	{
-		$sql = "UPDATE Roles SET  name = ?, description = ? WHERE  role_id = ?;";
+		$sql = "UPDATE Roles SET  `name` = ?, `description` = ? WHERE  `role_id` = ?;";
 		$params = array( 
 			$Roles->getName(), 
 			$Roles->getDescription(), 
 			$Roles->getRoleId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -210,27 +189,25 @@ abstract class RolesDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Roles dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Roles [$Roles] El objeto de tipo Roles a crear.
 	  **/
 	private static final function create( &$Roles )
 	{
-		$sql = "INSERT INTO Roles ( role_id, name, description ) VALUES ( ?, ?, ?);";
+		$sql = "INSERT INTO Roles ( `role_id`, `name`, `description` ) VALUES ( ?, ?, ?);";
 		$params = array( 
 			$Roles->getRoleId(), 
 			$Roles->getName(), 
 			$Roles->getDescription(), 
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */  $Roles->setRoleId( $conn->Insert_ID() ); /*  */ 
+ 		$Roles->setRoleId( $conn->Insert_ID() );
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -238,7 +215,7 @@ abstract class RolesDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Roles} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Roles}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -269,53 +246,52 @@ abstract class RolesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Roles WHERE ("; 
 		$val = array();
-		if( (($a = $RolesA->getRoleId()) != NULL) & ( ($b = $RolesB->getRoleId()) != NULL) ){
-				$sql .= " role_id >= ? AND role_id <= ? AND";
+		if( ( !is_null (($a = $RolesA->getRoleId()) ) ) & ( ! is_null ( ($b = $RolesB->getRoleId()) ) ) ){
+				$sql .= " `role_id` >= ? AND `role_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " role_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `role_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $RolesA->getName()) != NULL) & ( ($b = $RolesB->getName()) != NULL) ){
-				$sql .= " name >= ? AND name <= ? AND";
+		if( ( !is_null (($a = $RolesA->getName()) ) ) & ( ! is_null ( ($b = $RolesB->getName()) ) ) ){
+				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " name = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `name` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $RolesA->getDescription()) != NULL) & ( ($b = $RolesB->getDescription()) != NULL) ){
-				$sql .= " description >= ? AND description <= ? AND";
+		if( ( !is_null (($a = $RolesA->getDescription()) ) ) & ( ! is_null ( ($b = $RolesB->getDescription()) ) ) ){
+				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " description = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `description` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
+		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Roles($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Roles($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -330,9 +306,9 @@ abstract class RolesDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Roles [$Roles] El objeto de tipo Roles a eliminar
 	  **/
-	public static final function delete( &$Roles )
+	public static final function delete( $Roles )
 	{
-		if(self::getByPK($Roles->getRoleId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Roles->getRoleId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Roles WHERE  role_id = ?;";
 		$params = array( $Roles->getRoleId() );
 		global $conn;

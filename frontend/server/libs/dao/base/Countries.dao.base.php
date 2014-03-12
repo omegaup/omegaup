@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Countries Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Countries }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class CountriesDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $country_id ){
-			$pk = "";
-			$pk .= $country_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $country_id){
-			$pk = "";
-			$pk .= $country_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $country_id ){
-			$pk = "";
-			$pk .= $country_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -44,11 +34,11 @@ abstract class CountriesDAOBase extends DAO
 	  **/
 	public static final function save( &$Countries )
 	{
-		if(  self::getByPK(  $Countries->getCountryId() ) !== NULL )
+		if (!is_null(self::getByPK( $Countries->getCountryId() )))
 		{
-			try{ return CountriesDAOBase::update( $Countries) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return CountriesDAOBase::create( $Countries) ; } catch(Exception $e){ throw $e; }
+			return CountriesDAOBase::update( $Countries);
+		} else {
+			return CountriesDAOBase::create( $Countries);
 		}
 	}
 
@@ -64,19 +54,17 @@ abstract class CountriesDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $country_id )
 	{
-		if(self::recordExists(  $country_id)){
-			return self::getRecord( $country_id );
+		if(  is_null( $country_id )  ){ return NULL; }
+			return new Countries($obj);
 		}
 		$sql = "SELECT * FROM Countries WHERE (country_id = ? ) LIMIT 1;";
 		$params = array(  $country_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Countries( $rs );
-			self::pushRecord( $foo,  $country_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Countries( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -96,9 +84,9 @@ abstract class CountriesDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Countries";
-		if($orden != NULL)
+		if( ! is_null ( $orden ) )
 		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -108,8 +96,6 @@ abstract class CountriesDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Countries($foo);
     		array_push( $allData, $bar);
-			//country_id
-    		self::pushRecord( $bar, $foo["country_id"] );
 		}
 		return $allData;
 	}
@@ -141,59 +127,53 @@ abstract class CountriesDAOBase extends DAO
 	  **/
 	public static final function search( $Countries , $orderBy = null, $orden = 'ASC')
 	{
+		if (!($Countries instanceof Countries)) {
+			return self::search(new Countries($Countries));
+		}
+
 		$sql = "SELECT * from Countries WHERE ("; 
 		$val = array();
-		if( $Countries->getCountryId() != NULL){
-			$sql .= " country_id = ? AND";
+		if (!is_null( $Countries->getCountryId())) {
+			$sql .= " `country_id` = ? AND";
 			array_push( $val, $Countries->getCountryId() );
 		}
-
-		if( $Countries->getName() != NULL){
-			$sql .= " name = ? AND";
+		if (!is_null( $Countries->getName())) {
+			$sql .= " `name` = ? AND";
 			array_push( $val, $Countries->getName() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " order by " . $orderBy . " " . $orden ;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Countries($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["country_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Countries [$Countries] El objeto de tipo Countries a actualizar.
 	  **/
-	private static final function update( $Countries )
+	private static final function update($Countries)
 	{
-		$sql = "UPDATE Countries SET  name = ? WHERE  country_id = ?;";
+		$sql = "UPDATE Countries SET  `name` = ? WHERE  `country_id` = ?;";
 		$params = array( 
 			$Countries->getName(), 
 			$Countries->getCountryId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -204,26 +184,23 @@ abstract class CountriesDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Countries dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Countries [$Countries] El objeto de tipo Countries a crear.
 	  **/
 	private static final function create( &$Countries )
 	{
-		$sql = "INSERT INTO Countries ( country_id, name ) VALUES ( ?, ?);";
+		$sql = "INSERT INTO Countries ( `country_id`, `name` ) VALUES ( ?, ?);";
 		$params = array( 
 			$Countries->getCountryId(), 
 			$Countries->getName(), 
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */   /*  */ 
+ 
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -231,7 +208,7 @@ abstract class CountriesDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Countries} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Countries}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -262,42 +239,41 @@ abstract class CountriesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Countries WHERE ("; 
 		$val = array();
-		if( (($a = $CountriesA->getCountryId()) != NULL) & ( ($b = $CountriesB->getCountryId()) != NULL) ){
-				$sql .= " country_id >= ? AND country_id <= ? AND";
+		if( ( !is_null (($a = $CountriesA->getCountryId()) ) ) & ( ! is_null ( ($b = $CountriesB->getCountryId()) ) ) ){
+				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " country_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `country_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $CountriesA->getName()) != NULL) & ( ($b = $CountriesB->getName()) != NULL) ){
-				$sql .= " name >= ? AND name <= ? AND";
+		if( ( !is_null (($a = $CountriesA->getName()) ) ) & ( ! is_null ( ($b = $CountriesB->getName()) ) ) ){
+				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " name = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `name` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
+		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Countries($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Countries($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -312,9 +288,9 @@ abstract class CountriesDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Countries [$Countries] El objeto de tipo Countries a eliminar
 	  **/
-	public static final function delete( &$Countries )
+	public static final function delete( $Countries )
 	{
-		if(self::getByPK($Countries->getCountryId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Countries->getCountryId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Countries WHERE  country_id = ?;";
 		$params = array( $Countries->getCountryId() );
 		global $conn;

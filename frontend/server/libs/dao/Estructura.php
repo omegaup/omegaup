@@ -1,73 +1,73 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 		/** Table Data Access Object.
-       *	 
+		  * 
 		  * Esta clase abstracta comprende metodos comunes para todas las clases DAO que mapean una tabla
-		  * @author alanboy
 		  * @access private
 		  * @abstract
-		  * @package docs
 		  */
 		abstract class DAO
 		{
-		public static $useDAOCache = true;
-		protected static $isTrans = false;
-		protected static $transCount = 0;
-		public static $log;
-		
-		public static function transBegin (){
-			
-			self::$transCount ++;
-			
-            // @TODO Reactivate this
-			self::$log->debug("Iniciando transaccion (".self::$transCount.")");
-
-			if(self::$isTrans){
-				self::$log->debug("Transaccion ya ha sido iniciada antes.");
-				return;
+			protected static $isTrans = false;
+			protected static $transCount = 0;
+			protected static function log ($m = null) {
+				// Your logging call here.
 			}
-			
+			public static function transBegin() {
+				self::$transCount ++;
+				self::log("Iniciando transaccion (".self::$transCount.")");
+				if(self::$isTrans){
+					//self::log("Transaccion ya ha sido iniciada antes.");
+					return;
+				}
+
 			global $conn;
 			$conn->StartTrans();
 			self::$isTrans = true;
-			
-		}
 
+		}
 		public static function transEnd (  ){
 			
 			if(!self::$isTrans){
-				self::$log->debug("Transaccion commit pero no hay transaccion activa !!.");
+				self::log("Transaccion commit pero no hay transaccion activa !!.");
 				return;
 			}
-			
+
 			self::$transCount --;
-			self::$log->debug("Terminando transaccion (".self::$transCount.")");
-			
+			self::log("Terminando transaccion (".self::$transCount.")");
+
 			if(self::$transCount > 0){
 				return;
 			}
 			global $conn;
 			$conn->CompleteTrans();
-			self::$log->debug("Transaccion commit !!");
+			self::log("Transaccion commit !!");
 			self::$isTrans = false;
 		}
 		public static function transRollback (  ){
 			if(!self::$isTrans){
-				self::$log->debug("Transaccion rollback pero no hay transaccion activa !!.");
+				self::log("Transaccion rollback pero no hay transaccion activa !!.");
 				return;
 			}
 			
 			self::$transCount = 0;
 			global $conn;
 			$conn->FailTrans();
-			$conn->CompleteTrans();
-			self::$log->debug("Transaccion rollback !");
+			self::log("Transaccion rollback !");
 			self::$isTrans = false;
 		}
 		}
 		/** Value Object.
 		  * 
 		  * Esta clase abstracta comprende metodos comunes para todas los objetos VO
-		  * @author alanboy
 		  * @access private
 		  * @package docs
 		  * 
@@ -75,90 +75,33 @@
 		abstract class VO
 		{
 
-	        /**
-	          *	Obtener una representacion en forma de arreglo.
-	          *	
-	          * Este metodo transforma todas las propiedades este objeto en un arreglo asociativo.
-	          *	
-	          * @returns Array Un arreglo asociativo que describe a este objeto.
-	          **/
 			function asArray(){
 				return get_object_vars($this);
 			}
-                  
-                  /**
-	          *	Obtener una representacion en forma de arreglo sin mostrar los campos NULL.
-	          *	
-	          * Este metodo transforma todas las propiedades este objeto en un arreglo asociativo
-                  * sin mostrar los campos NULL.
-	          *	
-	          * @returns Array Un arreglo asociativo que describe a este objeto escondiendo los NULL.
-	          **/   
-                        function asArrayWithoutNulls()
-                        {
-                            // Get the complete representation of the array
-                            $completeArray = get_object_vars($this);
-                            
-                            $returnArray = array();
-                            
-                            foreach( $completeArray as $key => $value )
-                                if(!is_null($value))
-                                {
-                                    $returnArray[$key] = $value;
-                                    
-                                }
-                            
-                            return $returnArray;
-                        
-                        }
-                        
-                        
-                        
-                /**
-	          *	Obtener una representacion en forma de arreglo sólo con los campos 
-                  *     definidos en $filter 
-	          *	
-	          * Este metodo transforma todas las propiedades este objeto en un arreglo asociativo
-                  * sólo mostrando los campos definidos por filters
-	          *	
-	          * @returns Array Un arreglo filtrado asociativo que describe a este objeto.
-	          **/   
-                        function asFilteredArray($filters)
-                        {
-                            // Get the complete representation of the array
-                            $completeArray = get_object_vars($this);
-                            
-                            // Declare an empty array to return
-                            $returnArray = array();
-                            
-                            foreach( $filters as $filter )
-                            {                                
-                                // Only return properties included in $filters array
-                                if (isset ($completeArray[$filter]))
-                                {
-                                    $returnArray[$filter] = $completeArray[$filter];                                
-                                }
-                                else
-                                {
-                                    $returnArray[$filter] = NULL;
-                                }
-                            }
-                            
-                            return $returnArray;
-                        
-                        }
 
-
-			/**
-			  *
-			  *
-			  **/
-			protected function toUnixTime( Array $fields ){
-				foreach( $fields as $f ){
-					$this->$f = strtotime( $this->$f );
-				}
+			protected static function object_to_array($mixed) {
+				if(is_object($mixed)) $mixed = (array) $mixed;
+				if(is_array($mixed)) {
+				    $new = array();
+				    foreach($mixed as $key => $val) {
+				        $key = preg_replace("/^\\0(.*)\\0/","",$key);
+				        $new[$key] = object_to_array($val);
+				    }
+				} 
+				else $new = $mixed;
+				return $new; 
 			}
 
-		}
+			function __call($method, $params) {
+				 $var = substr($method, 3);
+				 $var = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $var)); 
 
-		DAO::$log = Logger::getLogger("dao");
+				 if (strncasecmp($method, "get", 3)==0) {
+					 return $this->$var;
+				 }
+
+				 if (strncasecmp($method, "set", 3)==0) {
+					 $this->$var = $params[0];
+				 }
+			}
+		}

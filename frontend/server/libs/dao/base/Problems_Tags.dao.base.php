@@ -1,37 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** ProblemsTags Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsTags }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class ProblemsTagsDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $problem_id, $tag_id ){
-			$pk = "";
-			$pk .= $problem_id . "-";
-			$pk .= $tag_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $problem_id, $tag_id){
-			$pk = "";
-			$pk .= $problem_id . "-";
-			$pk .= $tag_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $problem_id, $tag_id ){
-			$pk = "";
-			$pk .= $problem_id . "-";
-			$pk .= $tag_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -47,11 +34,11 @@ abstract class ProblemsTagsDAOBase extends DAO
 	  **/
 	public static final function save( &$Problems_Tags )
 	{
-		if(  self::getByPK(  $Problems_Tags->getProblemId() , $Problems_Tags->getTagId() ) !== NULL )
+		if (!is_null(self::getByPK( $Problems_Tags->getProblemId() , $Problems_Tags->getTagId() )))
 		{
-			try{ return ProblemsTagsDAOBase::update( $Problems_Tags) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return ProblemsTagsDAOBase::create( $Problems_Tags) ; } catch(Exception $e){ throw $e; }
+			return ProblemsTagsDAOBase::update( $Problems_Tags);
+		} else {
+			return ProblemsTagsDAOBase::create( $Problems_Tags);
 		}
 	}
 
@@ -67,19 +54,17 @@ abstract class ProblemsTagsDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $problem_id, $tag_id )
 	{
-		if(self::recordExists(  $problem_id, $tag_id)){
-			return self::getRecord( $problem_id, $tag_id );
+		if(  is_null( $problem_id ) || is_null( $tag_id )  ){ return NULL; }
+			return new ProblemsTags($obj);
 		}
 		$sql = "SELECT * FROM Problems_Tags WHERE (problem_id = ? AND tag_id = ? ) LIMIT 1;";
 		$params = array(  $problem_id, $tag_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new ProblemsTags( $rs );
-			self::pushRecord( $foo,  $problem_id, $tag_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new ProblemsTags( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -99,9 +84,9 @@ abstract class ProblemsTagsDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Problems_Tags";
-		if($orden != NULL)
+		if( ! is_null ( $orden ) )
 		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -111,9 +96,6 @@ abstract class ProblemsTagsDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new ProblemsTags($foo);
     		array_push( $allData, $bar);
-			//problem_id
-			//tag_id
-    		self::pushRecord( $bar, $foo["problem_id"],$foo["tag_id"] );
 		}
 		return $allData;
 	}
@@ -145,51 +127,46 @@ abstract class ProblemsTagsDAOBase extends DAO
 	  **/
 	public static final function search( $Problems_Tags , $orderBy = null, $orden = 'ASC')
 	{
+		if (!($Problems_Tags instanceof ProblemsTags)) {
+			return self::search(new ProblemsTags($Problems_Tags));
+		}
+
 		$sql = "SELECT * from Problems_Tags WHERE ("; 
 		$val = array();
-		if( $Problems_Tags->getProblemId() != NULL){
-			$sql .= " problem_id = ? AND";
+		if (!is_null( $Problems_Tags->getProblemId())) {
+			$sql .= " `problem_id` = ? AND";
 			array_push( $val, $Problems_Tags->getProblemId() );
 		}
-
-		if( $Problems_Tags->getTagId() != NULL){
-			$sql .= " tag_id = ? AND";
+		if (!is_null( $Problems_Tags->getTagId())) {
+			$sql .= " `tag_id` = ? AND";
 			array_push( $val, $Problems_Tags->getTagId() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " order by " . $orderBy . " " . $orden ;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new ProblemsTags($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["problem_id"],$foo["tag_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param ProblemsTags [$Problems_Tags] El objeto de tipo ProblemsTags a actualizar.
 	  **/
-	private static final function update( $Problems_Tags )
+	private static final function update($Problems_Tags)
 	{
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -200,26 +177,23 @@ abstract class ProblemsTagsDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto ProblemsTags dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param ProblemsTags [$Problems_Tags] El objeto de tipo ProblemsTags a crear.
 	  **/
 	private static final function create( &$Problems_Tags )
 	{
-		$sql = "INSERT INTO Problems_Tags ( problem_id, tag_id ) VALUES ( ?, ?);";
+		$sql = "INSERT INTO Problems_Tags ( `problem_id`, `tag_id` ) VALUES ( ?, ?);";
 		$params = array( 
 			$Problems_Tags->getProblemId(), 
 			$Problems_Tags->getTagId(), 
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */   /*  */ 
+ 
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -227,7 +201,7 @@ abstract class ProblemsTagsDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ProblemsTags} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ProblemsTags}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -258,42 +232,41 @@ abstract class ProblemsTagsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Problems_Tags WHERE ("; 
 		$val = array();
-		if( (($a = $Problems_TagsA->getProblemId()) != NULL) & ( ($b = $Problems_TagsB->getProblemId()) != NULL) ){
-				$sql .= " problem_id >= ? AND problem_id <= ? AND";
+		if( ( !is_null (($a = $Problems_TagsA->getProblemId()) ) ) & ( ! is_null ( ($b = $Problems_TagsB->getProblemId()) ) ) ){
+				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " problem_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `problem_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $Problems_TagsA->getTagId()) != NULL) & ( ($b = $Problems_TagsB->getTagId()) != NULL) ){
-				$sql .= " tag_id >= ? AND tag_id <= ? AND";
+		if( ( !is_null (($a = $Problems_TagsA->getTagId()) ) ) & ( ! is_null ( ($b = $Problems_TagsB->getTagId()) ) ) ){
+				$sql .= " `tag_id` >= ? AND `tag_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " tag_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `tag_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
+		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new ProblemsTags($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new ProblemsTags($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -308,9 +281,9 @@ abstract class ProblemsTagsDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param ProblemsTags [$Problems_Tags] El objeto de tipo ProblemsTags a eliminar
 	  **/
-	public static final function delete( &$Problems_Tags )
+	public static final function delete( $Problems_Tags )
 	{
-		if(self::getByPK($Problems_Tags->getProblemId(), $Problems_Tags->getTagId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Problems_Tags->getProblemId(), $Problems_Tags->getTagId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Problems_Tags WHERE  problem_id = ? AND tag_id = ?;";
 		$params = array( $Problems_Tags->getProblemId(), $Problems_Tags->getTagId() );
 		global $conn;

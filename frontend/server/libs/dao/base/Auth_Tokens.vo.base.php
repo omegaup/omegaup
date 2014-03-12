@@ -1,10 +1,17 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Value Object file for table Auth_Tokens.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
-  * @author alanboy
   * @access public
-  * @package docs
   * 
   */
 
@@ -16,20 +23,20 @@ class AuthTokens extends VO
 	  * Para construir un objeto de tipo AuthTokens debera llamarse a el constructor 
 	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
-	  * @return AuthTokens
 	  */
-	function __construct( $data = NULL)
-	{ 
-		if(isset($data))
+	function __construct($data = NULL)
+	{
+		if (isset($data))
 		{
-			if( isset($data['user_id']) ){
+			if (is_string($data))
+				$data = self::object_to_array(json_decode($data));
+
+
+			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
 			}
-			if( isset($data['token']) ){
+			if (isset($data['token'])) {
 				$this->token = $data['token'];
-			}
-			if( isset($data['create_time']) ){
-				$this->create_time = $data['create_time'];
 			}
 		}
 	}
@@ -45,89 +52,24 @@ class AuthTokens extends VO
 	{ 
 		$vec = array( 
 			"user_id" => $this->user_id,
-			"token" => $this->token,
-			"create_time" => $this->create_time
+			"token" => $this->token
 		); 
 	return json_encode($vec); 
 	}
-	
+
 	/**
-	  * user_id
-	  * 
-	  *  [Campo no documentado]<br>
-	  * @access protected
+	  *  [Campo no documentado]
+	  * @access public
 	  * @var int(11)
 	  */
-	protected $user_id;
+	public $user_id;
 
 	/**
-	  * token
-	  * 
-	  *  [Campo no documentado]<br>
-	  * <b>Llave Primaria</b><br>
-	  * @access protected
+	  *  [Campo no documentado]
+	  * Llave Primaria
+	  * @access public
 	  * @var varchar(128)
 	  */
-	protected $token;
-	
-	protected $create_time;
-
-	/**
-	  * getUserId
-	  * 
-	  * Get the <i>user_id</i> property for this object. Donde <i>user_id</i> es  [Campo no documentado]
-	  * @return int(11)
-	  */
-	final public function getUserId()
-	{
-		return $this->user_id;
-	}
-
-	/**
-	  * setUserId( $user_id )
-	  * 
-	  * Set the <i>user_id</i> property for this object. Donde <i>user_id</i> es  [Campo no documentado].
-	  * Una validacion basica se hara aqui para comprobar que <i>user_id</i> es de tipo <i>int(11)</i>. 
-	  * Si esta validacion falla, se arrojara... algo. 
-	  * @param int(11)
-	  */
-	final public function setUserId( $user_id )
-	{
-		$this->user_id = $user_id;
-	}
-
-	/**
-	  * getToken
-	  * 
-	  * Get the <i>token</i> property for this object. Donde <i>token</i> es  [Campo no documentado]
-	  * @return varchar(128)
-	  */
-	final public function getToken()
-	{
-		return $this->token;
-	}
-
-	/**
-	  * setToken( $token )
-	  * 
-	  * Set the <i>token</i> property for this object. Donde <i>token</i> es  [Campo no documentado].
-	  * Una validacion basica se hara aqui para comprobar que <i>token</i> es de tipo <i>varchar(128)</i>. 
-	  * Si esta validacion falla, se arrojara... algo. 
-	  * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
-	  * No deberias usar setToken( ) a menos que sepas exactamente lo que estas haciendo.<br>
-	  * @param varchar(128)
-	  */
-	final public function setToken( $token )
-	{
-		$this->token = $token;
-	}
-	
-	final public function setCreateTime($create_time) {
-		$this->create_time = $create_time;		
-	}
-	
-	final public function getCreateTime() {
-		return $this->create_time;
-	}
+	public $token;
 
 }

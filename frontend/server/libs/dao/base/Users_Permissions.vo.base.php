@@ -8,19 +8,19 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Value Object file for table Password_Change.
+/** Value Object file for table Users_Permissions.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
   * 
   */
 
-class PasswordChange extends VO
+class UsersPermissions extends VO
 {
 	/**
-	  * Constructor de PasswordChange
+	  * Constructor de UsersPermissions
 	  * 
-	  * Para construir un objeto de tipo PasswordChange debera llamarse a el constructor 
+	  * Para construir un objeto de tipo UsersPermissions debera llamarse a el constructor 
 	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
@@ -35,14 +35,11 @@ class PasswordChange extends VO
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
 			}
-			if (isset($data['token'])) {
-				$this->token = $data['token'];
+			if (isset($data['permission_id'])) {
+				$this->permission_id = $data['permission_id'];
 			}
-			if (isset($data['ip'])) {
-				$this->ip = $data['ip'];
-			}
-			if (isset($data['expiration_date'])) {
-				$this->expiration_date = $data['expiration_date'];
+			if (isset($data['contest_id'])) {
+				$this->contest_id = $data['contest_id'];
 			}
 		}
 	}
@@ -50,7 +47,7 @@ class PasswordChange extends VO
 	/**
 	  * Obtener una representacion en String
 	  * 
-	  * Este metodo permite tratar a un objeto PasswordChange en forma de cadena.
+	  * Este metodo permite tratar a un objeto UsersPermissions en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
 	  * @return String 
 	  */
@@ -58,15 +55,14 @@ class PasswordChange extends VO
 	{ 
 		$vec = array( 
 			"user_id" => $this->user_id,
-			"token" => $this->token,
-			"ip" => $this->ip,
-			"expiration_date" => $this->expiration_date
+			"permission_id" => $this->permission_id,
+			"contest_id" => $this->contest_id
 		); 
 	return json_encode($vec); 
 	}
 
 	/**
-	  * Identificador de a que usuario pertenece este token
+	  *  [Campo no documentado]
 	  * Llave Primaria
 	  * @access public
 	  * @var int(11)
@@ -74,24 +70,18 @@ class PasswordChange extends VO
 	public $user_id;
 
 	/**
-	  * El token que se genera aleatoriamente para luego comparar cuando el usuario haga click en el link
+	  *  [Campo no documentado]
+	  * Llave Primaria
 	  * @access public
-	  * @var char(64)
+	  * @var int(11)
 	  */
-	public $token;
+	public $permission_id;
 
 	/**
-	  * El ip desde donde se genero este reseteo de password
+	  * Este permiso solo aplica en el contexto de un concurso.
 	  * @access public
-	  * @var char(15)
+	  * @var int(11)
 	  */
-	public $ip;
-
-	/**
-	  * La fecha en que vence este token
-	  * @access public
-	  * @var timestamp
-	  */
-	public $expiration_date;
+	public $contest_id;
 
 }

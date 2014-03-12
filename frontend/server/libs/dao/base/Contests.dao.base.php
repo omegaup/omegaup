@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Contests Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Contests }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class ContestsDAOBase extends DAO
 {
-               
-		private static $loadedRecords = array();
 
-		private static function recordExists(  $contest_id ){
-			$pk = "";
-			$pk .= $contest_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $contest_id){
-			$pk = "";
-			$pk .= $contest_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $contest_id ){
-			$pk = "";
-			$pk .= $contest_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -44,11 +34,11 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	public static final function save( &$Contests )
 	{
-		if(  self::getByPK(  $Contests->getContestId() ) !== NULL )
+		if (!is_null(self::getByPK( $Contests->getContestId() )))
 		{
-			try{ return ContestsDAOBase::update( $Contests) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return ContestsDAOBase::create( $Contests) ; } catch(Exception $e){ throw $e; }
+			return ContestsDAOBase::update( $Contests);
+		} else {
+			return ContestsDAOBase::create( $Contests);
 		}
 	}
 
@@ -64,21 +54,17 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $contest_id )
 	{
-		if(self::recordExists(  $contest_id) && self::$useDAOCache == true){
-			return self::getRecord( $contest_id );
+		if(  is_null( $contest_id )  ){ return NULL; }
+			return new Contests($obj);
 		}
 		$sql = "SELECT * FROM Contests WHERE (contest_id = ? ) LIMIT 1;";
 		$params = array(  $contest_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Contests( $rs );
-			self::pushRecord( $foo,  $contest_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Contests( $rs );
+		return $foo;
 	}
-        
-
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -95,31 +81,23 @@ abstract class ContestsDAOBase extends DAO
 	  * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
 	  * @return Array Un arreglo que contiene objetos del tipo {@link Contests}.
 	  **/
-        
-	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC', $columnas = NULL )
+	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
-                // Implode array of columns to a coma-separated string               
-                $columns_str = is_null($columnas) ? "*" : implode(",", $columnas);
-                
-                $sql = "SELECT ".$columns_str." from Contests";
-                if($orden != NULL)
-                { $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-                if($pagina != NULL)
-                {
-                        $sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
-                }
-                
-                global $conn;                
-                $rs = $conn->Execute($sql);
-                $allData = array();
-                foreach ($rs as $foo) {
-                    $bar = new Contests($foo);
-                    array_push( $allData, $bar);
-                    
-                    //contest_id
-                    self::pushRecord( $bar, $foo["contest_id"] );
-                }
-                return $allData;
+		$sql = "SELECT * from Contests";
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
+		{
+			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
+		}
+		global $conn;
+		$rs = $conn->Execute($sql);
+		$allData = array();
+		foreach ($rs as $foo) {
+			$bar = new Contests($foo);
+    		array_push( $allData, $bar);
+		}
+		return $allData;
 	}
 
 
@@ -149,125 +127,114 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	public static final function search( $Contests , $orderBy = null, $orden = 'ASC')
 	{
+		if (!($Contests instanceof Contests)) {
+			return self::search(new Contests($Contests));
+		}
+
 		$sql = "SELECT * from Contests WHERE ("; 
 		$val = array();
-		if( $Contests->getContestId() != NULL){
-			$sql .= " contest_id = ? AND";
+		if (!is_null( $Contests->getContestId())) {
+			$sql .= " `contest_id` = ? AND";
 			array_push( $val, $Contests->getContestId() );
 		}
-
-		if( $Contests->getTitle() != NULL){
-			$sql .= " title = ? AND";
+		if (!is_null( $Contests->getTitle())) {
+			$sql .= " `title` = ? AND";
 			array_push( $val, $Contests->getTitle() );
 		}
-
-		if( $Contests->getDescription() != NULL){
-			$sql .= " description = ? AND";
+		if (!is_null( $Contests->getDescription())) {
+			$sql .= " `description` = ? AND";
 			array_push( $val, $Contests->getDescription() );
 		}
-
-		if( $Contests->getStartTime() != NULL){
-			$sql .= " start_time = ? AND";
+		if (!is_null( $Contests->getStartTime())) {
+			$sql .= " `start_time` = ? AND";
 			array_push( $val, $Contests->getStartTime() );
 		}
-
-		if( $Contests->getFinishTime() != NULL){
-			$sql .= " finish_time = ? AND";
+		if (!is_null( $Contests->getFinishTime())) {
+			$sql .= " `finish_time` = ? AND";
 			array_push( $val, $Contests->getFinishTime() );
 		}
-
-		if( $Contests->getWindowLength() != NULL){
-			$sql .= " window_length = ? AND";
+		if (!is_null( $Contests->getWindowLength())) {
+			$sql .= " `window_length` = ? AND";
 			array_push( $val, $Contests->getWindowLength() );
 		}
-
-		if( $Contests->getDirectorId() != NULL){
-			$sql .= " director_id = ? AND";
+		if (!is_null( $Contests->getDirectorId())) {
+			$sql .= " `director_id` = ? AND";
 			array_push( $val, $Contests->getDirectorId() );
 		}
-
-		if( $Contests->getRerunId() != NULL){
-			$sql .= " rerun_id = ? AND";
+		if (!is_null( $Contests->getRerunId())) {
+			$sql .= " `rerun_id` = ? AND";
 			array_push( $val, $Contests->getRerunId() );
 		}
-
-		if( $Contests->getPublic() != NULL){
-			$sql .= " public = ? AND";
+		if (!is_null( $Contests->getPublic())) {
+			$sql .= " `public` = ? AND";
 			array_push( $val, $Contests->getPublic() );
 		}
-
-		if( $Contests->getAlias() != NULL){
-			$sql .= " alias = ? AND";
+		if (!is_null( $Contests->getAlias())) {
+			$sql .= " `alias` = ? AND";
 			array_push( $val, $Contests->getAlias() );
 		}
-
-		if( $Contests->getScoreboard() != NULL){
-			$sql .= " scoreboard = ? AND";
+		if (!is_null( $Contests->getScoreboard())) {
+			$sql .= " `scoreboard` = ? AND";
 			array_push( $val, $Contests->getScoreboard() );
 		}
-
-		if( $Contests->getPartialScore() != NULL){
-			$sql .= " partial_score = ? AND";
+		if (!is_null( $Contests->getPointsDecayFactor())) {
+			$sql .= " `points_decay_factor` = ? AND";
+			array_push( $val, $Contests->getPointsDecayFactor() );
+		}
+		if (!is_null( $Contests->getPartialScore())) {
+			$sql .= " `partial_score` = ? AND";
 			array_push( $val, $Contests->getPartialScore() );
 		}
-
-		if( $Contests->getSubmissionsGap() != NULL){
-			$sql .= " submissions_gap = ? AND";
+		if (!is_null( $Contests->getSubmissionsGap())) {
+			$sql .= " `submissions_gap` = ? AND";
 			array_push( $val, $Contests->getSubmissionsGap() );
 		}
-
-		if( $Contests->getFeedback() != NULL){
-			$sql .= " feedback = ? AND";
+		if (!is_null( $Contests->getFeedback())) {
+			$sql .= " `feedback` = ? AND";
 			array_push( $val, $Contests->getFeedback() );
 		}
-
-		if( $Contests->getPenalty() != NULL){
-			$sql .= " penalty = ? AND";
+		if (!is_null( $Contests->getPenalty())) {
+			$sql .= " `penalty` = ? AND";
 			array_push( $val, $Contests->getPenalty() );
 		}
-
-		if( $Contests->getPenaltyTimeStart () != NULL){
-			$sql .= " penalty_time_start = ? AND";
+		if (!is_null( $Contests->getPenaltyTimeStart())) {
+			$sql .= " `penalty_time_start` = ? AND";
 			array_push( $val, $Contests->getPenaltyTimeStart() );
 		}
-                
-                if( $Contests->getPenaltyCalcPolicy() != NULL){
-			$sql .= " penalty_calc_policy = ? AND";
+		if (!is_null( $Contests->getPenaltyCalcPolicy())) {
+			$sql .= " `penalty_calc_policy` = ? AND";
 			array_push( $val, $Contests->getPenaltyCalcPolicy() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null( $Contests->getShowScoreboardAfter())) {
+			$sql .= " `show_scoreboard_after` = ? AND";
+			array_push( $val, $Contests->getShowScoreboardAfter() );
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " order by " . $orderBy . " " . $orden ;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Contests($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["contest_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu�ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Contests [$Contests] El objeto de tipo Contests a actualizar.
 	  **/
-	private static final function update( $Contests )
+	private static final function update($Contests)
 	{
-		$sql = "UPDATE Contests SET  title = ?, description = ?, start_time = ?, finish_time = ?, window_length = ?, director_id = ?, rerun_id = ?, public = ?, alias = ?, scoreboard = ?, partial_score = ?, submissions_gap = ?, feedback = ?, penalty = ?, penalty_time_start = ?, points_decay_factor = ?, penalty_calc_policy = ?, show_scoreboard_after = ?, scoreboard_url = ?, scoreboard_url_admin = ? WHERE  contest_id = ?;";
+		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_time_start` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ? WHERE  `contest_id` = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -279,25 +246,19 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getPublic(), 
 			$Contests->getAlias(), 
 			$Contests->getScoreboard(), 
+			$Contests->getPointsDecayFactor(), 
 			$Contests->getPartialScore(), 
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
 			$Contests->getPenalty(), 
-			$Contests->getPenaltyTimeStart(),                         
-                        $Contests->getPointsDecayFactor(),
-                        $Contests->getPenaltyCalcPolicy(),
-                        $Contests->getShowScoreboardAfter(),
-			$Contests->getScoreboardUrl(),
-			$Contests->getScoreboardUrlAdmin(),
-			$Contests->getContestId()
-                        
-                        );
+			$Contests->getPenaltyTimeStart(), 
+			$Contests->getPenaltyCalcPolicy(), 
+			$Contests->getShowScoreboardAfter(), 
+			$Contests->getContestId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -308,13 +269,12 @@ abstract class ContestsDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Contests dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Contests [$Contests] El objeto de tipo Contests a crear.
 	  **/
 	private static final function create( &$Contests )
 	{
-		$sql = "INSERT INTO Contests ( contest_id, title, description, start_time, finish_time, window_length, director_id, rerun_id, public, alias, scoreboard, partial_score, submissions_gap, feedback, penalty, penalty_time_start, points_decay_factor, penalty_calc_policy, show_scoreboard_after, scoreboard_url, scoreboard_url_admin) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_time_start`, `penalty_calc_policy`, `show_scoreboard_after` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->getContestId(), 
 			$Contests->getTitle(), 
@@ -327,26 +287,23 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getPublic(), 
 			$Contests->getAlias(), 
 			$Contests->getScoreboard(), 
+			$Contests->getPointsDecayFactor(), 
 			$Contests->getPartialScore(), 
 			$Contests->getSubmissionsGap(), 
 			$Contests->getFeedback(), 
 			$Contests->getPenalty(), 
-			$Contests->getPenaltyTimeStart(),                        
-                        $Contests->getPointsDecayFactor(),
-                        $Contests->getPenaltyCalcPolicy(),
-                        $Contests->getShowScoreboardAfter(),
-			$Contests->getScoreboardUrl(),
-			$Contests->getScoreboardUrlAdmin()
-		 );                
+			$Contests->getPenaltyTimeStart(), 
+			$Contests->getPenaltyCalcPolicy(), 
+			$Contests->getShowScoreboardAfter(), 
+		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */  $Contests->setContestId( $conn->Insert_ID() ); /*  */ 
+ 		$Contests->setContestId( $conn->Insert_ID() );
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -354,7 +311,7 @@ abstract class ContestsDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Contests} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Contests}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -385,196 +342,228 @@ abstract class ContestsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contests WHERE ("; 
 		$val = array();
-		if( (($a = $ContestsA->getContestId()) != NULL) & ( ($b = $ContestsB->getContestId()) != NULL) ){
-				$sql .= " contest_id >= ? AND contest_id <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getContestId()) ) ) & ( ! is_null ( ($b = $ContestsB->getContestId()) ) ) ){
+				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " contest_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `contest_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getTitle()) != NULL) & ( ($b = $ContestsB->getTitle()) != NULL) ){
-				$sql .= " title >= ? AND title <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getTitle()) ) ) & ( ! is_null ( ($b = $ContestsB->getTitle()) ) ) ){
+				$sql .= " `title` >= ? AND `title` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " title = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `title` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getDescription()) != NULL) & ( ($b = $ContestsB->getDescription()) != NULL) ){
-				$sql .= " description >= ? AND description <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getDescription()) ) ) & ( ! is_null ( ($b = $ContestsB->getDescription()) ) ) ){
+				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " description = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `description` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getStartTime()) != NULL) & ( ($b = $ContestsB->getStartTime()) != NULL) ){
-				$sql .= " start_time >= ? AND start_time <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getStartTime()) ) ) & ( ! is_null ( ($b = $ContestsB->getStartTime()) ) ) ){
+				$sql .= " `start_time` >= ? AND `start_time` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " start_time = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `start_time` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getFinishTime()) != NULL) & ( ($b = $ContestsB->getFinishTime()) != NULL) ){
-				$sql .= " finish_time >= ? AND finish_time <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getFinishTime()) ) ) & ( ! is_null ( ($b = $ContestsB->getFinishTime()) ) ) ){
+				$sql .= " `finish_time` >= ? AND `finish_time` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " finish_time = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `finish_time` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getWindowLength()) != NULL) & ( ($b = $ContestsB->getWindowLength()) != NULL) ){
-				$sql .= " window_length >= ? AND window_length <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getWindowLength()) ) ) & ( ! is_null ( ($b = $ContestsB->getWindowLength()) ) ) ){
+				$sql .= " `window_length` >= ? AND `window_length` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " window_length = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `window_length` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getDirectorId()) != NULL) & ( ($b = $ContestsB->getDirectorId()) != NULL) ){
-				$sql .= " director_id >= ? AND director_id <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getDirectorId()) ) ) & ( ! is_null ( ($b = $ContestsB->getDirectorId()) ) ) ){
+				$sql .= " `director_id` >= ? AND `director_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " director_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `director_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getRerunId()) != NULL) & ( ($b = $ContestsB->getRerunId()) != NULL) ){
-				$sql .= " rerun_id >= ? AND rerun_id <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getRerunId()) ) ) & ( ! is_null ( ($b = $ContestsB->getRerunId()) ) ) ){
+				$sql .= " `rerun_id` >= ? AND `rerun_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " rerun_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `rerun_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getPublic()) != NULL) & ( ($b = $ContestsB->getPublic()) != NULL) ){
-				$sql .= " public >= ? AND public <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getPublic()) ) ) & ( ! is_null ( ($b = $ContestsB->getPublic()) ) ) ){
+				$sql .= " `public` >= ? AND `public` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " public = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `public` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getAlias()) != NULL) & ( ($b = $ContestsB->getAlias()) != NULL) ){
-				$sql .= " alias >= ? AND alias <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getAlias()) ) ) & ( ! is_null ( ($b = $ContestsB->getAlias()) ) ) ){
+				$sql .= " `alias` >= ? AND `alias` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " alias = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `alias` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getScoreboard()) != NULL) & ( ($b = $ContestsB->getScoreboard()) != NULL) ){
-				$sql .= " scoreboard >= ? AND scoreboard <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getScoreboard()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboard()) ) ) ){
+				$sql .= " `scoreboard` >= ? AND `scoreboard` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " scoreboard = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `scoreboard` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getPartialScore()) != NULL) & ( ($b = $ContestsB->getPartialScore()) != NULL) ){
-				$sql .= " partial_score >= ? AND partial_score <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getPointsDecayFactor()) ) ) & ( ! is_null ( ($b = $ContestsB->getPointsDecayFactor()) ) ) ){
+				$sql .= " `points_decay_factor` >= ? AND `points_decay_factor` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " partial_score = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `points_decay_factor` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getSubmissionsGap()) != NULL) & ( ($b = $ContestsB->getSubmissionsGap()) != NULL) ){
-				$sql .= " submissions_gap >= ? AND submissions_gap <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getPartialScore()) ) ) & ( ! is_null ( ($b = $ContestsB->getPartialScore()) ) ) ){
+				$sql .= " `partial_score` >= ? AND `partial_score` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " submissions_gap = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `partial_score` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getFeedback()) != NULL) & ( ($b = $ContestsB->getFeedback()) != NULL) ){
-				$sql .= " feedback >= ? AND feedback <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getSubmissionsGap()) ) ) & ( ! is_null ( ($b = $ContestsB->getSubmissionsGap()) ) ) ){
+				$sql .= " `submissions_gap` >= ? AND `submissions_gap` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " feedback = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `submissions_gap` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getPenalty()) != NULL) & ( ($b = $ContestsB->getPenalty()) != NULL) ){
-				$sql .= " penalty >= ? AND penalty <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getFeedback()) ) ) & ( ! is_null ( ($b = $ContestsB->getFeedback()) ) ) ){
+				$sql .= " `feedback` >= ? AND `feedback` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " penalty = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `feedback` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ContestsA->getPenaltyTimeStart()) != NULL) & ( ($b = $ContestsB->getPenaltyTimeStart()) != NULL) ){
-				$sql .= " penalty_time_start >= ? AND penalty_time_start <= ? AND";
+		if( ( !is_null (($a = $ContestsA->getPenalty()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenalty()) ) ) ){
+				$sql .= " `penalty` >= ? AND `penalty` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " penalty_time_start = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `penalty` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ContestsA->getPenaltyTimeStart()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenaltyTimeStart()) ) ) ){
+				$sql .= " `penalty_time_start` >= ? AND `penalty_time_start` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `penalty_time_start` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ContestsA->getPenaltyCalcPolicy()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenaltyCalcPolicy()) ) ) ){
+				$sql .= " `penalty_calc_policy` >= ? AND `penalty_calc_policy` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `penalty_calc_policy` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ContestsA->getShowScoreboardAfter()) ) ) & ( ! is_null ( ($b = $ContestsB->getShowScoreboardAfter()) ) ) ){
+				$sql .= " `show_scoreboard_after` >= ? AND `show_scoreboard_after` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `show_scoreboard_after` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
+		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Contests($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Contests($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -589,9 +578,9 @@ abstract class ContestsDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Contests [$Contests] El objeto de tipo Contests a eliminar
 	  **/
-	public static final function delete( &$Contests )
+	public static final function delete( $Contests )
 	{
-		if(self::getByPK($Contests->getContestId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Contests->getContestId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Contests WHERE  contest_id = ?;";
 		$params = array( $Contests->getContestId() );
 		global $conn;
