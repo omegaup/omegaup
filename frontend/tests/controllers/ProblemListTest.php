@@ -208,5 +208,44 @@ class ProblemList extends OmegaupTestCase {
 			}			
 		}
 	}
+	
+	/**
+	 * Test List API with query param
+	 */
+	public function testListWithAliasQuery() {				
+		
+		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */);
+		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */);		
+		
+		$user = UserFactory::createUser();		
+		$admin = UserFactory::createAdminUser();
+		
+		// Expect public problem only
+		$r = new Request();
+		$r["auth_token"] = $this->login($user);
+		$r["query"] = substr($problemDataPublic["request"]["title"], 2, 5);				
+		$response = ProblemController::apiList($r);		
+		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPublic["request"]["alias"]);
+		
+		// Expect 0 problems, matches are private for $user
+		$r = new Request();
+		$r["auth_token"] = $this->login($user);
+		$r["query"] = substr($problemDataPrivate["request"]["title"], 2, 5);				
+		$response = ProblemController::apiList($r);
+		$this->assertEquals(0, count($response["results"]));
+		
+		// Expect 1 problem, admin can see private problem
+		$r = new Request();
+		$r["auth_token"] = $this->login($admin);
+		$r["query"] = substr($problemDataPrivate["request"]["title"], 2, 5);				
+		$response = ProblemController::apiList($r);		
+		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPrivate["request"]["alias"]); 
+		
+		// Expect public problem only
+		$r = new Request();
+		$r["auth_token"] = $this->login($user);		
+		$response = ProblemController::apiList($r);		
+		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPublic["request"]["alias"]);
+	}
 }
 

@@ -11,7 +11,7 @@ $(document).ready(function() {
 	var runsStatus = "";
 	var runsProblem = "";
 	var runsLang = "";
-	var runsUsername = "";
+	var runsUsername = "";	
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
 	var rankChartLimit = 1e99;
@@ -131,11 +131,41 @@ $(document).ready(function() {
 		$('select.runsveredict').change();
 	});
 	
+	if (contestAlias === "admin") {
+		$("#runsproblem").typeahead({
+			ajax: { 
+				url: "/api/problem/list/",
+				preProcess: function(data) { 
+					return data["results"];
+				}
+			},
+			display: 'title',
+			val: 'alias',
+			minLength: 2,
+			itemSelected: function (item, val, text) {						
+				// Refresh runs by calling change func
+				runsProblem = val;
+				$('select.runsveredict').change();
+			}
+		});
+
+		$('#runsproblem-clear').click(function() {
+			runsProblem = "";
+			$("#runsproblem").val('');
+			$('select.runsveredict').change();
+		});
+	}
+	
 	$('select.runsveredict, select.runsstatus, select.runsproblem, select.runslang').change(function () {
 		runsVeredict = $('select.runsveredict option:selected').val();
-		runsStatus	 = $('select.runsstatus	  option:selected').val();
-		runsProblem	 = $('select.runsproblem  option:selected').val();
+		runsStatus	 = $('select.runsstatus	  option:selected').val();						
 		runsLang	 = $('select.runslang	  option:selected').val();
+		
+		// in general admin panel, runsProblem is populated via the typehead
+		if (contestAlias != "admin") {
+			runsProblem	 = $('select.runsproblem  option:selected').val();
+		}
+		
 		console.log("changed select");
 		refreshRuns();
 	});
@@ -390,7 +420,7 @@ $(document).ready(function() {
 			$('.id', r).html(run.run_id);
 			$('.guid', r).html(run.guid);
 			$('.username', r).html(run.username);
-			$('.problem', r).html(run.alias);
+			$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');
 			$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 			$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 			$('.points', r).html(parseFloat(run.contest_score).toFixed(2));

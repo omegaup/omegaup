@@ -1,51 +1,25 @@
 <?php
 
 /*
- * Scoreboard 
- * 
+ * Scoreboard
+ *
  */
 
 class Scoreboard {
 	// Column to return total score per user
-
 	const total_column = "total";
-	const MEMCACHE_EVENTS_PREFIX = "scoreboard_events";
 
 	// Contest's data
-	private $data;
 	private $contest_id;
-	private $countProblemsInContest;
 	private $showAllRuns;
 	private $auth_token;
 	public $log;
 
 	public function __construct($contest_id, $showAllRuns = false, $auth_token = null) {
-		$this->data = array();
 		$this->contest_id = $contest_id;
 		$this->showAllRuns = $showAllRuns;
 		$this->auth_token = $auth_token;
 		$this->log = Logger::getLogger("Scoreboard");
-	}
-
-	public function getScoreboardTimeLimitUnixTimestamp(Contests $contest) {
-		$start = strtotime($contest->getStartTime());
-		$finish = strtotime($contest->getFinishTime());
-
-		if ($this->showAllRuns || ($contest->hasFinished() && $contest->getShowScoreboardAfter())) {
-			// Show full scoreboard to admin users
-			// or if the contest finished and the creator wants to show it at the end
-			$percentage = 1.0;
-		} else {
-			$percentage = (double) $contest->getScoreboard() / 100.0;
-		}
-
-		$limit = $start + (int) (($finish - $start) * $percentage);
-
-		return $limit;
-	}
-
-	public function getCountProblemsInContest() {
-		return $this->countProblemsInContest;
 	}
 
 	public function generate($withRunDetails = false, $sortByName = false, $filterUsersBy = NULL) {
@@ -54,13 +28,13 @@ class Scoreboard {
 		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $this->contest_id);
 		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $this->contest_id);
 
-		$can_use_contestant_cache = !$this->showAllRuns
-				&& !$sortByName
-				&& is_null($filterUsersBy);
+		$can_use_contestant_cache = !$this->showAllRuns &&
+			!$sortByName &&
+			is_null($filterUsersBy);
 
-		$can_use_admin_cache = $this->showAllRuns
-				&& !$sortByName
-				&& is_null($filterUsersBy);
+		$can_use_admin_cache = $this->showAllRuns &&
+			!$sortByName &&
+			is_null($filterUsersBy);
 
 		// If cache is turned on and we're not looking for admin-only runs
 		if ($can_use_contestant_cache) {
@@ -73,270 +47,229 @@ class Scoreboard {
 			try {
 				$contest = ContestsDAO::getByPK($this->contest_id);
 
-				// Get whether we can cache this scoreboard.
-				$pending_runs = RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
-				$cacheable_for_contestant = !$this->showAllRuns && !$pending_runs;
-				$cacheable_for_admin = $this->showAllRuns && !$pending_runs;
-
 				// Get all distinct contestants participating in the contest given contest_id
-				$contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, false /*show all runs*/, $filterUsersBy);
-
-				// Get all problems given contest_id
-				$contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
-			} catch (Exception $e) {
-				throw new InvalidDatabaseOperationException($e);				
-			}
-
-			$result = array();
-
-			// Save the number of problems internally
-			$this->countProblemsInContest = count($contest_problems);
-
-			// Calculate score for each contestant x problem
-			foreach ($contest_users as $contestant) {
-				$user_results = array();
-				$user_problems = array();
-
-				foreach ($contest_problems as $problems) {
-					$user_problems[$problems->getAlias()] = $this->getScore($problems->getProblemId(), $contestant->getUserId(), $this->getScoreboardTimeLimitUnixTimestamp($contest), $withRunDetails, $contest->getPenalty());
-				}
-
-				// Add the problems' information
-				$user_results['problems'] = $user_problems;
-
-				// Calculate total score for current user            
-				$user_results[self::total_column] = $this->getTotalScore($user_problems);
-
-				// And more information on the user
-				$user_results['username'] = $contestant->getUsername();
-				$user_results['name'] = $contestant->getName() ? $contestant->getName() : $contestant->getUsername();
-
-				// Add contestant results to scoreboard data
-				array_push($result, $user_results);
-			}
-
-			if ($sortByName == false) {
-				// Sort users by their total column
-				usort($result, array($this, 'compareUserScores'));
-			} else {
-				// Sort users by their name
-				usort($result, array($this, 'compareUserNames'));
-			}
-			
-			// Append the place for each user
-			$currentPoints = -1;
-			$currentPenalty = -1;
-			$place = 1;
-			$draws = 1;
-			foreach($result as &$userData) {
-				
-				if ($currentPoints === -1) {
-					$currentPoints = $userData["total"]["points"];
-					$currentPenalty = $userData["total"]["penalty"];
-				} else {
-					// If not in draw
-					if ($userData["total"]["points"] < $currentPoints || $userData["total"]["penalty"] > $currentPenalty) {
-						$currentPoints = $userData["total"]["points"];
-						$currentPenalty = $userData["total"]["penalty"];
-													
-						$place += $draws;
-						$draws = 1;
-						
-					} else if ($userData["total"]["points"] == $currentPoints && $userData["total"]["penalty"] == $currentPenalty) {							
-						$draws++;
-					}
-				}
-
-				// Set the place for the current user
-				$userData["place"] = $place;								
-			}
-			
-			// Cache scoreboard if there are no pending runs.
-			if ($cacheable_for_contestant && $can_use_contestant_cache) {
-				
-				$timeout = APC_USER_CACHE_SCOREBOARD_TIMEOUT;
-				
-				if ($contest->hasFinished()) {
-					// Cache the scoreboard until the end of time (or a redjudge, whatever happens first)
-					$timeout = 0;
-				}
-				
-				$contestantScoreboardCache->set($result, $timeout);
-				
-			} else if ($cacheable_for_admin && $can_use_admin_cache) {
-				
-				$timeout = APC_USER_CACHE_ADMIN_SCOREBOARD_TIMEOUT;
-				
-				if ($contest->hasFinished()) {
-					// Cache the scoreboard until the end of time (or a redjudge, whatever happens first)
-					$timeout = 0;
-				}
-				
-				$adminScoreboardCache->set($result, $timeout);
-			}
-		}
-
-		$this->data = $result;
-		return $this->data;
-	}
-
-	public function events() {
-		if ($this->showAllRuns || !isset($result) || is_null($result)) {
-			try {
-				$contest = ContestsDAO::getByPK($this->contest_id);
-
-				// Gets whether we can cache this scoreboard.
-				//$cacheable = !$this->showAllRuns && !RunsDAO::PendingRuns($this->contest_id, $this->showAllRuns);
-				// Get all distinct contestants participating in the contest given contest_id
-				$raw_contest_users = RunsDAO::GetAllRelevantUsers($this->contest_id, $this->showAllRuns);
+				$raw_contest_users = RunsDAO::GetAllRelevantUsers(
+					$this->contest_id,
+					false /*show all runs*/,
+					$filterUsersBy
+				);
 
 				// Get all problems given contest_id
 				$raw_contest_problems = ContestProblemsDAO::GetRelevantProblems($this->contest_id);
 
-				$run = new Runs();
-				$run->setContestId($this->contest_id);
-				$run->setStatus('ready');
-				if (!$this->showAllRuns) {
-					$run->setTest(0);
-				}
+				$use_penalty = $contest->getPenaltyTimeStart() != 'none';
 
-				$usePenalty = $contest->getPenaltyTimeStart() != 'none';
-
-				$contest_runs = RunsDAO::search($run, $usePenalty ? 'submit_delay' : 'time');
+				$contest_runs = RunsDAO::GetContestRuns(
+					$this->contest_id,
+					$use_penalty ? 'submit_delay' : 'run_id'
+				);
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
 
-			$contest_users = array();
-			$contest_problems = array();
+			$problem_mapping = array();
 
-			foreach ($raw_contest_users as $user) {
-				$contest_users[$user->getUserId()] = $user;
+			foreach ($raw_contest_problems as $problems) {
+				$problem_mapping[$problems->getProblemId()] = $problems->getAlias();
 			}
 
+			$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest);
 
-			foreach ($raw_contest_problems as $problem) {
-				$contest_problems[$problem->getProblemId()] = $problem;
-			}
+			$result = Scoreboard::getScoreboardFromRuns(
+				$contest_runs,
+				$raw_contest_users,
+				$problem_mapping,
+				$contest->getPenalty(),
+				$scoreboardLimit,
+				$this->showAllRuns,
+				$sortByName
+			);
 
-			$result = array();
-
-			// Save the number of problems internally
-			$this->countProblemsInContest = count($contest_problems);
-
-			$user_problems_score = array();
-
-			$contestStart = strtotime($contest->getStartTime());
-
-			// Calculate score for each contestant x problem
-			foreach ($contest_runs as $run) {
-				if (!isset($user_problems_score[$run->getUserId()])) {
-					$user_problems_score[$run->getUserId()] = array();
-				}
-
-				if (!isset($user_problems_score[$run->getUserId()][$run->getProblemId()])) {
-					$user_problems_score[$run->getUserId()][$run->getProblemId()] = array('points' => 0, 'penalty' => 0);
-				}
-
-				if ($user_problems_score[$run->getUserId()][$run->getProblemId()]['points'] >= $run->getContestScore()) {
-					continue;
-				}
-
-				if (strtotime($run->getTime()) >= $this->getScoreboardTimeLimitUnixTimestamp($contest)) {
-					continue;
-				}
-
-				$user_problems_score[$run->getUserId()][$run->getProblemId()]['points'] = round((float) $run->getContestScore(), 2);
-				$user_problems_score[$run->getUserId()][$run->getProblemId()]['penalty'] = 0;
-
-				$data = array();
-				$user = $contest_users[$run->getUserId()];
-
-				$data['name'] = $user->getName() ? $user->getName() : $user->getUsername();
-				$data['username'] = $user->getUsername();
-				$data['delta'] = $usePenalty ? (int)$run->getSubmitDelay() : (strtotime($run->getTime()) - $contestStart) / 60;
-
-				$data['problem'] = array(
-					'alias' => $contest_problems[$run->getProblemId()]->getAlias(),
-					'points' => round((float) $run->getContestScore(), 2),
-					'penalty' => 0
-				);
-
-				$data['total'] = array(
-					'points' => 0,
-					'penalty' => 0
-				);
-
-				foreach ($user_problems_score[$run->getUserId()] as $problem) {
-					$data['total']['points'] += $problem['points'];
-					$data['total']['penalty'] += $problem['penalty'];
-				}
-
-				// Add contestant results to scoreboard data
-				array_push($result, $data);
+			$timeout = max(0, strtotime($contest->getFinishTime()) - time());
+			if ($can_use_contestant_cache) {
+				$contestantScoreboardCache->set($result, $timeout);
+			} else if ($can_use_admin_cache) {
+				$adminScoreboardCache->set($result, $timeout);
 			}
 		}
 
-		$this->data = $result;
-		return $this->data;
+		return $result;
 	}
 
-	protected function getScore($problem_id, $user_id, $limit_timestamp, $withRunDetails, $penalty) {
-		$wrong_runs_count = 0;
-		try {
-			$bestRun = RunsDAO::GetBestRun($this->contest_id, $problem_id, $user_id, $limit_timestamp, $this->showAllRuns);
-			$extra_penalty = 0;
+	public function events() {
+		$result = null;
 
-			if ($penalty > 0 && !is_null($bestRun) && (int) $bestRun->getContestScore() > 0) {
-				$wrong_runs_count = RunsDAO::GetWrongRuns($this->contest_id, $problem_id, $user_id, $bestRun->getRunId(), $this->showAllRuns);
-				$extra_penalty = $penalty * $wrong_runs_count;
+		$contestantEventsCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
+		$adminEventsCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
+
+		$can_use_contestant_cache = !$this->showAllRuns;
+		$can_use_admin_cache = $this->showAllRuns;
+
+		// If cache is turned on and we're not looking for admin-only runs
+		if ($can_use_contestant_cache) {
+			$result = $contestantEventsCache->get();
+		} else if ($can_use_admin_cache) {
+			$result = $adminEventsCache->get();
+		}
+
+		if (is_null($result)) {
+			try {
+				$contest = ContestsDAO::getByPK($this->contest_id);
+
+				// Get all distinct contestants participating in the contest given contest_id
+				$raw_contest_users = RunsDAO::GetAllRelevantUsers(
+					$this->contest_id,
+					$this->showAllRuns
+				);
+
+				// Get all problems given contest_id
+				$raw_contest_problems =
+					ContestProblemsDAO::GetRelevantProblems($this->contest_id);
+
+				$use_penalty = $contest->getPenaltyTimeStart() != 'none';
+
+				$contest_runs = RunsDAO::GetContestRuns(
+					$this->contest_id,
+					$use_penalty ? 'submit_delay' : 'run_id'
+				);
+			} catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
 			}
+
+			$problem_mapping = array();
+
+			foreach ($raw_contest_problems as $problems) {
+				$problem_mapping[$problems->getProblemId()] = $problems->getAlias();
+			}
+
+			$result = Scoreboard::calculateEvents($contest,
+			                                      $contest_runs,
+			                                      $use_penalty,
+			                                      $raw_contest_users,
+			                                      $problem_mapping,
+			                                      $this->showAllRuns);
+
+			$timeout = max(0, strtotime($contest->getFinishTime()) - time());
+			if ($can_use_contestant_cache) {
+				$contestantEventsCache->set($result, $timeout);
+			} else if ($can_use_admin_cache) {
+				$adminEventsCache->set($result, $timeout);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * New runs trigger a scoreboard update asynchronously, only invalidate
+	 * scoreboard when contest details have changed.
+	 *
+	 * @param int $contest_id
+	 */
+	public static function InvalidateScoreboardCache($contest_id) {
+		$log = Logger::getLogger("Scoreboard");
+		$log->info("Invalidating scoreboard cache.");
+
+		// Invalidar cache del contestant
+		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
+		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest_id);
+
+		// Invalidar cache del admin
+		Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
+		Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest_id);
+	}
+
+	public static function RefreshScoreboardCache($contest_id) {
+		try {
+			$contest = ContestsDAO::getByPK($contest_id);
+
+			// Get all distinct contestants participating in the contest given contest_id
+			$raw_contest_users = RunsDAO::GetAllRelevantUsers($contest_id, true, NULL);
+
+			// Get all problems given contest_id
+			$raw_contest_problems = ContestProblemsDAO::GetRelevantProblems($contest_id);
+
+			$use_penalty = $contest->getPenaltyTimeStart() != 'none';
+
+			$contest_runs = RunsDAO::GetContestRuns(
+				$contest_id,
+				$use_penalty ? 'submit_delay' : 'run_id'
+			);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		// Penalty should not be added if the best run was 0 pts       
-		$final_penalty = $extra_penalty + ( ((int) $bestRun->getContestScore() > 0) ? (int) round($bestRun->getSubmitDelay()) : 0);
+		$problem_mapping = array();
 
-		// If we want all the details with the run (diff of cases, etc..)
-		if ($withRunDetails && !is_null($bestRun)) {
-			$runDetails = array();
-
-			if ($bestRun->getGuid() != "") {
-								
-				$runDetailsRequest = new Request(array(
-					"run_alias" => $bestRun->getGuid(),
-					"auth_token" => $this->auth_token,
-				));
-				$runDetails = RunController::apiAdminDetails($runDetailsRequest);
-				
-
-				// If STATUS="OK" and out_diff is not null, then status is WA
-				// OK just means that runner didn't crash. Grader grades after that.
-				foreach ($runDetails["cases"] as &$case) {
-					if ($case["meta"]["status"] == "OK" && !is_null($case["out_diff"])) {
-						$case["meta"]["status"] = "WA";
-					}
-				}
-
-				unset($runDetails["source"]);
-			}
-			return array(
-				"points" => (int) round($bestRun->getContestScore()),
-				"penalty" => $final_penalty,
-				"run_details" => $runDetails
-			);
-		} else {
-			return array(
-				"points" => (int) round($bestRun->getContestScore()),
-				"penalty" => $final_penalty,
-				"wrong_runs_count" => $wrong_runs_count,
-			);
+		foreach ($raw_contest_problems as $problems) {
+			$problem_mapping[$problems->getProblemId()] = $problems->getAlias();
 		}
+
+		$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest);
+
+		// Cache scoreboard until the contest ends (or forever if it has already ended).
+		$timeout = max(0, strtotime($contest->getFinishTime()) - time());
+		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
+		$contestantScoreboardCache->set(Scoreboard::getScoreboardFromRuns(
+			$contest_runs,
+			$raw_contest_users,
+			$problem_mapping,
+			$contest->getPenalty(),
+			$scoreboardLimit,
+			false, /* showAllRuns */
+			false  /* sortByName */
+		), $timeout);
+		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
+		$adminScoreboardCache->set(Scoreboard::getScoreboardFromRuns(
+			$contest_runs,
+			$raw_contest_users,
+			$problem_mapping,
+			$contest->getPenalty(),
+			$scoreboardLimit,
+			true, /* showAllRuns */
+			false /* sortByName */
+		), $timeout);
+
+		$contestantEventCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest_id);
+		$contestantEventCache->set(Scoreboard::calculateEvents(
+			$contest,
+			$contest_runs,
+			$use_penalty,
+			$raw_contest_users,
+			$problem_mapping,
+			false /* showAllRuns */
+		), $timeout);
+
+		$adminEventCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest_id);
+		$adminEventCache->set(Scoreboard::calculateEvents(
+			$contest,
+			$contest_runs,
+			$use_penalty,
+			$raw_contest_users,
+			$problem_mapping,
+			true /* showAllRuns */
+		), $timeout);
 	}
 
-	protected function getTotalScore($scores) {
+	private static function getScoreboardTimeLimitUnixTimestamp(Contests $contest,
+	                                                            $showAllRuns = false) {
+		$start = strtotime($contest->getStartTime());
+		$finish = strtotime($contest->getFinishTime());
 
+		if ($showAllRuns || ($contest->hasFinished() && $contest->getShowScoreboardAfter())) {
+			// Show full scoreboard to admin users
+			// or if the contest finished and the creator wants to show it at the end
+			$percentage = 1.0;
+		} else {
+			$percentage = (double) $contest->getScoreboard() / 100.0;
+		}
+
+		$limit = $start + (int) (($finish - $start) * $percentage);
+
+		return $limit;
+	}
+
+	private static function getTotalScore($scores) {
 		$sumPoints = 0;
 		$sumPenalty = 0;
 		// Get sum of all scores
@@ -351,7 +284,87 @@ class Scoreboard {
 		);
 	}
 
-	private function compareUserScores($a, $b) {
+	private static function getScoreboardFromRuns($runs, $raw_contest_users, $problem_mapping,
+	                                              $contest_penalty, $scoreboard_time_limit,
+	                                              $showAllRuns, $sortByName) {
+		$test_only = array();
+		$no_runs = array();
+		$users_info = array();
+
+		// Calculate score for each contestant x problem
+		foreach ($raw_contest_users as $contestant) {
+			$user_problems = array();
+
+			$test_only[$contestant->getUserId()] = true;
+			$no_runs[$contestant->getUserId()] = true;
+			foreach ($problem_mapping as $id=>$alias) {
+				$user_problems[$alias] = array(
+					'points' => 0,
+					'penalty' => 0,
+					'runs' => 0
+				);
+			}
+
+			// Add the problems' information
+			$users_info[$contestant->getUserId()] = array(
+				'problems' => $user_problems,
+				'username' => $contestant->getUsername(),
+				'name' => $contestant->getName() ?
+					$contestant->getName() :
+					$contestant->getUsername(),
+				'total' => null
+			);
+		}
+
+		foreach ($runs as $run) {
+			$user_id = $run->getUserId();
+			$problem_id = $run->getProblemId();
+			$contest_score = $run->getContestScore();
+			$is_test = $run->getTest() != 0;
+
+			$problem =
+				&$users_info[$user_id]['problems'][$problem_mapping[$problem_id]];
+
+			$test_only[$user_id] &= $is_test;
+			$no_runs[$user_id] = false;
+			if (!$showAllRuns) {
+				if ($is_test) {
+					continue;
+				}
+				if (strtotime($run->getTime()) >= $scoreboard_time_limit) {
+					$problem['runs']++;
+					continue;
+				}
+			}
+
+			$totalPenalty = $run->getSubmitDelay() +
+				$problem['runs'] * $contest_penalty;
+			if ($problem['points'] < $contest_score ||
+			    $problem['points'] == $contest_score && $problem['penalty'] > $totalPenalty) {
+				$problem['points'] = (int)round($contest_score);
+				$problem['penalty'] = $totalPenalty;
+			}
+			$problem['runs']++;
+		}
+
+		$result = array();
+		foreach ($raw_contest_users as $contestant) {
+			$user_id = $contestant->getUserId();
+
+			// Add contestant results to scoreboard data
+			if ($test_only[$user_id] && !$no_runs[$user_id]) {
+				continue;
+			}
+			$info = $users_info[$user_id];
+			$info[self::total_column] = Scoreboard::getTotalScore($info['problems']);
+			array_push($result, $info);
+		}
+
+		Scoreboard::sortScoreboard($result, $sortByName);
+		return $result;
+	}
+
+	private static function compareUserScores($a, $b) {
 		if ($a[self::total_column]["points"] == $b[self::total_column]["points"]) {
 			if ($a[self::total_column]["penalty"] == $b[self::total_column]["penalty"])
 				return 0;
@@ -362,29 +375,125 @@ class Scoreboard {
 		return ($a[self::total_column]["points"] < $b[self::total_column]["points"]) ? 1 : -1;
 	}
 
-	private function compareUserNames($a, $b) {
+	private static function compareUserNames($a, $b) {
 		return strcmp($a['username'], $b['username']);
 	}
 
-	/**
-	 * Any new run can potentially change the scoreboard.
-	 * When a new run is submitted, the scoreboard cache snapshot is deleted
-	 * 
-	 * @param int $contest_id
-	 */
-	public static function InvalidateScoreboardCache($contest_id) {
-		
-		$log = Logger::getLogger("Scoreboard");
-		$log->info("Invalidating scoreboard cache.");
+	private static function sortScoreboard(&$scoreboard, $sortByName = false) {
+		if ($sortByName == false) {
+			// Sort users by their total column
+			usort($scoreboard, array('Scoreboard', 'compareUserScores'));
+		} else {
+			// Sort users by their name
+			usort($scoreboard, array('Scoreboard', 'compareUserNames'));
+		}
 
-		// Invalidar cache del contestant
-		Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);		
+		// Append the place for each user
+		$currentPoints = -1;
+		$currentPenalty = -1;
+		$place = 1;
+		$draws = 1;
+		foreach($scoreboard as &$userData) {
+			if ($currentPoints === -1) {
+				$currentPoints = $userData["total"]["points"];
+				$currentPenalty = $userData["total"]["penalty"];
+			} else {
+				// If not in draw
+				if ($userData["total"]["points"] < $currentPoints ||
+				    $userData["total"]["penalty"] > $currentPenalty) {
+					$currentPoints = $userData["total"]["points"];
+					$currentPenalty = $userData["total"]["penalty"];
 
-		// Invalidar cache del admin
-		Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
-		
+					$place += $draws;
+					$draws = 1;
+
+				} else if ($userData["total"]["points"] == $currentPoints &&
+				           $userData["total"]["penalty"] == $currentPenalty) {
+					$draws++;
+				}
+			}
+
+			// Set the place for the current user
+			$userData["place"] = $place;
+		}
+	}
+
+	private static function calculateEvents($contest, $contest_runs, $use_penalty,
+	                                        $raw_contest_users, $problem_mapping, $showAllRuns) {
+		$contest_users = array();
+
+		foreach ($raw_contest_users as $user) {
+			$contest_users[$user->getUserId()] = $user;
+		}
+
+		$result = array();
+
+		$user_problems_score = array();
+
+		$contestStart = strtotime($contest->getStartTime());
+		$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest);
+
+		// Calculate score for each contestant x problem x run
+		foreach ($contest_runs as $run) {
+			if (!$showAllRuns && $run->getTest() != 0) {
+				continue;
+			}
+
+			$run_delay = strtotime($run->getTime());
+			if ($run_delay >= $scoreboardLimit) {
+				continue;
+			}
+
+			$user_id = $run->getUserId();
+			$problem_id = $run->getProblemId();
+			$contest_score = $run->getContestScore();
+
+			if (!isset($user_problems_score[$user_id])) {
+				$user_problems_score[$user_id] = array(
+					$problem_id => array('points' => 0, 'penalty' => 0)
+				);
+			} else if (!isset($user_problems_score[$user_id][$problem_id])) {
+				$user_problems_score[$user_id][$problem_id] =
+					array('points' => 0, 'penalty' => 0);
+			}
+
+			$problem_data = &$user_problems_score[$user_id][$problem_id];
+
+			if ($problem_data['points'] >= $contest_score) {
+				continue;
+			}
+
+			$problem_data['points'] = round((float) $contest_score, 2);
+			$problem_data['penalty'] = 0;
+
+			$user = &$contest_users[$user_id];
+
+			$data = array(
+				'name' => $user->getName() ? $user->getName() : $user->getUsername(),
+				'username' => $user->getUsername(),
+				'delta' => $use_penalty ?
+					(int)$run->getSubmitDelay() :
+					($run_delay - $contestStart) / 60,
+				'problem' => array(
+					'alias' => $problem_mapping[$problem_id],
+					'points' => round($contest_score, 2),
+					'penalty' => 0
+				),
+				'total' => array(
+					'points' => 0,
+					'penalty' => 0
+				)
+			);
+
+			foreach ($user_problems_score[$user_id] as $problem) {
+				$data['total']['points'] += $problem['points'];
+				$data['total']['penalty'] += $problem['penalty'];
+			}
+
+			// Add contestant results to scoreboard data
+			array_push($result, $data);
+		}
+
+		return $result;
 	}
 }
-
-
-

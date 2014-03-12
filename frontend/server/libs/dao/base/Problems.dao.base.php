@@ -141,7 +141,7 @@ abstract class ProblemsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Problems , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL)
+	public static final function search( $Problems , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		$sql = "SELECT * from Problems WHERE ("; 
 		$val = array();
@@ -233,6 +233,13 @@ abstract class ProblemsDAOBase extends DAO
 		if( $Problems->getOrder() != NULL){
 			$sql .= " `order` = ? AND";
 			array_push( $val, $Problems->getOrder() );
+		}
+		
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
 		}
 
 		if(sizeof($val) == 0){return array();}

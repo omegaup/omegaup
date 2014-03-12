@@ -207,17 +207,24 @@ legend {
 #problem .statement h1 {
 	font-size: 1.2em;
 	margin: 1.0em 0 0.5em 0;
+	font-weight: bold;
 }
 #problem .statement p {
 	line-height: 150%;
+	text-align: justify;
 }
 
 #problem .statement ul {
 	list-style: disc;
 }
 
-#problem .statement ul li {
+#problem .statement ol {
+	list-style: decimal;
+}
+
+#problem .statement ul li, #problem .statement ol li {
 	margin-left: 2em;
+	text-align: justify;
 }
 
 #problem .statement table.sample_io {

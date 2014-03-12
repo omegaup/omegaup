@@ -193,6 +193,25 @@ object Https extends Object with Log with Using {
 			true
 		}
 	})
+
+	def get(url: String):String = {
+		debug("Get {}", url)
+
+		if (url.startsWith("https://")) {
+			cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+				conn.addRequestProperty("Connection", "close")
+				conn.setSSLSocketFactory(socketFactory)
+				conn.setDoOutput(false)
+				new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine
+			}}
+		} else {
+			cusing (new URL(url).openConnection().asInstanceOf[HttpURLConnection]) { conn => {
+				conn.addRequestProperty("Connection", "close")
+				conn.setDoOutput(false)
+				new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine
+			}}
+		}
+	}
 	
 	def send[T, W <: AnyRef](url:String, request:W)(implicit mf: Manifest[T]):T = {
 		debug("Requesting {}", url)

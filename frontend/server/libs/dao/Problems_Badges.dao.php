@@ -1,6 +1,5 @@
 <?php
 
-require_once ('Estructura.php');
 require_once("base/Problems_Badges.dao.base.php");
 require_once("base/Problems_Badges.vo.base.php");
 /** Page-level DocBlock .

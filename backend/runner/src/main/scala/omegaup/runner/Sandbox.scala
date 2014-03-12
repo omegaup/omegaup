@@ -400,6 +400,11 @@ object Minijail extends Object with Sandbox with Log with Using {
 
     // 16MB + memory limit to prevent some RTE
     val memoryLimit = (16 * 1024 + message.memoryLimit) * 1024
+    // "640MB should be enough for anybody"
+    val hardLimit = Math.max(
+      memoryLimit,
+      Config.get("runner.memory.limit", 640) * 1024 * 1024
+    ).toString
 
     val params = (lang match {
       case "java" =>
@@ -413,24 +418,24 @@ object Minijail extends Object with Sandbox with Log with Using {
       case "c" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/cpp") ++
         commonParams ++
-        List("-m", memoryLimit.toString, "--", "./a.out")
+        List("-m", hardLimit, "--", "./a.out")
       case "cpp" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/cpp") ++
         commonParams ++
-        List("-m", memoryLimit.toString, "--", "./a.out")
+        List("-m", hardLimit, "--", "./a.out")
       case "cpp11" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/cpp") ++
         commonParams ++
-        List("-m", memoryLimit.toString, "--", "./a.out")
+        List("-m", hardLimit, "--", "./a.out")
       case "p" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/pas") ++
         commonParams ++
-        List("-m", memoryLimit.toString, "--", "/usr/bin/ldwrapper", "./Main")
+        List("-m", hardLimit, "--", "/usr/bin/ldwrapper", "./Main")
       case "py" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/py") ++
         commonParams ++
         List("-b", Config.get("runner.minijail.path", ".") + "/root-python,/usr/lib/python2.7") ++
-        List("-m", memoryLimit.toString, "--", "/usr/bin/python", "Main.py")
+        List("-m", hardLimit, "--", "/usr/bin/python", "Main.py")
       case "kp" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/karel") ++
         commonParams ++
@@ -459,7 +464,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         List("/usr/bin/sudo", minijail, "-S", scripts + "/hs") ++
         commonParams ++
         List("-b", Config.get("runner.minijail.path", ".") + "/root-hs,/usr/lib/ghc") ++
-        List("-m", memoryLimit.toString, "--", "./Main")
+        List("-m", hardLimit, "--", "./Main")
     }) ++ extraParams
 
     debug("{} {}", logTag, params.mkString(" "))

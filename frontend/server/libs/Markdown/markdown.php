@@ -545,11 +545,11 @@ class Markdown_Parser {
 	# These are all the transformations that form block-level
 	# tags like paragraphs, headers, and list items.
 	#
+		"doSampleIo"        => 9,
 		"doHeaders"         => 10,
 		"doHorizontalRules" => 20,
 		
 		"doLists"           => 40,
-		"doSampleIo"        => 42,
 		"doTables"          => 45,
 		"doCodeBlocks"      => 50,
 		"doBlockQuotes"     => 60,

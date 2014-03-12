@@ -1,6 +1,5 @@
 <?php
 
-require_once ('Estructura.php');
 require_once("base/Permissions.dao.base.php");
 require_once("base/Permissions.vo.base.php");
 /** Page-level DocBlock .

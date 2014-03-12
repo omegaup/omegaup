@@ -354,6 +354,17 @@ object Manager extends Object with Log {
 		if (run.status == Status.Ready) {
 			info("Veredict update: {} {} {} {} {} {} {}",
 				run.id, run.status, run.veredict, run.score, run.contest_score, run.runtime, run.memory)
+			try {
+				info("Scoreboard update {}",
+					run.contest match {
+						case Some(contest) => Https.get(Config.get("grader.scoreboard_refresh.url", "https://localhost/refresh_scoreboard.php?id=") + contest.id)
+						case None => "no contest"
+					}
+				)
+			} catch {
+				case e: Exception => error("Scoreboard update", e)
+			}
+
 			Broadcaster.update(run)
 			listeners foreach { listener => listener(run) }
 		}

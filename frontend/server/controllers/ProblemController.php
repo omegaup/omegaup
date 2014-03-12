@@ -845,6 +845,8 @@ class ProblemController extends Controller {
 		if (!isset($r["rowcount"])) {
 			$r["rowcount"] = 400;
 		}
+		
+		Validators::isStringNonEmpty($r["query"], "query", false);
 	}
 
 	/**
@@ -890,7 +892,18 @@ class ProblemController extends Controller {
 				}
 
 				if (!is_null($problem_mask)) {					
-					$problems = ProblemsDAO::search($problem_mask, "problem_id", 'DESC', $r["offset"], $r["rowcount"]);
+					$problems = ProblemsDAO::search(
+							$problem_mask, 
+							"problem_id", 
+							'DESC', 
+							$r["offset"], 
+							$r["rowcount"],
+							is_null($r["query"]) ? 
+								null : 
+								array(
+									"title" => $r["query"]
+								)
+						);
 					
 					foreach ($problems as $problem) {
 						array_push($response["results"], $problem->asArray());

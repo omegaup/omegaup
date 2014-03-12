@@ -31,11 +31,13 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		
 		// Create runs
 		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+		$runData1 = RunsFactory::createRun($problemData, $contestData, $contestant);
 		$runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);
 		$runData3 = RunsFactory::createRun($problemData, $contestData, $contestant3);
 		
 		// Grade the runs
-		RunsFactory::gradeRun($runData);
+		RunsFactory::gradeRun($runData, 0, "CE");
+		RunsFactory::gradeRun($runData1);
 		RunsFactory::gradeRun($runData2, .9, "PA");
 		RunsFactory::gradeRun($runData3, 1.0);
 		
@@ -64,7 +66,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		// Check data per problem
 		$this->assertEquals(100, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
 		$this->assertEquals(60, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["wrong_runs_count"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
 	}
 	
 	/**
@@ -114,7 +116,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		// Check data per problem
 		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
 		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["wrong_runs_count"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
 	}
 	
 	/**
@@ -164,7 +166,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		// Check data per problem
 		$this->assertEquals(100, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
 		$this->assertEquals(60, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["wrong_runs_count"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
 	}
 	
 	

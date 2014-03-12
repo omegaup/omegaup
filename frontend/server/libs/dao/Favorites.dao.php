@@ -1,6 +1,5 @@
 <?php
 
-require_once ('Estructura.php');
 require_once("base/Favorites.dao.base.php");
 require_once("base/Favorites.vo.base.php");
 /** Page-level DocBlock .

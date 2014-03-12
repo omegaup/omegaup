@@ -43,8 +43,8 @@ class ContestController extends Controller {
 		$addedContests = array();
 
 		foreach ($contests as $c) {
-			// At most we want 100 contests @TODO paginar correctamente
-			if (sizeof($addedContests) == 100) {
+			// At most we want 1000 contests @TODO paginar correctamente
+			if (sizeof($addedContests) == 1000) {
 				break;
 			}
 
@@ -1232,7 +1232,8 @@ class ContestController extends Controller {
 			ContestsDAO::transBegin();
 
 			// Save the contest object with data sent by user to the database
-			ContestsDAO::save($r["contest"]);
+			$contest = $r['contest'];
+			ContestsDAO::save($contest);
 
 			// If the contest is private, add the list of allowed users
 			if (!is_null($r["public"]) && $r["public"] == 0 && $r["hasPrivateUsers"]) {
