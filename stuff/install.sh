@@ -75,7 +75,7 @@ EOF
 	
 	sudo apt-get update -qq -y
 	
-	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl git phpunit g++ fp-compiler unzip openssh-client make zip libcap-dev libgfortran3 ghc libelf-dev
+	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl php5-apcu git phpunit g++ fp-compiler unzip openssh-client make zip libcap-dev libgfortran3 ghc libelf-dev
 	sudo apt-get install -qq -y openjdk-7-jdk || sudo apt-get install -qq -y openjdk-6-jdk
 	
 	if [ ! -f /usr/sbin/mysqld ]; then
