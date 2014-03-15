@@ -59,7 +59,9 @@ class SessionController extends Controller {
 	 *
 	 * */
 	public static function apiCurrentSession(Request $r = null) {
-		if (OMEGAUP_SESSION_CACHE_ENABLED && !is_null(self::$current_session)) {
+		if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+		    OMEGAUP_SESSION_CACHE_ENABLED === true &&
+		    !is_null(self::$current_session)) {
 			return self::$current_session;
 		}
 		$authToken = SessionController::getAuthToken($r);
@@ -74,7 +76,7 @@ class SessionController extends Controller {
 				$r,
 				['SessionController', 'getCurrentSession'],
 				$session,
-				APC_USER_CACHE_SESSIONS_TIMEOUT
+				APC_USER_CACHE_SESSION_TIMEOUT
 			);
 			self::$current_session = $session;
 			return self::$current_session;
