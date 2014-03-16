@@ -43,6 +43,9 @@ EOF
 chmod +x $TMPDIR/distrib/runner.sh
 
 cat > $TMPDIR/distrib/omegaup.conf <<EOF
+# Resource limits - disable increased hard limit
+runner.memory.limit=0
+
 # Logging
 logging.level=info
 logging.file=/opt/omegaup/runner.log
