@@ -14,14 +14,14 @@ pushd $ROOT/minijail
 popd
 
 pushd $ROOT/backend
-	sbt proguard:proguard
+	make
 popd
 
 TMPDIR=`mktemp -d`
 mkdir -p $TMPDIR/distrib/{compile,input}
 mkdir -p $TMPDIR/distrib/minijail/{bin,dist,scripts,bin}
 
-cp $ROOT/backend/runner/target/scala-2.10/proguard/runner_2.10-1.1.jar $TMPDIR/distrib/runner.jar
+cp $ROOT/bin/runner.jar $TMPDIR/distrib/runner.jar
 cp $ROOT/minijail/{minijail0,ldwrapper,libminijailpreload.so} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/bin/{karel,kcl} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/stuff/mkroot $TMPDIR/distrib/minijail/bin/

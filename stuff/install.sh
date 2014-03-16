@@ -140,9 +140,8 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	make
 
 	if [ "$SKIP_GRADER" != "1" ]; then 
-		# Build common
 		cd $OMEGAUP_ROOT/backend
-		sbt proguard:proguard
+		sbt compile
 	fi
 	popd
 fi
@@ -161,7 +160,6 @@ fi
 
 # Install the grader service.
 if [ ! -f /etc/init.d/omegaup ]; then
-	cp $OMEGAUP_ROOT/backend/grader/target/scala-2.10/proguard/grader_2.10-1.1.jar $OMEGAUP_ROOT/bin/grader.jar
 	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
 	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/" $OMEGAUP_ROOT/backend/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
 	sudo update-rc.d omegaup defaults
