@@ -142,7 +142,7 @@
 						<label for="public">{#contestNewFormPublic#}</label>
 						<select name='public' id='public' class="form-control">
 							<option value='1'>{#wordsYes#}</option>
-							<option value='0'>{#wordsNo#}</option>
+							<option value='0' selected="selected">{#wordsNo#}</option>
 						</select>
 						<p class="help-block">{#contestNewFormPublicDesc#}</p>
 					</div>
