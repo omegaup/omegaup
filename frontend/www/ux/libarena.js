@@ -193,7 +193,7 @@ Arena.prototype.onRankingChanged = function(data) {
 			if (!rank.problems.hasOwnProperty(alias)) continue;
 			
 			$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
-			$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty);
+			$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty + " (" + rank.problems[alias].runs  + ")");
 			if (this.problems[alias]) {
 				if (rank.username == omegaup.username) {
 					$('#problems .problem_' + alias + ' .solved')
