@@ -610,6 +610,10 @@ class ContestController extends Controller {
 			throw new InvalidParameterException("Problem not found");
 		}
 
+		if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r["current_user_id"], $problem)) {
+			throw new ForbiddenAccessException("Problem is marked as private.");
+		}
+
 		Validators::isNumberInRange($r["points"], "points", 0, INF);
 		Validators::isNumberInRange($r["order_in_contest"], "order_in_contest", 0, INF, false);
 
