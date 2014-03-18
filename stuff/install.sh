@@ -256,7 +256,12 @@ fi
 # Install config.php
 if [ ! -f $OMEGAUP_ROOT/frontend/server/config.php ]; then
 	pushd $OMEGAUP_ROOT/frontend/server/
-	sed -e "s/\(.*OMEGAUP_DB_USER.*\)'.*'.*$/\1'root');/;s/\(.*OMEGAUP_DB_PASS.*\)'.*'.*/\1'$MYSQL_PASSWORD');/" config.php.sample > config.php
+	cat > config.php << EOF
+<?php
+define('OMEGAUP_DB_USER', 'root');
+define('OMEGAUP_DB_PASS', '$MYSQL_PASSWORD');
+define('OMEGAUP_DB_NAME', '$MYSQL_DB_NAME');
+EOF
 	popd
 fi
 
@@ -296,15 +301,18 @@ if [ ! `mysql -uroot -p$MYSQL_PASSWORD --batch --skip-column-names -e "SHOW DATA
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME-test < $OMEGAUP_ROOT/frontend/private/countries_and_states.sql
 fi
 
-#update config.php
-
 #test curl
 
 #test index with curl
 
 #setup tests
 if [ ! -f $OMEGAUP_ROOT/frontend/tests/test_config.php ]; then
-	cp $OMEGAUP_ROOT/frontend/tests/test_config.php.sample $OMEGAUP_ROOT/frontend/tests/test_config.php
+	cat > $OMEGAUP_ROOT/frontend/tests/test_config.php << EOF
+<?php
+define('OMEGAUP_DB_USER', 'root');
+define('OMEGAUP_DB_PASS', '$MYSQL_PASSWORD');
+define('OMEGAUP_DB_NAME', '$MYSQL_DB_NAME-test');
+EOF
 fi
 
 if [ ! -f $OMEGAUP_ROOT/frontend/tests/controllers/omegaup.log ]; then

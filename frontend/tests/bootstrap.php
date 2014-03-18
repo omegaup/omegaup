@@ -6,8 +6,11 @@ define('IS_TEST', TRUE);
 date_default_timezone_set('UTC');
 
 define("OMEGAUP_ROOT", __DIR__ . "/../");
-// Load tess specific config globals
+// Load test specific config globals
 require_once("test_config.php");
+require_once("test_config.default.php");
+require_once(OMEGAUP_ROOT . "server/config.php");
+require_once(OMEGAUP_ROOT . "server/config.default.php");
 
 // Load api caller
 require_once(OMEGAUP_ROOT . "www/api/ApiCaller.php");
