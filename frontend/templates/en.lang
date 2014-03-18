@@ -71,6 +71,7 @@ contestNewFormStartDateDesc = "The time and date (in local time) in which the co
 contestNewFormSubmissionsSeparation = "Submission time window"
 contestNewFormSubmissionsSeparationDesc  = "Tiempo mínimo en minutos que debe de esperar un concursante despues de realizar un envío para hacer otro."
 contestNewFormUpdateContest = "Update contest"
+contestPrintableVersion = "Printable version"
 contestsCreateNew = "Create a new contest"
 contestsJoinScoreboards = "Merge scoreboards"
 contestsTablePublic = "Public"

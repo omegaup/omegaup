@@ -32,6 +32,7 @@
 			<th></th>
 			<th></th>
 			<th></th>
+			<th></th>
 		</thead>
 		<tbody>
 		</tbody>
@@ -69,6 +70,7 @@
 						+ "<td>" + ((contests.results[i].scoreboard_url == null) ? "" : "<a href='/arena/" + contests.results[i].alias  + "/scoreboard/" + contests.results[i].scoreboard_url + "'>{#contestScoreboardLink#}</a></td>")
 						+ "<td>" + ((contests.results[i].scoreboard_url == null) ? "" : "<a href='/arena/" + contests.results[i].alias  + "/scoreboard/" + contests.results[i].scoreboard_url_admin + "'>{#contestScoreboardAdminLink#}</a></td>")
 						+ '<td><a href="/conteststats.php?contest=' + contests.results[i].alias  + '">{#profileStatistics#}</a></td>'
+						+ '<td><a href="/contestprint.php?contest=' + contests.results[i].alias  + '">{#contestPrintableVersion#}</a></td>'
 						+ "</tr>";
 				}
 

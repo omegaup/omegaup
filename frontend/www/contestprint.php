@@ -3,7 +3,7 @@
 require_once( "../server/bootstrap.php" );
 require_once("api/ApiCaller.php");
 $r = new Request(array(
-		"contest_alias" => $_REQUEST["contest_alias"],
+		"contest_alias" => $_REQUEST["contest"],
 		"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 	));
 $r->method = "ContestController::apiDetails";
@@ -12,7 +12,7 @@ $response = ApiCaller::call($r);
 $problems = $response["problems"];
 foreach($problems as &$problem) {
 	$r = new Request(array(
-		"contest_alias" => $_REQUEST["contest_alias"],
+		"contest_alias" => $_REQUEST["contest"],
 		"problem_alias" => $problem["alias"],
 		"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 	));
