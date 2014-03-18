@@ -22,5 +22,5 @@ if ($response["status"] == "ok") {
 		}
 	}
 	$smarty->assign('contestReport', $response);
-	$smarty->display('../templates/contestreport.tpl');
+	$smarty->display('../templates/contest.report.tpl');
 }

@@ -1,0 +1,10 @@
+@media all {
+	.page-break	   { display: none; }
+	body               { font-family: sans-serif; }
+	tr:nth-child(even) { background-color: #eee; }
+	td.numeric         { text-align: right; }
+}
+
+@media print {
+	.page-break	   { display: block; page-break-before: always; }
+}

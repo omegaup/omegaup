@@ -2,20 +2,8 @@
 <html>
 <head>
 <title>Reporte {$smarty.get.contest_alias}</title>
-<style>
-{literal}
-@media all {
-	.page-break	   { display: none; }
-	body               { font-family: sans-serif; }
-	tr:nth-child(even) { background-color: #eee; }
-	td.numeric         { text-align: right; }
-}
 
-@media print {
-	.page-break	   { display: block; page-break-before: always; }
-}
-{/literal}
-</style>
+<link rel="stylesheet" href="/css/report.css" />
 </head>
 <body>
 {foreach name=outer item=contestantData from=$contestReport}

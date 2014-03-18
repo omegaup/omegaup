@@ -1,4 +1,5 @@
 body#practice { background: #668 url(/media/gradient.png) repeat-x 0 0; font-family: sans-serif; overflow-y: scroll; }
+body#report { background: white; font-family: sans-serif; overflow-y: scroll; }
 body { background: #e4e8ec linear-gradient(to top, #e4e8ec, #f3f6f9) fixed no-repeat; font-family: sans-serif; overflow-y: scroll; }
 
 h1 {
