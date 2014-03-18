@@ -74,7 +74,6 @@ class ContestScoreboardTest extends OmegaupTestCase {
 	 */
 	public function testScoreboardPercentajeForContestant() {
 		
-		DAO::$useDAOCache = false;
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
@@ -124,7 +123,6 @@ class ContestScoreboardTest extends OmegaupTestCase {
 	 */
 	public function testScoreboardPercentajeForContestAdmin() {
 		
-		DAO::$useDAOCache = false;
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 

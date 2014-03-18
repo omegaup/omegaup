@@ -32,7 +32,7 @@ abstract class AuthTokensDAOBase extends DAO
 	  * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Auth_Tokens )
+	public static final function save( $Auth_Tokens )
 	{
 		if (!is_null(self::getByPK( $Auth_Tokens->getToken() )))
 		{
@@ -55,8 +55,6 @@ abstract class AuthTokensDAOBase extends DAO
 	public static final function getByPK(  $token )
 	{
 		if(  is_null( $token )  ){ return NULL; }
-			return new AuthTokens($obj);
-		}
 		$sql = "SELECT * FROM Auth_Tokens WHERE (token = ? ) LIMIT 1;";
 		$params = array(  $token );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class AuthTokensDAOBase extends DAO
 	{
 		$sql = "SELECT * from Auth_Tokens";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class AuthTokensDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Auth_Tokens , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Auth_Tokens , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Auth_Tokens instanceof AuthTokens)) {
 			return self::search(new AuthTokens($Auth_Tokens));
@@ -141,12 +139,26 @@ abstract class AuthTokensDAOBase extends DAO
 			$sql .= " `token` = ? AND";
 			array_push( $val, $Auth_Tokens->getToken() );
 		}
+		if (!is_null( $Auth_Tokens->getCreateTime())) {
+			$sql .= " `create_time` = ? AND";
+			array_push( $val, $Auth_Tokens->getCreateTime() );
+		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -166,9 +178,10 @@ abstract class AuthTokensDAOBase extends DAO
 	  **/
 	private static final function update($Auth_Tokens)
 	{
-		$sql = "UPDATE Auth_Tokens SET  `user_id` = ? WHERE  `token` = ?;";
+		$sql = "UPDATE Auth_Tokens SET  `user_id` = ?, `create_time` = ? WHERE  `token` = ?;";
 		$params = array( 
 			$Auth_Tokens->getUserId(), 
+			$Auth_Tokens->getCreateTime(), 
 			$Auth_Tokens->getToken(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -187,12 +200,14 @@ abstract class AuthTokensDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens a crear.
 	  **/
-	private static final function create( &$Auth_Tokens )
+	private static final function create( $Auth_Tokens )
 	{
-		$sql = "INSERT INTO Auth_Tokens ( `user_id`, `token` ) VALUES ( ?, ?);";
+		if (is_null($Auth_Tokens->create_time)) $Auth_Tokens->create_time = gmdate('Y-m-d H:i:s');
+		$sql = "INSERT INTO Auth_Tokens ( `user_id`, `token`, `create_time` ) VALUES ( ?, ?, ?);";
 		$params = array( 
-			$Auth_Tokens->getUserId(), 
-			$Auth_Tokens->getToken(), 
+			$Auth_Tokens->user_id,
+			$Auth_Tokens->token,
+			$Auth_Tokens->create_time,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -261,9 +276,20 @@ abstract class AuthTokensDAOBase extends DAO
 			
 		}
 
+		if( ( !is_null (($a = $Auth_TokensA->getCreateTime()) ) ) & ( ! is_null ( ($b = $Auth_TokensB->getCreateTime()) ) ) ){
+				$sql .= " `create_time` >= ? AND `create_time` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `create_time` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

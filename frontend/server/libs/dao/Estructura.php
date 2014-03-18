@@ -98,10 +98,37 @@
 
 				 if (strncasecmp($method, "get", 3)==0) {
 					 return $this->$var;
-				 }
-
-				 if (strncasecmp($method, "set", 3)==0) {
+				 } else if (strncasecmp($method, "set", 3)==0) {
 					 $this->$var = $params[0];
+				 } else {
+					 throw new BadMethodCallException($method);
 				 }
 			}
+
+		public function asFilteredArray($filters)
+		{
+			// Get the complete representation of the array
+			$completeArray = get_object_vars($this);
+			// Declare an empty array to return
+			$returnArray = array();
+			foreach( $filters as $filter )
+			{
+				// Only return properties included in $filters array
+				if (isset ($completeArray[$filter]))
+				{
+					$returnArray[$filter] = $completeArray[$filter];
+				}
+				else
+				{
+					$returnArray[$filter] = NULL;
+				}
+			}
+			return $returnArray;
+		}
+
+		protected function toUnixTime(Array $fields) {
+			foreach ($fields as $f) {
+				$this->$f = strtotime($this->$f);
+			}
+		}
 		}

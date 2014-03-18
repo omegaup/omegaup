@@ -32,7 +32,7 @@ abstract class RolesPermissionsDAOBase extends DAO
 	  * @param RolesPermissions [$Roles_Permissions] El objeto de tipo RolesPermissions
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Roles_Permissions )
+	public static final function save( $Roles_Permissions )
 	{
 		if (!is_null(self::getByPK( $Roles_Permissions->getRoleId() , $Roles_Permissions->getPermissionId() )))
 		{
@@ -55,8 +55,6 @@ abstract class RolesPermissionsDAOBase extends DAO
 	public static final function getByPK(  $role_id, $permission_id )
 	{
 		if(  is_null( $role_id ) || is_null( $permission_id )  ){ return NULL; }
-			return new RolesPermissions($obj);
-		}
 		$sql = "SELECT * FROM Roles_Permissions WHERE (role_id = ? AND permission_id = ? ) LIMIT 1;";
 		$params = array(  $role_id, $permission_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class RolesPermissionsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Roles_Permissions";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class RolesPermissionsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Roles_Permissions , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Roles_Permissions , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Roles_Permissions instanceof RolesPermissions)) {
 			return self::search(new RolesPermissions($Roles_Permissions));
@@ -141,12 +139,22 @@ abstract class RolesPermissionsDAOBase extends DAO
 			$sql .= " `permission_id` = ? AND";
 			array_push( $val, $Roles_Permissions->getPermissionId() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -180,12 +188,12 @@ abstract class RolesPermissionsDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param RolesPermissions [$Roles_Permissions] El objeto de tipo RolesPermissions a crear.
 	  **/
-	private static final function create( &$Roles_Permissions )
+	private static final function create( $Roles_Permissions )
 	{
 		$sql = "INSERT INTO Roles_Permissions ( `role_id`, `permission_id` ) VALUES ( ?, ?);";
 		$params = array( 
-			$Roles_Permissions->getRoleId(), 
-			$Roles_Permissions->getPermissionId(), 
+			$Roles_Permissions->role_id,
+			$Roles_Permissions->permission_id,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -256,7 +264,7 @@ abstract class RolesPermissionsDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

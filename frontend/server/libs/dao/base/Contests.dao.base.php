@@ -32,7 +32,7 @@ abstract class ContestsDAOBase extends DAO
 	  * @param Contests [$Contests] El objeto de tipo Contests
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Contests )
+	public static final function save( $Contests )
 	{
 		if (!is_null(self::getByPK( $Contests->getContestId() )))
 		{
@@ -55,8 +55,6 @@ abstract class ContestsDAOBase extends DAO
 	public static final function getByPK(  $contest_id )
 	{
 		if(  is_null( $contest_id )  ){ return NULL; }
-			return new Contests($obj);
-		}
 		$sql = "SELECT * FROM Contests WHERE (contest_id = ? ) LIMIT 1;";
 		$params = array(  $contest_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class ContestsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contests";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class ContestsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Contests , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Contests , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Contests instanceof Contests)) {
 			return self::search(new Contests($Contests));
@@ -209,12 +207,30 @@ abstract class ContestsDAOBase extends DAO
 			$sql .= " `show_scoreboard_after` = ? AND";
 			array_push( $val, $Contests->getShowScoreboardAfter() );
 		}
+		if (!is_null( $Contests->getScoreboardUrl())) {
+			$sql .= " `scoreboard_url` = ? AND";
+			array_push( $val, $Contests->getScoreboardUrl() );
+		}
+		if (!is_null( $Contests->getScoreboardUrlAdmin())) {
+			$sql .= " `scoreboard_url_admin` = ? AND";
+			array_push( $val, $Contests->getScoreboardUrlAdmin() );
+		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -234,7 +250,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update($Contests)
 	{
-		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_time_start` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ? WHERE  `contest_id` = ?;";
+		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_time_start` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ? WHERE  `contest_id` = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -254,6 +270,8 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getPenaltyTimeStart(), 
 			$Contests->getPenaltyCalcPolicy(), 
 			$Contests->getShowScoreboardAfter(), 
+			$Contests->getScoreboardUrl(), 
+			$Contests->getScoreboardUrlAdmin(), 
 			$Contests->getContestId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -272,35 +290,46 @@ abstract class ContestsDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Contests [$Contests] El objeto de tipo Contests a crear.
 	  **/
-	private static final function create( &$Contests )
+	private static final function create( $Contests )
 	{
-		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_time_start`, `penalty_calc_policy`, `show_scoreboard_after` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Contests->start_time)) $Contests->start_time = '2000-01-01 06:00:00';
+		if (is_null($Contests->finish_time)) $Contests->finish_time = '2000-01-01 06:00:00';
+		if (is_null($Contests->public)) $Contests->public = '1';
+		if (is_null($Contests->scoreboard)) $Contests->scoreboard = '1';
+		if (is_null($Contests->points_decay_factor)) $Contests->points_decay_factor = '0';
+		if (is_null($Contests->partial_score)) $Contests->partial_score = '1';
+		if (is_null($Contests->submissions_gap)) $Contests->submissions_gap = '1';
+		if (is_null($Contests->penalty)) $Contests->penalty = '1';
+		if (is_null($Contests->show_scoreboard_after)) $Contests->show_scoreboard_after =  '1';
+		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_time_start`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Contests->getContestId(), 
-			$Contests->getTitle(), 
-			$Contests->getDescription(), 
-			$Contests->getStartTime(), 
-			$Contests->getFinishTime(), 
-			$Contests->getWindowLength(), 
-			$Contests->getDirectorId(), 
-			$Contests->getRerunId(), 
-			$Contests->getPublic(), 
-			$Contests->getAlias(), 
-			$Contests->getScoreboard(), 
-			$Contests->getPointsDecayFactor(), 
-			$Contests->getPartialScore(), 
-			$Contests->getSubmissionsGap(), 
-			$Contests->getFeedback(), 
-			$Contests->getPenalty(), 
-			$Contests->getPenaltyTimeStart(), 
-			$Contests->getPenaltyCalcPolicy(), 
-			$Contests->getShowScoreboardAfter(), 
+			$Contests->contest_id,
+			$Contests->title,
+			$Contests->description,
+			$Contests->start_time,
+			$Contests->finish_time,
+			$Contests->window_length,
+			$Contests->director_id,
+			$Contests->rerun_id,
+			$Contests->public,
+			$Contests->alias,
+			$Contests->scoreboard,
+			$Contests->points_decay_factor,
+			$Contests->partial_score,
+			$Contests->submissions_gap,
+			$Contests->feedback,
+			$Contests->penalty,
+			$Contests->penalty_time_start,
+			$Contests->penalty_calc_policy,
+			$Contests->show_scoreboard_after,
+			$Contests->scoreboard_url,
+			$Contests->scoreboard_url_admin,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Contests->setContestId( $conn->Insert_ID() );
+ 		$Contests->contest_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -551,9 +580,31 @@ abstract class ContestsDAOBase extends DAO
 			
 		}
 
+		if( ( !is_null (($a = $ContestsA->getScoreboardUrl()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboardUrl()) ) ) ){
+				$sql .= " `scoreboard_url` >= ? AND `scoreboard_url` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `scoreboard_url` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ContestsA->getScoreboardUrlAdmin()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboardUrlAdmin()) ) ) ){
+				$sql .= " `scoreboard_url_admin` >= ? AND `scoreboard_url_admin` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `scoreboard_url_admin` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

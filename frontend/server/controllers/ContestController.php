@@ -217,7 +217,7 @@ class ContestController extends Controller {
 			
 			self::canAccessContest($r);
 			
-			if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			if (!ContestsDAO::hasStarted($r["contest"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				$exception = new PreconditionFailedException("Contest has not started yet.");
 				$exception->addCustomMessageToArray("start_time", strtotime($r["contest"]->getStartTime()));
 
@@ -1232,8 +1232,7 @@ class ContestController extends Controller {
 			ContestsDAO::transBegin();
 
 			// Save the contest object with data sent by user to the database
-			$contest = $r['contest'];
-			ContestsDAO::save($contest);
+			ContestsDAO::save($r["contest"]);
 
 			// If the contest is private, add the list of allowed users
 			if (!is_null($r["public"]) && $r["public"] == 0 && $r["hasPrivateUsers"]) {

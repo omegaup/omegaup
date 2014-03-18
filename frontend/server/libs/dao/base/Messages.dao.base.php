@@ -32,7 +32,7 @@ abstract class MessagesDAOBase extends DAO
 	  * @param Messages [$Messages] El objeto de tipo Messages
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Messages )
+	public static final function save( $Messages )
 	{
 		if (!is_null(self::getByPK( $Messages->getMessageId() )))
 		{
@@ -55,8 +55,6 @@ abstract class MessagesDAOBase extends DAO
 	public static final function getByPK(  $message_id )
 	{
 		if(  is_null( $message_id )  ){ return NULL; }
-			return new Messages($obj);
-		}
 		$sql = "SELECT * FROM Messages WHERE (message_id = ? ) LIMIT 1;";
 		$params = array(  $message_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class MessagesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Messages";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class MessagesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Messages , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Messages , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Messages instanceof Messages)) {
 			return self::search(new Messages($Messages));
@@ -157,12 +155,22 @@ abstract class MessagesDAOBase extends DAO
 			$sql .= " `date` = ? AND";
 			array_push( $val, $Messages->getDate() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -207,22 +215,24 @@ abstract class MessagesDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Messages [$Messages] El objeto de tipo Messages a crear.
 	  **/
-	private static final function create( &$Messages )
+	private static final function create( $Messages )
 	{
+		if (is_null($Messages->read)) $Messages->read = '0';
+		if (is_null($Messages->date)) $Messages->date = gmdate('Y-m-d H:i:s');
 		$sql = "INSERT INTO Messages ( `message_id`, `read`, `sender_id`, `recipient_id`, `message`, `date` ) VALUES ( ?, ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Messages->getMessageId(), 
-			$Messages->getRead(), 
-			$Messages->getSenderId(), 
-			$Messages->getRecipientId(), 
-			$Messages->getMessage(), 
-			$Messages->getDate(), 
+			$Messages->message_id,
+			$Messages->read,
+			$Messages->sender_id,
+			$Messages->recipient_id,
+			$Messages->message,
+			$Messages->date,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Messages->setMessageId( $conn->Insert_ID() );
+ 		$Messages->message_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -332,7 +342,7 @@ abstract class MessagesDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

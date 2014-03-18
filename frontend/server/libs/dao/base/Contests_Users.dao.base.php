@@ -32,7 +32,7 @@ abstract class ContestsUsersDAOBase extends DAO
 	  * @param ContestsUsers [$Contests_Users] El objeto de tipo ContestsUsers
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Contests_Users )
+	public static final function save( $Contests_Users )
 	{
 		if (!is_null(self::getByPK( $Contests_Users->getUserId() , $Contests_Users->getContestId() )))
 		{
@@ -55,8 +55,6 @@ abstract class ContestsUsersDAOBase extends DAO
 	public static final function getByPK(  $user_id, $contest_id )
 	{
 		if(  is_null( $user_id ) || is_null( $contest_id )  ){ return NULL; }
-			return new ContestsUsers($obj);
-		}
 		$sql = "SELECT * FROM Contests_Users WHERE (user_id = ? AND contest_id = ? ) LIMIT 1;";
 		$params = array(  $user_id, $contest_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class ContestsUsersDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contests_Users";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class ContestsUsersDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Contests_Users , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Contests_Users , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Contests_Users instanceof ContestsUsers)) {
 			return self::search(new ContestsUsers($Contests_Users));
@@ -153,12 +151,22 @@ abstract class ContestsUsersDAOBase extends DAO
 			$sql .= " `time` = ? AND";
 			array_push( $val, $Contests_Users->getTime() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -201,15 +209,18 @@ abstract class ContestsUsersDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param ContestsUsers [$Contests_Users] El objeto de tipo ContestsUsers a crear.
 	  **/
-	private static final function create( &$Contests_Users )
+	private static final function create( $Contests_Users )
 	{
+		if (is_null($Contests_Users->access_time)) $Contests_Users->access_time = '0000-00-00 00:00:00';
+		if (is_null($Contests_Users->score)) $Contests_Users->score = '1';
+		if (is_null($Contests_Users->time)) $Contests_Users->time = '1';
 		$sql = "INSERT INTO Contests_Users ( `user_id`, `contest_id`, `access_time`, `score`, `time` ) VALUES ( ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Contests_Users->getUserId(), 
-			$Contests_Users->getContestId(), 
-			$Contests_Users->getAccessTime(), 
-			$Contests_Users->getScore(), 
-			$Contests_Users->getTime(), 
+			$Contests_Users->user_id,
+			$Contests_Users->contest_id,
+			$Contests_Users->access_time,
+			$Contests_Users->score,
+			$Contests_Users->time,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -313,7 +324,7 @@ abstract class ContestsUsersDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

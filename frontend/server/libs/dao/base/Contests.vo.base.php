@@ -89,6 +89,12 @@ class Contests extends VO
 			if (isset($data['show_scoreboard_after'])) {
 				$this->show_scoreboard_after = $data['show_scoreboard_after'];
 			}
+			if (isset($data['scoreboard_url'])) {
+				$this->scoreboard_url = $data['scoreboard_url'];
+			}
+			if (isset($data['scoreboard_url_admin'])) {
+				$this->scoreboard_url_admin = $data['scoreboard_url_admin'];
+			}
 		}
 	}
 
@@ -120,9 +126,21 @@ class Contests extends VO
 			"penalty" => $this->penalty,
 			"penalty_time_start" => $this->penalty_time_start,
 			"penalty_calc_policy" => $this->penalty_calc_policy,
-			"show_scoreboard_after" => $this->show_scoreboard_after
+			"show_scoreboard_after" => $this->show_scoreboard_after,
+			"scoreboard_url" => $this->scoreboard_url,
+			"scoreboard_url_admin" => $this->scoreboard_url_admin
 		); 
 	return json_encode($vec); 
+	}
+
+	/**
+	 * Converts date fields to timestamps
+	 **/
+	public function toUnixTime(array $fields = array()) {
+		if (count($fields) > 0)
+			parent::toUnixTime($fields);
+		else
+			parent::toUnixTime(array("start_time", "finish_time"));
 	}
 
 	/**
@@ -260,4 +278,17 @@ class Contests extends VO
 	  */
 	public $show_scoreboard_after;
 
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var VARCHAR(
+	  */
+	public $scoreboard_url;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var VARCHAR(
+	  */
+	public $scoreboard_url_admin;
 }

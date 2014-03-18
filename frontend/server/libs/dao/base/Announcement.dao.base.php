@@ -32,7 +32,7 @@ abstract class AnnouncementDAOBase extends DAO
 	  * @param Announcement [$Announcement] El objeto de tipo Announcement
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Announcement )
+	public static final function save( $Announcement )
 	{
 		if (!is_null(self::getByPK( $Announcement->getAnnouncementId() )))
 		{
@@ -55,8 +55,6 @@ abstract class AnnouncementDAOBase extends DAO
 	public static final function getByPK(  $announcement_id )
 	{
 		if(  is_null( $announcement_id )  ){ return NULL; }
-			return new Announcement($obj);
-		}
 		$sql = "SELECT * FROM Announcement WHERE (announcement_id = ? ) LIMIT 1;";
 		$params = array(  $announcement_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class AnnouncementDAOBase extends DAO
 	{
 		$sql = "SELECT * from Announcement";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class AnnouncementDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Announcement , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Announcement , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Announcement instanceof Announcement)) {
 			return self::search(new Announcement($Announcement));
@@ -149,12 +147,22 @@ abstract class AnnouncementDAOBase extends DAO
 			$sql .= " `description` = ? AND";
 			array_push( $val, $Announcement->getDescription() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -197,20 +205,21 @@ abstract class AnnouncementDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Announcement [$Announcement] El objeto de tipo Announcement a crear.
 	  **/
-	private static final function create( &$Announcement )
+	private static final function create( $Announcement )
 	{
+		if (is_null($Announcement->time)) $Announcement->time = gmdate('Y-m-d H:i:s');
 		$sql = "INSERT INTO Announcement ( `announcement_id`, `user_id`, `time`, `description` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$Announcement->getAnnouncementId(), 
-			$Announcement->getUserId(), 
-			$Announcement->getTime(), 
-			$Announcement->getDescription(), 
+			$Announcement->announcement_id,
+			$Announcement->user_id,
+			$Announcement->time,
+			$Announcement->description,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Announcement->setAnnouncementId( $conn->Insert_ID() );
+ 		$Announcement->announcement_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -298,7 +307,7 @@ abstract class AnnouncementDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

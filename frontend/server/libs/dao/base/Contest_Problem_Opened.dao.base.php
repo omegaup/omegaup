@@ -32,7 +32,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	  * @param ContestProblemOpened [$Contest_Problem_Opened] El objeto de tipo ContestProblemOpened
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Contest_Problem_Opened )
+	public static final function save( $Contest_Problem_Opened )
 	{
 		if (!is_null(self::getByPK( $Contest_Problem_Opened->getContestId() , $Contest_Problem_Opened->getProblemId() , $Contest_Problem_Opened->getUserId() )))
 		{
@@ -55,8 +55,6 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	public static final function getByPK(  $contest_id, $problem_id, $user_id )
 	{
 		if(  is_null( $contest_id ) || is_null( $problem_id ) || is_null( $user_id )  ){ return NULL; }
-			return new ContestProblemOpened($obj);
-		}
 		$sql = "SELECT * FROM Contest_Problem_Opened WHERE (contest_id = ? AND problem_id = ? AND user_id = ? ) LIMIT 1;";
 		$params = array(  $contest_id, $problem_id, $user_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contest_Problem_Opened";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Contest_Problem_Opened , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Contest_Problem_Opened , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Contest_Problem_Opened instanceof ContestProblemOpened)) {
 			return self::search(new ContestProblemOpened($Contest_Problem_Opened));
@@ -149,12 +147,22 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 			$sql .= " `open_time` = ? AND";
 			array_push( $val, $Contest_Problem_Opened->getOpenTime() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -195,14 +203,15 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param ContestProblemOpened [$Contest_Problem_Opened] El objeto de tipo ContestProblemOpened a crear.
 	  **/
-	private static final function create( &$Contest_Problem_Opened )
+	private static final function create( $Contest_Problem_Opened )
 	{
+		if (is_null($Contest_Problem_Opened->open_time)) $Contest_Problem_Opened->open_time = gmdate('Y-m-d H:i:s');
 		$sql = "INSERT INTO Contest_Problem_Opened ( `contest_id`, `problem_id`, `user_id`, `open_time` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$Contest_Problem_Opened->getContestId(), 
-			$Contest_Problem_Opened->getProblemId(), 
-			$Contest_Problem_Opened->getUserId(), 
-			$Contest_Problem_Opened->getOpenTime(), 
+			$Contest_Problem_Opened->contest_id,
+			$Contest_Problem_Opened->problem_id,
+			$Contest_Problem_Opened->user_id,
+			$Contest_Problem_Opened->open_time,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -295,7 +304,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

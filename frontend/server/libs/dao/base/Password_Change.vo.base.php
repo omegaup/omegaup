@@ -66,6 +66,16 @@ class PasswordChange extends VO
 	}
 
 	/**
+	 * Converts date fields to timestamps
+	 **/
+	public function toUnixTime(array $fields = array()) {
+		if (count($fields) > 0)
+			parent::toUnixTime($fields);
+		else
+			parent::toUnixTime(array("expiration_date"));
+	}
+
+	/**
 	  * Identificador de a que usuario pertenece este token
 	  * Llave Primaria
 	  * @access public
@@ -93,5 +103,4 @@ class PasswordChange extends VO
 	  * @var timestamp
 	  */
 	public $expiration_date;
-
 }

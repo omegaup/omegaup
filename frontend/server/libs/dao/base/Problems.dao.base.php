@@ -32,7 +32,7 @@ abstract class ProblemsDAOBase extends DAO
 	  * @param Problems [$Problems] El objeto de tipo Problems
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Problems )
+	public static final function save( $Problems )
 	{
 		if (!is_null(self::getByPK( $Problems->getProblemId() )))
 		{
@@ -55,8 +55,6 @@ abstract class ProblemsDAOBase extends DAO
 	public static final function getByPK(  $problem_id )
 	{
 		if(  is_null( $problem_id )  ){ return NULL; }
-			return new Problems($obj);
-		}
 		$sql = "SELECT * FROM Problems WHERE (problem_id = ? ) LIMIT 1;";
 		$params = array(  $problem_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class ProblemsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Problems";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class ProblemsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Problems , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Problems , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Problems instanceof Problems)) {
 			return self::search(new Problems($Problems));
@@ -213,12 +211,22 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `tolerance` = ? AND";
 			array_push( $val, $Problems->getTolerance() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -277,36 +285,47 @@ abstract class ProblemsDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Problems [$Problems] El objeto de tipo Problems a crear.
 	  **/
-	private static final function create( &$Problems )
+	private static final function create( $Problems )
 	{
+		if (is_null($Problems->public)) $Problems->public = '1';
+		if (is_null($Problems->validator)) $Problems->validator = 'token-numeric';
+		if (is_null($Problems->languages)) $Problems->languages = 'c,cpp,java,py,rb,pl,cs,p,hs,cpp11';
+		if (is_null($Problems->output_limit)) $Problems->output_limit = '10240';
+		if (is_null($Problems->visits)) $Problems->visits = '0';
+		if (is_null($Problems->submissions)) $Problems->submissions = '0';
+		if (is_null($Problems->accepted)) $Problems->accepted = '0';
+		if (is_null($Problems->difficulty)) $Problems->difficulty = '0';
+		if (is_null($Problems->creation_date)) $Problems->creation_date = gmdate('Y-m-d H:i:s');
+		if (is_null($Problems->order)) $Problems->order = 'normal';
+		if (is_null($Problems->tolerance)) $Problems->tolerance = 1e-9;
 		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `memory_limit`, `output_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Problems->getProblemId(), 
-			$Problems->getPublic(), 
-			$Problems->getAuthorId(), 
-			$Problems->getTitle(), 
-			$Problems->getAlias(), 
-			$Problems->getValidator(), 
-			$Problems->getLanguages(), 
-			$Problems->getServer(), 
-			$Problems->getRemoteId(), 
-			$Problems->getTimeLimit(), 
-			$Problems->getMemoryLimit(), 
-			$Problems->getOutputLimit(), 
-			$Problems->getVisits(), 
-			$Problems->getSubmissions(), 
-			$Problems->getAccepted(), 
-			$Problems->getDifficulty(), 
-			$Problems->getCreationDate(), 
-			$Problems->getSource(), 
-			$Problems->getOrder(), 
-			$Problems->getTolerance(), 
+			$Problems->problem_id,
+			$Problems->public,
+			$Problems->author_id,
+			$Problems->title,
+			$Problems->alias,
+			$Problems->validator,
+			$Problems->languages,
+			$Problems->server,
+			$Problems->remote_id,
+			$Problems->time_limit,
+			$Problems->memory_limit,
+			$Problems->output_limit,
+			$Problems->visits,
+			$Problems->submissions,
+			$Problems->accepted,
+			$Problems->difficulty,
+			$Problems->creation_date,
+			$Problems->source,
+			$Problems->order,
+			$Problems->tolerance,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Problems->setProblemId( $conn->Insert_ID() );
+ 		$Problems->problem_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -570,7 +589,7 @@ abstract class ProblemsDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

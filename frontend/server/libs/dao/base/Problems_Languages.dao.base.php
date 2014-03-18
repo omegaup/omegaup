@@ -32,7 +32,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	  * @param ProblemsLanguages [$Problems_Languages] El objeto de tipo ProblemsLanguages
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Problems_Languages )
+	public static final function save( $Problems_Languages )
 	{
 		if (!is_null(self::getByPK( $Problems_Languages->getProblemId() , $Problems_Languages->getLanguageId() )))
 		{
@@ -55,8 +55,6 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	public static final function getByPK(  $problem_id, $language_id )
 	{
 		if(  is_null( $problem_id ) || is_null( $language_id )  ){ return NULL; }
-			return new ProblemsLanguages($obj);
-		}
 		$sql = "SELECT * FROM Problems_Languages WHERE (problem_id = ? AND language_id = ? ) LIMIT 1;";
 		$params = array(  $problem_id, $language_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Problems_Languages";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Problems_Languages , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Problems_Languages , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Problems_Languages instanceof ProblemsLanguages)) {
 			return self::search(new ProblemsLanguages($Problems_Languages));
@@ -145,12 +143,22 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 			$sql .= " `translator_id` = ? AND";
 			array_push( $val, $Problems_Languages->getTranslatorId() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -191,13 +199,13 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param ProblemsLanguages [$Problems_Languages] El objeto de tipo ProblemsLanguages a crear.
 	  **/
-	private static final function create( &$Problems_Languages )
+	private static final function create( $Problems_Languages )
 	{
 		$sql = "INSERT INTO Problems_Languages ( `problem_id`, `language_id`, `translator_id` ) VALUES ( ?, ?, ?);";
 		$params = array( 
-			$Problems_Languages->getProblemId(), 
-			$Problems_Languages->getLanguageId(), 
-			$Problems_Languages->getTranslatorId(), 
+			$Problems_Languages->problem_id,
+			$Problems_Languages->language_id,
+			$Problems_Languages->translator_id,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -279,7 +287,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

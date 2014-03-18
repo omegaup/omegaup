@@ -42,7 +42,7 @@ abstract class TagsDAOBase extends DAO
 	  * @param Tags [$Tags] El objeto de tipo Tags
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Tags )
+	public static final function save( $Tags )
 	{
 		if(  self::getByPK(  $Tags->getTagId() ) !== NULL )
 		{
@@ -214,7 +214,7 @@ abstract class TagsDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Tags [$Tags] El objeto de tipo Tags a crear.
 	  **/
-	private static final function create( &$Tags )
+	private static final function create( $Tags )
 	{
 		$sql = "INSERT INTO Tags ( tag_id, name, description ) VALUES ( ?, ?, ?);";
 		$params = array( 
@@ -330,7 +330,7 @@ abstract class TagsDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Tags [$Tags] El objeto de tipo Tags a eliminar
 	  **/
-	public static final function delete( &$Tags )
+	public static final function delete( $Tags )
 	{
 		if(self::getByPK($Tags->getTagId()) === NULL) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Tags WHERE  tag_id = ?;";

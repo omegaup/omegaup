@@ -175,9 +175,6 @@ class DetailsContest extends OmegaupTestCase {
 	 */
 	public function testAccessTimeIsAlwaysFirstAccessForWindowLength() {
 
-		// This API requires DAO cache be turned off 
-		ContestsDAO::$useDAOCache = false;
-
 		// Get a contest 
 		$contestData = ContestsFactory::createContest();
 
@@ -215,9 +212,6 @@ class DetailsContest extends OmegaupTestCase {
 	 */
 	public function testAccessTimeIsAlwaysFirstAccess() {
 
-		// This API requires DAO cache be turned off 
-		ContestsDAO::$useDAOCache = false;
-
 		// Get a contest 
 		$contestData = ContestsFactory::createContest();
 
@@ -251,9 +245,6 @@ class DetailsContest extends OmegaupTestCase {
 	 * First access time should not change
 	 */
 	public function testAccessTimeIsAlwaysFirstAccessForPrivate() {
-
-		// This API requires DAO cache be turned off 
-		ContestsDAO::$useDAOCache = false;
 
 		// Get a contest 
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
@@ -293,9 +284,6 @@ class DetailsContest extends OmegaupTestCase {
 	 * @expectedException PreconditionFailedException
 	 */
 	public function testContestNotStartedYet() {
-		
-		// This API requires DAO cache be turned off 
-		ContestsDAO::$useDAOCache = false;
 
 		// Get a contest 
 		$contestData = ContestsFactory::createContest();

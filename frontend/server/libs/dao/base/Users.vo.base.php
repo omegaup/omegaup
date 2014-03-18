@@ -80,6 +80,12 @@ class Users extends VO
 			if (isset($data['last_access'])) {
 				$this->last_access = $data['last_access'];
 			}
+			if (isset($data['verified'])) {
+				$this->verified = $data['verified'];
+			}
+			if (isset($data['verification_id'])) {
+				$this->verification_id = $data['verification_id'];
+			}
 		}
 	}
 
@@ -108,9 +114,21 @@ class Users extends VO
 			"language_id" => $this->language_id,
 			"graduation_date" => $this->graduation_date,
 			"birth_date" => $this->birth_date,
-			"last_access" => $this->last_access
+			"last_access" => $this->last_access,
+			"verified" => $this->verified,
+			"verification_id" => $this->verification_id
 		); 
 	return json_encode($vec); 
+	}
+
+	/**
+	 * Converts date fields to timestamps
+	 **/
+	public function toUnixTime(array $fields = array()) {
+		if (count($fields) > 0)
+			parent::toUnixTime($fields);
+		else
+			parent::toUnixTime(array("last_access"));
 	}
 
 	/**
@@ -227,4 +245,17 @@ class Users extends VO
 	  */
 	public $last_access;
 
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var BOOLEAN
+	  */
+	public $verified;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var VARCHAR(
+	  */
+	public $verification_id;
 }

@@ -256,7 +256,7 @@ class Scoreboard {
 		$start = strtotime($contest->getStartTime());
 		$finish = strtotime($contest->getFinishTime());
 
-		if ($showAllRuns || ($contest->hasFinished() && $contest->getShowScoreboardAfter())) {
+		if ($showAllRuns || (ContestsDAO::hasFinished($contest) && $contest->getShowScoreboardAfter())) {
 			// Show full scoreboard to admin users
 			// or if the contest finished and the creator wants to show it at the end
 			$percentage = 1.0;

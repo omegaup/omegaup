@@ -32,7 +32,7 @@ abstract class UsersBadgesDAOBase extends DAO
 	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Users_Badges )
+	public static final function save( $Users_Badges )
 	{
 		if (!is_null(self::getByPK( $Users_Badges->getBadgeId() , $Users_Badges->getUserId() )))
 		{
@@ -55,8 +55,6 @@ abstract class UsersBadgesDAOBase extends DAO
 	public static final function getByPK(  $badge_id, $user_id )
 	{
 		if(  is_null( $badge_id ) || is_null( $user_id )  ){ return NULL; }
-			return new UsersBadges($obj);
-		}
 		$sql = "SELECT * FROM Users_Badges WHERE (badge_id = ? AND user_id = ? ) LIMIT 1;";
 		$params = array(  $badge_id, $user_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class UsersBadgesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Users_Badges";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class UsersBadgesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Users_Badges , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Users_Badges , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Users_Badges instanceof UsersBadges)) {
 			return self::search(new UsersBadges($Users_Badges));
@@ -149,12 +147,22 @@ abstract class UsersBadgesDAOBase extends DAO
 			$sql .= " `last_problem_id` = ? AND";
 			array_push( $val, $Users_Badges->getLastProblemId() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -196,14 +204,15 @@ abstract class UsersBadgesDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a crear.
 	  **/
-	private static final function create( &$Users_Badges )
+	private static final function create( $Users_Badges )
 	{
+		if (is_null($Users_Badges->time)) $Users_Badges->time = gmdate('Y-m-d H:i:s');
 		$sql = "INSERT INTO Users_Badges ( `badge_id`, `user_id`, `time`, `last_problem_id` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$Users_Badges->getBadgeId(), 
-			$Users_Badges->getUserId(), 
-			$Users_Badges->getTime(), 
-			$Users_Badges->getLastProblemId(), 
+			$Users_Badges->badge_id,
+			$Users_Badges->user_id,
+			$Users_Badges->time,
+			$Users_Badges->last_problem_id,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -296,7 +305,7 @@ abstract class UsersBadgesDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

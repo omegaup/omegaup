@@ -32,7 +32,7 @@ abstract class RunsDAOBase extends DAO
 	  * @param Runs [$Runs] El objeto de tipo Runs
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Runs )
+	public static final function save( $Runs )
 	{
 		if (!is_null(self::getByPK( $Runs->getRunId() )))
 		{
@@ -55,8 +55,6 @@ abstract class RunsDAOBase extends DAO
 	public static final function getByPK(  $run_id )
 	{
 		if(  is_null( $run_id )  ){ return NULL; }
-			return new Runs($obj);
-		}
 		$sql = "SELECT * FROM Runs WHERE (run_id = ? ) LIMIT 1;";
 		$params = array(  $run_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class RunsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Runs";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class RunsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Runs , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Runs , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Runs instanceof Runs)) {
 			return self::search(new Runs($Runs));
@@ -201,12 +199,22 @@ abstract class RunsDAOBase extends DAO
 			$sql .= " `judged_by` = ? AND";
 			array_push( $val, $Runs->getJudgedBy() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -262,33 +270,41 @@ abstract class RunsDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Runs [$Runs] El objeto de tipo Runs a crear.
 	  **/
-	private static final function create( &$Runs )
+	private static final function create( $Runs )
 	{
+		if (is_null($Runs->status)) $Runs->status = 'new';
+		if (is_null($Runs->runtime)) $Runs->runtime = '0';
+		if (is_null($Runs->memory)) $Runs->memory = '0';
+		if (is_null($Runs->score)) $Runs->score = '0';
+		if (is_null($Runs->contest_score)) $Runs->contest_score = '0';
+		if (is_null($Runs->time)) $Runs->time = gmdate('Y-m-d H:i:s');
+		if (is_null($Runs->submit_delay)) $Runs->submit_delay = '0';
+		if (is_null($Runs->test)) $Runs->test = '0';
 		$sql = "INSERT INTO Runs ( `run_id`, `user_id`, `problem_id`, `contest_id`, `guid`, `language`, `status`, `veredict`, `runtime`, `memory`, `score`, `contest_score`, `ip`, `time`, `submit_delay`, `test`, `judged_by` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Runs->getRunId(), 
-			$Runs->getUserId(), 
-			$Runs->getProblemId(), 
-			$Runs->getContestId(), 
-			$Runs->getGuid(), 
-			$Runs->getLanguage(), 
-			$Runs->getStatus(), 
-			$Runs->getVeredict(), 
-			$Runs->getRuntime(), 
-			$Runs->getMemory(), 
-			$Runs->getScore(), 
-			$Runs->getContestScore(), 
-			$Runs->getIp(), 
-			$Runs->getTime(), 
-			$Runs->getSubmitDelay(), 
-			$Runs->getTest(), 
-			$Runs->getJudgedBy(), 
+			$Runs->run_id,
+			$Runs->user_id,
+			$Runs->problem_id,
+			$Runs->contest_id,
+			$Runs->guid,
+			$Runs->language,
+			$Runs->status,
+			$Runs->veredict,
+			$Runs->runtime,
+			$Runs->memory,
+			$Runs->score,
+			$Runs->contest_score,
+			$Runs->ip,
+			$Runs->time,
+			$Runs->submit_delay,
+			$Runs->test,
+			$Runs->judged_by,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Runs->setRunId( $conn->Insert_ID() );
+ 		$Runs->run_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -519,7 +535,7 @@ abstract class RunsDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

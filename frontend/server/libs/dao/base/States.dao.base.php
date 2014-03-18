@@ -32,7 +32,7 @@ abstract class StatesDAOBase extends DAO
 	  * @param States [$States] El objeto de tipo States
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$States )
+	public static final function save( $States )
 	{
 		if (!is_null(self::getByPK( $States->getStateId() )))
 		{
@@ -55,8 +55,6 @@ abstract class StatesDAOBase extends DAO
 	public static final function getByPK(  $state_id )
 	{
 		if(  is_null( $state_id )  ){ return NULL; }
-			return new States($obj);
-		}
 		$sql = "SELECT * FROM States WHERE (state_id = ? ) LIMIT 1;";
 		$params = array(  $state_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class StatesDAOBase extends DAO
 	{
 		$sql = "SELECT * from States";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class StatesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $States , $orderBy = null, $orden = 'ASC')
+	public static final function search( $States , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($States instanceof States)) {
 			return self::search(new States($States));
@@ -141,16 +139,30 @@ abstract class StatesDAOBase extends DAO
 			$sql .= " `country_id` = ? AND";
 			array_push( $val, $States->getCountryId() );
 		}
+		if (!is_null( $States->getStateCode())) {
+			$sql .= " `state_code` = ? AND";
+			array_push( $val, $States->getStateCode() );
+		}
 		if (!is_null( $States->getName())) {
 			$sql .= " `name` = ? AND";
 			array_push( $val, $States->getName() );
+		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
 		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -170,9 +182,10 @@ abstract class StatesDAOBase extends DAO
 	  **/
 	private static final function update($States)
 	{
-		$sql = "UPDATE States SET  `country_id` = ?, `name` = ? WHERE  `state_id` = ?;";
+		$sql = "UPDATE States SET  `country_id` = ?, `state_code` = ?, `name` = ? WHERE  `state_id` = ?;";
 		$params = array( 
 			$States->getCountryId(), 
+			$States->getStateCode(), 
 			$States->getName(), 
 			$States->getStateId(), );
 		global $conn;
@@ -192,19 +205,21 @@ abstract class StatesDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param States [$States] El objeto de tipo States a crear.
 	  **/
-	private static final function create( &$States )
+	private static final function create( $States )
 	{
-		$sql = "INSERT INTO States ( `state_id`, `country_id`, `name` ) VALUES ( ?, ?, ?);";
+		$sql = "INSERT INTO States ( `state_id`, `country_id`, `state_code`, `name` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$States->getStateId(), 
-			$States->getCountryId(), 
-			$States->getName(), 
+			$States->state_id,
+			$States->country_id,
+			$States->state_code,
+			$States->name,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 
+ 		$States->state_id = $conn->Insert_ID();
+
 		return $ar;
 	}
 
@@ -267,6 +282,17 @@ abstract class StatesDAOBase extends DAO
 			
 		}
 
+		if( ( !is_null (($a = $StatesA->getStateCode()) ) ) & ( ! is_null ( ($b = $StatesB->getStateCode()) ) ) ){
+				$sql .= " `state_code` >= ? AND `state_code` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `state_code` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
 		if( ( !is_null (($a = $StatesA->getName()) ) ) & ( ! is_null ( ($b = $StatesB->getName()) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b)); 
@@ -280,7 +306,7 @@ abstract class StatesDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

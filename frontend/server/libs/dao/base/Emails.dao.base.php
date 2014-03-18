@@ -32,7 +32,7 @@ abstract class EmailsDAOBase extends DAO
 	  * @param Emails [$Emails] El objeto de tipo Emails
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Emails )
+	public static final function save( $Emails )
 	{
 		if (!is_null(self::getByPK( $Emails->getEmailId() )))
 		{
@@ -55,8 +55,6 @@ abstract class EmailsDAOBase extends DAO
 	public static final function getByPK(  $email_id )
 	{
 		if(  is_null( $email_id )  ){ return NULL; }
-			return new Emails($obj);
-		}
 		$sql = "SELECT * FROM Emails WHERE (email_id = ? ) LIMIT 1;";
 		$params = array(  $email_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class EmailsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Emails";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class EmailsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Emails , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Emails , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Emails instanceof Emails)) {
 			return self::search(new Emails($Emails));
@@ -145,12 +143,22 @@ abstract class EmailsDAOBase extends DAO
 			$sql .= " `user_id` = ? AND";
 			array_push( $val, $Emails->getUserId() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -192,19 +200,19 @@ abstract class EmailsDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Emails [$Emails] El objeto de tipo Emails a crear.
 	  **/
-	private static final function create( &$Emails )
+	private static final function create( $Emails )
 	{
 		$sql = "INSERT INTO Emails ( `email_id`, `email`, `user_id` ) VALUES ( ?, ?, ?);";
 		$params = array( 
-			$Emails->getEmailId(), 
-			$Emails->getEmail(), 
-			$Emails->getUserId(), 
+			$Emails->email_id,
+			$Emails->email,
+			$Emails->user_id,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Emails->setEmailId( $conn->Insert_ID() );
+ 		$Emails->email_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -281,7 +289,7 @@ abstract class EmailsDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

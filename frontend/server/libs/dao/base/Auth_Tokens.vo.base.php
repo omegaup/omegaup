@@ -38,6 +38,9 @@ class AuthTokens extends VO
 			if (isset($data['token'])) {
 				$this->token = $data['token'];
 			}
+			if (isset($data['create_time'])) {
+				$this->create_time = $data['create_time'];
+			}
 		}
 	}
 
@@ -52,9 +55,20 @@ class AuthTokens extends VO
 	{ 
 		$vec = array( 
 			"user_id" => $this->user_id,
-			"token" => $this->token
+			"token" => $this->token,
+			"create_time" => $this->create_time
 		); 
 	return json_encode($vec); 
+	}
+
+	/**
+	 * Converts date fields to timestamps
+	 **/
+	public function toUnixTime(array $fields = array()) {
+		if (count($fields) > 0)
+			parent::toUnixTime($fields);
+		else
+			parent::toUnixTime(array());
 	}
 
 	/**
@@ -72,4 +86,10 @@ class AuthTokens extends VO
 	  */
 	public $token;
 
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var TIMESTAMP
+	  */
+	public $create_time;
 }

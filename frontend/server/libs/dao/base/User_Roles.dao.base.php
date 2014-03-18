@@ -32,7 +32,7 @@ abstract class UserRolesDAOBase extends DAO
 	  * @param UserRoles [$User_Roles] El objeto de tipo UserRoles
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$User_Roles )
+	public static final function save( $User_Roles )
 	{
 		if (!is_null(self::getByPK( $User_Roles->getUserId() , $User_Roles->getRoleId() , $User_Roles->getContestId() )))
 		{
@@ -55,8 +55,6 @@ abstract class UserRolesDAOBase extends DAO
 	public static final function getByPK(  $user_id, $role_id, $contest_id )
 	{
 		if(  is_null( $user_id ) || is_null( $role_id ) || is_null( $contest_id )  ){ return NULL; }
-			return new UserRoles($obj);
-		}
 		$sql = "SELECT * FROM User_Roles WHERE (user_id = ? AND role_id = ? AND contest_id = ? ) LIMIT 1;";
 		$params = array(  $user_id, $role_id, $contest_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class UserRolesDAOBase extends DAO
 	{
 		$sql = "SELECT * from User_Roles";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class UserRolesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $User_Roles , $orderBy = null, $orden = 'ASC')
+	public static final function search( $User_Roles , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($User_Roles instanceof UserRoles)) {
 			return self::search(new UserRoles($User_Roles));
@@ -145,12 +143,22 @@ abstract class UserRolesDAOBase extends DAO
 			$sql .= " `contest_id` = ? AND";
 			array_push( $val, $User_Roles->getContestId() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -184,13 +192,14 @@ abstract class UserRolesDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param UserRoles [$User_Roles] El objeto de tipo UserRoles a crear.
 	  **/
-	private static final function create( &$User_Roles )
+	private static final function create( $User_Roles )
 	{
+		if (is_null($User_Roles->contest_id)) $User_Roles->contest_id = 1;
 		$sql = "INSERT INTO User_Roles ( `user_id`, `role_id`, `contest_id` ) VALUES ( ?, ?, ?);";
 		$params = array( 
-			$User_Roles->getUserId(), 
-			$User_Roles->getRoleId(), 
-			$User_Roles->getContestId(), 
+			$User_Roles->user_id,
+			$User_Roles->role_id,
+			$User_Roles->contest_id,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -272,7 +281,7 @@ abstract class UserRolesDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

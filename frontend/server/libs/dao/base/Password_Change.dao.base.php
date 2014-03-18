@@ -32,7 +32,7 @@ abstract class PasswordChangeDAOBase extends DAO
 	  * @param PasswordChange [$Password_Change] El objeto de tipo PasswordChange
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Password_Change )
+	public static final function save( $Password_Change )
 	{
 		if (!is_null(self::getByPK( $Password_Change->getUserId() )))
 		{
@@ -55,8 +55,6 @@ abstract class PasswordChangeDAOBase extends DAO
 	public static final function getByPK(  $user_id )
 	{
 		if(  is_null( $user_id )  ){ return NULL; }
-			return new PasswordChange($obj);
-		}
 		$sql = "SELECT * FROM Password_Change WHERE (user_id = ? ) LIMIT 1;";
 		$params = array(  $user_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class PasswordChangeDAOBase extends DAO
 	{
 		$sql = "SELECT * from Password_Change";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class PasswordChangeDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Password_Change , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Password_Change , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Password_Change instanceof PasswordChange)) {
 			return self::search(new PasswordChange($Password_Change));
@@ -149,12 +147,22 @@ abstract class PasswordChangeDAOBase extends DAO
 			$sql .= " `expiration_date` = ? AND";
 			array_push( $val, $Password_Change->getExpirationDate() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -197,14 +205,15 @@ abstract class PasswordChangeDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param PasswordChange [$Password_Change] El objeto de tipo PasswordChange a crear.
 	  **/
-	private static final function create( &$Password_Change )
+	private static final function create( $Password_Change )
 	{
+		if (is_null($Password_Change->expiration_date)) $Password_Change->expiration_date = gmdate('Y-m-d H:i:s');
 		$sql = "INSERT INTO Password_Change ( `user_id`, `token`, `ip`, `expiration_date` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$Password_Change->getUserId(), 
-			$Password_Change->getToken(), 
-			$Password_Change->getIp(), 
-			$Password_Change->getExpirationDate(), 
+			$Password_Change->user_id,
+			$Password_Change->token,
+			$Password_Change->ip,
+			$Password_Change->expiration_date,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -297,7 +306,7 @@ abstract class PasswordChangeDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

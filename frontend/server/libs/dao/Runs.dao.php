@@ -118,6 +118,22 @@ class RunsDAO extends RunsDAOBase
 		return $ar;
 	}
 
+	public static final function getByAlias($alias)
+	{
+		$sql = "SELECT * FROM Runs WHERE (guid = ? ) LIMIT 1;";
+		$params = array(  $alias );
+
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);
+		if(count($rs)==0)
+		{
+			return NULL;
+		}
+
+		$contest = new Runs( $rs );
+		return $contest;
+	}
+
 	/*
 	 * Gets the count of total runs sent to a given contest
 	 */

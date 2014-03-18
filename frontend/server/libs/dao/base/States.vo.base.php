@@ -38,6 +38,9 @@ class States extends VO
 			if (isset($data['country_id'])) {
 				$this->country_id = $data['country_id'];
 			}
+			if (isset($data['state_code'])) {
+				$this->state_code = $data['state_code'];
+			}
 			if (isset($data['name'])) {
 				$this->name = $data['name'];
 			}
@@ -56,14 +59,26 @@ class States extends VO
 		$vec = array( 
 			"state_id" => $this->state_id,
 			"country_id" => $this->country_id,
+			"state_code" => $this->state_code,
 			"name" => $this->name
 		); 
 	return json_encode($vec); 
 	}
 
 	/**
+	 * Converts date fields to timestamps
+	 **/
+	public function toUnixTime(array $fields = array()) {
+		if (count($fields) > 0)
+			parent::toUnixTime($fields);
+		else
+			parent::toUnixTime(array());
+	}
+
+	/**
 	  *  [Campo no documentado]
 	  * Llave Primaria
+	  * Auto Incremento
 	  * @access public
 	  * @var int(11)
 	  */
@@ -79,8 +94,14 @@ class States extends VO
 	/**
 	  *  [Campo no documentado]
 	  * @access public
+	  * @var CHAR(
+	  */
+	public $state_code;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
 	  * @var varchar(50)
 	  */
 	public $name;
-
 }

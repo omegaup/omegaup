@@ -29,16 +29,16 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  *	
 	  *	@static
 	  * @throws Exception si la operacion fallo.
-	  * @param CoderOfTheMonth [$Coder_of_the_Month] El objeto de tipo CoderOfTheMonth
+	  * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Coder_of_the_Month )
+	public static final function save( $Coder_Of_The_Month )
 	{
-		if (!is_null(self::getByPK( $Coder_of_the_Month->getCoderOfTheMonthId() )))
+		if (!is_null(self::getByPK( $Coder_Of_The_Month->getCoderOfTheMonthId() )))
 		{
-			return CoderOfTheMonthDAOBase::update( $Coder_of_the_Month);
+			return CoderOfTheMonthDAOBase::update( $Coder_Of_The_Month);
 		} else {
-			return CoderOfTheMonthDAOBase::create( $Coder_of_the_Month);
+			return CoderOfTheMonthDAOBase::create( $Coder_Of_The_Month);
 		}
 	}
 
@@ -55,9 +55,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	public static final function getByPK(  $coder_of_the_month_id )
 	{
 		if(  is_null( $coder_of_the_month_id )  ){ return NULL; }
-			return new CoderOfTheMonth($obj);
-		}
-		$sql = "SELECT * FROM Coder_of_the_Month WHERE (coder_of_the_month_id = ? ) LIMIT 1;";
+		$sql = "SELECT * FROM Coder_Of_The_Month WHERE (coder_of_the_month_id = ? ) LIMIT 1;";
 		$params = array(  $coder_of_the_month_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
@@ -83,9 +81,9 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  **/
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
-		$sql = "SELECT * from Coder_of_the_Month";
+		$sql = "SELECT * from Coder_Of_The_Month";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -121,40 +119,50 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  *	  }
 	  * </code>
 	  *	@static
-	  * @param CoderOfTheMonth [$Coder_of_the_Month] El objeto de tipo CoderOfTheMonth
+	  * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Coder_of_the_Month , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Coder_Of_The_Month , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
-		if (!($Coder_of_the_Month instanceof CoderOfTheMonth)) {
-			return self::search(new CoderOfTheMonth($Coder_of_the_Month));
+		if (!($Coder_Of_The_Month instanceof CoderOfTheMonth)) {
+			return self::search(new CoderOfTheMonth($Coder_Of_The_Month));
 		}
 
-		$sql = "SELECT * from Coder_of_the_Month WHERE ("; 
+		$sql = "SELECT * from Coder_Of_The_Month WHERE ("; 
 		$val = array();
-		if (!is_null( $Coder_of_the_Month->getCoderOfTheMonthId())) {
+		if (!is_null( $Coder_Of_The_Month->getCoderOfTheMonthId())) {
 			$sql .= " `coder_of_the_month_id` = ? AND";
-			array_push( $val, $Coder_of_the_Month->getCoderOfTheMonthId() );
+			array_push( $val, $Coder_Of_The_Month->getCoderOfTheMonthId() );
 		}
-		if (!is_null( $Coder_of_the_Month->getDescription())) {
+		if (!is_null( $Coder_Of_The_Month->getDescription())) {
 			$sql .= " `description` = ? AND";
-			array_push( $val, $Coder_of_the_Month->getDescription() );
+			array_push( $val, $Coder_Of_The_Month->getDescription() );
 		}
-		if (!is_null( $Coder_of_the_Month->getTime())) {
+		if (!is_null( $Coder_Of_The_Month->getTime())) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $Coder_of_the_Month->getTime() );
+			array_push( $val, $Coder_Of_The_Month->getTime() );
 		}
-		if (!is_null( $Coder_of_the_Month->getInterviewUrl())) {
+		if (!is_null( $Coder_Of_The_Month->getInterviewUrl())) {
 			$sql .= " `interview_url` = ? AND";
-			array_push( $val, $Coder_of_the_Month->getInterviewUrl() );
+			array_push( $val, $Coder_Of_The_Month->getInterviewUrl() );
+		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
 		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -170,16 +178,16 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  *	Actualizar registros.
 	  *
 	  * @return Filas afectadas
-	  * @param CoderOfTheMonth [$Coder_of_the_Month] El objeto de tipo CoderOfTheMonth a actualizar.
+	  * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth a actualizar.
 	  **/
-	private static final function update($Coder_of_the_Month)
+	private static final function update($Coder_Of_The_Month)
 	{
-		$sql = "UPDATE Coder_of_the_Month SET  `description` = ?, `time` = ?, `interview_url` = ? WHERE  `coder_of_the_month_id` = ?;";
+		$sql = "UPDATE Coder_Of_The_Month SET  `description` = ?, `time` = ?, `interview_url` = ? WHERE  `coder_of_the_month_id` = ?;";
 		$params = array( 
-			$Coder_of_the_Month->getDescription(), 
-			$Coder_of_the_Month->getTime(), 
-			$Coder_of_the_Month->getInterviewUrl(), 
-			$Coder_of_the_Month->getCoderOfTheMonthId(), );
+			$Coder_Of_The_Month->getDescription(), 
+			$Coder_Of_The_Month->getTime(), 
+			$Coder_Of_The_Month->getInterviewUrl(), 
+			$Coder_Of_The_Month->getCoderOfTheMonthId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -195,22 +203,23 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  * primaria generada en el objeto CoderOfTheMonth dentro de la misma transaccion.
 	  *	
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-	  * @param CoderOfTheMonth [$Coder_of_the_Month] El objeto de tipo CoderOfTheMonth a crear.
+	  * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth a crear.
 	  **/
-	private static final function create( &$Coder_of_the_Month )
+	private static final function create( $Coder_Of_The_Month )
 	{
-		$sql = "INSERT INTO Coder_of_the_Month ( `coder_of_the_month_id`, `description`, `time`, `interview_url` ) VALUES ( ?, ?, ?, ?);";
+		if (is_null($Coder_Of_The_Month->time)) $Coder_Of_The_Month->time = '2000-01-01';
+		$sql = "INSERT INTO Coder_Of_The_Month ( `coder_of_the_month_id`, `description`, `time`, `interview_url` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$Coder_of_the_Month->getCoderOfTheMonthId(), 
-			$Coder_of_the_Month->getDescription(), 
-			$Coder_of_the_Month->getTime(), 
-			$Coder_of_the_Month->getInterviewUrl(), 
+			$Coder_Of_The_Month->coder_of_the_month_id,
+			$Coder_Of_The_Month->description,
+			$Coder_Of_The_Month->time,
+			$Coder_Of_The_Month->interview_url,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Coder_of_the_Month->setCoderOfTheMonthId( $conn->Insert_ID() );
+ 		$Coder_Of_The_Month->coder_of_the_month_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -243,16 +252,16 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  *	  }
 	  * </code>
 	  *	@static
-	  * @param CoderOfTheMonth [$Coder_of_the_Month] El objeto de tipo CoderOfTheMonth
-	  * @param CoderOfTheMonth [$Coder_of_the_Month] El objeto de tipo CoderOfTheMonth
+	  * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth
+	  * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function byRange( $Coder_of_the_MonthA , $Coder_of_the_MonthB , $orderBy = null, $orden = 'ASC')
+	public static final function byRange( $Coder_Of_The_MonthA , $Coder_Of_The_MonthB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Coder_of_the_Month WHERE ("; 
+		$sql = "SELECT * from Coder_Of_The_Month WHERE ("; 
 		$val = array();
-		if( ( !is_null (($a = $Coder_of_the_MonthA->getCoderOfTheMonthId()) ) ) & ( ! is_null ( ($b = $Coder_of_the_MonthB->getCoderOfTheMonthId()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->getCoderOfTheMonthId()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getCoderOfTheMonthId()) ) ) ){
 				$sql .= " `coder_of_the_month_id` >= ? AND `coder_of_the_month_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
@@ -263,7 +272,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 			
 		}
 
-		if( ( !is_null (($a = $Coder_of_the_MonthA->getDescription()) ) ) & ( ! is_null ( ($b = $Coder_of_the_MonthB->getDescription()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->getDescription()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getDescription()) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
@@ -274,7 +283,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 			
 		}
 
-		if( ( !is_null (($a = $Coder_of_the_MonthA->getTime()) ) ) & ( ! is_null ( ($b = $Coder_of_the_MonthB->getTime()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->getTime()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getTime()) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
@@ -285,7 +294,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 			
 		}
 
-		if( ( !is_null (($a = $Coder_of_the_MonthA->getInterviewUrl()) ) ) & ( ! is_null ( ($b = $Coder_of_the_MonthB->getInterviewUrl()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->getInterviewUrl()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getInterviewUrl()) ) ) ){
 				$sql .= " `interview_url` >= ? AND `interview_url` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
@@ -298,7 +307,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;
@@ -321,13 +330,13 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  *	
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
-	  * @param CoderOfTheMonth [$Coder_of_the_Month] El objeto de tipo CoderOfTheMonth a eliminar
+	  * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth a eliminar
 	  **/
-	public static final function delete( $Coder_of_the_Month )
+	public static final function delete( $Coder_Of_The_Month )
 	{
-		if( is_null( self::getByPK($Coder_of_the_Month->getCoderOfTheMonthId()) ) ) throw new Exception('Campo no encontrado.');
-		$sql = "DELETE FROM Coder_of_the_Month WHERE  coder_of_the_month_id = ?;";
-		$params = array( $Coder_of_the_Month->getCoderOfTheMonthId() );
+		if( is_null( self::getByPK($Coder_Of_The_Month->getCoderOfTheMonthId()) ) ) throw new Exception('Campo no encontrado.');
+		$sql = "DELETE FROM Coder_Of_The_Month WHERE  coder_of_the_month_id = ?;";
+		$params = array( $Coder_Of_The_Month->getCoderOfTheMonthId() );
 		global $conn;
 
 		$conn->Execute($sql, $params);

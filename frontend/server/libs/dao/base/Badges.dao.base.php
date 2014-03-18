@@ -32,7 +32,7 @@ abstract class BadgesDAOBase extends DAO
 	  * @param Badges [$Badges] El objeto de tipo Badges
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Badges )
+	public static final function save( $Badges )
 	{
 		if (!is_null(self::getByPK( $Badges->getBadgeId() )))
 		{
@@ -55,8 +55,6 @@ abstract class BadgesDAOBase extends DAO
 	public static final function getByPK(  $badge_id )
 	{
 		if(  is_null( $badge_id )  ){ return NULL; }
-			return new Badges($obj);
-		}
 		$sql = "SELECT * FROM Badges WHERE (badge_id = ? ) LIMIT 1;";
 		$params = array(  $badge_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class BadgesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Badges";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class BadgesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Badges , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Badges , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Badges instanceof Badges)) {
 			return self::search(new Badges($Badges));
@@ -153,12 +151,22 @@ abstract class BadgesDAOBase extends DAO
 			$sql .= " `hint` = ? AND";
 			array_push( $val, $Badges->getHint() );
 		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -202,21 +210,22 @@ abstract class BadgesDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Badges [$Badges] El objeto de tipo Badges a crear.
 	  **/
-	private static final function create( &$Badges )
+	private static final function create( $Badges )
 	{
+		if (is_null($Badges->name)) $Badges->name = 'MyBadge';
 		$sql = "INSERT INTO Badges ( `badge_id`, `name`, `image_url`, `description`, `hint` ) VALUES ( ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Badges->getBadgeId(), 
-			$Badges->getName(), 
-			$Badges->getImageUrl(), 
-			$Badges->getDescription(), 
-			$Badges->getHint(), 
+			$Badges->badge_id,
+			$Badges->name,
+			$Badges->image_url,
+			$Badges->description,
+			$Badges->hint,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Badges->setBadgeId( $conn->Insert_ID() );
+ 		$Badges->badge_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -315,7 +324,7 @@ abstract class BadgesDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

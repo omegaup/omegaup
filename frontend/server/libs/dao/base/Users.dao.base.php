@@ -32,7 +32,7 @@ abstract class UsersDAOBase extends DAO
 	  * @param Users [$Users] El objeto de tipo Users
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Users )
+	public static final function save( $Users )
 	{
 		if (!is_null(self::getByPK( $Users->getUserId() )))
 		{
@@ -55,8 +55,6 @@ abstract class UsersDAOBase extends DAO
 	public static final function getByPK(  $user_id )
 	{
 		if(  is_null( $user_id )  ){ return NULL; }
-			return new Users($obj);
-		}
 		$sql = "SELECT * FROM Users WHERE (user_id = ? ) LIMIT 1;";
 		$params = array(  $user_id );
 		global $conn;
@@ -85,7 +83,7 @@ abstract class UsersDAOBase extends DAO
 	{
 		$sql = "SELECT * from Users";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -125,7 +123,7 @@ abstract class UsersDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Users , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Users , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
 		if (!($Users instanceof Users)) {
 			return self::search(new Users($Users));
@@ -197,12 +195,30 @@ abstract class UsersDAOBase extends DAO
 			$sql .= " `last_access` = ? AND";
 			array_push( $val, $Users->getLastAccess() );
 		}
+		if (!is_null( $Users->getVerified())) {
+			$sql .= " `verified` = ? AND";
+			array_push( $val, $Users->getVerified() );
+		}
+		if (!is_null( $Users->getVerificationId())) {
+			$sql .= " `verification_id` = ? AND";
+			array_push( $val, $Users->getVerificationId() );
+		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
 		if(sizeof($val) == 0) {
 			return self::getAll();
 		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-			$sql .= " order by " . $orderBy . " " . $orden ;
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -222,7 +238,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function update($Users)
 	{
-		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ? WHERE  `user_id` = ?;";
+		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ? WHERE  `user_id` = ?;";
 		$params = array( 
 			$Users->getUsername(), 
 			$Users->getFacebookUserId(), 
@@ -239,6 +255,8 @@ abstract class UsersDAOBase extends DAO
 			$Users->getGraduationDate(), 
 			$Users->getBirthDate(), 
 			$Users->getLastAccess(), 
+			$Users->getVerified(), 
+			$Users->getVerificationId(), 
 			$Users->getUserId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -257,32 +275,38 @@ abstract class UsersDAOBase extends DAO
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Users [$Users] El objeto de tipo Users a crear.
 	  **/
-	private static final function create( &$Users )
+	private static final function create( $Users )
 	{
-		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Users->solved)) $Users->solved = '0';
+		if (is_null($Users->submissions)) $Users->submissions = '0';
+		if (is_null($Users->last_access)) $Users->last_access = gmdate('Y-m-d H:i:s');
+		if (is_null($Users->verified)) $Users->verified = FALSE;
+		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `verification_id` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Users->getUserId(), 
-			$Users->getUsername(), 
-			$Users->getFacebookUserId(), 
-			$Users->getPassword(), 
-			$Users->getMainEmailId(), 
-			$Users->getName(), 
-			$Users->getSolved(), 
-			$Users->getSubmissions(), 
-			$Users->getCountryId(), 
-			$Users->getStateId(), 
-			$Users->getSchoolId(), 
-			$Users->getScholarDegree(), 
-			$Users->getLanguageId(), 
-			$Users->getGraduationDate(), 
-			$Users->getBirthDate(), 
-			$Users->getLastAccess(), 
+			$Users->user_id,
+			$Users->username,
+			$Users->facebook_user_id,
+			$Users->password,
+			$Users->main_email_id,
+			$Users->name,
+			$Users->solved,
+			$Users->submissions,
+			$Users->country_id,
+			$Users->state_id,
+			$Users->school_id,
+			$Users->scholar_degree,
+			$Users->language_id,
+			$Users->graduation_date,
+			$Users->birth_date,
+			$Users->last_access,
+			$Users->verified,
+			$Users->verification_id,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Users->setUserId( $conn->Insert_ID() );
+ 		$Users->user_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -500,9 +524,31 @@ abstract class UsersDAOBase extends DAO
 			
 		}
 
+		if( ( !is_null (($a = $UsersA->getVerified()) ) ) & ( ! is_null ( ($b = $UsersB->getVerified()) ) ) ){
+				$sql .= " `verified` >= ? AND `verified` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `verified` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $UsersA->getVerificationId()) ) ) & ( ! is_null ( ($b = $UsersB->getVerificationId()) ) ) ){
+				$sql .= " `verification_id` >= ? AND `verification_id` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `verification_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
 
 		}
 		global $conn;

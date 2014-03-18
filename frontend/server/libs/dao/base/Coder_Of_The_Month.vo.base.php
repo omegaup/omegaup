@@ -8,7 +8,7 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Value Object file for table Coder_of_the_Month.
+/** Value Object file for table Coder_Of_The_Month.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
@@ -66,6 +66,16 @@ class CoderOfTheMonth extends VO
 	}
 
 	/**
+	 * Converts date fields to timestamps
+	 **/
+	public function toUnixTime(array $fields = array()) {
+		if (count($fields) > 0)
+			parent::toUnixTime($fields);
+		else
+			parent::toUnixTime(array());
+	}
+
+	/**
 	  *  [Campo no documentado]
 	  * Llave Primaria
 	  * Auto Incremento
@@ -94,5 +104,4 @@ class CoderOfTheMonth extends VO
 	  * @var varchar(256)
 	  */
 	public $interview_url;
-
 }
