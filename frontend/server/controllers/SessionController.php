@@ -74,7 +74,7 @@ class SessionController extends Controller {
 				Cache::SESSION_PREFIX,
 				$authToken,
 				$r,
-				['SessionController', 'getCurrentSession'],
+				array('SessionController', 'getCurrentSession'),
 				$session,
 				APC_USER_CACHE_SESSION_TIMEOUT
 			);

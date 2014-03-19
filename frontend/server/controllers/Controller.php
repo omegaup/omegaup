@@ -144,7 +144,7 @@ class Controller {
 			if (is_int($source)) {
 				// Simple property:
 				$source = $info;
-				$info = [Controller::toCamelCase($source)];
+				$info = array(Controller::toCamelCase($source));
 			}
 			if (is_null($request[$source])) {
 				continue;

@@ -124,7 +124,7 @@ class Cache {
 		if (is_null($returnValue)) {
 
 			// Get the value from the function provided
-			$returnValue = $setFunc($r);
+			$returnValue = call_user_func($setFunc, $r);
 
 			// If the $setFunc() didn't disable the cache
 			if (self::$cacheResults === true) {

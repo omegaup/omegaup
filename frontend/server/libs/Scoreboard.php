@@ -50,7 +50,7 @@ class Scoreboard {
 				// Get all distinct contestants participating in the contest given contest_id
 				$raw_contest_users = RunsDAO::GetAllRelevantUsers(
 					$this->contest_id,
-					false /*show all runs*/,
+					true /*show all runs*/,
 					$filterUsersBy
 				);
 
@@ -73,7 +73,7 @@ class Scoreboard {
 				$problem_mapping[$problems->getProblemId()] = $problems->getAlias();
 			}
 
-			$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest);
+			$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, $this->showAllRuns);
 
 			$result = Scoreboard::getScoreboardFromRuns(
 				$contest_runs,
@@ -147,7 +147,7 @@ class Scoreboard {
 			                                      $use_penalty,
 			                                      $raw_contest_users,
 			                                      $problem_mapping,
-			                                      $this->showAllRuns);
+																						$this->showAllRuns);
 
 			$timeout = max(0, strtotime($contest->getFinishTime()) - time());
 			if ($can_use_contestant_cache) {
@@ -220,6 +220,7 @@ class Scoreboard {
 			false  /* sortByName */
 		), $timeout);
 		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
+		$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, true);
 		$adminScoreboardCache->set(Scoreboard::getScoreboardFromRuns(
 			$contest_runs,
 			$raw_contest_users,
@@ -352,7 +353,7 @@ class Scoreboard {
 			$user_id = $contestant->getUserId();
 
 			// Add contestant results to scoreboard data
-			if ($test_only[$user_id] && !$no_runs[$user_id]) {
+			if (!$showAllRuns && $test_only[$user_id] && !$no_runs[$user_id]) {
 				continue;
 			}
 			$info = $users_info[$user_id];
@@ -431,7 +432,7 @@ class Scoreboard {
 		$user_problems_score = array();
 
 		$contestStart = strtotime($contest->getStartTime());
-		$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest);
+		$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, $showAllRuns);
 
 		// Calculate score for each contestant x problem x run
 		foreach ($contest_runs as $run) {
