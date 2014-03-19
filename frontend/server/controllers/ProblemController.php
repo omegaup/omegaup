@@ -843,7 +843,7 @@ class ProblemController extends Controller {
 			$r["offset"] = 0;
 		}
 		if (!isset($r["rowcount"])) {
-			$r["rowcount"] = 400;
+			$r["rowcount"] = 1000;
 		}
 		
 		Validators::isStringNonEmpty($r["query"], "query", false);

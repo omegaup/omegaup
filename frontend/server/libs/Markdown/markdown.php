@@ -1677,7 +1677,7 @@ class Markdown_Parser {
 
 		for ($i = 1; $i < count($matches); $i += 2) {
 			if ($matches[$i] == 'description') {
-				$text .= "<td>" . $matches[$i+1] . "</td>";
+				$text .= "<td>" . $this->runBlockGamut($matches[$i+1]) . "</td>";
 			} else {
 				if ($matches[$i] == 'input') {
 					if ($first_row) $text .= '</tr>';
