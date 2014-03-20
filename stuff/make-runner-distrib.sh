@@ -19,11 +19,12 @@ popd
 
 TMPDIR=`mktemp -d`
 mkdir -p $TMPDIR/distrib/{compile,input}
-mkdir -p $TMPDIR/distrib/minijail/{bin,dist,scripts,bin}
+mkdir -p $TMPDIR/distrib/minijail/{bin,lib,dist,scripts,bin}
 
 cp $ROOT/bin/runner.jar $TMPDIR/distrib/runner.jar
 cp $ROOT/minijail/{minijail0,ldwrapper,libminijailpreload.so} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/bin/{karel,kcl} $TMPDIR/distrib/minijail/bin/
+cp $ROOT/stuff/libkarel.py $TMPDIR/distrib/minijail/lib/
 cp $ROOT/stuff/mkroot $TMPDIR/distrib/minijail/bin/
 cp $ROOT/stuff/minijail-scripts/* $TMPDIR/distrib/minijail/scripts/
 

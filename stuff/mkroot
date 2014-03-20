@@ -249,6 +249,7 @@ with Chroot('root-nodejs', '/opt/nodejs/') as root:
 with Chroot('root-python', '/usr/lib/python2.7/') as root:
 	root.copyfromhost('/usr/lib/python2.7', exclude=['/usr/lib/python2.7/dist-packages', '/usr/lib/python2.7/config-x86_64-linux-gnu'])
 	root.install('/usr/lib/python2.7/python', '/usr/bin/python')
+	root.install('/usr/lib/python2.7/libkarel.py', 'lib/libkarel.py')
 
 with Chroot('root-ruby', '/usr/lib/ruby/') as root:
 	root.copyfromhost('/usr/lib/ruby')
