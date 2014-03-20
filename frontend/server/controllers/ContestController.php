@@ -1432,7 +1432,7 @@ class ContestController extends Controller {
 
 		// Get our runs
 		try {
-			$runs = RunsDAO::search($runs_mask, "time", "DESC", $relevant_columns, $r["offset"], $r["rowcount"]);
+			$runs = RunsDAO::search($runs_mask, "time", "DESC", $r["offset"], $r["rowcount"]);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
