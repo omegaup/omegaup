@@ -490,7 +490,8 @@ class UserController extends Controller {
 
 			UserController::$sendEmailOnVerify = false;
 			self::apiCreate($createRequest);
-		} else {
+		} else if (!is_null($r["change_password"]) && $r["change_password"] !== false) {
+			// Pwd changes are by default unless explictly disabled
 			$resetRequest = new Request();
 			$resetRequest["auth_token"] = $r["auth_token"];
 			$resetRequest["username"] = $username;
@@ -570,9 +571,20 @@ class UserController extends Controller {
 				"GTO-PEN" => 19,
 			);
 			
+		} else if ($r["contest_type"] == "OMIAGS") {
+			
+			if (!($r["current_user"]->getUsername() == "Andreasantillana" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
+				throw new ForbiddenAccessException();
+			}
+			
+			$keys = array (				
+				"OMIAGS" => 35
+			);			
 		} else {
 			throw new InvalidParameterException("Invalid contest_type");
 		}
+		
+		
 			
 		foreach ($keys as $k => $n) {
 						
