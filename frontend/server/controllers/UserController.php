@@ -490,7 +490,7 @@ class UserController extends Controller {
 
 			UserController::$sendEmailOnVerify = false;
 			self::apiCreate($createRequest);
-		} else if (!is_null($r["change_password"]) && $r["change_password"] !== false) {
+		} else if (is_null($r["change_password"]) || $r["change_password"] !== "false") {
 			// Pwd changes are by default unless explictly disabled
 			$resetRequest = new Request();
 			$resetRequest["auth_token"] = $r["auth_token"];
@@ -604,7 +604,9 @@ class UserController extends Controller {
 					ContestController::apiAddUser($addUserRequest);
 				}
 				
-				$response[$username] = $password;			
+				if (is_null($r["change_password"]) || $r["change_password"] !== "false") {
+					$response[$username] = $password;
+				}
 			}
 		}
 
