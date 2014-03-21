@@ -1,4 +1,6 @@
 socket: return ENETDOWN
+unlink: 1
+mprotect: 1
 mmap: 1
 munmap: 1
 brk: 1
