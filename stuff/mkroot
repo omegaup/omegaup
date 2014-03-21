@@ -105,6 +105,7 @@ with Chroot('root', '/') as root:
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libgmp.so.10')
 	root.copyfromhost('/etc/localtime')
 	root.copyfromhost('/lib/x86_64-linux-gnu/libcap.so.2')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libexpat.so.1')
 	root.copyfromhost('/lib/x86_64-linux-gnu/libutil.so.1')
 	root.copyfromhost('/lib/x86_64-linux-gnu/libm.so.6')
 	root.copyfromhost('/lib/x86_64-linux-gnu/libpthread.so.0')

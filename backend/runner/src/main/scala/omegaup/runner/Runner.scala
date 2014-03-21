@@ -387,9 +387,9 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
   def removeCompileDir(token: String): Unit = {
     val runDirectory = new File(Config.get("compile.root", ".") + "/" + token)
     
-    if(!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
-    
-    FileUtil.deleteDirectory(runDirectory)
+    if (!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
+
+    if (!Config.get("runner.preserve", false)) FileUtil.deleteDirectory(runDirectory)
   }
 
   def input(inputName: String, inputStream: InputStream, size: Int = -1): InputOutputMessage = {
