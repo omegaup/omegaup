@@ -1408,47 +1408,36 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiRuns(Request $r) {
-
 		// Authenticate request
 		self::authenticateRequest($r);
 
 		// Validate request
 		self::validateRuns($r);
 
-		$runs_mask = null;
-
-		// Get all runs for problem given
-		$runs_mask = new Runs(array(
-					"contest_id" => $r["contest"]->getContestId(),
-					"status" => $r["status"],
-					"veredict" => $r["veredict"],
-					"problem_id" => !is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
-					"language" => $r["language"],
-					"user_id" => !is_null($r["user"]) ? $r["user"]->getUserId() : null,
-				));
-
-		// Filter relevant columns
-		$relevant_columns = array("run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
-
 		// Get our runs
 		try {
-			$runs = RunsDAO::search($runs_mask, "time", "DESC", $r["offset"], $r["rowcount"]);
+			$runs = RunsDAO::GetAllRunsInContest(
+				$r["contest"]->getContestId(),
+				$r["status"],
+				$r["veredict"],
+				!is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
+				$r["language"],
+				!is_null($r["user"]) ? $r["user"]->getUserId() : null,
+				$r["offset"],
+				$r["rowcount"]
+			);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		$relevant_columns[11] = 'username';
-		$relevant_columns[12] = 'alias';
-
 		$result = array();
 
 		foreach ($runs as $run) {
-			$filtered = $run->asFilteredArray($relevant_columns);
-			$filtered['time'] = strtotime($filtered['time']);
-			$filtered['score'] = round((float) $filtered['score'], 4);
-			$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
-			array_push($result, $filtered);
+			$run['time'] = (int)$run['time'];
+			$run['score'] = round((float)$run['score'], 4);
+			$run['contest_score'] = round((float)$run['contest_score'], 2);
+			array_push($result, $run);
 		}
 
 		$response = array();

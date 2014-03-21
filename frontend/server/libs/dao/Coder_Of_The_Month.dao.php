@@ -43,26 +43,17 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 		}
 		
 		$sql = "
-			SELECT COUNT( * ) TotalSolved, Users . user_id 
+			SELECT COUNT(*) TotalSolved, Users.user_id
 			FROM (
-
-
-				SELECT user_id, problem_id, COUNT( * ) AS Total
-
+				SELECT user_id, problem_id, COUNT(*) AS Total
 				FROM Runs
-
 				WHERE TIME >= ?
-
 				AND TIME <= ?
-
 				AND veredict = 'AC'
-
 				AND Test =0
-
 				GROUP BY user_id, problem_id
-
 				ORDER BY Total DESC
-				) T
+			) T
 			INNER JOIN Users ON T.user_id = Users.user_id
 			GROUP BY T.user_id
 			ORDER BY TotalSolved DESC 
@@ -77,10 +68,9 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			return NULL;
 		}
 		
-		$totalCount = $rs[0];				
-		$user = UsersDAO::getByPK($rs[1]);
+		$totalCount = $rs['TotalSolved'];
+		$user = UsersDAO::getByPK($rs['user_id']);
 
 		return array("totalCount" => $totalCount, "user" => $user);
 	}
-
 }

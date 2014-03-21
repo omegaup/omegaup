@@ -83,21 +83,21 @@ class Utils {
 		// Go to the DB 
 		global $conn;
 
-		$sql = "SELECT NOW()";
+		$sql = "SELECT NOW() n";
 		$rs = $conn->GetRow($sql);
 
 		if (count($rs) === 0) {
 			return NULL;
 		}
 
-		return $rs[0];
+		return $rs['n'];
 	}
 
-	static function GetTimeFromUnixTimestam($time) {
+	static function GetTimeFromUnixTimestamp($time) {
 		// Go to the DB to take the unix timestamp
 		global $conn;
 
-		$sql = "SELECT FROM_UNIXTIME(?)";
+		$sql = "SELECT FROM_UNIXTIME(?) t";
 		$params = array($time);
 		$rs = $conn->GetRow($sql, $params);
 
@@ -105,12 +105,12 @@ class Utils {
 			return NULL;
 		}
 
-		return $rs[0];
+		return $rs['t'];
 	}
 
 	static function getNextTime() {
 		self::$counttime++;
-		return Utils::GetTimeFromUnixTimestam(self::$inittime + self::$counttime);
+		return Utils::GetTimeFromUnixTimestamp(self::$inittime + self::$counttime);
 	}
 
 	static function CleanLog() {

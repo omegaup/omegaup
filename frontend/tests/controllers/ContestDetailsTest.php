@@ -293,7 +293,7 @@ class DetailsContest extends OmegaupTestCase {
 
 		// Set contest to not started yet
 		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
-		$contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 30));		
+		$contest->setStartTime(Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 30));
 		ContestsDAO::save($contest);
 
 		// Prepare our request

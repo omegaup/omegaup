@@ -37,13 +37,12 @@ class ContestRunsTest extends OmegaupTestCase {
 		$r["auth_token"] = $this->login($contestData["director"]);
 		
 		// Call API
-		$response = ContestController::apiRuns($r);						
-		
+		$response = ContestController::apiRuns($r);
+
 		// Assert
 		$this->assertEquals(1, count($response["runs"]));
 		$this->assertEquals($runData["response"]["guid"], $response["runs"][0]["guid"]);
-		$this->assertEquals($contestantData->username, $response["runs"][0]["username"]);
-		$this->assertEquals($problemData->alias, $response["runs"][0]["alias"]);
+		$this->assertEquals($contestant->username, $response["runs"][0]["username"]);
 	}
 }
 

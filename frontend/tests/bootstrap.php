@@ -40,4 +40,3 @@ Utils::CleanupDB();
 UserController::$sendEmailOnVerify = false;
 UserFactory::createUser("test", "testtesttest");
 UserController::$sendEmailOnVerify = true;
-
