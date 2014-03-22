@@ -1,4 +1,4 @@
-<?
+<?php
 include('../server/bootstrap.php');
 
 $r = new Request($_REQUEST);

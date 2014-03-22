@@ -37,6 +37,7 @@ try_define('OMEGAUP_EXPIRE_TOKEN_AFTER',			'8 HOUR');
 # GRADER CONFIG
 # ####################################
 try_define('OMEGAUP_GRADER_URL',				'https://localhost:21680/grade/');
+try_define('OMEGAUP_GRADER_SECRET', 'secret');
 try_define('OMEGAUP_SSLCERT_URL',				'/opt/omegaup/frontend/omegaup.pem');
 try_define('OMEGAUP_CACERT_URL',				'/opt/omegaup/frontend/omegaup.pem');
 try_define('RUNS_PATH',					'/var/lib/omegaup/submissions');
