@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `Clarifications` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `CoderOfTheMonth`
+-- Estructura de tabla para la tabla `Coder_Of_The_Month`
 --
 
 CREATE TABLE IF NOT EXISTS `Coder_Of_The_Month` (
@@ -548,9 +548,9 @@ ALTER TABLE `Clarifications`
   ADD CONSTRAINT `fk_cu_author_id` FOREIGN KEY (`author_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Filtros para la tabla `Coder_of_the_Month`
+-- Filtros para la tabla `Coder_Of_The_Month`
 --
-ALTER TABLE `Coder_of_the_Month`
+ALTER TABLE `Coder_Of_The_Month`
   ADD CONSTRAINT `fk_cotmu_coder_of_the_month_id` FOREIGN KEY (`coder_of_the_month_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --

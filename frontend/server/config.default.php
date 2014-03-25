@@ -1,6 +1,8 @@
 <?php
-function try_define($name, $value) {
-	if (!defined($name)) define($name, $value);
+if (!function_exists('try_define')) {
+	function try_define($name, $value) {
+		if (!defined($name)) define($name, $value);
+	}
 }
 # ###################################
 # GLOBAL CONFIG
