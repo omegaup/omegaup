@@ -35,7 +35,7 @@ class RunController extends Controller {
 	 * @throws InvalidParameterException
 	 * @throws ForbiddenAccessException
 	 */
-	private static function validateCreateRequest(Request &$r) {
+	private static function validateCreateRequest(Request $r) {
 		try {
 			Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
@@ -83,7 +83,7 @@ class RunController extends Controller {
 				}
 
 				// Validate that the run is timely inside contest
-				if (!$r["contest"]->isInsideContest($r["current_user_id"])) {
+				if (!ContestsDAO::isInsideContest($r["contest"], $r['current_user_id'])) {
 					throw new NotAllowedToSubmitException("Contest time has expired or not started yet.");
 				}
 
@@ -104,7 +104,7 @@ class RunController extends Controller {
 			// Propagate ApiException
 			throw $apiException;
 		} catch (Exception $e) {
-			// Operation failed in the data layer			
+			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 	}
@@ -214,8 +214,7 @@ class RunController extends Controller {
 			
 			// Update submissions counter++
 			$r["problem"]->setSubmissions($r["problem"]->getSubmissions() + 1);
-			$problem = $r['problem'];
-			ProblemsDAO::save($problem);
+			ProblemsDAO::save($r["problem"]);
 			
 		} catch (Exception $e) {
 			// Operation failed in the data layer

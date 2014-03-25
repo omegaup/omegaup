@@ -1,37 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Favorites Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Favorites }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class FavoritesDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $user_id, $problem_id ){
-			$pk = "";
-			$pk .= $user_id . "-";
-			$pk .= $problem_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $user_id, $problem_id){
-			$pk = "";
-			$pk .= $user_id . "-";
-			$pk .= $problem_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $user_id, $problem_id ){
-			$pk = "";
-			$pk .= $user_id . "-";
-			$pk .= $problem_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -45,13 +32,13 @@ abstract class FavoritesDAOBase extends DAO
 	  * @param Favorites [$Favorites] El objeto de tipo Favorites
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Favorites )
+	public static final function save( $Favorites )
 	{
-		if(  self::getByPK(  $Favorites->getUserId() , $Favorites->getProblemId() ) !== NULL )
+		if (!is_null(self::getByPK( $Favorites->getUserId() , $Favorites->getProblemId() )))
 		{
-			try{ return FavoritesDAOBase::update( $Favorites) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return FavoritesDAOBase::create( $Favorites) ; } catch(Exception $e){ throw $e; }
+			return FavoritesDAOBase::update( $Favorites);
+		} else {
+			return FavoritesDAOBase::create( $Favorites);
 		}
 	}
 
@@ -67,19 +54,15 @@ abstract class FavoritesDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $user_id, $problem_id )
 	{
-		if(self::recordExists(  $user_id, $problem_id)){
-			return self::getRecord( $user_id, $problem_id );
-		}
+		if(  is_null( $user_id ) || is_null( $problem_id )  ){ return NULL; }
 		$sql = "SELECT * FROM Favorites WHERE (user_id = ? AND problem_id = ? ) LIMIT 1;";
 		$params = array(  $user_id, $problem_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Favorites( $rs );
-			self::pushRecord( $foo,  $user_id, $problem_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Favorites( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -99,9 +82,9 @@ abstract class FavoritesDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Favorites";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -111,9 +94,6 @@ abstract class FavoritesDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Favorites($foo);
     		array_push( $allData, $bar);
-			//user_id
-			//problem_id
-    		self::pushRecord( $bar, $foo["user_id"],$foo["problem_id"] );
 		}
 		return $allData;
 	}
@@ -143,53 +123,58 @@ abstract class FavoritesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Favorites , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Favorites , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Favorites instanceof Favorites)) {
+			return self::search(new Favorites($Favorites));
+		}
+
 		$sql = "SELECT * from Favorites WHERE ("; 
 		$val = array();
-		if( $Favorites->getUserId() != NULL){
-			$sql .= " user_id = ? AND";
+		if (!is_null( $Favorites->getUserId())) {
+			$sql .= " `user_id` = ? AND";
 			array_push( $val, $Favorites->getUserId() );
 		}
-
-		if( $Favorites->getProblemId() != NULL){
-			$sql .= " problem_id = ? AND";
+		if (!is_null( $Favorites->getProblemId())) {
+			$sql .= " `problem_id` = ? AND";
 			array_push( $val, $Favorites->getProblemId() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Favorites($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["user_id"],$foo["problem_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Favorites [$Favorites] El objeto de tipo Favorites a actualizar.
 	  **/
-	private static final function update( $Favorites )
+	private static final function update($Favorites)
 	{
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -200,26 +185,23 @@ abstract class FavoritesDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Favorites dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Favorites [$Favorites] El objeto de tipo Favorites a crear.
 	  **/
-	private static final function create( &$Favorites )
+	private static final function create( $Favorites )
 	{
-		$sql = "INSERT INTO Favorites ( user_id, problem_id ) VALUES ( ?, ?);";
+		$sql = "INSERT INTO Favorites ( `user_id`, `problem_id` ) VALUES ( ?, ?);";
 		$params = array( 
-			$Favorites->getUserId(), 
-			$Favorites->getProblemId(), 
+			$Favorites->user_id,
+			$Favorites->problem_id,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */   /*  */ 
+ 
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -227,7 +209,7 @@ abstract class FavoritesDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Favorites} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Favorites}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -258,42 +240,41 @@ abstract class FavoritesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Favorites WHERE ("; 
 		$val = array();
-		if( (($a = $FavoritesA->getUserId()) != NULL) & ( ($b = $FavoritesB->getUserId()) != NULL) ){
-				$sql .= " user_id >= ? AND user_id <= ? AND";
+		if( ( !is_null (($a = $FavoritesA->getUserId()) ) ) & ( ! is_null ( ($b = $FavoritesB->getUserId()) ) ) ){
+				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " user_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `user_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $FavoritesA->getProblemId()) != NULL) & ( ($b = $FavoritesB->getProblemId()) != NULL) ){
-				$sql .= " problem_id >= ? AND problem_id <= ? AND";
+		if( ( !is_null (($a = $FavoritesA->getProblemId()) ) ) & ( ! is_null ( ($b = $FavoritesB->getProblemId()) ) ) ){
+				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " problem_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `problem_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Favorites($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Favorites($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -308,9 +289,9 @@ abstract class FavoritesDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Favorites [$Favorites] El objeto de tipo Favorites a eliminar
 	  **/
-	public static final function delete( &$Favorites )
+	public static final function delete( $Favorites )
 	{
-		if(self::getByPK($Favorites->getUserId(), $Favorites->getProblemId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Favorites->getUserId(), $Favorites->getProblemId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Favorites WHERE  user_id = ? AND problem_id = ?;";
 		$params = array( $Favorites->getUserId(), $Favorites->getProblemId() );
 		global $conn;

@@ -19,7 +19,6 @@ class UserFactory {
     * @return user (DAO)
     */
     public static function createUser($username = null, $password = null, $email = null, $verify = true) {
-        DAO::$useDAOCache = false;
 		
 		// If data is not provided, generate it randomly
         if (is_null($username)) {

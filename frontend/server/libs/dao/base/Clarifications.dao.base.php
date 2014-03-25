@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Clarifications Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Clarifications }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class ClarificationsDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $clarification_id ){
-			$pk = "";
-			$pk .= $clarification_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $clarification_id){
-			$pk = "";
-			$pk .= $clarification_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $clarification_id ){
-			$pk = "";
-			$pk .= $clarification_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -42,13 +32,13 @@ abstract class ClarificationsDAOBase extends DAO
 	  * @param Clarifications [$Clarifications] El objeto de tipo Clarifications
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Clarifications )
+	public static final function save( $Clarifications )
 	{
-		if(  self::getByPK(  $Clarifications->getClarificationId() ) !== NULL )
+		if (!is_null(self::getByPK( $Clarifications->getClarificationId() )))
 		{
-			try{ return ClarificationsDAOBase::update( $Clarifications) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return ClarificationsDAOBase::create( $Clarifications) ; } catch(Exception $e){ throw $e; }
+			return ClarificationsDAOBase::update( $Clarifications);
+		} else {
+			return ClarificationsDAOBase::create( $Clarifications);
 		}
 	}
 
@@ -64,19 +54,15 @@ abstract class ClarificationsDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $clarification_id )
 	{
-		if(self::recordExists(  $clarification_id)){
-			return self::getRecord( $clarification_id );
-		}
+		if(  is_null( $clarification_id )  ){ return NULL; }
 		$sql = "SELECT * FROM Clarifications WHERE (clarification_id = ? ) LIMIT 1;";
 		$params = array(  $clarification_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Clarifications( $rs );
-			self::pushRecord( $foo,  $clarification_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Clarifications( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -96,9 +82,9 @@ abstract class ClarificationsDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Clarifications";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -108,8 +94,6 @@ abstract class ClarificationsDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Clarifications($foo);
     		array_push( $allData, $bar);
-			//clarification_id
-    		self::pushRecord( $bar, $foo["clarification_id"] );
 		}
 		return $allData;
 	}
@@ -139,97 +123,95 @@ abstract class ClarificationsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Clarifications , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Clarifications , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
-		$sql = "SELECT c.*, p.alias as problem_alias from Clarifications AS c LEFT JOIN Problems AS p ON p.problem_id = c.problem_id WHERE ("; 
+		if (!($Clarifications instanceof Clarifications)) {
+			return self::search(new Clarifications($Clarifications));
+		}
+
+		$sql = "SELECT * from Clarifications WHERE ("; 
 		$val = array();
-		if( $Clarifications->getClarificationId() != NULL){
-			$sql .= " clarification_id = ? AND";
+		if (!is_null( $Clarifications->getClarificationId())) {
+			$sql .= " `clarification_id` = ? AND";
 			array_push( $val, $Clarifications->getClarificationId() );
 		}
-
-		if( $Clarifications->getAuthorId() != NULL){
-			$sql .= " c.author_id = ? AND";
+		if (!is_null( $Clarifications->getAuthorId())) {
+			$sql .= " `author_id` = ? AND";
 			array_push( $val, $Clarifications->getAuthorId() );
 		}
-
-		if( $Clarifications->getMessage() != NULL){
-			$sql .= " message = ? AND";
+		if (!is_null( $Clarifications->getMessage())) {
+			$sql .= " `message` = ? AND";
 			array_push( $val, $Clarifications->getMessage() );
 		}
-
-		if( $Clarifications->getAnswer() != NULL){
-			$sql .= " answer = ? AND";
+		if (!is_null( $Clarifications->getAnswer())) {
+			$sql .= " `answer` = ? AND";
 			array_push( $val, $Clarifications->getAnswer() );
 		}
-
-		if( $Clarifications->getTime() != NULL){
-			$sql .= " time = ? AND";
+		if (!is_null( $Clarifications->getTime())) {
+			$sql .= " `time` = ? AND";
 			array_push( $val, $Clarifications->getTime() );
 		}
-
-		if( $Clarifications->getProblemId() != NULL){
-			$sql .= " c.problem_id = ? AND";
+		if (!is_null( $Clarifications->getProblemId())) {
+			$sql .= " `problem_id` = ? AND";
 			array_push( $val, $Clarifications->getProblemId() );
 		}
-
-		if( $Clarifications->getContestId() != NULL){
-			$sql .= " contest_id = ? AND";
+		if (!is_null( $Clarifications->getContestId())) {
+			$sql .= " `contest_id` = ? AND";
 			array_push( $val, $Clarifications->getContestId() );
 		}
-
-		if( $Clarifications->getPublic() != NULL){
-			$sql .= " c.public = ? AND";
+		if (!is_null( $Clarifications->getPublic())) {
+			$sql .= " `public` = ? AND";
 			array_push( $val, $Clarifications->getPublic() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Clarifications($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["clarification_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu�ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Clarifications [$Clarifications] El objeto de tipo Clarifications a actualizar.
 	  **/
-	private static final function update( $Clarifications )
+	private static final function update($Clarifications)
 	{
-		$sql = "UPDATE Clarifications SET  author_id = ?, message = ?, answer = ?, time = ?, problem_id = ?, contest_id = ?, public = ? WHERE  clarification_id = ?;";
+		$sql = "UPDATE Clarifications SET  `author_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `contest_id` = ?, `public` = ? WHERE  `clarification_id` = ?;";
 		$params = array( 
 			$Clarifications->getAuthorId(), 
 			$Clarifications->getMessage(), 
 			$Clarifications->getAnswer(), 
-                        $Clarifications->getTime(), 
+			$Clarifications->getTime(), 
 			$Clarifications->getProblemId(), 
 			$Clarifications->getContestId(), 
 			$Clarifications->getPublic(), 
 			$Clarifications->getClarificationId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -240,32 +222,32 @@ abstract class ClarificationsDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Clarifications dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Clarifications [$Clarifications] El objeto de tipo Clarifications a crear.
 	  **/
-	private static final function create( &$Clarifications )
+	private static final function create( $Clarifications )
 	{
-		$sql = "INSERT INTO Clarifications ( clarification_id, author_id, message, answer, time, problem_id, contest_id, public ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Clarifications->time)) $Clarifications->time = gmdate('Y-m-d H:i:s');
+		if (is_null($Clarifications->public)) $Clarifications->public = '0';
+		$sql = "INSERT INTO Clarifications ( `clarification_id`, `author_id`, `message`, `answer`, `time`, `problem_id`, `contest_id`, `public` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Clarifications->getClarificationId(), 
-			$Clarifications->getAuthorId(), 
-			$Clarifications->getMessage(), 
-			$Clarifications->getAnswer(), 
-			$Clarifications->getTime(), 
-			$Clarifications->getProblemId(), 
-			$Clarifications->getContestId(), 
-			$Clarifications->getPublic(), 
+			$Clarifications->clarification_id,
+			$Clarifications->author_id,
+			$Clarifications->message,
+			$Clarifications->answer,
+			$Clarifications->time,
+			$Clarifications->problem_id,
+			$Clarifications->contest_id,
+			$Clarifications->public,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */  $Clarifications->setClarificationId( $conn->Insert_ID() ); /*  */ 
+ 		$Clarifications->clarification_id = $conn->Insert_ID();
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -273,7 +255,7 @@ abstract class ClarificationsDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Clarifications} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Clarifications}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -304,108 +286,107 @@ abstract class ClarificationsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Clarifications WHERE ("; 
 		$val = array();
-		if( (($a = $ClarificationsA->getClarificationId()) != NULL) & ( ($b = $ClarificationsB->getClarificationId()) != NULL) ){
-				$sql .= " clarification_id >= ? AND clarification_id <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->getClarificationId()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getClarificationId()) ) ) ){
+				$sql .= " `clarification_id` >= ? AND `clarification_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " clarification_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `clarification_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ClarificationsA->getAuthorId()) != NULL) & ( ($b = $ClarificationsB->getAuthorId()) != NULL) ){
-				$sql .= " author_id >= ? AND author_id <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->getAuthorId()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getAuthorId()) ) ) ){
+				$sql .= " `author_id` >= ? AND `author_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " author_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `author_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ClarificationsA->getMessage()) != NULL) & ( ($b = $ClarificationsB->getMessage()) != NULL) ){
-				$sql .= " message >= ? AND message <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->getMessage()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getMessage()) ) ) ){
+				$sql .= " `message` >= ? AND `message` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " message = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `message` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ClarificationsA->getAnswer()) != NULL) & ( ($b = $ClarificationsB->getAnswer()) != NULL) ){
-				$sql .= " answer >= ? AND answer <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->getAnswer()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getAnswer()) ) ) ){
+				$sql .= " `answer` >= ? AND `answer` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " answer = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `answer` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ClarificationsA->getTime()) != NULL) & ( ($b = $ClarificationsB->getTime()) != NULL) ){
-				$sql .= " time >= ? AND time <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->getTime()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getTime()) ) ) ){
+				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " time = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `time` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ClarificationsA->getProblemId()) != NULL) & ( ($b = $ClarificationsB->getProblemId()) != NULL) ){
-				$sql .= " problem_id >= ? AND problem_id <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->getProblemId()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getProblemId()) ) ) ){
+				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " problem_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `problem_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ClarificationsA->getContestId()) != NULL) & ( ($b = $ClarificationsB->getContestId()) != NULL) ){
-				$sql .= " contest_id >= ? AND contest_id <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->getContestId()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getContestId()) ) ) ){
+				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " contest_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `contest_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $ClarificationsA->getPublic()) != NULL) & ( ($b = $ClarificationsB->getPublic()) != NULL) ){
-				$sql .= " public >= ? AND public <= ? AND";
+		if( ( !is_null (($a = $ClarificationsA->getPublic()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getPublic()) ) ) ){
+				$sql .= " `public` >= ? AND `public` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " public = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `public` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Clarifications($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Clarifications($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -420,9 +401,9 @@ abstract class ClarificationsDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Clarifications [$Clarifications] El objeto de tipo Clarifications a eliminar
 	  **/
-	public static final function delete( &$Clarifications )
+	public static final function delete( $Clarifications )
 	{
-		if(self::getByPK($Clarifications->getClarificationId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Clarifications->getClarificationId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Clarifications WHERE  clarification_id = ?;";
 		$params = array( $Clarifications->getClarificationId() );
 		global $conn;

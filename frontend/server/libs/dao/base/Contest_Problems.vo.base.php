@@ -1,25 +1,37 @@
 <?php
 
-/** Value Object file for table Contest_Problems.
- * 
- * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
- * @author alanboy
- * @access public
- * @package docs
- * 
- */
-class ContestProblems extends VO {
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
 
+/** Value Object file for table Contest_Problems.
+  * 
+  * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
+  * @access public
+  * 
+  */
+
+class ContestProblems extends VO
+{
 	/**
-	 * Constructor de ContestProblems
-	 * 
-	 * Para construir un objeto de tipo ContestProblems debera llamarse a el constructor 
-	 * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
-	 * cuyos campos son iguales a las variables que constituyen a este objeto.
-	 * @return ContestProblems
-	 */
-	function __construct($data = NULL) {
-		if (isset($data)) {
+	  * Constructor de ContestProblems
+	  * 
+	  * Para construir un objeto de tipo ContestProblems debera llamarse a el constructor 
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  * cuyos campos son iguales a las variables que constituyen a este objeto.
+	  */
+	function __construct($data = NULL)
+	{
+		if (isset($data))
+		{
+			if (is_string($data))
+				$data = self::object_to_array(json_decode($data));
+
+
 			if (isset($data['contest_id'])) {
 				$this->contest_id = $data['contest_id'];
 			}
@@ -36,127 +48,60 @@ class ContestProblems extends VO {
 	}
 
 	/**
-	 * Obtener una representacion en String
-	 * 
-	 * Este metodo permite tratar a un objeto ContestProblems en forma de cadena.
-	 * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	 * @return String 
-	 */
-	public function __toString() {
-		$vec = array(
+	  * Obtener una representacion en String
+	  * 
+	  * Este metodo permite tratar a un objeto ContestProblems en forma de cadena.
+	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
+	  * @return String 
+	  */
+	public function __toString( )
+	{ 
+		$vec = array( 
 			"contest_id" => $this->contest_id,
 			"problem_id" => $this->problem_id,
-			"points" => $this->points
-		);
-		return json_encode($vec);
+			"points" => $this->points,
+			"order" => $this->order
+		); 
+	return json_encode($vec); 
 	}
 
 	/**
-	 * contest_id
-	 * 
-	 *  [Campo no documentado]<br>
-	 * <b>Llave Primaria</b><br>
-	 * @access protected
-	 * @var int(11)
-	 */
-	protected $contest_id;
-
-	/**
-	 * problem_id
-	 * 
-	 *  [Campo no documentado]<br>
-	 * <b>Llave Primaria</b><br>
-	 * @access protected
-	 * @var int(11)
-	 */
-	protected $problem_id;
-
-	/**
-	 * points
-	 * 
-	 *  [Campo no documentado]<br>
-	 * @access protected
-	 * @var double
-	 */
-	protected $points;
-	protected $order;
-
-	/**
-	 * getContestId
-	 * 
-	 * Get the <i>contest_id</i> property for this object. Donde <i>contest_id</i> es  [Campo no documentado]
-	 * @return int(11)
-	 */
-	final public function getContestId() {
-		return $this->contest_id;
+	 * Converts date fields to timestamps
+	 **/
+	public function toUnixTime(array $fields = array()) {
+		if (count($fields) > 0)
+			parent::toUnixTime($fields);
+		else
+			parent::toUnixTime(array());
 	}
 
 	/**
-	 * setContestId( $contest_id )
-	 * 
-	 * Set the <i>contest_id</i> property for this object. Donde <i>contest_id</i> es  [Campo no documentado].
-	 * Una validacion basica se hara aqui para comprobar que <i>contest_id</i> es de tipo <i>int(11)</i>. 
-	 * Si esta validacion falla, se arrojara... algo. 
-	 * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
-	 * No deberias usar setContestId( ) a menos que sepas exactamente lo que estas haciendo.<br>
-	 * @param int(11)
-	 */
-	final public function setContestId($contest_id) {
-		$this->contest_id = $contest_id;
-	}
+	  *  [Campo no documentado]
+	  * Llave Primaria
+	  * @access public
+	  * @var int(11)
+	  */
+	public $contest_id;
 
 	/**
-	 * getProblemId
-	 * 
-	 * Get the <i>problem_id</i> property for this object. Donde <i>problem_id</i> es  [Campo no documentado]
-	 * @return int(11)
-	 */
-	final public function getProblemId() {
-		return $this->problem_id;
-	}
+	  *  [Campo no documentado]
+	  * Llave Primaria
+	  * @access public
+	  * @var int(11)
+	  */
+	public $problem_id;
 
 	/**
-	 * setProblemId( $problem_id )
-	 * 
-	 * Set the <i>problem_id</i> property for this object. Donde <i>problem_id</i> es  [Campo no documentado].
-	 * Una validacion basica se hara aqui para comprobar que <i>problem_id</i> es de tipo <i>int(11)</i>. 
-	 * Si esta validacion falla, se arrojara... algo. 
-	 * <br><br>Esta propiedad se mapea con un campo que es una <b>Llave Primaria</b> !<br>
-	 * No deberias usar setProblemId( ) a menos que sepas exactamente lo que estas haciendo.<br>
-	 * @param int(11)
-	 */
-	final public function setProblemId($problem_id) {
-		$this->problem_id = $problem_id;
-	}
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var double
+	  */
+	public $points;
 
 	/**
-	 * getPoints
-	 * 
-	 * Get the <i>points</i> property for this object. Donde <i>points</i> es  [Campo no documentado]
-	 * @return double
-	 */
-	final public function getPoints() {
-		return $this->points;
-	}
-
-	/**
-	 * setPoints( $points )
-	 * 
-	 * Set the <i>points</i> property for this object. Donde <i>points</i> es  [Campo no documentado].
-	 * Una validacion basica se hara aqui para comprobar que <i>points</i> es de tipo <i>double</i>. 
-	 * Si esta validacion falla, se arrojara... algo. 
-	 * @param double
-	 */
-	final public function setPoints($points) {
-		$this->points = $points;
-	}
-
-	final public function getOrder() {
-		return $this->order;
-	}
-
-	final public function serOrder($order) {
-		$this->order = $order;
-	}
-
+	  * Define el orden de aparición de los problemas en un concurso
+	  * @access public
+	  * @var INT
+	  */
+	public $order;
 }

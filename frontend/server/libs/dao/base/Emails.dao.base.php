@@ -1,35 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Emails Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Emails }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class EmailsDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $email_id ){
-			return false;			
-			$pk = "";
-			$pk .= $email_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $email_id){
-			$pk = "";
-			$pk .= $email_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $email_id ){
-			$pk = "";
-			$pk .= $email_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -43,13 +32,13 @@ abstract class EmailsDAOBase extends DAO
 	  * @param Emails [$Emails] El objeto de tipo Emails
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Emails )
+	public static final function save( $Emails )
 	{
-		if(  self::getByPK(  $Emails->getEmailId() ) !== NULL )
+		if (!is_null(self::getByPK( $Emails->getEmailId() )))
 		{
-			try{ return EmailsDAOBase::update( $Emails) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return EmailsDAOBase::create( $Emails) ; } catch(Exception $e){ throw $e; }
+			return EmailsDAOBase::update( $Emails);
+		} else {
+			return EmailsDAOBase::create( $Emails);
 		}
 	}
 
@@ -65,19 +54,15 @@ abstract class EmailsDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $email_id )
 	{
-		if(self::recordExists(  $email_id)){
-			return self::getRecord( $email_id );
-		}
+		if(  is_null( $email_id )  ){ return NULL; }
 		$sql = "SELECT * FROM Emails WHERE (email_id = ? ) LIMIT 1;";
 		$params = array(  $email_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Emails( $rs );
-			self::pushRecord( $foo,  $email_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Emails( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -97,9 +82,9 @@ abstract class EmailsDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Emails";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -109,8 +94,6 @@ abstract class EmailsDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Emails($foo);
     		array_push( $allData, $bar);
-			//email_id
-    		self::pushRecord( $bar, $foo["email_id"] );
 		}
 		return $allData;
 	}
@@ -140,67 +123,70 @@ abstract class EmailsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Emails , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Emails , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Emails instanceof Emails)) {
+			return self::search(new Emails($Emails));
+		}
+
 		$sql = "SELECT * from Emails WHERE ("; 
 		$val = array();
-		if( $Emails->getEmailId() != NULL){
-			$sql .= " email_id = ? AND";
+		if (!is_null( $Emails->getEmailId())) {
+			$sql .= " `email_id` = ? AND";
 			array_push( $val, $Emails->getEmailId() );
 		}
-
-		if( $Emails->getEmail() != NULL){
-			$sql .= " email = ? AND";
+		if (!is_null( $Emails->getEmail())) {
+			$sql .= " `email` = ? AND";
 			array_push( $val, $Emails->getEmail() );
 		}
-
-		if( $Emails->getUserId() != NULL){
-			$sql .= " user_id = ? AND";
+		if (!is_null( $Emails->getUserId())) {
+			$sql .= " `user_id` = ? AND";
 			array_push( $val, $Emails->getUserId() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Emails($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["email_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Emails [$Emails] El objeto de tipo Emails a actualizar.
 	  **/
-	private static final function update( $Emails )
+	private static final function update($Emails)
 	{
-		$sql = "UPDATE Emails SET  email = ?, user_id = ? WHERE  email_id = ?;";
+		$sql = "UPDATE Emails SET  `email` = ?, `user_id` = ? WHERE  `email_id` = ?;";
 		$params = array( 
 			$Emails->getEmail(), 
 			$Emails->getUserId(), 
 			$Emails->getEmailId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -211,27 +197,25 @@ abstract class EmailsDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Emails dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Emails [$Emails] El objeto de tipo Emails a crear.
 	  **/
-	private static final function create( &$Emails )
+	private static final function create( $Emails )
 	{
-		$sql = "INSERT INTO Emails ( email_id, email, user_id ) VALUES ( ?, ?, ?);";
+		$sql = "INSERT INTO Emails ( `email_id`, `email`, `user_id` ) VALUES ( ?, ?, ?);";
 		$params = array( 
-			$Emails->getEmailId(), 
-			$Emails->getEmail(), 
-			$Emails->getUserId(), 
+			$Emails->email_id,
+			$Emails->email,
+			$Emails->user_id,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */ $Emails->setEmailId( $conn->Insert_ID() );   /*  */ 
+ 		$Emails->email_id = $conn->Insert_ID();
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -239,7 +223,7 @@ abstract class EmailsDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Emails} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Emails}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -270,53 +254,52 @@ abstract class EmailsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Emails WHERE ("; 
 		$val = array();
-		if( (($a = $EmailsA->getEmailId()) != NULL) & ( ($b = $EmailsB->getEmailId()) != NULL) ){
-				$sql .= " email_id >= ? AND email_id <= ? AND";
+		if( ( !is_null (($a = $EmailsA->getEmailId()) ) ) & ( ! is_null ( ($b = $EmailsB->getEmailId()) ) ) ){
+				$sql .= " `email_id` >= ? AND `email_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " email_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `email_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $EmailsA->getEmail()) != NULL) & ( ($b = $EmailsB->getEmail()) != NULL) ){
-				$sql .= " email >= ? AND email <= ? AND";
+		if( ( !is_null (($a = $EmailsA->getEmail()) ) ) & ( ! is_null ( ($b = $EmailsB->getEmail()) ) ) ){
+				$sql .= " `email` >= ? AND `email` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " email = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `email` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $EmailsA->getUserId()) != NULL) & ( ($b = $EmailsB->getUserId()) != NULL) ){
-				$sql .= " user_id >= ? AND user_id <= ? AND";
+		if( ( !is_null (($a = $EmailsA->getUserId()) ) ) & ( ! is_null ( ($b = $EmailsB->getUserId()) ) ) ){
+				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " user_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `user_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Emails($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Emails($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -331,9 +314,9 @@ abstract class EmailsDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Emails [$Emails] El objeto de tipo Emails a eliminar
 	  **/
-	public static final function delete( &$Emails )
+	public static final function delete( $Emails )
 	{
-		if(self::getByPK($Emails->getEmailId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Emails->getEmailId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Emails WHERE  email_id = ?;";
 		$params = array( $Emails->getEmailId() );
 		global $conn;

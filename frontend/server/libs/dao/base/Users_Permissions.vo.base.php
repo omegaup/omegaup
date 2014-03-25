@@ -8,19 +8,19 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Value Object file for table User_Roles.
+/** Value Object file for table Users_Permissions.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
   * 
   */
 
-class UserRoles extends VO
+class UsersPermissions extends VO
 {
 	/**
-	  * Constructor de UserRoles
+	  * Constructor de UsersPermissions
 	  * 
-	  * Para construir un objeto de tipo UserRoles debera llamarse a el constructor 
+	  * Para construir un objeto de tipo UsersPermissions debera llamarse a el constructor 
 	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
@@ -35,8 +35,8 @@ class UserRoles extends VO
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
 			}
-			if (isset($data['role_id'])) {
-				$this->role_id = $data['role_id'];
+			if (isset($data['permission_id'])) {
+				$this->permission_id = $data['permission_id'];
 			}
 			if (isset($data['contest_id'])) {
 				$this->contest_id = $data['contest_id'];
@@ -47,7 +47,7 @@ class UserRoles extends VO
 	/**
 	  * Obtener una representacion en String
 	  * 
-	  * Este metodo permite tratar a un objeto UserRoles en forma de cadena.
+	  * Este metodo permite tratar a un objeto UsersPermissions en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
 	  * @return String 
 	  */
@@ -55,7 +55,7 @@ class UserRoles extends VO
 	{ 
 		$vec = array( 
 			"user_id" => $this->user_id,
-			"role_id" => $this->role_id,
+			"permission_id" => $this->permission_id,
 			"contest_id" => $this->contest_id
 		); 
 	return json_encode($vec); 
@@ -85,11 +85,10 @@ class UserRoles extends VO
 	  * @access public
 	  * @var int(11)
 	  */
-	public $role_id;
+	public $permission_id;
 
 	/**
-	  *  [Campo no documentado]
-	  * Llave Primaria
+	  * Este permiso solo aplica en el contexto de un concurso.
 	  * @access public
 	  * @var int(11)
 	  */

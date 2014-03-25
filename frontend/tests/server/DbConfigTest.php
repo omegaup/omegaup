@@ -24,10 +24,10 @@ class DbConfigTest extends PHPUnit_Framework_TestCase
         // Go to the DB 
         global $conn;
         
-        $sql = "select timediff(now(),convert_tz(now(),@@session.time_zone,'+00:00'))";
+        $sql = "select timediff(now(),convert_tz(now(),@@session.time_zone,'+00:00')) d";
         $rs = $conn->GetRow($sql);                
         
-        $this->assertEquals("00:00:00", $rs[0]);
+        $this->assertEquals("00:00:00", $rs['d']);
     }
 }
 

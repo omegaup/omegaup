@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `Announcement` (
 CREATE TABLE IF NOT EXISTS `Auth_Tokens` (
   `user_id` int(11) NOT NULL,
   `token` varchar(128) NOT NULL,
+  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`token`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tokens de autorización para los logins.';
@@ -82,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `Clarifications` (
 -- Estructura de tabla para la tabla `CoderOfTheMonth`
 --
 
-CREATE TABLE IF NOT EXISTS `Coder_of_the_Month` (
+CREATE TABLE IF NOT EXISTS `Coder_Of_The_Month` (
   `coder_of_the_month_id` int(11) NOT NULL AUTO_INCREMENT,
   `description` tinytext,
   `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.',
@@ -117,6 +118,8 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `penalty_time_start` enum('contest','problem', 'none') NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
  `penalty_calc_policy` enum('sum', 'max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
  `show_scoreboard_after` BOOL NOT NULL DEFAULT  '1' COMMENT  'Mostrar el scoreboard automáticamente después del concurso',
+  `scoreboard_url` VARCHAR( 30 ) NULL DEFAULT NULL,
+  `scoreboard_url_admin` VARCHAR( 30 ) NULL DEFAULT NULL,
   PRIMARY KEY (`contest_id`),
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`),
@@ -417,8 +420,8 @@ CREATE TABLE IF NOT EXISTS `Runs` (
 --
 
 CREATE TABLE IF NOT EXISTS `Schools` (
-  `school_id` int(11) NOT NULL,
-  `state_id` int(11) NOT NULL,
+  `school_id` int(11) NOT NULL AUTO_INCREMENT,
+  `state_id` int(11) NULL,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`school_id`),
   KEY `state_id` (`state_id`)
@@ -431,8 +434,9 @@ CREATE TABLE IF NOT EXISTS `Schools` (
 --
 
 CREATE TABLE IF NOT EXISTS `States` (
-  `state_id` int(11) NOT NULL,
+  `state_id` int(11) NOT NULL AUTO_INCREMENT,
   `country_id` char(3) NOT NULL,
+  `state_code` CHAR( 3 ) NOT NULL,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`state_id`),
   KEY `country_id` (`country_id`)
@@ -461,6 +465,8 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `graduation_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
   `last_access` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `verified` BOOLEAN NOT NULL DEFAULT FALSE,
+  `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),
@@ -692,14 +698,6 @@ INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (1 ,  'ADMIN',  '
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (2 ,  'CONTEST_ADMIN',  'Contest admin');
 
 
-ALTER TABLE  `Auth_Tokens` ADD  `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
-
-ALTER TABLE  `Users` ADD  `verified` BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE  `Users` ADD  `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL;
-
-ALTER TABLE  `States` ADD  `state_code` CHAR( 3 ) NOT NULL AFTER  `country_id`;
-ALTER TABLE  `States` CHANGE  `state_id`  `state_id` INT( 11 ) NOT NULL AUTO_INCREMENT;
-
 --
 -- Update AC Count on grade
 --
@@ -710,12 +708,5 @@ CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs` FOR EACH ROW UPDATE  `Problems
 		AND NEW.`problem_id` =  `Runs`.`problem_id`
 		)
 WHERE NEW.problem_id =  `Problems`.`problem_id`;
-
-ALTER TABLE  `Schools` CHANGE  `state_id`  `state_id` INT( 11 ) NULL;
-ALTER TABLE  `Schools` CHANGE  `school_id`  `school_id` INT( 11 ) NOT NULL AUTO_INCREMENT;
-ALTER TABLE Runs CHANGE COLUMN language language enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11') NOT NULL;
-
-ALTER TABLE  `Contests` ADD  `scoreboard_url` VARCHAR( 30 ) NULL DEFAULT NULL;
-ALTER TABLE  `Contests` ADD  `scoreboard_url_admin` VARCHAR( 30 ) NULL DEFAULT NULL;
 
 COMMIT;

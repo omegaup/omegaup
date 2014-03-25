@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Messages Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Messages }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class MessagesDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $message_id ){
-			$pk = "";
-			$pk .= $message_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $message_id){
-			$pk = "";
-			$pk .= $message_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $message_id ){
-			$pk = "";
-			$pk .= $message_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -42,13 +32,13 @@ abstract class MessagesDAOBase extends DAO
 	  * @param Messages [$Messages] El objeto de tipo Messages
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Messages )
+	public static final function save( $Messages )
 	{
-		if(  self::getByPK(  $Messages->getMessageId() ) !== NULL )
+		if (!is_null(self::getByPK( $Messages->getMessageId() )))
 		{
-			try{ return MessagesDAOBase::update( $Messages) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return MessagesDAOBase::create( $Messages) ; } catch(Exception $e){ throw $e; }
+			return MessagesDAOBase::update( $Messages);
+		} else {
+			return MessagesDAOBase::create( $Messages);
 		}
 	}
 
@@ -64,19 +54,15 @@ abstract class MessagesDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $message_id )
 	{
-		if(self::recordExists(  $message_id)){
-			return self::getRecord( $message_id );
-		}
+		if(  is_null( $message_id )  ){ return NULL; }
 		$sql = "SELECT * FROM Messages WHERE (message_id = ? ) LIMIT 1;";
 		$params = array(  $message_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Messages( $rs );
-			self::pushRecord( $foo,  $message_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Messages( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -96,9 +82,9 @@ abstract class MessagesDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Messages";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -108,8 +94,6 @@ abstract class MessagesDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Messages($foo);
     		array_push( $allData, $bar);
-			//message_id
-    		self::pushRecord( $bar, $foo["message_id"] );
 		}
 		return $allData;
 	}
@@ -139,72 +123,74 @@ abstract class MessagesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Messages , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Messages , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Messages instanceof Messages)) {
+			return self::search(new Messages($Messages));
+		}
+
 		$sql = "SELECT * from Messages WHERE ("; 
 		$val = array();
-		if( $Messages->getMessageId() != NULL){
-			$sql .= " message_id = ? AND";
+		if (!is_null( $Messages->getMessageId())) {
+			$sql .= " `message_id` = ? AND";
 			array_push( $val, $Messages->getMessageId() );
 		}
-
-		if( $Messages->getRead() != NULL){
-			$sql .= " read = ? AND";
+		if (!is_null( $Messages->getRead())) {
+			$sql .= " `read` = ? AND";
 			array_push( $val, $Messages->getRead() );
 		}
-
-		if( $Messages->getSenderId() != NULL){
-			$sql .= " sender_id = ? AND";
+		if (!is_null( $Messages->getSenderId())) {
+			$sql .= " `sender_id` = ? AND";
 			array_push( $val, $Messages->getSenderId() );
 		}
-
-		if( $Messages->getRecipientId() != NULL){
-			$sql .= " recipient_id = ? AND";
+		if (!is_null( $Messages->getRecipientId())) {
+			$sql .= " `recipient_id` = ? AND";
 			array_push( $val, $Messages->getRecipientId() );
 		}
-
-		if( $Messages->getMessage() != NULL){
-			$sql .= " message = ? AND";
+		if (!is_null( $Messages->getMessage())) {
+			$sql .= " `message` = ? AND";
 			array_push( $val, $Messages->getMessage() );
 		}
-
-		if( $Messages->getDate() != NULL){
-			$sql .= " date = ? AND";
+		if (!is_null( $Messages->getDate())) {
+			$sql .= " `date` = ? AND";
 			array_push( $val, $Messages->getDate() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Messages($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["message_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Messages [$Messages] El objeto de tipo Messages a actualizar.
 	  **/
-	private static final function update( $Messages )
+	private static final function update($Messages)
 	{
-		$sql = "UPDATE Messages SET  read = ?, sender_id = ?, recipient_id = ?, message = ?, date = ? WHERE  message_id = ?;";
+		$sql = "UPDATE Messages SET  `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE  `message_id` = ?;";
 		$params = array( 
 			$Messages->getRead(), 
 			$Messages->getSenderId(), 
@@ -213,11 +199,9 @@ abstract class MessagesDAOBase extends DAO
 			$Messages->getDate(), 
 			$Messages->getMessageId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -228,30 +212,30 @@ abstract class MessagesDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Messages dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Messages [$Messages] El objeto de tipo Messages a crear.
 	  **/
-	private static final function create( &$Messages )
+	private static final function create( $Messages )
 	{
-		$sql = "INSERT INTO Messages ( message_id, read, sender_id, recipient_id, message, date ) VALUES ( ?, ?, ?, ?, ?, ?);";
+		if (is_null($Messages->read)) $Messages->read = '0';
+		if (is_null($Messages->date)) $Messages->date = gmdate('Y-m-d H:i:s');
+		$sql = "INSERT INTO Messages ( `message_id`, `read`, `sender_id`, `recipient_id`, `message`, `date` ) VALUES ( ?, ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Messages->getMessageId(), 
-			$Messages->getRead(), 
-			$Messages->getSenderId(), 
-			$Messages->getRecipientId(), 
-			$Messages->getMessage(), 
-			$Messages->getDate(), 
+			$Messages->message_id,
+			$Messages->read,
+			$Messages->sender_id,
+			$Messages->recipient_id,
+			$Messages->message,
+			$Messages->date,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */  $Messages->setMessageId( $conn->Insert_ID() ); /*  */ 
+ 		$Messages->message_id = $conn->Insert_ID();
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -259,7 +243,7 @@ abstract class MessagesDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Messages} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Messages}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -290,86 +274,85 @@ abstract class MessagesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Messages WHERE ("; 
 		$val = array();
-		if( (($a = $MessagesA->getMessageId()) != NULL) & ( ($b = $MessagesB->getMessageId()) != NULL) ){
-				$sql .= " message_id >= ? AND message_id <= ? AND";
+		if( ( !is_null (($a = $MessagesA->getMessageId()) ) ) & ( ! is_null ( ($b = $MessagesB->getMessageId()) ) ) ){
+				$sql .= " `message_id` >= ? AND `message_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " message_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `message_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $MessagesA->getRead()) != NULL) & ( ($b = $MessagesB->getRead()) != NULL) ){
-				$sql .= " read >= ? AND read <= ? AND";
+		if( ( !is_null (($a = $MessagesA->getRead()) ) ) & ( ! is_null ( ($b = $MessagesB->getRead()) ) ) ){
+				$sql .= " `read` >= ? AND `read` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " read = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `read` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $MessagesA->getSenderId()) != NULL) & ( ($b = $MessagesB->getSenderId()) != NULL) ){
-				$sql .= " sender_id >= ? AND sender_id <= ? AND";
+		if( ( !is_null (($a = $MessagesA->getSenderId()) ) ) & ( ! is_null ( ($b = $MessagesB->getSenderId()) ) ) ){
+				$sql .= " `sender_id` >= ? AND `sender_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " sender_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `sender_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $MessagesA->getRecipientId()) != NULL) & ( ($b = $MessagesB->getRecipientId()) != NULL) ){
-				$sql .= " recipient_id >= ? AND recipient_id <= ? AND";
+		if( ( !is_null (($a = $MessagesA->getRecipientId()) ) ) & ( ! is_null ( ($b = $MessagesB->getRecipientId()) ) ) ){
+				$sql .= " `recipient_id` >= ? AND `recipient_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " recipient_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `recipient_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $MessagesA->getMessage()) != NULL) & ( ($b = $MessagesB->getMessage()) != NULL) ){
-				$sql .= " message >= ? AND message <= ? AND";
+		if( ( !is_null (($a = $MessagesA->getMessage()) ) ) & ( ! is_null ( ($b = $MessagesB->getMessage()) ) ) ){
+				$sql .= " `message` >= ? AND `message` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " message = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `message` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $MessagesA->getDate()) != NULL) & ( ($b = $MessagesB->getDate()) != NULL) ){
-				$sql .= " date >= ? AND date <= ? AND";
+		if( ( !is_null (($a = $MessagesA->getDate()) ) ) & ( ! is_null ( ($b = $MessagesB->getDate()) ) ) ){
+				$sql .= " `date` >= ? AND `date` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " date = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `date` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Messages($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Messages($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -384,9 +367,9 @@ abstract class MessagesDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Messages [$Messages] El objeto de tipo Messages a eliminar
 	  **/
-	public static final function delete( &$Messages )
+	public static final function delete( $Messages )
 	{
-		if(self::getByPK($Messages->getMessageId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Messages->getMessageId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Messages WHERE  message_id = ?;";
 		$params = array( $Messages->getMessageId() );
 		global $conn;

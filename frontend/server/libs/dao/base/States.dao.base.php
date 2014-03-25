@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** States Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link States }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class StatesDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $state_id ){
-			$pk = "";
-			$pk .= $state_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $state_id){
-			$pk = "";
-			$pk .= $state_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $state_id ){
-			$pk = "";
-			$pk .= $state_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -42,13 +32,13 @@ abstract class StatesDAOBase extends DAO
 	  * @param States [$States] El objeto de tipo States
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$States )
+	public static final function save( $States )
 	{
-		if(  self::getByPK(  $States->getStateId() ) !== NULL )
+		if (!is_null(self::getByPK( $States->getStateId() )))
 		{
-			try{ return StatesDAOBase::update( $States) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return StatesDAOBase::create( $States) ; } catch(Exception $e){ throw $e; }
+			return StatesDAOBase::update( $States);
+		} else {
+			return StatesDAOBase::create( $States);
 		}
 	}
 
@@ -64,19 +54,15 @@ abstract class StatesDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $state_id )
 	{
-		if(self::recordExists(  $state_id)){
-			return self::getRecord( $state_id );
-		}
+		if(  is_null( $state_id )  ){ return NULL; }
 		$sql = "SELECT * FROM States WHERE (state_id = ? ) LIMIT 1;";
 		$params = array(  $state_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new States( $rs );
-			self::pushRecord( $foo,  $state_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new States( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -96,9 +82,9 @@ abstract class StatesDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from States";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -108,8 +94,6 @@ abstract class StatesDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new States($foo);
     		array_push( $allData, $bar);
-			//state_id
-    		self::pushRecord( $bar, $foo["state_id"] );
 		}
 		return $allData;
 	}
@@ -139,67 +123,75 @@ abstract class StatesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $States , $orderBy = null, $orden = 'ASC')
+	public static final function search( $States , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($States instanceof States)) {
+			return self::search(new States($States));
+		}
+
 		$sql = "SELECT * from States WHERE ("; 
 		$val = array();
-		if( $States->getStateId() != NULL){
-			$sql .= " state_id = ? AND";
+		if (!is_null( $States->getStateId())) {
+			$sql .= " `state_id` = ? AND";
 			array_push( $val, $States->getStateId() );
 		}
-
-		if( $States->getCountryId() != NULL){
-			$sql .= " country_id = ? AND";
+		if (!is_null( $States->getCountryId())) {
+			$sql .= " `country_id` = ? AND";
 			array_push( $val, $States->getCountryId() );
 		}
-
-		if( $States->getName() != NULL){
-			$sql .= " name = ? AND";
+		if (!is_null( $States->getStateCode())) {
+			$sql .= " `state_code` = ? AND";
+			array_push( $val, $States->getStateCode() );
+		}
+		if (!is_null( $States->getName())) {
+			$sql .= " `name` = ? AND";
 			array_push( $val, $States->getName() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new States($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["state_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param States [$States] El objeto de tipo States a actualizar.
 	  **/
-	private static final function update( $States )
+	private static final function update($States)
 	{
-		$sql = "UPDATE States SET  country_id = ?, name = ? WHERE  state_id = ?;";
+		$sql = "UPDATE States SET  `country_id` = ?, `state_code` = ?, `name` = ? WHERE  `state_id` = ?;";
 		$params = array( 
 			$States->getCountryId(), 
+			$States->getStateCode(), 
 			$States->getName(), 
 			$States->getStateId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -210,27 +202,26 @@ abstract class StatesDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto States dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param States [$States] El objeto de tipo States a crear.
 	  **/
-	private static final function create( &$States )
+	private static final function create( $States )
 	{
-		$sql = "INSERT INTO States ( state_id, country_id, name ) VALUES ( ?, ?, ?);";
+		$sql = "INSERT INTO States ( `state_id`, `country_id`, `state_code`, `name` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$States->getStateId(), 
-			$States->getCountryId(), 
-			$States->getName(), 
+			$States->state_id,
+			$States->country_id,
+			$States->state_code,
+			$States->name,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */   /*  */ 
+ 		$States->state_id = $conn->Insert_ID();
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -238,7 +229,7 @@ abstract class StatesDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link States} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link States}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -269,53 +260,63 @@ abstract class StatesDAOBase extends DAO
 	{
 		$sql = "SELECT * from States WHERE ("; 
 		$val = array();
-		if( (($a = $StatesA->getStateId()) != NULL) & ( ($b = $StatesB->getStateId()) != NULL) ){
-				$sql .= " state_id >= ? AND state_id <= ? AND";
+		if( ( !is_null (($a = $StatesA->getStateId()) ) ) & ( ! is_null ( ($b = $StatesB->getStateId()) ) ) ){
+				$sql .= " `state_id` >= ? AND `state_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " state_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `state_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $StatesA->getCountryId()) != NULL) & ( ($b = $StatesB->getCountryId()) != NULL) ){
-				$sql .= " country_id >= ? AND country_id <= ? AND";
+		if( ( !is_null (($a = $StatesA->getCountryId()) ) ) & ( ! is_null ( ($b = $StatesB->getCountryId()) ) ) ){
+				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " country_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `country_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $StatesA->getName()) != NULL) & ( ($b = $StatesB->getName()) != NULL) ){
-				$sql .= " name >= ? AND name <= ? AND";
+		if( ( !is_null (($a = $StatesA->getStateCode()) ) ) & ( ! is_null ( ($b = $StatesB->getStateCode()) ) ) ){
+				$sql .= " `state_code` >= ? AND `state_code` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " name = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `state_code` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $StatesA->getName()) ) ) & ( ! is_null ( ($b = $StatesB->getName()) ) ) ){
+				$sql .= " `name` >= ? AND `name` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `name` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new States($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new States($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -330,9 +331,9 @@ abstract class StatesDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param States [$States] El objeto de tipo States a eliminar
 	  **/
-	public static final function delete( &$States )
+	public static final function delete( $States )
 	{
-		if(self::getByPK($States->getStateId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($States->getStateId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM States WHERE  state_id = ?;";
 		$params = array( $States->getStateId() );
 		global $conn;

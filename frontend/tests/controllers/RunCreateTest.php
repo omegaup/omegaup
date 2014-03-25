@@ -133,7 +133,7 @@ class CreateRun extends OmegaupTestCase {
 
 		// Manually expire the contest		
 		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
-		$contest->setFinishTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() - 1));
+		$contest->setFinishTime(Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1));
 		ContestsDAO::save($contest);
 
 		// Call API
@@ -186,7 +186,7 @@ class CreateRun extends OmegaupTestCase {
 
 		// Manually expire contest
 		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
-		$contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 10));
+		$contest->setStartTime(Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10));
 		ContestsDAO::save($contest);
 
 		// Call API
@@ -200,9 +200,6 @@ class CreateRun extends OmegaupTestCase {
 	 * @expectedException NotAllowedToSubmitException 
 	 */
 	public function testInvalidRunInsideSubmissionsGap() {
-
-		// This API test requires DAO cache be turned off 
-		ContestsDAO::$useDAOCache = false;
 
 		// Set the context
 		$r = $this->setValidRequest();
@@ -377,7 +374,7 @@ class CreateRun extends OmegaupTestCase {
 		
 		// Manually set the contest	start 10 mins in the future
 		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
-		$contest->setStartTime(Utils::GetTimeFromUnixTimestam(Utils::GetPhpUnixTimestamp() + 10));
+		$contest->setStartTime(Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10));
 		ContestsDAO::save($contest);
 		
 		// Call API

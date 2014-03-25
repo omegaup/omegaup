@@ -123,6 +123,7 @@ try {
 	} else {
 		$conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 	}
+	$conn->SetFetchMode(ADODB_FETCH_ASSOC);
 } catch (Exception $databaseConectionException) {
 	Logger::error($databaseConectionException);
 
@@ -142,7 +143,6 @@ try {
 
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
-
 
 if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === TRUE)) {
 

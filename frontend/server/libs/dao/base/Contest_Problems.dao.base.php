@@ -1,37 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** ContestProblems Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link ContestProblems }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class ContestProblemsDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $contest_id, $problem_id ){
-			$pk = "";
-			$pk .= $contest_id . "-";
-			$pk .= $problem_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $contest_id, $problem_id){
-			$pk = "";
-			$pk .= $contest_id . "-";
-			$pk .= $problem_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $contest_id, $problem_id ){
-			$pk = "";
-			$pk .= $contest_id . "-";
-			$pk .= $problem_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -45,13 +32,13 @@ abstract class ContestProblemsDAOBase extends DAO
 	  * @param ContestProblems [$Contest_Problems] El objeto de tipo ContestProblems
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Contest_Problems )
+	public static final function save( $Contest_Problems )
 	{
-		if(  self::getByPK(  $Contest_Problems->getContestId() , $Contest_Problems->getProblemId() ) !== NULL )
+		if (!is_null(self::getByPK( $Contest_Problems->getContestId() , $Contest_Problems->getProblemId() )))
 		{
-			try{ return ContestProblemsDAOBase::update( $Contest_Problems) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return ContestProblemsDAOBase::create( $Contest_Problems) ; } catch(Exception $e){ throw $e; }
+			return ContestProblemsDAOBase::update( $Contest_Problems);
+		} else {
+			return ContestProblemsDAOBase::create( $Contest_Problems);
 		}
 	}
 
@@ -67,19 +54,15 @@ abstract class ContestProblemsDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $contest_id, $problem_id )
 	{
-		if(self::recordExists(  $contest_id, $problem_id)){
-			return self::getRecord( $contest_id, $problem_id );
-		}
+		if(  is_null( $contest_id ) || is_null( $problem_id )  ){ return NULL; }
 		$sql = "SELECT * FROM Contest_Problems WHERE (contest_id = ? AND problem_id = ? ) LIMIT 1;";
 		$params = array(  $contest_id, $problem_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new ContestProblems( $rs );
-			self::pushRecord( $foo,  $contest_id, $problem_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new ContestProblems( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -99,9 +82,9 @@ abstract class ContestProblemsDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Contest_Problems";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -111,9 +94,6 @@ abstract class ContestProblemsDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new ContestProblems($foo);
     		array_push( $allData, $bar);
-			//contest_id
-			//problem_id
-    		self::pushRecord( $bar, $foo["contest_id"],$foo["problem_id"] );
 		}
 		return $allData;
 	}
@@ -143,93 +123,74 @@ abstract class ContestProblemsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Contest_Problems , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Contest_Problems , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Contest_Problems instanceof ContestProblems)) {
+			return self::search(new ContestProblems($Contest_Problems));
+		}
+
 		$sql = "SELECT * from Contest_Problems WHERE ("; 
 		$val = array();
-		if( $Contest_Problems->getContestId() != NULL){
-			$sql .= " contest_id = ? AND";
+		if (!is_null( $Contest_Problems->getContestId())) {
+			$sql .= " `contest_id` = ? AND";
 			array_push( $val, $Contest_Problems->getContestId() );
 		}
-
-		if( $Contest_Problems->getProblemId() != NULL){
-			$sql .= " problem_id = ? AND";
+		if (!is_null( $Contest_Problems->getProblemId())) {
+			$sql .= " `problem_id` = ? AND";
 			array_push( $val, $Contest_Problems->getProblemId() );
 		}
-
-		if( $Contest_Problems->getPoints() != NULL){
-			$sql .= " points = ? AND";
+		if (!is_null( $Contest_Problems->getPoints())) {
+			$sql .= " `points` = ? AND";
 			array_push( $val, $Contest_Problems->getPoints() );
 		}
-
-		if(sizeof($val) == 0){return array();}
-		$sql = substr($sql, 0, -3) . " )";
-                                
-		if( $orderBy !== null ){
-		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-		
+		if (!is_null( $Contest_Problems->getOrder())) {
+			$sql .= " `order` = ? AND";
+			array_push( $val, $Contest_Problems->getOrder() );
 		}
-                               
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
+		$sql = substr($sql, 0, -3) . " )";
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
+		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new ContestProblems($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["contest_id"],$foo["problem_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
-        
-        /*
-         * 
-         * Get relevant problems including contest alias
-         */
-        public static final function GetRelevantProblems($contest_id)
-        {
-            
-            // Build SQL statement
-            $sql = "SELECT Problems.problem_id, alias from Problems INNER JOIN ( SELECT Contest_Problems.problem_id from Contest_Problems WHERE ( Contest_Problems.contest_id = ? ) ) ProblemsContests ON Problems.problem_id = ProblemsContests.problem_id ";
-            $val = array($contest_id);
-            
-            global $conn;
-            $rs = $conn->Execute($sql, $val);
-            
-            $ar = array();
-            foreach ($rs as $foo) {
-                    $bar =  new Problems($foo);
-            array_push( $ar,$bar);
-            }
-            
-            return $ar;
-        }
-        
-
 
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu�ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param ContestProblems [$Contest_Problems] El objeto de tipo ContestProblems a actualizar.
 	  **/
-	private static final function update( $Contest_Problems )
+	private static final function update($Contest_Problems)
 	{
-		$sql = "UPDATE Contest_Problems SET  points = ? WHERE  contest_id = ? AND problem_id = ? AND `order` = ?;";
+		$sql = "UPDATE Contest_Problems SET  `points` = ?, `order` = ? WHERE  `contest_id` = ? AND `problem_id` = ?;";
 		$params = array( 
 			$Contest_Problems->getPoints(), 
-			$Contest_Problems->getContestId(),$Contest_Problems->getProblemId(), 
-                        $Contest_Problems->getOrder());
+			$Contest_Problems->getOrder(), 
+			$Contest_Problems->getContestId(),$Contest_Problems->getProblemId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -240,28 +201,27 @@ abstract class ContestProblemsDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto ContestProblems dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param ContestProblems [$Contest_Problems] El objeto de tipo ContestProblems a crear.
 	  **/
-	private static final function create( &$Contest_Problems )
+	private static final function create( $Contest_Problems )
 	{
-		$sql = "INSERT INTO Contest_Problems ( contest_id, problem_id, points, `order` ) VALUES ( ?, ?, ?, ?);";
+		if (is_null($Contest_Problems->points)) $Contest_Problems->points = '1';
+		if (is_null($Contest_Problems->order)) $Contest_Problems->order =  '1';
+		$sql = "INSERT INTO Contest_Problems ( `contest_id`, `problem_id`, `points`, `order` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$Contest_Problems->getContestId(), 
-			$Contest_Problems->getProblemId(), 
-			$Contest_Problems->getPoints(), 
-                        $Contest_Problems->getOrder()
+			$Contest_Problems->contest_id,
+			$Contest_Problems->problem_id,
+			$Contest_Problems->points,
+			$Contest_Problems->order,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */   /*  */ 
+ 
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -269,7 +229,7 @@ abstract class ContestProblemsDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestProblems} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ContestProblems}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -300,53 +260,63 @@ abstract class ContestProblemsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contest_Problems WHERE ("; 
 		$val = array();
-		if( (($a = $Contest_ProblemsA->getContestId()) != NULL) & ( ($b = $Contest_ProblemsB->getContestId()) != NULL) ){
-				$sql .= " contest_id >= ? AND contest_id <= ? AND";
+		if( ( !is_null (($a = $Contest_ProblemsA->getContestId()) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->getContestId()) ) ) ){
+				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " contest_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `contest_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $Contest_ProblemsA->getProblemId()) != NULL) & ( ($b = $Contest_ProblemsB->getProblemId()) != NULL) ){
-				$sql .= " problem_id >= ? AND problem_id <= ? AND";
+		if( ( !is_null (($a = $Contest_ProblemsA->getProblemId()) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->getProblemId()) ) ) ){
+				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " problem_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `problem_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $Contest_ProblemsA->getPoints()) != NULL) & ( ($b = $Contest_ProblemsB->getPoints()) != NULL) ){
-				$sql .= " points >= ? AND points <= ? AND";
+		if( ( !is_null (($a = $Contest_ProblemsA->getPoints()) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->getPoints()) ) ) ){
+				$sql .= " `points` >= ? AND `points` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " points = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `points` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $Contest_ProblemsA->getOrder()) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->getOrder()) ) ) ){
+				$sql .= " `order` >= ? AND `order` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `order` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new ContestProblems($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new ContestProblems($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -361,9 +331,9 @@ abstract class ContestProblemsDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param ContestProblems [$Contest_Problems] El objeto de tipo ContestProblems a eliminar
 	  **/
-	public static final function delete( &$Contest_Problems )
+	public static final function delete( $Contest_Problems )
 	{
-		if(self::getByPK($Contest_Problems->getContestId(), $Contest_Problems->getProblemId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Contest_Problems->getContestId(), $Contest_Problems->getProblemId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Contest_Problems WHERE  contest_id = ? AND problem_id = ?;";
 		$params = array( $Contest_Problems->getContestId(), $Contest_Problems->getProblemId() );
 		global $conn;
