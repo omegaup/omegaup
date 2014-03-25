@@ -40,6 +40,7 @@
 				<script>!function(d,s,id){ var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){ js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs); } }(document,"script","twitter-wjs");</script>
 			</div>	
 		</div>
+		{if isset($coderOfTheMonthData)}
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">{#index#}</h3>
@@ -57,8 +58,9 @@
 			</div>
 			<div class="panel-body">
 				<a href='codersofthemonth.php'>{#coderOfTheMonthFullList#}</a>
-			</div>	
+			</div>
 		</div>
+		{/if}
 		
 		<div class="panel panel-default">
 			<div class="panel-heading">

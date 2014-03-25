@@ -14,7 +14,7 @@ try_define('OMEGAUP_DB_USER',				'omegaup');
 try_define('OMEGAUP_DB_PASS',				'');
 try_define('OMEGAUP_DB_HOST',				'localhost');
 try_define('OMEGAUP_DB_NAME',				'omegaup');
-try_define('OMEGAUP_DB_DRIVER',				'mysqlt');
+try_define('OMEGAUP_DB_DRIVER',				'mysqli');
 try_define('OMEGAUP_DB_DEBUG',				false);
 try_define('OMEGAUP_MD5_SALT',				'omegaup');
 
