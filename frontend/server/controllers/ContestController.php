@@ -1420,7 +1420,7 @@ class ContestController extends Controller {
 
 		// Get our runs
 		try {
-			$runs = RunsDAO::GetAllRunsInContest(
+			$runs = RunsDAO::GetAllRuns(
 				$r["contest"]->getContestId(),
 				$r["status"],
 				$r["veredict"],

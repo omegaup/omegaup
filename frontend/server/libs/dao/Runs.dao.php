@@ -92,42 +92,51 @@ class RunsDAO extends RunsDAOBase
 		return $ar;
 	}
 
-	public static final function GetAllRunsInContest($contest_id, $status, $veredict,
+	public static final function GetAllRuns($contest_id, $status, $veredict,
 			$problem_id, $language, $user_id, $offset, $rowcount) {
 		$sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.veredict, r.runtime, ' .
 			'r.memory, r.score, r.contest_score, UNIX_TIMESTAMP(r.time) AS time, ' .
 			'r.submit_delay, u.username, p.alias ' .
 			'FROM Runs r ' .
 			'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .
-			'INNER JOIN Users u ON u.user_id = r.user_id ' .
-			'WHERE r.contest_id = ? ';
-		$val = array($contest_id);
+			'INNER JOIN Users u ON u.user_id = r.user_id ';
+		$where = array();
+		$val = array();
+
+		if (!is_null($contest_id)) {
+			$where[] = 'r.contest_id = ?';
+			$val[] = $contest_id;
+		}
 
 		if (!is_null($status)) {
-			$sql .= 'AND r.status = ? ';
+			$where[] = 'r.status = ?';
 			$val[] = $status;
 		}
 		if (!is_null($veredict)) {
-			$sql .= 'AND r.veredict = ? ';
+			$where[] = 'r.veredict = ?';
 			$val[] = $veredict;
 		}
 		if (!is_null($problem_id)) {
-			$sql .= 'AND r.problem_id = ? ';
+			$where[] = 'r.problem_id = ?';
 			$val[] = $problem_id;
 		}
 		if (!is_null($language)) {
-			$sql .= 'AND r.language = ? ';
+			$where[] = 'r.language = ?';
 			$val[] = $language;
 		}
 		if (!is_null($user_id)) {
-			$sql .= 'AND r.user_id = ? ';
+			$where[] = 'r.user_id = ?';
 			$val[] = $user_id;
 		}
+		if (!empty($where)) {
+			$sql .= 'WHERE ' . implode(' AND ', $where) . ' ';
+		}
+
 		$sql .= 'ORDER BY run_id DESC ';
 		if (!is_null($offset)) {
 			$sql .= 'LIMIT ?, ?';
-			$val[] = $offset;
-			$val[] = $rowcount;
+			$val[] = (int)$offset;
+			$val[] = (int)$rowcount;
 		}
 
 		global $conn;
