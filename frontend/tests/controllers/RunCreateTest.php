@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateRun extends OmegaupTestCase {
+class RunCreateTest extends OmegaupTestCase {
 	
 	private $contestData;
 	private $contestant;
@@ -462,13 +462,14 @@ class CreateRun extends OmegaupTestCase {
 	 * 
 	 * @expectedException NotAllowedToSubmitException
 	 */
-	public function testRunToPrivateProblemWhileInsideAContest()
-	{
-		// Create public problem
-		$problemData = ProblemsFactory::createProblem(null, null, 0 /* private */);
-		
+	public function testRunToPrivateProblemWhileInsideAPublicContest()
+	{		
 		// Get a contest 
-		$contestData = ContestsFactory::createContest(null, 1);
+		$contestData = ContestsFactory::createContest(null, 1 /* public */);
+		
+		// Create public problem
+		$problemData = ProblemsFactory::createProblem(null, null, 0 /* private */, $contestData["director"]);
+		
 
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -491,7 +492,7 @@ class CreateRun extends OmegaupTestCase {
 		//PHPUnit does not set IP address, doing it manually
 		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
 		
-		// Call API
+		// Call API		
 		$response = RunController::apiCreate($r);		
 	}
 	
