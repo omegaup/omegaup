@@ -213,6 +213,7 @@ EOF
 	sudo service php5-fpm stop
 	sudo update-rc.d -f php5-fpm remove
 	sudo service hhvm restart
+	sudo update-rc.d hhvm defaults
 	sudo service nginx restart
 fi
 
