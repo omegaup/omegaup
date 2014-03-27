@@ -466,6 +466,10 @@ class ProblemController extends Controller {
 			throw new NotFoundException("Problem not found");
 		}
 
+		if (isset($r["statement_type"]) && !in_array($r["statement_type"], ["html", "markdown"])) {
+			throw new NotFoundException("Invalid statement type");
+		}
+
 		// If we request a problem inside a contest
 		if (!is_null($r["contest_alias"])) {
 			// Is the combination contest_id and problem_id valid?
@@ -509,6 +513,39 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Gets the problem statement from the filesystem.
+	 * 
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 */
+	public static function getProblemStatement(Request $r) {
+		$statement_type = ProblemController::getStatementType($r);
+		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem"]->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r["lang"] . "." . $statement_type;
+
+		try {
+			$file_content = FileHandler::ReadFile($source_path);
+		} catch (Exception $e) {
+			throw new InvalidFilesystemOperationException($e);
+		}
+		
+		return $file_content;
+	}
+
+	/**
+	 * Get the type of statement that was requested.
+	 * HTML is the default if statement_type unspecified in the request.
+	 * 
+	 * @param Request $r
+	 */
+	private static function getStatementType(Request $r) {
+		$type = "html";
+		if (isset($r["statement_type"])) {
+			$type = $r["statement_type"];
+		}
+		return $type;
+	}
+
+	/**
 	 * Entry point for Problem Details API
 	 * 
 	 * @param Request $r
@@ -530,19 +567,10 @@ class ProblemController extends Controller {
 		// Read the file that contains the source
 		if ($r["problem"]->getValidator() != 'remote') {
 			
-			Cache::getFromCacheOrSet(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"], $r, function(Request $r) {
-				
-				$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem"]->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r["lang"] . ".html";
-
-				try {
-					$file_content = FileHandler::ReadFile($source_path);
-				} catch (Exception $e) {
-					throw new InvalidFilesystemOperationException($e);
-				}
-				
-				return $file_content;
-				
-			}, $file_content, APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);																
+			$statement_type = ProblemController::getStatementType($r);
+			Cache::getFromCacheOrSet(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . $statement_type,
+				$r, 'ProblemController::getProblemStatement', $file_content,
+				APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
 
 			// Add problem statement to source
 			$response["problem_statement"] = $file_content;						

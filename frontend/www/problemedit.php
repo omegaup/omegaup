@@ -35,4 +35,6 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 }
 
 $smarty->assign('IS_UPDATE', 1);
+$smarty->assign('LOAD_MATHJAX', 1);
+$smarty->assign('LOAD_PAGEDOWN', 1);
 $smarty->display('../templates/problem.edit.tpl');
