@@ -72,6 +72,60 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
 	}
 
+	/**
+	 * Common code for testing the statement's source.
+	 */
+	public function internalViewProblemStatement($type, $expected_text) {
+		
+		// Get a contest 
+		$contestData = ContestsFactory::createContest();
+		
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Add the problem to the contest
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+		
+		// Get a user for our scenario
+		$contestant = UserFactory::createUser();
+		
+		// Prepare our request
+		$r = new Request();
+		$r["problem_alias"] = $problemData["request"]["alias"];
+
+		// Log in the user
+		$r["auth_token"] = $this->login($contestant);
+
+		
+		// Call api
+		$r["statement_type"] = $type;
+		$response = ProblemController::apiDetails($r);
+		
+				// Assert data
+				$this->assertContains($expected_text, $response["problem_statement"]);				
+	}
+
+	/**
+	 * Problem statmeent is returned in HTML.
+	 */
+	public function testViewProblemStatementHtml() {
+		$this->internalViewProblemStatement("html", "<h1>Entrada</h1>");
+	}
+
+	/**
+	 * Problem statmeent is returned in Markdown.
+	 */
+	public function testViewProblemStatementMarkdown() {
+		$this->internalViewProblemStatement("markdown", "# Entrada");
+	}
+
+	/**
+	 * @expectedException NotFoundException
+	 */
+	public function testViewProblemStatementInvalidType() {
+		$this->internalViewProblemStatement("not_html_or_markdown", "");
+	}
+
 	public function testProblemDetailsNotInContest() {
 		
 		// Get 1 problem public

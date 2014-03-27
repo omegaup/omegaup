@@ -45,6 +45,13 @@
 				});
 			{/IF}
 		});
+		
+		var md_converter = Markdown.getSanitizingConverter();
+		md_editor = new Markdown.Editor(md_converter, '-statement');		// Global.
+		md_editor.hooks.chain("onPreviewRefresh", function() {ldelim}
+			MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#wmd-preview').get(0)]);
+		{rdelim});
+		md_editor.run();
 	})();
 	
 	function refreshEditForm(problemAlias) {
@@ -66,7 +73,9 @@
 			$('select[name=validator]').val(problem.validator);
 			$('select[name=public]').val(problem.public);
 			$('input[name=alias]').val(problemAlias);
-		});
+			$('#wmd-input-statement').val(problem.problem_statement);
+			md_editor.refreshPreview();
+		}, "markdown");
 	}
 </script>
 

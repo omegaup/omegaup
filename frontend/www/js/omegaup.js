@@ -650,14 +650,16 @@ OmegaUp.prototype.getMyContests = function(callback) {
 	});
 };
 
-OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback) {
+OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, statement_type) {
 	var self = this;
-
+	if (statement_type === undefined) {
+		statement_type = "html";
+	}
 	$.post(
 		contestAlias === null ? 
 			'/api/problem/details/problem_alias/' + encodeURIComponent(problemAlias) + '/' :
 			'/api/problem/details/contest_alias/' + encodeURIComponent(contestAlias) + '/problem_alias/' + encodeURIComponent(problemAlias) + '/',
-		{lang:"es"},
+		{lang:"es", statement_type:statement_type},
 		function (problem) {
 			if (problem.runs) {
 				for (var i = 0; i < problem.runs.length; i++) {
