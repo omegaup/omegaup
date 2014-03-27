@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Badges Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Badges }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class BadgesDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $badge_id ){
-			$pk = "";
-			$pk .= $badge_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $badge_id){
-			$pk = "";
-			$pk .= $badge_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $badge_id ){
-			$pk = "";
-			$pk .= $badge_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -42,13 +32,13 @@ abstract class BadgesDAOBase extends DAO
 	  * @param Badges [$Badges] El objeto de tipo Badges
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Badges )
+	public static final function save( $Badges )
 	{
-		if(  self::getByPK(  $Badges->getBadgeId() ) !== NULL )
+		if (!is_null(self::getByPK( $Badges->getBadgeId() )))
 		{
-			try{ return BadgesDAOBase::update( $Badges) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return BadgesDAOBase::create( $Badges) ; } catch(Exception $e){ throw $e; }
+			return BadgesDAOBase::update( $Badges);
+		} else {
+			return BadgesDAOBase::create( $Badges);
 		}
 	}
 
@@ -64,19 +54,15 @@ abstract class BadgesDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $badge_id )
 	{
-		if(self::recordExists(  $badge_id)){
-			return self::getRecord( $badge_id );
-		}
+		if(  is_null( $badge_id )  ){ return NULL; }
 		$sql = "SELECT * FROM Badges WHERE (badge_id = ? ) LIMIT 1;";
 		$params = array(  $badge_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Badges( $rs );
-			self::pushRecord( $foo,  $badge_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Badges( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -96,9 +82,9 @@ abstract class BadgesDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Badges";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -108,8 +94,6 @@ abstract class BadgesDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Badges($foo);
     		array_push( $allData, $bar);
-			//badge_id
-    		self::pushRecord( $bar, $foo["badge_id"] );
 		}
 		return $allData;
 	}
@@ -139,67 +123,70 @@ abstract class BadgesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Badges , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Badges , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Badges instanceof Badges)) {
+			return self::search(new Badges($Badges));
+		}
+
 		$sql = "SELECT * from Badges WHERE ("; 
 		$val = array();
-		if( $Badges->getBadgeId() != NULL){
-			$sql .= " badge_id = ? AND";
+		if (!is_null( $Badges->getBadgeId())) {
+			$sql .= " `badge_id` = ? AND";
 			array_push( $val, $Badges->getBadgeId() );
 		}
-
-		if( $Badges->getName() != NULL){
-			$sql .= " name = ? AND";
+		if (!is_null( $Badges->getName())) {
+			$sql .= " `name` = ? AND";
 			array_push( $val, $Badges->getName() );
 		}
-
-		if( $Badges->getImageUrl() != NULL){
-			$sql .= " image_url = ? AND";
+		if (!is_null( $Badges->getImageUrl())) {
+			$sql .= " `image_url` = ? AND";
 			array_push( $val, $Badges->getImageUrl() );
 		}
-
-		if( $Badges->getDescription() != NULL){
-			$sql .= " description = ? AND";
+		if (!is_null( $Badges->getDescription())) {
+			$sql .= " `description` = ? AND";
 			array_push( $val, $Badges->getDescription() );
 		}
-
-		if( $Badges->getHint() != NULL){
-			$sql .= " hint = ? AND";
+		if (!is_null( $Badges->getHint())) {
+			$sql .= " `hint` = ? AND";
 			array_push( $val, $Badges->getHint() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Badges($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["badge_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Badges [$Badges] El objeto de tipo Badges a actualizar.
 	  **/
-	private static final function update( $Badges )
+	private static final function update($Badges)
 	{
-		$sql = "UPDATE Badges SET  name = ?, image_url = ?, description = ?, hint = ? WHERE  badge_id = ?;";
+		$sql = "UPDATE Badges SET  `name` = ?, `image_url` = ?, `description` = ?, `hint` = ? WHERE  `badge_id` = ?;";
 		$params = array( 
 			$Badges->getName(), 
 			$Badges->getImageUrl(), 
@@ -207,11 +194,9 @@ abstract class BadgesDAOBase extends DAO
 			$Badges->getHint(), 
 			$Badges->getBadgeId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -222,29 +207,28 @@ abstract class BadgesDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Badges dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Badges [$Badges] El objeto de tipo Badges a crear.
 	  **/
-	private static final function create( &$Badges )
+	private static final function create( $Badges )
 	{
-		$sql = "INSERT INTO Badges ( badge_id, name, image_url, description, hint ) VALUES ( ?, ?, ?, ?, ?);";
+		if (is_null($Badges->name)) $Badges->name = 'MyBadge';
+		$sql = "INSERT INTO Badges ( `badge_id`, `name`, `image_url`, `description`, `hint` ) VALUES ( ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Badges->getBadgeId(), 
-			$Badges->getName(), 
-			$Badges->getImageUrl(), 
-			$Badges->getDescription(), 
-			$Badges->getHint(), 
+			$Badges->badge_id,
+			$Badges->name,
+			$Badges->image_url,
+			$Badges->description,
+			$Badges->hint,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */  $Badges->setBadgeId( $conn->Insert_ID() ); /*  */ 
+ 		$Badges->badge_id = $conn->Insert_ID();
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -252,7 +236,7 @@ abstract class BadgesDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Badges} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Badges}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -283,75 +267,74 @@ abstract class BadgesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Badges WHERE ("; 
 		$val = array();
-		if( (($a = $BadgesA->getBadgeId()) != NULL) & ( ($b = $BadgesB->getBadgeId()) != NULL) ){
-				$sql .= " badge_id >= ? AND badge_id <= ? AND";
+		if( ( !is_null (($a = $BadgesA->getBadgeId()) ) ) & ( ! is_null ( ($b = $BadgesB->getBadgeId()) ) ) ){
+				$sql .= " `badge_id` >= ? AND `badge_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " badge_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `badge_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $BadgesA->getName()) != NULL) & ( ($b = $BadgesB->getName()) != NULL) ){
-				$sql .= " name >= ? AND name <= ? AND";
+		if( ( !is_null (($a = $BadgesA->getName()) ) ) & ( ! is_null ( ($b = $BadgesB->getName()) ) ) ){
+				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " name = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `name` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $BadgesA->getImageUrl()) != NULL) & ( ($b = $BadgesB->getImageUrl()) != NULL) ){
-				$sql .= " image_url >= ? AND image_url <= ? AND";
+		if( ( !is_null (($a = $BadgesA->getImageUrl()) ) ) & ( ! is_null ( ($b = $BadgesB->getImageUrl()) ) ) ){
+				$sql .= " `image_url` >= ? AND `image_url` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " image_url = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `image_url` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $BadgesA->getDescription()) != NULL) & ( ($b = $BadgesB->getDescription()) != NULL) ){
-				$sql .= " description >= ? AND description <= ? AND";
+		if( ( !is_null (($a = $BadgesA->getDescription()) ) ) & ( ! is_null ( ($b = $BadgesB->getDescription()) ) ) ){
+				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " description = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `description` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $BadgesA->getHint()) != NULL) & ( ($b = $BadgesB->getHint()) != NULL) ){
-				$sql .= " hint >= ? AND hint <= ? AND";
+		if( ( !is_null (($a = $BadgesA->getHint()) ) ) & ( ! is_null ( ($b = $BadgesB->getHint()) ) ) ){
+				$sql .= " `hint` >= ? AND `hint` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " hint = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `hint` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Badges($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Badges($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -366,9 +349,9 @@ abstract class BadgesDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Badges [$Badges] El objeto de tipo Badges a eliminar
 	  **/
-	public static final function delete( &$Badges )
+	public static final function delete( $Badges )
 	{
-		if(self::getByPK($Badges->getBadgeId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Badges->getBadgeId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Badges WHERE  badge_id = ?;";
 		$params = array( $Badges->getBadgeId() );
 		global $conn;

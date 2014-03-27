@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Announcement Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Announcement }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class AnnouncementDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $announcement_id ){
-			$pk = "";
-			$pk .= $announcement_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $announcement_id){
-			$pk = "";
-			$pk .= $announcement_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $announcement_id ){
-			$pk = "";
-			$pk .= $announcement_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -42,13 +32,13 @@ abstract class AnnouncementDAOBase extends DAO
 	  * @param Announcement [$Announcement] El objeto de tipo Announcement
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Announcement )
+	public static final function save( $Announcement )
 	{
-		if(  self::getByPK(  $Announcement->getAnnouncementId() ) !== NULL )
+		if (!is_null(self::getByPK( $Announcement->getAnnouncementId() )))
 		{
-			try{ return AnnouncementDAOBase::update( $Announcement) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return AnnouncementDAOBase::create( $Announcement) ; } catch(Exception $e){ throw $e; }
+			return AnnouncementDAOBase::update( $Announcement);
+		} else {
+			return AnnouncementDAOBase::create( $Announcement);
 		}
 	}
 
@@ -64,19 +54,15 @@ abstract class AnnouncementDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $announcement_id )
 	{
-		if(self::recordExists(  $announcement_id)){
-			return self::getRecord( $announcement_id );
-		}
+		if(  is_null( $announcement_id )  ){ return NULL; }
 		$sql = "SELECT * FROM Announcement WHERE (announcement_id = ? ) LIMIT 1;";
 		$params = array(  $announcement_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Announcement( $rs );
-			self::pushRecord( $foo,  $announcement_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Announcement( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -96,9 +82,9 @@ abstract class AnnouncementDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Announcement";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -108,8 +94,6 @@ abstract class AnnouncementDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Announcement($foo);
     		array_push( $allData, $bar);
-			//announcement_id
-    		self::pushRecord( $bar, $foo["announcement_id"] );
 		}
 		return $allData;
 	}
@@ -139,73 +123,75 @@ abstract class AnnouncementDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Announcement , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Announcement , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Announcement instanceof Announcement)) {
+			return self::search(new Announcement($Announcement));
+		}
+
 		$sql = "SELECT * from Announcement WHERE ("; 
 		$val = array();
-		if( $Announcement->getAnnouncementId() != NULL){
-			$sql .= " announcement_id = ? AND";
+		if (!is_null( $Announcement->getAnnouncementId())) {
+			$sql .= " `announcement_id` = ? AND";
 			array_push( $val, $Announcement->getAnnouncementId() );
 		}
-
-		if( $Announcement->getUserId() != NULL){
-			$sql .= " user_id = ? AND";
+		if (!is_null( $Announcement->getUserId())) {
+			$sql .= " `user_id` = ? AND";
 			array_push( $val, $Announcement->getUserId() );
 		}
-
-		if( $Announcement->getTime() != NULL){
-			$sql .= " time = ? AND";
+		if (!is_null( $Announcement->getTime())) {
+			$sql .= " `time` = ? AND";
 			array_push( $val, $Announcement->getTime() );
 		}
-
-		if( $Announcement->getDescription() != NULL){
-			$sql .= " description = ? AND";
+		if (!is_null( $Announcement->getDescription())) {
+			$sql .= " `description` = ? AND";
 			array_push( $val, $Announcement->getDescription() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Announcement($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["announcement_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Announcement [$Announcement] El objeto de tipo Announcement a actualizar.
 	  **/
-	private static final function update( $Announcement )
+	private static final function update($Announcement)
 	{
-		$sql = "UPDATE Announcement SET  user_id = ?, time = ?, description = ? WHERE  announcement_id = ?;";
+		$sql = "UPDATE Announcement SET  `user_id` = ?, `time` = ?, `description` = ? WHERE  `announcement_id` = ?;";
 		$params = array( 
 			$Announcement->getUserId(), 
 			$Announcement->getTime(), 
 			$Announcement->getDescription(), 
 			$Announcement->getAnnouncementId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -216,28 +202,27 @@ abstract class AnnouncementDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Announcement dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Announcement [$Announcement] El objeto de tipo Announcement a crear.
 	  **/
-	private static final function create( &$Announcement )
+	private static final function create( $Announcement )
 	{
-		$sql = "INSERT INTO Announcement ( announcement_id, user_id, time, description ) VALUES ( ?, ?, ?, ?);";
+		if (is_null($Announcement->time)) $Announcement->time = gmdate('Y-m-d H:i:s');
+		$sql = "INSERT INTO Announcement ( `announcement_id`, `user_id`, `time`, `description` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$Announcement->getAnnouncementId(), 
-			$Announcement->getUserId(), 
-			$Announcement->getTime(), 
-			$Announcement->getDescription(), 
+			$Announcement->announcement_id,
+			$Announcement->user_id,
+			$Announcement->time,
+			$Announcement->description,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */  $Announcement->setAnnouncementId( $conn->Insert_ID() ); /*  */ 
+ 		$Announcement->announcement_id = $conn->Insert_ID();
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -245,7 +230,7 @@ abstract class AnnouncementDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Announcement} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Announcement}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -276,64 +261,63 @@ abstract class AnnouncementDAOBase extends DAO
 	{
 		$sql = "SELECT * from Announcement WHERE ("; 
 		$val = array();
-		if( (($a = $AnnouncementA->getAnnouncementId()) != NULL) & ( ($b = $AnnouncementB->getAnnouncementId()) != NULL) ){
-				$sql .= " announcement_id >= ? AND announcement_id <= ? AND";
+		if( ( !is_null (($a = $AnnouncementA->getAnnouncementId()) ) ) & ( ! is_null ( ($b = $AnnouncementB->getAnnouncementId()) ) ) ){
+				$sql .= " `announcement_id` >= ? AND `announcement_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " announcement_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `announcement_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $AnnouncementA->getUserId()) != NULL) & ( ($b = $AnnouncementB->getUserId()) != NULL) ){
-				$sql .= " user_id >= ? AND user_id <= ? AND";
+		if( ( !is_null (($a = $AnnouncementA->getUserId()) ) ) & ( ! is_null ( ($b = $AnnouncementB->getUserId()) ) ) ){
+				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " user_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `user_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $AnnouncementA->getTime()) != NULL) & ( ($b = $AnnouncementB->getTime()) != NULL) ){
-				$sql .= " time >= ? AND time <= ? AND";
+		if( ( !is_null (($a = $AnnouncementA->getTime()) ) ) & ( ! is_null ( ($b = $AnnouncementB->getTime()) ) ) ){
+				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " time = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `time` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $AnnouncementA->getDescription()) != NULL) & ( ($b = $AnnouncementB->getDescription()) != NULL) ){
-				$sql .= " description >= ? AND description <= ? AND";
+		if( ( !is_null (($a = $AnnouncementA->getDescription()) ) ) & ( ! is_null ( ($b = $AnnouncementB->getDescription()) ) ) ){
+				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " description = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `description` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Announcement($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Announcement($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -348,9 +332,9 @@ abstract class AnnouncementDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Announcement [$Announcement] El objeto de tipo Announcement a eliminar
 	  **/
-	public static final function delete( &$Announcement )
+	public static final function delete( $Announcement )
 	{
-		if(self::getByPK($Announcement->getAnnouncementId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Announcement->getAnnouncementId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Announcement WHERE  announcement_id = ?;";
 		$params = array( $Announcement->getAnnouncementId() );
 		global $conn;

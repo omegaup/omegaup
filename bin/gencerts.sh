@@ -1,5 +1,10 @@
 #!/bin/bash
 
+PASSWORD=omegaup
+if [ "$1" != "" ]; then
+	PASSWORD=$1
+fi
+
 if [ "bin" == "$(basename `pwd`)" ]; then
 	cd ..
 fi
@@ -16,9 +21,10 @@ if [ -d ssl ]; then rm ssl/*; else mkdir ssl; fi
 /usr/bin/openssl x509 -req -days 3650 -in ssl/grader.csr -CA ssl/omegaup-ca.crt -CAkey ssl/omegaup-ca.key -set_serial 1 -out ssl/grader.crt
 rm ssl/grader.csr
 
-/usr/bin/openssl pkcs12 -export -in ssl/grader.crt -inkey ssl/grader.key -name "OmegaUp Grader" -certfile ssl/omegaup-ca.crt -caname "OmegaUp Certificate Authority" -password pass:omegaup -out ssl/grader.p12
-/usr/bin/keytool -importkeystore -srckeystore ssl/grader.p12 -srcstoretype pkcs12 -srcstorepass omegaup -srcalias "OmegaUp Grader" -destkeystore backend/grader/omegaup.jks -deststoretype jks -deststorepass omegaup
-/usr/bin/keytool -importcert -alias "OmegaUp Certificate Authority" -noprompt -trustcacerts -keystore backend/grader/omegaup.jks -storepass omegaup -file ssl/omegaup-ca.crt
+/usr/bin/openssl pkcs12 -export -in ssl/grader.crt -inkey ssl/grader.key -name "OmegaUp Grader" -certfile ssl/omegaup-ca.crt -caname "OmegaUp Certificate Authority" -password pass:$PASSWORD -out ssl/grader.p12
+/usr/bin/keytool -importkeystore -srckeystore ssl/grader.p12 -srcstoretype pkcs12 -srcstorepass $PASSWORD -srcalias "OmegaUp Grader" -destkeystore backend/grader/omegaup.jks -deststoretype jks -deststorepass $PASSWORD
+/usr/bin/keytool -importcert -alias "OmegaUp Certificate Authority" -noprompt -trustcacerts -keystore backend/grader/omegaup.jks -storepass $PASSWORD -file ssl/omegaup-ca.crt
+/usr/bin/keytool -importkeystore -srckeystore /usr/lib/jvm/java-7-openjdk-*/jre/lib/security/cacerts -srcstorepass changeit -destkeystore backend/grader/omegaup.jks -deststorepass $PASSWORD
 rm ssl/grader.p12 ssl/grader.key ssl/grader.crt
 
 /usr/bin/openssl genrsa -out ssl/runner.key 1024
@@ -26,9 +32,10 @@ rm ssl/grader.p12 ssl/grader.key ssl/grader.crt
 /usr/bin/openssl x509 -req -days 3650 -in ssl/runner.csr -CA ssl/omegaup-ca.crt -CAkey ssl/omegaup-ca.key -set_serial 2 -out ssl/runner.crt
 rm ssl/runner.csr
 
-/usr/bin/openssl pkcs12 -export -in ssl/runner.crt -inkey ssl/runner.key -name "OmegaUp Runner" -certfile ssl/omegaup-ca.crt -caname "OmegaUp Certificate Authority" -password pass:omegaup -out ssl/runner.p12
-/usr/bin/keytool -importkeystore -srckeystore ssl/runner.p12 -srcstoretype pkcs12 -srcstorepass omegaup -srcalias "OmegaUp Runner" -destkeystore backend/runner/omegaup.jks -deststoretype jks -deststorepass omegaup
-/usr/bin/keytool -importcert -alias "OmegaUp Certificate Authority" -noprompt -trustcacerts -keystore backend/runner/omegaup.jks -storepass omegaup -file ssl/omegaup-ca.crt
+/usr/bin/openssl pkcs12 -export -in ssl/runner.crt -inkey ssl/runner.key -name "OmegaUp Runner" -certfile ssl/omegaup-ca.crt -caname "OmegaUp Certificate Authority" -password pass:$PASSWORD -out ssl/runner.p12
+/usr/bin/keytool -importkeystore -srckeystore ssl/runner.p12 -srcstoretype pkcs12 -srcstorepass $PASSWORD -srcalias "OmegaUp Runner" -destkeystore backend/runner/omegaup.jks -deststoretype jks -deststorepass $PASSWORD
+/usr/bin/keytool -importcert -alias "OmegaUp Certificate Authority" -noprompt -trustcacerts -keystore backend/runner/omegaup.jks -storepass $PASSWORD -file ssl/omegaup-ca.crt
+/usr/bin/keytool -importkeystore -srckeystore /usr/lib/jvm/java-7-openjdk-*/jre/lib/security/cacerts -srcstorepass changeit -destkeystore backend/runner/omegaup.jks -deststorepass $PASSWORD
 rm ssl/runner.p12 ssl/runner.key ssl/runner.crt
 
 /usr/bin/openssl genrsa -out ssl/frontend.key 1024

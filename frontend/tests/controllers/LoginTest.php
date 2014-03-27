@@ -171,8 +171,6 @@ class LoginTest extends OmegaupTestCase {
 	 */
 	public function testNativeLoginWithOldPassword() {
 
-		DAO::$useDAOCache = false;
-
 		// Create an user in omegaup
 		$user = UserFactory::createUser();
 
@@ -206,8 +204,6 @@ class LoginTest extends OmegaupTestCase {
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testTokenExpired() {
-		DAO::$useDAOCache = false;
-
 		// Create an user in omegaup
 		$user = UserFactory::createUser();
 
@@ -234,8 +230,6 @@ class LoginTest extends OmegaupTestCase {
 	}
 
 	public function testDeleteTokenExpired() {
-
-		DAO::$useDAOCache = false;
 
 		// Create an user in omegaup
 		$user = UserFactory::createUser();
@@ -269,8 +263,6 @@ class LoginTest extends OmegaupTestCase {
 ////	 * @expectedException EmailNotVerifiedException
 ////	 */
 ////	public function testLoginUserNotVerifiedWithoutVerificationId() {
-////		DAO::$useDAOCache = false;
-////
 ////		// Create an user in omegaup
 ////		$user = UserFactory::createUser(null, null, null, false/* verified */);
 ////		$plainPass = $user->getPassword();

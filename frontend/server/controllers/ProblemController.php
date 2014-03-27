@@ -498,7 +498,7 @@ class ProblemController extends Controller {
 			}
 
 			// If the contest has not started, user should not see it, unless it is admin
-			if (!$r["contest"]->hasStarted($r["current_user_id"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			if (!ContestsDAO::hasStarted($r["contest"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				throw new ForbiddenAccessException("Contest has not started yet.");
 			}
 		} else {

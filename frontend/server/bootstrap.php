@@ -117,12 +117,16 @@ $conn = null;
 
 try {
 	$conn = ADONewConnection(OMEGAUP_DB_DRIVER);
+	// HHVM doesn't like ADOdb's default value of 'false' for port and socket.
+	$conn->port = null;
+	$conn->socket = null;
 	$conn->debug = OMEGAUP_DB_DEBUG;
 	if (/* site ready only? */ false) {
 		$conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_READONLY_USER, OMEGAUP_DB_READONLY_PASS, OMEGAUP_DB_NAME);
 	} else {
 		$conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 	}
+	$conn->SetFetchMode(ADODB_FETCH_ASSOC);
 } catch (Exception $databaseConectionException) {
 	Logger::error($databaseConectionException);
 
@@ -142,7 +146,6 @@ try {
 
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
-
 
 if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === TRUE)) {
 

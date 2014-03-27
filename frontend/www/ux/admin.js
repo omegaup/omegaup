@@ -464,41 +464,92 @@ $(document).ready(function() {
 							$('#run-details .source').html(omegaup.escape(data.source));
 						}
 						$('#run-details .cases div').remove();
+						$('#run-details .cases table').remove();
 						$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
 
-						function isDigit(x) {
-							return '0' <= x && x <= '9';
+						function numericSort(key) {
+							function isDigit(x) {
+								return '0' <= x && x <= '9';
+							}
+
+							return function(x, y) {
+								var i = 0, j = 0;
+								for (; i < x[key].length && j < y[key].length; i++, j++) {
+									if (isDigit(x[key][i]) && isDigit(x[key][j])) {
+										var nx = 0, ny = 0;
+										while (i < x[key].length && isDigit(x[key][i]))
+											nx = (nx * 10) + parseInt(x[key][i++]);
+										while (j < y[key].length && isDigit(y[key][j]))
+											ny = (ny * 10) + parseInt(y[key][j++]);
+										i--; j--;
+										if (nx != ny) return nx - ny;
+									} else if (x[key][i] < y[key][j]) {
+										return -1;
+									} else if (x[key][i] > y[key][j]) {
+										return 1;
+									}
+								}
+								return (x[key].length - i) - (y[key].length - j);
+							};
 						}
 
-						function numericSort(x, y) {
-							var i = 0, j = 0;
-							for (; i < x.name.length && j < y.name.length; i++, j++) {
-								if (isDigit(x.name[i]) && isDigit(x.name[j])) {
-									var nx = 0, ny = 0;
-									while (i < x.name.length && isDigit(x.name[i]))
-										nx = (nx * 10) + parseInt(x.name[i++]);
-									while (j < y.name.length && isDigit(y.name[j]))
-										ny = (ny * 10) + parseInt(y.name[j++]);
-									i--; j--;
-									if (nx != ny) return nx - ny;
-								} else if (x.name[i] < y.name[j]) {
-									return -1;
-								} else if (x.name[i] > y.name[j]) {
-									return 1;
+						data.groups.sort(numericSort('group'));
+						for (var i = 0; i < data.groups.length; i++) {
+							data.groups[i].cases.sort(numericSort('name'));
+						}
+
+						var groups = $('<table><thead><tr><th>Grupo</th><th>Caso</th><th>Metadata</th><th>V</th><th>S</th></thead></table>');
+
+						function addBlock(text, className) {
+								groups.append(
+									$('<tr></tr>')
+										.append($('<td></td>'))
+										.append(
+											$('<td colspan="3"></td>')
+												.append(
+													$('<pre></pre>')
+														.addClass(className)
+														.html(omegaup.escape(g.cases[0].out_diff))
+												)
+										)
+								);
+						}
+
+						for (var i = 0; i < data.groups.length; i++) {
+							var g = data.groups[i];
+							if (g.cases.length == 1) {
+									groups.append(
+										$('<tr class="group"></tr>')
+											.append('<th>' + g.cases[0].name + '</th>')
+											.append('<td></td>')
+											.append('<td>' + JSON.stringify(g.cases[0].meta) + '</td>')
+											.append('<td>' + g.cases[0].veredict + '</td>')
+											.append('<th class="score">' + g.cases[0].score + '</th>')
+									);
+									if (g.cases[0].err) addBlock(g.cases[0].err, 'stderr');
+									if (g.cases[0].out_diff) addBlock(g.cases[0].out_diff, 'diff');
+							} else {
+								groups.append(
+									$('<tr class="group"></tr>')
+										.append('<th colspan="4">' + omegaup.escape(g.group) + '</th>')
+										.append('<th class="score">' + g.score + '</th>')
+								);
+								for (var j = 0; j < g.cases.length; j++) {
+									var c = g.cases[j];
+									groups.append(
+										$('<tr></tr>')
+											.append('<td></td>')
+											.append('<td>' + c.name + '</td>')
+											.append('<td>' + JSON.stringify(c.meta) + '</td>')
+											.append('<td>' + c.veredict + '</td>')
+											.append('<td class="score">' + c.score + '</td>')
+									);
+									if (c.err) addBlock(c.err, 'stderr');
+									if (c.out_diff) addBlock(c.out_diff, 'diff');
 								}
 							}
-							return (x.name.length - i) - (y.name.length - j);
 						}
-
-						data.cases.sort(numericSort);
-
-						for (var i = 0; i < data.cases.length; i++) {
-							var c = data.cases[i];
-							$('#run-details .cases').append($("<div></div>").append($("<h2></h2>").html(c.name)));
-							$('#run-details .cases').append($("<div></div>").html(JSON.stringify(c.meta)));
-							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.out_diff ? omegaup.escape(c.out_diff) : "")));
-							$('#run-details .cases').append($("<div></div>").append($("<pre></pre>").html(c.err ? omegaup.escape(c.err) : "")));
-						}
+						$('#run-details .cases').append(groups);
 						window.location.hash = 'run/details';
 						$(window).hashchange();
 						$('#run-details').show();

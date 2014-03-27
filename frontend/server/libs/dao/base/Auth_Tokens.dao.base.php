@@ -1,35 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** AuthTokens Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link AuthTokens }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class AuthTokensDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $token ){
-			return false;
-			$pk = "";
-			$pk .= $token . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $token){
-			$pk = "";
-			$pk .= $token . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $token ){
-			$pk = "";
-			$pk .= $token . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -43,13 +32,13 @@ abstract class AuthTokensDAOBase extends DAO
 	  * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Auth_Tokens )
+	public static final function save( $Auth_Tokens )
 	{
-		if(  self::getByPK(  $Auth_Tokens->getToken() ) !== NULL )
+		if (!is_null(self::getByPK( $Auth_Tokens->getToken() )))
 		{
-			try{ return AuthTokensDAOBase::update( $Auth_Tokens) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return AuthTokensDAOBase::create( $Auth_Tokens) ; } catch(Exception $e){ throw $e; }
+			return AuthTokensDAOBase::update( $Auth_Tokens);
+		} else {
+			return AuthTokensDAOBase::create( $Auth_Tokens);
 		}
 	}
 
@@ -65,19 +54,15 @@ abstract class AuthTokensDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $token )
 	{
-		if(self::recordExists(  $token)){
-			return self::getRecord( $token );
-		}
+		if(  is_null( $token )  ){ return NULL; }
 		$sql = "SELECT * FROM Auth_Tokens WHERE (token = ? ) LIMIT 1;";
 		$params = array(  $token );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new AuthTokens( $rs );
-			self::pushRecord( $foo,  $token );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new AuthTokens( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -97,9 +82,9 @@ abstract class AuthTokensDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Auth_Tokens";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -109,8 +94,6 @@ abstract class AuthTokensDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new AuthTokens($foo);
     		array_push( $allData, $bar);
-			//token
-    		self::pushRecord( $bar, $foo["token"] );
 		}
 		return $allData;
 	}
@@ -140,62 +123,70 @@ abstract class AuthTokensDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Auth_Tokens , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Auth_Tokens , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Auth_Tokens instanceof AuthTokens)) {
+			return self::search(new AuthTokens($Auth_Tokens));
+		}
+
 		$sql = "SELECT * from Auth_Tokens WHERE ("; 
 		$val = array();
-		if( $Auth_Tokens->getUserId() != NULL){
-			$sql .= " user_id = ? AND";
+		if (!is_null( $Auth_Tokens->getUserId())) {
+			$sql .= " `user_id` = ? AND";
 			array_push( $val, $Auth_Tokens->getUserId() );
 		}
-
-		if( $Auth_Tokens->getToken() != NULL){
-			$sql .= " token = ? AND";
+		if (!is_null( $Auth_Tokens->getToken())) {
+			$sql .= " `token` = ? AND";
 			array_push( $val, $Auth_Tokens->getToken() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null( $Auth_Tokens->getCreateTime())) {
+			$sql .= " `create_time` = ? AND";
+			array_push( $val, $Auth_Tokens->getCreateTime() );
+		}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new AuthTokens($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["token"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu�ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens a actualizar.
 	  **/
-	private static final function update( $Auth_Tokens )
+	private static final function update($Auth_Tokens)
 	{
-		$sql = "UPDATE Auth_Tokens SET  user_id = ?, create_time = ? WHERE  token = ?;";
+		$sql = "UPDATE Auth_Tokens SET  `user_id` = ?, `create_time` = ? WHERE  `token` = ?;";
 		$params = array( 
-			$Auth_Tokens->getUserId(),
-			$Auth_Tokens->getCreateTime(),
+			$Auth_Tokens->getUserId(), 
+			$Auth_Tokens->getCreateTime(), 
 			$Auth_Tokens->getToken(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -206,26 +197,25 @@ abstract class AuthTokensDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto AuthTokens dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens a crear.
 	  **/
-	private static final function create( &$Auth_Tokens )
+	private static final function create( $Auth_Tokens )
 	{
-		$sql = "INSERT INTO Auth_Tokens ( user_id, token ) VALUES ( ?, ?);";
+		if (is_null($Auth_Tokens->create_time)) $Auth_Tokens->create_time = gmdate('Y-m-d H:i:s');
+		$sql = "INSERT INTO Auth_Tokens ( `user_id`, `token`, `create_time` ) VALUES ( ?, ?, ?);";
 		$params = array( 
-			$Auth_Tokens->getUserId(), 
-			$Auth_Tokens->getToken(), 
+			$Auth_Tokens->user_id,
+			$Auth_Tokens->token,
+			$Auth_Tokens->create_time,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */   /*  */ 
+ 
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -233,7 +223,7 @@ abstract class AuthTokensDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link AuthTokens} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link AuthTokens}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -264,42 +254,52 @@ abstract class AuthTokensDAOBase extends DAO
 	{
 		$sql = "SELECT * from Auth_Tokens WHERE ("; 
 		$val = array();
-		if( (($a = $Auth_TokensA->getUserId()) != NULL) & ( ($b = $Auth_TokensB->getUserId()) != NULL) ){
-				$sql .= " user_id >= ? AND user_id <= ? AND";
+		if( ( !is_null (($a = $Auth_TokensA->getUserId()) ) ) & ( ! is_null ( ($b = $Auth_TokensB->getUserId()) ) ) ){
+				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " user_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `user_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $Auth_TokensA->getToken()) != NULL) & ( ($b = $Auth_TokensB->getToken()) != NULL) ){
-				$sql .= " token >= ? AND token <= ? AND";
+		if( ( !is_null (($a = $Auth_TokensA->getToken()) ) ) & ( ! is_null ( ($b = $Auth_TokensB->getToken()) ) ) ){
+				$sql .= " `token` >= ? AND `token` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " token = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `token` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $Auth_TokensA->getCreateTime()) ) ) & ( ! is_null ( ($b = $Auth_TokensB->getCreateTime()) ) ) ){
+				$sql .= " `create_time` >= ? AND `create_time` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `create_time` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new AuthTokens($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new AuthTokens($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -314,9 +314,9 @@ abstract class AuthTokensDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens a eliminar
 	  **/
-	public static final function delete( &$Auth_Tokens )
+	public static final function delete( $Auth_Tokens )
 	{
-		if(self::getByPK($Auth_Tokens->getToken()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Auth_Tokens->getToken()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Auth_Tokens WHERE  token = ?;";
 		$params = array( $Auth_Tokens->getToken() );
 		global $conn;

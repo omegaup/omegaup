@@ -13,6 +13,7 @@ OMEGAUP_ROOT=/opt/omegaup
 WWW_ROOT=/var/www/omegaup.com
 USER=`whoami`
 MYSQL_PASSWORD=omegaup
+KEYSTORE_PASSWORD=omegaup
 MYSQL_DB_NAME=omegaup
 UBUNTU=`uname -a | grep -i ubuntu | wc -l`
 WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
@@ -64,6 +65,8 @@ if [ "$SKIP_INSTALL" != "1" ]; then
 			sed -e "s/http.*/& universe/" /etc/apt/sources.list > sources.list
 			sudo mv sources.list /etc/apt/sources.list
 		fi
+		wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | sudo apt-key add -
+		echo deb http://dl.hhvm.com/ubuntu saucy main | sudo tee /etc/apt/sources.list.d/hhvm.list
 	elif [ "$WHEEZY" != "1" ]; then
 		curl -s http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add - > /dev/null
 		cat > dotdeb.list << EOF
@@ -75,35 +78,13 @@ EOF
 	
 	sudo apt-get update -qq -y
 	
-	sudo apt-get install -qq -y nginx mysql-client php5-fpm php5-cli php5-mysql php-pear php5-mcrypt php5-curl php5-apcu git phpunit g++ fp-compiler unzip openssh-client make zip libcap-dev libgfortran3 ghc libelf-dev
+	sudo apt-get install -qq -y nginx mysql-client git phpunit phpunit-selenium php5-fpm g++ fp-compiler unzip openssh-client make zip libcap-dev libgfortran3 ghc libelf-dev hhvm-nightly
 	sudo apt-get install -qq -y openjdk-7-jdk || sudo apt-get install -qq -y openjdk-6-jdk
 	
 	if [ ! -f /usr/sbin/mysqld ]; then
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server
 		sleep 5
 		mysqladmin -u root password $MYSQL_PASSWORD
-	fi
-	
-	sudo apt-get install -qq -y phpunit-selenium || echo 'Selenium unavailable'
-	sudo apt-get install -qq -y php5-json || echo
-	
-	# Restart php-fpm so it picks php5-curl and php5-mcrypt.
-	if [ "$SAUCY" = "1" ]; then
-		# Saucy has some bugs with the installation of these packages :(
-		if [ ! -f /etc/php5/fpm/conf.d/20-curl.ini ]; then
-			echo "extension=curl.so" > 20-curl.ini
-			sudo cp 20-curl.ini /etc/php5/cli/conf.d
-			sudo mv 20-curl.ini /etc/php5/fpm/conf.d
-		fi
-		if [ ! -f /etc/php5/fpm/conf.d/20-mcrypt.ini ]; then
-			echo "extension=mcrypt.so" > 20-mcrypt.ini
-			sudo cp 20-mcrypt.ini /etc/php5/cli/conf.d
-			sudo mv 20-mcrypt.ini /etc/php5/fpm/conf.d
-		fi
-		sudo service php5-fpm restart
-		sudo service nginx restart
-	else
-		sudo /etc/init.d/php5-fpm restart
 	fi
 fi
 
@@ -129,7 +110,7 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	git submodule update --init
 
 	# Generate the certificates required.
-	bin/gencerts.sh
+	bin/gencerts.sh $KEYSTORE_PASSWORD
 
 	# Build the sandbox
 	cd $OMEGAUP_ROOT/sandbox
@@ -148,10 +129,11 @@ fi
 
 # Set up the minijail.
 if [ ! -d $MINIJAIL_ROOT ]; then
-	sudo mkdir -p $MINIJAIL_ROOT/{bin,dist,scripts}
+	sudo mkdir -p $MINIJAIL_ROOT/{bin,dist,scripts,lib}
 	sudo cp $OMEGAUP_ROOT/bin/{karel,kcl} $MINIJAIL_ROOT/bin/
 	sudo cp $OMEGAUP_ROOT/minijail/{minijail0,libminijailpreload.so,ldwrapper} $MINIJAIL_ROOT/bin/
 	sudo cp $OMEGAUP_ROOT/stuff/minijail-scripts/* $MINIJAIL_ROOT/scripts/
+	sudo cp $OMEGAUP_ROOT/stuff/libkarel.py $MINIJAIL_ROOT/lib/
 
 	pushd $MINIJAIL_ROOT
 		sudo python $OMEGAUP_ROOT/stuff/mkroot
@@ -161,7 +143,7 @@ fi
 # Install the grader service.
 if [ ! -f /etc/init.d/omegaup ]; then
 	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
-	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/" $OMEGAUP_ROOT/backend/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
+	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/;s/\(.*\.password\)\s*=.*$/\1=$KEYSTORE_PASSWORD/" $OMEGAUP_ROOT/backend/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
 	sudo update-rc.d omegaup defaults
 	cp ~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.12.jar $OMEGAUP_ROOT/bin
 	cp $OMEGAUP_ROOT/backend/grader/omegaup.jks $OMEGAUP_ROOT/bin
@@ -192,39 +174,26 @@ fi
 
 # Add ngnix configuration.
 if [ "$SKIP_NGINX" != "1" ]; then
-	FPM_PORT=`grep '^listen\b' /etc/php5/fpm/pool.d/www.conf 2>/dev/null | sed -e 's/.*=\s*//'`
-	if [ "$FPM_PORT" = "" ]; then
-		FPM_PORT=127.0.0.1:9000
-	fi
-	if [ "`echo $FPM_PORT | grep '/' | wc -l `" != "0" ]; then
-		FPM_PORT=unix:$FPM_PORT
-	fi
+	FPM_PORT=127.0.0.1:9000
 	cat > default.conf << EOF
 server {
 listen       80;
 server_name  .$HOSTNAME;
 client_max_body_size 0;
+root   $OMEGAUP_ROOT/frontend/www;
 
 location / {
-    root   $WWW_ROOT;
     index  index.php index.html;
-}
-
-# redirect server error pages to the static page /50x.html
-#
-error_page   500 502 503 504  /50x.html;
-location = /50x.html {
-    root   html;
 }
 
 include $OMEGAUP_ROOT/frontend/server/nginx.rewrites;
 
 # pass the PHP scripts to FastCGI server listening on $FPM_PORT.
-location ~ \.php$ {
-    root           $WWW_ROOT;
+location ~ \.(hh|php)$ {
+    fastcgi_keep_conn on;
     fastcgi_pass   $FPM_PORT;
     fastcgi_index  index.php;
-    fastcgi_param  SCRIPT_FILENAME  $WWW_ROOT\$fastcgi_script_name;
+    fastcgi_param  SCRIPT_FILENAME  \$document_root\$fastcgi_script_name;
     include        fastcgi_params;
 }
 
@@ -240,8 +209,12 @@ EOF
 	if [ -f /etc/nginx/sites-enabled/default ]; then
 		sudo mv /etc/nginx/sites-enabled/default /etc/nginx/sites-disabled
 	fi
-	
-	sudo /etc/init.d/nginx restart
+
+	sudo service php5-fpm stop
+	sudo update-rc.d -f php5-fpm remove
+	sudo service hhvm restart
+	sudo update-rc.d hhvm defaults
+	sudo service nginx restart
 fi
 
 # Set up runtime directories.
@@ -329,9 +302,21 @@ fi
 
 # Execute tests
 if [ "$SKIP_PHPUNIT" != "1" ]; then
+	if [ "`grep '\/usr\/share\/php' /etc/hhvm/php.ini | wc -l`" -eq 0 ]; then
+		cat | sudo tee /etc/hhvm/php.ini << EOF
+; php options
+include_path = /usr/share/php:.
+
+; hhvm specific
+hhvm.log.level = Warning
+hhvm.log.always_log_unhandled_exceptions = true
+hhvm.log.runtime_error_reporting_level = 8191
+hhvm.mysql.typed_results = false
+EOF
+	fi
 	pushd $OMEGAUP_ROOT/frontend/tests/
-	phpunit controllers/
-	phpunit server/
+	hhvm /usr/bin/phpunit controllers/
+	hhvm /usr/bin/phpunit server/
 	popd
 fi
 

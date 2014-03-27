@@ -1,34 +1,24 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** Languages Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link Languages }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class LanguagesDAOBase extends DAO
 {
 
-		private static $loadedRecords = array();
-
-		private static function recordExists(  $language_id ){
-			$pk = "";
-			$pk .= $language_id . "-";
-			return array_key_exists ( $pk , self::$loadedRecords );
-		}
-		private static function pushRecord( $inventario,  $language_id){
-			$pk = "";
-			$pk .= $language_id . "-";
-			self::$loadedRecords [$pk] = $inventario;
-		}
-		private static function getRecord(  $language_id ){
-			$pk = "";
-			$pk .= $language_id . "-";
-			return self::$loadedRecords[$pk];
-		}
 	/**
 	  *	Guardar registros. 
 	  *	
@@ -42,13 +32,13 @@ abstract class LanguagesDAOBase extends DAO
 	  * @param Languages [$Languages] El objeto de tipo Languages
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Languages )
+	public static final function save( $Languages )
 	{
-		if(  self::getByPK(  $Languages->getLanguageId() ) !== NULL )
+		if (!is_null(self::getByPK( $Languages->getLanguageId() )))
 		{
-			try{ return LanguagesDAOBase::update( $Languages) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return LanguagesDAOBase::create( $Languages) ; } catch(Exception $e){ throw $e; }
+			return LanguagesDAOBase::update( $Languages);
+		} else {
+			return LanguagesDAOBase::create( $Languages);
 		}
 	}
 
@@ -64,19 +54,15 @@ abstract class LanguagesDAOBase extends DAO
 	  **/
 	public static final function getByPK(  $language_id )
 	{
-		if(self::recordExists(  $language_id)){
-			return self::getRecord( $language_id );
-		}
+		if(  is_null( $language_id )  ){ return NULL; }
 		$sql = "SELECT * FROM Languages WHERE (language_id = ? ) LIMIT 1;";
 		$params = array(  $language_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-			$foo = new Languages( $rs );
-			self::pushRecord( $foo,  $language_id );
-			return $foo;
+		if(count($rs)==0) return NULL;
+		$foo = new Languages( $rs );
+		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -96,9 +82,9 @@ abstract class LanguagesDAOBase extends DAO
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
 		$sql = "SELECT * from Languages";
-		if($orden != NULL)
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
-		if($pagina != NULL)
+		if( ! is_null ( $orden ) )
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
+		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
 		}
@@ -108,8 +94,6 @@ abstract class LanguagesDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new Languages($foo);
     		array_push( $allData, $bar);
-			//language_id
-    		self::pushRecord( $bar, $foo["language_id"] );
 		}
 		return $allData;
 	}
@@ -139,67 +123,70 @@ abstract class LanguagesDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Languages , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Languages , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Languages instanceof Languages)) {
+			return self::search(new Languages($Languages));
+		}
+
 		$sql = "SELECT * from Languages WHERE ("; 
 		$val = array();
-		if( $Languages->getLanguageId() != NULL){
-			$sql .= " language_id = ? AND";
+		if (!is_null( $Languages->getLanguageId())) {
+			$sql .= " `language_id` = ? AND";
 			array_push( $val, $Languages->getLanguageId() );
 		}
-
-		if( $Languages->getName() != NULL){
-			$sql .= " name = ? AND";
+		if (!is_null( $Languages->getName())) {
+			$sql .= " `name` = ? AND";
 			array_push( $val, $Languages->getName() );
 		}
-
-		if( $Languages->getCountryId() != NULL){
-			$sql .= " country_id = ? AND";
+		if (!is_null( $Languages->getCountryId())) {
+			$sql .= " `country_id` = ? AND";
 			array_push( $val, $Languages->getCountryId() );
 		}
-
-		if(sizeof($val) == 0){return array();}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( ! is_null ( $orderBy ) ){
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Languages($foo);
-    		array_push( $ar,$bar);
-    		self::pushRecord( $bar, $foo["language_id"] );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cu‡ntas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param Languages [$Languages] El objeto de tipo Languages a actualizar.
 	  **/
-	private static final function update( $Languages )
+	private static final function update($Languages)
 	{
-		$sql = "UPDATE Languages SET  name = ?, country_id = ? WHERE  language_id = ?;";
+		$sql = "UPDATE Languages SET  `name` = ?, `country_id` = ? WHERE  `language_id` = ?;";
 		$params = array( 
 			$Languages->getName(), 
 			$Languages->getCountryId(), 
 			$Languages->getLanguageId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -210,27 +197,25 @@ abstract class LanguagesDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto Languages dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Languages [$Languages] El objeto de tipo Languages a crear.
 	  **/
-	private static final function create( &$Languages )
+	private static final function create( $Languages )
 	{
-		$sql = "INSERT INTO Languages ( language_id, name, country_id ) VALUES ( ?, ?, ?);";
+		$sql = "INSERT INTO Languages ( `language_id`, `name`, `country_id` ) VALUES ( ?, ?, ?);";
 		$params = array( 
-			$Languages->getLanguageId(), 
-			$Languages->getName(), 
-			$Languages->getCountryId(), 
+			$Languages->language_id,
+			$Languages->name,
+			$Languages->country_id,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */  $Languages->setLanguageId( $conn->Insert_ID() ); /*  */ 
+ 		$Languages->language_id = $conn->Insert_ID();
+
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -238,7 +223,7 @@ abstract class LanguagesDAOBase extends DAO
 	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Languages} de la base de datos siempre y cuando 
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Languages}.
 	  * 
-	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda. 
+	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
 	  *	
@@ -269,53 +254,52 @@ abstract class LanguagesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Languages WHERE ("; 
 		$val = array();
-		if( (($a = $LanguagesA->getLanguageId()) != NULL) & ( ($b = $LanguagesB->getLanguageId()) != NULL) ){
-				$sql .= " language_id >= ? AND language_id <= ? AND";
+		if( ( !is_null (($a = $LanguagesA->getLanguageId()) ) ) & ( ! is_null ( ($b = $LanguagesB->getLanguageId()) ) ) ){
+				$sql .= " `language_id` >= ? AND `language_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " language_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `language_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $LanguagesA->getName()) != NULL) & ( ($b = $LanguagesB->getName()) != NULL) ){
-				$sql .= " name >= ? AND name <= ? AND";
+		if( ( !is_null (($a = $LanguagesA->getName()) ) ) & ( ! is_null ( ($b = $LanguagesB->getName()) ) ) ){
+				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " name = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `name` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( (($a = $LanguagesA->getCountryId()) != NULL) & ( ($b = $LanguagesB->getCountryId()) != NULL) ){
-				$sql .= " country_id >= ? AND country_id <= ? AND";
+		if( ( !is_null (($a = $LanguagesA->getCountryId()) ) ) & ( ! is_null ( ($b = $LanguagesB->getCountryId()) ) ) ){
+				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
-		}elseif( $a || $b ){
-			$sql .= " country_id = ? AND"; 
-			$a = $a == NULL ? $b : $a;
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `country_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
-		if( $orderBy !== null ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		if( !is_null ( $orderBy ) ){
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, new Languages($foo));
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new Languages($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -330,9 +314,9 @@ abstract class LanguagesDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param Languages [$Languages] El objeto de tipo Languages a eliminar
 	  **/
-	public static final function delete( &$Languages )
+	public static final function delete( $Languages )
 	{
-		if(self::getByPK($Languages->getLanguageId()) === NULL) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Languages->getLanguageId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Languages WHERE  language_id = ?;";
 		$params = array( $Languages->getLanguageId() );
 		global $conn;

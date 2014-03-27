@@ -33,7 +33,7 @@ class Controller {
 		} catch(Exception $e) {
 			throw new ForbiddenAccessException();
 		}
-		
+
 		try {
 			$user = AuthTokensDAO::getUserByToken($r["auth_token"]);
 		} catch (Exception $e) {

@@ -35,7 +35,7 @@ class RunController extends Controller {
 	 * @throws InvalidParameterException
 	 * @throws ForbiddenAccessException
 	 */
-	private static function validateCreateRequest(Request &$r) {
+	private static function validateCreateRequest(Request $r) {
 		try {
 			Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
@@ -83,7 +83,7 @@ class RunController extends Controller {
 				}
 
 				// Validate that the run is timely inside contest
-				if (!$r["contest"]->isInsideContest($r["current_user_id"])) {
+				if (!ContestsDAO::isInsideContest($r["contest"], $r['current_user_id'])) {
 					throw new NotAllowedToSubmitException("Contest time has expired or not started yet.");
 				}
 
@@ -104,7 +104,7 @@ class RunController extends Controller {
 			// Propagate ApiException
 			throw $apiException;
 		} catch (Exception $e) {
-			// Operation failed in the data layer			
+			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 	}
@@ -214,8 +214,7 @@ class RunController extends Controller {
 			
 			// Update submissions counter++
 			$r["problem"]->setSubmissions($r["problem"]->getSubmissions() + 1);
-			$problem = $r['problem'];
-			ProblemsDAO::save($problem);
+			ProblemsDAO::save($r["problem"]);
 			
 		} catch (Exception $e) {
 			// Operation failed in the data layer
@@ -404,7 +403,6 @@ class RunController extends Controller {
 	public static function apiAdminDetails(Request $r) {
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
-
 		self::validateDetailsRequest($r);
 
 		if (!(Authorization::CanEditRun($r["current_user_id"], $r["run"]))) {
@@ -416,59 +414,39 @@ class RunController extends Controller {
 			$r["problem"] = ProblemsDAO::getByPK($r["run"]->getProblemId());
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
-		}		
+		}
 		
-		Cache::getFromCacheOrSet(Cache::RUN_ADMIN_DETAILS, $r["run"]->getRunId(), $r, function(Request $r) {
-			
-			$response = array();		
+		$response = array();
 
-			$problem_dir = PROBLEMS_PATH . '/' . $r["problem"]->getAlias() . '/cases/';
-			$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
+		$problem_dir = PROBLEMS_PATH . '/' . $r["problem"]->getAlias() . '/cases/';
+		$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
 
-			$cases = array();
+		$groups = array();
 
-			if (file_exists("$grade_dir.err")) {
-				$response['compile_error'] = file_get_contents("$grade_dir.err");
-			} else if (is_dir($grade_dir)) {
-				if ($dir = opendir($grade_dir)) {
-					while (($file = readdir($dir)) !== false) {
-						if ($file == '.' || $file == '..' || !strstr($file, ".meta"))
-							continue;
-
-						$case = array('name' => str_replace(".meta", "", $file), 'meta' => RunController::ParseMeta(file_get_contents("$grade_dir/$file")));
-
-						if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
-							$out = str_replace(".meta", ".out", $file);
-							$case['out_diff'] = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
-						}
-
-						if (file_exists("$grade_dir/" . str_replace(".meta", ".err", $file))) {
-							$err = "$grade_dir/" . str_replace(".meta", ".err", $file);
-							$case['err'] = file_get_contents($err);
-						}
-
-						array_push($cases, $case);
+		if (file_exists("$grade_dir.err")) {
+			$response['compile_error'] = file_get_contents("$grade_dir.err");
+		} else if (is_dir($grade_dir) && file_exists("$grade_dir/details.json")) {
+			$groups = json_decode(file_get_contents("$grade_dir/details.json"), true);
+			foreach ($groups as &$group) {
+				foreach ($group['cases'] as &$case) {
+					$case_name = $case['name'];
+					$case['meta'] = RunController::ParseMeta(file_get_contents("$grade_dir/$case_name.meta"));
+					unset($case['meta']['status']);
+					if (file_exists("$grade_dir/$case_name.out")) {
+						$case['out_diff'] = `diff -wauBbi $problem_dir/$case_name.out $grade_dir/$case_name.out | tail -n +3 | head -n50`;
 					}
-					closedir($dir);
+
+					if (file_exists("$grade_dir/$case_name.err")) {
+						$case['err'] = file_get_contents("$grade_dir/$case_name.err");
+					}
 				}
 			}
+		}
 
-			usort($cases, array("RunController", "MetaCompare"));
-
-			$response['cases'] = $cases;
-			$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
-			$response["status"] = "ok";
-			
-			// Save cache only if run was already graded
-			if ($r["run"]->getStatus() != 'ready') {
-				Cache::$cacheResults = false;
-			}
-			
-			return $response;;
-			
-		}, $response);
+		$response['groups'] = $groups;
+		$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
+		$response["status"] = "ok";
 		
-
 		return $response;
 	}
 
@@ -497,11 +475,19 @@ class RunController extends Controller {
 	 * @return boolean
 	 */
 	public static function MetaCompare($a, $b) {
+		if ($a['group'] == $b['group'])
+			return 0;
+
+		return ($a['group'] < $b['group']) ? -1 : 1;
+	}
+
+	public static function CaseCompare($a, $b) {
 		if ($a['name'] == $b['name'])
 			return 0;
 
 		return ($a['name'] < $b['name']) ? -1 : 1;
 	}
+
 
 	/**
 	 * Given the run alias, returns the source code and any compile errors if any
@@ -682,43 +668,33 @@ class RunController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiList(Request $r) {
-		
 		// Authenticate request
 		self::authenticateRequest($r);
-		
 		self::validateList($r);
 
-		// Get all runs for problem given
-		$runs_mask = new Runs(array(					
-					"status" => $r["status"],
-					"veredict" => $r["veredict"],
-					"problem_id" => !is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
-					"language" => $r["language"],
-					"user_id" => !is_null($r["user"]) ? $r["user"]->getUserId() : null,
-				));
-		
-		// Filter relevant columns
-		$relevant_columns = array("run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
-
-		// Get our runs
 		try {
-			$runs = RunsDAO::search($runs_mask, "time", "DESC", $relevant_columns, $r["offset"], $r["rowcount"]);
+			$runs = RunsDAO::GetAllRuns(
+				null,
+				$r["status"],
+				$r["veredict"],
+				!is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
+				$r["language"],
+				!is_null($r["user"]) ? $r["user"]->getUserId() : null,
+				$r["offset"],
+				$r["rowcount"]
+			);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
-		$relevant_columns[11] = 'username';
-		$relevant_columns[12] = 'alias';
 
 		$result = array();
 
 		foreach ($runs as $run) {
-			$filtered = $run->asFilteredArray($relevant_columns);
-			$filtered['time'] = strtotime($filtered['time']);
-			$filtered['score'] = round((float) $filtered['score'], 4);
-			$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
-			array_push($result, $filtered);
+			$run['time'] = (int)$run['time'];
+			$run['score'] = round((float)$run['score'], 4);
+			$run['contest_score'] = round((float)$run['contest_score'], 2);
+			array_push($result, $run);
 		}
 
 		$response = array();

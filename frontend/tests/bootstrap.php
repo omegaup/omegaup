@@ -9,7 +9,6 @@ define("OMEGAUP_ROOT", __DIR__ . "/../");
 // Load test specific config globals
 require_once("test_config.php");
 require_once("test_config.default.php");
-require_once(OMEGAUP_ROOT . "server/config.php");
 require_once(OMEGAUP_ROOT . "server/config.default.php");
 
 // Load api caller
@@ -43,4 +42,3 @@ Utils::CleanupDB();
 UserController::$sendEmailOnVerify = false;
 UserFactory::createUser("test", "testtesttest");
 UserController::$sendEmailOnVerify = true;
-
