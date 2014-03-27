@@ -107,5 +107,37 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$this->assertContains("<p>This is the new statement \$x\$</p>", $statementHtmlContents);
 		$this->assertContains($statement, $statementMarkdownContents);		
 	}
+	
+	
+	/**
+	 * Test apiUpdateStatement with embedded imgs via data URI 
+	 */
+	public function testProblemStatementUpdateWithImagesAsDataURI() {
+		
+		// Get a problem (with 'es' statements)
+		$problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . "triangulos.zip");
+		
+		// Update statement
+		$imgUri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
+		$imgFilename = sha1($imgUri);
+		
+		$statement = "This is the new statement with an image omg ![Alt text]($imgUri \"Optional title\")";
+		$response = ProblemController::apiUpdateStatement(new Request(array(
+			"auth_token" => $this->login($problemData["author"]),
+			"problem_alias" => $problemData["request"]["alias"],
+			"statement" => $statement
+		)));
+		
+		$this->assertEquals($response["status"], "ok");	
+
+		// Check statment contents
+		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problemData["request"]["alias"] . DIRECTORY_SEPARATOR;
+		$statementHtmlContents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		$statementMarkdownContents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
+		
+		$this->assertFileExists(IMAGES_PATH . $imgFilename);		
+		$this->assertContains("<img src=\"" . IMAGES_URL_PATH . $imgFilename . "\" alt=\"Alt text\" title=\"Optional title\" />", $statementHtmlContents);
+		$this->assertContains($statement, $statementMarkdownContents);		
+	}
 }
 

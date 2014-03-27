@@ -306,6 +306,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "bunny.jpg");
+		$this->assertFileExists(IMAGES_PATH . $imageSha1 . "." . $imageExtension);
 
 		// Verify that all the images are there.
 		$html_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");

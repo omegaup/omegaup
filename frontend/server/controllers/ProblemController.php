@@ -384,7 +384,8 @@ class ProblemController extends Controller {
 		$response["status"] = "ok";
 
 		// Invalidar problem statement cache @todo invalidar todos los lenguajes
-		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es");						
+		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es" . "html");
+		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es" . "markdown");
 
 		return $response;
 	}
@@ -412,8 +413,7 @@ class ProblemController extends Controller {
 			$r["lang"] = "es";
 		}				
 		
-		try {			
-			
+		try {					
 			// DeployProblemZip requires alias => problem_alias
 			$r["alias"] = $r["problem_alias"];
 			
@@ -422,8 +422,8 @@ class ProblemController extends Controller {
 			$problemDeployer->updateStatement($r);
 			
 			// Invalidar problem statement cache
-			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"]);			
-			
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "html");
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "markdown");			
 		} catch (ApiException $e) {
 			throw $e;
 		} catch (Exception $e) {

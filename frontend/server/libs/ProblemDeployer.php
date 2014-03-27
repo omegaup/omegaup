@@ -361,8 +361,16 @@ class ProblemDeployer {
 	 * @param type $imagepath
 	 * @return type
 	 */
-	public function imageMarkdownCallback($imagepath) {
-		if (array_key_exists($imagepath, $this->imageHashes)) {
+	public function imageMarkdownCallback($imagepath) {		
+		if (strpos($imagepath, "data:") === 0) {
+			$filename = sha1($imagepath);
+			$localDestination = IMAGES_PATH . $filename;
+			$globalDestination = IMAGES_URL_PATH . $filename;
+			
+			file_put_contents($localDestination, file_get_contents($imagepath));
+			return $globalDestination;
+		}
+		else if (array_key_exists($imagepath, $this->imageHashes)) {
 			if (is_bool($this->imageHashes[$imagepath])) {
 				
 				// copy the image to somewhere in IMAGES_PATH, get its SHA-1 sum,
