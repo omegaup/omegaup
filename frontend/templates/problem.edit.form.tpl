@@ -80,16 +80,7 @@
 	
 	<input id='' name='request' value='submit' type='hidden'>
 	
-	<div class="row">
-		<div class="form-group col-md-6 no-bottom-margin">
-		{if $IS_UPDATE eq 1}
-			<button type='submit' class="btn btn-primary">{#problemEditFormUpdateProblem#}</button>	
-		{else}
-			<button type='submit' class="btn btn-primary">{#problemEditFormCreateProblem#}</button>	
-		{/if}
-		</div>
-	</div>
-
+	{if $IS_UPDATE eq 1}
 	<div class="row">
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="#statement-source" data-toggle="tab">Source</a></li>
@@ -99,7 +90,7 @@
 		<div class="tab-content">
 			<div class="tab-pane active" id="statement-source">
 				<div id="wmd-button-bar-statement"></div>
-				<textarea class="wmd-input" id="wmd-input-statement"></textarea>
+				<textarea class="wmd-input" id="wmd-input-statement" name="wmd-input-statement"></textarea>
 			</div>
 
 			<div class="tab-pane" id="statement-preview">
@@ -107,6 +98,19 @@
 			</div>
 		</div>
 	</div>
+	{/if}
+	
+	<div class="row">
+		<div class="form-group col-md-6 no-bottom-margin">
+		{if $IS_UPDATE eq 1}
+			<button type='submit' class="btn btn-primary">{#problemEditFormUpdateProblem#}</button>	
+		{else}
+			<button type='submit' class="btn btn-primary">{#problemEditFormCreateProblem#}</button>	
+		{/if}
+		</div>
+	</div>
+		
+
 </form>
 	<p>
 		<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup">{#navHelp#}</a>

@@ -3,8 +3,12 @@
 require_once("../server/bootstrap.php");
 require_once("api/ApiCaller.php");
 
+$smarty->assign('IS_UPDATE', 1);
+$smarty->assign('LOAD_MATHJAX', 1);
+$smarty->assign('LOAD_PAGEDOWN', 1);
 
-if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {	
+if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {		
+	// Update problem contents/metadata
 	$r = new Request(array(
 				"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 				"problem_alias" => $_POST["edit-problem-list"],
@@ -17,24 +21,35 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 				"public" => $_POST["public"],
 			));
 	$r->method = "ProblemController::apiUpdate";
-
 	$response = ApiCaller::call($r);
-
 	if ($response["status"] == "error") {
-		$smarty->assign('STATUS_ERROR', $response["error"]);
-		$smarty->assign('TITLE', $_POST["title"]);
-		$smarty->assign('ALIAS', $_POST["edit-problem-list"]);
-		$smarty->assign('VALIDATOR', $_POST["validator"]);
-		$smarty->assign('TIME_LIMIT', $_POST["time_limit"]);
-		$smarty->assign('MEMORY_LIMIT', $_POST["memory_limit"]);
-		$smarty->assign('SOURCE', $_POST["source"]);
-		$smarty->assign('PUBLIC', $_POST["public"]);
-	} else if ($response["status"] == "ok") {
-		$smarty->assign('STATUS_SUCCESS', "Problem updated succesfully!");
-	}
+		onError($smarty, $response);
+	} 			
+	
+	// Update statement
+	$r = new Request(array(
+				"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
+				"problem_alias" => $_POST["edit-problem-list"],
+				"statement" => $_POST["wmd-input-statement"]				
+			));
+	$r->method = "ProblemController::apiUpdateStatement";
+	$response = ApiCaller::call($r);	
+	if ($response["status"] == "error") {
+		onError($smarty, $response);
+	} 
+	$smarty->assign('STATUS_SUCCESS', "Problem updated succesfully!");
 }
 
-$smarty->assign('IS_UPDATE', 1);
-$smarty->assign('LOAD_MATHJAX', 1);
-$smarty->assign('LOAD_PAGEDOWN', 1);
 $smarty->display('../templates/problem.edit.tpl');
+
+/**
+ * Handle error (print msg, die)
+ * 
+ * @param type $smarty
+ * @param type $response
+ */
+function onError($smarty, $response) {
+	$smarty->assign('STATUS_ERROR', $response["error"]);	
+	$smarty->display('../templates/problem.edit.tpl');
+	die();
+}
