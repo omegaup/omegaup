@@ -362,15 +362,15 @@ class ProblemDeployer {
 	 * @return type
 	 */
 	public function imageMarkdownCallback($imagepath) {		
-		if (strpos($imagepath, "data:") === 0) {
-			$filename = sha1($imagepath);
+		if (preg_match('%^data:image/([^;]+)%', $imagepath, $matches) === 1) {
+			$imagedata = file_get_contents($imagepath);
+			$filename = sha1($imagedata) . '.' . $matches[1];
 			$localDestination = IMAGES_PATH . $filename;
 			$globalDestination = IMAGES_URL_PATH . $filename;
 			
-			file_put_contents($localDestination, file_get_contents($imagepath));
+			file_put_contents($localDestination, $imagedata);
 			return $globalDestination;
-		}
-		else if (array_key_exists($imagepath, $this->imageHashes)) {
+		} else if (array_key_exists($imagepath, $this->imageHashes)) {
 			if (is_bool($this->imageHashes[$imagepath])) {
 				
 				// copy the image to somewhere in IMAGES_PATH, get its SHA-1 sum,

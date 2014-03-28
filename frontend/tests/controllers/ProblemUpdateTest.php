@@ -119,7 +119,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		
 		// Update statement
 		$imgUri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
-		$imgFilename = sha1($imgUri);
+		$imgFilename = 'af6a4603e039cca2f6823d287f6c87e561aa6e68.png';
 		
 		$statement = "This is the new statement with an image omg ![Alt text]($imgUri \"Optional title\")";
 		$response = ProblemController::apiUpdateStatement(new Request(array(
