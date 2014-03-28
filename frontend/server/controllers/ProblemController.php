@@ -466,7 +466,7 @@ class ProblemController extends Controller {
 			throw new NotFoundException("Problem not found");
 		}
 
-		if (isset($r["statement_type"]) && !in_array($r["statement_type"], ["html", "markdown"])) {
+		if (isset($r["statement_type"]) && !in_array($r["statement_type"], array("html", "markdown"))) {
 			throw new NotFoundException("Invalid statement type");
 		}
 
