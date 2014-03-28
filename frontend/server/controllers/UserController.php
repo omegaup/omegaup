@@ -711,7 +711,6 @@ class UserController extends Controller {
 	 * @return String
 	 */
 	public static function getPreferredLanguage(Request $r = NULL) {
-
 		$found = FALSE;
 		$result = "es";
 
@@ -721,9 +720,10 @@ class UserController extends Controller {
 			$found = TRUE;
 		}
 		if (!$found) {
-			$user = self::resolveTargetUser($r);
-			if (!is_null($user) && !is_null($user->getLanguageId())) {
-					$result = LanguagesDAO::getByPK( $user->getLanguageId() );
+			try {
+				$user = self::resolveTargetUser($r);
+				if (!is_null($user) && !is_null($user->getLanguageId())) {
+					$result = LanguagesDAO::getByPK($user->getLanguageId());
 					if (is_null($result)) {
 						self::$log->warn("Invalid language id for user");
 					} else {
@@ -731,6 +731,9 @@ class UserController extends Controller {
 						$found = true;
 					}
 				}
+			} catch (NotFoundException $ex) {
+				$found = false;
+			}
 		}
 
 		if (!$found) {
