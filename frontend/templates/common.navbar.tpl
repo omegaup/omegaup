@@ -60,7 +60,8 @@
 										if (graderInfo.status == "ok") {
 											var now = new Date().getTime() / 1000;
 											if (graderInfo.queues) {
-												queueLength = graderInfo.queues['#default'].run_queue_length;
+												queueLength = graderInfo.queues['#default'].run_queue_length +
+													graderInfo.queues['#default'].running.length;
 											}
 											if (queueLength < 5) {
 												$("#grader-status > a").addClass("grader-ok");
@@ -69,8 +70,7 @@
 											}
 											html += "<li><a href=\"#\">Grader OK</a></li>";
 											html += "<li><a href=\"#\">Embedded runner: " + graderInfo.embedded_runner + "</a></li>";
-											html += "<li><a href=\"#\">Queues: " + OmegaUp.ui.prettyPrintJSON(graderInfo.queues) + "</a></li>";
-											html += "<li><a href=\"#\">Idle runners: " + graderInfo.runner_queue_length + "</a></li>";
+											html += "<li><a href=\"#\">Queues: <pre style=\"width: 50em;\">" + OmegaUp.ui.prettyPrintJSON(graderInfo.queues) + "</pre></a></li>";
 										} else {
 											$("#grader-status > a").addClass("grader-error");
 											html += "<li><a href=\"#\">Grader DOWN</a></li>";
