@@ -322,6 +322,7 @@ legend {
 	width: 790px;
 	height: 23em;
 	margin: 0.5em 0;
+	font-family: monospace;
 }
 
 #overlay form .close {

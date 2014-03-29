@@ -43,7 +43,7 @@
 
 		<link rel="stylesheet" href="/css/jquery.gritter.css" />
 		<link rel="stylesheet" href="/css/common.css" />
-		<link rel="stylesheet" href="/ux/arena.css?t=2" />
+		<link rel="stylesheet" href="/ux/arena.css?t=3" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid}"{/if}>
