@@ -22,12 +22,12 @@ class ClarificationsDAO extends ClarificationsDAOBase {
 		$sql = '';
 		if ($admin) {
 			$sql = 'SELECT c.clarification_id, p.alias problem_alias, u.username author, ' .
-			       'c.message, c.answer, c.time, c.public, true can_answer ' .
+			       'c.message, c.answer, c.time, c.public ' .
 			       'FROM Clarifications c ' .
 			       'INNER JOIN Users u ON u.user_id = c.author_id ';
 		} else {
 			$sql = 'SELECT c.clarification_id, p.alias problem_alias, c.message, ' .
-			       'c.time, c.answer, c.public, false can_answer ' .
+			       'c.time, c.answer, c.public ' .
 			       'FROM Clarifications c ';
 		}
 		$sql .= 'INNER JOIN Problems p ON p.problem_id = c.problem_id ' .

@@ -816,6 +816,10 @@ class ContestController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
+		foreach ($clarifications as &$clar) {
+			$clar['can_answer'] = $is_contest_director;
+		}
+
 		// Add response to array
 		$response = array();
 		$response['clarifications'] = $clarifications;
