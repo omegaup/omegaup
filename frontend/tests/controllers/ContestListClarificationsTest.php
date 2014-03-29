@@ -31,8 +31,7 @@ class ListClarificationsContest extends OmegaupTestCase {
 		// Create 4 clarifications with this contestant
 		$clarificationData1 = array();
 		for ($i = 0; $i < 4; $i++) {
-			$clarificationData1[$i] = ClarificationsFactory::createClarification($problemData, $contestData, $contestant1);			
-			
+			$clarificationData1[$i] = ClarificationsFactory::createClarification($problemData, $contestData, $contestant1);
 			// We need to sleep a little bit to separate the times
 			sleep(1);
 		}
@@ -61,13 +60,13 @@ class ListClarificationsContest extends OmegaupTestCase {
 		// Call API
 		$response = ContestController::apiClarifications($r);
 
-		// Check that we got our 3 clarifications
+		// Check that we got all clarifications
 		$this->assertEquals(count($clarificationData1), count($response["clarifications"]));
-		
+
 		// Check that the clarifications came in the order we expect
 		// First we expect clarifications not answered
-		$this->assertEquals($clarificationData1[1]["request"]["message"], $response["clarifications"][0]["message"]);
-		$this->assertEquals($clarificationData1[3]["request"]["message"], $response["clarifications"][1]["message"]);
+		$this->assertEquals($clarificationData1[3]["request"]["message"], $response["clarifications"][0]["message"]);
+		$this->assertEquals($clarificationData1[1]["request"]["message"], $response["clarifications"][1]["message"]);
 		
 		// Then clarifications answered, newer first
 		$this->assertEquals($clarificationData1[2]["request"]["message"], $response["clarifications"][2]["message"]);

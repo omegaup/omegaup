@@ -795,128 +795,30 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiClarifications(Request $r) {
-
-		// Authenticate user
 		self::authenticateRequest($r);
-
-		// Validate request
 		self::validateClarifications($r);
 
-		$offset = is_null($r["offset"]) ? 0 : $r["offset"];
-		$rowcount = is_null($r["rowcount"]) ? 0 : $r["rowcount"];
+		$is_contest_director = Authorization::IsContestAdmin(
+			$r['current_user_id'],
+			$r['contest']
+		);
 
-		// Create array of relevant columns
-		$relevant_columns = array("clarification_id", "problem_alias", "message", "answer", "time", "public");
-
-
-		$public_clarification_mask = new Clarifications(array(
-					"public" => '1',
-					"contest_id" => $r["contest"]->getContestId()
-				));
-
-		$is_contest_director = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]);
-
-		// If user is the contest director, get all private clarifications
-		if ($is_contest_director) {
-			// Get all private clarifications 
-			$private_clarification_mask = new Clarifications(array(
-						"public" => '0',
-						"contest_id" => $r["contest"]->getContestId()
-					));
-		} else {
-			// Get private clarifications of the user 
-			$private_clarification_mask = new Clarifications(array(
-						"public" => '0',
-						"contest_id" => $r["contest"]->getContestId(),
-						"author_id" => $r["current_user_id"]
-					));
-		}
-
-		//@todo This query could be merged and optimized 
-		// Get our clarifications given the masks
 		try {
-			$clarifications_public = ClarificationsDAO::search($public_clarification_mask);
-			$clarifications_private = ClarificationsDAO::search($private_clarification_mask);
+			$clarifications = ClarificationsDAO::GetContestClarifications(
+				$r['contest']->getContestId(),
+				$is_contest_director,
+				$r['current_user_id'],
+				$r['offset'],
+				$r['rowcount']
+			);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		$clarifications_array = array();
-
-		// Filter each Public clarification and add it to the response
-		foreach ($clarifications_public as $clarification) {
-			$clar = $clarification->asFilteredArray($relevant_columns);
-			$clar['can_answer'] = $is_contest_director;
-
-			// Add author in case of contest_director
-			if ($is_contest_director) {
-				try {
-					$author_user = UsersDAO::getByPK($clarification->getAuthorId());
-					$clar['author'] = $author_user->getUsername();
-				} catch (Exception $e) {
-					throw new InvalidDatabaseOperationException($e);
-				}
-			}
-
-			array_push($clarifications_array, $clar);
-		}
-
-		// Filter each Private clarification and add it to the response
-		foreach ($clarifications_private as $clarification) {
-			$clar = $clarification->asFilteredArray($relevant_columns);
-			$clar['can_answer'] = $is_contest_director;
-
-			// Add author in case of contest_director
-			if ($is_contest_director) {
-				try {
-					$author_user = UsersDAO::getByPK($clarification->getAuthorId());
-					$clar['author'] = $author_user->getUsername();
-				} catch (Exception $e) {
-					throw new InvalidDatabaseOperationException($e);
-				}
-			}
-
-			array_push($clarifications_array, $clar);
-		}
-
-		// Sort final array by time
-		usort($clarifications_array, function($a, $b) {
-					// First, let's order by answer
-					$a_answered = strlen($a['answer']) > 0;
-					$b_answered = strlen($b['answer']) > 0;
-
-					if ($a_answered === $b_answered) {
-						$t1 = strtotime($a["time"]);
-						$t2 = strtotime($b["time"]);
-
-						if ($t1 === $t2)
-							return 0;
-
-						// If answered, then older goes first
-						if ($a_answered === false) {
-							return ($t1 > $t2) ? 1 : -1;
-						} else {
-							return ($t1 > $t2) ? -1 : 1;
-						}
-					}
-
-					// If a is not answered, it has priority
-					if ($a_answered === false) {
-						return -1;
-					} else {
-						return 1;
-					}
-				});
-
-		// LIMIT the array if rowcount !== 0
-		if ($rowcount !== 0) {
-			$clarifications_array = array_slice($clarifications_array, $offset, $rowcount, false);
-		}
-
 		// Add response to array
 		$response = array();
-		$response['clarifications'] = $clarifications_array;
+		$response['clarifications'] = $clarifications;
 		$response['status'] = "ok";
 
 		return $response;
