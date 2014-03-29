@@ -570,6 +570,42 @@ OmegaUp.prototype.addProblemToContest = function(contestAlias, order, problemAli
 	});
 };
 
+OmegaUp.prototype.removeProblemFromContest = function(contestAlias, problemAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/removeProblem/contest_alias/' + encodeURIComponent(contestAlias) + '/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.contestProblems = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/problems/contest_alias/' + encodeURIComponent(contestAlias) + '/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.addUserToContest = function(contestAlias, username, callback) {
 	var self = this;
 

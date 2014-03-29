@@ -66,7 +66,11 @@
 				user = users.users[i];
 				$('#contest-users').append(
 					$('<tr></tr>')
-						.append($('<td></td>').text(user.username))
+						.append($('<td></td>').append(
+							$('<a></a>')
+								.attr('href', '/profile/' + user.username + '/')
+								.text(user.username)
+						))
 						.append($('<td></td>').text(user.access_time))
 						.append($('<td><button type="button" class="close">&times;</button></td>')
 							.click((function(contestAlias, username) {

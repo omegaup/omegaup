@@ -13,16 +13,16 @@
 		</div>
 		<form class="form" id="add-problem-form">
 			<div class="form-group">
-				<label for="contests">{#wordsContests#}</label>
+				<label for="problems">{#wordsContests#}</label>
 				<select class='form-control' name='contests' id='contests'>
-					<option value=""></option>				
+					<option value=""></option>
 				</select>
 			</div>
 			
 			<div class="form-group">
 				<label for="problems">{#wordsProblems#}</label>
 				<select class='form-control' name='problems' id='problems'>
-					<option value=""></option>				
+					<option value=""></option>
 				</select>
 			</div>
 			
@@ -41,6 +41,24 @@
 				<button type='submit' class="btn btn-primary">{#wordsAddProblem#}</button>
 			</div>
 		</form>
+		<div class="row">
+			<div class="col-md-5">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">{#contestAddproblemRegisteredProblems#}</h3>
+					</div>
+					<table class="table table-striped">
+						<thead>
+							<th>{#contestAddproblemContestOrder#}</th>
+							<th>{#contestAddproblemProblemName#}</th>
+							<th>{#contestAddproblemProblemPoints#}</th>
+							<th>{#contestAddproblemProblemRemove#}</th>
+						</thead>
+						<tbody id="contest-problems"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 	</div>	
 </div>
 			
@@ -56,7 +74,7 @@
 				if (response.status == "ok") {
 					OmegaUp.ui.success("Problem successfully added!");
 					$('div.post.footer').show();
-					return;
+					updateContestProblems();
 				} else {
 					OmegaUp.ui.error(response.error || 'Error');
 				}
@@ -64,6 +82,49 @@
 			
 			return false; // Prevent page refresh
 		});
+
+		function updateContestProblems() {
+			var contestAlias = $('select#contests').val();
+
+			if (contestAlias == '') {
+				var problems = $('#contest-problems');
+				problems.empty();
+				return;
+			}
+
+			omegaup.contestProblems(contestAlias, function(response) {
+				var problems = $('#contest-problems');
+				problems.empty();
+
+				for (var i = 0; i < response.problems.length; i++) {
+					problems.append(
+						$('<tr></tr>')
+							.append($('<td></td>').text(response.problems[i].order))
+							.append($('<td></td>').append(
+								$('<a></a>')
+									.attr('href', '/arena/problem/' + response.problems[i].alias + '/')
+									.text(response.problems[i].alias))
+							)
+							.append($('<td></td>').text(response.problems[i].points))
+							.append($('<td><button type="button" class="close">&times;</button></td>')
+								.click((function(contest, problem) {
+									return function(e) {
+										omegaup.removeProblemFromContest(contest, problem, function(response) {
+											if (response.status == "ok") {
+												OmegaUp.ui.success("Problem successfully removed!");
+												$('div.post.footer').show();
+												$(e.target.parentElement.parentElement).remove();
+											} else {
+												OmegaUp.ui.error(response.error || 'error');
+											}
+										});
+									};
+								})(contestAlias, response.problems[i].alias))
+							)
+					);
+				}
+			});
+		}
 	
 		omegaup.getProblems(function(problems) {					
 			// Got the problems, lets populate the dropdown with them			
@@ -78,7 +139,11 @@
 					contest = contests.results[i];							
 					$('select#contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
 				}
-				
+
+				$('select#contests').change(function () {
+					updateContestProblems();
+				});
+
 				// If we have a contest in GET, then get it
 				{IF isset($smarty.get.contest)}
 				$('select#contests').each(function() {

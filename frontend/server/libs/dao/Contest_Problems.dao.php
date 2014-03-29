@@ -20,6 +20,22 @@ require_once("base/Contest_Problems.vo.base.php");
 class ContestProblemsDAO extends ContestProblemsDAOBase
 {
 	/*
+	 * Get contest problems including contest alias, points, and order
+	 */
+	public static final function GetContestProblems($contest_id) {
+		// Build SQL statement
+		$sql = 'SELECT p.problem_id, p.alias, cp.points, cp.order ' .
+		       'FROM Problems p ' .
+		       'INNER JOIN Contest_Problems cp ON cp.problem_id = p.problem_id ' .
+		       'WHERE cp.contest_id = ? ' .
+		       'ORDER BY cp.`order`;';
+		$val = array($contest_id);
+
+		global $conn;
+		return $conn->GetAll($sql, $val);
+	}
+
+	/*
 	 * 
 	 * Get relevant problems including contest alias
 	 */

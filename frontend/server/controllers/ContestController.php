@@ -61,7 +61,7 @@ class ContestController extends Controller {
 			}
 
 			/*
-			 * Ok, its not public, lets se if we have a 
+			 * Ok, its not public, lets se if we have a
 			 * valid user
 			 * */
 			if ($r["current_user_id"] === null) {
@@ -156,7 +156,7 @@ class ContestController extends Controller {
 	 * 
 	 * Expects $r["contest"] to contain the contest to check against.
 	 * 
-	 * In case of access check failed, an exception is thrown.	 
+	 * In case of access check failed, an exception is thrown.
 	 * 
 	 * @param Request $r
 	 * @throws ApiException
@@ -412,7 +412,7 @@ class ContestController extends Controller {
 			// End transaction transaction
 			ContestsDAO::transEnd();
 		} catch (Exception $e) {
-			// Operation failed in the data layer, rollback transaction 
+			// Operation failed in the data layer, rollback transaction
 			ContestsDAO::transRollback();
 
 			// Alias may be duplicated, 1062 error indicates that
@@ -541,6 +541,47 @@ class ContestController extends Controller {
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 */
+	public static function apiProblems(Request $r) {
+		// Authenticate user
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+
+		// Only director is allowed to create problems in contest
+		try {
+			$contest = ContestsDAO::getByAlias($r['contest_alias']);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($contest)) {
+			throw new InvalidParameterException('Contest not found');
+		}
+
+		// Only contest admin is allowed to view details through this API
+		if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+			throw new ForbiddenAccessException('Cannot add problem. You are not the contest director.');
+		}
+
+		try {
+			$problems = ContestProblemsDAO::GetContestProblems(
+				$contest->contest_id
+			);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array('status' => 'ok', 'problems' => $problems);
+	}
+
+	/**
+	 * Adds a problem to a contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
 	public static function apiAddProblem(Request $r) {
 
 		// Authenticate user
@@ -563,15 +604,16 @@ class ContestController extends Controller {
 		}
 
 		// Invalidar cache
-		Cache::deleteFromCache(Cache::CONTEST_INFO, $r["contest_alias"]);		
+		Cache::deleteFromCache(Cache::CONTEST_INFO, $r["contest_alias"]);
+		Scoreboard::InvalidateScoreboardCache($params['contest']->contest_id);
 
 		return array("status" => "ok");
 	}
 
 	/**
-	 * Validates the request for AddToContest and returns an array with 
+	 * Validates the request for AddToContest and returns an array with
 	 * the problem and contest DAOs
-	 * 
+	 *
 	 * @throws InvalidDatabaseOperationException
 	 * @throws InvalidParameterException
 	 * @throws ForbiddenAccessException
@@ -616,6 +658,88 @@ class ContestController extends Controller {
 
 		Validators::isNumberInRange($r["points"], "points", 0, INF);
 		Validators::isNumberInRange($r["order_in_contest"], "order_in_contest", 0, INF, false);
+
+		return array(
+			"contest" => $contest,
+			"problem" => $problem);
+	}
+
+	/**
+	 * Removes a problem from a contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiRemoveProblem(Request $r) {
+		// Authenticate user
+		self::authenticateRequest($r);
+
+		// Validate the request and get the problem and the contest in an array
+		$params = self::validateRemoveFromContestRequest($r);
+
+		try {
+			$relationship = new ContestProblems(array(
+				'contest_id' => $params['contest']->contest_id,
+				'problem_id' => $params['problem']->problem_id
+			));
+
+			ContestProblemsDAO::delete($relationship);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// Invalidar cache
+		Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
+		Scoreboard::InvalidateScoreboardCache($params['contest']->contest_id);
+
+		return array('status' => 'ok');
+	}
+
+	/**
+	 * Validates the request for RemoveFromContest and returns an array with 
+	 * the problem and contest DAOs
+	 * 
+	 * @throws InvalidDatabaseOperationException
+	 * @throws InvalidParameterException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateRemoveFromContestRequest(Request $r) {
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		// Only director is allowed to create problems in contest
+		try {
+			$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($contest)) {
+			throw new InvalidParameterException("Contest not found");
+		}
+
+		// Only contest admin is allowed to create problems in contest
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $contest)) {
+			throw new ForbiddenAccessException("Cannot add problem. You are not the contest director.");
+		}
+
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		try {
+			$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($problem)) {
+			throw new InvalidParameterException("Problem not found");
+		}
+
+		if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r["current_user_id"], $problem)) {
+			throw new ForbiddenAccessException("Problem is marked as private.");
+		}
 
 		return array(
 			"contest" => $contest,
