@@ -39,8 +39,14 @@
 					<div class="panel-heading">
 						<h3 class="panel-title">{#contestAdduserRegisteredUsers#}</h3>
 					</div>
-					<ul class="list-group" id="contest-users">
-					</ul>
+					<table class="table table-striped">
+						<thead>
+							<th>{#contestAdduserRegisteredUserUsername#}</th>
+							<th>{#contestAdduserRegisteredUserTime#}</th>
+							<th>{#contestAdduserRegisteredUserDelete#}</th>
+						</thead>
+						<tbody id="contest-users"></tbody>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -58,7 +64,27 @@
 			// Got the contests, lets populate the dropdown with them
 			for (var i = 0; i < users.users.length; i++) {
 				user = users.users[i];
-				$('#contest-users').append($('<li class="list-group-item"></li>').text(user.username));
+				$('#contest-users').append(
+					$('<tr></tr>')
+						.append($('<td></td>').text(user.username))
+						.append($('<td></td>').text(user.access_time))
+						.append($('<td><button type="button" class="close">&times;</button></td>')
+							.click((function(contestAlias, username) {
+								return function(e) {
+									omegaup.removeUserFromContest(contestAlias, username, function(response) {
+										if (response.status == "ok") {
+											OmegaUp.ui.success("User successfully removed!");
+											$('div.post.footer').show();
+											var tr = e.target.parentElement.parentElement;
+											$(tr).remove();
+										} else {
+											OmegaUp.ui.error(response.error || 'error');
+										}
+									});
+								};
+							})(contestAlias, user.username))
+						)
+				);
 			}
 		});	
 	}
