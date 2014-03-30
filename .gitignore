@@ -3,6 +3,7 @@
 karel/lib/x86_64-linux/*
 karel/karel
 karel/kcl
+bin/mysql-connector-java-5.1.12.jar
 
 # Ignore temporary files
 *~
@@ -29,6 +30,7 @@ grader/lib/
 *.crt
 *.key
 *.pem
+*.srl
 
 # SBT-related stuff
 target/

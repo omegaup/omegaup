@@ -29,7 +29,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     Config.set("db.user", "sa")
     Config.set("db.password", "")
 
-    Config.set("grader.keystore", "grader/omegaup.jks")
+    Config.set("ssl.keystore", "grader/omegaup.jks")
     Config.set("grader.runner.timeout", "10")
     Config.set("grader.port", "21681")
     Config.set("grader.embedded_runner.enable", "true")

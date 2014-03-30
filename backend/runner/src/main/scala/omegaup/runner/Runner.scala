@@ -430,26 +430,18 @@ object Service extends Object with Log with Using {
 
     Config.load(configPath)
 
-    // Setting keystore properties
-    System.setProperty("javax.net.ssl.keyStore",
-                       Config.get("runner.keystore", "omegaup.jks"))
-    System.setProperty("javax.net.ssl.trustStore",
-                       Config.get("runner.truststore", "omegaup.jks"))
-    System.setProperty("javax.net.ssl.keyStorePassword",
-                       Config.get("runner.keystore.password", "omegaup"))
-    System.setProperty("javax.net.ssl.trustStorePassword",
-                       Config.get("runner.truststore.password", "omegaup"))
-    
     // Get local hostname
-    val name = pusing(Runtime.getRuntime.exec("/bin/hostname")) {
-      p => new BufferedReader(new InputStreamReader(p.getInputStream)).readLine
+    val hostname = Config.get("runner.hostname", "")
+
+    if (hostname == "") {
+      throw new IllegalArgumentException("runner.hostname configuration must be set")
     }
     
     // logger
     Logging.init
 
     // And build a runner instance
-    val runner = new Runner(name, Minijail)
+    val runner = new Runner(hostname, Minijail)
 
     // the handler
     val handler = new AbstractHandler() {
@@ -562,23 +554,23 @@ object Service extends Object with Log with Using {
     
     val sslContext =
       new org.eclipse.jetty.util.ssl.SslContextFactory(
-        Config.get[String]("runner.keystore", "omegaup.jks")
+        Config.get("ssl.keystore", "omegaup.jks")
       )
-    sslContext.setKeyManagerPassword(Config.get[String]("runner.password", "omegaup"))
-    sslContext.setKeyStorePassword(Config.get[String]("runner.keystore.password", "omegaup"))
-    sslContext.setTrustStore(Config.get[String]("runner.truststore", "omegaup.jks"))
-    sslContext.setTrustStorePassword(Config.get[String]("runner.truststore.password", "omegaup"))
+    sslContext.setKeyManagerPassword(Config.get("ssl.password", "omegaup"))
+    sslContext.setKeyStorePassword(Config.get("ssl.keystore.password", "omegaup"))
+    sslContext.setTrustStore(Config.get("ssl.truststore", "omegaup.jks"))
+    sslContext.setTrustStorePassword(Config.get("ssl.truststore.password", "omegaup"))
     sslContext.setNeedClientAuth(true)
   
     val runnerConnector = new org.eclipse.jetty.server.ssl.SslSelectChannelConnector(sslContext)
-    runnerConnector.setPort(Config.get[Int]("runner.port", 0))
+    runnerConnector.setPort(Config.get("runner.port", 0))
     
     server.setConnectors(List(runnerConnector).toArray)
     
     server.setHandler(handler)
     server.start()
     
-    info("Runner {} registering port {}", name, runnerConnector.getLocalPort())
+    info("Runner {} registering port {}", hostname, runnerConnector.getLocalPort())
 
     // Send a heartbeat every 5 minutes to register
     val registerThread = new Thread() {
@@ -587,7 +579,7 @@ object Service extends Object with Log with Using {
           try {
             Https.send[RegisterOutputMessage, RegisterInputMessage](
               Config.get("grader.register.url", "https://localhost:21680/register/"),
-              new RegisterInputMessage(name, runnerConnector.getLocalPort())
+              new RegisterInputMessage(hostname, runnerConnector.getLocalPort())
             )
           } catch {
             case e: IOException => {
@@ -607,7 +599,7 @@ object Service extends Object with Log with Using {
           // well, at least try to de-register
           Https.send[RegisterOutputMessage, RegisterInputMessage](
             Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
-            new RegisterInputMessage(name, runnerConnector.getLocalPort())
+            new RegisterInputMessage(hostname, runnerConnector.getLocalPort())
           )
         } catch {
           case _: Throwable => {

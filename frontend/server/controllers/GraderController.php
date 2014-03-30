@@ -126,12 +126,13 @@ class GraderController extends Controller {
 
 		$response = array();
 		
-		self::$log->info("Getting grader /status");
+		self::$log->debug("Getting grader /status");
 		$grader = new Grader();
 		$response["grader"] = $grader->status();
-		
-		self::$log->info("Getting EC2 status");		
-		$response["cloud"] = self::getEc2Status();
+	
+		// TODO(lhchavez): Re-enable when we use EC2 again.
+		//self::$log->info("Getting EC2 status");
+		//$response["cloud"] = self::getEc2Status();
 		
 		$response["status"] = "ok";
 		return $response;

@@ -110,7 +110,7 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	git submodule update --init
 
 	# Generate the certificates required.
-	bin/gencerts.sh $KEYSTORE_PASSWORD
+	bin/certmanager init --password $KEYSTORE_PASSWORD
 
 	# Build minijail
 	cd $OMEGAUP_ROOT/minijail
@@ -256,6 +256,8 @@ if [ ! `mysql -uroot -p$MYSQL_PASSWORD --batch --skip-column-names -e "SHOW DATA
 	echo "Installing DB"
 	mysql -uroot -p$MYSQL_PASSWORD -e "CREATE DATABASE $MYSQL_DB_NAME;" 
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME < $OMEGAUP_ROOT/frontend/private/bd.sql
+	# omegaup:omegaup
+	# user:user
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'INSERT INTO Users(username, name, password, verified) VALUES("omegaup", "omegaUp admin", "$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a", 1), ("user", "omegaUp user", "$2a$08$wxJh5voFPGuP8fUEthTSvutdb1OaWOa8ZCFQOuU/ZxcsOuHGw0Cqy", 1);'
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'INSERT INTO Emails (email, user_id) VALUES("admin@omegaup.com", 1), ("user@omegaup.com", 2);'
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME -e 'UPDATE Users SET main_email_id=user_id;'

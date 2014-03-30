@@ -1,14 +1,9 @@
 <?php
 
 class Grader {
-
 	private $graderUrl;
 
-	public function Grader($graderUrl = NULL) {
-		if ($graderUrl === NULL) {
-			$graderUrl = OMEGAUP_GRADER_URL;
-		}
-
+	public function Grader($graderUrl = OMEGAUP_GRADER_URL) {
 		$this->graderUrl = $graderUrl;
 	}
 
@@ -38,9 +33,6 @@ class Grader {
 		// Set certifiate to verify peer with
 		curl_setopt($curl, CURLOPT_CAINFO, OMEGAUP_CACERT_URL);
 
-		// Don't check the common name (CN) attribute
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-
 		// Set curl HTTP header
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
 
@@ -68,29 +60,18 @@ class Grader {
 		// Execute call
 		$content = curl_exec($curl);
 
-		$errorMsg = NULL;
-		$ex = NULL;
-		if (!$content) {
-			$errorMsg = "curl_exec failed: " . curl_error($curl) . " " . curl_errno($curl);
+		if ($content === FALSE) {
+			$message = "curl_exec failed: " . curl_error($curl) . " " . curl_errno($curl);
+			$this->terminateGraderCall($curl);
+			throw new Exception($message);
 		}
-
-		if ($errorMsg !== NULL) {
-			$ex = new Exception($errorMsg);
-		}
+		$this->terminateGraderCall($curl);
 
 		$response_array = json_decode($content, true);
 		if ($response_array === FALSE) {
-			$ex = new Exception("json_encode failed with: " . json_last_error() . "for : " . $content);
+			throw new Exception("json_decode failed with: " . json_last_error() . "for : " . $content);
 		} else if ($response_array["status"] !== "ok") {
-			$this->terminateGraderCall($curl);
-			$ex = new Exception("Grader did not return status OK: " . $content);
-		}
-
-		$this->terminateGraderCall($curl);
-
-		// If a failure happened, throw exception
-		if (!is_null($ex)) {
-			throw $ex;
+			throw new Exception("Grader did not return status OK: " . $content);
 		}
 
 		return $response_array;
@@ -133,12 +114,10 @@ class Grader {
 	 * @return array json array
 	 */
 	public function status() {
-
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_STATUS_URL);
 
 		$content = $this->executeCurl($curl);
 
 		return $content;
 	}
-
 }

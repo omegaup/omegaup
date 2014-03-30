@@ -17,12 +17,6 @@ object Service extends Object with Log with Using {
 			i += 1
 		}
 
-		// Setting keystore properties
-		System.setProperty("javax.net.ssl.keyStore", Config.get("grader.keystore", "omegaup.jks"))
-		System.setProperty("javax.net.ssl.trustStore", Config.get("grader.truststore", "omegaup.jks"))
-		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("grader.keystore.password", "omegaup"))
-		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("grader.truststore.password", "omegaup"))
-
 		// logger
 		Logging.init
 

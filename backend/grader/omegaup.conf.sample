@@ -24,23 +24,21 @@ runner.sandbox.path=/opt/omegaup/sandbox
 runner.minijail.path=/var/lib/minijail
 runner.sandbox=minijail
 
+# SSL
+ssl.cacert.alias=omegaUp Certificate Authority
+ssl.keystore.password=omegaup
+ssl.keystore=/opt/omegaup/bin/omegaup.jks
+ssl.password=omegaup
+ssl.truststore.password=omegaup
+ssl.truststore=/opt/omegaup/bin/omegaup.jks
+
 # Grader
 grader.deregister.url=https://localhost:21680/deregister/
 grader.embedded_runner.enable=true
-grader.keystore.password=omegaup
-grader.keystore=/opt/omegaup/bin/omegaup.jks
 grader.memory_limit=2048
-grader.password=omegaup
 grader.port=21680
 grader.register.url=https://localhost:21680/register/
-grader.truststore.password=omegaup
-grader.truststore=/opt/omegaup/bin/omegaup.jks
 
 # Runner
-runner.keystore.password=omegaup
-runner.keystore=/opt/omegaup/bin/omegaup.jks
-runner.password=omegaup
 runner.port=0
 runner.preserve=false
-runner.truststore.password=omegaup
-runner.truststore=/opt/omegaup/bin/omegaup.jks

@@ -1,0 +1,117 @@
+#!/bin/bash -e
+
+PASSWORD=omegaup
+CA_NAME="omegaUp Certificate Authority"
+HOSTNAME=
+OUTPUT=
+
+usage() {
+	echo "$0 <command> [options]"
+	echo -e "\tWhere <command> is one of:"
+	echo -e "\t\tinit\tInitializes all keys and certificates"
+	echo -e "\t\trunner\tCreates a runner truststore. Requires --hostname and --output"
+	echo -e "\tWhere [options] are one or more of:"
+	echo -e "\t\t--password\tSets the store password"
+	echo -e "\t\t--ca-name\tSets the Certificate Authority name"
+	echo -e "\t\t--hostname\tSets the hostname of the runner"
+	echo -e "\t\t--output\tSets the output of the jks file"
+
+	exit 1
+}
+
+gen_jks() {
+	CN=$1
+	TARGET=$2
+	DIR=`mktemp -d`
+
+	if [ -f $TARGET ]; then rm $TARGET; fi
+
+	/usr/bin/openssl genrsa -out $DIR/runner.key 2048
+	/usr/bin/openssl req -new -subj "/C=MX/CN=$CN" -key $DIR/runner.key -out $DIR/runner.csr
+	/usr/bin/openssl x509 -req -days 3650 -in $DIR/runner.csr -CA ssl/omegaup-ca.crt -CAcreateserial \
+		-CAkey ssl/omegaup-ca.key -out $DIR/runner.crt
+
+	/usr/bin/openssl pkcs12 -export -in $DIR/runner.crt -inkey $DIR/runner.key -name "$CN" \
+		-certfile ssl/omegaup-ca.crt -caname "$CA_NAME" -password "pass:$PASSWORD" -out $DIR/runner.p12
+	/usr/bin/keytool -importkeystore -srckeystore $DIR/runner.p12 -srcstoretype pkcs12 \
+		-srcstorepass "$PASSWORD" -srcalias "$CN" -destkeystore $TARGET \
+		-deststoretype jks -deststorepass "$PASSWORD"
+	/usr/bin/keytool -importcert -alias "$CA_NAME" -noprompt -trustcacerts -keystore $TARGET \
+		-storepass "$PASSWORD" -file ssl/omegaup-ca.crt
+
+	rm -rf $DIR
+}
+
+gen_pem() {
+	CN=$1
+	TARGET=$2
+	DIR=`mktemp -d`
+
+	if [ -f $TARGET ]; then rm $TARGET; fi
+
+	/usr/bin/openssl genrsa -out $DIR/frontend.key 2048
+	/usr/bin/openssl req -new -subj "/C=MX/CN=$CN" -key $DIR/frontend.key -out $DIR/frontend.csr
+	/usr/bin/openssl x509 -req -days 3650 -in $DIR/frontend.csr -CA ssl/omegaup-ca.crt -CAcreateserial \
+		-CAkey ssl/omegaup-ca.key -out $DIR/frontend.crt
+
+	cat $DIR/frontend.key $DIR/frontend.crt ssl/omegaup-ca.crt > $TARGET
+
+	rm -rf $DIR
+}
+
+gen_ca() {
+	if [ -d ssl ]; then rm ssl/*; else mkdir ssl; fi
+	/usr/bin/openssl genrsa -out ssl/omegaup-ca.key 4096
+	/usr/bin/openssl req -new -subj "/C=MX/CN=$CA_NAME" -x509 -days 3650 -key ssl/omegaup-ca.key \
+		-out ssl/omegaup-ca.crt
+}
+
+if [ "bin" == "$(basename `pwd`)" ]; then
+	cd ..
+fi
+
+COMMAND=$1
+shift || usage
+
+while [[ $# > 1 ]]; do
+	KEY=$1
+	shift
+
+	case $KEY in
+		-p|--password)
+			PASSWORD="$1"
+			shift || usage
+			;;
+		-c|--ca-name)
+			CA_NAME="$1"
+			shift || usage
+			;;
+		-h|--hostname)
+			HOSTNAME="$1"
+			shift || usage
+			;;
+		-o|--output)
+			OUTPUT="$1"
+			shift || usage
+			;;
+		*)
+			usage
+			;;
+	esac
+done
+
+case $COMMAND in
+	init)
+		gen_ca
+
+		gen_jks localhost backend/grader/omegaup.jks
+		gen_jks localhost backend/runner/omegaup.jks
+		gen_pem "omegaup Frontend" frontend/omegaup.pem
+		;;
+	runner)
+		gen_jks "$HOSTNAME" "$OUTPUT"
+		;;
+	*)
+		usage
+		;;
+esac

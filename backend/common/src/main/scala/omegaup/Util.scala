@@ -3,6 +3,8 @@ package omegaup
 import java.io._
 import java.net._
 import java.util._
+import java.security.KeyStore
+import java.security.cert.X509Certificate
 import javax.net.ssl._
 import net.liftweb.json._
 import org.slf4j.{Logger, LoggerFactory}
@@ -185,22 +187,56 @@ class EnumerationWrapper[T](enumeration:java.util.Enumeration[T]) extends Iterat
 }
 
 object Https extends Object with Log with Using {
-	val socketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
+	val defaultSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
+	val runnerSocketFactory = new SSLSocketFactory {
+		private val sslContextFactory = new org.eclipse.jetty.util.ssl.SslContextFactory(
+			Config.get("ssl.keystore", "omegaup.jks"))
+		sslContextFactory.setKeyManagerPassword(Config.get("ssl.password", "omegaup"))
+		sslContextFactory.setKeyStorePassword(Config.get("ssl.keystore.password", "omegaup"))
+		sslContextFactory.setTrustStore(Config.get("ssl.truststore", "omegaup.jks"))
+		sslContextFactory.setTrustStorePassword(Config.get("ssl.truststore.password", "omegaup"))
+		sslContextFactory.setNeedClientAuth(true)
+		sslContextFactory.start
+		private val socketFactory = sslContextFactory.getSslContext.getSocketFactory
 
-	HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-		def verify(hostname:String, session:SSLSession) = {
-			debug("Verifying {}", hostname)
-			true
-		}
-	})
+		override def getDefaultCipherSuites(): Array[String] = defaultSocketFactory.getDefaultCipherSuites
+		override def getSupportedCipherSuites(): Array[String] = defaultSocketFactory.getSupportedCipherSuites
 
-	def get(url: String):String = {
+		@throws(classOf[IOException])
+		override def createSocket(host: String, port: Int): Socket =
+			socketFactory.createSocket(host, port)
+
+		@throws(classOf[IOException])
+		override def createSocket(host: String, port: Int, clientAddress: InetAddress, clientPort: Int): Socket =
+			socketFactory.createSocket(host, port, clientAddress, clientPort)
+
+		@throws(classOf[IOException])
+		override def createSocket(address: InetAddress, port: Int): Socket =
+			socketFactory.createSocket(address, port)
+
+		@throws(classOf[IOException])
+		override def createSocket(address: InetAddress, port: Int, clientAddress: InetAddress, clientPort: Int): Socket =
+			socketFactory.createSocket(address, port, clientAddress, clientPort)
+
+		@throws(classOf[IOException])
+		override def createSocket(socket: Socket, host: String, port: Int, autoClose: Boolean): Socket =
+			socketFactory.createSocket(socket, host, port, autoClose)
+
+		@throws(classOf[IOException])
+		override def createSocket(): Socket = socketFactory.createSocket
+	}
+
+	def get(url: String, runner: Boolean = true):String = {
 		debug("Get {}", url)
 
 		if (url.startsWith("https://")) {
 			cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
 				conn.addRequestProperty("Connection", "close")
-				conn.setSSLSocketFactory(socketFactory)
+				if (runner) {
+					conn.setSSLSocketFactory(runnerSocketFactory)
+				} else {
+					conn.setSSLSocketFactory(defaultSocketFactory)
+				}
 				conn.setDoOutput(false)
 				new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine
 			}}
@@ -213,7 +249,7 @@ object Https extends Object with Log with Using {
 		}
 	}
 	
-	def send[T, W <: AnyRef](url:String, request:W)(implicit mf: Manifest[T]):T = {
+	def send[T, W <: AnyRef](url:String, request:W, runner: Boolean = true)(implicit mf: Manifest[T]):T = {
 		debug("Requesting {}", url)
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
@@ -221,7 +257,11 @@ object Https extends Object with Log with Using {
 		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
 			conn.addRequestProperty("Content-Type", "text/json")
 			conn.addRequestProperty("Connection", "close")
-			conn.setSSLSocketFactory(socketFactory)
+			if (runner) {
+				conn.setSSLSocketFactory(runnerSocketFactory)
+			} else {
+				conn.setSSLSocketFactory(defaultSocketFactory)
+			}
 			conn.setDoOutput(true)
 			val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
 			Serialization.write[W, PrintWriter](request, writer)
@@ -231,13 +271,13 @@ object Https extends Object with Log with Using {
 		}}
 	}
 	
-	def zip_send[T](url:String, zipfile:String, zipname:String)(implicit mf: Manifest[T]): T = {
+	def zip_send[T](url:String, zipfile:String, zipname:String, runner: Boolean = true)(implicit mf: Manifest[T]): T = {
 		val file = new File(zipfile)
 		
-		zip_send(url, new FileInputStream(zipfile), file.length.toInt, zipname)
+		zip_send(url, new FileInputStream(zipfile), file.length.toInt, zipname, runner)
 	}
 	
-	def zip_send[T](url:String, inputStream:InputStream, zipSize:Int, zipname:String)(implicit mf: Manifest[T]): T = {
+	def zip_send[T](url:String, inputStream:InputStream, zipSize:Int, zipname:String, runner: Boolean = true)(implicit mf: Manifest[T]): T = {
 		debug("Requesting {}", url)
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
@@ -247,7 +287,11 @@ object Https extends Object with Log with Using {
 			conn.addRequestProperty("Content-Disposition", "attachment; filename=" + zipname + ";")
 			conn.addRequestProperty("Connection", "close")
 			conn.setFixedLengthStreamingMode(zipSize)
-			conn.setSSLSocketFactory(socketFactory)
+			if (runner) {
+				conn.setSSLSocketFactory(runnerSocketFactory)
+			} else {
+				conn.setSSLSocketFactory(defaultSocketFactory)
+			}
 			conn.setDoOutput(true)
 			val outputStream = conn.getOutputStream
 			val buffer = Array.ofDim[Byte](1024)
@@ -267,14 +311,18 @@ object Https extends Object with Log with Using {
 		}}
 	}
 	
-	def receive_zip[T, W <: AnyRef](url:String, request:W, file:String)(implicit mf: Manifest[T]): Option[T] = {
+	def receive_zip[T, W <: AnyRef](url:String, request:W, file:String, runner: Boolean = true)(implicit mf: Manifest[T]): Option[T] = {
 		debug("Requesting {}", url)
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 
 		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
 			conn.addRequestProperty("Content-Type", "text/json")
-			conn.setSSLSocketFactory(socketFactory)
+			if (runner) {
+				conn.setSSLSocketFactory(runnerSocketFactory)
+			} else {
+				conn.setSSLSocketFactory(defaultSocketFactory)
+			}
 			conn.setDoOutput(true)
 			val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
 			Serialization.write[W, PrintWriter](request, writer)

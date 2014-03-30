@@ -195,12 +195,6 @@ object Broadcaster extends Object with Log with Using {
 	}
 
 	def main(args: Array[String]) = {
-		// Setting keystore properties
-		System.setProperty("javax.net.ssl.keyStore", Config.get("broadcaster.keystore", "omegaup.jks"))
-		System.setProperty("javax.net.ssl.trustStore", Config.get("broadcaster.truststore", "omegaup.jks"))
-		System.setProperty("javax.net.ssl.keyStorePassword", Config.get("broadcaster.keystore.password", "omegaup"))
-		System.setProperty("javax.net.ssl.trustStorePassword", Config.get("broadcaster.truststore.password", "omegaup"))
-		
 		// logger
 		Logging.init()
 
