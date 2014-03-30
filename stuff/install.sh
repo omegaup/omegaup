@@ -112,10 +112,6 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	# Generate the certificates required.
 	bin/gencerts.sh $KEYSTORE_PASSWORD
 
-	# Build the sandbox
-	cd $OMEGAUP_ROOT/sandbox
-	make
-
 	# Build minijail
 	cd $OMEGAUP_ROOT/minijail
 	make

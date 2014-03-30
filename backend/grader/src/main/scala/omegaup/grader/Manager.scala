@@ -377,12 +377,7 @@ object Manager extends Object with Log {
 
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
-			// Choose a sandbox instance
-			val sandbox = Config.get("runner.sandbox", "box") match {
-				case "box" => Box
-				case "minijail" => Minijail
-			}
-			RunnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", sandbox))
+			RunnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
 		}
 
 		// the handler
@@ -417,12 +412,7 @@ object Manager extends Object with Log {
 							Logging.init()
 
 							if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
-								// Choose a sandbox instance
-								val sandbox = Config.get("runner.sandbox", "box") match {
-									case "box" => Box
-									case "minijail" => Minijail
-								}
-								RunnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", sandbox))
+								RunnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
 							}
 
 							response.setStatus(HttpServletResponse.SC_OK)

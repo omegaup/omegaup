@@ -11,4 +11,3 @@ Estos son los directorios que estamos usando activamente en el desarrollo:
 Y estos directorios también están en desarrollo, pero tienen su propio repositorio:
 * **minijail/** La nueva versión del sandbox! Este proyecto también tiene licencia BSD, pero diferente copyright owner (los contribuidores del proyecto Chromium)
 * **karel/** El intérprete oficial de Karel para la OMI.
-* **sandbox/** Incluye el código del sandbox, herramienta que evita que los códigos ejecuten rutinas maliciosas.

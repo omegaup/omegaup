@@ -448,14 +448,8 @@ object Service extends Object with Log with Using {
     // logger
     Logging.init
 
-    // Choose a sandbox instance
-    val sandbox = Config.get("runner.sandbox", "box") match {
-      case "box" => Box
-      case "minijail" => Minijail
-    }
-
     // And build a runner instance
-    val runner = new Runner(name, sandbox)
+    val runner = new Runner(name, Minijail)
 
     // the handler
     val handler = new AbstractHandler() {
