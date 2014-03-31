@@ -81,15 +81,17 @@ object Manager extends Object with Log {
 		if (run.status == Status.Ready) {
 			info("Veredict update: {} {} {} {} {} {} {}",
 				run.id, run.status, run.veredict, run.score, run.contest_score, run.runtime, run.memory)
-			try {
-				info("Scoreboard update {}",
-					run.contest match {
-						case Some(contest) => Https.get(Config.get("grader.scoreboard_refresh.url", "http://localhost/refresh_scoreboard.php?token=secret&id=") + contest.id, runner = false)
-						case None => "no contest"
-					}
-				)
-			} catch {
-				case e: Exception => error("Scoreboard update", e)
+			if (Config.get("grader.scoreboard_refresh.enable", true)) {
+				try {
+					info("Scoreboard refresh {}",
+						run.contest match {
+							case Some(contest) => Https.get(Config.get("grader.scoreboard_refresh.url", "http://localhost/refresh_scoreboard.php?token=secret&id=") + contest.id, runner = false)
+							case None => "no contest"
+						}
+					)
+				} catch {
+					case e: Exception => error("Scoreboard refresh", e)
+				}
 			}
 
 			Broadcaster.update(run)

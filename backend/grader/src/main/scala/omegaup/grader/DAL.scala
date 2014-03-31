@@ -14,7 +14,10 @@ object GraderData {
 		new Run(
 			id = rs.getLong("run_id"),
 			guid = rs.getString("guid"),
-			user = rs.getLong("user_id"),
+			user = new User(
+				id = rs.getLong("user_id"),
+				username = rs.getString("username")
+			),
 			language = Language.withName(rs.getString("language")),
 			status = Status.withName(rs.getString("status")),
 			veredict = Veredict.withName(rs.getString("veredict")),
@@ -63,6 +66,7 @@ object GraderData {
 				case 0 => None
 				case x: Long => Some(new Contest(
 					id = rs.getLong("contest_id"),
+					alias = rs.getString("alias"),
 					start_time = new Timestamp(rs.getDate("start_time").getTime()),
 					finish_time = new Timestamp(rs.getDate("finish_time").getTime()),
 					points_decay_factor = rs.getDouble("points_decay_factor"),
@@ -77,12 +81,18 @@ object GraderData {
 	def run(id: Long)(implicit connection: Connection): Option[Run] =
 		query("""
 			SELECT
-				r.*, p.*, cpo.open_time, cp.points, c.start_time, c.finish_time, c.points_decay_factor, r.submit_delay, c.partial_score, c.feedback, c.penalty, c.penalty_time_start, c.penalty_calc_policy
+				r.*, p.*, u.username, cpo.open_time, cp.points, c.alias,
+				c.start_time, c.finish_time, c.points_decay_factor,
+				r.submit_delay, c.partial_score, c.feedback, c.penalty,
+				c.penalty_time_start, c.penalty_calc_policy
 			FROM
 				Runs AS r
 			INNER JOIN
 				Problems AS p ON
 					p.problem_id = r.problem_id
+			INNER JOIN
+				Users AS u ON
+					u.user_id = r.user_id
 			LEFT JOIN
 				Contests AS c ON
 					c.contest_id = r.contest_id
@@ -104,12 +114,18 @@ object GraderData {
 	def pendingRuns()(implicit connection: Connection): Iterable[Run] =
 		queryEach("""
 			SELECT
-				r.*, p.*, cpo.open_time, cp.points, c.start_time, c.finish_time, c.points_decay_factor, r.submit_delay, c.partial_score, c.feedback, c.penalty, c.penalty_time_start, c.penalty_calc_policy
+				r.*, p.*, u.username, cpo.open_time, cp.points, c.alias,
+				c.start_time, c.finish_time, c.points_decay_factor,
+				r.submit_delay, c.partial_score, c.feedback, c.penalty,
+				c.penalty_time_start, c.penalty_calc_policy
 			FROM
 				Runs AS r
 			INNER JOIN
 				Problems AS p ON
 					p.problem_id = r.problem_id
+			INNER JOIN
+				Users AS u ON
+					u.user_id = r.user_id
 			LEFT JOIN
 				Contests AS c ON
 					c.contest_id = r.contest_id
@@ -145,7 +161,7 @@ object GraderData {
 	def insert(run: Run)(implicit connection: Connection): Run = {
 		execute(
 			"INSERT INTO Runs (user_id, problem_id, contest_id, guid, language, veredict, ip, time) VALUES(?, ?, ?, ?, ?, ?, ?, ?);",
-			run.user,
+			run.user.id,
 			run.problem.id,
 			run.contest match {
 				case None => None

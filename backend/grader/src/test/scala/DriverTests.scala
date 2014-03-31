@@ -33,6 +33,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     Config.set("grader.runner.timeout", "10")
     Config.set("grader.port", "21681")
     Config.set("grader.embedded_runner.enable", "true")
+    Config.set("grader.scoreboard_refresh.enable", "false")
     Config.set("grader.root", root.getCanonicalPath + "/grader")
     Config.set("runner.sandbox.path", new File("../sandbox").getCanonicalPath)
     Config.set("runner.minijail.path", "/var/lib/minijail")
@@ -131,7 +132,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val submit_id = GraderData.insert(new Run(
       guid = file.getName,
-      user = user,
+      user = new User(id = user),
       language = language,
       problem = new Problem(id = id),
       contest = contest match {

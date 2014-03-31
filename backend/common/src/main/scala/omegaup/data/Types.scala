@@ -95,6 +95,7 @@ import PenaltyTimeStart._
 class Contest(
 	var id: Long = 0,
 	var title: String = "",
+	var alias: String = "",
 	var description: String = "",
 	var start_time: Timestamp = new Timestamp(0),
 	var finish_time: Timestamp = new Timestamp(0),
@@ -115,6 +116,7 @@ class Contest(
     new Contest(
       id = this.id,
       title = this.title,
+      alias = this.alias,
       description = this.description,
       start_time = this.start_time,
       finish_time = this.finish_time,
@@ -182,9 +184,20 @@ class Problem(
     )
 }
 
+class User(
+	var id: Long = 0,
+	var username: String = ""
+) {
+  def copy() =
+    new User(
+      id = this.id,
+      username = this.username
+    )
+}
+
 class Run(
 	var id: Long = 0,
-	var user: Long = 0,
+	var user: User = null,
 	var problem: Problem = null,
 	var contest: Option[Contest] = None,
 	var guid: String = "",
@@ -203,7 +216,7 @@ class Run(
   def copy() =
     new Run(
       id = this.id,
-      user = this.user,
+      user = this.user.copy,
       problem = this.problem.copy,
       contest = this.contest map(_.copy),
       guid = this.guid,
