@@ -219,11 +219,13 @@ object Manager extends Object with Log {
 			Config.get("ssl.keystore", "omegaup.jks"))
 		sslContext.setKeyManagerPassword(Config.get("ssl.password", "omegaup"))
 		sslContext.setKeyStorePassword(Config.get("ssl.keystore.password", "omegaup"))
-		sslContext.setTrustStore(Config.get("ssl.truststore", "omegaup.jks"))
-		sslContext.setTrustStorePassword(Config.get("ssl.truststore.password", "omegaup"))
+		sslContext.setTrustStore(FileUtil.loadKeyStore(
+			Config.get("ssl.truststore", "omegaup.jks"),
+			Config.get("ssl.truststore.password", "omegaup")
+		))
 		sslContext.setNeedClientAuth(true)
 	
-		val graderConnector = new org.eclipse.jetty.server.ssl.SslSelectChannelConnector(sslContext)
+		val graderConnector = new org.eclipse.jetty.server.ServerConnector(server, sslContext)
 		graderConnector.setPort(Config.get("grader.port", 21680))
 				
 		server.setConnectors(List(graderConnector).toArray)

@@ -193,8 +193,10 @@ object Https extends Object with Log with Using {
 			Config.get("ssl.keystore", "omegaup.jks"))
 		sslContextFactory.setKeyManagerPassword(Config.get("ssl.password", "omegaup"))
 		sslContextFactory.setKeyStorePassword(Config.get("ssl.keystore.password", "omegaup"))
-		sslContextFactory.setTrustStore(Config.get("ssl.truststore", "omegaup.jks"))
-		sslContextFactory.setTrustStorePassword(Config.get("ssl.truststore.password", "omegaup"))
+		sslContextFactory.setTrustStore(FileUtil.loadKeyStore(
+			Config.get("ssl.truststore", "omegaup.jks"),
+			Config.get("ssl.truststore.password", "omegaup")
+		))
 		sslContextFactory.setNeedClientAuth(true)
 		sslContextFactory.start
 		private val socketFactory = sslContextFactory.getSslContext.getSocketFactory
@@ -421,6 +423,14 @@ object FileUtil extends Object with Using {
 		} else {
 			return path
 		}
+	}
+
+	def loadKeyStore(path: String, password: String): KeyStore = {
+		val keystore = KeyStore.getInstance(KeyStore.getDefaultType)
+		using (new FileInputStream(path)) { (in) => {
+			keystore.load(in, password.toCharArray)
+			keystore
+		}}
 	}
 }
 

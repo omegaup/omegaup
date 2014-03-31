@@ -14,19 +14,18 @@ packageOptions in (Compile, packageBin) +=
     Package.ManifestAttributes( java.util.jar.Attributes.Name.MAIN_CLASS -> "omegaup.Service" )
 
 libraryDependencies ++= Seq(
-  "org.eclipse.jetty" % "jetty-server" % "8.1.14.v20131031",
-  "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" artifacts(Artifact("javax.servlet", "jar", "jar")),
-  "org.eclipse.jetty" % "jetty-client" % "8.1.14.v20131031",
-  "org.eclipse.jetty" % "jetty-security" % "8.1.14.v20131031",
-  "org.eclipse.jetty" % "jetty-websocket" % "8.1.14.v20131031",
+  "org.eclipse.jetty" % "jetty-server" % "9.1.3.v20140225",
+  "org.eclipse.jetty" % "jetty-client" % "9.1.3.v20140225",
+  "org.eclipse.jetty" % "jetty-security" % "9.1.3.v20140225",
+  "org.eclipse.jetty.websocket" % "websocket-server" % "9.1.3.v20140225",
   "net.liftweb" %% "lift-json" % "2.5.1",
-  "org.slf4j" % "log4j-over-slf4j" % "1.7.5",
-  "ch.qos.logback" % "logback-core" % "1.0.13",
-  "ch.qos.logback" % "logback-classic" % "1.0.13",
-  "commons-codec" % "commons-codec" % "1.8",
-  "org.scalatest" %% "scalatest" % "2.0" % "test",
-  "com.h2database" % "h2" % "1.3.153" % "runtime",
-  "mysql" % "mysql-connector-java" % "5.1.12" % "runtime"
+  "org.slf4j" % "log4j-over-slf4j" % "1.7.6",
+  "ch.qos.logback" % "logback-core" % "1.1.1",
+  "ch.qos.logback" % "logback-classic" % "1.1.1",
+  "commons-codec" % "commons-codec" % "1.9",
+  "org.scalatest" %% "scalatest" % "2.1.2" % "test",
+  "com.h2database" % "h2" % "1.3.175" % "runtime",
+  "mysql" % "mysql-connector-java" % "5.1.29" % "runtime"
 )
 
 proguardSettings 

@@ -558,11 +558,13 @@ object Service extends Object with Log with Using {
       )
     sslContext.setKeyManagerPassword(Config.get("ssl.password", "omegaup"))
     sslContext.setKeyStorePassword(Config.get("ssl.keystore.password", "omegaup"))
-    sslContext.setTrustStore(Config.get("ssl.truststore", "omegaup.jks"))
-    sslContext.setTrustStorePassword(Config.get("ssl.truststore.password", "omegaup"))
+    sslContext.setTrustStore(FileUtil.loadKeyStore(
+      Config.get("ssl.truststore", "omegaup.jks"),
+      Config.get("ssl.truststore.password", "omegaup")
+    ))
     sslContext.setNeedClientAuth(true)
   
-    val runnerConnector = new org.eclipse.jetty.server.ssl.SslSelectChannelConnector(sslContext)
+    val runnerConnector = new org.eclipse.jetty.server.ServerConnector(server, sslContext)
     runnerConnector.setPort(Config.get("runner.port", 0))
     
     server.setConnectors(List(runnerConnector).toArray)

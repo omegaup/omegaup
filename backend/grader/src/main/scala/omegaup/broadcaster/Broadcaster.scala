@@ -13,13 +13,22 @@ import scala.collection.{mutable,immutable}
 import omegaup._
 import omegaup.data._
 
-class Session(var connection: WebSocket.Connection, var user: Long, var contest: Int) {}
-case class RunDetails(guid: String, runtime: Double, memory: Long, score: Double, contest_score: Double, status: String, veredict: String, submit_delay: Long, time: Long, language: String)
+case class RunDetails(
+	guid: String,
+	runtime: Double,
+	memory: Long,
+	score: Double,
+	contest_score: Double,
+	status: String,
+	veredict: String,
+	submit_delay: Long,
+	time: Long,
+	language: String
+)
 case class UpdateRunMessage(message: String, run: RunDetails)
 
 object Broadcaster extends Object with Log with Using {
 	// A collection of subscribers.
-	val subscribers = new ConcurrentLinkedQueue[Session]()
 		
 	def hashdigest(algorithm: String, s: String): String = {
 		val hexdigest = new StringBuffer
@@ -55,23 +64,6 @@ object Broadcaster extends Object with Log with Using {
 		)
 		
 		warn("Sending some JSON: {}", data)
-		
-		val it = subscribers.iterator
-		while (it.hasNext) {
-			val subscriber = it.next
-			
-			warn("Considering session {}, {} == {}, {}", subscriber.connection, subscriber.user, run.user, subscriber.contest)
-			
-			if (subscriber.user == run.user) {
-				try {
-					subscriber.connection.sendMessage(data)
-				} catch {
-					case e: IOException => {
-						it.remove
-					}
-				}
-			}
-		}
 	}
 
 	def getUserId(request: HttpServletRequest): Int = {
@@ -108,85 +100,12 @@ object Broadcaster extends Object with Log with Using {
 	}
 
 	def init() = {
-		// the handler
-		val handler = new WebSocketHandler() {
-			@throws(classOf[IOException])
-			@throws(classOf[ServletException])
-			override def handle(target: String, baseRequest: Request, request: HttpServletRequest, response: HttpServletResponse): Unit = {
-				info("handle {}", target)
-
-				target match {
-					case "/broadcast/" => {
-						try {
-							val data = request.getReader.readLine
-
-							val it = subscribers.iterator
-							while (it.hasNext) {
-        	    						try {
-                							it.next.connection.sendMessage(data)
-            							} catch {
-									case e: IOException => {
-										it.remove
-									}
-								}
-							}
-
-							response.setStatus(HttpServletResponse.SC_OK)
-						} catch {
-							case e: Exception => {
-								response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-								warn(e.toString)
-							}
-						}
-
-						baseRequest.setHandled(true)
-					}
-
-					case x: String => {
-						if (x.contains("/events/")) {
-							if (getUserId(request) == -1) {
-								response.setStatus(HttpServletResponse.SC_UNAUTHORIZED)
-								baseRequest.setHandled(true)
-							} else {
-								super.handle(target, baseRequest, request, response)
-							}
-						}
-					}
-				}
-			}
-
-			override def doWebSocketConnect(request: HttpServletRequest, protocol: String): WebSocket = {
-				val userId = getUserId(request)
-				val session = new Session(null, userId, -1)
-
-				info("New connection for protocol {}, userID {}", protocol, userId)
-
-				new WebSocket.OnTextMessage() {
-					override def onOpen(connection: WebSocket.Connection): Unit = {
-        					session.connection = connection
-						subscribers.add(session)
-					}
-
-					override def onClose(code: Int, message: String): Unit = {
-						info("Closed: {}", message)
-						subscribers.remove(session)
-					}
-
-					override def onMessage(data: String): Unit = {
-						debug("Message received: {}", data)
-					}
-				};
-			}
-		};
-
 		val server = new org.eclipse.jetty.server.Server()
 		
-		val broadcasterConnector = new org.eclipse.jetty.server.nio.SelectChannelConnector()
+		val broadcasterConnector = new org.eclipse.jetty.server.ServerConnector(server)
 		broadcasterConnector.setPort(Config.get[Int]("broadcaster.port", 39613))
-		
 		server.setConnectors(List(broadcasterConnector).toArray)
-		
-		server.setHandler(handler)
+
 		server.start()
 		
 		info("Registering port {}", broadcasterConnector.getLocalPort())
@@ -211,4 +130,3 @@ object Broadcaster extends Object with Log with Using {
 		server.join()
 	}
 }
-
