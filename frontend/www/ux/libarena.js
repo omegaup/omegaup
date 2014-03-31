@@ -126,9 +126,10 @@ Arena.prototype.initClock = function(start, finish, deadline) {
 
 Arena.prototype.initProblems = function(contest) {
 	var self = this;
-	var problems = contest.problems;
-	for (var i = 0; i < self.problems.length; i++) {
-		var alias = self.problems[i].alias;
+	problems = contest.problems;
+	for (var i = 0; i < problems.length; i++) {
+		var alias = problems[i].alias;
+		problems[i].letter = String.fromCharCode('A'.charCodeAt(0) + i);
 		self.problems[alias] = problems[i];
 
 		$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' +
@@ -226,7 +227,7 @@ Arena.prototype.updateRun = function(run) {
 	$(r + ' .time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 
 	if (run.status == 'ready') {
-		if (!self.practice && !self.onlyProblem && self.contestName != 'admin') {
+		if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
 			omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
 		}
 	} else if (self.socket == null) {
@@ -245,7 +246,7 @@ Arena.prototype.onRankingChanged = function(data) {
 	$('#mini-ranking tbody tr.inserted').remove();
 	$('#ranking tbody tr.inserted').remove();
 
-	var ranking = data.ranking;
+	var ranking = data.ranking || [];
 	var newRanking = {};		
 	
 	// Push data to ranking table
