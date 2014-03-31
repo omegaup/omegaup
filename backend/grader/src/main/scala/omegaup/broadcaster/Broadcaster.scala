@@ -47,9 +47,11 @@ object Broadcaster extends Object with Log with Using {
 	}
 
 	def unsubscribe(session: BroadcasterSession) = {
-		if (subscribers.contains(session.contest)) {
-			subscribers(session.contest) -= session
-			info("Disconnected {} {}", session.user, session.contest)
+		if (session != null) {
+			if (subscribers.contains(session.contest)) {
+				subscribers(session.contest) -= session
+				info("Disconnected {} {}", session.user, session.contest)
+			}
 		}
 	}
 		
