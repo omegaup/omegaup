@@ -52,7 +52,7 @@ ProguardKeys.options in Proguard ++= Seq(
 ProguardKeys.inputFilter in Proguard := { file =>
   file.name match {
     case "runner_2.10-1.1.jar" => None
-    case _ => Some("!**/ECLIPSEF.RSA,!**/ECLIPSEF.SF,!about.html,!META-INF/MANIFEST.MF,!rootdoc.txt")
+    case _ => Some("!**/ECLIPSEF.RSA,!**/ECLIPSEF.SF,!about.html,!META-INF/MANIFEST.MF,!rootdoc.txt,!META-INF/LICENSE.txt")
   }
 }
 

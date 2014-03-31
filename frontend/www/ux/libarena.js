@@ -29,8 +29,14 @@ function Arena() {
 	// The last known scoreboard event stream.
 	this.currentEvents = null;
 
-	// A mapping from problem aliases to problem information.
-	this.problems = {};
+	// Whether the current contest is in practice mode.
+	this.practice = window.location.pathname.indexOf('/practice/') !== -1;
+
+	// Whether this is a full contest or only a problem.
+	this.onlyProblem = window.location.pathname.indexOf('/problem/') !== -1;
+
+	// The alias of the contest.
+	this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 };
 
 Arena.veredicts = {
@@ -59,10 +65,12 @@ Arena.scoreboardColors = [
 	'#CD35D3',
 ];
 
-Arena.prototype.connectSocket = function() {
+Arena.prototype.connectSocket = function(force) {
 	var self = this;
 	// temporarily disable websockets.
-	return false;
+	if (!force) {
+		return false;
+	}
 
 	var uri;
 	if (window.location.protocol === "https:") {
@@ -70,22 +78,39 @@ Arena.prototype.connectSocket = function() {
 	} else {
 		uri = "ws:";
 	}
-	uri += "//" + window.location.host + "/api/contest/events/" + currentContest.alias + "/";
+	uri += "//" + window.location.host + "/api/contest/events/" + self.currentContest.alias + "/";
 
 	try {
-		socket = new WebSocket(uri, "omegaup.com.events");
-		socket.onclose = function(e) { socket = null; console.log(e); };
-		socket.onmessage = function(message) {
+		self.socket = new WebSocket(uri, "com.omegaup.events");
+		self.socket.onmessage = function(message) {
+			console.log(message);
 			var data = JSON.parse(message.data);
 
 			if (data.message == "/run/status/") {
 				data.run.time = new Date(data.run.time * 1000);
-				self.runUpdated(data.run);
+				self.updateRun(data.run);
 			}
 		};
-		socket.onerror = function(e) { console.log(e); };
+		self.socket.onopen = function() {
+			self.socket_keepalive = setInterval((function(socket) {
+				return function() {
+					socket.send('"ping"');
+				};
+			})(self.socket), 30000);
+		};
+		self.socket.onclose = function(e) {
+			self.socket = null;
+			clearInterval(self.socket_keepalive);
+			console.error(e);
+		};
+		self.socket.onerror = function(e) {
+			self.socket = null;
+			clearInterval(self.socket_keepalive);
+			console.error(e);
+		};
 	} catch (e) {
-		console.log(e);
+		self.socket = null;
+		console.error(e);
 	}
 };
 
@@ -100,10 +125,11 @@ Arena.prototype.initClock = function(start, finish, deadline) {
 };
 
 Arena.prototype.initProblems = function(contest) {
+	var self = this;
 	var problems = contest.problems;
-	for (var i = 0; i < problems.length; i++) {
-		var alias = problems[i].alias;
-		this.problems[alias] = problems[i];
+	for (var i = 0; i < self.problems.length; i++) {
+		var alias = self.problems[i].alias;
+		self.problems[alias] = problems[i];
 
 		$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' +
 				problems[i].letter + '</a></th>').insertBefore('#ranking thead th.total');
@@ -166,7 +192,56 @@ Arena.prototype.formatDelta = function(delta) {
 	return clock;
 };
 
+Arena.prototype.updateRunFallback = function(guid, orig_run) {
+	var self = this;
+	if (self.socket == null) {
+		setTimeout(function() { omegaup.runStatus(guid, self.updateRun.bind(self)); }, 5000);
+	}
+}
+
+Arena.prototype.updateRun = function(run) {
+	var self = this;
+
+	// Actualiza el objeto en los problemas.
+	for (p in self.problems) {
+		if (!self.problems.hasOwnProperty(p)) continue;
+		for (r in self.problems[p].runs) {
+			if (!self.problems[p].runs.hasOwnProperty(r)) continue;
+
+			if (self.problems[p].runs[r].guid == run.guid) {
+				self.problems[p].runs[r] = run;
+				break;
+			}
+		}
+	}
+	var r = '#run_' + run.guid;
+
+	if (run.status == 'ready') {
+		$(r + ' .runtime').html((parseFloat(run.runtime) / 1000).toFixed(2));
+		$(r + ' .memory').html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+		$(r + ' .points').html(parseFloat(run.contest_score).toFixed(2));
+		$(r + ' .penalty').html(run.submit_delay);
+	}
+	$(r + ' .status').html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+	$(r + ' .time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+
+	if (run.status == 'ready') {
+		if (!self.practice && !self.onlyProblem && self.contestName != 'admin') {
+			omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
+		}
+	} else if (self.socket == null) {
+		self.updateRunFallback(run.guid, run);
+	}
+};
+
+Arena.prototype.rankingChange = function(data) {
+	var self = this;
+	self.onRankingChanged(data);
+	omegaup.getRankingEvents(self.contestAlias, self.onRankingEvents.bind(self));
+}
+
 Arena.prototype.onRankingChanged = function(data) {
+	var self = this;
 	$('#mini-ranking tbody tr.inserted').remove();
 	$('#ranking tbody tr.inserted').remove();
 
@@ -194,10 +269,10 @@ Arena.prototype.onRankingChanged = function(data) {
 			
 			$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
 			$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty + " (" + rank.problems[alias].runs  + ")");
-			if (this.problems[alias]) {
+			if (self.problems[alias]) {
 				if (rank.username == omegaup.username) {
 					$('#problems .problem_' + alias + ' .solved')
-						.html("(" + rank.problems[alias].points + " / " + this.problems[alias].points + ")");
+						.html("(" + rank.problems[alias].points + " / " + self.problems[alias].points + ")");
 				}
 			}
 		}

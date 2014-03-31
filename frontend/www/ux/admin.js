@@ -1,9 +1,7 @@
 $(document).ready(function() {
 	var arena = new Arena();
-	var problems = {};
 	var activeTab = 'problems';
 	var currentProblem = null;
-	var currentContest = null;
 	var currentNotifications = {count: 0, timer: null};
 	var runsOffset = 0;
 	var runsRowcount = 100;
@@ -15,7 +13,8 @@ $(document).ready(function() {
 	var clarificationsOffset = 0;
 	var clarificationsRowcount = 20;
 	var rankChartLimit = 1e99;
-	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];		
+	var practice = false;
+	var onlyProblem = false;
 
 	Highcharts.setOptions({
 		global: {
@@ -23,7 +22,7 @@ $(document).ready(function() {
 		}
 	});
 
-	if (contestAlias === "admin") {		
+	if (arena.contestAlias === "admin") {
 		refreshRuns();
 		setInterval(function() { 
 			runsOffset = 0; // Return pagination to start on refresh
@@ -36,10 +35,11 @@ $(document).ready(function() {
 		$('#loading').fadeOut('slow');
 		$('#root').fadeIn('slow');
 	} else {
-		omegaup.getContest(contestAlias, function(contest) {
+		omegaup.getContest(arena.contestAlias, function(contest) {
 			$('#title .contest-title').html(omegaup.escape(contest.title));
 
-			currentContest = contest;
+			arena.currentContest = contest;
+			arena.connectSocket(true);
 
 			arena.initClock(contest.start_time, contest.finish_time);
 			arena.initProblems(contest);
@@ -48,8 +48,7 @@ $(document).ready(function() {
 				var problem = contest.problems[idx];
 				var problemName = String.fromCharCode(problem.letter) + '. ' + omegaup.escape(problem.title);
 
-				problems[problem.alias] = problem;
-
+				arena.problems[problem.alias] = problem;
 
 				$('#submit select[name="problem"]').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
 				$('#rejudge-problem-list').append($('<option>' + problemName + '</option>').attr('value', problem.alias));
@@ -60,13 +59,13 @@ $(document).ready(function() {
 				$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
 			}
 
-			omegaup.getRanking(contestAlias, rankingChange);
-			setInterval(function() { omegaup.getRanking(contestAlias, rankingChange); }, 5 * 60 * 1000);
+			omegaup.getRanking(arena.contestAlias, arena.rankingChange.bind(arena));
+			setInterval(function() { omegaup.getRanking(arena.contestAlias, arena.rankingChange.bind(arena)); }, 5 * 60 * 1000);
 
-			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
+			omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
 			setInterval(function() { 
 				clarificationsOffset = 0; // Return pagination to start on refresh
-				omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+				omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
 			}, 5 * 60 * 1000);
 
 			refreshRuns();
@@ -131,7 +130,7 @@ $(document).ready(function() {
 		$('select.runsveredict').change();
 	});
 	
-	if (contestAlias === "admin") {
+	if (arena.contestAlias === "admin") {
 		$("#runsproblem").typeahead({
 			ajax: { 
 				url: "/api/problem/list/",
@@ -162,7 +161,7 @@ $(document).ready(function() {
 		runsLang	 = $('select.runslang	  option:selected').val();
 		
 		// in general admin panel, runsProblem is populated via the typehead
-		if (contestAlias != "admin") {
+		if (arena.contestAlias != "admin") {
 			runsProblem	 = $('select.runsproblem  option:selected').val();
 		}
 		
@@ -178,7 +177,7 @@ $(document).ready(function() {
 			}
 			
 			// Refresh with previous page
-			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+			omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
 		}
 	});
 	
@@ -189,14 +188,14 @@ $(document).ready(function() {
 		}
 		
 		// Refresh with previous page
-		omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+		omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
 	});
 
 	$('#submit').submit(function(e) {
 		if (!$('#submit textarea[name="code"]').val()) return false;
 
 		$('#submit input').attr('disabled', 'disabled');
-		omegaup.submit(contestAlias, $('#submit select[name="problem"]').val(), $('#submit select[name="language"]').val(), $('#submit textarea[name="code"]').val(), function (run) {
+		omegaup.submit(arena.contestAlias, $('#submit select[name="problem"]').val(), $('#submit select[name="language"]').val(), $('#submit textarea[name="code"]').val(), function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
 				$('#submit input').removeAttr('disabled');
@@ -215,7 +214,7 @@ $(document).ready(function() {
 			$('.language', r).html(run.language)
 			$('table.runs tbody').prepend(r);
 
-			updateRun(run.guid, run);
+			arena.updateRunFallback(run.guid, run);
 
 			$('#overlay').hide();
 			$('#submit input').removeAttr('disabled');
@@ -227,7 +226,7 @@ $(document).ready(function() {
 
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
-		omegaup.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
+		omegaup.newClarification(arena.contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
 				$('#clarification input').removeAttr('disabled');
@@ -235,7 +234,7 @@ $(document).ready(function() {
 			}
 			$('#overlay').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
-			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
+			omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
 			$('#clarification input').removeAttr('disabled');
 		});
 
@@ -274,9 +273,9 @@ $(document).ready(function() {
 			$('#overlay form').hide();
 			$('#submit').show();
 			$('#overlay').show();
-		} else if (problem && problems[problem[1]]) {
+		} else if (problem && arena.problems[problem[1]]) {
 			var newRun = problem[2];
-			currentProblem = problem = problems[problem[1]];
+			currentProblem = problem = arena.problems[problem[1]];
 
 			$('#problem-list .active').removeClass('active');
 			$('#problem-list .problem_' + problem.alias).addClass('active');
@@ -299,7 +298,7 @@ $(document).ready(function() {
 			if (problem.problem_statement) {
 				update(problem);
 			} else {
-				omegaup.getProblem(contestAlias, problem.alias, function (problem_ext) {
+				omegaup.getProblem(arena.contestAlias, problem.alias, function (problem_ext) {
 					problem.source = problem_ext.source;
 					problem.problem_statement = problem_ext.problem_statement;
 					problem.runs = problem_ext.runs;
@@ -339,42 +338,6 @@ $(document).ready(function() {
 		
 	});
 
-	function rankingChange(data) {
-		arena.onRankingChanged(data);
-		omegaup.getRankingEvents(contestAlias, arena.onRankingEvents.bind(arena));
-	}
-
-	function updateRun(guid, orig_run) {
-		setTimeout(function() {
-			omegaup.runStatus(guid, function(run) {
-				var r = $('#run_' + run.guid);
-
-				orig_run.runtime = run.runtime;
-				orig_run.memory = run.memory;
-				orig_run.contest_score = run.contest_score;
-				orig_run.status = run.status;
-				orig_run.veredict = run.veredict;
-				orig_run.submit_delay = run.submit_delay;
-				orig_run.time = run.time;
-				orig_run.language = run.language;
-
-				$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-				$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-				$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
-				$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-				$('.penalty', r).html(run.submit_delay);
-				$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
-				$('.language', r).html(run.language);
-
-				if (run.status == 'ready') {
-					omegaup.getRanking(contestAlias, rankingChange);
-				} else {
-					updateRun(guid, orig_run);
-				}
-			});
-		}, 5000);
-	}
-	
 	function refreshRuns() {
 		var options = {
 			offset: runsOffset, 
@@ -401,10 +364,10 @@ $(document).ready(function() {
 			options.username = runsUsername;
 		}
 	
-		if (contestAlias === "admin") {
+		if (arena.contestAlias === "admin") {
 			omegaup.getRuns(options, runsChange);
 		} else {
-			omegaup.getContestRuns(contestAlias, options, runsChange); 
+			omegaup.getContestRuns(arena.contestAlias, options, runsChange);
 		}
 		
 	}
@@ -447,7 +410,7 @@ $(document).ready(function() {
 				$('.rejudge', row).append($('<input type="button" value="rejudge" />').click(function() {
 					$('.status', row).html('rejudging');
 					omegaup.runRejudge(guid, function() {
-						updateRun(guid, run);
+						arena.updateRunFallback(guid, run);
 					});
 				}));
 			})(run.guid, run, r);

@@ -1,6 +1,5 @@
 $(document).ready(function() {
 	var arena = new Arena();
-	var problems = {};
 	var activeTab = 'problems';	
 	var currentProblem = null;
 	var currentContest = null;
@@ -25,45 +24,6 @@ $(document).ready(function() {
 			useUTC: false
 		}
 	});
-
-	function updateRunFallback(guid, orig_run) {
-		setTimeout(function() { omegaup.runStatus(guid, updateRun); }, 5000);
-	}
-
-	function updateRun(run) {
-		// Actualiza el objeto en los problemas. 
-		for (p in problems) {
-			if (!problems.hasOwnProperty(p)) continue;
-			for (r in problems[p].runs) {
-				if (!problems[p].runs.hasOwnProperty(r)) continue;
-
-				if (problems[p].runs[r].guid == run.guid) {
-					problems[p].runs[r] = run;
-					break;
-				}
-			}
-		}
-		var r = '#run_' + run.guid;
-
-		if (run.status == 'ready') {
-			$(r + ' .runtime').html((parseFloat(run.runtime) / 1000).toFixed(2));
-			$(r + ' .memory').html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-			$(r + ' .points').html(parseFloat(run.contest_score).toFixed(2));
-			$(r + ' .penalty').html(run.submit_delay);
-		}
-		$(r + ' .status').html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-		$(r + ' .time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
-
-		if (socket == null) {
-			if (run.status == 'ready') {
-				if (!practice && !onlyProblem) {
-					omegaup.getRanking(contestAlias, rankingChange);
-				}
-			} else {
-				updateRunFallback(run.guid, run);
-			}
-		}
-	}
 
 	function onlyProblemLoaded(problem) {
 		if (problem.status == 'error') {
@@ -132,9 +92,9 @@ $(document).ready(function() {
 			var problem = contest.problems[idx];
 			var problemName = problem.letter + '. ' + omegaup.escape(problem.title);
 
-			problems[problem.alias] = problem;
-			if (!problems[problem.alias].runs) {
-				problems[problem.alias].runs = [];
+			arena.problems[problem.alias] = problem;
+			if (!arena.problems[problem.alias].runs) {
+				arena.problems[problem.alias].runs = [];
 			}
 
 			var prob = $('#problem-list .template').clone().removeClass('template').addClass('problem_' + problem.alias);
@@ -145,8 +105,8 @@ $(document).ready(function() {
 		}
 
 		if (!practice) {
-			omegaup.getRanking(contestAlias, rankingChange);
-			setInterval(function() { omegaup.getRanking(contestAlias, rankingChange); }, 5 * 60 * 1000);
+			omegaup.getRanking(contestAlias, arena.rankingChange.bind(arena));
+			setInterval(function() { omegaup.getRanking(contestAlias, arena.rankingChange.bind(arena)); }, 5 * 60 * 1000);
 
 			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
 			setInterval(function() { 
@@ -191,7 +151,7 @@ $(document).ready(function() {
 			}
 			
 			if (!onlyProblem) {
-				problems[currentProblem.alias].last_submission = new Date().getTime();
+				arena.problems[currentProblem.alias].last_submission = new Date().getTime();
 			}
 		
 			run.status = 'new';
@@ -216,7 +176,7 @@ $(document).ready(function() {
 			currentProblem.runs.push(run);
 
 			if (socket == null) {
-				updateRunFallback(run.guid, run);
+				arena.updateRunFallback(run.guid, run);
 			}
 
 			$('#overlay').hide();
@@ -229,7 +189,7 @@ $(document).ready(function() {
 	}
 
 	$('#submit').submit(function(e) {
-		if (!onlyProblem && (problems[currentProblem.alias].last_submission + submissionGap * 1000 > new Date().getTime())) {
+		if (!onlyProblem && (arena.problems[currentProblem.alias].last_submission + submissionGap * 1000 > new Date().getTime())) {
 			alert('Deben pasar ' + submissionGap + ' segundos entre envios de un mismo problema');
 			return false;
 		}
@@ -414,9 +374,9 @@ $(document).ready(function() {
 
 			var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
 
-			if (problem && problems[problem[1]]) {
+			if (problem && arena.problems[problem[1]]) {
 				var newRun = problem[2];
-				currentProblem = problem = problems[problem[1]];
+				currentProblem = problem = arena.problems[problem[1]];
 
 				$('#problem-list .active').removeClass('active');
 				$('#problem-list .problem_' + problem.alias).addClass('active');
@@ -533,11 +493,6 @@ $(document).ready(function() {
 		
 	});
 
-	function rankingChange(data) {
-		arena.onRankingChanged(data);
-		omegaup.getRankingEvents(contestAlias, arena.onRankingEvents.bind(arena));
-	}
-	
 	function clarificationsChange(data) {
 		$('.clarifications tr.inserted').remove();
 		if (data.clarifications.length > 0 && data.clarifications.length < clarificationsRowcount) {

@@ -48,6 +48,10 @@ ProguardKeys.options in Proguard ++= Seq(
   "-keepclassmembers class omegaup.Service { *; }",
   "-keep class scala.collection.JavaConversions",
   "-keep class org.eclipse.jetty.util.log.Slf4jLog",
+  "-keep class org.eclipse.jetty.websocket.server.WebSocketServerFactory { *; }",
+  "-keep class org.eclipse.jetty.websocket.api.extensions.*",
+  "-keep class org.eclipse.jetty.websocket.common.extensions.**",
+  "-keep class org.eclipse.jetty.websocket.**",
   "-keep class ch.qos.logback.classic.Logger",
   ProguardOptions.keepMain("omegaup.Service")
 )
@@ -55,7 +59,7 @@ ProguardKeys.options in Proguard ++= Seq(
 ProguardKeys.inputFilter in Proguard := { file =>
   file.name match {
     case "grader_2.10-1.1.jar" => None
-    case _ => Some("!**/ECLIPSEF.RSA,!**/ECLIPSEF.SF,!about.html,!META-INF/MANIFEST.MF,!rootdoc.txt,!META-INF/services/java.sql.Driver")
+    case _ => Some("!**/ECLIPSEF.RSA,!**/ECLIPSEF.SF,!about.html,!META-INF/MANIFEST.MF,!rootdoc.txt,!META-INF/services/java.sql.Driver,!META-INF/LICENSE.txt")
   }
 }
 

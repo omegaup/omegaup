@@ -66,7 +66,7 @@ object GraderData {
 				case 0 => None
 				case x: Long => Some(new Contest(
 					id = rs.getLong("contest_id"),
-					alias = rs.getString("alias"),
+					alias = rs.getString("contest_alias"),
 					start_time = new Timestamp(rs.getDate("start_time").getTime()),
 					finish_time = new Timestamp(rs.getDate("finish_time").getTime()),
 					points_decay_factor = rs.getDouble("points_decay_factor"),
@@ -81,7 +81,7 @@ object GraderData {
 	def run(id: Long)(implicit connection: Connection): Option[Run] =
 		query("""
 			SELECT
-				r.*, p.*, u.username, cpo.open_time, cp.points, c.alias,
+				r.*, p.*, u.username, cpo.open_time, cp.points, c.alias AS contest_alias,
 				c.start_time, c.finish_time, c.points_decay_factor,
 				r.submit_delay, c.partial_score, c.feedback, c.penalty,
 				c.penalty_time_start, c.penalty_calc_policy
@@ -114,7 +114,7 @@ object GraderData {
 	def pendingRuns()(implicit connection: Connection): Iterable[Run] =
 		queryEach("""
 			SELECT
-				r.*, p.*, u.username, cpo.open_time, cp.points, c.alias,
+				r.*, p.*, u.username, cpo.open_time, cp.points, c.alias AS contest_alias,
 				c.start_time, c.finish_time, c.points_decay_factor,
 				r.submit_delay, c.partial_score, c.feedback, c.penalty,
 				c.penalty_time_start, c.penalty_calc_policy

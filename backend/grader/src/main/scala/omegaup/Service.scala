@@ -20,7 +20,7 @@ object Service extends Object with Log with Using {
 		// logger
 		Logging.init
 
-		val servers = List(omegaup.grader.Manager.init(configPath), omegaup.broadcaster.Broadcaster.init)
+		val servers = List(omegaup.broadcaster.Broadcaster.init, omegaup.grader.Manager.init(configPath))
 		
 		Runtime.getRuntime.addShutdownHook(new Thread() {
 			override def run() = {
