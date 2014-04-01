@@ -39,7 +39,7 @@ $(document).ready(function() {
 			$('#title .contest-title').html(omegaup.escape(contest.title));
 
 			arena.currentContest = contest;
-			arena.connectSocket(true);
+			// arena.connectSocket(true);
 
 			arena.initClock(contest.start_time, contest.finish_time);
 			arena.initProblems(contest);
