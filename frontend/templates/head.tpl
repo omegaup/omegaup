@@ -53,9 +53,9 @@
 {/literal}
 {/if}
 {if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
-	<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js"></script>
-	<script type="text/javascript" src="/js/pagedown/Markdown.Sanitizer.js"></script>
-	<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js"></script>
+	<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ts=1"></script>
+	<script type="text/javascript" src="/js/pagedown/Markdown.Sanitizer.js?ts=1"></script>
+	<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ts=1"></script>
 	<link rel="stylesheet" type="text/css" href="/js/pagedown/demo/browser/demo.css" />
 {/if}
 		<script type="text/javascript"> /* Set sugarjs date locale globally */ Date.setLocale("{#locale#}");</script>
