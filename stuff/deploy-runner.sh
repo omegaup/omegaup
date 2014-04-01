@@ -1,13 +1,17 @@
-#!/bin/bash
+#!/bin/bash -e
 
-if [ $# -lt 1 ]; then
-	echo "$0 <hostname the runners must connect to>"
+if [ $# -lt 2 ]; then
+	echo "$0 <grader hostname> <hostname to deploy to>"
 	exit 1
 fi
 
+GRADER=$1
+HOSTNAME=$2
+
 ROOT=`dirname $0`/..
-TARGET=$ROOT/frontend/www/runner-distrib.sh
-HOSTNAME=$1
+TMPDIR=`mktemp -d`
+TARGET=$TMPDIR/runner-distrib.sh
+JKS=$ROOT/ssl/${HOSTNAME}.jks
 
 pushd $ROOT/minijail
 	make
@@ -17,52 +21,38 @@ pushd $ROOT/backend
 	make
 popd
 
-TMPDIR=`mktemp -d`
-mkdir -p $TMPDIR/distrib/{compile,input}
+if [ ! -f $JKS ]; then
+	$ROOT/bin/certmanager runner --hostname $HOSTNAME --output $JKS
+fi
+
+mkdir -p $TMPDIR/distrib/{compile,input,bin}
 mkdir -p $TMPDIR/distrib/minijail/{bin,lib,dist,scripts,bin}
 
-cp $ROOT/bin/runner.jar $TMPDIR/distrib/runner.jar
+cp $ROOT/bin/runner.jar $TMPDIR/distrib/bin/runner.jar
+cp $JKS $TMPDIR/distrib/bin/omegaup.jks
 cp $ROOT/minijail/{minijail0,ldwrapper,libminijailpreload.so} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/bin/{karel,kcl} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/stuff/libkarel.py $TMPDIR/distrib/minijail/lib/
 cp $ROOT/stuff/mkroot $TMPDIR/distrib/minijail/bin/
+cp $ROOT/stuff/runner.service $TMPDIR/distrib/bin
+chmod +x $TMPDIR/distrib/bin/runner.service
 cp $ROOT/stuff/minijail-scripts/* $TMPDIR/distrib/minijail/scripts/
 
-cat > $TMPDIR/distrib/runner.sh <<EOF
-#!/bin/bash
-
-cd "\$( dirname "\$0" )"
-
-killall java 2>/dev/null || true
-rm -f nohup.out 2>/dev/null || true
-rm -f runner.log 2>/dev/null || true
-su -c 'nohup /usr/bin/java -jar runner.jar &' omegaup
-chown -R omegaup.omegaup nohup.out || true
-
-exit
-EOF
-chmod +x $TMPDIR/distrib/runner.sh
-
-cat > $TMPDIR/distrib/omegaup.conf <<EOF
+cat > $TMPDIR/distrib/bin/omegaup.conf <<EOF
 # Logging
-logging.level=info
-logging.file=/opt/omegaup/runner.log
-
-# Use minijail
-runner.minijail.path=minijail
-runner.sandbox=minijail
+logging.level = info
+logging.file = /opt/omegaup/runner.log
 
 # Paths
-compile.root=compile
-grader.root=grade
-input.root=input
-problems.root=problems
-submissions.root=submissions
-runner.sandbox.path=sandbox
+compile.root = /opt/omegaup/compile
+input.root = /opt/omegaup/input
+runner.minijail.path = /opt/omegaup/minijail
 
 # Ports & Endpoints
-grader.register.url = https://$HOSTNAME:21680/register/
 runner.port = 21681
+grader.register.url = https://$GRADER:21680/register/
+grader.deregister.url = https://$GRADER:21680/deregister/
+runner.hostname = $HOSTNAME
 EOF
 
 pushd $TMPDIR/distrib
@@ -84,11 +74,6 @@ if [ "\`grep omegaup /etc/sudoers\`" = "" ]; then
 	echo "omegaup ALL = NOPASSWD: /opt/omegaup/minijail/bin/minijail0" >> /etc/sudoers
 fi
 
-# Download the certificate
-if [ ! -f /opt/omegaup/omegaup.jks ]; then
-	scp runner@$HOSTNAME:$ROOT/backend/runner/omegaup.jks /opt/omegaup/omegaup.jks
-fi
-
 # Add the user if not present
 id omegaup > /dev/null 2>&1
 if [ \$? -eq 1 ]; then
@@ -105,12 +90,20 @@ pushd /opt/omegaup/minijail
 popd
 
 # And finally start the runner.
-/opt/omegaup/runner.sh
+if [ ! -f /etc/init.d/runner ]; then
+	sudo cp /opt/omegaup/bin/runner.service /etc/init.d/runner
+	sudo update-rc.d runner defaults
+fi
+sudo service runner restart || true
 
 # Marks the end of the install script and the beginning of the payload
 exit
 EOF
 
 cat $TMPDIR/setup-runner $TMPDIR/runner-distrib.tar.bz2 > $TARGET
+
+# Deploy the payload
+scp $TARGET $HOSTNAME:~
+ssh $HOSTNAME -C "sudo /bin/bash ~/runner-distrib.sh"
 
 rm -rf $TMPDIR
