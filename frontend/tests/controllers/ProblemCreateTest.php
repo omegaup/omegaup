@@ -67,6 +67,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertFileExists($targetpath . "testplan");
 		$this->assertFileExists($targetpath . "cases");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "en.html");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "en.markdown");
 
 		// Default data
 		$this->assertEquals(0, $problem->getVisits());
@@ -311,15 +312,29 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Verify that all the images are there.
 		$html_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		if (strpos($html_contents, "<img src=\"". IMAGES_URL_PATH ."$imageSha1.$imageExtension\"") === false) {
-			$this->fail("No uploaded image found.");
+			$this->fail("Html: No uploaded image found.");
 		}
 		// And the direct URL.
 		if (strpos($html_contents, "<img src=\"$imageAbsoluteUrl\"") === false) {
-			$this->fail("No absolute image found.");
+			$this->fail("Html: No absolute image found.");
 		}
 		// And the unmodified, not found image.
 		if (strpos($html_contents, "<img src=\"notfound.jpg\"") === false) {
-			$this->fail("No non-found image found.");
+			$this->fail("Html: No non-found image found.");
+		}
+		
+		// Do image paht replacement checks in the markdown file
+		$markdown_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
+		if (strpos($markdown_contents, "![Saluda](". IMAGES_URL_PATH ."$imageSha1.$imageExtension)") === false) {
+			$this->fail("Markdown: No uploaded image found.");
+		}
+		// And the direct URL.
+		if (strpos($markdown_contents, "![Saluda]($imageAbsoluteUrl)") === false) {
+			$this->fail("Markdown: No absolute image found.");
+		}
+		// And the unmodified, not found image.
+		if (strpos($markdown_contents, "![404](notfound.jpg)") === false) {
+			$this->fail("Markdown: No non-found image found.");
 		}
 	}
 
