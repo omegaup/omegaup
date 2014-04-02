@@ -183,18 +183,18 @@ class Scoreboard {
 		try {
 			$contest = ContestsDAO::getByPK($contest_id);
 
-			// Get all distinct contestants participating in the contest given contest_id
-			$raw_contest_users = RunsDAO::GetAllRelevantUsers($contest_id, true, NULL);
-
-			// Get all problems given contest_id
-			$raw_contest_problems = ContestProblemsDAO::GetRelevantProblems($contest_id);
-
 			$use_penalty = $contest->getPenaltyTimeStart() != 'none';
 
 			$contest_runs = RunsDAO::GetContestRuns(
 				$contest_id,
 				$use_penalty ? 'submit_delay' : 'run_id'
 			);
+
+			// Get all distinct contestants participating in the contest given contest_id
+			$raw_contest_users = RunsDAO::GetAllRelevantUsers($contest_id, true, NULL);
+
+			// Get all problems given contest_id
+			$raw_contest_problems = ContestProblemsDAO::GetRelevantProblems($contest_id);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
