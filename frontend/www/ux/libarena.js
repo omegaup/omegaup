@@ -29,6 +29,9 @@ function Arena() {
 	// The last known scoreboard event stream.
 	this.currentEvents = null;
 
+	// Currently opened notifications.
+	this.currentNotifications = {count: 0, timer: null};
+
 	// Whether the current contest is in practice mode.
 	this.practice = window.location.pathname.indexOf('/practice/') !== -1;
 
@@ -130,6 +133,7 @@ Arena.prototype.initProblems = function(contest) {
 	for (var i = 0; i < problems.length; i++) {
 		var alias = problems[i].alias;
 		problems[i].letter = String.fromCharCode('A'.charCodeAt(0) + i);
+		problems[i].runs = problems[i].runs || [];
 		self.problems[alias] = problems[i];
 
 		$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' +
@@ -438,4 +442,50 @@ Arena.prototype.createChart = function(series, navigatorSeries) {
 				'transparent'
 		});
 	}
+};
+
+Arena.prototype.flashTitle = function(reset) {
+	if (document.title.indexOf("!") === 0) {
+		document.title = document.title.substring(2);
+	} else if (!reset) {
+		document.title = "! " + document.title;
+	}
+};
+
+Arena.prototype.notify = function(title, message, element, id) {
+	var self = this;
+
+	if (self.currentNotifications.hasOwnProperty(id)) {
+		return;
+	}
+
+	if (self.currentNotifications.timer == null) {
+		self.currentNotifications.timer = setInterval(self.flashTitle, 1000);
+	}
+
+	self.currentNotifications.count++;
+
+	var gid = $.gritter.add({
+		title: title,
+		text: message,
+		sticky: true,
+		before_close: function() {
+			if (element) {
+				window.focus();
+				element.scrollIntoView(true);
+			}
+			delete self.currentNotifications[id];
+
+			self.currentNotifications.count--;
+			if (self.currentNotifications.count == 0) {
+				clearInterval(self.currentNotifications.timer);
+				self.currentNotifications.timer = null;
+				self.flashTitle(true);
+			}
+		}
+	});
+
+	self.currentNotifications[id] = gid;
+
+	document.getElementById('notification_audio').play();
 };

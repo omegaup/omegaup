@@ -92,11 +92,6 @@ $(document).ready(function() {
 			var problem = contest.problems[idx];
 			var problemName = problem.letter + '. ' + omegaup.escape(problem.title);
 
-			arena.problems[problem.alias] = problem;
-			if (!arena.problems[problem.alias].runs) {
-				arena.problems[problem.alias].runs = [];
-			}
-
 			var prob = $('#problem-list .template').clone().removeClass('template').addClass('problem_' + problem.alias);
 			$('.name', prob).attr('href', '#problems/' + problem.alias).html(problemName);
 			$('#problem-list').append(prob);
@@ -174,10 +169,7 @@ $(document).ready(function() {
 				currentProblem.runs = [];
 			}
 			currentProblem.runs.push(run);
-
-			if (socket == null) {
-				arena.updateRunFallback(run.guid, run);
-			}
+			arena.updateRunFallback(run.guid, run);
 
 			$('#overlay').hide();
 			$('#submit input').removeAttr('disabled');
@@ -511,9 +503,9 @@ $(document).ready(function() {
 
 			$('.problem', r).html(clarification.problem_alias);
 						
-						if (clarification.can_answer) {
-							$('.author', r).html(clarification.author);
-						}
+			if (clarification.can_answer) {
+				$('.author', r).html(clarification.author);
+			}
 						
 			$('.time', r).html(clarification.time);
 			$('.message', r).html(omegaup.escape(clarification.message));

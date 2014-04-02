@@ -2,7 +2,6 @@ $(document).ready(function() {
 	var arena = new Arena();
 	var activeTab = 'problems';
 	var currentProblem = null;
-	var currentNotifications = {count: 0, timer: null};
 	var runsOffset = 0;
 	var runsRowcount = 100;
 	var runsVeredict = "";
@@ -526,50 +525,6 @@ $(document).ready(function() {
 		}
 	}
 	
-	function flashTitle(reset) {
-		if (document.title.indexOf("!") === 0) {
-			document.title = document.title.substring(2);
-		} else if (!reset) {
-			document.title = "! " + document.title;
-		}
-	}
-
-	function notify(title, message, element, id) {
-		if (currentNotifications.hasOwnProperty(id)) {
-			return;
-		}
-
-		if (currentNotifications.timer == null) {
-			currentNotifications.timer = setInterval(flashTitle, 1000);
-		}
-
-		currentNotifications.count++;
-
-		var gid = $.gritter.add({
-			title: title,
-			text: message,
-			sticky: true,
-			before_close: function() {
-				if (element) {
-					window.focus();
-					element.scrollIntoView(true);
-				}
-				delete currentNotifications[id];
-
-				currentNotifications.count--;
-				if (currentNotifications.count == 0) {
-					clearInterval(currentNotifications.timer);
-					currentNotifications.timer = null;
-					flashTitle(true);
-				}
-			}
-		});
-
-		currentNotifications[id] = gid;
-
-		document.getElementById('notification_audio').play();
-	}
-
 	function clarificationsChange(data) {
 		$('.clarifications tr.inserted').remove();
 
@@ -585,7 +540,12 @@ $(document).ready(function() {
 			$('.answer', r).html(omegaup.escape(clarification.answer));
 
 			if (!clarification.answer) {
-				notify(clarification.author + " - " + clarification.problem_alias, omegaup.escape(clarification.message), r[0], clarification.clarification_id);
+				arena.notify(
+					clarification.author + " - " + clarification.problem_alias,
+					omegaup.escape(clarification.message),
+					r[0],
+					'clarification-' + clarification.clarification_id
+				);
 			}
 
 			if (clarification.can_answer) {
