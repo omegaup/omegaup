@@ -229,7 +229,7 @@ object Https extends Object with Log with Using {
 	}
 
 	def get(url: String, runner: Boolean = true):String = {
-		debug("Get {}", url)
+		debug("GET {}", url)
 
 		if (url.startsWith("https://")) {
 			cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
@@ -247,6 +247,47 @@ object Https extends Object with Log with Using {
 				conn.addRequestProperty("Connection", "close")
 				conn.setDoOutput(false)
 				new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine
+			}}
+		}
+	}
+
+	def post[T](url: String, data: scala.collection.Map[String, String], runner: Boolean = true)(implicit mf: Manifest[T]):T = {
+		debug("POST {}", url)
+
+		val postdata = data.map { case(key, value) =>
+			URLEncoder.encode(key, "UTF-8") + "=" + URLEncoder.encode(value, "UTF-8")
+		}.mkString("&").getBytes("UTF-8")
+
+		implicit val formats = Serialization.formats(NoTypeHints)
+
+		if (url.startsWith("https://")) {
+			cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+				conn.setDoOutput(true)
+				conn.setRequestMethod("POST")
+				conn.addRequestProperty("Connection", "close")
+				conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+				conn.setRequestProperty("Content-Length", postdata.length.toString)
+				if (runner) {
+					conn.setSSLSocketFactory(runnerSocketFactory)
+				} else {
+					conn.setSSLSocketFactory(defaultSocketFactory)
+				}
+				val stream = conn.getOutputStream()
+				stream.write(postdata, 0, postdata.length)
+				stream.close
+				Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+			}}
+		} else {
+			cusing (new URL(url).openConnection().asInstanceOf[HttpURLConnection]) { conn => {
+				conn.setDoOutput(true)
+				conn.setRequestMethod("POST")
+				conn.addRequestProperty("Connection", "close")
+				conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+				conn.setRequestProperty("Content-Length", postdata.length.toString)
+				val stream = conn.getOutputStream()
+				stream.write(postdata, 0, postdata.length)
+				stream.close
+				Serialization.read[T](new InputStreamReader(conn.getInputStream()))
 			}}
 		}
 	}

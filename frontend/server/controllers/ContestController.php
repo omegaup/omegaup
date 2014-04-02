@@ -1767,4 +1767,22 @@ class ContestController extends Controller {
 		die();
 	}
 
+	public static function apiRole(Request $r) {
+		try {
+			self::authenticateRequest($r);
+			self::validateDetails($r);
+
+			return array(
+				'status' => 'ok',
+				'admin' => Authorization::IsContestAdmin($r["current_user_id"], $r['contest'])
+			);
+		} catch (Exception $e) {
+			self::$log->error("Error getting role", $e);
+
+			return array(
+				'status' => 'error',
+				'admin' => false
+			);
+		}
+	}
 }

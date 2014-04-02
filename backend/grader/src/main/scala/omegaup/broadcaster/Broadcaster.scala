@@ -43,7 +43,7 @@ object Broadcaster extends Object with Log with Using {
 			subscribers.put(session.contest, new mutable.ArrayBuffer[BroadcasterSession])
 		}
 		subscribers(session.contest) += session
-		info("Connected {} {}", session.user, session.contest)
+		info("Connected to {}", session.contest)
 	}
 
 	def unsubscribe(session: BroadcasterSession) = {
@@ -75,7 +75,6 @@ object Broadcaster extends Object with Log with Using {
 			case Some(c) => c.alias
 			case None => null
 		}
-		info("Updating run {} {}", contest, subscribers)
 		if (contest == null || !subscribers.contains(contest)) return
 
 		val data = Serialization.write(
@@ -100,7 +99,7 @@ object Broadcaster extends Object with Log with Using {
 		warn("Sending some JSON: {}", data)
 
 		for (subscriber <- subscribers(contest)) {
-			if (run.user.id == subscriber.user || subscriber.user == Config.get("grader.broadcaster.root", 1)) {
+			if (run.user.id == subscriber.user || subscriber.admin) {
 				if (!subscriber.send(data)) {
 					subscriber.close
 				}
@@ -108,7 +107,7 @@ object Broadcaster extends Object with Log with Using {
 		}
 	}
 
-	def getUserId(request: UpgradeRequest): Int = {
+	def getUserId(request: UpgradeRequest): (Int, String) = {
 		// Find user ID.
 		val cookies = request.getCookies.filter(_.getName == "ouat")
 		val userId = if (cookies.length == 1) {
@@ -119,23 +118,23 @@ object Broadcaster extends Object with Log with Using {
 
 		val tokens = userId.split('-')
 
-		if (tokens.length != 3) return -1
+		if (tokens.length != 3) return (-1, userId)
 
 		val entropy = tokens(0)
 		val user = tokens(1)
 
     		if (tokens(2) == hashdigest("SHA-256", Config.get("omegaup.md5.salt", "") + user + entropy)) {
 			try {
-				user.toInt
+				(user.toInt, userId)
 			} catch {
-				case e: Exception => -1
+				case e: Exception => (-1, userId)
 			}
 		} else {
-			-1
+			(-1, userId)
 		}
 	}
 
-	class BroadcasterSession(val user: Int, val contest: String, val session: Session) {
+	class BroadcasterSession(val user: Int, val contest: String, val admin: Boolean, val session: Session) {
 		def send(message: String): Boolean = {
 			if (!session.isOpen) return false
 			try {
@@ -167,18 +166,40 @@ object Broadcaster extends Object with Log with Using {
 		private var session: BroadcasterSession = null
 
 		override def onWebSocketConnect(sess: Session): Unit = {
-			val userId = getUserId(sess.getUpgradeRequest)
-			if (userId == -1) {
+			val (userId, token) = getUserId(sess.getUpgradeRequest)
+			val session = getSession(userId, token, sess)
+			if (session == null) {
 				sess.close(new CloseStatus(1000, "forbidden"))
 			} else {
-				PathRE findFirstIn sess.getUpgradeRequest.getRequestURI.getPath match {
-					case Some(PathRE(contest)) => {
-						session = new BroadcasterSession(userId, contest, sess)
-						subscribe(session)
-					}
-					case None => {
-						sess.close(new CloseStatus(1000, "forbidden"))
-					}
+				subscribe(session)
+			}
+		}
+
+		private def getSession(userId: Int, token: String, sess: Session): BroadcasterSession = {
+			if (userId == -1) return null
+			val contest = PathRE findFirstIn sess.getUpgradeRequest.getRequestURI.getPath match {
+				case Some(PathRE(contest)) => {
+					contest
+				}
+				case None => {
+					null
+				}
+			}
+			if (contest == null) return null
+			try {
+				val response = Https.post[ContestRoleResponse](
+					Config.get("grader.role.url", "http://localhost/api/contest/role/"),
+					Map("auth_token" -> token, "contest_alias" -> contest)
+				)
+				if (response.status == "ok") {
+					new BroadcasterSession(userId, contest, response.admin, sess)
+				} else {
+					null
+				}
+			} catch {
+				case e: Exception => {
+					error("Error getting role", e)
+					null
 				}
 			}
 		}

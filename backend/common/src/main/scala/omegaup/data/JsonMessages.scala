@@ -33,3 +33,6 @@ case class RegisterOutputMessage(status: String = "ok", error: Option[String] = 
 // for serializing judgement details
 case class CaseVeredictMessage(name: String, veredict:String, score: Double)
 case class GroupVeredictMessage(group: String, cases: List[CaseVeredictMessage], score: Double)
+
+// Broadcaster
+case class ContestRoleResponse(status: String = "ok", admin: Boolean = false)
