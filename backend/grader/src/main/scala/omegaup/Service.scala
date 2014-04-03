@@ -1,5 +1,10 @@
 package omegaup
 
+trait ServiceInterface {
+	def stop(): Unit
+	def join(): Unit
+}
+
 object Service extends Object with Log with Using {
 	def main(args: Array[String]) = {		
 		// Parse command-line options.
@@ -25,11 +30,17 @@ object Service extends Object with Log with Using {
 		Runtime.getRuntime.addShutdownHook(new Thread() {
 			override def run() = {
 				info("Shutting down")
-
-				servers foreach (_.stop)
+				try {
+					servers foreach (_.stop)
+				} catch {
+					case e: Exception => {
+						error("Error shutting down. Good night.", e)
+					}
+				}
 			}
 		});
 		
 		servers foreach (_.join)
+		info("Shut down cleanly")
 	}
 }

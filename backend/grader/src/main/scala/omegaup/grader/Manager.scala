@@ -239,7 +239,16 @@ object Manager extends Object with Log {
 
 		Manager.recoverQueue
 
-		server
+		new ServiceInterface {
+			override def stop(): Unit = {
+				server.stop
+				RunnerRouter.stop
+			}
+			override def join(): Unit = {
+				server.join
+				RunnerRouter.join
+			}
+		}
 	}
 	
 	def main(args: Array[String]) = {

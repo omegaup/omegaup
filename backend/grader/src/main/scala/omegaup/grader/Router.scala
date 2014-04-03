@@ -6,7 +6,7 @@ import omegaup.data._
 import omegaup.grader.drivers._
 import omegaup.runner._
 
-object RunnerRouter extends Object with Log {
+object RunnerRouter extends ServiceInterface with Log {
 	private val defaultQueueName = "#default"
 	private val dispatchers = scala.collection.mutable.HashMap[String, RunnerDispatcher](
 		defaultQueueName -> new RunnerDispatcher(defaultQueueName)
@@ -29,9 +29,17 @@ object RunnerRouter extends Object with Log {
 	def addRun(run: Run) = {
 		dispatchers(defaultQueueName).addRun(run)
 	}
+
+	override def stop(): Unit = {
+		dispatchers foreach (_._2.stop)
+	}
+
+	override def join(): Unit = {
+		dispatchers foreach (_._2.join)
+	}
 }
 
-class RunnerDispatcher(val name: String) extends Object with Log {
+class RunnerDispatcher(val name: String) extends ServiceInterface with Log {
 	private case class InFlightRun(service: RunnerService, run: Run, timestamp: Long)
 	private val registeredEndpoints = scala.collection.mutable.HashMap.empty[RunnerEndpoint, Long]
 	private val runnerQueue = scala.collection.mutable.Queue.empty[RunnerService]
@@ -274,5 +282,12 @@ class RunnerDispatcher(val name: String) extends Object with Log {
 			runLocked
 		}
 	}
-}
 
+	override def stop(): Unit = {
+		executor.shutdown
+	}
+
+	override def join(): Unit = {
+		executor.awaitTermination(Long.MaxValue, TimeUnit.NANOSECONDS)
+	}
+}

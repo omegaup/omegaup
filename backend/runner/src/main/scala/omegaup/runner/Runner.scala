@@ -614,8 +614,9 @@ object Service extends Object with Log with Using {
       }
     })
 		
-    registerThread.start()
+    registerThread.start
 
-    server.join()
+    server.join
+    info("Shut down cleanly")
   }
 }

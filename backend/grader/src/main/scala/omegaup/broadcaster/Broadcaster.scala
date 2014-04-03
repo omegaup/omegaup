@@ -32,11 +32,13 @@ case class RunDetails(
 )
 case class UpdateRunMessage(message: String, run: RunDetails)
 
-object Broadcaster extends Object with Log with Using {
+object Broadcaster extends Object with Runnable with Log with Using {
 	private val PathRE = """^/([a-zA-Z0-9_-]+)/?""".r
 	// A collection of subscribers.
 	private val subscribers = new mutable.HashMap[String, mutable.ArrayBuffer[BroadcasterSession]]
 	private val subscriberLock = new Object
+	private val PoisonPill = new Run
+	private val queue = new LinkedBlockingQueue[Run]
 
 	def subscribe(session: BroadcasterSession) = {
 		if (!subscribers.contains(session.contest)) {
@@ -70,41 +72,7 @@ object Broadcaster extends Object with Log with Using {
 	}
 	
 	def update(run: Run): Unit = {
-		implicit val formats = Serialization.formats(NoTypeHints)
-		val contest = run.contest match {
-			case Some(c) => c.alias
-			case None => null
-		}
-		if (contest == null || !subscribers.contains(contest)) return
-
-		val data = Serialization.write(
-			UpdateRunMessage("/run/status/",
-				RunDetails(
-					username = run.user.username,
-					contest_alias = Some(contest),
-					guid = run.guid,
-					runtime = run.runtime,
-					memory = run.memory,
-					score = run.score,
-					contest_score = run.contest_score,
-					status = run.status.toString,
-					veredict = run.veredict.toString,
-					submit_delay = run.submit_delay,
-					time = run.time.getTime / 1000,
-					language = run.language.toString
-				)
-			)
-		)
-		
-		warn("Sending some JSON: {}", data)
-
-		for (subscriber <- subscribers(contest)) {
-			if (run.user.id == subscriber.user || subscriber.admin) {
-				if (!subscriber.send(data)) {
-					subscriber.close
-				}
-			}
-		}
+		queue.put(run)
 	}
 
 	def getUserId(request: UpgradeRequest): (Int, String) = {
@@ -131,6 +99,49 @@ object Broadcaster extends Object with Log with Using {
 			}
 		} else {
 			(-1, userId)
+		}
+	}
+
+	override def run(): Unit = {
+		while (true) {
+			val r = queue.take
+			if (r == PoisonPill) return
+
+			val contest = r.contest match {
+				case Some(c) => c.alias
+				case None => null
+			}
+			if (contest != null && subscribers.contains(contest)) {
+				implicit val formats = Serialization.formats(NoTypeHints)
+				val data = Serialization.write(
+					UpdateRunMessage("/run/status/",
+						RunDetails(
+							username = r.user.username,
+							contest_alias = Some(contest),
+							guid = r.guid,
+							runtime = r.runtime,
+							memory = r.memory,
+							score = r.score,
+							contest_score = r.contest_score,
+							status = r.status.toString,
+							veredict = r.veredict.toString,
+							submit_delay = r.submit_delay,
+							time = r.time.getTime / 1000,
+							language = r.language.toString
+						)
+					)
+				)
+				
+				warn("Sending some JSON: {}", data)
+
+				for (subscriber <- subscribers(contest)) {
+					if (r.user.id == subscriber.user || subscriber.admin) {
+						if (!subscriber.send(data)) {
+							subscriber.close
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -246,7 +257,19 @@ object Broadcaster extends Object with Log with Using {
 		
 		info("Registering port {}", broadcasterConnector.getLocalPort)
 
-		server
+		val thread = new Thread(this)
+		thread.start
+
+		new ServiceInterface {
+			override def stop(): Unit = {
+				server.stop
+				queue.put(PoisonPill)
+			}
+			override def join(): Unit = {
+				server.join
+				thread.join
+			}
+		}
 	}
 
 	def main(args: Array[String]) = {
