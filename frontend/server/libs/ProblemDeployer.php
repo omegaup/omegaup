@@ -472,16 +472,11 @@ class ProblemDeployer {
 			return;
 		}
 
-		// Set directory to the one where contents.zip is to handle paths inside
-		// the zip correcly 
-		$original_dir = getcwd();
-		chdir($dirpath);
-
 		// cmd to be executed in console
 		// cases/*
 		$output = array();
 
-		$zip_cmd = "zip -r " . $path_to_contents_zip . " cases/* 2>&1";
+		$zip_cmd = "/usr/bin/zip -r $path_to_contents_zip  $dirpath/cases/* 2>&1";
 		$this->log->info("Zipping contents.zip cases using: " . $zip_cmd);
 		exec($zip_cmd, $output, $return_var);
 
@@ -499,7 +494,7 @@ class ProblemDeployer {
 		// statements/*
 		$output = array();
 
-		$zip_cmd = "zip -r " . $path_to_contents_zip . " statements/* 2>&1";
+		$zip_cmd = "/usr/bin/zip -r $path_to_contents_zip $dirpath/statements/* 2>&1";
 		$this->log->info("Zipping contents.zip statements using: " . $zip_cmd);
 		exec($zip_cmd, $output, $return_var);
 
@@ -513,9 +508,6 @@ class ProblemDeployer {
 			$this->log->info("zipping statements contents.zip succeeded:");
 			$this->log->info(implode("\n", $output));
 		}
-
-		// get back to original dir
-		chdir($original_dir);
 	}
 
 	/**
