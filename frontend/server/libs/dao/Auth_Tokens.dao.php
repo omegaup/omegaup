@@ -32,4 +32,16 @@ class AuthTokensDAO extends AuthTokensDAOBase {
 
 		return new Users($rs);
 	}
+
+	public static function expireAuthTokens($user_id) {
+		// look for it on the database
+		global $conn;
+
+		$sql = "delete from Auth_Tokens where user_id = ?;";
+
+		$params = array($user_id);
+
+		$conn->Execute($sql, $params);
+		return $conn->Affected_Rows();
+	}
 }
