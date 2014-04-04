@@ -414,10 +414,10 @@ class ProblemDeployer {
 		$this->log->info("Handling cases...");
 
 		// Aplying normalizr to cases
-		$return_var = 0;
 		$output = array();
 		$normalizr_cmd = BIN_PATH . "/normalizr " . $dirpath . DIRECTORY_SEPARATOR . "cases/* 2>&1";
 		$this->log->info("Applying normalizr: " . $normalizr_cmd);
+		$return_var = -1;
 		exec($normalizr_cmd, $output, $return_var);
 
 		// Log errors
@@ -440,6 +440,7 @@ class ProblemDeployer {
 		// Execute zip command
 		$output = array();
 		$this->log->info("Zipping input cases using: " . $zip_cmd);
+		$return_var = -1;
 		exec($zip_cmd, $output, $return_var);
 
 		// Check zip cmd return value
@@ -478,6 +479,7 @@ class ProblemDeployer {
 
 		$zip_cmd = "/usr/bin/zip -r $path_to_contents_zip  $dirpath/cases/* 2>&1";
 		$this->log->info("Zipping contents.zip cases using: " . $zip_cmd);
+		$return_var = -1;
 		exec($zip_cmd, $output, $return_var);
 
 		// Check zip cmd return value
@@ -496,6 +498,7 @@ class ProblemDeployer {
 
 		$zip_cmd = "/usr/bin/zip -r $path_to_contents_zip $dirpath/statements/* 2>&1";
 		$this->log->info("Zipping contents.zip statements using: " . $zip_cmd);
+		$return_var = -1;
 		exec($zip_cmd, $output, $return_var);
 
 
