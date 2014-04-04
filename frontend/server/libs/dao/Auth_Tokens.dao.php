@@ -21,7 +21,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
 		//look for it on the database
 		global $conn;
 
-		$sql = "select u.* from Users u, Auth_Tokens at where at.user_id = u.user_id and at.token = ? and NOW() < DATE_ADD(at.create_time, INTERVAL ".OMEGAUP_EXPIRE_TOKEN_AFTER.");";		
+		$sql = "select u.* from Users u, Auth_Tokens at where at.user_id = u.user_id and at.token = ?;";
 
 		$params = array($auth_token);
 
@@ -31,17 +31,5 @@ class AuthTokensDAO extends AuthTokensDAOBase {
 		if (count($rs) == 0) return NULL;
 
 		return new Users($rs);
-	}
-
-	public static function expireAuthTokens($user_id) {
-		//look for it on the database		
-		global  $conn;
-
-		$sql = "delete from Auth_Tokens where user_id = ? AND NOW() > DATE_ADD(create_time, INTERVAL ".OMEGAUP_EXPIRE_TOKEN_AFTER.");";
-
-		$params = array($user_id);
-
-		$conn->Execute($sql, $params);		
-		return $conn->Affected_Rows();
 	}
 }

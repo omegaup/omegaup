@@ -33,7 +33,6 @@ try_define('OMEGAUP_LOG_TO_FILE',				true);
 try_define('OMEGAUP_LOG_DB_QUERYS',				false);
 try_define('OMEGAUP_LOG_LEVEL',				"info");
 try_define('OMEGAUP_LOG_FILE',				'/var/log/omegaup/omegaup.log');
-try_define('OMEGAUP_EXPIRE_TOKEN_AFTER',			'8 HOUR');
 
 # ####################################
 # GRADER CONFIG

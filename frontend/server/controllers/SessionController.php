@@ -195,14 +195,6 @@ class SessionController extends Controller {
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
 		
-		//erase expired tokens
-		try {
-			$tokens_erased = AuthTokensDAO::expireAuthTokens($vo_User->getUserId());
-		} catch (Exception $e) {			
-			// Best effort
-			self::$log->error("Failed to delete expired tokens: $e->getMessage()");
-		}
-
 		// Create the new token
 		$entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));
 		$s_AuthT = $entropy . "-" . $vo_User->getUserId() . "-" . hash("sha256", OMEGAUP_MD5_SALT . $vo_User->getUserId() . $entropy);
@@ -219,7 +211,7 @@ class SessionController extends Controller {
 			
 		if (self::$setCookieOnRegisterSession) {
 			$sm = $this->getSessionManagerInstance();
-			$sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, time() + 60 * 60 * 24, '/');		
+			$sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, 0, '/');
 		}
 
 		Cache::deleteFromCache(Cache::SESSION_PREFIX, $s_AuthT);
