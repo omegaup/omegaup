@@ -5,20 +5,27 @@
 	<table class="table table-striped table-hover" id="rank-by-problems-solved">
 		<thead>
 			<tr>
-				<th>{#rankUser#}</th>				
+				<th>{#wordsUser#}</th>
 				<th>{#rankSolved#}</th>
 			</tr>
 		</thead>
 		<tbody>
-			{foreach from=$rank.rank item=data}
-				<tr>
-					<td><b><a href='/profile/{$data.username|htmlspecialchars}'>{$data.username|htmlspecialchars}</a></b></td>
-					<td>{$data.problems_solved}</td>
-				</tr>
-			{/foreach}
 		</tbody>
 	</table>
-	<div class="panel-body">
-		<a href='rank.php'>{#rankViewFull#}</a>
-	</div>	
+	<script language="javascript">
+		omegaup.getRankByProblemsSolved(
+				30*{$page},
+				30,
+				function(result) {
+					var html = "";
+					for (a = 0; a < result.rank.length; a++)
+					{
+						html += "<tr><td>"+result.rank[a].name + ""
+							+ " ("+result.rank[a].username + ")</td>"
+							+ "<td>"+result.rank[a].problems_solved + "</td></tr>";
+					}
+					$("#rank-by-problems-solved>tbody").append(html);
+				}
+		);
+	</script>
 </div>

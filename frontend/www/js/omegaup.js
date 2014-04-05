@@ -1150,6 +1150,26 @@ OmegaUp.prototype.getRankingByToken = function(contestAlias, token, callback) {
 	});
 };
 
+OmegaUp.prototype.getRankByProblemsSolved = function(offset, rowcount, callback) {
+	var self = this;
+
+	$.get(
+		'/api/user/RankByProblemsSolved/offset/' + encodeURIComponent(offset) + '/rowcount/' + encodeURIComponent(rowcount) + '/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
 OmegaUp.prototype.getRankingEvents = function(contestAlias, callback) {
 	var self = this;
 
