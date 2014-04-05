@@ -41,18 +41,22 @@ object Broadcaster extends Object with Runnable with Log with Using {
 	private val queue = new LinkedBlockingQueue[Run]
 
 	def subscribe(session: BroadcasterSession) = {
-		if (!subscribers.contains(session.contest)) {
-			subscribers.put(session.contest, new mutable.ArrayBuffer[BroadcasterSession])
+		subscriberLock.synchronized {
+			if (!subscribers.contains(session.contest)) {
+				subscribers.put(session.contest, new mutable.ArrayBuffer[BroadcasterSession])
+			}
+			subscribers(session.contest) += session
+			info("Connected {}->{} ({})", session.user, session.contest, subscribers(session.contest).length)
 		}
-		subscribers(session.contest) += session
-		info("Connected to {}", session.contest)
 	}
 
 	def unsubscribe(session: BroadcasterSession) = {
 		if (session != null) {
-			if (subscribers.contains(session.contest)) {
-				subscribers(session.contest) -= session
-				info("Disconnected {} {}", session.user, session.contest)
+			subscriberLock.synchronized {
+				if (subscribers.contains(session.contest)) {
+					subscribers(session.contest) -= session
+					info("Disconnected {}->{} ({})", session.user, session.contest, subscribers(session.contest).length)
+				}
 			}
 		}
 	}
@@ -62,9 +66,9 @@ object Broadcaster extends Object with Runnable with Log with Using {
 
 		for (c <- java.security.MessageDigest.getInstance(algorithm).digest(s.getBytes)) {
 			val hex = Integer.toHexString(0xFF & c)
-	                if (hex.length == 1) {
+			if (hex.length == 1) {
 				hexdigest.append('0')
-        		}
+			}
 			hexdigest.append(hex)
 		}
 
@@ -91,7 +95,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		val entropy = tokens(0)
 		val user = tokens(1)
 
-    		if (tokens(2) == hashdigest("SHA-256", Config.get("omegaup.md5.salt", "") + user + entropy)) {
+		if (tokens(2) == hashdigest("SHA-256", Config.get("omegaup.md5.salt", "") + user + entropy)) {
 			try {
 				(user.toInt, userId)
 			} catch {
@@ -107,17 +111,31 @@ object Broadcaster extends Object with Runnable with Log with Using {
 			val r = queue.take
 			if (r == PoisonPill) return
 
-			val contest = r.contest match {
-				case Some(c) => c.alias
-				case None => null
+			val contest = r.contest.getOrElse(null)
+
+			if (contest != null && Config.get("grader.scoreboard_refresh.enable", true)) {
+				try {
+					info("Scoreboard refresh {}",
+						Https.get(
+							Config.get(
+								"grader.scoreboard_refresh.url",
+								"http://localhost/refresh_scoreboard.php?token=secret&id="
+							) + contest.id,
+							runner = false
+						)
+					)
+				} catch {
+					case e: Exception => error("Scoreboard refresh", e)
+				}
 			}
-			if (contest != null && subscribers.contains(contest)) {
+
+			if (contest != null && subscribers.contains(contest.alias)) {
 				implicit val formats = Serialization.formats(NoTypeHints)
 				val data = Serialization.write(
 					UpdateRunMessage("/run/status/",
 						RunDetails(
 							username = r.user.username,
-							contest_alias = Some(contest),
+							contest_alias = Some(contest.alias),
 							guid = r.guid,
 							runtime = r.runtime,
 							memory = r.memory,
@@ -134,27 +152,24 @@ object Broadcaster extends Object with Runnable with Log with Using {
 				
 				warn("Sending some JSON: {}", data)
 
-				for (subscriber <- subscribers(contest)) {
-					if (r.user.id == subscriber.user || subscriber.admin) {
-						if (!subscriber.send(data)) {
-							subscriber.close
-						}
-					}
+				subscriberLock.synchronized {
+					subscribers(contest.alias)
+						.filter(subscriber => r.user.id == subscriber.user || subscriber.admin)
+						.foreach(_.send(data))
 				}
 			}
 		}
 	}
 
 	class BroadcasterSession(val user: Int, val contest: String, val admin: Boolean, val session: Session) {
-		def send(message: String): Boolean = {
-			if (!session.isOpen) return false
+		def send(message: String): Unit = {
+			if (!session.isOpen) return
 			try {
 				session.getRemote.sendString(message)
-				true
 			} catch {
 				case e: IOException => {
 					error("Failed to send a message: {}", e)
-					false
+					close
 				}
 			}
 		}
@@ -178,7 +193,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 
 		override def onWebSocketConnect(sess: Session): Unit = {
 			val (userId, token) = getUserId(sess.getUpgradeRequest)
-			val session = getSession(userId, token, sess)
+			session = getSession(userId, token, sess)
 			if (session == null) {
 				sess.close(new CloseStatus(1000, "forbidden"))
 			} else {
@@ -257,7 +272,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		
 		info("Registering port {}", broadcasterConnector.getLocalPort)
 
-		val thread = new Thread(this)
+		val thread = new Thread(this, "BroadcastThread")
 		thread.start
 
 		new ServiceInterface {
@@ -284,8 +299,10 @@ object Broadcaster extends Object with Runnable with Log with Using {
 
 				server.stop()
 			}
-		});
+		})
 		
 		server.join()
 	}
 }
+
+/* vim: set noexpandtab: */
