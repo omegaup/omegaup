@@ -194,7 +194,15 @@ class SessionController extends Controller {
 		//find if this user has older sessions
 		$vo_AuthT = new AuthTokens();
 		$vo_AuthT->setUserId($vo_User->getUserId());
-		
+
+		//erase expired tokens
+		try {
+			$tokens_erased = AuthTokensDAO::expireAuthTokens($vo_User->getUserId());
+		} catch (Exception $e) {
+			// Best effort
+			self::$log->error("Failed to delete expired tokens: $e->getMessage()");
+		}
+
 		// Create the new token
 		$entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));
 		$s_AuthT = $entropy . "-" . $vo_User->getUserId() . "-" . hash("sha256", OMEGAUP_MD5_SALT . $vo_User->getUserId() . $entropy);
