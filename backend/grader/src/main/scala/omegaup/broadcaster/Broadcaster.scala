@@ -32,13 +32,19 @@ case class RunDetails(
 )
 case class UpdateRunMessage(message: String, run: RunDetails)
 
+class QueuedElement(val contest: String, val targetUser: Long, val broadcast: Boolean) {}
+class QueuedRun(contest: String, targetUser: Long, broadcast: Boolean, val run: Run)
+	extends QueuedElement(contest, targetUser, broadcast) {}
+class QueuedMessage(contest: String, targetUser: Long, broadcast: Boolean, val message: String)
+	extends QueuedElement(contest, targetUser, broadcast) {}
+
 object Broadcaster extends Object with Runnable with Log with Using {
 	private val PathRE = """^/([a-zA-Z0-9_-]+)/?""".r
 	// A collection of subscribers.
 	private val subscribers = new mutable.HashMap[String, mutable.ArrayBuffer[BroadcasterSession]]
 	private val subscriberLock = new Object
-	private val PoisonPill = new Run
-	private val queue = new LinkedBlockingQueue[Run]
+	private val PoisonPill = new QueuedElement(null, -1, true)
+	private val queue = new LinkedBlockingQueue[QueuedElement]
 
 	def subscribe(session: BroadcasterSession) = {
 		subscriberLock.synchronized {
@@ -76,7 +82,21 @@ object Broadcaster extends Object with Runnable with Log with Using {
 	}
 	
 	def update(run: Run): Unit = {
-		queue.put(run)
+		run.contest match {
+			case Some(contest) =>
+				queue.put(new QueuedRun(contest.alias, run.user.id, false, run))
+			case None => {}
+		}
+	}
+
+	def broadcast(
+		contest: String,
+		targetUser: Long,
+		broadcast: Boolean,
+		message: String
+	): BroadcastOutputMessage = {
+		queue.put(new QueuedMessage(contest, targetUser, broadcast, message))
+		new BroadcastOutputMessage(status = "ok")
 	}
 
 	def getUserId(request: UpgradeRequest): (Int, String) = {
@@ -108,54 +128,59 @@ object Broadcaster extends Object with Runnable with Log with Using {
 
 	override def run(): Unit = {
 		while (true) {
-			val r = queue.take
-			if (r == PoisonPill) return
+			val elm = queue.take
+			if (elm == PoisonPill) return
 
-			val contest = r.contest.getOrElse(null)
+			val message = elm match {
+				case m: QueuedRun => {
+					if (Config.get("grader.scoreboard_refresh.enable", true)) {
+						try {
+							info("Scoreboard refresh {}",
+								Https.get(
+									Config.get(
+										"grader.scoreboard_refresh.url",
+										"http://localhost/refresh_scoreboard.php?token=secret&alias="
+									) + elm.contest,
+									runner = false
+								)
+							)
+						} catch {
+							case e: Exception => error("Scoreboard refresh", e)
+						}
+					}
 
-			if (contest != null && Config.get("grader.scoreboard_refresh.enable", true)) {
-				try {
-					info("Scoreboard refresh {}",
-						Https.get(
-							Config.get(
-								"grader.scoreboard_refresh.url",
-								"http://localhost/refresh_scoreboard.php?token=secret&id="
-							) + contest.id,
-							runner = false
+					val run = m.run
+					implicit val formats = Serialization.formats(NoTypeHints)
+					Serialization.write(
+						UpdateRunMessage("/run/update/",
+							RunDetails(
+								username = run.user.username,
+								contest_alias = Some(elm.contest),
+								guid = run.guid,
+								runtime = run.runtime,
+								memory = run.memory,
+								score = run.score,
+								contest_score = run.contest_score,
+								status = run.status.toString,
+								veredict = run.veredict.toString,
+								submit_delay = run.submit_delay,
+								time = run.time.getTime / 1000,
+								language = run.language.toString
+							)
 						)
 					)
-				} catch {
-					case e: Exception => error("Scoreboard refresh", e)
+				}
+
+				case m: QueuedMessage => {
+					m.message
 				}
 			}
 
-			if (contest != null && subscribers.contains(contest.alias)) {
-				implicit val formats = Serialization.formats(NoTypeHints)
-				val data = Serialization.write(
-					UpdateRunMessage("/run/status/",
-						RunDetails(
-							username = r.user.username,
-							contest_alias = Some(contest.alias),
-							guid = r.guid,
-							runtime = r.runtime,
-							memory = r.memory,
-							score = r.score,
-							contest_score = r.contest_score,
-							status = r.status.toString,
-							veredict = r.veredict.toString,
-							submit_delay = r.submit_delay,
-							time = r.time.getTime / 1000,
-							language = r.language.toString
-						)
-					)
-				)
-				
-				warn("Sending some JSON: {}", data)
-
-				subscriberLock.synchronized {
-					subscribers(contest.alias)
-						.filter(subscriber => r.user.id == subscriber.user || subscriber.admin)
-						.foreach(_.send(data))
+			subscriberLock.synchronized {
+				if (subscribers.contains(elm.contest)) {
+					subscribers(elm.contest)
+						.filter(subscriber => elm.broadcast || subscriber.admin || elm.targetUser == subscriber.user)
+						.foreach(_.send(message))
 				}
 			}
 		}

@@ -21,7 +21,7 @@ object GraderData {
 			language = Language.withName(rs.getString("language")),
 			status = Status.withName(rs.getString("status")),
 			veredict = Veredict.withName(rs.getString("veredict")),
-			time = new Timestamp(rs.getDate("time").getTime()),
+			time = rs.getTimestamp("time"),
 			submit_delay = rs.getInt("submit_delay"),
 			score = rs.getDouble("score"),
 			contest_score = rs.getDouble("contest_score"),
@@ -53,9 +53,9 @@ object GraderData {
 					case null => None
 					case x: String => Some(x.toLong)
 				},
-				open_time = rs.getDate("open_time") match {
+				open_time = rs.getTimestamp("open_time") match {
 					case null => None
-					case x: Date => Some(new Timestamp(x.getTime()))
+					case x: Timestamp => Some(x)
 				},
 				points = rs.getString("points") match {
 					case null => None
@@ -67,8 +67,8 @@ object GraderData {
 				case x: Long => Some(new Contest(
 					id = rs.getLong("contest_id"),
 					alias = rs.getString("contest_alias"),
-					start_time = new Timestamp(rs.getDate("start_time").getTime()),
-					finish_time = new Timestamp(rs.getDate("finish_time").getTime()),
+					start_time = rs.getTimestamp("start_time"),
+					finish_time = rs.getTimestamp("finish_time"),
 					points_decay_factor = rs.getDouble("points_decay_factor"),
 					partial_score = rs.getInt("partial_score") == 1,
 					feedback = Feedback.withName(rs.getString("feedback")),

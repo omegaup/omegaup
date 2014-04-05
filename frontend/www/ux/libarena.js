@@ -91,9 +91,11 @@ Arena.prototype.connectSocket = function() {
 			console.log(message);
 			var data = JSON.parse(message.data);
 
-			if (data.message == "/run/status/") {
+			if (data.message == "/run/update/") {
 				data.run.time = new Date(data.run.time * 1000);
 				self.updateRun(data.run);
+			} else if (data.message == "/clarification/update/") {
+				data.clarification.time = new Date(data.clarification.time * 1000);
 			}
 		};
 		self.socket.onopen = function() {
