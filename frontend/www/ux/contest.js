@@ -1,14 +1,9 @@
 $(document).ready(function() {
 	var arena = new Arena();
-	var currentProblem = null;
-	var currentContest = null;
-	var submissionGap = 0;
 	var socket = null;
 	var rankChartLimit = 10;
-	var practice = window.location.pathname.indexOf('/practice/') !== -1;
-	var onlyProblem = window.location.pathname.indexOf('/problem/') !== -1;
 
-	if (onlyProblem) {		
+	if (arena.onlyProblem) {
 		var onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(window.location.pathname)[1];		
 	}
 	else {
@@ -31,7 +26,7 @@ $(document).ready(function() {
 			return;
 		} 
 		
-		currentProblem = problem;
+		arena.currentProblem = problem;
 		
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
@@ -61,7 +56,7 @@ $(document).ready(function() {
 				$('#loading').html('404');
 			}
 			return;
-		} else if (practice && contest.finish_time && new Date().getTime() < contest.finish_time.getTime()) {
+		} else if (arena.practice && contest.finish_time && new Date().getTime() < contest.finish_time.getTime()) {
 			window.location = window.location.pathname.replace(/\/practice\/.*/, '/');
 			return;
 		}
@@ -74,14 +69,14 @@ $(document).ready(function() {
 		$('#summary .finish_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
 		$('#summary .window_length').html(contest.window_length);
 
-		currentContest = contest;
+		arena.submissionGap = parseInt(contest.submission_gap);
+		if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
 
-		arena.initClock(contest.start_time, contest.finish_time, contest.submission_deadline);
-
-		submissionGap = parseInt(contest.submission_gap);
-
-		if (!(submissionGap > 0)) submissionGap = 0;
-
+		arena.initClock(
+				contest.start_time,
+				contest.finish_time,
+				contest.submission_deadline
+		);
 		arena.initProblems(contest);
 
 		for (var idx in contest.problems) {
@@ -95,7 +90,7 @@ $(document).ready(function() {
 			$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
 		}
 
-		if (!practice) {
+		if (!arena.practice) {
 			arena.setupPolls();
 		}
 
@@ -104,13 +99,12 @@ $(document).ready(function() {
 
 		$('#loading').fadeOut('slow');
 		$('#root').fadeIn('slow');
-
-		arena.connectSocket();
 	}
 	
-	if (onlyProblem) {
+	if (arena.onlyProblem) {
 		omegaup.getProblem(null, onlyProblemAlias, onlyProblemLoaded)
 	} else {
+		arena.connectSocket();
 		omegaup.getContest(contestAlias, contestLoaded);
 	}
 	
@@ -134,8 +128,8 @@ $(document).ready(function() {
 				return;
 			}
 			
-			if (!onlyProblem) {
-				arena.problems[currentProblem.alias].last_submission = new Date().getTime();
+			if (!arena.onlyProblem) {
+				arena.problems[arena.currentProblem.alias].last_submission = new Date().getTime();
 			}
 		
 			run.status = 'new';
@@ -154,10 +148,10 @@ $(document).ready(function() {
 			$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 			$('.language', r).html(run.language)
 			$('#problem .runs > tbody:last').append(r);
-			if (!currentProblem.runs) {
-				currentProblem.runs = [];
+			if (!arena.currentProblem.runs) {
+				arena.currentProblem.runs = [];
 			}
-			currentProblem.runs.push(run);
+			arena.currentProblem.runs.push(run);
 			arena.updateRunFallback(run.guid, run);
 
 			$('#overlay').hide();
@@ -170,8 +164,8 @@ $(document).ready(function() {
 	}
 
 	$('#submit').submit(function(e) {
-		if (!onlyProblem && (arena.problems[currentProblem.alias].last_submission + submissionGap * 1000 > new Date().getTime())) {
-			alert('Deben pasar ' + submissionGap + ' segundos entre envios de un mismo problema');
+		if (!arena.onlyProblem && (arena.problems[arena.currentProblem.alias].last_submission + arena.submissionGap * 1000 > new Date().getTime())) {
+			alert('Deben pasar ' + arena.submissionGap + ' segundos entre envios de un mismo problema');
 			return false;
 		}
 
@@ -193,8 +187,8 @@ $(document).ready(function() {
 			}
 
 			reader.onload = function(e) {
-				submitRun((practice || onlyProblem)? '' : contestAlias,
-					  currentProblem.alias,
+				submitRun((arena.practice || arena.onlyProblem)? '' : contestAlias,
+					  arena.currentProblem.alias,
 					  $('#submit select[name="language"]').val(),
 					  e.target.result);
 			};
@@ -218,7 +212,7 @@ $(document).ready(function() {
 
 		if (!code) return false;
 
-		submitRun((practice || onlyProblem)? '' : contestAlias, currentProblem.alias, $('#submit select[name="language"]').val(), code);
+		submitRun((arena.practice || arena.onlyProblem)? '' : contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
 
 		return false;
 	});
@@ -263,9 +257,7 @@ $(document).ready(function() {
 	});
 
 	$(window).hashchange(function(e) {
-		
-		if (onlyProblem) {
-						
+		if (arena.onlyProblem) {
 			function updateOnlyProblem(problem) {
 				$('#summary').hide();
 				$('#problem').show();
@@ -323,11 +315,10 @@ $(document).ready(function() {
 					updateOnlyProblemRuns(data.runs, 'score', 100);
 				});
 
-
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 			}
 
-			updateOnlyProblem(currentProblem);		
+			updateOnlyProblem(arena.currentProblem);
 			var isNewRunOnlyProblem = window.location.hash.indexOf('#new-run') !== -1;
 			
 			if (isNewRunOnlyProblem) {
@@ -338,138 +329,8 @@ $(document).ready(function() {
 				$('#overlay').show();
 				$('#submit textarea[name="code"]').val('');
 			}
-			
 		} else {
-							
-			var tabChanged = false;
-			var tabs = ['summary', 'problems', 'ranking', 'clarifications'];
-
-			for (var i = 0; i < 4; i++) {
-				if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
-					tabChanged = arena.activeTab != tabs[i];
-					arena.activeTab = tabs[i];
-
-					break;
-				}
-			}
-
-			var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
-
-			if (problem && arena.problems[problem[1]]) {
-				var newRun = problem[2];
-				currentProblem = problem = arena.problems[problem[1]];
-
-				$('#problem-list .active').removeClass('active');
-				$('#problem-list .problem_' + problem.alias).addClass('active');
-
-				function update(problem) {
-					$('#summary').hide();
-					$('#problem').show();
-					$('#problem > .title').html(problem.letter + '. ' + omegaup.escape(problem.title));
-					$('#problem .data .points').html(problem.points);
-					$('#problem .validator').html(problem.validator);
-					$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
-					$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
-					$('#problem .statement').html(problem.problem_statement);
-					$('#problem .source span').html(omegaup.escape(problem.source));
-					$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
-
-					$('#problem .run-list .added').remove();
-
-					function updateProblemRuns(runs, score_column, multiplier) {
-						for (var idx in runs) {
-							if (!runs.hasOwnProperty(idx)) continue;
-							var run = runs[idx];
-
-							var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
-							$('.guid', r).html(run.guid.substring(run.guid.length - 5));
-							$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-							$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-							$('.points', r).html((parseFloat(run[score_column]) * multiplier).toFixed(2));
-							$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-							$('.penalty', r).html(run.submit_delay);
-							if (run.time) {
-								$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
-							}
-							$('.language', r).html(run.language);
-							(function(guid) {
-								$('.code', r).append($('<input type="button" value="ver" />').click(function() {
-									omegaup.runSource(guid, function(data) {
-										if (data.compile_error){							
-											$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
-										} else {
-											$('#submit textarea[name="code"]').val(data.source);
-										}
-										$('#submit input').hide();
-										$('#submit #lang-select').hide();
-										$('#submit').show();
-										$('#clarification').hide();
-										$('#overlay').show();
-										window.location.hash += '/show-run';
-									});
-									return false;
-								}));
-							})(run.guid);
-							$('#problem .runs > tbody:last').append(r);
-						}
-					}
-
-					if (practice || onlyProblem) {
-						omegaup.getProblemRuns(problem.alias, function (data) {
-							updateProblemRuns(data.runs, 'score', 100);
-						});
-					} else {
-						updateProblemRuns(problem.runs, 'contest_score', 1);
-					}
-
-					MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
-				}
-
-				if (problem.problem_statement !== undefined) {
-					update(problem);
-				} else {
-					omegaup.getProblem(contestAlias, problem.alias, function (problem_ext) {
-						problem.source = problem_ext.source;
-						problem.problem_statement = problem_ext.problem_statement;
-						problem.runs = problem_ext.runs;
-						update(problem);
-					});
-				}
-
-				if (newRun) {
-					$('#overlay form').hide();
-					$('#submit input').show();
-					$('#submit #lang-select').show();
-					$('#submit').show();
-					$('#overlay').show();
-					$('#submit textarea[name="code"]').val('');
-				}
-			} else if (arena.activeTab == 'problems') {
-				$('#problem').hide();
-				$('#summary').show();
-				$('#problem-list .active').removeClass('active');
-				$('#problem-list .summary').addClass('active');
-			} else if (arena.activeTab == 'clarifications') {
-				if (window.location.hash == '#clarifications/new') {
-					$('#overlay form').hide();
-					$('#overlay, #clarification').show();
-				}
-			}
-
-			if (tabChanged) {
-				$('.tabs a.active').removeClass('active');
-				$('.tabs a[href="#' + arena.activeTab + '"]').addClass('active');
-				$('.tab').hide();
-				$('#' + arena.activeTab).show();
-
-				if (arena.activeTab == 'ranking') {
-							if (arena.currentEvents) {
-								arena.onRankingEvents(arena.currentEvents);
-							}
-				} else if (arena.activeTab == 'clarifications') {
-					$('#clarifications-count').css("font-weight", "normal");
-				}
-			}
+			arena.onHashChanged();
 		}
 	});
 });

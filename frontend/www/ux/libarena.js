@@ -32,6 +32,9 @@ function Arena() {
 	// Currently opened notifications.
 	this.currentNotifications = {count: 0, timer: null};
 
+	// Currently opened problem.
+	this.currentProblem = null;
+
 	// Whether the current contest is in practice mode.
 	this.practice = window.location.pathname.indexOf('/practice/') !== -1;
 
@@ -51,6 +54,7 @@ function Arena() {
 	this.clarificationsRowcount = 20;
 	this.activeTab = 'problems';
 	this.clarifications = {};
+	this.submissionGap = 0;
 };
 
 Arena.veredicts = {
@@ -611,5 +615,141 @@ Arena.prototype.clarificationsChange = function(data) {
 
 	if (self.answeredClarifications > previouslyAnswered && self.activeTab != 'clarifications') {
 		$('#clarifications-count').css("font-weight", "bold");
+	}
+};
+
+Arena.prototype.onHashChanged = function() {
+	var self = this;
+	var tabChanged = false;
+	var tabs = ['summary', 'problems', 'ranking', 'clarifications', 'runs'];
+
+	for (var i = 0; i < tabs.length; i++) {
+		if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
+			tabChanged = self.activeTab != tabs[i];
+			self.activeTab = tabs[i];
+
+			break;
+		}
+	}
+
+	var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
+
+	if (problem && self.problems[problem[1]]) {
+		var newRun = problem[2];
+		self.currentProblem = problem = self.problems[problem[1]];
+
+		$('#problem-list .active').removeClass('active');
+		$('#problem-list .problem_' + problem.alias).addClass('active');
+
+		function update(problem) {
+			$('#summary').hide();
+			$('#problem').show();
+			$('#problem > .title').html(problem.letter + '. ' + omegaup.escape(problem.title));
+			$('#problem .data .points').html(problem.points);
+			$('#problem .validator').html(problem.validator);
+			$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
+			$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
+			$('#problem .statement').html(problem.problem_statement);
+			$('#problem .source span').html(omegaup.escape(problem.source));
+			$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
+
+			$('#problem .run-list .added').remove();
+
+			function updateProblemRuns(runs, score_column, multiplier) {
+				for (var idx in runs) {
+					if (!runs.hasOwnProperty(idx)) continue;
+					var run = runs[idx];
+
+					var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+					$('.guid', r).html(run.guid.substring(run.guid.length - 5));
+					$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
+					$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+					$('.points', r).html((parseFloat(run[score_column]) * multiplier).toFixed(2));
+					$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+					$('.penalty', r).html(run.submit_delay);
+					if (run.time) {
+						$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+					}
+					$('.language', r).html(run.language);
+					(function(guid) {
+						$('.code', r).append($('<input type="button" value="ver" />').click(function() {
+							omegaup.runSource(guid, function(data) {
+								if (data.compile_error){
+									$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
+								} else {
+									$('#submit textarea[name="code"]').val(data.source);
+								}
+								$('#submit input').hide();
+								$('#submit #lang-select').hide();
+								$('#submit').show();
+								$('#clarification').hide();
+								$('#overlay').show();
+								window.location.hash += '/show-run';
+							});
+							return false;
+						}));
+					})(run.guid);
+					$('#problem .runs > tbody:last').append(r);
+				}
+			}
+
+			if (self.practice || self.onlyProblem) {
+				omegaup.getProblemRuns(problem.alias, function (data) {
+					updateProblemRuns(data.runs, 'score', 100);
+				});
+			} else {
+				updateProblemRuns(problem.runs, 'contest_score', 1);
+			}
+
+			MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
+		}
+
+		if (problem.problem_statement) {
+			update(problem);
+		} else {
+			omegaup.getProblem(self.contestAlias, problem.alias, function (problem_ext) {
+				problem.source = problem_ext.source;
+				problem.problem_statement = problem_ext.problem_statement;
+				problem.runs = problem_ext.runs;
+				update(problem);
+			});
+		}
+
+		if (newRun) {
+				$('#overlay form').hide();
+				$('#submit input').show();
+				$('#submit #lang-select').show();
+				$('#submit').show();
+				$('#overlay').show();
+				$('#submit textarea[name="code"]').val('');
+		}
+	} else if (self.activeTab == 'problems') {
+		$('#problem').hide();
+		$('#summary').show();
+		$('#problem-list .active').removeClass('active');
+		$('#problem-list .summary').addClass('active');
+	} else if (self.activeTab == 'clarifications') {
+		if (window.location.hash == '#clarifications/new') {
+			$('#overlay form').hide();
+			$('#overlay, #clarification').show();
+		}
+	} else if (window.location.hash == '#run/details') {
+		$('#run-details').show();
+		$('#overlay').show();
+	}
+
+	if (tabChanged) {
+		$('.tabs a.active').removeClass('active');
+		$('.tabs a[href="#' + self.activeTab + '"]').addClass('active');
+		$('.tab').hide();
+		$('#' + self.activeTab).show();
+		
+		if (self.activeTab == 'ranking') {
+			if (self.currentEvents) {
+				self.onRankingEvents(self.currentEvents);
+			}
+		} else if (self.activeTab == 'clarifications') {
+			$('#clarifications-count').css("font-weight", "normal");
+		}
 	}
 };

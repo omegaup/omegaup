@@ -162,7 +162,7 @@
 			<form id="submit" method="POST">
 				<button class="close">&times;</button>
 				<div id="lang-select">
-					Lenguaje
+					{#wordsLanguage#}
 					<select name="language">
 						<option value=""></option>
 						<option value="cpp">C++</option>
@@ -184,7 +184,7 @@
 			</form>			
 			<form id="clarification" method="POST">
 				<button class="close">&times;</button>
-				{#wordsProblems#}
+				{#wordsProblem#}
 				<select name="problem">
 				</select><br/>
 				<textarea name="message"></textarea><br/>

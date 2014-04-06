@@ -34,7 +34,8 @@ legend {
 #root,
 #problem,
 #ranking,
-#clarifications {
+#clarifications,
+#runs {
 	display: none;
 }
 
