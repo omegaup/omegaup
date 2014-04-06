@@ -135,7 +135,7 @@
 					<thead>
 						<tr>
 							<th class="problem">{#wordsProblem#}</th>
-							 <th class="author">{#wordsAuthor#}</th>
+							<th class="author">{#wordsAuthor#}</th>
 							<th class="time">{#wordsTime#}</th>
 							<th class="message">{#wordsMessage#}</th>
 							<th class="answer">{#wordsResult#}</th>
@@ -149,10 +149,10 @@
 					<tbody class="clarification-list">
 						<tr class="template">
 							<td class="problem"></td>
-														<td class="author"></td>
+							<td class="author"></td>
 							<td class="time"></td>
-							<td class="message"></td>
-							<td class="answer"></td>
+							<td><pre class="message"></pre></td>
+							<td class="answer"><pre></pre></td>
 						</tr>
 					</tbody>
 				</table>

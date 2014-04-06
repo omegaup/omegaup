@@ -1,6 +1,5 @@
 $(document).ready(function() {
 	var arena = new Arena();
-	var activeTab = 'problems';
 	var currentProblem = null;
 	var runsOffset = 0;
 	var runsRowcount = 100;
@@ -9,8 +8,6 @@ $(document).ready(function() {
 	var runsProblem = "";
 	var runsLang = "";
 	var runsUsername = "";	
-	var clarificationsOffset = 0;
-	var clarificationsRowcount = 20;
 	var rankChartLimit = 1e99;
 	var practice = false;
 	var onlyProblem = false;
@@ -58,15 +55,7 @@ $(document).ready(function() {
 				$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
 			}
 
-			omegaup.getRanking(arena.contestAlias, arena.rankingChange.bind(arena));
-			setInterval(function() { omegaup.getRanking(arena.contestAlias, arena.rankingChange.bind(arena)); }, 5 * 60 * 1000);
-
-			omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
-			setInterval(function() { 
-				clarificationsOffset = 0; // Return pagination to start on refresh
-				omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
-			}, 5 * 60 * 1000);
-
+			arena.setupPolls();
 			refreshRuns();
 			setInterval(function() { 
 				runsOffset = 0; // Return pagination to start on refresh
@@ -169,25 +158,25 @@ $(document).ready(function() {
 	});
 	
 	$('.clarifpager .clarifpagerprev').click(function () {
-		if (clarificationsOffset > 0) {
-			clarificationsOffset -= clarificationsRowcount;
-			if (clarificationsOffset < 0) {
-				clarificationsOffset = 0;
+		if (arena.clarificationsOffset > 0) {
+			arena.clarificationsOffset -= arena.clarificationsRowcount;
+			if (arena.clarificationsOffset < 0) {
+				arena.clarificationsOffset = 0;
 			}
 			
 			// Refresh with previous page
-			omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+			omegaup.getClarifications(arena.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
 		}
 	});
 	
 	$('.clarifpager .clarifpagernext').click(function () {
-		clarificationsOffset += clarificationsRowcount;
-		if (clarificationsOffset < 0) {
-			clarificationsOffset = 0;
+		arena.clarificationsOffset += arena.clarificationsRowcount;
+		if (arena.clarificationsOffset < 0) {
+			arena.clarificationsOffset = 0;
 		}
 		
 		// Refresh with previous page
-		omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+		omegaup.getClarifications(arena.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
 	});
 
 	$('#submit').submit(function(e) {
@@ -233,7 +222,7 @@ $(document).ready(function() {
 			}
 			$('#overlay').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
-			omegaup.getClarifications(arena.contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
+			omegaup.getClarifications(arena.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, clarificationsChange);
 			$('#clarification input').removeAttr('disabled');
 		});
 
@@ -259,8 +248,8 @@ $(document).ready(function() {
 
 		for (var i = 0; i < 4; i++) {
 			if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
-				tabChanged = activeTab != tabs[i];
-				activeTab = tabs[i];
+				tabChanged = arena.activeTab != tabs[i];
+				arena.activeTab = tabs[i];
 
 				break;
 			}
@@ -307,12 +296,12 @@ $(document).ready(function() {
 
 			if (newRun) {
 			}
-		} else if (activeTab == 'problems') {
+		} else if (arena.activeTab == 'problems') {
 			$('#problem').hide();
 			$('#summary').show();
 			$('#problem-list .active').removeClass('active');
 			$('#problem-list .summary').addClass('active');
-		} else if (activeTab == 'clarifications') {
+		} else if (arena.activeTab == 'clarifications') {
 			if (window.location.hash == '#clarifications/new') {
 				$('#overlay form').hide();
 				$('#overlay, #clarification').show();
@@ -324,11 +313,11 @@ $(document).ready(function() {
 
 		if (tabChanged) {
 			$('.tabs a.active').removeClass('active');
-			$('.tabs a[href="#' + activeTab + '"]').addClass('active');
+			$('.tabs a[href="#' + arena.activeTab + '"]').addClass('active');
 			$('.tab').hide();
-			$('#' + activeTab).show();
+			$('#' + arena.activeTab).show();
 			
-			if (activeTab == 'ranking') {
+			if (arena.activeTab == 'ranking') {
 				if (arena.currentEvents) {
 					arena.onRankingEvents(arena.currentEvents);
 				}
@@ -368,7 +357,6 @@ $(document).ready(function() {
 		} else {
 			omegaup.getContestRuns(arena.contestAlias, options, runsChange);
 		}
-		
 	}
 
 	function runsChange(data) {
@@ -522,55 +510,6 @@ $(document).ready(function() {
 				}));
 			})(run.guid, run, r);
 			$('.runs > tbody:last').append(r);
-		}
-	}
-	
-	function clarificationsChange(data) {
-		$('.clarifications tr.inserted').remove();
-
-		for (var i = 0; i < data.clarifications.length; i++) {
-			var clarification = data.clarifications[i];
-
-			var r = $('.clarifications tbody tr.template').clone().removeClass('template').addClass('inserted');
-
-			$('.problem', r).html(clarification.problem_alias);
-			$('.author', r).html(clarification.author);
-			$('.time', r).html(clarification.time);
-			$('.message', r).html(omegaup.escape(clarification.message));
-			$('.answer', r).html(omegaup.escape(clarification.answer));
-
-			if (!clarification.answer) {
-				arena.notify(
-					clarification.author + " - " + clarification.problem_alias,
-					omegaup.escape(clarification.message),
-					r[0],
-					'clarification-' + clarification.clarification_id
-				);
-			}
-
-			if (clarification.can_answer) {
-				(function(id, answer, answerNode) {
-					if (clarification.public == 1) {
-						$('input[type="checkbox"]', answer).attr('checked', 'checked');
-					}
-					answer.submit(function () {
-						omegaup.updateClarification(
-							id,
-							$('textarea', answer).val(),
-							$('input[type="checkbox"]', answer).attr('checked'),
-							function() {
-								answerNode.html($('textarea', answer).val());
-								$('textarea', answer).val('');
-							}
-						);
-						return false;
-					});
-
-					answerNode.append(answer);
-				})(clarification.clarification_id, $('<form><input type="checkbox" /><textarea></textarea><input type="submit" /></form>'), $('.answer', r));
-			}
-
-			$('.clarifications tbody').append(r);
 		}
 	}
 });

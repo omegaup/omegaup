@@ -154,7 +154,7 @@
 						<td class="author"></td>
 						<td class="time"></td>
 						<td><pre class="message"></pre></td>
-						<td class="answer"></td>
+						<td class="answer"><pre></pre></td>
 					</tr>
 				</tbody>
 			</table>

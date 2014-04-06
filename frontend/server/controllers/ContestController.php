@@ -317,6 +317,7 @@ class ContestController extends Controller {
 				$result['submission_deadline'] = min(
 						strtotime($r["contest"]->getFinishTime()), strtotime($contest_user->getAccessTime()) + $r["contest"]->getWindowLength() * 60);
 			}
+			$result['admin'] = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]);
 		}
 
 		$result["status"] = "ok";
@@ -941,7 +942,7 @@ class ContestController extends Controller {
 		}
 
 		foreach ($clarifications as &$clar) {
-			$clar['can_answer'] = $is_contest_director;
+			$clar['time'] = strtotime($clar['time']);
 		}
 
 		// Add response to array

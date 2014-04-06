@@ -43,6 +43,14 @@ function Arena() {
 
 	// If websockets are enabled.
 	this.enableSockets = window.location.search.indexOf('ws=on') !== -1;
+
+	// If we have admin powers in this contest.
+	this.admin = false;
+	this.answeredClarifications = 0;
+	this.clarificationsOffset = 0;
+	this.clarificationsRowcount = 20;
+	this.activeTab = 'problems';
+	this.clarifications = {};
 };
 
 Arena.veredicts = {
@@ -96,6 +104,7 @@ Arena.prototype.connectSocket = function() {
 				self.updateRun(data.run);
 			} else if (data.message == "/clarification/update/") {
 				data.clarification.time = new Date(data.clarification.time * 1000);
+				self.updateClarification(data.clarification);
 			}
 		};
 		self.socket.onopen = function() {
@@ -121,6 +130,36 @@ Arena.prototype.connectSocket = function() {
 	}
 };
 
+Arena.prototype.setupPolls = function() {
+	var self = this;
+
+	omegaup.getRanking(
+		self.contestAlias,
+		self.rankingChange.bind(self)
+	);
+	omegaup.getClarifications(
+		self.contestAlias,
+		self.clarificationsOffset,
+		self.clarificationsRowcount,
+		self.clarificationsChange.bind(self)
+	);
+
+	self.rankingInterval = setInterval(function() {
+		omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
+	}, 5 * 60 * 1000);
+
+	if (!self.socket) {
+		self.clarificationInterval = setInterval(function() {
+			self.clarificationsOffset = 0; // Return pagination to start on refresh
+			omegaup.getClarifications(
+				self.contestAlias,
+				self.clarificationsOffset,
+				self.clarificationsRowcount,
+				self.clarificationsChange.bind(self));
+		}, 5 * 60 * 1000);
+	}
+};
+
 Arena.prototype.initClock = function(start, finish, deadline) {
 	this.startTime = start;
 	this.finishTime = finish;
@@ -133,10 +172,10 @@ Arena.prototype.initClock = function(start, finish, deadline) {
 
 Arena.prototype.initProblems = function(contest) {
 	var self = this;
+	self.admin = contest.admin;
 	problems = contest.problems;
 	for (var i = 0; i < problems.length; i++) {
 		var alias = problems[i].alias;
-		problems[i].letter = String.fromCharCode('A'.charCodeAt(0) + i);
 		problems[i].runs = problems[i].runs || [];
 		self.problems[alias] = problems[i];
 
@@ -478,7 +517,6 @@ Arena.prototype.notify = function(title, message, element, id) {
 				window.focus();
 				element.scrollIntoView(true);
 			}
-			delete self.currentNotifications[id];
 
 			self.currentNotifications.count--;
 			if (self.currentNotifications.count == 0) {
@@ -491,5 +529,87 @@ Arena.prototype.notify = function(title, message, element, id) {
 
 	self.currentNotifications[id] = gid;
 
-	document.getElementById('notification_audio').play();
+	var audio = document.getElementById('notification_audio');
+	if (audio != null) audio.play();
+};
+
+Arena.prototype.updateClarification = function(clarification) {
+	var self = this;
+	var r = null;
+	if (self.clarifications[clarification.clarification_id]) {
+		r = self.clarifications[clarification.clarification_id];
+	} else {
+		r = $('.clarifications tbody tr.template')
+			.clone()
+			.removeClass('template')
+			.addClass('inserted');
+
+		if (self.admin) {
+			(function(id, answer, answerNode) {
+				if (clarification.public == 1) {
+					$('input[type="checkbox"]', answer).attr('checked', 'checked');
+				}
+				answer.submit(function () {
+					omegaup.updateClarification(
+						id,
+						$('textarea', answer).val(),
+						$('input[type="checkbox"]', answer).attr('checked'),
+						function() {
+							$('pre', answerNode).html($('textarea', answer).val());
+							$('textarea', answer).val('');
+						}
+					);
+					return false;
+				});
+
+				answerNode.append(answer);
+			})(clarification.clarification_id, $('<form><input type="checkbox" /><textarea></textarea><input type="submit" /></form>'), $('.answer', r));
+		}
+	}
+
+	$('.problem', r).html(clarification.problem_alias);
+	if (self.admin) $('.author', r).html(clarification.author);
+	$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', clarification.time.getTime()));
+	$('.message', r).html(omegaup.escape(clarification.message));
+	$('.answer pre', r).html(omegaup.escape(clarification.answer));
+	if (clarification.answer) {
+		self.answeredClarifications++;
+	}
+
+	if (self.admin != !!clarification.answer) {
+		self.notify(
+			(clarification.author ? clarification.author + " - " : '') + clarification.problem_alias,
+			omegaup.escape(clarification.message) +
+				(clarification.answer ? ('<hr/>' + omegaup.escape(clarification.answer)) : ''),
+			r[0],
+			'clarification-' + clarification.clarification_id
+		);
+	}
+
+	if (!self.clarifications[clarification.clarification_id]) {
+		$('.clarifications tbody').prepend(r);
+		self.clarifications[clarification.clarification_id] = r;
+	}
+};
+
+Arena.prototype.clarificationsChange = function(data) {
+	var self = this;
+	$('.clarifications tr.inserted').remove();
+	if (data.clarifications.length > 0 && data.clarifications.length < self.clarificationsRowcount) {
+		$('#clarifications-count').html("(" + data.clarifications.length + ")");
+	} else if (data.clarifications.length >= self.clarificationsRowcount) {
+		$('#clarifications-count').html("("+ data.clarifications.length + "+)");
+	}
+
+	var previouslyAnswered = self.answeredClarifications;
+	self.answeredClarifications = 0;
+	self.clarifications = {};
+
+	for (var i = data.clarifications.length - 1; i >= 0; i--) {
+		self.updateClarification(data.clarifications[i]);
+	}
+
+	if (self.answeredClarifications > previouslyAnswered && self.activeTab != 'clarifications') {
+		$('#clarifications-count').css("font-weight", "bold");
+	}
 };

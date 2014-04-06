@@ -1,12 +1,8 @@
 $(document).ready(function() {
 	var arena = new Arena();
-	var activeTab = 'problems';	
 	var currentProblem = null;
 	var currentContest = null;
 	var submissionGap = 0;
-	var answeredClarifications = 0;
-	var clarificationsOffset = 0;
-	var clarificationsRowcount = 20;
 	var socket = null;
 	var rankChartLimit = 10;
 	var practice = window.location.pathname.indexOf('/practice/') !== -1;
@@ -100,14 +96,7 @@ $(document).ready(function() {
 		}
 
 		if (!practice) {
-			omegaup.getRanking(contestAlias, arena.rankingChange.bind(arena));
-			setInterval(function() { omegaup.getRanking(contestAlias, arena.rankingChange.bind(arena)); }, 5 * 60 * 1000);
-
-			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
-			setInterval(function() { 
-				clarificationsOffset = 0; // Return pagination to start on refresh
-				omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
-			}, 5 * 60 * 1000);
+			arena.setupPolls();
 		}
 
 		// Trigger the event (useful on page load).
@@ -235,25 +224,25 @@ $(document).ready(function() {
 	});
 	
 	$('.clarifpager .clarifpagerprev').click(function () {
-		if (clarificationsOffset > 0) {
-			clarificationsOffset -= clarificationsRowcount;
-			if (clarificationsOffset < 0) {
-				clarificationsOffset = 0;
+		if (arena.clarificationsOffset > 0) {
+			arena.clarificationsOffset -= arena.clarificationsRowcount;
+			if (arena.clarificationsOffset < 0) {
+				arena.clarificationsOffset = 0;
 			}
 			
 			// Refresh with previous page
-			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
 		}
 	});
 	
 	$('.clarifpager .clarifpagernext').click(function () {
-		clarificationsOffset += clarificationsRowcount;
-		if (clarificationsOffset < 0) {
-			clarificationsOffset = 0;
+		arena.clarificationsOffset += arena.clarificationsRowcount;
+		if (arena.clarificationsOffset < 0) {
+			arena.clarificationsOffset = 0;
 		}
 		
 		// Refresh with previous page
-		omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange); 
+		omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
 	});
 
 	$('#clarification').submit(function (e) {
@@ -266,7 +255,7 @@ $(document).ready(function() {
 			}
 			$('#overlay').hide();
 			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
-			omegaup.getClarifications(contestAlias, clarificationsOffset, clarificationsRowcount, clarificationsChange);
+			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
 			$('#clarification input').removeAttr('disabled');
 		});
 
@@ -357,8 +346,8 @@ $(document).ready(function() {
 
 			for (var i = 0; i < 4; i++) {
 				if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
-					tabChanged = activeTab != tabs[i];
-					activeTab = tabs[i];
+					tabChanged = arena.activeTab != tabs[i];
+					arena.activeTab = tabs[i];
 
 					break;
 				}
@@ -455,12 +444,12 @@ $(document).ready(function() {
 					$('#overlay').show();
 					$('#submit textarea[name="code"]').val('');
 				}
-			} else if (activeTab == 'problems') {
+			} else if (arena.activeTab == 'problems') {
 				$('#problem').hide();
 				$('#summary').show();
 				$('#problem-list .active').removeClass('active');
 				$('#problem-list .summary').addClass('active');
-			} else if (activeTab == 'clarifications') {
+			} else if (arena.activeTab == 'clarifications') {
 				if (window.location.hash == '#clarifications/new') {
 					$('#overlay form').hide();
 					$('#overlay, #clarification').show();
@@ -469,78 +458,18 @@ $(document).ready(function() {
 
 			if (tabChanged) {
 				$('.tabs a.active').removeClass('active');
-				$('.tabs a[href="#' + activeTab + '"]').addClass('active');
+				$('.tabs a[href="#' + arena.activeTab + '"]').addClass('active');
 				$('.tab').hide();
-				$('#' + activeTab).show();
+				$('#' + arena.activeTab).show();
 
-				if (activeTab == 'ranking') {
+				if (arena.activeTab == 'ranking') {
 							if (arena.currentEvents) {
 								arena.onRankingEvents(arena.currentEvents);
 							}
-				} else if (activeTab == 'clarifications') {
+				} else if (arena.activeTab == 'clarifications') {
 					$('#clarifications-count').css("font-weight", "normal");
 				}
 			}
 		}
-		
 	});
-
-	function clarificationsChange(data) {
-		$('.clarifications tr.inserted').remove();
-		if (data.clarifications.length > 0 && data.clarifications.length < clarificationsRowcount) {
-			$('#clarifications-count').html("(" + data.clarifications.length + ")");
-		} else if (data.clarifications.length >= clarificationsRowcount) {
-			$('#clarifications-count').html("("+ data.clarifications.length + "+)");
-		}
-
-		var previouslyAnswered = answeredClarifications;
-		answeredClarifications = 0;
-
-		for (var i = 0; i < data.clarifications.length; i++) {
-			var clarification = data.clarifications[i];
-
-			var r = $('.clarifications tbody tr.template').clone().removeClass('template').addClass('inserted');
-
-			$('.problem', r).html(clarification.problem_alias);
-						
-			if (clarification.can_answer) {
-				$('.author', r).html(clarification.author);
-			}
-						
-			$('.time', r).html(clarification.time);
-			$('.message', r).html(omegaup.escape(clarification.message));
-			$('.answer', r).html(omegaup.escape(clarification.answer));
-			if (clarification.answer) {
-				answeredClarifications++;
-			}
-
-			if (clarification.can_answer) {
-				(function(id, answer, answerNode) {
-					if (clarification.public == 1) {
-						$('input[type="checkbox"]', answer).attr('checked', 'checked');
-					}
-					answer.submit(function () {
-						omegaup.updateClarification(
-							id,
-							$('textarea', answer).val(),
-							$('input[type="checkbox"]', answer).attr('checked'),
-							function() {
-								answerNode.html($('textarea', answer).val());
-								$('textarea', answer).val('');
-							}
-						);
-						return false;
-					});
-
-					answerNode.append(answer);
-				})(clarification.clarification_id, $('<form><input type="checkbox" /><textarea></textarea><input type="submit" /></form>'), $('.answer', r));
-			}
-
-			$('.clarifications tbody').append(r);
-		}
-
-		if (answeredClarifications > previouslyAnswered && activeTab != 'clarifications') {
-			$('#clarifications-count').css("font-weight", "bold");
-		}
-	}
 });

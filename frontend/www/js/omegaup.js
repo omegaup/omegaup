@@ -1235,6 +1235,10 @@ OmegaUp.prototype.getClarifications = function(contestAlias, offset, count, call
 	$.get(
 		'/api/contest/clarifications/contest_alias/' + encodeURIComponent(contestAlias) + '/offset/' + encodeURIComponent(offset) + '/rowcount/' + encodeURIComponent(count) + '/',
 		function (data) {
+			for (var idx in data.clarifications) {
+				var clarification = data.clarifications[idx];
+				clarification.time = new Date(clarification.time * 1000);
+			}
 			callback(data);
 		},
 		'json'
