@@ -34,11 +34,11 @@ $(document).ready(function() {
 		$('#loading').fadeOut('slow');
 		$('#root').fadeIn('slow');
 	} else {
+		arena.connectSocket();
 		omegaup.getContest(arena.contestAlias, function(contest) {
 			$('#title .contest-title').html(omegaup.escape(contest.title));
 
 			arena.currentContest = contest;
-			// arena.connectSocket(true);
 
 			arena.initClock(contest.start_time, contest.finish_time);
 			arena.initProblems(contest);

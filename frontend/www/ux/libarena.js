@@ -40,6 +40,9 @@ function Arena() {
 
 	// The alias of the contest.
 	this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+
+	// If websockets are enabled.
+	this.enableSockets = window.location.search.indexOf('ws=on') !== -1;
 };
 
 Arena.veredicts = {
@@ -68,10 +71,9 @@ Arena.scoreboardColors = [
 	'#CD35D3',
 ];
 
-Arena.prototype.connectSocket = function(force) {
+Arena.prototype.connectSocket = function() {
 	var self = this;
-	// temporarily disable websockets.
-	if (!force) {
+	if (!self.enableSockets || self.contestAlias == 'admin') {
 		return false;
 	}
 
@@ -81,7 +83,7 @@ Arena.prototype.connectSocket = function(force) {
 	} else {
 		uri = "ws:";
 	}
-	uri += "//" + window.location.host + "/api/contest/events/" + self.currentContest.alias + "/";
+	uri += "//" + window.location.host + "/api/contest/events/" + self.contestAlias + "/";
 
 	try {
 		self.socket = new WebSocket(uri, "com.omegaup.events");
