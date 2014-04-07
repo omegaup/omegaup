@@ -19,6 +19,7 @@ import omegaup.data._
 case class RunDetails(
 	username: String,
 	contest_alias: Option[String],
+	alias: String,
 	guid: String,
 	runtime: Double,
 	memory: Long,
@@ -156,6 +157,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 							RunDetails(
 								username = run.user.username,
 								contest_alias = Some(elm.contest),
+								alias = run.problem.alias,
 								guid = run.guid,
 								runtime = run.runtime,
 								memory = run.memory,
