@@ -1,6 +1,7 @@
 <?php
 
 $CreatePseudoLocFile = NULL;
+$PseudoLocSource = NULL; 
 
 # files with lang extension
 $LanguagesArray = array();
@@ -15,9 +16,44 @@ for ($i = 0; $i < sizeof($argv); $i++)
 	if ($argv[$i] == "/ps")
 	{
 		$CreatePseudoLocFile = $argv[++$i];
+		$PseudoLocSource = $argv[++$i];
 	}
 }
 
+if ($CreatePseudoLocFile != null)
+{
+	echo "Creating pseudoloc from $PseudoLocSource into $CreatePseudoLocFile...\n";
+
+		$lineNumber = 0;
+		$contents = file_get_contents($PseudoLocSource);
+		$lines = explode("\n", $contents);
+		array_pop($lines);
+
+		$psHandle = fopen($CreatePseudoLocFile, "w");
+
+		foreach ($lines as $line)
+		{
+			$parts = explode(" = ", $line);
+
+			if (sizeof($parts) != 2)
+			{
+				die ($PseudoLocSource . ": Malformed line ". $lineNumber .":".$line . "\n");
+			}
+
+			$healthy = array("e", "l", "s", "o", "t", "\"" );
+			$yummy   = array("3", "1", "5", "0", "7", "" );
+			$newphrase = str_replace($healthy, $yummy, $parts[1]);
+
+			fwrite($psHandle, 
+				$parts[0]
+				. " = "
+				. "\"(" . $lineNumber . " " . $newphrase . ")\"\n"); 
+			$lineNumber++;
+		}
+		fclose($psHandle);
+
+	exit();
+}
 
 # discover lang files
 if ($handle = opendir('.'))
