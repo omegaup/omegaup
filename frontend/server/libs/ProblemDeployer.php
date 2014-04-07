@@ -516,11 +516,11 @@ class ProblemDeployer {
 	/**
 	 * Returns the path where the problem contents will be placed
 	 * 
-	 * @param Request $r
+	 * @param string $alias
 	 * @return string
 	 */
-	private function getDirpath(Request $r) {
-		return PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["alias"];
+	private function getDirpath($alias) {
+		return PROBLEMS_PATH . DIRECTORY_SEPARATOR . $alias;
 	}
 
 	/**
@@ -537,9 +537,16 @@ class ProblemDeployer {
 	 * 
 	 * @param string $dirpath
 	 */
-	public function deleteProblemFromFilesystem(Request $r) {
+	public function deleteProblemFromFilesystem($alias) {
 		// Drop contents into path required
-		FileHandler::DeleteDirRecursive($this->getDirpath($r));
+		$dirpath = $this->getDirpath($alias);
+		$this->log->info("Deleting recursively $dirpath");
+		
+		if (is_dir($dirpath)) {
+			FileHandler::DeleteDirRecursive($dirpath);
+		} else {
+			$this->log->info("$dirpath didnt exist");
+		}
 	}
 	
 	/**
@@ -576,15 +583,15 @@ class ProblemDeployer {
 			$this->log->info("Starting statement update, lang: " . $r["lang"]);
 			
 			// Delete statement files
-			$markdownFile = $this->getDirpath($r) . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $r["lang"] . ".markdown";
-			$htmlFile = $this->getDirpath($r) . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $r["lang"] . ".html";
+			$markdownFile = $this->getDirpath($r['alias']) . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $r["lang"] . ".markdown";
+			$htmlFile = $this->getDirpath($r['alias']) . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $r["lang"] . ".html";
 			FileHandler::DeleteFile($markdownFile);
 			FileHandler::DeleteFile($htmlFile);
 			
 			// Deploy statement
 			FileHandler::CreateFile($markdownFile, $r["statement"]);
 			$this->current_markdown_file_contents = $r["statement"];
-			$this->HTMLizeStatement($this->getDirpath($r), $r["lang"] . ".markdown");
+			$this->HTMLizeStatement($this->getDirpath($r['alias']), $r["lang"] . ".markdown");
 			
 		} catch (Exception $e) {
 			throw new ProblemDeploymentFailedException($e);
@@ -597,7 +604,23 @@ class ProblemDeployer {
 	 * @param Request $r
 	 */
 	public function update(Request $r) {
-		$this->deploy($r, true);
+		// Append _tmp to alias
+		$r['original_alias'] = $r['alias'];
+		$r['alias'] = $r['alias'] . '_tmp';
+				
+		try {
+			$this->log->info("Starting problem update. Deploying to: " . $r["alias"]);
+			$this->deploy($r, true /*isUpdate*/);
+		} catch (Exception $e) {
+			// Rollback aliases first
+			$r['alias'] = $r['original_alias'];
+			
+			// Delete _tmp folder						
+			$this->deleteProblemFromFilesystem($r['alias'] . '_tmp');
+			
+			// Propagate original exception
+			throw $e;
+		}		
 	}		
 	
 	/**
@@ -613,12 +636,13 @@ class ProblemDeployer {
 			$this->validateZip();
 			
 			// Create paths			
-			$dirpath = $this->getDirpath($r);
+			$dirpath = $this->getDirpath($r['alias']);
 			$this->problemDirPath = $dirpath;
 			$filepath = $this->getFilepath($dirpath);
-
+			
 			if ($isUpdate === true) {
-				$this->deleteProblemFromFilesystem($r);
+				// Clean the _tmp folder				
+				$this->deleteProblemFromFilesystem($r['alias']);				
 			}
 
 			// Making target directory
@@ -638,6 +662,15 @@ class ProblemDeployer {
 
 			// Update contents.zip
 			$this->updateContentsDotZip($dirpath, $filepath);
+			
+			if ($isUpdate === true) {				
+				$updatedPath = $this->getDirpath($r['alias']);
+				$r['alias'] = $r['original_alias'];
+				$oldPath = $this->getDirpath($r['alias']);
+				
+				$this->log->info("Replacing $oldPath with $updatedPath");
+				FileHandler::Replace($oldPath, $updatedPath);
+			}			
 		} catch (Exception $e) {
 			throw new ProblemDeploymentFailedException($e);
 		} 
@@ -651,7 +684,7 @@ class ProblemDeployer {
 	 * @throws InvalidFilesystemOperationException
 	 */
 	public function getOutputLimit(Request $r) {
-		$dirpath = $this->getDirpath($r);
+		$dirpath = $this->getDirpath($r['alias']);
 		$has_validator = false;
 
 		if ($handle = opendir($dirpath)) {

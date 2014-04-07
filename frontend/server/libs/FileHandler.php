@@ -60,7 +60,7 @@ class FileHandler {
 
 	static function MakeDir($pathName, $chmod = 0777) {
 		self::$log->info("Trying to create directory: " . $pathName);
-		if (!mkdir($pathName, $chmod)) {
+		if (!@mkdir($pathName, $chmod)) {
 			throw new RuntimeException("FATAL: Not able to move create dir " . $pathName . " CHMOD: " . $chmod);
 		}
 	}
@@ -101,6 +101,15 @@ class FileHandler {
 			$errors = error_get_last();
 			throw new RuntimeException("FATAL: Unable to copy $source to $dest: ". $errors['type']." ". $errors["message"]);
 		}
+	}
+	
+	static public function Replace($old, $new) {
+		self::DeleteDirRecursive($old);
+		if(!@rename($new, $old)) {
+			$errors = error_get_last();
+			throw new RuntimeException("FATAL: Unable to rename $old to $new " . $errors['type']." ". $errors["message"]);
+		}		
+		self::DeleteDirRecursive($new);
 	}
 
 }

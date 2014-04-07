@@ -198,7 +198,7 @@ class ProblemController extends Controller {
 			ProblemsDAO::transRollback();
 
 			// Rollback the problem if deployed partially
-			$problemDeployer->deleteProblemFromFilesystem($r);
+			$problemDeployer->deleteProblemFromFilesystem($r['alias']);
 
 			throw $e;
 		} catch (Exception $e) {
@@ -212,7 +212,7 @@ class ProblemController extends Controller {
 			} else {
 
 				// Rollback the problem if deployed partially
-				$problemDeployer->deleteProblemFromFilesystem($r);
+				$problemDeployer->deleteProblemFromFilesystem($r['alias']);
 
 				throw new InvalidDatabaseOperationException($e);
 			}

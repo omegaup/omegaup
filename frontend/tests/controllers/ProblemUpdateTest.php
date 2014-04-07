@@ -139,5 +139,55 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$this->assertContains("<img src=\"" . IMAGES_URL_PATH . $imgFilename . "\" alt=\"Alt text\" title=\"Optional title\" />", $statementHtmlContents);
 		$this->assertContains($statement, $statementMarkdownContents);		
 	}
+	
+	/**
+	 * Tests update problem: on error, original contesnts should persist
+	 */
+	public function testUpdateProblemFailed() {				
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+	
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+		
+		// Update Problem calls grader to rejudge, we need to detour grader calls
+		// We will submit 2 runs to the problem, so we can expect 2 calls to grader
+		// to rejudge them
+		$this->detourGraderCalls($this->exactly(0));
+		
+		// Prepare request
+		$r = new Request();
+		$r["title"] = "new title";
+		$r["time_limit"] = 12345;
+		$r["problem_alias"] = $problemData["request"]["alias"];
+		
+		// Set file upload context. This problem should fail
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT."nostmt.zip";
+		
+		// Log in as contest director
+		$r["auth_token"] = $this->login($problemData["author"]);
+		
+		// Call API. Should fail
+		try {
+			ProblemController::apiUpdate($r);
+		} catch (ProblemDeploymentFailedException $e) {
+			// Expected
+		}
+				
+		// Verify contents were not erased
+		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem_alias"] . DIRECTORY_SEPARATOR;
+		$temppath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem_alias"] . '_tmp' . DIRECTORY_SEPARATOR;
+		
+		$this->assertFileNotExists($temppath);
+		$this->assertFileExists($targetpath . "contents.zip");
+		$this->assertFileExists($targetpath . "cases.zip");
+		$this->assertFileExists($targetpath . "cases");
+		$this->assertFileExists($targetpath . "inputname");
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		
+		// Check statements still is the original one
+		$statement = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		$this->assertContains("<h1>Entrada</h1>", $statement);					
+	}			
 }
 
