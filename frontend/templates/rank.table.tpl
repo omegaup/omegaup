@@ -1,6 +1,10 @@
-<div class="wait_for_ajax panel panel-default" id="problems_list" >
+<div class=" panel panel-default" id="problems_list" >
 	<div class="panel-heading">
-		<h3 class="panel-title">{#rankHeaderPreCount#} {$rank.rank|@count} {#rankHeaderPostCount#}</h3>
+		<h3 class="panel-title">{#rankHeaderPreCount#} {#rankHeaderPostCount#}</h3>
+		{if $page > 0}
+			<a href="{$smarty.server.PHP_SELF}?p={$page-1}">{#wordsPrevPage#}</a>
+		{/if}
+		<a href="{$smarty.server.PHP_SELF}?p={$page+1}">{#wordsNextPage#}</a>
 	</div>
 	<table class="table table-striped table-hover" id="rank-by-problems-solved">
 		<thead>
@@ -14,14 +18,15 @@
 	</table>
 	<script language="javascript">
 		omegaup.getRankByProblemsSolved(
-				30*{$page},
-				30,
+				100*{$page},
+				100,
 				function(result) {
 					var html = "";
 					for (a = 0; a < result.rank.length; a++)
 					{
-						html += "<tr><td>"+result.rank[a].name + ""
-							+ " ("+result.rank[a].username + ")</td>"
+						html += "<tr><td><b><a href=\""+result.rank[a].username + "\" >"
+							+ ""+result.rank[a].username + "</a></b>"
+							+ " "+ (result.rank[a].name == null ? "" : result.rank[a].name) + "</td>"
 							+ "<td>"+result.rank[a].problems_solved + "</td></tr>";
 					}
 					$("#rank-by-problems-solved>tbody").append(html);
