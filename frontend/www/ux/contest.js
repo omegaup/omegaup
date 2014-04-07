@@ -1,7 +1,5 @@
 $(document).ready(function() {
 	var arena = new Arena();
-	var socket = null;
-	var rankChartLimit = 10;
 
 	if (arena.onlyProblem) {
 		var onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(window.location.pathname)[1];		
@@ -133,9 +131,10 @@ $(document).ready(function() {
 			}
 		
 			run.status = 'new';
+			run.alias = arena.currentProblem.alias;
 			run.contest_score = 0;
 			run.time = new Date;
-			run.penalty = '-';
+			run.penalty = 0;
 			run.runtime = 0;
 			run.memory = 0;
 			run.language = $('#submit select[name="language"]').val();
@@ -144,13 +143,7 @@ $(document).ready(function() {
 				.removeClass('template')
 				.addClass('added')
 				.addClass('run_' + run.guid);
-			$('.guid', r).html(run.guid.substring(run.guid.length - 5));
-			$('.runtime', r).html('-');
-			$('.memory', r).html('-');
-			$('.status', r).html('new');
-			$('.points', r).html('0');
-			$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
-			$('.language', r).html(run.language)
+			arena.displayRun(run, r);
 			$('#problem .runs > tbody:last').append(r);
 			if (!arena.currentProblem.runs) {
 				arena.currentProblem.runs = [];
@@ -286,16 +279,6 @@ $(document).ready(function() {
 							.removeClass('template')
 							.addClass('added')
 							.addClass('run_' + run.guid);
-						$('.guid', r).html(run.guid.substring(run.guid.length - 5));
-						$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-						$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-						$('.points', r).html((parseFloat(run[score_column]) * multiplier).toFixed(2));
-						$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-						$('.penalty', r).html(run.submit_delay);
-						if (run.time) {
-							$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
-						}
-						$('.language', r).html(run.language);
 						(function(guid) {
 							$('.code', r).append($('<input type="button" value="ver" />').click(function() {
 								omegaup.runSource(guid, function(data) {
@@ -314,10 +297,10 @@ $(document).ready(function() {
 								return false;
 							}));
 						})(run.guid);
+						arena.displayRun(run, r);
 						$('#problem .runs > tbody:last').append(r);
 					}
 				}
-
 
 				omegaup.getProblemRuns(problem.alias, function (data) {
 					updateOnlyProblemRuns(data.runs, 'score', 100);

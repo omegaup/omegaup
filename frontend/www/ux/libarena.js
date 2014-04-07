@@ -271,15 +271,11 @@ Arena.prototype.updateRun = function(run) {
 		}
 	}
 	var r = $('.run_' + run.guid);
-
-	if (run.status == 'ready') {
-		$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-		$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-		$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
-		$('.penalty', r).html(run.submit_delay);
+	if (self.admin && $('#runs .run_' + run.guid).length == 0) {
+		r = self.createAdminRun(run);
+		$('#runs .runs > tbody:last').prepend(r);
 	}
-	$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-	$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+	self.displayRun(run, r);
 
 	if (run.status == 'ready') {
 		if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
@@ -287,6 +283,174 @@ Arena.prototype.updateRun = function(run) {
 		}
 	} else if (self.socket == null) {
 		self.updateRunFallback(run.guid, run);
+	}
+};
+
+Arena.prototype.createAdminRun = function(run) {
+	var self = this;
+	var r = $('#runs .runs .run-list .template')
+		.clone()
+		.removeClass('template')
+		.addClass('added')
+		.addClass('run_' + run.guid);
+
+	// Rejudge
+	(function(guid, run, row) {
+		$('.rejudge', row).append($('<input type="button" value="rejudge" />').click(function() {
+			$('.status', row).html('rejudging').css('background-color', '');
+			omegaup.runRejudge(guid, function() {
+				self.updateRunFallback(guid, run);
+			});
+		}));
+	})(run.guid, run, r);
+
+	// Details
+	(function(guid, run, row) {
+		$('.details', row).append($('<input type="button" value="details" />').click(function() {
+			omegaup.runDetails(guid, function(data) {
+				$('#run-details .compile_error').html('');
+				if (data.compile_error) {
+					$('#run-details .compile_error').html(omegaup.escape(data.compile_error));
+				}
+				if (data.source.indexOf('data:') === 0) {
+					$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">descarga</a>');
+				} else {
+					$('#run-details .source').html(omegaup.escape(data.source));
+				}
+				$('#run-details .cases div').remove();
+				$('#run-details .cases table').remove();
+				$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
+
+				function numericSort(key) {
+					function isDigit(x) {
+						return '0' <= x && x <= '9';
+					}
+
+					return function(x, y) {
+						var i = 0, j = 0;
+						for (; i < x[key].length && j < y[key].length; i++, j++) {
+							if (isDigit(x[key][i]) && isDigit(x[key][j])) {
+								var nx = 0, ny = 0;
+								while (i < x[key].length && isDigit(x[key][i]))
+									nx = (nx * 10) + parseInt(x[key][i++]);
+								while (j < y[key].length && isDigit(y[key][j]))
+									ny = (ny * 10) + parseInt(y[key][j++]);
+								i--; j--;
+								if (nx != ny) return nx - ny;
+							} else if (x[key][i] < y[key][j]) {
+								return -1;
+							} else if (x[key][i] > y[key][j]) {
+								return 1;
+							}
+						}
+						return (x[key].length - i) - (y[key].length - j);
+					};
+				}
+
+				data.groups.sort(numericSort('group'));
+				for (var i = 0; i < data.groups.length; i++) {
+					data.groups[i].cases.sort(numericSort('name'));
+				}
+
+				var groups = $('<table><thead><tr><th>Grupo</th><th>Caso</th><th>Metadata</th><th>V</th><th>S</th></thead></table>');
+
+				function addBlock(text, className) {
+						groups.append(
+							$('<tr></tr>')
+								.append($('<td></td>'))
+								.append(
+									$('<td colspan="3"></td>')
+										.append(
+											$('<pre></pre>')
+												.addClass(className)
+												.html(omegaup.escape(g.cases[0].out_diff))
+										)
+								)
+						);
+				}
+
+				for (var i = 0; i < data.groups.length; i++) {
+					var g = data.groups[i];
+					if (g.cases.length == 1) {
+							groups.append(
+								$('<tr class="group"></tr>')
+									.append('<th>' + g.cases[0].name + '</th>')
+									.append('<td></td>')
+									.append('<td>' + JSON.stringify(g.cases[0].meta) + '</td>')
+									.append('<td>' + g.cases[0].veredict + '</td>')
+									.append('<th class="score">' + g.cases[0].score + '</th>')
+							);
+							if (g.cases[0].err) addBlock(g.cases[0].err, 'stderr');
+							if (g.cases[0].out_diff) addBlock(g.cases[0].out_diff, 'diff');
+					} else {
+						groups.append(
+							$('<tr class="group"></tr>')
+								.append('<th colspan="4">' + omegaup.escape(g.group) + '</th>')
+								.append('<th class="score">' + g.score + '</th>')
+						);
+						for (var j = 0; j < g.cases.length; j++) {
+							var c = g.cases[j];
+							groups.append(
+								$('<tr></tr>')
+									.append('<td></td>')
+									.append('<td>' + c.name + '</td>')
+									.append('<td>' + JSON.stringify(c.meta) + '</td>')
+									.append('<td>' + c.veredict + '</td>')
+									.append('<td class="score">' + c.score + '</td>')
+							);
+							if (c.err) addBlock(c.err, 'stderr');
+							if (c.out_diff) addBlock(c.out_diff, 'diff');
+						}
+					}
+				}
+				$('#run-details .cases').append(groups);
+				window.location.hash = 'run/details';
+				$(window).hashchange();
+				$('#run-details').show();
+				$('#submit').hide();
+				$('#clarification').hide();
+				$('#overlay').show();
+			});
+		}));
+	})(run.guid, run, r);
+
+	return r;
+};
+
+Arena.prototype.displayRun = function(run, r) {
+	var self = this;
+
+	$('.id', r).html(run.run_id);
+	$('.guid', r).html(self.admin ? run.guid : run.guid.substring(run.guid.length - 5));
+	$('.username', r).html(run.username);
+	$('.language', r).html(run.language);
+	$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');
+
+	$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
+	$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+	$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
+	$('.percentage', r).html((parseFloat(run.score) * 100).toFixed(2) + '%');
+	$('.status', r).html(
+		run.status == 'ready' ?
+		(
+		 Arena.veredicts[run.veredict] ?
+		 "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" :
+		 run.veredict
+		) :
+		run.status
+	);
+	if (run.veredict == 'JE')	{
+		$('.status', r).css('background-color', '#f00');
+	}	else if (run.veredict == 'RTE' || run.veredict == 'CE' || run.veredict == 'RFE') {
+		$('.status', r).css('background-color', '#ff9900');
+	} else if (run.veredict == 'AC') {
+		$('.status', r).css('background-color', '#CCFF66');
+	} else {
+		$('.status', r).css('background-color', '');
+	}
+	$('.penalty', r).html(run.submit_delay);
+	if (run.time) {
+		$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 	}
 };
 
@@ -669,16 +833,7 @@ Arena.prototype.onHashChanged = function() {
 						.removeClass('template')
 						.addClass('added')
 						.addClass('run_' + run.guid);
-					$('.guid', r).html(run.guid.substring(run.guid.length - 5));
-					$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
-					$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-					$('.points', r).html((parseFloat(run[score_column]) * multiplier).toFixed(2));
-					$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-					$('.penalty', r).html(run.submit_delay);
-					if (run.time) {
-						$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
-					}
-					$('.language', r).html(run.language);
+					self.displayRun(run, r);
 					(function(guid) {
 						$('.code', r).append($('<input type="button" value="ver" />').click(function() {
 							omegaup.runSource(guid, function(data) {
