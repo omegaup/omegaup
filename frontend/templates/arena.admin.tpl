@@ -3,7 +3,7 @@
 				<source src="/media/notification.mp3" type="audio/mpeg" />
 			</audio>
 			<div id="title">
-				<h1 class="contest-title"></h1>
+				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>
 				<div class="clock">00:00:00</div>
 			</div>
 			<ul class="tabs">

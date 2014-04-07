@@ -99,6 +99,7 @@ Arena.prototype.connectSocket = function() {
 
 	try {
 		self.socket = new WebSocket(uri, "com.omegaup.events");
+		$('#title .socket-status').html('&bull;');
 		self.socket.onmessage = function(message) {
 			console.log(message);
 			var data = JSON.parse(message.data);
@@ -112,6 +113,7 @@ Arena.prototype.connectSocket = function() {
 			}
 		};
 		self.socket.onopen = function() {
+			$('#title .socket-status').html('&bull;').css('color', '#080');
 			self.socket_keepalive = setInterval((function(socket) {
 				return function() {
 					socket.send('"ping"');
@@ -119,11 +121,13 @@ Arena.prototype.connectSocket = function() {
 			})(self.socket), 30000);
 		};
 		self.socket.onclose = function(e) {
+			$('#title .socket-status').html('&cross;').css('color', '#800');
 			self.socket = null;
 			clearInterval(self.socket_keepalive);
 			console.error(e);
 		};
 		self.socket.onerror = function(e) {
+			$('#title .socket-status').html('&cross;').css('color', '#800');
 			self.socket = null;
 			clearInterval(self.socket_keepalive);
 			console.error(e);
