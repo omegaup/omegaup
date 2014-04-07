@@ -219,7 +219,7 @@ $(document).ready(function() {
 					.clone()
 					.removeClass('template')
 					.addClass('added')
-					.attr('id', 'run_' + run.guid);
+					.addClass('run_' + run.guid);
 				$('.guid', r).html(run.guid);
 				$('.status', r).html('new');
 				$('.points', r).html('0');
@@ -311,33 +311,43 @@ $(document).ready(function() {
 			if (!data.runs.hasOwnProperty(idx)) continue;
 			var run = data.runs[idx];
 
-			var r = $('#runs .runs .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+			var r = $('#runs .runs .run-list .template')
+				.clone()
+				.removeClass('template')
+				.addClass('added')
+				.addClass('run_' + run.guid);
 			$('.id', r).html(run.run_id);
 			$('.guid', r).html(run.guid);
 			$('.username', r).html(run.username);
+			$('.language', r).html(run.language);
 			$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');
+
 			$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 			$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 			$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
 			$('.percentage', r).html((parseFloat(run.score) * 100).toFixed(2) + '%');
-			$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-			if (run.veredict == 'JE')
-			{
+			$('.status', r).html(
+				run.status == 'ready' ?
+				(
+				 Arena.veredicts[run.veredict] ?
+				 "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" :
+				 run.veredict
+				) :
+				run.status
+			);
+			if (run.veredict == 'JE')	{
 				$('.status', r).css('background-color', '#f00');
-			}
-			else if (run.veredict == 'RTE' || run.veredict == 'CE' || run.veredict == 'RFE')
-			{
+			}	else if (run.veredict == 'RTE' || run.veredict == 'CE' || run.veredict == 'RFE') {
 				$('.status', r).css('background-color', '#ff9900');
-			}
-			else if (run.veredict == 'AC')
-			{
+			} else if (run.veredict == 'AC') {
 				$('.status', r).css('background-color', '#CCFF66');
 			}
 			$('.penalty', r).html(run.submit_delay);
 			if (run.time) {
 				$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 			}
-			$('.language', r).html(run.language);
+
+			// Rejudge
 			(function(guid, run, row) {
 				$('.rejudge', row).append($('<input type="button" value="rejudge" />').click(function() {
 					$('.status', row).html('rejudging');
@@ -346,6 +356,8 @@ $(document).ready(function() {
 					});
 				}));
 			})(run.guid, run, r);
+
+			// Details
 			(function(guid, run, row) {
 				$('.details', row).append($('<input type="button" value="details" />').click(function() {
 					omegaup.runDetails(guid, function(data) {

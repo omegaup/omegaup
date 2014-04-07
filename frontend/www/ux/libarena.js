@@ -270,16 +270,16 @@ Arena.prototype.updateRun = function(run) {
 			}
 		}
 	}
-	var r = '#run_' + run.guid;
+	var r = $('.run_' + run.guid);
 
 	if (run.status == 'ready') {
-		$(r + ' .runtime').html((parseFloat(run.runtime) / 1000).toFixed(2));
-		$(r + ' .memory').html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
-		$(r + ' .points').html(parseFloat(run.contest_score).toFixed(2));
-		$(r + ' .penalty').html(run.submit_delay);
+		$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
+		$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+		$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
+		$('.penalty', r).html(run.submit_delay);
 	}
-	$(r + ' .status').html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
-	$(r + ' .time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
+	$('.status', r).html(run.status == 'ready' ? (Arena.veredicts[run.veredict] ? "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" : run.veredict) : run.status);
+	$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 
 	if (run.status == 'ready') {
 		if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
@@ -664,7 +664,11 @@ Arena.prototype.onHashChanged = function() {
 					if (!runs.hasOwnProperty(idx)) continue;
 					var run = runs[idx];
 
-					var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+					var r = $('#problem .run-list .template')
+						.clone()
+						.removeClass('template')
+						.addClass('added')
+						.addClass('run_' + run.guid);
 					$('.guid', r).html(run.guid.substring(run.guid.length - 5));
 					$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 					$('.memory', r).html((parseFloat(run.memory) / (1024 * 1024)).toFixed(2));

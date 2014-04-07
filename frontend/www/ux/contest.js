@@ -139,7 +139,11 @@ $(document).ready(function() {
 			run.runtime = 0;
 			run.memory = 0;
 			run.language = $('#submit select[name="language"]').val();
-			var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+			var r = $('#problem .run-list .template')
+				.clone()
+				.removeClass('template')
+				.addClass('added')
+				.addClass('run_' + run.guid);
 			$('.guid', r).html(run.guid.substring(run.guid.length - 5));
 			$('.runtime', r).html('-');
 			$('.memory', r).html('-');
@@ -277,7 +281,11 @@ $(document).ready(function() {
 						if (!runs.hasOwnProperty(idx)) continue;
 						var run = runs[idx];
 
-						var r = $('#problem .run-list .template').clone().removeClass('template').addClass('added').attr('id', 'run_' + run.guid);
+						var r = $('#problem .run-list .template')
+							.clone()
+							.removeClass('template')
+							.addClass('added')
+							.addClass('run_' + run.guid);
 						$('.guid', r).html(run.guid.substring(run.guid.length - 5));
 						$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 						$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
