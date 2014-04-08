@@ -4,7 +4,7 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-{include file='rank.table.tpl' rank=$rank page=$page}
+{include file='rank.table.tpl' page=$page}
 
 <script>
 	$(".navbar #nav-rank").addClass("active");

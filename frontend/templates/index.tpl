@@ -81,7 +81,7 @@
 		    </ul>
 		</div>					
 				
-		{include file='rank.table.tpl' rank=$rank}
+		{include file='rank.table.tpl' length=5 is_index=true}
 		
 		<div class="panel panel-default">
 			<div id="runs-chart"></div>
