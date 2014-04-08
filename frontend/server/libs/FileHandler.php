@@ -103,13 +103,20 @@ class FileHandler {
 		}
 	}
 	
-	static public function Replace($old, $new) {
-		self::DeleteDirRecursive($old);
-		if(!@rename($new, $old)) {
+	static public function Rename($old, $new) {
+		self::$log->info("Renaming $old to $new");
+		if(!@rename($old, $new)) {
 			$errors = error_get_last();
 			throw new RuntimeException("FATAL: Unable to rename $old to $new " . $errors['type']." ". $errors["message"]);
-		}		
-		self::DeleteDirRecursive($new);
+		}	
+	}
+	
+	static public function SafeReplace($old, $new) {		
+		self::Rename($old, $old.'_old');
+		self::Rename($new, $old);
+		
+		self::$log->info("Deleting $old _old dir");
+		self::DeleteDirRecursive($old.'_old');					
 	}
 
 }

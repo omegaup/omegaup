@@ -669,7 +669,7 @@ class ProblemDeployer {
 				$oldPath = $this->getDirpath($r['alias']);
 				
 				$this->log->info("Replacing $oldPath with $updatedPath");
-				FileHandler::Replace($oldPath, $updatedPath);
+				FileHandler::SafeReplace($oldPath, $updatedPath);
 			}			
 		} catch (Exception $e) {
 			throw new ProblemDeploymentFailedException($e);
