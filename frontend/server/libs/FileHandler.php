@@ -71,9 +71,10 @@ class FileHandler {
 	}
 	
 	static function DeleteFile($pathName) {
-		self::$log->info("Trying to delete file: " . $pathName);
+		self::$log->info("Trying to delete file: " . $pathName);		
 		if (!@unlink($pathName)) {
-			throw new RuntimeException("FATAL: Not able to delete file " . $pathName);
+			$errors = error_get_last();
+			throw new RuntimeException("FATAL: Not able to delete file $pathName ". $errors['type']." ". $errors["message"]);
 		}
 	}
 
@@ -82,17 +83,17 @@ class FileHandler {
 			return;
 		}
 
-		foreach (glob($dir . '/*') as $file) {
+		foreach (glob($dir . '/*') as $file) {			
 			if (is_dir($file)) {
 				self::rrmdir($file);
-			} else
-			if (!@unlink($file)) {
-				throw new RuntimeException("FATAL: Not able to delete file " . $file);
+			} else {
+				self::DeleteFile($file);
 			}
 		}
 
 		if (!@rmdir($dir)) {
-			throw new RuntimeException("FATAL: Not able to delete dir " . $dir);
+			$errors = error_get_last();
+			throw new RuntimeException("FATAL: Not able to delete dir " . $dir . $errors['type']." ". $errors["message"]);
 		}
 	}
 	
