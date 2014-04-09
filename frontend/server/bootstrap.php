@@ -116,7 +116,7 @@ global $conn;
 $conn = null;
 
 try {
-	$conn =& ADONewConnection(OMEGAUP_DB_DRIVER);
+	$conn = ADONewConnection(OMEGAUP_DB_DRIVER);
 	// HHVM doesn't like ADOdb's default value of 'false' for port and socket.
 	$conn->port = null;
 	$conn->socket = null;
