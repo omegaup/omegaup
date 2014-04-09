@@ -1305,7 +1305,11 @@ class UserController extends Controller {
 			if (!is_null($db_results)) {
 				foreach ($db_results as $userEntry) {
 					$user = $userEntry["user"];
-					array_push($response["rank"], array("username" => $user->getUsername(), "name" => $user->getName(), "problems_solved" => $userEntry["problems_solved"]));
+					array_push($response["rank"], array(
+						"username" => $user->getUsername(), 
+						"name" => $user->getName(), 
+						"problems_solved" => $userEntry["problems_solved"],
+						"rank" => $userEntry["rank"]));
 				}
 			}
 			
@@ -1313,7 +1317,7 @@ class UserController extends Controller {
 		}, $response); 
 		
 		// If cache was set, we need to maintain a list of different ranks in the cache
-		// (A different rank means different offset and rowcount params
+		// (A different rankCacheName means different offset and rowcount params
 		if ($cacheUsed === false) {
 			self::setProblemsSolvedRankCacheList($rankCacheName);
 		}		

@@ -62,27 +62,41 @@ class UsersDAO extends UsersDAOBase
 	public static function GetRankByProblemsSolved($limit = 100, $offset = 0) {
 		
 		global  $conn;
-		
-		$sql = "SELECT COUNT( * ) AS ProblemsSolved, Users . * 
-				FROM Users
-				INNER JOIN (
-					SELECT COUNT( * ) AS TotalPerProblem, problem_id, user_id
-					FROM Runs
-					WHERE Runs.veredict =  'AC'
-					AND Runs.test =0
-					GROUP BY user_id, problem_id
-					ORDER BY TotalPerProblem DESC
-				) AS p ON p.user_id = Users.user_id
-				WHERE Users.main_email_id IS NOT NULL 
-				GROUP BY user_id
-				ORDER BY ProblemsSolved DESC 
-				LIMIT $offset , $limit";
+		$conn->Execute("SET @prev_value = NULL;");
+		$conn->Execute("SET @rank_count = 0;");
+		$sql = "SELECT ProblemsSolved, username, rank FROM (
+					SELECT ProblemsSolved, username,
+					CASE
+						WHEN @prev_value = ProblemsSolved THEN @rank_count
+						WHEN @prev_value := ProblemsSolved THEN @rank_count := @rank_count + 1
+					END AS rank
+
+					 FROM (
+						SELECT COUNT( * ) AS ProblemsSolved, Users . *
+									FROM Users
+									INNER JOIN (
+										SELECT COUNT( * ) AS TotalPerProblem, problem_id, user_id
+										FROM Runs
+										WHERE Runs.veredict =  'AC'
+										AND Runs.test =0
+										GROUP BY user_id, problem_id
+										ORDER BY TotalPerProblem DESC
+									) AS p ON p.user_id = Users.user_id
+
+									WHERE Users.main_email_id IS NOT NULL 
+									GROUP BY user_id
+									ORDER BY ProblemsSolved DESC 
+						 ) AS UsersProblemsSolved
+					) AS Rank
+				ORDER BY Rank ASC 
+				LIMIT $offset, $limit		
+				";
 		
 		$rs = $conn->Execute($sql);
 		$ar = array();
 		foreach ($rs as $foo) {			
 			$bar =  new Users($foo);
-			$result = array("user" => $bar, "problems_solved" =>  $foo["ProblemsSolved"]);
+			$result = array("user" => $bar, "problems_solved" =>  $foo["ProblemsSolved"], "rank" => $foo["rank"]);
     		array_push( $ar, $result);    		
 		}
 		return $ar;	
