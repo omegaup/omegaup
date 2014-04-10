@@ -44,7 +44,7 @@
 					var html = "";
 					for (a = 0; a < result.rank.length; a++)
 					{
-						html += "<tr><td>" + result.rank[a].rank + "</td><td><b><a href=\""+result.rank[a].username + "\" >"
+						html += "<tr><td>" + result.rank[a].rank + "</td><td><b><a href=/profile/"+ result.rank[a].username + ">"
 							+ ""+result.rank[a].username + "</a></b>"
 							+ " "+ (result.rank[a].name == null ? "" : result.rank[a].name) + "</td>"
 							+ "<td>"+result.rank[a].problems_solved + "</td></tr>";
