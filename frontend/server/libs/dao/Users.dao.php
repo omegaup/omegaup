@@ -59,13 +59,15 @@ class UsersDAO extends UsersDAOBase
 		return $ar;		
 	}
 	
-	public static function GetRankByProblemsSolved($limit = 100, $offset = 0) {
+	public static function GetRankByProblemsSolved($limit = 100, $offset = 0, Users $user = null) {
+		
+		$filterByUser = !is_null($user);
 		
 		global  $conn;
 		$conn->Execute("SET @prev_value = NULL;");
 		$conn->Execute("SET @rank_count = 0;");
-		$sql = "SELECT ProblemsSolved, username, rank FROM (
-					SELECT ProblemsSolved, username,
+		$sql = "SELECT ProblemsSolved, username, name, rank, user_id FROM (
+					SELECT ProblemsSolved, username, name, user_id,
 					CASE
 						WHEN @prev_value = ProblemsSolved THEN @rank_count
 						WHEN @prev_value := ProblemsSolved THEN @rank_count := @rank_count + 1
@@ -87,12 +89,17 @@ class UsersDAO extends UsersDAOBase
 									GROUP BY user_id
 									ORDER BY ProblemsSolved DESC 
 						 ) AS UsersProblemsSolved
-					) AS Rank
-				ORDER BY Rank ASC 
-				LIMIT $offset, $limit		
-				";
+					) AS Rank ";
+		($filterByUser) ? $sql .= "WHERE user_id = ? " : $sql .= "ORDER BY Rank ASC LIMIT $offset, $limit";		
 		
-		$rs = $conn->Execute($sql);
+		$rs = null;
+		if ($filterByUser) {
+			$params = array($user->user_id);			
+			$rs = $conn->Execute($sql, $params);
+		} else {
+			$rs = $conn->Execute($sql);
+		}
+		
 		$ar = array();
 		foreach ($rs as $foo) {			
 			$bar =  new Users($foo);

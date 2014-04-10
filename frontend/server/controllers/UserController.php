@@ -1257,18 +1257,34 @@ class UserController extends Controller {
 	}
 	
 	/**
-	 * Gets the top N users who have solved more problems
+	 * If no username provided: Gets the top N users who have solved more problems
+	 * If username provided: Gets rank for username provided
 	 * 
 	 * @param Request $r
 	 * @return string
 	 * @throws InvalidDatabaseOperationException
 	 */
-	public static function apiRankByProblemsSolved(Request $r) {
-		
-		self::authenticateRequest($r);
-		
+	public static function apiRankByProblemsSolved(Request $r) {				
+						
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
+		
+		$r["user"] = null;
+		if (!is_null($r["username"])) {			
+			Validators::isStringNonEmpty($r["username"], "username");			
+			try {
+				$r["user"] = UsersDAO::FindByUsername($r["username"]);
+				if (is_null($r["user"])) {
+					throw new NotFoundException("User does not exist");
+				}
+			} 
+			catch (ApiException $e) {
+				throw $e;
+			}
+			catch (Exception $e) {
+				throw new InvalidDatabaseOperationException($e);
+			}			
+		}
 
 		// Defaults for offset and rowcount
 		if (!isset($r["offset"])) {
@@ -1290,37 +1306,51 @@ class UserController extends Controller {
 	 */
 	public static function getRankByProblemsSolved(Request $r) {
 		
-		$rankCacheName =  $r["offset"] . '-' . $r["rowcount"];
-		
-		$cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function(Request $r) {
-		
-			$response = array();
-			$response["rank"] = array();
+		if (is_null($r["user"])) {		
+			$rankCacheName =  $r["offset"] . '-' . $r["rowcount"];
+
+			$cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function(Request $r) {
+				$response = array();
+				$response["rank"] = array();
+				try {
+					$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"]);
+				} catch (Exception $e) {
+					throw new InvalidDatabaseOperationException($e);
+				}
+
+				if (!is_null($db_results)) {
+					foreach ($db_results as $userEntry) {
+						$user = $userEntry["user"];
+						array_push($response["rank"], array(
+							"username" => $user->getUsername(), 
+							"name" => $user->getName(), 
+							"problems_solved" => $userEntry["problems_solved"],
+							"rank" => $userEntry["rank"]));
+					}
+				}
+				return $response;			
+			}, $response); 
+
+			// If cache was set, we need to maintain a list of different ranks in the cache
+			// (A different rankCacheName means different offset and rowcount params
+			if ($cacheUsed === false) {
+				self::setProblemsSolvedRankCacheList($rankCacheName);
+			}		
+		} else {
+			$response = array();			
 			try {
-				$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"]);
+				$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"], $r["user"]);
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
-
-			if (!is_null($db_results)) {
-				foreach ($db_results as $userEntry) {
-					$user = $userEntry["user"];
-					array_push($response["rank"], array(
-						"username" => $user->getUsername(), 
-						"name" => $user->getName(), 
-						"problems_solved" => $userEntry["problems_solved"],
-						"rank" => $userEntry["rank"]));
-				}
+			if (!is_null($db_results) && count($db_results) > 0) {
+				$entry = $db_results[0];
+				$user = $entry["user"];
+				$response["rank"] = $entry["rank"];
+				$response["name"] = $user->getName();
+				$response["problems_solved"] = $entry["problems_solved"];
 			}
-			
-			return $response;			
-		}, $response); 
-		
-		// If cache was set, we need to maintain a list of different ranks in the cache
-		// (A different rankCacheName means different offset and rowcount params
-		if ($cacheUsed === false) {
-			self::setProblemsSolvedRankCacheList($rankCacheName);
-		}		
+		}
 		
 		$response["status"] = "ok";
 		return $response;

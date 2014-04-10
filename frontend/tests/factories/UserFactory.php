@@ -36,6 +36,7 @@ class UserFactory {
 		// Populate a new Request to pass to the API
 		$r = new Request(array(
 				"username" => $username,
+				"name" => $username,
 				"password" => $password,
 				"email" => $email)
 				);
