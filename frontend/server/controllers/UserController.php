@@ -1264,8 +1264,9 @@ class UserController extends Controller {
 	 * @return string
 	 * @throws InvalidDatabaseOperationException
 	 */
+
 	public static function apiRankByProblemsSolved(Request $r) {				
-						
+
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
 		
