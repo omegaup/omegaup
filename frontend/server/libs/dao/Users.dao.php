@@ -66,31 +66,39 @@ class UsersDAO extends UsersDAOBase
 		global  $conn;
 		$conn->Execute("SET @prev_value = NULL;");
 		$conn->Execute("SET @rank_count = 0;");
+		$conn->Execute("SET @prev_value_ties = NULL");
+		$conn->Execute("SET @prev_ties_count = 0;");
+		$conn->Execute("SET @ties_count = 0");
 		$sql = "SELECT ProblemsSolved, username, name, rank, user_id FROM (
 					SELECT ProblemsSolved, username, name, user_id,
+					@prev_ties_count := @ties_count as previous_ties_count,
+					CASE
+						WHEN @prev_value_ties = ProblemsSolved THEN @ties_count := @ties_count + 1
+						WHEN @prev_value_ties := ProblemsSolved THEN @ties_count := 0                                                                     
+					END AS ties_count,                          
 					CASE
 						WHEN @prev_value = ProblemsSolved THEN @rank_count
-						WHEN @prev_value := ProblemsSolved THEN @rank_count := @rank_count + 1
+						WHEN @prev_value := ProblemsSolved THEN @rank_count := @rank_count + 1 + @prev_ties_count                                                                                                                                                   
 					END AS rank
 
-					 FROM (
-						SELECT COUNT( * ) AS ProblemsSolved, Users . *
-									FROM Users
-									INNER JOIN (
-										SELECT COUNT( * ) AS TotalPerProblem, problem_id, user_id
-										FROM Runs
-										WHERE Runs.veredict =  'AC'
-										AND Runs.test =0
-										GROUP BY user_id, problem_id
-										ORDER BY TotalPerProblem DESC
-									) AS p ON p.user_id = Users.user_id
+					FROM (
+					   SELECT COUNT( * ) AS ProblemsSolved, Users . *
+								   FROM Users
+								   INNER JOIN (
+									   SELECT COUNT( * ) AS TotalPerProblem, problem_id, user_id
+									   FROM Runs
+									   WHERE Runs.veredict =  'AC'
+									   AND Runs.test =0
+									   GROUP BY user_id, problem_id
+									   ORDER BY TotalPerProblem DESC
+								   ) AS p ON p.user_id = Users.user_id
 
-									WHERE Users.main_email_id IS NOT NULL 
-									GROUP BY user_id
-									ORDER BY ProblemsSolved DESC 
-						 ) AS UsersProblemsSolved
-					) AS Rank ";
-		($filterByUser) ? $sql .= "WHERE user_id = ? " : $sql .= "ORDER BY Rank ASC LIMIT $offset, $limit";		
+								   WHERE Users.main_email_id IS NOT NULL 
+								   GROUP BY user_id
+								   ORDER BY ProblemsSolved DESC, user_id
+						) AS UsersProblemsSolved
+				   ) AS Rank ";
+		($filterByUser) ? $sql .= "WHERE user_id = ? " : $sql .= "ORDER BY Rank ASC, user_id LIMIT $offset, $limit";		
 		
 		$rs = null;
 		if ($filterByUser) {
