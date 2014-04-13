@@ -466,7 +466,12 @@ Arena.prototype.onRankingChanged = function(data) {
 	$('#ranking tbody tr.inserted').remove();
 
 	var ranking = data.ranking || [];
-	var newRanking = {};		
+	var newRanking = {};
+	var order = {};
+
+	for (var i = 0; i < data.problems.length; i++) {
+		order[data.problems[i].alias] = i;
+	}
 	
 	// Push data to ranking table
 	for (var i = 0; i < ranking.length; i++) {
@@ -484,15 +489,16 @@ Arena.prototype.onRankingChanged = function(data) {
 		$('.user', r).html(username);
 
 		// Update problem scores.
-		for (var alias in rank.problems) {
-			if (!rank.problems.hasOwnProperty(alias)) continue;
+		for (var alias in order) {
+			if (!order.hasOwnProperty(alias)) continue;
+			var problem = rank.problems[order[alias]];
 			
-			$('.prob_' + alias + '_points', r).html(rank.problems[alias].points);
-			$('.prob_' + alias + '_penalty', r).html(rank.problems[alias].penalty + " (" + rank.problems[alias].runs  + ")");
+			$('.prob_' + alias + '_points', r).html(problem.points);
+			$('.prob_' + alias + '_penalty', r).html(problem.penalty + " (" + problem.runs  + ")");
 			if (self.problems[alias]) {
 				if (rank.username == omegaup.username) {
 					$('#problems .problem_' + alias + ' .solved')
-						.html("(" + rank.problems[alias].points + " / " + self.problems[alias].points + ")");
+						.html("(" + problem.points + " / " + self.problems[alias].points + ")");
 				}
 			}
 		}

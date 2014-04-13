@@ -64,9 +64,9 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$this->assertEquals(3, $response["ranking"][2]["place"]);
 		
 		// Check data per problem
-		$this->assertEquals(100, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
-		$this->assertEquals(60, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
+		$this->assertEquals(100, $response["ranking"][0]["problems"][0]["points"]);
+		$this->assertEquals(60, $response["ranking"][0]["problems"][0]["penalty"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][0]["runs"]);
 	}
 	
 	/**
@@ -113,9 +113,9 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$this->assertEquals(0, $response["ranking"][0]["total"]["penalty"]); /* 60 because contest started 60 mins ago in the default factory */
 		
 		// Check data per problem
-		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
-		$this->assertEquals(0, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
+		$this->assertEquals(0, $response["ranking"][0]["problems"][0]["points"]);
+		$this->assertEquals(0, $response["ranking"][0]["problems"][0]["penalty"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][0]["runs"]);
 	}
 	
 	/**
@@ -162,9 +162,9 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$this->assertEquals(60, $response["ranking"][0]["total"]["penalty"]); /* 60 because contest started 60 mins ago in the default factory */
 		
 		// Check data per problem
-		$this->assertEquals(100, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["points"]);
-		$this->assertEquals(60, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["penalty"]);
-		$this->assertEquals(1, $response["ranking"][0]["problems"][$problemData["request"]["alias"]]["runs"]);
+		$this->assertEquals(100, $response["ranking"][0]["problems"][0]["points"]);
+		$this->assertEquals(60, $response["ranking"][0]["problems"][0]["penalty"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][0]["runs"]);
 	}
 	
 	

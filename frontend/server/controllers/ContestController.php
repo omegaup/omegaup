@@ -1034,20 +1034,11 @@ class ContestController extends Controller {
 		
 		// Create scoreboard
 		$scoreboard = new Scoreboard(
-						$r["contest"]->getContestId(),
-						$showAllRuns
+			$r["contest"]->getContestId(),
+			$showAllRuns
 		);
-
-		// Push scoreboard data in response
-		$response = array();
-		$response["ranking"] = $scoreboard->generate();
 		
-		// Add time left to response
-		$response['start_time'] = strtotime($r["contest"]->getStartTime());		
-		$response['finish_time'] = strtotime($r["contest"]->getFinishTime());		
-		$response['title'] = $r["contest"]->getTitle();		
-
-		return $response;
+		return $scoreboard->generate();
 	}
 	
 	/**
@@ -1094,7 +1085,7 @@ class ContestController extends Controller {
 		
 		// Merge
 		foreach($scoreboards as $contest_alias => $scoreboard) {
-			foreach($scoreboard as $user_results) {
+			foreach($scoreboard['ranking'] as $user_results) {
 				//var_dump($user_results);
 				
 				// If user haven't been added to the merged scoredboard, add him
