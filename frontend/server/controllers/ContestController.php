@@ -1778,7 +1778,7 @@ class ContestController extends Controller {
 				'admin' => Authorization::IsContestAdmin($r["current_user_id"], $r['contest'])
 			);
 		} catch (Exception $e) {
-			self::$log->error("Error getting role", $e);
+			self::$log->error("Error getting role: " . $e);
 
 			return array(
 				'status' => 'error',
