@@ -334,6 +334,7 @@ class Scoreboard {
 				}
 				if (strtotime($run->getTime()) >= $scoreboard_time_limit) {
 					$problem['runs']++;
+					$problem['pending'] = true;
 					continue;
 				}
 			}
