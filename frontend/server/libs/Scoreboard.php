@@ -473,9 +473,9 @@ class Scoreboard {
 			$data = array(
 				'name' => $user->getName() ? $user->getName() : $user->getUsername(),
 				'username' => $user->getUsername(),
-				'delta' => $use_penalty ?
+				'delta' => max(0, $use_penalty ?
 					(int)$run->getSubmitDelay() :
-					($run_delay - $contestStart) / 60,
+					($run_delay - $contestStart) / 60),
 				'problem' => array(
 					'alias' => $problem_mapping[$problem_id],
 					'points' => round($contest_score, 2),
