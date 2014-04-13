@@ -40,7 +40,4 @@ $(document).ready(function() {
 		$('#root').show();
 		$('#loading').fadeOut('slow');
 	});
-
-	$('#contest-list tr').live('click', function() {
-	});
 });
