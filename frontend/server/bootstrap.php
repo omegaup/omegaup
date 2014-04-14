@@ -102,6 +102,7 @@ require_once("controllers/SessionController.php");
 require_once("controllers/ContestController.php");
 require_once("controllers/ProblemController.php");
 require_once("controllers/RunController.php");
+require_once("controllers/ScoreboardController.php");
 require_once("controllers/ClarificationController.php");
 require_once("controllers/TimeController.php");
 require_once("controllers/GraderController.php");

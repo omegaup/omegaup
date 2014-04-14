@@ -93,7 +93,12 @@ class ClarificationController extends Controller {
 
 			$grader = new Grader();
 			self::$log->debug("Sending update $message");
-			$grader->broadcast($r['contest']->alias, $r['current_user_id'], false, $message);
+			$grader->broadcast(
+				$r['contest']->alias,
+				$message,
+				false,
+				$r['current_user_id']
+			);
 		} catch(Exception $e) {
 			self::$log->error("Failed to send to broadcaster" . $e->getMessage());
 		}
@@ -237,9 +242,14 @@ class ClarificationController extends Controller {
 
 			$grader = new Grader();
 			self::$log->debug("Sending update $message");
-			$grader->broadcast($contest->alias, $r['current_user_id'], false, $message);
+			$grader->broadcast(
+				$contest->alias,
+				$message,
+				false,
+				$r['current_user_id']
+			);
 		} catch(Exception $e) {
-			self::$log->error("Failed to send to broadcaster" . $e->getMessage());
+			self::$log->error("Failed to send to broadcaster " . $e->getMessage());
 		}
 
 		$response = array();

@@ -114,13 +114,14 @@ class Grader {
 		return $this->executeCurl($curl);
 	}
 
-	public function broadcast($contest_alias, $user_id, $broadcast, $message) {
+	public function broadcast($contest_alias, $message, $broadcast, $user_id = -1, $user_only = false) {
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_BROADCAST_URL);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode(array(
 			'contest' => $contest_alias,
-			'targetUser' => (int)$user_id,
+			'message' => $message,
 			'broadcast' => $broadcast,
-			'message' => $message
+			'targetUser' => (int)$user_id,
+			'userOnly' => $user_only
 		)));
 		return $this->executeCurl($curl);
 	}

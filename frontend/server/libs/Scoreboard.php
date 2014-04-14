@@ -229,7 +229,8 @@ class Scoreboard {
 		// Cache scoreboard until the contest ends (or forever if it has already ended).
 		$timeout = max(0, strtotime($contest->getFinishTime()) - time());
 		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
-		$contestantScoreboardCache->set(Scoreboard::getScoreboardFromRuns(
+
+		$contestantScoreboard = Scoreboard::getScoreboardFromRuns(
 			$contest_runs,
 			$raw_contest_users,
 			$problem_mapping,
@@ -238,10 +239,11 @@ class Scoreboard {
 			$contest,
 			false, /* showAllRuns */
 			false  /* sortByName */
-		), $timeout);
+		);
+		$contestantScoreboardCache->set($contestantScoreboard, $timeout);
 		$adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
 		$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, true);
-		$adminScoreboardCache->set(Scoreboard::getScoreboardFromRuns(
+		$adminScoreboard = Scoreboard::getScoreboardFromRuns(
 			$contest_runs,
 			$raw_contest_users,
 			$problem_mapping,
@@ -250,7 +252,8 @@ class Scoreboard {
 			$contest,
 			true, /* showAllRuns */
 			false /* sortByName */
-		), $timeout);
+		);
+		$adminScoreboardCache->set($adminScoreboard, $timeout);
 
 		$contestantEventCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest_id);
 		$contestantEventCache->set(Scoreboard::calculateEvents(
@@ -271,6 +274,35 @@ class Scoreboard {
 			$problem_mapping,
 			true /* showAllRuns */
 		), $timeout);
+
+		// Try to broadcast the updated scoreboards:
+		$log = Logger::getLogger("Scoreboard");
+		try {
+			$grader = new Grader();
+			$log->debug("Sending updated scoreboards");
+			$grader->broadcast(
+				$contest->alias,
+				json_encode(array(
+					'message' => '/scoreboard/update/',
+					'scoreboard' => $adminScoreboard
+				)),
+				false,
+				-1,
+				false
+			);
+			$grader->broadcast(
+				$contest->alias,
+				json_encode(array(
+					'message' => '/scoreboard/update/',
+					'scoreboard' => $contestantScoreboard
+				)),
+				true,
+				-1,
+				true
+			);
+		} catch (Exception $e) {
+			$log->error('Error broadcasting scoreboard: ' . $e);
+		}
 	}
 
 	private static function getScoreboardTimeLimitUnixTimestamp(Contests $contest,

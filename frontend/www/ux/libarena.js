@@ -110,6 +110,8 @@ Arena.prototype.connectSocket = function() {
 			} else if (data.message == "/clarification/update/") {
 				data.clarification.time = new Date(data.clarification.time * 1000);
 				self.updateClarification(data.clarification);
+			} else if (data.message == '/scoreboard/update/') {
+				self.rankingChange(data.scoreboard);
 			}
 		};
 		self.socket.onopen = function() {
@@ -152,10 +154,6 @@ Arena.prototype.setupPolls = function() {
 		self.clarificationsChange.bind(self)
 	);
 
-	self.rankingInterval = setInterval(function() {
-		omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
-	}, 5 * 60 * 1000);
-
 	if (!self.socket) {
 		self.clarificationInterval = setInterval(function() {
 			self.clarificationsOffset = 0; // Return pagination to start on refresh
@@ -164,6 +162,10 @@ Arena.prototype.setupPolls = function() {
 				self.clarificationsOffset,
 				self.clarificationsRowcount,
 				self.clarificationsChange.bind(self));
+		}, 5 * 60 * 1000);
+
+		self.rankingInterval = setInterval(function() {
+			omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
 		}, 5 * 60 * 1000);
 	}
 };
@@ -277,12 +279,14 @@ Arena.prototype.updateRun = function(run) {
 	}
 	self.displayRun(run, r);
 
-	if (run.status == 'ready') {
-		if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
-			omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
+	if (self.socket == null) {
+		if (run.status == 'ready') {
+			if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
+				omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
+			}
+		} else {
+			self.updateRunFallback(run.guid, run);
 		}
-	} else if (self.socket == null) {
-		self.updateRunFallback(run.guid, run);
 	}
 };
 

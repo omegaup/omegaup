@@ -33,18 +33,18 @@ case class RunDetails(
 )
 case class UpdateRunMessage(message: String, run: RunDetails)
 
-class QueuedElement(val contest: String, val targetUser: Long, val broadcast: Boolean) {}
-class QueuedRun(contest: String, targetUser: Long, broadcast: Boolean, val run: Run)
-	extends QueuedElement(contest, targetUser, broadcast) {}
-class QueuedMessage(contest: String, targetUser: Long, broadcast: Boolean, val message: String)
-	extends QueuedElement(contest, targetUser, broadcast) {}
+class QueuedElement(val contest: String, val broadcast: Boolean, val targetUser: Long, val userOnly: Boolean) {}
+class QueuedRun(contest: String, broadcast: Boolean, targetUser: Long, userOnly: Boolean, val run: Run)
+	extends QueuedElement(contest, broadcast, targetUser, userOnly) {}
+class QueuedMessage(contest: String, broadcast: Boolean, targetUser: Long, userOnly: Boolean, val message: String)
+	extends QueuedElement(contest, broadcast, targetUser, userOnly) {}
 
 object Broadcaster extends Object with Runnable with Log with Using {
 	private val PathRE = """^/([a-zA-Z0-9_-]+)/?""".r
 	// A collection of subscribers.
 	private val subscribers = new mutable.HashMap[String, mutable.ArrayBuffer[BroadcasterSession]]
 	private val subscriberLock = new Object
-	private val PoisonPill = new QueuedElement(null, -1, true)
+	private val PoisonPill = new QueuedElement(null, true, -1, false)
 	private val queue = new LinkedBlockingQueue[QueuedElement]
 
 	def subscribe(session: BroadcasterSession) = {
@@ -85,18 +85,19 @@ object Broadcaster extends Object with Runnable with Log with Using {
 	def update(run: Run): Unit = {
 		run.contest match {
 			case Some(contest) =>
-				queue.put(new QueuedRun(contest.alias, run.user.id, false, run))
+				queue.put(new QueuedRun(contest.alias, false, run.user.id, false, run))
 			case None => {}
 		}
 	}
 
 	def broadcast(
 		contest: String,
-		targetUser: Long,
+		message: String,
 		broadcast: Boolean,
-		message: String
+		targetUser: Long = -1,
+		userOnly: Boolean = false
 	): BroadcastOutputMessage = {
-		queue.put(new QueuedMessage(contest, targetUser, broadcast, message))
+		queue.put(new QueuedMessage(contest, broadcast, targetUser, userOnly, message))
 		new BroadcastOutputMessage(status = "ok")
 	}
 
@@ -134,14 +135,22 @@ object Broadcaster extends Object with Runnable with Log with Using {
 
 			val message = elm match {
 				case m: QueuedRun => {
+					val run = m.run
+					implicit val formats = Serialization.formats(NoTypeHints)
+
 					if (Config.get("grader.scoreboard_refresh.enable", true)) {
 						try {
 							info("Scoreboard refresh {}",
-								Https.get(
+								Https.post[ScoreboardRefreshResponse](
 									Config.get(
 										"grader.scoreboard_refresh.url",
-										"http://localhost/refresh_scoreboard.php?token=secret&alias="
-									) + elm.contest,
+										"http://localhost/api/scoreboard/refresh/"
+									),
+									Map(
+										"token" -> Config.get("grader.scoreboard_refresh.token", "secret"),
+										"alias" -> elm.contest,
+										"run" -> run.id.toString
+									),
 									runner = false
 								)
 							)
@@ -150,8 +159,6 @@ object Broadcaster extends Object with Runnable with Log with Using {
 						}
 					}
 
-					val run = m.run
-					implicit val formats = Serialization.formats(NoTypeHints)
 					Serialization.write(
 						UpdateRunMessage("/run/update/",
 							RunDetails(
@@ -181,7 +188,16 @@ object Broadcaster extends Object with Runnable with Log with Using {
 			subscriberLock.synchronized {
 				if (subscribers.contains(elm.contest)) {
 					subscribers(elm.contest)
-						.filter(subscriber => elm.broadcast || subscriber.admin || elm.targetUser == subscriber.user)
+						.filter(subscriber =>
+							(
+								elm.broadcast ||
+								subscriber.admin ||
+								elm.targetUser == subscriber.user
+							) && (
+								!elm.userOnly ||
+								!subscriber.admin
+							)
+						)
 						.foreach(_.send(message))
 				}
 			}
