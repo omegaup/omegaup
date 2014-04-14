@@ -15,6 +15,7 @@ $(document).ready(function() {
 	});
 
 	if (arena.contestAlias === "admin") {
+		$('#runs').show();
 		refreshRuns();
 		setInterval(function() { 
 			runsOffset = 0; // Return pagination to start on refresh
@@ -297,7 +298,7 @@ $(document).ready(function() {
 		if (runsUsername != "") {
 			options.username = runsUsername;
 		}
-	
+
 		if (arena.contestAlias === "admin") {
 			omegaup.getRuns(options, runsChange);
 		} else {
@@ -308,13 +309,13 @@ $(document).ready(function() {
 	function runsChange(data) {
 		$('#runs .runs .run-list .added').remove();
 
-		for (var idx in data.runs) {
-			if (!data.runs.hasOwnProperty(idx)) continue;
-			var run = data.runs[idx];
+		for (var i = 0; i < data.runs.length; i++) {
+			var run = data.runs[i];
 
 			var r = arena.createAdminRun(run);
 			arena.displayRun(run, r);
-			$('#runs .runs > tbody:last').append(r);
+			console.log(r);
+			$('#runs .runs > tbody').append(r);
 		}
 	}
 });

@@ -36,7 +36,7 @@ function Arena() {
 	this.currentProblem = null;
 
 	// Whether the current contest is in practice mode.
-	this.practice = window.location.pathname.indexOf('/practice/') !== -1;
+	this.practice = window.location.pathname.indexOf('/practice') !== -1;
 
 	// Whether this is a full contest or only a problem.
 	this.onlyProblem = window.location.pathname.indexOf('/problem/') !== -1;
@@ -173,6 +173,10 @@ Arena.prototype.setupPolls = function() {
 Arena.prototype.initClock = function(start, finish, deadline) {
 	this.startTime = start;
 	this.finishTime = finish;
+	if (this.practice) {
+		$('#title .clock').html('&infin;');
+		return;
+	}
 	if (deadline) this.submissionDeadline = deadline;
 	if (!this.clockInterval) {
 		this.updateClock();
