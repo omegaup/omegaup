@@ -1,5 +1,7 @@
 {include file='redirect.tpl'}
-{assign var="htmlTitle" value="{#omegaupTitleContestAdduser#}"}
+{if !isset($htmlTitle)}
+	{assign var="htmlTitle" value="{#omegaupTitleContestAdduser#}"}
+{/if}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
@@ -30,9 +32,10 @@
 
 			<input id='user' name='user' value='' type='hidden'>
 
-			<button class="btn btn-primary" type='submit'>Agregar {#wordsUser#}</button>
+			<button class="btn btn-primary" type='submit'>Agregar {if isset($isAddAdmin)}{#wordsAdmin#}{else}{#wordsUser#}{/if}</button>
 		</form>
 		
+		{if !isset($isAddAdmin)}
 		<div class="row">
 			<div class="col-md-5">
 				<div class="panel panel-default">
@@ -50,10 +53,48 @@
 				</div>
 			</div>
 		</div>
+		{/if}
 	</div>
 </div>
 
-<script>
+<script>		
+	omegaup.getMyContests(function(contests) {					
+		// Got the contests, lets populate the dropdown with them			
+		for (var i = 0; i < contests.results.length; i++) {
+			contest = contests.results[i];							
+			$('select#contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
+		}				
+		
+		{if !isset($isAddAdmin)}
+		$('select#contests').change(function () {					
+			updateContestUsers();
+		});
+		{/if}
+		
+		// If we have a contest in GET, then select it
+		{IF isset($smarty.get.contest)}
+		$('select#contests').each(function() {
+			$('option', this).each(function() {
+				if($(this).val() == "{$smarty.get.contest}") {
+					$(this).attr('selected', 'selected');
+					$('select#contests').trigger('change');
+				}
+			});
+		});
+		{/IF}
+	});	
+	
+	$("#username").typeahead({
+		ajax: "/api/user/list/",
+		display: 'label',
+		val: 'label',
+		minLength: 2,
+		itemSelected: function (item, val, text) {
+			$("#user").val(val);
+		}
+    });
+	
+	{if !isset($isAddAdmin)}
 	function updateContestUsers() {
 		contestAlias = $('select#contests').val();
 		
@@ -93,40 +134,6 @@
 		});	
 	}
 	
-	omegaup.getMyContests(function(contests) {					
-		// Got the contests, lets populate the dropdown with them			
-		for (var i = 0; i < contests.results.length; i++) {
-			contest = contests.results[i];							
-			$('select#contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
-		}				
-		
-		$('select#contests').change(function () {					
-			updateContestUsers();
-		});
-		
-		// If we have a contest in GET, then select it
-		{IF isset($smarty.get.contest)}
-		$('select#contests').each(function() {
-			$('option', this).each(function() {
-				if($(this).val() == "{$smarty.get.contest}") {
-					$(this).attr('selected', 'selected');
-					$('select#contests').trigger('change');
-				}
-			});
-		});
-		{/IF}
-	});	
-	
-	$("#username").typeahead({
-		ajax: "/api/user/list/",
-		display: 'label',
-		val: 'label',
-		minLength: 2,
-		itemSelected: function (item, val, text) {
-			$("#user").val(val);
-		}
-    });
-	
 	$('#add-user-form').submit(function() {
 		contestAlias = $('select#contests').val();
 		username = $("#user").val();
@@ -142,6 +149,7 @@
 		});
 		return false; // Prevent refresh
 	});
+	{/if}
 	
 </script>
 
