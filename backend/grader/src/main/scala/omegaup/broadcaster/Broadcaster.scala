@@ -101,33 +101,6 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		new BroadcastOutputMessage(status = "ok")
 	}
 
-	def getUserId(request: UpgradeRequest): (Int, String) = {
-		// Find user ID.
-		val cookies = request.getCookies.filter(_.getName == "ouat")
-		val userId = if (cookies.length == 1) {
-			cookies(0).getValue
-		} else {
-			""
-		}
-
-		val tokens = userId.split('-')
-
-		if (tokens.length != 3) return (-1, userId)
-
-		val entropy = tokens(0)
-		val user = tokens(1)
-
-		if (tokens(2) == hashdigest("SHA-256", Config.get("omegaup.md5.salt", "") + user + entropy)) {
-			try {
-				(user.toInt, userId)
-			} catch {
-				case e: Exception => (-1, userId)
-			}
-		} else {
-			(-1, userId)
-		}
-	}
-
 	override def run(): Unit = {
 		while (true) {
 			val elm = queue.take
@@ -235,8 +208,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		private var session: BroadcasterSession = null
 
 		override def onWebSocketConnect(sess: Session): Unit = {
-			val (userId, token) = getUserId(sess.getUpgradeRequest)
-			session = getSession(userId, token, sess)
+			session = getSession(sess)
 			if (session == null) {
 				sess.close(new CloseStatus(1000, "forbidden"))
 			} else {
@@ -244,8 +216,53 @@ object Broadcaster extends Object with Runnable with Log with Using {
 			}
 		}
 
-		private def getSession(userId: Int, token: String, sess: Session): BroadcasterSession = {
-			if (userId == -1) return null
+		private def getScoreboardSession(sess: Session, contest: String): BroadcasterSession = {
+			val query = sess.getUpgradeRequest.getRequestURI.getQuery.split("=")
+			if (query.length != 2) return null
+			try {
+				val response = Https.post[ContestRoleResponse](
+					Config.get("grader.role.url", "http://localhost/api/contest/role/"),
+					Map("token" -> query(1), "contest_alias" -> contest)
+				)
+				if (response.status == "ok") {
+					return new BroadcasterSession(0, contest, response.admin, sess)
+				}
+			} catch {
+				case e: Exception => {
+					error("Error getting role", e)
+				}
+			}
+			null
+		}
+
+		private def getUserId(request: UpgradeRequest): (Int, String) = {
+			// Find user ID.
+			val cookies = request.getCookies.filter(_.getName == "ouat")
+			val userId = if (cookies.length == 1) {
+				cookies(0).getValue
+			} else {
+				""
+			}
+
+			val tokens = userId.split('-')
+
+			if (tokens.length != 3) return (-1, userId)
+
+			val entropy = tokens(0)
+			val user = tokens(1)
+
+			if (tokens(2) == hashdigest("SHA-256", Config.get("omegaup.md5.salt", "") + user + entropy)) {
+				try {
+					(user.toInt, userId)
+				} catch {
+					case e: Exception => (-1, userId)
+				}
+			} else {
+				(-1, userId)
+			}
+		}
+
+		private def getSession(sess: Session): BroadcasterSession = {
 			val contest = PathRE findFirstIn sess.getUpgradeRequest.getRequestURI.getPath match {
 				case Some(PathRE(contest)) => {
 					contest
@@ -255,6 +272,11 @@ object Broadcaster extends Object with Runnable with Log with Using {
 				}
 			}
 			if (contest == null) return null
+			if (sess.getUpgradeRequest.getRequestURI.getQuery != null) {
+				return getScoreboardSession(sess, contest)
+			}
+			val (userId, token) = getUserId(sess.getUpgradeRequest)
+			if (userId == -1) return null
 			try {
 				val response = Https.post[ContestRoleResponse](
 					Config.get("grader.role.url", "http://localhost/api/contest/role/"),

@@ -1127,7 +1127,6 @@ OmegaUp.prototype.getRanking = function(contestAlias, callback) {
 	});
 };
 
-
 OmegaUp.prototype.getRankingByToken = function(contestAlias, token, callback) {
 	var self = this;
 
@@ -1136,6 +1135,26 @@ OmegaUp.prototype.getRankingByToken = function(contestAlias, token, callback) {
 		function (data) {
 			data.start_time = self.time(data.start_time * 1000);
 			data.finish_time = self.time(data.finish_time * 1000);
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
+OmegaUp.prototype.getRankingEventsByToken = function(contestAlias, token, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/scoreboardevents/contest_alias/' + encodeURIComponent(contestAlias) + '/token/' + encodeURIComponent(token) + '/',
+		function (data) {
 			callback(data);
 		},
 		'json'

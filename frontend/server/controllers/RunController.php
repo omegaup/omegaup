@@ -445,6 +445,9 @@ class RunController extends Controller {
 
 		$response['groups'] = $groups;
 		$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
+		if ($response['source'] == null) {
+			$response['source'] = '';
+		}
 		$response["status"] = "ok";
 		
 		return $response;

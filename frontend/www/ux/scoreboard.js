@@ -1,20 +1,28 @@
 $(document).ready(function() {
 	var arena = new Arena();
 	var params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(window.location.pathname);
-	var contestAlias = params[1];
-	var token = params[2];
+	arena.contestAlias = params[1];
+	arena.scoreboardToken = params[2];
 	var getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
 	
-	// Update scoreboard
-	omegaup.getContestByToken(contestAlias, token, function(contest) {
+	arena.connectSocket();
+	omegaup.getContestByToken(arena.contestAlias, arena.scoreboardToken, function(contest) {
 		arena.initProblems(contest);
 		arena.initClock(contest.start_time, contest.finish_time);
 		$('#title .contest-title').html(contest.title);
 
-		omegaup.getRankingByToken(contestAlias, token, arena.onRankingChanged.bind(arena));
-		if (new Date() < contest.finish_time) {
+		omegaup.getRankingByToken(
+			arena.contestAlias,
+			arena.scoreboardToken,
+			arena.rankingChange.bind(arena)
+		);
+		if (new Date() < contest.finish_time && !arena.socket) {
 			setInterval(function() {
-				omegaup.getRankingByToken(contestAlias, token, arena.onRankingChanged.bind(arena));
+				omegaup.getRankingByToken(
+					arena.contestAlias,
+					arena.scoreboardToken,
+					arena.rankingChange.bind(arena)
+				);
 			}, getRankingByTokenRefresh);
 		}
 

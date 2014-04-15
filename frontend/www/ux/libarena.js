@@ -44,6 +44,9 @@ function Arena() {
 	// The alias of the contest.
 	this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
+	// The token for standalone scoreboards.
+	this.scoreboardToken = null;
+
 	// If websockets are enabled.
 	this.enableSockets = window.location.search.indexOf('ws=on') !== -1;
 
@@ -96,6 +99,9 @@ Arena.prototype.connectSocket = function() {
 		uri = "ws:";
 	}
 	uri += "//" + window.location.host + "/api/contest/events/" + self.contestAlias + "/";
+	if (self.scoreboardToken) {
+		uri += "?token=" + self.scoreboardToken;
+	}
 
 	try {
 		self.socket = new WebSocket(uri, "com.omegaup.events");
@@ -465,7 +471,11 @@ Arena.prototype.displayRun = function(run, r) {
 Arena.prototype.rankingChange = function(data) {
 	var self = this;
 	self.onRankingChanged(data);
-	omegaup.getRankingEvents(self.contestAlias, self.onRankingEvents.bind(self));
+	if (self.scoreboardToken) {
+		omegaup.getRankingEventsByToken(self.contestAlias, self.scoreboardToken, self.onRankingEvents.bind(self));
+	} else {
+		omegaup.getRankingEvents(self.contestAlias, self.onRankingEvents.bind(self));
+	}
 }
 
 Arena.prototype.onRankingChanged = function(data) {

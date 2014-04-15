@@ -169,7 +169,6 @@ $(document).ready(function() {
 			runsProblem	 = $('select.runsproblem  option:selected').val();
 		}
 		
-		console.log("changed select");
 		refreshRuns();
 	});
 	
@@ -314,7 +313,6 @@ $(document).ready(function() {
 
 			var r = arena.createAdminRun(run);
 			arena.displayRun(run, r);
-			console.log(r);
 			$('#runs .runs > tbody').append(r);
 		}
 	}

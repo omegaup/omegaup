@@ -1,6 +1,6 @@
 {include file='arena.head.tpl' jsfile='/ux/scoreboard.js'}
 		<div id="title">
-			<h1 class="contest-title"></h1>
+			<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>
 			<div class="clock">00:00:00</div>
 		</div>		
 		<div id="ranking">			

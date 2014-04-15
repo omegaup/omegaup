@@ -80,11 +80,6 @@
 							<th>{#wordsDetails#}</th>
 						</tr>
 					</thead>
-					<tfoot>
-						<tr>
-							<td colspan="13"><a href="#new-run">Nuevo envío</a></td>
-						</tr>
-					</tfoot>
 					<tbody class="run-list">
 						<tr class="template">
 							<td class="id"></td>
