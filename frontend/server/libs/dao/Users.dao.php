@@ -96,8 +96,8 @@ class UsersDAO extends UsersDAOBase
 								   WHERE Users.main_email_id IS NOT NULL 
 								   GROUP BY user_id
 								   ORDER BY ProblemsSolved DESC, user_id
-						) AS UsersProblemsSolved
-				   ) AS Rank ";
+					) AS UsersProblemsSolved
+				) AS Rank ";
 		($filterByUser) ? $sql .= "WHERE user_id = ? " : $sql .= "ORDER BY Rank ASC, user_id LIMIT $offset, $limit";		
 		
 		$rs = null;

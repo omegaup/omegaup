@@ -46,4 +46,22 @@ class UserRankTest extends OmegaupTestCase {
 		$this->assertEquals($response["name"], $contestant->getName());
 		$this->assertEquals($response["problems_solved"], 1);		
 	}
+	
+	/**
+	 * Tests apiRankByProblemsSolved for a specific user with no runs
+	 */
+	public function testUserRankByProblemsSolvedWith0Runs() {
+		
+		// Create a user and sumbit a run with him
+		$contestant = UserFactory::createUser();		
+		
+		// Call API
+		$response = UserController::apiRankByProblemsSolved(new Request(array(
+			"username" => $contestant->getUsername()
+		)));
+		
+		$this->assertEquals($response["name"], $contestant->getName());
+		$this->assertEquals($response["problems_solved"], 0);		
+		$this->assertEquals($response["rank"], 0);		
+	}
 }

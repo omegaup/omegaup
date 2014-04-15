@@ -8,10 +8,7 @@
 
 <div class="row" id="inner-content">
 	<div class="col-md-2 no-right-padding" id="userbox">
-		<div class="panel panel-default" id="userbox-inner">
-			<div class="panel-heading">
-				<h2 class="panel-title">{$profile.userinfo.username}</h2>
-			</div>
+		<div class="panel panel-default" id="userbox-inner">			
 			<div class="panel-body">
 				<div class="thumbnail bottom-margin"> <img src="{$profile.userinfo.gravatar_92}"/></div>
 				{if isset($profile.userinfo.email)}
@@ -25,7 +22,7 @@
 	<div class="col-md-10 no-right-padding">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h2 class="panel-title">{#profileInfo#}</h2>
+				<h2 class="panel-title">{if $profile.userinfo.rankinfo.rank > 0}#{$profile.userinfo.rankinfo.rank} - {/if}{$profile.userinfo.username}</h2>
 			</div>
 			<div class="panel-body">
 				<div id="SettingsPage_Content">

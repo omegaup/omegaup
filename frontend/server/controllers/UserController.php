@@ -853,15 +853,14 @@ class UserController extends Controller {
 	 */
 	public static function apiProfile(Request $r) {
 
-		self::authenticateRequest($r);
-				
+		self::authenticateRequest($r);				
 		$r["user"] = self::resolveTargetUser($r);
 		
-		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 
-										
-			return UserController::getProfile($r["user"]);
-			
+		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 										
+			return UserController::getProfile($r["user"]);			
 		}, $response);
+				
+		$response["userinfo"]["rankinfo"] = self::getRankByProblemsSolved($r);
 		
 		// Do not leak plain emails in case the request is for a profile other than 
 		// the logged user's one
@@ -1318,7 +1317,7 @@ class UserController extends Controller {
 				} catch (Exception $e) {
 					throw new InvalidDatabaseOperationException($e);
 				}
-
+				
 				if (!is_null($db_results)) {
 					foreach ($db_results as $userEntry) {
 						$user = $userEntry["user"];
@@ -1344,12 +1343,17 @@ class UserController extends Controller {
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
-			if (!is_null($db_results) && count($db_results) > 0) {
-				$entry = $db_results[0];
-				$user = $entry["user"];
-				$response["rank"] = $entry["rank"];
-				$response["name"] = $user->getName();
-				$response["problems_solved"] = $entry["problems_solved"];
+			if (!is_null($db_results)) {
+				if (count($db_results) > 0) {
+					$entry = $db_results[0];					
+					$response["rank"] = $entry["rank"];
+					$response["name"] = $r["user"]->getName();
+					$response["problems_solved"] = $entry["problems_solved"];
+				} else {
+					$response["rank"] = 0;
+					$response["name"] = $r["user"]->getName();
+					$response["problems_solved"] = 0;
+				}				
 			}
 		}
 		
