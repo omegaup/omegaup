@@ -58,7 +58,7 @@ class ClarificationController extends Controller {
 		$response = array();
 
 		$time = time();
-		$clarification = new Clarifications(array(
+		$r['clarification'] = new Clarifications(array(
 			'author_id' => $r['current_user_id'],
 			'contest_id' => $r['contest']->getContestId(),
 			'problem_id' => $r['problem']->getProblemId(),
@@ -70,40 +70,16 @@ class ClarificationController extends Controller {
 		// Insert new Clarification
 		try {
 			// Save the clarification object with data sent by user to the database
-			ClarificationsDAO::save($clarification);
+			ClarificationsDAO::save($r['clarification']);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		// Broadcast the clarification
-		try {
-			$message = json_encode(array(
-				'message' => '/clarification/update/',
-				'clarification' => array(
-					'clarification_id' => $clarification->clarification_id,
-					'problem_alias' => $r['problem']->alias,
-					'author' => $r['current_user']->username,
-					'message' => $clarification->message,
-					'answer' => null,
-					'time' => $time,
-					'public' => false
-				)
-			));
+		$r['user'] = $r['current_user'];
+		self::broadcastClarification($r, $time);
 
-			$grader = new Grader();
-			self::$log->debug("Sending update $message");
-			$grader->broadcast(
-				$r['contest']->alias,
-				$message,
-				false,
-				$r['current_user_id']
-			);
-		} catch(Exception $e) {
-			self::$log->error("Failed to send to broadcaster" . $e->getMessage());
-		}
-
-		$response["clarification_id"] = $clarification->clarification_id;
+		$response["clarification_id"] = $r['clarification']->clarification_id;
 		$response["status"] = "ok";
 
 		return $response;
@@ -178,7 +154,7 @@ class ClarificationController extends Controller {
 
 		// Check that clarification exists
 		try {
-			$r["clarification"] = ClarificationsDAO::getByPK($r["clarification_id"]);
+			$r['clarification'] = ClarificationsDAO::GetByPK($r["clarification_id"]);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -196,7 +172,6 @@ class ClarificationController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiUpdate(Request $r) {
-
 		// Authenticate user
 		self::authenticateRequest($r);
 
@@ -223,34 +198,8 @@ class ClarificationController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		// Broadcast the clarification
-		try {
-			$contest = ContestsDAO::getByPK($r['clarification']->contest_id);
-			$problem = ProblemsDAO::getByPK($r['clarification']->problem_id);
-			$message = json_encode(array(
-				'message' => '/clarification/update/',
-				'clarification' => array(
-					'clarification_id' => $r['clarification']->clarification_id,
-					'problem_alias' => $problem->alias,
-					'author' => $r['current_user']->username,
-					'message' => $r['clarification']->message,
-					'answer' => $r['clarification']->answer,
-					'time' => $time,
-					'public' => $r['public'] != '0'
-				)
-			));
-
-			$grader = new Grader();
-			self::$log->debug("Sending update $message");
-			$grader->broadcast(
-				$contest->alias,
-				$message,
-				false,
-				$r['current_user_id']
-			);
-		} catch(Exception $e) {
-			self::$log->error("Failed to send to broadcaster " . $e->getMessage());
-		}
+		$r['problem'] = $r['contest'] = $r['user'] = null;
+		self::broadcastClarification($r, $time);
 
 		$response = array();
 		$response["status"] = "ok";
@@ -258,4 +207,40 @@ class ClarificationController extends Controller {
 		return $response;
 	}
 
+	private static function broadcastClarification(Request $r, $time) {
+		try {
+			if (is_null($r['problem'])) {
+				$r['problem'] = ProblemsDAO::GetByPK($r['clarification']->problem_id);
+			}
+			if (is_null($r['contest'])) {
+				$r['contest'] = ContestsDAO::GetByPK($r['clarification']->contest_id);
+			}
+			if (is_null($r['user'])) {
+				$r['user'] = UsersDAO::GetByPK($r['clarification']->author_id);
+			}
+			$message = json_encode(array(
+				'message' => '/clarification/update/',
+				'clarification' => array(
+					'clarification_id' => $r['clarification']->clarification_id,
+					'problem_alias' => $r['problem']->alias,
+					'author' => $r['user']->username,
+					'message' => $r['clarification']->message,
+					'answer' => $r['clarification']->answer,
+					'time' => $time,
+					'public' => $r['clarification']->public != '0'
+				)
+			));
+
+			$grader = new Grader();
+			self::$log->debug("Sending update $message");
+			$grader->broadcast(
+				$r['contest']->alias,
+				$message,
+				$r['clarification']->public != '0',
+				$r['clarification']->author_id
+			);
+		} catch(Exception $e) {
+			self::$log->error("Failed to send to broadcaster " . $e->getMessage());
+		}
+	}
 }
