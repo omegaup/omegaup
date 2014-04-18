@@ -71,10 +71,12 @@ $(document).ready(function() {
 
 			arena.setupPolls();
 			refreshRuns();
-			setInterval(function() { 
-				runsOffset = 0; // Return pagination to start on refresh
-				refreshRuns();
-			}, 5 * 60 * 1000);
+			if (!arena.socket) {
+				setInterval(function() {
+					runsOffset = 0; // Return pagination to start on refresh
+					refreshRuns();
+				}, 5 * 60 * 1000);
+			}
 
 			// Trigger the event (useful on page load).
 			$(window).hashchange();
