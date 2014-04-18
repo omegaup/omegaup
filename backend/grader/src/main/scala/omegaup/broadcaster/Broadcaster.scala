@@ -222,7 +222,8 @@ object Broadcaster extends Object with Runnable with Log with Using {
 			try {
 				val response = Https.post[ContestRoleResponse](
 					Config.get("grader.role.url", "http://localhost/api/contest/role/"),
-					Map("token" -> query(1), "contest_alias" -> contest)
+					Map("token" -> query(1), "contest_alias" -> contest),
+					runner = false
 				)
 				if (response.status == "ok") {
 					return new BroadcasterSession(0, contest, response.admin, sess)
@@ -280,7 +281,8 @@ object Broadcaster extends Object with Runnable with Log with Using {
 			try {
 				val response = Https.post[ContestRoleResponse](
 					Config.get("grader.role.url", "http://localhost/api/contest/role/"),
-					Map("auth_token" -> token, "contest_alias" -> contest)
+					Map("auth_token" -> token, "contest_alias" -> contest),
+					runner = false
 				)
 				if (response.status == "ok") {
 					new BroadcasterSession(userId, contest, response.admin, sess)
