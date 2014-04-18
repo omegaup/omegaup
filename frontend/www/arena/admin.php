@@ -1,3 +1,5 @@
 <?php
 require_once('../../server/bootstrap.php');
-$smarty->display('../../templates/arena.admin.tpl');
+$smarty->assign('jsfile', '/ux/admin.js');
+$smarty->assign('admin', true);
+$smarty->display('../../templates/arena.contest.tpl');

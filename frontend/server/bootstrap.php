@@ -102,6 +102,7 @@ require_once("controllers/SessionController.php");
 require_once("controllers/ContestController.php");
 require_once("controllers/ProblemController.php");
 require_once("controllers/RunController.php");
+require_once("controllers/ScoreboardController.php");
 require_once("controllers/ClarificationController.php");
 require_once("controllers/TimeController.php");
 require_once("controllers/GraderController.php");
@@ -167,33 +168,28 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 		$smarty->assign("OMEGAUP_GA_TRACK", 0 );
 	}
 
-	$c_Session = new SessionController;
-	if ($c_Session->CurrentSessionAvailable()) {
+	$userRequest = new Request($_REQUEST);
+	$session = SessionController::apiCurrentSession($userRequest);
+	if ($session['valid']) {
 		$smarty->assign("LOGGED_IN", "1");
 		UITools::$IsLoggedIn = true;
 		
-		$a_CurrentSession = $c_Session->apiCurrentSession();
-		$smarty->assign("CURRENT_USER_USERNAME", $a_CurrentSession["username"]);
-		$smarty->assign("CURRENT_USER_EMAIL", $a_CurrentSession["email"]);
-		$smarty->assign("CURRENT_USER_LANG", "en");
-		$smarty->assign("CURRENT_USER_IS_EMAIL_VERIFIED", $a_CurrentSession["is_email_verified"]);
-		$smarty->assign("CURRENT_USER_IS_ADMIN", $a_CurrentSession["is_admin"]);
-		$smarty->assign("CURRENT_USER_PRIVATE_CONTESTS_COUNT", $a_CurrentSession["private_contests_count"]);
-		$smarty->assign("CURRENT_USER_PRIVATE_PROBLEMS_COUNT", $a_CurrentSession["private_problems_count"]);
-		$smarty->assign("CURRENT_USER_AUTH_TOKEN", $a_CurrentSession["auth_token"]);
-		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", '<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=92">');
-		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", '<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=16">');
-		$smarty->assign("CURRENT_USER_GRAVATAR_URL_32", '<img src="https://secure.gravatar.com/avatar/' . md5($a_CurrentSession["email"]) . '?s=32">');
+		$smarty->assign("CURRENT_USER_USERNAME", $session["username"]);
+		$smarty->assign("CURRENT_USER_EMAIL", $session["email"]);
+		$smarty->assign("CURRENT_USER_IS_EMAIL_VERIFIED", $session["is_email_verified"]);
+		$smarty->assign("CURRENT_USER_IS_ADMIN", $session["is_admin"]);
+		$smarty->assign("CURRENT_USER_PRIVATE_CONTESTS_COUNT", $session["private_contests_count"]);
+		$smarty->assign("CURRENT_USER_PRIVATE_PROBLEMS_COUNT", $session["private_problems_count"]);
+		$smarty->assign("CURRENT_USER_AUTH_TOKEN", $session["auth_token"]);
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", '<img src="https://secure.gravatar.com/avatar/' . md5($session["email"]) . '?s=92">');
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", '<img src="https://secure.gravatar.com/avatar/' . md5($session["email"]) . '?s=16">');
+		$smarty->assign("CURRENT_USER_GRAVATAR_URL_32", '<img src="https://secure.gravatar.com/avatar/' . md5($session["email"]) . '?s=32">');
 		
-		UITools::$isAdmin = $a_CurrentSession["is_admin"];
+		UITools::$isAdmin = $session["is_admin"];
+		$userRequest["username"] = $session["username"];
 	} else {
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", '<img src="/media/avatar_92.png">');
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", '<img src="/media/avatar_16.png">');
-	}
-
-	$userRequest = new Request();
-	if ($c_Session->CurrentSessionAvailable()) {
-		$userRequest["username"] = $a_CurrentSession["username"];
 	}
 
 	$lang = UserController::getPreferredLanguage($userRequest);

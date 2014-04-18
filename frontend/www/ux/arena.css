@@ -34,7 +34,8 @@ legend {
 #root,
 #problem,
 #ranking,
-#clarifications {
+#clarifications,
+#runs {
 	display: none;
 }
 
@@ -55,6 +56,11 @@ legend {
 #title .clock {
 	text-align: center;
 	font-size: 2em;
+}
+#practice #title .clock {
+	font-size: 6em;
+	line-height: .4em;
+	margin-bottom: .2em;
 }
 
 .tabs {

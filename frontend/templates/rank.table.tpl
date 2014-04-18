@@ -46,7 +46,7 @@
 					{
 						html += "<tr><td>" + result.rank[a].rank + "</td><td><b><a href=/profile/"+ result.rank[a].username + ">"
 							+ ""+result.rank[a].username + "</a></b>"
-							+ " "+ (result.rank[a].name == null ? "" : result.rank[a].name) + "</td>"
+							+ "<br/>" + (result.rank[a].name == null ? "&nbsp;" : result.rank[a].name) + "</td>"
 							+ "<td>"+result.rank[a].problems_solved + "</td></tr>";
 					}
 					$("#rank-by-problems-solved>tbody").append(html);

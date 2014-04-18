@@ -36,3 +36,12 @@ case class GroupVeredictMessage(group: String, cases: List[CaseVeredictMessage],
 
 // Broadcaster
 case class ContestRoleResponse(status: String = "ok", admin: Boolean = false)
+case class BroadcastInputMessage(
+  contest: String = "",
+  message: String = "",
+  broadcast: Boolean = false,
+  targetUser: Long = -1,
+  userOnly: Boolean = false
+)
+case class BroadcastOutputMessage(status: String = "ok", error: Option[String] = None)
+case class ScoreboardRefreshResponse(status: String = "ok", error: Option[String] = None, errorcode: Option[String] = None, header: Option[String] = None)

@@ -64,12 +64,16 @@ class SessionController extends Controller {
 		    !is_null(self::$current_session)) {
 			return self::$current_session;
 		}
-		$authToken = SessionController::getAuthToken($r);
 		if (is_null($r)) {
 			$r = new Request();
 		}
-		$r['auth_token'] = $authToken;
-		if ($authToken != null) {
+		if (is_null($r['auth_token'])) {
+			$r['auth_token'] = SessionController::getAuthToken($r);
+		}
+		$authToken = $r['auth_token'];
+		if ($authToken != null &&
+		    defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+		    OMEGAUP_SESSION_CACHE_ENABLED === true) {
 			Cache::getFromCacheOrSet(
 				Cache::SESSION_PREFIX,
 				$authToken,
@@ -79,9 +83,9 @@ class SessionController extends Controller {
 				APC_USER_CACHE_SESSION_TIMEOUT
 			);
 			self::$current_session = $session;
-			return self::$current_session;
+		} else {
+			self::$current_session = SessionController::getCurrentSession($r);
 		}
-		self::$current_session = SessionController::getCurrentSession($r);
 		return self::$current_session;
 	}
 
@@ -89,7 +93,7 @@ class SessionController extends Controller {
 		$SessionM = self::getSessionManagerInstance();
 		$SessionM->sessionStart();
 		$authToken = null;
-		if (!is_null($r)) {
+		if (!is_null($r) && !is_null($r['auth_token'])) {
 			$authToken = $r['auth_token'];
 		} else {
 			$authToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);

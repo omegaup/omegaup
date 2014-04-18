@@ -57,24 +57,29 @@ class ClarificationController extends Controller {
 
 		$response = array();
 
-		$clarification = new Clarifications(array(
-					"author_id" => $r["current_user_id"],
-					"contest_id" => $r["contest"]->getContestId(),
-					"problem_id" => $r["problem"]->getProblemId(),
-					"message" => $r["message"],
-					"public" => '0'
-				));
+		$time = time();
+		$r['clarification'] = new Clarifications(array(
+			'author_id' => $r['current_user_id'],
+			'contest_id' => $r['contest']->getContestId(),
+			'problem_id' => $r['problem']->getProblemId(),
+			'message' => $r['message'],
+			'time' => gmdate('Y-m-d H:i:s', $time),
+			'public' => '0'
+		));
 
 		// Insert new Clarification
 		try {
 			// Save the clarification object with data sent by user to the database
-			ClarificationsDAO::save($clarification);
+			ClarificationsDAO::save($r['clarification']);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		$response["clarification_id"] = $clarification->getClarificationId();
+		$r['user'] = $r['current_user'];
+		self::broadcastClarification($r, $time);
+
+		$response["clarification_id"] = $r['clarification']->clarification_id;
 		$response["status"] = "ok";
 
 		return $response;
@@ -149,7 +154,7 @@ class ClarificationController extends Controller {
 
 		// Check that clarification exists
 		try {
-			$r["clarification"] = ClarificationsDAO::getByPK($r["clarification_id"]);
+			$r['clarification'] = ClarificationsDAO::GetByPK($r["clarification_id"]);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -167,7 +172,6 @@ class ClarificationController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiUpdate(Request $r) {
-
 		// Authenticate user
 		self::authenticateRequest($r);
 
@@ -183,7 +187,8 @@ class ClarificationController extends Controller {
 		self::updateValueProperties($r, $r["clarification"], $valueProperties);
 
 		// Let DB handle time update
-		$r["clarification"]->setTime(NULL);
+		$time = time();
+		$r["clarification"]->time = gmdate('Y-m-d H:i:s', $time);
 
 		// Save the clarification
 		try {
@@ -193,10 +198,49 @@ class ClarificationController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
+		$r['problem'] = $r['contest'] = $r['user'] = null;
+		self::broadcastClarification($r, $time);
+
 		$response = array();
 		$response["status"] = "ok";
 
 		return $response;
 	}
 
+	private static function broadcastClarification(Request $r, $time) {
+		try {
+			if (is_null($r['problem'])) {
+				$r['problem'] = ProblemsDAO::GetByPK($r['clarification']->problem_id);
+			}
+			if (is_null($r['contest'])) {
+				$r['contest'] = ContestsDAO::GetByPK($r['clarification']->contest_id);
+			}
+			if (is_null($r['user'])) {
+				$r['user'] = UsersDAO::GetByPK($r['clarification']->author_id);
+			}
+			$message = json_encode(array(
+				'message' => '/clarification/update/',
+				'clarification' => array(
+					'clarification_id' => $r['clarification']->clarification_id,
+					'problem_alias' => $r['problem']->alias,
+					'author' => $r['user']->username,
+					'message' => $r['clarification']->message,
+					'answer' => $r['clarification']->answer,
+					'time' => $time,
+					'public' => $r['clarification']->public != '0'
+				)
+			));
+
+			$grader = new Grader();
+			self::$log->debug("Sending update $message");
+			$grader->broadcast(
+				$r['contest']->alias,
+				$message,
+				$r['clarification']->public != '0',
+				$r['clarification']->author_id
+			);
+		} catch(Exception $e) {
+			self::$log->error("Failed to send to broadcaster " . $e->getMessage());
+		}
+	}
 }

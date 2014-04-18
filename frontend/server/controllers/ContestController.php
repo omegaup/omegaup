@@ -195,7 +195,6 @@ class ContestController extends Controller {
 	 * @throws PreconditionFailedException
 	 */
 	private static function validateDetails(Request $r) {
-
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		// If the contest is private, verify that our user is invited
@@ -209,23 +208,25 @@ class ContestController extends Controller {
 			throw new NotFoundException("Contest not found");
 		}
 
+		$r['contest_admin'] = false;
 
 		// If the contest has not started, user should not see it, unless it is admin or has a token.
 		if (is_null($r['token'])) {
 			// Crack the request to get the current user
 			self::authenticateRequest($r);
-			
 			self::canAccessContest($r);
-			
-			if (!ContestsDAO::hasStarted($r["contest"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+
+			$r['contest_admin'] = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]);
+			if (!ContestsDAO::hasStarted($r["contest"]) && !$r['contest_admin']) {
 				$exception = new PreconditionFailedException("Contest has not started yet.");
 				$exception->addCustomMessageToArray("start_time", strtotime($r["contest"]->getStartTime()));
 
 				throw $exception;
 			}
 		} else {
-			if ($r["token"] !== $r["contest"]->getScoreboardUrl() &&
-					$r["token"] !== $r["contest"]->getScoreboardUrlAdmin()) {
+			if ($r['token'] === $r['contest']->getScoreboardUrlAdmin()) {
+				$r['contest_admin'] = true;
+			} else if ($r['token'] !== $r['contest']->getScoreboardUrl()) {
 				throw new ForbiddenAccessException("Invalid scoreboard url.");
 			}
 		}
@@ -317,6 +318,7 @@ class ContestController extends Controller {
 				$result['submission_deadline'] = min(
 						strtotime($r["contest"]->getFinishTime()), strtotime($contest_user->getAccessTime()) + $r["contest"]->getWindowLength() * 60);
 			}
+			$result['admin'] = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]);
 		}
 
 		$result["status"] = "ok";
@@ -941,7 +943,7 @@ class ContestController extends Controller {
 		}
 
 		foreach ($clarifications as &$clar) {
-			$clar['can_answer'] = $is_contest_director;
+			$clar['time'] = strtotime($clar['time']);
 		}
 
 		// Add response to array
@@ -962,20 +964,7 @@ class ContestController extends Controller {
 	 */
 	public static function apiScoreboardEvents(Request $r) {
 		// Get the current user
-		self::authenticateRequest($r);
-
-		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
-
-		try {
-			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
-		} catch (Exception $e) {
-			// Operation failed in the data layer
-			throw new InvalidDatabaseOperationException($e);
-		}
-
-		if (is_null($r["contest"])) {
-			throw new NotFoundException("Contest not found");
-		}
+		self::validateDetails($r);
 
 		// Create scoreboard
 		$scoreboard = new Scoreboard(
@@ -1033,20 +1022,11 @@ class ContestController extends Controller {
 		
 		// Create scoreboard
 		$scoreboard = new Scoreboard(
-						$r["contest"]->getContestId(),
-						$showAllRuns
+			$r["contest"]->getContestId(),
+			$showAllRuns
 		);
-
-		// Push scoreboard data in response
-		$response = array();
-		$response["ranking"] = $scoreboard->generate();
 		
-		// Add time left to response
-		$response['start_time'] = strtotime($r["contest"]->getStartTime());		
-		$response['finish_time'] = strtotime($r["contest"]->getFinishTime());		
-		$response['title'] = $r["contest"]->getTitle();		
-
-		return $response;
+		return $scoreboard->generate();
 	}
 	
 	/**
@@ -1093,7 +1073,7 @@ class ContestController extends Controller {
 		
 		// Merge
 		foreach($scoreboards as $contest_alias => $scoreboard) {
-			foreach($scoreboard as $user_results) {
+			foreach($scoreboard['ranking'] as $user_results) {
 				//var_dump($user_results);
 				
 				// If user haven't been added to the merged scoredboard, add him
@@ -1769,15 +1749,14 @@ class ContestController extends Controller {
 
 	public static function apiRole(Request $r) {
 		try {
-			self::authenticateRequest($r);
 			self::validateDetails($r);
 
 			return array(
 				'status' => 'ok',
-				'admin' => Authorization::IsContestAdmin($r["current_user_id"], $r['contest'])
+				'admin' => $r['contest_admin']
 			);
 		} catch (Exception $e) {
-			self::$log->error("Error getting role", $e);
+			self::$log->error("Error getting role: " . $e);
 
 			return array(
 				'status' => 'error',

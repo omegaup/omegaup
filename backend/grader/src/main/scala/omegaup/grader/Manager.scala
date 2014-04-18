@@ -191,6 +191,25 @@ object Manager extends Object with Log {
 							}
 						}
 					}
+					case "/broadcast/" => {
+						try {
+							val req = Serialization.read[BroadcastInputMessage](request.getReader())
+							response.setStatus(HttpServletResponse.SC_OK)
+							Broadcaster.broadcast(
+								req.contest,
+								req.message,
+								req.broadcast,
+								req.targetUser,
+								req.userOnly
+							)
+						} catch {
+							case e: Exception => {
+								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
+								error("Broadcast failed: {}", e)
+								new BroadcastOutputMessage(status = "error", error = Some(e.getMessage))
+							}
+						}
+					}
 					case _ => {
 						response.setStatus(HttpServletResponse.SC_NOT_FOUND)
 						new NullMessage()

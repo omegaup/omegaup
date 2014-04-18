@@ -19,6 +19,7 @@ import omegaup.data._
 case class RunDetails(
 	username: String,
 	contest_alias: Option[String],
+	alias: String,
 	guid: String,
 	runtime: Double,
 	memory: Long,
@@ -32,13 +33,19 @@ case class RunDetails(
 )
 case class UpdateRunMessage(message: String, run: RunDetails)
 
+class QueuedElement(val contest: String, val broadcast: Boolean, val targetUser: Long, val userOnly: Boolean) {}
+class QueuedRun(contest: String, broadcast: Boolean, targetUser: Long, userOnly: Boolean, val run: Run)
+	extends QueuedElement(contest, broadcast, targetUser, userOnly) {}
+class QueuedMessage(contest: String, broadcast: Boolean, targetUser: Long, userOnly: Boolean, val message: String)
+	extends QueuedElement(contest, broadcast, targetUser, userOnly) {}
+
 object Broadcaster extends Object with Runnable with Log with Using {
 	private val PathRE = """^/([a-zA-Z0-9_-]+)/?""".r
 	// A collection of subscribers.
 	private val subscribers = new mutable.HashMap[String, mutable.ArrayBuffer[BroadcasterSession]]
 	private val subscriberLock = new Object
-	private val PoisonPill = new Run
-	private val queue = new LinkedBlockingQueue[Run]
+	private val PoisonPill = new QueuedElement(null, true, -1, false)
+	private val queue = new LinkedBlockingQueue[QueuedElement]
 
 	def subscribe(session: BroadcasterSession) = {
 		subscriberLock.synchronized {
@@ -76,86 +83,95 @@ object Broadcaster extends Object with Runnable with Log with Using {
 	}
 	
 	def update(run: Run): Unit = {
-		queue.put(run)
+		run.contest match {
+			case Some(contest) =>
+				queue.put(new QueuedRun(contest.alias, false, run.user.id, false, run))
+			case None => {}
+		}
 	}
 
-	def getUserId(request: UpgradeRequest): (Int, String) = {
-		// Find user ID.
-		val cookies = request.getCookies.filter(_.getName == "ouat")
-		val userId = if (cookies.length == 1) {
-			cookies(0).getValue
-		} else {
-			""
-		}
-
-		val tokens = userId.split('-')
-
-		if (tokens.length != 3) return (-1, userId)
-
-		val entropy = tokens(0)
-		val user = tokens(1)
-
-		if (tokens(2) == hashdigest("SHA-256", Config.get("omegaup.md5.salt", "") + user + entropy)) {
-			try {
-				(user.toInt, userId)
-			} catch {
-				case e: Exception => (-1, userId)
-			}
-		} else {
-			(-1, userId)
-		}
+	def broadcast(
+		contest: String,
+		message: String,
+		broadcast: Boolean,
+		targetUser: Long = -1,
+		userOnly: Boolean = false
+	): BroadcastOutputMessage = {
+		queue.put(new QueuedMessage(contest, broadcast, targetUser, userOnly, message))
+		new BroadcastOutputMessage(status = "ok")
 	}
 
 	override def run(): Unit = {
 		while (true) {
-			val r = queue.take
-			if (r == PoisonPill) return
+			val elm = queue.take
+			if (elm == PoisonPill) return
 
-			val contest = r.contest.getOrElse(null)
+			val message = elm match {
+				case m: QueuedRun => {
+					val run = m.run
+					implicit val formats = Serialization.formats(NoTypeHints)
 
-			if (contest != null && Config.get("grader.scoreboard_refresh.enable", true)) {
-				try {
-					info("Scoreboard refresh {}",
-						Https.get(
-							Config.get(
-								"grader.scoreboard_refresh.url",
-								"http://localhost/refresh_scoreboard.php?token=secret&id="
-							) + contest.id,
-							runner = false
+					if (Config.get("grader.scoreboard_refresh.enable", true)) {
+						try {
+							info("Scoreboard refresh {}",
+								Https.post[ScoreboardRefreshResponse](
+									Config.get(
+										"grader.scoreboard_refresh.url",
+										"http://localhost/api/scoreboard/refresh/"
+									),
+									Map(
+										"token" -> Config.get("grader.scoreboard_refresh.token", "secret"),
+										"alias" -> elm.contest,
+										"run" -> run.id.toString
+									),
+									runner = false
+								)
+							)
+						} catch {
+							case e: Exception => error("Scoreboard refresh", e)
+						}
+					}
+
+					Serialization.write(
+						UpdateRunMessage("/run/update/",
+							RunDetails(
+								username = run.user.username,
+								contest_alias = Some(elm.contest),
+								alias = run.problem.alias,
+								guid = run.guid,
+								runtime = run.runtime,
+								memory = run.memory,
+								score = run.score,
+								contest_score = run.contest_score,
+								status = run.status.toString,
+								veredict = run.veredict.toString,
+								submit_delay = run.submit_delay,
+								time = run.time.getTime / 1000,
+								language = run.language.toString
+							)
 						)
 					)
-				} catch {
-					case e: Exception => error("Scoreboard refresh", e)
+				}
+
+				case m: QueuedMessage => {
+					m.message
 				}
 			}
 
-			if (contest != null && subscribers.contains(contest.alias)) {
-				implicit val formats = Serialization.formats(NoTypeHints)
-				val data = Serialization.write(
-					UpdateRunMessage("/run/status/",
-						RunDetails(
-							username = r.user.username,
-							contest_alias = Some(contest.alias),
-							guid = r.guid,
-							runtime = r.runtime,
-							memory = r.memory,
-							score = r.score,
-							contest_score = r.contest_score,
-							status = r.status.toString,
-							veredict = r.veredict.toString,
-							submit_delay = r.submit_delay,
-							time = r.time.getTime / 1000,
-							language = r.language.toString
+			subscriberLock.synchronized {
+				if (subscribers.contains(elm.contest)) {
+					subscribers(elm.contest)
+						.filter(subscriber =>
+							(
+								elm.broadcast ||
+								subscriber.admin ||
+								elm.targetUser == subscriber.user
+							) && (
+								!elm.userOnly ||
+								!subscriber.admin
+							)
 						)
-					)
-				)
-				
-				warn("Sending some JSON: {}", data)
-
-				subscriberLock.synchronized {
-					subscribers(contest.alias)
-						.filter(subscriber => r.user.id == subscriber.user || subscriber.admin)
-						.foreach(_.send(data))
+						.foreach(_.send(message))
 				}
 			}
 		}
@@ -192,8 +208,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		private var session: BroadcasterSession = null
 
 		override def onWebSocketConnect(sess: Session): Unit = {
-			val (userId, token) = getUserId(sess.getUpgradeRequest)
-			session = getSession(userId, token, sess)
+			session = getSession(sess)
 			if (session == null) {
 				sess.close(new CloseStatus(1000, "forbidden"))
 			} else {
@@ -201,8 +216,53 @@ object Broadcaster extends Object with Runnable with Log with Using {
 			}
 		}
 
-		private def getSession(userId: Int, token: String, sess: Session): BroadcasterSession = {
-			if (userId == -1) return null
+		private def getScoreboardSession(sess: Session, contest: String): BroadcasterSession = {
+			val query = sess.getUpgradeRequest.getRequestURI.getQuery.split("=")
+			if (query.length != 2) return null
+			try {
+				val response = Https.post[ContestRoleResponse](
+					Config.get("grader.role.url", "http://localhost/api/contest/role/"),
+					Map("token" -> query(1), "contest_alias" -> contest)
+				)
+				if (response.status == "ok") {
+					return new BroadcasterSession(0, contest, response.admin, sess)
+				}
+			} catch {
+				case e: Exception => {
+					error("Error getting role", e)
+				}
+			}
+			null
+		}
+
+		private def getUserId(request: UpgradeRequest): (Int, String) = {
+			// Find user ID.
+			val cookies = request.getCookies.filter(_.getName == "ouat")
+			val userId = if (cookies.length == 1) {
+				cookies(0).getValue
+			} else {
+				""
+			}
+
+			val tokens = userId.split('-')
+
+			if (tokens.length != 3) return (-1, userId)
+
+			val entropy = tokens(0)
+			val user = tokens(1)
+
+			if (tokens(2) == hashdigest("SHA-256", Config.get("omegaup.md5.salt", "") + user + entropy)) {
+				try {
+					(user.toInt, userId)
+				} catch {
+					case e: Exception => (-1, userId)
+				}
+			} else {
+				(-1, userId)
+			}
+		}
+
+		private def getSession(sess: Session): BroadcasterSession = {
 			val contest = PathRE findFirstIn sess.getUpgradeRequest.getRequestURI.getPath match {
 				case Some(PathRE(contest)) => {
 					contest
@@ -212,6 +272,11 @@ object Broadcaster extends Object with Runnable with Log with Using {
 				}
 			}
 			if (contest == null) return null
+			if (sess.getUpgradeRequest.getRequestURI.getQuery != null) {
+				return getScoreboardSession(sess, contest)
+			}
+			val (userId, token) = getUserId(sess.getUpgradeRequest)
+			if (userId == -1) return null
 			try {
 				val response = Https.post[ContestRoleResponse](
 					Config.get("grader.role.url", "http://localhost/api/contest/role/"),

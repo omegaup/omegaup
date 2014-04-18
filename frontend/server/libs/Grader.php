@@ -1,10 +1,7 @@
 <?php
 
 class Grader {
-	private $graderUrl;
-
-	public function Grader($graderUrl = OMEGAUP_GRADER_URL) {
-		$this->graderUrl = $graderUrl;
+	public function Grader() {
 	}
 
 	/**
@@ -84,12 +81,12 @@ class Grader {
 	 * @throws Exception
 	 */
 	public function Grade($runId) {
-		$curl = $this->initGraderCall($this->graderUrl);
+		$curl = $this->initGraderCall(OMEGAUP_GRADER_URL);
 
 		// Set curl Post data
 		curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"id\":$runId}");
 
-		$content = $this->executeCurl($curl);
+		return $this->executeCurl($curl);
 	}
 
 	/**
@@ -103,9 +100,7 @@ class Grader {
 		// Execute call		
 		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));
 
-		$content = $this->executeCurl($curl);
-
-		return $content;
+		return $this->executeCurl($curl);
 	}
 
 	/**
@@ -116,8 +111,18 @@ class Grader {
 	public function status() {
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_STATUS_URL);
 
-		$content = $this->executeCurl($curl);
+		return $this->executeCurl($curl);
+	}
 
-		return $content;
+	public function broadcast($contest_alias, $message, $broadcast, $user_id = -1, $user_only = false) {
+		$curl = $this->initGraderCall(OMEGAUP_GRADER_BROADCAST_URL);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode(array(
+			'contest' => $contest_alias,
+			'message' => $message,
+			'broadcast' => $broadcast,
+			'targetUser' => (int)$user_id,
+			'userOnly' => $user_only
+		)));
+		return $this->executeCurl($curl);
 	}
 }
