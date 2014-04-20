@@ -3,8 +3,60 @@
 	body               { font-family: sans-serif; }
 	tr:nth-child(even) { background-color: #eee; }
 	td.numeric         { text-align: right; }
+	table td {
+		border: 1px solid #000;
+		padding: 0.2em;
+	}
+	.title .data {
+		margin: 0 auto 1em auto;
+	}
+	.title .data tr:nth-child(even) { background-color: transparent; }
+	.statement p, .statement li {
+		line-height: 150%;
+		text-align: justify;
+	}
+	#report > .title {
+		text-align: center;
+	}
+	.statement ul {
+		list-style: disc;
+	}
+
+	.statement ol {
+		list-style: decimal;
+	}
+
+	.statement li {
+		margin-left: 2em;
+	}
+
+	.statement table.sample_io {
+		border: 1px solid #000;
+		background: #eee;
+		margin: 5px;
+		padding : 5px;
+	}
+	.statement .sample_io td {
+		font-size: 11pt;
+		background: #eee;
+		vertical-align: top;
+		padding: 10px;
+		border: 1px solid #000;
+	}
+	.statement .sample_io pre {
+		white-space: pre;
+		word-break: keep-all;
+		word-wrap: normal;
+		background: transparent;
+		border: 0px;
+		padding: 0px;
+		margin: inherit;
+	}
 }
 
 @media print {
+	@page { margin: 1in; }
 	.page-break	   { display: block; page-break-before: always; }
+	table {	page-break-inside: avoid;	}
+	hr { display: none; }
 }

@@ -52,6 +52,9 @@ legend {
 	font-size: 2em;
 	margin: 0.5em;
 }
+body#only-problem #title {
+	display: none;
+}
 
 #title .clock {
 	text-align: center;
@@ -106,6 +109,12 @@ legend {
 	margin-left: 19em;
 	border: 1px solid #ccc;
 	border-width: 0 0 1px 1px;
+}
+body#only-problem .navleft .main {
+	width: 900px;
+	margin: 0 auto;
+	border: none;
+	padding: 1em 7em 2em 7em;
 }
 
 .tab {

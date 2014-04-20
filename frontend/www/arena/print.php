@@ -1,15 +1,14 @@
 <?php
-
-require_once( "../server/bootstrap.php" );
-require_once("api/ApiCaller.php");
+require_once( "../../server/bootstrap.php" );
+require_once("../api/ApiCaller.php");
 $r = new Request(array(
-		"contest_alias" => $_REQUEST["contest"],
+		"contest_alias" => $_REQUEST["alias"],
 		"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 	));
 $r->method = "ContestController::apiDetails";
-$response = ApiCaller::call($r);
+$contest = ApiCaller::call($r);
 
-$problems = $response["problems"];
+$problems = $contest["problems"];
 foreach($problems as &$problem) {
 	$r = new Request(array(
 		"contest_alias" => $_REQUEST["contest"],
@@ -23,5 +22,6 @@ foreach($problems as &$problem) {
 	$problem["statement"] = $response["problem_statement"];
 }
 
+$smarty->assign('contestName', $contest['title']);
 $smarty->assign('problems', $problems);
 $smarty->display('../templates/contest.print.tpl');

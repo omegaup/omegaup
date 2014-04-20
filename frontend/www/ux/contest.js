@@ -100,6 +100,7 @@ $(document).ready(function() {
 	}
 	
 	if (arena.onlyProblem) {
+		$('body').attr('id', 'only-problem');
 		omegaup.getProblem(null, onlyProblemAlias, onlyProblemLoaded)
 	} else {
 		arena.connectSocket();
