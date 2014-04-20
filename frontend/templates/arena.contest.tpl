@@ -98,7 +98,11 @@
 								<th>{#wordsMemoria#}</th>
 								<th>{#wordsTime#}</th>
 								<th>{#wordsStatus#}</th>
+{if $practice}
+								<th>{#wordsPercentage#}</th>
+{else}
 								<th>{#wordsPoints#}</th>
+{/if}
 								<th>{#wordsPenalty#}</th>
 								<th>C&oacute;digo</th>
 							</tr>
@@ -116,7 +120,11 @@
 								<td class="memory"></td>
 								<td class="time"></td>
 								<td class="status"></td>
+{if $practice}
+								<td class="percentage"></td>
+{else}
 								<td class="points"></td>
+{/if}
 								<td class="penalty"></td>
 								<td class="code"></td>
 							</tr>
