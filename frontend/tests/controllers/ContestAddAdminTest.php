@@ -67,5 +67,34 @@ class ContestAddAdminTest extends OmegaupTestCase {
 		$contestData["request"]["title"] = $r["title"];
 		$this->assertContest($contestData["request"]);
 	}
+	
+	/**
+	 * Tests remove admins
+	 */
+	public function testRemoveAdmin() {
+		
+		// Get a contest 
+		$contestData = ContestsFactory::createContest();
+		
+		// Get users
+		$user = UserFactory::createUser();
+		$user2 = UserFactory::createUser();
+		
+		ContestsFactory::addAdminUser($contestData, $user);
+		ContestsFactory::addAdminUser($contestData, $user2);
+		
+		// Prepare request for remove one admin
+		$r = new Request();
+		$r["auth_token"] = $this->login($contestData["director"]);
+		$r["usernameOrEmail"] = $user->getUsername();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		
+		// Call api
+		ContestController::apiRemoveAdmin($r);
+
+		$contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+		$this->AssertFalse(Authorization::IsContestAdmin($user->getUserId(), $contest));
+		$this->AssertTrue(Authorization::IsContestAdmin($user2->getUserId(), $contest));
+	}
 }
 

@@ -871,7 +871,7 @@ class ContestController extends Controller {
 		// Only director is allowed to create problems in contest
 		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException();
-		}
+		}				
 
 		$contest_user = new UserRoles();
 		$contest_user->setContestId($r["contest"]->getContestId());
@@ -881,6 +881,56 @@ class ContestController extends Controller {
 		// Save the contest to the DB
 		try {
 			UserRolesDAO::save($contest_user);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array("status" => "ok");
+	}
+	
+	/**
+	 * Removes an admin from a contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiRemoveAdmin(Request $r) {
+		// Authenticate logged user
+		self::authenticateRequest($r);
+
+		// Check contest_alias
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		$r["user"] = UserController::resolveUser($r["usernameOrEmail"]);
+
+		try {
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// Only admin is alowed to make modifications
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			throw new ForbiddenAccessException();
+		}
+		
+		// Check if admin to delete is actually an admin
+		if (!Authorization::IsContestAdmin($r["user"]->getUserId(), $r["contest"])){
+			throw new NotFoundException();
+		}
+
+		$contest_user = new UserRoles();
+		$contest_user->setContestId($r["contest"]->getContestId());
+		$contest_user->setUserId($r["user"]->getUserId());
+		$contest_user->setRoleId(CONTEST_ADMIN_ROLE);
+
+		// Delete the role
+		try {
+			UserRolesDAO::delete($contest_user);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
