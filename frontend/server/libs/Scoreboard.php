@@ -439,11 +439,11 @@ class Scoreboard {
 		if ($a[self::total_column]["penalty"] != $b[self::total_column]["penalty"]) {
 			return ($a[self::total_column]["penalty"] > $b[self::total_column]["penalty"]) ? 1 : -1;
 		}
-		return compareUserNames($a, $b);
+		return Scoreboard::compareUserNames($a, $b);
 	}
 
 	private static function compareUserNames($a, $b) {
-		return strcmp($a['username'], $b['username']);
+		return strcasecmp($a['username'], $b['username']);
 	}
 
 	private static function compareOrder($a, $b) {
