@@ -55,13 +55,21 @@ class UserProfileTest extends OmegaupTestCase {
 		ContestsFactory::addUser($contests[0], $contestant);
 		ContestsFactory::addUser($contests[1], $contestant);
 		
-		$r = new Request(array(
-			"auth_token" => self::login($contestant)
-		));
+		$problemData = ProblemsFactory::createProblem();
+		ContestsFactory::addProblemToContest($problemData, $contests[0]);
 		
-		$response = UserController::apiContestStats($r);
+		$runData = RunsFactory::createRun($problemData, $contests[0], $contestant);
+		RunsFactory::gradeRun($runData);
 		
-		$this->assertEquals(count($contests), count($response["contests"]));
+		// Get ContestStats		 		
+		$response = UserController::apiContestStats(new Request(
+				array(
+					"auth_token" => self::login($contestant)
+				))
+		);
+		
+		// Result should be 1 since user has only actually participated in 1 contest (submitted run)
+		$this->assertEquals(1, count($response["contests"]));
 	}
 	
 	/*

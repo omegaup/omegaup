@@ -71,4 +71,20 @@ class ContestsDAO extends ContestsDAOBase
 
 		return time() <= strtotime($first_access_time) + $contest->window_length * 60;
 	}
+	
+	public static function getContestsParticipated($user_id) {
+		$sql = "SELECT * from Contests WHERE contest_id IN ("
+				. "SELECT DISTINCT contest_id FROM Runs WHERE user_id = ? AND test = 0 AND contest_id IS NOT NULL"
+				. ")";
+		$params = array($user_id);
+
+		global $conn;
+		$rs = $conn->Execute($sql, $params);
+		$ar = array();
+		foreach ($rs as $foo) {
+			$bar =  new Contests($foo);
+			array_push($ar,$bar);
+		}
+		return $ar;		
+	}
 }

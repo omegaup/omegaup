@@ -983,19 +983,16 @@ class UserController extends Controller {
 		$contest_user_key = new ContestsUsers();
 		$contest_user_key->setUserId($user->getUserId());
 
+		// Get contests where user had at least 1 run
 		try {
-			$db_results = ContestsUsersDAO::search($contest_user_key, "contest_id", 'DESC');
+			$contestsParticipated = ContestsDAO::getContestsParticipated($user->getUserId());
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
 		$contests = array();
-		foreach ($db_results as $result) {
-			
-			// Get contest data
-			$contest_id = $result->getContestId();
-			$contest = ContestsDAO::getByPK($contest_id);
-			
+		foreach ($contestsParticipated as $contest) {
+						
 			// Get user ranking
 			$scoreboardR = new Request(array("auth_token" => $r["auth_token"], "contest_alias" => $contest->getAlias()));
 			$scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
