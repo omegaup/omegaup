@@ -624,6 +624,27 @@ OmegaUp.prototype.addAdminToContest = function(contestAlias, username, callback)
 	});
 };
 
+OmegaUp.prototype.removeAdminFromContest = function(contestAlias, username, callback) {
+	var self = this;
+
+	$.post(
+		'/api/contest/removeAdmin/contest_alias/' + encodeURIComponent(contestAlias) + '/',
+		{			
+			usernameOrEmail : username			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.addUserToContest = function(contestAlias, username, callback) {
 	var self = this;
 

@@ -322,11 +322,8 @@
 									.attr('href', '/profile/' + admin.username + '/')
 									.text(admin.username)
 							))
-							.append($('<td></td>').text(admin.role))
-							.append($('<td></td>'))
-							/*
-							 * TODO: Hacer posible eliminar admins.
-							.append($('<td><button type="button" class="close">&times;</button></td>')
+							.append($('<td></td>').text(admin.role))							
+							.append((admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
 								.click((function(username) {
 									return function(e) {
 										omegaup.removeAdminFromContest(contestAlias, username, function(response) {
@@ -341,8 +338,7 @@
 										});
 									};
 								})(admin.username))
-							)
-							*/
+							)							
 					);
 				}
 			});

@@ -8,7 +8,7 @@
 		<script type="text/javascript" src="/js/jquery.js"></script>
 		<!--<script type="text/javascript" src="/js/jquery-ui.min.js"></script>-->
 		<!--<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js"></script>-->
-		<script type="text/javascript" src="/js/omegaup.js?ts=18"></script>
+		<script type="text/javascript" src="/js/omegaup.js?ts=19"></script>
 		<script type="text/javascript" src="/js/sugar.js"></script>
 		<script type="text/javascript" src="/js/sugar.es.js"></script>
 		<script type="text/javascript" src="/js/highstock.js"></script>
