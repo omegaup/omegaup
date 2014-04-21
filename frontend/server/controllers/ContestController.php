@@ -853,7 +853,6 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiAddAdmin(Request $r) {
-
 		// Authenticate logged user
 		self::authenticateRequest($r);
 
@@ -1177,6 +1176,36 @@ class ContestController extends Controller {
 
 		$response = array();
 		$response["users"] = $users;
+		$response["status"] = "ok";
+
+		return $response;
+	}
+
+	/**
+	 * Returns all contest administrators
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiAdmins(Request $r) {
+		// Authenticate request
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		try {
+			$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $contest)) {
+			throw new ForbiddenAccessException();
+		}
+
+		$response = array();
+		$response["admins"] = UserRolesDAO::getContestAdmins($contest);
 		$response["status"] = "ok";
 
 		return $response;

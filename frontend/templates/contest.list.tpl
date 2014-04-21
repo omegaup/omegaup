@@ -25,11 +25,7 @@
 			<th>{#arenaPracticeStartTime#}</th>
 			<th>{#arenaPracticeEndtime#}</th>
 			<th>{#contestsTablePublic#}</th>
-			<th></th>
-			<th></th>
-			<th></th>
-			<th></th>
-			<th></th>
+			<th colspan="2">Scoreboard</th>
 			<th></th>
 			<th></th>
 			<th></th>
@@ -64,15 +60,12 @@
 						+ '<td><a href="' + makeWorldClockLink(startDate) + '">' + startDate.format("long", "es") + "</a></td>"
 						+ '<td><a href="' + makeWorldClockLink(endDate) + '">' + endDate.format("long", "es") + "</a></td>"
 						+ '<td>'+ ((contests.results[i].public == '1') ? '{#wordsYes#}' : '{#wordsNo#}')  + '</td>'
-						+ '<td><a href="/contestedit.php?contest=' + contests.results[i].alias  + '">{#wordsEdit#}</a></td>'
-						+ '<td><a href="/addproblemtocontest.php?contest=' + contests.results[i].alias  + '">{#contestEditAddProblems#}</a></td>'
-						+ '<td><a href="/addusertoprivatecontest.php?contest=' + contests.results[i].alias  + '">{#contestListAddContestants#}</a></td>'
-						+ '<td><a href="/addadmintocontest.php?contest=' + contests.results[i].alias  + '">{#contestListAddAdmins#}</a></td>'
-						+ "<td><a href='/arena/" + contests.results[i].alias  + "/admin/'>{#contestListSubmissions#}</a></td>"
-						+ "<td>" + ((contests.results[i].scoreboard_url == null) ? "" : "<a href='/arena/" + contests.results[i].alias  + "/scoreboard/" + contests.results[i].scoreboard_url + "'>{#contestScoreboardLink#}</a></td>")
-						+ "<td>" + ((contests.results[i].scoreboard_url == null) ? "" : "<a href='/arena/" + contests.results[i].alias  + "/scoreboard/" + contests.results[i].scoreboard_url_admin + "'>{#contestScoreboardAdminLink#}</a></td>")
-						+ '<td><a href="/conteststats.php?contest=' + contests.results[i].alias  + '">{#profileStatistics#}</a></td>'
-						+ '<td><a href="/contestprint.php?contest=' + contests.results[i].alias  + '">{#contestPrintableVersion#}</a></td>'
+						+ '<td>' + ((contests.results[i].scoreboard_url == null) ? '' : '<a class="glyphicon glyphicon-link" href="/arena/' + contests.results[i].alias  + '/scoreboard/' + contests.results[i].scoreboard_url + '" title="{#contestScoreboardLink#}"> Public</a></td>')
+						+ '<td>' + ((contests.results[i].scoreboard_url_admin == null) ? '' : '<a class="glyphicon glyphicon-link" href="/arena/' + contests.results[i].alias  + '/scoreboard/' + contests.results[i].scoreboard_url_admin + '" title="{#contestScoreboardAdminLink#}"> Admin</a></td>')
+						+ '<td><a class="glyphicon glyphicon-edit" href="/contestedit.php?contest=' + contests.results[i].alias  + '" title="{#wordsEdit#}"></a></td>'
+						+ '<td><a class="glyphicon glyphicon-dashboard" href="/arena/' + contests.results[i].alias  + '/admin/" title="{#contestListSubmissions#}"></a></td>'
+						+ '<td><a class="glyphicon glyphicon-stats" href="/conteststats.php?contest=' + contests.results[i].alias  + '" title="{#profileStatistics#}"></a></td>'
+						+ '<td><a class="glyphicon glyphicon-print" href="/arena/' + contests.results[i].alias  + '/print/" title="{#contestPrintableVersion#}"></a></td>'
 						+ "</tr>";
 				}
 

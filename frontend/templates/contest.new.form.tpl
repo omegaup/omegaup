@@ -22,17 +22,6 @@
 		</div>		
 		{/if}
 		<form class="new_contest_form">
-				{if $IS_UPDATE eq 1}
-					<div class="row">
-						<div class="form-group col-md-6">
-							<label for="contests">{#contestNewFormContestToEdit#}</label>
-							<select class='contests form-control' name='contests' id='contest_alias'>
-								<option value=""></option>
-							</select>
-						</div>
-					</div>
-				{/if}
-				
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="title">{#wordsTitle#}</label>

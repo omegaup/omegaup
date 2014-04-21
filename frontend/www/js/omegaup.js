@@ -23,7 +23,6 @@ OmegaUp.prototype.escape = function(s) {
 
 OmegaUp.ui = {
 	error: function(reason) {
-		window.scroll(0, 0);
 		$('#status .message').html(reason);
 		$('#status')
 			.removeClass('alert-success')
@@ -33,7 +32,6 @@ OmegaUp.ui = {
 	},
 
 	info: function(message) {
-		window.scroll(0, 0);
 		$('#status .message').html(message);
 		$('#status')
 			.removeClass('alert-danger')
@@ -43,7 +41,6 @@ OmegaUp.ui = {
 	},
 
 	success: function(message) {
-		window.scroll(0, 0);
 		$('#status .message').html(message);
 		$('#status')
 			.removeClass('alert-danger')
@@ -869,6 +866,23 @@ OmegaUp.prototype.getContestUsers = function(contestAlias, callback) {
 	});
 };
 
+OmegaUp.prototype.getContestAdmins = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/admins/contest_alias/' + encodeURIComponent(contestAlias) + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
 
 OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 	var self = this;
