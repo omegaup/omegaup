@@ -433,14 +433,13 @@ class Scoreboard {
 	}
 
 	private static function compareUserScores($a, $b) {
-		if ($a[self::total_column]["points"] == $b[self::total_column]["points"]) {
-			if ($a[self::total_column]["penalty"] == $b[self::total_column]["penalty"])
-				return 0;
-
+		if ($a[self::total_column]["points"] != $b[self::total_column]["points"]) {
+			return ($a[self::total_column]["points"] < $b[self::total_column]["points"]) ? 1 : -1;
+		}
+		if ($a[self::total_column]["penalty"] != $b[self::total_column]["penalty"]) {
 			return ($a[self::total_column]["penalty"] > $b[self::total_column]["penalty"]) ? 1 : -1;
 		}
-
-		return ($a[self::total_column]["points"] < $b[self::total_column]["points"]) ? 1 : -1;
+		return compareUserNames($a, $b);
 	}
 
 	private static function compareUserNames($a, $b) {
