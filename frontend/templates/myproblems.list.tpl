@@ -35,9 +35,6 @@
 							<th>{#contestNewFormPublic#}</th>
 							<th></th>
 							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
 						</tr>
 					</thead>
 					<tbody></tbody>
@@ -69,7 +66,6 @@
 						+ "<td><b><a href='/arena/problem/" + problems.results[i].alias  + "/'>" + omegaup.escape(problems.results[i].title) + "</a></b></td>"										
 						+ '<td>'+ ((problems.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
 						+ '<td><a href="/problemedit.php?problem=' + problems.results[i].alias  + '">{#wordsEdit#}</a></td>'
-						+ '<td><a href="/addproblemtocontest.php?problem=' + problems.results[i].alias  + '">{#myproblemsListAddContests#}</a></td>'					
 						+ '<td><a href="/problemstats.php?problem=' + problems.results[i].alias  + '">Estadísticas</a></td>'
 						+ "</tr>";
 				}
