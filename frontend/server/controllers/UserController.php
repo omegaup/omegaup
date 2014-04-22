@@ -994,7 +994,11 @@ class UserController extends Controller {
 		foreach ($contestsParticipated as $contest) {
 						
 			// Get user ranking
-			$scoreboardR = new Request(array("auth_token" => $r["auth_token"], "contest_alias" => $contest->getAlias()));
+			$scoreboardR = new Request(array(
+				"auth_token" => $r["auth_token"], 
+				"contest_alias" => $contest->getAlias(),
+				"token" => $contest->getScoreboardUrlAdmin()
+			));
 			$scoreboardResponse = ContestController::apiScoreboard($scoreboardR);
 			
 			// Grab the place of the current user in the given contest	

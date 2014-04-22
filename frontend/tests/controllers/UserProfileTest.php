@@ -73,6 +73,41 @@ class UserProfileTest extends OmegaupTestCase {
 	}
 	
 	/*
+	 * Test the contest which a certain user has participated.
+	 * API can be accessed by a user who cannot see the contest (contest is private)
+	 */
+	public function testUserContestsPrivateContestOutsider() {
+		
+		$contestant = UserFactory::createUser();
+		
+		$contests = array();
+		$contests[0] = ContestsFactory::createContest(null /*title*/, 0 /*public*/);
+		$contests[1] = ContestsFactory::createContest();
+		
+		ContestsFactory::addUser($contests[0], $contestant);
+		ContestsFactory::addUser($contests[1], $contestant);
+		
+		$problemData = ProblemsFactory::createProblem();
+		ContestsFactory::addProblemToContest($problemData, $contests[0]);
+		
+		$runData = RunsFactory::createRun($problemData, $contests[0], $contestant);
+		RunsFactory::gradeRun($runData);
+		
+		$externalUser = UserFactory::createUser();
+		
+		// Get ContestStats		 		
+		$response = UserController::apiContestStats(new Request(
+				array(
+					"auth_token" => self::login($externalUser),
+					"username" => $contestant->getUsername()
+				))
+		);
+		
+		// Result should be 1 since user has only actually participated in 1 contest (submitted run)
+		$this->assertEquals(1, count($response["contests"]));
+	}
+	
+	/*
 	 * Test the problems solved by user
 	 */
 	public function testProblemsSolved() {
