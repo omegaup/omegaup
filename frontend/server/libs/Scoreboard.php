@@ -359,6 +359,7 @@ class Scoreboard {
 			foreach ($problem_mapping as $id=>$problem) {
 				array_push($user_problems, array(
 					'points' => 0,
+					'percent' => 0,
 					'penalty' => 0,
 					'runs' => 0
 				));
@@ -376,10 +377,11 @@ class Scoreboard {
 		}
 
 		foreach ($runs as $run) {
-			$user_id = $run->getUserId();
-			$problem_id = $run->getProblemId();
-			$contest_score = $run->getContestScore();
-			$is_test = $run->getTest() != 0;
+			$user_id = $run->user_id;
+			$problem_id = $run->problem_id;
+			$contest_score = $run->contest_score;
+			$score = $run->score;
+			$is_test = $run->test != 0;
 
 			$problem =
 				&$users_info[$user_id]['problems'][$problem_mapping[$problem_id]['order']];
@@ -402,6 +404,7 @@ class Scoreboard {
 			if ($problem['points'] < $contest_score ||
 			    $problem['points'] == $contest_score && $problem['penalty'] > $totalPenalty) {
 				$problem['points'] = (int)round($contest_score);
+				$problem['percent'] = (int)round($score * 100);
 				$problem['penalty'] = $totalPenalty;
 			}
 			$problem['runs']++;

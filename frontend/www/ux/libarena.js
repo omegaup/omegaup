@@ -1,4 +1,7 @@
 function Arena() {
+	// The current contest.
+	this.currentContest = null;
+
 	// The interval for clock updates.
 	this.clockInterval = null;
 
@@ -25,6 +28,12 @@ function Arena() {
 
 	// The offset of each user into the ranking table.
 	this.currentRanking = {};
+
+	// The previous ranking information. Useful to show diffs.
+	this.prevRankingState = null;
+
+	// Every time a recent event is shown, have this interval clear it after 30s.
+	this.removeRecentEventClassTimeout = null;
 
 	// The last known scoreboard event stream.
 	this.currentEvents = null;
@@ -192,6 +201,7 @@ Arena.prototype.initClock = function(start, finish, deadline) {
 
 Arena.prototype.initProblems = function(contest) {
 	var self = this;
+	self.currentContest = contest;
 	self.admin = contest.admin;
 	problems = contest.problems;
 	for (var i = 0; i < problems.length; i++) {
@@ -199,19 +209,13 @@ Arena.prototype.initProblems = function(contest) {
 		problems[i].runs = problems[i].runs || [];
 		self.problems[alias] = problems[i];
 
-		$('<th colspan="2"><a href="#problems/' + alias + '" title="' + alias + '">' +
+		$('<th><a href="#problems/' + alias + '" title="' + alias + '">' +
 				problems[i].letter + '</a></th>').insertBefore('#ranking thead th.total');
 		$('<td class="prob_' + alias + '_points"></td>')
 			.insertBefore('#ranking tbody .template td.points');
-		if (contest.show_penalty) {
-			$('<td class="prob_' + alias + '_penalty"></td>')
-				.insertBefore('#ranking tbody .template td.points');
-		}
 	}
-	if (!contest.show_penalty) {
-		$('#ranking thead th').attr('colspan', '');
-		$('#ranking tbody .template .penalty').remove();
-	}
+	$('#ranking thead th').attr('colspan', '');
+	$('#ranking tbody .template .penalty').remove();
 };
 
 Arena.prototype.updateClock = function() {
@@ -483,9 +487,15 @@ Arena.prototype.onRankingChanged = function(data) {
 	$('#mini-ranking tbody tr.inserted').remove();
 	$('#ranking tbody tr.inserted').remove();
 
+	if (self.removeRecentEventClassTimeout) {
+		clearTimeout(self.removeRecentEventClassTimeout);
+		self.removeRecentEventClassTimeout = null;
+	}
+
 	var ranking = data.ranking || [];
 	var newRanking = {};
 	var order = {};
+	var currentRankingState = {};
 
 	for (var i = 0; i < data.problems.length; i++) {
 		order[data.problems[i].alias] = i;
@@ -506,13 +516,51 @@ Arena.prototype.onRankingChanged = function(data) {
 			((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
 		$('.user', r).html(username);
 
+		currentRankingState[username] = {
+			place: rank.place,
+			accepted: {}
+		};
+
 		// Update problem scores.
+		var totalRuns = 0;
 		for (var alias in order) {
 			if (!order.hasOwnProperty(alias)) continue;
 			var problem = rank.problems[order[alias]];
-			
-			$('.prob_' + alias + '_points', r).html(problem.points);
-			$('.prob_' + alias + '_penalty', r).html(problem.penalty + " (" + problem.runs  + ")");
+			totalRuns += problem.runs;
+	
+			var pointsCell = $('.prob_' + alias + '_points', r);
+			if (problem.runs == 0) {
+				pointsCell.html('-');
+			} else if (self.currentContest.show_penalty) {
+				pointsCell.html(
+					'<div class="points">' + (problem.points ? '+' + problem.points : '0') + '</div>\n' +
+					'<div class="penalty">' + problem.penalty + ' (' + problem.runs  + ')</div>'
+				);
+			} else {
+				pointsCell.html(
+					'<div class="points">' + (problem.points ? '+' + problem.points : '0') + '</div>\n' +
+					'<div class="penalty">(' + problem.runs  + ')</div>'
+				);
+			}
+			pointsCell
+				.removeClass('pending accepted wrong');
+			if (problem.runs > 0) {
+				if (problem.percent == 100) {
+					currentRankingState[username].accepted[problem.alias] = true;
+					pointsCell.addClass('accepted');
+					if (this.prevRankingState) {
+						if (!this.prevRankingState[username] ||
+								!this.prevRankingState[username].accepted[problem.alias]) {
+							pointsCell.addClass('recent-event');
+						}
+					}
+				} else if (problem.pending) {
+					pointsCell.addClass('pending');
+				} else if (problem.percent == 0) {
+					pointsCell.addClass('wrong');
+				}
+			}
+
 			if (self.problems[alias]) {
 				if (rank.username == omegaup.username) {
 					$('#problems .problem_' + alias + ' .solved')
@@ -521,9 +569,26 @@ Arena.prototype.onRankingChanged = function(data) {
 			}
 		}
 
-		$('.points', r).html(rank.total.points);
-		$('.penalty', r).html(rank.total.penalty);
-		$('.position', r).html(rank.place);
+		if (self.currentContest.show_penalty) {
+			$('td.points', r).html(
+				'<div class="points">' + rank.total.points + '</div>' +
+				'<div class="penalty">' + rank.total.penalty + ' (' + totalRuns + ')</div>'
+			);
+		} else {
+			$('td.points', r).html(
+				'<div class="points">' + rank.total.points + '</div>' +
+				'<div class="penalty">(' + totalRuns + ')</div>'
+			);
+		}
+		$('.position', r)
+			.html(rank.place)
+			.removeClass('recent-event');
+		if (this.prevRankingState) {
+			if (!this.prevRankingState[username] ||
+					this.prevRankingState[username].place > rank.place) {
+				$('.position', r).addClass('recent-event');
+			}
+		}
 
 		$('#ranking tbody').append(r);
 
@@ -544,6 +609,10 @@ Arena.prototype.onRankingChanged = function(data) {
 	}
 
 	this.currentRanking = newRanking;
+	this.prevRankingState = currentRankingState;
+	self.removeRecentEventClassTimeout = setTimeout(function() {
+		$('.recent-event').removeClass('recent-event');
+	}, 30000);
 };
 
 Arena.prototype.onRankingEvents = function(data) {
@@ -868,6 +937,7 @@ Arena.prototype.onHashChanged = function() {
 								}
 								$('#submit input').hide();
 								$('#submit #lang-select').hide();
+								$('#overlay form').hide();
 								$('#submit').show();
 								$('#clarification').hide();
 								$('#overlay').show();
@@ -921,6 +991,7 @@ Arena.prototype.onHashChanged = function() {
 			$('#overlay, #clarification').show();
 		}
 	} else if (window.location.hash == '#run/details') {
+		$('#overlay form').hide();
 		$('#run-details').show();
 		$('#overlay').show();
 	}

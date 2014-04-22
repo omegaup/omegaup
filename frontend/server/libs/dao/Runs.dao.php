@@ -356,7 +356,7 @@ class RunsDAO extends RunsDAOBase
 	}
 
 	public static final function GetContestRuns($contest_id, $order_by_column) {
-		$sql = "SELECT contest_score, problem_id, user_id, test, time, submit_delay FROM Runs WHERE contest_id = ? AND status = 'ready' AND veredict NOT IN ('CE', 'JE') ORDER BY ?;";
+		$sql = "SELECT score, contest_score, problem_id, user_id, test, time, submit_delay FROM Runs WHERE contest_id = ? AND status = 'ready' AND veredict NOT IN ('CE', 'JE') ORDER BY ?;";
 		$val = array($contest_id, $order_by_column);
 
 		global $conn;
