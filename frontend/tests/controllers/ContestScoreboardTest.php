@@ -28,30 +28,36 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		$contestant = UserFactory::createUser();
 		$contestant2 = UserFactory::createUser();
 		$contestant3 = UserFactory::createUser();
+		$contestDirector = $contestData["director"];
+		$contestAdmin = UserFactory::createUser();
+		ContestsFactory::addAdminUser($contestData, $contestAdmin);
 		
 		// Create runs
 		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
 		$runData1 = RunsFactory::createRun($problemData, $contestData, $contestant);
-		$runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);
+		$runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);		
 		$runData3 = RunsFactory::createRun($problemData, $contestData, $contestant3);
+		$runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
+		$runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
 		
 		// Grade the runs
 		RunsFactory::gradeRun($runData, 0, "CE");
 		RunsFactory::gradeRun($runData1);
-		RunsFactory::gradeRun($runData2, .9, "PA");
-		RunsFactory::gradeRun($runData3, 1.0);
-		
+		RunsFactory::gradeRun($runData2, .9, "PA");		
+		RunsFactory::gradeRun($runData3, 1, "AC", 180);
+		RunsFactory::gradeRun($runDataDirector, 1, "AC", 120);
+		RunsFactory::gradeRun($runDataAdmin, 1, "AC", 110);
+						
 		// Create request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
 		$r["auth_token"] = $this->login($contestant);
 		
 		// Create API
-		$response = ContestController::apiScoreboard($r);								
+		$response = ContestController::apiScoreboard($r);			
 		
 		// Validate that we have ranking
-		$this->assertEquals(3, count($response["ranking"]));
-		
+		$this->assertEquals(3, count($response["ranking"]));		
 		$this->assertEquals($contestant->getUsername(), $response["ranking"][0]["username"]);
 		
 		//Check totals
@@ -60,7 +66,33 @@ class ContestScoreboardTest extends OmegaupTestCase {
 		
 		// Check places
 		$this->assertEquals(1, $response["ranking"][0]["place"]);
-		$this->assertEquals(1, $response["ranking"][1]["place"]);
+		$this->assertEquals(2, $response["ranking"][1]["place"]);
+		$this->assertEquals(3, $response["ranking"][2]["place"]);
+		
+		// Check data per problem
+		$this->assertEquals(100, $response["ranking"][0]["problems"][0]["points"]);
+		$this->assertEquals(60, $response["ranking"][0]["problems"][0]["penalty"]);
+		$this->assertEquals(1, $response["ranking"][0]["problems"][0]["runs"]);
+		
+		// Now get the scoreboard as an contest director
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		$r["auth_token"] = $this->login($contestDirector);
+		
+		// Create API
+		$response = ContestController::apiScoreboard($r);		
+		
+		// Validate that we have ranking
+		$this->assertEquals(3, count($response["ranking"]));		
+		$this->assertEquals($contestant->getUsername(), $response["ranking"][0]["username"]);
+		
+		//Check totals
+		$this->assertEquals(100, $response["ranking"][0]["total"]["points"]);
+		$this->assertEquals(60, $response["ranking"][0]["total"]["penalty"]); /* 60 because contest started 60 mins ago in the default factory */
+		
+		// Check places
+		$this->assertEquals(1, $response["ranking"][0]["place"]);
+		$this->assertEquals(2, $response["ranking"][1]["place"]);
 		$this->assertEquals(3, $response["ranking"][2]["place"]);
 		
 		// Check data per problem

@@ -123,7 +123,7 @@ class RunsFactory {
 	 * @param int $points
 	 * @param string $veredict
 	 */
-	public static function gradeRun($runData, $points = 1, $veredict = "AC") {
+	public static function gradeRun($runData, $points = 1, $veredict = "AC", $submitDelay = null) {
 		
 		$run = RunsDAO::getByAlias($runData["response"]["guid"]);
 		
@@ -131,6 +131,10 @@ class RunsFactory {
 		$run->setScore($points);
 		$run->setContestScore($points * 100);
 		$run->setStatus("ready");
+		
+		if(!is_null($submitDelay)) {
+			$run->setSubmitDelay($submitDelay);
+		}
 		
 		RunsDAO::save($run);				
 	}

@@ -305,9 +305,12 @@ class RunsDAO extends RunsDAOBase {
 
 	public static final function GetAllRelevantUsers($contest_id, $showAllRuns = false, $filterUsersBy = null) {
 
-		// Build SQL statement
+		// Build SQL statement		
 		if (!$showAllRuns) {
-			$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( SELECT DISTINCT Runs.user_id from Runs WHERE ( Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) RunsContests ON Users.user_id = RunsContests.user_id " . (!is_null($filterUsersBy) ? "WHERE Users.username LIKE ?" : "");
+			$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( "
+					. "SELECT DISTINCT Runs.user_id from Runs "
+					. "WHERE ( Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) "
+				. "RunsContests ON Users.user_id = RunsContests.user_id " . (!is_null($filterUsersBy) ? "WHERE Users.username LIKE ?" : "");
 
 			if (is_null($filterUsersBy)) {
 				$val = array($contest_id);
@@ -315,8 +318,12 @@ class RunsDAO extends RunsDAOBase {
 				$val = array($contest_id, $filterUsersBy . "%");
 			}
 		} else {
-			$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id WHERE contest_id = ?";
-			$val = array($contest_id);
+			$sql = "SELECT Users.user_id, username, Users.name from Users "
+					. "INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id "
+					. "WHERE contest_id = ? AND Users.user_id NOT IN"
+						. " (SELECT user_id FROM User_Roles WHERE contest_id = ? OR contest_id = 0)"
+					. "AND Users.user_id != (SELECT director_id FROM Contests where contest_id = ?)";
+			$val = array($contest_id, $contest_id, $contest_id);
 		}
 
 
@@ -334,7 +341,7 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	public static final function GetContestRuns($contest_id, $order_by_column) {
-		$sql = "SELECT contest_score, problem_id, user_id, test, time, submit_delay FROM Runs WHERE contest_id = ? AND status = 'ready' AND veredict NOT IN ('CE', 'JE') ORDER BY ?;";
+		$sql = "SELECT contest_score, problem_id, user_id, test, time, submit_delay FROM Runs WHERE contest_id = ? AND status = 'ready' AND Test = '0' AND veredict NOT IN ('CE', 'JE') ORDER BY ?;";
 		$val = array($contest_id, $order_by_column);
 
 		global $conn;
