@@ -62,7 +62,7 @@ cur.execute("""INSERT INTO Contest_Problems
 db.commit()
 
 # Allow user to open the contest to see the shiny display
-print>>sys.stderr,
+print>>sys.stderr, \
 	'http://localhost:8080/arena/%s/scoreboard/%s?ws=on' % (new_alias, scoreboard_token)
 print>>sys.stderr, 'Press Enter to continue...',
 raw_input()
@@ -108,5 +108,6 @@ cur.close()
 db.close()
 
 # Print some stats
-print t1_all - t0_all
 print times
+print t1_all - t0_all
+print (t1_all - t0_all) / num_rows
