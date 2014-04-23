@@ -50,6 +50,9 @@ function Arena() {
 	// Whether this is a full contest or only a problem.
 	this.onlyProblem = window.location.pathname.indexOf('/problem/') !== -1;
 
+	// Whether this is a scoreboard-only view.
+	this.onlyScoreboard = window.location.pathname.indexOf('/scoreboard/') !== -1;
+
 	// The alias of the contest.
 	this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 
@@ -123,8 +126,10 @@ Arena.prototype.connectSocket = function() {
 				data.run.time = new Date(data.run.time * 1000);
 				self.updateRun(data.run);
 			} else if (data.message == "/clarification/update/") {
-				data.clarification.time = new Date(data.clarification.time * 1000);
-				self.updateClarification(data.clarification);
+				if (!self.onlyScoreboard) {
+					data.clarification.time = new Date(data.clarification.time * 1000);
+					self.updateClarification(data.clarification);
+				}
 			} else if (data.message == '/scoreboard/update/') {
 				self.rankingChange(data.scoreboard);
 			}
