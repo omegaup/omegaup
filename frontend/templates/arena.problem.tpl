@@ -33,7 +33,7 @@
 								<th>{#wordsMemoria#}</th>
 								<th>{#wordsTime#}</th>
 								<th>{#wordsStatus#}</th>
-								<th>{#wordsPoints#}</th>
+								<th>{#wordsPercentage#}</th>
 								<th>{#wordsPenalty#}</th>
 								<th>C&oacute;digo</th>
 							</tr>
@@ -51,7 +51,7 @@
 								<td class="memory"></td>
 								<td class="time"></td>
 								<td class="status"></td>
-								<td class="points"></td>
+								<td class="percentage"></td>
 								<td class="penalty"></td>
 								<td class="code"></td>
 							</tr>
