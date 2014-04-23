@@ -715,6 +715,7 @@ Arena.prototype.createChart = function(series, navigatorSeries) {
 		
 		plotOptions: {
 			series: {
+				animation: false,
 				lineWidth: 3,
 				states: {
 					hover: {
