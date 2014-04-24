@@ -4,57 +4,64 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-{include file='contest.new.form.tpl'}
-
-<div class="panel panel-primary">
-	<div class="panel-heading">
-		<h2 class="panel-title">{#wordsAddProblem#}</h2>
-	</div>
-
-	<div class="panel-body">
-		<form class="form" id="add-problem-form">
-			<div class="form-group">
-				<label for="problems">{#wordsProblems#}</label>
-				<select class='form-control' name='problems' id='problems'>
-					<option value=""></option>
-				</select>
-			</div>
-
-			<div class="form-group">
-				<label for="points">{#contestAddproblemProblemPoints#}</label>
-				<input id='points' name='points' size="3" value="100" class="form-control" />
-			</div>
-
-			<div class="form-group">
-				<label for="order">{#contestAddproblemContestOrder#}</label>
-				<input id='order' name='order' value='1' size="2" class="form-control" />
-			</div>
-
-			<div class="form-group">
-				<input id='' name='request' value='submit' type='hidden'>
-				<button type='submit' class="btn btn-primary">{#wordsAddProblem#}</button>
-			</div>
-		</form>
-	</div>
-
-	<table class="table table-striped">
-		<thead>
-			<th>{#contestAddproblemContestOrder#}</th>
-			<th>{#contestAddproblemProblemName#}</th>
-			<th>{#contestAddproblemProblemPoints#}</th>
-			<th>{#contestAddproblemProblemRemove#}</th>
-		</thead>
-		<tbody id="contest-problems"></tbody>
-	</table>
+<div class="page-header">
+	<h1><span>{#frontPageLoading#}</span> <small></small></h1>
 </div>
 
-<div class="row">
-	<div class="col-md-6">
+<ul class="nav nav-tabs nav-justified" id="sections">
+	<li class="active"><a href="#edit" data-toggle="tab">{#contestEdit#}</a></li>
+	<li><a href="#problems" data-toggle="tab">{#wordsAddProblem#}</a></li>
+	<li><a href="#contestants" data-toggle="tab">{#contestAdduserAddContestant#}</a></li>
+	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
+</ul>
+
+<div class="tab-content">
+	<div class="tab-pane active" id="edit">
+		{include file='contest.new.form.tpl'}
+	</div>
+
+	<div class="tab-pane" id="problems">
 		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<h2 class="panel-title">{#contestAdduserAddContestant#}</h2>
+			<div class="panel-body">
+				<form class="form" id="add-problem-form">
+					<div class="form-group">
+						<label for="problems">{#wordsProblems#}</label>
+						<select class='form-control' name='problems' id='problems'>
+							<option value=""></option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="points">{#contestAddproblemProblemPoints#}</label>
+						<input id='points' name='points' size="3" value="100" class="form-control" />
+					</div>
+
+					<div class="form-group">
+						<label for="order">{#contestAddproblemContestOrder#}</label>
+						<input id='order' name='order' value='1' size="2" class="form-control" />
+					</div>
+
+					<div class="form-group">
+						<input id='' name='request' value='submit' type='hidden'>
+						<button type='submit' class="btn btn-primary">{#wordsAddProblem#}</button>
+					</div>
+				</form>
 			</div>
 
+			<table class="table table-striped">
+				<thead>
+					<th>{#contestAddproblemContestOrder#}</th>
+					<th>{#contestAddproblemProblemName#}</th>
+					<th>{#contestAddproblemProblemPoints#}</th>
+					<th>{#contestAddproblemProblemRemove#}</th>
+				</thead>
+				<tbody id="contest-problems"></tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="tab-pane" id="contestants">
+		<div class="panel panel-primary">
 			<div class="panel-body">
 				<form class="form" id="add-contestant-form">
 					<div class="form-group">
@@ -79,12 +86,8 @@
 		</div>
 	</div>
 
-	<div class="col-md-6">
+	<div class="tab-pane" id="admins">
 		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<h2 class="panel-title">{#omegaupTitleContestAddAdmin#}</h2>
-			</div>
-
 			<div class="panel-body">
 				<form class="form" id="add-admin-form">
 					<div class="form-group">
@@ -112,9 +115,22 @@
 
 <script>
 	$('document').ready(function() {
+		if(window.location.hash){
+			$('#sections').find('a[href="'+window.location.hash+'"]').tab('show');
+		}
+
+		$('#sections').on('click', 'a', function (e) {
+			e.preventDefault();
+			// add this line
+			window.location.hash = $(this).attr('href');
+			$(this).tab('show');
+		});
+
 		var contestAlias = '{$smarty.get.contest}';
 
 		omegaup.getContest(contestAlias, function(contest) {
+			$('.page-header h1 span').html('{#contestEdit#} ' + contest.title);
+			$('.page-header h1 small').html('&ndash; <a href="/arena/' + contestAlias + '/">{#contestDetailsGoToContest#}</a>');
 			$(".new_contest_form #title").val(contest.title);
 			$(".new_contest_form #alias").val(contest.alias);
 			$(".new_contest_form #description").val(contest.description);

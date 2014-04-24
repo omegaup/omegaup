@@ -3,16 +3,14 @@
 {/if}
 
 
-<div class="panel panel-primary	">
+<div class="panel panel-primary">
+	{if $IS_UPDATE neq 1}
 	<div class="panel-heading">
 		<h3 class="panel-title">
-			{if $IS_UPDATE neq 1}
-				{#contestNew#}
-			{else}
-				{#contestEdit#}
-			{/if}
+			{#contestNew#}
 		</h3>
 	</div>
+	{/if}
 	<div class="panel-body">
 		{if $IS_UPDATE neq 1}
 		<div class="btn-group bottom-margin">
