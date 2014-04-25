@@ -447,7 +447,9 @@ Arena.prototype.displayRun = function(run, r) {
 	$('.guid', r).html(self.admin ? run.guid : run.guid.substring(run.guid.length - 5));
 	$('.username', r).html(run.username);
 	$('.language', r).html(run.language);
-	$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');
+	if (run.alias) {
+		$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');
+	}
 
 	$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
 	$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
