@@ -160,7 +160,7 @@
 			var end = list[i].finish_time;
 			
 			if (end > now) {
-				$('#next-contests-list').append('<a href="/arena" class="list-group-item">' + omegaup.escape(list[i].title) + '</a>');
+				$('#next-contests-list').append('<a href="/arena/' + omegaup.escape(list[i].alias) + '" class="list-group-item">' + omegaup.escape(list[i].title) + '</a>');
 			}
 		}
 	  
