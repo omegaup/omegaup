@@ -8,6 +8,7 @@
 				<th>{#wordsTitle#}</th>
 				<th>{#wordsRuns#}</th>
 				<th>{#wordsSolved#}</th>
+				<th>{#wordsRatio#}</th>
 				<th>{#wordsMyScore#}</th>
 			</tr>
 		</thead>
@@ -30,10 +31,14 @@
 			var html = "";
 
 			for (var i = 0; i < problems.results.length; i++) {
+				var accepted = problems.results[i].accepted;
+				var submissions = problems.results[i].submissions;
+				var ratio = (problems.results[i].submissions > 0) ? ((accepted/(submissions*1.0))*100).toFixed(2) : 0.0;
 				html += "<tr>"
 					+ '<td><a href="/arena/problem/' + problems.results[i].alias  + '">' + omegaup.escape(problems.results[i].title) + "</a></td>"
-					+ "<td>" + problems.results[i].submissions + "</td>"
-					+ "<td>" + problems.results[i].accepted + "</td>"
+					+ "<td>" + submissions + "</td>"
+					+ "<td>" + accepted  + "</td>"
+					+ "<td>" + ratio + "%</td>"
 					+ "<td><b>" + problems.results[i].score + "</b></td>"
 					+ "</tr>";
 			}

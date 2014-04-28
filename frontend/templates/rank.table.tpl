@@ -15,7 +15,7 @@
 		<h3 class="panel-title">{#rankHeaderPreCount#} {$length} {#rankHeaderPostCount#}</h3>
 		{if !$is_index}
 			{if $page > 0}
-				<a href="{$smarty.server.PHP_SELF}?p={$page-1}">{#wordsPrevPage#}</a>
+				<a href="{$smarty.server.PHP_SELF}?p={$page-1}">{#wordsPrevPage#}</a> |
 			{/if}
 			<a href="{$smarty.server.PHP_SELF}?p={$page+1}">{#wordsNextPage#}</a>
 		{/if}
@@ -30,12 +30,18 @@
 		</thead>
 		<tbody>
 		</tbody>
-	</table>
-	{if $is_index}
-		<div class="panel-body">
-			<a href='rank.php'>{#rankViewFull#}</a>
-		</div>	
-	{/if}
+	</table>	
+	<div class="panel-body">
+		{if $is_index}
+		<a href='rank.php'>{#rankViewFull#}</a>
+		{else}		
+			{if $page > 0}
+				<a href="{$smarty.server.PHP_SELF}?p={$page-1}">{#wordsPrevPage#}</a> | 
+			{/if}
+			<a href="{$smarty.server.PHP_SELF}?p={$page+1}">{#wordsNextPage#}</a>
+		{/if}
+	</div>	
+
 	<script language="javascript">
 		omegaup.getRankByProblemsSolved(
 				{$length}*{$page},
