@@ -74,8 +74,9 @@ class ContestsDAO extends ContestsDAOBase
 	
 	public static function getContestsParticipated($user_id) {
 		$sql = "SELECT * from Contests WHERE contest_id IN ("
-				. "SELECT DISTINCT contest_id FROM Runs WHERE user_id = ? AND test = 0 AND contest_id IS NOT NULL"
-				. ")";
+					. "SELECT DISTINCT contest_id FROM Runs WHERE user_id = ? AND test = 0 AND contest_id IS NOT NULL"
+			   . ")"
+			   . "ORDER BY contest_id DESC";
 		$params = array($user_id);
 
 		global $conn;
