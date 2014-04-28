@@ -491,6 +491,14 @@ class UserController extends Controller {
 			UserController::$sendEmailOnVerify = false;
 			self::apiCreate($createRequest);
 		} else if (is_null($r["change_password"]) || $r["change_password"] !== "false") {
+			
+			if (!$user->getVerified()) {
+				self::apiVerifyEmail(new Request(array(
+					"auth_token" => $r["auth_token"],
+					"usernameOrEmail" => $username					
+				)));
+			}
+			
 			// Pwd changes are by default unless explictly disabled
 			$resetRequest = new Request();
 			$resetRequest["auth_token"] = $r["auth_token"];
