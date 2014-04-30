@@ -60,7 +60,8 @@ object GraderData {
 				points = rs.getString("points") match {
 					case null => None
 					case x: String => Some(x.toDouble)
-				}
+				},
+				slow = false
 			),
 			contest = rs.getLong("contest_id") match {
 				case 0 => None

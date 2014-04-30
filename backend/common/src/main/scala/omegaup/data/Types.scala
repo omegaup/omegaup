@@ -156,7 +156,8 @@ class Problem(
 	var order: Order = Order.Normal,
 	var open_time: Option[Timestamp] = None,
 	var points: Option[Double] = None,
-	var tolerance: Double = 1e-6
+	var tolerance: Double = 1e-6,
+	var slow: Boolean = false
 ) {
   def copy() =
     new Problem(
@@ -180,7 +181,8 @@ class Problem(
       order = this.order,
       open_time = this.open_time,
       points = this.points,
-      tolerance = this.tolerance
+      tolerance = this.tolerance,
+      slow = this.slow
     )
 }
 

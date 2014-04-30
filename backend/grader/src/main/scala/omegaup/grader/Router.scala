@@ -1,33 +1,134 @@
 package omegaup.grader
 
 import java.util.concurrent._
+import java.text.ParseException
 import omegaup._
 import omegaup.data._
 import omegaup.grader.drivers._
 import omegaup.runner._
+import scala.util.parsing.combinator.syntactical._
+import scala.collection.immutable.{HashMap, HashSet}
 
-object RunnerRouter extends ServiceInterface with Log {
-	private val defaultQueueName = "#default"
-	private val dispatchers = scala.collection.mutable.HashMap[String, RunnerDispatcher](
-		defaultQueueName -> new RunnerDispatcher(defaultQueueName)
-	)
+trait RunRouter {
+	def apply(run: Run): String
+}
+
+object RoutingDescription extends StandardTokenParsers {
+	val defaultQueueName = "#default"
+	lexical.delimiters ++= List("(", ")", "[", "]", "{", "}", ",", ":", "==", "||", "&&")
+	lexical.reserved += ("in", "runners", "condition", "contest", "user", "name", "slow")
+
+	def parse(input: String): (Map[String,String], RunRouter) = routingTable(new lexical.Scanner(input)) match {
+		case Success(table, _) => table
+		case NoSuccess(msg, input) => {
+			System.err.println(input.pos.longString)
+			throw new ParseException(msg, input.offset)
+		}
+	}
+
+	private def routingTable = phrase(rep(queue)) ^^ { (list: List[(String, List[String], RunMatcher)]) => (
+		new HashMap[String,String] ++ list.map { case (name, runners, condition) =>
+			runners.map(_ -> name)
+		}.flatten,
+		new RunRouterImpl(list.map { case (name, runners, condition) => condition -> name })
+	)}
+	private def queue = "{" ~ name ~ "," ~ runners ~ "," ~ condition ~ "}" ^^ { case "{" ~ name ~ "," ~ runners ~ "," ~ condition ~ "}" => (name, runners, condition) }
+	private def name = "name" ~ ":" ~> stringLit
+	private def runners = "runners" ~ ":" ~> stringList
+	private def condition = "condition" ~ ":" ~> expr
+	private def expr: Parser[RunMatcher] = ( "(" ~> expr <~ ")" ) | orExpr
+	private def orExpr: Parser[RunMatcher] = rep1sep(andExpr, "||") ^^ { (andList: List[RunMatcher]) =>
+		andList.length match {
+			case 1 => andList(0)
+			case _ => new OrMatcher(andList)
+		}
+	}
+	private def andExpr: Parser[RunMatcher] = rep1sep(opExpr, "&&") ^^ { (opList: List[RunMatcher]) =>
+		opList.length match {
+			case 1 => opList(0)
+			case _ => new AndMatcher(opList)
+		}
+	}
+	private def opExpr: Parser[RunMatcher] = eqExpr | inExpr | slowExpr
+	private def eqExpr: Parser[RunMatcher] = param ~ "==" ~ stringLit ^^ { case param ~ "==" ~ arg => new EqMatcher(param, arg) }
+	private def inExpr: Parser[RunMatcher] = param ~ "in" ~ stringList ^^ { case param ~ "in" ~ arg => new InMatcher(param, arg) }
+	private def slowExpr: Parser[RunMatcher] = "slow" ^^ { case "slow" => new SlowMatcher() }
+
+	private def param: Parser[String] = "contest" | "user"
+	private def stringList: Parser[List[String]] = "[" ~> rep1sep(stringLit, ",") <~ "]"
+
+	private class RunRouterImpl(routingMap: List[(RunMatcher, String)]) extends Object with RunRouter {
+		def apply(run: Run): String = {
+			for (entry <- routingMap) {
+				if (entry._1(run)) return entry._2
+			}
+			defaultQueueName
+		}
+
+		override def toString(): String = routingMap.toString
+	}
+
+	private trait RunMatcher {
+		def apply(run: Run): Boolean
+		def getParam(run: Run, param: String) = param match {
+			case "contest" => {
+				run.contest match {
+					case None => ""
+					case Some(contest) => contest.alias
+				}
+			}
+			case "user" => run.user.username
+		}
+	}
+
+	private class EqMatcher(param: String, arg: String) extends Object with RunMatcher {
+		def apply(run: Run): Boolean = getParam(run, param) == arg
+		override def toString(): String = param + " == " + arg
+	}
+
+	private class InMatcher(param: String, arg: List[String]) extends Object with RunMatcher {
+		private val set = new HashSet[String]() ++ arg
+		def apply(run: Run): Boolean = set.contains(getParam(run, param))
+		override def toString(): String = param + " in " + "[" + set.mkString(", ") + "]"
+	}
+
+	private class SlowMatcher() extends Object with RunMatcher {
+		def apply(run: Run): Boolean = run.problem.slow
+	}
+
+	private class OrMatcher(arg: List[RunMatcher]) extends Object with RunMatcher {
+		def apply(run: Run): Boolean = arg.exists(_(run))
+		override def toString(): String = "(" + arg.mkString(" || ") + ")"
+	}
+
+	private class AndMatcher(arg: List[RunMatcher]) extends Object with RunMatcher {
+		def apply(run: Run): Boolean = arg.forall(_(run))
+		override def toString(): String = arg.mkString(" && ")
+	}
+}
+
+class RunnerRouter(dispatcherNames: Map[String,String], runRouter: RunRouter) extends ServiceInterface with Log {
+	private val dispatchers = new HashMap[String, RunnerDispatcher] ++
+	(new HashSet[String]() ++ dispatcherNames.map(_._2) + RoutingDescription.defaultQueueName).map { (queue: String) => {
+		queue -> new RunnerDispatcher(queue)
+	}}
 
 	def status() = dispatchers.toMap.map(entry => {entry._1 -> entry._2.status()})
 
 	def register(hostname: String, port: Int): RegisterOutputMessage = {
-		dispatchers(defaultQueueName).register(hostname, port)
+		dispatch(hostname).register(hostname, port)
 	}
 
 	def deregister(hostname: String, port: Int): RegisterOutputMessage = {
-		dispatchers(defaultQueueName).deregister(hostname, port)
+		dispatch(hostname).deregister(hostname, port)
 	}
 
 	def addRunner(runner: RunnerService) = {
-		dispatchers(defaultQueueName).addRunner(runner)
+		dispatch(runner.name).addRunner(runner)
 	}
 
 	def addRun(run: Run) = {
-		dispatchers(defaultQueueName).addRun(run)
+		dispatchers(runRouter(run)).addRun(run)
 	}
 
 	override def stop(): Unit = {
@@ -36,6 +137,11 @@ object RunnerRouter extends ServiceInterface with Log {
 
 	override def join(): Unit = {
 		dispatchers foreach (_._2.join)
+	}
+
+	private def dispatch(hostname: String): RunnerDispatcher = {
+		if (dispatcherNames.contains(hostname)) dispatchers(dispatcherNames(hostname))
+			dispatchers(RoutingDescription.defaultQueueName)
 	}
 }
 
@@ -162,7 +268,7 @@ class RunnerDispatcher(val name: String) extends ServiceInterface with Log {
 							}
 
 							// But do re-queue the run
-							RunnerRouter.addRun(r)
+							dispatcher.addRun(r)
 
 							// And commit suicide
 							throw e
@@ -291,3 +397,5 @@ class RunnerDispatcher(val name: String) extends ServiceInterface with Log {
 		executor.awaitTermination(Long.MaxValue, TimeUnit.NANOSECONDS)
 	}
 }
+
+/* vim: set noexpandtab: */

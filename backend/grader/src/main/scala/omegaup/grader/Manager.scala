@@ -25,6 +25,15 @@ object Manager extends Object with Log {
 		Config.get("db.user", "omegaup"),
 		Config.get("db.password", "")
 	)
+	val runnerRouter = RoutingDescription.parse(
+		try {
+			FileUtil.read(Config.get("grader.routing.file", "routing.conf"))
+		} catch {
+			case e: FileNotFoundException => ""
+		}
+	) match {
+		case (dispatcherNames, runRouter) => new RunnerRouter(dispatcherNames, runRouter)
+	}
 
 	def addListener(listener: Run => Unit) = listeners += listener
 
@@ -60,7 +69,7 @@ object Manager extends Object with Log {
 				GraderData.update(run)
 			}
 
-			RunnerRouter.addRun(run)
+			runnerRouter.addRun(run)
 			new GradeOutputMessage()
 		}
 	}
@@ -93,7 +102,7 @@ object Manager extends Object with Log {
 
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
-			RunnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
+			runnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
 		}
 
 		// the handler
@@ -128,7 +137,7 @@ object Manager extends Object with Log {
 							Logging.init()
 
 							if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
-								RunnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
+								runnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
 							}
 
 							response.setStatus(HttpServletResponse.SC_OK)
@@ -145,7 +154,7 @@ object Manager extends Object with Log {
 						response.setStatus(HttpServletResponse.SC_OK)
 						new StatusOutputMessage(
 							embedded_runner = Config.get("grader.embedded_runner.enable", false),
-							queues = RunnerRouter.status
+							queues = runnerRouter.status
 						)
 					}
 					case "/grade/" => {
@@ -170,7 +179,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							RunnerRouter.register(req.hostname, req.port)
+							runnerRouter.register(req.hostname, req.port)
 						} catch {
 							case e: Exception => {
 								error("Register failed: {}", e)
@@ -183,7 +192,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							RunnerRouter.deregister(req.hostname, req.port)
+							runnerRouter.deregister(req.hostname, req.port)
 						} catch {
 							case e: Exception => {
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
@@ -248,11 +257,11 @@ object Manager extends Object with Log {
 		new ServiceInterface {
 			override def stop(): Unit = {
 				server.stop
-				RunnerRouter.stop
+				runnerRouter.stop
 			}
 			override def join(): Unit = {
 				server.join
-				RunnerRouter.join
+				runnerRouter.join
 			}
 		}
 	}
