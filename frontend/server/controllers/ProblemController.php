@@ -346,6 +346,36 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Returns all problem administrators
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiAdmins(Request $r) {
+		// Authenticate request
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		try {
+			$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (!Authorization::IsProblemAdmin($r["current_user_id"], $problem)) {
+			throw new ForbiddenAccessException();
+		}
+
+		$response = array();
+		$response["admins"] = UserRolesDAO::getProblemAdmins($problem);
+		$response["status"] = "ok";
+
+		return $response;
+	}
+	
+	/**
 	 * Rejudge problem
 	 * 
 	 * @param Request $r

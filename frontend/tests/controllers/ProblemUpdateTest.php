@@ -270,5 +270,47 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$problems = ProblemsDAO::search($problem_mask);
 				
 	}
+	
+	/**
+	 * Tests problem admins list API
+	 */
+	public function testProblemAdmins() {
+		
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Create our new admin
+		$problemAdmin = UserFactory::createUser();
+		
+		// Add admin to the problem
+		$response = ProblemController::apiAddAdmin(new Request(array(
+			"usernameOrEmail" => $problemAdmin->username,
+			"problem_alias" => $problemData["request"]["alias"],
+			"auth_token" => $this->login($problemData["author"])
+		)));
+				
+		$this->assertEquals("ok", $response["status"]);
+		
+		// Get the list of admins
+		$response = ProblemController::apiAdmins(new Request(array(
+			"problem_alias" => $problemData["request"]["alias"],
+			"auth_token" => $this->login($problemData["author"])
+		)));
+
+		$adminFound = false;
+		$authorFound = false;
+		foreach ($response["admins"] as $adminEntry) {
+			if ($adminEntry["username"] == $problemAdmin->username) {
+				$adminFound = true;				
+			}
+			
+			if ($adminEntry["username"] == $problemData["author"]->username) {
+				$authorFound = true;				
+			}
+		}
+		$this->assertTrue($adminFound);
+		$this->assertTrue($authorFound);
+		
+	}
 }
 

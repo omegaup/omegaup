@@ -63,4 +63,50 @@ class UserRolesDAO extends UserRolesDAOBase {
 
 		return $admins;
 	}
+	
+	public static function getProblemAdmins(Problems $problem) {
+		$sql = '
+			SELECT
+				u.username, ur.role_id AS role
+			FROM
+				User_Roles ur
+			INNER JOIN
+				Users u ON u.user_id = ur.user_id
+			WHERE
+				ur.role_id = 1 OR ur.role_id = 3 AND ur.contest_id = ?;';
+		$params = array($problem->problem_id);
+
+		global $conn;
+		$admins = $conn->GetAll($sql, $params);
+
+		$sql = '
+			SELECT
+				u.username
+			FROM
+				Problems p
+			INNER JOIN
+				Users u ON u.user_id = p.author_id
+			WHERE
+			p.problem_id = ?;';
+		$params = array($problem->problem_id);
+		$author = $conn->GetOne($sql, $params);
+		
+		$found = false;
+		for ($i = 0; $i < count($admins); $i++) {
+			if ($admins[$i]['role'] == ADMIN_ROLE)	{
+				$admins[$i]['role'] = 'site-admin';
+			} else if ($admins[$i]['username'] == $author) {
+				$admins[$i]['role'] = 'author';
+				$found = true;
+			} else {
+				$admins[$i]['role'] = 'admin';
+			}
+		}
+
+		if (!$found) {
+			array_push($admins, array('username' => $author, 'role' => 'author'));
+		}
+
+		return $admins;
+	}
 }
