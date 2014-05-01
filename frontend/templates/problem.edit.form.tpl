@@ -97,7 +97,7 @@
 				<div class="no-bottom-margin" id="wmd-preview-statement"></div>
 			</div>
 		</div>
-	</div>
+	</div>			
 	{/if}
 	
 	<div class="row">
@@ -109,9 +109,109 @@
 		{/if}
 		</div>
 	</div>
-		
-
+				
 </form>
 	<p>
 		<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup">{#navHelp#}</a>
 	</p>
+{if $IS_UPDATE eq 1}
+<div class="tab-pane" id="admins">
+	<div class="panel panel-primary">
+		<div class="panel-body">
+			<form class="form" id="add-admin-form">
+				<div class="form-group">
+					<label for="username-admin">{#wordsAdmin#}</label>
+					<input id="username-admin" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
+				</div>
+
+				<input id="user-admin" name="user" value="" type="hidden">
+
+				<button class="btn btn-primary" type='submit'>Agregar {#wordsAdmin#}</button>
+			</form>
+		</div>
+
+		<table class="table table-striped">
+			<thead>
+				<th>{#contestEditRegisteredAdminUsername#}</th>
+				<th>{#contestEditRegisteredAdminRole#}</th>
+				<th>{#contestEditRegisteredAdminDelete#}</th>
+			</thead>
+			<tbody id="problem-admins"></tbody>
+		</table>
+	</div>
+</div>
+{/if}
+
+<script>
+	(function(){
+		var problemAlias = '{$smarty.get.problem}';
+
+		// Add admins typeahead
+		function typeahead(dest) {
+			return {
+				ajax: '/api/user/list/',
+				display: 'label',
+				val: 'label',
+				minLength: 2,
+				itemSelected: function (item, val, text) {
+					$(dest).val(val);
+				}
+			}
+		};
+
+		refreshProblemAdmins();
+		$('#username-admin').typeahead(typeahead('#user-admin'));
+
+		$('#add-admin-form').submit(function() {
+			var username = $('#user-admin').val();
+
+			omegaup.addAdminToProblem(problemAlias, username, function(response) {
+				if (response.status === "ok") {
+					OmegaUp.ui.success("Admin successfully added!");
+					$('div.post.footer').show();
+
+					refreshProblemAdmins();
+				} else {
+					OmegaUp.ui.error(response.error || 'error');
+				}
+			});
+
+			return false; // Prevent refresh
+		});
+
+		function refreshProblemAdmins() {
+			omegaup.getProblemAdmins(problemAlias, function(admins) {
+				$('#problem-admins').empty();
+				// Got the contests, lets populate the dropdown with them
+				for (var i = 0; i < admins.admins.length; i++) {
+					var admin = admins.admins[i];
+					$('#problem-admins').append(
+						$('<tr></tr>')
+							.append($('<td></td>').append(
+								$('<a></a>')
+									.attr('href', '/profile/' + admin.username + '/')
+									.text(admin.username)
+							))
+							.append($('<td></td>').text(admin.role))							
+							.append((admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
+								.click((function(username) {
+									return function(e) {
+										omegaup.removeAdminFromProblem(problemAlias, username, function(response) {
+											if (response.status == "ok") {
+												OmegaUp.ui.success("Admin successfully removed!");
+												$('div.post.footer').show();
+												var tr = e.target.parentElement.parentElement;
+												$(tr).remove();
+											} else {
+												OmegaUp.ui.error(response.error || 'error');
+											}
+										});
+									};
+								})(admin.username))
+							)							
+					);
+				}
+			});
+		}
+	})();
+</script>
