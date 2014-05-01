@@ -11,8 +11,8 @@
 		<script type="text/javascript" src="/js/sugar.js"></script>
 		<script type="text/javascript" src="/js/sugar.es.js"></script>
 		<script type="text/javascript" src="/js/omegaup.js"></script>
-		<script type="text/javascript" src="/ux/libarena.js?ts=3"></script>
-		<script type="text/javascript" src="{$jsfile}?ts=2"></script>
+		<script type="text/javascript" src="/ux/libarena.js?ts=4"></script>
+		<script type="text/javascript" src="{$jsfile}?ts=4"></script>
 {literal}
 		<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
