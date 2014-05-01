@@ -540,7 +540,7 @@ class UserController extends Controller {
 				"DUR" => 4,
 				"GUA" => 4,
 				"GRO" => 4,
-				"HID" => 4,
+				"HID" => 8,
 				"JAL" => 4,
 				"MEX" => 8,
 				"MIC" => 4,
