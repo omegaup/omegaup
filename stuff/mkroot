@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import glob
 import hashlib
 import os
 import os.path
@@ -30,6 +31,10 @@ class Chroot:
 			os.makedirs(self.__chroot_path(path))
 
 	def copyfromhost(self, path, exclude=[]):
+		if '*' in path:
+			for p in glob.glob(path):
+				self.copyfromhost(p, exclude)
+			return
 		self.mkdir(os.path.dirname(path))
 		if os.path.isdir(os.path.realpath(path)):
 			for root, dirs, files in os.walk(path):
@@ -116,7 +121,7 @@ with Chroot('root', '/') as root:
 	root.copyfromhost('/lib/x86_64-linux-gnu/librt.so.1')
 	root.copyfromhost('/lib/x86_64-linux-gnu/libdl.so.2')
 	root.copyfromhost('/lib/x86_64-linux-gnu/libz.so.1')
-	root.copyfromhost('/lib/x86_64-linux-gnu/libc-2.17.so')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libc-2.*.so')
 	root.copyfromhost('/lib64/ld-linux-x86-64.so.2')
 
 	root.write('/etc/passwd',
@@ -152,8 +157,8 @@ with Chroot('root-compilers', '/') as root:
 	root.copyfromhost('/usr/bin/gcc')
 	root.copyfromhost('/usr/bin/g++')
 	root.copyfromhost('/usr/bin/as')
-	root.copyfromhost('/usr/lib/libopcodes-2.23.52-system.20130913.so')
-	root.copyfromhost('/usr/lib/libbfd-2.23.52-system.20130913.so')
+	root.copyfromhost('/usr/lib/libopcodes-2.*-system*.so')
+	root.copyfromhost('/usr/lib/libbfd-2.*-system*.so')
 	root.copyfromhost('/usr/bin/fpc')
 	root.copyfromhost('/usr/bin/ld')
 	root.copyfromhost('/usr/bin/ld.bfd')
@@ -195,7 +200,7 @@ with Chroot('root-compilers', '/') as root:
 	root.copyfromhost('/lib/x86_64-linux-gnu/librt.so.1')
 	root.copyfromhost('/lib/x86_64-linux-gnu/libdl.so.2')
 	root.copyfromhost('/lib/x86_64-linux-gnu/libz.so.1')
-	root.copyfromhost('/lib/x86_64-linux-gnu/libc-2.17.so')
+	root.copyfromhost('/lib/x86_64-linux-gnu/libc-2.*.so')
 	root.copyfromhost('/lib64/ld-linux-x86-64.so.2')
 
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/crtn.o')
