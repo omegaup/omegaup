@@ -188,6 +188,87 @@ class UpdateProblemTest extends OmegaupTestCase {
 		// Check statements still is the original one
 		$statement = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		$this->assertContains("<h1>Entrada</h1>", $statement);					
-	}			
+	}	
+	
+	/** 
+	 * Tests problem admin can edit a problem
+	 */
+	public function testUpdateProblemWithProblemAdmin() {
+		
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Create our new admin
+		$problemAdmin = UserFactory::createUser();
+		
+		// Add admin to the problem
+		$response = ProblemController::apiAddAdmin(new Request(array(
+			"usernameOrEmail" => $problemAdmin->username,
+			"problem_alias" => $problemData["request"]["alias"],
+			"auth_token" => $this->login($problemData["author"])
+		)));
+				
+		$this->assertEquals("ok", $response["status"]);
+		
+		//Call API
+		$newTitle = "new title coadmin";
+		$response = ProblemController::apiUpdate(new Request(array(
+			"problem_alias" => $problemData["request"]["alias"],
+			"title" => $newTitle,
+			"auth_token" => $this->login($problemAdmin)
+		)));
+		
+		// Verify data in DB
+		$problem_mask = new Problems();
+		$problem_mask->setTitle($newTitle);
+		$problems = ProblemsDAO::search($problem_mask);
+		
+		$this->assertTrue(!is_null($problems));
+	}
+	
+	/** 
+	 * Tests removed problem admin can't edit a problem anymore
+	 * 
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testUpdateProblemWithRemovedProblemAdmin() {
+		
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Create our new admin
+		$problemAdmin = UserFactory::createUser();
+		
+		// Add admin to the problem
+		$response = ProblemController::apiAddAdmin(new Request(array(
+			"usernameOrEmail" => $problemAdmin->username,
+			"problem_alias" => $problemData["request"]["alias"],
+			"auth_token" => $this->login($problemData["author"])
+		)));
+				
+		$this->assertEquals("ok", $response["status"]);
+		
+		// Then remove the user		
+		$response = ProblemController::apiRemoveAdmin(new Request(array(
+			"usernameOrEmail" => $problemAdmin->username,
+			"problem_alias" => $problemData["request"]["alias"],
+			"auth_token" => $this->login($problemData["author"])
+		)));
+		$this->assertEquals("ok", $response["status"]);
+		
+		//Call API
+		$newTitle = "new title coadmin";
+		$response = ProblemController::apiUpdate(new Request(array(
+			"problem_alias" => $problemData["request"]["alias"],
+			"title" => $newTitle,
+			"auth_token" => $this->login($problemAdmin)
+		)));
+		
+		// Verify data in DB
+		$problem_mask = new Problems();
+		$problem_mask->setTitle($newTitle);
+		$problems = ProblemsDAO::search($problem_mask);
+				
+	}
 }
 
