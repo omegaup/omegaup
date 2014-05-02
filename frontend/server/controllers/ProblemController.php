@@ -261,7 +261,130 @@ class ProblemController extends Controller {
 			throw new ForbiddenAccessException();
 		}
 	}
+	
+	/**
+	 * Adds an admin to a problem
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiAddAdmin(Request $r) {
+		// Authenticate logged user
+		self::authenticateRequest($r);
 
+		// Check problem_alias
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		$user = UserController::resolveUser($r["usernameOrEmail"]);
+
+		try {
+			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		if (!Authorization::IsProblemAdmin($r["current_user_id"], $r["problem"])) {
+			throw new ForbiddenAccessException();
+		}				
+
+		$problem_user = new UserRoles();
+		$problem_user->setContestId($r["problem"]->problem_id);
+		$problem_user->setUserId($user->user_id);
+		$problem_user->setRoleId(PROBLEM_ADMIN_ROLE);
+
+		// Save the contest to the DB
+		try {
+			UserRolesDAO::save($problem_user);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array("status" => "ok");
+	}
+	
+	/**
+	 * Removes an admin from a contest
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiRemoveAdmin(Request $r) {
+		// Authenticate logged user
+		self::authenticateRequest($r);
+
+		// Check whether problem exists
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		$r["user"] = UserController::resolveUser($r["usernameOrEmail"]);
+
+		try {
+			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		if (!Authorization::IsProblemAdmin($r["current_user_id"], $r["problem"])) {
+			throw new ForbiddenAccessException();
+		}	
+		
+		// Check if admin to delete is actually an admin
+		if (!Authorization::IsProblemAdmin($r["user"]->user_id, $r["problem"])){
+			throw new NotFoundException();
+		}
+
+		$problem_user = new UserRoles();
+		$problem_user->setContestId($r["problem"]->problem_id);
+		$problem_user->setUserId($r["user"]->user_id);
+		$problem_user->setRoleId(PROBLEM_ADMIN_ROLE);
+
+		// Delete the role
+		try {
+			UserRolesDAO::delete($problem_user);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array("status" => "ok");
+	}
+
+	/**
+	 * Returns all problem administrators
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiAdmins(Request $r) {
+		// Authenticate request
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		try {
+			$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (!Authorization::IsProblemAdmin($r["current_user_id"], $problem)) {
+			throw new ForbiddenAccessException();
+		}
+
+		$response = array();
+		$response["admins"] = UserRolesDAO::getProblemAdmins($problem);
+		$response["status"] = "ok";
+
+		return $response;
+	}
+	
 	/**
 	 * Rejudge problem
 	 * 

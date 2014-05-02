@@ -41,7 +41,7 @@ $(document).ready(function() {
 				var f = (function(x, y) {
 					return function() {
 						var t = new Date();
-						$('#loading').html(x + ' ' + formatDelta(y.getTime() - t.getTime()));
+						$('#loading').html(x + ' ' + Arena.formatDelta(y.getTime() - t.getTime()));
 						if (t.getTime() < y.getTime()) {
 							setTimeout(f, 1000);
 						} else {

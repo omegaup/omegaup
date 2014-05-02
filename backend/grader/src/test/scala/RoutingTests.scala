@@ -38,12 +38,14 @@ class RoutingSpec extends FlatSpec {
     router(
       new Run(
         contest = Some(new Contest(alias = "test_contest")),
+        problem = new Problem(),
         user = new User(username = "foo")
       )
     ) should equal (RoutingDescription.defaultQueueName)
     router(
       new Run(
         contest = Some(new Contest(alias = "test_contest")),
+        problem = new Problem(),
         user = new User(username = "test_user")
       )
     ) should equal ("test")

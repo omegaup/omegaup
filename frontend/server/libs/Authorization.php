@@ -5,6 +5,7 @@
  */
 define('ADMIN_ROLE', '1');
 define('CONTEST_ADMIN_ROLE', '2');
+define('PROBLEM_ADMIN_ROLE', '3');
 
 class Authorization {
 	public static function CanViewRun($user_id, Runs $run) {
@@ -88,7 +89,7 @@ class Authorization {
 			return false;
 		}
 
-		return ($problem->getAuthorId() === $user_id || Authorization::IsSystemAdmin($user_id));
+		return Authorization::IsProblemAdmin($user_id, $problem);
 	}
 
 	public static function IsContestAdmin($user_id, Contests $contest) {
@@ -108,6 +109,25 @@ class Authorization {
 		}
 		
 		return ($contest->getDirectorId() === $user_id) || self::IsSystemAdmin($user_id);
+	}
+	
+	public static function IsProblemAdmin($user_id, Problems $problem) {
+		if (is_null($problem)) {
+			return false;
+		}
+
+		try {
+			$ur = UserRolesDAO::getByPK($user_id, PROBLEM_ADMIN_ROLE, $problem->problem_id);
+			
+			if (!is_null($ur)) {
+				return true;
+			}
+			
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+		
+		return ($problem->author_id === $user_id) || self::IsSystemAdmin($user_id);
 	}
 
 	public static function IsSystemAdmin($user_id) {

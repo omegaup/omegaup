@@ -140,7 +140,9 @@ class RunnerRouter(dispatcherNames: Map[String,String], runRouter: RunRouter) ex
 	}
 
 	private def dispatch(hostname: String): RunnerDispatcher = {
-		if (dispatcherNames.contains(hostname)) dispatchers(dispatcherNames(hostname))
+		if (dispatcherNames.contains(hostname))
+			dispatchers(dispatcherNames(hostname))
+		else
 			dispatchers(RoutingDescription.defaultQueueName)
 	}
 }
@@ -356,7 +358,8 @@ class RunnerDispatcher(val name: String) extends ServiceInterface with Log {
 
 	private def addRunnerLocked(runner: RunnerService) = {
 		debug("Adding runner {}", runner)
-		runnerQueue += runner
+		if (!runnerQueue.contains(runner))
+			runnerQueue += runner
 		dispatchLocked
 	}
 

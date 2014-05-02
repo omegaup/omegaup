@@ -41,57 +41,83 @@ class GraderSpec extends FlatSpec with Matchers {
 	}
 
 	"Grader" should "work properly" in {
-		TokenCaselessGrader.gradeCase(null,
-					      "test",
-					      new File("grader/src/test/resources/A/sample.out"),
-					      new File("grader/src/test/resources/B/sample.out")) should equal (1.0)
-		TokenCaselessGrader.gradeCase(null,
-					      "test",
-					      new File("grader/src/test/resources/A/easy.00.out"),
-					      new File("grader/src/test/resources/B/easy.00.out")) should equal (1.0)
-		TokenCaselessGrader.gradeCase(null,
-					      "test",
-					      new File("grader/src/test/resources/A/easy.01.out"),
-					      new File("grader/src/test/resources/B/easy.01.out")) should equal (0.0)
-		TokenCaselessGrader.gradeCase(null,
-					      "test",
-					      new File("grader/src/test/resources/A/medium.00.out"),
-					      new File("grader/src/test/resources/B/medium.00.out")) should equal (0.0)
-		TokenCaselessGrader.gradeCase(null,
-					      "test",
-					      new File("grader/src/test/resources/A/medium.01.out"),
-					      new File("grader/src/test/resources/B/medium.01.out")) should equal (0.0)
-		TokenNumericGrader.gradeCase(null,
-					     "test",
-					     new File("grader/src/test/resources/A/artista02.out"),
-					     new File("grader/src/test/resources/B/artista02.out")) should equal (1.0)
+		TokenCaselessGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/A/sample.out"),
+			new File("grader/src/test/resources/B/sample.out"),
+			null) should equal (1.0)
+		TokenCaselessGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/A/easy.00.out"),
+			new File("grader/src/test/resources/B/easy.00.out"),
+			null) should equal (1.0)
+		TokenCaselessGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/A/easy.01.out"),
+			new File("grader/src/test/resources/B/easy.01.out"),
+			null) should equal (0.0)
+		TokenCaselessGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/A/medium.00.out"),
+			new File("grader/src/test/resources/B/medium.00.out"),
+			null) should equal (0.0)
+		TokenCaselessGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/A/medium.01.out"),
+			new File("grader/src/test/resources/B/medium.01.out"),
+			null) should equal (0.0)
+		TokenNumericGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/A/artista02.out"),
+			new File("grader/src/test/resources/B/artista02.out"),
+			null) should equal (1.0)
 
-		TokenCaselessGrader.gradeCase(null,
-					      "test",
-					      new File("grader/src/test/resources/grade_A.out"),
-					      new File("grader/src/test/resources/grade_B.out")) should equal (1.0)
-		TokenGrader.gradeCase(null,
-				      "test",
-				      new File("grader/src/test/resources/grade_A.out"),
-				      new File("grader/src/test/resources/grade_B.out")) should equal (0.0)
-		TokenNumericGrader.gradeCase(null,
-					     "test",
-					     new File("grader/src/test/resources/grade_A.out"),
-					     new File("grader/src/test/resources/grade_B.out")) should equal (1.0)
+		TokenCaselessGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/grade_A.out"),
+			new File("grader/src/test/resources/grade_B.out"),
+			null) should equal (1.0)
+		TokenGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/grade_A.out"),
+			new File("grader/src/test/resources/grade_B.out"),
+			null) should equal (0.0)
+		TokenNumericGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/grade_A.out"),
+			new File("grader/src/test/resources/grade_B.out"),
+			null) should equal (1.0)
 	}
 
 	"Grader" should "be tolerant to large files" in {
-		TokenNumericGrader.gradeCase(null,
-					     "test",
-					     new File("grader/src/test/resources/A.out"),
-					     new File("grader/src/test/resources/B.out")) should equal (0.0)
-		TokenNumericGrader.gradeCase(null,
-					     "test",
-					     new File("grader/src/test/resources/A.out"),
-					     new File("grader/src/test/resources/A.out")) should equal (0.0)
-		TokenNumericGrader.gradeCase(null,
-					     "test",
-					     new File("grader/src/test/resources/B.out"),
-					     new File("grader/src/test/resources/B.out")) should equal (1.0)
+		TokenNumericGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/A.out"),
+			new File("grader/src/test/resources/B.out"),
+			null) should equal (0.0)
+		TokenNumericGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/A.out"),
+			new File("grader/src/test/resources/A.out"),
+			null) should equal (0.0)
+		TokenNumericGrader.gradeCase(
+			null,
+			"test",
+			new File("grader/src/test/resources/B.out"),
+			new File("grader/src/test/resources/B.out"),
+			null) should equal (1.0)
 	}
 }
+
+/* vim: set noexpandtab: */

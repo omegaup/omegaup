@@ -9,7 +9,7 @@ case class CaseData(name: String, data: String)
 case class CompileInputMessage(lang: String, code: List[(String, String)], master_lang: Option[String] = None, master_code: Option[List[(String, String)]] = None)
 case class CompileOutputMessage(status: String = "ok", error: Option[String] = None, token: Option[String] = None)
 
-case class RunInputMessage(token: String, timeLimit: Float = 1, memoryLimit: Int = 65535, outputLimit: Long = 10240, input: Option[String] = None, cases: Option[List[CaseData]] = None)
+case class RunInputMessage(token: String, timeLimit: Float = 1, memoryLimit: Int = 65535, outputLimit: Long = 10240, debug: Boolean = false, input: Option[String] = None, cases: Option[List[CaseData]] = None)
 case class RunOutputMessage(status: String = "ok", error: Option[String] = None, results: Option[List[RunCaseResult]] = None)
 
 case class InputOutputMessage(status: String = "ok", error: Option[String] = None)
@@ -25,7 +25,7 @@ case class QueueStatus(
   runners: List[String],
   running: List[Running]
 )
-case class GradeInputMessage(id: Int)
+case class GradeInputMessage(id: Int, debug: Boolean = false)
 case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
 case class RegisterInputMessage(hostname: String, port: Int)
 case class RegisterOutputMessage(status: String = "ok", error: Option[String] = None)

@@ -645,6 +645,48 @@ OmegaUp.prototype.removeAdminFromContest = function(contestAlias, username, call
 	});
 };
 
+OmegaUp.prototype.addAdminToProblem = function(problemAlias, username, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/addAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		{			
+			usernameOrEmail : username			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.removeAdminFromProblem = function(problemAlias, username, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/removeAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		{			
+			usernameOrEmail : username			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.addUserToContest = function(contestAlias, username, callback) {
 	var self = this;
 
@@ -905,6 +947,24 @@ OmegaUp.prototype.getContestAdmins = function(contestAlias, callback) {
 	});
 };
 
+OmegaUp.prototype.getProblemAdmins = function(problemAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/problem/admins/problem_alias/' + encodeURIComponent(problemAlias) + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 	var self = this;
 
@@ -1123,11 +1183,11 @@ OmegaUp.prototype.runSource = function(guid, callback) {
 	});
 };
 
-OmegaUp.prototype.runRejudge = function(guid, callback) {
+OmegaUp.prototype.runRejudge = function(guid, debug, callback) {
 	var self = this;
 
 	$.get(
-		'/api/run/rejudge/run_alias/' + encodeURIComponent(guid) + '/',
+		'/api/run/rejudge/run_alias/' + encodeURIComponent(guid) + '/' + (debug ? 'debug/true/' : ''),
 		function (data) {
 			callback(data);
 		},

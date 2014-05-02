@@ -233,40 +233,16 @@ Arena.prototype.updateClock = function() {
 	var clock = "";
 
 	if (date < this.startTime.getTime()) {
-		clock = "-" + this.formatDelta(this.startTime.getTime() - (date + omegaup.deltaTime));
+		clock = "-" + Arena.formatDelta(this.startTime.getTime() - (date + omegaup.deltaTime));
 	} else if (date > countdownTime.getTime()) {
 		clock = "00:00:00";
 		clearInterval(this.clockInterval);
 		this.clockInterval = null;
 	} else {
-		clock = this.formatDelta(countdownTime.getTime() - (date + omegaup.deltaTime));
+		clock = Arena.formatDelta(countdownTime.getTime() - (date + omegaup.deltaTime));
 	}
 
 	$('#title .clock').html(clock);
-};
-
-Arena.prototype.formatDelta = function(delta) {
-	var days = Math.floor(delta / (24 * 60 * 60 * 1000));
-	delta -= days * (24 * 60 * 60 * 1000);
-	var hours = Math.floor(delta / (60 * 60 * 1000));
-	delta -= hours * (60 * 60 * 1000);
-	var minutes = Math.floor(delta / (60 * 1000));
-	delta -= minutes * (60 * 1000);
-	var seconds = Math.floor(delta / 1000);
-
-	var clock = "";
-
-	if (days > 0) {
-		clock += days + ":";
-	}
-	if (hours < 10) clock += "0";
-	clock += hours + ":";
-	if (minutes < 10) clock += "0";
-	clock += minutes + ":";
-	if (seconds < 10) clock += "0";
-	clock += seconds;
-
-	return clock;
 };
 
 Arena.prototype.updateRunFallback = function(guid, orig_run) {
@@ -321,7 +297,17 @@ Arena.prototype.createAdminRun = function(run) {
 	(function(guid, run, row) {
 		$('.rejudge', row).append($('<input type="button" value="rejudge" />').click(function() {
 			$('.status', row).html('rejudging').css('background-color', '');
-			omegaup.runRejudge(guid, function() {
+			omegaup.runRejudge(guid, false, function() {
+				self.updateRunFallback(guid, run);
+			});
+		}));
+	})(run.guid, run, r);
+
+	// Debug-Rejudge
+	(function(guid, run, row) {
+		$('.rejudge', row).append($('<input type="button" value="debug" />').click(function() {
+			$('.status', row).html('rejudging').css('background-color', '');
+			omegaup.runRejudge(guid, true, function() {
 				self.updateRunFallback(guid, run);
 			});
 		}));
@@ -343,6 +329,7 @@ Arena.prototype.createAdminRun = function(run) {
 				$('#run-details .cases div').remove();
 				$('#run-details .cases table').remove();
 				$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
+				$('#run-details .download a.details').attr('href', '/api/run/download/run_alias/' + guid + '/complete/true/');
 
 				function numericSort(key) {
 					function isDigit(x) {
@@ -1027,4 +1014,28 @@ Arena.prototype.onHashChanged = function() {
 			$('#clarifications-count').css("font-weight", "normal");
 		}
 	}
+};
+
+Arena.formatDelta = function(delta) {
+	var days = Math.floor(delta / (24 * 60 * 60 * 1000));
+	delta -= days * (24 * 60 * 60 * 1000);
+	var hours = Math.floor(delta / (60 * 60 * 1000));
+	delta -= hours * (60 * 60 * 1000);
+	var minutes = Math.floor(delta / (60 * 1000));
+	delta -= minutes * (60 * 1000);
+	var seconds = Math.floor(delta / 1000);
+
+	var clock = "";
+
+	if (days > 0) {
+		clock += days + ":";
+	}
+	if (hours < 10) clock += "0";
+	clock += hours + ":";
+	if (minutes < 10) clock += "0";
+	clock += minutes + ":";
+	if (seconds < 10) clock += "0";
+	clock += seconds;
+
+	return clock;
 };

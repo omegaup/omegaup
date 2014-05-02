@@ -292,17 +292,18 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
                           outputFile = casePath + ".out",
                           errorFile = casePath + ".err"
               )
-            
-              if (!Config.get("runner.preserve", false)) new File(casePath + ".in").delete
             }}
           }
         }
       }
     
       val zipOutput = new ZipOutputStream(new FileOutputStream(zipFile.getCanonicalPath))
-    
+   
+      var addedValidator = false
       runDirectory.listFiles.filter { _.getName.endsWith(".meta") } .foreach { (x) => {
         val meta = MetaFile.load(x.getCanonicalPath)
+        var addedErr = false
+        var addedOut = false
       
         if(meta("status") == "OK") {
           val validatorDirectory = new File(runDirectory.getCanonicalPath + "/validator")
@@ -331,6 +332,29 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
                         originalInputFile = Some(inputFile.getCanonicalPath),
                         runMetaFile = Some(x.getCanonicalPath)
             )
+
+            if (message.debug) {
+              if (!addedValidator) {
+                addedValidator = true
+                zipOutput.putNextEntry(new ZipEntry("validator/"))
+              }
+
+              zipOutput.putNextEntry(new ZipEntry("validator/" + caseName + ".meta"))
+              using (new FileInputStream(caseFile + ".meta")) {
+                inputStream => FileUtil.copy(inputStream, zipOutput)
+              }
+              zipOutput.closeEntry
+              zipOutput.putNextEntry(new ZipEntry("validator/" + caseName + ".out"))
+              using (new FileInputStream(caseFile + ".out")) {
+                inputStream => FileUtil.copy(inputStream, zipOutput)
+              }
+              zipOutput.closeEntry
+              zipOutput.putNextEntry(new ZipEntry("validator/" + caseName + ".err"))
+              using (new FileInputStream(caseFile + ".err")) {
+                inputStream => FileUtil.copy(inputStream, zipOutput)
+              }
+              zipOutput.closeEntry
+            }
             
             val metaAddendum = try {
               using (new BufferedReader(new FileReader(caseFile + ".out"))) { reader => {
@@ -353,6 +377,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
             inputStream => FileUtil.copy(inputStream, zipOutput)
           }
           zipOutput.closeEntry
+          addedOut = true
         } else if((meta("status") == "RE" && lang == "java") ||
                   (meta("status") == "SG" && lang == "cpp") ||
                   (meta("status") == "SG" && lang == "cpp11")) {
@@ -361,6 +386,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
             inputStream => FileUtil.copy(inputStream, zipOutput)
           }
           zipOutput.closeEntry
+          addedErr = true
         }
         
         zipOutput.putNextEntry(new ZipEntry(x.getName))
@@ -368,11 +394,22 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
           FileUtil.copy(inputStream, zipOutput)
         }}
         zipOutput.closeEntry
-      
-        if (!Config.get("runner.preserve", false)) {
-          x.delete
-          new File(x.getCanonicalPath.replace(".meta", ".err")).delete
-          new File(x.getCanonicalPath.replace(".meta", ".out")).delete
+
+        if (message.debug) {
+          if (!addedErr) {
+            zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
+            using (new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))) {
+              inputStream => FileUtil.copy(inputStream, zipOutput)
+            }
+            zipOutput.closeEntry
+          }
+          if (!addedOut) {
+            zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".out")))
+            using (new FileInputStream(x.getCanonicalPath.replace(".meta", ".out"))) {
+              inputStream => FileUtil.copy(inputStream, zipOutput)
+            }
+            zipOutput.closeEntry
+          }
         }
       }}
     

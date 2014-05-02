@@ -49,6 +49,7 @@ object OmegaUpDriver extends Driver with Log {
     ).trim
     val msg = new RunInputMessage(
       output.token.get,
+      debug = run.debug,
       timeLimit = run.problem.time_limit match {
         case Some(x) => x / 1000.0f
         case _ => 1.0f
