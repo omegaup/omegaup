@@ -61,7 +61,7 @@ object GraderData {
 					case null => None
 					case x: String => Some(x.toDouble)
 				},
-				slow = false
+				slow = rs.getInt("slow") == 1
 			),
 			contest = rs.getLong("contest_id") match {
 				case 0 => None

@@ -13,16 +13,22 @@ trait RunRouter {
 	def apply(run: Run): String
 }
 
-object RoutingDescription extends StandardTokenParsers {
+object RoutingDescription extends StandardTokenParsers with Log {
 	val defaultQueueName = "#default"
 	lexical.delimiters ++= List("(", ")", "[", "]", "{", "}", ",", ":", "==", "||", "&&")
-	lexical.reserved += ("in", "runners", "condition", "contest", "user", "name", "slow")
+	lexical.reserved += ("in", "runners", "condition", "contest", "user", "name", "slow", "problem")
 
-	def parse(input: String): (Map[String,String], RunRouter) = routingTable(new lexical.Scanner(input)) match {
-		case Success(table, _) => table
-		case NoSuccess(msg, input) => {
-			System.err.println(input.pos.longString)
-			throw new ParseException(msg, input.offset)
+	def parse(input: String): (Map[String,String], RunRouter) = {
+		info("Parsing RoutingDescription: {}", input)
+		routingTable(new lexical.Scanner(input)) match {
+			case Success(table, _) => {
+				info("RoutingDescription parsed: {}", table)
+				table
+			}
+			case NoSuccess(msg, input) => {
+				System.err.println(input.pos.longString)
+				throw new ParseException(msg, input.offset)
+			}
 		}
 	}
 
@@ -54,18 +60,23 @@ object RoutingDescription extends StandardTokenParsers {
 	private def inExpr: Parser[RunMatcher] = param ~ "in" ~ stringList ^^ { case param ~ "in" ~ arg => new InMatcher(param, arg) }
 	private def slowExpr: Parser[RunMatcher] = "slow" ^^ { case "slow" => new SlowMatcher() }
 
-	private def param: Parser[String] = "contest" | "user"
+	private def param: Parser[String] = "contest" | "user" | "problem"
 	private def stringList: Parser[List[String]] = "[" ~> rep1sep(stringLit, ",") <~ "]"
 
-	private class RunRouterImpl(routingMap: List[(RunMatcher, String)]) extends Object with RunRouter {
+	private class RunRouterImpl(routingMap: List[(RunMatcher, String)]) extends Object with RunRouter with Log {
 		def apply(run: Run): String = {
 			for (entry <- routingMap) {
-				if (entry._1(run)) return entry._2
+				debug("Run {} matching against {}", run, entry._1)
+				if (entry._1(run)) {
+					debug("Run {} matched into {}", run.id, entry._2)
+					return entry._2
+				}
 			}
+			debug("Run {} matched nothing. Returning {}", run.id, defaultQueueName)
 			defaultQueueName
 		}
 
-		override def toString(): String = routingMap.toString
+		override def toString(): String = "RunRouter(" + routingMap.mkString(", ") + ")"
 	}
 
 	private trait RunMatcher {
@@ -77,6 +88,7 @@ object RoutingDescription extends StandardTokenParsers {
 					case Some(contest) => contest.alias
 				}
 			}
+			case "problem" => run.problem.alias
 			case "user" => run.user.username
 		}
 	}
@@ -94,6 +106,7 @@ object RoutingDescription extends StandardTokenParsers {
 
 	private class SlowMatcher() extends Object with RunMatcher {
 		def apply(run: Run): Boolean = run.problem.slow
+		override def toString(): String = "slow"
 	}
 
 	private class OrMatcher(arg: List[RunMatcher]) extends Object with RunMatcher {

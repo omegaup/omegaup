@@ -151,6 +151,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `source` varchar(256) DEFAULT NULL,
   `order` varchar(10) NOT NULL DEFAULT 'normal',
+  `slow` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`problem_id`)
 );
 
