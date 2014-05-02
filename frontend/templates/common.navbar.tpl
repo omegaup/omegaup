@@ -60,8 +60,12 @@
 										if (graderInfo.status == "ok") {
 											var now = new Date().getTime() / 1000;
 											if (graderInfo.queues) {
-												queueLength = graderInfo.queues['#default'].run_queue_length +
-													graderInfo.queues['#default'].running.length;
+												queueLength = 0;
+												for (var queue in graderInfo.queues) {
+													if (!graderInfo.queues.hasOwnProperty(queue)) continue;
+													queueLength = graderInfo.queues[queue].run_queue_length +
+														graderInfo.queues[queue].running.length;
+												}
 											}
 											if (queueLength < 5) {
 												$("#grader-status > a").addClass("grader-ok");
