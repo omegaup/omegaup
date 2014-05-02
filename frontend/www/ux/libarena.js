@@ -297,7 +297,17 @@ Arena.prototype.createAdminRun = function(run) {
 	(function(guid, run, row) {
 		$('.rejudge', row).append($('<input type="button" value="rejudge" />').click(function() {
 			$('.status', row).html('rejudging').css('background-color', '');
-			omegaup.runRejudge(guid, function() {
+			omegaup.runRejudge(guid, false, function() {
+				self.updateRunFallback(guid, run);
+			});
+		}));
+	})(run.guid, run, r);
+
+	// Debug-Rejudge
+	(function(guid, run, row) {
+		$('.rejudge', row).append($('<input type="button" value="debug" />').click(function() {
+			$('.status', row).html('rejudging').css('background-color', '');
+			omegaup.runRejudge(guid, true, function() {
 				self.updateRunFallback(guid, run);
 			});
 		}));
@@ -319,6 +329,7 @@ Arena.prototype.createAdminRun = function(run) {
 				$('#run-details .cases div').remove();
 				$('#run-details .cases table').remove();
 				$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
+				$('#run-details .download a.details').attr('href', '/api/run/download/run_alias/' + guid + '/complete/true/');
 
 				function numericSort(key) {
 					function isDigit(x) {

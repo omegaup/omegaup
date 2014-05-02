@@ -12,12 +12,10 @@ import omegaup._
 import omegaup.data._
 import Veredict._
 
-trait Grader extends Object with Log {
-	def grade(run: Run): Run = {
-		val id = run.id
-		val alias = run.problem.alias
+trait Grader extends Object with Log with Using {
+  def extract(run: Run, dataDirectory: File): Unit = {
+    val id = run.id
 		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
-		val dataDirectory = new File(zip.getParentFile.getCanonicalPath + "/" + id)
 
 		// Cleanup previous invocations in case of re-judge.
 		FileUtil.deleteDirectory(dataDirectory)
@@ -28,20 +26,22 @@ trait Grader extends Object with Log {
 
 		dataDirectory.mkdirs()
 		
-		val input = new ZipInputStream(new FileInputStream(zip.getCanonicalPath))
+		val input = new ZipInputStream(new FileInputStream(zip))
 		var entry: ZipEntry = input.getNextEntry
 		val buffer = Array.ofDim[Byte](1024)
 		var read: Int = 0
 		
 		while(entry != null) {
-			val outFile = new File(entry.getName())
-			val output = new FileOutputStream(dataDirectory.getCanonicalPath + "/" + outFile.getName)
-
-			while( { read = input.read(buffer); read > 0 } ) {
-				output.write(buffer, 0, read)
+			val outFile = new File(dataDirectory, entry.getName())
+			if (entry.isDirectory) {
+				outFile.mkdir
+			} else {
+				using(new FileOutputStream(outFile)) { output => {
+					while( { read = input.read(buffer); read > 0 } ) {
+						output.write(buffer, 0, read)
+					}
+				}}
 			}
-
-			output.close
 			input.closeEntry
 			entry = input.getNextEntry
 		}
@@ -49,20 +49,27 @@ trait Grader extends Object with Log {
 		input.close
 		
 		zip.delete
+	}
+
+	def grade(run: Run): Run = {
+		val alias = run.problem.alias
+		val dataDirectory = new File(Config.get("grader.root", ".") + "/" + run.id)
+
+		extract(run, dataDirectory)
 		
 		run.status = Status.Ready
 		run.veredict = Veredict.Accepted
 		run.runtime = 0
 		run.memory = 0
 		
-                val metas = dataDirectory.listFiles
-                  .filter { _.getName.endsWith(".meta") }
-                  .map{ f => f.getName.substring(0, f.getName.length - 5)->(f, MetaFile.load(f.getCanonicalPath)) }
-                  .toMap
+		val metas = dataDirectory.listFiles
+			.filter { _.getName.endsWith(".meta") }
+			.map{ f => f.getName.substring(0, f.getName.length - 5)->(f, MetaFile.load(f.getCanonicalPath)) }
+			.toMap
 		
 		val weightsFile = new File(Config.get("problems.root", "./problems") + "/" + alias + "/testplan")
 
-                trace("Finding Weights file in {}", weightsFile.getCanonicalPath)
+		trace("Finding Weights file in {}", weightsFile.getCanonicalPath)
 		
 		val weights:scala.collection.Map[String,scala.collection.Map[String,Double]] = if (weightsFile.exists) {
 			val weights = new mutable.ListMap[String,mutable.ListMap[String,Double]]
@@ -73,17 +80,17 @@ trait Grader extends Object with Log {
 				val tokens = line.split("\\s+")
 			
 				if(tokens.length == 2 && !tokens(0).startsWith("#")) {
-                                        val idx = tokens(0).indexOf(".")
+					val idx = tokens(0).indexOf(".")
 
-                                        val group = if (idx != -1) {
-                                          	tokens(0).substring(0, idx)
-                                        } else {
-                                          	tokens(0)
-                                        }
+					val group = if (idx != -1) {
+						tokens(0).substring(0, idx)
+					} else {
+						tokens(0)
+					}
 
-                                        if (!weights.contains(group)) {
-                                                weights += (group -> new mutable.ListMap[String,Double])
-                                        }
+					if (!weights.contains(group)) {
+						weights += (group -> new mutable.ListMap[String,Double])
+					}
 
 					try {
 						weights(group) += (tokens(0) -> tokens(1).toDouble)
@@ -98,23 +105,22 @@ trait Grader extends Object with Log {
 			val weights = new mutable.ListMap[String,mutable.ListMap[String,Double]]
 
 			val inputs = new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/")
-			.listFiles
-			.filter { _.getName.endsWith(".in") }
+				.listFiles
+				.filter { _.getName.endsWith(".in") }
 
 			for (f <- inputs) {
-                                val caseName = f.getName.substring(0, f.getName.length - 3)
+				val caseName = f.getName.substring(0, f.getName.length - 3)
 
-                                val idx = caseName.indexOf(".")
+				val idx = caseName.indexOf(".")
+				val group = if (idx != -1) {
+					caseName.substring(0, idx)
+				} else {
+					caseName
+				}
 
-                                val group = if (idx != -1) {
-                                	caseName.substring(0, idx)
-                                } else {
-                                        caseName
-                                }
-
-                                if (!weights.contains(group)) {
-                                        weights += (group -> new mutable.ListMap[String,Double])
-                                }
+				if (!weights.contains(group)) {
+					weights += (group -> new mutable.ListMap[String,Double])
+				}
 
 				try {
 					weights(group) += (caseName -> 1.0)
@@ -150,12 +156,6 @@ trait Grader extends Object with Log {
 					if (run.veredict < Veredict.MemoryLimitExceeded) run.veredict = Veredict.MemoryLimitExceeded
 				} else if(run.veredict < v) run.veredict = v
 			} else if (run.language == Language.Java) {
-				if (meta.contains("message") && meta("message").contains("ptrace")) {
-					// TODO(lhchavez): Remove when minijail is a thing.
-					error("Rejudging run {} due to JE-prevention.", run.id)
-					Manager.grade(run.id)
-					throw new RuntimeException("Please rejudge me.")
-				}
 				val errFile = new File(f.getCanonicalPath.replace(".meta", ".err"))
 				if (errFile.exists && FileUtil.read(errFile.getCanonicalPath).contains("java.lang.OutOfMemoryError")) {
 					if (run.veredict < Veredict.MemoryLimitExceeded) run.veredict = Veredict.MemoryLimitExceeded
@@ -168,50 +168,48 @@ trait Grader extends Object with Log {
 			run.memory = 0
 			run.score = 0
 		} else {
-			val caseScores = weights.map {
-			  case (group, data) => {
-                            val scores = data
-                            .map { case (name, weight) =>
-                              new CaseVeredictMessage(
-                                name,
-                                if (metas.contains(name)) {
-					metas(name)._2("status")
-				} else {
-					"OK"
-				},
-                                if (metas.contains(name) && metas(name)._2("status") == "OK") {
-                                  val f = metas(name)._1
+			val caseScores = weights.map { case (group, data) => {
+				val scores = data.map { case (name, weight) =>
+					new CaseVeredictMessage(
+						name,
+						if (metas.contains(name)) {
+							metas(name)._2("status")
+						} else {
+							"OK"
+						},
+						if (metas.contains(name) && metas(name)._2("status") == "OK") {
+								val f = metas(name)._1
 
-													       gradeCase(
-															     run,
-                                    name,
-				    new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out")),
-			            new File(f.getCanonicalPath.replace(".meta", ".out"))
-                                  ) * weight
-                                } else {
-                                  0.0
-                                }
-                              )
-                            }
-                            
-                            new GroupVeredictMessage(
-                              group,
-                              scores.toList,
-                              if (scores.forall(_.score > 0)) {
-                                scores.foldLeft(0.0)(_+_.score)
-                              } else {
-                                0.0
-                              }
-                            )
-                          }
-                        }
-                        
-                        implicit val formats = Serialization.formats(NoTypeHints)
-                        
+								gradeCase(
+									run,
+									name,
+									new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out")),
+									new File(f.getCanonicalPath.replace(".meta", ".out")),
+									metas(name)._2
+								) * weight
+						} else {
+							0.0
+						}
+					)
+				}
+
+				new GroupVeredictMessage(
+					group,
+					scores.toList,
+					if (scores.forall(_.score > 0)) {
+						scores.foldLeft(0.0)(_+_.score)
+					} else {
+						0.0
+					}
+				)
+			}}
+
+			implicit val formats = Serialization.formats(NoTypeHints)
+
 			val details = new File(Config.get("grader.root", "./grader") + "/" + run.id + "/details.json")
-                        debug("Writing details into {}.", details.getCanonicalPath)
+			debug("Writing details into {}.", details.getCanonicalPath)
 			Serialization.write(caseScores, new FileWriter(details))
-                        
+
 			run.score = caseScores.foldLeft(0.0)(_+_.score) / weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2)) * (run.contest match {
 				case None => 1.0
 				case Some(contest) => {
@@ -221,10 +219,10 @@ trait Grader extends Object with Log {
 						var TT = (contest.finish_time.getTime() - contest.start_time.getTime()) / 60000.0
 						var PT = run.submit_delay / 60.0
 
-                                                if (contest.points_decay_factor >= 1.0) {
-                                                  contest.points_decay_factor = 1.0
-                                                }
-						
+						if (contest.points_decay_factor >= 1.0) {
+							contest.points_decay_factor = 1.0
+						}
+
 						(1 - contest.points_decay_factor) + contest.points_decay_factor * TT*TT / (10 * PT*PT + TT*TT)
 					}
 				}
@@ -244,188 +242,17 @@ trait Grader extends Object with Log {
 		run
 	}
 	
-	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File, meta: scala.collection.Map[String,String]): Double
 }
 
 object CustomGrader extends Grader {
-	override def grade(run: Run): Run = {
-		val id = run.id
-		val alias = run.problem.alias
-		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
-		val dataDirectory = new File(zip.getParentFile.getCanonicalPath + "/" + id)
-
-		// Cleanup previous invocations in case of re-judge.
-		FileUtil.deleteDirectory(dataDirectory)
-		val compileError = new File(zip.getParentFile, id + ".err")
-		if (compileError.exists) {
-			compileError.delete
-		}
-
-		dataDirectory.mkdirs()
-		
-		val input = new ZipInputStream(new FileInputStream(zip.getCanonicalPath))
-		var entry: ZipEntry = input.getNextEntry
-		val buffer = Array.ofDim[Byte](1024)
-		var read: Int = 0
-		
-		while(entry != null) {
-			val outFile = new File(entry.getName())
-			val output = new FileOutputStream(dataDirectory.getCanonicalPath + "/" + outFile.getName)
-
-			while( { read = input.read(buffer); read > 0 } ) {
-				output.write(buffer, 0, read)
-			}
-
-			output.close
-			input.closeEntry
-			entry = input.getNextEntry
-		}
-		
-		input.close
-		
-		zip.delete
-		
-		run.status = Status.Ready
-		run.veredict = Veredict.Accepted
-		run.runtime = 0
-		run.memory = 0
-		
-                val metas = dataDirectory.listFiles
-                  .filter { _.getName.endsWith(".meta") }
-                  .map{ f => f.getName.substring(0, f.getName.length - 5)->(f, MetaFile.load(f.getCanonicalPath)) }
-                  .toMap
-		
-		val weightsFile = new File(Config.get("problems.root", "./problems") + "/" + alias + "/testplan")
-
-                trace("Finding Weights file in {}", weightsFile.getCanonicalPath)
-		
-		val weights:scala.collection.Map[String,scala.collection.Map[String,Double]] = if (weightsFile.exists) {
-			val weights = new mutable.ListMap[String,mutable.ListMap[String,Double]]
-			val fileReader = new BufferedReader(new FileReader(weightsFile))
-			var line: String = null
-	
-			while( { line = fileReader.readLine(); line != null} ) {
-				val tokens = line.split("\\s+")
-			
-				if(tokens.length == 2 && !tokens(0).startsWith("#")) {
-                                        var group:String = null
-
-                                        val idx = tokens(0).indexOf(".")
-
-                                        if (idx != -1) {
-                                          group = tokens(0).substring(0, idx)
-                                        } else {
-                                          group = tokens(0)
-                                        }
-
-                                        if (!weights.contains(group)) {
-                                                weights += (group -> new mutable.ListMap[String,Double])
-                                        }
-
-					try {
-						weights(group) += (tokens(0) -> tokens(1).toDouble)
-					}
-				}
-			}
-		
-			fileReader.close()
-		
-			weights
+	override def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File, meta: scala.collection.Map[String,String]): Double = {
+		if (meta.contains("score")) {
+			meta("score").toDouble
 		} else {
-			new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/")
-			.listFiles
-			.filter { _.getName.endsWith(".in") }
-			.map {  f:File =>
-                                val caseName = f.getName.substring(0, f.getName.length - 3)
-
-                                (caseName -> Map(caseName -> 1.0))
-			}
-			.toMap
+			0.0
 		}
-
-		metas.values.foreach { case (f, meta) => {
-			run.runtime += math.round(1000 * meta("time").toDouble)
-			run.memory = math.max(run.memory, meta("mem").toLong)
-			val v = meta("status") match {
-				case "XX" => Veredict.JudgeError
-				case "JE" => Veredict.JudgeError
-				case "OK" => Veredict.Accepted
-				case "RE" => Veredict.RuntimeError
-				case "TO" => Veredict.TimeLimitExceeded
-				case "ML" => Veredict.MemoryLimitExceeded
-				case "OL" => Veredict.OutputLimitExceeded
-				case "FO" => Veredict.RestrictedFunctionError
-				case "FA" => Veredict.RestrictedFunctionError
-				case "SG" => Veredict.RuntimeError
-				case _    => Veredict.JudgeError
-			}
-			
-			if(run.veredict < v) run.veredict = v
-		}}
-		
-		if (run.veredict == Veredict.JudgeError) {
-			run.runtime = 0
-			run.memory = 0
-			run.score = 0
-		} else {
-			run.score = weights
-                        .map { case (group, data) => 
-                          {
-                            val scores = data
-                            .map { case (name, weight) =>
-                              if (metas.contains(name) && metas(name)._2("status") == "OK") {
-                                val f = metas(name)._1
-
-                                if (metas(name)._2.contains("score")) {
-                                	metas(name)._2("score").toDouble
-                                } else {
-                                	0.0
-                                } * weight
-                              } else {
-                                0.0
-                              }
-                            }
-                            
-                            if (scores.forall(_ > 0)) {
-                              scores.foldLeft(0.0)(_+_)
-                            } else {
-                              0.0
-                            }
-                          }
-                        }
-			.foldLeft(0.0)(_+_) / weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2)) * (run.contest match {
-				case None => 1.0
-				case Some(contest) => {
-					if (contest.points_decay_factor <= 0.0 || run.submit_delay == 0.0) {
-						1.0
-					} else {
-						var TT = (contest.finish_time.getTime() - contest.start_time.getTime()) / 60000.0
-						var PT = run.submit_delay / 60.0
-
-                                                if (contest.points_decay_factor >= 1.0) {
-                                                  contest.points_decay_factor = 1.0
-                                                }
-						
-						(1 - contest.points_decay_factor) + contest.points_decay_factor * TT*TT / (10 * PT*PT + TT*TT)
-					}
-				}
-			})
-
-			run.score = scala.math.round(run.score * 1024) / 1024.0
-			
-			if(run.score == 0 && run.veredict < Veredict.WrongAnswer) run.veredict = Veredict.WrongAnswer
-			else if(run.score < (1-1e-9) && run.veredict < Veredict.PartialAccepted) run.veredict = Veredict.PartialAccepted
-		}
-		
-		run.problem.points match {
-			case None => {}
-			case Some(factor) => run.contest_score = run.score * factor
-		}
-
-		run
 	}
-	
-	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0
 }
 
 object LiteralGrader extends Grader {
@@ -481,7 +308,7 @@ object LiteralGrader extends Grader {
 		run
 	}
 	
-	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = 0
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File, meta: scala.collection.Map[String,String]): Double = 0
 }
 
 class Token(var nextChar: Int, reader: Reader, containedInTokenClass: (Char) => Boolean) extends Iterator[Char] {
@@ -627,7 +454,7 @@ trait TokenizerComparer extends Object with Log {
 }
 
 object TokenGrader extends Grader with TokenizerComparer {
-	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File, meta: scala.collection.Map[String,String]): Double = {
 		val charClass = (c: Char) => !c.isWhitespace
 		gradeCase(
 			run,
@@ -639,7 +466,7 @@ object TokenGrader extends Grader with TokenizerComparer {
 }
 
 object TokenCaselessGrader extends Grader with TokenizerComparer {
-	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File, meta: scala.collection.Map[String,String]): Double = {
 		val charClass = (c: Char) => !c.isWhitespace
 		gradeCase(
 			run,
@@ -651,7 +478,7 @@ object TokenCaselessGrader extends Grader with TokenizerComparer {
 }
 
 object TokenNumericGrader extends Grader with TokenizerComparer {
-	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File): Double = {
+	def gradeCase(run: Run, caseName: String, runOut: File, problemOut: File, meta: scala.collection.Map[String,String]): Double = {
 		val charClass = (c: Char) => c.isDigit || c == '.' || c == '-'
 		gradeCase(
 			run,
@@ -661,3 +488,5 @@ object TokenNumericGrader extends Grader with TokenizerComparer {
 			new NumericTokenComparer(if (run != null) run.problem.tolerance else 1e-6))
 	}
 }
+
+/* vim: set noexpandtab: */

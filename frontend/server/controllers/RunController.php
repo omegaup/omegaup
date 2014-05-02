@@ -351,7 +351,7 @@ class RunController extends Controller {
 		}
 
 		try {
-			self::$grader->Grade($r["run"]->getRunId());
+			self::$grader->Grade($r["run"]->getRunId(), $r['debug'] || false);
 		} catch (Exception $e) {
 			self::$log->error("Call to Grader::grade() failed:");
 			self::$log->error($e);
@@ -554,12 +554,25 @@ class RunController extends Controller {
 		if (is_dir($grade_dir)) {
 			if ($dir = opendir($grade_dir)) {
 				while (($file = readdir($dir)) !== false) {
-					if ($file == '.' || $file == '..' || !strstr($file, ".out"))
+					$path = "$grade_dir/$file";
+					if (is_dir($path) || (!$r['complete'] && !strstr($file, ".out")))
 						continue;
 
 					$zip->add_file_from_path("$file", "$grade_dir/$file");
 				}
 				closedir($dir);
+			}
+			if ($r['complete'] && is_dir("$grade_dir/validator")) {
+				if ($dir = opendir("$grade_dir/validator")) {
+					while (($file = readdir($dir)) !== false) {
+						$path = "$grade_dir/validator/$file";
+						if (is_dir($path))
+							continue;
+
+						$zip->add_file_from_path("validator/$file", "$grade_dir/validator/$file");
+					}
+					closedir($dir);
+				}
 			}
 		}
 

@@ -46,10 +46,10 @@ object Manager extends Object with Log {
 
 		info("Recovering previous queue: {} runs re-added", pendingRuns.size)
 	
-		pendingRuns foreach grade
+		pendingRuns foreach(grade(_, false))
 	}
 
-	def grade(run: Run): GradeOutputMessage = {
+	def grade(run: Run, debug: Boolean): GradeOutputMessage = {
 		info("Judging {}", run.id)
 
 		implicit val conn = connection
@@ -69,17 +69,18 @@ object Manager extends Object with Log {
 				GraderData.update(run)
 			}
 
+			run.debug = debug
 			runnerRouter.addRun(run)
 			new GradeOutputMessage()
 		}
 	}
-	
-	def grade(id: Long): GradeOutputMessage = {
+
+	def grade(id: Long, debug: Boolean): GradeOutputMessage = {
 		implicit val conn = connection
 		
 		GraderData.run(id) match {
 			case None => throw new IllegalArgumentException("Id " + id + " not found")
-			case Some(run) => grade(run)
+			case Some(run) => grade(run, debug)
 		}
 	}
 
@@ -161,7 +162,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[GradeInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							Manager.grade(req.id)
+							Manager.grade(req.id, req.debug)
 						} catch {
 							case e: IllegalArgumentException => {
 								error("Grade failed: {}", e)

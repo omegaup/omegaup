@@ -1183,11 +1183,11 @@ OmegaUp.prototype.runSource = function(guid, callback) {
 	});
 };
 
-OmegaUp.prototype.runRejudge = function(guid, callback) {
+OmegaUp.prototype.runRejudge = function(guid, debug, callback) {
 	var self = this;
 
 	$.get(
-		'/api/run/rejudge/run_alias/' + encodeURIComponent(guid) + '/',
+		'/api/run/rejudge/run_alias/' + encodeURIComponent(guid) + '/' + (debug ? 'debug/true/' : ''),
 		function (data) {
 			callback(data);
 		},
