@@ -2,7 +2,7 @@
 	{assign "IS_UPDATE" 0}
 {/if}
 
-<form method='POST' action='{$smarty.server.REQUEST_URI}' id='problem_form' class="form" enctype="multipart/form-data">	
+<form method='POST' action='{$smarty.server.REQUEST_URI}' id='problem_form' class="form" enctype="multipart/form-data">
 	{if $IS_UPDATE eq 1}
 		<div class="row">
 			<div class="form-group col-md-6">
@@ -22,14 +22,14 @@
 		
 		<div class="form-group  col-md-6">
 			<label for="title">{#wordsTitle#}</label>
-			<input id='title' name='title' value='{$TITLE|htmlspecialchars}' type='text' class="form-control" />
+			<input id='title' name='title' value='{if $IS_UPDATE eq 0}{$TITLE|htmlspecialchars}{/if}' type='text' class="form-control" />
 		</div>
 	</div>
 	
 	<div class="row">
 		<div class="form-group  col-md-6">
 			<label for="alias">{#wordsAlias#}</label>
-			<input id='alias' name='alias' value='{$ALIAS|htmlspecialchars}' type='text' class="form-control"{if $IS_UPDATE eq 1} disabled="disabled"{/if}/>
+			<input id='alias' name='alias' value='{if $IS_UPDATE eq 0}{$ALIAS|htmlspecialchars}{/if}' type='text' class="form-control"{if $IS_UPDATE eq 1} disabled="disabled"{/if}/>
 		</div>
 
 		<div class="form-group col-md-6">
@@ -47,24 +47,24 @@
 	<div class="row">
 		<div class="form-group  col-md-6">
 			<label for="time_limit">Tiempo límite (ms)</label>
-			<input id='time_limit' name='time_limit' value='{$TIME_LIMIT}' type='text' class="form-control" />
+			<input id='time_limit' name='time_limit' value='{if $IS_UPDATE eq 0}{$TIME_LIMIT}{/if}' type='text' class="form-control" />
 		</div>
 
 		<div class="form-group  col-md-6">
 			<label for="memory_limit">Límite de memoria (kB)</label>
-			<input id='memory_limit' name='memory_limit' value='{$MEMORY_LIMIT}' type='text' class="form-control" />
+			<input id='memory_limit' name='memory_limit' value='{if $IS_UPDATE eq 0}{$MEMORY_LIMIT}{/if}' type='text' class="form-control" />
 		</div>
 	</div>
 	
 	<div class="row">
 		<div class="form-group  col-md-6">
 			<label for="output_limit">Límite de salida (bytes)</label>
-			<input id="output_limit" name="output_limit" value="{$OUTPUT_LIMIT}" type='text' class="form-control" />
+			<input id="output_limit" name="output_limit" value="{if $IS_UPDATE eq 0}{$OUTPUT_LIMIT}{/if}" type='text' class="form-control" />
 		</div>
 
 		<div class="form-group  col-md-6">
 			<label for="source">{#wordsSource#}</label>
-			<input id='source' name='source' value='{$SOURCE|htmlspecialchars}' type='text' class="form-control" />
+			<input id='source' name='source' value='{if $IS_UPDATE eq 0}{$SOURCE|htmlspecialchars}{/if}' type='text' class="form-control" />
 		</div>
 	</div>
 		
@@ -74,6 +74,34 @@
 			<select name='public' id='public' class="form-control">
 				<option value="0">{#wordsNo#}</option>
 				<option value="1" selected="selected">Sí</option>
+			</select>
+		</div>
+
+		<script>
+			$(function() {
+				$('#languages').selectpicker();
+				{if $IS_UPDATE eq 0}
+					// Set default languages.
+					$('#languages').val(['c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11']);
+				{/if}
+			});
+		</script>
+		<div class="form-group col-md-6">
+			<label for="languages">{#problemEditFormLanguages#}</label>
+			<select name='languages[]' id='languages' class="selectpicker form-control languages" multiple>
+				<option value="c">C</option>
+				<option value="cpp">C++</option>
+				<option value="cpp11">C++11</option>
+				<option value="cs">C#</option>
+				<option value="hs">Haskell</option>
+				<option value="java">Java</option>
+				<option value="kj">Karel (Java)</option>
+				<option value="kp">Karel (Pascal)</option>
+				<option value="p">Pascal</option>
+				<option value="pl">Perl</option>
+				<option value="py">Python</option>
+				<option value="rb">Ruby</option>
+				<option value="cat">{#wordsJustOutput#}</option>
 			</select>
 		</div>
 	</div>

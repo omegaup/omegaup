@@ -158,6 +158,17 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Checks that two sets (given by char delimited strings) are equal.
+	 */
+	public function assertEqualSets($expected, $actual, $delim = ",") {
+		$expected_set = explode($delim, $expected);
+		sort($expected_set);
+		$actual_set = explode($delim, $actual);
+		sort($actual_set);
+		$this->assertEquals($expected_set, $actual_set);
+	}
+
+	/**
 	 * Problem: PHPUnit does not support is_uploaded_file and move_uploaded_file
 	 * native functions of PHP to move files around needed for store zip contents
 	 * in the required places.

@@ -19,6 +19,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 				"output_limit" => $_POST["output_limit"],
 				"source" => $_POST["source"],
 				"public" => $_POST["public"],
+				"languages" => $_POST["languages"],
 			));
 	$r->method = "ProblemController::apiUpdate";
 	$response = ApiCaller::call($r);

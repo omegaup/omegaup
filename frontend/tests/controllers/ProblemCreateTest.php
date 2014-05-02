@@ -55,6 +55,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals($r["memory_limit"], $problem->getMemoryLimit());
 		$this->assertEquals($r["order"], $problem->getOrder());
 		$this->assertEquals($r["source"], $problem->getSource());
+		$this->assertEqualSets($r["languages"], $problem->getLanguages());
 
 		// Verify author username -> author id conversion
 		$user = UsersDAO::getByPK($problem->getAuthorId());
@@ -127,7 +128,8 @@ class CreateProblemTest extends OmegaupTestCase {
 			"validator",
 			"time_limit",
 			"memory_limit",
-			"source",			
+			"source",
+			"languages",
 		);
 
 		foreach ($valid_keys as $key) {
@@ -154,6 +156,35 @@ class CreateProblemTest extends OmegaupTestCase {
 			}
 
 			$this->fail("Exception was expected. Parameter: " . $key);
+		}
+	}
+
+	/**
+	 * Test that sends invalid languages.
+	 */
+	public function testInvalidLanguage() {
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+		foreach (array("abc", "c,cpp,cows", "java,coffee,espresso") as $languages) {
+			// Get the problem data
+			$problemData = ProblemsFactory::getRequest();
+			$r = $problemData["request"];
+			$problemAuthor = $problemData["author"];
+
+			// Login user
+			$r["auth_token"] = $this->login($problemAuthor);
+			$r["languages"] = $languages;
+			try {
+				// Call the API
+				$response = ProblemController::apiCreate($r);
+			} catch (InvalidParameterException $e) {
+				// We're OK, clean up our mess and continue
+				unset($_REQUEST);
+				continue;
+			}
+			$this->fail("Exception was expected. Language set: $languages");
 		}
 	}
 

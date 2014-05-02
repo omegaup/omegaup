@@ -139,6 +139,15 @@ class ProblemController extends Controller {
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["output_limit"], "output_limit", 0, INF, $is_required);
+
+		// HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
+		// on it already, so I'll just leave this here for now...
+		if (!isset($r["languages"]) && isset($_REQUEST["languages"])) {
+			$r["languages"] = implode(",", $_REQUEST["languages"]);
+		} else if (isset($r["languages"]) && is_array($r["languages"])) {
+			$r["languages"] = implode(",", $r["languages"]);
+		}
+		Validators::isValidSubset($r["languages"], "languages", array('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11'), $is_required);
 	}
 
 	/**
@@ -171,6 +180,7 @@ class ProblemController extends Controller {
 		$problem->setOrder("normal"); /* defaulting to normal */
 		$problem->setAuthorId($r["current_user_id"]);
 		$problem->setAlias($r["alias"]);
+		$problem->setLanguages($r["languages"]);
 
 		$problemDeployer = new ProblemDeployer();
 
@@ -321,6 +331,7 @@ class ProblemController extends Controller {
 			"memory_limit"  => array("important" => true), // requires rejudge
 			"source",
 			"order",
+			"languages",
 		);
 		$requiresRejudge = self::updateValueProperties($r, $r["problem"], $valueProperties);
 
@@ -562,19 +573,22 @@ class ProblemController extends Controller {
 		$response = array();
 
 		// Create array of relevant columns
-		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit", "memory_limit", "output_limit", "visits", "submissions", "accepted", "difficulty", "creation_date", "source", "order", "points", "public");
+		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit",
+				"memory_limit", "output_limit", "visits", "submissions", "accepted",
+				"difficulty", "creation_date", "source", "order", "points", "public",
+				"languages");
 
 		// Read the file that contains the source
 		if ($r["problem"]->getValidator() != 'remote') {
-			
+
 			$statement_type = ProblemController::getStatementType($r);
 			Cache::getFromCacheOrSet(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . $statement_type,
 				$r, 'ProblemController::getProblemStatement', $file_content,
 				APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
 
 			// Add problem statement to source
-			$response["problem_statement"] = $file_content;						
-			
+			$response["problem_statement"] = $file_content;
+
 		} else if ($r["problem"]->getServer() == 'uva') {
 			$response["problem_statement"] = '<iframe src="http://acm.uva.es/p/v' . substr($r["problem"]->getRemoteId(), 0, strlen($r["problem"]->getRemoteId()) - 2) . '/' . $r["problem"]->getRemoteId() . '.html"></iframe>';
 		}
@@ -640,10 +654,10 @@ class ProblemController extends Controller {
 					throw new InvalidDatabaseOperationException($e);
 				}
 			}
-		}						
-		
+		}
+
 		// Add the procesed runs to the request
-		$response["runs"] = $runs_filtered_array;		
+		$response["runs"] = $runs_filtered_array;
 		$response["score"] = self::bestScore($r);
 		$response["status"] = "ok";
 		return $response;
@@ -873,7 +887,7 @@ class ProblemController extends Controller {
 		if (!isset($r["rowcount"])) {
 			$r["rowcount"] = 1000;
 		}
-		
+
 		Validators::isStringNonEmpty($r["query"], "query", false);
 	}
 
@@ -901,25 +915,25 @@ class ProblemController extends Controller {
 			// Add private in the first pass, public in the second
 			try {
 				$problem_mask = NULL;
-				if ($i === 0 && !is_null($r["current_user_id"])) {					
-					if (Authorization::IsSystemAdmin($r["current_user_id"])) {						
+				if ($i === 0 && !is_null($r["current_user_id"])) {
+					if (Authorization::IsSystemAdmin($r["current_user_id"])) {
 						$problem_mask = new Problems(array(
 								"public" => "0"
-							));							
-					} else {						
+							));
+					} else {
 						// Sys admin can see al private problems
 						$problem_mask = new Problems(array(
 								"public" => "0",
 								"author_id" => $r["current_user_id"]
 							));
-					}					
+					}
 				} else if ($i === 1) {
 					$problem_mask = new Problems(array(
 								"public" => 1
 							));
 				}
 
-				if (!is_null($problem_mask)) {					
+				if (!is_null($problem_mask)) {
 					$problems = ProblemsDAO::search(
 							$problem_mask, 
 							"problem_id", 
@@ -943,10 +957,10 @@ class ProblemController extends Controller {
 		}
 
 		// Sort result by name 
-		usort($response["results"], function($a, $b) {			
+		usort($response["results"], function($a, $b) {
 			return strcmp($a["title"], $b["title"]);
 		});
-				
+
 		// Add users' best scores to the list
 		foreach ($response["results"] as &$problemData) {
 			// If we have a logged-in user (this API can be accessed by non-logged in users)
@@ -956,8 +970,7 @@ class ProblemController extends Controller {
 				$problemData['score'] = 0;
 			}
 		}
-		
-		
+
 		$response["status"] = "ok";
 		return $response;
 	}
@@ -997,28 +1010,28 @@ class ProblemController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
-	
+
 	/**
 	 * Returns the best score for a problem
 	 * 
 	 * @param Request $r
 	 */
 	public static function apiBestScore(Request $r) {
-		
+
 		self::authenticateRequest($r);
-		
+
 		// Uses same params as apiDetails, except for lang, which is optional
 		self::validateDetails($r);
-		
+
 		// If username is set in the request, we use that user as target.
 		// else, we query using current_user
 		$user = self::resolveTargetUser($r);
-		
+
 		$response["score"] = self::bestScore($r, $user);
 		$response["status"] = "ok";
 		return $response;
 	}
-	
+
 	/**
 	 * Returns the best score of a problem.
 	 * Problem must be loadad in $r["problem"]
@@ -1032,22 +1045,22 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	private static function bestScore(Request $r, Users $user = null) {
-		
+
 		$current_user_id = (is_null($user) ? $r["current_user_id"] : $user->getUserId());
-		
+
 		$score = 0;
 		try {
 			// Add best score info
 			if (is_null($r["contest"])) {
 				$score = RunsDAO::GetBestScore($r["problem"]->getProblemId(), $current_user_id);
 			} else {
-				$bestRun = RunsDAO::GetBestRun($r["contest"]->getContestId(), $r["problem"]->getProblemId(), $current_user_id, strtotime($r["contest"]->getFinishTime()), false /*showAllRuns*/);								
+				$bestRun = RunsDAO::GetBestRun($r["contest"]->getContestId(), $r["problem"]->getProblemId(), $current_user_id, strtotime($r["contest"]->getFinishTime()), false /*showAllRuns*/);
 				$score = is_null($bestRun->getContestScore()) ? 0 : $bestRun->getContestScore();
-			}				
+			}
 		} catch(Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		return $score;
 	}
 

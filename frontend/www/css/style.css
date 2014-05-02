@@ -508,3 +508,8 @@ padding-right: 5px;
 #problem .statement p { text-align: justify; }
 #problem .statement li { text-align: justify; }
 #problem .statement h1 { font-weight: bold; }
+
+#problem_form .languages {
+	padding: 0;
+	width: 100%;
+}

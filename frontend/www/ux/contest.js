@@ -270,6 +270,15 @@ $(document).ready(function() {
 
 				$('#problem .run-list .added').remove();
 
+				var language_array = problem.languages.split(',');
+				$('#lang-select option').each(function(index, item) {
+					if (language_array.indexOf($(item).val()) >= 0) {
+						$(item).show();
+					} else {
+						$(item).hide();
+					}
+				});
+
 				function updateOnlyProblemRuns(runs, score_column, multiplier) {
 					for (var idx in runs) {
 						if (!runs.hasOwnProperty(idx)) continue;

@@ -198,14 +198,37 @@ class Validators {
 
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
+		if ($isPresent && !in_array($parameter, $enum)) {
+			throw new InvalidParameterException("{$parameterName} is not in expected set: " . implode(", ", $enum));
+		}
+
+		return true;
+	}
+
+	/**
+	 * 
+	 * @param mixed $parameter
+	 * @param string $parameterName
+	 * @param array $enum
+	 * @param type $required
+	 * @return boolean
+	 * @throws InvalidParameterException
+	 */
+	public static function isValidSubset($parameter, $parameterName, array $enum, $required = true) {
+
+		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+
 		if ($isPresent) {
-			foreach ($enum as $option) {
-				if ($parameter == $option) {
-					return true;
+			$bad_elements = array();
+			$elements = explode(",", $parameter);
+			foreach ($elements as $element) {
+				if (!in_array($element, $enum)) {
+					$bad_elements[] = $element;
 				}
 			}
-
-			throw new InvalidParameterException("{$parameterName} is not in expected set: " . implode(", ", $enum));
+			if (count($bad_elements) > 0) {
+				throw new InvalidParameterException(implode(",", $bad_elements) . " are not in expected set: " . implode(", ", $enum));
+			}
 		}
 
 		return true;

@@ -81,6 +81,55 @@ class UpdateProblemTest extends OmegaupTestCase {
 				
 	}
 	
+	public function testUpdateProblemWithValidLanguages() {
+		
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem(null, "valid-languages");
+
+		// Prepare request
+		$r = new Request();
+		$r["languages"] = "hs,java,pl";
+		$r["problem_alias"] = $problemData["request"]["alias"];
+		
+		// Log in as contest director
+		$r["auth_token"] = $this->login($problemData["author"]);
+		
+		//Call API
+		$response = ProblemController::apiUpdate($r);
+		
+		// Verify data in DB
+		$problem_mask = new Problems();
+		$problem_mask->setAlias($r["alias"]);
+		$problems = ProblemsDAO::search($problem_mask);
+    
+		// Check that we only retrieved 1 element
+		$this->assertEquals(1, count($problems));
+		$this->assertEqualSets($r["languages"], $problems[0]->getLanguages());
+
+		// Validate response
+		$this->assertEquals("ok", $response["status"]);
+	}
+
+	/**
+	 * @expectedException InvalidParameterException
+	 */
+	public function testUpdateProblemWithInvalidLanguages() {
+		
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+
+		// Prepare request
+		$r = new Request();
+		$r["languages"] = "cows,hs,java,pl";
+		$r["problem_alias"] = $problemData["request"]["alias"];
+		
+		// Log in as contest director
+		$r["auth_token"] = $this->login($problemData["author"]);
+		
+		//Call API
+		$response = ProblemController::apiUpdate($r);
+	}
+
 	/**
 	 * Test apiUpdateStatement
 	 */
@@ -141,7 +190,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 	}
 	
 	/**
-	 * Tests update problem: on error, original contesnts should persist
+	 * Tests update problem: on error, original contents should persist
 	 */
 	public function testUpdateProblemFailed() {				
 		// Get a problem
