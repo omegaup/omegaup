@@ -17,11 +17,17 @@
 		
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+		
+		<!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">-->
+		<link rel="stylesheet" href="/css/bootstrap.min.css">
 		<!-- Optional theme -->
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
+                
+		<!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">-->
+		<link rel="stylesheet" href="/css/bootstrap-theme.min.css">
 		<!-- Latest compiled and minified JavaScript -->
-		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+		
+		<!--<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>-->
+		<script src="/js/bootstrap.min.js"></script>
 		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
 		<link rel="stylesheet" href="/css/bootstrap-select.min.css">
 		<script type="text/javascript" src="/js/bootstrap-select.min.js"></script>
