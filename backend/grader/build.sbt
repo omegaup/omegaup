@@ -14,10 +14,10 @@ packageOptions in (Compile, packageBin) +=
     Package.ManifestAttributes( java.util.jar.Attributes.Name.MAIN_CLASS -> "omegaup.Service" )
 
 libraryDependencies ++= Seq(
-  "org.eclipse.jetty" % "jetty-server" % "9.1.3.v20140225",
-  "org.eclipse.jetty" % "jetty-client" % "9.1.3.v20140225",
-  "org.eclipse.jetty" % "jetty-security" % "9.1.3.v20140225",
-  "org.eclipse.jetty.websocket" % "websocket-server" % "9.1.3.v20140225",
+  "org.eclipse.jetty" % "jetty-server" % "9.1.2.v20140210",
+  "org.eclipse.jetty" % "jetty-client" % "9.1.2.v20140210",
+  "org.eclipse.jetty" % "jetty-security" % "9.1.2.v20140210",
+  "org.eclipse.jetty.websocket" % "websocket-server" % "9.1.2.v20140210",
   "net.liftweb" %% "lift-json" % "2.5.1",
   "org.slf4j" % "log4j-over-slf4j" % "1.7.6",
   "ch.qos.logback" % "logback-core" % "1.1.1",
