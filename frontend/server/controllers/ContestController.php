@@ -270,7 +270,7 @@ class ContestController extends Controller {
 			$problemsResponseArray = array();
 
 			// Set of columns that we want to show through this API. Doesn't include the SOURCE
-			$relevant_columns = array("title", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "dificulty", "order");
+			$relevant_columns = array("title", "alias", "validator", "time_limit", "memory_limit", "visits", "submissions", "accepted", "dificulty", "order", "languages");
 			$letter = ord('A');
 
 			foreach ($problemsInContest as $problemkey) {
