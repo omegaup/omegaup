@@ -813,7 +813,7 @@ Arena.prototype.updateClarification = function(clarification) {
 					omegaup.updateClarification(
 						id,
 						$('textarea', answer).val(),
-						$('input[type="checkbox"]', answer).attr('checked'),
+						$('input[type="checkbox"]', answer)[0].checked,
 						function() {
 							$('pre', answerNode).html($('textarea', answer).val());
 							$('textarea', answer).val('');
