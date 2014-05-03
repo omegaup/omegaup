@@ -602,6 +602,10 @@ Arena.prototype.onRankingChanged = function(data) {
 		}
 	}
 
+	if (data.time) {
+		$('#ranking .footer').html(omegaup.time(data.time));
+	}
+
 	this.currentRanking = newRanking;
 	this.prevRankingState = currentRankingState;
 	self.removeRecentEventClassTimeout = setTimeout(function() {

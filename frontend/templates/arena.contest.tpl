@@ -252,6 +252,7 @@
 						</tr>
 					</tbody>
 				</table>
+				<div class="footer"></div>
 			</div>
 			<div id="clarifications" class="tab">
 				<table class="clarifications">

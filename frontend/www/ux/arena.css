@@ -442,6 +442,12 @@ body#only-problem .navleft .main {
 #ranking td.wrong {
 	background: #fdd;
 }
+#ranking .footer {
+	padding: 1em;
+	text-align: right;
+	font-size: 70%;
+	color: grey;
+}
 
 #ranking a {
 	color: #5588DD;

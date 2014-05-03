@@ -230,7 +230,6 @@ class Scoreboard {
 
 		// Cache scoreboard until the contest ends (or forever if it has already ended).
 		$timeout = max(0, strtotime($contest->getFinishTime()) - time());
-		//$timeout = 120;
 		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
 
 		$contestantScoreboard = Scoreboard::getScoreboardFromRuns(
@@ -456,7 +455,8 @@ class Scoreboard {
 			'ranking' => $result,
 			'start_time' => strtotime($contest->start_time),
 			'finish_time' => strtotime($contest->finish_time),
-			'title' => $contest->title
+			'title' => $contest->title,
+			'time' => time() * 1000
 		);
 	}
 
