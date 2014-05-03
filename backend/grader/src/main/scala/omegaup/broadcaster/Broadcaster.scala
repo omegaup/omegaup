@@ -101,78 +101,92 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		new BroadcastOutputMessage(status = "ok")
 	}
 
-	override def run(): Unit = {
-		while (true) {
-			val elm = queue.take
-			if (elm == PoisonPill) return
+	private def runLoop(elm: QueuedElement): Unit = {
+		val message = elm match {
+			case m: QueuedRun => {
+				val run = m.run
+				implicit val formats = Serialization.formats(NoTypeHints)
 
-			val message = elm match {
-				case m: QueuedRun => {
-					val run = m.run
-					implicit val formats = Serialization.formats(NoTypeHints)
-
-					if (Config.get("grader.scoreboard_refresh.enable", true)) {
-						try {
-							info("Scoreboard refresh {}",
-								Https.post[ScoreboardRefreshResponse](
-									Config.get(
-										"grader.scoreboard_refresh.url",
-										"http://localhost/api/scoreboard/refresh/"
-									),
-									Map(
-										"token" -> Config.get("grader.scoreboard_refresh.token", "secret"),
-										"alias" -> elm.contest,
-										"run" -> run.id.toString
-									),
-									runner = false
-								)
+				if (Config.get("grader.scoreboard_refresh.enable", true)) {
+					try {
+						info("Scoreboard refresh {}",
+							Https.post[ScoreboardRefreshResponse](
+								Config.get(
+									"grader.scoreboard_refresh.url",
+									"http://localhost/api/scoreboard/refresh/"
+								),
+								Map(
+									"token" -> Config.get("grader.scoreboard_refresh.token", "secret"),
+									"alias" -> elm.contest,
+									"run" -> run.id.toString
+								),
+								runner = false
 							)
-						} catch {
-							case e: Exception => error("Scoreboard refresh", e)
-						}
+						)
+					} catch {
+						case e: Exception => error("Scoreboard refresh", e)
 					}
+				}
 
-					Serialization.write(
-						UpdateRunMessage("/run/update/",
-							RunDetails(
-								username = run.user.username,
-								contest_alias = Some(elm.contest),
-								alias = run.problem.alias,
-								guid = run.guid,
-								runtime = run.runtime,
-								memory = run.memory,
-								score = run.score,
-								contest_score = run.contest_score,
-								status = run.status.toString,
-								veredict = run.veredict.toString,
-								submit_delay = run.submit_delay,
-								time = run.time.getTime / 1000,
-								language = run.language.toString
-							)
+				Serialization.write(
+					UpdateRunMessage("/run/update/",
+						RunDetails(
+							username = run.user.username,
+							contest_alias = Some(elm.contest),
+							alias = run.problem.alias,
+							guid = run.guid,
+							runtime = run.runtime,
+							memory = run.memory,
+							score = run.score,
+							contest_score = run.contest_score,
+							status = run.status.toString,
+							veredict = run.veredict.toString,
+							submit_delay = run.submit_delay,
+							time = run.time.getTime / 1000,
+							language = run.language.toString
 						)
 					)
-				}
-
-				case m: QueuedMessage => {
-					m.message
-				}
+				)
 			}
 
-			subscriberLock.synchronized {
-				if (subscribers.contains(elm.contest)) {
-					subscribers(elm.contest)
-						.filter(subscriber =>
-							(
-								elm.broadcast ||
-								subscriber.admin ||
-								elm.targetUser == subscriber.user
-							) && (
-								!elm.userOnly ||
-								!subscriber.admin
-							)
+			case m: QueuedMessage => {
+				m.message
+			}
+		}
+
+		val notifyList = subscriberLock.synchronized {
+			if (subscribers.contains(elm.contest)) {
+				subscribers(elm.contest)
+					.filter(subscriber =>
+						(
+							elm.broadcast ||
+							subscriber.admin ||
+							elm.targetUser == subscriber.user
+						) && (
+							!elm.userOnly ||
+							!subscriber.admin
 						)
-						.foreach(_.send(message))
+					)
+			} else {
+				null
+			}
+		}
+
+		if (notifyList != null)
+			notifyList.foreach(_.send(message))
+	}
+
+	override def run(): Unit = {
+		while (true) {
+			try {
+				val elm = queue.take
+				if (elm == PoisonPill) {
+					info("Broadcaster thread finished normally")
+					return
 				}
+				runLoop(elm)
+			} catch {
+				case e: Exception => error("runLoop: {}", e)
 			}
 		}
 	}
@@ -183,7 +197,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 			try {
 				session.getRemote.sendString(message)
 			} catch {
-				case e: IOException => {
+				case e: Exception => {
 					error("Failed to send a message: {}", e)
 					close
 				}
@@ -208,6 +222,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		private var session: BroadcasterSession = null
 
 		override def onWebSocketConnect(sess: Session): Unit = {
+			info("Connecting from {}", sess)
 			session = getSession(sess)
 			if (session == null) {
 				sess.close(new CloseStatus(1000, "forbidden"))
@@ -342,14 +357,18 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		val thread = new Thread(this, "BroadcastThread")
 		thread.start
 
+		info("Broadcaster started")
+
 		new ServiceInterface {
 			override def stop(): Unit = {
+				info("Broadcaster stopping")
 				server.stop
 				queue.put(PoisonPill)
 			}
 			override def join(): Unit = {
 				server.join
 				thread.join
+				info("Broadcaster stopped")
 			}
 		}
 	}

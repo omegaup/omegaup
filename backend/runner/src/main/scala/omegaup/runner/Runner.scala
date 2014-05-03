@@ -449,6 +449,56 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
   }
 }
 
+class RegisterThread(hostname: String, port: Int) extends Thread("RegisterThread") with Log {
+  private var deadline = 0L
+  private var alive = true
+  private val lock = new Object
+
+  def extendDeadline() = {
+    deadline = System.currentTimeMillis + 5 * 60 * 1000;
+  }
+
+  def shutdown() = {
+    alive = false
+    lock.synchronized {
+      lock.notifyAll
+    }
+  }
+
+  private def waitUntilDeadline(): Unit = {
+    while (alive) {
+      val time = System.currentTimeMillis
+      if (time >= deadline) return
+      
+      try {
+        lock.synchronized {
+          lock.wait(deadline - time)
+        }
+      } catch {
+        case e: InterruptedException => {}
+      }
+    }
+  }
+
+  override def run(): Unit = {
+    while (alive) {
+      waitUntilDeadline
+      if (!alive) return
+      try {
+        Https.send[RegisterOutputMessage, RegisterInputMessage](
+          Config.get("grader.register.url", "https://localhost:21680/register/"),
+          new RegisterInputMessage(hostname, port)
+        )
+      } catch {
+        case e: IOException => {
+          error("Failed to register", e)
+        }
+      }
+      extendDeadline
+    }
+  }
+}
+
 object Service extends Object with Log with Using {
   def main(args: Array[String]) = {
     // Parse command-line options.
@@ -473,6 +523,8 @@ object Service extends Object with Log with Using {
     if (hostname == "") {
       throw new IllegalArgumentException("runner.hostname configuration must be set")
     }
+
+    var registerThread: RegisterThread = null
     
     // logger
     Logging.init
@@ -532,6 +584,7 @@ object Service extends Object with Log with Using {
             response.setContentType("text/json")
             Serialization.write(request.getPathInfo() match {
               case "/compile/" => {
+                registerThread.extendDeadline
                 try {
                   val req = Serialization.read[CompileInputMessage](request.getReader())
                   response.setStatus(HttpServletResponse.SC_OK)
@@ -603,34 +656,14 @@ object Service extends Object with Log with Using {
   
     val runnerConnector = new org.eclipse.jetty.server.ServerConnector(server, sslContext)
     runnerConnector.setPort(Config.get("runner.port", 0))
+
+    info("Runner {} registering port {}", hostname, runnerConnector.getLocalPort)
+    registerThread = new RegisterThread(hostname, runnerConnector.getLocalPort)
     
     server.setConnectors(List(runnerConnector).toArray)
-    
     server.setHandler(handler)
     server.start()
     
-    info("Runner {} registering port {}", hostname, runnerConnector.getLocalPort())
-
-    // Send a heartbeat every 5 minutes to register
-    val registerThread = new Thread() {
-      override def run() = {
-        while (true) {
-          try {
-            Https.send[RegisterOutputMessage, RegisterInputMessage](
-              Config.get("grader.register.url", "https://localhost:21680/register/"),
-              new RegisterInputMessage(hostname, runnerConnector.getLocalPort())
-            )
-          } catch {
-            case e: IOException => {
-              error("Failed to register", e)
-            }
-          }
-
-          Thread.sleep(5 * 60 * 1000)
-        }
-      }
-    }
-
     Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() = {
         info("Shutting down")
@@ -647,10 +680,11 @@ object Service extends Object with Log with Using {
         }
 
         server.stop
-        registerThread.stop
+        registerThread.shutdown
       }
     })
 		
+    // Send a heartbeat every 5 minutes to register
     registerThread.start
 
     server.join

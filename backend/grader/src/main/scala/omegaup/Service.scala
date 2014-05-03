@@ -17,7 +17,9 @@ object Service extends Object with Log with Using {
 				Config.load(configPath)
 			} else if (args(i) == "--output" && i + 1 < args.length) {
 				i += 1
-				System.setOut(new java.io.PrintStream(new java.io.FileOutputStream(args(i))))
+				var logStream = new java.io.PrintStream(new java.io.FileOutputStream(args(i), true))
+				System.setOut(logStream)
+				System.setErr(logStream)
 			}
 			i += 1
 		}
@@ -44,3 +46,5 @@ object Service extends Object with Log with Using {
 		info("Shut down cleanly")
 	}
 }
+
+/* vim: set noexpandtab: */

@@ -251,18 +251,20 @@ object Manager extends Object with Log {
 		server.setHandler(handler)
 		server.start()
 
-		info("Omegaup started")
+		info("omegaUp manager started")
 
 		Manager.recoverQueue
 
 		new ServiceInterface {
 			override def stop(): Unit = {
+				info("omegaUp manager stopping")
 				server.stop
 				runnerRouter.stop
 			}
 			override def join(): Unit = {
 				server.join
 				runnerRouter.join
+				info("omegaUp manager stopped")
 			}
 		}
 	}
