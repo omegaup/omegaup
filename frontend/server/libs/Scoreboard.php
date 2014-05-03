@@ -88,7 +88,9 @@ class Scoreboard {
 				$scoreboardLimit,
 				$contest,
 				$this->showAllRuns,
-				$sortByName
+				$sortByName,
+				$withRunDetails,
+				$this->auth_token
 			);
 
 			$timeout = max(0, strtotime($contest->getFinishTime()) - time());
@@ -228,6 +230,7 @@ class Scoreboard {
 
 		// Cache scoreboard until the contest ends (or forever if it has already ended).
 		$timeout = max(0, strtotime($contest->getFinishTime()) - time());
+		//$timeout = 120;
 		$contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
 
 		$contestantScoreboard = Scoreboard::getScoreboardFromRuns(
@@ -340,7 +343,7 @@ class Scoreboard {
 
 	private static function getScoreboardFromRuns($runs, $raw_contest_users, $problem_mapping,
 	                                              $contest_penalty, $scoreboard_time_limit,
-	                                              $contest, $showAllRuns, $sortByName) {
+	                                              $contest, $showAllRuns, $sortByName, $withRunDetails = false, $auth_token = null) {
 		$test_only = array();
 		$no_runs = array();
 		$users_info = array();
@@ -406,6 +409,28 @@ class Scoreboard {
 				$problem['points'] = (int)round($contest_score);
 				$problem['percent'] = (int)round($score * 100);
 				$problem['penalty'] = $totalPenalty;
+
+				if ($withRunDetails === true) {
+					$runDetails = array();
+					
+					$runDetailsRequest = new Request(array(
+						"run_alias" => $run->guid,
+						"auth_token" => $auth_token,
+					));
+					$runDetails = RunController::apiAdminDetails($runDetailsRequest);
+
+
+					// If STATUS="OK" and out_diff is not null, then status is WA
+					// OK just means that runner didn't crash. Grader grades after that.
+					foreach ($runDetails["cases"] as &$case) {
+						if ($case["meta"]["status"] == "OK" && !is_null($case["out_diff"])) {
+							$case["meta"]["status"] = "WA";
+						}
+					}
+	
+					unset($runDetails["source"]);
+					$problem['run_details'] = $runDetails;
+				}
 			}
 			$problem['runs']++;
 		}

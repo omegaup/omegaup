@@ -1688,8 +1688,8 @@ class ContestController extends Controller {
 		// have the full list of cases
 		$problemStats = array();
 		$i = 0;
-		foreach ($contestReport[0]["problems"] as $key => $problemData) {
-			$problem_alias = $key;
+		foreach ($contestReport["problems"] as $entry) {
+			$problem_alias = $entry["alias"];
 			$problemStatsRequest = new Request(array(
 						"problem_alias" => $problem_alias,
 						"auth_token" => $r["auth_token"],
@@ -1700,23 +1700,22 @@ class ContestController extends Controller {
 			$i++;
 		}
 
-
 		// Build a csv
 		$csvData = array();
 
 		// Build titles
 		$csvRow = array();
 		$csvRow[] = "username";
-		foreach ($contestReport[0]["problems"] as $key => $problemData) {
-			foreach ($problemStats[$key]["cases_stats"] as $caseName => $counts) {
+		foreach ($contestReport["problems"] as $entry) {
+			foreach ($problemStats[$entry["alias"]]["cases_stats"] as $caseName => $counts) {
 				$csvRow[] = $caseName;
 			}
-			$csvRow[] = $key . " total";
+			$csvRow[] = $entry["alias"] . " total";
 		}
 		$csvRow[] = "total";
 		$csvData[] = $csvRow;
 
-		foreach ($contestReport as $userData) {
+		foreach ($contestReport["ranking"] as $userData) {
 
 			if ($userData === "ok") {
 				continue;

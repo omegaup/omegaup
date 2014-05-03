@@ -7,17 +7,21 @@ $r = new Request(array(
 		"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 	));
 $r->method = "ContestController::apiReport";
-$response = ApiCaller::call($r);
+$fullResponse = ApiCaller::call($r);
 
-if ($response["status"] == "ok") {
+if ($fullResponse["status"] == "ok") {
+	$response = $fullResponse["ranking"];
 	for ($i = 0; $i < count($response); $i++) {
 		if (!isset($response[$i]['problems'])) continue;
 		foreach ($response[$i]['problems'] as &$problem) {
-			if (!isset($problem['run_details']) || !isset($problem['run_details']['cases'])) continue;
-			foreach ($problem['run_details']['cases'] as &$case) {
-				$case['meta']['time'] = (float)$case['meta']['time'];
-				$case['meta']['time-wall'] = (float)$case['meta']['time-wall'];
-				$case['meta']['mem'] = (float)$case['meta']['mem'] / 1024.0 / 1024.0;
+			if (!isset($problem['run_details']) || !isset($problem['run_details']['groups'])) continue;
+			
+			foreach ($problem['run_details']['groups'] as &$group) {
+				foreach ($group['cases'] as &$case) {
+					$case['meta']['time'] = (float)$case['meta']['time'];
+					$case['meta']['time-wall'] = (float)$case['meta']['time-wall'];
+					$case['meta']['mem'] = (float)$case['meta']['mem'] / 1024.0 / 1024.0;
+				}
 			}
 		}
 	}
