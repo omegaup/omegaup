@@ -201,7 +201,7 @@ class RunnerDispatcher(val name: String) extends ServiceInterface with Log {
 			registeredEndpoints(endpoint) = System.currentTimeMillis
 		}
 
-		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
+		debug("Runner queue register {} length {} known endpoints {}", name, runnerQueue.size, registeredEndpoints.size)
 
 		new RegisterOutputMessage()
 	}
@@ -220,7 +220,7 @@ class RunnerDispatcher(val name: String) extends ServiceInterface with Log {
 			deregisterLocked(endpoint)
 		}
 
-		info("Runner queue length {} known endpoints {}", runnerQueue.size, registeredEndpoints.size)
+		debug("Runner queue deregister {} length {} known endpoints {}", name, runnerQueue.size, registeredEndpoints.size)
 
 		new RegisterOutputMessage()
 	}

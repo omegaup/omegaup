@@ -222,7 +222,7 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		private var session: BroadcasterSession = null
 
 		override def onWebSocketConnect(sess: Session): Unit = {
-			info("Connecting from {}", sess)
+			info("Connecting from {}", sess.getRemoteAddress.getAddress)
 			session = getSession(sess)
 			if (session == null) {
 				sess.close(new CloseStatus(1000, "forbidden"))

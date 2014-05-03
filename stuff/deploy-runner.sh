@@ -41,7 +41,7 @@ cp $ROOT/stuff/minijail-scripts/* $TMPDIR/distrib/minijail/scripts/
 cat > $TMPDIR/distrib/bin/omegaup.conf <<EOF
 # Logging
 logging.level = info
-logging.file = /opt/omegaup/runner.log
+logging.file =
 
 # Paths
 compile.root = /opt/omegaup/compile

@@ -463,6 +463,18 @@ class RegisterThread(hostname: String, port: Int) extends Thread("RegisterThread
     lock.synchronized {
       lock.notifyAll
     }
+    info("Shutting down")
+    try {
+      // well, at least try to de-register
+      Https.send[RegisterOutputMessage, RegisterInputMessage](
+        Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
+        new RegisterInputMessage(hostname, port)
+      )
+    } catch {
+      case _: Throwable => {
+        // Best effort is best effort.
+      }
+    }
   }
 
   private def waitUntilDeadline(): Unit = {
@@ -656,29 +668,17 @@ object Service extends Object with Log with Using {
   
     val runnerConnector = new org.eclipse.jetty.server.ServerConnector(server, sslContext)
     runnerConnector.setPort(Config.get("runner.port", 0))
+    
+    server.setConnectors(List(runnerConnector).toArray)
+    server.setHandler(handler)
+
+    server.start()
 
     info("Runner {} registering port {}", hostname, runnerConnector.getLocalPort)
     registerThread = new RegisterThread(hostname, runnerConnector.getLocalPort)
     
-    server.setConnectors(List(runnerConnector).toArray)
-    server.setHandler(handler)
-    server.start()
-    
     Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() = {
-        info("Shutting down")
-        try {
-          // well, at least try to de-register
-          Https.send[RegisterOutputMessage, RegisterInputMessage](
-            Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
-            new RegisterInputMessage(hostname, runnerConnector.getLocalPort())
-          )
-        } catch {
-          case _: Throwable => {
-            // Best effort is best effort.
-          }
-        }
-
         server.stop
         registerThread.shutdown
       }
@@ -688,6 +688,7 @@ object Service extends Object with Log with Using {
     registerThread.start
 
     server.join
+    registerThread.join
     info("Shut down cleanly")
   }
 }
