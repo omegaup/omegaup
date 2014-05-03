@@ -63,7 +63,7 @@
 												queueLength = 0;
 												for (var queue in graderInfo.queues) {
 													if (!graderInfo.queues.hasOwnProperty(queue)) continue;
-													queueLength = graderInfo.queues[queue].run_queue_length +
+													queueLength += graderInfo.queues[queue].run_queue_length +
 														graderInfo.queues[queue].running.length;
 												}
 											}
