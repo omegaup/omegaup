@@ -10,7 +10,7 @@ class RunController extends Controller {
 	public static $defaultSubmissionGap = 60; /*seconds*/
 	public static $grader = null;
 	private static $practice = false;
-	public static $sourceContestFilter = true;
+	public static $sourceContestFilter = false;
 
 	/**
 	 * Creates an instance of Grader if not already created
