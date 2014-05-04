@@ -58,10 +58,12 @@ class OmegaUpRunstreamReader(callback: RunCaseCallback) extends Object with Usin
 	}
 }
 
-class RunnerProxy(val hostname: String, val port: Int) extends RunnerService with Log {
+class RunnerProxy(val hostname: String, port: Int) extends RunnerService with Log {
 	private val url = "https://" + hostname + ":" + port
 
 	def name() = hostname
+
+	override def port() = port
 
 	override def toString() = "RunnerProxy(%s:%d)".format(hostname, port)
 

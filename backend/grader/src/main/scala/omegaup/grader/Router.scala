@@ -13,12 +13,22 @@ trait RunRouter {
 	def apply(run: Run): String
 }
 
+class RunnerEndpoint(val hostname: String, val port: Int) {
+	def ==(o: RunnerEndpoint) = hostname == o.hostname && port == o.port
+	override def hashCode() = 28227 + 97 * hostname.hashCode + port
+	override def equals(other: Any) = other match {
+		case x:RunnerEndpoint => hostname == x.hostname && port == x.port
+		case _ => false
+	}
+	override def toString() = "%s:%d".format(hostname, port)
+}
+
 object RoutingDescription extends StandardTokenParsers with Log {
 	val defaultQueueName = "#default"
 	lexical.delimiters ++= List("(", ")", "[", "]", "{", "}", ",", ":", "==", "||", "&&")
 	lexical.reserved += ("in", "runners", "condition", "contest", "user", "name", "slow", "problem")
 
-	def parse(input: String): (Map[String,String], RunRouter) = {
+	def parse(input: String): (Map[RunnerEndpoint,String], RunRouter) = {
 		info("Parsing RoutingDescription: {}", input)
 		routingTable(new lexical.Scanner(input)) match {
 			case Success(table, _) => {
@@ -32,15 +42,23 @@ object RoutingDescription extends StandardTokenParsers with Log {
 		}
 	}
 
-	private def routingTable = phrase(rep(queue)) ^^ { (list: List[(String, List[String], RunMatcher)]) => (
-		new HashMap[String,String] ++ list.map { case (name, runners, condition) =>
+	private def routingTable = phrase(rep(queue)) ^^ { (list: List[(String, List[RunnerEndpoint], RunMatcher)]) => (
+		new HashMap[RunnerEndpoint,String] ++ list.map { case (name, runners, condition) =>
 			runners.map(_ -> name)
 		}.flatten,
 		new RunRouterImpl(list.map { case (name, runners, condition) => condition -> name })
 	)}
 	private def queue = "{" ~ name ~ "," ~ runners ~ "," ~ condition ~ "}" ^^ { case "{" ~ name ~ "," ~ runners ~ "," ~ condition ~ "}" => (name, runners, condition) }
 	private def name = "name" ~ ":" ~> stringLit
-	private def runners = "runners" ~ ":" ~> stringList
+	private def runners = "runners" ~ ":" ~> stringList ^^ (
+		_.map( x => {
+				val idx = x.indexOf(":")
+				if (idx == -1)
+					new RunnerEndpoint(x, 21681)
+				else
+					new RunnerEndpoint(x.substring(0, idx), x.substring(idx + 1).toInt)
+		})
+	)
 	private def condition = "condition" ~ ":" ~> expr
 	private def expr: Parser[RunMatcher] = ( "(" ~> expr <~ ")" ) | orExpr
 	private def orExpr: Parser[RunMatcher] = rep1sep(andExpr, "||") ^^ { (andList: List[RunMatcher]) =>
@@ -120,24 +138,25 @@ object RoutingDescription extends StandardTokenParsers with Log {
 	}
 }
 
-class RunnerRouter(dispatcherNames: Map[String,String], runRouter: RunRouter) extends ServiceInterface with Log {
-	private val dispatchers = new HashMap[String, RunnerDispatcher] ++
+class RunnerRouter(dispatcherNames: Map[RunnerEndpoint, String], runRouter: RunRouter) extends ServiceInterface with Log {
+	private val dispatchers = new HashMap[RunnerEndpoint, RunnerDispatcher] ++
 	(new HashSet[String]() ++ dispatcherNames.map(_._2) + RoutingDescription.defaultQueueName).map { (queue: String) => {
-		queue -> new RunnerDispatcher(queue)
+		queue -> new RunnerDispatcher(queue, this)
 	}}
+	dispatcherNames.foreach { case (endpoint, queue) => dispatchers(queue).register(endpoint.hostname, endpoint.port) }
 
-	def status() = dispatchers.toMap.map(entry => {entry._1 -> entry._2.status()})
+	def status() = dispatchers.toMap.map(entry => {entry._1.toString -> entry._2.status})
 
 	def register(hostname: String, port: Int): RegisterOutputMessage = {
-		dispatch(hostname).register(hostname, port)
+		dispatch(new RunnerEndpoint(hostname, port)).register(hostname, port)
 	}
 
 	def deregister(hostname: String, port: Int): RegisterOutputMessage = {
-		dispatch(hostname).deregister(hostname, port)
+		dispatch(new RunnerEndpoint(hostname, port)).deregister(hostname, port)
 	}
 
 	def addRunner(runner: RunnerService) = {
-		dispatch(runner.name).addRunner(runner)
+		dispatch(new RunnerEndpoint(runner.name, runner.port)).addRunner(runner)
 	}
 
 	def addRun(run: Run) = {
@@ -152,15 +171,15 @@ class RunnerRouter(dispatcherNames: Map[String,String], runRouter: RunRouter) ex
 		dispatchers foreach (_._2.join)
 	}
 
-	private def dispatch(hostname: String): RunnerDispatcher = {
-		if (dispatcherNames.contains(hostname))
-			dispatchers(dispatcherNames(hostname))
+	private def dispatch(endpoint: RunnerEndpoint): RunnerDispatcher = {
+		if (dispatcherNames.contains(endpoint))
+			dispatchers(dispatcherNames(endpoint))
 		else
 			dispatchers(RoutingDescription.defaultQueueName)
 	}
 }
 
-class RunnerDispatcher(val name: String) extends ServiceInterface with Log {
+class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceInterface with Log {
 	private case class InFlightRun(service: RunnerService, run: Run, timestamp: Long)
 	private val registeredEndpoints = scala.collection.mutable.HashMap.empty[RunnerEndpoint, Long]
 	private val runnerQueue = scala.collection.mutable.Queue.empty[RunnerService]
@@ -237,16 +256,6 @@ class RunnerDispatcher(val name: String) extends ServiceInterface with Log {
 		lock.synchronized {
 			addRunnerLocked(runner)
 		}
-	}
-
-	private class RunnerEndpoint(val hostname: String, val port: Int) {
-		def ==(o: RunnerEndpoint) = hostname == o.hostname && port == o.port
-		override def hashCode() = 28227 + 97 * hostname.hashCode + port
-		override def equals(other: Any) = other match {
-			case x:RunnerEndpoint => hostname == x.hostname && port == x.port
-			case _ => false
-		}
-		override def toString() = "RunnerEndpoint(%s:%d)".format(hostname, port)
 	}
 
 	private class GradeTask(

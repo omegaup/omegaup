@@ -28,11 +28,17 @@ class RoutingSpec extends FlatSpec {
       }
       {
         name: "test",
-        runners: ["hello", "world"],
+        runners: ["hello:1", "world:2"],
         condition: contest == "test_contest" && user in ["test_user"]
       }
     """)
-  mapping should equal (Map("slow" -> "slow", "problem" -> "problem", "world" -> "test", "hello" -> "test"))
+    mapping should equal (Map(
+      new RunnerEndpoint("slow", 21681) -> "slow",
+      new RunnerEndpoint("problem", 21681) -> "problem",
+      new RunnerEndpoint("world", 2) -> "test",
+      new RunnerEndpoint("hello", 1) -> "test"
+    ))
+    mapping(new RunnerEndpoint("problem", 21681)) should equal("problem")
     router(
       new Run(
         contest = Some(new Contest(alias = "foo")),
