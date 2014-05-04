@@ -45,6 +45,68 @@ class OmegaUpRunstreamWriter(outputStream: OutputStream) extends Closeable with 
   }
 }
 
+class RegisterThread(hostname: String, port: Int) extends Thread("RegisterThread") with Log {
+  private var deadline = 0L
+  private var alive = true
+  private val lock = new Object
+
+  def extendDeadline() = {
+    deadline = System.currentTimeMillis + 1 * 60 * 1000;
+  }
+
+  def shutdown() = {
+    alive = false
+    lock.synchronized {
+      lock.notifyAll
+    }
+    info("Shutting down")
+    try {
+      // well, at least try to de-register
+      Https.send[RegisterOutputMessage, RegisterInputMessage](
+        Config.get("grader.deregister.url", "https://localhost:21680/deregister/"),
+        new RegisterInputMessage(hostname, port)
+      )
+    } catch {
+      case _: Throwable => {
+        // Best effort is best effort.
+      }
+    }
+  }
+
+  private def waitUntilDeadline(): Unit = {
+    while (alive) {
+      val time = System.currentTimeMillis
+      if (time >= deadline) return
+      
+      try {
+        lock.synchronized {
+          lock.wait(deadline - time)
+        }
+      } catch {
+        case e: InterruptedException => {}
+      }
+    }
+  }
+
+  override def run(): Unit = {
+    while (alive) {
+      waitUntilDeadline
+      if (!alive) return
+      try {
+        Https.send[RegisterOutputMessage, RegisterInputMessage](
+          Config.get("grader.register.url", "https://localhost:21680/register/"),
+          new RegisterInputMessage(hostname, port)
+        )
+      } catch {
+        case e: IOException => {
+          error("Failed to register", e)
+        }
+      }
+      extendDeadline
+    }
+  }
+}
+
 object Service extends Object with Log with Using {
   def main(args: Array[String]) = {
     // Parse command-line options.

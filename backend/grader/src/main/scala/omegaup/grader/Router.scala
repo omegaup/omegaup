@@ -382,6 +382,12 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 		debug("Adding runner {}", runner)
 		if (!runnerQueue.contains(runner))
 			runnerQueue += runner
+		runner match {
+			case proxy: omegaup.runner.RunnerProxy => {
+				val endpoint = new RunnerEndpoint(proxy.hostname, proxy.port)
+				registeredEndpoints(endpoint) = System.currentTimeMillis
+			}
+		}
 		dispatchLocked
 	}
 
