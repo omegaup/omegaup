@@ -520,7 +520,9 @@ class RunController extends Controller {
 		$response = array();
 		
 		if (OMEGAUP_LOCKDOWN) {
-			$response['source'] = "";
+			// OMI hotfix
+			// @TODO @joemmanuel, hay que localizar este msg :P
+			$response['source'] = "Ver el código ha sido temporalmente desactivado.";
 		} else {
 			// Get the source
 			$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
