@@ -506,9 +506,6 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiSource(Request $r) {
-		if (OMEGAUP_LOCKDOWN) {
-			throw new ForbiddenAccessException("lockdown");
-		}
 
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
@@ -521,8 +518,12 @@ class RunController extends Controller {
 
 		$response = array();
 		
-		// Get the source
-		$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
+		if (OMEGAUP_LOCKDOWN) {
+			$response['source'] = "";
+		} else {
+			// Get the source
+			$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
+		}
 
 		// Get the error
 		$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
