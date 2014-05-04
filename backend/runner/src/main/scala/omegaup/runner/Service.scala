@@ -10,37 +10,9 @@ import omegaup._
 import omegaup.data._
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 
-class DebugOutputStream(stream: OutputStream) extends OutputStream {
-  val buffer = new StringBuilder
-
-  private def add(c: Int) = {
-    var b = c.toByte
-    if (32 <= b && b < 128) {
-      buffer.append(b.toChar)
-    } else {
-      buffer.append(f"\\x$b%02x")
-    }
-    c
-  }
-
-  override def close(): Unit = stream.close
-  override def flush(): Unit = stream.flush
-  override def write(b: Int): Unit = stream.write(add(b))
-  override def write(b: Array[Byte]): Unit = write(b, 0, b.length)
-  override def write(b: Array[Byte], off: Int, len: Int): Unit = {
-    for (i <- off until off + len) {
-      add(b(i))
-    }
-    stream.write(b, off, len)
-  }
-
-  override def toString() = buffer.toString
-}
-
 class OmegaUpRunstreamWriter(outputStream: OutputStream) extends Closeable with RunCaseCallback with Log {
   private val bzip2 = new BZip2CompressorOutputStream(outputStream)
-  private val debugStream = new DebugOutputStream(bzip2)
-  private val dos = new DataOutputStream(debugStream)
+  private val dos = new DataOutputStream(bzip2)
   private var finalized = false
 
   def apply(filename: String, length: Long, stream: InputStream): Unit = {
@@ -70,7 +42,6 @@ class OmegaUpRunstreamWriter(outputStream: OutputStream) extends Closeable with 
     bzip2.close
     dos.close
     outputStream.close
-		debug("Stream written: \"{}\"", debugStream.toString)
   }
 }
 
