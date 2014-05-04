@@ -308,7 +308,7 @@ object Minijail extends Object with Sandbox with Log with Using {
       }
     } else {
       meta("return") = meta("status")
-      if (meta("status") == "0") {
+      if (meta("status") == "0" || lang == "c") {
         meta("status") = "OK"
       } else if (meta("status") != "JE") {
         meta("status") = "RE"
