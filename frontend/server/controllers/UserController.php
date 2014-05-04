@@ -322,6 +322,9 @@ class UserController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiChangePassword(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
 
 		self::authenticateRequest($r);
 

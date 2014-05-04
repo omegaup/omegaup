@@ -334,6 +334,9 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiCreate(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
 
 		// Authenticate user
 		self::authenticateRequest($r);
@@ -537,7 +540,7 @@ class ContestController extends Controller {
 	}
 
 	/**
-	 * Adds a problem to a contest
+	 * Gets the problems from a contest
 	 * 
 	 * @param Request $r
 	 * @return array
@@ -585,6 +588,9 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiAddProblem(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
 
 		// Authenticate user
 		self::authenticateRequest($r);
@@ -793,6 +799,9 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiAddUser(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
 
 		// Authenticate logged user
 		self::authenticateRequest($r);
@@ -853,6 +862,10 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiAddAdmin(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
+
 		// Authenticate logged user
 		self::authenticateRequest($r);
 
@@ -1283,6 +1296,9 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiUpdate(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
 
 		// Authenticate request
 		self::authenticateRequest($r);

@@ -37,6 +37,7 @@ if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 	}
 }
 
+define('OMEGAUP_LOCKDOWN', $_SERVER['HTTP_HOST'] == OMEGAUP_LOCKDOWN_DOMAIN);
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
 /*

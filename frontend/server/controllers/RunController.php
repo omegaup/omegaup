@@ -6,11 +6,9 @@
  * @author joemmanuel
  */
 class RunController extends Controller {
-
 	public static $defaultSubmissionGap = 60; /*seconds*/
 	public static $grader = null;
 	private static $practice = false;
-	public static $sourceContestFilter = false;
 
 	/**
 	 * Creates an instance of Grader if not already created
@@ -133,6 +131,9 @@ class RunController extends Controller {
 		$response = array();
 
 		if (self::$practice) {
+			if (OMEGAUP_LOCKDOWN) {
+				throw new ForbiddenAccessException("lockdown");
+			}
 			$submit_delay = 0;
 			$contest_id = null;
 			$test = 0;
@@ -402,6 +403,10 @@ class RunController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiAdminDetails(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
+
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 		self::validateDetailsRequest($r);
@@ -501,6 +506,10 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiSource(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
+
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
@@ -512,17 +521,6 @@ class RunController extends Controller {
 
 		$response = array();
 		
-		// Panic check
-		if (self::$sourceContestFilter) {
-			$r["contest"] = is_null($r["run"]->contest_id) ? null : ContestsDAO::getByPK($r["run"]->contest_id);
-			
-			if (is_null($r["contest"]) || $r["contest"]->alias !== "OMI2014DIA1") {
-				$response['source'] = "Ver el código para este concurso ha sido temporalmente desactivado";
-				$response['status'] = "ok";
-				return $response;
-			}
-		}
-						
 		// Get the source
 		$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
 
@@ -543,6 +541,9 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiDownload(Request $r) {
+		if (OMEGAUP_LOCKDOWN) {
+			throw new ForbiddenAccessException("lockdown");
+		}
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 

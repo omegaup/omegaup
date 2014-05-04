@@ -8,6 +8,7 @@ if (!function_exists('try_define')) {
 # GLOBAL CONFIG
 # ###################################
 try_define('OMEGAUP_ROOT', '/opt/omegaup/frontend');
+try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 
 # ####################################
 # DATABASE CONFIG
