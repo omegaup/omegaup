@@ -55,7 +55,7 @@ $(document).ready(function() {
 			}
 			return;
 		} else if (arena.practice && contest.finish_time && new Date().getTime() < contest.finish_time.getTime()) {
-			window.location = window.location.pathname.replace(/\/practice\/.*/, '/');
+			window.location = window.location.pathname.replace(/\/practice.*/, '/');
 			return;
 		}
 
