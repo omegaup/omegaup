@@ -267,11 +267,10 @@ Arena.prototype.updateRun = function(run) {
 			}
 		}
 	}
-	var r = $('.run_' + run.guid);
 	if (self.admin && $('#runs .run_' + run.guid).length == 0) {
-		r = self.createAdminRun(run);
-		$('#runs .runs > tbody:last').prepend(r);
+		$('#runs .runs > tbody:last').prepend(self.createAdminRun(run));
 	}
+	var r = $('.run_' + run.guid);
 	self.displayRun(run, r);
 
 	if (self.socket == null) {

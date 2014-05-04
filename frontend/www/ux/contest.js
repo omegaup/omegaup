@@ -210,7 +210,7 @@ $(document).ready(function() {
 
 		if (!code) return false;
 
-		submitRun((arena.practice || arena.onlyProblem)? '' : contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
+		submitRun((arena.practice || arena.onlyProblem) ? '' : contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
 
 		return false;
 	});
