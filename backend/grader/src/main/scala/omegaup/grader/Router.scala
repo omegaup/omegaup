@@ -143,7 +143,7 @@ class RunnerRouter(dispatcherNames: Map[RunnerEndpoint, String], runRouter: RunR
 	(new HashSet[String]() ++ dispatcherNames.map(_._2) + RoutingDescription.defaultQueueName).map { (queue: String) => {
 		queue -> new RunnerDispatcher(queue, this)
 	}}
-	dispatcherNames.foreach { case (endpoint, queue) => dispatchers(queue).register(endpoint.hostname, endpoint.port) }
+	dispatcherNames.foreach { case (endpoint, queue) => register(endpoint.hostname, endpoint.port) }
 
 	def status() = dispatchers.toMap.map(entry => {entry._1.toString -> entry._2.status})
 

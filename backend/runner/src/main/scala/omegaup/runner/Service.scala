@@ -10,13 +10,14 @@ import omegaup._
 import omegaup.data._
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 
-class OmegaUpRunstreamWriter(outputStream: OutputStream) extends Closeable with RunCaseCallback {
+class OmegaUpRunstreamWriter(outputStream: OutputStream) extends Closeable with RunCaseCallback with Log {
   private val bzip2 = new BZip2CompressorOutputStream(outputStream)
   private val dos = new DataOutputStream(bzip2)
   private var finalized = false
 
   def apply(filename: String, length: Long, stream: InputStream): Unit = {
     if (finalized) return
+    debug("Writing {}({}) into runstream", filename, length)
     dos.writeBoolean(true)
     dos.writeUTF(filename)
     dos.writeLong(length)
@@ -25,10 +26,12 @@ class OmegaUpRunstreamWriter(outputStream: OutputStream) extends Closeable with 
     while ( { read = stream.read(buffer, 0, buffer.length); read > 0 } ) {
       dos.write(buffer, 0, read)
     }
+    dos.flush
   }
 
   def finalize(message: RunOutputMessage): Unit = {
     if (finalized) return
+    debug("Finalizing runstream with {}", message)
     dos.writeBoolean(false)
     implicit val formats = Serialization.formats(NoTypeHints)
     Serialization.write(message, new OutputStreamWriter(dos))
