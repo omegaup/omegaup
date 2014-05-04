@@ -95,7 +95,8 @@ object Service extends Object with Log with Using {
             response.setStatus(HttpServletResponse.SC_OK)
 
             using (new OmegaUpRunstreamWriter(response.getOutputStream)) { callbackProxy => {
-              val message = try {
+              var message: RunOutputMessage = null
+              message = try {
                 val req = Serialization.read[RunInputMessage](request.getReader)
                 token = req.token
                 
@@ -107,7 +108,7 @@ object Service extends Object with Log with Using {
                   new RunOutputMessage(status = "error", error = Some(e.getMessage))
                 }
               } finally {
-                if (token != null)
+                if (token != null && !(message != null && message.error == Some("missing input")))
                   runner.removeCompileDir(token)
               }
               callbackProxy.finalize(message)

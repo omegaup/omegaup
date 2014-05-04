@@ -385,7 +385,10 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
    
     // HACKHACKHACK Investigar por qué esto está ocurriendo.
     // if (!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
-    if (!runDirectory.exists) return
+    if (!runDirectory.exists) {
+      error("Directory {} was removed earlier. This is an error", runDirectory)
+      return
+    }
 
     if (!Config.get("runner.preserve", false)) FileUtil.deleteDirectory(runDirectory)
   }
