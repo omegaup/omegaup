@@ -32,6 +32,9 @@ class RunstreamSpec extends FlatSpec with Using {
         timesCalled should be <(cases.length)
         filename should equal(cases(timesCalled)._1)
         length should equal(cases(timesCalled)._2.length)
+        val buffer = new Array[Byte](length.toInt)
+        stream.read(buffer)
+        buffer should equal(cases(timesCalled)._2)
         timesCalled += 1
       }
     }
