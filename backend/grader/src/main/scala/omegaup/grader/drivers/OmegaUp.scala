@@ -76,7 +76,7 @@ object OmegaUpDriver extends Driver with Log {
     info("Running {} {} on {}", alias, id, service.name)
     val response = service.run(msg, placer)
     debug("Ran {} {}, returned {}", alias, id, response)
-    if (service.run(msg, placer).status != "ok") {
+    if (response.status != "ok") {
       if (response.error.get ==  "missing input") {
         info("Received a missing input message, trying to send input from {}", alias)
         val inputZip = new File(Config.get("problems.root", "problems"), alias + "/cases.zip")
