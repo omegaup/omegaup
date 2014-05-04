@@ -11,6 +11,7 @@ write: 1
 close: 1
 exit: 1
 exit_group: 1
+time: 1
 
 # ldwrapper
 execve: 1

@@ -18,3 +18,4 @@ munmap: 1
 exit_group: 1
 gettimeofday: 1
 times: 1
+time: 1

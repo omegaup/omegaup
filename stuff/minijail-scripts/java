@@ -20,6 +20,7 @@ lstat: 1
 clock_getres: 1
 clock_gettime: 1
 gettimeofday: 1
+time: 1
 getrlimit: 1
 setrlimit: arg0 == RLIMIT_STACK; return EPERM
 geteuid: 1
