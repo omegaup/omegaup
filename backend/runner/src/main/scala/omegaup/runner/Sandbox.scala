@@ -178,7 +178,7 @@ object Minijail extends Object with Sandbox with Log with Using {
     val runtime = Runtime.getRuntime
 
     var timeLimit = message.timeLimit
-    if (lang == "java" || lang == "p") {
+    if (lang == "java") {
       timeLimit += 1
     }
 
