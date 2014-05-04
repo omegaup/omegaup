@@ -125,7 +125,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
                 .read(runDirectory.getCanonicalPath + "/compile.err")
                 .replace(runDirectory.getCanonicalPath + "/", "")
 
-          if (compileError == "") {
+          if (missingMainClass) {
             compileError = "Class should be called \"Main\"."
           }
         
