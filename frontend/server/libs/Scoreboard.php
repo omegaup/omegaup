@@ -443,6 +443,7 @@ class Scoreboard {
 				continue;
 			}
 			$info = $users_info[$user_id];
+			if ($info == null) continue;
 			$info[self::total_column] = Scoreboard::getTotalScore($info['problems']);
 			array_push($result, $info);
 		}
@@ -566,6 +567,8 @@ class Scoreboard {
 			$problem_data['penalty'] = 0;
 
 			$user = &$contest_users[$user_id];
+
+			if ($user == null) continue;
 
 			$data = array(
 				'name' => $user->getName() ? $user->getName() : $user->getUsername(),

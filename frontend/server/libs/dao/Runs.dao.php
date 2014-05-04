@@ -309,7 +309,7 @@ class RunsDAO extends RunsDAOBase {
 		if (!$showAllRuns) {
 			$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( "
 					. "SELECT DISTINCT Runs.user_id from Runs "
-					. "WHERE ( Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) "
+					. "WHERE ( Runs.veredict NOT IN ('CE', 'JE') AND Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) "
 				. "RunsContests ON Users.user_id = RunsContests.user_id " . (!is_null($filterUsersBy) ? "WHERE Users.username LIKE ?" : "");
 
 			if (is_null($filterUsersBy)) {
