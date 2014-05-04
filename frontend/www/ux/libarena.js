@@ -325,6 +325,12 @@ Arena.prototype.createAdminRun = function(run) {
 				} else {
 					$('#run-details .source').html(omegaup.escape(data.source));
 				}
+				
+				$('#run-details .judged_by').html('');
+				if (data.judged_by) {
+					$('#run-details .judged_by').html(data.judged_by);
+				}
+				
 				$('#run-details .cases div').remove();
 				$('#run-details .cases table').remove();
 				$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');

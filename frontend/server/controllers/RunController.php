@@ -454,6 +454,7 @@ class RunController extends Controller {
 		if ($response['source'] == null) {
 			$response['source'] = '';
 		}
+		$response['judged_by'] = $r["run"]->judged_by;
 		$response["status"] = "ok";
 		
 		return $response;
