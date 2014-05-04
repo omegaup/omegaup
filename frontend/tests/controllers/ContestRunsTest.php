@@ -43,6 +43,7 @@ class ContestRunsTest extends OmegaupTestCase {
 		$this->assertEquals(1, count($response["runs"]));
 		$this->assertEquals($runData["response"]["guid"], $response["runs"][0]["guid"]);
 		$this->assertEquals($contestant->username, $response["runs"][0]["username"]);
+		$this->assertEquals("J1", $response["runs"][0]["judged_by"]);
 	}
 }
 

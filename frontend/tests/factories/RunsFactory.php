@@ -131,6 +131,7 @@ class RunsFactory {
 		$run->setScore($points);
 		$run->setContestScore($points * 100);
 		$run->setStatus("ready");
+		$run->judged_by = "J1";
 		
 		if(!is_null($submitDelay)) {
 			$run->setSubmitDelay($submitDelay);

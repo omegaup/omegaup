@@ -460,6 +460,7 @@ Arena.prototype.displayRun = function(run, r) {
 		$('.status', r).css('background-color', '');
 	}
 	$('.penalty', r).html(run.submit_delay);
+	$('.judged_by', r).html(run.judged_by);
 	if (run.time) {
 		$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 	}

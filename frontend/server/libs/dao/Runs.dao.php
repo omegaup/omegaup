@@ -90,7 +90,7 @@ class RunsDAO extends RunsDAOBase {
 
 	public static final function GetAllRuns($contest_id, $status, $veredict, $problem_id, $language, $user_id, $offset, $rowcount) {
 		$sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.veredict, r.runtime, ' .
-				'r.memory, r.score, r.contest_score, UNIX_TIMESTAMP(r.time) AS time, ' .
+				'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
 				'r.submit_delay, u.username, p.alias ' .
 				'FROM Runs r ' .
 				'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .

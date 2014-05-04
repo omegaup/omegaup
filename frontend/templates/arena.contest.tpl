@@ -207,6 +207,7 @@
 							<th>{#wordsStatus#}</th>
 							<th>{#wordsPoints#}</th>
 							<th>{#wordsPenalty#}</th>
+							<th>Judged by</th>
 							<th>Rejuecear</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
@@ -224,6 +225,7 @@
 							<td class="status"></td>
 							<td class="points"></td>
 							<td class="penalty"></td>
+							<td class="judged_by"></td>
 							<td class="rejudge"></td>
 							<td class="details"></td>
 						</tr>
