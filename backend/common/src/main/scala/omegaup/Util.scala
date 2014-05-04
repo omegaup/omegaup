@@ -292,6 +292,28 @@ object Https extends Object with Log with Using {
 		}
 	}
 	
+  def send[T, W <: AnyRef](url:String, request:W, responseReader: InputStream=>T, runner: Boolean = true)(implicit mf: Manifest[T]):T = {
+		debug("Requesting {}", url)
+		
+		implicit val formats = Serialization.formats(NoTypeHints)
+		
+		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+			conn.addRequestProperty("Content-Type", "text/json")
+			conn.addRequestProperty("Connection", "close")
+			if (runner) {
+				conn.setSSLSocketFactory(runnerSocketFactory)
+			} else {
+				conn.setSSLSocketFactory(defaultSocketFactory)
+			}
+			conn.setDoOutput(true)
+			val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
+			Serialization.write[W, PrintWriter](request, writer)
+			writer.close()
+		
+			responseReader(conn.getInputStream)
+		}}
+	}
+
 	def send[T, W <: AnyRef](url:String, request:W, runner: Boolean = true)(implicit mf: Manifest[T]):T = {
 		debug("Requesting {}", url)
 		

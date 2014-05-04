@@ -3,7 +3,6 @@ package omegaup.grader
 import java.io._
 import java.util._
 import java.util.regex.Pattern
-import java.util.zip._
 import scala.collection.Iterator
 import scala.collection.mutable
 import scala.collection.immutable.Map
@@ -13,50 +12,10 @@ import omegaup.data._
 import Veredict._
 
 trait Grader extends Object with Log with Using {
-  def extract(run: Run, dataDirectory: File): Unit = {
-    val id = run.id
-		val zip = new File(Config.get("grader.root", ".") + "/" + id + ".zip")
-
-		// Cleanup previous invocations in case of re-judge.
-		FileUtil.deleteDirectory(dataDirectory)
-		val compileError = new File(zip.getParentFile, id + ".err")
-		if (compileError.exists) {
-			compileError.delete
-		}
-
-		dataDirectory.mkdirs()
-		
-		val input = new ZipInputStream(new FileInputStream(zip))
-		var entry: ZipEntry = input.getNextEntry
-		val buffer = Array.ofDim[Byte](1024)
-		var read: Int = 0
-		
-		while(entry != null) {
-			val outFile = new File(dataDirectory, entry.getName())
-			if (entry.isDirectory) {
-				outFile.mkdir
-			} else {
-				using(new FileOutputStream(outFile)) { output => {
-					while( { read = input.read(buffer); read > 0 } ) {
-						output.write(buffer, 0, read)
-					}
-				}}
-			}
-			input.closeEntry
-			entry = input.getNextEntry
-		}
-		
-		input.close
-		
-		zip.delete
-	}
-
 	def grade(run: Run): Run = {
 		val alias = run.problem.alias
 		val dataDirectory = new File(Config.get("grader.root", ".") + "/" + run.id)
 
-		extract(run, dataDirectory)
-		
 		run.status = Status.Ready
 		run.veredict = Veredict.Accepted
 		run.runtime = 0

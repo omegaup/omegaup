@@ -8,6 +8,10 @@ import org.slf4j._
 import org.scalatest.{FlatSpec, BeforeAndAfterAll}
 import org.scalatest.Matchers
 
+object NullRunCaseCallback extends Object with RunCaseCallback {
+  def apply(filename: String, length: Long, stream: InputStream): Unit = {}
+}
+
 class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   override def beforeAll() {
     import java.util.zip._
@@ -136,7 +140,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       new CaseData("segfault", "6"),
       new CaseData("zerodiv", "7"),
       new CaseData("ret1", "8")
-    ))), new File(zipRoot.getCanonicalPath + "/test1.zip"))
+    ))), NullRunCaseCallback)
     
     val test2 = runner.compile(CompileInputMessage("cpp", List(("Main.cpp", """
       #include<stdio.h>
@@ -189,7 +193,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       new CaseData("segfault", "6"),
       new CaseData("zerodiv", "7"),
       new CaseData("ret1", "8")
-    ))), new File(zipRoot.getCanonicalPath + "/test2.zip"))
+    ))), NullRunCaseCallback)
     
     val test3 = runner.compile(CompileInputMessage("java", List(("Main.java", """
       import java.io.*;
@@ -240,7 +244,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       new CaseData("segfault", "6"),
       new CaseData("zerodiv", "7"),
       new CaseData("ret1", "8")
-    ))), new File(zipRoot.getCanonicalPath + "/test3.zip"))
+    ))), NullRunCaseCallback)
 
     val test4 = runner.compile(CompileInputMessage("cpp11", List(("Main.cpp", """
       #include<stdio.h>
@@ -293,7 +297,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       new CaseData("segfault", "6"),
       new CaseData("zerodiv", "7"),
       new CaseData("ret1", "8")
-    ))), new File(zipRoot.getCanonicalPath + "/test2.zip"))
+    ))), NullRunCaseCallback)
   }
 
   "Exploits" should "be handled" in {
@@ -307,7 +311,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     """))))
     runner.run(RunInputMessage(test5.token.get, 1, 65536, 1, false, None, Some(List(
       new CaseData("ok", "0")
-    ))), new File(zipRoot.getCanonicalPath + "/test5.zip"))
+    ))), NullRunCaseCallback)
 
     // x86_64 forkbomb
     val test4 = runner.compile(CompileInputMessage("cpp", List(("Main.cpp", """
@@ -315,7 +319,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     """))))
     runner.run(RunInputMessage(test4.token.get, 1, 65536, 1, false, None, Some(List(
       new CaseData("ok", "0")
-    ))), new File(zipRoot.getCanonicalPath + "/test4.zip"))
+    ))), NullRunCaseCallback)
 
     // Java6 parse double bug in compiler: CVE-2010-4476
     val test6 = runner.compile(CompileInputMessage("java", List(("Main.java", """
@@ -392,7 +396,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     
     runner.run(RunInputMessage(test3.token.get, 1, 65536, 1, false, None, Some(List(
       new CaseData("zero", "0")
-    ))), new File(zipRoot.getCanonicalPath + "/test6.zip"))
+    ))), NullRunCaseCallback)
 
     val test4 = runner.compile(CompileInputMessage("c", List(("Main.c", """
       #include<stdio.h>
@@ -414,7 +418,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     
     runner.run(RunInputMessage(test4.token.get, 1, 65536, 1, false, None, Some(List(
       new CaseData("je", "0")
-    ))), new File(zipRoot.getCanonicalPath + "/test7.zip"))
+    ))), NullRunCaseCallback)
 
     val test7 = runner.compile(CompileInputMessage("kj", List(("Main.kj", "foo"))))
     test7.status should not equal ("ok")
@@ -459,7 +463,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       new CaseData("zero", "0 0\n"),
       new CaseData("two", "2 2\n"),
       new CaseData("half", "0.5 0.5\n")
-    ))), new File(zipRoot.getCanonicalPath + "/test8.zip"))
+    ))), NullRunCaseCallback)
 
     val test6 = runner.compile(CompileInputMessage("cpp", List(("Main.cpp", """
       #include<iostream>
@@ -484,6 +488,6 @@ print 1.0 / (1.0 + (answer - user)**2)
       new CaseData("zero", "0 0\n"),
       new CaseData("two", "2 2\n"),
       new CaseData("half", "0.5 0.5\n")
-    ))), new File(zipRoot.getCanonicalPath + "/test9.zip"))
+    ))), NullRunCaseCallback)
   }
 }

@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-core" % "1.1.1",
   "ch.qos.logback" % "logback-classic" % "1.1.1",
   "commons-codec" % "commons-codec" % "1.9",
+  "org.apache.commons" % "commons-compress" % "1.8",
   "org.scalatest" %% "scalatest" % "2.1.2" % "test"
 )
 
@@ -52,7 +53,7 @@ ProguardKeys.options in Proguard ++= Seq(
 ProguardKeys.inputFilter in Proguard := { file =>
   file.name match {
     case "runner_2.10-1.1.jar" => None
-    case _ => Some("!**/ECLIPSEF.RSA,!**/ECLIPSEF.SF,!about.html,!META-INF/MANIFEST.MF,!rootdoc.txt,!META-INF/LICENSE.txt")
+    case _ => Some("!**/ECLIPSEF.RSA,!**/ECLIPSEF.SF,!about.html,!META-INF/MANIFEST.MF,!rootdoc.txt,!META-INF/LICENSE.txt,!META-INF/NOTICE.txt")
   }
 }
 

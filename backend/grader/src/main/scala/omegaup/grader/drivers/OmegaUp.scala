@@ -21,7 +21,7 @@ object OmegaUpDriver extends Driver with Log {
     val alias = run.problem.alias
     val lang = run.language
 
-    info("OU Compiling {} {} on {}", alias, id, service.name)
+    info("Compiling {} {} on {}", alias, id, service.name)
 
     run.status = Status.Compiling
     run.judged_by = Some(service.name)
@@ -68,26 +68,49 @@ object OmegaUpDriver extends Driver with Log {
     run.status = Status.Running
     Manager.updateVeredict(run)
 
-    val zip = new File(Config.get("grader.root", "grader") + "/" + id + ".zip")
-    service.run(msg, zip) match {
-      case Some(x) => {
-        info("Received a message {}, trying to send input from {}", x, zip.getCanonicalPath)
+    val target = new File(Config.get("grader.root", "grader") + "/" + id + "/")
+    FileUtil.deleteDirectory(target)
+    target.mkdir
+    val placer = new CasePlacer(target)
+
+    info("Running {} {} on {}", alias, id, service.name)
+    val response = service.run(msg, placer)
+    debug("Ran {} {}, returned {}", alias, id, response)
+    if (service.run(msg, placer).status != "ok") {
+      if (response.error.get ==  "missing input") {
+        info("Received a missing input message, trying to send input from {}", alias)
         val inputZip = new File(Config.get("problems.root", "problems"), alias + "/cases.zip")
         if(
           service.input(
             input,
             new FileInputStream(inputZip), inputZip.length.toInt
           ).status != "ok" ||
-          service.run(msg, zip) != None
+          service.run(msg, placer).status != "ok"
         ) {
           throw new RuntimeException("OU unable to run submission after sending input. giving up.")
         }
+      } else {
+        throw new RuntimeException(response.error.get)
       }
-      case _ => {}
     }
+
+    info("Grading {} {}", alias, id)
 
     // Finally return the run.
     run
+  }
+
+  class CasePlacer(directory: File) extends Object with RunCaseCallback with Using with Log {
+    def apply(filename: String, length: Long, stream: InputStream): Unit = {
+      debug("Placing file {}({}) into {}", filename, length, directory)
+      val target = new File(directory, filename)
+      if (!target.getParentFile.exists) {
+        target.getParentFile.mkdirs
+      }
+      using (new FileOutputStream(new File(directory, filename))) {
+        FileUtil.copy(stream, _)
+      }
+    }
   }
 
   override def grade(run: Run): Run = {
@@ -113,7 +136,7 @@ object OmegaUpDriver extends Driver with Log {
         )
       }).find(_._2.exists) match {
         case Some((lang, validator)) => {
-          debug("OU Using custom validator {} for problem {}",
+          debug("Using custom validator {} for problem {}",
                 validator.getCanonicalPath,
                 run.problem.alias)
           validatorLang = Some(lang)
@@ -121,13 +144,13 @@ object OmegaUpDriver extends Driver with Log {
         }
 
         case _ => {
-          throw new FileNotFoundException("OU Validator for problem " + run.problem.alias +
+          throw new FileNotFoundException("Validator for problem " + run.problem.alias +
                                           " was set to 'custom', but no validator program" +
                                           " was found.")
         }
       }
     } else {
-      debug("OU Using {} validator for problem {}", run.problem.validator, run.problem.alias)
+      debug("Using {} validator for problem {}", run.problem.validator, run.problem.alias)
     }
 
     val codes = new ListBuffer[(String,String)]
@@ -137,7 +160,7 @@ object OmegaUpDriver extends Driver with Log {
     )
 
     if (interactiveRoot.isDirectory) {
-      debug("OU Using interactive mode problem {}", run.problem.alias)
+      debug("Using interactive mode problem {}", run.problem.alias)
 
       val unitNameFile = new File(interactiveRoot, "unitname")
       if (!unitNameFile.isFile) {

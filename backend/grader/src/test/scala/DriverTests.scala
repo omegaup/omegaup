@@ -103,8 +103,10 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
         } catch {
           case e: Exception => { exception = e }
         }
-        ready = true
-        lock.synchronized { lock.notify }
+        lock.synchronized {
+          ready = true
+          lock.notify
+        }
       }
     }
 
@@ -115,7 +117,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       user: Int,
       contest: Int,
       date: String
-    )(test: (Run) => Unit) = {
+    )(test: Run=>Unit) = {
       import java.util.Date
       import java.sql.Timestamp
       import java.text.SimpleDateFormat
@@ -126,51 +128,53 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
         new java.io.File(Config.get("submissions.root", "."))
       )
 
-    implicit val conn = Manager.connection
+      implicit val conn = Manager.connection
 
-    FileUtil.write(file.getCanonicalPath, code)
+      FileUtil.write(file.getCanonicalPath, code)
 
-    val submit_id = GraderData.insert(new Run(
-      guid = file.getName,
-      user = new User(id = user),
-      language = language,
-      problem = new Problem(id = id),
-      contest = contest match {
-        case 0 => None
-        case x: Int => Some(new Contest(id = x))
-      },
-      time = new Timestamp(date match {
-          case null => new Date().getTime()
-          case x: String => new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(x).getTime()
-        })
-    )).id
+      val submit_id = GraderData.insert(new Run(
+        guid = file.getName,
+        user = new User(id = user),
+        language = language,
+        problem = new Problem(id = id),
+        contest = contest match {
+          case 0 => None
+          case x: Int => Some(new Contest(id = x))
+        },
+        time = new Timestamp(date match {
+            case null => new Date().getTime()
+            case x: String => new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(x).getTime()
+          })
+      )).id
 
-    ready = false
-    tests += test
-    Manager.grade(submit_id, false)
+      ready = false
+      tests += test
+      Manager.grade(submit_id, false)
 
-    lock.synchronized {
-      lock.wait(10000)
+      lock.synchronized {
+        if (!ready) {
+          lock.wait(10000)
+        }
+      }
+
+      ready should be (true)
+      if (exception != null) throw exception
     }
 
-    if (!ready) throw new Exception("Test timed out")
-    if (exception != null) throw exception
-  }
-
-  def omegaUpSubmit (problem_id: Long, language: Language, code: String)(test: (Run) => Unit) = {
-    omegaUpSubmitContest(problem_id, language, code, 1, 0, null) { test }
-  }
-
-  omegaUpSubmit(1, Language.Cpp, """
-    int main() {
-      while(true);
+    def omegaUpSubmit (problem_id: Long, language: Language, code: String)(test: (Run) => Unit) = {
+      omegaUpSubmitContest(problem_id, language, code, 1, 0, null) { test }
     }
-  """) { run => {
-    run.status should equal (Status.Ready)
-    run.veredict should equal (Veredict.TimeLimitExceeded)
-    run.score should equal (0)
-    run.contest_score should equal (0)
-  }}
+
+    omegaUpSubmit(1, Language.Cpp, """
+      int main() {
+        while(true);
+      }
+    """) { run => {
+      run.status should equal (Status.Ready)
+      run.veredict should equal (Veredict.TimeLimitExceeded)
+      run.score should equal (0)
+      run.contest_score should equal (0)
+    }}
 
   omegaUpSubmitContest(1, Language.Cpp, """
     #include <cstdlib>

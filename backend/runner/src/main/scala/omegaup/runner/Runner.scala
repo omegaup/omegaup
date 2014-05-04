@@ -2,11 +2,6 @@ package omegaup.runner
 
 import java.io._
 import java.util.zip._
-import javax.servlet._
-import javax.servlet.http._
-import org.eclipse.jetty.server.Request
-import org.eclipse.jetty.server.handler._
-import net.liftweb.json._
 import scala.collection.{mutable,immutable}
 import omegaup._
 import omegaup.data._
@@ -194,12 +189,12 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
     compile(new File(runRoot + "/bin"), message.lang, message.code, "compile error")
   }
 
-  def run(message: RunInputMessage, zipFile: File) : Option[RunOutputMessage] = {
+  def run(message: RunInputMessage, callback: RunCaseCallback) : RunOutputMessage = {
     info("run {}", message)
     val casesDirectory:File = message.input match {
       case Some(in) => {
         if (in.contains(".") || in.contains("/")) {
-          throw new IllegalArgumentException("Invalid input")
+          return new RunOutputMessage(status="error", error=Some("Invalid input"))
         }
         new File (Config.get("input.root", ".") + "/" + in)
       }
@@ -207,15 +202,15 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
     }
     
     if(message.token.contains("..") || message.token.contains("/")) {
-      throw new IllegalArgumentException("Invalid token")
+      return new RunOutputMessage(status="error", error=Some("Invalid token"))
     }
     
     if(casesDirectory != null && !casesDirectory.exists) {
-      Some(new RunOutputMessage(error=Some("missing input")))
+      new RunOutputMessage(status="error", error=Some("missing input"))
     } else {
       val runDirectory = new File(Config.get("compile.root", ".") + "/" + message.token)
     
-      if(!runDirectory.exists) throw new IllegalArgumentException("Invalid token")
+      if(!runDirectory.exists) return new RunOutputMessage(status="error", error=Some("Invalid token"))
     
       val binDirectory = new File(runDirectory.getCanonicalPath + "/bin")
     
@@ -297,9 +292,6 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
         }
       }
     
-      val zipOutput = new ZipOutputStream(new FileOutputStream(zipFile.getCanonicalPath))
-   
-      var addedValidator = false
       runDirectory.listFiles.filter { _.getName.endsWith(".meta") } .foreach { (x) => {
         val meta = MetaFile.load(x.getCanonicalPath)
         var addedErr = false
@@ -334,26 +326,9 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
             )
 
             if (message.debug) {
-              if (!addedValidator) {
-                addedValidator = true
-                zipOutput.putNextEntry(new ZipEntry("validator/"))
-              }
-
-              zipOutput.putNextEntry(new ZipEntry("validator/" + caseName + ".meta"))
-              using (new FileInputStream(caseFile + ".meta")) {
-                inputStream => FileUtil.copy(inputStream, zipOutput)
-              }
-              zipOutput.closeEntry
-              zipOutput.putNextEntry(new ZipEntry("validator/" + caseName + ".out"))
-              using (new FileInputStream(caseFile + ".out")) {
-                inputStream => FileUtil.copy(inputStream, zipOutput)
-              }
-              zipOutput.closeEntry
-              zipOutput.putNextEntry(new ZipEntry("validator/" + caseName + ".err"))
-              using (new FileInputStream(caseFile + ".err")) {
-                inputStream => FileUtil.copy(inputStream, zipOutput)
-              }
-              zipOutput.closeEntry
+              publish(callback, new File(caseFile + ".meta"), "validator/")
+              publish(callback, new File(caseFile + ".out"), "validator/")
+              publish(callback, new File(caseFile + ".err"), "validator/")
             }
             
             val metaAddendum = try {
@@ -372,52 +347,36 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
             MetaFile.save(x.getCanonicalPath, meta ++ metaAddendum)
           }
           
-          zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".out")))
-          using (new FileInputStream(x.getCanonicalPath.replace(".meta", ".out"))) {
-            inputStream => FileUtil.copy(inputStream, zipOutput)
-          }
-          zipOutput.closeEntry
+          publish(callback, new File(x.getCanonicalPath.replace(".meta", ".out")))
           addedOut = true
         } else if((meta("status") == "RE" && lang == "java") ||
                   (meta("status") == "SG" && lang == "cpp") ||
                   (meta("status") == "SG" && lang == "cpp11")) {
-          zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
-          using (new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))) {
-            inputStream => FileUtil.copy(inputStream, zipOutput)
-          }
-          zipOutput.closeEntry
+          publish(callback, new File(x.getCanonicalPath.replace(".meta", ".err")))
           addedErr = true
         }
         
-        zipOutput.putNextEntry(new ZipEntry(x.getName))
-        using (new FileInputStream(x.getCanonicalPath)) { inputStream => {
-          FileUtil.copy(inputStream, zipOutput)
-        }}
-        zipOutput.closeEntry
+        publish(callback, x)
 
         if (message.debug) {
           if (!addedErr) {
-            zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".err")))
-            using (new FileInputStream(x.getCanonicalPath.replace(".meta", ".err"))) {
-              inputStream => FileUtil.copy(inputStream, zipOutput)
-            }
-            zipOutput.closeEntry
+            publish(callback, new File(x.getCanonicalPath.replace(".meta", ".err")))
           }
           if (!addedOut) {
-            zipOutput.putNextEntry(new ZipEntry(x.getName.replace(".meta", ".out")))
-            using (new FileInputStream(x.getCanonicalPath.replace(".meta", ".out"))) {
-              inputStream => FileUtil.copy(inputStream, zipOutput)
-            }
-            zipOutput.closeEntry
+            publish(callback, new File(x.getCanonicalPath.replace(".meta", ".out")))
           }
         }
       }}
     
-      zipOutput.close
-    
       info("run finished token={}", message.token)
       
-      None
+      new RunOutputMessage()
+    }
+  }
+
+  def publish(callback: RunCaseCallback, file: File, prefix: String = "") = {
+    using (new FileInputStream(file)) {
+      callback(prefix + file.getName, file.length, _)
     }
   }
   
@@ -508,187 +467,5 @@ class RegisterThread(hostname: String, port: Int) extends Thread("RegisterThread
       }
       extendDeadline
     }
-  }
-}
-
-object Service extends Object with Log with Using {
-  def main(args: Array[String]) = {
-    // Parse command-line options.
-    var configPath = "omegaup.conf"
-    var i = 0
-    while (i < args.length) {
-      if (args(i) == "--config" && i + 1 < args.length) {
-        i += 1
-        configPath = args(i)
-      } else if (args(i) == "--output" && i + 1 < args.length) {
-        i += 1
-        System.setOut(new java.io.PrintStream(new java.io.FileOutputStream(args(i))))
-      }
-      i += 1
-    }
-
-    Config.load(configPath)
-
-    // Get local hostname
-    val hostname = Config.get("runner.hostname", "")
-
-    if (hostname == "") {
-      throw new IllegalArgumentException("runner.hostname configuration must be set")
-    }
-
-    var registerThread: RegisterThread = null
-    
-    // logger
-    Logging.init
-
-    // And build a runner instance
-    val runner = new Runner(hostname, Minijail)
-
-    // the handler
-    val handler = new AbstractHandler() {
-      @throws(classOf[IOException])
-      @throws(classOf[ServletException])
-      override def handle(target: String,
-                          baseRequest: Request,
-                          request: HttpServletRequest,
-                          response: HttpServletResponse) = {
-        implicit val formats = Serialization.formats(NoTypeHints)
-        
-        request.getPathInfo() match {
-          case "/run/" => {
-            try {
-              val req = Serialization.read[RunInputMessage](request.getReader)
-              
-              val zipFile = new File(Config.get("compile.root", "."), req.token + "/output.zip")
-              runner.run(req, zipFile) match {
-                case Some(msg: RunOutputMessage) => {
-                  response.setContentType("text/json")
-                  response.setStatus(HttpServletResponse.SC_OK)
-                  
-                  Serialization.write(msg, response.getWriter())
-                }
-                case _ => {
-                  response.setContentType("application/zip")
-                  response.setStatus(HttpServletResponse.SC_OK)
-                  response.setContentLength(zipFile.length.asInstanceOf[Int])
-              
-                  using (new FileInputStream(zipFile)) { inputStream => {
-                    using (response.getOutputStream) { outputStream => {
-                      FileUtil.copy(inputStream, outputStream)
-                    }}
-                  }}
-              
-                  runner.removeCompileDir(req.token)
-                }
-              }
-            } catch {
-              case e: Exception => {
-                error("/run/", e)
-                response.setContentType("text/json")
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
-                Serialization.write(new RunOutputMessage(status = "error",
-                                                         error = Some(e.getMessage)),
-                                    response.getWriter())
-              }
-            }
-          }
-          case _ => {
-            response.setContentType("text/json")
-            Serialization.write(request.getPathInfo() match {
-              case "/compile/" => {
-                registerThread.extendDeadline
-                try {
-                  val req = Serialization.read[CompileInputMessage](request.getReader())
-                  response.setStatus(HttpServletResponse.SC_OK)
-                  runner.compile(req)
-                } catch {
-                  case e: Exception => {
-                    error("/compile/", e)
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
-                    new CompileOutputMessage(status = "error", error = Some(e.getMessage))
-                  }
-                }
-              }
-              case "/input/" => {
-                try {
-                  info("/input/")
-                  
-                  response.setStatus(HttpServletResponse.SC_OK)
-                  if(request.getContentType() != "application/zip" ||
-                     request.getHeader("Content-Disposition") == null) {
-                    new InputOutputMessage(
-                      status = "error",
-                      error = Some("Content-Type must be \"application/zip\", " +
-                                   "Content-Disposition must be \"attachment\" and a filename " +
-                                   "must be specified"
-                              )
-                    )
-                  } else {
-                    val ContentDispositionRegex =
-                      "attachment; filename=([a-zA-Z0-9_-][a-zA-Z0-9_.-]*);.*".r
-      
-                    val ContentDispositionRegex(inputName) =
-                      request.getHeader("Content-Disposition")
-                    runner.input(inputName, request.getInputStream)
-                  }
-                } catch {
-                  case e: Exception => {
-                    error("/input/", e)
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
-                    new InputOutputMessage(status = "error", error = Some(e.getMessage))
-                  }
-                }
-              }
-              case _ => {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND)
-                new NullMessage()
-              }
-            }, response.getWriter())
-          }
-        }
-        
-        baseRequest.setHandled(true)
-      }
-    };
-
-    // boilerplate code for jetty with https support  
-    val server = new org.eclipse.jetty.server.Server()
-    
-    val sslContext =
-      new org.eclipse.jetty.util.ssl.SslContextFactory(
-        Config.get("ssl.keystore", "omegaup.jks")
-      )
-    sslContext.setKeyManagerPassword(Config.get("ssl.password", "omegaup"))
-    sslContext.setKeyStorePassword(Config.get("ssl.keystore.password", "omegaup"))
-    sslContext.setTrustStore(FileUtil.loadKeyStore(
-      Config.get("ssl.truststore", "omegaup.jks"),
-      Config.get("ssl.truststore.password", "omegaup")
-    ))
-    sslContext.setNeedClientAuth(true)
-  
-    val runnerConnector = new org.eclipse.jetty.server.ServerConnector(server, sslContext)
-    runnerConnector.setPort(Config.get("runner.port", 0))
-    
-    server.setConnectors(List(runnerConnector).toArray)
-    server.setHandler(handler)
-
-    server.start()
-
-    info("Runner {} registering port {}", hostname, runnerConnector.getLocalPort)
-    registerThread = new RegisterThread(hostname, runnerConnector.getLocalPort)
-    
-    Runtime.getRuntime.addShutdownHook(new Thread() {
-      override def run() = {
-        server.stop
-        registerThread.shutdown
-      }
-    })
-		
-    // Send a heartbeat every 5 minutes to register
-    registerThread.start
-
-    server.join
-    registerThread.join
-    info("Shut down cleanly")
   }
 }
