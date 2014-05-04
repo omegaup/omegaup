@@ -17,10 +17,6 @@ pushd $ROOT/minijail
 	make
 popd
 
-pushd $ROOT/backend
-	make
-popd
-
 if [ ! -f $JKS ]; then
 	$ROOT/bin/certmanager runner --hostname $HOSTNAME --output $JKS
 fi
