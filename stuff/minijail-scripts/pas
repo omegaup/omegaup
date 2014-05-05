@@ -1,3 +1,6 @@
+open: 1
+stat: 1
+dup: 1
 getrlimit: 1
 rt_sigaction: 1
 rt_sigprocmask: 1
