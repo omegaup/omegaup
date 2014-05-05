@@ -58,6 +58,8 @@ popd
 cat > $TMPDIR/setup-runner <<EOF
 #!/bin/bash -e
 
+sudo service runner stop || echo 'No runner found'
+
 # Install all required packages
 if [ ! -d /opt/omegaup ]; then
 	apt-get update -y
