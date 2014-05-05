@@ -93,8 +93,6 @@ object OmegaUpDriver extends Driver with Log {
       }
     }
 
-    info("Grading {} {}", alias, id)
-
     // Finally return the run.
     run
   }
@@ -119,6 +117,7 @@ object OmegaUpDriver extends Driver with Log {
       case Validator.Token => TokenGrader.grade(run)
       case Validator.TokenCaseless => TokenCaselessGrader.grade(run)
       case Validator.TokenNumeric => TokenNumericGrader.grade(run)
+      case _ => throw new IllegalArgumentException("Validator " + run.problem.validator + " not found")
     }
   }
 

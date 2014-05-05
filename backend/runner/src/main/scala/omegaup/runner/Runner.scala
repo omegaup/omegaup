@@ -125,7 +125,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
                 .read(runDirectory.getCanonicalPath + "/compile.err")
                 .replace(runDirectory.getCanonicalPath + "/", "")
 
-          if (missingMainClass) {
+          if (compileError == "" && missingMainClass) {
             compileError = "Class should be called \"Main\"."
           }
         
@@ -237,6 +237,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
                   }
                   FileUtil.write(new File(runDirectory, caseName + ".meta").getCanonicalPath,
                                  "time:0\ntime-wall:0\nmem:0\nsyscall-count:0\nstatus:OK")
+                  process(message, runDirectory, casesDirectory, lang, new File(runDirectory, caseName + ".meta"), callback)
                 }
                 stream.closeEntry
                 entry = stream.getNextEntry
@@ -250,6 +251,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
             FileUtil.copy(new File(binDirectory, "Main.cat"), new File(caseName + ".out"))
             FileUtil.write(caseName + ".meta",
                            "time:0\ntime-wall:0\nmem:0\nsyscall-count:0\nstatus:OK")
+            process(message, runDirectory, casesDirectory, lang, new File(caseName + ".meta"), callback)
           }
         }
       } else {
@@ -267,6 +269,8 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
                         outputFile = caseName + ".out",
                         errorFile = caseName + ".err"
             )
+
+            process(message, runDirectory, casesDirectory, lang, new File(caseName + ".meta"), callback)
           }}
         }
       
@@ -287,86 +291,12 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
                           outputFile = casePath + ".out",
                           errorFile = casePath + ".err"
               )
+
+              process(message, runDirectory, casesDirectory, lang, new File(casePath + ".meta"), callback)
             }}
           }
         }
       }
-    
-      runDirectory.listFiles.filter { _.getName.endsWith(".meta") } .foreach { (x) => {
-        val meta = MetaFile.load(x.getCanonicalPath)
-        var addedErr = false
-        var addedOut = false
-      
-        if(meta("status") == "OK") {
-          val validatorDirectory = new File(runDirectory.getCanonicalPath + "/validator")
-          if (validatorDirectory.exists) {
-            val caseName = FileUtil.removeExtension(x.getName)
-            val caseFile = new File(validatorDirectory, caseName).getCanonicalPath;
-            var inputFile = new File(FileUtil.removeExtension(x.getCanonicalPath) + ".in")
-            if (!inputFile.exists) {
-              inputFile = new File(casesDirectory, caseName + ".in")
-            }
-            
-            val validator_lang =
-              using (new BufferedReader(new FileReader(new File(validatorDirectory, "lang")))) {
-                reader => reader.readLine
-              }
-
-            sandbox.run(message,
-                        validator_lang,
-                        logTag = "Validator run",
-                        extraParams = List(caseName, lang),
-                        chdir = validatorDirectory.getCanonicalPath,
-                        metaFile = caseFile + ".meta",
-                        inputFile = FileUtil.removeExtension(x.getCanonicalPath) + ".out",
-                        outputFile = caseFile + ".out",
-                        errorFile = caseFile + ".err",
-                        originalInputFile = Some(inputFile.getCanonicalPath),
-                        runMetaFile = Some(x.getCanonicalPath)
-            )
-
-            if (message.debug) {
-              publish(callback, new File(caseFile + ".meta"), "validator/")
-              publish(callback, new File(caseFile + ".out"), "validator/")
-              publish(callback, new File(caseFile + ".err"), "validator/")
-            }
-            
-            val metaAddendum = try {
-              using (new BufferedReader(new FileReader(caseFile + ".out"))) { reader => {
-                List(
-                  ("score" -> math.max(0.0, math.min(1.0, reader.readLine.trim.toDouble)).toString)
-                )
-              }}
-            } catch {
-              case e: Exception => {
-                error("validador", caseFile + ".out", e)
-                List(("status", "JE"))
-              }
-            }
-            
-            MetaFile.save(x.getCanonicalPath, meta ++ metaAddendum)
-          }
-          
-          publish(callback, new File(x.getCanonicalPath.replace(".meta", ".out")))
-          addedOut = true
-        } else if((meta("status") == "RE" && lang == "java") ||
-                  (meta("status") == "SG" && lang == "cpp") ||
-                  (meta("status") == "SG" && lang == "cpp11")) {
-          publish(callback, new File(x.getCanonicalPath.replace(".meta", ".err")))
-          addedErr = true
-        }
-        
-        publish(callback, x)
-
-        if (message.debug) {
-          if (!addedErr) {
-            publish(callback, new File(x.getCanonicalPath.replace(".meta", ".err")))
-          }
-          if (!addedOut) {
-            publish(callback, new File(x.getCanonicalPath.replace(".meta", ".out")))
-          }
-        }
-      }}
     
       info("run finished token={}", message.token)
       
@@ -374,8 +304,85 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
     }
   }
 
+  def process(message: RunInputMessage, runDirectory: File, casesDirectory: File, lang: String, x: File, callback: RunCaseCallback): Unit = {
+    val meta = MetaFile.load(x.getCanonicalPath)
+    var addedErr = false
+    var addedOut = false
+  
+    if(meta("status") == "OK") {
+      val validatorDirectory = new File(runDirectory.getCanonicalPath + "/validator")
+      if (validatorDirectory.exists) {
+        val caseName = FileUtil.removeExtension(x.getName)
+        val caseFile = new File(validatorDirectory, caseName).getCanonicalPath;
+        var inputFile = new File(FileUtil.removeExtension(x.getCanonicalPath) + ".in")
+        if (!inputFile.exists) {
+          inputFile = new File(casesDirectory, caseName + ".in")
+        }
+        
+        val validator_lang =
+          using (new BufferedReader(new FileReader(new File(validatorDirectory, "lang")))) {
+            reader => reader.readLine
+          }
+
+        sandbox.run(message,
+                    validator_lang,
+                    logTag = "Validator run",
+                    extraParams = List(caseName, lang),
+                    chdir = validatorDirectory.getCanonicalPath,
+                    metaFile = caseFile + ".meta",
+                    inputFile = FileUtil.removeExtension(x.getCanonicalPath) + ".out",
+                    outputFile = caseFile + ".out",
+                    errorFile = caseFile + ".err",
+                    originalInputFile = Some(inputFile.getCanonicalPath),
+                    runMetaFile = Some(x.getCanonicalPath)
+        )
+
+        if (message.debug) {
+          publish(callback, new File(caseFile + ".meta"), "validator/")
+          publish(callback, new File(caseFile + ".out"), "validator/")
+          publish(callback, new File(caseFile + ".err"), "validator/")
+        }
+        
+        val metaAddendum = try {
+          using (new BufferedReader(new FileReader(caseFile + ".out"))) { reader => {
+            List(
+              ("score" -> math.max(0.0, math.min(1.0, reader.readLine.trim.toDouble)).toString)
+            )
+          }}
+        } catch {
+          case e: Exception => {
+            error("validador", caseFile + ".out", e)
+            List(("status", "JE"))
+          }
+        }
+        
+        MetaFile.save(x.getCanonicalPath, meta ++ metaAddendum)
+      }
+      
+      publish(callback, new File(x.getCanonicalPath.replace(".meta", ".out")))
+      addedOut = true
+    } else if((meta("status") == "RE" && lang == "java") ||
+              (meta("status") == "SG" && lang == "cpp") ||
+              (meta("status") == "SG" && lang == "cpp11")) {
+      publish(callback, new File(x.getCanonicalPath.replace(".meta", ".err")))
+      addedErr = true
+    }
+    
+    publish(callback, x)
+
+    if (message.debug) {
+      if (!addedErr) {
+        publish(callback, new File(x.getCanonicalPath.replace(".meta", ".err")))
+      }
+      if (!addedOut) {
+        publish(callback, new File(x.getCanonicalPath.replace(".meta", ".out")))
+      }
+    }
+  }
+
   def publish(callback: RunCaseCallback, file: File, prefix: String = "") = {
     using (new FileInputStream(file)) {
+      debug("Publishing {} {}", file, file.length)
       callback(prefix + file.getName, file.length, _)
     }
   }

@@ -272,6 +272,16 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 		driver: Driver
 	) extends Runnable {
 		override def run(): Unit = {
+			try {
+				gradeTask
+			} catch {
+				case e: Exception => {
+					error("Error while running {}: {}", r.id, e)
+				}
+			}
+		}
+
+		private def gradeTask() = {
 			val future = dispatcher.executor.submit(new Callable[Run]() {
 					override def call(): Run = {
 						driver.run(r.copy, runner)
@@ -336,6 +346,7 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 						driver.grade(r.copy)
 					} catch {
 						case e: Exception => {
+							error("Error while grading {}", e)
 							r.score = 0
 							r.contest_score = 0
 							r.status = Status.Ready
@@ -393,6 +404,7 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 				val endpoint = new RunnerEndpoint(proxy.hostname, proxy.port)
 				registeredEndpoints(endpoint) = System.currentTimeMillis
 			}
+			case _ => {}
 		}
 		dispatchLocked
 	}

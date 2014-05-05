@@ -82,6 +82,10 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     FileUtil.read("grader/src/test/resources/h2.sql").split("\n\n").foreach { Database.execute(_) }
   }
 
+  override def afterAll() {
+    Manager.connection.close
+  }
+
   "OmegaUpDriver" should "submit" in {
     System.setProperty("grader.embedded_runner.enable", "true")
 
@@ -157,7 +161,9 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
         }
       }
 
-      ready should be (true)
+      if (!ready) {
+        throw new RuntimeException("Didn't finish")
+      }
       if (exception != null) throw exception
     }
 

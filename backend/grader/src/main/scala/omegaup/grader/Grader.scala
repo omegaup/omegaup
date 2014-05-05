@@ -16,6 +16,8 @@ trait Grader extends Object with Log with Using {
 		val alias = run.problem.alias
 		val dataDirectory = new File(Config.get("grader.root", ".") + "/" + run.id)
 
+		info("Grading {} {} with {}", alias, run.id, run.problem.validator)
+
 		run.status = Status.Ready
 		run.veredict = Veredict.Accepted
 		run.runtime = 0
