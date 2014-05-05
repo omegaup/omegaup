@@ -26,7 +26,7 @@ class RunnerEndpoint(val hostname: String, val port: Int) {
 object RoutingDescription extends StandardTokenParsers with Log {
 	val defaultQueueName = "#default"
 	lexical.delimiters ++= List("(", ")", "[", "]", "{", "}", ",", ":", "==", "||", "&&")
-	lexical.reserved += ("in", "runners", "condition", "contest", "user", "name", "slow", "problem")
+	lexical.reserved += ("in", "runners", "condition", "contest", "user", "name", "slow", "problem", "true")
 
 	def parse(input: String): (Map[RunnerEndpoint,String], RunRouter) = {
 		info("Parsing RoutingDescription: {}", input)
@@ -73,10 +73,11 @@ object RoutingDescription extends StandardTokenParsers with Log {
 			case _ => new AndMatcher(opList)
 		}
 	}
-	private def opExpr: Parser[RunMatcher] = eqExpr | inExpr | slowExpr
+	private def opExpr: Parser[RunMatcher] = eqExpr | inExpr | slowExpr | trueExpr
 	private def eqExpr: Parser[RunMatcher] = param ~ "==" ~ stringLit ^^ { case param ~ "==" ~ arg => new EqMatcher(param, arg) }
 	private def inExpr: Parser[RunMatcher] = param ~ "in" ~ stringList ^^ { case param ~ "in" ~ arg => new InMatcher(param, arg) }
-	private def slowExpr: Parser[RunMatcher] = "slow" ^^ { case "slow" => new SlowMatcher() }
+	private def slowExpr: Parser[RunMatcher] = "slow" ^^ { case "slow" => SlowMatcher }
+	private def trueExpr: Parser[RunMatcher] = "true" ^^ { case "true" => TrueMatcher }
 
 	private def param: Parser[String] = "contest" | "user" | "problem"
 	private def stringList: Parser[List[String]] = "[" ~> rep1sep(stringLit, ",") <~ "]"
@@ -122,11 +123,6 @@ object RoutingDescription extends StandardTokenParsers with Log {
 		override def toString(): String = param + " in " + "[" + set.mkString(", ") + "]"
 	}
 
-	private class SlowMatcher() extends Object with RunMatcher {
-		def apply(run: Run): Boolean = run.problem.slow
-		override def toString(): String = "slow"
-	}
-
 	private class OrMatcher(arg: List[RunMatcher]) extends Object with RunMatcher {
 		def apply(run: Run): Boolean = arg.exists(_(run))
 		override def toString(): String = "(" + arg.mkString(" || ") + ")"
@@ -135,6 +131,16 @@ object RoutingDescription extends StandardTokenParsers with Log {
 	private class AndMatcher(arg: List[RunMatcher]) extends Object with RunMatcher {
 		def apply(run: Run): Boolean = arg.forall(_(run))
 		override def toString(): String = arg.mkString(" && ")
+	}
+
+	private object SlowMatcher extends Object with RunMatcher {
+		def apply(run: Run): Boolean = run.problem.slow
+		override def toString(): String = "slow"
+	}
+
+	private object TrueMatcher extends Object with RunMatcher {
+		def apply(run: Run): Boolean = true
+		override def toString(): String = "true"
 	}
 }
 

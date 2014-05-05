@@ -73,21 +73,20 @@ object OmegaUpDriver extends Driver with Log {
     target.mkdir
     val placer = new CasePlacer(target)
 
-    info("Running {} {} on {}", alias, id, service.name)
-    val response = service.run(msg, placer)
+    info("Running {}({}) on {}", alias, id, service.name)
+    var response = service.run(msg, placer)
     debug("Ran {} {}, returned {}", alias, id, response)
     if (response.status != "ok") {
       if (response.error.get ==  "missing input") {
-        info("Received a missing input message, trying to send input from {}", alias)
+        info("Received a missing input message, trying to send input from {} ({})", alias, service.name)
         val inputZip = new File(Config.get("problems.root", "problems"), alias + "/cases.zip")
-        if(
-          service.input(
-            input,
-            new FileInputStream(inputZip), inputZip.length.toInt
-          ).status != "ok" ||
-          service.run(msg, placer).status != "ok"
-        ) {
-          throw new RuntimeException("OU unable to run submission after sending input. giving up.")
+        if(service.input(input, new FileInputStream(inputZip), inputZip.length.toInt).status != "ok") {
+          throw new RuntimeException("Unable to send input. giving up.")
+        }
+        response = service.run(msg, placer)
+        if (response.status != "ok") {
+          error("Second try, ran {}({}) on {}, returned {}", alias, id, service.name, response)
+          throw new RuntimeException("Unable to run submission after sending input. giving up.")
         }
       } else {
         throw new RuntimeException(response.error.get)
