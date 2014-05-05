@@ -170,11 +170,11 @@ object Service extends Object with Log with Using {
                   new RunOutputMessage(status = "error", error = Some(e.getMessage))
                 }
               } finally {
-                if (token != null && !(message != null && message.error == Some("missing input")))
+                info("Returning {}", message)
+                if (token != null && (message == null || message.error.isEmpty || message.error.get != "missing input"))
                   runner.removeCompileDir(token)
+                callbackProxy.finalize(message)
               }
-              info("Returning {}", message)
-              callbackProxy.finalize(message)
             }}
           }
           case _ => {
