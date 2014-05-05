@@ -390,7 +390,10 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
       return
     }
 
-    if (!Config.get("runner.preserve", false)) FileUtil.deleteDirectory(runDirectory)
+    if (!Config.get("runner.preserve", false)) {
+      error("Removing directory {}", runDirectory)
+      FileUtil.deleteDirectory(runDirectory)
+    }
   }
 
   def input(inputName: String, inputStream: InputStream, size: Int = -1): InputOutputMessage = {

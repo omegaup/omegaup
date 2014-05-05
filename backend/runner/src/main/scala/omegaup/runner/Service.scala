@@ -173,6 +173,7 @@ object Service extends Object with Log with Using {
                 if (token != null && !(message != null && message.error == Some("missing input")))
                   runner.removeCompileDir(token)
               }
+              info("Returning {}", message)
               callbackProxy.finalize(message)
             }}
           }
