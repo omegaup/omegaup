@@ -199,6 +199,8 @@ class ProblemController extends Controller {
 				$problem->setOutputLimit($output_limit);
 			}
 
+			$problem->slow = $problemDeployer->isSlow($problem);
+
 			// Save the contest object with data sent by user to the database
 			ProblemsDAO::save($problem);
 
@@ -212,6 +214,8 @@ class ProblemController extends Controller {
 
 			throw $e;
 		} catch (Exception $e) {
+			self::$log->error("Failed to upload problem");
+			self::$log->error($e);
 
 			// Operation failed unexpectedly, rollback transaction 
 			ProblemsDAO::transRollback();
@@ -300,6 +304,8 @@ class ProblemController extends Controller {
 			UserRolesDAO::save($problem_user);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
+			self::$log->error("Failed to save user roles");
+			self::$log->error($e);
 			throw new InvalidDatabaseOperationException($e);
 		}
 
@@ -481,6 +487,8 @@ class ProblemController extends Controller {
 					$r['problem']->setOutputLimit($output_limit);
 				}
 
+				$r['problem']->slow = $problemDeployer->isSlow($r['problem']);
+
 				$response["uploaded_files"] = $problemDeployer->filesToUnzip;
 			}
 
@@ -497,6 +505,8 @@ class ProblemController extends Controller {
 		} catch (Exception $e) {
 			// Operation failed in the data layer, rollback transaction 
 			ProblemsDAO::transRollback();
+			self::$log->error("Failed to update problem");
+			self::$log->error($e);
 
 			throw new InvalidDatabaseOperationException($e);
 		}

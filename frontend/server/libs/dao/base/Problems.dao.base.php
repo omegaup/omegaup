@@ -211,6 +211,10 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `tolerance` = ? AND";
 			array_push( $val, $Problems->getTolerance() );
 		}
+		if (!is_null( $Problems->getSlow())) {
+			$sql .= " `slow` = ? AND";
+			array_push( $val, $Problems->getSlow() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -246,7 +250,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function update($Problems)
 	{
-		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `memory_limit` = ?, `output_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ? WHERE  `problem_id` = ?;";
+		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `memory_limit` = ?, `output_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ? WHERE  `problem_id` = ?;";
 		$params = array( 
 			$Problems->getPublic(), 
 			$Problems->getAuthorId(), 
@@ -267,6 +271,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getSource(), 
 			$Problems->getOrder(), 
 			$Problems->getTolerance(), 
+			$Problems->getSlow(),
 			$Problems->getProblemId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -298,7 +303,8 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->creation_date)) $Problems->creation_date = gmdate('Y-m-d H:i:s');
 		if (is_null($Problems->order)) $Problems->order = 'normal';
 		if (is_null($Problems->tolerance)) $Problems->tolerance = 1e-9;
-		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `memory_limit`, `output_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Problems->slow)) $Problems->slow = 0;
+		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `memory_limit`, `output_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Problems->problem_id,
 			$Problems->public,
@@ -320,6 +326,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->source,
 			$Problems->order,
 			$Problems->tolerance,
+			$Problems->slow,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -582,6 +589,17 @@ abstract class ProblemsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `tolerance` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ProblemsA->getSlow()) ) ) & ( ! is_null ( ($b = $ProblemsB->getSlow()) ) ) ){
+				$sql .= " `slow` >= ? AND `slow` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `slow` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

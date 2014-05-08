@@ -716,5 +716,41 @@ class ProblemDeployer {
 
 		return (int)(($output_limit + 4095) / 4096 + 1) * 4096;
 	}
+
+	/**
+	 * Calculates if this problem should go into the slow queue.
+	 * A slow problem takes 30s or more to judge.
+	 *
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 */
+	public function isSlow(Problems $problem) {
+		$dirpath = $this->getDirpath($problem->alias);
+		$validator = 0;
+
+		if ($handle = opendir($dirpath)) {
+			while (false !== ($entry = readdir($handle))) {
+				if (stripos($entry, 'validator.') === 0) {
+					$validator = 1;
+					break;
+				}
+			}
+			closedir($handle);
+		}
+
+		$dirpath .= '/cases';
+
+		$input_count = 0;
+
+		if ($handle = opendir($dirpath)) {
+			while (false !== ($entry = readdir($handle))) {
+				if (!$this->endsWith($entry, '.in', true)) continue;
+				$input_count += 1;
+			}
+			closedir($handle);
+		}
+
+		return ((int)($problem->time_limit + 999) / 1000 + $validator) * ($input_count) >= 30;
+	}
 }
 

@@ -92,6 +92,9 @@ class Problems extends VO
 			if (isset($data['tolerance'])) {
 				$this->tolerance = $data['tolerance'];
 			}
+			if (isset($data['slow'])) {
+				$this->slow = $data['slow'];
+			}
 		}
 	}
 
@@ -124,7 +127,8 @@ class Problems extends VO
 			"creation_date" => $this->creation_date,
 			"source" => $this->source,
 			"order" => $this->order,
-			"tolerance" => $this->tolerance
+			"tolerance" => $this->tolerance,
+			"slow" => $this->slow
 		); 
 	return json_encode($vec); 
 	}
@@ -280,4 +284,11 @@ class Problems extends VO
 	  * @var double
 	  */
 	public $tolerance;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var tinyint(1)
+	  */
+	public $slow;
 }

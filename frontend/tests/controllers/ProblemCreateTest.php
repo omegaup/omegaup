@@ -56,6 +56,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals($r["order"], $problem->getOrder());
 		$this->assertEquals($r["source"], $problem->getSource());
 		$this->assertEqualSets($r["languages"], $problem->getLanguages());
+		$this->assertEquals(0, $problem->slow);
 
 		// Verify author username -> author id conversion
 		$user = UsersDAO::getByPK($problem->getAuthorId());
@@ -75,6 +76,48 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals(0, $problem->getSubmissions());
 		$this->assertEquals(0, $problem->getAccepted());
 		$this->assertEquals(0, $problem->getDifficulty());
+	}
+
+	/**
+	 * Basic test for slow problems
+	 */
+	public function testSlowQueue() {
+
+		// Get the problem data
+		$problemData = ProblemsFactory::getRequest();
+		$r = $problemData["request"];
+		$r['time_limit'] = 8000;
+		$problemAuthor = $problemData["author"];
+
+		// Login user
+		$r["auth_token"] = $this->login($problemAuthor);
+
+		// Get File Uploader Mock and tell Omegaup API to use it
+		FileHandler::SetFileUploader($this->createFileUploaderMock());
+
+		// Call the API
+		$response = ProblemController::apiCreate($r);
+
+		// Validate
+		// Verify response
+		$this->assertEquals("ok", $response["status"]);
+		$this->assertEquals("testplan", $response["uploaded_files"][10]);
+
+
+		// Verify data in DB
+		$problem_mask = new Problems();
+		$problem_mask->setTitle($r["title"]);
+		$problems = ProblemsDAO::search($problem_mask);
+
+		// Check that we only retreived 1 element
+		$this->assertEquals(1, count($problems));
+		$problem = $problems[0];
+
+		// Verify contest was found
+		$this->assertNotNull($problem);
+
+		// Verify DB data
+		$this->assertEquals(1, $problem->slow);
 	}
 
 	/**
