@@ -2,11 +2,15 @@
 				<div class="navbar-inner">
 					<div class="container">
 						<div class="navbar-header">
-							<a class="navbar-brand" href="/index.php">
-								<img src="/media/omegaup_curves.png" alt="OmegaUp" />
+							<a class="navbar-brand" href="/">
+								<img src="/media/omegaup_curves.png" alt="omegaUp" />
+								{if $smarty.const.OMEGAUP_LOCKDOWN}
+								<img title="lockdown" alt="lockdown" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=" />
+								{/if}
 							</a>
 						</div>
 						<ul class="nav navbar-nav">
+							{if !$smarty.const.OMEGAUP_LOCKDOWN}
 							<li id="nav-arena"{if isset($currentSection) && $currentSection == 'arena'} class="active"{/if}><a href='/arena'>{#navArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
 								<li id="nav-contests"><a href='/contests.php'>{#navMyContests#}</a></li>
@@ -23,6 +27,7 @@
 							<li id="nav-rank"><a href='/rank.php'>{#navRanking#}</a></li>
 							<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
 							<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
+							{/if}
 						</ul>
 						
 						<ul class="nav navbar-nav navbar-right">

@@ -1,6 +1,10 @@
 <?php
 	require_once( "../server/bootstrap.php" );
-	
+	if (OMEGAUP_LOCKDOWN) {
+		header('Location: /arena/');
+		die();
+	}
+
 	// Coder of the month
 	try {
 		$coderOfTheMonthResponse = UserController::apiCoderOfTheMonth(new Request());
