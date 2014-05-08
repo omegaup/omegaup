@@ -193,7 +193,7 @@ class ProblemController extends Controller {
 			$problemDeployer->deploy($r);
 
 			// Calculate output limit.
-			$output_limit = $problemDeployer->getOutputLimit($r);
+			$output_limit = $problemDeployer->getOutputLimit($r['alias']);
 
 			if ($output_limit != -1) {
 				$problem->setOutputLimit($output_limit);
@@ -462,7 +462,9 @@ class ProblemController extends Controller {
 			"order",
 			"languages",
 		);
-		$requiresRejudge = self::updateValueProperties($r, $r["problem"], $valueProperties);
+		$problem = $r['problem'];
+		$requiresRejudge = self::updateValueProperties($r, $problem, $valueProperties);
+		$r['problem'] = $problem;
 
 		$response = array();
 		$problemDeployer = new ProblemDeployer();
@@ -481,19 +483,19 @@ class ProblemController extends Controller {
 				$problemDeployer->update($r);
 
 				// Calculate output limit.
-				$output_limit = $problemDeployer->getOutputLimit($r);
+				$output_limit = $problemDeployer->getOutputLimit($r['alias']);
 
 				if ($output_limit != -1) {
 					$r['problem']->setOutputLimit($output_limit);
 				}
 
-				$r['problem']->slow = $problemDeployer->isSlow($r['problem']);
+				$problem->slow = $problemDeployer->isSlow($problem);
 
 				$response["uploaded_files"] = $problemDeployer->filesToUnzip;
 			}
 
 			// Save the contest object with data sent by user to the database
-			ProblemsDAO::save($r["problem"]);
+			ProblemsDAO::save($problem);
 
 			//End transaction
 			ProblemsDAO::transEnd();

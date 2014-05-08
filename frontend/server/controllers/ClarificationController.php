@@ -184,15 +184,17 @@ class ClarificationController extends Controller {
 			"answer",
 			"public",
 		);
-		self::updateValueProperties($r, $r["clarification"], $valueProperties);
+		$clarification = $r['clarification'];
+		self::updateValueProperties($r, $clarification, $valueProperties);
+		$r['clarification'] = $clarification;
 
 		// Let DB handle time update
 		$time = time();
-		$r["clarification"]->time = gmdate('Y-m-d H:i:s', $time);
+		$clarification->time = gmdate('Y-m-d H:i:s', $time);
 
 		// Save the clarification
 		try {
-			ClarificationsDAO::save($r["clarification"]);
+			ClarificationsDAO::save($clarification);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);

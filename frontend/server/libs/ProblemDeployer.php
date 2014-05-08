@@ -680,11 +680,11 @@ class ProblemDeployer {
 	 * Gets the maximum output file size. Returns -1 if there is a
 	 * custom validator.
 	 * 
-	 * @param Request $r
+	 * @param string $alias
 	 * @throws InvalidFilesystemOperationException
 	 */
-	public function getOutputLimit(Request $r) {
-		$dirpath = $this->getDirpath($r['alias']);
+	public function getOutputLimit($alias) {
+		$dirpath = $this->getDirpath($alias);
 		$has_validator = false;
 
 		if ($handle = opendir($dirpath)) {
