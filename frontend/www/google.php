@@ -36,5 +36,6 @@
     //$association_handle = get_saved_handle_somehow();
 
     //use the saved association handle
-    $googleLogin = GoogleOpenID::createRequest($_SERVER["PHP_SELF"] . "?gr=1" . (isset($_GET['redirect']) ? '&redirect=' . urlencode($_GET['redirect']) : ''), $association_handle, true);
+    $return_to = (!empty($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+    $googleLogin = GoogleOpenID::createRequest($return_to . "?gr=1" . (isset($_GET['redirect']) ? '&redirect=' . urlencode($_GET['redirect']) : ''), $association_handle, true);
     $googleLogin->redirect();

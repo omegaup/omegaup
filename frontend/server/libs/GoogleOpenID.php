@@ -122,8 +122,8 @@
         $assoc_handle = GoogleOpenID::getAssociationHandle();
         
       //if return_to is a relative URL, make it absolute
-      if(stripos($return_to, "http://")==false &&
-         stripos($return_to, "https://")==false){
+      if(stripos($return_to, "http://")===false &&
+         stripos($return_to, "https://")===false){
         //if the first character is a slash, delete it
         if(substr($return_to, 0, 1)=="/")
           $return_to = substr($return_to, 1);
