@@ -19,6 +19,7 @@ class ProblemType {
 class ProblemDeployer {
 	
 	const MAX_ZIP_FILESIZE = 209715200; //200 * 1024 * 1024;
+	const MAX_INTERACTIVE_ZIP_FILESIZE = 524288000; //500 * 1024 * 1024;
 
 	public $filesToUnzip;
 	private $imageHashes;
@@ -235,8 +236,10 @@ class ProblemDeployer {
 				}
 			}
 
-			if ($size > ProblemDeployer::MAX_ZIP_FILESIZE) {
-				throw new InvalidParameterException("Extracted zip size ($size) over max allowed MB. Rejecting.");
+			if ($this->problemType == ProblemType::Interactive && $size > ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE) {
+				throw new InvalidParameterException("Extracted zip size ($size) over max allowed (" . ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE . ") for interactive problems. Rejecting.");
+			} else if ($size > ProblemDeployer::MAX_ZIP_FILESIZE) {
+				throw new InvalidParameterException("Extracted zip size ($size) over max allowed (" . ProblemDeployer::MAX_ZIP_FILE_SIZE . "). Rejecting.");
 			}
 
 			try {
