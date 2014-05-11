@@ -711,7 +711,7 @@ class ProblemController extends Controller {
 		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit",
 				"memory_limit", "output_limit", "visits", "submissions", "accepted",
 				"difficulty", "creation_date", "source", "order", "points", "public",
-				"languages");
+				"languages", "slow");
 
 		// Read the file that contains the source
 		if ($r["problem"]->getValidator() != 'remote') {

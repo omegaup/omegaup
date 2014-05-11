@@ -4,48 +4,169 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<div class="panel panel-primary">
-	<div class="panel-heading">
-		<h3 class="panel-title">{#problemEditEditProblem#}</h3>
+<div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
+
+<div class="page-header">
+	<h1><span>{#frontPageLoading#}</span> <small></small></h1>
+	<p><a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup">{#navHelp#}</a></p>
+</div>
+
+<ul class="nav nav-tabs nav-justified" id="sections">
+	<li class="active"><a href="#edit" data-toggle="tab">{#problemEditEditProblem#}</a></li>
+	<li><a href="#markdown" data-toggle="tab">{#problemEditEditMarkdown#}</a></li>
+	<li><a href="#admins" data-toggle="tab">{#problemEditAddAdmin#}</a></li>
+</ul>
+
+<div class="tab-content">
+	<div class="tab-pane active" id="edit">
+		{include file='problem.edit.form.tpl'}
 	</div>
-	<div class="panel-body">
-		<div class="wait_for_ajax" id="problems_list">
+
+	<div class="tab-pane" id="markdown">
+		<div class="panel panel-primary">
+			<form class="panel-body form" method="post" action="{$smarty.server.REQUEST_URI}" enctype="multipart/form-data">
+				<input type="hidden" name="problem_alias" value="{$smarty.get.problem}" />
+				<input type="hidden" name="request" value="markdown" />
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel">
+							<ul class="nav nav-tabs">
+								<li class="active"><a href="#statement-source" data-toggle="tab">Source</a></li>
+								<li><a href="#statement-preview" data-toggle="tab">Preview</a></li>
+							</ul>
+							
+							<div class="tab-content">
+								<div class="tab-pane active" id="statement-source">
+									<div id="wmd-button-bar-statement"></div>
+									<textarea class="wmd-input" id="wmd-input-statement" name="wmd-input-statement"></textarea>
+								</div>
+
+								<div class="tab-pane" id="statement-preview">
+									<div class="no-bottom-margin statement" id="wmd-preview-statement"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<button type='submit' class="btn btn-primary">{#problemEditFormUpdateMarkdown#}</button>	
+					</div>
+				</div>
+			</form>
 		</div>
-		<div>				
-			{include file='problem.edit.form.tpl'}
+	</div>
+
+	<div class="tab-pane" id="admins">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<form class="form" id="add-admin-form">
+					<div class="form-group">
+						<label for="username-admin">{#wordsAdmin#}</label>
+						<input id="username-admin" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
+					</div>
+
+					<input id="user-admin" name="user" value="" type="hidden">
+
+					<button class="btn btn-primary" type='submit'>Agregar {#wordsAdmin#}</button>
+				</form>
+			</div>
+
+			<table class="table table-striped">
+				<thead>
+					<th>{#contestEditRegisteredAdminUsername#}</th>
+					<th>{#contestEditRegisteredAdminRole#}</th>
+					<th>{#contestEditRegisteredAdminDelete#}</th>
+				</thead>
+				<tbody id="problem-admins"></tbody>
+			</table>
 		</div>
 	</div>
 </div>
 			
 <script>
 	(function(){
-		$('select.edit-problem-list').change(function () {			
-			console.log("changed select");
-			refreshEditForm($('select.edit-problem-list option:selected').val());
-		});				
-	
-		omegaup.getMyProblems(function(problems) {					
-			// Got the problems, lets populate the dropdown with them			
-			for (var i = 0; i < problems.results.length; i++) {
-				problem = problems.results[i];							
-				$('select.edit-problem-list').append($('<option></option>').attr('value', problem.alias).text(problem.title));
-			}			
+		if(window.location.hash){
+			$('#sections').find('a[href="'+window.location.hash+'"]').tab('show');
+		}
 
-			$("#problems_list").removeClass("wait_for_ajax");
-				
-			// If we have a problem in GET, then get it
-			{IF isset($smarty.get.problem)}
-				$('select.edit-problem-list').each(function() {
-					$('option', this).each(function() {
-						if($(this).val() == "{$smarty.get.problem}") {
-							$(this).attr('selected', 'selected');
-							$('select.edit-problem-list').trigger('change');
-						}
-					});
-				});
-			{/IF}
+		$('#sections').on('click', 'a', function (e) {
+			e.preventDefault();
+			// add this line
+			window.location.hash = $(this).attr('href');
+			$(this).tab('show');
 		});
-		
+
+		var problemAlias = '{$smarty.get.problem}';
+		refreshEditForm(problemAlias);
+
+		// Add admins typeahead
+		function typeahead(dest) {
+			return {
+				ajax: '/api/user/list/',
+				display: 'label',
+				val: 'label',
+				minLength: 2,
+				itemSelected: function (item, val, text) {
+					$(dest).val(val);
+				}
+			}
+		};
+		refreshProblemAdmins();
+		$('#username-admin').typeahead(typeahead('#user-admin'));
+
+		$('#add-admin-form').submit(function() {
+			var username = $('#user-admin').val();
+
+			omegaup.addAdminToProblem(problemAlias, username, function(response) {
+				if (response.status === "ok") {
+					OmegaUp.ui.success("Admin successfully added!");
+					$('div.post.footer').show();
+
+					refreshProblemAdmins();
+				} else {
+					OmegaUp.ui.error(response.error || 'error');
+				}
+			});
+
+			return false; // Prevent refresh
+		});
+
+		function refreshProblemAdmins() {
+			omegaup.getProblemAdmins(problemAlias, function(admins) {
+				$('#problem-admins').empty();
+				// Got the contests, lets populate the dropdown with them
+				for (var i = 0; i < admins.admins.length; i++) {
+					var admin = admins.admins[i];
+					$('#problem-admins').append(
+						$('<tr></tr>')
+							.append($('<td></td>').append(
+								$('<a></a>')
+									.attr('href', '/profile/' + admin.username + '/')
+									.text(admin.username)
+							))
+							.append($('<td></td>').text(admin.role))
+							.append((admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
+								.click((function(username) {
+									return function(e) {
+										omegaup.removeAdminFromProblem(problemAlias, username, function(response) {
+											if (response.status == "ok") {
+												OmegaUp.ui.success("Admin successfully removed!");
+												$('div.post.footer').show();
+												var tr = e.target.parentElement.parentElement;
+												$(tr).remove();
+											} else {
+												OmegaUp.ui.error(response.error || 'error');
+											}
+										});
+									};
+								})(admin.username))
+							)
+					);
+				}
+			});
+		}
+	
 		var md_converter = Markdown.getSanitizingConverter();
 		md_editor = new Markdown.Editor(md_converter, '-statement');		// Global.
 		md_editor.hooks.chain("onPreviewRefresh", function() {ldelim}
@@ -65,6 +186,8 @@
 		}
 		
 		omegaup.getProblem(null, problemAlias, function(problem) {
+			$('.page-header h1 span').html('{#problemEditEditProblem#} ' + problem.title);
+			$('.page-header h1 small').html('&ndash; <a href="/arena/problem/' + problemAlias + '/">{#problemEditGoToProblem#}</a>');
 			$('input[name=title]').val(problem.title);
 			$('input[name=time_limit]').val(problem.time_limit);
 			$('input[name=memory_limit]').val(problem.memory_limit);
@@ -78,6 +201,9 @@
 			$('input[name=alias]').val(problemAlias);
 			$('#wmd-input-statement').val(problem.problem_statement);
 			md_editor.refreshPreview();
+			if (problem.slow == 1) {
+				$('.slow-warning').show();
+			}
 		}, "markdown");
 	}
 </script>
