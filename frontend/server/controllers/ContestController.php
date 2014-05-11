@@ -254,6 +254,13 @@ class ContestController extends Controller {
 			$result['start_time'] = strtotime($result['start_time']);
 			$result['finish_time'] = strtotime($result['finish_time']);
 
+			try {
+				$result['director'] = UsersDAO::getByPK($r['contest']->director_id)->username;
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+
 			// Get problems of the contest
 			$key_problemsInContest = new ContestProblems(
 					array(

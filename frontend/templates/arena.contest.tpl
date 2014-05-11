@@ -55,7 +55,9 @@
 					<table>
 						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td class="start_time"></td></tr>
 						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td class="finish_time"></td></tr>
-						<tr><td><strong>Tiempo para resolver los problemas</strong></td><td> {#wordsMinutes#}</td></tr>
+						<tr><td><strong>{#arenaPracticeScoreboardCutoff#}</strong></td><td class="scoreboard_cutoff"></td></tr>
+						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td class="window_length"></td></tr>
+						<tr><td><strong>{#arenaContestOrganizer#}</strong></td><td class="contest_organizer"></td></tr>
 					</table>
 				</div>
 				<div id="problem" class="main">

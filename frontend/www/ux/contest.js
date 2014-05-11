@@ -65,7 +65,12 @@ $(document).ready(function() {
 					
 		$('#summary .start_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
 		$('#summary .finish_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
-		$('#summary .window_length').html(contest.window_length);
+		var duration = contest.finish_time.getTime() - contest.start_time.getTime();
+		$('#summary .window_length').html(Arena.formatDelta((contest.window_length * 60000) || duration));
+		$('#summary .scoreboard_cutoff').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
+			contest.start_time.getTime() + duration * contest.scoreboard / 100));
+		$('#summary .contest_organizer').html(
+			'<a href="/profile.php?username=' + contest.director + '">' + contest.director + '</a>');
 
 		arena.submissionGap = parseInt(contest.submission_gap);
 		if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
