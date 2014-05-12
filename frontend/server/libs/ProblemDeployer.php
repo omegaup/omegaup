@@ -18,8 +18,10 @@ class ProblemType {
 
 class ProblemDeployer {
 	
-	const MAX_ZIP_FILESIZE = 209715200; //200 * 1024 * 1024;
-	const MAX_INTERACTIVE_ZIP_FILESIZE = 524288000; //500 * 1024 * 1024;
+	const MAX_ZIP_FILESIZE = 209715200; // 200 * 1024 * 1024;
+	const MAX_INTERACTIVE_ZIP_FILESIZE = 524288000; // 500 * 1024 * 1024;
+	const SLOW_QUEUE_THRESHOLD = 30;
+	const MAX_RUNTIME_HARD_LIMIT = 300; // 5 * 60
 
 	public $filesToUnzip;
 	private $imageHashes;
@@ -753,7 +755,13 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		return ((int)($problem->time_limit + 999) / 1000 + $validator) * ($input_count) >= 30;
+		$max_runtime = ((int)($problem->time_limit + 999) / 1000 + $validator) * $input_count;
+
+		if ($max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
+			throw new ProblemDeploymentFailedException('Problem would run for more than 5 minutes in case of TLE. Rejected.');
+		}
+
+		return $max_runtime >= ProblemDeployer::SLOW_QUEUE_THRESHOLD;
 	}
 }
 
