@@ -183,12 +183,6 @@ $(document).ready(function() {
 			file = file.files[0];
 			var reader = new FileReader();
 
-			if (file.size >= 10240) {
-				// 10kb should be enough for anybody.
-				alert('El límite para subir archivos son 10kB');
-				return false;
-			}
-
 			reader.onload = function(e) {
 				submitRun((arena.practice || arena.onlyProblem)? '' : contestAlias,
 					  arena.currentProblem.alias,
@@ -205,8 +199,17 @@ $(document).ready(function() {
 					extension == 'hs' || extension == 'kp' ||
 					extension == 'p' || extension == 'pas' ||
 					extension == 'py' || extension == 'rb') {
+				if (file.size >= 10240) {
+					alert('El límite para subir archivos son 10kB');
+					return false;
+				}
 				reader.readAsText(file, 'UTF-8');
 			} else {
+				// 100kB _must_ be enough for anybody.
+				if (file.size >= 102400) {
+					alert('El límite para subir archivos son 100kB');
+					return false;
+				}
 				reader.readAsDataURL(file);
 			}
 
