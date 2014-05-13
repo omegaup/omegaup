@@ -458,6 +458,7 @@ class ProblemController extends Controller {
 			"validator"     => array("important" => true), // requires rejudge
 			"time_limit"    => array("important" => true), // requires rejudge
 			"memory_limit"  => array("important" => true), // requires rejudge
+			"output_limit"  => array("important" => true), // requires rejudge
 			"source",
 			"order",
 			"languages",
