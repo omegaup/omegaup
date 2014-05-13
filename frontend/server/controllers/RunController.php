@@ -438,13 +438,6 @@ class RunController extends Controller {
 					$case_name = $case['name'];
 					$case['meta'] = RunController::ParseMeta(file_get_contents("$grade_dir/$case_name.meta"));
 					unset($case['meta']['status']);
-					if (file_exists("$grade_dir/$case_name.out")) {
-						$case['out_diff'] = `diff -wauBbi $problem_dir/$case_name.out $grade_dir/$case_name.out | tail -n +3 | head -n50`;
-					}
-
-					if (file_exists("$grade_dir/$case_name.err")) {
-						$case['err'] = file_get_contents("$grade_dir/$case_name.err");
-					}
 				}
 			}
 		}
@@ -568,7 +561,35 @@ class RunController extends Controller {
 
 		$zip = new ZipStream($r["run"]->getGuid() . '.zip');
 
-		if (is_dir($grade_dir)) {
+		if (file_exists("$grade_dir.err")) {
+			$zip->add_file_from_path("compile.err", "$grade_dir.err");
+		} else if (is_dir($grade_dir) && file_exists("$grade_dir/details.json")) {
+			$validator = $problem->validator == 'custom';
+			$groups = json_decode(file_get_contents("$grade_dir/details.json"), true);
+			foreach ($groups as $group) {
+				foreach ($group['cases'] as $case) {
+					$case_name = $case['name'];
+					$zip->add_file_from_path("$case_name.out", "$grade_dir/$case_name.out");
+
+					if (!$validator && $case['veredict'] == 'OK' && ($case['score'] < 1)) {
+						$out_diff = `diff -wauBbi $problem_dir/$case_name.out $grade_dir/$case_name.out | tail -n +3 | head -n50`;
+						$zip->add_file("$case_name.out.diff", $out_diff);
+					}
+
+					if (!$r['complete']) continue;
+
+					$zip->add_file_from_path("$case_name.err", "$grade_dir/$case_name.err");
+					$zip->add_file_from_path("$case_name.meta", "$grade_dir/$case_name.meta");
+
+					if ($validator && is_dir("$grade_dir/validator")) {
+						$zip->add_file_from_path("validator/$case_name.meta", "$grade_dir/validator/$case_name.meta");
+						$zip->add_file_from_path("validator/$case_name.out", "$grade_dir/validator/$case_name.out");
+						$zip->add_file_from_path("validator/$case_name.err", "$grade_dir/validator/$case_name.err");
+					}
+				}
+			}
+		} else if (is_dir($grade_dir)) {
+			// No nice details.json, probably a JE.
 			if ($dir = opendir($grade_dir)) {
 				while (($file = readdir($dir)) !== false) {
 					$path = "$grade_dir/$file";
