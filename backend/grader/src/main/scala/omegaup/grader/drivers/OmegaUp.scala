@@ -13,7 +13,7 @@ import Status._
 import Validator._
 
 object OmegaUpDriver extends Driver with Log {
-  override def run(run: Run, service: RunnerService): Run = {
+  override def run(ctx: RunContext, run: Run): Run = {
     // If using the literal validator, we can skip the run.
     if (run.problem.validator == Validator.Literal) return run
 
@@ -21,14 +21,16 @@ object OmegaUpDriver extends Driver with Log {
     val alias = run.problem.alias
     val lang = run.language
 
-    info("Compiling {} {} on {}", alias, id, service.name)
+    info("Compiling {} {} on {}", alias, id, ctx.service.name)
 
     run.status = Status.Compiling
-    run.judged_by = Some(service.name)
-    Manager.updateVeredict(run)
+    run.judged_by = Some(ctx.service.name)
+    Manager.updateVeredict(ctx, run)
 
     val code = FileUtil.read(Config.get("submissions.root", "submissions") + "/" + run.guid)
-    val output = service.compile(createCompileMessage(run, code))
+    val output = ctx.trace(EventCategory.Compile) {
+      ctx.service.compile(createCompileMessage(run, code))
+    }
   
     if(output.status != "ok") {
       val errorFile = new FileWriter(Config.get("grader.root", "grader") + "/" + id + ".err")
@@ -49,7 +51,7 @@ object OmegaUpDriver extends Driver with Log {
     ).trim
     val msg = new RunInputMessage(
       output.token.get,
-      debug = run.debug,
+      debug = ctx.debug,
       timeLimit = run.problem.time_limit match {
         case Some(x) => x / 1000.0f
         case _ => 1.0f
@@ -66,26 +68,34 @@ object OmegaUpDriver extends Driver with Log {
     )
   
     run.status = Status.Running
-    Manager.updateVeredict(run)
+    Manager.updateVeredict(ctx, run)
 
     val target = new File(Config.get("grader.root", "grader") + "/" + id + "/")
     FileUtil.deleteDirectory(target)
     target.mkdir
     val placer = new CasePlacer(target)
 
-    info("Running {}({}) on {}", alias, id, service.name)
-    var response = service.run(msg, placer)
+    info("Running {}({}) on {}", alias, id, ctx.service.name)
+    var response = ctx.trace(EventCategory.Run) {
+      ctx.service.run(msg, placer)
+    }
     debug("Ran {} {}, returned {}", alias, id, response)
     if (response.status != "ok") {
       if (response.error.get ==  "missing input") {
-        info("Received a missing input message, trying to send input from {} ({})", alias, service.name)
+        info("Received a missing input message, trying to send input from {} ({})", alias, ctx.service.name)
         val inputZip = new File(Config.get("problems.root", "problems"), alias + "/cases.zip")
-        if(service.input(input, new FileInputStream(inputZip), inputZip.length.toInt).status != "ok") {
-          throw new RuntimeException("Unable to send input. giving up.")
+        ctx.trace(EventCategory.Input) {
+          if(ctx.service.input(
+            input, new FileInputStream(inputZip), inputZip.length.toInt
+          ).status != "ok") {
+            throw new RuntimeException("Unable to send input. giving up.")
+          }
         }
-        response = service.run(msg, placer)
+        response = ctx.trace(EventCategory.Run) {
+          ctx.service.run(msg, placer)
+        }
         if (response.status != "ok") {
-          error("Second try, ran {}({}) on {}, returned {}", alias, id, service.name, response)
+          error("Second try, ran {}({}) on {}, returned {}", alias, id, ctx.service.name, response)
           throw new RuntimeException("Unable to run submission after sending input. giving up.")
         }
       } else {
@@ -110,14 +120,16 @@ object OmegaUpDriver extends Driver with Log {
     }
   }
 
-  override def grade(run: Run): Run = {
-    run.problem.validator match {
-      case Validator.Custom => CustomGrader.grade(run)
-      case Validator.Literal => LiteralGrader.grade(run)
-      case Validator.Token => TokenGrader.grade(run)
-      case Validator.TokenCaseless => TokenCaselessGrader.grade(run)
-      case Validator.TokenNumeric => TokenNumericGrader.grade(run)
-      case _ => throw new IllegalArgumentException("Validator " + run.problem.validator + " not found")
+  override def grade(ctx: RunContext, run: Run): Run = {
+    ctx.trace(EventCategory.Grade) {
+      run.problem.validator match {
+        case Validator.Custom => CustomGrader.grade(ctx, run)
+        case Validator.Literal => LiteralGrader.grade(ctx, run)
+        case Validator.Token => TokenGrader.grade(ctx, run)
+        case Validator.TokenCaseless => TokenCaselessGrader.grade(ctx, run)
+        case Validator.TokenNumeric => TokenNumericGrader.grade(ctx, run)
+        case _ => throw new IllegalArgumentException("Validator " + run.problem.validator + " not found")
+      }
     }
   }
 

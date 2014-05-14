@@ -213,8 +213,7 @@ class Run(
 	var ip: String = "127.0.0.1",
 	var time: Timestamp = new Timestamp(0),
 	var submit_delay: Int = 0,
-	var judged_by: Option[String] = None,
-  var debug: Boolean = false
+	var judged_by: Option[String] = None
 ) {
   def copy() =
     new Run(
@@ -233,7 +232,6 @@ class Run(
       ip = this.ip,
       time = this.time,
       submit_delay = this.submit_delay,
-      judged_by = this.judged_by,
-      debug = this.debug
+      judged_by = this.judged_by
     )
 }

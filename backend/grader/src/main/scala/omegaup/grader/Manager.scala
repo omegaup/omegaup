@@ -15,6 +15,55 @@ import Veredict._
 import Validator._
 import Server._
 
+object EventCategory extends Enumeration {
+	type EventCategory = Value
+	val Queue = Value(0)
+	val UpdateVeredict = Value(1)
+	val Runner = Value(2)
+	val Compile = Value(3)
+	val Input = Value(4)
+	val Run = Value(5)
+	val Grade = Value(6)
+	val BroadcastQueue = Value(7)
+	val GraderRefresh = Value(8)
+}
+import EventCategory.EventCategory
+
+case class Event(begin: Boolean, category: EventCategory, time: Long = System.nanoTime) {
+	def toString(id: Long): String = s"""{"cat":"Grader","name":"$category","pid":0,"tid":$id,"ts":${time / 1000},"ph":"${if (begin) 'B' else 'E'}"}"""
+}
+
+class RunContext(var run: Run, val debug: Boolean) extends Object with Log {
+	val rejudges: Int = 0
+	val eventList = new scala.collection.mutable.MutableList[Event]
+	var service: RunnerService = null
+	var flightTime: Long = 0
+
+	def startFlight(service: RunnerService) = {
+		this.service = service
+		this.flightTime = System.currentTimeMillis
+	}
+
+	def trace[T](category: EventCategory)(f: => T): T = {
+		try {
+			eventList += new Event(true, category)
+			f
+		} finally {
+			eventList += new Event(false, category)
+		}
+	}
+
+	def queued(): Unit = eventList += new Event(true, EventCategory.Queue)
+	def dequeued(): Unit = eventList += new Event(false, EventCategory.Queue)
+
+	def broadcastQueued(): Unit = eventList += new Event(true, EventCategory.BroadcastQueue)
+	def broadcastDequeued(): Unit = eventList += new Event(false, EventCategory.BroadcastQueue)
+
+	def finish() = {
+		info("[" + eventList.map(_.toString(run.id)).mkString(",") + "]")
+	}
+}
+
 object Manager extends Object with Log {
 	private val listeners = scala.collection.mutable.ListBuffer.empty[Run => Unit]
 
@@ -46,31 +95,30 @@ object Manager extends Object with Log {
 
 		info("Recovering previous queue: {} runs re-added", pendingRuns.size)
 	
-		pendingRuns foreach(grade(_, false))
+		pendingRuns foreach(run => grade(new RunContext(run, false)))
 	}
 
-	def grade(run: Run, debug: Boolean): GradeOutputMessage = {
-		info("Judging {}", run.id)
+	def grade(ctx: RunContext): GradeOutputMessage = {
+		info("Judging {}", ctx.run.id)
 
 		implicit val conn = connection
 
-		if (run.problem.validator == Validator.Remote) {
-			run.status = Status.Ready
-			run.veredict = Veredict.JudgeError
-			run.judged_by = Some("Grader")
-			GraderData.update(run)
+		if (ctx.run.problem.validator == Validator.Remote) {
+			ctx.run.status = Status.Ready
+			ctx.run.veredict = Veredict.JudgeError
+			ctx.run.judged_by = Some("Grader")
+			GraderData.update(ctx.run)
 
 			new GradeOutputMessage(status = "error", error = Some("Remote validators not supported anymore"))
 		} else {
-			if (run.status != Status.Waiting) {
-				run.status = Status.Waiting
-				run.veredict = Veredict.JudgeError
-				run.judged_by = None
-				GraderData.update(run)
+			if (ctx.run.status != Status.Waiting) {
+				ctx.run.status = Status.Waiting
+				ctx.run.veredict = Veredict.JudgeError
+				ctx.run.judged_by = None
+				GraderData.update(ctx.run)
 			}
 
-			run.debug = debug
-			runnerRouter.addRun(run)
+			runnerRouter.addRun(ctx)
 			new GradeOutputMessage()
 		}
 	}
@@ -80,18 +128,20 @@ object Manager extends Object with Log {
 		
 		GraderData.run(id) match {
 			case None => throw new IllegalArgumentException("Id " + id + " not found")
-			case Some(run) => grade(run, debug)
+			case Some(run) => grade(new RunContext(run, debug))
 		}
 	}
 
-	def updateVeredict(run: Run): Run = {
+	def updateVeredict(ctx: RunContext, run: Run): Run = {
 		implicit val conn = connection
 	
-		GraderData.update(run)
+		ctx.trace(EventCategory.UpdateVeredict) {
+			GraderData.update(run)
+		}
 		if (run.status == Status.Ready) {
 			info("Veredict update: {} {} {} {} {} {} {}",
 				run.id, run.status, run.veredict, run.score, run.contest_score, run.runtime, run.memory)
-			Broadcaster.update(run)
+			Broadcaster.update(ctx)
 			listeners foreach { listener => listener(run) }
 		}
 

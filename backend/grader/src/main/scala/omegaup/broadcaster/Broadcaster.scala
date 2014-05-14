@@ -15,6 +15,7 @@ import scala.collection.{mutable,immutable}
 import scala.collection.JavaConversions._
 import omegaup._
 import omegaup.data._
+import omegaup.grader._
 
 case class RunDetails(
 	username: String,
@@ -34,7 +35,7 @@ case class RunDetails(
 case class UpdateRunMessage(message: String, run: RunDetails)
 
 class QueuedElement(val contest: String, val broadcast: Boolean, val targetUser: Long, val userOnly: Boolean) {}
-class QueuedRun(contest: String, broadcast: Boolean, targetUser: Long, userOnly: Boolean, val run: Run)
+class QueuedRun(contest: String, broadcast: Boolean, targetUser: Long, userOnly: Boolean, val ctx: RunContext)
 	extends QueuedElement(contest, broadcast, targetUser, userOnly) {}
 class QueuedMessage(contest: String, broadcast: Boolean, targetUser: Long, userOnly: Boolean, val message: String)
 	extends QueuedElement(contest, broadcast, targetUser, userOnly) {}
@@ -82,11 +83,15 @@ object Broadcaster extends Object with Runnable with Log with Using {
 		return hexdigest.toString
 	}
 	
-	def update(run: Run): Unit = {
-		run.contest match {
-			case Some(contest) =>
-				queue.put(new QueuedRun(contest.alias, false, run.user.id, false, run))
-			case None => {}
+	def update(ctx: RunContext): Unit = {
+		ctx.run.contest match {
+			case Some(contest) => {
+				ctx.broadcastQueued
+				queue.put(new QueuedRun(contest.alias, false, ctx.run.user.id, false, ctx))
+			}
+			case None => {
+				ctx.finish
+			}
 		}
 	}
 
@@ -104,29 +109,34 @@ object Broadcaster extends Object with Runnable with Log with Using {
 	private def runLoop(elm: QueuedElement): Unit = {
 		val message = elm match {
 			case m: QueuedRun => {
-				val run = m.run
+				m.ctx.broadcastDequeued
+				val run = m.ctx.run
 				implicit val formats = Serialization.formats(NoTypeHints)
 
 				if (Config.get("grader.scoreboard_refresh.enable", true)) {
-					try {
-						info("Scoreboard refresh {}",
-							Https.post[ScoreboardRefreshResponse](
-								Config.get(
-									"grader.scoreboard_refresh.url",
-									"http://localhost/api/scoreboard/refresh/"
-								),
-								Map(
-									"token" -> Config.get("grader.scoreboard_refresh.token", "secret"),
-									"alias" -> elm.contest,
-									"run" -> run.id.toString
-								),
-								runner = false
+					m.ctx.trace(EventCategory.GraderRefresh) {
+						try {
+							info("Scoreboard refresh {}",
+								Https.post[ScoreboardRefreshResponse](
+									Config.get(
+										"grader.scoreboard_refresh.url",
+										"http://localhost/api/scoreboard/refresh/"
+									),
+									Map(
+										"token" -> Config.get("grader.scoreboard_refresh.token", "secret"),
+										"alias" -> elm.contest,
+										"run" -> run.id.toString
+									),
+									runner = false
+								)
 							)
-						)
-					} catch {
-						case e: Exception => error("Scoreboard refresh", e)
+						} catch {
+							case e: Exception => error("Scoreboard refresh", e)
+						}
 					}
 				}
+
+				m.ctx.finish
 
 				Serialization.write(
 					UpdateRunMessage("/run/update/",

@@ -12,7 +12,7 @@ import omegaup.data._
 import Veredict._
 
 trait Grader extends Object with Log with Using {
-	def grade(run: Run): Run = {
+	def grade(ctx: RunContext, run: Run): Run = {
 		val alias = run.problem.alias
 		val dataDirectory = new File(Config.get("grader.root", ".") + "/" + run.id)
 
@@ -233,7 +233,7 @@ object CustomGrader extends Grader {
 }
 
 object LiteralGrader extends Grader {
-	override def grade(run: Run): Run = {
+	override def grade(ctx: RunContext, run: Run): Run = {
 		debug("Grading {}", run)
 		
 		run.status = Status.Ready

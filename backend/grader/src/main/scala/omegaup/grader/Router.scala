@@ -165,8 +165,8 @@ class RunnerRouter(dispatcherNames: Map[RunnerEndpoint, String], runRouter: RunR
 		dispatch(new RunnerEndpoint(runner.name, runner.port)).addRunner(runner)
 	}
 
-	def addRun(run: Run) = {
-		dispatchers(runRouter(run)).addRun(run)
+	def addRun(ctx: RunContext) = {
+		dispatchers(runRouter(ctx.run)).addRun(ctx)
 	}
 
 	override def stop(): Unit = {
@@ -186,11 +186,10 @@ class RunnerRouter(dispatcherNames: Map[RunnerEndpoint, String], runRouter: RunR
 }
 
 class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceInterface with Log {
-	private case class InFlightRun(service: RunnerService, run: Run, timestamp: Long)
 	private val registeredEndpoints = scala.collection.mutable.HashMap.empty[RunnerEndpoint, Long]
 	private val runnerQueue = scala.collection.mutable.Queue.empty[RunnerService]
-	private val runQueue = scala.collection.mutable.Queue.empty[Run]
-	private val runsInFlight = scala.collection.mutable.HashMap.empty[Long, InFlightRun]
+	private val runQueue = scala.collection.mutable.Queue.empty[RunContext]
+	private val runsInFlight = scala.collection.mutable.HashMap.empty[Long, RunContext]
 	private val executor = Executors.newCachedThreadPool
 	private var flightIndex: Long = 0
 	private val lock = new Object
@@ -250,10 +249,11 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 		new RegisterOutputMessage()
 	}
 
-	def addRun(run: Run) = {
+	def addRun(ctx: RunContext) = {
+		ctx.queued()
 		lock.synchronized {
-			debug("Adding run {}", run)
-			runQueue += run
+			debug("Adding run {}", ctx)
+			runQueue += ctx
 			dispatchLocked
 		}
 	}
@@ -267,8 +267,7 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 	private class GradeTask(
 		dispatcher: RunnerDispatcher,
 		flightIndex: Long,
-		var r: Run,
-		runner: RunnerService,
+		ctx: RunContext,
 		driver: Driver
 	) extends Runnable {
 		override def run(): Unit = {
@@ -276,25 +275,25 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 				gradeTask
 			} catch {
 				case e: Exception => {
-					error("Error while running {}: {}", r.id, e)
+					error("Error while running {}: {}", ctx.run.id, e)
 				}
 			}
 		}
 
 		private def gradeTask() = {
 			val future = dispatcher.executor.submit(new Callable[Run]() {
-					override def call(): Run = {
-						driver.run(r.copy, runner)
+					override def call(): Run = ctx.trace(EventCategory.Runner) {
+						driver.run(ctx, ctx.run.copy)
 					}
 			})
 
-			r = try {
+			ctx.run = try {
 				future.get(Config.get("grader.runner.timeout", 10 * 60) * 1000, TimeUnit.MILLISECONDS)
 			} catch {
 				case e: ExecutionException => {
 					error("Submission {} {} failed - {} {}",
-						r.problem.alias,
-						r.id,
+						ctx.run.problem.alias,
+						ctx.run.id,
 						e.getCause.toString,
 						e.getCause.getStackTrace
 					)
@@ -302,80 +301,84 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 					e.getCause match {
 						case inner: java.net.SocketException => {
 							// Probably a network error of some sort. No use in re-queueing the runner.
-							runner match {
+							ctx.service match {
 								case proxy: omegaup.runner.RunnerProxy => dispatcher.deregister(proxy.hostname, proxy.port)
 								case _ => {}
 							}
 
 							// But do re-queue the run
-							dispatcher.addRun(r)
+							dispatcher.addRun(ctx)
 
 							// And commit suicide
 							throw e
 						}
 						case _ => {
-							r.score = 0
-							r.contest_score = 0
-							r.status = Status.Ready
-							r.veredict = Veredict.JudgeError
+							ctx.run.score = 0
+							ctx.run.contest_score = 0
+							ctx.run.status = Status.Ready
+							ctx.run.veredict = Veredict.JudgeError
 						}
 					}
 
-					r
+					ctx.run
 				}
 				case e: TimeoutException => {
-					error("Submission {} {} timed out - {} {}", r.problem.alias, r.id, e.toString, e.getStackTrace)
+					error("Submission {} {} timed out - {} {}",
+						ctx.run.problem.alias,
+						ctx.run.id,
+						e.toString,
+						e.getStackTrace)
 
 					// Probably a network error of some sort. No use in re-queueing the runner.
-					runner match {
+					ctx.service match {
 						case proxy: omegaup.runner.RunnerProxy => dispatcher.deregister(proxy.hostname, proxy.port)
 						case _ => {}
 					}
 
-					r
+					ctx.run
 				}
 			} finally {
 				dispatcher.flightFinished(flightIndex)
 			}
 
-			Manager.updateVeredict(
-				if (r.status == Status.Ready) {
-					r
-				} else {
-					try {
-						driver.grade(r.copy)
-					} catch {
-						case e: Exception => {
-							error("Error while grading {}", e)
-							r.score = 0
-							r.contest_score = 0
-							r.status = Status.Ready
-							r.veredict = Veredict.JudgeError
+			if (ctx.run.status != Status.Ready) {
+				ctx.run = try {
+					driver.grade(ctx, ctx.run.copy)
+				} catch {
+					case e: Exception => {
+						error("Error while grading {}", e)
+						ctx.run.score = 0
+						ctx.run.contest_score = 0
+						ctx.run.status = Status.Ready
+						ctx.run.veredict = Veredict.JudgeError
 
-							r
-						}
+						ctx.run
 					}
 				}
-			)
+			}
+
+			Manager.updateVeredict(ctx, ctx.run)
 		}
 	}
 
 	private def runLocked() = {
 		val runner = runnerQueue.dequeue
-		val run = runQueue.dequeue
+		val ctx = runQueue.dequeue
+		ctx.dequeued
 
-		runsInFlight += flightIndex -> InFlightRun(runner, run, System.currentTimeMillis)
-		executor.submit(new GradeTask(this, flightIndex, run, runner, OmegaUpDriver))
+		ctx.startFlight(runner)
+		runsInFlight += flightIndex -> ctx
+		executor.submit(new GradeTask(this, flightIndex, ctx, OmegaUpDriver))
 
 		flightIndex += 1
 	}
 
 	private def pruneFlights() = lock.synchronized {
 		var cutoffTime = System.currentTimeMillis - Config.get("grader.runner.timeout", 10 * 60) * 1000
-		runsInFlight.foreach { case (i, flightInfo) => {
-			if (flightInfo.timestamp < cutoffTime) {
-				warn("Expiring stale flight {}, run {}", flightInfo.service, flightInfo.run.id)
-				flightInfo.service match {
+		runsInFlight.foreach { case (i, ctx) => {
+			if (ctx.flightTime < cutoffTime) {
+				warn("Expiring stale flight {}, run {}", ctx.service, ctx.run.id)
+				ctx.service match {
 					case proxy: RunnerProxy => deregisterLocked(new RunnerEndpoint(proxy.hostname, proxy.port))
 					case _ => {}
 				}
@@ -386,9 +389,9 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 
 	private def flightFinished(flightIndex: Long) = lock.synchronized {
 		if (runsInFlight.contains(flightIndex)) {
-			var flightRun = runsInFlight(flightIndex)
+			var ctx = runsInFlight(flightIndex)
 			runsInFlight -= flightIndex
-			addRunnerLocked(flightRun.service)
+			addRunnerLocked(ctx.service)
 		} else {
 			error("Lost track of flight {}!", flightIndex)
 			throw new RuntimeException("Flight corrupted, bail out")
