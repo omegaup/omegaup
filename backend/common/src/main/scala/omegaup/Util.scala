@@ -91,88 +91,115 @@ trait Log {
 }
 
 object Logging extends Object with Log {
+	private val encoderPattern = "%date [%thread] %-5level %logger{35} - %msg%n"
 	def init(): Unit = {
+		import ch.qos.logback.classic.Logger
+		import ch.qos.logback.classic.Level._
+		import ch.qos.logback.core.filter._
+		import ch.qos.logback.classic.spi.ILoggingEvent
+		import ch.qos.logback.core.spi.FilterReply
+
 		System.setProperty("org.mortbay.log.class", "org.mortbay.log.Slf4jLog")
 
-		val rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).asInstanceOf[ch.qos.logback.classic.Logger]
+		val rootLogger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
 
-		rootLogger.detachAndStopAllAppenders
+		createAppender(rootLogger, Config.get("logging.file", ""), new Filter[ILoggingEvent]() {
+				override def decide(event: ILoggingEvent): FilterReply = {
+					val throwable = event.getThrowableProxy()
 
-		val context = rootLogger.getLoggerContext
-		var appender: ch.qos.logback.core.Appender[ch.qos.logback.classic.spi.ILoggingEvent] = null
-		val encoderPattern = "%date [%thread] %-5level %logger{35} - %msg%n"
-
-		if (Config.get("logging.file", "") == "syslog") {
-			val syslogAppender = new ch.qos.logback.classic.net.SyslogAppender()
-			syslogAppender.setFacility("SYSLOG")
-
-			appender = syslogAppender
-		} else if (Config.get("logging.file", "") != "") {
-			val encoder = new ch.qos.logback.classic.encoder.PatternLayoutEncoder()
-			encoder.setContext(context)
-			encoder.setPattern(encoderPattern)
-			encoder.start()
-
-			val fileAppender = new ch.qos.logback.core.FileAppender[ch.qos.logback.classic.spi.ILoggingEvent]()
-			fileAppender.setAppend(true)
-			fileAppender.setFile(Config.get("logging.file", ""))
-			fileAppender.setEncoder(encoder)
-
-			appender = fileAppender
-		} else {
-			val encoder = new ch.qos.logback.classic.encoder.PatternLayoutEncoder()
-			encoder.setContext(context)
-			encoder.setPattern(encoderPattern)
-			encoder.start()
-
-			val consoleAppender = new ch.qos.logback.core.ConsoleAppender[ch.qos.logback.classic.spi.ILoggingEvent]()
-			consoleAppender.setEncoder(encoder)
-
-			appender = consoleAppender
-		}
-
-		appender.setContext(context)
-		appender.addFilter(new ch.qos.logback.core.filter.Filter[ch.qos.logback.classic.spi.ILoggingEvent]() {
-			override def decide(event: ch.qos.logback.classic.spi.ILoggingEvent): ch.qos.logback.core.spi.FilterReply = {
-				val throwable = event.getThrowableProxy()
-
-				if (throwable == null) {
-					ch.qos.logback.core.spi.FilterReply.ACCEPT
-				} else {
-					val message = throwable.getClassName()
-
-					if (message.contains("java.nio.channels.ClosedChannelException") ||
-					    message.contains("org.mortbay.jetty.EofException")
-					) {
-						ch.qos.logback.core.spi.FilterReply.DENY
+					if (throwable == null) {
+						FilterReply.ACCEPT
 					} else {
-						ch.qos.logback.core.spi.FilterReply.ACCEPT
+						val message = throwable.getClassName
+
+						if (message.contains("java.nio.channels.ClosedChannelException") ||
+							message.contains("org.mortbay.jetty.EofException")
+						) {
+						FilterReply.DENY
+					} else {
+						FilterReply.ACCEPT
 					}
 				}
 			}
 		})
-		appender.start
-
-		rootLogger.addAppender(appender)
 
 		rootLogger.setLevel(
 			Config.get("logging.level", "info") match {
-				case "all" => ch.qos.logback.classic.Level.TRACE
-				case "finest" => ch.qos.logback.classic.Level.TRACE
-				case "finer" => ch.qos.logback.classic.Level.TRACE
-				case "trace" => ch.qos.logback.classic.Level.TRACE
-				case "fine" => ch.qos.logback.classic.Level.DEBUG
-				case "config" => ch.qos.logback.classic.Level.DEBUG
-				case "debug" => ch.qos.logback.classic.Level.DEBUG
-				case "info" => ch.qos.logback.classic.Level.INFO
-				case "warn" => ch.qos.logback.classic.Level.WARN
-				case "warning" => ch.qos.logback.classic.Level.WARN
-				case "error" => ch.qos.logback.classic.Level.ERROR
-				case "severe" => ch.qos.logback.classic.Level.ERROR
+				case "all" => TRACE
+				case "finest" => TRACE
+				case "finer" => TRACE
+				case "trace" => TRACE
+				case "fine" => DEBUG
+				case "config" => DEBUG
+				case "debug" => DEBUG
+				case "info" => INFO
+				case "warn" => WARN
+				case "warning" => WARN
+				case "error" => ERROR
+				case "severe" => ERROR
 			}
 		)
 
+		val perfLog = Config.get("logging.perf.file", "")
+		if (perfLog != "") {
+			val perfLogger = LoggerFactory.getLogger("omegaup.grader.RunContext").asInstanceOf[Logger]
+
+			createAppender(perfLogger, perfLog)
+
+			perfLogger.setAdditive(false)
+			perfLogger.setLevel(INFO)
+		}
+
 		info("Logger loaded for {}", Config.get("logging.file", ""))
+	}
+
+	private def createAppender(
+		logger: ch.qos.logback.classic.Logger,
+		file: String,
+		filter: ch.qos.logback.core.filter.Filter[ch.qos.logback.classic.spi.ILoggingEvent] = null
+	) = {
+		import ch.qos.logback.core.{FileAppender, ConsoleAppender}
+		import ch.qos.logback.classic.net._
+		import ch.qos.logback.classic.encoder._
+		import ch.qos.logback.classic.spi.ILoggingEvent
+
+		logger.detachAndStopAllAppenders
+		val context = logger.getLoggerContext
+		val appender = if (file == "syslog") {
+			val syslogAppender = new SyslogAppender
+			syslogAppender.setFacility("SYSLOG")
+
+			syslogAppender
+		} else if (file != "") {
+			val encoder = new PatternLayoutEncoder
+			encoder.setContext(context)
+			encoder.setPattern(encoderPattern)
+			encoder.start()
+
+			val fileAppender = new FileAppender[ILoggingEvent]
+			fileAppender.setAppend(true)
+			fileAppender.setFile(file)
+			fileAppender.setEncoder(encoder)
+
+			fileAppender
+		} else {
+			val encoder = new PatternLayoutEncoder
+			encoder.setContext(context)
+			encoder.setPattern(encoderPattern)
+			encoder.start()
+
+			val consoleAppender = new ConsoleAppender[ILoggingEvent]
+			consoleAppender.setEncoder(encoder)
+
+			consoleAppender
+		}
+		appender.setContext(context)
+		if (filter != null) {
+			appender.addFilter(filter)
+		}
+		appender.start
+
+		logger.addAppender(appender)
 	}
 }
 
@@ -568,3 +595,5 @@ object DataUriStream extends Object with Log {
 }
 
 class DataUriInputStream(stream: InputStream) extends FilterInputStream(DataUriStream(stream)) with Log {}
+
+/* vim: set noexpandtab: */
