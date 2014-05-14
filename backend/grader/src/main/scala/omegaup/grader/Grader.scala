@@ -130,34 +130,49 @@ trait Grader extends Object with Log with Using {
 			run.score = 0
 		} else {
 			val caseScores = weights.map { case (group, data) => {
-				val scores = data.map { case (name, weight) =>
-					new CaseVeredictMessage(
-						name,
-						if (metas.contains(name)) {
+				val scores = data.map { case (name, weight) => {
+						var veredict = if (metas.contains(name)) {
 							metas(name)._2("status")
 						} else {
 							"OK"
-						},
-						if (metas.contains(name) && metas(name)._2("status") == "OK") {
-								val f = metas(name)._1
+						}
 
-								gradeCase(
-									run,
-									name,
-									new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out")),
-									new File(f.getCanonicalPath.replace(".meta", ".out")),
-									metas(name)._2
-								) * weight
+						val score = if (metas.contains(name) && metas(name)._2("status") == "OK") {
+							val f = metas(name)._1
+
+							val rawScore = gradeCase(
+								run,
+								name,
+								new File(Config.get("problems.root", "./problems") + "/" + alias + "/cases/" + f.getName.replace(".meta", ".out")),
+								new File(f.getCanonicalPath.replace(".meta", ".out")),
+								metas(name)._2
+							)
+
+							veredict = if (rawScore == 1.0) {
+								"AC"
+							} else if (rawScore > 0) {
+								"PA"
+							} else {
+								"WA"
+							}
+
+							rawScore
 						} else {
 							0.0
 						}
-					)
+
+						new CaseVeredictMessage(
+							name,
+							veredict,
+							score * weight
+						)
+					}
 				}
 
 				new GroupVeredictMessage(
 					group,
 					scores.toList,
-					if (scores.forall(_.score > 0)) {
+					if (scores.forall(caseVeredict => caseVeredict.veredict == "AC" || caseVeredict.veredict == "PA")) {
 						scores.foldLeft(0.0)(_+_.score)
 					} else {
 						0.0
@@ -171,7 +186,8 @@ trait Grader extends Object with Log with Using {
 			debug("Writing details into {}.", details.getCanonicalPath)
 			Serialization.write(caseScores, new FileWriter(details))
 
-			run.score = caseScores.foldLeft(0.0)(_+_.score) / weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2)) * (run.contest match {
+			val normalizedWeights = weights.foldLeft(0.0)(_+_._2.foldLeft(0.0)(_+_._2))
+			run.score = caseScores.foldLeft(0.0)(_+_.score) / normalizedWeights * (run.contest match {
 				case None => 1.0
 				case Some(contest) => {
 					if (contest.points_decay_factor <= 0.0 || run.submit_delay == 0.0) {
