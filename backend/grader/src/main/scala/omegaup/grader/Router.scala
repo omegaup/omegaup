@@ -282,7 +282,7 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 
 		private def gradeTask() = {
 			val future = dispatcher.executor.submit(new Callable[Run]() {
-					override def call(): Run = ctx.trace(EventCategory.Runner) {
+					override def call(): Run = ctx.trace(EventCategory.Runner, "runner" -> ctx.service.name) {
 						driver.run(ctx, ctx.run.copy)
 					}
 			})
@@ -364,7 +364,7 @@ class RunnerDispatcher(val name: String, router: RunnerRouter) extends ServiceIn
 	private def runLocked() = {
 		val runner = runnerQueue.dequeue
 		val ctx = runQueue.dequeue
-		ctx.dequeued
+		ctx.dequeued(name)
 
 		ctx.startFlight(runner)
 		runsInFlight += flightIndex -> ctx
