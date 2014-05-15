@@ -22,8 +22,31 @@ trait Using {
 	def rusing[A, B <: java.sql.ResultSet] (closeable: B) (f: B => A): A =
 		 try { f(closeable) } finally { closeable.close }
 
-	def cusing[A, B <: HttpURLConnection] (disconnectable: B) (f: B => A): A =
-		 try { f(disconnectable) } finally { disconnectable.disconnect }
+	def cusing[A, B <: java.net.HttpURLConnection] (connection: B) (f: B => A): A = {
+		// This tries to leverage HttpURLConnection's Keep-Alive facilities.
+		try {
+			f(connection)
+		} catch {
+			case e: IOException => {
+				try {
+					val err = connection.getErrorStream
+					val buf = Array.ofDim[Byte](1024)
+					var ret: Int = 0
+					while ({ ret = err.read(buf); ret > 0}){}
+					err.close
+				} catch {
+					case _: Throwable => {}
+				}
+				throw e
+			}
+		} finally {
+			try {
+				connection.getInputStream.close
+			} catch {
+				case _: Throwable => {}
+			}
+		}
+	 }
 
 	def pusing[A] (process: Process) (f: Process => A): A =
 		 try {
@@ -255,27 +278,24 @@ object Https extends Object with Log with Using {
 		override def createSocket(): Socket = socketFactory.createSocket
 	}
 
+	private def connect(url: String, runner: Boolean) = {
+		val conn = new URL(url).openConnection.asInstanceOf[HttpURLConnection]
+		if (url.startsWith("https://")) {
+			if (runner) {
+				conn.asInstanceOf[HttpsURLConnection].setSSLSocketFactory(runnerSocketFactory)
+			}
+		}
+		conn
+	}
+
 	def get(url: String, runner: Boolean = true):String = {
 		debug("GET {}", url)
 
-		if (url.startsWith("https://")) {
-			cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
-				conn.addRequestProperty("Connection", "close")
-				if (runner) {
-					conn.setSSLSocketFactory(runnerSocketFactory)
-				} else {
-					conn.setSSLSocketFactory(defaultSocketFactory)
-				}
-				conn.setDoOutput(false)
-				new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine
-			}}
-		} else {
-			cusing (new URL(url).openConnection().asInstanceOf[HttpURLConnection]) { conn => {
-				conn.addRequestProperty("Connection", "close")
-				conn.setDoOutput(false)
-				new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine
-			}}
-		}
+		cusing (connect(url, runner)) { conn => {
+			conn.addRequestProperty("Connection", "close")
+			conn.setDoOutput(false)
+			new BufferedReader(new InputStreamReader(conn.getInputStream())).readLine
+		}}
 	}
 
 	def post[T](url: String, data: scala.collection.Map[String, String], runner: Boolean = true)(implicit mf: Manifest[T]):T = {
@@ -287,36 +307,16 @@ object Https extends Object with Log with Using {
 
 		implicit val formats = Serialization.formats(NoTypeHints)
 
-		if (url.startsWith("https://")) {
-			cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
-				conn.setDoOutput(true)
-				conn.setRequestMethod("POST")
-				conn.addRequestProperty("Connection", "close")
-				conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-				conn.setRequestProperty("Content-Length", postdata.length.toString)
-				if (runner) {
-					conn.setSSLSocketFactory(runnerSocketFactory)
-				} else {
-					conn.setSSLSocketFactory(defaultSocketFactory)
-				}
-				val stream = conn.getOutputStream()
-				stream.write(postdata, 0, postdata.length)
-				stream.close
-				Serialization.read[T](new InputStreamReader(conn.getInputStream()))
-			}}
-		} else {
-			cusing (new URL(url).openConnection().asInstanceOf[HttpURLConnection]) { conn => {
-				conn.setDoOutput(true)
-				conn.setRequestMethod("POST")
-				conn.addRequestProperty("Connection", "close")
-				conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-				conn.setRequestProperty("Content-Length", postdata.length.toString)
-				val stream = conn.getOutputStream()
-				stream.write(postdata, 0, postdata.length)
-				stream.close
-				Serialization.read[T](new InputStreamReader(conn.getInputStream()))
-			}}
-		}
+		cusing (connect(url, runner)) { conn => {
+			conn.setDoOutput(true)
+			conn.setRequestMethod("POST")
+			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+			conn.setRequestProperty("Content-Length", postdata.length.toString)
+			val stream = conn.getOutputStream()
+			stream.write(postdata, 0, postdata.length)
+			stream.close
+			Serialization.read[T](new InputStreamReader(conn.getInputStream()))
+		}}
 	}
 	
   def send[T, W <: AnyRef](url:String, request:W, responseReader: InputStream=>T, runner: Boolean = true)(implicit mf: Manifest[T]):T = {
@@ -324,14 +324,8 @@ object Https extends Object with Log with Using {
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 		
-		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+		cusing (connect(url, runner)) { conn => {
 			conn.addRequestProperty("Content-Type", "text/json")
-			conn.addRequestProperty("Connection", "close")
-			if (runner) {
-				conn.setSSLSocketFactory(runnerSocketFactory)
-			} else {
-				conn.setSSLSocketFactory(defaultSocketFactory)
-			}
 			conn.setDoOutput(true)
 			val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
 			Serialization.write[W, PrintWriter](request, writer)
@@ -346,14 +340,8 @@ object Https extends Object with Log with Using {
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 		
-		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+		cusing (connect(url, runner)) { conn => {
 			conn.addRequestProperty("Content-Type", "text/json")
-			conn.addRequestProperty("Connection", "close")
-			if (runner) {
-				conn.setSSLSocketFactory(runnerSocketFactory)
-			} else {
-				conn.setSSLSocketFactory(defaultSocketFactory)
-			}
 			conn.setDoOutput(true)
 			val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
 			Serialization.write[W, PrintWriter](request, writer)
@@ -374,16 +362,10 @@ object Https extends Object with Log with Using {
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 		
-		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+		cusing (connect(url, runner)) { conn => {
 			conn.addRequestProperty("Content-Type", "application/zip")
 			conn.addRequestProperty("Content-Disposition", "attachment; filename=" + zipname + ";")
-			conn.addRequestProperty("Connection", "close")
 			conn.setFixedLengthStreamingMode(zipSize)
-			if (runner) {
-				conn.setSSLSocketFactory(runnerSocketFactory)
-			} else {
-				conn.setSSLSocketFactory(defaultSocketFactory)
-			}
 			conn.setDoOutput(true)
 			val outputStream = conn.getOutputStream
 			val buffer = Array.ofDim[Byte](1024)
@@ -408,13 +390,8 @@ object Https extends Object with Log with Using {
 		
 		implicit val formats = Serialization.formats(NoTypeHints)
 
-		cusing (new URL(url).openConnection().asInstanceOf[HttpsURLConnection]) { conn => {
+		cusing (connect(url, runner)) { conn => {
 			conn.addRequestProperty("Content-Type", "text/json")
-			if (runner) {
-				conn.setSSLSocketFactory(runnerSocketFactory)
-			} else {
-				conn.setSSLSocketFactory(defaultSocketFactory)
-			}
 			conn.setDoOutput(true)
 			val writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()))
 			Serialization.write[W, PrintWriter](request, writer)
@@ -560,7 +537,6 @@ object MetaFile extends Object with Using {
 
 object DataUriStream extends Object with Log {
 	def apply(stream: InputStream) = {
-		System.out.println(stream)
 		debug("Reading data URI")
 
 		val buffer = Array.ofDim[Byte](1024)
