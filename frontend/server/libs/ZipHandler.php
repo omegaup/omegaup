@@ -27,19 +27,31 @@ class ZipHandler {
 
 			$zip->close();
 		} else {
-			throw new Exception("Error openning zip file: " . $this->zipFileErrMsg($zipResource));
+			throw new Exception("Error opening zip file: " . ZipHandler::ErrorMessage($zipResource));
 		}
 	}
 
-	public static function ZipCleanup($tmp_dir) {
-		if (unlink($tmp_dir) === FALSE) {
-			Logger::error("Unable to remove the file " . $tmp_dir . " while doing ZipCleanup");
-			throw new Excpetion("Unable to remove the file " . $tmp_dir);
+	static function AddDirectory($zip, $source, $prefix, $excluded) {
+		if (!is_dir($source)) return;
+
+		if ($handle = opendir($source)) {
+			while (false !== ($entry = readdir($handle))) {
+				if ($entry == "." || $entry == "..") continue;
+				$sourcePath = "$source/$entry";
+				$targetPath = ($prefix == "") ? $entry : "$prefix/$entry";
+				if (in_array($targetPath, $excluded)) continue;
+				if (is_dir($sourcePath)) {
+					$zip->AddEmptyDir($targetPath);
+					ZipHandler::AddDirectory($zip, $sourcePath, $targetPath, $excluded);
+				} else {
+					$zip->addFile($sourcePath, $targetPath);
+				}
+			}
+			closedir($handle);
 		}
 	}
 
-	public static function zipFileErrMsg($errno) {
-
+	public static function ErrorMessage($errno) {
 		$zipFileFunctionsErrors = array(
 			'ZIPARCHIVE::ER_MULTIDISK' => 'Multi-disk zip archives not supported.',
 			'ZIPARCHIVE::ER_RENAME' => 'Renaming temporary file failed.',
@@ -74,5 +86,4 @@ class ZipHandler {
 		}
 		return 'Zip File Function error: unknown';
 	}
-
 }

@@ -489,28 +489,6 @@ class CreateProblemTest extends OmegaupTestCase {
 	}
 	
 	/**
-	 * Basic test for uploadin problem missing inputs
-	 * 
-	 * @expectedException ProblemDeploymentFailedException
-	 */
-	public function testCreateProblemMissingInput() {
-
-		// Get the problem data
-		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "missingin.zip");
-		$r = $problemData["request"];
-		$problemAuthor = $problemData["author"];
-
-		// Login user
-		$r["auth_token"] = $this->login($problemAuthor);
-
-		// Get File Uploader Mock and tell Omegaup API to use it
-		FileHandler::SetFileUploader($this->createFileUploaderMock());
-
-		// Call the API				
-		$response = ProblemController::apiCreate($r);	
-	}
-	
-	/**
 	 * Basic test for uploadin problem missing outputs
 	 * 
 	 * @expectedException ProblemDeploymentFailedException

@@ -21,7 +21,7 @@ try_define('OMEGAUP_BASE_URL',			'http://localhost');
 # LOG CONFIG
 # ####################################
 try_define('OMEGAUP_LOG_FILE',				OMEGAUP_TEST_ROOT . 'omegaup.log');
-try_define('OMEGAUP_LOG_LEVEL',				"info");
+try_define('OMEGAUP_LOG_LEVEL',				"debug");
 
 # ####################################
 # GRADER CONFIG

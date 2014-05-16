@@ -158,7 +158,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiCreate(Request $r) {
-
 		self::authenticateRequest($r);
 
 		// Validates request
@@ -182,7 +181,7 @@ class ProblemController extends Controller {
 		$problem->setAlias($r["alias"]);
 		$problem->setLanguages($r["languages"]);
 
-		$problemDeployer = new ProblemDeployer();
+		$problemDeployer = new ProblemDeployer($r['alias'], false);
 
 		// Insert new problem
 		try {
@@ -190,27 +189,31 @@ class ProblemController extends Controller {
 			ProblemsDAO::transBegin();
 
 			// Create file after we know that alias is unique			
-			$problemDeployer->deploy($r);
+			$problemDeployer->deploy();
+			if ($problemDeployer->hasValidator) {
+				$problem->validator = 'custom';
+			} else if ($problem->validator == 'custom') {
+				throw new ProblemDeploymentFailedException('Problem requested custom validator but has no validator.');
+			}
+			$problem->slow = $problemDeployer->isSlow($problem);
 
 			// Calculate output limit.
-			$output_limit = $problemDeployer->getOutputLimit($r['alias']);
+			$output_limit = $problemDeployer->getOutputLimit();
 
 			if ($output_limit != -1) {
 				$problem->setOutputLimit($output_limit);
 			}
 
-			$problem->slow = $problemDeployer->isSlow($problem);
-
 			// Save the contest object with data sent by user to the database
 			ProblemsDAO::save($problem);
 
 			ProblemsDAO::transEnd();
+
+			// Commit at the very end
+			$problemDeployer->commit();
 		} catch (ApiException $e) {
 			// Operation failed in something we know it could fail, rollback transaction 
 			ProblemsDAO::transRollback();
-
-			// Rollback the problem if deployed partially
-			$problemDeployer->deleteProblemFromFilesystem($r['alias']);
 
 			throw $e;
 		} catch (Exception $e) {
@@ -225,11 +228,10 @@ class ProblemController extends Controller {
 				throw new DuplicatedEntryInDatabaseException("Problem title already exists. Please try a different one.", $e);
 			} else {
 
-				// Rollback the problem if deployed partially
-				$problemDeployer->deleteProblemFromFilesystem($r['alias']);
-
 				throw new InvalidDatabaseOperationException($e);
 			}
+		} finally {
+			$problemDeployer->cleanup();
 		}
 
 		// Adding unzipped files to response
@@ -468,7 +470,7 @@ class ProblemController extends Controller {
 		$r['problem'] = $problem;
 
 		$response = array();
-		$problemDeployer = new ProblemDeployer();
+		$problemDeployer = new ProblemDeployer($problem->alias, false);
 
 		// Insert new problem
 		try {
@@ -481,18 +483,26 @@ class ProblemController extends Controller {
 				// DeployProblemZip requires alias => problem_alias
 				$r["alias"] = $r["problem_alias"];
 
-				$problemDeployer->update($r);
+				$problemDeployer->deploy();
+				if ($problemDeployer->hasValidator) {
+					$problem->validator = 'custom';
+				} else if ($problem->validator == 'custom') {
+					throw new ProblemDeploymentFailedException('Problem requested custom validator but has no validator.');
+				}
+				// This must come before the commit in case isSlow throws an exception.
+				$problem->slow = $problemDeployer->isSlow($problem);
 
 				// Calculate output limit.
-				$output_limit = $problemDeployer->getOutputLimit($r['alias']);
+				$output_limit = $problemDeployer->getOutputLimit();
 
 				if ($output_limit != -1) {
 					$r['problem']->setOutputLimit($output_limit);
 				}
 
-				$problem->slow = $problemDeployer->isSlow($problem);
-
 				$response["uploaded_files"] = $problemDeployer->filesToUnzip;
+				$problemDeployer->commit();
+			} else {
+				$problem->slow = $problemDeployer->isSlow($problem);
 			}
 
 			// Save the contest object with data sent by user to the database
@@ -512,6 +522,8 @@ class ProblemController extends Controller {
 			self::$log->error($e);
 
 			throw new InvalidDatabaseOperationException($e);
+		} finally {
+			$problemDeployer->cleanup();
 		}
 
 		if (($requiresRejudge === true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE === true)) {
@@ -559,14 +571,12 @@ class ProblemController extends Controller {
 		if (is_null($r["lang"])) {
 			$r["lang"] = "es";
 		}				
-		
+
+		$problemDeployer = new ProblemDeployer($r['problem_alias']);
 		try {					
-			// DeployProblemZip requires alias => problem_alias
-			$r["alias"] = $r["problem_alias"];
 			
-			$problemDeployer = new ProblemDeployer();
-			
-			$problemDeployer->updateStatement($r);
+			$problemDeployer->updateStatement($r['lang'], $r['statement']);
+			$problemDeployer->commit();
 			
 			// Invalidar problem statement cache
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "html");
@@ -575,6 +585,8 @@ class ProblemController extends Controller {
 			throw $e;
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
+		} finally {
+			$problemDeployer->cleanup();
 		}
 		
 		// All clear
@@ -1199,5 +1211,4 @@ class ProblemController extends Controller {
 
 		return $score;
 	}
-
 }

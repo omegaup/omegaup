@@ -65,6 +65,35 @@ class FileHandler {
 		}
 	}
 
+	static function TempDir($dir, $prefix='', $mode=0700)  {
+		if (substr($dir, -1) != '/') $dir .= '/';
+
+		do {
+			$path = $dir.$prefix.mt_rand(0, 9999999);
+		} while (!@mkdir($path, $mode));
+
+		return $path;
+	}
+
+	static function BackupDir($source, $dest) {
+		if (!is_dir($source)) return;
+		if (!is_dir($dest)) @mkdir($dest);
+
+		if ($handle = opendir($source)) {
+			while (false !== ($entry = readdir($handle))) {
+				if ($entry == "." || $entry == "..") continue;
+				$sourcePath = "$source/$entry";
+				$targetPath = "$dest/$entry";
+				if (is_dir($sourcePath)) {
+					FileHandler::BackupDir($sourcePath, $targetPath);
+				} else {
+					link($sourcePath, $targetPath);
+				}
+			}
+			closedir($handle);
+		}
+	}
+
 	static function DeleteDirRecursive($pathName) {
 		self::$log->info("Trying to delete recursively dir: " . $pathName);
 		self::rrmdir($pathName);
