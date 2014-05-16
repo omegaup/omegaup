@@ -54,6 +54,7 @@ ProguardKeys.options in Proguard ++= Seq(
   "-keep class org.eclipse.jetty.websocket.common.extensions.**",
   "-keep class org.eclipse.jetty.websocket.**",
   "-keep class ch.qos.logback.classic.Logger",
+  "-keep class ch.qos.logback.classic.spi.ThrowableProxy",
   ProguardOptions.keepMain("omegaup.Service")
 )
 

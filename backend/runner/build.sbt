@@ -47,6 +47,7 @@ ProguardKeys.options in Proguard ++= Seq(
   "-keep class scala.collection.JavaConversions",
   "-keep class org.eclipse.jetty.util.log.Slf4jLog",
   "-keep class ch.qos.logback.classic.Logger",
+  "-keep class ch.qos.logback.classic.spi.ThrowableProxy",
   ProguardOptions.keepMain("omegaup.runner.Service")
 )
 
