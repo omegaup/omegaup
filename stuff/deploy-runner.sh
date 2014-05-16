@@ -67,6 +67,13 @@ if [ ! -d /opt/omegaup ]; then
 	mkdir /opt/omegaup
 fi
 
+# Install dnsmasq to hardcode the DNS reverse resolution
+if [ ! -f /etc/dnsmaq.d/omegaup.conf ]; then
+	apt-get install -y dnsmasq
+	echo -e 'address=/omegaup.com/162.220.216.152\nptr-record=152.216.220.162.in-addr.arpa,omegaup.com' | sudo tee /etc/dnsmasq.d/omegaup.conf > /dev/null
+	sudo service dnsmasq restart
+fi
+
 # Minijail needs sudopowers
 if [ "\`grep omegaup /etc/sudoers\`" = "" ]; then
 	echo "omegaup ALL = NOPASSWD: /opt/omegaup/minijail/bin/minijail0" >> /etc/sudoers
