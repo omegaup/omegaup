@@ -7,6 +7,8 @@ import re
 parser = argparse.ArgumentParser('Process the perf log into something Chrome can display.')
 parser.add_argument('file', nargs='?', default='/var/log/omegaup/perf.log',
                     help='The location of the omegaUp perf.log')
+parser.add_argument('--nopid', default=True, dest='pid', action='store_false',
+                    help='The horizontal layout of the events in the Chrome tracing screen')
 parser.add_argument('--tscaling', default='as-is', choices=['as-is','shift','trim', 'cat'],
                     help='The horizontal layout of the events in the Chrome tracing screen')
 parser.add_argument('--sscaling', default='best', choices=['single','run','best'],
@@ -33,24 +35,40 @@ def extent(run):
 			t1 = max(t1, event['ts'])
 	return t0, t1
 
+# Segment into runners
+runners = {}
+if args.pid:
+	for run in runs:
+		# Find runner
+		runner = ""
+		for event in run:
+			if 'args' in event and 'runner' in event['args']:
+				runner = event['args']['runner']
+				break
+		if runner not in runners:
+			runners[runner] = len(runners) + 1
+		pid = runners[runner]
+		for event in run:
+			event['pid'] = pid
+
 # Temporal (horizontal) scaling
 if args.tscaling == 'shift':
 	for run in runs:
-		t0, t1 = extent(run[0])
+		t0, t1 = extent(run)
 		for event in run:
 			event['ts'] -= t0
 elif args.tscaling == 'cat':
 	start = 0
 	for run in runs:
-		t0, t1 = extent(run[0])
-		t0 -= start
-		start += t1 - t0 + 1000
+		t0, t1 = extent(run)
+		delta = t0 - start
+		start += t1 - t0
 		for event in run:
-			event['ts'] -= t0
+			event['ts'] -= delta
 elif args.tscaling == 'trim':
 	ends = [(runs[0][0]['ts'], 0)]
 	for run in runs:
-		t0, t1 = extent(run[0])
+		t0, t1 = extent(run)
 		tidx = -1
 		while ends[tidx][0] > t0:
 			tidx -= 1
@@ -68,10 +86,13 @@ if args.sscaling == 'run':
 		for event in run:
 			event['tid'] = tid
 if args.sscaling == 'best':
-	threads = []
+	pidThreads = {}
 	for run in runs:
 		t0, t1 = extent(run)
 		idx = -1
+		if run[0]['pid'] not in pidThreads:
+			pidThreads[run[0]['pid']] = []
+		threads = pidThreads[run[0]['pid']]
 		for i in xrange(len(threads)):
 			if threads[i] <= t0:
 				idx = i
@@ -83,24 +104,12 @@ if args.sscaling == 'best':
 		for event in run:
 			event['tid'] = idx
 
-data = []
-runners = {}
-# Flatten and add metadata
-for run in runs:
-	# Find runner
-	runner = ""
-	for event in run:
-		if 'args' in event and 'runner' in event['args']:
-			runner = event['args']['runner']
-			break
-	if runner not in runners:
-		runners[runner] = len(runners) + 1
-	pid = runners[runner]
-	for event in run:
-		event['pid'] = pid
+# Add metadata
+data = [{"name": "process_name", "ph": "M", "pid": runners[runner], "tid": 0, "args": {"name": runner}} for runner in runners] 
 
+# Flatten
+for run in runs:
 	data += run
-data = [{"name": "process_name", "ph": "M", "pid": runners[runner], "tid": 0, "args": {"name": runner}} for runner in runners] + data
 
 print json.dumps(data, separators=(',', ':'))
 
