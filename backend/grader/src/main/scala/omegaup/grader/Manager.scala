@@ -161,7 +161,9 @@ object Manager extends Object with Log {
 				ctx.run.status = Status.Waiting
 				ctx.run.veredict = Veredict.JudgeError
 				ctx.run.judged_by = None
-				GraderData.update(ctx.run)
+				ctx.trace(EventCategory.UpdateVeredict) {
+					GraderData.update(ctx.run)
+				}
 			}
 
 			runnerRouter.addRun(ctx)

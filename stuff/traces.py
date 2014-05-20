@@ -66,15 +66,18 @@ elif args.tscaling == 'cat':
 		for event in run:
 			event['ts'] -= delta
 elif args.tscaling == 'trim':
-	ends = [(runs[0][0]['ts'], 0)]
+	curStart = runs[0][0]['ts']
+	curEnd = runs[0][0]['ts']
+	curOffset = 0
 	for run in runs:
 		t0, t1 = extent(run)
-		tidx = -1
-		while ends[tidx][0] > t0:
-			tidx -= 1
-		delta = t0 - ends[tidx][1]
-		if t1 > ends[-1][0]:
-			ends.append((t1, t1 - delta))
+		if t0 >= curEnd:
+			curOffset +=  curEnd - curStart
+			curStart = t0
+			curEnd = t1
+		else:
+			curEnd = max(curEnd, t1)
+		delta = curStart - curOffset
 		for event in run:
 			event['ts'] -= delta
 
