@@ -73,7 +73,7 @@ class ApiException extends Exception {
 			"status" => "error",
 			"error" => $this->message,
 			"errorcode" => $this->code,
-			"header" => $this->header,			
+			"header" => $this->header
 		);
 		
 		return array_merge($arrayToReturn, $this->customMessage);
@@ -126,7 +126,7 @@ class InvalidDatabaseOperationException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("Oops. I've encountered an internal error. Please try again.", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+		parent::__construct("generalError", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
 	}
 
 }
@@ -159,7 +159,7 @@ class ForbiddenAccessException extends ApiException {
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	function __construct($message = "User is not allowed to view this content.", Exception $previous = NULL) {
+	function __construct($message = "userNotAllowed", Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 403 FORBIDDEN', 403, $previous);
 	}
 
@@ -176,7 +176,7 @@ class PreconditionFailedException extends ApiException {
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	function __construct($message = "User is not allowed to view this content.", Exception $previous = NULL) {
+	function __construct($message = "userNotAllowed", Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
 	}
 
@@ -193,7 +193,7 @@ class InvalidFilesystemOperationException extends ApiException {
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	function __construct($message = "Oops. I've encountered an internal error. Please try again.", Exception $previous = NULL) {
+	function __construct($message = "generalError", Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
 	}
 
@@ -210,7 +210,7 @@ class InternalServerErrorException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("Oops. I've encountered an internal error. Please try again.", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
+		parent::__construct("generalError", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
 	}
 
 }
@@ -227,14 +227,14 @@ class InvalidCredentialsException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("Username or password is wrong. Please check your credentials.", "HTTP/1.1 403 FORBIDDEN", 101, $previous);
+		parent::__construct("usernameOrPassIsWrong", "HTTP/1.1 403 FORBIDDEN", 101, $previous);
 	}
 
 }
 
 class NotAllowedToSubmitException extends ApiException {
 	
-	function __construct($message = "Unable to submit run: You're not allowed to submit yet. ", Exception $previous = NULL) {
+	function __construct($message = "unableToSubmit", Exception $previous = NULL) {
 		parent::__construct($message, "HTTP/1.1 401 FORBIDDEN", 501, $previous);
 	}
 }
@@ -248,7 +248,7 @@ class EmailNotVerifiedException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("Your email is not verified yet. Please look for the verification email in your inbox and spam folder. If you still have problems, please contact joe@omegaup.com for support.", "HTTP/1.1 403 FORBIDDEN", 600, $previous);
+		parent::__construct("emailNotVerified", "HTTP/1.1 403 FORBIDDEN", 600, $previous);
 	}
 
 }
@@ -262,7 +262,7 @@ class EmailVerificationSendException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("There was an error sending the verification email. Please try again later or contact joe@omegaup.com for support. Your email is not verified yet.", "HTTP/1.1 403 FORBIDDEN", 601, $previous);
+		parent::__construct("errorWhileSendingMail", "HTTP/1.1 500 INTERNAL SERVER ERROR", 601, $previous);
 	}
 
 }
@@ -279,7 +279,7 @@ class ProblemDeploymentFailedException extends ApiException {
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
-		parent::__construct("Unable to deploy problem, please check your zip: " . $previous->getMessage(), 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);		
+		parent::__construct("unableToDeployProblem", 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);		
 	}
 
 }
