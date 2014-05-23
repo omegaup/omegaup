@@ -69,9 +69,12 @@ class ApiException extends Exception {
 	 * @return array
 	 */
 	public function asResponseArray() {
+
+		// Obtener el texto final (ya localizado) de smarty.	
+		global $smarty;
 		$arrayToReturn =  array(
 			"status" => "error",
-			"error" => $this->message,
+			"error" => $smarty->getConfigVars($this->message), //; $this->message,
 			"errorcode" => $this->code,
 			"header" => $this->header
 		);
