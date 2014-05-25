@@ -10,6 +10,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Redirige localhost:8080 hacia el puerto 80 de la VM
   config.vm.network :forwarded_port, guest: 80, host: 8080
 
+  # Permite usar las llaves SSH del host en la VM
+  config.ssh.forward_agent = true
+
   config.vm.provider :virtualbox do |vb|
     # Compilar grader y runner necesita al menos 1GB de memoria
     vb.customize ["modifyvm", :id, "--memory", "1024"]
