@@ -10,7 +10,7 @@ import scala.util.parsing.combinator.syntactical._
 import scala.collection.immutable.{HashMap, HashSet}
 
 trait RunRouter {
-	def apply(run: Run): String
+	def apply(ctx: RunContext): String
 }
 
 class RunnerEndpoint(val hostname: String, val port: Int) {
@@ -77,21 +77,22 @@ object RoutingDescription extends StandardTokenParsers with Log {
 	private def eqExpr: Parser[RunMatcher] = param ~ "==" ~ stringLit ^^ { case param ~ "==" ~ arg => new EqMatcher(param, arg) }
 	private def inExpr: Parser[RunMatcher] = param ~ "in" ~ stringList ^^ { case param ~ "in" ~ arg => new InMatcher(param, arg) }
 	private def slowExpr: Parser[RunMatcher] = "slow" ^^ { case "slow" => SlowMatcher }
+	private def rejudgeExpr: Parser[RunMatcher] = "rejudge" ^^ { case "rejudge" => RejudgeMatcher }
 	private def trueExpr: Parser[RunMatcher] = "true" ^^ { case "true" => TrueMatcher }
 
 	private def param: Parser[String] = "contest" | "user" | "problem"
 	private def stringList: Parser[List[String]] = "[" ~> rep1sep(stringLit, ",") <~ "]"
 
 	private class RunRouterImpl(routingMap: List[(RunMatcher, String)]) extends Object with RunRouter with Log {
-		def apply(run: Run): String = {
+		def apply(ctx: RunContext): String = {
 			for (entry <- routingMap) {
-				debug("Run {} matching against {}", run, entry._1)
-				if (entry._1(run)) {
-					debug("Run {} matched into {}", run.id, entry._2)
+				debug("Run {} matching against {}", ctx.run, entry._1)
+				if (entry._1(ctx)) {
+					debug("Run {} matched into {}", ctx.run.id, entry._2)
 					return entry._2
 				}
 			}
-			debug("Run {} matched nothing. Returning {}", run.id, defaultQueueName)
+			debug("Run {} matched nothing. Returning {}", ctx.run.id, defaultQueueName)
 			defaultQueueName
 		}
 
@@ -99,47 +100,52 @@ object RoutingDescription extends StandardTokenParsers with Log {
 	}
 
 	private trait RunMatcher {
-		def apply(run: Run): Boolean
-		def getParam(run: Run, param: String) = param match {
+		def apply(ctx: RunContext): Boolean
+		def getParam(ctx: RunContext, param: String) = param match {
 			case "contest" => {
-				run.contest match {
+				ctx.run.contest match {
 					case None => ""
 					case Some(contest) => contest.alias
 				}
 			}
-			case "problem" => run.problem.alias
-			case "user" => run.user.username
+			case "problem" => ctx.run.problem.alias
+			case "user" => ctx.run.user.username
 		}
 	}
 
 	private class EqMatcher(param: String, arg: String) extends Object with RunMatcher {
-		def apply(run: Run): Boolean = getParam(run, param) == arg
+		def apply(ctx: RunContext): Boolean = getParam(ctx, param) == arg
 		override def toString(): String = param + " == " + arg
 	}
 
 	private class InMatcher(param: String, arg: List[String]) extends Object with RunMatcher {
 		private val set = new HashSet[String]() ++ arg
-		def apply(run: Run): Boolean = set.contains(getParam(run, param))
+		def apply(ctx: RunContext): Boolean = set.contains(getParam(ctx, param))
 		override def toString(): String = param + " in " + "[" + set.mkString(", ") + "]"
 	}
 
 	private class OrMatcher(arg: List[RunMatcher]) extends Object with RunMatcher {
-		def apply(run: Run): Boolean = arg.exists(_(run))
+		def apply(ctx: RunContext): Boolean = arg.exists(_(ctx))
 		override def toString(): String = "(" + arg.mkString(" || ") + ")"
 	}
 
 	private class AndMatcher(arg: List[RunMatcher]) extends Object with RunMatcher {
-		def apply(run: Run): Boolean = arg.forall(_(run))
+		def apply(ctx: RunContext): Boolean = arg.forall(_(ctx))
 		override def toString(): String = arg.mkString(" && ")
 	}
 
 	private object SlowMatcher extends Object with RunMatcher {
-		def apply(run: Run): Boolean = run.problem.slow
+		def apply(ctx: RunContext): Boolean = ctx.run.problem.slow
 		override def toString(): String = "slow"
 	}
 
+	private object RejudgeMatcher extends Object with RunMatcher {
+		def apply(ctx: RunContext): Boolean = ctx.rejudge
+		override def toString(): String = "rejudge"
+	}
+
 	private object TrueMatcher extends Object with RunMatcher {
-		def apply(run: Run): Boolean = true
+		def apply(ctx: RunContext): Boolean = true
 		override def toString(): String = "true"
 	}
 }
@@ -166,7 +172,7 @@ class RunnerRouter(dispatcherNames: Map[RunnerEndpoint, String], runRouter: RunR
 	}
 
 	def addRun(ctx: RunContext) = {
-		dispatchers(runRouter(ctx.run)).addRun(ctx)
+		dispatchers(runRouter(ctx)).addRun(ctx)
 	}
 
 	override def stop(): Unit = {

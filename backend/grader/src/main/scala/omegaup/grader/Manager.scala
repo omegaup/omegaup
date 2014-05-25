@@ -61,7 +61,7 @@ case class CompleteEvent(category: EventCategory, time: Long, duration: Long, ar
 	}
 }
 
-class RunContext(var run: Run, val debug: Boolean) extends Object with Log {
+class RunContext(var run: Run, val debug: Boolean, val rejudge: Boolean) extends Object with Log {
 	val rejudges: Int = 0
 	val eventList = new scala.collection.mutable.MutableList[AnyRef]
 	var service: RunnerService = null
@@ -141,7 +141,7 @@ object Manager extends Object with Log {
 
 		info("Recovering previous queue: {} runs re-added", pendingRuns.size)
 	
-		pendingRuns foreach(run => grade(new RunContext(run, false)))
+		pendingRuns foreach(run => grade(new RunContext(run, false, false)))
 	}
 
 	def grade(ctx: RunContext): GradeOutputMessage = {
@@ -171,12 +171,12 @@ object Manager extends Object with Log {
 		}
 	}
 
-	def grade(id: Long, debug: Boolean): GradeOutputMessage = {
+	def grade(message: GradeInputMessage): GradeOutputMessage = {
 		implicit val conn = connection
 		
-		GraderData.run(id) match {
-			case None => throw new IllegalArgumentException("Id " + id + " not found")
-			case Some(run) => grade(new RunContext(run, debug))
+		GraderData.run(message.id) match {
+			case None => throw new IllegalArgumentException("Id " + message.id + " not found")
+			case Some(run) => grade(new RunContext(run, message.debug, message.rejudge))
 		}
 	}
 
@@ -260,7 +260,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[GradeInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							Manager.grade(req.id, req.debug)
+							Manager.grade(req)
 						} catch {
 							case e: IllegalArgumentException => {
 								error("Grade failed: {}", e)

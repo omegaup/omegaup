@@ -25,7 +25,7 @@ case class QueueStatus(
   runners: List[String],
   running: List[Running]
 )
-case class GradeInputMessage(id: Int, debug: Boolean = false)
+case class GradeInputMessage(id: Int, debug: Boolean = false, rejudge: Boolean = false)
 case class GradeOutputMessage(status: String = "ok", error: Option[String] = None)
 case class RegisterInputMessage(hostname: String, port: Int)
 case class RegisterOutputMessage(status: String = "ok", error: Option[String] = None)
