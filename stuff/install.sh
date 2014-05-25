@@ -136,19 +136,22 @@ fi
 
 # Install the grader service.
 if [ ! -f /etc/init.d/omegaup ]; then
+	cp ~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.29.jar $OMEGAUP_ROOT/bin
+	cp $OMEGAUP_ROOT/backend/grader/omegaup.jks $OMEGAUP_ROOT/bin
+	if [ ! -d /var/log/omegaup ]; then
+		sudo mkdir -p /var/log/omegaup
+		sudo touch /var/log/omegaup/service.log
+		sudo chown omegaup.omegaup /var/log/omegaup/service.log
+	fi
+	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0" >> /etc/sudoers'
+	# Java 7 has a bug with NSS libraries. Disable them.
+	if [ "`grep '\/lib\/security\/nss.cfg' /etc/java-7-openjdk/security/java.security`" != "" ]; then
+		sed -e 's/(.*\/lib\/security\/nss.cfg)/#\1/' /etc/java-7-openjdk/security/java.security > ~/.java.security
+		sudo mv ~/.java.security /etc/java-7-openjdk/security/java.security
+	fi
 	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
 	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/;s/\(.*\.password\)\s*=.*$/\1=$KEYSTORE_PASSWORD/" $OMEGAUP_ROOT/backend/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
 	sudo update-rc.d omegaup defaults
-	cp ~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.29.jar $OMEGAUP_ROOT/bin
-	cp $OMEGAUP_ROOT/backend/grader/omegaup.jks $OMEGAUP_ROOT/bin
-	sudo mkdir -p /var/log/omegaup
-	sudo touch /var/log/omegaup/service.log
-	sudo chown omegaup.omegaup /var/log/omegaup/service.log
-	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0" >> /etc/sudoers'
-	if [ "`grep '\/lib\/security\/nss.cfg' /etc/java-7-openjdk/security/java.security`" != "" ]; then
-		sed -e 's/.*\/lib\/security\/nss.cfg/security.provider.9=sun.security.ec.SunEC/' /etc/java-7-openjdk/security/java.security > ~/.java.security
-		sudo mv ~/.java.security /etc/java-7-openjdk/security/java.security
-	fi
 	sudo service omegaup start
 fi
 
