@@ -18,6 +18,7 @@ MYSQL_DB_NAME=omegaup
 UBUNTU=`uname -a | grep -i ubuntu | wc -l`
 WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
 SAUCY=`grep 'Ubuntu 13.10' /etc/issue | wc -l`
+TRUSTY=`grep 'Ubuntu 14.04' /etc/issue | wc -l`
 HOSTNAME=localhost
 MINIJAIL_ROOT=/var/lib/minijail
 
@@ -36,9 +37,6 @@ while getopts "h:u:m:p:01" optname; do
 		"1")
 			SKIP_NGINX=1
 			;;
-		"2")
-			SKIP_GRADER=1
-			;;
 		"h")
 			show_help
 			;;
@@ -46,12 +44,12 @@ while getopts "h:u:m:p:01" optname; do
 done
 
 # Install _crucial_ stuff first.
-if [ ! -f /usr/bin/curl ]; then
-	sudo apt-get install -qq -y curl
-fi
-
 if [ ! -f /usr/bin/vim ]; then
 	sudo apt-get install -qq -y vim
+fi
+
+if [ ! -f /usr/bin/curl ]; then
+	sudo apt-get install -qq -y curl
 fi
 
 # Ensure users have been added.
@@ -66,7 +64,7 @@ if [ "$SKIP_INSTALL" != "1" ]; then
 			sudo mv sources.list /etc/apt/sources.list
 		fi
 		wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | sudo apt-key add -
-		echo deb http://dl.hhvm.com/ubuntu saucy main | sudo tee /etc/apt/sources.list.d/hhvm.list
+		echo deb http://dl.hhvm.com/ubuntu trusty main | sudo tee /etc/apt/sources.list.d/hhvm.list
 	elif [ "$WHEEZY" != "1" ]; then
 		curl -s http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add - > /dev/null
 		cat > dotdeb.list << EOF
@@ -116,10 +114,10 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	cd $OMEGAUP_ROOT/minijail
 	make
 
-	if [ "$SKIP_GRADER" != "1" ]; then 
-		cd $OMEGAUP_ROOT/backend
-		sbt compile
-	fi
+	# Grab all sbt dependencies -- including MySQL.
+	cd $OMEGAUP_ROOT/backend
+	sbt update
+
 	popd
 fi
 
