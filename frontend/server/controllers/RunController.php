@@ -233,7 +233,7 @@ class RunController extends Controller {
 
 		// Call Grader
 		try {
-			self::$grader->Grade($run->getRunId());
+			self::$grader->Grade($run->getRunId(), false, false);
 		} catch (Exception $e) {
 			self::$log->error("Call to Grader::grade() failed:");
 			self::$log->error($e);
@@ -353,7 +353,7 @@ class RunController extends Controller {
 		}
 
 		try {
-			self::$grader->Grade($r["run"]->getRunId(), $r['debug'] || false);
+			self::$grader->Grade($r["run"]->getRunId(), true, $r['debug'] || false);
 		} catch (Exception $e) {
 			self::$log->error("Call to Grader::grade() failed:");
 			self::$log->error($e);

@@ -421,7 +421,7 @@ class ProblemController extends Controller {
 				$run->setScore(0);
 				$run->setContestScore(0);
 				RunsDAO::save($run);
-				self::$grader->Grade($run->getRunId());
+				self::$grader->Grade($run->getRunId(), true, false);
 
 				// Expire details of the run				
 				RunController::invalidateCacheOnRejudge($run);				
