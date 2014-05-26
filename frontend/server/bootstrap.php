@@ -5,6 +5,9 @@
  *
  * */
 
+// unsafe-eval is required by MathJax
+header("Content-Security-Policy: script-src 'self' https://www.google.com 'unsafe-eval'; frame-src https://www.facebook.com https://platform.twitter.com;");
+
 // Set default time
 date_default_timezone_set('UTC');
 

@@ -52,55 +52,7 @@
 							{/if}
 						</ul>
 						{if $CURRENT_USER_IS_ADMIN eq '1'}
-						<script>
-							function updateGraderStatus() {
-								$("#grader-status > a").removeClass("grader-error grader-ok grader-warning grader-unknown");
-								$("#grader-count").html("<img src='/media/waitcircle.gif' />");
-								var html = "<li><a href='/admin/'>Admin</a></li>";
-								omegaup.getGraderStats(function(stats){	
-									if (stats && stats.status == "ok") {
-										var graderInfo = stats.grader;
-										var queueLength = -1;
-
-										if (graderInfo.status == "ok") {
-											var now = new Date().getTime() / 1000;
-											if (graderInfo.queues) {
-												queueLength = 0;
-												for (var queue in graderInfo.queues) {
-													if (!graderInfo.queues.hasOwnProperty(queue)) continue;
-													queueLength += graderInfo.queues[queue].run_queue_length +
-														graderInfo.queues[queue].running.length;
-												}
-											}
-											if (queueLength < 5) {
-												$("#grader-status > a").addClass("grader-ok");
-											} else {
-												$("#grader-status > a").addClass("grader-warning");
-											}
-											html += "<li><a href=\"#\">Grader OK</a></li>";
-											html += "<li><a href=\"#\">Embedded runner: " + graderInfo.embedded_runner + "</a></li>";
-											html += "<li><a href=\"#\">Queues: <pre style=\"width: 50em;\">" + OmegaUp.ui.prettyPrintJSON(graderInfo.queues) + "</pre></a></li>";
-										} else {
-											$("#grader-status > a").addClass("grader-error");
-											html += "<li><a href=\"#\">Grader DOWN</a></li>";
-										}
-
-										$("#grader-count").html(queueLength);
-									} else {
-										$("#grader-status > a").addClass("grader-unknown");
-										html += "<li><a href=\"#\">Grader DOWN</a></li>";
-										html += "<li><a href=\"#\">API api/grader/status call failed:";
-										html += stats.error.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-										html += "</a></li>";
-										$("#grader-count").html('?');
-									}
-									$("#grader-status .dropdown-menu").html(html);
-								});
-							}
-
-							updateGraderStatus();
-							setInterval(updateGraderStatus,	30000);
-						</script>
+						<script type="text/javascript" src="/js/common.navbar.grader_status.js"></script>
 						{/if}
 					</div>
 				</div>
