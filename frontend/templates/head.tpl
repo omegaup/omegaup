@@ -53,10 +53,8 @@
 		-->
 		
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
-{literal}
+	<script type="text/javascript" src="/js/mathjax-config.js"></script>
 	<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-	<script type="text/x-mathjax-config" src="/js/head.mathjax.js"></script>
-{/literal}
 {/if}
 {if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
 	<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ts=1"></script>
