@@ -5,8 +5,6 @@
  *
  * */
 
-header("Content-Security-Policy: script-src 'self' https://www.google.com; frame-src https://www.facebook.com https://platform.twitter.com;");
-
 // Set default time
 date_default_timezone_set('UTC');
 
@@ -41,6 +39,10 @@ if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 
 define('OMEGAUP_LOCKDOWN', isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == OMEGAUP_LOCKDOWN_DOMAIN);
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
+
+if (OMEGAUP_LOCKDOWN || OMEGAUP_USE_CSP) {
+	header("Content-Security-Policy: script-src 'self' https://www.google.com; frame-src https://www.facebook.com https://platform.twitter.com;");
+}
 
 /*
  * Load libraries
