@@ -11,12 +11,11 @@
 		<script type="text/javascript" src="/js/sugar.js"></script>
 		<script type="text/javascript" src="/js/sugar.es.js"></script>
 		<script type="text/javascript" src="/js/omegaup.js?ts=6"></script>
+		<script type="text/javascript" src="/js/lang.{#locale#}.js?ts=1"></script>
 		<script type="text/javascript" src="/ux/libarena.js?ts=5"></script>
 		<script type="text/javascript" src="{$jsfile}?ts=5"></script>
-{literal}
+		<script type="text/javascript" src="/js/mathjax-config.js"></script>
 		<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-		<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
-{/literal}
 		<link rel="stylesheet" href="/css/reset.css" />
 
 		<!-- Bootstrap from CDN -->

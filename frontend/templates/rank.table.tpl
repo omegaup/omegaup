@@ -20,7 +20,7 @@
 			<a href="{$smarty.server.PHP_SELF}?p={$page+1}">{#wordsNextPage#}</a>
 		{/if}
 	</div>
-	<table class="table table-striped table-hover" id="rank-by-problems-solved">
+	<table class="table table-striped table-hover" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}">
 		<thead>
 			<tr>
 				<th>#</th>
@@ -42,21 +42,5 @@
 		{/if}
 	</div>	
 
-	<script language="javascript">
-		omegaup.getRankByProblemsSolved(
-				{$length}*{$page},
-				{$length},
-				function(result) {
-					var html = "";
-					for (a = 0; a < result.rank.length; a++)
-					{
-						html += "<tr><td>" + result.rank[a].rank + "</td><td><b><a href=/profile/"+ result.rank[a].username + ">"
-							+ ""+result.rank[a].username + "</a></b>"
-							+ "<br/>" + (result.rank[a].name == null ? "&nbsp;" : result.rank[a].name) + "</td>"
-							+ "<td>"+result.rank[a].problems_solved + "</td></tr>";
-					}
-					$("#rank-by-problems-solved>tbody").append(html);
-				}
-		);
-	</script>
+	<script language="javascript" src="/js/rank.table.js"></script>
 </div>
