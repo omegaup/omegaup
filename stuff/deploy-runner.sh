@@ -7,6 +7,9 @@ fi
 
 GRADER=$1
 HOSTNAME=$2
+if [ "$USERNAME" == "" ]; then
+	USERNAME=`whoami`
+fi
 
 ROOT=`dirname $0`/..
 TMPDIR=`mktemp -d`
@@ -108,7 +111,7 @@ EOF
 cat $TMPDIR/setup-runner $TMPDIR/runner-distrib.tar.bz2 > $TARGET
 
 # Deploy the payload
-scp $TARGET $HOSTNAME:~
-ssh $HOSTNAME -C "sudo /bin/bash ~/runner-distrib.sh"
+scp $TARGET $USERNAME@$HOSTNAME:~
+ssh $USERNAME@$HOSTNAME -C "sudo /bin/bash ~/runner-distrib.sh"
 
 rm -rf $TMPDIR
