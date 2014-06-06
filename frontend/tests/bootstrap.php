@@ -17,7 +17,6 @@ require_once("controllers/ApiCallerMock.php");
 
 // Load test utils
 require_once("controllers/OmegaupTestCase.php");
-require_once("ui/OmegaupUITestCase.php");
 require_once("common/Utils.php");
 
 // Load Factories

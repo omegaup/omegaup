@@ -95,7 +95,7 @@ Logger::configure(array(
 			)
 		)
 	));
-
+$log = Logger::getLogger("bootstrap");
 
 /**
  * Load controllers
@@ -131,7 +131,7 @@ try {
 	// HHVM also doesn't like PConnect. It leaks.
 	$conn->Connect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 } catch (Exception $databaseConectionException) {
-	Logger::error($databaseConectionException);
+	$log->error($databaseConectionException);
 
 	if (!$conn) {
 		/**

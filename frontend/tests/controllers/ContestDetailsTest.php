@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class DetailsContest extends OmegaupTestCase {
+class ContestDetailsTest extends OmegaupTestCase {
 
 	/**
 	 * Insert problems in a contest
