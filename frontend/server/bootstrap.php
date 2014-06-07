@@ -43,6 +43,7 @@ define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 if (OMEGAUP_LOCKDOWN || OMEGAUP_USE_CSP) {
 	header("Content-Security-Policy: script-src 'self' https://www.google.com; frame-src https://www.facebook.com https://platform.twitter.com;");
 }
+header('X-Frame-Options: DENY');
 
 /*
  * Load libraries
