@@ -48,11 +48,8 @@ class OmegaUpRunstreamWriter(outputStream: OutputStream) extends Closeable with 
 class RegisterThread(hostname: String, port: Int) extends Thread("RegisterThread") with Log {
   private var deadline = 0L
   private var alive = true
+  private var active = true
   private val lock = new Object
-
-  def extendDeadline() = {
-    deadline = System.currentTimeMillis + 1 * 60 * 1000;
-  }
 
   def shutdown() = {
     alive = false
@@ -71,6 +68,21 @@ class RegisterThread(hostname: String, port: Int) extends Thread("RegisterThread
         // Best effort is best effort.
       }
     }
+  }
+
+  def acquire(): Boolean = lock.synchronized {
+    if (!active) return false
+    active = false
+    return true
+  }
+
+  def release() = lock.synchronized {
+    active = true
+    extendDeadline
+  }
+
+  private def extendDeadline() = {
+    deadline = System.currentTimeMillis + 1 * 60 * 1000;
   }
 
   private def waitUntilDeadline(): Unit = {
@@ -92,14 +104,16 @@ class RegisterThread(hostname: String, port: Int) extends Thread("RegisterThread
     while (alive) {
       waitUntilDeadline
       if (!alive) return
-      try {
-        Https.send[RegisterOutputMessage, RegisterInputMessage](
-          Config.get("grader.register.url", "https://localhost:21680/register/"),
-          new RegisterInputMessage(hostname, port)
-        )
-      } catch {
-        case e: IOException => {
-          error("Failed to register", e)
+      if (active) {
+        try {
+          Https.send[RegisterOutputMessage, RegisterInputMessage](
+            Config.get("grader.register.url", "https://localhost:21680/register/"),
+            new RegisterInputMessage(hostname, port)
+          )
+        } catch {
+          case e: IOException => {
+            error("Failed to register", e)
+          }
         }
       }
       extendDeadline
@@ -108,6 +122,18 @@ class RegisterThread(hostname: String, port: Int) extends Thread("RegisterThread
 }
 
 object Service extends Object with Log with Using {
+  def lock[T](registerThread: RegisterThread)(success: =>T, failure: =>T): T = {
+    if (registerThread.acquire) {
+      try {
+        success
+      } finally {
+        registerThread.release
+      }
+    } else {
+      failure
+    }
+  }
+
   def main(args: Array[String]) = {
     // Parse command-line options.
     var configPath = "omegaup.conf"
@@ -151,7 +177,7 @@ object Service extends Object with Log with Using {
         implicit val formats = Serialization.formats(NoTypeHints)
         
         request.getPathInfo() match {
-          case "/run/" => {
+          case "/run/" => lock[Unit](registerThread) ({
             var token: String = null
             response.setContentType("application/x-omegaup-runstream")
             response.setStatus(HttpServletResponse.SC_OK)
@@ -174,12 +200,15 @@ object Service extends Object with Log with Using {
                 runner.removeCompileDir(token)
               callbackProxy.finalize(message)
             }}
-          }
+          }, {
+            response.setContentType("text/json")
+            response.setStatus(HttpServletResponse.SC_CONFLICT)
+            Serialization.write(new RunOutputMessage(status="error", error=Some("Resource busy")))
+          })
           case _ => {
             response.setContentType("text/json")
             Serialization.write(request.getPathInfo() match {
-              case "/compile/" => {
-                registerThread.extendDeadline
+              case "/compile/" => lock(registerThread) ({
                 try {
                   val req = Serialization.read[CompileInputMessage](request.getReader())
                   response.setStatus(HttpServletResponse.SC_OK)
@@ -191,8 +220,11 @@ object Service extends Object with Log with Using {
                     new CompileOutputMessage(status = "error", error = Some(e.getMessage))
                   }
                 }
-              }
-              case "/input/" => {
+              }, {
+                response.setStatus(HttpServletResponse.SC_CONFLICT)
+                new CompileOutputMessage(status="error", error=Some("Resource busy"))
+              })
+              case "/input/" => lock(registerThread) ({
                 try {
                   info("/input/")
                   
@@ -221,7 +253,10 @@ object Service extends Object with Log with Using {
                     new InputOutputMessage(status = "error", error = Some(e.getMessage))
                   }
                 }
-              }
+              }, {
+                response.setStatus(HttpServletResponse.SC_CONFLICT)
+                new InputOutputMessage(status="error", error=Some("Resource busy"))
+              })
               case _ => {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND)
                 new NullMessage()
