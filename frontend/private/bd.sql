@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
  `show_scoreboard_after` BOOL NOT NULL DEFAULT  '1' COMMENT  'Mostrar el scoreboard automáticamente después del concurso',
   `scoreboard_url` VARCHAR( 30 ) NULL DEFAULT NULL,
   `scoreboard_url_admin` VARCHAR( 30 ) NULL DEFAULT NULL,
+  `urgent` tinyint(1) DEFAULT 0 NOT NULL COMMENT 'Indica si el concurso es de alta prioridad y requiere mejor QoS.',
   PRIMARY KEY (`contest_id`),
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`),

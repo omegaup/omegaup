@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `penalty` int(11) NOT NULL DEFAULT '1' COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
   `penalty_time_start` varchar(10) NOT NULL COMMENT 'Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema',
   `penalty_calc_policy` varchar(3) DEFAULT 'sum' NOT NULL COMMENT 'Indica como afecta el penalty al score.',
+  `urgent` tinyint(1) DEFAULT '0' NOT NULL COMMENT 'Indica si el concurso es de alta prioridad y requiere mejor QoS.',
   PRIMARY KEY (`contest_id`)
 );
 

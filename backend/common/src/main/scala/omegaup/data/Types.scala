@@ -110,7 +110,8 @@ class Contest(
 	var submissions_gap: Int = 0,
 	var feedback: Feedback = Feedback.Yes,
 	var penalty: Int = 20,
-	var penalty_time_start: PenaltyTimeStart = PenaltyTimeStart.Contest
+	var penalty_time_start: PenaltyTimeStart = PenaltyTimeStart.Contest,
+	var urgent: Boolean = false
 ) {
   def copy() =
     new Contest(
@@ -131,7 +132,8 @@ class Contest(
       submissions_gap = this.submissions_gap,
       feedback = this.feedback,
       penalty = this.penalty,
-      penalty_time_start = this.penalty_time_start
+      penalty_time_start = this.penalty_time_start,
+      urgent = this.urgent
     )
 }
 

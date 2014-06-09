@@ -88,6 +88,8 @@ object RoutingDescription extends StandardTokenParsers with Log {
 				6
 			} else if (ctx.run.contest.isEmpty) {
 				4
+			} else if (ctx.run.contest.get.urgent) {
+				0
 			} else {
 				2
 			}

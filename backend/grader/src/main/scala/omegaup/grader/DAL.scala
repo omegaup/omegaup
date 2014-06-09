@@ -74,7 +74,8 @@ object GraderData {
 					partial_score = rs.getInt("partial_score") == 1,
 					feedback = Feedback.withName(rs.getString("feedback")),
 					penalty = rs.getInt("penalty"),
-					penalty_time_start = PenaltyTimeStart.withName(rs.getString("penalty_time_start"))
+					penalty_time_start = PenaltyTimeStart.withName(rs.getString("penalty_time_start")),
+					urgent = rs.getInt("urgent") == 1
 				))
 			}
 		)
@@ -85,7 +86,7 @@ object GraderData {
 				r.*, p.*, u.username, cpo.open_time, cp.points, c.alias AS contest_alias,
 				c.start_time, c.finish_time, c.points_decay_factor,
 				r.submit_delay, c.partial_score, c.feedback, c.penalty,
-				c.penalty_time_start, c.penalty_calc_policy
+				c.penalty_time_start, c.penalty_calc_policy, c.urgent
 			FROM
 				Runs AS r
 			INNER JOIN
@@ -118,7 +119,7 @@ object GraderData {
 				r.*, p.*, u.username, cpo.open_time, cp.points, c.alias AS contest_alias,
 				c.start_time, c.finish_time, c.points_decay_factor,
 				r.submit_delay, c.partial_score, c.feedback, c.penalty,
-				c.penalty_time_start, c.penalty_calc_policy
+				c.penalty_time_start, c.penalty_calc_policy, c.urgent
 			FROM
 				Runs AS r
 			INNER JOIN
