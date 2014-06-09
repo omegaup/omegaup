@@ -315,7 +315,6 @@ EOF
 	fi
 	pushd $OMEGAUP_ROOT/frontend/tests/
 	hhvm /usr/bin/phpunit controllers/
-	hhvm /usr/bin/phpunit server/
 	popd
 fi
 
