@@ -23,7 +23,7 @@
 			$(".new_contest_form #submissions_gap").val() * 60,
 			$(".new_contest_form #feedback").val(), 
 			$(".new_contest_form #penalty").val(), 
-			$(".new_contest_form #public").val(),
+			0 /*public*/,
 			$(".new_contest_form #scoreboard").val(), 
 			$(".new_contest_form #penalty_time_start").val(),
 			$(".new_contest_form #show_scoreboard_after").val(),

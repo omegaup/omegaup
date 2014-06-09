@@ -13,3 +13,4 @@ $("#private-contests-count-alert-close").click(function () {
 $("#private-problems-count-alert-close").click(function () {
 	$("#private-problems-count-alert").slideUp();
 });
+

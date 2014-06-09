@@ -11,6 +11,7 @@
 <ul class="nav nav-tabs nav-justified" id="sections">
 	<li class="active"><a href="#edit" data-toggle="tab">{#contestEdit#}</a></li>
 	<li><a href="#problems" data-toggle="tab">{#wordsAddProblem#}</a></li>
+	<li><a href="#publish" data-toggle="tab">{#makePublic#}</a></li>
 	<li><a href="#contestants" data-toggle="tab">{#contestAdduserAddContestant#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
 </ul>
@@ -57,6 +58,25 @@
 				</thead>
 				<tbody id="contest-problems"></tbody>
 			</table>
+		</div>
+	</div>
+				
+	<div class='tab-pane' id='publish'>
+		<div class="panel panel-primary">
+			<div class='panel body'>
+				<form class='contest-publish-form'>
+					<div class="form-group">
+						<label for="public">{#contestNewFormPublic#}</label>
+						<select name='public' id='public' class="form-control">
+							<option value='0' selected="selected">{#wordsNo#}</option>
+							<option value='1'>{#wordsYes#}</option>							
+						</select>
+						<p class="help-block">{#contestNewFormPublicDesc#}</p>
+					</div>
+					
+					<button class="btn btn-primary" type='submit'>{#wordsSaveChanges#}</button>
+				</form>
+			</div>
 		</div>
 	</div>
 
@@ -155,6 +175,8 @@
 			$(".new_contest_form #scoreboard").val(contest.scoreboard);
 			$(".new_contest_form #penalty_time_start").val(contest.penalty_time_start);
 			$(".new_contest_form #show_scoreboard_after").val(contest.show_scoreboard_after);
+			
+			$(".contest-publish-form #public").val(contest.public);
 		});
 
 		omegaup.getProblems(function(problems) {
@@ -171,6 +193,16 @@
 
 		// Edit contest
 		$('.new_contest_form').submit(function() {
+			return updateContest($(".new_contest_form #public").val());
+		});
+		
+		// Publish
+		$('.contest-publish-form').submit(function() {
+			return updateContest($(".contest-publish-form #public").val());
+		});
+		
+		// Update contest
+		function updateContest(public) {
 			var window_length_value = $('#window_length_enabled').is(':checked') ?
 					$('#window_length').val() :
 					'NULL';
@@ -187,7 +219,7 @@
 				$(".new_contest_form #submissions_gap").val() * 60,
 				$(".new_contest_form #feedback").val(),
 				$(".new_contest_form #penalty").val(),
-				$(".new_contest_form #public").val(),
+				public,
 				$(".new_contest_form #scoreboard").val(),
 				$(".new_contest_form #penalty_time_start").val(),
 				$(".new_contest_form #show_scoreboard_after").val(),
@@ -202,7 +234,7 @@
 				}
 			);
 			return false;
-		});
+		}
 
 		// Edit problems
 		function refreshContestProblems() {

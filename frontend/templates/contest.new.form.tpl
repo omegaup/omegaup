@@ -2,6 +2,12 @@
 	{assign "IS_UPDATE" 0}
 {/if}
 
+<div class="alert alert-info" id='private-contest-info-alert'>		
+	<span class="message">			
+		{#contestNewPublicInfoNotice#}
+	</span>
+</div>
+
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE neq 1}
@@ -125,6 +131,7 @@
 						<p class="help-block">{#contestNewFormScoreboardAtEndDesc#}</p>
 					</div>
 					
+					{if $IS_UPDATE eq 1}
 					<div class="form-group col-md-6">
 						<label for="public">{#contestNewFormPublic#}</label>
 						<select name='public' id='public' class="form-control">
@@ -133,6 +140,7 @@
 						</select>
 						<p class="help-block">{#contestNewFormPublicDesc#}</p>
 					</div>
+					{/if}
 				</div>
 				
 				<div class="form-group">
@@ -176,8 +184,7 @@
 		$('#window_length_enabled').removeAttr('checked');
 		$('#window_length').attr('disabled','disabled');
 		$('#window_length').val('');
-		
-		$(".new_contest_form #public").val('1');
+				
 		$(".new_contest_form #scoreboard").val('0');
 		$(".new_contest_form #points_decay_factor").val('0');		
 		$(".new_contest_form #submissions_gap").val('1');
@@ -193,8 +200,7 @@
 		$('#window_length_enabled').attr('checked', 'checked');
 		$('#window_length').removeAttr('disabled');
 		$('#window_length').val('180');
-		
-		$(".new_contest_form #public").val('1');
+				
 		$(".new_contest_form #scoreboard").val('0');
 		$(".new_contest_form #points_decay_factor").val('0');		
 		$(".new_contest_form #submissions_gap").val('0');
@@ -210,8 +216,7 @@
 		$('#window_length_enabled').removeAttr('checked');
 		$('#window_length').attr('disabled','disabled');
 		$('#window_length').val('');
-		
-		$(".new_contest_form #public").val('1');
+				
 		$(".new_contest_form #scoreboard").val('75');
 		$(".new_contest_form #points_decay_factor").val('0');		
 		$(".new_contest_form #submissions_gap").val('1');

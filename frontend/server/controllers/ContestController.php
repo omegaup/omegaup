@@ -1291,7 +1291,7 @@ class ContestController extends Controller {
 		// Check that contest has some problems at least 1 problem
 		$problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->getContestId());
 		if (count($problemsInContest) < 1) {
-			throw new InvalidParameterException("Public contest must have at least 1 problem added");
+			throw new InvalidParameterException("contestPublicRequiresProblem");
 		}
 	}
 
