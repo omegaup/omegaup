@@ -423,6 +423,71 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$this->assertContestDetails($contestData, array(), $detailsResponse);
 		
 	}
+	
+	/**
+	 * Tests contest report used in OMI
+	 */
+	public function testContestReport() {
+		
+		// Get a problem
+		$problemData = ProblemsFactory::createProblem();
+
+		// Get a contest 
+		$contestData = ContestsFactory::createContest();
+
+		// Add the problem to the contest
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+
+		// Create our contestants
+		$contestants = array();
+		array_push($contestants, UserFactory::createUser());
+		array_push($contestants, UserFactory::createUser());
+		array_push($contestants, UserFactory::createUser());
+		
+		$contestDirector = $contestData["director"];
+		$contestAdmin = UserFactory::createUser();
+		ContestsFactory::addAdminUser($contestData, $contestAdmin);
+		
+		// Create runs
+		$runsData = array();
+		$runsData[0] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
+		$runsData[1] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
+		$runsData[2] = RunsFactory::createRun($problemData, $contestData, $contestants[1]);		
+		$runsData[3] = RunsFactory::createRun($problemData, $contestData, $contestants[2]);
+		$runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
+		$runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
+		
+		// Grade the runs
+		RunsFactory::gradeRun($runsData[0], 0, "CE");
+		RunsFactory::gradeRun($runsData[1]);
+		RunsFactory::gradeRun($runsData[2], .9, "PA");		
+		RunsFactory::gradeRun($runsData[3], 1, "AC", 180);
+		RunsFactory::gradeRun($runDataDirector, 1, "AC", 120);
+		RunsFactory::gradeRun($runDataAdmin, 1, "AC", 110);
+							
+		// Create API
+		$response = ContestController::apiReport(new Request(array(
+			"contest_alias" => $contestData["request"]["alias"],
+			"auth_token" => $this->login($contestDirector)
+		)));	
+				
+		
+		$this->assertEquals($problemData["request"]["alias"], $response["problems"][0]["alias"]);
+		
+		foreach ($contestants as $contestant) {
+			
+			$found = false;
+			foreach ($response["ranking"] as $rank) {
+				if ($rank["username"] == $contestant->username) {
+					$found = true;
+					break;
+				}
+			}
+			$this->assertTrue($found);
+		}
+		
+		
+	}
 
 }
 
