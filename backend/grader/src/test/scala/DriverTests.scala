@@ -153,7 +153,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
       ready = false
       tests += test
-      Manager.grade(submit_id, false)
+      Manager.grade(new GradeInputMessage(id = submit_id.toInt))
 
       lock.synchronized {
         if (!ready) {

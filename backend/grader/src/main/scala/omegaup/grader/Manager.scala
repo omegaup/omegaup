@@ -62,6 +62,7 @@ case class CompleteEvent(category: EventCategory, time: Long, duration: Long, ar
 }
 
 class RunContext(var run: Run, val debug: Boolean, val rejudge: Boolean) extends Object with Log {
+	val creationTime = System.currentTimeMillis
 	val rejudges: Int = 0
 	val eventList = new scala.collection.mutable.MutableList[AnyRef]
 	var service: RunnerService = null
@@ -96,8 +97,8 @@ class RunContext(var run: Run, val debug: Boolean, val rejudge: Boolean) extends
 		}
 		eventList += new Event(true, EventCategory.Queue)
 	}
-	def dequeued(name: String): Unit = {
-		eventList += new Event(false, EventCategory.Queue, "queue" -> name)
+	def dequeued(runner: String): Unit = {
+		eventList += new Event(false, EventCategory.Queue, "runner" -> runner)
 		hasBeenDequeued = true
 	}
 
@@ -120,15 +121,14 @@ object Manager extends Object with Log {
 		Config.get("db.user", "omegaup"),
 		Config.get("db.password", "")
 	)
-	val runnerRouter = RoutingDescription.parse(
+	RunnerDispatcher.updateConfiguration(
 		try {
 			FileUtil.read(Config.get("grader.routing.file", "routing.conf"))
 		} catch {
 			case e: FileNotFoundException => ""
-		}
-	) match {
-		case (dispatcherNames, runRouter) => new RunnerRouter(dispatcherNames, runRouter)
-	}
+		},
+		Config.get("grader.routing.slow_threshold", 50)
+	)
 
 	def addListener(listener: Run => Unit) = listeners += listener
 
@@ -166,7 +166,7 @@ object Manager extends Object with Log {
 				}
 			}
 
-			runnerRouter.addRun(ctx)
+			RunnerDispatcher.addRun(ctx)
 			new GradeOutputMessage()
 		}
 	}
@@ -201,7 +201,7 @@ object Manager extends Object with Log {
 
 		// shall we create an embedded runner?
 		if(Config.get("grader.embedded_runner.enable", false)) {
-			runnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
+			RunnerDispatcher.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
 		}
 
 		// the handler
@@ -236,7 +236,7 @@ object Manager extends Object with Log {
 							Logging.init()
 
 							if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
-								runnerRouter.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
+								RunnerDispatcher.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
 							}
 
 							response.setStatus(HttpServletResponse.SC_OK)
@@ -253,7 +253,7 @@ object Manager extends Object with Log {
 						response.setStatus(HttpServletResponse.SC_OK)
 						new StatusOutputMessage(
 							embedded_runner = Config.get("grader.embedded_runner.enable", false),
-							queues = runnerRouter.status
+							queue = Some(RunnerDispatcher.status)
 						)
 					}
 					case "/grade/" => {
@@ -278,7 +278,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							runnerRouter.register(req.hostname, req.port)
+							RunnerDispatcher.register(req.hostname, req.port)
 						} catch {
 							case e: Exception => {
 								error("Register failed: {}", e)
@@ -291,7 +291,7 @@ object Manager extends Object with Log {
 						try {
 							val req = Serialization.read[RegisterInputMessage](request.getReader())
 							response.setStatus(HttpServletResponse.SC_OK)
-							runnerRouter.deregister(req.hostname, req.port)
+							RunnerDispatcher.deregister(req.hostname, req.port)
 						} catch {
 							case e: Exception => {
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
@@ -357,11 +357,11 @@ object Manager extends Object with Log {
 			override def stop(): Unit = {
 				info("omegaUp manager stopping")
 				server.stop
-				runnerRouter.stop
+				RunnerDispatcher.stop
 			}
 			override def join(): Unit = {
 				server.join
-				runnerRouter.join
+				RunnerDispatcher.join
 				info("omegaUp manager stopped")
 			}
 		}

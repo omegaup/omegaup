@@ -17,7 +17,7 @@ case class InputOutputMessage(status: String = "ok", error: Option[String] = Non
 // from Grader
 case class ReloadConfigInputMessage(overrides: Option[Map[String, String]] = None)
 case class ReloadConfigOutputMessage(status: String = "ok", error: Option[String] = None)
-case class StatusOutputMessage(status: String = "ok", embedded_runner: Boolean = true, queues: Map[String, QueueStatus])
+case class StatusOutputMessage(status: String = "ok", embedded_runner: Boolean = true, queue: Option[QueueStatus] = None)
 case class Running(name: String, id: Int)
 case class QueueStatus(
   run_queue_length: Int,
