@@ -310,7 +310,10 @@ object RunnerDispatcher extends ServiceInterface with Log {
 						}
 						case _ => {
 							ctx.run.score = 0
-							ctx.run.contest_score = 0
+							ctx.run.contest_score = ctx.run.contest match {
+								case None => None
+								case Some(x) => Some(0)
+							}
 							ctx.run.status = Status.Ready
 							ctx.run.veredict = Veredict.JudgeError
 						}
@@ -344,7 +347,10 @@ object RunnerDispatcher extends ServiceInterface with Log {
 					case e: Exception => {
 						error("Error while grading {}", e)
 						ctx.run.score = 0
-						ctx.run.contest_score = 0
+						ctx.run.contest_score = ctx.run.contest match {
+							case None => None
+							case Some(x) => Some(0)
+						}
 						ctx.run.status = Status.Ready
 						ctx.run.veredict = Veredict.JudgeError
 

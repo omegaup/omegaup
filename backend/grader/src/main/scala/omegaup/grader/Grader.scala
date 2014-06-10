@@ -211,9 +211,9 @@ trait Grader extends Object with Log with Using {
 			else if(run.score < (1-1e-9) && run.veredict < Veredict.PartialAccepted) run.veredict = Veredict.PartialAccepted
 		}
 		
-		run.problem.points match {
-			case None => {}
-			case Some(factor) => run.contest_score = run.score * factor
+		run.contest_score = run.problem.points match {
+			case None => None
+			case Some(factor) => Some(run.score * factor)
 		}
 
 		run

@@ -202,7 +202,7 @@ class RunController extends Controller {
 					"runtime" => 0,
 					"memory" => 0,
 					"score" => 0,
-					"contest_score" => 0,
+					"contest_score" => $contest_id != null ? 0 : null,
 					"ip" => $_SERVER['REMOTE_ADDR'],
 					"submit_delay" => $submit_delay, /* based on penalty_time_start */
 					"guid" => md5(uniqid(rand(), true)),
@@ -313,7 +313,9 @@ class RunController extends Controller {
 		$filtered = $r["run"]->asFilteredArray($relevant_columns);
 		$filtered['time'] = strtotime($filtered['time']);
 		$filtered['score'] = round((float) $filtered['score'], 4);
-		$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
+		if ($filtered['contest_score'] != null) {
+			$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
+		}
 
 		$response = $filtered;
 
@@ -747,7 +749,9 @@ class RunController extends Controller {
 		foreach ($runs as $run) {
 			$run['time'] = (int)$run['time'];
 			$run['score'] = round((float)$run['score'], 4);
-			$run['contest_score'] = round((float)$run['contest_score'], 2);
+			if ($run['contest_score'] != null) {
+				$run['contest_score'] = round((float)$run['contest_score'], 2);
+			}
 			array_push($result, $run);
 		}
 

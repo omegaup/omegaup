@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `runtime` int(11) NOT NULL DEFAULT '0',
   `memory` int(11) NOT NULL DEFAULT '0',
   `score` double NOT NULL DEFAULT '0',
-  `contest_score` double NOT NULL DEFAULT '0',
+  `contest_score` double NULL DEFAULT NULL,
   `ip` char(15) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',

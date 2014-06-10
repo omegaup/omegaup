@@ -24,7 +24,10 @@ object GraderData {
 			time = rs.getTimestamp("time"),
 			submit_delay = rs.getInt("submit_delay"),
 			score = rs.getDouble("score"),
-			contest_score = rs.getDouble("contest_score"),
+			contest_score = rs.getString("contest_score") match {
+				case null => None
+				case x: String => Some(x.toDouble)
+			},
 			judged_by = rs.getString("judged_by") match {
 				case null => None
 				case x: String => Some(x)
@@ -153,7 +156,10 @@ object GraderData {
 			run.runtime,
 			run.memory,
 			run.score,
-			run.contest_score,
+			run.contest_score match {
+				case None => null
+				case Some(x) => x
+			},
 			run.judged_by,
 			run.id
 		)
@@ -179,3 +185,5 @@ object GraderData {
 		run
 	}
 }
+
+/* vim: set noexpandtab: */

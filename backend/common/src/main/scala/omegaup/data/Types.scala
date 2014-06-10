@@ -211,7 +211,7 @@ class Run(
 	var runtime: Long = 0,
 	var memory: Long = 0,
 	var score: Double = 0,
-	var contest_score: Double = 0,
+	var contest_score: Option[Double] = None,
 	var ip: String = "127.0.0.1",
 	var time: Timestamp = new Timestamp(0),
 	var submit_delay: Int = 0,

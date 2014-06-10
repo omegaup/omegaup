@@ -138,7 +138,7 @@ $(document).ready(function() {
 		
 			run.status = 'new';
 			run.alias = arena.currentProblem.alias;
-			run.contest_score = 0;
+			run.contest_score = null;
 			run.time = new Date;
 			run.penalty = 0;
 			run.runtime = 0;

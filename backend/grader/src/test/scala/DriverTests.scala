@@ -179,7 +179,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       run.status should equal (Status.Ready)
       run.veredict should equal (Veredict.TimeLimitExceeded)
       run.score should equal (0)
-      run.contest_score should equal (0)
+      run.contest_score should equal (None)
     }}
 
   omegaUpSubmitContest(1, Language.Cpp, """
@@ -202,7 +202,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.Accepted)
     run.score should equal (1)
-    run.contest_score should equal (100)
+    run.contest_score should equal (Some(100))
   }}
 
   omegaUpSubmit(1, Language.Cpp, """
@@ -225,14 +225,14 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.PartialAccepted)
     run.score should equal (0.5)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(1, Language.Literal, "") { run => {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.WrongAnswer)
     run.score should equal (0.0)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(1, Language.Literal,
@@ -247,7 +247,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.Accepted)
     run.score should equal (1.0)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(1, Language.Literal,
@@ -262,7 +262,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.PartialAccepted)
     run.score should equal (0.5)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(2, Language.Cpp, """
@@ -284,7 +284,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.Accepted)
     run.score should equal (1)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(2, Language.Cpp, """
@@ -306,7 +306,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.PartialAccepted)
     run.score should be (0.2 +- 0.001)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(3, Language.Cpp, """
@@ -328,7 +328,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.Accepted)
     run.score should equal (1)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(3, Language.Cpp, """
@@ -350,7 +350,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.PartialAccepted)
     run.score should be (0.05 +- 0.001)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(4, Language.Cpp, """
@@ -372,7 +372,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.PartialAccepted)
     run.score should be (0.71 +- 0.01)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(4, Language.Cpp, """
@@ -394,7 +394,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.Accepted)
     run.score should equal (1)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(5, Language.Cpp, """
@@ -405,7 +405,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.Accepted)
     run.score should equal (1)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(5, Language.Cpp, """
@@ -414,7 +414,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.WrongAnswer)
     run.score should equal (0)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(5, Language.Cpp, """
@@ -424,7 +424,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     run.status should equal (Status.Ready)
     run.veredict should equal (Veredict.CompileError)
     run.score should equal (0)
-    run.contest_score should equal (0)
+    run.contest_score should equal (None)
   }}
 
   omegaUpSubmit(6, Language.KarelJava, """
@@ -575,7 +575,7 @@ class DriverSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       run.status should equal (Status.Ready)
       run.veredict should equal (Veredict.Accepted)
       run.score should equal (1)
-      run.contest_score should equal (0)
+      run.contest_score should equal (None)
     }}
   }
 }

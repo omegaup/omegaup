@@ -25,7 +25,7 @@ case class RunDetails(
 	runtime: Double,
 	memory: Long,
 	score: Double,
-	contest_score: Double,
+	contest_score: Option[Double],
 	status: String,
 	veredict: String,
 	submit_delay: Long,
