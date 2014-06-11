@@ -43,22 +43,35 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 		}
 		
 		$sql = "
-			SELECT COUNT(*) TotalSolved, Users.user_id
-			FROM (
-				SELECT user_id, problem_id, COUNT(*) AS Total
-				FROM Runs
-				WHERE TIME >= ?
-				AND TIME <= ?
-				AND veredict = 'AC'
-				AND Test =0
-				GROUP BY user_id, problem_id
-				ORDER BY Total DESC
-			) T
-			INNER JOIN Users ON T.user_id = Users.user_id
-			GROUP BY T.user_id
-			ORDER BY TotalSolved DESC 
-			LIMIT 1 
-			";
+			SELECT
+				username, name, up.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ps.points) score
+			FROM
+				(
+					SELECT DISTINCT
+						r.user_id, r.problem_id
+					FROM
+						Runs r
+					WHERE
+						r.veredict = 'AC' AND r.test = 0 AND 
+						r.time >= ? AND 
+						r.time <= ?
+				) AS up
+			INNER JOIN
+				(
+					SELECT
+						p.problem_id, ROUND(100 / LOG(2, accepted+1) , 0) AS points
+					FROM
+						Problems p
+
+				) AS ps ON ps.problem_id = up.problem_id
+			INNER JOIN
+				Users u ON u.user_id = up.user_id 
+			GROUP BY
+				username
+			ORDER BY
+				score DESC
+			LIMIT 1
+		";
 
 		$val = array($startTime, $endTime);
 
@@ -68,9 +81,11 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 			return NULL;
 		}
 		
-		$totalCount = $rs['TotalSolved'];
+		$totalCount = $rs['ProblemsSolved'];
 		$user = UsersDAO::getByPK($rs['user_id']);
+		$score = $rs['score'];
+		
 
-		return array("totalCount" => $totalCount, "user" => $user);
+		return array("totalCount" => $totalCount, "user" => $user, "score" => $score);
 	}
 }
