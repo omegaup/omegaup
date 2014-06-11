@@ -22,6 +22,7 @@ class UserRankTest extends OmegaupTestCase {
 				$found = true;
 				$this->assertEquals($entry["name"], $contestant->getName());
 				$this->assertEquals($entry["problems_solved"], 1);
+				$this->assertEquals($entry["score"], 100);
 			}
 		}
 		$this->assertTrue($found);		

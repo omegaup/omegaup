@@ -20,12 +20,15 @@
 			<a href="{$smarty.server.PHP_SELF}?p={$page+1}">{#wordsNextPage#}</a>
 		{/if}
 	</div>
-	<table class="table table-striped table-hover" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}">
+	<table class="table table-striped table-hover" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}" is-index="{$is_index}">
 		<thead>
 			<tr>
 				<th>#</th>
 				<th>{#wordsUser#}</th>
+				<th>{#rankScore#}</th>
+				{if !$is_index}
 				<th>{#rankSolved#}</th>
+				{/if}
 			</tr>
 		</thead>
 		<tbody>

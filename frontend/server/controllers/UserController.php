@@ -1325,7 +1325,7 @@ class UserController extends Controller {
 				$response = array();
 				$response["rank"] = array();
 				try {
-					$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"]);
+					$db_results = UsersDAO::GetRankByProblemsSolved2($r["rowcount"], $r["offset"]);
 				} catch (Exception $e) {
 					throw new InvalidDatabaseOperationException($e);
 				}
@@ -1337,7 +1337,8 @@ class UserController extends Controller {
 							"username" => $user->getUsername(), 
 							"name" => $user->getName(), 
 							"problems_solved" => $userEntry["problems_solved"],
-							"rank" => $userEntry["rank"]));
+							"rank" => $userEntry["rank"],
+							"score" => $userEntry["score"]));
 					}
 				}
 				return $response;			

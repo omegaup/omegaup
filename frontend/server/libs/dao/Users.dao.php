@@ -116,4 +116,89 @@ class UsersDAO extends UsersDAOBase
 		}
 		return $ar;	
 	}
+	
+	/* 
+	 * Factoring in difficulty of problems solved
+	 */
+	public static function GetRankByProblemsSolved2($limit = 100, $offset = 0, Users $user = null) {
+		
+		$filterByUser = !is_null($user);
+		
+		global  $conn;
+		$conn->Execute("SET @prev_value = NULL;");
+		$conn->Execute("SET @rank_count = 0;");
+		$conn->Execute("SET @prev_value_ties = NULL");
+		$conn->Execute("SET @prev_ties_count = 0;");
+		$conn->Execute("SET @ties_count = 0");
+		$sql = "SELECT 
+					ProblemsSolved, score, username, name, rank, user_id 
+				FROM 
+					(
+						SELECT 
+							ProblemsSolved, username, score, name, user_id, @prev_ties_count := @ties_count as previous_ties_count,
+						CASE
+							WHEN @prev_value_ties = score THEN @ties_count := @ties_count + 1
+							WHEN @prev_value_ties := score THEN @ties_count := 0                                                                     
+						END AS ties_count,                          
+						CASE
+							WHEN @prev_value = score THEN @rank_count
+							WHEN @prev_value := score THEN @rank_count := @rank_count + 1 + @prev_ties_count                                                                                                                                                   
+						END AS rank
+						FROM 
+							(
+								SELECT
+									username, name, up.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ps.points) score
+								FROM
+									(
+										SELECT DISTINCT
+											r.user_id, r.problem_id
+										FROM
+											Runs r
+										WHERE
+											r.veredict = 'AC' AND r.test = 0
+									) AS up
+								INNER JOIN
+									(
+										SELECT
+											p.problem_id, ROUND(100 / LOG(2, accepted+1) , 0) AS points
+										FROM
+											Problems p
+
+									) AS ps ON ps.problem_id = up.problem_id
+								INNER JOIN
+									Users u ON u.user_id = up.user_id 
+								GROUP BY
+									username
+								ORDER BY
+									score DESC					   
+
+							) AS UsersProblemsSolved
+					) AS Rank ";
+		
+		($filterByUser) ? 
+			$sql .= "WHERE user_id = ? " : 
+			$sql .= "ORDER BY Rank ASC, user_id LIMIT $offset, $limit";		
+		
+		$rs = null;
+		if ($filterByUser) {
+			$params = array($user->user_id);			
+			$rs = $conn->Execute($sql, $params);
+		} else {
+			$rs = $conn->Execute($sql);
+		}
+		
+		$ar = array();
+		foreach ($rs as $foo) {			
+			$bar =  new Users($foo);
+			$result = array(
+				"user" => $bar, 
+				"problems_solved" =>  $foo["ProblemsSolved"], 
+				"rank" => $foo["rank"], 
+				"score" => $foo["score"]
+				);
+			
+    		array_push( $ar, $result);    		
+		}
+		return $ar;	
+	}
 }
