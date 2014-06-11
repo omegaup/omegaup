@@ -23,7 +23,7 @@ class UITools {
 	public static function setRankByProblemsSolved(Smarty $smarty, $offset, $rowcount) {
 
 		$rankRequest = new Request(array("offset" => $offset, "rowcount" => $rowcount));
-		$response = UserController::getRankByProblemsSolved($rankRequest);
+		$response = UserController::getRankByProblemsSolved2($rankRequest);
 
 		$smarty->assign('rank', $response);
 	}

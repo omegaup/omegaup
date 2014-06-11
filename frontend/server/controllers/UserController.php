@@ -1352,7 +1352,7 @@ class UserController extends Controller {
 		} else {
 			$response = array();			
 			try {
-				$db_results = UsersDAO::GetRankByProblemsSolved($r["rowcount"], $r["offset"], $r["user"]);
+				$db_results = UsersDAO::GetRankByProblemsSolved2($r["rowcount"], $r["offset"], $r["user"]);
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
