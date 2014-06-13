@@ -28,7 +28,7 @@ object RoutingDescription extends StandardTokenParsers with Log {
 	lexical.reserved += ("not", "in", "user", "slow", "problem", "true", "urgent", "contest", "practice", "rejudge")
 
 	def parse(input: String): RunRouter = {
-		info("Parsing routing rule: {}", input)
+		info("Parsing routing table: {}", input)
 		routingTable(new lexical.Scanner(input)) match {
 			case Success(rules, _) => {
 				info("Routing rule parsed: {}", rules)

@@ -189,7 +189,7 @@ object Manager extends Object with Log {
 		run
 	}
 
-	def updateConfiguration(embeddedRunner: Boolean = false) = {
+	private def updateConfiguration(embeddedRunner: Boolean) = {
 		if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
 			RunnerDispatcher.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
 		}
@@ -204,15 +204,22 @@ object Manager extends Object with Log {
 				error("Unable to parse {} at character {}", source, ex.getErrorOffset)
 			}
 		}
+		Config.get("grader.routing.registered_runners", "").split("\\s+").foreach({ endpoint => {
+			val tokens = endpoint.split(":")
+			if (tokens.length > 0 && tokens(0).trim.length > 0) {
+				if (tokens.length == 1) {
+					RunnerDispatcher.register(tokens(0), 21681)
+				} else {
+					RunnerDispatcher.register(tokens(0), tokens(1).toInt)
+				}
+			}
+		}})
 	}
 	
 	def init(configPath: String) = {
 		import omegaup.data._
 
-		// shall we create an embedded runner?
-		if(Config.get("grader.embedded_runner.enable", false)) {
-			RunnerDispatcher.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
-		}
+		updateConfiguration(false)
 
 		// the handler
 		val handler = new AbstractHandler() {
@@ -245,6 +252,7 @@ object Manager extends Object with Log {
 
 							Logging.init()
 
+							updateConfiguration(embeddedRunner)
 
 							response.setStatus(HttpServletResponse.SC_OK)
 							new ReloadConfigOutputMessage()
