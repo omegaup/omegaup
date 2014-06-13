@@ -1,6 +1,7 @@
 package omegaup.grader
 
 import java.io._
+import java.text.ParseException
 import javax.servlet._
 import javax.servlet.http._
 import org.eclipse.jetty.server.Request
@@ -121,14 +122,6 @@ object Manager extends Object with Log {
 		Config.get("db.user", "omegaup"),
 		Config.get("db.password", "")
 	)
-	RunnerDispatcher.updateConfiguration(
-		try {
-			FileUtil.read(Config.get("grader.routing.file", "routing.conf"))
-		} catch {
-			case e: FileNotFoundException => ""
-		},
-		Config.get("grader.routing.slow_threshold", 50)
-	)
 
 	def addListener(listener: Run => Unit) = listeners += listener
 
@@ -195,6 +188,23 @@ object Manager extends Object with Log {
 
 		run
 	}
+
+	def updateConfiguration(embeddedRunner: Boolean = false) = {
+		if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
+			RunnerDispatcher.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
+		}
+		val source = Config.get("grader.routing.table", "")
+		try {
+			RunnerDispatcher.updateConfiguration(
+				Config.get("grader.routing.table", source),
+				Config.get("grader.routing.slow_threshold", 50)
+			)
+		} catch {
+			case ex: ParseException => {
+				error("Unable to parse {} at character {}", source, ex.getErrorOffset)
+			}
+		}
+	}
 	
 	def init(configPath: String) = {
 		import omegaup.data._
@@ -235,9 +245,6 @@ object Manager extends Object with Log {
 
 							Logging.init()
 
-							if (Config.get("grader.embedded_runner.enable", false) && !embeddedRunner) {
-								RunnerDispatcher.addRunner(new omegaup.runner.Runner("#embedded-runner", Minijail))
-							}
 
 							response.setStatus(HttpServletResponse.SC_OK)
 							new ReloadConfigOutputMessage()

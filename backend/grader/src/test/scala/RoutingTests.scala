@@ -11,13 +11,13 @@ class RoutingSpec extends FlatSpec {
 	"Routing descriptions" should "parse correctly" in {
     var thrown: ParseException = null
 
-    a [ParseException] should be thrownBy RoutingDescription.parse(Array("in"))
+    a [ParseException] should be thrownBy RoutingDescription.parse("in")
 
-    val router = RoutingDescription.parse(Array(
-      """contest: problem == "problem" """,
-      """urgent: !rejudge && contest == "test_contest" && user in ["test_user"]""",
-      """practice: slow"""
-    ))
+    val router = RoutingDescription.parse("""
+      contest: problem == "problem";
+      urgent: !rejudge && contest == "test_contest" && user in ["test_user"];
+      practice: slow
+    """)
     router(
       new RunContext(new Run(
         contest = Some(new Contest(alias = "foo")),

@@ -24,26 +24,25 @@ class RunnerEndpoint(val hostname: String, val port: Int) {
 }
 
 object RoutingDescription extends StandardTokenParsers with Log {
-	lexical.delimiters ++= List("(", ")", "[", "]", "{", "}", ",", ":", "==", "!=", "||", "&&", "!")
+	lexical.delimiters ++= List("(", ")", "[", "]", "{", "}", ",", ":", ";", "==", "!=", "||", "&&", "!")
 	lexical.reserved += ("not", "in", "user", "slow", "problem", "true", "urgent", "contest", "practice", "rejudge")
 
-	def parse(input: Iterable[String]): RunRouter = {
-		new RunRouterImpl(input.map { _.trim } .filter { _.length > 0 } .map {line => {
-			info("Parsing routing rule: {}", line)
-			routingRule(new lexical.Scanner(line)) match {
-				case Success(rule, _) => {
-					info("Routing rule parsed: {}", rule)
-					rule
-				}
-				case NoSuccess(msg, input) => {
-					System.err.println(input.pos.longString)
-					throw new ParseException(msg, input.offset)
-				}
+	def parse(input: String): RunRouter = {
+		info("Parsing routing rule: {}", input)
+		routingTable(new lexical.Scanner(input)) match {
+			case Success(rules, _) => {
+				info("Routing rule parsed: {}", rules)
+				new RunRouterImpl(rules)
 			}
-		}}.toList)
+			case NoSuccess(msg, err) => {
+				System.err.println(err.pos.longString)
+				throw new ParseException(msg, err.offset)
+			}
+		}
 	}
 
-	private def routingRule = phrase(queueName ~ ":" ~ expr) ^^ { case queueId ~ ":" ~ condition => condition -> queueId }
+	private def routingTable = phrase(repsep(routingRule, ";"))
+	private def routingRule = queueName ~ ":" ~ expr ^^ { case queueId ~ ":" ~ condition => condition -> queueId }
 	private def queueName: Parser[Int] = ("urgent" ^^ { case "urgent" => 0 }) | ("contest" ^^ { case "contest" => 2 }) |
 			("practice" ^^ { case "practice" => 4 }) | ("rejudge" ^^ { case "rejudge" => 6 })
 	private def expr: Parser[RunMatcher] = ( "(" ~> expr <~ ")" ) | orExpr
@@ -168,7 +167,7 @@ object RunnerDispatcher extends ServiceInterface with Log {
 	private val runsInFlight = scala.collection.mutable.HashMap.empty[Long, RunContext]
 	private val executor = Executors.newCachedThreadPool
 	private var flightIndex: Long = 0
-	private var runRouter = RoutingDescription.parse(List[String]())
+	private var runRouter = RoutingDescription.parse("")
 	private var slowThreshold: Int = 50
 	private var slowRuns: Int = 0
 	private val lock = new Object
@@ -194,7 +193,7 @@ object RunnerDispatcher extends ServiceInterface with Log {
 	}
 
 	def updateConfiguration(description: String, slowThreshold: Int) = lock.synchronized {
-		runRouter = RoutingDescription.parse(description.split("\n"))
+		runRouter = RoutingDescription.parse(description)
 		this.slowThreshold = slowThreshold
 
 		val runs = scala.collection.mutable.MutableList.empty[RunContext]
