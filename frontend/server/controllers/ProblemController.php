@@ -1117,8 +1117,8 @@ class ProblemController extends Controller {
 			} else {
 				$problemData['score'] = 0;
 			}
-			
-			$problemData['rankPoints'] = ($problemData['accepted'] == 0) ? 100 : intval(100.0/log(intval($problemData['accepted']) + 1, 2));
+						
+			$problemData['rankPoints'] = intval(100.0/log(max(intval($problemData['accepted']), 1) + 1, 2));
 		}
 
 		$response["status"] = "ok";
