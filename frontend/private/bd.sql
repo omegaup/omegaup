@@ -704,12 +704,19 @@ INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (3 ,  'PROBLEM_AD
 --
 -- Update AC Count on grade
 --
-CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs` FOR EACH ROW UPDATE  `Problems` SET  `Problems`.`accepted` = (
-	SELECT COUNT( DISTINCT user_id ) 
-		FROM  `Runs` 
-		WHERE  `Runs`.`veredict` =  'AC'
-		AND NEW.`problem_id` =  `Runs`.`problem_id`
-	)	
-WHERE NEW.problem_id =  `Problems`.`problem_id`;
+DELIMITER $$ 
+CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs` 
+FOR EACH ROW BEGIN
+	IF (OLD.veredict = 'AC' OR NEW.veredict = 'AC') THEN
+		UPDATE  `Problems` SET  `Problems`.`accepted` = (
+			SELECT COUNT( DISTINCT user_id ) 
+				FROM  `Runs` 
+				WHERE  `Runs`.`veredict` =  'AC'
+				AND NEW.`problem_id` =  `Runs`.`problem_id`
+			)	
+		WHERE NEW.problem_id =  `Problems`.`problem_id`;	
+	END IF;
+END$$	
+DELIMITER ;
 
 COMMIT;
