@@ -863,8 +863,9 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiProfile(Request $r) {
-
-		self::authenticateRequest($r);				
+		
+		self::authenticateOrAllowUnauthenticatedRequest($r);
+			
 		$r["user"] = self::resolveTargetUser($r);
 		
 		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 										
@@ -984,7 +985,7 @@ class UserController extends Controller {
 	 */
 	public static function apiContestStats(Request $r) {
 
-		self::authenticateRequest($r);
+		self::authenticateOrAllowUnauthenticatedRequest($r);
 
 		$response = array();
 		$response["contests"] = array();
@@ -1039,7 +1040,7 @@ class UserController extends Controller {
 	 */
 	public static function apiProblemsSolved(Request $r) {
 
-		self::authenticateRequest($r);
+		self::authenticateOrAllowUnauthenticatedRequest($r);
 
 		$response = array();
 		$response["problems"] = array();
@@ -1105,12 +1106,10 @@ class UserController extends Controller {
 	 */
 	public static function apiStats(Request $r) {
 		
-		self::authenticateRequest($r);
-					
+		self::authenticateOrAllowUnauthenticatedRequest($r);					
 		$user = self::resolveTargetUser($r);
 		
-		try {
-			
+		try {			
 			$totalRunsCount = RunsDAO::CountTotalRunsOfUser($user->getUserId());
 			
 			// List of veredicts			
@@ -1118,8 +1117,7 @@ class UserController extends Controller {
 			
 			foreach (self::$veredicts as $veredict) {
 				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfUserByVeredict($user->getUserId(), $veredict);
-			}			
-			
+			}						
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}

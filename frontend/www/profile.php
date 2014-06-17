@@ -2,8 +2,6 @@
 
 require_once( "../server/bootstrap.php" );
 
-UITools::redirectToLoginIfNotLoggedIn();
-
 UITools::setProfile($smarty);
 
 $smarty->display('../templates/profile.tpl');

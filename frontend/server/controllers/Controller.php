@@ -37,6 +37,25 @@ class Controller {
 	}
 	
 	/**
+	 * Calls authenticateRequest and throws only if authentication fails AND 
+	 * there's no target username in Request. 
+	 * This is to allow unauthenticated access to APIs that work for both 
+	 * current authenticated user and a targeted user (via $r["username"])
+	 * 
+	 * @param Request $r
+	 */
+	protected static function authenticateOrAllowUnauthenticatedRequest(Request $r) {		
+		try {
+			self::authenticateRequest($r);
+		} catch (ForbiddenAccessException $e) {
+			// allow unauthenticated only if it has $r["username"]
+			if (is_null($r["username"])) {
+				throw $e;
+			}
+		}		
+	}
+	
+	/**
 	 * Resolves the target user for the API. If a username is provided in
 	 * the request, then we use that one. Otherwise, we use currently logged-in
 	 * user.
