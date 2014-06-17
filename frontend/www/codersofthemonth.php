@@ -2,8 +2,6 @@
 
 require_once( "../server/bootstrap.php" );
 
-UITools::redirectToLoginIfNotLoggedIn();
-
 $request = new Request(array(
 	"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN')
 ));

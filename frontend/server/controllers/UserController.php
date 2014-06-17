@@ -949,9 +949,7 @@ class UserController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiCoderOfTheMonthList(Request $r) {
-	
-		self::authenticateRequest($r);
-				
+							
 		$response = array();
 		$response["coders"] = array();
 		try {

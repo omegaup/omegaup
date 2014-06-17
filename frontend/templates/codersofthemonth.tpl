@@ -1,4 +1,3 @@
-{include file='redirect.tpl'}
 {assign var="htmlTitle" value="{#omegaupTitleCodersofthemonth#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
