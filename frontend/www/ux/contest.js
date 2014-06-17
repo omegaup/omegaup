@@ -331,6 +331,10 @@ $(document).ready(function() {
 			var isNewRunOnlyProblem = window.location.hash.indexOf('#new-run') !== -1;
 			
 			if (isNewRunOnlyProblem) {
+				if (!omegaup.loggedIn && omegaup.login_url) {
+					window.location = omegaup.login_url + "?redirect=" + escape(window.location);
+					return;
+				}
 				$('#overlay form').hide();
 				$('#submit input').show();
 				$('#submit #lang-select').show();

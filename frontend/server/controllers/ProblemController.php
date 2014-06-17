@@ -712,8 +712,17 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiDetails(Request $r) {
-		// Get user
-		self::authenticateRequest($r);
+		
+		// Get user.
+		// Allow unauthenticated requests if we are not openning a problem 
+		// inside a contest.
+		try {
+			self::authenticateRequest($r);
+		} catch(ForbiddenAccessException $e) {
+			if (!is_null($r["contest_alias"])) {
+				throw $e;
+			}
+		}
 
 		// Validate request
 		self::validateDetails($r);
