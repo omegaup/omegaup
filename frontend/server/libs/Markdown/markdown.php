@@ -67,7 +67,7 @@ Author: Michel Fortin
 Author URI: http://michelf.com/
 */
 
-if (isset($wp_version)) {
+if (isset($wp_version) && function_exists('add_filter') && function_exists('remove_filter')) {
 	# More details about how it works here:
 	# <http://michelf.com/weblog/2005/wordpress-text-flow-vs-markdown/>
 	
