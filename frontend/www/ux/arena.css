@@ -281,20 +281,20 @@ body#only-problem .navleft .main {
 	font-style: italic;
 }
 
-.runs {
+.runs, .best-solvers {
 	width: 100%;
 	border: 1px solid #ccc;
 	margin-top: 2em;
 }
 
-.runs caption {
+.runs caption, .best-solvers caption {
 	font-weight: bold;
 	font-size: 1.em;
 	margin-bottom: 1em;
 }
 
-.runs td,
-.runs th {
+.runs td, .best-solvers td,
+.runs th, .best-solvers th {
 	border: 1px solid #ccc;
 	border-width: 1px 0;
 	text-align: center;

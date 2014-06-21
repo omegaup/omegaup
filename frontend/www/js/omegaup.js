@@ -788,7 +788,7 @@ OmegaUp.prototype.getMyContests = function(callback) {
 	});
 };
 
-OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, statement_type) {
+OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, statement_type, show_solvers) {
 	var self = this;
 	if (statement_type === undefined) {
 		statement_type = "html";
@@ -797,7 +797,7 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, st
 		contestAlias === null ? 
 			'/api/problem/details/problem_alias/' + encodeURIComponent(problemAlias) + '/' :
 			'/api/problem/details/contest_alias/' + encodeURIComponent(contestAlias) + '/problem_alias/' + encodeURIComponent(problemAlias) + '/',
-		{lang:"es", statement_type:statement_type},
+		{lang:"es", statement_type:statement_type, show_solvers: !!show_solvers},
 		function (problem) {
 			if (problem.runs) {
 				for (var i = 0; i < problem.runs.length; i++) {

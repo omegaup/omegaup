@@ -57,6 +57,27 @@
 							</tr>
 						</tbody>
 					</table>
+					<table class="best-solvers">
+						<caption>{#wordsBestSolvers#}</caption>
+						<thead>
+							<tr>
+								<th>{#wordsUser#}</th>
+								<th>{#wordsLanguage#}</th>
+								<th>{#wordsRuntime#}</th>
+								<th>{#wordsMemoria#}</th>
+								<th>{#wordsTime#}</th>
+							</tr>
+						</thead>
+						<tbody class="solver-list">
+							<tr class="template">
+								<td><a class="user"></a></td>
+								<td class="language"></td>
+								<td class="runtime"></td>
+								<td class="memory"></td>
+								<td class="time"></td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>

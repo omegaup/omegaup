@@ -68,6 +68,43 @@ class RunsDAO extends RunsDAOBase {
 	 * Gets an array of the guids of the pending runs
 	 */
 
+	public static final function GetBestSolvingRunsForProblem($problem_id) {
+		$sql = '
+			SELECT u.username, r.language, r.runtime, r.memory, UNIX_TIMESTAMP(r.time) time FROM
+				(SELECT
+					MIN(r.run_id) run_id, r.user_id, r.runtime
+				FROM
+					Runs r
+				INNER JOIN
+					(
+						SELECT
+							rr.user_id, MIN(rr.runtime) AS runtime
+						FROM
+							Runs rr
+						WHERE
+							rr.problem_id = ? AND rr.veredict = \'AC\' AND rr.test = 0 GROUP BY rr.user_id
+					) AS sr ON sr.user_id = r.user_id AND sr.runtime = r.runtime
+				WHERE
+					r.problem_id = ? AND r.veredict = \'AC\' AND r.test = 0
+				GROUP BY
+					r.user_id, r.runtime
+				ORDER
+					BY r.runtime, run_id
+				LIMIT 0, 10) as runs
+			INNER JOIN
+				Users u ON u.user_id = runs.user_id
+			INNER JOIN
+				Runs r ON r.run_id = runs.run_id;';
+		$val = array($problem_id, $problem_id);
+
+		global $conn;
+		return $conn->GetAll($sql, $val);
+	}
+
+	/*
+	 * Gets an array of the guids of the pending runs
+	 */
+
 	public static final function GetPendingRunsOfContest($contest_id, $showAllRuns = false) {
 		// Build SQL statement.
 		$sql = "SELECT guid FROM Runs WHERE contest_id = ? AND status != 'ready'";

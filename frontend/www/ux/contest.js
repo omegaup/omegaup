@@ -25,6 +25,17 @@ $(document).ready(function() {
 		} 
 		
 		arena.currentProblem = problem;
+
+		for (var i = 0; i < problem.solvers.length; i++) {
+			var solver = problem.solvers[i];
+			var prob = $('.solver-list .template').clone().removeClass('template');
+			$('.user', prob).attr('href', '/profile/' + solver.username).html(solver.username);
+			$('.language', prob).html(solver.language);
+			$('.runtime', prob).html((parseFloat(solver.runtime) / 1000.0).toFixed(2));
+			$('.memory', prob).html((parseFloat(solver.memory) / (1024 * 1024)).toFixed(2));
+			$('.time', prob).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
+			$('.solver-list').append(prob);
+		}
 		
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
@@ -106,7 +117,7 @@ $(document).ready(function() {
 	
 	if (arena.onlyProblem) {
 		$('body').attr('id', 'only-problem');
-		omegaup.getProblem(null, onlyProblemAlias, onlyProblemLoaded)
+		omegaup.getProblem(null, onlyProblemAlias, onlyProblemLoaded, 'html', true)
 	} else {
 		arena.connectSocket();
 		omegaup.getContest(contestAlias, contestLoaded);
@@ -320,9 +331,11 @@ $(document).ready(function() {
 					}
 				}
 
-				omegaup.getProblemRuns(problem.alias, function (data) {
-					updateOnlyProblemRuns(data.runs, 'score', 100);
-				});
+				if (omegaup.loggedIn) {
+					omegaup.getProblemRuns(problem.alias, function (data) {
+						updateOnlyProblemRuns(data.runs, 'score', 100);
+					});
+				}
 
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 			}

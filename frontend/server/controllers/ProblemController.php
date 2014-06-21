@@ -811,6 +811,8 @@ class ProblemController extends Controller {
 					throw new InvalidDatabaseOperationException($e);
 				}
 			}
+		} else if (isset($r['show_solvers']) && $r['show_solvers']) {
+			$response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
 		}
 
 		// Add the procesed runs to the request
