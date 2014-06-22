@@ -12,6 +12,12 @@
 
 		var html = "";
 
+		if (document.location.search.indexOf('sort=accepted') != -1) {
+			problems.results.sort(function (a, b) {
+				return a.accepted - b.accepted;
+			});
+		}
+
 		for (var i = 0; i < problems.results.length; i++) {
 			var accepted = problems.results[i].accepted;
 			var submissions = problems.results[i].submissions;
