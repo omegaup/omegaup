@@ -175,12 +175,13 @@ class ProblemDeployer {
 		}
 
 		$max_runtime = ((int)($problem->time_limit + 999) / 1000 + $validator) * $input_count;
+		$this->log->info("Slowness log: {$problem->time_limit} + $validator * $input_count = $max_runtime");
 
 		if ($max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
 			throw new ProblemDeploymentFailedException('Problem would run for more than 5 minutes in case of TLE. Rejected.');
 		}
 
-		return $max_runtime >= ProblemDeployer::SLOW_QUEUE_THRESHOLD;
+		return $max_runtime >= ProblemDeployer::SLOW_QUEUE_THRESHOLD ? 1 : 0;
 	}
 
 	/**
