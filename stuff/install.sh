@@ -146,7 +146,7 @@ if [ ! -f /etc/init.d/omegaup ]; then
 	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0" >> /etc/sudoers'
 	# Java 7 has a bug with NSS libraries. Disable them.
 	if [ "`grep '\/lib\/security\/nss.cfg' /etc/java-7-openjdk/security/java.security`" != "" ]; then
-		sed -e 's/(.*\/lib\/security\/nss.cfg)/#\1/' /etc/java-7-openjdk/security/java.security > ~/.java.security
+		sed -e 's/\(.*\/lib\/security\/nss.cfg\)/#\1/' /etc/java-7-openjdk/security/java.security > ~/.java.security
 		sudo mv ~/.java.security /etc/java-7-openjdk/security/java.security
 	fi
 	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
