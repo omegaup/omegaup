@@ -19,6 +19,7 @@ class ProblemDeployer {
 	private $current_markdown_file_contents;
 
 	private $alias;
+	private $preserve;
 	private $tmpDir = null;
 	private $targetDir = null;
 	private $zipPath = null;
@@ -31,6 +32,7 @@ class ProblemDeployer {
 
 		$this->tmpDir = FileHandler::TempDir("/tmp", "ProblemDeployer", 0755);
 		$this->targetDir = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $this->alias;
+		$this->preserve = $preserve;
 		if ($preserve) {
 			FileHandler::BackupDir($this->targetDir, $this->tmpDir);
 		} else {
@@ -150,7 +152,7 @@ class ProblemDeployer {
 	public function isSlow(Problems $problem) {
 		$validator = 0;
 
-		$dirpath = is_dir($this->tmpDir) ? $this->tmpDir : $this->targetDir;
+		$dirpath = $this->preserve ? $this->tmpDir : $this->targetDir;
 
 		if ($handle = opendir($dirpath)) {
 			while (false !== ($entry = readdir($handle))) {
@@ -162,7 +164,7 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		$dirpath .= "/cases";
+		$dirpath .= '/cases';
 
 		$input_count = 0;
 
@@ -174,8 +176,7 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		$max_runtime = ((int)($problem->time_limit + 999) / 1000 + $validator) * $input_count;
-		$this->log->info("Slowness log: {$problem->time_limit} + $validator * $input_count = $max_runtime");
+		$max_runtime = (int)(($problem->time_limit + 999) / 1000 + $validator) * $input_count;
 
 		if ($max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
 			throw new ProblemDeploymentFailedException('Problem would run for more than 5 minutes in case of TLE. Rejected.');
