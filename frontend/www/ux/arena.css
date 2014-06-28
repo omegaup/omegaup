@@ -244,13 +244,18 @@ body#only-problem .navleft .main {
 }
 
 #problem .statement table.sample_io {
-	border: 1px solid #000;
-	background: #eee;
 	margin: 5px;
 	padding : 5px;
 }
-#problem .statement .sample_io td {
+.sample_io tbody {
 	background: #eee;
+	border: 1px solid #000;
+}
+#problem .statement .sample_io th {
+	padding: 10px;
+	border-top: 0;
+}
+#problem .statement .sample_io td {
 	vertical-align: top;
 	padding: 10px;
 	border: 1px solid #000;

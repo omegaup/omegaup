@@ -42,7 +42,10 @@
 								</div>
 
 								<div class="tab-pane" id="statement-preview">
+									<h1 style="text-align: center;" class="title"></h1>
 									<div class="no-bottom-margin statement" id="wmd-preview-statement"></div>
+									<hr/>
+									<em>{#wordsSource#}: <span class="source"></span></em>
 								</div>
 							</div>
 						</div>
@@ -189,10 +192,12 @@
 			$('.page-header h1 span').html('{#problemEditEditProblem#} ' + problem.title);
 			$('.page-header h1 small').html('&ndash; <a href="/arena/problem/' + problemAlias + '/">{#problemEditGoToProblem#}</a>');
 			$('input[name=title]').val(problem.title);
+			$('#statement-preview .title').html(omegaup.escape(problem.title));
 			$('input[name=time_limit]').val(problem.time_limit);
 			$('input[name=memory_limit]').val(problem.memory_limit);
 			$('input[name=output_limit]').val(problem.output_limit);
 			$('input[name=source]').val(problem.source);
+			$('#statement-preview .source').html(omegaup.escape(problem.source));
 			$('select[name=validator]').val(problem.validator);
 			$('select[name=public]').val(problem.public);
 			$('#languages')

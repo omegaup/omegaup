@@ -201,7 +201,7 @@ div#sidebar { display: none }
 	background-color: #fff;
 	font-family: monospace;
 }
-#wmd-preview {
+#wmd-preview-wrapper {
 	float: right;
 	width: 420px;
 	border: 1px solid #eee;
@@ -209,14 +209,30 @@ div#sidebar { display: none }
 	padding: 15px;
 }
 table.sample_io {
-	border: 1px solid #000;
+	margin: 5px;
+	padding : 5px;
+}
+.sample_io tbody {
 	background: #eee;
+	border: 1px solid #000;
+}
+.sample_io th {
+	padding: 10px;
+	border-top: 0;
 }
 .sample_io td {
-	background: #eee;
 	vertical-align: top;
 	padding: 10px;
 	border: 1px solid #000;
+}
+.sample_io pre {
+	white-space: pre;
+	word-break: keep-all;
+	word-wrap: normal;
+	background: transparent;
+	border: 0px;
+	padding: 0px;
+	margin: inherit;
 }
 table.merged-scoreboard td {
 	vertical-align: middle;

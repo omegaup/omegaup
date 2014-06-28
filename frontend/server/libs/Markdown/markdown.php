@@ -1685,6 +1685,7 @@ class Markdown_Parser {
 		for ($i = 1; $i < count($matches); $i += 2) {
 			if ($matches[$i] == 'description') {
 				$description_column = true;
+				break;
 			}
 		}
 
@@ -1696,22 +1697,36 @@ class Markdown_Parser {
 		}
 		$text .= '</tr></thead>';
 
-		$first_row = false;
+		$first_row = true;
 		$text .= '<tbody>';
+		$columns = 0;
 		for ($i = 1; $i < count($matches); $i += 2) {
 			if ($matches[$i] == 'description') {
 				$text .= "<td>" . $this->runBlockGamut($matches[$i+1]) . "</td>";
+				$columns++;
 			} else {
 				if ($matches[$i] == 'input') {
-					if ($first_row) $text .= '</tr>';
+					if (!$first_row) {
+						while ($columns < ($description_column ? 3 : 2)) {
+							$text .= '<td></td>';
+							$columns++;
+						}
+						$text .= '</tr>';
+					}
 					$first_row = false;
 
 					$text .= '<tr>';
+					$columns = 0;
 				}
 				$text .= "<td><pre>" . $matches[$i+1] . "</pre></td>";
+				$columns++;
 			}
 		}
 
+		while ($columns < ($description_column ? 3 : 2)) {
+			$text .= '<td></td>';
+			$columns++;
+		}
 		$text .= '</tr></tbody></table>';
 		
 		return $this->hashBlock($text) . "\n";

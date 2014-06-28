@@ -9,7 +9,12 @@
 
 <div class="post">
 <div id="problem">
+<div id="wmd-preview-wrapper">
+<h1 style="text-align: center;">Nombre del problema</h1>
 <div id="wmd-preview" class="statement"></div>
+<hr/>
+<em>Fuente: fuente</em>
+</div>
 <div id="wmd-panel">
 	<div id="wmd-button-bar"></div>
 	<textarea class="wmd-input" id="wmd-input"># Descripción
