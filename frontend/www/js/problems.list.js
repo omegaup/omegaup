@@ -12,9 +12,11 @@
 
 		var html = "";
 
-		if (document.location.search.indexOf('sort=accepted') != -1) {
+		if (document.location.search.indexOf('sort=difficulty') != -1) {
 			problems.results.sort(function (a, b) {
-				return a.accepted - b.accepted;
+				if (a.accepted != b.accepted)
+					return a.accepted - b.accepted;
+				return b.submissions - a.submissions;
 			});
 		}
 
