@@ -40,12 +40,12 @@ define( 'MARKDOWN_VERSION',  "1.0.1n" ); # Sat 10 Oct 2009
 
 @define( 'MARKDOWN_PARSER_CLASS',  'Markdown_Parser' );
 
-function Markdown($text, $image_callback = 'identity_callback') {
+function Markdown($text, $image_callback = 'identity_callback', $translation_callback = 'translation_callback') {
 #
 # Initialize the parser and return the result of its transform method.
 #
 	$parser_class = MARKDOWN_PARSER_CLASS;
-	$parser = new $parser_class($image_callback);
+	$parser = new $parser_class($image_callback, $translation_callback);
 
 	# Transform text using parser.
 	return $parser->transform($text);
@@ -53,6 +53,10 @@ function Markdown($text, $image_callback = 'identity_callback') {
 
 function identity_callback($x) {
 	return $x;
+}
+
+function translation_callback($key) {
+	throw new Exception('Translation callback not set');
 }
 
 
@@ -217,11 +221,15 @@ class Markdown_Parser {
 	# A callback function to handle images.
 	var $image_callback = null;
 
-	function Markdown_Parser($image_callback) {
+	# A callback function to handle translation.
+	var $translation_callback = null;
+
+	function Markdown_Parser($image_callback, $translation_callback) {
 		#
 		# Constructor function. Initialize appropriate member variables.
 		#
 		$this->image_callback = $image_callback;
+		$this->translation_callback = $translation_callback;
 		$this->_initDetab();
 		$this->prepareItalicsAndBold();
 	
@@ -1673,8 +1681,23 @@ class Markdown_Parser {
 
 		$matches = preg_split('/(?:^|\n) [ ]* [|][|] [ ]* (input|output|description|end) [ ]* (?:\n|$)/xm', $input, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-		$first_row = false;
+		$description_column = false;
+		for ($i = 1; $i < count($matches); $i += 2) {
+			if ($matches[$i] == 'description') {
+				$description_column = true;
+			}
+		}
 
+		$text .= '<thead><tr>';
+		$text .= '<th>' . call_user_func($this->translation_callback, 'input') . '</th>';
+		$text .= '<th>' . call_user_func($this->translation_callback, 'output') . '</th>';
+		if ($description_column) {
+			$text .= '<th>' . call_user_func($this->translation_callback, 'description') . '</th>';
+		}
+		$text .= '</tr></thead>';
+
+		$first_row = false;
+		$text .= '<tbody>';
 		for ($i = 1; $i < count($matches); $i += 2) {
 			if ($matches[$i] == 'description') {
 				$text .= "<td>" . $this->runBlockGamut($matches[$i+1]) . "</td>";
@@ -1689,7 +1712,7 @@ class Markdown_Parser {
 			}
 		}
 
-		$text .= '</tr></table>';
+		$text .= '</tr></tbody></table>';
 		
 		return $this->hashBlock($text) . "\n";
 	}

@@ -17,6 +17,7 @@ class ProblemDeployer {
 	private $casesFiles;
 	private $log;
 	private $current_markdown_file_contents;
+	private $currentLanguage;
 
 	private $alias;
 	private $preserve;
@@ -444,12 +445,16 @@ class ProblemDeployer {
 	 *
 	 * @param string $problemBasePath
 	 * @param string $statementFileName
+	 * @param string $lang The 2-letter code for the language
 	 */
 	private function HTMLizeStatement($problemBasePath, $statementFileName) {
 		$this->log->info("HTMLizing statement: " . $statementFileName);
 
 		// Path used to deploy the raw problem statement (.markdown)
 		$markdown_filepath = $problemBasePath . DIRECTORY_SEPARATOR . $statementFileName;
+
+		// Get the language of this statement
+		$lang = basename($statementFileName, ".markdown");
 
 		// Fix for Windows Latin-1 statements:
 		// For now, assume that if it is not UTF-8, then it is Windows Latin-1 and then convert
@@ -465,14 +470,16 @@ class ProblemDeployer {
 
 		// Transform markdown to HTML and sync img paths between Markdown and HTML
 		$this->log->info("Transforming markdown to html");
-		$html_file_contents = Markdown($this->current_markdown_file_contents, array($this, 'imageMarkdownCallback'));
+		$this->currentLanguage = $lang;
+		$html_file_contents = Markdown(
+			$this->current_markdown_file_contents,
+			array($this, 'imageMarkdownCallback'),
+			array($this, 'translationCallback')
+		);
 
 		// Then save the changes to the markdown file
 		$this->log->info("Saving markdown after Markdown-HTML img path sync: " . $markdown_filepath);
 		FileHandler::CreateFile($markdown_filepath, $this->current_markdown_file_contents);
-
-		// Get the language of this statement
-		$lang = basename($statementFileName, ".markdown");
 
 		// Save the HTML file in the path .../problem_alias/statements/lang.html
 		$html_filepath = $problemBasePath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html";
@@ -527,6 +534,26 @@ class ProblemDeployer {
 		$this->current_markdown_file_contents = str_replace($imagepath, $result, $this->current_markdown_file_contents);
 
 		return $result;
+	}
+
+	public function translationCallback($key) {
+		if ($this->currentLanguage == 'en') {
+			switch ($key) {
+				case 'input': return 'Input';
+				case 'output': return 'Output';
+				case 'description': return 'Description';
+			}
+		} else {
+			if ($this->currentLanguage != 'es') {
+				$this->log->error("Unknown language: $lang");
+			}
+			switch ($key) {
+				case 'input': return 'Entrada';
+				case 'output': return 'Salida';
+				case 'description': return 'Descripción';
+			}
+		}
+		throw new Exception("Invalid translation key $key");
 	}
 
 	/**
