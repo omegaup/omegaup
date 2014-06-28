@@ -154,6 +154,10 @@ class ProblemDeployer {
 
 		$dirpath = $this->preserve ? $this->tmpDir : $this->targetDir;
 
+		if (!is_dir($dirpath)) {
+			$dirpath = $this->tmpDir;
+		}
+
 		if ($handle = opendir($dirpath)) {
 			while (false !== ($entry = readdir($handle))) {
 				if (stripos($entry, 'validator.') === 0) {
