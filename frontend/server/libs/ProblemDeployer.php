@@ -591,18 +591,24 @@ class ProblemDeployer {
 		}
 
 		// Add all .in files
-		$cases_zip = new ZipArchive;
-		$resource = $cases_zip->open($cases_zip_path, ZipArchive::CREATE);
-	 	if ($resource !== TRUE) {
-			$error = ZipHandler::ErrorMessage($resource);
-			$this->log->error("zipping cases failed with error: $error");
-			throw new InvalidFilesystemOperationException("Error creating contents.zip: $error");
+		$descriptorspec = array(
+			0 => array('pipe', 'r'),
+			1 => array('file', '/dev/null', 'r'),
+			2 => array('file', '/dev/null', 'r')
+		);
+
+		$proc = proc_open("/usr/bin/zip cases.zip -@ -j -D", $descriptorspec, $pipes, $dirpath, array());
+		if (!is_resource($proc)) {
+			throw new InvalidFilesystemOperationException("Error creating cases.zip");
 		}
 
 		foreach ($casesFiles as $case) {
-			$cases_zip->addFile("$dirpath/$case", basename($case));
+			fwrite($pipes[0], "$dirpath/$case\n");
 		}
-		$cases_zip->close();
+		fclose($pipes[0]);
+		if (proc_close($proc) != 0) {
+			throw new InvalidFilesystemOperationException("Error creating cases.zip");
+		}
 
 		$this->log->info("zipping cases succeeded");
 
@@ -622,22 +628,16 @@ class ProblemDeployer {
 			unlink($path_to_contents_zip);
 		}
 
-		$contents = new ZipArchive;
-		$resource = $contents->open($path_to_contents_zip, ZipArchive::CREATE);
-		if ($resource	!== TRUE) {
-			$error = ZipHandler::ErrorMessage($resource);
-			$this->log->error("zipping cases failed with error: $error");
-			throw new InvalidFilesystemOperationException("Error creating contents.zip: $error");
-		}
-
-		ZipHandler::AddDirectory(
-			$contents,
-			$dirpath,
-			"",
-			array("contents.zip", "cases.zip", "inputname")
+		$descriptorspec = array(
+			0 => array('file', '/dev/null', 'r'),
+			1 => array('file', '/dev/null', 'r'),
+			2 => array('file', '/dev/null', 'r')
 		);
 
-		$contents->close();
+		$proc = proc_open("/usr/bin/zip -r contents.zip . -xi contents.zip cases.zip inputname", $descriptorspec, $pipes, $dirpath, array());
+		if (!is_resource($proc) || proc_close($proc) != 0) {
+			throw new InvalidFilesystemOperationException("Error creating contents.zip");
+		}
 	}
 
 	/**
