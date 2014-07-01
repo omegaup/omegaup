@@ -95,6 +95,9 @@ class Contests extends VO
 			if (isset($data['scoreboard_url_admin'])) {
 				$this->scoreboard_url_admin = $data['scoreboard_url_admin'];
 			}
+			if (isset($data['urgent'])) {
+				$this->urgent = $data['urgent'];
+			}
 		}
 	}
 
@@ -128,7 +131,8 @@ class Contests extends VO
 			"penalty_calc_policy" => $this->penalty_calc_policy,
 			"show_scoreboard_after" => $this->show_scoreboard_after,
 			"scoreboard_url" => $this->scoreboard_url,
-			"scoreboard_url_admin" => $this->scoreboard_url_admin
+			"scoreboard_url_admin" => $this->scoreboard_url_admin,
+			"urgent" => $this->urgent
 		); 
 	return json_encode($vec); 
 	}
@@ -291,4 +295,11 @@ class Contests extends VO
 	  * @var VARCHAR(
 	  */
 	public $scoreboard_url_admin;
+
+	/**
+	  * Indica si el concurso es de alta prioridad y requiere mejor QoS.
+	  * @access public
+	  * @var tinyint(1)
+	  */
+	public $urgent;
 }

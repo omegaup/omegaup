@@ -215,6 +215,10 @@ abstract class ContestsDAOBase extends DAO
 			$sql .= " `scoreboard_url_admin` = ? AND";
 			array_push( $val, $Contests->getScoreboardUrlAdmin() );
 		}
+		if (!is_null( $Contests->getUrgent())) {
+			$sql .= " `urgent` = ? AND";
+			array_push( $val, $Contests->getUrgent() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -250,7 +254,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update($Contests)
 	{
-		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_time_start` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ? WHERE  `contest_id` = ?;";
+		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_time_start` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ? WHERE  `contest_id` = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -272,6 +276,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getShowScoreboardAfter(), 
 			$Contests->getScoreboardUrl(), 
 			$Contests->getScoreboardUrlAdmin(), 
+			$Contests->getUrgent(), 
 			$Contests->getContestId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -301,7 +306,8 @@ abstract class ContestsDAOBase extends DAO
 		if (is_null($Contests->submissions_gap)) $Contests->submissions_gap = '1';
 		if (is_null($Contests->penalty)) $Contests->penalty = '1';
 		if (is_null($Contests->show_scoreboard_after)) $Contests->show_scoreboard_after =  '1';
-		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_time_start`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Contests->urgent)) $Contests->urgent = 0;
+		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_time_start`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->contest_id,
 			$Contests->title,
@@ -324,6 +330,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->show_scoreboard_after,
 			$Contests->scoreboard_url,
 			$Contests->scoreboard_url_admin,
+			$Contests->urgent,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -597,6 +604,17 @@ abstract class ContestsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `scoreboard_url_admin` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ContestsA->getUrgent()) ) ) & ( ! is_null ( ($b = $ContestsB->getUrgent()) ) ) ){
+				$sql .= " `urgent` >= ? AND `urgent` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `urgent` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

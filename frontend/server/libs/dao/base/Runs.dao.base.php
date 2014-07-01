@@ -276,7 +276,6 @@ abstract class RunsDAOBase extends DAO
 		if (is_null($Runs->runtime)) $Runs->runtime = '0';
 		if (is_null($Runs->memory)) $Runs->memory = '0';
 		if (is_null($Runs->score)) $Runs->score = '0';
-		if (is_null($Runs->contest_score)) $Runs->contest_score = '0';
 		if (is_null($Runs->time)) $Runs->time = gmdate('Y-m-d H:i:s');
 		if (is_null($Runs->submit_delay)) $Runs->submit_delay = '0';
 		if (is_null($Runs->test)) $Runs->test = '0';
