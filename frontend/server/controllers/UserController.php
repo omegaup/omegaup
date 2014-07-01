@@ -43,11 +43,11 @@ class UserController extends Controller {
 		}
 
 		if (!is_null($userByEmail)) {
-			throw new DuplicatedEntryInDatabaseException("email already exists");
+			throw new ApiException("mailInUse");
 		}
 
 		if (!is_null($user)) {
-			throw new DuplicatedEntryInDatabaseException("Username already exists.");
+			throw new ApiException("usernameInUse");
 		}
 
 		// Prepare DAOs
