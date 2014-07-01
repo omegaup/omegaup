@@ -38,6 +38,9 @@ class Schools extends VO
 			if (isset($data['state_id'])) {
 				$this->state_id = $data['state_id'];
 			}
+			if (isset($data['country_id'])) {
+				$this->country_id = $data['country_id'];
+			}
 			if (isset($data['name'])) {
 				$this->name = $data['name'];
 			}
@@ -56,6 +59,7 @@ class Schools extends VO
 		$vec = array( 
 			"school_id" => $this->school_id,
 			"state_id" => $this->state_id,
+			"country_id" => $this->country_id,
 			"name" => $this->name
 		); 
 	return json_encode($vec); 
@@ -90,7 +94,14 @@ class Schools extends VO
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var varchar(50)
+	  * @var char(3)
+	  */
+	public $country_id;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var varchar(128)
 	  */
 	public $name;
 }

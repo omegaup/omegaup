@@ -424,9 +424,11 @@ CREATE TABLE IF NOT EXISTS `Runs` (
 CREATE TABLE IF NOT EXISTS `Schools` (
   `school_id` int(11) NOT NULL AUTO_INCREMENT,
   `state_id` int(11) NULL,
-  `name` varchar(50) NOT NULL,
+  `country_id` char(3) DEFAULT NULL,
+  `name` varchar(128) NOT NULL,
   PRIMARY KEY (`school_id`),
-  KEY `state_id` (`state_id`)
+  KEY `state_id` (`state_id`),
+  KEY `country_id` (`country_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
 
 -- --------------------------------------------------------
@@ -655,13 +657,14 @@ ALTER TABLE `Runs`
 -- Filtros para la tabla `Schools`
 --
 ALTER TABLE `Schools`
-  ADD CONSTRAINT `state_id` FOREIGN KEY (`state_id`) REFERENCES `States` (`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `state_id` FOREIGN KEY (`state_id`) REFERENCES `States` (`state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `States`
 --
 ALTER TABLE `States`
-  ADD CONSTRAINT `country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_stc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Users`

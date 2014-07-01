@@ -139,6 +139,10 @@ abstract class SchoolsDAOBase extends DAO
 			$sql .= " `state_id` = ? AND";
 			array_push( $val, $Schools->getStateId() );
 		}
+		if (!is_null( $Schools->getCountryId())) {
+			$sql .= " `country_id` = ? AND";
+			array_push( $val, $Schools->getCountryId() );
+		}
 		if (!is_null( $Schools->getName())) {
 			$sql .= " `name` = ? AND";
 			array_push( $val, $Schools->getName() );
@@ -178,9 +182,10 @@ abstract class SchoolsDAOBase extends DAO
 	  **/
 	private static final function update($Schools)
 	{
-		$sql = "UPDATE Schools SET  `state_id` = ?, `name` = ? WHERE  `school_id` = ?;";
+		$sql = "UPDATE Schools SET  `state_id` = ?, `country_id` = ?, `name` = ? WHERE  `school_id` = ?;";
 		$params = array( 
 			$Schools->getStateId(), 
+			$Schools->getCountryId(), 
 			$Schools->getName(), 
 			$Schools->getSchoolId(), );
 		global $conn;
@@ -202,10 +207,11 @@ abstract class SchoolsDAOBase extends DAO
 	  **/
 	private static final function create( $Schools )
 	{
-		$sql = "INSERT INTO Schools ( `school_id`, `state_id`, `name` ) VALUES ( ?, ?, ?);";
+		$sql = "INSERT INTO Schools ( `school_id`, `state_id`, `country_id`, `name` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
 			$Schools->school_id,
 			$Schools->state_id,
+			$Schools->country_id,
 			$Schools->name,
 		 );
 		global $conn;
@@ -271,6 +277,17 @@ abstract class SchoolsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `state_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $SchoolsA->getCountryId()) ) ) & ( ! is_null ( ($b = $SchoolsB->getCountryId()) ) ) ){
+				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `country_id` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
