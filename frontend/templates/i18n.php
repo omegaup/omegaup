@@ -47,7 +47,7 @@ if ($CreatePseudoLocFile != null)
 			fwrite($psHandle, 
 				$parts[0]
 				. " = "
-				. "\"(" . $lineNumber . " " . $newphrase . ")\"\n"); 
+				. "\"(" . $newphrase . ")\"\n"); 
 			$lineNumber++;
 		}
 		fclose($psHandle);
