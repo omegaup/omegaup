@@ -53,7 +53,7 @@ abstract class ApiException extends Exception {
 	public function asArray() {
 		$arrayToReturn =  array(
 			"status" => "error",
-			"error" => $this->message,
+			"error" => $this->getErrorMessage(),
 			"errorcode" => $this->code,
 			"header" => $this->header,
 			"cause" => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : NULL,
@@ -69,12 +69,9 @@ abstract class ApiException extends Exception {
 	 * @return array
 	 */
 	public function asResponseArray() {
-
-		// Obtener el texto final (ya localizado) de smarty.	
-		global $smarty;
 		$arrayToReturn =  array(
 			"status" => "error",
-			"error" => $smarty->getConfigVars($this->message), //; $this->message,
+			"error" => $this->getErrorMessage(),
 			"errorcode" => $this->code,
 			"header" => $this->header
 		);
@@ -82,6 +79,11 @@ abstract class ApiException extends Exception {
 		return array_merge($arrayToReturn, $this->customMessage);
 	}
 
+	protected function getErrorMessage() {
+		// Obtener el texto final (ya localizado) de smarty.
+		global $smarty;
+		return $smarty->getConfigVars($this->message);
+	}
 }
 
 /**
@@ -90,15 +92,23 @@ abstract class ApiException extends Exception {
  */
 class InvalidParameterException extends ApiException {
 
+	private $parameter;
+
 	/**
 	 * 
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	function __construct($message, Exception $previous = NULL) {
+	function __construct($message, $parameter, Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+		$this->parameter = $parameter;
 	}
 
+	protected function getErrorMessage() {
+		// Obtener el texto final (ya localizado) de smarty.
+		global $smarty;
+		return $smarty->getConfigVars($this->message) . ': ' . $this->parameter;
+	}
 }
 
 /**

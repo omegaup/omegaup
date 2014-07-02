@@ -553,7 +553,9 @@
 										$('#status').addClass("alert-success");
 										$('#status').slideDown();
 										return false;
-									}		
+									} else {
+										OmegaUp.ui.error(response.error);
+									}
 			});
 			
 			return false; // Prevent page refresh on submit

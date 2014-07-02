@@ -7,9 +7,10 @@
  */
 class Validators {
 
-	// @todo Localization
-	const IS_EMPTY = " cannot be empty.";
-	const IS_INVALID = " is invalid.";
+	const NOT_A_NUMBER = "parameterNotANumber";
+	const INVALID_ALIAS = "parameterInvalidAlias";
+	const IS_EMPTY = "parameterEmpty";
+	const IS_INVALID = "parameterInvalid";
 
 	/**
 	 * Check if email is valid
@@ -24,7 +25,7 @@ class Validators {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
 		if ($isPresent && !filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
-			throw new InvalidParameterException($parameterName . Validators::IS_INVALID);
+			throw new InvalidParameterException(Validators::IS_INVALID, $parameterName);
 		}
 
 		return true;
@@ -44,7 +45,7 @@ class Validators {
 
 		// Validate data is string        
 		if ($isPresent && (!is_string($parameter) || strlen($parameter) < 1)) {
-			throw new InvalidParameterException($parameterName . Validators::IS_EMPTY);
+			throw new InvalidParameterException(Validators::IS_EMPTY, $parameterName);
 		}
 
 		// Validation passed
@@ -99,8 +100,8 @@ class Validators {
 				strlen($parameter) > 0 &&
 				strlen($parameter) <= 32 &&
 				preg_match('/^[a-zA-Z0-9-_]+$/', $parameter) === 1)) {
-			throw new InvalidParameterException("{$parameterName} is not a valid alias");
-		}
+					throw new InvalidParameterException(Validators::INVALID_ALIAS, $parameterName);
+			}
 
 		return true;
 	}
@@ -117,7 +118,7 @@ class Validators {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 		
 		if ($isPresent && preg_match("/[^a-zA-Z0-9_.-]/", $parameter)) {
-			throw new InvalidParameterException("{$parameterName} can only contain letters, numbers and '.', '-' and '_'");			
+			throw new InvalidParameterException(Validators::INVALID_ALIAS, $parameterName);
 		}
 		
 		Validators::isStringOfMinLength($parameter, $parameterName, 2);
@@ -137,7 +138,7 @@ class Validators {
 		// Validate that we are working with a date
 		// @TODO This strtotime() allows nice strings like "next Thursday". 
 		if ($isPresent && strtotime($parameter) === -1) {
-			throw new InvalidParameterException($parameterName . Validators::IS_INVALID);
+			throw new InvalidParameterException(Validators::IS_INVALID, $parameterName);
 		}
 
 		return true;
@@ -179,7 +180,7 @@ class Validators {
 
 		// Validate that we are working with a number
 		if ($isPresent && !is_numeric($parameter)) {
-			throw new InvalidParameterException("{$parameterName} is not a number.");
+			throw new InvalidParameterException(Validators::NOT_A_NUMBER, $parameterName);
 		}
 
 		return true;
@@ -246,7 +247,7 @@ class Validators {
 		$isPresent = !is_null($parameter);
 
 		if ($required && !$isPresent) {
-			throw new InvalidParameterException($parameterName . Validators::IS_EMPTY);
+			throw new InvalidParameterException(Validators::IS_EMPTY, $parameterName);
 		}
 
 		return $isPresent;
