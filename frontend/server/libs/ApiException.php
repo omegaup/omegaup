@@ -7,7 +7,7 @@
  * 
  * 
  */
-class ApiException extends Exception {
+abstract class ApiException extends Exception {
 
 	protected $header;
 	private $customMessage;
