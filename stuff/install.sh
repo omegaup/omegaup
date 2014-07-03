@@ -103,6 +103,9 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	sudo chown $USER -R $OMEGAUP_ROOT
 	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
 
+	# Install githooks
+	stuff/install-githooks.sh
+
 	# Update the submodules
 	pushd $OMEGAUP_ROOT
 	git submodule update --init
