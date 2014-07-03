@@ -469,7 +469,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	/**
 	 * Basic test for uploadin problem without statement
 	 * 
-	 * @expectedException ProblemDeploymentFailedException
+	 * @expectedException InvalidParameterException
 	 */
 	public function testCreateProblemWithoutStatement() {
 
@@ -491,7 +491,7 @@ class CreateProblemTest extends OmegaupTestCase {
 	/**
 	 * Basic test for uploadin problem missing outputs
 	 * 
-	 * @expectedException ProblemDeploymentFailedException
+	 * @expectedException InvalidParameterException
 	 */
 	public function testCreateProblemMissingOutput() {
 

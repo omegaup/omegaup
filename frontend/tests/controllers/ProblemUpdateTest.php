@@ -219,7 +219,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		// Call API. Should fail
 		try {
 			ProblemController::apiUpdate($r);
-		} catch (ProblemDeploymentFailedException $e) {
+		} catch (InvalidParameterException $e) {
 			// Expected
 		}
 				
