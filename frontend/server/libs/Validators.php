@@ -7,11 +7,6 @@
  */
 class Validators {
 
-	const NOT_A_NUMBER = "parameterNotANumber";
-	const INVALID_ALIAS = "parameterInvalidAlias";
-	const IS_EMPTY = "parameterEmpty";
-	const IS_INVALID = "parameterInvalid";
-
 	/**
 	 * Check if email is valid
 	 * 
@@ -25,7 +20,7 @@ class Validators {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
 		if ($isPresent && !filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
-			throw new InvalidParameterException(Validators::IS_INVALID, $parameterName);
+			throw new InvalidParameterException("parameterInvalid", $parameterName);
 		}
 
 		return true;
@@ -45,7 +40,7 @@ class Validators {
 
 		// Validate data is string        
 		if ($isPresent && (!is_string($parameter) || strlen($parameter) < 1)) {
-			throw new InvalidParameterException(Validators::IS_EMPTY, $parameterName);
+			throw new InvalidParameterException("parameterEmpty", $parameterName);
 		}
 
 		// Validation passed
@@ -63,7 +58,8 @@ class Validators {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
 		if ($isPresent && !(is_string($parameter) && strlen($parameter) <= $maxLength)) {
-			throw new InvalidParameterException("{$parameterName} is too large (max length: {$maxLength})");
+			throw new InvalidParameterException("parameterStringTooLong", $parameterName,
+				array('max_length' => $maxLength));
 		}
 
 		return true;
@@ -80,7 +76,8 @@ class Validators {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
 		if ($isPresent && !(is_string($parameter) && strlen($parameter) >= $minLength)) {
-			throw new InvalidParameterException("{$parameterName} is too short (min length: {$minLength})");
+			throw new InvalidParameterException("parameterStringTooShort", $parameterName,
+				array('min_length' => $minLength));
 		}
 
 		return true;
@@ -100,7 +97,7 @@ class Validators {
 				strlen($parameter) > 0 &&
 				strlen($parameter) <= 32 &&
 				preg_match('/^[a-zA-Z0-9-_]+$/', $parameter) === 1)) {
-					throw new InvalidParameterException(Validators::INVALID_ALIAS, $parameterName);
+					throw new InvalidParameterException("parameterInvalidAlias", $parameterName);
 			}
 
 		return true;
@@ -118,7 +115,7 @@ class Validators {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 		
 		if ($isPresent && preg_match("/[^a-zA-Z0-9_.-]/", $parameter)) {
-			throw new InvalidParameterException(Validators::INVALID_ALIAS, $parameterName);
+			throw new InvalidParameterException("parameterInvalidAlias", $parameterName);
 		}
 		
 		Validators::isStringOfMinLength($parameter, $parameterName, 2);
@@ -138,7 +135,7 @@ class Validators {
 		// Validate that we are working with a date
 		// @TODO This strtotime() allows nice strings like "next Thursday". 
 		if ($isPresent && strtotime($parameter) === -1) {
-			throw new InvalidParameterException(Validators::IS_INVALID, $parameterName);
+			throw new InvalidParameterException("parameterInvalid", $parameterName);
 		}
 
 		return true;
@@ -160,8 +157,14 @@ class Validators {
 		self::isNumber($parameter, $parameterName, $required);
 
 		// Validate that is target number is inside the range
-		if ($isPresent && !($parameter >= $lowerBound && $parameter <= $upperBound)) {
-			throw new InvalidParameterException("{$parameterName} is outside the allowed range ({$lowerBound}, {$upperBound})");
+		if ($isPresent) {
+			if ($parameter < $lowerBound) {
+				throw new InvalidParameterException("parameterNumberTooSmall", $parameterName,
+					array('lower_bound' => $lowerBound));
+			} else if ($parameter > $upperBound) {
+				throw new InvalidParameterException("parameterNumberTooLarge", $parameterName,
+					array('upper_bound' => $upperBound));
+			}
 		}
 
 		return true;
@@ -180,7 +183,7 @@ class Validators {
 
 		// Validate that we are working with a number
 		if ($isPresent && !is_numeric($parameter)) {
-			throw new InvalidParameterException(Validators::NOT_A_NUMBER, $parameterName);
+			throw new InvalidParameterException("parameterNotANumber", $parameterName);
 		}
 
 		return true;
@@ -200,7 +203,8 @@ class Validators {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
 		if ($isPresent && !in_array($parameter, $enum)) {
-			throw new InvalidParameterException("{$parameterName} is not in expected set: " . implode(", ", $enum));
+			throw new InvalidParameterException("parameterNotInExpectedSet", $parameterName,
+				array('bad_elements' => $parameter, 'expected_set' => implode(", ", $enum)));
 		}
 
 		return true;
@@ -228,7 +232,8 @@ class Validators {
 				}
 			}
 			if (count($bad_elements) > 0) {
-				throw new InvalidParameterException(implode(",", $bad_elements) . " are not in expected set: " . implode(", ", $enum));
+				throw new InvalidParameterException("parameterNotInExpectedSet", $parameterName,
+					array('bad_elements' => implode(",", $bad_elements), 'expected_set' => implode(", ", $enum)));
 			}
 		}
 
@@ -247,7 +252,7 @@ class Validators {
 		$isPresent = !is_null($parameter);
 
 		if ($required && !$isPresent) {
-			throw new InvalidParameterException(Validators::IS_EMPTY, $parameterName);
+			throw new InvalidParameterException("parameterEmpty", $parameterName);
 		}
 
 		return $isPresent;

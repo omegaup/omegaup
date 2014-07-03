@@ -21,7 +21,7 @@ class SchoolController extends Controller {
 		} else if (!is_null($r["query"])) {
 			$param = "query";
 		} else {
-			throw new InvalidParameterException("query".Validators::IS_EMPTY);
+			throw new InvalidParameterException("parameterEmpty", "query");
 		}
 
 		try {
@@ -61,7 +61,7 @@ class SchoolController extends Controller {
 			}
 			
 			if (is_null($r["state"])) {
-				throw new InvalidParameterException("State not found");
+				throw new InvalidParameterException("parameterNotFound", "state");
 			}
 		}				
 		

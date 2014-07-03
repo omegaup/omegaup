@@ -96,9 +96,9 @@ class ProblemDeployer {
 	 * @throws InvalidFilesystemOperationException
 	 */
 	public function deploy() {
-		try {
-			$this->validateZip();
+		$this->validateZip();
 
+		try {
 			// Unzip the user's zip
 			ZipHandler::DeflateZip($this->zipPath, $this->tmpDir, $this->filesToUnzip);
 
@@ -203,14 +203,15 @@ class ProblemDeployer {
 		$statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $zipFilesArray);
 
 		if (count($statements) < 1) {
-			throw new InvalidParameterException("No statements found");
+			throw new InvalidParameterException("problemDeployerNoStatements");
 		}
 
 		// Add statements to the files to be unzipped
 		foreach ($statements as $file) {
 			// Revisar que los statements no esten vacíos
 			if (strlen($zip->getFromName($file, 1)) < 1) {
-				throw new InvalidParameterException("Statement $file is empty.");
+				throw new InvalidParameterException("problemDeployerEmptyStatement", NULL,
+					array('file' => $file));
 			}
 
 			$this->log->info("Adding statements to the files to be unzipped: " . $file);
@@ -261,12 +262,13 @@ class ProblemDeployer {
 				$this->filesToUnzip[] = $path;
 				$this->filesToUnzip[] = $zipFilesArray[$idx];
 			} else {
-				throw new InvalidParameterException(".out for case \"$path\" not found.");
+				throw new InvalidParameterException("problemDeployerOutMissing", NULL,
+					array('file' => $path));
 			}
 		}
 
 		if ($cases === 0) {
-			throw new InvalidParameterException("No cases found.");
+			throw new InvalidParameterException("problemDeployerNoCases");
 		}
 
 		$this->log->info($cases . " cases found.");
@@ -294,7 +296,8 @@ class ProblemDeployer {
 			// Check .in file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.in';
 			if ($zip->getFromName($path) === FALSE) {
-				throw new InvalidParameterException("Not able to find " . $testplan_array[1][$i] . " input in testplan.");
+				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
+					array('file' => $testplan_array[1][$i]));
 			}
 
 			$this->filesToUnzip[] = $path;
@@ -303,7 +306,8 @@ class ProblemDeployer {
 			// Check .out file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.out';
 			if ($zip->getFromName($path) === FALSE) {
-				throw new InvalidParameterException("Not able to find " . $testplan_array[1][$i] . " output in testplan.");
+				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
+					array('file' => $testplan_array[1][$i]));
 			}
 
 			$this->filesToUnzip[] = $path;
@@ -324,13 +328,13 @@ class ProblemDeployer {
 
 		if (!array_key_exists("problem_contents", $_FILES)) {
 			$this->log->error("\$_FILES global does not contain problem_contents.");
-			throw new InvalidParameterException("problem_contents is invalid.");
+			throw new InvalidParameterException("parameterEmpty", "problem_contents");
 		}
 
 		if (isset($_FILES['problem_contents']) &&
 				!FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
 			$this->log->error("GetFileUploader()->IsUploadedFile() check failed for \$_FILES['problem_contents']['tmp_name'].");
-			throw new InvalidParameterException("problem_contents is invalid.");
+			throw new InvalidParameterException("parameterEmpty", "problem_contents");
 		}
 
 		$this->filesToUnzip = array();
@@ -345,7 +349,8 @@ class ProblemDeployer {
 
 		$size = 0;
 		if ($resource !== TRUE) {
-			throw new InvalidParameterException("Unable to open zip." . ZipHandler::zipFileErrMsg($resource));
+		 	$this->log->error("Unable to open zip file: " . ZipHandler::ErrorMessage($resource));
+			throw new InvalidParameterException("problemDeployerCorruptZip");
 		}
 
 		// Get list of files
@@ -375,9 +380,11 @@ class ProblemDeployer {
 		}
 
 		if ($this->isInteractive && $size > ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE) {
-			throw new InvalidParameterException("Extracted zip size ($size) over max allowed (" . ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE . ") for interactive problems. Rejecting.");
+			throw new InvalidParameterException("problemDeployerExceededZipSizeLimit", NULL,
+				array("size" => $size, "max_size" => ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE));
 		} else if ($size > ProblemDeployer::MAX_ZIP_FILESIZE) {
-			throw new InvalidParameterException("Extracted zip size ($size) over max allowed (" . ProblemDeployer::MAX_ZIP_FILE_SIZE . "). Rejecting.");
+			throw new InvalidParameterException("problemDeployerExceededZipSizeLimit", NULL,
+				array("size" => $size, "max_size" => ProblemDeployer::MAX_ZIP_FILESIZE));
 		}
 
 		try {

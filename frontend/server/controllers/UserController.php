@@ -358,7 +358,7 @@ class UserController extends Controller {
 								$r["old_password"], $user->getPassword());
 
 				if ($old_password_valid === false) {
-					throw new InvalidParameterException("old_password" . Validators::IS_INVALID);
+					throw new InvalidParameterException("parameterInvalid", "old_password");
 				}
 			}
 
@@ -592,7 +592,8 @@ class UserController extends Controller {
 				"OMIAGS" => 35
 			);			
 		} else {
-			throw new InvalidParameterException("Invalid contest_type");
+			throw new InvalidParameterException("parameterNotInExpectedSet", "contest_type",
+				array("bad_elements" => $r["contest_type"], "expected_set" => "OMI, OMIAGS, ORIG"));
 		}
 		
 		
@@ -912,7 +913,7 @@ class UserController extends Controller {
 				// Generate the coder
 				$retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
 				if ($retArray == null) {
-					throw new InvalidParameterException("No coders.");
+					throw new InvalidParameterException("parameterInvalid", "date");
 				}
 
 				$user = $retArray["user"];
@@ -1079,7 +1080,7 @@ class UserController extends Controller {
 		} else if (!is_null($r["query"])) {
 			$param = "query";
 		} else {
-			throw new InvalidParameterException("query".Validators::IS_EMPTY);
+			throw new InvalidParameterException("parameterEmpty", "query");
 		}
 		
 		try {
@@ -1143,7 +1144,7 @@ class UserController extends Controller {
 			$testu = UsersDAO::FindByUsername($r["username"]);
 
 			if (!is_null($testu)) {
-				throw new InvalidParameterException("Este nombre de usuario ya esta tomado.");
+				throw new InvalidParameterException("parameterUsernameInUse", "username");
 			}
 		}
 
@@ -1180,7 +1181,7 @@ class UserController extends Controller {
 			}
 			
 			if (is_null($r["country"])) {
-				throw new InvalidParameterException("Country not found");
+				throw new InvalidParameterException("parameterInvalid", "country");
 			}
 		}
 		
@@ -1198,7 +1199,7 @@ class UserController extends Controller {
 			}
 			
 			if (is_null($r["state"])) {
-				throw new InvalidParameterException("State not found");
+				throw new InvalidParameterException("parameterInvalid", "state");
 			}
 		}
 		
@@ -1211,7 +1212,7 @@ class UserController extends Controller {
 					$response = SchoolController::apiCreate($schoolR);
 					$r["school_id"] = $response["school_id"];
 				} catch (Exception $e) {
-					throw new InvalidParameterException("School creation failed.", $e);
+					throw new InvalidDatabaseOperationException($e);
 				}
 			} else if ($r["school_id"] == "") {
 				$r["school_id"] = null;
@@ -1223,7 +1224,7 @@ class UserController extends Controller {
 				}
 
 				if (is_null($r["school"])) {
-					throw new InvalidParameterException("School not found");
+					throw new InvalidParameterException("parameterInvalid", "school");
 				}
 			}
 		}

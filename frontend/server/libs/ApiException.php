@@ -80,9 +80,9 @@ abstract class ApiException extends Exception {
 	}
 
 	protected function getErrorMessage() {
-		// Obtener el texto final (ya localizado) de smarty.
+		// obtener el texto final (ya localizado) de smarty.
 		global $smarty;
-		return $smarty->getConfigVars($this->message);
+		return $smarty->getconfigvars($this->message);
 	}
 }
 
@@ -93,21 +93,29 @@ abstract class ApiException extends Exception {
 class InvalidParameterException extends ApiException {
 
 	private $parameter;
+	private $additional_parameters;
 
 	/**
 	 * 
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	function __construct($message, $parameter, Exception $previous = NULL) {
-		parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+	function __construct($message, $parameter = NULL, $additional_parameters = array()) {
+		parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400);
 		$this->parameter = $parameter;
+		$this->additional_parameters = $additional_parameters;
 	}
 
 	protected function getErrorMessage() {
 		// Obtener el texto final (ya localizado) de smarty.
 		global $smarty;
-		return $smarty->getConfigVars($this->message) . ': ' . $this->parameter;
+		$message = sprintf($smarty->getConfigVars($this->message),
+		                   $this->additional_parameters);
+		if ($this->parameter == NULL) {
+			return $message;
+		} else {
+			return "$message: {$this->parameter}";
+		}
 	}
 }
 
@@ -291,8 +299,14 @@ class ProblemDeploymentFailedException extends ApiException {
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	function __construct(Exception $previous = NULL) {
-		parent::__construct("unableToDeployProblem", 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);		
+	function __construct(ApiException $previous = NULL) {
+		parent::__construct("problemDeployerFailed", 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
 	}
 
+	protected function getErrorMessage() {
+		// obtener el texto final (ya localizado) de smarty.
+		global $smarty;
+		return $smarty->getconfigvars($this->message) . ': ' .
+			$this->previous->getErrorMessage();
+	}
 }

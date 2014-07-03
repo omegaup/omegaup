@@ -67,11 +67,15 @@ class RunController extends Controller {
 			Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
 
+			if ($r["contest"] == NULL) {
+				throw new InvalidParameterException("parameterNotFound", "contest_alias");
+			}
+
 			// Validate that the combination contest_id problem_id is valid
 			if (!ContestProblemsDAO::getByPK(
 							$r["contest"]->getContestId(), $r["problem"]->getProblemId()
 			)) {
-				throw new InvalidParameterException("problem_alias and contest_alias combination is invalid.");
+				throw new InvalidParameterException("parameterNotFound", "problem_alias");
 			}
 
 			// Contest admins can skip following checks

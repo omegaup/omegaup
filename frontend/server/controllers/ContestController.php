@@ -485,7 +485,7 @@ class ContestController extends Controller {
 
 		// Validate start & finish time
 		if ($start_time > $finish_time) {
-			throw new InvalidParameterException("start_time cannot be after finish_time");
+			throw new InvalidParameterException("contestNewInvalidStartTime");
 		}
 
 		// Calculate the actual contest length
@@ -514,13 +514,13 @@ class ContestController extends Controller {
 			// Validate that the request is well-formed			
 			$r["private_users_list"] = json_decode($r["private_users"]);
 			if (is_null($r["private_users_list"])) {
-				throw new InvalidParameterException("private_users" . Validators::IS_INVALID);
+				throw new InvalidParameterException("parameterInvalid", "private_users");
 			}
 
 			// Validate that all users exists in the DB
 			foreach ($r["private_users_list"] as $userkey) {
 				if (is_null(UsersDAO::getByPK($userkey))) {
-					throw new InvalidParameterException("private_users contains a user that doesn't exists");
+					throw new InvalidParameterException("parameterNotFound", "private_users");
 				}
 			}
 
@@ -568,7 +568,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null($contest)) {
-			throw new InvalidParameterException('Contest not found');
+			throw new InvalidParameterException("parameterNotFound", "contest_alias");
 		}
 
 		// Only contest admin is allowed to view details through this API
@@ -646,7 +646,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null($contest)) {
-			throw new InvalidParameterException("Contest not found");
+			throw new InvalidParameterException("parameterNotFound", "contest_alias");
 		}
 
 		// Only contest admin is allowed to create problems in contest
@@ -664,7 +664,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null($problem)) {
-			throw new InvalidParameterException("Problem not found");
+			throw new InvalidParameterException("parameterNotFound", "problem_alias");
 		}
 
 		if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r["current_user_id"], $problem)) {
@@ -731,7 +731,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null($contest)) {
-			throw new InvalidParameterException("Contest not found");
+			throw new InvalidParameterException("parameterNotFound", "problem_alias");
 		}
 
 		// Only contest admin is allowed to create problems in contest
@@ -749,7 +749,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null($problem)) {
-			throw new InvalidParameterException("Problem not found");
+			throw new InvalidParameterException("parameterNotFound", "problem_alias");
 		}
 
 		if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r["current_user_id"], $problem)) {
@@ -786,7 +786,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null($r["user"])) {
-			throw new InvalidParameterException("User provided does not exists");
+			throw new InvalidParameterException("parameterNotFound", "user");
 		}
 
 		// Only director is allowed to create problems in contest
