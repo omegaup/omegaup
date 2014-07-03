@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 TEMPLATES_PATH = 'frontend/templates'
+JS_TEMPLATES_PATH = 'frontend/www/js'
 PSEUDOLOC = 'hacker-boy'
 LINE_RE = re.compile(r'\s+=\s+')
 
@@ -27,6 +28,7 @@ args = parser.parse_args()
 
 root_dir = subprocess.check_output(['/usr/bin/git', 'rev-parse', '--show-toplevel']).strip()
 templates_dir = os.path.join(root_dir, TEMPLATES_PATH)
+js_templates_dir = os.path.join(root_dir, JS_TEMPLATES_PATH)
 pseudoloc_file = os.path.join(templates_dir, PSEUDOLOC + '.lang')
 strings = {}
 languages = set()
@@ -86,8 +88,15 @@ for lang in languages:
     with codecs.open(lang_path, 'w', 'utf-8') as lang_file:
         for key in sorted(strings.keys()):
             lang_file.write('%s = %s\n' % (key, strings[key][lang]))
+    js_lang_path = os.path.join(js_templates_dir, 'lang.%s.js' % lang)
+    with codecs.open(js_lang_path, 'w', 'utf-8') as lang_file:
+        lang_file.write('OmegaUp.T = {\n')
+        for key in sorted(strings.keys()):
+            lang_file.write('\t%s: %s,\n' % (key, strings[key][lang]))
+        lang_file.write('};\n')
 
-pseudoloc_path = os.path.join(templates_dir, PSEUDOLOC + '.lang')
+pseudoloc_path = os.path.join(templates_dir, '%s.lang' % PSEUDOLOC)
+js_pseudoloc_path = os.path.join(js_templates_dir, 'lang.%s.js' % PSEUDOLOC)
 
 def pseudoloc(s):
     healthy = u'elsot'
@@ -98,3 +107,10 @@ def pseudoloc(s):
 with codecs.open(pseudoloc_path, 'w', 'utf-8') as lang_file:
     for key in sorted(strings.keys()):
         lang_file.write('%s = %s\n' % (key, pseudoloc(strings[key]['en'])))
+    js_lang_path = os.path.join(js_templates_dir, 'lang.%s.js' % lang)
+
+with codecs.open(js_pseudoloc_path, 'w', 'utf-8') as lang_file:
+    lang_file.write('OmegaUp.T = {\n')
+    for key in sorted(strings.keys()):
+        lang_file.write('\t%s: %s,\n' % (key, pseudoloc(strings[key]['en'])))
+    lang_file.write('};\n')
