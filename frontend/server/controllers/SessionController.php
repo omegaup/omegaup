@@ -396,7 +396,7 @@ class SessionController extends Controller {
 		$c_Users = new UserController();
 		$vo_User = null;
 
-		if (isset($r["returnAuthToken"])) {
+		if (NULL != $r["returnAuthToken"]) {
 			$returnAuthToken = $r["returnAuthToken"];
 		} else {
 			$returnAuthToken = false;

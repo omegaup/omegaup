@@ -148,19 +148,19 @@ class UserController extends Controller {
 	public function TestPassword(Request $r) {
 		$user_id = $email = $username = $password = null;
 
-		if (isset($r["user_id"])) {
+		if (NULL != $r["user_id"]) {
 			$user_id = $r["user_id"];
 		}
 
-		if (isset($r["email"])) {
+		if (NULL != $r["email"]) {
 			$email = $r["email"];
 		}
 
-		if (isset($r["username"])) {
+		if (NULL != $r["username"]) {
 			$username = $r["username"];
 		}
 
-		if (isset($r["password"])) {
+		if (NULL != $r["password"]) {
 			$password = $r["password"];
 		}
 
@@ -1296,10 +1296,10 @@ class UserController extends Controller {
 		}
 
 		// Defaults for offset and rowcount
-		if (!isset($r["offset"])) {
+		if (NULL != $r["offset"]) {
 			$r["offset"] = 0;
 		}
-		if (!isset($r["rowcount"])) {
+		if (NULL != $r["rowcount"]) {
 			$r["rowcount"] = 100;
 		}
 				
