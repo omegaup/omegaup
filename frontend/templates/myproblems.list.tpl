@@ -7,7 +7,7 @@
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="bottom-margin">
-			<a href="/problemcreate.php" class="btn btn-primary" id="problem-create">{#myproblemsListCreateProblem#}</a>			
+			<a href="/problem/new/" class="btn btn-primary" id="problem-create">{#myproblemsListCreateProblem#}</a>
 		</div>
 		<div class="bottom-margin">
 			{#forSelectedItems#}: 
@@ -65,8 +65,8 @@
 						+ "<td><input type='checkbox' id='" + problems.results[i].alias + "'/></td>" 
 						+ "<td><b><a href='/arena/problem/" + problems.results[i].alias  + "/'>" + omegaup.escape(problems.results[i].title) + "</a></b></td>"										
 						+ '<td>'+ ((problems.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
-						+ '<td><a class="glyphicon glyphicon-edit" href="/problemedit.php?problem=' + problems.results[i].alias  + '"></a></td>'
-						+ '<td><a class="glyphicon glyphicon-stats" href="/problemstats.php?problem=' + problems.results[i].alias  + '"></a></td>'
+						+ '<td><a class="glyphicon glyphicon-edit" href="/problem/edit/' + problems.results[i].alias  + '/"></a></td>'
+						+ '<td><a class="glyphicon glyphicon-stats" href="/problem/stats/' + problems.results[i].alias  + '/"></a></td>'
 						+ "</tr>";
 				}
 				$("#problem_list").removeClass("wait_for_ajax")

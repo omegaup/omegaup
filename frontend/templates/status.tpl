@@ -19,7 +19,7 @@
 			Tienes <b>{$CURRENT_USER_PRIVATE_PROBLEMS_COUNT} problema{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if} 
 			privado{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if}</b> registrado{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if} 
 			en omegaUp.						
-			Por favor revisa <a href="/myproblems.php">aquí</a> si alguno de tus problemas ya puede ser <b>público</b> para ayudar a la comunidad =).
+			Por favor revisa <a href="/problems/mine/">aquí</a> si alguno de tus problemas ya puede ser <b>público</b> para ayudar a la comunidad =).
 		</span>
 	</div>
 {/if}

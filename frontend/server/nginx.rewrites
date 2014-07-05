@@ -3,6 +3,11 @@ location /api/ {
 }
 
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /contest.php?alias=$1 last;
+rewrite ^/problem/new/?$ /problemnew.php last;
+rewrite ^/problem/edit/([a-zA-Z0-9_+-]+)/?$ /problemedit.php?problem=$1 last;
+rewrite ^/problem/stats/([a-zA-Z0-9_+-]+)/?$ /problemstats.php?problem=$1 last;
+rewrite ^/problem/list/?$ /problemlist.php last;
+rewrite ^/problem/mine/?$ /problemmine.php last;
 rewrite ^/arena/admin/?$ /arena/adminpractice.php last;
 rewrite ^/arena/?$ /arena/index.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/?$ /arena/contest.php last;
