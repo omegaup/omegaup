@@ -88,15 +88,17 @@
 					Lenguaje
 					<select name="language">
 						<option value=""></option>
-						<option value="cpp">C++</option>
 						<option value="cpp11">C++11</option>
+						<option value="cpp">C++</option>
 						<option value="c">C</option>
+						<option value="hs">Haskell</option>
 						<option value="java">Java</option>
 						<option value="p">Pascal</option>
-						<option value="cat">{#wordsJustOutput#}</option>
+						<option value="py">Python</option>
+						<option value="rb">Ruby</option>
 						<option value="kp">Karel (Pascal)</option>
 						<option value="kj">Karel (Java)</option>
-						<option value="hs">Haskell</option>
+						<option value="cat">{#wordsJustOutput#}</option>
 					</select>
 				</div>
 				<textarea name="code"></textarea><br/>

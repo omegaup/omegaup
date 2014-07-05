@@ -81,7 +81,7 @@
 				<div class="form-group col-md-6">
 					<label for="languages">{#problemEditFormLanguages#}</label>
 					<select name="languages[]" id="languages" class="form-control">
-						<option value="c,cpp,cpp11,cs,hs,java,p,pl,py,rb">C, C++, C++11, C#, Haskell, Java, Pascal, Perl, Python, Ruby</option>
+						<option value="c,cpp,cpp11,cs,hs,java,p,py,rb">C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby</option>
 						<option value="kp,kj">Karel</option>
 						<option value="cat">{#wordsJustOutput#}</option>
 					</select>
