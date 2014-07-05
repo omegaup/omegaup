@@ -168,18 +168,18 @@ class UsersDAO extends UsersDAOBase
 
 							) AS UsersProblemsSolved
 					) AS Rank ";
-		
-		($filterByUser) ? 
-			$sql .= "WHERE user_id = ? " : 
-			$sql .= "ORDER BY Rank ASC, user_id LIMIT $offset, $limit";		
-		
-		$rs = null;
+
+		$params = array();
 		if ($filterByUser) {
-			$params = array($user->user_id);			
-			$rs = $conn->Execute($sql, $params);
+			$sql .= 'WHERE user_id = ? ';
+			$params[] = $user->user_id;
 		} else {
-			$rs = $conn->Execute($sql);
+			$sql .= 'ORDER BY Rank ASC, user_id LIMIT ?, ?';
+			$params[] = $offset;
+			$params[] = $limit;
 		}
+
+		$rs = $conn->Execute($sql, $params);
 		
 		$ar = array();
 		foreach ($rs as $foo) {			
