@@ -1296,11 +1296,11 @@ class UserController extends Controller {
 		}
 
 		// Defaults for offset and rowcount
-		if (NULL != $r["offset"]) {
-			$r["offset"] = 0;
+		if (NULL == $r['offset']) {
+			$r['offset'] = 0;
 		}
-		if (NULL != $r["rowcount"]) {
-			$r["rowcount"] = 100;
+		if (NULL == $r['rowcount']) {
+			$r['rowcount'] = 100;
 		}
 				
 		return self::getRankByProblemsSolved($r);
@@ -1322,11 +1322,7 @@ class UserController extends Controller {
 				$response = array();
 				$response["rank"] = array();
 				try {
-					if (isset($r['rowcount']) && isset($r['offset'])) {
-						$db_results = UsersDAO::GetRankByProblemsSolved2($r['rowcount'], $r['offset']);
-					} else {
-						$db_results = UsersDAO::GetRankByProblemsSolved2();
-					}
+					$db_results = UsersDAO::GetRankByProblemsSolved2($r['rowcount'], $r['offset']);
 				} catch (Exception $e) {
 					throw new InvalidDatabaseOperationException($e);
 				}

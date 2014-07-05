@@ -175,8 +175,8 @@ class UsersDAO extends UsersDAOBase
 			$params[] = $user->user_id;
 		} else {
 			$sql .= 'ORDER BY Rank ASC, user_id LIMIT ?, ?';
-			$params[] = $offset;
-			$params[] = $limit;
+			$params[] = (int)$offset;
+			$params[] = (int)$limit;
 		}
 
 		$rs = $conn->Execute($sql, $params);
