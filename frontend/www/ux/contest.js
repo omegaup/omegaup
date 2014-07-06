@@ -14,8 +14,44 @@ $(document).ready(function() {
 		}
 	});
 
+	function onlyProblemUpdateRuns(runs, score_column, multiplier) {
+		$('#problem .run-list .added').remove();
+		for (var idx in runs) {
+			if (!runs.hasOwnProperty(idx)) continue;
+			var run = runs[idx];
+
+			var r = $('#problem .run-list .template')
+				.clone()
+				.removeClass('template')
+				.addClass('added')
+				.addClass('run_' + run.guid);
+			(function(guid) {
+				$('.code', r).append($('<input type="button" value="ver" />').click(function() {
+					omegaup.runSource(guid, function(data) {
+						if (data.compile_error) {
+							$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
+						} else {
+							$('#submit textarea[name="code"]').val(data.source);
+						}
+						$('#submit input').hide();
+						$('#submit #lang-select').hide();
+						$('#submit').show();
+						$('#clarification').hide();
+						$('#overlay').show();
+						window.location.hash += '/show-run';
+					});
+					return false;
+				}));
+			})(run.guid);
+			arena.displayRun(run, r);
+			$('#problem .runs > tbody:last').append(r);
+		}
+	}
+
 	function onlyProblemLoaded(problem) {
 		arena.currentProblem = problem;
+
+		MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 
 		for (var i = 0; i < problem.solvers.length; i++) {
 			var solver = problem.solvers[i];
@@ -26,6 +62,21 @@ $(document).ready(function() {
 			$('.memory', prob).html((parseFloat(solver.memory) / (1024 * 1024)).toFixed(2));
 			$('.time', prob).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
 			$('.solver-list').append(prob);
+		}
+
+		var language_array = problem.languages.split(',');
+		$('#lang-select option').each(function(index, item) {
+			if (language_array.indexOf($(item).val()) >= 0) {
+				$(item).show();
+			} else {
+				$(item).hide();
+			}
+		});
+
+		if (problem.user.logged_in) {
+			omegaup.getProblemRuns(problem.alias, function (data) {
+				onlyProblemUpdateRuns(data.runs, 'score', 100);
+			});
 		}
 		
 		// Trigger the event (useful on page load).
@@ -262,67 +313,7 @@ $(document).ready(function() {
 
 	$(window).hashchange(function(e) {
 		if (arena.onlyProblem) {
-			function updateOnlyProblem(problem) {
-				$('#summary').hide();
-				$('#problem').show();
-
-				$('#problem .run-list .added').remove();
-
-				var language_array = problem.languages.split(',');
-				$('#lang-select option').each(function(index, item) {
-					if (language_array.indexOf($(item).val()) >= 0) {
-						$(item).show();
-					} else {
-						$(item).hide();
-					}
-				});
-
-				function updateOnlyProblemRuns(runs, score_column, multiplier) {
-					for (var idx in runs) {
-						if (!runs.hasOwnProperty(idx)) continue;
-						var run = runs[idx];
-
-						var r = $('#problem .run-list .template')
-							.clone()
-							.removeClass('template')
-							.addClass('added')
-							.addClass('run_' + run.guid);
-						(function(guid) {
-							$('.code', r).append($('<input type="button" value="ver" />').click(function() {
-								omegaup.runSource(guid, function(data) {
-									if (data.compile_error){							
-										$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
-									} else {
-										$('#submit textarea[name="code"]').val(data.source);
-									}
-									$('#submit input').hide();
-									$('#submit #lang-select').hide();
-									$('#submit').show();
-									$('#clarification').hide();
-									$('#overlay').show();
-									window.location.hash += '/show-run';
-								});
-								return false;
-							}));
-						})(run.guid);
-						arena.displayRun(run, r);
-						$('#problem .runs > tbody:last').append(r);
-					}
-				}
-
-				if (omegaup.loggedIn) {
-					omegaup.getProblemRuns(problem.alias, function (data) {
-						updateOnlyProblemRuns(data.runs, 'score', 100);
-					});
-				}
-
-				MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
-			}
-
-			updateOnlyProblem(arena.currentProblem);
-			var isNewRunOnlyProblem = window.location.hash.indexOf('#new-run') !== -1;
-			
-			if (isNewRunOnlyProblem) {
+			if (window.location.hash.indexOf('#new-run') !== -1) {
 				if (!omegaup.loggedIn && omegaup.login_url) {
 					window.location = omegaup.login_url + "?redirect=" + escape(window.location);
 					return;

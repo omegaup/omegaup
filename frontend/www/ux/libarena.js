@@ -443,14 +443,14 @@ Arena.prototype.displayRun = function(run, r) {
 		$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');
 	}
 
-	$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
+	$('.runtime', r).html((parseFloat(run.runtime || "0") / 1000).toFixed(2));
 	$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 	if (run.contest_score != null) {
-		$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
+		$('.points', r).html(parseFloat(run.contest_score || "0").toFixed(2));
 	} else {
 		$('.points', r).html('-');
 	}
-	$('.percentage', r).html((parseFloat(run.score) * 100).toFixed(2) + '%');
+	$('.percentage', r).html((parseFloat(run.score || "0") * 100).toFixed(2) + '%');
 	$('.status', r).html(
 		run.status == 'ready' ?
 		(
@@ -469,7 +469,7 @@ Arena.prototype.displayRun = function(run, r) {
 	} else {
 		$('.status', r).css('background-color', '');
 	}
-	$('.penalty', r).html(run.submit_delay);	
+	$('.penalty', r).html(run.submit_delay);
 	if (run.time) {
 		$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 	}
