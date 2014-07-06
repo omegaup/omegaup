@@ -15,15 +15,6 @@ $(document).ready(function() {
 	});
 
 	function onlyProblemLoaded(problem) {
-		if (problem.status == 'error') {
-			if (!omegaup.loggedIn && omegaup.login_url) {
-				window.location = omegaup.login_url + "?redirect=" + escape(window.location);
-			} else {
-				$('#loading').html('404');
-			}
-			return;
-		} 
-		
 		arena.currentProblem = problem;
 
 		for (var i = 0; i < problem.solvers.length; i++) {
@@ -39,9 +30,6 @@ $(document).ready(function() {
 		
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
-
-		$('#loading').fadeOut('slow');
-		$('#root').fadeIn('slow');
 	}
 
 	function contestLoaded(contest) {
@@ -116,8 +104,7 @@ $(document).ready(function() {
 	}
 	
 	if (arena.onlyProblem) {
-		$('body').attr('id', 'only-problem');
-		omegaup.getProblem(null, onlyProblemAlias, onlyProblemLoaded, 'html', true)
+		onlyProblemLoaded(JSON.parse(document.getElementById('problem-json').firstChild.nodeValue));
 	} else {
 		arena.connectSocket();
 		omegaup.getContest(contestAlias, contestLoaded);
@@ -278,14 +265,6 @@ $(document).ready(function() {
 			function updateOnlyProblem(problem) {
 				$('#summary').hide();
 				$('#problem').show();
-				$('#problem > .title').html(omegaup.escape(problem.title));
-				$('#problem .data .points').html(problem.points);
-				$('#problem .validator').html(problem.validator);
-				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
-				$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
-				$('#problem .statement').html(problem.problem_statement);
-				$('#problem .source span').html(omegaup.escape(problem.source));
-				$('#problem .runs tfoot td a').attr('href', '#new-run');
 
 				$('#problem .run-list .added').remove();
 

@@ -1,28 +1,25 @@
-{include file='arena.head.tpl' jsfile='/ux/contest.js'}
-			<div id="title">
-				<h1 class="contest-title"></h1>
-				<div class="clock" style="font-size: 5em; line-height: .4em; margin-bottom: .2em;">&infin;</div>
-			</div>
+{include file='arena.head.tpl' jsfile='/ux/contest.js' bodyid='only-problem'}
 			<div id="problems" class="tab navleft">								
 				<div id="problem" class="main">
-					<h1 class="title"></h1>
+					<script type="text/json" id="problem-json">{$problem}</script>
+					<h1 class="title">{$title|escape}</h1>
 					<table class="data">
 						<tr>
 							<td>{#wordsPoints#}</td>
-							<td class="points"></div>
+							<td class="points">{$points|escape}</div>
 							<td>{#wordsValidator#}</td>
-							<td class="validator"></div>
+							<td class="validator">{$validator|escape}</div>
 						</tr>
 						<tr>
 							<td>{#wordsTimeLimit#}</td>
-							<td class="time_limit"></td>
+							<td class="time_limit">{$time_limit|escape}</td>
 							<td>{#wordsMemoryLimit#}</td>
-							<td class="memory_limit"></td>
+							<td class="memory_limit">{$memory_limit|escape}</td>
 						</tr>
 					</table>
-					<div class="statement"></div>
+					<div class="statement">{$problem_statement}</div>
 					<hr />
-					<div class="source">Fuente: <span></span></div>
+					<div class="source">Fuente: <span>{$source|escape}</span></div>
 					<table class="runs">
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>
@@ -40,7 +37,7 @@
 						</thead>
 						<tfoot>
 							<tr>
-								<td colspan="9"><a href="#problems/run">Nuevo envío</a></td>
+								<td colspan="9"><a href="#new-run">Nuevo envío</a></td>
 							</tr>
 						</tfoot>
 						<tbody class="run-list">

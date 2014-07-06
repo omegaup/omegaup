@@ -39,6 +39,11 @@ legend {
 	display: none;
 }
 
+#only-problem #root,
+#only-problem #problem {
+	display: block;
+}
+
 #problems.active { display: block; }
 
 #title img {
