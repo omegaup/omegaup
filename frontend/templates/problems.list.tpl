@@ -1,6 +1,6 @@
 <div class="wait_for_ajax panel panel-default" id="problems_list" >
 	<div class="panel-heading">
-		<h3 class="panel-title">{#wordProblems#}</h3>
+		<h3 class="panel-title">{#wordsProblems#}</h3>
 	</div>
 	<table class="table">
 		<thead>
