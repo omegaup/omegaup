@@ -2,7 +2,11 @@
 			<div id="problems" class="tab navleft">								
 				<div id="problem" class="main">
 					<script type="text/json" id="problem-json">{$problem}</script>
-					<h1 class="title">{$title|escape}</h1>
+					<h1 class="title">{$title|escape}
+						{if $problem_admin}
+							(<a href="/problem/edit/{$problem_alias}/">{#wordsEdit#}</a>)
+						{/if}
+					</h1>
 					<table class="data">
 						<tr>
 							<td>{#wordsPoints#}</td>
