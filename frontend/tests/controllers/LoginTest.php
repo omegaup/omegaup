@@ -168,6 +168,7 @@ class LoginTest extends OmegaupTestCase {
 	/**
 	 * Test user login with valid credentials, username and password
 	 * 
+	 * @expectedException InvalidCredentialsException
 	 */
 	public function testNativeLoginWithOldPassword() {
 
@@ -189,15 +190,7 @@ class LoginTest extends OmegaupTestCase {
 				));
 
 		// Call the API
-		$response = UserController::apiLogin($r);
-
-		$this->assertEquals("ok", $response["status"]);
-		$this->assertLogin($user, $response["auth_token"]);
-
-		$response = UserController::apiLogin($r);
-
-		$this->assertEquals("ok", $response["status"]);
-		$this->assertLogin($user, $response["auth_token"]);
+		$response = UserController::apiLogin($r);	
 	}
 
 	public function testDeleteTokenExpired() {
@@ -384,6 +377,24 @@ class LoginTest extends OmegaupTestCase {
 		$response = SessionController::apiCurrentSession();
 		
 		$this->assertEquals(0, $response["private_problems_count"]);
+	}
+
+		
+	/**
+	 * Logins with empty passwords in DB are disabled
+	 * 
+	 * @expectedException LoginDisabledException
+	 */
+	public function testLoginDisabled() {
+		
+		// User to be verified
+		$user = UserFactory::createUser();
+		
+		// Force empty password
+		$user->setPassword("");
+		UsersDAO::save($user);
+		
+		$this->login($user);				
 	}
 
 }
