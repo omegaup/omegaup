@@ -1,5 +1,6 @@
 $(document).ready(function() {
 	var arena = new Arena();
+	var admin = null;
 
 	if (arena.onlyProblem) {
 		var onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(window.location.pathname)[1];		
@@ -15,16 +16,9 @@ $(document).ready(function() {
 	});
 
 	function onlyProblemLoaded(problem) {
-		if (problem.status == 'error') {
-			if (!omegaup.loggedIn && omegaup.login_url) {
-				window.location = omegaup.login_url + "?redirect=" + escape(window.location);
-			} else {
-				$('#loading').html('404');
-			}
-			return;
-		} 
-		
 		arena.currentProblem = problem;
+
+		MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 
 		for (var i = 0; i < problem.solvers.length; i++) {
 			var solver = problem.solvers[i];
@@ -36,12 +30,109 @@ $(document).ready(function() {
 			$('.time', prob).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
 			$('.solver-list').append(prob);
 		}
+
+		var language_array = problem.languages.split(',');
+		$('#lang-select option').each(function(index, item) {
+			if (language_array.indexOf($(item).val()) >= 0) {
+				$(item).show();
+			} else {
+				$(item).hide();
+			}
+		});
+
+		if (problem.user.logged_in) {
+			omegaup.getProblemRuns(problem.alias, {}, function (data) {
+				onlyProblemUpdateRuns(data.runs, 'score', 100);
+			});
+		}
+
+		if (problem.user.admin) {
+			admin = new ArenaAdmin(arena, onlyProblemAlias);
+			admin.refreshRuns();
+			admin.refreshClarifications();
+			setInterval(function() {
+				admin.refreshRuns();
+				admin.refreshClarifications();
+			}, 5 * 60 * 1000);
+		}
 		
 		// Trigger the event (useful on page load).
-		$(window).hashchange();
+		onlyProblemHashChanged();
+	}
 
-		$('#loading').fadeOut('slow');
-		$('#root').fadeIn('slow');
+	function onlyProblemUpdateRuns(runs, score_column, multiplier) {
+		$('#problem .run-list .added').remove();
+		for (var idx in runs) {
+			if (!runs.hasOwnProperty(idx)) continue;
+			var run = runs[idx];
+
+			var r = $('#problem .run-list .template')
+				.clone()
+				.removeClass('template')
+				.addClass('added')
+				.addClass('run_' + run.guid);
+			(function(guid) {
+				$('.code', r).append($('<input type="button" value="ver" />').click(function() {
+					omegaup.runSource(guid, function(data) {
+						if (data.compile_error) {
+							$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
+						} else {
+							$('#submit textarea[name="code"]').val(data.source);
+						}
+						$('#submit input').hide();
+						$('#submit #lang-select').hide();
+						$('#submit').show();
+						$('#clarification').hide();
+						$('#overlay').show();
+						window.location.hash += '/show-run';
+					});
+					return false;
+				}));
+			})(run.guid);
+			arena.displayRun(run, r);
+			$('#problem .runs > tbody:last').append(r);
+		}
+	}
+
+	function onlyProblemHashChanged() {
+		var self = this;
+		var tabChanged = false;
+		var tabs = ['problems', 'clarifications', 'runs'];
+
+		for (var i = 0; i < tabs.length; i++) {
+			if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
+				tabChanged = arena.activeTab != tabs[i];
+				arena.activeTab = tabs[i];
+
+				break;
+			}
+		}
+
+		if (arena.activeTab == 'problems') {
+			if (window.location.hash.indexOf('/new-run') !== -1) {
+				if (!omegaup.loggedIn && omegaup.login_url) {
+					window.location = omegaup.login_url + "?redirect=" + escape(window.location);
+					return;
+				}
+				$('#overlay form').hide();
+				$('#submit input').show();
+				$('#submit #lang-select').show();
+				$('#submit').show();
+				$('#overlay').show();
+				$('#submit textarea[name="code"]').val('');
+			}
+		}
+
+		if (tabChanged) {
+			$('.tabs a.active').removeClass('active');
+			$('.tabs a[href="#' + arena.activeTab + '"]').addClass('active');
+			$('.tab').hide();
+			$('#' + arena.activeTab).show();
+			
+			if (arena.activeTab == 'clarifications') {
+				$('#clarifications-count').css("font-weight", "normal");
+			}
+		}
 	}
 
 	function contestLoaded(contest) {
@@ -81,7 +172,7 @@ $(document).ready(function() {
 		$('#summary .scoreboard_cutoff').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
 			contest.start_time.getTime() + duration * contest.scoreboard / 100));
 		$('#summary .contest_organizer').html(
-			'<a href="/profile.php?username=' + contest.director + '">' + contest.director + '</a>');
+			'<a href="/profile/' + contest.director + '/">' + contest.director + '</a>');
 
 		arena.submissionGap = parseInt(contest.submission_gap);
 		if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
@@ -116,13 +207,33 @@ $(document).ready(function() {
 	}
 	
 	if (arena.onlyProblem) {
-		$('body').attr('id', 'only-problem');
-		omegaup.getProblem(null, onlyProblemAlias, onlyProblemLoaded, 'html', true)
+		onlyProblemLoaded(JSON.parse(document.getElementById('problem-json').firstChild.nodeValue));
 	} else {
 		arena.connectSocket();
 		omegaup.getContest(contestAlias, contestLoaded);
+
+		$('.clarifpager .clarifpagerprev').click(function () {
+			if (arena.clarificationsOffset > 0) {
+				arena.clarificationsOffset -= arena.clarificationsRowcount;
+				if (arena.clarificationsOffset < 0) {
+					arena.clarificationsOffset = 0;
+				}
+				
+				// Refresh with previous page
+				omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
+			}
+		});
+		
+		$('.clarifpager .clarifpagernext').click(function () {
+			arena.clarificationsOffset += arena.clarificationsRowcount;
+			if (arena.clarificationsOffset < 0) {
+				arena.clarificationsOffset = 0;
+			}
+			
+			// Refresh with previous page
+			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
+		});
 	}
-	
 
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
@@ -234,28 +345,6 @@ $(document).ready(function() {
 		return false;
 	});
 	
-	$('.clarifpager .clarifpagerprev').click(function () {
-		if (arena.clarificationsOffset > 0) {
-			arena.clarificationsOffset -= arena.clarificationsRowcount;
-			if (arena.clarificationsOffset < 0) {
-				arena.clarificationsOffset = 0;
-			}
-			
-			// Refresh with previous page
-			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
-		}
-	});
-	
-	$('.clarifpager .clarifpagernext').click(function () {
-		arena.clarificationsOffset += arena.clarificationsRowcount;
-		if (arena.clarificationsOffset < 0) {
-			arena.clarificationsOffset = 0;
-		}
-		
-		// Refresh with previous page
-		omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
-	});
-
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
 		omegaup.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
@@ -275,86 +364,7 @@ $(document).ready(function() {
 
 	$(window).hashchange(function(e) {
 		if (arena.onlyProblem) {
-			function updateOnlyProblem(problem) {
-				$('#summary').hide();
-				$('#problem').show();
-				$('#problem > .title').html(omegaup.escape(problem.title));
-				$('#problem .data .points').html(problem.points);
-				$('#problem .validator').html(problem.validator);
-				$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
-				$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
-				$('#problem .statement').html(problem.problem_statement);
-				$('#problem .source span').html(omegaup.escape(problem.source));
-				$('#problem .runs tfoot td a').attr('href', '#new-run');
-
-				$('#problem .run-list .added').remove();
-
-				var language_array = problem.languages.split(',');
-				$('#lang-select option').each(function(index, item) {
-					if (language_array.indexOf($(item).val()) >= 0) {
-						$(item).show();
-					} else {
-						$(item).hide();
-					}
-				});
-
-				function updateOnlyProblemRuns(runs, score_column, multiplier) {
-					for (var idx in runs) {
-						if (!runs.hasOwnProperty(idx)) continue;
-						var run = runs[idx];
-
-						var r = $('#problem .run-list .template')
-							.clone()
-							.removeClass('template')
-							.addClass('added')
-							.addClass('run_' + run.guid);
-						(function(guid) {
-							$('.code', r).append($('<input type="button" value="ver" />').click(function() {
-								omegaup.runSource(guid, function(data) {
-									if (data.compile_error){							
-										$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
-									} else {
-										$('#submit textarea[name="code"]').val(data.source);
-									}
-									$('#submit input').hide();
-									$('#submit #lang-select').hide();
-									$('#submit').show();
-									$('#clarification').hide();
-									$('#overlay').show();
-									window.location.hash += '/show-run';
-								});
-								return false;
-							}));
-						})(run.guid);
-						arena.displayRun(run, r);
-						$('#problem .runs > tbody:last').append(r);
-					}
-				}
-
-				if (omegaup.loggedIn) {
-					omegaup.getProblemRuns(problem.alias, function (data) {
-						updateOnlyProblemRuns(data.runs, 'score', 100);
-					});
-				}
-
-				MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
-			}
-
-			updateOnlyProblem(arena.currentProblem);
-			var isNewRunOnlyProblem = window.location.hash.indexOf('#new-run') !== -1;
-			
-			if (isNewRunOnlyProblem) {
-				if (!omegaup.loggedIn && omegaup.login_url) {
-					window.location = omegaup.login_url + "?redirect=" + escape(window.location);
-					return;
-				}
-				$('#overlay form').hide();
-				$('#submit input').show();
-				$('#submit #lang-select').show();
-				$('#submit').show();
-				$('#overlay').show();
-				$('#submit textarea[name="code"]').val('');
-			}
+			onlyProblemHashChanged(e);
 		} else {
 			arena.onHashChanged();
 		}

@@ -40,7 +40,8 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 		$smarty->assign('SOURCE', $_POST["source"]);
 		$smarty->assign('PUBLIC', $_POST["public"]);
 	} else if ($response["status"] == "ok") {
-		$smarty->assign('STATUS_SUCCESS', "New problem created succesfully! Alias: " . $response["alias"]);
+		header("Location: /problem/edit/{$response['alias']}/");
+		die();
 	}
 }
 

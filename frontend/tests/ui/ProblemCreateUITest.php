@@ -16,7 +16,7 @@ class ProblemCreateUITest extends OmegaupUITestCase {
 		$contestant = $this->createAdminUserAndLogin();
 				
 		// Open problem create
-		$this->open('/problemcreate.php');
+		$this->open('/problemnew.php');
 		
 		$this->type('name=title', $problemData["request"]["title"]);
 		$this->type('source', $problemData["request"]["source"]);
@@ -37,7 +37,7 @@ class ProblemCreateUITest extends OmegaupUITestCase {
 		$contestant = $this->createAdminUserAndLogin();
 				
 		// Open problem create
-		$this->open('/problemcreate.php');						
+		$this->open('/problemnew.php');
 		
 		// Click inicia sesion		
 		$this->clickAndWait("//input[@value='Crear problema']");
@@ -51,7 +51,7 @@ class ProblemCreateUITest extends OmegaupUITestCase {
 		$problemData = ProblemsFactory::getRequest();				
 				
 		// Open problem create
-		$this->open('/problemcreate.php');										
+		$this->open('/problemnew.php');
 		
 		$this->waitForElementPresent('//*[@id="content"]/div[2]/div[1]/h1');
 		$this->assertElementContainsText('//*[@id="content"]/div[2]/div[1]/h1', "¡Inicia sesion en Omegaup!");		

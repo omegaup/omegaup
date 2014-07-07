@@ -1,4 +1,5 @@
 {include file='arena.head.tpl' jsfile='/ux/admin.js'}
+			<script type="text/javascript" src="/ux/libadmin.js"></script>
 			<div id="title">
 				<h1 class="contest-title">Envíos globales</h1>
 			</div>
@@ -43,17 +44,17 @@
 							<label for="runslang">Lenguaje: </label>
 							<select class="runslang" name="runslang">
 								<option value="">{#wordsAll#}</option>
-								<option value="c">C</option>
-								<option value="cpp">C++</option>
 								<option value="cpp11">C++11</option>
+								<option value="cpp">C++</option>
+								<option value="c">C</option>
+								<option value="hs">Haskell</option>
 								<option value="java">Java</option>
+								<option value="p">Pascal</option>
 								<option value="py">Python</option>
 								<option value="rb">Ruby</option>
-								<option value="pl">Perl</option>
-								<option value="cs">C#</option>
-								<option value="p">Pascal</option>
 								<option value="kp">Karel (Pascal)</option>
 								<option value="kj">Karel (Java)</option>
+								<option value="cat">{#wordsJustOutput#}</option>
 							</select>
 								
 							<label for="runsusername">Usuario: </label>

@@ -3,6 +3,11 @@ location /api/ {
 }
 
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /contest.php?alias=$1 last;
+rewrite ^/problem/new/?$ /problemnew.php last;
+rewrite ^/problem/edit/([a-zA-Z0-9_+-]+)/?$ /problemedit.php?problem=$1 last;
+rewrite ^/problem/stats/([a-zA-Z0-9_+-]+)/?$ /problemstats.php?problem=$1 last;
+rewrite ^/problem/list/?$ /problemlist.php last;
+rewrite ^/problem/mine/?$ /problemmine.php last;
 rewrite ^/arena/admin/?$ /arena/adminpractice.php last;
 rewrite ^/arena/?$ /arena/index.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/?$ /arena/contest.php last;
@@ -10,5 +15,6 @@ rewrite ^/arena/[a-zA-Z0-9_+-]+/scoreboard/[a-zA-Z0-9_+-]+/?$ /arena/scoreboard.
 rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/admin.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/practice/?$ /arena/practice.php last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/print/?$ /arena/print.php?alias=$1 last;
-rewrite ^/arena/problem/[a-zA-Z0-9_+-]+/?$ /arena/problem.php last;
+rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
+rewrite ^/profile/?$ /profile.php last;

@@ -78,30 +78,11 @@
 					</select>
 				</div>
 
-				<script>
-					$(function() {
-						$('#languages').selectpicker();
-						{if $IS_UPDATE eq 0}
-							// Set default languages.
-							$('#languages').val(['c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11']);
-						{/if}
-					});
-				</script>
 				<div class="form-group col-md-6">
 					<label for="languages">{#problemEditFormLanguages#}</label>
-					<select name='languages[]' id='languages' class="selectpicker form-control languages" multiple>
-						<option value="c">C</option>
-						<option value="cpp">C++</option>
-						<option value="cpp11">C++11</option>
-						<option value="cs">C#</option>
-						<option value="hs">Haskell</option>
-						<option value="java">Java</option>
-						<option value="kj">Karel (Java)</option>
-						<option value="kp">Karel (Pascal)</option>
-						<option value="p">Pascal</option>
-						<option value="pl">Perl</option>
-						<option value="py">Python</option>
-						<option value="rb">Ruby</option>
+					<select name="languages[]" id="languages" class="form-control">
+						<option value="c,cpp,cpp11,cs,hs,java,p,py,rb">C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby</option>
+						<option value="kp,kj">Karel</option>
 						<option value="cat">{#wordsJustOutput#}</option>
 					</select>
 				</div>

@@ -17,12 +17,12 @@
 								<li id="nav-problems">
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
-										<li><a href="/myproblems.php">{#navMyProblems#}</a></li>
-										<li><a href="/probs.php">{#wordsProblems#}</a></li>
+										<li><a href="/problem/mine/">{#navMyProblems#}</a></li>
+										<li><a href="/problem/list/">{#wordsProblems#}</a></li>
 									</ul>
 								</li>
 							{else}
-								<li id="nav-problems"><a href='/probs.php'>{#wordsProblems#}</a></li>
+								<li id="nav-problems"><a href='/problem/list/'>{#wordsProblems#}</a></li>
 							{/if}
 							<li id="nav-rank"><a href='/rank.php'>{#navRanking#}</a></li>
 							<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
@@ -35,7 +35,7 @@
 								<li class="dropdown">
 								<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown"><span>{$CURRENT_USER_GRAVATAR_URL_32}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
 									<ul class="dropdown-menu">
-									 <li><a href='/profile.php'>{#navViewProfile#}</a></li>
+									 <li><a href='/profile/'>{#navViewProfile#}</a></li>
 									 <li><a href='/logout.php'>{#navLogOut#}</a></li>
 									</ul>
 								</li>	

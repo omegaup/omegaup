@@ -200,9 +200,7 @@
 			$('#statement-preview .source').html(omegaup.escape(problem.source));
 			$('select[name=validator]').val(problem.validator);
 			$('select[name=public]').val(problem.public);
-			$('#languages')
-				.val(problem.languages.split(','))
-				.selectpicker('refresh');
+			$('#languages').val(problem.languages);
 			$('input[name=alias]').val(problemAlias);
 			$('#wmd-input-statement').val(problem.problem_statement);
 			md_editor.refreshPreview();

@@ -39,6 +39,11 @@ legend {
 	display: none;
 }
 
+#only-problem #root,
+#only-problem #problem {
+	display: block;
+}
+
 #problems.active { display: block; }
 
 #title img {
@@ -51,9 +56,6 @@ legend {
 	text-align: center;
 	font-size: 2em;
 	margin: 0.5em;
-}
-body#only-problem #title {
-	display: none;
 }
 
 #title .clock {
@@ -95,6 +97,12 @@ body#only-problem #title {
 	background-color: #ddd;
 }
 
+body#only-problem .tabs {
+	width: 900px;
+	margin: 1em auto 0 auto;
+	border-top: 0;
+}
+
 .navleft {
 	overflow: hidden;
 }
@@ -110,11 +118,15 @@ body#only-problem #title {
 	border: 1px solid #ccc;
 	border-width: 0 0 1px 1px;
 }
-body#only-problem .navleft .main {
+body#only-problem .tab {
 	width: 900px;
 	margin: 0 auto;
 	border: none;
-	padding: 1em 7em 2em 7em;
+	padding: 0;
+}
+body#only-problem #problems .main {
+	margin: 0;
+	padding: 2em 7em;
 }
 
 .tab {

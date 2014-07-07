@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<title>omegaUp</title>
+		<title>{if $title}{$title|escape} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="/js/jquery-1.10.2.js"></script>
 		<script type="text/javascript" src="/js/jquery.ba-hashchange.js"></script>
 		<script type="text/javascript" src="/js/jquery.gritter.min.js"></script>
@@ -45,9 +45,11 @@
 		<link rel="stylesheet" href="/ux/arena.css?t=4" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 	</head>
-	<body{if isset($bodyid) and $bodyid} id="{$bodyid}"{/if}>
+	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}>
 		<!-- Generated from http://ajaxload.info/ -->
+		{if isset($bodyid) and $bodyid != 'only-problem'}
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
+		{/if}
 		<div id="root">
 {include file='common.navbar.tpl' currentSection='arena'}
 {include file='status.tpl'}

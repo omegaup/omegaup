@@ -419,7 +419,7 @@ Arena.prototype.createAdminRun = function(run) {
 					}
 				}
 				$('#run-details .cases').append(groups);
-				window.location.hash = 'run/details';
+				window.location.hash = 'runs/details';
 				$(window).hashchange();
 				$('#run-details').show();
 				$('#submit').hide();
@@ -443,14 +443,14 @@ Arena.prototype.displayRun = function(run, r) {
 		$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');
 	}
 
-	$('.runtime', r).html((parseFloat(run.runtime) / 1000).toFixed(2));
+	$('.runtime', r).html((parseFloat(run.runtime || "0") / 1000).toFixed(2));
 	$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 	if (run.contest_score != null) {
-		$('.points', r).html(parseFloat(run.contest_score).toFixed(2));
+		$('.points', r).html(parseFloat(run.contest_score || "0").toFixed(2));
 	} else {
 		$('.points', r).html('-');
 	}
-	$('.percentage', r).html((parseFloat(run.score) * 100).toFixed(2) + '%');
+	$('.percentage', r).html((parseFloat(run.score || "0") * 100).toFixed(2) + '%');
 	$('.status', r).html(
 		run.status == 'ready' ?
 		(
@@ -469,7 +469,7 @@ Arena.prototype.displayRun = function(run, r) {
 	} else {
 		$('.status', r).css('background-color', '');
 	}
-	$('.penalty', r).html(run.submit_delay);	
+	$('.penalty', r).html(run.submit_delay);
 	if (run.time) {
 		$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 	}
@@ -840,6 +840,7 @@ Arena.prototype.updateClarification = function(clarification) {
 		}
 	}
 
+	$('.contest', r).html(clarification.contest_alias);
 	$('.problem', r).html(clarification.problem_alias);
 	if (self.admin) $('.author', r).html(clarification.author);
 	$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', clarification.time.getTime()));
@@ -968,7 +969,7 @@ Arena.prototype.onHashChanged = function() {
 			}
 
 			if (self.practice || self.onlyProblem) {
-				omegaup.getProblemRuns(problem.alias, function (data) {
+				omegaup.getProblemRuns(problem.alias, {}, function (data) {
 					updateProblemRuns(data.runs, 'score', 100);
 				});
 			} else {
@@ -1007,7 +1008,7 @@ Arena.prototype.onHashChanged = function() {
 			$('#overlay form').hide();
 			$('#overlay, #clarification').show();
 		}
-	} else if (window.location.hash == '#run/details') {
+	} else if (window.location.hash == '#runs/details') {
 		$('#overlay form').hide();
 		$('#run-details').show();
 		$('#overlay').show();
