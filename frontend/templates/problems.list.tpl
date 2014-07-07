@@ -14,11 +14,11 @@
 				</th>
 				<th>{#wordsRatio#}</th>
 				<th>
-					<a rel="tooltip" href="?sort=solved" data-toggle="tooltip" title data-original-title="{#sortByPointsForRank#}">{#wordsPointsForRank#}</a>
+					<a rel="tooltip" href="?sort=difficulty" data-toggle="tooltip" title data-original-title="{#sortByPointsForRank#}">{#wordsPointsForRank#}</a>
 					<a rel="tooltip" href="http://blog.omegaup.com/2014/06/el-nuevo-ranking-de-omegaup/" data-toggle="tooltip" title data-original-title="{#wordsPointsForRankTooltip#}"><img src="/media/question.png"></a>
 				</th>
 				<th>
-					<a rel="tooltip" href="?sort=solved" data-toggle="tooltip" title data-original-title="{#sortByMyScore#}">{#wordsMyScore#}</a>
+					<a rel="tooltip" href="?sort=score" data-toggle="tooltip" title data-original-title="{#sortByMyScore#}">{#wordsMyScore#}</a>
 				</th>
 			</tr>
 		</thead>
