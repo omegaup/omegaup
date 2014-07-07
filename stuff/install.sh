@@ -108,21 +108,24 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 
 	# Update the submodules
 	pushd $OMEGAUP_ROOT
-	git submodule update --init
-
-	# Generate the certificates required.
-	bin/certmanager init --password $KEYSTORE_PASSWORD
-
-	# Build minijail
-	cd $OMEGAUP_ROOT/minijail
-	make
-
-	# Grab all sbt dependencies -- including MySQL.
-	cd $OMEGAUP_ROOT/backend
-	sbt update
-
+	git submodule update --init	
 	popd
 fi
+
+# Generate the certificates required.
+pushd $OMEGAUP_ROOT
+bin/certmanager init --password $KEYSTORE_PASSWORD
+
+# Build minijail
+cd $OMEGAUP_ROOT/minijail
+make
+
+# Grab all sbt dependencies -- including MySQL.
+cd $OMEGAUP_ROOT/backend
+sbt update
+
+popd
+
 
 # Set up the minijail.
 if [ ! -d $MINIJAIL_ROOT ]; then

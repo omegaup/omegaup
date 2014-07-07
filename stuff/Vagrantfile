@@ -20,4 +20,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Instala todo usando el script.
   config.vm.provision :shell, :privileged => false, :path => "https://raw.github.com/omegaup/omegaup/master/stuff/install.sh"
+
+ # Sincronizar folder con vagrant
+  config.vm.synced_folder "~/Documents/omegaup/omegaup/", "/opt/omegaup", type: "rsync",
+    rsync__exclude: ".git/",
+    rsync__args: "-rv",
+    disabled: true
 end
