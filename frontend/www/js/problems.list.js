@@ -20,6 +20,30 @@
 			});
 		}
 
+		if (document.location.search.indexOf('sort=new') != -1) {
+			problems.results.sort(function (a, b) {
+				return a.problem_id - b.problem_id;
+			});
+		}
+
+		if (document.location.search.indexOf('sort=runs') != -1) {
+			problems.results.sort(function (a, b) {
+				return a.submissions - b.submissions;
+			});
+		}
+
+		if (document.location.search.indexOf('sort=solved') != -1) {
+			problems.results.sort(function (a, b) {
+				return a.accepted - b.accepted;
+			});
+		}
+
+		if (document.location.search.indexOf('sort=score') != -1) {
+			problems.results.sort(function (a, b) {
+				return a.score - b.score;
+			});
+		}
+
 		for (var i = 0; i < problems.results.length; i++) {
 			var accepted = problems.results[i].accepted;
 			var submissions = problems.results[i].submissions;

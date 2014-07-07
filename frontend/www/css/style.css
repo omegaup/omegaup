@@ -529,3 +529,5 @@ padding-right: 5px;
 	padding: 0;
 	width: 100%;
 }
+
+th.contains-long-desc{ min-width:369px; }
