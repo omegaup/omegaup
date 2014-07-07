@@ -1,5 +1,6 @@
 $(document).ready(function() {
 	var arena = new Arena();
+	var admin = null;
 
 	if (arena.onlyProblem) {
 		var onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(window.location.pathname)[1];		
@@ -13,6 +14,51 @@ $(document).ready(function() {
 			useUTC: false
 		}
 	});
+
+	function onlyProblemLoaded(problem) {
+		arena.currentProblem = problem;
+
+		MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
+
+		for (var i = 0; i < problem.solvers.length; i++) {
+			var solver = problem.solvers[i];
+			var prob = $('.solver-list .template').clone().removeClass('template');
+			$('.user', prob).attr('href', '/profile/' + solver.username).html(solver.username);
+			$('.language', prob).html(solver.language);
+			$('.runtime', prob).html((parseFloat(solver.runtime) / 1000.0).toFixed(2));
+			$('.memory', prob).html((parseFloat(solver.memory) / (1024 * 1024)).toFixed(2));
+			$('.time', prob).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
+			$('.solver-list').append(prob);
+		}
+
+		var language_array = problem.languages.split(',');
+		$('#lang-select option').each(function(index, item) {
+			if (language_array.indexOf($(item).val()) >= 0) {
+				$(item).show();
+			} else {
+				$(item).hide();
+			}
+		});
+
+		if (problem.user.logged_in) {
+			omegaup.getProblemRuns(problem.alias, {}, function (data) {
+				onlyProblemUpdateRuns(data.runs, 'score', 100);
+			});
+		}
+
+		if (problem.user.admin) {
+			admin = new ArenaAdmin(arena, onlyProblemAlias);
+			admin.refreshRuns();
+			admin.refreshClarifications();
+			setInterval(function() {
+				admin.refreshRuns();
+				admin.refreshClarifications();
+			}, 5 * 60 * 1000);
+		}
+		
+		// Trigger the event (useful on page load).
+		onlyProblemHashChanged();
+	}
 
 	function onlyProblemUpdateRuns(runs, score_column, multiplier) {
 		$('#problem .run-list .added').remove();
@@ -48,39 +94,45 @@ $(document).ready(function() {
 		}
 	}
 
-	function onlyProblemLoaded(problem) {
-		arena.currentProblem = problem;
+	function onlyProblemHashChanged() {
+		var self = this;
+		var tabChanged = false;
+		var tabs = ['problems', 'clarifications', 'runs'];
 
-		MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
+		for (var i = 0; i < tabs.length; i++) {
+			if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
+				tabChanged = arena.activeTab != tabs[i];
+				arena.activeTab = tabs[i];
 
-		for (var i = 0; i < problem.solvers.length; i++) {
-			var solver = problem.solvers[i];
-			var prob = $('.solver-list .template').clone().removeClass('template');
-			$('.user', prob).attr('href', '/profile/' + solver.username).html(solver.username);
-			$('.language', prob).html(solver.language);
-			$('.runtime', prob).html((parseFloat(solver.runtime) / 1000.0).toFixed(2));
-			$('.memory', prob).html((parseFloat(solver.memory) / (1024 * 1024)).toFixed(2));
-			$('.time', prob).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000));
-			$('.solver-list').append(prob);
-		}
-
-		var language_array = problem.languages.split(',');
-		$('#lang-select option').each(function(index, item) {
-			if (language_array.indexOf($(item).val()) >= 0) {
-				$(item).show();
-			} else {
-				$(item).hide();
+				break;
 			}
-		});
-
-		if (problem.user.logged_in) {
-			omegaup.getProblemRuns(problem.alias, function (data) {
-				onlyProblemUpdateRuns(data.runs, 'score', 100);
-			});
 		}
-		
-		// Trigger the event (useful on page load).
-		$(window).hashchange();
+
+		if (arena.activeTab == 'problems') {
+			if (window.location.hash.indexOf('/new-run') !== -1) {
+				if (!omegaup.loggedIn && omegaup.login_url) {
+					window.location = omegaup.login_url + "?redirect=" + escape(window.location);
+					return;
+				}
+				$('#overlay form').hide();
+				$('#submit input').show();
+				$('#submit #lang-select').show();
+				$('#submit').show();
+				$('#overlay').show();
+				$('#submit textarea[name="code"]').val('');
+			}
+		}
+
+		if (tabChanged) {
+			$('.tabs a.active').removeClass('active');
+			$('.tabs a[href="#' + arena.activeTab + '"]').addClass('active');
+			$('.tab').hide();
+			$('#' + arena.activeTab).show();
+			
+			if (arena.activeTab == 'clarifications') {
+				$('#clarifications-count').css("font-weight", "normal");
+			}
+		}
 	}
 
 	function contestLoaded(contest) {
@@ -159,8 +211,29 @@ $(document).ready(function() {
 	} else {
 		arena.connectSocket();
 		omegaup.getContest(contestAlias, contestLoaded);
+
+		$('.clarifpager .clarifpagerprev').click(function () {
+			if (arena.clarificationsOffset > 0) {
+				arena.clarificationsOffset -= arena.clarificationsRowcount;
+				if (arena.clarificationsOffset < 0) {
+					arena.clarificationsOffset = 0;
+				}
+				
+				// Refresh with previous page
+				omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
+			}
+		});
+		
+		$('.clarifpager .clarifpagernext').click(function () {
+			arena.clarificationsOffset += arena.clarificationsRowcount;
+			if (arena.clarificationsOffset < 0) {
+				arena.clarificationsOffset = 0;
+			}
+			
+			// Refresh with previous page
+			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
+		});
 	}
-	
 
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
@@ -272,28 +345,6 @@ $(document).ready(function() {
 		return false;
 	});
 	
-	$('.clarifpager .clarifpagerprev').click(function () {
-		if (arena.clarificationsOffset > 0) {
-			arena.clarificationsOffset -= arena.clarificationsRowcount;
-			if (arena.clarificationsOffset < 0) {
-				arena.clarificationsOffset = 0;
-			}
-			
-			// Refresh with previous page
-			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
-		}
-	});
-	
-	$('.clarifpager .clarifpagernext').click(function () {
-		arena.clarificationsOffset += arena.clarificationsRowcount;
-		if (arena.clarificationsOffset < 0) {
-			arena.clarificationsOffset = 0;
-		}
-		
-		// Refresh with previous page
-		omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
-	});
-
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
 		omegaup.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
@@ -313,18 +364,7 @@ $(document).ready(function() {
 
 	$(window).hashchange(function(e) {
 		if (arena.onlyProblem) {
-			if (window.location.hash.indexOf('#new-run') !== -1) {
-				if (!omegaup.loggedIn && omegaup.login_url) {
-					window.location = omegaup.login_url + "?redirect=" + escape(window.location);
-					return;
-				}
-				$('#overlay form').hide();
-				$('#submit input').show();
-				$('#submit #lang-select').show();
-				$('#submit').show();
-				$('#overlay').show();
-				$('#submit textarea[name="code"]').val('');
-			}
+			onlyProblemHashChanged(e);
 		} else {
 			arena.onHashChanged();
 		}

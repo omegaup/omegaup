@@ -977,6 +977,10 @@ class ContestController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
+		if ($r['contest'] == null) {
+			throw new NotFoundException($r['contest_alias']);
+		}
+
 		Validators::isNumber($r["offset"], "offset", false /* optional */);
 		Validators::isNumber($r["rowcount"], "rowcount", false /* optional */);
 	}
@@ -1012,7 +1016,7 @@ class ContestController extends Controller {
 		}
 
 		foreach ($clarifications as &$clar) {
-			$clar['time'] = strtotime($clar['time']);
+			$clar['time'] = (int)$clar['time'];
 		}
 
 		// Add response to array

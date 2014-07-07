@@ -1,12 +1,6 @@
 $(document).ready(function() {
 	var arena = new Arena();
-	var runsOffset = 0;
-	var runsRowcount = 100;
-	var runsVeredict = "";
-	var runsStatus = "";
-	var runsProblem = "";
-	var runsLang = "";
-	var runsUsername = "";	
+	var admin = new ArenaAdmin(arena);
 
 	Highcharts.setOptions({
 		global: {
@@ -16,10 +10,10 @@ $(document).ready(function() {
 
 	if (arena.contestAlias === "admin") {
 		$('#runs').show();
-		refreshRuns();
+		admin.refreshRuns();
 		setInterval(function() { 
 			runsOffset = 0; // Return pagination to start on refresh
-			refreshRuns();
+			admin.refreshRuns();
 		}, 5 * 60 * 1000);		
 
 		// Trigger the event (useful on page load).
@@ -70,11 +64,11 @@ $(document).ready(function() {
 			}
 
 			arena.setupPolls();
-			refreshRuns();
+			admin.refreshRuns();
 			if (!arena.socket) {
 				setInterval(function() {
 					runsOffset = 0; // Return pagination to start on refresh
-					refreshRuns();
+					admin.refreshRuns();
 				}, 5 * 60 * 1000);
 			}
 
@@ -96,106 +90,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	$('.runspager .runspagerprev').click(function () {
-		if (runsOffset > 0) {
-			runsOffset -= runsRowcount;
-			if (runsOffset < 0) {
-				runsOffset = 0;
-			}
-			
-			// Refresh with previous page
-			refreshRuns();
-		}
-	});
-	
-	$('.runspager .runspagernext').click(function () {
-		runsOffset += runsRowcount;
-		if (runsOffset < 0) {
-			runsOffset = 0;
-		}
-		
-		// Refresh with previous page
-		refreshRuns();
-	});
-	
-	$("#runsusername").typeahead({
-		ajax: "/api/user/list/",
-		display: 'label',
-		val: 'label',
-		minLength: 2,
-		itemSelected: function (item, val, text) {						
-			// Refresh runs by calling change func
-			runsUsername = val;
-			$('select.runsveredict').change();
-		}
-	});
-	
-	$('#runsusername-clear').click(function() {
-		runsUsername = "";
-		$("#runsusername").val('');
-		$('select.runsveredict').change();
-	});
-	
-	if (arena.contestAlias === "admin") {
-		$("#runsproblem").typeahead({
-			ajax: { 
-				url: "/api/problem/list/",
-				preProcess: function(data) { 
-					return data["results"];
-				}
-			},
-			display: 'title',
-			val: 'alias',
-			minLength: 2,
-			itemSelected: function (item, val, text) {						
-				// Refresh runs by calling change func
-				runsProblem = val;
-				$('select.runsveredict').change();
-			}
-		});
-
-		$('#runsproblem-clear').click(function() {
-			runsProblem = "";
-			$("#runsproblem").val('');
-			$('select.runsveredict').change();
-		});
-	}
-	
-	$('select.runsveredict, select.runsstatus, select.runsproblem, select.runslang').change(function () {
-		runsVeredict = $('select.runsveredict option:selected').val();
-		runsStatus	 = $('select.runsstatus	  option:selected').val();						
-		runsLang	 = $('select.runslang	  option:selected').val();
-		
-		// in general admin panel, runsProblem is populated via the typehead
-		if (arena.contestAlias != "admin") {
-			runsProblem	 = $('select.runsproblem  option:selected').val();
-		}
-		
-		refreshRuns();
-	});
-	
-	$('.clarifpager .clarifpagerprev').click(function () {
-		if (arena.clarificationsOffset > 0) {
-			arena.clarificationsOffset -= arena.clarificationsRowcount;
-			if (arena.clarificationsOffset < 0) {
-				arena.clarificationsOffset = 0;
-			}
-			
-			// Refresh with previous page
-			omegaup.getClarifications(arena.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
-		}
-	});
-	
-	$('.clarifpager .clarifpagernext').click(function () {
-		arena.clarificationsOffset += arena.clarificationsRowcount;
-		if (arena.clarificationsOffset < 0) {
-			arena.clarificationsOffset = 0;
-		}
-		
-		// Refresh with previous page
-		omegaup.getClarifications(arena.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
-	});
-
 	$('#submit').submit(function(e) {
 		if (!$('#submit textarea[name="code"]').val()) return false;
 
@@ -241,27 +135,10 @@ $(document).ready(function() {
 		return false;
 	});
 
-	$('#clarification').submit(function (e) {
-		$('#clarification input').attr('disabled', 'disabled');
-		omegaup.newClarification(arena.contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
-			if (run.status != 'ok') {
-				alert(run.error);
-				$('#clarification input').removeAttr('disabled');
-				return;
-			}
-			$('#overlay').hide();
-			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
-			omegaup.getClarifications(arena.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, clarificationsChange);
-			$('#clarification input').removeAttr('disabled');
-		});
-
-		return false;
-	});
-
 	$('#rejudge-problem').click(function() {
 		if (confirm('Deseas rejuecear el problema ' + arena.currentProblem.alias + '?')) {
 			omegaup.rejudgeProblem(arena.currentProblem.alias, function (x) {
-				refreshRuns();
+				admin.refreshRuns();
 			});
 		}
 		return false;
@@ -273,49 +150,4 @@ $(document).ready(function() {
 	});
 
 	$(window).hashchange(arena.onHashChanged.bind(arena));
-
-	function refreshRuns() {
-		var options = {
-			offset: runsOffset, 
-			rowcount: runsRowcount
-		};
-		
-		if (runsVeredict != "") {
-			options.veredict = runsVeredict;
-		}
-		
-		if (runsStatus != "") {
-			options.status = runsStatus;
-		}
-		
-		if (runsProblem != "") {
-			options.problem_alias = runsProblem;
-		}
-		
-		if (runsLang != "") {
-			options.language = runsLang;
-		}
-		
-		if (runsUsername != "") {
-			options.username = runsUsername;
-		}
-
-		if (arena.contestAlias === "admin") {
-			omegaup.getRuns(options, runsChange);
-		} else {
-			omegaup.getContestRuns(arena.contestAlias, options, runsChange);
-		}
-	}
-
-	function runsChange(data) {
-		$('#runs .runs .run-list .added').remove();
-
-		for (var i = 0; i < data.runs.length; i++) {
-			var run = data.runs[i];
-
-			var r = arena.createAdminRun(run);
-			arena.displayRun(run, r);
-			$('#runs .runs > tbody').append(r);
-		}
-	}
 });

@@ -842,6 +842,10 @@ class ProblemController extends Controller {
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
+
+		if ($r['problem'] == null) {
+			throw new NotFoundException($r['problem_alias']);
+		}
 	}
 
 	/**
@@ -860,34 +864,107 @@ class ProblemController extends Controller {
 
 		$response = array();
 
-		$keyrun = new Runs(array(
-					"user_id" => $r["current_user_id"],
-					"problem_id" => $r["problem"]->getProblemId()
-				));
+		if ($r['show_all']) {
+			if (!Authorization::CanEditProblem($r['current_user_id'], $r['problem'])) {
+				throw new ForbiddenAccessException();
+			}
+			try {
+				$runs = RunsDAO::GetAllRuns(
+					null,
+					$r["status"],
+					$r["veredict"],
+					$r["problem"]->problem_id,
+					$r["language"],
+					!is_null($r["user"]) ? $r["user"]->user_id : null,
+					$r["offset"],
+					$r["rowcount"]
+				);
 
-		// Get all the available runs
+				$result = array();
+
+				foreach ($runs as $run) {
+					$run['time'] = (int)$run['time'];
+					$run['score'] = round((float)$run['score'], 4);
+					if ($run['contest_score'] != null) {
+						$run['contest_score'] = round((float)$run['contest_score'], 2);
+					}
+					array_push($result, $run);
+				}
+
+				$response['runs'] = $result;
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+		} else {
+			$keyrun = new Runs(array(
+				"user_id" => $r["current_user_id"],
+				"problem_id" => $r["problem"]->getProblemId()
+			));
+
+			// Get all the available runs
+			try {
+				$runs_array = RunsDAO::search($keyrun);
+
+				// Create array of relevant columns for list of runs
+				$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+
+				// Add each filtered run to an array
+				$response["runs"] = array();
+				if (count($runs_array) >= 0) {
+					$runs_filtered_array = array();
+					foreach ($runs_array as $run) {
+						$filtered = $run->asFilteredArray($relevant_columns);
+						$filtered['time'] = strtotime($filtered['time']);
+						array_push($response['runs'], $filtered);
+					}
+				}
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
+			}
+		}
+
+		$response["status"] = "ok";
+		return $response;
+	}
+
+	/**
+	 * Entry point for Problem clarifications API
+	 * 
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiClarifications(Request $r) {
+		// Get user
+		self::authenticateRequest($r);
+		self::validateRuns($r);
+
+		$is_problem_admin = Authorization::CanEditProblem($r['current_user_id'], $r['problem']);
+
 		try {
-			$runs_array = RunsDAO::search($keyrun);
+			$clarifications = ClarificationsDAO::GetProblemClarifications(
+				$r['problem']->problem_id,
+				$is_problem_admin,
+				$r['current_user_id'],
+				$r['offset'],
+				$r['rowcount']
+			);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		// Create array of relevant columns for list of runs
-		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
-
-		// Add each filtered run to an array
-		$response["runs"] = array();
-		if (count($runs_array) >= 0) {
-			$runs_filtered_array = array();
-			foreach ($runs_array as $run) {
-				$filtered = $run->asFilteredArray($relevant_columns);
-				$filtered['time'] = strtotime($filtered['time']);
-				array_push($response['runs'], $filtered);
-			}
+		foreach ($clarifications as &$clar) {
+			$clar['time'] = (int)$clar['time'];
 		}
 
-		$response["status"] = "ok";
+		// Add response to array
+		$response = array();
+		$response['clarifications'] = $clarifications;
+		$response['status'] = "ok";
+
 		return $response;
 	}
 

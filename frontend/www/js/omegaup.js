@@ -816,11 +816,12 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, st
 	});
 };
 
-OmegaUp.prototype.getProblemRuns = function(problemAlias, callback) {
+OmegaUp.prototype.getProblemRuns = function(problemAlias, options, callback) {
 	var self = this;
 
 	$.post(
 		'/api/problem/runs/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		options,
 		function (problem) {
 			if (problem.runs) {
 				for (var i = 0; i < problem.runs.length; i++) {
@@ -983,12 +984,17 @@ OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
 	});
 };
 
-OmegaUp.prototype.getProblemStats = function(problemAlias, callback) {
+OmegaUp.prototype.getProblemClarifications = function(problemAlias, offset, rowcount, callback) {
 	var self = this;
 
 	$.get(
-		'/api/problem/stats/problem_alias/' + encodeURIComponent(problemAlias) + '/' ,
+		'/api/problem/clarifications/problem_alias/' + encodeURIComponent(problemAlias) +
+		'/offset/' + offset + '/rowcount/' + rowcount + '/',
 		function (data) {
+			for (var idx in data.clarifications) {
+				var clarification = data.clarifications[idx];
+				clarification.time = new Date(clarification.time * 1000);
+			}
 			callback(data);
 		},
 		'json'

@@ -419,7 +419,7 @@ Arena.prototype.createAdminRun = function(run) {
 					}
 				}
 				$('#run-details .cases').append(groups);
-				window.location.hash = 'run/details';
+				window.location.hash = 'runs/details';
 				$(window).hashchange();
 				$('#run-details').show();
 				$('#submit').hide();
@@ -840,6 +840,7 @@ Arena.prototype.updateClarification = function(clarification) {
 		}
 	}
 
+	$('.contest', r).html(clarification.contest_alias);
 	$('.problem', r).html(clarification.problem_alias);
 	if (self.admin) $('.author', r).html(clarification.author);
 	$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', clarification.time.getTime()));
@@ -968,7 +969,7 @@ Arena.prototype.onHashChanged = function() {
 			}
 
 			if (self.practice || self.onlyProblem) {
-				omegaup.getProblemRuns(problem.alias, function (data) {
+				omegaup.getProblemRuns(problem.alias, {}, function (data) {
 					updateProblemRuns(data.runs, 'score', 100);
 				});
 			} else {
@@ -1007,7 +1008,7 @@ Arena.prototype.onHashChanged = function() {
 			$('#overlay form').hide();
 			$('#overlay, #clarification').show();
 		}
-	} else if (window.location.hash == '#run/details') {
+	} else if (window.location.hash == '#runs/details') {
 		$('#overlay form').hide();
 		$('#run-details').show();
 		$('#overlay').show();
