@@ -127,6 +127,7 @@ OmegaUp.T = {
 	invalidScoreboardUrl: "Invalid scoreboard url.",
 	invalidStatementType: "Invalid statement type",
 	locale: "en",
+	loginDisabled: "Your user is too old and for your security it has been disabled. Please contact joe@omegaup.com to login again.",
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail or user",
 	loginFederated: "Login using these sites",
