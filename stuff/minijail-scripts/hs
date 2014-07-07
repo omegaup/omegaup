@@ -11,6 +11,7 @@ exit: 1
 fcntl: arg1 == F_GETFL
 fstat: 1
 mmap: 1
+mremap: 1
 lseek: 1
 socket: return ENETDOWN
 munmap: 1
