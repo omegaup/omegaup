@@ -172,7 +172,7 @@ $(document).ready(function() {
 		$('#summary .scoreboard_cutoff').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
 			contest.start_time.getTime() + duration * contest.scoreboard / 100));
 		$('#summary .contest_organizer').html(
-			'<a href="/profile.php?username=' + contest.director + '">' + contest.director + '</a>');
+			'<a href="/profile/' + contest.director + '/">' + contest.director + '</a>');
 
 		arena.submissionGap = parseInt(contest.submission_gap);
 		if (!(arena.submissionGap > 0)) arena.submissionGap = 0;

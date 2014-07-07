@@ -67,7 +67,7 @@
 								  $("#new-password-1").val(), 
 								  function(response){
 									if (response.status == "ok") {
-										window.location = "profile.php";
+										window.location = "/profile/";
 										return false;
 									}
 									else if(response.error !== undefined){

@@ -20,7 +20,7 @@
 	    if (isset($_GET['redirect'])) {
 		    die(header('Location: ' . $_GET['redirect']));
 	    } else {
-	            die(header("Location: profile.php"));
+	            die(header("Location: /profile/"));
 	    }
         }
 

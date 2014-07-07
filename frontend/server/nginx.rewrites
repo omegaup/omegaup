@@ -17,3 +17,4 @@ rewrite ^/arena/[a-zA-Z0-9_+-]+/practice/?$ /arena/practice.php last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/print/?$ /arena/print.php?alias=$1 last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
+rewrite ^/profile/?$ /profile.php last;
