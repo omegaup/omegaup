@@ -2,6 +2,7 @@ function ArenaAdmin(arena, onlyProblemAlias) {
 	this.arena = arena;
 	this.arena.admin = true;
 	this.onlyProblemAlias = onlyProblemAlias;
+	this.runsProblemAlias = '';
 	this.runsOffset = 0;
 	this.runsRowcount = 100;
 
@@ -57,10 +58,14 @@ ArenaAdmin.prototype.setUpPagers = function() {
 			display: 'title',
 			val: 'alias',
 			minLength: 2,
-			itemSelected: self.refreshRuns.bind(self)
+			itemSelected: function(item, val, text) {
+				self.runsProblemAlias = val;
+				self.refreshRuns();
+			}
 		});
 
 		$('#runsproblem-clear').click(function() {
+			self.runsProblemAlias = '';
 			$("#runsproblem").val('');
 			self.refreshRuns();
 		});
@@ -129,12 +134,12 @@ ArenaAdmin.prototype.refreshRuns = function() {
 		options.status = $('select.runsstatus option:selected').val();
 	}
 	
-	if ($('select.runsproblem option:selected').val()) {
-		options.problem_alias = $('select.runsproblem option:selected').val();
-	}
-	
 	if ($('select.runslang option:selected').val()) {
 		options.language = $('select.runslang option:selected').val();
+	}
+	
+	if (self.runsProblemAlias) {
+		options.problem_alias = self.runsProblemAlias;
 	}
 	
 	if ($('#runsusername').val()) {

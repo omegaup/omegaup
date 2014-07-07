@@ -40,9 +40,10 @@ class Authorization {
 			$isContestAdmin = Authorization::IsContestAdmin($user_id, $contest);
 		}
 
+		$isProblemAdmin = Authorization::IsProblemAdmin($user_id, $problem);
+
 		return $isContestAdmin
-			|| self::IsSystemAdmin($user_id)
-			|| $problem->getAuthorId() === $user_id;
+			|| $isProblemAdmin;
 	}
 
 	public static function CanViewClarification($user_id, Clarifications $clarification) {
@@ -99,7 +100,6 @@ class Authorization {
 
 		try {
 			$ur = UserRolesDAO::getByPK($user_id, CONTEST_ADMIN_ROLE, $contest->getContestId());
-			
 			if (!is_null($ur)) {
 				return true;
 			}
