@@ -4,7 +4,8 @@ PASSWORD=omegaup
 CA_NAME="omegaUp Certificate Authority"
 HOSTNAME=
 OUTPUT=
-ROOT=`dirname $0`/../ssl
+OMEGAUP_ROOT=`dirname $0`/..
+ROOT=$OMEGAUP_ROOT/ssl
 
 usage() {
 	echo "$0 <command> [options]"
@@ -101,9 +102,9 @@ case $COMMAND in
 	init)
 		gen_ca
 
-		gen_jks localhost backend/grader/omegaup.jks
-		gen_jks localhost backend/runner/omegaup.jks
-		gen_pem "omegaup Frontend" frontend/omegaup.pem
+		gen_jks localhost $OMEGAUP_ROOT/backend/grader/omegaup.jks
+		gen_jks localhost $OMEGAUP_ROOT/backend/runner/omegaup.jks
+		gen_pem "omegaup Frontend" $OMEGAUP_ROOT/frontend/omegaup.pem
 		;;
 	runner)
 		if [ \( "$HOSTNAME" == "" \) -o \( "$OUTPUT" == "" \) ] ; then
