@@ -36,7 +36,7 @@
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>
 							<tr>
-								<th>{#wordsID#}</th>
+								<th class="hidden-sm hidden-xs">{#wordsID#}</th>
 								<th>{#wordsLanguage#}</th>
 								<th>{#wordsRuntime#}</th>
 								<th>{#wordsMemoria#}</th>
@@ -54,7 +54,7 @@
 						</tfoot>
 						<tbody class="run-list">
 							<tr class="template">
-								<td class="guid"></td>
+								<td class="guid hidden-sm hidden-xs"></td>
 								<td class="language"></td>
 								<td class="runtime"></td>
 								<td class="memory"></td>
@@ -148,7 +148,7 @@
 					</caption>
 					<thead>
 						<tr>
-							<th>GUID</th>
+							<th class="hidden-sm hidden-xs">GUID</th>
 							<th>{#wordsUser#}</th>
 							<th>{#wordsLanguage#}</th>
 							<th>{#wordsRuntime#}</th>
@@ -163,7 +163,7 @@
 					</thead>
 					<tbody class="run-list">
 						<tr class="template">
-							<td class="guid"></td>
+							<td class="guid hidden-sm hidden-xs"></td>
 							<td class="username"></td>
 							<td class="language"></td>
 							<td class="runtime"></td>

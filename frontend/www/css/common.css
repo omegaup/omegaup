@@ -22,7 +22,7 @@
 }
 
 #header .navbar-inner {
-	width: 900px;
+	max-width: 900px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -38,3 +38,11 @@
 #header #grader-status > a.grader-ok { color: rgb(70, 136, 71); background-image: linear-gradient(rgb(223, 240, 216) 0px, rgb(200, 229, 188) 100%); background-color: rgb(223, 240, 216); }
 #header #grader-status > a.grader-warning { color: #c09853; background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%); border-color: #f5e79e; }
 
+@media (max-width: 991px) {
+	#header .navbar-inner {
+		width: 100% !important;
+	}
+	.container {
+		max-width: 100% !important;
+	}
+}

@@ -24,9 +24,17 @@
 							{else}
 								<li id="nav-problems"><a href='/problem/list/'>{#wordsProblems#}</a></li>
 							{/if}
-							<li id="nav-rank"><a href='/rank.php'>{#navRanking#}</a></li>
-							<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
-							<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
+							<li class="hidden-xs hidden-sm" id="nav-rank"><a href='/rank.php'>{#navRanking#}</a></li>
+							<li class="hidden-xs hidden-sm"><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
+							<li class="hidden-xs hidden-sm"><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
+							<li id="nav-mas" class="hidden-md hidden-lg">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>+</span><span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<li><a href='/rank.php'>{#navRanking#}</a></li>
+									<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
+									<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
+								</ul>
+							</li>
 							{/if}
 						</ul>
 						
