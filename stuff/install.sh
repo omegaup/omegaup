@@ -15,6 +15,7 @@ USER=`whoami`
 MYSQL_PASSWORD=omegaup
 KEYSTORE_PASSWORD=omegaup
 MYSQL_DB_NAME=omegaup
+MYSQL_JAR=~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.29.jar
 UBUNTU=`uname -a | grep -i ubuntu | wc -l`
 WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
 SAUCY=`grep 'Ubuntu 13.10' /etc/issue | wc -l`
@@ -103,28 +104,29 @@ if [ ! -d $OMEGAUP_ROOT ]; then
 	sudo chown $USER -R $OMEGAUP_ROOT
 	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
 
+	pushd $OMEGAUP_ROOT
 	# Install githooks
 	stuff/install-githooks.sh
 
 	# Update the submodules
-	pushd $OMEGAUP_ROOT
 	git submodule update --init	
 	popd
 fi
 
 # Generate the certificates required.
-pushd $OMEGAUP_ROOT
-bin/certmanager init --password $KEYSTORE_PASSWORD
+if [ ! -d $OMEGAUP_ROOT/ssl ]; then
+	$OMEGAUP_ROOT/bin/certmanager init --password $KEYSTORE_PASSWORD
+fi
 
 # Build minijail
-cd $OMEGAUP_ROOT/minijail
-make
+make -C $OMEGAUP_ROOT/minijail
 
 # Grab all sbt dependencies -- including MySQL.
-cd $OMEGAUP_ROOT/backend
-sbt update
-
-popd
+if [ ! -f $MYSQL_JAR ]; then
+	pushd $OMEGAUP_ROOT/backend
+	sbt update
+	popd
+fi
 
 
 # Set up the minijail.
@@ -142,7 +144,7 @@ fi
 
 # Install the grader service.
 if [ ! -f /etc/init.d/omegaup ]; then
-	cp ~/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.29.jar $OMEGAUP_ROOT/bin
+	cp $MYSQL_JAR $OMEGAUP_ROOT/bin
 	cp $OMEGAUP_ROOT/backend/grader/omegaup.jks $OMEGAUP_ROOT/bin
 	if [ ! -d /var/log/omegaup ]; then
 		sudo mkdir -p /var/log/omegaup
