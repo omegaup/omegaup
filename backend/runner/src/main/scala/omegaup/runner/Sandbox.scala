@@ -1,6 +1,8 @@
 package omegaup.runner
 
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 
 import omegaup._
 import omegaup.data._
@@ -140,26 +142,22 @@ object Minijail extends Object with Sandbox with Log with Using {
 
     debug("Compile {}", params.mkString(" "))
 
-    pusing (runtime.exec(params.toArray)) { process => {
-      if (process != null) {
-        val status = process.waitFor
-        val errorPath = chdir + "/" + errorFile
-        // Truncate the compiler error to 8k
-        try {
-          val outChan = new java.io.FileOutputStream(errorPath, true).getChannel()
-          outChan.truncate(8192)
-          outChan.close()
-        } catch {
-          case e: Exception => {
-            error("Unable to truncate {}: {}", errorPath, e)
-          }
+    val (status, syscallName) = runMinijail(params)
+    if (status != -1) {
+      val errorPath = chdir + "/" + errorFile
+      // Truncate the compiler error to 8k
+      try {
+        val outChan = new java.io.FileOutputStream(errorPath, true).getChannel()
+        outChan.truncate(8192)
+        outChan.close()
+      } catch {
+        case e: Exception => {
+          error("Unable to truncate {}: {}", errorPath, e)
         }
-        patchMetaFile(lang, None, metaFile)
-        callback(status)
-      } else {
-        callback(-1)
       }
-    }}
+      patchMetaFile(lang, syscallName, None, metaFile)
+    }
+    callback(status)
   }
 
   def run(message: RunInputMessage,
@@ -274,13 +272,37 @@ object Minijail extends Object with Sandbox with Log with Using {
     }) ++ extraParams
 
     debug("{} {}", logTag, params.mkString(" "))
-    pusing (runtime.exec(params.toArray)) { process =>
-      if (process != null) process.waitFor
-      patchMetaFile(lang, Some(message), metaFile)
-    }
+    val (status, syscallName) = runMinijail(params)
+    patchMetaFile(lang, syscallName, Some(message), metaFile)
   }
 
-  def patchMetaFile(lang: String, message: Option[RunInputMessage], metaFile: String) = {
+  private def runMinijail(params: List[String]): (Int, String) = {
+    val helperPath = Config.get("runner.minijail.path", ".") + "/bin/minijail_syscall_helper"
+    val helperParams = List("/usr/bin/sudo", helperPath)
+    val runtime = Runtime.getRuntime
+    var status = -1
+    var syscallName = ""
+
+    pusing (runtime.exec(helperParams.toArray)) { helper => {
+      pusing (runtime.exec(params.toArray)) { minijail =>
+        if (minijail != null) {
+          status = minijail.waitFor
+        }
+      }
+      if (helper != null) {
+        helper.getOutputStream.close
+        using (new BufferedReader(new InputStreamReader(helper.getInputStream))) { stream =>
+          syscallName = stream.readLine
+        }
+        helper.getInputStream.close
+        helper.waitFor
+      }
+    }}
+
+    (status, syscallName)
+  }
+
+  private def patchMetaFile(lang: String, syscallName: String, message: Option[RunInputMessage], metaFile: String) = {
     val meta = try {
       collection.mutable.Map(MetaFile.load(metaFile).toSeq: _*)
     } catch {
@@ -305,6 +327,10 @@ object Minijail extends Object with Sandbox with Log with Using {
         case "25" => "OL" // SIGFSZ
         case "35" => "OL" // SIGFSZ
         case _ => "JE"
+      }
+
+      if (meta("signal") == "31") { // SIGSYS
+        meta("syscall") = syscallName
       }
     } else {
       meta("return") = meta("status")
