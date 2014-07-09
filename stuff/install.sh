@@ -151,7 +151,6 @@ if [ ! -f /etc/init.d/omegaup ]; then
 		sudo touch /var/log/omegaup/service.log
 		sudo chown omegaup.omegaup /var/log/omegaup/service.log
 	fi
-	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0" >> /etc/sudoers'
 	# Java 7 has a bug with NSS libraries. Disable them.
 	if [ "`grep '\/lib\/security\/nss.cfg' /etc/java-7-openjdk/security/java.security`" != "" ]; then
 		sed -e 's/\(.*\/lib\/security\/nss.cfg\)/#\1/' /etc/java-7-openjdk/security/java.security > ~/.java.security
@@ -161,6 +160,14 @@ if [ ! -f /etc/init.d/omegaup ]; then
 	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/;s/\(.*\.password\)\s*=.*$/\1=$KEYSTORE_PASSWORD/" $OMEGAUP_ROOT/backend/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
 	sudo update-rc.d omegaup defaults
 	sudo service omegaup start
+fi
+
+if [ "`sudo grep minijail0 /etc/sudoers`" == "" ]; then
+	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail0" >> /etc/sudoers'
+fi
+
+if [ "`sudo grep minijail_syscall_helper /etc/sudoers`" == "" ]; then
+	sudo sh -c 'echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail_syscall_helper" >> /etc/sudoers'
 fi
 
 # Set up the www root.
