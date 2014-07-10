@@ -294,14 +294,31 @@ object Minijail extends Object with Sandbox with Log with Using {
           status = minijail.waitFor
         }
       }
-      if (helper != null) {
+      if (helper == null) {
+        error("minijail_syscall_helper was null")
+      } else {
         val future = executor.submit(new Callable[String]() {
           override def call(): String = {
             var result: String = null
             using (new BufferedReader(new InputStreamReader(helper.getInputStream))) { stream =>
               result = stream.readLine
             }
-            helper.waitFor
+            try {
+              using (new BufferedReader(new InputStreamReader(helper.getErrorStream))) { stream =>
+                var line: String = null
+                while ( { line = stream.readLine ; line != null } ) {
+                  error("minijail_syscall_helper {}", line)
+                }
+              }
+            } catch {
+              case e: Exception => {
+                debug("minijail_syscall_helper {}", e)
+              }
+            }
+            val helperStatus = helper.waitFor
+            if (helperStatus != 0) {
+              debug("minijail_syscall_helper exit status {}", helperStatus)
+            }
             result
           }
         })

@@ -16,9 +16,7 @@ TMPDIR=`mktemp -d`
 TARGET=$TMPDIR/runner-distrib.sh
 JKS=$ROOT/ssl/${HOSTNAME}.jks
 
-pushd $ROOT/minijail
-	make
-popd
+make -C $ROOT/minijail
 
 if [ ! -f $JKS ]; then
 	$ROOT/bin/certmanager runner --hostname $HOSTNAME --output $JKS
@@ -83,7 +81,7 @@ if [ "\`grep minijail0 /etc/sudoers\`" = "" ]; then
 fi
 
 if [ "\`sudo grep minijail_syscall_helper /etc/sudoers\`" = "" ]; then
-	echo "omegaup ALL = NOPASSWD: /var/lib/minijail/bin/minijail_syscall_helper" >> /etc/sudoers
+	echo "omegaup ALL = NOPASSWD: /opt/omegaup/minijail/bin/minijail_syscall_helper" >> /etc/sudoers
 fi
 
 # Add the user if not present
