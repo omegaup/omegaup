@@ -20,8 +20,13 @@ object OmegaUpDriver extends Driver with Log {
     val id = run.id
     val alias = run.problem.alias
     val lang = run.language
+    val errorFile = new File(Config.get("grader.root", "grader"), + id + ".err")
 
     info("Compiling {} {} on {}", alias, id, ctx.service.name)
+
+    if (errorFile.exists) {
+      errorFile.delete
+    }
 
     run.status = Status.Compiling
     run.judged_by = Some(ctx.service.name)
@@ -33,9 +38,7 @@ object OmegaUpDriver extends Driver with Log {
     }
   
     if(output.status != "ok") {
-      val errorFile = new FileWriter(Config.get("grader.root", "grader") + "/" + id + ".err")
-      errorFile.write(output.error.get)
-      errorFile.close
+      FileUtil.write(errorFile, output.error.get)
   
       run.status = Status.Ready
       run.veredict = Veredict.CompileError

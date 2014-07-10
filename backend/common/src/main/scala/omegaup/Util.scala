@@ -441,6 +441,13 @@ object FileUtil extends Object with Using {
 	}
 
 	@throws(classOf[IOException])
+	def write(file: File, data: String): Unit = {
+		using (new FileWriter(file)) { fileWriter =>
+			fileWriter.write(data)
+		}
+	}
+
+	@throws(classOf[IOException])
 	def copy(src: File, dest: File): Unit = {
 		using (new FileInputStream(src)) { inputStream => {
 			using (new FileOutputStream(dest)) { outputStream => {
