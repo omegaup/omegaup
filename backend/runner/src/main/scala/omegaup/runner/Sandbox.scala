@@ -3,6 +3,9 @@ package omegaup.runner
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 import omegaup._
 import omegaup.data._
@@ -29,6 +32,8 @@ trait Sandbox {
 }
 
 object Minijail extends Object with Sandbox with Log with Using {
+  val executor = Executors.newCachedThreadPool
+
   def compile[A](lang: String,
                  inputFiles: TraversableOnce[String],
                  chdir: String = "",
@@ -155,7 +160,7 @@ object Minijail extends Object with Sandbox with Log with Using {
           error("Unable to truncate {}: {}", errorPath, e)
         }
       }
-      patchMetaFile(lang, syscallName, None, metaFile)
+      patchMetaFile(lang, status, syscallName, None, metaFile)
     }
     callback(status)
   }
@@ -273,7 +278,7 @@ object Minijail extends Object with Sandbox with Log with Using {
 
     debug("{} {}", logTag, params.mkString(" "))
     val (status, syscallName) = runMinijail(params)
-    patchMetaFile(lang, syscallName, Some(message), metaFile)
+    patchMetaFile(lang, status, syscallName, Some(message), metaFile)
   }
 
   private def runMinijail(params: List[String]): (Int, String) = {
@@ -290,19 +295,33 @@ object Minijail extends Object with Sandbox with Log with Using {
         }
       }
       if (helper != null) {
-        helper.getOutputStream.close
-        using (new BufferedReader(new InputStreamReader(helper.getInputStream))) { stream =>
-          syscallName = stream.readLine
+        val future = executor.submit(new Callable[String]() {
+          override def call(): String = {
+            var result: String = null
+            using (new BufferedReader(new InputStreamReader(helper.getInputStream))) { stream =>
+              result = stream.readLine
+            }
+            helper.waitFor
+            result
+          }
+        })
+
+        // Wait up to 1 second for the output. Otherwise kill the process.
+        try {
+          syscallName = future.get(1, TimeUnit.SECONDS)
+        } catch {
+          case e: Exception => {
+            error("Failed to read syscall name: {}", e)
+            helper.destroy
+          }
         }
-        helper.getInputStream.close
-        helper.waitFor
       }
     }}
 
     (status, syscallName)
   }
 
-  private def patchMetaFile(lang: String, syscallName: String, message: Option[RunInputMessage], metaFile: String) = {
+  private def patchMetaFile(lang: String, status: Int, syscallName: String, message: Option[RunInputMessage], metaFile: String) = {
     val meta = try {
       collection.mutable.Map(MetaFile.load(metaFile).toSeq: _*)
     } catch {
@@ -323,7 +342,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         case "14" => "TO" // SIGALRM
         case "24" => "TO" // SIGXCPU
         case "30" => "TO" // SIGXCPU
-        case "31" => "RE" // SIGSYS
+        case "31" => "FO" // SIGSYS
         case "25" => "OL" // SIGFSZ
         case "35" => "OL" // SIGFSZ
         case _ => "JE"

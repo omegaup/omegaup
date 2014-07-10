@@ -236,7 +236,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
                     FileUtil.copy(stream, _)
                   }
                   FileUtil.write(new File(runDirectory, caseName + ".meta").getCanonicalPath,
-                                 "time:0\ntime-wall:0\nmem:0\nsyscall-count:0\nstatus:OK")
+                                 "time:0\ntime-wall:0\nmem:0\nstatus:OK")
                   process(message, runDirectory, casesDirectory, lang, new File(runDirectory, caseName + ".meta"), callback)
                 }
                 stream.closeEntry
@@ -250,7 +250,7 @@ class Runner(name: String, sandbox: Sandbox) extends RunnerService with Log with
             val caseName = runDirectory.getCanonicalPath + "/Main"
             FileUtil.copy(new File(binDirectory, "Main.cat"), new File(caseName + ".out"))
             FileUtil.write(caseName + ".meta",
-                           "time:0\ntime-wall:0\nmem:0\nsyscall-count:0\nstatus:OK")
+                           "time:0\ntime-wall:0\nmem:0\nstatus:OK")
             process(message, runDirectory, casesDirectory, lang, new File(caseName + ".meta"), callback)
           }
         }

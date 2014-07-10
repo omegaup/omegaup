@@ -310,7 +310,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       int main() { (*(void (*)())"\x6a\x02\x58\xcd\x80\xeb\xf9")(); }
     """))))
     runner.run(RunInputMessage(test5.token.get, 1, 65536, 1, false, None, Some(List(
-      new CaseData("ok", "0")
+      new CaseData("x86_forkbomb", "0")
     ))), NullRunCaseCallback)
 
     // x86_64 forkbomb
@@ -318,7 +318,7 @@ class CompileSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       int main() { (*(void (*)())"\x48\x31\xc0\xb0\x39\xcd\x80\xeb\xfa")(); }
     """))))
     runner.run(RunInputMessage(test4.token.get, 1, 65536, 1, false, None, Some(List(
-      new CaseData("ok", "0")
+      new CaseData("x86_64_forkbomb", "0")
     ))), NullRunCaseCallback)
 
     // Java6 parse double bug in compiler: CVE-2010-4476
