@@ -21,7 +21,6 @@ class UserController extends Controller {
 	 * @throws DuplicatedEntryInDatabaseException
 	 */
 	public static function apiCreate(Request $r) {
-
 		// Validate request
 		Validators::isValidUsername($r["username"], "username");		
 		
@@ -1135,13 +1134,15 @@ class UserController extends Controller {
 			if (!is_null($testu)) {
 				throw new InvalidParameterException("parameterUsernameInUse", "username");
 			}
+
+			Validators::isValidUsername($r["username"], "username");
+			$r["current_user"]->setUsername($r["username"]);
 		}
 
 		SecurityTools::testStrongPassword($r["password"]);
 		$hashedPassword = SecurityTools::hashString($r["password"]);
 		$r["current_user"]->setPassword($hashedPassword);
 
-		$r["current_user"]->setUsername($r["username"]);
 		UsersDAO::save($r["current_user"]);
 
 		return array("status" => "ok");
@@ -1156,7 +1157,6 @@ class UserController extends Controller {
 	 * @throws InvalidParameterException
 	 */
 	public static function apiUpdate(Request $r) {
-		
 		self::authenticateRequest($r);
 		
 		Validators::isStringNonEmpty($r["name"], "name", false);

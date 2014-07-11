@@ -263,9 +263,7 @@ class SessionController extends Controller {
 				$suffix++;
 			}
 		}
-		$username .= $suffix;
-
-		return $username;
+		return $username . $suffix;
 	}
 
 	public function LoginViaGoogle($s_Email) {
