@@ -47,7 +47,7 @@
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}>
 		<!-- Generated from http://ajaxload.info/ -->
-		{if isset($bodyid) and $bodyid != 'only-problem'}
+		{if !isset($bodyid) or $bodyid != 'only-problem'}
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		{/if}
 		<div id="root">
