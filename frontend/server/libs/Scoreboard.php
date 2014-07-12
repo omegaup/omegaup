@@ -388,6 +388,14 @@ class Scoreboard {
 			$problem =
 				&$users_info[$user_id]['problems'][$problem_mapping[$problem_id]['order']];
 
+			if (!array_key_exists($user_id, $test_only)) {
+				//
+				// Hay un usuario en la lista de Runs, 
+				// que no fue regresado por RunsDAO::GetAllRelevantUsers()
+				//
+				continue;
+			}
+
 			$test_only[$user_id] &= $is_test;
 			$no_runs[$user_id] = false;
 			if (!$showAllRuns) {
@@ -537,14 +545,22 @@ class Scoreboard {
 
 		// Calculate score for each contestant x problem x run
 		foreach ($contest_runs as $run) {
+
+
 			if (!$showAllRuns && $run->getTest() != 0) {
 				continue;
 			}
 
+		$log = Logger::getLogger("Scoreboard");
 			$run_delay = strtotime($run->getTime());
+		    $log->debug(">>      run_delay : $run_delay");
+		    $log->debug(">>scoreboardLimit : $scoreboardLimit");
+		    $log->debug("");
+
 			if ($run_delay >= $scoreboardLimit) {
 				continue;
 			}
+
 
 			$user_id = $run->getUserId();
 			$problem_id = $run->getProblemId();
