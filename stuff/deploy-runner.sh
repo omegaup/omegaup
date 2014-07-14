@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 if [ $# -lt 2 ]; then
-	echo "$0 <grader hostname> <hostname to deploy to>"
+	echo "$0 <grader hostname> <hostname to deploy to> [--upgrade]"
 	exit 1
 fi
 
@@ -9,6 +9,11 @@ GRADER=$1
 HOSTNAME=$2
 if [ "$USERNAME" == "" ]; then
 	USERNAME=`whoami`
+fi
+
+UPGRADE_COMMAND=
+if [ "$3" == "--upgrade" ]; then
+	UPGRADE_COMMAND="apt-get update -y && apt-get upgrade -y"
 fi
 
 ROOT=`dirname $0`/..
@@ -60,6 +65,8 @@ cat > $TMPDIR/setup-runner <<EOF
 #!/bin/bash -e
 
 sudo service runner stop || echo 'No runner found'
+
+$UPGRADE_COMMAND
 
 # Install all required packages
 if [ ! -d /opt/omegaup ]; then
