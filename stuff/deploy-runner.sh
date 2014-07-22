@@ -32,7 +32,7 @@ mkdir -p $TMPDIR/distrib/minijail/{bin,lib,dist,scripts,bin}
 
 cp $ROOT/bin/runner.jar $TMPDIR/distrib/bin/runner.jar
 cp $JKS $TMPDIR/distrib/bin/omegaup.jks
-cp $ROOT/minijail/{minijail0,ldwrapper,libminijailpreload.so,minijail_syscall_helper} $TMPDIR/distrib/minijail/bin/
+cp $ROOT/minijail/{minijail0,libminijailpreload.so,minijail_syscall_helper} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/bin/{karel,kcl} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/stuff/libkarel.py $TMPDIR/distrib/minijail/lib/
 cp $ROOT/stuff/mkroot $TMPDIR/distrib/minijail/bin/

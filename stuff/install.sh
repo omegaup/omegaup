@@ -133,7 +133,7 @@ fi
 if [ ! -d $MINIJAIL_ROOT ]; then
 	sudo mkdir -p $MINIJAIL_ROOT/{bin,dist,scripts,lib}
 	sudo cp $OMEGAUP_ROOT/bin/{karel,kcl} $MINIJAIL_ROOT/bin/
-	sudo cp $OMEGAUP_ROOT/minijail/{minijail0,libminijailpreload.so,ldwrapper} $MINIJAIL_ROOT/bin/
+	sudo cp $OMEGAUP_ROOT/minijail/{minijail0,libminijailpreload.so,minijail_syscall_helper} $MINIJAIL_ROOT/bin/
 	sudo cp $OMEGAUP_ROOT/stuff/minijail-scripts/* $MINIJAIL_ROOT/scripts/
 	sudo cp $OMEGAUP_ROOT/stuff/libkarel.py $MINIJAIL_ROOT/lib/
 

@@ -92,7 +92,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         commonParams ++
         List(
           "--",
-          "/usr/bin/ldwrapper", Config.get("p.compiler.path", "/usr/bin/fpc"),
+          Config.get("p.compiler.path", "/usr/bin/fpc"),
           "-Tlinux",
           "-O2",
           "-Mobjfpc",
@@ -111,7 +111,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         commonParams ++
         List(
           "--",
-          "/usr/bin/ldwrapper", Config.get("kcl.compiler.path", "/usr/bin/kcl"),
+          Config.get("kcl.compiler.path", "/usr/bin/kcl"),
           "-lj",
           "-o",
           "Main.kx",
@@ -123,7 +123,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         commonParams ++
         List(
           "--",
-          "/usr/bin/ldwrapper", Config.get("kcl.compiler.path", "/usr/bin/kcl"),
+          Config.get("kcl.compiler.path", "/usr/bin/kcl"),
           "-lp",
           "-o",
           "Main.kx",
@@ -239,7 +239,7 @@ object Minijail extends Object with Sandbox with Log with Using {
       case "p" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/pas") ++
         commonParams ++
-        List("-m", hardLimit, "--", "/usr/bin/ldwrapper", "./Main")
+        List("-m", hardLimit, "--", "./Main")
       case "py" =>
         List("/usr/bin/sudo", minijail, "-S", scripts + "/py") ++
         commonParams ++
@@ -250,7 +250,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         commonParams ++
         List(
           "--",
-          "/usr/bin/ldwrapper", Config.get("karel.runtime.path", "/usr/bin/karel"),
+          Config.get("karel.runtime.path", "/usr/bin/karel"),
           "/dev/stdin",
           "-oi",
           "-q",
@@ -262,7 +262,7 @@ object Minijail extends Object with Sandbox with Log with Using {
         commonParams ++
         List(
           "--",
-          "/usr/bin/ldwrapper", Config.get("karel.runtime.path", "/usr/bin/karel"),
+          Config.get("karel.runtime.path", "/usr/bin/karel"),
           "/dev/stdin",
           "-oi",
           "-q",
