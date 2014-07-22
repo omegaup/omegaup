@@ -21,6 +21,7 @@ if (isset($_POST["request"])) {
 					"source" => $_POST["source"],
 					"public" => $_POST["public"],
 					"languages" => $_POST["languages"],
+					"stack_limit" => $_POST["stack_limit"]
 				));
 		$r->method = "ProblemController::apiUpdate";
 		$response = ApiCaller::call($r);

@@ -95,6 +95,9 @@ class Problems extends VO
 			if (isset($data['slow'])) {
 				$this->slow = $data['slow'];
 			}
+			if (isset($data['stack_limit'])) {
+				$this->stack_limit = $data['stack_limit'];
+			}
 		}
 	}
 
@@ -128,7 +131,8 @@ class Problems extends VO
 			"source" => $this->source,
 			"order" => $this->order,
 			"tolerance" => $this->tolerance,
-			"slow" => $this->slow
+			"slow" => $this->slow,
+			"stack_limit" => $this->stack_limit
 		); 
 	return json_encode($vec); 
 	}
@@ -291,4 +295,11 @@ class Problems extends VO
 	  * @var tinyint(1)
 	  */
 	public $slow;
+	
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var int(11)
+	  */
+	public $stack_limit;
 }

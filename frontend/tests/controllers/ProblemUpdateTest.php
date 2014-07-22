@@ -44,6 +44,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$r["title"] = "new title";
 		$r["time_limit"] = 12345;
 		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r["stack_limit"] = 12345;
 		
 		// Set file upload context
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT."triangulos.zip";
@@ -78,6 +79,8 @@ class UpdateProblemTest extends OmegaupTestCase {
 		// Check update in statements
 		$statement = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		$this->assertContains("perímetro", $statement);
+		
+		$this->assertEquals(12345, $problems[0]->stack_limit);
 				
 	}
 	

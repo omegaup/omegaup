@@ -185,6 +185,7 @@
 			$('input[name=memory_limit]').val('');
 			$('input[name=output_limit]').val('');
 			$('input[name=source]').val('');
+			$('input[name=stack_limit]').val('');
 			return;
 		}
 		
@@ -196,6 +197,7 @@
 			$('input[name=time_limit]').val(problem.time_limit);
 			$('input[name=memory_limit]').val(problem.memory_limit);
 			$('input[name=output_limit]').val(problem.output_limit);
+			$('input[name=stack_limit]').val(problem.stack_limit);
 			$('input[name=source]').val(problem.source);
 			$('#statement-preview .source').html(omegaup.escape(problem.source));
 			$('select[name=validator]').val(problem.validator);

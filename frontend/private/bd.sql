@@ -307,6 +307,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `order` enum('normal','inverse') NOT NULL DEFAULT 'normal',
   `tolerance` double NOT NULL DEFAULT 1e-9,
   `slow` tinyint(1) NOT NULL DEFAULT 0,
+  `stack_limit` int(11) NOT NULL DEFAULT 10240,
   PRIMARY KEY (`problem_id`),
   KEY `author_id` (`author_id`),
   UNIQUE KEY `problems_alias` (`alias`)

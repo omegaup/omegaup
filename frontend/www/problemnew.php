@@ -9,6 +9,7 @@ $smarty->assign('VALIDATOR', "token-caseless");
 $smarty->assign('TIME_LIMIT', "1000");
 $smarty->assign('OUTPUT_LIMIT', "10240");
 $smarty->assign('MEMORY_LIMIT', "32768");
+$smarty->assign('STACK_LIMIT', "10240");
 $smarty->assign('SOURCE', "");
 $smarty->assign('PUBLIC', "0");
 
@@ -24,6 +25,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 				"output_limit" => $_POST["output_limit"],
  				"source" => $_POST["source"],				
 				"public" => $_POST["public"],
+				"stack_limit" => $_POST["stack_limit"]
 			));
 	$r->method = "ProblemController::apiCreate";
 
@@ -39,6 +41,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 		$smarty->assign('MEMORY_LIMIT', $_POST["memory_limit"]);
 		$smarty->assign('SOURCE', $_POST["source"]);
 		$smarty->assign('PUBLIC', $_POST["public"]);
+		$smarty->assign('STACK_LIMIT', $_POST["stack_limit"]);
 	} else if ($response["status"] == "ok") {
 		header("Location: /problem/edit/{$response['alias']}/");
 		die();

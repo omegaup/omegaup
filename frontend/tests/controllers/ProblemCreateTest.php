@@ -57,6 +57,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals($r["source"], $problem->getSource());
 		$this->assertEqualSets($r["languages"], $problem->getLanguages());
 		$this->assertEquals(0, $problem->slow);
+		$this->assertEquals(10000, $problem->stack_limit);
 
 		// Verify author username -> author id conversion
 		$user = UsersDAO::getByPK($problem->getAuthorId());

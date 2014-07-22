@@ -65,6 +65,7 @@ class ProblemsFactory {
 		$r["public"] = $public;        	
 		$r["output_limit"] = 10240;        	
 		$r["languages"] = 'c,cpp,py';
+		$r["stack_limit"] = 10000;
 
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = $zipName; 

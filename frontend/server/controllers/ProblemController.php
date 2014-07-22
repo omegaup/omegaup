@@ -180,6 +180,7 @@ class ProblemController extends Controller {
 		$problem->setAuthorId($r["current_user_id"]);
 		$problem->setAlias($r["alias"]);
 		$problem->setLanguages($r["languages"]);
+		$problem->setStackLimit($r["stack_limit"]);
 
 		$problemDeployer = new ProblemDeployer($r['alias'], false);
 
@@ -461,6 +462,7 @@ class ProblemController extends Controller {
 			"time_limit"    => array("important" => true), // requires rejudge
 			"memory_limit"  => array("important" => true), // requires rejudge
 			"output_limit"  => array("important" => true), // requires rejudge
+			"stack_limit"   => array("important" => true), // requires rejudge
 			"source",
 			"order",
 			"languages",
@@ -733,7 +735,7 @@ class ProblemController extends Controller {
 		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit",
 				"memory_limit", "output_limit", "visits", "submissions", "accepted",
 				"difficulty", "creation_date", "source", "order", "points", "public",
-				"languages", "slow");
+				"languages", "slow", "stack_limit");
 
 		// Read the file that contains the source
 		if ($r["problem"]->getValidator() != 'remote') {

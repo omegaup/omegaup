@@ -68,7 +68,7 @@
 					<input id='source' name='source' value='{if $IS_UPDATE eq 0}{$SOURCE|htmlspecialchars}{/if}' type='text' class="form-control" />
 				</div>
 			</div>
-				
+											
 			<div class="row">
 				<div class="form-group col-md-6">
 					<label for="public">{#problemEditFormAppearsAsPublic#}</label>
@@ -85,6 +85,13 @@
 						<option value="kp,kj">Karel</option>
 						<option value="cat">{#wordsJustOutput#}</option>
 					</select>
+				</div>
+			</div>
+					
+			<div class="row">
+				<div class="form-group  col-md-6">
+					<label for="stack_limit">Límite de pila</label>
+					<input id="stack_limit" name="stack_limit" value="{if $IS_UPDATE eq 0}{$STACK_LIMIT}{/if}" type='text' class="form-control" />
 				</div>
 			</div>
 			
