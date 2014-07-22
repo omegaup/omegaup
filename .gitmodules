@@ -16,3 +16,6 @@
 [submodule "frontend/www/js/pagedown"]
 	path = frontend/www/js/pagedown
 	url = https://github.com/omegaup/pagedown.git
+[submodule "backend"]
+	path = backend
+	url = https://github.com/omegaup/backend.git
