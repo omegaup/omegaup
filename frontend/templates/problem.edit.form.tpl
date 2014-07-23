@@ -90,7 +90,7 @@
 					
 			<div class="row">
 				<div class="form-group  col-md-6">
-					<label for="stack_limit">Límite de pila</label>
+					<label for="stack_limit">{#problemEditStackLimit#}</label>
 					<input id="stack_limit" name="stack_limit" value="{if $IS_UPDATE eq 0}{$STACK_LIMIT}{/if}" type='text' class="form-control" />
 				</div>
 			</div>

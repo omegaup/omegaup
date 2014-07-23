@@ -227,6 +227,7 @@ OmegaUp.T = {
 	problemEditFormValidatorType: "(Va1idad0r 7yp3)",
 	problemEditGoToProblem: "(G0 70 pr0b13m)",
 	problemEditSlowWarning: "(<57r0ng>Warning</57r0ng>: Thi5 pr0b13m wi11 b3 judg3d in 7h3 510w qu3u3 5inc3 TLE run5 migh7 fini5h in m0r3 7han 305 (numb3r 0f ca535 * 7im3 1imi7 in 53c0nd5 r0und3d up). Pr0b13m5 in 7h3 510w qu3u3 migh7 7ak3 up 70 53v3ra1 minu735 in b3ing judg3d, 70 av0id 510wing 7h3 r357 0f 7h3 5y573m. If y0u wan7 7hi5 pr0b13m 70 n07 b3 in 7h3 510w qu3u3, r3m0v3 7357 ca535 0r r3duc3 7h3 7im3 1imi7.)",
+	problemEditStackLimit: "(S7ack 1imi7 (KB))",
 	problemIsNotPublic: "(Th3 pr0b13m i5 n07 pub1ic.)",
 	problemIsPrivate: "(Pr0b13m i5 mark3d a5 priva73.)",
 	problemNew: "(Cr3a73 pr0b13m)",
