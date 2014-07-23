@@ -13,9 +13,10 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 	 */
 	public function setUp() {
 		
+		parent::setUp();
 		UserController::$sendEmailOnVerify = false;
 		SessionController::$setCookieOnRegisterSession = false;
-		
+				
 		//Clean $_REQUEST before each test
 		unset($_REQUEST);
 	}

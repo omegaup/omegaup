@@ -281,11 +281,7 @@ if [ ! `mysql -uroot -p$MYSQL_PASSWORD --batch --skip-column-names -e "SHOW DATA
 	
 	echo "Installing States and Countries"
 	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME < $OMEGAUP_ROOT/frontend/private/countries_and_states.sql
-
-	echo "Installing test db"
-	mysql -uroot -p$MYSQL_PASSWORD -e "CREATE DATABASE \`$MYSQL_DB_NAME-test\`;" 
-	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME-test < $OMEGAUP_ROOT/frontend/private/bd.sql
-	mysql -uroot -p$MYSQL_PASSWORD $MYSQL_DB_NAME-test < $OMEGAUP_ROOT/frontend/private/countries_and_states.sql
+	
 fi
 
 #test curl
@@ -298,7 +294,7 @@ if [ ! -f $OMEGAUP_ROOT/frontend/tests/test_config.php ]; then
 <?php
 define('OMEGAUP_DB_USER', 'root');
 define('OMEGAUP_DB_PASS', '$MYSQL_PASSWORD');
-define('OMEGAUP_DB_NAME', '$MYSQL_DB_NAME-test');
+define('OMEGAUP_DB_NAME', '$MYSQL_DB_NAME');
 EOF
 fi
 

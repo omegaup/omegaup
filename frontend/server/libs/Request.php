@@ -12,10 +12,6 @@
  * copy-on-write semantics.
  */
 class Request extends ArrayObject {
-	/**
-	 * The parameters that can be accessed through this Request.
-	 */
-	private $params = null;
 
 	/**
 	 * The parent of this Request. This is set whenever the push function is called.
@@ -47,38 +43,21 @@ class Request extends ArrayObject {
 	 */
 	public function __construct($contents = null) {
 		if ($contents != null && is_array($contents)) {
-			$this->params = $contents;
+			foreach($contents as $key => $value) {
+				$this[$key] = $value;
+			}
 		} else {
 			$this->params = array();
 		}
 	}
-
-	/**
-	 * Assigns $key to $value. Used as $req[$key] = $value;
-	 *
-	 * @param string $key   The key.
-	 * @param mixed  $value The value.
-	 */
-	public function offsetSet($key, $value) {
-		$this->params[$key] = $value;
-	}
-
+	
 	/**
 	 * Whether $key exists. Used as isset($req[$key]);
 	 *
 	 * @param string $key The key.
 	 */
-	public function offsetExists($key) {
-		return $key == 'auth_token' || isset($this->params[$key]) || ($this->parent != null && isset($this->parent[$key]));
-	}
-
-	/**
-	 * Usets a key. Used as unset($req[$key]);
-	 *
-	 * @param string $key The key.
-	 */
-	public function offsetUnset($key) {
-		unset($this->params[$key]);
+	public function offsetExists($key) {		
+		return parent::offsetExists($key) || ($this->parent != null && isset($this->parent[$key]));
 	}
 
 	/**
@@ -86,8 +65,8 @@ class Request extends ArrayObject {
 	 *
 	 * @param string $key The key.
 	 */
-	public function offsetGet($key) {
-		return (isset($this->params[$key]) && $this->params[$key] !== "null") ? $this->params[$key] : ($this->parent != null ? $this->parent[$key] : null);
+	public function offsetGet($key) {		
+		return (isset($this[$key]) && parent::offsetGet($key) !== "null") ? parent::offsetGet($key) : ($this->parent != null ? $this->parent[$key] : null);
 	}
 
 	/**
