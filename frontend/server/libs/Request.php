@@ -34,22 +34,6 @@ class Request extends ArrayObject {
 	 * The method that will be called.
 	 */
 	public $method = null;
-
-	/**
-	 * The constructor of this class. Uses $contents as the backing for the values.
-	 *
-	 * @param array $contents An associative array with the values that this class
-	 *                        will use.
-	 */
-	public function __construct($contents = null) {
-		if ($contents != null && is_array($contents)) {
-			foreach($contents as $key => $value) {
-				$this[$key] = $value;
-			}
-		} else {
-			$this->params = array();
-		}
-	}
 	
 	/**
 	 * Whether $key exists. Used as isset($req[$key]);
@@ -66,7 +50,7 @@ class Request extends ArrayObject {
 	 * @param string $key The key.
 	 */
 	public function offsetGet($key) {		
-		return (isset($this[$key]) && parent::offsetGet($key) !== "null") ? parent::offsetGet($key) : ($this->parent != null ? $this->parent[$key] : null);
+		return (isset($this[$key]) && parent::offsetGet($key) !== "null") ? parent::offsetGet($key) : ($this->parent != null ? $this->parent->offsetGet($key) : null);
 	}
 
 	/**
