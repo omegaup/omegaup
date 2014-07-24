@@ -30,3 +30,6 @@ brk: 1
 arch_prctl: 1
 exit_group: 1
 gettimeofday: 1
+
+# ldwrapper
+execve: 1

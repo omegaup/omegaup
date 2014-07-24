@@ -16,3 +16,6 @@ exit: 1
 exit_group: 1
 time: 1
 select: 1
+
+# ldwrapper
+execve: 1

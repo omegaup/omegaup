@@ -149,6 +149,7 @@ with Chroot('root', '/') as root:
 	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
 
+	root.install('/usr/bin/ldwrapper', 'bin/ldwrapper')
 	root.install('/usr/bin/karel', 'bin/karel')
 	root.install('/lib/libminijailpreload.so', 'bin/libminijailpreload.so')
 
@@ -241,6 +242,7 @@ with Chroot('root-compilers', '/') as root:
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
 	root.symlink('/tmp', '/home')
 
+	root.install('/usr/bin/ldwrapper', 'bin/ldwrapper')
 	root.install('/usr/bin/kcl', 'bin/kcl')
 	root.install('/lib/libminijailpreload.so', 'bin/libminijailpreload.so')
 
