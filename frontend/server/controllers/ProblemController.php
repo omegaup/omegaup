@@ -182,6 +182,10 @@ class ProblemController extends Controller {
 		$problem->setLanguages($r["languages"]);
 		$problem->setStackLimit($r["stack_limit"]);
 
+		if (file_exists(PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'])) {
+			throw new DuplicatedEntryInDatabaseException('problemExists');
+		}
+
 		$problemDeployer = new ProblemDeployer($r['alias'], false);
 
 		// Insert new problem

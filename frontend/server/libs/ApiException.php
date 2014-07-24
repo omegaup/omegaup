@@ -307,7 +307,7 @@ class ProblemDeploymentFailedException extends ApiException {
 		// obtener el texto final (ya localizado) de smarty.
 		global $smarty;
 		return $smarty->getconfigvars($this->message) . ': ' .
-			$this->previous->getErrorMessage();
+			!is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : '';
 	}
 }
 

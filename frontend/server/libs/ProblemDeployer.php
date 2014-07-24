@@ -83,8 +83,11 @@ class ProblemDeployer {
 
 			// Update contents.zip
 			$this->updateContentsDotZip($this->tmpDir, "$this->tmpDir/contents.zip");
-		} catch (Exception $e) {
+		} catch (ApiException $e) {
 			throw new ProblemDeploymentFailedException($e);
+		} catch (Exception $e) {
+			$this->log->error("Failed to deploy", $e);
+			throw new ProblemDeploymentFailedException();
 		}
 	}
 
