@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<title>{if $title}{$title|escape} &ndash; {/if}omegaUp</title>
+		<title>{if isset($title)}{$title|escape} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="/js/jquery-1.10.2.js"></script>
 		<script type="text/javascript" src="/js/jquery.ba-hashchange.js"></script>
 		<script type="text/javascript" src="/js/jquery.gritter.min.js"></script>

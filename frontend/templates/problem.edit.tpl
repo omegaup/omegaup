@@ -15,6 +15,7 @@
 	<li class="active"><a href="#edit" data-toggle="tab">{#problemEditEditProblem#}</a></li>
 	<li><a href="#markdown" data-toggle="tab">{#problemEditEditMarkdown#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#problemEditAddAdmin#}</a></li>
+	<li><a href="#tags" data-toggle="tab">{#problemEditAddTags#}</a></li>
 </ul>
 
 <div class="tab-content">
@@ -85,6 +86,37 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="tab-pane" id="tags">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<form class="form" id="add-tag-form">
+					<div class="form-group">
+						<label for="tag-name">{#wordsTags#}</label>
+						<input id="tag-name" name="tag_name" value="" type="text" size="20" class="form-control" autocomplete="off" />
+					</div>
+					<div class="form-group">
+						<label for="tag-public">{#wordsPublic#}</label>
+						<select id="tag-public" name="tag_public" class="form-control">
+							<option value="0" selected="selected">{#wordsNo#}</option>
+							<option value="1">{#wordsYes#}</option>
+						</select>
+					</div>
+
+					<button class="btn btn-primary" type='submit'>{#wordsAddTag#}</button>
+				</form>
+			</div>
+
+			<table class="table table-striped">
+				<thead>
+					<th>{#contestEditTagName#}</th>
+					<th>{#contestEditTagPublic#}</th>
+					<th>{#contestEditTagDelete#}</th>
+				</thead>
+				<tbody id="problem-tags"></tbody>
+			</table>
+		</div>
+	</div>
 </div>
 			
 <script>
@@ -103,20 +135,29 @@
 		var problemAlias = '{$smarty.get.problem}';
 		refreshEditForm(problemAlias);
 
-		// Add admins typeahead
-		function typeahead(dest) {
-			return {
-				ajax: '/api/user/list/',
-				display: 'label',
-				val: 'label',
-				minLength: 2,
-				itemSelected: function (item, val, text) {
-					$(dest).val(val);
-				}
-			}
-		};
+		// Add typeaheads
 		refreshProblemAdmins();
-		$('#username-admin').typeahead(typeahead('#user-admin'));
+		$('#username-admin').typeahead({
+			ajax: '/api/user/list/',
+			display: 'label',
+			val: 'label',
+			minLength: 2,
+			itemSelected: function (item, val, text) {
+				$('#user-admin').val(val);
+			}
+		});
+
+		refreshProblemTags();
+		$('#tag-name').typeahead({
+			ajax: '/api/tag/list/',
+			hint: true,
+			highlight: true,
+			display: 'name',
+			val: 'name',
+			itemSelected: function (item, val, text) {
+				$('#tag-name').val(val);
+			}
+		});
 
 		$('#add-admin-form').submit(function() {
 			var username = $('#user-admin').val();
@@ -164,6 +205,59 @@
 										});
 									};
 								})(admin.username))
+							)
+					);
+				}
+			});
+		}
+
+		$('#add-tag-form').submit(function() {
+			var tagname = $('#tag-name').val();
+			var public = $('#tag-public').val();
+
+			omegaup.addTagToProblem(problemAlias, tagname, public, function(response) {
+				if (response.status === "ok") {
+					OmegaUp.ui.success("Tag successfully added!");
+					$('div.post.footer').show();
+
+					refreshProblemTags();
+				} else {
+					OmegaUp.ui.error(response.error || 'error');
+				}
+			});
+
+			return false; // Prevent refresh
+		});
+
+		function refreshProblemTags() {
+			omegaup.getProblemTags(problemAlias, function(result) {
+				$('#problem-tags').empty();
+				// Got the contests, lets populate the dropdown with them
+				for (var i = 0; i < result.tags.length; i++) {
+					var tag = result.tags[i];
+					$('#problem-tags').append(
+						$('<tr></tr>')
+							.append($('<td></td>').append(
+								$('<a></a>')
+									.attr('href', '/problem/tags/' + tag.name + '/')
+									.text(tag.name)
+							))
+							.append($('<td></td>').text(tag.public))
+							.append($('<td><button type="button" class="close">&times;</button></td>')
+								.click((function(tagname) {
+									return function(e) {
+										omegaup.removeTagFromProblem(problemAlias, tagname, function(response) {
+											if (response.status == "ok") {
+												OmegaUp.ui.success("Tag successfully removed!");
+												$('div.post.footer').show();
+												var tr = e.target.parentElement.parentElement;
+												$(tr).remove();
+											} else {
+												OmegaUp.ui.error(response.error || 'error');
+											}
+										});
+									};
+								})(tag.name))
 							)
 					);
 				}

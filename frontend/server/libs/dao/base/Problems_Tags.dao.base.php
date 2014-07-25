@@ -139,6 +139,10 @@ abstract class ProblemsTagsDAOBase extends DAO
 			$sql .= " `tag_id` = ? AND";
 			array_push( $val, $Problems_Tags->getTagId() );
 		}
+		if (!is_null( $Problems_Tags->getPublic())) {
+			$sql .= " `public` = ? AND";
+			array_push( $val, $Problems_Tags->getPublic() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -174,6 +178,13 @@ abstract class ProblemsTagsDAOBase extends DAO
 	  **/
 	private static final function update($Problems_Tags)
 	{
+		$sql = "UPDATE Problems_Tags SET  `public` = ? WHERE  `problem_id` = ? AND `tag_id` = ?;";
+		$params = array( 
+			$Problems_Tags->getPublic(), 
+			$Problems_Tags->getProblemId(),$Problems_Tags->getTagId(), );
+		global $conn;
+		$conn->Execute($sql, $params);
+		return $conn->Affected_Rows();
 	}
 
 	/**
@@ -190,10 +201,12 @@ abstract class ProblemsTagsDAOBase extends DAO
 	  **/
 	private static final function create( $Problems_Tags )
 	{
-		$sql = "INSERT INTO Problems_Tags ( `problem_id`, `tag_id` ) VALUES ( ?, ?);";
+		if (is_null($Problems_Tags->public)) $Problems_Tags->public = 0;
+		$sql = "INSERT INTO Problems_Tags ( `problem_id`, `tag_id`, `public` ) VALUES ( ?, ?, ?);";
 		$params = array( 
 			$Problems_Tags->problem_id,
 			$Problems_Tags->tag_id,
+			$Problems_Tags->public,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -257,6 +270,17 @@ abstract class ProblemsTagsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `tag_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $Problems_TagsA->getPublic()) ) ) & ( ! is_null ( ($b = $Problems_TagsB->getPublic()) ) ) ){
+				$sql .= " `public` >= ? AND `public` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `public` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

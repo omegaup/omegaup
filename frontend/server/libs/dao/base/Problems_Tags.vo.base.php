@@ -38,6 +38,9 @@ class ProblemsTags extends VO
 			if (isset($data['tag_id'])) {
 				$this->tag_id = $data['tag_id'];
 			}
+			if (isset($data['public'])) {
+				$this->public = $data['public'];
+			}
 		}
 	}
 
@@ -52,7 +55,8 @@ class ProblemsTags extends VO
 	{ 
 		$vec = array( 
 			"problem_id" => $this->problem_id,
-			"tag_id" => $this->tag_id
+			"tag_id" => $this->tag_id,
+			"public" => $this->public
 		); 
 	return json_encode($vec); 
 	}
@@ -82,4 +86,11 @@ class ProblemsTags extends VO
 	  * @var int(11)
 	  */
 	public $tag_id;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var tinyint(1)
+	  */
+	public $public;
 }

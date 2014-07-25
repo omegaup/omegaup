@@ -295,7 +295,7 @@ class Problems extends VO
 	  * @var tinyint(1)
 	  */
 	public $slow;
-	
+
 	/**
 	  *  [Campo no documentado]
 	  * @access public

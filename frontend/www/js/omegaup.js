@@ -666,6 +666,28 @@ OmegaUp.prototype.addAdminToProblem = function(problemAlias, username, callback)
 	});
 };
 
+OmegaUp.prototype.addTagToProblem = function(problemAlias, tagname, public, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/addTag/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		{
+			name: tagname,
+			public: public
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.removeAdminFromProblem = function(problemAlias, username, callback) {
 	var self = this;
 
@@ -673,6 +695,27 @@ OmegaUp.prototype.removeAdminFromProblem = function(problemAlias, username, call
 		'/api/problem/removeAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
 		{			
 			usernameOrEmail : username			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.removeTagFromProblem = function(problemAlias, tagname, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/removeTag/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		{
+			name : tagname
 		},
 		function (data) {
 			callback(data);
@@ -953,6 +996,24 @@ OmegaUp.prototype.getProblemAdmins = function(problemAlias, callback) {
 
 	$.get(
 		'/api/problem/admins/problem_alias/' + encodeURIComponent(problemAlias) + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getProblemTags = function(problemAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/problem/tags/problem_alias/' + encodeURIComponent(problemAlias) + '/' ,
 		function (data) {
 			callback(data);
 		},

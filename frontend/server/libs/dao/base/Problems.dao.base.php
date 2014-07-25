@@ -215,6 +215,10 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `slow` = ? AND";
 			array_push( $val, $Problems->getSlow() );
 		}
+		if (!is_null( $Problems->getStackLimit())) {
+			$sql .= " `stack_limit` = ? AND";
+			array_push( $val, $Problems->getStackLimit() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -272,8 +276,8 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getOrder(), 
 			$Problems->getTolerance(), 
 			$Problems->getSlow(), 
-			$Problems->stack_limit,
-			$Problems->getProblemId());
+			$Problems->getStackLimit(), 
+			$Problems->getProblemId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -308,7 +312,7 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->tolerance)) $Problems->tolerance = 1e-9;
 		if (is_null($Problems->slow)) $Problems->slow = 0;
 		if (is_null($Problems->stack_limit)) $Problems->stack_limit = 10240;
-		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `memory_limit`, `output_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `stack_limit`) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `memory_limit`, `output_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `stack_limit` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Problems->problem_id,
 			$Problems->public,
@@ -331,7 +335,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->order,
 			$Problems->tolerance,
 			$Problems->slow,
-			$Problems->stack_limit
+			$Problems->stack_limit,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -605,6 +609,17 @@ abstract class ProblemsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `slow` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ProblemsA->getStackLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getStackLimit()) ) ) ){
+				$sql .= " `stack_limit` >= ? AND `stack_limit` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `stack_limit` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

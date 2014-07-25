@@ -316,6 +316,19 @@ CREATE TABLE IF NOT EXISTS `Problems` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `Tags`
+--
+
+CREATE TABLE IF NOT EXISTS `Tags` (
+  `tag_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(32) NOT NULL,
+  PRIMARY KEY (`tag_id`),
+  UNIQUE KEY `tag_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags privados para los problemas.' AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `Problem_Badges`
 --
 
@@ -352,10 +365,11 @@ CREATE TABLE IF NOT EXISTS `Problems_Languages` (
 CREATE TABLE IF NOT EXISTS `Problems_Tags` (
   `problem_id` int(11) NOT NULL,
   `tag_id` int(11) NOT NULL,
+  `public` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`problem_id`,`tag_id`),
-  KEY `tag_id` (`tag_id`),
-  KEY `problem_id` (`problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda la relacion entre Problemas y sus Tags';
+  KEY `problem_id` (`problem_id`),
+  KEY `tag_id` (`tag_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags privados para los problemas.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -570,6 +584,13 @@ ALTER TABLE `Contests`
 ALTER TABLE `Contests_Users`
   ADD CONSTRAINT `fk_cuc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Problem_Tags`
+--
+ALTER TABLE `Problems_Tags`
+  ADD CONSTRAINT `fk_ptp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ptt_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `Tags` (`tag_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Contest_Problems`

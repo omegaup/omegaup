@@ -316,6 +316,73 @@ class ProblemController extends Controller {
 	}
 	
 	/**
+	 * Adds a tag to a problem
+	 *
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiAddTag(Request $r) {
+		// Check problem_alias
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		// Authenticate logged user
+		self::authenticateRequest($r);
+
+		$problem = ProblemsDAO::getByAlias($r['problem_alias']);
+
+		if (!Authorization::IsProblemAdmin($r["current_user_id"], $problem)) {
+			throw new ForbiddenAccessException();
+		}
+
+		// Normalize name.
+		$tag_name = $r['name'];
+		Validators::isStringNonEmpty($tag_name, 'name');
+		$tag_name = TagController::normalize($tag_name);
+
+		try {
+			$tag = TagsDAO::getByName($tag_name);
+		} catch (Exception $e) {
+			$this->log->info($e);
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if ($tag == null) {
+			try {
+				$tag = new Tags();
+				$tag->name = $tag_name;
+				TagsDAO::save($tag);
+			} catch (Exception $inner) {
+				$this->log->info($e);
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($inner);
+			}
+		}
+
+		if (is_null($tag->tag_id)) {
+			throw new InvalidDatabaseOperationException(new Exception("tag"));
+		}
+
+		$problem_tag = new ProblemsTags();
+		$problem_tag->problem_id = $problem->problem_id;
+		$problem_tag->tag_id = $tag->tag_id;
+		$problem_tag->public = $r['public'] ? 1 : 0;
+
+		// Save the tag to the DB
+		try {
+			ProblemsTagsDAO::save($problem_tag);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			self::$log->error("Failed to save tag", $e);
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array('status' => 'ok', 'name' => $tag_name);
+	}
+
+	/**
 	 * Removes an admin from a contest
 	 * 
 	 * @param Request $r
@@ -365,6 +432,54 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Removes a tag from a contest
+	 *
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 * @throws ForbiddenAccessException
+	 */
+	public static function apiRemoveTag(Request $r) {
+		// Authenticate logged user
+		self::authenticateRequest($r);
+
+		// Check whether problem exists
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		try {
+			$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+			$tag = TagsDAO::getByName($r['name']);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($problem)) {
+			throw new NotFoundException('problem');
+		} else if (is_null($tag)) {
+			throw new NotFoundException('tag');
+		}
+	
+		if (!Authorization::IsProblemAdmin($r["current_user_id"], $problem)) {
+			throw new ForbiddenAccessException();
+		}
+
+		$problem_tag = new ProblemsTags();
+		$problem_tag->problem_id = $problem->problem_id;
+		$problem_tag->tag_id = $tag->tag_id;
+
+		// Delete the role
+		try {
+			ProblemsTagsDAO::delete($problem_tag);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array("status" => "ok");
+	}
+
+	/**
 	 * Returns all problem administrators
 	 * 
 	 * @param Request $r
@@ -389,6 +504,36 @@ class ProblemController extends Controller {
 
 		$response = array();
 		$response["admins"] = UserRolesDAO::getProblemAdmins($problem);
+		$response["status"] = "ok";
+
+		return $response;
+	}
+	
+	/**
+	 * Returns all problem tags
+	 * 
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiTags(Request $r) {
+		// Authenticate request
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		try {
+			$problem = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		$response = array();
+		$response["tags"] = ProblemsTagsDAO::getProblemTags(
+			$problem,
+			!Authorization::IsProblemAdmin($r["current_user_id"], $problem)
+		);
+
 		$response["status"] = "ok";
 
 		return $response;

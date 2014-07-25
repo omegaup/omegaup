@@ -17,7 +17,31 @@ require_once("base/Tags.vo.base.php");
   * @package docs
   * 
   */
-class TagsDAO extends TagsDAOBase
-{
+class TagsDAO extends TagsDAOBase {
+	public static final function getByName($name) {
+		$sql = "SELECT * FROM Tags WHERE (name = ? ) LIMIT 1;";
+		$params = array($name);
 
+		global $conn;
+		$rs = $conn->GetRow($sql, $params);
+		if (count($rs) == 0)
+		{
+			return NULL;
+		}
+
+		return new Tags($rs);
+	}
+
+	public static function FindByName($name) {
+		global $conn;
+		$escapedStr = mysql_real_escape_string($name);
+		$sql = "SELECT name FROM Tags WHERE name LIKE '%{$escapedStr}%' LIMIT 10";
+
+		$rs = $conn->Execute($sql);
+		$result = array();
+		foreach ($rs as $row) {
+			array_push($result, new Tags($row));
+		}
+		return $result;
+	}
 }
