@@ -14,6 +14,7 @@ try {
 
 $smarty->assign('problem_statement', $result['problem_statement']);
 $smarty->assign('problem_alias', $result['alias']);
+$smarty->assign('public', $result['public']);
 $smarty->assign('source', $result['source']);
 $smarty->assign('title', $result['title']);
 $smarty->assign('points', $result['points']);

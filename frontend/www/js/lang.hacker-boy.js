@@ -338,6 +338,7 @@ OmegaUp.T = {
 	wordsPointsForRank: "(P0in75 f0r ranking)",
 	wordsPointsForRankTooltip: "(Th353 p0in75 r35pr353n7 7h3 ac7ua1 va1u3 0f 7hi5 pr0b13m. S01ving i7 wi11 d3cr3a53 i75 va1u3. F0r d37ai15 f0110w 7hi5 1ink.)",
 	wordsPrevPage: "(Pr3vi0u5 pag3)",
+	wordsPrivate: "(Priva73)",
 	wordsProblem: "(Pr0b13m)",
 	wordsProblems: "(Pr0b13m5)",
 	wordsPublic: "(Pub1ic)",

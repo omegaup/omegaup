@@ -10,7 +10,7 @@
 			<div id="problems" class="tab">
 				<div id="problem" class="main">
 					<script type="text/json" id="problem-json">{$problem}</script>
-					<h1 class="title">{$title|escape}
+					<h1 class="title">{if $public == 0}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if} {$title|escape}
 						{if $problem_admin}
 							(<a href="/problem/edit/{$problem_alias}/">{#wordsEdit#}</a>)
 						{/if}

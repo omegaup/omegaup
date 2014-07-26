@@ -338,6 +338,7 @@ OmegaUp.T = {
 	wordsPointsForRank: "Points for ranking",
 	wordsPointsForRankTooltip: "These points respresent the actual value of this problem. Solving it will decrease its value. For details follow this link.",
 	wordsPrevPage: "Previous page",
+	wordsPrivate: "Private",
 	wordsProblem: "Problem",
 	wordsProblems: "Problems",
 	wordsPublic: "Public",
