@@ -179,6 +179,10 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `output_limit` = ? AND";
 			array_push( $val, $Problems->getOutputLimit() );
 		}
+		if (!is_null( $Problems->getStackLimit())) {
+			$sql .= " `stack_limit` = ? AND";
+			array_push( $val, $Problems->getStackLimit() );
+		}
 		if (!is_null( $Problems->getVisits())) {
 			$sql .= " `visits` = ? AND";
 			array_push( $val, $Problems->getVisits() );
@@ -215,10 +219,6 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `slow` = ? AND";
 			array_push( $val, $Problems->getSlow() );
 		}
-		if (!is_null( $Problems->getStackLimit())) {
-			$sql .= " `stack_limit` = ? AND";
-			array_push( $val, $Problems->getStackLimit() );
-		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -254,7 +254,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function update($Problems)
 	{
-		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `memory_limit` = ?, `output_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `stack_limit` = ? WHERE  `problem_id` = ?;";
+		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ? WHERE  `problem_id` = ?;";
 		$params = array( 
 			$Problems->getPublic(), 
 			$Problems->getAuthorId(), 
@@ -267,6 +267,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getTimeLimit(), 
 			$Problems->getMemoryLimit(), 
 			$Problems->getOutputLimit(), 
+			$Problems->getStackLimit(), 
 			$Problems->getVisits(), 
 			$Problems->getSubmissions(), 
 			$Problems->getAccepted(), 
@@ -276,7 +277,6 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getOrder(), 
 			$Problems->getTolerance(), 
 			$Problems->getSlow(), 
-			$Problems->getStackLimit(), 
 			$Problems->getProblemId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -303,6 +303,7 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->time_limit)) $Problems->time_limit = '3000';
 		if (is_null($Problems->memory_limit)) $Problems->memory_limit = '64';
 		if (is_null($Problems->output_limit)) $Problems->output_limit = '10240';
+		if (is_null($Problems->stack_limit)) $Problems->stack_limit = '10485760';
 		if (is_null($Problems->visits)) $Problems->visits = '0';
 		if (is_null($Problems->submissions)) $Problems->submissions = '0';
 		if (is_null($Problems->accepted)) $Problems->accepted = '0';
@@ -311,8 +312,7 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->order)) $Problems->order = 'normal';
 		if (is_null($Problems->tolerance)) $Problems->tolerance = 1e-9;
 		if (is_null($Problems->slow)) $Problems->slow = 0;
-		if (is_null($Problems->stack_limit)) $Problems->stack_limit = 10240;
-		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `memory_limit`, `output_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `stack_limit` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Problems->problem_id,
 			$Problems->public,
@@ -326,6 +326,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->time_limit,
 			$Problems->memory_limit,
 			$Problems->output_limit,
+			$Problems->stack_limit,
 			$Problems->visits,
 			$Problems->submissions,
 			$Problems->accepted,
@@ -335,7 +336,6 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->order,
 			$Problems->tolerance,
 			$Problems->slow,
-			$Problems->stack_limit,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -515,6 +515,17 @@ abstract class ProblemsDAOBase extends DAO
 			
 		}
 
+		if( ( !is_null (($a = $ProblemsA->getStackLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getStackLimit()) ) ) ){
+				$sql .= " `stack_limit` >= ? AND `stack_limit` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `stack_limit` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
 		if( ( !is_null (($a = $ProblemsA->getVisits()) ) ) & ( ! is_null ( ($b = $ProblemsB->getVisits()) ) ) ){
 				$sql .= " `visits` >= ? AND `visits` <= ? AND";
 				array_push( $val, min($a,$b)); 
@@ -609,17 +620,6 @@ abstract class ProblemsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `slow` = ? AND"; 
-			$a = is_null ( $a ) ? $b : $a;
-			array_push( $val, $a);
-			
-		}
-
-		if( ( !is_null (($a = $ProblemsA->getStackLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getStackLimit()) ) ) ){
-				$sql .= " `stack_limit` >= ? AND `stack_limit` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
-		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `stack_limit` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

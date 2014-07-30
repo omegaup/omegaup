@@ -298,6 +298,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `time_limit` int(11) DEFAULT '3000',
   `memory_limit` int(11) DEFAULT '64',
   `output_limit` int(11) NOT NULL DEFAULT '10240',
+  `stack_limit` int(11) NOT NULL DEFAULT '10485760',
   `visits` int(11) NOT NULL DEFAULT '0',
   `submissions` int(11) NOT NULL DEFAULT '0',
   `accepted` int(11) NOT NULL DEFAULT '0',
@@ -307,7 +308,6 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `order` enum('normal','inverse') NOT NULL DEFAULT 'normal',
   `tolerance` double NOT NULL DEFAULT 1e-9,
   `slow` tinyint(1) NOT NULL DEFAULT 0,
-  `stack_limit` int(11) NOT NULL DEFAULT 10240000,
   PRIMARY KEY (`problem_id`),
   KEY `author_id` (`author_id`),
   UNIQUE KEY `problems_alias` (`alias`)

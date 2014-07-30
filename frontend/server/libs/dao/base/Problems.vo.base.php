@@ -68,6 +68,9 @@ class Problems extends VO
 			if (isset($data['output_limit'])) {
 				$this->output_limit = $data['output_limit'];
 			}
+			if (isset($data['stack_limit'])) {
+				$this->stack_limit = $data['stack_limit'];
+			}
 			if (isset($data['visits'])) {
 				$this->visits = $data['visits'];
 			}
@@ -95,9 +98,6 @@ class Problems extends VO
 			if (isset($data['slow'])) {
 				$this->slow = $data['slow'];
 			}
-			if (isset($data['stack_limit'])) {
-				$this->stack_limit = $data['stack_limit'];
-			}
 		}
 	}
 
@@ -123,6 +123,7 @@ class Problems extends VO
 			"time_limit" => $this->time_limit,
 			"memory_limit" => $this->memory_limit,
 			"output_limit" => $this->output_limit,
+			"stack_limit" => $this->stack_limit,
 			"visits" => $this->visits,
 			"submissions" => $this->submissions,
 			"accepted" => $this->accepted,
@@ -131,8 +132,7 @@ class Problems extends VO
 			"source" => $this->source,
 			"order" => $this->order,
 			"tolerance" => $this->tolerance,
-			"slow" => $this->slow,
-			"stack_limit" => $this->stack_limit
+			"slow" => $this->slow
 		); 
 	return json_encode($vec); 
 	}
@@ -238,6 +238,13 @@ class Problems extends VO
 	  * @access public
 	  * @var int(11)
 	  */
+	public $stack_limit;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var int(11)
+	  */
 	public $visits;
 
 	/**
@@ -295,11 +302,4 @@ class Problems extends VO
 	  * @var tinyint(1)
 	  */
 	public $slow;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var int(11)
-	  */
-	public $stack_limit;
 }
