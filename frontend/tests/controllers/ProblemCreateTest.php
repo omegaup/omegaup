@@ -63,10 +63,9 @@ class CreateProblemTest extends OmegaupTestCase {
 		$user = UsersDAO::getByPK($problem->getAuthorId());
 		$this->assertEquals($user->getUsername(), $r["author_username"]);
 
-		// Verify problem contents.zip were copied
+		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;
 
-		$this->assertFileExists($targetpath . "contents.zip");
 		$this->assertFileExists($targetpath . "testplan");
 		$this->assertFileExists($targetpath . "cases");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "en.html");
@@ -146,13 +145,12 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals("cases/g1.train0.in", $response["uploaded_files"][0]);
 		$this->assertEquals("cases/g1.train0.out", $response["uploaded_files"][1]);
 
-		// Verify problem contents.zip were copied
+		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["alias"] . DIRECTORY_SEPARATOR;
 
-		$this->assertFileExists($targetpath . "contents.zip");
 		$this->assertFileExists($targetpath . "testplan");
-		$this->assertFileExists($targetpath . "cases" . DIRECTORY_SEPARATOR . "g1.train0.in");
-		$this->assertFileExists($targetpath . "cases" . DIRECTORY_SEPARATOR . "g1.train0.out");
+		$this->assertFileExists($targetpath . "cases/in/g1.train0.in");
+		$this->assertFileExists($targetpath . "cases/out/g1.train0.out");
 		$this->assertFileExists($targetpath . "cases");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 	}
@@ -282,13 +280,10 @@ class CreateProblemTest extends OmegaupTestCase {
 		$user = UsersDAO::getByPK($problem->getAuthorId());
 		$this->assertEquals($user->getUsername(), $r["author_username"]);
 
-		// Verify problem contents.zip were copied
+		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;
 
-		$this->assertFileExists($targetpath . "contents.zip");
-		$this->assertFileExists($targetpath . "cases.zip");
 		$this->assertFileExists($targetpath . "cases");
-		$this->assertFileExists($targetpath . "inputname");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 
 		// Default data
@@ -327,12 +322,9 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals(1, count($problems));
 		$problem = $problems[0];
 
-		// Verify problem contents.zip were copied
+		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;
-		$this->assertFileExists($targetpath . "contents.zip");
-		$this->assertFileExists($targetpath . "cases.zip");
 		$this->assertFileExists($targetpath . "cases");
-		$this->assertFileExists($targetpath . "inputname");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
 
@@ -373,12 +365,9 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Verify response
 		$this->assertEquals("ok", $response["status"]);
 
-		// Verify problem contents.zip were copied
+		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["alias"] . DIRECTORY_SEPARATOR;
-		$this->assertFileExists($targetpath . "contents.zip");
-		$this->assertFileExists($targetpath . "cases.zip");
 		$this->assertFileExists($targetpath . "cases");
-		$this->assertFileExists($targetpath . "inputname");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "bunny.jpg");
@@ -458,10 +447,9 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Verify DB data
 		$this->assertEquals($r["title"], $problem->getTitle());
 		
-		// Verify problem contents.zip were copied
+		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;
 
-		$this->assertFileExists($targetpath . "contents.zip");
 		$this->assertFileExists($targetpath . "testplan");
 		$this->assertFileExists($targetpath . "cases");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "en.html");						

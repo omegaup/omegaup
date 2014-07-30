@@ -67,13 +67,10 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertEquals("cases/1.in", $response["uploaded_files"][0]);
 		
-		// Verify problem contents.zip were copied
+		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem_alias"] . DIRECTORY_SEPARATOR;
 
-		$this->assertFileExists($targetpath . "contents.zip");
-		$this->assertFileExists($targetpath . "cases.zip");
 		$this->assertFileExists($targetpath . "cases");
-		$this->assertFileExists($targetpath . "inputname");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		
 		// Check update in statements
@@ -231,10 +228,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$temppath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem_alias"] . '_tmp' . DIRECTORY_SEPARATOR;
 		
 		$this->assertFileNotExists($temppath);
-		$this->assertFileExists($targetpath . "contents.zip");
-		$this->assertFileExists($targetpath . "cases.zip");
 		$this->assertFileExists($targetpath . "cases");
-		$this->assertFileExists($targetpath . "inputname");
 		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		
 		// Check statements still is the original one

@@ -34,10 +34,10 @@ class FileHandler {
 
 	static function CreateFile($filename, $contents) {
 		// Open file
-		$handle = fopen($filename, 'w');
+		$handle = @fopen($filename, 'w');
 
 		if (!$handle) {
-			throw new RuntimeException("Not able to create file. ");
+			throw new RuntimeException("Not able to create file. $filename");
 		}
 
 		// Write to file
@@ -112,17 +112,24 @@ class FileHandler {
 			return;
 		}
 
-		foreach (glob($dir . '/*') as $file) {			
-			if (is_dir($file)) {
-				self::rrmdir($file);
+		$dh = opendir($dir);
+		if (!$dh) {
+			throw new RuntimeException("FATAL: Not able to open dir " . $dir);
+		}
+		while (($file = readdir($dh)) !== false) {
+			if ($file == '.' || $file == '..') {
+				continue;
+			}
+			if (is_dir("$dir/$file")) {
+				self::rrmdir("$dir/$file");
 			} else {
-				self::DeleteFile($file);
+				self::DeleteFile("$dir/$file");
 			}
 		}
+		closedir($dh);
 
 		if (!@rmdir($dir)) {
-			$errors = error_get_last();
-			throw new RuntimeException("FATAL: Not able to delete dir " . $dir . $errors['type']." ". $errors["message"]);
+			throw new RuntimeException("FATAL: Not able to delete dir " . $dir);
 		}
 	}
 	

@@ -118,7 +118,7 @@ class Utils {
 	}
 
 	static function CleanPath($path) {
-		self::DeleteDirRecursive($path);
+		FileHandler::DeleteDirRecursive($path);
 		mkdir($path);
 	}
 
@@ -158,28 +158,6 @@ class Utils {
 			var_dump($e->getMessage());
 			
 			$conn->Execute("SET foreign_key_checks = 1;");
-		}
-	}
-
-	static function DeleteDirRecursive($pathName) {
-		self::rrmdir($pathName);
-	}
-
-	private static function rrmdir($dir) {
-		if (!file_exists($dir)) {
-			return;
-		}
-
-		foreach (glob($dir . '/*') as $file) {
-			if (is_dir($file)) {
-				self::rrmdir($file);
-			} else if (!unlink($file)) {
-				throw new Exception("FATAL: Not able to delete file " . $file);
-			}
-		}
-
-		if (!rmdir($dir)) {
-			throw new Exception("FATAL: Not able to delete dir " . $dir);
 		}
 	}
 }

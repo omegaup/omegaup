@@ -215,7 +215,7 @@ class ProblemController extends Controller {
 			ProblemsDAO::transEnd();
 
 			// Commit at the very end
-			$problemDeployer->commit();
+			$problemDeployer->commit("Initial commit", $r['current_user']);
 		} catch (ApiException $e) {
 			// Operation failed in something we know it could fail, rollback transaction 
 			ProblemsDAO::transRollback();
@@ -651,7 +651,7 @@ class ProblemController extends Controller {
 				}
 
 				$response["uploaded_files"] = $problemDeployer->filesToUnzip;
-				$problemDeployer->commit();
+				$problemDeployer->commit("Updated problem contents", $r['current_user']);
 			} else {
 				$problem->slow = $problemDeployer->isSlow($problem);
 			}
@@ -723,11 +723,10 @@ class ProblemController extends Controller {
 			$r["lang"] = "es";
 		}				
 
-		$problemDeployer = new ProblemDeployer($r['problem_alias']);
+		$problemDeployer = new ProblemDeployer($r['problem_alias'], true);
 		try {					
-			
 			$problemDeployer->updateStatement($r['lang'], $r['statement']);
-			$problemDeployer->commit();
+			$problemDeployer->commit("Updated statement for {$r['lang']}", $r['current_user']);
 			
 			// Invalidar problem statement cache
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "html");
