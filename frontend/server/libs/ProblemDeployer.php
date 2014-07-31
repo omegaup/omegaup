@@ -53,7 +53,7 @@ class ProblemDeployer {
 		return $output;
 	}
 
-	public function __construct($alias, $preserve) {
+	public function __construct($alias, $preserve = false) {
 		$this->log = Logger::getLogger("ProblemDeployer");
 		$this->alias = $alias;
 
@@ -62,11 +62,18 @@ class ProblemDeployer {
 		$this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
 		$this->preserve = $preserve;
 
+
+		if (!is_writable(PROBLEMS_GIT_PATH)) {
+			$this->log->error("path is not writable:" . PROBLEMS_GIT_PATH);
+			throw new ProblemDeploymentFailedException();
+		}
+
 		// Initialize bare git repository
 		if (!file_exists($this->gitDir)) {
 			// Atomically try to create it.
-			if (!@mkdir($this->gitDir)) {
-				throw new InvalidParameterException("aliasInUse");
+			if (!mkdir($this->gitDir)) {
+				$this->log->error("unable to mkdir: " . $this->gitDir);
+				throw new ProblemDeploymentFailedException();
 			}
 			$this->git('init -q --bare ' . escapeshellarg($this->gitDir), PROBLEMS_GIT_PATH);
 			$created = true;
@@ -107,7 +114,8 @@ class ProblemDeployer {
 		$this->git('config push.default simple', $this->tmpDir);
 		$this->git('commit -am ' . escapeshellarg($message), $this->tmpDir);
 		$this->git('push', $this->tmpDir);
-		if (!file_exists($this->targetDir)) {
+
+		if (!file_exists($this->targetDir . DIRECTORY_SEPARATOR . ".git")) {
 			$this->git('clone ' . escapeshellarg($this->gitDir) . ' ' . escapeshellarg($this->targetDir), PROBLEMS_PATH);
 		} else {
 			$this->git('pull --rebase', $this->targetDir);
@@ -171,6 +179,14 @@ class ProblemDeployer {
 	 */
 	public function deploy() {
 		$this->validateZip();
+
+		if (!file_exists("$this->tmpDir/cases/in")) {
+			mkdir("$this->tmpDir/cases/in", 0777, true);
+		}
+
+		if (!file_exists("$this->tmpDir/cases/out")) {
+			mkdir("$this->tmpDir/cases/out", 0777, true);
+		}
 
 		try {
 			// Unzip the user's zip
