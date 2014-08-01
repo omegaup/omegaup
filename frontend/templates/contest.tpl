@@ -4,18 +4,10 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-{if not isset($smarty.session.contributeAlert) and $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 0}
+{if $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 0 and $FREE_CONTESTS_ALERT eq 1}
 	<div class="alert alert-info">
 		<span class="message">
-            {#messageMakeYourContestsPublic#}
-		</span>
-	</div>
-{/if}
-
-{if not isset($smarty.session.contributeAlert) and $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 0}
-	<div class="alert alert-info">
-		<span class="message">			
-            {#messageMakeYourProblemsPublic#}
+			{#messageMakeYourContestsPublic#}
 		</span>
 	</div>
 {/if}
