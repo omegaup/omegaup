@@ -570,7 +570,7 @@ class ProblemDeployer {
 		$this->log->info("HTMLizing statement: " . $statementFileName);
 
 		// Path used to deploy the raw problem statement (.markdown)
-		$markdown_filepath = $problemBasePath . DIRECTORY_SEPARATOR . $statementFileName;
+		$markdown_filepath = "$problemBasePath/statements/$statementFileName";
 
 		// Get the language of this statement
 		$lang = basename($statementFileName, ".markdown");
@@ -601,7 +601,7 @@ class ProblemDeployer {
 		FileHandler::CreateFile($markdown_filepath, $this->current_markdown_file_contents);
 
 		// Save the HTML file in the path .../problem_alias/statements/lang.html
-		$html_filepath = $problemBasePath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html";
+		$html_filepath = "$problemBasePath/statements/$lang.html";
 		$this->log->info("Saving HTML statement in " . $html_filepath);
 		FileHandler::CreateFile($html_filepath, $html_file_contents);
 	}
