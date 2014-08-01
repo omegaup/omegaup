@@ -215,6 +215,8 @@ OmegaUp.T = {
 	problemDeployerNoCases: "No se encontraron casos",
 	problemDeployerNoStatements: "No se encontraron redacciones",
 	problemDeployerOutMissing: "No se encontró un .out para el caso \"%(file)\"",
+	problemDeployerSlowRejected: "El problema podría correr por más de 5 minutos en caso de TLE. Reduce el número de casos o disminuye el tiempo límite.",
+	problemDeployerValidatorRequired: "El problema require un validador personalizado pero no se encontró un validador en el .zip",
 	problemEditAddAdmin: "Administradores",
 	problemEditAddTags: "Tags",
 	problemEditEditMarkdown: "Editar Redacción",

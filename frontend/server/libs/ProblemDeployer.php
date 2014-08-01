@@ -12,6 +12,10 @@ class ProblemDeployer {
 	const SLOW_QUEUE_THRESHOLD = 30;
 	const MAX_RUNTIME_HARD_LIMIT = 300; // 5 * 60
 
+	const CREATE = 0;
+	const UPDATE_CASES = 1;
+	const UPDATE_STATEMENTS = 2;
+
 	public $filesToUnzip;
 	private $imageHashes;
 	private $casesFiles;
@@ -20,13 +24,65 @@ class ProblemDeployer {
 	private $currentLanguage;
 
 	private $alias;
-	private $preserve;
 	private $tmpDir = null;
 	private $targetDir = null;
 	private $zipPath = null;
 	public $hasValidator = false;
 	private $isInteractive = false;
 	private $created = false;
+	private $operation = null;
+
+	public function __construct($alias, $operation) {
+		$this->log = Logger::getLogger("ProblemDeployer");
+		$this->alias = $alias;
+
+		$this->tmpDir = FileHandler::TempDir("/tmp", "ProblemDeployer", 0755);
+		$this->targetDir = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $this->alias;
+		$this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
+		$this->operation = $operation;
+
+		if (!is_writable(PROBLEMS_GIT_PATH)) {
+			$this->log->error("path is not writable:" . PROBLEMS_GIT_PATH);
+			throw new ProblemDeploymentFailedException();
+		}
+
+		if ($this->operation == ProblemDeployer::CREATE) {
+			// Atomically try to create the bare repository.
+			if (!@mkdir($this->gitDir)) {
+				throw new InvalidParameterException("aliasInUse");
+			}
+			$this->git('init -q --bare ' . escapeshellarg($this->gitDir), PROBLEMS_GIT_PATH);
+			$created = true;
+		}
+
+		// Clone repository into tmp dir
+		$this->git('clone ' . escapeshellarg($this->gitDir) . ' ' .
+		           escapeshellarg($this->tmpDir), '/tmp');
+
+		// Ensure .gitattributes flags all inputs/outputs as binaries so it does not
+		// take several minutes diffing them to save a little space.
+		if (!file_exists("$this->tmpDir/.gitattributes")) {
+			FileHandler::CreateFile("$this->tmpDir/.gitattributes",
+				"cases/in/* -diff -delta -merge -text -crlf\n" .
+				"cases/out/* -diff -delta -merge -text -crlf");
+		}
+
+		if ($this->operation == ProblemDeployer::UPDATE_CASES) {
+			$dh = opendir($this->tmpDir);
+			while (($file = readdir($dh)) !== false) {
+				if ($file == '.' || $file == '..' || $file == '.git' ||
+				    $file == 'statements' || $file == '.gitattributes') {
+					continue;
+				}
+				$this->git('rm -rf ' . escapeshellarg($file), $this->tmpDir);
+			}
+			closedir($dh);
+		}
+	}
+
+	public function __destruct() {
+		$this->cleanup();
+	}
 
 	private function git($cmd, $cwd) {
 		$descriptorspec = array(
@@ -37,13 +93,14 @@ class ProblemDeployer {
 		$proc = proc_open("/usr/bin/git $cmd", $descriptorspec, $pipes, $cwd, array());
 
 		if (!is_resource($proc)) {
+			$this->log->error("git $cmd failed: unable to exec");
 			throw new ProblemDeploymentFailedException();
 		}
 
 		fclose($pipes[0]);
 		$output = stream_get_contents($pipes[1]);
 		$err = stream_get_contents($pipes[2]);
-		
+
 		$retval = proc_close($proc);
 		if ($retval != 0) {
 			$this->log->error("git $cmd failed: $retval $output $err");
@@ -53,70 +110,22 @@ class ProblemDeployer {
 		return $output;
 	}
 
-	public function __construct($alias, $preserve = false) {
-		$this->log = Logger::getLogger("ProblemDeployer");
-		$this->alias = $alias;
-
-		$this->tmpDir = FileHandler::TempDir("/tmp", "ProblemDeployer", 0755);
-		$this->targetDir = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $this->alias;
-		$this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
-		$this->preserve = $preserve;
-
-
-		if (!is_writable(PROBLEMS_GIT_PATH)) {
-			$this->log->error("path is not writable:" . PROBLEMS_GIT_PATH);
-			throw new ProblemDeploymentFailedException();
-		}
-
-		// Initialize bare git repository
-		if (!file_exists($this->gitDir)) {
-			// Atomically try to create it.
-			if (!mkdir($this->gitDir)) {
-				$this->log->error("unable to mkdir: " . $this->gitDir);
-				throw new ProblemDeploymentFailedException();
-			}
-			$this->git('init -q --bare ' . escapeshellarg($this->gitDir), PROBLEMS_GIT_PATH);
-			$created = true;
-		}
-
-		// Clone repository into tmp dir
-		$this->git('clone ' . escapeshellarg($this->gitDir) . ' ' . escapeshellarg($this->tmpDir), '/tmp');
-
-		if (!$preserve) {
-			$dh = opendir($this->tmpDir);
-			while (($file = readdir($dh)) !== false) {
-				if ($file == '.' || $file == '..' || $file == '.git' || $file == 'statements') {
-					continue;
-				}
-				$this->git('rm -rf ' . escapeshellarg($file), $this->tmpDir);
-			}
-			closedir($dh);
-			mkdir("$this->tmpDir/cases");
-			mkdir("$this->tmpDir/cases/in");
-			mkdir("$this->tmpDir/cases/out");
-			FileHandler::CreateFile("$this->tmpDir/.gitattributes",
-				"cases/in/* -diff -delta -merge -text -crlf\ncases/out/* -diff -delta -merge -text -crlf");
-		}
-	}
-
-	public function __destruct() {
-		$this->cleanup();
-	}
-
 	public function commit($message, $user) {
 		$this->git('add .', $this->tmpDir);
 		if ($this->git('status -s --porcelain', $this->tmpDir) == '') {
 			// No changes detected. Return happily.
 			return;
 		}
-		$this->git('config user.email ' . escapeshellarg("$user->username@omegaup"), $this->tmpDir);
+		$this->git('config user.email ' . escapeshellarg("$user->username@omegaup"),
+		           $this->tmpDir);
 		$this->git('config user.name ' . escapeshellarg($user->username), $this->tmpDir);
 		$this->git('config push.default simple', $this->tmpDir);
 		$this->git('commit -am ' . escapeshellarg($message), $this->tmpDir);
 		$this->git('push', $this->tmpDir);
 
 		if (!file_exists($this->targetDir . DIRECTORY_SEPARATOR . ".git")) {
-			$this->git('clone ' . escapeshellarg($this->gitDir) . ' ' . escapeshellarg($this->targetDir), PROBLEMS_PATH);
+			$this->git('clone ' . escapeshellarg($this->gitDir) . ' ' .
+			           escapeshellarg($this->targetDir), PROBLEMS_PATH);
 		} else {
 			$this->git('pull --rebase', $this->targetDir);
 		}
@@ -163,10 +172,10 @@ class ProblemDeployer {
 			$this->current_markdown_file_contents = $statement;
 			$this->HTMLizeStatement($this->tmpDir, "$lang.markdown");
 		} catch (ApiException $e) {
-			throw new ProblemDeploymentFailedException($e);
+			throw new ProblemDeploymentFailedException($e->getMessage(), $e);
 		} catch (Exception $e) {
 			$this->log->error("Failed to deploy $e");
-			throw new ProblemDeploymentFailedException();
+			throw new ProblemDeploymentFailedException('problemDeployerFailed', $e);
 		}
 	}
 
@@ -214,10 +223,10 @@ class ProblemDeployer {
 			// Handle cases
 			$this->handleCases($this->tmpDir, $this->casesFiles);
 		} catch (ApiException $e) {
-			throw new ProblemDeploymentFailedException($e);
+			throw new ProblemDeploymentFailedException($e->getMessage(), $e);
 		} catch (Exception $e) {
 			$this->log->error("Deployment exception $e");
-			throw new ProblemDeploymentFailedException();
+			throw new ProblemDeploymentFailedException('problemDeployerFailed', $e);
 		}
 	}
 
@@ -259,11 +268,7 @@ class ProblemDeployer {
 	public function isSlow(Problems $problem) {
 		$validator = 0;
 
-		$dirpath = $this->preserve ? $this->tmpDir : $this->targetDir;
-
-		if (!is_dir($dirpath)) {
-			$dirpath = $this->tmpDir;
-		}
+		$dirpath = $this->tmpDir;
 
 		if ($handle = opendir($dirpath)) {
 			while (false !== ($entry = readdir($handle))) {
@@ -287,10 +292,11 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		$max_runtime = (int)(($problem->time_limit + 999) / 1000 + $validator) * $input_count;
+		$max_runtime = (int)(($problem->time_limit + 999) / 1000 + $validator) *
+			$input_count;
 
 		if ($max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
-			throw new ProblemDeploymentFailedException('Problem would run for more than 5 minutes in case of TLE. Rejected.');
+			throw new ProblemDeploymentFailedException('problemDeployerSlowRejected');
 		}
 
 		return $max_runtime >= ProblemDeployer::SLOW_QUEUE_THRESHOLD ? 1 : 0;
