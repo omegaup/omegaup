@@ -4,26 +4,18 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-{if $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 0}
-	<div class="alert alert-info" id='private-contests-count-alert'>
-		<button type="button" class="close" id="private-contests-count-alert-close">&times;</button>
-		<span class="message">			
-			Tienes <b>{$CURRENT_USER_PRIVATE_CONTESTS_COUNT} concurso{if $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 1}s{/if} 
-			privado{if $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 1}s{/if}</b> registrado{if $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 1}s{/if} 
-			en omegaUp.						
-			Por favor revisa <a href="/contests.php">aquí</a> si alguno de tus concursos ya puede ser <b>público</b> para ayudar a la comunidad =).
+{if not isset($smarty.session.contributeAlert) and $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 0}
+	<div class="alert alert-info">
+		<span class="message">
+            {#messageMakeYourContestsPublic#}
 		</span>
 	</div>
 {/if}
 
-{if $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 0}
-	<div class="alert alert-info" id='private-problems-count-alert'>
-		<button type="button" class="close" id="private-problems-count-alert-close">&times;</button>
+{if not isset($smarty.session.contributeAlert) and $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 0}
+	<div class="alert alert-info">
 		<span class="message">			
-			Tienes <b>{$CURRENT_USER_PRIVATE_PROBLEMS_COUNT} problema{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if} 
-			privado{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if}</b> registrado{if $CURRENT_USER_PRIVATE_PROBLEMS_COUNT gt 1}s{/if} 
-			en omegaUp.						
-			Por favor revisa <a href="/problems/mine/">aquí</a> si alguno de tus problemas ya puede ser <b>público</b> para ayudar a la comunidad =).
+            {#messageMakeYourProblemsPublic#}
 		</span>
 	</div>
 {/if}
