@@ -8,9 +8,9 @@
 	// session, the first time the user visits the "My contests" page.
 	if ($session['valid'] && $session['private_contests_count'] > 0 && !isset($_SESSION['free_contests_alert'])) {
 		$_SESSION['free_contests_alert'] = 1;
-		$smarty->assign("FREE_CONTESTS_ALERT", 1);
+		$smarty->assign("PRIVATE_CONTESTS_ALERT", 1);
 	} else {
-		$smarty->assign("FREE_CONTESTS_ALERT", 0);
+		$smarty->assign("PRIVATE_CONTESTS_ALERT", 0);
 	}
 
 	$smarty->display('../templates/contest.tpl');
