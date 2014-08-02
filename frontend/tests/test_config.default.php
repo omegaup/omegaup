@@ -32,7 +32,7 @@ try_define('OMEGAUP_CACERT_URL',			'/opt/omegaup/frontend/omegaup.pem');
 try_define('RUNS_PATH',				OMEGAUP_TEST_ROOT . 'submissions');
 try_define('PROBLEMS_PATH',				OMEGAUP_TEST_ROOT . 'problems');
 try_define('PROBLEMS_GIT_PATH',				OMEGAUP_TEST_ROOT . 'problems.git');
-try_define('IMAGES_PATH',				OMEGAUP_ROOT. 'www/img/');
+try_define('IMAGES_PATH',				OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH',			'/img/');
 try_define('BIN_PATH',				'/opt/omegaup/bin');
 try_define('OMEGAUP_GRADER_CONFIG_PATH',		'/opt/omegaup/grader/omegaup.conf');

@@ -100,7 +100,7 @@ class FileHandler {
 	}
 	
 	static function DeleteFile($pathName) {
-		self::$log->info("Trying to delete file: " . $pathName);		
+		self::$log->debug("Trying to delete file: " . $pathName);
 		if (!@unlink($pathName)) {
 			$errors = error_get_last();
 			throw new RuntimeException("FATAL: Not able to delete file $pathName ". $errors['type']." ". $errors["message"]);

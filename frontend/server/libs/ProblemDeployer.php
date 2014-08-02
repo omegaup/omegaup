@@ -614,7 +614,7 @@ class ProblemDeployer {
 	 * @return type
 	 */
 	public function imageMarkdownCallback($imagepath) {
-		$result = "";
+		$replacement = null;
 
 		if (preg_match('%^data:image/([^;]+)%', $imagepath, $matches) === 1) {
 			$imagedata = file_get_contents($imagepath);
@@ -622,35 +622,41 @@ class ProblemDeployer {
 			$localDestination = IMAGES_PATH . $filename;
 			$globalDestination = IMAGES_URL_PATH . $filename;
 
-			file_put_contents($localDestination, $imagedata);
-			$result = $globalDestination;
+			file_put_contents("$this->tmpDir/statements/$filename", $imagedata);
+			$this->log->info("Deploying image: to $localDestination");
+			if (!file_exists($localDestination)) {
+				file_put_contents($localDestination, $imagedata);
+			}
+
+			$replacement = $globalDestination;
 		} else if (array_key_exists($imagepath, $this->imageHashes)) {
 			if (is_bool($this->imageHashes[$imagepath])) {
-
 				// copy the image to somewhere in IMAGES_PATH, get its SHA-1 sum,
 				// and store it in the imageHashes array.
 
 				$source = "$this->tmpDir/statements/$imagepath";
 				$hash = sha1_file($source);
-				$extension = substr($imagepath, strpos($imagepath, "."));
-				$hashedFilename =  "$hash$extension";
+				$extension = substr($imagepath, strrpos($imagepath, "."));
+				$hashedFilename = $hash . $extension;
 				$copyDestination = IMAGES_PATH . $hashedFilename;
 
-				$this->log->info("Deploying image: copying $source to $copyDestination");
-
-				FileHandler::Copy($source, $copyDestination);
+				if (!file_exists($copyDestination)) {
+					$this->log->info("Deploying image: copying $source to $copyDestination");
+					FileHandler::Copy($source, $copyDestination);
+				}
 				$this->imageHashes[$imagepath] = IMAGES_URL_PATH . $hashedFilename;
 			}
-			$result = $this->imageHashes[$imagepath];
+			$replacement = $this->imageHashes[$imagepath];
 		} else {
 			// Also support absolute urls.
-			$result = $imagepath;
+			return $imagepath;
 		}
 
 		// Replace path in markdown as well
-		$this->current_markdown_file_contents = str_replace($imagepath, $result, $this->current_markdown_file_contents);
+		$this->current_markdown_file_contents =
+			str_replace($imagepath, $replacement, $this->current_markdown_file_contents);
 
-		return $result;
+		return $replacement;
 	}
 
 	public function translationCallback($key) {

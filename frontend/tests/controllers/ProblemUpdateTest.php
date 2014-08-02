@@ -183,9 +183,10 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$statementHtmlContents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
 		$statementMarkdownContents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
 		
-		$this->assertFileExists(IMAGES_PATH . $imgFilename);		
+		$this->assertFileExists(IMAGES_PATH . $imgFilename);
+		$this->assertFileExists("$targetpath/statements/$imgFilename");
 		$this->assertContains("<img src=\"" . IMAGES_URL_PATH . $imgFilename . "\" alt=\"Alt text\" title=\"Optional title\" />", $statementHtmlContents);
-		$this->assertContains($imgFilename, $statementMarkdownContents);
+		$this->assertContains("![Alt text](" . IMAGES_URL_PATH . "$imgFilename \"Optional title\")", $statementMarkdownContents);
 	}
 	
 	/**

@@ -709,7 +709,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiUpdateStatement(Request $r) {
-		
 		self::authenticateRequest($r);
 		
 		self::validateCreateOrUpdate($r, true);

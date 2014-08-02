@@ -375,31 +375,19 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Verify that all the images are there.
 		$html_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
-		if (strpos($html_contents, "<img src=\"". IMAGES_URL_PATH ."$imageSha1.$imageExtension\"") === false) {
-			$this->fail("Html: No uploaded image found.");
-		}
+		$this->assertContains("<img src=\"". IMAGES_URL_PATH ."$imageSha1.$imageExtension\"", $html_contents);
 		// And the direct URL.
-		if (strpos($html_contents, "<img src=\"$imageAbsoluteUrl\"") === false) {
-			$this->fail("Html: No absolute image found.");
-		}
+		$this->assertContains("<img src=\"$imageAbsoluteUrl\"", $html_contents);
 		// And the unmodified, not found image.
-		if (strpos($html_contents, "<img src=\"notfound.jpg\"") === false) {
-			$this->fail("Html: No non-found image found.");
-		}
+		$this->assertContains("<img src=\"notfound.jpg\"", $html_contents);
 		
 		// Do image paht replacement checks in the markdown file
 		$markdown_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
-		if (strpos($markdown_contents, "![Saluda](". IMAGES_URL_PATH ."$imageSha1.$imageExtension)") === false) {
-			$this->fail("Markdown: No uploaded image found.");
-		}
+		$this->assertContains("![Saluda](" . IMAGES_URL_PATH . "$imageSha1.$imageExtension)", $markdown_contents);
 		// And the direct URL.
-		if (strpos($markdown_contents, "![Saluda]($imageAbsoluteUrl)") === false) {
-			$this->fail("Markdown: No absolute image found.");
-		}
+		$this->assertContains("![Saluda]($imageAbsoluteUrl)", $markdown_contents);
 		// And the unmodified, not found image.
-		if (strpos($markdown_contents, "![404](notfound.jpg)") === false) {
-			$this->fail("Markdown: No non-found image found.");
-		}
+		$this->assertContains("![404](notfound.jpg)", $markdown_contents);
 	}
 
 		
