@@ -147,6 +147,8 @@ OmegaUp.T = {
 	mailInUse: "El email seleccionado ya está ocupado. Intenta con otro email válido.",
 	makePrivate: "Hacer privado",
 	makePublic: "Hacer público",
+	messageMakeYourContestsPublic: "Tienes concursos privados que ya han terminado. Por favor considera hacerlos públicos y así contribuir a la comunidad.",
+	messageMakeYourProblemsPublic: "Tienes problemas privados que ya han sido utilizados. Por favor considera hacerlos públicos y así contribuir a la comunidad.",
 	mustProvideUserIdEmailOrUsername: "Debes proveer uno de los siguentes:",
 	mustWaitNToSubmit: "Debes esperar %n entre envios.",
 	myproblemsListAddContests: "Agregar a concurso",

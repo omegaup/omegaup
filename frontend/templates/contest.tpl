@@ -4,6 +4,14 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
+{if $LOGGED_IN eq 1 and $CURRENT_USER_PRIVATE_CONTESTS_COUNT gt 0 and $PRIVATE_CONTESTS_ALERT eq 1}
+	<div class="alert alert-info">
+		<span class="message">
+			{#messageMakeYourContestsPublic#}
+		</span>
+	</div>
+{/if}
+
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="bottom-margin">
