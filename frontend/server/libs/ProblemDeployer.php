@@ -48,7 +48,7 @@ class ProblemDeployer {
 
 		if ($this->operation == ProblemDeployer::CREATE) {
 			// Atomically try to create the bare repository.
-			if (!@mkdir($this->gitDir)) {
+			if (!@mkdir($this->gitDir, 0755)) {
 				throw new InvalidParameterException("aliasInUse");
 			}
 			$this->git('init -q --bare ' . escapeshellarg($this->gitDir), PROBLEMS_GIT_PATH);
@@ -164,7 +164,7 @@ class ProblemDeployer {
 			}
 
 			if (!is_dir("$this->tmpDir/statements")) {
-				mkdir("$this->tmpDir/statements");
+				mkdir("$this->tmpDir/statements", 0755);
 			}
 
 			// Deploy statement
@@ -190,11 +190,11 @@ class ProblemDeployer {
 		$this->validateZip();
 
 		if (!file_exists("$this->tmpDir/cases/in")) {
-			mkdir("$this->tmpDir/cases/in", 0777, true);
+			mkdir("$this->tmpDir/cases/in", 0755, true);
 		}
 
 		if (!file_exists("$this->tmpDir/cases/out")) {
-			mkdir("$this->tmpDir/cases/out", 0777, true);
+			mkdir("$this->tmpDir/cases/out", 0755, true);
 		}
 
 		try {
@@ -213,7 +213,7 @@ class ProblemDeployer {
 			closedir($dh);
 
 			// Handle statements
-			$this->handleStatements($this->tmpDir, $this->filesToUnzip);
+			$this->handleStatements($this->filesToUnzip);
 
 			// Verify at least one statement was extracted.
 			if (!is_dir("$this->tmpDir/statements")) {
@@ -537,8 +537,7 @@ class ProblemDeployer {
 	 * @param string $dirpath
 	 * @param array $filesToUnzip
 	 */
-	private function handleStatements($dirpath, array $filesToUnzip = null) {
-
+	private function handleStatements(array $filesToUnzip = null) {
 		// Get a list of all available statements.
 		// At this point, zip is validated and it has at least 1 statement. No need to check
 		$statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $filesToUnzip);
@@ -546,16 +545,15 @@ class ProblemDeployer {
 
 		// Transform statements from markdown to HTML
 		foreach ($statements as $statement) {
-
 			// Get the path to the markdown unzipped file
-			$markdown_filepath = $dirpath . DIRECTORY_SEPARATOR . $statement;
+			$markdown_filepath = "$this->tmpDir/$statement";
 			$this->log->info("Reading file " . $markdown_filepath);
 
 			// Read the contents of the original markdown file
 			$this->current_markdown_file_contents = FileHandler::ReadFile($markdown_filepath);
 
 			// Deploy statement raw (.markdown) and transformed (.html)
-			$this->HTMLizeStatement($dirpath, $statement);
+			$this->HTMLizeStatement($this->tmpDir, basename($statement));
 		}
 	}
 

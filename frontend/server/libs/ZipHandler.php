@@ -16,7 +16,7 @@ class ZipHandler {
 		foreach ($filesArray as $file) {
 			$dir = dirname("$extractToDir/$file");
 			if (!is_dir($dir)) {
-				mkdir($dir, 0777, true);
+				mkdir($dir, 0755, true);
 			}
 		}
 

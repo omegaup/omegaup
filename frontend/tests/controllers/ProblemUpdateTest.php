@@ -162,7 +162,6 @@ class UpdateProblemTest extends OmegaupTestCase {
 	 * Test apiUpdateStatement with embedded imgs via data URI 
 	 */
 	public function testProblemStatementUpdateWithImagesAsDataURI() {
-		
 		// Get a problem (with 'es' statements)
 		$problemData = ProblemsFactory::createProblem(OMEGAUP_RESOURCES_ROOT . "triangulos.zip");
 		
@@ -186,7 +185,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		
 		$this->assertFileExists(IMAGES_PATH . $imgFilename);		
 		$this->assertContains("<img src=\"" . IMAGES_URL_PATH . $imgFilename . "\" alt=\"Alt text\" title=\"Optional title\" />", $statementHtmlContents);
-		$this->assertContains($statement, $statementMarkdownContents);		
+		$this->assertContains($imgFilename, $statementMarkdownContents);
 	}
 	
 	/**

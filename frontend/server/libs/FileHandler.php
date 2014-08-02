@@ -58,7 +58,7 @@ class FileHandler {
 		}
 	}
 
-	static function MakeDir($pathName, $chmod = 0777) {
+	static function MakeDir($pathName, $chmod = 0755) {
 		self::$log->info("Trying to create directory: " . $pathName);
 		if (!@mkdir($pathName, $chmod)) {
 			throw new RuntimeException("FATAL: Not able to move create dir " . $pathName . " CHMOD: " . $chmod);
