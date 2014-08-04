@@ -93,7 +93,8 @@ class ProblemDeployer {
 		$proc = proc_open("/usr/bin/git $cmd", $descriptorspec, $pipes, $cwd, array());
 
 		if (!is_resource($proc)) {
-			$this->log->error("git $cmd failed: unable to exec");
+			$errors = error_get_last();
+			$this->log->error("git $cmd failed: {$errors['type']} {$errors['message']}");
 			throw new ProblemDeploymentFailedException();
 		}
 

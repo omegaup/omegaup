@@ -129,7 +129,9 @@ class FileHandler {
 		closedir($dh);
 
 		if (!@rmdir($dir)) {
-			throw new RuntimeException("FATAL: Not able to delete dir " . $dir);
+			$errors = error_get_last();
+			self::$log->error("Not able to delete dir $dir {$errors['type']} {$errors['message']}");
+			throw new RuntimeException("unableToDeleteDir");
 		}
 	}
 	
