@@ -122,7 +122,7 @@ class ProblemDeployer {
 		$this->git('config user.name ' . escapeshellarg($user->username), $this->tmpDir);
 		$this->git('config push.default matching', $this->tmpDir);
 		$this->git('commit -am ' . escapeshellarg($message), $this->tmpDir);
-		$this->git('push', $this->tmpDir);
+		$this->git('push origin master', $this->tmpDir);
 
 		if (!file_exists($this->targetDir . DIRECTORY_SEPARATOR . ".git")) {
 			$this->git('clone ' . escapeshellarg($this->gitDir) . ' ' .
