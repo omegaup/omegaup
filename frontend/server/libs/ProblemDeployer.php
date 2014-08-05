@@ -120,7 +120,7 @@ class ProblemDeployer {
 		$this->git('config user.email ' . escapeshellarg("$user->username@omegaup"),
 		           $this->tmpDir);
 		$this->git('config user.name ' . escapeshellarg($user->username), $this->tmpDir);
-		$this->git('config push.default simple', $this->tmpDir);
+		$this->git('config push.default matching', $this->tmpDir);
 		$this->git('commit -am ' . escapeshellarg($message), $this->tmpDir);
 		$this->git('push', $this->tmpDir);
 
