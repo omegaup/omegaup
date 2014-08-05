@@ -299,15 +299,8 @@ class ProblemDeploymentFailedException extends ApiException {
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	function __construct(ApiException $previous = NULL) {
-		parent::__construct("problemDeployerFailed", 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
-	}
-
-	protected function getErrorMessage() {
-		// obtener el texto final (ya localizado) de smarty.
-		global $smarty;
-		return $smarty->getconfigvars($this->message) . ': ' .
-			!is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : '';
+	function __construct($message = "problemDeployerFailed", Exception $previous = NULL) {
+		parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
 	}
 }
 

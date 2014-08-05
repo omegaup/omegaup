@@ -217,6 +217,8 @@ OmegaUp.T = {
 	problemDeployerNoCases: "No cases found",
 	problemDeployerNoStatements: "No statements found",
 	problemDeployerOutMissing: ".out not found for case \"%(file)\"",
+	problemDeployerSlowRejected: "Problem would run for more than 5 minutes in case of TLE. Rejected.",
+	problemDeployerValidatorRequired: "Problem requested custom validator but has no validator.",
 	problemEditAddAdmin: "Administrators",
 	problemEditAddTags: "Tags",
 	problemEditEditMarkdown: "Edit statement",

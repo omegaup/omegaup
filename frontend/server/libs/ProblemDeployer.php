@@ -12,6 +12,10 @@ class ProblemDeployer {
 	const SLOW_QUEUE_THRESHOLD = 30;
 	const MAX_RUNTIME_HARD_LIMIT = 300; // 5 * 60
 
+	const CREATE = 0;
+	const UPDATE_CASES = 1;
+	const UPDATE_STATEMENTS = 2;
+
 	public $filesToUnzip;
 	private $imageHashes;
 	private $casesFiles;
@@ -20,27 +24,59 @@ class ProblemDeployer {
 	private $currentLanguage;
 
 	private $alias;
-	private $preserve;
 	private $tmpDir = null;
 	private $targetDir = null;
 	private $zipPath = null;
 	public $hasValidator = false;
 	private $isInteractive = false;
+	private $created = false;
+	private $operation = null;
 
-	public function __construct($alias, $preserve = true) {
+	public function __construct($alias, $operation) {
 		$this->log = Logger::getLogger("ProblemDeployer");
 		$this->alias = $alias;
 
 		$this->tmpDir = FileHandler::TempDir("/tmp", "ProblemDeployer", 0755);
 		$this->targetDir = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $this->alias;
-		$this->preserve = $preserve;
-		if ($preserve) {
-			FileHandler::BackupDir($this->targetDir, $this->tmpDir);
-		} else {
-			FileHandler::BackupDir(
-				"$this->targetDir/statements",
-				"$this->tmpDir/statements"
-			);
+		$this->gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $this->alias;
+		$this->operation = $operation;
+
+		if (!is_writable(PROBLEMS_GIT_PATH)) {
+			$this->log->error("path is not writable:" . PROBLEMS_GIT_PATH);
+			throw new ProblemDeploymentFailedException();
+		}
+
+		if ($this->operation == ProblemDeployer::CREATE) {
+			// Atomically try to create the bare repository.
+			if (!@mkdir($this->gitDir, 0755)) {
+				throw new InvalidParameterException("aliasInUse");
+			}
+			$this->git('init -q --bare ' . escapeshellarg($this->gitDir), PROBLEMS_GIT_PATH);
+			$created = true;
+		}
+
+		// Clone repository into tmp dir
+		$this->git('clone ' . escapeshellarg($this->gitDir) . ' ' .
+		           escapeshellarg($this->tmpDir), '/tmp');
+
+		// Ensure .gitattributes flags all inputs/outputs as binaries so it does not
+		// take several minutes diffing them to save a little space.
+		if (!file_exists("$this->tmpDir/.gitattributes")) {
+			FileHandler::CreateFile("$this->tmpDir/.gitattributes",
+				"cases/in/* -diff -delta -merge -text -crlf\n" .
+				"cases/out/* -diff -delta -merge -text -crlf");
+		}
+
+		if ($this->operation == ProblemDeployer::UPDATE_CASES) {
+			$dh = opendir($this->tmpDir);
+			while (($file = readdir($dh)) !== false) {
+				if ($file == '.' || $file == '..' || $file == '.git' ||
+				    $file == 'statements' || $file == '.gitattributes') {
+					continue;
+				}
+				$this->git('rm -rf ' . escapeshellarg($file), $this->tmpDir);
+			}
+			closedir($dh);
 		}
 	}
 
@@ -48,14 +84,62 @@ class ProblemDeployer {
 		$this->cleanup();
 	}
 
-	public function commit() {
-		FileHandler::DeleteDirRecursive($this->targetDir);
-		rename($this->tmpDir, $this->targetDir);
+	private function git($cmd, $cwd) {
+		$descriptorspec = array(
+			0 => array("pipe", "r"),
+			1 => array("pipe", "w"),
+			2 => array("pipe", "w")
+		);
+		$proc = proc_open("/usr/bin/git $cmd", $descriptorspec, $pipes, $cwd, array());
+
+		if (!is_resource($proc)) {
+			$errors = error_get_last();
+			$this->log->error("git $cmd failed: {$errors['type']} {$errors['message']}");
+			throw new ProblemDeploymentFailedException();
+		}
+
+		fclose($pipes[0]);
+		$output = stream_get_contents($pipes[1]);
+		$err = stream_get_contents($pipes[2]);
+
+		$retval = proc_close($proc);
+		if ($retval != 0) {
+			$this->log->error("git $cmd failed: $retval $output $err");
+			throw new ProblemDeploymentFailedException();
+		}
+
+		return $output;
+	}
+
+	public function commit($message, $user) {
+		$this->git('add .', $this->tmpDir);
+		if ($this->git('status -s --porcelain', $this->tmpDir) == '') {
+			// No changes detected. Return happily.
+			return;
+		}
+		$this->git('config user.email ' . escapeshellarg("$user->username@omegaup"),
+		           $this->tmpDir);
+		$this->git('config user.name ' . escapeshellarg($user->username), $this->tmpDir);
+		$this->git('config push.default matching', $this->tmpDir);
+		$this->git('commit -am ' . escapeshellarg($message), $this->tmpDir);
+		$this->git('push origin master', $this->tmpDir);
+
+		if (!file_exists($this->targetDir . DIRECTORY_SEPARATOR . ".git")) {
+			$this->git('clone ' . escapeshellarg($this->gitDir) . ' ' .
+			           escapeshellarg($this->targetDir), PROBLEMS_PATH);
+		} else {
+			$this->git('pull --rebase', $this->targetDir);
+		}
 	}
 
 	public function cleanup() {
 		if ($this->tmpDir != null && is_dir($this->tmpDir)) {
 			FileHandler::DeleteDirRecursive($this->tmpDir);
+		}
+
+		// Something went wrong and the target directory was not committed. Rollback.
+		if ($this->created && !file_exists($this->tagetDir)) {
+			FileHandler::DeleteDirRecursive($this->gitDir);
 		}
 	}
 
@@ -73,21 +157,26 @@ class ProblemDeployer {
 			// Delete statement files
 			$markdownFile = "$this->tmpDir/statements/$lang.markdown";
 			$htmlFile = "$this->tmpDir/statements/$lang.html";
-			FileHandler::DeleteFile($markdownFile);
-			FileHandler::DeleteFile($htmlFile);
+			if (file_exists($markdownFile)) {
+				$this->git('rm -f ' . escapeshellarg($markdownFile), $this->tmpDir);
+			}
+			if (file_exists($htmlFile)) {
+				$this->git('rm -f ' . escapeshellarg($htmlFile), $this->tmpDir);
+			}
+
+			if (!is_dir("$this->tmpDir/statements")) {
+				mkdir("$this->tmpDir/statements", 0755);
+			}
 
 			// Deploy statement
 			FileHandler::CreateFile($markdownFile, $statement);
 			$this->current_markdown_file_contents = $statement;
 			$this->HTMLizeStatement($this->tmpDir, "$lang.markdown");
-
-			// Update contents.zip
-			$this->updateContentsDotZip($this->tmpDir, "$this->tmpDir/contents.zip");
 		} catch (ApiException $e) {
-			throw new ProblemDeploymentFailedException($e);
+			throw new ProblemDeploymentFailedException($e->getMessage(), $e);
 		} catch (Exception $e) {
-			$this->log->error("Failed to deploy", $e);
-			throw new ProblemDeploymentFailedException();
+			$this->log->error("Failed to deploy $e");
+			throw new ProblemDeploymentFailedException('problemDeployerFailed', $e);
 		}
 	}
 
@@ -101,20 +190,44 @@ class ProblemDeployer {
 	public function deploy() {
 		$this->validateZip();
 
+		if (!file_exists("$this->tmpDir/cases/in")) {
+			mkdir("$this->tmpDir/cases/in", 0755, true);
+		}
+
+		if (!file_exists("$this->tmpDir/cases/out")) {
+			mkdir("$this->tmpDir/cases/out", 0755, true);
+		}
+
 		try {
 			// Unzip the user's zip
 			ZipHandler::DeflateZip($this->zipPath, $this->tmpDir, $this->filesToUnzip);
 
+			// Move all .in and .out files to their folder.
+			$dh = opendir("$this->tmpDir/cases/");
+			while (($file = readdir($dh)) !== false) {
+				if ($this->endsWith($file, '.out', true)) {
+					rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/out/$file");
+				} else if ($this->endsWith($file, '.in', true)) {
+					rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/in/$file");
+				}
+			}
+			closedir($dh);
+
 			// Handle statements
-			$this->handleStatements($this->tmpDir, $this->filesToUnzip);
+			$this->handleStatements($this->filesToUnzip);
+
+			// Verify at least one statement was extracted.
+			if (!is_dir("$this->tmpDir/statements")) {
+				throw new InvalidParameterException('problemDeployerNoStatements');
+			}
 
 			// Handle cases
 			$this->handleCases($this->tmpDir, $this->casesFiles);
-
-			// Update contents.zip
-			$this->updateContentsDotZip($this->tmpDir, "$this->tmpDir/contents.zip");
+		} catch (ApiException $e) {
+			throw new ProblemDeploymentFailedException($e->getMessage(), $e);
 		} catch (Exception $e) {
-			throw new ProblemDeploymentFailedException($e);
+			$this->log->error("Deployment exception $e");
+			throw new ProblemDeploymentFailedException('problemDeployerFailed', $e);
 		}
 	}
 
@@ -130,7 +243,7 @@ class ProblemDeployer {
 			return -1;
 		}
 
-		$dirpath = "$this->tmpDir/cases";
+		$dirpath = "$this->tmpDir/cases/out";
 
 		$output_limit = 10240;
 
@@ -156,11 +269,7 @@ class ProblemDeployer {
 	public function isSlow(Problems $problem) {
 		$validator = 0;
 
-		$dirpath = $this->preserve ? $this->tmpDir : $this->targetDir;
-
-		if (!is_dir($dirpath)) {
-			$dirpath = $this->tmpDir;
-		}
+		$dirpath = $this->tmpDir;
 
 		if ($handle = opendir($dirpath)) {
 			while (false !== ($entry = readdir($handle))) {
@@ -172,7 +281,7 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		$dirpath .= '/cases';
+		$dirpath .= '/cases/in';
 
 		$input_count = 0;
 
@@ -184,10 +293,11 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		$max_runtime = (int)(($problem->time_limit + 999) / 1000 + $validator) * $input_count;
+		$max_runtime = (int)(($problem->time_limit + 999) / 1000 + $validator) *
+			$input_count;
 
 		if ($max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
-			throw new ProblemDeploymentFailedException('Problem would run for more than 5 minutes in case of TLE. Rejected.');
+			throw new ProblemDeploymentFailedException('problemDeployerSlowRejected');
 		}
 
 		return $max_runtime >= ProblemDeployer::SLOW_QUEUE_THRESHOLD ? 1 : 0;
@@ -229,7 +339,7 @@ class ProblemDeployer {
 			$this->filesToUnzip[] = $file;
 			$this->imageHashes[substr($file, strlen('statements/'))] = true;
 			if (file_exists("$this->tmpDir/$file")) {
-				unlink("$this->tmpDir/$file");
+				$this->git("rm -f $this->tmpDir/$file", $this->tmpDir);
 			}
 		}
 
@@ -428,8 +538,7 @@ class ProblemDeployer {
 	 * @param string $dirpath
 	 * @param array $filesToUnzip
 	 */
-	private function handleStatements($dirpath, array $filesToUnzip = null) {
-
+	private function handleStatements(array $filesToUnzip = null) {
 		// Get a list of all available statements.
 		// At this point, zip is validated and it has at least 1 statement. No need to check
 		$statements = preg_grep('/^statements\/[a-zA-Z]{2}\.markdown$/', $filesToUnzip);
@@ -437,16 +546,15 @@ class ProblemDeployer {
 
 		// Transform statements from markdown to HTML
 		foreach ($statements as $statement) {
-
 			// Get the path to the markdown unzipped file
-			$markdown_filepath = $dirpath . DIRECTORY_SEPARATOR . $statement;
+			$markdown_filepath = "$this->tmpDir/$statement";
 			$this->log->info("Reading file " . $markdown_filepath);
 
 			// Read the contents of the original markdown file
 			$this->current_markdown_file_contents = FileHandler::ReadFile($markdown_filepath);
 
 			// Deploy statement raw (.markdown) and transformed (.html)
-			$this->HTMLizeStatement($dirpath, $statement);
+			$this->HTMLizeStatement($this->tmpDir, basename($statement));
 		}
 	}
 
@@ -461,7 +569,7 @@ class ProblemDeployer {
 		$this->log->info("HTMLizing statement: " . $statementFileName);
 
 		// Path used to deploy the raw problem statement (.markdown)
-		$markdown_filepath = $problemBasePath . DIRECTORY_SEPARATOR . $statementFileName;
+		$markdown_filepath = "$problemBasePath/statements/$statementFileName";
 
 		// Get the language of this statement
 		$lang = basename($statementFileName, ".markdown");
@@ -492,7 +600,7 @@ class ProblemDeployer {
 		FileHandler::CreateFile($markdown_filepath, $this->current_markdown_file_contents);
 
 		// Save the HTML file in the path .../problem_alias/statements/lang.html
-		$html_filepath = $problemBasePath . DIRECTORY_SEPARATOR . "statements" . DIRECTORY_SEPARATOR . $lang . ".html";
+		$html_filepath = "$problemBasePath/statements/$lang.html";
 		$this->log->info("Saving HTML statement in " . $html_filepath);
 		FileHandler::CreateFile($html_filepath, $html_file_contents);
 	}
@@ -507,7 +615,7 @@ class ProblemDeployer {
 	 * @return type
 	 */
 	public function imageMarkdownCallback($imagepath) {
-		$result = "";
+		$replacement = null;
 
 		if (preg_match('%^data:image/([^;]+)%', $imagepath, $matches) === 1) {
 			$imagedata = file_get_contents($imagepath);
@@ -515,35 +623,41 @@ class ProblemDeployer {
 			$localDestination = IMAGES_PATH . $filename;
 			$globalDestination = IMAGES_URL_PATH . $filename;
 
-			file_put_contents($localDestination, $imagedata);
-			$result = $globalDestination;
+			file_put_contents("$this->tmpDir/statements/$filename", $imagedata);
+			$this->log->info("Deploying image: to $localDestination");
+			if (!file_exists($localDestination)) {
+				file_put_contents($localDestination, $imagedata);
+			}
+
+			$replacement = $globalDestination;
 		} else if (array_key_exists($imagepath, $this->imageHashes)) {
 			if (is_bool($this->imageHashes[$imagepath])) {
-
 				// copy the image to somewhere in IMAGES_PATH, get its SHA-1 sum,
 				// and store it in the imageHashes array.
 
 				$source = "$this->tmpDir/statements/$imagepath";
 				$hash = sha1_file($source);
-				$extension = substr($imagepath, strpos($imagepath, "."));
-				$hashedFilename =  "$hash$extension";
+				$extension = substr($imagepath, strrpos($imagepath, "."));
+				$hashedFilename = $hash . $extension;
 				$copyDestination = IMAGES_PATH . $hashedFilename;
 
-				$this->log->info("Deploying image: copying $source to $copyDestination");
-
-				FileHandler::Copy($source, $copyDestination);
+				if (!file_exists($copyDestination)) {
+					$this->log->info("Deploying image: copying $source to $copyDestination");
+					FileHandler::Copy($source, $copyDestination);
+				}
 				$this->imageHashes[$imagepath] = IMAGES_URL_PATH . $hashedFilename;
 			}
-			$result = $this->imageHashes[$imagepath];
+			$replacement = $this->imageHashes[$imagepath];
 		} else {
 			// Also support absolute urls.
-			$result = $imagepath;
+			return $imagepath;
 		}
 
 		// Replace path in markdown as well
-		$this->current_markdown_file_contents = str_replace($imagepath, $result, $this->current_markdown_file_contents);
+		$this->current_markdown_file_contents =
+			str_replace($imagepath, $replacement, $this->current_markdown_file_contents);
 
-		return $result;
+		return $replacement;
 	}
 
 	public function translationCallback($key) {
@@ -578,7 +692,7 @@ class ProblemDeployer {
 
 		// Aplying normalizr to cases
 		$output = array();
-		$normalizr_cmd = BIN_PATH . "/normalizr $dirpath/cases/* 2>&1";
+		$normalizr_cmd = BIN_PATH . "/normalizr $dirpath/cases/in/* $dirpath/cases/out/* 2>&1";
 		$this->log->info("Applying normalizr: " . $normalizr_cmd);
 		$return_var = -1;
 		exec($normalizr_cmd, $output, $return_var);
@@ -590,64 +704,6 @@ class ProblemDeployer {
 			$this->log->info("normalizr succeeded");
 		}
 		$this->log->info(implode("\n", $output));
-
-		// After normalizrfication, we need to generate a zip file that will be
-		// passed between grader and runners with the INPUT files...
-		// Create path to cases.zip and proper cmds
-		$cases_zip_path = $dirpath . "/cases.zip";
-
-		if (is_file($cases_zip_path)) {
-			unlink($cases_zip_path);
-		}
-
-		// Add all .in files
-		$descriptorspec = array(
-			0 => array('pipe', 'r'),
-			1 => array('file', '/dev/null', 'r'),
-			2 => array('file', '/dev/null', 'r')
-		);
-
-		$proc = proc_open("/usr/bin/zip cases.zip -@ -j -D", $descriptorspec, $pipes, $dirpath, array());
-		if (!is_resource($proc)) {
-			throw new InvalidFilesystemOperationException("Error creating cases.zip");
-		}
-
-		foreach ($casesFiles as $case) {
-			fwrite($pipes[0], "$dirpath/$case\n");
-		}
-		fclose($pipes[0]);
-		if (proc_close($proc) != 0) {
-			throw new InvalidFilesystemOperationException("Error creating cases.zip");
-		}
-
-		$this->log->info("zipping cases succeeded");
-
-		// Generate sha1sum for cases.zip distribution from grader to runners
-		$this->log->info("Writing to : $dirpath/inputname");
-		file_put_contents("$dirpath/inputname", sha1_file($cases_zip_path));
-	}
-
-	/**
-	 *
-	 * @param string $dirpath
-	 * @param string $path_to_contents_zip
-	 * @return type
-	 */
-	private function updateContentsDotZip($dirpath, $path_to_contents_zip) {
-		if (is_file($path_to_contents_zip)) {
-			unlink($path_to_contents_zip);
-		}
-
-		$descriptorspec = array(
-			0 => array('file', '/dev/null', 'r'),
-			1 => array('file', '/dev/null', 'r'),
-			2 => array('file', '/dev/null', 'r')
-		);
-
-		$proc = proc_open("/usr/bin/zip -r contents.zip . -xi contents.zip cases.zip inputname", $descriptorspec, $pipes, $dirpath, array());
-		if (!is_resource($proc) || proc_close($proc) != 0) {
-			throw new InvalidFilesystemOperationException("Error creating contents.zip");
-		}
 	}
 
 	/**

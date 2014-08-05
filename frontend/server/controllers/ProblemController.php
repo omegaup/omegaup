@@ -186,7 +186,7 @@ class ProblemController extends Controller {
 			throw new DuplicatedEntryInDatabaseException('problemExists');
 		}
 
-		$problemDeployer = new ProblemDeployer($r['alias'], false);
+		$problemDeployer = new ProblemDeployer($r['alias'], ProblemDeployer::CREATE);
 
 		// Insert new problem
 		try {
@@ -198,7 +198,7 @@ class ProblemController extends Controller {
 			if ($problemDeployer->hasValidator) {
 				$problem->validator = 'custom';
 			} else if ($problem->validator == 'custom') {
-				throw new ProblemDeploymentFailedException('Problem requested custom validator but has no validator.');
+				throw new ProblemDeploymentFailedException('problemDeployerValidatorRequired');
 			}
 			$problem->slow = $problemDeployer->isSlow($problem);
 
@@ -215,7 +215,7 @@ class ProblemController extends Controller {
 			ProblemsDAO::transEnd();
 
 			// Commit at the very end
-			$problemDeployer->commit();
+			$problemDeployer->commit("Initial commit", $r['current_user']);
 		} catch (ApiException $e) {
 			// Operation failed in something we know it could fail, rollback transaction 
 			ProblemsDAO::transRollback();
@@ -621,7 +621,7 @@ class ProblemController extends Controller {
 		$r['problem'] = $problem;
 
 		$response = array();
-		$problemDeployer = new ProblemDeployer($problem->alias, false);
+		$problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES);
 
 		// Insert new problem
 		try {
@@ -638,7 +638,7 @@ class ProblemController extends Controller {
 				if ($problemDeployer->hasValidator) {
 					$problem->validator = 'custom';
 				} else if ($problem->validator == 'custom') {
-					throw new ProblemDeploymentFailedException('Problem requested custom validator but has no validator.');
+					throw new ProblemDeploymentFailedException('problemDeployerValidatorRequired');
 				}
 				// This must come before the commit in case isSlow throws an exception.
 				$problem->slow = $problemDeployer->isSlow($problem);
@@ -651,7 +651,7 @@ class ProblemController extends Controller {
 				}
 
 				$response["uploaded_files"] = $problemDeployer->filesToUnzip;
-				$problemDeployer->commit();
+				$problemDeployer->commit("Updated problem contents", $r['current_user']);
 			} else {
 				$problem->slow = $problemDeployer->isSlow($problem);
 			}
@@ -709,7 +709,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiUpdateStatement(Request $r) {
-		
 		self::authenticateRequest($r);
 		
 		self::validateCreateOrUpdate($r, true);
@@ -723,11 +722,10 @@ class ProblemController extends Controller {
 			$r["lang"] = "es";
 		}				
 
-		$problemDeployer = new ProblemDeployer($r['problem_alias']);
+		$problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
 		try {					
-			
 			$problemDeployer->updateStatement($r['lang'], $r['statement']);
-			$problemDeployer->commit();
+			$problemDeployer->commit("Updated statement for {$r['lang']}", $r['current_user']);
 			
 			// Invalidar problem statement cache
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "html");
@@ -773,11 +771,11 @@ class ProblemController extends Controller {
 		}
 
 		if (is_null($r["problem"])) {
-			throw new NotFoundException("Problem not found");
+			throw new NotFoundException("problemNotFound");
 		}
 
 		if (isset($r["statement_type"]) && !in_array($r["statement_type"], array("html", "markdown"))) {
-			throw new NotFoundException("Invalid statement type");
+			throw new NotFoundException("invalidStatementType");
 		}
 
 		// If we request a problem inside a contest
@@ -787,7 +785,7 @@ class ProblemController extends Controller {
 				$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
 
 				if (is_null($r["contest"])) {
-					throw new NotFoundException("Contest not found");
+					throw new NotFoundException("contestNotFound");
 				}
 
 				if (is_null(ContestProblemsDAO::getByPK($r["contest"]->getContestId(), $r["problem"]->getProblemId()))) {

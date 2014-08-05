@@ -46,6 +46,7 @@ try_define('OMEGAUP_SSLCERT_URL',				'/opt/omegaup/frontend/omegaup.pem');
 try_define('OMEGAUP_CACERT_URL',				'/opt/omegaup/frontend/omegaup.pem');
 try_define('RUNS_PATH',					'/var/lib/omegaup/submissions');
 try_define('PROBLEMS_PATH',					'/var/lib/omegaup/problems');
+try_define('PROBLEMS_GIT_PATH',					'/var/lib/omegaup/problems.git');
 try_define('BIN_PATH',					'/opt/omegaup/bin');
 try_define('IMAGES_PATH',					'/opt/omegaup/frontend/www/img/');
 try_define('IMAGES_URL_PATH',				'/img/');
