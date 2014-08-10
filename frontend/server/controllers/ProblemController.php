@@ -902,34 +902,38 @@ class ProblemController extends Controller {
 		// Add the problem the response
 		$response = array_merge($response, $r["problem"]->asFilteredArray($relevant_columns));
 
-		// Create array of relevant columns for list of runs
-		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+		if (!is_null($r['current_user_id'])) {
+			// Create array of relevant columns for list of runs
+			$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
 
-		// Search the relevant runs from the DB
-		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+			// Search the relevant runs from the DB
+			$contest = ContestsDAO::getByAlias($r["contest_alias"]);
 
-		$keyrun = new Runs(array(
-					"user_id" => $r["current_user_id"],
-					"problem_id" => $r["problem"]->getProblemId(),
-					"contest_id" => is_null($r["contest"]) ? null : $r["contest"]->getContestId()
-				));
+			$keyrun = new Runs(array(
+				"user_id" => $r["current_user_id"],
+				"problem_id" => $r["problem"]->getProblemId(),
+				"contest_id" => is_null($r["contest"]) ? null : $r["contest"]->getContestId()
+			));
 
-		// Get all the available runs done by the current_user
-		try {
-			$runs_array = RunsDAO::search($keyrun);
-		} catch (Exception $e) {
-			// Operation failed in the data layer
-			throw new InvalidDatabaseOperationException($e);
-		}
-
-		// Add each filtered run to an array
-		if (count($runs_array) >= 0) {
-			$runs_filtered_array = array();
-			foreach ($runs_array as $run) {
-				$filtered = $run->asFilteredArray($relevant_columns);
-				$filtered['time'] = strtotime($filtered['time']);
-				array_push($runs_filtered_array, $filtered);
+			// Get all the available runs done by the current_user
+			try {
+				$runs_array = RunsDAO::search($keyrun);
+			} catch (Exception $e) {
+				// Operation failed in the data layer
+				throw new InvalidDatabaseOperationException($e);
 			}
+
+			// Add each filtered run to an array
+			if (count($runs_array) >= 0) {
+				$runs_filtered_array = array();
+				foreach ($runs_array as $run) {
+					$filtered = $run->asFilteredArray($relevant_columns);
+					$filtered['time'] = strtotime($filtered['time']);
+					array_push($runs_filtered_array, $filtered);
+				}
+			}
+
+			$response["runs"] = $runs_filtered_array;
 		}
 
 		if (!is_null($r["contest"])) {
@@ -964,8 +968,6 @@ class ProblemController extends Controller {
 			$response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
 		}
 
-		// Add the procesed runs to the request
-		$response["runs"] = $runs_filtered_array;
 		$response["score"] = self::bestScore($r);
 		$response["status"] = "ok";
 		return $response;
@@ -1432,8 +1434,11 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	private static function bestScore(Request $r, Users $user = null) {
-
 		$current_user_id = (is_null($user) ? $r["current_user_id"] : $user->getUserId());
+
+		if (is_null($current_user_id)) {
+			return 0;
+		}
 
 		$score = 0;
 		try {
