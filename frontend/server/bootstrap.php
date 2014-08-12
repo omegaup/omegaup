@@ -202,3 +202,6 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	$lang = UserController::getPreferredLanguage($userRequest);
 	$smarty->configLoad(__DIR__ . "/../templates/". $lang . ".lang");
 }
+
+// Load pager class
+require_once('libs/Pager.php');
