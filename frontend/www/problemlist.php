@@ -18,6 +18,8 @@
 		array('order_by' => $order_by, 'mode' => $mode)
 	);
 
+	$smarty->assign('MODE', $mode);
+	$smarty->assign('ORDER_BY', $order_by);
 	$smarty->assign('problems', $response['results']);
 	$smarty->assign('pager_links', $pager_links);
     $smarty->display( '../templates/problems.tpl' );

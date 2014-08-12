@@ -1,3 +1,4 @@
+{include file='problem_search_bar.tpl'}
 <div class="wait_for_ajax panel panel-default" id="problems_list" >
 	<div class="panel-heading">
 		<h3 class="panel-title">{#wordsProblems#}</h3>
@@ -31,16 +32,6 @@
 		</tbody>
 	</table>
 
-	<div class="pager-bar">
-		<center>
-			<ul class="pagination">
-				{foreach from=$pager_links item=page}
-					<li {if $page.class != ''}class="{$page.class}"{/if}>
-						<a href="{$page.url}">{$page.label}</a>
-					</li>
-				{/foreach}
-			</ul>
-		</center>
-	</div>
+	{include file='pager_bar.tpl'}
 </div>
 <!--<script src="/js/problems.list.js"></script>-->
