@@ -97,3 +97,6 @@ try_define('OMEGAUP_SESSION_CACHE_ENABLED', true);
 # #########################
 try_define('SMARTY_CACHE_DIR',				'/var/tmp');
 try_define('IS_TEST',					FALSE);
+
+// Pager constants
+try_define('PROBLEMS_PER_PAGE', 100);
