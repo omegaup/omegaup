@@ -3,7 +3,6 @@
 require_once 'libs/FileHandler.php';
 require_once 'libs/ZipHandler.php';
 require_once 'libs/Markdown/markdown.php';
-
 /**
  * ProblemsController
  */
@@ -1283,7 +1282,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiList(Request $r) {
-
 		// Authenticate request
 		try {
 			self::authenticateRequest($r);
@@ -1341,11 +1339,6 @@ class ProblemController extends Controller {
 			}
 		}
 
-		// Sort result by name 
-		usort($response["results"], function($a, $b) {
-			return strcmp($a["title"], $b["title"]);
-		});
-
 		// Add users' best scores to the list
 		foreach ($response["results"] as &$problemData) {
 			// If we have a logged-in user (this API can be accessed by non-logged in users)
@@ -1356,8 +1349,82 @@ class ProblemController extends Controller {
 			}
 						
 			$problemData['rankPoints'] = intval(100.0/log(max(intval($problemData['accepted']), 1) + 1, 2));
+
+			// Compute success ratio
+			$submissions = $problem.submissions;
+			$accepted = $problem.accepted;
+			$problemData["ratio"] = ($submissions > 0) ? round(($accepted / (1.0 * $submissions)) * 100, 2) : 0.0;
 		}
 
+		// Sort results
+		$sorting_options = array('title', 'runs', 'solved', 'ratio', 'points', 'score');
+		if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
+			$order = $r['order_by'];
+			if ($order === 'title') {
+				usort($response['results'], function($a, $b) {
+					return strcmp($a['title'], $b['title']);
+				});
+			} else if ($order === 'runs') {
+				usort($response['results'], function($a, $b) {
+					return $a['submissions'] - $b['submissions'];
+				});
+			} else if ($order === 'solved') {
+				usort($response['results'], function($a, $b) {
+					return $a['accepted'] - $b['accepted'];
+				});
+			} else if ($order === 'ratio') {
+				usort($response['results'], function($a, $b) {
+					if ($a['ratio'] < $b['ratio']) {
+						return -1;
+					} else if ($a['ratio'] > $b['ratio']) {
+						return 1;
+					} else {
+						return 0;
+					}
+				});
+			} else if ($order === 'points') {
+				usort($response['results'], function($a, $b) {
+					return $a['rankPoints'] - $b['rankPoints'];
+				});
+			} else if ($order === 'score') {
+				usort($response['results'], function($a, $b) {
+					if ($a['score'] < $b['score']) {
+						return -1;
+					} else if ($a['score'] > $b['score']) {
+						return 1;
+					} else {
+						return 0;
+					}
+				});
+			}
+		} else {
+			usort($response["results"], function($a, $b) {
+				return strcmp($a["title"], $b["title"]);
+			});
+		}
+
+		$total = count($response['results']);
+		$response['total'] = $total;
+		$total_pages = intval(ceil($total / PROBLEMS_PER_PAGE) + 1E-9);
+
+		$page = 0;
+		if (is_null($r['page'])) {
+			$page = 1;
+		} else {
+			$page = intval($r['page']);
+			if ($page < 1 || $page > $total_pages) {
+				$page = 1;
+			}
+		}
+
+		$elements = array();
+		$start = ($page - 1) * PROBLEMS_PER_PAGE;
+		$end = min($total, $start + PROBLEMS_PER_PAGE);
+		for ($i = $start; $i < $end; $i++) {
+			array_push($elements, $response['results'][$i]);
+		}
+
+		$response['results'] = $elements;
 		$response["status"] = "ok";
 		return $response;
 	}

@@ -6,23 +6,41 @@
 		<thead>
 			<tr>
 				<th class="contains-long-desc">{#wordsTitle#}</th>
-				<th>
-					<a rel="tooltip" href="?sort=runs" data-toggle="tooltip" title data-original-title="{#sortByRuns#}">{#wordsRuns#}</a>
-				</th>
-				<th>
-					<a rel="tooltip" href="?sort=solved" data-toggle="tooltip" title data-original-title="{#sortBySolved#}">{#wordsSolved#}</a>
-				</th>
+				<th>{#wordsRuns#}</th>
+				<th>{#wordsSolved#}</th>
 				<th>{#wordsRatio#}</th>
 				<th>
-					<a rel="tooltip" href="?sort=difficulty" data-toggle="tooltip" title data-original-title="{#sortByPointsForRank#}">{#wordsPointsForRank#}</a>
+					{#wordsPointsForRank#}
 					<a rel="tooltip" href="http://blog.omegaup.com/2014/06/el-nuevo-ranking-de-omegaup/" data-toggle="tooltip" title data-original-title="{#wordsPointsForRankTooltip#}"><img src="/media/question.png"></a>
 				</th>
-				<th>
-					<a rel="tooltip" href="?sort=score" data-toggle="tooltip" title data-original-title="{#sortByMyScore#}">{#wordsMyScore#}</a>
-				</th>
+
+				<th>{#wordsMyScore#}</th>
 			</tr>
 		</thead>
-		<tbody></tbody>
+		<tbody>
+			{foreach item=problem from=$problems}
+				<tr>
+				<td><a href="/arena/problem/{$problem.alias}">{$problem.title}</a></td>
+				<td>{$problem.submissions}</td>
+				<td>{$problem.accepted}</td>
+				<td>{$problem.ratio}%</td>
+				<td>{$problem.rankPoints}</td>
+				<td>{$problem.score}</td>
+				</tr>
+			{/foreach}
+		</tbody>
 	</table>
+
+	<div class="pager-bar">
+		<center>
+			<ul class="pagination">
+				{foreach from=$pager_links item=page}
+					<li {if $page.class != ''}class="{$page.class}"{/if}>
+						<a href="{$page.url}">{$page.label}</a>
+					</li>
+				{/foreach}
+			</ul>
+		</center>
+	</div>
 </div>
-<script src="/js/problems.list.js"></script>
+<!--<script src="/js/problems.list.js"></script>-->
