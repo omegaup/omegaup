@@ -65,11 +65,9 @@ class ProblemList extends OmegaupTestCase {
 		
 		// Get 3 problems
 		$n = 3;
-		echo "\n";
 		for ($i = 0; $i < $n; $i++) {
 			$problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */);
-			echo "Alias $i: " . $problemData[$i]['request']['alias'] . "\n";
-		$i
+		}
 		
 
 		$r = new Request();
@@ -177,10 +175,16 @@ class ProblemList extends OmegaupTestCase {
 		// Validate results
 		foreach ($response['results'] as $responseProblem) {
 			if ($responseProblem['alias'] === $problemData['request']['alias']) {
+				echo "\n";
+				echo $responseProblem['score'];
+				echo "\n";
 				if ($responseProblem['score'] != 100.00) {
 					$this->fail("Expected to see 100 score for this problem");
 				}
 			} else if ($responseProblem['alias'] === $problemDataDecimal['request']['alias']){
+				echo "\n";
+				echo $responseProblem['score'];
+				echo "\n";
 				if ($responseProblem['score'] != 12.35) {
 					$this->fail("Expected to see 12.34 score for this problem");
 				}

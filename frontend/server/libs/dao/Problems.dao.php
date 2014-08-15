@@ -19,91 +19,161 @@ require_once("base/Problems.vo.base.php");
   */
 class ProblemsDAO extends ProblemsDAOBase
 {
-	public static final function byUserType($user_type, $order, $mode, $offset, $rowcount, $query, $author_id = null) {
+	public static final function byUserType($user_type, $order, $mode, $offset, $rowcount, $query, $user_id = null) {
 		global $conn;
 		$result = null;
 		if ($user_type === USER_ADMIN) {
-			$like_query = "";
+			$like_query = '';
 			if (!is_null($query)) {
 				$escapedValue = mysql_real_escape_string($query);
-				$like_query = " AND title LIKE '%{$escapedValue}%'";
+				$like_query = " where title like '%{$escapedValue}%'";
 			}
-			$sql ="SELECT * FROM 
-			       (SELECT R.score, P.*
-					FROM
+			$sql = "
+				select
+					*
+				from
 					(
-						SELECT	100 / log2(GREATEST(accepted, 1) + 1) AS points,
-								accepted / GREATEST(1, submissions)       AS ratio,
-								Problems.*
-						FROM 	Problems
-					) AS P, Runs AS R
-
-					WHERE	R.user_id = $author_id 		AND
-							P.problem_id = R.problem_id	AND
-							R.score >= ALL 	(
-												SELECT score
-												FROM Runs
-												WHERE 	user_id = $author_id		AND
-														problem_id = P.problem_id 	AND
-														status = 'ready'
-												ORDER BY score DESC, submit_delay ASC
-											)
-							$like_query
-
-					UNION
-
-					SELECT	0 AS score,
-							100 / log2(GREATEST(accepted, 1) + 1) AS points,
-							accepted / GREATEST(1, submissions)   AS ratio,
-							Problems.*
-					FROM 	Problems, Runs
-					WHERE   (Problems.problem_id, $author_id) NOT IN (SELECT DISTINCT problem_id, user_id FROM Runs) $like_query ) AS T
-					ORDER BY $order $mode";
+						(
+							select
+								R.score, P.*
+							from
+								(
+									select
+										user_id,
+										problem_id,
+										round(max(score) * 100, 2) as score
+									from
+										Runs 
+									where
+										status = 'ready' and
+										user_id = $user_id
+									group by
+										user_id,
+										problem_id
+								) as R,
+								(
+									select
+										100 / log2(GREATEST(accepted, 1) + 1)   as points,
+										accepted / GREATEST(1, submissions)     as ratio,
+										Problems.*
+									from
+										Problems
+								) as P
+							where
+								R.problem_id = P.problem_id and
+								R.user_id = $user_id
+						)
+						union
+						(
+								select
+									0 as score,
+									100 / log2(GREATEST(accepted, 1) + 1)   as points,
+									accepted / GREATEST(1, submissions)     as ratio,
+									Problems.*
+								from
+									Problems
+								where
+									(problem_id, $user_id) not in
+										(
+											select
+												problem_id,
+												user_id
+											from
+												Runs 
+											where
+												status = 'ready' and
+												user_id = $user_id
+											group by
+												user_id,
+												problem_id
+										)
+						)
+					) as T
+				$like_query
+				order by
+					$order $mode";
 
 			if (!is_null($rowcount)) {
-				$sql .= " LIMIT $offset, $rowcount";
+				$sql .= " limit $offset, $rowcount";
 			}	
+
 			$result = $conn->Execute($sql);
-		} else if ($user_type === USER_NORMAL && !is_null($author_id)) {
-			$like_query = "";
+		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
+			$like_query = '';
 			if (!is_null($query)) {
 				$escapedValue = mysql_real_escape_string($query);
-				$like_query = " AND title LIKE '%{$escapedValue}%'";
+				$like_query = " where title like '%{$escapedValue}%'";
 			}
-			$sql = "SELECT * FROM
-				   (SELECT R.score, P.*
-					FROM
+			$sql = "
+				select
+					*
+				from
 					(
-						SELECT	100 / log2(GREATEST(accepted, 1) + 1) 	AS points,
-								accepted / GREATEST(1, submissions)     AS ratio,
-								Problems.*
-						FROM 	Problems
-						WHERE   (public = 1 OR author_id = $author_id) $like_query
-					) AS P, Runs AS R
-
-					WHERE	R.user_id = $author_id 		AND
-							P.problem_id = R.problem_id	AND
-							R.score >= ALL 	(
-												SELECT score
-												FROM Runs
-												WHERE 	user_id = $author_id		AND
-														problem_id = P.problem_id 	AND
-														status = 'ready'
-												ORDER BY score DESC, submit_delay ASC
-											)
-
-					UNION
-
-					SELECT	0 AS score,
-							100 / log2(GREATEST(accepted, 1) + 1) AS points,
-							accepted / GREATEST(1, submissions)   AS ratio,
-							Problems.*
-					FROM 	Problems, Runs
-					WHERE   (public = 1 OR author_id = $author_id) AND (Problems.problem_id, $author_id) NOT IN (SELECT DISTINCT problem_id, user_id from Runs) $like_query ) AS T 
-					ORDER BY $order $mode";
+						(
+							select
+								R.score, P.*
+							from
+								(
+									select
+										user_id,
+										problem_id,
+										round(max(score) * 100, 2) as score
+									from
+										Runs 
+									where
+										status = 'ready' and
+										user_id = $user_id
+									group by
+										user_id,
+										problem_id
+								) as R,
+								(
+									select
+										100 / log2(GREATEST(accepted, 1) + 1)   as points,
+										accepted / GREATEST(1, submissions)     as ratio,
+										Problems.*
+									from
+										Problems
+									where
+										(public = 1 or author_id = $user_id)
+								) as P
+							where
+								R.problem_id = P.problem_id and
+								R.user_id = $user_id
+						)
+						union
+						(
+								select
+									0 as score,
+									100 / log2(GREATEST(accepted, 1) + 1)   as points,
+									accepted / GREATEST(1, submissions)     as ratio,
+									Problems.*
+								from
+									Problems
+								where
+									(public = 1 or author_id = $user_id) and
+									(problem_id, $user_id) not in
+										(
+											select
+												problem_id,
+												user_id
+											from
+												Runs 
+											where
+												status = 'ready' and
+												user_id = $user_id
+											group by
+												user_id,
+												problem_id
+										)
+						)
+					) as T
+				$like_query
+				order by
+					$order $mode";
 
 			if (!is_null($rowcount)) {
-				$sql .= " LIMIT $offset, $rowcount";
+				$sql .= " limit $offset, $rowcount";
 			}	
 			$result = $conn->Execute($sql);
 		} else if ($user_type === USER_ANONYMOUS) {
