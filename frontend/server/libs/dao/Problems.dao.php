@@ -19,6 +19,127 @@ require_once("base/Problems.vo.base.php");
   */
 class ProblemsDAO extends ProblemsDAOBase
 {
+	public static final function byUserType($user_type, $order, $mode, $offset, $rowcount, $query, $author_id = null) {
+		global $conn;
+		$result = null;
+		if ($user_type === USER_ADMIN) {
+			$like_query = "";
+			if (!is_null($query)) {
+				$escapedValue = mysql_real_escape_string($query);
+				$like_query = " AND title LIKE '%{$escapedValue}%'";
+			}
+			$sql ="SELECT * FROM 
+			       (SELECT R.score, P.*
+					FROM
+					(
+						SELECT	100 / log2(GREATEST(accepted, 1) + 1) AS points,
+								accepted / GREATEST(1, submissions)       AS ratio,
+								Problems.*
+						FROM 	Problems
+					) AS P, Runs AS R
+
+					WHERE	R.user_id = $author_id 		AND
+							P.problem_id = R.problem_id	AND
+							R.score >= ALL 	(
+												SELECT score
+												FROM Runs
+												WHERE 	user_id = $author_id		AND
+														problem_id = P.problem_id 	AND
+														status = 'ready'
+												ORDER BY score DESC, submit_delay ASC
+											)
+							$like_query
+
+					UNION
+
+					SELECT	0 AS score,
+							100 / log2(GREATEST(accepted, 1) + 1) AS points,
+							accepted / GREATEST(1, submissions)   AS ratio,
+							Problems.*
+					FROM 	Problems, Runs
+					WHERE   (Problems.problem_id, $author_id) NOT IN (SELECT DISTINCT problem_id, user_id FROM Runs) $like_query ) AS T
+					ORDER BY $order $mode";
+
+			if (!is_null($rowcount)) {
+				$sql .= " LIMIT $offset, $rowcount";
+			}	
+			$result = $conn->Execute($sql);
+		} else if ($user_type === USER_NORMAL && !is_null($author_id)) {
+			$like_query = "";
+			if (!is_null($query)) {
+				$escapedValue = mysql_real_escape_string($query);
+				$like_query = " AND title LIKE '%{$escapedValue}%'";
+			}
+			$sql = "SELECT * FROM
+				   (SELECT R.score, P.*
+					FROM
+					(
+						SELECT	100 / log2(GREATEST(accepted, 1) + 1) 	AS points,
+								accepted / GREATEST(1, submissions)     AS ratio,
+								Problems.*
+						FROM 	Problems
+						WHERE   (public = 1 OR author_id = $author_id) $like_query
+					) AS P, Runs AS R
+
+					WHERE	R.user_id = $author_id 		AND
+							P.problem_id = R.problem_id	AND
+							R.score >= ALL 	(
+												SELECT score
+												FROM Runs
+												WHERE 	user_id = $author_id		AND
+														problem_id = P.problem_id 	AND
+														status = 'ready'
+												ORDER BY score DESC, submit_delay ASC
+											)
+
+					UNION
+
+					SELECT	0 AS score,
+							100 / log2(GREATEST(accepted, 1) + 1) AS points,
+							accepted / GREATEST(1, submissions)   AS ratio,
+							Problems.*
+					FROM 	Problems, Runs
+					WHERE   (public = 1 OR author_id = $author_id) AND (Problems.problem_id, $author_id) NOT IN (SELECT DISTINCT problem_id, user_id from Runs) $like_query ) AS T 
+					ORDER BY $order $mode";
+
+			if (!is_null($rowcount)) {
+				$sql .= " LIMIT $offset, $rowcount";
+			}	
+			$result = $conn->Execute($sql);
+		} else if ($user_type === USER_ANONYMOUS) {
+			$like_query = "";
+			if (!is_null($query)) {
+				$escapedValue = mysql_real_escape_string($query);
+				$like_query = " AND title LIKE '%{$escapedValue}%'";
+			}
+			$sql = "SELECT	0 AS score,
+							100 / log2(GREATEST(accepted, 1) + 1) AS points,
+							accepted / GREATEST(1, submissions)   AS ratio,
+							Problems.*
+					FROM	Problems
+					WHERE 	public = 1 $like_query ORDER BY $order $mode";
+
+			if (!is_null($rowcount)) {
+				$sql .= " LIMIT $offset, $rowcount";
+			}	
+
+			$result = $conn->Execute($sql);
+		}
+
+		$problems = array();
+		if (!is_null($result)) {
+			foreach ($result as $row) {
+				$temp = new Problems($row);
+				$problem = $temp->asArray();
+				$problem['score'] = $row['score'];
+				$problem['points'] = $row['points'];
+				$problem['ratio'] = $row['ratio'];
+				array_push($problems, $problem);
+			}
+		}
+		return $problems;
+	}
+
 	/* byPage: search and return all the results by size and number of page and other attributes */
 	public static final function byPage( $sizePage , $noPage , $condition = null , $serv = null, $orderBy = null, $orden = 'ASC')
 	{	

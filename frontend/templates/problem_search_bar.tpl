@@ -4,12 +4,12 @@
 			<div class="form-group">
 				<label class="control-label" for="order_by">{#wordsOrderBy#}</label>
 				<select class="form-control" id="problem-search-order" name="order_by">
-					<option {if $ORDER_BY == 'title'}	selected="selected"{/if}	value="title">{#wordsTitle#}</option>
-					<option {if $ORDER_BY == 'runs'}	selected="selected"{/if}	value="runs">{#wordsRuns#}</option>
-					<option {if $ORDER_BY == 'solved'}	selected="selected"{/if}	value="solved">{#wordsSolved#}</option>
-					<option {if $ORDER_BY == 'ratio'}	selected="selected"{/if}	value="ratio">{#wordsRatio#}</option>
-					<option {if $ORDER_BY == 'points'}	selected="selected"{/if}	value="points">{#wordsPointsForRank#}</option>
-					<option {if $ORDER_BY == 'score'}	selected="selected"{/if}	value="score">{#wordsMyScore#}</option>
+					<option {if $ORDER_BY == 'title'}		selected="selected"{/if}	value="title">{#wordsTitle#}</option>
+					<option {if $ORDER_BY == 'submissions'}	selected="selected"{/if}	value="submissions">{#wordsRuns#}</option>
+					<option {if $ORDER_BY == 'accepted'}	selected="selected"{/if}	value="accepted">{#wordsSolved#}</option>
+					<option {if $ORDER_BY == 'ratio'}		selected="selected"{/if}	value="ratio">{#wordsRatio#}</option>
+					<option {if $ORDER_BY == 'points'}		selected="selected"{/if}	value="points">{#wordsPointsForRank#}</option>
+					<option {if $ORDER_BY == 'score'}		selected="selected"{/if}	value="score">{#wordsMyScore#}</option>
 				</select>
 			</div>
 

@@ -25,7 +25,7 @@
 				<td>{$problem.submissions}</td>
 				<td>{$problem.accepted}</td>
 				<td>{$problem.ratio}%</td>
-				<td>{$problem.rankPoints}</td>
+				<td>{$problem.points}</td>
 				<td>{$problem.score}</td>
 				</tr>
 			{/foreach}
@@ -34,4 +34,3 @@
 
 	{include file='pager_bar.tpl'}
 </div>
-<!--<script src="/js/problems.list.js"></script>-->

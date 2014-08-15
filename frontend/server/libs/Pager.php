@@ -1,47 +1,59 @@
 <?php
 class Pager {
-	public static function concat($params)
-	{
-		$str = "";
-		$i = 0;
-		$size = count($params);
-		foreach ($params as $key => $val) {
+	/**
+	 * Returns a concatenation of key => value parameters ready to use in a URL.
+	 */
+	public static function buildQueryString($dict) {
+		$params = array();
+		foreach ($dict as $key => $val) {
 			$str .= "$key=$val";
-			if ($i + 1 < $size) {
-				$str .= '&';
-			}
-			$i++;
+			$params[] = urlencode($key) . '=' . urlencode($val);
 		}
 
-		return $str;
+		return implode('&', $params);
 	}
 
-	public static function paginate($base_url, $page, $adjacent, $total, $extra_params)
-	{
-		$total_pages = intval(ceil($total / PROBLEMS_PER_PAGE) + 1E-9);
-		if ($page < 1 || $page > $total_pages) {
-			$page = 1;
+	/**
+	 * Returns an array with all the information needed to create a pager bar.
+	 * -------------------------------------------------------------------------------------
+	 * | « | ... | c - a | ... | c - 2 | c - 1 | c | c + 1 | c + 2 | ... | c + a | ... | » |
+	 * -------------------------------------------------------------------------------------
+	 *                                           ^
+	 *                                           |
+	 *                                      current page
+	 *
+	 * @param int $rows	The total number of rows to show.
+	 * @param int $current	The page we want to show, the 'c' in the figure.
+	 * @param string $url	The base URL that each item will point to.
+	 * @param int $adjacent	Number of items before and after the current page, the 'a' in the figure.
+	 * @param array $params	Additional key => value parameters to append to the item's URL.
+	 * @return array $items	The information for each item of the pager.
+	 */
+	public static function paginate($rows, $current, $url, $adjacent, $params) {
+		$pages = intval((float)($rows + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+		if ($current < 1 || $current > $pages) {
+			$current = 1;
 		}
 
-		$expa = '';
-		if (count($extra_params) > 0) {
-			$expa = '&' . self::concat($extra_params);
+		$query = '';
+		if (count($params) > 0) {
+			$query = '&' . self::buildQueryString($params);
 		}
 
-		$pager_links = array();
-		$prev = array('label' => 'Previous', 'url' => '', 'class' => '');
-		if ($page > $adjacent + 1) {
-			$prev['url'] = $base_url . '?page=' . ($page - 1) . $expa;
+		$items = array();
+		$prev = array('label' => '«', 'url' => '', 'class' => '');
+		if ($current > 1) {
+			$prev['url'] = $url . '?page=' . ($current - 1) . $query;
 		} else {
 			$prev['url'] = '';
 			$prev['class'] = 'disabled';
 		}
-		array_push($pager_links, $prev);
+		array_push($items, $prev);
 
-		if ($page > $adjacent + 1) {
+		if ($current > $adjacent + 1) {
 			$first = array(
 				'label' => '1',
-				'url'   => $base_url . '?page=1' . $expa,
+				'url'   => $url . '?page=1' . $query,
 				'class' => ''
 			);
 			$period = array(
@@ -49,61 +61,45 @@ class Pager {
 				'url'	=> '',
 				'class' => 'disabled'
 			);
-			array_push($pager_links, $first);
-			array_push($pager_links, $period);
+			array_push($items, $first);
+			array_push($items, $period);
 		}
 
-		for ($i = max(1, $page - $adjacent); $i < $page; $i++) {
+		for ($i = max(1, $current - $adjacent); $i <= min($pages, $current + $adjacent); $i++) {
 			$item = array(
 				'label' => $i,
-				'url'   => $base_url . '?page=' . $i . $expa,
-				'class' => ''
+				'url'   => $url . '?page=' . $i . $query,
+				'class' => ($i == $current) ? 'active' : ''
 
 			);
-			array_push($pager_links, $item);
+			array_push($items, $item);
 		}
 
-		$current = array(
-			'label' => $page,
-			'url'   => '',
-			'class' => 'active'
-		);
-		array_push($pager_links, $current);
-
-		for ($i = $page + 1; $i <= min($total_pages, $page + $adjacent); $i++) {
-			$item = array(
-				'label' => $i,
-				'url'   => $base_url . '?page=' . $i . $expa,
-				'class' => ''
-			);
-			array_push($pager_links, $item);
-		}
-
-		if ($page + $adjacent < $total_pages) {
+		if ($current + $adjacent < $pages) {
 			$period = array(
 				'label' => '...',
 				'url'	=> '',
 				'class' => 'disabled'
 			);
 			$last = array(
-				'label' => $total_pages,
-				'url'   => $base_url . '?page=' . $total_pages . $expa,
+				'label' => $pages,
+				'url'   => $url . '?page=' . $pages . $query,
 				'class' => ''
 			);
-			array_push($pager_links, $period);
-			array_push($pager_links, $last);
+			array_push($items, $period);
+			array_push($items, $last);
 		}
 
-		$next = array('label' => 'Next', 'url' => '', 'class' => '');
-		if ($page + $adjacent < $total_pages) {
-			$next['url'] = $base_url . '?page=' . ($page + 1) . $expa;
+		$next = array('label' => '»', 'url' => '', 'class' => '');
+		if ($current < $pages) {
+			$next['url'] = $url . '?page=' . ($current + 1) . $query;
 		} else {
 			$next['url'] = '';
 			$next['class'] = 'disabled';
 		}
-		array_push($pager_links, $next);
+		array_push($items, $next);
 
-		return $pager_links;
+		return $items;
 	}
 }
 ?>

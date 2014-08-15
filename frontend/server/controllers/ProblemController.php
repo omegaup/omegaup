@@ -1291,77 +1291,11 @@ class ProblemController extends Controller {
 
 		self::validateList($r);
 
-		$response = array();
-		$response["results"] = array();
-		for ($i = 0; $i < 2; $i++) {
-
-			// Add private in the first pass, public in the second
-			try {
-				$problem_mask = NULL;
-				if ($i === 0 && !is_null($r["current_user_id"])) {
-					if (Authorization::IsSystemAdmin($r["current_user_id"])) {
-						$problem_mask = new Problems(array(
-								"public" => "0"
-							));
-					} else {
-						// Sys admin can see al private problems
-						$problem_mask = new Problems(array(
-								"public" => "0",
-								"author_id" => $r["current_user_id"]
-							));
-					}
-				} else if ($i === 1) {
-					$problem_mask = new Problems(array(
-								"public" => 1
-							));
-				}
-
-				if (!is_null($problem_mask)) {
-					$problems = ProblemsDAO::search(
-							$problem_mask, 
-							"problem_id", 
-							'DESC', 
-							$r["offset"], 
-							$r["rowcount"],
-							is_null($r["query"]) ? 
-								null : 
-								array(
-									"title" => $r["query"]
-								)
-						);
-					
-					foreach ($problems as $problem) {
-						array_push($response["results"], $problem->asArray());
-					}
-				}
-			} catch (Exception $e) {
-				throw new InvalidDatabaseOperationException($e);
-			}
-		}
-
-		// Add users' best scores to the list
-		foreach ($response["results"] as &$problemData) {
-			// If we have a logged-in user (this API can be accessed by non-logged in users)
-			if (!is_null($r['current_user_id'])) {
-				$problemData['score'] = RunsDAO::GetBestScore($problemData['problem_id'], $r['current_user_id']);
-			} else {
-				$problemData['score'] = 0;
-			}
-						
-			$problemData['rankPoints'] = intval(100.0/log(max(intval($problemData['accepted']), 1) + 1, 2));
-
-			// Compute success ratio
-			$submissions = $problemData['submissions'];
-			$accepted = $problemData['accepted'];
-			$problemData["ratio"] = ($submissions > 0) ? round(($accepted / (1.0 * $submissions)) * 100, 2) : 0.0;
-		}
-
 		// Sort results
-		$sorting_options = array('title', 'runs', 'solved', 'ratio', 'points', 'score');
+		$order = 'problem_id';
+		$sorting_options = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
 		if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
 			$order = $r['order_by'];
-		} else {
-			$order = 'title';
 		}
 
 		if (!is_null($r['mode']) && ($r['mode'] === 'asc' || $r['mode'] === 'desc')) {
@@ -1370,64 +1304,35 @@ class ProblemController extends Controller {
 			$mode = 'asc';
 		}
 
-		if ($order === 'title') {
-			usort($response['results'], function($a, $b) use ($mode) {
-				if ($mode === 'asc') {
-					return strcmp($a['title'], $b['title']);
-				} else {
-					return strcmp($b['title'], $a['title']);
-				}
-			});
-		} else if ($order === 'runs') {
-			usort($response['results'], function($a, $b) use ($mode) {
-				if ($mode === 'asc') {
-					return $a['submissions'] - $b['submissions'];
-				} else {
-					return $b['submissions'] - $a['submissions'];
-				}
-			});
-		} else if ($order === 'solved') {
-			usort($response['results'], function($a, $b) use ($mode) {
-				if ($mode === 'asc') {
-					return $a['accepted'] - $b['accepted'];
-				} else {
-					return $b['accepted'] - $a['accepted'];
-				}
-			});
-		} else if ($order === 'ratio') {
-			usort($response['results'], function($a, $b) use ($mode) {
-				$x = $a['ratio'];
-				$y = $b['ratio'];
-				if ($mode === 'desc') {
-					$x = $b['ratio'];
-					$y = $a['ratio'];
-				}
-
-				return ($x <= $y) ? -1 : 1;
-			});
-		} else if ($order === 'points') {
-			usort($response['results'], function($a, $b) use ($mode) {
-				if ($mode === 'asc') {
-					return $a['rankPoints'] - $b['rankPoints'];
-				} else {
-					return $b['rankPoints'] - $a['rankPoints'];
-				}
-			});
-		} else if ($order === 'score') {
-			usort($response['results'], function($a, $b) use ($mode) {
-				$x = $a['score'];
-				$y = $b['score'];
-				if ($mode === 'desc') {
-					$x = $b['score'];
-					$y = $a['score'];
-				}
-				return ($x <= $y) ? -1 : 1;
-			});
+		$response = array();
+		$response["results"] = array();
+		$author_id = null;
+		$user_type = USER_ANONYMOUS;
+		if (!is_null($r['current_user_id'])) {
+			$author_id = $r['current_user_id'];
+			if (Authorization::IsSystemAdmin($r['current_user_id'])) {
+				$user_type = USER_ADMIN;
+			} else {
+				$user_type = USER_NORMAL;
+			}
 		}
+
+		$offset = is_null($r['offset']) ? 0 : $r['offset'];
+		$rowcount = is_null($r['rowcount']) ? null : $r['rowcount'];
+		$query = is_null($r['query']) ? null : $r['query'];
+		$response['results'] = ProblemsDAO::byUserType(
+			$user_type,
+			$order,
+			$mode,
+			$offset,
+			$rowcount,
+			$query,
+			$author_id
+		);
 
 		$total = count($response['results']);
 		$response['total'] = $total;
-		$total_pages = intval(ceil($total / PROBLEMS_PER_PAGE) + 1E-9);
+		$total_pages = intval((float)($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
 
 		if (!is_null($r['page'])) {
 			$p = intval($r['page']);

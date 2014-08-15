@@ -65,9 +65,11 @@ class ProblemList extends OmegaupTestCase {
 		
 		// Get 3 problems
 		$n = 3;
+		echo "\n";
 		for ($i = 0; $i < $n; $i++) {
 			$problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */);
-		}
+			echo "Alias $i: " . $problemData[$i]['request']['alias'] . "\n";
+		$i
 		
 
 		$r = new Request();

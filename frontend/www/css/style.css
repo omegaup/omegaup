@@ -532,10 +532,6 @@ padding-right: 5px;
 
 th.contains-long-desc{ min-width:369px; }
 
-.pager-bar {
-	margin-top: 15px;
-	border-top: 1px solid #ccc;
-}
 
 .search-bar {
 	margin-bottom: 10px;
@@ -553,4 +549,9 @@ th.contains-long-desc{ min-width:369px; }
 
 .search-bar #problem-search-button {
 	height: 32px;
+}
+
+.pager-bar {
+	margin-top: 15px;
+	border-top: 1px solid #ccc;
 }
