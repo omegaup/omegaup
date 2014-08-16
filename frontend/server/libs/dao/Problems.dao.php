@@ -26,75 +26,75 @@ class ProblemsDAO extends ProblemsDAOBase
 			$like_query = '';
 			if (!is_null($query)) {
 				$escapedValue = mysql_real_escape_string($query);
-				$like_query = " where title like '%{$escapedValue}%'";
+				$like_query = " WHERE title like '%{$escapedValue}%'";
 			}
 			$sql = "
-				select
+				SELECT
 					*
-				from
+				FROM
 					(
 						(
-							select
+							SELECT
 								R.score, P.*
-							from
+							FROM
 								(
-									select
+									SELECT
 										user_id,
 										problem_id,
-										round(max(score) * 100, 2) as score
-									from
+										ROUND(MAX(score) * 100, 2) AS score
+									FROM
 										Runs 
-									where
-										status = 'ready' and
+									WHERE
+										status = 'ready' AND
 										user_id = $user_id
-									group by
+									GROUP BY
 										user_id,
 										problem_id
-								) as R,
+								) AS R,
 								(
-									select
-										100 / log2(GREATEST(accepted, 1) + 1)   as points,
-										accepted / GREATEST(1, submissions)     as ratio,
+									SELECT
+										100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
+										accepted / GREATEST(1, submissions)     AS ratio,
 										Problems.*
-									from
+									FROM
 										Problems
-								) as P
-							where
-								R.problem_id = P.problem_id and
+								) AS P
+							WHERE
+								R.problem_id = P.problem_id AND
 								R.user_id = $user_id
 						)
-						union
+						UNION
 						(
-								select
-									0 as score,
-									100 / log2(GREATEST(accepted, 1) + 1)   as points,
-									accepted / GREATEST(1, submissions)     as ratio,
+								SELECT
+									0 AS score,
+									100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
+									accepted / GREATEST(1, submissions)     AS ratio,
 									Problems.*
-								from
+								FROM
 									Problems
-								where
-									(problem_id, $user_id) not in
+								WHERE
+									(problem_id, $user_id) NOT IN
 										(
-											select
+											SELECT
 												problem_id,
 												user_id
-											from
+											FROM
 												Runs 
-											where
-												status = 'ready' and
+											WHERE
+												status = 'ready' AND
 												user_id = $user_id
-											group by
+											GROUP BY
 												user_id,
 												problem_id
 										)
 						)
-					) as T
+					) AS T
 				$like_query
-				order by
+				ORDER BY
 					$order $mode";
 
 			if (!is_null($rowcount)) {
-				$sql .= " limit $offset, $rowcount";
+				$sql .= " LIMIT $offset, $rowcount";
 			}	
 
 			$result = $conn->Execute($sql);
@@ -102,78 +102,78 @@ class ProblemsDAO extends ProblemsDAOBase
 			$like_query = '';
 			if (!is_null($query)) {
 				$escapedValue = mysql_real_escape_string($query);
-				$like_query = " where title like '%{$escapedValue}%'";
+				$like_query = " WHERE title LIKE '%{$escapedValue}%'";
 			}
 			$sql = "
-				select
+				SELECT
 					*
-				from
+				FROM
 					(
 						(
-							select
+							SELECT
 								R.score, P.*
-							from
+							FROM
 								(
-									select
+									SELECT
 										user_id,
 										problem_id,
-										round(max(score) * 100, 2) as score
-									from
+										ROUND(MAX(score) * 100, 2) AS score
+									FROM
 										Runs 
-									where
-										status = 'ready' and
+									WHERE
+										status = 'ready' AND
 										user_id = $user_id
-									group by
+									GROUP BY
 										user_id,
 										problem_id
-								) as R,
+								) AS R,
 								(
-									select
-										100 / log2(GREATEST(accepted, 1) + 1)   as points,
-										accepted / GREATEST(1, submissions)     as ratio,
+									SELECT
+										100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
+										accepted / GREATEST(1, submissions)     AS ratio,
 										Problems.*
-									from
+									FROM
 										Problems
-									where
-										(public = 1 or author_id = $user_id)
-								) as P
-							where
-								R.problem_id = P.problem_id and
+									WHERE
+										(public = 1 OR author_id = $user_id)
+								) AS P
+							WHERE
+								R.problem_id = P.problem_id AND
 								R.user_id = $user_id
 						)
-						union
+						UNION
 						(
-								select
-									0 as score,
-									100 / log2(GREATEST(accepted, 1) + 1)   as points,
-									accepted / GREATEST(1, submissions)     as ratio,
+								SELECT
+									0 AS score,
+									100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
+									accepted / GREATEST(1, submissions)     AS ratio,
 									Problems.*
-								from
+								FROM
 									Problems
-								where
-									(public = 1 or author_id = $user_id) and
-									(problem_id, $user_id) not in
+								WHERE
+									(public = 1 OR author_id = $user_id) AND
+									(problem_id, $user_id) NOT IN
 										(
-											select
+											SELECT
 												problem_id,
 												user_id
-											from
+											FROM
 												Runs 
-											where
-												status = 'ready' and
+											WHERE
+												status = 'ready' AND
 												user_id = $user_id
-											group by
+											GROUP BY
 												user_id,
 												problem_id
 										)
 						)
-					) as T
+					) AS T
 				$like_query
-				order by
+				ORDER BY
 					$order $mode";
 
 			if (!is_null($rowcount)) {
-				$sql .= " limit $offset, $rowcount";
+				$sql .= " LIMIT $offset, $rowcount";
 			}	
 			$result = $conn->Execute($sql);
 		} else if ($user_type === USER_ANONYMOUS) {
@@ -183,7 +183,7 @@ class ProblemsDAO extends ProblemsDAOBase
 				$like_query = " AND title LIKE '%{$escapedValue}%'";
 			}
 			$sql = "SELECT	0 AS score,
-							100 / log2(GREATEST(accepted, 1) + 1) AS points,
+							100 / LOG2(GREATEST(accepted, 1) + 1) AS points,
 							accepted / GREATEST(1, submissions)   AS ratio,
 							Problems.*
 					FROM	Problems

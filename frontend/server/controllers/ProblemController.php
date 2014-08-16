@@ -1301,7 +1301,7 @@ class ProblemController extends Controller {
 		if (!is_null($r['mode']) && ($r['mode'] === 'asc' || $r['mode'] === 'desc')) {
 			$mode = $r['mode'];
 		} else {
-			$mode = 'asc';
+			$mode = 'desc';
 		}
 
 		$response = array();

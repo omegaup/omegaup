@@ -175,16 +175,10 @@ class ProblemList extends OmegaupTestCase {
 		// Validate results
 		foreach ($response['results'] as $responseProblem) {
 			if ($responseProblem['alias'] === $problemData['request']['alias']) {
-				echo "\n";
-				echo $responseProblem['score'];
-				echo "\n";
 				if ($responseProblem['score'] != 100.00) {
 					$this->fail("Expected to see 100 score for this problem");
 				}
 			} else if ($responseProblem['alias'] === $problemDataDecimal['request']['alias']){
-				echo "\n";
-				echo $responseProblem['score'];
-				echo "\n";
 				if ($responseProblem['score'] != 12.35) {
 					$this->fail("Expected to see 12.34 score for this problem");
 				}
