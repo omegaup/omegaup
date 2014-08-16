@@ -21,85 +21,46 @@ class ProblemsDAO extends ProblemsDAOBase
 {
 	public static final function byUserType($user_type, $order, $mode, $offset, $rowcount, $query, $user_id = null) {
 		global $conn;
+		if (!is_null($query)) {
+			$escapedQuery = mysql_real_escape_string($query);
+		}
 		$result = null;
 		if ($user_type === USER_ADMIN) {
-			$like_query = '';
-			if (!is_null($query)) {
-				$escapedValue = mysql_real_escape_string($query);
-				$like_query = " WHERE title like '%{$escapedValue}%'";
-			}
+			$args = array($user_id);
 			$sql = "
 				SELECT
-					*
+					100 / LOG2(GREATEST(accepted, 1) + 1)	AS points,
+					accepted / GREATEST(1, submissions)		AS ratio,
+					ROUND(100 * COALESCE(ps.score, 0))		AS score,
+					p.*
 				FROM
-					(
-						(
-							SELECT
-								R.score, P.*
-							FROM
-								(
-									SELECT
-										user_id,
-										problem_id,
-										ROUND(MAX(score) * 100, 2) AS score
-									FROM
-										Runs 
-									WHERE
-										status = 'ready' AND
-										user_id = $user_id
-									GROUP BY
-										user_id,
-										problem_id
-								) AS R,
-								(
-									SELECT
-										100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
-										accepted / GREATEST(1, submissions)     AS ratio,
-										Problems.*
-									FROM
-										Problems
-								) AS P
-							WHERE
-								R.problem_id = P.problem_id AND
-								R.user_id = $user_id
-						)
-						UNION
-						(
-								SELECT
-									0 AS score,
-									100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
-									accepted / GREATEST(1, submissions)     AS ratio,
-									Problems.*
-								FROM
-									Problems
-								WHERE
-									(problem_id, $user_id) NOT IN
-										(
-											SELECT
-												problem_id,
-												user_id
-											FROM
-												Runs 
-											WHERE
-												status = 'ready' AND
-												user_id = $user_id
-											GROUP BY
-												user_id,
-												problem_id
-										)
-						)
-					) AS T
-				$like_query
-				ORDER BY
-					$order $mode";
+					Problems p
+				LEFT JOIN (
+					SELECT
+					  Problems.problem_id,
+					  MAX(Runs.score) AS score
+					FROM 
+					  Problems
+					INNER JOIN
+					  Runs ON Runs.user_id = ? AND Runs.problem_id = Problems.problem_id
+					GROUP BY
+					  Problems.problem_id
+				) ps ON ps.problem_id = p.problem_id";
+
+			if (!is_null($query)) {
+				$sql .= " WHERE title LIKE '%$escapedQuery%'";
+			}
+
+			$sql .= " ORDER BY $order $mode ";
 
 			if (!is_null($rowcount)) {
-				$sql .= " LIMIT $offset, $rowcount";
-			}	
+				$sql .= "LIMIT ?, ?";
+				array_push($args, $offset, $rowcount);
+			}
 
-			$result = $conn->Execute($sql);
+			$result = $conn->Execute($sql, $args);
 		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
-			$like_query = '';
+			$like_query = "";
 			if (!is_null($query)) {
 				$escapedValue = mysql_real_escape_string($query);
 				$like_query = " WHERE title LIKE '%{$escapedValue}%'";
@@ -190,17 +151,19 @@ class ProblemsDAO extends ProblemsDAOBase
 					WHERE 	public = 1 $like_query ORDER BY $order $mode";
 
 			if (!is_null($rowcount)) {
-				$sql .= " LIMIT $offset, $rowcount";
-			}	
+				$sql .= " LIMIT ? ?";
+			}
 
-			$result = $conn->Execute($sql);
+			$args = array($offset, $rowcount);
+			$result = $conn->Execute($sql, $args);
 		}
 
+		$filters = array('title', 'submissions', 'accepted', 'alias');
 		$problems = array();
 		if (!is_null($result)) {
 			foreach ($result as $row) {
 				$temp = new Problems($row);
-				$problem = $temp->asArray();
+				$problem = $temp->asFilteredArray($filters);
 				$problem['score'] = $row['score'];
 				$problem['points'] = $row['points'];
 				$problem['ratio'] = $row['ratio'];

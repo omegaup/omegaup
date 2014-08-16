@@ -8,7 +8,7 @@
 			<tr>
 				<th class="contains-long-desc">{#wordsTitle#}</th>
 				<th>{#wordsRuns#}</th>
-				<th>{#wordsSolved#}</th>
+				<th>{#wordsAccepted#}</th>
 				<th>{#wordsRatio#}</th>
 				<th>
 					{#wordsPointsForRank#}

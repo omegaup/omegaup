@@ -30,7 +30,7 @@ class Pager {
 	 * @return array $items	The information for each item of the pager.
 	 */
 	public static function paginate($rows, $current, $url, $adjacent, $params) {
-		$pages = intval((float)($rows + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+		$pages = ($rows + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE;
 		if ($current < 1 || $current > $pages) {
 			$current = 1;
 		}

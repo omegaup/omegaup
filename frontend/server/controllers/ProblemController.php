@@ -1309,7 +1309,7 @@ class ProblemController extends Controller {
 		$author_id = null;
 		$user_type = USER_ANONYMOUS;
 		if (!is_null($r['current_user_id'])) {
-			$author_id = $r['current_user_id'];
+			$author_id = intval($r['current_user_id']);
 			if (Authorization::IsSystemAdmin($r['current_user_id'])) {
 				$user_type = USER_ADMIN;
 			} else {
@@ -1317,9 +1317,10 @@ class ProblemController extends Controller {
 			}
 		}
 
-		$offset = is_null($r['offset']) ? 0 : $r['offset'];
-		$rowcount = is_null($r['rowcount']) ? null : $r['rowcount'];
 		$query = is_null($r['query']) ? null : $r['query'];
+		$offset = is_null($r['offset']) ? 0 :  intval($r['offset']);
+		$rowcount = is_null($r['rowcount']) ? null : intval($r['rowcount']);
+
 		$response['results'] = ProblemsDAO::byUserType(
 			$user_type,
 			$order,
@@ -1332,11 +1333,11 @@ class ProblemController extends Controller {
 
 		$total = count($response['results']);
 		$response['total'] = $total;
-		$total_pages = intval((float)($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+		$pages = ($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE;
 
 		if (!is_null($r['page'])) {
 			$p = intval($r['page']);
-			if ($p >= 1 && $p <= $total_pages) {
+			if ($p >= 1 && $p <= $pages) {
 				$page = $p;
 			} else {
 				$page = 1;
