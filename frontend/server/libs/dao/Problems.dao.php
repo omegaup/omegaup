@@ -22,7 +22,7 @@ class ProblemsDAO extends ProblemsDAOBase
 	public static final function byUserType($user_type, $order, $mode, $offset, $rowcount, $query, $user_id = null) {
 		global $conn;
 		if (!is_null($query)) {
-			$escapedQuery = mysql_real_escape_string($query);
+			$escaped_query = mysql_real_escape_string($query);
 		}
 		$result = null;
 		if ($user_type === USER_ADMIN) {
@@ -37,18 +37,18 @@ class ProblemsDAO extends ProblemsDAOBase
 					Problems p
 				LEFT JOIN (
 					SELECT
-					  Problems.problem_id,
-					  MAX(Runs.score) AS score
+						Problems.problem_id,
+						MAX(Runs.score) AS score
 					FROM 
-					  Problems
+						Problems
 					INNER JOIN
-					  Runs ON Runs.user_id = ? AND Runs.problem_id = Problems.problem_id
+						Runs ON Runs.user_id = ? AND Runs.problem_id = Problems.problem_id
 					GROUP BY
-					  Problems.problem_id
+						Problems.problem_id
 				) ps ON ps.problem_id = p.problem_id";
 
 			if (!is_null($query)) {
-				$sql .= " WHERE title LIKE '%$escapedQuery%'";
+				$sql .= " WHERE title LIKE '%$escaped_query%'";
 			}
 
 			$sql .= " ORDER BY $order $mode ";
@@ -60,95 +60,57 @@ class ProblemsDAO extends ProblemsDAOBase
 
 			$result = $conn->Execute($sql, $args);
 		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
-			$like_query = "";
+			$like_query = '';
 			if (!is_null($query)) {
-				$escapedValue = mysql_real_escape_string($query);
-				$like_query = " WHERE title LIKE '%{$escapedValue}%'";
+				$like_query = " AND title LIKE '%$escaped_query%'";
 			}
 			$sql = "
 				SELECT
-					*
+					100 / LOG2(GREATEST(accepted, 1) + 1)	AS points,
+					accepted / GREATEST(1, submissions)		AS ratio,
+					ROUND(100 * COALESCE(ps.score, 0), 2)	AS score,
+					p.*
 				FROM
-					(
-						(
-							SELECT
-								R.score, P.*
-							FROM
-								(
-									SELECT
-										user_id,
-										problem_id,
-										ROUND(MAX(score) * 100, 2) AS score
-									FROM
-										Runs 
-									WHERE
-										status = 'ready' AND
-										user_id = $user_id
-									GROUP BY
-										user_id,
-										problem_id
-								) AS R,
-								(
-									SELECT
-										100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
-										accepted / GREATEST(1, submissions)     AS ratio,
-										Problems.*
-									FROM
-										Problems
-									WHERE
-										(public = 1 OR author_id = $user_id)
-								) AS P
-							WHERE
-								R.problem_id = P.problem_id AND
-								R.user_id = $user_id
-						)
-						UNION
-						(
-								SELECT
-									0 AS score,
-									100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
-									accepted / GREATEST(1, submissions)     AS ratio,
-									Problems.*
-								FROM
-									Problems
-								WHERE
-									(public = 1 OR author_id = $user_id) AND
-									(problem_id, $user_id) NOT IN
-										(
-											SELECT
-												problem_id,
-												user_id
-											FROM
-												Runs 
-											WHERE
-												status = 'ready' AND
-												user_id = $user_id
-											GROUP BY
-												user_id,
-												problem_id
-										)
-						)
-					) AS T
-				$like_query
+					Problems p
+				LEFT JOIN (
+					SELECT
+						p.problem_id,
+						MAX(r.score) AS score
+					  FROM 
+						Problems p
+						INNER JOIN
+						Runs r ON r.user_id = ? AND r.problem_id = p.problem_id
+						GROUP BY
+							p.problem_id
+				) ps ON ps.problem_id = p.problem_id
+				LEFT JOIN
+					User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id
+				WHERE
+					(public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query
 				ORDER BY
 					$order $mode";
 
 			if (!is_null($rowcount)) {
-				$sql .= " LIMIT $offset, $rowcount";
-			}	
-			$result = $conn->Execute($sql);
-		} else if ($user_type === USER_ANONYMOUS) {
-			$like_query = "";
-			if (!is_null($query)) {
-				$escapedValue = mysql_real_escape_string($query);
-				$like_query = " AND title LIKE '%{$escapedValue}%'";
+				$sql .= " LIMIT ?, ?";
 			}
-			$sql = "SELECT	0 AS score,
-							100 / LOG2(GREATEST(accepted, 1) + 1) AS points,
-							accepted / GREATEST(1, submissions)   AS ratio,
-							Problems.*
-					FROM	Problems
-					WHERE 	public = 1 $like_query ORDER BY $order $mode";
+			$args = array($user_id, $user_id, $user_id, $offset, $rowcount);
+			$result = $conn->Execute($sql, $args);
+		} else if ($user_type === USER_ANONYMOUS) {
+			$like_query = '';
+			if (!is_null($query)) {
+				$like_query = " AND title LIKE '%{$escaped_query}%'";
+			}
+			$sql = "SELECT
+						0 AS score,
+						100 / LOG2(GREATEST(accepted, 1) + 1) AS points,
+						accepted / GREATEST(1, submissions)   AS ratio,
+						Problems.*
+					FROM
+						Problems
+					WHERE
+						public = 1 $like_query
+					ORDER BY
+						$order $mode";
 
 			if (!is_null($rowcount)) {
 				$sql .= " LIMIT ? ?";
