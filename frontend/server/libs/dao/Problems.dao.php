@@ -113,7 +113,7 @@ class ProblemsDAO extends ProblemsDAOBase
 						$order $mode";
 
 			if (!is_null($rowcount)) {
-				$sql .= " LIMIT ? ?";
+				$sql .= " LIMIT ?, ?";
 			}
 
 			$args = array($offset, $rowcount);
