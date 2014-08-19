@@ -158,7 +158,7 @@ class UsersDAO extends UsersDAOBase
 											r.veredict = 'AC' AND r.test = 0
 									) AS up
 								INNER JOIN
-									Problems ps ON ps.problem_id = up.problem_id
+									Problems ps ON ps.problem_id = up.problem_id and ps.public = 1
 								INNER JOIN
 									Users u ON u.user_id = up.user_id 
 								GROUP BY
