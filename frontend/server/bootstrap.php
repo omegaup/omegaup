@@ -114,6 +114,7 @@ require_once("controllers/ClarificationController.php");
 require_once("controllers/TimeController.php");
 require_once("controllers/GraderController.php");
 require_once("controllers/SchoolController.php");
+require_once("controllers/GroupController.php");
 
 require_once("libs/adodb/adodb.inc.php");
 require_once("libs/adodb/adodb-exceptions.inc.php");

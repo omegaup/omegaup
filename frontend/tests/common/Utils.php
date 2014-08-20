@@ -138,7 +138,9 @@ class Utils {
 			'Emails',
 			'User_Roles',
 			'Coder_Of_The_Month',
-			'Users',			
+			'Users',
+			'Groups_Users',
+			'Groups'
 		);
 
 		try {

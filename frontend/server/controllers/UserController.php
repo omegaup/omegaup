@@ -443,7 +443,7 @@ class UserController extends Controller {
 					|| !is_null($user = UsersDAO::FindByUsername($userOrEmail))) {
 				return $user;
 			} else {
-				throw new NotFoundException("Username or email not found");
+				throw new InvalidParameterException("parameterNotFound", "User");
 			}
 		} catch (ApiException $apiException) {
 			throw $apiException;
@@ -799,7 +799,7 @@ class UserController extends Controller {
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 */
-	public static function getProfile(Users $user) {
+	private static function getProfileImp(Users $user) {
 		
 		$response = array();
 		$response["userinfo"] = array();
@@ -843,6 +843,32 @@ class UserController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * Get user profile from cache
+	 * Requires $r["user"] to be an actual User
+	 * 
+	 * @param Request $r
+	 * @param array $response
+	 * @param Request $r
+	 * @return type
+	 */
+	public static function getProfile(Request $r, array &$response) {
+		if (is_null($r["user"])) {
+			throw new InvalidParameterException("parameterNotFound", "User");
+		}
+		
+		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 										
+			return UserController::getProfileImp($r["user"]);			
+		}, $response);
+				
+		$response["userinfo"]["rankinfo"] = self::getRankByProblemsSolved($r);
+		
+		// Do not leak plain emails in case the request is for a profile other than 
+		// the logged user's one
+		if ($r["user"]->getUserId() !== $r['current_user_id']) {
+			unset($response["userinfo"]["email"]);
+		}
+	}
 	
 	/**
 	 * Get general user info
@@ -857,17 +883,8 @@ class UserController extends Controller {
 			
 		$r["user"] = self::resolveTargetUser($r);
 		
-		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 										
-			return UserController::getProfile($r["user"]);			
-		}, $response);
-				
-		$response["userinfo"]["rankinfo"] = self::getRankByProblemsSolved($r);
-		
-		// Do not leak plain emails in case the request is for a profile other than 
-		// the logged user's one
-		if ($r["user"]->getUserId() !== $r['current_user_id']) {
-			unset($response["userinfo"]["email"]);
-		}
+		$response = array();
+		self::getProfile($r, $response);
 		
 		$response["status"] = "ok";
 		return $response;
@@ -926,7 +943,7 @@ class UserController extends Controller {
 		}
 
 		// Get the profile of the coder of the month
-		$response = self::getProfile($user);		
+		$response = self::getProfileImp($user);		
 		
 		$response["status"] = "ok";		
 		return $response;

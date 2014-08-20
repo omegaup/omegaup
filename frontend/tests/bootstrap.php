@@ -25,6 +25,7 @@ require_once 'factories/ContestsFactory.php';
 require_once 'factories/ClarificationsFactory.php';
 require_once 'factories/UserFactory.php';
 require_once 'factories/RunsFactory.php';
+require_once 'factories/GroupsFactory.php';
 
 // Clean previous log
 Utils::CleanLog();

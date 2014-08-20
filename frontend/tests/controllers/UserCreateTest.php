@@ -207,7 +207,7 @@ class CreateUserTest extends OmegaupTestCase {
 	 * Admin can verify users only with username
 	 * Testing invalid username
 	 * 
-	 * @expectedException NotFoundException
+	 * @expectedException InvalidParameterException
 	 */
 	public function testUsernameVerificationByAdminInvalidUsername() {
 			

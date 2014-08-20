@@ -80,7 +80,7 @@ class Controller {
 				$user = UsersDAO::FindByUsername($r["username"]);
 
 				if (is_null($user)) {
-					throw new NotFoundException("User does not exist");
+					throw new InvalidParameterException("parameterNotFound", "Username");
 				}
 			} 
 			catch (ApiException $e) {

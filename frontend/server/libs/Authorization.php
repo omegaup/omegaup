@@ -139,4 +139,16 @@ class Authorization {
 			throw new InvalidDatabaseOperationException($e);
 		}
 	}
+	
+	public static function IsGroupOwner($user_id, Groups $group) {
+		if (is_null($group)) {
+			return false;
+		}
+		
+		if ($user_id === $group->owner_id) {
+			return true;
+		}
+		
+		return false;
+	}
 }
