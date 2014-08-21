@@ -5,7 +5,6 @@
  *
  * @author joemmanuel
  */
-require_once 'SessionController.php';
 
 class GroupController extends Controller {
 	
@@ -30,6 +29,8 @@ class GroupController extends Controller {
 			));
 			
 			GroupsDAO::save($group);
+			
+			self::$log->info("Group " . $r["alias"] . " created.");
 		} catch(Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -122,7 +123,7 @@ class GroupController extends Controller {
 			}
 			
 			GroupsUsersDAO::delete($key);			
-			
+			self::$log->info("Removed " . $r["user"]->username . " removed.");			
 		} catch (ApiException $ex) {
 			throw $ex;
 		} catch (Exception $ex) {
@@ -179,10 +180,9 @@ class GroupController extends Controller {
 				"group_id" => $r["group"]->group_id
 			)));
 			
-			foreach ($userGroups as $userGroup) {
-				$userProfile = array();
+			foreach ($userGroups as $userGroup) {				 
 				$r["user"] = UsersDAO::getByPK($userGroup->user_id);				
-				UserController::getProfile($r, $userProfile);
+				$userProfile = UserController::getProfile($r);
 				
 				$response["users"][] = $userProfile;
 			}

@@ -799,7 +799,7 @@ class UserController extends Controller {
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 */
-	private static function getProfileImp(Users $user) {
+	private static function getProfileImpl(Users $user) {
 		
 		$response = array();
 		$response["userinfo"] = array();
@@ -852,14 +852,22 @@ class UserController extends Controller {
 	 * @param Request $r
 	 * @return type
 	 */
-	public static function getProfile(Request $r, array &$response) {
+	public static function getProfile(Request $r) {
 		if (is_null($r["user"])) {
 			throw new InvalidParameterException("parameterNotFound", "User");
 		}
 		
-		Cache::getFromCacheOrSet(Cache::USER_PROFILE, $r["user"]->getUsername(), $r, function(Request $r) { 										
-			return UserController::getProfileImp($r["user"]);			
-		}, $response);
+		$response = array();
+		
+		Cache::getFromCacheOrSet(
+				Cache::USER_PROFILE, 
+				$r["user"]->getUsername(), 
+				$r, 
+				function(Request $r) { 										
+					return UserController::getProfileImpl($r["user"]);			
+				}, 
+				$response
+		);
 				
 		$response["userinfo"]["rankinfo"] = self::getRankByProblemsSolved($r);
 		
@@ -868,6 +876,8 @@ class UserController extends Controller {
 		if ($r["user"]->getUserId() !== $r['current_user_id']) {
 			unset($response["userinfo"]["email"]);
 		}
+		
+		return $response;
 	}
 	
 	/**
@@ -883,8 +893,7 @@ class UserController extends Controller {
 			
 		$r["user"] = self::resolveTargetUser($r);
 		
-		$response = array();
-		self::getProfile($r, $response);
+		$response = self::getProfile($r);		
 		
 		$response["status"] = "ok";
 		return $response;
@@ -943,7 +952,7 @@ class UserController extends Controller {
 		}
 
 		// Get the profile of the coder of the month
-		$response = self::getProfileImp($user);		
+		$response = self::getProfileImpl($user);		
 		
 		$response["status"] = "ok";		
 		return $response;
