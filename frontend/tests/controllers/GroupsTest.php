@@ -15,10 +15,12 @@ class GroupsTest extends OmegaupTestCase {
 		$owner = UserFactory::createUser();
 		$name = Utils::CreateRandomString();
 		$description = Utils::CreateRandomString();
+		$alias = Utils::CreateRandomString();
 		
 		$response = GroupController::apiCreate(new Request(array(
 			"auth_token" => self::login($owner),
 			"name" => $name,
+			"alias" => $alias,
 			"description" => $description
 		)));
 		
@@ -43,7 +45,7 @@ class GroupsTest extends OmegaupTestCase {
 		$response = GroupController::apiAddUser(new Request(array(
 			"auth_token" => self::login($group["owner"]),
 			"username" => $user->username,
-			"group_id" => $group["group"]->group_id
+			"group_alias" => $group["group"]->alias
 		)));
 		$this->assertEquals("ok", $response["status"]);
 		
@@ -64,7 +66,7 @@ class GroupsTest extends OmegaupTestCase {
 		$response = GroupController::apiAddUser(new Request(array(
 			"auth_token" => self::login($userCalling),
 			"username" => $user->username,
-			"group_id" => $group["group"]->group_id
+			"group_alias" => $group["group"]->alias
 		)));		
 	}
 	
@@ -80,7 +82,7 @@ class GroupsTest extends OmegaupTestCase {
 		$response = GroupController::apiRemoveUser(new Request(array(
 			"auth_token" => self::login($groupData["owner"]),
 			"username" => $user->username,
-			"group_id" => $groupData["group"]->group_id
+			"group_alias" => $groupData["group"]->alias
 		)));
 		
 		$this->assertEquals("ok", $response["status"]);
@@ -102,7 +104,7 @@ class GroupsTest extends OmegaupTestCase {
 		GroupController::apiRemoveUser(new Request(array(
 			"auth_token" => self::login($groupData["owner"]),
 			"username" => $user->username,
-			"group_id" => $groupData["group"]->group_id
+			"group_alias" => $groupData["group"]->alias
 		)));			
 	}
 	
@@ -119,7 +121,7 @@ class GroupsTest extends OmegaupTestCase {
 		GroupController::apiRemoveUser(new Request(array(
 			"auth_token" => self::login($user),
 			"username" => $user->username,
-			"group_id" => $groupData["group"]->group_id
+			"group_alias" => $groupData["group"]->alias
 		)));			
 	}
 	
@@ -163,7 +165,7 @@ class GroupsTest extends OmegaupTestCase {
 		// Call API
 		$response = GroupController::apiDetails(new Request(array(
 			"auth_token" => self::login($groupData["owner"]),
-			"group_id" => $groupData["group"]->group_id
+			"group_alias" => $groupData["group"]->alias
 		)));
 				
 		$this->assertEquals($nUsers, count($response["users"]));

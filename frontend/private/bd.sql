@@ -547,13 +547,15 @@ CREATE TABLE IF NOT EXISTS `Users_Permissions` (
 --
 
 CREATE TABLE IF NOT EXISTS `Groups` (
-  `group_id` int(11) AUTO_INCREMENT NOT NULL,
+  `group_id` int(11) AUTO_INCREMENT NOT NULL,  
   `owner_id` int(11) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `alias` varchar(50) NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`group_id`),
-  KEY `owner_id` (`owner_id`)
+  KEY `owner_id` (`owner_id`),
+  UNIQUE KEY `groups_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 

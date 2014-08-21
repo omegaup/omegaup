@@ -9,7 +9,7 @@ class GroupsFactory {
 	 * @param type $name
 	 * @param type $description
 	 */
-	public static function createGroup($owner = null, $name = null, $description = null) {
+	public static function createGroup($owner = null, $name = null, $description = null, $alias = null) {
 		if (is_null($owner)) {
 			$owner = UserFactory::createUser();
 		}
@@ -22,15 +22,22 @@ class GroupsFactory {
 			$description = Utils::CreateRandomString();
 		}
 		
+		if (is_null($alias)) {
+			$alias = Utils::CreateRandomString();
+		}
+		
+		
+		
 		$r = new Request(array(
 			"auth_token" => OmegaupTestCase::login($owner),
 			"name" => $name,
-			"description" => $description
+			"description" => $description,
+			"alias" => $alias
 		));
 		
 		$response = GroupController::apiCreate($r);
 		$groups = GroupsDAO::search(new Groups(array(
-			"name" => $name
+			"alias" => $alias
 		)));
 		
 		return array(
@@ -52,7 +59,7 @@ class GroupsFactory {
 		GroupController::apiAddUser(new Request(array(
 			"auth_token" => OmegaupTestCase::login($groupData["owner"]),
 			"username" => $user->username,
-			"group_id" => $groupData["group"]->group_id
+			"group_alias" => $groupData["group"]->alias
 		)));
 	}
 }

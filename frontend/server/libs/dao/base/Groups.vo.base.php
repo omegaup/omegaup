@@ -35,6 +35,9 @@ class Groups extends VO
 			if( isset($data['create_time']) ){
 				$this->create_time = $data['create_time'];
 			}
+			if( isset($data['alias']) ){
+				$this->alias = $data['alias'];
+			}
 			if( isset($data['name']) ){
 				$this->name = $data['name'];
 			}
@@ -57,6 +60,7 @@ class Groups extends VO
 			"group_id" => $this->group_id,
 			"owner_id" => $this->owner_id,
 			"create_time" => $this->create_time,
+			"alias" => $this->alias,
 			"name" => $this->name,
 			"description" => $this->description
 		); 
@@ -91,6 +95,15 @@ class Groups extends VO
 	  * @var timestamp
 	  */
 	public $create_time;
+
+	/**
+	  * alias
+	  * 
+	  *  [Campo no documentado]<br>
+	  * @access public
+	  * @var varchar(50)
+	  */
+	public $alias;
 
 	/**
 	  * name
@@ -184,6 +197,30 @@ class Groups extends VO
 	final public function setCreateTime( $create_time )
 	{
 		$this->create_time = $create_time;
+	}
+
+	/**
+	  * getAlias
+	  * 
+	  * Get the <i>alias</i> property for this object. Donde <i>alias</i> es  [Campo no documentado]
+	  * @return varchar(50)
+	  */
+	final public function getAlias()
+	{
+		return $this->alias;
+	}
+
+	/**
+	  * setAlias( $alias )
+	  * 
+	  * Set the <i>alias</i> property for this object. Donde <i>alias</i> es  [Campo no documentado].
+	  * Una validacion basica se hara aqui para comprobar que <i>alias</i> es de tipo <i>varchar(50)</i>. 
+	  * Si esta validacion falla, se arrojara... algo. 
+	  * @param varchar(50)
+	  */
+	final public function setAlias( $alias )
+	{
+		$this->alias = $alias;
 	}
 
 	/**

@@ -142,6 +142,11 @@ abstract class GroupsDAOBase extends DAO
 			array_push( $val, $Groups->getCreateTime() );
 		}
 
+		if( ! is_null( $Groups->getAlias() ) ){
+			$sql .= " `alias` = ? AND";
+			array_push( $val, $Groups->getAlias() );
+		}
+
 		if( ! is_null( $Groups->getName() ) ){
 			$sql .= " `name` = ? AND";
 			array_push( $val, $Groups->getName() );
@@ -183,10 +188,11 @@ abstract class GroupsDAOBase extends DAO
 	  **/
 	private static final function update( $Groups )
 	{
-		$sql = "UPDATE Groups SET  `owner_id` = ?, `create_time` = ?, `name` = ?, `description` = ? WHERE  `group_id` = ?;";
+		$sql = "UPDATE Groups SET  `owner_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE  `group_id` = ?;";
 		$params = array( 
 			$Groups->getOwnerId(), 
 			$Groups->getCreateTime(), 
+			$Groups->getAlias(), 
 			$Groups->getName(), 
 			$Groups->getDescription(), 
 			$Groups->getGroupId(), );
@@ -212,11 +218,12 @@ abstract class GroupsDAOBase extends DAO
 	  **/
 	private static final function create( &$Groups )
 	{
-		$sql = "INSERT INTO Groups ( `group_id`, `owner_id`, `create_time`, `name`, `description` ) VALUES ( ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Groups ( `group_id`, `owner_id`, `create_time`, `alias`, `name`, `description` ) VALUES ( ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Groups->getGroupId(), 
 			$Groups->getOwnerId(), 
 			$Groups->getCreateTime(), 
+			$Groups->getAlias(), 
 			$Groups->getName(), 
 			$Groups->getDescription(), 
 		 );
@@ -295,6 +302,17 @@ abstract class GroupsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `create_time` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $GroupsA->getAlias()) ) ) & ( ! is_null ( ($b = $GroupsB->getAlias()) ) ) ){
+				$sql .= " `alias` >= ? AND `alias` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `alias` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

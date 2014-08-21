@@ -17,6 +17,7 @@ class GroupController extends Controller {
 	public static function apiCreate(Request $r) {		
 		self::authenticateRequest($r);
 		
+		Validators::isValidAlias($r["alias"], "alias", true);
 		Validators::isStringNonEmpty($r["name"], "name", true);
 		Validators::isStringNonEmpty($r["description"], "description", false);
 						
@@ -24,7 +25,8 @@ class GroupController extends Controller {
 			$group = new Groups(array(
 				"owner_id" => $r["current_user_id"],
 				"name" => $r["name"],
-				"description" =>$r["description"]
+				"description" =>$r["description"],
+				"alias" => $r["alias"]
 			));
 			
 			GroupsDAO::save($group);
@@ -46,15 +48,21 @@ class GroupController extends Controller {
 	private static function validateGroup(Request $r) {
 		self::authenticateRequest($r);
 		
-		Validators::isNumber($r["group_id"], "group_id");
+		Validators::isStringNonEmpty($r["group_alias"], "group_alias");
 		try {
-			$r["group"] = GroupsDAO::getByPK($r["group_id"]);						
+			$groups = GroupsDAO::search(new Groups(array(
+				"alias" => $r["group_alias"]
+			)));
+			
+			if (is_null($groups) || count($groups) === 0) {
+				throw new InvalidParameterException("parameterNotFound", "Group");
+			} else {
+				$r["group"] = $groups[0];
+			}			
+		} catch (ApiException $ex) {
+			throw $ex;
 		} catch (Exception $ex) {
 			throw new InvalidDatabaseOperationException($ex);
-		}
-		
-		if (is_null($r["group"])) {
-			throw new InvalidParameterException("parameterNotFound", "Group");
 		}
 		
 		if (!Authorization::IsGroupOwner($r["current_user_id"], $r["group"])) {
@@ -82,7 +90,7 @@ class GroupController extends Controller {
 						
 		try {
 			$groups_user = new GroupsUsers(array(
-				"group_id" => $r["group_id"],
+				"group_id" => $r["group"]->group_id,
 				"user_id" => $r["user"]->user_id
 			));
 			GroupsUsersDAO::save($groups_user);
@@ -103,7 +111,7 @@ class GroupController extends Controller {
 		
 		try {
 			$key = new GroupsUsers(array(
-				"group_id" => $r["group_id"],
+				"group_id" => $r["group"]->group_id,
 				"user_id" => $r["user"]->user_id 
 			));
 			
@@ -168,7 +176,7 @@ class GroupController extends Controller {
 			$response["group"] = $r["group"]->asArray();
 			
 			$userGroups = GroupsUsersDAO::search(new GroupsUsers(array(
-				"group_id" => $r["group_id"]
+				"group_id" => $r["group"]->group_id
 			)));
 			
 			foreach ($userGroups as $userGroup) {
