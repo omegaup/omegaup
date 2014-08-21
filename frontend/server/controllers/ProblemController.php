@@ -1292,12 +1292,14 @@ class ProblemController extends Controller {
 		self::validateList($r);
 
 		// Sort results
-		$order = 'problem_id';
+		$order = 'problem_id'; // Order by problem_id by default.
 		$sorting_options = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
+		// "order_by" MUST be one of the allowed options, otherwise the default ordering will be used.
 		if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
 			$order = $r['order_by'];
 		}
 
+		// "mode" MUST be a valid one, for compatibility reasons 'descending' is the mode by default.
 		if (!is_null($r['mode']) && ($r['mode'] === 'asc' || $r['mode'] === 'desc')) {
 			$mode = $r['mode'];
 		} else {
@@ -1307,6 +1309,10 @@ class ProblemController extends Controller {
 		$response = array();
 		$response["results"] = array();
 		$author_id = null;
+		// There are basically three types of users:
+		// - Non-logged in users: Anonymous
+		// - Logged in users with normal permissions: Normal
+		// - Logged in users with administrative rights: Admin
 		$user_type = USER_ANONYMOUS;
 		if (!is_null($r['current_user_id'])) {
 			$author_id = intval($r['current_user_id']);
@@ -1317,8 +1323,13 @@ class ProblemController extends Controller {
 			}
 		}
 
+		// Search for problems whose title has $query as a substring.
 		$query = is_null($r['query']) ? null : $r['query'];
+
+		// Skips the first $offset rows of the result.
 		$offset = is_null($r['offset']) ? 0 :  intval($r['offset']);
+
+		// Specifies the maximum number of rows to return.
 		$rowcount = is_null($r['rowcount']) ? null : intval($r['rowcount']);
 
 		$response['results'] = ProblemsDAO::byUserType(
@@ -1331,11 +1342,15 @@ class ProblemController extends Controller {
 			$author_id
 		);
 
+		// The total number of rows, this value is used by the pager (if any) 
+		// to know the total number of pages.
 		$total = count($response['results']);
 		$response['total'] = $total;
 		$pages = ($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE;
 
+		// Pagination is a new feature and it's not done by default.
 		if (!is_null($r['page'])) {
+			// If the page is out of range, the first page is served.
 			$p = intval($r['page']);
 			if ($p >= 1 && $p <= $pages) {
 				$page = $p;
@@ -1343,6 +1358,7 @@ class ProblemController extends Controller {
 				$page = 1;
 			}
 
+			// Take just the rows of the required page.
 			$elements = array();
 			$start = ($page - 1) * PROBLEMS_PER_PAGE;
 			$end = min($total, $start + PROBLEMS_PER_PAGE);

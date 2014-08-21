@@ -247,5 +247,89 @@ class ProblemList extends OmegaupTestCase {
 		$response = ProblemController::apiList($r);		
 		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPublic["request"]["alias"]);
 	}
+
+	/**
+	 * Test 'page', 'order_by' and 'mode' parametes of the apiList() method.
+	 */
+	public function testProblemListPager() {
+		// Create a user and some problems with submissions for the tests.
+		$contestant = UserFactory::createUser();
+		RunController::$defaultSubmissionGap = 0;
+		for ($i = 0; $i < 6; $i++) {
+			$problemData[$i] = ProblemsFactory::createProblem(null, null, 1);
+			$runs = $i / 2;
+			for ($r = 0; $r < $runs; $r++) {
+				$runData = RunsFactory::createRunToProblem($problemData[$i], $contestant);
+				$points = rand(0, 100);
+				$veredict = 'WA';
+				if ($points > 0) {
+					$veredict = ($points == 100) ? 'AC' : 'PA';
+				}
+
+				RunsFactory::gradeRun($runData, $points / 100, $veredict);
+			}
+		}
+		RunController::$defaultSubmissionGap = 100;
+
+
+		$request = new Request();
+		$request['auth_token'] = $this->login($contestant);
+		$response = ProblemController::apiList($request);
+		$total = $response['total'];
+		$pages = ($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE;
+
+		/*
+		The following tests will try the different scenarios that can occur
+		with the additions of the three features to apiList(), that is, paging,
+		order by column and order mode: Call apiList() with and without
+		pagination, for each allowed ordering and each possible order mode. 
+		 */
+		$modes = array('asc', 'desc');
+		$columns = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
+		$counter = 0;
+		for ($paging = 0; $paging <= 1; $paging++) {
+			foreach ($columns as $col) {
+				foreach ($modes as $mode) {
+					$first = null;
+					$last = null;
+					$request['mode'] = $mode;
+					$request['order_by'] = $col;
+					if ($paging == 1) {
+						$request['page'] = 1;
+						$response = ProblemController::apiList($request);
+						$first = $response['results'];
+						$request['page'] = intval(floor($pages));
+						$response = ProblemController::apiList($request);
+						$last = $response['results'];
+
+						// Test number of problems per page
+						$this->assertEquals(count($first), PROBLEMS_PER_PAGE);
+					} else {
+						$request['page']= null;
+						$response = ProblemController::apiList($request);
+						$first = $response['results'];
+						$last = &$first;
+					}
+
+					$i = 0;
+					$j = count($last) - 1;
+					if ($col === 'title') {
+						$comp = strcmp($first[$i]['title'], $last[$j]['title']);
+						if ($mode === 'asc') {
+							$this->assertTrue($comp <= 0);
+						} else {
+							$this->assertTrue($comp >= 0);
+						}
+					} else {
+						if ($mode === 'asc') {
+							$this->assertTrue($first[$i][$col] <= $last[$j][$col]);
+						} else {
+							$this->assertTrue($first[$i][$col] >= $last[$j][$col]);
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
