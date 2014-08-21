@@ -3,7 +3,6 @@
 require_once 'libs/FileHandler.php';
 require_once 'libs/ZipHandler.php';
 require_once 'libs/Markdown/markdown.php';
-
 /**
  * ProblemsController
  */
@@ -1285,7 +1284,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiList(Request $r) {
-
 		// Authenticate request
 		try {
 			self::authenticateRequest($r);
@@ -1295,69 +1293,81 @@ class ProblemController extends Controller {
 
 		self::validateList($r);
 
+		// Sort results
+		$order = 'problem_id'; // Order by problem_id by default.
+		$sorting_options = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
+		// "order_by" may be one of the allowed options, otherwise the default ordering will be used.
+		if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
+			$order = $r['order_by'];
+		}
+
+		// "mode" may be a valid one, for compatibility reasons 'descending' is the mode by default.
+		if (!is_null($r['mode']) && ($r['mode'] === 'asc' || $r['mode'] === 'desc')) {
+			$mode = $r['mode'];
+		} else {
+			$mode = 'desc';
+		}
+
 		$response = array();
 		$response["results"] = array();
-		for ($i = 0; $i < 2; $i++) {
-
-			// Add private in the first pass, public in the second
-			try {
-				$problem_mask = NULL;
-				if ($i === 0 && !is_null($r["current_user_id"])) {
-					if (Authorization::IsSystemAdmin($r["current_user_id"])) {
-						$problem_mask = new Problems(array(
-								"public" => "0"
-							));
-					} else {
-						// Sys admin can see al private problems
-						$problem_mask = new Problems(array(
-								"public" => "0",
-								"author_id" => $r["current_user_id"]
-							));
-					}
-				} else if ($i === 1) {
-					$problem_mask = new Problems(array(
-								"public" => 1
-							));
-				}
-
-				if (!is_null($problem_mask)) {
-					$problems = ProblemsDAO::search(
-							$problem_mask, 
-							"problem_id", 
-							'DESC', 
-							$r["offset"], 
-							$r["rowcount"],
-							is_null($r["query"]) ? 
-								null : 
-								array(
-									"title" => $r["query"]
-								)
-						);
-					
-					foreach ($problems as $problem) {
-						array_push($response["results"], $problem->asArray());
-					}
-				}
-			} catch (Exception $e) {
-				throw new InvalidDatabaseOperationException($e);
+		$author_id = null;
+		// There are basically three types of users:
+		// - Non-logged in users: Anonymous
+		// - Logged in users with normal permissions: Normal
+		// - Logged in users with administrative rights: Admin
+		$user_type = USER_ANONYMOUS;
+		if (!is_null($r['current_user_id'])) {
+			$author_id = intval($r['current_user_id']);
+			if (Authorization::IsSystemAdmin($r['current_user_id'])) {
+				$user_type = USER_ADMIN;
+			} else {
+				$user_type = USER_NORMAL;
 			}
 		}
 
-		// Sort result by name 
-		usort($response["results"], function($a, $b) {
-			return strcmp($a["title"], $b["title"]);
-		});
+		// Search for problems whose title has $query as a substring.
+		$query = is_null($r['query']) ? null : $r['query'];
 
-		// Add users' best scores to the list
-		foreach ($response["results"] as &$problemData) {
-			// If we have a logged-in user (this API can be accessed by non-logged in users)
-			if (!is_null($r['current_user_id'])) {
-				$problemData['score'] = RunsDAO::GetBestScore($problemData['problem_id'], $r['current_user_id']);
+		// Skips the first $offset rows of the result.
+		$offset = is_null($r['offset']) ? 0 :  intval($r['offset']);
+
+		// Specifies the maximum number of rows to return.
+		$rowcount = is_null($r['rowcount']) ? null : intval($r['rowcount']);
+
+		$response['results'] = ProblemsDAO::byUserType(
+			$user_type,
+			$order,
+			$mode,
+			$offset,
+			$rowcount,
+			$query,
+			$author_id
+		);
+
+		// The total number of rows, this value is used by the pager (if any) 
+		// to know the total number of pages.
+		$total = count($response['results']);
+		$response['total'] = $total;
+		$pages = ($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE;
+
+		// Pagination is a new feature and it's not done by default.
+		if (!is_null($r['page'])) {
+			// If the page is out of range, the first page is served.
+			$p = intval($r['page']);
+			if ($p >= 1 && $p <= $pages) {
+				$page = $p;
 			} else {
-				$problemData['score'] = 0;
+				$page = 1;
 			}
-						
-			$problemData['rankPoints'] = intval(100.0/log(max(intval($problemData['accepted']), 1) + 1, 2));
+
+			// Take just the rows of the required page.
+			$elements = array();
+			$start = ($page - 1) * PROBLEMS_PER_PAGE;
+			$end = min($total, $start + PROBLEMS_PER_PAGE);
+			for ($i = $start; $i < $end; $i++) {
+				array_push($elements, $response['results'][$i]);
+			}
+			$response['results'] = $elements;
 		}
 
 		$response["status"] = "ok";

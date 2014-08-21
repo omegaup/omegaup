@@ -46,3 +46,8 @@ try_define('APC_USER_CACHE_ENABLED',			false);
 # SMARTY USER CACHE
 # #########################
 try_define('SMARTY_CACHE_DIR',			'/var/tmp/omegaup/');
+#
+# #########################
+# PAGER CONSTANTS FOR TESTING
+# #########################
+try_define('PROBLEMS_PER_PAGE', 2);

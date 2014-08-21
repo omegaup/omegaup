@@ -97,3 +97,15 @@ try_define('OMEGAUP_SESSION_CACHE_ENABLED', true);
 # #########################
 try_define('SMARTY_CACHE_DIR',				'/var/tmp');
 try_define('IS_TEST',					FALSE);
+
+# #########################
+# PAGER CONSTANTS
+# #########################
+try_define('PROBLEMS_PER_PAGE', 100);
+
+# #########################
+# USER TYPES
+# #########################
+try_define('USER_ADMIN',		'user_admin');
+try_define('USER_NORMAL',		'user_normal');
+try_define('USER_ANONYMOUS',	'user_anonymous');

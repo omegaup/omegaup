@@ -1,3 +1,4 @@
+{include file='problem_search_bar.tpl'}
 <div class="wait_for_ajax panel panel-default" id="problems_list" >
 	<div class="panel-heading">
 		<h3 class="panel-title">{#wordsProblems#}</h3>
@@ -6,23 +7,30 @@
 		<thead>
 			<tr>
 				<th class="contains-long-desc">{#wordsTitle#}</th>
-				<th>
-					<a rel="tooltip" href="?sort=runs" data-toggle="tooltip" title data-original-title="{#sortByRuns#}">{#wordsRuns#}</a>
-				</th>
-				<th>
-					<a rel="tooltip" href="?sort=solved" data-toggle="tooltip" title data-original-title="{#sortBySolved#}">{#wordsSolved#}</a>
-				</th>
+				<th>{#wordsRuns#}</th>
+				<th>{#wordsAccepted#}</th>
 				<th>{#wordsRatio#}</th>
 				<th>
-					<a rel="tooltip" href="?sort=difficulty" data-toggle="tooltip" title data-original-title="{#sortByPointsForRank#}">{#wordsPointsForRank#}</a>
+					{#wordsPointsForRank#}
 					<a rel="tooltip" href="http://blog.omegaup.com/2014/06/el-nuevo-ranking-de-omegaup/" data-toggle="tooltip" title data-original-title="{#wordsPointsForRankTooltip#}"><img src="/media/question.png"></a>
 				</th>
-				<th>
-					<a rel="tooltip" href="?sort=score" data-toggle="tooltip" title data-original-title="{#sortByMyScore#}">{#wordsMyScore#}</a>
-				</th>
+
+				<th>{#wordsMyScore#}</th>
 			</tr>
 		</thead>
-		<tbody></tbody>
+		<tbody>
+			{foreach item=problem from=$problems}
+				<tr>
+				<td><a href="/arena/problem/{$problem.alias}">{$problem.title}</a></td>
+				<td>{$problem.submissions}</td>
+				<td>{$problem.accepted}</td>
+				<td>{$problem.ratio}%</td>
+				<td>{$problem.points}</td>
+				<td>{$problem.score}</td>
+				</tr>
+			{/foreach}
+		</tbody>
 	</table>
+
+	{include file='pager_bar.tpl'}
 </div>
-<script src="/js/problems.list.js"></script>

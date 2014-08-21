@@ -531,3 +531,27 @@ padding-right: 5px;
 }
 
 th.contains-long-desc{ min-width:369px; }
+
+
+.search-bar {
+	margin-bottom: 10px;
+}
+
+.search-bar #problem-search-order {
+	width: 250px;
+	margin-left: 10px;
+}
+
+.search-bar #problem-search-mode {
+	width: 150px;
+	margin-left: 10px;
+}
+
+.search-bar #problem-search-button {
+	height: 32px;
+}
+
+.pager-bar {
+	margin-top: 15px;
+	border-top: 1px solid #ccc;
+}

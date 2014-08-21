@@ -19,6 +19,137 @@ require_once("base/Problems.vo.base.php");
   */
 class ProblemsDAO extends ProblemsDAOBase
 {
+	public static final function byUserType($user_type, $order, $mode, $offset, $rowcount, $query, $user_id = null) {
+		global $conn;
+		if (!is_null($query)) {
+			$escaped_query = mysql_real_escape_string($query);
+		}
+
+		// Just in case.
+		if ($mode !== 'asc' && $mode !== 'desc') {
+			$mode = 'desc';
+		}
+
+		// Use BINARY mode to force case sensitive comparisons when ordering by title.
+		$collation = ($order === 'title') ? 'COLLATE utf8_bin' : '';
+
+		$result = null;
+		if ($user_type === USER_ADMIN) {
+			$args = array($user_id);
+			$sql = "
+				SELECT
+					100 / LOG2(GREATEST(accepted, 1) + 1)	AS points,
+					accepted / GREATEST(1, submissions)		AS ratio,
+					ROUND(100 * COALESCE(ps.score, 0))		AS score,
+					p.*
+				FROM
+					Problems p
+				LEFT JOIN (
+					SELECT
+						Problems.problem_id,
+						MAX(Runs.score) AS score
+					FROM 
+						Problems
+					INNER JOIN
+						Runs ON Runs.user_id = ? AND Runs.problem_id = Problems.problem_id
+					GROUP BY
+						Problems.problem_id
+				) ps ON ps.problem_id = p.problem_id";
+
+			if (!is_null($query)) {
+				$sql .= " WHERE title LIKE '%$escaped_query%'";
+			}
+
+			$sql .= " ORDER BY `$order` $collation $mode ";
+
+			if (!is_null($rowcount)) {
+				$sql .= "LIMIT ?, ?";
+				array_push($args, $offset, $rowcount);
+			}
+
+			$result = $conn->Execute($sql, $args);
+		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
+			$like_query = '';
+			if (!is_null($query)) {
+				$like_query = " AND title LIKE '%$escaped_query%'";
+			}
+			$args = array($user_id, $user_id, $user_id);
+			$sql = "
+				SELECT
+					100 / LOG2(GREATEST(accepted, 1) + 1)	AS points,
+					accepted / GREATEST(1, submissions)		AS ratio,
+					ROUND(100 * COALESCE(ps.score, 0), 2)	AS score,
+					p.*
+				FROM
+					Problems p
+				LEFT JOIN (
+					SELECT
+						p.problem_id,
+						MAX(r.score) AS score
+					  FROM 
+						Problems p
+						INNER JOIN
+						Runs r ON r.user_id = ? AND r.problem_id = p.problem_id
+						GROUP BY
+							p.problem_id
+				) ps ON ps.problem_id = p.problem_id
+				LEFT JOIN
+					User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id
+				WHERE
+					(public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query
+				ORDER BY
+					`$order` $collation $mode";
+
+			if (!is_null($rowcount)) {
+				$sql .= " LIMIT ?, ?";
+				array_push($args, $offset, $rowcount);
+			}
+			$result = $conn->Execute($sql, $args);
+		} else if ($user_type === USER_ANONYMOUS) {
+			$like_query = '';
+			if (!is_null($query)) {
+				$like_query = " AND title LIKE '%{$escaped_query}%'";
+			}
+			$sql = "
+					SELECT
+						0 AS score,
+						100 / LOG2(GREATEST(accepted, 1) + 1) AS points,
+						accepted / GREATEST(1, submissions)   AS ratio,
+						Problems.*
+					FROM
+						Problems
+					WHERE
+						public = 1 $like_query
+					ORDER BY
+						 `$order` $collation $mode";
+
+			$args = array();
+			if (!is_null($rowcount)) {
+				$sql .= " LIMIT ?, ?";
+				$args = array($offset, $rowcount);
+			}
+
+			$result = $conn->Execute($sql, $args);
+		}
+
+		// Only these fields (plus score, points and ratio) will be returned.
+		$filters = array('title', 'submissions', 'accepted', 'alias');
+		$problems = array();
+		if (!is_null($result)) {
+			foreach ($result as $row) {
+				$temp = new Problems($row);
+				$problem = $temp->asFilteredArray($filters);
+
+				// score, points and ratio are not actually fields of a Problems object.
+				$problem['score'] = $row['score'];
+				$problem['points'] = $row['points'];
+				$problem['ratio'] = $row['ratio'];
+				array_push($problems, $problem);
+			}
+		}
+		return $problems;
+	}
+
 	/* byPage: search and return all the results by size and number of page and other attributes */
 	public static final function byPage( $sizePage , $noPage , $condition = null , $serv = null, $orderBy = null, $orden = 'ASC')
 	{	
