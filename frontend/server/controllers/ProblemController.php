@@ -1294,12 +1294,12 @@ class ProblemController extends Controller {
 		// Sort results
 		$order = 'problem_id'; // Order by problem_id by default.
 		$sorting_options = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
-		// "order_by" MUST be one of the allowed options, otherwise the default ordering will be used.
+		// "order_by" may be one of the allowed options, otherwise the default ordering will be used.
 		if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
 			$order = $r['order_by'];
 		}
 
-		// "mode" MUST be a valid one, for compatibility reasons 'descending' is the mode by default.
+		// "mode" may be a valid one, for compatibility reasons 'descending' is the mode by default.
 		if (!is_null($r['mode']) && ($r['mode'] === 'asc' || $r['mode'] === 'desc')) {
 			$mode = $r['mode'];
 		} else {

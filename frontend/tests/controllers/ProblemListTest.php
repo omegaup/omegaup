@@ -278,12 +278,10 @@ class ProblemList extends OmegaupTestCase {
 		$total = $response['total'];
 		$pages = ($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE;
 
-		/*
-		The following tests will try the different scenarios that can occur
-		with the additions of the three features to apiList(), that is, paging,
-		order by column and order mode: Call apiList() with and without
-		pagination, for each allowed ordering and each possible order mode. 
-		 */
+		// The following tests will try the different scenarios that can occur
+		// with the additions of the three features to apiList(), that is, paging,
+		// order by column and order mode: Call apiList() with and without
+		// pagination, for each allowed ordering and each possible order mode. 
 		$modes = array('asc', 'desc');
 		$columns = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
 		$counter = 0;

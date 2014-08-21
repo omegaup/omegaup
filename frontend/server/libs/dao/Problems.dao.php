@@ -31,7 +31,7 @@ class ProblemsDAO extends ProblemsDAOBase
 		}
 
 		// Use BINARY mode to force case sensitive comparisons when ordering by title.
-		$binary_mode = ($order === 'title') ? 'BINARY' : '';
+		$collation = ($order === 'title') ? 'COLLATE utf8_bin' : '';
 
 		$result = null;
 		if ($user_type === USER_ADMIN) {
@@ -60,7 +60,7 @@ class ProblemsDAO extends ProblemsDAOBase
 				$sql .= " WHERE title LIKE '%$escaped_query%'";
 			}
 
-			$sql .= " ORDER BY $binary_mode `$order` $mode ";
+			$sql .= " ORDER BY `$order` $collation $mode ";
 
 			if (!is_null($rowcount)) {
 				$sql .= "LIMIT ?, ?";
@@ -98,7 +98,7 @@ class ProblemsDAO extends ProblemsDAOBase
 				WHERE
 					(public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query
 				ORDER BY
-					$binary_mode `$order` $mode";
+					`$order` $collation $mode";
 
 			if (!is_null($rowcount)) {
 				$sql .= " LIMIT ?, ?";
@@ -121,7 +121,7 @@ class ProblemsDAO extends ProblemsDAOBase
 					WHERE
 						public = 1 $like_query
 					ORDER BY
-						 $binary_mode `$order` $mode";
+						 `$order` $collation $mode";
 
 			$args = array();
 			if (!is_null($rowcount)) {
