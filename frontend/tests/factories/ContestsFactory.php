@@ -42,8 +42,8 @@ class ContestsFactory {
 		$r["penalty"] = 100;
 		$r["scoreboard"] = 100;
 		$r["penalty_time_start"] = "contest";
-		$r["penalty_calc_policy"] = "sum";
-
+		$r["penalty_calc_policy"] = "sum";		
+		
 		return array(
 			"request" => $r,
 			"director" => $contestDirector);
@@ -67,9 +67,12 @@ class ContestsFactory {
 			$r["public"] = 1;
 		}
 		
+		$contest = ContestsDAO::getByAlias($r["alias"]);
+		
 		return array(
 			"director" => $contestData["director"],
 			"request" => $r,
+			"contest" => $contest
 		);
 	}
 

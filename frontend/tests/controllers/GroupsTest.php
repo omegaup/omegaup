@@ -171,4 +171,155 @@ class GroupsTest extends OmegaupTestCase {
 		$this->assertEquals($nUsers, count($response["users"]));
 		$this->assertEquals($groupData["group"]->group_id, $response["group"]["group_id"]);
 	}
+	
+	/**
+	 * Test add a scoreboard
+	 */	
+	public function testCreateScoreboard() {		
+		$groupData = GroupsFactory::createGroup();		
+		$name = Utils::CreateRandomString();
+		$description = Utils::CreateRandomString();
+		$alias = Utils::CreateRandomString();
+		
+		$response = GroupController::apiCreateScoreboard(new Request(array(
+			"auth_token" => self::login($groupData["owner"]),
+			"group_alias" => $groupData["group"]->alias,
+			"name" => $name,
+			"alias" => $alias,
+			"description" => $description	
+		)));
+	
+		$this->assertEquals("ok", $response["status"]);
+		
+		$groupScoreboards = GroupsScoreboardsDAO::search(new GroupsScoreboards(array(
+			"alias" => $alias
+		)));		
+		
+		$groupScoreboard = $groupScoreboards[0];		
+		$this->assertNotNull($groupScoreboard);
+		$this->assertEquals($description, $groupScoreboard->getDescription());
+		$this->assertEquals($groupData["group"]->group_id, $groupScoreboard->getGroupId());
+	}
+	
+	/**
+	 * Adding a contest to a scoreboard
+	 */
+	public function testAddContestToScoreboard() {
+		$groupData = GroupsFactory::createGroup();
+		$scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+		$contestData = ContestsFactory::createContest();
+		ContestsFactory::addAdminUser($contestData, $groupData["owner"]);
+		
+		$response = GroupScoreboardController::apiAddContest(new Request(array(
+			"auth_token" => self::login($groupData["owner"]),
+			"group_alias" => $groupData["request"]["alias"],
+			"scoreboard_alias" => $scoreboardData["request"]["alias"],
+			"contest_alias" => $contestData["request"]["alias"]
+		)));
+		
+		$this->assertEquals("ok", $response["status"]);
+		
+		$gscs = GroupsScoreboardsContestsDAO::search(new GroupsScoreboardsContests(array(
+			"group_scoreboard_id" => $scoreboardData["scoreboard"]->group_scoreboard_id,
+			"contest_id" => $contestData["contest"]->contest_id			
+		)));
+		$gsc = $gscs[0];
+		
+		$this->assertNotNull($gsc);		
+	}
+	
+	/**
+	 * Adding a contest to a scoreboard not being contest admin
+	 * 
+	 * @expectedException ForbiddenAccessException
+	 */
+	public function testAddContestToScoreboardNoContestAdmin() {
+		$groupData = GroupsFactory::createGroup();
+		$scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+		$contestData = ContestsFactory::createContest();		
+		
+		GroupScoreboardController::apiAddContest(new Request(array(
+			"auth_token" => self::login($groupData["owner"]),
+			"group_alias" => $groupData["request"]["alias"],
+			"scoreboard_alias" => $scoreboardData["request"]["alias"],
+			"contest_alias" => $contestData["request"]["alias"]
+		)));				
+	}
+	
+	/**
+	 * Removes contest from scoreboard
+	 */
+	public function testRemoveContestFromScoreboard() {
+		
+		$groupData = GroupsFactory::createGroup();
+		$scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+		$contestData = ContestsFactory::createContest();
+		ContestsFactory::addAdminUser($contestData, $groupData["owner"]);
+		
+		GroupsFactory::addContestToScoreboard($contestData, $scoreboardData, $groupData);
+		
+		$response = GroupScoreboardController::apiRemoveContest(new Request(array(
+			"auth_token" => self::login($groupData["owner"]),
+			"group_alias" => $groupData["request"]["alias"],
+			"scoreboard_alias" => $scoreboardData["request"]["alias"],
+			"contest_alias" => $contestData["request"]["alias"]
+		)));
+		
+		$this->assertEquals("ok", $response["status"]);
+		
+		$gscs = GroupsScoreboardsContestsDAO::search(new GroupsScoreboardsContests(array(
+			"group_scoreboard_id" => $scoreboardData["scoreboard"]->group_scoreboard_id,
+			"contest_id" => $contestData["contest"]->contest_id			
+		)));		
+		
+		$this->assertEquals(0, count($gscs));	
+	}
+	
+	
+	/**
+	 * apiDetails
+	 */
+	public function testScoreboardDetails() {
+		
+		$groupData = GroupsFactory::createGroup();
+		$scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+		$contestsData = array();
+		$n = 5;
+		
+		for ($i = 0; $i < $n; $i++) {
+			$contestsData[] = ContestsFactory::createContest();
+			ContestsFactory::addAdminUser($contestsData[$i], $groupData["owner"]);		
+			GroupsFactory::addContestToScoreboard($contestsData[$i], $scoreboardData, $groupData);
+		}
+		
+		$response = GroupScoreboardController::apiDetails(new Request(array(
+			"auth_token" => self::login($groupData["owner"]),
+			"group_alias" => $groupData["request"]["alias"],
+			"scoreboard_alias" => $scoreboardData["request"]["alias"],
+		)));
+						
+		$this->assertEquals($n, count($response["contests"]));
+		$this->assertEquals($scoreboardData["request"]["alias"], $response["scoreboard"]["alias"]);
+	}
+	
+	/**
+	 * apiList
+	 */
+	public function testScoreboardsList() {
+		
+		$groupData = GroupsFactory::createGroup();
+		$n = 5;
+		$scoreboardsData = array();
+		for ($i = 0; $i < $n; $i++) {
+			$scoreboardsData[] = GroupsFactory::createGroupScoreboard($groupData);
+		}
+		
+		$response = GroupScoreboardController::apiList(new Request(array(
+			"auth_token" => self::login($groupData["owner"]),
+			"group_alias" => $groupData["request"]["alias"],			
+		)));
+				
+		$this->assertEquals($n, count($response["scoreboards"]));		
+	}
+	
 }

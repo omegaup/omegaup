@@ -46,7 +46,7 @@ class GroupController extends Controller {
 	 * @throws InvalidParameterException
 	 * @throws ForbiddenAccessException
 	 */
-	private static function validateGroup(Request $r) {
+	public static function validateGroup(Request $r) {
 		self::authenticateRequest($r);
 		
 		Validators::isStringNonEmpty($r["group_alias"], "group_alias");
@@ -194,5 +194,36 @@ class GroupController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
+	
+	/**
+	 * Create a scoreboard set to a group
+	 * 
+	 * @param Request $r
+	 */
+	public static function apiCreateScoreboard (Request $r) {
+		self::validateGroup($r);
+		
+		Validators::isValidAlias($r["alias"], "alias", true);
+		Validators::isStringNonEmpty($r["name"], "name", true);
+		Validators::isStringNonEmpty($r["description"], "description", false);
+		
+		try {
+			
+			$groupScoreboard = new GroupsScoreboards(array(
+				"group_id" => $r["group"]->group_id,
+				"name" => $r["name"],
+				"description" =>$r["description"],
+				"alias" => $r["alias"]
+			));
+			
+			GroupsScoreboardsDAO::save($groupScoreboard);
+			
+			self::$log->info("New scoreboard created " . $r["alias"]);
+		} catch (Exception $ex) {
+			throw new InvalidDatabaseOperationException($ex);
+		}
+				
+		return array("status" => "ok");
+	}	
 }
 

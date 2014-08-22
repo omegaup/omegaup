@@ -140,7 +140,9 @@ class Utils {
 			'Coder_Of_The_Month',
 			'Users',
 			'Groups_Users',
-			'Groups'
+			'Groups_Scoreboards_Contests',
+			'Groups_Scoreboards',			
+			'Groups',
 		);
 
 		try {

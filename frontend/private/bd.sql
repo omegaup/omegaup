@@ -572,6 +572,33 @@ CREATE TABLE IF NOT EXISTS `Groups_Users` (
 
 
 --
+-- Estructura de tabla para la tabla `Groups`
+--
+
+CREATE TABLE IF NOT EXISTS `Groups_Scoreboards` (
+  `group_scoreboard_id` int(11) AUTO_INCREMENT NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `alias` varchar(50) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `description` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`group_scoreboard_id`),
+  KEY `group_id` (`group_id`),
+  UNIQUE KEY `groups_scoreboards_alias` (`alias`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+
+--
+-- Estructura de tabla para la tabla `Groups_Users`
+--
+CREATE TABLE IF NOT EXISTS `Groups_Scoreboards_Contests` (
+  `group_scoreboard_id` int(11) NOT NULL,
+  `contest_id` int(11) NOT NULL,
+  PRIMARY KEY (`group_scoreboard_id`,`contest_id`),
+  KEY `group_scoreboard_id` (`group_scoreboard_id`),
+  KEY `contest_id` (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+--
 -- Restricciones para tablas volcadas
 --
 
@@ -750,11 +777,18 @@ ALTER TABLE `Users_Permissions`
   ADD CONSTRAINT `fk_up_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `Groups`
-  ADD CONSTRAINT `fk_g_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_g_user_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `Groups_Users`
-  ADD CONSTRAINT `fk_gu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_gu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_gu_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `Groups_Scoreboards`
+  ADD CONSTRAINT `fk_gs_user_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `Groups_Scoreboards_Contests`
+  ADD CONSTRAINT `fk_gsc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (1 ,  'ADMIN',  'Admin');
