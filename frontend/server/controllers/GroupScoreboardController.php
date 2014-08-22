@@ -123,6 +123,8 @@ class GroupScoreboardController extends Controller {
 		self::validateGroupScoreboard($r);
 		
 		$response = array();
+		
+		// Fill contests
 		$response["contests"] = array();
 		try {
 			$groupScoreboardContestKey = new GroupsScoreboardsContests(array(
@@ -143,9 +145,37 @@ class GroupScoreboardController extends Controller {
 			throw new InvalidDatabaseOperationException($ex);
 		}
 		
+		// Fill details of this scoreboard
 		$response["scoreboard"] = $r["scoreboard"]->asArray();
-		$response["status"] = "ok";
 		
+		// Get merged scoreboard
+		$r["contest_aliases"] = array();
+		foreach ($response["contests"] as $contest) {
+			$r["contest_aliases"][] = $contest["alias"];
+		}		
+		
+		$r["contest_aliases"] = implode(",", $r["contest_aliases"]);
+		
+		try {
+			$groupUsers = GroupsUsersDAO::search(new GroupsUsers(array(
+				"group_id" => $r["scoreboard"]->group_id
+			)));		
+						
+			$r["usernames_filter"] = array();
+			foreach ($groupUsers as $groupUser) {
+				$user = UsersDAO::getByPK($groupUser->user_id);
+				$r["usernames_filter"][] = $user->username;
+			}
+			
+		} catch (Exception $ex) {
+			throw new InvalidDatabaseOperationException($ex);
+		}		
+		
+		$r["usernames_filter"] = implode(",", $r["usernames_filter"]);
+		$mergedScoreboardResponse = ContestController::apiScoreboardMerge($r);
+		
+		$response["ranking"] = $mergedScoreboardResponse["ranking"];	
+		$response["status"] = "ok";		
 		return $response;
 	}
 	

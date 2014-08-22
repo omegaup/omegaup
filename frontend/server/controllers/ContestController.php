@@ -1115,6 +1115,13 @@ class ContestController extends Controller {
 		Validators::isStringNonEmpty($r["contest_aliases"], "contest_aliases");
 		$contest_aliases = explode(",", $r["contest_aliases"]);
 		
+		Validators::isStringNonEmpty($r["usernames_filter"], "usernames_filter", false);
+		
+		$usernames_filter = array();
+		if (isset($r["usernames_filter"])) {
+			$usernames_filter = explode(",", $r["usernames_filter"]);
+		}
+		
 		// Validate all contest alias
 		$contests = array();
 		foreach ($contest_aliases as $contest_alias) {
@@ -1146,8 +1153,7 @@ class ContestController extends Controller {
 		
 		// Merge
 		foreach($scoreboards as $contest_alias => $scoreboard) {
-			foreach($scoreboard['ranking'] as $user_results) {
-				//var_dump($user_results);
+			foreach($scoreboard['ranking'] as $user_results) {				
 				
 				// If user haven't been added to the merged scoredboard, add him
 				if (!isset($merged_scoreboard[$user_results["username"]])) {
@@ -1163,6 +1169,15 @@ class ContestController extends Controller {
 				
 				$merged_scoreboard[$user_results["username"]]["total"]["points"] += $user_results["total"]["points"];
 				$merged_scoreboard[$user_results["username"]]["total"]["penalty"] += $user_results["total"]["penalty"];
+			}
+		}
+		
+		// Remove users not in filter
+		if (isset($r["usernames_filter"])) {
+			foreach ($merged_scoreboard as $username => $entry) {
+				if (array_search($username, $usernames_filter) === false) {
+					unset($merged_scoreboard[$username]);
+				}
 			}
 		}
 		

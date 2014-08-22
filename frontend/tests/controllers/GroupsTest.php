@@ -284,12 +284,28 @@ class GroupsTest extends OmegaupTestCase {
 		$groupData = GroupsFactory::createGroup();
 		$scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
 		$contestsData = array();
+		
+		// Create contestants to submit runs
+		$contestantInGroup = UserFactory::createUser();
+		GroupsFactory::addUserToGroup($groupData, $contestantInGroup);		
+		$contestantNotInGroup = UserFactory::createUser();
+						
 		$n = 5;
 		
 		for ($i = 0; $i < $n; $i++) {
 			$contestsData[] = ContestsFactory::createContest();
 			ContestsFactory::addAdminUser($contestsData[$i], $groupData["owner"]);		
 			GroupsFactory::addContestToScoreboard($contestsData[$i], $scoreboardData, $groupData);
+			
+			// Create a problem to solve					
+			$problemData = ProblemsFactory::createProblem();
+			ContestsFactory::addProblemToContest($problemData, $contestsData[$i]);
+								
+			// Submit runs
+			$run1 = RunsFactory::createRun($problemData, $contestsData[$i], $contestantInGroup);
+			$run2 = RunsFactory::createRun($problemData, $contestsData[$i], $contestantNotInGroup);
+			RunsFactory::gradeRun($run1);
+			RunsFactory::gradeRun($run2);
 		}
 		
 		$response = GroupScoreboardController::apiDetails(new Request(array(
@@ -297,9 +313,13 @@ class GroupsTest extends OmegaupTestCase {
 			"group_alias" => $groupData["request"]["alias"],
 			"scoreboard_alias" => $scoreboardData["request"]["alias"],
 		)));
-						
+				
 		$this->assertEquals($n, count($response["contests"]));
-		$this->assertEquals($scoreboardData["request"]["alias"], $response["scoreboard"]["alias"]);
+		$this->assertEquals($scoreboardData["request"]["alias"], $response["scoreboard"]["alias"]);		
+		
+		// Only 1 user in the merged scoreboard is expected
+		$this->assertEquals(1, count($response["ranking"]));
+		$this->assertEquals($n, count($response["ranking"][0]["contests"]));
 	}
 	
 	/**
