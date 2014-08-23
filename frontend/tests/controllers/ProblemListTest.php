@@ -306,7 +306,7 @@ class ProblemList extends OmegaupTestCase {
 						$request['page']= null;
 						$response = ProblemController::apiList($request);
 						$first = $response['results'];
-						$last = &$first;
+						$last = $first;
 					}
 
 					$i = 0;
