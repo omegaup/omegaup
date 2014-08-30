@@ -44,7 +44,7 @@ class GroupsTest extends OmegaupTestCase {
 						
 		$response = GroupController::apiAddUser(new Request(array(
 			"auth_token" => self::login($group["owner"]),
-			"username" => $user->username,
+			"usernameOrEmail" => $user->username,
 			"group_alias" => $group["group"]->alias
 		)));
 		$this->assertEquals("ok", $response["status"]);
@@ -65,7 +65,7 @@ class GroupsTest extends OmegaupTestCase {
 						
 		$response = GroupController::apiAddUser(new Request(array(
 			"auth_token" => self::login($userCalling),
-			"username" => $user->username,
+			"usernameOrEmail" => $user->username,
 			"group_alias" => $group["group"]->alias
 		)));		
 	}
@@ -81,7 +81,7 @@ class GroupsTest extends OmegaupTestCase {
 		
 		$response = GroupController::apiRemoveUser(new Request(array(
 			"auth_token" => self::login($groupData["owner"]),
-			"username" => $user->username,
+			"usernameOrEmail" => $user->username,
 			"group_alias" => $groupData["group"]->alias
 		)));
 		
@@ -103,7 +103,7 @@ class GroupsTest extends OmegaupTestCase {
 		
 		GroupController::apiRemoveUser(new Request(array(
 			"auth_token" => self::login($groupData["owner"]),
-			"username" => $user->username,
+			"usernameOrEmail" => $user->username,
 			"group_alias" => $groupData["group"]->alias
 		)));			
 	}
@@ -120,7 +120,7 @@ class GroupsTest extends OmegaupTestCase {
 		
 		GroupController::apiRemoveUser(new Request(array(
 			"auth_token" => self::login($user),
-			"username" => $user->username,
+			"usernameOrEmail" => $user->username,
 			"group_alias" => $groupData["group"]->alias
 		)));			
 	}

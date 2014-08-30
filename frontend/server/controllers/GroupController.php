@@ -25,7 +25,8 @@ class GroupController extends Controller {
 				"owner_id" => $r["current_user_id"],
 				"name" => $r["name"],
 				"description" =>$r["description"],
-				"alias" => $r["alias"]
+				"alias" => $r["alias"],
+				"create_time" => gmdate('Y-m-d H:i:s', time()),
 			));
 			
 			GroupsDAO::save($group);
@@ -223,7 +224,8 @@ class GroupController extends Controller {
 				"group_id" => $r["group"]->group_id,
 				"name" => $r["name"],
 				"description" =>$r["description"],
-				"alias" => $r["alias"]
+				"alias" => $r["alias"],
+				"create_time" => gmdate('Y-m-d H:i:s', time())
 			));
 			
 			GroupsScoreboardsDAO::save($groupScoreboard);

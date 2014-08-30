@@ -150,31 +150,31 @@ class GroupScoreboardController extends Controller {
 		// If we have contests, calculate merged&filtered scoreboard
 		if (count($response["contests"]) > 0) {
 			// Get merged scoreboard
-			$r["contest_aliases"] = array();
+			$r["contest_aliases"] = "";
 			foreach ($response["contests"] as $contest) {
-				$r["contest_aliases"][] = $contest["alias"];
-			}		
-
-			$r["contest_aliases"] = implode(",", $r["contest_aliases"]);
+				$r["contest_aliases"] .= $contest["alias"] . ",";
+			}
+			
+			$r["contest_aliases"] = rtrim($r["contest_aliases"], ",");
 
 			try {
 				$groupUsers = GroupsUsersDAO::search(new GroupsUsers(array(
 					"group_id" => $r["scoreboard"]->group_id
 				)));		
 
-				$r["usernames_filter"] = array();
+				$r["usernames_filter"] = "";
 				foreach ($groupUsers as $groupUser) {
 					$user = UsersDAO::getByPK($groupUser->user_id);
-					$r["usernames_filter"][] = $user->username;
+					$r["usernames_filter"] .= $user->username . ",";
 				}
+				
+				$r["usernames_filter"] = rtrim($r["usernames_filter"], ",");
 
 			} catch (Exception $ex) {
 				throw new InvalidDatabaseOperationException($ex);
 			}		
-
-			$r["usernames_filter"] = implode(",", $r["usernames_filter"]);
+			
 			$mergedScoreboardResponse = ContestController::apiScoreboardMerge($r);
-
 			$response["ranking"] = $mergedScoreboardResponse["ranking"];	
 		}
 		
