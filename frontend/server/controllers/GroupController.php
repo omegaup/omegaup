@@ -77,8 +77,7 @@ class GroupController extends Controller {
 	 * @param Request $r
 	 */
 	private static function validateGroupAndOwner(Request $r) {
-		self::validateGroup($r);		
-		$r["user"] = self::resolveTargetUser($r);
+		self::validateGroup($r);				
 	}
 	
 	/**
@@ -88,6 +87,7 @@ class GroupController extends Controller {
 	 */
 	public static function apiAddUser(Request $r) {
 		self::validateGroupAndOwner($r);
+		$r["user"] = UserController::resolveUser($r["usernameOrEmail"]);
 						
 		try {
 			$groups_user = new GroupsUsers(array(
@@ -109,6 +109,7 @@ class GroupController extends Controller {
 	 */
 	public static function apiRemoveUser(Request $r) {
 		self::validateGroupAndOwner($r);
+		$r["user"] = UserController::resolveUser($r["usernameOrEmail"]);
 		
 		try {
 			$key = new GroupsUsers(array(
@@ -172,6 +173,7 @@ class GroupController extends Controller {
 		$response = array();
 		$response["group"] = array();
 		$response["users"] = array();
+		$response["scoreboards"] = array();
 		
 		try {
 			$response["group"] = $r["group"]->asArray();
@@ -185,6 +187,14 @@ class GroupController extends Controller {
 				$userProfile = UserController::getProfile($r);
 				
 				$response["users"][] = $userProfile;
+			}
+			
+			$scoreboards = GroupsScoreboardsDAO::search(new GroupsScoreboards(array(
+				"group_id" => $r["group"]->group_id
+			)));
+			
+			foreach ($scoreboards as $scoreboard) {
+				$response["scoreboards"][] = $scoreboard->asArray();
 			}
 			
 		} catch (Exception $ex) {

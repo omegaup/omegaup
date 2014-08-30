@@ -21,6 +21,7 @@
 										<li><a href="/problem/list/">{#wordsProblems#}</a></li>
 									</ul>
 								</li>
+								<!--<li id="nav-groups"><a href='/groups.php'>{#navGroups#}</a></li>-->
 							{else}
 								<li id="nav-problems"><a href='/problem/list/'>{#wordsProblems#}</a></li>
 							{/if}
