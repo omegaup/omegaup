@@ -137,6 +137,37 @@ OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, ca
 	});
 };
 
+OmegaUp.prototype.createGroup = function(
+					alias,
+					name,
+					description,					
+					callback
+				) {
+	$.post(
+		'/api/group/create/' ,
+		{
+			alias				: alias,
+			name				: name,
+			description			: description,			
+		},
+		function(data) {
+			if (data.status !== undefined && data.status == "error") {
+				OmegaUp.ui.error(data.error);
+			}
+			if (callback !== undefined) { callback(data); }
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
 OmegaUp.prototype.createContest = function(
 					title,
 					description,
@@ -326,6 +357,26 @@ OmegaUp.prototype.getUserStats = function(username, callback) {
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
 			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getGroups = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/group/list/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
 		}
 	});
 };
@@ -730,6 +781,116 @@ OmegaUp.prototype.removeTagFromProblem = function(problemAlias, tagname, callbac
 	});
 };
 
+OmegaUp.prototype.addUserToGroup = function(groupAlias, username, callback) {
+	var self = this;
+
+	$.post(
+		'/api/group/addUser/group_alias/' + encodeURIComponent(groupAlias) + '/',
+		{			
+			usernameOrEmail : username			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.removeUserFromGroup = function(groupAlias, username, callback) {
+	var self = this;
+
+	$.post(
+		'/api/group/removeUser/group_alias/' + encodeURIComponent(groupAlias) + '/',
+		{
+			usernameOrEmail : username
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.addScoreboardToGroup = function(groupAlias, alias, name, description, callback) {
+	var self = this;
+
+	$.post(
+		'/api/group/createScoreboard/group_alias/' + encodeURIComponent(groupAlias) + '/',
+		{			
+			alias		: alias,
+			name		: name,
+			description : description
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+
+OmegaUp.prototype.addContestToScoreboard = function(groupAlias, scoreboardAlias, contestAlias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/groupScoreboard/addContest/group_alias/' + encodeURIComponent(groupAlias) + '/',
+		{			
+			scoreboard_alias		: scoreboardAlias,
+			contest_alias			: contestAlias			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.removeContestFromScoreboard = function(groupAlias, scoreboardAlias, contestAlias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/groupScoreboard/removeContest/group_alias/' + encodeURIComponent(groupAlias) + '/',
+		{			
+			scoreboard_alias		: scoreboardAlias,
+			contest_alias			: contestAlias			
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.addUserToContest = function(contestAlias, username, callback) {
 	var self = this;
 
@@ -847,6 +1008,45 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, st
 					problem.runs[i].time = self.time(problem.runs[i].time * 1000);
 				}
 			}
+			callback(problem);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getGroup = function(groupAlias, callback) {
+	var self = this;
+	
+	$.post(		
+		'/api/group/details/group_alias/' + encodeURIComponent(groupAlias) + '/',
+		function (problem) {			
+			callback(problem);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getGroupScoreboard = function(groupAlias, scoreboardAlias, callback) {
+	var self = this;
+	
+	$.post(		
+		'/api/groupScoreboard/details/group_alias/' + encodeURIComponent(groupAlias) + '/',
+		{
+			scoreboard_alias : scoreboardAlias
+		},
+		function (problem) {			
 			callback(problem);
 		},
 		'json'

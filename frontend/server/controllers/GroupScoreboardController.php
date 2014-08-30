@@ -25,7 +25,7 @@ class GroupScoreboardController extends Controller {
 			throw new InvalidDatabaseOperationException($ex);
 		}
 		
-		if (is_null($r["scoreboards"]) || count($r["scoreboards"]) === 0 || is_null($r["scoreboards"])) {
+		if (is_null($r["scoreboards"]) || count($r["scoreboards"]) === 0 || is_null($r["scoreboards"][0])) {
 			throw new InvalidParameterException("parameterNotFound", "Scoreboard");
 		}
 		
@@ -53,7 +53,7 @@ class GroupScoreboardController extends Controller {
 			throw new InvalidParameterException("parameterNotFound", "Contest");
 		}
 		
-		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+		if ($r["contest"]->public == 0 && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException();
 		}			
 	}
@@ -126,21 +126,20 @@ class GroupScoreboardController extends Controller {
 		
 		// Fill contests
 		$response["contests"] = array();
+		$response["ranking"] = array();
 		try {
 			$groupScoreboardContestKey = new GroupsScoreboardsContests(array(
 				"group_scoreboard_id" => $r["scoreboard"]->group_scoreboard_id,
 			));
 			
-			$gscs = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);
-			if (is_null($gscs) || count($gscs) === 0) {
-				throw new InvalidParameterException("parameterNotFound", "Contest");
-			}
-			
+			$gscs = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);			
 			foreach($gscs as $gsc) {
 				$contest = ContestsDAO::getByPK($gsc->contest_id);
 				$response["contests"][] = $contest->asArray();
 			}
 			
+		} catch (ApiException $ex) {
+			throw $ex;
 		} catch (Exception $ex) {
 			throw new InvalidDatabaseOperationException($ex);
 		}
@@ -148,33 +147,37 @@ class GroupScoreboardController extends Controller {
 		// Fill details of this scoreboard
 		$response["scoreboard"] = $r["scoreboard"]->asArray();
 		
-		// Get merged scoreboard
-		$r["contest_aliases"] = array();
-		foreach ($response["contests"] as $contest) {
-			$r["contest_aliases"][] = $contest["alias"];
-		}		
-		
-		$r["contest_aliases"] = implode(",", $r["contest_aliases"]);
-		
-		try {
-			$groupUsers = GroupsUsersDAO::search(new GroupsUsers(array(
-				"group_id" => $r["scoreboard"]->group_id
-			)));		
-						
-			$r["usernames_filter"] = array();
-			foreach ($groupUsers as $groupUser) {
-				$user = UsersDAO::getByPK($groupUser->user_id);
-				$r["usernames_filter"][] = $user->username;
+		// If we have contests, calculate merged&filtered scoreboard
+		if (count($response["contests"]) > 0) {
+			// Get merged scoreboard
+			$r["contest_aliases"] = "";
+			foreach ($response["contests"] as $contest) {
+				$r["contest_aliases"] .= $contest["alias"] . ",";
 			}
 			
-		} catch (Exception $ex) {
-			throw new InvalidDatabaseOperationException($ex);
-		}		
+			$r["contest_aliases"] = rtrim($r["contest_aliases"], ",");
+
+			try {
+				$groupUsers = GroupsUsersDAO::search(new GroupsUsers(array(
+					"group_id" => $r["scoreboard"]->group_id
+				)));		
+
+				$r["usernames_filter"] = "";
+				foreach ($groupUsers as $groupUser) {
+					$user = UsersDAO::getByPK($groupUser->user_id);
+					$r["usernames_filter"] .= $user->username . ",";
+				}
+				
+				$r["usernames_filter"] = rtrim($r["usernames_filter"], ",");
+
+			} catch (Exception $ex) {
+				throw new InvalidDatabaseOperationException($ex);
+			}		
+			
+			$mergedScoreboardResponse = ContestController::apiScoreboardMerge($r);
+			$response["ranking"] = $mergedScoreboardResponse["ranking"];	
+		}
 		
-		$r["usernames_filter"] = implode(",", $r["usernames_filter"]);
-		$mergedScoreboardResponse = ContestController::apiScoreboardMerge($r);
-		
-		$response["ranking"] = $mergedScoreboardResponse["ranking"];	
 		$response["status"] = "ok";		
 		return $response;
 	}

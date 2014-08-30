@@ -58,7 +58,7 @@ class GroupsFactory {
 		
 		GroupController::apiAddUser(new Request(array(
 			"auth_token" => OmegaupTestCase::login($groupData["owner"]),
-			"username" => $user->username,
+			"usernameOrEmail" => $user->username,
 			"group_alias" => $groupData["group"]->alias
 		)));
 	}
