@@ -52,7 +52,7 @@ class ProblemDeployer {
 				throw new InvalidParameterException("aliasInUse");
 			}
 			$this->git('init -q --bare ' . escapeshellarg($this->gitDir), PROBLEMS_GIT_PATH);
-			$created = true;
+			$this->created = true;
 		}
 
 		// Clone repository into tmp dir
@@ -138,7 +138,7 @@ class ProblemDeployer {
 		}
 
 		// Something went wrong and the target directory was not committed. Rollback.
-		if ($this->created && !file_exists($this->tagetDir)) {
+		if ($this->created && !file_exists($this->targetDir)) {
 			FileHandler::DeleteDirRecursive($this->gitDir);
 		}
 	}
