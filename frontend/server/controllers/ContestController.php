@@ -1796,15 +1796,6 @@ class ContestController extends Controller {
 			$csvData[] = $csvRow;
 		}
 
-		// Write contents to a csv raw string
-		ob_start();
-		$out = fopen('php://output', 'w');
-		foreach ($csvData as $csvRow) {
-			fputcsv($out, $csvRow);
-		}
-		fclose($out);
-		$rawOutput = ob_get_clean();
-
 		// Set headers to auto-download file	
 		header("Pragma: public");
 		header("Expires: 0");
@@ -1814,11 +1805,18 @@ class ContestController extends Controller {
 		header("Content-Type: application/download");
 		header("Content-Disposition: attachment;filename=" . $r["contest_alias"] . "_report.csv");
 		header("Content-Transfer-Encoding: binary");
-		echo $rawOutput;
+
+		// Write contents to a csv raw string
+		// TODO(https://github.com/omegaup/omegaup/issues/628): Escape = to prevent applications from inadvertently executing code
+		// http://contextis.co.uk/blog/comma-separated-vulnerabilities/
+		$out = fopen('php://output', 'w');
+		foreach ($csvData as $csvRow) {
+			fputcsv($out, $csvRow);
+		}
+		fclose($out);
 
 		// X_X
 		die();
-		return $csvData;
 	}
 
 	public static function apiDownload(Request $r) {
