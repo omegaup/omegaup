@@ -99,6 +99,7 @@ $(document).ready(function() {
 			arena.currentProblem.alias,
 			$('#submit select[name="language"]').val(),
 			$('#submit textarea[name="code"]').val(),
+			'textarea',
 			function (run) {
 				if (run.status != 'ok') {
 					alert(run.error);
