@@ -139,15 +139,20 @@ class GroupScoreboardController extends Controller {
 			));
 			
 			$r["gscs"] = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);			
+			$i = 0;
 			foreach($r["gscs"] as $gsc) {
 				$contest = ContestsDAO::getByPK($gsc->contest_id);
-				$response["contests"][] = $contest->asArray();
+				$response["contests"][$i] = $contest->asArray();
+				$response["contests"][$i]["only_ac"] = $gsc->only_ac;
+				$response["contests"][$i]["weight"] = $gsc->weight;
 				
 				// Fill contest params to pass to scoreboardMerge
 				$r["contest_params"][$contest->alias] = array(
 					"only_ac" => ($gsc->only_ac == 0) ? false : true,
 					"weight" => $gsc->weight 
 				);
+				
+				$i++;
 			}			
 		} catch (ApiException $ex) {
 			throw $ex;

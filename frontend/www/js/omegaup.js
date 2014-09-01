@@ -847,14 +847,16 @@ OmegaUp.prototype.addScoreboardToGroup = function(groupAlias, alias, name, descr
 };
 
 
-OmegaUp.prototype.addContestToScoreboard = function(groupAlias, scoreboardAlias, contestAlias, callback) {
+OmegaUp.prototype.addContestToScoreboard = function(groupAlias, scoreboardAlias, contestAlias, onlyAC, weight, callback) {
 	var self = this;
 
 	$.post(
 		'/api/groupScoreboard/addContest/group_alias/' + encodeURIComponent(groupAlias) + '/',
 		{			
 			scoreboard_alias		: scoreboardAlias,
-			contest_alias			: contestAlias			
+			contest_alias			: contestAlias,
+			only_ac					: onlyAC,
+			weight					: weight,
 		},
 		function (data) {
 			callback(data);

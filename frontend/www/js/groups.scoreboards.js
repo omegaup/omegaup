@@ -16,11 +16,13 @@ $(function() {
 			}
 		});
 
-		$('#scoreboard-add-contest-form').submit(function() {
+		$('#scoreboard-add-contest-form').submit(function() {						
 			omegaup.addContestToScoreboard(
 				groupAlias,
 				scoreboardAlias,
-				$("#contests").val(),			
+				$("#contests").val(),
+				$('#only_ac').val(),
+				$('#weight').val(),
 				function(data) {
 					if(data.status === "ok") {
 						OmegaUp.ui.success("Contest successfully added!");
@@ -48,7 +50,9 @@ $(function() {
 									$('<a></a>')
 										.attr('href', '/arena/' + contest.alias + '/')
 										.text(omegaup.escape(contest.title))
-								))							
+								))
+								.append($('<td></td>').append(scoreboard.only_ac))
+								.append($('<td></td>').append(scoreboard.weight))
 								.append($('<td><button type="button" class="close">&times;</button></td>')
 									.click((function(contestAlias) {
 										return function(e) {
