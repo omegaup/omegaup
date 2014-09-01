@@ -127,8 +127,7 @@ class GroupScoreboardController extends Controller {
 	public static function apiDetails(Request $r) {
 		self::validateGroupScoreboard($r);
 		
-		$response = array();
-		$r["contest_params"] = array();
+		$response = array();		
 		
 		// Fill contests
 		$response["contests"] = array();
@@ -140,6 +139,7 @@ class GroupScoreboardController extends Controller {
 			
 			$r["gscs"] = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);			
 			$i = 0;
+			$contest_params = array();
 			foreach($r["gscs"] as $gsc) {
 				$contest = ContestsDAO::getByPK($gsc->contest_id);
 				$response["contests"][$i] = $contest->asArray();
@@ -147,7 +147,7 @@ class GroupScoreboardController extends Controller {
 				$response["contests"][$i]["weight"] = $gsc->weight;
 				
 				// Fill contest params to pass to scoreboardMerge
-				$r["contest_params"][$contest->alias] = array(
+				$contest_params[$contest->alias] = array(
 					"only_ac" => ($gsc->only_ac == 0) ? false : true,
 					"weight" => $gsc->weight 
 				);
@@ -159,6 +159,8 @@ class GroupScoreboardController extends Controller {
 		} catch (Exception $ex) {
 			throw new InvalidDatabaseOperationException($ex);
 		}
+		
+		$r["contest_params"] = $contest_params;
 		
 		// Fill details of this scoreboard
 		$response["scoreboard"] = $r["scoreboard"]->asArray();

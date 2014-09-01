@@ -51,8 +51,8 @@ $(function() {
 										.attr('href', '/arena/' + contest.alias + '/')
 										.text(omegaup.escape(contest.title))
 								))
-								.append($('<td></td>').append(scoreboard.only_ac))
-								.append($('<td></td>').append(scoreboard.weight))
+								.append($('<td></td>').append(contest.only_ac))
+								.append($('<td></td>').append(contest.weight))
 								.append($('<td><button type="button" class="close">&times;</button></td>')
 									.click((function(contestAlias) {
 										return function(e) {
