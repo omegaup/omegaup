@@ -594,6 +594,8 @@ CREATE TABLE IF NOT EXISTS `Groups_Scoreboards` (
 CREATE TABLE IF NOT EXISTS `Groups_Scoreboards_Contests` (
   `group_scoreboard_id` int(11) NOT NULL,
   `contest_id` int(11) NOT NULL,
+  `only_ac` tinyint(1)  NOT NULL DEFAULT '0',
+  `weight` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`group_scoreboard_id`,`contest_id`),
   KEY `group_scoreboard_id` (`group_scoreboard_id`),
   KEY `contest_id` (`contest_id`)

@@ -137,6 +137,16 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 			array_push( $val, $Groups_Scoreboards_Contests->getContestId() );
 		}
 
+		if( ! is_null( $Groups_Scoreboards_Contests->getOnlyAc() ) ){
+			$sql .= " `only_ac` = ? AND";
+			array_push( $val, $Groups_Scoreboards_Contests->getOnlyAc() );
+		}
+
+		if( ! is_null( $Groups_Scoreboards_Contests->getWeight() ) ){
+			$sql .= " `weight` = ? AND";
+			array_push( $val, $Groups_Scoreboards_Contests->getWeight() );
+		}
+
 		if(sizeof($val) == 0){return self::getAll(/* $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' */);}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
@@ -168,6 +178,15 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  **/
 	private static final function update( $Groups_Scoreboards_Contests )
 	{
+		$sql = "UPDATE Groups_Scoreboards_Contests SET  `only_ac` = ?, `weight` = ? WHERE  `group_scoreboard_id` = ? AND `contest_id` = ?;";
+		$params = array( 
+			$Groups_Scoreboards_Contests->getOnlyAc(), 
+			$Groups_Scoreboards_Contests->getWeight(), 
+			$Groups_Scoreboards_Contests->getGroupScoreboardId(),$Groups_Scoreboards_Contests->getContestId(), );
+		global $conn;
+		try{$conn->Execute($sql, $params);}
+		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		return $conn->Affected_Rows();
 	}
 
 
@@ -186,10 +205,12 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  **/
 	private static final function create( &$Groups_Scoreboards_Contests )
 	{
-		$sql = "INSERT INTO Groups_Scoreboards_Contests ( `group_scoreboard_id`, `contest_id` ) VALUES ( ?, ?);";
+		$sql = "INSERT INTO Groups_Scoreboards_Contests ( `group_scoreboard_id`, `contest_id`, `only_ac`, `weight` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
 			$Groups_Scoreboards_Contests->getGroupScoreboardId(), 
 			$Groups_Scoreboards_Contests->getContestId(), 
+			$Groups_Scoreboards_Contests->getOnlyAc(), 
+			$Groups_Scoreboards_Contests->getWeight(), 
 		 );
 		global $conn;
 		try{$conn->Execute($sql, $params);}
@@ -255,6 +276,28 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `contest_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->getOnlyAc()) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->getOnlyAc()) ) ) ){
+				$sql .= " `only_ac` >= ? AND `only_ac` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `only_ac` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->getWeight()) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->getWeight()) ) ) ){
+				$sql .= " `weight` >= ? AND `weight` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `weight` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

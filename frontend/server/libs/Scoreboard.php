@@ -13,13 +13,15 @@ class Scoreboard {
 	private $contest_id;
 	private $showAllRuns;
 	private $auth_token;
+	private $onlyAC;
 	public $log;
 
-	public function __construct($contest_id, $showAllRuns = false, $auth_token = null) {
+	public function __construct($contest_id, $showAllRuns = false, $auth_token = null, $onlyAC = false) {
 		$this->contest_id = $contest_id;
 		$this->showAllRuns = $showAllRuns;
 		$this->auth_token = $auth_token;
 		$this->log = Logger::getLogger("Scoreboard");
+		$this->onlyAC = $onlyAC;
 	}
 
 	public function generate($withRunDetails = false, $sortByName = false, $filterUsersBy = NULL) {
@@ -30,11 +32,13 @@ class Scoreboard {
 
 		$can_use_contestant_cache = !$this->showAllRuns &&
 			!$sortByName &&
-			is_null($filterUsersBy);
+			is_null($filterUsersBy) &&
+			!$this->onlyAC;
 
 		$can_use_admin_cache = $this->showAllRuns &&
 			!$sortByName &&
-			is_null($filterUsersBy);
+			is_null($filterUsersBy) &&
+			!$this->onlyAC;
 
 		// If cache is turned on and we're not looking for admin-only runs
 		if ($can_use_contestant_cache) {
@@ -62,7 +66,8 @@ class Scoreboard {
 
 				$contest_runs = RunsDAO::GetContestRuns(
 					$this->contest_id,
-					$use_penalty ? 'submit_delay' : 'run_id'
+					$use_penalty ? 'submit_delay' : 'run_id',
+					$this->onlyAC
 				);
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);

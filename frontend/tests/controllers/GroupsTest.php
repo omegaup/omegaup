@@ -214,7 +214,9 @@ class GroupsTest extends OmegaupTestCase {
 			"auth_token" => self::login($groupData["owner"]),
 			"group_alias" => $groupData["request"]["alias"],
 			"scoreboard_alias" => $scoreboardData["request"]["alias"],
-			"contest_alias" => $contestData["request"]["alias"]
+			"contest_alias" => $contestData["request"]["alias"],
+			"weight" => 1,
+			"only_ac" => 0
 		)));
 		
 		$this->assertEquals("ok", $response["status"]);
@@ -340,6 +342,61 @@ class GroupsTest extends OmegaupTestCase {
 		)));
 				
 		$this->assertEquals($n, count($response["scoreboards"]));		
+	}
+	
+	/**
+	 * apiDetails with only AC and Weights
+	 */
+	public function testScoreboardDetailsOnlyAcAndWeight() {
+		
+		$groupData = GroupsFactory::createGroup();
+		$scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+		$contestsData = array();
+		
+		// Create contestants to submit runs
+		$contestantInGroup = UserFactory::createUser();
+		GroupsFactory::addUserToGroup($groupData, $contestantInGroup);		
+		$contestantInGroupNoAc = UserFactory::createUser();
+		GroupsFactory::addUserToGroup($groupData, $contestantInGroupNoAc);		
+						
+		$n = 5;
+		
+		for ($i = 0; $i < $n; $i++) {
+			$contestsData[] = ContestsFactory::createContest();
+			ContestsFactory::addAdminUser($contestsData[$i], $groupData["owner"]);		
+			GroupsFactory::addContestToScoreboard($contestsData[$i], $scoreboardData, $groupData, 1 /*onlyAC*/, ($i === 0 ? 3 : 1));
+			
+			// Create a problem to solve					
+			$problemData = ProblemsFactory::createProblem();
+			ContestsFactory::addProblemToContest($problemData, $contestsData[$i]);
+								
+			// Submit runs
+			$run1 = RunsFactory::createRun($problemData, $contestsData[$i], $contestantInGroup);
+			$run2 = RunsFactory::createRun($problemData, $contestsData[$i], $contestantInGroupNoAc);
+			RunsFactory::gradeRun($run1);
+			RunsFactory::gradeRun($run2, 0.5, 'PA');
+		}
+		
+		$response = GroupScoreboardController::apiDetails(new Request(array(
+			"auth_token" => self::login($groupData["owner"]),
+			"group_alias" => $groupData["request"]["alias"],
+			"scoreboard_alias" => $scoreboardData["request"]["alias"],
+		)));
+				
+		$this->assertEquals($n, count($response["contests"]));
+		$this->assertEquals($scoreboardData["request"]["alias"], $response["scoreboard"]["alias"]);		
+		
+		// 2 users in the merged scoreboard is expected		
+		$this->assertEquals(2, count($response["ranking"]));
+		$this->assertEquals($n, count($response["ranking"][0]["contests"]));
+		
+		// Only AC is expected		
+		$this->assertEquals(100, $response["ranking"][0]["contests"][$contestsData[1]["request"]["alias"]]["points"]);
+		$this->assertEquals(0, $response["ranking"][1]["contests"][$contestsData[1]["request"]["alias"]]["points"]);
+		
+		// Weight x3 in the first contest for 1st user
+		$this->assertEquals(300, $response["ranking"][0]["contests"][$contestsData[0]["request"]["alias"]]["points"]);
+		$this->assertEquals(700, $response["ranking"][0]["total"]["points"]);
 	}
 	
 }

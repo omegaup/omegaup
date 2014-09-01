@@ -64,12 +64,17 @@ class GroupScoreboardController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiAddContest(Request $r) {				
-		self::validateGroupScoreboardAndContest($r);				
+		self::validateGroupScoreboardAndContest($r);
+		
+		Validators::isInEnum($r["only_ac"], "only_ac", array(0,1));
+		Validators::isNumber($r["weight"], "weight");
 		
 		try {
 			$groupScoreboardContest = new GroupsScoreboardsContests(array(
 				"group_scoreboard_id" => $r["scoreboard"]->group_scoreboard_id,
-				"contest_id" => $r["contest"]->contest_id
+				"contest_id" => $r["contest"]->contest_id,
+				"only_ac" => $r["only_ac"],
+				"weight" => $r["weight"]
 			));
 			
 			GroupsScoreboardsContestsDAO::save($groupScoreboardContest);
@@ -123,6 +128,7 @@ class GroupScoreboardController extends Controller {
 		self::validateGroupScoreboard($r);
 		
 		$response = array();
+		$r["contest_params"] = array();
 		
 		// Fill contests
 		$response["contests"] = array();
@@ -132,12 +138,17 @@ class GroupScoreboardController extends Controller {
 				"group_scoreboard_id" => $r["scoreboard"]->group_scoreboard_id,
 			));
 			
-			$gscs = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);			
-			foreach($gscs as $gsc) {
+			$r["gscs"] = GroupsScoreboardsContestsDAO::search($groupScoreboardContestKey);			
+			foreach($r["gscs"] as $gsc) {
 				$contest = ContestsDAO::getByPK($gsc->contest_id);
 				$response["contests"][] = $contest->asArray();
-			}
-			
+				
+				// Fill contest params to pass to scoreboardMerge
+				$r["contest_params"][$contest->alias] = array(
+					"only_ac" => ($gsc->only_ac == 0) ? false : true,
+					"weight" => $gsc->weight 
+				);
+			}			
 		} catch (ApiException $ex) {
 			throw $ex;
 		} catch (Exception $ex) {

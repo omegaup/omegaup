@@ -32,6 +32,12 @@ class GroupsScoreboardsContests extends VO
 			if( isset($data['contest_id']) ){
 				$this->contest_id = $data['contest_id'];
 			}
+			if( isset($data['only_ac']) ){
+				$this->only_ac = $data['only_ac'];
+			}
+			if( isset($data['weight']) ){
+				$this->weight = $data['weight'];
+			}
 		}
 	}
 
@@ -46,7 +52,9 @@ class GroupsScoreboardsContests extends VO
 	{ 
 		$vec = array( 
 			"group_scoreboard_id" => $this->group_scoreboard_id,
-			"contest_id" => $this->contest_id
+			"contest_id" => $this->contest_id,
+			"only_ac" => $this->only_ac,
+			"weight" => $this->weight
 		); 
 	return json_encode($vec); 
 	}
@@ -70,6 +78,24 @@ class GroupsScoreboardsContests extends VO
 	  * @var int(11)
 	  */
 	public $contest_id;
+
+	/**
+	  * only_ac
+	  * 
+	  *  [Campo no documentado]<br>
+	  * @access public
+	  * @var tinyint(1)
+	  */
+	public $only_ac;
+
+	/**
+	  * weight
+	  * 
+	  *  [Campo no documentado]<br>
+	  * @access public
+	  * @var int(11)
+	  */
+	public $weight;
 
 	/**
 	  * getGroupScoreboardId
@@ -121,6 +147,54 @@ class GroupsScoreboardsContests extends VO
 	final public function setContestId( $contest_id )
 	{
 		$this->contest_id = $contest_id;
+	}
+
+	/**
+	  * getOnlyAc
+	  * 
+	  * Get the <i>only_ac</i> property for this object. Donde <i>only_ac</i> es  [Campo no documentado]
+	  * @return tinyint(1)
+	  */
+	final public function getOnlyAc()
+	{
+		return $this->only_ac;
+	}
+
+	/**
+	  * setOnlyAc( $only_ac )
+	  * 
+	  * Set the <i>only_ac</i> property for this object. Donde <i>only_ac</i> es  [Campo no documentado].
+	  * Una validacion basica se hara aqui para comprobar que <i>only_ac</i> es de tipo <i>tinyint(1)</i>. 
+	  * Si esta validacion falla, se arrojara... algo. 
+	  * @param tinyint(1)
+	  */
+	final public function setOnlyAc( $only_ac )
+	{
+		$this->only_ac = $only_ac;
+	}
+
+	/**
+	  * getWeight
+	  * 
+	  * Get the <i>weight</i> property for this object. Donde <i>weight</i> es  [Campo no documentado]
+	  * @return int(11)
+	  */
+	final public function getWeight()
+	{
+		return $this->weight;
+	}
+
+	/**
+	  * setWeight( $weight )
+	  * 
+	  * Set the <i>weight</i> property for this object. Donde <i>weight</i> es  [Campo no documentado].
+	  * Una validacion basica se hara aqui para comprobar que <i>weight</i> es de tipo <i>int(11)</i>. 
+	  * Si esta validacion falla, se arrojara... algo. 
+	  * @param int(11)
+	  */
+	final public function setWeight( $weight )
+	{
+		$this->weight = $weight;
 	}
 
 }

@@ -1115,7 +1115,7 @@ class ContestController extends Controller {
 		Validators::isStringNonEmpty($r["contest_aliases"], "contest_aliases");
 		$contest_aliases = explode(",", $r["contest_aliases"]);
 		
-		Validators::isStringNonEmpty($r["usernames_filter"], "usernames_filter", false);
+		Validators::isStringNonEmpty($r["usernames_filter"], "usernames_filter", false);		
 		
 		$usernames_filter = array();
 		if (isset($r["usernames_filter"])) {
@@ -1142,11 +1142,23 @@ class ContestController extends Controller {
 		// Get all scoreboards
 		$scoreboards = array();
 		foreach($contests as $contest) {
-			$s = new Scoreboard(
-					$contest->getContestId(), 
-					false);
 			
-			$scoreboards[$contest->getAlias()] = $s->generate();
+			// Set defaults for contests params
+			if (!isset($r["contest_params"][$contest->alias]["only_ac"])) {
+				$r["contest_params"][$contest->alias]["only_ac"] = false;
+			}
+			
+			if (!isset($r["contest_params"][$contest->alias]["weight"])) {
+				$r["contest_params"][$contest->alias]["weight"] = 1;
+			}
+						
+			$s = new Scoreboard(
+					$contest->contest_id, 
+					false, /*showAllRuns*/
+					null,  /*auth_token*/
+					$r["contest_params"][$contest->alias]["only_ac"]);
+			
+			$scoreboards[$contest->alias] = $s->generate();
 		}
 			
 		$merged_scoreboard = array();
@@ -1164,10 +1176,10 @@ class ContestController extends Controller {
 					$merged_scoreboard[$user_results["username"]]["total"]["penalty"] = 0;
 				}
 				
-				$merged_scoreboard[$user_results["username"]]["contests"][$contest_alias]["points"] = $user_results["total"]["points"];
+				$merged_scoreboard[$user_results["username"]]["contests"][$contest_alias]["points"] = ($user_results["total"]["points"] * $r["contest_params"][$contest_alias]["weight"]);
 				$merged_scoreboard[$user_results["username"]]["contests"][$contest_alias]["penalty"] = $user_results["total"]["penalty"];
 				
-				$merged_scoreboard[$user_results["username"]]["total"]["points"] += $user_results["total"]["points"];
+				$merged_scoreboard[$user_results["username"]]["total"]["points"] += ($user_results["total"]["points"] * $r["contest_params"][$contest_alias]["weight"]);
 				$merged_scoreboard[$user_results["username"]]["total"]["penalty"] += $user_results["total"]["penalty"];
 			}
 		}

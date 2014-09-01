@@ -112,13 +112,15 @@ class GroupsFactory {
 	 * @param array $scorebaordData
 	 * @param array $groupData
 	 */
-	public static function addContestToScoreboard($contestData, $scoreboardData, $groupData) {
+	public static function addContestToScoreboard($contestData, $scoreboardData, $groupData, $onlyAC = 0, $weight = 1) {
 		
 		GroupScoreboardController::apiAddContest(new Request(array(
 			"auth_token" => OmegaupTestCase::login($groupData["owner"]),
 			"group_alias" => $groupData["request"]["alias"],
 			"scoreboard_alias" => $scoreboardData["request"]["alias"],
-			"contest_alias" => $contestData["request"]["alias"]
+			"contest_alias" => $contestData["request"]["alias"],
+			"only_ac" => $onlyAC,
+			"weight" => $weight
 		)));
 	}
 }
