@@ -245,9 +245,9 @@ $(document).ready(function() {
 		}
 	});
 
-	function submitRun(contestAlias, problemAlias, lang, code, origin) {
+	function submitRun(contestAlias, problemAlias, lang, code) {
 		$('#submit input').attr('disabled', 'disabled');
-		omegaup.submit(contestAlias, problemAlias, lang, code, origin, function (run) {
+		omegaup.submit(contestAlias, problemAlias, lang, code, function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
 				$('#submit input').removeAttr('disabled');
@@ -309,8 +309,7 @@ $(document).ready(function() {
 				submitRun((arena.practice || arena.onlyProblem)? '' : contestAlias,
 					  arena.currentProblem.alias,
 					  $('#submit select[name="language"]').val(),
-					  e.target.result,
-					  'file');
+					  e.target.result);
 			};
 
 			var extension = file.name.split(/\./);
@@ -341,12 +340,7 @@ $(document).ready(function() {
 
 		if (!code) return false;
 
-		submitRun(
-			(arena.practice || arena.onlyProblem) ? '' : contestAlias,
-			arena.currentProblem.alias,
-			$('#submit select[name="language"]').val(),
-			code,
-			'textarea');
+		submitRun((arena.practice || arena.onlyProblem) ? '' : contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
 
 		return false;
 	});

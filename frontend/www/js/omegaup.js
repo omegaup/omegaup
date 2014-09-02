@@ -1347,7 +1347,7 @@ OmegaUp.prototype.getRuns = function(options, callback) {
 	});
 };
 
-OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, origin, callback) {
+OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, callback) {
 	var self = this;
 
 	$.post(
@@ -1356,8 +1356,7 @@ OmegaUp.prototype.submit = function(contestAlias, problemAlias, language, code, 
 			contest_alias: contestAlias,
 			problem_alias: problemAlias,
 			language: language,
-			source: code,
-			origin: origin
+			source: code
 		},
 		function (data) {
 			callback(data);

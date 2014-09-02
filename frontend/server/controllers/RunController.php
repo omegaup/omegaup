@@ -131,11 +131,6 @@ class RunController extends Controller {
 		// Validate request
 		self::validateCreateRequest($r);
 
-		// UI Experiment
-		if (isset($r['origin'])) {
-			self::$log->info("Run origin {$r['origin']}");
-		}
-
 		self::$log->info("New run being submitted !!");
 		$response = array();
 
