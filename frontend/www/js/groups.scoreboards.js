@@ -75,62 +75,70 @@ $(function() {
 		}
 	} else if (formPage === "details") {
 		
-		omegaup.getGroupScoreboard(groupAlias, scoreboardAlias, function(scoreboard){						
-			var html = "<table class=\"merged-scoreboard\"><tr><td></td><td><b>Username</b></td>";
+		omegaup.getGroupScoreboard(groupAlias, scoreboardAlias, function(scoreboard){
+			var ranking = scoreboard["ranking"];						
+			$("#scoreboard-title").html(scoreboard.scoreboard.name);
 			
-			var contests = [];
-			for (var alias in scoreboard["ranking"][0]["contests"]) {
-				html += "<td colspan=\"2\"><b>" + alias + "</b></td>";
-				contests.push(alias);
-			}	
-						
-			html += "<td colspan=\"2\"><b>Total</b></td>";
-			html += "</tr>"
+			// Adding contest's column
+			for (var c = 0; c < scoreboard.contests.length; c++) {
+				var alias = scoreboard.contests[c].alias;
+				
+				$('<th><a href="/arena/' + alias + '" title="' + alias + '">' +
+					c + '</a></th>').insertBefore('#ranking thead th.total');
 			
-			ranking = scoreboard["ranking"];
-			var showPenalty = false;
-			for (var entry in ranking) {
-				if (!ranking.hasOwnProperty(entry)) continue;
-				data = ranking[entry];
-				showPenalty |= !!data["total"]["penalty"];
+				$('<td class="prob_' + alias + '_points"></td>')
+					.insertBefore('#ranking tbody .template td.points');
+			
+				$('#ranking thead th').attr('colspan', '');
+				$('#ranking tbody .template .penalty').remove();
 			}
-
-			for (var entry in ranking) {
-				if (!ranking.hasOwnProperty(entry)) continue;
-				data = ranking[entry];
-				place = parseInt(entry) + 1;
-				
-				html += "<tr>";
-				html += "<td><strong>" + (place) + "</strong></td>";
-				html += "<td><div class=\"username\">" + data["username"] + "</div>";
-				if (data["username"] != data["name"]) {
-					html += "<div class=\"name\">" + data["name"] + "</div></td>";
-				} else {
-					html += "<div class=\"name\">&nbsp;</div></td>";
-				}
-				
-				for (var c in contests) {
-					if (showPenalty) {
-						html += "<td class=\"numeric\">" + data["contests"][contests[c]]["points"] + "</td>";
-						html += "<td class=\"numeric\">" + data["contests"][contests[c]]["penalty"] + "</td>";
-					} else {
-						html += "<td class=\"numeric\" colspan=\"2\">" + data["contests"][contests[c]]["points"] + "</td>";
-					}
-				}
-				
-				if (showPenalty) {
-					html += "<td class=\"numeric\">" + data["total"]["points"] + "</td>";
-					html += "<td class=\"numeric\">" + data["total"]["penalty"] + "</td>";
-				} else {
-					html += "<td class=\"numeric\" colspan=\"2\">" + data["total"]["points"] + "</td>";
-				}
-				
-				html += "</tr>";
-			}			
-	
-			html += "</table>"
 			
-			$("#ranking").html(html);
+			// Adding scoreboard data:
+			// Cleaning up table
+			$('#ranking tbody tr.inserted').remove();
+			
+			// For each user
+			for (var i = 0; i < ranking.length; i++) {
+				var rank = ranking[i];
+				
+				var r = $('#ranking tbody tr.template')
+					.clone()
+					.removeClass('template')
+					.addClass('inserted')
+					.addClass('rank-new');
+			
+				var username = rank.username +
+					((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
+				$('.user', r).html(username);
+				
+				// For each contest in the scoreboard
+				for (var c = 0; c < scoreboard.contests.length; c++) {
+					var alias = scoreboard.contests[c].alias;
+					var contestResults = rank.contests[alias];
+					
+					var pointsCell = $('.prob_' + alias + '_points', r);
+					pointsCell.html(
+						'<div class="points">' + (contestResults.points ? '+' + contestResults.points : '0') + '</div>\n' +
+						'<div class="penalty">' + contestResults.penalty + '</div>'
+					);
+					
+					pointsCell.removeClass('pending accepted wrong');										
+				}
+								
+				$('td.points', r).html(
+					'<div class="points">' + rank.total.points + '</div>' +
+					'<div class="penalty">' + rank.total.penalty + '</div>'
+				);
+				$('.position', r)
+					.html(i + 1)
+					.removeClass('recent-event');
+			
+				$('#ranking tbody').append(r);
+			}
+			
+			$('#ranking').show();
+			$('#root').fadeIn('slow');
+			$('#loading').fadeOut('slow');
 		});
 	}
 });
