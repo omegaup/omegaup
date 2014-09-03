@@ -135,6 +135,10 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 			$sql .= " `coder_of_the_month_id` = ? AND";
 			array_push( $val, $Coder_Of_The_Month->getCoderOfTheMonthId() );
 		}
+		if (!is_null( $Coder_Of_The_Month->getUserId())) {
+			$sql .= " `user_id` = ? AND";
+			array_push( $val, $Coder_Of_The_Month->getUserId() );
+		}
 		if (!is_null( $Coder_Of_The_Month->getDescription())) {
 			$sql .= " `description` = ? AND";
 			array_push( $val, $Coder_Of_The_Month->getDescription() );
@@ -182,8 +186,9 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  **/
 	private static final function update($Coder_Of_The_Month)
 	{
-		$sql = "UPDATE Coder_Of_The_Month SET  `description` = ?, `time` = ?, `interview_url` = ? WHERE  `coder_of_the_month_id` = ?;";
+		$sql = "UPDATE Coder_Of_The_Month SET  `user_id` = ?, `description` = ?, `time` = ?, `interview_url` = ? WHERE  `coder_of_the_month_id` = ?;";
 		$params = array( 
+			$Coder_Of_The_Month->getUserId(), 
 			$Coder_Of_The_Month->getDescription(), 
 			$Coder_Of_The_Month->getTime(), 
 			$Coder_Of_The_Month->getInterviewUrl(), 
@@ -208,9 +213,10 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	private static final function create( $Coder_Of_The_Month )
 	{
 		if (is_null($Coder_Of_The_Month->time)) $Coder_Of_The_Month->time = '2000-01-01';
-		$sql = "INSERT INTO Coder_Of_The_Month ( `coder_of_the_month_id`, `description`, `time`, `interview_url` ) VALUES ( ?, ?, ?, ?);";
+		$sql = "INSERT INTO Coder_Of_The_Month ( `coder_of_the_month_id`, `user_id`, `description`, `time`, `interview_url` ) VALUES ( ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Coder_Of_The_Month->coder_of_the_month_id,
+			$Coder_Of_The_Month->user_id,
 			$Coder_Of_The_Month->description,
 			$Coder_Of_The_Month->time,
 			$Coder_Of_The_Month->interview_url,
@@ -267,6 +273,17 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `coder_of_the_month_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->getUserId()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getUserId()) ) ) ){
+				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `user_id` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

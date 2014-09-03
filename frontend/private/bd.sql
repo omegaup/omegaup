@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS `Clarifications` (
 
 CREATE TABLE IF NOT EXISTS `Coder_Of_The_Month` (
   `coder_of_the_month_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
   `description` tinytext,
   `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.',
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
@@ -628,7 +629,7 @@ ALTER TABLE `Clarifications`
 -- Filtros para la tabla `Coder_Of_The_Month`
 --
 ALTER TABLE `Coder_Of_The_Month`
-  ADD CONSTRAINT `fk_cotmu_coder_of_the_month_id` FOREIGN KEY (`coder_of_the_month_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Contests`

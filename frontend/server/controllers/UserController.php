@@ -934,7 +934,7 @@ class UserController extends Controller {
 				
 				// Save it
 				$c = new CoderOfTheMonth(array(
-					"coder_of_the_month_id" => $user->getUserId(),
+					"user_id" => $user->user_id,
 					"time" => $firstDay,
 					
 				));
@@ -944,7 +944,7 @@ class UserController extends Controller {
 			} else {
 				
 				// Grab the user info
-				$user = UsersDAO::getByPK($coderOfTheMonth->getCoderOfTheMonthId());
+				$user = UsersDAO::getByPK($coderOfTheMonth->user_id);
 			}			
 							
 		} catch (Exception $e) {
@@ -971,7 +971,7 @@ class UserController extends Controller {
 			$coders = CoderOfTheMonthDAO::getAll(null,null,"time", "DESC");
 			
 			foreach ($coders as $c) {
-				$user = UsersDAO::getByPK($c->getCoderOfTheMonthId());
+				$user = UsersDAO::getByPK($c->user_id);
 				$email = EmailsDAO::getByPK($user->getMainEmailId());
 				$response["coders"][] = array(
 					"username" => $user->getUsername(),

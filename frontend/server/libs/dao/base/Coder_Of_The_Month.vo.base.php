@@ -35,6 +35,9 @@ class CoderOfTheMonth extends VO
 			if (isset($data['coder_of_the_month_id'])) {
 				$this->coder_of_the_month_id = $data['coder_of_the_month_id'];
 			}
+			if (isset($data['user_id'])) {
+				$this->user_id = $data['user_id'];
+			}
 			if (isset($data['description'])) {
 				$this->description = $data['description'];
 			}
@@ -58,6 +61,7 @@ class CoderOfTheMonth extends VO
 	{ 
 		$vec = array( 
 			"coder_of_the_month_id" => $this->coder_of_the_month_id,
+			"user_id" => $this->user_id,
 			"description" => $this->description,
 			"time" => $this->time,
 			"interview_url" => $this->interview_url
@@ -83,6 +87,13 @@ class CoderOfTheMonth extends VO
 	  * @var int(11)
 	  */
 	public $coder_of_the_month_id;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var int(11)
+	  */
+	public $user_id;
 
 	/**
 	  *  [Campo no documentado]
