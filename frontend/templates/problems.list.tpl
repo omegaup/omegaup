@@ -21,7 +21,7 @@
 		<tbody>
 			{foreach item=problem from=$problems}
 				<tr>
-				<td><a href="/arena/problem/{$problem.alias}">{$problem.title}</a></td>
+				<td><a href="/arena/problem/{$problem.alias}">{$problem.title}</a>{if $problem.public == 0} <span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}</td>
 				<td>{$problem.submissions}</td>
 				<td>{$problem.accepted}</td>
 				<td>{$problem.ratio}%</td>
