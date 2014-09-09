@@ -733,6 +733,8 @@ class UserController extends Controller {
 				}
 			} catch (NotFoundException $ex) {
 				$found = false;
+			} catch (InvalidParameterException $ex) {
+				$found = false;
 			}
 		}
 
