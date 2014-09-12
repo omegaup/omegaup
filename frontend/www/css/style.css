@@ -537,8 +537,12 @@ th.contains-long-desc{ min-width:369px; }
 	margin-bottom: 10px;
 }
 
+.search-bar #problem-search-box {
+	width: 300px;
+}
+
 .search-bar #problem-search-order {
-	width: 250px;
+	width: 200px;
 	margin-left: 10px;
 }
 

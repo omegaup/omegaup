@@ -343,6 +343,7 @@ OmegaUp.T = {
 	wordsGroups: "(Gr0up5)",
 	wordsID: "(ID)",
 	wordsJustOutput: "(Ju57 0u7pu7)",
+	wordsKeyword: "(K3yw0rd)",
 	wordsLanguage: "(Languag3)",
 	wordsLiveStatistics: "(Liv3 57a7i57ic5)",
 	wordsMember: "(M3mb3r)",
