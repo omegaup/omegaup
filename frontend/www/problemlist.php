@@ -8,6 +8,11 @@
 	$r['page'] = $page;
 	$r['order_by'] = $order_by;
 	$r['mode'] = $mode;
+	$keyword = '';
+	if (!is_null($_GET['query']) && strlen($_GET['query']) > 0) {
+		$keyword = substr($_GET['query'], 0, 256);
+		$r['query'] = $keyword;
+	}
 	$response = ProblemController::apiList($r);
 
 	$pager_items = Pager::paginate(
@@ -15,9 +20,10 @@
 		$page,
 		'/problem/list',
 		5,
-		array('order_by' => $order_by, 'mode' => $mode)
+		array('query' => $keyword, 'order_by' => $order_by, 'mode' => $mode)
 	);
 
+	$smarty->assign('KEYWORD', $keyword);
 	$smarty->assign('MODE', $mode);
 	$smarty->assign('ORDER_BY', $order_by);
 	$smarty->assign('problems', $response['results']);

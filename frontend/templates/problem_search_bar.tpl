@@ -2,6 +2,12 @@
 	<form action="/problem/list" method="GET">
 		<div class="form-inline">
 			<div class="form-group">
+				<input	class="form-control" id="problem-search-box"
+						type="text" name='query' autocomplete="off"
+						{if $KEYWORD != ''} value="{$KEYWORD}"{/if}
+						maxlength="256" placeholder="{#wordsKeyword#}">
+			</div>
+			<div class="form-group">
 				<label class="control-label" for="order_by">{#wordsOrderBy#}</label>
 				<select class="form-control" id="problem-search-order" name="order_by">
 					<option {if $ORDER_BY == 'title'}		selected="selected"{/if}	value="title">{#wordsTitle#}</option>
@@ -24,4 +30,6 @@
 			<input class="btn btn-primary btn-lg active" type="submit" value="{#wordsSearch#}" id="problem-search-button"/>
 		</div>
 	</form>
+
+	<script src='/js/search.js'></script>
 </div>

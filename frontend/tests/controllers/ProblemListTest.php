@@ -249,7 +249,7 @@ class ProblemList extends OmegaupTestCase {
 	}
 
 	/**
-	 * Test 'page', 'order_by' and 'mode' parametes of the apiList() method.
+	 * Test 'page', 'order_by' and 'mode' parametes of the apiList() method, and search by title.
 	 */
 	public function testProblemListPager() {
 		// Create a user and some problems with submissions for the tests.
@@ -275,8 +275,23 @@ class ProblemList extends OmegaupTestCase {
 		$request = new Request();
 		$request['auth_token'] = $this->login($contestant);
 		$response = ProblemController::apiList($request);
+
+		// Test search by title
+		$titles = array();
+		foreach ($response['results'] as $problem) {
+			array_push($titles, $problem['title']);
+		}
+		foreach ($titles as $title) {
+			$request['query'] = $title;
+			$response = ProblemController::apiList($request);
+			$this->assertTrue(count($response['results']) == 1);
+			$this->assertTrue($title === $response['results'][0]['title']);
+		}
+
+		$request['query'] = null;
+		$response = ProblemController::apiList($request);
 		$total = $response['total'];
-		$pages = ($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE;
+		$pages = intval(($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
 
 		// The following tests will try the different scenarios that can occur
 		// with the additions of the three features to apiList(), that is, paging,
@@ -296,7 +311,7 @@ class ProblemList extends OmegaupTestCase {
 						$request['page'] = 1;
 						$response = ProblemController::apiList($request);
 						$first = $response['results'];
-						$request['page'] = intval(floor($pages));
+						$request['page'] = $pages;
 						$response = ProblemController::apiList($request);
 						$last = $response['results'];
 
