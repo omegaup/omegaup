@@ -315,12 +315,14 @@ $(document).ready(function() {
 			var extension = file.name.split(/\./);
 			extension = extension[extension.length - 1];
 
-			if (file.type.indexOf('text/') === 0 ||
+			if ($('#submit select[name="language"]').val() != 'cat' ||
+					file.type.indexOf('text/') === 0 ||
 					extension == 'cpp' || extension == 'c' ||
 					extension == 'java' || extension == 'txt' ||
 					extension == 'hs' || extension == 'kp' ||
-					extension == 'p' || extension == 'pas' ||
-					extension == 'py' || extension == 'rb') {
+					extension == 'kj' || extension == 'p' ||
+					extension == 'pas' || extension == 'py' ||
+					extension == 'rb') {
 				if (file.size >= 10240) {
 					alert('El límite para subir archivos son 10kB');
 					return false;
