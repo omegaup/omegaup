@@ -1,16 +1,21 @@
 $('document').ready(function() {
 	$('#problem-search-box').typeahead({
-		ajax: { 
-			url: "/api/problem/list/",
-			preProcess: function(data) { 
-				return data["results"];
-			}
-		},
-		display: 'title',
-		val: 'title',
 		minLength: 3,
-		itemSelected: function(item, val, text) {
-			$('#problem-search-box').val(val);
+		highlight: true,
+	}, {
+		source: function (query, cb) {
+			omegaup.searchProblems(query, function (data) {
+				cb(data.results);
+			});
+		},
+		displayKey: 'title',
+		templates: {
+			suggestion: function (elm) {
+				return "<strong>" + elm.title + "</strong> (" + elm.alias + ")";
+			}
 		}
-	})
+	}).on('typeahead:selected', function(item, val, text) {
+			$('#problem-search-box').val(val.title);
+		}
+	);
 });

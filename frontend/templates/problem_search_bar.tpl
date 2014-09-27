@@ -2,7 +2,7 @@
 	<form action="/problem/list" method="GET">
 		<div class="form-inline">
 			<div class="form-group">
-				<input	class="form-control" id="problem-search-box"
+				<input class="form-control" id="problem-search-box"
 						type="text" name='query' autocomplete="off"
 						{if $KEYWORD != ''} value="{$KEYWORD}"{/if}
 						maxlength="256" placeholder="{#wordsKeyword#}">

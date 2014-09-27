@@ -953,6 +953,82 @@ OmegaUp.prototype.getProblems = function(callback) {
 	});
 };
 
+OmegaUp.prototype.searchProblems = function(query, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/list/',
+		{query: query},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.searchTags = function(query, callback) {
+	var self = this;
+
+	$.post(
+		'/api/tag/list/',
+		{query: query},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.searchSchools = function(query, callback) {
+	var self = this;
+
+	$.post(
+		'/api/school/list/',
+		{query: query},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.searchUsers = function(query, callback) {
+	var self = this;
+
+	$.post(
+		'/api/user/list/',
+		{query: query},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getMyProblems = function(callback) {
 	var self = this;
 

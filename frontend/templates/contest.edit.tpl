@@ -26,10 +26,9 @@
 			<div class="panel-body">
 				<form class="form" id="add-problem-form">
 					<div class="form-group">
-						<label for="problems">{#wordsProblems#}</label>
-						<select class='form-control' name='problems' id='problems'>
-							<option value=""></option>
-						</select>
+						<label for="problems-dropdown">{#wordsProblems#}</label>
+						<input class="typeahead form-control" name="problems" id="problems-dropdown" 
+							autocomplete="off" />
 					</div>
 
 					<div class="form-group">
@@ -89,8 +88,6 @@
 						<input id="username-contestant" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<input id="user-contestant" name="user" value="" type="hidden">
-
 					<button class="btn btn-primary" type='submit'>Agregar {#wordsUser#}</button>
 				</form>
 			</div>
@@ -114,8 +111,6 @@
 						<label for="username-admin">{#wordsAdmin#}</label>
 						<input id="username-admin" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
-
-					<input id="user-admin" name="user" value="" type="hidden">
 
 					<button class="btn btn-primary" type='submit'>Agregar {#wordsAdmin#}</button>
 				</form>
@@ -273,7 +268,7 @@
 		}
 
 		$('#add-problem-form').submit(function() {
-			problemAlias = $('select#problems').val();
+			problemAlias = $('input#problems-dropdown').val();
 			points = $('input#points').val();
 			order = $('input#order').val();
 
@@ -291,20 +286,38 @@
 		});
 
 		// Edit users
-		function typeahead(dest) {
-			return {
-				ajax: '/api/user/list/',
-				display: 'label',
-				val: 'label',
+		function typeahead(elm) {
+			elm.typeahead({
 				minLength: 2,
-				itemSelected: function (item, val, text) {
-					$(dest).val(val);
-				}
-			}
+				highlight: true,
+			}, {
+				source: omegaup.searchUsers,
+				displayKey: 'label',
+			}).on('typeahead:selected', function(item, val, text) {
+				elm.val(val.label);
+			});
 		};
 
-		$('#username-contestant').typeahead(typeahead('#user-contestant'));
-		$('#username-admin').typeahead(typeahead('#user-admin'));
+		typeahead($('#username-contestant'));
+		typeahead($('#username-admin'));
+		$('#problems-dropdown').typeahead({
+			minLength: 3,
+			highlight: false,
+		}, {
+			source: function (query, cb) {
+				omegaup.searchProblems(query, function (data) {
+					cb(data.results);
+				});
+			},
+			displayKey: 'alias',
+			templates: {
+				suggestion: function (elm) {
+					return "<strong>" + elm.title + "</strong> (" + elm.alias + ")";
+				}
+			}
+		}).on('typeahead:selected', function(item, val, text) {
+			$('#problems-dropdown').val(val.alias);
+		});
 
 		function refreshContestContestants() {
 			omegaup.getContestUsers(contestAlias, function(users) {
@@ -342,7 +355,7 @@
 		}
 
 		$('#add-contestant-form').submit(function() {
-			username = $("#user-contestant").val();
+			username = $("#username-contestant").val();
 			omegaup.addUserToContest(contestAlias, username, function(response) {
 				if (response.status == "ok") {
 					OmegaUp.ui.success("User successfully added!");
@@ -393,7 +406,7 @@
 		}
 
 		$('#add-admin-form').submit(function() {
-			var username = $('#user-admin').val();
+			var username = $('#username-admin').val();
 
 			omegaup.addAdminToContest(contestAlias, username, function(response) {
 				if (response.status == "ok") {

@@ -31,8 +31,8 @@
 		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
 		<link rel="stylesheet" href="/css/bootstrap-datepicker.css">
 		<script type="text/javascript" src="/js/bootstrap-datepicker.js"></script>
-		<!-- Bootstrap typeahead plugin from https://github.com/tcrosen/twitter-bootstrap-typeahead -->
-		<script type="text/javascript" src="/js/bootstrap-typeahead.js"></script>
+		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
+		<script type="text/javascript" src="/js/typeahead.jquery.js"></script>
 		<!-- Bootstrap timepicker plugin from https://github.com/jdewit/bootstrap-timepicker
 		<link rel="stylesheet" href="/css/bootstrap-timepicker.min.css">
 		<script type="text/javascript" src="/js/bootstrap-timepicker.min.js"></script> -->

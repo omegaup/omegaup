@@ -29,14 +29,14 @@
 				
 <script>
 	$("#username").typeahead({
-		ajax: "/api/user/list/",
-		display: 'label',
-		val: 'label',
 		minLength: 2,
-		itemSelected: function (item, val, text) {
-			$("#user").val(val);
-		}
-    });
+		highlight: true,
+	}, {
+		source: omegaup.searchUsers,
+		displayKey: 'label',
+	}).on('typeahead:selected', function(item, val, text) {
+		$("#username").val(val.label);
+	});
 	
 	$('#change-password-form').submit(function() {
 		password = $('#password').val();

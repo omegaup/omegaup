@@ -282,6 +282,7 @@ OmegaUp.T = {
 	rankViewFull: "(Vi3w fu11 rank)",
 	runNotFound: "(Run n07 f0und)",
 	schoolNotFound: "(Sch001 n07 f0und)",
+	schoolToBeAdded: "(Y0ur 5ch001 ha5 n07 b33n r3gi573r3d in 0m3gaUp. I7 wi11 b3 add3d wh3n y0u 5av3 y0ur chang35.)",
 	scoreboardmerge: "(M3rg3 5c0rb0ard)",
 	selectAction: "(S313c7 ac7i0n)",
 	sortByMyScore: "(S0r7 by my 5c0r3)",

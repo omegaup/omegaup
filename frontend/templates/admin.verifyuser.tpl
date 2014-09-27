@@ -13,7 +13,6 @@
 				<label for="username">Username</label>
 				<input id='username' name='username' value='' type='text' size='20' class="form-control" />
 			</div>
-			<input id='user' name='user' value='' type='hidden'>
 			
 			<button class="btn btn-primary" type='submit'>Verify user</button>
 		</form>		
@@ -22,18 +21,17 @@
 
 <script>
 	$("#username").typeahead({
-		ajax: "/api/user/list/",
-		display: 'label',
-		val: 'label',
 		minLength: 2,
-		itemSelected: function (item, val, text) {
-			$("#user").val(val);
-		}
-    });
-	
+		highlight: true,
+	}, {
+		source: omegaup.searchUsers,
+		displayKey: 'label',
+	}).on('typeahead:selected', function(item, val, text) {
+		$("#username").val(val.label);
+	});
 	
 	$('#verify-user-form').submit(function() {		
-		username = $("#user").val();
+		username = $("#username").val();
 		
 		omegaup.forceVerifyEmail(username, function(response) {
 			if (response.status == "ok") {

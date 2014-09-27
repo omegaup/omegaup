@@ -282,6 +282,7 @@ OmegaUp.T = {
 	rankViewFull: "View full rank",
 	runNotFound: "Run not found",
 	schoolNotFound: "School not found",
+	schoolToBeAdded: "Your school has not been registered in omegaUp. It will be added when you save your changes.",
 	scoreboardmerge: "Merge scorboard",
 	selectAction: "Select action",
 	sortByMyScore: "Sort by my score",

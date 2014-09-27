@@ -291,12 +291,6 @@
 						<input id='school_id' name='school_id' value='' type='hidden'>
 					</div>
 
-					<div class="form-group" id="school-found">
-						<div class="col-md-offset-3 col-md-7">
-							<div class="alert alert-info">Tu escuela aún no existe en OmegaUp. Será agregada cuando guardes tus cambios.</div>
-						</div>
-					</div>
-
 					<div class="form-group">
 						<label for="locale" class="col-md-3 control-label">{#wordsLanguage#}</label>
 						<div class="col-md-7">
@@ -386,26 +380,19 @@
 {literal}
 		$("#birth_date").datepicker();
 		$("#graduation_date").datepicker();
-		
-		$("#school-found").hide();
+	
+		$('#school_id').val(-1);	
 		$("#school").typeahead({
-			ajax: {
-				url: "/api/school/list/",
-				preProcess: function (data) {
-					if (data.length === 0) {
-						$("#school-found").slideDown();
-						$("#school_id").val(-1);
-					} else {
-						$("#school-found").slideUp();
-					}
-					return data;
-				}
-			},
-			display: 'label',
 			minLength: 2,
-			itemSelected: function (item, val, text) {
-				$("#school_id").val(val);											
+			highlight: true,
+		}, {
+			source: omegaup.searchSchools,
+			displayKey: 'label',
+			templates: {
+				empty: OmegaUp.T.schoolToBeAdded,
 			}
+		}).on('typeahead:selected', function(item, val, text) {
+			$("#school_id").val(val.label);
 		});
 		
 		$('#country_id').change(function () {

@@ -70,8 +70,6 @@
 						<input id="username-admin" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<input id="user-admin" name="user" value="" type="hidden">
-
 					<button class="btn btn-primary" type='submit'>Agregar {#wordsAdmin#}</button>
 				</form>
 			</div>
@@ -137,30 +135,29 @@
 
 		// Add typeaheads
 		refreshProblemAdmins();
-		$('#username-admin').typeahead({
-			ajax: '/api/user/list/',
-			display: 'label',
-			val: 'label',
+		$("#username-admin").typeahead({
 			minLength: 2,
-			itemSelected: function (item, val, text) {
-				$('#user-admin').val(val);
-			}
+			highlight: true,
+		}, {
+			source: omegaup.searchUsers,
+			displayKey: 'label',
+		}).on('typeahead:selected', function(item, val, text) {
+			$("#username-admin").val(val.label);
 		});
 
 		refreshProblemTags();
-		$('#tag-name').typeahead({
-			ajax: '/api/tag/list/',
-			hint: true,
+		$("#tag-name").typeahead({
+			minLength: 2,
 			highlight: true,
-			display: 'name',
-			val: 'name',
-			itemSelected: function (item, val, text) {
-				$('#tag-name').val(val);
-			}
+		}, {
+			source: omegaup.searchTags,
+			displayKey: 'name',
+		}).on('typeahead:selected', function(item, val, text) {
+			$("#tag-name").val(val.name);
 		});
 
 		$('#add-admin-form').submit(function() {
-			var username = $('#user-admin').val();
+			var username = $('#username-admin').val();
 
 			omegaup.addAdminToProblem(problemAlias, username, function(response) {
 				if (response.status === "ok") {
