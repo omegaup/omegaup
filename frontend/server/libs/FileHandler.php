@@ -42,12 +42,12 @@ class FileHandler {
 
 		// Write to file
 		if (!fwrite($handle, $contents)) {
-			throw new RuntimeException("Not able to write in file. ");
+			throw new RuntimeException("Not able to write '$contents' in file. $filename");
 		}
 
 		// Close file
 		if (!fclose($handle)) {
-			throw new RuntimeException("Not able to close recently created file. ");
+			throw new RuntimeException("Not able to close recently created file. $filename");
 		}
 	}
 
