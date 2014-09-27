@@ -11,6 +11,7 @@ class UserController extends Controller {
 
 	public static $sendEmailOnVerify = true;
 	public static $redirectOnVerify = true;
+	private static $permissionKey = null;
 
 	/**
 	 * Entry point for Create a User API
@@ -63,6 +64,10 @@ class UserController extends Controller {
 		}
 		if (isset($r['facebook_user_id'])) {
 			$user_data['facebook_user_id'] = $r['facebook_user_id'];
+		}
+		if (!is_null(self::$permissionKey) &&
+		    self::$permissionKey == $r['permission_key']) {
+			$user_data['verified'] = 1;
 		}
 		$user = new Users($user_data);
 
@@ -317,7 +322,9 @@ class UserController extends Controller {
 		self::authenticateRequest($r);
 
 		$hashedPassword = NULL;
-		if (Authorization::IsSystemAdmin($r["current_user_id"]) && isset($r["username"])) {
+		if (isset($r["username"]) &&
+			((!is_null(self::$permissionKey) && self::$permissionKey == $r['permission_key']) ||
+			Authorization::IsSystemAdmin($r["current_user_id"]))) {
 			// System admin can force reset passwords for any user
 			Validators::isStringNonEmpty($r["username"], "username");
 			
@@ -464,7 +471,6 @@ class UserController extends Controller {
 	 * @param string $password
 	 */
 	private static function omiPrepareUser(Request $r, $username, $password) {
-
 		try {
 			$user = UsersDAO::FindByUsername($username);
 		} catch (Exception $e) {
@@ -474,15 +480,15 @@ class UserController extends Controller {
 		if (is_null($user)) {
 			self::$log->info("Creating user: " . $username);
 			$createRequest = new Request(array(
-						"username" => $username,
-						"password" => $password,
-						"email" => $username . "@omi.com",
-					));
+				"username" => $username,
+				"password" => $password,
+				"email" => $username . "@omi.com",
+			));
 
 			UserController::$sendEmailOnVerify = false;
 			self::apiCreate($createRequest);
+			return true;
 		} else if (is_null($r["change_password"]) || $r["change_password"] !== "false") {
-			
 			if (!$user->getVerified()) {
 				self::apiVerifyEmail(new Request(array(
 					"auth_token" => $r["auth_token"],
@@ -495,8 +501,12 @@ class UserController extends Controller {
 			$resetRequest["auth_token"] = $r["auth_token"];
 			$resetRequest["username"] = $username;
 			$resetRequest["password"] = $password;
+			$resetRequest['permission_key'] = $r['permission_key'];
 			self::apiChangePassword($resetRequest);
-		}		
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -559,15 +569,16 @@ class UserController extends Controller {
 			}
 			
 			$keys = array (				
-				"GTO-SFR" => 17,
-				"GTO-URI" => 25,
-				"GTO-IRA" => 19,
-				"GTO-LEO" => 22,
-				"GTO-VDS" => 17,
-				"GTO-GTO" => 13,
-				"GTO-CEL" => 14,
-				"GTO-SIL" => 19,
-				"GTO-PEN" => 19,
+				"ORIG14-SFR" => 11,
+				"ORIG14-URI" => 15,
+				"ORIG14-LEO" => 33,
+				"ORIG14-VDS" => 10,
+				"ORIG14-GTO" => 12,
+				"ORIG14-CEL" => 28,
+				"ORIG14-IRA" => 30,
+				"ORIG14-SLV" => 6,
+				"ORIG14-JUV" => 10,
+				"ORIG14-DHI" => 11,
 			);
 			
 		} else if ($r["contest_type"] == "OMIAGS") {
@@ -583,17 +594,17 @@ class UserController extends Controller {
 			throw new InvalidParameterException("parameterNotInExpectedSet", "contest_type",
 				array("bad_elements" => $r["contest_type"], "expected_set" => "OMI, OMIAGS, ORIG"));
 		}
-		
-		
-			
-		foreach ($keys as $k => $n) {
-						
-			for ($i = 1; $i <= $n; $i++) {
 
+		self::$permissionKey = $r['permission_key'] = self::randomString(32);
+		
+		foreach ($keys as $k => $n) {
+			for ($i = 1; $i <= $n; $i++) {
 				$username = $k . "-" . $i;
 				$password = self::randomString(8);
 
-				self::omiPrepareUser($r, $username, $password);
+				if (self::omiPrepareUser($r, $username, $password)) {
+					$response[$username] = $password;
+				}
 		
 				// Add user to contest if needed
 				if (!is_null($r["contest_alias"])) {
@@ -602,10 +613,6 @@ class UserController extends Controller {
 					$addUserRequest["usernameOrEmail"] = $username;
 					$addUserRequest["contest_alias"] = $r["contest_alias"];
 					ContestController::apiAddUser($addUserRequest);
-				}
-				
-				if (is_null($r["change_password"]) || $r["change_password"] !== "false") {
-					$response[$username] = $password;
 				}
 			}
 		}
