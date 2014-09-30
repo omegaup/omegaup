@@ -9,7 +9,7 @@
 	$r['order_by'] = $order_by;
 	$r['mode'] = $mode;
 	$keyword = '';
-	if (!is_null($_GET['query']) && strlen($_GET['query']) > 0) {
+	if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {
 		$keyword = substr($_GET['query'], 0, 256);
 		$r['query'] = $keyword;
 	}

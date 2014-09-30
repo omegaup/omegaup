@@ -5,6 +5,7 @@ class Pager {
 	 */
 	public static function buildQueryString($dict) {
 		$params = array();
+		$str = '';
 		foreach ($dict as $key => $val) {
 			$str .= "$key=$val";
 			$params[] = urlencode($key) . '=' . urlencode($val);
