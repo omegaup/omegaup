@@ -169,7 +169,7 @@ class ContestController extends Controller {
 			throw new NotFoundException("Contest not found");
 		}
 		
-		if ($r["contest"]->getPublic() === '0') {
+		if ($r["contest"]->public != 1) {
 			try {
 				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 					throw new ForbiddenAccessException();

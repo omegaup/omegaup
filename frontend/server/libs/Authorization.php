@@ -51,8 +51,12 @@ class Authorization {
 			return false;
 		}
 
+		if ($clarification->author_id === $user_id) {
+			return true;
+		}
+
 		try {
-			$contest = ContestsDAO::getByPK($clarification->getContestId());
+			$contest = ContestsDAO::getByPK($clarification->contest_id);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -61,8 +65,7 @@ class Authorization {
 			return false;
 		}
 
-		return ($clarification->getAuthorId() === $user_id
-				|| Authorization::IsContestAdmin($user_id, $contest));
+		return Authorization::IsContestAdmin($user_id, $contest);
 	}
 
 	public static function CanEditClarification($user_id, Clarifications $clarification) {
