@@ -394,6 +394,7 @@ OmegaUp.T = {
 	wordsTotal: "Total",
 	wordsUser: "Usuario",
 	wordsValidator: "Validador",
+	wordsVerdict: "Veredicto",
 	wordsYes: "Sí",
 	youMustOpenBeforeSubmit: "",
 };

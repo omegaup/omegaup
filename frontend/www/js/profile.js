@@ -1,7 +1,7 @@
 	var username = $('#username').attr("data-username");
 	
 	omegaup.getUserStats(username, function(data) {		
-		window.run_counts_chart = oGraph.veredictCounts('veredict-chart', username, data);	
+		window.run_counts_chart = oGraph.verdictCounts('verdict-chart', username, data);	
 	});
 	
 	omegaup.getContestStatsForUser(username, function(data){

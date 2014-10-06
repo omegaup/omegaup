@@ -8,7 +8,7 @@
 	<div class="copy">
 		<h1>Estadísticas en vivo</h1>				
 		<h2><div id="total-runs"></div> </h2>
-		<div id="veredict-chart"></div>
+		<div id="verdict-chart"></div>
 		<div id="distribution-chart"></div>
 		<div id="pending-runs-chart"></div>
 	</div>
@@ -56,8 +56,8 @@
 			return;
 		}
 
-		// Draw veredict counts pie chart
-		window.run_counts_chart = oGraph.veredictCounts('veredict-chart', '{$smarty.get.contest}', stats);
+		// Draw verdict counts pie chart
+		window.run_counts_chart = oGraph.verdictCounts('verdict-chart', '{$smarty.get.contest}', stats);
 				
 		// Draw distribution of scores chart
 		window.distribution_chart = oGraph.distributionChart('distribution-chart', '{$smarty.get.contest}', stats);

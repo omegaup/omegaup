@@ -30,7 +30,7 @@
 			<td class="numeric">{$case.meta.time|string_format:"%.3f"}</td>
 			<td class="numeric">{$case.meta['time-wall']|string_format:"%.3f"}</td>
 			<td class="numeric">{$case.meta.mem|string_format:"%.2f"}</td>
-			<td>{$case.veredict}</td>
+			<td>{$case.verdict}</td>
 			<td>{$case.score}</td>
 			<td>{if isset($case.out_diff)}<pre>{$case.out_diff|escape:'html'}</pre>{/if}</td>
 			</tr>

@@ -39,7 +39,7 @@ class RunStatusTest extends OmegaupTestCase {
 		$response = RunController::apiStatus($r);
 		
 		$this->assertEquals($r["run_alias"], $response["guid"]);
-        $this->assertEquals("JE", $response["veredict"]);
+        $this->assertEquals("JE", $response["verdict"]);
         $this->assertEquals("new", $response["status"]);
 		
 	}

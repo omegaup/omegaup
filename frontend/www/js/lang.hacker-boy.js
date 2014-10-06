@@ -394,6 +394,7 @@ OmegaUp.T = {
 	wordsTotal: "(T07a1)",
 	wordsUser: "(U53r)",
 	wordsValidator: "(Va1ida70r)",
+	wordsVerdict: "(V3rdic7)",
 	wordsYes: "(Y35)",
 	youMustOpenBeforeSubmit: "(Y0u mu57 0p3n 7h3 pr0b13m b3f0r3 7rying 70 5ubmi7 a 501u7i0n.)",
 };

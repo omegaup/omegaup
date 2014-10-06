@@ -82,10 +82,10 @@ class RunsDAO extends RunsDAOBase {
 						FROM
 							Runs rr
 						WHERE
-							rr.problem_id = ? AND rr.veredict = \'AC\' AND rr.test = 0 GROUP BY rr.user_id
+							rr.problem_id = ? AND rr.verdict = \'AC\' AND rr.test = 0 GROUP BY rr.user_id
 					) AS sr ON sr.user_id = r.user_id AND sr.runtime = r.runtime
 				WHERE
-					r.problem_id = ? AND r.veredict = \'AC\' AND r.test = 0
+					r.problem_id = ? AND r.verdict = \'AC\' AND r.test = 0
 				GROUP BY
 					r.user_id, r.runtime
 				ORDER
@@ -125,8 +125,8 @@ class RunsDAO extends RunsDAOBase {
 		return $ar;
 	}
 
-	public static final function GetAllRuns($contest_id, $status, $veredict, $problem_id, $language, $user_id, $offset, $rowcount) {
-		$sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.veredict, r.runtime, ' .
+	public static final function GetAllRuns($contest_id, $status, $verdict, $problem_id, $language, $user_id, $offset, $rowcount) {
+		$sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, ' .
 				'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
 				'r.submit_delay, u.username, p.alias ' .
 				'FROM Runs r ' .
@@ -144,9 +144,9 @@ class RunsDAO extends RunsDAOBase {
 			$where[] = 'r.status = ?';
 			$val[] = $status;
 		}
-		if (!is_null($veredict)) {
-			$where[] = 'r.veredict = ?';
-			$val[] = $veredict;
+		if (!is_null($verdict)) {
+			$where[] = 'r.verdict = ?';
+			$val[] = $verdict;
 		}
 		if (!is_null($problem_id)) {
 			$where[] = 'r.problem_id = ?';
@@ -265,13 +265,13 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	/*
-	 * Gets the count of total runs sent to a given contest by veredict
+	 * Gets the count of total runs sent to a given contest by verdict
 	 */
 
-	public static final function CountTotalRunsOfContestByVeredict($contest_id, $veredict, $showAllRuns = false) {
+	public static final function CountTotalRunsOfContestByVerdict($contest_id, $verdict, $showAllRuns = false) {
 		// Build SQL statement.
-		$sql = "SELECT COUNT(*) FROM Runs WHERE contest_id = ? AND veredict = ? ";
-		$val = array($contest_id, $veredict);
+		$sql = "SELECT COUNT(*) FROM Runs WHERE contest_id = ? AND verdict = ? ";
+		$val = array($contest_id, $verdict);
 
 		if (!$showAllRuns) {
 			$sql .= ' AND test = 0';
@@ -282,13 +282,13 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	/*
-	 * Gets the count of total runs sent to a given contest by veredict
+	 * Gets the count of total runs sent to a given contest by verdict
 	 */
 
-	public static final function CountTotalRunsOfProblemByVeredict($problem_id, $veredict, $showAllRuns = false) {
+	public static final function CountTotalRunsOfProblemByVerdict($problem_id, $verdict, $showAllRuns = false) {
 		// Build SQL statement.
-		$sql = "SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND veredict = ? ";
-		$val = array($problem_id, $veredict);
+		$sql = "SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND verdict = ? ";
+		$val = array($problem_id, $verdict);
 
 		if (!$showAllRuns) {
 			$sql .= ' AND test = 0';
@@ -299,13 +299,13 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	/*
-	 * Gets the count of total runs sent to a given contest by veredict
+	 * Gets the count of total runs sent to a given contest by verdict
 	 */
 
-	public static final function CountTotalRunsOfUserByVeredict($user_id, $veredict, $showAllRuns = false) {
+	public static final function CountTotalRunsOfUserByVerdict($user_id, $verdict, $showAllRuns = false) {
 		// Build SQL statement.
-		$sql = "SELECT COUNT(*) FROM Runs WHERE user_id = ? AND veredict = ? ";
-		$val = array($user_id, $veredict);
+		$sql = "SELECT COUNT(*) FROM Runs WHERE user_id = ? AND verdict = ? ";
+		$val = array($user_id, $verdict);
 
 		if (!$showAllRuns) {
 			$sql .= ' AND test = 0';
@@ -346,7 +346,7 @@ class RunsDAO extends RunsDAOBase {
 		if (!$showAllRuns) {
 			$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( "
 					. "SELECT DISTINCT Runs.user_id from Runs "
-					. "WHERE ( Runs.veredict NOT IN ('CE', 'JE') AND Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) "
+					. "WHERE ( Runs.verdict NOT IN ('CE', 'JE') AND Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) "
 				. "RunsContests ON Users.user_id = RunsContests.user_id " . (!is_null($filterUsersBy) ? "WHERE Users.username LIKE ?" : "");
 
 			if (is_null($filterUsersBy)) {
@@ -388,8 +388,8 @@ class RunsDAO extends RunsDAOBase {
 					. "AND status = 'ready' "
 					. "AND Test = '0' " .
 					(($onlyAC === false) ? 
-						"AND veredict NOT IN ('CE', 'JE') " :
-						"AND veredict IN ('AC') ")
+						"AND verdict NOT IN ('CE', 'JE') " :
+						"AND verdict IN ('AC') ")
 				. "ORDER BY ?;";
 		
 		$val = array($contest_id, $order_by_column);
@@ -478,7 +478,7 @@ class RunsDAO extends RunsDAOBase {
 
 	public static final function GetWrongRuns($contest_id, $problem_id, $user_id, $run_id, $showAllRuns) {
 		//Build SQL statement
-		$sql = "SELECT COUNT(*) AS wrong_runs FROM Runs WHERE user_id = ? AND contest_id = ? AND problem_id = ? AND veredict != 'JE' AND veredict != 'CE' AND run_id < ? " . ($showAllRuns ? "" : " AND test = 0 ");
+		$sql = "SELECT COUNT(*) AS wrong_runs FROM Runs WHERE user_id = ? AND contest_id = ? AND problem_id = ? AND verdict != 'JE' AND verdict != 'CE' AND run_id < ? " . ($showAllRuns ? "" : " AND test = 0 ");
 		$val = array($user_id, $contest_id, $problem_id, $run_id);
 
 		global $conn;
@@ -488,12 +488,12 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	/*
-	 * Get runs of a user with veredict eq AC
+	 * Get runs of a user with verdict eq AC
 	 */
 
 	public static final function GetRunsByUser($user_id) {
 		// SQL sentence
-		$sql = "SELECT DISTINCT * FROM Runs WHERE user_id = ? AND veredict = 'AC'";
+		$sql = "SELECT DISTINCT * FROM Runs WHERE user_id = ? AND verdict = 'AC'";
 		$val = array($user_id);
 
 		global $conn;
@@ -542,7 +542,7 @@ class RunsDAO extends RunsDAOBase {
 
 	public static function GetAcRunCountsToDate($date) {
 
-		$sql = "select count(*) as total from Runs where veredict = 'AC' and time <= ?";
+		$sql = "select count(*) as total from Runs where verdict = 'AC' and time <= ?";
 		$val = array($date);
 
 		global $conn;
@@ -602,13 +602,13 @@ class RunsDAO extends RunsDAOBase {
 			array_push($val, $Runs->getStatus());
 		}
 
-		if ($Runs->getVeredict() != NULL) {
-			if ($Runs->getVeredict() == "NO-AC") {
-				$sql .= " veredict != ? AND";
+		if ($Runs->getVerdict() != NULL) {
+			if ($Runs->getVerdict() == "NO-AC") {
+				$sql .= " verdict != ? AND";
 				array_push($val, "AC");
 			} else {
-				$sql .= " veredict = ? AND";
-				array_push($val, $Runs->getVeredict());
+				$sql .= " verdict = ? AND";
+				array_push($val, $Runs->getVerdict());
 			}
 		}
 

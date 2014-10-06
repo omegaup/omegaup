@@ -84,7 +84,7 @@ for row in cur.fetchall():
 
 	# Add run
 	cur.execute("""INSERT INTO Runs (
-		user_id, problem_id, contest_id, guid, language, status, veredict, runtime,
+		user_id, problem_id, contest_id, guid, language, status, verdict, runtime,
 		memory, score, contest_score, ip, submit_delay, test, judged_by, time
 	) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""",
 	(row[1], row[2], new_id, hashlib.md5(new_alias + row[4]).hexdigest()) + row[5:13] + row[14:] + (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()),))

@@ -261,12 +261,12 @@ class ProblemList extends OmegaupTestCase {
 			for ($r = 0; $r < $runs; $r++) {
 				$runData = RunsFactory::createRunToProblem($problemData[$i], $contestant);
 				$points = rand(0, 100);
-				$veredict = 'WA';
+				$verdict = 'WA';
 				if ($points > 0) {
-					$veredict = ($points == 100) ? 'AC' : 'PA';
+					$verdict = ($points == 100) ? 'AC' : 'PA';
 				}
 
-				RunsFactory::gradeRun($runData, $points / 100, $veredict);
+				RunsFactory::gradeRun($runData, $points / 100, $verdict);
 			}
 		}
 		RunController::$defaultSubmissionGap = 100;

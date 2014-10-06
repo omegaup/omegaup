@@ -1,12 +1,19 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** GroupsUsers Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link GroupsUsers }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class GroupsUsersDAOBase extends DAO
@@ -25,13 +32,13 @@ abstract class GroupsUsersDAOBase extends DAO
 	  * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Groups_Users )
+	public static final function save( $Groups_Users )
 	{
-		if( ! is_null ( self::getByPK(  $Groups_Users->getGroupId() , $Groups_Users->getUserId() ) ) )
+		if (!is_null(self::getByPK( $Groups_Users->getGroupId() , $Groups_Users->getUserId() )))
 		{
-			try{ return GroupsUsersDAOBase::update( $Groups_Users) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return GroupsUsersDAOBase::create( $Groups_Users) ; } catch(Exception $e){ throw $e; }
+			return GroupsUsersDAOBase::update( $Groups_Users);
+		} else {
+			return GroupsUsersDAOBase::create( $Groups_Users);
 		}
 	}
 
@@ -40,7 +47,7 @@ abstract class GroupsUsersDAOBase extends DAO
 	  *	Obtener {@link GroupsUsers} por llave primaria. 
 	  *	
 	  * Este metodo cargara un objeto {@link GroupsUsers} de la base de datos 
-      * usando sus llaves primarias. 
+	  * usando sus llaves primarias. 
 	  *	
 	  *	@static
 	  * @return @link GroupsUsers Un objeto del tipo {@link GroupsUsers}. NULL si no hay tal registro.
@@ -48,20 +55,14 @@ abstract class GroupsUsersDAOBase extends DAO
 	public static final function getByPK(  $group_id, $user_id )
 	{
 		if(  is_null( $group_id ) || is_null( $user_id )  ){ return NULL; }
-            if(!is_null( self::$redisConection ) && !is_null($obj = self::$redisConection->get( "GroupsUsers-" . $group_id."-" . $user_id ))){
-                Logger::log("REDIS !");
-                return new GroupsUsers($obj);
-            }
 		$sql = "SELECT * FROM Groups_Users WHERE (group_id = ? AND user_id = ? ) LIMIT 1;";
 		$params = array(  $group_id, $user_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0) return NULL;
 		$foo = new GroupsUsers( $rs );
-		if(!is_null(self::$redisConection)) self::$redisConection->set(  "GroupsUsers-" . $group_id."-" . $user_id, $foo );
 		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -82,7 +83,7 @@ abstract class GroupsUsersDAOBase extends DAO
 	{
 		$sql = "SELECT * from Groups_Users";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -93,7 +94,6 @@ abstract class GroupsUsersDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new GroupsUsers($foo);
     		array_push( $allData, $bar);
-                if(!is_null(self::$redisConection)) self::$redisConection->set(  "GroupsUsers-" . $bar->getGroupId()."-" . $bar->getUserId(), $bar );
 		}
 		return $allData;
 	}
@@ -123,53 +123,58 @@ abstract class GroupsUsersDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Groups_Users , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Groups_Users , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Groups_Users instanceof GroupsUsers)) {
+			return self::search(new GroupsUsers($Groups_Users));
+		}
+
 		$sql = "SELECT * from Groups_Users WHERE ("; 
 		$val = array();
-		if( ! is_null( $Groups_Users->getGroupId() ) ){
+		if (!is_null( $Groups_Users->getGroupId())) {
 			$sql .= " `group_id` = ? AND";
 			array_push( $val, $Groups_Users->getGroupId() );
 		}
-
-		if( ! is_null( $Groups_Users->getUserId() ) ){
+		if (!is_null( $Groups_Users->getUserId())) {
 			$sql .= " `user_id` = ? AND";
 			array_push( $val, $Groups_Users->getUserId() );
 		}
-
-		if(sizeof($val) == 0){return self::getAll(/* $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' */);}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new GroupsUsers($foo);
-    		array_push( $ar,$bar);
-                    if(!is_null(self::$redisConection)) self::$redisConection->set(  "GroupsUsers-" . $bar->getGroupId()."-" . $bar->getUserId(), $bar );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cuántas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers a actualizar.
 	  **/
-	private static final function update( $Groups_Users )
+	private static final function update($Groups_Users)
 	{
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -180,26 +185,23 @@ abstract class GroupsUsersDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto GroupsUsers dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers a crear.
 	  **/
-	private static final function create( &$Groups_Users )
+	private static final function create( $Groups_Users )
 	{
 		$sql = "INSERT INTO Groups_Users ( `group_id`, `user_id` ) VALUES ( ?, ?);";
 		$params = array( 
-			$Groups_Users->getGroupId(), 
-			$Groups_Users->getUserId(), 
+			$Groups_Users->group_id,
+			$Groups_Users->user_id,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */   /*  */ 
+ 
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -262,19 +264,17 @@ abstract class GroupsUsersDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, $bar = new GroupsUsers($foo));
-                    if(!is_null(self::$redisConection)) self::$redisConection->set(  "GroupsUsers-" . $bar->getGroupId()."-" . $bar->getUserId(), $bar );
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new GroupsUsers($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -289,7 +289,7 @@ abstract class GroupsUsersDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param GroupsUsers [$Groups_Users] El objeto de tipo GroupsUsers a eliminar
 	  **/
-	public static final function delete( &$Groups_Users )
+	public static final function delete( $Groups_Users )
 	{
 		if( is_null( self::getByPK($Groups_Users->getGroupId(), $Groups_Users->getUserId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Groups_Users WHERE  group_id = ? AND user_id = ?;";

@@ -194,7 +194,7 @@ class Problems extends VO
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var set('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11')
+	  * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11')
 	  */
 	public $languages;
 

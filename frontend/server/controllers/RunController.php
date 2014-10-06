@@ -41,7 +41,7 @@ class RunController extends Controller {
 			// Check that problem exists
 			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
 
-			Validators::isInEnum($r["language"], "language", array('kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'cat', 'hs'));
+			Validators::isInEnum($r["language"], "language", array('kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'cat', 'hs'));
 			Validators::isStringNonEmpty($r["source"], "source");
 
 			// Check for practice or public problem, there is no contest info in this scenario
@@ -210,7 +210,7 @@ class RunController extends Controller {
 					"ip" => $_SERVER['REMOTE_ADDR'],
 					"submit_delay" => $submit_delay, /* based on penalty_time_start */
 					"guid" => md5(uniqid(rand(), true)),
-					"veredict" => "JE",
+					"verdict" => "JE",
 					"test" => $test
 				));
 
@@ -313,7 +313,7 @@ class RunController extends Controller {
 		}
 
 		// Fill response
-		$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+		$relevant_columns = array("guid", "language", "status", "verdict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
 		$filtered = $r["run"]->asFilteredArray($relevant_columns);
 		$filtered['time'] = strtotime($filtered['time']);
 		$filtered['score'] = round((float) $filtered['score'], 4);
@@ -577,7 +577,7 @@ class RunController extends Controller {
 					$case_name = $case['name'];
 					$zip->add_file_from_path("$case_name.out", "$grade_dir/$case_name.out");
 
-					if (!$validator && $case['veredict'] == 'OK' && ($case['score'] < 1)) {
+					if (!$validator && $case['verdict'] == 'OK' && ($case['score'] < 1)) {
 						$out_diff = `diff -wauBbi $problem_dir/$case_name.out $grade_dir/$case_name.out | tail -n +3 | head -n50`;
 						$zip->add_file("$case_name.out.diff", $out_diff);
 					}
@@ -686,7 +686,7 @@ class RunController extends Controller {
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
 		Validators::isInEnum($r["status"], "status", array('new', 'waiting', 'compiling', 'running', 'ready'), false);
-		Validators::isInEnum($r["veredict"], "veredict", array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"), false);
+		Validators::isInEnum($r["verdict"], "verdict", array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"), false);
 
 
 		// Check filter by problem, is optional
@@ -705,7 +705,7 @@ class RunController extends Controller {
 			}
 		}
 
-		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj', 'cat', 'hs'), false);
+		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs'), false);
 		
 		// Get user if we have something in username
 		if (!is_null($r["username"])) {
@@ -736,7 +736,7 @@ class RunController extends Controller {
 			$runs = RunsDAO::GetAllRuns(
 				null,
 				$r["status"],
-				$r["veredict"],
+				$r["verdict"],
 				!is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
 				$r["language"],
 				!is_null($r["user"]) ? $r["user"]->getUserId() : null,

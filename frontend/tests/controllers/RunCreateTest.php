@@ -101,7 +101,7 @@ class RunCreateTest extends OmegaupTestCase {
 			$this->assertEquals((time() - intval(strtotime($contest->getStartTime()))) / 60, $run->getSubmitDelay(), '', 0.5);
 		}
 		
-		$this->assertEquals("JE", $run->getVeredict());
+		$this->assertEquals("JE", $run->getVerdict());
 	}
 
 	/**

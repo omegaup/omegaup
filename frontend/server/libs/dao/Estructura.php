@@ -18,7 +18,6 @@
 		{
 			protected static $isTrans = false;
 			protected static $transCount = 0;
-			protected static $redisConection = NULL;
 			protected static function log ($m = null) {
 				// Your logging call here.
 			}

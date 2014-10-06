@@ -87,7 +87,7 @@ class UsersDAO extends UsersDAOBase
 								   INNER JOIN (
 									   SELECT COUNT( * ) AS TotalPerProblem, problem_id, user_id
 									   FROM Runs
-									   WHERE Runs.veredict =  'AC'
+									   WHERE Runs.verdict =  'AC'
 									   AND Runs.test =0
 									   GROUP BY user_id, problem_id
 									   ORDER BY TotalPerProblem DESC
@@ -155,7 +155,7 @@ class UsersDAO extends UsersDAOBase
 										FROM
 											Runs r
 										WHERE
-											r.veredict = 'AC' AND r.test = 0
+											r.verdict = 'AC' AND r.test = 0
 									) AS up
 								INNER JOIN
 									Problems ps ON ps.problem_id = up.problem_id and ps.public = 1

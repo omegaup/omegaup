@@ -144,8 +144,8 @@
 							<button class="runspagerprev">&lt;</button>
 							<button class="runspagernext">&gt;</button>
 							
-							<label for="runsveredict">Veredicto: </label>
-							<select class="runsveredict" name="runsveredict">
+							<label for="runsverdict">{#wordsVerdict#}: </label>
+							<select class="runsverdict" name="runsverdict">
 								<option value="">{#wordsAll#}</option>
 								<option value="AC">AC</option>
 								<option value="PA">PA</option>
@@ -183,7 +183,7 @@
 								<option value="c">C</option>
 								<option value="hs">Haskell</option>
 								<option value="java">Java</option>
-								<option value="p">Pascal</option>
+								<option value="pas">Pascal</option>
 								<option value="py">Python</option>
 								<option value="rb">Ruby</option>
 								<option value="kp">Karel (Pascal)</option>
@@ -304,7 +304,7 @@
 						<option value="c">C</option>
 						<option value="hs">Haskell</option>
 						<option value="java">Java</option>
-						<option value="p">Pascal</option>
+						<option value="pas">Pascal</option>
 						<option value="py">Python</option>
 						<option value="rb">Ruby</option>
 						<option value="kp">Karel (Pascal)</option>

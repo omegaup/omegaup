@@ -1520,7 +1520,7 @@ class ContestController extends Controller {
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
 		Validators::isInEnum($r["status"], "status", array('new', 'waiting', 'compiling', 'running', 'ready'), false);
-		Validators::isInEnum($r["veredict"], "veredict", array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"), false);
+		Validators::isInEnum($r["verdict"], "verdict", array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"), false);
 
 
 		// Check filter by problem, is optional
@@ -1539,7 +1539,7 @@ class ContestController extends Controller {
 			}
 		}
 
-		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'p', 'kp', 'kj'), false);
+		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj'), false);
 
 		// Get user if we have something in username
 		if (!is_null($r["username"])) {
@@ -1566,7 +1566,7 @@ class ContestController extends Controller {
 			$runs = RunsDAO::GetAllRuns(
 				$r["contest"]->getContestId(),
 				$r["status"],
-				$r["veredict"],
+				$r["verdict"],
 				!is_null($r["problem"]) ? $r["problem"]->getProblemId() : null,
 				$r["language"],
 				!is_null($r["user"]) ? $r["user"]->getUserId() : null,
@@ -1643,11 +1643,11 @@ class ContestController extends Controller {
 			// Wait time
 			$waitTimeArray = RunsDAO::GetLargestWaitTimeOfContest($r["contest"]->getContestId());
 
-			// List of veredicts			
-			$veredict_counts = array();
+			// List of verdicts			
+			$verdict_counts = array();
 
-			foreach (self::$veredicts as $veredict) {
-				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfContestByVeredict($r["contest"]->getContestId(), $veredict);
+			foreach (self::$verdicts as $verdict) {
+				$verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfContestByVerdict($r["contest"]->getContestId(), $verdict);
 			}
 			
 			// Get max points posible for contest
@@ -1682,7 +1682,7 @@ class ContestController extends Controller {
 			"pending_runs" => $pendingRunsGuids,
 			"max_wait_time" => is_null($waitTimeArray) ? 0 : $waitTimeArray[1],
 			"max_wait_time_guid" => is_null($waitTimeArray) ? 0 : $waitTimeArray[0]->getGuid(),
-			"veredict_counts" => $veredict_counts,
+			"verdict_counts" => $verdict_counts,
 			"distribution" => $distribution,
 			"size_of_bucket" => $sizeOfBucket,
 			"total_points" => $totalPoints,
@@ -1838,7 +1838,7 @@ class ContestController extends Controller {
 		self::validateStats($r);
 
 		// Get our runs
-		$relevant_columns = array("run_id", "guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
+		$relevant_columns = array("run_id", "guid", "language", "status", "verdict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
 		try {
 			$runs = RunsDAO::search(new Runs(array(
 								"contest_id" => $r["contest"]->getContestId()
@@ -1851,7 +1851,7 @@ class ContestController extends Controller {
 		$zip = new ZipStream($r["contest_alias"] . '.zip');
 
 		// Add runs to zip
-		$table = "guid,user,problem,veredict,points\n";
+		$table = "guid,user,problem,verdict,points\n";
 		foreach ($runs as $run) {
 
 			$zip->add_file_from_path("runs/" . $run->getGuid(), RUNS_PATH . '/' . $run->getGuid());
@@ -1860,7 +1860,7 @@ class ContestController extends Controller {
 			$columns[1] = 'alias';
 			$usernameProblemData = $run->asFilteredArray($columns);
 
-			$table .= $run->getGuid() . "," . $usernameProblemData['username'] . "," . $usernameProblemData['alias'] . "," . $run->getVeredict() . "," . $run->getContestScore();
+			$table .= $run->getGuid() . "," . $usernameProblemData['username'] . "," . $usernameProblemData['alias'] . "," . $run->getVerdict() . "," . $run->getContestScore();
 			$table .= "\n";
 		}
 

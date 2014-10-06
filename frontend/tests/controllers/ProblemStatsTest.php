@@ -60,8 +60,8 @@ class ProblemStatsTest extends OmegaupTestCase {
 
 		// Check number of pending runs
 		$this->assertEquals(count($pendingRunsData), count($response["pending_runs"]));
-		$this->assertEquals(count($ACRunsData), ($response["veredict_counts"]["AC"]));
-		$this->assertEquals(count($WARunsData), ($response["veredict_counts"]["WA"]));
+		$this->assertEquals(count($ACRunsData), ($response["verdict_counts"]["AC"]));
+		$this->assertEquals(count($WARunsData), ($response["verdict_counts"]["WA"]));
 
 		$this->assertEquals($pendingRunsCount + $ACRunsCount + $WARunsCount, $response["total_runs"]);
 	}

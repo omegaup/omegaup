@@ -101,7 +101,7 @@
 				<h2 class="panel-title">{#profileStatistics#}</h2>
 			</div>
 			<div class="panel-body">
-				<div id="veredict-chart"><img src="/media/wait.gif" /></div>
+				<div id="verdict-chart"><img src="/media/wait.gif" /></div>
 			</div>
 		</div>
 																			

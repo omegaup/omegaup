@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
   `validator` enum('remote','literal','token','token-caseless','token-numeric','custom') NOT NULL DEFAULT 'token-numeric',
-  `languages` set('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,cs,p,hs,cpp11',
+  `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11',
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
   `time_limit` int(11) DEFAULT '3000',
@@ -411,9 +411,9 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `problem_id` int(11) NOT NULL,
   `contest_id` int(11) DEFAULT NULL,
   `guid` char(32) NOT NULL,
-  `language` enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11') NOT NULL,
+  `language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') NOT NULL,
   `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
-  `veredict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL,
+  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL,
   `runtime` int(11) NOT NULL DEFAULT '0',
   `memory` int(11) NOT NULL DEFAULT '0',
   `score` double NOT NULL DEFAULT '0',
@@ -805,11 +805,11 @@ INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (3 ,  'PROBLEM_AD
 DELIMITER $$ 
 CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs` 
 FOR EACH ROW BEGIN
-	IF (OLD.veredict = 'AC' OR NEW.veredict = 'AC') THEN
+	IF (OLD.verdict = 'AC' OR NEW.verdict = 'AC') THEN
 		UPDATE  `Problems` SET  `Problems`.`accepted` = (
 			SELECT COUNT( DISTINCT user_id ) 
 				FROM  `Runs` 
-				WHERE  `Runs`.`veredict` =  'AC'
+				WHERE  `Runs`.`verdict` =  'AC'
 				AND NEW.`problem_id` =  `Runs`.`problem_id`
 			)	
 		WHERE NEW.problem_id =  `Problems`.`problem_id`;	

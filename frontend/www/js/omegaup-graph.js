@@ -3,7 +3,7 @@ function OmegaupGraph() {
 	var self = this;	
 }
 
-OmegaupGraph.prototype.veredictCounts = function(renderTo, title, stats) {
+OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
 	return new Highcharts.Chart ({
 		chart: {
 			plotBackgroundColor: null,
@@ -12,11 +12,11 @@ OmegaupGraph.prototype.veredictCounts = function(renderTo, title, stats) {
 			renderTo: renderTo
 		},
 		title: {
-			text: 'Veredictos de ' + title
+			text: 'veredictos de ' + title
 		},
 		tooltip: {
 			formatter: function() {
-							return '<b>Envíos</b>: '+ stats.veredict_counts[this.point.name] ;
+							return '<b>Envíos</b>: '+ stats.verdict_counts[this.point.name] ;
 					}
 
 		},
@@ -29,7 +29,7 @@ OmegaupGraph.prototype.veredictCounts = function(renderTo, title, stats) {
 					color: '#000000',
 					connectorColor: '#000000',					
 					formatter: function() {
-							return '<b>'+ this.point.name +'</b>: '+ this.percentage.toFixed(2) +' % ('+ stats.veredict_counts[this.point.name] +')' ;
+							return '<b>'+ this.point.name +'</b>: '+ this.percentage.toFixed(2) +' % ('+ stats.verdict_counts[this.point.name] +')' ;
 					}
 				}
 			}
@@ -44,20 +44,20 @@ OmegaupGraph.prototype.veredictCounts = function(renderTo, title, stats) {
 	
 OmegaupGraph.prototype.normalizeRunCounts = function(stats) {
 	return [
-			['WA',   (stats.veredict_counts["WA"] / stats.total_runs) * 100],
-			['PA',   (stats.veredict_counts["PA"] / stats.total_runs) * 100],
+			['WA',   (stats.verdict_counts["WA"] / stats.total_runs) * 100],
+			['PA',   (stats.verdict_counts["PA"] / stats.total_runs) * 100],
 			{
 				name: 'AC',
-				y: (stats.veredict_counts["AC"] / stats.total_runs) * 100,
+				y: (stats.verdict_counts["AC"] / stats.total_runs) * 100,
 				sliced: true,
 				selected: true
 			},
-			['TLE',   (stats.veredict_counts["TLE"] / stats.total_runs) * 100],
-			['MLE',   (stats.veredict_counts["MLE"] / stats.total_runs) * 100],
-			['OLE',   (stats.veredict_counts["OLE"] / stats.total_runs) * 100],
-			['RTE',   (stats.veredict_counts["RTE"] / stats.total_runs) * 100],
-			['CE',   (stats.veredict_counts["CE"] / stats.total_runs) * 100],
-			['JE',   (stats.veredict_counts["JE"] / stats.total_runs) * 100],
+			['TLE',   (stats.verdict_counts["TLE"] / stats.total_runs) * 100],
+			['MLE',   (stats.verdict_counts["MLE"] / stats.total_runs) * 100],
+			['OLE',   (stats.verdict_counts["OLE"] / stats.total_runs) * 100],
+			['RTE',   (stats.verdict_counts["RTE"] / stats.total_runs) * 100],
+			['CE',   (stats.verdict_counts["CE"] / stats.total_runs) * 100],
+			['JE',   (stats.verdict_counts["JE"] / stats.total_runs) * 100],
 		];	
 };
 

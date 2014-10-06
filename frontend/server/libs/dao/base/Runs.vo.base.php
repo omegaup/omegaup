@@ -53,8 +53,8 @@ class Runs extends VO
 			if (isset($data['status'])) {
 				$this->status = $data['status'];
 			}
-			if (isset($data['veredict'])) {
-				$this->veredict = $data['veredict'];
+			if (isset($data['verdict'])) {
+				$this->verdict = $data['verdict'];
 			}
 			if (isset($data['runtime'])) {
 				$this->runtime = $data['runtime'];
@@ -103,7 +103,7 @@ class Runs extends VO
 			"guid" => $this->guid,
 			"language" => $this->language,
 			"status" => $this->status,
-			"veredict" => $this->veredict,
+			"verdict" => $this->verdict,
 			"runtime" => $this->runtime,
 			"memory" => $this->memory,
 			"score" => $this->score,
@@ -167,7 +167,7 @@ class Runs extends VO
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var enum('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11')
+	  * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11')
 	  */
 	public $language;
 
@@ -183,7 +183,7 @@ class Runs extends VO
 	  * @access public
 	  * @var enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE')
 	  */
-	public $veredict;
+	public $verdict;
 
 	/**
 	  *  [Campo no documentado]

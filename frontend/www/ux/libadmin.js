@@ -71,7 +71,7 @@ ArenaAdmin.prototype.setUpPagers = function() {
 		});
 	}
 	
-	$('select.runsveredict, select.runsstatus, select.runsproblem, select.runslang')
+	$('select.runsverdict, select.runsstatus, select.runsproblem, select.runslang')
 		.change(self.refreshRuns.bind(self));
 	
 	$('.clarifpager .clarifpagerprev').click(function () {
@@ -126,8 +126,8 @@ ArenaAdmin.prototype.refreshRuns = function() {
 		rowcount: self.runsRowcount
 	};
 	
-	if ($('select.runsveredict option:selected').val()) {
-		options.veredict = $('select.runsveredict option:selected').val();
+	if ($('select.runsverdict option:selected').val()) {
+		options.verdict = $('select.runsverdict option:selected').val();
 	}
 	
 	if ($('select.runsstatus option:selected').val()) {

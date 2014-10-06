@@ -72,7 +72,7 @@ function Arena() {
 	this.submissionGap = 0;
 };
 
-Arena.veredicts = {
+Arena.verdicts = {
 	AC: "Accepted",
 	PA: "Partially Accepted",
 	WA: "Wrong Answer",
@@ -392,7 +392,7 @@ Arena.prototype.createAdminRun = function(run) {
 									.append('<th>' + g.cases[0].name + '</th>')
 									.append('<td></td>')
 									.append('<td>' + JSON.stringify(g.cases[0].meta) + '</td>')
-									.append('<td>' + g.cases[0].veredict + '</td>')
+									.append('<td>' + g.cases[0].verdict + '</td>')
 									.append('<th class="score">' + g.cases[0].score + '</th>')
 							);
 							if (g.cases[0].err) addBlock(g.cases[0].err, 'stderr');
@@ -410,7 +410,7 @@ Arena.prototype.createAdminRun = function(run) {
 									.append('<td></td>')
 									.append('<td>' + c.name + '</td>')
 									.append('<td>' + JSON.stringify(c.meta) + '</td>')
-									.append('<td>' + c.veredict + '</td>')
+									.append('<td>' + c.verdict + '</td>')
 									.append('<td class="score">' + c.score + '</td>')
 							);
 							if (c.err) addBlock(c.err, 'stderr');
@@ -444,7 +444,7 @@ Arena.prototype.displayRun = function(run, r) {
 	}
 
 	$('.runtime', r).html((parseFloat(run.runtime || "0") / 1000).toFixed(2));
-	$('.memory', r).html((run.veredict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
+	$('.memory', r).html((run.verdict == "MLE" ? ">" : "") + (parseFloat(run.memory) / (1024 * 1024)).toFixed(2));
 	if (run.contest_score != null) {
 		$('.points', r).html(parseFloat(run.contest_score || "0").toFixed(2));
 	} else {
@@ -454,17 +454,17 @@ Arena.prototype.displayRun = function(run, r) {
 	$('.status', r).html(
 		run.status == 'ready' ?
 		(
-		 Arena.veredicts[run.veredict] ?
-		 "<abbr title=\"" + Arena.veredicts[run.veredict] + "\">" + run.veredict + "</abbr>" :
-		 run.veredict
+		 Arena.verdicts[run.verdict] ?
+		 "<abbr title=\"" + Arena.verdicts[run.verdict] + "\">" + run.verdict + "</abbr>" :
+		 run.verdict
 		) :
 		run.status
 	);
-	if (run.veredict == 'JE')	{
+	if (run.verdict == 'JE')	{
 		$('.status', r).css('background-color', '#f00');
-	}	else if (run.veredict == 'RTE' || run.veredict == 'CE' || run.veredict == 'RFE') {
+	}	else if (run.verdict == 'RTE' || run.verdict == 'CE' || run.verdict == 'RFE') {
 		$('.status', r).css('background-color', '#ff9900');
-	} else if (run.veredict == 'AC') {
+	} else if (run.verdict == 'AC') {
 		$('.status', r).css('background-color', '#CCFF66');
 	} else {
 		$('.status', r).css('background-color', '');

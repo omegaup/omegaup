@@ -12,11 +12,11 @@ class Controller {
 	public static $log;
 
 	/**
-	 * List of veredicts
+	 * List of verdicts
 	 * 
 	 * @var array 
 	 */
-	public static $veredicts = array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC");
+	public static $verdicts = array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC");
 	
 	/**
 	 * Given the request, returns what user is performing the request by

@@ -1,12 +1,19 @@
 <?php
+
+/** ******************************************************************************* *
+  *                    !ATENCION!                                                   *
+  *                                                                                 *
+  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
+  * reemplazados la proxima vez que se autogenere el codigo.                        *
+  *                                                                                 *
+  * ******************************************************************************* */
+
 /** GroupsScoreboardsContests Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
   * almacenar de forma permanente y recuperar instancias de objetos {@link GroupsScoreboardsContests }. 
-  * @author alanboy
-  * @access private
+  * @access public
   * @abstract
-  * @package docs
   * 
   */
 abstract class GroupsScoreboardsContestsDAOBase extends DAO
@@ -25,13 +32,13 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  * @param GroupsScoreboardsContests [$Groups_Scoreboards_Contests] El objeto de tipo GroupsScoreboardsContests
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( &$Groups_Scoreboards_Contests )
+	public static final function save( $Groups_Scoreboards_Contests )
 	{
-		if( ! is_null ( self::getByPK(  $Groups_Scoreboards_Contests->getGroupScoreboardId() , $Groups_Scoreboards_Contests->getContestId() ) ) )
+		if (!is_null(self::getByPK( $Groups_Scoreboards_Contests->getGroupScoreboardId() , $Groups_Scoreboards_Contests->getContestId() )))
 		{
-			try{ return GroupsScoreboardsContestsDAOBase::update( $Groups_Scoreboards_Contests) ; } catch(Exception $e){ throw $e; }
-		}else{
-			try{ return GroupsScoreboardsContestsDAOBase::create( $Groups_Scoreboards_Contests) ; } catch(Exception $e){ throw $e; }
+			return GroupsScoreboardsContestsDAOBase::update( $Groups_Scoreboards_Contests);
+		} else {
+			return GroupsScoreboardsContestsDAOBase::create( $Groups_Scoreboards_Contests);
 		}
 	}
 
@@ -40,7 +47,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  *	Obtener {@link GroupsScoreboardsContests} por llave primaria. 
 	  *	
 	  * Este metodo cargara un objeto {@link GroupsScoreboardsContests} de la base de datos 
-      * usando sus llaves primarias. 
+	  * usando sus llaves primarias. 
 	  *	
 	  *	@static
 	  * @return @link GroupsScoreboardsContests Un objeto del tipo {@link GroupsScoreboardsContests}. NULL si no hay tal registro.
@@ -48,20 +55,14 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	public static final function getByPK(  $group_scoreboard_id, $contest_id )
 	{
 		if(  is_null( $group_scoreboard_id ) || is_null( $contest_id )  ){ return NULL; }
-            if(!is_null( self::$redisConection ) && !is_null($obj = self::$redisConection->get( "GroupsScoreboardsContests-" . $group_scoreboard_id."-" . $contest_id ))){
-                Logger::log("REDIS !");
-                return new GroupsScoreboardsContests($obj);
-            }
 		$sql = "SELECT * FROM Groups_Scoreboards_Contests WHERE (group_scoreboard_id = ? AND contest_id = ? ) LIMIT 1;";
 		$params = array(  $group_scoreboard_id, $contest_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0) return NULL;
 		$foo = new GroupsScoreboardsContests( $rs );
-		if(!is_null(self::$redisConection)) self::$redisConection->set(  "GroupsScoreboardsContests-" . $group_scoreboard_id."-" . $contest_id, $foo );
 		return $foo;
 	}
-
 
 	/**
 	  *	Obtener todas las filas.
@@ -82,7 +83,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Groups_Scoreboards_Contests";
 		if( ! is_null ( $orden ) )
-		{ $sql .= " ORDER BY " . $orden . " " . $tipo_de_orden;	}
+		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
 			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
@@ -93,7 +94,6 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 		foreach ($rs as $foo) {
 			$bar = new GroupsScoreboardsContests($foo);
     		array_push( $allData, $bar);
-                if(!is_null(self::$redisConection)) self::$redisConection->set(  "GroupsScoreboardsContests-" . $bar->getGroupScoreboardId()."-" . $bar->getContestId(), $bar );
 		}
 		return $allData;
 	}
@@ -123,60 +123,64 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Groups_Scoreboards_Contests , $orderBy = null, $orden = 'ASC')
+	public static final function search( $Groups_Scoreboards_Contests , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
+		if (!($Groups_Scoreboards_Contests instanceof GroupsScoreboardsContests)) {
+			return self::search(new GroupsScoreboardsContests($Groups_Scoreboards_Contests));
+		}
+
 		$sql = "SELECT * from Groups_Scoreboards_Contests WHERE ("; 
 		$val = array();
-		if( ! is_null( $Groups_Scoreboards_Contests->getGroupScoreboardId() ) ){
+		if (!is_null( $Groups_Scoreboards_Contests->getGroupScoreboardId())) {
 			$sql .= " `group_scoreboard_id` = ? AND";
 			array_push( $val, $Groups_Scoreboards_Contests->getGroupScoreboardId() );
 		}
-
-		if( ! is_null( $Groups_Scoreboards_Contests->getContestId() ) ){
+		if (!is_null( $Groups_Scoreboards_Contests->getContestId())) {
 			$sql .= " `contest_id` = ? AND";
 			array_push( $val, $Groups_Scoreboards_Contests->getContestId() );
 		}
-
-		if( ! is_null( $Groups_Scoreboards_Contests->getOnlyAc() ) ){
+		if (!is_null( $Groups_Scoreboards_Contests->getOnlyAc())) {
 			$sql .= " `only_ac` = ? AND";
 			array_push( $val, $Groups_Scoreboards_Contests->getOnlyAc() );
 		}
-
-		if( ! is_null( $Groups_Scoreboards_Contests->getWeight() ) ){
+		if (!is_null( $Groups_Scoreboards_Contests->getWeight())) {
 			$sql .= " `weight` = ? AND";
 			array_push( $val, $Groups_Scoreboards_Contests->getWeight() );
 		}
-
-		if(sizeof($val) == 0){return self::getAll(/* $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' */);}
+		if (!is_null($likeColumns)) {
+			foreach ($likeColumns as $column => $value) {
+				$escapedValue = mysql_real_escape_string($value);
+				$sql .= "`{$column}` LIKE '%{$value}%' AND";
+			}
+		}
+		if(sizeof($val) == 0) {
+			return self::getAll();
+		}
 		$sql = substr($sql, 0, -3) . " )";
 		if( ! is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+			$sql .= " ORDER BY `" . $orderBy . "` " . $orden;
+		}
+		// Add LIMIT offset, rowcount if rowcount is set
+		if (!is_null($rowcount)) {
+			$sql .= " LIMIT ". $offset . "," . $rowcount;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new GroupsScoreboardsContests($foo);
-    		array_push( $ar,$bar);
-                    if(!is_null(self::$redisConection)) self::$redisConection->set(  "GroupsScoreboardsContests-" . $bar->getGroupScoreboardId()."-" . $bar->getContestId(), $bar );
+			array_push( $ar,$bar);
 		}
 		return $ar;
 	}
 
-
 	/**
 	  *	Actualizar registros.
-	  *	
-	  * Este metodo es un metodo de ayuda para uso interno. Se ejecutara todas las manipulaciones
-	  * en la base de datos que estan dadas en el objeto pasado.No se haran consultas SELECT 
-	  * aqui, sin embargo. El valor de retorno indica cuántas filas se vieron afectadas.
-	  *	
-	  * @internal private information for advanced developers only
-	  * @return Filas afectadas o un string con la descripcion del error
+	  *
+	  * @return Filas afectadas
 	  * @param GroupsScoreboardsContests [$Groups_Scoreboards_Contests] El objeto de tipo GroupsScoreboardsContests a actualizar.
 	  **/
-	private static final function update( $Groups_Scoreboards_Contests )
+	private static final function update($Groups_Scoreboards_Contests)
 	{
 		$sql = "UPDATE Groups_Scoreboards_Contests SET  `only_ac` = ?, `weight` = ? WHERE  `group_scoreboard_id` = ? AND `contest_id` = ?;";
 		$params = array( 
@@ -184,11 +188,9 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 			$Groups_Scoreboards_Contests->getWeight(), 
 			$Groups_Scoreboards_Contests->getGroupScoreboardId(),$Groups_Scoreboards_Contests->getContestId(), );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
 
 	/**
 	  *	Crear registros.
@@ -199,28 +201,27 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
 	  * primaria generada en el objeto GroupsScoreboardsContests dentro de la misma transaccion.
 	  *	
-	  * @internal private information for advanced developers only
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param GroupsScoreboardsContests [$Groups_Scoreboards_Contests] El objeto de tipo GroupsScoreboardsContests a crear.
 	  **/
-	private static final function create( &$Groups_Scoreboards_Contests )
+	private static final function create( $Groups_Scoreboards_Contests )
 	{
+		if (is_null($Groups_Scoreboards_Contests->only_ac)) $Groups_Scoreboards_Contests->only_ac = '0';
+		if (is_null($Groups_Scoreboards_Contests->weight)) $Groups_Scoreboards_Contests->weight = 1;
 		$sql = "INSERT INTO Groups_Scoreboards_Contests ( `group_scoreboard_id`, `contest_id`, `only_ac`, `weight` ) VALUES ( ?, ?, ?, ?);";
 		$params = array( 
-			$Groups_Scoreboards_Contests->getGroupScoreboardId(), 
-			$Groups_Scoreboards_Contests->getContestId(), 
-			$Groups_Scoreboards_Contests->getOnlyAc(), 
-			$Groups_Scoreboards_Contests->getWeight(), 
+			$Groups_Scoreboards_Contests->group_scoreboard_id,
+			$Groups_Scoreboards_Contests->contest_id,
+			$Groups_Scoreboards_Contests->only_ac,
+			$Groups_Scoreboards_Contests->weight,
 		 );
 		global $conn;
-		try{$conn->Execute($sql, $params);}
-		catch(Exception $e){ throw new Exception ($e->getMessage()); }
+		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		/* save autoincremented value on obj */   /*  */ 
+ 
 		return $ar;
 	}
-
 
 	/**
 	  *	Buscar por rango.
@@ -305,19 +306,17 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
-		    $sql .= " order by " . $orderBy . " " . $orden ;
-		
+		    $sql .= " order by `" . $orderBy . "` " . $orden ;
+
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
-		foreach ($rs as $foo) {
-    		array_push( $ar, $bar = new GroupsScoreboardsContests($foo));
-                    if(!is_null(self::$redisConection)) self::$redisConection->set(  "GroupsScoreboardsContests-" . $bar->getGroupScoreboardId()."-" . $bar->getContestId(), $bar );
+		foreach ($rs as $row) {
+			array_push( $ar, $bar = new GroupsScoreboardsContests($row));
 		}
 		return $ar;
 	}
-
 
 	/**
 	  *	Eliminar registros.
@@ -332,7 +331,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  *	@return int El numero de filas afectadas.
 	  * @param GroupsScoreboardsContests [$Groups_Scoreboards_Contests] El objeto de tipo GroupsScoreboardsContests a eliminar
 	  **/
-	public static final function delete( &$Groups_Scoreboards_Contests )
+	public static final function delete( $Groups_Scoreboards_Contests )
 	{
 		if( is_null( self::getByPK($Groups_Scoreboards_Contests->getGroupScoreboardId(), $Groups_Scoreboards_Contests->getContestId()) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Groups_Scoreboards_Contests WHERE  group_scoreboard_id = ? AND contest_id = ?;";

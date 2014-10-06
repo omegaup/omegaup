@@ -1134,18 +1134,18 @@ class UserController extends Controller {
 		try {			
 			$totalRunsCount = RunsDAO::CountTotalRunsOfUser($user->getUserId());
 			
-			// List of veredicts			
-			$veredict_counts = array();
+			// List of verdicts			
+			$verdict_counts = array();
 			
-			foreach (self::$veredicts as $veredict) {
-				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfUserByVeredict($user->getUserId(), $veredict);
+			foreach (self::$verdicts as $verdict) {
+				$verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfUserByVerdict($user->getUserId(), $verdict);
 			}						
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
 		
 		return array(
-			"veredict_counts" => $veredict_counts,
+			"verdict_counts" => $verdict_counts,
 			"total_runs" => $totalRunsCount,
 			"status" => "ok"
 		);
@@ -1421,7 +1421,7 @@ class UserController extends Controller {
 	/**
 	 * Expires the known ranks
 	 * @TODO: This should be called only in the grader->frontend callback and only IFF 
-	 * veredict = AC (and not test run)
+	 * verdict = AC (and not test run)
 	 */
 	public static function deleteProblemsSolvedRankCacheList() {
 		

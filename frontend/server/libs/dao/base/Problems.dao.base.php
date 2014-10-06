@@ -299,7 +299,7 @@ abstract class ProblemsDAOBase extends DAO
 	{
 		if (is_null($Problems->public)) $Problems->public = '1';
 		if (is_null($Problems->validator)) $Problems->validator = 'token-numeric';
-		if (is_null($Problems->languages)) $Problems->languages = 'c,cpp,java,py,rb,pl,cs,p,hs,cpp11';
+		if (is_null($Problems->languages)) $Problems->languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11';
 		if (is_null($Problems->time_limit)) $Problems->time_limit = '3000';
 		if (is_null($Problems->memory_limit)) $Problems->memory_limit = '64';
 		if (is_null($Problems->output_limit)) $Problems->output_limit = '10240';

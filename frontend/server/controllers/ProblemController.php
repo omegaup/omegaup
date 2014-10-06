@@ -146,7 +146,7 @@ class ProblemController extends Controller {
 		} else if (isset($r["languages"]) && is_array($r["languages"])) {
 			$r["languages"] = implode(",", $r["languages"]);
 		}
-		Validators::isValidSubset($r["languages"], "languages", array('c','cpp','java','py','rb','pl','cs','p','kp','kj','cat','hs','cpp11'), $is_required);
+		Validators::isValidSubset($r["languages"], "languages", array('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11'), $is_required);
 	}
 
 	/**
@@ -566,7 +566,7 @@ class ProblemController extends Controller {
 
 			foreach ($runs as $run) {
 				$run->setStatus('new');
-				$run->setVeredict('JE');
+				$run->setVerdict('JE');
 				$run->setScore(0);
 				$run->setContestScore(0);
 				RunsDAO::save($run);
@@ -903,7 +903,7 @@ class ProblemController extends Controller {
 
 		if (!is_null($r['current_user_id'])) {
 			// Create array of relevant columns for list of runs
-			$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+			$relevant_columns = array("guid", "language", "status", "verdict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
 
 			// Search the relevant runs from the DB
 			$contest = ContestsDAO::getByAlias($r["contest_alias"]);
@@ -1022,7 +1022,7 @@ class ProblemController extends Controller {
 				$runs = RunsDAO::GetAllRuns(
 					null,
 					$r["status"],
-					$r["veredict"],
+					$r["verdict"],
 					$r["problem"]->problem_id,
 					$r["language"],
 					!is_null($r["user"]) ? $r["user"]->user_id : null,
@@ -1057,7 +1057,7 @@ class ProblemController extends Controller {
 				$runs_array = RunsDAO::search($keyrun);
 
 				// Create array of relevant columns for list of runs
-				$relevant_columns = array("guid", "language", "status", "veredict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+				$relevant_columns = array("guid", "language", "status", "verdict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
 
 				// Add each filtered run to an array
 				$response["runs"] = array();
@@ -1146,11 +1146,11 @@ class ProblemController extends Controller {
 			// Count of pending runs (int)
 			$totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r["problem"]->getProblemId());
 
-			// List of veredicts			
-			$veredict_counts = array();
+			// List of verdicts			
+			$verdict_counts = array();
 
-			foreach (self::$veredicts as $veredict) {
-				$veredict_counts[$veredict] = RunsDAO::CountTotalRunsOfProblemByVeredict($r["problem"]->getProblemId(), $veredict);
+			foreach (self::$verdicts as $verdict) {
+				$verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfProblemByVerdict($r["problem"]->getProblemId(), $verdict);
 			}
 
 			// Array to count AC stats per case.
@@ -1250,7 +1250,7 @@ class ProblemController extends Controller {
 		return array(
 			"total_runs" => $totalRunsCount,
 			"pending_runs" => $pendingRunsGuids,
-			"veredict_counts" => $veredict_counts,
+			"verdict_counts" => $verdict_counts,
 			"cases_stats" => $cases_stats["counts"],
 			"status" => "ok"
 		);
