@@ -41,7 +41,7 @@
 	   formData.append("alias", $("#problem_upload_window #alias").val());
 	   formData.append("source",  $("#problem_upload_window #source").val());
 	   formData.append("public", "1");
-	   formData.append("validator", "token"); // //remote, token, token-caseless, token-numeric
+	   formData.append("validator", "token"); // token, token-caseless, token-numeric, custom
 	   formData.append("time_limit",  $("#problem_upload_window #time_limit").val());
 	   formData.append("memory_limit", $("#problem_upload_window #memory_limit").val());
 	   formData.append("order", "normal");
@@ -363,9 +363,9 @@
 		<td>
 			<select id="validator">
 				<option>token</option>
-				<option>remote</option>
 				<option>token-caseless</option>
 				<option>token-numeric</option>
+				<option>custom</option>
 			</select>
 		</td>
 		</tr>

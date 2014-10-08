@@ -292,7 +292,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `author_id` int(11) NOT NULL,
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
-  `validator` enum('remote','token','token-caseless','token-numeric','custom') NOT NULL DEFAULT 'token-numeric',
+  `validator` enum('token','token-caseless','token-numeric','custom') NOT NULL DEFAULT 'token-numeric',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11',
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
