@@ -52,7 +52,7 @@ class RunController extends Controller {
 									$r["problem"]->getProblemId(),
 									$r["current_user_id"])
 							&& !Authorization::IsSystemAdmin($r["current_user_id"])) {
-							throw new NotAllowedToSubmitException("You have to wait " . self::$defaultSubmissionGap . " between submissions");
+							throw new NotAllowedToSubmitException("runWaitGap");
 					}
 
 					self::$practice = true;
@@ -82,25 +82,25 @@ class RunController extends Controller {
 			if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				// Before submit something, contestant had to open the problem/contest
 				if (!ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) {
-					throw new NotAllowedToSubmitException("You must open the problem before trying to submit a solution.");
+					throw new NotAllowedToSubmitException("runNotEvenOpened");
 				}
 
 				// Validate that the run is timely inside contest
 				if (!ContestsDAO::isInsideContest($r["contest"], $r['current_user_id'])) {
-					throw new NotAllowedToSubmitException("Contest time has expired or not started yet.");
+					throw new NotAllowedToSubmitException("runNotInsideContest");
 				}
 
 				// Validate if contest is private then the user should be registered
 				if ($r["contest"]->getPublic() == 0
 						&& is_null(ContestsUsersDAO::getByPK(
 										$r["current_user_id"], $r["contest"]->getContestId()))) {
-					throw new NotAllowedToSubmitException("You are not registered to this contest.");
+					throw new NotAllowedToSubmitException("runNotRegistered");
 				}
 
 				// Validate if the user is allowed to submit given the submissions_gap 			
 				if (!RunsDAO::IsRunInsideSubmissionGap(
 								$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"])) {
-					throw new NotAllowedToSubmitException("You have to wait " . $r["contest"]->getSubmissionsGap() . " seconds between consecutive submissions.");
+					throw new NotAllowedToSubmitException("runWaitGap");
 				}
 			}
 		} catch (ApiException $apiException) {
@@ -131,7 +131,7 @@ class RunController extends Controller {
 		// Validate request
 		self::validateCreateRequest($r);
 
-		self::$log->info("New run being submitted !!");
+		self::$log->info("New run being submitted!!");
 		$response = array();
 
 		if (self::$practice) {
@@ -163,8 +163,7 @@ class RunController extends Controller {
 						//holy moly, he is submitting a run 
 						//and he hasnt even opened the problem
 						//what should be done here?
-						self::$log->error("User is submitting a run and he has not even opened the problem");
-						throw new Exception("User is submitting a run and he has not even opened the problem");
+						throw new NotAllowedToSubmitException("runEvenOpened");
 					}
 
 					$start = $opened->getOpenTime();

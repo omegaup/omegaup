@@ -8,6 +8,7 @@
  * 
  */
 abstract class ApiException extends Exception {
+	public static $log;
 
 	protected $header;
 	private $customMessage;
@@ -82,9 +83,17 @@ abstract class ApiException extends Exception {
 	protected function getErrorMessage() {
 		// obtener el texto final (ya localizado) de smarty.
 		global $smarty;
-		return $smarty->getconfigvars($this->message);
+		$localizedText = $smarty->getconfigvars($this->message);
+		if (empty($localizedText)) {
+			self::$log->error("Untranslated error message: {$this->message}");
+			return "[untranslated]";
+		} else {
+			return $localizedText;
+		}
 	}
 }
+
+ApiException::$log = Logger::getLogger("ApiException");
 
 /**
  * InvalidArgumentException

@@ -197,7 +197,7 @@ class RunCreateTest extends OmegaupTestCase {
 	 * Test that a user cannot submit once he has already submitted something
 	 * and the submissions gap time has not expired
 	 * 
-	 * @expectedException NotAllowedToSubmitException 
+	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testInvalidRunInsideSubmissionsGap() {
 
