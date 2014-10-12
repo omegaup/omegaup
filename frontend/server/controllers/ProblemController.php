@@ -229,7 +229,7 @@ class ProblemController extends Controller {
 
 			// Alias may be duplicated, 1062 error indicates that
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
-				throw new DuplicatedEntryInDatabaseException("Problem title already exists. Please try a different one.", $e);
+				throw new DuplicatedEntryInDatabaseException("problemTitleExists");
 			} else {
 
 				throw new InvalidDatabaseOperationException($e);
@@ -263,7 +263,7 @@ class ProblemController extends Controller {
 		}
 
 		if (is_null($r["problem"])) {
-			throw new NotFoundException("Problem not found");
+			throw new NotFoundException("problemNotFound");
 		}
 
 		// We need to check that the user can actually edit the problem
@@ -788,7 +788,7 @@ class ProblemController extends Controller {
 				}
 
 				if (is_null(ContestProblemsDAO::getByPK($r["contest"]->getContestId(), $r["problem"]->getProblemId()))) {
-					throw new NotFoundException("Problem not found in contest given");
+					throw new NotFoundException("problemNotFoundInContest");
 				}
 			} catch (ApiException $apiException) {
 				throw $apiException;
@@ -806,14 +806,14 @@ class ProblemController extends Controller {
 
 			// If the contest has not started, user should not see it, unless it is admin
 			if (!ContestsDAO::hasStarted($r["contest"]) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-				throw new ForbiddenAccessException("Contest has not started yet.");
+				throw new ForbiddenAccessException("contestNotStarted");
 			}
 		} else {
 
 			if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 				// If the problem is requested outside a contest, we need to check that it is not private
 				if ($r["problem"]->getPublic() == "0") {
-					throw new ForbiddenAccessException("Problem is marked as private.");
+					throw new ForbiddenAccessException("problemIsPrivate");
 				}
 			}
 		}
@@ -994,7 +994,7 @@ class ProblemController extends Controller {
 		}
 
 		if ($r['problem'] == null) {
-			throw new NotFoundException($r['problem_alias']);
+			throw new NotFoundException("problemNotFound");
 		}
 	}
 

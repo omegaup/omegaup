@@ -166,13 +166,13 @@ class ContestController extends Controller {
 	private static function canAccessContest(Request $r) {
 		
 		if (!isset($r["contest"]) || is_null($r["contest"])) {
-			throw new NotFoundException("Contest not found");
+			throw new NotFoundException("contestNotFound");
 		}
 		
 		if ($r["contest"]->public != 1) {
 			try {
 				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-					throw new ForbiddenAccessException();
+					throw new ForbiddenAccessException("userNotAllowed");
 				}
 			} catch (ApiException $e) {
 				// Propagate exception
@@ -205,7 +205,7 @@ class ContestController extends Controller {
 		}
 
 		if (is_null($r["contest"])) {
-			throw new NotFoundException("Contest not found");
+			throw new NotFoundException("contestNotFound");
 		}
 
 		$r['contest_admin'] = false;
@@ -218,7 +218,7 @@ class ContestController extends Controller {
 
 			$r['contest_admin'] = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]);
 			if (!ContestsDAO::hasStarted($r["contest"]) && !$r['contest_admin']) {
-				$exception = new PreconditionFailedException("Contest has not started yet.");
+				$exception = new PreconditionFailedException("contestNotStarted");
 				$exception->addCustomMessageToArray("start_time", strtotime($r["contest"]->getStartTime()));
 
 				throw $exception;
@@ -227,7 +227,7 @@ class ContestController extends Controller {
 			if ($r['token'] === $r['contest']->getScoreboardUrlAdmin()) {
 				$r['contest_admin'] = true;
 			} else if ($r['token'] !== $r['contest']->getScoreboardUrl()) {
-				throw new ForbiddenAccessException("Invalid scoreboard url.");
+				throw new ForbiddenAccessException("invalidScoreboardUrl");
 			}
 		}
 	}
@@ -429,7 +429,7 @@ class ContestController extends Controller {
 
 			// Alias may be duplicated, 1062 error indicates that
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
-				throw new DuplicatedEntryInDatabaseException("alias already exists. Please choose a different alias.", $e);
+				throw new DuplicatedEntryInDatabaseException("aliasInUse", $e);
 			} else {
 				throw new InvalidDatabaseOperationException($e);
 			}
@@ -464,7 +464,7 @@ class ContestController extends Controller {
 			}
 
 			if (is_null($r["contest_alias"])) {
-				throw new NotFoundException("Contest not found");
+				throw new NotFoundException("contestNotFound");
 			}
 
 			if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
@@ -573,7 +573,7 @@ class ContestController extends Controller {
 
 		// Only contest admin is allowed to view details through this API
 		if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
-			throw new ForbiddenAccessException('Cannot add problem. You are not the contest director.');
+			throw new ForbiddenAccessException('cannotAddProb');
 		}
 
 		try {
@@ -651,7 +651,7 @@ class ContestController extends Controller {
 
 		// Only contest admin is allowed to create problems in contest
 		if (!Authorization::IsContestAdmin($r["current_user_id"], $contest)) {
-			throw new ForbiddenAccessException("Cannot add problem. You are not the contest director.");
+			throw new ForbiddenAccessException("cannotAddProb");
 		}
 
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
@@ -668,7 +668,7 @@ class ContestController extends Controller {
 		}
 
 		if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r["current_user_id"], $problem)) {
-			throw new ForbiddenAccessException("Problem is marked as private.");
+			throw new ForbiddenAccessException("problemIsPrivate");
 		}
 
 		Validators::isNumberInRange($r["points"], "points", 0, INF);
@@ -736,7 +736,7 @@ class ContestController extends Controller {
 
 		// Only contest admin is allowed to create problems in contest
 		if (!Authorization::IsContestAdmin($r["current_user_id"], $contest)) {
-			throw new ForbiddenAccessException("Cannot add problem. You are not the contest director.");
+			throw new ForbiddenAccessException("cannotAddProb");
 		}
 
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
@@ -753,7 +753,7 @@ class ContestController extends Controller {
 		}
 
 		if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r["current_user_id"], $problem)) {
-			throw new ForbiddenAccessException("Problem is marked as private.");
+			throw new ForbiddenAccessException("problemIsPrivate");
 		}
 
 		return array(
@@ -978,7 +978,7 @@ class ContestController extends Controller {
 		}
 
 		if ($r['contest'] == null) {
-			throw new NotFoundException($r['contest_alias']);
+			throw new NotFoundException("contestNotFound");
 		}
 
 		Validators::isNumber($r["offset"], "offset", false /* optional */);
@@ -1089,7 +1089,7 @@ class ContestController extends Controller {
 			} else if ($r["token"] === $r["contest"]->getScoreboardUrlAdmin()) {
 				$showAllRuns = true;
 			} else {
-				throw new ForbiddenAccessException("Invalid scoreboard url.");
+				throw new ForbiddenAccessException("invalidScoreboardUrl");
 			}
 		}
 		
@@ -1133,7 +1133,7 @@ class ContestController extends Controller {
 			}
 
 			if (is_null($contest)) {
-				throw new NotFoundException("Contest {$contest_alias} not found");
+				throw new NotFoundException("contestNotFound");
 			}
 			
 			array_push($contests, $contest);
@@ -1510,11 +1510,11 @@ class ContestController extends Controller {
 		}
 
 		if (is_null($r["contest"])) {
-			throw new NotFoundException("Contest not found.");
+			throw new NotFoundException("contestNotFound");
 		}
 
 		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-			throw new ForbiddenAccessException();
+			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
 		Validators::isNumber($r["offset"], "offset", false);
@@ -1535,7 +1535,7 @@ class ContestController extends Controller {
 			}
 
 			if (is_null($r["problem"])) {
-				throw new NotFoundException("Problem not found.");
+				throw new NotFoundException("problemNotFound");
 			}
 		}
 
@@ -1614,7 +1614,7 @@ class ContestController extends Controller {
 
 		// This API is Contest Admin only
 		if (is_null($r["contest"]) || !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-			throw new ForbiddenAccessException();
+			throw new ForbiddenAccessException("userNotAllowed");
 		}
 	}
 

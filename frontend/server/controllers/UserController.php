@@ -169,7 +169,7 @@ class UserController extends Controller {
 		}
 
 		if (is_null($user_id) && is_null($email) && is_null($username)) {
-			throw new Exception("You must provide either one of the following: user_id, email or username");
+			throw new ApiException("mustProvideUSerIdEmailOrUsername");
 		}
 
 		$vo_UserToTest = null;
@@ -332,7 +332,7 @@ class UserController extends Controller {
 				$user = UsersDAO::FindByUsername($r["username"]);
 
 				if (is_null($user)) {
-					throw new NotFoundException("User does not exists");
+					throw new NotFoundException("userNotExist");
 				}
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
@@ -412,7 +412,7 @@ class UserController extends Controller {
 		}			
 		
 		if (is_null($user)) {
-			throw new NotFoundException("Verification id is invalid.");
+			throw new NotFoundException("verificationIdInvalid");
 		}
 				
 		try {
@@ -1308,7 +1308,7 @@ class UserController extends Controller {
 			try {
 				$r["user"] = UsersDAO::FindByUsername($r["username"]);
 				if (is_null($r["user"])) {
-					throw new NotFoundException("User does not exist");
+					throw new NotFoundException("userNotExist");
 				}
 			} 
 			catch (ApiException $e) {
@@ -1475,7 +1475,7 @@ class UserController extends Controller {
 		} catch (Exception $e) {
 			// If duplicate in DB
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
-				throw new DuplicatedEntryInDatabaseException("El email seleccionado ya está ocupado. Intenta con otro email válido.", $e);
+				throw new DuplicatedEntryInDatabaseException("mailInUse");
 			} else {
 				throw new InvalidDatabaseOperationException($e);
 			}

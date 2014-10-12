@@ -59,7 +59,7 @@ class RunController extends Controller {
 					return;
 				} else 
 				{
-					throw new NotAllowedToSubmitException("The problem is not public.");
+					throw new NotAllowedToSubmitException("problemIsNotPublic");
 				}
 			}
 
@@ -290,7 +290,7 @@ class RunController extends Controller {
 		}
 
 		if (is_null($r["run"])) {
-			throw new NotFoundException("Run not found");
+			throw new NotFoundException("runNotFound");
 		}
 	}
 
@@ -308,7 +308,7 @@ class RunController extends Controller {
 		self::validateDetailsRequest($r);
 
 		if (!(Authorization::CanViewRun($r["current_user_id"], $r["run"]))) {
-			throw new ForbiddenAccessException();
+			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
 		// Fill response
@@ -341,7 +341,7 @@ class RunController extends Controller {
 		self::validateDetailsRequest($r);
 
 		if (!(Authorization::CanEditRun($r["current_user_id"], $r["run"]))) {
-			throw new ForbiddenAccessException();
+			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
 		self::$log->info("Run being rejudged!!");
@@ -417,7 +417,7 @@ class RunController extends Controller {
 		self::validateDetailsRequest($r);
 
 		if (!(Authorization::CanEditRun($r["current_user_id"], $r["run"]))) {
-			throw new ForbiddenAccessException();
+			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
 		// Get the problem
@@ -512,7 +512,7 @@ class RunController extends Controller {
 		self::validateDetailsRequest($r);
 
 		if (!(Authorization::CanViewRun($r["current_user_id"], $r["run"]))) {
-			throw new ForbiddenAccessException();
+			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
 		$response = array();
@@ -554,7 +554,7 @@ class RunController extends Controller {
 		$r["contest"] = ContestsDAO::getByPK($r["run"]->getContestId());
 
 		if (!Authorization::IsSystemAdmin($r['current_user_id']) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-			throw new ForbiddenAccessException();
+			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
 		$problem = ProblemsDAO::getByPK($r["run"]->getProblemId());
@@ -679,7 +679,7 @@ class RunController extends Controller {
 		}
 		
 		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
-			throw new ForbiddenAccessException();
+			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
 		Validators::isNumber($r["offset"], "offset", false);
@@ -700,7 +700,7 @@ class RunController extends Controller {
 			}
 
 			if (is_null($r["problem"])) {
-				throw new NotFoundException("Problem not found.");
+				throw new NotFoundException("problemNotFound");
 			}
 		}
 
