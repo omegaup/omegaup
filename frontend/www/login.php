@@ -25,7 +25,7 @@
 	}
 
 	if (isset($_GET["state"])) {
-		$success = $c_Session->LoginViaFacebook();
+		$c_Session->LoginViaFacebook();
 		$triedToLogin = true;
 	}
 

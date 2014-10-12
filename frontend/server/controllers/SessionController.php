@@ -366,7 +366,12 @@ class SessionController extends Controller {
 									"ignore_password" => true
 								)
 							);
-				$res = UserController::apiCreate($r);
+				try {
+					$res = UserController::apiCreate($r);
+				} catch (ApiException $e) {
+					self::$log->e("Unable to login via Facebook " . $e);
+					return false;
+				}
 				$vo_User = UsersDAO::getByPK($res["user_id"]);
 		}
 
