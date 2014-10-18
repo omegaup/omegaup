@@ -145,6 +145,7 @@ OmegaUp.T = {
 	loginEmail: "(E-mai1)",
 	loginEmailUsername: "(E-mai1 0r u53r)",
 	loginFederated: "(L0gin u5ing 7h353 5i735)",
+	loginFederatedFailed: "(L0gin u5ing 7h3 3x73rna1 par7y fai13d. Did y0u r3j3c7 acc355?)",
 	loginHeader: "(L0gin 70 Om3gaUp)",
 	loginLogIn: "(L0g in)",
 	loginNative: "(Om3gaUp acc0un7)",

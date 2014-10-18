@@ -40,12 +40,13 @@
 			die(header('Location: /profile/'));
 		}
 	} else if ($triedToLogin) {
-		if (!$emailVerified) {
-			$smarty->assign('ERROR_TO_USER', 'EMAIL_NOT_VERIFIED');
+		if (isset($response["error"])) {
+			$smarty->assign('ERROR_TO_USER', 'NATIVE_LOGIN_FAILED');
+			$smarty->assign('ERROR_MESSAGE', $response["error"]);
 		} else {
-			$smarty->assign('ERROR_TO_USER', 'USER_OR_PASSWORD_WRONG');
+			$smarty->assign('ERROR_TO_USER', 'THIRD_PARTY_LOGIN_FAILED');
+			$smarty->assign('ERROR_MESSAGE', $smarty->getconfigvars('loginFederatedFailed')) ;
 		}
-		$smarty->assign('ERROR_MESSAGE', $response["error"]);
 	}
 
 	$smarty->display('../templates/login.tpl');

@@ -145,6 +145,7 @@ OmegaUp.T = {
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail or user",
 	loginFederated: "Login using these sites",
+	loginFederatedFailed: "Login using the external party failed. Did you reject access?",
 	loginHeader: "Login to OmegaUp",
 	loginLogIn: "Log in",
 	loginNative: "OmegaUp account",

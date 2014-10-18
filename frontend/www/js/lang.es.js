@@ -145,6 +145,7 @@ OmegaUp.T = {
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail o usuario",
 	loginFederated: "Cuenta en otros sitios",
+	loginFederatedFailed: "El inicio de sesion con el sitio externo fallo.",
 	loginHeader: "Inicia sesi&oacute;n en omegaUp",
 	loginLogIn: "Iniciar sesion",
 	loginNative: "Cuenta omegaUp",
