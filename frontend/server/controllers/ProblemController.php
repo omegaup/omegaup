@@ -22,22 +22,6 @@ class ProblemController extends Controller {
 
 	/**
 	 * 
-	 * @param type $pageSize
-	 * @param type $pageNumber
-	 * @param type $servidor
-	 * @param type $orderBy
-	 * @return type
-	 */
-	public static function getProblemList($pageSize = 10, $pageNumber = 1, $servidor = null, $orderBy = null) {
-
-		//$condition = "server = '$servidor' and public = 1";
-		//$results = ProblemsDAO::byPage ( $sizePage , $noPage , $condition , $servidor, $orderBy );		
-
-		return ProblemsDAO::getAll($pageNumber, $pageSize, $orderBy);
-	}
-
-	/**
-	 * 
 	 * @return type
 	 */
 	public static function getJudgesList() {
@@ -1262,16 +1246,17 @@ class ProblemController extends Controller {
 	 * @param Request $r
 	 */
 	private static function validateList(Request $r) {
-
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
 
 		// Defaults for offset and rowcount
-		if (!isset($r["offset"])) {
-			$r["offset"] = 0;
-		}
-		if (!isset($r["rowcount"])) {
-			$r["rowcount"] = 1000;
+		if (!isset($r['page'])) {
+			if (!isset($r["offset"])) {
+				$r["offset"] = 0;
+			}
+			if (!isset($r["rowcount"])) {
+				$r["rowcount"] = 1000;
+			}
 		}
 
 		Validators::isStringNonEmpty($r["query"], "query", false);
@@ -1328,12 +1313,19 @@ class ProblemController extends Controller {
 		// Search for problems whose title has $query as a substring.
 		$query = is_null($r['query']) ? null : $r['query'];
 
-		// Skips the first $offset rows of the result.
-		$offset = is_null($r['offset']) ? 0 :  intval($r['offset']);
+		if (!is_null($r['offset']) && !is_null($r['rowcount'])) {
+			// Skips the first $offset rows of the result.
+			$offset = intval($r['offset']);
 
-		// Specifies the maximum number of rows to return.
-		$rowcount = is_null($r['rowcount']) ? null : intval($r['rowcount']);
+			// Specifies the maximum number of rows to return.
+			$rowcount = intval($r['rowcount']);
+		} else {
+			$offset = (is_null($r['page']) ? 0 : intval($r['page']) - 1) *
+				PROBLEMS_PER_PAGE;
+			$rowcount = PROBLEMS_PER_PAGE;
+		}
 
+		$total = 0;
 		$response['results'] = ProblemsDAO::byUserType(
 			$user_type,
 			$order,
@@ -1341,34 +1333,10 @@ class ProblemController extends Controller {
 			$offset,
 			$rowcount,
 			$query,
-			$author_id
+			$author_id,
+			&$total
 		);
-
-		// The total number of rows, this value is used by the pager (if any) 
-		// to know the total number of pages.
-		$total = count($response['results']);
 		$response['total'] = $total;
-		$pages = ($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE;
-
-		// Pagination is a new feature and it's not done by default.
-		if (!is_null($r['page'])) {
-			// If the page is out of range, the first page is served.
-			$p = intval($r['page']);
-			if ($p >= 1 && $p <= $pages) {
-				$page = $p;
-			} else {
-				$page = 1;
-			}
-
-			// Take just the rows of the required page.
-			$elements = array();
-			$start = ($page - 1) * PROBLEMS_PER_PAGE;
-			$end = min($total, $start + PROBLEMS_PER_PAGE);
-			for ($i = $start; $i < $end; $i++) {
-				array_push($elements, $response['results'][$i]);
-			}
-			$response['results'] = $elements;
-		}
 
 		$response["status"] = "ok";
 		return $response;

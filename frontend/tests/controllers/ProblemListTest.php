@@ -308,6 +308,13 @@ class ProblemList extends OmegaupTestCase {
 					$request['mode'] = $mode;
 					$request['order_by'] = $col;
 					if ($paging == 1) {
+						// Clear offset and rowcount if set.
+						if (isset($request['offset'])) {
+							unset($request['offset']);
+						}
+						if (isset($request['rowcount'])) {
+							unset($request['rowcount']);
+						}
 						$request['page'] = 1;
 						$response = ProblemController::apiList($request);
 						$first = $response['results'];
@@ -316,7 +323,7 @@ class ProblemList extends OmegaupTestCase {
 						$last = $response['results'];
 
 						// Test number of problems per page
-						$this->assertEquals(count($first), PROBLEMS_PER_PAGE);
+						$this->assertEquals(PROBLEMS_PER_PAGE, count($first));
 					} else {
 						$request['page']= null;
 						$response = ProblemController::apiList($request);

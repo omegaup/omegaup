@@ -19,8 +19,10 @@ require_once("base/Problems.vo.base.php");
   */
 class ProblemsDAO extends ProblemsDAOBase
 {
-	public static final function byUserType($user_type, $order, $mode, $offset, $rowcount, $query, $user_id = null) {
+	public static final function byUserType($user_type, $order, $mode, $offset,
+			$rowcount, $query, $user_id, &$total) {
 		global $conn;
+
 		if (!is_null($query)) {
 			$escaped_query = mysql_real_escape_string($query);
 		}
@@ -33,15 +35,19 @@ class ProblemsDAO extends ProblemsDAOBase
 		// Use BINARY mode to force case sensitive comparisons when ordering by title.
 		$collation = ($order === 'title') ? 'COLLATE utf8_bin' : '';
 
-		$result = null;
+		$select = "";
+		$sql= "";
+		$args = array();
+
 		if ($user_type === USER_ADMIN) {
 			$args = array($user_id);
-			$sql = "
+			$select = "
 				SELECT
 					100 / LOG2(GREATEST(accepted, 1) + 1)	AS points,
 					accepted / GREATEST(1, submissions)		AS ratio,
 					ROUND(100 * COALESCE(ps.score, 0))		AS score,
-					p.*
+					p.*";
+			$sql = "
 				FROM
 					Problems p
 				LEFT JOIN (
@@ -61,37 +67,31 @@ class ProblemsDAO extends ProblemsDAOBase
 			}
 
 			$sql .= " ORDER BY `$order` $collation $mode ";
-
-			if (!is_null($rowcount)) {
-				$sql .= "LIMIT ?, ?";
-				array_push($args, $offset, $rowcount);
-			}
-
-			$result = $conn->Execute($sql, $args);
 		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
 			$like_query = '';
 			if (!is_null($query)) {
 				$like_query = " AND title LIKE '%$escaped_query%'";
 			}
 			$args = array($user_id, $user_id, $user_id);
-			$sql = "
+			$select = "
 				SELECT
 					100 / LOG2(GREATEST(accepted, 1) + 1)	AS points,
 					accepted / GREATEST(1, submissions)		AS ratio,
 					ROUND(100 * COALESCE(ps.score, 0), 2)	AS score,
-					p.*
+					p.*";
+			$sql = "
 				FROM
 					Problems p
 				LEFT JOIN (
 					SELECT
 						p.problem_id,
 						MAX(r.score) AS score
-					  FROM 
+					FROM 
 						Problems p
-						INNER JOIN
+					INNER JOIN
 						Runs r ON r.user_id = ? AND r.problem_id = p.problem_id
-						GROUP BY
-							p.problem_id
+					GROUP BY
+						p.problem_id
 				) ps ON ps.problem_id = p.problem_id
 				LEFT JOIN
 					User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id
@@ -99,38 +99,38 @@ class ProblemsDAO extends ProblemsDAOBase
 					(public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query
 				ORDER BY
 					`$order` $collation $mode";
-
-			if (!is_null($rowcount)) {
-				$sql .= " LIMIT ?, ?";
-				array_push($args, $offset, $rowcount);
-			}
-			$result = $conn->Execute($sql, $args);
 		} else if ($user_type === USER_ANONYMOUS) {
 			$like_query = '';
 			if (!is_null($query)) {
 				$like_query = " AND title LIKE '%{$escaped_query}%'";
 			}
-			$sql = "
+			$select = "
 					SELECT
 						0 AS score,
 						100 / LOG2(GREATEST(accepted, 1) + 1) AS points,
 						accepted / GREATEST(1, submissions)   AS ratio,
-						Problems.*
+						Problems.*";
+			$sql = "
 					FROM
 						Problems
 					WHERE
 						public = 1 $like_query
 					ORDER BY
 						 `$order` $collation $mode";
-
-			$args = array();
-			if (!is_null($rowcount)) {
-				$sql .= " LIMIT ?, ?";
-				$args = array($offset, $rowcount);
-			}
-
-			$result = $conn->Execute($sql, $args);
 		}
+
+		$total = $conn->GetOne("SELECT COUNT(*) $sql", $args);
+
+		// Reset the offset to 0 if out of bounds.
+		if ($offset < 0 || $offset > $total) {
+			$offset = 0;
+		}
+
+		$sql .= " LIMIT ?, ?";
+		$args[] = $offset;
+		$args[] = $rowcount;
+
+		$result = $conn->Execute("$select $sql", $args);
 
 		// Only these fields (plus score, points and ratio) will be returned.
 		$filters = array('title', 'submissions', 'accepted', 'alias', 'public');
@@ -144,74 +144,11 @@ class ProblemsDAO extends ProblemsDAOBase
 				$problem['score'] = $row['score'];
 				$problem['points'] = $row['points'];
 				$problem['ratio'] = $row['ratio'];
+				$problem['tags'] = ProblemsDAO::getTagsForProblem($temp, true);
 				array_push($problems, $problem);
 			}
 		}
 		return $problems;
-	}
-
-	/* byPage: search and return all the results by size and number of page and other attributes */
-	public static final function byPage( $sizePage , $noPage , $condition = null , $serv = null, $orderBy = null, $orden = 'ASC')
-	{	
-		global $conn;
-		$val = array($condition);		
-		$sql = "SELECT count(*) from Problems WHERE $condition"; 	
-		$rs = $conn->getRow($sql);
-		$total = $rs[0];
-		
-		//problem_id	public	author_id	title	alias	validator	server	remote_id	
-		//time_limit	memory_limit	visits	submissions	accepted	difficulty	creation_date	source	order
-		$ord = array("problem_id"=>1,
-					 "public"=>0,
-					 "author_id"=>0,
-					 "title"=>1,
-					 "alias"=>0,
-					 "validator"=>0,
-					 "server"=>0,
-					 "remote_id"=>0,
-					 "time_limit"=>1,
-					 "memory_limit"=>1,
-					 "visits"=>1,
-					 "submissions"=>1,
-					 "accepted"=>1,
-					 "difficulty"=>1,
-					 "creation_date"=>0,
-					 "source"=>0,
-					 "order"=>0
-					 );					 
-		if(!isset($ord[$orderBy]))
-			$orderBy = "title";
-		else if($ord[$orderBy] == 0)$orderBy = "title";
-		
-		$total_paginas = ceil($total/$sizePage);
-		$inicio = $sizePage * ($noPage - 1);
-		$limite = $inicio + $sizePage;
-		$val = array(  $inicio, $sizePage);		
-		$sql = "SELECT * from Problems WHERE $condition ORDER BY $orderBy $orden LIMIT ?, ?"; 
-		
-		$rs = $conn->Execute($sql, $val);
-		$ar = array();
-		$info = "Mostrando $noPage de $total_paginas p&aacute;ginas. De ".( $inicio + 1 )." 
-		a $limite de  $total registros.";
-		$bar_size = 5;//sera 1 mas
-		
-		if( ( $noPage - $bar_size/2 ) >= ($total_paginas  - $bar_size )) $i = $total_paginas - $bar_size;		
-		else if( ( $noPage - $bar_size/2 )>1)$i = ceil($noPage - $bar_size/2);
-		else $i=1;
-		$cont = 0;
-		$bar = "<a href='?noPage=1&serv=$serv&order=$orderBy'> << </a>";
-		for(;$i <= $total_paginas && $cont <= $bar_size ; $i++  ){
-			if($noPage == $i) $bar .= " $i ";
-			else $bar .= "<a href='?noPage=$i&serv=$serv&order=$orderBy'> $i </a>";
-			$cont ++;
-		}
-		$bar .= "<a href='?noPage=$total_paginas&serv=$serv&order=$orderBy'> >> </a>";
-		array_push( $ar, $info);
-		array_push( $ar, $bar);
-		foreach ($rs as $foo) {		
-    		array_push( $ar, new Problems($foo));
-		}
-		return $ar;
 	}
 	
 	public static final function getByAlias($alias)
@@ -252,6 +189,31 @@ class ProblemsDAO extends ProblemsDAOBase
 		return $result;
 	}
 
+	public static final function getTagsForProblem($problem, $public) {
+		global $conn;
+
+		$sql = "SELECT
+			t.name
+		FROM
+			Problems_Tags pt
+		INNER JOIN
+			Tags t ON t.tag_id = pt.tag_id
+		WHERE
+			pt.problem_id = ?";
+		if ($public) {
+			$sql .= " AND pt.public = 1";
+		}
+
+		$rs = $conn->Execute($sql, $problem->problem_id);
+		$result = array();
+
+		foreach ($rs as $r) {
+			$result[] = $r['name'];
+		}
+
+		return $result;
+	}
+	
 	public static final function getPracticeDeadline($id) {
 		global $conn;
 
