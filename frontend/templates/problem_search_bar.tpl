@@ -1,11 +1,18 @@
 <div class="search-bar">
-	<form action="/problem/list" method="GET">
+	<form action="/problem/list/" method="GET">
 		<div class="form-inline">
+			{if !empty($smarty.get.tag)}
+			<div class="form-group">
+				<input type="hidden" name="tag" value="{$smarty.get.tag|urlencode}" />
+				<span class="tag">{$smarty.get.tag|escape}</span>
+				<a href="/problem/list/"><span class="glyphicon glyphicon-remove"></span></a>
+			</div>
+			{/if}
 			<div class="form-group">
 				<input class="form-control" id="problem-search-box"
 						type="text" name='query' autocomplete="off"
 						{if $KEYWORD != ''} value="{$KEYWORD}"{/if}
-						maxlength="256" placeholder="{#wordsKeyword#}">
+						placeholder="{#wordsKeyword#}">
 			</div>
 			<div class="form-group">
 				<label class="control-label" for="order_by">{#wordsOrderBy#}</label>

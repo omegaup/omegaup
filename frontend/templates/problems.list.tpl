@@ -3,7 +3,7 @@
 	<div class="panel-heading">
 		<h3 class="panel-title">{#wordsProblems#}</h3>
 	</div>
-	<table class="table">
+	<table class="table problem-list">
 		<thead>
 			<tr>
 				<th class="contains-long-desc">{#wordsTitle#}</th>
@@ -21,7 +21,15 @@
 		<tbody>
 			{foreach item=problem from=$problems}
 				<tr>
-				<td><a href="/arena/problem/{$problem.alias}">{$problem.title}</a>{if $problem.public == 0} <span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}</td>
+				<td><a href="/arena/problem/{$problem.alias}">{$problem.title}</a>{if $problem.public == 0} <span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
+					{if count($problem.tags) > 0}
+					<div class="tag-list" title="{" "|implode:$problem.tags|escape}">
+					{foreach item=tag from=$problem.tags}
+						<a class="tag" href="/problem/list/?tag={$tag|escape}">{$tag|escape}</a>
+					{/foreach}
+					</div>
+					{/if}
+				</td>
 				<td>{$problem.submissions}</td>
 				<td>{$problem.accepted}</td>
 				<td>{$problem.ratio}%</td>

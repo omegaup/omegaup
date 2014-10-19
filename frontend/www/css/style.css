@@ -537,10 +537,6 @@ th.contains-long-desc{ min-width:369px; }
 	margin-bottom: 10px;
 }
 
-.search-bar #problem-search-box {
-	width: 300px;
-}
-
 .search-bar #problem-search-order {
 	width: 200px;
 	margin-left: 10px;
@@ -553,6 +549,22 @@ th.contains-long-desc{ min-width:369px; }
 
 .search-bar #problem-search-button {
 	height: 32px;
+}
+
+table.problem-list td {
+	vertical-align: middle !important;
+}
+
+.tag-list {
+	line-height: 2em;
+}
+
+.tag {
+	font-size: 0.8em;
+	background: #eee;
+	padding: 0.5em;
+	color: #888;
+	border: 1px solid #ccc;
 }
 
 .pager-bar {

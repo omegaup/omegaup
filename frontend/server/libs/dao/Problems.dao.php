@@ -20,7 +20,7 @@ require_once("base/Problems.vo.base.php");
 class ProblemsDAO extends ProblemsDAOBase
 {
 	public static final function byUserType($user_type, $order, $mode, $offset,
-			$rowcount, $query, $user_id, &$total) {
+			$rowcount, $query, $user_id, $tag, &$total) {
 		global $conn;
 
 		if (!is_null($query)) {
@@ -60,13 +60,25 @@ class ProblemsDAO extends ProblemsDAOBase
 						Runs ON Runs.user_id = ? AND Runs.problem_id = Problems.problem_id
 					GROUP BY
 						Problems.problem_id
-				) ps ON ps.problem_id = p.problem_id";
+					) ps ON ps.problem_id = p.problem_id";
 
-			if (!is_null($query)) {
-				$sql .= " WHERE title LIKE '%$escaped_query%'";
+			$added_where = false;
+			if (!is_null($tag)) {
+				$sql .= " INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id";
+				$sql .= " INNER JOIN Tags t ON pt.tag_id = t.tag_id";
+				$sql .= " WHERE t.name = ?";
+				$args[] = $tag;
+				$added_where = true;
 			}
 
-			$sql .= " ORDER BY `$order` $collation $mode ";
+			if (!is_null($query)) {
+				if (!$added_where) {
+					$sql .= " WHERE";
+				} else {
+					$sql .= " AND";
+				}
+				$sql .= " title LIKE '%$escaped_query%'";
+			}
 		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
 			$like_query = '';
 			if (!is_null($query)) {
@@ -94,11 +106,19 @@ class ProblemsDAO extends ProblemsDAOBase
 						p.problem_id
 				) ps ON ps.problem_id = p.problem_id
 				LEFT JOIN
-					User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id
-				WHERE
-					(public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query
-				ORDER BY
-					`$order` $collation $mode";
+					User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id";
+
+			if (!is_null($tag)) {
+				$sql .= " INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id";
+				$sql .= " INNER JOIN Tags t ON pt.tag_id = t.tag_id";
+				$sql .= " WHERE t.name = ? AND pt.public = 1 AND";
+				$args[] = $tag;
+			} else {
+				$sql .= " WHERE";
+			}
+
+			$sql .= "
+					(public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query";
 		} else if ($user_type === USER_ANONYMOUS) {
 			$like_query = '';
 			if (!is_null($query)) {
@@ -112,11 +132,18 @@ class ProblemsDAO extends ProblemsDAOBase
 						Problems.*";
 			$sql = "
 					FROM
-						Problems
-					WHERE
-						public = 1 $like_query
-					ORDER BY
-						 `$order` $collation $mode";
+						Problems";
+
+			if (!is_null($tag)) {
+				$sql .= " INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id";
+				$sql .= " INNER JOIN Tags t ON pt.tag_id = t.tag_id";
+				$sql .= " WHERE t.name = ? AND pt.public = 1 AND";
+				$args[] = $tag;
+			} else {
+				$sql .= " WHERE";
+			}
+
+			$sql .= " public = 1 $like_query";
 		}
 
 		$total = $conn->GetOne("SELECT COUNT(*) $sql", $args);
@@ -126,6 +153,11 @@ class ProblemsDAO extends ProblemsDAOBase
 			$offset = 0;
 		}
 
+		if ($order == 'problem_id') {
+			$sql .= " ORDER BY p.problem_id $collation $mode";
+		} else {
+			$sql .= " ORDER BY `$order` $collation $mode";
+		}
 		$sql .= " LIMIT ?, ?";
 		$args[] = $offset;
 		$args[] = $rowcount;

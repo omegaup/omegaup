@@ -236,7 +236,7 @@
 						$('<tr></tr>')
 							.append($('<td></td>').append(
 								$('<a></a>')
-									.attr('href', '/problem/tags/' + tag.name + '/')
+									.attr('href', '/problem/list/?tag=' + tag.name)
 									.text(tag.name)
 							))
 							.append($('<td></td>').text(tag.public))

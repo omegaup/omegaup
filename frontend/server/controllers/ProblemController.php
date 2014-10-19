@@ -1334,6 +1334,7 @@ class ProblemController extends Controller {
 			$rowcount,
 			$query,
 			$author_id,
+			$r['tag'],
 			&$total
 		);
 		$response['total'] = $total;
