@@ -82,13 +82,12 @@ class ProblemsDAO extends ProblemsDAOBase
 		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
 			$like_query = '';
 			if (!is_null($query)) {
-				$like_query = " AND title LIKE '%$escaped_query%'";
+				$like_query = " AND p.title LIKE '%$escaped_query%'";
 			}
-			$args = array($user_id, $user_id, $user_id);
 			$select = "
 				SELECT
-					100 / LOG2(GREATEST(accepted, 1) + 1)	AS points,
-					accepted / GREATEST(1, submissions)		AS ratio,
+					100 / LOG2(GREATEST(p.accepted, 1) + 1)	AS points,
+					p.accepted / GREATEST(1, p.submissions)		AS ratio,
 					ROUND(100 * COALESCE(ps.score, 0), 2)	AS score,
 					p.*";
 			$sql = "
@@ -96,17 +95,18 @@ class ProblemsDAO extends ProblemsDAOBase
 					Problems p
 				LEFT JOIN (
 					SELECT
-						p.problem_id,
+						pi.problem_id,
 						MAX(r.score) AS score
 					FROM 
-						Problems p
+						Problems pi
 					INNER JOIN
-						Runs r ON r.user_id = ? AND r.problem_id = p.problem_id
+						Runs r ON r.user_id = ? AND r.problem_id = pi.problem_id
 					GROUP BY
-						p.problem_id
+						pi.problem_id
 				) ps ON ps.problem_id = p.problem_id
 				LEFT JOIN
 					User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id";
+			$args = array($user_id, $user_id);
 
 			if (!is_null($tag)) {
 				$sql .= " INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id";
@@ -118,21 +118,22 @@ class ProblemsDAO extends ProblemsDAOBase
 			}
 
 			$sql .= "
-					(public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query";
+				(p.public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query";
+			$args[] = $user_id;
 		} else if ($user_type === USER_ANONYMOUS) {
 			$like_query = '';
 			if (!is_null($query)) {
-				$like_query = " AND title LIKE '%{$escaped_query}%'";
+				$like_query = " AND p.title LIKE '%{$escaped_query}%'";
 			}
 			$select = "
 					SELECT
 						0 AS score,
-						100 / LOG2(GREATEST(accepted, 1) + 1) AS points,
-						accepted / GREATEST(1, submissions)   AS ratio,
-						Problems.*";
+						100 / LOG2(GREATEST(p.accepted, 1) + 1) AS points,
+						accepted / GREATEST(1, p.submissions)   AS ratio,
+						p.*";
 			$sql = "
 					FROM
-						Problems";
+						Problems p";
 
 			if (!is_null($tag)) {
 				$sql .= " INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id";
@@ -143,7 +144,7 @@ class ProblemsDAO extends ProblemsDAOBase
 				$sql .= " WHERE";
 			}
 
-			$sql .= " public = 1 $like_query";
+			$sql .= " p.public = 1 $like_query";
 		}
 
 		$total = $conn->GetOne("SELECT COUNT(*) $sql", $args);
