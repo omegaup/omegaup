@@ -230,6 +230,8 @@ OmegaUp.T = {
 	problemDeployerEmptyStatement: "Statements file \"%(file)\" is empty",
 	problemDeployerExceededZipSizeLimit: "Extracted zip size (%(size)) over max allowed (%(max_size)). Rejecting.",
 	problemDeployerFailed: "Unable to deploy problem",
+	problemDeployerIdlMissing: "Interactive problem is missing an .idl file",
+	problemDeployerLibinteractiveValidationError: "Interactive problem is invalid",
 	problemDeployerMissingFromTestplan: "Case in testplan missing from case list (%(file))",
 	problemDeployerNoCases: "No cases found",
 	problemDeployerNoStatements: "No statements found",

@@ -230,6 +230,8 @@ OmegaUp.T = {
 	problemDeployerEmptyStatement: "(S7a73m3n75 fi13 \%(fi13)\ i5 3mp7y)",
 	problemDeployerExceededZipSizeLimit: "(Ex7rac73d zip 5iz3 (%(5iz3)) 0v3r max a110w3d (%(max_5iz3)). R3j3c7ing.)",
 	problemDeployerFailed: "(Unab13 70 d3p10y pr0b13m)",
+	problemDeployerIdlMissing: "(In73rac7iv3 pr0b13m i5 mi55ing an .id1 fi13)",
+	problemDeployerLibinteractiveValidationError: "(In73rac7iv3 pr0b13m i5 inva1id)",
 	problemDeployerMissingFromTestplan: "(Ca53 in 7357p1an mi55ing fr0m ca53 1i57 (%(fi13)))",
 	problemDeployerNoCases: "(N0 ca535 f0und)",
 	problemDeployerNoStatements: "(N0 57a73m3n75 f0und)",

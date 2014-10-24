@@ -182,6 +182,11 @@ if [ ! -d $WWW_ROOT ]; then
 		sudo mkdir $WWW_ROOT/img
 	fi
 	sudo chown www-data.www-data $WWW_ROOT/img
+	# Templates directory
+	if [ ! -d $WWW_ROOT/templates ]; then
+		sudo mkdir $WWW_ROOT/templates
+	fi
+	sudo chown www-data.www-data $WWW_ROOT/templates
 fi
 
 # Add ngnix configuration.

@@ -54,6 +54,7 @@ frontend/server/api/tests/problems/
 frontend/server/api/tests/submissions/
 frontend/tests/controllers/img/
 frontend/www/img/
+frontend/www/templates/
 omegaup_test.log
 
 # Ignore runtime and test stuff

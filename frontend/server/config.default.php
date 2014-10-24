@@ -50,6 +50,8 @@ try_define('PROBLEMS_GIT_PATH',					'/var/lib/omegaup/problems.git');
 try_define('BIN_PATH',					'/opt/omegaup/bin');
 try_define('IMAGES_PATH',					'/opt/omegaup/frontend/www/img/');
 try_define('IMAGES_URL_PATH',				'/img/');
+try_define('TEMPLATES_PATH',					'/opt/omegaup/frontend/www/templates/');
+try_define('TEMPLATES_URL_PATH',				'/templates/');
 try_define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
 try_define('OMEGAUP_GRADER_RELOAD_CONFIG_URL',		'https://localhost:21680/reload-config/');
 try_define('OMEGAUP_GRADER_STATUS_URL',			'https://localhost:21680/status/');

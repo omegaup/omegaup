@@ -77,7 +77,7 @@ class FileHandler {
 
 	static function BackupDir($source, $dest) {
 		if (!is_dir($source)) return;
-		if (!is_dir($dest)) @mkdir($dest);
+		if (!is_dir($dest)) @mkdir($dest, 0755);
 
 		if ($handle = opendir($source)) {
 			while (false !== ($entry = readdir($handle))) {

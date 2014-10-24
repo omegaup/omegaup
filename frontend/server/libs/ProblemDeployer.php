@@ -29,6 +29,7 @@ class ProblemDeployer {
 	private $zipPath = null;
 	public $hasValidator = false;
 	private $isInteractive = false;
+	private $idlFile = null;
 	private $created = false;
 	private $operation = null;
 
@@ -84,18 +85,18 @@ class ProblemDeployer {
 		$this->cleanup();
 	}
 
-	private function git($cmd, $cwd) {
+	private function execute($cmd, $cwd) {
 		$descriptorspec = array(
 			0 => array("pipe", "r"),
 			1 => array("pipe", "w"),
 			2 => array("pipe", "w")
 		);
-		$proc = proc_open("/usr/bin/git $cmd", $descriptorspec, $pipes, $cwd, array());
+		$proc = proc_open($cmd, $descriptorspec, $pipes, $cwd, array());
 
 		if (!is_resource($proc)) {
 			$errors = error_get_last();
-			$this->log->error("git $cmd failed: {$errors['type']} {$errors['message']}");
-			throw new ProblemDeploymentFailedException();
+			$this->log->error("$cmd failed: {$errors['type']} {$errors['message']}");
+			throw new Exception($errors['message']);
 		}
 
 		fclose($pipes[0]);
@@ -104,11 +105,19 @@ class ProblemDeployer {
 
 		$retval = proc_close($proc);
 		if ($retval != 0) {
-			$this->log->error("git $cmd failed: $retval $output $err");
-			throw new ProblemDeploymentFailedException();
+			$this->log->error("$cmd failed: $retval $output $err");
+			throw new Exception($err);
 		}
 
 		return $output;
+	}
+
+	private function git($cmd, $cwd) {
+		try {
+			return $this->execute("/usr/bin/git $cmd", $cwd);
+		} catch (Exception $e) {
+			throw new ProblemDeploymentException();
+		}
 	}
 
 	public function commit($message, $user) {
@@ -129,6 +138,17 @@ class ProblemDeployer {
 			           escapeshellarg($this->targetDir), PROBLEMS_PATH);
 		} else {
 			$this->git('pull --rebase', $this->targetDir);
+		}
+
+		// Copy the libinteractive templates to a publically accessible location.
+		$publicDestination = TEMPLATES_PATH . "/$this->alias/";
+		if (is_dir($publicDestination)) {
+			FileHandler::DeleteDirRecursive($publicDestination);
+		}
+
+		if (is_dir("$this->tmpDir/interactive/generated")) {
+			FileHandler::BackupDir("$this->tmpDir/interactive/generated",
+				$publicDestination);
 		}
 	}
 
@@ -205,13 +225,21 @@ class ProblemDeployer {
 			// Move all .in and .out files to their folder.
 			$dh = opendir("$this->tmpDir/cases/");
 			while (($file = readdir($dh)) !== false) {
-				if ($this->endsWith($file, '.out', true)) {
+				if (ProblemDeployer::endsWith($file, '.out', true)) {
 					rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/out/$file");
-				} else if ($this->endsWith($file, '.in', true)) {
+				} else if (ProblemDeployer::endsWith($file, '.in', true)) {
 					rename("$this->tmpDir/cases/$file", "$this->tmpDir/cases/in/$file");
 				}
 			}
 			closedir($dh);
+
+			if ($this->isInteractive) {
+				$target = "$this->tmpDir/interactive/generated/";
+				if (!is_dir($target)) {
+					mkdir($target, 0755);
+				}
+				$this->handleInteractive("$this->tmpDir/$this->idlFile", $target);
+			}
 
 			// Handle statements
 			$this->handleStatements($this->filesToUnzip);
@@ -224,7 +252,7 @@ class ProblemDeployer {
 			// Handle cases
 			$this->handleCases($this->tmpDir, $this->casesFiles);
 		} catch (ApiException $e) {
-			throw new ProblemDeploymentFailedException($e->getMessage(), $e);
+			throw $e;
 		} catch (Exception $e) {
 			$this->log->error("Deployment exception $e");
 			throw new ProblemDeploymentFailedException('problemDeployerFailed', $e);
@@ -249,7 +277,7 @@ class ProblemDeployer {
 
 		if ($handle = opendir($dirpath)) {
 			while (false !== ($entry = readdir($handle))) {
-				if (!$this->endsWith($entry, '.out', true)) continue;
+				if (!ProblemDeployer::endsWith($entry, '.out', true)) continue;
 
 				$output_limit = max($output_limit, filesize("$dirpath/$entry"));
 			}
@@ -287,7 +315,7 @@ class ProblemDeployer {
 
 		if ($handle = opendir($dirpath)) {
 			while (false !== ($entry = readdir($handle))) {
-				if (!$this->endsWith($entry, '.in', true)) continue;
+				if (!ProblemDeployer::endsWith($entry, '.in', true)) continue;
 				$input_count += 1;
 			}
 			closedir($handle);
@@ -364,7 +392,7 @@ class ProblemDeployer {
 		for ($i = 0; $i < count($zipFilesArray); $i++) {
 			$path = $zipFilesArray[$i];
 
-			if (strpos($path, "cases/") != 0 || !$this->endsWith($path, ".in", true)) continue;
+			if (strpos($path, "cases/") != 0 || !ProblemDeployer::endsWith($path, ".in", true)) continue;
 			// Look for the .out pair
 			$outPath = substr($path, 0, strlen($path) - 3) . ".out";
 			$idx = $zip->locateName($outPath, ZipArchive::FL_NOCASE);
@@ -488,8 +516,15 @@ class ProblemDeployer {
 				$this->filesToUnzip[] = $zip->getNameIndex($i);
 
 				$this->isInteractive = true;
-				$this->log->info("Interactive folder found: " . $zip->getNameIndex($i));
+				if (ProblemDeployer::endsWith($zip->getNameIndex($i), '.idl', true)) {
+					$this->log->info(".idl file found: " . $zip->getNameIndex($i));
+					$this->idlFile = $zip->getNameIndex($i);
+				}
 			}
+		}
+
+		if ($this->isInteractive && $this->idlFile == null) {
+			throw new InvalidParameterException("problemDeployerIdlMissing");
 		}
 
 		if ($this->isInteractive && $size > ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE) {
@@ -528,6 +563,23 @@ class ProblemDeployer {
 		}
 
 		return $returnValue;
+	}
+
+
+	/**
+	 * Validate libinteractive problems and generate all possible templates.
+	 *
+	 * @param string $idlPath
+	 */
+	private function handleInteractive($idlPath, $target) {
+		try {
+			$cmd = '/usr/bin/java -jar ' . BIN_PATH . '/libinteractive.jar generate-all ' .
+				escapeshellarg($idlPath) . ' --package-directory ' . escapeshellarg($target);
+			return $this->execute($cmd, $target);
+		} catch (Exception $e) {
+			throw new InvalidParameterException(
+				'problemDeployerLibinteractiveValidationError', $e->getMessage());
+		}
 	}
 
 
@@ -714,7 +766,7 @@ class ProblemDeployer {
 	 * @param boolean $case
 	 * @return boolean
 	 */
-	private function endsWith($haystack, $needle, $case) {
+	private static function endsWith($haystack, $needle, $case) {
 		$expectedPosition = strlen($haystack) - strlen($needle);
 
 		$ans = false;
