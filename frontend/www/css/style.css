@@ -208,6 +208,16 @@ div#sidebar { display: none }
 	margin-top: 35px;
 	padding: 15px;
 }
+#wmd-preview-statement code.libinteractive-download,
+#wmd-preview-wrapper code.libinteractive-download {
+	color: #ccc;
+	margin: 1em 0;
+	border: 1px dotted #ccc;
+	display: block;
+	text-align: center;
+	font-size: 2em;
+	line-height: 3em;
+}
 table.sample_io {
 	margin: 5px;
 	padding : 5px;

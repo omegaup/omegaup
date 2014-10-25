@@ -287,6 +287,11 @@ body#only-problem #problems .main {
 	height: 400px;
 }
 
+#problem .statement a.libinteractive-help {
+	display: inline-block;
+	float: right;
+}
+
 #problem hr {
 	width: 90%;
 	border: 0;

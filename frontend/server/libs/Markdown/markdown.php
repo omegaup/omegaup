@@ -224,6 +224,10 @@ class Markdown_Parser {
 	# A callback function to handle translation.
 	var $translation_callback = null;
 
+	# Template expansions
+	var $templates = array(
+	);
+
 	function Markdown_Parser($image_callback, $translation_callback) {
 		#
 		# Constructor function. Initialize appropriate member variables.
@@ -232,6 +236,56 @@ class Markdown_Parser {
 		$this->translation_callback = $translation_callback;
 		$this->_initDetab();
 		$this->prepareItalicsAndBold();
+		$this->templates['libinteractive:download'] =
+			'<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">' .
+						call_user_func($this->translation_callback, 'libinteractive-title')
+					. '<a class="libinteractive-help" target="_blank" href="' .
+						call_user_func($this->translation_callback, 'libinteractive-help')
+					. '"><span class="glyphicon glyphicon-question-sign"></span></a></h3>
+				</div>
+				<div class="panel-body">
+					<form id="libinteractive-download" role="form" data-alias="' .
+						call_user_func($this->translation_callback, 'alias')
+					. '">
+						<div class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="libinteractive-download-os">' .
+									call_user_func($this->translation_callback, 'os')
+								. '</label>
+								<div class="col-sm-10">
+									<select class="form-control download-os" id="libinteractive-download-os">
+										<option value="unix">Linux/Mac OS X</option>
+										<option value="windows">Windows</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="libinteractive-download-lang">' .
+									call_user_func($this->translation_callback, 'language')
+								. '</label>
+								<div class="col-sm-10">
+									<select class="form-control download-lang" id="libinteractive-download-lang">
+										<option value="c">C</option>
+										<option value="cpp">C++</option>
+										<option value="java">Java</option>
+										<option value="py">Python</option>
+										<option value="pas">Pascal</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<input class="btn btn-primary active" type="submit" value="' .
+											call_user_func($this->translation_callback, 'download')
+									. '" />
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>';
 	
 		$this->nested_brackets_re = 
 			str_repeat('(?>[^\[\]]+|\[', $this->nested_brackets_depth).
@@ -633,6 +687,7 @@ class Markdown_Parser {
 		"encodeAmpsAndAngles" =>  40,
 
 		"doItalicsAndBold"    =>  50,
+		"doTemplates"         =>  55,
 		"doHardBreaks"        =>  60,
 		);
 
@@ -1290,6 +1345,22 @@ class Markdown_Parser {
 		}
 		return $text_stack[0];
 	}
+
+	function doTemplates($text) {
+		return preg_replace_callback(
+			'/^\s*\{\{([a-z0-9_:]+)\}\}\s*$/',
+			array(&$this, '_doTemplates_callback'), $text);
+	}
+	function _doTemplates_callback($matches) {
+		$name = $matches[1];
+		if (array_key_exists($name, $this->templates)) {
+			return $this->hashBlock($this->templates[$name]);
+		} else {
+			return $this->hashBlock('<strong style=\"color: red\">
+				Unrecognized template name: ' . $name . '</strong>');
+		}
+	}
+
 
 	function doBlockQuotes($text) {
 		$text = preg_replace_callback('/

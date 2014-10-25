@@ -70,6 +70,21 @@ function Arena() {
 	this.activeTab = 'problems';
 	this.clarifications = {};
 	this.submissionGap = 0;
+
+	// Setup any global hooks.
+	$('#libinteractive-download').submit(function(e) {
+		var form = $(e.target);
+		var alias = e.target.attributes['data-alias'].value;
+		var os = form.find('.download-os').val();
+		var lang = form.find('.download-lang').val();
+		var extension = (os == 'unix' ? '.tar.bz2' : '.zip');
+
+		window.location = (
+			window.location.protocol + '//' + window.location.host + '/templates/' +
+			alias + '/' + alias + '_' + os + '_' + lang + extension);
+
+		return false;
+	});
 };
 
 Arena.verdicts = {
