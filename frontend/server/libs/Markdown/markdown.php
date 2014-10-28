@@ -267,12 +267,21 @@ class Markdown_Parser {
 								. '</label>
 								<div class="col-sm-10">
 									<select class="form-control download-lang" id="libinteractive-download-lang">
-										<option value="c">C</option>
+										<option value="c" selected="selected">C</option>
 										<option value="cpp">C++</option>
 										<option value="java">Java</option>
 										<option value="py">Python</option>
 										<option value="pas">Pascal</option>
 									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<strong class="col-sm-2 control-label">' .
+									call_user_func($this->translation_callback, 'libinteractive-filename')
+									. '</strong>
+								<div class="col-sm-10">' .
+									call_user_func($this->translation_callback, 'idl')
+								. '.<span class="libinteractive-extension">c</span>
 								</div>
 							</div>
 							<div class="form-group">

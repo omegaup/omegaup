@@ -85,6 +85,11 @@ function Arena() {
 
 		return false;
 	});
+
+	$('#libinteractive-download .download-lang').change(function(e) {
+		var form = $('#libinteractive-download');
+		form.find('.libinteractive-extension').html(form.find('.download-lang').val());
+	});
 };
 
 Arena.verdicts = {

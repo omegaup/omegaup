@@ -573,7 +573,7 @@ class ProblemDeployer {
 	 */
 	private function handleInteractive($idlPath, $target) {
 		try {
-			$cmd = '/usr/bin/java -jar ' . BIN_PATH . '/libinteractive.jar generate-all ' .
+			$cmd = '/usr/bin/java -Xmx64M -jar ' . BIN_PATH . '/libinteractive.jar generate-all ' .
 				escapeshellarg($idlPath) . ' --package-directory ' . escapeshellarg($target) .
 				' --package-prefix ' . escapeshellarg($this->alias . '_');
 			return $this->execute($cmd, $target);
@@ -716,6 +716,9 @@ class ProblemDeployer {
 	public function translationCallback($key) {
 		if ($key == 'alias') {
 			return $this->alias;
+		} else if ($key == 'idl') {
+			$info = pathinfo($this->idlFile);
+			return basename($info['basename'], '.' . $info['extension']);
 		}
 		if ($this->currentLanguage == 'en') {
 			switch ($key) {
@@ -725,8 +728,9 @@ class ProblemDeployer {
 				case 'os': return 'Operating System';
 				case 'language': return 'Language';
 				case 'download': return 'Download';
+				case 'libinteractive-filename': return 'File to submit';
+				case 'libinteractive-help': return '/libinteractive/en/contest/';
 				case 'libinteractive-title': return 'Interactive templates';
-				case 'libinteractive-help': return 'https://omegaup.com/libinteractive/en/';
 			}
 		} else {
 			if ($this->currentLanguage != 'es') {
@@ -739,8 +743,9 @@ class ProblemDeployer {
 				case 'os': return 'Sistema Operativo';
 				case 'language': return 'Lenguaje';
 				case 'download': return 'Descargar';
+				case 'libinteractive-filename': return 'Archivo que debes enviar';
 				case 'libinteractive-title': return 'Plantillas para problema interactivo';
-				case 'libinteractive-help': return 'https://omegaup.com/libinteractive/es/';
+				case 'libinteractive-help': return '/libinteractive/es/contest/';
 			}
 		}
 		throw new Exception("Invalid translation key $key");
