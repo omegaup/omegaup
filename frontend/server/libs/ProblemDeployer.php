@@ -29,6 +29,7 @@ class ProblemDeployer {
 	private $zipPath = null;
 	public $hasValidator = false;
 	private $isInteractive = false;
+	private $checkedForInteractive = false;
 	private $idlFile = null;
 	private $created = false;
 	private $operation = null;
@@ -523,6 +524,8 @@ class ProblemDeployer {
 			}
 		}
 
+		$this->checkedForInteractive = true;
+
 		if ($this->isInteractive && $this->idlFile == null) {
 			throw new InvalidParameterException("problemDeployerIdlMissing");
 		}
@@ -713,12 +716,36 @@ class ProblemDeployer {
 		return $replacement;
 	}
 
+	private function getIdlFile() {
+		if (!$this->checkedForInteractive) {
+			$this->checkedForInteractive = true;
+
+			$dirpath = $this->tmpDir . '/interactive/';
+
+			if (($handle = @opendir($dirpath)) !== false) {
+				while (($entry = readdir($handle)) !== false) {
+					if (ProblemDeployer::endsWith($entry, ".idl", true)) {
+						$this->idlFile = '/interactive/' . $entry;
+						break;
+					}
+				}
+				closedir($handle);
+			}
+		}
+		return $this->idlFile;
+	}
+
 	public function translationCallback($key) {
 		if ($key == 'alias') {
 			return $this->alias;
 		} else if ($key == 'idl') {
-			$info = pathinfo($this->idlFile);
-			return basename($info['basename'], '.' . $info['extension']);
+			$idlFile = $this->getIdlFile();
+			if ($idlFile == null) {
+				return "(null)";
+			} else {
+				$info = pathinfo($idlFile);
+				return basename($info['basename'], '.' . $info['extension']);
+			}
 		}
 		if ($this->currentLanguage == 'en') {
 			switch ($key) {
