@@ -156,6 +156,8 @@ class ProblemsDAO extends ProblemsDAOBase
 
 		if ($order == 'problem_id') {
 			$sql .= " ORDER BY p.problem_id $collation $mode";
+		} else if ($order == 'points' && $mode == 'desc') {
+			$sql .= " ORDER BY `points` DESC, `accepted` ASC, `submissions` DESC";
 		} else {
 			$sql .= " ORDER BY `$order` $collation $mode";
 		}
