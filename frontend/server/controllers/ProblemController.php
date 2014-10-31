@@ -118,7 +118,8 @@ class ProblemController extends Controller {
 		Validators::isStringNonEmpty($r["title"], "title", $is_required);
 		Validators::isStringNonEmpty($r["source"], "source", $is_required);
 		Validators::isInEnum($r["public"], "public", array("0", "1"), $is_required);
-		Validators::isInEnum($r["validator"], "validator", array("token", "token-caseless", "token-numeric", "custom"), $is_required);
+		Validators::isInEnum($r["validator"], "validator",
+			array("token", "token-caseless", "token-numeric", "custom", "literal"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["output_limit"], "output_limit", 0, INF, $is_required);

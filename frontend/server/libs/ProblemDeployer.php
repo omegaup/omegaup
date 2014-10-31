@@ -393,7 +393,8 @@ class ProblemDeployer {
 		for ($i = 0; $i < count($zipFilesArray); $i++) {
 			$path = $zipFilesArray[$i];
 
-			if (strpos($path, "cases/") != 0 || !ProblemDeployer::endsWith($path, ".in", true)) continue;
+			if (strpos($path, "cases/") !== 0 ||
+			    !ProblemDeployer::endsWith($path, ".in", true)) continue;
 			// Look for the .out pair
 			$outPath = substr($path, 0, strlen($path) - 3) . ".out";
 			$idx = $zip->locateName($outPath, ZipArchive::FL_NOCASE);
@@ -404,8 +405,7 @@ class ProblemDeployer {
 				$this->filesToUnzip[] = $path;
 				$this->filesToUnzip[] = $zipFilesArray[$idx];
 			} else {
-				throw new InvalidParameterException("problemDeployerOutMissing", NULL,
-					array('file' => $path));
+				throw new InvalidParameterException("problemDeployerOutMissing", $path);
 			}
 		}
 
@@ -526,8 +526,12 @@ class ProblemDeployer {
 
 		$this->checkedForInteractive = true;
 
-		if ($this->isInteractive && $this->idlFile == null) {
-			throw new InvalidParameterException("problemDeployerIdlMissing");
+		if ($this->isInteractive) {
+			if ($this->idlFile == null) {
+				throw new InvalidParameterException("problemDeployerIdlMissing");
+			} else if (!in_array('interactive/examples/sample.in', $this->filesToUnzip)) {
+				throw new InvalidParameterException("problemDeployerInteractiveSampleMissing");
+			}
 		}
 
 		if ($this->isInteractive && $size > ProblemDeployer::MAX_INTERACTIVE_ZIP_FILESIZE) {

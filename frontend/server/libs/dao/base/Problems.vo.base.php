@@ -187,7 +187,7 @@ class Problems extends VO
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var enum('remote','literal','token','token-caseless','token-numeric','custom')
+	  * @var enum('token','token-caseless','token-numeric','custom','literal')
 	  */
 	public $validator;
 

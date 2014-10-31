@@ -36,10 +36,11 @@
 				<div class="form-group col-md-6">
 					<label for="validator">{#problemEditFormValidatorType#}</label>
 					<select name='validator' id='validator' class="form-control" >
-							<option value="token-caseless">{#problemEditFormTokenByToken#}, ignorando diferencias en mayúsculas/minúsculas (default)</option>
-							<option value="token-numeric">Tokens numéricos con tolerancia</option>
+							<option value="token-caseless">{#problemEditFormTokenCaseless#}</option>
+							<option value="token-numeric">{#problemEditFormNumericTokensWithTolerance#}</option>
 							<option value="token">{#problemEditFormTokenByToken#}</option>
-							<option value="custom">Validador personalizado (validator.$lang$)</option>
+							<option value="literal">{#problemEditFormLiteral#}</option>
+							<option value="custom">{#problemEditFormCustom#}</option>
 					</select>
 				</div>
 			</div>
