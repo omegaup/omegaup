@@ -3,6 +3,8 @@ repo_url: https://github.com/omegaup/libinteractive
 docs_dir: .
 pages:
 - [index.md, Índice]
+- [writing.md, Escribiendo problemas]
+- [internals.md, Detalles de implementación]
 - [contest.md, Concursantes]
 - [license.md, Licencia]
 theme: readthedocs

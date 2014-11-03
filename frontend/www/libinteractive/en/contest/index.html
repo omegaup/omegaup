@@ -45,6 +45,20 @@
       <ul class="current">
     
         
+            <li class="toctree-l1 ">
+                <a class="" href="../writing">Writing problems</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../internals">Implementation details</a>
+            </li>
+        
+
+    
+        
             <li class="toctree-l1 current">
                 <a class="current" href=".">Contestants</a>
             </li>
@@ -91,59 +105,60 @@
 </div>
           <div role="main">
             <div class="section">
-              <h1 id="ejecutar-programas-de-libinteractive">Ejecutar programas de libinteractive</h1>
-<p>libinteractive es una manera sencilla de hacer problemas interactivos. El
-proceso para compilar, ejecutar y probar los programas es ligeramente distinto
-al que estás acostumbrado, pero es sencillo. Los pasos específicos dependen del
-sistema operativo que estés usando:</p>
+              <h1 id="running-libinteractive-problems">Running libinteractive problems</h1>
+<p>libinteractive is an easy way to write interactive problems. The process to
+compile, run, and test programs is slightly different to the one you are used
+to, but it is simple. The specific steps depend on the operating system you are
+using:</p>
 <h3 id="windows">Windows</h3>
 <ul>
-<li>Extrae todos los archivos a una carpeta, abre la consola y dirígete a la
-  carpeta donde extrajiste los archivos.</li>
-<li>Debes tener instalado <a href="http://www.codeblocks.org/downloads/binaries#windows">CodeBlocks</a>
-  (asegúrate de bajar la versión que dice MinGW) y haberlo ejecutado al menos
-  una vez.<ul>
-<li>Si quieres usar Java, debes tener instalado el
+<li>Extract all files in the template into a folder. Open the Commandline
+    (Windows+R, type <code>cmd</code> and press Return),   and navigate to the folder you just
+    created.</li>
+<li>You must have previously installed <a href="http://www.codeblocks.org/downloads/binaries#windows">CodeBlocks</a>
+  (make sure to install the version that says MinGW) and run it at least once.<ul>
+<li>If you are using Java, you must install the
   <a href="http://www.oracle.com/technetwork/java/javase/downloads/">JDK</a>.</li>
-<li>Si quieres usar Pascal, debes tener instalado
-  <a href="http://www.lazarus.freepascal.org/index.php?page=downloads">Lazarus</a> y
-  haberlo ejecutado al menos una vez.</li>
-<li>Si quieres usar Python, debes tener instalado <a href="https://www.python.org/downloads/">Python 2.7</a></li>
+<li>If you want to use Pascal, you need to install
+  <a href="http://www.lazarus.freepascal.org/index.php?page=downloads">Lazarus</a> and
+        have launched it at least once.</li>
+<li>If you want to use Python, you need to install
+      <a href="https://www.python.org/downloads/">Python 2.7</a>.</li>
 </ul>
 </li>
-<li>Escribe <code>run</code> (o <code>run.bat</code>) para compilar todos los programas que necesitas y
-  posteriormente ejecutar tu código. Recuerda que el validador espera una
-  entrada en la consola, así que debes ya sea escribirla o pasársela como
-  archivo (<code>run &lt; entrada.in</code>).</li>
-<li>Para probar tu solución con un caso de prueba, escribe <code>test</code> (o <code>test.bat</code>).
-  Esto es equivalente a correr <code>run.bat &lt; examples\sample.in</code>.</li>
+<li>To compile all required programs, type <code>run</code> (or <code>run.bat</code>). This will also
+    run your code. Remember that the problemsetter program expects to read the
+    case from stdin, so you either need to type it on the commandline or redirect
+    stdin (<code>run &lt; input.in</code>).</li>
+<li>To test your solution with a test case, write <code>test</code> (or <code>test.bat</code>). This is
+  equivalent to running <code>run.bat &lt; examples\sample.in</code>.</li>
 </ul>
 <h3 id="linuxmac-os-x">Linux/Mac OS X</h3>
 <ul>
-<li>Extrae todos los archivos a una carpeta y abre la terminal y dirígete a la
-  carpeta donde extrajiste los archivos.</li>
-<li>Se recomienda que tengas instalados los siguientes paquetes: <code>make</code>, <code>gcc</code>,
-  <code>g++</code>, <code>fpc</code>, <code>python</code> y <code>openjdk-7-jdk</code>.</li>
-<li>Escribe <code>make</code> para compilar todos los programas que necesitas y <code>make run</code>
-  para ejecutar tu código. Recuerda que el validador espera una entrada en la
-  consola, así que debes ya sea escribirla o pasársela como archivo (<code>make run
-  &lt; entrada.in</code>).</li>
-<li>Para probar tu solución con un caso de prueba, escribe <code>make test</code>. Esto es
-  equivalente a correr <code>make run &lt; examples/sample.in</code>.</li>
+<li>Extract all template files to a directory, open the terminal and navigate to
+  the recently created directory.</li>
+<li>It is recommended that you have the following packages installed: <code>make</code>,
+  <code>gcc</code>, <code>g++</code>, <code>fpc</code>, <code>python</code> y <code>openjdk-7-jdk</code>.</li>
+<li>Write <code>make</code> to compile all needed programs and <code>make run</code> to execute your
+  code. Rembember that the problemsetter program expects to read a test case
+    from stdin, so either type it on the terminal or redirect stdin (<code>make run
+  &lt; input.in</code>).</li>
+<li>To test your solution against a test case, write <code>make test</code>. This is
+  equivalent to running <code>make run &lt; examples/sample.in</code>.</li>
 </ul>
-<h1 id="notas-generales">Notas generales</h1>
+<h1 id="general-notes">General notes</h1>
 <ul>
-<li>Para resolver el problema, debes enviar únicamente el archivo que te indica
-  la página. No envíes ningún otro archivo o resultará en un error de
-  compilación.</li>
-<li>Algunos problemas tendrán más casos de ejemplo en la carpeta <code>examples</code> además
-  de <code>sample.in</code>. Intenta hacer que tu código pase con todos esos casos. Puedes
-  probarlo corriendo ya sea <code>run &lt; examples/archivo.in</code> o <code>make run &lt; examples/archivo.in</code>,
-  depende de tu sistema operativo.</li>
-<li>Para obtener todos los puntos de un problema, tu programa debe poder resolver
-  todos los casos posibles. Intenta pensar en casos de ejemplo adicionales a
-  los que se encuentren en la plantilla, corre tu código con ellos y verifica
-  que de el resultado correcto. Mucha suerte!</li>
+<li>To correctly solve the problem, you must only submit the file that the
+    website tells you. Don't send any other file or it will result in a
+    compilation error.</li>
+<li>Some problems will have extra test inputs beside <code>sample.in</code>. Try to make
+    your code run correctly with all those cases. You can try them out by running
+    either <code>run &lt; examples/file.in</code> or <code>make run &lt; examples/file.in</code>, depending
+    on your operating system.</li>
+<li>To get all possible points in a problem, your program must solve all possible
+    test cases, even some not included in the <code>examples</code> folder. Try to think of
+    additional test cases, run your code with them and verify that the result is
+    correct. Good luck!</li>
 </ul>
 
             </div>
@@ -155,7 +170,7 @@ sistema operativo que estés usando:</p>
         <a href="../license" class="btn btn-neutral float-right" title="License"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href=".." class="btn btn-neutral" title="Index"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../internals" class="btn btn-neutral" title="Implementation details"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   

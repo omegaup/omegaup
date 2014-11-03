@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Escribiendo problemas - libinteractive</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> libinteractive</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+            <li class="toctree-l1 current">
+                <a class="current" href=".">Escribiendo problemas</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../internals">Detalles de implementación</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../contest">Concursantes</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../license">Licencia</a>
+            </li>
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Escribiendo problemas</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <h1 id="como-escribir-problemas">Cómo escribir problemas</h1>
+<p>Primero debes escribir un archivo .idl con la descripción de las interfaces
+(funciones definidas en el programa del juez y concursante). También debes
+escribir un programa (de preferencia en C/C++, por eficiencia) que lea el caso
+de entrada estándar, invoque las funciones que el concursante debe implementar
+y finalmente escriba en salida estándar ya sea la salida del programa o el
+puntaje final que el concursante obtuvo en ese caso (si se utiliza el validador
+<code>literal</code> en omegaUp). Finalmente, es necesario correr libinteractive para que
+genere todos los archivos necesarios para poder probar la solución, de esta manera:</p>
+<pre class="prettyprint well"><code>java -jar libinteractive.jar generate &lt;archivo.idl&gt; &lt;lenguaje del juez&gt; &lt;lenguaje de la solución&gt; --makefile
+</code></pre>
+<p>Es necesario crear un directorio llamado <code>examples</code> (en minúsculas) y colocar
+un caso de ejemplo llamado <code>sample.in</code> en ese directorio. De ser necesario, es
+posible colocar más casos de ejemplo en ese directorio y se copiarán
+automáticamente a las plantillas para que los concursantes puedan descargarlas.</p>
+<p>Por último, hay que implementar la solución y correr <code>make test</code> para verificar
+que todo funciona. De ser necesario generar una implementación alternativa del
+programa del juez que se pueda distribuir a los concursantes (por si el
+programa del juez contiene la solución o pistas que divulgan cómo llegar a la
+solución), se puede agregar un segundo archivo con <code>.distrib</code> antes de la
+extensión. Por ejemplo, si el programa del juez está en el archivo <code>Main.cpp</code>,
+el programa público del juez se puede colocar en el archivo <code>Main.distrib.cpp</code>
+y únicamente este se distribuiría en las plantillas a los concursantes.</p>
+<p>Una vez que se está contento con el problema, se debe convertir a formato
+omegaUp para subirlo. Para hacerlo, deben existir las siguientes carpetas:</p>
+<ul>
+<li><code>cases</code>, con los casos oficiales. Las entradas deben estar en archivos con
+    extensión <code>.in</code> y las salidas en archivos con el mismo nombre pero
+    terminación <code>.out</code>.</li>
+<li><code>statements</code> con las redacciones. Las redacciones se deben escribir en formato
+    Markdown, y debe haber una por lenguaje. Por ejemplo, para un problema en
+    inglés y español, deben existir dos archivos: <code>es.markdown</code> y <code>en.markdown</code>.
+    Para incluir el control para descargar las plantillas, los archivos <code>.markdown</code>
+    deben contener la cadena <code>{{libinteractive:download}}</code> en un renglón, sin texto
+    extra.</li>
+<li><code>interactive</code> con el problema interactivo. Aquí solo debe estar el archivo .idl,
+    el programa del juez (<code>Main.cpp</code>) y la carpeta <code>examples</code> con <code>sample.in</code> y
+    cualquier otro caso de entrada necesario. Opcionalmente puede estar el
+    archivo <code>Main.distrib.cpp</code> si <code>Main.cpp</code> tiene parte de la solución. No se debe
+    incluir el Makefile, la solución de prueba o la carpeta libinteractive.</li>
+</ul>
+<p>Por último, esas tres carpetas deben guardarse en un archivo .zip sin carpetas
+intermedias. Las plantillas que se distribuirán a los concursantes se generarán
+de manera automática.</p>
+<h1 id="convenciones">Convenciones</h1>
+<ul>
+<li>La primer interfaz en el .idl (el programa del juez) debe llamarse <code>Main</code>. El
+  programa del juez, entonces, debe estar en un archivo llamado <code>Main.cpp</code> (o
+  la extensión que utilice el lenguaje de programación en el que se escribe).</li>
+<li>El programa del concursante debe estar en un archivo con el mismo nombre que
+    el archivo .idl, pero con la extensión apropiada para ese lenguaje de
+    programación. Por ejemplo, para el problema <code>sumas</code>, la solución del
+    concursante en <code>sumas.cpp</code>.</li>
+<li>Cada interfaz producirá un ejecutable distinto, y se correrán en procesos
+    separados. Eso quiere decir que ninguna variable se puede compartir, así que
+    es necesario pasarlas como parámetros a funciones.</li>
+<li>Todas las interfaces se pueden comunicar con Main, y Main se puede comunicar
+    con todas las demás interfaces, pero dos interfaces del concursante no se
+    pueden comunicar entre sí.</li>
+<li>Los arreglos como tipos de parámetros de función son permitidos, pero sus
+  dimensiones deben obedecer las reglas de los arreglos en C: todas las
+    dimensiones (excepto la primera) deben ser constantes enteras.</li>
+<li>Los arreglos pueden declarar su primera dimensión como una variable, pero
+  esta variable debe aparecer como parámetro en la misma función, y debe
+    aparecer antes en la lista de parámetros.</li>
+<li>Los parámetros que sean utilizados como dimensiones de arreglos deben
+  declarar el atributo <code>Range</code>, con los valores mínimo y máximo que puede
+    tomar ese parámetro. Esto se utiliza para saber de antemano qué tan grande
+    puede ser la memoria que es necesario alojar para que quepa el arreglo
+    entero.</li>
+</ul>
+<h1 id="ejemplos-de-archivos-idl">Ejemplos de archivos .idl</h1>
+<p><a href="https://omegaup.com/arena/problem/jarras/">Las jarras de agua</a></p>
+<pre class="prettyprint well"><code>interface Main {
+ void verterAgua(int fuente, int destino);
+};
+
+interface jarras {
+    void programa(int objetivo, int capacidadJarra1, int capacidadJarra2);
+};
+</code></pre>
+<p><a href="http://cms.ioi-jp.org/open-2014/data/2014-open-d1-factories-en.pdf">Factories</a></p>
+<pre class="prettyprint well"><code>interface Main {
+};
+
+interface factories {
+    void Init([Range(2, 500000)] int N, int[N] A, int[N] B, int[N] D);
+    long Query([Range(1, 499999)] int S, int[S] X, [Range(1, 499999)] int T, int[T] Y);
+};
+</code></pre>
+<p><a href="http://www.ioi2011.or.th/hsc/tasks/EN/parrots.pdf">Parrots</a></p>
+<pre class="prettyprint well"><code>interface Main {
+    void send([Range(0, 65535)] int n);
+    void output([Range(0, 255)] int n);
+};
+
+interface encoder {
+    void encode([Range(0, 64)] int N, int[N] M);
+};
+
+interface decoder {
+    void decode([Range(0, 64)] int N, [Range(0, 320)] int L, int[L] X);
+};
+</code></pre>
+<h1 id="gramatica-idl">Gramática IDL</h1>
+<p>IDL es casi un subconjunto de WebIDL, pero con un poco de sintaxis extra para
+concursos de programación:</p>
+<pre class="prettyprint well"><code>letter
+    = "a" | "b" | ... | "y" | "z"
+    | "A" | "B" | ... | "Y" | "Z"
+    ;
+
+digit
+    = "0" | "1" | ... | "8" | "9"
+    ;
+
+ident
+    = (letter | "_"), { letter | digit | "_" }
+    ;
+
+number
+    = digit, { digit }
+    ;
+
+interface-list
+    = interface, { interface }
+    ;
+
+interface
+    = "interface", ident, "{", { function }, "}", ";"
+    ;
+
+function
+    = return-type, ident, "(", param-list , ")", ";"
+    ;
+
+param-list
+    = [ param, { ",", param } ]
+    ;
+
+type
+    = array | primitive
+    ;
+
+primitive
+    = "bool" | "int" | "short" | "float"
+    | "char" | "string" | "long"
+    ;
+
+array
+    = primitive, "[", expr, "]", { "[", expr, "]" }
+    ;
+
+return-type
+    = primitive | "void"
+    ;
+
+expr
+    = ident | number
+    ;
+
+param
+    = { param-attribute }, type, ident
+    ;
+
+param-attribute
+    = "[", range-attribute, "]"
+    ;
+
+range-attribute
+    = "Range", "(", expression, ",", expression, ")"
+    ;
+</code></pre>
+
+            </div>
+          </div> 
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../internals" class="btn btn-neutral float-right" title="Detalles de implementación"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Índice"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

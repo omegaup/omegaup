@@ -46,6 +46,20 @@
     
         
             <li class="toctree-l1 ">
+                <a class="" href="writing/">Writing problems</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="internals/">Implementation details</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
                 <a class="" href="contest/">Contestants</a>
             </li>
         
@@ -91,7 +105,57 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>libinteractive</p>
+              <h1 id="libinteractive">libinteractive</h1>
+<p>A tiny IDL translator that creates IPC shims to easily create interactive
+problems.</p>
+<p>To avoid having to write a program in each of the supported languages and
+making sure that none of them has bugs or undefined behavior that might
+cause the wrong output/veredict to be emitted, libinteractive allows you
+to have both the problemsetter and contestants' implementations in different
+processes and possibly languages.</p>
+<h3 id="example">Example</h3>
+<p>Let's say you have a problem called <code>sums</code>. You, as problemsetter, implement
+your part of the problem in a file called <code>Main.cpp</code> and the contestants writes
+their solution in a file called <code>sums.py</code>, so you can do:</p>
+<pre class="prettyprint well"><code class="console">$ ls
+Main.cpp sums.py sums.idl input
+
+$ cat Main.cpp
+#include &lt;stdio.h&gt;
+#include &quot;sums.h&quot;
+
+int main(int argc, char* argv[]) {
+    int a, b;
+    scanf(&quot;%d %d\n&quot;, &amp;a, &amp;b);
+    printf(&quot;%d\n&quot;, sums(a, b));
+}
+
+$ cat sums.py
+def sums(a, b):
+    print 'Hello, world!'
+    return a + b
+
+$ cat sum.idl
+interface Main {
+}
+
+interface sums {
+    int sums(int a, int b);
+}
+
+$ java -jar libinteractive.jar generate sums.idl cpp py --makefile
+$ make run &lt; input
+[Main] 3
+[ sum] Hello, world!
+
+Memory:   5.023 MB
+Time:     0.011 s
+</code></pre>
+
+<p>You can also add a --verbose flag to libinteractive to print a message every
+time an IPC call is made.</p>
+<h1 id="download">Download</h1>
+<p>You can grab the latest <code>.jar</code> from the <a href="https://github.com/omegaup/libinteractive/releases">Releases page</a></p>
 
             </div>
           </div> 
@@ -99,7 +163,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="contest/" class="btn btn-neutral float-right" title="Contestants"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="writing/" class="btn btn-neutral float-right" title="Writing problems"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
     </div>

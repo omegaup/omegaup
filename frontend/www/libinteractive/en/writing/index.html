@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Writing problems - libinteractive</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> libinteractive</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+            <li class="toctree-l1 current">
+                <a class="current" href=".">Writing problems</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../internals">Implementation details</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../contest">Contestants</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../license">License</a>
+            </li>
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Writing problems</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <h1 id="how-to-write-problems">How to write problems</h1>
+<p>First you need to write an .idl file with the description of the interfaces
+(functions defined in both the problemsetter and contestant code). You must
+also write a program (if possible in C/C++, for bestperformance) that reads a
+case from stdin, invokes the functions that the contestant must implement, and
+finally write either the final output or a number between 0 and 1 (inclusive)
+that represents the score of the test case to stdout (if you use the <code>literal</code>
+validator in omegaUp). Once this is done, you need to run libinteractive to
+generate all necessary files to be able to test the solution, like so:</p>
+<pre class="prettyprint well"><code>java -jar libinteractive.jar generate &lt;file.idl&gt; &lt;problemsetter language&gt; &lt;solution language&gt; --makefile
+</code></pre>
+<p>Where the languages are one of <code>c</code>, <code>cpp</code>, <code>pas</code>, <code>py</code>, <code>java</code>. <code>pas</code> is not
+supported as a problemsetter language, so it will fail if you try.</p>
+<p>You must also create a directory called <code>examples</code> (in lowercase) and place a
+sample input in a file called <code>sample.in</code> in that directory. If needed, you can
+add more test cases in that directory, and they will be automatically copied to
+the templates that the contestants can download.</p>
+<p>Finally, the actual solution must be implemented. You can run <code>make test</code> to
+verify that everything works correctly. If the problemsetter program contains a
+valid solution to the problem or enough details can be leaked that would lead
+to a solution, you can write a second implementation that would only be
+distributed to the contestants in the template files by adding a file with
+<code>.distrib</code> before the extension. For instance, if the problemsetter program is
+in <code>Main.cpp</code>, the second, public version can be placed in <code>Main.distrib.cpp</code>
+and it will be the one that will be copied into the templates.</p>
+<p>Once y ou are happy with the problem, it must be converted to omegaUp format to
+upload it. To do so, the following folders must be present:</p>
+<ul>
+<li><code>cases</code>, with the official cases. The inputs must be saved in files with the
+  <code>.in</code> extension, and the outputs in files with the same name but with <code>.out</code>
+  extension.</li>
+<li><code>statements</code> with the problem statements. The statements must be written in
+    Markdown and there must be one per language. For instance, for a problem that
+    will be in both english and spanish, there must be two files: <code>es.markdown</code>
+    and <code>en.markdown</code>. To include the control to download the libinteractive
+    templates, the <code>.markdown</code> files must include the string
+    <code>{{libinteractive:download}}</code> in a line of its own, with no extra text.</li>
+<li><code>interactive</code> with the interactive problem. This should <strong>only</strong> contain the
+    .idl file, the problemsetter problem (<code>Main.cpp</code>), and the <code>examples</code> folder
+    with <code>sample.in</code> and any other sample input. Optionally, the
+    <code>Main.distrib.cpp</code> file may be present if <code>Main.cpp</code> has implementation
+    details that should not be distributed. In particular, the Makefile, the
+    sample solution and the <code>libinteractive</code> generated directory should not be
+    present in the .zip.</li>
+</ul>
+<p>These three folders must be saved in a .zip file, without any intermediate
+folders. The templates that will be distributed to the contestants will be
+automatically generated.</p>
+<h1 id="conventions">Conventions</h1>
+<ul>
+<li>The first interface in the .idl file is the problemsetter program and
+    <strong>must</strong> be called <code>Main</code>. The problemsetter program must then be placed in a
+    file called <code>Main.cpp</code> (probably with a different extension, depending of the
+    programming language it is written on).</li>
+<li>The contestant's program(s) must be saved in a file with the same name as the
+    .idl file, but with the correct extension for the programming language it is
+    written on. For instance, for the problem <code>sums.idl</code>, the solution must be
+    placed in the file <code>sums.cpp</code>.</li>
+<li>Each interface will be compiled into a different executable, and will be run
+  in separatr processes. This means that no variables may be shared, so it will
+    be necessary to communicate any state using functions.</li>
+<li>All interfaces may call the functions in the Main interface, and Main may
+    call any function in any other interface. Other interfaces cannot call each
+    other's functions.</li>
+<li>Arrays as parameter types are allowed, but their dimensions must obey the
+  rules for C arrays: all dimensions (except the first one) must be integer
+    constantes.</li>
+<li>Arrays may declare its first dimension as a variable, but this variable
+  must be of type <code>int</code>, it must be passed as a parameter to the function, and
+    it must come before the array in the parameter list.</li>
+<li>The parameters that are used as array dimensions must declare the <code>Range</code>
+    attribute, with the minimum and maximum values that the parameter might take.
+    This is used to know the maximum size in bytes that the message needs
+    allocated so that the arrays fit in them.</li>
+</ul>
+<h1 id="sample-idl-files">Sample .idl files</h1>
+<p><a href="https://omegaup.com/arena/problem/jarras/">Las jarras de agua</a></p>
+<pre class="prettyprint well"><code>interface Main {
+ void verterAgua(int fuente, int destino);
+};
+
+interface jarras {
+    void programa(int objetivo, int capacidadJarra1, int capacidadJarra2);
+};
+</code></pre>
+<p><a href="http://cms.ioi-jp.org/open-2014/data/2014-open-d1-factories-en.pdf">Factories</a></p>
+<pre class="prettyprint well"><code>interface Main {
+};
+
+interface factories {
+    void Init([Range(2, 500000)] int N, int[N] A, int[N] B, int[N] D);
+    long Query([Range(1, 499999)] int S, int[S] X, [Range(1, 499999)] int T, int[T] Y);
+};
+</code></pre>
+<p><a href="http://www.ioi2011.or.th/hsc/tasks/EN/parrots.pdf">Parrots</a></p>
+<pre class="prettyprint well"><code>interface Main {
+    void send([Range(0, 65535)] int n);
+    void output([Range(0, 255)] int n);
+};
+
+interface encoder {
+    void encode([Range(0, 64)] int N, int[N] M);
+};
+
+interface decoder {
+    void decode([Range(0, 64)] int N, [Range(0, 320)] int L, int[L] X);
+};
+</code></pre>
+<h1 id="idl-grammar">IDL Grammar</h1>
+<p>IDL is almost a subset of <a href="http://www.w3.org/TR/2012/WD-WebIDL-20120207/">WebIDL</a>,
+but with some syntax to help programming contests.</p>
+<pre class="prettyprint well"><code>letter
+    = "a" | "b" | ... | "y" | "z"
+    | "A" | "B" | ... | "Y" | "Z"
+    ;
+
+digit
+    = "0" | "1" | ... | "8" | "9"
+    ;
+
+ident
+    = (letter | "_"), { letter | digit | "_" }
+    ;
+
+number
+    = digit, { digit }
+    ;
+
+interface-list
+    = interface, { interface }
+    ;
+
+interface
+    = "interface", ident, "{", { function }, "}", ";"
+    ;
+
+function
+    = return-type, ident, "(", param-list , ")", ";"
+    ;
+
+param-list
+    = [ param, { ",", param } ]
+    ;
+
+type
+    = array | primitive
+    ;
+
+primitive
+    = "bool" | "int" | "short" | "float"
+    | "char" | "string" | "long"
+    ;
+
+array
+    = primitive, "[", expr, "]", { "[", expr, "]" }
+    ;
+
+return-type
+    = primitive | "void"
+    ;
+
+expr
+    = ident | number
+    ;
+
+param
+    = { param-attribute }, type, ident
+    ;
+
+param-attribute
+    = "[", range-attribute, "]"
+    ;
+
+range-attribute
+    = "Range", "(", expression, ",", expression, ")"
+    ;
+</code></pre>
+
+            </div>
+          </div> 
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../internals" class="btn btn-neutral float-right" title="Implementation details"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Index"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

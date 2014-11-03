@@ -46,6 +46,20 @@
     
         
             <li class="toctree-l1 ">
+                <a class="" href="writing/">Escribiendo problemas</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="internals/">Detalles de implementación</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
                 <a class="" href="contest/">Concursantes</a>
             </li>
         
@@ -91,7 +105,56 @@
 </div>
           <div role="main">
             <div class="section">
-              <p>libinteractive</p>
+              <h1 id="libinteractive">libinteractive</h1>
+<p>Un pequeño traductor de IDL que crea adaptadores que hacen llamadas entre
+procesos para crear problemas interactivos fácilmente.</p>
+<p>Para evitar tener que escribir un programa en cada uno de los lenguajes
+soportados y asegurarse que no tengan bugs y no tengan comportamiento
+indefinido que pueda hacer que se emita un veredicto incorrecto, libinteractive
+te permite tener ambas implementaciones en procesos (y lenguajes) separados.</p>
+<h3 id="ejemplo">Ejemplo</h3>
+<p>Digamos que tienes un problema llamado <code>sumas</code>. Tú como juez implementas un
+validador en un archivo <code>Main.cpp</code> y el competidor codifica la solución en
+<code>sumas.py</code>, puedes hacer:</p>
+<pre class="prettyprint well"><code class="console">$ ls
+Main.cpp sum.py sum.idl input
+
+$ cat Main.cpp
+#include &lt;stdio.h&gt;
+#include &quot;sum.h&quot;
+
+int main(int argc, char* argv[]) {
+    int a, b;
+    scanf(&quot;%d %d\n&quot;, &amp;a, &amp;b);
+    printf(&quot;%d\n&quot;, sum(a, b));
+}
+
+$ cat sum.py
+def sum(a, b):
+    print 'Hello, world!'
+    return a + b
+
+$ cat sum.idl
+interface Main {
+}
+
+interface sum {
+    int sum(int a, int b);
+}
+
+$ java -jar libinteractive.jar generate sum.idl cpp py --makefile
+$ make run &lt; input
+[Main] 3
+[ sum] Hello, world!
+
+Memory:   5.023 MB
+Time:     0.011 s
+</code></pre>
+
+<p>También puedes agregar la bandera <code>--verbose</code> a libinteractive para imprimir
+mensajes de depuración cada vez que se realiza una llamada entre los procesos.</p>
+<h1 id="descarga">Descarga</h1>
+<p>Puedes descargar el .jar más reciente de la <a href="https://github.com/omegaup/libinteractive/releases">página de descargas</a>.</p>
 
             </div>
           </div> 
@@ -99,7 +162,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="contest/" class="btn btn-neutral float-right" title="Concursantes"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="writing/" class="btn btn-neutral float-right" title="Escribiendo problemas"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
     </div>

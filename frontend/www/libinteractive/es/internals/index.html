@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Detalles de implementación - libinteractive</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> libinteractive</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../writing">Escribiendo problemas</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 current">
+                <a class="current" href=".">Detalles de implementación</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../contest">Concursantes</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../license">Licencia</a>
+            </li>
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Detalles de implementación</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/omegaup/libinteractive" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <h1 id="como-funciona">Cómo funciona</h1>
+<p>libinteractive lee un archivo .idl, que es una descripción textual de las
+funciones implementadas por el programa del juez y del concursante que se
+pueden invocar uno desde el otro. A partir de este archivo, se pueden generar
+todas las reglas necesarias para compilar los archivos y permitir que ambos
+programas se comuniquen entre sí como si hubieran sido compilados en un solo
+programa.</p>
+<p>Una ventaja de libinteractive es que separa los códigos del concursante y el
+juez en procesos distintos, así que ya no es necesario proteger la memoria
+y la entrada estándar para evitar trampas. También es posible escribir ambas
+implementaciones en lenguajes de programación distintos. Eso quiere decir que
+tú como juez solo necesitas escribir una implementación y libinteractive se
+encarga del resto.</p>
+<h1 id="detalles-de-implementacion">Detalles de implementación</h1>
+<p>Al leer el archivo .idl, libinteractive genera un Makefile (o un archivo .bat
+en Windows) y el código necesario para que los programas del juez y del
+concursante puedan invocar las funciones del otro sin problemas. Las funciones
+que genera libinteractive serializan y deserializan los parámetros de la
+función, emite un mensaje dirigido al otro proceso, y espera la respuesta (si
+es que la función regresa algo) para regresarla como resultado de la función.</p>
+<p>libinteractive utiliza <a href="http://es.wikipedia.org/wiki/Tuber%C3%ADa_(inform%C3%A1tica)">tuberías nombradas</a>
+(named pipes) para lograr la comunicación entre procesos y la sincronización.
+Los mensajes se componen de un identificador de función (autogenerado para cada
+una de las funciones), los parámetros de la función serializados, seguido de un
+cookie de verificación que se debe regresar tal cual para validar que el
+mensaje fue transmitido correctamente. El formato binario específico que se
+utiliza se muestra a continuación:</p>
+<pre class="prettyprint well"><code>message = function-id *field cookie
+function-id = int ; un entero de 32-bits que identifica la función a llamar
+cookie = int ; un entero de 32-bits que se utiliza como sentinela
+field = byte | short | int | float | long | double | array
+byte = UNSIGNED_CHAR
+short = SHORT
+int = INT
+float = INT ; IEEE-754 binary32
+double = LONG ; IEEE-754 binary64
+long = LONG
+array = *byte ; tantos bytes como sea necesario para representar el arreglo
+</code></pre>
+<p>Todos los enteros utilizan la codificación little-endian (la nativa en x86),
+por lo que la implementación en C simplemente necesita invocar la llamada de
+sistema <code>write</code> con un apuntador al parámetro a escribir con
+<code>sizeof(parametro)</code> como longitud.</p>
+<p>Todos los arreglos en el .idl deben ser arreglos válidos en C. Esto es, todas
+las dimensiones del arreglo, excepto quizás la primera, deben ser constantes
+numéricas en tiempo de compilación. La primer dimensión puede ser variable, en
+cuyo caso debe pasarse como uno de los parámetros de tipo <code>int</code> a la función.</p>
+<p>Como el orden y el tipo de los parámetros está determinado en el .idl (y por
+ende, en tiempo de compilación), no es necesario escribir en el mensaje la
+longitud del mismo, ya que el decodificador está generado de tal manera que
+solo leerá la cantidad correcta de bytes de la tubería.</p>
+<p>Finalmente, libinteractive también genera un Makefile/.bat para que los
+concursantes puedan compilar el código sin preocuparse de los detalles, y
+probar sus implementaciones con casos de ejemplo proveídos por el juez.
+Uno de los archivos que compila el Makefile es un pequeño programa llamado
+<code>run</code>, que genera los archivos necesarios para establecer las tuberías, ejecuta
+los programas, redirige la entrada estándar al programa del juez (si es
+necesario), y finalmente imprime la salida/error estándar de todos los
+programas de manera ordenada para poder identificar de qué proceso viene.
+Por último, al terminar todos los programas, imprime un resumen con la
+cantidad de memoria residente máxima utilizada y el tiempo total consumido
+por el código del concursante (user time).</p>
+<h1 id="desempeno">Desempeño</h1>
+<p>Al no compilar directamente ambos programas del juez y concursante en un mismo
+proceso, lo que antes era una llamada de función (0-10 ciclos de CPU si la
+solución está escrita en C, depende de si es posible realizar <em>inlining</em> de la
+función o no) ahora requiere realizar dos llamadas de sistema y dos cambios de
+proceso que agrega 7-10 microsegundos al tiempo total de ejecución (wall time),
+y alrededor de 2-3 microsegundos al tiempo de ejecución del concursante (user
+time). Eso quiere decir que si un problema requiere hacer más de 400,000
+llamadas a función entre los programas del juez y concursante, los programas
+generados por libinteractive van a ocasionar que los envíos excedan los tiempos
+límite. Estos tiempos extra son causados por el sistema operativo y no hay mucho
+que se pueda hacer al respecto.</p>
+<p>Si el problema no requiere un gran volumen de llamadas, libinteractive es una
+excelente opción para hacer problemas interactivos.</p>
+<h1 id="escenarios-soportados">Escenarios soportados</h1>
+<p>Otros escenarios que son bastante eficientes hacerlos bajo libinteractive son:</p>
+<ul>
+<li>Pasar arreglos gigantes de millones de elementos entre el programa del juez y
+    concursante es bastante más eficiente que leerlo de entrada estándar, así que
+    eso disminuirá el tiempo del concursante.</li>
+<li>Tener problemas de varias fases (como Parrots en la IOI 2011) era bastante
+  complicado antes pero es un escenario considerado en libinteractive.</li>
+<li>Autogenerar la entrada del concursante. Por ejemplo, una técnica utilizada
+    comúnmente en el Facebook Hacker Cup es pedirle al concursante que genere la
+    entrada utilizando un <a href="http://en.wikipedia.org/wiki/Linear_congruential_generator">generador de números aleatorios con congruencia linear</a>.
+    Esto evita desperdiciar tiempo leyendo archivos gigantes de entrada estándar.</li>
+<li>Al ser separados los procesos, no es necesario esconder/encriptar la memoria.
+  Esto permite que el programa del juez a su vez sea el validador y regrese la
+    calificación.</li>
+</ul>
+
+            </div>
+          </div> 
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../contest" class="btn btn-neutral float-right" title="Concursantes"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../writing" class="btn btn-neutral" title="Escribiendo problemas"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>
