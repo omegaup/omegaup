@@ -233,7 +233,17 @@ body#only-problem #problems .main {
 }
 
 #problem .statement h1 {
-	font-size: 1.2em;
+	font-size: 1.3em;
+	margin: 1.0em 0 0.5em 0;
+	font-weight: bold;
+}
+#problem .statement h2 {
+	font-size: 1.1em;
+	margin: 1.0em 0 0.5em 0;
+	font-weight: bold;
+}
+#problem .statement h3 {
+	font-size: 1.0em;
 	margin: 1.0em 0 0.5em 0;
 	font-weight: bold;
 }
@@ -290,6 +300,10 @@ body#only-problem #problems .main {
 #problem .statement a.libinteractive-help {
 	display: inline-block;
 	float: right;
+}
+
+#problem .statement img {
+	max-width: 100%;
 }
 
 #problem hr {
