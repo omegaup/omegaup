@@ -251,7 +251,7 @@ OmegaUp.T = {
 	problemEditFormFile: "File",
 	problemEditFormHelp: "Help",
 	problemEditFormLanguages: "Languages",
-	problemEditFormLiteral: "Literal (stdout is score)",
+	problemEditFormLiteral: "Interpret stdout as score",
 	problemEditFormNumericTokensWithTolerance: "Numeric tokens with tolerance",
 	problemEditFormTokenByToken: "Token by Token",
 	problemEditFormTokenCaseless: "Token by Token, ignoring upper/lowercase",

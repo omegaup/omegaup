@@ -251,7 +251,7 @@ OmegaUp.T = {
 	problemEditFormFile: "(Fi13)",
 	problemEditFormHelp: "(H31p)",
 	problemEditFormLanguages: "(Languag35)",
-	problemEditFormLiteral: "(Li73ra1 (57d0u7 i5 5c0r3))",
+	problemEditFormLiteral: "(In73rpr37 57d0u7 a5 5c0r3)",
 	problemEditFormNumericTokensWithTolerance: "(Num3ric 70k3n5 wi7h 7013ranc3)",
 	problemEditFormTokenByToken: "(T0k3n by T0k3n)",
 	problemEditFormTokenCaseless: "(T0k3n by T0k3n, ign0ring upp3r/10w3rca53)",
