@@ -2,7 +2,7 @@
 	function updateGraderStatus() {
 		$("#grader-status > a").removeClass("grader-error grader-ok grader-warning grader-unknown");
 		$("#grader-count").html("<img src='/media/waitcircle.gif' />");
-		var html = "<li><a href='/admin/'>Admin</a></li>";
+		var html = "<li><a href='/arena/admin/'>Últimos envíos</a></li>";
 		omegaup.getGraderStats(function(stats){	
 			if (stats && stats.status == "ok") {
 				var graderInfo = stats.grader;
