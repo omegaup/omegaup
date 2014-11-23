@@ -936,9 +936,9 @@ Arena.prototype.onHashChanged = function() {
 			$('#problem').show();
 			$('#problem > .title').html(problem.letter + '. ' + omegaup.escape(problem.title));
 			$('#problem .data .points').html(problem.points);
-			$('#problem .validator').html(problem.validator);
-			$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 			$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
+			$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
+			$('#problem .overall_wall_time_limit').html(problem.overall_wall_time_limit / 1000 + "s");
 			$('#problem .statement').html(problem.problem_statement);
 			$('#problem .source span').html(omegaup.escape(problem.source));
 			$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');

@@ -297,6 +297,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
   `time_limit` int(11) DEFAULT '3000',
+  `overall_wall_time_limit` int(11) DEFAULT '60000',
   `memory_limit` int(11) DEFAULT '64',
   `output_limit` int(11) NOT NULL DEFAULT '10240',
   `stack_limit` int(11) NOT NULL DEFAULT '10485760',

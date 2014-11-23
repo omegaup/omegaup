@@ -20,6 +20,7 @@ $smarty->assign('title', $result['title']);
 $smarty->assign('points', $result['points']);
 $smarty->assign('validator', $result['validator']);
 $smarty->assign('time_limit', $result['time_limit'] / 1000 . 's');
+$smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
 

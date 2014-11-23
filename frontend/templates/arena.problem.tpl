@@ -19,14 +19,14 @@
 						<tr>
 							<td>{#wordsPoints#}</td>
 							<td class="points">{$points|escape}</div>
-							<td>{#wordsValidator#}</td>
-							<td class="validator">{$validator|escape}</div>
+							<td>{#wordsMemoryLimit#}</td>
+							<td class="memory_limit">{$memory_limit|escape}</td>
 						</tr>
 						<tr>
 							<td>{#wordsTimeLimit#}</td>
 							<td class="time_limit">{$time_limit|escape}</td>
-							<td>{#wordsMemoryLimit#}</td>
-							<td class="memory_limit">{$memory_limit|escape}</td>
+							<td>{#wordsOverallWallTimeLimit#}</td>
+							<td class="overall_wall_time_limit">{$overall_wall_time_limit|escape}</td>
 						</tr>
 					</table>
 					<div class="statement">{$problem_statement}</div>

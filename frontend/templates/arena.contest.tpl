@@ -67,14 +67,14 @@
 						<tr>
 							<td>{#wordsPoints#}</td>
 							<td class="points"></div>
-							<td>{#wordsValidator#}</td>
-							<td class="validator"></div>
+							<td>{#arenaCommonMemoryLimit#}</td>
+							<td class="memory_limit"></td>
 						</tr>
 						<tr>
 							<td>{#arenaCommonTimeLimit#}</td>
 							<td class="time_limit"></td>
-							<td>{#arenaCommonMemoryLimit#}</td>
-							<td class="memory_limit"></td>
+							<td>{#arenaCommonOverallWallTimeLimit#}</td>
+							<td class="overall_wall_time_limit"></td>
 						</tr>
 					</table>
 {if $admin}

@@ -21,14 +21,14 @@
 			<tr>
 				<td>{#wordsPoints#}</td>
 				<td class="points">{$problem.points}</div>
-				<td>{#wordsValidator#}</td>
-				<td class="validator">{$problem.validator}</div>
+				<td>{#arenaCommonMemoryLimit#}</td>
+				<td class="memory_limit">{$problem.memory_limit / 1024} MB</td>
 			</tr>
 			<tr>
 				<td>{#arenaCommonTimeLimit#}</td>
 				<td class="time_limit">{$problem.time_limit / 1000} s</td>
-				<td>{#arenaCommonMemoryLimit#}</td>
-				<td class="memory_limit">{$problem.memory_limit / 1024} MB</td>
+				<td>{#arenaCommonOverallWallTimeLimit#}</td>
+				<td class="time_limit">{$problem.overall_wall_time_limit / 1000} s</td>
 			</tr>
 		</table>
 	</div>

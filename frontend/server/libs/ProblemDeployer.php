@@ -298,7 +298,16 @@ class ProblemDeployer {
 	public function isSlow(Problems $problem) {
 		$validator = 0;
 
+		if ($problem->overall_wall_time_limit <=
+		    ProblemDeployer::SLOW_QUEUE_THRESHOLD * 1000) {
+			return 0;
+		}
+
 		$dirpath = $this->tmpDir;
+
+		if (!is_dir("$dirpath/cases")) {
+			$dirpath = $this->targetDir;
+		}
 
 		if ($handle = opendir($dirpath)) {
 			while (false !== ($entry = readdir($handle))) {

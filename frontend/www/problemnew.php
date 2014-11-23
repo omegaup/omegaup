@@ -7,6 +7,7 @@ $smarty->assign('TITLE', "");
 $smarty->assign('ALIAS', "");
 $smarty->assign('VALIDATOR', "token-caseless");
 $smarty->assign('TIME_LIMIT', "1000");
+$smarty->assign('OVERALL_WALL_TIME_LIMIT', "60000");
 $smarty->assign('OUTPUT_LIMIT', "10240");
 $smarty->assign('MEMORY_LIMIT', "32768");
 $smarty->assign('STACK_LIMIT', "10485760");

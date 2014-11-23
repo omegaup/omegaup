@@ -52,30 +52,42 @@
 				</div>
 
 				<div class="form-group  col-md-6">
-					<label for="memory_limit">Límite de memoria (kB)</label>
-					<input id='memory_limit' name='memory_limit' value='{if $IS_UPDATE eq 0}{$MEMORY_LIMIT}{/if}' type='text' class="form-control" />
+					<label for="overall_wall_time_limit">Tiempo límite total (ms)</label>
+					<input id='overall_wall_time_limit' name='overall_wall_time_limit' value='{if $IS_UPDATE eq 0}{$OVERALL_WALL_TIME_LIMIT}{/if}' type='text' class="form-control" />
 				</div>
 			</div>
 			
 			<div class="row">
 				<div class="form-group  col-md-6">
+					<label for="memory_limit">Límite de memoria (kB)</label>
+					<input id='memory_limit' name='memory_limit' value='{if $IS_UPDATE eq 0}{$MEMORY_LIMIT}{/if}' type='text' class="form-control" />
+				</div>
+
+				<div class="form-group  col-md-6">
 					<label for="output_limit">Límite de salida (bytes)</label>
 					<input id="output_limit" name="output_limit" value="{if $IS_UPDATE eq 0}{$OUTPUT_LIMIT}{/if}" type='text' class="form-control" />
 				</div>
-
+			</div>
+			
+			<div class="row">
 				<div class="form-group  col-md-6">
 					<label for="source">{#wordsSource#}</label>
 					<input id='source' name='source' value='{if $IS_UPDATE eq 0}{$SOURCE|htmlspecialchars}{/if}' type='text' class="form-control" />
 				</div>
-			</div>
-											
-			<div class="row">
+
 				<div class="form-group col-md-6">
 					<label for="public">{#problemEditFormAppearsAsPublic#}</label>
 					<select name='public' id='public' class="form-control">
 						<option value="0">{#wordsNo#}</option>
 						<option value="1" selected="selected">Sí</option>
 					</select>
+				</div>
+			</div>
+											
+			<div class="row">
+				<div class="form-group  col-md-6">
+					<label for="stack_limit">{#problemEditStackLimit#}</label>
+					<input id="stack_limit" name="stack_limit" value="{if $IS_UPDATE eq 0}{$STACK_LIMIT}{/if}" type='text' class="form-control" />
 				</div>
 
 				<div class="form-group col-md-6">
@@ -85,13 +97,6 @@
 						<option value="kp,kj">Karel</option>
 						<option value="cat">{#wordsJustOutput#}</option>
 					</select>
-				</div>
-			</div>
-					
-			<div class="row">
-				<div class="form-group  col-md-6">
-					<label for="stack_limit">{#problemEditStackLimit#}</label>
-					<input id="stack_limit" name="stack_limit" value="{if $IS_UPDATE eq 0}{$STACK_LIMIT}{/if}" type='text' class="form-control" />
 				</div>
 			</div>
 			

@@ -171,6 +171,10 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `time_limit` = ? AND";
 			array_push( $val, $Problems->getTimeLimit() );
 		}
+		if (!is_null( $Problems->getOverallWallTimeLimit())) {
+			$sql .= " `overall_wall_time_limit` = ? AND";
+			array_push( $val, $Problems->getOverallWallTimeLimit() );
+		}
 		if (!is_null( $Problems->getMemoryLimit())) {
 			$sql .= " `memory_limit` = ? AND";
 			array_push( $val, $Problems->getMemoryLimit() );
@@ -254,7 +258,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function update($Problems)
 	{
-		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ? WHERE  `problem_id` = ?;";
+		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `overall_wall_time_limit` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ? WHERE  `problem_id` = ?;";
 		$params = array( 
 			$Problems->getPublic(), 
 			$Problems->getAuthorId(), 
@@ -265,6 +269,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getServer(), 
 			$Problems->getRemoteId(), 
 			$Problems->getTimeLimit(), 
+			$Problems->getOverallWallTimeLimit(), 
 			$Problems->getMemoryLimit(), 
 			$Problems->getOutputLimit(), 
 			$Problems->getStackLimit(), 
@@ -301,6 +306,7 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->validator)) $Problems->validator = 'token-numeric';
 		if (is_null($Problems->languages)) $Problems->languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11';
 		if (is_null($Problems->time_limit)) $Problems->time_limit = '3000';
+		if (is_null($Problems->overall_wall_time_limit)) $Problems->overall_wall_time_limit = '60000';
 		if (is_null($Problems->memory_limit)) $Problems->memory_limit = '64';
 		if (is_null($Problems->output_limit)) $Problems->output_limit = '10240';
 		if (is_null($Problems->stack_limit)) $Problems->stack_limit = '10485760';
@@ -312,7 +318,7 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->order)) $Problems->order = 'normal';
 		if (is_null($Problems->tolerance)) $Problems->tolerance = 1e-9;
 		if (is_null($Problems->slow)) $Problems->slow = 0;
-		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `overall_wall_time_limit`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Problems->problem_id,
 			$Problems->public,
@@ -324,6 +330,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->server,
 			$Problems->remote_id,
 			$Problems->time_limit,
+			$Problems->overall_wall_time_limit,
 			$Problems->memory_limit,
 			$Problems->output_limit,
 			$Problems->stack_limit,
@@ -488,6 +495,17 @@ abstract class ProblemsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `time_limit` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ProblemsA->getOverallWallTimeLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getOverallWallTimeLimit()) ) ) ){
+				$sql .= " `overall_wall_time_limit` >= ? AND `overall_wall_time_limit` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `overall_wall_time_limit` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

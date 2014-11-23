@@ -16,6 +16,7 @@ if (isset($_POST["request"])) {
 					"title" => $_POST["title"],
 					"validator" => $_POST["validator"],
 					"time_limit" => $_POST["time_limit"],
+					"overall_wall_time_limit" => $_POST["overall_wall_time_limit"],
 					"memory_limit" => $_POST["memory_limit"],
 					"output_limit" => $_POST["output_limit"],
 					"source" => $_POST["source"],
