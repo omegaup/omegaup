@@ -22,6 +22,11 @@ class RunsDAO extends RunsDAOBase {
 
 	const DEFAULT_SUBMISSION_GAP = 120;
 
+	const HIDE_OMEGAUP_ADMINS 	= 1;
+	const HIDE_CONTEST_DIRECTOR = 2;
+	const HIDE_CE_OR_JE 		= 4;
+	const HIDE_TEST_RUNS 		= 8;
+
 	/*
 	 * Gets a boolean indicating whether there are runs that are not ready.
 	 */
@@ -338,32 +343,56 @@ class RunsDAO extends RunsDAOBase {
 	/*
 	 *  GetAllRelevantUsers
 	 * 
+	 * HideOptions puede ser una combinacion de :
+	 *	RunsDAO::HIDE_OMEGAUP_ADMINS
+	 *	RunsDAO::HIDE_CONTEST_DIRECTOR
+	 *	RunsDAO::HIDE_TEST_RUNS
+	 *	RunsDAO::HIDE_CE_OR_JE
+	 *
 	 */
+	public static final function GetAllRelevantUsers($contest_id, $hideOptions = 0, $filterUsersBy = null) {
 
-	public static final function GetAllRelevantUsers($contest_id, $showAllRuns = false, $filterUsersBy = null) {
+		$sql = "SELECT Users.user_id, username, Users.name from Users ";
+		$val = array();
 
-		// Build SQL statement		
-		if (!$showAllRuns) {
-			$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( "
-					. "SELECT DISTINCT Runs.user_id from Runs "
-					. "WHERE ( Runs.verdict NOT IN ('CE', 'JE') AND Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) "
-				. "RunsContests ON Users.user_id = RunsContests.user_id " . (!is_null($filterUsersBy) ? "WHERE Users.username LIKE ?" : "");
+		if ($hideOptions & RunsDAO::HIDE_CE_OR_JE || $hideOptions & RunsDAO::HIDE_TEST_RUNS) {
+			// Buscar usando Runs
+			$sql .= " INNER JOIN ( SELECT DISTINCT Runs.user_id from Runs 
+									 WHERE ( 
+											Runs.verdict NOT IN ('CE', 'JE') 
+											AND Runs.contest_id = ? 
+											AND Runs.status = 'ready' ";
 
-			if (is_null($filterUsersBy)) {
-				$val = array($contest_id);
-			} else {
-				$val = array($contest_id, $filterUsersBy . "%");
+			if ($hideOptions & RunsDAO::HIDE_TEST_RUNS) {
+				$sql .= " 					AND Runs.test = 0"; 
 			}
+
+			$sql .= "				)
+								) RunsContests ON Users.user_id = RunsContests.user_id WHERE 1=1 ";
+			array_push($val, $contest_id);
+
 		} else {
-			$sql = "SELECT Users.user_id, username, Users.name from Users "
-					. "INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id "
-					. "WHERE contest_id = ? AND Users.user_id NOT IN"
-						. " (SELECT user_id FROM User_Roles WHERE contest_id = ? OR contest_id = 0)"
-					. "AND Users.user_id != (SELECT director_id FROM Contests where contest_id = ?)";
-			$val = array($contest_id, $contest_id, $contest_id);
+			// Buscar usando Contest_Users
+			$sql .= "INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id "
+				. "WHERE contest_id = ? ";
+			array_push($val, $contest_id);
 		}
 
+		if (!is_null($filterUsersBy)) {
+			$sql .= "AND Users.username LIKE ? ";
+			array_push($val,  $filterUsersBy . "%");
+		}
+		
 
+		if ($hideOptions & RunsDAO::HIDE_OMEGAUP_ADMINS) {
+			// Tener contest_id=0 en User_Roles te hace admin en Omegaup
+			$sql .= "AND Users.user_id NOT IN (SELECT user_id FROM User_Roles WHERE contest_id = 0) ";
+		}
+
+		if ($hideOptions & RunsDAO::HIDE_CONTEST_DIRECTOR) {
+			$sql .= "AND Users.user_id NOT IN (SELECT user_id FROM User_Roles WHERE contest_id = ?) ";
+			array_push($val, $contest_id);
+		}
 
 		global $conn;
 		$rs = $conn->Execute($sql, $val);

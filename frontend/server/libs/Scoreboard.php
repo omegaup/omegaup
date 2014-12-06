@@ -54,7 +54,10 @@ class Scoreboard {
 				// Get all distinct contestants participating in the contest given contest_id
 				$raw_contest_users = RunsDAO::GetAllRelevantUsers(
 					$this->contest_id,
-					true /* show all runs */,
+					RunsDAO::HIDE_OMEGAUP_ADMINS
+						| RunsDAO::HIDE_CONTEST_DIRECTOR
+						| RunsDAO::HIDE_TEST_RUNS
+						| RunsDAO::HIDE_CE_OR_JE,
 					$filterUsersBy
 				);
 
@@ -129,11 +132,22 @@ class Scoreboard {
 			try {
 				$contest = ContestsDAO::getByPK($this->contest_id);
 
+				$hideOptions = 0;
+
+				if ($this->showAllRuns) {
+					$hideOptions =  RunsDAO::HIDE_OMEGAUP_ADMINS
+						| RunsDAO::HIDE_CONTEST_DIRECTOR;
+				} else {
+					$hideOptions =  RunsDAO::HIDE_OMEGAUP_ADMINS
+						| RunsDAO::HIDE_CONTEST_DIRECTOR
+						| RunsDAO::HIDE_TEST_RUNS
+						| RunsDAO::HIDE_CE_OR_JE;
+				}
+
 				// Get all distinct contestants participating in the contest given contest_id
 				$raw_contest_users = RunsDAO::GetAllRelevantUsers(
 					$this->contest_id,
-					$this->showAllRuns
-				);
+					$hideOptions);
 
 				// Get all problems given contest_id
 				$raw_contest_problems =
@@ -210,7 +224,8 @@ class Scoreboard {
 			// Get all distinct contestants participating in the contest given contest_id
 			$raw_contest_users = RunsDAO::GetAllRelevantUsers(
 				$contest_id,
-				true /* show all runs */,
+				RunsDAO::HIDE_OMEGAUP_ADMINS
+					| RunsDAO::HIDE_CONTEST_DIRECTOR,
 				NULL
 			);
 
