@@ -406,7 +406,7 @@ class ProblemDeployer {
 			    !ProblemDeployer::endsWith($path, ".in", true)) continue;
 			// Look for the .out pair
 			$outPath = substr($path, 0, strlen($path) - 3) . ".out";
-			$idx = $zip->locateName($outPath, ZipArchive::FL_NOCASE);
+			$idx = $zip->locateName($outPath, 0);
 
 			if ($idx !== FALSE) {
 				$cases++;
