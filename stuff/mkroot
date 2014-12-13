@@ -48,7 +48,10 @@ class Chroot:
 						if abspath.startswith(self.mountpoint):
 							self.symlink(filepath, target)
 						else:
-							os.link(abspath, self.__chroot_path(filepath))
+							try:
+								os.link(abspath, self.__chroot_path(filepath))
+							except OSError, e:
+								print e, abspath, filepath
 					else:
 						os.link(os.path.realpath(filepath), self.__chroot_path(filepath))
 				for d in dirs:
