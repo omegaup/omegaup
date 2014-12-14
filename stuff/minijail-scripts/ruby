@@ -23,6 +23,7 @@ getcwd: 1
 munmap: 1
 futex: 1
 exit_group: 1
+gettimeofday: 1
 sched_getaffinity: 1
 
 set_robust_list: 1
