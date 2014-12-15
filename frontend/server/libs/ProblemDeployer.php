@@ -334,7 +334,8 @@ class ProblemDeployer {
 		$max_runtime = (int)(($problem->time_limit + 999) / 1000 + $validator) *
 			$input_count;
 
-		if ($max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
+		if ($problem->overall_wall_time_limit >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT * 1000
+		    && $max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
 			throw new ProblemDeploymentFailedException('problemDeployerSlowRejected');
 		}
 
