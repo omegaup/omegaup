@@ -31,6 +31,7 @@ umask: 1
 chmod: 1
 dup2: 1
 setrlimit: arg0 == RLIMIT_STACK; return EPERM
+mremap: 1
 
 # Danger Zone!!!
 clone: 1
