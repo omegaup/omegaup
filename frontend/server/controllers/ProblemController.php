@@ -955,6 +955,11 @@ class ProblemController extends Controller {
 			$response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
 		}
 
+		if (!is_null($r['current_user_id'])) {
+			ProblemViewedDAO::MarkProblemViewed($r['current_user_id'],
+				$r['problem']->problem_id);
+		}
+
 		$response["score"] = self::bestScore($r);
 		$response["status"] = "ok";
 		return $response;

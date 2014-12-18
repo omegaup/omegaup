@@ -164,6 +164,19 @@ CREATE TABLE IF NOT EXISTS `Contest_Problems` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `Problem_Viewed`
+--
+
+CREATE TABLE IF NOT EXISTS `Problem_Viewed` (
+  `problem_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `view_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`problem_id`,`user_id`),
+  KEY `problem_id` (`problem_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla de vistas de problemas';
+
+--
 -- Estructura de tabla para la tabla `Contest_User_OpenedProblems`
 --
 
@@ -666,6 +679,13 @@ ALTER TABLE `Contest_Problem_Opened`
   ADD CONSTRAINT `fk_cpo_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cpo_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cpo_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Problem_Viewed`
+--
+ALTER TABLE `Problem_Viewed`
+  ADD CONSTRAINT `fk_pv_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_pv_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Emails`
