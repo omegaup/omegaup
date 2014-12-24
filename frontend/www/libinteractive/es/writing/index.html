@@ -116,6 +116,9 @@ puntaje final que el concursante obtuvo en ese caso (si se utiliza el validador
 genere todos los archivos necesarios para poder probar la solución, de esta manera:</p>
 <pre class="prettyprint well"><code>java -jar libinteractive.jar generate &lt;archivo.idl&gt; &lt;lenguaje del juez&gt; &lt;lenguaje de la solución&gt; --makefile
 </code></pre>
+<p>Donde el lenguaje es uno de <code>c</code>, <code>cpp</code>, <code>pas</code>, <code>py</code>, <code>java</code>. <code>pas</code>
+no está soportado como lenguaje para el programa del juez, solo
+del concursante</p>
 <p>Es necesario crear un directorio llamado <code>examples</code> (en minúsculas) y colocar
 un caso de ejemplo llamado <code>sample.in</code> en ese directorio. De ser necesario, es
 posible colocar más casos de ejemplo en ese directorio y se copiarán
