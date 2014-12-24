@@ -331,7 +331,8 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		$max_runtime = (int)(($problem->time_limit + 999) / 1000 + $validator) *
+		$max_ms_per_run = $problem->time_limit + $problem->extra_wall_time;
+		$max_runtime = (int)(($max_ms_per_run + 999) / 1000 + $validator) *
 			$input_count;
 
 		if ($problem->overall_wall_time_limit >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT * 1000

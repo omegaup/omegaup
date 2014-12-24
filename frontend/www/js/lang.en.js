@@ -356,6 +356,8 @@ OmegaUp.T = {
 	wordsDownloadOutput: "Download output",
 	wordsEdit: "Edit",
 	wordsEndTime: "End",
+	wordsExtraWallTime: "Extra time for libinteractive",
+	wordsExtraWallTimeMs: "Extra time for libinteractive (ms)",
 	wordsFeedback: "Feedback",
 	wordsGroups: "Groups",
 	wordsID: "ID",

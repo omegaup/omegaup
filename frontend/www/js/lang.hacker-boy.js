@@ -356,6 +356,8 @@ OmegaUp.T = {
 	wordsDownloadOutput: "(D0wn10ad 0u7pu7)",
 	wordsEdit: "(Edi7)",
 	wordsEndTime: "(End)",
+	wordsExtraWallTime: "(Ex7ra 7im3 f0r 1ibin73rac7iv3)",
+	wordsExtraWallTimeMs: "(Ex7ra 7im3 f0r 1ibin73rac7iv3 (m5))",
 	wordsFeedback: "(F33dback)",
 	wordsGroups: "(Gr0up5)",
 	wordsID: "(ID)",

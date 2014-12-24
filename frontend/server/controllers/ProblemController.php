@@ -122,6 +122,7 @@ class ProblemController extends Controller {
 			array("token", "token-caseless", "token-numeric", "custom", "literal"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["overall_wall_time_limit"], "overall_wall_time_limit", 0, 60000, $is_required);
+		Validators::isNumberInRange($r["extra_wall_time"], "extra_wall_time", 0, 5000, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["output_limit"], "output_limit", 0, INF, $is_required);
 
@@ -155,6 +156,7 @@ class ProblemController extends Controller {
 		$problem->setValidator($r["validator"]);
 		$problem->setTimeLimit($r["time_limit"]);
 		$problem->setOverallWallTimeLimit($r["overall_wall_time_limit"]);
+		$problem->setExtraWallTime($r["extra_wall_time"]);
 		$problem->setMemoryLimit($r["memory_limit"]);
 		$problem->setOutputLimit($r["output_limit"]);
 		$problem->setVisits(0);
@@ -595,7 +597,8 @@ class ProblemController extends Controller {
 			"title",
 			"validator"     => array("important" => true), // requires rejudge
 			"time_limit"    => array("important" => true), // requires rejudge
-			"overall_wall_time_limit"    => array("important" => true), // requires rejudge
+			"overall_wall_time_limit" => array("important" => true), // requires rejudge
+			"extra_wall_time" => array("important" => true), // requires rejudge
 			"memory_limit"  => array("important" => true), // requires rejudge
 			"output_limit"  => array("important" => true), // requires rejudge
 			"stack_limit"   => array("important" => true), // requires rejudge
@@ -867,9 +870,10 @@ class ProblemController extends Controller {
 
 		// Create array of relevant columns
 		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit",
-				"overall_wall_time_limit", "memory_limit", "output_limit", "visits", 
-				"submissions", "accepted", "difficulty", "creation_date", "source", 
-				"order", "points", "public", "languages", "slow", "stack_limit");
+				"overall_wall_time_limit", "extra_wall_time", "memory_limit",
+				"output_limit", "visits", "submissions", "accepted", "difficulty",
+				"creation_date", "source", "order", "points", "public", "languages",
+				"slow", "stack_limit");
 
 		// Read the file that contains the source
 		if ($r["problem"]->getValidator() != 'remote') {
