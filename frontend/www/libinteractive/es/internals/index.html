@@ -174,28 +174,40 @@ solución está escrita en C, depende de si es posible realizar <em>inlining</em
 función o no) ahora requiere realizar dos llamadas de sistema y dos cambios de
 proceso que agrega 7-10 microsegundos al tiempo total de ejecución (wall time),
 y alrededor de 2-3 microsegundos al tiempo de ejecución del concursante (user
-time). Eso quiere decir que si un problema requiere hacer más de 400,000
+time). Eso quiere decir que si un problema requiere hacer más de ~400,000
 llamadas a función entre los programas del juez y concursante, los programas
 generados por libinteractive van a ocasionar que los envíos excedan los tiempos
-límite. Estos tiempos extra son causados por el sistema operativo y no hay mucho
-que se pueda hacer al respecto.</p>
+límite.</p>
+<p>La mayoría de este tiempo extra es causada por el hecho que hay que copiar
+datos a buffers compartidos fuera del proceso, y no es posible mejorarlo sin
+cambiar el modelo de programación, pero eso rompería el requerimiento de que
+debe ser posible enlazar ambos subprogramas en un mismo proceso si están
+escritos en el mismo lenguaje, y haría todo más complicado para los
+concursantes. El resto del tiempo extra es causado por el sistema operativo al
+momento de hacer llamadas de sistema y los cambios de proceso, así que no hay
+mucho que se pueda hacer al respecto. Experimentos con métodos alternativos de
+hacer llamadas entre proceso (memoria compartida + semáforos para indicar
+disponibilidad) demostraron que el tiempo total para evaluar un envío podría
+mejorar en menos del 5%, a cambio de aumentar el tiempo del concursante por
+hasta un 50%.</p>
 <p>Si el problema no requiere un gran volumen de llamadas, libinteractive es una
 excelente opción para hacer problemas interactivos.</p>
 <h1 id="escenarios-soportados">Escenarios soportados</h1>
 <p>Otros escenarios que son bastante eficientes hacerlos bajo libinteractive son:</p>
 <ul>
 <li>Pasar arreglos gigantes de millones de elementos entre el programa del juez y
-    concursante es bastante más eficiente que leerlo de entrada estándar, así que
-    eso disminuirá el tiempo del concursante.</li>
+  concursante es bastante más eficiente que leerlo de entrada estándar (solo
+  una llamada de sistema si los datos caben en un buffer de 4096 bytes), así
+  que eso disminuirá el tiempo del concursante.</li>
 <li>Tener problemas de varias fases (como Parrots en la IOI 2011) era bastante
   complicado antes pero es un escenario considerado en libinteractive.</li>
 <li>Autogenerar la entrada del concursante. Por ejemplo, una técnica utilizada
-    comúnmente en el Facebook Hacker Cup es pedirle al concursante que genere la
-    entrada utilizando un <a href="http://en.wikipedia.org/wiki/Linear_congruential_generator">generador de números aleatorios con congruencia linear</a>.
-    Esto evita desperdiciar tiempo leyendo archivos gigantes de entrada estándar.</li>
-<li>Al ser separados los procesos, no es necesario esconder/encriptar la memoria.
+  comúnmente en el Facebook Hacker Cup es pedirle al concursante que genere la
+  entrada utilizando un <a href="http://en.wikipedia.org/wiki/Linear_congruential_generator">generador de números aleatorios con congruencia linear</a>.
+  Esto evita desperdiciar tiempo leyendo archivos gigantes de entrada estándar.</li>
+<li>Al ser separados los procesos, no es necesario esconder/obfuscar la memoria.
   Esto permite que el programa del juez a su vez sea el validador y regrese la
-    calificación.</li>
+  calificación.</li>
 </ul>
 
             </div>

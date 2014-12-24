@@ -135,19 +135,19 @@ y únicamente este se distribuiría en las plantillas a los concursantes.</p>
 omegaUp para subirlo. Para hacerlo, deben existir las siguientes carpetas:</p>
 <ul>
 <li><code>cases</code>, con los casos oficiales. Las entradas deben estar en archivos con
-    extensión <code>.in</code> y las salidas en archivos con el mismo nombre pero
-    terminación <code>.out</code>.</li>
+  extensión <code>.in</code> y las salidas en archivos con el mismo nombre pero
+  terminación <code>.out</code>.</li>
 <li><code>statements</code> con las redacciones. Las redacciones se deben escribir en formato
-    Markdown, y debe haber una por lenguaje. Por ejemplo, para un problema en
-    inglés y español, deben existir dos archivos: <code>es.markdown</code> y <code>en.markdown</code>.
-    Para incluir el control para descargar las plantillas, los archivos <code>.markdown</code>
-    deben contener la cadena <code>{{libinteractive:download}}</code> en un renglón, sin texto
-    extra.</li>
+  Markdown, y debe haber una por lenguaje. Por ejemplo, para un problema en
+  inglés y español, deben existir dos archivos: <code>es.markdown</code> y <code>en.markdown</code>.
+  Para incluir el control para descargar las plantillas, los archivos <code>.markdown</code>
+  deben contener la cadena <code>{{libinteractive:download}}</code> en un renglón, sin texto
+  extra.</li>
 <li><code>interactive</code> con el problema interactivo. Aquí solo debe estar el archivo .idl,
-    el programa del juez (<code>Main.cpp</code>) y la carpeta <code>examples</code> con <code>sample.in</code> y
-    cualquier otro caso de entrada necesario. Opcionalmente puede estar el
-    archivo <code>Main.distrib.cpp</code> si <code>Main.cpp</code> tiene parte de la solución. No se debe
-    incluir el Makefile, la solución de prueba o la carpeta libinteractive.</li>
+  el programa del juez (<code>Main.cpp</code>) y la carpeta <code>examples</code> con <code>sample.in</code> y
+  cualquier otro caso de entrada necesario. Opcionalmente puede estar el
+  archivo <code>Main.distrib.cpp</code> si <code>Main.cpp</code> tiene parte de la solución. No se debe
+  incluir el Makefile, la solución de prueba o la carpeta libinteractive.</li>
 </ul>
 <p>Por último, esas tres carpetas deben guardarse en un archivo .zip sin carpetas
 intermedias. Las plantillas que se distribuirán a los concursantes se generarán
@@ -158,26 +158,32 @@ de manera automática.</p>
   programa del juez, entonces, debe estar en un archivo llamado <code>Main.cpp</code> (o
   la extensión que utilice el lenguaje de programación en el que se escribe).</li>
 <li>El programa del concursante debe estar en un archivo con el mismo nombre que
-    el archivo .idl, pero con la extensión apropiada para ese lenguaje de
-    programación. Por ejemplo, para el problema <code>sumas</code>, la solución del
-    concursante en <code>sumas.cpp</code>.</li>
+  el archivo .idl, pero con la extensión apropiada para ese lenguaje de
+  programación. Por ejemplo, para el problema <code>sumas</code>, la solución del
+  concursante en <code>sumas.cpp</code>.</li>
 <li>Cada interfaz producirá un ejecutable distinto, y se correrán en procesos
-    separados. Eso quiere decir que ninguna variable se puede compartir, así que
-    es necesario pasarlas como parámetros a funciones.</li>
+  separados. Eso quiere decir que ninguna variable se puede compartir, así que
+  es necesario pasarlas como parámetros a funciones.</li>
 <li>Todas las interfaces se pueden comunicar con Main, y Main se puede comunicar
-    con todas las demás interfaces, pero dos interfaces del concursante no se
-    pueden comunicar entre sí.</li>
+  con todas las demás interfaces, pero dos interfaces del concursante no se
+  pueden comunicar entre sí.</li>
 <li>Los arreglos como tipos de parámetros de función son permitidos, pero sus
   dimensiones deben obedecer las reglas de los arreglos en C: todas las
-    dimensiones (excepto la primera) deben ser constantes enteras.</li>
+  dimensiones (excepto la primera) deben ser constantes enteras.</li>
 <li>Los arreglos pueden declarar su primera dimensión como una variable, pero
   esta variable debe aparecer como parámetro en la misma función, y debe
-    aparecer antes en la lista de parámetros.</li>
+  aparecer antes en la lista de parámetros.</li>
 <li>Los parámetros que sean utilizados como dimensiones de arreglos deben
   declarar el atributo <code>Range</code>, con los valores mínimo y máximo que puede
-    tomar ese parámetro. Esto se utiliza para saber de antemano qué tan grande
-    puede ser la memoria que es necesario alojar para que quepa el arreglo
-    entero.</li>
+  tomar ese parámetro. Esto se utiliza para saber de antemano qué tan grande
+  puede ser la memoria que es necesario alojar para que quepa el arreglo
+  entero.</li>
+<li>Si experas que una función pueda terminar el proceso legítimamente (porque es
+  la función que se debe llamar para reportar la respuesta correcta, o porque
+  es una función del evaluador que puede terminar porque el concursante realizó
+  una operación inválida), la función debe tener el atributo <code>NoReturn</code> para
+  evitar que el otro proceso se confunda cuando deje de recibir información a
+  media llamada.</li>
 </ul>
 <h1 id="ejemplos-de-archivos-idl">Ejemplos de archivos .idl</h1>
 <p><a href="https://omegaup.com/arena/problem/jarras/">Las jarras de agua</a></p>
@@ -212,6 +218,16 @@ interface decoder {
     void decode([Range(0, 64)] int N, [Range(0, 320)] int L, int[L] X);
 };
 </code></pre>
+<p><a href="http://www.ioi2013.org/wp-content/uploads/tasks/day2/cave/cave.pdf">Cave</a></p>
+<pre class="prettyprint well"><code>interface Main {
+    [NoReturn] int tryCombination([Range(0, 5000)] int N, int[N] S);
+    [NoReturn] void answer([Range(0, 5000)] int N, int[N] S, int[N] D);
+};
+
+interface cave {
+    void exploreCave(int N);
+};
+</code></pre>
 <h1 id="gramatica-idl">Gramática IDL</h1>
 <p>IDL es casi un subconjunto de WebIDL, pero con un poco de sintaxis extra para
 concursos de programación:</p>
@@ -241,7 +257,8 @@ interface
     ;
 
 function
-    = return-type, ident, "(", param-list , ")", ";"
+    = { function-attribute }, return-type, ident,
+      "(", param-list , ")", ";"
     ;
 
 param-list
@@ -271,6 +288,14 @@ expr
 
 param
     = { param-attribute }, type, ident
+    ;
+
+function-attribute
+    = "[", noreturn-attribute, "]"
+    ;
+
+noreturn-attribute
+    = "NoReturn"
     ;
 
 param-attribute

@@ -130,25 +130,25 @@ distributed to the contestants in the template files by adding a file with
 <code>.distrib</code> before the extension. For instance, if the problemsetter program is
 in <code>Main.cpp</code>, the second, public version can be placed in <code>Main.distrib.cpp</code>
 and it will be the one that will be copied into the templates.</p>
-<p>Once y ou are happy with the problem, it must be converted to omegaUp format to
+<p>Once you are happy with the problem, it must be converted to omegaUp format to
 upload it. To do so, the following folders must be present:</p>
 <ul>
 <li><code>cases</code>, with the official cases. The inputs must be saved in files with the
   <code>.in</code> extension, and the outputs in files with the same name but with <code>.out</code>
   extension.</li>
 <li><code>statements</code> with the problem statements. The statements must be written in
-    Markdown and there must be one per language. For instance, for a problem that
-    will be in both english and spanish, there must be two files: <code>es.markdown</code>
-    and <code>en.markdown</code>. To include the control to download the libinteractive
-    templates, the <code>.markdown</code> files must include the string
-    <code>{{libinteractive:download}}</code> in a line of its own, with no extra text.</li>
+  Markdown and there must be one per language. For instance, for a problem that
+  will be in both english and spanish, there must be two files: <code>es.markdown</code>
+  and <code>en.markdown</code>. To include the control to download the libinteractive
+  templates, the <code>.markdown</code> files must include the string
+  <code>{{libinteractive:download}}</code> in a line of its own, with no extra text.</li>
 <li><code>interactive</code> with the interactive problem. This should <strong>only</strong> contain the
-    .idl file, the problemsetter problem (<code>Main.cpp</code>), and the <code>examples</code> folder
-    with <code>sample.in</code> and any other sample input. Optionally, the
-    <code>Main.distrib.cpp</code> file may be present if <code>Main.cpp</code> has implementation
-    details that should not be distributed. In particular, the Makefile, the
-    sample solution and the <code>libinteractive</code> generated directory should not be
-    present in the .zip.</li>
+  .idl file, the problemsetter problem (<code>Main.cpp</code>), and the <code>examples</code> folder
+  with <code>sample.in</code> and any other sample input. Optionally, the
+  <code>Main.distrib.cpp</code> file may be present if <code>Main.cpp</code> has implementation
+  details that should not be distributed. In particular, the Makefile, the
+  sample solution and the <code>libinteractive</code> generated directory should not be
+  present in the .zip.</li>
 </ul>
 <p>These three folders must be saved in a .zip file, without any intermediate
 folders. The templates that will be distributed to the contestants will be
@@ -156,29 +156,34 @@ automatically generated.</p>
 <h1 id="conventions">Conventions</h1>
 <ul>
 <li>The first interface in the .idl file is the problemsetter program and
-    <strong>must</strong> be called <code>Main</code>. The problemsetter program must then be placed in a
-    file called <code>Main.cpp</code> (probably with a different extension, depending of the
-    programming language it is written on).</li>
+  <strong>must</strong> be called <code>Main</code>. The problemsetter program must then be placed in a
+  file called <code>Main.cpp</code> (probably with a different extension, depending of the
+  programming language it is written on).</li>
 <li>The contestant's program(s) must be saved in a file with the same name as the
-    .idl file, but with the correct extension for the programming language it is
-    written on. For instance, for the problem <code>sums.idl</code>, the solution must be
-    placed in the file <code>sums.cpp</code>.</li>
+  .idl file, but with the correct extension for the programming language it is
+  written on. For instance, for the problem <code>sums.idl</code>, the solution must be
+  placed in the file <code>sums.cpp</code>.</li>
 <li>Each interface will be compiled into a different executable, and will be run
   in separate processes. This means that no variables may be shared, so it will
-    be necessary to communicate any state using functions.</li>
+  be necessary to communicate any state using functions.</li>
 <li>All interfaces may call the functions in the Main interface, and Main may
-    call any function in any other interface. Other interfaces cannot call each
-    other's functions.</li>
+  call any function in any other interface. Other interfaces cannot call each
+  other's functions.</li>
 <li>Arrays as parameter types are allowed, but their dimensions must obey the
   rules for C arrays: all dimensions (except the first one) must be integer
-    constantes.</li>
+  constantes.</li>
 <li>Arrays may declare its first dimension as a variable, but this variable
   must be of type <code>int</code>, it must be passed as a parameter to the function, and
-    it must come before the array in the parameter list.</li>
+  it must come before the array in the parameter list.</li>
 <li>The parameters that are used as array dimensions must declare the <code>Range</code>
-    attribute, with the minimum and maximum values that the parameter might take.
-    This is used to know the maximum size in bytes that the message needs
-    allocated so that the arrays fit in them.</li>
+  attribute, with the minimum and maximum values that the parameter might take.
+  This is used to know the maximum size in bytes that the message needs
+  allocated so that the arrays fit in them.</li>
+<li>If you expect that a function might legitimately exit the process (because it
+  is the function that is called when the correct answer is reached, or because
+  it might detect an error on the contestant's data), the function must possess
+  the <code>NoReturn</code> attribute to avoid causing the other process to get confused
+  about exiting when it stops receiving information mid-call.</li>
 </ul>
 <h1 id="sample-idl-files">Sample .idl files</h1>
 <p><a href="https://omegaup.com/arena/problem/jarras/">Las jarras de agua</a></p>
@@ -213,6 +218,16 @@ interface decoder {
     void decode([Range(0, 64)] int N, [Range(0, 320)] int L, int[L] X);
 };
 </code></pre>
+<p><a href="http://www.ioi2013.org/wp-content/uploads/tasks/day2/cave/cave.pdf">Cave</a></p>
+<pre class="prettyprint well"><code>interface Main {
+    [NoReturn] int tryCombination([Range(0, 5000)] int N, int[N] S);
+    [NoReturn] void answer([Range(0, 5000)] int N, int[N] S, int[N] D);
+};
+
+interface cave {
+    void exploreCave(int N);
+};
+</code></pre>
 <h1 id="idl-grammar">IDL Grammar</h1>
 <p>IDL is almost a subset of <a href="http://www.w3.org/TR/2012/WD-WebIDL-20120207/">WebIDL</a>,
 but with some syntax to help programming contests.</p>
@@ -242,7 +257,8 @@ interface
     ;
 
 function
-    = return-type, ident, "(", param-list , ")", ";"
+    = { function-attribute }, return-type, ident,
+      "(", param-list , ")", ";"
     ;
 
 param-list
@@ -272,6 +288,14 @@ expr
 
 param
     = { param-attribute }, type, ident
+    ;
+
+function-attribute
+    = "[", noreturn-attribute, "]"
+    ;
+
+noreturn-attribute
+    = "NoReturn"
     ;
 
 param-attribute
