@@ -41,6 +41,10 @@ class RunController extends Controller {
 			// Check that problem exists
 			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
 
+			if ($r['problem']->deprecated) {
+				throw new PreconditionFailedException('problemDeprecated');
+			}
+
 			Validators::isInEnum($r["language"], "language", array('kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'cat', 'hs'));
 			Validators::isStringNonEmpty($r["source"], "source");
 

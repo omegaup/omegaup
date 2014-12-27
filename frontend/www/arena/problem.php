@@ -2,6 +2,7 @@
 require_once('../../server/bootstrap.php');
 
 $r = new Request($_REQUEST);
+$session = SessionController::apiCurrentSession($r);
 $r['statement_type'] = 'html';
 $r['show_solvers'] = true;
 try {
@@ -24,7 +25,6 @@ $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
 
-$session = SessionController::apiCurrentSession($r);
 $result['user'] = array(
 	'logged_in' => $session['valid'],
 	'admin' => Authorization::CanEditProblem($session['id'], $problem)

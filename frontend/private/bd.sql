@@ -164,6 +164,19 @@ CREATE TABLE IF NOT EXISTS `Contest_Problems` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `Problem_Viewed`
+--
+
+CREATE TABLE IF NOT EXISTS `Problem_Viewed` (
+  `problem_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `view_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`problem_id`,`user_id`),
+  KEY `problem_id` (`problem_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla de vistas de problemas';
+
+--
 -- Estructura de tabla para la tabla `Contest_User_OpenedProblems`
 --
 
@@ -296,9 +309,10 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11',
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
-  `time_limit` int(11) DEFAULT '3000',
-  `overall_wall_time_limit` int(11) DEFAULT '60000',
-  `memory_limit` int(11) DEFAULT '64',
+  `time_limit` int(11) NOT NULL DEFAULT '3000',
+  `overall_wall_time_limit` int(11) NOT NULL DEFAULT '60000',
+  `extra_wall_time` int(11) NOT NULL DEFAULT '0',
+  `memory_limit` int(11) NOT NULL DEFAULT '64',
   `output_limit` int(11) NOT NULL DEFAULT '10240',
   `stack_limit` int(11) NOT NULL DEFAULT '10485760',
   `visits` int(11) NOT NULL DEFAULT '0',
@@ -310,6 +324,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `order` enum('normal','inverse') NOT NULL DEFAULT 'normal',
   `tolerance` double NOT NULL DEFAULT 1e-9,
   `slow` tinyint(1) NOT NULL DEFAULT 0,
+  `deprecated` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`problem_id`),
   KEY `author_id` (`author_id`),
   UNIQUE KEY `problems_alias` (`alias`)
@@ -666,6 +681,13 @@ ALTER TABLE `Contest_Problem_Opened`
   ADD CONSTRAINT `fk_cpo_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cpo_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cpo_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Problem_Viewed`
+--
+ALTER TABLE `Problem_Viewed`
+  ADD CONSTRAINT `fk_pv_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_pv_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Emails`

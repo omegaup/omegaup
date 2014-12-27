@@ -316,8 +316,12 @@ Arena.prototype.createAdminRun = function(run) {
 	(function(guid, run, row) {
 		$('.rejudge', row).append($('<input type="button" value="rejudge" />').click(function() {
 			$('.status', row).html('rejudging').css('background-color', '');
-			omegaup.runRejudge(guid, false, function() {
-				self.updateRunFallback(guid, run);
+			omegaup.runRejudge(guid, false, function(data) {
+				if (data.status == 'error') {
+					self.updateRun(run);
+				} else {
+					self.updateRunFallback(guid, run);
+				}
 			});
 		}));
 	})(run.guid, run, r);
@@ -326,8 +330,12 @@ Arena.prototype.createAdminRun = function(run) {
 	(function(guid, run, row) {
 		$('.rejudge', row).append($('<input type="button" value="debug" />').click(function() {
 			$('.status', row).html('rejudging').css('background-color', '');
-			omegaup.runRejudge(guid, true, function() {
-				self.updateRunFallback(guid, run);
+			omegaup.runRejudge(guid, true, function(data) {
+				if (data.status == 'error') {
+					self.updateRun(run);
+				} else {
+					self.updateRunFallback(guid, run);
+				}
 			});
 		}));
 	})(run.guid, run, r);

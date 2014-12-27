@@ -331,10 +331,12 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		$max_runtime = (int)(($problem->time_limit + 999) / 1000 + $validator) *
+		$max_ms_per_run = $problem->time_limit + $problem->extra_wall_time;
+		$max_runtime = (int)(($max_ms_per_run + 999) / 1000 + $validator) *
 			$input_count;
 
-		if ($max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
+		if ($problem->overall_wall_time_limit >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT * 1000
+		    && $max_runtime >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT) {
 			throw new ProblemDeploymentFailedException('problemDeployerSlowRejected');
 		}
 
@@ -406,7 +408,7 @@ class ProblemDeployer {
 			    !ProblemDeployer::endsWith($path, ".in", true)) continue;
 			// Look for the .out pair
 			$outPath = substr($path, 0, strlen($path) - 3) . ".out";
-			$idx = $zip->locateName($outPath, ZipArchive::FL_NOCASE);
+			$idx = $zip->locateName($outPath, 0);
 
 			if ($idx !== FALSE) {
 				$cases++;

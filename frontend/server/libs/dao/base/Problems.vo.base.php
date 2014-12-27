@@ -65,6 +65,9 @@ class Problems extends VO
 			if (isset($data['overall_wall_time_limit'])) {
 				$this->overall_wall_time_limit = $data['overall_wall_time_limit'];
 			}
+			if (isset($data['extra_wall_time'])) {
+				$this->extra_wall_time = $data['extra_wall_time'];
+			}
 			if (isset($data['memory_limit'])) {
 				$this->memory_limit = $data['memory_limit'];
 			}
@@ -101,6 +104,9 @@ class Problems extends VO
 			if (isset($data['slow'])) {
 				$this->slow = $data['slow'];
 			}
+			if (isset($data['deprecated'])) {
+				$this->deprecated = $data['deprecated'];
+			}
 		}
 	}
 
@@ -125,6 +131,7 @@ class Problems extends VO
 			"remote_id" => $this->remote_id,
 			"time_limit" => $this->time_limit,
 			"overall_wall_time_limit" => $this->overall_wall_time_limit,
+			"extra_wall_time" => $this->extra_wall_time,
 			"memory_limit" => $this->memory_limit,
 			"output_limit" => $this->output_limit,
 			"stack_limit" => $this->stack_limit,
@@ -136,7 +143,8 @@ class Problems extends VO
 			"source" => $this->source,
 			"order" => $this->order,
 			"tolerance" => $this->tolerance,
-			"slow" => $this->slow
+			"slow" => $this->slow,
+			"deprecated" => $this->deprecated
 		); 
 	return json_encode($vec); 
 	}
@@ -235,6 +243,13 @@ class Problems extends VO
 	  * @access public
 	  * @var int(11)
 	  */
+	public $extra_wall_time;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var int(11)
+	  */
 	public $memory_limit;
 
 	/**
@@ -313,4 +328,11 @@ class Problems extends VO
 	  * @var tinyint(1)
 	  */
 	public $slow;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var tinyint(1)
+	  */
+	public $deprecated;
 }

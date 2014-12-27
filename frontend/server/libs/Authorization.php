@@ -35,6 +35,10 @@ class Authorization {
 			return false;
 		}
 
+		if ($problem->deprecated) {
+			throw new PreconditionFailedException('problemDeprecated');
+		}
+
 		$isContestAdmin = false;
 		if (!is_null($contest)) {
 			$isContestAdmin = Authorization::IsContestAdmin($user_id, $contest);

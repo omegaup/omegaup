@@ -117,35 +117,35 @@ te permite tener ambas implementaciones en procesos (y lenguajes) separados.</p>
 validador en un archivo <code>Main.cpp</code> y el competidor codifica la solución en
 <code>sumas.py</code>, puedes hacer:</p>
 <pre class="prettyprint well"><code class="console">$ ls
-Main.cpp sum.py sum.idl input
+Main.cpp sumas.py sumas.idl input
 
 $ cat Main.cpp
 #include &lt;stdio.h&gt;
-#include &quot;sum.h&quot;
+#include &quot;sumas.h&quot;
 
 int main(int argc, char* argv[]) {
     int a, b;
     scanf(&quot;%d %d\n&quot;, &amp;a, &amp;b);
-    printf(&quot;%d\n&quot;, sum(a, b));
+    printf(&quot;%d\n&quot;, sumas(a, b));
 }
 
-$ cat sum.py
-def sum(a, b):
-    print 'Hello, world!'
+$ cat sumas.py
+def sumas(a, b):
+    print 'Hola, mundo!'
     return a + b
 
-$ cat sum.idl
+$ cat sumas.idl
 interface Main {
 }
 
-interface sum {
-    int sum(int a, int b);
+interface sumas {
+    int sumas(int a, int b);
 }
 
-$ java -jar libinteractive.jar generate sum.idl cpp py --makefile
+$ java -jar libinteractive.jar generate sumas.idl cpp py --makefile
 $ make run &lt; input
 [Main] 3
-[ sum] Hello, world!
+[ sum] Hola, mundo!
 
 Memory:   5.023 MB
 Time:     0.011 s

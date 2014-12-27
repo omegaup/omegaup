@@ -111,6 +111,10 @@ class ProblemController extends Controller {
 			if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 				throw new ForbiddenAccessException();
 			}
+
+			if ($r['problem']->deprecated) {
+				throw new PreconditionFailedException('problemDeprecated');
+			}
 		} else {
 			Validators::isValidAlias($r['alias'], 'alias');
 		}
@@ -122,6 +126,7 @@ class ProblemController extends Controller {
 			array("token", "token-caseless", "token-numeric", "custom", "literal"), $is_required);
 		Validators::isNumberInRange($r["time_limit"], "time_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["overall_wall_time_limit"], "overall_wall_time_limit", 0, 60000, $is_required);
+		Validators::isNumberInRange($r["extra_wall_time"], "extra_wall_time", 0, 5000, $is_required);
 		Validators::isNumberInRange($r["memory_limit"], "memory_limit", 0, INF, $is_required);
 		Validators::isNumberInRange($r["output_limit"], "output_limit", 0, INF, $is_required);
 
@@ -155,6 +160,7 @@ class ProblemController extends Controller {
 		$problem->setValidator($r["validator"]);
 		$problem->setTimeLimit($r["time_limit"]);
 		$problem->setOverallWallTimeLimit($r["overall_wall_time_limit"]);
+		$problem->setExtraWallTime($r["extra_wall_time"]);
 		$problem->setMemoryLimit($r["memory_limit"]);
 		$problem->setOutputLimit($r["output_limit"]);
 		$problem->setVisits(0);
@@ -251,6 +257,10 @@ class ProblemController extends Controller {
 
 		if (is_null($r["problem"])) {
 			throw new NotFoundException("problemNotFound");
+		}
+
+		if ($r['problem']->deprecated) {
+			throw new PreconditionFailedException('problemDeprecated');
 		}
 
 		// We need to check that the user can actually edit the problem
@@ -595,7 +605,8 @@ class ProblemController extends Controller {
 			"title",
 			"validator"     => array("important" => true), // requires rejudge
 			"time_limit"    => array("important" => true), // requires rejudge
-			"overall_wall_time_limit"    => array("important" => true), // requires rejudge
+			"overall_wall_time_limit" => array("important" => true), // requires rejudge
+			"extra_wall_time" => array("important" => true), // requires rejudge
 			"memory_limit"  => array("important" => true), // requires rejudge
 			"output_limit"  => array("important" => true), // requires rejudge
 			"stack_limit"   => array("important" => true), // requires rejudge
@@ -867,9 +878,10 @@ class ProblemController extends Controller {
 
 		// Create array of relevant columns
 		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit",
-				"overall_wall_time_limit", "memory_limit", "output_limit", "visits", 
-				"submissions", "accepted", "difficulty", "creation_date", "source", 
-				"order", "points", "public", "languages", "slow", "stack_limit");
+				"overall_wall_time_limit", "extra_wall_time", "memory_limit",
+				"output_limit", "visits", "submissions", "accepted", "difficulty",
+				"creation_date", "source", "order", "points", "public", "languages",
+				"slow", "stack_limit");
 
 		// Read the file that contains the source
 		if ($r["problem"]->getValidator() != 'remote') {
@@ -953,6 +965,11 @@ class ProblemController extends Controller {
 			}
 		} else if (isset($r['show_solvers']) && $r['show_solvers']) {
 			$response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
+		}
+
+		if (!is_null($r['current_user_id'])) {
+			ProblemViewedDAO::MarkProblemViewed($r['current_user_id'],
+				$r['problem']->problem_id);
 		}
 
 		$response["score"] = self::bestScore($r);
