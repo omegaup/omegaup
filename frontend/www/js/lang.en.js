@@ -242,6 +242,7 @@ OmegaUp.T = {
 	problemDeployerOutMissing: ".out not found for case",
 	problemDeployerSlowRejected: "Problem would run for more than 5 minutes in case of TLE. Rejected.",
 	problemDeployerValidatorRequired: "Problem requested custom validator but has no validator.",
+	problemDeprecated: "Problem is deprecated",
 	problemEditAddAdmin: "Administrators",
 	problemEditAddTags: "Tags",
 	problemEditEditMarkdown: "Edit statement",

@@ -111,6 +111,10 @@ class ProblemController extends Controller {
 			if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 				throw new ForbiddenAccessException();
 			}
+
+			if ($r['problem']->deprecated) {
+				throw new PreconditionFailedException('problemDeprecated');
+			}
 		} else {
 			Validators::isValidAlias($r['alias'], 'alias');
 		}
@@ -253,6 +257,10 @@ class ProblemController extends Controller {
 
 		if (is_null($r["problem"])) {
 			throw new NotFoundException("problemNotFound");
+		}
+
+		if ($r['problem']->deprecated) {
+			throw new PreconditionFailedException('problemDeprecated');
 		}
 
 		// We need to check that the user can actually edit the problem

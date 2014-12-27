@@ -227,6 +227,10 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `slow` = ? AND";
 			array_push( $val, $Problems->getSlow() );
 		}
+		if (!is_null( $Problems->getDeprecated())) {
+			$sql .= " `deprecated` = ? AND";
+			array_push( $val, $Problems->getDeprecated() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -262,7 +266,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function update($Problems)
 	{
-		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ? WHERE  `problem_id` = ?;";
+		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ? WHERE  `problem_id` = ?;";
 		$params = array( 
 			$Problems->getPublic(), 
 			$Problems->getAuthorId(), 
@@ -287,6 +291,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getOrder(), 
 			$Problems->getTolerance(), 
 			$Problems->getSlow(), 
+			$Problems->getDeprecated(), 
 			$Problems->getProblemId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -324,7 +329,8 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->order)) $Problems->order = 'normal';
 		if (is_null($Problems->tolerance)) $Problems->tolerance = 1e-9;
 		if (is_null($Problems->slow)) $Problems->slow = 0;
-		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Problems->deprecated)) $Problems->deprecated = 0;
+		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Problems->problem_id,
 			$Problems->public,
@@ -350,6 +356,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->order,
 			$Problems->tolerance,
 			$Problems->slow,
+			$Problems->deprecated,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -656,6 +663,17 @@ abstract class ProblemsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `slow` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ProblemsA->getDeprecated()) ) ) & ( ! is_null ( ($b = $ProblemsB->getDeprecated()) ) ) ){
+				$sql .= " `deprecated` >= ? AND `deprecated` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `deprecated` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

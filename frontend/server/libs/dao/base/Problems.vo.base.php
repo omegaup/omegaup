@@ -104,6 +104,9 @@ class Problems extends VO
 			if (isset($data['slow'])) {
 				$this->slow = $data['slow'];
 			}
+			if (isset($data['deprecated'])) {
+				$this->deprecated = $data['deprecated'];
+			}
 		}
 	}
 
@@ -140,7 +143,8 @@ class Problems extends VO
 			"source" => $this->source,
 			"order" => $this->order,
 			"tolerance" => $this->tolerance,
-			"slow" => $this->slow
+			"slow" => $this->slow,
+			"deprecated" => $this->deprecated
 		); 
 	return json_encode($vec); 
 	}
@@ -324,4 +328,11 @@ class Problems extends VO
 	  * @var tinyint(1)
 	  */
 	public $slow;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var tinyint(1)
+	  */
+	public $deprecated;
 }

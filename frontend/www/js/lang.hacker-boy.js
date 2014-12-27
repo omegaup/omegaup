@@ -242,6 +242,7 @@ OmegaUp.T = {
 	problemDeployerOutMissing: "(.0u7 n07 f0und f0r ca53)",
 	problemDeployerSlowRejected: "(Pr0b13m w0u1d run f0r m0r3 7han 5 minu735 in ca53 0f TLE. R3j3c73d.)",
 	problemDeployerValidatorRequired: "(Pr0b13m r3qu3573d cu570m va1ida70r bu7 ha5 n0 va1ida70r.)",
+	problemDeprecated: "(Pr0b13m i5 d3pr3ca73d)",
 	problemEditAddAdmin: "(Admini57ra70r5)",
 	problemEditAddTags: "(Tag5)",
 	problemEditEditMarkdown: "(Edi7 57a73m3n7)",
