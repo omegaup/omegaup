@@ -357,8 +357,6 @@ class RunsDAO extends RunsDAOBase {
 					. "INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id "
 					. "WHERE contest_id = ? AND Users.user_id NOT IN"
 						. " (SELECT user_id FROM User_Roles WHERE contest_id = 0)" ;
-					//. "AND Users.user_id != (SELECT director_id FROM Contests where contest_id = ?)";
-			//$val = array($contest_id, $contest_id, $contest_id);
 			$val = array($contest_id);
 		}
 
