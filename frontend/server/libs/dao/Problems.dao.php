@@ -23,10 +23,6 @@ class ProblemsDAO extends ProblemsDAOBase
 			$rowcount, $query, $user_id, $tag, &$total) {
 		global $conn;
 
-		if (!is_null($query)) {
-			$escaped_query = mysql_real_escape_string($query);
-		}
-
 		// Just in case.
 		if ($mode !== 'asc' && $mode !== 'desc') {
 			$mode = 'desc';
@@ -77,12 +73,14 @@ class ProblemsDAO extends ProblemsDAOBase
 				} else {
 					$sql .= " AND";
 				}
-				$sql .= " title LIKE '%$escaped_query%'";
+				$sql .= " title LIKE CONCAT('%', ?, '%') ";
+				$args[] = $query;
 			}
 		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
 			$like_query = '';
 			if (!is_null($query)) {
-				$like_query = " AND p.title LIKE '%$escaped_query%'";
+				$like_query = " AND p.title LIKE CONCAT('%', ?, '%')";
+				$args[] = $query;
 			}
 			$select = "
 				SELECT
@@ -123,7 +121,8 @@ class ProblemsDAO extends ProblemsDAOBase
 		} else if ($user_type === USER_ANONYMOUS) {
 			$like_query = '';
 			if (!is_null($query)) {
-				$like_query = " AND p.title LIKE '%{$escaped_query}%'";
+				$like_query = " AND p.title LIKE CONCAT('%', ?, '%') ";
+			    $args[] = $query;
 			}
 			$select = "
 					SELECT
