@@ -23,6 +23,7 @@
 					<option {if $ORDER_BY == 'ratio'}		selected="selected"{/if}	value="ratio">{#wordsRatio#}</option>
 					<option {if $ORDER_BY == 'points'}		selected="selected"{/if}	value="points">{#wordsPointsForRank#}</option>
 					<option {if $ORDER_BY == 'score'}		selected="selected"{/if}	value="score">{#wordsMyScore#}</option>
+					<option {if $ORDER_BY == 'creation_date'} selected="selected"{/if}	value="creation_date">{#codersOfTheMonthDate#}</option>
 				</select>
 			</div>
 
