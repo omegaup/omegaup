@@ -339,10 +339,8 @@ class RunsDAO extends RunsDAOBase {
 	 *  GetAllRelevantUsers
 	 * 
 	 */
-
 	public static final function GetAllRelevantUsers($contest_id, $showAllRuns = false, $filterUsersBy = null) {
 
-		// Build SQL statement		
 		if (!$showAllRuns) {
 			$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( "
 					. "SELECT DISTINCT Runs.user_id from Runs "
@@ -357,10 +355,8 @@ class RunsDAO extends RunsDAOBase {
 		} else {
 			$sql = "SELECT Users.user_id, username, Users.name from Users "
 					. "INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id "
-					. "WHERE contest_id = ? AND Users.user_id NOT IN"
-						. " (SELECT user_id FROM User_Roles WHERE contest_id = ? OR contest_id = 0)"
-					. "AND Users.user_id != (SELECT director_id FROM Contests where contest_id = ?)";
-			$val = array($contest_id, $contest_id, $contest_id);
+					. "WHERE contest_id = ? " ;
+			$val = array($contest_id);
 		}
 
 
