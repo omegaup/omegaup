@@ -1752,7 +1752,8 @@ class ContestController extends Controller {
 						"auth_token" => $r["auth_token"],
 					));
 
-			$problemStats[$problem_alias] = ProblemController::apiStats($problemStatsRequest);
+			$problemStats[$i] = ProblemController::apiStats($problemStatsRequest);
+			$problemStats[$problem_alias] = $problemStats[$i];
 
 			$i++;
 		}
@@ -1811,7 +1812,7 @@ class ContestController extends Controller {
 			$csvData[] = $csvRow;
 		}
 
-		// Set headers to auto-download file	
+		// Set headers to auto-download file
 		header("Pragma: public");
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
@@ -1826,12 +1827,24 @@ class ContestController extends Controller {
 		// http://contextis.co.uk/blog/comma-separated-vulnerabilities/
 		$out = fopen('php://output', 'w');
 		foreach ($csvData as $csvRow) {
-			fputcsv($out, $csvRow);
+			fputcsv($out, ContestController::escapeCsv($csvRow));
 		}
 		fclose($out);
 
 		// X_X
 		die();
+	}
+
+	private static function escapeCsv($csvRow) {
+		$escapedRow = array();
+		foreach ($csvRow as $field) {
+			if (is_string($field) && $field[0] == '=') {
+				$escapedRow[] = "'" . $field;
+			} else {
+				$escapedRow[] = $field;
+			}
+		}
+		return $escapedRow;
 	}
 
 	public static function apiDownload(Request $r) {
