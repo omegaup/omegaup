@@ -47,10 +47,10 @@ class UsersDAO extends UsersDAOBase
 	public static function FindByUsernameOrName($usernameOrName) {
 		
 		global  $conn;
-		$escapedStr = mysql_real_escape_string($usernameOrName);
-		$sql = "select DISTINCT u.* from Users u where u.username LIKE '%{$escapedStr}%' or u.name LIKE '%{$escapedStr}%' LIMIT 10";				
+		$sql = "select DISTINCT u.* from Users u where u.username LIKE CONCAT('%', ?, '%') or u.name LIKE CONCAT('%', ?, '%') LIMIT 10";
+		$args = array($usernameOrName, $usernameOrName);
 		
-		$rs = $conn->Execute($sql);
+		$rs = $conn->Execute($sql, $args);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Users($foo);

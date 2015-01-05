@@ -34,10 +34,11 @@ class TagsDAO extends TagsDAOBase {
 
 	public static function FindByName($name) {
 		global $conn;
-		$escapedStr = mysql_real_escape_string($name);
-		$sql = "SELECT name FROM Tags WHERE name LIKE '%{$escapedStr}%' LIMIT 10";
+		$sql = "SELECT name FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 10";
+		$args = array($name);
 
-		$rs = $conn->Execute($sql);
+
+		$rs = $conn->Execute($sql, $args);
 		$result = array();
 		foreach ($rs as $row) {
 			array_push($result, new Tags($row));

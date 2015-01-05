@@ -29,10 +29,11 @@ class SchoolsDAO extends SchoolsDAOBase
 	public static function findByName($name) {
 		
 		global  $conn;
-		$escapedStr = mysql_real_escape_string($name);
-		$sql = "select DISTINCT s.* from Schools s where s.name LIKE '%{$escapedStr}%' LIMIT 10";				
-		
-		$rs = $conn->Execute($sql);
+				
+		$sql = "select DISTINCT s.* from Schools s where s.name LIKE  CONCAT('%', ?, '%') LIMIT 10";
+		$args = array($name);
+
+		$rs = $conn->Execute($sql, $args);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Users($foo);

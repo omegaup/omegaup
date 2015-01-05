@@ -77,7 +77,7 @@ class ProblemList extends OmegaupTestCase {
 
 		$response = ProblemController::apiList($r);
 
-		$this->assertEquals(1, count($response["results"]));
+		$this->assertCount(1, $response["results"]);
 		$this->assertEquals($problemData[1]["request"]["alias"], $response["results"][0]["alias"]);
 	}
 

@@ -77,11 +77,7 @@ class ProblemsDAO extends ProblemsDAOBase
 				$args[] = $query;
 			}
 		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
-			$like_query = '';
-			if (!is_null($query)) {
-				$like_query = " AND p.title LIKE CONCAT('%', ?, '%')";
-				$args[] = $query;
-			}
+
 			$select = "
 				SELECT
 					100 / LOG2(GREATEST(p.accepted, 1) + 1)	AS points,
@@ -104,7 +100,8 @@ class ProblemsDAO extends ProblemsDAOBase
 				) ps ON ps.problem_id = p.problem_id
 				LEFT JOIN
 					User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id";
-			$args = array($user_id, $user_id);
+			$args[] = $user_id;
+			$args[] = $user_id;
 
 			if (!is_null($tag)) {
 				$sql .= " INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id";
@@ -116,14 +113,15 @@ class ProblemsDAO extends ProblemsDAOBase
 			}
 
 			$sql .= "
-				(p.public = 1 OR p.author_id = ? OR ur.role_id = 3) $like_query";
+				(p.public = 1 OR p.author_id = ? OR ur.role_id = 3) ";
 			$args[] = $user_id;
-		} else if ($user_type === USER_ANONYMOUS) {
-			$like_query = '';
+
 			if (!is_null($query)) {
-				$like_query = " AND p.title LIKE CONCAT('%', ?, '%') ";
-			    $args[] = $query;
+				$sql .= " AND p.title LIKE CONCAT('%', ?, '%')";
+				$args[] = $query;
 			}
+		} else if ($user_type === USER_ANONYMOUS) {
+
 			$select = "
 					SELECT
 						0 AS score,
@@ -143,7 +141,14 @@ class ProblemsDAO extends ProblemsDAOBase
 				$sql .= " WHERE";
 			}
 
-			$sql .= " p.public = 1 $like_query";
+			$sql .= " p.public = 1 ";
+
+			if (!is_null($query)) {
+				$sql .= " AND p.title LIKE CONCAT('%', ?, '%') ";
+			    $args[] = $query;
+			}
+
+
 		}
 
 		$total = $conn->GetOne("SELECT COUNT(*) $sql", $args);
