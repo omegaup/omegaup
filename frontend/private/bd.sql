@@ -503,6 +503,8 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `last_access` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `verified` BOOLEAN NOT NULL DEFAULT FALSE,
   `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL,
+  `reset_digest` VARCHAR(45) NULL DEFAULT NULL,
+  `reset_sent_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),

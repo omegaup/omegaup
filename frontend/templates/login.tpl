@@ -20,26 +20,20 @@
 				<h4>{#loginNative#}</h4>
 				<form method='POST' action='{$smarty.server.REQUEST_URI}' id='login_form' class="form-horizontal">
 					<div class="form-group">
-						<div class="col-md-12">
-							<input id='user' name='user' value='' type='text' class="form-control" placeholder="{#loginEmailUsername#}" />
-						</div>
+						<label for='user'>{#loginEmailUsername#}</label>
+						<input id='user' name='user' value='' type='text' class='form-control' />
+					</div>
+
+					<div class="form-group">
+						<label for='pass'>{#loginPassword#} (<a href="/forgot_password.php">{#loginRecover#}</a>)</label>
+						<input id='pass' name='pass' value='' type='password' class='form-control' />
 					</div>
 					
-					<div class="form-group">
-						<div class="col-md-12">
-							<input id='pass' name='pass' value='' type='password' class="form-control" placeholder="{#loginPassword#}" />
-						</div>
-					</div>
 					
 					<input id='' name='request' value='login' type='hidden' />
 					
 					<div class="form-group">
-						<div class="col-md-6">
-							<a href="login.php" class="btn btn-link col-md-4">{#loginRecover#}</a>
-						</div>
-						<div class="col-md-6">
-							<button class="btn btn-primary form-control" type='submit'>{#loginLogIn#}</button>
-						</div>
+						<button class="btn btn-primary form-control" type='submit'>{#loginLogIn#}</button>
 					</div>
 				</form>
 			</div>

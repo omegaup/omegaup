@@ -47,6 +47,19 @@ class SecurityTools {
 	}
 
 	/**
+	 * Basic test to determine if a given password is acceptable without throwing exception.
+	 * @return boolean
+	 */
+	public static function IsValidPassword($password) {
+		if (is_null($password) || !is_string($password)) {
+			return false;
+		}
+
+		return strlen($password) >= 8 && strlen($password) <= 72;
+	}
+
+
+	/**
 	 * Given a plain string, returns its hash using phpass library
 	 * 
 	 * @param string $string

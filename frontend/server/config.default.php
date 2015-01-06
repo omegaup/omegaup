@@ -77,7 +77,7 @@ try_define('OMEGAUP_EMAIL_SEND_EMAILS',			false);
 try_define('OMEGAUP_FORCE_EMAIL_VERIFICATION',		false);
 try_define('OMEGAUP_EMAIL_SMTP_HOST',			'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_USER',			'xxxx');
-try_define('OMEGAUP_EMAIL_SMTP_PASSWORD',			'xxxx');
+try_define('OMEGAUP_EMAIL_SMTP_PASSWORD',		'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_PORT',			'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_FROM',			'xxxx');
 try_define('OMEGAUP_EMAIL_MAILCHIMP_ENABLE', false);
@@ -111,3 +111,10 @@ try_define('PROBLEMS_PER_PAGE', 100);
 try_define('USER_ADMIN',		'user_admin');
 try_define('USER_NORMAL',		'user_normal');
 try_define('USER_ANONYMOUS',	'user_anonymous');
+
+# #########################
+# STATUS CODES
+# #########################
+try_define('STATUS_OK', 'ok');
+try_define('STATUS_BAD_REQUEST', 'bad_request');
+try_define('STATUS_INTERNAL_SERVER_ERROR', 'internal_server_error');

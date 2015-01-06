@@ -203,6 +203,14 @@ abstract class UsersDAOBase extends DAO
 			$sql .= " `verification_id` = ? AND";
 			array_push( $val, $Users->getVerificationId() );
 		}
+		if (!is_null( $Users->getResetDigest())) {
+			$sql .= " `reset_digest` = ? AND";
+			array_push( $val, $Users->getResetDigest() );
+		}
+		if (!is_null( $Users->getResetSentAt())) {
+			$sql .= " `reset_sent_at` = ? AND";
+			array_push( $val, $Users->getResetSentAt() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -238,7 +246,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function update($Users)
 	{
-		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ? WHERE  `user_id` = ?;";
+		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ? WHERE  `user_id` = ?;";
 		$params = array( 
 			$Users->getUsername(), 
 			$Users->getFacebookUserId(), 
@@ -257,6 +265,8 @@ abstract class UsersDAOBase extends DAO
 			$Users->getLastAccess(), 
 			$Users->getVerified(), 
 			$Users->getVerificationId(), 
+			$Users->getResetDigest(), 
+			$Users->getResetSentAt(), 
 			$Users->getUserId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -281,7 +291,7 @@ abstract class UsersDAOBase extends DAO
 		if (is_null($Users->submissions)) $Users->submissions = '0';
 		if (is_null($Users->last_access)) $Users->last_access = gmdate('Y-m-d H:i:s');
 		if (is_null($Users->verified)) $Users->verified = FALSE;
-		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `verification_id` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Users->user_id,
 			$Users->username,
@@ -301,6 +311,8 @@ abstract class UsersDAOBase extends DAO
 			$Users->last_access,
 			$Users->verified,
 			$Users->verification_id,
+			$Users->reset_digest,
+			$Users->reset_sent_at,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -541,6 +553,28 @@ abstract class UsersDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `verification_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $UsersA->getResetDigest()) ) ) & ( ! is_null ( ($b = $UsersB->getResetDigest()) ) ) ){
+				$sql .= " `reset_digest` >= ? AND `reset_digest` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `reset_digest` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $UsersA->getResetSentAt()) ) ) & ( ! is_null ( ($b = $UsersB->getResetSentAt()) ) ) ){
+				$sql .= " `reset_sent_at` >= ? AND `reset_sent_at` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `reset_sent_at` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
