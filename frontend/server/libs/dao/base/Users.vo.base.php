@@ -86,6 +86,12 @@ class Users extends VO
 			if (isset($data['verification_id'])) {
 				$this->verification_id = $data['verification_id'];
 			}
+			if (isset($data['reset_digest'])) {
+				$this->reset_digest = $data['reset_digest'];
+			}
+			if (isset($data['reset_sent_at'])) {
+				$this->reset_sent_at = $data['reset_sent_at'];
+			}
 		}
 	}
 
@@ -116,7 +122,9 @@ class Users extends VO
 			"birth_date" => $this->birth_date,
 			"last_access" => $this->last_access,
 			"verified" => $this->verified,
-			"verification_id" => $this->verification_id
+			"verification_id" => $this->verification_id,
+			"reset_digest" => $this->reset_digest,
+			"reset_sent_at" => $this->reset_sent_at
 		); 
 	return json_encode($vec); 
 	}
@@ -258,4 +266,18 @@ class Users extends VO
 	  * @var VARCHAR(
 	  */
 	public $verification_id;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var VARCHAR(45)
+	  */
+	public $reset_digest;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var DATETIME
+	  */
+	public $reset_sent_at;
 }

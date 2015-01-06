@@ -195,4 +195,33 @@ class UsersDAO extends UsersDAOBase
 		}
 		return $ar;	
 	}
+
+	public static function FindResetInfoByEmail($email) {
+		$user = self::FindByEmail($email);
+		if (is_null($user)) {
+			return NULL;
+		} else {
+			return Array(
+				'reset_digest'	=> $user->reset_digest,
+				'reset_sent_at'	=> $user->reset_sent_at
+			);
+		}
+	}
+
+	public static function UpdateResetInfo($user_id, $reset_digest, $reset_sent_at) {
+		global $conn;
+		$params = Array($reset_digest, $reset_sent_at, $user_id);
+		$sql = 'UPDATE Users SET reset_digest = ?, reset_sent_at = ? WHERE user_id = ?';
+		$ret = $conn->Execute($sql, $params);
+		return ($ret) ? true : false;
+	}
+
+	public static function ResetPassword($user_id, $password) {
+		global $conn;
+		$hashedPassword = SecurityTools::hashString($password);
+		$params = Array($hashedPassword, $user_id);
+		$ret = $conn->Execute("UPDATE Users SET password = ? WHERE user_id = ?", $params);
+		return ($ret) ? true : false;
+	}
+
 }

@@ -6,7 +6,15 @@ class ApiUtils {
 	 * Gets a random string
 	 */
 	public static function GetRandomString() {
-		md5(uniqid(rand(), true));
+		return md5(uniqid(rand(), true));
+	}
+
+	public static function GetStringTime($time = NULL) {
+		if (is_null($time)) {
+			return date('Y-m-d H:i:s');
+		} else {
+			return date('Y-m-d H:i:s', $time);
+		}
 	}
 
 	/**
