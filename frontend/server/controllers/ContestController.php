@@ -1148,11 +1148,18 @@ class ContestController extends Controller {
 			
 			// Set defaults for contests params
 			if (!isset($r["contest_params"][$contest->alias]["only_ac"])) {
-				$r["contest_params"][$contest->alias]["only_ac"] = false;
+				// Hay que hacer esto para evitar "Indirect modification of overloaded element of Request has no effect"
+				// http://stackoverflow.com/questions/20053269/indirect-modification-of-overloaded-element-of-splfixedarray-has-no-effect
+				$cp = $r["contest_params"];
+				$cp[$contest->alias]["only_ac"] = false;
+				$r["contest_params"] = $cp;
 			}
 			
 			if (!isset($r["contest_params"][$contest->alias]["weight"])) {
-				$r["contest_params"][$contest->alias]["weight"] = 1;
+				// Ditto indirect modification.
+				$cp = $r["contest_params"];
+				$cp[$contest->alias]["weight"] = 1;
+				$r["contest_params"] = $cp;
 			}
 						
 			$s = new Scoreboard(
