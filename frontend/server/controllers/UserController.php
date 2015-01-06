@@ -1203,10 +1203,6 @@ class UserController extends Controller {
 			} catch(Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
-			
-			if (is_null($r["country"])) {
-				throw new InvalidParameterException("parameterInvalid", "country");
-			}
 		}
 		
 		if ($r["state_id"] === 'null') {
@@ -1220,10 +1216,6 @@ class UserController extends Controller {
 				$r["state"] = StatesDAO::getByPK($r["state_id"]);
 			} catch (Exception $e) { 
 				throw new InvalidDatabaseOperationException($e);
-			}
-			
-			if (is_null($r["state"])) {
-				throw new InvalidParameterException("parameterInvalid", "state");
 			}
 		}
 		
