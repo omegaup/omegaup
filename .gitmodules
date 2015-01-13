@@ -19,3 +19,6 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/omegaup/backend.git
+[submodule "libinteractive"]
+	path = libinteractive
+	url = https://github.com/omegaup/libinteractive.git
