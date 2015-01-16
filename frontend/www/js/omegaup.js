@@ -1876,6 +1876,37 @@ OmegaUp.prototype.changePassword = function(oldPassword, newPassword, callback) 
 	});
 };
 
+OmegaUp.prototype.resetCreate = function(email) {
+	$.post(
+		'/api/reset/create',
+		{ email: email },
+		function(data) {
+		OmegaUp.ui.success(data.message);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		OmegaUp.ui.error(JSON.parse(j.responseText).error);
+	});
+};
+
+OmegaUp.prototype.resetUpdate = function(email, resetToken, password, passwordConfirmation) {
+    $.post(
+		'/api/reset/update',
+		{
+			email: email,
+			reset_token: resetToken,
+			password: password,
+			password_confirmation: passwordConfirmation
+		},
+		function(data) {
+			OmegaUp.ui.success(data.message);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		OmegaUp.ui.error(JSON.parse(j.responseText).error);
+	});
+}
+
 var omegaup = new OmegaUp();
 
 function dateToString(currentDate) {

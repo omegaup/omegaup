@@ -1,140 +1,116 @@
 <?php
 class ResetUpdateTest extends OmegaupTestCase {
 	public function testShouldRequireAllParameters() {
-		$r = new Request();
-		$response = ResetController::apiUpdate($r);
-		$this->assertEquals(STATUS_BAD_REQUEST, $response['status']);
-		// EXPERIMENTAL: What do you think about some tests like this
-		// (ignoring the fact that expected message is hard coded)?
-		$this->assertEquals('Missing parameters.', $response['message']);
-
-		$r['email'] = 'user@omegaup.com';
-		$response = ResetController::apiUpdate($r);
-		$this->assertEquals(STATUS_BAD_REQUEST, $response['status']);
+		try {
+			$r = new Request();
+			ResetController::apiUpdate($r);
+		} catch (InvalidParameterException $expected) {
+			// Verify that the cause of the exception was the expected.
+			$this->assertEquals('invalidParameters', $expected->getMessage());
+		}
 	}
-
-	public function testShouldRefuseUnregisteredEmailAddresses() {
-		$r = new Request(Array(
-			'email'					=> 'user@omegaup.com',
-			'reset_token'			=> ApiUtils::GetRandomString(),
-			'password'				=> 'newpassword',
-			'password_confirmation'	=> 'newpassword'
-		));
-
-		$response = ResetController::apiUpdate($r);
-		$this->assertEquals(STATUS_BAD_REQUEST, $response['status']);
+	
+	public function testShouldRefuseUnverifiedUser() {
+		try {
+			$user_data = UserFactory::generateUser(false);
+			$user_data['password_confirmation'] = $user_data['password'];
+			$user_data['reset_token'] = Utils::CreateRandomString();
+			$r = new Request($user_data);
+			ResetController::apiUpdate($r);
+		} catch (InvalidParameterException $expected) {
+			$this->assertEquals('unverifiedUser', $expected->getMessage());
+		}
 	}
 
 	public function testShouldRefuseInvalidResetToken() {
-		$username = 'user';
-		$password = 'mypassword';
-		$email = 'user@omegaup.com';
-		$user = UserFactory::createUser($username, $password, $email);
-		$r = new Request(Array(
-			'email'					=> $email,
-			'reset_token'			=> ApiUtils::GetRandomString(),
-			'password'				=> 'newpassword',
-			'password_confirmation'	=> 'newpassword'
-		));
-
-		$response = ResetController::apiUpdate($r);
-		$this->assertEquals(STATUS_BAD_REQUEST, $response['status']);
+		try {
+			$user_data = UserFactory::generateUser();
+			$user_data['password_confirmation'] = $user_data['password'];
+			$user_data['reset_token'] = 'abcde';
+			$r = new Request($user_data);
+			ResetController::apiUpdate($r);
+		} catch (InvalidParameterException $expected) {
+			$this->assertEquals('invalidResetToken', $expected->getMessage());
+		}
 	}
 
+	
 	public function testShouldRefusePasswordMismatch() {
-		Utils::CleanupDB();
-		$username = 'user';
-		$password = 'mypassword';
-		$email = 'user@omegaup.com';
-		$user = UserFactory::createUser($username, $password, $email);
-
-		$r = new Request(Array('email' => $email));
-		$response = ResetController::apiCreate($r);
-		$token = $response['token'];
-		$r = new Request(Array(
-			'email'					=> $email,
-			'reset_token'			=> $token,
-			'password'				=> 'oldpassword',
-			'password_confirmation'	=> 'newpassword'
-		));
-
-		$response = ResetController::apiUpdate($r);
-		$this->assertEquals(STATUS_BAD_REQUEST, $response['status']);
+		try {
+			$user_data = UserFactory::generateUser();
+			$r = new Request(Array('email' => $user_data['email']));
+			$response = ResetController::apiCreate($r);
+			$user_data['reset_token'] = $response['token'];
+			$user_data['password_confirmation'] = 'abcde';
+			$r = new Request($user_data);
+			ResetController::apiUpdate($r);
+		} catch (InvalidParameterException $expected) {
+			$this->assertEquals('passwordMismatch', $expected->getMessage());
+		}
 	}
 
-	public function testShouldRefuseWeakPassword() {
-		Utils::CleanupDB();
-		$username = 'user';
-		$password = 'mypassword';
-		$email = 'user@omegaup.com';
-		$user = UserFactory::createUser($username, $password, $email);
-
-		$r = new Request(Array('email' => $email));
+	public function testShouldRefuseInvalidPassword() {
+		$user_data = UserFactory::generateUser();
+		$r = new Request(Array('email' => $user_data['email']));
 		$response = ResetController::apiCreate($r);
-		$token = $response['token'];
-		$r = new Request(Array(
-			'email'					=> $email,
-			'reset_token'			=> $token,
-			'password'				=> 'a',
-			'password_confirmation'	=> 'a'
-		));
+		$user_data['reset_token'] = $response['token'];
 
-		$response = ResetController::apiUpdate($r);
-		$this->assertEquals(STATUS_BAD_REQUEST, $response['status']);
+		$user_data['password'] = 'abcde';
+		$user_data['password_confirmation'] = 'abcde';
+		$r = new Request($user_data);
+		try {
+			ResetController::apiUpdate($r);
+		} catch (InvalidParameterException $expected) {
+			$this->assertEquals('parameterStringTooShort', $expected->getMessage());
+		}
+
+		$user_data['password'] = str_pad('', 73, 'a');
+		$user_data['password_confirmation'] = str_pad('', 73, 'a');
+		$r = new Request($user_data);
+		try {
+			ResetController::apiUpdate($r);
+		} catch (InvalidParameterException $expected) {
+			$this->assertEquals('parameterStringTooLong', $expected->getMessage());
+		}
 	}
 
 	public function testShouldRefuseExpiredReset() {
-		Utils::CleanupDB();
-		$username = 'user';
-		$password = 'mypassword';
-		$email = 'user@omegaup.com';
-		$user = UserFactory::createUser($username, $password, $email);
-
-		$r = new Request(Array('email' => $email));
+		$user_data = UserFactory::generateUser();
+		$r = new Request(array('email' => $user_data['email']));
 		$response = ResetController::apiCreate($r);
-		$token = $response['token'];
-		$new_password = 'mybrandnewpassword';
-		$r = new Request(Array(
-			'email'					=> $email,
-			'reset_token'			=> $token,
-			'password'				=> $new_password,
-			'password_confirmation'	=> $new_password
-		));
-		
-		$reset_digest = hash('sha1', $token);
+		$user_data['password_confirmation'] = $user_data['password'];
+		$user_data['reset_token'] = $response['token'];
+		$reset_digest = hash('sha1', $response['token']);
+
 		// Time travel
-		$reset_sent_at = ApiUtils::GetStringTime(time() - (2 * 3600 + 1));
-		UsersDAO::UpdateResetInfo($user->user_id, $reset_digest,$reset_sent_at);
+		$reset_sent_at = ApiUtils::GetStringTime(time() - (PASSWORD_RESET_TIMEOUT + 1));
+		$user = UsersDAO::FindByEmail($user_data['email']);
+		$user->setResetDigest($reset_digest);
+		$user->setResetSentAt($reset_sent_at);
+		UsersDAO::save($user);
 
-		$response = ResetController::apiUpdate($r);
-		$this->assertEquals(STATUS_BAD_REQUEST, $response['status']);
-
-		// Using tests like this we can be sure the the operation failed due to
-		// the intended reason.
-		$this->assertEquals('Token expired.', $response['message']);
+		try {
+			$r = new Request($user_data);
+			$response = ResetController::apiUpdate($r);
+		} catch (InvalidParameterException $expected) {
+			$this->assertEquals('passwordResetResetExpired', $expected->getMessage());
+		}
 	}
 
 	public function testShouldLogInWithNewPassword() {
-		Utils::CleanupDB();
-		$username = 'user';
-		$password = 'mypassword';
-		$email = 'user@omegaup.com';
-		$user = UserFactory::createUser($username, $password, $email);
+		$user_data = UserFactory::generateUser();
+		$r = new Request(array('email' => $user_data['email']));
+		$create_response = ResetController::apiCreate($r);
+		$reset_token = $create_response['token'];
+		$user_data['reset_token'] = $reset_token;
 
-		$r = new Request(Array('email' => $email));
-		$response = ResetController::apiCreate($r);
-		$token = $response['token'];
-		$new_password = 'mybrandnewpassword';
-		$r = new Request(Array(
-			'email'					=> $email,
-			'reset_token'			=> $token,
-			'password'				=> $new_password,
-			'password_confirmation'	=> $new_password
-		));
+		$new_password = 'newpassword';
+		$user_data['password'] = $new_password;
+		$user_data['password_confirmation'] = $new_password;
+		$r = new Request($user_data);
 
-		$response = ResetController::apiUpdate($r);
-		$this->assertEquals(STATUS_OK, $response['status']);
-
+		$user = UsersDAO::FindByEmail($user_data['email']);
+		ResetController::apiUpdate($r);
 		$user->password = $new_password;
 		$this->login($user);
 	}
