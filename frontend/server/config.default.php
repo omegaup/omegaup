@@ -112,9 +112,7 @@ try_define('USER_ADMIN',		'user_admin');
 try_define('USER_NORMAL',		'user_normal');
 try_define('USER_ANONYMOUS',	'user_anonymous');
 
-# #########################
-# STATUS CODES
-# #########################
-try_define('STATUS_OK', 'ok');
-try_define('STATUS_BAD_REQUEST', 'bad_request');
-try_define('STATUS_INTERNAL_SERVER_ERROR', 'internal_server_error');
+# ########################
+# PASSWORD RESET CONFIG
+# ########################
+try_define('PASSWORD_RESET_TIMEOUT', 2 * 3600);

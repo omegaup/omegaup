@@ -281,6 +281,19 @@ CREATE TABLE IF NOT EXISTS `Password_Change` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Resets` (
+  `resets_id` INT(11) NOT NULL,
+  `user_id` INT(11) NOT NULL,
+  PRIMARY KEY (`resets_id`, `user_id`),
+  INDEX `fk_Resets_Users_idx` (`user_id` ASC),
+  CONSTRAINT `fk_Resets_Users`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `omegaup`.`Users` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB CHARSET=utf8 COMMENT='Tabla para registrar las peticiones de reset de contrasennias.';
+
+-- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `Permissions`

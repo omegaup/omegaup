@@ -5,75 +5,55 @@ class ResetController extends Controller {
 	 * password. The first step consist of sending an email to the user with
 	 * instructions to reset he's password, if and only if the email is valid.
 	 * @param Request $r
-	 * return array
+	 * @return array
+	 * @throws InvalidParameterException
 	 */
 	public static function apiCreate(Request $r) {
+		self::ValidateCreateRequest($r);
 		$email = $r['email'];
-		if (is_null($email)) {
-			return self::badRequest('Missing parameter.');
-		} else {
-			// Email should be registered to begin with, right?
-			$user = UsersDAO::FindByEmail($email);
-			if (is_null($user)) {
-				return self::badRequest('Invalid email.');
-			}
-			// OK, send email with instructions.
-			$token = ApiUtils::GetRandomString();
-			$reset_digest = hash('sha1', $token);
-			$reset_sent_at = ApiUtils::GetStringTime();
+		$token = ApiUtils::GetRandomString();
+		$reset_digest = hash('sha1', $token);
+		$reset_sent_at = ApiUtils::GetStringTime();
 
-			if (IS_TEST) {
-				$ret = UsersDAO::UpdateResetInfo(
-					$user->user_id,
-					$reset_digest,
-					$reset_sent_at
-				);
+		$mail = new PHPMailer();
+		$mail->IsSMTP();
+		$mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
+		$mail->SMTPAuth = true;
+		$mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
+		$mail->From = OMEGAUP_EMAIL_SMTP_FROM;
+		$mail->Port = 465;
+		$mail->SMTPSecure = 'ssl';
+		$mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
 
-				if ($ret) {
-					return Array('status' => STATUS_OK, 'token' => $token);
-				} else {
-					return Array('status' => STATUS_INTERNAL_SERVER_ERROR);
-				}
-			} else {
-				$mail = new PHPMailer();
-				$mail->IsSMTP();
-				$mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
-				$mail->SMTPAuth = true;
-				$mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
-				$mail->From = OMEGAUP_EMAIL_SMTP_FROM;
-				$mail->Port = 465;
-				$mail->SMTPSecure = 'ssl';
-				$mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+		$mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
+		$mail->AddAddress($email);
+		$mail->isHTML(true);
 
-				$mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
-				$mail->AddAddress($email);
-				$mail->isHTML(true);
-				$mail->Subject = "Restablecer contraseña en OmegaUp";
-
-				$link = $_SERVER['SERVER_NAME'] . '/reset_password.php?';
-				$link .= 'email=' . rawurlencode($email)
-					  . '&reset_token=' . $token;
-				$mail->Body = "Da clic en el siguiente enlace para restablecer "
-							. "tu contraseña: <a href='$link'>$link</a><br><br>"
-							. "Si tu no solicitaste esta operación no hagas "
-							. "clic y verifica que tu cuenta este a salvo.";
-				if (!$mail->Send()) {
-					self::$log->error("Failed to send mail:". $mail->ErrorInfo);
-					return Array('status' => STATUS_INTERNAL_SERVER_ERROR);
-				} else {
-					$ret = UsersDAO::UpdateResetInfo(
-						$user->user_id,
-						$reset_digest,
-						$reset_sent_at
-					);
-					if ($ret) {
-						return Array('status' => STATUS_OK);
-					} else {
-						return Array('status' => STATUS_INTERNAL_SERVER_ERROR);
-					}
-				}
-			}
+		global $smarty;
+		$mail->Subject = IS_TEST ? "title" : $smarty->getConfigVariable('wordsReset');
+		$host = IS_TEST ? 'http://localhost' : $_SERVER['SERVER_NAME'];
+		$link = $host . '/reset_password.php?';
+		$link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
+		$message = IS_TEST ? "message" : $smarty->getConfigVariable('wordsResetMessage');
+		$mail->Body = str_replace('[link]', $link, $message);
+            
+		$user = UsersDAO::FindByEmail($email);
+		$user->setResetDigest($reset_digest);
+		$user->setResetSentAt($reset_sent_at);
+		UsersDAO::save($user);
+		if (IS_TEST) {
+			return array('status' => 'ok', 'token' => $token);
+		} else if (!$mail->Send()) {
+			self::$log->error("Failed to send mail:". $mail->ErrorInfo);
+			$user->setResetDigest(NULL);
+			$user->setResetSentAt(NULL);
+			UsersDAO::save($user);
 		}
+
+		return array(
+			'status' => 'ok',
+			'message' => IS_TEST ? "message" : $smarty->getConfigVariable('passwordResetRequestSuccess')
+		);
 	}
 
 	/**
@@ -82,60 +62,60 @@ class ResetController extends Controller {
 	 * the correct parameters are suplied.
 	 * @param Request $r
 	 * @return array
+	 * @throws InvalidParameterException
 	 */
 	public static function apiUpdate(Request $r) {
+		self::ValidateUpdateRequest($r);
 		$email = $r['email'];
+		$user = UsersDAO::FindByEmail($email);
+		$user->setPassword(SecurityTools::hashString($r['password']));
+		$user->setResetDigest(NULL);
+		$user->setResetSentAt(NULL);
+		UsersDAO::save($user);
+
+		global $smarty;
+		return array(
+			'status' => 'ok',
+			'message' =>  IS_TEST ? "message" : $smarty->getConfigVariable('passwordResetResetSuccess')
+		);
+	}
+
+	public function validateCreateRequest($r) {
+		if (is_null(UsersDAO::FindByEmail($r['email']))) {
+			throw new InvalidParameterException('invalidUser');
+		}
+	}
+
+	public function validateUpdateRequest($r) {
+		$user = UsersDAO::FindByEmail($r['email']);
 		$reset_token = $r['reset_token'];
 		$password = $r['password'];
 		$password_confirmation = $r['password_confirmation'];
-
-		// All parameters MUST be present
-		if (is_null($email)
+		if (is_null($user)
 			|| is_null($reset_token)
 			|| is_null($password)
 			|| is_null($password_confirmation)
 		) {
-			return self::badRequest('Missing parameters.');
-		} else {
-			// Verify that the email is valid.
-			$user = UsersDAO::FindByEmail($email);
-			if (is_null($user)) {
-				return self::badRequest('Invalid address.');
-			}
-
-			$reset_digest = hash('sha1', $reset_token);
-			if ($reset_digest !== $user->reset_digest) {
-				return self::badRequest('Invalid parameters.');
-			}
-
-			// Reset request expires after 2 hours.
-			$seconds = time() - strtotime($user->reset_sent_at);
-			if ($seconds > 2 * 3600) {
-				return self::badRequest('Token expired.');
-			}
-
-			if ($password !== $password_confirmation) {
-				return self::badRequest('Password mismatch.');
-			}
-
-			if (!SecurityTools::IsValidPassword($password)) {
-				return self::badRequest('Invalid password.');
-			}
-
-			// OK, let's reset your password.
-			if (UsersDAO::ResetPassword($user->user_id, $password)) {
-				UsersDAO::UpdateResetInfo($user->user_id, NULL, NULL);
-				return Array('status' => STATUS_OK);
-			} else {
-				return Array('status' => STATUS_INTERNAL_SERVER_ERROR);
-			}
+			throw new InvalidParameterException('invalidParameters');
 		}
-	}
 
-	private function badRequest($message) {
-		return Array(
-			'status' => STATUS_BAD_REQUEST,
-			'message' => $message
-		);
+		if (!$user->verified) {
+			throw new InvalidParameterException('unverifiedUser');
+		}
+
+		if ($user->reset_digest !== hash('sha1', $reset_token)) {
+			throw new InvalidParameterException('invalidResetToken');
+		}
+
+		if ($password !== $password_confirmation) {
+			throw new InvalidParameterException('passwordMismatch');
+		}
+
+		SecurityTools::testStrongPassword($password);
+
+		$seconds = time() - strtotime($user->reset_sent_at);
+		if ($seconds > PASSWORD_RESET_TIMEOUT) {
+			throw new InvalidParameterException('passwordResetResetExpired');
+		}
 	}
 }

@@ -62,6 +62,24 @@ class UserFactory {
 		
         return $user;
     } 
+
+	/**
+	 * Creates a native user in Omegaup and returns an array with the data used
+	 * to create the user.
+	 * @param $verify
+	 * @return array
+	 */
+	public static function generateUser($verify = true) {
+		$username = Utils::CreateRandomString();
+		$password = Utils::CreateRandomString();
+		$email = Utils::CreateRandomString()."@mail.com";
+		self::createUser($username, $password, $email, $verify);
+		return array(
+			"username" => $username,
+			"password" => $password,
+			"email" => $email
+		);
+    }
 	
 	/**
 	 * Creates a user using self::createUser with verify = false
