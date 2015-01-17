@@ -231,6 +231,7 @@ OmegaUp.T = {
 	parameterStringTooShort: "La longitud de la cadena debe ser al menos %(min_length) caracteres",
 	parameterUsernameInUse: "El nombre de usuario ya fue tomado",
 	passwordMismatch: "Las contraseñas no coinciden.",
+	passwordResetMinWait: "Debes esperar unos minutos antes de realizar otra petición.",
 	passwordResetPassword: "Nueva contraseña",
 	passwordResetPasswordConfirmation: "Confirma la nueva contraseña",
 	passwordResetRequestSuccess: "Se te ha enviado un correo con instrucciones.",
