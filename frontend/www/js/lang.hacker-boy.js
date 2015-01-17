@@ -231,6 +231,7 @@ OmegaUp.T = {
 	parameterStringTooShort: "(Param373r i5 5h0r73r 7han %(min_13ng7h) charac73r5)",
 	parameterUsernameInUse: "(U53rnam3 a1r3ady in u53)",
 	passwordMismatch: "(Pa55w0rd mi5ma7ch.)",
+	passwordResetMinWait: "(Y0u 5h0u1d wai7 50m3 minu735 b3f0r3 an07h3r r3qu357.)",
 	passwordResetPassword: "(N3w pa55w0rd)",
 	passwordResetPasswordConfirmation: "(N3w pa55w0rd c0nfirma7i0n)",
 	passwordResetRequestSuccess: "(An 3mai1 ha5 b33n 53n7 70 y0ur 3mai1 wi7h in57ruc7i0n5.)",

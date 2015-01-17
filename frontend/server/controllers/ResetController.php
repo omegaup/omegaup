@@ -29,21 +29,24 @@ class ResetController extends Controller {
 		$mail->AddAddress($email);
 		$mail->isHTML(true);
 
-		global $smarty;
-		$mail->Subject = IS_TEST ? "title" : $smarty->getConfigVariable('wordsReset');
-		$host = IS_TEST ? 'http://localhost' : $_SERVER['SERVER_NAME'];
-		$link = $host . '/reset_password.php?';
-		$link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
-		$message = IS_TEST ? "message" : $smarty->getConfigVariable('wordsResetMessage');
-		$mail->Body = str_replace('[link]', $link, $message);
-            
 		$user = UsersDAO::FindByEmail($email);
 		$user->setResetDigest($reset_digest);
 		$user->setResetSentAt($reset_sent_at);
 		UsersDAO::save($user);
+
 		if (IS_TEST) {
 			return array('status' => 'ok', 'token' => $token);
-		} else if (!$mail->Send()) {
+		}
+
+		global $smarty;
+		$mail->Subject = $smarty->getConfigVariable('wordsReset');
+		$host = 'www.omegaup.com';
+		$link = $host . '/reset_password.php?';
+		$link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
+		$message = $smarty->getConfigVariable('wordsResetMessage');
+		$mail->Body = str_replace('[link]', $link, $message);
+            
+		if (!$mail->Send()) {
 			self::$log->error("Failed to send mail:". $mail->ErrorInfo);
 			$user->setResetDigest(NULL);
 			$user->setResetSentAt(NULL);
@@ -52,7 +55,7 @@ class ResetController extends Controller {
 
 		return array(
 			'status' => 'ok',
-			'message' => IS_TEST ? "message" : $smarty->getConfigVariable('passwordResetRequestSuccess')
+			'message' => $smarty->getConfigVariable('passwordResetRequestSuccess')
 		);
 	}
 
@@ -66,8 +69,7 @@ class ResetController extends Controller {
 	 */
 	public static function apiUpdate(Request $r) {
 		self::ValidateUpdateRequest($r);
-		$email = $r['email'];
-		$user = UsersDAO::FindByEmail($email);
+		$user = UsersDAO::FindByEmail($r['email']);
 		$user->setPassword(SecurityTools::hashString($r['password']));
 		$user->setResetDigest(NULL);
 		$user->setResetSentAt(NULL);
@@ -80,13 +82,18 @@ class ResetController extends Controller {
 		);
 	}
 
-	public function validateCreateRequest($r) {
+	private function validateCreateRequest($r) {
+		$user = UsersDAO::FindByEmail($r['email']);
 		if (is_null(UsersDAO::FindByEmail($r['email']))) {
 			throw new InvalidParameterException('invalidUser');
 		}
+		$seconds = time() - strtotime($user->reset_sent_at);
+		if ($seconds < PASSWORD_RESET_MIN_WAIT) {
+			throw new InvalidParameterException('passwordResetMinWait');
+		}
 	}
 
-	public function validateUpdateRequest($r) {
+	private function validateUpdateRequest($r) {
 		$user = UsersDAO::FindByEmail($r['email']);
 		$reset_token = $r['reset_token'];
 		$password = $r['password'];
@@ -94,8 +101,7 @@ class ResetController extends Controller {
 		if (is_null($user)
 			|| is_null($reset_token)
 			|| is_null($password)
-			|| is_null($password_confirmation)
-		) {
+			|| is_null($password_confirmation)) {
 			throw new InvalidParameterException('invalidParameters');
 		}
 

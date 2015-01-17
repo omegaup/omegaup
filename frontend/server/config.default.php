@@ -116,3 +116,4 @@ try_define('USER_ANONYMOUS',	'user_anonymous');
 # PASSWORD RESET CONFIG
 # ########################
 try_define('PASSWORD_RESET_TIMEOUT', 2 * 3600);
+try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);

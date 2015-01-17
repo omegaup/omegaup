@@ -8,8 +8,29 @@ class ResetCreateTest extends OmegaupTestCase {
 
 	public function testShouldRefuseNotRegisteredEmailAddresses() {
 		$this->setExpectedException('InvalidParameterException');
-		$email = Utils::CreateRandomString()."@mail.com";
+		$email = Utils::CreateRandomString() . "@mail.com";
 		$r = new Request();
 		$response = ResetController::apiCreate($r);
+	}
+
+	public function testShouldRefuseMultipleRequestsInShortInterval() {
+		$user_data = UserFactory::generateUser();
+		$r = new Request(array('email' => $user_data['email']));
+		$response = ResetController::apiCreate($r);
+
+		try {
+			ResetController::apiCreate($r);
+		} catch (InvalidParameterException $expected) {
+			$message = $expected->getMessage();
+		}
+		$this->assertEquals('passwordResetMinWait', $message);
+
+		// time travel
+		$reset_sent_at = ApiUtils::GetStringTime(time() - PASSWORD_RESET_MIN_WAIT - 1);
+		$user = UsersDAO::FindByEmail($user_data['email']);
+		$user->setResetSentAt($reset_sent_at);
+		UsersDAO::save($user);
+
+		ResetController::apiCreate($r);
 	}
 }
