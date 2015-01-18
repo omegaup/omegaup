@@ -18,7 +18,7 @@
 					<input type="password" id="password_confirmation" name="password_confirmation" class="form-control"/>
 				</div>
 				<div class="form-group">
-					<button type="submit" class="btn btn-primary form-control">{#wordsSaveChanges#}</input>
+					<button type="submit" id="submit" class="btn btn-primary form-control">{#wordsSaveChanges#}</input>
 				</div>
 			</form>
 		</div>

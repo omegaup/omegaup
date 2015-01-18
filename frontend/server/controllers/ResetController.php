@@ -40,7 +40,7 @@ class ResetController extends Controller {
 
 		global $smarty;
 		$mail->Subject = $smarty->getConfigVariable('wordsReset');
-		$host = 'www.omegaup.com';
+		$host = OMEGAUP_SERVER;
 		$link = $host . '/reset_password.php?';
 		$link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
 		$message = $smarty->getConfigVariable('wordsResetMessage');
@@ -87,6 +87,11 @@ class ResetController extends Controller {
 		if (is_null(UsersDAO::FindByEmail($r['email']))) {
 			throw new InvalidParameterException('invalidUser');
 		}
+
+		if (!$user->verified) {
+			throw new InvalidParameterException('unverifiedUser');
+		}
+
 		$seconds = time() - strtotime($user->reset_sent_at);
 		if ($seconds < PASSWORD_RESET_MIN_WAIT) {
 			throw new InvalidParameterException('passwordResetMinWait');
@@ -103,10 +108,6 @@ class ResetController extends Controller {
 			|| is_null($password)
 			|| is_null($password_confirmation)) {
 			throw new InvalidParameterException('invalidParameters');
-		}
-
-		if (!$user->verified) {
-			throw new InvalidParameterException('unverifiedUser');
 		}
 
 		if ($user->reset_digest !== hash('sha1', $reset_token)) {

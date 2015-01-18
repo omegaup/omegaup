@@ -13,6 +13,17 @@ class ResetCreateTest extends OmegaupTestCase {
 		$response = ResetController::apiCreate($r);
 	}
 
+	public function testShouldRefuseUnverifiedUser() {
+		try {
+			$user_data = UserFactory::generateUser(false);
+			$r = new Request($user_data);
+			ResetController::apiCreate($r);
+		} catch (InvalidParameterException $expected) {
+			$message = $expected->getMessage();
+		}
+		$this->assertEquals('unverifiedUser', $message);
+	}
+
 	public function testShouldRefuseMultipleRequestsInShortInterval() {
 		$user_data = UserFactory::generateUser();
 		$r = new Request(array('email' => $user_data['email']));

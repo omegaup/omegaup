@@ -234,7 +234,7 @@ OmegaUp.T = {
 	passwordResetMinWait: "Debes esperar unos minutos antes de realizar otra petición.",
 	passwordResetPassword: "Nueva contraseña",
 	passwordResetPasswordConfirmation: "Confirma la nueva contraseña",
-	passwordResetRequestSuccess: "Se te ha enviado un correo con instrucciones.",
+	passwordResetRequestSuccess: "Instrucciones han sido enviadas a tu correo.",
 	passwordResetRequestTitle: "Olvide mi contraseña",
 	passwordResetResetExpired: "El tiempo para restablecer tu contraseña ha expirado.",
 	passwordResetResetSuccess: "Tu contraseña ha sido actualizada.",

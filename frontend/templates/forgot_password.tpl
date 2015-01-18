@@ -12,7 +12,7 @@
 					<input type="text" id="email" name="email" class="form-control"/>
 				</div>
 				<div class="form-group">
-					<button type="submit" class="btn btn-primary form-control">{#wordsSend#}</input>
+					<button type="submit" id="submit" class="btn btn-primary form-control">{#wordsSend#}</input>
 				</div>
 			</form>
 		</div>

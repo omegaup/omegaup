@@ -10,19 +10,6 @@ class ResetUpdateTest extends OmegaupTestCase {
 		}
 		$this->assertEquals('invalidParameters', $message);
 	}
-	
-	public function testShouldRefuseUnverifiedUser() {
-		try {
-			$user_data = UserFactory::generateUser(false);
-			$user_data['password_confirmation'] = $user_data['password'];
-			$user_data['reset_token'] = Utils::CreateRandomString();
-			$r = new Request($user_data);
-			ResetController::apiUpdate($r);
-		} catch (InvalidParameterException $expected) {
-			$message = $expected->getMessage();
-		}
-		$this->assertEquals('unverifiedUser', $message);
-	}
 
 	public function testShouldRefuseInvalidResetToken() {
 		try {

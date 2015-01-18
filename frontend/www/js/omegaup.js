@@ -1876,20 +1876,24 @@ OmegaUp.prototype.changePassword = function(oldPassword, newPassword, callback) 
 	});
 };
 
-OmegaUp.prototype.resetCreate = function(email) {
+OmegaUp.prototype.resetCreate = function(email, callback) {
+    OmegaUp.ui.dismissNotifications();
 	$.post(
 		'/api/reset/create',
 		{ email: email },
 		function(data) {
-		OmegaUp.ui.success(data.message);
+			OmegaUp.ui.success(data.message);
+			callback();
 		},
 		'json'
 	).fail(function(j, status, errorThrown) {
 		OmegaUp.ui.error(JSON.parse(j.responseText).error);
+		callback();
 	});
 };
 
-OmegaUp.prototype.resetUpdate = function(email, resetToken, password, passwordConfirmation) {
+OmegaUp.prototype.resetUpdate = function(email, resetToken, password, passwordConfirmation, callback) {
+    OmegaUp.ui.dismissNotifications();
     $.post(
 		'/api/reset/update',
 		{
@@ -1900,10 +1904,12 @@ OmegaUp.prototype.resetUpdate = function(email, resetToken, password, passwordCo
 		},
 		function(data) {
 			OmegaUp.ui.success(data.message);
+			callback();
 		},
 		'json'
 	).fail(function(j, status, errorThrown) {
 		OmegaUp.ui.error(JSON.parse(j.responseText).error);
+		callback();
 	});
 }
 
