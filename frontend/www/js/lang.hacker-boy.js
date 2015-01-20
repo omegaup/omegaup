@@ -165,7 +165,6 @@ OmegaUp.T = {
 	mailInUse: "(Thi5 mai1 i5 a1r3ady in u53. Try again.)",
 	makePrivate: "(Mak3 priva73)",
 	makePublic: "(Mak3 pub1ic)",
-	messageFailure: "(S0m37hing w3n7 wr0ng. Try again.)",
 	messageMakeYourContestsPublic: "(Y0u hav3 priva73 c0n73575 7ha7 hav3 a1r3ady 3nd3d. P13a53 c0n5id3r mak3 7h3m pub1ic 70 c0n7ribu73 70 7h3 c0mmuni7y.)",
 	messageMakeYourProblemsPublic: "(Y0u hav3 priva73 pr0b13m5 7ha7 hav3 a1r3ady b33n u53d. P13a53 c0n5id3r mak3 7h3m pub1ic 70 c0n7ribu73 70 7h3 c0mmuni7y.)",
 	mustProvideUserIdEmailOrUsername: "(Y0u mu57 pr0vid3 3i7h3r 0n3 0f 7h3 f0110wing: u53r_id, 3mai1 0r u53rnam3)",

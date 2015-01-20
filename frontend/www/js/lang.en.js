@@ -165,7 +165,6 @@ OmegaUp.T = {
 	mailInUse: "This mail is already in use. Try again.",
 	makePrivate: "Make private",
 	makePublic: "Make public",
-	messageFailure: "Something went wrong. Try again.",
 	messageMakeYourContestsPublic: "You have private contests that have already ended. Please consider make them public to contribute to the community.",
 	messageMakeYourProblemsPublic: "You have private problems that have already been used. Please consider make them public to contribute to the community.",
 	mustProvideUserIdEmailOrUsername: "You must provide either one of the following: user_id, email or username",

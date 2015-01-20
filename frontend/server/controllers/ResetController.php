@@ -84,7 +84,7 @@ class ResetController extends Controller {
 
 	private function validateCreateRequest($r) {
 		$user = UsersDAO::FindByEmail($r['email']);
-		if (is_null(UsersDAO::FindByEmail($r['email']))) {
+		if (is_null($user)) {
 			throw new InvalidParameterException('invalidUser');
 		}
 

@@ -7,8 +7,8 @@
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
 			<form id='reset-password-form' method="POST" action="/reset_password.php">
-				<input type="hidden" id="email" name="email" value="{$EMAIL}" />
-				<input type="hidden" id="reset_token" name="reset_token" value="{$RESET_TOKEN}" />
+				<input type="hidden" id="email" name="email" value="{$EMAIL|escape:'html'}" />
+				<input type="hidden" id="reset_token" name="reset_token" value="{$RESET_TOKEN|escape:'html'}" />
 				<div class="form-group">
 					<label for="password">{#passwordResetPassword#}</label>
 					<input type="password" id="password" name="password" class="form-control"/>
