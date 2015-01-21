@@ -11,6 +11,7 @@ try_define('OMEGAUP_ROOT', '/opt/omegaup/frontend');
 try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 try_define('OMEGAUP_COOKIE_DOMAIN', null);
 try_define('OMEGAUP_USE_CSP', false);
+try_define('OMEGAUP_SERVER', 'localhost');
 
 # ####################################
 # DATABASE CONFIG
@@ -77,7 +78,7 @@ try_define('OMEGAUP_EMAIL_SEND_EMAILS',			false);
 try_define('OMEGAUP_FORCE_EMAIL_VERIFICATION',		false);
 try_define('OMEGAUP_EMAIL_SMTP_HOST',			'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_USER',			'xxxx');
-try_define('OMEGAUP_EMAIL_SMTP_PASSWORD',			'xxxx');
+try_define('OMEGAUP_EMAIL_SMTP_PASSWORD',		'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_PORT',			'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_FROM',			'xxxx');
 try_define('OMEGAUP_EMAIL_MAILCHIMP_ENABLE', false);
@@ -111,3 +112,9 @@ try_define('PROBLEMS_PER_PAGE', 100);
 try_define('USER_ADMIN',		'user_admin');
 try_define('USER_NORMAL',		'user_normal');
 try_define('USER_ANONYMOUS',	'user_anonymous');
+
+# ########################
+# PASSWORD RESET CONFIG
+# ########################
+try_define('PASSWORD_RESET_TIMEOUT', 2 * 3600);
+try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);

@@ -268,21 +268,6 @@ CREATE TABLE IF NOT EXISTS `Messages` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `PasswordChange`
---
-
-CREATE TABLE IF NOT EXISTS `Password_Change` (
-  `user_id` int(11) NOT NULL COMMENT 'Identificador de a que usuario pertenece este token',
-  `token` char(64) NOT NULL COMMENT 'El token que se genera aleatoriamente para luego comparar cuando el usuario haga click en el link',
-  `ip` char(15) NOT NULL COMMENT 'El ip desde donde se genero este reseteo de password',
-  `expiration_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'La fecha en que vence este token',
-  PRIMARY KEY (`user_id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `Permissions`
 --
 
@@ -503,6 +488,8 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `last_access` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `verified` BOOLEAN NOT NULL DEFAULT FALSE,
   `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL,
+  `reset_digest` VARCHAR(45) NULL DEFAULT NULL,
+  `reset_sent_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),
@@ -714,12 +701,6 @@ ALTER TABLE `Languages`
 ALTER TABLE `Messages`
   ADD CONSTRAINT `fk_m_recipient_id` FOREIGN KEY (`recipient_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_m_sender_id` FOREIGN KEY (`sender_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
--- Filtros para la tabla `Password_Change`
---
-ALTER TABLE `Password_Change`
-  ADD CONSTRAINT `fk_pc_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problems`

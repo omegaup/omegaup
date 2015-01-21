@@ -615,3 +615,11 @@ table.problem-list td {
 .tt-suggestion p {
   margin: 0;
 }
+
+/* Reset password stuff */
+#password-reset {
+}
+
+#password-reset h1 {
+	text-align: center;
+}

@@ -195,4 +195,16 @@ class UsersDAO extends UsersDAOBase
 		}
 		return $ar;	
 	}
+
+	public static function FindResetInfoByEmail($email) {
+		$user = self::FindByEmail($email);
+		if (is_null($user)) {
+			return NULL;
+		} else {
+			return Array(
+				'reset_digest'	=> $user->reset_digest,
+				'reset_sent_at'	=> $user->reset_sent_at
+			);
+		}
+	}
 }
