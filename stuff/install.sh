@@ -77,9 +77,9 @@ EOF
 	
 	sudo apt-get update -qq -y
 	
-	sudo apt-get install -qq -y nginx mysql-client git phpunit phpunit-selenium php5-fpm g++ fp-compiler unzip openssh-client make zip libcap-dev libgfortran3 ghc libelf-dev hhvm-nightly
+	sudo apt-get install -qq -y nginx mysql-client git phpunit phpunit-selenium php5-fpm g++ fp-compiler unzip openssh-client make zip libcap-dev libgfortran3 ghc libelf-dev hhvm-nightly libruby
 	sudo apt-get install -qq -y openjdk-7-jdk || sudo apt-get install -qq -y openjdk-6-jdk
-	
+
 	if [ ! -f /usr/sbin/mysqld ]; then
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server
 		sleep 5
@@ -89,7 +89,7 @@ fi
 
 # Install SBT.
 if [ ! -f /usr/bin/sbt ]; then
-	sudo wget -q http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.1/sbt-launch.jar -O /usr/bin/sbt-launch.jar
+	sudo wget -q https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar -O /usr/bin/sbt-launch.jar
 	cat > sbt << EOF
 #!/bin/sh
 java -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$0\`/sbt-launch.jar "\$@"
@@ -123,6 +123,7 @@ make -C $OMEGAUP_ROOT/minijail
 
 # Grab all sbt dependencies -- including MySQL.
 if [ ! -f $MYSQL_JAR ]; then
+	make -C $OMEGAUP_ROOT/libinteractive
 	pushd $OMEGAUP_ROOT/backend
 	sbt update
 	popd
