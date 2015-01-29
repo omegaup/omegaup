@@ -15,8 +15,8 @@ $(function() {
 
 				for (var i = 0; i < groups.groups.length; i++) {					
 					html += "<tr>"						
-						+ "<td><b><a href='/group/" + groups.groups[i].alias  + "/'>" + omegaup.escape(groups.groups[i].name) + "</a></b></td>"
-						+ '<td><a class="glyphicon glyphicon-edit" href="/groupedit.php?group=' + groups.groups[i].alias  + '" title="{#wordsEdit#}"></a></td>'
+						+ "<td><b><a href='/group/" + groups.groups[i].alias  + "/edit/#scoreboards'>" + omegaup.escape(groups.groups[i].name) + "</a></b></td>"
+						+ '<td><a class="glyphicon glyphicon-edit" href="/group/' + groups.groups[i].alias  + '/edit#edit" title="{#wordsEdit#}"></a></td>'
 						+ "</tr>";
 				}
 
@@ -34,7 +34,7 @@ $(function() {
 				$(".new_group_form #description").val(),
 				function(data) {
 					if(data.status === "ok") {
-						window.location.replace('groupedit.php?group='+ $('.new_group_form #alias').val() + '#members');
+						window.location.replace('/group/'+ $('.new_group_form #alias').val() + '/edit/#members');
 					} else {
 						OmegaUp.ui.error(data.error || 'error');
 					}
@@ -61,17 +61,17 @@ $(function() {
 		// Typehead
 		refreshGroupMembers();
 		$('#member-username').typeahead({
-			ajax: '/api/user/list/',
-			display: 'label',
-			val: 'label',
 			minLength: 2,
-			itemSelected: function (item, val, text) {
-				$('#member-user').val(val);
-			}
+			highlight: true,
+		}, {
+			source: omegaup.searchUsers,
+			displayKey: 'label',
+		}).on('typeahead:selected', function(item, val, text) {
+			$('#member-username').val(val.label);
 		});
-		
+
 		$('#add-member-form').submit(function() {
-			var username = $('#member-user').val();
+			var username = $('#member-username').val();
 
 			omegaup.addUserToGroup(groupAlias, username, function(response) {
 				if (response.status === "ok") {
@@ -151,10 +151,10 @@ $(function() {
 						$('<tr></tr>')
 							.append($('<td></td>').append(
 								$('<a></a>')
-									.attr('href', '/groupscoreboard.php?group=' + groupAlias + '&scoreboard=' + scoreboard.alias)
+									.attr('href', '/group/' + groupAlias + '/scoreboard/' + scoreboard.alias + '/')
 									.text(omegaup.escape(scoreboard.name))
 							))							
-							.append($('<td><a class="glyphicon glyphicon-edit" href="/groupscoreboardedit.php?scoreboard=' + scoreboard.alias  + '&group=' + groupAlias + '" title="Edit"></a></td>'))
+							.append($('<td><a class="glyphicon glyphicon-edit" href="/group/' + groupAlias + '/scoreboard/' + scoreboard.alias  + '/edit/" title="Edit"></a></td>'))
 					);
 				}
 			});

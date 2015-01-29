@@ -11,7 +11,7 @@
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="bottom-margin">
-			<a href="/groupcreate.php" class="btn btn-primary" id="contest-create">{#groupsCreateNew#}</a>					
+			<a href="/group/new/" class="btn btn-primary" id="contest-create">{#groupsCreateNew#}</a>
 		</div>
 		
 		<div id="parent_groups_list">
@@ -21,8 +21,8 @@
 				</div>
 				<table class="table">
 					<thead>						
-						<th>{#wordsTitle#}</th>							
-						<th></th>							
+						<th>{#wordsTitle#}</th>
+						<th></th>
 					</thead>
 					<tbody>
 					</tbody>

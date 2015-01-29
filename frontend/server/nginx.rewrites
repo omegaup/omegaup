@@ -3,6 +3,12 @@ location /api/ {
 }
 
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /contest.php?alias=$1 last;
+rewrite ^/group/new/?$ /groupnew.php last;
+rewrite ^/group/([a-zA-Z0-9_+-]+)/edit/?$ /groupedit.php?group=$1 last;
+rewrite ^/group/([a-zA-Z0-9_+-]+)/stats/?$ /groupstats.php?group=$1 last;
+rewrite ^/group/list/?$ /grouplist.php last;
+rewrite ^/group/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /groupscoreboardedit.php?group=$1&scoreboard=$2 last;
+rewrite ^/group/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
 rewrite ^/problem/new/?$ /problemnew.php last;
 rewrite ^/problem/edit/([a-zA-Z0-9_+-]+)/?$ /problemedit.php?problem=$1 last;
 rewrite ^/problem/stats/([a-zA-Z0-9_+-]+)/?$ /problemstats.php?problem=$1 last;

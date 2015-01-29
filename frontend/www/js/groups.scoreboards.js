@@ -21,7 +21,7 @@ $(function() {
 				groupAlias,
 				scoreboardAlias,
 				$("#contests").val(),
-				$('#only_ac').val(),
+				$('#only-ac').val(),
 				$('#weight').val(),
 				function(data) {
 					if(data.status === "ok") {
@@ -51,7 +51,7 @@ $(function() {
 										.attr('href', '/arena/' + contest.alias + '/')
 										.text(omegaup.escape(contest.title))
 								))
-								.append($('<td></td>').append(contest.only_ac))
+								.append($('<td></td>').append(contest.only_ac ? OmegaUp.T.wordsYes : OmegaUp.T.wordsNo))
 								.append($('<td></td>').append(contest.weight))
 								.append($('<td><button type="button" class="close">&times;</button></td>')
 									.click((function(contestAlias) {
