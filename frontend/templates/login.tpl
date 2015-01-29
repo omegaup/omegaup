@@ -12,7 +12,7 @@
 		<div class="row">
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>
-				<a href="google.php{if $smarty.server.QUERY_STRING}?{$smarty.server.QUERY_STRING}{/if}" title="log in with Google" style="background: #fff url(/css/openid-logos.png); background-position: -1px -1px" class="google openid_large_btn"></a>
+				<a href="/login/google/{if $smarty.server.QUERY_STRING}?{$smarty.server.QUERY_STRING}{/if}" title="log in with Google" style="background: #fff url(/css/openid-logos.png); background-position: -1px -1px" class="google openid_large_btn"></a>
 				&nbsp;&nbsp;&nbsp; <a href="{$FB_URL}" title="log in with Facebook" style="background: #fff url(/css/openid-logos.png); background-position: -1px -456px" class="facebook openid_large_btn"></a><a style="float:right"></a><br>
 			</div>
 		
@@ -21,12 +21,12 @@
 				<form method='POST' action='{$smarty.server.REQUEST_URI}' id='login_form' class="form-horizontal">
 					<div class="form-group">
 						<label for='user'>{#loginEmailUsername#}</label>
-						<input id='user' name='user' value='' type='text' class='form-control' />
+						<input id='user' name='user' value='' type='text' class='form-control' tabindex="1" />
 					</div>
 
 					<div class="form-group">
-						<label for='pass'>{#loginPassword#} (<a href="/forgot_password.php">{#loginRecover#}</a>)</label>
-						<input id='pass' name='pass' value='' type='password' class='form-control' />
+						<label for='pass'>{#loginPassword#} (<a href="/login/password/recover/">{#loginRecover#}</a>)</label>
+						<input id='pass' name='pass' value='' type='password' class='form-control' tabindex="2" />
 					</div>
 					
 					
@@ -45,7 +45,7 @@
 			<h2 class="panel-title">{#loginSignupHeader#}</h3>
 		</div>
 		<div class="panel-body">
-			<form method='POST' action='login.php' id="register-form">
+			<form method='POST' action='/login/' id="register-form">
 				<div class="row">
 					<div class="col-md-4 col-md-offset-2">
 						<div class="form-group">

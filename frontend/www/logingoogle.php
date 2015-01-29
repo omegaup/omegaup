@@ -24,7 +24,7 @@
 	    }
         }
 
-        die(header("Location: login.php?shva=1"));
+        die(header("Location: /login/?shva=1"));
     }
 
     $association_handle = GoogleOpenID::getAssociationHandle( );

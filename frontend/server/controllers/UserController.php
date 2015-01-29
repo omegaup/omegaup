@@ -425,7 +425,7 @@ class UserController extends Controller {
 		self::$log->info("User verification complete.");
 
 		if (self::$redirectOnVerify) {
-			die(header('Location: /login.php'));
+			die(header('Location: /login/'));
 		}
 		return array("status" => "ok");
 	}

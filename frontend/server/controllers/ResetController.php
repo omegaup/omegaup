@@ -41,7 +41,7 @@ class ResetController extends Controller {
 		global $smarty;
 		$mail->Subject = $smarty->getConfigVariable('wordsReset');
 		$host = OMEGAUP_SERVER;
-		$link = $host . '/reset_password.php?';
+		$link = $host . '/login/password/reset/?';
 		$link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
 		$message = $smarty->getConfigVariable('wordsResetMessage');
 		$mail->Body = str_replace('[link]', $link, $message);

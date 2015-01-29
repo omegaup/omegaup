@@ -15,9 +15,9 @@
 		<h3 class="panel-title">{#rankHeaderPreCount#} {$length} {#rankHeaderPostCount#}</h3>
 		{if !$is_index}
 			{if $page > 0}
-				<a href="{$smarty.server.PHP_SELF}?page={$page-1}">{#wordsPrevPage#}</a> |
+				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
 			{/if}
-			<a href="{$smarty.server.PHP_SELF}?page={$page+1}">{#wordsNextPage#}</a>
+			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
 		{/if}
 	</div>
 	<table class="table table-striped table-hover" id="rank-by-problems-solved" data-length="{$length}" data-page="{$page}" is-index="{$is_index}">
@@ -36,12 +36,12 @@
 	</table>	
 	<div class="panel-body">
 		{if $is_index}
-		<a href='rank.php'>{#rankViewFull#}</a>
+		<a href='/rank/'>{#rankViewFull#}</a>
 		{else}		
 			{if $page > 0}
-				<a href="{$smarty.server.PHP_SELF}?page={$page-1}">{#wordsPrevPage#}</a> | 
+				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> | 
 			{/if}
-			<a href="{$smarty.server.PHP_SELF}?page={$page+1}">{#wordsNextPage#}</a>
+			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
 		{/if}
 	</div>	
 

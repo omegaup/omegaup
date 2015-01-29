@@ -121,7 +121,7 @@ class SessionController extends Controller {
 				"email_md5" => NULL,
 				"auth_token" => NULL,
 				"is_admin" => false,
-				"login_url" => "/login.php"
+				"login_url" => "/login/"
 			);
 		}
 
@@ -140,7 +140,7 @@ class SessionController extends Controller {
 				"email_md5" => NULL,
 				"auth_token" => NULL,
 				"is_admin" => false,
-				"login_url" => "/login.php"
+				"login_url" => "/login/"
 			);
 		}
 

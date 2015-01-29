@@ -11,5 +11,5 @@
     if (isset($_REQUEST['redirect'])) {
 	    die(header('Location: ' . $_REQUEST['redirect']));
     } else {
-	    die(header('Location: /login.php'));
+	    die(header('Location: /login/'));
     }

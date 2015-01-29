@@ -15,7 +15,7 @@
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="bottom-margin">
-			<a href="/contestcreate.php" class="btn btn-primary" id="contest-create">{#contestsCreateNew#}</a>
+			<a href="/contest/new/" class="btn btn-primary" id="contest-create">{#contestsCreateNew#}</a>
 			<a href="/scoreboardmerge.php" class="btn btn-default" id="scoreboard-merge">{#contestsJoinScoreboards#}</a>
 		</div>
 

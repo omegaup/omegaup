@@ -6,7 +6,7 @@
 	<h1>{#passwordResetRequestTitle#}</h1>
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
-			<form id="forgot-password-form" method="POST" action="/forgot_password.php">
+			<form id="forgot-password-form" method="POST" action="/login/password/recover/">
 				<div class="form-group">
 					<label for="email">{#profileEmail#}</label>
 					<input type="text" id="email" name="email" class="form-control"/>

@@ -11,27 +11,32 @@
 						</div>
 						<ul class="nav navbar-nav">
 							{if !$smarty.const.OMEGAUP_LOCKDOWN}
-							<li id="nav-arena"{if isset($currentSection) && $currentSection == 'arena'} class="active"{/if}><a href='/arena'>{#navArena#}</a></li>
+							<li id="nav-arena"{if isset($currentSection) && $currentSection == 'arena'} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
-								<li id="nav-contests"><a href='/contests.php'>{#navMyContests#}</a></li>
+								<li id="nav-contests">
+									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><a href='/contest/'>{#navMyContests#}</a></li>
+										<li><a href='/group/'>{#navMyGroups#}</a></li>
+									</ul>
+								</li>
 								<li id="nav-problems">
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
 										<li><a href="/problem/mine/">{#navMyProblems#}</a></li>
-										<li><a href="/problem/list/">{#wordsProblems#}</a></li>
+										<li><a href="/problem/">{#wordsProblems#}</a></li>
 									</ul>
 								</li>
-								<!--<li id="nav-groups"><a href='/groups.php'>{#navGroups#}</a></li>-->
 							{else}
-								<li id="nav-problems"><a href='/problem/list/'>{#wordsProblems#}</a></li>
+								<li id="nav-problems"><a href='/problem/'>{#wordsProblems#}</a></li>
 							{/if}
-							<li class="hidden-xs hidden-sm" id="nav-rank"><a href='/rank.php'>{#navRanking#}</a></li>
+							<li class="hidden-xs hidden-sm" id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
 							<li class="hidden-xs hidden-sm"><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
 							<li class="hidden-xs hidden-sm"><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
 							<li id="nav-mas" class="hidden-md hidden-lg">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>+</span><span class="caret"></span></a>
 								<ul class="dropdown-menu">
-									<li><a href='/rank.php'>{#navRanking#}</a></li>
+									<li><a href='/rank/'>{#navRanking#}</a></li>
 									<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
 									<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
 								</ul>
@@ -45,11 +50,11 @@
 								<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown"><span>{$CURRENT_USER_GRAVATAR_URL_32}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
 									<ul class="dropdown-menu">
 									 <li><a href='/profile/'>{#navViewProfile#}</a></li>
-									 <li><a href='/logout.php'>{#navLogOut#}</a></li>
+									 <li><a href='/logout/'>{#navLogOut#}</a></li>
 									</ul>
 								</li>	
 							{else}
-								<li><a href='/login.php?redirect={$smarty.server.REQUEST_URI|escape:'url'}'>{#navLogIn#}</a></li>
+								<li><a href='/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}'>{#navLogIn#}</a></li>
 							{/if}
 							
 							{if $CURRENT_USER_IS_ADMIN eq '1'}

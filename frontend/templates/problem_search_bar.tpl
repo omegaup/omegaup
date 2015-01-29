@@ -1,11 +1,11 @@
 <div class="search-bar">
-	<form action="/problem/list/" method="GET">
+	<form action="/problem/" method="GET">
 		<div class="form-inline">
 			{if !empty($smarty.get.tag)}
 			<div class="form-group">
 				<input type="hidden" name="tag" value="{$smarty.get.tag|urlencode}" />
 				<span class="tag">{$smarty.get.tag|escape}</span>
-				<a href="/problem/list/"><span class="glyphicon glyphicon-remove"></span></a>
+				<a href="/problem/"><span class="glyphicon glyphicon-remove"></span></a>
 			</div>
 			{/if}
 			<div class="form-group">

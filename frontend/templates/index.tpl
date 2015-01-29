@@ -10,7 +10,7 @@
 				<h1>{#frontPageWelcome#}</h1>
 				<p>{#frontPageDescription#}</p>
 				<div class="text-center">
-					<a href="contestcreate.php" class="btn btn-primary btn-lg" id="contest-create">{#frontPageCreateContestButton#}</a>
+					<a href="/contest/new/" class="btn btn-primary btn-lg" id="contest-create">{#frontPageCreateContestButton#}</a>
 				</div>
 				<p>{#frontPageIntroduction#}</p>
 				<div class="text-center">
@@ -58,7 +58,7 @@
 				</div>
 			</div>
 			<div class="panel-body">
-				<a href='codersofthemonth.php'>{#coderOfTheMonthFullList#}</a>
+				<a href="/coderofthemonth/">{#coderOfTheMonthFullList#}</a>
 			</div>
 		</div>
 		{/if}

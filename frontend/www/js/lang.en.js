@@ -181,6 +181,7 @@ OmegaUp.T = {
 	navLogIn: "Log in",
 	navLogOut: "Log out",
 	navMyContests: "My contests",
+	navMyGroups: "My groups",
 	navMyProblems: "My problems",
 	navQuestions: "Questions",
 	navRanking: "Rank",

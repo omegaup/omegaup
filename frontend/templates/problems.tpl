@@ -4,7 +4,7 @@
 {include file='status.tpl'}
 
 <div id="parent_problems_list">
-	{include file='problems.list.tpl'}
+	{include file='problem.list.tpl'}
 </div>
 
 <script>

@@ -1,5 +1,4 @@
-
-$(".navbar #nav-groups").addClass("active");
+$(".navbar #nav-contests").addClass("active");
 
 var formData = $('#form-data');
 var formName = formData.attr('data-name');

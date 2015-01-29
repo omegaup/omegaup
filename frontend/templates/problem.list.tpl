@@ -25,7 +25,7 @@
 					{if count($problem.tags) > 0}
 					<div class="tag-list" title="{" "|implode:$problem.tags|escape}">
 					{foreach item=tag from=$problem.tags}
-						<a class="tag" href="/problem/list/?tag={$tag|escape}">{$tag|escape}</a>
+						<a class="tag" href="/problem/?tag={$tag|escape}">{$tag|escape}</a>
 					{/foreach}
 					</div>
 					{/if}

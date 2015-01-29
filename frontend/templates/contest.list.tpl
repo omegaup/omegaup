@@ -62,9 +62,9 @@
 						+ '<td>'+ ((contests.results[i].public == '1') ? '{#wordsYes#}' : '{#wordsNo#}')  + '</td>'
 						+ '<td>' + ((contests.results[i].scoreboard_url == null) ? '' : '<a class="glyphicon glyphicon-link" href="/arena/' + contests.results[i].alias  + '/scoreboard/' + contests.results[i].scoreboard_url + '" title="{#contestScoreboardLink#}"> Public</a></td>')
 						+ '<td>' + ((contests.results[i].scoreboard_url_admin == null) ? '' : '<a class="glyphicon glyphicon-link" href="/arena/' + contests.results[i].alias  + '/scoreboard/' + contests.results[i].scoreboard_url_admin + '" title="{#contestScoreboardAdminLink#}"> Admin</a></td>')
-						+ '<td><a class="glyphicon glyphicon-edit" href="/contestedit.php?contest=' + contests.results[i].alias  + '" title="{#wordsEdit#}"></a></td>'
+						+ '<td><a class="glyphicon glyphicon-edit" href="/contest/' + contests.results[i].alias  + '/edit/" title="{#wordsEdit#}"></a></td>'
 						+ '<td><a class="glyphicon glyphicon-dashboard" href="/arena/' + contests.results[i].alias  + '/admin/" title="{#contestListSubmissions#}"></a></td>'
-						+ '<td><a class="glyphicon glyphicon-stats" href="/conteststats.php?contest=' + contests.results[i].alias  + '" title="{#profileStatistics#}"></a></td>'
+						+ '<td><a class="glyphicon glyphicon-stats" href="/contest/' + contests.results[i].alias  + '/stats/" title="{#profileStatistics#}"></a></td>'
 						+ '<td><a class="glyphicon glyphicon-print" href="/arena/' + contests.results[i].alias  + '/print/" title="{#contestPrintableVersion#}"></a></td>'
 						+ "</tr>";
 				}

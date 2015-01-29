@@ -29,7 +29,7 @@
 			$(".new_contest_form #show_scoreboard_after").val(),
 			function(data) {
 				if(data.status == "ok") {
-					window.location.replace('contestedit.php?contest='+ $('.new_contest_form #alias').val() + '#problems');
+					window.location.replace('/contest/'+ $('.new_contest_form #alias').val() + '/edit/#problems');
 				} else {
 					OmegaUp.ui.error(data.error || 'error');
 				}
