@@ -408,7 +408,7 @@ wordsPublic = "Público"
 wordsRanking = "Ranking"
 wordsRatio = "Ratio"
 wordsReset = "OmegaUp: Restablecer contraseña."
-wordsResetMessage = "Da clic en el siguiente enlace para restablecer tu contraseña: <a href='[link]'>[link]</a><br><br>Si tu no solicitaste esta operación no hagas clic y verifica que tu cuenta este a salvo.";
+wordsResetMessage = "Da clic en el siguiente enlace para restablecer tu contraseña: <a href='[link]'>[link]</a><br><br>Si tu no solicitaste esta operación no hagas clic y verifica que tu cuenta este a salvo."
 wordsResult = "Respuesta"
 wordsRuns = "Envíos"
 wordsRuntime = "Tiempo"
