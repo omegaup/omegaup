@@ -12,7 +12,7 @@
 					<script type="text/json" id="problem-json">{$problem}</script>
 					<h1 class="title">{if $public == 0}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if} {$title|escape}
 						{if $problem_admin}
-							(<a href="/problem/edit/{$problem_alias}/">{#wordsEdit#}</a>)
+							(<a href="/problem/{$problem_alias}/edit/">{#wordsEdit#}</a>)
 						{/if}
 					</h1>
 					<table class="data">

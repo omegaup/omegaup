@@ -47,7 +47,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 		$smarty->assign('PUBLIC', $_POST["public"]);
 		$smarty->assign('STACK_LIMIT', $_POST["stack_limit"]);
 	} else if ($response["status"] == "ok") {
-		header("Location: /problem/edit/{$response['alias']}/");
+		header("Location: /problem/{$response['alias']}/edit/");
 		die();
 	}
 }
