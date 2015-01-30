@@ -19,6 +19,7 @@ rewrite ^/group/([a-zA-Z0-9_+-]+)/stats/?$ /groupstats.php?group=$1 last;
 rewrite ^/group/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /groupscoreboardedit.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
 rewrite ^/problem/?$ /problemlist.php last;
+rewrite ^/problem/list/?$ /problemlist.php last;
 rewrite ^/problem/new/?$ /problemnew.php last;
 rewrite ^/problem/mine/?$ /problemmine.php last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/edit/?$ /problemedit.php?problem=$1 last;

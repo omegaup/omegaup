@@ -9,5 +9,5 @@ if ($session['valid'] && $session['private_contests_count'] > 0 && !isset($_SESS
 	$smarty->assign("PRIVATE_PROBLEMS_ALERT", 0);
 }
 
-$smarty->display('../templates/myproblems.list.tpl');
+$smarty->display('../templates/problem.mine.tpl');
 
