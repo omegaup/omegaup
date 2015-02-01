@@ -590,9 +590,19 @@ class UserController extends Controller {
 			$keys = array (				
 				"OMIAGS" => 35
 			);			
-		} else {
+		} else if ($r["contest_type"] == "OSI") {
+			
+			if (!($r["current_user"]->getUsername() == "cope_quintana" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
+				throw new ForbiddenAccessException();
+			}
+			
+			$keys = array (				
+				"OSI15" => 30
+			);	
+		}
+		else {
 			throw new InvalidParameterException("parameterNotInExpectedSet", "contest_type",
-				array("bad_elements" => $r["contest_type"], "expected_set" => "OMI, OMIAGS, ORIG"));
+				array("bad_elements" => $r["contest_type"], "expected_set" => "OMI, OMIAGS, ORIG, OSI"));
 		}
 
 		self::$permissionKey = $r['permission_key'] = self::randomString(32);
