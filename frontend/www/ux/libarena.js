@@ -72,24 +72,7 @@ function Arena() {
 	this.submissionGap = 0;
 
 	// Setup any global hooks.
-	$('#libinteractive-download').submit(function(e) {
-		var form = $(e.target);
-		var alias = e.target.attributes['data-alias'].value;
-		var os = form.find('.download-os').val();
-		var lang = form.find('.download-lang').val();
-		var extension = (os == 'unix' ? '.tar.bz2' : '.zip');
-
-		window.location = (
-			window.location.protocol + '//' + window.location.host + '/templates/' +
-			alias + '/' + alias + '_' + os + '_' + lang + extension);
-
-		return false;
-	});
-
-	$('#libinteractive-download .download-lang').change(function(e) {
-		var form = $('#libinteractive-download');
-		form.find('.libinteractive-extension').html(form.find('.download-lang').val());
-	});
+	this.installLibinteractiveHooks();
 };
 
 Arena.verdicts = {
@@ -117,6 +100,28 @@ Arena.scoreboardColors = [
 	'#8144D6',
 	'#CD35D3',
 ];
+
+Arena.prototype.installLibinteractiveHooks = function() {
+	$('#libinteractive-download').submit(function(e) {
+		var form = $(e.target);
+		var alias = e.target.attributes['data-alias'].value;
+		var os = form.find('.download-os').val();
+		var lang = form.find('.download-lang').val();
+		var extension = (os == 'unix' ? '.tar.bz2' : '.zip');
+
+		var new_location = (
+			window.location.protocol + '//' + window.location.host + '/templates/' +
+			alias + '/' + alias + '_' + os + '_' + lang + extension);
+		window.location = new_location;
+
+		return false;
+	});
+
+	$('#libinteractive-download .download-lang').change(function(e) {
+		var form = $('#libinteractive-download');
+		form.find('.libinteractive-extension').html(form.find('.download-lang').val());
+	});
+}
 
 Arena.prototype.connectSocket = function() {
 	var self = this;
@@ -950,6 +955,7 @@ Arena.prototype.onHashChanged = function() {
 			$('#problem .statement').html(problem.problem_statement);
 			$('#problem .source span').html(omegaup.escape(problem.source));
 			$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
+			self.installLibinteractiveHooks();
 
 			$('#problem .run-list .added').remove();
 
