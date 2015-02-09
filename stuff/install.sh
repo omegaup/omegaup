@@ -237,8 +237,8 @@ fi
 
 # Set up runtime directories.
 if [ ! -d /var/lib/omegaup ]; then
-	sudo mkdir -p /var/lib/omegaup/{compile,grade,input,problems,submissions}
-	sudo chown www-data.www-data /var/lib/omegaup/{problems,submissions}
+	sudo mkdir -p /var/lib/omegaup/{compile,grade,input,problems,problems.git,submissions}
+	sudo chown www-data.www-data /var/lib/omegaup/{problems,problems.git,submissions}
 	sudo chown omegaup.omegaup /var/lib/omegaup/{compile,grade,input}
 fi
 
