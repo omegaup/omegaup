@@ -147,7 +147,7 @@ with Chroot('root', '/') as root:
 
 	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
 	root.symlink('/usr/bin/node', '/opt/nodejs/bin/node')
-	root.symlink('/usr/bin/java', '/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java')
+	root.symlink('/usr/bin/java', '/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java')
 	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/1.9.1/ruby')
 	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
@@ -167,13 +167,13 @@ with Chroot('root-compilers', '/') as root:
 	root.copyfromhost('/usr/bin/ld.bfd')
 	root.copyfromhost('/usr/bin/ppcx64')
 
-	root.copyfromhost('/usr/lib/gcc/x86_64-linux-gnu/4.8')
+	root.copyfromhost('/usr/lib/gcc/x86_64-linux-gnu/4.9')
 	root.symlink('/usr/lib/gcc/x86_64-linux-gnu/ld', '/usr/bin/ld')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libcloog-isl.so.4')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libisl.so.10')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libmpc.so.3')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libmpfr.so.4')
-	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libasan.so.0')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libasan.so.1')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libatomic.so.1')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libgfortran.so.3')
 	root.copyfromhost('/usr/lib/x86_64-linux-gnu/libgomp.so.1')
@@ -225,7 +225,7 @@ with Chroot('root-compilers', '/') as root:
 	    'nobody:x:65534:65534:nobody:/nonexistent:/bin/false')
 
 	# Mountpoints for libraries
-	root.mkdir('/usr/lib/ruby/1.9.1/')
+	root.mkdir('/usr/lib/ruby/2.1.0/')
 	root.mkdir('/usr/lib/python2.7/')
 	root.mkdir('/usr/lib/jvm/')
 	root.mkdir('/usr/lib/ghc/')
@@ -237,10 +237,10 @@ with Chroot('root-compilers', '/') as root:
 	root.mkdir('/home/')
 	root.mkdir('/sys/')
 
-	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
+	root.symlink('/usr/lib/x86_64-linux-gnu/libruby-2.1.so.2.1', '/usr/lib/ruby/2.1.0/libruby-2.1.so.2.1')
 	root.symlink('/usr/bin/node', '/opt/nodejs/bin/node')
-	root.symlink('/usr/bin/javac', '/usr/lib/jvm/java-7-openjdk-amd64/bin/javac')
-	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/1.9.1/ruby')
+	root.symlink('/usr/bin/javac', '/usr/lib/jvm/java-8-openjdk-amd64/bin/javac')
+	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/2.1.0/ruby')
 	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
 	root.symlink('/tmp', '/home')
@@ -262,8 +262,8 @@ with Chroot('root-python', '/usr/lib/python2.7/') as root:
 
 with Chroot('root-ruby', '/usr/lib/ruby/') as root:
 	root.copyfromhost('/usr/lib/ruby')
-	root.install('/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9', '/usr/lib/libruby-1.9.1.so.1.9')
-	root.install('/usr/lib/ruby/1.9.1/ruby', '/usr/bin/ruby')
+	root.install('/usr/lib/ruby/2.1.0/libruby-2.1.so.2.1', '/usr/lib/x86_64-linux-gnu/libruby-2.1.so.2.1')
+	root.install('/usr/lib/ruby/2.1.0/ruby', '/usr/bin/ruby')
 
 with Chroot('root-hs', '/usr/lib/ghc/') as root:
 	root.copyfromhost('/usr/lib/ghc')

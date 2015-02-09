@@ -10,6 +10,7 @@ show_help() {
 
 # Configuration.
 OMEGAUP_ROOT=/opt/omegaup
+OMEGAUP_BRANCH=
 WWW_ROOT=/var/www/omegaup.com
 USER=`whoami`
 MYSQL_PASSWORD=omegaup
@@ -20,6 +21,7 @@ UBUNTU=`grep Ubuntu /etc/issue | wc -l`
 WHEEZY=`grep 'Debian GNU/Linux 7' /etc/issue | wc -l`
 SAUCY=`grep 'Ubuntu 13.10' /etc/issue | wc -l`
 TRUSTY=`grep 'Ubuntu 14.04' /etc/issue | wc -l`
+UTOPIC=`grep 'Ubuntu 14.10' /etc/issue | wc -l`
 HOSTNAME=localhost
 MINIJAIL_ROOT=/var/lib/minijail
 
@@ -64,8 +66,14 @@ if [ "$SKIP_INSTALL" != "1" ]; then
 			sed -e "s/http.*/& universe/" /etc/apt/sources.list > sources.list
 			sudo mv sources.list /etc/apt/sources.list
 		fi
-		wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | sudo apt-key add -
-		echo deb http://dl.hhvm.com/ubuntu trusty main | sudo tee /etc/apt/sources.list.d/hhvm.list
+		if [ ! -f /etc/apt/sources.list.d/hhvm.list ]; then
+			wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | sudo apt-key add -
+			if [ "$TRUSTY" = "1" ]; then
+				echo deb http://dl.hhvm.com/ubuntu trusty main | sudo tee /etc/apt/sources.list.d/hhvm.list
+			elif [ "$UTOPIC" = "1" ]; then
+				echo deb http://dl.hhvm.com/ubuntu utopic main | sudo tee /etc/apt/sources.list.d/hhvm.list
+			fi
+		fi
 	elif [ "$WHEEZY" != "1" ]; then
 		curl -s http://www.dotdeb.org/dotdeb.gpg | sudo apt-key add - > /dev/null
 		cat > dotdeb.list << EOF
@@ -78,7 +86,8 @@ EOF
 	sudo apt-get update -qq -y
 	
 	sudo apt-get install -qq -y nginx mysql-client git phpunit phpunit-selenium php5-fpm g++ fp-compiler unzip openssh-client make zip libcap-dev libgfortran3 ghc libelf-dev hhvm-nightly libruby
-	sudo apt-get install -qq -y openjdk-7-jdk || sudo apt-get install -qq -y openjdk-6-jdk
+	sudo apt-get install -qq -y openjdk-8-jdk || sudo apt-get install -qq -y openjdk-7-jdk || sudo apt-get install -qq -y openjdk-6-jdk
+	sudo update-ca-certificates -f
 
 	if [ ! -f /usr/sbin/mysqld ]; then
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -q -y mysql-server
@@ -90,10 +99,17 @@ fi
 # Install SBT.
 if [ ! -f /usr/bin/sbt ]; then
 	sudo wget -q https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar -O /usr/bin/sbt-launch.jar
-	cat > sbt << EOF
+	if [ "$UTOPIC" = "1" ]; then
+		cat > sbt << EOF
+#!/bin/sh
+java -Xss1M -XX:+CMSClassUnloadingEnabled -jar \`dirname \$0\`/sbt-launch.jar "\$@"
+EOF
+	else
+		cat > sbt << EOF
 #!/bin/sh
 java -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=384M -jar \`dirname \$0\`/sbt-launch.jar "\$@"
 EOF
+	fi
 	sudo mv sbt /usr/bin/
 	sudo chmod +x /usr/bin/sbt
 fi
@@ -102,7 +118,7 @@ fi
 if [ ! -d $OMEGAUP_ROOT ]; then
 	sudo mkdir $OMEGAUP_ROOT
 	sudo chown $USER -R $OMEGAUP_ROOT
-	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT
+	git clone https://github.com/omegaup/omegaup.git $OMEGAUP_ROOT $OMEGAUP_BRANCH
 
 	pushd $OMEGAUP_ROOT
 	# Install githooks
@@ -152,10 +168,12 @@ if [ ! -f /etc/init.d/omegaup ]; then
 		sudo touch /var/log/omegaup/service.log
 		sudo chown omegaup.omegaup /var/log/omegaup/service.log
 	fi
-	# Java 7 has a bug with NSS libraries. Disable them.
-	if [ "`grep '\/lib\/security\/nss.cfg' /etc/java-7-openjdk/security/java.security`" != "" ]; then
-		sed -e 's/\(.*\/lib\/security\/nss.cfg\)/#\1/' /etc/java-7-openjdk/security/java.security > ~/.java.security
-		sudo mv ~/.java.security /etc/java-7-openjdk/security/java.security
+	if [ "$UTOPIC" != "1" ]; then
+		# Java 7 has a bug with NSS libraries. Disable them.
+		if [ "`grep '\/lib\/security\/nss.cfg' /etc/java-7-openjdk/security/java.security`" != "" ]; then
+			sed -e 's/\(.*\/lib\/security\/nss.cfg\)/#\1/' /etc/java-7-openjdk/security/java.security > ~/.java.security
+			sudo mv ~/.java.security /etc/java-7-openjdk/security/java.security
+		fi
 	fi
 	sudo cp $OMEGAUP_ROOT/stuff/omegaup.service /etc/init.d/omegaup
 	sed -e "s/db.user\s*=.*$/db.user=root/;s/db.password\s*=.*$/db.password=$MYSQL_PASSWORD/;s/\(.*\.password\)\s*=.*$/\1=$KEYSTORE_PASSWORD/" $OMEGAUP_ROOT/backend/grader/omegaup.conf.sample > $OMEGAUP_ROOT/bin/omegaup.conf
