@@ -574,5 +574,3 @@ class ZipStream {
     return call_user_func_array('pack', $args);
   }
 };
-
-?>

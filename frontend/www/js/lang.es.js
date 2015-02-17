@@ -368,6 +368,7 @@ OmegaUp.T = {
 	wordsDescription: "Descripci&oacute;n",
 	wordsDetails: "Detalles",
 	wordsDownload: "Descargar",
+	wordsDownloadDetails: "Descargar .zip con salidas",
 	wordsDownloadOutput: "Descargar salida",
 	wordsEdit: "Editar",
 	wordsEndTime: "Fin",

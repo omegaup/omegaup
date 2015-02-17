@@ -84,7 +84,7 @@ class RunCreateTest extends OmegaupTestCase {
 		$this->assertNotNull($run->getGuid());
 
 		// Validate file created
-		$filename = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
+		$filename = RunController::getSubmissionPath($run);
 		$this->assertFileExists($filename);
 		$fileContent = file_get_contents($filename);
 		$this->assertEquals($r["source"], $fileContent);

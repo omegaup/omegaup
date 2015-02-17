@@ -103,5 +103,3 @@ class Pager {
 		return $items;
 	}
 }
-?>
-

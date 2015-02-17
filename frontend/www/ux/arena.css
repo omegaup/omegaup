@@ -397,10 +397,17 @@ body#only-problem #problems .main {
 	padding: 0.3em 0.5em;
 }
 
-.compile_error {
+#run-details .compile_error {
 	margin-top: 1em;
 	border-top: 1px dotted black;
 	padding-top: 1em;
+	display: none;
+}
+#run-details .logs {
+	margin-top: 1em;
+	border-top: 1px dotted black;
+	padding-top: 1em;
+	display: none;
 }
 .cases table {
 	width: 100%;

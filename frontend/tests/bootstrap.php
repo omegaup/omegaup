@@ -34,7 +34,13 @@ Utils::CleanLog();
 Utils::CleanPath(PROBLEMS_PATH);
 Utils::CleanPath(PROBLEMS_GIT_PATH);
 Utils::CleanPath(RUNS_PATH);
+Utils::CleanPath(GRADE_PATH);
 Utils::CleanPath(IMAGES_PATH);
+
+for ($i = 0; $i < 256; $i++) {
+	mkdir(RUNS_PATH . sprintf('/%02x', $i));
+	mkdir(GRADE_PATH . sprintf('/%02x', $i));
+}
 
 // Clean DB
 Utils::CleanupDB();

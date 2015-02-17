@@ -368,6 +368,7 @@ OmegaUp.T = {
 	wordsDescription: "(D35crip7i0n)",
 	wordsDetails: "(D37ai15)",
 	wordsDownload: "(D0wn10ad)",
+	wordsDownloadDetails: "(D0wn10ad .zip wi7h 0u7pu75)",
 	wordsDownloadOutput: "(D0wn10ad 0u7pu7)",
 	wordsEdit: "(Edi7)",
 	wordsEndTime: "(End)",

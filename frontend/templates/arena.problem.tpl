@@ -239,7 +239,8 @@
 				
 				<pre class="source"></pre>
 				<pre class="compile_error"></pre>
-				<div class="download"><a href="#">Bajar salida</a> <a href="#" class="details">Bajar todo</a></div>
+				<pre class="logs"></pre>
+				<div class="download"><a href="#">{#wordsDownloadDetails#}</a></div>
 				<div class="cases"></div>
 			</form>
 			{/if}

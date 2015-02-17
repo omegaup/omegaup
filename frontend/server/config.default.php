@@ -41,11 +41,12 @@ try_define('OMEGAUP_LOG_FILE',				'/var/log/omegaup/omegaup.log');
 # ####################################
 # GRADER CONFIG
 # ####################################
-try_define('OMEGAUP_GRADER_URL',				'https://localhost:21680/grade/');
+try_define('OMEGAUP_GRADER_URL',				'https://localhost:21680/run/grade/');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
 try_define('OMEGAUP_SSLCERT_URL',				'/opt/omegaup/frontend/omegaup.pem');
 try_define('OMEGAUP_CACERT_URL',				'/opt/omegaup/frontend/omegaup.pem');
 try_define('RUNS_PATH',					'/var/lib/omegaup/submissions');
+try_define('GRADE_PATH',					'/var/lib/omegaup/grade');
 try_define('PROBLEMS_PATH',					'/var/lib/omegaup/problems');
 try_define('PROBLEMS_GIT_PATH',					'/var/lib/omegaup/problems.git');
 try_define('BIN_PATH',					'/opt/omegaup/bin');
@@ -55,7 +56,7 @@ try_define('TEMPLATES_PATH',					'/opt/omegaup/frontend/www/templates/');
 try_define('TEMPLATES_URL_PATH',				'/templates/');
 try_define('OMEGAUP_GRADER_CONFIG_PATH',			'/opt/omegaup/grader/omegaup.conf');
 try_define('OMEGAUP_GRADER_RELOAD_CONFIG_URL',		'https://localhost:21680/reload-config/');
-try_define('OMEGAUP_GRADER_STATUS_URL',			'https://localhost:21680/status/');
+try_define('OMEGAUP_GRADER_STATUS_URL',			'https://localhost:21680/grader/status/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE',	true);
 try_define('OMEGAUP_GRADER_BROADCAST_URL',			'https://localhost:21680/broadcast/');
 

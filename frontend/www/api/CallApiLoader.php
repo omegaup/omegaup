@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 define("WHOAMI", "API");
 require_once("../../server/inc/bootstrap.php");
@@ -12,5 +12,3 @@ header("Pragma: no-cache");
 
 require_once("../../server/api/ApiLoader.php");
 echo ApiLoader::load();
-
-?>

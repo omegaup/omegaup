@@ -349,9 +349,15 @@ Arena.prototype.createAdminRun = function(run) {
 	(function(guid, run, row) {
 		$('.details', row).append($('<input type="button" value="details" />').click(function() {
 			omegaup.runDetails(guid, function(data) {
-				$('#run-details .compile_error').html('');
 				if (data.compile_error) {
-					$('#run-details .compile_error').html(omegaup.escape(data.compile_error));
+					$('#run-details .compile_error').html(omegaup.escape(data.compile_error)).show();
+				} else {
+					$('#run-details .compile_error').html('').hide();
+				}
+				if (data.logs) {
+					$('#run-details .logs').html(omegaup.escape(data.logs)).show();
+				} else {
+					$('#run-details .logs').html('').hide();
 				}
 				if (data.source.indexOf('data:') === 0) {
 					$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">descarga</a>');

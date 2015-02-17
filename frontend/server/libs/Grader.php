@@ -80,13 +80,15 @@ class Grader {
 	 * @param int $runId
 	 * @throws Exception
 	 */
-	public function Grade($runId, $rejudge, $debug) {
+	public function Grade($runGuids, $rejudge, $debug) {
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_URL);
 
 		// Set curl Post data
-		$debug = $debug ? "true" : "false";
-		$rejudge = $rejudge ? "true" : "false";
-		curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"id\":$runId,\"rejudge\":$rejudge,\"debug\":$debug}");
+		$debug = !!$debug;
+		$rejudge = !!$rejudge;
+		curl_setopt($curl, CURLOPT_POSTFIELDS,
+			json_encode(array('id' => $runGuids, 'rejudge' => $rejudge, 'debug' => $debug))
+		);
 
 		return $this->executeCurl($curl);
 	}

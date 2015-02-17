@@ -10,6 +10,21 @@ class RunController extends Controller {
 	public static $grader = null;
 	private static $practice = false;
 
+	public static function getGradePath($run) {
+		return GRADE_PATH . '/' .
+			substr($run->guid, 0, 2) . '/' .
+			substr($run->guid, 2);
+	}
+
+	/**
+	 * Gets the path of the file that contains the submission.
+	 */
+	public static function getSubmissionPath($run) {
+		return RUNS_PATH .
+			DIRECTORY_SEPARATOR . substr($run->guid, 0, 2) .
+			DIRECTORY_SEPARATOR . substr($run->guid, 2);
+	}
+
 	/**
 	 * Creates an instance of Grader if not already created
 	 */
@@ -232,7 +247,7 @@ class RunController extends Controller {
 
 		try {
 			// Create file for the run
-			$filepath = RUNS_PATH . DIRECTORY_SEPARATOR . $run->getGuid();
+			$filepath = RunController::getSubmissionPath($run);
 			FileHandler::CreateFile($filepath, $r["source"]);
 		} catch (Exception $e) {
 			throw new InvalidFilesystemOperationException($e);
@@ -240,7 +255,7 @@ class RunController extends Controller {
 
 		// Call Grader
 		try {
-			self::$grader->Grade($run->getRunId(), false, false);
+			self::$grader->Grade([$run->guid], false, false);
 		} catch (Exception $e) {
 			self::$log->error("Call to Grader::grade() failed:");
 			self::$log->error($e);
@@ -350,19 +365,17 @@ class RunController extends Controller {
 
 		self::$log->info("Run being rejudged!!");
 
-		// Try to delete compile message, if exists.
+		// Try to delete existing directory, if exists.
 		try {
-			$grade_err = RUNS_PATH . '/../grade/' . $r["run"]->getRunId() . '.err';
-			if (file_exists($grade_err)) {
-				unlink($grade_err);
-			}
+			$grade_dir = RunController::getGradePath($r['run']);
+			FileHandler::DeleteDirRecursive($grade_dir);
 		} catch (Exception $e) {
 			// Soft error :P
 			self::$log->warn($e);
 		}
 
 		try {
-			self::$grader->Grade($r["run"]->getRunId(), true, $r['debug'] || false);
+			self::$grader->Grade([$r["run"]->guid], true, $r['debug'] || false);
 		} catch (Exception $e) {
 			self::$log->error("Call to Grader::grade() failed:");
 			self::$log->error($e);
@@ -434,25 +447,22 @@ class RunController extends Controller {
 		$response = array();
 
 		$problem_dir = PROBLEMS_PATH . '/' . $r["problem"]->getAlias() . '/cases/';
-		$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
+		$grade_dir = RunController::getGradePath($r['run']);
 
 		$groups = array();
 
-		if (file_exists("$grade_dir.err")) {
-			$response['compile_error'] = file_get_contents("$grade_dir.err");
-		} else if (is_dir($grade_dir) && file_exists("$grade_dir/details.json")) {
+		if (file_exists("$grade_dir/compile_error.log")) {
+			$response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
+		}
+		if (file_exists("$grade_dir/details.json")) {
 			$groups = json_decode(file_get_contents("$grade_dir/details.json"), true);
-			foreach ($groups as &$group) {
-				foreach ($group['cases'] as &$case) {
-					$case_name = $case['name'];
-					$case['meta'] = RunController::ParseMeta(file_get_contents("$grade_dir/$case_name.meta"));
-					unset($case['meta']['status']);
-				}
-			}
+		}
+		if (file_exists("$grade_dir/run.log")) {
+			$response['logs'] = file_get_contents("$grade_dir/run.log");
 		}
 
 		$response['groups'] = $groups;
-		$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
+		$response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
 		if ($response['source'] == null) {
 			$response['source'] = '';
 		}
@@ -527,13 +537,13 @@ class RunController extends Controller {
 			$response['source'] = "Ver el código ha sido temporalmente desactivado.";
 		} else {
 			// Get the source
-			$response['source'] = file_get_contents(RUNS_PATH . '/' . $r["run"]->getGuid());
+			$response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
 		}
 
 		// Get the error
-		$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
-		if (file_exists("$grade_dir.err")) {
-			$response['compile_error'] = file_get_contents("$grade_dir.err");
+		$grade_dir = RunController::getGradePath($r['run']);
+		if (file_exists("$grade_dir/compile_error.log")) {
+			$response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
 		}
 
 		$response["status"] = "ok";
@@ -564,70 +574,14 @@ class RunController extends Controller {
 			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
-		$problem = ProblemsDAO::getByPK($r["run"]->getProblemId());
+		$grade_dir = RunController::getGradePath($r['run']);
+		$results_zip = "$grade_dir/results.zip";
 
-		$problem_dir = PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases/';
-		$grade_dir = RUNS_PATH . '/../grade/' . $r["run"]->getRunId();
-
-		$cases = array();
-
-		$zip = new ZipStream($r["run"]->getGuid() . '.zip');
-
-		if (file_exists("$grade_dir.err")) {
-			$zip->add_file_from_path("compile.err", "$grade_dir.err");
-		} else if (is_dir($grade_dir) && file_exists("$grade_dir/details.json")) {
-			$validator = $problem->validator == 'custom';
-			$groups = json_decode(file_get_contents("$grade_dir/details.json"), true);
-			foreach ($groups as $group) {
-				foreach ($group['cases'] as $case) {
-					$case_name = $case['name'];
-					$zip->add_file_from_path("$case_name.out", "$grade_dir/$case_name.out");
-
-					if (!$validator && $case['verdict'] == 'OK' && ($case['score'] < 1)) {
-						$out_diff = `diff -wauBbi $problem_dir/$case_name.out $grade_dir/$case_name.out | tail -n +3 | head -n50`;
-						$zip->add_file("$case_name.out.diff", $out_diff);
-					}
-
-					if (!$r['complete']) continue;
-
-					$zip->add_file_from_path("$case_name.err", "$grade_dir/$case_name.err");
-					$zip->add_file_from_path("$case_name.meta", "$grade_dir/$case_name.meta");
-
-					if ($validator && is_dir("$grade_dir/validator")) {
-						$zip->add_file_from_path("validator/$case_name.meta", "$grade_dir/validator/$case_name.meta");
-						$zip->add_file_from_path("validator/$case_name.out", "$grade_dir/validator/$case_name.out");
-						$zip->add_file_from_path("validator/$case_name.err", "$grade_dir/validator/$case_name.err");
-					}
-				}
-			}
-		} else if (is_dir($grade_dir)) {
-			// No nice details.json, probably a JE.
-			if ($dir = opendir($grade_dir)) {
-				while (($file = readdir($dir)) !== false) {
-					$path = "$grade_dir/$file";
-					if (is_dir($path) || (!$r['complete'] && !strstr($file, ".out")))
-						continue;
-
-					$zip->add_file_from_path("$file", "$grade_dir/$file");
-				}
-				closedir($dir);
-			}
-			if ($r['complete'] && is_dir("$grade_dir/validator")) {
-				if ($dir = opendir("$grade_dir/validator")) {
-					while (($file = readdir($dir)) !== false) {
-						$path = "$grade_dir/validator/$file";
-						if (is_dir($path))
-							continue;
-
-						$zip->add_file_from_path("validator/$file", "$grade_dir/validator/$file");
-					}
-					closedir($dir);
-				}
-			}
-		}
-
-		$zip->finish();
-		die();
+		header('Content-Type: application/zip');
+		header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
+		header('Content-Length: ' . filesize($results_zip));
+		readfile($results_zip);
+		exit;
 	}
 	
 	/**

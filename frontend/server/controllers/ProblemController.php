@@ -561,17 +561,19 @@ class ProblemController extends Controller {
 								"problem_id" => $r["problem"]->getProblemId()
 							)));
 
+			$guids = array();
 			foreach ($runs as $run) {
+				$guids[] = $run->guid;
 				$run->setStatus('new');
 				$run->setVerdict('JE');
 				$run->setScore(0);
 				$run->setContestScore(0);
 				RunsDAO::save($run);
-				self::$grader->Grade($run->getRunId(), true, false);
 
 				// Expire details of the run				
 				RunController::invalidateCacheOnRejudge($run);				
 			}
+			self::$grader->Grade($guids, true, false);
 		} catch (Exception $e) {
 			self::$log->error("Failed to rejudge runs after problem update");
 			self::$log->error($e);
@@ -1193,50 +1195,22 @@ class ProblemController extends Controller {
 			// For each run we got
 			foreach ($runs as $run) {
 				// Build grade dir
-				$grade_dir = RUNS_PATH . '/../grade/' . $run->getRunId();
+				$grade_dir = RunController::getGradePath($run);
 
-				// Skip it if it didn't produce outputs 
-				if (file_exists("$grade_dir.err")) {
+				// Skip it if it failed to compile.
+				if (file_exists("$grade_dir/compile_error.log")) {
 					continue;
-				} else if (is_dir($grade_dir)) {
-					// Try to open the details file.
-					if (file_exists("$grade_dir/details.json")) {
-						$details = json_decode(file_get_contents("$grade_dir/details.json"));
-						foreach ($details as $group) {
-							foreach ($group->cases as $case) {
-								if ($case->score > 0) {
-									$cases_stats["counts"][$case->name]++;
-								}
+				}
+
+				// Try to open the details file.
+				if (file_exists("$grade_dir/details.json")) {
+					$details = json_decode(file_get_contents("$grade_dir/details.json"));
+					foreach ($details as $group) {
+						foreach ($group->cases as $case) {
+							if ($case->score > 0) {
+								$cases_stats["counts"][$case->name]++;
 							}
 						}
-					} else if ($dir = opendir($grade_dir)) {
-						// Read all files in this run directory
-						while (($file = readdir($dir)) !== false) {
-
-							// Skip non output cases
-							if ($file == '.' || $file == '..' || !strstr($file, ".meta")) {
-								continue;
-							}
-
-							// Get the case name
-							$case_name = str_replace(".meta", "", $file);
-
-							// If we have an output
-							if (file_exists("$grade_dir/" . str_replace(".meta", ".out", $file))) {
-
-								// Get the output of this case
-								$out = str_replace(".meta", ".out", $file);
-								$case_out = `diff -wuBbi $problem_dir/$out $grade_dir/$out | tail -n +3 | head -n50`;
-
-								// If the output was empty
-								if (strcmp($case_out, "") === 0) {
-									$cases_stats["counts"][$case_name]++;
-								}
-							}
-						}
-
-						// Close this run dir
-						closedir($dir);
 					}
 				}
 			}
