@@ -483,6 +483,7 @@ class UserController extends Controller {
 				"username" => $username,
 				"password" => $password,
 				"email" => $username . "@omi.com",
+				"permission_key" => $r['permission_key']
 			));
 
 			UserController::$sendEmailOnVerify = false;
