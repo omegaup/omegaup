@@ -599,17 +599,25 @@ class UserController extends Controller {
 			$keys = array (				
 				"OSI15" => 30
 			);	
+		} else if ($r["contest_type"] == "OVI") {
+			if (!($r["current_user"]->getUsername() == "covi.academico" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
+				throw new ForbiddenAccessException();
+			}
+			$keys = array (
+				"OVI15" => 50
+			);
 		}
 		else {
 			throw new InvalidParameterException("parameterNotInExpectedSet", "contest_type",
-				array("bad_elements" => $r["contest_type"], "expected_set" => "OMI, OMIAGS, ORIG, OSI"));
+				array("bad_elements" => $r["contest_type"], "expected_set" => "OMI, OMIAGS, ORIG, OSI, OVI"));
 		}
 
 		self::$permissionKey = $r['permission_key'] = self::randomString(32);
 		
 		foreach ($keys as $k => $n) {
+			$digits = floor(log10($n) + 1);
 			for ($i = 1; $i <= $n; $i++) {
-				$username = $k . "-" . $i;
+				$username = $k . "-" . str_pad($i, $digits, '0', STR_PAD_LEFT);
 				$password = self::randomString(8);
 
 				if (self::omiPrepareUser($r, $username, $password)) {
