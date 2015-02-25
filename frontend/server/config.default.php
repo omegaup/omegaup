@@ -11,7 +11,7 @@ try_define('OMEGAUP_ROOT', '/opt/omegaup/frontend');
 try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 try_define('OMEGAUP_COOKIE_DOMAIN', null);
 try_define('OMEGAUP_USE_CSP', false);
-try_define('OMEGAUP_SERVER', 'localhost');
+try_define('OMEGAUP_URL', 'http://localhost');
 
 # ####################################
 # DATABASE CONFIG
