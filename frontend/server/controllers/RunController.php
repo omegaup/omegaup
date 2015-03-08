@@ -555,9 +555,12 @@ class RunController extends Controller {
 
 		self::validateDetailsRequest($r);
 
-		$r["contest"] = ContestsDAO::getByPK($r["run"]->getContestId());
+		$r['problem'] = ProblemsDAO::getByPK($r['run']->problem_id);
+		$r['contest'] = !is_null($r['run']->contest_id) ?
+			ContestsDAO::getByPK($r['run']->contest_id) : null;
 
-		if (!Authorization::IsSystemAdmin($r['current_user_id']) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+		if (!Authorization::IsProblemAdmin($r['current_user_id'], $r['problem']) &&
+		    (is_null($r['contest']) || Authorization::IsContestAdmin($r['current_user_id'], $r['contest']))) {
 			throw new ForbiddenAccessException("userNotAllowed");
 		}
 
