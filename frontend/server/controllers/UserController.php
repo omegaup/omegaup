@@ -584,7 +584,7 @@ class UserController extends Controller {
 			
 		} else if ($r["contest_type"] == "OMIAGS") {
 			
-			if (!($r["current_user"]->getUsername() == "Andreasantillana" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
+			if (!($r["current_user"]->getUsername() == "andreasantillana" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
 				throw new ForbiddenAccessException();
 			}
 			
