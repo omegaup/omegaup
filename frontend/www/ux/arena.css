@@ -265,6 +265,13 @@ body#only-problem #problems .main {
 	text-align: justify;
 }
 
+#problem .statement table td {
+	border: 1px solid #000;
+	padding: 10px;
+}
+#problem .statement table th {
+	text-align: center;
+}
 #problem .statement table.sample_io {
 	margin: 5px;
 	padding : 5px;
