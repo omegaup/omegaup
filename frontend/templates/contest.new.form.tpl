@@ -81,7 +81,7 @@
 					<div class="form-group col-md-6">
 						<label for="submissions_gap">{#contestNewFormSubmissionsSeparation#}</label>
 						<input id='submissions_gap' name='submissions_gap' value='1' type='text' size='2' class="form-control">
-						<p class="help-block">{#contestNewFormDifferentStartsDesc#}</p>
+						<p class="help-block">{#contestNewFormSubmissionsSeparationDesc#}</p>
 					</div>
 				</div>
 				
