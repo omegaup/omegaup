@@ -1,5 +1,6 @@
 OmegaUp.T = {
 	aliasInUse: "alias already exists. Please choose a different alias.",
+	apiNotFound: "Requested API endpoint not found.",
 	arenaAdminManageProblem: "Manage problem",
 	arenaCommonCode: "Code",
 	arenaCommonMemoryLimit: "Memory limit",
@@ -276,6 +277,7 @@ OmegaUp.T = {
 	problemEditGoToProblem: "Go to problem",
 	problemEditSlowWarning: "<strong>Warning</strong>: This problem will be judged in the slow queue since TLE runs might finish in more than 30s (number of cases * time limit in seconds rounded up). Problems in the slow queue might take up to several minutes in being judged, to avoid slowing the rest of the system. If you want this problem to not be in the slow queue, remove test cases or reduce the time limit.",
 	problemEditStackLimit: "Stack limit (bytes)",
+	problemExists: "Another problem with that name already exists. Choose another name.",
 	problemIsNotPublic: "The problem is not public.",
 	problemIsPrivate: "Problem is marked as private.",
 	problemNew: "Create problem",
@@ -352,6 +354,7 @@ OmegaUp.T = {
 	usernameInUse: "Username already exists.",
 	usernameOrPassIsWrong: "Username or password is wrong. Please check your credentials.",
 	verifiationIdInvalid: "Verification id is invalid.",
+	verificationIdInvalid: "The provided verification information is not valid.",
 	wordsAccepted: "Accepted",
 	wordsAddMember: "Add member",
 	wordsAddProblem: "Add problem",

@@ -1,5 +1,6 @@
 OmegaUp.T = {
 	aliasInUse: "(a1ia5 a1r3ady 3xi575. P13a53 ch0053 a diff3r3n7 a1ia5.)",
+	apiNotFound: "(R3qu3573d API 3ndp0in7 n07 f0und.)",
 	arenaAdminManageProblem: "(Manag3 pr0b13m)",
 	arenaCommonCode: "(C0d3)",
 	arenaCommonMemoryLimit: "(M3m0ry 1imi7)",
@@ -276,6 +277,7 @@ OmegaUp.T = {
 	problemEditGoToProblem: "(G0 70 pr0b13m)",
 	problemEditSlowWarning: "(<57r0ng>Warning</57r0ng>: Thi5 pr0b13m wi11 b3 judg3d in 7h3 510w qu3u3 5inc3 TLE run5 migh7 fini5h in m0r3 7han 305 (numb3r 0f ca535 * 7im3 1imi7 in 53c0nd5 r0und3d up). Pr0b13m5 in 7h3 510w qu3u3 migh7 7ak3 up 70 53v3ra1 minu735 in b3ing judg3d, 70 av0id 510wing 7h3 r357 0f 7h3 5y573m. If y0u wan7 7hi5 pr0b13m 70 n07 b3 in 7h3 510w qu3u3, r3m0v3 7357 ca535 0r r3duc3 7h3 7im3 1imi7.)",
 	problemEditStackLimit: "(S7ack 1imi7 (by735))",
+	problemExists: "(An07h3r pr0b13m wi7h 7ha7 nam3 a1r3ady 3xi575. Ch0053 an07h3r nam3.)",
 	problemIsNotPublic: "(Th3 pr0b13m i5 n07 pub1ic.)",
 	problemIsPrivate: "(Pr0b13m i5 mark3d a5 priva73.)",
 	problemNew: "(Cr3a73 pr0b13m)",
@@ -352,6 +354,7 @@ OmegaUp.T = {
 	usernameInUse: "(U53rnam3 a1r3ady 3xi575.)",
 	usernameOrPassIsWrong: "(U53rnam3 0r pa55w0rd i5 wr0ng. P13a53 ch3ck y0ur cr3d3n7ia15.)",
 	verifiationIdInvalid: "(V3rifica7i0n id i5 inva1id.)",
+	verificationIdInvalid: "(Th3 pr0vid3d v3rifica7i0n inf0rma7i0n i5 n07 va1id.)",
 	wordsAccepted: "(Acc3p73d)",
 	wordsAddMember: "(Add m3mb3r)",
 	wordsAddProblem: "(Add pr0b13m)",

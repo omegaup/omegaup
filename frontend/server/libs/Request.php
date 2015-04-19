@@ -73,7 +73,7 @@ class Request extends ArrayObject {
 		$response = call_user_func($this->method, $this);
 		
 		if ($response === false) {
-			throw new NotFoundException("Api requested not found.");
+			throw new NotFoundException("apiNotFound");
 		}
 		
 		return $response;
