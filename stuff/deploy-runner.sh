@@ -41,20 +41,26 @@ chmod +x $TMPDIR/distrib/bin/runner.service
 cp $ROOT/stuff/minijail-scripts/* $TMPDIR/distrib/minijail/scripts/
 
 cat > $TMPDIR/distrib/bin/omegaup.conf <<EOF
-# Logging
-logging.level = info
-logging.file =
-
-# Paths
-compile.root = /opt/omegaup/compile
-input.root = /opt/omegaup/input
-runner.minijail.path = /opt/omegaup/minijail
-
-# Ports & Endpoints
-runner.port = 21681
-grader.register.url = https://$GRADER:21680/register/
-grader.deregister.url = https://$GRADER:21680/deregister/
-runner.hostname = $HOSTNAME
+{
+	"logging": {
+		"file": "/opt/omegaup/runner_service.log"
+	},
+	"common": {
+		"roots": {
+			"compile": "/opt/omegaup/compile",
+			"input": "/opt/omegaup/input"
+		},
+		"paths": {
+			"minijail": "/opt/omegaup/minijail"
+		}
+	},
+	"runner": {
+		"port": 21681,
+		"register_url": "https://$GRADER:21680/endpoint/register/",
+		"deregister_url": "https://$GRADER:21680/endpoint/deregister/",
+		"hostname": "$HOSTNAME"
+	}
+}
 EOF
 
 pushd $TMPDIR/distrib
