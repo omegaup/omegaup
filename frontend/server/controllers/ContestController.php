@@ -781,6 +781,10 @@ class ContestController extends Controller {
 
 		$r["user"] = UserController::resolveUser($r["usernameOrEmail"]);
 
+		if (is_null($r["user"])) {
+			throw new NotFoundException("userOrMailNotFound");
+		}
+
 		try {
 			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
 		} catch (Exception $e) {
@@ -788,8 +792,8 @@ class ContestController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		if (is_null($r["user"])) {
-			throw new InvalidParameterException("parameterNotFound", "user");
+		if (is_null($r["contest"])) {
+			throw new NotFoundException("contestNotFound");
 		}
 
 		// Only director is allowed to create problems in contest

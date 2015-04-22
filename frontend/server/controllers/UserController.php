@@ -450,7 +450,7 @@ class UserController extends Controller {
 					|| !is_null($user = UsersDAO::FindByUsername($userOrEmail))) {
 				return $user;
 			} else {
-				throw new InvalidParameterException("parameterNotFound", "User");
+				throw new NotFoundException("userOrMailNotFound");
 			}
 		} catch (ApiException $apiException) {
 			throw $apiException;

@@ -352,7 +352,7 @@ OmegaUp.T = {
 	userNotExist: "Usuario no existe",
 	userOrMailNotFound: "Usuario o mail no encontrado",
 	usernameInUse: "Este nombre de usuario ya esta tomado.",
-	usernameOrPassIsWrong: "Username or password is wrong. Please check your credentials.",
+	usernameOrPassIsWrong: "El nombre de usuario o la contraseña son incorrectos. Por favor verifica tus credenciales.",
 	verifiationIdInvalid: "Id de verificacion es invalido",
 	verificationIdInvalid: "La información de verificación suministrada no es válida.",
 	wordsAccepted: "Resueltos",
