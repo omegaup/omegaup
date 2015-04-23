@@ -92,7 +92,7 @@ class ProblemDeployer {
 			1 => array("pipe", "w"),
 			2 => array("pipe", "w")
 		);
-		$proc = proc_open($cmd, $descriptorspec, $pipes, $cwd, array());
+		$proc = proc_open($cmd, $descriptorspec, $pipes, $cwd, array('LANG' => 'en_US.UTF-8'));
 
 		if (!is_resource($proc)) {
 			$errors = error_get_last();
