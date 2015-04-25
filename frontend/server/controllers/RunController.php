@@ -65,7 +65,9 @@ class RunController extends Controller {
 
 			// Check for practice or public problem, there is no contest info in this scenario
 			if ($r["contest_alias"] == "") {
-				if (Authorization::IsSystemAdmin($r["current_user_id"]) || time() > ProblemsDAO::getPracticeDeadline($r["problem"]->getProblemId()) || $r["problem"]->getPublic() == true) {					
+				if (Authorization::IsProblemAdmin($r['current_user_id'], $r['problem']) ||
+					  time() > ProblemsDAO::getPracticeDeadline($r["problem"]->getProblemId()) ||
+					  $r["problem"]->getPublic() == true) {
 					if (!RunsDAO::IsRunInsideSubmissionGap(
 									null, 
 									$r["problem"]->getProblemId(),
@@ -76,8 +78,7 @@ class RunController extends Controller {
 
 					self::$practice = true;
 					return;
-				} else 
-				{
+				} else {
 					throw new NotAllowedToSubmitException("problemIsNotPublic");
 				}
 			}
