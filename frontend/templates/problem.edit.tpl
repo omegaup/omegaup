@@ -273,6 +273,7 @@
 		if (problemAlias === "") {
 			$('input[name=title]').val('');
 			$('input[name=time_limit]').val('');
+			$('input[name=validator_time_limit]').val('');
 			$('input[name=overall_wall_time_limit]').val('');
 			$('input[name=extra_wall_time]').val('');
 			$('input[name=memory_limit]').val('');
@@ -288,6 +289,7 @@
 			$('input[name=title]').val(problem.title);
 			$('#statement-preview .title').html(omegaup.escape(problem.title));
 			$('input[name=time_limit]').val(problem.time_limit);
+			$('input[name=validator_time_limit]').val(problem.validator_time_limit);
 			$('input[name=overall_wall_time_limit]').val(problem.overall_wall_time_limit);
 			$('input[name=extra_wall_time]').val(problem.extra_wall_time);
 			$('input[name=memory_limit]').val(problem.memory_limit);

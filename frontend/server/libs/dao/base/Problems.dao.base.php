@@ -171,6 +171,10 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `time_limit` = ? AND";
 			array_push( $val, $Problems->getTimeLimit() );
 		}
+		if (!is_null( $Problems->getValidatorTimeLimit())) {
+			$sql .= " `validator_time_limit` = ? AND";
+			array_push( $val, $Problems->getValidatorTimeLimit() );
+		}
 		if (!is_null( $Problems->getOverallWallTimeLimit())) {
 			$sql .= " `overall_wall_time_limit` = ? AND";
 			array_push( $val, $Problems->getOverallWallTimeLimit() );
@@ -266,7 +270,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function update($Problems)
 	{
-		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ? WHERE  `problem_id` = ?;";
+		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `validator_time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ? WHERE  `problem_id` = ?;";
 		$params = array( 
 			$Problems->getPublic(), 
 			$Problems->getAuthorId(), 
@@ -277,6 +281,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getServer(), 
 			$Problems->getRemoteId(), 
 			$Problems->getTimeLimit(), 
+			$Problems->getValidatorTimeLimit(), 
 			$Problems->getOverallWallTimeLimit(), 
 			$Problems->getExtraWallTime(), 
 			$Problems->getMemoryLimit(), 
@@ -316,6 +321,7 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->validator)) $Problems->validator = 'token-numeric';
 		if (is_null($Problems->languages)) $Problems->languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11';
 		if (is_null($Problems->time_limit)) $Problems->time_limit = '3000';
+		if (is_null($Problems->validator_time_limit)) $Problems->validator_time_limit = '3000';
 		if (is_null($Problems->overall_wall_time_limit)) $Problems->overall_wall_time_limit = '60000';
 		if (is_null($Problems->extra_wall_time)) $Problems->extra_wall_time = '0';
 		if (is_null($Problems->memory_limit)) $Problems->memory_limit = '64';
@@ -330,7 +336,7 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->tolerance)) $Problems->tolerance = 1e-9;
 		if (is_null($Problems->slow)) $Problems->slow = 0;
 		if (is_null($Problems->deprecated)) $Problems->deprecated = 0;
-		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Problems->problem_id,
 			$Problems->public,
@@ -342,6 +348,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->server,
 			$Problems->remote_id,
 			$Problems->time_limit,
+			$Problems->validator_time_limit,
 			$Problems->overall_wall_time_limit,
 			$Problems->extra_wall_time,
 			$Problems->memory_limit,
@@ -509,6 +516,17 @@ abstract class ProblemsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `time_limit` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ProblemsA->getValidatorTimeLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getValidatorTimeLimit()) ) ) ){
+				$sql .= " `validator_time_limit` >= ? AND `validator_time_limit` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `validator_time_limit` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

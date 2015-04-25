@@ -314,6 +314,9 @@ class ProblemDeployer {
 				if (stripos($entry, 'validator.') === 0) {
 					$validator = 1;
 					break;
+				} else if (stripos($entry, 'interactive') === 0) {
+					$validator = 1;
+					break;
 				}
 			}
 			closedir($handle);
@@ -331,8 +334,9 @@ class ProblemDeployer {
 			closedir($handle);
 		}
 
-		$max_ms_per_run = $problem->time_limit + $problem->extra_wall_time;
-		$max_runtime = (int)(($max_ms_per_run + 999) / 1000 + $validator) *
+		$max_ms_per_run = $problem->time_limit + $problem->extra_wall_time +
+			$validator * $problem->validator_time_limit;
+		$max_runtime = (int)(($max_ms_per_run + 999) / 1000) *
 			$input_count;
 
 		if ($problem->overall_wall_time_limit >= ProblemDeployer::MAX_RUNTIME_HARD_LIMIT * 1000

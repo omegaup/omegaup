@@ -62,6 +62,9 @@ class Problems extends VO
 			if (isset($data['time_limit'])) {
 				$this->time_limit = $data['time_limit'];
 			}
+			if (isset($data['validator_time_limit'])) {
+				$this->validator_time_limit = $data['validator_time_limit'];
+			}
 			if (isset($data['overall_wall_time_limit'])) {
 				$this->overall_wall_time_limit = $data['overall_wall_time_limit'];
 			}
@@ -130,6 +133,7 @@ class Problems extends VO
 			"server" => $this->server,
 			"remote_id" => $this->remote_id,
 			"time_limit" => $this->time_limit,
+			"validator_time_limit" => $this->validator_time_limit,
 			"overall_wall_time_limit" => $this->overall_wall_time_limit,
 			"extra_wall_time" => $this->extra_wall_time,
 			"memory_limit" => $this->memory_limit,
@@ -230,6 +234,13 @@ class Problems extends VO
 	  * @var int(11)
 	  */
 	public $time_limit;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var int(11)
+	  */
+	public $validator_time_limit;
 
 	/**
 	  *  [Campo no documentado]

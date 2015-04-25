@@ -295,6 +295,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `server` enum('uva','livearchive','pku','tju','spoj') DEFAULT NULL,
   `remote_id` varchar(10) DEFAULT NULL,
   `time_limit` int(11) NOT NULL DEFAULT '3000',
+  `validator_time_limit` int(11) NOT NULL DEFAULT '3000',
   `overall_wall_time_limit` int(11) NOT NULL DEFAULT '60000',
   `extra_wall_time` int(11) NOT NULL DEFAULT '0',
   `memory_limit` int(11) NOT NULL DEFAULT '64',
