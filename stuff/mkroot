@@ -23,23 +23,26 @@ class Chroot:
 			shutil.rmtree(path, True)
 		os.mkdir(path)
 	
-	def __chroot_path(self, path):
-		return self.chroot + path[len(self.mountpoint)-1:]
+	def __chroot_path(self, path, relative_to=None):
+                root = relative_to
+                if root is None:
+                    root = self.mountpoint
+		return self.chroot + path[len(root)-1:]
 
-	def mkdir(self, path):
-		if not os.path.isdir(self.__chroot_path(path)):
-			os.makedirs(self.__chroot_path(path))
+	def mkdir(self, path, relative_to=None):
+		if not os.path.isdir(self.__chroot_path(path, relative_to)):
+			os.makedirs(self.__chroot_path(path, relative_to))
 
-	def copyfromhost(self, path, exclude=[]):
+	def copyfromhost(self, path, relative_to=None, exclude=[]):
 		if '*' in path:
 			for p in glob.glob(path):
-				self.copyfromhost(p, exclude)
+				self.copyfromhost(p, relative_to, exclude)
 			return
 		self.mkdir(os.path.dirname(path))
 		if os.path.isdir(os.path.realpath(path)):
 			for root, dirs, files in os.walk(path):
 				if any([root.startswith(e) for e in exclude]): continue
-				self.mkdir(root)
+				self.mkdir(root, relative_to)
 				for f in files:
 					filepath = os.path.join(root, f)
 					if os.path.islink(filepath):
@@ -49,11 +52,11 @@ class Chroot:
 							self.symlink(filepath, target)
 						else:
 							try:
-								os.link(abspath, self.__chroot_path(filepath))
+								os.link(abspath, self.__chroot_path(filepath, relative_to))
 							except OSError, e:
 								print e, abspath, filepath
 					else:
-						os.link(os.path.realpath(filepath), self.__chroot_path(filepath))
+						os.link(os.path.realpath(filepath), self.__chroot_path(filepath, relative_to))
 				for d in dirs:
 					dirpath = os.path.join(root, d)
 					if os.path.islink(dirpath):
@@ -62,9 +65,9 @@ class Chroot:
 						if abspath.startswith(self.mountpoint):
 							self.symlink(dirpath, target)
 						else:
-							shutil.copytree(abspath, self.__chroot_path(dirpath))
+							shutil.copytree(abspath, self.__chroot_path(dirpath, relative_to))
 		else:
-			os.link(os.path.realpath(path), self.__chroot_path(path))
+			os.link(os.path.realpath(path), self.__chroot_path(path, relative_to))
 	
 	def install(self, path, source):
 		self.mkdir(os.path.dirname(path))
@@ -139,16 +142,16 @@ with Chroot('root', '/') as root:
 	root.mkdir('/sys/')
 
 	# Mountpoints for libraries
-	root.mkdir('/usr/lib/ruby/1.9.1/')
+	root.mkdir('/usr/lib/ruby/2.1.0/')
 	root.mkdir('/usr/lib/python2.7/')
 	root.mkdir('/usr/lib/jvm/')
 	root.mkdir('/usr/lib/ghc/')
 	root.mkdir('/opt/nodejs/')
 
-	root.symlink('/usr/lib/libruby-1.9.1.so.1.9', '/usr/lib/ruby/1.9.1/libruby-1.9.1.so.1.9')
+	root.symlink('/usr/lib/x86_64-linux-gnu/libruby-2.1.so.2.1', '/usr/lib/ruby/2.1.0/libruby-2.1.so.2.1')
 	root.symlink('/usr/bin/node', '/opt/nodejs/bin/node')
 	root.symlink('/usr/bin/java', '/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java')
-	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/1.9.1/ruby')
+	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/2.1.0/ruby')
 	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
 
@@ -262,6 +265,7 @@ with Chroot('root-python', '/usr/lib/python2.7/') as root:
 
 with Chroot('root-ruby', '/usr/lib/ruby/') as root:
 	root.copyfromhost('/usr/lib/ruby')
+	root.copyfromhost('/usr/lib/x86_64-linux-gnu/ruby/', relative_to='/usr/lib/x86_64-linux-gnu/ruby/')
 	root.install('/usr/lib/ruby/2.1.0/libruby-2.1.so.2.1', '/usr/lib/x86_64-linux-gnu/libruby-2.1.so.2.1')
 	root.install('/usr/lib/ruby/2.1.0/ruby', '/usr/bin/ruby')
 
