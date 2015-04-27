@@ -12,10 +12,30 @@
 		<div class="row">
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>
-				<a href="/login/google/{if $smarty.server.QUERY_STRING}?{$smarty.server.QUERY_STRING}{/if}" title="log in with Google" style="background: #fff url(/css/openid-logos.png); background-position: -1px -1px" class="google openid_large_btn"></a>
-				&nbsp;&nbsp;&nbsp; <a href="{$FB_URL}" title="log in with Facebook" style="background: #fff url(/css/openid-logos.png); background-position: -1px -456px" class="facebook openid_large_btn"></a><a style="float:right"></a><br>
+
+				<div 
+					id="signinButton">
+					<span class="g-signin"
+						title="log in with Google"
+						data-scope="email"
+						data-clientid="{$GOOGLECLIENTID}"
+						data-redirecturi="postmessage"
+						data-cookiepolicy="single_host_origin"
+						data-callback="signInCallback">
+					</span>
+				</div>
+
+				&nbsp;&nbsp;&nbsp;
+
+				<a href="{$FB_URL}"
+					title="log in with Facebook"
+					style="background: #fff url(/css/openid-logos.png); background-position: -1px -456px"
+					class="facebook openid_large_btn"></a>
+
+				<a style="float:right"></a>
+				<br>
 			</div>
-		
+
 			<div class="col-md-4">
 				<h4>{#loginNative#}</h4>
 				<form method='POST' action='{$smarty.server.REQUEST_URI}' id='login_form' class="form-horizontal">
@@ -92,5 +112,5 @@
 </div>
 
 <script type="text/javascript" src="/js/login.js"></script>
-
+<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 {include file='footer.tpl'}

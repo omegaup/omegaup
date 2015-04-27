@@ -8,6 +8,7 @@
  *     Alan Gonzalez alanboy@alanboy.net
  *
  * */
+
 class SessionController extends Controller {
 
 	const AUTH_TOKEN_ENTROPY_SIZE = 15;
@@ -107,7 +108,7 @@ class SessionController extends Controller {
 			return null;
 		}
 	}
-				
+
 	public static function getCurrentSession(Request $r) {
 		$authToken = $r['auth_token'];
 
@@ -169,10 +170,6 @@ class SessionController extends Controller {
 		);
 	}
 
-	/**
-	 *
-	 *
-	 * */
 	public function UnRegisterSession() {
 		$a_CurrentSession = self::apiCurrentSession();
 		$vo_AuthT = new AuthTokens(array("token" => $a_CurrentSession["auth_token"]));
@@ -264,6 +261,58 @@ class SessionController extends Controller {
 			}
 		}
 		return $username . $suffix;
+	}
+
+	public static function apiGoogleLogin(Request $r = null) {
+
+		if (is_null($r["storeToken"]))
+		{
+			throw new InvalidParameterException("parameterNotFound", "storeToken");
+		}
+
+		$client = new Google_Client();
+		$client->setClientId(OMEGAUP_GOOGLE_CLIENTID);
+		$client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
+		$client->setRedirectUri('postmessage');
+		$client->setScopes(array(
+			'https://www.googleapis.com/auth/userinfo.email',
+			'https://www.googleapis.com/auth/userinfo.profile'));
+
+		try{
+			$client->authenticate($r["storeToken"]);
+
+		} catch(Google_Auth_Exception $ge) {
+			self::$log->error($ge->getMessage());
+			throw new InternalServerErrorException($ge);
+
+		}
+
+		if ($client->getAccessToken()) {
+
+			$request = new Google_Http_Request("https://www.googleapis.com/oauth2/v2/userinfo?alt=json");
+			$userinfo = $client->getAuth()->authenticatedRequest($request);
+			$responseJson = json_decode($userinfo->getResponseBody(), true);
+
+			// responseJson will have:
+			//    [id] => 103621569728764469767
+			//    [email] => johndoe@gmail.com
+			//    [verified_email] => 1
+			//    [name] => Alan Gonzalez
+			//    [given_name] => Alan
+			//    [family_name] => Gonzalez
+			//    [link] => https://plus.google.com/123621569728764469767
+			//    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
+			//    [gender] => male
+			//    [locale] => en
+
+			$controller = (new SessionController())->LoginViaGoogle($responseJson["email"]);
+
+		} else {
+			throw new InternalServerErrorException(new Exception());
+
+		}
+
+		return array("status" => "ok");
 	}
 
 	public function LoginViaGoogle($s_Email) {
@@ -405,8 +454,8 @@ class SessionController extends Controller {
 			$returnAuthToken = false;
 		}
 
-		try {			
-			$vo_User = UserController::resolveUser($r["usernameOrEmail"]);			
+		try {
+			$vo_User = UserController::resolveUser($r["usernameOrEmail"]);
 			$r["user_id"] = $vo_User->getUserId();
 			$r["user"] = $vo_User;
 		} catch (ApiException $e) {

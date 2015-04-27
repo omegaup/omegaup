@@ -67,6 +67,13 @@ try_define('OMEGAUP_FB_APPID',				'xxxxx');
 try_define('OMEGAUP_FB_SECRET',				'xxxxx');
 
 # ####################################
+# GOOGLE LOGIN CONFIG
+# ####################################
+try_define('OMEGAUP_GOOGLE_SECRET',				'xxxxx');
+try_define('OMEGAUP_GOOGLE_CLIENTID',			'xxxxx');
+
+
+# ####################################
 # GOOGLE ANALYTICS
 # ####################################
 try_define('OMEGAUP_GA_TRACK',				false);

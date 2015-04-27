@@ -22,3 +22,6 @@
 [submodule "libinteractive"]
 	path = libinteractive
 	url = https://github.com/omegaup/libinteractive.git
+[submodule "frontend/server/libs/google-api-php-client"]
+	path = frontend/server/libs/google-api-php-client
+	url = https://github.com/google/google-api-php-client

@@ -122,6 +122,7 @@ require_once("libs/adodb/adodb.inc.php");
 require_once("libs/adodb/adodb-exceptions.inc.php");
 
 require_once("libs/facebook-php-sdk/facebook.php");
+require_once("libs/google-api-php-client/src/Google/autoload.php");
 
 global $conn;
 $conn = null;
@@ -151,7 +152,6 @@ try {
 				)));
 	}
 }
-
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
 
@@ -166,6 +166,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 		$smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
 	}
 
+	$smarty->assign("GOOGLECLIENTID", OMEGAUP_GOOGLE_CLIENTID);
 
 	$smarty->assign("LOGGED_IN", "0");
 	UITools::$IsLoggedIn = false;

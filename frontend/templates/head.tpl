@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 	<head data-locale="{#locale#}">
+
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<meta name="google-signin-client_id" content="{$GOOGLECLIENTID}">
+
 		<title>{$htmlTitle} &ndash; omegaUp</title>
 
 		<script type="text/javascript" src="/js/jquery.js"></script>

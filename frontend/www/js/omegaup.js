@@ -345,6 +345,25 @@ OmegaUp.prototype.login = function(username, password, callback) {
 	});
 };
 
+OmegaUp.prototype.googleLogin = function(storeToken, callback) {
+	$.post(
+		'/api/session/googlelogin/',
+		{ storeToken: storeToken },
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
 OmegaUp.prototype.getUserStats = function(username, callback) {
 	$.get(
 		username == null ? '/api/user/stats/' : '/api/user/stats/username/' + encodeURIComponent(username),
