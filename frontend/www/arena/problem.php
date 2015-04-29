@@ -25,6 +25,10 @@ $smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 .
 $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
+$smarty->assign('karel_problem', count(array_intersect(
+	explode(',', $result['languages']),
+	array('kp', 'kj')
+)) == 2);
 
 $result['user'] = array(
 	'logged_in' => $session['valid'],

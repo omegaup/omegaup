@@ -220,6 +220,7 @@ OmegaUp.T = {
 	omegaupTitleRank: "(Rank)",
 	omegaupTitleRedaccion: "(R3dacci0n)",
 	omegaupTitleScoreboardmerge: "(Sc0r3b0ardm3rg3)",
+	openInKarelJs: "(Y0u can u53 kar31.j5 70 501v3 7hi5 pr0b13m)",
 	parameterEmpty: "(Emp7y param373r)",
 	parameterInvalid: "(Inva1id param373r)",
 	parameterInvalidAlias: "(Param373r can 0n1y c0n7ain 13773r5, digi75, and _)",

@@ -88,6 +88,9 @@
 						</fieldset>
 					</form>
 {/if}
+					<div class="karel-js-link hide">
+						<a href="/karel.js/" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
+					</div>
 					<div class="statement"></div>
 					<hr />
 					<div class="source">Fuente: <span></span></div>

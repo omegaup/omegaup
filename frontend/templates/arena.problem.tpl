@@ -29,6 +29,11 @@
 							<td class="overall_wall_time_limit">{$overall_wall_time_limit|escape}</td>
 						</tr>
 					</table>
+{if $karel_problem}
+					<div class="karel-js-link">
+						<a href="/karel.js/" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
+					</div>
+{/if}
 					<div class="statement">{$problem_statement}</div>
 					<hr />
 					<div class="source">Fuente: <span>{$source|escape}</span></div>

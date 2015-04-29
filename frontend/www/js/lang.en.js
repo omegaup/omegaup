@@ -220,6 +220,7 @@ OmegaUp.T = {
 	omegaupTitleRank: "Rank",
 	omegaupTitleRedaccion: "Redaccion",
 	omegaupTitleScoreboardmerge: "Scoreboardmerge",
+	openInKarelJs: "You can use karel.js to solve this problem",
 	parameterEmpty: "Empty parameter",
 	parameterInvalid: "Invalid parameter",
 	parameterInvalidAlias: "Parameter can only contain letters, digits, and _",

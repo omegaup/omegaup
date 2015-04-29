@@ -959,13 +959,19 @@ Arena.prototype.onHashChanged = function() {
 			$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
 			$('#problem .overall_wall_time_limit').html(problem.overall_wall_time_limit / 1000 + "s");
 			$('#problem .statement').html(problem.problem_statement);
+			var karel_langs = ['kp', 'kj'];
+			var language_array = problem.languages.split(',');
+			if (karel_langs.every(function(x) { return language_array.indexOf(x) != -1})) {
+				$('#problem .karel-js-link').removeClass('hide');
+			} else {
+				$('#problem .karel-js-link').addClass('hide');
+			}
 			$('#problem .source span').html(omegaup.escape(problem.source));
 			$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
 			self.installLibinteractiveHooks();
 
 			$('#problem .run-list .added').remove();
 
-			var language_array = problem.languages.split(',');
 			$('#lang-select option').each(function(index, item) {
 				if (language_array.indexOf($(item).val()) >= 0) {
 					$(item).show();

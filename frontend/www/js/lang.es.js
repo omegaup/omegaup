@@ -220,6 +220,7 @@ OmegaUp.T = {
 	omegaupTitleRank: "Rank",
 	omegaupTitleRedaccion: "Redaccion",
 	omegaupTitleScoreboardmerge: "Scoreboard Merge",
+	openInKarelJs: "Puedes utilizar karel.js para resolver este problema",
 	parameterEmpty: "El campo no puede estar vacío",
 	parameterInvalid: "Parámetro inválido",
 	parameterInvalidAlias: "El campo debe constar de letras, números y _",

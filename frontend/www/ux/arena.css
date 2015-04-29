@@ -537,4 +537,17 @@ body#only-problem #problems .main {
 
 #main.container { margin-top: 20px; max-width: 930px; }
 
+.karel-js-link {
+	border: 1px solid #eee;
+	border-left: 0;
+	border-radius: 3px;
+	margin: 2em;
+}
+.karel-js-link a {
+	border-left: 5px solid #1b809e;
+	display: block;
+	padding: 1em;
+}
+
 .no-wrap { white-space: nowrap; }
+.hide { display: none; }
