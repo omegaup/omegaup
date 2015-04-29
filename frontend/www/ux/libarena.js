@@ -60,7 +60,7 @@ function Arena() {
 	this.scoreboardToken = null;
 
 	// If websockets are enabled.
-	this.enableSockets = window.location.search.indexOf('ws=on') !== -1;
+	this.enableSockets = window.location.search.indexOf('ws=off') === -1;
 
 	// If we have admin powers in this contest.
 	this.admin = false;
