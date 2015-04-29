@@ -418,7 +418,7 @@ class SessionController extends Controller {
 				try {
 					$res = UserController::apiCreate($r);
 				} catch (ApiException $e) {
-					self::$log->e("Unable to login via Facebook " . $e);
+					self::$log->error("Unable to login via Facebook " . $e);
 					return false;
 				}
 				$vo_User = UsersDAO::getByPK($res["user_id"]);
