@@ -563,6 +563,17 @@ class UserController extends Controller {
 				"OMI2015-YUC" => 4,
 				"OMI2015-ZAC" => 4,
 			);
+		} else if ($r["contest_type"] == "OMIPS") {
+			
+			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
+				throw new ForbiddenAccessException();
+			}
+			
+			$keys = array(
+				"OMIPS2015-P" => 25,
+				"OMIPS2015-S" => 25,
+			);
+
 		} else if ($r["contest_type"] == "ORIG") {
 			
 			if (!($r["current_user"]->getUsername() == "kuko.coder" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
