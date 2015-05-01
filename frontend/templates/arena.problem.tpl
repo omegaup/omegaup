@@ -31,7 +31,7 @@
 					</table>
 {if $karel_problem}
 					<div class="karel-js-link">
-						<a href="/karel.js/" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
+						<a href="/karel.js/{if !empty($sample_input)}#mundo:{$sample_input|escape:url}{/if}" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
 					</div>
 {/if}
 					<div class="statement">{$problem_statement}</div>

@@ -699,6 +699,7 @@ class ProblemController extends Controller {
 		// Invalidar problem statement cache @todo invalidar todos los lenguajes
 		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es" . "html");
 		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es" . "markdown");
+		Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in");
 
 		return $response;
 	}
@@ -733,6 +734,7 @@ class ProblemController extends Controller {
 			// Invalidar problem statement cache
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "html");
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "markdown");			
+			Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in");
 		} catch (ApiException $e) {
 			throw $e;
 		} catch (Exception $e) {
@@ -843,6 +845,25 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Gets the sample input from the filesystem.
+	 * 
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 */
+	public static function getSampleInput(Request $r) {
+		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem"]->getAlias() . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . 'sample.in';
+
+		try {
+			$file_content = FileHandler::ReadFile($source_path);
+		} catch (Exception $e) {
+			// Most problems won't have a sample input.
+			$file_content = '';
+		}
+		
+		return $file_content;
+	}
+
+	/**
 	 * Get the type of statement that was requested.
 	 * HTML is the default if statement_type unspecified in the request.
 	 * 
@@ -901,6 +922,14 @@ class ProblemController extends Controller {
 
 		} else if ($r["problem"]->getServer() == 'uva') {
 			$response["problem_statement"] = '<iframe src="http://acm.uva.es/p/v' . substr($r["problem"]->getRemoteId(), 0, strlen($r["problem"]->getRemoteId()) - 2) . '/' . $r["problem"]->getRemoteId() . '.html"></iframe>';
+		}
+
+		// Add the example input.
+		Cache::getFromCacheOrSet(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in",
+			$r, 'ProblemController::getSampleInput', $sample_input,
+			APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
+		if (!empty($sample_input)) {
+			$response['sample_input'] = $sample_input;
 		}
 
 		// Add the problem the response

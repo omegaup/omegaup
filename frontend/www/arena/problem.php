@@ -29,6 +29,7 @@ $smarty->assign('karel_problem', count(array_intersect(
 	explode(',', $result['languages']),
 	array('kp', 'kj')
 )) == 2);
+$smarty->assign('sample_input', $result['sample_input']);
 
 $result['user'] = array(
 	'logged_in' => $session['valid'],

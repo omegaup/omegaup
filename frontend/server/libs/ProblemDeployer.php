@@ -537,6 +537,12 @@ class ProblemDeployer {
 					$this->idlFile = $zip->getNameIndex($i);
 				}
 			}
+
+			// Example inputs.
+			if (stripos($zip->getNameIndex($i), 'examples/') === 0 &&
+				ProblemDeployer::endsWith($zip->getNameIndex($i), ".in", true)) {
+					$this->filesToUnzip[] = $zip->getNameIndex($i);
+			}
 		}
 
 		$this->checkedForInteractive = true;
