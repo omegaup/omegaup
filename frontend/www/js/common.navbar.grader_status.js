@@ -19,6 +19,7 @@
 						$("#grader-status > a").addClass("grader-warning");
 					}
 					html += "<li><a href=\"#\">Grader OK</a></li>";
+					html += "<li><a href=\"#\">Broadcaster sockets: " + graderInfo.broadcaster_sockets + "</a></li>";
 					html += "<li><a href=\"#\">Embedded runner: " + graderInfo.embedded_runner + "</a></li>";
 					html += "<li><a href=\"#\">Queues: <pre style=\"width: 50em;\">" + OmegaUp.ui.prettyPrintJSON(graderInfo.queue) + "</pre></a></li>";
 				} else {

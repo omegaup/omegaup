@@ -171,12 +171,14 @@ Arena.prototype.connectSocket = function() {
 			$('#title .socket-status').html('&cross;').css('color', '#800');
 			self.socket = null;
 			clearInterval(self.socket_keepalive);
+			setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
 			console.error(e);
 		};
 		self.socket.onerror = function(e) {
 			$('#title .socket-status').html('&cross;').css('color', '#800');
 			self.socket = null;
 			clearInterval(self.socket_keepalive);
+			setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
 			console.error(e);
 		};
 	} catch (e) {
