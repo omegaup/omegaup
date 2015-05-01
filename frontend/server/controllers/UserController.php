@@ -562,6 +562,7 @@ class UserController extends Controller {
 				"OMI2015-VER" => 4,
 				"OMI2015-YUC" => 4,
 				"OMI2015-ZAC" => 4,
+				"OMI2015-INV" => 4,
 			);
 		} else if ($r["contest_type"] == "OMIPS") {
 			
