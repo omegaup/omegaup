@@ -38,7 +38,11 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 	$response = ApiCaller::call($r);
 
 	if ($response["status"] == "error") {
-		$smarty->assign('STATUS_ERROR', $response["error"]);
+		if (empty($response["error"])) {
+			$smarty->assign('STATUS_ERROR', "{error}");
+		} else {
+			$smarty->assign('STATUS_ERROR', $response["error"]);
+		}
 		$smarty->assign('TITLE', $_POST["title"]);
 		$smarty->assign('ALIAS', $_POST["alias"]);
 		$smarty->assign('VALIDATOR', $_POST["validator"]);

@@ -449,11 +449,15 @@ class ProblemDeployer {
 		// LOL RegEx magic to get test case names from testplan
 		preg_match_all('/^\\s*([^#]+?)\\s+(\\d+)\\s*$/m', $testplan, $testplan_array);
 
+		if (count($testplan_array[1]) == 0) {
+				throw new InvalidParameterException("problemDeployerTestplanEmpty", NULL);
+		}
+
 		for ($i = 0; $i < count($testplan_array[1]); $i++) {
 			// Check .in file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.in';
 			if ($zip->getFromName($path) === FALSE) {
-				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
+				throw new InvalidParameterException("problemDeployerTestplanCaseMissing", NULL,
 					array('file' => $testplan_array[1][$i]));
 			}
 
@@ -463,11 +467,24 @@ class ProblemDeployer {
 			// Check .out file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.out';
 			if ($zip->getFromName($path) === FALSE) {
-				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
+				throw new InvalidParameterException("problemDeployerTestplanCaseMissing", NULL,
 					array('file' => $testplan_array[1][$i]));
 			}
 
 			$this->filesToUnzip[] = $path;
+		}
+
+		// Reverse check: are all cases in the testplan?
+		for ($i = 0; $i < count($zipFilesArray); $i++) {
+			$path = $zipFilesArray[$i];
+			if (strpos($path, "cases/") !== 0 ||
+				!ProblemDeployer::endsWith($path, ".in", true)) continue;
+			$caseName = substr($path, strlen("cases/"));
+			$caseName = substr($caseName, 0, strlen($caseName) - 3);
+			if (!in_array($caseName, $testplan_array[1])) {
+				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
+					array('file' => $caseName));
+			}
 		}
 
 		return true;
