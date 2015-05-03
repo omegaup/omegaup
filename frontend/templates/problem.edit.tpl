@@ -33,7 +33,7 @@
 						<div class="panel">
 							<ul class="nav nav-tabs">
 								<li class="active"><a href="#statement-source" data-toggle="tab">Source</a></li>
-								<li><a href="#statement-preview" data-toggle="tab">Preview</a></li>
+								<li><a id="statement-preview-link" href="#statement-preview" data-toggle="tab">Preview</a></li>
 							</ul>
 							
 							<div class="tab-content">
@@ -263,9 +263,6 @@
 	
 		var md_converter = Markdown.getSanitizingConverter();
 		md_editor = new Markdown.Editor(md_converter, '-statement');		// Global.
-		md_editor.hooks.chain("onPreviewRefresh", function() {ldelim}
-			MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#wmd-preview').get(0)]);
-		{rdelim});
 		md_editor.run();
 	})();
 	
@@ -308,6 +305,10 @@
 			}
 		}, "markdown");
 	}
+
+	$('#statement-preview-link').on('show.bs.tab', function(e) {
+		MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#wmd-preview').get(0)]);
+	});
 </script>
 
 {include file='footer.tpl'}
