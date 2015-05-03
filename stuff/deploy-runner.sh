@@ -77,7 +77,7 @@ $UPGRADE_COMMAND
 # Install all required packages
 if [ ! -d /opt/omegaup ]; then
 	apt-get update -y
-	apt-get install -y g++ fp-compiler openjdk-7-jdk ruby libgfortran3 ghc
+	apt-get install -y g++ fp-compiler openjdk-8-jdk ruby libgfortran3 ghc
 	mkdir /opt/omegaup
 fi
 
@@ -126,7 +126,7 @@ EOF
 cat $TMPDIR/setup-runner $TMPDIR/runner-distrib.tar.bz2 > $TARGET
 
 # Deploy the payload
-scp $TARGET $USERNAME@$HOSTNAME:~
-ssh $USERNAME@$HOSTNAME -C "sudo /bin/bash ~/runner-distrib.sh"
+scp $IDENTITY $TARGET $USERNAME@$HOSTNAME:~
+ssh $IDENTITY $USERNAME@$HOSTNAME -C "sudo /bin/bash ~/runner-distrib.sh"
 
 rm -rf $TMPDIR
