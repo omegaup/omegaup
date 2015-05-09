@@ -207,11 +207,9 @@ class CreateUserTest extends OmegaupTestCase {
 	 * Admin can verify users only with username
 	 * Testing invalid username
 	 * 
-	 * @expectedException InvalidParameterException
+	 * @expectedException NotFoundException
 	 */
 	public function testUsernameVerificationByAdminInvalidUsername() {
-			
-		
 		// Admin will verify $user
 		$admin = UserFactory::createAdminUser();
 		

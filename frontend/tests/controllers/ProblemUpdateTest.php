@@ -35,9 +35,8 @@ class UpdateProblemTest extends OmegaupTestCase {
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 		
 		// Update Problem calls grader to rejudge, we need to detour grader calls
-		// We will submit 2 runs to the problem, so we can expect 2 calls to grader
-		// to rejudge them
-		$this->detourGraderCalls($this->exactly(2));
+		// We will submit 2 runs to the problem, a call to grader to rejudge them
+		$this->detourGraderCalls($this->exactly(1));
 		
 		// Prepare request
 		$r = new Request();
