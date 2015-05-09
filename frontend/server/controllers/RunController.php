@@ -315,6 +315,42 @@ class RunController extends Controller {
 	}
 
 	/**
+	 * Validate request of admin details
+	 * 
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateAdminDetailsRequest(Request $r) {
+		Validators::isStringNonEmpty($r["run_alias"], "run_alias");
+
+		try {
+			$r["run"] = RunsDAO::getByAlias($r["run_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["run"])) {
+			throw new NotFoundException("runNotFound");
+		}
+
+		try {
+			$r["problem"] = ProblemsDAO::getByPK($r['run']->problem_id);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["problem"])) {
+			throw new NotFoundException("problemNotFound");
+		}
+
+		if (!(Authorization::IsProblemAdmin($r["current_user_id"], $r["problem"]))) {
+			throw new ForbiddenAccessException("userNotAllowed");
+		}
+	}
+
+	/**
 	 * Get basic details of a run
 	 * 
 	 * @param Request $r
@@ -432,18 +468,7 @@ class RunController extends Controller {
 
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
-		self::validateDetailsRequest($r);
-
-		if (!(Authorization::CanEditRun($r["current_user_id"], $r["run"]))) {
-			throw new ForbiddenAccessException("userNotAllowed");
-		}
-
-		// Get the problem
-		try {
-			$r["problem"] = ProblemsDAO::getByPK($r["run"]->getProblemId());
-		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
-		}
+		self::validateAdminDetailsRequest($r);
 		
 		$response = array();
 
@@ -564,16 +589,7 @@ class RunController extends Controller {
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 
-		self::validateDetailsRequest($r);
-
-		$r['problem'] = ProblemsDAO::getByPK($r['run']->problem_id);
-		$r['contest'] = !is_null($r['run']->contest_id) ?
-			ContestsDAO::getByPK($r['run']->contest_id) : null;
-
-		if (!Authorization::IsProblemAdmin($r['current_user_id'], $r['problem']) &&
-		    (is_null($r['contest']) || Authorization::IsContestAdmin($r['current_user_id'], $r['contest']))) {
-			throw new ForbiddenAccessException("userNotAllowed");
-		}
+		self::validateAdminDetailsRequest($r);
 
 		$grade_dir = RunController::getGradePath($r['run']);
 		$results_zip = "$grade_dir/results.zip";
