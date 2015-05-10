@@ -61,6 +61,7 @@ $(document).ready(function() {
 				$('#problem-list').append(prob);
 
 				$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
+				$('select.runsproblem').append('<option value="' + problem.alias + '">' + problemName + '</option>');
 			}
 
 			arena.setupPolls();
