@@ -146,7 +146,7 @@
 							</select>
 								
 							<label for="runsusername">Usuario: </label>
-							<input id="runsusername" type="text"  size='20'/>
+							<input id="runsusername" type="text" class="typeahead form-control" autocomplete="off"/>
 							<button type="button" class="close" id="runsusername-clear" style="float: none;">&times;</button>
 								
 						</div>

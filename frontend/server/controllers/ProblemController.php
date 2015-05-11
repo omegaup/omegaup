@@ -925,6 +925,7 @@ class ProblemController extends Controller {
 		}
 
 		// Add the example input.
+		$sample_input = null;
 		Cache::getFromCacheOrSet(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in",
 			$r, 'ProblemController::getSampleInput', $sample_input,
 			APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
@@ -1056,6 +1057,13 @@ class ProblemController extends Controller {
 		if ($r['show_all']) {
 			if (!Authorization::CanEditProblem($r['current_user_id'], $r['problem'])) {
 				throw new ForbiddenAccessException();
+			}
+			if (!is_null($r['username'])) {
+				try {
+					$r['user'] = UsersDAO::FindByUsername($r['username']);
+				} catch (Exception $e) {
+					throw new NotFoundException('userNotFound');
+				}
 			}
 			try {
 				$runs = RunsDAO::GetAllRuns(
