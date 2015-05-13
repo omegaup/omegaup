@@ -14,9 +14,10 @@
 				<h4>{#loginFederated#}</h4>
 
 				<div 
-					id="signinButton">
-					<span class="g-signin"
-						title="log in with Google"
+					id="signinButton"
+					title="{#loginWithGoogle#}"
+					class="openid_large_btn">
+					<span class="g-signin "
 						data-scope="email"
 						data-clientid="{$GOOGLECLIENTID}"
 						data-redirecturi="postmessage"
@@ -25,15 +26,11 @@
 					</span>
 				</div>
 
-				&nbsp;&nbsp;&nbsp;
-
 				<a href="{$FB_URL}"
-					title="log in with Facebook"
-					style="background: #fff url(/css/openid-logos.png); background-position: -1px -456px"
+					title="{#loginWithFacebook#}"
 					class="facebook openid_large_btn"></a>
-
 				<a style="float:right"></a>
-				<br>
+
 			</div>
 
 			<div class="col-md-4">

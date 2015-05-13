@@ -163,6 +163,8 @@ OmegaUp.T = {
 	loginRepeatPassword: "Repeat password",
 	loginSignUp: "Register",
 	loginSignupHeader: "Create an omegaUp account, quick and easy!",
+	loginWithFacebook: "Login with Facebook",
+	loginWithGoogle: "Log in with Google",
 	mailInUse: "This mail is already in use. Try again.",
 	makePrivate: "Make private",
 	makePublic: "Make public",

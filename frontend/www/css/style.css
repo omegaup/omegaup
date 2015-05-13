@@ -3,7 +3,6 @@ html { height: 100%; }
 body {
 	height: 100%;
 	margin: 0;
-	/*font: 13px "lucida grande",tahoma,verdana,arial,sans-serif;*/
 	background: #e4e8ec linear-gradient(to top, #e4e8ec, #f3f6f9) fixed no-repeat;
 	-webkit-font-smoothing: antialiased;
 }
@@ -22,21 +21,6 @@ div#title {
 	margin-right: auto;
 }
 
-.openid_large_btn {
-	width: 120px;
-	height: 60px;
-	border: 2px solid #DDD;
-	border-right: 2px solid #CCC;
-	border-bottom: 2px solid #CCC;
-	margin: 3px;
-	float: left;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	box-shadow: 2px 2px 4px #DDD;
-	-moz-box-shadow: 2px 2px 4px #ddd;
-	-webkit-box-shadow: 2px 2px 4px #DDD;
-}
 
 #status {
 	max-width: 900px;
@@ -44,89 +28,95 @@ div#title {
 	margin-right: auto;
 }
 
-
 div.post {
-    background: #fff /*url(../media/line.png)*/; -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.18);
-    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.18);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    padding-top: 20px;
+	background: #fff /*url(../media/line.png)*/; -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+	box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	padding-top: 20px;
 }
 
 a {
-    color: #8bb0d3;
-    text-decoration: none;
-    -webkit-transition: color 0.1s ease;
+	color: #8bb0d3;
+	text-decoration: none;
+	-webkit-transition: color 0.1s ease;
 }
+
 a:hover { color: #666 }
 /* 27 for baseline */
 
 h1{
-    margin-top: 10px;
-    padding: 0px 5px 0;
-    font-size: 26px;
-    -webkit-text-stroke: 1px transparent;
-    text-rendering: optimizeLegibility;
+	margin-top: 10px;
+	padding: 0px 5px 0;
+	font-size: 26px;
+	-webkit-text-stroke: 1px transparent;
+	text-rendering: optimizeLegibility;
 }
 
 div.title {
-    padding: 37px 50px 0;
-    font-size: 26px;
-    -webkit-text-stroke: 1px transparent;
-    text-rendering: optimizeLegibility;
+	padding: 37px 50px 0;
+	font-size: 26px;
+	-webkit-text-stroke: 1px transparent;
+	text-rendering: optimizeLegibility;
 }
 div.title a { color: #555 }
 div.title a:hover { color: #8bb0d3 }
 div.copy { padding: 16px; }
+
 div.copy h3 {
-font-size: 20px;
-line-height: 0px;
-font-weight: normal;
-background-color: #678DD7;
-padding: 15px;
-margin-left: -10px;
-margin-top: -10px;
-color: white;
-border-radius: 3px;
+	font-size: 20px;
+	line-height: 0px;
+	font-weight: normal;
+	background-color: #678DD7;
+	padding: 15px;
+	margin-left: -10px;
+	margin-top: -10px;
+	color: white;
+	border-radius: 3px;
 }
+
 div.copy p {
-    font-size: 13px;
-    line-height: 18px;
-    padding-bottom: 18px;
-    color: #888;
+	font-size: 13px;
+	line-height: 18px;
+	padding-bottom: 18px;
+	color: #888;
 }
+
 div.copy img {
-    background: #fff;
-    padding: 10px;
-    zborder: 1px solid #eee;
-    margin: 15px 0 20px -10px;
-    -webkit-box-shadow: -1px 1px 3px rgba(0,0,0,0.2);
-    -webkit-border-radius: 2px;
-    /*-webkit-transform: rotate(1deg);*/
+	background: #fff;
+	padding: 10px;
+	zborder: 1px solid #eee;
+	margin: 15px 0 20px -10px;
+	-webkit-box-shadow: -1px 1px 3px rgba(0,0,0,0.2);
+	-webkit-border-radius: 2px;
+	/*-webkit-transform: rotate(1deg);*/
 }
+
 div.copy code {
-    font-family: monospace;
-    font-size: 11px;
+	font-family: monospace;
+	font-size: 11px;
 }
+
 div.copy pre code {
-    display: block;
-    margin: 0 -50px 18px;
-    padding: 28px 50px;
-    background: #fcfcf5;
-    border-top: 1px solid #f3f3e3;
-    border-bottom: 1px solid #f3f3e3;
-    color: #777;
+	display: block;
+	margin: 0 -50px 18px;
+	padding: 28px 50px;
+	background: #fcfcf5;
+	border-top: 1px solid #f3f3e3;
+	border-bottom: 1px solid #f3f3e3;
+	color: #777;
 }
-div.copy.error { 
-	padding: 16px; 
+
+div.copy.error {
+	padding: 16px;
 	background-color: #ffffff;
 }
+
 div.copy.button { 
 	background-color: rgba(0, 0, 0, 0);
 	background-image: -webkit-linear-gradient(top, rgb(0, 192, 9) 0px, rgb(5, 122, 1) 100%);
-	
 	background-origin: padding-box;
 	background-size: auto;
 	border-bottom-color: rgb(2, 107, 0);
@@ -359,67 +349,55 @@ input[type=button],
 	text-align: center;
 }
 
-input[type=submit].OK,
-input[type=button].OK,
-.POS.Boton.OK,
-.Boton.OK {
-    border: 1px solid #29691D;
-    color: white;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
-    background: #3D9400;
-}
-
-
-input[type=submit].BAD,
-input[type=button].BAD,
-.POS.Boton.BAD,
-.Boton.BAD {
-    border: 1px solid red;
-    color: white;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
-    background: #3D9400;
-}
-
-
 input[type=submit]:hover,
 input[type=button]:hover,
 .POS.Boton:hover,
 .Boton:hover {
-    background-color: #F8F8F8;
-    background-image: -webkit-linear-gradient(top,#f8f8f8,#f1f1f1);
-    background-image: -moz-linear-gradient(top,#f8f8f8,#f1f1f1);
-    background-image: -ms-linear-gradient(top,#f8f8f8,#f1f1f1);
-    background-image: -o-linear-gradient(top,#f8f8f8,#f1f1f1);
-    background-image: linear-gradient(top,#f8f8f8,#f1f1f1);
-    border: 1px solid #C6C6C6;
-    color: #333;
+	background-color: #F8F8F8;
+	background-image: -webkit-linear-gradient(top,#f8f8f8,#f1f1f1);
+	background-image: -moz-linear-gradient(top,#f8f8f8,#f1f1f1);
+	background-image: -ms-linear-gradient(top,#f8f8f8,#f1f1f1);
+	background-image: -o-linear-gradient(top,#f8f8f8,#f1f1f1);
+	background-image: linear-gradient(top,#f8f8f8,#f1f1f1);
+	border: 1px solid #C6C6C6;
+	color: #333;
 }
 
 .openid_large_btn {
-    width: 100px;
-    height: 60px;
-    border: 2px solid #DDD;
-    border-right: 2px solid #CCC;
-    border-bottom: 2px solid #CCC;
-    margin: 3px;
-    float: left;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    box-shadow: 2px 2px 4px #DDD;
-    -moz-box-shadow: 2px 2px 4px #ddd;
-    -webkit-box-shadow: 2px 2px 4px #DDD;
+	width: 128px;
+	height: 38px;
+	border: 1px solid #DDD;
+	border-right: 2px solid #CCC;
+	border-bottom: 2px solid #CCC;
+	margin: 1px;
+	float: left;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	box-shadow: 2px 2px 4px #DDD;
+	-moz-box-shadow: 2px 2px 4px #ddd;
+	-webkit-box-shadow: 2px 2px 4px #DDD;
+	padding: 2px;
+}
+
+.facebook {
+	background: #fff url(/css/openid-logos.png);
+	background-position: -5px -474px;
+	background-repeat: no-repeat;
 }
 
 .clearfix::after {
-clear: both;
-content: ".";
-display: block;
-font-size: 0;
-height: 0;
-line-height: 0;
-visibility: hidden;
+	clear: both;
+	content: ".";
+	display: block;
+	font-size: 0;
+	height: 0;
+	line-height: 0;
+	visibility: hidden;
 }
+
+
+/* Todo esto se usa en profile.tpl */
 .fbSettingsList .fbSettingsListItemLabel {
 color: #333;
 float: left;
@@ -427,11 +405,11 @@ width: 165px;
 }
 
 .fbSettingsList .fbSettingsListItemSaved, .fbSettingsList .fbSettingsListItemEdit {
-color: #3B5998;
-float: right;
-padding-left: 25px;
-padding-right: 5px;
-text-align: right;
+	color: #3B5998;
+	float: right;
+	padding-left: 25px;
+	padding-right: 5px;
+	text-align: right;
 }
 
 ._4ks > li {
@@ -494,8 +472,6 @@ background: transparent;
 display: block;
 text-decoration: none;
 }
-
-
 
 .pvm {
 padding-top: 10px;

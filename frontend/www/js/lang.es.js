@@ -163,6 +163,8 @@ OmegaUp.T = {
 	loginRepeatPassword: "Repetir contrase&ntilde;a",
 	loginSignUp: "Registrar",
 	loginSignupHeader: "Crea una cuenta omegaUp, &#161;es f&aacute;cil y r&aacute;pido!",
+	loginWithFacebook: "Iniciar sesion con Facebook",
+	loginWithGoogle: "Iniciar sesion con Google",
 	mailInUse: "El email seleccionado ya está ocupado. Intenta con otro email válido.",
 	makePrivate: "Hacer privado",
 	makePublic: "Hacer público",

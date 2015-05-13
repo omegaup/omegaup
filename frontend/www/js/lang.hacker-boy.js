@@ -163,6 +163,8 @@ OmegaUp.T = {
 	loginRepeatPassword: "(R3p3a7 pa55w0rd)",
 	loginSignUp: "(R3gi573r)",
 	loginSignupHeader: "(Cr3a73 an 0m3gaUp acc0un7, quick and 3a5y!)",
+	loginWithFacebook: "(L0gin wi7h Fac3b00k)",
+	loginWithGoogle: "(L0g in wi7h G00g13)",
 	mailInUse: "(Thi5 mai1 i5 a1r3ady in u53. Try again.)",
 	makePrivate: "(Mak3 priva73)",
 	makePublic: "(Mak3 pub1ic)",
