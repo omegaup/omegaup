@@ -125,7 +125,7 @@ Arena.prototype.installLibinteractiveHooks = function() {
 
 Arena.prototype.connectSocket = function() {
 	var self = this;
-	if (!self.enableSockets || self.contestAlias == 'admin') {
+	if (self.practice || !self.enableSockets || self.contestAlias == 'admin') {
 		return false;
 	}
 
