@@ -1,5 +1,5 @@
 aliasInUse = "Alias ya existe"
-apiNotFound = "El API solicitada no fue encontra."
+apiNotFound = "El API solicitada no fue encontrada."
 arenaAdminManageProblem = "Administrar problema"
 arenaCommonCode = "C&oacute;digo"
 arenaCommonMemoryLimit = "Límite de memoria"
