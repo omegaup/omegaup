@@ -49,12 +49,12 @@
 								<th>{#wordsStatus#}</th>
 								<th>{#wordsPercentage#}</th>
 								<th>{#wordsPenalty#}</th>
-								<th>C&oacute;digo</th>
+								<th>{#wordsCode#}</th>
 							</tr>
 						</thead>
 						<tfoot>
 							<tr>
-								<td colspan="9"><a href="#problems/new-run">Nuevo envío</a></td>
+								<td colspan="9"><a href="#problems/new-run">{#wordsNewSubmissions#}</a></td>
 							</tr>
 						</tfoot>
 						<tbody class="run-list">
@@ -162,7 +162,7 @@
 							<th>{#wordsStatus#}</th>
 							<th>{#wordsPercentage#}</th>
 							<th>{#wordsPenalty#}</th>
-							<th>Rejuecear</th>
+							<th>{#wordsRejudge#}</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
 					</thead>
@@ -218,7 +218,7 @@
 			<form id="submit" method="POST">
 				<button class="close">&times;</button>
 				<div id="lang-select">
-					Lenguaje
+					{#wordsLanguage#}
 					<select name="language">
 						<option value=""></option>
 						<option value="cpp11">C++11</option>

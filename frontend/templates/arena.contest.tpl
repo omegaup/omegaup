@@ -110,12 +110,12 @@
 								<th>{#wordsPoints#}</th>
 {/if}
 								<th>{#wordsPenalty#}</th>
-								<th>C&oacute;digo</th>
+								<th>{#wordsCode#}</th>
 							</tr>
 						</thead>
 						<tfoot>
 							<tr>
-								<td colspan="9"><a href="#problems/run">Nuevo envío</a></td>
+								<td colspan="9"><a href="#problems/run">{#wordsNewSubmissions#}</a></td>
 							</tr>
 						</tfoot>
 						<tbody class="run-list">

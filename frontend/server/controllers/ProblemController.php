@@ -741,7 +741,7 @@ class ProblemController extends Controller {
 			"wo", "fy", "xh", "yi", "yo", "za", "zu");
 		Validators::isInEnum($r["lang"], "lang", $iso639_1, false /* is_required */);
 		if (is_null($r["lang"])) {
-			$r["lang"] = "es";
+			$r['lang'] = UserController::getPreferredLanguage($r);
 		}
 
 		$problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
@@ -780,11 +780,11 @@ class ProblemController extends Controller {
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias", false);
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
-		// Lang is optional. Default is ES
+		// Lang is optional. Default is user's preferred.
 		if (!is_null($r["lang"])) {
 			Validators::isStringOfMaxLength($r["lang"], "lang", 2);
 		} else {
-			$r["lang"] = "es";
+			$r['lang'] = UserController::getPreferredLanguage($r);
 		}
 
 		try {

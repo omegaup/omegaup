@@ -88,7 +88,10 @@ def pseudoloc(s):
 	return u'"(%s)"' % s.translate(table)
 
 for key, values in strings.iteritems():
-	values[PSEUDOLOC] = pseudoloc(values['en'])
+	if key == 'locale':
+	    values[PSEUDOLOC] = '"ps"'
+	else:
+	    values[PSEUDOLOC] = pseudoloc(values['en'])
 
 for lang in languages:
 	lang_path = os.path.join(templates_dir, lang + '.lang')
