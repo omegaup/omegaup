@@ -755,10 +755,6 @@ class ContestController extends Controller {
 			throw new InvalidParameterException("parameterNotFound", "problem_alias");
 		}
 
-		if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r["current_user_id"], $problem)) {
-			throw new ForbiddenAccessException("problemIsPrivate");
-		}
-
 		return array(
 			"contest" => $contest,
 			"problem" => $problem);
