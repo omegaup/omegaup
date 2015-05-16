@@ -362,6 +362,9 @@ class ProblemDeployer {
 		if (count($statements) < 1) {
 			throw new InvalidParameterException("problemDeployerNoStatements");
 		}
+		if (!in_array('statements/es.markdown', $statements)) {
+			throw new InvalidParameterException('spanishStatementMissing');
+		}
 
 		// Add statements to the files to be unzipped
 		foreach ($statements as $file) {
