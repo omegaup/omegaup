@@ -862,6 +862,13 @@ class ProblemController extends Controller {
 		return $file_content;
 	}
 
+	public static function isLanguageSupportedForProblem(Request $r) {
+		$statement_type = ProblemController::getStatementType($r);
+		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem"]->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r["lang"] . "." . $statement_type;
+
+		return file_exists($source_path);
+	}
+
 	/**
 	 * Gets the sample input from the filesystem.
 	 * 
@@ -928,19 +935,18 @@ class ProblemController extends Controller {
 			"languages", "slow", "stack_limit");
 
 		// Read the file that contains the source
-		if ($r["problem"]->getValidator() != 'remote') {
-
-			$statement_type = ProblemController::getStatementType($r);
-			Cache::getFromCacheOrSet(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . $statement_type,
-				$r, 'ProblemController::getProblemStatement', $file_content,
-				APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
-
-			// Add problem statement to source
-			$response["problem_statement"] = $file_content;
-
-		} else if ($r["problem"]->getServer() == 'uva') {
-			$response["problem_statement"] = '<iframe src="http://acm.uva.es/p/v' . substr($r["problem"]->getRemoteId(), 0, strlen($r["problem"]->getRemoteId()) - 2) . '/' . $r["problem"]->getRemoteId() . '.html"></iframe>';
+		if (!ProblemController::isLanguageSupportedForProblem($r)) {
+			// If there is no language file for the problem, return the spanish version.
+			$r['lang'] = 'es';
 		}
+		$statement_type = ProblemController::getStatementType($r);
+		Cache::getFromCacheOrSet(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . $statement_type,
+			$r, 'ProblemController::getProblemStatement', $file_content,
+			APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
+
+		// Add problem statement to source
+		$response["problem_statement"] = $file_content;
+		$response["problem_statement_language"] = $r['lang'];
 
 		// Add the example input.
 		$sample_input = null;
