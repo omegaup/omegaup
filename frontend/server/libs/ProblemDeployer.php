@@ -33,6 +33,7 @@ class ProblemDeployer {
 	private $idlFile = null;
 	private $created = false;
 	private $operation = null;
+	private $updatedLanguages = array();
 
 	public function __construct($alias, $operation) {
 		$this->log = Logger::getLogger("ProblemDeployer");
@@ -193,6 +194,7 @@ class ProblemDeployer {
 			FileHandler::CreateFile($markdownFile, $statement);
 			$this->current_markdown_file_contents = $statement;
 			$this->HTMLizeStatement($this->tmpDir, "$lang.markdown");
+			$this->updatedLanguages[] = $lang;
 		} catch (ApiException $e) {
 			throw new ProblemDeploymentFailedException($e->getMessage(), $e);
 		} catch (Exception $e) {
@@ -345,6 +347,15 @@ class ProblemDeployer {
 		}
 
 		return $max_runtime >= ProblemDeployer::SLOW_QUEUE_THRESHOLD ? 1 : 0;
+	}
+
+	/**
+	 * Returns the list of updated langauge files.
+	 *
+	 * @return array The list of updated languages
+	 */
+	public function getUpdatedLanguages() {
+		return $this->updatedLanguages;
 	}
 
 	/**
@@ -656,6 +667,7 @@ class ProblemDeployer {
 
 			// Deploy statement raw (.markdown) and transformed (.html)
 			$this->HTMLizeStatement($this->tmpDir, basename($statement));
+			$this->updatedLanguages[] = basename($statement, ".markdown");
 		}
 	}
 

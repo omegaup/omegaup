@@ -697,8 +697,10 @@ class ProblemController extends Controller {
 		$response["status"] = "ok";
 
 		// Invalidar problem statement cache @todo invalidar todos los lenguajes
-		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es" . "html");
-		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es" . "markdown");
+		foreach ($problemDeployer->getUpdatedLanguages() as $lang) {
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $lang . "html");
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $lang . "markdown");
+		}
 		Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in");
 
 		return $response;
@@ -720,11 +722,27 @@ class ProblemController extends Controller {
 		// Validate statement
 		Validators::isStringNonEmpty($r["statement"], "statement");
 		
-		// Check lang, default is "es", more languages to come...
-		Validators::isInEnum($r["lang"], "lang", array("en", "es"), false /* is_required */);
+		// Check that lang is in the ISO 639-1 code list, default is "es".
+		$iso639_1 = array("ab", "aa", "af", "ak", "sq", "am", "ar", "an", "hy",
+			"as", "av", "ae", "ay", "az", "bm", "ba", "eu", "be", "bn", "bh", "bi",
+			"bs", "br", "bg", "my", "ca", "ch", "ce", "ny", "zh", "cv", "kw", "co",
+			"cr", "hr", "cs", "da", "dv", "nl", "dz", "en", "eo", "et", "ee", "fo",
+			"fj", "fi", "fr", "ff", "gl", "ka", "de", "el", "gn", "gu", "ht", "ha",
+			"he", "hz", "hi", "ho", "hu", "ia", "id", "ie", "ga", "ig", "ik", "io",
+			"is", "it", "iu", "ja", "jv", "kl", "kn", "kr", "ks", "kk", "km", "ki",
+			"rw", "ky", "kv", "kg", "ko", "ku", "kj", "la", "lb", "lg", "li", "ln",
+			"lo", "lt", "lu", "lv", "gv", "mk", "mg", "ms", "ml", "mt", "mi", "mr",
+			"mh", "mn", "na", "nv", "nd", "ne", "ng", "nb", "nn", "no", "ii", "nr",
+			"oc", "oj", "cu", "om", "or", "os", "pa", "pi", "fa", "pl", "ps", "pt",
+			"qu", "rm", "rn", "ro", "ru", "sa", "sc", "sd", "se", "sm", "sg", "sr",
+			"gd", "sn", "si", "sk", "sl", "so", "st", "es", "su", "sw", "ss", "sv",
+			"ta", "te", "tg", "th", "ti", "bo", "tk", "tl", "tn", "to", "tr", "ts",
+			"tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "cy",
+			"wo", "fy", "xh", "yi", "yo", "za", "zu");
+		Validators::isInEnum($r["lang"], "lang", $iso639_1, false /* is_required */);
 		if (is_null($r["lang"])) {
 			$r["lang"] = "es";
-		}				
+		}
 
 		$problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
 		try {					
