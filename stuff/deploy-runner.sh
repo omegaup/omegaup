@@ -81,6 +81,13 @@ if [ ! -d /opt/omegaup ]; then
 	mkdir /opt/omegaup
 fi
 
+# Install some Haskell packages
+#if [ ! -f /usr/bin/cabal ]; then
+#  sudo apt-get install cabal-install
+#  sudo cabal update
+#  sudo cabal install --global vector array mtl logict lens pipes mwc-random hashtables aeson hashmap
+#fi
+
 # Install dnsmasq to hardcode the DNS reverse resolution
 if [ ! -f /etc/dnsmaq.d/omegaup.conf ]; then
 	apt-get install -y dnsmasq
