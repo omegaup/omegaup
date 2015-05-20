@@ -896,21 +896,21 @@ class UserController extends Controller {
 		if (is_null($r["user"])) {
 			throw new InvalidParameterException("parameterNotFound", "User");
 		}
-		
+
 		$response = array();
-		
+
 		Cache::getFromCacheOrSet(
-				Cache::USER_PROFILE, 
-				$r["user"]->getUsername(), 
-				$r, 
-				function(Request $r) { 										
-					return UserController::getProfileImpl($r["user"]);			
-				}, 
+				Cache::USER_PROFILE,
+				$r["user"]->getUsername(),
+				$r,
+				function(Request $r) {
+					return UserController::getProfileImpl($r["user"]);
+				},
 				$response
 		);
-				
+
 		$response["userinfo"]["rankinfo"] = self::getRankByProblemsSolved($r);
-		
+
 		// Do not leak plain emails in case the request is for a profile other than 
 		// the logged user's one
 		if ($r["user"]->getUserId() !== $r['current_user_id']) {
@@ -930,11 +930,11 @@ class UserController extends Controller {
 	public static function apiProfile(Request $r) {
 		
 		self::authenticateOrAllowUnauthenticatedRequest($r);
-			
+
 		$r["user"] = self::resolveTargetUser($r);
-		
-		$response = self::getProfile($r);		
-		
+
+		$response = self::getProfile($r);
+
 		$response["status"] = "ok";
 		return $response;
 	}
@@ -1235,13 +1235,13 @@ class UserController extends Controller {
 				throw new InvalidDatabaseOperationException($e);
 			}
 		}
-		
+
 		if ($r["state_id"] === 'null') {
 			$r["state_id"] = null;
 		}
-		
+
 		Validators::isNumber($r["state_id"], "state_id", false);
-		
+
 		if (!is_null($r["state_id"])) {
 			try {
 				$r["state"] = StatesDAO::getByPK($r["state_id"]);
@@ -1275,11 +1275,11 @@ class UserController extends Controller {
 				}
 			}
 		}
-		
+
 		Validators::isStringNonEmpty($r["scholar_degree"], "scholar_degree", false);
 		Validators::isDate($r["graduation_date"], "graduation_date", false);
 		Validators::isDate($r["birth_date"], "birth_date", false);
-		
+
 		if (!is_null($r["locale"])) {
 			// find language in Language
 			$query = LanguagesDAO::search(new Languages( array( "name" => $r["locale"])));
@@ -1295,22 +1295,27 @@ class UserController extends Controller {
 			"scholar_degree",
 			"school_id",
 			"graduation_date" => array("transform" => function($value) { return gmdate('Y-m-d', $value); }),
-			"birth_date"			=> array("transform" => function($value) { return gmdate('Y-m-d', $value); }),
+			"birth_date" => array("transform" => function($value) { return gmdate('Y-m-d', $value); }),
 		);
+
 		self::updateValueProperties($r, $r["current_user"], $valueProperties);
-		
+
 		try {
-			UsersDAO::save($r["current_user"]);			
+			UsersDAO::save($r["current_user"]);
 		} catch(Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		// Expire profile cache
-		Cache::deleteFromCache(Cache::USER_PROFILE, $r["current_user"]->getUsername());		
+
+		Cache::deleteFromCache(Cache::USER_PROFILE, $r["current_user"]->getUsername());
+		$sessionController = new SessionController();
+		$sessionController->InvalidateCache();
+
 
 		return array("status" => "ok");
 	}
-	
+
 	/**
 	 * If no username provided: Gets the top N users who have solved more problems
 	 * If username provided: Gets rank for username provided
