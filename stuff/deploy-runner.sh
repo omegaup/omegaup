@@ -32,7 +32,7 @@ mkdir -p $TMPDIR/distrib/minijail/{bin,lib,dist,scripts,bin}
 
 cp $ROOT/bin/runner.jar $TMPDIR/distrib/bin/runner.jar
 cp $JKS $TMPDIR/distrib/bin/omegaup.jks
-cp $ROOT/minijail/{minijail0,ldwrapper,libminijailpreload.so,minijail_syscall_helper} $TMPDIR/distrib/minijail/bin/
+cp $ROOT/minijail/{minijail0,ldwrapper,libminijailpreload.so} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/bin/{karel,kcl} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/stuff/libkarel.py $TMPDIR/distrib/minijail/lib/
 cp $ROOT/stuff/mkroot $TMPDIR/distrib/minijail/bin/
@@ -98,10 +98,6 @@ fi
 # Minijail needs sudopowers
 if [ "\`grep minijail0 /etc/sudoers\`" = "" ]; then
 	echo "omegaup ALL = NOPASSWD: /opt/omegaup/minijail/bin/minijail0" >> /etc/sudoers
-fi
-
-if [ "\`sudo grep minijail_syscall_helper /etc/sudoers\`" = "" ]; then
-	echo "omegaup ALL = NOPASSWD: /opt/omegaup/minijail/bin/minijail_syscall_helper" >> /etc/sudoers
 fi
 
 # Add the user if not present
