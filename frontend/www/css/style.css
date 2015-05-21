@@ -364,7 +364,8 @@ input[type=button]:hover,
 }
 
 .openid_large_btn {
-	width: 128px;
+	width: auto;
+	min-width: 95px;
 	height: 38px;
 	border: 1px solid #DDD;
 	border-right: 2px solid #CCC;
