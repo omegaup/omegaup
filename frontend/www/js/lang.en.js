@@ -27,6 +27,7 @@ OmegaUp.T = {
 	contestAddproblemProblemPoints: "Points this problem is worth",
 	contestAddproblemProblemRemove: "Remove",
 	contestAddproblemRegisteredProblems: "Problems in this contest",
+	contestAddproblemTooManyProblems: "This contest has too many problems, so it is not possible to add a new one",
 	contestAdduserAddContestant: "Add contestant",
 	contestAdduserAddUser: "Add user",
 	contestAdduserRegisteredUserDelete: "Remove",

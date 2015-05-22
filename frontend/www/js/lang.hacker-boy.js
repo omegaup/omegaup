@@ -27,6 +27,7 @@ OmegaUp.T = {
 	contestAddproblemProblemPoints: "(P0in75 7hi5 pr0b13m i5 w0r7h)",
 	contestAddproblemProblemRemove: "(R3m0v3)",
 	contestAddproblemRegisteredProblems: "(Pr0b13m5 in 7hi5 c0n7357)",
+	contestAddproblemTooManyProblems: "(Thi5 c0n7357 ha5 700 many pr0b13m5, 50 i7 i5 n07 p055ib13 70 add a n3w 0n3)",
 	contestAdduserAddContestant: "(Add c0n7357an7)",
 	contestAdduserAddUser: "(Add u53r)",
 	contestAdduserRegisteredUserDelete: "(R3m0v3)",
