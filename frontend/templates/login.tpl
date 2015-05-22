@@ -109,5 +109,5 @@
 </div>
 
 <script type="text/javascript" src="/js/login.js"></script>
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+<script src="https://apis.google.com/js/platform.js?onload=renderButton" defer></script>
 {include file='footer.tpl'}
