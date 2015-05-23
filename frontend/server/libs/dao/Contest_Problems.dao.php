@@ -26,7 +26,7 @@ class ContestProblemsDAO extends ContestProblemsDAOBase
 		// Build SQL statement
 		$sql = 'SELECT COUNT(cp.problem_id) ' .
 		       'FROM Contest_Problems cp ' .
-		       'WHERE cp.contest_id = ?;';
+		       'WHERE cp.contest_id = ?';
 		$val = array($contest_id);
 
 		global $conn;
