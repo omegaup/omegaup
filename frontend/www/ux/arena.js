@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	Date.setLocale("es");
+	Date.setLocale(OmegaUp.T.locale);
 	
 	function makeWorldClockLink(date) {
 		try {
@@ -11,7 +11,7 @@ $(document).ready(function() {
 	
 	function convertSecondsToReadableTime(seconds) {
 		var time = new Date(seconds);
-		return time.format('{h}h {mm}m', 'es');
+		return time.format('{h}h {mm}m', OmegaUp.T.locale);
 	}
 	
 	var omegaup = new OmegaUp();
@@ -32,7 +32,7 @@ $(document).ready(function() {
 					'<td class="no-wrap"><a href="' + makeWorldClockLink(start) + '">' + start.long() + '</a></td>' +
 					'<td class="no-wrap"><a href="' + makeWorldClockLink(end) + '">' + end.long() + '</a></td>' + 
 					'<td class="no-wrap">' + toHHMM(list[i].duration) + '</td>' +
-					'<td>' + (end < now ? '<a href="/arena/' + list[i].alias + '/practice/">Práctica</a>' : '') + '</td>' +
+					'<td>' + (end < now ? '<a href="/arena/' + list[i].alias + '/practice/">' + OmegaUp.T.wordsPractice + '</a>' : '') + '</td>' +
 				'</tr>')
 			);
 		}

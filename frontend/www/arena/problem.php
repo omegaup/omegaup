@@ -14,6 +14,7 @@ try {
 }
 
 $smarty->assign('problem_statement', $result['problem_statement']);
+$smarty->assign('problem_statement_language', $result['problem_statement_language']);
 $smarty->assign('problem_alias', $result['alias']);
 $smarty->assign('public', $result['public']);
 $smarty->assign('source', $result['source']);
@@ -29,6 +30,9 @@ $smarty->assign('karel_problem', count(array_intersect(
 	explode(',', $result['languages']),
 	array('kp', 'kj')
 )) == 2);
+if (isset($result['sample_input'])) {
+	$smarty->assign('sample_input', $result['sample_input']);
+}
 
 $result['user'] = array(
 	'logged_in' => $session['valid'],

@@ -1089,16 +1089,20 @@ OmegaUp.prototype.getMyContests = function(callback) {
 	});
 };
 
-OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, statement_type, show_solvers) {
+OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, statement_type, show_solvers, language) {
 	var self = this;
 	if (statement_type === undefined) {
 		statement_type = "html";
+	}
+	var params = {statement_type:statement_type, show_solvers: !!show_solvers};
+	if (language) {
+		params.lang = language;
 	}
 	$.post(
 		contestAlias === null ? 
 			'/api/problem/details/problem_alias/' + encodeURIComponent(problemAlias) + '/' :
 			'/api/problem/details/contest_alias/' + encodeURIComponent(contestAlias) + '/problem_alias/' + encodeURIComponent(problemAlias) + '/',
-		{lang:"es", statement_type:statement_type, show_solvers: !!show_solvers},
+		params,
 		function (problem) {
 			if (problem.runs) {
 				for (var i = 0; i < problem.runs.length; i++) {

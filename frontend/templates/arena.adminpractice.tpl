@@ -38,7 +38,7 @@
 							</select>
 							
 							<label for="runsproblem">Problema: </label>
-							<input id="runsproblem" type="text"  size='20'/>
+							<input id="runsproblem" type="text" class="typeahead form-control" autocomplete="off" />
 							<button type="button" class="close" id="runsproblem-clear" style="float: none;">&times;</button>
 							
 							<label for="runslang">Lenguaje: </label>
@@ -58,7 +58,7 @@
 							</select>
 								
 							<label for="runsusername">Usuario: </label>
-							<input id="runsusername" type="text"  size='20'/>
+							<input id="runsusername" type="text" class="typeahead form-control" autocomplete="off"/>
 							<button type="button" class="close" id="runsusername-clear" style="float: none;">&times;</button>
 							
 						</div>

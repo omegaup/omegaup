@@ -32,7 +32,7 @@ mkdir -p $TMPDIR/distrib/minijail/{bin,lib,dist,scripts,bin}
 
 cp $ROOT/bin/runner.jar $TMPDIR/distrib/bin/runner.jar
 cp $JKS $TMPDIR/distrib/bin/omegaup.jks
-cp $ROOT/minijail/{minijail0,ldwrapper,libminijailpreload.so,minijail_syscall_helper} $TMPDIR/distrib/minijail/bin/
+cp $ROOT/minijail/{minijail0,ldwrapper,libminijailpreload.so} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/bin/{karel,kcl} $TMPDIR/distrib/minijail/bin/
 cp $ROOT/stuff/libkarel.py $TMPDIR/distrib/minijail/lib/
 cp $ROOT/stuff/mkroot $TMPDIR/distrib/minijail/bin/
@@ -77,9 +77,16 @@ $UPGRADE_COMMAND
 # Install all required packages
 if [ ! -d /opt/omegaup ]; then
 	apt-get update -y
-	apt-get install -y g++ fp-compiler openjdk-7-jdk ruby libgfortran3 ghc
+	apt-get install -y g++ fp-compiler openjdk-8-jdk ruby libgfortran3 ghc
 	mkdir /opt/omegaup
 fi
+
+# Install some Haskell packages
+#if [ ! -f /usr/bin/cabal ]; then
+#  sudo apt-get install cabal-install
+#  sudo cabal update
+#  sudo cabal install --global vector array mtl logict lens pipes mwc-random hashtables aeson hashmap
+#fi
 
 # Install dnsmasq to hardcode the DNS reverse resolution
 if [ ! -f /etc/dnsmaq.d/omegaup.conf ]; then
@@ -91,10 +98,6 @@ fi
 # Minijail needs sudopowers
 if [ "\`grep minijail0 /etc/sudoers\`" = "" ]; then
 	echo "omegaup ALL = NOPASSWD: /opt/omegaup/minijail/bin/minijail0" >> /etc/sudoers
-fi
-
-if [ "\`sudo grep minijail_syscall_helper /etc/sudoers\`" = "" ]; then
-	echo "omegaup ALL = NOPASSWD: /opt/omegaup/minijail/bin/minijail_syscall_helper" >> /etc/sudoers
 fi
 
 # Add the user if not present
@@ -126,7 +129,7 @@ EOF
 cat $TMPDIR/setup-runner $TMPDIR/runner-distrib.tar.bz2 > $TARGET
 
 # Deploy the payload
-scp $TARGET $USERNAME@$HOSTNAME:~
-ssh $USERNAME@$HOSTNAME -C "sudo /bin/bash ~/runner-distrib.sh"
+scp $IDENTITY $TARGET $USERNAME@$HOSTNAME:~
+ssh $IDENTITY $USERNAME@$HOSTNAME -C "sudo /bin/bash ~/runner-distrib.sh"
 
 rm -rf $TMPDIR

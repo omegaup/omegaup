@@ -749,86 +749,86 @@ class UserController extends Controller {
 	 * @return String
 	 */
 	public static function getPreferredLanguage(Request $r = NULL) {
-		$found = FALSE;
-		$result = "es";
-
 		// for quick debugging 
 		if (isset($_GET["lang"])) {
-			$result = $_GET["lang"];
-			$found = TRUE;
+			return UserController::convertToSupportedLanguage($_GET["lang"]);
 		}
-		if (!$found) {
-			try {
-				$user = self::resolveTargetUser($r);
-				if (!is_null($user) && !is_null($user->getLanguageId())) {
-					$result = LanguagesDAO::getByPK($user->getLanguageId());
-					if (is_null($result)) {
-						self::$log->warn("Invalid language id for user");
-					} else {
-						$result = $result->getName();
-						$found = true;
-					}
+
+		try {
+			$user = self::resolveTargetUser($r);
+			if (!is_null($user) && !is_null($user->getLanguageId())) {
+				$result = LanguagesDAO::getByPK($user->getLanguageId());
+				if (is_null($result)) {
+					self::$log->warn("Invalid language id for user");
+				} else {
+					return UserController::convertToSupportedLanguage($result->getName());
 				}
-			} catch (NotFoundException $ex) {
-				$found = false;
-			} catch (InvalidParameterException $ex) {
-				$found = false;
+			}
+		} catch (NotFoundException $ex) {
+			self::$log->debug($ex);
+		} catch (InvalidParameterException $ex) {
+			self::$log->debug($ex);
+		}
+
+		$langs = array();
+
+		if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+			// break up string into pieces (languages and q factors)
+			preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+
+			if (count($lang_parse[1])) {
+				// create a list like "en" => 0.8
+				$langs = array_combine($lang_parse[1], $lang_parse[4]);
+
+				// set default to 1 for any without q factor
+				foreach ($langs as $lang => $val) {
+					if ($val === '') $langs[$lang] = 1;
+				}
+
+				// sort list based on value	
+				arsort($langs, SORT_NUMERIC);
 			}
 		}
 
-		if (!$found) {
-			$langs = array();
+		foreach ($langs as $langCode => $langWeight) {
+			switch (substr($langCode, 0, 2)) {
+				case "en":
+					return "en";
 
-			if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-				// break up string into pieces (languages and q factors)
-				preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+				case "es":
+					return "es";
 
-				if (count($lang_parse[1])) {
-					// create a list like "en" => 0.8
-					$langs = array_combine($lang_parse[1], $lang_parse[4]);
-
-					// set default to 1 for any without q factor
-					foreach ($langs as $lang => $val) {
-						if ($val === '') $langs[$lang] = 1;
-					}
-
-					// sort list based on value	
-					arsort($langs, SORT_NUMERIC);
-				}
-			}
-
-			foreach ($langs as $langCode => $langWeight) {
-				switch (substr($langCode, 0, 2)) {
-					case "en":
-						$result = "en";
-						$found = true;
-					break;
-
-					case "es":
-						$result = "es";
-						$found = true;
-					break;
-				}
+				case "pt":
+					return "pt";
 			}
 		}
 
+		// Fallback to spanish.
+		return "es";
+	}
+
+	private static function convertToSupportedLanguage($lang) {
 		switch ($result) {
 			case "en":
 			case "en-us":
-				$result = "en";
-				break;
+				return "en";
 
 			case "es":
 			case "es-mx":
-				$result = "es";
-				break;
+				return "es";
+
+			case "pt":
+			case "pt-pt":
+			case "pt-br":
+				return "pt";
 
 			case "ps":
 			case "ps-ps":
-				$result = "hacker-boy";
-				break;
+				return "hacker-boy";
 		}
-		return $result;
+
+		// Fallback to spanish.
+		return "es";
 	}
 
 
@@ -896,21 +896,21 @@ class UserController extends Controller {
 		if (is_null($r["user"])) {
 			throw new InvalidParameterException("parameterNotFound", "User");
 		}
-		
+
 		$response = array();
-		
+
 		Cache::getFromCacheOrSet(
-				Cache::USER_PROFILE, 
-				$r["user"]->getUsername(), 
-				$r, 
-				function(Request $r) { 										
-					return UserController::getProfileImpl($r["user"]);			
-				}, 
+				Cache::USER_PROFILE,
+				$r["user"]->getUsername(),
+				$r,
+				function(Request $r) {
+					return UserController::getProfileImpl($r["user"]);
+				},
 				$response
 		);
-				
+
 		$response["userinfo"]["rankinfo"] = self::getRankByProblemsSolved($r);
-		
+
 		// Do not leak plain emails in case the request is for a profile other than 
 		// the logged user's one
 		if ($r["user"]->getUserId() !== $r['current_user_id']) {
@@ -930,11 +930,11 @@ class UserController extends Controller {
 	public static function apiProfile(Request $r) {
 		
 		self::authenticateOrAllowUnauthenticatedRequest($r);
-			
+
 		$r["user"] = self::resolveTargetUser($r);
-		
-		$response = self::getProfile($r);		
-		
+
+		$response = self::getProfile($r);
+
 		$response["status"] = "ok";
 		return $response;
 	}
@@ -1235,13 +1235,13 @@ class UserController extends Controller {
 				throw new InvalidDatabaseOperationException($e);
 			}
 		}
-		
+
 		if ($r["state_id"] === 'null') {
 			$r["state_id"] = null;
 		}
-		
+
 		Validators::isNumber($r["state_id"], "state_id", false);
-		
+
 		if (!is_null($r["state_id"])) {
 			try {
 				$r["state"] = StatesDAO::getByPK($r["state_id"]);
@@ -1275,11 +1275,11 @@ class UserController extends Controller {
 				}
 			}
 		}
-		
+
 		Validators::isStringNonEmpty($r["scholar_degree"], "scholar_degree", false);
 		Validators::isDate($r["graduation_date"], "graduation_date", false);
 		Validators::isDate($r["birth_date"], "birth_date", false);
-		
+
 		if (!is_null($r["locale"])) {
 			// find language in Language
 			$query = LanguagesDAO::search(new Languages( array( "name" => $r["locale"])));
@@ -1295,22 +1295,27 @@ class UserController extends Controller {
 			"scholar_degree",
 			"school_id",
 			"graduation_date" => array("transform" => function($value) { return gmdate('Y-m-d', $value); }),
-			"birth_date"			=> array("transform" => function($value) { return gmdate('Y-m-d', $value); }),
+			"birth_date" => array("transform" => function($value) { return gmdate('Y-m-d', $value); }),
 		);
+
 		self::updateValueProperties($r, $r["current_user"], $valueProperties);
-		
+
 		try {
-			UsersDAO::save($r["current_user"]);			
+			UsersDAO::save($r["current_user"]);
 		} catch(Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		// Expire profile cache
-		Cache::deleteFromCache(Cache::USER_PROFILE, $r["current_user"]->getUsername());		
+
+		Cache::deleteFromCache(Cache::USER_PROFILE, $r["current_user"]->getUsername());
+		$sessionController = new SessionController();
+		$sessionController->InvalidateCache();
+
 
 		return array("status" => "ok");
 	}
-	
+
 	/**
 	 * If no username provided: Gets the top N users who have solved more problems
 	 * If username provided: Gets rank for username provided

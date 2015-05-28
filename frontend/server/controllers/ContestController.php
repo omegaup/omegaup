@@ -6,6 +6,8 @@
  */
 class ContestController extends Controller {
 
+	const MAX_PROBLEMS_IN_CONTEST = 30;
+
 	/**
 	 * Returns a list of contests
 	 * 
@@ -281,7 +283,7 @@ class ContestController extends Controller {
 				"overall_wall_time_limit", "extra_wall_time", "memory_limit",
 				"visits", "submissions", "accepted", "dificulty", "order",
 				"languages");
-			$letter = ord('A');
+			$letter = 0;
 
 			foreach ($problemsInContest as $problemkey) {
 				try {
@@ -295,7 +297,7 @@ class ContestController extends Controller {
 				// Add the 'points' value that is stored in the ContestProblem relationship
 				$temp_array = $temp_problem->asFilteredArray($relevant_columns);
 				$temp_array["points"] = $problemkey->getPoints();
-				$temp_array['letter'] = chr($letter++);
+				$temp_array['letter'] = ContestController::columnName($letter++);
 
 				// Save our array into the response
 				array_push($problemsResponseArray, $temp_array);
@@ -333,6 +335,19 @@ class ContestController extends Controller {
 
 		$result["status"] = "ok";
 		return $result;
+	}
+
+	/**
+	 * Returns a "column name" for the $idx (think Excel column names).
+	 */
+	private static function columnName($idx) {
+		$name = chr(ord('A') + $idx % 26);
+		while ($idx >= 26) {
+			$idx /= 26;
+			$idx--;
+			$name = chr(ord('A') + $idx % 26) . $name;
+		}
+		return $name;
 	}
 
 	/**
@@ -608,6 +623,11 @@ class ContestController extends Controller {
 		// Validate the request and get the problem and the contest in an array
 		$params = self::validateAddToContestRequest($r);
 
+		if (ContestProblemsDAO::CountContestProblems($params['contest']->contest_id)
+				>= ContestController::MAX_PROBLEMS_IN_CONTEST) {
+			throw new PreconditionFailedException("contestAddproblemTooManyProblems");
+		}
+
 		try {
 			$relationship = new ContestProblems(array(
 						"contest_id" => $params["contest"]->getContestId(),
@@ -753,10 +773,6 @@ class ContestController extends Controller {
 
 		if (is_null($problem)) {
 			throw new InvalidParameterException("parameterNotFound", "problem_alias");
-		}
-
-		if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r["current_user_id"], $problem)) {
-			throw new ForbiddenAccessException("problemIsPrivate");
 		}
 
 		return array(

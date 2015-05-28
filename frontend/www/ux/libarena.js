@@ -125,7 +125,7 @@ Arena.prototype.installLibinteractiveHooks = function() {
 
 Arena.prototype.connectSocket = function() {
 	var self = this;
-	if (!self.enableSockets || self.contestAlias == 'admin') {
+	if (self.practice || !self.enableSockets || self.contestAlias == 'admin') {
 		return false;
 	}
 
@@ -171,12 +171,14 @@ Arena.prototype.connectSocket = function() {
 			$('#title .socket-status').html('&cross;').css('color', '#800');
 			self.socket = null;
 			clearInterval(self.socket_keepalive);
+			setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
 			console.error(e);
 		};
 		self.socket.onerror = function(e) {
 			$('#title .socket-status').html('&cross;').css('color', '#800');
 			self.socket = null;
 			clearInterval(self.socket_keepalive);
+			setTimeout(function() { self.setupPolls(); }, Math.random() * 15000);
 			console.error(e);
 		};
 	} catch (e) {
@@ -962,6 +964,17 @@ Arena.prototype.onHashChanged = function() {
 			var karel_langs = ['kp', 'kj'];
 			var language_array = problem.languages.split(',');
 			if (karel_langs.every(function(x) { return language_array.indexOf(x) != -1})) {
+				var original_href = $('#problem .karel-js-link a').attr('href');
+				var hash_index = original_href.indexOf('#');
+				if (hash_index != -1) {
+					original_href = original_href.substring(0, hash_index);
+				}
+				if (problem.sample_input) {
+					$('#problem .karel-js-link a').attr('href', original_href + '#mundo:'
+							+ encodeURIComponent(problem.sample_input));
+				} else {
+					$('#problem .karel-js-link a').attr('href', original_href);
+				}
 				$('#problem .karel-js-link').removeClass('hide');
 			} else {
 				$('#problem .karel-js-link').addClass('hide');
@@ -1031,6 +1044,7 @@ Arena.prototype.onHashChanged = function() {
 			omegaup.getProblem(self.contestAlias, problem.alias, function (problem_ext) {
 				problem.source = problem_ext.source;
 				problem.problem_statement = problem_ext.problem_statement;
+				problem.sample_input = problem_ext.sample_input;
 				problem.runs = problem_ext.runs;
 				update(problem);
 			});

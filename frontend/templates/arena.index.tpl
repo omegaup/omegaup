@@ -2,7 +2,7 @@
 			<div class="container" id="main">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h2 class="panel-title">Concursos actuales</h2>
+						<h2 class="panel-title">{#arenaCurrentContests#}</h2>
 					</div>
 					<table class="contest-list table table-striped table-hover">
 						<thead><tr>

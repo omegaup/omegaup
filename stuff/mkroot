@@ -246,6 +246,7 @@ with Chroot('root-compilers', '/') as root:
 	root.symlink('/usr/bin/ruby', '/usr/lib/ruby/2.1.0/ruby')
 	root.symlink('/usr/bin/python', '/usr/lib/python2.7/python')
 	root.symlink('/usr/bin/ghc', '/usr/lib/ghc/lib/ghc')
+	root.symlink('/usr/local/lib/x86_64-linux-ghc-7.6.3', '/usr/lib/ghc/x86_64-linux-ghc-7.6.3')
 	root.symlink('/tmp', '/home')
 
 	root.install('/usr/bin/ldwrapper', 'bin/ldwrapper')
@@ -271,3 +272,4 @@ with Chroot('root-ruby', '/usr/lib/ruby/') as root:
 
 with Chroot('root-hs', '/usr/lib/ghc/') as root:
 	root.copyfromhost('/usr/lib/ghc')
+	root.copyfromhost('/usr/local/lib/x86_64-linux-ghc-7.6.3/', relative_to='/usr/local/lib/')

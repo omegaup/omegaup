@@ -36,7 +36,8 @@ if (isset($_POST["request"])) {
 		$r = new Request(array(
 					"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 					"problem_alias" => $_POST["problem_alias"],
-					"statement" => $_POST["wmd-input-statement"]
+					"statement" => $_POST["wmd-input-statement"],
+					"lang" => $_POST["statement-language"]
 				));
 		$r->method = "ProblemController::apiUpdateStatement";
 		$response = ApiCaller::call($r);

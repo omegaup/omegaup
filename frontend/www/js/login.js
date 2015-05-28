@@ -31,11 +31,16 @@ $(document).ready(function() {
 	$("#register-form").submit(registerAndLogin);
 });
 
-function signInCallback(authResult) {
-	
-	//$('#google-signin').attr('style', 'display: none');
-	if (authResult['code']) {
+var logmeoutOnce = window.location.href.endsWith("?logout");
 
+function signInCallback(authResult) {
+
+	//$('#google-signin').attr('style', 'display: none');
+	if (logmeoutOnce) {
+		gapi.auth.signOut();
+		logmeoutOnce = false;
+
+	} else if (authResult['code']) {
 		omegaup.googleLogin(
 				authResult['code'],
 				function (data) {

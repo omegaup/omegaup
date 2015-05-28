@@ -28,11 +28,6 @@ class ScoreboardController extends Controller {
 		}
 		$id = $contest->getContestId();
 
-		$run = RunsDAO::getByPK((int)$r['run']);
-		if ($run === NULL) {
-			throw new NotFoundException();
-		}
-
 		Scoreboard::RefreshScoreboardCache($id);
 
 		return array(

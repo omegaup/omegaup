@@ -428,12 +428,12 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * Tests contest report used in OMI
 	 */
 	public function testContestReport() {
-		
-		// Get a problem
-		$problemData = ProblemsFactory::createProblem();
-
 		// Get a contest 
 		$contestData = ContestsFactory::createContest();
+		$contestDirector = $contestData["director"];
+
+		// Get a problem
+		$problemData = ProblemsFactory::createProblemWithAuthor($contestDirector);
 
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -444,7 +444,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 		array_push($contestants, UserFactory::createUser());
 		array_push($contestants, UserFactory::createUser());
 		
-		$contestDirector = $contestData["director"];
 		$contestAdmin = UserFactory::createUser();
 		ContestsFactory::addAdminUser($contestData, $contestAdmin);
 		

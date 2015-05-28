@@ -170,10 +170,16 @@ class SessionController extends Controller {
 		);
 	}
 
+	public function InvalidateCache() {
+		$a_CurrentSession = self::apiCurrentSession();
+		Cache::deleteFromCache(Cache::SESSION_PREFIX, $a_CurrentSession['auth_token']);
+	}
+
 	public function UnRegisterSession() {
+		$this->InvalidateCache();
+
 		$a_CurrentSession = self::apiCurrentSession();
 		$vo_AuthT = new AuthTokens(array("token" => $a_CurrentSession["auth_token"]));
-		Cache::deleteFromCache(Cache::SESSION_PREFIX, $a_CurrentSession['auth_token']);
 
 		// Expire the local session cache.
 		self::$current_session = null;

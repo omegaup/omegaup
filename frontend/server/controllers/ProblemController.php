@@ -697,8 +697,11 @@ class ProblemController extends Controller {
 		$response["status"] = "ok";
 
 		// Invalidar problem statement cache @todo invalidar todos los lenguajes
-		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es" . "html");
-		Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-es" . "markdown");
+		foreach ($problemDeployer->getUpdatedLanguages() as $lang) {
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $lang . "html");
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $lang . "markdown");
+		}
+		Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in");
 
 		return $response;
 	}
@@ -719,11 +722,27 @@ class ProblemController extends Controller {
 		// Validate statement
 		Validators::isStringNonEmpty($r["statement"], "statement");
 		
-		// Check lang, default is "es", more languages to come...
-		Validators::isInEnum($r["lang"], "lang", array("en", "es"), false /* is_required */);
+		// Check that lang is in the ISO 639-1 code list, default is "es".
+		$iso639_1 = array("ab", "aa", "af", "ak", "sq", "am", "ar", "an", "hy",
+			"as", "av", "ae", "ay", "az", "bm", "ba", "eu", "be", "bn", "bh", "bi",
+			"bs", "br", "bg", "my", "ca", "ch", "ce", "ny", "zh", "cv", "kw", "co",
+			"cr", "hr", "cs", "da", "dv", "nl", "dz", "en", "eo", "et", "ee", "fo",
+			"fj", "fi", "fr", "ff", "gl", "ka", "de", "el", "gn", "gu", "ht", "ha",
+			"he", "hz", "hi", "ho", "hu", "ia", "id", "ie", "ga", "ig", "ik", "io",
+			"is", "it", "iu", "ja", "jv", "kl", "kn", "kr", "ks", "kk", "km", "ki",
+			"rw", "ky", "kv", "kg", "ko", "ku", "kj", "la", "lb", "lg", "li", "ln",
+			"lo", "lt", "lu", "lv", "gv", "mk", "mg", "ms", "ml", "mt", "mi", "mr",
+			"mh", "mn", "na", "nv", "nd", "ne", "ng", "nb", "nn", "no", "ii", "nr",
+			"oc", "oj", "cu", "om", "or", "os", "pa", "pi", "fa", "pl", "ps", "pt",
+			"qu", "rm", "rn", "ro", "ru", "sa", "sc", "sd", "se", "sm", "sg", "sr",
+			"gd", "sn", "si", "sk", "sl", "so", "st", "es", "su", "sw", "ss", "sv",
+			"ta", "te", "tg", "th", "ti", "bo", "tk", "tl", "tn", "to", "tr", "ts",
+			"tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "cy",
+			"wo", "fy", "xh", "yi", "yo", "za", "zu");
+		Validators::isInEnum($r["lang"], "lang", $iso639_1, false /* is_required */);
 		if (is_null($r["lang"])) {
-			$r["lang"] = "es";
-		}				
+			$r['lang'] = UserController::getPreferredLanguage($r);
+		}
 
 		$problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
 		try {					
@@ -733,6 +752,7 @@ class ProblemController extends Controller {
 			// Invalidar problem statement cache
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "html");
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "markdown");			
+			Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in");
 		} catch (ApiException $e) {
 			throw $e;
 		} catch (Exception $e) {
@@ -760,11 +780,11 @@ class ProblemController extends Controller {
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias", false);
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
-		// Lang is optional. Default is ES
+		// Lang is optional. Default is user's preferred.
 		if (!is_null($r["lang"])) {
 			Validators::isStringOfMaxLength($r["lang"], "lang", 2);
 		} else {
-			$r["lang"] = "es";
+			$r['lang'] = UserController::getPreferredLanguage($r);
 		}
 
 		try {
@@ -842,6 +862,32 @@ class ProblemController extends Controller {
 		return $file_content;
 	}
 
+	public static function isLanguageSupportedForProblem(Request $r) {
+		$statement_type = ProblemController::getStatementType($r);
+		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem"]->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r["lang"] . "." . $statement_type;
+
+		return file_exists($source_path);
+	}
+
+	/**
+	 * Gets the sample input from the filesystem.
+	 * 
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 */
+	public static function getSampleInput(Request $r) {
+		$source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem"]->getAlias() . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . 'sample.in';
+
+		try {
+			$file_content = FileHandler::ReadFile($source_path);
+		} catch (Exception $e) {
+			// Most problems won't have a sample input.
+			$file_content = '';
+		}
+		
+		return $file_content;
+	}
+
 	/**
 	 * Get the type of statement that was requested.
 	 * HTML is the default if statement_type unspecified in the request.
@@ -889,18 +935,26 @@ class ProblemController extends Controller {
 			"languages", "slow", "stack_limit");
 
 		// Read the file that contains the source
-		if ($r["problem"]->getValidator() != 'remote') {
+		if (!ProblemController::isLanguageSupportedForProblem($r)) {
+			// If there is no language file for the problem, return the spanish version.
+			$r['lang'] = 'es';
+		}
+		$statement_type = ProblemController::getStatementType($r);
+		Cache::getFromCacheOrSet(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . $statement_type,
+			$r, 'ProblemController::getProblemStatement', $file_content,
+			APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
 
-			$statement_type = ProblemController::getStatementType($r);
-			Cache::getFromCacheOrSet(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . $statement_type,
-				$r, 'ProblemController::getProblemStatement', $file_content,
-				APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
+		// Add problem statement to source
+		$response["problem_statement"] = $file_content;
+		$response["problem_statement_language"] = $r['lang'];
 
-			// Add problem statement to source
-			$response["problem_statement"] = $file_content;
-
-		} else if ($r["problem"]->getServer() == 'uva') {
-			$response["problem_statement"] = '<iframe src="http://acm.uva.es/p/v' . substr($r["problem"]->getRemoteId(), 0, strlen($r["problem"]->getRemoteId()) - 2) . '/' . $r["problem"]->getRemoteId() . '.html"></iframe>';
+		// Add the example input.
+		$sample_input = null;
+		Cache::getFromCacheOrSet(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in",
+			$r, 'ProblemController::getSampleInput', $sample_input,
+			APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT);
+		if (!empty($sample_input)) {
+			$response['sample_input'] = $sample_input;
 		}
 
 		// Add the problem the response
@@ -1027,6 +1081,13 @@ class ProblemController extends Controller {
 		if ($r['show_all']) {
 			if (!Authorization::CanEditProblem($r['current_user_id'], $r['problem'])) {
 				throw new ForbiddenAccessException();
+			}
+			if (!is_null($r['username'])) {
+				try {
+					$r['user'] = UsersDAO::FindByUsername($r['username']);
+				} catch (Exception $e) {
+					throw new NotFoundException('userNotFound');
+				}
 			}
 			try {
 				$runs = RunsDAO::GetAllRuns(

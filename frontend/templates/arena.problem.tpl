@@ -31,7 +31,7 @@
 					</table>
 {if $karel_problem}
 					<div class="karel-js-link">
-						<a href="/karel.js/" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
+						<a href="/karel.js/{if !empty($sample_input)}#mundo:{$sample_input|escape:url}{/if}" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
 					</div>
 {/if}
 					<div class="statement">{$problem_statement}</div>
@@ -49,12 +49,12 @@
 								<th>{#wordsStatus#}</th>
 								<th>{#wordsPercentage#}</th>
 								<th>{#wordsPenalty#}</th>
-								<th>C&oacute;digo</th>
+								<th>{#wordsCode#}</th>
 							</tr>
 						</thead>
 						<tfoot>
 							<tr>
-								<td colspan="9"><a href="#problems/new-run">Nuevo envío</a></td>
+								<td colspan="9"><a href="#problems/new-run">{#wordsNewSubmissions#}</a></td>
 							</tr>
 						</tfoot>
 						<tbody class="run-list">
@@ -146,7 +146,7 @@
 							</select>
 								
 							<label for="runsusername">Usuario: </label>
-							<input id="runsusername" type="text"  size='20'/>
+							<input id="runsusername" type="text" class="typeahead form-control" autocomplete="off"/>
 							<button type="button" class="close" id="runsusername-clear" style="float: none;">&times;</button>
 								
 						</div>
@@ -162,7 +162,7 @@
 							<th>{#wordsStatus#}</th>
 							<th>{#wordsPercentage#}</th>
 							<th>{#wordsPenalty#}</th>
-							<th>Rejuecear</th>
+							<th>{#wordsRejudge#}</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
 					</thead>
@@ -218,7 +218,7 @@
 			<form id="submit" method="POST">
 				<button class="close">&times;</button>
 				<div id="lang-select">
-					Lenguaje
+					{#wordsLanguage#}
 					<select name="language">
 						<option value=""></option>
 						<option value="cpp11">C++11</option>

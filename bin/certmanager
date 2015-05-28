@@ -3,6 +3,7 @@
 PASSWORD=omegaup
 CA_NAME="omegaUp Certificate Authority"
 HOSTNAME=
+IP_ADDR=0
 OUTPUT=
 OMEGAUP_ROOT=`dirname $0`/..
 ROOT=$OMEGAUP_ROOT/ssl
@@ -29,9 +30,38 @@ gen_jks() {
 	if [ -f $TARGET ]; then rm $TARGET; fi
 
 	/usr/bin/openssl genrsa -out $DIR/runner.key 2048
-	/usr/bin/openssl req -new -subj "/C=MX/CN=$CN" -key $DIR/runner.key -out $DIR/runner.csr
-	/usr/bin/openssl x509 -req -days 3650 -in $DIR/runner.csr -CA $ROOT/omegaup-ca.crt -CAcreateserial \
-		-CAkey $ROOT/omegaup-ca.key -out $DIR/runner.crt
+	if [ $IP_ADDR -eq 1 ]; then
+		/usr/bin/openssl req -new -key $DIR/runner.key -out $DIR/runner.csr -config <(
+cat <<EOF
+[req]
+default_bits=2048
+prompt=no
+default_md=sha1
+req_extensions=req_ext
+distinguished_name=dn
+[dn]
+C=MX
+CN=$CN
+[req_ext]
+subjectAltName=IP:$CN
+EOF
+		)
+	else
+		/usr/bin/openssl req -new -subj "/C=MX/CN=$CN" -key $DIR/runner.key -out $DIR/runner.csr
+	fi
+
+	if [ $IP_ADDR -eq 1 ]; then
+		/usr/bin/openssl x509 -req -days 3650 -in $DIR/runner.csr -CA $ROOT/omegaup-ca.crt -CAcreateserial \
+			-CAkey $ROOT/omegaup-ca.key -out $DIR/runner.crt -extensions req_ext -extfile <(
+cat <<EOF
+[req_ext]
+subjectAltName=IP:$CN
+EOF
+		)
+	else
+		/usr/bin/openssl x509 -req -days 3650 -in $DIR/runner.csr -CA $ROOT/omegaup-ca.crt -CAcreateserial \
+			-CAkey $ROOT/omegaup-ca.key -out $DIR/runner.crt
+	fi
 
 	/usr/bin/openssl pkcs12 -export -in $DIR/runner.crt -inkey $DIR/runner.key -name "$CN" \
 		-certfile $ROOT/omegaup-ca.crt -caname "$CA_NAME" -password "pass:$PASSWORD" -out $DIR/runner.p12
@@ -86,6 +116,7 @@ while [[ $# > 1 ]]; do
 			;;
 		-h|--hostname)
 			HOSTNAME="$1"
+			IP_ADDR=`echo $HOSTNAME | grep '^[0-9]\+\(\.[0-9]\+\)\{3\}$' | wc -l`
 			shift || usage
 			;;
 		-o|--output)

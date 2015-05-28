@@ -59,7 +59,8 @@ class ProblemsFactory {
         $r["author_username"] = $author->getUsername();
         $r["validator"] = "token";
         $r["time_limit"] = 5000;
-        $r["overall_wall_time_limit"] = 60000;
+				$r["overall_wall_time_limit"] = 60000;
+				$r["validator_time_limit"] = 30000;
         $r["extra_wall_time"] = 0;
         $r["memory_limit"] = 32000;                
         $r["source"] = "yo";

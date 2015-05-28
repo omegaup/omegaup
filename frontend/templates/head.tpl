@@ -12,8 +12,7 @@
 		<!--<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js"></script>-->
 		<script type="text/javascript" src="/js/omegaup.js?ts=22"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ts=2"></script>
-		<script type="text/javascript" src="/js/sugar.js"></script>
-		<script type="text/javascript" src="/js/sugar.es.js"></script>
+		<script type="text/javascript" src="/js/sugar.js?ts=2"></script>
 		<script type="text/javascript" src="/js/highstock.js"></script>
 		<script type="text/javascript" src="/js/omegaup-graph.js"></script>
 		<script type="text/javascript" src="/js/langtools.js"></script>

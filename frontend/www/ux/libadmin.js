@@ -35,12 +35,12 @@ ArenaAdmin.prototype.setUpPagers = function() {
 	});
 	
 	$("#runsusername").typeahead({
-		ajax: "/api/user/list/",
-		display: 'label',
-		val: 'label',
 		minLength: 2,
-		itemSelected: self.refreshRuns.bind(self)
-	});
+		highlight: true,
+	}, {
+		source: omegaup.searchUsers,
+		displayKey: 'label',
+	}).on('typeahead:selected', self.refreshRuns.bind(self));
 	
 	$('#runsusername-clear').click(function() {
 		$("#runsusername").val('');
@@ -48,20 +48,24 @@ ArenaAdmin.prototype.setUpPagers = function() {
 	});
 	
 	if (self.arena.contestAlias === "admin") {
-		$("#runsproblem").typeahead({
-			ajax: { 
-				url: "/api/problem/list/",
-				preProcess: function(data) { 
-					return data["results"];
-				}
-			},
-			display: 'title',
-			val: 'alias',
+		$('#runsproblem').typeahead({
 			minLength: 2,
-			itemSelected: function(item, val, text) {
-				self.runsProblemAlias = val;
-				self.refreshRuns();
+			highlight: true,
+		}, {
+			source: function (query, cb) {
+				omegaup.searchProblems(query, function (data) {
+					cb(data.results);
+				});
+			},
+			displayKey: 'title',
+			templates: {
+				suggestion: function (elm) {
+					return "<strong>" + elm.title + "</strong> (" + elm.alias + ")";
+				}
 			}
+		}).on('typeahead:selected', function(ev, item) {
+			self.runsProblemAlias = item.alias;
+			self.refreshRuns();
 		});
 
 		$('#runsproblem-clear').click(function() {
@@ -140,6 +144,10 @@ ArenaAdmin.prototype.refreshRuns = function() {
 	
 	if (self.runsProblemAlias) {
 		options.problem_alias = self.runsProblemAlias;
+	}
+	
+	if ($('select.runsproblem').val()) {
+		options.problem_alias = $('select.runsproblem').val();
 	}
 	
 	if ($('#runsusername').val()) {

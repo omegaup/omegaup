@@ -16,6 +16,7 @@
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
 </ul>
 
+
 <div class="tab-content">
 	<div class="tab-pane active" id="edit">
 		{include file='contest.new.form.tpl'}
@@ -59,10 +60,10 @@
 			</table>
 		</div>
 	</div>
-				
+
 	<div class='tab-pane' id='publish'>
 		<div class="panel panel-primary">
-			<div class='panel body'>
+			<div class='panel-body'>
 				<form class='contest-publish-form'>
 					<div class="form-group">
 						<label for="public">{#contestNewFormPublic#}</label>

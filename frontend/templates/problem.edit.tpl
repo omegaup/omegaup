@@ -4,6 +4,8 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
+<script src="/js/problem.edit.js" type="text/javascript"></script>
+
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
 
 <div class="page-header">
@@ -26,14 +28,22 @@
 	<div class="tab-pane" id="markdown">
 		<div class="panel panel-primary">
 			<form class="panel-body form" method="post" action="{$smarty.server.REQUEST_URI}" enctype="multipart/form-data">
-				<input type="hidden" name="problem_alias" value="{$smarty.get.problem}" />
+				<input type="hidden" name="problem_alias" id="problem-alias" value="{$smarty.get.problem}" />
 				<input type="hidden" name="request" value="markdown" />
+				<div class="row">
+					<label for="statement-language">{#statementLanguage#}</label>
+					<select name="statement-language" id="statement-language">
+						<option value="es">{#statementLanguageEs#}</option>
+						<option value="en">{#statementLanguageEn#}</option>
+						<option value="pt">{#statementLanguagePt#}</option>
+					</select>
+				</div>
 				<div class="row">
 					<div class="col-md-12">
 						<div class="panel">
 							<ul class="nav nav-tabs">
 								<li class="active"><a href="#statement-source" data-toggle="tab">Source</a></li>
-								<li><a href="#statement-preview" data-toggle="tab">Preview</a></li>
+								<li><a id="statement-preview-link" href="#statement-preview" data-toggle="tab">Preview</a></li>
 							</ul>
 							
 							<div class="tab-content">
@@ -116,198 +126,5 @@
 		</div>
 	</div>
 </div>
-			
-<script>
-	(function(){
-		if(window.location.hash){
-			$('#sections').find('a[href="'+window.location.hash+'"]').tab('show');
-		}
-
-		$('#sections').on('click', 'a', function (e) {
-			e.preventDefault();
-			// add this line
-			window.location.hash = $(this).attr('href');
-			$(this).tab('show');
-		});
-
-		var problemAlias = '{$smarty.get.problem}';
-		refreshEditForm(problemAlias);
-
-		// Add typeaheads
-		refreshProblemAdmins();
-		$("#username-admin").typeahead({
-			minLength: 2,
-			highlight: true,
-		}, {
-			source: omegaup.searchUsers,
-			displayKey: 'label',
-		}).on('typeahead:selected', function(item, val, text) {
-			$("#username-admin").val(val.label);
-		});
-
-		refreshProblemTags();
-		$("#tag-name").typeahead({
-			minLength: 2,
-			highlight: true,
-		}, {
-			source: omegaup.searchTags,
-			displayKey: 'name',
-		}).on('typeahead:selected', function(item, val, text) {
-			$("#tag-name").val(val.name);
-		});
-
-		$('#add-admin-form').submit(function() {
-			var username = $('#username-admin').val();
-
-			omegaup.addAdminToProblem(problemAlias, username, function(response) {
-				if (response.status === "ok") {
-					OmegaUp.ui.success("Admin successfully added!");
-					$('div.post.footer').show();
-
-					refreshProblemAdmins();
-				} else {
-					OmegaUp.ui.error(response.error || 'error');
-				}
-			});
-
-			return false; // Prevent refresh
-		});
-
-		function refreshProblemAdmins() {
-			omegaup.getProblemAdmins(problemAlias, function(admins) {
-				$('#problem-admins').empty();
-				// Got the contests, lets populate the dropdown with them
-				for (var i = 0; i < admins.admins.length; i++) {
-					var admin = admins.admins[i];
-					$('#problem-admins').append(
-						$('<tr></tr>')
-							.append($('<td></td>').append(
-								$('<a></a>')
-									.attr('href', '/profile/' + admin.username + '/')
-									.text(admin.username)
-							))
-							.append($('<td></td>').text(admin.role))
-							.append((admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
-								.click((function(username) {
-									return function(e) {
-										omegaup.removeAdminFromProblem(problemAlias, username, function(response) {
-											if (response.status == "ok") {
-												OmegaUp.ui.success("Admin successfully removed!");
-												$('div.post.footer').show();
-												var tr = e.target.parentElement.parentElement;
-												$(tr).remove();
-											} else {
-												OmegaUp.ui.error(response.error || 'error');
-											}
-										});
-									};
-								})(admin.username))
-							)
-					);
-				}
-			});
-		}
-
-		$('#add-tag-form').submit(function() {
-			var tagname = $('#tag-name').val();
-			var public = $('#tag-public').val();
-
-			omegaup.addTagToProblem(problemAlias, tagname, public, function(response) {
-				if (response.status === "ok") {
-					OmegaUp.ui.success("Tag successfully added!");
-					$('div.post.footer').show();
-
-					refreshProblemTags();
-				} else {
-					OmegaUp.ui.error(response.error || 'error');
-				}
-			});
-
-			return false; // Prevent refresh
-		});
-
-		function refreshProblemTags() {
-			omegaup.getProblemTags(problemAlias, function(result) {
-				$('#problem-tags').empty();
-				// Got the contests, lets populate the dropdown with them
-				for (var i = 0; i < result.tags.length; i++) {
-					var tag = result.tags[i];
-					$('#problem-tags').append(
-						$('<tr></tr>')
-							.append($('<td></td>').append(
-								$('<a></a>')
-									.attr('href', '/problem/?tag=' + tag.name)
-									.text(tag.name)
-							))
-							.append($('<td></td>').text(tag.public))
-							.append($('<td><button type="button" class="close">&times;</button></td>')
-								.click((function(tagname) {
-									return function(e) {
-										omegaup.removeTagFromProblem(problemAlias, tagname, function(response) {
-											if (response.status == "ok") {
-												OmegaUp.ui.success("Tag successfully removed!");
-												$('div.post.footer').show();
-												var tr = e.target.parentElement.parentElement;
-												$(tr).remove();
-											} else {
-												OmegaUp.ui.error(response.error || 'error');
-											}
-										});
-									};
-								})(tag.name))
-							)
-					);
-				}
-			});
-		}
-	
-		var md_converter = Markdown.getSanitizingConverter();
-		md_editor = new Markdown.Editor(md_converter, '-statement');		// Global.
-		md_editor.hooks.chain("onPreviewRefresh", function() {ldelim}
-			MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#wmd-preview').get(0)]);
-		{rdelim});
-		md_editor.run();
-	})();
-	
-	function refreshEditForm(problemAlias) {
-		if (problemAlias === "") {
-			$('input[name=title]').val('');
-			$('input[name=time_limit]').val('');
-			$('input[name=validator_time_limit]').val('');
-			$('input[name=overall_wall_time_limit]').val('');
-			$('input[name=extra_wall_time]').val('');
-			$('input[name=memory_limit]').val('');
-			$('input[name=output_limit]').val('');
-			$('input[name=source]').val('');
-			$('input[name=stack_limit]').val('');
-			return;
-		}
-		
-		omegaup.getProblem(null, problemAlias, function(problem) {
-			$('.page-header h1 span').html('{#problemEditEditProblem#} ' + problem.title);
-			$('.page-header h1 small').html('&ndash; <a href="/arena/problem/' + problemAlias + '/">{#problemEditGoToProblem#}</a>');
-			$('input[name=title]').val(problem.title);
-			$('#statement-preview .title').html(omegaup.escape(problem.title));
-			$('input[name=time_limit]').val(problem.time_limit);
-			$('input[name=validator_time_limit]').val(problem.validator_time_limit);
-			$('input[name=overall_wall_time_limit]').val(problem.overall_wall_time_limit);
-			$('input[name=extra_wall_time]').val(problem.extra_wall_time);
-			$('input[name=memory_limit]').val(problem.memory_limit);
-			$('input[name=output_limit]').val(problem.output_limit);
-			$('input[name=stack_limit]').val(problem.stack_limit);
-			$('input[name=source]').val(problem.source);
-			$('#statement-preview .source').html(omegaup.escape(problem.source));
-			$('select[name=validator]').val(problem.validator);
-			$('select[name=public]').val(problem.public);
-			$('#languages').val(problem.languages);
-			$('input[name=alias]').val(problemAlias);
-			$('#wmd-input-statement').val(problem.problem_statement);
-			md_editor.refreshPreview();
-			if (problem.slow == 1) {
-				$('.slow-warning').show();
-			}
-		}, "markdown");
-	}
-</script>
 
 {include file='footer.tpl'}

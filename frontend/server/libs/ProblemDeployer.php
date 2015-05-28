@@ -33,6 +33,7 @@ class ProblemDeployer {
 	private $idlFile = null;
 	private $created = false;
 	private $operation = null;
+	private $updatedLanguages = array();
 
 	public function __construct($alias, $operation) {
 		$this->log = Logger::getLogger("ProblemDeployer");
@@ -193,6 +194,7 @@ class ProblemDeployer {
 			FileHandler::CreateFile($markdownFile, $statement);
 			$this->current_markdown_file_contents = $statement;
 			$this->HTMLizeStatement($this->tmpDir, "$lang.markdown");
+			$this->updatedLanguages[] = $lang;
 		} catch (ApiException $e) {
 			throw new ProblemDeploymentFailedException($e->getMessage(), $e);
 		} catch (Exception $e) {
@@ -348,6 +350,15 @@ class ProblemDeployer {
 	}
 
 	/**
+	 * Returns the list of updated langauge files.
+	 *
+	 * @return array The list of updated languages
+	 */
+	public function getUpdatedLanguages() {
+		return $this->updatedLanguages;
+	}
+
+	/**
 	 *
 	 * @param array $zipFilesArray
 	 * @param ZipArchive $zip
@@ -361,6 +372,9 @@ class ProblemDeployer {
 
 		if (count($statements) < 1) {
 			throw new InvalidParameterException("problemDeployerNoStatements");
+		}
+		if (!in_array('statements/es.markdown', $statements)) {
+			throw new InvalidParameterException('spanishStatementMissing');
 		}
 
 		// Add statements to the files to be unzipped
@@ -449,11 +463,15 @@ class ProblemDeployer {
 		// LOL RegEx magic to get test case names from testplan
 		preg_match_all('/^\\s*([^#]+?)\\s+(\\d+)\\s*$/m', $testplan, $testplan_array);
 
+		if (count($testplan_array[1]) == 0) {
+				throw new InvalidParameterException("problemDeployerTestplanEmpty", NULL);
+		}
+
 		for ($i = 0; $i < count($testplan_array[1]); $i++) {
 			// Check .in file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.in';
 			if ($zip->getFromName($path) === FALSE) {
-				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
+				throw new InvalidParameterException("problemDeployerTestplanCaseMissing", NULL,
 					array('file' => $testplan_array[1][$i]));
 			}
 
@@ -463,11 +481,24 @@ class ProblemDeployer {
 			// Check .out file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.out';
 			if ($zip->getFromName($path) === FALSE) {
-				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
+				throw new InvalidParameterException("problemDeployerTestplanCaseMissing", NULL,
 					array('file' => $testplan_array[1][$i]));
 			}
 
 			$this->filesToUnzip[] = $path;
+		}
+
+		// Reverse check: are all cases in the testplan?
+		for ($i = 0; $i < count($zipFilesArray); $i++) {
+			$path = $zipFilesArray[$i];
+			if (strpos($path, "cases/") !== 0 ||
+				!ProblemDeployer::endsWith($path, ".in", true)) continue;
+			$caseName = substr($path, strlen("cases/"));
+			$caseName = substr($caseName, 0, strlen($caseName) - 3);
+			if (!in_array($caseName, $testplan_array[1])) {
+				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
+					array('file' => $caseName));
+			}
 		}
 
 		return true;
@@ -536,6 +567,12 @@ class ProblemDeployer {
 					$this->log->info(".idl file found: " . $zip->getNameIndex($i));
 					$this->idlFile = $zip->getNameIndex($i);
 				}
+			}
+
+			// Example inputs.
+			if (stripos($zip->getNameIndex($i), 'examples/') === 0 &&
+				ProblemDeployer::endsWith($zip->getNameIndex($i), ".in", true)) {
+					$this->filesToUnzip[] = $zip->getNameIndex($i);
 			}
 		}
 
@@ -630,6 +667,7 @@ class ProblemDeployer {
 
 			// Deploy statement raw (.markdown) and transformed (.html)
 			$this->HTMLizeStatement($this->tmpDir, basename($statement));
+			$this->updatedLanguages[] = basename($statement, ".markdown");
 		}
 	}
 

@@ -20,6 +20,20 @@ require_once("base/Contest_Problems.vo.base.php");
 class ContestProblemsDAO extends ContestProblemsDAOBase
 {
 	/*
+	 * Get number of problems in contest.
+	 */
+	public static final function CountContestProblems($contest_id) {
+		// Build SQL statement
+		$sql = 'SELECT COUNT(cp.problem_id) ' .
+		       'FROM Contest_Problems cp ' .
+		       'WHERE cp.contest_id = ?';
+		$val = array($contest_id);
+
+		global $conn;
+		return $conn->GetOne($sql, $val);
+	}
+
+	/*
 	 * Get contest problems including contest alias, points, and order
 	 */
 	public static final function GetContestProblems($contest_id) {
