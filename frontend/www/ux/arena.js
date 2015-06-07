@@ -1,6 +1,6 @@
 $(document).ready(function() {
 	Date.setLocale(OmegaUp.T.locale);
-	
+
 	function makeWorldClockLink(date) {
 		try {
 			return "http://timeanddate.com/worldclock/fixedtime.html?iso=" + date.iso();
@@ -8,12 +8,12 @@ $(document).ready(function() {
 			return '#';
 		}
 	}
-	
+
 	function convertSecondsToReadableTime(seconds) {
 		var time = new Date(seconds);
 		return time.format('{h}h {mm}m', OmegaUp.T.locale);
 	}
-	
+
 	var omegaup = new OmegaUp();
 
 	omegaup.getContests(function (data) {

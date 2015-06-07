@@ -204,6 +204,13 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	}
 
 	$lang = UserController::getPreferredLanguage($userRequest);
+
+	if (defined("OMEGAUP_DEVELOPMENT_MODE") && OMEGAUP_DEVELOPMENT_MODE)
+	{
+		$smarty->force_compile = true;
+		$smarty->caching = 0;
+	}
+
 	$smarty->configLoad(__DIR__ . "/../templates/". $lang . ".lang");
 }
 

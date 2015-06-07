@@ -15,8 +15,6 @@
 	<li><a href="#contestants" data-toggle="tab">{#contestAdduserAddContestant#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
 </ul>
-
-
 <div class="tab-content">
 	<div class="tab-pane active" id="edit">
 		{include file='contest.new.form.tpl'}
@@ -69,7 +67,7 @@
 						<label for="public">{#contestNewFormPublic#}</label>
 						<select name='public' id='public' class="form-control">
 							<option value='0' selected="selected">{#wordsNo#}</option>
-							<option value='1'>{#wordsYes#}</option>							
+							<option value='1'>{#wordsYes#}</option>
 						</select>
 						<p class="help-block">{#contestNewFormPublicDesc#}</p>
 					</div>
@@ -89,17 +87,34 @@
 						<input id="username-contestant" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<button class="btn btn-primary" type='submit'>Agregar {#wordsUser#}</button>
+					<button class="btn btn-primary" type='submit'>{#contestAdduserAddUser#}</button>
 				</form>
 			</div>
 
 			<table class="table table-striped">
 				<thead>
-					<th>{#contestAdduserRegisteredUserUsername#}</th>
+					<th>{#wordsUser#}</th>
 					<th>{#contestAdduserRegisteredUserTime#}</th>
 					<th>{#contestAdduserRegisteredUserDelete#}</th>
 				</thead>
 				<tbody id="contest-users"></tbody>
+			</table>
+		</div>
+
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				{#pendingRegistrations#}
+			</div>
+			<table class="table table-striped">
+				<thead>
+					<th>{#wordsUser#}</th>
+					<th>{#userEditCountry#}</th>
+					<th>{#requestDate#}</th>
+					<th>{#currentStatus#}</th>
+					<th>{#lastUpdate#}</th>
+					<th colspan="2">{#contestAdduserAddContestant#}</th>
+				</thead>
+				<tbody id="contest-users-request"></tbody>
 			</table>
 		</div>
 	</div>
@@ -113,7 +128,7 @@
 						<input id="username-admin" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
 					</div>
 
-					<button class="btn btn-primary" type='submit'>Agregar {#wordsAdmin#}</button>
+					<button class="btn btn-primary" type='submit'>{#contestAdduserAddUser#}</button>
 				</form>
 			</div>
 
@@ -186,6 +201,7 @@
 		refreshContestProblems();
 		refreshContestContestants();
 		refreshContestAdmins();
+		refreshContestRequests();
 
 		// Edit contest
 		$('.new_contest_form').submit(function() {
@@ -196,7 +212,7 @@
 		$('.contest-publish-form').submit(function() {
 			return updateContest($(".contest-publish-form #public").val());
 		});
-		
+
 		// Update contest
 		function updateContest(public) {
 			var window_length_value = $('#window_length_enabled').is(':checked') ?
@@ -320,6 +336,90 @@
 			$('#problems-dropdown').val(val.alias);
 		});
 
+		function parseRequestStatus(resultFromApi) {
+			if (resultFromApi == null) {
+				return "Pending.";
+			}
+
+			if (resultFromApi == "true"
+					|| resultFromApi == "1") {
+				return "Accepted";
+			}
+
+			return "Denied";
+		}
+
+		function refreshContestRequests() {
+			omegaup.getContestRequests(contestAlias, function(users) {
+
+				$('#contest-users-request').empty();
+
+				// Got the contests, lets populate the dropdown with them
+				for (var i = 0; i < users.users.length; i++) {
+					user = users.users[i];
+
+					$('#contest-users-request').append(
+						$('<tr></tr>')
+
+							// Username
+							.append($('<td></td>').append(
+								$('<b></b>')
+									.text(user.userinfo.name)
+								).append(
+									$('<a></a>')
+										.attr('href', '/profile/' + user.username + '/')
+										.attr('target', '_blank') 
+										.text( '(' + user.username + ')')
+								))
+
+							// Country
+							.append($('<td></td>').text(user.userinfo.country))
+
+							// Request time
+							.append($('<td></td>').text(user.request_time))
+
+							// Current Status
+							.append($('<td></td>').text(parseRequestStatus(user.accepted)))
+
+							// Last update
+							.append($('<td></td>').text(user.last_update == null ? "" : user.last_update))
+
+							// Arbitrate request : Deny
+							.append($('<td><button type="button" class="close" style="color:red">&times;</button></td>')
+								.click((function(username) {
+									return function(e) {
+										omegaup.arbitrateContestUserRequest(contestAlias, username, false, "notes", function(response) {
+										if (response.status == "ok") {
+												OmegaUp.ui.success("{#successfulOperation#}");
+												refreshContestRequests();
+											} else {
+												OmegaUp.ui.error(response.error || 'error');
+											}
+										});
+									};
+								})(user.username))
+							)
+
+							// Arbitrate request : Approve
+							.append($('<td><button type="button" class="close" style="color:green">&#x2713;</button></td>')
+								.click((function(username) {
+									return function(e) {
+										omegaup.arbitrateContestUserRequest(contestAlias, username, true, "notes", function(response) {
+											if (response.status == "ok") {
+												OmegaUp.ui.success("{#successfulOperation#}");
+												refreshContestRequests();
+											} else {
+												OmegaUp.ui.error(response.error || 'error');
+											}
+										});
+									};
+								})(user.username))
+							)
+					);
+				}
+			});
+		}
+
 		function refreshContestContestants() {
 			omegaup.getContestUsers(contestAlias, function(users) {
 				$('#contest-users').empty();
@@ -384,7 +484,7 @@
 									.attr('href', '/profile/' + admin.username + '/')
 									.text(admin.username)
 							))
-							.append($('<td></td>').text(admin.role))							
+							.append($('<td></td>').text(admin.role))
 							.append((admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
 								.click((function(username) {
 									return function(e) {
@@ -400,7 +500,7 @@
 										});
 									};
 								})(admin.username))
-							)							
+							)
 					);
 				}
 			});

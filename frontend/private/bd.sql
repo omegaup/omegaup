@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `scoreboard_url` VARCHAR( 30 ) NULL DEFAULT NULL,
   `scoreboard_url_admin` VARCHAR( 30 ) NULL DEFAULT NULL,
   `urgent` tinyint(1) DEFAULT 0 NOT NULL COMMENT 'Indica si el concurso es de alta prioridad y requiere mejor QoS.',
+  `contestant_must_register`   tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica que los participantes deben pre-registrarse antes de poder paticipar',
   PRIMARY KEY (`contest_id`),
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`),
@@ -191,7 +192,22 @@ CREATE TABLE IF NOT EXISTS `Contest_Problem_Opened` (
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relacion entre Concursos y los problemas que tiene este';
 
--- --------------------------------------------------------
+--
+-- Estructura de tabla para la tabla `Contest_User_Request`
+--
+
+CREATE TABLE IF NOT EXISTS `Contest_User_Request` (
+	`user_id` int(11) NOT NULL,
+	`contest_id` int(11) NOT NULL,
+	`request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`last_update` timestamp NULL DEFAULT NULL,
+	`accepted` tinyint(1) DEFAULT NULL,
+	`extra_note` text,
+	`reason` enum('PRIVATE_CONTEST','PENDING') DEFAULT NULL
+	PRIMARY KEY (`user_id`,`contest_id`),
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Used when contestant_must_register = 1';
+
+	-- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `Countries`
@@ -823,3 +839,5 @@ END$$
 DELIMITER ;
 
 COMMIT;
+
+

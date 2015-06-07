@@ -22,7 +22,10 @@ class colors:
 
 parser = argparse.ArgumentParser(description='i18n tool')
 parser.add_argument('--validate', dest='validate', action='store_true',
-                    default=False, help='Only validates, does not make changes')
+		default=False, help='Only validates, does not make changes')
+
+parser.add_argument('--fill-missing-with-english', dest='fillmissing', action='store_true',
+		default=False, help='Fill missing words with the english version of it')
 
 args = parser.parse_args()
 
@@ -57,6 +60,20 @@ errors = False
 if args.validate and not_sorted:
 	print >> sys.stderr, 'Entries in %s are not sorted.' % ', '.join(sorted(not_sorted))
 	errors = True
+
+
+if args.fillmissing:
+	for key, values in strings.iteritems():
+		missing_languages = languages.difference(values.keys())
+		if missing_languages:
+			print >> sys.stderr, 'Fixing %s%s for %s%s' % (colors.HEADER, key, lang, colors.NORMAL)
+			english_word = values['en']
+			for lang in sorted(languages):
+				if lang not in values:
+					with codecs.open(templates_dir + "/" + lang+".lang", 'a', 'utf-8') as myfile:
+						print >> myfile, '%s = %s' % (key, english_word)
+	print >> sys.stderr, 'Done fixing your missing files, re-run this tool again as usual.'
+	sys.exit(0)
 
 for key, values in strings.iteritems():
 	missing_languages = languages.difference(values.keys())
@@ -104,3 +121,4 @@ for lang in languages:
 		for key in sorted(strings.keys()):
 			lang_file.write('\t%s: %s,\n' % (key, strings[key][lang]))
 		lang_file.write('};\n')
+

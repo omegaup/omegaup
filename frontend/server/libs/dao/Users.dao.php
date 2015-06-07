@@ -17,10 +17,7 @@ require_once("base/Users.vo.base.php");
   * @package docs
   * 
   */
-class UsersDAO extends UsersDAOBase
-{
-
-
+class UsersDAO extends UsersDAOBase {
 	public static function FindByEmail($email) {
 		global  $conn;
 		$sql = "select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id";
@@ -43,26 +40,26 @@ class UsersDAO extends UsersDAOBase
 
 		return array_pop( $a_Results );
 	}
-	
+
 	public static function FindByUsernameOrName($usernameOrName) {
-		
+
 		global  $conn;
 		$sql = "select DISTINCT u.* from Users u where u.username LIKE CONCAT('%', ?, '%') or u.name LIKE CONCAT('%', ?, '%') LIMIT 10";
 		$args = array($usernameOrName, $usernameOrName);
-		
+
 		$rs = $conn->Execute($sql, $args);
 		$ar = array();
 		foreach ($rs as $foo) {
 			$bar =  new Users($foo);
-    		array_push( $ar,$bar);    		
+    		array_push( $ar,$bar);
 		}
-		return $ar;		
+		return $ar;
 	}
-	
+
 	public static function GetRankByProblemsSolved($limit = 100, $offset = 0, Users $user = null) {
-		
+
 		$filterByUser = !is_null($user);
-		
+
 		global  $conn;
 		$conn->Execute("SET @prev_value = NULL;");
 		$conn->Execute("SET @rank_count = 0;");

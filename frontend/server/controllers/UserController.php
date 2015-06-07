@@ -840,12 +840,11 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	private static function getProfileImpl(Users $user) {
-		
 		$response = array();
 		$response["userinfo"] = array();
 		$response["problems"] = array();
 
-		$response["userinfo"]["username"] = $user->getUsername();		
+		$response["userinfo"]["username"] = $user->getUsername();
 		$response["userinfo"]["name"] = $user->getName();
 		$response["userinfo"]["solved"] = $user->getSolved();
 		$response["userinfo"]["submissions"] = $user->getSubmissions();
@@ -928,7 +927,6 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiProfile(Request $r) {
-		
 		self::authenticateOrAllowUnauthenticatedRequest($r);
 
 		$r["user"] = self::resolveTargetUser($r);
@@ -948,7 +946,7 @@ class UserController extends Controller {
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 */
-	public static function apiCoderOfTheMonth(Request $r) {				
+	public static function apiCoderOfTheMonth(Request $r) {
 
 		// Get first day of the current month
 		$firstDay = date('Y-m-01');
@@ -992,8 +990,8 @@ class UserController extends Controller {
 		}
 
 		// Get the profile of the coder of the month
-		$response = self::getProfileImpl($user);		
-		
+		$response = self::getProfileImpl($user);
+
 		$response["status"] = "ok";		
 		return $response;
 	}
@@ -1044,7 +1042,7 @@ class UserController extends Controller {
 		$response["contests"] = array();
 
 		$user = self::resolveTargetUser($r);
-		
+
 		$contest_user_key = new ContestsUsers();
 		$contest_user_key->setUserId($user->getUserId());
 
@@ -1097,9 +1095,9 @@ class UserController extends Controller {
 
 		$response = array();
 		$response["problems"] = array();
-		
+
 		$user = self::resolveTargetUser($r);
-		
+
 		try {
 			$db_results = ProblemsDAO::getProblemsSolved($user->getUserId());
 		} catch (Exception $e) {
@@ -1325,14 +1323,14 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 
-	public static function apiRankByProblemsSolved(Request $r) {				
+	public static function apiRankByProblemsSolved(Request $r) {
 
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
 		
 		$r["user"] = null;
-		if (!is_null($r["username"])) {			
-			Validators::isStringNonEmpty($r["username"], "username");			
+		if (!is_null($r["username"])) {
+			Validators::isStringNonEmpty($r["username"], "username");
 			try {
 				$r["user"] = UsersDAO::FindByUsername($r["username"]);
 				if (is_null($r["user"])) {

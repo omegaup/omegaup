@@ -31,11 +31,11 @@ class Controller {
 		if (!$session['valid'] || $session['user'] == null) {
 			throw new ForbiddenAccessException();
 		}
-		
+
 		$r["current_user"] = $session['user'];
 		$r["current_user_id"] = $session['user']->user_id;
 	}
-	
+
 	/**
 	 * Calls authenticateRequest and throws only if authentication fails AND 
 	 * there's no target username in Request. 
@@ -68,10 +68,10 @@ class Controller {
 	 * @throws NotFoundException
 	 */
 	protected static function resolveTargetUser(Request $r) {
-		
-		// By default use current user		
-		$user = $r["current_user"];	 
-		
+
+		// By default use current user
+		$user = $r["current_user"];
+
 		if (!is_null($r["username"])) {
 			
 			Validators::isStringNonEmpty($r["username"], "username");
@@ -88,9 +88,9 @@ class Controller {
 			}
 			catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
-			}			
+			}
 		}
-		
+
 		return $user;
 	}
 	

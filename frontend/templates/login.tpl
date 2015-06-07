@@ -6,9 +6,9 @@
 <div id="login-page">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h2 class="panel-title">{#loginHeader#}</h3>
+			<h2 class="panel-title">{#loginHeader#}</h2>
 		</div>
-		
+
 		<div class="row">
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>

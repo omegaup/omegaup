@@ -12,6 +12,7 @@ try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 try_define('OMEGAUP_COOKIE_DOMAIN', null);
 try_define('OMEGAUP_USE_CSP', false);
 try_define('OMEGAUP_URL', 'http://localhost');
+try_define('OMEGAUP_DEVELOPMENT_MODE', false);
 
 # ####################################
 # DATABASE CONFIG

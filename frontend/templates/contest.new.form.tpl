@@ -2,13 +2,6 @@
 	{assign "IS_UPDATE" 0}
 {/if}
 
-<div class="alert alert-info" id='private-contest-info-alert'>		
-	<span class="message">			
-		{#contestNewPublicInfoNotice#}
-	</span>
-</div>
-
-
 <div class="panel panel-primary">
 	{if $IS_UPDATE neq 1}
 	<div class="panel-heading">

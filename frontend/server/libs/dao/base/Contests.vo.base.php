@@ -98,6 +98,9 @@ class Contests extends VO
 			if (isset($data['urgent'])) {
 				$this->urgent = $data['urgent'];
 			}
+			if (isset($data['contestant_must_register'])) {
+				$this->contestant_must_register = $data['contestant_must_register'];
+			}
 		}
 	}
 
@@ -132,7 +135,8 @@ class Contests extends VO
 			"show_scoreboard_after" => $this->show_scoreboard_after,
 			"scoreboard_url" => $this->scoreboard_url,
 			"scoreboard_url_admin" => $this->scoreboard_url_admin,
-			"urgent" => $this->urgent
+			"urgent" => $this->urgent,
+			"contestant_must_register" => $this->contestant_must_register
 		); 
 	return json_encode($vec); 
 	}
@@ -302,4 +306,11 @@ class Contests extends VO
 	  * @var tinyint(1)
 	  */
 	public $urgent;
+
+	/**
+	  * Indica que los participantes deben pre-registrarse antes de poder paticipar
+	  * @access public
+	  * @var 
+	  */
+	public $contestant_must_register;
 }

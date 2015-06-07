@@ -164,9 +164,10 @@ $(document).ready(function() {
 		$('#title .contest-title').html(omegaup.escape(contest.title));
 		$('#summary .title').html(omegaup.escape(contest.title));
 		$('#summary .description').html(omegaup.escape(contest.description));
-					
+
 		$('#summary .start_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
 		$('#summary .finish_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
+
 		var duration = contest.finish_time.getTime() - contest.start_time.getTime();
 		$('#summary .window_length').html(Arena.formatDelta((contest.window_length * 60000) || duration));
 		$('#summary .scoreboard_cutoff').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
@@ -205,7 +206,7 @@ $(document).ready(function() {
 		$('#loading').fadeOut('slow');
 		$('#root').fadeIn('slow');
 	}
-	
+
 	if (arena.onlyProblem) {
 		onlyProblemLoaded(JSON.parse(document.getElementById('problem-json').firstChild.nodeValue));
 	} else {
