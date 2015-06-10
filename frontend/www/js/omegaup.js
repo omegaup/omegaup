@@ -23,6 +23,7 @@ OmegaUp.prototype.escape = function(s) {
 
 OmegaUp.ui = {
 	error: function(reason) {
+		if ($('#status .message').length == 0) console.error("Showing warning but there is no status div");
 		$('#status .message').html(reason);
 		$('#status')
 			.removeClass('alert-success')
@@ -449,6 +450,30 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	});
 };
 
+OmegaUp.prototype.getContestPublicDetails = function(alias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/publicdetails/contest_alias/' + encodeURIComponent(alias) + '/',
+		function (contest) {
+			if (contest.status == 'ok') {
+				contest.start_time = self.time(contest.start_time * 1000);
+				contest.finish_time = self.time(contest.finish_time * 1000);
+				contest.submission_deadline = self.time(contest.submission_deadline * 1000);
+				contest.show_penalty = (contest.penalty != 0 || contest.penalty_time_start != "none");
+			}
+			callback(contest);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error': undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getContestByToken = function(alias, token, callback) {
 	var self = this;
 
@@ -518,6 +543,48 @@ OmegaUp.prototype.getCoderOfTheMonth = function(callback) {
 	});
 };
 
+OmegaUp.prototype.arbitrateContestUserRequest = function(contest_alias, username, resolution, notes, callback) {
+	$.post(
+		'/api/contest/arbitraterequest/',
+		{
+			contest_alias: contest_alias,
+			username : username,
+			resolution : resolution,
+			note : notes
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+}
+
+OmegaUp.prototype.registerForContest = function(contest_alias, callback) {
+	var self = this;
+	$.post(
+		'/api/contest/registerforcontest/',
+		{
+			contest_alias: contest_alias,
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.updateProblem = function(alias, public, callback) {
 	var self = this;
 
@@ -525,7 +592,7 @@ OmegaUp.prototype.updateProblem = function(alias, public, callback) {
 		'/api/problem/update/',
 		{
 			problem_alias: alias,
-			public: public			
+			public: public
 		},
 		function (data) {
 			callback(data);
@@ -1261,6 +1328,24 @@ OmegaUp.prototype.getContestUsers = function(contestAlias, callback) {
 
 	$.get(
 		'/api/contest/users/contest_alias/' + encodeURIComponent(contestAlias) + '/' ,
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getContestRequests = function(contestAlias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/requests/contest_alias/' + encodeURIComponent(contestAlias) + '/' ,
 		function (data) {
 			callback(data);
 		},

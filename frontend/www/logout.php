@@ -1,14 +1,17 @@
 <?php
-    require_once("../server/bootstrap.php");
 
-    $c_Session = new SessionController;
+require_once("../server/bootstrap.php");
 
-    if ($c_Session->CurrentSessionAvailable()) {
-        $c_Session->UnRegisterSession();
-    }
+$c_Session = new SessionController;
 
-    if (isset($_REQUEST['redirect'])) {
-        die(header('Location: ' . $_REQUEST['redirect']));
-    } else {
+if ($c_Session->CurrentSessionAvailable()) {
+	$c_Session->UnRegisterSession();
+}
+
+if (isset($_REQUEST['redirect'])) {
+	die(header('Location: ' . $_REQUEST['redirect']));
+
+} else {
 	die(header('Location: /login/?logout'));
-    }
+
+}

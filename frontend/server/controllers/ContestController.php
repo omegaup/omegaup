@@ -7,6 +7,7 @@
 class ContestController extends Controller {
 
 	const MAX_PROBLEMS_IN_CONTEST = 30;
+	const SHOW_INTRO = true;
 
 	/**
 	 * Returns a list of contests
@@ -153,7 +154,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Checks if user can access contests: If the contest is private then the user
-	 * must be added to the contest (an entry ContestUsers must exists) OR the user 
+	 * must be added to the contest (an entry ContestsUsers must exists) OR the user 
 	 * should be a Contest Admin.
 	 * 
 	 * Expects $r["contest"] to contain the contest to check against.
@@ -170,7 +171,11 @@ class ContestController extends Controller {
 		if (!isset($r["contest"]) || is_null($r["contest"])) {
 			throw new NotFoundException("contestNotFound");
 		}
-		
+
+		if (!($r["contest"] instanceof Contests)) {
+			throw new InvalidParameterException("contest must be an instance of ContestVO");
+		}
+
 		if ($r["contest"]->public != 1) {
 			try {
 				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
@@ -185,7 +190,60 @@ class ContestController extends Controller {
 			}
 		}
 	}
-	
+
+	/**
+	 * Validate the basics of a contest request.
+	 *
+	 */
+	private static function validateBasicDetails(Request $r) {
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+		// If the contest is private, verify that our user is invited
+		try {
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["contest"])) {
+			throw new NotFoundException("contestNotFound");
+		}
+	}
+
+	/**
+	 * Show the contest intro unless you are admin, or you 
+	 * already started this contest.
+	 */
+	public static function showContestIntro(Request $r) {
+
+		try {
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+		}catch(Exception $e) {
+			throw new NotFoundException("contestNotFound");
+		}
+
+		try {
+			self::canAccessContest($r);
+		} catch (Exception $e) {
+			return ContestController::SHOW_INTRO;
+		}
+
+		// You are admin
+		if ($r['contest_admin']) {
+			self::$log->error("Not intro because you are admin");
+			return !ContestController::SHOW_INTRO;
+		}
+
+		$currentsesion = SessionController::getCurrentSession($r);
+
+		// You already started the contest.
+		if (!is_null(ContestsUsersDAO::getByPK($currentsesion["id"], $r["contest"]->getContestId()))) {
+			self::$log->debug("Not intro because you already started the contest");
+			return !ContestController::SHOW_INTRO;
+		}
+
+		return ContestController::SHOW_INTRO;
+	}
+
 	/**
 	 * Validate request of a details contest
 	 * 
@@ -197,18 +255,8 @@ class ContestController extends Controller {
 	 * @throws PreconditionFailedException
 	 */
 	private static function validateDetails(Request $r) {
-		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
-		// If the contest is private, verify that our user is invited
-		try {
-			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
-		} catch (Exception $e) {
-			throw new InvalidDatabaseOperationException($e);
-		}
-
-		if (is_null($r["contest"])) {
-			throw new NotFoundException("contestNotFound");
-		}
+		self::validateBasicDetails($r);
 
 		$r['contest_admin'] = false;
 
@@ -234,6 +282,81 @@ class ContestController extends Controller {
 		}
 	}
 
+	public static function apiPublicDetails(Request $r) {
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+	
+		$result = array();
+
+		// If the contest is private, verify that our user is invited
+		try {
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["contest"])) {
+			throw new NotFoundException("contestNotFound");
+		}
+
+		if ($r["contest"]->public != 1) {
+			// Contest is not public, does user have access ?
+			throw new NotFoundException("contestNotFound");
+		}
+
+		// Create array of relevant columns
+
+		$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy", "public", "show_scoreboard_after", "contestant_must_register");
+
+		// Initialize response to be the contest information
+		$result = $r["contest"]->asFilteredArray($relevant_columns);
+
+		$current_ses = SessionController::getCurrentSession($r);
+		$result["contestant_must_register"] = ($result["contestant_must_register"] == "1");
+
+		if ($current_ses["valid"] && $result["contestant_must_register"]) {
+
+			$registration = ContestUserRequestDAO::getByPK($current_ses["id"], $r["contest"]->contest_id);
+
+			$result["user_registration_requested"] = !is_null($registration);
+
+			if (is_null($registration)) {
+				$result["user_registration_accepted"] = false;
+				$result["user_registration_answered"] = false;
+			} else {
+				$result["user_registration_answered"] = !is_null($registration->getAccepted());
+				$result["user_registration_accepted"] = $registration->getAccepted() == "1";
+			}
+		}
+
+		$result['start_time'] = strtotime($result['start_time']);
+		$result['finish_time'] = strtotime($result['finish_time']);
+
+		$result['status'] = 'ok';
+
+		return $result;
+	}
+
+	public static function apiRegisterForContest(Request $r) {
+		self::validateBasicDetails($r);
+
+		$current_user = AuthTokensDAO::getUserByToken($r["auth_token"]);
+
+		$contest_req = new ContestUserRequest();
+		$contest_req->setUserId($current_user->getUserId());
+		$contest_req->setContestId($r["contest"]->getContestId());
+		$contest_req->setRequestTime(gmdate('Y-m-d H:i:s'));
+
+		try {
+			ContestUserRequestDAO::save($contest_req);
+		} catch (Exception $e) {
+			self::$log->error("Failed to create new ContestUserRequest: " . $e->getMessage());
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		return array("status" => "ok");
+	}
+
+
 	/**
 	 * Returns details of a Contest
 	 * 
@@ -241,12 +364,12 @@ class ContestController extends Controller {
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 */
-	public static function apiDetails(Request $r) {		
+	public static function apiDetails(Request $r) {
 
 		self::validateDetails($r);
-		
+
 		Cache::getFromCacheOrSet(Cache::CONTEST_INFO, $r["contest_alias"], $r, function(Request $r) {
-			
+
 			// Create array of relevant columns
 			$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy", "public", "show_scoreboard_after");
 
@@ -268,6 +391,7 @@ class ContestController extends Controller {
 					array(
 						"contest_id" => $r["contest"]->getContestId()
 			));
+
 			try {
 				$problemsInContest = ContestProblemsDAO::search($key_problemsInContest, "order");
 			} catch (Exception $e) {
@@ -305,12 +429,11 @@ class ContestController extends Controller {
 
 			// Add problems to response
 			$result['problems'] = $problemsResponseArray;
-			
+
 			return $result;
-			
+
 		}, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
-												
-				
+
 		if (is_null($r['token'])) {
 			// Adding timer info separately as it depends on the current user and we don't
 			// want this to get generally cached for everybody
@@ -835,7 +958,6 @@ class ContestController extends Controller {
 
 		// Authenticate logged user
 		self::authenticateRequest($r);
-
 		self::validateAddUser($r);
 
 		$contest_user = new ContestsUsers();
@@ -850,6 +972,7 @@ class ContestController extends Controller {
 			ContestsUsersDAO::save($contest_user);
 		} catch (Exception $e) {
 			// Operation failed in the data layer
+			self::$log->error("Failed to create new ContestUser: " . $e->getMessage());
 			throw new InvalidDatabaseOperationException($e);
 		}
 
@@ -867,7 +990,6 @@ class ContestController extends Controller {
 
 		// Authenticate logged user
 		self::authenticateRequest($r);
-
 		self::validateAddUser($r);
 
 		$contest_user = new ContestsUsers();
@@ -1259,6 +1381,100 @@ class ContestController extends Controller {
 		}
 
 		return ($a["total"]["points"] < $b["total"]["points"]) ? 1 : -1;
+	}
+
+	public static function apiRequests(Request $r) {
+
+		// Authenticate request
+		self::authenticateRequest($r);
+
+		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
+
+		try {
+			$contest = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $contest)) {
+			throw new ForbiddenAccessException();
+		}
+
+		// Get users from DB
+		$contest_user_key = new ContestUserRequest();
+		$contest_user_key->setContestId($contest->getContestId());
+
+		try {
+			$db_results = ContestUserRequestDAO::search($contest_user_key);
+		} catch (Exception $e) {
+			// Operation failed in the data layer
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		// @TODO prefetch an alias-user_id map so that we dont need
+		// a getbypk (sql select query) on every iteration of the following
+		// loop
+
+		$users = array();
+		foreach ($db_results as $result) {
+			$user_id = $result->getUserId();
+			$user = UsersDAO::getByPK($user_id);
+
+			// Get user profile. Email, school, etc.
+			$profile_request = new Request();
+			$profile_request["username"] = $user->getUsername();
+
+			$userprofile = UserController::apiProfile($profile_request);
+
+			$users[] = array(
+				"userinfo" => $userprofile["userinfo"],
+				"username" => $user->getUsername(),
+				"last_update" => $result->last_update,
+				"last_update" => $result->last_update,
+				"accepted" => $result->accepted,
+				"extra_note" => $result->extra_note,
+				"request_time" => $result->request_time);
+		}
+
+		$response = array();
+		$response["users"] = $users;
+		$response["status"] = "ok";
+
+		return $response;
+	}
+
+	public static function apiArbitrateRequest(Request $r) {
+		$result = array("status" => "ok");
+
+		// user must be admin of conest to arbitrate security
+
+		try {
+			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
+		} catch (Exception $e) {
+			throw new NotFoundException($e);
+		}
+
+		if (is_null($r["contest"])) {
+			throw new NotFoundException("contestNotFound");
+		}
+
+		$r["target_user"] = UsersDAO::FindByUsername($r["username"]);
+
+		$request = ContestUserRequestDAO::getByPK($r["target_user"]->user_id, $r["contest"]->contest_id);
+
+		if (is_null($request)) {
+			throw new InvalidParameterException("userNotInListOfRequests");
+		}
+
+		$request->setAccepted($r["resolution"] == "true");
+		$request->setExtraNote($r["note"]);
+
+		$request->setLastUpdate(gmdate('Y-m-d H:i:s'));
+		//$request->setLastModificationBy($current_ses["id"]);
+
+		ContestUserRequestDAO::save($request);
+
+		return $result;
 	}
 
 	/**

@@ -1,8 +1,8 @@
 <?php
 
-	require_once ('Estructura.php');
+require_once ('Estructura.php');
 
-	spl_autoload_register(function ($class) {
+spl_autoload_register(function ($class) {
 	if (substr($class, -3) == "DAO")
 	{
 		$class = substr($class, 0, -3);

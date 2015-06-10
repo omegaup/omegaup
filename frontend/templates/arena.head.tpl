@@ -12,7 +12,9 @@
 		<script type="text/javascript" src="/js/omegaup.js?ts=22"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ts=3"></script>
 		<script type="text/javascript" src="/ux/libarena.js?ts=12"></script>
+		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}?ts=7"></script>
+		{/if}
 		<script type="text/javascript" src="/js/mathjax-config.js"></script>
 		<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<link rel="stylesheet" href="/css/reset.css" />
@@ -45,6 +47,7 @@
 		<link rel="shortcut icon" href="/favicon.ico" />
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}>
+
 		<!-- Generated from http://ajaxload.info/ -->
 		{if !isset($bodyid) or $bodyid != 'only-problem'}
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>

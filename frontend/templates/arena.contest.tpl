@@ -1,4 +1,5 @@
 {include file='arena.head.tpl' jsfile=$jsfile}
+
 {if $admin}
 			<script type="text/javascript" src="/ux/libadmin.js"></script>	
 			<audio id="notification_audio">
@@ -9,6 +10,7 @@
 				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>
 				<div class="clock">00:00:00</div>
 			</div>
+
 {if !$practice}
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblems#}</a></li>
@@ -142,11 +144,11 @@
 			<div id="runs" class="tab">
 				<table class="runs">
 					<caption>
-						Envíos 
+						{#wordsSubmissions#}
 						<div class="runspager">
 							<button class="runspagerprev">&lt;</button>
 							<button class="runspagernext">&gt;</button>
-							
+
 							<label for="runsverdict">{#wordsVerdict#}: </label>
 							<select class="runsverdict" name="runsverdict">
 								<option value="">{#wordsAll#}</option>
@@ -162,7 +164,7 @@
 								<option value="JE">JE</option>
 								<option value="NO-AC">No AC</option>
 							</select>
-							
+
 							<label for="runsstatus">{#wordsStatus#}: </label>
 							<select class="runsstatus" name="runsstatus">
 								<option value="">{#wordsAll#}</option>
@@ -172,12 +174,12 @@
 								<option value="running">running</option>
 								<option value="ready">ready</option>
 							</select>
-							
+
 							<label for="runsproblem">{#wordsProblem#}: </label>
 							<select class="runsproblem">
 								<option value="">{#wordsAll#}</option>
 							</select>
-							
+
 							<label for="runslang">{#wordsLanguage#}: </label>
 							<select class="runslang" name="runslang">
 								<option value="">{#wordsAll#}</option>
@@ -193,11 +195,11 @@
 								<option value="kj">Karel (Java)</option>
 								<option value="cat">{#wordsJustOutput#}</option>
 							</select>
-								
+
 							<label for="runsusername">Usuario: </label>
 							<input id="runsusername" type="text"   class="typeahead form-control" autocomplete="off"/>
 							<button type="button" class="close" id="runsusername-clear" style="float: none;">&times;</button>
-								
+
 						</div>
 					</caption>
 					<thead>
@@ -212,8 +214,8 @@
 							<th>{#wordsTime#}</th>
 							<th>{#wordsStatus#}</th>
 							<th>{#wordsPoints#}</th>
-							<th>{#wordsPenalty#}</th>							
-							<th>Rejuecear</th>
+							<th>{#wordsPenalty#}</th>
+							<th>{#wordsRejudge#}</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
 					</thead>
@@ -229,7 +231,7 @@
 							<td class="time"></td>
 							<td class="status"></td>
 							<td class="points"></td>
-							<td class="penalty"></td>							
+							<td class="penalty"></td>
 							<td class="rejudge"></td>
 							<td class="details"></td>
 						</tr>
