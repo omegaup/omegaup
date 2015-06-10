@@ -203,8 +203,8 @@ CREATE TABLE IF NOT EXISTS `Contest_User_Request` (
 	`last_update` timestamp NULL DEFAULT NULL,
 	`accepted` tinyint(1) DEFAULT NULL,
 	`extra_note` text,
-	`reason` enum('PRIVATE_CONTEST','PENDING') DEFAULT NULL
-	PRIMARY KEY (`user_id`,`contest_id`),
+	`reason` enum('PRIVATE_CONTEST', 'PENDING') DEFAULT 'PENDING',
+	PRIMARY KEY (`user_id`,`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Used when contestant_must_register = 1';
 
 	-- --------------------------------------------------------
