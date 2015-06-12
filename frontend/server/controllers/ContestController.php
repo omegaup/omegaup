@@ -214,16 +214,22 @@ class ContestController extends Controller {
 	 * already started this contest.
 	 */
 	public static function showContestIntro(Request $r) {
-
 		try {
 			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
-		}catch(Exception $e) {
+		} catch(Exception $e) {
 			throw new NotFoundException("contestNotFound");
 		}
 
 		try {
+			// Half-authenticate, in case there is no session in place.
+			$session = SessionController::apiCurrentSession($r);
+			if ($session['valid'] && $session['user'] != null) {
+				$r["current_user"] = $session['user'];
+				$r["current_user_id"] = $session['user']->user_id;
+			}
 			self::canAccessContest($r);
 		} catch (Exception $e) {
+			self::$log->error("Exception while trying to verify access: " . $e);
 			return ContestController::SHOW_INTRO;
 		}
 
@@ -233,10 +239,10 @@ class ContestController extends Controller {
 			return !ContestController::SHOW_INTRO;
 		}
 
-		$currentsesion = SessionController::getCurrentSession($r);
+		$cs = SessionController::apiCurrentSession();
 
 		// You already started the contest.
-		if (!is_null(ContestsUsersDAO::getByPK($currentsesion["id"], $r["contest"]->getContestId()))) {
+		if (!is_null(ContestsUsersDAO::getByPK($cs["id"], $r["contest"]->getContestId()))) {
 			self::$log->debug("Not intro because you already started the contest");
 			return !ContestController::SHOW_INTRO;
 		}
@@ -298,10 +304,13 @@ class ContestController extends Controller {
 			throw new NotFoundException("contestNotFound");
 		}
 
-		if ($r["contest"]->public != 1) {
-			// Contest is not public, does user have access ?
-			throw new NotFoundException("contestNotFound");
+		// Half-authenticate, in case there is no session in place.
+		$session = SessionController::apiCurrentSession($r);
+		if ($session['valid'] && $session['user'] != null) {
+			$r["current_user"] = $session['user'];
+			$r["current_user_id"] = $session['user']->user_id;
 		}
+		self::canAccessContest($r);
 
 		// Create array of relevant columns
 

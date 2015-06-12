@@ -808,7 +808,7 @@ class UserController extends Controller {
 	}
 
 	private static function convertToSupportedLanguage($lang) {
-		switch ($result) {
+		switch ($lang) {
 			case "en":
 			case "en-us":
 				return "en";
