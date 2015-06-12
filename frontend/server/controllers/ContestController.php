@@ -2145,8 +2145,25 @@ class ContestController extends Controller {
 		die();
 	}
 
+	/**
+	 * Given a contest_alias and user_id, returns the role of the user within
+	 * the context of a contest.
+	 * 
+	 * @param Request $r
+	 * @return array
+	 */
 	public static function apiRole(Request $r) {
-		try {
+		try {			
+			if ($r['contest_alias'] == 'all-events') {
+				self::authenticateRequest($r);				
+				if (Authorization::IsSystemAdmin($r['current_user_id']) ) {
+					return array(
+						'status' => 'ok',
+						'admin' => true
+					);
+				}
+			}
+	
 			self::validateDetails($r);
 
 			return array(
