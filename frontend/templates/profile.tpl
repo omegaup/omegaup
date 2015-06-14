@@ -114,6 +114,6 @@
 <div id="username" style="display:none" data-username="{IF isset($smarty.get.username)}{$smarty.get.username|replace:"\\":""}{ELSE}{$CURRENT_USER_USERNAME}{/IF}">       
 </div>
 
-<script src="/js/profile.js"></script>
+<script src="/js/profile.js?ver=04c552"></script>
 
 {include file='footer.tpl'}

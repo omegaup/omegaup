@@ -5,7 +5,7 @@
 {include file='status.tpl'}
 
 <span id="form-data" data-name="groups" data-page="edit" data-alias="{$smarty.get.group}"></span>							
-<script src="/js/groups.js"></script>
+<script src="/js/groups.js?ver=284da8"></script>
 
 <ul class="nav nav-tabs nav-justified" id="sections">
 	<li class="active"><a href="#members" data-toggle="tab">{#groupEditMembers#}</a></li>	

@@ -4,7 +4,7 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<script src="/js/problem.edit.js" type="text/javascript"></script>
+<script src="/js/problem.edit.js?ver=b6d8ee" type="text/javascript"></script>
 
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
 

@@ -66,7 +66,7 @@
 							{/if}
 						</ul>
 						{if $CURRENT_USER_IS_ADMIN eq '1'}
-						<script type="text/javascript" src="/js/common.navbar.grader_status.js"></script>
+						<script type="text/javascript" src="/js/common.navbar.grader_status.js?ver=75f079"></script>
 						{/if}
 					</div>
 				</div>

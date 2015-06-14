@@ -108,6 +108,6 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/login.js"></script>
+<script type="text/javascript" src="/js/login.js?ver=35dc77"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" defer></script>
 {include file='footer.tpl'}

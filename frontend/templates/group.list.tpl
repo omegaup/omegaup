@@ -5,7 +5,7 @@
 {include file='status.tpl'}
 
 <span id="form-data" data-name="groups" data-page="list"></span>							
-<script src="/js/groups.js"></script>
+<script src="/js/groups.js?ver=284da8"></script>
 
 
 <div class="panel panel-default">

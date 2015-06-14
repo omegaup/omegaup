@@ -1,9 +1,9 @@
 {assign var="htmlTitle" value="{#omegaupTitleRedaccion#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
-<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ts=1"></script>
-<script type="text/javascript" src="/js/pagedown/Markdown.Sanitizer.js?ts=1"></script>
-<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ts=1"></script>
+<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ver=bbca63"></script>
+<script type="text/javascript" src="/js/pagedown/Markdown.Sanitizer.js?ver=25306e"></script>
+<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ver=1bf05c"></script>
 <link rel="stylesheet" type="text/css" href="/js/pagedown/demo/browser/demo.css" />
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 

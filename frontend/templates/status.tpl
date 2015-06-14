@@ -15,4 +15,4 @@
 	</div>
 {/if}
 
-<script type="text/javascript" src="/js/status.dismiss.js"></script>
+<script type="text/javascript" src="/js/status.dismiss.js?ver=474f8b"></script>
