@@ -31,7 +31,7 @@ $(document).ready(function() {
 					$('#loading').html('404');
 				}
 				return;
-			} else if (arena.practice && contest.finish_time && new Date().getTime() < contest.finish_time.getTime()) {
+			} else if (arena.practice && contest.finish_time && omegaup.time().getTime() < contest.finish_time.getTime()) {
 				window.location = window.location.pathname.replace(/\/practice\/.*/, '/');
 				return;
 			}
@@ -109,7 +109,7 @@ $(document).ready(function() {
 				run.status = 'new';
 				run.alias = arena.currentProblem.alias;
 				run.contest_score = null;
-				run.time = new Date;
+				run.time = omegaup.time();
 				run.penalty = 0;
 				run.runtime = 0;
 				run.memory = 0;

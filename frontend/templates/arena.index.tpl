@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/arena.js'}
+{include file='arena.head.tpl' jsfile='/ux/arena.js?ts=2'}
 			<div class="container" id="main">
 				<div class="panel panel-primary">
 					<div class="panel-heading">

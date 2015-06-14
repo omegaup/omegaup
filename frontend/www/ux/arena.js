@@ -9,11 +9,6 @@ $(document).ready(function() {
 		}
 	}
 
-	function convertSecondsToReadableTime(seconds) {
-		var time = new Date(seconds);
-		return time.format('{h}h {mm}m', OmegaUp.T.locale);
-	}
-
 	var omegaup = new OmegaUp();
 
 	omegaup.getContests(function (data) {

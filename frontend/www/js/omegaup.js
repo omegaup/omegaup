@@ -1440,7 +1440,7 @@ OmegaUp.prototype.getProblemClarifications = function(problemAlias, offset, rowc
 		function (data) {
 			for (var idx in data.clarifications) {
 				var clarification = data.clarifications[idx];
-				clarification.time = new Date(clarification.time * 1000);
+				clarification.time = self.time(clarification.time * 1000);
 			}
 			callback(data);
 		},
@@ -1825,7 +1825,7 @@ OmegaUp.prototype.getClarifications = function(contestAlias, offset, count, call
 		function (data) {
 			for (var idx in data.clarifications) {
 				var clarification = data.clarifications[idx];
-				clarification.time = new Date(clarification.time * 1000);
+				clarification.time = self.time(clarification.time * 1000);
 			}
 			callback(data);
 		},

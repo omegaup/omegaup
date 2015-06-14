@@ -16,7 +16,7 @@ $(document).ready(function() {
 			arena.scoreboardToken,
 			arena.rankingChange.bind(arena)
 		);
-		if (new Date() < contest.finish_time && !arena.socket) {
+		if (omegaup.time() < contest.finish_time && !arena.socket) {
 			setInterval(function() {
 				omegaup.getRankingByToken(
 					arena.contestAlias,

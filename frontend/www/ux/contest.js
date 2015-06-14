@@ -142,7 +142,7 @@ $(document).ready(function() {
 			} else if (contest.start_time) {
 				var f = (function(x, y) {
 					return function() {
-						var t = new Date();
+						var t = omegaup.time();
 						$('#loading').html(x + ' ' + Arena.formatDelta(y.getTime() - t.getTime()));
 						if (t.getTime() < y.getTime()) {
 							setTimeout(f, 1000);
@@ -156,7 +156,7 @@ $(document).ready(function() {
 				$('#loading').html('404');
 			}
 			return;
-		} else if (arena.practice && contest.finish_time && new Date().getTime() < contest.finish_time.getTime()) {
+		} else if (arena.practice && contest.finish_time && omegaup.time().getTime() < contest.finish_time.getTime()) {
 			window.location = window.location.pathname.replace(/\/practice.*/, '/');
 			return;
 		}
@@ -256,7 +256,7 @@ $(document).ready(function() {
 			}
 			
 			if (!arena.onlyProblem) {
-				arena.problems[arena.currentProblem.alias].last_submission = new Date().getTime();
+				arena.problems[arena.currentProblem.alias].last_submission = omegaup.time().getTime();
 			}
 		
 			run.status = 'new';
@@ -290,7 +290,7 @@ $(document).ready(function() {
 	}
 
 	$('#submit').submit(function(e) {
-		if (!arena.onlyProblem && (arena.problems[arena.currentProblem.alias].last_submission + arena.submissionGap * 1000 > new Date().getTime())) {
+		if (!arena.onlyProblem && (arena.problems[arena.currentProblem.alias].last_submission + arena.submissionGap * 1000 > omegaup.time().getTime())) {
 			alert('Deben pasar ' + arena.submissionGap + ' segundos entre envios de un mismo problema');
 			return false;
 		}

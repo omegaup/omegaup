@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/contest.js' bodyid='only-problem'}
+{include file='arena.head.tpl' jsfile='/ux/contest.js?ts=2' bodyid='only-problem'}
 			{if $problem_admin}
 			<script type="text/javascript" src="/ux/libadmin.js"></script>
 			<ul class="tabs">
