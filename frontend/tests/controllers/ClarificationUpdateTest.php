@@ -13,7 +13,6 @@ class UpdateClarificationTest extends OmegaupTestCase {
 	 * 
 	 */
 	public function testUpdateAnswer() {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
@@ -27,31 +26,27 @@ class UpdateClarificationTest extends OmegaupTestCase {
 		$contestant = UserFactory::createUser();
 
 		// Create clarification
-		$clarificationData = ClarificationsFactory::createClarification($problemData, $contestData, $contestant);
-		
-		// Prepare request
-		$r = new Request();
-		$r["clarification_id"] = $clarificationData["response"]["clarification_id"];
-		
-		// Log in the user
-		$r["auth_token"] = $this->login($contestData["director"]);
+		$this->initMockClarificationController(2);
+		$clarificationData = ClarificationsFactory::createClarification($this, 
+			$problemData, $contestData, $contestant);
 		
 		// Update answer
-		$r["answer"] = "new answer";
-		
-		// Call api
-		$response = ClarificationController::apiUpdate($r);
+		$newAnswer = 'new answer';
+		$response = ClarificationsFactory::answer($this, $clarificationData, 
+			$contestData, $newAnswer);
 		
 		// Get clarification from DB
-		$clarification = ClarificationsDAO::getByPK($r["clarification_id"]);
+		$clarification = ClarificationsDAO::getByPK(
+			$clarificationData['response']['clarification_id']);
 		
 		// Validate that clarification stays the same
-		$this->assertEquals($clarificationData["request"]["message"], $clarification->getMessage());
-		$this->assertEquals($clarificationData["request"]["public"], $clarification->getPublic());
+		$this->assertEquals($clarificationData["request"]["message"], 
+			$clarification->getMessage());
+		$this->assertEquals($clarificationData["request"]["public"], 
+			$clarification->getPublic());
 				
 		// Validate our update
-		$this->assertEquals($r["answer"], $clarification->getAnswer());
+		$this->assertEquals($newAnswer, $clarification->getAnswer());
 	}
-
 }
 

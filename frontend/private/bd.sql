@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `Contest_User_Request` (
 	`last_update` timestamp NULL DEFAULT NULL,
 	`accepted` tinyint(1) DEFAULT NULL,
 	`extra_note` text,
-	`reason` enum('PRIVATE_CONTEST', 'PENDING') DEFAULT 'PENDING',
+	`reason` enum('PRIVATE_CONTEST','PENDING') DEFAULT 'PENDING',
 	PRIMARY KEY (`user_id`,`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Used when contestant_must_register = 1';
 
@@ -327,6 +327,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `tolerance` double NOT NULL DEFAULT 1e-9,
   `slow` tinyint(1) NOT NULL DEFAULT 0,
   `deprecated` tinyint(1) NOT NULL DEFAULT 0,
+  `email_clarifications` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`problem_id`),
   KEY `author_id` (`author_id`),
   UNIQUE KEY `problems_alias` (`alias`)

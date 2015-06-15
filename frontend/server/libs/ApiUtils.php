@@ -131,6 +131,13 @@ class ApiUtils {
 		return $string;
 	}
 
+	public static function FormatString($format, $named_args) {
+		foreach ($named_args as $key => $value) {
+			$format = str_replace("%($key)", $value, $format);
+		}
+
+		return $format;
+	}
 }
 
 ?>

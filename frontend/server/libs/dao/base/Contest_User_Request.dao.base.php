@@ -222,6 +222,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 	private static final function create( $Contest_User_Request )
 	{
 		if (is_null($Contest_User_Request->request_time)) $Contest_User_Request->request_time = gmdate('Y-m-d H:i:s');
+		if (is_null($Contest_User_Request->reason)) $Contest_User_Request->reason = 'PENDING';
 		$sql = "INSERT INTO Contest_User_Request ( `user_id`, `contest_id`, `request_time`, `last_update`, `accepted`, `extra_note`, `reason` ) VALUES ( ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contest_User_Request->user_id,

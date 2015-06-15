@@ -25,33 +25,22 @@ class CreateClarificationTest extends OmegaupTestCase {
 		// Create our contestant who will submit the clarification
 		$contestant = UserFactory::createUser();
 
-		// Our contestant has to open the contest before sending a clarification
-		ContestsFactory::openContest($contestData, $contestant);
-
-		// Then we need to open the problem
-		ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
-
-		// Create the request for our api
-		$r = new Request();
-		$r["message"] = Utils::CreateRandomString();
-		$r["contest_alias"] = $contestData["request"]["alias"];
-		$r["problem_alias"] = $problemData["request"]["alias"];
-
-		// Log in our user and set the auth_token properly
-		$r["auth_token"] = $this->login($contestant);
-
 		// Call the API
-		$response = ClarificationController::apiCreate($r);
+		$this->initMockClarificationController(1);
+		$clarificationData = ClarificationsFactory::createClarification($this, 
+			$problemData, $contestData, $contestant);
 
 		// Assert status of new contest
-		$this->assertArrayHasKey("clarification_id", $response);
+		$this->assertArrayHasKey("clarification_id", $clarificationData['response']);
 
 		// Verify that clarification was inserted in the database
-		$clarification = ClarificationsDAO::getByPK($response["clarification_id"]);
+		$clarification = 
+			ClarificationsDAO::getByPK($clarificationData['response']['clarification_id']);
 
 		// Verify our retreived clarificatoin
 		$this->assertNotNull($clarification);
-		$this->assertEquals($r["message"], $clarification->getMessage());
+		$this->assertEquals($clarificationData['request']['message'], 
+			$clarification->getMessage());
 
 		// We need to verify that the contest and problem IDs where properly saved
 		// Extractiing the contest and problem from DB to check IDs
@@ -61,6 +50,4 @@ class CreateClarificationTest extends OmegaupTestCase {
 		$this->assertEquals($contest->getContestId(), $clarification->getContestId());
 		$this->assertEquals($problem->getProblemId(), $clarification->getProblemId());
 	}
-
 }
-

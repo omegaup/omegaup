@@ -110,6 +110,9 @@ class Problems extends VO
 			if (isset($data['deprecated'])) {
 				$this->deprecated = $data['deprecated'];
 			}
+			if (isset($data['email_clarifications'])) {
+				$this->email_clarifications = $data['email_clarifications'];
+			}
 		}
 	}
 
@@ -148,7 +151,8 @@ class Problems extends VO
 			"order" => $this->order,
 			"tolerance" => $this->tolerance,
 			"slow" => $this->slow,
-			"deprecated" => $this->deprecated
+			"deprecated" => $this->deprecated,
+			"email_clarifications" => $this->email_clarifications
 		); 
 	return json_encode($vec); 
 	}
@@ -346,4 +350,11 @@ class Problems extends VO
 	  * @var tinyint(1)
 	  */
 	public $deprecated;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var tinyint(1)
+	  */
+	public $email_clarifications;
 }

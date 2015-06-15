@@ -7,12 +7,12 @@
  * @author joemmanuel
  */
 class OmegaupTestCase extends PHPUnit_Framework_TestCase {
+	public $mockClarificationController = null;
 
 	/**
 	 * setUp function gets executed before each test (thanks to phpunit)
 	 */
 	public function setUp() {
-		
 		parent::setUp();
 		UserController::$sendEmailOnVerify = false;
 		SessionController::$setCookieOnRegisterSession = false;
@@ -25,12 +25,23 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 	 * Override session_start, phpunit doesn't like it, but we still validate that it is called once
 	 */
 	public function mockSessionManager() {
-						
 		$sessionManagerMock = $this->getMock('SessionManager', array('sessionStart'));
 		$sessionManagerMock->expects($this->once())
 				->method('sessionStart')
 				->will($this->returnValue(''));		
 		SessionController::$_sessionManager = $sessionManagerMock;
+	}
+
+	protected function initMockClarificationController($times) {
+		$class = $this->getMockClass(
+			'ClarificationController',
+			array('broadcastClarification', 'sendClarificationEmail')
+		);
+		$class::staticExpects($this->exactly($times))
+			->method('broadcastClarification');
+		$class::staticExpects($this->exactly($times))
+			->method('sendClarificationEmail');
+		$this->mockClarificationController = $class;
 	}
 
 	/**

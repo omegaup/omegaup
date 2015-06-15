@@ -47,7 +47,9 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		$contestant = UserFactory::createUser();
 
 		// Create the clarification, note that contestant will create it
-		$clarificationData = ClarificationsFactory::createClarification($problemData, $contestData, $contestant);
+		$this->initMockClarificationController(1);
+		$clarificationData = ClarificationsFactory::createClarification($this, 
+			$problemData, $contestData, $contestant);
 
 		// Prepare the request object
 		$r = new Request();
@@ -82,7 +84,9 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		$contestant = UserFactory::createUser();
 
 		// Create the clarification, note that contestant will create it
-		$clarificationData = ClarificationsFactory::createClarification($problemData, $contestData, $contestant);
+		$this->initMockClarificationController(1);
+		$clarificationData = ClarificationsFactory::createClarification($this, 
+			$problemData, $contestData, $contestant);
 
 		// Prepare the request object
 		$r = new Request();
@@ -121,7 +125,9 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		$contestant2 = UserFactory::createUser();
 
 		// Create the clarification, note that contestant will create it
-		$clarificationData = ClarificationsFactory::createClarification($problemData, $contestData, $contestant);
+		$this->initMockClarificationController(1);
+		$clarificationData = ClarificationsFactory::createClarification($this, 
+			$problemData, $contestData, $contestant);
 
 		// Prepare the request object
 		$r = new Request();
@@ -152,7 +158,9 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		$contestant2 = UserFactory::createUser();
 
 		// Create the clarification, note that contestant will create it
-		$clarificationData = ClarificationsFactory::createClarification($problemData, $contestData, $contestant);
+		$this->initMockClarificationController(1);
+		$clarificationData = ClarificationsFactory::createClarification($this, 
+			$problemData, $contestData, $contestant);
 
 		// Manually set the just created clarification to PUBLIC
 		$clarification = ClarificationsDAO::getByPK($clarificationData["response"]["clarification_id"]);

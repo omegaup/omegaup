@@ -289,4 +289,47 @@ class ProblemsDAO extends ProblemsDAOBase
  		
         return $rs["Total"];
 	}
+
+	public static function getExplicitAdminEmails(Problems $problem) {
+		global $conn;
+		$sql = "
+			SELECT DISTINCT
+				e.email
+			FROM
+				(
+					SELECT
+						p.problem_id, p.author_id AS user_id
+					FROM
+						Problems AS p
+					WHERE p.problem_id = ?
+					UNION
+					SELECT
+						ur.contest_id AS problem_id, ur.user_id
+					FROM
+						User_Roles ur
+					WHERE
+						role_id = ? AND ur.contest_id = ?
+				) AS a
+			INNER JOIN
+				Users u
+			ON
+				u.user_id = a.user_id
+			INNER JOIN
+				Emails e
+			ON
+				e.user_id = u.main_email_id;
+		";
+
+		$params = array($problem->problem_id,
+			PROBLEM_ADMIN_ROLE, 
+			$problem->problem_id);
+		$rs = $conn->Execute($sql, $params);
+		
+		$result = array();
+		foreach ($rs as $r) {
+			$result[] = $r['email'];
+		}
+
+		return $result;
+	}
 }

@@ -15,7 +15,8 @@ class ClarificationsFactory {
 	 * @param type $contestData
 	 * @param type $contestant
 	 */
-	public static function createClarification($problemData, $contestData, $contestant) {
+	public static function createClarification(OmegaupTestCase $test, 
+		$problemData, $contestData, $contestant) {
 
 		// Our contestant has to open the contest before sending a clarification
 		ContestsFactory::openContest($contestData, $contestant);
@@ -34,7 +35,8 @@ class ClarificationsFactory {
 		$r["auth_token"] = OmegaupTestCase::login($contestant);
 
 		// Call the API
-		$response = ClarificationController::apiCreate($r);
+		$mock = $test->mockClarificationController;
+		$response = $mock::apiCreate($r);
 
 		// Clean up stuff
 		unset($_REQUEST);
@@ -52,7 +54,8 @@ class ClarificationsFactory {
 	 * @param type $contestData
 	 * @param type $message
 	 */
-	public static function answer($clarificationData, $contestData, $message = 'lol') {
+	public static function answer(OmegaupTestCase $test, $clarificationData, 
+		$contestData, $message = 'lol') {
 		
 		// Prepare request
 		$r = new Request();
@@ -65,8 +68,7 @@ class ClarificationsFactory {
 		$r["answer"] = $message;
 		
 		// Call api
-		ClarificationController::apiUpdate($r);		
+		$mock = $test->mockClarificationController;
+		$mock::apiUpdate($r);
 	}
-
 }
-

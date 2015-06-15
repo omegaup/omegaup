@@ -30,16 +30,19 @@ class ListClarificationsContest extends OmegaupTestCase {
 
 		// Create 4 clarifications with this contestant
 		$clarificationData1 = array();
+		$this->initMockClarificationController(9);
 		for ($i = 0; $i < 4; $i++) {
-			$clarificationData1[$i] = ClarificationsFactory::createClarification($problemData, $contestData, $contestant1);
+			$clarificationData1[$i] = 
+				ClarificationsFactory::createClarification($this, $problemData, 
+				$contestData, $contestant1);
 			// We need to sleep a little bit to separate the times
 			sleep(1);
 		}
 		
 		// Answer clarification 0 and 2
-		ClarificationsFactory::answer($clarificationData1[0], $contestData);
+		ClarificationsFactory::answer($this, $clarificationData1[0], $contestData);
 		sleep(1);
-		ClarificationsFactory::answer($clarificationData1[2], $contestData);
+		ClarificationsFactory::answer($this, $clarificationData1[2], $contestData);
 
 		// Create another contestant
 		$contestant2 = UserFactory::createUser();
@@ -47,7 +50,9 @@ class ListClarificationsContest extends OmegaupTestCase {
 		// Create 3 clarifications with this contestant
 		$clarificationData2 = array();
 		for ($i = 0; $i < 3; $i++) {
-			$clarificationData2[$i] = ClarificationsFactory::createClarification($problemData, $contestData, $contestant2);
+			$clarificationData2[$i] = 
+				ClarificationsFactory::createClarification($this, $problemData, 
+				$contestData, $contestant2);
 		}
 
 		// Prepare the request
@@ -72,6 +77,4 @@ class ListClarificationsContest extends OmegaupTestCase {
 		$this->assertEquals($clarificationData1[2]["request"]["message"], $response["clarifications"][2]["message"]);
 		$this->assertEquals($clarificationData1[0]["request"]["message"], $response["clarifications"][3]["message"]);
 	}
-
 }
-

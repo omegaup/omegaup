@@ -235,6 +235,10 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `deprecated` = ? AND";
 			array_push( $val, $Problems->getDeprecated() );
 		}
+		if (!is_null( $Problems->getEmailClarifications())) {
+			$sql .= " `email_clarifications` = ? AND";
+			array_push( $val, $Problems->getEmailClarifications() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -270,7 +274,7 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function update($Problems)
 	{
-		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `validator_time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ? WHERE  `problem_id` = ?;";
+		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `validator_time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ?, `email_clarifications` = ? WHERE  `problem_id` = ?;";
 		$params = array( 
 			$Problems->getPublic(), 
 			$Problems->getAuthorId(), 
@@ -297,6 +301,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->getTolerance(), 
 			$Problems->getSlow(), 
 			$Problems->getDeprecated(), 
+			$Problems->getEmailClarifications(), 
 			$Problems->getProblemId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -336,7 +341,8 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->tolerance)) $Problems->tolerance = 1e-9;
 		if (is_null($Problems->slow)) $Problems->slow = 0;
 		if (is_null($Problems->deprecated)) $Problems->deprecated = 0;
-		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Problems->email_clarifications)) $Problems->email_clarifications = 0;
+		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated`, `email_clarifications` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Problems->problem_id,
 			$Problems->public,
@@ -364,6 +370,7 @@ abstract class ProblemsDAOBase extends DAO
 			$Problems->tolerance,
 			$Problems->slow,
 			$Problems->deprecated,
+			$Problems->email_clarifications,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -692,6 +699,17 @@ abstract class ProblemsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `deprecated` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ProblemsA->getEmailClarifications()) ) ) & ( ! is_null ( ($b = $ProblemsB->getEmailClarifications()) ) ) ){
+				$sql .= " `email_clarifications` >= ? AND `email_clarifications` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `email_clarifications` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

@@ -18,6 +18,8 @@ OmegaUp.T = {
 	arenaPracticeScoreboardCutoff: "tempo de corte Scoreboard",
 	arenaPracticeStartTime: "Hora de início",
 	cannotAddProb: "Não é possível adicionar problema. Você não é o diretor do concurso.",
+	clarificationEmailBody: "<p>Olá!</p><p>O usuário <strong><a href=\"https://omegaup.com/profile/%(user_name)\">%(user_name)</a></strong> solicitou um esclarecimento para o problema <strong><a href=\"https://omegaup.com/arena/problem/%(problem_alias)\">%(problem_name)</a></strong>:</p><p><blockquote><p>%(clarification_body)</p></blockquote><p>Para respondê-lo, por favor visite o seguinte link: <a href=\"%(url)\">%(url)</a>.</p><p>Obrigado,<br/>omegaUp</p>",
+	clarificationEmailSubject: "[omegaUp] Novo esclarecimento para o problema %(problem_name)",
 	clarificationNotFound: "Clarificação não encontrada",
 	coderOfTheMonthFullList: "Ver a lista completa",
 	codersOfTheMonth: "codificadores do Mês",
