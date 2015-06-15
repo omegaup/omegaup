@@ -232,7 +232,8 @@ class ContestController extends Controller {
 		}
 
 		// You are admin
-		if ($r['contest_admin']) {
+		if (!is_null($r['current_user_id']) &&
+			Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			self::$log->error("Not intro because you are admin");
 			return !ContestController::SHOW_INTRO;
 		}

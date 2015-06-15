@@ -11,10 +11,7 @@ $r = new Request(array(
 
 if (ContestController::showContestIntro($r)) {
 	$smarty->display('../../templates/arena.contest.intro.tpl');
-
 } else  {
 	$smarty->assign('jsfile', '/ux/contest.js');
 	$smarty->display('../../templates/arena.contest.tpl');
-
 }
-
