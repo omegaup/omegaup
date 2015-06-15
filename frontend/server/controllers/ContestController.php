@@ -5,8 +5,6 @@
  * 
  */
 class ContestController extends Controller {
-
-	const MAX_PROBLEMS_IN_CONTEST = 30;
 	const SHOW_INTRO = true;
 
 	/**
@@ -756,7 +754,7 @@ class ContestController extends Controller {
 		$params = self::validateAddToContestRequest($r);
 
 		if (ContestProblemsDAO::CountContestProblems($params['contest']->contest_id)
-				>= ContestController::MAX_PROBLEMS_IN_CONTEST) {
+				>= MAX_PROBLEMS_IN_CONTEST) {
 			throw new PreconditionFailedException("contestAddproblemTooManyProblems");
 		}
 

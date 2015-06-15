@@ -116,6 +116,11 @@ try_define('IS_TEST',					FALSE);
 try_define('PROBLEMS_PER_PAGE', 100);
 
 # #########################
+# CONTEST CONSTANTS
+# #########################
+try_define('MAX_PROBLEMS_IN_CONTEST', 30);
+
+# #########################
 # USER TYPES
 # #########################
 try_define('USER_ADMIN',		'user_admin');

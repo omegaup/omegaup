@@ -159,7 +159,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
 		$auth_token = $this->login($contestData["director"]);
 
-		for ($i = 0; $i < ContestController::MAX_PROBLEMS_IN_CONTEST + 1; $i++) {
+		for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST + 1; $i++) {
 			// Get a problem
 			$problemData = ProblemsFactory::createProblemWithAuthor($contestData['director']);
 
@@ -176,7 +176,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 				// Call API
 				$response = ContestController::apiAddProblem($r);
 
-				$this->assertLessThan(ContestController::MAX_PROBLEMS_IN_CONTEST, $i);
+				$this->assertLessThan(MAX_PROBLEMS_IN_CONTEST, $i);
 
 				// Validate
 				$this->assertEquals("ok", $response["status"]);
@@ -184,7 +184,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 				self::assertProblemAddedToContest($problemData, $contestData, $r);
 			} catch (ApiException $e) {
 				$this->assertEquals($e->getMessage(), "contestAddproblemTooManyProblems");
-				$this->assertEquals($i, ContestController::MAX_PROBLEMS_IN_CONTEST);
+				$this->assertEquals($i, MAX_PROBLEMS_IN_CONTEST);
 			}
 		}
 	}
