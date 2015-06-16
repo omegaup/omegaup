@@ -112,6 +112,16 @@
 				</div>
 			</div>
 
+			<div class="row">
+				<div class="form-group  col-md-6">
+					<label for="email_clarifications">{#problemEditEmailClarifications#}</label>
+					<select id="email_clarifications" name="email_clarifications" class="form-control">
+						<option value="0" {if $IS_UPDATE eq 0 && $EMAIL_CLARIFICATIONS eq 0}selected="selected"{/if}>{#wordsNo#}</option>
+						<option value="1" {if $IS_UPDATE eq 0 && $EMAIL_CLARIFICATIONS eq 1}selected="selected"{/if}>{#wordsYes#}</option>
+					</select>
+				</div>
+			</div>
+
 			<input id='' name='request' value='submit' type='hidden'>
 
 			<div class="row">

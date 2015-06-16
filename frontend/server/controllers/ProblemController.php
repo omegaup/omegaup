@@ -175,6 +175,7 @@ class ProblemController extends Controller {
 		$problem->setAlias($r["alias"]);
 		$problem->setLanguages($r["languages"]);
 		$problem->setStackLimit($r["stack_limit"]);
+		$problem->setEmailClarifications($r["email_clarifications"]);
 
 		if (file_exists(PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'])) {
 			throw new DuplicatedEntryInDatabaseException('problemExists');
@@ -615,6 +616,7 @@ class ProblemController extends Controller {
 			"memory_limit"  => array("important" => true), // requires rejudge
 			"output_limit"  => array("important" => true), // requires rejudge
 			"stack_limit"   => array("important" => true), // requires rejudge
+			"email_clarifications",
 			"source",
 			"order",
 			"languages",
@@ -932,7 +934,7 @@ class ProblemController extends Controller {
 			"validator_time_limit", "overall_wall_time_limit", "extra_wall_time",
 			"memory_limit", "output_limit", "visits", "submissions", "accepted",
 			"difficulty", "creation_date", "source", "order", "points", "public",
-			"languages", "slow", "stack_limit");
+			"languages", "slow", "stack_limit", "email_clarifications");
 
 		// Read the file that contains the source
 		if (!ProblemController::isLanguageSupportedForProblem($r)) {

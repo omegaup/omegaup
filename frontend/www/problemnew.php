@@ -13,6 +13,7 @@ $smarty->assign('EXTRA_WALL_TIME', "0");
 $smarty->assign('OUTPUT_LIMIT', "10240");
 $smarty->assign('MEMORY_LIMIT', "32768");
 $smarty->assign('STACK_LIMIT', "10485760");
+$smarty->assign('EMAIL_CLARIFICATIONS', "0");
 $smarty->assign('SOURCE', "");
 $smarty->assign('PUBLIC', "0");
 
@@ -31,7 +32,8 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 				"output_limit" => $_POST["output_limit"],
  				"source" => $_POST["source"],				
 				"public" => $_POST["public"],
-				"stack_limit" => $_POST["stack_limit"]
+				"stack_limit" => $_POST["stack_limit"],
+				"email_clarifications" => $_POST["email_clarifications"]
 			));
 	$r->method = "ProblemController::apiCreate";
 
@@ -53,6 +55,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 		$smarty->assign('SOURCE', $_POST["source"]);
 		$smarty->assign('PUBLIC', $_POST["public"]);
 		$smarty->assign('STACK_LIMIT', $_POST["stack_limit"]);
+		$smarty->assign('EMAIL_CLARIFICATIONS', $_POST["email_clarifications"]);
 	} else if ($response["status"] == "ok") {
 		header("Location: /problem/{$response['alias']}/edit/");
 		die();

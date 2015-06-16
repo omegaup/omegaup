@@ -280,6 +280,7 @@ OmegaUp.T = {
 	problemEditAddTags: "Tags",
 	problemEditEditMarkdown: "Edit statement",
 	problemEditEditProblem: "Edit problem",
+	problemEditEmailClarifications: "Send clarifications through email",
 	problemEditFormAppearsAsPublic: "Appear in the public listing",
 	problemEditFormCreateProblem: "Create problem",
 	problemEditFormCustom: "Custom validator (validator.$lang$)",
