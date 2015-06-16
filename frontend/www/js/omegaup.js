@@ -230,7 +230,7 @@ OmegaUp.prototype.updateContest = function(
 					finish_time,
 					window_length,
 					alias,
-					points_decay_factor,					 
+					points_decay_factor,
 					submissions_gap,
 					feedback, 
 					penalty,
@@ -238,8 +238,10 @@ OmegaUp.prototype.updateContest = function(
 					scoreboard, 
 					penalty_type,
 					show_scoreboard_after,
+					contestant_must_register,
 					callback
 				) {
+	console.log(contestant_must_register);
 	$.post(
 		'/api/contest/update/contest_alias/' + encodeURIComponent(contest_alias) + '/' ,
 		{
@@ -251,13 +253,14 @@ OmegaUp.prototype.updateContest = function(
 			window_length		: window_length,
 			public				: public,
 			alias				: alias,
-			points_decay_factor	: points_decay_factor,			
+			points_decay_factor	: points_decay_factor,
 			submissions_gap		: submissions_gap,
 			feedback			: feedback, 
 			penalty				: penalty,
 			scoreboard			: scoreboard, 
-			penalty_type	: penalty_type,
-			show_scoreboard_after	: show_scoreboard_after 
+			penalty_type		: penalty_type,
+			show_scoreboard_after	: show_scoreboard_after,
+			contestant_must_register	: contestant_must_register
 		},
 		function(data) {
 			if (data.status !== undefined && data.status == "error") {

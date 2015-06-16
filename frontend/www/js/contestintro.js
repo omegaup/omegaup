@@ -32,7 +32,6 @@ $(document).ready(function() {
 					$("#request-access-form").show();
 					$('#start-contest-submit').prop('disabled', false);
 				} else {
-					console.log("ok");
 					$("#registration_pending").removeClass("hidden");
 				}
 			}
@@ -91,15 +90,19 @@ $(document).ready(function() {
 	}
 
 	function contestLoaded(contest) {
+		if (contest.status != "ok" ) {
+			$('#contest-details').hide();
+			$('#contest-details').parent().removeClass('col-md-6').addClass('col-md-2');
 
-		// TODO: add the spinning gif
-		$('#loading').html("");
-		$('.contest #title').html(omegaup.escape(contest.title));
-		$('.contest #description').html(omegaup.escape(contest.description));
+		} else {
+			$('.contest #title').html(omegaup.escape(contest.title));
+			$('.contest #description').html(omegaup.escape(contest.description));
 
-		$('.contest #time-until-start').html(omegaup.escape(contest.start_time));
-		$('.contest #start_time').val(dateToString(contest.start_time));
-		$('.contest #finish_time').val(dateToString(contest.finish_time));
+			$('.contest #time-until-start').html(omegaup.escape(contest.start_time));
+			$('.contest #start_time').val(dateToString(contest.start_time));
+			$('.contest #finish_time').val(dateToString(contest.finish_time));
+
+		}
 
 		// Feel free to re-write this if you have the time.
 		if (contest.contestant_must_register) {
@@ -120,5 +123,6 @@ $(document).ready(function() {
 			readyToStart(contest);
 		}
 	}
+
 	omegaup.getContestPublicDetails(contestAlias, contestLoaded);
 });

@@ -452,9 +452,9 @@ div.problem-row div.ptitle {
 		//Load Contest details
 		var a = window.location.pathname.split("/");
 		omegaup.getContest(a[a.length-1], function(data){
-			console.log(data);
 			if( data.status == "error" ){
 					switch(data.errorcode){
+						case 400:
 						case 403:
 								$(".hiddeable_on_error").hide();
 								$(".showable_on_error").show();

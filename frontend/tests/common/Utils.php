@@ -143,6 +143,8 @@ class Utils {
 			'Groups_Scoreboards_Contests',
 			'Groups_Scoreboards',			
 			'Groups',
+			'Contest_User_Request',
+			'Contest_User_Request_History'
 		);
 
 		try {

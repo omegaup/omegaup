@@ -8,6 +8,7 @@
  */
 class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 	public $mockClarificationController = null;
+	private static $logObj = null;
 
 	/**
 	 * setUp function gets executed before each test (thanks to phpunit)
@@ -274,9 +275,18 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $message Message to log
 	 */
-	public static function log($message) {
+	public static function logToErr($message) {
 		fwrite(STDERR, $message . "\n");
 	}
+
+	public static function log($message) {
+		if (is_null(self::$logObj)) {
+			self::$logObj = Logger::getLogger("tests");
+		}
+
+		self::$logObj->info("[INFO] " . $message);
+	}
+
 
 }
 

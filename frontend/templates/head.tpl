@@ -10,8 +10,10 @@
 		<script type="text/javascript" src="/js/jquery.js?ver=198b3f"></script>
 		<!--<script type="text/javascript" src="/js/jquery-ui.min.js?ver=192dc3"></script>-->
 		<!--<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js?ver=bd6cce"></script>-->
-		<script type="text/javascript" src="/js/omegaup.js?ver=fe736e"></script>
-		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=a0f58c,355838,4f9064,1d080a"></script>
+
+		<script type="text/javascript" src="/js/omegaup.js?ver=21ac40"></script>
+		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=85bd6e,f7fbba,455f7b,3817e7"></script>
+
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
 		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>
 		<script type="text/javascript" src="/js/omegaup-graph.js?ver=528500"></script>
@@ -30,6 +32,11 @@
 		
 		<!--<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js?ver=176563"></script>-->
 		<script src="/js/bootstrap.min.js?ver=176563"></script>
+
+		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
+		<script src="/js/bootstrap-table.min.js?ver=711245"></script>
+		<link rel="stylesheet" href="/css/bootstrap-table.min.css">
+
 		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
 		<link rel="stylesheet" href="/css/bootstrap-select.min.css">
 		<script type="text/javascript" src="/js/bootstrap-select.min.js?ver=cf5db5"></script>

@@ -10,84 +10,86 @@
 			<h2 class="panel-title" >{#contestRules#}</h2>
 		</div>
 
-		<div class="row">
-			<div class="col-md-6 col-md-offset-1">
-				<h2 id="title"></h2>
-				<p id="description"></p>
+		<div class="row" >
+			<div class="col-md-6 col-md-offset-1" >
+				<div id="contest-details">
+					<h2 id="title"></h2>
+					<p id="description"></p>
 
-				<div class="row">
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormStartDateDesc#}" for="start_time">{#contestNewFormStartDate#}</label>
-						<input disabled id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
-					</div>
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormStartDateDesc#}" for="start_time">{#contestNewFormStartDate#}</label>
+							<input disabled id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
+						</div>
 
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormEndDateDesc#}" for="finish_time">{#contestNewFormEndDate#}</label>
-						<input disabled id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormScoreboardAtEndDesc#}" for="show_scoreboard_after">Scoreboard al finalizar el concurso</label>
-						<select disabled id='show_scoreboard_after' name='show_scoreboard_after' class="form-control">
-							<option value='1'>{#wordsYes#}</option>
-							<option value='0'>{#wordsNo#}</option>
-						</select>
-					</div>
-
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormDifferentStartsDesc#}" for="window_length_enabled">{#contestNewFormDifferentStarts#}</label>
-						<div class="checkbox">
-							<label>
-								<input disabled type='checkbox' id='window_length_enabled' name='window_length_enabled'>	Habilitar
-							</label>
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormEndDateDesc#}" for="finish_time">{#contestNewFormEndDate#}</label>
+							<input disabled id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
 						</div>
 					</div>
-				</div>
 
-				<div class="row">
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormScoreboardTimePercentDesc#}" for="scoreboard">{#contestNewFormScoreboardTimePercent#}</label>
-						<input disabled id='scoreboard' name='scoreboard' value='100' type='text' size='3' class="form-control">
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormScoreboardAtEndDesc#}" for="show_scoreboard_after">Scoreboard al finalizar el concurso</label>
+							<select disabled id='show_scoreboard_after' name='show_scoreboard_after' class="form-control">
+								<option value='1'>{#wordsYes#}</option>
+								<option value='0'>{#wordsNo#}</option>
+							</select>
+						</div>
+
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormDifferentStartsDesc#}" for="window_length_enabled">{#contestNewFormDifferentStarts#}</label>
+							<div class="checkbox">
+								<label>
+									<input disabled type='checkbox' id='window_length_enabled' name='window_length_enabled'>	Habilitar
+								</label>
+							</div>
+						</div>
 					</div>
 
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormSubmissionsSeparationDesc#}" for="submissions_gap">{#contestNewFormSubmissionsSeparation#}</label>
-						<input disabled id='submissions_gap' name='submissions_gap' value='1' type='text' size='2' class="form-control">
-					</div>
-				</div>
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormScoreboardTimePercentDesc#}" for="scoreboard">{#contestNewFormScoreboardTimePercent#}</label>
+							<input disabled id='scoreboard' name='scoreboard' value='100' type='text' size='3' class="form-control">
+						</div>
 
-				<div class="row">
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormPenaltyTypeDesc#}" for="penalty_type">{#contestNewFormPenaltyType#}</label>
-						<select disabled name='penalty_type' id='penalty_type' class="form-control">
-							<option value='none'>{#contestNewFormNoPenalty#}</option>
-							<option value='problem_open'>{#contestNewFormByProblem#}</option>
-							<option value='contest_start'>{#contestNewFormByContests#}</option>
-							<option value='runtime'>{#contestNewFormByRuntime#}</option>
-						</select>
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormSubmissionsSeparationDesc#}" for="submissions_gap">{#contestNewFormSubmissionsSeparation#}</label>
+							<input disabled id='submissions_gap' name='submissions_gap' value='1' type='text' size='2' class="form-control">
+						</div>
 					</div>
 
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormPenaltyDesc#}" for="penalty">{#wordsPenalty#}</label>
-						<input disabled id='penalty' name='penalty' value='0' type='text' size='2' class="form-control">
-					</div>
-				</div>
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormPenaltyTypeDesc#}" for="penalty_type">{#contestNewFormPenaltyType#}</label>
+							<select disabled name='penalty_type' id='penalty_type' class="form-control">
+								<option value='none'>{#contestNewFormNoPenalty#}</option>
+								<option value='problem_open'>{#contestNewFormByProblem#}</option>
+								<option value='contest_start'>{#contestNewFormByContests#}</option>
+								<option value='runtime'>{#contestNewFormByRuntime#}</option>
+							</select>
+						</div>
 
-				<div class="row">
-					<div class="form-group col-md-6">
-						<label  title="{#contestNewFormImmediateFeedbackDesc#}" for="feedback">{#wordsFeedback#}</label>
-						<select disabled name='feedback' id='feedback' class="form-control">
-							<option value='yes'>{#wordsYes#}</option>
-							<option value='no'>{#wordsNo#}</option>
-							<option value='partial'>{#wordsPartial#}</option>
-						</select>
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormPenaltyDesc#}" for="penalty">{#wordsPenalty#}</label>
+							<input disabled id='penalty' name='penalty' value='0' type='text' size='2' class="form-control">
+						</div>
 					</div>
 
-					<div class="form-group col-md-6">
-						<label title="{#contestNewFormPintDecrementFactorDesc#}" for="points_decay_factor">{#contestNewFormPintDecrementFactor#}</label>
-						<input disabled id='points_decay_factor' name='points_decay_factor' value='0.0' type='text' size='4' class="form-control">
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label  title="{#contestNewFormImmediateFeedbackDesc#}" for="feedback">{#wordsFeedback#}</label>
+							<select disabled name='feedback' id='feedback' class="form-control">
+								<option value='yes'>{#wordsYes#}</option>
+								<option value='no'>{#wordsNo#}</option>
+								<option value='partial'>{#wordsPartial#}</option>
+							</select>
+						</div>
+
+						<div class="form-group col-md-6">
+							<label title="{#contestNewFormPintDecrementFactorDesc#}" for="points_decay_factor">{#contestNewFormPintDecrementFactor#}</label>
+							<input disabled id='points_decay_factor' name='points_decay_factor' value='0.0' type='text' size='4' class="form-control" />
+						</div>
 					</div>
 				</div>
 			</div><!-- contestRules -->
@@ -150,6 +152,6 @@
 		</div><!-- row -->
 	</div><!-- panel panel-default -->
 
-<script src="/js/contestintro.js?ver=37c1cc"></script>
+<script src="/js/contestintro.js?ver=700d18"></script>
 {include file='footer.tpl'}
 
