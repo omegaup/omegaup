@@ -11,7 +11,7 @@
 		<!--<script type="text/javascript" src="/js/jquery-ui.min.js?ver=192dc3"></script>-->
 		<!--<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js?ver=bd6cce"></script>-->
 		<script type="text/javascript" src="/js/omegaup.js?ver=58edd2"></script>
-		<script type="text/javascript" src="/js/lang.{#locale#}.js?ts=2"></script>
+		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=5a16d8,42e78b,71dbdc,ee692b"></script>
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
 		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>
 		<script type="text/javascript" src="/js/omegaup-graph.js?ver=528500"></script>
