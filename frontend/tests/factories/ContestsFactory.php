@@ -41,7 +41,7 @@ class ContestsFactory {
 		$r["feedback"] = "yes";
 		$r["penalty"] = 100;
 		$r["scoreboard"] = 100;
-		$r["penalty_time_start"] = "contest";
+		$r["penalty_type"] = "contest_start";
 		$r["penalty_calc_policy"] = "sum";		
 		
 		return array(

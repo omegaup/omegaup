@@ -162,17 +162,17 @@ class RunController extends Controller {
 			$contest_id = null;
 			$test = 0;
 		} else {
-			//check the kind of penalty_time_start for this contest
-			$penalty_time_start = $r["contest"]->getPenaltyTimeStart();
+			//check the kind of penalty_type for this contest
+			$penalty_type = $r["contest"]->penalty_type;
 
-			switch ($penalty_time_start) {
-				case "contest":
+			switch ($penalty_type) {
+				case "contest_start":
 					// submit_delay is calculated from the start
 					// of the contest
 					$start = $r["contest"]->getStartTime();
 					break;
 
-				case "problem":
+				case "problem_open":
 					// submit delay is calculated from the 
 					// time the user opened the problem
 					$opened = ContestProblemOpenedDAO::getByPK(
@@ -190,12 +190,13 @@ class RunController extends Controller {
 					break;
 
 				case "none":
+				case "runtime":
 					//we dont care
 					$start = null;
 					break;
 
 				default:
-					self::$log->error("penalty_time_start for this contests is not a valid option, asuming `none`.");
+					self::$log->error("penalty_type for this contests is not a valid option, asuming `none`.");
 					$start = null;
 			}
 
@@ -223,11 +224,12 @@ class RunController extends Controller {
 					"source" => $r["source"],
 					"status" => "new",
 					"runtime" => 0,
+					"penalty" => $submit_delay,
 					"memory" => 0,
 					"score" => 0,
 					"contest_score" => $contest_id != null ? 0 : null,
 					"ip" => $_SERVER['REMOTE_ADDR'],
-					"submit_delay" => $submit_delay, /* based on penalty_time_start */
+					"submit_delay" => $submit_delay, /* based on penalty_type */
 					"guid" => md5(uniqid(rand(), true)),
 					"verdict" => "JE",
 					"test" => $test
@@ -368,7 +370,9 @@ class RunController extends Controller {
 		}
 
 		// Fill response
-		$relevant_columns = array("guid", "language", "status", "verdict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+		$relevant_columns = array("guid", "language", "status", "verdict", 
+			"runtime", "penalty", "memory", "score", "contest_score", "time", 
+			"submit_delay");
 		$filtered = $r["run"]->asFilteredArray($relevant_columns);
 		$filtered['time'] = strtotime($filtered['time']);
 		$filtered['score'] = round((float) $filtered['score'], 4);

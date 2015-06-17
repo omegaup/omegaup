@@ -59,6 +59,9 @@ class Runs extends VO
 			if (isset($data['runtime'])) {
 				$this->runtime = $data['runtime'];
 			}
+			if (isset($data['penalty'])) {
+				$this->penalty = $data['penalty'];
+			}
 			if (isset($data['memory'])) {
 				$this->memory = $data['memory'];
 			}
@@ -105,6 +108,7 @@ class Runs extends VO
 			"status" => $this->status,
 			"verdict" => $this->verdict,
 			"runtime" => $this->runtime,
+			"penalty" => $this->penalty,
 			"memory" => $this->memory,
 			"score" => $this->score,
 			"contest_score" => $this->contest_score,
@@ -191,6 +195,13 @@ class Runs extends VO
 	  * @var int(11)
 	  */
 	public $runtime;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var int(11)
+	  */
+	public $penalty;
 
 	/**
 	  *  [Campo no documentado]

@@ -182,7 +182,7 @@ OmegaUp.prototype.createContest = function(
 					penalty,
 					public,
 					scoreboard, 
-					penalty_time_start, 					
+					penalty_type,
 					show_scoreboard_after,
 					callback
 				) {
@@ -199,9 +199,9 @@ OmegaUp.prototype.createContest = function(
 			points_decay_factor	: points_decay_factor,			
 			submissions_gap		: submissions_gap,
 			feedback			: feedback, 
-			penalty				: penalty , 			
+			penalty				: penalty ,
 			scoreboard			: scoreboard, 
-			penalty_time_start	: penalty_time_start, 
+			penalty_type	: penalty_type,
 			show_scoreboard_after	: show_scoreboard_after 
 		},
 		function(data) {
@@ -236,7 +236,7 @@ OmegaUp.prototype.updateContest = function(
 					penalty,
 					public,
 					scoreboard, 
-					penalty_time_start, 					
+					penalty_type,
 					show_scoreboard_after,
 					callback
 				) {
@@ -254,9 +254,9 @@ OmegaUp.prototype.updateContest = function(
 			points_decay_factor	: points_decay_factor,			
 			submissions_gap		: submissions_gap,
 			feedback			: feedback, 
-			penalty				: penalty , 			
+			penalty				: penalty,
 			scoreboard			: scoreboard, 
-			penalty_time_start	: penalty_time_start, 
+			penalty_type	: penalty_type,
 			show_scoreboard_after	: show_scoreboard_after 
 		},
 		function(data) {
@@ -436,7 +436,7 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 				contest.start_time = self.time(contest.start_time * 1000);
 				contest.finish_time = self.time(contest.finish_time * 1000);
 				contest.submission_deadline = self.time(contest.submission_deadline * 1000);
-				contest.show_penalty = (contest.penalty != 0 || contest.penalty_time_start != "none");
+				contest.show_penalty = (contest.penalty != 0 || contest.penalty_type != "none");
 			}
 			callback(contest);
 		},
@@ -460,7 +460,7 @@ OmegaUp.prototype.getContestPublicDetails = function(alias, callback) {
 				contest.start_time = self.time(contest.start_time * 1000);
 				contest.finish_time = self.time(contest.finish_time * 1000);
 				contest.submission_deadline = self.time(contest.submission_deadline * 1000);
-				contest.show_penalty = (contest.penalty != 0 || contest.penalty_time_start != "none");
+				contest.show_penalty = (contest.penalty != 0 || contest.penalty_type != "none");
 			}
 			callback(contest);
 		},
@@ -483,7 +483,7 @@ OmegaUp.prototype.getContestByToken = function(alias, token, callback) {
 			if (contest.status == 'ok') {
 				contest.start_time = self.time(contest.start_time * 1000);
 				contest.finish_time = self.time(contest.finish_time * 1000);
-				contest.show_penalty = (contest.penalty || contest.penalty_time_start != "none");
+				contest.show_penalty = (contest.penalty || contest.penalty_type != "none");
 			}
 			callback(contest);
 		},

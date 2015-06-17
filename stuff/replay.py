@@ -43,7 +43,7 @@ new_alias = "%s_%d" % (contest_alias, t)
 scoreboard_token = hashlib.md5(new_alias + '_scoreboard_admin').hexdigest()[:30]
 cur.execute("""INSERT INTO Contests(
 		title, description, start_time, finish_time, director_id, rerun_id, alias,
-		feedback, penalty_time_start, penalty_calc_policy, scoreboard_url,
+		feedback, penalty_type, penalty_calc_policy, scoreboard_url,
 		scoreboard_url_admin
 	) VALUES(%s, %s, %s, %s, 1, 0, %s, "yes", "none", "sum", %s, %s);""",
 	(new_alias,

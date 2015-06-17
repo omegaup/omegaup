@@ -98,7 +98,7 @@ class RunCreateTest extends OmegaupTestCase {
 		$this->assertEquals("127.0.0.1", $run->getIp());
 		
 		if (!is_null($contest)) {
-			$this->assertEquals((time() - intval(strtotime($contest->getStartTime()))) / 60, $run->getSubmitDelay(), '', 0.5);
+			$this->assertEquals((time() - intval(strtotime($contest->getStartTime()))) / 60, $run->penalty, '', 0.5);
 		}
 		
 		$this->assertEquals("JE", $run->getVerdict());

@@ -60,11 +60,12 @@
 
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label title="Indica el momento cuando se inicia a contar el tiempo: cuando inicia el concurso o cuando se abre el problema." for="penalty_time_start">{#contestNewFormPenaltyType#}</label>
-						<select disabled name='penalty_time_start' id='penalty_time_start' class="form-control">
+						<label title="{#contestNewFormPenaltyTypeDesc#}" for="penalty_type">{#contestNewFormPenaltyType#}</label>
+						<select disabled name='penalty_type' id='penalty_type' class="form-control">
 							<option value='none'>{#contestNewFormNoPenalty#}</option>
-							<option value='problem'>{#contestNewFormByProblem#}</option>
-							<option value='contest'>{#contestNewFormByContests#}</option>
+							<option value='problem_open'>{#contestNewFormByProblem#}</option>
+							<option value='contest_start'>{#contestNewFormByContests#}</option>
+							<option value='runtime'>{#contestNewFormByRuntime#}</option>
 						</select>
 					</div>
 

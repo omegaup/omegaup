@@ -25,7 +25,7 @@
 			$(".new_contest_form #penalty").val(), 
 			0 /*public*/,
 			$(".new_contest_form #scoreboard").val(), 
-			$(".new_contest_form #penalty_time_start").val(),
+			$(".new_contest_form #penalty_type").val(),
 			$(".new_contest_form #show_scoreboard_after").val(),
 			function(data) {
 				if(data.status == "ok") {

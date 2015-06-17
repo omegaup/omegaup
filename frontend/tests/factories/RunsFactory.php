@@ -134,11 +134,10 @@ class RunsFactory {
 		$run->judged_by = "J1";
 		
 		if(!is_null($submitDelay)) {
-			$run->setSubmitDelay($submitDelay);
+			$run->submit_delay = $submitDelay;
+			$run->penalty = $submitDelay;
 		}
 		
 		RunsDAO::save($run);				
 	}
-
 }
-

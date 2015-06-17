@@ -510,7 +510,7 @@ Arena.prototype.displayRun = function(run, r) {
 	} else {
 		$('.status', r).css('background-color', '');
 	}
-	$('.penalty', r).html(run.submit_delay);
+	$('.penalty', r).html(run.penalty);
 	if (run.time) {
 		$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 	}

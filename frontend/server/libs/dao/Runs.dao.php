@@ -126,7 +126,7 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	public static final function GetAllRuns($contest_id, $status, $verdict, $problem_id, $language, $user_id, $offset, $rowcount) {
-		$sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, ' .
+		$sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, r.penalty, ' .
 				'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
 				'r.submit_delay, u.username, p.alias ' .
 				'FROM Runs r ' .
@@ -380,7 +380,7 @@ class RunsDAO extends RunsDAOBase {
 	public static final function GetContestRuns($contest_id, $order_by_column, $onlyAC = false) {
 
 		$sql =	  "SELECT "
-					. "score, contest_score, problem_id, user_id, test, time, submit_delay, guid "
+					. "score, penalty, contest_score, problem_id, user_id, test, time, submit_delay, guid "
 				. "FROM "
 					. "Runs "
 				. "WHERE "
@@ -440,7 +440,7 @@ class RunsDAO extends RunsDAOBase {
 
 	public static final function GetBestRun($contest_id, $problem_id, $user_id, $finish_time, $showAllRuns) {
 		//Build SQL statement
-		$sql = "SELECT contest_score, submit_delay, guid, run_id from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' and time <= FROM_UNIXTIME(?) " . ($showAllRuns ? "" : " AND test = 0 ") . " ORDER BY contest_score DESC, submit_delay ASC  LIMIT 1";
+		$sql = "SELECT contest_score, penalty, submit_delay, guid, run_id from Runs where user_id = ? and contest_id = ? and problem_id = ? and status = 'ready' and time <= FROM_UNIXTIME(?) " . ($showAllRuns ? "" : " AND test = 0 ") . " ORDER BY contest_score DESC, penalty ASC  LIMIT 1";
 		$val = array($user_id, $contest_id, $problem_id, $finish_time);
 
 		global $conn;
@@ -459,7 +459,7 @@ class RunsDAO extends RunsDAOBase {
 	 */
 	public static final function GetBestScore($problem_id, $user_id) {
 		//Build SQL statement
-		$sql = "SELECT score from Runs where user_id = ? and problem_id = ? and status = 'ready' ORDER BY score DESC, submit_delay ASC  LIMIT 1";
+		$sql = "SELECT score from Runs where user_id = ? and problem_id = ? and status = 'ready' ORDER BY score DESC, penalty ASC  LIMIT 1";
 		$val = array($user_id, $problem_id);
 
 		global $conn;

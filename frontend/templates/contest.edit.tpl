@@ -184,7 +184,7 @@
 			$(".new_contest_form #penalty").val(contest.penalty);
 			$(".new_contest_form #public").val(contest.public);
 			$(".new_contest_form #scoreboard").val(contest.scoreboard);
-			$(".new_contest_form #penalty_time_start").val(contest.penalty_time_start);
+			$(".new_contest_form #penalty_type").val(contest.penalty_type);
 			$(".new_contest_form #show_scoreboard_after").val(contest.show_scoreboard_after);
 			
 			$(".contest-publish-form #public").val(contest.public);
@@ -233,7 +233,7 @@
 				$(".new_contest_form #penalty").val(),
 				public,
 				$(".new_contest_form #scoreboard").val(),
-				$(".new_contest_form #penalty_time_start").val(),
+				$(".new_contest_form #penalty_type").val(),
 				$(".new_contest_form #show_scoreboard_after").val(),
 				function(data) {
 					if(data.status == "ok") {

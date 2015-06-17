@@ -80,8 +80,8 @@ class Contests extends VO
 			if (isset($data['penalty'])) {
 				$this->penalty = $data['penalty'];
 			}
-			if (isset($data['penalty_time_start'])) {
-				$this->penalty_time_start = $data['penalty_time_start'];
+			if (isset($data['penalty_type'])) {
+				$this->penalty_type = $data['penalty_type'];
 			}
 			if (isset($data['penalty_calc_policy'])) {
 				$this->penalty_calc_policy = $data['penalty_calc_policy'];
@@ -130,7 +130,7 @@ class Contests extends VO
 			"submissions_gap" => $this->submissions_gap,
 			"feedback" => $this->feedback,
 			"penalty" => $this->penalty,
-			"penalty_time_start" => $this->penalty_time_start,
+			"penalty_type" => $this->penalty_type,
 			"penalty_calc_policy" => $this->penalty_calc_policy,
 			"show_scoreboard_after" => $this->show_scoreboard_after,
 			"scoreboard_url" => $this->scoreboard_url,
@@ -266,11 +266,11 @@ class Contests extends VO
 	public $penalty;
 
 	/**
-	  * Indica el momento cuando se inicia a contar el timpo: cuando inicia el concurso o cuando se abre el problema
+	  * Indica la política de cálculo de penalty: minutos desde que inició el concurso, minutos desde que se abrió el problema, o tiempo de ejecución (en milisegundos).
 	  * @access public
-	  * @var enum('contest','problem',
+	  * @var enum('contest_start','problem_open',
 	  */
-	public $penalty_time_start;
+	public $penalty_type;
 
 	/**
 	  * Indica como afecta el penalty al score.

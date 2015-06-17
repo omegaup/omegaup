@@ -167,6 +167,10 @@ abstract class RunsDAOBase extends DAO
 			$sql .= " `runtime` = ? AND";
 			array_push( $val, $Runs->getRuntime() );
 		}
+		if (!is_null( $Runs->getPenalty())) {
+			$sql .= " `penalty` = ? AND";
+			array_push( $val, $Runs->getPenalty() );
+		}
 		if (!is_null( $Runs->getMemory())) {
 			$sql .= " `memory` = ? AND";
 			array_push( $val, $Runs->getMemory() );
@@ -234,7 +238,7 @@ abstract class RunsDAOBase extends DAO
 	  **/
 	private static final function update($Runs)
 	{
-		$sql = "UPDATE Runs SET  `user_id` = ?, `problem_id` = ?, `contest_id` = ?, `guid` = ?, `language` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `ip` = ?, `time` = ?, `submit_delay` = ?, `test` = ?, `judged_by` = ? WHERE  `run_id` = ?;";
+		$sql = "UPDATE Runs SET  `user_id` = ?, `problem_id` = ?, `contest_id` = ?, `guid` = ?, `language` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `ip` = ?, `time` = ?, `submit_delay` = ?, `test` = ?, `judged_by` = ? WHERE  `run_id` = ?;";
 		$params = array( 
 			$Runs->getUserId(), 
 			$Runs->getProblemId(), 
@@ -244,6 +248,7 @@ abstract class RunsDAOBase extends DAO
 			$Runs->getStatus(), 
 			$Runs->getVerdict(), 
 			$Runs->getRuntime(), 
+			$Runs->getPenalty(), 
 			$Runs->getMemory(), 
 			$Runs->getScore(), 
 			$Runs->getContestScore(), 
@@ -274,12 +279,13 @@ abstract class RunsDAOBase extends DAO
 	{
 		if (is_null($Runs->status)) $Runs->status = 'new';
 		if (is_null($Runs->runtime)) $Runs->runtime = '0';
+		if (is_null($Runs->penalty)) $Runs->penalty = '0';
 		if (is_null($Runs->memory)) $Runs->memory = '0';
 		if (is_null($Runs->score)) $Runs->score = '0';
 		if (is_null($Runs->time)) $Runs->time = gmdate('Y-m-d H:i:s');
 		if (is_null($Runs->submit_delay)) $Runs->submit_delay = '0';
 		if (is_null($Runs->test)) $Runs->test = '0';
-		$sql = "INSERT INTO Runs ( `run_id`, `user_id`, `problem_id`, `contest_id`, `guid`, `language`, `status`, `verdict`, `runtime`, `memory`, `score`, `contest_score`, `ip`, `time`, `submit_delay`, `test`, `judged_by` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Runs ( `run_id`, `user_id`, `problem_id`, `contest_id`, `guid`, `language`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `ip`, `time`, `submit_delay`, `test`, `judged_by` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Runs->run_id,
 			$Runs->user_id,
@@ -290,6 +296,7 @@ abstract class RunsDAOBase extends DAO
 			$Runs->status,
 			$Runs->verdict,
 			$Runs->runtime,
+			$Runs->penalty,
 			$Runs->memory,
 			$Runs->score,
 			$Runs->contest_score,
@@ -439,6 +446,17 @@ abstract class RunsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `runtime` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $RunsA->getPenalty()) ) ) & ( ! is_null ( ($b = $RunsB->getPenalty()) ) ) ){
+				$sql .= " `penalty` >= ? AND `penalty` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `penalty` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

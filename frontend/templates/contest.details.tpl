@@ -203,16 +203,15 @@
 						<tr>
 							<!-- ----------------------------------------- -->
 							<td class="info">
-								<b>{#contestDetailsPenaltyTimeStart#}</b>
-								<p>
-									 Indica el momento cuando se inicia a contar el tiempo: cuando inicia el concurso o cuando se abre el problema
-								</p>
+								<b>{#contestDetailsPenaltyType#}</b>
+								<p>{#contestNewFormPenaltyTypeDesc#}</p>
 							</td>
 							<td>
-								<select name='penalty_time_start' id='penalty_time_start'>
-									<option value='none'>none</option>
-									<option value='problem'>problem</option>
-									<option value='contest'>contest</option>
+								<select name='penalty_type' id='penalty_type' class="form-control">
+									<option value='none'>{#contestNewFormNoPenalty#}</option>
+									<option value='problem_open'>{#contestNewFormByProblem#}</option>
+									<option value='contest_start'>{#contestNewFormByContests#}</option>
+									<option value='runtime'>{#contestNewFormByRuntime#}</option>
 								</select>
 							</td>
 							<td class="info">

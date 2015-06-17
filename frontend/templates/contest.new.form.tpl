@@ -80,13 +80,14 @@
 				
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="penalty_time_start">{#contestNewFormPenaltyType#}</label>
-						<select name='penalty_time_start' id='penalty_time_start' class="form-control">
+						<label for="penalty_type">{#contestNewFormPenaltyType#}</label>
+						<select name='penalty_type' id='penalty_type' class="form-control">
 							<option value='none'>{#contestNewFormNoPenalty#}</option>
-							<option value='problem'>{#contestNewFormByProblem#}</option>
-							<option value='contest'>{#contestNewFormByContests#}</option>
+							<option value='problem_open'>{#contestNewFormByProblem#}</option>
+							<option value='contest_start'>{#contestNewFormByContests#}</option>
+							<option value='runtime'>{#contestNewFormByRuntime#}</option>
 						</select>
-						<p class="help-block">Indica el momento cuando se inicia a contar el tiempo: cuando inicia el concurso o cuando se abre el problema.</p>
+						<p class="help-block">{#contestNewFormPenaltyTypeDesc#}</p>
 					</div>
 					
 					<div class="form-group col-md-6">
@@ -183,7 +184,7 @@
 		$(".new_contest_form #submissions_gap").val('1');
 		$(".new_contest_form #feedback").val('yes');
 		$(".new_contest_form #penalty").val('0');
-		$(".new_contest_form #penalty_time_start").val('none');
+		$(".new_contest_form #penalty_type").val('none');
 		$(".new_contest_form #show_scoreboard_after").val('1');		
 	});
 	
@@ -199,7 +200,7 @@
 		$(".new_contest_form #submissions_gap").val('0');
 		$(".new_contest_form #feedback").val('yes');
 		$(".new_contest_form #penalty").val('0');
-		$(".new_contest_form #penalty_time_start").val('none');
+		$(".new_contest_form #penalty_type").val('none');
 		$(".new_contest_form #show_scoreboard_after").val('1');		
 	});
 	
@@ -215,7 +216,7 @@
 		$(".new_contest_form #submissions_gap").val('1');
 		$(".new_contest_form #feedback").val('yes');
 		$(".new_contest_form #penalty").val('20');
-		$(".new_contest_form #penalty_time_start").val('contest');
+		$(".new_contest_form #penalty_type").val('contest_start');
 		$(".new_contest_form #show_scoreboard_after").val('1');		
 	});
 </script>

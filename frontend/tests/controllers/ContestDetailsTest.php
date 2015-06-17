@@ -51,7 +51,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$this->assertEquals($contest->getFeedback(), $response["feedback"]);
 		$this->assertEquals($contest->getPenalty(), $response["penalty"]);
 		$this->assertEquals($contest->getScoreboard(), $response["scoreboard"]);
-		$this->assertEquals($contest->getPenaltyTimeStart(), $response["penalty_time_start"]);
+		$this->assertEquals($contest->penalty_type, $response["penalty_type"]);
 		$this->assertEquals($contest->getPenaltyCalcPolicy(), $response["penalty_calc_policy"]);
 
 		// Assert we have our problems

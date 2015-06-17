@@ -313,7 +313,7 @@ class ContestController extends Controller {
 
 		// Create array of relevant columns
 
-		$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy", "public", "show_scoreboard_after", "contestant_must_register");
+		$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_type", "penalty_calc_policy", "public", "show_scoreboard_after", "contestant_must_register");
 
 		// Initialize response to be the contest information
 		$result = $r["contest"]->asFilteredArray($relevant_columns);
@@ -379,7 +379,7 @@ class ContestController extends Controller {
 		Cache::getFromCacheOrSet(Cache::CONTEST_INFO, $r["contest_alias"], $r, function(Request $r) {
 
 			// Create array of relevant columns
-			$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_time_start", "penalty_calc_policy", "public", "show_scoreboard_after");
+			$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_type", "penalty_calc_policy", "public", "show_scoreboard_after");
 
 			// Initialize response to be the contest information
 			$result = $r["contest"]->asFilteredArray($relevant_columns);
@@ -518,7 +518,7 @@ class ContestController extends Controller {
 		$contest->setSubmissionsGap($r["submissions_gap"]);
 		$contest->setFeedback($r["feedback"]);
 		$contest->setPenalty(max(0, intval($r["penalty"])));
-		$contest->setPenaltyTimeStart($r["penalty_time_start"]);
+		$contest->penalty_type = $r["penalty_type"];
 		$contest->setPenaltyCalcPolicy(is_null($r["penalty_calc_policy"]) ? "sum" : $r["penalty_calc_policy"]);
 		$contest->setScoreboardUrl(self::randomString(30));
 		$contest->setScoreboardUrlAdmin(self::randomString(30));
@@ -655,7 +655,7 @@ class ContestController extends Controller {
 		Validators::isNumberInRange($r["submissions_gap"], "submissions_gap", 0, $contest_length, $is_required);
 
 		Validators::isInEnum($r["feedback"], "feedback", array("no", "yes", "partial"), $is_required);
-		Validators::isInEnum($r["penalty_time_start"], "penalty_time_start", array("contest", "problem", "none"), $is_required);
+		Validators::isInEnum($r["penalty_type"], "penalty_type", array("contest_start", "problem_open", "runtime", "none"), $is_required);
 		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"), false);
 
 		// Check that the users passed through the private_users parameter are valid
@@ -1621,7 +1621,7 @@ class ContestController extends Controller {
 			"submissions_gap",
 			"feedback",
 			"penalty"				=> array("transform" => function($value) { return max(0, intval($value)); }),
-			"penalty_time_start",
+			"penalty_type",
 			"penalty_calc_policy",
 			"show_scoreboard_after",
 		);
@@ -2105,7 +2105,9 @@ class ContestController extends Controller {
 		self::validateStats($r);
 
 		// Get our runs
-		$relevant_columns = array("run_id", "guid", "language", "status", "verdict", "runtime", "memory", "score", "contest_score", "time", "submit_delay", "Users.username", "Problems.alias");
+		$relevant_columns = array("run_id", "guid", "language", "status", 
+			"verdict", "runtime", "penalty", "memory", "score", "contest_score", 
+			"time", "submit_delay", "Users.username", "Problems.alias");
 		try {
 			$runs = RunsDAO::search(new Runs(array(
 								"contest_id" => $r["contest"]->getContestId()

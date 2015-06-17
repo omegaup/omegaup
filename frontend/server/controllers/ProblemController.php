@@ -964,7 +964,9 @@ class ProblemController extends Controller {
 
 		if (!is_null($r['current_user_id'])) {
 			// Create array of relevant columns for list of runs
-			$relevant_columns = array("guid", "language", "status", "verdict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+			$relevant_columns = array("guid", "language", "status", "verdict", 
+				"runtime", "penalty", "memory", "score", "contest_score", "time", 
+				"submit_delay");
 
 			// Search the relevant runs from the DB
 			$contest = ContestsDAO::getByAlias($r["contest_alias"]);
@@ -1130,7 +1132,9 @@ class ProblemController extends Controller {
 				$runs_array = RunsDAO::search($keyrun);
 
 				// Create array of relevant columns for list of runs
-				$relevant_columns = array("guid", "language", "status", "verdict", "runtime", "memory", "score", "contest_score", "time", "submit_delay");
+				$relevant_columns = array("guid", "language", "status", "verdict", 
+					"runtime", "penalty", "memory", "score", "contest_score", "time", 
+					"submit_delay");
 
 				// Add each filtered run to an array
 				$response["runs"] = array();
