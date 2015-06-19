@@ -11,7 +11,7 @@ import sys
 
 TEMPLATES_PATH = 'frontend/templates'
 WWW_PATH = 'frontend/www'
-JS_RE = re.compile(r'.*[\'"]((/(?:ux|js)/.*?\.js)(\?ver=[0-9a-f]+)?)[\'"]')
+JS_RE = re.compile(r'.*[\'"]((/(?:ux|js)/.*?\.js)(\?ver=[0-9a-f,]+)?)[\'"]')
 LANGS = ['es', 'en', 'pt', 'hacker-boy']
 
 class colors:

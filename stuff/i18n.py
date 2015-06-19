@@ -13,6 +13,7 @@ TEMPLATES_PATH = 'frontend/templates'
 JS_TEMPLATES_PATH = 'frontend/www/js'
 PSEUDOLOC = 'hacker-boy'
 LINE_RE = re.compile(r'\s+=\s+')
+VALUE_RE = re.compile('^"([^"]|\\")*"$')
 
 class colors:
 	HEADER = '\033[95m'
@@ -43,17 +44,20 @@ for lang_path in glob(os.path.join(templates_dir, '*.lang')):
 	languages.add(lang)
 	last_key = ''
 	with codecs.open(lang_path, 'r', 'utf-8') as lang_file:
-		for line in lang_file:
+		for lineno, line in enumerate(lang_file):
 			try:
-				key, value = LINE_RE.split(line.strip())
+				key, value = LINE_RE.split(line.strip(), 1)
 				if last_key >= key:
 					not_sorted.add(lang)
 				last_key = key
 				if key not in strings:
 					strings[key] = {}
+				if VALUE_RE.match(value) is None:
+					raise Exception("Invalid value")
 				strings[key][lang] = value
 			except:
-				print >> sys.stderr, 'Invalid i18n line "%s" in file "%s"' % (line.strip(), lang_path)
+				print >> sys.stderr, 'Invalid i18n line "%s" in %s:%d' % (
+						line.strip(), lang_path, lineno + 1)
 				sys.exit(1)
 
 errors = False
