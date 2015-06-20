@@ -21,7 +21,7 @@
 	<div class="col-md-10 no-right-padding">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h2 class="panel-title">{if $profile.userinfo.rankinfo.rank > 0}#{$profile.userinfo.rankinfo.rank} - {/if}{$profile.userinfo.username} {if isset($profile.userinfo.country_id)} <img src="/media/flags/{$profile.userinfo.country_id|lower}.png" width="16" height="11" /> {/if}</h2>
+				<h2 class="panel-title">{if $profile.userinfo.rankinfo.rank > 0}#{$profile.userinfo.rankinfo.rank} - {/if}{$profile.userinfo.username} {if isset($profile.userinfo.country_id)} <img src="/media/flags/{$profile.userinfo.country_id|lower}.png" width="16" height="11" title="{$profile.userinfo.country_id}"/> {/if}</h2>
 			</div>
 			<div class="panel-body">
 				<div id="SettingsPage_Content">

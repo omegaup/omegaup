@@ -2058,6 +2058,6 @@ function getFlagSrc(user) {
 	if (typeof user.country === 'undefined' || user.country === null) {
 		return '';
 	} else {
-		return ' <img src="/media/flags/' + user.country.toLowerCase() + '.png" width="16" height="11" />';
+		return ' <img src="/media/flags/' + user.country.toLowerCase() + '.png" width="16" height="11" title="' + user.country + '" />';
 	}
 }
