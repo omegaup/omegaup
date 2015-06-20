@@ -370,6 +370,7 @@
 										.attr('href', '/profile/' + user.username + '/')
 										.attr('target', '_blank') 
 										.text( '(' + user.username + ')')
+										.append(getFlagSrc(user))
 								))
 
 							// Country
@@ -431,7 +432,7 @@
 							.append($('<td></td>').append(
 								$('<a></a>')
 									.attr('href', '/profile/' + user.username + '/')
-									.text(user.username)
+									.text(user.username).append(getFlagSrc(user))
 							))
 							.append($('<td></td>').text(user.access_time))
 							.append($('<td><button type="button" class="close">&times;</button></td>')

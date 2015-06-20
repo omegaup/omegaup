@@ -1526,7 +1526,7 @@ class ContestController extends Controller {
 		foreach ($db_results as $result) {
 			$user_id = $result->getUserId();
 			$user = UsersDAO::getByPK($user_id);
-			$users[] = array("user_id" => $user_id, "username" => $user->getUsername(), 'access_time' => $result->access_time);
+			$users[] = array("user_id" => $user_id, "username" => $user->getUsername(), 'access_time' => $result->access_time, 'country' => $user->getCountryId());
 		}
 
 		$response = array();

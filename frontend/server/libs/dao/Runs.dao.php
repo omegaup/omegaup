@@ -344,7 +344,7 @@ class RunsDAO extends RunsDAOBase {
 
 		// Build SQL statement		
 		if (!$showAllRuns) {
-			$sql = "SELECT Users.user_id, username, Users.name from Users INNER JOIN ( "
+			$sql = "SELECT Users.user_id, username, Users.name, Users.country_id from Users INNER JOIN ( "
 					. "SELECT DISTINCT Runs.user_id from Runs "
 					. "WHERE ( Runs.verdict NOT IN ('CE', 'JE') AND Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? "" : " AND Runs.test = 0") . " ) ) "
 				. "RunsContests ON Users.user_id = RunsContests.user_id " . (!is_null($filterUsersBy) ? "WHERE Users.username LIKE ?" : "");
@@ -355,7 +355,7 @@ class RunsDAO extends RunsDAOBase {
 				$val = array($contest_id, $filterUsersBy . "%");
 			}
 		} else {
-			$sql = "SELECT Users.user_id, username, Users.name from Users "
+			$sql = "SELECT Users.user_id, username, Users.name, Users.country_id from Users "
 					. "INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id "
 					. "WHERE contest_id = ? AND Users.user_id NOT IN"
 						. " (SELECT user_id FROM User_Roles WHERE contest_id = ? OR contest_id = 0)"
