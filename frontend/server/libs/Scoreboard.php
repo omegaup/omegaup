@@ -282,8 +282,7 @@ class Scoreboard {
 			true /* showAllRuns */
 		), $timeout);
 
-		// Try to broadcast the updated scoreboards:
-		$log = Logger::getLogger("Scoreboard");
+		// Try to broadcast the updated scoreboards:		
 		try {
 			$grader = new Grader();
 			$log->debug("Sending updated scoreboards");
@@ -379,7 +378,8 @@ class Scoreboard {
 				'name' => $contestant->getName() ?
 					$contestant->getName() :
 					$contestant->getUsername(),
-				'total' => null
+				'total' => null,
+				'country' => $contestant->getCountryId()
 			);
 		}
 
@@ -555,7 +555,7 @@ class Scoreboard {
 				continue;
 			}
 
-		$log = Logger::getLogger("Scoreboard");
+			$log = Logger::getLogger("Scoreboard");
 			$run_delay = strtotime($run->getTime());
 		    $log->debug(">>      run_delay : $run_delay");
 		    $log->debug(">>scoreboardLimit : $scoreboardLimit");
@@ -606,7 +606,8 @@ class Scoreboard {
 				'total' => array(
 					'points' => 0,
 					'penalty' => 0
-				)
+				),
+				'country' => $user->getCountryId()
 			);
 
 			foreach ($user_problems_score[$user_id] as $problem) {

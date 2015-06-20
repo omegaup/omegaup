@@ -2053,3 +2053,11 @@ function toHHMM(duration) {
     var time    = hours+'h '+minutes+'m';
     return time;
 }
+
+function getFlagSrc(user) {
+	if (typeof user.country === 'undefined' || user.country === null) {
+		return '';
+	} else {
+		return ' <img src="/media/flags/' + user.country.toLowerCase() + '.png" width="16" height="11" />';
+	}
+}

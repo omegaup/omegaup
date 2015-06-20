@@ -558,7 +558,8 @@ Arena.prototype.onRankingChanged = function(data) {
 		
 		var username = rank.username +
 			((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
-		$('.user', r).html(username);
+		
+		$('.user', r).html(username + getFlagSrc(rank));
 
 		currentRankingState[username] = {
 			place: rank.place,
@@ -644,7 +645,7 @@ Arena.prototype.onRankingChanged = function(data) {
 				.addClass('inserted');
 
 			$('.position', r).html(rank.place);
-			$('.user', r).html('<span title="' + username + '">' + rank.username + '</span>');
+			$('.user', r).html('<span title="' + username + '">' + rank.username + getFlagSrc(rank) +'</span>');
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
 
