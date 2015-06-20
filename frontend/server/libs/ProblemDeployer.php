@@ -28,6 +28,7 @@ class ProblemDeployer {
 	private $targetDir = null;
 	private $zipPath = null;
 	public $hasValidator = false;
+	public $requiresRejudge = false;
 	private $isInteractive = false;
 	private $checkedForInteractive = false;
 	private $idlFile = null;
@@ -118,15 +119,36 @@ class ProblemDeployer {
 		try {
 			return $this->execute("/usr/bin/git $cmd", $cwd);
 		} catch (Exception $e) {
-			throw new ProblemDeploymentException();
+			throw new ProblemDeploymentException($e);
 		}
 	}
 
 	public function commit($message, $user) {
 		$this->git('add .', $this->tmpDir);
-		if ($this->git('status -s --porcelain', $this->tmpDir) == '') {
+		$this->requiresRejudge = false;
+		$changedFiles = false;
+		foreach (split('\n', $this->git('status -s --porcelain', $this->tmpDir)) as $line) {
+			if ($line == '') {
+				// Happens when the input is empty.
+				continue;
+			}
+			$changedFiles = true;
+			$path = substr($line, 3);
+			if (strpos($path, ".git") === 0 || strpos($path, "statements/") === 0 ||
+			    strpos($path, "examples/") === 0 ||
+			    strpos($path, "interactive/examples/") === 0) {
+				continue;
+			}
+			$this->requiresRejudge = true;
+		}
+		if (!$changedFiles) {
 			// No changes detected. Return happily.
+			$this->log->debug("No files changed.");
 			return;
+		} else if ($this->requiresRejudge) {
+			$this->log->debug("Files changed, rejudge required.");
+		} else {
+			$this->log->debug("Files changed.");
 		}
 		$this->git('config user.email ' . escapeshellarg("$user->username@omegaup"),
 		           $this->tmpDir);

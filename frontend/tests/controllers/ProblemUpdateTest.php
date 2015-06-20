@@ -46,12 +46,12 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$r["stack_limit"] = 12345;
 		
 		// Set file upload context
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT."triangulos.zip";
+		$_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT."triangulos.zip";
 		
 		// Log in as contest director
 		$r["auth_token"] = $this->login($problemData["author"]);
 		
-		//Call API
+		// Call API
 		$response = ProblemController::apiUpdate($r);
 		
 		// Verify data in DB
@@ -64,13 +64,15 @@ class UpdateProblemTest extends OmegaupTestCase {
 		
 		// Validate rsponse
 		$this->assertEquals("ok", $response["status"]);
+		$this->assertEquals(true, $response["rejudged"]);
 		$this->assertEquals("cases/1.in", $response["uploaded_files"][0]);
 		
 		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r["problem_alias"] . DIRECTORY_SEPARATOR;
 
 		$this->assertFileExists($targetpath . "cases");
-		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
+		$this->assertFileExists($targetpath . "statements/es.html");
+		$this->assertFileNotExists($targetpath . "examples/sample.in");
 		
 		// Check update in statements
 		$statement = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.html");
@@ -78,6 +80,12 @@ class UpdateProblemTest extends OmegaupTestCase {
 		
 		$this->assertEquals(12345, $problems[0]->stack_limit);
 				
+		// Call API again to add an example, should not trigger rejudge.
+		$_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT."triangulos-examples.zip";
+		$response = ProblemController::apiUpdate($r);
+		$this->assertEquals("ok", $response["status"]);
+		$this->assertEquals(false, $response["rejudged"]);
+		$this->assertFileExists($targetpath . "examples/sample.in");
 	}
 	
 	public function testUpdateProblemWithValidLanguages() {

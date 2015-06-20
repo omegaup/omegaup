@@ -625,7 +625,9 @@ class ProblemController extends Controller {
 		$requiresRejudge = self::updateValueProperties($r, $problem, $valueProperties);
 		$r['problem'] = $problem;
 
-		$response = array();
+		$response = array(
+			'rejudged' => false
+		);
 		$problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES);
 
 		// Insert new problem
@@ -634,7 +636,6 @@ class ProblemController extends Controller {
 			ProblemsDAO::transBegin();
 
 			if (isset($_FILES['problem_contents']) && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
-				$requiresRejudge = true;
 
 				// DeployProblemZip requires alias => problem_alias
 				$r["alias"] = $r["problem_alias"];
@@ -657,6 +658,7 @@ class ProblemController extends Controller {
 
 				$response["uploaded_files"] = $problemDeployer->filesToUnzip;
 				$problemDeployer->commit("Updated problem contents", $r['current_user']);
+				$requiresRejudge |= $problemDeployer->requiresRejudge;
 			} else {
 				$problem->slow = $problemDeployer->isSlow($problem);
 			}
@@ -682,10 +684,11 @@ class ProblemController extends Controller {
 			$problemDeployer->cleanup();
 		}
 
-		if (($requiresRejudge === true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE === true)) {
+		if (($requiresRejudge == true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE == true)) {
 			self::$log->info("Calling ProblemController::apiRejudge");
 			try {
 				self::apiRejudge($r);
+				$response['rejudged'] = true;
 			} catch (Exception $e) {
 				self::$log->error("Best efort ProblemController::apiRejudge failed", $e);
 			}
