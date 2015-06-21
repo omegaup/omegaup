@@ -282,7 +282,8 @@ class Scoreboard {
 			true /* showAllRuns */
 		), $timeout);
 
-		// Try to broadcast the updated scoreboards:		
+		// Try to broadcast the updated scoreboards:	
+		$log = Logger::getLogger("Scoreboard");
 		try {
 			$grader = new Grader();
 			$log->debug("Sending updated scoreboards");
