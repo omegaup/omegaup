@@ -291,7 +291,14 @@
 							<td class="author"></td>
 							<td class="time"></td>
 							<td><pre class="message"></pre></td>
-							<td class="answer"><pre></pre></td>
+							<td class="answer">
+								<pre></pre>
+								<form id="create-response-form" class="form-inline template">																	
+									<textarea id="create-response-text" class="form-control" placeholder="{#wordsAnswer#}"></textarea>
+									<label><input type="checkbox" id="create-response-is-public"/> {#wordsPublic#}</label>									
+									<input type="submit" />
+								</form>
+							</td>
 						</tr>
 					</tbody>
 				</table>

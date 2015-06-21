@@ -505,7 +505,8 @@ body#only-problem #problems .main {
 
 .clarifications tbody td {
 	border: 1px solid #000;
-	padding: 0.2em;
+	padding: 0.4em;
+	padding-left: 7px;
 }
 
 .clarifications tfoot td a {

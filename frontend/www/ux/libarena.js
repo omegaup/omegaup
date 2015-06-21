@@ -854,31 +854,30 @@ Arena.prototype.updateClarification = function(clarification) {
 	if (self.clarifications[clarification.clarification_id]) {
 		r = self.clarifications[clarification.clarification_id];
 	} else {
-		r = $('.clarifications tbody tr.template')
+		r = $('.clarifications tbody.clarification-list tr.template')
 			.clone()
 			.removeClass('template')
 			.addClass('inserted');
 
 		if (self.admin) {
-			(function(id, answer, answerNode) {
+			(function(id, answerNode) {
+				var responseFormNode = $('#create-response-form', answerNode).removeClass('template');
 				if (clarification.public == 1) {
-					$('input[type="checkbox"]', answer).attr('checked', 'checked');
+					$('#create-response-is-public', responseFormNode).attr('checked', 'checked');
 				}
-				answer.submit(function () {
+				responseFormNode.submit(function () {
 					omegaup.updateClarification(
 						id,
-						$('textarea', answer).val(),
-						$('input[type="checkbox"]', answer)[0].checked,
+						$('#create-response-text', this).val(),
+						$('#create-response-is-public', this)[0].checked,
 						function() {
-							$('pre', answerNode).html($('textarea', answer).val());
-							$('textarea', answer).val('');
+							$('pre', answerNode).html($('#create-response-text', answerNode).val());
+							$('#create-response-text', answerNode).val('');
 						}
 					);
 					return false;
-				});
-
-				answerNode.append(answer);
-			})(clarification.clarification_id, $('<form><input type="checkbox" /><textarea></textarea><input type="submit" /></form>'), $('.answer', r));
+				});				
+			})(clarification.clarification_id, $('.answer', r));
 		}
 	}
 
@@ -903,7 +902,7 @@ Arena.prototype.updateClarification = function(clarification) {
 	}
 
 	if (!self.clarifications[clarification.clarification_id]) {
-		$('.clarifications tbody').prepend(r);
+		$('.clarifications tbody.clarification-list').prepend(r);
 		self.clarifications[clarification.clarification_id] = r;
 	}
 };
