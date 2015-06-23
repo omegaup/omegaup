@@ -416,10 +416,11 @@ class Scoreboard {
 			}
 
 			$totalPenalty = $run->penalty +	$problem['runs'] * $contest_penalty;
-			if ($problem['points'] < $contest_score ||
-			    $problem['points'] == $contest_score && $problem['penalty'] > $totalPenalty) {
-				$problem['points'] = (int)round($contest_score);
-				$problem['percent'] = (int)round($score * 100);
+			$rounded_score = round($contest_score, 2);
+			if ($problem['points'] < $rounded_score ||
+			    $problem['points'] == $rounded_score && $problem['penalty'] > $totalPenalty) {
+				$problem['points'] = $rounded_score;
+				$problem['percent'] = round($score * 100, 2);
 				$problem['penalty'] = $totalPenalty;
 
 				if ($withRunDetails === true) {
