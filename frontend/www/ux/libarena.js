@@ -478,7 +478,7 @@ Arena.prototype.displayRun = function(run, r) {
 
 	$('.id', r).html(run.run_id);
 	$('.guid', r).html(self.admin ? run.guid : run.guid.substring(run.guid.length - 5));
-	$('.username', r).html(run.username);
+	$('.username', r).html(getProfileLink(run.username) + getFlagSrc(run, 'country_id'));
 	$('.language', r).html(run.language);
 	if (run.alias) {
 		$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');

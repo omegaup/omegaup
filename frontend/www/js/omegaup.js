@@ -2054,10 +2054,16 @@ function toHHMM(duration) {
     return time;
 }
 
-function getFlagSrc(user) {
-	if (typeof user.country === 'undefined' || user.country === null) {
+function getFlagSrc(user, property) {
+	property = typeof property !== 'undefined' ? property : 'country';
+	
+	if (typeof user[property] === 'undefined' || user[property] === null) {
 		return '';
 	} else {
-		return ' <img src="/media/flags/' + user.country.toLowerCase() + '.png" width="16" height="11" title="' + user.country + '" />';
+		return ' <img src="/media/flags/' + user[property].toLowerCase() + '.png" width="16" height="11" title="' + user[property] + '" />';
 	}
+}
+
+function getProfileLink(username) {
+	return '<a href="/profile/' + username +'" >' + username + '</a>';
 }
