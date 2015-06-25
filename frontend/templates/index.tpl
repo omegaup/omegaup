@@ -48,7 +48,7 @@
 			</div>
 			<div id="coder_of_the_month" class="panel-body">
 				<div class="rss_element">
-					<h4 class="text-center" id="coder-of-the-month-username"><a href="/profile/{$coderOfTheMonthData.username|htmlspecialchars}">{$coderOfTheMonthData.username|htmlspecialchars}</a></h4>
+					<h4 class="text-center" id="coder-of-the-month-username"><a href="/profile/{$coderOfTheMonthData.username|htmlspecialchars}">{$coderOfTheMonthData.username|htmlspecialchars}</a><img src="/media/flags/{$coderOfTheMonthData.country_id|lower}.png" width="16" height="11" title="{$coderOfTheMonthData.country_id}"/></h4>
 					<div class="text-center" id="coder-of-the-month-img"><a href="/profile/{$coderOfTheMonthData.username|htmlspecialchars}"><img src="{$coderOfTheMonthData.gravatar_92}"></a></div>
 					<div id="coder-of-the-month-name">{$coderOfTheMonthData.name|htmlspecialchars}</div>
 					<div id="coder-of-the-month-school">{$coderOfTheMonthData.school|htmlspecialchars}</div>

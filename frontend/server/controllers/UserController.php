@@ -1385,7 +1385,8 @@ class UserController extends Controller {
 							"name" => $user->getName(), 
 							"problems_solved" => $userEntry["problems_solved"],
 							"rank" => $userEntry["rank"],
-							"score" => $userEntry["score"]));
+							"score" => $userEntry["score"],
+							"country_id" => $user->getCountryId()));
 					}
 				}
 				return $response;			
