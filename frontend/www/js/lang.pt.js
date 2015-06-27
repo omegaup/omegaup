@@ -258,6 +258,7 @@ OmegaUp.T = {
 	passwordResetResetSuccess: "Sua senha foi atualizada.",
 	passwordResetResetTitle: "Password Reset",
 	pendingRegistrations: "inscrições pendentes",
+	privacyPolicyNotice: "Ao clicar em Registrar-se você está aceitando o site <a href='http://blog.omegaup.com/privacy-policy/'> Uso e Política de Privacidade </a>.",
 	privateUsers: "Usuários privados",
 	privateUsersContainsInvalidUser: "Lista de usuários privados contém um usuário que não existe",
 	probAliasAndContestAliasInvalid: "Aliás do problema e aliás do concurso combinação é inválida.",

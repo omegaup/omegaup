@@ -94,7 +94,11 @@
 						</div>
 					</div>
 				</div>
-				
+				<div class="row">
+					<div class="col-md-4 col-md-offset-2">
+						{#privacyPolicyNotice#}
+					</div>
+				</div>
 				<div class="row">
 					<div class="col-md-4 col-md-offset-6">
 						<div class="form-group">

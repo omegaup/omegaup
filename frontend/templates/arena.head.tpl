@@ -10,7 +10,7 @@
 		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
 		<script type="text/javascript" src="/js/omegaup.js?ver=fe736e"></script>
-		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=dd7717,f72aed,2d3cbf,692115"></script>
+		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=a0f58c,355838,4f9064,1d080a"></script>
 		<script type="text/javascript" src="/ux/libarena.js?ver=835d86"></script>
 		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>

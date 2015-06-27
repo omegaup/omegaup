@@ -258,6 +258,7 @@ OmegaUp.T = {
 	passwordResetResetSuccess: "(Y0ur pa55w0rd ha5 b33n upda73d.)",
 	passwordResetResetTitle: "(R3537 pa55w0rd)",
 	pendingRegistrations: "(P3nding r3qu3575)",
+	privacyPolicyNotice: "(By c1icking 0n R3gi573r y0u ar3 acc3p7ing 7h3 5i73 <a hr3f='h77p://b10g.0m3gaup.c0m/privacy-p01icy/'>U53 and Privacy P01icy</a>.)",
 	privateUsers: "(priva73_u53r5)",
 	privateUsersContainsInvalidUser: "(priva73_u53r5 c0n7ain5 a u53r 7ha7 d035n'7 3xi575)",
 	probAliasAndContestAliasInvalid: "(pr0b13m_a1ia5 and c0n7357_a1ia5 c0mbina7i0n i5 inva1id.)",

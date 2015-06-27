@@ -257,6 +257,7 @@ passwordResetResetExpired = "El tiempo para restablecer tu contraseña ha expira
 passwordResetResetSuccess = "Tu contraseña ha sido actualizada."
 passwordResetResetTitle = "Restablecer contraseña"
 pendingRegistrations = "Solicitudes pendientes"
+privacyPolicyNotice = "Al dar click en Registrar aceptas las <a href='http://blog.omegaup.com/privacy-policy/'>Políticas de Uso y Privacidad</a> del sitio."
 privateUsers = "Usuarios privados"
 privateUsersContainsInvalidUser = "Lista de usuarios privados contiene un usuario que no existe"
 probAliasAndContestAliasInvalid = "Alias de problema y alias de concurso combinacion es invalida"
