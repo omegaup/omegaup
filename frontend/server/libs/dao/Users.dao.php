@@ -128,11 +128,11 @@ class UsersDAO extends UsersDAOBase {
 		$conn->Execute("SET @prev_ties_count = 0;");
 		$conn->Execute("SET @ties_count = 0");
 		$sql = "SELECT 
-					ProblemsSolved, score, username, name, rank, user_id 
+					ProblemsSolved, score, username, name, rank, user_id, country_id 
 				FROM 
 					(
 						SELECT 
-							ProblemsSolved, username, score, name, user_id, @prev_ties_count := @ties_count as previous_ties_count,
+							ProblemsSolved, username, score, name, country_id, user_id, @prev_ties_count := @ties_count as previous_ties_count,
 						CASE
 							WHEN @prev_value_ties = score THEN @ties_count := @ties_count + 1
 							WHEN @prev_value_ties := score THEN @ties_count := 0                                                                     
@@ -144,7 +144,7 @@ class UsersDAO extends UsersDAOBase {
 						FROM 
 							(
 								SELECT
-									username, name, up.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
+									username, name, country_id, up.user_id, COUNT(ps.problem_id) ProblemsSolved, SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
 								FROM
 									(
 										SELECT DISTINCT
