@@ -908,7 +908,11 @@ class UserController extends Controller {
 				$response
 		);
 
-		$response["userinfo"]["rankinfo"] = self::getRankByProblemsSolved($r);
+		if (is_null($r["omit_rank"]) || !$r["omit_rank"]) {
+			$response["userinfo"]["rankinfo"] = self::getRankByProblemsSolved($r);
+		} else {
+			$response["userinfo"]["rankinfo"] = array();
+		}
 
 		// Do not leak plain emails in case the request is for a profile other than 
 		// the logged user's one

@@ -1431,6 +1431,7 @@ class ContestController extends Controller {
 			// Get user profile. Email, school, etc.
 			$profile_request = new Request();
 			$profile_request["username"] = $user->getUsername();
+			$profile_request["omit_rank"] = true;
 
 			$userprofile = UserController::apiProfile($profile_request);
 
