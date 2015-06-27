@@ -31,3 +31,5 @@ exit_group: 1
 uname: 1
 process_vm_readv: 1
 getpid: 1
+set_robust_list: 1
+setrlimit: 1
