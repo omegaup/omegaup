@@ -28,9 +28,6 @@ class ContestStatsTest extends OmegaupTestCase {
 		// Create a run that we will wait to grade it
 		$maxWaitRunData = RunsFactory::createRun($problemData, $contestData, $contestant);
 
-		// Wait 1 sec before pushiing more runs
-		sleep(1);
-
 		// Create some runs to be pending
 		$pendingRunsCount = 10;
 		$pendingRunsData = array();

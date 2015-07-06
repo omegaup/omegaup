@@ -7,25 +7,25 @@ date_default_timezone_set('UTC');
 
 define("OMEGAUP_ROOT", __DIR__ . "/../");
 // Load test specific config globals
-require_once("test_config.php");
-require_once("test_config.default.php");
+require_once(OMEGAUP_ROOT . "tests/test_config.php");
+require_once(OMEGAUP_ROOT . "tests/test_config.default.php");
 require_once(OMEGAUP_ROOT . "server/config.default.php");
 
 // Load api caller
 require_once(OMEGAUP_ROOT . "www/api/ApiCaller.php");
-require_once("controllers/ApiCallerMock.php");
+require_once(OMEGAUP_ROOT . "tests/controllers/ApiCallerMock.php");
 
 // Load test utils
-require_once("controllers/OmegaupTestCase.php");
-require_once("common/Utils.php");
+require_once(OMEGAUP_ROOT . "tests/controllers/OmegaupTestCase.php");
+require_once(OMEGAUP_ROOT . "tests/common/Utils.php");
 
 // Load Factories
-require_once 'factories/ProblemsFactory.php';
-require_once 'factories/ContestsFactory.php';
-require_once 'factories/ClarificationsFactory.php';
-require_once 'factories/UserFactory.php';
-require_once 'factories/RunsFactory.php';
-require_once 'factories/GroupsFactory.php';
+require_once(OMEGAUP_ROOT . 'tests/factories/ProblemsFactory.php');
+require_once(OMEGAUP_ROOT . 'tests/factories/ContestsFactory.php');
+require_once(OMEGAUP_ROOT . 'tests/factories/ClarificationsFactory.php');
+require_once(OMEGAUP_ROOT . 'tests/factories/UserFactory.php');
+require_once(OMEGAUP_ROOT . 'tests/factories/RunsFactory.php');
+require_once(OMEGAUP_ROOT . 'tests/factories/GroupsFactory.php');
 
 // Clean previous log
 Utils::CleanLog();

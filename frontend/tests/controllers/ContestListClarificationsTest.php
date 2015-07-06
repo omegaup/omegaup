@@ -35,13 +35,10 @@ class ListClarificationsContest extends OmegaupTestCase {
 			$clarificationData1[$i] = 
 				ClarificationsFactory::createClarification($this, $problemData, 
 				$contestData, $contestant1);
-			// We need to sleep a little bit to separate the times
-			sleep(1);
 		}
 		
 		// Answer clarification 0 and 2
 		ClarificationsFactory::answer($this, $clarificationData1[0], $contestData);
-		sleep(1);
 		ClarificationsFactory::answer($this, $clarificationData1[2], $contestData);
 
 		// Create another contestant

@@ -1,0 +1,15 @@
+language: php
+
+php:
+  - 5.5
+  - hhvm
+
+env:
+  - DB=mysql
+
+before_script:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
+  - mysql omegaup-test < frontend/private/bd.sql
+  - mysql omegaup-test < frontend/private/countries_and_states.sql
+
+script: phpunit --bootstrap frontend/tests/bootstrap.php --configuration frontend/tests/phpunit.txt frontend/tests/controllers

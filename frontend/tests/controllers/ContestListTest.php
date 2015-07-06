@@ -41,9 +41,13 @@ class ContestListTest extends OmegaupTestCase {
 		
 		$response = ContestController::apiList($r);
 		
-		// Assert our contest is there
-        $this->assertArrayHasKey("0", $response['results']);        
-        $this->assertEquals($contestData["request"]["title"], $response['results'][0]["title"]);
+		// Assert our contest is there.
+		foreach ($response['results'] as $contest) {
+			if ($contest['title'] == $contestData['request']['title']) {
+				return;
+			}
+		}
+		assertFalse(TRUE, 'Array does not contain created contest');
 	}		
 	
 	

@@ -199,8 +199,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
 		$firstAccessTime = $contest_user->getAccessTime();
 
-		// Call API again after 1 second, access time should not change		
-		sleep(1);
+		// Call API again, access time should not change		
 		$response = ContestController::apiDetails($r);
 
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
@@ -233,8 +232,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
 		$firstAccessTime = $contest_user->getAccessTime();
 
-		// Call API again after 1 second, access time should not change		
-		sleep(1);
+		// Call API again, access time should not change		
 		$response = ContestController::apiDetails($r);
 
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
@@ -270,8 +268,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
 		$firstAccessTime = $contest_user->getAccessTime();
 
-		// Call API again after 1 second, access time should not change		
-		sleep(1);
+		// Call API again, access time should not change		
 		$response = ContestController::apiDetails($r);
 
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
