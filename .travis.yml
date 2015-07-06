@@ -16,3 +16,7 @@ script:
   - phpunit --bootstrap frontend/tests/bootstrap.php --configuration frontend/tests/phpunit.xml frontend/tests/controllers
   - python stuff/i18n.py --validate
   - python stuff/update-templates.py --validate
+
+notifications:
+  slack:
+    secure: BGGaWyzHJ0Fb+oU93EjuZZ7e/2GK+dT1Ao3W5Ulbv8dQbzV761151T4Vby40hxIMim+MoXq+zL2GQ9i7tg6GnEMNVVBpHqL40S1Y5qZbZMPkcy0vq14t41uX5vJNIYVp24IvTxWKy3XA2+cq7irILTD2lMzv6xMveawhYdiqkwU=
