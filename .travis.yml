@@ -2,7 +2,6 @@ language: php
 
 php:
   - 5.5
-  - hhvm
 
 env:
   - DB=mysql
@@ -12,4 +11,7 @@ before_script:
   - mysql omegaup-test < frontend/private/bd.sql
   - mysql omegaup-test < frontend/private/countries_and_states.sql
 
-script: phpunit --bootstrap frontend/tests/bootstrap.php --configuration frontend/tests/phpunit.xml frontend/tests/controllers
+script:
+  - phpunit --bootstrap frontend/tests/bootstrap.php --configuration frontend/tests/phpunit.xml frontend/tests/controllers
+  - python stuff/i18n.py --validate
+  - python stuff/update-templates.py --validate

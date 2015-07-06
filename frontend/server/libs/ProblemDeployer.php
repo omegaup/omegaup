@@ -127,7 +127,7 @@ class ProblemDeployer {
 		$this->git('add .', $this->tmpDir);
 		$this->requiresRejudge = false;
 		$changedFiles = false;
-		foreach (split('\n', $this->git('status -s --porcelain', $this->tmpDir)) as $line) {
+		foreach (explode('\n', $this->git('status -s --porcelain', $this->tmpDir)) as $line) {
 			if ($line == '') {
 				// Happens when the input is empty.
 				continue;

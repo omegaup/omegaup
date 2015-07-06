@@ -20,11 +20,9 @@
  *
  */
 class GraderMock extends Grader {
-
-	public function Grade($runId) {
+	public function Grade($runGuids, $rejudge, $debug) {
 		return;
 	}
-
 }
 
 class RunsFactory {
