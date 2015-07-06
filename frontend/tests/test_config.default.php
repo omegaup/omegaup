@@ -8,6 +8,8 @@ if (!function_exists('try_define')) {
 # DATABASE CONFIG
 # ####################################
 try_define('OMEGAUP_DB_NAME',                      'omegaup-test');
+try_define('OMEGAUP_DB_USER', 'root');
+try_define('OMEGAUP_DB_PASS', '');
 
 # ####################################
 # TEST CONFIG

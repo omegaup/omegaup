@@ -7,7 +7,8 @@ date_default_timezone_set('UTC');
 
 define("OMEGAUP_ROOT", __DIR__ . "/../");
 // Load test specific config globals
-require_once(OMEGAUP_ROOT . "tests/test_config.php");
+// Do not panic if the test-specific override file is not present.
+@include_once(OMEGAUP_ROOT . "tests/test_config.php");
 require_once(OMEGAUP_ROOT . "tests/test_config.default.php");
 require_once(OMEGAUP_ROOT . "server/config.default.php");
 
