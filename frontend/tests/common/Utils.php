@@ -119,7 +119,7 @@ class Utils {
 
 	static function CleanPath($path) {
 		FileHandler::DeleteDirRecursive($path);
-		mkdir($path);
+		mkdir($path, 0755, true);
 	}
 
 	static function CleanupDB() {

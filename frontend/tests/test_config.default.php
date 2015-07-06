@@ -14,9 +14,9 @@ try_define('OMEGAUP_DB_PASS', '');
 # ####################################
 # TEST CONFIG
 # ####################################
-try_define('OMEGAUP_FRONTEND_SERVER_ROOT',		OMEGAUP_ROOT . 'server/');
-try_define('OMEGAUP_TEST_ROOT',			'/opt/omegaup/frontend/tests/controllers/');
-try_define('OMEGAUP_RESOURCES_ROOT',		'/opt/omegaup/frontend/tests/resources/');
+try_define('OMEGAUP_FRONTEND_SERVER_ROOT',		OMEGAUP_ROOT . '/server/');
+try_define('OMEGAUP_TEST_ROOT',			OMEGAUP_ROOT . '/tests/controllers/');
+try_define('OMEGAUP_RESOURCES_ROOT',		OMEGAUP_ROOT . '/tests/resources/');
 try_define('OMEGAUP_BASE_URL',			'http://localhost');
 
 # ####################################
@@ -29,16 +29,15 @@ try_define('OMEGAUP_LOG_LEVEL',				"debug");
 # GRADER CONFIG
 # ####################################
 try_define('OMEGAUP_GRADER_URL',			'https://localhost:21680/grade/');
-try_define('OMEGAUP_SSLCERT_URL',			'/opt/omegaup/frontend/omegaup.pem');
-try_define('OMEGAUP_CACERT_URL',			'/opt/omegaup/frontend/omegaup.pem');
+try_define('OMEGAUP_SSLCERT_URL',			OMEGAUP_ROOT . '/omegaup.pem');
+try_define('OMEGAUP_CACERT_URL',			OMEGAUP_ROOT . '/omegaup.pem');
 try_define('RUNS_PATH',				OMEGAUP_TEST_ROOT . 'submissions');
 try_define('GRADE_PATH',				OMEGAUP_TEST_ROOT . 'grade');
 try_define('PROBLEMS_PATH',				OMEGAUP_TEST_ROOT . 'problems');
 try_define('PROBLEMS_GIT_PATH',				OMEGAUP_TEST_ROOT . 'problems.git');
 try_define('IMAGES_PATH',				OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH',			'/img/');
-try_define('BIN_PATH',				'/opt/omegaup/bin');
-try_define('OMEGAUP_GRADER_CONFIG_PATH',		'/opt/omegaup/grader/omegaup.conf');
+try_define('BIN_PATH',				OMEGAUP_ROOT . '/../bin');
 
 # #########################
 # CACHE CONFIG
