@@ -47,8 +47,8 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		$contestant = UserFactory::createUser();
 
 		// Create the clarification, note that contestant will create it
-		$this->initMockClarificationController(1);
-		$clarificationData = ClarificationsFactory::createClarification($this, 
+		$this->detourBroadcasterCalls();
+		$clarificationData = ClarificationsFactory::createClarification(
 			$problemData, $contestData, $contestant);
 
 		// Prepare the request object
@@ -84,8 +84,8 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		$contestant = UserFactory::createUser();
 
 		// Create the clarification, note that contestant will create it
-		$this->initMockClarificationController(1);
-		$clarificationData = ClarificationsFactory::createClarification($this, 
+		$this->detourBroadcasterCalls();
+		$clarificationData = ClarificationsFactory::createClarification(
 			$problemData, $contestData, $contestant);
 
 		// Prepare the request object
@@ -125,8 +125,8 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		$contestant2 = UserFactory::createUser();
 
 		// Create the clarification, note that contestant will create it
-		$this->initMockClarificationController(1);
-		$clarificationData = ClarificationsFactory::createClarification($this, 
+		$this->detourBroadcasterCalls();
+		$clarificationData = ClarificationsFactory::createClarification(
 			$problemData, $contestData, $contestant);
 
 		// Prepare the request object
@@ -158,8 +158,8 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		$contestant2 = UserFactory::createUser();
 
 		// Create the clarification, note that contestant will create it
-		$this->initMockClarificationController(1);
-		$clarificationData = ClarificationsFactory::createClarification($this, 
+		$this->detourBroadcasterCalls();
+		$clarificationData = ClarificationsFactory::createClarification(
 			$problemData, $contestData, $contestant);
 
 		// Manually set the just created clarification to PUBLIC

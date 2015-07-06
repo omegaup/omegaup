@@ -26,13 +26,13 @@ class UpdateClarificationTest extends OmegaupTestCase {
 		$contestant = UserFactory::createUser();
 
 		// Create clarification
-		$this->initMockClarificationController(2);
-		$clarificationData = ClarificationsFactory::createClarification($this, 
+		$this->detourBroadcasterCalls($this->exactly(2));
+		$clarificationData = ClarificationsFactory::createClarification(
 			$problemData, $contestData, $contestant);
 		
 		// Update answer
 		$newAnswer = 'new answer';
-		$response = ClarificationsFactory::answer($this, $clarificationData, 
+		$response = ClarificationsFactory::answer($clarificationData, 
 			$contestData, $newAnswer);
 		
 		// Get clarification from DB

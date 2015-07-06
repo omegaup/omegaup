@@ -32,18 +32,6 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 		SessionController::$_sessionManager = $sessionManagerMock;
 	}
 
-	protected function initMockClarificationController($times) {
-		$class = $this->getMockClass(
-			'ClarificationController',
-			array('broadcastClarification', 'sendClarificationEmail')
-		);
-		$class::staticExpects($this->exactly($times))
-			->method('broadcastClarification');
-		$class::staticExpects($this->exactly($times))
-			->method('sendClarificationEmail');
-		$this->mockClarificationController = $class;
-	}
-
 	/**
 	 * Given an User, checks that login let state as supposed
 	 * 
@@ -248,7 +236,6 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function detourGraderCalls($times = null) {
-
 		if (is_null($times)) {
 			$times = $this->once();
 		}
@@ -266,6 +253,21 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 		RunController::$grader = $graderMock;
 		ProblemController::$grader = $graderMock;
 	}
+
+	protected function detourBroadcasterCalls($times=null) {
+		if (is_null($times)) {
+			$times = $this->once();
+		}
+
+		$broadcasterMock = $this->getMock(
+			'Broadcaster',
+			array('broadcastClarification')
+		);
+		$broadcasterMock->expects($times)
+			->method('broadcastClarification');
+		ClarificationController::$broadcaster = $broadcasterMock;
+	}
+
 
 	/**
 	 * Log a message to STDERR

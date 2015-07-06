@@ -30,16 +30,16 @@ class ListClarificationsContest extends OmegaupTestCase {
 
 		// Create 4 clarifications with this contestant
 		$clarificationData1 = array();
-		$this->initMockClarificationController(9);
+		$this->detourBroadcasterCalls($this->exactly(9));
 		for ($i = 0; $i < 4; $i++) {
 			$clarificationData1[$i] = 
-				ClarificationsFactory::createClarification($this, $problemData, 
+				ClarificationsFactory::createClarification($problemData, 
 				$contestData, $contestant1);
 		}
 		
 		// Answer clarification 0 and 2
-		ClarificationsFactory::answer($this, $clarificationData1[0], $contestData);
-		ClarificationsFactory::answer($this, $clarificationData1[2], $contestData);
+		ClarificationsFactory::answer($clarificationData1[0], $contestData);
+		ClarificationsFactory::answer($clarificationData1[2], $contestData);
 
 		// Create another contestant
 		$contestant2 = UserFactory::createUser();
@@ -48,7 +48,7 @@ class ListClarificationsContest extends OmegaupTestCase {
 		$clarificationData2 = array();
 		for ($i = 0; $i < 3; $i++) {
 			$clarificationData2[$i] = 
-				ClarificationsFactory::createClarification($this, $problemData, 
+				ClarificationsFactory::createClarification($problemData, 
 				$contestData, $contestant2);
 		}
 

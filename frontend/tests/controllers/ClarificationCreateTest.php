@@ -26,8 +26,8 @@ class CreateClarificationTest extends OmegaupTestCase {
 		$contestant = UserFactory::createUser();
 
 		// Call the API
-		$this->initMockClarificationController(1);
-		$clarificationData = ClarificationsFactory::createClarification($this, 
+		$this->detourBroadcasterCalls();
+		$clarificationData = ClarificationsFactory::createClarification( 
 			$problemData, $contestData, $contestant);
 
 		// Assert status of new contest
