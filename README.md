@@ -1,5 +1,7 @@
 # Bienvenido a omegaUp!
 
+[![Build Status](https://travis-ci.org/omegaup/omegaup.svg?branch=master)](https://travis-ci.org/omegaup/omegaup)
+
 ## Código
 
 Estos son los directorios que estamos usando activamente en el desarrollo:
