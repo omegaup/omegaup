@@ -81,7 +81,7 @@ class ResetController extends Controller {
 		);
 	}
 
-	private function validateCreateRequest($r) {
+	private static function validateCreateRequest($r) {
 		$user = UsersDAO::FindByEmail($r['email']);
 		if (is_null($user)) {
 			throw new InvalidParameterException('invalidUser');
@@ -97,7 +97,7 @@ class ResetController extends Controller {
 		}
 	}
 
-	private function validateUpdateRequest($r) {
+	private static function validateUpdateRequest($r) {
 		$user = UsersDAO::FindByEmail($r['email']);
 		$reset_token = $r['reset_token'];
 		$password = $r['password'];
