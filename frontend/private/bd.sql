@@ -200,14 +200,28 @@ CREATE TABLE IF NOT EXISTS `Contest_User_Request` (
 	`user_id` int(11) NOT NULL,
 	`contest_id` int(11) NOT NULL,
 	`request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`last_update` timestamp NULL DEFAULT NULL,
+	`last_update` timestamp NOT NULL ,
 	`accepted` tinyint(1) DEFAULT NULL,
 	`extra_note` text,
-	`reason` enum('PRIVATE_CONTEST','PENDING') DEFAULT 'PENDING',
 	PRIMARY KEY (`user_id`,`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Used when contestant_must_register = 1';
 
 	-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Contest_User_Request_History`
+--
+
+CREATE TABLE IF NOT EXISTS `Contest_User_Request_History` (
+	  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+	  `user_id` int(11) NOT NULL,
+	  `contest_id` int(11) NOT NULL,
+	  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	  `accepted` tinyint(4) NOT NULL,
+	  `admin_id` int(11) NOT NULL,
+	  PRIMARY KEY (`history_id`),
+	  KEY `user_contest_hist` (`user_id`, `contest_id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 
 --
 -- Estructura de tabla para la tabla `Countries`

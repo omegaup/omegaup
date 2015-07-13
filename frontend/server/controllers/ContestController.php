@@ -165,7 +165,6 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function canAccessContest(Request $r) {
-		
 		if (!isset($r["contest"]) || is_null($r["contest"])) {
 			throw new NotFoundException("contestNotFound");
 		}
@@ -176,7 +175,8 @@ class ContestController extends Controller {
 
 		if ($r["contest"]->public != 1) {
 			try {
-				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) 
+						&& !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 					throw new ForbiddenAccessException("userNotAllowed");
 				}
 			} catch (ApiException $e) {
@@ -185,6 +185,16 @@ class ContestController extends Controller {
 			} catch (Exception $e) {
 				// Operation failed in the data layer
 				throw new InvalidDatabaseOperationException($e);
+			}
+		} else {
+			if ($r["contest"]->contestant_must_register == "1") {
+				if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+					$req = ContestUserRequestDAO::getByPK($r["current_user_id"], $r["contest"]->contest_id);
+
+					if (is_null($req) || ($req->accepted === "0")) {
+						throw new ForbiddenAccessException("youAreNotRegistered");
+					}
+				}
 			}
 		}
 	}
@@ -241,7 +251,9 @@ class ContestController extends Controller {
 		$cs = SessionController::apiCurrentSession();
 
 		// You already started the contest.
-		if (!is_null(ContestsUsersDAO::getByPK($cs["id"], $r["contest"]->getContestId()))) {
+		$contestOpened = null;
+		if (!is_null($clarificationEmailBody = ContestsUsersDAO::getByPK($cs["id"], $r["contest"]->getContestId()))
+				&& ($contestOpened->access_time != "0000-00-00 00:00:00")) {
 			self::$log->debug("Not intro because you already started the contest");
 			return !ContestController::SHOW_INTRO;
 		}
@@ -379,7 +391,25 @@ class ContestController extends Controller {
 		Cache::getFromCacheOrSet(Cache::CONTEST_INFO, $r["contest_alias"], $r, function(Request $r) {
 
 			// Create array of relevant columns
-			$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_type", "penalty_calc_policy", "public", "show_scoreboard_after");
+			$relevant_columns = array(
+				"title",
+				"description", 
+				"start_time", 
+				"finish_time",
+				"window_length",
+				"alias", 
+				"scoreboard", 
+				"points_decay_factor",
+				"partial_score", 
+				"submissions_gap", 
+				"feedback", 
+				"penalty", 
+				"time_start", 
+				"penalty_type",
+				"penalty_calc_policy",
+				"public", 
+				"show_scoreboard_after",
+				"contestant_must_register");
 
 			// Initialize response to be the contest information
 			$result = $r["contest"]->asFilteredArray($relevant_columns);
@@ -1408,23 +1438,35 @@ class ContestController extends Controller {
 			throw new ForbiddenAccessException();
 		}
 
-		// Get users from DB
-		$contest_user_key = new ContestUserRequest();
-		$contest_user_key->setContestId($contest->getContestId());
-
 		try {
-			$db_results = ContestUserRequestDAO::search($contest_user_key);
+			$db_results = ContestUserRequestDAO::getRequestsForContest($contest->getContestId());
 		} catch (Exception $e) {
-			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
 
 		// @TODO prefetch an alias-user_id map so that we dont need
-		// a getbypk (sql select query) on every iteration of the following
-		// loop
+		// a getbypk (sql select query) on every iteration of the following loop
+
+		// Precalculate all admin profiles.
+		$admin_infos = array();
+		foreach ($db_results as $result) {
+			$admin_id = $result["admin_id"];
+			if (!array_key_exists($admin_id, $admin_infos)) {
+				$data = UsersDAO::getByPK($admin_id);
+				if (!is_null($data)) {
+					$admin_infos[$admin_id]["user_id"] = $data->user_id;
+					$admin_infos[$admin_id]["username"] = $data->username;
+					$admin_infos[$admin_id]["name"] = $data->name;
+				}
+			}
+		}
 
 		$users = array();
 		foreach ($db_results as $result) {
+
+			$admin_id = $result["admin_id"];
+
+			$result = new ContestUserRequest($result);
 			$user_id = $result->getUserId();
 			$user = UsersDAO::getByPK($user_id);
 
@@ -1434,15 +1476,20 @@ class ContestController extends Controller {
 			$profile_request["omit_rank"] = true;
 
 			$userprofile = UserController::apiProfile($profile_request);
+			$adminprofile = array();
 
-			$users[] = array(
-				"userinfo" => $userprofile["userinfo"],
-				"username" => $user->getUsername(),
-				"last_update" => $result->last_update,
-				"last_update" => $result->last_update,
-				"accepted" => $result->accepted,
-				"extra_note" => $result->extra_note,
-				"request_time" => $result->request_time);
+			if (array_key_exists($admin_id, $admin_infos)) {
+				$adminprofile = $admin_infos[$admin_id];
+			}
+
+			$users[] = array_merge(
+				$userprofile["userinfo"],
+				array(
+					"last_update" => $result->last_update,
+					"accepted" => $result->accepted,
+					"extra_note" => $result->extra_note,
+					"admin" => $adminprofile,
+					"request_time" => $result->request_time));
 		}
 
 		$response = array();
@@ -1453,9 +1500,15 @@ class ContestController extends Controller {
 	}
 
 	public static function apiArbitrateRequest(Request $r) {
+
 		$result = array("status" => "ok");
 
-		// user must be admin of conest to arbitrate security
+		if (is_null($r["resolution"])) {
+			throw new InvalidParameterException("invalidParameters");
+		}
+
+		// user must be admin of contest to arbitrate security
+		$current_ses = SessionController::getCurrentSession($r);
 
 		try {
 			$r["contest"] = ContestsDAO::getByAlias($r["contest_alias"]);
@@ -1475,13 +1528,31 @@ class ContestController extends Controller {
 			throw new InvalidParameterException("userNotInListOfRequests");
 		}
 
-		$request->setAccepted($r["resolution"] == "true");
-		$request->setExtraNote($r["note"]);
+		if ($r["resolution"] === "false") {
+			// "false" casts to true.
+			$resolution = false;
+		} else {
+			$resolution = (bool)$r["resolution"];
+		}
 
+		$request->setAccepted($resolution);
+		$request->setExtraNote($r["note"]);
 		$request->setLastUpdate(gmdate('Y-m-d H:i:s'));
-		//$request->setLastModificationBy($current_ses["id"]);
 
 		ContestUserRequestDAO::save($request);
+
+		// Save this action in the history
+		$history = new ContestUserRequestHistory();
+		$history->user_id = $request->user_id;
+		$history->contest_id = $request->user_id;
+		$history->time = $request->last_update;
+		$history->admin_id = $current_ses["id"];
+		$history->accepted = $request->accepted;
+
+		ContestUserRequestHistoryDAO::save($history);
+
+		self::$log->info("Arbitrated contest for user, new accepted user_id="
+								. $r["target_user"]->user_id . ", state=" . $resolution);
 
 		return $result;
 	}
@@ -1601,12 +1672,12 @@ class ContestController extends Controller {
 
 		// Update contest DAO
 		if (!is_null($r["public"])) {
-			
+
 			// If going public
-			if ($r["public"] == 1) {				
-				self::validateContestCanBePublic($r["contest"]);								
+			if ($r["public"] == 1) {
+				self::validateContestCanBePublic($r["contest"]);
 			}
-			
+
 			$r["contest"]->setPublic($r["public"]);
 		}
 
@@ -1625,6 +1696,7 @@ class ContestController extends Controller {
 			"penalty_type",
 			"penalty_calc_policy",
 			"show_scoreboard_after",
+			"contestant_must_register",
 		);
 		self::updateValueProperties($r, $r["contest"], $valueProperties);
 

@@ -65,7 +65,7 @@
 				<form class='contest-publish-form'>
 					<div class="form-group">
 						<label for="public">{#contestNewFormPublic#}</label>
-						<select name='public' id='public' class="form-control">
+						<select name='public' id='registration' class="form-control">
 							<option value='0' selected="selected">{#wordsNo#}</option>
 							<option value='1'>{#wordsYes#}</option>
 						</select>
@@ -101,20 +101,21 @@
 			</table>
 		</div>
 
-		<div class="panel panel-primary">
+		<div class="panel panel-primary" id="requests">
 			<div class="panel-body">
 				{#pendingRegistrations#}
 			</div>
-			<table class="table table-striped">
+			<table id="user-requests-table"  >
 				<thead>
+				<tr>
 					<th>{#wordsUser#}</th>
 					<th>{#userEditCountry#}</th>
 					<th>{#requestDate#}</th>
 					<th>{#currentStatus#}</th>
 					<th>{#lastUpdate#}</th>
-					<th colspan="2">{#contestAdduserAddContestant#}</th>
+					<th>{#contestAdduserAddContestant#}</th>
+				</tr>
 				</thead>
-				<tbody id="contest-users-request"></tbody>
 			</table>
 		</div>
 	</div>
@@ -183,11 +184,17 @@
 			$(".new_contest_form #feedback").val(contest.feedback);
 			$(".new_contest_form #penalty").val(contest.penalty);
 			$(".new_contest_form #public").val(contest.public);
+			$(".new_contest_form #register").val(contest.contestant_must_register);
 			$(".new_contest_form #scoreboard").val(contest.scoreboard);
 			$(".new_contest_form #penalty_type").val(contest.penalty_type);
 			$(".new_contest_form #show_scoreboard_after").val(contest.show_scoreboard_after);
 			
 			$(".contest-publish-form #public").val(contest.public);
+
+			if (contest.contestant_must_register == null ||
+					contest.contestant_must_register == "0"){
+				$("#requests").hide();
+			}
 		});
 
 		omegaup.getProblems(function(problems) {
@@ -235,6 +242,7 @@
 				$(".new_contest_form #scoreboard").val(),
 				$(".new_contest_form #penalty_type").val(),
 				$(".new_contest_form #show_scoreboard_after").val(),
+				$(".new_contest_form #register").val(),
 				function(data) {
 					if(data.status == "ok") {
 						OmegaUp.ui.success('Tu concurso ha sido editado! <a href="/arena/'+ $('.new_contest_form #alias').val() + '">{#contestEditGoToContest#}</a>');
@@ -336,88 +344,79 @@
 			$('#problems-dropdown').val(val.alias);
 		});
 
-		function parseRequestStatus(resultFromApi) {
-			if (resultFromApi == null) {
-				return "Pending.";
-			}
-
-			if (resultFromApi == "true"
-					|| resultFromApi == "1") {
-				return "Accepted";
-			}
-
-			return "Denied";
-		}
-
 		function refreshContestRequests() {
-			omegaup.getContestRequests(contestAlias, function(users) {
 
-				$('#contest-users-request').empty();
-
-				// Got the contests, lets populate the dropdown with them
-				for (var i = 0; i < users.users.length; i++) {
-					user = users.users[i];
-
-					$('#contest-users-request').append(
-						$('<tr></tr>')
-
-							// Username
-							.append($('<td></td>').append(
-								$('<b></b>')
-									.text(user.userinfo.name)
-								).append(
-									$('<a></a>')
-										.attr('href', '/profile/' + user.username + '/')
-										.attr('target', '_blank') 
-										.text( '(' + user.username + ')')
-										.append(getFlagSrc(user))
-								))
-
-							// Country
-							.append($('<td></td>').text(user.userinfo.country))
-
-							// Request time
-							.append($('<td></td>').text(user.request_time))
-
-							// Current Status
-							.append($('<td></td>').text(parseRequestStatus(user.accepted)))
-
-							// Last update
-							.append($('<td></td>').text(user.last_update == null ? "" : user.last_update))
-
-							// Arbitrate request : Deny
-							.append($('<td><button type="button" class="close" style="color:red">&times;</button></td>')
-								.click((function(username) {
-									return function(e) {
-										omegaup.arbitrateContestUserRequest(contestAlias, username, false, "notes", function(response) {
+			$("#user-requests-table").bootstrapTable({
+				method:'get',
+				url : '/api/contest/requests/contest_alias/{$smarty.get.contest}/',
+				onPostBody: function () {
+					$(".close.request-accept").click((function() {
+							return function() {
+								var username = $(this).val();
+								var contestAlias = '{$smarty.get.contest}';
+								omegaup.arbitrateContestUserRequest(contestAlias, username, true /* accepted */, "", function(response) {
 										if (response.status == "ok") {
-												OmegaUp.ui.success("{#successfulOperation#}");
-												refreshContestRequests();
-											} else {
-												OmegaUp.ui.error(response.error || 'error');
-											}
-										});
-									};
-								})(user.username))
-							)
+											OmegaUp.ui.success("{#successfulOperation#}");
+											$('#user-requests-table').bootstrapTable('refresh');
+										} else {
+											OmegaUp.ui.error(response.error || 'error');
+										}
+									});
+								};
+							})());
 
-							// Arbitrate request : Approve
-							.append($('<td><button type="button" class="close" style="color:green">&#x2713;</button></td>')
-								.click((function(username) {
-									return function(e) {
-										omegaup.arbitrateContestUserRequest(contestAlias, username, true, "notes", function(response) {
-											if (response.status == "ok") {
-												OmegaUp.ui.success("{#successfulOperation#}");
-												refreshContestRequests();
-											} else {
-												OmegaUp.ui.error(response.error || 'error');
-											}
-										});
-									};
-								})(user.username))
-							)
-					);
-				}
+					$(".close.request-deny").click((function() {
+							return function() {
+								var username = $(this).val();
+								var contestAlias = '{$smarty.get.contest}';
+								omegaup.arbitrateContestUserRequest(contestAlias, username, false /* rejected */, "", function(response) {
+										if (response.status == "ok") {
+											OmegaUp.ui.success("{#successfulOperation#}");
+											$('#user-requests-table').bootstrapTable('refresh');
+										} else {
+											OmegaUp.ui.error(response.error || 'error');
+										}
+									});
+								};
+							})());
+				},
+				responseHandler: function (res) {
+					return res.users;
+				},
+				columns : [{
+					field : 'username'
+				}, {
+					field : 'country',
+					sortable : true
+				}, {
+					field : 'request_time'
+				}, {
+					field : 'accepted',
+					sortable : true,
+					formatter: function(value) {
+						if (value == null) {
+							return OmegaUp.T.wordsDenied;
+						}
+
+						if (value == "true" || value == "1") {
+							return OmegaUp.T.wordAccepted;
+						}
+
+						return OmegaUp.T.wordsDenied;
+					}
+				}, {
+					field : 'last_update',
+					formatter: function(v,o) {
+						return v + " (" + o.admin.username + ")";
+					}
+				}, {
+					field : 'accepted',
+					formatter : function(a,b,c) {
+						return '<button type="button" class="close request-deny" value="'+b.username+'" style="color:red">&times;</button>'
+						     + '<button type="button" class="close request-accept" value="'+b.username+'" style="color:green">&#x2713;</button>';
+
+					}
+				}]
 			});
 		}
 

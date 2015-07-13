@@ -919,7 +919,7 @@ class UserController extends Controller {
 		if ($r["user"]->getUserId() !== $r['current_user_id']) {
 			unset($response["userinfo"]["email"]);
 		}
-		
+
 		return $response;
 	}
 	
