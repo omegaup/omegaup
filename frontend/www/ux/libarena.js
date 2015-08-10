@@ -75,19 +75,6 @@ function Arena() {
 	this.installLibinteractiveHooks();
 };
 
-Arena.verdicts = {
-	AC: "Accepted",
-	PA: "Partially Accepted",
-	WA: "Wrong Answer",
-	TLE: "Time Limit Exceeded",
-	MLE: "Memory Limit Exceeded",
-	OLE: "Output Limit Exceeded",
-	RTE: "Runtime Error",
-	RFE: "Restricted Function",
-	CE: "Compilation Error",
-	JE: "Judge Error" 
-};
-
 Arena.scoreboardColors = [
 	'#FB3F51',
 	'#FF5D40',
@@ -295,7 +282,7 @@ Arena.prototype.updateRun = function(run) {
 		}
 	}
 	if (self.admin && $('#runs .run_' + run.guid).length == 0) {
-		$('#runs .runs > tbody:last').prepend(self.createAdminRun(run));
+		$('#runs .runs').prepend(self.createAdminRun(run));
 	}
 	var r = $('.run_' + run.guid);
 	self.displayRun(run, r);
@@ -313,9 +300,9 @@ Arena.prototype.updateRun = function(run) {
 
 Arena.prototype.createAdminRun = function(run) {
 	var self = this;
-	var r = $('#runs .runs .run-list .template')
+	var r = $('#runs .runs tbody.run-list-template')
 		.clone()
-		.removeClass('template')
+		.removeClass('run-list-template')
 		.addClass('added')
 		.addClass('run_' + run.guid);
 
@@ -347,129 +334,6 @@ Arena.prototype.createAdminRun = function(run) {
 		}));
 	})(run.guid, run, r);
 
-	// Details
-	(function(guid, run, row) {
-		$('.details', row).append($('<input type="button" value="details" />').click(function() {
-			omegaup.runDetails(guid, function(data) {
-				if (data.compile_error) {
-					$('#run-details .compile_error').html(omegaup.escape(data.compile_error)).show();
-				} else {
-					$('#run-details .compile_error').html('').hide();
-				}
-				if (data.logs) {
-					$('#run-details .logs').html(omegaup.escape(data.logs)).show();
-				} else {
-					$('#run-details .logs').html('').hide();
-				}
-				if (data.source.indexOf('data:') === 0) {
-					$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">descarga</a>');
-				} else {
-					$('#run-details .source').html(omegaup.escape(data.source));
-				}
-				
-				$('#run-details .judged_by').html('');
-				if (data.judged_by) {
-					$('#run-details .judged_by').html(data.judged_by);
-				}
-				
-				$('#run-details .cases div').remove();
-				$('#run-details .cases table').remove();
-				$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
-				$('#run-details .download a.details').attr('href', '/api/run/download/run_alias/' + guid + '/complete/true/');
-
-				function numericSort(key) {
-					function isDigit(x) {
-						return '0' <= x && x <= '9';
-					}
-
-					return function(x, y) {
-						var i = 0, j = 0;
-						for (; i < x[key].length && j < y[key].length; i++, j++) {
-							if (isDigit(x[key][i]) && isDigit(x[key][j])) {
-								var nx = 0, ny = 0;
-								while (i < x[key].length && isDigit(x[key][i]))
-									nx = (nx * 10) + parseInt(x[key][i++]);
-								while (j < y[key].length && isDigit(y[key][j]))
-									ny = (ny * 10) + parseInt(y[key][j++]);
-								i--; j--;
-								if (nx != ny) return nx - ny;
-							} else if (x[key][i] < y[key][j]) {
-								return -1;
-							} else if (x[key][i] > y[key][j]) {
-								return 1;
-							}
-						}
-						return (x[key].length - i) - (y[key].length - j);
-					};
-				}
-
-				data.groups.sort(numericSort('group'));
-				for (var i = 0; i < data.groups.length; i++) {
-					data.groups[i].cases.sort(numericSort('name'));
-				}
-
-				var groups = $('<table><thead><tr><th>Grupo</th><th>Caso</th><th>Metadata</th><th>V</th><th>S</th></thead></table>');
-
-				function addBlock(text, className) {
-						groups.append(
-							$('<tr></tr>')
-								.append($('<td></td>'))
-								.append(
-									$('<td colspan="3"></td>')
-										.append(
-											$('<pre></pre>')
-												.addClass(className)
-												.html(omegaup.escape(g.cases[0].out_diff))
-										)
-								)
-						);
-				}
-
-				for (var i = 0; i < data.groups.length; i++) {
-					var g = data.groups[i];
-					if (g.cases.length == 1) {
-							groups.append(
-								$('<tr class="group"></tr>')
-									.append('<th>' + g.cases[0].name + '</th>')
-									.append('<td></td>')
-									.append('<td>' + JSON.stringify(g.cases[0].meta) + '</td>')
-									.append('<td>' + g.cases[0].verdict + '</td>')
-									.append('<th class="score">' + g.cases[0].score + '</th>')
-							);
-							if (g.cases[0].err) addBlock(g.cases[0].err, 'stderr');
-							if (g.cases[0].out_diff) addBlock(g.cases[0].out_diff, 'diff');
-					} else {
-						groups.append(
-							$('<tr class="group"></tr>')
-								.append('<th colspan="4">' + omegaup.escape(g.group) + '</th>')
-								.append('<th class="score">' + g.score + '</th>')
-						);
-						for (var j = 0; j < g.cases.length; j++) {
-							var c = g.cases[j];
-							groups.append(
-								$('<tr></tr>')
-									.append('<td></td>')
-									.append('<td>' + c.name + '</td>')
-									.append('<td>' + JSON.stringify(c.meta) + '</td>')
-									.append('<td>' + c.verdict + '</td>')
-									.append('<td class="score">' + c.score + '</td>')
-							);
-							if (c.err) addBlock(c.err, 'stderr');
-							if (c.out_diff) addBlock(c.out_diff, 'diff');
-						}
-					}
-				}
-				$('#run-details .cases').append(groups);
-				window.location.hash = 'runs/details';
-				$(window).hashchange();
-				$('#run-details').show();
-				$('#submit').hide();
-				$('#clarification').hide();
-				$('#overlay').show();
-			});
-		}));
-	})(run.guid, run, r);
-
 	return r;
 };
 
@@ -477,7 +341,12 @@ Arena.prototype.displayRun = function(run, r) {
 	var self = this;
 
 	$('.id', r).html(run.run_id);
-	$('.guid', r).html(self.admin ? run.guid : run.guid.substring(run.guid.length - 5));
+	var guid = $('<acronym></acronym>')
+		.text(run.guid.substring(run.guid.length - 8));
+	if (self.admin) {
+		guid.attr('title', run.guid);
+	}
+	$('.guid', r).append(guid);
 	$('.username', r).html(getProfileLink(run.username) + getFlagSrc(run, 'country_id'));
 	$('.language', r).html(run.language);
 	if (run.alias) {
@@ -489,28 +358,47 @@ Arena.prototype.displayRun = function(run, r) {
 	if (run.contest_score != null) {
 		$('.points', r).html(parseFloat(run.contest_score || "0").toFixed(2));
 	} else {
-		$('.points', r).html('-');
+		$('.points', r).html('—');
 	}
 	$('.percentage', r).html((parseFloat(run.score || "0") * 100).toFixed(2) + '%');
-	$('.status', r).html(
+	$('.status', r).text(
 		run.status == 'ready' ?
-		(
-		 Arena.verdicts[run.verdict] ?
-		 "<abbr title=\"" + Arena.verdicts[run.verdict] + "\">" + run.verdict + "</abbr>" :
-		 run.verdict
-		) :
-		run.status
+			OmegaUp.T['verdict' + run.verdict] :
+			run.status
 	);
+	$('.penalty', r).html(run.penalty);
+	$('button.details', r).click(function() {
+		omegaup.runSource(run.guid, Arena.displayRunDetails);
+		return false;
+	});
+	$('button.admin-details', r).click(function() {
+		omegaup.runDetails(run.guid, Arena.displayRunDetails);
+		return false;
+	});
 	if (run.verdict == 'JE')	{
-		$('.status', r).css('background-color', '#f00');
-	}	else if (run.verdict == 'RTE' || run.verdict == 'CE' || run.verdict == 'RFE') {
-		$('.status', r).css('background-color', '#ff9900');
+		$('.status', r)
+			.css('background-color', '#f00');
+		$('.points', r)
+			.text('—');
+		$('.percentage', r)
+			.text('—');
+		$('.penalty', r)
+			.text('—');
+	} else if (run.verdict == 'CE') {
+		$('.status', r)
+			.css('background-color', '#f90');
+		$('.points', r)
+			.text('—');
+		$('.percentage', r)
+			.text('—');
+		$('.penalty', r)
+			.text('—');
 	} else if (run.verdict == 'AC') {
-		$('.status', r).css('background-color', '#CCFF66');
+		$('.status', r)
+			.css('background-color', '#CF6');
 	} else {
 		$('.status', r).css('background-color', '');
 	}
-	$('.penalty', r).html(run.penalty);
 	if (run.time) {
 		$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', run.time.getTime()));
 	}
@@ -550,9 +438,9 @@ Arena.prototype.onRankingChanged = function(data) {
 		var rank = ranking[i];
 		newRanking[rank.username] = i;
 		
-		var r = $('#ranking tbody tr.template')
+		var r = $('#ranking tbody.run-list-template')
 			.clone()
-			.removeClass('template')
+			.removeClass('run-list-template')
 			.addClass('inserted')
 			.addClass('rank-new');
 		
@@ -639,9 +527,9 @@ Arena.prototype.onRankingChanged = function(data) {
 
 		// update miniranking
 		if (i < 10) {
-			r = $('#mini-ranking tbody tr.template')
+			r = $('#mini-ranking tbody.run-list-template')
 				.clone()
-				.removeClass('template')
+				.removeClass('run-list-template')
 				.addClass('inserted');
 
 			$('.position', r).html(rank.place);
@@ -983,7 +871,7 @@ Arena.prototype.onHashChanged = function() {
 			$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
 			self.installLibinteractiveHooks();
 
-			$('#problem .run-list .added').remove();
+			$('#problem tbody.added').remove();
 
 			$('#lang-select option').each(function(index, item) {
 				if (language_array.indexOf($(item).val()) >= 0) {
@@ -998,32 +886,13 @@ Arena.prototype.onHashChanged = function() {
 					if (!runs.hasOwnProperty(idx)) continue;
 					var run = runs[idx];
 
-					var r = $('#problem .run-list .template')
+					var r = $('#problem tbody.run-list-template')
 						.clone()
-						.removeClass('template')
+						.removeClass('run-list-template')
 						.addClass('added')
 						.addClass('run_' + run.guid);
 					self.displayRun(run, r);
-					(function(guid) {
-						$('.code', r).append($('<input type="button" value="ver" />').click(function() {
-							omegaup.runSource(guid, function(data) {
-								if (data.compile_error){
-									$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
-								} else {
-									$('#submit textarea[name="code"]').val(data.source);
-								}
-								$('#submit input').hide();
-								$('#submit #lang-select').hide();
-								$('#overlay form').hide();
-								$('#submit').show();
-								$('#clarification').hide();
-								$('#overlay').show();
-								window.location.hash += '/show-run';
-							});
-							return false;
-						}));
-					})(run.guid);
-					$('#problem .runs > tbody:last').append(r);
+					$('#problem .runs').append(r);
 				}
 			}
 
@@ -1088,6 +957,168 @@ Arena.prototype.onHashChanged = function() {
 			$('#clarifications-count').css("font-weight", "normal");
 		}
 	}
+};
+
+Arena.displayRunDetails = function(data) {
+	console.log(data);
+	if (data.compile_error) {
+		$('#run-details .compile_error pre').html(omegaup.escape(data.compile_error));
+		$('#run-details .compile_error').show();
+	} else {
+		$('#run-details .compile_error').hide();
+		$('#run-details .compile_error pre').html('');
+	}
+	if (data.logs) {
+		$('#run-details .logs pre').html(omegaup.escape(data.logs));
+		$('#run-details .logs').show();
+	} else {
+		$('#run-details .logs').hide();
+		$('#run-details .logs pre').html('');
+	}
+	if (data.source.indexOf('data:') === 0) {
+		$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">' + OmegaUp.T['wordsDownload'] + '</a>');
+	} else {
+		$('#run-details .source').html(omegaup.escape(data.source));
+	}
+	
+	if (data.judged_by) {
+		$('#run-details .judged_by pre').html(omegaup.escape(data.judged_by));
+		$('#run-details .judged_by').show();
+	} else {
+		$('#run-details .judged_by').hide();
+		$('#run-details .judged_by pre').html('');
+	}
+	
+	$('#run-details .cases div').remove();
+	$('#run-details .cases table').remove();
+	if (self.admin) {
+		$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
+		$('#run-details .download a.details').attr('href', '/api/run/download/run_alias/' + guid + '/complete/true/');
+		$('#run-details .download').show();
+	} else {
+		$('#run-details .download').hide();
+	}
+
+	function numericSort(key) {
+		function isDigit(x) {
+			return '0' <= x && x <= '9';
+		}
+
+		return function(x, y) {
+			var i = 0, j = 0;
+			for (; i < x[key].length && j < y[key].length; i++, j++) {
+				if (isDigit(x[key][i]) && isDigit(x[key][j])) {
+					var nx = 0, ny = 0;
+					while (i < x[key].length && isDigit(x[key][i]))
+						nx = (nx * 10) + parseInt(x[key][i++]);
+					while (j < y[key].length && isDigit(y[key][j]))
+						ny = (ny * 10) + parseInt(y[key][j++]);
+					i--; j--;
+					if (nx != ny) return nx - ny;
+				} else if (x[key][i] < y[key][j]) {
+					return -1;
+				} else if (x[key][i] > y[key][j]) {
+					return 1;
+				}
+			}
+			return (x[key].length - i) - (y[key].length - j);
+		};
+	}
+
+	if (data.groups && data.groups.length) {
+		data.groups.sort(numericSort('group'));
+		for (var i = 0; i < data.groups.length; i++) {
+			data.groups[i].cases.sort(numericSort('name'));
+		}
+
+		var groups = $('<table></table>')
+			.append(
+				$('<thead></thead>')
+					.append(
+						$('<tr></tr>')
+							.append('<th>' + OmegaUp.T['wordsGroup'] + '</th>')
+							.append('<th>' + OmegaUp.T['wordsCase'] + '</th>')
+							.append('<th>' + OmegaUp.T['wordsVerdict'] + '</th>')
+							.append('<th colspan="3">' + OmegaUp.T['rankScore'] + '</th>')
+							.append('<th width="1"></th>')
+					)
+			);
+
+		for (var i = 0; i < data.groups.length; i++) {
+			var g = data.groups[i];
+			var cases = $('<tbody></tbody>').hide();
+			groups.append(
+				$('<tbody></tbody>')
+					.append(
+						$('<tr class="group"></tr>')
+							.append('<th class="center">' + omegaup.escape(g.group) + '</th>')
+							.append('<th colspan="2"></th>')
+							.append('<th class="score">' + g.score + '</th>')
+							.append('<th class="center" width="10">' + (g.max_score !== undefined ? '/' : '') + '</th>')
+							.append('<th>' + (g.max_score !== undefined ? g.max_score : '') + '</th>')
+							.append(
+								$('<td></td>')
+									.append(
+										$('<span class="collapse glyphicon glyphicon-collapse-down"></span>')
+											.click((function (cases) {
+												return function(ev) {
+													var target = $(ev.target);
+													if (target.hasClass('glyphicon-collapse-down')) {
+														target.removeClass('glyphicon-collapse-down');
+														target.addClass('glyphicon-collapse-up');
+													} else {
+														target.addClass('glyphicon-collapse-down');
+														target.removeClass('glyphicon-collapse-up');
+													}
+													cases.toggle();
+													return false;
+												};
+											})(cases))
+									)
+						)
+					)
+			);
+			for (var j = 0; j < g.cases.length; j++) {
+				var c = g.cases[j];
+				var caseRow = $('<tr></tr>')
+					.append('<td></td>')
+					.append('<td class="center">' + c.name + '</td>')
+					.append('<td class="center">' + OmegaUp.T['verdict' + c.verdict] + '</td>')
+					.append('<td class="score">' + c.score + '</td>')
+					.append('<td class="center" width="10">' + (c.max_score !== undefined ? '/' : '') + '</td>')
+					.append('<td>' + (c.max_score !== undefined ? c.max_score : '') + '</td>')
+				cases.append(caseRow);
+				if (self.admin && c.meta) {
+					var metaRow = $('<tr class="meta"></tr>')
+						.append('<td colspan="6"><pre>' + JSON.stringify(c.meta, null, 2) + '</pre></td>')
+						.hide();
+					caseRow.append(
+						$('<td></td>')
+							.append(
+								$('<span class="collapse glyphicon glyphicon-list-alt"></span>')
+									.click((function (metaRow) {
+										return function(ev) {
+											metaRow.toggle();
+											return false;
+										};
+									})(metaRow))
+							)
+					);
+					cases.append(metaRow);
+				}
+			}
+			groups.append(cases);
+		}
+		$('#run-details .cases').append(groups);
+		$('#run-details .cases').show();
+	} else {
+		$('#run-details .cases').hide();
+	}
+	$('#overlay form').hide();
+	$('#overlay').show();
+	$('#run-details').show();
+	window.location.hash += '/show-run';
+	$(window).hashchange();
 };
 
 Arena.formatDelta = function(delta) {
