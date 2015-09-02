@@ -75,8 +75,8 @@
 							<tr>
 								<th>{#wordsUser#}</th>
 								<th>{#wordsLanguage#}</th>
-								<th>{#wordsRuntime#}</th>
 								<th>{#wordsMemoria#}</th>
+								<th>{#wordsRuntime#}</th>
 								<th>{#wordsTime#}</th>
 							</tr>
 						</thead>
@@ -84,8 +84,8 @@
 							<tr class="template">
 								<td><a class="user"></a></td>
 								<td class="language"></td>
-								<td class="runtime"></td>
 								<td class="memory"></td>
+								<td class="runtime"></td>
 								<td class="time"></td>
 							</tr>
 						</tbody>
