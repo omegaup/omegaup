@@ -4,7 +4,7 @@
 			</div>
 			{if !$smarty.const.OMEGAUP_LOCKDOWN}
 			<ul class="nav navbar-nav navbar-right">
-				<li><a href='https://github.com/omegaup/omegaup/'>{#frontPageDevelopers#}</a></li>
+				<li><a href='https://omegaup.com/hackathon/'>{#frontPageDevelopers#}</a></li>
 			</ul>
 			{/if}
 		</div>
