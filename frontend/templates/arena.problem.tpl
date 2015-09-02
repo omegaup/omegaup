@@ -1,6 +1,6 @@
-{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=d228d5' bodyid='only-problem'}
+{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=a90f05' bodyid='only-problem'}
 			{if $problem_admin}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=2141d0"></script>
+			<script type="text/javascript" src="/ux/libadmin.js?ver=427c35"></script>
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblem#}</a></li>
 				<li><a href="#runs">{#wordsRuns#}</a></li>
@@ -41,14 +41,15 @@
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>
 							<tr>
-								<th>{#wordsID#}</th>
-								<th>{#wordsStatus#}</th>
-								<th class="numeric">{#wordsPercentage#}</th>
-								<th class="numeric">{#wordsPenalty#}</th>
+								<th class="hidden-sm hidden-xs">{#wordsID#}</th>
 								<th>{#wordsLanguage#}</th>
-								<th class="numeric">{#wordsMemoria#}</th>
-								<th class="numeric">{#wordsRuntime#}</th>
-								<th>{#wordsDetails#}</th>
+								<th>{#wordsRuntime#}</th>
+								<th>{#wordsMemoria#}</th>
+								<th>{#wordsTime#}</th>
+								<th>{#wordsStatus#}</th>
+								<th>{#wordsPercentage#}</th>
+								<th>{#wordsPenalty#}</th>
+								<th>{#wordsCode#}</th>
 							</tr>
 						</thead>
 						<tfoot>
@@ -56,16 +57,17 @@
 								<td colspan="9"><a href="#problems/new-run">{#wordsNewSubmissions#}</a></td>
 							</tr>
 						</tfoot>
-						<tbody class="run-list-template">
-							<tr>
-								<td class="guid"></td>
-								<td class="status"></td>
-								<td class="percentage numeric"></td>
-								<td class="penalty numeric"></td>
+						<tbody class="run-list">
+							<tr class="template">
+								<td class="guid hidden-sm hidden-xs"></td>
 								<td class="language"></td>
-								<td class="runtime numeric"></td>
-								<td class="memory numeric"></td>
-								<td><button class="details glyphicon glyphicon-zoom-in"></button></td>
+								<td class="runtime"></td>
+								<td class="memory"></td>
+								<td class="time"></td>
+								<td class="status"></td>
+								<td class="percentage"></td>
+								<td class="penalty"></td>
+								<td class="code"></td>
 							</tr>
 						</tbody>
 					</table>
@@ -151,32 +153,32 @@
 					</caption>
 					<thead>
 						<tr>
-							<th>{#wordsTime#}</th>
 							<th class="hidden-sm hidden-xs">GUID</th>
 							<th>{#wordsUser#}</th>
-							<th>{#wordsStatus#}</th>
-							<th class="numeric">{#wordsPercentage#}</th>
-							<th class="numeric">{#wordsPenalty#}</th>
 							<th>{#wordsLanguage#}</th>
-							<th class="numeric">{#wordsRuntime#}</th>
-							<th class="numeric">{#wordsMemoria#}</th>
+							<th>{#wordsRuntime#}</th>
+							<th>{#wordsMemoria#}</th>
+							<th>{#wordsTime#}</th>
+							<th>{#wordsStatus#}</th>
+							<th>{#wordsPercentage#}</th>
+							<th>{#wordsPenalty#}</th>
 							<th>{#wordsRejudge#}</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
 					</thead>
-					<tbody class="run-list-template">
-						<tr>
-							<td class="time"></td>
+					<tbody class="run-list">
+						<tr class="template">
 							<td class="guid hidden-sm hidden-xs"></td>
 							<td class="username"></td>
-							<td class="status"></td>
-							<td class="percentage numeric"></td>
-							<td class="penalty numeric"></td>
 							<td class="language"></td>
-							<td class="runtime numeric"></td>
-							<td class="memory numeric"></td>
+							<td class="runtime"></td>
+							<td class="memory"></td>
+							<td class="time"></td>
+							<td class="status"></td>
+							<td class="percentage"></td>
+							<td class="penalty"></td>
 							<td class="rejudge"></td>
-							<td><button class="admin-details glyphicon glyphicon-zoom-in"></button></td>
+							<td class="details"></td>
 						</tr>
 					</tbody>
 				</table>
@@ -236,7 +238,17 @@
 				<input type="file" id="code_file" /><br/>
 				<input type="submit" />
 			</form>
-{include file='arena.rundetails.tpl'}
+			{if $problem_admin}
+			<form id="run-details">
+				<button class="close">&times;</button>
+				
+				<pre class="source"></pre>
+				<pre class="compile_error"></pre>
+				<pre class="logs"></pre>
+				<div class="download"><a href="#">{#wordsDownloadDetails#}</a></div>
+				<div class="cases"></div>
+			</form>
+			{/if}
 		</div>
 		<div id="footer">
 		</div>

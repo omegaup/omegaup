@@ -1,5 +1,5 @@
-{include file='arena.head.tpl' jsfile='/ux/admin.js?ver=e5e8f9'}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=2141d0"></script>
+{include file='arena.head.tpl' jsfile='/ux/admin.js?ver=3ee049'}
+			<script type="text/javascript" src="/ux/libadmin.js?ver=427c35"></script>
 			<div id="title">
 				<h1 class="contest-title">Envíos globales</h1>
 			</div>
@@ -65,45 +65,53 @@
 					</caption>
 					<thead>
 						<tr>
-							<th>{#wordsTime#}</th>
-							<th class="numeric">Id</th>
+							<th>Id</th>
 							<th>GUID</th>
 							<th>{#wordsUser#}</th>
 							<th>{#wordsProblem#}</th>
-							<th>{#wordsStatus#}</th>
-							<th class="numeric">{#wordsPoints#}</th>
-							<th class="numeric">{#wordsPercentage#}</th>
-							<th class="numeric">{#wordsPenalty#}</th>
 							<th>{#wordsLanguage#}</th>
-							<th class="numeric">{#wordsRuntime#}</th>
-							<th class="numeric">{#wordsMemoria#}</th>
+							<th>{#wordsRuntime#}</th>
+							<th>{#wordsMemoria#}</th>
+							<th>{#wordsTime#}</th>
+							<th>{#wordsStatus#}</th>
+							<th>{#wordsPoints#}</th>
+							<th>%</th>
+							<th>{#wordsPenalty#}</th>
 							<th>Rejuecear</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
 					</thead>
-					<tbody class="run-list-template">
-						<tr>
-							<td class="time"></td>
-							<td class="id numeric"></td>
+					<tbody class="run-list">
+						<tr class="template">
+							<td class="id"></td>
 							<td class="guid"></td>
 							<td class="username"></td>
 							<td class="problem"></td>
-							<td class="status"></td>
-							<td class="points numeric"></td>
-							<td class="percentage numeric"></td>
-							<td class="penalty numeric"></td>
 							<td class="language"></td>
-							<td class="runtime numeric"></td>
-							<td class="memory numeric"></td>
+							<td class="runtime"></td>
+							<td class="memory"></td>
+							<td class="time"></td>
+							<td class="status"></td>
+							<td class="points"></td>
+							<td class="percentage"></td>
+							<td class="penalty"></td>
 							<td class="rejudge"></td>
-							<td><button class="admin-details glyphicon glyphicon-zoom-in"></button></td>
+							<td class="details"></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 		</div>
 		<div id="overlay">			
-{include file='arena.rundetails.tpl'}
+			<form id="run-details">
+				<button class="close">&times;</button>
+				
+				<pre class="source"></pre>
+				<pre class="compile_error"></pre>
+				<pre class="logs"></pre>
+				<div class="download"><a href="#">{#wordsDownloadDetails#}</a></div>
+				<div class="cases"></div>
+			</form>
 		</div>
 	</body>
 </html>

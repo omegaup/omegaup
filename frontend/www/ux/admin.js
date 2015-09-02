@@ -114,9 +114,9 @@ $(document).ready(function() {
 				run.runtime = 0;
 				run.memory = 0;
 				run.language = $('#submit select[name="language"]').val();
-				var r = $('#problem tbody.run-list-template')
+				var r = $('#problem .run-list .template')
 					.clone()
-					.removeClass('run-list-template')
+					.removeClass('template')
 					.addClass('added')
 					.addClass('run_' + run.guid);
 				arena.displayRun(run, r);

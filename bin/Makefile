@@ -5,15 +5,21 @@ CFLAGS=-O2
 -include ../backend/definitions.mk
 
 .PHONY: all clean
-all: normalizr runner.jar grader.jar
+all: normalizr libinteractive.jar runner.jar grader.jar
 
 clean:
 	@rm normalizr
 	$(MAKE) -C ../libinteractive clean
 	$(MAKE) -C ../backend clean
 
-$(RUNNER_JAR) $(GRADER_JAR): $(BACKEND_SOURCES)
+$(LIBINTERACTIVE_JAR): $(LIBINTERACTIVE_SOURCES)
+	$(MAKE) -C ../libinteractive all
+
+$(RUNNER_JAR) $(GRADER_JAR): $(BACKEND_SOURCES) $(LIBINTERACTIVE_JAR)
 	$(MAKE) -C ../backend all
+    
+libinteractive.jar: $(LIBINTERACTIVE_JAR)
+	cp $^ $@
 
 runner.jar: $(RUNNER_JAR)
 	cp $^ $@
