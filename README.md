@@ -31,7 +31,9 @@ El resto del código está en otros repositorios:
   de comandos Linux.
 * [minijail](https://github.com/omegaup/minijail): Un fork de
   [minijail](https://chromium.googlesource.com/chromiumos/platform2/+/master/minijail/),
-  escrito por el proyecto (Chromium)[https://www.chromium.org] y adaptado para
+  escrito por el proyecto [Chromium](https://www.chromium.org) y adaptado para
   ser usado en concursos de programación.
 * [libinteractive](https://github.com/omegaup/libinteractive): Una librería
   para hacer problemas interactivos fácilmente.
+
+Todo el código de omegaUp está distribuido bajo la licencia BSD.
