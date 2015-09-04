@@ -13,6 +13,14 @@ php:
 env:
   - DB=mysql
 
+# Disables default git submodules.
+# This is done to only download the modules required for testing.
+git:
+  submodules: false
+
+before_install:
+  - git submodule update --init frontend/server/libs/log4php frontend/server/libs/adodb frontend/server/libs/google-api-php-client
+
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
   - mysql omegaup-test < frontend/private/bd.sql
