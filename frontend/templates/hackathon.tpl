@@ -21,7 +21,7 @@
 				ayuda en sus tiempos libres y rara vez estos coinciden, pero eso no te debe
 				detener.</p>
 				<p>Cuando sepas que vas a tener tiempo libre y quieras ver si alguien
-				más va a estar disponible puedes usar esta lista, y antoar en lo que piensas
+				más va a estar disponible puedes usar esta lista, y anotar en lo que piensas
 				trabajar.</p>
 				<p>Si dos o mas personas están trabajando el mismo día en cosas se puede armar
 				un mini hackaton y echarnos porras mutuamente. Existe un hangouts permanente
