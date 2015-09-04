@@ -1,12 +1,6 @@
 [submodule "frontend/www/js/mathjax"]
 	path = frontend/www/js/mathjax
 	url = https://github.com/mathjax/MathJax.git
-[submodule "minijail"]
-	path = minijail
-	url = https://github.com/omegaup/minijail.git
-[submodule "karel"]
-	path = karel
-	url = https://github.com/omegaup/karel.git
 [submodule "frontend/server/libs/log4php"]
 	path = frontend/server/libs/log4php
 	url = https://github.com/omegaup/logging-log4php.git
