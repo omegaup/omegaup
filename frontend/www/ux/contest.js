@@ -61,36 +61,18 @@ $(document).ready(function() {
 	}
 
 	function onlyProblemUpdateRuns(runs, score_column, multiplier) {
-		$('#problem .run-list .added').remove();
+		$('#problem tbody.added').remove();
 		for (var idx in runs) {
 			if (!runs.hasOwnProperty(idx)) continue;
 			var run = runs[idx];
 
-			var r = $('#problem .run-list .template')
+			var r = $('#problem tbody.run-list-template')
 				.clone()
-				.removeClass('template')
+				.removeClass('run-list-template')
 				.addClass('added')
 				.addClass('run_' + run.guid);
-			(function(guid) {
-				$('.code', r).append($('<input type="button" value="ver" />').click(function() {
-					omegaup.runSource(guid, function(data) {
-						if (data.compile_error) {
-							$('#submit textarea[name="code"]').val(data.source + '\n\n--------------------------\nCOMPILE ERROR:\n' + data.compile_error);
-						} else {
-							$('#submit textarea[name="code"]').val(data.source);
-						}
-						$('#submit input').hide();
-						$('#submit #lang-select').hide();
-						$('#submit').show();
-						$('#clarification').hide();
-						$('#overlay').show();
-						window.location.hash += '/show-run';
-					});
-					return false;
-				}));
-			})(run.guid);
 			arena.displayRun(run, r);
-			$('#problem .runs > tbody:last').append(r);
+			$('#problem .runs').append(r);
 		}
 	}
 
@@ -267,13 +249,13 @@ $(document).ready(function() {
 			run.runtime = 0;
 			run.memory = 0;
 			run.language = $('#submit select[name="language"]').val();
-			var r = $('#problem .run-list .template')
+			var r = $('#problem tbody.run-list-template')
 				.clone()
-				.removeClass('template')
+				.removeClass('run-list-template')
 				.addClass('added')
 				.addClass('run_' + run.guid);
 			arena.displayRun(run, r);
-			$('#problem .runs > tbody:last').append(r);
+			$('#problem .runs').append(r);
 			if (!arena.currentProblem.runs) {
 				arena.currentProblem.runs = [];
 			}

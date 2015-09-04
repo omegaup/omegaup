@@ -15,8 +15,8 @@
 							<th class="total" colspan="2">{#wordsTotal#}</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr class="template">
+					<tbody class="user-list-template">
+						<tr>
 							<td class="position"></td>
 							<td class="legend"></td>
 							<td class="user"></td>

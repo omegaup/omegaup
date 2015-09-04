@@ -1,7 +1,7 @@
 {include file='arena.head.tpl' jsfile=$jsfile}
 
 {if $admin}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=427c35"></script>
+			<script type="text/javascript" src="/ux/libadmin.js?ver=2141d0"></script>
 			<audio id="notification_audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
 			</audio>
@@ -41,8 +41,8 @@
 								<th class="total" colspan="2">{#wordsTotal#}</th>
 							</tr>
 						</thead>
-						<tbody>
-							<tr class="template">
+						<tbody class="user-list-template">
+							<tr>
 								<td class="position"></td>
 								<td class="user"></td>
 								<td class="points"></td>
@@ -100,19 +100,19 @@
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>
 							<tr>
-								<th>{#wordsID#}</th>
-								<th>{#wordsLanguage#}</th>
-								<th>{#wordsRuntime#}</th>
-								<th>{#wordsMemoria#}</th>
 								<th>{#wordsTime#}</th>
+								<th>{#wordsID#}</th>
 								<th>{#wordsStatus#}</th>
 {if $practice}
-								<th>{#wordsPercentage#}</th>
+								<th class="numeric">{#wordsPercentage#}</th>
 {else}
-								<th>{#wordsPoints#}</th>
+								<th class="numeric">{#wordsPoints#}</th>
 {/if}
-								<th>{#wordsPenalty#}</th>
-								<th>{#wordsCode#}</th>
+								<th class="numeric">{#wordsPenalty#}</th>
+								<th>{#wordsLanguage#}</th>
+								<th class="numeric">{#wordsRuntime#}</th>
+								<th class="numeric">{#wordsMemoria#}</th>
+								<th>{#wordsDetails#}</th>
 							</tr>
 						</thead>
 						<tfoot>
@@ -120,21 +120,21 @@
 								<td colspan="9"><a href="#problems/run">{#wordsNewSubmissions#}</a></td>
 							</tr>
 						</tfoot>
-						<tbody class="run-list">
-							<tr class="template">
-								<td class="guid"></td>
-								<td class="language"></td>
-								<td class="runtime"></td>
-								<td class="memory"></td>
+						<tbody class="run-list-template">
+							<tr>
 								<td class="time"></td>
+								<td class="guid"></td>
 								<td class="status"></td>
 {if $practice}
-								<td class="percentage"></td>
+								<td class="percentage numeric"></td>
 {else}
-								<td class="points"></td>
+								<td class="points numeric"></td>
 {/if}
-								<td class="penalty"></td>
-								<td class="code"></td>
+								<td class="penalty numeric"></td>
+								<td class="language"></td>
+								<td class="runtime numeric"></td>
+								<td class="memory numeric"></td>
+								<td><button class="details glyphicon glyphicon-zoom-in"></button></td>
 							</tr>
 						</tbody>
 					</table>
@@ -204,36 +204,36 @@
 					</caption>
 					<thead>
 						<tr>
-							<th>Id</th>
+							<th>{#wordsTime#}</th>
+							<th class="numeric">Id</th>
 							<th>GUID</th>
 							<th>{#wordsUser#}</th>
 							<th>{#wordsProblem#}</th>
-							<th>{#wordsLanguage#}</th>
-							<th>{#wordsRuntime#}</th>
-							<th>{#wordsMemoria#}</th>
-							<th>{#wordsTime#}</th>
 							<th>{#wordsStatus#}</th>
-							<th>{#wordsPoints#}</th>
-							<th>{#wordsPenalty#}</th>
+							<th class="numeric">{#wordsPoints#}</th>
+							<th class="numeric">{#wordsPenalty#}</th>
+							<th>{#wordsLanguage#}</th>
+							<th class="numeric">{#wordsRuntime#}</th>
+							<th class="numeric">{#wordsMemoria#}</th>
 							<th>{#wordsRejudge#}</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
 					</thead>
-					<tbody class="run-list">
-						<tr class="template">
-							<td class="id"></td>
+					<tbody class="run-list-template">
+						<tr>
+							<td class="time"></td>
+							<td class="id numeric"></td>
 							<td class="guid"></td>
 							<td class="username"></td>
 							<td class="problem"></td>
-							<td class="language"></td>
-							<td class="runtime"></td>
-							<td class="memory"></td>
-							<td class="time"></td>
 							<td class="status"></td>
-							<td class="points"></td>
-							<td class="penalty"></td>
+							<td class="points numeric"></td>
+							<td class="penalty numeric"></td>
+							<td class="language"></td>
+							<td class="runtime numeric"></td>
+							<td class="memory numeric"></td>
 							<td class="rejudge"></td>
-							<td class="details"></td>
+							<td><button class="admin-details glyphicon glyphicon-zoom-in"></button></td>
 						</tr>
 					</tbody>
 				</table>
@@ -250,8 +250,8 @@
 							<th class="total" colspan="2">{#wordsTotal#}</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr class="template">
+					<tbody class="user-list-template">
+						<tr>
 							<td class="position"></td>
 							<td class="legend"></td>
 							<td class="user"></td>
@@ -338,18 +338,7 @@
 				<textarea name="message"></textarea><br/>
 				<input type="submit" />
 			</form>
-{if $admin}
-			<form id="run-details">
-				<button class="close">&times;</button>
-				
-				<pre class="source"></pre>
-				<pre class="compile_error"></pre>
-				<pre class="logs"></pre>
-				<div class="download"><a href="#">{#wordsDownloadDetails#}</a></div>
-				<pre class="judged_by"></pre>
-				<div class="cases"></div>
-			</form>
-{/if}
+{include file='arena.rundetails.tpl'}
 		</div>
 	</body>
 </html>

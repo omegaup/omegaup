@@ -84,26 +84,26 @@ $(function() {
 				var alias = scoreboard.contests[c].alias;
 				
 				$('<th><a href="/arena/' + alias + '" title="' + alias + '">' +
-					c + '</a></th>').insertBefore('#ranking thead th.total');
+					c + '</a></th>').insertBefore('#ranking-table thead th.total');
 			
 				$('<td class="prob_' + alias + '_points"></td>')
-					.insertBefore('#ranking tbody .template td.points');
+					.insertBefore('#ranking-table tbody.template td.points');
 			
-				$('#ranking thead th').attr('colspan', '');
-				$('#ranking tbody .template .penalty').remove();
+				$('#ranking-table thead th').attr('colspan', '');
+				$('#ranking-table tbody.template .penalty').remove();
 			}
 			
 			// Adding scoreboard data:
 			// Cleaning up table
-			$('#ranking tbody tr.inserted').remove();
+			$('#ranking-table tbody.inserted').remove();
 			
 			// For each user
 			for (var i = 0; i < ranking.length; i++) {
 				var rank = ranking[i];
 				
-				var r = $('#ranking tbody tr.template')
+				var r = $('#ranking-table tbody.user-list-template')
 					.clone()
-					.removeClass('template')
+					.removeClass('user-list-template')
 					.addClass('inserted')
 					.addClass('rank-new');
 			
@@ -133,7 +133,7 @@ $(function() {
 					.html(i + 1)
 					.removeClass('recent-event');
 			
-				$('#ranking tbody').append(r);
+				$('#ranking-table').append(r);
 			}
 			
 			$('#ranking').show();

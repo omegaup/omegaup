@@ -186,13 +186,13 @@ ArenaAdmin.prototype.refreshClarifications = function() {
 
 ArenaAdmin.prototype.runsChanged = function(data) {
 	var self = this;
-	$('#runs .runs .run-list .added').remove();
+	$('#runs .runs tbody.added').remove();
 
 	for (var i = 0; i < data.runs.length; i++) {
 		var run = data.runs[i];
 
 		var r = self.arena.createAdminRun(run);
 		self.arena.displayRun(run, r);
-		$('#runs .runs > tbody').append(r);
+		$('#runs .runs').append(r);
 	}
 };
