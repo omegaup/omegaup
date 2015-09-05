@@ -87,10 +87,10 @@ $(function() {
 					c + '</a></th>').insertBefore('#ranking-table thead th.total');
 			
 				$('<td class="prob_' + alias + '_points"></td>')
-					.insertBefore('#ranking-table tbody.template td.points');
+					.insertBefore('#ranking-table tbody.user-list-template td.points');
 			
 				$('#ranking-table thead th').attr('colspan', '');
-				$('#ranking-table tbody.template .penalty').remove();
+				$('#ranking-table tbody.user-list-template .penalty').remove();
 			}
 			
 			// Adding scoreboard data:

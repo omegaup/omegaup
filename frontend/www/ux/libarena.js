@@ -231,10 +231,10 @@ Arena.prototype.initProblems = function(contest) {
 		$('<th><a href="#problems/' + alias + '" title="' + alias + '">' +
 				problems[i].letter + '</a></th>').insertBefore('#ranking-table thead th.total');
 		$('<td class="prob_' + alias + '_points"></td>')
-			.insertBefore('#ranking-table tbody.template tr td.points');
+			.insertBefore('#ranking-table tbody.user-list-template td.points');
 	}
 	$('#ranking-table thead th').attr('colspan', '');
-	$('#ranking-table tbody.template tr .penalty').remove();
+	$('#ranking-table tbody.user-list-template .penalty').remove();
 };
 
 Arena.prototype.updateClock = function() {
