@@ -308,7 +308,7 @@ Arena.prototype.createAdminRun = function(run) {
 
 	// Rejudge
 	(function(guid, run, row) {
-		$('.rejudge', row).append($('<input type="button" value="rejudge" />').click(function() {
+		$('.rejudge', row).append($('<button class="glyphicon glyphicon-repeat" title="rejudge"></button>').click(function() {
 			$('.status', row).html('rejudging').css('background-color', '');
 			omegaup.runRejudge(guid, false, function(data) {
 				if (data.status == 'error') {
@@ -322,7 +322,7 @@ Arena.prototype.createAdminRun = function(run) {
 
 	// Debug-Rejudge
 	(function(guid, run, row) {
-		$('.rejudge', row).append($('<input type="button" value="debug" />').click(function() {
+		$('.rejudge', row).append($('<button class="glyphicon glyphicon-flag" title="debug"></button>').click(function() {
 			$('.status', row).html('rejudging').css('background-color', '');
 			omegaup.runRejudge(guid, true, function(data) {
 				if (data.status == 'error') {
@@ -342,12 +342,15 @@ Arena.prototype.displayRun = function(run, r) {
 
 	$('.id', r).html(run.run_id);
 	var guid = $('<acronym></acronym>')
-		.text(run.guid.substring(run.guid.length - 8));
+		.text(run.guid.substring(0, 8));
 	if (self.admin) {
 		guid.attr('title', run.guid);
 	}
+	$('.guid acronym', r).remove();
 	$('.guid', r).append(guid);
-	$('.username', r).html(getProfileLink(run.username) + getFlagSrc(run, 'country_id'));
+	if (run.username) {
+		$('.username', r).html(getProfileLink(run.username) + getFlagSrc(run, 'country_id'));
+	}
 	$('.language', r).html(run.language);
 	if (run.alias) {
 		$('.problem', r).html('<a href="/arena/problem/' + run.alias + '">' + run.alias + '</a>');
