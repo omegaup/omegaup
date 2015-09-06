@@ -15,7 +15,13 @@
 					<h3>{#wordsLogs#}</h3>
 					<pre></pre>
 				</div>
-				<div class="download"><a href="#">{#wordsDownloadDetails#}</a></div>
+				<div class="download">
+					<h3>{#wordsDownload#}</h3>
+					<ul>
+						<li><a href="#">{#wordsDownloadOutput#}</a></li>
+						<li><a href="#" class="details">{#wordsDownloadDetails#}</a></li>
+					</ul>
+				</div>
 				<div class="judged_by">
 					<h3>{#wordsJudgedBy#}</h3>
 					<pre></pre>

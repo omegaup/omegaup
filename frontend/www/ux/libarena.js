@@ -371,14 +371,18 @@ Arena.prototype.displayRun = function(run, r) {
 	);
 	$('.penalty', r).html(run.penalty);
 	$('button.details', r).click(function() {
-		omegaup.runSource(run.guid, Arena.displayRunDetails);
+		omegaup.runSource(run.guid, function(data) {
+			self.displayRunDetails(data, run.guid);
+		});
 		return false;
 	});
 	$('button.admin-details', r).click(function() {
-		omegaup.runDetails(run.guid, Arena.displayRunDetails);
+		omegaup.runDetails(run.guid, function(data) {
+			self.displayRunDetails(data, run.guid);
+		});
 		return false;
 	});
-	if (run.verdict == 'JE')	{
+	if (run.verdict == 'JE') {
 		$('.status', r)
 			.css('background-color', '#f00');
 		$('.points', r)
@@ -962,8 +966,9 @@ Arena.prototype.onHashChanged = function() {
 	}
 };
 
-Arena.displayRunDetails = function(data) {
-	console.log(data);
+Arena.prototype.displayRunDetails = function(data, guid) {
+	var self = this;
+
 	if (data.compile_error) {
 		$('#run-details .compile_error pre').html(omegaup.escape(data.compile_error));
 		$('#run-details .compile_error').show();
