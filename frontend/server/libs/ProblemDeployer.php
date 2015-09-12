@@ -447,7 +447,12 @@ class ProblemDeployer {
 			if (strpos($path, "cases/") !== 0 ||
 			    !ProblemDeployer::endsWith($path, ".in", true)) continue;
 			// Look for the .out pair
-			$outPath = substr($path, 0, strlen($path) - 3) . ".out";
+			if (strpos($path, "cases/in/") === 0) {
+				$outPath = "cases/out/" . substr($path, strlen("cases/in/"));
+				$outPath = substr($outPath, 0, strlen($outPath) - 3) . ".out";
+			} else {
+				$outPath = substr($path, 0, strlen($path) - 3) . ".out";
+			}
 			$idx = $zip->locateName($outPath, 0);
 
 			if ($idx !== FALSE) {
@@ -493,8 +498,11 @@ class ProblemDeployer {
 			// Check .in file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.in';
 			if ($zip->getFromName($path) === FALSE) {
-				throw new InvalidParameterException("problemDeployerTestplanCaseMissing", NULL,
-					array('file' => $testplan_array[1][$i]));
+				$path = 'cases/in/' . $testplan_array[1][$i] . '.in';
+				if ($zip->getFromName($path) === FALSE) {
+					throw new InvalidParameterException("problemDeployerTestplanCaseMissing", NULL,
+						array('file' => $testplan_array[1][$i]));
+				}
 			}
 
 			$this->filesToUnzip[] = $path;
@@ -503,8 +511,11 @@ class ProblemDeployer {
 			// Check .out file
 			$path = 'cases' . DIRECTORY_SEPARATOR . $testplan_array[1][$i] . '.out';
 			if ($zip->getFromName($path) === FALSE) {
-				throw new InvalidParameterException("problemDeployerTestplanCaseMissing", NULL,
-					array('file' => $testplan_array[1][$i]));
+				$path = 'cases/out/' . $testplan_array[1][$i] . '.out';
+				if ($zip->getFromName($path) === FALSE) {
+					throw new InvalidParameterException("problemDeployerTestplanCaseMissing", NULL,
+						array('file' => $testplan_array[1][$i]));
+				}
 			}
 
 			$this->filesToUnzip[] = $path;
@@ -515,7 +526,11 @@ class ProblemDeployer {
 			$path = $zipFilesArray[$i];
 			if (strpos($path, "cases/") !== 0 ||
 				!ProblemDeployer::endsWith($path, ".in", true)) continue;
-			$caseName = substr($path, strlen("cases/"));
+			if (strpos($path, "cases/in/") === 0) {
+				$caseName = substr($path, strlen("cases/in/"));
+			} else {
+				$caseName = substr($path, strlen("cases/"));
+			}
 			$caseName = substr($caseName, 0, strlen($caseName) - 3);
 			if (!in_array($caseName, $testplan_array[1])) {
 				throw new InvalidParameterException("problemDeployerMissingFromTestplan", NULL,
