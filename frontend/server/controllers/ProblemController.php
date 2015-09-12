@@ -21,18 +21,6 @@ class ProblemController extends Controller {
 	}
 
 	/**
-	 * 
-	 * @return type
-	 */
-	public static function getJudgesList() {
-		return array('uva' => "Universidad de Valladolid |",
-			'livearchive' => "ICPC Live Archive |",
-			'pku' => "Pekin University |",
-			'tju' => " Tianjing University |",
-			'spoj' => "SPOJ");
-	}
-
-	/**
 	 * Adds a problem from a remote server to the list of known
 	 * problems.
 	 *
