@@ -847,6 +847,68 @@ class ProblemController extends Controller {
 	}
 
 	/**
+	 * Entry point for Problem Download API
+	 *
+	 * @param Request $r
+	 * @throws InvalidFilesystemOperationException
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiDownload(Request $r) {
+		try {
+			self::authenticateRequest($r);
+		} catch (ForbiddenAccessException $e) {
+			throw $e;
+		}
+
+		// Validate request
+		self::validateDownload($r);
+
+		// Get HEAD revision to avoid race conditions.
+		$gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias;
+		$git = new Git($gitDir);
+		$head = trim($git->get(array('rev-parse', 'HEAD')));
+
+		// Set headers to auto-download file
+		header('Pragma: public');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Content-Type: application/zip');
+		header('Content-Disposition: attachment;filename=' . $r['problem']->alias . '_' . $head . '.zip');
+		header('Content-Transfer-Encoding: binary');
+		$git->exec(array('archive', '--format=zip', $head));
+
+		die();
+	}
+
+	/**
+	 * Validate problem Details API
+	 *
+	 * @param Request $r
+	 * @throws ApiException
+	 * @throws InvalidDatabaseOperationException
+	 * @throws NotFoundException
+	 * @throws ForbiddenAccessException
+	 */
+	private static function validateDownload(Request $r) {
+		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
+
+		try {
+			$r["problem"] = ProblemsDAO::getByAlias($r["problem_alias"]);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["problem"])) {
+			throw new NotFoundException("problemNotFound");
+		}
+
+		if (!Authorization::IsProblemAdmin($r["current_user_id"], $r["problem"])) {
+			throw new ForbiddenAccessException();
+		}
+	}
+
+
+	/**
 	 * Entry point for Problem Details API
 	 * 
 	 * @param Request $r

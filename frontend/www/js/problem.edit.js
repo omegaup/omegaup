@@ -55,6 +55,11 @@ $(document).ready(function() {
 		return false; // Prevent refresh
 	});
 
+	$('#download form').submit(function() {
+		window.location = '/api/problem/download/problem_alias/' + omegaup.escape(problemAlias) + '/';
+		return false;
+	});
+
 	function refreshProblemAdmins() {
 		omegaup.getProblemAdmins(problemAlias, function(admins) {
 			$('#problem-admins').empty();

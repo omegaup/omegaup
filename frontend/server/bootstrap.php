@@ -57,6 +57,7 @@ require_once("libs/Validators.php");
 require_once("libs/SecurityTools.php");
 require_once("libs/Cache.php");
 require_once("libs/Authorization.php");
+require_once("libs/Git.php");
 require_once("libs/Grader.php");
 require_once("libs/Broadcaster.php");
 require_once("libs/Scoreboard.php");

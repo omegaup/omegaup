@@ -139,5 +139,3 @@ class ApiUtils {
 		return $format;
 	}
 }
-
-?>
