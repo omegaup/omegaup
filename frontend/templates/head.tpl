@@ -12,7 +12,7 @@
 		<!--<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js?ver=bd6cce"></script>-->
 
 		<script type="text/javascript" src="/js/omegaup.js?ver=21ac40"></script>
-		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=3ac043,a3a933,22ada3,2dd041"></script>
+		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=36e7cb,d773cf,376c5e,a49572"></script>
 
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
 		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>

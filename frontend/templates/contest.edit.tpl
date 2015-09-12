@@ -490,7 +490,7 @@
 									return function(e) {
 										omegaup.removeAdminFromContest(contestAlias, username, function(response) {
 											if (response.status == "ok") {
-												OmegaUp.ui.success("Admin successfully removed!");
+												OmegaUp.ui.success("{#adminAdded#}");
 												$('div.post.footer').show();
 												var tr = e.target.parentElement.parentElement;
 												$(tr).remove();
@@ -511,7 +511,7 @@
 
 			omegaup.addAdminToContest(contestAlias, username, function(response) {
 				if (response.status == "ok") {
-					OmegaUp.ui.success("Admin successfully added!");
+					OmegaUp.ui.success("{#adminAdded#}");
 					$('div.post.footer').show();
 
 					refreshContestAdmins();

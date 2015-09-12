@@ -43,7 +43,7 @@ $(document).ready(function() {
 
 		omegaup.addAdminToProblem(problemAlias, username, function(response) {
 			if (response.status === "ok") {
-				OmegaUp.ui.success("Admin successfully added!");
+				OmegaUp.ui.success(OmegaUp.T.adminAdded);
 				$('div.post.footer').show();
 
 				refreshProblemAdmins();
@@ -79,7 +79,7 @@ $(document).ready(function() {
 								return function(e) {
 									omegaup.removeAdminFromProblem(problemAlias, username, function(response) {
 										if (response.status == "ok") {
-											OmegaUp.ui.success("Admin successfully removed!");
+											OmegaUp.ui.success(OmegaUp.T.adminAdded);
 											$('div.post.footer').show();
 											var tr = e.target.parentElement.parentElement;
 											$(tr).remove();

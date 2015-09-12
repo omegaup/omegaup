@@ -1,5 +1,6 @@
 OmegaUp.T = {
 	aboutToStart: "Estas a punto de iniciar el concurso. Una vez que hagas click en entrar, tu tiempo iniciara.",
+	adminAdded: "Administrador agregado correctamente",
 	aliasInUse: "Alias ya existe",
 	apiNotFound: "El API solicitada no fue encontrada.",
 	arenaAdminManageProblem: "Administrar problema",
