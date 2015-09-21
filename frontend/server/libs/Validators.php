@@ -134,7 +134,7 @@ class Validators {
 
 		// Validate that we are working with a date
 		// @TODO This strtotime() allows nice strings like "next Thursday". 
-		if ($isPresent && strtotime($parameter) === -1) {
+		if ($isPresent && strtotime($parameter) === false) {
 			throw new InvalidParameterException("parameterInvalid", $parameterName);
 		}
 

@@ -1279,8 +1279,23 @@ class UserController extends Controller {
 		}
 
 		Validators::isStringNonEmpty($r["scholar_degree"], "scholar_degree", false);
-		Validators::isDate($r["graduation_date"], "graduation_date", false);
-		Validators::isDate($r["birth_date"], "birth_date", false);
+
+		if (!is_null($r['graduation_date'])) {
+			if (is_numeric($r['graduation_date'])) {
+				$r['graduation_date'] = (int)$r['graduation_date'];
+			} else {
+				Validators::isDate($r["graduation_date"], "graduation_date", false);
+				$r['graduation_date'] = strtotime($r['graduation_date']);
+			}
+		}
+		if (!is_null($r['birth_date'])) {
+			if (is_numeric($r['birth_date'])) {
+				$r['birth_date'] = (int)$r['birth_date'];
+			} else {
+				Validators::isDate($r["birth_date"], "birth_date", false);
+				$r['birth_date'] = strtotime($r['birth_date']);
+			}
+		}
 
 		if (!is_null($r["locale"])) {
 			// find language in Language
