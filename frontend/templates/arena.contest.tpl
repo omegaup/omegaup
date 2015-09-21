@@ -110,8 +110,8 @@
 {/if}
 								<th class="numeric">{#wordsPenalty#}</th>
 								<th>{#wordsLanguage#}</th>
+								<th class="numeric">{#wordsMemory#}</th>
 								<th class="numeric">{#wordsRuntime#}</th>
-								<th class="numeric">{#wordsMemoria#}</th>
 								<th>{#wordsDetails#}</th>
 							</tr>
 						</thead>
@@ -132,8 +132,8 @@
 {/if}
 								<td class="penalty numeric"></td>
 								<td class="language"></td>
-								<td class="runtime numeric"></td>
 								<td class="memory numeric"></td>
+								<td class="runtime numeric"></td>
 								<td><button class="details glyphicon glyphicon-zoom-in"></button></td>
 							</tr>
 						</tbody>
@@ -213,8 +213,8 @@
 							<th class="numeric">{#wordsPoints#}</th>
 							<th class="numeric">{#wordsPenalty#}</th>
 							<th>{#wordsLanguage#}</th>
+							<th class="numeric">{#wordsMemory#}</th>
 							<th class="numeric">{#wordsRuntime#}</th>
-							<th class="numeric">{#wordsMemoria#}</th>
 							<th>{#wordsRejudge#}</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
@@ -230,8 +230,8 @@
 							<td class="points numeric"></td>
 							<td class="penalty numeric"></td>
 							<td class="language"></td>
-							<td class="runtime numeric"></td>
 							<td class="memory numeric"></td>
+							<td class="runtime numeric"></td>
 							<td class="rejudge"></td>
 							<td><button class="admin-details glyphicon glyphicon-zoom-in"></button></td>
 						</tr>

@@ -75,8 +75,8 @@
 							<th class="numeric">{#wordsPercentage#}</th>
 							<th class="numeric">{#wordsPenalty#}</th>
 							<th>{#wordsLanguage#}</th>
+							<th class="numeric">{#wordsMemory#}</th>
 							<th class="numeric">{#wordsRuntime#}</th>
-							<th class="numeric">{#wordsMemoria#}</th>
 							<th>Rejuecear</th>
 							<th>{#wordsDetails#}</th>
 						</tr>
@@ -93,8 +93,8 @@
 							<td class="percentage numeric"></td>
 							<td class="penalty numeric"></td>
 							<td class="language"></td>
-							<td class="runtime numeric"></td>
 							<td class="memory numeric"></td>
+							<td class="runtime numeric"></td>
 							<td class="rejudge"></td>
 							<td><button class="admin-details glyphicon glyphicon-zoom-in"></button></td>
 						</tr>

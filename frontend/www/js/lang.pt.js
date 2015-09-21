@@ -445,7 +445,7 @@ OmegaUp.T = {
 	wordsLiveStatistics: "Estatísticas ao vivo",
 	wordsLogs: "Log de execução",
 	wordsMember: "Membro",
-	wordsMemoria: "Memória",
+	wordsMemory: "Memória",
 	wordsMemoryLimit: "Limite de memória",
 	wordsMessage: "Mensagem",
 	wordsMinutes: "minutos",

@@ -445,7 +445,7 @@ OmegaUp.T = {
 	wordsLiveStatistics: "(Liv3 57a7i57ic5)",
 	wordsLogs: "(L0g5)",
 	wordsMember: "(M3mb3r)",
-	wordsMemoria: "(M3m0ry)",
+	wordsMemory: "(M3m0ry)",
 	wordsMemoryLimit: "(M3m0ry 1imi7)",
 	wordsMessage: "(M355ag3)",
 	wordsMinutes: "(minu735)",
