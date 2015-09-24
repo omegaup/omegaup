@@ -315,16 +315,7 @@ class ContestController extends Controller {
 			throw new NotFoundException("contestNotFound");
 		}
 
-		// Half-authenticate, in case there is no session in place.
-		$session = SessionController::apiCurrentSession($r);
-		if ($session['valid'] && $session['user'] != null) {
-			$r["current_user"] = $session['user'];
-			$r["current_user_id"] = $session['user']->user_id;
-		}
-		self::canAccessContest($r);
-
 		// Create array of relevant columns
-
 		$relevant_columns = array("title", "description", "start_time", "finish_time", "window_length", "alias", "scoreboard", "points_decay_factor", "partial_score", "submissions_gap", "feedback", "penalty", "time_start", "penalty_type", "penalty_calc_policy", "public", "show_scoreboard_after", "contestant_must_register");
 
 		// Initialize response to be the contest information
