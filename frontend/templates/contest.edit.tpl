@@ -65,7 +65,7 @@
 				<form class='contest-publish-form'>
 					<div class="form-group">
 						<label for="public">{#contestNewFormPublic#}</label>
-						<select name='public' id='registration' class="form-control">
+						<select name='public' id='public' class="form-control">
 							<option value='0' selected="selected">{#wordsNo#}</option>
 							<option value='1'>{#wordsYes#}</option>
 						</select>
