@@ -8,8 +8,6 @@
 		<title>{$htmlTitle} &ndash; omegaUp</title>
 
 		<script type="text/javascript" src="/js/jquery.js?ver=198b3f"></script>
-		<!--<script type="text/javascript" src="/js/jquery-ui.min.js?ver=192dc3"></script>-->
-		<!--<script type="text/javascript" src="/js/jquery-ui-timepicker-addon.js?ver=bd6cce"></script>-->
 
 		<script type="text/javascript" src="/js/omegaup.js?ver=21ac40"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=2aca77,ad4a76,02d86f,f284dd"></script>
@@ -22,15 +20,12 @@
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
 		
-		<!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">-->
 		<link rel="stylesheet" href="/css/bootstrap.min.css">
 		<!-- Optional theme -->
                 
-		<!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">-->
 		<link rel="stylesheet" href="/css/bootstrap-theme.min.css">
 		<!-- Latest compiled and minified JavaScript -->
 		
-		<!--<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js?ver=176563"></script>-->
 		<script src="/js/bootstrap.min.js?ver=176563"></script>
 
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
@@ -45,9 +40,6 @@
 		<script type="text/javascript" src="/js/bootstrap-datepicker.js?ver=bf3a56"></script>
 		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
 		<script type="text/javascript" src="/js/typeahead.jquery.js?ver=2e4977"></script>
-		<!-- Bootstrap timepicker plugin from https://github.com/jdewit/bootstrap-timepicker
-		<link rel="stylesheet" href="/css/bootstrap-timepicker.min.css">
-		<script type="text/javascript" src="/js/bootstrap-timepicker.min.js"></script> -->
 		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
 		<link rel="stylesheet" href="/css/bootstrap-datetimepicker.css">
 		<script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js?ver=a0cafb"></script>
@@ -56,10 +48,6 @@
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="/css/style.css">
 		<link rel="stylesheet" type="text/css" href="/css/common.css">
-		<!--
-		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.16.custom.css">
-		<link rel="stylesheet" type="text/css" href="/css/jquery-ui-timepicker-addon.css">
-		-->
 		
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
 	<script type="text/javascript" src="/js/mathjax-config.js?ver=37494e"></script>

@@ -542,6 +542,9 @@ table.problem-list td {
 	vertical-align: middle !important;
 }
 
+.template,
+.problem-list-template { display: none; }
+
 .tag-list {
 	line-height: 2em;
 }

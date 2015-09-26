@@ -36,76 +36,35 @@
 				<div class="panel-heading">
 					<h3 class="panel-title">{#myproblemsListMyProblems#}</h3>
 				</div>
-				<table class="table">
+				<table class="table" id="problem-list">
 					<thead>
 						<tr>
 							<th></th>
 							<th>{#wordsTitle#}</th>
-							<th>{#contestNewFormPublic#}</th>
-							<th></th>
-							<th></th>
+							<th>{#wordsEdit#}</th>
+							<th>{#wordsStatistics#}</th>
 						</tr>
 					</thead>
-					<tbody></tbody>
+					<tbody class="problem-list-template">
+						<tr>
+							<td>
+								<input type="checkbox"></td>
+							<td>
+								<a class="title"></a> <span class="glyphicon glyphicon-eye-close private hidden" title="{#wordsPrivate#}"></span>
+								<div class="tag-list hidden"></div>
+							</td>
+							<td>
+								<a class="glyphicon glyphicon-edit edit"></a>
+							</td>
+							<td>
+								<a class="glyphicon glyphicon-stats stats"></a>
+							</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 		</div>
 	</div>
 </div>
-
-<script>
-	(function(){
-		$(".navbar #nav-problems").addClass("active");
-		
-		function makeWorldClockLink(date) {
-			try {
-				return "http://timeanddate.com/worldclock/fixedtime.html?iso=" + date.toISOString();
-			} catch (e) {
-				return '#';
-			}
-		}
-	
-		function fillProblemsTable() {
-			omegaup.getMyProblems(function(problems) {
-				// Got the contests, lets draw them
-				var html = "";
-				for (var i = 0; i < problems.results.length; i++) {
-					html += "<tr>"
-						+ "<td><input type='checkbox' id='" + problems.results[i].alias + "'/></td>" 
-						+ "<td><b><a href='/arena/problem/" + problems.results[i].alias  + "/'>" + omegaup.escape(problems.results[i].title) + "</a></b></td>"										
-						+ '<td>'+ ((problems.results[i].public == '1') ? 'Sí' : 'No')  + '</td>'
-						+ '<td><a class="glyphicon glyphicon-edit" href="/problem/' + problems.results[i].alias  + '/edit/"></a></td>'
-						+ '<td><a class="glyphicon glyphicon-stats" href="/problem/' + problems.results[i].alias  + '/stats/"></a></td>'
-						+ "</tr>";
-				}
-				$("#problem_list").removeClass("wait_for_ajax")
-				$("#problem_list tbody").empty().html(html);
-			});
-		}
-		fillProblemsTable();
-		
-		$("#bulk-make-public").click(function() {
-			OmegaUp.ui.bulkOperation(
-				function(alias, handleResponseCallback) {
-					omegaup.updateProblem(alias, 1 /*public*/, handleResponseCallback);
-				},
-				function() {
-					fillProblemsTable();
-				}
-			)}
-		);
-		
-		$("#bulk-make-private").click(function() {
-			OmegaUp.ui.bulkOperation(
-				function(alias, handleError) {
-					omegaup.updateProblem(alias, 0 /*public*/, handleResponseCallback);
-				},
-				function() {
-					fillProblemsTable();
-				}
-			)}
-		);
-	})();
-</script>
-	
+<script type="text/javascript" src="/js/problem.mine.js?ver=8e7f18"></script>
 {include file='footer.tpl'}

@@ -1438,7 +1438,9 @@ class ProblemController extends Controller {
 			}
 
 			foreach ($problems as $problem) {
-				array_push($response["results"], $problem->asArray());
+				$problemArray = $problem->asArray();
+				$problemArray['tags'] = ProblemsDAO::getTagsForProblem($problem, false);
+				array_push($response["results"], $problemArray);
 			}
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
