@@ -20,7 +20,7 @@ class FileHandler {
 
 	static function ReadFile($filepath) {
 		if (!file_exists($filepath)) {
-			throw new RuntimeException("File doesn't exists.");
+			throw new RuntimeException("fileNotFound");
 		}
 
 		$file_content = file_get_contents($filepath);

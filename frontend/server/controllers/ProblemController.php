@@ -800,7 +800,7 @@ class ProblemController extends Controller {
 		try {
 			$file_content = FileHandler::ReadFile($source_path);
 		} catch (Exception $e) {
-			throw new InvalidFilesystemOperationException($e);
+			throw new InvalidFilesystemOperationException("statementNotFound");
 		}
 		
 		return $file_content;

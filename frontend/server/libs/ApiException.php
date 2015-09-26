@@ -86,7 +86,7 @@ abstract class ApiException extends Exception {
 		$localizedText = $smarty->getConfigVars($this->message);
 		if (empty($localizedText)) {
 			self::$log->error("Untranslated error message: {$this->message}");
-			return "{untranslated:{$this->message}";
+			return "{untranslated:{$this->message}}";
 		} else {
 			return $localizedText;
 		}
@@ -121,7 +121,7 @@ class InvalidParameterException extends ApiException {
 		$localizedText = $smarty->getConfigVars($this->message);
 		if (empty($localizedText)) {
 			self::$log->error("Untranslated error message: {$this->message}");
-			return "{untranslated:{$this->message}";
+			return "{untranslated:{$this->message}}";
 		}
 		$localizedText = ApiUtils::FormatString($localizedText, 
 			$this->additional_parameters);

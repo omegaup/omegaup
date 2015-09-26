@@ -128,7 +128,7 @@ class ApiCaller{
 
 		if ($args === false || count($args) < 2) {
 			self::$log->error("Api called with URI with less args than expected: ".count($args));
-			throw new NotFoundException("Api requested not found.");
+			throw new NotFoundException("apiNotFound");
 		}
 
 		$controllerName = ucfirst($args[2]);
@@ -141,7 +141,7 @@ class ApiCaller{
 
 		if(!class_exists($controllerName)) {
 			self::$log->error("Controller name was not found: ". $controllerName);
-			throw new NotFoundException("Api requested not found.");
+			throw new NotFoundException("apiNotFound");
 		}
 
 		// Create request
@@ -153,7 +153,7 @@ class ApiCaller{
 		// Check the method
 		if(!method_exists($controllerName, $methodName)) {
 			self::$log->error("Method name was not found: ". $controllerName."::".$methodName);
-			throw new NotFoundException("Api requested not found.");
+			throw new NotFoundException("apiNotFound");
 		}
 
 		// Get the auth_token and user data from cookies

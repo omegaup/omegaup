@@ -192,7 +192,7 @@ class ContestController extends Controller {
 					$req = ContestUserRequestDAO::getByPK($r["current_user_id"], $r["contest"]->contest_id);
 
 					if (is_null($req) || ($req->accepted === "0")) {
-						throw new ForbiddenAccessException("youAreNotRegistered");
+						throw new ForbiddenAccessException("contestNotRegistered");
 					}
 				}
 			}
