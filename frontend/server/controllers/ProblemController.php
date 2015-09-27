@@ -543,6 +543,9 @@ class ProblemController extends Controller {
 
 		self::validateCreateOrUpdate($r, true /* is update */);
 
+		// Validate commit message.	
+		Validators::isStringNonEmpty($r["message"], "message");
+
 		// Update the Problem object
 		$valueProperties = array(
 			"public",
@@ -596,7 +599,7 @@ class ProblemController extends Controller {
 				}
 
 				$response["uploaded_files"] = $problemDeployer->filesToUnzip;
-				$problemDeployer->commit("Updated problem contents", $r['current_user']);
+				$problemDeployer->commit($r['message'], $r['current_user']);
 				$requiresRejudge |= $problemDeployer->requiresRejudge;
 			} else {
 				$problem->slow = $problemDeployer->isSlow($problem);
@@ -665,6 +668,7 @@ class ProblemController extends Controller {
 		
 		// Validate statement
 		Validators::isStringNonEmpty($r["statement"], "statement");
+		Validators::isStringNonEmpty($r["message"], "message");
 		
 		// Check that lang is in the ISO 639-1 code list, default is "es".
 		$iso639_1 = array("ab", "aa", "af", "ak", "sq", "am", "ar", "an", "hy",
@@ -691,7 +695,7 @@ class ProblemController extends Controller {
 		$problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
 		try {					
 			$problemDeployer->updateStatement($r['lang'], $r['statement']);
-			$problemDeployer->commit("Updated statement for {$r['lang']}", $r['current_user']);
+			$problemDeployer->commit("{$r['lang']}.markdown: {$r['message']}", $r['current_user']);
 			
 			// Invalidar problem statement cache
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "html");

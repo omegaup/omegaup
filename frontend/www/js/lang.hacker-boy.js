@@ -284,6 +284,7 @@ OmegaUp.T = {
 	problemDeprecated: "(Pr0b13m i5 d3pr3ca73d)",
 	problemEditAddAdmin: "(Admini57ra70r5)",
 	problemEditAddTags: "(Tag5)",
+	problemEditCommitMessage: "(Upda73 d35crip7i0n)",
 	problemEditEditMarkdown: "(Edi7 57a73m3n7)",
 	problemEditEditProblem: "(Edi7 pr0b13m)",
 	problemEditEmailClarifications: "(S3nd c1arifica7i0n5 7hr0ugh 3mai1)",

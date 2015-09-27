@@ -63,6 +63,14 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="row">
+					<div class="form-group  col-md-6">
+						<label for="markdown_message">{#problemEditCommitMessage#}</label>
+						<input id="markdown_message" name="message" type="text" class="form-control" />
+					</div>
+				</div>
+
 				<div class="row">
 					<div class="col-md-12">
 						<button type='submit' class="btn btn-primary">{#problemEditFormUpdateMarkdown#}</button>	

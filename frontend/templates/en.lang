@@ -283,6 +283,7 @@ problemDeployerValidatorRequired = "Problem requested custom validator but has n
 problemDeprecated = "Problem is deprecated"
 problemEditAddAdmin = "Administrators"
 problemEditAddTags = "Tags"
+problemEditCommitMessage = "Update description"
 problemEditEditMarkdown = "Edit statement"
 problemEditEditProblem = "Edit problem"
 problemEditEmailClarifications = "Send clarifications through email"

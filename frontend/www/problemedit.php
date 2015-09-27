@@ -14,6 +14,7 @@ if (isset($_POST["request"])) {
 					"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 					"problem_alias" => $_POST["problem_alias"],
 					"title" => $_POST["title"],
+					"message" => $_POST["message"],
 					"validator" => $_POST["validator"],
 					"time_limit" => $_POST["time_limit"],
 					"validator_time_limit" => $_POST["validator_time_limit"],
@@ -38,6 +39,7 @@ if (isset($_POST["request"])) {
 					"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 					"problem_alias" => $_POST["problem_alias"],
 					"statement" => $_POST["wmd-input-statement"],
+					"message" => $_POST["message"],
 					"lang" => $_POST["statement-language"]
 				));
 		$r->method = "ProblemController::apiUpdateStatement";

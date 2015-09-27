@@ -44,6 +44,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$r["time_limit"] = 12345;
 		$r["problem_alias"] = $problemData["request"]["alias"];
 		$r["stack_limit"] = 12345;
+		$r['message'] = 'Changed some properties';
 		
 		// Set file upload context
 		$_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT."triangulos.zip";
@@ -97,6 +98,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$r = new Request();
 		$r["languages"] = "hs,java,pl";
 		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r['message'] = 'Changed alias and languages';
 		
 		// Log in as contest director
 		$r["auth_token"] = $this->login($problemData["author"]);
@@ -129,6 +131,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$r = new Request();
 		$r["languages"] = "cows,hs,java,pl";
 		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r['message'] = 'Changed invalid languages';
 		
 		// Log in as contest director
 		$r["auth_token"] = $this->login($problemData["author"]);
@@ -150,6 +153,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$response = ProblemController::apiUpdateStatement(new Request(array(
 			"auth_token" => $this->login($problemData["author"]),
 			"problem_alias" => $problemData["request"]["alias"],
+			"message" => 'Statement is now more fun',
 			"statement" => $statement
 		)));
 		
@@ -180,6 +184,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$response = ProblemController::apiUpdateStatement(new Request(array(
 			"auth_token" => $this->login($problemData["author"]),
 			"problem_alias" => $problemData["request"]["alias"],
+			"message" => 'Statement now contains images',
 			"statement" => $statement
 		)));
 		
@@ -216,6 +221,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$r["title"] = "new title";
 		$r["time_limit"] = 12345;
 		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r["message"] = 'This shoudl fail';
 		
 		// Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT."nostmt.zip";
@@ -268,6 +274,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$response = ProblemController::apiUpdate(new Request(array(
 			"problem_alias" => $problemData["request"]["alias"],
 			"title" => $newTitle,
+			"message" => 'Admin powers',
 			"auth_token" => $this->login($problemAdmin)
 		)));
 		
@@ -314,6 +321,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 		$response = ProblemController::apiUpdate(new Request(array(
 			"problem_alias" => $problemData["request"]["alias"],
 			"title" => $newTitle,
+			"message" => 'Non-admin powers',
 			"auth_token" => $this->login($problemAdmin)
 		)));
 		

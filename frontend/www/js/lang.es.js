@@ -284,6 +284,7 @@ OmegaUp.T = {
 	problemDeprecated: "El problema está deprecado",
 	problemEditAddAdmin: "Administradores",
 	problemEditAddTags: "Tags",
+	problemEditCommitMessage: "Descripción del cambio",
 	problemEditEditMarkdown: "Editar Redacción",
 	problemEditEditProblem: "Editar Problema",
 	problemEditEmailClarifications: "Enviar clarificaciones por correo",

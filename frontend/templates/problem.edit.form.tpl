@@ -120,6 +120,11 @@
 						<option value="1" {if $IS_UPDATE eq 0 && $EMAIL_CLARIFICATIONS eq 1}selected="selected"{/if}>{#wordsYes#}</option>
 					</select>
 				</div>
+
+				<div class="form-group  col-md-6">
+					<label for="update_message">{#problemEditCommitMessage#}</label>
+					<input id="update_message" name="message" type="text" class="form-control" />
+				</div>
 			</div>
 
 			<input id='' name='request' value='submit' type='hidden'>
