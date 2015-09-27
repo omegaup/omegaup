@@ -321,7 +321,7 @@ class RunsDAO extends RunsDAOBase {
 
 	public static final function GetLargestWaitTimeOfContest($contest_id, $showAllRuns = false) {
 		// Build SQL statement.
-		$sql = "SELECT * FROM Runs WHERE contest_id = ? AND status != 'ready' ORDER BY time ASC LIMIT 1";
+		$sql = "SELECT * FROM Runs WHERE contest_id = ? AND status != 'ready' ORDER BY run_id ASC LIMIT 1";
 		$val = array($contest_id);
 
 		global $conn;
