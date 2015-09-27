@@ -122,6 +122,7 @@ OmegaUp.T = {
 	countryNotFound: "(C0un7ry n07 f0und)",
 	createSchoolFailed: "(Sch001 cr3a7i0n fai13d.)",
 	currentStatus: "(Curr3n7 57a73)",
+	editFieldRequired: "(Mi55ing r3quir3d fi31d)",
 	emailInUse: "(3mai1 a1r3ady 3xi575)",
 	emailNotVerified: "(Y0ur 3mai1 i5 n07 v3rifi3d y37. P13a53 100k f0r 7h3 v3rifica7i0n 3mai1 in y0ur inb0x and 5pam f01d3r. If y0u 57i11 hav3 pr0b13m5, p13a53 c0n7ac7 j03@0m3gaup.c0m f0r 5upp0r7.)",
 	enterContest: "(En73r c0n7357)",

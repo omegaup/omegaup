@@ -2,6 +2,8 @@
 	{assign "IS_UPDATE" 0}
 {/if}
 
+<script src="/js/problem.edit.form.js?ver=949b22" type="text/javascript"></script>
+
 <div class="panel panel-primary">
 	{if $IS_UPDATE neq 1}
 	<div class="panel-heading">
@@ -11,7 +13,7 @@
 	</div>
 	{/if}
 	<div class="panel-body">
-		<form method='POST' action='{$smarty.server.REQUEST_URI}' id='problem_form' class="form" enctype="multipart/form-data">
+		<form method="POST" action="{$smarty.server.REQUEST_URI}" id="problem-form" class="form" enctype="multipart/form-data">
 			{if $IS_UPDATE eq 1}
 				<input type="hidden" name="problem_alias" value="{$smarty.get.problem}" />
 			{/if}
@@ -82,8 +84,8 @@
 			</div>
 
 			<div class="row">
-				<div class="form-group  col-md-6">
-					<label for="source">{#wordsSource#}</label>
+				<div class="form-group  col-md-6" id="source-group">
+					<label class="control-label" for="source">{#wordsSource#}</label>
 					<input id='source' name='source' value='{if $IS_UPDATE eq 0}{$SOURCE|htmlspecialchars}{/if}' type='text' class="form-control" />
 				</div>
 
@@ -121,10 +123,12 @@
 					</select>
 				</div>
 
-				<div class="form-group  col-md-6">
-					<label for="update_message">{#problemEditCommitMessage#}</label>
-					<input id="update_message" name="message" type="text" class="form-control" />
+				{if $IS_UPDATE eq 1}
+				<div class="form-group  col-md-6" id="update-message-group">
+					<label class="control-label" for="update-message">{#problemEditCommitMessage#}</label>
+					<input id="update-message" name="message" type="text" class="form-control" />
 				</div>
+				{/if}
 			</div>
 
 			<input id='' name='request' value='submit' type='hidden'>

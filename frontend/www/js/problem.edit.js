@@ -60,6 +60,15 @@ $(document).ready(function() {
 		return false;
 	});
 
+	$('#markdown form').submit(function() {
+		$('.has-error').removeClass('has-error');
+		if ($('#markdown-message').val() == '') {
+			OmegaUp.ui.error(OmegaUp.T['editFieldRequired']);
+			$('#markdown-message-group').addClass('has-error');
+			return false;
+		}
+	});
+
 	function refreshProblemAdmins() {
 		omegaup.getProblemAdmins(problemAlias, function(admins) {
 			$('#problem-admins').empty();

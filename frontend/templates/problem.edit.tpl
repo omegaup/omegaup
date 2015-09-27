@@ -4,7 +4,7 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<script src="/js/problem.edit.js?ver=028e60" type="text/javascript"></script>
+<script src="/js/problem.edit.js?ver=884d97" type="text/javascript"></script>
 
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
 
@@ -65,9 +65,9 @@
 				</div>
 
 				<div class="row">
-					<div class="form-group  col-md-6">
-						<label for="markdown_message">{#problemEditCommitMessage#}</label>
-						<input id="markdown_message" name="message" type="text" class="form-control" />
+					<div class="form-group  col-md-6" id="markdown-message-group">
+						<label class="control-label" for="markdown-message">{#problemEditCommitMessage#}</label>
+						<input id="markdown-message" name="message" type="text" class="form-control" />
 					</div>
 				</div>
 
