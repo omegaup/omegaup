@@ -79,15 +79,21 @@ $(document).ready(function() {
 	function onlyProblemHashChanged() {
 		var self = this;
 		var tabChanged = false;
+		var foundHash = false;
 		var tabs = ['problems', 'clarifications', 'runs'];
 
 		for (var i = 0; i < tabs.length; i++) {
 			if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
 				tabChanged = arena.activeTab != tabs[i];
 				arena.activeTab = tabs[i];
+				foundHash = true;
 
 				break;
 			}
+		}
+
+		if (!foundHash) {
+			window.location.hash = '#' + arena.activeTab;
 		}
 
 		if (arena.activeTab == 'problems') {
@@ -220,8 +226,8 @@ $(document).ready(function() {
 
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
-			$('#overlay, #submit #clarification').hide();
-			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+			$('#submit #clarification').hide();
+			arena.hideOverlay();
 			var code_file = $('#code_file');
 			code_file.replaceWith(code_file = code_file.clone(true));
 			return false;
@@ -262,12 +268,11 @@ $(document).ready(function() {
 			arena.currentProblem.runs.push(run);
 			arena.updateRunFallback(run.guid, run);
 
-			$('#overlay').hide();
 			$('#submit input').removeAttr('disabled');
 			$('#submit textarea[name="code"]').val('');
 			var code_file = $('#code_file');
 			code_file.replaceWith(code_file = code_file.clone(true));
-			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+			arena.hideOverlay();
 		});
 	}
 
@@ -338,8 +343,7 @@ $(document).ready(function() {
 				$('#clarification input').removeAttr('disabled');
 				return;
 			}
-			$('#overlay').hide();
-			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+			arena.hideOverlay();
 			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
 			$('#clarification input').removeAttr('disabled');
 		});

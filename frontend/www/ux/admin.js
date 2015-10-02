@@ -2,6 +2,8 @@ $(document).ready(function() {
 	var arena = new Arena();
 	var admin = new ArenaAdmin(arena);
 
+	$(window).hashchange(arena.onHashChanged.bind(arena));
+
 	Highcharts.setOptions({
 		global: {
 			useUTC: false
@@ -83,8 +85,8 @@ $(document).ready(function() {
 	
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
-			$('#overlay, #submit #clarification').hide();
-			window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+			$('#submit #clarification').hide();
+			arena.hideOverlay();
 			var code_file = $('#code_file');
 			code_file.replaceWith(code_file = code_file.clone(true));
 			return false;
@@ -127,9 +129,8 @@ $(document).ready(function() {
 				arena.currentProblem.runs.push(run);
 				arena.updateRunFallback(run.guid, run);
 
-				$('#overlay').hide();
 				$('#submit input').removeAttr('disabled');
-				window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+				arena.hideOverlay();
 			}
 		);
 
@@ -149,6 +150,4 @@ $(document).ready(function() {
 		$('#update-problem input[name="problem_alias"]').val(arena.currentProblem.alias);
 		return confirm('Deseas actualizar el problema ' + arena.currentProblem.alias + '?');
 	});
-
-	$(window).hashchange(arena.onHashChanged.bind(arena));
 });

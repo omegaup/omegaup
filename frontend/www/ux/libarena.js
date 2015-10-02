@@ -371,15 +371,13 @@ Arena.prototype.displayRun = function(run, r) {
 	);
 	$('.penalty', r).html(run.penalty);
 	$('button.details', r).click(function() {
-		omegaup.runSource(run.guid, function(data) {
-			self.displayRunDetails(data, run.guid);
-		});
+		window.location.hash += '/show-run:' + run.guid;
+		$(window).hashchange();
 		return false;
 	});
 	$('button.admin-details', r).click(function() {
-		omegaup.runDetails(run.guid, function(data) {
-			self.displayRunDetails(data, run.guid);
-		});
+		window.location.hash += '/show-run:' + run.guid;
+		$(window).hashchange();
 		return false;
 	});
 	if (run.verdict == 'JE') {
@@ -827,15 +825,21 @@ Arena.prototype.clarificationsChange = function(data) {
 Arena.prototype.onHashChanged = function() {
 	var self = this;
 	var tabChanged = false;
+	var foundHash = false;
 	var tabs = ['summary', 'problems', 'ranking', 'clarifications', 'runs'];
 
 	for (var i = 0; i < tabs.length; i++) {
 		if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
 			tabChanged = self.activeTab != tabs[i];
 			self.activeTab = tabs[i];
+			foundHash = true;
 
 			break;
 		}
+	}
+
+	if (!foundHash) {
+		window.location.hash = '#' + self.activeTab;
 	}
 
 	var problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
@@ -944,10 +948,13 @@ Arena.prototype.onHashChanged = function() {
 			$('#overlay form').hide();
 			$('#overlay, #clarification').show();
 		}
-	} else if (window.location.hash == '#runs/details') {
+	}
+	var showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
+	var showRunMatch = window.location.hash.match(showRunRegex);
+	if (showRunMatch) {
 		$('#overlay form').hide();
-		$('#run-details').show();
 		$('#overlay').show();
+		omegaup.runDetails(showRunMatch[1], self.displayRunDetails.bind(self));
 	}
 
 	if (tabChanged) {
@@ -966,8 +973,18 @@ Arena.prototype.onHashChanged = function() {
 	}
 };
 
-Arena.prototype.displayRunDetails = function(data, guid) {
+Arena.prototype.hideOverlay = function() {
+	$('#overlay').hide();
+	window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+};
+
+Arena.prototype.displayRunDetails = function(data) {
 	var self = this;
+
+	if (data.status == 'error') {
+		self.hideOverlay();
+		return;
+	}
 
 	if (data.compile_error) {
 		$('#run-details .compile_error pre').html(omegaup.escape(data.compile_error));
@@ -1000,8 +1017,8 @@ Arena.prototype.displayRunDetails = function(data, guid) {
 	$('#run-details .cases div').remove();
 	$('#run-details .cases table').remove();
 	if (self.admin) {
-		$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + guid + '/');
-		$('#run-details .download a.details').attr('href', '/api/run/download/run_alias/' + guid + '/complete/true/');
+		$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + data.guid + '/');
+		$('#run-details .download a.details').attr('href', '/api/run/download/run_alias/' + data.guid + '/complete/true/');
 		$('#run-details .download').show();
 	} else {
 		$('#run-details .download').hide();
@@ -1125,8 +1142,6 @@ Arena.prototype.displayRunDetails = function(data, guid) {
 	$('#overlay form').hide();
 	$('#overlay').show();
 	$('#run-details').show();
-	window.location.hash += '/show-run';
-	$(window).hashchange();
 };
 
 Arena.formatDelta = function(delta) {

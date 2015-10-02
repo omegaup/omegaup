@@ -1,7 +1,7 @@
 {include file='arena.head.tpl' jsfile=$jsfile}
 
 {if $admin}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=2141d0"></script>
+			<script type="text/javascript" src="/ux/libadmin.js?ver=5eb094"></script>
 			<audio id="notification_audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
 			</audio>

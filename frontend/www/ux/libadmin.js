@@ -110,9 +110,7 @@ ArenaAdmin.prototype.setUpPagers = function() {
 					$('#clarification input').removeAttr('disabled');
 					return;
 				}
-				$('#overlay').hide();
-				window.location.hash = window.location.hash.substring(0,
-						window.location.hash.lastIndexOf('/'));
+				arena.hideOverlay();
 				self.refreshClarifications();
 				$('#clarification input').removeAttr('disabled');
 			}
