@@ -460,6 +460,67 @@ class RunController extends Controller {
 	}
 
 	/**
+	 * Gets the details of a run. Includes admin details if admin.
+	 *
+	 * @param Request $r
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiDetails(Request $r) {
+		// Get the user who is calling this API
+		self::authenticateRequest($r);
+
+		self::validateDetailsRequest($r);
+
+		try {
+			$r["problem"] = ProblemsDAO::getByPK($r['run']->problem_id);
+		} catch (Exception $e) {
+			throw new InvalidDatabaseOperationException($e);
+		}
+
+		if (is_null($r["problem"])) {
+			throw new NotFoundException("problemNotFound");
+		}
+
+		if (!(Authorization::CanViewRun($r["current_user_id"], $r["run"]))) {
+			throw new ForbiddenAccessException("userNotAllowed");
+		}
+
+		$response = array();
+
+		if (OMEGAUP_LOCKDOWN) {
+			// OMI hotfix
+			// @TODO @joemmanuel, hay que localizar este msg :P
+			$response['source'] = "Ver el código ha sido temporalmente desactivado.";
+			$response["status"] = "ok";
+			return $response;
+		}
+
+		// Get the source
+		$response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
+
+		// Get the error
+		$grade_dir = RunController::getGradePath($r['run']);
+		if (file_exists("$grade_dir/compile_error.log")) {
+			$response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
+		}
+
+		if (Authorization::IsProblemAdmin($r['current_user_id'], $r['problem'])) {
+			if (file_exists("$grade_dir/details.json")) {
+				$response['groups'] = json_decode(file_get_contents("$grade_dir/details.json"), true);
+			}
+			if (file_exists("$grade_dir/run.log")) {
+				$response['logs'] = file_get_contents("$grade_dir/run.log");
+			}
+
+			$response['judged_by'] = $r["run"]->judged_by;
+		}
+		$response['guid'] = $r['run']->guid;
+		$response["status"] = "ok";
+
+		return $response;
+	}
+
+	/**
 	 * Gets the full details of a run. Includes diff of cases
 	 * 
 	 * @param Request $r
@@ -550,7 +611,6 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiSource(Request $r) {
-
 		// Get the user who is calling this API
 		self::authenticateRequest($r);
 

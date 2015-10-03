@@ -372,12 +372,10 @@ Arena.prototype.displayRun = function(run, r) {
 	$('.penalty', r).html(run.penalty);
 	$('button.details', r).click(function() {
 		window.location.hash += '/show-run:' + run.guid;
-		$(window).hashchange();
 		return false;
 	});
 	$('button.admin-details', r).click(function() {
 		window.location.hash += '/show-run:' + run.guid;
-		$(window).hashchange();
 		return false;
 	});
 	if (run.verdict == 'JE') {
@@ -949,13 +947,7 @@ Arena.prototype.onHashChanged = function() {
 			$('#overlay, #clarification').show();
 		}
 	}
-	var showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
-	var showRunMatch = window.location.hash.match(showRunRegex);
-	if (showRunMatch) {
-		$('#overlay form').hide();
-		$('#overlay').show();
-		omegaup.runDetails(showRunMatch[1], self.displayRunDetails.bind(self));
-	}
+	self.detectShowRun();
 
 	if (tabChanged) {
 		$('.tabs a.active').removeClass('active');
@@ -970,6 +962,17 @@ Arena.prototype.onHashChanged = function() {
 		} else if (self.activeTab == 'clarifications') {
 			$('#clarifications-count').css("font-weight", "normal");
 		}
+	}
+};
+
+Arena.prototype.detectShowRun = function() {
+	var self = this;
+	var showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
+	var showRunMatch = window.location.hash.match(showRunRegex);
+	if (showRunMatch) {
+		$('#overlay form').hide();
+		$('#overlay').show();
+		omegaup.runDetails(showRunMatch[1], self.displayRunDetails.bind(self));
 	}
 };
 

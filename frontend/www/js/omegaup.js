@@ -1583,7 +1583,7 @@ OmegaUp.prototype.runDetails = function(guid, callback) {
 	var self = this;
 
 	$.get(
-		'/api/run/admindetails/run_alias/' + encodeURIComponent(guid) + '/',
+		'/api/run/details/run_alias/' + encodeURIComponent(guid) + '/',
 		function (data) {
 			callback(data);
 		},

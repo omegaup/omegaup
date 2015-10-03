@@ -110,6 +110,7 @@ $(document).ready(function() {
 				$('#submit textarea[name="code"]').val('');
 			}
 		}
+		arena.detectShowRun();
 
 		if (tabChanged) {
 			$('.tabs a.active').removeClass('active');
