@@ -521,50 +521,6 @@ class RunController extends Controller {
 	}
 
 	/**
-	 * Gets the full details of a run. Includes diff of cases
-	 * 
-	 * @param Request $r
-	 * @throws InvalidDatabaseOperationException
-	 */
-	public static function apiAdminDetails(Request $r) {
-		if (OMEGAUP_LOCKDOWN) {
-			throw new ForbiddenAccessException("lockdown");
-		}
-
-		// Get the user who is calling this API
-		self::authenticateRequest($r);
-		self::validateAdminDetailsRequest($r);
-		
-		$response = array();
-
-		$problem_dir = PROBLEMS_PATH . '/' . $r["problem"]->getAlias() . '/cases/';
-		$grade_dir = RunController::getGradePath($r['run']);
-
-		$groups = array();
-
-		if (file_exists("$grade_dir/compile_error.log")) {
-			$response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
-		}
-		if (file_exists("$grade_dir/details.json")) {
-			$groups = json_decode(file_get_contents("$grade_dir/details.json"), true);
-		}
-		if (file_exists("$grade_dir/run.log")) {
-			$response['logs'] = file_get_contents("$grade_dir/run.log");
-		}
-
-		$response['groups'] = $groups;
-		$response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-		if ($response['source'] == null) {
-			$response['source'] = '';
-		}
-		$response['guid'] = $r['run']->guid;
-		$response['judged_by'] = $r["run"]->judged_by;
-		$response["status"] = "ok";
-		
-		return $response;
-	}
-
-	/**
 	 * Parses Run metadata
 	 * 
 	 * @param string $meta
