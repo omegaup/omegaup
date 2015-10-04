@@ -855,7 +855,8 @@ class UserController extends Controller {
 		if (!is_null($user->getLanguageId())) {
 			$query = LanguagesDAO::getByPK($user->getLanguageId());	
 			if (!is_null($query)) {
-				$response["userinfo"]["locale"] = $query->getName();
+				$response["userinfo"]["locale"] =
+					UserController::convertToSupportedLanguage($query->getName());
 			}
 		}
 

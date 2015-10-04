@@ -384,6 +384,7 @@ OmegaUp.T = {
 	userEditSchool: "Escola",
 	userEditSchoolGrade: "Grau de escola",
 	userEditState: "Estado",
+	userEditSuccess: "Perfil atualizado com sucesso",
 	userEmailEditEditMainEmail: "Atualizar seu e-mail principal",
 	userEmailEditEmail: "E-mail",
 	userEmailEditSaving: "Salvando",
