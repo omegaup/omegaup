@@ -822,9 +822,8 @@ class UserController extends Controller {
 			case "pt-br":
 				return "pt";
 
-			case "ps":
-			case "ps-ps":
-				return "hacker-boy";
+			case "pseudo":
+				return "pseudo";
 		}
 
 		// Fallback to spanish.

@@ -11,7 +11,7 @@ import sys
 
 TEMPLATES_PATH = 'frontend/templates'
 JS_TEMPLATES_PATH = 'frontend/www/js'
-PSEUDOLOC = 'hacker-boy'
+PSEUDOLOC = 'pseudo'
 LINE_RE = re.compile(r'\s+=\s+')
 VALUE_RE = re.compile('^"([^"]|\\")*"$')
 
@@ -110,7 +110,7 @@ def pseudoloc(s):
 
 for key, values in strings.iteritems():
 	if key == 'locale':
-	    values[PSEUDOLOC] = '"ps"'
+	    values[PSEUDOLOC] = '"pseudo"'
 	else:
 	    values[PSEUDOLOC] = pseudoloc(values['en'])
 

@@ -298,7 +298,7 @@
 							<option value="es">es</option>
 							<option value="en">en</option>
 							<option value="pt">pt</option>
-							<option value="hacker-boy">pseudo-loc</option>
+							<option value="pseudo">pseudo-loc</option>
 						</select>
 						</div>
 					</div>

@@ -164,7 +164,7 @@ OmegaUp.T = {
 	lastUpdate: "(La57 upda73)",
 	libinteractiveLanguage: "(Languag3)",
 	libinteractiveOs: "(Op3ra7ing Sy573m)",
-	locale: "ps",
+	locale: "pseudo",
 	loginDisabled: "(Y0ur u53r i5 700 01d and f0r y0ur 53curi7y i7 ha5 b33n di5ab13d. P13a53 c0n7ac7 0m3gaup-50p0r73@g00g13gr0up5.c0m 70 10gin again.)",
 	loginEmail: "(E-mai1)",
 	loginEmailUsername: "(E-mai1 0r u53r)",
