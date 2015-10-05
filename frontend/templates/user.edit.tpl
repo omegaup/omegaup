@@ -288,7 +288,7 @@
 						<div class="col-md-7">
 							<input id='school' name='school' value='' type='text' size='20' class="form-control" /> 
 						</div>
-						<input id='school_id' name='school_id' value='' type='hidden'>
+						<input id='school_id' name='school_id' value="" type='hidden'>
 					</div>
 
 					<div class="form-group">
@@ -377,5 +377,5 @@
 		</div>
 	</div>
 	
-	<script type="text/javascript" src="/js/user.edit.js?ver=9bb909"></script>
+	<script type="text/javascript" src="/js/user.edit.js?ver=807c6c"></script>
 {/block}

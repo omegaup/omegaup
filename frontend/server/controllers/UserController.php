@@ -1253,19 +1253,7 @@ class UserController extends Controller {
 		}
 		
 		if (!is_null($r["school_id"])) {
-			
-			if ($r["school_id"] == -1) {
-				// UI sets -1 if school does not exists.
-				try {
-					$schoolR = new Request(array("name" => $r["school_name"], "state_id" => $r["state_id"], "auth_token" => $r["auth_token"]));
-					$response = SchoolController::apiCreate($schoolR);
-					$r["school_id"] = $response["school_id"];
-				} catch (Exception $e) {
-					throw new InvalidDatabaseOperationException($e);
-				}
-			} else if ($r["school_id"] == "") {
-				$r["school_id"] = null;
-			} else {			
+			if (is_numeric($r['school_id'])) {
 				try {
 					$r["school"] = SchoolsDAO::getByPK($r["school_id"]);	
 				} catch(Exception $e) {
@@ -1274,6 +1262,16 @@ class UserController extends Controller {
 
 				if (is_null($r["school"])) {
 					throw new InvalidParameterException("parameterInvalid", "school");
+				}
+			} else if (empty($r['school_name'])) {
+				$r["school_id"] = null;
+			} else {
+				try {
+					$schoolR = new Request(array("name" => $r["school_name"], "state_id" => $r["state_id"], "auth_token" => $r["auth_token"]));
+					$response = SchoolController::apiCreate($schoolR);
+					$r["school_id"] = $response["school_id"];
+				} catch (Exception $e) {
+					throw new InvalidDatabaseOperationException($e);
 				}
 			}
 		}
