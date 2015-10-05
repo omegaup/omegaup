@@ -380,16 +380,21 @@ class RunsDAO extends RunsDAOBase {
 	public static final function GetContestRuns($contest_id, $order_by_column, $onlyAC = false) {
 
 		$sql =	  "SELECT "
-					. "score, penalty, contest_score, problem_id, user_id, test, time, submit_delay, guid "
+					. "r.score, r.penalty, r.contest_score, r.problem_id, r.user_id, r.test, r.time, r.submit_delay, r.guid "
 				. "FROM "
-					. "Runs "
+					. "Runs r "
+				. "INNER JOIN "
+					. "Contest_Problems cp "
+				. "ON "
+					. "r.problem_id = cp.problem_id "
+					. "AND r.contest_id = cp.contest_id "
 				. "WHERE "
-					. "contest_id = ? "
-					. "AND status = 'ready' "
-					. "AND Test = '0' " .
+					. "cp.contest_id = ? "
+					. "AND r.status = 'ready' "
+					. "AND r.test = '0' " .
 					(($onlyAC === false) ? 
-						"AND verdict NOT IN ('CE', 'JE') " :
-						"AND verdict IN ('AC') ")
+						"AND r.verdict NOT IN ('CE', 'JE') " :
+						"AND r.verdict IN ('AC') ")
 				. "ORDER BY ?;";
 		
 		$val = array($contest_id, $order_by_column);
