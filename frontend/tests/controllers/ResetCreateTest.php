@@ -14,6 +14,7 @@ class ResetCreateTest extends OmegaupTestCase {
 	}
 
 	public function testShouldRefuseUnverifiedUser() {
+		$message = null;
 		try {
 			$user_data = UserFactory::generateUser(false);
 			$r = new Request($user_data);

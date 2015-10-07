@@ -62,7 +62,7 @@
 			<h2 class="panel-title">{#loginSignupHeader#}</h3>
 		</div>
 		<div class="panel-body">
-			<p>El registro nativo esta desctivado por el momento. Por favor regístrate usando tu cuenta de Google o Facebook.</p> 
+			<p>{#nativeSignupDisabled#}</p>
 		</div>
 		<!--
 		<div class="panel-body">

@@ -21,25 +21,27 @@ class UserFactory {
     public static function createUser($username = null, $password = null, $email = null, $verify = true) {
 		
 		// If data is not provided, generate it randomly
-        if (is_null($username)) {
-            $username = Utils::CreateRandomString();
-        }
-        
-        if (is_null($password)) {
-            $password = Utils::CreateRandomString();
-        }            
-        
-        if (is_null($email)) {
-            $email = Utils::CreateRandomString()."@mail.com";
-        }
+		if (is_null($username)) {
+			$username = Utils::CreateRandomString();
+		}
+		
+		if (is_null($password)) {
+			$password = Utils::CreateRandomString();
+		}            
+		
+		if (is_null($email)) {
+			$email = Utils::CreateRandomString()."@mail.com";
+		}
         
 		// Populate a new Request to pass to the API
+		UserController::$permissionKey = uniqid();
 		$r = new Request(array(
-				"username" => $username,
-				"name" => $username,
-				"password" => $password,
-				"email" => $email)
-				);
+			"username" => $username,
+			"name" => $username,
+			"password" => $password,
+			"email" => $email,
+			"permission_key" => UserController::$permissionKey
+		));
 		
 		// Call the API		
 		$response = UserController::apiCreate($r);
@@ -55,6 +57,9 @@ class UserFactory {
 		if ($verify) {
 			UserController::$redirectOnVerify = false;
 			$user = self::verifyUser($user);
+		} else {
+			$user->verified = 0;
+			UsersDAO::save($user);
 		}
 						
 		// Password came hashed from DB. Set password in plaintext

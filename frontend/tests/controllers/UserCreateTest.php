@@ -15,10 +15,12 @@ class CreateUserTest extends OmegaupTestCase {
 	public function testCreateUserPositive() {
 		
 		// Inflate request 
+		UserController::$permissionKey = uniqid();
 		$r = new Request(array(
 			"username" => Utils::CreateRandomString(),
 			"password" => Utils::CreateRandomString(),
-			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
+			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com",
+			"permission_key" => UserController::$permissionKey
 		));
 		
 		// Call API		
@@ -38,12 +40,14 @@ class CreateUserTest extends OmegaupTestCase {
 	 * @expectedException DuplicatedEntryInDatabaseException
 	 */
 	public function testDuplicatedUsernames() {
-		
+		UserController::$permissionKey = uniqid();
+
 		// Inflate request 
 		$r = new Request(array(
 			"username" => Utils::CreateRandomString(),
 			"password" => Utils::CreateRandomString(),
-			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
+			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com",
+			"permission_key" => UserController::$permissionKey
 		));
 		
 		// Call API		
@@ -63,12 +67,14 @@ class CreateUserTest extends OmegaupTestCase {
 	 * @expectedException DuplicatedEntryInDatabaseException
 	 */
 	public function testDuplicatedEmails() {
+		UserController::$permissionKey = uniqid();
 		
 		// Inflate request 
 		$r = new Request(array(
 			"username" => Utils::CreateRandomString(),
 			"password" => Utils::CreateRandomString(),
-			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
+			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com",
+			"permission_key" => UserController::$permissionKey
 		));
 		
 		// Call API
@@ -89,11 +95,13 @@ class CreateUserTest extends OmegaupTestCase {
 	 * @expectedException InvalidParameterException
 	 */
 	public function testNoPassword() {
+		UserController::$permissionKey = uniqid();
 		
 		// Inflate request 
 		$r = new Request(array(
 			"username" => Utils::CreateRandomString(),
-			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
+			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com",
+			"permission_key" => UserController::$permissionKey
 		));
 		
 		// Call API
@@ -106,11 +114,13 @@ class CreateUserTest extends OmegaupTestCase {
 	 * @expectedException InvalidParameterException
 	 */
 	public function testNoEmail() {
+		UserController::$permissionKey = uniqid();
 		
 		// Inflate request 
 		$r = new Request(array(
 			"username" => Utils::CreateRandomString(),
-			"password" => Utils::CreateRandomString()
+			"password" => Utils::CreateRandomString(),
+			"permission_key" => UserController::$permissionKey
 		));
 		
 		// Call API
@@ -123,11 +133,13 @@ class CreateUserTest extends OmegaupTestCase {
 	 * @expectedException InvalidParameterException
 	 */
 	public function testNoUser() {
+		UserController::$permissionKey = uniqid();
 		
 		// Inflate request 
 		$r = new Request(array(
 			"password" => Utils::CreateRandomString(),
-			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
+			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com",
+			"permission_key" => UserController::$permissionKey
 		));
 		
 		// Call API
@@ -139,11 +151,13 @@ class CreateUserTest extends OmegaupTestCase {
 	 * Tests Create User API happy path excercising the httpEntryPoint
 	 */
 	public function testCreateUserPositiveViahttpEntryPoint() {
+		UserController::$permissionKey = uniqid();
 		
 		// Set context
 		$_REQUEST["username"] = Utils::CreateRandomString();
 		$_REQUEST["password"] = Utils::CreateRandomString();
 		$_REQUEST["email"] = Utils::CreateRandomString()."@".Utils::CreateRandomString().".com";
+		$_REQUEST["permission_key"] = UserController::$permissionKey;
 
 		// Override session_start, phpunit doesn't like it, but we still validate that it is called once
 		$this->mockSessionManager();
@@ -166,12 +180,14 @@ class CreateUserTest extends OmegaupTestCase {
 	 * @expectedException InvalidParameterException
 	 */
 	public function testUsernameWithInvalidChars() {
+		UserController::$permissionKey = uniqid();
 		
 		// Inflate request 
 		$r = new Request(array(
 			"username" => "ínvalid username",
 			"password" => Utils::CreateRandomString(),
-			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com"
+			"email" => Utils::CreateRandomString()."@".Utils::CreateRandomString().".com",
+			"permission_key" => UserController::$permissionKey
 		));
 		
 		// Call API		

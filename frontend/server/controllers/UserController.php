@@ -11,7 +11,7 @@ class UserController extends Controller {
 
 	public static $sendEmailOnVerify = true;
 	public static $redirectOnVerify = true;
-	private static $permissionKey = null;
+	public static $permissionKey = null;
 
 	/**
 	 * Entry point for Create a User API
@@ -68,12 +68,14 @@ class UserController extends Controller {
 		if (!is_null(self::$permissionKey) &&
 		    self::$permissionKey == $r['permission_key']) {
 			$user_data['verified'] = 1;
+		} else {
+			throw new ForbiddenAccessException("nativeSignupDisabled");
 		}
 		$user = new Users($user_data);
 
 		$email = new Emails(array(
-					"email" => $r["email"],
-				));
+			"email" => $r["email"],
+		));
 
 		// Save objects into DB
 		try {
@@ -96,7 +98,9 @@ class UserController extends Controller {
 		self::$log->info("User " . $user->getUsername() . " created, sending verification mail");
 
 		$r["user"] = $user;
-		self::sendVerificationEmail($r);
+		if (!$user->verified) {
+			self::sendVerificationEmail($r);
+		}
 
 		self::registerToMailchimp($r);
 		
@@ -105,7 +109,6 @@ class UserController extends Controller {
 			"user_id" => $user->getUserId()
 		);
 	}
-	
 	
 	/**
 	 * Registers a user to Mailchimp
@@ -377,7 +380,6 @@ class UserController extends Controller {
 	 * @throws NotFoundException
 	 */
 	public static function apiVerifyEmail(Request $r) {
-
 		$user = null;
 		
 		// Admin can override verification by sending username
@@ -1488,7 +1490,6 @@ class UserController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiUpdateMainEmail(Request $r) {
-		
 		self::authenticateRequest($r);
 		
 		Validators::isEmail($r["email"], "email");
@@ -1533,7 +1534,6 @@ class UserController extends Controller {
 		self::sendVerificationEmail($r);
 				
 		return array("status" => "ok");
-		
 	}
 	
 }

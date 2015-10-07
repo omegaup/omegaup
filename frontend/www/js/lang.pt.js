@@ -194,6 +194,7 @@ OmegaUp.T = {
 	myproblemsListAddContests: "Adicionar um concurso",
 	myproblemsListCreateProblem: "Criar um problema",
 	myproblemsListMyProblems: "Meus Problemas",
+	nativeSignupDisabled: "Registro direto foi desativado. Por favor, registre pelo Google ou Facebook.",
 	navArena: "Arena",
 	navBlog: "Blog",
 	navContests: "Concursos",

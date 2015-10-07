@@ -330,19 +330,18 @@ class SessionController extends Controller {
 			self::$log->info("LoginViaGoogle: Creating new user for $s_Email");
 
 			$username = self::getUniqueUsernameFromEmail($s_Email);
+			UserController::$permissionKey = uniqid();
 
-			$r = new Request(
-							array(
-								"name" => $username,
-								"username" => $username,
-								"email" => $s_Email,
-								"password" => NULL,
-								"ignore_password" => true
-							)
-						);
+			$r = new Request(array(
+				"name" => $username,
+				"username" => $username,
+				"email" => $s_Email,
+				"password" => NULL,
+				"ignore_password" => true,
+				"permission_key" => UserController::$permissionKey
+			));
 
 			$res = UserController::apiCreate($r);
-
 		} else {
 			//user has been here before, lets just register the session
 			$this->RegisterSession($vo_User);
@@ -402,32 +401,32 @@ class SessionController extends Controller {
 			self::$log->info("user has been here before with facebook!");
 
 		} else {
-				// The user has never been here before, let's register him
+			// The user has never been here before, let's register him
 
-				// I have a problem with this:
-				$username = self::getUniqueUsernameFromEmail($fb_user_profile["email"]);
-				// Even if the user gave us his/her email, we should not
-				// just go ahead and assume its ok to share with the world
-				// maybe we could do:
-				// $username = str_replace(" ", "_", $fb_user_profile["name"] ),
+			// I have a problem with this:
+			$username = self::getUniqueUsernameFromEmail($fb_user_profile["email"]);
+			// Even if the user gave us his/her email, we should not
+			// just go ahead and assume its ok to share with the world
+			// maybe we could do:
+			// $username = str_replace(" ", "_", $fb_user_profile["name"] ),
+			UserController::$permissionKey = uniqid();
 
-				$r = new Request(
-								array(
-									"name" => $fb_user_profile["name"],
-									"username" => $username,
-									"email" => $fb_user_profile["email"],
-									"facebook_user_id" => $fb_user_profile["id"],
-									"password" => NULL,
-									"ignore_password" => true
-								)
-							);
-				try {
-					$res = UserController::apiCreate($r);
-				} catch (ApiException $e) {
-					self::$log->error("Unable to login via Facebook " . $e);
-					return false;
-				}
-				$vo_User = UsersDAO::getByPK($res["user_id"]);
+			$r = new Request(array(
+				"name" => $fb_user_profile["name"],
+				"username" => $username,
+				"email" => $fb_user_profile["email"],
+				"facebook_user_id" => $fb_user_profile["id"],
+				"password" => NULL,
+				"permission_key" => UserController::$permissionKey,
+				"ignore_password" => true
+			));
+			try {
+				$res = UserController::apiCreate($r);
+			} catch (ApiException $e) {
+				self::$log->error("Unable to login via Facebook " . $e);
+				return false;
+			}
+			$vo_User = UsersDAO::getByPK($res["user_id"]);
 		}
 
 		//since we got here, this user does not have
@@ -435,8 +434,7 @@ class SessionController extends Controller {
 		//so we dont have to call facebook to see
 		//if he is still logged in, and he can call
 		//the api 
-		$this->RegisterSession( $vo_User );
-
+		$this->RegisterSession($vo_User);
 	}
 
 	/**
