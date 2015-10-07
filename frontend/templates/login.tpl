@@ -62,6 +62,10 @@
 			<h2 class="panel-title">{#loginSignupHeader#}</h3>
 		</div>
 		<div class="panel-body">
+			<p>El registro nativo esta desctivado por el momento. Por favor regístrate usando tu cuenta de Google o Facebook.</p> 
+		</div>
+		<!--
+		<div class="panel-body">
 			<form method='POST' action='/login/' id="register-form">
 				<div class="row">
 					<div class="col-md-4 col-md-offset-2">
@@ -109,6 +113,7 @@
 				</div>
 			</form>
 		</div>
+		-->
 	</div>
 </div>
 
