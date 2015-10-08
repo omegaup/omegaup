@@ -10,10 +10,16 @@ $(document).ready(function() {
 			return false;
 		}
 
+		if (grecaptcha.getResponse().length == 0) {
+			OmegaUp.ui.error(OmegaUp.T.unableToVerifyCaptcha);
+			return false;
+		}
+
 		omegaup.createUser(
 			$('#reg_email').val(),
 			$('#reg_username').val(),
 			$('#reg_pass').val(),
+			grecaptcha.getResponse(),	
 			function (data) { 
 				//registration callback
 				if (data.status != 'ok') {

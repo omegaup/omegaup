@@ -69,8 +69,46 @@ class UserController extends Controller {
 		    self::$permissionKey == $r['permission_key']) {
 			$user_data['verified'] = 1;
 		} else {
-			throw new ForbiddenAccessException("nativeSignupDisabled");
+			// Validate captcha
+			if (!isset($r["recaptcha"])) {
+				throw new InvalidParameterException("parameterNotFound", "recaptcha");
+			}
+
+			$url = 'https://www.google.com/recaptcha/api/siteverify';
+			$data = array(
+				'secret' => OMEGAUP_RECAPTCHA_SECRET,
+				'response' => $r["recaptcha"],
+				'remoteip' => $_SERVER["REMOTE_ADDR"]);
+
+			// use key 'http' even if you send the request to https://...
+			$options = array(
+					'http' => array(
+						'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+						'method'  => 'POST',
+						'content' => http_build_query($data),
+						),
+					);
+			$context  = stream_context_create($options);
+			$result = file_get_contents($url, false, $context);
+	 
+			if ($result === false) {
+				self::$log->error("POST Request to Google Recaptcha failed.");
+				throw new CaptchaVerificationFailedException();
+			}	
+
+			$resultAsJson = json_decode($result, true);
+			if(is_null($resultAsJson)) {
+				self::$log->error("Captcha response was not a json");
+				self::$log->error("Here is the result:" . $result);
+				throw new CaptchaVerificationFailedException();
+			}
+
+			if (!(array_key_exists("success", $resultAsJson) && $resultAsJson["success"])) {
+				self::$log->error("Captcha response said no");
+				throw new CaptchaVerificationFailedException();
+			}
 		}
+
 		$user = new Users($user_data);
 
 		$email = new Emails(array(

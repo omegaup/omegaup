@@ -115,10 +115,10 @@ OmegaUp.ui = {
 	}
 };
 
-OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, callback) {
+OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, s_ReCaptchaToken, callback) {
 	$.post(
 		'/api/user/create/',
-		{ email: s_Email, username: s_Username, password: s_PlainPassword },
+		{ email: s_Email, username: s_Username, password: s_PlainPassword, recaptcha : s_ReCaptchaToken },
 		function (data) {
 			if (data.status !== undefined && data.status == "error") {
 				OmegaUp.ui.error(data.error);

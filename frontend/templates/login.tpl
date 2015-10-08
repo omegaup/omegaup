@@ -62,10 +62,6 @@
 			<h2 class="panel-title">{#loginSignupHeader#}</h3>
 		</div>
 		<div class="panel-body">
-			<p>{#nativeSignupDisabled#}</p>
-		</div>
-		<!--
-		<div class="panel-body">
 			<form method='POST' action='/login/' id="register-form">
 				<div class="row">
 					<div class="col-md-4 col-md-offset-2">
@@ -102,6 +98,9 @@
 					<div class="col-md-4 col-md-offset-2">
 						{#privacyPolicyNotice#}
 					</div>
+					<div class="col-md-4">
+						<div class="g-recaptcha" data-sitekey="6LfMqdoSAAAAALS8h-PB_sqY7V4nJjFpGK2jAokS"></div>
+					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-4 col-md-offset-6">
@@ -113,10 +112,10 @@
 				</div>
 			</form>
 		</div>
-		-->
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/login.js?ver=35dc77"></script>
+<script type="text/javascript" src="/js/login.js?ver=364d4b"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" defer></script>
+<script src='https://www.google.com/recaptcha/api.js'></script>
 {include file='footer.tpl'}

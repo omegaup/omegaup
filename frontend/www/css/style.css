@@ -612,3 +612,8 @@ iframe.embedded-doc {
 	width: 100%;
 	height: 400px;
 }
+
+.g-recaptcha {
+    transform:scale(0.90);
+    transform-origin:0 0;
+}
