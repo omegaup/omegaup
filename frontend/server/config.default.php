@@ -80,6 +80,11 @@ try_define('OMEGAUP_GA_TRACK',				false);
 try_define('OMEGAUP_GA_ID',					'xxxxx');
 
 # ####################################
+# GOOGLE RECAPTCHA
+# ####################################
+try_define('OMEGAUP_RECAPTCHA_SECRET',			'xxxx'	);
+
+# ####################################
 # EMAIL CONFIG
 # ####################################
 try_define('OMEGAUP_EMAIL_SEND_EMAILS',			false);

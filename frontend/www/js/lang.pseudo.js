@@ -365,6 +365,7 @@ OmegaUp.T = {
 	status: "(Upda73 y0ur 3mai1 h3r3.)",
 	submittingUnOpenedProblem: "(U53r i5 5ubmi77ing a run and h3 ha5 n07 3v3n 0p3n3d 7h3 pr0b13m)",
 	successfulOperation: "(Succ355)",
+	unableToVerifyCaptcha: "(W3 fai13d 70 v3rify 7h3 cap7cha. P13a53 r310ad 7h3 pag3 and 7ry again.)",
 	unverifiedUser: "(Unv3rifi3d u53r.)",
 	userEditBachelors: "(Bach310r5)",
 	userEditBirthDate: "(Bir7h da73)",

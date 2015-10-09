@@ -238,6 +238,22 @@ class InvalidFilesystemOperationException extends ApiException {
  * Default for unexpected errors
  * 
  */
+class CaptchaVerificationFailedException extends ApiException {
+
+	/**
+	 * 
+	 * @param Exception $previous
+	 */
+	function __construct(Exception $previous = NULL) {
+		parent::__construct("unableToVerifyCaptcha", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
+	}
+
+}
+
+/**
+ * Default for unexpected errors
+ * 
+ */
 class InternalServerErrorException extends ApiException {
 
 	/**

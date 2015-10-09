@@ -365,6 +365,7 @@ OmegaUp.T = {
 	status: "no verificas tu correo. Actualiza tu email aquí",
 	submittingUnOpenedProblem: "Estas intentando enviar una solucion a un problema que no haz abierto.",
 	successfulOperation: "Operacion exitosa",
+	unableToVerifyCaptcha: "No pudimos verificar el Captcha. Recarga la pagina e intenta de nuevo.",
 	unverifiedUser: "Usurio no verificado.",
 	userEditBachelors: "Licenciatura",
 	userEditBirthDate: "Fecha de nacimiento",
