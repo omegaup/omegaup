@@ -457,6 +457,78 @@ class RunCreateTest extends OmegaupTestCase {
 	}
 	
 	/**
+	 * Languages must be validated against the problem's allowed languages.
+	 * 
+	 * @expectedException InvalidParameterException
+	 */
+	public function testRunInvalidProblemLanguage() {
+		// Create public problem without C as an option.
+		$problemData = ProblemsFactory::createProblem(null, null, 1, null, 'cpp');
+		
+		// Create our contestant
+		$contestant = UserFactory::createUser();
+		
+		// Create an empty request
+		$r = new Request();
+
+		// Log in as contest director
+		$r["auth_token"] = $this->login($contestant);
+
+		// Build request
+		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r["language"] = "c";
+		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+
+		//PHPUnit does not set IP address, doing it manually
+		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
+		
+		// Call API
+		$response = RunController::apiCreate($r);
+	}
+	
+	/**
+	 * Languages must be validated against the problem's allowed languages.
+	 * 
+	 * @expectedException InvalidParameterException
+	 */
+	public function testRunInvalidContestLanguage() {
+		$problemData = ProblemsFactory::createProblem();
+		
+		// Get a contest 
+		$contestData = ContestsFactory::createContest(null, 1, null, 'cpp');
+
+		// Add the problem to the contest
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+		
+		// Create our contestant
+		$contestant = UserFactory::createUser();
+
+		// Our contestant has to open the contest before sending a run
+		ContestsFactory::openContest($contestData, $contestant);
+
+		// Then we need to open the problem
+		ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
+
+		// Create an empty request
+		$r = new Request();
+
+		// Log in as contest director
+		$r["auth_token"] = $this->login($contestant);
+
+		// Build request
+		$r["contest_alias"] = $contestData["request"]["alias"];
+		$r["problem_alias"] = $problemData["request"]["alias"];
+		$r["language"] = "c";
+		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+
+		//PHPUnit does not set IP address, doing it manually
+		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
+		
+		// Call API
+		$response = RunController::apiCreate($r);
+	}
+	
+	/**
 	 * User cannot send runs to a private problem, regardless of it being 
 	 * in a contest
 	 * 

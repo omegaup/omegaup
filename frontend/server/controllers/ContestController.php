@@ -400,7 +400,8 @@ class ContestController extends Controller {
 				"penalty_calc_policy",
 				"public", 
 				"show_scoreboard_after",
-				"contestant_must_register");
+				"contestant_must_register",
+				"languages");
 
 			// Initialize response to be the contest information
 			$result = $r["contest"]->asFilteredArray($relevant_columns);
@@ -451,6 +452,12 @@ class ContestController extends Controller {
 				$temp_array = $temp_problem->asFilteredArray($relevant_columns);
 				$temp_array["points"] = $problemkey->getPoints();
 				$temp_array['letter'] = ContestController::columnName($letter++);
+				if (!empty($result['languages'])) {
+					$temp_array['languages'] = join(',', array_intersect(
+						explode(',', $result['languages']),
+						explode(',', $temp_array['languages'])
+					));
+				}
 
 				// Save our array into the response
 				array_push($problemsResponseArray, $temp_array);
@@ -541,6 +548,7 @@ class ContestController extends Controller {
 		$contest->setPenalty(max(0, intval($r["penalty"])));
 		$contest->penalty_type = $r["penalty_type"];
 		$contest->setPenaltyCalcPolicy(is_null($r["penalty_calc_policy"]) ? "sum" : $r["penalty_calc_policy"]);
+		$contest->setLanguages(empty($r['languages']) ? null : $r['languages']);
 		$contest->setScoreboardUrl(self::randomString(30));
 		$contest->setScoreboardUrlAdmin(self::randomString(30));
 

@@ -50,6 +50,7 @@ class RunController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateCreateRequest(Request $r) {
+		$allowedLanguages = array('kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'cat', 'hs');
 		try {
 			Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
@@ -60,7 +61,12 @@ class RunController extends Controller {
 				throw new PreconditionFailedException('problemDeprecated');
 			}
 
-			Validators::isInEnum($r["language"], "language", array('kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'cat', 'hs'));
+			$allowedLanguages = array_intersect(
+				$allowedLanguages,
+				explode(',', $r['problem']->languages)
+			);
+			Validators::isInEnum($r["language"], "language",
+				$allowedLanguages);
 			Validators::isStringNonEmpty($r["source"], "source");
 
 			// Check for practice or public problem, there is no contest info in this scenario
@@ -89,6 +95,15 @@ class RunController extends Controller {
 
 			if ($r["contest"] == NULL) {
 				throw new InvalidParameterException("parameterNotFound", "contest_alias");
+			}
+
+			if ($r['contest']->languages !== null) {
+				$allowedLanguages = array_intersect(
+					$allowedLanguages,
+					explode(',', $r['contest']->languages)
+				);
+				Validators::isInEnum($r["language"], "language",
+					$allowedLanguages);
 			}
 
 			// Validate that the combination contest_id problem_id is valid

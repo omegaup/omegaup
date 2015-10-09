@@ -16,7 +16,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * @return array array of problemData
 	 */
 	private function insertProblemsInContest($contestData, $numOfProblems = 3) {
-
 		// Create problems
 		$problems = array();
 		for ($i = 0; $i < $numOfProblems; $i++) {
@@ -35,7 +34,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * @param type $response
 	 */
 	private function assertContestDetails($contestData, $problems, $response) {
-
 		// To validate, grab the contest object directly from the DB
 		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
 
@@ -87,7 +85,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * Get contest details for a public contest
 	 */
 	public function testGetContestDetailsValid() {
-
 		// Get a contest 
 		$contestData = ContestsFactory::createContest();
 
@@ -109,6 +106,36 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$response = ContestController::apiDetails($r);
 
 		$this->assertContestDetails($contestData, $problems, $response);
+	}
+
+	/**
+	 * Language filter works.
+	 */
+	public function testGetContestDetailsWithLanguageFilter() {
+		// Get a contest 
+		$contestData = ContestsFactory::createContest(null, 1, null, 'c,cpp,java');
+
+		// Get some problems into the contest
+		$problemData = ProblemsFactory::createProblem(null, null, 1, null, 'cpp,java,py');
+		ContestsFactory::addProblemToContest($problemData, $contestData);
+
+		// Get a user for our scenario
+		$contestant = UserFactory::createUser();
+
+		// Prepare our request
+		$r = new Request();
+		$r["contest_alias"] = $contestData["request"]["alias"];
+
+		// Log in the user
+		$r["auth_token"] = $this->login($contestant);
+
+		// Call api
+		$response = ContestController::apiDetails($r);
+
+		$this->assertEquals(1, count($response["problems"]));
+		// Verify that the allowed languages for the problem are the intersection of
+		// the allowed languages.
+		$this->assertEquals('cpp,java', $response['problems'][0]['languages']);
 	}
 
 	/**
@@ -466,7 +493,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 			"contest_alias" => $contestData["request"]["alias"],
 			"auth_token" => $this->login($contestDirector)
 		)));	
-				
 		
 		$this->assertEquals($problemData["request"]["alias"], $response["problems"][0]["alias"]);
 		
@@ -481,9 +507,5 @@ class ContestDetailsTest extends OmegaupTestCase {
 			}
 			$this->assertTrue($found);
 		}
-		
-		
 	}
-
 }
-

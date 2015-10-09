@@ -101,6 +101,9 @@ class Contests extends VO
 			if (isset($data['contestant_must_register'])) {
 				$this->contestant_must_register = $data['contestant_must_register'];
 			}
+			if (isset($data['languages'])) {
+				$this->languages = $data['languages'];
+			}
 		}
 	}
 
@@ -136,7 +139,8 @@ class Contests extends VO
 			"scoreboard_url" => $this->scoreboard_url,
 			"scoreboard_url_admin" => $this->scoreboard_url_admin,
 			"urgent" => $this->urgent,
-			"contestant_must_register" => $this->contestant_must_register
+			"contestant_must_register" => $this->contestant_must_register,
+			"languages" => $this->languages
 		); 
 	return json_encode($vec); 
 	}
@@ -313,4 +317,11 @@ class Contests extends VO
 	  * @var 
 	  */
 	public $contestant_must_register;
+
+	/**
+	  * Un filtro (opcional) de qué lenguajes se pueden usar en un concurso
+	  * @access public
+	  * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11')
+	  */
+	public $languages;
 }

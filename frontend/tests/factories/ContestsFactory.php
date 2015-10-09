@@ -16,7 +16,7 @@ class ContestsFactory {
 	 * @param Users $contestDirector
 	 * @return Request
 	 */
-	public static function getRequest($title = null, $public = 0, Users $contestDirector = null) {
+	public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null) {
 
 		if (is_null($contestDirector)) {
 			$contestDirector = UserFactory::createUser();
@@ -42,17 +42,18 @@ class ContestsFactory {
 		$r["penalty"] = 100;
 		$r["scoreboard"] = 100;
 		$r["penalty_type"] = "contest_start";
-		$r["penalty_calc_policy"] = "sum";		
+		$r["penalty_calc_policy"] = "sum";
+		$r['languages'] = $languages;
 		
 		return array(
 			"request" => $r,
 			"director" => $contestDirector);
 	}
 
-	public static function createContest($title = null, $public = 1, Users $contestDirector = null) {
+	public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null) {
 
 		// Create a valid contest Request object
-		$contestData = ContestsFactory::getRequest($title, 0, $contestDirector);
+		$contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages);
 		$r = $contestData["request"];
 		$contestDirector = $contestData["director"];
 
