@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=5767fc' bodyid='only-problem'}
+{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=ef8b93' bodyid='only-problem'}
 			{if $problem_admin}
 			<script type="text/javascript" src="/ux/libadmin.js?ver=5eb094"></script>
 			<ul class="tabs">
@@ -213,29 +213,7 @@
 			{/if}
 		</div>
 		<div id="overlay">
-			<form id="submit" method="POST">
-				<button class="close">&times;</button>
-				<div id="lang-select">
-					{#wordsLanguage#}
-					<select name="language">
-						<option value=""></option>
-						<option value="cpp11">C++11</option>
-						<option value="cpp">C++</option>
-						<option value="c">C</option>
-						<option value="hs">Haskell</option>
-						<option value="java">Java</option>
-						<option value="pas">Pascal</option>
-						<option value="py">Python</option>
-						<option value="rb">Ruby</option>
-						<option value="kp">Karel (Pascal)</option>
-						<option value="kj">Karel (Java)</option>
-						<option value="cat">{#wordsJustOutput#}</option>
-					</select>
-				</div>
-				<textarea name="code"></textarea><br/>
-				<input type="file" id="code_file" /><br/>
-				<input type="submit" />
-			</form>
+{include file='arena.runsubmit.tpl'}
 {include file='arena.rundetails.tpl'}
 		</div>
 		<div id="footer">

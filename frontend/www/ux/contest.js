@@ -229,7 +229,7 @@ $(document).ready(function() {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
 			$('#submit #clarification').hide();
 			arena.hideOverlay();
-			var code_file = $('#code_file');
+			var code_file = $('#submit-code-file');
 			code_file.replaceWith(code_file = code_file.clone(true));
 			return false;
 		}
@@ -271,11 +271,22 @@ $(document).ready(function() {
 
 			$('#submit input').removeAttr('disabled');
 			$('#submit textarea[name="code"]').val('');
-			var code_file = $('#code_file');
+			var code_file = $('#submit-code-file');
 			code_file.replaceWith(code_file = code_file.clone(true));
 			arena.hideOverlay();
 		});
 	}
+
+	$('#submit select[name="language"]').change(function (e) {
+		var lang = $('#submit select[name="language"]').val();
+		if (lang == 'cpp11') {
+			$('#submit-filename-extension').text('.cpp');
+		} else if (lang && lang != 'cat') {
+			$('#submit-filename-extension').text('.' + lang);
+		} else {
+			$('#submit-filename-extension').text();
+		}
+	});
 
 	$('#submit').submit(function(e) {
 		if (!arena.onlyProblem && (arena.problems[arena.currentProblem.alias].last_submission + arena.submissionGap * 1000 > omegaup.time().getTime())) {
@@ -289,7 +300,7 @@ $(document).ready(function() {
 		}
 
 		var code = $('#submit textarea[name="code"]').val();
-		var file = $('#code_file')[0];
+		var file = $('#submit-code-file')[0];
 		if (file && file.files && file.files.length > 0) {
 			file = file.files[0];
 			var reader = new FileReader();
