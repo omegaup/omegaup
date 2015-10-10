@@ -377,7 +377,7 @@ class RunsDAO extends RunsDAOBase {
 		return $ar;
 	}
 
-	public static final function GetContestRuns($contest_id, $order_by_column, $onlyAC = false) {
+	public static final function GetContestRuns($contest_id, $onlyAC = false) {
 
 		$sql =	  "SELECT "
 					. "r.score, r.penalty, r.contest_score, r.problem_id, r.user_id, r.test, r.time, r.submit_delay, r.guid "
@@ -395,9 +395,9 @@ class RunsDAO extends RunsDAOBase {
 					(($onlyAC === false) ? 
 						"AND r.verdict NOT IN ('CE', 'JE') " :
 						"AND r.verdict IN ('AC') ")
-				. "ORDER BY ?;";
+				. "ORDER BY r.run_id;";
 		
-		$val = array($contest_id, $order_by_column);
+		$val = array($contest_id);
 
 		global $conn;
 		$rs = $conn->Execute($sql, $val);

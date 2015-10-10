@@ -62,11 +62,8 @@ class Scoreboard {
 				$raw_contest_problems =
 					ContestProblemsDAO::GetRelevantProblems($this->contest_id);
 
-				$use_penalty = $contest->penalty_type != 'none';
-
 				$contest_runs = RunsDAO::GetContestRuns(
 					$this->contest_id,
-					$use_penalty ? 'penalty' : 'run_id',
 					$this->onlyAC
 				);
 			} catch (Exception $e) {
@@ -139,12 +136,7 @@ class Scoreboard {
 				$raw_contest_problems =
 					ContestProblemsDAO::GetRelevantProblems($this->contest_id);
 
-				$use_penalty = $contest->penalty_type != 'none';
-
-				$contest_runs = RunsDAO::GetContestRuns(
-					$this->contest_id,
-					$use_penalty ? 'penalty' : 'run_id'
-				);
+				$contest_runs = RunsDAO::GetContestRuns($this->contest_id);
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
@@ -161,7 +153,6 @@ class Scoreboard {
 
 			$result = Scoreboard::calculateEvents($contest,
 			                                      $contest_runs,
-			                                      $use_penalty,
 			                                      $raw_contest_users,
 			                                      $problem_mapping,
 																						$this->showAllRuns);
@@ -200,12 +191,7 @@ class Scoreboard {
 		try {
 			$contest = ContestsDAO::getByPK($contest_id);
 
-			$use_penalty = $contest->penalty_type != 'none';
-
-			$contest_runs = RunsDAO::GetContestRuns(
-				$contest_id,
-				$use_penalty ? 'penalty' : 'run_id'
-			);
+			$contest_runs = RunsDAO::GetContestRuns($contest_id);
 
 			// Get all distinct contestants participating in the contest given contest_id
 			$raw_contest_users = RunsDAO::GetAllRelevantUsers(
@@ -266,7 +252,6 @@ class Scoreboard {
 		$contestantEventCache->set(Scoreboard::calculateEvents(
 			$contest,
 			$contest_runs,
-			$use_penalty,
 			$raw_contest_users,
 			$problem_mapping,
 			false /* showAllRuns */
@@ -276,7 +261,6 @@ class Scoreboard {
 		$adminEventCache->set(Scoreboard::calculateEvents(
 			$contest,
 			$contest_runs,
-			$use_penalty,
 			$raw_contest_users,
 			$problem_mapping,
 			true /* showAllRuns */
@@ -522,7 +506,7 @@ class Scoreboard {
 		}
 	}
 
-	private static function calculateEvents($contest, $contest_runs, $use_penalty,
+	private static function calculateEvents($contest, $contest_runs,
 	                                        $raw_contest_users, $problem_mapping, $showAllRuns) {
 		$contest_users = array();
 
@@ -539,8 +523,6 @@ class Scoreboard {
 
 		// Calculate score for each contestant x problem x run
 		foreach ($contest_runs as $run) {
-
-
 			if (!$showAllRuns && $run->getTest() != 0) {
 				continue;
 			}
@@ -554,7 +536,6 @@ class Scoreboard {
 			if ($run_delay >= $scoreboardLimit) {
 				continue;
 			}
-
 
 			$user_id = $run->getUserId();
 			$problem_id = $run->getProblemId();
@@ -585,9 +566,7 @@ class Scoreboard {
 			$data = array(
 				'name' => $user->getName() ? $user->getName() : $user->getUsername(),
 				'username' => $user->getUsername(),
-				'delta' => max(0, $use_penalty ?
-					(int)$run->submit_delay :
-					($run_delay - $contestStart) / 60),
+				'delta' => max(0, ($run_delay - $contestStart) / 60),
 				'problem' => array(
 					'alias' => $problem_mapping[$problem_id]['alias'],
 					'points' => round($contest_score, 2),
