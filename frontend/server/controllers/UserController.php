@@ -133,11 +133,13 @@ class UserController extends Controller {
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		self::$log->info("User " . $user->getUsername() . " created, sending verification mail");
-
 		$r["user"] = $user;
 		if (!$user->verified) {
+			self::$log->info("User " . $user->getUsername() . " created, sending verification mail");
+
 			self::sendVerificationEmail($r);
+		} else {
+			self::$log->info("User " . $user->getUsername() . " created, trusting e-mail");
 		}
 
 		self::registerToMailchimp($r);
