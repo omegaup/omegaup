@@ -22,7 +22,7 @@ div#title {
 }
 
 
-#status {
+#status, #announcement {
 	max-width: 900px;
 	margin-left: auto;
 	margin-right: auto;
