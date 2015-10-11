@@ -10,8 +10,8 @@
 							</a>
 						</div>
 						<ul class="nav navbar-nav">
-							{if !$smarty.const.OMEGAUP_LOCKDOWN}
-							<li id="nav-arena"{if isset($currentSection) && $currentSection == 'arena'} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
+							{if !$smarty.const.OMEGAUP_LOCKDOWN && !$inContest}
+							<li id="nav-arena"><a href='/arena/'>{#navArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
 								<li id="nav-contests">
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>

@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile=$jsfile}
+{include file='arena.head.tpl' jsfile=$jsfile inContest=!$practice}
 
 {if $admin}
 			<script type="text/javascript" src="/ux/libadmin.js?ver=5eb094"></script>

@@ -35,9 +35,6 @@
 		<script type="text/javascript" src="/js/bootstrap-datepicker.js?ver=bf3a56"></script>
 		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
 		<script type="text/javascript" src="/js/typeahead.jquery.js?ver=2e4977"></script>
-		<!-- Bootstrap timepicker plugin from https://github.com/jdewit/bootstrap-timepicker
-		<link rel="stylesheet" href="/css/bootstrap-timepicker.min.css">
-		<script type="text/javascript" src="/js/bootstrap-timepicker.min.js"></script> -->
 		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
 		<link rel="stylesheet" href="/css/bootstrap-datetimepicker.css">
 		<script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js?ver=a0cafb"></script>
