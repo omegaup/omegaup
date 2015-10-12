@@ -71,6 +71,3 @@
 					</div>
 				</div>
 			</div>
-			<div class="alert alert-info" id="announcement">
-				<span class="message">omegaUp estará cerrado por mantenimiento a partir de <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=omegaUp+maintenance&iso=20151011T22&p1=155">2015-10-11 22:00:00 (GMT-5)</a></span>
-			</div>
