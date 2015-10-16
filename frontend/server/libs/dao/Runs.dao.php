@@ -3,24 +3,22 @@
 require_once("base/Runs.dao.base.php");
 require_once("base/Runs.vo.base.php");
 /** Page-level DocBlock .
- * 
+ *
  * @author alanboy
  * @package docs
- * 
+ *
  */
 
 /** Runs Data Access Object (DAO).
- * 
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
- * almacenar de forma permanente y recuperar instancias de objetos {@link Runs }. 
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+ * almacenar de forma permanente y recuperar instancias de objetos {@link Runs }.
  * @author alanboy
  * @access public
  * @package docs
- * 
+ *
  */
 class RunsDAO extends RunsDAOBase {
-
-	const DEFAULT_SUBMISSION_GAP = 120;
 
 	/*
 	 * Gets a boolean indicating whether there are runs that are not ready.
@@ -316,7 +314,7 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	/*
-	 * Gets the largest queued time of a run in ms 
+	 * Gets the largest queued time of a run in ms
 	 */
 
 	public static final function GetLargestWaitTimeOfContest($contest_id, $showAllRuns = false) {
@@ -337,12 +335,12 @@ class RunsDAO extends RunsDAOBase {
 
 	/*
 	 *  GetAllRelevantUsers
-	 * 
+	 *
 	 */
 
 	public static final function GetAllRelevantUsers($contest_id, $showAllRuns = false, $filterUsersBy = null) {
 
-		// Build SQL statement		
+		// Build SQL statement
 		if (!$showAllRuns) {
 			$sql = "SELECT Users.user_id, username, Users.name, Users.country_id from Users INNER JOIN ( "
 					. "SELECT DISTINCT Runs.user_id from Runs "
@@ -392,11 +390,11 @@ class RunsDAO extends RunsDAOBase {
 					. "cp.contest_id = ? "
 					. "AND r.status = 'ready' "
 					. "AND r.test = '0' " .
-					(($onlyAC === false) ? 
+					(($onlyAC === false) ?
 						"AND r.verdict NOT IN ('CE', 'JE') " :
 						"AND r.verdict IN ('AC') ")
 				. "ORDER BY r.run_id;";
-		
+
 		$val = array($contest_id);
 
 		global $conn;
@@ -411,9 +409,9 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	/*
-	 * 
+	 *
 	 * Get last run of a user
-	 * 
+	 *
 	 */
 
 	public static final function GetLastRun($contest_id, $problem_id, $user_id) {
@@ -438,9 +436,9 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	/*
-	 * 
+	 *
 	 * Get best run of a user
-	 * 
+	 *
 	 */
 
 	public static final function GetBestRun($contest_id, $problem_id, $user_id, $finish_time, $showAllRuns) {
@@ -456,7 +454,7 @@ class RunsDAO extends RunsDAOBase {
 
 	/**
 	 * Returns best score for the given user and problem, between 0 and 100
-	 * 
+	 *
 	 * @global type $conn
 	 * @param type $problem_id
 	 * @param type $user_id
@@ -506,7 +504,7 @@ class RunsDAO extends RunsDAOBase {
 		$rs = $conn->Execute($sql, $val);
 
 		$ar = array();
-		//Wrap every row in a Runs object 
+		//Wrap every row in a Runs object
 		foreach ($rs as $iter) {
 			$run = new Runs($iter);
 			array_push($ar, $run);
@@ -522,16 +520,15 @@ class RunsDAO extends RunsDAOBase {
 			return true;
 		}
 
-		if ($contest_id == null) {
-			$submission_gap = RunController::$defaultSubmissionGap;
-		} else {
+		$submission_gap = 0;
+		if ($contest_id != null) {
 			// Get submissions gap
 			$contest = ContestsDAO::getByPK($contest_id);
 			$submission_gap = (int) $contest->getSubmissionsGap();
 		}
+		$submission_gap = max($submission_gap, RunController::$defaultSubmissionGap);
 
-		// Giving 10 secs as gift
-		return time() >= (strtotime($lastrun->getTime()) + $submission_gap - 10);
+		return time() >= (strtotime($lastrun->getTime()) + $submission_gap);
 	}
 
 	public static function GetRunCountsToDate($date) {
@@ -557,7 +554,7 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	public static final function searchRunIdGreaterThan($Runs, $greaterThan, $orderBy = null, $orden = 'ASC', $columnas = NULL, $offset = 0, $rowcount = NULL) {
-		// Implode array of columns to a coma-separated string               
+		// Implode array of columns to a coma-separated string
 		$columns_str = is_null($columnas) ? "*" : implode(",", $columnas);
 
 		$sql = "SELECT " . $columns_str . "  from Runs ";

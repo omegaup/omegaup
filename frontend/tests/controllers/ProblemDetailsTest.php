@@ -7,24 +7,24 @@
  */
 
 class ProblemDetailsTest extends OmegaupTestCase {
-	
+
 	/**
-	 * 
-	 */	
+	 *
+	 */
 	public function testViewProblemInAContestDetailsValid() {
-		
-		// Get a contest 
+
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
-		
+
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
-		
+
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
-		
+
 		// Get a user for our scenario
 		$contestant = UserFactory::createUser();
-		
+
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
@@ -32,42 +32,42 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
-		
+
 		// Call api
 		$response = ProblemController::apiDetails($r);
-		
+
 		// Get problem and contest from DB to check it
-        $problemDAO = ProblemsDAO::getByAlias($problemData["request"]["alias"]);               
+        $problemDAO = ProblemsDAO::getByAlias($problemData["request"]["alias"]);
 		$contestDAO = ContestsDAO::getByAlias($contestData["request"]["alias"]);
 		$contestantsDAO = UsersDAO::search(new Users(array("username" => $contestant->getUsername())));
-		$contestantDAO = $contestantsDAO[0];						
-        
+		$contestantDAO = $contestantsDAO[0];
+
         // Assert data
         $this->assertEquals($response["title"], $problemDAO->getTitle());
         $this->assertEquals($response["alias"], $problemDAO->getAlias());
         $this->assertEquals($response["validator"], $problemDAO->getValidator());
         $this->assertEquals($response["time_limit"], $problemDAO->getTimeLimit());
-        $this->assertEquals($response["memory_limit"], $problemDAO->getMemoryLimit());                      
-        $this->assertEquals($response["author_id"], $problemDAO->getAuthorId()); 
-        $this->assertEquals($response["source"], $problemDAO->getSource()); 
-        $this->assertContains("<h1>Entrada</h1>", $response["problem_statement"]);        
+        $this->assertEquals($response["memory_limit"], $problemDAO->getMemoryLimit());
+        $this->assertEquals($response["author_id"], $problemDAO->getAuthorId());
+        $this->assertEquals($response["source"], $problemDAO->getSource());
+        $this->assertContains("<h1>Entrada</h1>", $response["problem_statement"]);
         $this->assertEquals($response["order"], $problemDAO->getOrder());
 		$this->assertEquals($response["score"], 0);
-        
+
         // Default data
         $this->assertEquals(0, $problemDAO->getVisits());
         $this->assertEquals(0, $problemDAO->getSubmissions());
         $this->assertEquals(0, $problemDAO->getAccepted());
         $this->assertEquals(0, $problemDAO->getDifficulty());
-        
+
         // Verify that we have an empty array of runs
         $this->assertEquals(0, count($response["runs"]));
-        
+
         // Verify that problem was marked as Opened
         $problem_opened = ContestProblemOpenedDAO::getByPK($contestDAO->getContestId(), $problemDAO->getProblemId(), $contestantDAO->getUserId());
-        $this->assertNotNull($problem_opened);        
+        $this->assertNotNull($problem_opened);
 
-        // Verify open time 
+        // Verify open time
         $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));
 
 	}
@@ -76,19 +76,19 @@ class ProblemDetailsTest extends OmegaupTestCase {
 	 * Common code for testing the statement's source.
 	 */
 	public function internalViewProblemStatement($type, $expected_text) {
-		
-		// Get a contest 
+
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
-		
+
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
-		
+
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
-		
+
 		// Get a user for our scenario
 		$contestant = UserFactory::createUser();
-		
+
 		// Prepare our request
 		$r = new Request();
 		$r["problem_alias"] = $problemData["request"]["alias"];
@@ -96,13 +96,13 @@ class ProblemDetailsTest extends OmegaupTestCase {
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
 
-		
+
 		// Call api
 		$r["statement_type"] = $type;
 		$response = ProblemController::apiDetails($r);
-		
+
 				// Assert data
-				$this->assertContains($expected_text, $response["problem_statement"]);				
+				$this->assertContains($expected_text, $response["problem_statement"]);
 	}
 
 	/**
@@ -127,106 +127,102 @@ class ProblemDetailsTest extends OmegaupTestCase {
 	}
 
 	public function testProblemDetailsNotInContest() {
-		
+
 		// Get 1 problem public
 		$problemData = ProblemsFactory::createProblem(null, null, 1 /* public */);
-				
+
 		// Get a user for our scenario
 		$contestant = UserFactory::createUser();
-		
+
 		// Prepare our request
-		$r = new Request();		
+		$r = new Request();
 		$r["problem_alias"] = $problemData["request"]["alias"];
 
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
-		
+
 		// Call api
 		$response = ProblemController::apiDetails($r);
-		
+
 		$this->assertEquals($response["alias"], $problemData["request"]["alias"]);
 	}
-	
+
 	/**
 	 * User not invited to private contest can't see problem details
-	 * 
+	 *
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testPrivateProblemDetailsNotInContest() {
-		
+
 		// Get 1 problem public
 		$problemData = ProblemsFactory::createProblem(null, null, 0 /* private */);
-				
+
 		// Get a user for our scenario
 		$contestant = UserFactory::createUser();
-		
+
 		// Prepare our request
-		$r = new Request();		
+		$r = new Request();
 		$r["problem_alias"] = $problemData["request"]["alias"];
 
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
-		
+
 		// Call api
-		$response = ProblemController::apiDetails($r);				
+		$response = ProblemController::apiDetails($r);
 	}
-	
+
 	/**
 	 * Best score is returned
 	 */
 	public function testScoreInDetailsOutsideContest() {
-		
+
 		// Create problem
 		$problemData = ProblemsFactory::createProblem();
-		
+
 		// Create contestant
 		$contestant = UserFactory::createUser();
-		
+
 		// Create 2 runs, 100 and 50.
-		RunController::$defaultSubmissionGap = 0;
 		$runData = RunsFactory::createRunToProblem($problemData, $contestant);
 		$runDataPA = RunsFactory::createRunToProblem($problemData, $contestant);
 		RunsFactory::gradeRun($runData);
 		RunsFactory::gradeRun($runDataPA, 0.5, "PA");
-		RunController::$defaultSubmissionGap = 60;
-		
+
 		// Call API
 		$response = ProblemController::apiDetails(new Request(array(
 			"auth_token" => $this->login($contestant),
 			"problem_alias" => $problemData["request"]["alias"]
 		)));
-		
+
 		$this->assertEquals(100.00, $response["score"]);
 	}
-	
+
 	/**
 	 * Best score is returned, problem inside a contest
 	 */
 	public function testScoreInDetailsInsideContest() {
-		
+
 		// Create problem and contest
 		$problemData = ProblemsFactory::createProblem();
 		$contestData = ContestsFactory::createContest();
 		ContestsFactory::addProblemToContest($problemData, $contestData);
-		
+
 		// Create contestant
 		$contestant = UserFactory::createUser();
-		
+
 		// Create 2 runs, 100 and 50.
-		RunController::$defaultSubmissionGap = 0;
 		$runDataOutsideContest = RunsFactory::createRunToProblem($problemData, $contestant);
 		$runDataInsideContest = RunsFactory::createRun($problemData, $contestData, $contestant);
 		RunsFactory::gradeRun($runDataOutsideContest);
 		RunsFactory::gradeRun($runDataInsideContest, 0.5, "PA");
-		RunController::$defaultSubmissionGap = 60;
-		
+
 		// Call API
 		$response = ProblemController::apiDetails(new Request(array(
 			"auth_token" => $this->login($contestant),
 			"problem_alias" => $problemData["request"]["alias"],
 			"contest_alias" => $contestData["request"]["alias"]
-		))); 
-		
+		)));
+
 		$this->assertEquals(50.00, $response["score"]);
 	}
 }

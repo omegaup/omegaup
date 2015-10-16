@@ -33,12 +33,12 @@ class ProblemList extends OmegaupTestCase {
 				if ($problemResponse === "ok") {
 					continue;
 				}
-				
+
 				if ($problemResponse['alias'] === $problemData[$i]["request"]["alias"]) {
 					$exists = true;
 					break;
 				}
-			}			
+			}
 			if (!$exists) {
 				$this->fail("Problem" . $problemData[$i]["request"]["alias"] . " is not in the list.");
 			}
@@ -57,18 +57,18 @@ class ProblemList extends OmegaupTestCase {
 			$this->fail("Private problem" . $privateProblemData["request"]["alias"] . " is in the list.");
 		}
 	}
-	
+
 	/**
 	 * Limit the output to one problem we know
 	 */
 	public function testLimitOffset() {
-		
+
 		// Get 3 problems
 		$n = 3;
 		for ($i = 0; $i < $n; $i++) {
 			$problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */);
 		}
-		
+
 
 		$r = new Request();
 		$r["auth_token"] = $this->login(UserFactory::createUser());
@@ -86,92 +86,86 @@ class ProblemList extends OmegaupTestCase {
 	 *
 	 */
 	public function testPrivateProblemsShowToAuthor() {
-		
+
 		$author = UserFactory::createUser();
 		$anotherAuthor = UserFactory::createUser();
-		
+
 		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
-		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);		
-		$anotherProblemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $anotherAuthor);		
-		
+		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);
+		$anotherProblemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $anotherAuthor);
+
 		$r = new Request();
 		$r["auth_token"] = $this->login($author);
-		
+
 		$response = ProblemController::apiList($r);
-		
+
 		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPrivate["request"]["alias"]);
 	}
-	
+
 	/**
 	 * The author should see his problems as well
 	 *
 	 */
 	public function testAllPrivateProblemsShowToAdmin() {
-		
+
 		$author = UserFactory::createUser();
-		
+
 		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
-		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);		
-		
+		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);
+
 		$admin = UserFactory::createAdminUser();
-		
+
 		$r = new Request();
 		$r["auth_token"] = $this->login($admin);
-		
+
 		$response = ProblemController::apiList($r);
-		
+
 		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPrivate["request"]["alias"]);
 	}
-	
+
 	/**
 	 * Test myList API
 	 */
 	public function testMyList() {
-		
+
 		// Get 3 problems
 		$author = UserFactory::createUser();
 		$n = 3;
 		for ($i = 0; $i < $n; $i++) {
 			$problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
 		}
-		
-		$r = new Request();
-		$r["auth_token"] = $this->login($author);		
 
-		$response = ProblemController::apiMyList($r);		
+		$r = new Request();
+		$r["auth_token"] = $this->login($author);
+
+		$response = ProblemController::apiMyList($r);
 		$this->assertEquals(3, count($response["results"]));
 		$this->assertEquals($problemData[2]["request"]["alias"], $response["results"][0]["alias"]);
 	}
-		
+
 	/**
 	 * Logged-in users will have their best scores for all problems
 	 */
 	public function testListContainsScores() {
-		
+
 		$contestant = UserFactory::createUser();
-		
+
 		$problemData = ProblemsFactory::createProblem();
 		$problemDataNoRun = ProblemsFactory::createProblem();
 		$problemDataDecimal = ProblemsFactory::createProblem();
-		
-		// We'll send consecutive runs, changing submission gap to 0 to avoid waiting
-		RunController::$defaultSubmissionGap = 0;
-		
+
 		$runData = RunsFactory::createRunToProblem($problemData, $contestant);
-		RunsFactory::gradeRun($runData);				
-		
+		RunsFactory::gradeRun($runData);
+
 		$runDataDecimal = RunsFactory::createRunToProblem($problemDataDecimal, $contestant);
 		RunsFactory::gradeRun($runDataDecimal, ".123456", "PA");
-		
-		
-		RunController::$defaultSubmissionGap = 100;
-		
+
 		$r = new Request(array(
 			"auth_token" => $this->login($contestant)
 		));
-		
+
 		$response = ProblemController::apiList($r);
-		
+
 		// Validate results
 		foreach ($response['results'] as $responseProblem) {
 			if ($responseProblem['alias'] === $problemData['request']['alias']) {
@@ -189,62 +183,62 @@ class ProblemList extends OmegaupTestCase {
 			}
 		}
 	}
-	
+
 	/**
 	 * Test that non-logged in users dont have score set
 	 */
-	public function testListScoresForNonLoggedIn() {				
-		
-		$problemData = ProblemsFactory::createProblem();						
-		
+	public function testListScoresForNonLoggedIn() {
+
+		$problemData = ProblemsFactory::createProblem();
+
 		$r = new Request();
-		
+
 		$response = ProblemController::apiList($r);
-		
+
 		// Validate results
 		foreach ($response['results'] as $responseProblem) {
 			if ($responseProblem['score'] != "0") {
 				$this->fail('Expecting score to be not set for non-logged in users');
-			}			
+			}
 		}
 	}
-	
+
 	/**
 	 * Test List API with query param
 	 */
-	public function testListWithAliasQuery() {				
-		
+	public function testListWithAliasQuery() {
+
 		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */);
-		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */);		
-		
-		$user = UserFactory::createUser();		
+		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */);
+
+		$user = UserFactory::createUser();
 		$admin = UserFactory::createAdminUser();
-		
+
 		// Expect public problem only
 		$r = new Request();
 		$r["auth_token"] = $this->login($user);
-		$r["query"] = substr($problemDataPublic["request"]["title"], 2, 5);				
-		$response = ProblemController::apiList($r);		
+		$r["query"] = substr($problemDataPublic["request"]["title"], 2, 5);
+		$response = ProblemController::apiList($r);
 		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPublic["request"]["alias"]);
-		
+
 		// Expect 0 problems, matches are private for $user
 		$r = new Request();
 		$r["auth_token"] = $this->login($user);
-		$r["query"] = substr($problemDataPrivate["request"]["title"], 2, 5);				
+		$r["query"] = substr($problemDataPrivate["request"]["title"], 2, 5);
 		$response = ProblemController::apiList($r);
 		$this->assertEquals(0, count($response["results"]));
-		
+
 		// Expect 1 problem, admin can see private problem
 		$r = new Request();
 		$r["auth_token"] = $this->login($admin);
-		$r["query"] = substr($problemDataPrivate["request"]["title"], 2, 5);				
-		$response = ProblemController::apiList($r);		
-		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPrivate["request"]["alias"]); 
-		
+		$r["query"] = substr($problemDataPrivate["request"]["title"], 2, 5);
+		$response = ProblemController::apiList($r);
+		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPrivate["request"]["alias"]);
+
 		// Expect public problem only
 		$r = new Request();
-		$r["auth_token"] = $this->login($user);		
-		$response = ProblemController::apiList($r);		
+		$r["auth_token"] = $this->login($user);
+		$response = ProblemController::apiList($r);
 		$this->assertArrayContainsInKey($response["results"], "alias", $problemDataPublic["request"]["alias"]);
 	}
 
@@ -254,7 +248,6 @@ class ProblemList extends OmegaupTestCase {
 	public function testProblemListPager() {
 		// Create a user and some problems with submissions for the tests.
 		$contestant = UserFactory::createUser();
-		RunController::$defaultSubmissionGap = 0;
 		for ($i = 0; $i < 6; $i++) {
 			$problemData[$i] = ProblemsFactory::createProblem(null, null, 1);
 			$runs = $i / 2;
@@ -269,8 +262,6 @@ class ProblemList extends OmegaupTestCase {
 				RunsFactory::gradeRun($runData, $points / 100, $verdict);
 			}
 		}
-		RunController::$defaultSubmissionGap = 100;
-
 
 		$request = new Request();
 		$request['auth_token'] = $this->login($contestant);
@@ -296,7 +287,7 @@ class ProblemList extends OmegaupTestCase {
 		// The following tests will try the different scenarios that can occur
 		// with the additions of the three features to apiList(), that is, paging,
 		// order by column and order mode: Call apiList() with and without
-		// pagination, for each allowed ordering and each possible order mode. 
+		// pagination, for each allowed ordering and each possible order mode.
 		$modes = array('asc', 'desc');
 		$columns = array('title', 'submissions', 'accepted', 'ratio', 'points', 'score');
 		$counter = 0;

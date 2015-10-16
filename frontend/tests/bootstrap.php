@@ -2,7 +2,7 @@
 
 define('IS_TEST', TRUE);
 
-// Set timezone to UTC  
+// Set timezone to UTC
 date_default_timezone_set('UTC');
 
 define("OMEGAUP_ROOT", __DIR__ . "/..");
@@ -31,7 +31,7 @@ require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
 // Clean previous log
 Utils::CleanLog();
 
-// Clean problems and runs path    
+// Clean problems and runs path
 Utils::CleanPath(PROBLEMS_PATH);
 Utils::CleanPath(PROBLEMS_GIT_PATH);
 Utils::CleanPath(RUNS_PATH);
@@ -50,3 +50,6 @@ Utils::CleanupDB();
 UserController::$sendEmailOnVerify = false;
 UserFactory::createUser("test", "testtesttest");
 UserController::$sendEmailOnVerify = true;
+
+// Globally disable run wait gap.
+RunController::$defaultSubmissionGap = 0;
