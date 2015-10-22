@@ -654,6 +654,13 @@ class UserController extends Controller {
 			$keys = array (				
 				"OSI15" => 30
 			);	
+		} else if ($r["contest_type"] == "UNAMFC") {
+			if (!($r["current_user"]->getUsername() == "manuelalcantara52" || $r["current_user"]->getUsername() == "manuel52" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
+				throw new ForbiddenAccessException();
+			}
+			$keys = array (
+				"UNAMFC15" => 30
+			);
 		} else if ($r["contest_type"] == "OVI") {
 			if (!($r["current_user"]->getUsername() == "covi.academico" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
 				throw new ForbiddenAccessException();
@@ -661,8 +668,7 @@ class UserController extends Controller {
 			$keys = array (
 				"OVI15" => 50
 			);
-		}
-		else {
+		} else {
 			throw new InvalidParameterException("parameterNotInExpectedSet", "contest_type",
 				array("bad_elements" => $r["contest_type"], "expected_set" => "OMI, OMIAGS, ORIG, OSI, OVI"));
 		}
