@@ -266,7 +266,7 @@ class Scoreboard {
 			true /* showAllRuns */
 		), $timeout);
 
-		// Try to broadcast the updated scoreboards:	
+		// Try to broadcast the updated scoreboards:
 		$log = Logger::getLogger("Scoreboard");
 		try {
 			$grader = new Grader();
@@ -298,16 +298,16 @@ class Scoreboard {
 
 	private static function getScoreboardTimeLimitUnixTimestamp(Contests $contest,
 	                                                            $showAllRuns = false) {
-		$start = strtotime($contest->getStartTime());
-		$finish = strtotime($contest->getFinishTime());
-
 		if ($showAllRuns || (ContestsDAO::hasFinished($contest) && $contest->getShowScoreboardAfter())) {
 			// Show full scoreboard to admin users
 			// or if the contest finished and the creator wants to show it at the end
-			$percentage = 1.0;
-		} else {
-			$percentage = (double) $contest->getScoreboard() / 100.0;
+			return null;
 		}
+
+		$start = strtotime($contest->getStartTime());
+		$finish = strtotime($contest->getFinishTime());
+
+		$percentage = (double)$contest->scoreboard / 100.0;
 
 		$limit = $start + (int) (($finish - $start) * $percentage);
 
@@ -380,7 +380,7 @@ class Scoreboard {
 
 			if (!array_key_exists($user_id, $test_only)) {
 				//
-				// Hay un usuario en la lista de Runs, 
+				// Hay un usuario en la lista de Runs,
 				// que no fue regresado por RunsDAO::GetAllRelevantUsers()
 				//
 				continue;
@@ -392,7 +392,8 @@ class Scoreboard {
 				if ($is_test) {
 					continue;
 				}
-				if (strtotime($run->getTime()) >= $scoreboard_time_limit) {
+				if (!is_null($scoreboard_time_limit) &&
+				    strtotime($run->getTime()) >= $scoreboard_time_limit) {
 					$problem['runs']++;
 					$problem['pending'] = true;
 					continue;
@@ -409,7 +410,7 @@ class Scoreboard {
 
 				if ($withRunDetails === true) {
 					$runDetails = array();
-					
+
 					$runDetailsRequest = new Request(array(
 						"run_alias" => $run->guid,
 						"auth_token" => $auth_token,
@@ -518,7 +519,7 @@ class Scoreboard {
 
 		$user_problems_score = array();
 
-		$contestStart = strtotime($contest->getStartTime());
+		$contestStart = strtotime($contest->start_time);
 		$scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, $showAllRuns);
 
 		// Calculate score for each contestant x problem x run
@@ -533,7 +534,7 @@ class Scoreboard {
 		    $log->debug(">>scoreboardLimit : $scoreboardLimit");
 		    $log->debug("");
 
-			if ($run_delay >= $scoreboardLimit) {
+			if (!is_null($scoreboardLimit) && $run_delay >= $scoreboardLimit) {
 				continue;
 			}
 
