@@ -435,21 +435,21 @@ Arena.prototype.onRankingChanged = function(data) {
 	for (var i = 0; i < data.problems.length; i++) {
 		order[data.problems[i].alias] = i;
 	}
-	
+
 	// Push data to ranking table
 	for (var i = 0; i < ranking.length; i++) {
 		var rank = ranking[i];
 		newRanking[rank.username] = i;
-		
+
 		var r = $('#ranking-table tbody.user-list-template')
 			.clone()
 			.removeClass('user-list-template')
 			.addClass('inserted')
 			.addClass('rank-new');
-		
+
 		var username = rank.username +
 			((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
-		
+
 		$('.user', r).html(username + getFlagSrc(rank));
 
 		currentRankingState[username] = {
@@ -463,7 +463,7 @@ Arena.prototype.onRankingChanged = function(data) {
 			if (!order.hasOwnProperty(alias)) continue;
 			var problem = rank.problems[order[alias]];
 			totalRuns += problem.runs;
-	
+
 			var pointsCell = $('.prob_' + alias + '_points', r);
 			if (problem.runs == 0) {
 				pointsCell.html('-');
@@ -565,10 +565,10 @@ Arena.prototype.onRankingEvents = function(data) {
 	// group points by person
 	for (var i = 0, l = data.events.length; i < l; i++) {
 		var curr = data.events[i];
-		
+
 		// limit chart to top n users
 		if (this.currentRanking[curr.username] > Arena.scoreboardColors.length - 1) continue;
-		
+
 		if (!dataInSeries[curr.name]) {
 				dataInSeries[curr.name] = [[this.startTime.getTime(), 0]];
 				usernames[curr.name] = curr.username;
@@ -577,7 +577,7 @@ Arena.prototype.onRankingEvents = function(data) {
 				this.startTime.getTime() + curr.delta*60*1000,
 				curr.total.points
 		]);
-		
+
 		// check if to add to navigator
 		if (curr.total.points > navigatorData[navigatorData.length-1][1]) {
 				navigatorData.push([
@@ -586,7 +586,7 @@ Arena.prototype.onRankingEvents = function(data) {
 				]);
 		}
 	}
-	
+
 	// convert datas to series
 	for (var i in dataInSeries) {
 		if (dataInSeries.hasOwnProperty(i)) {
@@ -602,11 +602,11 @@ Arena.prototype.onRankingEvents = function(data) {
 				});
 		}
 	}
-	
+
 	series.sort(function (a, b) {
 		return a.rank - b.rank;
 	});
-	
+
 	navigatorData.push([
 			Math.min(this.finishTime.getTime(), Date.now()),
 			navigatorData[navigatorData.length - 1][1]
@@ -616,7 +616,7 @@ Arena.prototype.onRankingEvents = function(data) {
 
 Arena.prototype.createChart = function(series, navigatorSeries) {
 	if (series.length == 0) return;
-	
+
 	Highcharts.setOptions({
 		colors: Arena.scoreboardColors
 	});
@@ -647,7 +647,7 @@ Arena.prototype.createChart = function(series, navigatorSeries) {
 				return total;
 			})(this.problems)
 		},
-		
+
 		plotOptions: {
 			series: {
 				animation: false,
@@ -678,10 +678,10 @@ Arena.prototype.createChart = function(series, navigatorSeries) {
 		rangeSelector: {
 			enabled: false
 		},
-		
+
 		series: series
 	});
-	
+
 	// set legend colors
 	var rows = $('#ranking-table tbody.inserted tr');
 	for (var r = 0; r < rows.length; r++) {
@@ -767,7 +767,7 @@ Arena.prototype.updateClarification = function(clarification) {
 						}
 					);
 					return false;
-				});				
+				});
 			})(clarification.clarification_id, $('.answer', r));
 		}
 	}
@@ -876,7 +876,12 @@ Arena.prototype.onHashChanged = function() {
 			} else {
 				$('#problem .karel-js-link').addClass('hide');
 			}
-			$('#problem .source span').html(omegaup.escape(problem.source));
+			if (problem.source) {
+				$('#problem .source span').html(omegaup.escape(problem.source));
+				$('#problem .source').show();
+			} else {
+				$('#problem .source').hide();
+			}
 			$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
 			self.installLibinteractiveHooks();
 
@@ -954,7 +959,7 @@ Arena.prototype.onHashChanged = function() {
 		$('.tabs a[href="#' + self.activeTab + '"]').addClass('active');
 		$('.tab').hide();
 		$('#' + self.activeTab).show();
-		
+
 		if (self.activeTab == 'ranking') {
 			if (self.currentEvents) {
 				self.onRankingEvents(self.currentEvents);
@@ -1008,7 +1013,7 @@ Arena.prototype.displayRunDetails = function(data) {
 	} else {
 		$('#run-details .source').html(omegaup.escape(data.source));
 	}
-	
+
 	if (data.judged_by) {
 		$('#run-details .judged_by pre').html(omegaup.escape(data.judged_by));
 		$('#run-details .judged_by').show();
@@ -1016,7 +1021,7 @@ Arena.prototype.displayRunDetails = function(data) {
 		$('#run-details .judged_by').hide();
 		$('#run-details .judged_by pre').html('');
 	}
-	
+
 	$('#run-details .cases div').remove();
 	$('#run-details .cases table').remove();
 	if (self.admin) {

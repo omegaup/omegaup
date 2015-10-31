@@ -95,7 +95,7 @@
 					</div>
 					<div class="statement"></div>
 					<hr />
-					<div class="source">Fuente: <span></span></div>
+					<div class="source">{#wordsSource#}: <span></span></div>
 					<table class="runs">
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>

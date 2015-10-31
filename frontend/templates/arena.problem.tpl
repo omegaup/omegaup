@@ -36,7 +36,9 @@
 {/if}
 					<div class="statement">{$problem_statement}</div>
 					<hr />
-					<div class="source">Fuente: <span>{$source|escape}</span></div>
+{if $source}
+					<div class="source">{#wordsSource#}: <span>{$source|escape}</span></div>
+{/if}
 					<table class="runs">
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>

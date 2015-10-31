@@ -22,7 +22,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Validates a Create or Update Problem API request
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws NotFoundException
 	 */
@@ -82,7 +82,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Create a new problem
-	 * 
+	 *
 	 * @throws ApiException
 	 * @throws DuplicatedEntryInDatabaseException
 	 * @throws InvalidDatabaseOperationException
@@ -127,7 +127,7 @@ class ProblemController extends Controller {
 
 			ProblemsDAO::transBegin();
 
-			// Create file after we know that alias is unique			
+			// Create file after we know that alias is unique
 			$problemDeployer->deploy();
 			if ($problemDeployer->hasValidator) {
 				$problem->validator = 'custom';
@@ -151,7 +151,7 @@ class ProblemController extends Controller {
 			// Commit at the very end
 			$problemDeployer->commit("Initial commit", $r['current_user']);
 		} catch (ApiException $e) {
-			// Operation failed in something we know it could fail, rollback transaction 
+			// Operation failed in something we know it could fail, rollback transaction
 			ProblemsDAO::transRollback();
 
 			throw $e;
@@ -159,7 +159,7 @@ class ProblemController extends Controller {
 			self::$log->error("Failed to upload problem");
 			self::$log->error($e);
 
-			// Operation failed unexpectedly, rollback transaction 
+			// Operation failed unexpectedly, rollback transaction
 			ProblemsDAO::transRollback();
 
 			// Alias may be duplicated, 1062 error indicates that
@@ -183,7 +183,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Validates a Rejudge Problem API request
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws NotFoundException
 	 */
@@ -210,10 +210,10 @@ class ProblemController extends Controller {
 			throw new ForbiddenAccessException();
 		}
 	}
-	
+
 	/**
 	 * Adds an admin to a problem
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -234,10 +234,10 @@ class ProblemController extends Controller {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		if (!Authorization::IsProblemAdmin($r["current_user_id"], $r["problem"])) {
 			throw new ForbiddenAccessException();
-		}				
+		}
 
 		$problem_user = new UserRoles();
 		$problem_user->setContestId($r["problem"]->problem_id);
@@ -256,7 +256,7 @@ class ProblemController extends Controller {
 
 		return array("status" => "ok");
 	}
-	
+
 	/**
 	 * Adds a tag to a problem
 	 *
@@ -326,7 +326,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Removes an admin from a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -347,11 +347,11 @@ class ProblemController extends Controller {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		if (!Authorization::IsProblemAdmin($r["current_user_id"], $r["problem"])) {
 			throw new ForbiddenAccessException();
-		}	
-		
+		}
+
 		// Check if admin to delete is actually an admin
 		if (!Authorization::IsProblemAdmin($r["user"]->user_id, $r["problem"])){
 			throw new NotFoundException();
@@ -401,7 +401,7 @@ class ProblemController extends Controller {
 		} else if (is_null($tag)) {
 			throw new NotFoundException('tag');
 		}
-	
+
 		if (!Authorization::IsProblemAdmin($r["current_user_id"], $problem)) {
 			throw new ForbiddenAccessException();
 		}
@@ -423,7 +423,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Returns all problem administrators
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -450,10 +450,10 @@ class ProblemController extends Controller {
 
 		return $response;
 	}
-	
+
 	/**
 	 * Returns all problem tags
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -480,10 +480,10 @@ class ProblemController extends Controller {
 
 		return $response;
 	}
-	
+
 	/**
 	 * Rejudge problem
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws ApiException
 	 * @throws InvalidDatabaseOperationException
@@ -512,8 +512,8 @@ class ProblemController extends Controller {
 				$run->setContestScore(0);
 				RunsDAO::save($run);
 
-				// Expire details of the run				
-				RunController::invalidateCacheOnRejudge($run);				
+				// Expire details of the run
+				RunController::invalidateCacheOnRejudge($run);
 			}
 			self::$grader->Grade($guids, true, false);
 		} catch (Exception $e) {
@@ -525,14 +525,14 @@ class ProblemController extends Controller {
 		$response = array();
 
 		// All clear
-		$response["status"] = "ok";				
+		$response["status"] = "ok";
 
 		return $response;
 	}
 
 	/**
 	 * Update problem contents
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws ApiException
 	 * @throws InvalidDatabaseOperationException
@@ -543,7 +543,7 @@ class ProblemController extends Controller {
 
 		self::validateCreateOrUpdate($r, true /* is update */);
 
-		// Validate commit message.	
+		// Validate commit message.
 		Validators::isStringNonEmpty($r["message"], "message");
 
 		// Update the Problem object
@@ -611,12 +611,12 @@ class ProblemController extends Controller {
 			//End transaction
 			ProblemsDAO::transEnd();
 		} catch (ApiException $e) {
-			// Operation failed in the data layer, rollback transaction 
+			// Operation failed in the data layer, rollback transaction
 			ProblemsDAO::transRollback();
 
 			throw $e;
 		} catch (Exception $e) {
-			// Operation failed in the data layer, rollback transaction 
+			// Operation failed in the data layer, rollback transaction
 			ProblemsDAO::transRollback();
 			self::$log->error("Failed to update problem");
 			self::$log->error($e);
@@ -652,10 +652,10 @@ class ProblemController extends Controller {
 
 		return $response;
 	}
-		
+
 	/**
-	 * Updates problem statement only	 
-	 * 
+	 * Updates problem statement only
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws ApiException
@@ -663,13 +663,13 @@ class ProblemController extends Controller {
 	 */
 	public static function apiUpdateStatement(Request $r) {
 		self::authenticateRequest($r);
-		
+
 		self::validateCreateOrUpdate($r, true);
-		
+
 		// Validate statement
 		Validators::isStringNonEmpty($r["statement"], "statement");
 		Validators::isStringNonEmpty($r["message"], "message");
-		
+
 		// Check that lang is in the ISO 639-1 code list, default is "es".
 		$iso639_1 = array("ab", "aa", "af", "ak", "sq", "am", "ar", "an", "hy",
 			"as", "av", "ae", "ay", "az", "bm", "ba", "eu", "be", "bn", "bh", "bi",
@@ -693,13 +693,13 @@ class ProblemController extends Controller {
 		}
 
 		$problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
-		try {					
+		try {
 			$problemDeployer->updateStatement($r['lang'], $r['statement']);
 			$problemDeployer->commit("{$r['lang']}.markdown: {$r['message']}", $r['current_user']);
-			
+
 			// Invalidar problem statement cache
 			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "html");
-			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "markdown");			
+			Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r["problem"]->getAlias() . "-" . $r["lang"] . "-" . "markdown");
 			Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r["problem"]->getAlias() . "-sample.in");
 		} catch (ApiException $e) {
 			throw $e;
@@ -708,7 +708,7 @@ class ProblemController extends Controller {
 		} finally {
 			$problemDeployer->cleanup();
 		}
-		
+
 		// All clear
 		$response["status"] = "ok";
 		return $response;
@@ -716,7 +716,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Validate problem Details API
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws ApiException
 	 * @throws InvalidDatabaseOperationException
@@ -793,7 +793,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Gets the problem statement from the filesystem.
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidFilesystemOperationException
 	 */
@@ -806,7 +806,7 @@ class ProblemController extends Controller {
 		} catch (Exception $e) {
 			throw new InvalidFilesystemOperationException("statementNotFound");
 		}
-		
+
 		return $file_content;
 	}
 
@@ -819,7 +819,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Gets the sample input from the filesystem.
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidFilesystemOperationException
 	 */
@@ -832,14 +832,14 @@ class ProblemController extends Controller {
 			// Most problems won't have a sample input.
 			$file_content = '';
 		}
-		
+
 		return $file_content;
 	}
 
 	/**
 	 * Get the type of statement that was requested.
 	 * HTML is the default if statement_type unspecified in the request.
-	 * 
+	 *
 	 * @param Request $r
 	 */
 	private static function getStatementType(Request $r) {
@@ -914,15 +914,15 @@ class ProblemController extends Controller {
 
 	/**
 	 * Entry point for Problem Details API
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidFilesystemOperationException
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiDetails(Request $r) {
-		
+
 		// Get user.
-		// Allow unauthenticated requests if we are not openning a problem 
+		// Allow unauthenticated requests if we are not openning a problem
 		// inside a contest.
 		try {
 			self::authenticateRequest($r);
@@ -970,10 +970,15 @@ class ProblemController extends Controller {
 		// Add the problem the response
 		$response = array_merge($response, $r["problem"]->asFilteredArray($relevant_columns));
 
+		// Hide the source if the problem is not public.
+		if (!$r['problem']->public) {
+			unset($response['source']);
+		}
+
 		if (!is_null($r['current_user_id'])) {
 			// Create array of relevant columns for list of runs
-			$relevant_columns = array("guid", "language", "status", "verdict", 
-				"runtime", "penalty", "memory", "score", "contest_score", "time", 
+			$relevant_columns = array("guid", "language", "status", "verdict",
+				"runtime", "penalty", "memory", "score", "contest_score", "time",
 				"submit_delay");
 
 			// Search the relevant runs from the DB
@@ -1050,7 +1055,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Validate problem Details API
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws ApiException
 	 * @throws InvalidDatabaseOperationException
@@ -1076,7 +1081,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Entry point for Problem runs API
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidFilesystemOperationException
 	 * @throws InvalidDatabaseOperationException
@@ -1140,8 +1145,8 @@ class ProblemController extends Controller {
 				$runs_array = RunsDAO::search($keyrun);
 
 				// Create array of relevant columns for list of runs
-				$relevant_columns = array("guid", "language", "status", "verdict", 
-					"runtime", "penalty", "memory", "score", "contest_score", "time", 
+				$relevant_columns = array("guid", "language", "status", "verdict",
+					"runtime", "penalty", "memory", "score", "contest_score", "time",
 					"submit_delay");
 
 				// Add each filtered run to an array
@@ -1166,7 +1171,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Entry point for Problem clarifications API
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidFilesystemOperationException
 	 * @throws InvalidDatabaseOperationException
@@ -1205,7 +1210,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Stats of a problem
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws ForbiddenAccessException
@@ -1231,7 +1236,7 @@ class ProblemController extends Controller {
 			// Count of pending runs (int)
 			$totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r["problem"]->getProblemId());
 
-			// List of verdicts			
+			// List of verdicts
 			$verdict_counts = array();
 
 			foreach (self::$verdicts as $verdict) {
@@ -1315,7 +1320,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Validate list request
-	 * 
+	 *
 	 * @param Request $r
 	 */
 	private static function validateList(Request $r) {
@@ -1337,7 +1342,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * List of public and user's private problems
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 */
@@ -1417,9 +1422,9 @@ class ProblemController extends Controller {
 	}
 
 	/**
-	 * 
+	 *
 	 * Gets a list of problems where current user is the owner
-	 * 
+	 *
 	 * @param Request $r
 	 */
 	public static function apiMyList(Request $r) {
@@ -1456,7 +1461,7 @@ class ProblemController extends Controller {
 
 	/**
 	 * Returns the best score for a problem
-	 * 
+	 *
 	 * @param Request $r
 	 */
 	public static function apiBestScore(Request $r) {
@@ -1480,9 +1485,9 @@ class ProblemController extends Controller {
 	 * Problem must be loadad in $r["problem"]
 	 * Contest could be loadad in $r["contest"]. If set, will only look for
 	 * runs inside that contest.
-	 * 
+	 *
 	 * Authentication is expected to be performed earlier.
-	 * 
+	 *
 	 * @param Request $r
 	 * @return float
 	 * @throws InvalidDatabaseOperationException
