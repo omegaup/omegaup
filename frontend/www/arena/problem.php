@@ -18,6 +18,7 @@ $smarty->assign('problem_statement_language', $result['problem_statement_languag
 $smarty->assign('problem_alias', $result['alias']);
 $smarty->assign('public', $result['public']);
 $smarty->assign('source', $result['source']);
+$smarty->assign('problemsetter', $result['problemsetter']);
 $smarty->assign('title', $result['title']);
 $smarty->assign('points', $result['points']);
 $smarty->assign('validator', $result['validator']);

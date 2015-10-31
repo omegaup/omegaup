@@ -96,6 +96,7 @@
 					<div class="statement"></div>
 					<hr />
 					<div class="source">{#wordsSource#}: <span></span></div>
+					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
 					<table class="runs">
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>

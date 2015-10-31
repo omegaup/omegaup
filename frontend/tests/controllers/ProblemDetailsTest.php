@@ -16,8 +16,11 @@ class ProblemDetailsTest extends OmegaupTestCase {
 		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
+		// Get a user to be the author
+		$author = UserFactory::createUser();
+
 		// Get a problem
-		$problemData = ProblemsFactory::createProblem();
+		$problemData = ProblemsFactory::createProblem(null, null, 1, $author);
 
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -48,7 +51,8 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals($response["validator"], $problemDAO->getValidator());
         $this->assertEquals($response["time_limit"], $problemDAO->getTimeLimit());
         $this->assertEquals($response["memory_limit"], $problemDAO->getMemoryLimit());
-        $this->assertEquals($response["author_id"], $problemDAO->getAuthorId());
+        $this->assertEquals($response["problemsetter"]['username'], $author->username);
+        $this->assertEquals($response["problemsetter"]['name'], $author->name);
         $this->assertEquals($response["source"], $problemDAO->getSource());
         $this->assertContains("<h1>Entrada</h1>", $response["problem_statement"]);
         $this->assertEquals($response["order"], $problemDAO->getOrder());

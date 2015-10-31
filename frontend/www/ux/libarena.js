@@ -882,6 +882,14 @@ Arena.prototype.onHashChanged = function() {
 			} else {
 				$('#problem .source').hide();
 			}
+			if (problem.problemsetter) {
+				$('#problem .problemsetter a')
+					.html(omegaup.escape(problem.problemsetter.name))
+					.attr('href', '/profile/' + problem.problemsetter.username + '/');
+				$('#problem .problemsetter').show();
+			} else {
+				$('#problem .problemsetter').hide();
+			}
 			$('#problem .runs tfoot td a').attr('href', '#problems/' + problem.alias + '/new-run');
 			self.installLibinteractiveHooks();
 
@@ -926,6 +934,7 @@ Arena.prototype.onHashChanged = function() {
 		} else {
 			omegaup.getProblem(self.contestAlias, problem.alias, function (problem_ext) {
 				problem.source = problem_ext.source;
+				problem.problemsetter = problem_ext.problemsetter;
 				problem.problem_statement = problem_ext.problem_statement;
 				problem.sample_input = problem_ext.sample_input;
 				problem.runs = problem_ext.runs;

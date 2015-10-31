@@ -938,7 +938,7 @@ class ProblemController extends Controller {
 		$response = array();
 
 		// Create array of relevant columns
-		$relevant_columns = array("title", "author_id", "alias", "validator", "time_limit",
+		$relevant_columns = array("title", "alias", "validator", "time_limit",
 			"validator_time_limit", "overall_wall_time_limit", "extra_wall_time",
 			"memory_limit", "output_limit", "visits", "submissions", "accepted",
 			"difficulty", "creation_date", "source", "order", "points", "public",
@@ -970,8 +970,18 @@ class ProblemController extends Controller {
 		// Add the problem the response
 		$response = array_merge($response, $r["problem"]->asFilteredArray($relevant_columns));
 
-		// Hide the source if the problem is not public.
-		if (!$r['problem']->public) {
+		// If the problem is public or if the user has admin privileges, show the
+		// problem source and alias of owner.
+		if ($r['problem']->public ||
+		    Authorization::IsProblemAdmin($r['current_user_id'], $r['problem'])) {
+			$problemsetter = UsersDAO::getByPK($r['problem']->author_id);
+			if (!is_null($problemsetter)) {
+				$response['problemsetter'] = array(
+					'username' => $problemsetter->username,
+					'name' => $problemsetter->name
+				);
+			}
+		} else {
 			unset($response['source']);
 		}
 

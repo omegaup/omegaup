@@ -482,6 +482,7 @@ OmegaUp.T = {
 	wordsPrivate: "Private",
 	wordsProblem: "Problem",
 	wordsProblems: "Problems",
+	wordsProblemsetter: "Uploaded by",
 	wordsPublic: "Public",
 	wordsRanking: "Ranking",
 	wordsRatio: "Ratio",

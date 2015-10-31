@@ -39,6 +39,9 @@
 {if $source}
 					<div class="source">{#wordsSource#}: <span>{$source|escape}</span></div>
 {/if}
+{if $problemsetter}
+					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
+{/if}
 					<table class="runs">
 						<caption>{#wordsSubmissions#}</caption>
 						<thead>
