@@ -978,7 +978,9 @@ class ProblemController extends Controller {
 			if (!is_null($problemsetter)) {
 				$response['problemsetter'] = array(
 					'username' => $problemsetter->username,
-					'name' => $problemsetter->name
+					'name' => is_null($problemsetter->name) ?
+					          $problemsetter->username :
+					          $problemsetter->name
 				);
 			}
 		} else {
