@@ -192,6 +192,9 @@ $(document).ready(function() {
 		$('input[name=stack_limit]').val(problem.stack_limit);
 		$('input[name=source]').val(problem.source);
 		$('#statement-preview .source').html(omegaup.escape(problem.source));
+		$('#statement-preview .problemsetter')
+			.attr('href', '/profile/' + problem.problemsetter.username + '/')
+			.html(omegaup.escape(problem.problemsetter.name));
 		$('select[name=email_clarifications]').val(problem.email_clarifications);
 		$('select[name=validator]').val(problem.validator);
 		$('select[name=public]').val(problem.public);

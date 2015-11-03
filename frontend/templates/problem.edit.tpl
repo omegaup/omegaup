@@ -4,7 +4,7 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<script src="/js/problem.edit.js?ver=884d97" type="text/javascript"></script>
+<script src="/js/problem.edit.js?ver=dc5cfd" type="text/javascript"></script>
 
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
 
@@ -57,7 +57,8 @@
 									<h1 style="text-align: center;" class="title"></h1>
 									<div class="no-bottom-margin statement" id="wmd-preview-statement"></div>
 									<hr/>
-									<em>{#wordsSource#}: <span class="source"></span></em>
+									<div><em>{#wordsSource#}: <span class="source"></span></em></div>
+									<div><em>{#wordsProblemsetter#}: <a class="problemsetter"></a></em></div>
 								</div>
 							</div>
 						</div>

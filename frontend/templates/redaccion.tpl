@@ -13,7 +13,8 @@
 <h1 style="text-align: center;">Nombre del problema</h1>
 <div id="wmd-preview" class="statement"></div>
 <hr/>
-<em>Fuente: fuente</em>
+<div><em>Fuente: fuente</em></div>
+<div><em>Subido por: tu_usuario</em></div>
 </div>
 <div id="wmd-panel">
 	<div id="wmd-button-bar"></div>
