@@ -652,7 +652,7 @@ class UserController extends Controller {
 			}
 
 			$keys = array (
-				"OSI15" => 30
+				"OSI16" => 50
 			);
 		} else if ($r["contest_type"] == "UNAMFC") {
 			if (!($r["current_user"]->getUsername() == "manuelalcantara52" || $r["current_user"]->getUsername() == "manuel52" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
