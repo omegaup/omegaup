@@ -10,7 +10,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
 	/**
 	 * Insert problems in a contest
-	 * 
+	 *
 	 * @param type $contestData
 	 * @param type $numOfProblems
 	 * @return array array of problemData
@@ -28,7 +28,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
 	/**
 	 * Checks the contest details response
-	 * 
+	 *
 	 * @param type $contestData
 	 * @param type $problems
 	 * @param type $response
@@ -59,7 +59,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 		// Assert problem data
 		$i = 0;
 		foreach ($response["problems"] as $problem_array) {
-			// Get problem from DB            
+			// Get problem from DB
 			$problem = ProblemsDAO::getByAlias($problems[$i]["request"]["alias"]);
 
 			// Assert data in DB
@@ -85,7 +85,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * Get contest details for a public contest
 	 */
 	public function testGetContestDetailsValid() {
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Get some problems into the contest
@@ -112,7 +112,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * Language filter works.
 	 */
 	public function testGetContestDetailsWithLanguageFilter() {
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 1, null, 'c,cpp,java');
 
 		// Get some problems into the contest
@@ -143,7 +143,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 */
 	public function testShowValidPrivateContest() {
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
 
 		// Get some problems into the contest
@@ -171,12 +171,12 @@ class ContestDetailsTest extends OmegaupTestCase {
 
 	/**
 	 * Dont show private contests for users that are not in the private list
-	 * 
+	 *
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testDontShowPrivateContestForAnyUser() {
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
 
 		// Get some problems into the contest
@@ -202,7 +202,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 */
 	public function testAccessTimeIsAlwaysFirstAccessForWindowLength() {
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Convert contest into WindowLength one
@@ -226,7 +226,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
 		$firstAccessTime = $contest_user->getAccessTime();
 
-		// Call API again, access time should not change		
+		// Call API again, access time should not change
 		$response = ContestController::apiDetails($r);
 
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
@@ -238,7 +238,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 */
 	public function testAccessTimeIsAlwaysFirstAccess() {
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Get a user for our scenario
@@ -259,7 +259,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
 		$firstAccessTime = $contest_user->getAccessTime();
 
-		// Call API again, access time should not change		
+		// Call API again, access time should not change
 		$response = ContestController::apiDetails($r);
 
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
@@ -271,7 +271,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 */
 	public function testAccessTimeIsAlwaysFirstAccessForPrivate() {
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
 
 		// Get a user for our scenario
@@ -295,7 +295,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
 		$firstAccessTime = $contest_user->getAccessTime();
 
-		// Call API again, access time should not change		
+		// Call API again, access time should not change
 		$response = ContestController::apiDetails($r);
 
 		$contest_user = ContestsUsersDAO::getByPK($contestant->getUserId(), $contest->getContestId());
@@ -304,12 +304,12 @@ class ContestDetailsTest extends OmegaupTestCase {
 
 	/**
 	 * Try to view a contest before it has started
-	 * 
+	 *
 	 * @expectedException PreconditionFailedException
 	 */
 	public function testContestNotStartedYet() {
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Get a user for our scenario
@@ -330,15 +330,15 @@ class ContestDetailsTest extends OmegaupTestCase {
 		// Call api
 		$response = ContestController::apiDetails($r);
 	}
-	
+
 	/**
 	 * Tests that user can get contest details with the scoreboard token
 	 */
 	public function testDetailsUsingToken() {
-		
+
 		// Get a private contest
 		$contestData = ContestsFactory::createContest(null, 0);
-		
+
 		// Create our user not added to the contest
 		$externalUser = UserFactory::createUser();
 
@@ -347,11 +347,11 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$response = ContestController::apiMyList(new Request(array(
 			"auth_token" => $this->login($contestData["director"])
 		)));
-		
+
 		// Look for our contest from the list and save the scoreboard tokens
 		$scoreboard_url = null;
 		$scoreboard_admin_url = null;
-		foreach ($response["results"] as $c) {			
+		foreach ($response["results"] as $c) {
 			if ($c["alias"] === $contestData["request"]["alias"]) {
 				$scoreboard_url = $c["scoreboard_url"];
 				$scoreboard_admin_url = $c["scoreboard_url_admin"];
@@ -359,68 +359,68 @@ class ContestDetailsTest extends OmegaupTestCase {
 			}
 		}
 		$this->assertNotNull($scoreboard_url);
-		$this->assertNotNull($scoreboard_admin_url);					
-		
+		$this->assertNotNull($scoreboard_admin_url);
+
 		// Call details using token
 		$detailsResponse = ContestController::apiDetails(new Request(array(
 			"auth_token" => $this->login($externalUser),
 			"contest_alias" => $contestData["request"]["alias"],
 			"token" => $scoreboard_url
 		)));
-				
+
 		$this->assertContestDetails($contestData, array(), $detailsResponse);
-		
+
 		// Call details using admin token
 		$detailsResponse = ContestController::apiDetails(new Request(array(
 			"auth_token" => $this->login($externalUser),
 			"contest_alias" => $contestData["request"]["alias"],
 			"token" => $scoreboard_admin_url
 		)));
-				
+
 		$this->assertContestDetails($contestData, array(), $detailsResponse);
-		
+
 	}
-	
+
 	/**
 	 * Test accesing api with invalid scoreboard token. Should fail.
-	 * 
+	 *
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testDetailsUsingInvalidToken() {
-		
+
 		// Get a private contest
 		$contestData = ContestsFactory::createContest(null, 0);
-		
+
 		// Create our user not added to the contest
 		$externalUser = UserFactory::createUser();
-		
+
 		// Call details using token
 		$detailsResponse = ContestController::apiDetails(new Request(array(
 			"auth_token" => $this->login($externalUser),
 			"contest_alias" => $contestData["request"]["alias"],
 			"token" => "invalid token"
 		)));
-		
+
 	}
-	
+
 	/**
 	 * Tests that user can get contest details with the scoreboard token
 	 */
 	public function testDetailsNoLoginUsingToken() {
-		
+
 		// Get a private contest
 		$contestData = ContestsFactory::createContest(null, 0);
-		
+
 		// Get the scoreboard url by using the MyList api being the
 		// contest director
 		$response = ContestController::apiMyList(new Request(array(
 			"auth_token" => $this->login($contestData["director"])
 		)));
-		
+
 		// Look for our contest from the list and save the scoreboard tokens
 		$scoreboard_url = null;
 		$scoreboard_admin_url = null;
-		foreach ($response["results"] as $c) {			
+		foreach ($response["results"] as $c) {
 			if ($c["alias"] === $contestData["request"]["alias"]) {
 				$scoreboard_url = $c["scoreboard_url"];
 				$scoreboard_admin_url = $c["scoreboard_url_admin"];
@@ -428,31 +428,31 @@ class ContestDetailsTest extends OmegaupTestCase {
 			}
 		}
 		$this->assertNotNull($scoreboard_url);
-		$this->assertNotNull($scoreboard_admin_url);					
-		
+		$this->assertNotNull($scoreboard_admin_url);
+
 		// Call details using token
-		$detailsResponse = ContestController::apiDetails(new Request(array(			
+		$detailsResponse = ContestController::apiDetails(new Request(array(
 			"contest_alias" => $contestData["request"]["alias"],
 			"token" => $scoreboard_url
 		)));
-				
+
 		$this->assertContestDetails($contestData, array(), $detailsResponse);
-		
+
 		// Call details using admin token
-		$detailsResponse = ContestController::apiDetails(new Request(array(			
+		$detailsResponse = ContestController::apiDetails(new Request(array(
 			"contest_alias" => $contestData["request"]["alias"],
 			"token" => $scoreboard_admin_url
 		)));
-				
+
 		$this->assertContestDetails($contestData, array(), $detailsResponse);
-		
+
 	}
-	
+
 	/**
 	 * Tests contest report used in OMI
 	 */
 	public function testContestReport() {
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 		$contestDirector = $contestData["director"];
 
@@ -467,37 +467,37 @@ class ContestDetailsTest extends OmegaupTestCase {
 		array_push($contestants, UserFactory::createUser());
 		array_push($contestants, UserFactory::createUser());
 		array_push($contestants, UserFactory::createUser());
-		
+
 		$contestAdmin = UserFactory::createUser();
 		ContestsFactory::addAdminUser($contestData, $contestAdmin);
-		
+
 		// Create runs
 		$runsData = array();
 		$runsData[0] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
 		$runsData[1] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
-		$runsData[2] = RunsFactory::createRun($problemData, $contestData, $contestants[1]);		
+		$runsData[2] = RunsFactory::createRun($problemData, $contestData, $contestants[1]);
 		$runsData[3] = RunsFactory::createRun($problemData, $contestData, $contestants[2]);
 		$runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
 		$runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
-		
+
 		// Grade the runs
 		RunsFactory::gradeRun($runsData[0], 0, "CE");
 		RunsFactory::gradeRun($runsData[1]);
-		RunsFactory::gradeRun($runsData[2], .9, "PA");		
+		RunsFactory::gradeRun($runsData[2], .9, "PA");
 		RunsFactory::gradeRun($runsData[3], 1, "AC", 180);
 		RunsFactory::gradeRun($runDataDirector, 1, "AC", 120);
 		RunsFactory::gradeRun($runDataAdmin, 1, "AC", 110);
-							
+
 		// Create API
 		$response = ContestController::apiReport(new Request(array(
 			"contest_alias" => $contestData["request"]["alias"],
 			"auth_token" => $this->login($contestDirector)
-		)));	
-		
+		)));
+
 		$this->assertEquals($problemData["request"]["alias"], $response["problems"][0]["alias"]);
-		
+
 		foreach ($contestants as $contestant) {
-			
+
 			$found = false;
 			foreach ($response["ranking"] as $rank) {
 				if ($rank["username"] == $contestant->username) {
@@ -506,6 +506,57 @@ class ContestDetailsTest extends OmegaupTestCase {
 				}
 			}
 			$this->assertTrue($found);
+		}
+	}
+
+	/**
+	 * Check that user in private list can view private contest
+	 */
+	public function testNoPrivilegeEscalationOccurs() {
+		// Get a contest
+		$contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+		// Get some problems into the contest
+		$numOfProblems = 3;
+		$problems = $this->insertProblemsInContest($contestData, $numOfProblems);
+
+		// Get a user for our scenario
+		$contestant = UserFactory::createUser();
+
+		// Prepare our request
+		$r = new Request(array(
+			"auth_token" => $this->login($contestant),
+			"contest_alias" => $contestData["request"]["alias"]
+		));
+
+		// Call api. This should fail.
+		try {
+			ContestController::apiDetails($r);
+			$this->assertTrue(false, "User with no access could see the contest");
+		} catch (ForbiddenAccessException $e) {
+			// Pass
+		}
+
+		// Get details from a problem in that contest. This should also fail.
+		try {
+			$problem_request = new Request(array(
+				"auth_token" => $this->login($contestant),
+				"contest_alias" => $contestData['request']['alias'],
+				"problem_alias" => $problems[0]['request']['alias']
+			));
+
+			ProblemController::apiDetails($problem_request);
+			$this->assertTrue(false, "User with no access could see the problem");
+		} catch (ForbiddenAccessException $e) {
+			// Pass
+		}
+
+		// Call api again. This should (still) fail.
+		try {
+			$response = ContestController::apiDetails($r);
+			$this->assertTrue(false, "User with no access could see the contest");
+		} catch (ForbiddenAccessException $e) {
+			// Pass
 		}
 	}
 }

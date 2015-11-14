@@ -770,8 +770,8 @@ class ProblemController extends Controller {
 
 
 			// If the contest is private, verify that our user is invited
-			if ($r["contest"]->getPublic() === 0) {
-				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			if ($r["contest"]->public != "1") {
+				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->contest_id)) && !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 					throw new ForbiddenAccessException();
 				}
 			}
@@ -781,10 +781,9 @@ class ProblemController extends Controller {
 				throw new ForbiddenAccessException("contestNotStarted");
 			}
 		} else {
-
 			if (!Authorization::CanEditProblem($r["current_user_id"], $r["problem"])) {
 				// If the problem is requested outside a contest, we need to check that it is not private
-				if ($r["problem"]->getPublic() == "0") {
+				if ($r["problem"]->public != "1") {
 					throw new ForbiddenAccessException("problemIsPrivate");
 				}
 			}
@@ -1027,7 +1026,7 @@ class ProblemController extends Controller {
 			// At this point, contestant_user relationship should be established.
 			try {
 				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-									$r["current_user_id"], $r["contest"]->getContestId());
+									$r["current_user_id"], $r["contest"]->contest_id);
 			} catch (Exception $e) {
 				// Operation failed in the data layer
 				throw new InvalidDatabaseOperationException($e);

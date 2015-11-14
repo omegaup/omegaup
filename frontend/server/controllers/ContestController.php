@@ -593,7 +593,7 @@ class ContestController extends Controller {
 			ContestsDAO::save($contest);
 
 			// If the contest is private, add the list of allowed users
-			if ($r["public"] == 0 && $r["hasPrivateUsers"]) {
+			if ($r["public"] != 1 && $r["hasPrivateUsers"]) {
 				foreach ($r["private_users_list"] as $userkey) {
 					// Create a temp DAO for the relationship
 					$temp_user_contest = new ContestsUsers(array(
@@ -710,7 +710,7 @@ class ContestController extends Controller {
 		Validators::isInEnum($r["penalty_calc_policy"], "penalty_calc_policy", array("sum", "max"), false);
 
 		// Check that the users passed through the private_users parameter are valid
-		if (!is_null($r["public"]) && $r["public"] == 0 && !is_null($r["private_users"])) {
+		if (!is_null($r["public"]) && $r["public"] != 1 && !is_null($r["private_users"])) {
 			// Validate that the request is well-formed
 			$r["private_users_list"] = json_decode($r["private_users"]);
 			if (is_null($r["private_users_list"])) {
@@ -1730,7 +1730,7 @@ class ContestController extends Controller {
 			ContestsDAO::save($r["contest"]);
 
 			// If the contest is private, add the list of allowed users
-			if (!is_null($r["public"]) && $r["public"] == 0 && $r["hasPrivateUsers"]) {
+			if (!is_null($r["public"]) && $r["public"] != 1 && $r["hasPrivateUsers"]) {
 				// Get current users
 				$cu_key = new ContestsUsers(array("contest_id" => $r["contest"]->getContestId()));
 				$current_users = ContestsUsersDAO::search($cu_key);

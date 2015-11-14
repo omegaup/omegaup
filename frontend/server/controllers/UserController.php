@@ -1095,9 +1095,6 @@ class UserController extends Controller {
 
 		$user = self::resolveTargetUser($r);
 
-		$contest_user_key = new ContestsUsers();
-		$contest_user_key->setUserId($user->getUserId());
-
 		// Get contests where user had at least 1 run
 		try {
 			$contestsParticipated = ContestsDAO::getContestsParticipated($user->getUserId());
