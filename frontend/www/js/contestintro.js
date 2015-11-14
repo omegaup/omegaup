@@ -11,7 +11,7 @@ $(document).ready(function() {
 			contestAlias,
 			function(result) {
 				if (result.status == "error") {
-					OmegaUp.ui.error("{#generalError#}");
+					OmegaUp.ui.error(result.error);
 					$("#start-contest-form").show();
 				} else {
 					window.location.reload();
@@ -28,7 +28,7 @@ $(document).ready(function() {
 			contestAlias,
 			function(result) {
 				if (result.status == "error") {
-					OmegaUp.ui.error("{#generalError#}");
+					OmegaUp.ui.error(result.error);
 					$("#request-access-form").show();
 					$('#start-contest-submit').prop('disabled', false);
 				} else {

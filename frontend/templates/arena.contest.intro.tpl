@@ -152,6 +152,6 @@
 		</div><!-- row -->
 	</div><!-- panel panel-default -->
 
-<script src="/js/contestintro.js?ver=700d18"></script>
+<script src="/js/contestintro.js?ver=038efa"></script>
 {include file='footer.tpl'}
 

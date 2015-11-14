@@ -2,14 +2,14 @@
 
 /**
  * ContestController
- * 
+ *
  */
 class ContestController extends Controller {
 	const SHOW_INTRO = true;
 
 	/**
 	 * Returns a list of contests
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -88,7 +88,7 @@ class ContestController extends Controller {
 
 			/**
 			 * He can see it !
-			 * 
+			 *
 			 * */
 			$c->toUnixTime();
 			$contestInfo = $c->asFilteredArray($relevant_columns);
@@ -106,7 +106,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Returls a list of contests where current user is the director
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -123,16 +123,16 @@ class ContestController extends Controller {
 			$contests = ContestsDAO::getAll(NULL, NULL, "contest_id", 'DESC');
 
 			// If current user is not sys admin, then we need to filter out the contests where
-			// the current user is not contest admin			
+			// the current user is not contest admin
 			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
 				$contests_all = $contests;
 				$contests = array();
-				
+
 				foreach ($contests_all as $c) {
-					if (Authorization::IsContestAdmin($r["current_user_id"], $c)) {						
+					if (Authorization::IsContestAdmin($r["current_user_id"], $c)) {
 						$contests[] = $c;
 					}
-				}				
+				}
 			}
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
@@ -152,13 +152,13 @@ class ContestController extends Controller {
 
 	/**
 	 * Checks if user can access contests: If the contest is private then the user
-	 * must be added to the contest (an entry ContestsUsers must exists) OR the user 
+	 * must be added to the contest (an entry ContestsUsers must exists) OR the user
 	 * should be a Contest Admin.
-	 * 
+	 *
 	 * Expects $r["contest"] to contain the contest to check against.
-	 * 
+	 *
 	 * In case of access check failed, an exception is thrown.
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws ApiException
 	 * @throws InvalidDatabaseOperationException
@@ -175,7 +175,7 @@ class ContestController extends Controller {
 
 		if ($r["contest"]->public != 1) {
 			try {
-				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId())) 
+				if (is_null(ContestsUsersDAO::getByPK($r["current_user_id"], $r["contest"]->getContestId()))
 						&& !Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 					throw new ForbiddenAccessException("userNotAllowed");
 				}
@@ -218,7 +218,21 @@ class ContestController extends Controller {
 	}
 
 	/**
-	 * Show the contest intro unless you are admin, or you 
+	 * Validate if a contestant has explicit access to a contest.
+	 *
+	 * @param Request $r
+	 */
+	public static function isInvitedToContest(Request $r) {
+		if (is_null($r['contest']) || is_null($r['current_user_id'])) {
+			return false;
+		}
+		return $r['contest']->public == 1 ||
+			!is_null(ContestsUsersDAO::getByPK($r['current_user_id'],
+				$r['contest']->getContestId()));
+	}
+
+	/**
+	 * Show the contest intro unless you are admin, or you
 	 * already started this contest.
 	 */
 	public static function showContestIntro(Request $r) {
@@ -227,16 +241,24 @@ class ContestController extends Controller {
 		} catch(Exception $e) {
 			throw new NotFoundException("contestNotFound");
 		}
+		if (is_null($r['contest'])) {
+			throw new NotFoundException("contestNotFound");
+		}
 
 		try {
 			// Half-authenticate, in case there is no session in place.
 			$session = SessionController::apiCurrentSession($r);
-			if ($session['valid'] && $session['user'] != null) {
+			if ($session['valid'] && !is_null($session['user'])) {
 				$r["current_user"] = $session['user'];
 				$r["current_user_id"] = $session['user']->user_id;
 			}
 			self::canAccessContest($r);
 		} catch (Exception $e) {
+			// Could not access contest. Private contests must not be leaked, so
+			// unless they were manually added beforehand, show them a 404 error.
+			if (!ContestController::isInvitedToContest($r)) {
+				throw $e;
+			}
 			self::$log->error("Exception while trying to verify access: " . $e);
 			return ContestController::SHOW_INTRO;
 		}
@@ -252,7 +274,7 @@ class ContestController extends Controller {
 
 		// You already started the contest.
 		$contestOpened = null;
-		if (!is_null($clarificationEmailBody = ContestsUsersDAO::getByPK($cs["id"], $r["contest"]->getContestId()))
+		if (!is_null($contestOpened = ContestsUsersDAO::getByPK($cs["id"], $r["contest"]->getContestId()))
 				&& ($contestOpened->access_time != "0000-00-00 00:00:00")) {
 			self::$log->debug("Not intro because you already started the contest");
 			return !ContestController::SHOW_INTRO;
@@ -263,7 +285,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Validate request of a details contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
@@ -301,7 +323,7 @@ class ContestController extends Controller {
 
 	public static function apiPublicDetails(Request $r) {
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
-	
+
 		$result = array();
 
 		// If the contest is private, verify that our user is invited
@@ -370,7 +392,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Returns details of a Contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -384,21 +406,21 @@ class ContestController extends Controller {
 			// Create array of relevant columns
 			$relevant_columns = array(
 				"title",
-				"description", 
-				"start_time", 
+				"description",
+				"start_time",
 				"finish_time",
 				"window_length",
-				"alias", 
-				"scoreboard", 
+				"alias",
+				"scoreboard",
 				"points_decay_factor",
-				"partial_score", 
-				"submissions_gap", 
-				"feedback", 
-				"penalty", 
-				"time_start", 
+				"partial_score",
+				"submissions_gap",
+				"feedback",
+				"penalty",
+				"time_start",
 				"penalty_type",
 				"penalty_calc_policy",
-				"public", 
+				"public",
 				"show_scoreboard_after",
 				"contestant_must_register",
 				"languages");
@@ -481,7 +503,7 @@ class ContestController extends Controller {
 				// Operation failed in the data layer
 				throw new InvalidDatabaseOperationException($e);
 			}
-			
+
 			// Add time left to response
 			if ($r["contest"]->getWindowLength() === null) {
 				$result['submission_deadline'] = strtotime($r["contest"]->getFinishTime());
@@ -511,7 +533,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Creates a new contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws DuplicatedEntryInDatabaseException
@@ -621,13 +643,13 @@ class ContestController extends Controller {
 	 * Validates that Request contains expected data to create or update a contest
 	 * In case of update, everything is optional except the contest_alias
 	 * In case of error, this function throws.
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidParameterException
 	 */
 	private static function validateCreateOrUpdate(Request $r, $is_update = false) {
 
-		// Is the parameter required? 
+		// Is the parameter required?
 		$is_required = true;
 
 		if ($is_update === true) {
@@ -689,7 +711,7 @@ class ContestController extends Controller {
 
 		// Check that the users passed through the private_users parameter are valid
 		if (!is_null($r["public"]) && $r["public"] == 0 && !is_null($r["private_users"])) {
-			// Validate that the request is well-formed			
+			// Validate that the request is well-formed
 			$r["private_users_list"] = json_decode($r["private_users"]);
 			if (is_null($r["private_users_list"])) {
 				throw new InvalidParameterException("parameterInvalid", "private_users");
@@ -726,7 +748,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Gets the problems from a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -767,7 +789,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Adds a problem to a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -864,7 +886,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Removes a problem from a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -895,9 +917,9 @@ class ContestController extends Controller {
 	}
 
 	/**
-	 * Validates the request for RemoveFromContest and returns an array with 
+	 * Validates the request for RemoveFromContest and returns an array with
 	 * the problem and contest DAOs
-	 * 
+	 *
 	 * @throws InvalidDatabaseOperationException
 	 * @throws InvalidParameterException
 	 * @throws ForbiddenAccessException
@@ -942,7 +964,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Validates add/remove user request
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws InvalidParameterException
@@ -982,7 +1004,7 @@ class ContestController extends Controller {
 	 * Adds a user to a contest.
 	 * By default, any user can view details of public contests.
 	 * Only users added through this API can view private contests
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1018,7 +1040,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Remove a user from a private contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return type
 	 * @throws InvalidDatabaseOperationException
@@ -1044,7 +1066,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Adds an admin to a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1073,7 +1095,7 @@ class ContestController extends Controller {
 		// Only director is allowed to create problems in contest
 		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException();
-		}				
+		}
 
 		$contest_user = new UserRoles();
 		$contest_user->setContestId($r["contest"]->getContestId());
@@ -1090,10 +1112,10 @@ class ContestController extends Controller {
 
 		return array("status" => "ok");
 	}
-	
+
 	/**
 	 * Removes an admin from a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1119,7 +1141,7 @@ class ContestController extends Controller {
 		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 			throw new ForbiddenAccessException();
 		}
-		
+
 		// Check if admin to delete is actually an admin
 		if (!Authorization::IsContestAdmin($r["user"]->getUserId(), $r["contest"])){
 			throw new NotFoundException();
@@ -1143,7 +1165,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Validate the Clarifications request
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 */
@@ -1168,9 +1190,9 @@ class ContestController extends Controller {
 	}
 
 	/**
-	 * 
+	 *
 	 * Get clarifications of a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1211,7 +1233,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Returns the Scoreboard events
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1236,14 +1258,14 @@ class ContestController extends Controller {
 
 	/**
 	 * Returns the Scoreboard
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
 	 */
 	public static function apiScoreboard(Request $r) {
-		
+
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		try {
@@ -1252,21 +1274,21 @@ class ContestController extends Controller {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
-		// If true, will override Scoreboard Pertentage to 100% 
+
+		// If true, will override Scoreboard Pertentage to 100%
 		$showAllRuns = false;
-		
+
 		if (is_null($r["token"])) {
 			// Get the current user
 			self::authenticateRequest($r);
-			
+
 			self::canAccessContest($r);
-			
+
 			if (Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
 				$showAllRuns = true;
 			}
 		} else {
-			if ($r["token"] === $r["contest"]->getScoreboardUrl()) {				
+			if ($r["token"] === $r["contest"]->getScoreboardUrl()) {
 				$showAllRuns = false;
 			} else if ($r["token"] === $r["contest"]->getScoreboardUrlAdmin()) {
 				$showAllRuns = true;
@@ -1274,41 +1296,41 @@ class ContestController extends Controller {
 				throw new ForbiddenAccessException("invalidScoreboardUrl");
 			}
 		}
-		
+
 		// Create scoreboard
 		$scoreboard = new Scoreboard(
 			$r["contest"]->getContestId(),
 			$showAllRuns
 		);
-		
+
 		return $scoreboard->generate();
 	}
-	
+
 	/**
 	 * Gets the accomulative scoreboard for an array of contests
-	 * 
+	 *
 	 * @param Request $r
 	 */
 	public static function apiScoreboardMerge(Request $r) {
-	
+
 		// Get the current user
 		self::authenticateRequest($r);
-		
+
 		Validators::isStringNonEmpty($r["contest_aliases"], "contest_aliases");
 		$contest_aliases = explode(",", $r["contest_aliases"]);
-		
-		Validators::isStringNonEmpty($r["usernames_filter"], "usernames_filter", false);		
-		
+
+		Validators::isStringNonEmpty($r["usernames_filter"], "usernames_filter", false);
+
 		$usernames_filter = array();
 		if (isset($r["usernames_filter"])) {
 			$usernames_filter = explode(",", $r["usernames_filter"]);
 		}
-		
+
 		// Validate all contest alias
 		$contests = array();
 		foreach ($contest_aliases as $contest_alias) {
 			try {
-				$contest = ContestsDAO::getByAlias($contest_alias);				
+				$contest = ContestsDAO::getByAlias($contest_alias);
 			} catch (Exception $e) {
 				// Operation failed in the data layer
 				throw new InvalidDatabaseOperationException($e);
@@ -1317,14 +1339,14 @@ class ContestController extends Controller {
 			if (is_null($contest)) {
 				throw new NotFoundException("contestNotFound");
 			}
-			
+
 			array_push($contests, $contest);
-		}		
-				
+		}
+
 		// Get all scoreboards
 		$scoreboards = array();
 		foreach($contests as $contest) {
-			
+
 			// Set defaults for contests params
 			if (!isset($r["contest_params"][$contest->alias]["only_ac"])) {
 				// Hay que hacer esto para evitar "Indirect modification of overloaded element of Request has no effect"
@@ -1333,29 +1355,29 @@ class ContestController extends Controller {
 				$cp[$contest->alias]["only_ac"] = false;
 				$r["contest_params"] = $cp;
 			}
-			
+
 			if (!isset($r["contest_params"][$contest->alias]["weight"])) {
 				// Ditto indirect modification.
 				$cp = $r["contest_params"];
 				$cp[$contest->alias]["weight"] = 1;
 				$r["contest_params"] = $cp;
 			}
-						
+
 			$s = new Scoreboard(
-					$contest->contest_id, 
+					$contest->contest_id,
 					false, /*showAllRuns*/
 					null,  /*auth_token*/
 					$r["contest_params"][$contest->alias]["only_ac"]);
-			
+
 			$scoreboards[$contest->alias] = $s->generate();
 		}
-			
+
 		$merged_scoreboard = array();
-		
+
 		// Merge
 		foreach($scoreboards as $contest_alias => $scoreboard) {
-			foreach($scoreboard['ranking'] as $user_results) {				
-				
+			foreach($scoreboard['ranking'] as $user_results) {
+
 				// If user haven't been added to the merged scoredboard, add him
 				if (!isset($merged_scoreboard[$user_results["username"]])) {
 					$merged_scoreboard[$user_results["username"]] = array();
@@ -1364,15 +1386,15 @@ class ContestController extends Controller {
 					$merged_scoreboard[$user_results["username"]]["total"]["points"] = 0;
 					$merged_scoreboard[$user_results["username"]]["total"]["penalty"] = 0;
 				}
-				
+
 				$merged_scoreboard[$user_results["username"]]["contests"][$contest_alias]["points"] = ($user_results["total"]["points"] * $r["contest_params"][$contest_alias]["weight"]);
 				$merged_scoreboard[$user_results["username"]]["contests"][$contest_alias]["penalty"] = $user_results["total"]["penalty"];
-				
+
 				$merged_scoreboard[$user_results["username"]]["total"]["points"] += ($user_results["total"]["points"] * $r["contest_params"][$contest_alias]["weight"]);
 				$merged_scoreboard[$user_results["username"]]["total"]["penalty"] += $user_results["total"]["penalty"];
 			}
 		}
-		
+
 		// Remove users not in filter
 		if (isset($r["usernames_filter"])) {
 			foreach ($merged_scoreboard as $username => $entry) {
@@ -1381,7 +1403,7 @@ class ContestController extends Controller {
 				}
 			}
 		}
-		
+
 		// Normalize user["contests"] entries so all contain the same contests
 		foreach($merged_scoreboard as $username => $entry) {
 			foreach($contests as $contest) {
@@ -1391,20 +1413,20 @@ class ContestController extends Controller {
 				}
 			}
 		}
-		
+
 		// Sort merged_scoreboard
 		usort($merged_scoreboard, array('self', 'compareUserScores'));
-		
+
 		$response = array();
 		$response["ranking"] = $merged_scoreboard;
 		$response["status"] = "ok";
-		
+
 		return $response;
 	}
-	
+
 	/**
 	 * Compares results of 2 contestants to sort them in the scoreboard
-	 * 
+	 *
 	 * @param type $a
 	 * @param type $b
 	 * @return int
@@ -1558,7 +1580,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Returns ALL users participating in a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1609,7 +1631,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Returns all contest administrators
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1636,14 +1658,14 @@ class ContestController extends Controller {
 
 		return $response;
 	}
-	
+
 	/**
 	 * Enforces rules to avoid having invalid/unactionable public contests
-	 * 
+	 *
 	 * @param Contests $contest
 	 */
 	private static function validateContestCanBePublic(Contests $contest) {
-		
+
 		// Check that contest has some problems at least 1 problem
 		$problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->getContestId());
 		if (count($problemsInContest) < 1) {
@@ -1653,7 +1675,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Update a Contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1737,7 +1759,7 @@ class ContestController extends Controller {
 					ContestsUsersDAO::save($temp_user_contest);
 				}
 
-				// Delete users 
+				// Delete users
 				foreach ($to_delete as $userkey) {
 					// Create a temp DAO for the relationship
 					$temp_user_contest = new ContestsUsers(array(
@@ -1784,21 +1806,21 @@ class ContestController extends Controller {
 				}
 			}
 
-			// End transaction 
+			// End transaction
 			ContestsDAO::transEnd();
 		} catch (Exception $e) {
-			// Operation failed in the data layer, rollback transaction 
+			// Operation failed in the data layer, rollback transaction
 			ContestsDAO::transRollback();
 
 			throw new InvalidDatabaseOperationException($e);
 		}
 
-		// Expire contest-info cache		
+		// Expire contest-info cache
 		Cache::deleteFromCache(Cache::CONTEST_INFO, $r["contest_alias"]);
-		
+
 		// Expire contest scoreboard cache
 		Scoreboard::InvalidateScoreboardCache($r["contest"]->getContestId());
-		
+
 		// Happy ending
 		$response = array();
 		$response["status"] = 'ok';
@@ -1810,7 +1832,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Validates runs API
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
@@ -1875,7 +1897,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Returns all runs for a contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1922,7 +1944,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Validates that request contains contest_alias and the api is contest-admin only
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws ForbiddenAccessException
@@ -1946,7 +1968,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Stats of a problem
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -1969,34 +1991,34 @@ class ContestController extends Controller {
 			// Wait time
 			$waitTimeArray = RunsDAO::GetLargestWaitTimeOfContest($r["contest"]->getContestId());
 
-			// List of verdicts			
+			// List of verdicts
 			$verdict_counts = array();
 
 			foreach (self::$verdicts as $verdict) {
 				$verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfContestByVerdict($r["contest"]->getContestId(), $verdict);
 			}
-			
+
 			// Get max points posible for contest
 			$key = new ContestProblems(array("contest_id" => $r["contest"]->getContestId()));
 			$contestProblems = ContestProblemsDAO::search($key);
 			$totalPoints = 0;
 			foreach($contestProblems as $cP) {
 				$totalPoints += $cP->getPoints();
-			} 
-			
-			
+			}
+
+
 			// Get scoreboard to calculate distribution
-			$distribution = array();			
+			$distribution = array();
 			for ($i = 0; $i < 101; $i++) {
 				$distribution[$i] = 0;
 			}
-			
-			$sizeOfBucket = $totalPoints / 100;			
+
+			$sizeOfBucket = $totalPoints / 100;
 			$scoreboardResponse = self::apiScoreboard($r);
 			foreach($scoreboardResponse["ranking"] as $results) {
 				$distribution[(int)($results["total"]["points"] / $sizeOfBucket)]++;
-			}						
-			
+			}
+
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
@@ -2018,7 +2040,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Returns a detailed report of the contest
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 */
@@ -2047,7 +2069,7 @@ class ContestController extends Controller {
 
 	/**
 	 * Generates a CSV for contest report
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 */
@@ -2177,8 +2199,8 @@ class ContestController extends Controller {
 		self::validateStats($r);
 
 		// Get our runs
-		$relevant_columns = array("run_id", "guid", "language", "status", 
-			"verdict", "runtime", "penalty", "memory", "score", "contest_score", 
+		$relevant_columns = array("run_id", "guid", "language", "status",
+			"verdict", "runtime", "penalty", "memory", "score", "contest_score",
 			"time", "submit_delay", "Users.username", "Problems.alias");
 		try {
 			$runs = RunsDAO::search(new Runs(array(
@@ -2221,14 +2243,14 @@ class ContestController extends Controller {
 	/**
 	 * Given a contest_alias and user_id, returns the role of the user within
 	 * the context of a contest.
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 */
 	public static function apiRole(Request $r) {
-		try {			
+		try {
 			if ($r['contest_alias'] == 'all-events') {
-				self::authenticateRequest($r);				
+				self::authenticateRequest($r);
 				if (Authorization::IsSystemAdmin($r['current_user_id']) ) {
 					return array(
 						'status' => 'ok',
@@ -2236,7 +2258,7 @@ class ContestController extends Controller {
 					);
 				}
 			}
-	
+
 			self::validateDetails($r);
 
 			return array(
