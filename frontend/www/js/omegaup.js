@@ -49,46 +49,46 @@ OmegaUp.ui = {
 			.addClass('alert-success')
 			.slideDown();
 	},
-	
+
 	dismissNotifications: function() {
 		$('#status').slideUp();
 	},
-	
+
 	bulkOperation: function (operation, onOperationFinished) {
 		var isStopExecuted = false;
 		var success = true;
 		var error = null;
-		
+
 		handleResponseCallback = function(data) {
 			if(data.status !== "ok") {
 				success = false;
 				error = data.error;
-			} 
-		};				
+			}
+		};
 		$('input[type=checkbox]').each(function() {
 			if (this.checked) {
 				operation(this.id, handleResponseCallback);
-			}		
+			}
 		});
-		
+
 		// Wait for all
-		$(document).ajaxStop(function() {			
+		$(document).ajaxStop(function() {
 			if (!isStopExecuted) {
-				
+
 				// Make sure we execute this block once. onOperationFinish might have
-				// async calls that would fire ajaxStop event 
+				// async calls that would fire ajaxStop event
 				isStopExecuted = true;
 				$(document).off("ajaxStop");
-				
+
 				onOperationFinished();
 
 				if (success === false) {
-					OmegaUp.ui.error("Error actualizando items: " + error);				
+					OmegaUp.ui.error("Error actualizando items: " + error);
 				} else {
 					OmegaUp.ui.success("Todos los items han sido actualizados");
-				}		
+				}
 			}
-		});						
+		});
 	},
 
 	prettyPrintJSON: function(json) {
@@ -141,7 +141,7 @@ OmegaUp.prototype.createUser = function(s_Email, s_Username, s_PlainPassword, s_
 OmegaUp.prototype.createGroup = function(
 					alias,
 					name,
-					description,					
+					description,
 					callback
 				) {
 	$.post(
@@ -149,7 +149,7 @@ OmegaUp.prototype.createGroup = function(
 		{
 			alias				: alias,
 			name				: name,
-			description			: description,			
+			description			: description,
 		},
 		function(data) {
 			if (data.status !== undefined && data.status == "error") {
@@ -176,12 +176,12 @@ OmegaUp.prototype.createContest = function(
 					finish_time,
 					window_length,
 					alias,
-					points_decay_factor,					 
+					points_decay_factor,
 					submissions_gap,
-					feedback, 
+					feedback,
 					penalty,
 					public,
-					scoreboard, 
+					scoreboard,
 					penalty_type,
 					show_scoreboard_after,
 					callback
@@ -196,13 +196,13 @@ OmegaUp.prototype.createContest = function(
 			window_length		: window_length,
 			public				: public,
 			alias				: alias,
-			points_decay_factor	: points_decay_factor,			
+			points_decay_factor	: points_decay_factor,
 			submissions_gap		: submissions_gap,
-			feedback			: feedback, 
+			feedback			: feedback,
 			penalty				: penalty ,
-			scoreboard			: scoreboard, 
+			scoreboard			: scoreboard,
 			penalty_type	: penalty_type,
-			show_scoreboard_after	: show_scoreboard_after 
+			show_scoreboard_after	: show_scoreboard_after
 		},
 		function(data) {
 			if (data.status !== undefined && data.status == "error") {
@@ -232,16 +232,15 @@ OmegaUp.prototype.updateContest = function(
 					alias,
 					points_decay_factor,
 					submissions_gap,
-					feedback, 
+					feedback,
 					penalty,
 					public,
-					scoreboard, 
+					scoreboard,
 					penalty_type,
 					show_scoreboard_after,
 					contestant_must_register,
 					callback
 				) {
-	console.log(contestant_must_register);
 	$.post(
 		'/api/contest/update/contest_alias/' + encodeURIComponent(contest_alias) + '/' ,
 		{
@@ -255,9 +254,9 @@ OmegaUp.prototype.updateContest = function(
 			alias				: alias,
 			points_decay_factor	: points_decay_factor,
 			submissions_gap		: submissions_gap,
-			feedback			: feedback, 
+			feedback			: feedback,
 			penalty				: penalty,
-			scoreboard			: scoreboard, 
+			scoreboard			: scoreboard,
 			penalty_type		: penalty_type,
 			show_scoreboard_after	: show_scoreboard_after,
 			contestant_must_register	: contestant_must_register
@@ -510,7 +509,7 @@ OmegaUp.prototype.getProfile = function(username, callback) {
 				data.userinfo.birth_date = self.time(data.userinfo.birth_date * 1000);
 				data.userinfo.graduation_date = self.time(data.userinfo.graduation_date * 1000);
 			}
-			
+
 			callback(data);
 		},
 		'json'
@@ -533,7 +532,7 @@ OmegaUp.prototype.getCoderOfTheMonth = function(callback) {
 				data.userinfo.birth_date = self.time(data.userinfo.birth_date * 1000);
 				data.userinfo.graduation_date = self.time(data.userinfo.graduation_date * 1000);
 			}
-			
+
 			callback(data);
 		},
 		'json'
@@ -595,7 +594,8 @@ OmegaUp.prototype.updateProblem = function(alias, public, callback) {
 		'/api/problem/update/',
 		{
 			problem_alias: alias,
-			public: public
+			public: public,
+			message: public ? 'private -> public' : 'public -> private'
 		},
 		function (data) {
 			callback(data);
@@ -663,13 +663,13 @@ OmegaUp.prototype.updateBasicProfile = function(username, name, password, callba
 };
 
 OmegaUp.prototype.updateMainEmail = function(email, callback) {
-	
+
 	var self = this;
 
 	$.post(
 		'/api/user/updateMainEmail/',
 		{
-			email: email			
+			email: email
 		},
 		function (data) {
 			callback(data);
@@ -681,7 +681,7 @@ OmegaUp.prototype.updateMainEmail = function(email, callback) {
 		} catch (err) {
 			callback({status:'error', 'error':undefined});
 		}
-	});	
+	});
 };
 
 OmegaUp.prototype.addProblemToContest = function(contestAlias, order, problemAlias, points, callback) {
@@ -689,7 +689,7 @@ OmegaUp.prototype.addProblemToContest = function(contestAlias, order, problemAli
 
 	$.post(
 		'/api/contest/addProblem/contest_alias/' + encodeURIComponent(contestAlias) + '/problem_alias/' + encodeURIComponent(problemAlias) + '/',
-		{			
+		{
 			problem_alias : problemAlias,
 			points : points,
 			order_in_contest : order
@@ -748,8 +748,8 @@ OmegaUp.prototype.addAdminToContest = function(contestAlias, username, callback)
 
 	$.post(
 		'/api/contest/addAdmin/contest_alias/' + encodeURIComponent(contestAlias) + '/',
-		{			
-			usernameOrEmail : username			
+		{
+			usernameOrEmail : username
 		},
 		function (data) {
 			callback(data);
@@ -769,8 +769,8 @@ OmegaUp.prototype.removeAdminFromContest = function(contestAlias, username, call
 
 	$.post(
 		'/api/contest/removeAdmin/contest_alias/' + encodeURIComponent(contestAlias) + '/',
-		{			
-			usernameOrEmail : username			
+		{
+			usernameOrEmail : username
 		},
 		function (data) {
 			callback(data);
@@ -790,8 +790,8 @@ OmegaUp.prototype.addAdminToProblem = function(problemAlias, username, callback)
 
 	$.post(
 		'/api/problem/addAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
-		{			
-			usernameOrEmail : username			
+		{
+			usernameOrEmail : username
 		},
 		function (data) {
 			callback(data);
@@ -833,8 +833,8 @@ OmegaUp.prototype.removeAdminFromProblem = function(problemAlias, username, call
 
 	$.post(
 		'/api/problem/removeAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
-		{			
-			usernameOrEmail : username			
+		{
+			usernameOrEmail : username
 		},
 		function (data) {
 			callback(data);
@@ -875,8 +875,8 @@ OmegaUp.prototype.addUserToGroup = function(groupAlias, username, callback) {
 
 	$.post(
 		'/api/group/addUser/group_alias/' + encodeURIComponent(groupAlias) + '/',
-		{			
-			usernameOrEmail : username			
+		{
+			usernameOrEmail : username
 		},
 		function (data) {
 			callback(data);
@@ -917,7 +917,7 @@ OmegaUp.prototype.addScoreboardToGroup = function(groupAlias, alias, name, descr
 
 	$.post(
 		'/api/group/createScoreboard/group_alias/' + encodeURIComponent(groupAlias) + '/',
-		{			
+		{
 			alias		: alias,
 			name		: name,
 			description : description
@@ -941,7 +941,7 @@ OmegaUp.prototype.addContestToScoreboard = function(groupAlias, scoreboardAlias,
 
 	$.post(
 		'/api/groupScoreboard/addContest/group_alias/' + encodeURIComponent(groupAlias) + '/',
-		{			
+		{
 			scoreboard_alias		: scoreboardAlias,
 			contest_alias			: contestAlias,
 			only_ac					: onlyAC,
@@ -965,9 +965,9 @@ OmegaUp.prototype.removeContestFromScoreboard = function(groupAlias, scoreboardA
 
 	$.post(
 		'/api/groupScoreboard/removeContest/group_alias/' + encodeURIComponent(groupAlias) + '/',
-		{			
+		{
 			scoreboard_alias		: scoreboardAlias,
-			contest_alias			: contestAlias			
+			contest_alias			: contestAlias
 		},
 		function (data) {
 			callback(data);
@@ -987,8 +987,8 @@ OmegaUp.prototype.addUserToContest = function(contestAlias, username, callback) 
 
 	$.post(
 		'/api/contest/addUser/contest_alias/' + encodeURIComponent(contestAlias) + '/',
-		{			
-			usernameOrEmail : username			
+		{
+			usernameOrEmail : username
 		},
 		function (data) {
 			callback(data);
@@ -1169,7 +1169,7 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, st
 		params.lang = language;
 	}
 	$.post(
-		contestAlias === null ? 
+		contestAlias === null ?
 			'/api/problem/details/problem_alias/' + encodeURIComponent(problemAlias) + '/' :
 			'/api/problem/details/contest_alias/' + encodeURIComponent(contestAlias) + '/problem_alias/' + encodeURIComponent(problemAlias) + '/',
 		params,
@@ -1193,10 +1193,10 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, st
 
 OmegaUp.prototype.getGroup = function(groupAlias, callback) {
 	var self = this;
-	
-	$.post(		
+
+	$.post(
 		'/api/group/details/group_alias/' + encodeURIComponent(groupAlias) + '/',
-		function (problem) {			
+		function (problem) {
 			callback(problem);
 		},
 		'json'
@@ -1211,13 +1211,13 @@ OmegaUp.prototype.getGroup = function(groupAlias, callback) {
 
 OmegaUp.prototype.getGroupScoreboard = function(groupAlias, scoreboardAlias, callback) {
 	var self = this;
-	
-	$.post(		
+
+	$.post(
 		'/api/groupScoreboard/details/group_alias/' + encodeURIComponent(groupAlias) + '/',
 		{
 			scoreboard_alias : scoreboardAlias
 		},
-		function (problem) {			
+		function (problem) {
 			callback(problem);
 		},
 		'json'
@@ -1899,7 +1899,7 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	if(username !== null) toSend.username = username;
 	if(name !== null) toSend.name = name;
 	if(email !== null) toSend.email = email;
-	if(birthDate !== null) toSend.birthDate = birthDate;		
+	if(birthDate !== null) toSend.birthDate = birthDate;
 	if(school !== null) toSend.school = school;
 	if(password !== null) toSend.password = password;
 	if(oldPassword !== null) toSend.oldPassword = oldPassword;
@@ -1927,7 +1927,7 @@ OmegaUp.prototype.forceVerifyEmail = function(username, callback) {
 	$.post(
 		'/api/user/verifyemail/',
 		{
-			usernameOrEmail: username,			
+			usernameOrEmail: username,
 		},
 		function (data) {
 			callback(data);
@@ -1950,7 +1950,7 @@ OmegaUp.prototype.forceChangePassword = function(username, newpassword, callback
 		'/api/user/changepassword/',
 		{
 			username: username,
-			password: newpassword			
+			password: newpassword
 		},
 		function (data) {
 			callback(data);
@@ -1972,7 +1972,7 @@ OmegaUp.prototype.changePassword = function(oldPassword, newPassword, callback) 
 		'/api/user/changepassword/',
 		{
 			old_password: oldPassword,
-			password: newPassword			
+			password: newPassword
 		},
 		function (data) {
 			callback(data);
@@ -2045,21 +2045,21 @@ $(document).ajaxError(function(e, xhr, settings, exception) {
 
 // From http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
 function toHHMM(duration) {
-    var sec_num = parseInt(duration, 10); 
+    var sec_num = parseInt(duration, 10);
     var hours   = Math.floor(sec_num / 3600);
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     var seconds = sec_num - (hours * 3600) - (minutes * 60);
-    
+
     if (minutes < 10) {minutes = "0"+minutes;}
     if (seconds < 10) {seconds = "0"+seconds;}
-	
+
     var time    = hours+'h '+minutes+'m';
     return time;
 }
 
 function getFlagSrc(user, property) {
 	property = typeof property !== 'undefined' ? property : 'country';
-	
+
 	if (typeof user[property] === 'undefined' || user[property] === null) {
 		return '';
 	} else {
