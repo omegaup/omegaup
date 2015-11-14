@@ -6,8 +6,8 @@ $(document).ready(function() {
 		$("#request-access-form").hide();
 		$('#start-contest-submit').prop('disabled', true);
 
-		// Getting contest details will mark the contest as opened
-		omegaup.getContest(
+		// Explicitly join the contest.
+		omegaup.openContest(
 			contestAlias,
 			function(result) {
 				if (result.status == "error") {

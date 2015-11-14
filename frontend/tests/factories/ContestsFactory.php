@@ -10,7 +10,7 @@ class ContestsFactory {
 
 	/**
 	 * Returns a Request object with complete context to create a contest
-	 * 
+	 *
 	 * @param string $title
 	 * @param string $public
 	 * @param Users $contestDirector
@@ -44,7 +44,7 @@ class ContestsFactory {
 		$r["penalty_type"] = "contest_start";
 		$r["penalty_calc_policy"] = "sum";
 		$r['languages'] = $languages;
-		
+
 		return array(
 			"request" => $r,
 			"director" => $contestDirector);
@@ -67,9 +67,9 @@ class ContestsFactory {
 			self::forcePublic($contestData);
 			$r["public"] = 1;
 		}
-		
+
 		$contest = ContestsDAO::getByAlias($r["alias"]);
-		
+
 		return array(
 			"director" => $contestData["director"],
 			"request" => $r,
@@ -78,45 +78,44 @@ class ContestsFactory {
 	}
 
 	public static function addProblemToContest($problemData, $contestData) {
-		
+
 		// Create an empty request
 		$r = new Request();
-		
-		// Log in as contest director		
+
+		// Log in as contest director
 		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);
-		
+
 		// Build request
 		$r["contest_alias"] = $contestData["request"]["alias"];
 		$r["problem_alias"] = $problemData["request"]["alias"];
 		$r["points"] = 100;
-		$r["order_in_contest"] = 1;				
-		
+		$r["order_in_contest"] = 1;
+
 		// Call API
-		$response = ContestController::apiAddProblem($r);				
-		
+		$response = ContestController::apiAddProblem($r);
+
 		// Clean up
 		unset($_REQUEST);
 	}
-	
+
 	public static function openContest($contestData, $user) {
-		
 		// Create an empty request
 		$r = new Request();
-		
-		// Log in as contest director		
+
+		// Log in as contest director
 		$r["auth_token"] = OmegaupTestCase::login($user);
-		
+
 		// Prepare our request
 		$r["contest_alias"] = $contestData["request"]["alias"];
-		
+
 		// Call api
-		ContestController::apiDetails($r);
-		
+		ContestController::apiOpen($r);
+
 		unset($_REQUEST);
 	}
-	
+
 	public static function openProblemInContest($contestData, $problemData, $user) {
-		
+
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
@@ -124,58 +123,58 @@ class ContestsFactory {
 
 		// Log in the user
 		$r["auth_token"] = OmegaupTestCase::login($user);
-		
+
 		// Call api
 		ProblemController::apiDetails($r);
-		
+
 		unset($_REQUEST);
 	}
-	
+
 	public static function addUser($contestData, $user) {
-		
+
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
 		$r["usernameOrEmail"] = $user->getUsername();
-		
+
 		// Log in the contest director
 		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);
-		
+
 		// Call api
 		ContestController::apiAddUser($r);
-		
-		unset($_REQUEST);		
+
+		unset($_REQUEST);
 	}
-	
+
 	public static function addAdminUser($contestData, $user) {
-		
+
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
 		$r["usernameOrEmail"] = $user->getUsername();
-		
+
 		// Log in the contest director
 		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);
-		
+
 		// Call api
 		ContestController::apiAddAdmin($r);
-		
-		unset($_REQUEST);		
+
+		unset($_REQUEST);
 	}
-	
+
 	public static function makeContestWindowLength($contestData, $windowLength = 20) {
-		
+
 		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
         $contest->setWindowLength($windowLength);
-        ContestsDAO::save($contest);		
+        ContestsDAO::save($contest);
 	}
-	
+
 	public static function forcePublic($contestData) {
 		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
         $contest->setPublic(1);
-        ContestsDAO::save($contest);		
+        ContestsDAO::save($contest);
 	}
-	
+
 	public static function setScoreboardPercentage($contestData, $percentage) {
 		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
 		$contest->setScoreboard($percentage);

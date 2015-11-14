@@ -263,13 +263,6 @@ class ContestController extends Controller {
 			return ContestController::SHOW_INTRO;
 		}
 
-		// You are admin
-		if (!is_null($r['current_user_id']) &&
-			Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
-			self::$log->debug("Not intro because you are admin");
-			return !ContestController::SHOW_INTRO;
-		}
-
 		$cs = SessionController::apiCurrentSession();
 
 		// You already started the contest.
@@ -389,6 +382,17 @@ class ContestController extends Controller {
 		return array("status" => "ok");
 	}
 
+	/**
+	 * Joins a contest - explicitly adds a user to a contest.
+	 *
+	 * @param Request $r
+	 */
+	public static function apiOpen(Request $r) {
+		self::validateDetails($r);
+		ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+			$r["current_user_id"], $r["contest"]->contest_id, true);
+		return array("status" => "ok");
+	}
 
 	/**
 	 * Returns details of a Contest
@@ -398,7 +402,6 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiDetails(Request $r) {
-
 		self::validateDetails($r);
 
 		Cache::getFromCacheOrSet(Cache::CONTEST_INFO, $r["contest_alias"], $r, function(Request $r) {
@@ -498,7 +501,9 @@ class ContestController extends Controller {
 			// Save the time of the first access
 			try {
 				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-								$r["current_user_id"], $r["contest"]->getContestId());
+					$r["current_user_id"], $r["contest"]->contest_id);
+			} catch (ApiException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				// Operation failed in the data layer
 				throw new InvalidDatabaseOperationException($e);
@@ -509,7 +514,7 @@ class ContestController extends Controller {
 				$result['submission_deadline'] = strtotime($r["contest"]->getFinishTime());
 			} else {
 				$result['submission_deadline'] = min(
-						strtotime($r["contest"]->getFinishTime()), strtotime($contest_user->getAccessTime()) + $r["contest"]->getWindowLength() * 60);
+						strtotime($r["contest"]->getFinishTime()), strtotime($contest_user->access_time) + $r["contest"]->getWindowLength() * 60);
 			}
 			$result['admin'] = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]);
 		}
