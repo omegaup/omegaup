@@ -266,9 +266,10 @@ class ContestController extends Controller {
 		$cs = SessionController::apiCurrentSession();
 
 		// You already started the contest.
-		$contestOpened = null;
-		if (!is_null($contestOpened = ContestsUsersDAO::getByPK($cs["id"], $r["contest"]->getContestId()))
-				&& ($contestOpened->access_time != "0000-00-00 00:00:00")) {
+		$contestOpened = ContestsUsersDAO::getByPK($r['current_user_id'],
+			$r["contest"]->getContestId());
+		if (!is_null($contestOpened) &&
+			$contestOpened->access_time != "0000-00-00 00:00:00") {
 			self::$log->debug("Not intro because you already started the contest");
 			return !ContestController::SHOW_INTRO;
 		}
@@ -391,6 +392,7 @@ class ContestController extends Controller {
 		self::validateDetails($r);
 		ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
 			$r["current_user_id"], $r["contest"]->contest_id, true);
+		self::$log->info("User '{$r['current_user']->username}' joined contest '{$r['contest']->alias}'");
 		return array("status" => "ok");
 	}
 
