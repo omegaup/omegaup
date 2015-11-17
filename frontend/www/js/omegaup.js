@@ -428,6 +428,24 @@ OmegaUp.prototype.getContests = function(callback) {
 	});
 };
 
+OmegaUp.prototype.openContest = function(alias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/open/contest_alias/' + encodeURIComponent(alias) + '/',
+		function (contest) {
+			callback(contest);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getContest = function(alias, callback) {
 	var self = this;
 

@@ -1025,8 +1025,10 @@ class ProblemController extends Controller {
 		if (!is_null($r["contest"])) {
 			// At this point, contestant_user relationship should be established.
 			try {
-				$contest_user = ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
-									$r["current_user_id"], $r["contest"]->contest_id);
+				ContestsUsersDAO::CheckAndSaveFirstTimeAccess(
+					$r["current_user_id"], $r["contest"]->contest_id);
+			} catch (ApiException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				// Operation failed in the data layer
 				throw new InvalidDatabaseOperationException($e);

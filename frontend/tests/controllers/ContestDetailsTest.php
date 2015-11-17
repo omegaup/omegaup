@@ -102,6 +102,9 @@ class ContestDetailsTest extends OmegaupTestCase {
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
 
+		// Explicitly join contest
+		ContestController::apiOpen($r);
+
 		// Call api
 		$response = ContestController::apiDetails($r);
 
@@ -128,6 +131,9 @@ class ContestDetailsTest extends OmegaupTestCase {
 
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
+
+		// Explicitly join contest
+		ContestController::apiOpen($r);
 
 		// Call api
 		$response = ContestController::apiDetails($r);
@@ -218,6 +224,9 @@ class ContestDetailsTest extends OmegaupTestCase {
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
 
+		// Explicitly join contest
+		ContestController::apiOpen($r);
+
 		// Call api
 		$response = ContestController::apiDetails($r);
 
@@ -250,6 +259,9 @@ class ContestDetailsTest extends OmegaupTestCase {
 
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
+
+		// Explicitly join contest
+		ContestController::apiOpen($r);
 
 		// Call api
 		$response = ContestController::apiDetails($r);
