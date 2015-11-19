@@ -39,9 +39,9 @@ class RunController extends Controller {
 	}
 
 	/**
-	 * 
-	 * Validates Create Run request 
-	 * 
+	 *
+	 * Validates Create Run request
+	 *
 	 * @param Request $r
 	 * @throws ApiException
 	 * @throws InvalidDatabaseOperationException
@@ -75,7 +75,7 @@ class RunController extends Controller {
 					  time() > ProblemsDAO::getPracticeDeadline($r["problem"]->getProblemId()) ||
 					  $r["problem"]->getPublic() == true) {
 					if (!RunsDAO::IsRunInsideSubmissionGap(
-									null, 
+									null,
 									$r["problem"]->getProblemId(),
 									$r["current_user_id"])
 							&& !Authorization::IsSystemAdmin($r["current_user_id"])) {
@@ -132,7 +132,7 @@ class RunController extends Controller {
 					throw new NotAllowedToSubmitException("runNotRegistered");
 				}
 
-				// Validate if the user is allowed to submit given the submissions_gap 			
+				// Validate if the user is allowed to submit given the submissions_gap
 				if (!RunsDAO::IsRunInsideSubmissionGap(
 								$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"])) {
 					throw new NotAllowedToSubmitException("runWaitGap");
@@ -148,8 +148,8 @@ class RunController extends Controller {
 	}
 
 	/**
-	 * Create a new run 
-	 * 
+	 * Create a new run
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws Exception
@@ -188,14 +188,14 @@ class RunController extends Controller {
 					break;
 
 				case "problem_open":
-					// submit delay is calculated from the 
+					// submit delay is calculated from the
 					// time the user opened the problem
 					$opened = ContestProblemOpenedDAO::getByPK(
 									$r["contest"]->getContestId(), $r["problem"]->getProblemId(), $r["current_user_id"]
 					);
 
 					if (is_null($opened)) {
-						//holy moly, he is submitting a run 
+						//holy moly, he is submitting a run
 						//and he hasnt even opened the problem
 						//what should be done here?
 						throw new NotAllowedToSubmitException("runEvenOpened");
@@ -253,11 +253,11 @@ class RunController extends Controller {
 		try {
 			// Push run into DB
 			RunsDAO::save($run);
-			
+
 			// Update submissions counter++
 			$r["problem"]->setSubmissions($r["problem"]->getSubmissions() + 1);
 			ProblemsDAO::save($r["problem"]);
-			
+
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
@@ -300,16 +300,16 @@ class RunController extends Controller {
 		// Happy ending
 		$response["guid"] = $run->getGuid();
 		$response["status"] = "ok";
-		
+
 		// Expire rank cache
 		UserController::deleteProblemsSolvedRankCacheList();
 
 		return $response;
-	}	
+	}
 
 	/**
 	 * Validate request of details
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
@@ -333,7 +333,7 @@ class RunController extends Controller {
 
 	/**
 	 * Validate request of admin details
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
@@ -369,7 +369,7 @@ class RunController extends Controller {
 
 	/**
 	 * Get basic details of a run
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidFilesystemOperationException
@@ -385,12 +385,16 @@ class RunController extends Controller {
 		}
 
 		// Fill response
-		$relevant_columns = array("guid", "language", "status", "verdict", 
-			"runtime", "penalty", "memory", "score", "contest_score", "time", 
+		$relevant_columns = array("guid", "language", "status", "verdict",
+			"runtime", "penalty", "memory", "score", "contest_score", "time",
 			"submit_delay");
 		$filtered = $r["run"]->asFilteredArray($relevant_columns);
 		$filtered['time'] = strtotime($filtered['time']);
 		$filtered['score'] = round((float) $filtered['score'], 4);
+		$filtered['runtime'] = (int)$filtered['runtime'];
+		$filtered['penalty'] = (int)$filtered['penalty'];
+		$filtered['memory'] = (int)$filtered['memory'];
+		$filtered['submit_delay'] = (int)$filtered['submit_delay'];
 		if ($filtered['contest_score'] != null) {
 			$filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
 		}
@@ -402,7 +406,7 @@ class RunController extends Controller {
 
 	/**
 	 * Re-sends a problem to Grader.
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 */
@@ -439,30 +443,30 @@ class RunController extends Controller {
 
 		$response = array();
 		$response['status'] = 'ok';
-				
-		self::invalidateCacheOnRejudge($r["run"]);					
-		
+
+		self::invalidateCacheOnRejudge($r["run"]);
+
 		// Expire ranks
 		UserController::deleteProblemsSolvedRankCacheList();
 
-		return $response;	
+		return $response;
 	}
-	
+
 	/**
 	 * Invalidates relevant caches on run rejudge
-	 * 
+	 *
 	 * @param RunsDAO $run
 	 */
 	public static function invalidateCacheOnRejudge(Runs $run) {
 		try {
 			// Expire details of the run
-			Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());		
-			
+			Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());
+
 			$contest = ContestsDAO::getByPK($run->getContestId());
-			
+
 			// Now we need to invalidate problem stats
 			$problem = ProblemsDAO::getByPK($run->getProblemId());
-			
+
 			if (!is_null($problem)) {
 				// Invalidar cache stats
 				Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->getAlias());
@@ -470,7 +474,7 @@ class RunController extends Controller {
 		} catch (Exception $e) {
 			// We did our best effort to invalidate the cache...
 			self::$log->warn("Failed to invalidate cache on Rejudge, skipping: ");
-			self::$log->warn($e);			
+			self::$log->warn($e);
 		}
 	}
 
@@ -537,7 +541,7 @@ class RunController extends Controller {
 
 	/**
 	 * Parses Run metadata
-	 * 
+	 *
 	 * @param string $meta
 	 * @return array
 	 */
@@ -554,7 +558,7 @@ class RunController extends Controller {
 
 	/**
 	 * Compare two Run metadata
-	 * 
+	 *
 	 * @param array $a
 	 * @param array $b
 	 * @return boolean
@@ -577,7 +581,7 @@ class RunController extends Controller {
 	/**
 	 * Given the run alias, returns the source code and any compile errors if any
 	 * Used in the arena, any contestant can view its own codes and compile errors
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws ForbiddenAccessException
 	 */
@@ -592,7 +596,7 @@ class RunController extends Controller {
 		}
 
 		$response = array();
-		
+
 		if (OMEGAUP_LOCKDOWN) {
 			// OMI hotfix
 			// @TODO @joemmanuel, hay que localizar este msg :P
@@ -614,7 +618,7 @@ class RunController extends Controller {
 
 	/**
 	 * Given the run alias, returns a .zip file with all the .out files generated for a run.
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws ForbiddenAccessException
 	 */
@@ -636,54 +640,54 @@ class RunController extends Controller {
 		readfile($results_zip);
 		exit;
 	}
-	
+
 	/**
 	 * Get total of last 6 months
-	 * 
+	 *
 	 * @param Request $r
 	 * @return type
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiCounts(Request $r) {
-		
+
 		$totals = array();
-		
+
 		Cache::getFromCacheOrSet(Cache::RUN_COUNTS, "", $r, function(Request $r) {
-			
+
 			$totals = array();
 			$totals["total"] = array();
 			$totals["ac"] = array();
 			try {
 
 				$date = date('Y-m-d', strtotime('1 days'));
-				
+
 				for ($i = 0; $i < 30 * 3 /*about 3 months*/; $i++) {
 					$totals["total"][$date] = RunsDAO::GetRunCountsToDate($date);
 					$totals["ac"][$date] = RunsDAO::GetAcRunCountsToDate($date);
 					$date = date('Y-m-d', strtotime('-'.$i.' days'));
 				}
-				
+
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
-			
+
 			return $totals;
-			
+
 		}, $totals, 24*60*60 /*expire in 1 day*/);
-										
+
 		return $totals;
 	}
-	
+
 	/**
 	 * Validator for List API
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws ForbiddenAccessException
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
 	 */
 	private static function validateList(Request $r) {
-		
+
 		// Defaults for offset and rowcount
 		if (!isset($r["offset"])) {
 			$r["offset"] = 0;
@@ -691,7 +695,7 @@ class RunController extends Controller {
 		if (!isset($r["rowcount"])) {
 			$r["rowcount"] = 100;
 		}
-		
+
 		if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
 			throw new ForbiddenAccessException("userNotAllowed");
 		}
@@ -719,7 +723,7 @@ class RunController extends Controller {
 		}
 
 		Validators::isInEnum($r["language"], "language", array('c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'kp', 'kj', 'cat', 'hs'), false);
-		
+
 		// Get user if we have something in username
 		if (!is_null($r["username"])) {
 			try {
@@ -730,12 +734,12 @@ class RunController extends Controller {
 				$r["user"] = null;
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Gets a list of latest runs overall
-	 * 
+	 *
 	 * @param Request $r
 	 * @return string
 	 * @throws InvalidDatabaseOperationException
