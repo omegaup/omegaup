@@ -2,10 +2,10 @@
 
 /**
  *   ApiException
- * 
- *   Exception that works with arrays instead of plain strings 
- * 
- * 
+ *
+ *   Exception that works with arrays instead of plain strings
+ *
+ *
  */
 abstract class ApiException extends Exception {
 	public static $log;
@@ -15,7 +15,7 @@ abstract class ApiException extends Exception {
 
 	/**
 	 * Builds an api exception
-	 * 
+	 *
 	 * @param string $message
 	 * @param string $header
 	 * @param string $code
@@ -30,16 +30,16 @@ abstract class ApiException extends Exception {
 
 	/**
 	 * Returns header
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getHeader() {
 		return $this->header;
 	}
-	
+
 	/**
 	 * Adds a custom field to the asArray representation of this exception
-	 * 
+	 *
 	 * @param string $key
 	 * @param type $value
 	 */
@@ -48,7 +48,7 @@ abstract class ApiException extends Exception {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return array
 	 */
 	public function asArray() {
@@ -60,23 +60,24 @@ abstract class ApiException extends Exception {
 			"cause" => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : NULL,
 			"trace" => $this->getTraceAsString(),
 		);
-		
+
 		return array_merge($arrayToReturn, $this->customMessage);
 	}
-	
+
 	/**
 	 * Returns exception info intended for public error msgs in http responses
-	 * 
+	 *
 	 * @return array
 	 */
 	public function asResponseArray() {
 		$arrayToReturn =  array(
 			"status" => "error",
 			"error" => $this->getErrorMessage(),
+			"errorname" => $this->message,
 			"errorcode" => $this->code,
 			"header" => $this->header
 		);
-		
+
 		return array_merge($arrayToReturn, $this->customMessage);
 	}
 
@@ -97,7 +98,7 @@ ApiException::$log = Logger::getLogger("ApiException");
 
 /**
  * InvalidArgumentException
- * 
+ *
  */
 class InvalidParameterException extends ApiException {
 
@@ -105,7 +106,7 @@ class InvalidParameterException extends ApiException {
 	private $additional_parameters;
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -123,7 +124,7 @@ class InvalidParameterException extends ApiException {
 			self::$log->error("Untranslated error message: {$this->message}");
 			return "{untranslated:{$this->message}}";
 		}
-		$localizedText = ApiUtils::FormatString($localizedText, 
+		$localizedText = ApiUtils::FormatString($localizedText,
 			$this->additional_parameters);
 		if ($this->parameter == NULL) {
 			return $localizedText;
@@ -135,12 +136,12 @@ class InvalidParameterException extends ApiException {
 
 /**
  * DuplicatedEntryInDatabaseException
- * 
+ *
  */
 class DuplicatedEntryInDatabaseException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -152,12 +153,12 @@ class DuplicatedEntryInDatabaseException extends ApiException {
 
 /**
  * DuplicatedEntryInDatabaseException
- * 
+ *
  */
 class InvalidDatabaseOperationException extends ApiException {
 
 	/**
-	 *  
+	 *
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
@@ -168,12 +169,12 @@ class InvalidDatabaseOperationException extends ApiException {
 
 /**
  * NotFoundException
- * 
+ *
  */
 class NotFoundException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -185,29 +186,44 @@ class NotFoundException extends ApiException {
 
 /**
  * ForbiddenAccessException
- * 
+ *
  */
 class ForbiddenAccessException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
 	function __construct($message = "userNotAllowed", Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 403 FORBIDDEN', 403, $previous);
 	}
+}
 
+/**
+ * UnauthorizedException
+ *
+ */
+class UnauthorizedException extends ApiException {
+
+	/**
+	 *
+	 * @param string $message
+	 * @param Exception $previous
+	 */
+	function __construct($message = "loginRequired", Exception $previous = NULL) {
+		parent::__construct($message, 'HTTP/1.1 401 UNAUTHORIZED', 401, $previous);
+	}
 }
 
 /**
  * PreconditionFailed
- * 
+ *
  */
 class PreconditionFailedException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -219,12 +235,12 @@ class PreconditionFailedException extends ApiException {
 
 /**
  * Filesystem operation failed
- * 
+ *
  */
 class InvalidFilesystemOperationException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -236,12 +252,12 @@ class InvalidFilesystemOperationException extends ApiException {
 
 /**
  * Default for unexpected errors
- * 
+ *
  */
 class CaptchaVerificationFailedException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
@@ -252,12 +268,12 @@ class CaptchaVerificationFailedException extends ApiException {
 
 /**
  * Default for unexpected errors
- * 
+ *
  */
 class InternalServerErrorException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param Exception $previous
 	 */
 	function __construct(Exception $previous = NULL) {
@@ -268,12 +284,12 @@ class InternalServerErrorException extends ApiException {
 
 /**
  * Login failed exception
- * 
+ *
  */
 class InvalidCredentialsException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -284,9 +300,9 @@ class InvalidCredentialsException extends ApiException {
 }
 
 class NotAllowedToSubmitException extends ApiException {
-	
+
 	function __construct($message = "unableToSubmit", Exception $previous = NULL) {
-		parent::__construct($message, "HTTP/1.1 401 FORBIDDEN", 501, $previous);
+		parent::__construct($message, "HTTP/1.1 403 FORBIDDEN", 403, $previous);
 	}
 }
 
@@ -294,7 +310,7 @@ class NotAllowedToSubmitException extends ApiException {
 class EmailNotVerifiedException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -308,7 +324,7 @@ class EmailNotVerifiedException extends ApiException {
 class EmailVerificationSendException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -320,12 +336,12 @@ class EmailVerificationSendException extends ApiException {
 
 /**
  * ProblemDeploymentFailedException
- * 
+ *
  */
 class ProblemDeploymentFailedException extends ApiException {
 
 	/**
-	 * 
+	 *
 	 * @param string $message
 	 * @param Exception $previous
 	 */
@@ -338,7 +354,7 @@ class ProblemDeploymentFailedException extends ApiException {
  * LoginDisabledException
  */
 class LoginDisabledException extends ApiException {
-	
+
 	function __construct(ApiException $previous = NULL) {
 		parent::__construct("loginDisabled", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
 	}

@@ -5,7 +5,7 @@ require_once(__DIR__."/../../server/bootstrap.php");
 /**
  * Encapsulates calls to the API and provides initialization and
  * error handling (try catch) logic for logging and alerting
- * 
+ *
  */
 class ApiCaller{
 
@@ -44,7 +44,7 @@ class ApiCaller{
 
 	/**
 	 *Handles main API workflow. All HTTP API calls start here.
-	 * 
+	 *
 	 */
 	public static function httpEntryPoint() {
 		$r = NULL;
@@ -60,20 +60,20 @@ class ApiCaller{
 			$apiException = new InternalServerErrorException($e);
 			$response = $apiException->asResponseArray();
 		}
-		
+
 		if (is_null($response) || !is_array($response)) {
 			$apiException = new InternalServerErrorException(new Exception("Api did not return an array."));
 			self::$log->error($apiException);
 			$response = $apiException->asResponseArray();
 		}
-		
+
 		return self::render($response, $r);
 	}
 
 	/**
 	 * Renders the response properly and, in the case of HTTP API,
 	 * sets the header
-	 * 
+	 *
 	 * @param array $response
 	 * @param Request $r
 	 */
@@ -89,19 +89,19 @@ class ApiCaller{
 				self::$log->error("json_encode failed for: ". implode(",", $response));
 				$apiException = new InternalServerErrorException();
 				$json_result = json_encode($apiException->asResponseArray());
-			}							
-			
+			}
+
 			// Print the result using late static binding semantics
-			// Return needed for testability purposes, for production it 
+			// Return needed for testability purposes, for production it
 			// returns void.
 			return static::printResult($json_result);
 		}
 	}
-	
+
 	/**
 	 * In production, prints the result.
 	 * Decoupled for testability purposes
-	 * 
+	 *
 	 * @param string $string
 	 */
 	private static function printResult($string) {
@@ -111,7 +111,7 @@ class ApiCaller{
 	/**
 	 * Parses the URI from $_SERVER and determines which controller and
 	 * function to call.
-	 * 
+	 *
 	 * @return Request
 	 * @throws NotFoundException
 	 */
@@ -158,7 +158,7 @@ class ApiCaller{
 
 		// Get the auth_token and user data from cookies
 		$cs = SessionController::apiCurrentSession();
-		
+
 		// If we got an auth_token from cookies, replace it
 		if (!is_null($cs["auth_token"])) {
 			$request["auth_token"] = $cs["auth_token"];
@@ -169,28 +169,31 @@ class ApiCaller{
 		}
 
 		$request->method = $controllerName . "::" . $methodName;
-	
+
 		return $request;
 	}
 
 
 	/**
 	 * Sets all required headers for the API called via HTTP
-	 * 
+	 *
 	 * @param array $response
 	 */
 	private static function setHttpHeaders(array $response) {
-		
+
 		// Scumbag IE y su cache agresivo.
 		header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 		header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
-		
+
 		// Set header accordingly
 		if (isset($response["header"])) {
 			header($response["header"]);
+			if ($response["header"] == 'HTTP/1.1 401 UNAUTHORIZED') {
+				header('WWW-Authenticate: omegaUp location="/login"');
+			}
 		} else {
 			header("Content-Type: application/json");
 		}

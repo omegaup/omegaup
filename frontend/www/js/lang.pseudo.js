@@ -181,6 +181,7 @@ OmegaUp.T = {
 	loginPasswordTooShort: "(Pa55w0rd i5 700 5h0r7)",
 	loginRecover: "(F0rg07 y0ur pa55w0rd?)",
 	loginRepeatPassword: "(R3p3a7 pa55w0rd)",
+	loginRequired: "(Y0u n33d 70 10gin 70 p3rf0rm 7ha7 ac7i0n)",
 	loginSignUp: "(R3gi573r)",
 	loginSignupHeader: "(Cr3a73 an 0m3gaUp acc0un7, quick and 3a5y!)",
 	loginWithFacebook: "(L0gin wi7h Fac3b00k)",

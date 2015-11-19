@@ -13,15 +13,15 @@ class Controller {
 
 	/**
 	 * List of verdicts
-	 * 
-	 * @var array 
+	 *
+	 * @var array
 	 */
 	public static $verdicts = array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC");
-	
+
 	/**
 	 * Given the request, returns what user is performing the request by
 	 * looking at the auth_token
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws ForbiddenAccessException
@@ -29,7 +29,7 @@ class Controller {
 	protected static function authenticateRequest(Request $r) {
 		$session = SessionController::apiCurrentSession($r);
 		if (!$session['valid'] || $session['user'] == null) {
-			throw new ForbiddenAccessException();
+			throw new UnauthorizedException();
 		}
 
 		$r["current_user"] = $session['user'];
@@ -37,14 +37,14 @@ class Controller {
 	}
 
 	/**
-	 * Calls authenticateRequest and throws only if authentication fails AND 
-	 * there's no target username in Request. 
-	 * This is to allow unauthenticated access to APIs that work for both 
+	 * Calls authenticateRequest and throws only if authentication fails AND
+	 * there's no target username in Request.
+	 * This is to allow unauthenticated access to APIs that work for both
 	 * current authenticated user and a targeted user (via $r["username"])
-	 * 
+	 *
 	 * @param Request $r
 	 */
-	protected static function authenticateOrAllowUnauthenticatedRequest(Request $r) {		
+	protected static function authenticateOrAllowUnauthenticatedRequest(Request $r) {
 		try {
 			self::authenticateRequest($r);
 		} catch (ForbiddenAccessException $e) {
@@ -52,16 +52,16 @@ class Controller {
 			if (is_null($r["username"])) {
 				throw $e;
 			}
-		}		
+		}
 	}
-	
+
 	/**
 	 * Resolves the target user for the API. If a username is provided in
 	 * the request, then we use that one. Otherwise, we use currently logged-in
 	 * user.
-	 * 
+	 *
 	 * Request must be authenticated before this function is called.
-	 * 
+	 *
 	 * @param Request $r
 	 * @return Users
 	 * @throws InvalidDatabaseOperationException
@@ -73,16 +73,16 @@ class Controller {
 		$user = $r["current_user"];
 
 		if (!is_null($r["username"])) {
-			
+
 			Validators::isStringNonEmpty($r["username"], "username");
-			
+
 			try {
 				$user = UsersDAO::FindByUsername($r["username"]);
 
 				if (is_null($user)) {
 					throw new InvalidParameterException("parameterNotFound", "Username");
 				}
-			} 
+			}
 			catch (ApiException $e) {
 				throw $e;
 			}
@@ -93,10 +93,10 @@ class Controller {
 
 		return $user;
 	}
-	
+
 	/**
 	 * Retunrs a random string of size $length
-	 * 
+	 *
 	 * @param string $length
 	 * @return string
 	 */

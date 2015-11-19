@@ -181,6 +181,7 @@ OmegaUp.T = {
 	loginPasswordTooShort: "Password is too short",
 	loginRecover: "Forgot your password?",
 	loginRepeatPassword: "Repeat password",
+	loginRequired: "You need to login to perform that action",
 	loginSignUp: "Register",
 	loginSignupHeader: "Create an omegaUp account, quick and easy!",
 	loginWithFacebook: "Login with Facebook",
