@@ -1,8 +1,8 @@
 CC=g++
 CFLAGS=-O2
 
--include ../libinteractive/definitions.mk
--include ../backend/definitions.mk
+include ../libinteractive/definitions.mk
+include ../backend/definitions.mk
 
 .PHONY: all clean
 all: normalizr runner.jar grader.jar
@@ -12,8 +12,10 @@ clean:
 	$(MAKE) -C ../libinteractive clean
 	$(MAKE) -C ../backend clean
 
-$(RUNNER_JAR) $(GRADER_JAR): $(BACKEND_SOURCES)
-	$(MAKE) -C ../backend all
+$(RUNNER_JAR): $(BACKEND_SOURCES)
+	$(MAKE) -C ../backend
+
+$(GRADER_JAR): $(RUNNER_JAR)
 
 runner.jar: $(RUNNER_JAR)
 	cp $^ $@
