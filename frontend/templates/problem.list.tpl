@@ -32,7 +32,7 @@
 				</td>
 				<td>{$problem.submissions}</td>
 				<td>{$problem.accepted}</td>
-				<td>{$problem.ratio}%</td>
+				<td>{100 * $problem.ratio}%</td>
 				<td>{$problem.points}</td>
 				<td>{$problem.score}</td>
 				</tr>
