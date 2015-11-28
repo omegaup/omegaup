@@ -6,7 +6,7 @@
 <script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ver=1bf05c"></script>
 <link rel="stylesheet" type="text/css" href="/js/pagedown/demo/browser/demo.css" />
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
-<script src="/js/js.cookie.js?ver=3a458d"></script>
+<script src="/js/js.cookie.js?ver=afd524"></script>
 
 <div class="post">
 <div id="problem">
