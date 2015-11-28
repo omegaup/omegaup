@@ -62,6 +62,19 @@ Case #2: 15
 				{rdelim});
 				editor1.run();
 		{rdelim})();
+		
+		// Ask the user if they want to restore the last draft
+		$(document).ready(function() {
+			if (localStorage.getItem('wmdinput')) {
+				var r = confirm('¿Deseas restaurar tu última redacción?');
+				if (r == true) {
+					$('#wmd-input').val(localStorage.getItem('wmdinput'));
+				}
+			}
+		});
+	        $('#wmd-input').keyup(function() {
+			localStorage.setItem('wmdinput', $('#wmd-input').val())
+		});
 </script>
 <div style='clear: both;'></div>
 </div>
