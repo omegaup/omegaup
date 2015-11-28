@@ -6,7 +6,6 @@
 <script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ver=1bf05c"></script>
 <link rel="stylesheet" type="text/css" href="/js/pagedown/demo/browser/demo.css" />
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
-<script src="/js/js.cookie.js?ver=afd524"></script>
 
 <div class="post">
 <div id="problem">
@@ -66,15 +65,15 @@ Case #2: 15
 		
 		// Ask the user if they want to restore the last draft
 		$(document).ready(function() {
-			if (Cookies.get('wmdinput')) {
+			if (localStorage.getItem('wmdinput')) {
 				var r = confirm('¿Deseas restaurar tu última redacción?');
 				if (r == true) {
-					$('#wmd-input').val(Cookies.get('wmdinput'));
+					$('#wmd-input').val(localStorage.getItem('wmdinput'));
 				}
 			}
 		});
 	        $('#wmd-input').keyup(function() {
-			Cookies.set('wmdinput', $('#wmd-input').val());
+			localStorage.setItem('wmdinput', $('#wmd-input').val())
 		});
 </script>
 <div style='clear: both;'></div>
