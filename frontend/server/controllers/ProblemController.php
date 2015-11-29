@@ -1363,7 +1363,7 @@ class ProblemController extends Controller {
 		// Authenticate request
 		try {
 			self::authenticateRequest($r);
-		} catch (ForbiddenAccessException $e) {
+		} catch (UnauthorizedException $e) {
 			// Do nothing, we allow unauthenticated users to use this API
 		}
 
