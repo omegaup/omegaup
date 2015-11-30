@@ -857,11 +857,7 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiDownload(Request $r) {
-		try {
-			self::authenticateRequest($r);
-		} catch (ForbiddenAccessException $e) {
-			throw $e;
-		}
+		self::authenticateRequest($r);
 
 		// Validate request
 		self::validateDownload($r);
@@ -925,7 +921,7 @@ class ProblemController extends Controller {
 		// inside a contest.
 		try {
 			self::authenticateRequest($r);
-		} catch(ForbiddenAccessException $e) {
+		} catch(UnauthorizedException $e) {
 			if (!is_null($r["contest_alias"])) {
 				throw $e;
 			}

@@ -24,7 +24,7 @@ class Controller {
 	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
-	 * @throws ForbiddenAccessException
+	 * @throws UnauthorizedException
 	 */
 	protected static function authenticateRequest(Request $r) {
 		$session = SessionController::apiCurrentSession($r);
@@ -47,7 +47,7 @@ class Controller {
 	protected static function authenticateOrAllowUnauthenticatedRequest(Request $r) {
 		try {
 			self::authenticateRequest($r);
-		} catch (ForbiddenAccessException $e) {
+		} catch (UnauthorizedException $e) {
 			// allow unauthenticated only if it has $r["username"]
 			if (is_null($r["username"])) {
 				throw $e;

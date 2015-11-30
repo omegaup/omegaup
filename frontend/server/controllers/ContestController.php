@@ -20,7 +20,7 @@ class ContestController extends Controller {
 		// the list of contests
 		try {
 			self::authenticateRequest($r);
-		} catch (ForbiddenAccessException $e) {
+		} catch (UnauthorizedException $e) {
 			// Do nothing
 		}
 
