@@ -666,7 +666,7 @@ class UserController extends Controller {
 				throw new ForbiddenAccessException();
 			}
 			$keys = array (
-				"OVI15" => 50
+				"OVI15" => 200
 			);
 		} else {
 			throw new InvalidParameterException("parameterNotInExpectedSet", "contest_type",
