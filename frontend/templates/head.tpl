@@ -64,5 +64,4 @@
 	<body>
 		
 		<div id="wrapper">
-
-{include file='common.navbar.tpl'}
+{include file='common.navbar.tpl' navbarSection=$navbarSection}

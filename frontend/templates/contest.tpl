@@ -1,6 +1,6 @@
 {include file='redirect.tpl'}
 {assign var="htmlTitle" value="{#omegaupTitleContest#}"}
-{include file='head.tpl'}
+{include file='head.tpl' navbarSection="contests"}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
@@ -24,9 +24,5 @@
 		</div>
 	</div>
 </div>
-
-<script>
-	$(".navbar #nav-contests").addClass("active");
-</script>
 	
 {include file='footer.tpl'}

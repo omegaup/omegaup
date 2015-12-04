@@ -3,12 +3,6 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<script>
-	function printMonthAndYear(date) {
-		return date.slice(0, -3);
-	}
-</script>
-
 <div class="wait_for_ajax panel panel-default" id="coders_list" >
 	<div class="panel-heading">
 		<h3 class="panel-title">{#codersOfTheMonth#}</h3>
@@ -27,7 +21,7 @@
 					<tr>
 						<td><img src="{$data.gravatar_32}"/></td>
 						<td><b><a href='/profile/{$data.username|htmlspecialchars}'>{$data.username|htmlspecialchars}</a></b></td>
-						<td><script>document.write(printMonthAndYear("{$data.date}"));</script></td>
+						<td>{$data.date}</td>
 					</tr>
 				{/foreach}
 			</tbody>

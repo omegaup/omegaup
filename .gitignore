@@ -71,3 +71,4 @@ frontend/.DS_Store
 # Ignore stuff in www
 frontend/www/apc.php
 frontend/www/preguntas/
+frontend/www/js/google-analytics.js

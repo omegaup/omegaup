@@ -40,9 +40,7 @@ if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 define('OMEGAUP_LOCKDOWN', isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == OMEGAUP_LOCKDOWN_DOMAIN);
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
-if (OMEGAUP_LOCKDOWN || OMEGAUP_USE_CSP) {
-	header("Content-Security-Policy: script-src 'self' https://www.google.com; frame-src https://www.facebook.com https://platform.twitter.com;");
-}
+header("Content-Security-Policy: script-src 'self' https://www.google.com; frame-src https://www.facebook.com https://platform.twitter.com;");
 header('X-Frame-Options: DENY');
 
 /*
@@ -161,7 +159,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 
 	include("libs/smarty/Smarty.class.php");
 
-	$smarty = new Smarty;	
+	$smarty = new Smarty;
 	$smarty->setTemplateDir(__DIR__ . "/../templates/");
 	$smarty->assign("CURRENT_USER_IS_ADMIN", 0);
 	if (defined("SMARTY_CACHE_DIR")) {
@@ -186,7 +184,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 	if ($session['valid']) {
 		$smarty->assign("LOGGED_IN", "1");
 		UITools::$IsLoggedIn = true;
-		
+
 		$smarty->assign("CURRENT_USER_USERNAME", $session["username"]);
 		$smarty->assign("CURRENT_USER_EMAIL", $session["email"]);
 		$smarty->assign("CURRENT_USER_IS_EMAIL_VERIFIED", $session["is_email_verified"]);
@@ -197,7 +195,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_128", '<img src="https://secure.gravatar.com/avatar/' . md5($session["email"]) . '?s=92">');
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_16", '<img src="https://secure.gravatar.com/avatar/' . md5($session["email"]) . '?s=16">');
 		$smarty->assign("CURRENT_USER_GRAVATAR_URL_32", '<img src="https://secure.gravatar.com/avatar/' . md5($session["email"]) . '?s=32">');
-		
+
 		UITools::$isAdmin = $session["is_admin"];
 		$userRequest["username"] = $session["username"];
 	} else {

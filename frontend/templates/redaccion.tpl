@@ -53,29 +53,7 @@ Case #2: 15
 * Los
 * Límites</textarea>
 </div>
-<script type="text/javascript">
-		(function () {ldelim}
-				var converter1 = Markdown.getSanitizingConverter();
-				var editor1 = new Markdown.Editor(converter1);
-				editor1.hooks.chain("onPreviewRefresh", function() {ldelim}
-					MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#wmd-preview').get(0)]);
-				{rdelim});
-				editor1.run();
-		{rdelim})();
-		
-		// Ask the user if they want to restore the last draft
-		$(document).ready(function() {
-			if (localStorage.getItem('wmdinput')) {
-				var r = confirm('¿Deseas restaurar tu última redacción?');
-				if (r == true) {
-					$('#wmd-input').val(localStorage.getItem('wmdinput'));
-				}
-			}
-		});
-	        $('#wmd-input').keyup(function() {
-			localStorage.setItem('wmdinput', $('#wmd-input').val())
-		});
-</script>
+<script type="text/javascript" src="/js/redaccion.js?ver=ed6e43"></script>
 <div style='clear: both;'></div>
 </div>
 </div>

@@ -11,16 +11,16 @@
 						</div>
 						<ul class="nav navbar-nav">
 							{if !$smarty.const.OMEGAUP_LOCKDOWN && !$inContest}
-							<li id="nav-arena"><a href='/arena/'>{#navArena#}</a></li>
+							<li id="nav-arena"{if $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
 							{if $LOGGED_IN eq '1'}
-								<li id="nav-contests">
+								<li id="nav-contests"{if $navbarSection == 'contests'} class="active"{/if}>
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
 										<li><a href='/contest/'>{#navMyContests#}</a></li>
 										<li><a href='/group/'>{#navMyGroups#}</a></li>
 									</ul>
 								</li>
-								<li id="nav-problems">
+								<li id="nav-problems"{if $navbarSection == "problems"} class="active"{/if}>
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
 										<li><a href="/problem/mine/">{#navMyProblems#}</a></li>
@@ -28,9 +28,9 @@
 									</ul>
 								</li>
 							{else}
-								<li id="nav-problems"><a href='/problem/'>{#wordsProblems#}</a></li>
+								<li id="nav-problems"{if $navbarSection == "problems"} class="active"{/if}><a href='/problem/'>{#wordsProblems#}</a></li>
 							{/if}
-							<li class="hidden-xs hidden-sm" id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
+							<li class="hidden-xs hidden-sm{if $navbarSection == "rank"} active{/if}" id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
 							<li class="hidden-xs hidden-sm"><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
 							<li class="hidden-xs hidden-sm"><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
 							<li id="nav-mas" class="hidden-md hidden-lg">

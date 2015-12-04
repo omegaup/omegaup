@@ -27,28 +27,5 @@
 		</div>
 	</div>
 							
-	<script>
-		$('form#user_edit_email_form').submit(function (){
-			
-			$('#wait').show();
-			
-			omegaup.updateMain{#userEmailEditEmail#}($('#email').val(), function (response) {
-				if (response.status == "ok") {
-					$('#status').html("{#userEmailEditEmail#} actualizado correctamente! En unos minutos recibirás más instrucciones en tu email. No olvides revisar tu carpeta de Spam.");
-					$('#status').addClass("alert-success");
-					$('#status').slideDown();
-					
-					$('#wait').hide();
-					return false;
-				} else {
-					OmegaUp.ui.error(response.error || 'error');					
-				}
-				
-				$('#wait').hide();
-			});
-									
-			// Prevent page refresh on submit
-			return false;
-		});
-	</script>
+	<script type="text/javascript" src="/js/user.email.edit.js?ver=4e55cf"></script>
 {/block}
