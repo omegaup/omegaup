@@ -288,7 +288,6 @@ class ContestController extends Controller {
 	 * @throws PreconditionFailedException
 	 */
 	private static function validateDetails(Request $r) {
-
 		self::validateBasicDetails($r);
 
 		$r['contest_admin'] = false;
@@ -397,17 +396,14 @@ class ContestController extends Controller {
 	}
 
 	/**
-	 * Returns details of a Contest
+	 * Returns details of a Contest. This is shared between apiDetails and
+	 * apiAdminDetails.
 	 *
 	 * @param Request $r
-	 * @return array
-	 * @throws InvalidDatabaseOperationException
+	 * @param $result
 	 */
-	public static function apiDetails(Request $r) {
-		self::validateDetails($r);
-
+	private static function getCachedDetails(Request $r, &$result) {
 		Cache::getFromCacheOrSet(Cache::CONTEST_INFO, $r["contest_alias"], $r, function(Request $r) {
-
 			// Create array of relevant columns
 			$relevant_columns = array(
 				"title",
@@ -496,6 +492,20 @@ class ContestController extends Controller {
 			return $result;
 
 		}, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
+	}
+
+	/**
+	 * Returns details of a Contest
+	 *
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiDetails(Request $r) {
+		self::validateDetails($r);
+
+		$result = array();
+		self::getCachedDetails($r, $result);
 
 		if (is_null($r['token'])) {
 			// Adding timer info separately as it depends on the current user and we don't
@@ -522,6 +532,30 @@ class ContestController extends Controller {
 		}
 
 		$result["status"] = "ok";
+		return $result;
+	}
+
+	/**
+	 * Returns details of a Contest, for administrators. This differs from
+	 * apiDetails in the sense that it does not attempt to calculate the
+	 * remaining time from the contest, or register the opened time.
+	 *
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiAdminDetails(Request $r) {
+		self::validateDetails($r);
+
+		if (!Authorization::IsContestAdmin($r["current_user_id"], $r["contest"])) {
+			throw new ForbiddenAccessException();
+		}
+
+		$result = array();
+		self::getCachedDetails($r, $result);
+
+		$result["status"] = "ok";
+		$result['admin'] = true;
 		return $result;
 	}
 

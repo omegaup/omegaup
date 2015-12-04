@@ -470,6 +470,30 @@ OmegaUp.prototype.getContest = function(alias, callback) {
 	});
 };
 
+OmegaUp.prototype.getContestAdminDetails = function(alias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/contest/admindetails/contest_alias/' + encodeURIComponent(alias) + '/',
+		function (contest) {
+			if (contest.status == 'ok') {
+				contest.start_time = self.time(contest.start_time * 1000);
+				contest.finish_time = self.time(contest.finish_time * 1000);
+				contest.submission_deadline = self.time(contest.submission_deadline * 1000);
+				contest.show_penalty = (contest.penalty != 0 || contest.penalty_type != "none");
+			}
+			callback(contest);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getContestPublicDetails = function(alias, callback) {
 	var self = this;
 

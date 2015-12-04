@@ -394,6 +394,32 @@ class ContestDetailsTest extends OmegaupTestCase {
 	}
 
 	/**
+	 * Tests admin details. For /contest/.../edit/.
+	 */
+	public function testContestAdminDetails() {
+		// Get a contest
+		$contestData = ContestsFactory::createContest();
+		$contestDirector = $contestData["director"];
+
+		$r = new Request(array(
+			"auth_token" => $this->login($contestDirector),
+			"contest_alias" => $contestData["request"]["alias"]
+		));
+
+		// Call api. This should fail.
+		try {
+			ContestController::apiDetails($r);
+			$this->assertTrue(false, "User that has not opened contest was able to see its details");
+		} catch (ForbiddenAccessException $e) {
+			// Pass
+		}
+
+		// Call admin api. This should succeed.
+		$detailsResponse = ContestController::apiAdminDetails($r);
+		$this->assertContestDetails($contestData, array(), $detailsResponse);
+	}
+
+	/**
 	 * Test accesing api with invalid scoreboard token. Should fail.
 	 *
 	 * @expectedException ForbiddenAccessException
