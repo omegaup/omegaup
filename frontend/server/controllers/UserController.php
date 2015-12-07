@@ -68,7 +68,7 @@ class UserController extends Controller {
 		if (!is_null(self::$permissionKey) &&
 		    self::$permissionKey == $r['permission_key']) {
 			$user_data['verified'] = 1;
-		} else {
+		} else if (OMEGAUP_VALIDATE_CAPTCHA) {
 			// Validate captcha
 			if (!isset($r["recaptcha"])) {
 				throw new InvalidParameterException("parameterNotFound", "recaptcha");
