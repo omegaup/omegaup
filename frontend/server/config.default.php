@@ -81,7 +81,8 @@ try_define('OMEGAUP_GA_ID',					'xxxxx');
 # ####################################
 # GOOGLE RECAPTCHA
 # ####################################
-try_define('OMEGAUP_RECAPTCHA_SECRET',			'xxxx'	);
+try_define('OMEGAUP_RECAPTCHA_SECRET',			'xxxx');
+try_define('OMEGAUP_VALIDATE_CAPTCHA',			false);
 
 # ####################################
 # EMAIL CONFIG
