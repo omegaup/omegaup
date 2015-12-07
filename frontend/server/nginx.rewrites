@@ -9,7 +9,7 @@ rewrite ^/login/google/?$ /logingoogle.php last;
 rewrite ^/logout/?$ /logout.php last;
 rewrite ^/contest/?$ /contests.php last;
 rewrite ^/contest/new/?$ /contestnew.php last;
-rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /contest.php?alias=$1 last;
+rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /arena/contest.php?contest_alias=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contestedit.php?contest=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /conteststats.php?contest=$1 last;
 rewrite ^/group/?$ /grouplist.php last;
