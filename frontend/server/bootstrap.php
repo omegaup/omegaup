@@ -45,7 +45,7 @@ $csp_mode = 'Content-Security-Policy-Report-Only';
 if (OMEGAUP_LOCKDOWN) {
 	$csp_mode = 'Content-Security-Policy';
 }
-header("$csp_mode: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com; frame-src https://www.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com; report-uri /cspreport.php");
+header("$csp_mode: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com https://js-agent.newrelic.com https://bam.nr-data.net; frame-src https://www.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com; report-uri /cspreport.php");
 header('X-Frame-Options: DENY');
 
 /*
