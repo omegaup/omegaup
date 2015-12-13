@@ -299,6 +299,7 @@ OmegaUp.T = {
 	problemEditFormCustom: "Validador personalizado (validator.$lang$)",
 	problemEditFormFile: "Archivo",
 	problemEditFormHelp: "Ayuda",
+        problemEditFormHowToWriteProblems: "Cómo escribir problemas para omegaUp",
 	problemEditFormLanguages: "Lenguajes",
 	problemEditFormLiteral: "Interpretar salida estándar como puntaje",
 	problemEditFormNumericTokensWithTolerance: "Tokens numéricos con tolerancia",
