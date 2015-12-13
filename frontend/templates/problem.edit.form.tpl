@@ -17,9 +17,9 @@
 			{if $IS_UPDATE eq 1}
 				<input type="hidden" name="problem_alias" value="{$smarty.get.problem}" />
 			{/if}
-			<p>
-			<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup"><b>{#problemEditFormHowToWriteProblems#}</b></a>
-			</p>
+			<div class="alert alert-info" role="alert">
+				<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup" class="alert-link">{#problemEditFormHowToWriteProblems#}</a>
+			</div>
 			<div class="row">
 				<div class="form-group col-md-6">
 					<label for="problem_contents">{#problemEditFormFile#}</label>
