@@ -299,6 +299,7 @@ OmegaUp.T = {
 	problemEditFormCustom: "(Cu570m va1ida70r (va1ida70r.$1ang$))",
 	problemEditFormFile: "(Fi13)",
 	problemEditFormHelp: "(H31p)",
+        problemEditFormHowToWriteProblems: "(H0w t0 writ3 pr0b13m5)",
 	problemEditFormLanguages: "(Languag35)",
 	problemEditFormLiteral: "(In73rpr37 57d0u7 a5 5c0r3)",
 	problemEditFormNumericTokensWithTolerance: "(Num3ric 70k3n5 wi7h 7013ranc3)",
