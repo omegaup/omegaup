@@ -1,4 +1,5 @@
 <?php
+	define('OMEGAUP_BYPASS_CSP_INSECURE_NEVER_USE_THIS', TRUE);
 	require_once("../server/bootstrap.php");
 	require_once("api/ApiCaller.php");
 
@@ -8,7 +9,7 @@
 
 	if (isset($_POST["request"]) && ($_POST["request"] == "login")) {
 		// user wants to login natively
-		
+
 		$r = new Request();
 		$r["usernameOrEmail"] = $_POST["user"];
 		$r["password"] = $_POST["pass"];
@@ -18,8 +19,8 @@
 		if ($response["status"] === "error") {
 			if ($response["errorcode"] === 600 || $response["errorcode"] === 601) {
 				$emailVerified = false;
-			} 
-		} 
+			}
+		}
 
 		$triedToLogin = true;
 	}
