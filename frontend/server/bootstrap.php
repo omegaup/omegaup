@@ -40,12 +40,7 @@ if (!(defined('IS_TEST') && IS_TEST === TRUE)) {
 define('OMEGAUP_LOCKDOWN', isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == OMEGAUP_LOCKDOWN_DOMAIN);
 define("OMEGAUP_AUTH_TOKEN_COOKIE_NAME", "ouat");
 
-// TODO(12/13/15): Remove this once we are sure it won't break anything.
-$csp_mode = 'Content-Security-Policy-Report-Only';
-if (OMEGAUP_LOCKDOWN) {
-	$csp_mode = 'Content-Security-Policy';
-}
-header("$csp_mode: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com https://js-agent.newrelic.com https://bam.nr-data.net https://ssl.google-analytics.com; frame-src https://www.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com; report-uri /cspreport.php");
+header("Content-Security-Policy: script-src 'self' https://www.google.com https://apis.google.com https://www.gstatic.com https://js-agent.newrelic.com https://bam.nr-data.net https://ssl.google-analytics.com; frame-src https://www.facebook.com https://platform.twitter.com https://www.google.com https://apis.google.com https://accounts.google.com; report-uri /cspreport.php");
 header('X-Frame-Options: DENY');
 
 /*
