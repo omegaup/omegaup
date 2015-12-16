@@ -64,4 +64,8 @@
 	<body>
 		
 		<div id="wrapper">
+{if isset($navbarSection)}
 {include file='common.navbar.tpl' navbarSection=$navbarSection}
+{else}
+{include file='common.navbar.tpl'}
+{/if}
