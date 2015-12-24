@@ -60,9 +60,9 @@ class ContestController extends Controller {
             }
 
             /*
-			 * Ok, its not public, lets se if we have a
-			 * valid user
-			 * */
+             * Ok, its not public, lets se if we have a
+             * valid user
+             * */
             if ($r['current_user_id'] === null) {
                 continue;
             }
@@ -1301,6 +1301,108 @@ class ContestController extends Controller {
     }
 
     /**
+     * Adds an group admin to a contest
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiAddGroupAdmin(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admins are allowed to modify contest
+        if (!Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $group_role = new GroupRoles();
+        $group_role->setContestId($r['contest']->getContestId());
+        $group_role->setGroupId($group->group_id);
+        $group_role->setRoleId(CONTEST_ADMIN_ROLE);
+
+        // Save the contest to the DB
+        try {
+            GroupRolesDAO::save($group_role);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    /**
+     * Removes a group admin from a contest
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiRemoveGroupAdmin(Request $r) {
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Only admin is alowed to make modifications
+        if (!Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $group_role = new GroupRoles();
+        $group_role->setContestId($r['contest']->getContestId());
+        $group_role->setGroupId($group->group_id);
+        $group_role->setRoleId(CONTEST_ADMIN_ROLE);
+
+        // Delete the role
+        try {
+            GroupRolesDAO::delete($group_role);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    /**
      * Validate the Clarifications request
      *
      * @param Request $r
@@ -1785,6 +1887,7 @@ class ContestController extends Controller {
 
         $response = array();
         $response['admins'] = UserRolesDAO::getContestAdmins($contest);
+        $response['group_admins'] = GroupRolesDAO::getContestAdmins($contest);
         $response['status'] = 'ok';
 
         return $response;

@@ -105,16 +105,12 @@ class Authorization {
             return false;
         }
 
-        try {
-            $ur = UserRolesDAO::getByPK($user_id, CONTEST_ADMIN_ROLE, $contest->getContestId());
-            if (!is_null($ur)) {
-                return true;
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        if (GroupRolesDAO::IsContestAdmin($user_id, $contest) ||
+            UserRolesDAO::IsContestAdmin($user_id, $contest)) {
+            return true;
         }
 
-        return ($contest->getDirectorId() === $user_id) || self::IsSystemAdmin($user_id);
+        return $contest->getDirectorId() === $user_id;
     }
 
     public static function IsProblemAdmin($user_id, Problems $problem) {
@@ -122,38 +118,28 @@ class Authorization {
             return false;
         }
 
-        try {
-            $ur = UserRolesDAO::getByPK($user_id, PROBLEM_ADMIN_ROLE, $problem->problem_id);
-
-            if (!is_null($ur)) {
-                return true;
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        if (GroupRolesDAO::IsProblemAdmin($user_id, $problem) ||
+            UserRolesDAO::IsProblemAdmin($user_id, $problem)) {
+            return true;
         }
 
-        return ($problem->author_id === $user_id) || self::IsSystemAdmin($user_id);
+        return $problem->author_id === $user_id;
     }
 
     public static function IsSystemAdmin($user_id) {
-        try {
-            $ur = UserRolesDAO::getByPK($user_id, ADMIN_ROLE, 0 /* general admin */);
-
-            return !is_null($ur);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        return GroupRolesDAO::IsSystemAdmin($user_id) ||
+               UserRolesDAO::IsSystemAdmin($user_id);
     }
 
-    public static function IsGroupOwner($user_id, Groups $group) {
+    public static function IsGroupAdmin($user_id, Groups $group) {
         if (is_null($group)) {
             return false;
         }
 
-        if ($user_id === $group->owner_id) {
+        if (Authorization::IsSystemAdmin($user_id)) {
             return true;
         }
 
-        return false;
+        return $group->owner_id === $user_id;
     }
 }

@@ -10,7 +10,7 @@
 
 <span id="form-data" data-name="groups" data-page="new"></span>
 <script src="/js/alias.generate.js?ver=68db5b"></script>
-<script src="/js/groups.js?ver=252302"></script>
+<script src="/js/groups.js?ver=5a0ed7"></script>
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE neq 1}

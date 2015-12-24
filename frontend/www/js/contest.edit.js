@@ -163,7 +163,7 @@ $('document').ready(function() {
 	});
 
 	// Edit users
-	function typeahead(elm) {
+	function userTypeahead(elm) {
 		elm.typeahead({
 			minLength: 2,
 			highlight: true,
@@ -175,8 +175,21 @@ $('document').ready(function() {
 		});
 	};
 
-	typeahead($('#username-contestant'));
-	typeahead($('#username-admin'));
+	function groupTypeahead(elm) {
+		elm.typeahead({
+			minLength: 2,
+			highlight: true,
+		}, {
+			source: omegaup.searchGroups,
+			displayKey: 'label',
+		}).on('typeahead:selected', function(item, val, text) {
+			elm.val(val.label);
+		});
+	};
+
+	userTypeahead($('#username-contestant'));
+	userTypeahead($('#username-admin'));
+	groupTypeahead($('#groupalias-admin'));
 	$('#problems-dropdown').typeahead({
 		minLength: 3,
 		highlight: false,
@@ -351,6 +364,35 @@ $('document').ready(function() {
 						)
 				);
 			}
+			$('#contest-group-admins').empty();
+			for (var i = 0; i < admins.group_admins.length; i++) {
+				var group_admin = admins.group_admins[i];
+				$('#contest-group-admins').append(
+					$('<tr></tr>')
+						.append($('<td></td>').append(
+							$('<a></a>')
+								.attr('href', '/group/' + group_admin.alias + '/edit/')
+								.text(group_admin.name)
+						))
+						.append($('<td></td>').text(group_admin.role))
+						.append((group_admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
+							.click((function(alias) {
+								return function(e) {
+									omegaup.removeGroupAdminFromContest(contestAlias, alias, function(response) {
+										if (response.status == "ok") {
+											OmegaUp.ui.success(OmegaUp.T['adminAdded']);
+											$('div.post.footer').show();
+											var tr = e.target.parentElement.parentElement;
+											$(tr).remove();
+										} else {
+											OmegaUp.ui.error(response.error || 'error');
+										}
+									});
+								};
+							})(group_admin.alias))
+						)
+				);
+			}
 		});
 	}
 
@@ -358,6 +400,23 @@ $('document').ready(function() {
 		var username = $('#username-admin').val();
 
 		omegaup.addAdminToContest(contestAlias, username, function(response) {
+			if (response.status == "ok") {
+				OmegaUp.ui.success(OmegaUp.T['adminAdded']);
+				$('div.post.footer').show();
+
+				refreshContestAdmins();
+			} else {
+				OmegaUp.ui.error(response.error || 'error');
+			}
+		});
+
+		return false; // Prevent refresh
+	});
+
+	$('#add-group-admin-form').submit(function() {
+		var groupalias = $('#groupalias-admin').val();
+
+		omegaup.addGroupAdminToContest(contestAlias, groupalias, function(response) {
 			if (response.status == "ok") {
 				OmegaUp.ui.success(OmegaUp.T['adminAdded']);
 				$('div.post.footer').show();

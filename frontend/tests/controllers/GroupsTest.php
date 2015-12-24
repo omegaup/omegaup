@@ -124,7 +124,7 @@ class GroupsTest extends OmegaupTestCase {
     /**
      * List of groups
      */
-    public function testGroupsList() {
+    public function testGroupsMyList() {
         // Create 5 groups for the same owner
         $owner = UserFactory::createUser();
         $groups = array();
@@ -137,7 +137,7 @@ class GroupsTest extends OmegaupTestCase {
         GroupsFactory::createGroup();
 
         // Call API
-        $response = GroupController::apiList(new Request(array(
+        $response = GroupController::apiMyList(new Request(array(
             'auth_token' => self::login($owner),
         )));
 

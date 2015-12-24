@@ -26,6 +26,15 @@ $(document).ready(function() {
 	}).on('typeahead:selected', function(item, val, text) {
 		$("#username-admin").val(val.label);
 	});
+	$('#groupalias-admin').typeahead({
+		minLength: 2,
+		highlight: true,
+	}, {
+		source: omegaup.searchGroups,
+		displayKey: 'label',
+	}).on('typeahead:selected', function(item, val, text) {
+		$('#groupalias-admin').val(val.label);
+	});
 
 	refreshProblemTags();
 	$("#tag-name").typeahead({
@@ -42,6 +51,23 @@ $(document).ready(function() {
 		var username = $('#username-admin').val();
 
 		omegaup.addAdminToProblem(problemAlias, username, function(response) {
+			if (response.status === "ok") {
+				OmegaUp.ui.success(OmegaUp.T.adminAdded);
+				$('div.post.footer').show();
+
+				refreshProblemAdmins();
+			} else {
+				OmegaUp.ui.error(response.error || 'error');
+			}
+		});
+
+		return false; // Prevent refresh
+	});
+
+	$('#add-group-admin-form').submit(function() {
+		var groupalias = $('#groupalias-admin').val();
+
+		omegaup.addGroupAdminToProblem(problemAlias, groupalias, function(response) {
 			if (response.status === "ok") {
 				OmegaUp.ui.success(OmegaUp.T.adminAdded);
 				$('div.post.footer').show();
@@ -98,6 +124,36 @@ $(document).ready(function() {
 									});
 								};
 							})(admin.username))
+						)
+				);
+			}
+			$('#problem-group-admins').empty();
+			// Got the contests, lets populate the dropdown with them
+			for (var i = 0; i < admins.group_admins.length; i++) {
+				var group_admin = admins.group_admins[i];
+				$('#problem-group-admins').append(
+					$('<tr></tr>')
+						.append($('<td></td>').append(
+							$('<a></a>')
+								.attr('href', '/group/' + group_admin.alias + '/edit/')
+								.text(group_admin.name)
+						))
+						.append($('<td></td>').text(group_admin.role))
+						.append((group_admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
+							.click((function(alias) {
+								return function(e) {
+									omegaup.removeGroupAdminFromProblem(problemAlias, alias, function(response) {
+										if (response.status == "ok") {
+											OmegaUp.ui.success(OmegaUp.T.adminAdded);
+											$('div.post.footer').show();
+											var tr = e.target.parentElement.parentElement;
+											$(tr).remove();
+										} else {
+											OmegaUp.ui.error(response.error || 'error');
+										}
+									});
+								};
+							})(group_admin.alias))
 						)
 				);
 			}

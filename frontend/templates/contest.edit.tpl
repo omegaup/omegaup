@@ -14,6 +14,7 @@
 	<li><a href="#publish" data-toggle="tab">{#makePublic#}</a></li>
 	<li><a href="#contestants" data-toggle="tab">{#contestAdduserAddContestant#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#omegaupTitleContestAddAdmin#}</a></li>
+	<li><a href="#group-admins" data-toggle="tab">{#omegaupTitleContestAddGroupAdmin#}</a></li>
 </ul>
 <div class="tab-content">
 	<div class="tab-pane active" id="edit">
@@ -143,7 +144,31 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="tab-pane" id="group-admins">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<form class="form" id="add-group-admin-form">
+					<div class="form-group">
+						<label for="groupalias-admin">{#wordsGroupAdmin#}</label>
+						<input id="groupalias-admin" name="alias" value="" type="text" size="20" class="form-control" autocomplete="off" />
+					</div>
+
+					<button class="btn btn-primary" type='submit'>{#contestAddgroupAddGroup#}</button>
+				</form>
+			</div>
+
+			<table class="table table-striped">
+				<thead>
+					<th>{#contestEditRegisteredGroupAdminName#}</th>
+					<th>{#contestEditRegisteredAdminRole#}</th>
+					<th>{#contestEditRegisteredAdminDelete#}</th>
+				</thead>
+				<tbody id="contest-group-admins"></tbody>
+			</table>
+		</div>
+	</div>
 </div>
 
-<script type="text/javascript" src="/js/contest.edit.js?ver=3a3670"></script>
+<script type="text/javascript" src="/js/contest.edit.js?ver=0370d3"></script>
 {include file='footer.tpl'}

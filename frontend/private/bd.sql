@@ -669,6 +669,21 @@ CREATE TABLE IF NOT EXISTS `Groups_Scoreboards_Contests` (
   KEY `group_scoreboard_id` (`group_scoreboard_id`),
   KEY `contest_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Estructura de tabla para la tabla `Group_Roles`
+--
+
+CREATE TABLE IF NOT EXISTS `Group_Roles` (
+  `group_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `contest_id` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`group_id`,`role_id`,`contest_id`),
+  KEY `group_id` (`group_id`),
+  KEY `role_id` (`role_id`),
+  KEY `contest_id` (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los grupos.';
+
 --
 -- Restricciones para tablas volcadas
 --
@@ -774,6 +789,13 @@ ALTER TABLE `Emails`
 ALTER TABLE `Favorites`
   ADD CONSTRAINT `fk_f_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_f_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Group_Roles`
+--
+ALTER TABLE `Group_Roles`
+  ADD CONSTRAINT `fk_gr_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_gr_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Languages`
