@@ -5,6 +5,9 @@ define('IS_TEST', TRUE);
 // Set timezone to UTC
 date_default_timezone_set('UTC');
 
+// Set remote address to localhost.
+$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
 define("OMEGAUP_ROOT", __DIR__ . "/..");
 // Load test specific config globals
 // Do not panic if the test-specific override file is not present.

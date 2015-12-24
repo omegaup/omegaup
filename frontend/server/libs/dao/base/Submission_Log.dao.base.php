@@ -8,59 +8,59 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** ContestUserRequest Data Access Object (DAO) Base.
+/** SubmissionLog Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link ContestUserRequest }. 
+  * almacenar de forma permanente y recuperar instancias de objetos {@link SubmissionLog }. 
   * @access public
   * @abstract
   * 
   */
-abstract class ContestUserRequestDAOBase extends DAO
+abstract class SubmissionLogDAOBase extends DAO
 {
 
 	/**
 	  *	Guardar registros. 
 	  *	
-	  *	Este metodo guarda el estado actual del objeto {@link ContestUserRequest} pasado en la base de datos. La llave 
+	  *	Este metodo guarda el estado actual del objeto {@link SubmissionLog} pasado en la base de datos. La llave 
 	  *	primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
 	  *	primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
 	  *	en ese objeto el ID recien creado.
 	  *	
 	  *	@static
 	  * @throws Exception si la operacion fallo.
-	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
+	  * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( $Contest_User_Request )
+	public static final function save( $Submission_Log )
 	{
-		if (!is_null(self::getByPK( $Contest_User_Request->getUserId() , $Contest_User_Request->getContestId() )))
+		if (!is_null(self::getByPK( $Submission_Log->getRunId() )))
 		{
-			return ContestUserRequestDAOBase::update( $Contest_User_Request);
+			return SubmissionLogDAOBase::update( $Submission_Log);
 		} else {
-			return ContestUserRequestDAOBase::create( $Contest_User_Request);
+			return SubmissionLogDAOBase::create( $Submission_Log);
 		}
 	}
 
 
 	/**
-	  *	Obtener {@link ContestUserRequest} por llave primaria. 
+	  *	Obtener {@link SubmissionLog} por llave primaria. 
 	  *	
-	  * Este metodo cargara un objeto {@link ContestUserRequest} de la base de datos 
+	  * Este metodo cargara un objeto {@link SubmissionLog} de la base de datos 
 	  * usando sus llaves primarias. 
 	  *	
 	  *	@static
-	  * @return @link ContestUserRequest Un objeto del tipo {@link ContestUserRequest}. NULL si no hay tal registro.
+	  * @return @link SubmissionLog Un objeto del tipo {@link SubmissionLog}. NULL si no hay tal registro.
 	  **/
-	public static final function getByPK(  $user_id, $contest_id )
+	public static final function getByPK(  $run_id )
 	{
-		if(  is_null( $user_id ) || is_null( $contest_id )  ){ return NULL; }
-		$sql = "SELECT * FROM Contest_User_Request WHERE (user_id = ? AND contest_id = ? ) LIMIT 1;";
-		$params = array(  $user_id, $contest_id );
+		if(  is_null( $run_id )  ){ return NULL; }
+		$sql = "SELECT * FROM Submission_Log WHERE (run_id = ? ) LIMIT 1;";
+		$params = array(  $run_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0) return NULL;
-		$foo = new ContestUserRequest( $rs );
+		$foo = new SubmissionLog( $rs );
 		return $foo;
 	}
 
@@ -68,7 +68,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 	  *	Obtener todas las filas.
 	  *	
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-	  * un vector que contiene objetos de tipo {@link ContestUserRequest}. Tenga en cuenta que este metodo
+	  * un vector que contiene objetos de tipo {@link SubmissionLog}. Tenga en cuenta que este metodo
 	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
 	  *	
@@ -77,11 +77,11 @@ abstract class ContestUserRequestDAOBase extends DAO
 	  * @param $columnas_por_pagina Columnas por pagina.
 	  * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-	  * @return Array Un arreglo que contiene objetos del tipo {@link ContestUserRequest}.
+	  * @return Array Un arreglo que contiene objetos del tipo {@link SubmissionLog}.
 	  **/
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
-		$sql = "SELECT * from Contest_User_Request";
+		$sql = "SELECT * from Submission_Log";
 		if( ! is_null ( $orden ) )
 		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
@@ -92,7 +92,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 		$rs = $conn->Execute($sql);
 		$allData = array();
 		foreach ($rs as $foo) {
-			$bar = new ContestUserRequest($foo);
+			$bar = new SubmissionLog($foo);
     		array_push( $allData, $bar);
 		}
 		return $allData;
@@ -102,7 +102,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 	/**
 	  *	Buscar registros.
 	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestUserRequest} de la base de datos. 
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link SubmissionLog} de la base de datos. 
 	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
 	  *	
@@ -119,41 +119,37 @@ abstract class ContestUserRequestDAOBase extends DAO
 	  *	  }
 	  * </code>
 	  *	@static
-	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
+	  * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $Contest_User_Request , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
+	public static final function search( $Submission_Log , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
-		if (!($Contest_User_Request instanceof ContestUserRequest)) {
-			return self::search(new ContestUserRequest($Contest_User_Request));
+		if (!($Submission_Log instanceof SubmissionLog)) {
+			return self::search(new SubmissionLog($Submission_Log));
 		}
 
-		$sql = "SELECT * from Contest_User_Request WHERE ("; 
+		$sql = "SELECT * from Submission_Log WHERE ("; 
 		$val = array();
-		if (!is_null( $Contest_User_Request->getUserId())) {
-			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Contest_User_Request->getUserId() );
-		}
-		if (!is_null( $Contest_User_Request->getContestId())) {
+		if (!is_null( $Submission_Log->getContestId())) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Contest_User_Request->getContestId() );
+			array_push( $val, $Submission_Log->getContestId() );
 		}
-		if (!is_null( $Contest_User_Request->getRequestTime())) {
-			$sql .= " `request_time` = ? AND";
-			array_push( $val, $Contest_User_Request->getRequestTime() );
+		if (!is_null( $Submission_Log->getRunId())) {
+			$sql .= " `run_id` = ? AND";
+			array_push( $val, $Submission_Log->getRunId() );
 		}
-		if (!is_null( $Contest_User_Request->getLastUpdate())) {
-			$sql .= " `last_update` = ? AND";
-			array_push( $val, $Contest_User_Request->getLastUpdate() );
+		if (!is_null( $Submission_Log->getUserId())) {
+			$sql .= " `user_id` = ? AND";
+			array_push( $val, $Submission_Log->getUserId() );
 		}
-		if (!is_null( $Contest_User_Request->getAccepted())) {
-			$sql .= " `accepted` = ? AND";
-			array_push( $val, $Contest_User_Request->getAccepted() );
+		if (!is_null( $Submission_Log->getIp())) {
+			$sql .= " `ip` = ? AND";
+			array_push( $val, $Submission_Log->getIp() );
 		}
-		if (!is_null( $Contest_User_Request->getExtraNote())) {
-			$sql .= " `extra_note` = ? AND";
-			array_push( $val, $Contest_User_Request->getExtraNote() );
+		if (!is_null( $Submission_Log->getTime())) {
+			$sql .= " `time` = ? AND";
+			array_push( $val, $Submission_Log->getTime() );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -176,7 +172,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
-			$bar =  new ContestUserRequest($foo);
+			$bar =  new SubmissionLog($foo);
 			array_push( $ar,$bar);
 		}
 		return $ar;
@@ -186,17 +182,17 @@ abstract class ContestUserRequestDAOBase extends DAO
 	  *	Actualizar registros.
 	  *
 	  * @return Filas afectadas
-	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest a actualizar.
+	  * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog a actualizar.
 	  **/
-	private static final function update($Contest_User_Request)
+	private static final function update($Submission_Log)
 	{
-		$sql = "UPDATE Contest_User_Request SET  `request_time` = ?, `last_update` = ?, `accepted` = ?, `extra_note` = ? WHERE  `user_id` = ? AND `contest_id` = ?;";
+		$sql = "UPDATE Submission_Log SET  `contest_id` = ?, `user_id` = ?, `ip` = ?, `time` = ? WHERE  `run_id` = ?;";
 		$params = array( 
-			$Contest_User_Request->getRequestTime(), 
-			$Contest_User_Request->getLastUpdate(), 
-			$Contest_User_Request->getAccepted(), 
-			$Contest_User_Request->getExtraNote(), 
-			$Contest_User_Request->getUserId(),$Contest_User_Request->getContestId(), );
+			$Submission_Log->getContestId(), 
+			$Submission_Log->getUserId(), 
+			$Submission_Log->getIp(), 
+			$Submission_Log->getTime(), 
+			$Submission_Log->getRunId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -206,25 +202,24 @@ abstract class ContestUserRequestDAOBase extends DAO
 	  *	Crear registros.
 	  *	
 	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
-	  * contenidos del objeto ContestUserRequest suministrado. Asegurese
+	  * contenidos del objeto SubmissionLog suministrado. Asegurese
 	  * de que los valores para todas las columnas NOT NULL se ha especificado 
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
-	  * primaria generada en el objeto ContestUserRequest dentro de la misma transaccion.
+	  * primaria generada en el objeto SubmissionLog dentro de la misma transaccion.
 	  *	
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest a crear.
+	  * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog a crear.
 	  **/
-	private static final function create( $Contest_User_Request )
+	private static final function create( $Submission_Log )
 	{
-		if (is_null($Contest_User_Request->request_time)) $Contest_User_Request->request_time = gmdate('Y-m-d H:i:s');
-		$sql = "INSERT INTO Contest_User_Request ( `user_id`, `contest_id`, `request_time`, `last_update`, `accepted`, `extra_note` ) VALUES ( ?, ?, ?, ?, ?, ?);";
+		if (is_null($Submission_Log->time)) $Submission_Log->time = gmdate('Y-m-d H:i:s');
+		$sql = "INSERT INTO Submission_Log ( `contest_id`, `run_id`, `user_id`, `ip`, `time` ) VALUES ( ?, ?, ?, ?, ?);";
 		$params = array( 
-			$Contest_User_Request->user_id,
-			$Contest_User_Request->contest_id,
-			$Contest_User_Request->request_time,
-			$Contest_User_Request->last_update,
-			$Contest_User_Request->accepted,
-			$Contest_User_Request->extra_note,
+			$Submission_Log->contest_id,
+			$Submission_Log->run_id,
+			$Submission_Log->user_id,
+			$Submission_Log->ip,
+			$Submission_Log->time,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -237,8 +232,8 @@ abstract class ContestUserRequestDAOBase extends DAO
 	/**
 	  *	Buscar por rango.
 	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestUserRequest} de la base de datos siempre y cuando 
-	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ContestUserRequest}.
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link SubmissionLog} de la base de datos siempre y cuando 
+	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link SubmissionLog}.
 	  * 
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -262,27 +257,16 @@ abstract class ContestUserRequestDAOBase extends DAO
 	  *	  }
 	  * </code>
 	  *	@static
-	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
-	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
+	  * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog
+	  * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function byRange( $Contest_User_RequestA , $Contest_User_RequestB , $orderBy = null, $orden = 'ASC')
+	public static final function byRange( $Submission_LogA , $Submission_LogB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Contest_User_Request WHERE ("; 
+		$sql = "SELECT * from Submission_Log WHERE ("; 
 		$val = array();
-		if( ( !is_null (($a = $Contest_User_RequestA->getUserId()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getUserId()) ) ) ){
-				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
-		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `user_id` = ? AND"; 
-			$a = is_null ( $a ) ? $b : $a;
-			array_push( $val, $a);
-			
-		}
-
-		if( ( !is_null (($a = $Contest_User_RequestA->getContestId()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $Submission_LogA->getContestId()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getContestId()) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
@@ -293,45 +277,45 @@ abstract class ContestUserRequestDAOBase extends DAO
 			
 		}
 
-		if( ( !is_null (($a = $Contest_User_RequestA->getRequestTime()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getRequestTime()) ) ) ){
-				$sql .= " `request_time` >= ? AND `request_time` <= ? AND";
+		if( ( !is_null (($a = $Submission_LogA->getRunId()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getRunId()) ) ) ){
+				$sql .= " `run_id` >= ? AND `run_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `request_time` = ? AND"; 
+			$sql .= " `run_id` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( ( !is_null (($a = $Contest_User_RequestA->getLastUpdate()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getLastUpdate()) ) ) ){
-				$sql .= " `last_update` >= ? AND `last_update` <= ? AND";
+		if( ( !is_null (($a = $Submission_LogA->getUserId()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getUserId()) ) ) ){
+				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `last_update` = ? AND"; 
+			$sql .= " `user_id` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( ( !is_null (($a = $Contest_User_RequestA->getAccepted()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getAccepted()) ) ) ){
-				$sql .= " `accepted` >= ? AND `accepted` <= ? AND";
+		if( ( !is_null (($a = $Submission_LogA->getIp()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getIp()) ) ) ){
+				$sql .= " `ip` >= ? AND `ip` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `accepted` = ? AND"; 
+			$sql .= " `ip` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( ( !is_null (($a = $Contest_User_RequestA->getExtraNote()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getExtraNote()) ) ) ){
-				$sql .= " `extra_note` >= ? AND `extra_note` <= ? AND";
+		if( ( !is_null (($a = $Submission_LogA->getTime()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getTime()) ) ) ){
+				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `extra_note` = ? AND"; 
+			$sql .= " `time` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
@@ -346,7 +330,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $row) {
-			array_push( $ar, $bar = new ContestUserRequest($row));
+			array_push( $ar, $bar = new SubmissionLog($row));
 		}
 		return $ar;
 	}
@@ -355,20 +339,20 @@ abstract class ContestUserRequestDAOBase extends DAO
 	  *	Eliminar registros.
 	  *	
 	  * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-	  * en el objeto ContestUserRequest suministrado. Una vez que se ha suprimido un objeto, este no 
+	  * en el objeto SubmissionLog suministrado. Una vez que se ha suprimido un objeto, este no 
 	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila 
 	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. 
 	  * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
 	  *	
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
-	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest a eliminar
+	  * @param SubmissionLog [$Submission_Log] El objeto de tipo SubmissionLog a eliminar
 	  **/
-	public static final function delete( $Contest_User_Request )
+	public static final function delete( $Submission_Log )
 	{
-		if( is_null( self::getByPK($Contest_User_Request->getUserId(), $Contest_User_Request->getContestId()) ) ) throw new Exception('Campo no encontrado.');
-		$sql = "DELETE FROM Contest_User_Request WHERE  user_id = ? AND contest_id = ?;";
-		$params = array( $Contest_User_Request->getUserId(), $Contest_User_Request->getContestId() );
+		if( is_null( self::getByPK($Submission_Log->getRunId()) ) ) throw new Exception('Campo no encontrado.');
+		$sql = "DELETE FROM Submission_Log WHERE  run_id = ?;";
+		$params = array( $Submission_Log->getRunId() );
 		global $conn;
 
 		$conn->Execute($sql, $params);

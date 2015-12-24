@@ -95,6 +95,12 @@ class ContestDetailsTest extends OmegaupTestCase {
 		// Get a user for our scenario
 		$contestant = UserFactory::createUser();
 
+		// Assert the log is empty.
+		$this->assertEquals(0, count(ContestAccessLogDAO::search(array(
+			'contest_id' => $contestData['contest']->contest_id,
+			'user_id' => $contestant->user_id,
+		))));
+
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
@@ -109,6 +115,12 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$response = ContestController::apiDetails($r);
 
 		$this->assertContestDetails($contestData, $problems, $response);
+
+		// Assert the log is not empty.
+		$this->assertEquals(1, count(ContestAccessLogDAO::search(array(
+			'contest_id' => $contestData['contest']->contest_id,
+			'user_id' => $contestant->user_id,
+		))));
 	}
 
 	/**
@@ -354,6 +366,8 @@ class ContestDetailsTest extends OmegaupTestCase {
 		// Create our user not added to the contest
 		$externalUser = UserFactory::createUser();
 
+		$originalContestAccessLog = ContestAccessLogDAO::getAll();
+
 		// Get the scoreboard url by using the MyList api being the
 		// contest director
 		$response = ContestController::apiMyList(new Request(array(
@@ -391,6 +405,9 @@ class ContestDetailsTest extends OmegaupTestCase {
 
 		$this->assertContestDetails($contestData, array(), $detailsResponse);
 
+		// All requests were done using tokens, so the log must be identical.
+		$contestAccessLog = ContestAccessLogDAO::getAll();
+		$this->assertEquals($originalContestAccessLog, $contestAccessLog);
 	}
 
 	/**
