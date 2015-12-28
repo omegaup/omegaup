@@ -529,6 +529,13 @@ class ContestController extends Controller {
 						strtotime($r["contest"]->getFinishTime()), strtotime($contest_user->access_time) + $r["contest"]->getWindowLength() * 60);
 			}
 			$result['admin'] = Authorization::IsContestAdmin($r["current_user_id"], $r["contest"]);
+
+			// Log the operation.
+			ContestAccessLogDAO::save(new ContestAccessLog(array(
+				'user_id' => $r['current_user_id'],
+				'contest_id' => $r['contest']->contest_id,
+				'ip' => ip2long($_SERVER['REMOTE_ADDR']),
+			)));
 		}
 
 		$result["status"] = "ok";
@@ -557,6 +564,90 @@ class ContestController extends Controller {
 		$result["status"] = "ok";
 		$result['admin'] = true;
 		return $result;
+	}
+
+	/**
+	 * Returns a report with all user activity for a contest.
+	 *
+	 * @param Request $r
+	 * @return array
+	 * @throws InvalidDatabaseOperationException
+	 */
+	public static function apiActivityReport(Request $r) {
+		self::validateDetails($r);
+
+		if (!$r['contest_admin']) {
+			throw new ForbiddenAccessException();
+		}
+
+		$accesses = ContestAccessLogDAO::GetAccessForContest($r['contest']);
+		$submissions = SubmissionLogDAO::GetSubmissionsForContest($r['contest']);
+
+		// Merge both logs.
+		$result['events'] = array();
+		$lenAccesses = count($accesses);
+		$lenSubmissions = count($submissions);
+		$iAccesses = 0;
+		$iSubmissions = 0;
+
+		while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
+			if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
+				array_push($result['events'], ContestController::processAccess(
+					$accesses[$iAccesses++]
+				));
+			} else {
+				array_push($result['events'], ContestController::processSubmission(
+					$submissions[$iSubmissions++]
+				));
+			}
+		}
+
+		while ($iAccesses < $lenAccesses) {
+			array_push($result['events'], ContestController::processAccess(
+				$accesses[$iAccesses++]
+			));
+		}
+
+		while ($iSubmissions < $lenSubmissions) {
+			array_push($result['events'], ContestController::processSubmission(
+				$submissions[$iSubmissions++]
+			));
+		}
+
+		// Anonimize data.
+		$ipMapping = array();
+		foreach ($result['events'] as &$entry) {
+			if (!array_key_exists($entry['ip'], $ipMapping)) {
+				$ipMapping[$entry['ip']] = count($ipMapping);
+			}
+			$entry['ip'] = $ipMapping[$entry['ip']];
+		}
+
+		$result["status"] = "ok";
+		return $result;
+	}
+
+	private static function processAccess(&$access) {
+		return array(
+			'username' => $access['username'],
+			'time' => (int)$access['time'],
+			'ip' => (int)$access['ip'],
+			'event' => array(
+				'name' => 'open',
+			),
+		);
+	}
+
+	private static function processSubmission(&$submission) {
+		return array(
+			'username' => $submission['username'],
+			'time' => (int)$submission['time'],
+			'ip' => (int)$submission['ip'],
+			'event' => array(
+				'name' => 'submit',
+				'problem' => $submission['alias'],
+			),
+		);
 	}
 
 	/**

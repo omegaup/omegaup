@@ -166,7 +166,7 @@ class SessionController extends Controller {
 			'is_admin' => Authorization::IsSystemAdmin($vo_CurrentUser->getUserId()),
 			'private_contests_count' => ContestsDAO::getPrivateContestsCount($vo_CurrentUser),
 			'private_problems_count' => ProblemsDAO::getPrivateCount($vo_CurrentUser),
-			'needs_basic_info' =>$vo_CurrentUser->getPassword() == NULL 
+			'needs_basic_info' =>$vo_CurrentUser->getPassword() == NULL
 		);
 	}
 
@@ -187,7 +187,7 @@ class SessionController extends Controller {
 		try {
 			AuthTokensDAO::delete($vo_AuthT);
 		} catch (Exception $e) {
-			
+
 		}
 
 		unset($_SESSION['omegaup_user']);
@@ -195,6 +195,12 @@ class SessionController extends Controller {
 	}
 
 	private function RegisterSession(Users $vo_User, $b_ReturnAuthTokenAsString = false) {
+		// Log the login.
+		UserLoginLogDAO::save(new UserLoginLog(array(
+			'user_id' => $vo_User->user_id,
+			'ip' => ip2long($_SERVER['REMOTE_ADDR']),
+		)));
+
 		// Expire the local session cache.
 		self::$current_session = null;
 
@@ -223,14 +229,14 @@ class SessionController extends Controller {
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-			
+
 		if (self::$setCookieOnRegisterSession) {
 			$sm = $this->getSessionManagerInstance();
 			$sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, 0, '/');
 		}
 
 		Cache::deleteFromCache(Cache::SESSION_PREFIX, $s_AuthT);
-		
+
 		if ($b_ReturnAuthTokenAsString) {
 			return $s_AuthT;
 		}
@@ -251,7 +257,7 @@ class SessionController extends Controller {
 
 		$suffix = "";
 		for (;;) {
-			// Maybe we can bring all records from db 
+			// Maybe we can bring all records from db
 			// with prefix $username, beacuse this:
 			$userexists = UsersDAO::FindByUsername($username . $suffix);
 			// will query db every single time probably.
@@ -352,7 +358,7 @@ class SessionController extends Controller {
 		//ok, the user does not have any auth token
 		//if he wants to test facebook login
 		//Facebook must send me the state=something
-		//query, so i dont have to be testing 
+		//query, so i dont have to be testing
 		//facebook sessions on every single petition
 		//made from the front-end
 		if (!isset($_GET["state"])) {
@@ -393,7 +399,7 @@ class SessionController extends Controller {
 		//time the user has been here, lets register his info
 		self::$log->info("User is logged in via facebook !!");
 
-		$results = UsersDAO::FindByEmail( $fb_user_profile["email"] );	
+		$results = UsersDAO::FindByEmail( $fb_user_profile["email"] );
 
 		if (!is_null($results)) {
 			//user has been here before with facebook!
@@ -433,7 +439,7 @@ class SessionController extends Controller {
 		//any auth token, lets give him one
 		//so we dont have to call facebook to see
 		//if he is still logged in, and he can call
-		//the api 
+		//the api
 		$this->RegisterSession($vo_User);
 	}
 
@@ -442,7 +448,7 @@ class SessionController extends Controller {
 	 * Expects in request:
 	 * usernameOrEmail
 	 * password
-	 * 
+	 *
 	 * @param Request $r
 	 * @return boolean
 	 */
@@ -475,12 +481,13 @@ class SessionController extends Controller {
 		}
 
 		self::$log->info("User " . $r["usernameOrEmail"] . " has loged in natively.");
-		
+
 		UserController::checkEmailVerification($r);
-		
+
 		try {
 			return $this->RegisterSession($vo_User, $returnAuthToken);
 		} catch (Exception $e) {
+			self::$log->error($e);
 			return false;
 			//@TODO actuar en base a la exception
 		}

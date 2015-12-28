@@ -54,9 +54,6 @@ class RunCreateTest extends OmegaupTestCase {
 		$r["language"] = "c";
 		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 
-		//PHPUnit does not set IP address, doing it manually
-		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
-
 		return $r;
 	}
 
@@ -95,7 +92,13 @@ class RunCreateTest extends OmegaupTestCase {
 		$this->assertEquals(0, $run->getMemory());
 		$this->assertEquals(0, $run->getScore());
 		$this->assertEquals(0, $run->getContestScore());
-		$this->assertEquals("127.0.0.1", $run->getIp());
+
+		$logs = SubmissionLogDAO::search(array(
+			"run_id" => $run->run_id
+		));
+
+		$this->assertEquals(1, count($logs));
+		$this->assertEquals(ip2long("127.0.0.1"), $logs[0]->ip);
 
 		if (!is_null($contest)) {
 			$this->assertEquals((time() - intval(strtotime($contest->getStartTime()))) / 60, $run->penalty, '', 0.5);
@@ -445,9 +448,6 @@ class RunCreateTest extends OmegaupTestCase {
 		$r["language"] = "c";
 		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 
-		//PHPUnit does not set IP address, doing it manually
-		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
-
 		// Call API
 		$this->detourGraderCalls($this->exactly(1));
 		$response = RunController::apiCreate($r);
@@ -478,9 +478,6 @@ class RunCreateTest extends OmegaupTestCase {
 		$r["problem_alias"] = $problemData["request"]["alias"];
 		$r["language"] = "c";
 		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
-
-		//PHPUnit does not set IP address, doing it manually
-		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
 
 		// Call API
 		$response = RunController::apiCreate($r);
@@ -521,9 +518,6 @@ class RunCreateTest extends OmegaupTestCase {
 		$r["language"] = "c";
 		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 
-		//PHPUnit does not set IP address, doing it manually
-		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
-
 		// Call API
 		$response = RunController::apiCreate($r);
 	}
@@ -561,9 +555,6 @@ class RunCreateTest extends OmegaupTestCase {
 		$r["language"] = "c";
 		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 
-		//PHPUnit does not set IP address, doing it manually
-		$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
-
 		// Call API
 		$response = RunController::apiCreate($r);
 	}
@@ -594,9 +585,6 @@ class RunCreateTest extends OmegaupTestCase {
 			$r["problem_alias"] = $problemData["request"]["alias"];
 			$r["language"] = "c";
 			$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
-
-			//PHPUnit does not set IP address, doing it manually
-			$_SERVER["REMOTE_ADDR"] = "127.0.0.1";
 
 			// Call API
 			$this->detourGraderCalls($this->exactly(1));

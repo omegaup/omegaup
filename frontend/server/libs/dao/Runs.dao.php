@@ -634,11 +634,6 @@ class RunsDAO extends RunsDAOBase {
 			array_push($val, $Runs->getContestScore());
 		}
 
-		if ($Runs->getIp() != NULL) {
-			$sql .= " ip = ? AND";
-			array_push($val, $Runs->getIp());
-		}
-
 		if ($Runs->getTime() != NULL) {
 			$sql .= " time = ? AND";
 			array_push($val, $Runs->getTime());

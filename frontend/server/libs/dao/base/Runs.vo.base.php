@@ -71,9 +71,6 @@ class Runs extends VO
 			if (isset($data['contest_score'])) {
 				$this->contest_score = $data['contest_score'];
 			}
-			if (isset($data['ip'])) {
-				$this->ip = $data['ip'];
-			}
 			if (isset($data['time'])) {
 				$this->time = $data['time'];
 			}
@@ -112,7 +109,6 @@ class Runs extends VO
 			"memory" => $this->memory,
 			"score" => $this->score,
 			"contest_score" => $this->contest_score,
-			"ip" => $this->ip,
 			"time" => $this->time,
 			"submit_delay" => $this->submit_delay,
 			"test" => $this->test,
@@ -223,13 +219,6 @@ class Runs extends VO
 	  * @var double
 	  */
 	public $contest_score;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var char(15)
-	  */
-	public $ip;
 
 	/**
 	  *  [Campo no documentado]

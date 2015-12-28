@@ -80,7 +80,7 @@ class Utils {
 	}
 
 	static function GetDbDatetime() {
-		// Go to the DB 
+		// Go to the DB
 		global $conn;
 
 		$sql = "SELECT NOW() n";
@@ -141,28 +141,31 @@ class Utils {
 			'Users',
 			'Groups_Users',
 			'Groups_Scoreboards_Contests',
-			'Groups_Scoreboards',			
+			'Groups_Scoreboards',
 			'Groups',
 			'Contest_User_Request',
-			'Contest_User_Request_History'
+			'Contest_User_Request_History',
+			'Submission_Log',
+			'User_Login_Log',
+			'Contest_Access_Log'
 		);
 
 		try {
-			// Disable foreign checks 
+			// Disable foreign checks
 			$conn->Execute("SET foreign_key_checks = 0;");
-			
+
 			foreach ($tables as $t) {
 				$sql = "TRUNCATE TABLE `" . $t . "`; ";
 				$conn->Execute($sql);
 			}
-			
+
 			// Enabling them again
 			$conn->Execute("SET foreign_key_checks = 1;");
 		} catch (Exception $e) {
 			echo "Cleanup DB error. Tests will continue anyways:";
 			var_dump($sql);
 			var_dump($e->getMessage());
-			
+
 			$conn->Execute("SET foreign_key_checks = 1;");
 		}
 	}

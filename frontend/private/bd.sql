@@ -147,6 +147,43 @@ CREATE TABLE IF NOT EXISTS `Contests_Users` (
   KEY `contest_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden participar en concurso cerrado.';
 
+--
+-- Estructura de tabla para la tabla `User_Login_Log`
+--
+
+CREATE TABLE IF NOT EXISTS `User_Login_Log` (
+	`user_id` int(11) NOT NULL,
+	`ip` int UNSIGNED NOT NULL,
+	`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de inicios de sesión exitosos';
+
+--
+-- Estructura de tabla para la tabla `Contest_Access_Log`
+--
+
+CREATE TABLE IF NOT EXISTS `Contest_Access_Log` (
+	`contest_id` int(11) NOT NULL,
+	`user_id` int(11) NOT NULL,
+	`ip` int UNSIGNED NOT NULL,
+	`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	KEY `contest_id` (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de acceso a concursos';
+
+--
+-- Estructura de tabla para la tabla `Submission_Log`
+--
+
+CREATE TABLE IF NOT EXISTS `Submission_Log` (
+	`contest_id` int(11) NULL DEFAULT NULL,
+	`run_id` int(11) NOT NULL,
+	`user_id` int(11) NOT NULL,
+	`ip` int UNSIGNED NOT NULL,
+	`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`run_id`),
+	KEY `contest_id` (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de envíos';
+
 -- --------------------------------------------------------
 
 --
@@ -453,7 +490,6 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `memory` int(11) NOT NULL DEFAULT '0',
   `score` double NOT NULL DEFAULT '0',
   `contest_score` double NULL DEFAULT NULL,
-  `ip` char(15) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',
   `test` tinyint(1) NOT NULL DEFAULT '0',
@@ -680,6 +716,27 @@ ALTER TABLE `Contests`
 ALTER TABLE `Contests_Users`
   ADD CONSTRAINT `fk_cuc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Contest_Access_Log`
+--
+ALTER TABLE `Contest_Access_Log`
+  ADD CONSTRAINT `fk_calc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_calu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `User_Login_Log`
+--
+ALTER TABLE `User_Login_Log`
+  ADD CONSTRAINT `fk_ullu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `Submission_Log`
+--
+ALTER TABLE `Submission_Log`
+  ADD CONSTRAINT `fk_slc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_slr_run_id` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_slu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problem_Tags`

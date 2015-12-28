@@ -243,7 +243,6 @@ class RunController extends Controller {
 					"memory" => 0,
 					"score" => 0,
 					"contest_score" => $contest_id != null ? 0 : null,
-					"ip" => $_SERVER['REMOTE_ADDR'],
 					"submit_delay" => $submit_delay, /* based on penalty_type */
 					"guid" => md5(uniqid(rand(), true)),
 					"verdict" => "JE",
@@ -253,6 +252,13 @@ class RunController extends Controller {
 		try {
 			// Push run into DB
 			RunsDAO::save($run);
+
+			SubmissionLogDAO::save(new SubmissionLog(array(
+				"user_id" => $run->user_id,
+				"run_id" => $run->run_id,
+				"contest_id" => $run->contest_id,
+				"ip" => ip2long($_SERVER['REMOTE_ADDR'])
+			)));
 
 			// Update submissions counter++
 			$r["problem"]->setSubmissions($r["problem"]->getSubmissions() + 1);
