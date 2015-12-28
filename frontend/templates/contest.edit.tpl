@@ -26,7 +26,7 @@
 				<form class="form" id="add-problem-form">
 					<div class="form-group">
 						<label for="problems-dropdown">{#wordsProblems#}</label>
-						<input class="typeahead form-control" name="problems" id="problems-dropdown" 
+						<input class="typeahead form-control" name="problems" id="problems-dropdown"
 							autocomplete="off" />
 					</div>
 
@@ -71,7 +71,7 @@
 						</select>
 						<p class="help-block">{#contestNewFormPublicDesc#}</p>
 					</div>
-					
+
 					<button class="btn btn-primary" type='submit'>{#wordsSaveChanges#}</button>
 				</form>
 			</div>
@@ -145,5 +145,5 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/contest.edit.js?ver=bafadc"></script>
+<script type="text/javascript" src="/js/contest.edit.js?ver=3a3670"></script>
 {include file='footer.tpl'}

@@ -21,7 +21,6 @@ class ContestsDAO extends ContestsDAOBase
 {
 	public static final function getByAlias($alias)
 	{
-
 		$sql = "SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;";
 		$params = array(  $alias );
 
@@ -32,11 +31,9 @@ class ContestsDAO extends ContestsDAOBase
         $contest = new Contests( $rs );
 
         return $contest;
-
 	}
 
 	public static function getPrivateContestsCount(Users $user) {
-
 		$sql = "SELECT count(*) as Total FROM Contests WHERE public = 0 and (director_id = ?);";
 		$params = array($user->getUserId());
 
@@ -71,7 +68,7 @@ class ContestsDAO extends ContestsDAOBase
 
 		return time() <= strtotime($first_access_time) + $contest->window_length * 60;
 	}
-	
+
 	public static function getContestsParticipated($user_id) {
 		$sql = "SELECT * from Contests WHERE contest_id IN ("
 					. "SELECT DISTINCT contest_id FROM Runs WHERE user_id = ? AND test = 0 AND contest_id IS NOT NULL"
@@ -86,6 +83,6 @@ class ContestsDAO extends ContestsDAOBase
 			$bar =  new Contests($foo);
 			array_push($ar,$bar);
 		}
-		return $ar;		
+		return $ar;
 	}
 }

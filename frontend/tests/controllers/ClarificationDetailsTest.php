@@ -6,17 +6,14 @@
  * @author joemmanuel
  */
 
-
 class DetailsClarificationTest extends OmegaupTestCase {
-
 	/**
 	 * Validates a clarification given the clarification ID
-	 * 
+	 *
 	 * @param int $clarification_id
 	 * @param array $response
 	 */
 	private function assertClarification($clarification_id, $response) {
-
 		// Get the actual clarification from DB to compare it with what we got
 		$clarification = ClarificationsDAO::getByPK($clarification_id);
 
@@ -33,11 +30,10 @@ class DetailsClarificationTest extends OmegaupTestCase {
 	 * clarifications
 	 */
 	public function testShowClarificationAsContestDirector() {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
@@ -70,11 +66,10 @@ class DetailsClarificationTest extends OmegaupTestCase {
 	 * see it, even though it is private by default for everybody else
 	 */
 	public function testShowClarificationAsOriginalContestant() {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
@@ -104,15 +99,14 @@ class DetailsClarificationTest extends OmegaupTestCase {
 
 	/**
 	 * Checks that private clarifications cant be viewed by someone else
-	 * 
+	 *
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testClarificationsCreatedPrivateAsDefault() {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
@@ -141,11 +135,10 @@ class DetailsClarificationTest extends OmegaupTestCase {
 	}
 
 	public function testPublicClarificationsCanBeViewed() {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
@@ -180,6 +173,5 @@ class DetailsClarificationTest extends OmegaupTestCase {
 		// Check the data we got
 		$this->assertClarification($r["clarification_id"], $response);
 	}
-
 }
 

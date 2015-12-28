@@ -74,7 +74,6 @@ OmegaUp.ui = {
 		// Wait for all
 		$(document).ajaxStop(function() {
 			if (!isStopExecuted) {
-
 				// Make sure we execute this block once. onOperationFinish might have
 				// async calls that would fire ajaxStop event
 				isStopExecuted = true;
@@ -705,7 +704,6 @@ OmegaUp.prototype.updateBasicProfile = function(username, name, password, callba
 };
 
 OmegaUp.prototype.updateMainEmail = function(email, callback) {
-
 	var self = this;
 
 	$.post(
@@ -976,7 +974,6 @@ OmegaUp.prototype.addScoreboardToGroup = function(groupAlias, alias, name, descr
 		}
 	});
 };
-
 
 OmegaUp.prototype.addContestToScoreboard = function(groupAlias, scoreboardAlias, contestAlias, onlyAC, weight, callback) {
 	var self = this;
@@ -1553,7 +1550,6 @@ OmegaUp.prototype.getProblemsSolved = function(username, callback) {
 	});
 };
 
-
 OmegaUp.prototype.getRuns = function(options, callback) {
 	var self = this;
 
@@ -1843,7 +1839,6 @@ OmegaUp.prototype.getScoreboardMerge = function(contestAliases, callback) {
 	});
 };
 
-
 OmegaUp.prototype.getGraderStats = function(callback) {
 	var self = this;
 
@@ -1932,8 +1927,6 @@ OmegaUp.prototype.updateClarification = function(clarificationId, answer, public
 	});
 };
 
-
-
 OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school, password, oldPassword, callback ){
 	var self = this,
 		toSend = {};
@@ -1945,7 +1938,6 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	if(school !== null) toSend.school = school;
 	if(password !== null) toSend.password = password;
 	if(oldPassword !== null) toSend.oldPassword = oldPassword;
-
 
 	$.post(
 		'/api/controllername/user/edit/',
@@ -1983,7 +1975,6 @@ OmegaUp.prototype.forceVerifyEmail = function(username, callback) {
 		}
 	});
 };
-
 
 OmegaUp.prototype.forceChangePassword = function(username, newpassword, callback) {
 	var self = this;

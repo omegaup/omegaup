@@ -3,19 +3,19 @@
 require_once("base/User_Roles.dao.base.php");
 require_once("base/User_Roles.vo.base.php");
 /** Page-level DocBlock .
-  * 
+  *
   * @author alanboy
   * @package docs
-  * 
+  *
   */
 /** UserRoles Data Access Object (DAO).
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link UserRoles }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link UserRoles }.
   * @author alanboy
   * @access public
   * @package docs
-  * 
+  *
   */
 class UserRolesDAO extends UserRolesDAOBase {
 	public static function getContestAdmins(Contests $contest) {
@@ -63,7 +63,7 @@ class UserRolesDAO extends UserRolesDAOBase {
 
 		return $admins;
 	}
-	
+
 	public static function getProblemAdmins(Problems $problem) {
 		$sql = '
 			SELECT
@@ -90,7 +90,7 @@ class UserRolesDAO extends UserRolesDAOBase {
 			p.problem_id = ?;';
 		$params = array($problem->problem_id);
 		$author = $conn->GetOne($sql, $params);
-		
+
 		$found = false;
 		for ($i = 0; $i < count($admins); $i++) {
 			if ($admins[$i]['role'] == ADMIN_ROLE)	{

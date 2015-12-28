@@ -7,16 +7,14 @@
  */
 
 class CreateClarificationTest extends OmegaupTestCase {
-
 	/**
 	 * Creates a valid clarification
 	 */
 	public function testCreateValidClarification() {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
@@ -27,19 +25,19 @@ class CreateClarificationTest extends OmegaupTestCase {
 
 		// Call the API
 		$this->detourBroadcasterCalls();
-		$clarificationData = ClarificationsFactory::createClarification( 
+		$clarificationData = ClarificationsFactory::createClarification(
 			$problemData, $contestData, $contestant);
 
 		// Assert status of new contest
 		$this->assertArrayHasKey("clarification_id", $clarificationData['response']);
 
 		// Verify that clarification was inserted in the database
-		$clarification = 
+		$clarification =
 			ClarificationsDAO::getByPK($clarificationData['response']['clarification_id']);
 
 		// Verify our retreived clarificatoin
 		$this->assertNotNull($clarification);
-		$this->assertEquals($clarificationData['request']['message'], 
+		$this->assertEquals($clarificationData['request']['message'],
 			$clarification->getMessage());
 
 		// We need to verify that the contest and problem IDs where properly saved

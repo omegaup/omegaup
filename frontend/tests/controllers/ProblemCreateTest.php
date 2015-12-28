@@ -8,12 +8,10 @@
 require_once 'libs/FileHandler.php';
 
 class CreateProblemTest extends OmegaupTestCase {
-
 	/**
 	 * Basic test for creating a problem
 	 */
 	public function testCreateValidProblem() {
-
 		// Get the problem data
 		$problemData = ProblemsFactory::getRequest();
 		$r = $problemData["request"];
@@ -25,14 +23,13 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-		// Call the API				
+		// Call the API
 		$response = ProblemController::apiCreate($r);
 
 		// Validate
 		// Verify response
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertEquals("testplan", $response["uploaded_files"][10]);
-
 
 		// Verify data in DB
 		$problem_mask = new Problems();
@@ -102,7 +99,6 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertEquals("testplan", $response["uploaded_files"][10]);
 
-
 		// Verify data in DB
 		$problem_mask = new Problems();
 		$problem_mask->setTitle($r["title"]);
@@ -144,7 +140,6 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertEquals("testplan", $response["uploaded_files"][10]);
 
-
 		// Verify data in DB
 		$problem_mask = new Problems();
 		$problem_mask->setTitle($r["title"]);
@@ -165,7 +160,6 @@ class CreateProblemTest extends OmegaupTestCase {
 	 * Basic test for creating a problem
 	 */
 	public function testCreateValidProblemWithINCases() {
-
 		// Get the problem data
 		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . 'mrkareltastic.zip');
 		$r = $problemData["request"];
@@ -177,7 +171,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-		// Call the API				
+		// Call the API
 		$response = ProblemController::apiCreate($r);
 
 		// Validate
@@ -200,10 +194,8 @@ class CreateProblemTest extends OmegaupTestCase {
 	 * Test that sends incomplete requests
 	 */
 	public function testRequiredParameters() {
-
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
-
 
 		// Array of valid keys
 		$valid_keys = array(
@@ -216,7 +208,6 @@ class CreateProblemTest extends OmegaupTestCase {
 		);
 
 		foreach ($valid_keys as $key) {
-
 			// Get the problem data
 			$problemData = ProblemsFactory::getRequest();
 			$r = $problemData["request"];
@@ -229,8 +220,7 @@ class CreateProblemTest extends OmegaupTestCase {
 			unset($r[$key]);
 
 			try {
-
-				// Call the API				
+				// Call the API
 				$response = ProblemController::apiCreate($r);
 			} catch (InvalidParameterException $e) {
 				// We're OK, clean up our mess and continue
@@ -246,7 +236,6 @@ class CreateProblemTest extends OmegaupTestCase {
 	 * Test that sends invalid languages.
 	 */
 	public function testInvalidLanguage() {
-
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
@@ -275,7 +264,6 @@ class CreateProblemTest extends OmegaupTestCase {
 	 * Test that we are able to submit a problem without testplan
 	 */
 	public function testValidProblemNoTestplan() {
-
 		// Get the problem data
 		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "triangulos.zip");
 		$r = $problemData["request"];
@@ -287,11 +275,11 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-		// Call the API				
+		// Call the API
 		$response = ProblemController::apiCreate($r);
 
 		// Validate
-		// Verify response		
+		// Verify response
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertEquals("cases/1.in", $response["uploaded_files"][0]);
 
@@ -338,7 +326,6 @@ class CreateProblemTest extends OmegaupTestCase {
 	 * Test that we are able to submit a problem without testplan
 	 */
 	public function testValidProblemWithNonUTF8CharsInStmt() {
-
 		// Get the problem data
 		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "nonutf8stmt.zip");
 		$r = $problemData["request"];
@@ -350,7 +337,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-		// Call the API				
+		// Call the API
 		$response = ProblemController::apiCreate($r);
 
 		// Verify response
@@ -400,7 +387,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-		// Call the API				
+		// Call the API
 		$response = ProblemController::apiCreate($r);
 
 		// Verify response
@@ -421,7 +408,7 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertContains("<img src=\"$imageAbsoluteUrl\"", $html_contents);
 		// And the unmodified, not found image.
 		$this->assertContains("<img src=\"notfound.jpg\"", $html_contents);
-		
+
 		// Do image paht replacement checks in the markdown file
 		$markdown_contents = file_get_contents($targetpath . "statements" . DIRECTORY_SEPARATOR . "es.markdown");
 		$this->assertContains("![Saluda](" . IMAGES_URL_PATH . "$imageSha1.$imageExtension)", $markdown_contents);
@@ -431,17 +418,15 @@ class CreateProblemTest extends OmegaupTestCase {
 		$this->assertContains("![404](notfound.jpg)", $markdown_contents);
 	}
 
-		
 	/**
 	 * Test that we can produce a valid alias from the title
 	 */
 	public function testConstructAliasFromTitle() {
-
 		// Get the problem data
 		$problemData = ProblemsFactory::getRequest();
 		$r = $problemData["request"];
 		$problemAuthor = $problemData["author"];
-		
+
 		// Set a valid "complex" title
 		$r["title"] = "Lá Venganza Del Malvado Dr. Liraaa";
 
@@ -451,14 +436,13 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-		// Call the API				
+		// Call the API
 		$response = ProblemController::apiCreate($r);
 
 		// Validate
 		// Verify response
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertEquals("testplan", $response["uploaded_files"][10]);
-
 
 		// Verify data in DB
 		$problem_mask = new Problems();
@@ -475,22 +459,21 @@ class CreateProblemTest extends OmegaupTestCase {
 
 		// Verify DB data
 		$this->assertEquals($r["title"], $problem->getTitle());
-		
+
 		// Verify problem contents were copied
 		$targetpath = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $problem->getAlias() . DIRECTORY_SEPARATOR;
 
 		$this->assertFileExists($targetpath . "testplan");
 		$this->assertFileExists($targetpath . "cases");
-		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "en.html");						
+		$this->assertFileExists($targetpath . "statements" . DIRECTORY_SEPARATOR . "en.html");
 	}
-	
+
 	/**
 	 * Basic test for uploadin problem without statement
-	 * 
+	 *
 	 * @expectedException InvalidParameterException
 	 */
 	public function testCreateProblemWithoutStatement() {
-
 		// Get the problem data
 		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "nostmt.zip");
 		$r = $problemData["request"];
@@ -502,17 +485,16 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-		// Call the API				
-		$response = ProblemController::apiCreate($r);			
+		// Call the API
+		$response = ProblemController::apiCreate($r);
 	}
-	
+
 	/**
 	 * Basic test for uploadin problem missing outputs
-	 * 
+	 *
 	 * @expectedException InvalidParameterException
 	 */
 	public function testCreateProblemMissingOutput() {
-
 		// Get the problem data
 		$problemData = ProblemsFactory::getRequest(OMEGAUP_RESOURCES_ROOT . "missingout.zip");
 		$r = $problemData["request"];
@@ -524,8 +506,8 @@ class CreateProblemTest extends OmegaupTestCase {
 		// Get File Uploader Mock and tell Omegaup API to use it
 		FileHandler::SetFileUploader($this->createFileUploaderMock());
 
-		// Call the API				
-		$response = ProblemController::apiCreate($r);	
+		// Call the API
+		$response = ProblemController::apiCreate($r);
 	}
 }
 

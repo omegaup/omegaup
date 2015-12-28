@@ -6,7 +6,6 @@
  * @author joemmanuel
  */
 class Controller {
-
 	// If we turn this into protected,
 	// how are we going to initialize?
 	public static $log;
@@ -68,12 +67,10 @@ class Controller {
 	 * @throws NotFoundException
 	 */
 	protected static function resolveTargetUser(Request $r) {
-
 		// By default use current user
 		$user = $r["current_user"];
 
 		if (!is_null($r["username"])) {
-
 			Validators::isStringNonEmpty($r["username"], "username");
 
 			try {

@@ -1,7 +1,7 @@
 <?php
 /**
  * Request
- * 
+ *
  * The request class holds all the parameters that are passed into an API call.
  * You can pass in an associative array to the constructor and that will be used
  * as a backing for the values.
@@ -12,7 +12,6 @@
  * copy-on-write semantics.
  */
 class Request extends ArrayObject {
-
 	/**
 	 * The parent of this Request. This is set whenever the push function is called.
 	 */
@@ -34,13 +33,13 @@ class Request extends ArrayObject {
 	 * The method that will be called.
 	 */
 	public $method = null;
-	
+
 	/**
 	 * Whether $key exists. Used as isset($req[$key]);
 	 *
 	 * @param string $key The key.
 	 */
-	public function offsetExists($key) {		
+	public function offsetExists($key) {
 		return parent::offsetExists($key) || ($this->parent != null && isset($this->parent[$key]));
 	}
 
@@ -49,7 +48,7 @@ class Request extends ArrayObject {
 	 *
 	 * @param string $key The key.
 	 */
-	public function offsetGet($key) {		
+	public function offsetGet($key) {
 		return (isset($this[$key]) && parent::offsetGet($key) !== "null") ? parent::offsetGet($key) : ($this->parent != null ? $this->parent->offsetGet($key) : null);
 	}
 
@@ -71,11 +70,11 @@ class Request extends ArrayObject {
 	 */
 	public function execute() {
 		$response = call_user_func($this->method, $this);
-		
+
 		if ($response === false) {
 			throw new NotFoundException("apiNotFound");
 		}
-		
+
 		return $response;
 	}
 }

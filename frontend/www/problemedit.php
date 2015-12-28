@@ -55,12 +55,12 @@ $smarty->display('../templates/problem.edit.tpl');
 
 /**
  * Handle error (print msg, die)
- * 
+ *
  * @param type $smarty
  * @param type $response
  */
 function onError($smarty, $response) {
-	$smarty->assign('STATUS_ERROR', $response["error"]);	
+	$smarty->assign('STATUS_ERROR', $response["error"]);
 	$smarty->display('../templates/problem.edit.tpl');
 	die();
 }

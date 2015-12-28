@@ -11,7 +11,7 @@ class SessionManager {
 				setcookie($old_name, '', time()-1000, '/');
 			}
 		}
-		
+
 		// Set the new one
 		$httponly = true;
 		$domain = OMEGAUP_COOKIE_DOMAIN;

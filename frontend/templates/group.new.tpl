@@ -9,8 +9,8 @@
 {/if}
 
 <span id="form-data" data-name="groups" data-page="new"></span>
-<script src="/js/alias.generate.js?ver=bcc72a"></script>
-<script src="/js/groups.js?ver=284da8"></script>
+<script src="/js/alias.generate.js?ver=68db5b"></script>
+<script src="/js/groups.js?ver=252302"></script>
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE neq 1}
@@ -20,7 +20,7 @@
 		</h3>
 	</div>
 	{/if}
-	
+
 	<div class="panel-body">
 		<form class="new_group_form">
 			<div class="row">
@@ -35,14 +35,14 @@
 					<p class="help-block">{#contestNewFormShortTitle_alias_Desc#}</p>
 				</div>
 			</div>
-				
+
 			<div class="row">
 				<div class="form-group col-md-6">
 					<label for="description">{#groupNewFormDescription#}</label>
 					<textarea id='description' name='description' cols="30" rows="5" class="form-control"></textarea>
 				</div>
 			</div>
-			
+
 			<div class="form-group">
 				{if $IS_UPDATE eq 1}
 					<button type='submit' class="btn btn-primary">{#groupNewFormUpdateGroup#}</button>
@@ -50,8 +50,8 @@
 					<button type='submit' class="btn btn-primary">{#groupNewFormCreateGroup#}</button>
 				{/if}
 			</div>
-		</form>				
+		</form>
 	</div>
 </div>
-			
+
 {include file='footer.tpl'}

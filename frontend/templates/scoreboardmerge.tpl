@@ -6,7 +6,7 @@
 
 <div class="post">
 	<div class="copy">
-		<legend>Concurso: <select class="contests" name='contests' id='contests' multiple="multiple" size="10">				
+		<legend>Concurso: <select class="contests" name='contests' id='contests' multiple="multiple" size="10">
 		</select></legend>
 	</div>
 
@@ -15,7 +15,7 @@
 
 <div class="post">
 	<div class="copy" id="ranking">
-		
+
 	</div>
 </div>
 

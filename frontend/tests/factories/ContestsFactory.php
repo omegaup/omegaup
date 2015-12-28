@@ -7,7 +7,6 @@
  */
 
 class ContestsFactory {
-
 	/**
 	 * Returns a Request object with complete context to create a contest
 	 *
@@ -17,7 +16,6 @@ class ContestsFactory {
 	 * @return Request
 	 */
 	public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null) {
-
 		if (is_null($contestDirector)) {
 			$contestDirector = UserFactory::createUser();
 		}
@@ -51,7 +49,6 @@ class ContestsFactory {
 	}
 
 	public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null) {
-
 		// Create a valid contest Request object
 		$contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages);
 		$r = $contestData["request"];
@@ -78,7 +75,6 @@ class ContestsFactory {
 	}
 
 	public static function addProblemToContest($problemData, $contestData) {
-
 		// Create an empty request
 		$r = new Request();
 
@@ -115,7 +111,6 @@ class ContestsFactory {
 	}
 
 	public static function openProblemInContest($contestData, $problemData, $user) {
-
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
@@ -131,7 +126,6 @@ class ContestsFactory {
 	}
 
 	public static function addUser($contestData, $user) {
-
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
@@ -147,7 +141,6 @@ class ContestsFactory {
 	}
 
 	public static function addAdminUser($contestData, $user) {
-
 		// Prepare our request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
@@ -163,7 +156,6 @@ class ContestsFactory {
 	}
 
 	public static function makeContestWindowLength($contestData, $windowLength = 20) {
-
 		$contest = ContestsDAO::getByAlias($contestData["request"]["alias"]);
         $contest->setWindowLength($windowLength);
         ContestsDAO::save($contest);
@@ -180,6 +172,5 @@ class ContestsFactory {
 		$contest->setScoreboard($percentage);
 		ContestsDAO::save($contest);
 	}
-
 }
 

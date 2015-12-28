@@ -1,4 +1,4 @@
-<script src="/js/alias.generate.js?ver=bcc72a"></script>
+<script src="/js/alias.generate.js?ver=68db5b"></script>
 
 <div class="panel panel-primary">
 	<div class="panel-body">
@@ -20,18 +20,18 @@
 					<div class="form-group col-md-6">
 						<label for="description">{#groupNewFormDescription#}</label>
 						<textarea id='description' name='description' cols="30" rows="5" class="form-control"></textarea>
-					</div>											
+					</div>
 				</div>
-															
+
 				<button class="btn btn-primary" type='submit'>{#groupEditScoreboardsAdd#}</button>
-			</div>			
+			</div>
 		</form>
 	</div>
 
 	<table class="table table-striped">
 		<thead>
 			<th>{#groupEditScoreboards#}</th>
-			<th></th>			
+			<th></th>
 		</thead>
 		<tbody id="group-scoreboards"></tbody>
 	</table>

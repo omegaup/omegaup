@@ -8,7 +8,6 @@
 require_once 'SessionController.php';
 
 class UserController extends Controller {
-
 	public static $sendEmailOnVerify = true;
 	public static $redirectOnVerify = true;
 	public static $permissionKey = null;
@@ -156,9 +155,7 @@ class UserController extends Controller {
 	 * @param Request r
 	 */
 	private static function registerToMailchimp(Request $r) {
-
 		if (OMEGAUP_EMAIL_MAILCHIMP_ENABLE === true) {
-
 			self::$log->info("Adding user to Mailchimp.");
 
 			$MailChimp = new MailChimp(OMEGAUP_EMAIL_MAILCHIMP_API_KEY);
@@ -179,7 +176,6 @@ class UserController extends Controller {
 			}
 		}
 	}
-
 
 	/**
 	 *
@@ -242,7 +238,6 @@ class UserController extends Controller {
 		if ($newPasswordCheck === true) {
 			return true;
 		}
-
 	}
 
 	/**
@@ -293,14 +288,12 @@ class UserController extends Controller {
 	 * @throws EmailNotVerifiedException
 	 */
 	public static function checkEmailVerification(Request $r) {
-
 		if (OMEGAUP_FORCE_EMAIL_VERIFICATION) {
 			// Check if he has been verified
 			if ($r["user"]->getVerified() == '0') {
 				self::$log->info("User not verified.");
 
 				if ($r["user"]->getVerificationId() == null) {
-
 					self::$log->info("User does not have verification id. Generating.");
 
 					try {
@@ -330,7 +323,6 @@ class UserController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiLogin(Request $r) {
-
 		// Create a SessionController to perform login
 		$sessionController = new SessionController();
 
@@ -437,7 +429,6 @@ class UserController extends Controller {
 			$user = self::resolveUser($r["usernameOrEmail"]);
 
 			self::$redirectOnVerify = false;
-
 		} else {
 			// Normal user verification path
 			Validators::isStringNonEmpty($r["id"], "id");
@@ -482,7 +473,6 @@ class UserController extends Controller {
 	 * @throws InvalidParameterException
 	 */
 	public static function resolveUser($userOrEmail) {
-
 		Validators::isStringNonEmpty($userOrEmail, "Username or email not found");
 
 		$user = null;
@@ -559,13 +549,11 @@ class UserController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiGenerateOmiUsers(Request $r) {
-
 		self::authenticateRequest($r);
 
 		$response = array();
 
 		if ($r["contest_type"] == "OMI") {
-
 			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
 				throw new ForbiddenAccessException();
 			}
@@ -607,7 +595,6 @@ class UserController extends Controller {
 				"OMI2015-INV" => 4,
 			);
 		} else if ($r["contest_type"] == "OMIPS") {
-
 			if (!Authorization::IsSystemAdmin($r["current_user_id"])) {
 				throw new ForbiddenAccessException();
 			}
@@ -616,9 +603,7 @@ class UserController extends Controller {
 				"OMIPS2015-P" => 25,
 				"OMIPS2015-S" => 25,
 			);
-
 		} else if ($r["contest_type"] == "ORIG") {
-
 			if (!($r["current_user"]->getUsername() == "kuko.coder" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
 				throw new ForbiddenAccessException();
 			}
@@ -635,9 +620,7 @@ class UserController extends Controller {
 				"ORIG1516-URI" => 17,
 				"ORIG1516-VDS" => 15,
 			);
-
 		} else if ($r["contest_type"] == "OMIAGS") {
-
 			if (!($r["current_user"]->getUsername() == "andreasantillana" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
 				throw new ForbiddenAccessException();
 			}
@@ -646,7 +629,6 @@ class UserController extends Controller {
 				"OMIAGS" => 35
 			);
 		} else if ($r["contest_type"] == "OSI") {
-
 			if (!($r["current_user"]->getUsername() == "cope_quintana" || Authorization::IsSystemAdmin($r["current_user_id"]))) {
 				throw new ForbiddenAccessException();
 			}
@@ -707,14 +689,12 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiContests(Request $r) {
-
 		self::authenticateRequest($r);
 
 		$response = array();
 		$response["contests"] = array();
 
 		try {
-
 			$contest_director_key = new Contests(array(
 						"director_id" => $r["current_user_id"]
 					));
@@ -760,7 +740,6 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiProblems(Request $r) {
-
 		self::authenticateRequest($r);
 
 		$response = array();
@@ -787,7 +766,6 @@ class UserController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
-
 
 	/**
 	 * Returns the prefered language as a string (en,es,fra) of the user given
@@ -877,7 +855,6 @@ class UserController extends Controller {
 		// Fallback to spanish.
 		return "es";
 	}
-
 
 	/**
 	 * Returns the profile of the user given
@@ -999,12 +976,10 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiCoderOfTheMonth(Request $r) {
-
 		// Get first day of the current month
 		$firstDay = date('Y-m-01');
 
 		try {
-
 			$coderOfTheMonth = null;
 
 			$codersOfTheMonth = CoderOfTheMonthDAO::search(new CoderOfTheMonth(array("time" => $firstDay)));
@@ -1013,7 +988,6 @@ class UserController extends Controller {
 			}
 
 			if (is_null($coderOfTheMonth)) {
-
 				// Generate the coder
 				$retArray = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
 				if ($retArray == null) {
@@ -1029,14 +1003,10 @@ class UserController extends Controller {
 
 				));
 				CoderOfTheMonthDAO::save($c);
-
-
 			} else {
-
 				// Grab the user info
 				$user = UsersDAO::getByPK($coderOfTheMonth->user_id);
 			}
-
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -1054,7 +1024,6 @@ class UserController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiCoderOfTheMonthList(Request $r) {
-
 		$response = array();
 		$response["coders"] = array();
 		try {
@@ -1069,7 +1038,6 @@ class UserController extends Controller {
 					"date" => $c->getTime()
 				);
 			}
-
 		} catch (Exception $ex) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -1077,7 +1045,6 @@ class UserController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
-
 
 	/**
 	 * Get Contests which a certain user has participated in
@@ -1087,7 +1054,6 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiContestStats(Request $r) {
-
 		self::authenticateOrAllowUnauthenticatedRequest($r);
 
 		$response = array();
@@ -1104,7 +1070,6 @@ class UserController extends Controller {
 
 		$contests = array();
 		foreach ($contestsParticipated as $contest) {
-
 			// Get user ranking
 			$scoreboardR = new Request(array(
 				"auth_token" => $r["auth_token"],
@@ -1139,7 +1104,6 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiProblemsSolved(Request $r) {
-
 		self::authenticateOrAllowUnauthenticatedRequest($r);
 
 		$response = array();
@@ -1172,7 +1136,6 @@ class UserController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiList(Request $r) {
-
 		self::authenticateRequest($r);
 
 		$param = "";
@@ -1205,7 +1168,6 @@ class UserController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiStats(Request $r) {
-
 		self::authenticateOrAllowUnauthenticatedRequest($r);
 		$user = self::resolveTargetUser($r);
 
@@ -1372,7 +1334,6 @@ class UserController extends Controller {
 		$sessionController = new SessionController();
 		$sessionController->InvalidateCache();
 
-
 		return array("status" => "ok");
 	}
 
@@ -1386,7 +1347,6 @@ class UserController extends Controller {
 	 */
 
 	public static function apiRankByProblemsSolved(Request $r) {
-
 		Validators::isNumber($r["offset"], "offset", false);
 		Validators::isNumber($r["rowcount"], "rowcount", false);
 
@@ -1426,7 +1386,6 @@ class UserController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function getRankByProblemsSolved(Request $r) {
-
 		if (is_null($r["user"])) {
 			$rankCacheName =  $r["offset"] . '-' . $r["rowcount"];
 
@@ -1491,7 +1450,6 @@ class UserController extends Controller {
 	 * @param string $rankCacheName
 	 */
 	private static function setProblemsSolvedRankCacheList($rankCacheName) {
-
 		// Save the instance of the rankName in a key/value array, so we know all ranks to
 		// expire
 		$rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, "");
@@ -1513,12 +1471,10 @@ class UserController extends Controller {
 	 * verdict = AC (and not test run)
 	 */
 	public static function deleteProblemsSolvedRankCacheList() {
-
 		$rankCacheList = new Cache(Cache::PROBLEMS_SOLVED_RANK_LIST, "");
 		$ranksList = $rankCacheList->get();
 
 		if (!is_null($ranksList)) {
-
 			$rankCacheList->delete();
 
 			foreach($ranksList as $key => $value) {
@@ -1548,7 +1504,6 @@ class UserController extends Controller {
 				self::$log->info("User not verified.");
 
 				if ($r["current_user"]->getVerificationId() == null) {
-
 					self::$log->info("User does not have verification id. Generating.");
 
 					try {
@@ -1559,7 +1514,6 @@ class UserController extends Controller {
 					}
 				}
 			}
-
 		} catch (Exception $e) {
 			// If duplicate in DB
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
@@ -1578,5 +1532,4 @@ class UserController extends Controller {
 
 		return array("status" => "ok");
 	}
-
 }

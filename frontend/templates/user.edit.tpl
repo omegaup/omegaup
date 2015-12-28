@@ -1,4 +1,4 @@
-{extends file="profile.tpl"} 
+{extends file="profile.tpl"}
 {block name="content"}
 	<div class="col-md-10">
 		<div class="panel panel-default">
@@ -13,14 +13,14 @@
 							<input id='name' name='name' value='' type='text' size='30' class="form-control">
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label for="birth_date" class="col-md-3 control-label">{#userEditBirthDate#}</label>
 						<div class="col-md-7">
 							<input id='birth_date' name='birth_date' value='' type='text' size ='10' class="form-control">
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label for="country_id" class="col-md-3 control-label">País</label>
 						<div class="col-md-7">
@@ -275,18 +275,18 @@
 							</select>
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label for="state_id" class="col-md-3 control-label">{#profileState#}</label>
 						<div class="col-md-7">
 							<select name='state_id' id='state_id' disabled="true" class="form-control"></select>
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label for="school" class="col-md-3 control-label">{#profileSchool#}</label>
 						<div class="col-md-7">
-							<input id='school' name='school' value='' type='text' size='20' class="form-control" /> 
+							<input id='school' name='school' value='' type='text' size='20' class="form-control" />
 						</div>
 						<input id='school_id' name='school_id' value="" type='hidden'>
 					</div>
@@ -302,11 +302,11 @@
 						</select>
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label for="scholar_degree" class="col-md-3 control-label">{#userEditSchoolGrade#}</label>
 						<div class="col-md-7">
-							<select name='scholar_degree' id='scholar_degree' class="form-control">			
+							<select name='scholar_degree' id='scholar_degree' class="form-control">
 								<option value='{#userEditElementary#}'>{#userEditElementary#}</option>
 								<option value='{#userEditMiddleSchool#}'>{#userEditMiddleSchool#}</option>
 								<option value='{#userEditHighSchool#}'>{#userEditHighSchool#}</option>
@@ -317,31 +317,31 @@
 							</select>
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label for="graduation_date" class="col-md-3 control-label">Fecha de graduación</label>
 						<div class="col-md-7">
 							<input id='graduation_date' name='graduation_date' value='' type='text' size ='10' class="form-control">
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<label class="col-md-3 control-label">{#userEditProfileImage#}</label>
 						<div class="col-md-7">
 							<a href="http://www.gravatar.com" target="_blank" class="btn btn-link">Súbela en Gravatar.com usando tu email: {$CURRENT_USER_EMAIL}</a>
 						</div>
 					</div>
-					
+
 					<div class="form-group">
 						<div class="col-md-offset-3 col-md-7">
 							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
 						</div>
 					</div>
-				</form>				
+				</form>
 			</div>
-			
+
 		</div>
-						
+
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h2 class="panel-title">{#userEditChangePassword#}</h2>
@@ -366,7 +366,7 @@
 							<input id='new-password-2' name='name' value='' type='password' size='30' class="form-control">
 						</div>
 					</div>
-						
+
 					<div class="form-group">
 						<div class="col-md-offset-3 col-md-7">
 							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
@@ -376,6 +376,6 @@
 			</div>
 		</div>
 	</div>
-	
-	<script type="text/javascript" src="/js/user.edit.js?ver=807c6c"></script>
+
+	<script type="text/javascript" src="/js/user.edit.js?ver=c75eaf"></script>
 {/block}

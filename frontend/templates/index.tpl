@@ -17,10 +17,10 @@
 					<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
 				</div>
 			</div>
-		</div>		
-		
+		</div>
+
 		<div class="panel panel-default">
-			<div class="panel-heading">					
+			<div class="panel-heading">
 				<h3 class="panel-title">{#frontPageBlogPosts#}</h3>
 			</div>
 			<div class="panel-body">
@@ -28,7 +28,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="col-md-4">
 		<div class="panel panel-default">
 			<div class="panel-body">
@@ -39,7 +39,7 @@
 				<iframe allowtransparency="true" frameborder="0" scrolling="no"
 					src="https://platform.twitter.com/widgets/follow_button.html?screen_name=omegaup"
 					style="width:300px; height:20px;"></iframe>
-			</div>	
+			</div>
 		</div>
 		{if isset($coderOfTheMonthData)}
 		<div class="panel panel-default">
@@ -54,7 +54,7 @@
 					<div id="coder-of-the-month-school">{$coderOfTheMonthData.school|htmlspecialchars}</div>
 					<div id="coder-of-the-month-place">
 						{if isset($coderOfTheMonthData.state)} {$coderOfTheMonthData.state|htmlspecialchars}, {/if}{$coderOfTheMonthData.country|htmlspecialchars}
-					</div>					
+					</div>
 				</div>
 			</div>
 			<div class="panel-body">
@@ -62,28 +62,28 @@
 			</div>
 		</div>
 		{/if}
-		
+
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">{#frontPageMaterial#}</h3>
 			</div>
 			<div id="recommended_material" class="panel-body">
 				<a href="https://omegaup.com/img/libropre3.pdf">Descarga en PDF aquí:
-				<img src="https://omegaup.com/img/libroluis.gif" width="75%"/>				
+				<img src="https://omegaup.com/img/libroluis.gif" width="75%"/>
 				</a>
 			</div>
 		</div>
-		
+
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">{#frontPageNextContests#}</h3>
 			</div>
-			<ul class="list-group" id="next-contests-list">			
+			<ul class="list-group" id="next-contests-list">
 		    </ul>
-		</div>					
-				
+		</div>
+
 		{include file='rank.table.tpl' length=5 is_index=true}
-		
+
 		<div class="panel panel-default">
 			<div id="runs-chart"></div>
 		</div>

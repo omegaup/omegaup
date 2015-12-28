@@ -3,19 +3,19 @@
 require_once("base/Problems.dao.base.php");
 require_once("base/Problems.vo.base.php");
 /** Page-level DocBlock .
-  * 
+  *
   * @author alanboy
   * @package docs
-  * 
+  *
   */
 /** Problems Data Access Object (DAO).
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Problems }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link Problems }.
   * @author alanboy
   * @access public
   * @package docs
-  * 
+  *
   */
 class ProblemsDAO extends ProblemsDAOBase
 {
@@ -50,7 +50,7 @@ class ProblemsDAO extends ProblemsDAOBase
 					SELECT
 						Problems.problem_id,
 						MAX(Runs.score) AS score
-					FROM 
+					FROM
 						Problems
 					INNER JOIN
 						Runs ON Runs.user_id = ? AND Runs.problem_id = Problems.problem_id
@@ -77,7 +77,6 @@ class ProblemsDAO extends ProblemsDAOBase
 				$args[] = $query;
 			}
 		} else if ($user_type === USER_NORMAL && !is_null($user_id)) {
-
 			$select = "
 				SELECT
 					100 / LOG2(GREATEST(p.accepted, 1) + 1)	AS points,
@@ -91,7 +90,7 @@ class ProblemsDAO extends ProblemsDAOBase
 					SELECT
 						pi.problem_id,
 						MAX(r.score) AS score
-					FROM 
+					FROM
 						Problems pi
 					INNER JOIN
 						Runs r ON r.user_id = ? AND r.problem_id = pi.problem_id
@@ -121,7 +120,6 @@ class ProblemsDAO extends ProblemsDAOBase
 				$args[] = $query;
 			}
 		} else if ($user_type === USER_ANONYMOUS) {
-
 			$select = "
 					SELECT
 						0 AS score,
@@ -147,8 +145,6 @@ class ProblemsDAO extends ProblemsDAOBase
 				$sql .= " AND p.title LIKE CONCAT('%', ?, '%') ";
 			    $args[] = $query;
 			}
-
-
 		}
 
 		$total = $conn->GetOne("SELECT COUNT(*) $sql", $args);
@@ -189,19 +185,19 @@ class ProblemsDAO extends ProblemsDAOBase
 		}
 		return $problems;
 	}
-	
+
 	public static final function getByAlias($alias)
 	{
 		$sql = "SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;";
 		$params = array(  $alias );
-                
+
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0)
                 {
                     return NULL;
                 }
-                
+
                 $contest = new Problems( $rs );
 
                 return $contest;
@@ -211,7 +207,7 @@ class ProblemsDAO extends ProblemsDAOBase
 	{
 		global $conn;
 		$quoted = $conn->Quote($alias);
-		
+
 		if (strpos($quoted, "'") !== FALSE) {
 			$quoted = substr($quoted, 1, strlen($quoted) - 2);
 		}
@@ -252,41 +248,41 @@ class ProblemsDAO extends ProblemsDAOBase
 
 		return $result;
 	}
-	
+
 	public static final function getPracticeDeadline($id) {
 		global $conn;
 
 		$sql = "SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Contest_Problems cp USING(contest_id) WHERE cp.problem_id = ?";
 		return $conn->GetOne($sql, $id);
 	}
-	
+
 	public static final function getProblemsSolved($id) {
 		global $conn;
-		
+
 		$sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.test = 0 and `Runs`.user_id = ? ORDER BY `Problems`.problem_id DESC";
 		$val = array($id);
 		$rs = $conn->Execute($sql, $val);
-		
+
 		$result = array();
 
 		foreach ($rs as $r) {
 			array_push($result, new Problems($r));
 		}
 
-		return $result;		
+		return $result;
 	}
-	
+
 	public static function getPrivateCount(Users $user) {
-		$sql = "SELECT count(*) as Total FROM Problems WHERE public = 0 and (author_id = ?);";		
+		$sql = "SELECT count(*) as Total FROM Problems WHERE public = 0 and (author_id = ?);";
 		$params = array($user->getUserId());
-                
+
 		global $conn;
-		$rs = $conn->GetRow($sql, $params);				                        
-		
+		$rs = $conn->GetRow($sql, $params);
+
 		if (!array_key_exists("Total", $rs)) {
 			return 0;
 		}
- 		
+
         return $rs["Total"];
 	}
 
@@ -321,10 +317,10 @@ class ProblemsDAO extends ProblemsDAOBase
 		";
 
 		$params = array($problem->problem_id,
-			PROBLEM_ADMIN_ROLE, 
+			PROBLEM_ADMIN_ROLE,
 			$problem->problem_id);
 		$rs = $conn->Execute($sql, $params);
-		
+
 		$result = array();
 		foreach ($rs as $r) {
 			$result[] = $r['email'];

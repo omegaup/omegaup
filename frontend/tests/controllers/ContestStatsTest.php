@@ -6,17 +6,15 @@
  * @author joemmanuel
  */
 class ContestStatsTest extends OmegaupTestCase {
-
 	/**
 	 * Check stats are ok for WA, AC, PA and total counts
 	 * Also validates the max wait time guid
 	 */
 	public function testGetStats() {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
@@ -76,11 +74,10 @@ class ContestStatsTest extends OmegaupTestCase {
 	 * Checks that, if there's no wait time, 0 is posted in max_wait_time
 	 */
 	public function testGetStatsNoWaitTime() {
-		
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
@@ -88,7 +85,7 @@ class ContestStatsTest extends OmegaupTestCase {
 
 		// Create our contestant
 		$contestant = UserFactory::createUser();
-		
+
 		$ACRunsCount = 2;
 		$ACRunsData = array();
 		for ($i = 0; $i < $ACRunsCount; $i++) {
@@ -97,7 +94,7 @@ class ContestStatsTest extends OmegaupTestCase {
 			// Grade the run
 			RunsFactory::gradeRun($ACRunsData[$i]);
 		}
-		
+
 		// Create request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
@@ -105,12 +102,11 @@ class ContestStatsTest extends OmegaupTestCase {
 
 		// Call API
 		$response = ContestController::apiStats($r);
-		
+
 		// Check number of pending runs
 		$this->assertEquals($ACRunsCount, $response["total_runs"]);
 		$this->assertEquals(0, $response["max_wait_time"]);
-		$this->assertEquals(0, $response["max_wait_time_guid"]);						
+		$this->assertEquals(0, $response["max_wait_time_guid"]);
 	}
-
 }
 

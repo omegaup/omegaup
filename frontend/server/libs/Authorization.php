@@ -110,14 +110,13 @@ class Authorization {
 			if (!is_null($ur)) {
 				return true;
 			}
-			
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		return ($contest->getDirectorId() === $user_id) || self::IsSystemAdmin($user_id);
 	}
-	
+
 	public static function IsProblemAdmin($user_id, Problems $problem) {
 		if (is_null($problem)) {
 			return false;
@@ -125,15 +124,14 @@ class Authorization {
 
 		try {
 			$ur = UserRolesDAO::getByPK($user_id, PROBLEM_ADMIN_ROLE, $problem->problem_id);
-			
+
 			if (!is_null($ur)) {
 				return true;
 			}
-			
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
-		
+
 		return ($problem->author_id === $user_id) || self::IsSystemAdmin($user_id);
 	}
 
@@ -146,16 +144,16 @@ class Authorization {
 			throw new InvalidDatabaseOperationException($e);
 		}
 	}
-	
+
 	public static function IsGroupOwner($user_id, Groups $group) {
 		if (is_null($group)) {
 			return false;
 		}
-		
+
 		if ($user_id === $group->owner_id) {
 			return true;
 		}
-		
+
 		return false;
 	}
 }

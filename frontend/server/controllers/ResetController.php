@@ -44,7 +44,7 @@ class ResetController extends Controller {
 		$link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
 		$message = $smarty->getConfigVariable('wordsResetMessage');
 		$mail->Body = str_replace('[link]', $link, $message);
-            
+
 		if (!$mail->Send()) {
 			self::$log->error("Failed to send mail:". $mail->ErrorInfo);
 			$user->setResetDigest(NULL);

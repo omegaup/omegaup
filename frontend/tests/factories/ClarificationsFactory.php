@@ -7,17 +7,15 @@
  */
 
 class ClarificationsFactory {
-
 	/**
 	 * Creates a clarification in a problem inside a contest
-	 * 
+	 *
 	 * @param type $problemData
 	 * @param type $contestData
 	 * @param type $contestant
 	 */
-	public static function createClarification($problemData, $contestData, 
+	public static function createClarification($problemData, $contestData,
 		$contestant) {
-
 		// Our contestant has to open the contest before sending a clarification
 		ContestsFactory::openContest($contestData, $contestant);
 
@@ -45,27 +43,26 @@ class ClarificationsFactory {
 			"response" => $response
 		);
 	}
-	
+
 	/**
 	 * Answer a clarification
-	 * 
+	 *
 	 * @param type $clarificationData
 	 * @param type $contestData
 	 * @param type $message
 	 */
 	public static function answer($clarificationData, $contestData,
 		$message = 'lol') {
-		
 		// Prepare request
 		$r = new Request();
 		$r["clarification_id"] = $clarificationData["response"]["clarification_id"];
-		
+
 		// Log in the user
 		$r["auth_token"] = OmegaupTestCase::login($contestData["director"]);
-		
+
 		// Update answer
 		$r["answer"] = $message;
-		
+
 		// Call api
 		ClarificationController::apiUpdate($r);
 	}

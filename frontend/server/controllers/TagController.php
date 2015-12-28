@@ -15,8 +15,8 @@ class TagController extends Controller {
 	}
 
 	/**
-	 * Gets a list of tags 
-	 * 
+	 * Gets a list of tags
+	 *
 	 * @param Request $r
 	 */
 	public function apiList(Request $r) {
@@ -30,7 +30,7 @@ class TagController extends Controller {
 		} else {
 			throw new InvalidParameterException("parameterEmpty", "query");
 		}
-		
+
 		try {
 			$tags = TagsDAO::FindByName($r[$param]);
 		} catch (Exception $e) {

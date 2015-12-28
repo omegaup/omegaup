@@ -8,7 +8,6 @@ require_once(__DIR__."/../../server/bootstrap.php");
  *
  */
 class ApiCaller{
-
 	public static $log;
 
 	/**
@@ -54,7 +53,6 @@ class ApiCaller{
 		} catch (ApiException $apiException) {
 			self::$log->error($apiException);
 			$response = $apiException->asResponseArray();
-
 		} catch (Exception $e){
 			self::$log->error($e);
 			$apiException = new InternalServerErrorException($e);
@@ -116,7 +114,6 @@ class ApiCaller{
 	 * @throws NotFoundException
 	 */
 	private static function parseUrl() {
-
 		$apiAsUrl = $_SERVER["REQUEST_URI"];
 		// Spliting only by '/' results in URIs with parameters like this:
 		//		/api/problem/list/?page=1
@@ -173,14 +170,12 @@ class ApiCaller{
 		return $request;
 	}
 
-
 	/**
 	 * Sets all required headers for the API called via HTTP
 	 *
 	 * @param array $response
 	 */
 	private static function setHttpHeaders(array $response) {
-
 		// Scumbag IE y su cache agresivo.
 		header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");

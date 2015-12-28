@@ -495,7 +495,6 @@ class Scoreboard {
 
 					$place += $draws;
 					$draws = 1;
-
 				} else if ($userData["total"]["points"] == $currentPoints &&
 				           $userData["total"]["penalty"] == $currentPenalty) {
 					$draws++;

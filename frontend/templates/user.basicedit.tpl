@@ -1,4 +1,4 @@
-{extends file="profile.tpl"} 
+{extends file="profile.tpl"}
 {block name="content"}
 	<div class="col-md-10">
 		<div class="panel panel-default">
@@ -44,6 +44,6 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<script type="text/javascript" src="/js/user.basicedit.js?ver=ce00f9"></script>
 {/block}

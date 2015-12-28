@@ -7,7 +7,6 @@
  */
 
 class RunCreateTest extends OmegaupTestCase {
-
 	private $contestData;
 	private $contestant;
 
@@ -18,7 +17,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * @return Request
 	 */
 	private function setValidRequest($contest_public = 1) {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
@@ -64,7 +62,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * @param type $response
 	 */
 	private function assertRun($r, $response) {
-
 		// Validate
 		$this->assertEquals("ok", $response["status"]);
 		$this->assertArrayHasKey("guid", $response);
@@ -111,7 +108,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * Basic new run test
 	 */
 	public function testNewRunValid() {
-
 		$r = $this->setValidRequest();
 		$this->detourGraderCalls();
 
@@ -131,7 +127,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testRunWhenContestExpired() {
-
 		$r = $this->setValidRequest();
 
 		// Manually expire the contest
@@ -147,7 +142,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * Test a valid submission to a private contest
 	 */
 	public function testRunToValidPrivateContest() {
-
 		$r = $this->setValidRequest(0 /* private contest */);
 		$this->detourGraderCalls();
 
@@ -165,7 +159,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testRunPrivateContestWithUserNotRegistred() {
-
 		$r = $this->setValidRequest(0 /* private contest */);
 
 		// Create a second user not regitered to private contest
@@ -184,7 +177,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testRunWhenContestNotStarted() {
-
 		$r = $this->setValidRequest();
 
 		// Manually expire contest
@@ -203,7 +195,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testInvalidRunInsideSubmissionsGap() {
-
 		// Set the context
 		$r = $this->setValidRequest();
 		$this->detourGraderCalls();
@@ -227,7 +218,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * Submission gap is per problem, not per contest
 	 */
 	public function testSubmissionGapIsPerProblem() {
-
 		// Set the context
 		$r = $this->setValidRequest();
 
@@ -280,7 +270,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * Test that a run can't be send with missing parameters
 	 */
 	public function testMissingParameters() {
-
 		// Set the context for the first contest
 		$original_r = $this->setValidRequest();
 		$this->detourGraderCalls($this->any());
@@ -300,7 +289,6 @@ class RunCreateTest extends OmegaupTestCase {
 			UNSET($r[$key]);
 
 			try {
-
 				// Call API
 				$response = RunController::apiCreate($r);
 			} catch (InvalidParameterException $e) {
@@ -317,7 +305,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * Test valid window length
 	 */
 	public function testNewRunInWindowLengthPublicContest() {
-
 		// Set the context for the first contest
 		$r = $this->setValidRequest();
 		$this->detourGraderCalls();
@@ -341,7 +328,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * @expectedException NotAllowedToSubmitException
 	 */
 	public function testNewRunOutWindowLengthPublicContest() {
-
 		// Set the context for the first contest
 		$r = $this->setValidRequest();
 
@@ -362,12 +348,10 @@ class RunCreateTest extends OmegaupTestCase {
 		RunController::apiCreate($r);
 	}
 
-
 	/**
 	 * Admin is god, is able to submit even when contest has not started yet
 	 */
 	public function testRunWhenContestNotStartedForContestDirector() {
-
 		// Set the context for the first contest
 		$r = $this->setValidRequest();
 		$this->detourGraderCalls();
@@ -391,7 +375,6 @@ class RunCreateTest extends OmegaupTestCase {
 	 * for testing purposes
 	 */
 	public function testInvalidRunInsideSubmissionsGapForContestDirector() {
-
 		// Set the context for the first contest
 		$r = $this->setValidRequest();
 		$this->detourGraderCalls($this->exactly(2));
@@ -415,7 +398,6 @@ class RunCreateTest extends OmegaupTestCase {
 
 		// Validate the run
 		$this->assertRun($r, $response);
-
 	}
 
 	/**
@@ -535,7 +517,6 @@ class RunCreateTest extends OmegaupTestCase {
 
 		// Create public problem
 		$problemData = ProblemsFactory::createProblem(null, null, 0 /* private */, $contestData["director"]);
-
 
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);

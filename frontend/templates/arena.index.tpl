@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/arena.js?ver=55d195'}
+{include file='arena.head.tpl' jsfile='/ux/arena.js?ver=ae8e3f'}
 			<div class="container" id="main">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
@@ -17,7 +17,7 @@
 						</tbody>
 					</table>
 				</div>
-				
+
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h2 class="panel-title">{#arenaOldContests#}</h2>

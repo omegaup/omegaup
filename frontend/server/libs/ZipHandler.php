@@ -3,7 +3,6 @@
 require_once('ApiUtils.php');
 
 class ZipHandler {
-
 	public static function DeflateZip($pathToZip, $extractToDir, array $filesArray = NULL) {
 		if (is_null($pathToZip)) {
 			throw new Exception("Path to ZIP is null");

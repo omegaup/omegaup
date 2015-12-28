@@ -15,10 +15,10 @@ foreach($problems as &$problem) {
 		"problem_alias" => $problem["alias"],
 		"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 	));
-	
+
 	$r->method = "ProblemController::apiDetails";
 	$response = ApiCaller::call($r);
-	
+
 	$problem["statement"] = $response["problem_statement"];
 }
 

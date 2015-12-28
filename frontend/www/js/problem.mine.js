@@ -1,6 +1,6 @@
 (function(){
 	$(".navbar #nav-problems").addClass("active");
-	
+
 	function fillProblemsTable() {
 		omegaup.getMyProblems(function(problems) {
 			$('#problem-list .added').remove();
@@ -32,7 +32,7 @@
 		});
 	}
 	fillProblemsTable();
-	
+
 	$("#bulk-make-public").click(function() {
 		OmegaUp.ui.bulkOperation(
 			function(alias, handleResponseCallback) {
@@ -43,7 +43,7 @@
 			}
 		)}
 	);
-	
+
 	$("#bulk-make-private").click(function() {
 		OmegaUp.ui.bulkOperation(
 			function(alias, handleError) {

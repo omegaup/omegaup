@@ -1,15 +1,13 @@
 {include file='redirect.tpl'}
-{include file='arena.head.tpl' jsfile='/js/groups.scoreboards.js?ver=ad97aa'}
+{include file='arena.head.tpl' jsfile='/js/groups.scoreboards.js?ver=8b6fdd'}
 
 <span id="form-data" data-name="group-scoreboards" data-page="details" data-alias="{$smarty.get.scoreboard}" data-group-alias="{$smarty.get.group}">
 </span>
 
-
-	
 		<div id="title">
-			<h1><span class="scoreboard-title" id="scoreboard-title"></span></h1>			
+			<h1><span class="scoreboard-title" id="scoreboard-title"></span></h1>
 		</div>
-		<div id="ranking">			
+		<div id="ranking">
 			<table id="ranking-table">
 				<thead>
 					<tr>
@@ -29,7 +27,7 @@
 				</tbody>
 			</table>
 		</div>
-	
-</div>			
+
+</div>
 </body>
 </html>

@@ -5,12 +5,10 @@
  */
 
 class ProblemBestScoreTest extends OmegaupTestCase {
-
 	/**
 	 * Test apiBestScore for submits in a problem for current user
 	 */
 	public function testBestScoreInProblem() {
-
 		// Create problem
 		$problemData = ProblemsFactory::createProblem();
 
@@ -36,7 +34,6 @@ class ProblemBestScoreTest extends OmegaupTestCase {
 	 * Test apiBestScore for submits inside a contest
 	 */
 	public function testBestScoreInsideContest() {
-
 		// Create problem and contest
 		$problemData = ProblemsFactory::createProblem();
 		$contestData = ContestsFactory::createContest();
@@ -65,7 +62,6 @@ class ProblemBestScoreTest extends OmegaupTestCase {
 	 * Test apiBestScore for submits in a problem for other user
 	 */
 	public function testBestScoreInProblemOtherUser() {
-
 		// Create problem
 		$problemData = ProblemsFactory::createProblem();
 

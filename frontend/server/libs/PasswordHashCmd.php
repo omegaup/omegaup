@@ -13,7 +13,6 @@ function randomString($length) {
 	return $str;
 }
 
-
 $password = randomString(8);
 echo "$password\n";
 echo SecurityTools::hashString($password) . "\n";

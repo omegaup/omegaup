@@ -6,15 +6,14 @@
  * @author joemmanuel
  */
 class SchoolController extends Controller {
-	
 	/**
-	 * Gets a list of schools 
-	 * 
+	 * Gets a list of schools
+	 *
 	 * @param Request $r
 	 */
 	public static function apiList(Request $r) {
 		self::authenticateRequest($r);
-		
+
 		$param = "";
 		if (!is_null($r["term"])) {
 			$param = "term";
@@ -25,7 +24,7 @@ class SchoolController extends Controller {
 		}
 
 		try {
-			$schools = SchoolsDAO::findByName($r[$param]);			
+			$schools = SchoolsDAO::findByName($r[$param]);
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
 		}
@@ -38,10 +37,10 @@ class SchoolController extends Controller {
 
 		return $response;
 	}
-	
+
 	/**
 	 * Create new school
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -49,28 +48,27 @@ class SchoolController extends Controller {
 	 */
 	public static function apiCreate(Request $r) {
 		self::authenticateRequest($r);
-		
+
 		Validators::isStringNonEmpty($r["name"], "name");
 		Validators::isNumber($r["state_id"], "state_id", false);
-		
+
 		if (!is_null($r["state_id"])) {
 			try {
 				$r["state"] = StatesDAO::getByPK($r["state_id"]);
-			} catch (Exception $e) { 
+			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
-			
+
 			if (is_null($r["state"])) {
 				throw new InvalidParameterException("parameterNotFound", "state");
 			}
-		}				
-		
+		}
+
 		// Create school object
 		$school = new Schools(array("name" => $r["name"], "state_id" => $r["state_id"]));
-		
+
 		$school_id = 0;
-		try {			
-			
+		try {
 			$existing = SchoolsDAO::findByName($r["name"]);
 			if (count($existing) > 0) {
 				$school_id = $existing[0]->getSchoolId();
@@ -78,11 +76,11 @@ class SchoolController extends Controller {
 				// Save in db
 				SchoolsDAO::save($school);
 				$school_id = $school->getSchoolId();
-			}						
+			}
 		} catch (Exception $e) {
 			throw new InvalidDatabaseOperationException($e);
-		} 
-		
+		}
+
 		return array("status" => "ok", "school_id" => $school_id);
 	}
 }

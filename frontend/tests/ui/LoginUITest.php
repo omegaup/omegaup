@@ -7,15 +7,13 @@
  */
 
 class LoginUITest extends OmegaupUITestCase {
-
 	public function testLogin() {
-
 		// Turn off sending email on usere creation
 		UserController::$sendEmailOnVerify = false;
-		
+
 		// Create a user
 		$contestant = UserFactory::createUser();
-					
+
 		// Open index
 		$this->open('/');
 
@@ -26,13 +24,12 @@ class LoginUITest extends OmegaupUITestCase {
 		$this->type('user', $contestant->getUsername());
 		$this->type('pass', $contestant->getPassword());
 
-		// Click inicia sesion		
+		// Click inicia sesion
 		$this->clickAndWait("//input[@value='Inicia sesion']");
 
 		// Sanity check that we are logged in
 		$this->waitForElementPresent('//*[@id="wrapper"]/div[1]/a');
 		$this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->getUsername());
 	}
-
 }
 

@@ -6,21 +6,20 @@ var formPage = formData.attr('data-page');
 var formAlias = formData.attr('data-alias');
 
 $(function() {
-	
 	if (formPage === "list") {
 		function fillGroupsList() {
 			omegaup.getGroups(function(groups) {
 				var html = "";
 
-				for (var i = 0; i < groups.groups.length; i++) {					
-					html += "<tr>"						
+				for (var i = 0; i < groups.groups.length; i++) {
+					html += "<tr>"
 						+ "<td><b><a href='/group/" + groups.groups[i].alias  + "/edit/#scoreboards'>" + omegaup.escape(groups.groups[i].name) + "</a></b></td>"
 						+ '<td><a class="glyphicon glyphicon-edit" href="/group/' + groups.groups[i].alias  + '/edit#edit" title="{#wordsEdit#}"></a></td>'
 						+ "</tr>";
 				}
 
 				$("#groups_list").removeClass("wait_for_ajax");
-				$("#groups_list > table > tbody").empty().html(html);			
+				$("#groups_list > table > tbody").empty().html(html);
 			});
 		}
 
@@ -44,19 +43,19 @@ $(function() {
 		});
 	} else if (formPage === "edit") {
 		var groupAlias = formAlias;
-		
+
 		// Sections UI actions
 		if(window.location.hash){
 			$('#sections').find('a[href="'+window.location.hash+'"]').tab('show');
 		}
-		
+
 		$('#sections').on('click', 'a', function (e) {
 			e.preventDefault();
 			// add this line
 			window.location.hash = $(this).attr('href');
 			$(this).tab('show');
 		});
-				
+
 		// Typehead
 		refreshGroupMembers();
 		$('#member-username').typeahead({
@@ -85,11 +84,11 @@ $(function() {
 
 			return false; // Prevent refresh
 		});
-		
+
 		function refreshGroupMembers() {
 			omegaup.getGroup(groupAlias, function(group){
 				$('#group-members').empty();
-				
+
 				for (var i = 0; i < group.users.length; i++) {
 					var user = group.users[i];
 					$('#group-members').append(
@@ -98,7 +97,7 @@ $(function() {
 								$('<a></a>')
 									.attr('href', '/profile/' + user.userinfo.username + '/')
 									.text(omegaup.escape(user.userinfo.username))
-							))							
+							))
 							.append($('<td><button type="button" class="close">&times;</button></td>')
 								.click((function(username) {
 									return function(e) {
@@ -119,9 +118,8 @@ $(function() {
 				}
 			});
 		}
-		
+
 		$('#add-scoreboard-form').submit(function() {
-			
 			var name = $('#title').val();
 			var alias = $('#alias').val();
 			var description = $('#description').val();
@@ -139,11 +137,11 @@ $(function() {
 
 			return false; // Prevent refresh
 		});
-		
+
 		function refreshGroupScoreboards() {
 			omegaup.getGroup(groupAlias, function(group){
 				$('#group-scoreboards').empty();
-				
+
 				for (var i = 0; i < group.scoreboards.length; i++) {
 					var scoreboard = group.scoreboards[i];
 					$('#group-scoreboards').append(
@@ -152,17 +150,14 @@ $(function() {
 								$('<a></a>')
 									.attr('href', '/group/' + groupAlias + '/scoreboard/' + scoreboard.alias + '/')
 									.text(omegaup.escape(scoreboard.name))
-							))							
+							))
 							.append($('<td><a class="glyphicon glyphicon-edit" href="/group/' + groupAlias + '/scoreboard/' + scoreboard.alias  + '/edit/" title="Edit"></a></td>'))
 					);
 				}
 			});
 		}
-		
-		refreshGroupScoreboards();		
+
+		refreshGroupScoreboards();
 	}
 });
-
-
-
 

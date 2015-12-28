@@ -3,4 +3,4 @@
 			<div class="alert alert-danger">
 				{$ERROR_MESSAGE}
 			</div>
-		{/if} 		
+		{/if}

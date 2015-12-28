@@ -6,7 +6,7 @@
 
 <div class="post">
 	<div class="copy">
-		<h1>Estadísticas en vivo</h1>				
+		<h1>Estadísticas en vivo</h1>
 		<h2><div id="total-runs"></div> </h2>
 		<div id="verdict-chart"></div>
 		<div id="cases-distribution-chart"></div>
@@ -15,7 +15,7 @@
 </div>
 
 {if isset($smarty.get.problem)}
-<script type="text/javascript" src="/js/problem.stats.js?ver=7431dd"></script>
+<script type="text/javascript" src="/js/problem.stats.js?ver=caa326"></script>
 {/if}
 
 {include file='footer.tpl'}

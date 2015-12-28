@@ -13,8 +13,6 @@ INSERT INTO `Roles` (`role_id`,`name`,`description`) VALUES (2,'Contestant','Con
 INSERT INTO `Roles` (`role_id`,`name`,`description`) VALUES (3,'Judge','Juez de concursos. Encargados de crear problemas y responder preguntas sobre los problemas');
 INSERT INTO `Roles` (`role_id`,`name`,`description`) VALUES (4,'Visitor','Usuario no loggeado a omegaup');
 
-
-
 /* Inserts all permissions */
 
 INSERT INTO `Permissions` (`permission_id`,`name`,`description`) VALUES (1,'/contests/','Lista (por default de los últimos 10 concursos) que el usuario "puede ver"');
@@ -34,8 +32,6 @@ INSERT INTO `Permissions` (`permission_id`,`name`,`description`) VALUES (14,'/no
 INSERT INTO `Permissions` (`permission_id`,`name`,`description`) VALUES (15,'/arena','Regresa el HTML de la arena. Si el usuario no esta loggeado, muestra el login. Si está loggeado, por');
 INSERT INTO `Permissions` (`permission_id`,`name`,`description`) VALUES (16,'/arena/:contest_alias','Si el usuario puede verlo, regresa el HTML asociado a un concurso, /contests/:id');
 INSERT INTO `Permissions` (`permission_id`,`name`,`description`) VALUES (17,'/arena/:contest_alias/scoreboard','Si el usuario puede verlo, regresa el HTML asociado a un concurso, arreglando de forma bonita los co');
-
-
 
 /* Install Roles_Permissions*/
 

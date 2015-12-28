@@ -12,7 +12,7 @@
 			<thead>
 				<tr>
 					<th></th>
-					<th>{#codersOfTheMonthUser#}</th>				
+					<th>{#codersOfTheMonthUser#}</th>
 					<th>{#codersOfTheMonthDate#}</th>
 				</tr>
 			</thead>
@@ -26,7 +26,7 @@
 				{/foreach}
 			</tbody>
 		</table>
-	</div>			
+	</div>
 </div>
-				
+
 {include file='footer.tpl'}

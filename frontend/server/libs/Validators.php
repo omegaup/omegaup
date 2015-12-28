@@ -6,10 +6,9 @@
  * @author joemmanuel
  */
 class Validators {
-
 	/**
 	 * Check if email is valid
-	 * 
+	 *
 	 * @param string $email
 	 * @param string $parameterName Name of parameter that will appear en error message
 	 * @param boolean $required If $required is TRUE and the parameter is not present, check fails.
@@ -28,7 +27,7 @@ class Validators {
 
 	/**
 	 * Check if string is string and not empty
-	 * 
+	 *
 	 * @param string $email
 	 * @param string $parameterName Name of parameter that will appear en error message
 	 * @param boolean $required If $required is TRUE and the parameter is not present, check fails.
@@ -38,7 +37,7 @@ class Validators {
 	public static function isStringNonEmpty($parameter, $parameterName, $required = true) {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
-		// Validate data is string        
+		// Validate data is string
 		if ($isPresent && (!is_string($parameter) || strlen($parameter) < 1)) {
 			throw new InvalidParameterException("parameterEmpty", $parameterName);
 		}
@@ -48,7 +47,7 @@ class Validators {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param string $parameter
 	 * @param string $parameterName
 	 * @param int $maxLength
@@ -66,7 +65,7 @@ class Validators {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param string $parameter
 	 * @param string $parameterName
 	 * @param int $minLength
@@ -84,7 +83,7 @@ class Validators {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param string $parameter
 	 * @param string $parameterName
 	 * @param boolean $required
@@ -102,10 +101,10 @@ class Validators {
 
 		return true;
 	}
-	
+
 	/**
 	 * Enforces username requirements
-	 * 
+	 *
 	 * @param string $parameter
 	 * @param string $parameterName
 	 * @param boolean $required
@@ -113,16 +112,16 @@ class Validators {
 	 */
 	public static function isValidUsername($parameter, $parameterName, $required = true) {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
-		
+
 		if ($isPresent && preg_match("/[^a-zA-Z0-9_.-]/", $parameter)) {
 			throw new InvalidParameterException("parameterInvalidAlias", $parameterName);
 		}
-		
+
 		Validators::isStringOfMinLength($parameter, $parameterName, 2);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param date $parameter
 	 * @param string $parameterName
 	 * @param boolean $required
@@ -133,7 +132,7 @@ class Validators {
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
 		// Validate that we are working with a date
-		// @TODO This strtotime() allows nice strings like "next Thursday". 
+		// @TODO This strtotime() allows nice strings like "next Thursday".
 		if ($isPresent && strtotime($parameter) === false) {
 			throw new InvalidParameterException("parameterInvalid", $parameterName);
 		}
@@ -142,7 +141,7 @@ class Validators {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param string $parameter
 	 * @param string $parameterName
 	 * @param int $lowerBound
@@ -171,7 +170,7 @@ class Validators {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param int $parameter
 	 * @param string $parameterName
 	 * @param bool $required
@@ -190,7 +189,7 @@ class Validators {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param mixed $parameter
 	 * @param string $parameterName
 	 * @param array $enum
@@ -199,7 +198,6 @@ class Validators {
 	 * @throws InvalidParameterException
 	 */
 	public static function isInEnum($parameter, $parameterName, array $enum, $required = true) {
-
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
 		if ($isPresent && !in_array($parameter, $enum)) {
@@ -211,7 +209,7 @@ class Validators {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param mixed $parameter
 	 * @param string $parameterName
 	 * @param array $enum
@@ -220,7 +218,6 @@ class Validators {
 	 * @throws InvalidParameterException
 	 */
 	public static function isValidSubset($parameter, $parameterName, array $enum, $required = true) {
-
 		$isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
 
 		if ($isPresent) {
@@ -241,7 +238,7 @@ class Validators {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param type $parameter
 	 * @param type $parameterName
 	 * @param boolean $required
@@ -257,5 +254,4 @@ class Validators {
 
 		return $isPresent;
 	}
-
 }

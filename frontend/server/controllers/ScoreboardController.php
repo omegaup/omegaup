@@ -2,13 +2,12 @@
 
 /**
  * ScoreboardController
- * 
+ *
  */
 class ScoreboardController extends Controller {
-
 	/**
 	 * Returns a list of contests
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException

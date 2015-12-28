@@ -1,6 +1,6 @@
 
 function OmegaupGraph() {
-	var self = this;	
+	var self = this;
 }
 
 OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
@@ -18,7 +18,6 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
 			formatter: function() {
 							return '<b>Envíos</b>: '+ stats.verdict_counts[this.point.name] ;
 					}
-
 		},
 		plotOptions: {
 			pie: {
@@ -27,7 +26,7 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
 				dataLabels: {
 					enabled: true,
 					color: '#000000',
-					connectorColor: '#000000',					
+					connectorColor: '#000000',
 					formatter: function() {
 							return '<b>'+ this.point.name +'</b>: '+ this.percentage.toFixed(2) +' % ('+ stats.verdict_counts[this.point.name] +')' ;
 					}
@@ -41,7 +40,7 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
 		}]
 	});
 };
-	
+
 OmegaupGraph.prototype.normalizeRunCounts = function(stats) {
 	return [
 			['WA',   (stats.verdict_counts["WA"] / stats.total_runs) * 100],
@@ -58,7 +57,7 @@ OmegaupGraph.prototype.normalizeRunCounts = function(stats) {
 			['RTE',   (stats.verdict_counts["RTE"] / stats.total_runs) * 100],
 			['CE',   (stats.verdict_counts["CE"] / stats.total_runs) * 100],
 			['JE',   (stats.verdict_counts["JE"] / stats.total_runs) * 100],
-		];	
+		];
 };
 
 OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
@@ -70,7 +69,6 @@ OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
 			renderTo: 'pending-runs-chart',
 			events: {
 				load: function() {
-
 					// set up the updating of the chart each second
 					var series = this.series[0];
 					setInterval(function() {
@@ -137,18 +135,18 @@ OmegaupGraph.prototype.getDistribution = function(stats) {
 	for (var val in stats.distribution) {
 		distribution.push(parseInt(stats.distribution[val]));
 	}
-		
+
 	return distribution;
 };
 
 OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
 	var categories_vals = [];
-	var separator = 0;		
+	var separator = 0;
 	for (var val in stats.distribution) {
 		categories_vals[val] = separator;
-		separator += stats.size_of_bucket;			
+		separator += stats.size_of_bucket;
 	}
-	
+
 	return new Highcharts.Chart ({
 		chart: {
 			type: 'column',
@@ -156,7 +154,7 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
 		},
 		title: {
 			text: 'Distribución de puntajes del concurso ' + title
-		},            
+		},
 		xAxis: {
 		   categories: categories_vals,
 			title: {
@@ -166,7 +164,6 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
 				formatter: function() {
 					if (this.value % 10 == 0) {
 						return this.value;
-
 					}
 					else {
 						return '';
@@ -181,7 +178,6 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
 			}
 		},
 		tooltip: {
-
 		},
 		plotOptions: {
 			column: {
@@ -192,13 +188,8 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
 		series: [{
 			name: 'Número de concursantes',
 			data: this.getDistribution(stats)
-
 		}]
 	});
-		
-		
 };
-		
-
 
 var oGraph = new OmegaupGraph();

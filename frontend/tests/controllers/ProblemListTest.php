@@ -6,12 +6,10 @@
  * @author joemmanuel
  */
 class ProblemList extends OmegaupTestCase {
-
 	/**
 	 * Gets the list of problems
 	 */
 	public function testProblemList() {
-
 		// Get 3 problems
 		$n = 3;
 		for ($i = 0; $i < $n; $i++) {
@@ -62,13 +60,11 @@ class ProblemList extends OmegaupTestCase {
 	 * Limit the output to one problem we know
 	 */
 	public function testLimitOffset() {
-
 		// Get 3 problems
 		$n = 3;
 		for ($i = 0; $i < $n; $i++) {
 			$problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */);
 		}
-
 
 		$r = new Request();
 		$r["auth_token"] = $this->login(UserFactory::createUser());
@@ -86,7 +82,6 @@ class ProblemList extends OmegaupTestCase {
 	 *
 	 */
 	public function testPrivateProblemsShowToAuthor() {
-
 		$author = UserFactory::createUser();
 		$anotherAuthor = UserFactory::createUser();
 
@@ -107,7 +102,6 @@ class ProblemList extends OmegaupTestCase {
 	 *
 	 */
 	public function testAllPrivateProblemsShowToAdmin() {
-
 		$author = UserFactory::createUser();
 
 		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
@@ -127,7 +121,6 @@ class ProblemList extends OmegaupTestCase {
 	 * Test myList API
 	 */
 	public function testMyList() {
-
 		// Get 3 problems
 		$author = UserFactory::createUser();
 		$n = 3;
@@ -147,7 +140,6 @@ class ProblemList extends OmegaupTestCase {
 	 * Logged-in users will have their best scores for all problems
 	 */
 	public function testListContainsScores() {
-
 		$contestant = UserFactory::createUser();
 
 		$problemData = ProblemsFactory::createProblem();
@@ -188,7 +180,6 @@ class ProblemList extends OmegaupTestCase {
 	 * Test that non-logged in users dont have score set
 	 */
 	public function testListScoresForNonLoggedIn() {
-
 		$problemData = ProblemsFactory::createProblem();
 
 		$r = new Request();
@@ -207,7 +198,6 @@ class ProblemList extends OmegaupTestCase {
 	 * Test List API with query param
 	 */
 	public function testListWithAliasQuery() {
-
 		$problemDataPublic = ProblemsFactory::createProblem(null, null, 1 /* public */);
 		$problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */);
 

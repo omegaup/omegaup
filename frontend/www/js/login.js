@@ -19,8 +19,8 @@ $(document).ready(function() {
 			$('#reg_email').val(),
 			$('#reg_username').val(),
 			$('#reg_pass').val(),
-			grecaptcha.getResponse(),	
-			function (data) { 
+			grecaptcha.getResponse(),
+			function (data) {
 				//registration callback
 				if (data.status != 'ok') {
 					OmegaUp.ui.error(data.error);
@@ -33,32 +33,27 @@ $(document).ready(function() {
 		);
 		return false; // Prevent form submission
 	}
-	
+
 	$("#register-form").submit(registerAndLogin);
 });
 
 var logmeoutOnce = window.location.href.endsWith("?logout");
 
 function signInCallback(authResult) {
-
 	//$('#google-signin').attr('style', 'display: none');
 	if (logmeoutOnce) {
 		gapi.auth.signOut();
 		logmeoutOnce = false;
-
 	} else if (authResult['code']) {
 		omegaup.googleLogin(
 				authResult['code'],
 				function (data) {
-
 					if (data.status == 'ok') {
 						window.location.reload();
 					} else {
 						OmegaUp.ui.error(data.error);
 					}
-
 				});
-
 	} else if (authResult['error']) {
 		// Esto se hace en cada refresh a la pagina de login.
 		//OmegaUp.ui.error('There was an error: ' + authResult['error']);

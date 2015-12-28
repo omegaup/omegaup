@@ -24,7 +24,6 @@ class ResetUpdateTest extends OmegaupTestCase {
 		$this->assertEquals('invalidResetToken', $message);
 	}
 
-	
 	public function testShouldRefusePasswordMismatch() {
 		try {
 			$user_data = UserFactory::generateUser();

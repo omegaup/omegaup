@@ -634,7 +634,6 @@ class ProblemDeployer {
 		try {
 			// Look for testplan
 			if (in_array("testplan", $zipFilesArray)) {
-
 				$returnValue = $this->checkCasesWithTestplan($zip, $zipFilesArray);
 				$this->log->info("testplan found, checkCasesWithTestPlan=" . $returnValue);
 				$this->filesToUnzip[] = 'testplan';
@@ -661,7 +660,6 @@ class ProblemDeployer {
 		return $returnValue;
 	}
 
-
 	/**
 	 * Validate libinteractive problems and generate all possible templates.
 	 *
@@ -678,7 +676,6 @@ class ProblemDeployer {
 				'problemDeployerLibinteractiveValidationError', $e->getMessage());
 		}
 	}
-
 
 	/**
 	 * Read already deployed statements from filesystem and apply transformations
@@ -754,7 +751,6 @@ class ProblemDeployer {
 		$this->log->info("Saving HTML statement in " . $html_filepath);
 		FileHandler::CreateFile($html_filepath, $html_file_contents);
 	}
-
 
 	/**
 	 * Deploys the given image when present in the statement contents.

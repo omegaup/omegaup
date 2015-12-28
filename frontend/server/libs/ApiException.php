@@ -101,7 +101,6 @@ ApiException::$log = Logger::getLogger("ApiException");
  *
  */
 class InvalidParameterException extends ApiException {
-
 	private $parameter;
 	private $additional_parameters;
 
@@ -139,7 +138,6 @@ class InvalidParameterException extends ApiException {
  *
  */
 class DuplicatedEntryInDatabaseException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -148,7 +146,6 @@ class DuplicatedEntryInDatabaseException extends ApiException {
 	function __construct($message, Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
 	}
-
 }
 
 /**
@@ -156,7 +153,6 @@ class DuplicatedEntryInDatabaseException extends ApiException {
  *
  */
 class InvalidDatabaseOperationException extends ApiException {
-
 	/**
 	 *
 	 * @param Exception $previous
@@ -164,7 +160,6 @@ class InvalidDatabaseOperationException extends ApiException {
 	function __construct(Exception $previous = NULL) {
 		parent::__construct("generalError", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
 	}
-
 }
 
 /**
@@ -172,7 +167,6 @@ class InvalidDatabaseOperationException extends ApiException {
  *
  */
 class NotFoundException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -181,7 +175,6 @@ class NotFoundException extends ApiException {
 	function __construct($message, Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 404 NOT FOUND', 404, $previous);
 	}
-
 }
 
 /**
@@ -189,7 +182,6 @@ class NotFoundException extends ApiException {
  *
  */
 class ForbiddenAccessException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -205,7 +197,6 @@ class ForbiddenAccessException extends ApiException {
  *
  */
 class UnauthorizedException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -221,7 +212,6 @@ class UnauthorizedException extends ApiException {
  *
  */
 class PreconditionFailedException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -230,7 +220,6 @@ class PreconditionFailedException extends ApiException {
 	function __construct($message = "userNotAllowed", Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
 	}
-
 }
 
 /**
@@ -238,7 +227,6 @@ class PreconditionFailedException extends ApiException {
  *
  */
 class InvalidFilesystemOperationException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -247,7 +235,6 @@ class InvalidFilesystemOperationException extends ApiException {
 	function __construct($message = "generalError", Exception $previous = NULL) {
 		parent::__construct($message, 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
 	}
-
 }
 
 /**
@@ -255,7 +242,6 @@ class InvalidFilesystemOperationException extends ApiException {
  *
  */
 class CaptchaVerificationFailedException extends ApiException {
-
 	/**
 	 *
 	 * @param Exception $previous
@@ -263,7 +249,6 @@ class CaptchaVerificationFailedException extends ApiException {
 	function __construct(Exception $previous = NULL) {
 		parent::__construct("unableToVerifyCaptcha", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
 	}
-
 }
 
 /**
@@ -271,7 +256,6 @@ class CaptchaVerificationFailedException extends ApiException {
  *
  */
 class InternalServerErrorException extends ApiException {
-
 	/**
 	 *
 	 * @param Exception $previous
@@ -279,7 +263,6 @@ class InternalServerErrorException extends ApiException {
 	function __construct(Exception $previous = NULL) {
 		parent::__construct("generalError", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
 	}
-
 }
 
 /**
@@ -287,7 +270,6 @@ class InternalServerErrorException extends ApiException {
  *
  */
 class InvalidCredentialsException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -296,19 +278,15 @@ class InvalidCredentialsException extends ApiException {
 	function __construct(Exception $previous = NULL) {
 		parent::__construct("usernameOrPassIsWrong", "HTTP/1.1 403 FORBIDDEN", 101, $previous);
 	}
-
 }
 
 class NotAllowedToSubmitException extends ApiException {
-
 	function __construct($message = "unableToSubmit", Exception $previous = NULL) {
 		parent::__construct($message, "HTTP/1.1 403 FORBIDDEN", 403, $previous);
 	}
 }
 
-
 class EmailNotVerifiedException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -317,12 +295,9 @@ class EmailNotVerifiedException extends ApiException {
 	function __construct(Exception $previous = NULL) {
 		parent::__construct("emailNotVerified", "HTTP/1.1 403 FORBIDDEN", 600, $previous);
 	}
-
 }
 
-
 class EmailVerificationSendException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -331,7 +306,6 @@ class EmailVerificationSendException extends ApiException {
 	function __construct(Exception $previous = NULL) {
 		parent::__construct("errorWhileSendingMail", "HTTP/1.1 500 INTERNAL SERVER ERROR", 601, $previous);
 	}
-
 }
 
 /**
@@ -339,7 +313,6 @@ class EmailVerificationSendException extends ApiException {
  *
  */
 class ProblemDeploymentFailedException extends ApiException {
-
 	/**
 	 *
 	 * @param string $message
@@ -354,7 +327,6 @@ class ProblemDeploymentFailedException extends ApiException {
  * LoginDisabledException
  */
 class LoginDisabledException extends ApiException {
-
 	function __construct(ApiException $previous = NULL) {
 		parent::__construct("loginDisabled", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
 	}

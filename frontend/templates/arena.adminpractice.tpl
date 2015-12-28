@@ -1,16 +1,16 @@
-{include file='arena.head.tpl' jsfile='/ux/admin.js?ver=06e031'}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=5eb094"></script>
+{include file='arena.head.tpl' jsfile='/ux/admin.js?ver=b36af2'}
+			<script type="text/javascript" src="/ux/libadmin.js?ver=a96398"></script>
 			<div id="title">
 				<h1 class="contest-title">Envíos globales</h1>
 			</div>
 			<div id="runs">
 				<table class="runs">
 					<caption>
-						Envíos 
+						Envíos
 						<div class="runspager">
 							<button class="runspagerprev">&lt;</button>
 							<button class="runspagernext">&gt;</button>
-							
+
 							<label for="runsverdict">{#wordsVerdict#}: </label>
 							<select class="runsverdict" name="runsverdict">
 								<option value="">{#wordsAll#}</option>
@@ -26,7 +26,7 @@
 								<option value="JE">JE</option>
 								<option value="NO-AC">No AC</option>
 							</select>
-							
+
 							<label for="runsstatus">{#wordsStatus#}: </label>
 							<select class="runsstatus" name="runsstatus">
 								<option value="">{#wordsAll#}</option>
@@ -36,11 +36,11 @@
 								<option value="running">running</option>
 								<option value="ready">ready</option>
 							</select>
-							
+
 							<label for="runsproblem">Problema: </label>
 							<input id="runsproblem" type="text" class="typeahead form-control" autocomplete="off" />
 							<button type="button" class="close" id="runsproblem-clear" style="float: none;">&times;</button>
-							
+
 							<label for="runslang">Lenguaje: </label>
 							<select class="runslang" name="runslang">
 								<option value="">{#wordsAll#}</option>
@@ -56,11 +56,11 @@
 								<option value="kj">Karel (Java)</option>
 								<option value="cat">{#wordsJustOutput#}</option>
 							</select>
-								
+
 							<label for="runsusername">Usuario: </label>
 							<input id="runsusername" type="text" class="typeahead form-control" autocomplete="off"/>
 							<button type="button" class="close" id="runsusername-clear" style="float: none;">&times;</button>
-							
+
 						</div>
 					</caption>
 					<thead>
@@ -102,7 +102,7 @@
 				</table>
 			</div>
 		</div>
-		<div id="overlay">			
+		<div id="overlay">
 {include file='arena.rundetails.tpl'}
 		</div>
 	</body>

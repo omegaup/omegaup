@@ -9,7 +9,7 @@
   * ******************************************************************************* */
 
 		/** Table Data Access Object.
-		  * 
+		  *
 		  * Esta clase abstracta comprende metodos comunes para todas las clases DAO que mapean una tabla
 		  * @access private
 		  * @abstract
@@ -32,10 +32,8 @@
 			global $conn;
 			$conn->StartTrans();
 			self::$isTrans = true;
-
 		}
 		public static function transEnd (  ){
-			
 			if(!self::$isTrans){
 				self::log("Transaccion commit pero no hay transaccion activa !!.");
 				return;
@@ -57,7 +55,7 @@
 				self::log("Transaccion rollback pero no hay transaccion activa !!.");
 				return;
 			}
-			
+
 			self::$transCount = 0;
 			global $conn;
 			$conn->FailTrans();
@@ -66,15 +64,14 @@
 		}
 		}
 		/** Value Object.
-		  * 
+		  *
 		  * Esta clase abstracta comprende metodos comunes para todas los objetos VO
 		  * @access private
 		  * @package docs
-		  * 
+		  *
 		  */
 		abstract class VO
 		{
-
 			function asArray(){
 				return get_object_vars($this);
 			}
@@ -87,14 +84,14 @@
 				        $key = preg_replace("/^\\0(.*)\\0/","",$key);
 				        $new[$key] = object_to_array($val);
 				    }
-				} 
+				}
 				else $new = $mixed;
-				return $new; 
+				return $new;
 			}
 
 			function __call($method, $params) {
 				 $var = substr($method, 3);
-				 $var = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $var)); 
+				 $var = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $var));
 
 				 if (strncasecmp($method, "get", 3)==0) {
 					 return $this->$var;

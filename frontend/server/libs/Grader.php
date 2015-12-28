@@ -6,7 +6,7 @@ class Grader {
 
 	/**
 	 * Initializes curl with JSON headers to call grader
-	 * 
+	 *
 	 * @return curl_session
 	 * @throws Exception
 	 */
@@ -38,7 +38,7 @@ class Grader {
 
 	/**
 	 * Closes curl session
-	 * 
+	 *
 	 * @param curl_session $curl
 	 */
 	private function terminateGraderCall($curl) {
@@ -48,7 +48,7 @@ class Grader {
 
 	/**
 	 * Error checking after curl_exec
-	 * 
+	 *
 	 * @param curl_session $curl
 	 * @param array $content
 	 * @throws Exception
@@ -75,8 +75,8 @@ class Grader {
 	}
 
 	/**
-	 * Call /grade endpoint with run id as paraemeter 
-	 * 
+	 * Call /grade endpoint with run id as paraemeter
+	 *
 	 * @param int $runId
 	 * @throws Exception
 	 */
@@ -95,13 +95,13 @@ class Grader {
 
 	/**
 	 * Call /reload-config endpoint
-	 * 
+	 *
 	 * @param array $request
 	 * @return string
 	 */
 	public function reloadConfig($request) {
 		$curl = $this->initGraderCall(OMEGAUP_GRADER_RELOAD_CONFIG_URL);
-		// Execute call		
+		// Execute call
 		curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));
 
 		return $this->executeCurl($curl);
@@ -109,7 +109,7 @@ class Grader {
 
 	/**
 	 * Returns the response of the /status entry point
-	 * 
+	 *
 	 * @return array json array
 	 */
 	public function status() {

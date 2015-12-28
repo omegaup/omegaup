@@ -10,7 +10,6 @@ class RegisterToContestTest extends OmegaupTestCase {
 	//pruebas extra para distinguir entre invitado y ya entrado al concurso
 
 	public function testSimpleRegistrationActions() {
-
 		self::log("Started");
 		//create a contest and its admin
 		$contestData = ContestsFactory::createContest(null, 1 /*public*/);
@@ -51,7 +50,6 @@ class RegisterToContestTest extends OmegaupTestCase {
 		$r3["username"] = $contestant->username;
 		$r3["resolution"] = false;
 		ContestController::apiArbitrateRequest($r3);
-
 
 		//ask for details again, this should fail again
 		$r2 = new Request();

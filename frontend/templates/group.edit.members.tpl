@@ -14,7 +14,7 @@
 
 	<table class="table table-striped">
 		<thead>
-			<th>{#wordsUser#}</th>			
+			<th>{#wordsUser#}</th>
 			<th>{#contestEditRegisteredAdminDelete#}</th>
 		</thead>
 		<tbody id="group-members"></tbody>

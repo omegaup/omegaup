@@ -7,12 +7,10 @@
  */
 
 class ProblemDetailsTest extends OmegaupTestCase {
-
 	/**
 	 *
 	 */
 	public function testViewProblemInAContestDetailsValid() {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
@@ -76,14 +74,12 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         // Verify open time
         $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));
-
 	}
 
 	/**
 	 * Common code for testing the statement's source.
 	 */
 	public function internalViewProblemStatement($type, $expected_text) {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
@@ -102,7 +98,6 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
 		// Log in the user
 		$r["auth_token"] = $this->login($contestant);
-
 
 		// Call api
 		$r["statement_type"] = $type;
@@ -134,7 +129,6 @@ class ProblemDetailsTest extends OmegaupTestCase {
 	}
 
 	public function testProblemDetailsNotInContest() {
-
 		// Get 1 problem public
 		$problemData = ProblemsFactory::createProblem(null, null, 1 /* public */);
 
@@ -160,7 +154,6 @@ class ProblemDetailsTest extends OmegaupTestCase {
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testPrivateProblemDetailsNotInContest() {
-
 		// Get 1 problem public
 		$problemData = ProblemsFactory::createProblem(null, null, 0 /* private */);
 
@@ -182,7 +175,6 @@ class ProblemDetailsTest extends OmegaupTestCase {
 	 * Best score is returned
 	 */
 	public function testScoreInDetailsOutsideContest() {
-
 		// Create problem
 		$problemData = ProblemsFactory::createProblem();
 
@@ -208,7 +200,6 @@ class ProblemDetailsTest extends OmegaupTestCase {
 	 * Best score is returned, problem inside a contest
 	 */
 	public function testScoreInDetailsInsideContest() {
-
 		// Create problem and contest
 		$problemData = ProblemsFactory::createProblem();
 		$contestData = ContestsFactory::createContest();

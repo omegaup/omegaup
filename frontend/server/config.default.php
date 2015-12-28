@@ -71,7 +71,6 @@ try_define('OMEGAUP_FB_SECRET',				'xxxxx');
 try_define('OMEGAUP_GOOGLE_SECRET',				'xxxxx');
 try_define('OMEGAUP_GOOGLE_CLIENTID',			'xxxxx');
 
-
 # ####################################
 # GOOGLE ANALYTICS
 # ####################################

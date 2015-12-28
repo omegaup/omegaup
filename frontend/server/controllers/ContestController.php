@@ -15,7 +15,6 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiList(Request $r) {
-
 		// Check who is visiting, but a not logged user can still view
 		// the list of contests
 		try {
@@ -50,7 +49,6 @@ class ContestController extends Controller {
 			}
 
 			if ($c->getPublic()) {
-
 				$c->toUnixTime();
 
 				$contestInfo = $c->asFilteredArray($relevant_columns);
@@ -112,14 +110,12 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiMyList(Request $r) {
-
 		self::authenticateRequest($r);
 
 		// Create array of relevant columns
 		$relevant_columns = array("title", "alias", "start_time", "finish_time", "public", "scoreboard_url", "scoreboard_url_admin");
 		$contests = null;
 		try {
-
 			$contests = ContestsDAO::getAll(NULL, NULL, "contest_id", 'DESC');
 
 			// If current user is not sys admin, then we need to filter out the contests where
@@ -340,7 +336,6 @@ class ContestController extends Controller {
 		$result["contestant_must_register"] = ($result["contestant_must_register"] == "1");
 
 		if ($current_ses["valid"] && $result["contestant_must_register"]) {
-
 			$registration = ContestUserRequestDAO::getByPK($current_ses["id"], $r["contest"]->contest_id);
 
 			$result["user_registration_requested"] = !is_null($registration);
@@ -490,7 +485,6 @@ class ContestController extends Controller {
 			$result['problems'] = $problemsResponseArray;
 
 			return $result;
-
 		}, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
 	}
 
@@ -780,12 +774,10 @@ class ContestController extends Controller {
 	 * @throws InvalidParameterException
 	 */
 	private static function validateCreateOrUpdate(Request $r, $is_update = false) {
-
 		// Is the parameter required?
 		$is_required = true;
 
 		if ($is_update === true) {
-
 			// In case of Update API, required parameters for Create API are not required
 			$is_required = false;
 
@@ -971,7 +963,6 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateAddToContestRequest(Request $r) {
-
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		// Only director is allowed to create problems in contest
@@ -1103,7 +1094,6 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateAddUser(Request $r) {
-
 		$r["user"] = null;
 
 		// Check contest_alias
@@ -1178,7 +1168,6 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiRemoveUser(Request $r) {
-
 		// Authenticate logged user
 		self::authenticateRequest($r);
 		self::validateAddUser($r);
@@ -1302,7 +1291,6 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	private static function validateClarifications(Request $r) {
-
 		// Check contest_alias
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
@@ -1397,7 +1385,6 @@ class ContestController extends Controller {
 	 * @throws NotFoundException
 	 */
 	public static function apiScoreboard(Request $r) {
-
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		try {
@@ -1444,7 +1431,6 @@ class ContestController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiScoreboardMerge(Request $r) {
-
 		// Get the current user
 		self::authenticateRequest($r);
 
@@ -1478,7 +1464,6 @@ class ContestController extends Controller {
 		// Get all scoreboards
 		$scoreboards = array();
 		foreach($contests as $contest) {
-
 			// Set defaults for contests params
 			if (!isset($r["contest_params"][$contest->alias]["only_ac"])) {
 				// Hay que hacer esto para evitar "Indirect modification of overloaded element of Request has no effect"
@@ -1509,7 +1494,6 @@ class ContestController extends Controller {
 		// Merge
 		foreach($scoreboards as $contest_alias => $scoreboard) {
 			foreach($scoreboard['ranking'] as $user_results) {
-
 				// If user haven't been added to the merged scoredboard, add him
 				if (!isset($merged_scoreboard[$user_results["username"]])) {
 					$merged_scoreboard[$user_results["username"]] = array();
@@ -1575,7 +1559,6 @@ class ContestController extends Controller {
 	}
 
 	public static function apiRequests(Request $r) {
-
 		// Authenticate request
 		self::authenticateRequest($r);
 
@@ -1616,7 +1599,6 @@ class ContestController extends Controller {
 
 		$users = array();
 		foreach ($db_results as $result) {
-
 			$admin_id = $result["admin_id"];
 
 			$result = new ContestUserRequest($result);
@@ -1653,7 +1635,6 @@ class ContestController extends Controller {
 	}
 
 	public static function apiArbitrateRequest(Request $r) {
-
 		$result = array("status" => "ok");
 
 		if (is_null($r["resolution"])) {
@@ -1718,7 +1699,6 @@ class ContestController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiUsers(Request $r) {
-
 		// Authenticate request
 		self::authenticateRequest($r);
 
@@ -1797,7 +1777,6 @@ class ContestController extends Controller {
 	 * @param Contests $contest
 	 */
 	private static function validateContestCanBePublic(Contests $contest) {
-
 		// Check that contest has some problems at least 1 problem
 		$problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->getContestId());
 		if (count($problemsInContest) < 1) {
@@ -1825,7 +1804,6 @@ class ContestController extends Controller {
 
 		// Update contest DAO
 		if (!is_null($r["public"])) {
-
 			// If going public
 			if ($r["public"] == 1) {
 				self::validateContestCanBePublic($r["contest"]);
@@ -1971,7 +1949,6 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateRuns(Request $r) {
-
 		// Defaults for offset and rowcount
 		if (!isset($r["offset"])) {
 			$r["offset"] = 0;
@@ -2001,7 +1978,6 @@ class ContestController extends Controller {
 		Validators::isNumber($r["rowcount"], "rowcount", false);
 		Validators::isInEnum($r["status"], "status", array('new', 'waiting', 'compiling', 'running', 'ready'), false);
 		Validators::isInEnum($r["verdict"], "verdict", array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"), false);
-
 
 		// Check filter by problem, is optional
 		if (!is_null($r["problem_alias"])) {
@@ -2082,7 +2058,6 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateStats(Request $r) {
-
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 
 		try {
@@ -2107,7 +2082,6 @@ class ContestController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	public static function apiStats(Request $r) {
-
 		// Get user
 		self::authenticateRequest($r);
 
@@ -2138,7 +2112,6 @@ class ContestController extends Controller {
 				$totalPoints += $cP->getPoints();
 			}
 
-
 			// Get scoreboard to calculate distribution
 			$distribution = array();
 			for ($i = 0; $i < 101; $i++) {
@@ -2150,7 +2123,6 @@ class ContestController extends Controller {
 			foreach($scoreboardResponse["ranking"] as $results) {
 				$distribution[(int)($results["total"]["points"] / $sizeOfBucket)]++;
 			}
-
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
@@ -2206,7 +2178,6 @@ class ContestController extends Controller {
 	 * @return array
 	 */
 	public static function apiCsvReport(Request $r) {
-
 		self::authenticateRequest($r);
 
 		self::validateStats($r);
@@ -2251,7 +2222,6 @@ class ContestController extends Controller {
 		$csvData[] = $csvRow;
 
 		foreach ($contestReport["ranking"] as $userData) {
-
 			if ($userData === "ok") {
 				continue;
 			}
@@ -2260,7 +2230,6 @@ class ContestController extends Controller {
 			$csvRow[] = $userData["username"];
 
 			foreach ($userData["problems"] as $key => $problemData) {
-
 				// If the user don't have these details then he didn't submit,
 				// we need to fill the report with 0s for completeness
 				if (!isset($problemData["run_details"]["cases"]) || count($problemData["run_details"]["cases"]) === 0) {
@@ -2273,7 +2242,6 @@ class ContestController extends Controller {
 				} else {
 					// for each case
 					foreach ($problemData["run_details"]["cases"] as $caseData) {
-
 						// If case is correct
 						if (strcmp($caseData["meta"]["status"], "OK") === 0 && strcmp($caseData["out_diff"], "") === 0) {
 							$csvRow[] = '1';
@@ -2325,7 +2293,6 @@ class ContestController extends Controller {
 	}
 
 	public static function apiDownload(Request $r) {
-
 		self::authenticateRequest($r);
 
 		self::validateStats($r);

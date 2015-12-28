@@ -123,7 +123,6 @@ class Cache {
 
 		// If there wasn't a value in the cache for the key ($prefix, $id)
 		if (is_null($returnValue)) {
-
 			// Get the value from the function provided
 			$returnValue = call_user_func($setFunc, $r);
 
@@ -137,7 +136,6 @@ class Cache {
 
 			// Cache was not used
 			return false;
-
 		}
 
 		// Cache was used

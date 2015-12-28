@@ -1,7 +1,6 @@
 $(function() {
-	
 	$(".navbar #nav-groups").addClass("active");
-	
+
 	var formData = $('#form-data');
 	var formName = formData.attr('data-name');
 	var formPage = formData.attr('data-page');
@@ -9,14 +8,14 @@ $(function() {
 	var groupAlias = formData.attr('data-group-alias');
 
 	if (formPage === "edit") {
-		omegaup.getContests(function(contests) {							
+		omegaup.getContests(function(contests) {
 			for (var i = 0; i < contests.results.length; i++) {
-				contest = contests.results[i];							
+				contest = contests.results[i];
 				$('#contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
 			}
 		});
 
-		$('#scoreboard-add-contest-form').submit(function() {						
+		$('#scoreboard-add-contest-form').submit(function() {
 			omegaup.addContestToScoreboard(
 				groupAlias,
 				scoreboardAlias,
@@ -74,57 +73,56 @@ $(function() {
 			});
 		}
 	} else if (formPage === "details") {
-		
 		omegaup.getGroupScoreboard(groupAlias, scoreboardAlias, function(scoreboard){
-			var ranking = scoreboard["ranking"];						
+			var ranking = scoreboard["ranking"];
 			$("#scoreboard-title").html(scoreboard.scoreboard.name);
-			
+
 			// Adding contest's column
 			for (var c = 0; c < scoreboard.contests.length; c++) {
 				var alias = scoreboard.contests[c].alias;
-				
+
 				$('<th><a href="/arena/' + alias + '" title="' + alias + '">' +
 					c + '</a></th>').insertBefore('#ranking-table thead th.total');
-			
+
 				$('<td class="prob_' + alias + '_points"></td>')
 					.insertBefore('#ranking-table tbody.user-list-template td.points');
-			
+
 				$('#ranking-table thead th').attr('colspan', '');
 				$('#ranking-table tbody.user-list-template .penalty').remove();
 			}
-			
+
 			// Adding scoreboard data:
 			// Cleaning up table
 			$('#ranking-table tbody.inserted').remove();
-			
+
 			// For each user
 			for (var i = 0; i < ranking.length; i++) {
 				var rank = ranking[i];
-				
+
 				var r = $('#ranking-table tbody.user-list-template')
 					.clone()
 					.removeClass('user-list-template')
 					.addClass('inserted')
 					.addClass('rank-new');
-			
+
 				var username = rank.username +
 					((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
 				$('.user', r).html(username);
-				
+
 				// For each contest in the scoreboard
 				for (var c = 0; c < scoreboard.contests.length; c++) {
 					var alias = scoreboard.contests[c].alias;
 					var contestResults = rank.contests[alias];
-					
+
 					var pointsCell = $('.prob_' + alias + '_points', r);
 					pointsCell.html(
 						'<div class="points">' + (contestResults.points ? '+' + contestResults.points : '0') + '</div>\n' +
 						'<div class="penalty">' + contestResults.penalty + '</div>'
 					);
-					
-					pointsCell.removeClass('pending accepted wrong');										
+
+					pointsCell.removeClass('pending accepted wrong');
 				}
-								
+
 				$('td.points', r).html(
 					'<div class="points">' + rank.total.points + '</div>' +
 					'<div class="penalty">' + rank.total.penalty + '</div>'
@@ -132,10 +130,10 @@ $(function() {
 				$('.position', r)
 					.html(i + 1)
 					.removeClass('recent-event');
-			
+
 				$('#ranking-table').append(r);
 			}
-			
+
 			$('#ranking').show();
 			$('#root').fadeIn('slow');
 			$('#loading').fadeOut('slow');

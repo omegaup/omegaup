@@ -7,7 +7,6 @@
  */
 
 class ContestDetailsTest extends OmegaupTestCase {
-
 	/**
 	 * Insert problems in a contest
 	 *
@@ -160,7 +159,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * Check that user in private list can view private contest
 	 */
 	public function testShowValidPrivateContest() {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
 
@@ -193,7 +191,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testDontShowPrivateContestForAnyUser() {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
 
@@ -219,7 +216,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * First access time should not change for Window Length contests
 	 */
 	public function testAccessTimeIsAlwaysFirstAccessForWindowLength() {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
@@ -258,7 +254,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * First access time should not change
 	 */
 	public function testAccessTimeIsAlwaysFirstAccess() {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
@@ -294,7 +289,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * First access time should not change
 	 */
 	public function testAccessTimeIsAlwaysFirstAccessForPrivate() {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
 
@@ -332,7 +326,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * @expectedException PreconditionFailedException
 	 */
 	public function testContestNotStartedYet() {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
@@ -359,7 +352,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * Tests that user can get contest details with the scoreboard token
 	 */
 	public function testDetailsUsingToken() {
-
 		// Get a private contest
 		$contestData = ContestsFactory::createContest(null, 0);
 
@@ -442,7 +434,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testDetailsUsingInvalidToken() {
-
 		// Get a private contest
 		$contestData = ContestsFactory::createContest(null, 0);
 
@@ -455,14 +446,12 @@ class ContestDetailsTest extends OmegaupTestCase {
 			"contest_alias" => $contestData["request"]["alias"],
 			"token" => "invalid token"
 		)));
-
 	}
 
 	/**
 	 * Tests that user can get contest details with the scoreboard token
 	 */
 	public function testDetailsNoLoginUsingToken() {
-
 		// Get a private contest
 		$contestData = ContestsFactory::createContest(null, 0);
 
@@ -500,7 +489,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 		)));
 
 		$this->assertContestDetails($contestData, array(), $detailsResponse);
-
 	}
 
 	/**
@@ -552,7 +540,6 @@ class ContestDetailsTest extends OmegaupTestCase {
 		$this->assertEquals($problemData["request"]["alias"], $response["problems"][0]["alias"]);
 
 		foreach ($contestants as $contestant) {
-
 			$found = false;
 			foreach ($response["ranking"] as $rank) {
 				if ($rank["username"] == $contestant->username) {

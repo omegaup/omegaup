@@ -26,7 +26,6 @@ class GraderMock extends Grader {
 }
 
 class RunsFactory {
-
 	/**
 	 * Builds and returns a request object to be used for RunController::apiCreate
 	 *
@@ -36,7 +35,6 @@ class RunsFactory {
 	 * @return Request
 	 */
 	private static function createRequestCommon($problemData, $contestData, $contestant) {
-
 		// Create an empty request
 		$r = new Request();
 
@@ -64,7 +62,6 @@ class RunsFactory {
 	 * @return array
 	 */
 	public static function createRun($problemData, $contestData, $contestant) {
-
 		// Our contestant has to open the contest before sending a run
 		ContestsFactory::openContest($contestData, $contestant);
 
@@ -94,7 +91,6 @@ class RunsFactory {
 	 * @param type $contestant
 	 */
 	public static function createRunToProblem($problemData, $contestant) {
-
 		$r = self::createRequestCommon($problemData, null, $contestant);
 
 		// Call API
@@ -119,7 +115,6 @@ class RunsFactory {
 	 * @param string $verdict
 	 */
 	public static function gradeRun($runData, $points = 1, $verdict = "AC", $submitDelay = null) {
-
 		$run = RunsDAO::getByAlias($runData["response"]["guid"]);
 
 		$run->setVerdict($verdict);

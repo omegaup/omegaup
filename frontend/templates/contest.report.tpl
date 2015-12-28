@@ -12,7 +12,7 @@
     {foreach key=key item=item from=$contestantData.problems}
     	<h4>Problem: {$key}</h4>
 	<h4>Points: {$item.points}</h4>
-   	<table>	
+   	<table>
 	<tr>
 	<th>Case</th>
 	<th>Time (Sec)</th>

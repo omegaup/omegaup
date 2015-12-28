@@ -3,7 +3,7 @@ $(document).ready(function() {
 	var admin = null;
 
 	if (arena.onlyProblem) {
-		var onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(window.location.pathname)[1];		
+		var onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 	}
 	else {
 		var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
@@ -55,7 +55,7 @@ $(document).ready(function() {
 				admin.refreshClarifications();
 			}, 5 * 60 * 1000);
 		}
-		
+
 		// Trigger the event (useful on page load).
 		onlyProblemHashChanged();
 	}
@@ -117,7 +117,7 @@ $(document).ready(function() {
 			$('.tabs a[href="#' + arena.activeTab + '"]').addClass('active');
 			$('.tab').hide();
 			$('#' + arena.activeTab).show();
-			
+
 			if (arena.activeTab == 'clarifications') {
 				$('#clarifications-count').css("font-weight", "normal");
 			}
@@ -208,20 +208,20 @@ $(document).ready(function() {
 				if (arena.clarificationsOffset < 0) {
 					arena.clarificationsOffset = 0;
 				}
-				
+
 				// Refresh with previous page
-				omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
+				omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
 			}
 		});
-		
+
 		$('.clarifpager .clarifpagernext').click(function () {
 			arena.clarificationsOffset += arena.clarificationsRowcount;
 			if (arena.clarificationsOffset < 0) {
 				arena.clarificationsOffset = 0;
 			}
-			
+
 			// Refresh with previous page
-			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena)); 
+			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
 		});
 	}
 
@@ -243,11 +243,11 @@ $(document).ready(function() {
 				$('#submit input').removeAttr('disabled');
 				return;
 			}
-			
+
 			if (!arena.onlyProblem) {
 				arena.problems[arena.currentProblem.alias].last_submission = omegaup.time().getTime();
 			}
-		
+
 			run.status = 'new';
 			run.alias = arena.currentProblem.alias;
 			run.contest_score = null;
@@ -346,7 +346,7 @@ $(document).ready(function() {
 
 		return false;
 	});
-	
+
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
 		omegaup.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {

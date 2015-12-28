@@ -13,7 +13,6 @@
 			</div>
 		</td>
 
-
 		<td >
 			<div class="post" style="width: 760px; min-height: 300px;">
 				<div class="copy" >
@@ -46,9 +45,6 @@
 	</tr>
 	</table>
 </div>
-
-
-
 
 {include file='footer.tpl'}
 

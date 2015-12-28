@@ -13,10 +13,10 @@ $(document).ready(function() {
 	if (arena.contestAlias === "admin") {
 		$('#runs').show();
 		admin.refreshRuns();
-		setInterval(function() { 
+		setInterval(function() {
 			runsOffset = 0; // Return pagination to start on refresh
 			admin.refreshRuns();
-		}, 5 * 60 * 1000);		
+		}, 5 * 60 * 1000);
 
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
@@ -41,7 +41,7 @@ $(document).ready(function() {
 
 			$('#summary .title').html(omegaup.escape(contest.title));
 			$('#summary .description').html(omegaup.escape(contest.description));
-						
+
 			$('#summary .start_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
 			$('#summary .finish_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
 			$('#summary .window_length').html(contest.window_length);
@@ -82,7 +82,7 @@ $(document).ready(function() {
 			$('#root').fadeIn('slow');
 		});
 	}
-	
+
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
 			$('#submit #clarification').hide();
@@ -103,7 +103,7 @@ $(document).ready(function() {
 			$('#submit-filename-extension').text();
 		}
 	});
-	
+
 	$('#submit').submit(function(e) {
 		if (!$('#submit textarea[name="code"]').val()) return false;
 

@@ -6,11 +6,8 @@
  * @author joemmanuel
  */
 
-
 class ContestUsersTest extends OmegaupTestCase {
-
 	public function testContestUsersValid() {
-
 		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
@@ -18,7 +15,6 @@ class ContestUsersTest extends OmegaupTestCase {
 		$n = 10;
 		$users = array();
 		for($i = 0; $i < $n; $i++) {
-
 			// Create a user
 			$users[$i] = UserFactory::createUser();
 

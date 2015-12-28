@@ -94,7 +94,6 @@
 				</div>
 			</div><!-- contestRules -->
 
-
 			<div class="col-md-4">
 				<h4>{#contestJoin#}</h4>
 
@@ -152,6 +151,6 @@
 		</div><!-- row -->
 	</div><!-- panel panel-default -->
 
-<script src="/js/contestintro.js?ver=6627a8"></script>
+<script src="/js/contestintro.js?ver=67104b"></script>
 {include file='footer.tpl'}
 

@@ -19,7 +19,6 @@ require_once("base/Runs.vo.base.php");
  *
  */
 class RunsDAO extends RunsDAOBase {
-
 	/*
 	 * Gets a boolean indicating whether there are runs that are not ready.
 	 */
@@ -339,7 +338,6 @@ class RunsDAO extends RunsDAOBase {
 	 */
 
 	public static final function GetAllRelevantUsers($contest_id, $showAllRuns = false, $filterUsersBy = null) {
-
 		// Build SQL statement
 		if (!$showAllRuns) {
 			$sql = "SELECT Users.user_id, username, Users.name, Users.country_id from Users INNER JOIN ( "
@@ -361,8 +359,6 @@ class RunsDAO extends RunsDAOBase {
 			$val = array($contest_id, $contest_id, $contest_id);
 		}
 
-
-
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
 
@@ -376,7 +372,6 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	public static final function GetContestRuns($contest_id, $onlyAC = false) {
-
 		$sql =	  "SELECT "
 					. "r.score, r.penalty, r.contest_score, r.problem_id, r.user_id, r.test, r.time, r.submit_delay, r.guid "
 				. "FROM "
@@ -532,7 +527,6 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	public static function GetRunCountsToDate($date) {
-
 		$sql = "select count(*) as total from Runs where time <= ?";
 		$val = array($date);
 
@@ -543,7 +537,6 @@ class RunsDAO extends RunsDAOBase {
 	}
 
 	public static function GetAcRunCountsToDate($date) {
-
 		$sql = "select count(*) as total from Runs where verdict = 'AC' and time <= ?";
 		$val = array($date);
 
@@ -669,5 +662,4 @@ class RunsDAO extends RunsDAOBase {
 		}
 		return $ar;
 	}
-
 }

@@ -7,15 +7,13 @@
  */
 
 class EmailVerificationUITest extends OmegaupUITestCase {
-
 	public function testLogin() {
-
 		// Turn off sending email on usere creation
 		UserController::$sendEmailOnVerify = false;
-		
+
 		// Create a user
 		$contestant = UserFactory::createUserWithoutVerify();
-					
+
 		// Open index
 		$this->open('/');
 
@@ -26,24 +24,24 @@ class EmailVerificationUITest extends OmegaupUITestCase {
 		$this->type('user', $contestant->getUsername());
 		$this->type('pass', $contestant->getPassword());
 
-		// Click inicia sesion		
+		// Click inicia sesion
 		$this->clickAndWait("//input[@value='Inicia sesion']");
 
-		// Wait for message		
+		// Wait for message
 		$this->waitForElementPresent('//*[@id="content"]/div[2]/div');
 		$this->assertElementContainsText('//*[@id="content"]/div[2]/div', "Your email is not verified yet. Please check your e-mail.");
-		
+
 		// Go to verification page and wait for redirection to login page
 		$this->open('/api/user/verifyemail/id/'.$contestant->getVerificationId());
 		$this->waitForElementPresent('//*[@id="content"]/div[2]/div[1]/h1');
-				
+
 		// Type login data
 		$this->type('user', $contestant->getUsername());
 		$this->type('pass', $contestant->getPassword());
 
-		// Click inicia sesion		
+		// Click inicia sesion
 		$this->clickAndWait("//input[@value='Inicia sesion']");
-		
+
 		// Sanity check that we are logged in
 		$this->waitForElementPresent('//*[@id="wrapper"]/div[1]/a');
 		$this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->getUsername());

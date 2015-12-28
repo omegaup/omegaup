@@ -7,7 +7,6 @@ require_once 'libs/Markdown/markdown.php';
  * ProblemsController
  */
 class ProblemController extends Controller {
-
 	public static $grader = null;
 
 	/**
@@ -124,7 +123,6 @@ class ProblemController extends Controller {
 
 		// Insert new problem
 		try {
-
 			ProblemsDAO::transBegin();
 
 			// Create file after we know that alias is unique
@@ -166,7 +164,6 @@ class ProblemController extends Controller {
 			if (strpos($e->getMessage(), "1062") !== FALSE) {
 				throw new DuplicatedEntryInDatabaseException("problemTitleExists");
 			} else {
-
 				throw new InvalidDatabaseOperationException($e);
 			}
 		} finally {
@@ -538,7 +535,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiUpdate(Request $r) {
-
 		self::authenticateRequest($r);
 
 		self::validateCreateOrUpdate($r, true /* is update */);
@@ -578,7 +574,6 @@ class ProblemController extends Controller {
 			ProblemsDAO::transBegin();
 
 			if (isset($_FILES['problem_contents']) && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
-
 				// DeployProblemZip requires alias => problem_alias
 				$r["alias"] = $r["problem_alias"];
 
@@ -724,7 +719,6 @@ class ProblemController extends Controller {
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateDetails(Request $r) {
-
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias", false);
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 
@@ -767,7 +761,6 @@ class ProblemController extends Controller {
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
-
 
 			// If the contest is private, verify that our user is invited
 			if ($r["contest"]->public != "1") {
@@ -906,7 +899,6 @@ class ProblemController extends Controller {
 		}
 	}
 
-
 	/**
 	 * Entry point for Problem Details API
 	 *
@@ -915,7 +907,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiDetails(Request $r) {
-
 		// Get user.
 		// Allow unauthenticated requests if we are not openning a problem
 		// inside a contest.
@@ -1226,7 +1217,6 @@ class ProblemController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiStats(Request $r) {
-
 		// Get user
 		self::authenticateRequest($r);
 
@@ -1437,7 +1427,6 @@ class ProblemController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiMyList(Request $r) {
-
 		self::authenticateRequest($r);
 		self::validateList($r);
 
@@ -1474,7 +1463,6 @@ class ProblemController extends Controller {
 	 * @param Request $r
 	 */
 	public static function apiBestScore(Request $r) {
-
 		self::authenticateRequest($r);
 
 		// Uses same params as apiDetails, except for lang, which is optional

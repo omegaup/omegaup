@@ -6,24 +6,22 @@
  * @author joemmanuel
  */
 class ProblemStatsTest extends OmegaupTestCase {
-
 	/**
 	 * Check stats are ok for WA, AC, PA and total counts
 	 * Also validates the max wait time guid
 	 */
 	public function testGetStats() {
-
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
 
 		// Create our contestant
-		$contestant = UserFactory::createUser();		
+		$contestant = UserFactory::createUser();
 
 		// Create some runs to be pending
 		$pendingRunsCount = 5;

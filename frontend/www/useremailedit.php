@@ -7,5 +7,4 @@ UITools::setProfile($smarty);
 
 $smarty->display('../templates/user.email.edit.tpl');
 
-
 ?>

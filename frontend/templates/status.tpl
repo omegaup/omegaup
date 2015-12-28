@@ -1,4 +1,4 @@
-{if isset($STATUS_ERROR) and $STATUS_ERROR neq ''} 
+{if isset($STATUS_ERROR) and $STATUS_ERROR neq ''}
 	<div class="alert alert-danger" id='status'>
 		<button type="button" class="close" id="alert-close">&times;</button>
 		<span class="message">{$STATUS_ERROR}</span>

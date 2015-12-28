@@ -6,7 +6,7 @@
 
 <div class="post">
 	<div class="copy">
-		<h1>Estadísticas en vivo</h1>				
+		<h1>Estadísticas en vivo</h1>
 		<h2><div id="total-runs"></div> </h2>
 		<div id="verdict-chart"></div>
 		<div id="distribution-chart"></div>
@@ -14,6 +14,6 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/contest.stats.js?ver=bf9889"></script>
+<script type="text/javascript" src="/js/contest.stats.js?ver=ec0e2c"></script>
 
 {include file='footer.tpl'}

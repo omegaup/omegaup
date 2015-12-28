@@ -6,7 +6,6 @@
  * @author joemmanuel
  */
 class ClarificationController extends Controller {
-
 	public static $broadcaster = null;
 
 	/**
@@ -21,13 +20,12 @@ class ClarificationController extends Controller {
 
 	/**
 	 * Validate the request of apiCreate
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
 	 */
 	private static function validateCreate(Request $r) {
-
 		Validators::isStringNonEmpty($r["contest_alias"], "contest_alias");
 		Validators::isStringNonEmpty($r["problem_alias"], "problem_alias");
 		Validators::isStringNonEmpty($r["message"], "message");
@@ -55,7 +53,7 @@ class ClarificationController extends Controller {
 
 	/**
 	 * Creates a Clarification
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -99,7 +97,7 @@ class ClarificationController extends Controller {
 
 	/**
 	 * Validate Details API request
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws NotFoundException
@@ -119,7 +117,7 @@ class ClarificationController extends Controller {
 			throw new NotFoundException("clarificationNotFound");
 		}
 
-		// If the clarification is private, verify that our user is invited or is contest director 
+		// If the clarification is private, verify that our user is invited or is contest director
 		if ($r["clarification"]->public != 1) {
 			if (!(Authorization::CanViewClarification($r["current_user_id"], $r["clarification"]))) {
 				throw new ForbiddenAccessException();
@@ -129,7 +127,7 @@ class ClarificationController extends Controller {
 
 	/**
 	 * API for getting a clarification
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 */
@@ -152,13 +150,12 @@ class ClarificationController extends Controller {
 
 	/**
 	 * Validate update API request
-	 * 
+	 *
 	 * @param Request $r
 	 * @throws InvalidDatabaseOperationException
 	 * @throws ForbiddenAccessException
 	 */
 	private static function validateUpdate(Request $r) {
-
 		Validators::isNumber($r["clarification_id"], "clarificaion_id");
 		Validators::isStringNonEmpty($r["answer"], "answer", false /* not required */);
 		Validators::isInEnum($r["public"], "public", array('0', '1'), false /* not required */);
@@ -178,7 +175,7 @@ class ClarificationController extends Controller {
 
 	/**
 	 * Update a clarification
-	 * 
+	 *
 	 * @param Request $r
 	 * @return array
 	 * @throws InvalidDatabaseOperationException
@@ -187,7 +184,7 @@ class ClarificationController extends Controller {
 		// Authenticate user
 		self::authenticateRequest($r);
 
-		// Validate request 
+		// Validate request
 		self::validateUpdate($r);
 
 		// Update clarification

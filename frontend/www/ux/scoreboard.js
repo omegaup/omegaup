@@ -4,7 +4,7 @@ $(document).ready(function() {
 	arena.contestAlias = params[1];
 	arena.scoreboardToken = params[2];
 	var getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
-	
+
 	arena.connectSocket();
 	omegaup.getContestByToken(arena.contestAlias, arena.scoreboardToken, function(contest) {
 		arena.initProblems(contest);

@@ -8,14 +8,14 @@
 		<h2 class="panel-title">Force user validation</h2>
 	</div>
 	<div class="panel-body">
-		<form class="form bottom-margin" id="verify-user-form">	
+		<form class="form bottom-margin" id="verify-user-form">
 			<div class="form-group">
 				<label for="username">Username</label>
 				<input id='username' name='username' value='' type='text' size='20' class="form-control" />
 			</div>
-			
+
 			<button class="btn btn-primary" type='submit'>Verify user</button>
-		</form>		
+		</form>
 	</div>
 </div>
 

@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/scoreboard.js?ver=eb3d7e'}
+{include file='arena.head.tpl' jsfile='/ux/scoreboard.js?ver=428746'}
 		<div id="scoreboard">
 			<div id="title">
 				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>

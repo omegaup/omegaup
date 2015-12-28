@@ -18,22 +18,22 @@ ArenaAdmin.prototype.setUpPagers = function() {
 			if (self.runsOffset < 0) {
 				self.runsOffset = 0;
 			}
-			
+
 			// Refresh with previous page
 			self.refreshRuns();
 		}
 	});
-	
+
 	$('.runspager .runspagernext').click(function () {
 		self.runsOffset += self.runsRowcount;
 		if (self.runsOffset < 0) {
 			self.runsOffset = 0;
 		}
-		
+
 		// Refresh with previous page
 		self.refreshRuns();
 	});
-	
+
 	$("#runsusername").typeahead({
 		minLength: 2,
 		highlight: true,
@@ -41,12 +41,12 @@ ArenaAdmin.prototype.setUpPagers = function() {
 		source: omegaup.searchUsers,
 		displayKey: 'label',
 	}).on('typeahead:selected', self.refreshRuns.bind(self));
-	
+
 	$('#runsusername-clear').click(function() {
 		$("#runsusername").val('');
 		self.refreshRuns();
 	});
-	
+
 	if (self.arena.contestAlias === "admin") {
 		$('#runsproblem').typeahead({
 			minLength: 2,
@@ -74,10 +74,10 @@ ArenaAdmin.prototype.setUpPagers = function() {
 			self.refreshRuns();
 		});
 	}
-	
+
 	$('select.runsverdict, select.runsstatus, select.runsproblem, select.runslang')
 		.change(self.refreshRuns.bind(self));
-	
+
 	$('.clarifpager .clarifpagerprev').click(function () {
 		if (self.arena.clarificationsOffset > 0) {
 			self.arena.clarificationsOffset -= self.arena.clarificationsRowcount;
@@ -88,13 +88,13 @@ ArenaAdmin.prototype.setUpPagers = function() {
 			self.refreshClarifications();
 		}
 	});
-	
+
 	$('.clarifpager .clarifpagernext').click(function () {
 		self.arena.clarificationsOffset += self.arena.clarificationsRowcount;
 		if (self.arena.clarificationsOffset < 0) {
 			self.arena.clarificationsOffset = 0;
 		}
-		
+
 		self.refreshClarifications();
 	});
 
@@ -124,30 +124,30 @@ ArenaAdmin.prototype.refreshRuns = function() {
 	var self = this;
 
 	var options = {
-		offset: self.runsOffset, 
+		offset: self.runsOffset,
 		rowcount: self.runsRowcount
 	};
-	
+
 	if ($('select.runsverdict option:selected').val()) {
 		options.verdict = $('select.runsverdict option:selected').val();
 	}
-	
+
 	if ($('select.runsstatus option:selected').val()) {
 		options.status = $('select.runsstatus option:selected').val();
 	}
-	
+
 	if ($('select.runslang option:selected').val()) {
 		options.language = $('select.runslang option:selected').val();
 	}
-	
+
 	if (self.runsProblemAlias) {
 		options.problem_alias = self.runsProblemAlias;
 	}
-	
+
 	if ($('select.runsproblem').val()) {
 		options.problem_alias = $('select.runsproblem').val();
 	}
-	
+
 	if ($('#runsusername').val()) {
 		options.username = $('#runsusername').val();
 	}

@@ -19,17 +19,17 @@ $(document).ready(function() {
 		$("#school_id").val(val.id);
 		$('#school_name').val(val.label);
 	});
-	
+
 	$('#country_id').change(function () {
 		// Clear select
 		$('#state_id option').each(function(index, option) {
 			$(option).remove();
 		});
-		
+
 		if ($("#country_id").val() == 'MX') {
 			// Enable
 			$('#state_id').removeAttr('disabled');
-			
+
 			$('#state_id').append($('<option></option>').attr('value', '52').text('Aguascalientes'));
 			$('#state_id').append($('<option></option>').attr('value', '53').text('Baja California'));
 			$('#state_id').append($('<option></option>').attr('value', '54').text('Baja California Sur'));
@@ -61,12 +61,12 @@ $(document).ready(function() {
 			$('#state_id').append($('<option></option>').attr('value', '80').text('Tlaxcala'));
 			$('#state_id').append($('<option></option>').attr('value', '81').text('Veracruz'));
 			$('#state_id').append($('<option></option>').attr('value', '82').text('Yucatan'));
-			$('#state_id').append($('<option></option>').attr('value', '83').text('Zacatecas'));			
+			$('#state_id').append($('<option></option>').attr('value', '83').text('Zacatecas'));
 		}
 		else if ($("#country_id").val() == 'US') {
 			// Enable
 			$('#state_id').removeAttr('disabled');
-			
+
 			$('#state_id').append($('<option></option>').attr('value', '1').text('Alabama'));
 			$('#state_id').append($('<option></option>').attr('value', '2').text('Alaska'));
 			$('#state_id').append($('<option></option>').attr('value', '3').text('Arizona'));
@@ -118,13 +118,12 @@ $(document).ready(function() {
 			$('#state_id').append($('<option></option>').attr('value', '49').text('West Virginia'));
 			$('#state_id').append($('<option></option>').attr('value', '50').text('Wisconsin'));
 			$('#state_id').append($('<option></option>').attr('value', '51').text('Wyoming'));
-			
 		} else {
 			// Disable
-			$('#state_id').attr('disabled','disabled');								
-		}			
+			$('#state_id').attr('disabled','disabled');
+		}
 	});
-	
+
 	omegaup.getProfile(null, function(data) {
 		$("#username").html(data.userinfo.username);
 		$("#name").val(data.userinfo.name);
@@ -132,10 +131,10 @@ $(document).ready(function() {
 		$("#graduation_date").val(onlyDateToString(data.userinfo.graduation_date));
 		$("#country_id").val(data.userinfo.country_id);
 		$("#locale").val(data.userinfo.locale);
-		
+
 		// Update state dropdown status
 		$('#country_id').trigger('change');
-		
+
 		$("#state_id").val(data.userinfo.state_id);
 		$("#scholar_degree").val(data.userinfo.scholar_degree);
 		$("#school_id").val(data.userinfo.school_id);
@@ -145,11 +144,11 @@ $(document).ready(function() {
 		original_school = data.userinfo.school;
 		original_school_id = data.userinfo.school_id;
 	});
-	
+
 	var formSubmit = function() {
 		var birth_date = new Date($("#birth_date").val());
 		birth_date.setHours(23);
-		
+
 		var graduation_date = new Date($("#graduation_date").val());
 		graduation_date.setHours(23);
 
@@ -159,13 +158,13 @@ $(document).ready(function() {
 		    $('#school').val() != original_school) {
 			$('#school_id').val('');
 		}
-		
+
 		omegaup.updateProfile(
-			$("#name").val(), 
-			birth_date.getTime() / 1000, 
-			$("#country_id").val(), 
-			$("#state_id").val(), 
-			$("#scholar_degree").val(), 
+			$("#name").val(),
+			birth_date.getTime() / 1000,
+			$("#country_id").val(),
+			$("#state_id").val(),
+			$("#scholar_degree").val(),
 			graduation_date.getTime() / 1000,
 			$("#school_id").val(),
 			$("#school").val(),
@@ -182,13 +181,12 @@ $(document).ready(function() {
 				}
 			}
 		);
-		
+
 		return false; // Prevent page refresh on submit
 	};
-	
-	
+
 	$('form#user_profile_form').submit(formSubmit);
-	
+
 	$('form#change-password-form').submit(function() {
 		var newPassword = $('#new-password-1').val();
 		var newPassword2 = $('#new-password-2').val();
@@ -196,9 +194,9 @@ $(document).ready(function() {
 			OmegaUp.ui.error(OmegaUp.T['loginPasswordNotEqual']);
 			return false;
 		}
-	
+
 		var oldPassword = $('#old-password').val();
-		
+
 		omegaup.changePassword(oldPassword, newPassword, function(data) {
 			if (data.status == "ok") {
 				OmegaUp.ui.success(OmegaUp.T['passwordResetResetSuccess']);
@@ -206,7 +204,7 @@ $(document).ready(function() {
 				OmegaUp.ui.error(data.error);
 			}
 		});
-		
+
 		// Prevent page refresh on submit
 		return false;
 	});

@@ -18,7 +18,6 @@ $smarty->assign('SOURCE', "");
 $smarty->assign('PUBLIC', "0");
 
 if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
-		
 	$r = new Request(array(
 				"auth_token" => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
 				"title" => $_POST["title"],
@@ -30,7 +29,7 @@ if (isset($_POST["request"]) && ($_POST["request"] == "submit")) {
 				"extra_wall_time" => $_POST["extra_wall_time"],
 				"memory_limit" => $_POST["memory_limit"],
 				"output_limit" => $_POST["output_limit"],
- 				"source" => $_POST["source"],				
+ 				"source" => $_POST["source"],
 				"public" => $_POST["public"],
 				"stack_limit" => $_POST["stack_limit"],
 				"email_clarifications" => $_POST["email_clarifications"]

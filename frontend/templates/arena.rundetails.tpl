@@ -1,6 +1,6 @@
 			<form id="run-details">
 				<button class="close">&times;</button>
-		
+
 				<div class="cases">
 					<h3>{#wordsCases#}</h3>
 					<div></div>

@@ -263,7 +263,6 @@ $('document').ready(function() {
 				formatter : function(a,b,c) {
 					return '<button type="button" class="close request-deny" value="'+b.username+'" style="color:red">&times;</button>'
 							 + '<button type="button" class="close request-accept" value="'+b.username+'" style="color:green">&#x2713;</button>';
-
 				}
 			}]
 		});

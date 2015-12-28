@@ -78,10 +78,8 @@ $(document).ready(function() {
 		var clock = "";
 
 		if (date > contest.finish_time.getTime()) { // Ended
-
 		} else if (date > contest.start_time.getTime()) { // Started
 			$('#click_to_proceed').removeClass('hidden');
-
 		} else { // Not started
 			$("#ready_to_start").removeClass("hidden");
 			contestObject = contest;
@@ -93,7 +91,6 @@ $(document).ready(function() {
 		if (contest.status != "ok" ) {
 			$('#contest-details').hide();
 			$('#contest-details').parent().removeClass('col-md-6').addClass('col-md-2');
-
 		} else {
 			$('.contest #title').html(omegaup.escape(contest.title));
 			$('.contest #description').html(omegaup.escape(contest.description));
@@ -101,7 +98,6 @@ $(document).ready(function() {
 			$('.contest #time-until-start').html(omegaup.escape(contest.start_time));
 			$('.contest #start_time').val(dateToString(contest.start_time));
 			$('.contest #finish_time').val(dateToString(contest.finish_time));
-
 		}
 
 		// Feel free to re-write this if you have the time.

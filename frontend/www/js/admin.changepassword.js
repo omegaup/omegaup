@@ -17,7 +17,6 @@ $('document').ready(function() {
 			if (response.status == "ok") {
 				OmegaUp.ui.success("Password successfully changed!");
 				$('div.post.footer').show();
-
 			} else {
 				OmegaUp.ui.error(response.error || 'error');
 			}

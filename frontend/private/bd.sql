@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
 CREATE TABLE IF NOT EXISTS `Contests_Users` (
   `user_id` int(11) NOT NULL,
   `contest_id` int(11) NOT NULL,
-  `access_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora a la que entró el usuario al concurso',  
+  `access_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Hora a la que entró el usuario al concurso',
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
   PRIMARY KEY (`user_id`,`contest_id`),
@@ -501,7 +501,6 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   UNIQUE KEY `runs_alias` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.' AUTO_INCREMENT=1 ;
 
-
 -- --------------------------------------------------------
 
 --
@@ -615,13 +614,12 @@ CREATE TABLE IF NOT EXISTS `Users_Permissions` (
   KEY `permission_id` (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los permisos que se pueden dar a los usuarios.';
 
-
 --
 -- Estructura de tabla para la tabla `Groups`
 --
 
 CREATE TABLE IF NOT EXISTS `Groups` (
-  `group_id` int(11) AUTO_INCREMENT NOT NULL,  
+  `group_id` int(11) AUTO_INCREMENT NOT NULL,
   `owner_id` int(11) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `alias` varchar(50) NOT NULL,
@@ -631,7 +629,6 @@ CREATE TABLE IF NOT EXISTS `Groups` (
   KEY `owner_id` (`owner_id`),
   UNIQUE KEY `groups_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
-
 
 --
 -- Estructura de tabla para la tabla `Groups_Users`
@@ -643,7 +640,6 @@ CREATE TABLE IF NOT EXISTS `Groups_Users` (
   KEY `user_id` (`user_id`),
   KEY `group_id` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 --
 -- Estructura de tabla para la tabla `Groups`
@@ -660,7 +656,6 @@ CREATE TABLE IF NOT EXISTS `Groups_Scoreboards` (
   KEY `group_id` (`group_id`),
   UNIQUE KEY `groups_scoreboards_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
-
 
 --
 -- Estructura de tabla para la tabla `Groups_Users`
@@ -866,7 +861,6 @@ ALTER TABLE `User_Roles`
   ADD CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-
 --
 -- Filtros para la tabla `Users_Permissions`
 --
@@ -888,30 +882,27 @@ ALTER TABLE `Groups_Scoreboards_Contests`
   ADD CONSTRAINT `fk_gsc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (1 ,  'ADMIN',  'Admin');
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (2 ,  'CONTEST_ADMIN',  'Contest admin');
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (3 ,  'PROBLEM_ADMIN',  'Problem admin');
 
-
 --
 -- Update AC Count on grade
 --
-DELIMITER $$ 
-CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs` 
+DELIMITER $$
+CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs`
 FOR EACH ROW BEGIN
 	IF (OLD.verdict = 'AC' OR NEW.verdict = 'AC') THEN
 		UPDATE  `Problems` SET  `Problems`.`accepted` = (
-			SELECT COUNT( DISTINCT user_id ) 
-				FROM  `Runs` 
+			SELECT COUNT( DISTINCT user_id )
+				FROM  `Runs`
 				WHERE  `Runs`.`verdict` =  'AC'
 				AND NEW.`problem_id` =  `Runs`.`problem_id`
-			)	
-		WHERE NEW.problem_id =  `Problems`.`problem_id`;	
+			)
+		WHERE NEW.problem_id =  `Problems`.`problem_id`;
 	END IF;
-END$$	
+END$$
 DELIMITER ;
 
 COMMIT;
-
 

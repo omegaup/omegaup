@@ -6,13 +6,11 @@
  * @author joemmanuel
  */
 class UpdateContestTest extends OmegaupTestCase {
-
 	/**
 	 * Only update the contest title. Rest should stay the same
 	 */
 	public function testUpdateContestTitle() {
-
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Prepare request
@@ -36,12 +34,11 @@ class UpdateContestTest extends OmegaupTestCase {
 	}
 
 	/**
-	 * 
+	 *
 	 * @expectedException ForbiddenAccessException
 	 */
 	public function testUpdateContestNonDirector() {
-
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Prepare request
@@ -55,17 +52,16 @@ class UpdateContestTest extends OmegaupTestCase {
 		$r["title"] = Utils::CreateRandomString();
 
 		// Call API
-		ContestController::apiUpdate($r);		
+		ContestController::apiUpdate($r);
 	}
 
 	/**
 	 * Update from private to public. Should fail if no problems in contest
-	 * 
-	 * @expectedException InvalidParameterException	 
+	 *
+	 * @expectedException InvalidParameterException
 	 */
 	public function testUpdatePrivateContestToPublicWithoutProblems() {
-
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
 
 		// Prepare request
@@ -81,22 +77,21 @@ class UpdateContestTest extends OmegaupTestCase {
 		// Call API
 		$response = ContestController::apiUpdate($r);
 	}
-	
+
 	/**
 	 * Update from private to public with problems added
-	 * 
+	 *
 	 */
 	public function testUpdatePrivateContestToPublicWithProblems() {
-
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest(null, 0 /* private */);
 
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
-		
+
 		// Add the problem to the contest
 		ContestsFactory::addProblemToContest($problemData, $contestData);
-		
+
 		// Prepare request
 		$r = new Request();
 		$r["contest_alias"] = $contestData["request"]["alias"];
@@ -109,7 +104,7 @@ class UpdateContestTest extends OmegaupTestCase {
 
 		// Call API
 		$response = ContestController::apiUpdate($r);
-		
+
 		$contestData["request"]["public"] = $r["public"];
 		$this->assertContest($contestData["request"]);
 	}

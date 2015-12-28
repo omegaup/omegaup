@@ -1,7 +1,6 @@
 <?php
 
 class ApiUtils {
-
 	/**
 	 * Gets a random string
 	 */
@@ -21,7 +20,7 @@ class ApiUtils {
 	 * Remove accents helper
 	 * From: http://stackoverflow.com/questions/1017599/how-do-i-remove-accents-from-characters-in-a-php-string
 	 * (Wordpress)
-	 * 
+	 *
 	 * @param type $string
 	 * @return type
 	 */

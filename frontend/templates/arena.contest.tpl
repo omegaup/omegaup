@@ -1,7 +1,7 @@
 {include file='arena.head.tpl' jsfile=$jsfile inContest=!$practice}
 
 {if $admin}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=5eb094"></script>
+			<script type="text/javascript" src="/ux/libadmin.js?ver=a96398"></script>
 			<audio id="notification_audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
 			</audio>
@@ -294,9 +294,9 @@
 							<td><pre class="message"></pre></td>
 							<td class="answer">
 								<pre></pre>
-								<form id="create-response-form" class="form-inline template">																	
+								<form id="create-response-form" class="form-inline template">
 									<textarea id="create-response-text" class="form-control" placeholder="{#wordsAnswer#}"></textarea>
-									<label><input type="checkbox" id="create-response-is-public"/> {#wordsPublic#}</label>									
+									<label><input type="checkbox" id="create-response-is-public"/> {#wordsPublic#}</label>
 									<input type="submit" />
 								</form>
 							</td>

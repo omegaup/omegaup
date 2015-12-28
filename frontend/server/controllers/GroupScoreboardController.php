@@ -7,7 +7,6 @@
  */
 
 class GroupScoreboardController extends Controller {
-
 	/**
 	 * Validate group scoreboard request
 	 *
@@ -187,7 +186,6 @@ class GroupScoreboardController extends Controller {
 				}
 
 				$r["usernames_filter"] = rtrim($r["usernames_filter"], ",");
-
 			} catch (Exception $ex) {
 				throw new InvalidDatabaseOperationException($ex);
 			}
@@ -219,7 +217,6 @@ class GroupScoreboardController extends Controller {
 			foreach($scoreboards as $scoreboard) {
 				$response["scoreboards"][] = $scoreboard->asArray();
 			}
-
 		} catch (Exception $ex) {
 			throw new InvalidDatabaseOperationException($ex);
 		}
@@ -227,6 +224,5 @@ class GroupScoreboardController extends Controller {
 		$response["status"] = "ok";
 		return $response;
 	}
-
 }
 

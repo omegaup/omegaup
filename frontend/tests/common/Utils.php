@@ -6,7 +6,6 @@
  * @author joemmanuel
  */
 class Utils {
-
 	static $inittime;
 	static $counttime;
 

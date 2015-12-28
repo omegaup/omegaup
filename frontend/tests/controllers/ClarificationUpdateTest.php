@@ -7,16 +7,15 @@
  */
 
 class UpdateClarificationTest extends OmegaupTestCase {
-
 	/**
-	 * Basic test for answer	 
-	 * 
+	 * Basic test for answer
+	 *
 	 */
 	public function testUpdateAnswer() {
 		// Get a problem
 		$problemData = ProblemsFactory::createProblem();
 
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
 
 		// Add the problem to the contest
@@ -29,22 +28,22 @@ class UpdateClarificationTest extends OmegaupTestCase {
 		$this->detourBroadcasterCalls($this->exactly(2));
 		$clarificationData = ClarificationsFactory::createClarification(
 			$problemData, $contestData, $contestant);
-		
+
 		// Update answer
 		$newAnswer = 'new answer';
-		$response = ClarificationsFactory::answer($clarificationData, 
+		$response = ClarificationsFactory::answer($clarificationData,
 			$contestData, $newAnswer);
-		
+
 		// Get clarification from DB
 		$clarification = ClarificationsDAO::getByPK(
 			$clarificationData['response']['clarification_id']);
-		
+
 		// Validate that clarification stays the same
-		$this->assertEquals($clarificationData["request"]["message"], 
+		$this->assertEquals($clarificationData["request"]["message"],
 			$clarification->getMessage());
-		$this->assertEquals($clarificationData["request"]["public"], 
+		$this->assertEquals($clarificationData["request"]["public"],
 			$clarification->getPublic());
-				
+
 		// Validate our update
 		$this->assertEquals($newAnswer, $clarification->getAnswer());
 	}

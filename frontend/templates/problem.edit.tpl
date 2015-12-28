@@ -46,7 +46,7 @@
 								<li class="active"><a href="#statement-source" data-toggle="tab">Source</a></li>
 								<li><a id="statement-preview-link" href="#statement-preview" data-toggle="tab">Preview</a></li>
 							</ul>
-							
+
 							<div class="tab-content">
 								<div class="tab-pane active" id="statement-source">
 									<div id="wmd-button-bar-statement"></div>
@@ -74,7 +74,7 @@
 
 				<div class="row">
 					<div class="col-md-12">
-						<button type='submit' class="btn btn-primary">{#problemEditFormUpdateMarkdown#}</button>	
+						<button type='submit' class="btn btn-primary">{#problemEditFormUpdateMarkdown#}</button>
 					</div>
 				</div>
 			</form>

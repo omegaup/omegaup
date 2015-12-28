@@ -12,22 +12,21 @@
 	</div>
 {/if}
 
-
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="bottom-margin">
 			<a href="/problem/new/" class="btn btn-primary" id="problem-create">{#myproblemsListCreateProblem#}</a>
 		</div>
 		<div class="bottom-margin">
-			{#forSelectedItems#}: 
+			{#forSelectedItems#}:
 			<div class="btn-group">
 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 				  {#selectAction#}<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu" role="menu">
 				  <li><a id="bulk-make-public">{#makePublic#}</a></li>
-				  <li><a id="bulk-make-private">{#makePrivate#}</a></li>				  
-				  <li class="divider"></li>				  
+				  <li><a id="bulk-make-private">{#makePrivate#}</a></li>
+				  <li class="divider"></li>
 				</ul>
 			  </div>
 		</div>
@@ -66,5 +65,5 @@
 		</div>
 	</div>
 </div>
-<script type="text/javascript" src="/js/problem.mine.js?ver=8e7f18"></script>
+<script type="text/javascript" src="/js/problem.mine.js?ver=c46c26"></script>
 {include file='footer.tpl'}

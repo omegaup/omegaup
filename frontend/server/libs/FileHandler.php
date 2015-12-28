@@ -3,7 +3,6 @@
 require_once('FileUploader.php');
 
 class FileHandler {
-
 	protected static $fileUploader;
 	public static $log;
 
@@ -98,7 +97,7 @@ class FileHandler {
 		self::$log->info("Trying to delete recursively dir: " . $pathName);
 		self::rrmdir($pathName);
 	}
-	
+
 	static function DeleteFile($pathName) {
 		self::$log->debug("Trying to delete file: " . $pathName);
 		if (!@unlink($pathName)) {
@@ -134,30 +133,29 @@ class FileHandler {
 			throw new RuntimeException("unableToDeleteDir");
 		}
 	}
-	
+
 	static public function Copy($source, $dest) {
 		if(!@copy($source, $dest)) {
 			$errors = error_get_last();
 			throw new RuntimeException("FATAL: Unable to copy $source to $dest: ". $errors['type']." ". $errors["message"]);
 		}
 	}
-	
+
 	static public function Rename($old, $new) {
 		self::$log->info("Renaming $old to $new");
 		if(!@rename($old, $new)) {
 			$errors = error_get_last();
 			throw new RuntimeException("FATAL: Unable to rename $old to $new " . $errors['type']." ". $errors["message"]);
-		}	
-	}
-	
-	static public function SafeReplace($old, $new) {		
-		self::Rename($old, $old.'_old');
-		self::Rename($new, $old);
-		
-		self::$log->info("Deleting $old _old dir");
-		self::DeleteDirRecursive($old.'_old');					
+		}
 	}
 
+	static public function SafeReplace($old, $new) {
+		self::Rename($old, $old.'_old');
+		self::Rename($new, $old);
+
+		self::$log->info("Deleting $old _old dir");
+		self::DeleteDirRecursive($old.'_old');
+	}
 }
 
 FileHandler::$log = Logger::getLogger("FileHandler");

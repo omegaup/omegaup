@@ -6,7 +6,6 @@
  * @author alanboy@omegaup.com
  */
 class UserRegistrationTest extends OmegaupTestCase {
-
 	/*
 	 *  Scenario:
 	 *		user A creates a new native account :
@@ -16,7 +15,6 @@ class UserRegistrationTest extends OmegaupTestCase {
 	 *			email=A@gmail.com
 	 */
 	public function testUserNameCollision() {
-
 		$salt = time();
 
 		// Test users should not exist
@@ -35,5 +33,4 @@ class UserRegistrationTest extends OmegaupTestCase {
 		$this->assertNotNull(UsersDAO::FindByUsername("A".$salt."2"));
 	}
 }
-
 

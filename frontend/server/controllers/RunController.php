@@ -263,7 +263,6 @@ class RunController extends Controller {
 			// Update submissions counter++
 			$r["problem"]->setSubmissions($r["problem"]->getSubmissions() + 1);
 			ProblemsDAO::save($r["problem"]);
-
 		} catch (Exception $e) {
 			// Operation failed in the data layer
 			throw new InvalidDatabaseOperationException($e);
@@ -583,7 +582,6 @@ class RunController extends Controller {
 		return ($a['name'] < $b['name']) ? -1 : 1;
 	}
 
-
 	/**
 	 * Given the run alias, returns the source code and any compile errors if any
 	 * Used in the arena, any contestant can view its own codes and compile errors
@@ -655,16 +653,13 @@ class RunController extends Controller {
 	 * @throws InvalidDatabaseOperationException
 	 */
 	public static function apiCounts(Request $r) {
-
 		$totals = array();
 
 		Cache::getFromCacheOrSet(Cache::RUN_COUNTS, "", $r, function(Request $r) {
-
 			$totals = array();
 			$totals["total"] = array();
 			$totals["ac"] = array();
 			try {
-
 				$date = date('Y-m-d', strtotime('1 days'));
 
 				for ($i = 0; $i < 30 * 3 /*about 3 months*/; $i++) {
@@ -672,13 +667,11 @@ class RunController extends Controller {
 					$totals["ac"][$date] = RunsDAO::GetAcRunCountsToDate($date);
 					$date = date('Y-m-d', strtotime('-'.$i.' days'));
 				}
-
 			} catch (Exception $e) {
 				throw new InvalidDatabaseOperationException($e);
 			}
 
 			return $totals;
-
 		}, $totals, 24*60*60 /*expire in 1 day*/);
 
 		return $totals;
@@ -693,7 +686,6 @@ class RunController extends Controller {
 	 * @throws NotFoundException
 	 */
 	private static function validateList(Request $r) {
-
 		// Defaults for offset and rowcount
 		if (!isset($r["offset"])) {
 			$r["offset"] = 0;
@@ -710,7 +702,6 @@ class RunController extends Controller {
 		Validators::isNumber($r["rowcount"], "rowcount", false);
 		Validators::isInEnum($r["status"], "status", array('new', 'waiting', 'compiling', 'running', 'ready'), false);
 		Validators::isInEnum($r["verdict"], "verdict", array("AC", "PA", "WA", "TLE", "MLE", "OLE", "RTE", "RFE", "CE", "JE", "NO-AC"), false);
-
 
 		// Check filter by problem, is optional
 		if (!is_null($r["problem_alias"])) {
@@ -740,7 +731,6 @@ class RunController extends Controller {
 				$r["user"] = null;
 			}
 		}
-
 	}
 
 	/**

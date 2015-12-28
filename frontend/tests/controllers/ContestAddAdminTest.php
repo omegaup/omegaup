@@ -6,45 +6,42 @@
  * @author joemmanuel
  */
 class ContestAddAdminTest extends OmegaupTestCase {
-	
 	public function testAddContestAdmin() {
-		
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
-		
+
 		// Get a user
 		$user = UserFactory::createUser();
-		
+
 		// Prepare request
 		$r = new Request();
 		$r["auth_token"] = $this->login($contestData["director"]);
 		$r["usernameOrEmail"] = $user->getUsername();
 		$r["contest_alias"] = $contestData["request"]["alias"];
-		
+
 		// Call api
 		$response = ContestController::apiAddAdmin($r);
-		
+
 		// Get the role
 		$contest = ContestsDAO::getByAlias($r["contest_alias"]);
 		$ur = UserRolesDAO::getByPK($user->getUserId(), CONTEST_ADMIN_ROLE, $contest->getContestId());
-				
+
 		$this->assertNotNull($ur);
 	}
-	
+
 	public function testIsContestAdminCheck() {
-		
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
-		
+
 		// Get a user
 		$user = UserFactory::createUser();
-		
+
 		// Prepare request
 		$r = new Request();
 		$r["auth_token"] = $this->login($contestData["director"]);
 		$r["usernameOrEmail"] = $user->getUsername();
 		$r["contest_alias"] = $contestData["request"]["alias"];
-		
+
 		// Call api
 		ContestController::apiAddAdmin($r);
 
@@ -67,28 +64,27 @@ class ContestAddAdminTest extends OmegaupTestCase {
 		$contestData["request"]["title"] = $r["title"];
 		$this->assertContest($contestData["request"]);
 	}
-	
+
 	/**
 	 * Tests remove admins
 	 */
 	public function testRemoveAdmin() {
-		
-		// Get a contest 
+		// Get a contest
 		$contestData = ContestsFactory::createContest();
-		
+
 		// Get users
 		$user = UserFactory::createUser();
 		$user2 = UserFactory::createUser();
-		
+
 		ContestsFactory::addAdminUser($contestData, $user);
 		ContestsFactory::addAdminUser($contestData, $user2);
-		
+
 		// Prepare request for remove one admin
 		$r = new Request();
 		$r["auth_token"] = $this->login($contestData["director"]);
 		$r["usernameOrEmail"] = $user->getUsername();
 		$r["contest_alias"] = $contestData["request"]["alias"];
-		
+
 		// Call api
 		ContestController::apiRemoveAdmin($r);
 

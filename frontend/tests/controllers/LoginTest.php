@@ -6,13 +6,11 @@
  * @author joemmanuel
  */
 class LoginTest extends OmegaupTestCase {
-
 	/**
 	 * Test user login with valid credentials, username and password
 	 *
 	 */
 	public function testNativeLoginByUserPositive() {
-
 		// Create an user in omegaup
 		$user = UserFactory::createUser();
 
@@ -44,7 +42,6 @@ class LoginTest extends OmegaupTestCase {
 	 *
 	 */
 	public function testNativeLoginByEmailPositive() {
-
 		$email = Utils::CreateRandomString() . "@mail.com";
 		$user = UserFactory::createUser(null, null, $email);
 
@@ -66,7 +63,6 @@ class LoginTest extends OmegaupTestCase {
 	 * @expectedException InvalidCredentialsException
 	 */
 	public function testNativeLoginByUserInvalidPassword() {
-
 		// Create an user in omegaup
 		$user = UserFactory::createUser();
 
@@ -86,7 +82,6 @@ class LoginTest extends OmegaupTestCase {
 	 * @expectedException InvalidCredentialsException
 	 */
 	public function testNativeLoginByUserInvalidUsername() {
-
 		// Inflate request with user data
 		$r = new Request(array(
 					"usernameOrEmail" => "IDontExist",
@@ -103,7 +98,6 @@ class LoginTest extends OmegaupTestCase {
 	 * @expectedException InvalidCredentialsException
 	 */
 	public function testNativeLoginByEmailInvalidPassword() {
-
 		// Create an user in omegaup
 		$email = Utils::CreateRandomString() . "@mail.com";
 		$user = UserFactory::createUser(null, null, $email);
@@ -124,7 +118,6 @@ class LoginTest extends OmegaupTestCase {
 	 *
 	 */
 	public function testNativeLoginPositiveViaHttp() {
-
 		// Create an user
 		$user = UserFactory::createUser();
 
@@ -152,7 +145,6 @@ class LoginTest extends OmegaupTestCase {
 	 *
 	 */
 	public function test2ConsecutiveLogins() {
-
 		// Create an user in omegaup
 		$user = UserFactory::createUser();
 
@@ -181,7 +173,6 @@ class LoginTest extends OmegaupTestCase {
 	 * @expectedException InvalidCredentialsException
 	 */
 	public function testNativeLoginWithOldPassword() {
-
 		// Create an user in omegaup
 		$user = UserFactory::createUser();
 
@@ -204,7 +195,6 @@ class LoginTest extends OmegaupTestCase {
 	}
 
 	public function testDeleteTokenExpired() {
-
 		// Create an user in omegaup
 		$user = UserFactory::createUser();
 
@@ -232,7 +222,6 @@ class LoginTest extends OmegaupTestCase {
 ////		$auth_token = self::login($user);
 ////	}
 
-
 ////	/**
 ////	 * @expectedException EmailNotVerifiedException
 ////	 */
@@ -254,7 +243,6 @@ class LoginTest extends OmegaupTestCase {
 	 * when there's 1 private contest count
 	 */
 	public function testSessionControlerPrivateContestsCount() {
-
 		// Create private contest
 		$contestData = ContestsFactory::createContest(null, 0 /*public*/);
 		$user = $contestData["director"];
@@ -278,7 +266,6 @@ class LoginTest extends OmegaupTestCase {
 	 * when there's 1 public contest
 	 */
 	public function testSessionControlerPrivateContestsCountWithPublicContest() {
-
 		// Create private contest
 		$contestData = ContestsFactory::createContest(null, 1 /*public*/);
 		$user = $contestData["director"];
@@ -302,7 +289,6 @@ class LoginTest extends OmegaupTestCase {
 	 * when there's 0 contests created
 	 */
 	public function testSessionControlerPrivateContestsCountWithNoContests() {
-
 		$user = UserFactory::createUser();
 
 		$this->mockSessionManager();
@@ -324,7 +310,6 @@ class LoginTest extends OmegaupTestCase {
 	 * when there's 1 private problem
 	 */
 	public function testSessionControlerPrivateProblemsCount() {
-
 		// Create private problem
 		$problemData = ProblemsFactory::createProblem(null, null, 0 /*public*/);
 		$user = $problemData["author"];
@@ -348,7 +333,6 @@ class LoginTest extends OmegaupTestCase {
 	 * when there's 1 public problem
 	 */
 	public function testSessionControlerPrivateProblemsCountWithPublicProblem() {
-
 		// Create public problem
 		$problemData = ProblemsFactory::createProblem(null, null, 1 /*public*/);
 		$user = $problemData["author"];
@@ -372,7 +356,6 @@ class LoginTest extends OmegaupTestCase {
 	 * when there's 0 problems
 	 */
 	public function testSessionControlerPrivateProblemsCountWithNoProblems() {
-
 		$user = UserFactory::createUser();
 
 		$this->mockSessionManager();
@@ -389,14 +372,12 @@ class LoginTest extends OmegaupTestCase {
 		$this->assertEquals(0, $response["private_problems_count"]);
 	}
 
-
 	/**
 	 * Logins with empty passwords in DB are disabled
 	 *
 	 * @expectedException LoginDisabledException
 	 */
 	public function testLoginDisabled() {
-
 		// User to be verified
 		$user = UserFactory::createUser();
 
@@ -406,6 +387,5 @@ class LoginTest extends OmegaupTestCase {
 
 		$this->login($user);
 	}
-
 }
 

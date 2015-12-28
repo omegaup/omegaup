@@ -43,7 +43,7 @@
 							</li>
 							{/if}
 						</ul>
-						
+
 						<ul class="nav navbar-nav navbar-right">
 							{if $LOGGED_IN eq '1'}
 								<li class="dropdown">
@@ -52,11 +52,11 @@
 									 <li><a href='/profile/'>{#navViewProfile#}</a></li>
 									 <li><a href='/logout/'>{#navLogOut#}</a></li>
 									</ul>
-								</li>	
+								</li>
 							{else}
 								<li><a href='/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}'>{#navLogIn#}</a></li>
 							{/if}
-							
+
 							{if $CURRENT_USER_IS_ADMIN eq '1'}
 								<li id="grader-status" class="dropdown">
 									<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="grader-count"><img src="/media/waitcircle.gif" /></span> <span class="caret"></span></a>
@@ -66,7 +66,7 @@
 							{/if}
 						</ul>
 						{if $CURRENT_USER_IS_ADMIN eq '1'}
-						<script type="text/javascript" src="/js/common.navbar.grader_status.js?ver=75f079"></script>
+						<script type="text/javascript" src="/js/common.navbar.grader_status.js?ver=ecf939"></script>
 						{/if}
 					</div>
 				</div>

@@ -10,7 +10,6 @@
  * */
 
 class SessionController extends Controller {
-
 	const AUTH_TOKEN_ENTROPY_SIZE = 15;
 
 	private static $current_session = null;
@@ -187,7 +186,6 @@ class SessionController extends Controller {
 		try {
 			AuthTokensDAO::delete($vo_AuthT);
 		} catch (Exception $e) {
-
 		}
 
 		unset($_SESSION['omegaup_user']);
@@ -276,7 +274,6 @@ class SessionController extends Controller {
 	}
 
 	public static function apiGoogleLogin(Request $r = null) {
-
 		if (is_null($r["storeToken"]))
 		{
 			throw new InvalidParameterException("parameterNotFound", "storeToken");
@@ -292,15 +289,12 @@ class SessionController extends Controller {
 
 		try{
 			$client->authenticate($r["storeToken"]);
-
 		} catch(Google_Auth_Exception $ge) {
 			self::$log->error($ge->getMessage());
 			throw new InternalServerErrorException($ge);
-
 		}
 
 		if ($client->getAccessToken()) {
-
 			$request = new Google_Http_Request("https://www.googleapis.com/oauth2/v2/userinfo?alt=json");
 			$userinfo = $client->getAuth()->authenticatedRequest($request);
 			$responseJson = json_decode($userinfo->getResponseBody(), true);
@@ -318,10 +312,8 @@ class SessionController extends Controller {
 			//    [locale] => en
 
 			$controller = (new SessionController())->LoginViaGoogle($responseJson["email"]);
-
 		} else {
 			throw new InternalServerErrorException(new Exception());
-
 		}
 
 		return array("status" => "ok");
@@ -385,12 +377,10 @@ class SessionController extends Controller {
 		try {
 			// Proceed knowing you have a logged in user who's authenticated.
 			$fb_user_profile = $facebook->api('/me');
-
 		} catch (FacebookApiException $e) {
 			$fb_user = null;
 			self::$log->error("FacebookException:" . $e);
 			return false;
-
 		}
 
 		//ok we know the user is logged in,
@@ -405,7 +395,6 @@ class SessionController extends Controller {
 			//user has been here before with facebook!
 			$vo_User = $results;
 			self::$log->info("user has been here before with facebook!");
-
 		} else {
 			// The user has never been here before, let's register him
 
@@ -492,5 +481,4 @@ class SessionController extends Controller {
 			//@TODO actuar en base a la exception
 		}
 	}
-
 }

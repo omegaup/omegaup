@@ -30,7 +30,6 @@ $('document').ready(function() {
 		return casesCounts;
 	}
 
-
 	function updateRunCountsData() {
 		window.run_counts_chart.series[0].setData(oGraph.normalizeRunCounts(stats));
 		window.cases_distribution_chart.series[0].setData(getCasesDistribution());
@@ -38,7 +37,6 @@ $('document').ready(function() {
 	}
 
 	function drawCharts() {
-
 		$('#total-runs').html('Total de envíos: ' + stats.total_runs);
 
 		if (window.run_counts_chart != null) {
@@ -84,11 +82,9 @@ $('document').ready(function() {
 			series: [{
 				name: 'Número de soluciones',
 				data: casesCounts
-
 			}]
 		});
 	}
-
 
 	getStats();
 

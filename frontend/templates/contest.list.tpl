@@ -1,7 +1,7 @@
 <div class="wait_for_ajax panel panel-default no-bottom-margin" id="contest_list">
-	
+
 	<div class="bottom-margin">
-			{#forSelectedItems#}: 
+			{#forSelectedItems#}:
 			<div class="btn-group">
 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 				  {#selectAction#}<span class="caret"></span>
@@ -13,11 +13,11 @@
 				</ul>
 			  </div>
 	</div>
-				  
+
 	<div class="panel-heading">
 		<h3 class="panel-title">{#wordsContests#}</h3>
 	</div>
-	
+
 	<table class="table">
 		<thead>
 			<th></th>

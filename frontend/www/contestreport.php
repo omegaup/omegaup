@@ -15,7 +15,7 @@ if ($fullResponse["status"] == "ok") {
 		if (!isset($response[$i]['problems'])) continue;
 		foreach ($response[$i]['problems'] as &$problem) {
 			if (!isset($problem['run_details']) || !isset($problem['run_details']['groups'])) continue;
-			
+
 			foreach ($problem['run_details']['groups'] as &$group) {
 				foreach ($group['cases'] as &$case) {
 					$case['meta']['time'] = (float)$case['meta']['time'];

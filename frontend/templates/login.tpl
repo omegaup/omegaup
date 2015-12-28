@@ -13,7 +13,7 @@
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>
 
-				<div 
+				<div
 					id="signinButton"
 					title="{#loginWithGoogle#}"
 					class="openid_large_btn">
@@ -45,10 +45,9 @@
 						<label for='pass'>{#loginPassword#} (<a href="/login/password/recover/">{#loginRecover#}</a>)</label>
 						<input id='pass' name='pass' value='' type='password' class='form-control' tabindex="2" />
 					</div>
-					
-					
+
 					<input id='' name='request' value='login' type='hidden' />
-					
+
 					<div class="form-group">
 						<button class="btn btn-primary form-control" type='submit'>{#loginLogIn#}</button>
 					</div>
@@ -56,7 +55,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h2 class="panel-title">{#loginSignupHeader#}</h3>
@@ -70,7 +69,7 @@
 							<input id='reg_username' name='reg_username' value='' type='text' class="form-control">
 						</div>
 					</div>
-					
+
 					<div class="col-md-4">
 						<div class="form-group">
 							<label for="reg_email" class="control-label">{#loginEmail#}</label>
@@ -78,7 +77,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="row">
 					<div class="col-md-4 col-md-offset-2">
 						<div class="form-group">
@@ -86,7 +85,7 @@
 							<input id='reg_pass' name='reg_pass' value='' type='password' class="form-control">
 						</div>
 					</div>
-					
+
 					<div class="col-md-4">
 						<div class="form-group">
 							<label for="reg_pass2" class="control-label">{#loginRepeatPassword#}</label>
@@ -115,7 +114,7 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/login.js?ver=364d4b"></script>
+<script type="text/javascript" src="/js/login.js?ver=35b529"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" defer></script>
 <script src='https://www.google.com/recaptcha/api.js'></script>
 {include file='footer.tpl'}

@@ -16,7 +16,7 @@
 			<button class="btn btn-default" id='omi' name='omi'>Estilo OMI - IOI</button>
 			<button class="btn btn-default" id='preioi' name='preioi'>{#contestNewForm#}</button>
 			<button class="btn btn-default" id='conacup' name='conacup'>{#contestNewFormConacupStyle#}</button>
-		</div>		
+		</div>
 		{/if}
 		<form class="new_contest_form">
 				<div class="row">
@@ -24,34 +24,34 @@
 						<label for="title">{#wordsTitle#}</label>
 						<input id='title' name='title' value='' type='text' size='30' class="form-control">
 					</div>
-					
+
 					<div class="form-group col-md-6">
 						<label for="alias">{#contestNewFormShortTitle_alias_#}</label>
 						<input id='alias' name='alias' value='' type='text' class="form-control" {IF $IS_UPDATE eq 1} disabled="true" {/if}>
 						<p class="help-block">{#contestNewFormShortTitle_alias_Desc#}</p>
 					</div>
 				</div>
-				
+
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="start_time">{#contestNewFormStartDate#}</label>
 						<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
 						<p class="help-block">{#contestNewFormStartDateDesc#}</p>
 					</div>
-					
+
 					<div class="form-group col-md-6">
 						<label for="finish_time">{#contestNewFormEndDate#}</label>
 						<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
 						<p class="help-block">{#contestNewFormEndDateDesc#}</p>
 					</div>
 				</div>
-				
+
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="description">{#contestNewFormDescription#}</label>
 						<textarea id='description' name='description' cols="30" rows="10" class="form-control"></textarea>
 					</div>
-					
+
 					<div class="form-group col-md-6">
 						<label for="window_length_enabled">{#contestNewFormDifferentStarts#}</label>
 						<div class="checkbox">
@@ -63,21 +63,21 @@
 						<p class="help-block">{#contestNewFormDifferentStartsDesc#}</p>
 					</div>
 				</div>
-				
+
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="scoreboard">{#contestNewFormScoreboardTimePercent#}</label>
 						<input id='scoreboard' name='scoreboard' value='100' type='text' size='3' class="form-control">
 						<p class="help-block">{#contestNewFormScoreboardTimePercentDesc#}</p>
 					</div>
-					
+
 					<div class="form-group col-md-6">
 						<label for="submissions_gap">{#contestNewFormSubmissionsSeparation#}</label>
 						<input id='submissions_gap' name='submissions_gap' value='1' type='text' size='2' class="form-control">
 						<p class="help-block">{#contestNewFormSubmissionsSeparationDesc#}</p>
 					</div>
 				</div>
-				
+
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="penalty_type">{#contestNewFormPenaltyType#}</label>
@@ -89,14 +89,14 @@
 						</select>
 						<p class="help-block">{#contestNewFormPenaltyTypeDesc#}</p>
 					</div>
-					
+
 					<div class="form-group col-md-6">
 						<label for="penalty">{#wordsPenalty#}</label>
 						<input id='penalty' name='penalty' value='0' type='text' size='2' class="form-control">
 						<p class="help-block">{#contestNewFormPenaltyDesc#}</p>
 					</div>
 				</div>
-				
+
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="feedback">{#wordsFeedback#}</label>
@@ -107,14 +107,14 @@
 						</select>
 						<p class="help-block">{#contestNewFormImmediateFeedbackDesc#}</p>
 					</div>
-					
+
 					<div class="form-group col-md-6">
 						<label for="points_decay_factor">{#contestNewFormPintDecrementFactor#}</label>
 						<input id='points_decay_factor' name='points_decay_factor' value='0.0' type='text' size='4' class="form-control">
 						<p class="help-block">{#contestNewFormPintDecrementFactorDesc#}</p>
 					</div>
 				</div>
-				
+
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="show_scoreboard_after">Scoreboard al finalizar el concurso</label>
@@ -124,7 +124,7 @@
 						</select>
 						<p class="help-block">{#contestNewFormScoreboardAtEndDesc#}</p>
 					</div>
-					
+
 					{if $IS_UPDATE eq 1}
 					<div class="form-group col-md-6">
 						<label for="public">{#contestNewFormPublic#}</label>

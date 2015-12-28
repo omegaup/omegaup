@@ -26,7 +26,6 @@ $('document').ready(function() {
 		setTimeout( function() { getStats(); }, callStatsApiTimeout);
 	}
 
-
 	function updateRunCountsData() {
 		window.run_counts_chart.series[0].setData(oGraph.normalizeRunCounts(stats));
 		window.distribution_chart.series[0].setData(oGraph.getDistribution(stats));

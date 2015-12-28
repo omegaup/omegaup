@@ -29,7 +29,7 @@
 				<div class="form-group col-md-6">
 					<button class="btn btn-primary" type='submit'>{#groupEditScoreboardsAddContest#}</button>
 				</div>
-			</div>			
+			</div>
 		</form>
 	</div>
 
@@ -38,7 +38,7 @@
 			<th>{#wordsContests#}</th>
 			<th>{#groupNewFormOnlyAC#}</th>
 			<th>{#groupNewFormWeight#}</th>
-			<th></th>			
+			<th></th>
 		</thead>
 		<tbody id="scoreboard-contests"></tbody>
 	</table>

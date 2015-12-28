@@ -9,23 +9,23 @@
 
 		<script type="text/javascript" src="/js/jquery.js?ver=198b3f"></script>
 
-		<script type="text/javascript" src="/js/omegaup.js?ver=34dda2"></script>
+		<script type="text/javascript" src="/js/omegaup.js?ver=5ab184"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=58816d,a4ef56,de5b0f,a06d98"></script>
 
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
 		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>
-		<script type="text/javascript" src="/js/omegaup-graph.js?ver=528500"></script>
+		<script type="text/javascript" src="/js/omegaup-graph.js?ver=12891c"></script>
 		<script type="text/javascript" src="/js/langtools.js?ver=adeec4"></script>
-		
+
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
-		
+
 		<link rel="stylesheet" href="/css/bootstrap.min.css">
 		<!-- Optional theme -->
-                
+
 		<link rel="stylesheet" href="/css/bootstrap-theme.min.css">
 		<!-- Latest compiled and minified JavaScript -->
-		
+
 		<script src="/js/bootstrap.min.js?ver=176563"></script>
 
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
@@ -48,7 +48,7 @@
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="/css/style.css">
 		<link rel="stylesheet" type="text/css" href="/css/common.css">
-		
+
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
 	<script type="text/javascript" src="/js/mathjax-config.js?ver=37494e"></script>
 	<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
@@ -62,7 +62,7 @@
 		<script type="text/javascript" src="/js/head.sugar_locale.js?ver=0cb37f"></script>
 	</head>
 	<body>
-		
+
 		<div id="wrapper">
 {if isset($navbarSection)}
 {include file='common.navbar.tpl' navbarSection=$navbarSection}

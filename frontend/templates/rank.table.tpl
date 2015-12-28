@@ -33,17 +33,17 @@
 		</thead>
 		<tbody>
 		</tbody>
-	</table>	
+	</table>
 	<div class="panel-body">
 		{if $is_index}
 		<a href='/rank/'>{#rankViewFull#}</a>
-		{else}		
+		{else}
 			{if $page > 0}
-				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> | 
+				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
 			{/if}
 			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
 		{/if}
-	</div>	
+	</div>
 
-	<script language="javascript" src="/js/rank.table.js?ver=71304b"></script>
+	<script language="javascript" src="/js/rank.table.js?ver=312863"></script>
 </div>
