@@ -1,8 +1,8 @@
 <?php
 
-require_once( "../../server/bootstrap.php" );
+require_once('../../server/bootstrap.php');
 
 UITools::redirectToLoginIfNotLoggedIn();
 UITools::redirectIfNoAdmin();
 
-$smarty->display( '../../templates/admin.verifyuser.tpl' );
+$smarty->display('../../templates/admin.verifyuser.tpl');

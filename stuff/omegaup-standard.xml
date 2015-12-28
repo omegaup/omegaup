@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<ruleset name="omegaUp">
+	<description>The omegaUp coding standard.</description>
+
+	<!-- Inherit from PSR2 -->
+	<rule ref="PSR2">
+		<!-- Braces on the same line -->
+		<exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+
+		<!-- TODO(lhchavez): Remove these. -->
+		<exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+		<exclude name="PSR1.Classes.ClassDeclaration.MultipleClasses"/>
+		<exclude name="PSR1.Files.SideEffects.FoundWithSymbols"/>
+		<exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
+	</rule>
+
+	<!-- Braces on the same line -->
+	<rule name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnNewLine"/>
+
+	 <!-- There MUST NOT be trailing whitespace. EVER. -->
+	 <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
+		 <properties>
+			 <property name="ignoreBlankLines" value="false"/>
+		 </properties>
+	 </rule>
+
+	 <!-- Avoid double-quoted strings -->
+	 <rule ref="Squiz.Strings.DoubleQuoteUsage.NotRequired">
+		 <exclude name="Squiz.Strings.DoubleQuoteUsage.ContainsVar"/>
+	 </rule>
+
+	 <!-- Don't comment out code -->
+	 <rule ref="Squiz.PHP.CommentedOutCode"/>
+
+	 <!-- eval is evil -->
+	 <rule ref="Squiz.PHP.Eval" />
+</ruleset>

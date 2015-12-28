@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Badges.dao.base.php");
-require_once("base/Badges.vo.base.php");
+require_once('base/Badges.dao.base.php');
+require_once('base/Badges.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

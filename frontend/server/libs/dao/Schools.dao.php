@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Schools.dao.base.php");
-require_once("base/Schools.vo.base.php");
+require_once('base/Schools.dao.base.php');
+require_once('base/Schools.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy
@@ -19,25 +19,25 @@ require_once("base/Schools.vo.base.php");
   */
 class SchoolsDAO extends SchoolsDAOBase
 {
-	/**
-	 * Finds schools that cotains 'name'
-	 *
-	 * @global type $conn
-	 * @param string $name
-	 * @return array Schools
-	 */
-	public static function findByName($name) {
-		global  $conn;
+    /**
+     * Finds schools that cotains 'name'
+     *
+     * @global type $conn
+     * @param string $name
+     * @return array Schools
+     */
+    public static function findByName($name) {
+        global  $conn;
 
-		$sql = "select DISTINCT s.* from Schools s where s.name LIKE  CONCAT('%', ?, '%') LIMIT 10";
-		$args = array($name);
+        $sql = "select DISTINCT s.* from Schools s where s.name LIKE  CONCAT('%', ?, '%') LIMIT 10";
+        $args = array($name);
 
-		$rs = $conn->Execute($sql, $args);
-		$ar = array();
-		foreach ($rs as $foo) {
-			$bar =  new Users($foo);
-    		array_push( $ar,$bar);
-		}
-		return $ar;
-	}
+        $rs = $conn->Execute($sql, $args);
+        $ar = array();
+        foreach ($rs as $foo) {
+            $bar =  new Users($foo);
+            array_push($ar, $bar);
+        }
+        return $ar;
+    }
 }

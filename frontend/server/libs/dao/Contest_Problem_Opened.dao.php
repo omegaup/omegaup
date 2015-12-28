@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Contest_Problem_Opened.dao.base.php");
-require_once("base/Contest_Problem_Opened.vo.base.php");
+require_once('base/Contest_Problem_Opened.dao.base.php');
+require_once('base/Contest_Problem_Opened.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

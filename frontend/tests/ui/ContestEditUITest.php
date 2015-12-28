@@ -6,40 +6,39 @@
  * @author joemmanuel
  */
 class ContestEditUITest extends OmegaupUITestCase {
-	public function testEditContest() {
-		// Login
-		$author = $this->createUserAndLogin();
+    public function testEditContest() {
+        // Login
+        $author = $this->createUserAndLogin();
 
-		// Create a problem
-		$contestData = ContestsFactory::createContest(null, 1, $author);
+        // Create a problem
+        $contestData = ContestsFactory::createContest(null, 1, $author);
 
-		// Open problem create
-		$this->open('/contestedit.php');
+        // Open problem create
+        $this->open('/contestedit.php');
 
-		sleep(1);
+        sleep(1);
 
-		$this->type('name=contests', $contestData["request"]["alias"]);
+        $this->type('name=contests', $contestData['request']['alias']);
 
-		$this->waitForValue('name=title', $contestData["request"]["title"]);
+        $this->waitForValue('name=title', $contestData['request']['title']);
 
-		$contestData["request"]["title"] = "new title";
-		$contestData["request"]["description"] = "new description";
-		$contestData["request"]["public"] = 0;
+        $contestData['request']['title'] = 'new title';
+        $contestData['request']['description'] = 'new description';
+        $contestData['request']['public'] = 0;
 
-		$this->type('name=title', $contestData["request"]["title"]);
-		$this->type('name=description', $contestData["request"]["description"]);
-		$this->type('name=public', $contestData["request"]["public"]);
+        $this->type('name=title', $contestData['request']['title']);
+        $this->type('name=description', $contestData['request']['description']);
+        $this->type('name=public', $contestData['request']['public']);
 
-		// Click inicia sesion
-		$this->click("//input[@value='Actualizar concurso']");
+        // Click inicia sesion
+        $this->click("//input[@value='Actualizar concurso']");
 
-		$this->waitForElementPresent('id=status');
-		sleep(1);
-		$this->assertElementContainsText('//*[@id="content"]/div[2]/div', "Tu concurso ha sido editado!");
+        $this->waitForElementPresent('id=status');
+        sleep(1);
+        $this->assertElementContainsText('//*[@id="content"]/div[2]/div', 'Tu concurso ha sido editado!');
 
-		// Check DB values
-		$v = new OmegaupTestCase();
-		$v->assertContest($contestData["request"]);
-	}
+        // Check DB values
+        $v = new OmegaupTestCase();
+        $v->assertContest($contestData['request']);
+    }
 }
-

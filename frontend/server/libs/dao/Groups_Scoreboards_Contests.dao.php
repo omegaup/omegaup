@@ -1,8 +1,8 @@
 <?php
 
-require_once ('Estructura.php');
-require_once("base/Groups_Scoreboards_Contests.dao.base.php");
-require_once("base/Groups_Scoreboards_Contests.vo.base.php");
+require_once('Estructura.php');
+require_once('base/Groups_Scoreboards_Contests.dao.base.php');
+require_once('base/Groups_Scoreboards_Contests.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Countries.dao.base.php");
-require_once("base/Countries.vo.base.php");
+require_once('base/Countries.dao.base.php');
+require_once('base/Countries.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

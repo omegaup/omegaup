@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Emails.dao.base.php");
-require_once("base/Emails.vo.base.php");
+require_once('base/Emails.dao.base.php');
+require_once('base/Emails.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

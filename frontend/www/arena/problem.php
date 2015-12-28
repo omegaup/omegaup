@@ -6,11 +6,11 @@ $session = SessionController::apiCurrentSession($r);
 $r['statement_type'] = 'html';
 $r['show_solvers'] = true;
 try {
-	$result = ProblemController::apiDetails($r);
-	$problem = ProblemsDAO::GetByAlias($result['alias']);
+    $result = ProblemController::apiDetails($r);
+    $problem = ProblemsDAO::GetByAlias($result['alias']);
 } catch (ApiException $e) {
-	header('HTTP/1.1 404 Not Found');
-	die(file_get_contents('../404.html'));
+    header('HTTP/1.1 404 Not Found');
+    die(file_get_contents('../404.html'));
 }
 
 $smarty->assign('problem_statement', $result['problem_statement']);
@@ -28,16 +28,16 @@ $smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 
 $smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
 $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('karel_problem', count(array_intersect(
-	explode(',', $result['languages']),
-	array('kp', 'kj')
+    explode(',', $result['languages']),
+    array('kp', 'kj')
 )) == 2);
 if (isset($result['sample_input'])) {
-	$smarty->assign('sample_input', $result['sample_input']);
+    $smarty->assign('sample_input', $result['sample_input']);
 }
 
 $result['user'] = array(
-	'logged_in' => $session['valid'],
-	'admin' => Authorization::CanEditProblem($session['id'], $problem)
+    'logged_in' => $session['valid'],
+    'admin' => Authorization::CanEditProblem($session['id'], $problem)
 );
 $smarty->assign('problem_admin', $result['user']['admin']);
 

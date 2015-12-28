@@ -1,10 +1,10 @@
 <?php
 
-	require_once( "../../server/bootstrap.php" );
+    require_once('../../server/bootstrap.php');
 
-	UITools::redirectToLoginIfNotLoggedIn();
-	UITools::redirectIfNoAdmin();
+    UITools::redirectToLoginIfNotLoggedIn();
+    UITools::redirectIfNoAdmin();
 
-	$smarty->assign('logContents', '');
+    $smarty->assign('logContents', '');
 
-	$smarty->display( '../../templates/admin.log.tpl' );
+    $smarty->display('../../templates/admin.log.tpl');

@@ -1,7 +1,7 @@
 <?php
 
-	require_once( "../../server/bootstrap.php" );
+    require_once('../../server/bootstrap.php');
 
-	$u = UsersDAO::getAll( );
+    $u = UsersDAO::getAll();
 
-    $smarty->display( '../templates/admin_users.tpl' );
+    $smarty->display('../templates/admin_users.tpl');

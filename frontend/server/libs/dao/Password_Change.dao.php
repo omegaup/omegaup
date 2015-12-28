@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Password_Change.dao.base.php");
-require_once("base/Password_Change.vo.base.php");
+require_once('base/Password_Change.dao.base.php');
+require_once('base/Password_Change.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

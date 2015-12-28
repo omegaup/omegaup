@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Announcement.dao.base.php");
-require_once("base/Announcement.vo.base.php");
+require_once('base/Announcement.dao.base.php');
+require_once('base/Announcement.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

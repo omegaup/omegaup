@@ -1,5 +1,5 @@
 <?php
 
-require_once("ApiCaller.php");
+require_once('ApiCaller.php');
 
 ApiCaller::httpEntryPoint();

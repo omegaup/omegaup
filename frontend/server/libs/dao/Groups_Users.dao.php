@@ -1,8 +1,8 @@
 <?php
 
-require_once ('Estructura.php');
-require_once("base/Groups_Users.dao.base.php");
-require_once("base/Groups_Users.vo.base.php");
+require_once('Estructura.php');
+require_once('base/Groups_Users.dao.base.php');
+require_once('base/Groups_Users.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

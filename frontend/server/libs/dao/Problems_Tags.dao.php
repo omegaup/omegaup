@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Problems_Tags.dao.base.php");
-require_once("base/Problems_Tags.vo.base.php");
+require_once('base/Problems_Tags.dao.base.php');
+require_once('base/Problems_Tags.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy
@@ -19,8 +19,8 @@ require_once("base/Problems_Tags.vo.base.php");
   */
 class ProblemsTagsDAO extends ProblemsTagsDAOBase
 {
-	public static function getProblemTags(Problems $problem, $public_only) {
-		$sql = '
+    public static function getProblemTags(Problems $problem, $public_only) {
+        $sql = '
 			SELECT
 				t.name, pt.public
 			FROM
@@ -29,13 +29,13 @@ class ProblemsTagsDAO extends ProblemsTagsDAOBase
 				Tags t on t.tag_id = pt.tag_id
 			WHERE
 				pt.problem_id = ?';
-		$params = array($problem->problem_id);
-		if ($public_only) {
-			$sql .= ' AND pt.public = 1';
-		}
-		$sql .= ';';
+        $params = array($problem->problem_id);
+        if ($public_only) {
+            $sql .= ' AND pt.public = 1';
+        }
+        $sql .= ';';
 
-		global $conn;
-		return $conn->GetAll($sql, $params);
-	}
+        global $conn;
+        return $conn->GetAll($sql, $params);
+    }
 }

@@ -8,129 +8,131 @@
  *
  */
 abstract class ApiException extends Exception {
-	public static $log;
+    public static $log;
 
-	protected $header;
-	private $customMessage;
+    protected $header;
+    private $customMessage;
 
-	/**
-	 * Builds an api exception
-	 *
-	 * @param string $message
-	 * @param string $header
-	 * @param string $code
-	 * @param Exception $previous
-	 */
-	function __construct($message, $header, $code, Exception $previous = NULL) {
-		parent::__construct($message, $code, $previous);
+    /**
+     * Builds an api exception
+     *
+     * @param string $message
+     * @param string $header
+     * @param string $code
+     * @param Exception $previous
+     */
+    public function __construct($message, $header, $code, Exception $previous = null) {
+        parent::__construct($message, $code, $previous);
 
-		$this->header = $header;
-		$this->customMessage = array();
-	}
+        $this->header = $header;
+        $this->customMessage = array();
+    }
 
-	/**
-	 * Returns header
-	 *
-	 * @return string
-	 */
-	public function getHeader() {
-		return $this->header;
-	}
+    /**
+     * Returns header
+     *
+     * @return string
+     */
+    public function getHeader() {
+        return $this->header;
+    }
 
-	/**
-	 * Adds a custom field to the asArray representation of this exception
-	 *
-	 * @param string $key
-	 * @param type $value
-	 */
-	public function addCustomMessageToArray($key, $value) {
-		$this->customMessage[$key] = $value;
-	}
+    /**
+     * Adds a custom field to the asArray representation of this exception
+     *
+     * @param string $key
+     * @param type $value
+     */
+    public function addCustomMessageToArray($key, $value) {
+        $this->customMessage[$key] = $value;
+    }
 
-	/**
-	 *
-	 * @return array
-	 */
-	public function asArray() {
-		$arrayToReturn =  array(
-			"status" => "error",
-			"error" => $this->getErrorMessage(),
-			"errorcode" => $this->code,
-			"header" => $this->header,
-			"cause" => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : NULL,
-			"trace" => $this->getTraceAsString(),
-		);
+    /**
+     *
+     * @return array
+     */
+    public function asArray() {
+        $arrayToReturn =  array(
+            'status' => 'error',
+            'error' => $this->getErrorMessage(),
+            'errorcode' => $this->code,
+            'header' => $this->header,
+            'cause' => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : null,
+            'trace' => $this->getTraceAsString(),
+        );
 
-		return array_merge($arrayToReturn, $this->customMessage);
-	}
+        return array_merge($arrayToReturn, $this->customMessage);
+    }
 
-	/**
-	 * Returns exception info intended for public error msgs in http responses
-	 *
-	 * @return array
-	 */
-	public function asResponseArray() {
-		$arrayToReturn =  array(
-			"status" => "error",
-			"error" => $this->getErrorMessage(),
-			"errorname" => $this->message,
-			"errorcode" => $this->code,
-			"header" => $this->header
-		);
+    /**
+     * Returns exception info intended for public error msgs in http responses
+     *
+     * @return array
+     */
+    public function asResponseArray() {
+        $arrayToReturn =  array(
+            'status' => 'error',
+            'error' => $this->getErrorMessage(),
+            'errorname' => $this->message,
+            'errorcode' => $this->code,
+            'header' => $this->header
+        );
 
-		return array_merge($arrayToReturn, $this->customMessage);
-	}
+        return array_merge($arrayToReturn, $this->customMessage);
+    }
 
-	protected function getErrorMessage() {
-		// obtener el texto final (ya localizado) de smarty.
-		global $smarty;
-		$localizedText = $smarty->getConfigVars($this->message);
-		if (empty($localizedText)) {
-			self::$log->error("Untranslated error message: {$this->message}");
-			return "{untranslated:{$this->message}}";
-		} else {
-			return $localizedText;
-		}
-	}
+    protected function getErrorMessage() {
+        // obtener el texto final (ya localizado) de smarty.
+        global $smarty;
+        $localizedText = $smarty->getConfigVars($this->message);
+        if (empty($localizedText)) {
+            self::$log->error("Untranslated error message: {$this->message}");
+            return "{untranslated:{$this->message}}";
+        } else {
+            return $localizedText;
+        }
+    }
 }
 
-ApiException::$log = Logger::getLogger("ApiException");
+ApiException::$log = Logger::getLogger('ApiException');
 
 /**
  * InvalidArgumentException
  *
  */
 class InvalidParameterException extends ApiException {
-	private $parameter;
-	private $additional_parameters;
+    private $parameter;
+    private $additional_parameters;
 
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct($message, $parameter = NULL, $additional_parameters = array()) {
-		parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400);
-		$this->parameter = $parameter;
-		$this->additional_parameters = $additional_parameters;
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message, $parameter = null, $additional_parameters = array()) {
+        parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400);
+        $this->parameter = $parameter;
+        $this->additional_parameters = $additional_parameters;
+    }
 
-	protected function getErrorMessage() {
-		// Obtener el texto final (ya localizado) de smarty.
-		global $smarty;
-		$localizedText = $smarty->getConfigVars($this->message);
-		if (empty($localizedText)) {
-			self::$log->error("Untranslated error message: {$this->message}");
-			return "{untranslated:{$this->message}}";
-		}
-		$localizedText = ApiUtils::FormatString($localizedText,
-			$this->additional_parameters);
-		if ($this->parameter == NULL) {
-			return $localizedText;
-		} else {
-			return "$localizedText: {$this->parameter}";
-		}
-	}
+    protected function getErrorMessage() {
+        // Obtener el texto final (ya localizado) de smarty.
+        global $smarty;
+        $localizedText = $smarty->getConfigVars($this->message);
+        if (empty($localizedText)) {
+            self::$log->error("Untranslated error message: {$this->message}");
+            return "{untranslated:{$this->message}}";
+        }
+        $localizedText = ApiUtils::FormatString(
+            $localizedText,
+            $this->additional_parameters
+        );
+        if ($this->parameter == null) {
+            return $localizedText;
+        } else {
+            return "$localizedText: {$this->parameter}";
+        }
+    }
 }
 
 /**
@@ -138,14 +140,14 @@ class InvalidParameterException extends ApiException {
  *
  */
 class DuplicatedEntryInDatabaseException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct($message, Exception $previous = NULL) {
-		parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message, Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    }
 }
 
 /**
@@ -153,13 +155,13 @@ class DuplicatedEntryInDatabaseException extends ApiException {
  *
  */
 class InvalidDatabaseOperationException extends ApiException {
-	/**
-	 *
-	 * @param Exception $previous
-	 */
-	function __construct(Exception $previous = NULL) {
-		parent::__construct("generalError", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
-	}
+    /**
+     *
+     * @param Exception $previous
+     */
+    public function __construct(Exception $previous = null) {
+        parent::__construct('generalError', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    }
 }
 
 /**
@@ -167,14 +169,14 @@ class InvalidDatabaseOperationException extends ApiException {
  *
  */
 class NotFoundException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct($message, Exception $previous = NULL) {
-		parent::__construct($message, 'HTTP/1.1 404 NOT FOUND', 404, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message, Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 404 NOT FOUND', 404, $previous);
+    }
 }
 
 /**
@@ -182,14 +184,14 @@ class NotFoundException extends ApiException {
  *
  */
 class ForbiddenAccessException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct($message = "userNotAllowed", Exception $previous = NULL) {
-		parent::__construct($message, 'HTTP/1.1 403 FORBIDDEN', 403, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message = 'userNotAllowed', Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 403 FORBIDDEN', 403, $previous);
+    }
 }
 
 /**
@@ -197,14 +199,14 @@ class ForbiddenAccessException extends ApiException {
  *
  */
 class UnauthorizedException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct($message = "loginRequired", Exception $previous = NULL) {
-		parent::__construct($message, 'HTTP/1.1 401 UNAUTHORIZED', 401, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message = 'loginRequired', Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 401 UNAUTHORIZED', 401, $previous);
+    }
 }
 
 /**
@@ -212,14 +214,14 @@ class UnauthorizedException extends ApiException {
  *
  */
 class PreconditionFailedException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct($message = "userNotAllowed", Exception $previous = NULL) {
-		parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message = 'userNotAllowed', Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
+    }
 }
 
 /**
@@ -227,14 +229,14 @@ class PreconditionFailedException extends ApiException {
  *
  */
 class InvalidFilesystemOperationException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct($message = "generalError", Exception $previous = NULL) {
-		parent::__construct($message, 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message = 'generalError', Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
+    }
 }
 
 /**
@@ -242,13 +244,13 @@ class InvalidFilesystemOperationException extends ApiException {
  *
  */
 class CaptchaVerificationFailedException extends ApiException {
-	/**
-	 *
-	 * @param Exception $previous
-	 */
-	function __construct(Exception $previous = NULL) {
-		parent::__construct("unableToVerifyCaptcha", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
-	}
+    /**
+     *
+     * @param Exception $previous
+     */
+    public function __construct(Exception $previous = null) {
+        parent::__construct('unableToVerifyCaptcha', 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
+    }
 }
 
 /**
@@ -256,13 +258,13 @@ class CaptchaVerificationFailedException extends ApiException {
  *
  */
 class InternalServerErrorException extends ApiException {
-	/**
-	 *
-	 * @param Exception $previous
-	 */
-	function __construct(Exception $previous = NULL) {
-		parent::__construct("generalError", 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
-	}
+    /**
+     *
+     * @param Exception $previous
+     */
+    public function __construct(Exception $previous = null) {
+        parent::__construct('generalError', 'HTTP/1.1 500 INTERNAL SERVER ERROR', 500, $previous);
+    }
 }
 
 /**
@@ -270,42 +272,42 @@ class InternalServerErrorException extends ApiException {
  *
  */
 class InvalidCredentialsException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct(Exception $previous = NULL) {
-		parent::__construct("usernameOrPassIsWrong", "HTTP/1.1 403 FORBIDDEN", 101, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct(Exception $previous = null) {
+        parent::__construct('usernameOrPassIsWrong', 'HTTP/1.1 403 FORBIDDEN', 101, $previous);
+    }
 }
 
 class NotAllowedToSubmitException extends ApiException {
-	function __construct($message = "unableToSubmit", Exception $previous = NULL) {
-		parent::__construct($message, "HTTP/1.1 403 FORBIDDEN", 403, $previous);
-	}
+    public function __construct($message = 'unableToSubmit', Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 403 FORBIDDEN', 403, $previous);
+    }
 }
 
 class EmailNotVerifiedException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct(Exception $previous = NULL) {
-		parent::__construct("emailNotVerified", "HTTP/1.1 403 FORBIDDEN", 600, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct(Exception $previous = null) {
+        parent::__construct('emailNotVerified', 'HTTP/1.1 403 FORBIDDEN', 600, $previous);
+    }
 }
 
 class EmailVerificationSendException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct(Exception $previous = NULL) {
-		parent::__construct("errorWhileSendingMail", "HTTP/1.1 500 INTERNAL SERVER ERROR", 601, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct(Exception $previous = null) {
+        parent::__construct('errorWhileSendingMail', 'HTTP/1.1 500 INTERNAL SERVER ERROR', 601, $previous);
+    }
 }
 
 /**
@@ -313,21 +315,21 @@ class EmailVerificationSendException extends ApiException {
  *
  */
 class ProblemDeploymentFailedException extends ApiException {
-	/**
-	 *
-	 * @param string $message
-	 * @param Exception $previous
-	 */
-	function __construct($message = "problemDeployerFailed", Exception $previous = NULL) {
-		parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
-	}
+    /**
+     *
+     * @param string $message
+     * @param Exception $previous
+     */
+    public function __construct($message = 'problemDeployerFailed', Exception $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
+    }
 }
 
 /**
  * LoginDisabledException
  */
 class LoginDisabledException extends ApiException {
-	function __construct(ApiException $previous = NULL) {
-		parent::__construct("loginDisabled", 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
-	}
+    public function __construct(ApiException $previous = null) {
+        parent::__construct('loginDisabled', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    }
 }
