@@ -5,3 +5,4 @@ OMEGAUP_ROOT=`/usr/bin/git rev-parse --show-toplevel`
 /usr/bin/python $OMEGAUP_ROOT/stuff/i18n.py --validate
 /usr/bin/python $OMEGAUP_ROOT/stuff/update-templates.py --validate
 /bin/bash $OMEGAUP_ROOT/stuff/whitespace-purge.sh --validate
+/bin/bash $OMEGAUP_ROOT/stuff/php-format.sh --validate

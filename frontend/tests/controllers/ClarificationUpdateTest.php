@@ -7,45 +7,55 @@
  */
 
 class UpdateClarificationTest extends OmegaupTestCase {
-	/**
-	 * Basic test for answer
-	 *
-	 */
-	public function testUpdateAnswer() {
-		// Get a problem
-		$problemData = ProblemsFactory::createProblem();
+    /**
+     * Basic test for answer
+     *
+     */
+    public function testUpdateAnswer() {
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
 
-		// Get a contest
-		$contestData = ContestsFactory::createContest();
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
 
-		// Add the problem to the contest
-		ContestsFactory::addProblemToContest($problemData, $contestData);
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
 
-		// Create our contestant who will submit the clarification
-		$contestant = UserFactory::createUser();
+        // Create our contestant who will submit the clarification
+        $contestant = UserFactory::createUser();
 
-		// Create clarification
-		$this->detourBroadcasterCalls($this->exactly(2));
-		$clarificationData = ClarificationsFactory::createClarification(
-			$problemData, $contestData, $contestant);
+        // Create clarification
+        $this->detourBroadcasterCalls($this->exactly(2));
+        $clarificationData = ClarificationsFactory::createClarification(
+            $problemData,
+            $contestData,
+            $contestant
+        );
 
-		// Update answer
-		$newAnswer = 'new answer';
-		$response = ClarificationsFactory::answer($clarificationData,
-			$contestData, $newAnswer);
+        // Update answer
+        $newAnswer = 'new answer';
+        $response = ClarificationsFactory::answer(
+            $clarificationData,
+            $contestData,
+            $newAnswer
+        );
 
-		// Get clarification from DB
-		$clarification = ClarificationsDAO::getByPK(
-			$clarificationData['response']['clarification_id']);
+        // Get clarification from DB
+        $clarification = ClarificationsDAO::getByPK(
+            $clarificationData['response']['clarification_id']
+        );
 
-		// Validate that clarification stays the same
-		$this->assertEquals($clarificationData["request"]["message"],
-			$clarification->getMessage());
-		$this->assertEquals($clarificationData["request"]["public"],
-			$clarification->getPublic());
+        // Validate that clarification stays the same
+        $this->assertEquals(
+            $clarificationData['request']['message'],
+            $clarification->getMessage()
+        );
+        $this->assertEquals(
+            $clarificationData['request']['public'],
+            $clarification->getPublic()
+        );
 
-		// Validate our update
-		$this->assertEquals($newAnswer, $clarification->getAnswer());
-	}
+        // Validate our update
+        $this->assertEquals($newAnswer, $clarification->getAnswer());
+    }
 }
-

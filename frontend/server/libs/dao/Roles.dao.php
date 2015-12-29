@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Roles.dao.base.php");
-require_once("base/Roles.vo.base.php");
+require_once('base/Roles.dao.base.php');
+require_once('base/Roles.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

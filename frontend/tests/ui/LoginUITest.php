@@ -7,29 +7,28 @@
  */
 
 class LoginUITest extends OmegaupUITestCase {
-	public function testLogin() {
-		// Turn off sending email on usere creation
-		UserController::$sendEmailOnVerify = false;
+    public function testLogin() {
+        // Turn off sending email on usere creation
+        UserController::$sendEmailOnVerify = false;
 
-		// Create a user
-		$contestant = UserFactory::createUser();
+        // Create a user
+        $contestant = UserFactory::createUser();
 
-		// Open index
-		$this->open('/');
+        // Open index
+        $this->open('/');
 
-		// Click in Iniciar Sesion
-		$this->clickAndWait('link=Inicia sesion');
+        // Click in Iniciar Sesion
+        $this->clickAndWait('link=Inicia sesion');
 
-		// Type login data
-		$this->type('user', $contestant->getUsername());
-		$this->type('pass', $contestant->getPassword());
+        // Type login data
+        $this->type('user', $contestant->getUsername());
+        $this->type('pass', $contestant->getPassword());
 
-		// Click inicia sesion
-		$this->clickAndWait("//input[@value='Inicia sesion']");
+        // Click inicia sesion
+        $this->clickAndWait("//input[@value='Inicia sesion']");
 
-		// Sanity check that we are logged in
-		$this->waitForElementPresent('//*[@id="wrapper"]/div[1]/a');
-		$this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->getUsername());
-	}
+        // Sanity check that we are logged in
+        $this->waitForElementPresent('//*[@id="wrapper"]/div[1]/a');
+        $this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->getUsername());
+    }
 }
-

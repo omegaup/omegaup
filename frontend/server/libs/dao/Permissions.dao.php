@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Permissions.dao.base.php");
-require_once("base/Permissions.vo.base.php");
+require_once('base/Permissions.dao.base.php');
+require_once('base/Permissions.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

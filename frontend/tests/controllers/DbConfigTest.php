@@ -14,7 +14,7 @@ class DbConfigTest extends PHPUnit_Framework_TestCase
     {
         $timezone = date_default_timezone_get();
 
-        $this->assertEquals("UTC", $timezone);
+        $this->assertEquals('UTC', $timezone);
     }
 
     public function testDbUtc()
@@ -25,8 +25,6 @@ class DbConfigTest extends PHPUnit_Framework_TestCase
         $sql = "select timediff(now(),convert_tz(now(),@@session.time_zone,'+00:00')) d";
         $rs = $conn->GetRow($sql);
 
-        $this->assertEquals("00:00:00", $rs['d']);
+        $this->assertEquals('00:00:00', $rs['d']);
     }
 }
-
-?>

@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Users.dao.base.php");
-require_once("base/Users.vo.base.php");
+require_once('base/Users.dao.base.php');
+require_once('base/Users.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy
@@ -18,53 +18,55 @@ require_once("base/Users.vo.base.php");
   *
   */
 class UsersDAO extends UsersDAOBase {
-	public static function FindByEmail($email) {
-		global  $conn;
-		$sql = "select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id";
-		$params = array( $email );
-		$rs = $conn->GetRow($sql, $params);
-		if(count($rs)==0)return NULL;
-		return new Users( $rs );
-	}
+    public static function FindByEmail($email) {
+        global  $conn;
+        $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
+        $params = array( $email );
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs)==0) {
+            return null;
+        }
+        return new Users($rs);
+    }
 
-	public static function FindByUsername($username) {
-		$vo_Query = new Users( array(
-			"username" => $username
-		));
+    public static function FindByUsername($username) {
+        $vo_Query = new Users(array(
+            'username' => $username
+        ));
 
-		$a_Results = UsersDAO::search( $vo_Query );
+        $a_Results = UsersDAO::search($vo_Query);
 
-		if (sizeof($a_Results) != 1) {
-			return NULL;
-		}
+        if (sizeof($a_Results) != 1) {
+            return null;
+        }
 
-		return array_pop( $a_Results );
-	}
+        return array_pop($a_Results);
+    }
 
-	public static function FindByUsernameOrName($usernameOrName) {
-		global  $conn;
-		$sql = "select DISTINCT u.* from Users u where u.username LIKE CONCAT('%', ?, '%') or u.name LIKE CONCAT('%', ?, '%') LIMIT 10";
-		$args = array($usernameOrName, $usernameOrName);
+    public static function FindByUsernameOrName($usernameOrName) {
+        global  $conn;
+        $sql = "select DISTINCT u.* from Users u where u.username LIKE CONCAT('%', ?, '%') or u.name LIKE CONCAT('%', ?, '%') LIMIT 10";
+        $args = array($usernameOrName, $usernameOrName);
 
-		$rs = $conn->Execute($sql, $args);
-		$ar = array();
-		foreach ($rs as $foo) {
-			$bar =  new Users($foo);
-    		array_push( $ar,$bar);
-		}
-		return $ar;
-	}
+        $rs = $conn->Execute($sql, $args);
+        $ar = array();
+        foreach ($rs as $foo) {
+            $bar =  new Users($foo);
+            array_push($ar, $bar);
+        }
+        return $ar;
+    }
 
-	public static function GetRankByProblemsSolved($limit = 100, $offset = 0, Users $user = null) {
-		$filterByUser = !is_null($user);
+    public static function GetRankByProblemsSolved($limit = 100, $offset = 0, Users $user = null) {
+        $filterByUser = !is_null($user);
 
-		global  $conn;
-		$conn->Execute("SET @prev_value = NULL;");
-		$conn->Execute("SET @rank_count = 0;");
-		$conn->Execute("SET @prev_value_ties = NULL");
-		$conn->Execute("SET @prev_ties_count = 0;");
-		$conn->Execute("SET @ties_count = 0");
-		$sql = "SELECT ProblemsSolved, username, name, rank, user_id FROM (
+        global  $conn;
+        $conn->Execute('SET @prev_value = NULL;');
+        $conn->Execute('SET @rank_count = 0;');
+        $conn->Execute('SET @prev_value_ties = NULL');
+        $conn->Execute('SET @prev_ties_count = 0;');
+        $conn->Execute('SET @ties_count = 0');
+        $sql = "SELECT ProblemsSolved, username, name, rank, user_id FROM (
 					SELECT ProblemsSolved, username, name, user_id,
 					@prev_ties_count := @ties_count as previous_ties_count,
 					CASE
@@ -93,38 +95,38 @@ class UsersDAO extends UsersDAOBase {
 								   ORDER BY ProblemsSolved DESC, user_id
 					) AS UsersProblemsSolved
 				) AS Rank ";
-		($filterByUser) ? $sql .= "WHERE user_id = ? " : $sql .= "ORDER BY Rank ASC, user_id LIMIT $offset, $limit";
+        ($filterByUser) ? $sql .= 'WHERE user_id = ? ' : $sql .= "ORDER BY Rank ASC, user_id LIMIT $offset, $limit";
 
-		$rs = null;
-		if ($filterByUser) {
-			$params = array($user->user_id);
-			$rs = $conn->Execute($sql, $params);
-		} else {
-			$rs = $conn->Execute($sql);
-		}
+        $rs = null;
+        if ($filterByUser) {
+            $params = array($user->user_id);
+            $rs = $conn->Execute($sql, $params);
+        } else {
+            $rs = $conn->Execute($sql);
+        }
 
-		$ar = array();
-		foreach ($rs as $foo) {
-			$bar =  new Users($foo);
-			$result = array("user" => $bar, "problems_solved" =>  $foo["ProblemsSolved"], "rank" => $foo["rank"]);
-    		array_push( $ar, $result);
-		}
-		return $ar;
-	}
+        $ar = array();
+        foreach ($rs as $foo) {
+            $bar =  new Users($foo);
+            $result = array('user' => $bar, 'problems_solved' =>  $foo['ProblemsSolved'], 'rank' => $foo['rank']);
+            array_push($ar, $result);
+        }
+        return $ar;
+    }
 
-	/*
+    /*
 	 * Factoring in difficulty of problems solved
 	 */
-	public static function GetRankByProblemsSolved2($limit = 100, $offset = 0, Users $user = null) {
-		$filterByUser = !is_null($user);
+    public static function GetRankByProblemsSolved2($limit = 100, $offset = 0, Users $user = null) {
+        $filterByUser = !is_null($user);
 
-		global  $conn;
-		$conn->Execute("SET @prev_value = NULL;");
-		$conn->Execute("SET @rank_count = 0;");
-		$conn->Execute("SET @prev_value_ties = NULL");
-		$conn->Execute("SET @prev_ties_count = 0;");
-		$conn->Execute("SET @ties_count = 0");
-		$sql = "SELECT
+        global  $conn;
+        $conn->Execute('SET @prev_value = NULL;');
+        $conn->Execute('SET @rank_count = 0;');
+        $conn->Execute('SET @prev_value_ties = NULL');
+        $conn->Execute('SET @prev_ties_count = 0;');
+        $conn->Execute('SET @ties_count = 0');
+        $sql = "SELECT
 					ProblemsSolved, score, username, name, rank, user_id, country_id
 				FROM
 					(
@@ -163,42 +165,42 @@ class UsersDAO extends UsersDAOBase {
 							) AS UsersProblemsSolved
 					) AS Rank ";
 
-		$params = array();
-		if ($filterByUser) {
-			$sql .= 'WHERE user_id = ? ';
-			$params[] = $user->user_id;
-		} else {
-			$sql .= 'ORDER BY Rank ASC, user_id LIMIT ?, ?';
-			$params[] = (int)$offset;
-			$params[] = (int)$limit;
-		}
+        $params = array();
+        if ($filterByUser) {
+            $sql .= 'WHERE user_id = ? ';
+            $params[] = $user->user_id;
+        } else {
+            $sql .= 'ORDER BY Rank ASC, user_id LIMIT ?, ?';
+            $params[] = (int)$offset;
+            $params[] = (int)$limit;
+        }
 
-		$rs = $conn->Execute($sql, $params);
+        $rs = $conn->Execute($sql, $params);
 
-		$ar = array();
-		foreach ($rs as $foo) {
-			$bar =  new Users($foo);
-			$result = array(
-				"user" => $bar,
-				"problems_solved" =>  $foo["ProblemsSolved"],
-				"rank" => $foo["rank"],
-				"score" => $foo["score"]
-				);
+        $ar = array();
+        foreach ($rs as $foo) {
+            $bar =  new Users($foo);
+            $result = array(
+                'user' => $bar,
+                'problems_solved' =>  $foo['ProblemsSolved'],
+                'rank' => $foo['rank'],
+                'score' => $foo['score']
+                );
 
-    		array_push( $ar, $result);
-		}
-		return $ar;
-	}
+            array_push($ar, $result);
+        }
+        return $ar;
+    }
 
-	public static function FindResetInfoByEmail($email) {
-		$user = self::FindByEmail($email);
-		if (is_null($user)) {
-			return NULL;
-		} else {
-			return Array(
-				'reset_digest'	=> $user->reset_digest,
-				'reset_sent_at'	=> $user->reset_sent_at
-			);
-		}
-	}
+    public static function FindResetInfoByEmail($email) {
+        $user = self::FindByEmail($email);
+        if (is_null($user)) {
+            return null;
+        } else {
+            return array(
+                'reset_digest'  => $user->reset_digest,
+                'reset_sent_at'     => $user->reset_sent_at
+            );
+        }
+    }
 }

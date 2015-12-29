@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Tags.dao.base.php");
-require_once("base/Tags.vo.base.php");
+require_once('base/Tags.dao.base.php');
+require_once('base/Tags.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy
@@ -18,30 +18,29 @@ require_once("base/Tags.vo.base.php");
   *
   */
 class TagsDAO extends TagsDAOBase {
-	public static final function getByName($name) {
-		$sql = "SELECT * FROM Tags WHERE (name = ? ) LIMIT 1;";
-		$params = array($name);
+    final public static function getByName($name) {
+        $sql = 'SELECT * FROM Tags WHERE (name = ? ) LIMIT 1;';
+        $params = array($name);
 
-		global $conn;
-		$rs = $conn->GetRow($sql, $params);
-		if (count($rs) == 0)
-		{
-			return NULL;
-		}
+        global $conn;
+        $rs = $conn->GetRow($sql, $params);
+        if (count($rs) == 0) {
+            return null;
+        }
 
-		return new Tags($rs);
-	}
+        return new Tags($rs);
+    }
 
-	public static function FindByName($name) {
-		global $conn;
-		$sql = "SELECT name FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 10";
-		$args = array($name);
+    public static function FindByName($name) {
+        global $conn;
+        $sql = "SELECT name FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 10";
+        $args = array($name);
 
-		$rs = $conn->Execute($sql, $args);
-		$result = array();
-		foreach ($rs as $row) {
-			array_push($result, new Tags($row));
-		}
-		return $result;
-	}
+        $rs = $conn->Execute($sql, $args);
+        $result = array();
+        foreach ($rs as $row) {
+            array_push($result, new Tags($row));
+        }
+        return $result;
+    }
 }

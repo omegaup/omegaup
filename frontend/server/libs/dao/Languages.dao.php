@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Languages.dao.base.php");
-require_once("base/Languages.vo.base.php");
+require_once('base/Languages.dao.base.php');
+require_once('base/Languages.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

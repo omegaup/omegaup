@@ -6,30 +6,29 @@
  * @author joemmanuel
  */
 class ArenaAdminAllTestextends extends OmegaupUITestCase {
-	public function testProblemArenaAndSubmbit() {
-		// Create a contestant
-		$contestant = UserFactory::createUser();
+    public function testProblemArenaAndSubmbit() {
+        // Create a contestant
+        $contestant = UserFactory::createUser();
 
-		// Create a problem
-		$problemData = ProblemsFactory::createProblem();
+        // Create a problem
+        $problemData = ProblemsFactory::createProblem();
 
-		// Get a contest
-		$contestData = ContestsFactory::createContest();
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
 
-		// Add the problem to the contest
-		ContestsFactory::addProblemToContest($problemData, $contestData);
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
 
-		// Create a run
-		$runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        // Create a run
+        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
 
-		// Login
-		$contestant = $this->createAdminUserAndLogin();
+        // Login
+        $contestant = $this->createAdminUserAndLogin();
 
-		// Open ADMIN
-		$this->open('/arena/admin');
+        // Open ADMIN
+        $this->open('/arena/admin');
 
-		// Wait for table to render with our run
-		$this->waitForElementPresent('//*[@id="run_'.$runData["response"]["guid"].'"]/td[2]');
-	}
+        // Wait for table to render with our run
+        $this->waitForElementPresent('//*[@id="run_'.$runData['response']['guid'].'"]/td[2]');
+    }
 }
-

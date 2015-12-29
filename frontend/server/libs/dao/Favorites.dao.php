@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Favorites.dao.base.php");
-require_once("base/Favorites.vo.base.php");
+require_once('base/Favorites.dao.base.php');
+require_once('base/Favorites.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy

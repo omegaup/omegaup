@@ -1,7 +1,7 @@
 <?php
 
-require_once("base/Contest_Problems.dao.base.php");
-require_once("base/Contest_Problems.vo.base.php");
+require_once('base/Contest_Problems.dao.base.php');
+require_once('base/Contest_Problems.vo.base.php');
 /** Page-level DocBlock .
   *
   * @author alanboy
@@ -19,64 +19,64 @@ require_once("base/Contest_Problems.vo.base.php");
   */
 class ContestProblemsDAO extends ContestProblemsDAOBase
 {
-	/*
+    /*
 	 * Get number of problems in contest.
 	 */
-	public static final function CountContestProblems($contest_id) {
-		// Build SQL statement
-		$sql = 'SELECT COUNT(cp.problem_id) ' .
-		       'FROM Contest_Problems cp ' .
-		       'WHERE cp.contest_id = ?';
-		$val = array($contest_id);
+    final public static function CountContestProblems($contest_id) {
+        // Build SQL statement
+        $sql = 'SELECT COUNT(cp.problem_id) ' .
+               'FROM Contest_Problems cp ' .
+               'WHERE cp.contest_id = ?';
+        $val = array($contest_id);
 
-		global $conn;
-		return $conn->GetOne($sql, $val);
-	}
+        global $conn;
+        return $conn->GetOne($sql, $val);
+    }
 
-	/*
+    /*
 	 * Get contest problems including contest alias, points, and order
 	 */
-	public static final function GetContestProblems($contest_id) {
-		// Build SQL statement
-		$sql = 'SELECT p.problem_id, p.alias, cp.points, cp.order ' .
-		       'FROM Problems p ' .
-		       'INNER JOIN Contest_Problems cp ON cp.problem_id = p.problem_id ' .
-		       'WHERE cp.contest_id = ? ' .
-		       'ORDER BY cp.`order` ASC;';
-		$val = array($contest_id);
+    final public static function GetContestProblems($contest_id) {
+        // Build SQL statement
+        $sql = 'SELECT p.problem_id, p.alias, cp.points, cp.order ' .
+               'FROM Problems p ' .
+               'INNER JOIN Contest_Problems cp ON cp.problem_id = p.problem_id ' .
+               'WHERE cp.contest_id = ? ' .
+               'ORDER BY cp.`order` ASC;';
+        $val = array($contest_id);
 
-		global $conn;
-		return $conn->GetAll($sql, $val);
-	}
+        global $conn;
+        return $conn->GetAll($sql, $val);
+    }
 
-	/*
+    /*
 	 *
 	 * Get relevant problems including contest alias
 	 */
-	public static final function GetRelevantProblems($contest_id)
-	{
-		// Build SQL statement
-		$sql = "
-			SELECT
-				p.problem_id, p.alias
-			FROM
-				Contest_Problems cp
-			INNER JOIN
-				Problems p ON p.problem_id = cp.problem_id
-			WHERE
-				cp.contest_id = ?
-			ORDER BY cp.`order` ASC;";
-		$val = array($contest_id);
+    final public static function GetRelevantProblems($contest_id)
+    {
+        // Build SQL statement
+        $sql = '
+            SELECT
+                p.problem_id, p.alias
+            FROM
+                Contest_Problems cp
+            INNER JOIN
+                Problems p ON p.problem_id = cp.problem_id
+            WHERE
+                cp.contest_id = ?
+            ORDER BY cp.`order` ASC;';
+        $val = array($contest_id);
 
-		global $conn;
-		$rs = $conn->Execute($sql, $val);
+        global $conn;
+        $rs = $conn->Execute($sql, $val);
 
-		$ar = array();
-		foreach ($rs as $foo) {
-			$bar =  new Problems($foo);
-			array_push( $ar,$bar);
-		}
+        $ar = array();
+        foreach ($rs as $foo) {
+            $bar =  new Problems($foo);
+            array_push($ar, $bar);
+        }
 
-		return $ar;
-	}
+        return $ar;
+    }
 }

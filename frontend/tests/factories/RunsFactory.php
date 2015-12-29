@@ -20,114 +20,114 @@
  *
  */
 class GraderMock extends Grader {
-	public function Grade($runGuids, $rejudge, $debug) {
-		return;
-	}
+    public function Grade($runGuids, $rejudge, $debug) {
+        return;
+    }
 }
 
 class RunsFactory {
-	/**
-	 * Builds and returns a request object to be used for RunController::apiCreate
-	 *
-	 * @param type $problemData
-	 * @param type $contestData
-	 * @param type $contestant
-	 * @return Request
-	 */
-	private static function createRequestCommon($problemData, $contestData, $contestant) {
-		// Create an empty request
-		$r = new Request();
+    /**
+     * Builds and returns a request object to be used for RunController::apiCreate
+     *
+     * @param type $problemData
+     * @param type $contestData
+     * @param type $contestant
+     * @return Request
+     */
+    private static function createRequestCommon($problemData, $contestData, $contestant) {
+        // Create an empty request
+        $r = new Request();
 
-		// Log in as contestant
-		$r["auth_token"] = OmegaupTestCase::login($contestant);
+        // Log in as contestant
+        $r['auth_token'] = OmegaupTestCase::login($contestant);
 
-		// Build request
-		if (!is_null($contestData)) {
-			$r["contest_alias"] = $contestData["request"]["alias"];
-		}
+        // Build request
+        if (!is_null($contestData)) {
+            $r['contest_alias'] = $contestData['request']['alias'];
+        }
 
-		$r["problem_alias"] = $problemData["request"]["alias"];
-		$r["language"] = "c";
-		$r["source"] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['language'] = 'c';
+        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 
-		return $r;
-	}
+        return $r;
+    }
 
-	/**
-	 * Creates a run
-	 *
-	 * @param type $problemData
-	 * @param type $contestData
-	 * @param Users $contestant
-	 * @return array
-	 */
-	public static function createRun($problemData, $contestData, $contestant) {
-		// Our contestant has to open the contest before sending a run
-		ContestsFactory::openContest($contestData, $contestant);
+    /**
+     * Creates a run
+     *
+     * @param type $problemData
+     * @param type $contestData
+     * @param Users $contestant
+     * @return array
+     */
+    public static function createRun($problemData, $contestData, $contestant) {
+        // Our contestant has to open the contest before sending a run
+        ContestsFactory::openContest($contestData, $contestant);
 
-		// Then we need to open the problem
-		ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
+        // Then we need to open the problem
+        ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
 
-		$r = self::createRequestCommon($problemData, $contestData, $contestant);
+        $r = self::createRequestCommon($problemData, $contestData, $contestant);
 
-		// Call API
-		RunController::$grader = new GraderMock();
-		$response = RunController::apiCreate($r);
+        // Call API
+        RunController::$grader = new GraderMock();
+        $response = RunController::apiCreate($r);
 
-		// Clean up
-		unset($_REQUEST);
+        // Clean up
+        unset($_REQUEST);
 
-		return array(
-			"request" => $r,
-			"contestant" => $contestant,
-			"response" => $response
-		);
-	}
+        return array(
+            'request' => $r,
+            'contestant' => $contestant,
+            'response' => $response
+        );
+    }
 
-	/**
-	 * Creates a run to the given problem
-	 *
-	 * @param type $problemData
-	 * @param type $contestant
-	 */
-	public static function createRunToProblem($problemData, $contestant) {
-		$r = self::createRequestCommon($problemData, null, $contestant);
+    /**
+     * Creates a run to the given problem
+     *
+     * @param type $problemData
+     * @param type $contestant
+     */
+    public static function createRunToProblem($problemData, $contestant) {
+        $r = self::createRequestCommon($problemData, null, $contestant);
 
-		// Call API
-		RunController::$grader = new GraderMock();
-		$response = RunController::apiCreate($r);
+        // Call API
+        RunController::$grader = new GraderMock();
+        $response = RunController::apiCreate($r);
 
-		// Clean up
-		unset($_REQUEST);
+        // Clean up
+        unset($_REQUEST);
 
-		return array(
-			"request" => $r,
-			"contestant" => $contestant,
-			"response" => $response
-		);
-	}
+        return array(
+            'request' => $r,
+            'contestant' => $contestant,
+            'response' => $response
+        );
+    }
 
-	/**
-	 * Given a run id, set a score to a given run
-	 *
-	 * @param type $runData
-	 * @param int $points
-	 * @param string $verdict
-	 */
-	public static function gradeRun($runData, $points = 1, $verdict = "AC", $submitDelay = null) {
-		$run = RunsDAO::getByAlias($runData["response"]["guid"]);
+    /**
+     * Given a run id, set a score to a given run
+     *
+     * @param type $runData
+     * @param int $points
+     * @param string $verdict
+     */
+    public static function gradeRun($runData, $points = 1, $verdict = 'AC', $submitDelay = null) {
+        $run = RunsDAO::getByAlias($runData['response']['guid']);
 
-		$run->setVerdict($verdict);
-		$run->setScore($points);
-		$run->setContestScore($points * 100);
-		$run->setStatus("ready");
-		$run->judged_by = "J1";
+        $run->setVerdict($verdict);
+        $run->setScore($points);
+        $run->setContestScore($points * 100);
+        $run->setStatus('ready');
+        $run->judged_by = 'J1';
 
-		if(!is_null($submitDelay)) {
-			$run->submit_delay = $submitDelay;
-			$run->penalty = $submitDelay;
-		}
+        if (!is_null($submitDelay)) {
+            $run->submit_delay = $submitDelay;
+            $run->penalty = $submitDelay;
+        }
 
-		RunsDAO::save($run);
-	}
+        RunsDAO::save($run);
+    }
 }

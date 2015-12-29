@@ -12,69 +12,69 @@
  * copy-on-write semantics.
  */
 class Request extends ArrayObject {
-	/**
-	 * The parent of this Request. This is set whenever the push function is called.
-	 */
-	private $parent = null;
+    /**
+     * The parent of this Request. This is set whenever the push function is called.
+     */
+    private $parent = null;
 
-	/**
-	 * The format in which the request will be rendered.
-	 */
-	const JsonFormat = 0;
-	const HtmlFormat = 1;
-	public $renderFormat = Request::JsonFormat;
+    /**
+     * The format in which the request will be rendered.
+     */
+    const JSON_FORMAT = 0;
+    const HTML_FORMAT = 1;
+    public $renderFormat = Request::JSON_FORMAT;
 
-	/**
-	 * The object of the user currently logged in.
-	 */
-	public $user = null;
+    /**
+     * The object of the user currently logged in.
+     */
+    public $user = null;
 
-	/**
-	 * The method that will be called.
-	 */
-	public $method = null;
+    /**
+     * The method that will be called.
+     */
+    public $method = null;
 
-	/**
-	 * Whether $key exists. Used as isset($req[$key]);
-	 *
-	 * @param string $key The key.
-	 */
-	public function offsetExists($key) {
-		return parent::offsetExists($key) || ($this->parent != null && isset($this->parent[$key]));
-	}
+    /**
+     * Whether $key exists. Used as isset($req[$key]);
+     *
+     * @param string $key The key.
+     */
+    public function offsetExists($key) {
+        return parent::offsetExists($key) || ($this->parent != null && isset($this->parent[$key]));
+    }
 
-	/**
-	 * Gets the value associated with a key. Used as $req[$key];
-	 *
-	 * @param string $key The key.
-	 */
-	public function offsetGet($key) {
-		return (isset($this[$key]) && parent::offsetGet($key) !== "null") ? parent::offsetGet($key) : ($this->parent != null ? $this->parent->offsetGet($key) : null);
-	}
+    /**
+     * Gets the value associated with a key. Used as $req[$key];
+     *
+     * @param string $key The key.
+     */
+    public function offsetGet($key) {
+        return (isset($this[$key]) && parent::offsetGet($key) !== 'null') ? parent::offsetGet($key) : ($this->parent != null ? $this->parent->offsetGet($key) : null);
+    }
 
-	/**
-	 * Creates a new Request with the same members as the current Request, with copy-on-write semantics.
-	 *
-	 * @param array $contents The (optional) array with the values.
-	 */
-	public function push($contents = null) {
-		$req = new Request($contents);
-		$req->parent = $this;
-		$req->user = $this->user;
-		$req->renderFormat = $this->renderFormat;
-		return $req;
-	}
+    /**
+     * Creates a new Request with the same members as the current Request, with copy-on-write semantics.
+     *
+     * @param array $contents The (optional) array with the values.
+     */
+    public function push($contents = null) {
+        $req = new Request($contents);
+        $req->parent = $this;
+        $req->user = $this->user;
+        $req->renderFormat = $this->renderFormat;
+        return $req;
+    }
 
-	/**
-	 * Executes the user-provided function and returns its result.
-	 */
-	public function execute() {
-		$response = call_user_func($this->method, $this);
+    /**
+     * Executes the user-provided function and returns its result.
+     */
+    public function execute() {
+        $response = call_user_func($this->method, $this);
 
-		if ($response === false) {
-			throw new NotFoundException("apiNotFound");
-		}
+        if ($response === false) {
+            throw new NotFoundException('apiNotFound');
+        }
 
-		return $response;
-	}
+        return $response;
+    }
 }
