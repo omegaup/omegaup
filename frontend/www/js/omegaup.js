@@ -382,11 +382,11 @@ OmegaUp.prototype.getUserStats = function(username, callback) {
 	});
 };
 
-OmegaUp.prototype.getGroups = function(callback) {
+OmegaUp.prototype.getMyGroups = function(callback) {
 	var self = this;
 
 	$.get(
-		'/api/group/list/',
+		'/api/group/mylist/',
 		function (data) {
 			callback(data);
 		},
@@ -846,14 +846,13 @@ OmegaUp.prototype.addAdminToProblem = function(problemAlias, username, callback)
 	});
 };
 
-OmegaUp.prototype.addTagToProblem = function(problemAlias, tagname, public, callback) {
+OmegaUp.prototype.removeAdminFromProblem = function(problemAlias, username, callback) {
 	var self = this;
 
 	$.post(
-		'/api/problem/addTag/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		'/api/problem/removeAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
 		{
-			name: tagname,
-			public: public
+			usernameOrEmail : username
 		},
 		function (data) {
 			callback(data);
@@ -868,13 +867,98 @@ OmegaUp.prototype.addTagToProblem = function(problemAlias, tagname, public, call
 	});
 };
 
-OmegaUp.prototype.removeAdminFromProblem = function(problemAlias, username, callback) {
+OmegaUp.prototype.addGroupAdminToContest = function(contestAlias, alias, callback) {
 	var self = this;
 
 	$.post(
-		'/api/problem/removeAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		'/api/contest/addGroupAdmin/contest_alias/' + encodeURIComponent(contestAlias) + '/',
 		{
-			usernameOrEmail : username
+			group: alias
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.removeGroupAdminFromContest = function(contestAlias, alias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/contest/removeGroupAdmin/contest_alias/' + encodeURIComponent(contestAlias) + '/',
+		{
+			group: alias
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.addGroupAdminToProblem = function(problemAlias, alias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/addGroupAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		{
+			group: alias
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.removeGroupAdminFromProblem = function(problemAlias, alias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/removeGroupAdmin/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		{
+			group: alias
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.addTagToProblem = function(problemAlias, tagname, public, callback) {
+	var self = this;
+
+	$.post(
+		'/api/problem/addTag/problem_alias/' + encodeURIComponent(problemAlias) + '/',
+		{
+			name: tagname,
+			public: public
 		},
 		function (data) {
 			callback(data);
@@ -1143,6 +1227,25 @@ OmegaUp.prototype.searchUsers = function(query, callback) {
 
 	$.post(
 		'/api/user/list/',
+		{query: query},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.searchGroups = function(query, callback) {
+	var self = this;
+
+	$.post(
+		'/api/group/list/',
 		{query: query},
 		function (data) {
 			callback(data);

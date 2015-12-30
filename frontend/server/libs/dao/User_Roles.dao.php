@@ -109,4 +109,45 @@ class UserRolesDAO extends UserRolesDAOBase {
 
         return $admins;
     }
+
+    public static function IsContestAdmin($user_id, Contests $contest) {
+        $sql = '
+			SELECT
+				COUNT(*)
+			FROM
+				User_Roles ur
+			WHERE
+				ur.user_id = ? AND
+				(ur.role_id = 1 OR ur.role_id = 2 AND ur.contest_id = ?);';
+        $params = array($user_id, $contest->contest_id);
+        global $conn;
+        return $conn->GetOne($sql, $params) > 0;
+    }
+
+    public static function IsProblemAdmin($user_id, Problems $problem) {
+        $sql = '
+			SELECT
+				COUNT(*)
+			FROM
+				User_Roles ur
+			WHERE
+				ur.user_id = ? AND
+				(ur.role_id = 1 OR ur.role_id = 3 AND ur.contest_id = ?);';
+        $params = array($user_id, $problem->problem_id);
+        global $conn;
+        return $conn->GetOne($sql, $params) > 0;
+    }
+
+    public static function IsSystemAdmin($user_id) {
+        $sql = '
+			SELECT
+				COUNT(*)
+			FROM
+				User_Roles ur
+			WHERE
+				ur.user_id = ?;';
+        $params = array($user_id);
+        global $conn;
+        return $conn->GetOne($sql, $params) > 0;
+    }
 }

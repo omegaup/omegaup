@@ -240,14 +240,64 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $problem_user = new UserRoles();
-        $problem_user->setContestId($r['problem']->problem_id);
-        $problem_user->setUserId($user->user_id);
-        $problem_user->setRoleId(PROBLEM_ADMIN_ROLE);
+        $user_role = new UserRoles();
+        $user_role->setContestId($r['problem']->problem_id);
+        $user_role->setUserId($user->user_id);
+        $user_role->setRoleId(PROBLEM_ADMIN_ROLE);
 
         // Save the contest to the DB
         try {
-            UserRolesDAO::save($problem_user);
+            UserRolesDAO::save($user_role);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            self::$log->error('Failed to save user roles');
+            self::$log->error($e);
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    /**
+     * Adds a group admin to a problem
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiAddGroupAdmin(Request $r) {
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check problem_alias
+        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!Authorization::IsProblemAdmin($r['current_user_id'], $r['problem'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $group_role = new GroupRoles();
+        $group_role->setContestId($r['problem']->problem_id);
+        $group_role->setGroupId($group->group_id);
+        $group_role->setRoleId(PROBLEM_ADMIN_ROLE);
+
+        // Save the role
+        try {
+            GroupRolesDAO::save($group_role);
         } catch (Exception $e) {
             // Operation failed in the data layer
             self::$log->error('Failed to save user roles');
@@ -358,14 +408,62 @@ class ProblemController extends Controller {
             throw new NotFoundException();
         }
 
-        $problem_user = new UserRoles();
-        $problem_user->setContestId($r['problem']->problem_id);
-        $problem_user->setUserId($r['user']->user_id);
-        $problem_user->setRoleId(PROBLEM_ADMIN_ROLE);
+        $user_role = new UserRoles();
+        $user_role->setContestId($r['problem']->problem_id);
+        $user_role->setUserId($r['user']->user_id);
+        $user_role->setRoleId(PROBLEM_ADMIN_ROLE);
 
         // Delete the role
         try {
-            UserRolesDAO::delete($problem_user);
+            UserRolesDAO::delete($user_role);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    /**
+     * Removes a group admin from a problem
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiRemoveGroupAdmin(Request $r) {
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        // Check whether problem exists
+        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+
+        $group = GroupsDAO::FindByAlias($r['group']);
+
+        if ($group == null) {
+            throw new InvalidParameterException('invalidParameters');
+        }
+
+        try {
+            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (!Authorization::IsProblemAdmin($r['current_user_id'], $r['problem'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $group_role = new GroupRoles();
+        $group_role->setContestId($r['problem']->problem_id);
+        $group_role->setGroupId($group->group_id);
+        $group_role->setRoleId(PROBLEM_ADMIN_ROLE);
+
+        // Delete the role
+        try {
+            GroupRolesDAO::delete($group_role);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -447,6 +545,7 @@ class ProblemController extends Controller {
 
         $response = array();
         $response['admins'] = UserRolesDAO::getProblemAdmins($problem);
+        $response['group_admins'] = GroupRolesDAO::getProblemAdmins($problem);
         $response['status'] = 'ok';
 
         return $response;

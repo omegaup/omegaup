@@ -66,7 +66,7 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        if (!Authorization::IsGroupOwner($r['current_user_id'], $r['group'])) {
+        if (!Authorization::IsGroupAdmin($r['current_user_id'], $r['group'])) {
             throw new ForbiddenAccessException();
         }
     }
@@ -139,7 +139,7 @@ class GroupController extends Controller {
      *
      * @param Request $r
      */
-    public static function apiList(Request $r) {
+    public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
 
         $response = array();
@@ -158,6 +158,35 @@ class GroupController extends Controller {
         }
 
         $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
+     * Returns a list of groups that match a partial name. This returns an
+     * array instead of an object since it is used by typeahead.
+     *
+     * @param Request $r
+     */
+    public static function apiList(Request $r) {
+        self::authenticateRequest($r);
+
+        if (is_null($r['query'])) {
+            throw new InvalidParameterException('parameterEmpty', 'query');
+        }
+        if (strlen($r['query']) < 2) {
+            throw new InvalidParameterException('parameterInvalid', 'query');
+        }
+
+        try {
+            $groups = GroupsDAO::SearchByName($r['query']);
+        } catch (Exception $ex) {
+            throw new InvalidDatabaseOperationException($ex);
+        }
+
+        $response = array();
+        foreach ($groups as $group) {
+            array_push($response, array('label' => $group->name, 'value' => $group->alias));
+        }
         return $response;
     }
 

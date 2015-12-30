@@ -142,6 +142,7 @@ class Utils {
             'Groups_Scoreboards_Contests',
             'Groups_Scoreboards',
             'Groups',
+            'Group_Roles',
             'Contest_User_Request',
             'Contest_User_Request_History',
             'Submission_Log',

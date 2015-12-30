@@ -4,7 +4,7 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<script src="/js/problem.edit.js?ver=dc5cfd" type="text/javascript"></script>
+<script src="/js/problem.edit.js?ver=6ec770" type="text/javascript"></script>
 
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
 
@@ -17,6 +17,7 @@
 	<li class="active"><a href="#edit" data-toggle="tab">{#problemEditEditProblem#}</a></li>
 	<li><a href="#markdown" data-toggle="tab">{#problemEditEditMarkdown#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#problemEditAddAdmin#}</a></li>
+	<li><a href="#group-admins" data-toggle="tab">{#problemEditAddGroupAdmin#}</a></li>
 	<li><a href="#tags" data-toggle="tab">{#problemEditAddTags#}</a></li>
 	<li><a href="#download" data-toggle="tab">{#wordsDownload#}</a></li>
 </ul>
@@ -101,6 +102,30 @@
 					<th>{#contestEditRegisteredAdminDelete#}</th>
 				</thead>
 				<tbody id="problem-admins"></tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="tab-pane" id="group-admins">
+		<div class="panel panel-primary">
+			<div class="panel-body">
+				<form class="form" id="add-group-admin-form">
+					<div class="form-group">
+						<label for="groupalias-admin">{#wordsGroupAdmin#}</label>
+						<input id="groupalias-admin" name="name" value="" type="text" size="20" class="form-control" autocomplete="off" />
+					</div>
+
+					<button class="btn btn-primary" type='submit'>{#contestAddgroupAddGroup#}</button>
+				</form>
+			</div>
+
+			<table class="table table-striped">
+				<thead>
+					<th>{#contestEditRegisteredGroupAdminName#}</th>
+					<th>{#contestEditRegisteredAdminRole#}</th>
+					<th>{#contestEditRegisteredAdminDelete#}</th>
+				</thead>
+				<tbody id="problem-group-admins"></tbody>
 			</table>
 		</div>
 	</div>

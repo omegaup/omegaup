@@ -1142,7 +1142,8 @@ class UserController extends Controller {
     }
 
     /**
-     * Gets a list of users
+     * Gets a list of users. This returns an array instead of an object since
+     * it is used by typeahead.
      *
      * @param Request $r
      */
