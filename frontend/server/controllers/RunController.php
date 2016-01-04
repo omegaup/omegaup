@@ -50,6 +50,11 @@ class RunController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateCreateRequest(Request $r) {
+        // https://github.com/omegaup/omegaup/issues/739
+        if ($r['current_user']->username == 'omi') {
+            throw new ForbiddenAccessException();
+        }
+
         $allowedLanguages = array('kp', 'kj', 'c', 'cpp', 'cpp11', 'java', 'py', 'rb', 'pl', 'cs', 'pas', 'cat', 'hs');
         try {
             Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');

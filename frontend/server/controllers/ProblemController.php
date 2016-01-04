@@ -27,6 +27,10 @@ class ProblemController extends Controller {
      */
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         $is_required = true;
+        // https://github.com/omegaup/omegaup/issues/739
+        if ($r['current_user']->username == 'omi') {
+            throw new ForbiddenAccessException();
+        }
 
         // In case of update, params are optional
         if ($is_update) {
