@@ -104,7 +104,7 @@ class GroupRolesDAO extends GroupRolesDAOBase
 			INNER JOIN
 				Groups_Users gu ON gu.group_id = gr.group_id
 			WHERE
-				gu.user_id = ?;';
+				gu.user_id = ? AND gr.role_id = 1;';
         $params = array($user_id);
         global $conn;
         return $conn->GetOne($sql, $params) > 0;

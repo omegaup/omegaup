@@ -145,7 +145,7 @@ class UserRolesDAO extends UserRolesDAOBase {
 			FROM
 				User_Roles ur
 			WHERE
-				ur.user_id = ?;';
+				ur.user_id = ? AND ur.role_id = 1;';
         $params = array($user_id);
         global $conn;
         return $conn->GetOne($sql, $params) > 0;
