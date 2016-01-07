@@ -87,4 +87,28 @@ class ContestsDAO extends ContestsDAOBase
         }
         return $ar;
     }
+
+    final public static function getAllMultipleOrder($pagina = null, $columnas_por_pagina = null, $orden = null) {
+        $sql = 'SELECT * from Contests';
+
+        if (! is_null($orden)) {
+            $orden = implode(',', array_map(function ($entry) {
+                return '`' . $entry['column'] . '`' . ' ' . $entry['type'];
+
+            }, $orden));
+
+            $sql .= ' ORDER BY ' . $orden;
+        }
+        if (! is_null($pagina)) {
+            $sql .= ' LIMIT ' . (( $pagina - 1 )*$columnas_por_pagina) . ',' . $columnas_por_pagina;
+        }
+        global $conn;
+        $rs = $conn->Execute($sql);
+        $allData = array();
+        foreach ($rs as $foo) {
+            $bar = new Contests($foo);
+            array_push($allData, $bar);
+        }
+        return $allData;
+    }
 }

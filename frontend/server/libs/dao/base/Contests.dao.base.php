@@ -227,6 +227,10 @@ abstract class ContestsDAOBase extends DAO
 			$sql .= " `languages` = ? AND";
 			array_push( $val, $Contests->getLanguages() );
 		}
+		if (!is_null( $Contests->getRecommended())) {
+			$sql .= " `recommended` = ? AND";
+			array_push( $val, $Contests->getRecommended() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -262,7 +266,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update($Contests)
 	{
-		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ? WHERE  `contest_id` = ?;";
+		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ? WHERE  `contest_id` = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -287,6 +291,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getUrgent(), 
 			$Contests->getContestantMustRegister(), 
 			$Contests->getLanguages(), 
+			$Contests->getRecommended(), 
 			$Contests->getContestId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -318,7 +323,8 @@ abstract class ContestsDAOBase extends DAO
 		if (is_null($Contests->show_scoreboard_after)) $Contests->show_scoreboard_after =  '1';
 		if (is_null($Contests->urgent)) $Contests->urgent = 0;
 		if (is_null($Contests->contestant_must_register)) $Contests->contestant_must_register = '0';
-		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Contests->recommended)) $Contests->recommended =  '0';
+		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages`, `recommended` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->contest_id,
 			$Contests->title,
@@ -344,6 +350,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->urgent,
 			$Contests->contestant_must_register,
 			$Contests->languages,
+			$Contests->recommended,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -650,6 +657,17 @@ abstract class ContestsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `languages` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ContestsA->getRecommended()) ) ) & ( ! is_null ( ($b = $ContestsB->getRecommended()) ) ) ){
+				$sql .= " `recommended` >= ? AND `recommended` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `recommended` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			

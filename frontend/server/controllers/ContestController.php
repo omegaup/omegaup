@@ -24,11 +24,30 @@ class ContestController extends Controller {
         }
 
         // Create array of relevant columns
-        $relevant_columns = array('contest_id', 'title', 'description', 'start_time', 'finish_time', 'public', 'alias', 'director_id', 'window_length');
+        $relevant_columns = array(
+            'contest_id',
+            'title',
+            'description',
+            'start_time',
+            'finish_time',
+            'public',
+            'alias',
+            'director_id',
+            'window_length',
+            'recommended'
+            );
 
         try {
             // Get all contests using only relevan columns
-            $contests = ContestsDAO::getAll(null, null, 'finish_time', 'DESC', $relevant_columns);
+            $contests = ContestsDAO::getAllMultipleOrder(
+                null,
+                null,
+                array(
+                        array('column' => 'recommended', 'type' => 'DESC'),
+                        array('column' => 'finish_time', 'type' => 'DESC')
+                    ),
+                $relevant_columns
+            );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -2505,5 +2524,44 @@ class ContestController extends Controller {
                 'admin' => false
             );
         }
+    }
+
+    /**
+     * Given a contest_alias, sets the recommended flag on/off.
+     * Only omegaUp admins can call this API.
+     *
+     * @param Request $r
+     * @return array
+     */
+    public static function apiSetRecommended(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        // Validate & get contest_alias
+        try {
+            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($r['contest'])) {
+            throw new NotFoundException('contestNotFound');
+        }
+
+        // Validate value param
+        Validators::isInEnum($r['value'], 'value', array('0', '1'));
+
+        $r['contest']->recommended = $r['value'];
+
+        try {
+            ContestsDAO::save($r['contest']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
     }
 }

@@ -11,7 +11,7 @@
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
 
 		<script type="text/javascript" src="/js/omegaup.js?ver=3086d6"></script>
-		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=c4d6e5,022bb9,76ef57,c61d5b"></script>
+		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=6f8b8b,e2245f,9c2261,8fd3f0"></script>
 		<script type="text/javascript" src="/ux/libarena.js?ver=b34d0a"></script>
 		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>

@@ -15,7 +15,7 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null) {
+    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null, $finish_time = null) {
         if (is_null($contestDirector)) {
             $contestDirector = UserFactory::createUser();
         }
@@ -29,7 +29,7 @@ class ContestsFactory {
         $r['title'] = $title;
         $r['description'] = 'description';
         $r['start_time'] = Utils::GetPhpUnixTimestamp() - 60 * 60;
-        $r['finish_time'] = Utils::GetPhpUnixTimestamp() + 60 * 60;
+        $r['finish_time'] = ($finish_time == null ? (Utils::GetPhpUnixTimestamp() + 60 * 60) : $finish_time);
         $r['window_length'] = null;
         $r['public'] = $public;
         $r['alias'] = substr($title, 0, 20);
@@ -42,15 +42,16 @@ class ContestsFactory {
         $r['penalty_type'] = 'contest_start';
         $r['penalty_calc_policy'] = 'sum';
         $r['languages'] = $languages;
+        $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
 
         return array(
             'request' => $r,
             'director' => $contestDirector);
     }
 
-    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null) {
+    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null) {
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages);
+        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages, $finish_time);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 

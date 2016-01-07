@@ -104,6 +104,9 @@ class Contests extends VO
 			if (isset($data['languages'])) {
 				$this->languages = $data['languages'];
 			}
+			if (isset($data['recommended'])) {
+				$this->recommended = $data['recommended'];
+			}
 		}
 	}
 
@@ -140,7 +143,8 @@ class Contests extends VO
 			"scoreboard_url_admin" => $this->scoreboard_url_admin,
 			"urgent" => $this->urgent,
 			"contestant_must_register" => $this->contestant_must_register,
-			"languages" => $this->languages
+			"languages" => $this->languages,
+			"recommended" => $this->recommended
 		); 
 	return json_encode($vec); 
 	}
@@ -324,4 +328,11 @@ class Contests extends VO
 	  * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11')
 	  */
 	public $languages;
+
+	/**
+	  * 'Mostrar el concurso en la lista de recomendados.
+	  * @access public
+	  * @var BOOL
+	  */
+	public $recommended;
 }
