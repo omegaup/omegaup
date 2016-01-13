@@ -134,6 +134,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         $this->assertEquals($r['scoreboard'], $contest->getScoreboard());
         $this->assertEquals($r['penalty_type'], $contest->penalty_type);
         $this->assertEquals($r['penalty_calc_policy'], $contest->getPenaltyCalcPolicy());
+        $this->assertEquals($r['recommended'], $contest->getRecommended());
     }
 
     /**

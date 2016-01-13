@@ -108,4 +108,62 @@ class UpdateContestTest extends OmegaupTestCase {
         $contestData['request']['public'] = $r['public'];
         $this->assertContest($contestData['request']);
     }
+
+     /**
+      * Set Recommended flag to a given contest
+      */
+    public function testSetRecommendedFlag() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Prepare request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+
+        // Log in with site admin
+        $r['auth_token'] = $this->login(UserFactory::createAdminUser());
+
+        // Update value to TRUE
+        $r['value'] = 1;
+
+        // Call API
+        ContestController::apiSetRecommended($r);
+
+        // Verify setting
+        $contestData['request']['recommended'] = $r['value'];
+        $this->assertContest($contestData['request']);
+
+        // Turn flag down
+        $r['value'] = 0;
+
+        // Call API again
+        ContestController::apiSetRecommended($r);
+
+        // Verify setting
+        $contestData['request']['recommended'] = $r['value'];
+        $this->assertContest($contestData['request']);
+    }
+
+     /**
+      * Set Recommended flag to a given contest from non admin account
+      *
+      * @expectedException ForbiddenAccessException
+      */
+    public function testSetRecommendedFlagNonAdmin() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Prepare request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+
+        // Log in with contest owner
+        $r['auth_token'] = $this->login($contestData['director']);
+
+        // Update value to TRUE
+        $r['value'] = 1;
+
+        // Call API
+        ContestController::apiSetRecommended($r);
+    }
 }
