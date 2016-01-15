@@ -78,6 +78,7 @@ $(document).ready(function() {
 		var clock = "";
 
 		if (date > contest.finish_time.getTime()) { // Ended
+			$('#click_to_proceed').removeClass('hidden');
 		} else if (date > contest.start_time.getTime()) { // Started
 			$('#click_to_proceed').removeClass('hidden');
 		} else { // Not started

@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/arena.js?ver=c785a2'}
+{include file='arena.head.tpl' jsfile='/ux/arena.js?ver=815914'}
 			<div class="container" id="main">
 				<div class="panel panel-default">
 					<div class="panel-body">
@@ -9,10 +9,10 @@
 						<p>{#frontPageIntroduction#}</p>
 						<div class="text-center">
 							<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
-						</div>									
+						</div>
 					</div>
 				</div>
-				
+
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h2 class="panel-title">{#arenaRecommendedCurrentContests#}</h2>
@@ -30,7 +30,7 @@
 						</tbody>
 					</table>
 				</div>
-				
+
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h2 class="panel-title">{#arenaCurrentContests#}</h2>
@@ -56,14 +56,14 @@
 					<table class="contest-list table table-striped table-hover">
 						<thead><tr>
 							<th>{#wordsContest#}</th>
-							<th>{#wordsDescription#}</th>							
+							<th>{#wordsDescription#}</th>
 							<th>{#wordsPractice#}</th>
 						</tr></thead>
 						<tbody id="recommended-past-contests">
 						</tbody>
 					</table>
 				</div>
-							
+
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h2 class="panel-title">{#arenaOldContests#}</h2>
@@ -71,7 +71,7 @@
 					<table class="contest-list table table-striped table-hover">
 						<thead><tr>
 							<th>{#wordsContest#}</th>
-							<th>{#wordsDescription#}</th>							
+							<th>{#wordsDescription#}</th>
 							<th>{#wordsPractice#}</th>
 						</tr></thead>
 						<tbody id="past-contests">

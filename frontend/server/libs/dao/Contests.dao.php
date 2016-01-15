@@ -94,7 +94,6 @@ class ContestsDAO extends ContestsDAOBase
         if (! is_null($orden)) {
             $orden = implode(',', array_map(function ($entry) {
                 return '`' . $entry['column'] . '`' . ' ' . $entry['type'];
-
             }, $orden));
 
             $sql .= ' ORDER BY ' . $orden;
