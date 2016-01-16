@@ -601,7 +601,7 @@ class UserController extends Controller {
                 'OMI2015-INV' => 4,
             );
         } elseif ($r['contest_type'] == 'OMIPS') {
-            if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+            if (!($r['current_user']->getUsername() == 'andreasantillana' || Authorization::IsSystemAdmin($r['current_user_id']))) {
                 throw new ForbiddenAccessException();
             }
 
