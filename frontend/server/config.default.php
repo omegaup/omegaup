@@ -95,9 +95,9 @@ try_define('OMEGAUP_EMAIL_SMTP_USER', 'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_PASSWORD', 'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_PORT', 'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_FROM', 'xxxx');
-try_define('OMEGAUP_EMAIL_MAILCHIMP_ENABLE', false);
-try_define('OMEGAUP_EMAIL_MAILCHIMP_API_KEY', 'xxxx');
-try_define('OMEGAUP_EMAIL_MAILCHIMP_LIST_ID', 'xxxx');
+try_define('OMEGAUP_EMAIL_SENDY_ENABLE', false);
+try_define('OMEGAUP_EMAIL_SENDY_SUSCRIBE_URL', 'xxx');
+try_define('OMEGAUP_EMAIL_SENDY_LIST', 'xxx');
 
 # #########################
 # CACHE CONFIG

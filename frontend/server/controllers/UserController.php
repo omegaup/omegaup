@@ -141,8 +141,6 @@ class UserController extends Controller {
             self::$log->info('User ' . $user->getUsername() . ' created, trusting e-mail');
         }
 
-        self::registerToMailchimp($r);
-
         return array(
             'status' => 'ok',
             'user_id' => $user->getUserId()
@@ -150,31 +148,50 @@ class UserController extends Controller {
     }
 
     /**
-     * Registers a user to Mailchimp
+     * Registers the created user to Sendy
      *
-     * @param Request r
+     * @param Request $r
      */
-    private static function registerToMailchimp(Request $r) {
-        if (OMEGAUP_EMAIL_MAILCHIMP_ENABLE === true) {
-            self::$log->info('Adding user to Mailchimp.');
-
-            $MailChimp = new MailChimp(OMEGAUP_EMAIL_MAILCHIMP_API_KEY);
-            $result = $MailChimp->call('lists/subscribe', array(
-                    'id'                => OMEGAUP_EMAIL_MAILCHIMP_LIST_ID,
-                    'email'             => array('email'=> $r['email']),
-                    'merge_vars'        => array('FNAME'=>$r['user']->getUsername()),
-                    'double_optin'      => false,
-                    'update_existing'   => true,
-                    'replace_interests' => false,
-                    'send_welcome'      => false,
-                ));
-
-            if (array_key_exists('status', $result) && $result['status'] == 'error') {
-                self::$log->error('Mailchimp error result: ' . implode(' | ', $result));
-            } else {
-                self::$log->info('Mailchimp success result: ' . implode(' | ', $result));
-            }
+    private static function registerToSendy(Users $user) {
+        if (!OMEGAUP_EMAIL_SENDY_ENABLE) {
+            return;
         }
+
+        self::$log->info('Adding user to Sendy.');
+
+        // Get email
+        try {
+            $email = EmailsDAO::getByPK($user->getMainEmailId());
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        //Subscribe
+        $postdata = http_build_query(
+            array(
+                'name' => $user->username,
+                'email' => $email->email,
+                'list' => OMEGAUP_EMAIL_SENDY_LIST,
+                'boolean' => 'true'
+                )
+        );
+        $opts = array(
+            'http' => array(
+                'method'  => 'POST',
+                'header'  => 'Content-type: application/x-www-form-urlencoded',
+                'content' => $postdata)
+        );
+
+        $context  = stream_context_create($opts);
+        $result = file_get_contents(OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL, false, $context);
+
+        //check result and redirect
+        if ($result) {
+            self::$log->info('Success adding user to Sendy.');
+        } else {
+            self::$log->info('Failure adding user to Sendy.');
+        }
+        self::$log->info($result);
     }
 
     /**
@@ -462,6 +479,8 @@ class UserController extends Controller {
         }
 
         self::$log->info('User verification complete.');
+
+        self::registerToSendy($user);
 
         if (self::$redirectOnVerify) {
             die(header('Location: /login/'));
