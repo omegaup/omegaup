@@ -233,6 +233,7 @@ class ClarificationController extends Controller {
             self::$log->error('Failed to broadcast clarification: ' . $e);
             return;
         }
+        self::initializeBroadcaster();
         self::$broadcaster->broadcastClarification($r, $time);
     }
 }

@@ -24,7 +24,7 @@ class Broadcaster {
             ));
 
             $grader = new Grader();
-            self::$log->debug("Sending update $message");
+            $this->log->debug("Sending update $message");
             $grader->broadcast(
                 is_null($r['contest']) ? null : $r['contest']->alias,
                 $message,
@@ -32,7 +32,7 @@ class Broadcaster {
                 $r['clarification']->author_id
             );
         } catch (Exception $e) {
-            self::$log->error('Failed to send to broadcaster ' . $e->getMessage());
+            $this->log->error('Failed to send to broadcaster ' . $e->getMessage());
         }
         $this->sendClarificationEmail($r, $time);
     }
@@ -82,10 +82,10 @@ class Broadcaster {
             );
 
             if (!$mail->Send()) {
-                self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
+                $this->log->error('Failed to send mail: ' . $mail->ErrorInfo);
             }
         } catch (Exception $e) {
-            self::$log->error('Failed to send clarification email ' . $e->getMessage());
+            $this->log->error('Failed to send clarification email ' . $e->getMessage());
         }
     }
 }
