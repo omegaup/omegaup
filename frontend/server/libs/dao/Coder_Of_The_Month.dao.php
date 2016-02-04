@@ -58,6 +58,10 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 				Problems ps ON ps.problem_id = up.problem_id and ps.public = 1
 			INNER JOIN
 				Users u ON u.user_id = up.user_id
+			LEFT JOIN
+				Coder_Of_The_Month cm on u.user_id = cm.user_id
+			WHERE
+				cm.user_id IS NULL
 			GROUP BY
 				user_id
 			ORDER BY
