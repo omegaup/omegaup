@@ -8,6 +8,9 @@ define('CONTEST_ADMIN_ROLE', '2');
 define('PROBLEM_ADMIN_ROLE', '3');
 
 class Authorization {
+    // Cache for the system admin privilege. This is used sort of frequently.
+    private static $is_system_admin = null;
+
     public static function CanViewRun($user_id, Runs $run) {
         if (is_null($run) || !is_a($run, 'Runs')) {
             return false;
@@ -39,15 +42,11 @@ class Authorization {
             throw new PreconditionFailedException('problemDeprecated');
         }
 
-        $isContestAdmin = false;
-        if (!is_null($contest)) {
-            $isContestAdmin = Authorization::IsContestAdmin($user_id, $contest);
+        if (!is_null($contest) && Authorization::IsContestAdmin($user_id, $contest)) {
+            return true;
         }
 
-        $isProblemAdmin = Authorization::IsProblemAdmin($user_id, $problem);
-
-        return $isContestAdmin
-            || $isProblemAdmin;
+        return Authorization::IsProblemAdmin($user_id, $problem);
     }
 
     public static function CanViewClarification($user_id, Clarifications $clarification) {
@@ -105,12 +104,12 @@ class Authorization {
             return false;
         }
 
-        if (GroupRolesDAO::IsContestAdmin($user_id, $contest) ||
-            UserRolesDAO::IsContestAdmin($user_id, $contest)) {
+        if ($contest->director_id === $user_id) {
             return true;
         }
 
-        return $contest->getDirectorId() === $user_id;
+        return GroupRolesDAO::IsContestAdmin($user_id, $contest) ||
+               UserRolesDAO::IsContestAdmin($user_id, $contest);
     }
 
     public static function IsProblemAdmin($user_id, Problems $problem) {
@@ -118,17 +117,21 @@ class Authorization {
             return false;
         }
 
-        if (GroupRolesDAO::IsProblemAdmin($user_id, $problem) ||
-            UserRolesDAO::IsProblemAdmin($user_id, $problem)) {
+        if ($problem->author_id === $user_id) {
             return true;
         }
 
-        return $problem->author_id === $user_id;
+        return GroupRolesDAO::IsProblemAdmin($user_id, $problem) ||
+               UserRolesDAO::IsProblemAdmin($user_id, $problem);
     }
 
     public static function IsSystemAdmin($user_id) {
-        return GroupRolesDAO::IsSystemAdmin($user_id) ||
-               UserRolesDAO::IsSystemAdmin($user_id);
+        if (self::$is_system_admin == null) {
+            self::$is_system_admin =
+                GroupRolesDAO::IsSystemAdmin($user_id) ||
+                UserRolesDAO::IsSystemAdmin($user_id);
+        }
+        return self::$is_system_admin;
     }
 
     public static function IsGroupAdmin($user_id, Groups $group) {
@@ -136,10 +139,10 @@ class Authorization {
             return false;
         }
 
-        if (Authorization::IsSystemAdmin($user_id)) {
+        if ($group->owner_id === $user_id) {
             return true;
         }
 
-        return $group->owner_id === $user_id;
+        return Authorization::IsSystemAdmin($user_id);
     }
 }

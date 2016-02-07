@@ -578,8 +578,9 @@ class UserController extends Controller {
 
         $response = array();
 
+        $is_system_admin = Authorization::IsSystemAdmin($r['current_user_id']);
         if ($r['contest_type'] == 'OMI') {
-            if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+            if (!$is_system_admin) {
                 throw new ForbiddenAccessException();
             }
 
@@ -620,7 +621,9 @@ class UserController extends Controller {
                 'OMI2015-INV' => 4,
             );
         } elseif ($r['contest_type'] == 'OMIPS') {
-            if (!($r['current_user']->getUsername() == 'andreasantillana' || Authorization::IsSystemAdmin($r['current_user_id']))) {
+            if ($r['current_user']->getUsername() != 'andreasantillana'
+                && !$is_system_admin
+            ) {
                 throw new ForbiddenAccessException();
             }
 
@@ -629,7 +632,9 @@ class UserController extends Controller {
                 'OMIPS2015-S' => 25,
             );
         } elseif ($r['contest_type'] == 'ORIG') {
-            if (!($r['current_user']->getUsername() == 'kuko.coder' || Authorization::IsSystemAdmin($r['current_user_id']))) {
+            if ($r['current_user']->getUsername() != 'kuko.coder'
+                && !$is_system_admin
+            ) {
                 throw new ForbiddenAccessException();
             }
 
@@ -646,7 +651,9 @@ class UserController extends Controller {
                 'ORIG1516-VDS' => 15,
             );
         } elseif ($r['contest_type'] == 'OMIAGS') {
-            if (!($r['current_user']->getUsername() == 'andreasantillana' || Authorization::IsSystemAdmin($r['current_user_id']))) {
+            if ($r['current_user']->getUsername() != 'andreasantillana'
+                && !$is_system_admin
+            ) {
                 throw new ForbiddenAccessException();
             }
 
@@ -654,7 +661,9 @@ class UserController extends Controller {
                 'OMIAGS' => 35
             );
         } elseif ($r['contest_type'] == 'OSI') {
-            if (!($r['current_user']->getUsername() == 'cope_quintana' || Authorization::IsSystemAdmin($r['current_user_id']))) {
+            if ($r['current_user']->getUsername() != 'cope_quintana'
+                && !$is_system_admin
+            ) {
                 throw new ForbiddenAccessException();
             }
 
@@ -662,14 +671,19 @@ class UserController extends Controller {
                 'OSI16' => 120
             );
         } elseif ($r['contest_type'] == 'UNAMFC') {
-            if (!($r['current_user']->getUsername() == 'manuelalcantara52' || $r['current_user']->getUsername() == 'manuel52' || Authorization::IsSystemAdmin($r['current_user_id']))) {
+            if ($r['current_user']->getUsername() != 'manuelalcantara52'
+                && $r['current_user']->getUsername() != 'manuel52'
+                && !$is_system_admin
+            ) {
                 throw new ForbiddenAccessException();
             }
             $keys = array (
                 'UNAMFC15' => 30
             );
         } elseif ($r['contest_type'] == 'OVI') {
-            if (!($r['current_user']->getUsername() == 'covi.academico' || Authorization::IsSystemAdmin($r['current_user_id']))) {
+            if ($r['current_user']->getUsername() != 'covi.academico'
+                && !$is_system_admin
+            ) {
                 throw new ForbiddenAccessException();
             }
             $keys = array (

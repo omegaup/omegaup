@@ -870,19 +870,25 @@ class ProblemController extends Controller {
             }
 
             // If the contest is private, verify that our user is invited
+            $contest_admin
+                = Authorization::IsContestAdmin($r['current_user_id'], $r['contest']);
             if ($r['contest']->public != '1') {
-                if (is_null(ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id)) && !Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
+                if (is_null(ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id))
+                    && !$contest_admin
+                ) {
                     throw new ForbiddenAccessException();
                 }
             }
 
-            // If the contest has not started, user should not see it, unless it is admin
-            if (!ContestsDAO::hasStarted($r['contest']) && !Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
+            // If the contest has not started, user should not see it, unless
+            // it is admin
+            if (!ContestsDAO::hasStarted($r['contest']) && !$contest_admin) {
                 throw new ForbiddenAccessException('contestNotStarted');
             }
         } else {
             if (!Authorization::CanEditProblem($r['current_user_id'], $r['problem'])) {
-                // If the problem is requested outside a contest, we need to check that it is not private
+                // If the problem is requested outside a contest, we need to
+                // check that it is not private
                 if ($r['problem']->public != '1') {
                     throw new ForbiddenAccessException('problemIsPrivate');
                 }
@@ -1563,8 +1569,8 @@ class ProblemController extends Controller {
                 $problems = ProblemsDAO::getAll(null, null, 'problem_id', 'DESC');
             } else {
                 $problem_mask = new Problems(array(
-                            'author_id' => $r['current_user_id']
-                        ));
+                    'author_id' => $r['current_user_id']
+                ));
                 $problems = ProblemsDAO::search($problem_mask, 'problem_id', 'DESC', $r['offset'], $r['rowcount']);
             }
 
