@@ -614,3 +614,13 @@ iframe.embedded-doc {
     transform:scale(0.90);
     transform-origin:0 0;
 }
+
+/* Hacks */
+/* Este estilo evita el desbordamiento de las pestañas toggle tabs (tabs.js)
+de bootstrap. Sólo afecta a los .nav-tabs, ya que el "padding" horizontal
+con un valor distinto de 0 en el ancho provoca un error de alineación,
+También es bueno aclarar que las listas tienen el texto alineado
+al centro por lo que el texto siempre se verá en orden. */
+.nav-tabs.nav-justified > li > a {
+	padding: 14px 0;
+}
