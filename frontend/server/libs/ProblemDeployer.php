@@ -121,7 +121,7 @@ class ProblemDeployer {
         try {
             return $this->execute("/usr/bin/git $cmd", $cwd);
         } catch (Exception $e) {
-            throw new ProblemDeploymentException($e);
+            throw new ProblemDeploymentFailedException($e);
         }
     }
 

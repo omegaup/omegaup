@@ -100,7 +100,15 @@ class Controller {
         $str = '';
         $size = strlen($chars);
         for ($i = 0; $i < $length; $i++) {
-            $str .= $chars[rand(0, $size - 1)];
+            $index = 0;
+
+            if (function_exists('random_int')) {
+                $index = random_int(0, $size - 1);
+            } else {
+                $index = mt_rand(0, $size - 1);
+            }
+
+            $str .= $chars[$index];
         }
 
         return $str;
