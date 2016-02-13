@@ -620,7 +620,7 @@ class UserController extends Controller {
                 'OMI2015-ZAC' => 4,
                 'OMI2015-INV' => 4,
             );
-        } elseif ($r['contest_type'] == 'OMIPS') {
+        } elseif ($r['contest_type'] == 'OMIP') {
             if ($r['current_user']->getUsername() != 'andreasantillana'
                 && !$is_system_admin
             ) {
@@ -629,6 +629,15 @@ class UserController extends Controller {
 
             $keys = array(
                 'OMIP2016' => 800,
+            );
+        } elseif ($r['contest_type'] == 'OMIS') {
+            if ($r['current_user']->getUsername() != 'andreasantillana'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys = array(
                 'OMIS2016' => 800,
             );
         } elseif ($r['contest_type'] == 'ORIG') {
