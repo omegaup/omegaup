@@ -628,8 +628,8 @@ class UserController extends Controller {
             }
 
             $keys = array(
-                'OMIPS2015-P' => 25,
-                'OMIPS2015-S' => 25,
+                'OMIP2016' => 800,
+                'OMIS2016' => 800,
             );
         } elseif ($r['contest_type'] == 'ORIG') {
             if ($r['current_user']->getUsername() != 'kuko.coder'
