@@ -34,7 +34,7 @@ $(document).ready(function() {
 			target.append(
 					$('<tr>' +
 						'<td><a href="/arena/' + list[i].alias + '">' + omegaup.escape(list[i].title) + (list[i].recommended === '0' ? '' : ' <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>')  + '</a></td>' +
-						'<td>' + omegaup.escape(list[i].description) + '</td>' +
+						'<td class="forcebreaks">' + omegaup.escape(list[i].description) + '</td>' +
 						(end > now ?
 							'<td class="no-wrap"><a href="' + makeWorldClockLink(start) + '">' + start.long() + '</a></td>' +
 							'<td class="no-wrap"><a href="' + makeWorldClockLink(end) + '">' + end.long() + '</a></td>' +

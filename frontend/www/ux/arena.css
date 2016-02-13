@@ -639,3 +639,11 @@ th.numeric {
 	margin-left: auto;
 	margin-right: auto;
 }
+
+td.forcebreaks {
+	text-overflow: ellipsis !important;
+	word-wrap: break-word;
+	overflow: hidden;
+	display: table-cell;
+	max-width: 250px !important;
+}
