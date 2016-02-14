@@ -9,8 +9,13 @@
 #header .navbar-nav > li > a {
 	color: #fff;
 }
+
 #header .navbar-nav > li > a:hover,
-.nav .open>a, .nav .open>a:hover, .nav .open>a:focus {
+#header .nav > li > a:hover,
+#header .nav > li > a:focus,
+.nav .open>a,
+.nav .open>a:hover,
+.nav .open>a:focus {
 	background-color: #577DC7;
 }
 

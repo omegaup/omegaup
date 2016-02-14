@@ -26,7 +26,6 @@
 				<ul class="dropdown-menu" role="menu">
 				  <li><a id="bulk-make-public">{#makePublic#}</a></li>
 				  <li><a id="bulk-make-private">{#makePrivate#}</a></li>
-				  <li class="divider"></li>
 				</ul>
 			  </div>
 		</div>
