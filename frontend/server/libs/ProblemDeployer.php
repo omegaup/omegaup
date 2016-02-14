@@ -60,8 +60,10 @@ class ProblemDeployer {
         }
 
         // Clone repository into tmp dir
-        $this->git('clone ' . escapeshellarg($this->gitDir) . ' ' .
-                   escapeshellarg($this->tmpDir), '/tmp');
+        $this->git(
+            'clone ' . escapeshellarg($this->gitDir) . ' ' . escapeshellarg($this->tmpDir),
+            '/tmp'
+        );
 
         // Ensure .gitattributes flags all inputs/outputs as binaries so it does not
         // take several minutes diffing them to save a little space.
@@ -162,8 +164,10 @@ class ProblemDeployer {
         $this->git('push origin master', $this->tmpDir);
 
         if (!file_exists($this->targetDir . DIRECTORY_SEPARATOR . '.git')) {
-            $this->git('clone ' . escapeshellarg($this->gitDir) . ' ' .
-                       escapeshellarg($this->targetDir), PROBLEMS_PATH);
+            $this->git(
+                'clone ' . escapeshellarg($this->gitDir) . ' ' . escapeshellarg($this->targetDir),
+                PROBLEMS_PATH
+            );
         } else {
             $this->git('pull --rebase', $this->targetDir);
         }
@@ -701,7 +705,7 @@ class ProblemDeployer {
         try {
             $cmd = '/usr/bin/java -Xmx64M -jar ' . BIN_PATH . '/libinteractive.jar generate-all ' .
                 escapeshellarg($idlPath) . ' --package-directory ' . escapeshellarg($target) .
-                ' --package-prefix ' . escapeshellarg($this->alias . '_');
+                ' --package-prefix ' . escapeshellarg($this->alias . '_') . ' --shift-time-for-zip';
             return $this->execute($cmd, $target);
         } catch (Exception $e) {
             throw new InvalidParameterException(
