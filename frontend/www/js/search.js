@@ -3,11 +3,11 @@ $('document').ready(function() {
 		minLength: 3,
 		highlight: true,
 	}, {
-		source: function (query, cb) {
+		source: omegaup.typeaheadWrapper(function (query, cb) {
 			omegaup.searchProblems(query, function (data) {
 				cb(data.results);
 			});
-		},
+		}),
 		displayKey: 'title',
 		templates: {
 			suggestion: function (elm) {

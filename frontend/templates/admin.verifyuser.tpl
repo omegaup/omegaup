@@ -19,4 +19,4 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/admin.verifyuser.js?ver=b32de5"></script>
+<script type="text/javascript" src="/js/admin.verifyuser.js?ver=5f52dd"></script>

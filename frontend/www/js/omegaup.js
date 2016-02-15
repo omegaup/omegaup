@@ -2160,6 +2160,36 @@ OmegaUp.prototype.resetUpdate = function(email, resetToken, password, passwordCo
 	});
 }
 
+OmegaUp.prototype.typeaheadWrapper = function(f) {
+	var self = this;
+	var lastRequest = null;
+	var pending = false;
+	function wrappedCall(query, callback) {
+		if (pending) {
+			lastRequest = [query, callback];
+		} else {
+			pending = true;
+			f(query, function(data) {
+				if (lastRequest != null) {
+					// Typeahead will ignore any stale callbacks. Given that we
+					// will start a new request ASAP, let's do a best-effort
+					// callback to the current request with the old data.
+					lastRequest[1](data);
+				} else {
+					callback(data);
+				}
+				pending = false;
+				if (lastRequest != null) {
+					var request = lastRequest;
+					lastRequest = null;
+					wrappedCall(request[0], request[1]);
+				}
+			});
+		}
+	}
+	return wrappedCall;
+};
+
 var omegaup = new OmegaUp();
 
 function dateToString(currentDate) {

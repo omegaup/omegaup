@@ -27,6 +27,6 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/admin.changepassword.js?ver=c641fe"></script>
+<script type="text/javascript" src="/js/admin.changepassword.js?ver=13fb62"></script>
 
 {include file='footer.tpl'}

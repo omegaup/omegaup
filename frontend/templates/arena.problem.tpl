@@ -1,6 +1,6 @@
 {include file='arena.head.tpl' jsfile='/ux/contest.js?ver=b25782' bodyid='only-problem'}
 			{if $problem_admin}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=a96398"></script>
+			<script type="text/javascript" src="/ux/libadmin.js?ver=582fea"></script>
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblem#}</a></li>
 				<li><a href="#runs">{#wordsRuns#}</a></li>

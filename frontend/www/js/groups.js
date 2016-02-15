@@ -62,7 +62,7 @@ $(function() {
 			minLength: 2,
 			highlight: true,
 		}, {
-			source: omegaup.searchUsers,
+			source: omegaup.typeaheadWrapper(omegaup.searchUsers.bind(omegaup)),
 			displayKey: 'label',
 		}).on('typeahead:selected', function(item, val, text) {
 			$('#member-username').val(val.label);

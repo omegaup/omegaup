@@ -1,5 +1,5 @@
 {include file='arena.head.tpl' jsfile='/ux/admin.js?ver=b36af2'}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=a96398"></script>
+			<script type="text/javascript" src="/ux/libadmin.js?ver=582fea"></script>
 			<div id="title">
 				<h1 class="contest-title">Envíos globales</h1>
 			</div>

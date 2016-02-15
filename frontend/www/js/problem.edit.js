@@ -21,7 +21,7 @@ $(document).ready(function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.searchUsers,
+		source: omegaup.typeaheadWrapper(omegaup.searchUsers.bind(omegaup)),
 		displayKey: 'label',
 	}).on('typeahead:selected', function(item, val, text) {
 		$("#username-admin").val(val.label);
@@ -30,7 +30,7 @@ $(document).ready(function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.searchGroups,
+		source: omegaup.typeaheadWrapper(omegaup.searchGroups.bind(omegaup)),
 		displayKey: 'label',
 	}).on('typeahead:selected', function(item, val, text) {
 		$('#groupalias-admin').val(val.label);
@@ -41,7 +41,7 @@ $(document).ready(function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.searchTags,
+		source: omegaup.typeaheadWrapper(omegaup.searchTags.bind(omegaup)),
 		displayKey: 'name',
 	}).on('typeahead:selected', function(item, val, text) {
 		$("#tag-name").val(val.name);

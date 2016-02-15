@@ -377,5 +377,5 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/js/user.edit.js?ver=c75eaf"></script>
+	<script type="text/javascript" src="/js/user.edit.js?ver=dfb3d0"></script>
 {/block}

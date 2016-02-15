@@ -10,7 +10,7 @@ $(document).ready(function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.searchSchools,
+		source: omegaup.typeaheadWrapper(omegaup.searchSchools.bind(omegaup)),
 		displayKey: 'label',
 		templates: {
 			empty: OmegaUp.T.schoolToBeAdded,

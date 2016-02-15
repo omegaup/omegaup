@@ -39,5 +39,5 @@
 		</div>
 	</form>
 
-	<script src='/js/search.js?ver=e32a3e'></script>
+	<script src='/js/search.js?ver=ac7e88'></script>
 </div>

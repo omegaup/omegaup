@@ -38,7 +38,7 @@ ArenaAdmin.prototype.setUpPagers = function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.searchUsers,
+		source: omegaup.typeaheadWrapper(omegaup.searchUsers.bind(omegaup)),
 		displayKey: 'label',
 	}).on('typeahead:selected', self.refreshRuns.bind(self));
 
@@ -52,11 +52,11 @@ ArenaAdmin.prototype.setUpPagers = function() {
 			minLength: 2,
 			highlight: true,
 		}, {
-			source: function (query, cb) {
+			source: omegaup.typeaheadWrapper(function (query, cb) {
 				omegaup.searchProblems(query, function (data) {
 					cb(data.results);
 				});
-			},
+			}),
 			displayKey: 'title',
 			templates: {
 				suggestion: function (elm) {
