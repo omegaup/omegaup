@@ -191,7 +191,7 @@ class GroupController extends Controller {
     }
 
     /**
-     * Details of a group (users in a group)
+     * Details of a group (scoreboards)
      *
      * @param Request $r
      */
@@ -199,31 +199,40 @@ class GroupController extends Controller {
         self::validateGroupAndOwner($r);
 
         $response = array();
-        $response['group'] = array();
-        $response['users'] = array();
-        $response['scoreboards'] = array();
 
         try {
             $response['group'] = $r['group']->asArray();
 
-            $userGroups = GroupsUsersDAO::search(new GroupsUsers(array(
-                'group_id' => $r['group']->group_id
-            )));
+            $scoreboards = GroupsScoreboardsDAO::search(
+                new GroupsScoreboards(
+                    array('group_id' => $r['group']->group_id)
+                )
+            );
 
-            foreach ($userGroups as $userGroup) {
-                $r['user'] = UsersDAO::getByPK($userGroup->user_id);
-                $userProfile = UserController::getProfile($r);
-
-                $response['users'][] = $userProfile;
-            }
-
-            $scoreboards = GroupsScoreboardsDAO::search(new GroupsScoreboards(array(
-                'group_id' => $r['group']->group_id
-            )));
-
+            $response['scoreboards'] = array();
             foreach ($scoreboards as $scoreboard) {
                 $response['scoreboards'][] = $scoreboard->asArray();
             }
+        } catch (Exception $ex) {
+            throw new InvalidDatabaseOperationException($ex);
+        }
+
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
+     * Members of a group (usernames only).
+     *
+     * @param Request $r
+     */
+    public static function apiMembers(Request $r) {
+        self::validateGroupAndOwner($r);
+
+        $response = array();
+
+        try {
+            $response['users'] = GroupsUsersDAO::GetMemberUsernames($r['group']);
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }

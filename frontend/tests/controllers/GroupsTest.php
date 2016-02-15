@@ -162,9 +162,13 @@ class GroupsTest extends OmegaupTestCase {
             'auth_token' => self::login($groupData['owner']),
             'group_alias' => $groupData['group']->alias
         )));
-
-        $this->assertEquals($nUsers, count($response['users']));
         $this->assertEquals($groupData['group']->group_id, $response['group']['group_id']);
+
+        $response = GroupController::apiMembers(new Request(array(
+            'auth_token' => self::login($groupData['owner']),
+            'group_alias' => $groupData['group']->alias
+        )));
+        $this->assertEquals($nUsers, count($response['users']));
     }
 
     /**

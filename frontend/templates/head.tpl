@@ -9,7 +9,7 @@
 
 		<script type="text/javascript" src="/js/jquery.js?ver=198b3f"></script>
 
-		<script type="text/javascript" src="/js/omegaup.js?ver=d931a6"></script>
+		<script type="text/javascript" src="/js/omegaup.js?ver=71bdbd"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=6f8b8b,e2245f,9c2261,8fd3f0"></script>
 
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>

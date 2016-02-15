@@ -1333,6 +1333,24 @@ OmegaUp.prototype.getProblem = function(contestAlias, problemAlias, callback, st
 	});
 };
 
+OmegaUp.prototype.getGroupMembers = function(groupAlias, callback) {
+	var self = this;
+
+	$.post(
+		'/api/group/members/group_alias/' + encodeURIComponent(groupAlias) + '/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
 OmegaUp.prototype.getGroup = function(groupAlias, callback) {
 	var self = this;
 

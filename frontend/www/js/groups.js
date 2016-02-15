@@ -86,7 +86,7 @@ $(function() {
 		});
 
 		function refreshGroupMembers() {
-			omegaup.getGroup(groupAlias, function(group){
+			omegaup.getGroupMembers(groupAlias, function(group){
 				$('#group-members').empty();
 
 				for (var i = 0; i < group.users.length; i++) {
@@ -95,8 +95,8 @@ $(function() {
 						$('<tr></tr>')
 							.append($('<td></td>').append(
 								$('<a></a>')
-									.attr('href', '/profile/' + user.userinfo.username + '/')
-									.text(omegaup.escape(user.userinfo.username))
+									.attr('href', '/profile/' + user.username + '/')
+									.text(omegaup.escape(user.username))
 							))
 							.append($('<td><button type="button" class="close">&times;</button></td>')
 								.click((function(username) {
@@ -112,7 +112,7 @@ $(function() {
 											}
 										});
 									};
-								})(user.userinfo.username))
+								})(user.username))
 							)
 					);
 				}
