@@ -19,6 +19,7 @@ class Cache {
     const USER_PROFILE = 'profile-';
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
     const PROBLEMS_SOLVED_RANK_LIST = 'problems-solved-rank-list';
+    const CONTESTS_LIST_PUBLIC = 'contest-list-public';
 
     private $enabled;
     private $log;
@@ -148,7 +149,7 @@ class Cache {
      * @param string $prefix
      * @param string $id
      */
-    public static function deleteFromCache($prefix, $id) {
+    public static function deleteFromCache($prefix, $id = '') {
         $cache = new Cache($prefix, $id);
         $cache->delete();
     }

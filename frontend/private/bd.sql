@@ -929,3 +929,7 @@ DELIMITER ;
 
 COMMIT;
 
+CREATE INDEX idx_contest_public ON Contests (public);
+CREATE INDEX idx_user_roles_contest ON User_Roles (contest_id);
+CREATE INDEX idx_contest_director_id ON Contests (director_id);
+CREATE INDEX idx_contest_public_director_id ON Contests (`public`, director_id);
