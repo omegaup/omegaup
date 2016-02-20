@@ -118,6 +118,68 @@ class ProblemList extends OmegaupTestCase {
     }
 
     /**
+     * An added admin should see those problems as well
+     */
+    public function testAllPrivateProblemsShowToAddedAdmin() {
+        $author = UserFactory::createUser();
+
+        $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);
+
+        $addedAdmin = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($addedAdmin);
+
+        // Should not be contained in problem list.
+        $response = ProblemController::apiList($r);
+        $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+
+        $r2 = new Request();
+        $r2['auth_token'] = $this->login($author);
+        $r2['problem_alias'] = $problemDataPrivate['request']['alias'];
+        $r2['usernameOrEmail'] = $addedAdmin->username;
+        $response = ProblemController::apiAddAdmin($r2);
+
+        $this->assertEquals('ok', $response['status']);
+
+        // Now it should be visible.
+        $response = ProblemController::apiList($r);
+        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+    }
+
+    /**
+     * An added admin group should see those problems as well
+     */
+    public function testAllPrivateProblemsShowToAddedAdminGroup() {
+        $author = UserFactory::createUser();
+
+        $problemDataPrivate = ProblemsFactory::createProblem(null, null, 0 /* public */, $author);
+
+        $addedAdmin = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($addedAdmin);
+
+        // Should not be contained in problem list.
+        $response = ProblemController::apiList($r);
+        $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+
+        $group = GroupsFactory::createGroup($addedAdmin);
+
+        $r2 = new Request();
+        $r2['auth_token'] = $this->login($author);
+        $r2['problem_alias'] = $problemDataPrivate['request']['alias'];
+        $r2['group'] = $group['group']->alias;
+        $response = ProblemController::apiAddGroupAdmin($r2);
+
+        $this->assertEquals('ok', $response['status']);
+
+        // Now it should be visible.
+        $response = ProblemController::apiList($r);
+        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+    }
+
+    /**
      * Test myList API
      */
     public function testMyList() {

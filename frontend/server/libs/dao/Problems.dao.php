@@ -107,7 +107,12 @@ class ProblemsDAO extends ProblemsDAOBase
                         pi.problem_id
                 ) ps ON ps.problem_id = p.problem_id
                 LEFT JOIN
-                    User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id';
+                    User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id
+                LEFT JOIN
+                    Groups_Users gu ON gu.user_id = ?
+                LEFT JOIN
+                    Group_Roles gr ON gr.group_id = gu.group_id AND p.problem_id = gr.contest_id';
+            $args[] = $user_id;
             $args[] = $user_id;
             $args[] = $user_id;
 
@@ -121,7 +126,7 @@ class ProblemsDAO extends ProblemsDAOBase
             }
 
             $sql .= '
-                (p.public = 1 OR p.author_id = ? OR ur.role_id = 3) ';
+                (p.public = 1 OR p.author_id = ? OR ur.role_id = 3 OR gr.role_id = 3) ';
             $args[] = $user_id;
 
             if (!is_null($query)) {

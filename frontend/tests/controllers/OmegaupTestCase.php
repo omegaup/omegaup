@@ -154,6 +154,21 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Asserts that string is not present in keyed array
+     *
+     * @param array $array
+     * @param string $key
+     * @param string $needle
+     */
+    public function assertArrayNotContainsInKey($array, $key, $needle) {
+        foreach ($array as $a) {
+            if ($a[$key] === $needle) {
+                $this->fail("$needle found in array");
+            }
+        }
+    }
+
+    /**
      * Checks that two sets (given by char delimited strings) are equal.
      */
     public function assertEqualSets($expected, $actual, $delim = ',') {
