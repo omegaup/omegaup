@@ -116,154 +116,101 @@ class ContestsDAO extends ContestsDAOBase
      * @param int $columnas_por_pagina
      * @return array
      */
-    final public static function getAllContestsForUser($user_id, $pagina = null, $columnas_por_pagina = null) {
-        $sql = '
-               SELECT
-                     contest_id,
-                     title,
-                     description,
-                     finish_time as original_finish_time,
-                     UNIX_TIMESTAMP (start_time) as start_time,
-                     UNIX_TIMESTAMP (finish_time) as finish_time,
-                     public,
-                     alias,
-                     director_id,
-                     window_length,
-                     recommended,
-                     (CASE WHEN window_length IS NULL THEN TIMESTAMPDIFF(SECOND, start_time, finish_time) ELSE (window_length * 60) END) AS duration
-               FROM
-               (
-                    (
-                         SELECT
-                            Contests.contest_id,
-                            title,
-                            description,
-                            finish_time as original_finish_time,
-                            start_time,
-                            finish_time,
-                            public,
-                            alias,
-                            director_id,
-                            window_length,
-                            recommended
-                         FROM
-                            Contests
-                         WHERE
-                            Contests.public = 0 AND Contests.director_id = ?
-                     )
+    final public static function getAllContestsForUser($user_id, $pagina = 1, $renglones_por_pagina = 1000) {
+        $offset = ($pagina - 1) * $renglones_por_pagina;
 
-                     UNION
-                     (
-                         SELECT
-                            Contests.contest_id,
-                            title,
-                            description,
-                            finish_time as original_finish_time,
-                            start_time,
-                            finish_time,
-                            public,
-                            alias,
-                            director_id,
-                            window_length,
-                            recommended
-                         FROM
-                             Contests
-                         JOIN
-                             Contests_Users
-                         ON
-                             Contests.contest_id = Contests_Users.contest_id
-                         WHERE
-                             Contests.public = 0 AND Contests_Users.user_id = ?
-                     )
+        $columns = '
+                    Contests.contest_id,
+                    title,
+                    description,
+                    finish_time as original_finish_time,
+                    UNIX_TIMESTAMP (start_time) as start_time,
+                    UNIX_TIMESTAMP (finish_time) as finish_time,
+                    finish_time,
+                    public,
+                    alias,
+                    director_id,
+                    (CASE WHEN window_length IS NULL THEN TIMESTAMPDIFF(SECOND, start_time, finish_time) ELSE (window_length * 60) END) AS window_length,
+                    recommended
+                   ';
 
-                     UNION
+        $sql = "
+                (
+                     SELECT
+                        $columns
+                     FROM
+                        Contests
+                     WHERE
+                        Contests.public = 0 AND Contests.director_id = ?
+                 )
 
-                     (
-                         SELECT
-                          Contests.contest_id,
-                          title,
-                          description,
-                          finish_time as original_finish_time,
-                          start_time,
-                          finish_time,
-                          public,
-                          alias,
-                          director_id,
-                          window_length,
-                          recommended
-                         FROM
-                             Contests
-                         JOIN
-                             User_Roles
-                         ON
-                             User_Roles.contest_id = Contests.contest_id
+                 UNION
+                 (
+                     SELECT
+                        $columns
+                     FROM
+                         Contests
+                     JOIN
+                         Contests_Users
+                     ON
+                         Contests.contest_id = Contests_Users.contest_id
+                     WHERE
+                         Contests.public = 0 AND Contests_Users.user_id = ?
+                 )
 
-                         WHERE
-                             Contests.public = 0 AND
-                             User_Roles.user_id = ?
-                             AND (User_Roles.role_id = 2 or User_Roles.role_id = 1)
-                     )
+                 UNION
 
-                     UNION
-                     (
-                         SELECT
-                            Contests.contest_id,
-                            title,
-                            description,
-                            finish_time as original_finish_time,
-                            start_time,
-                            finish_time,
-                            public,
-                            alias,
-                            director_id,
-                            window_length,
-                            recommended
-                         FROM
-                             Contests
-                         JOIN
-                             Group_Roles gr ON Contests.contest_id = gr.contest_id
-                         JOIN
-                             Groups_Users gu ON gu.group_id = gr.group_id
-                         WHERE
-                             Contests.public = 0 AND
-                             gu.user_id = ? AND
-                             (gr.role_id = 2 or gr.role_id = 1)
-                     )
+                 (
+                     SELECT
+                         $columns
+                     FROM
+                         Contests
+                     JOIN
+                         User_Roles
+                     ON
+                         User_Roles.contest_id = Contests.contest_id
 
-                     UNION
+                     WHERE
+                         Contests.public = 0 AND
+                         User_Roles.user_id = ? AND
+                         (User_Roles.role_id = 2 or User_Roles.role_id = 1)
+                 )
 
-                     (
-                         SELECT
-                            Contests.contest_id,
-                            title,
-                            description,
-                            finish_time as original_finish_time,
-                            start_time,
-                            finish_time,
-                            public,
-                            alias,
-                            director_id,
-                            window_length,
-                            recommended
-                         FROM
-                             Contests
-                         WHERE
-                             Public = 1
-                         ORDER BY
-                             `recommended` DESC,
-                             `original_finish_time` DESC
-                         LIMIT 100
-                     )
+                 UNION
+                 (
+                     SELECT
+                         $columns
+                     FROM
+                         Contests
+                     JOIN
+                         Group_Roles ON Contests.contest_id = Group_Roles.contest_id
+                     JOIN
+                         Groups_Users ON Groups_Users.group_id = Group_Roles.group_id
+                     WHERE
+                         Contests.public = 0 AND
+                         Groups_Users.user_id = ? AND
+                         (Group_Roles.role_id = 2 or Group_Roles.role_id = 1)
+                 )
 
-                     ORDER BY
-                         CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
-                         `recommended` DESC,
-                         `original_finish_time` DESC
-                     LIMIT 100
-                ) AS All_Contests
-                ';
+                 UNION
 
-        $params = array($user_id, $user_id, $user_id, $user_id);
+                 (
+                     SELECT
+                         $columns
+                     FROM
+                         Contests
+                     WHERE
+                         Public = 1
+                 )
+
+                 ORDER BY
+                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
+                     `recommended` DESC,
+                     `original_finish_time` DESC
+                 LIMIT ?, ?
+                ";
+
+        $params = array($user_id, $user_id, $user_id, $user_id, $offset, $renglones_por_pagina);
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
@@ -278,7 +225,9 @@ class ContestsDAO extends ContestsDAOBase
         return $allData;
     }
 
-    final public static function getAllPublicContests($pagina = null, $columnas_por_pagina = null) {
+    final public static function getAllPublicContests($pagina = 1, $renglones_por_pagina = 1000) {
+        $offset = ($pagina - 1) * $renglones_por_pagina;
+
         $sql = '
                SELECT
                      contest_id,
@@ -291,8 +240,7 @@ class ContestsDAO extends ContestsDAOBase
                      alias,
                      director_id,
                      window_length,
-                     recommended,
-                     (CASE WHEN window_length IS NULL THEN TIMESTAMPDIFF(SECOND, start_time, finish_time) ELSE (window_length * 60) END) AS duration
+                     recommended
                 FROM
                     Contests
                 WHERE
@@ -301,11 +249,12 @@ class ContestsDAO extends ContestsDAOBase
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
                     `original_finish_time` DESC
-                LIMIT 100
+                LIMIT ?, ?
                 ';
 
         global $conn;
-        $rs = $conn->Execute($sql);
+        $params = array($offset, $renglones_por_pagina);
+        $rs = $conn->Execute($sql, $params);
 
         $allData = array();
 
@@ -317,7 +266,9 @@ class ContestsDAO extends ContestsDAOBase
         return $allData;
     }
 
-    final public static function getAllContests($pagina = null, $columnas_por_pagina = null) {
+    final public static function getAllContests($pagina = 1, $renglones_por_pagina = 1000) {
+        $offset = ($pagina - 1) * $renglones_por_pagina;
+
         $sql = '
                SELECT
                      contest_id,
@@ -330,19 +281,19 @@ class ContestsDAO extends ContestsDAOBase
                      alias,
                      director_id,
                      window_length,
-                     recommended,
-                     (CASE WHEN window_length IS NULL THEN TIMESTAMPDIFF(SECOND, start_time, finish_time) ELSE (window_length * 60) END) AS duration
+                     recommended
                 FROM
                     Contests
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
                     `original_finish_time` DESC
-                LIMIT 100
+                LIMIT ?, ?
                 ';
 
         global $conn;
-        $rs = $conn->Execute($sql);
+        $params = array($offset, $renglones_por_pagina);
+        $rs = $conn->Execute($sql, $params);
 
         $allData = array();
 

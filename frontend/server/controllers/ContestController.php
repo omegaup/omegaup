@@ -27,26 +27,45 @@ class ContestController extends Controller {
             $contests = array();
 
             if ($r['current_user_id'] === null) {
-                // Get all public contests only from cache
-                Cache::getFromCacheOrSet(Cache::CONTESTS_LIST_PUBLIC, '', $r, function (Request $r) {
-                    return ContestsDAO::getAllPublicContests();
-                }, $contests);
+                // Get all public contests
+                Cache::getFromCacheOrSet(
+                    Cache::CONTESTS_LIST_PUBLIC,
+                    '',
+                    $r,
+                    function (Request $r) {
+                            return ContestsDAO::getAllPublicContests();
+                    },
+                    $contests
+                );
             } elseif (Authorization::IsSystemAdmin($r['current_user_id'])) {
-                // Get all conetsts
-                $contests = ContestsDAO::getAllContests();
+                // Get all contests
+                Cache::getFromCacheOrSet(
+                    Cache::CONTESTS_LIST_SYSTEM_ADMIN,
+                    '',
+                    $r,
+                    function (Request $r) {
+                            return ContestsDAO::getAllContests();
+                    },
+                    $contests
+                );
             } else {
                 // Get all public+private contests
-                $contests = ContestsDAO::getAllContestsForUser(
+                Cache::getFromCacheOrSet(
+                    Cache::CONTESTS_LIST_USER_ID,
                     $r['current_user_id'],
-                    null,
-                    null
+                    $r,
+                    function (Request $r) {
+                            return ContestsDAO::getAllContestsForUser($r['current_user_id']);
+                    },
+                    $contests
                 );
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $relevant_columns = array(
+        // Filter returned values by these columns
+        $relevantColumns = array(
             'contest_id',
             'title',
             'description',
@@ -61,11 +80,10 @@ class ContestController extends Controller {
 
         $addedContests = array();
         foreach ($contests as $c) {
-            $contestInfo = $c->asFilteredArray($relevant_columns);
+            $contestInfo = $c->asFilteredArray($relevantColumns);
 
-            $contestInfo['duration'] = (is_null($c->getWindowLength()) ?
-                                $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength() * 60));
-
+            // Duration is calculated on SQL query and placed on WindowLength.
+            $contestInfo['duration'] = $c->getWindowLength();
             $addedContests[] = $contestInfo;
         }
 
@@ -748,6 +766,8 @@ class ContestController extends Controller {
 
         // Expire contes-list cache
         Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        Cache::deleteMultipleFromCache('/^'.Cache::CONTESTS_LIST_USER_ID.'/');
 
         self::$log->info('New Contest Created: ' . $r['alias']);
         return array('status' => 'ok');
@@ -2039,6 +2059,8 @@ class ContestController extends Controller {
 
         // Expire contes-list cache
         Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        Cache::deleteMultipleFromCache('/^'.Cache::CONTESTS_LIST_USER_ID.'/');
 
         // Happy ending
         $response = array();

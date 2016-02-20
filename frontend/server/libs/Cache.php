@@ -20,6 +20,8 @@ class Cache {
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
     const PROBLEMS_SOLVED_RANK_LIST = 'problems-solved-rank-list';
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
+    const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
+    const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
 
     private $enabled;
     private $log;
@@ -31,7 +33,7 @@ class Cache {
      * Inicializa el cache para el key dado
      * @param string $key el id del cache
      */
-    public function __construct($prefix, $id){
+    public function __construct($prefix, $id = ''){
         $this->key = $prefix.$id;
         $this->enabled = (defined('APC_USER_CACHE_ENABLED') && APC_USER_CACHE_ENABLED === true);
         $this->log = Logger::getLogger('cache');
@@ -77,6 +79,28 @@ class Cache {
                 return true;
             } else {
                 $this->log->warn('Failed to invalidate cache for key: ' . $this->key);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * deletePattern
+     *
+     * Si el cache está prendido, invalida todas las entradas que hagan
+     * match con el regex en $key
+     *
+     *  @return boolean
+     */
+    public function deletePattern() {
+        if ($this->enabled === true) {
+            $toDelete = new APCIterator('user', $this->key, APC_ITER_VALUE);
+
+            if (apc_delete($toDelete) === true) {
+                return true;
+            } else {
+                $this->log->warn('Failed to invalidate cache for key pattern: ' . $this->key);
             }
         }
 
@@ -152,5 +176,15 @@ class Cache {
     public static function deleteFromCache($prefix, $id = '') {
         $cache = new Cache($prefix, $id);
         $cache->delete();
+    }
+
+    /**
+     * Delete entries that match the given regex pattern
+     *
+     * @param type $regex
+     */
+    public static function deleteMultipleFromCache($regex) {
+        $cache = new Cache($regex);
+        $cache->deletePattern();
     }
 }
