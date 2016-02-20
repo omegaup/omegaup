@@ -20,11 +20,44 @@ class ContestController extends Controller {
         try {
             self::authenticateRequest($r);
         } catch (UnauthorizedException $e) {
-            // Do nothing
+            // Do nothing.
         }
 
-        // Create array of relevant columns
-        $relevant_columns = array(
+        try {
+            $contests = array();
+
+            if ($r['current_user_id'] === null) {
+                // Get all public contests
+                Cache::getFromCacheOrSet(
+                    Cache::CONTESTS_LIST_PUBLIC,
+                    '',
+                    $r,
+                    function (Request $r) {
+                            return ContestsDAO::getAllPublicContests();
+                    },
+                    $contests
+                );
+            } elseif (Authorization::IsSystemAdmin($r['current_user_id'])) {
+                // Get all contests
+                Cache::getFromCacheOrSet(
+                    Cache::CONTESTS_LIST_SYSTEM_ADMIN,
+                    '',
+                    $r,
+                    function (Request $r) {
+                            return ContestsDAO::getAllContests();
+                    },
+                    $contests
+                );
+            } else {
+                // Get all public+private contests
+                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id']);
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Filter returned values by these columns
+        $relevantColumns = array(
             'contest_id',
             'title',
             'description',
@@ -34,83 +67,15 @@ class ContestController extends Controller {
             'alias',
             'director_id',
             'window_length',
-            'recommended'
+            'recommended',
             );
 
-        try {
-            // Get all contests using only relevan columns
-            $contests = ContestsDAO::getAllMultipleOrder(
-                null,
-                null,
-                array(
-                        array('column' => 'recommended', 'type' => 'DESC'),
-                        array('column' => 'finish_time', 'type' => 'DESC')
-                    ),
-                $relevant_columns
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        // DAO requires contest_id as relevant column but we don't want to expose it
-        array_shift($relevant_columns);
-
-        /**
-         * Ok, lets go 1 by 1, and if its public, show it,
-         * if its not, check if the user has access to it.
-         * */
         $addedContests = array();
-
         foreach ($contests as $c) {
-            // At most we want 1000 contests @TODO paginar correctamente
-            if (sizeof($addedContests) == 1000) {
-                break;
-            }
+            $contestInfo = $c->asFilteredArray($relevantColumns);
 
-            if ($c->getPublic()) {
-                $c->toUnixTime();
-
-                $contestInfo = $c->asFilteredArray($relevant_columns);
-                $contestInfo['duration'] = (is_null($c->getWindowLength()) ?
-                                $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength() * 60));
-
-                $addedContests[] = $contestInfo;
-                continue;
-            }
-
-            /*
-             * Ok, its not public, lets se if we have a
-             * valid user
-             * */
-            if ($r['current_user_id'] === null) {
-                continue;
-            }
-
-            /**
-             * Ok, i have a user. Can he see this contest ?
-             * */
-            try {
-                $contestUser = ContestsUsersDAO::getByPK($r['current_user_id'], $c->getContestId());
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            // Admins can see all contests
-            if ($contestUser === null && !Authorization::IsContestAdmin($r['current_user_id'], $c)) {
-                /**
-                 * Nope, he cant .
-                 * */
-                continue;
-            }
-
-            /**
-             * He can see it !
-             *
-             * */
-            $c->toUnixTime();
-            $contestInfo = $c->asFilteredArray($relevant_columns);
             $contestInfo['duration'] = (is_null($c->getWindowLength()) ?
-                            $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength() * 60));
+                                $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength() * 60));
 
             $addedContests[] = $contestInfo;
         }
@@ -791,6 +756,10 @@ class ContestController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         }
+
+        // Expire contes-list cache
+        Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
         self::$log->info('New Contest Created: ' . $r['alias']);
         return array('status' => 'ok');
@@ -2079,6 +2048,10 @@ class ContestController extends Controller {
 
         // Expire contest scoreboard cache
         Scoreboard::InvalidateScoreboardCache($r['contest']->getContestId());
+
+        // Expire contes-list cache
+        Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
         // Happy ending
         $response = array();

@@ -88,26 +88,220 @@ class ContestsDAO extends ContestsDAOBase
         return $ar;
     }
 
-    final public static function getAllMultipleOrder($pagina = null, $columnas_por_pagina = null, $orden = null) {
-        $sql = 'SELECT * from Contests';
+    /**
+     * Regresa todos los concursos que un usuario puede ver.
+     *
+     * Explicación:
+     *
+     * La estructura de este query optimiza el uso de indíces en mysql, en particular idx_contest_public_director_id
+     * y idx_contest_public.
+     *
+     * El primer SELECT transforma las columnas a como las espera la API.
+     * Luego:
+     *
+     * Todos los concursos privados donde el usuadio fue el creador (director_id)
+     * UNION
+     * Todos los concursos privados a los que el usuario ha sido invitado
+     * UNION
+     * Todos los concursos privados a los que el usuario es ADMIN
+     * UNION
+     * Todos los concursos privados donde el usuario pertenece a un grupo que es ADMIN del concurso
+     * UNION
+     * Todos los concursos públicos.
+     *
+     *
+     * @global type $conn
+     * @param int $user_id
+     * @param int $pagina
+     * @param int $columnas_por_pagina
+     * @return array
+     */
+    final public static function getAllContestsForUser($user_id, $pagina = 1, $renglones_por_pagina = 1000) {
+        $offset = ($pagina - 1) * $renglones_por_pagina;
 
-        if (! is_null($orden)) {
-            $orden = implode(',', array_map(function ($entry) {
-                return '`' . $entry['column'] . '`' . ' ' . $entry['type'];
-            }, $orden));
+        $columns = '
+                    Contests.contest_id,
+                    title,
+                    description,
+                    finish_time as original_finish_time,
+                    UNIX_TIMESTAMP (start_time) as start_time,
+                    UNIX_TIMESTAMP (finish_time) as finish_time,
+                    finish_time,
+                    public,
+                    alias,
+                    director_id,
+                    recommended,
+                    window_length
+                   ';
 
-            $sql .= ' ORDER BY ' . $orden;
-        }
-        if (! is_null($pagina)) {
-            $sql .= ' LIMIT ' . (( $pagina - 1 )*$columnas_por_pagina) . ',' . $columnas_por_pagina;
-        }
+        $sql = "
+                (
+                     SELECT
+                        $columns
+                     FROM
+                        Contests
+                     WHERE
+                        Contests.public = 0 AND Contests.director_id = ?
+                 )
+
+                 UNION
+                 (
+                     SELECT
+                        $columns
+                     FROM
+                         Contests
+                     JOIN
+                         Contests_Users
+                     ON
+                         Contests.contest_id = Contests_Users.contest_id
+                     WHERE
+                         Contests.public = 0 AND Contests_Users.user_id = ?
+                 )
+
+                 UNION
+
+                 (
+                     SELECT
+                         $columns
+                     FROM
+                         Contests
+                     JOIN
+                         User_Roles
+                     ON
+                         User_Roles.contest_id = Contests.contest_id
+
+                     WHERE
+                         Contests.public = 0 AND
+                         User_Roles.user_id = ? AND
+                         (User_Roles.role_id = 2 or User_Roles.role_id = 1)
+                 )
+
+                 UNION
+                 (
+                     SELECT
+                         $columns
+                     FROM
+                         Contests
+                     JOIN
+                         Group_Roles ON Contests.contest_id = Group_Roles.contest_id
+                     JOIN
+                         Groups_Users ON Groups_Users.group_id = Group_Roles.group_id
+                     WHERE
+                         Contests.public = 0 AND
+                         Groups_Users.user_id = ? AND
+                         (Group_Roles.role_id = 2 or Group_Roles.role_id = 1)
+                 )
+
+                 UNION
+
+                 (
+                     SELECT
+                         $columns
+                     FROM
+                         Contests
+                     WHERE
+                         Public = 1
+                 )
+
+                 ORDER BY
+                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
+                     `recommended` DESC,
+                     `original_finish_time` DESC
+                 LIMIT ?, ?
+                ";
+
+        $params = array($user_id, $user_id, $user_id, $user_id, $offset, $renglones_por_pagina);
+
         global $conn;
-        $rs = $conn->Execute($sql);
+        $rs = $conn->Execute($sql, $params);
+
         $allData = array();
+
         foreach ($rs as $foo) {
             $bar = new Contests($foo);
             array_push($allData, $bar);
         }
+
+        return $allData;
+    }
+
+    final public static function getAllPublicContests($pagina = 1, $renglones_por_pagina = 1000) {
+        $offset = ($pagina - 1) * $renglones_por_pagina;
+
+        $sql = '
+               SELECT
+                     contest_id,
+                     title,
+                     description,
+                     finish_time as original_finish_time,
+                     UNIX_TIMESTAMP (start_time) as start_time,
+                     UNIX_TIMESTAMP (finish_time) as finish_time,
+                     public,
+                     alias,
+                     director_id,
+                     window_length,
+                     recommended
+                FROM
+                    Contests
+                WHERE
+                    Public = 1
+                ORDER BY
+                    CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
+                    `recommended` DESC,
+                    `original_finish_time` DESC
+                LIMIT ?, ?
+                ';
+
+        global $conn;
+        $params = array($offset, $renglones_por_pagina);
+        $rs = $conn->Execute($sql, $params);
+
+        $allData = array();
+
+        foreach ($rs as $foo) {
+            $bar = new Contests($foo);
+            array_push($allData, $bar);
+        }
+
+        return $allData;
+    }
+
+    final public static function getAllContests($pagina = 1, $renglones_por_pagina = 1000) {
+        $offset = ($pagina - 1) * $renglones_por_pagina;
+
+        $sql = '
+               SELECT
+                     contest_id,
+                     title,
+                     description,
+                     finish_time as original_finish_time,
+                     UNIX_TIMESTAMP (start_time) as start_time,
+                     UNIX_TIMESTAMP (finish_time) as finish_time,
+                     public,
+                     alias,
+                     director_id,
+                     window_length,
+                     recommended
+                FROM
+                    Contests
+                ORDER BY
+                    CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
+                    `recommended` DESC,
+                    `original_finish_time` DESC
+                LIMIT ?, ?
+                ';
+
+        global $conn;
+        $params = array($offset, $renglones_por_pagina);
+        $rs = $conn->Execute($sql, $params);
+
+        $allData = array();
+
+        foreach ($rs as $foo) {
+            $bar = new Contests($foo);
+            array_push($allData, $bar);
+        }
+
         return $allData;
     }
 }
