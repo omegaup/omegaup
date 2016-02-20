@@ -50,15 +50,7 @@ class ContestController extends Controller {
                 );
             } else {
                 // Get all public+private contests
-                Cache::getFromCacheOrSet(
-                    Cache::CONTESTS_LIST_USER_ID,
-                    $r['current_user_id'],
-                    $r,
-                    function (Request $r) {
-                            return ContestsDAO::getAllContestsForUser($r['current_user_id']);
-                    },
-                    $contests
-                );
+                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id']);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -767,7 +759,6 @@ class ContestController extends Controller {
         // Expire contes-list cache
         Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
         Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
-        Cache::deleteMultipleFromCache('/^'.Cache::CONTESTS_LIST_USER_ID.'/');
 
         self::$log->info('New Contest Created: ' . $r['alias']);
         return array('status' => 'ok');
@@ -2060,7 +2051,6 @@ class ContestController extends Controller {
         // Expire contes-list cache
         Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
         Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
-        Cache::deleteMultipleFromCache('/^'.Cache::CONTESTS_LIST_USER_ID.'/');
 
         // Happy ending
         $response = array();

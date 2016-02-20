@@ -86,28 +86,6 @@ class Cache {
     }
 
     /**
-     * deletePattern
-     *
-     * Si el cache está prendido, invalida todas las entradas que hagan
-     * match con el regex en $key
-     *
-     *  @return boolean
-     */
-    public function deletePattern() {
-        if ($this->enabled === true) {
-            $toDelete = new APCIterator('user', $this->key, APC_ITER_VALUE);
-
-            if (apc_delete($toDelete) === true) {
-                return true;
-            } else {
-                $this->log->warn('Failed to invalidate cache for key pattern: ' . $this->key);
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * get
      *
      * Si el cache está prendido y la clave está en el cache, regresa el valor. Si no está, regresa null
@@ -176,15 +154,5 @@ class Cache {
     public static function deleteFromCache($prefix, $id = '') {
         $cache = new Cache($prefix, $id);
         $cache->delete();
-    }
-
-    /**
-     * Delete entries that match the given regex pattern
-     *
-     * @param type $regex
-     */
-    public static function deleteMultipleFromCache($regex) {
-        $cache = new Cache($regex);
-        $cache->deletePattern();
     }
 }
