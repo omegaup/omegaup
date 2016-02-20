@@ -130,8 +130,8 @@ class ContestsDAO extends ContestsDAOBase
                     public,
                     alias,
                     director_id,
-                    (CASE WHEN window_length IS NULL THEN TIMESTAMPDIFF(SECOND, start_time, finish_time) ELSE (window_length * 60) END) AS window_length,
-                    recommended
+                    recommended,
+                    window_length
                    ';
 
         $sql = "

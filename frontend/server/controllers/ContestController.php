@@ -74,8 +74,9 @@ class ContestController extends Controller {
         foreach ($contests as $c) {
             $contestInfo = $c->asFilteredArray($relevantColumns);
 
-            // Duration is calculated on SQL query and placed on WindowLength.
-            $contestInfo['duration'] = $c->getWindowLength();
+            $contestInfo['duration'] = (is_null($c->getWindowLength()) ?
+                                $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength() * 60));
+
             $addedContests[] = $contestInfo;
         }
 
