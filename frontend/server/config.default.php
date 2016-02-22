@@ -107,6 +107,7 @@ try_define('APC_USER_CACHE_CONTEST_INFO_TIMEOUT', 10);
 try_define('APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT', 60); // in seconds
 try_define('APC_USER_CACHE_PROBLEM_STATS_TIMEOUT', 0); // in seconds
 try_define('APC_USER_CACHE_SESSION_TIMEOUT', 8 * 3600); // seconds, match OMEGAUP_EXPIRE_TOKEN_AFTER
+try_define('APC_USER_CACHE_USER_RANK_TIMEOUT', 60 * 30); // in seconds, half of mysql event Refresh_User_Rank_Event
 try_define('OMEGAUP_SESSION_CACHE_ENABLED', true);
 
 # #########################

@@ -1,6 +1,14 @@
 <?php
 
 class UserRankTest extends OmegaupTestCase {
+    private function refreshUserRank() {
+        $r = new Request();
+        $admin = UserFactory::createAdminUser();
+
+        $r['auth_token'] = $this->login($admin);
+        UserController::apiRefreshUserRank($r);
+    }
+
     /**
      * Tests apiRankByProblemsSolved
      */
@@ -10,6 +18,9 @@ class UserRankTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
+
+        // Refresh Rank
+        $this->refreshUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request());
@@ -42,6 +53,9 @@ class UserRankTest extends OmegaupTestCase {
         $runDataPrivate = RunsFactory::createRunToProblem($problemDataPrivate, $contestant2);
         RunsFactory::gradeRun($runDataPrivate);
 
+        // Refresh Rank
+        $this->refreshUserRank();
+
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request());
 
@@ -71,6 +85,9 @@ class UserRankTest extends OmegaupTestCase {
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
 
+        // Refresh Rank
+        $this->refreshUserRank();
+
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request(array(
             'username' => $contestant->getUsername()
@@ -84,8 +101,11 @@ class UserRankTest extends OmegaupTestCase {
      * Tests apiRankByProblemsSolved for a specific user with no runs
      */
     public function testUserRankByProblemsSolvedWith0Runs() {
-        // Create a user and sumbit a run with him
+        // Create a user with no runs
         $contestant = UserFactory::createUser();
+
+        // Refresh Rank
+        $this->refreshUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request(array(
