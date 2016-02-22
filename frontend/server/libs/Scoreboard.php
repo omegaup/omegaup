@@ -86,7 +86,8 @@ class Scoreboard {
                 $contest_runs,
                 $raw_contest_users,
                 $problem_mapping,
-                $contest->getPenalty(),
+                $contest->penalty,
+                $contest->penalty_calc_policy,
                 $scoreboardLimit,
                 $contest,
                 $this->showAllRuns,
@@ -229,7 +230,8 @@ class Scoreboard {
             $contest_runs,
             $raw_contest_users,
             $problem_mapping,
-            $contest->getPenalty(),
+            $contest->penalty,
+            $contest->penalty_calc_policy,
             $scoreboardLimit,
             $contest,
             false, /* showAllRuns */
@@ -242,7 +244,8 @@ class Scoreboard {
             $contest_runs,
             $raw_contest_users,
             $problem_mapping,
-            $contest->getPenalty(),
+            $contest->penalty,
+            $contest->penalty_calc_policy,
             $scoreboardLimit,
             $contest,
             true, /* showAllRuns */
@@ -318,18 +321,22 @@ class Scoreboard {
         return $limit;
     }
 
-    private static function getTotalScore($scores) {
-        $sumPoints = 0;
-        $sumPenalty = 0;
-        // Get sum of all scores
+    private static function getTotalScore($scores, $contest_penalty_calc_policy) {
+        $totalPoints = 0;
+        $totalPenalty = 0;
+        // Get final scores
         foreach ($scores as $score) {
-            $sumPoints += $score['points'];
-            $sumPenalty += $score['penalty'];
+            $totalPoints += $score['points'];
+            if ($contest_penalty_calc_policy == 'sum') {
+                $totalPenalty += $score['penalty'];
+            } else {
+                $totalPenalty = max($totalPenalty, $score['penalty']);
+            }
         }
 
         return array(
-            'points' => $sumPoints,
-            'penalty' => $sumPenalty
+            'points' => $totalPoints,
+            'penalty' => $totalPenalty
         );
     }
 
@@ -338,6 +345,7 @@ class Scoreboard {
         $raw_contest_users,
         $problem_mapping,
         $contest_penalty,
+        $contest_penalty_calc_policy,
         $scoreboard_time_limit,
         $contest,
         $showAllRuns,
@@ -448,7 +456,7 @@ class Scoreboard {
             if ($info == null) {
                 continue;
             }
-            $info[self::TOTAL_COLUMN] = Scoreboard::getTotalScore($info['problems']);
+            $info[self::TOTAL_COLUMN] = Scoreboard::getTotalScore($info['problems'], $contest_penalty_calc_policy);
             array_push($result, $info);
         }
 
@@ -603,7 +611,14 @@ class Scoreboard {
 
             foreach ($user_problems_score[$user_id] as $problem) {
                 $data['total']['points'] += $problem['points'];
-                $data['total']['penalty'] += $problem['penalty'];
+                if ($contest->penalty_calc_policy == 'sum') {
+                    $data['total']['penalty'] += $problem['penalty'];
+                } else {
+                    $data['total']['penalty'] = max(
+                        $data['total']['penalty'],
+                        $problem['penalty']
+                    );
+                }
             }
 
             // Add contestant results to scoreboard data

@@ -12,14 +12,16 @@ class ContestScoreboardTest extends OmegaupTestCase {
      * just submitted
      */
     public function testBasicScoreboard() {
-        // Get a problem
+        // Get two problems
         $problemData = ProblemsFactory::createProblem();
+        $problemData2 = ProblemsFactory::createProblem();
 
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        // Add the problem to the contest
+        // Add the problems to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
+        ContestsFactory::addProblemToContest($problemData2, $contestData);
 
         // Create our contestants
         $contestant = UserFactory::createUser();
@@ -34,14 +36,16 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $runData1 = RunsFactory::createRun($problemData, $contestData, $contestant);
         $runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);
         $runData3 = RunsFactory::createRun($problemData, $contestData, $contestant3);
+        $runData4 = RunsFactory::createRun($problemData2, $contestData, $contestant);
         $runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
         $runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
 
         // Grade the runs
-        RunsFactory::gradeRun($runData, 0, 'CE');
-        RunsFactory::gradeRun($runData1);
-        RunsFactory::gradeRun($runData2, .9, 'PA');
+        RunsFactory::gradeRun($runData, 0, 'CE', 60);
+        RunsFactory::gradeRun($runData1, 1, 'AC', 60);
+        RunsFactory::gradeRun($runData2, .9, 'PA', 60);
         RunsFactory::gradeRun($runData3, 1, 'AC', 180);
+        RunsFactory::gradeRun($runData4, 1, 'AC', 200);
         RunsFactory::gradeRun($runDataDirector, 1, 'AC', 120);
         RunsFactory::gradeRun($runDataAdmin, 1, 'AC', 110);
 
@@ -58,8 +62,8 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals($contestant->getUsername(), $response['ranking'][0]['username']);
 
         //Check totals
-        $this->assertEquals(100, $response['ranking'][0]['total']['points']);
-        $this->assertEquals(60, $response['ranking'][0]['total']['penalty']); /* 60 because contest started 60 mins ago in the default factory */
+        $this->assertEquals(200, $response['ranking'][0]['total']['points']);
+        $this->assertEquals(260, $response['ranking'][0]['total']['penalty']);
 
         // Check places
         $this->assertEquals(1, $response['ranking'][0]['place']);
@@ -70,6 +74,9 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals(100, $response['ranking'][0]['problems'][0]['points']);
         $this->assertEquals(60, $response['ranking'][0]['problems'][0]['penalty']);
         $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
+        $this->assertEquals(100, $response['ranking'][0]['problems'][1]['points']);
+        $this->assertEquals(200, $response['ranking'][0]['problems'][1]['penalty']);
+        $this->assertEquals(1, $response['ranking'][0]['problems'][1]['runs']);
 
         // Now get the scoreboard as an contest director
         $r = new Request();
@@ -84,8 +91,8 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals($contestant->getUsername(), $response['ranking'][0]['username']);
 
         //Check totals
-        $this->assertEquals(100, $response['ranking'][0]['total']['points']);
-        $this->assertEquals(60, $response['ranking'][0]['total']['penalty']); /* 60 because contest started 60 mins ago in the default factory */
+        $this->assertEquals(200, $response['ranking'][0]['total']['points']);
+        $this->assertEquals(260, $response['ranking'][0]['total']['penalty']);
 
         // Check places
         $this->assertEquals(1, $response['ranking'][0]['place']);
@@ -96,6 +103,52 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals(100, $response['ranking'][0]['problems'][0]['points']);
         $this->assertEquals(60, $response['ranking'][0]['problems'][0]['penalty']);
         $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
+        $this->assertEquals(100, $response['ranking'][0]['problems'][1]['points']);
+        $this->assertEquals(200, $response['ranking'][0]['problems'][1]['penalty']);
+        $this->assertEquals(1, $response['ranking'][0]['problems'][1]['runs']);
+    }
+
+    /**
+     * Basic test of scoreboard with max policy.
+     */
+    public function testMaxPolicyScoreboard() {
+        // Get two problems
+        $problemData = ProblemsFactory::createProblem();
+        $problemData2 = ProblemsFactory::createProblem();
+
+        // Get a contest
+        $contestData = ContestsFactory::createContest(null, 1, null, null, null, 'max');
+
+        // Add the problems to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+        ContestsFactory::addProblemToContest($problemData2, $contestData);
+
+        // Create our contestants
+        $contestant = UserFactory::createUser();
+
+        // Create runs
+        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData1 = RunsFactory::createRun($problemData2, $contestData, $contestant);
+
+        // Grade the runs
+        RunsFactory::gradeRun($runData, 1, 'AC', 60);
+        RunsFactory::gradeRun($runData1, 1, 'AC', 200);
+
+        // Create request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['auth_token'] = $this->login($contestant);
+
+        // Create API
+        $response = ContestController::apiScoreboard($r);
+
+        // Validate that we have ranking
+        $this->assertEquals(1, count($response['ranking']));
+        $this->assertEquals($contestant->getUsername(), $response['ranking'][0]['username']);
+
+        //Check totals
+        $this->assertEquals(200, $response['ranking'][0]['total']['points']);
+        $this->assertEquals(200, $response['ranking'][0]['total']['penalty']);
     }
 
     /**

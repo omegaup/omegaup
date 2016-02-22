@@ -15,7 +15,7 @@ class ContestsFactory {
      * @param Users $contestDirector
      * @return Request
      */
-    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null, $finish_time = null) {
+    public static function getRequest($title = null, $public = 0, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
         if (is_null($contestDirector)) {
             $contestDirector = UserFactory::createUser();
         }
@@ -40,7 +40,11 @@ class ContestsFactory {
         $r['penalty'] = 100;
         $r['scoreboard'] = 100;
         $r['penalty_type'] = 'contest_start';
-        $r['penalty_calc_policy'] = 'sum';
+        if ($penalty_calc_policy == null) {
+            $r['penalty_calc_policy'] = 'sum';
+        } else {
+            $r['penalty_calc_policy'] = $penalty_calc_policy;
+        }
         $r['languages'] = $languages;
         $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
 
@@ -49,9 +53,9 @@ class ContestsFactory {
             'director' => $contestDirector);
     }
 
-    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null) {
+    public static function createContest($title = null, $public = 1, Users $contestDirector = null, $languages = null, $finish_time = null, $penalty_calc_policy = null) {
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages, $finish_time);
+        $contestData = ContestsFactory::getRequest($title, 0, $contestDirector, $languages, $finish_time, $penalty_calc_policy);
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
 
