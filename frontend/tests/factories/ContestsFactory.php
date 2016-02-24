@@ -8,7 +8,8 @@
 
 class ContestsFactory {
     /**
-     * Returns a Request object with complete context to create a contest
+     * Returns a Request object with complete context to create a contest.
+     * By default, contest duration is 1HR.
      *
      * @param string $title
      * @param string $public

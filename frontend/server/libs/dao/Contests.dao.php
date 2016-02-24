@@ -19,6 +19,20 @@ require_once('base/Contests.vo.base.php');
   */
 class ContestsDAO extends ContestsDAOBase
 {
+    private static $getContestsColumns = '
+                                Contests.contest_id,
+                                title,
+                                description,
+                                finish_time as original_finish_time,
+                                UNIX_TIMESTAMP (start_time) as start_time,
+                                UNIX_TIMESTAMP (finish_time) as finish_time,
+                                public,
+                                alias,
+                                director_id,
+                                recommended,
+                                window_length
+                                ';
+
     final public static function getByAlias($alias)
     {
         $sql = 'SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;';
@@ -119,20 +133,7 @@ class ContestsDAO extends ContestsDAOBase
     final public static function getAllContestsForUser($user_id, $pagina = 1, $renglones_por_pagina = 1000) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
-        $columns = '
-                    Contests.contest_id,
-                    title,
-                    description,
-                    finish_time as original_finish_time,
-                    UNIX_TIMESTAMP (start_time) as start_time,
-                    UNIX_TIMESTAMP (finish_time) as finish_time,
-                    finish_time,
-                    public,
-                    alias,
-                    director_id,
-                    recommended,
-                    window_length
-                   ';
+        $columns = ContestsDAO::$getContestsColumns;
 
         $sql = "
                 (
@@ -228,19 +229,11 @@ class ContestsDAO extends ContestsDAOBase
     final public static function getAllPublicContests($pagina = 1, $renglones_por_pagina = 1000) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
-        $sql = '
+        $columns = ContestsDAO::$getContestsColumns;
+
+        $sql = "
                SELECT
-                     contest_id,
-                     title,
-                     description,
-                     finish_time as original_finish_time,
-                     UNIX_TIMESTAMP (start_time) as start_time,
-                     UNIX_TIMESTAMP (finish_time) as finish_time,
-                     public,
-                     alias,
-                     director_id,
-                     window_length,
-                     recommended
+                    $columns
                 FROM
                     Contests
                 WHERE
@@ -250,7 +243,7 @@ class ContestsDAO extends ContestsDAOBase
                     `recommended` DESC,
                     `original_finish_time` DESC
                 LIMIT ?, ?
-                ';
+                ";
 
         global $conn;
         $params = array($offset, $renglones_por_pagina);
@@ -269,19 +262,11 @@ class ContestsDAO extends ContestsDAOBase
     final public static function getAllContests($pagina = 1, $renglones_por_pagina = 1000) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
-        $sql = '
-               SELECT
-                     contest_id,
-                     title,
-                     description,
-                     finish_time as original_finish_time,
-                     UNIX_TIMESTAMP (start_time) as start_time,
-                     UNIX_TIMESTAMP (finish_time) as finish_time,
-                     public,
-                     alias,
-                     director_id,
-                     window_length,
-                     recommended
+        $columns = ContestsDAO::$getContestsColumns;
+
+        $sql = "
+                SELECT
+                    $columns
                 FROM
                     Contests
                 ORDER BY
@@ -289,7 +274,7 @@ class ContestsDAO extends ContestsDAOBase
                     `recommended` DESC,
                     `original_finish_time` DESC
                 LIMIT ?, ?
-                ';
+                ";
 
         global $conn;
         $params = array($offset, $renglones_por_pagina);

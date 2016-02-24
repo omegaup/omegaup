@@ -20,11 +20,18 @@ class colors:
 	FAIL = '\033[91m'
 	NORMAL = '\033[0m'
 
+def which(program):
+	for path in os.environ["PATH"].split(os.pathsep):
+		exe_file = os.path.join(path.strip('"'), program)
+		if os.path.isfile(exe_file) and os.access(exe_file, os.X_OK):
+			return exe_file
+	raise Exception('`%s` not found' % program)
+
 def run_validation(grep_flags, detect_regex, error_string, fix_command, files,
 		validate_only):
 	violations = []
 	try:
-		violations += subprocess.check_output(['/bin/grep', grep_flags] + FILTERS +
+		violations += subprocess.check_output([which('grep'), grep_flags] + FILTERS +
 			[detect_regex] + files).strip().split('\n')
 	except subprocess.CalledProcessError:
 		# If the command failed, that means that nothing matched.
@@ -68,7 +75,7 @@ def main():
 
 	errors |= run_validation('-Rl', r'\s\+$',
 			'Files have trailing whitespace',
-			['/bin/sed', '-i', '-e', r's/\s*$//'],
+			[which('sed'), '-i', '-e', r's/\s*$//'],
 			changed_files, args.validate)
 	errors |= run_validation('-PRzl', r'(?s)\n\n\n',
 			'Files have consecutive empty lines',

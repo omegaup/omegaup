@@ -7,6 +7,13 @@
  */
 
 class ContestListTest extends OmegaupTestCase {
+    /**
+     * Check if given contest ($contestData) is in $response
+     *
+     * @param array $response
+     * @param array $contestData
+     * @param bool $inverse
+     */
     private function assertTitleInList($response, $contestData, $inverse = false) {
         // Assert our contest is there
         $titles = array();
@@ -21,6 +28,30 @@ class ContestListTest extends OmegaupTestCase {
         } else {
             $this->assertContains($contestData['request']['title'], $titles);
         }
+    }
+
+    /**
+     * Check request and response durations match.
+     *
+     * @param array $response
+     * @param array $contestData
+     */
+    private function assertDurationIsCorrect($response, $contestData) {
+        $contestFromResponse = null;
+
+        foreach ($response['results'] as $entry) {
+            if ($entry['title'] === $contestData['request']['title']) {
+                $contestFromResponse = $entry;
+                break;
+            }
+        }
+
+        $this->assertNotNull($contestFromResponse);
+
+        $durationFromResponse = $contestFromResponse['finish_time'] - $contestFromResponse['start_time'];
+        $durationFromRequest = $contestData['request']['finish_time'] - $contestData['request']['start_time'];
+
+        $this->assertEquals($durationFromRequest, $durationFromResponse);
     }
 
     /**
@@ -44,7 +75,7 @@ class ContestListTest extends OmegaupTestCase {
                 return;
             }
         }
-        assertFalse(true, 'Array does not contain created contest');
+        $this->assertFalse(true, 'Array does not contain created contest');
     }
 
     /**
@@ -59,6 +90,7 @@ class ContestListTest extends OmegaupTestCase {
         $response = ContestController::apiList($r);
 
         $this->assertTitleInList($response, $contestData);
+        $this->assertDurationIsCorrect($response, $contestData);
     }
 
     /**
@@ -81,6 +113,7 @@ class ContestListTest extends OmegaupTestCase {
         $response = ContestController::apiList($r);
 
         $this->assertTitleInList($response, $contestData);
+        $this->assertDurationIsCorrect($response, $contestData);
     }
 
     /**
@@ -121,6 +154,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Assert our contest is there
         $this->assertTitleInList($response, $contestData);
+        $this->assertDurationIsCorrect($response, $contestData);
     }
 
     /**
@@ -144,6 +178,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Assert our contest is there
         $this->assertTitleInList($response, $contestData);
+        $this->assertDurationIsCorrect($response, $contestData);
     }
 
     /**
