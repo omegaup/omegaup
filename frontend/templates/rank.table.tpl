@@ -45,5 +45,5 @@
 		{/if}
 	</div>
 
-	<script language="javascript" src="/js/rank.table.js?ver=312863"></script>
+	<script language="javascript" src="/js/rank.table.js?ver=7a08b8"></script>
 </div>

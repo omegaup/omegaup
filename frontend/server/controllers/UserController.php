@@ -1425,7 +1425,7 @@ class UserController extends Controller {
 
         // Defaults for offset and rowcount
         if (null == $r['offset']) {
-            $r['offset'] = 0;
+            $r['offset'] = 1;
         }
         if (null == $r['rowcount']) {
             $r['rowcount'] = 100;
@@ -1441,7 +1441,7 @@ class UserController extends Controller {
      * @param Request $r
      * @throws InvalidDatabaseOperationException
      */
-    public static function getRankByProblemsSolved(Request $r) {
+    private static function getRankByProblemsSolved(Request $r) {
         if (is_null($r['user'])) {
             $rankCacheName =  $r['offset'] . '-' . $r['rowcount'];
 
@@ -1449,25 +1449,24 @@ class UserController extends Controller {
                 $response = array();
                 $response['rank'] = array();
                 try {
-                    $db_results = UsersDAO::GetRankByProblemsSolved2($r['rowcount'], $r['offset']);
+                    $userRankEntries = UserRankDAO::getAll($r['offset'], $r['rowcount'], 'Rank', 'DESC');
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
 
-                if (!is_null($db_results)) {
-                    foreach ($db_results as $userEntry) {
-                        $user = $userEntry['user'];
+                if (!is_null($userRankEntries)) {
+                    foreach ($userRankEntries as $userRank) {
                         array_push($response['rank'], array(
-                            'username' => $user->getUsername(),
-                            'name' => $user->getName(),
-                            'problems_solved' => $userEntry['problems_solved'],
-                            'rank' => $userEntry['rank'],
-                            'score' => $userEntry['score'],
-                            'country_id' => $user->getCountryId()));
+                            'username' => $userRank->username,
+                            'name' => $userRank->name,
+                            'problems_solved' => $userRank->problems_solved_count,
+                            'rank' => $userRank->rank,
+                            'score' => $userRank->score,
+                            'country_id' => $userRank->country_id));
                     }
                 }
                 return $response;
-            }, $response);
+            }, $response, APC_USER_CACHE_USER_RANK_TIMEOUT);
 
             // If cache was set, we need to maintain a list of different ranks in the cache
             // (A different rankCacheName means different offset and rowcount params
@@ -1476,22 +1475,21 @@ class UserController extends Controller {
             }
         } else {
             $response = array();
+
             try {
-                $db_results = UsersDAO::GetRankByProblemsSolved2($r['rowcount'], $r['offset'], $r['user']);
+                $userRank = UserRankDAO::getByPK($r['user']->user_id);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
-            if (!is_null($db_results)) {
-                if (count($db_results) > 0) {
-                    $entry = $db_results[0];
-                    $response['rank'] = $entry['rank'];
-                    $response['name'] = $r['user']->getName();
-                    $response['problems_solved'] = $entry['problems_solved'];
-                } else {
-                    $response['rank'] = 0;
-                    $response['name'] = $r['user']->getName();
-                    $response['problems_solved'] = 0;
-                }
+
+            if (!is_null($userRank)) {
+                $response['rank'] = $userRank->rank;
+                $response['name'] = $r['user']->name;
+                $response['problems_solved'] = $userRank->problems_solved_count;
+            } else {
+                $response['rank'] = 0;
+                $response['name'] = $r['user']->name;
+                $response['problems_solved'] = 0;
             }
         }
 
@@ -1537,6 +1535,33 @@ class UserController extends Controller {
                 Cache::deleteFromCache(Cache::PROBLEMS_SOLVED_RANK, $key);
             }
         }
+    }
+
+    /**
+     * Forza un refresh de la tabla User_Rank. SysAdmin only.
+     *
+     * @param Request $r
+     * @return array
+     * @throws UnauthorizedException
+     */
+    public static function apiRefreshUserRank(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+            throw new UnauthorizedException();
+        }
+
+        // Actualizar tabla User_Rank
+        try {
+            UserRankDAO::refreshUserRank();
+        } catch (Exception $ex) {
+            throw new InvalidDatabaseOperationException($ex);
+        }
+
+        // Borrar todos los ranks cacheados
+        self::deleteProblemsSolvedRankCacheList();
+
+        return array('status' => 'ok');
     }
 
     /**

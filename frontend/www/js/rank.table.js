@@ -4,7 +4,7 @@
 	var page = parseInt(problemsSolved.attr('data-page'));
 	var is_index = (problemsSolved.attr('is-index') === "1" ? true : false);
 	omegaup.getRankByProblemsSolved(
-			length * page,
+			page,
 			length,
 			function(result) {
 				var html = "";
