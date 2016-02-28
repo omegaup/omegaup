@@ -1,6 +1,6 @@
-{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=b25782' bodyid='only-problem'}
+{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=363345' bodyid='only-problem'}
 			{if $problem_admin}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=582fea"></script>
+			<script type="text/javascript" src="/ux/libadmin.js?ver=4ef011"></script>
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblem#}</a></li>
 				<li><a href="#runs">{#wordsRuns#}</a></li>
@@ -42,38 +42,7 @@
 {if $problemsetter}
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
 {/if}
-					<table class="runs">
-						<caption>{#wordsSubmissions#}</caption>
-						<thead>
-							<tr>
-								<th>{#wordsID#}</th>
-								<th>{#wordsStatus#}</th>
-								<th class="numeric">{#wordsPercentage#}</th>
-								<th class="numeric">{#wordsPenalty#}</th>
-								<th>{#wordsLanguage#}</th>
-								<th class="numeric">{#wordsMemory#}</th>
-								<th class="numeric">{#wordsRuntime#}</th>
-								<th>{#wordsDetails#}</th>
-							</tr>
-						</thead>
-						<tfoot>
-							<tr>
-								<td colspan="9"><a href="#problems/new-run">{#wordsNewSubmissions#}</a></td>
-							</tr>
-						</tfoot>
-						<tbody class="run-list-template">
-							<tr>
-								<td class="guid"></td>
-								<td class="status"></td>
-								<td class="percentage numeric"></td>
-								<td class="penalty numeric"></td>
-								<td class="language"></td>
-								<td class="memory numeric"></td>
-								<td class="runtime numeric"></td>
-								<td><button class="details glyphicon glyphicon-zoom-in"></button></td>
-							</tr>
-						</tbody>
-					</table>
+{include file='arena.runs.tpl' show_submit=true show_details=true}
 					<table class="best-solvers">
 						<caption>{#wordsBestSolvers#}</caption>
 						<thead>
@@ -99,92 +68,7 @@
 			</div>
 			{if $problem_admin}
 			<div id="runs" class="tab">
-				<table class="runs">
-					<caption>
-						Envíos
-						<div class="runspager">
-							<button class="runspagerprev">&lt;</button>
-							<button class="runspagernext">&gt;</button>
-
-							<label for="runsverdict">{#wordsVerdict#}: </label>
-							<select class="runsverdict" name="runsverdict">
-								<option value="">{#wordsAll#}</option>
-								<option value="AC">AC</option>
-								<option value="PA">PA</option>
-								<option value="WA">WA</option>
-								<option value="TLE">TLE</option>
-								<option value="MLE">MLE</option>
-								<option value="OLE">OLE</option>
-								<option value="RTE">RTE</option>
-								<option value="RFE">RFE</option>
-								<option value="CE">CE</option>
-								<option value="JE">JE</option>
-								<option value="NO-AC">No AC</option>
-							</select>
-
-							<label for="runsstatus">{#wordsStatus#}: </label>
-							<select class="runsstatus" name="runsstatus">
-								<option value="">{#wordsAll#}</option>
-								<option value="new">new</option>
-								<option value="waiting">waiting</option>
-								<option value="compiling">compiling</option>
-								<option value="running">running</option>
-								<option value="ready">ready</option>
-							</select>
-
-							<label for="runslang">{#wordsLanguage#}: </label>
-							<select class="runslang" name="runslang">
-								<option value="">{#wordsAll#}</option>
-								<option value="cpp11">C++11</option>
-								<option value="cpp">C++</option>
-								<option value="c">C</option>
-								<option value="hs">Haskell</option>
-								<option value="java">Java</option>
-								<option value="pas">Pascal</option>
-								<option value="py">Python</option>
-								<option value="rb">Ruby</option>
-								<option value="kp">Karel (Pascal)</option>
-								<option value="kj">Karel (Java)</option>
-								<option value="cat">{#wordsJustOutput#}</option>
-							</select>
-
-							<label for="runsusername">Usuario: </label>
-							<input id="runsusername" type="text" class="typeahead form-control" autocomplete="off"/>
-							<button type="button" class="close" id="runsusername-clear" style="float: none;">&times;</button>
-
-						</div>
-					</caption>
-					<thead>
-						<tr>
-							<th>{#wordsTime#}</th>
-							<th class="hidden-sm hidden-xs">GUID</th>
-							<th>{#wordsUser#}</th>
-							<th>{#wordsStatus#}</th>
-							<th class="numeric">{#wordsPercentage#}</th>
-							<th class="numeric">{#wordsPenalty#}</th>
-							<th>{#wordsLanguage#}</th>
-							<th class="numeric">{#wordsMemory#}</th>
-							<th class="numeric">{#wordsRuntime#}</th>
-							<th>{#wordsRejudge#}</th>
-							<th>{#wordsDetails#}</th>
-						</tr>
-					</thead>
-					<tbody class="run-list-template">
-						<tr>
-							<td class="time"></td>
-							<td class="guid hidden-sm hidden-xs"></td>
-							<td class="username"></td>
-							<td class="status"></td>
-							<td class="percentage numeric"></td>
-							<td class="penalty numeric"></td>
-							<td class="language"></td>
-							<td class="memory numeric"></td>
-							<td class="runtime numeric"></td>
-							<td class="rejudge"></td>
-							<td><button class="admin-details glyphicon glyphicon-zoom-in"></button></td>
-						</tr>
-					</tbody>
-				</table>
+{include file='arena.runs.tpl' show_pager=true show_user=true show_rejudge=true show_details=true}
 			</div>
 			<div id="clarifications" class="tab">
 				<table class="clarifications">

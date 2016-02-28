@@ -2241,13 +2241,11 @@ function toHHMM(duration) {
     return time;
 }
 
-function getFlagSrc(user, property) {
-	property = typeof property !== 'undefined' ? property : 'country';
-
-	if (typeof user[property] === 'undefined' || user[property] === null) {
+function getFlag(country) {
+	if (!country) {
 		return '';
 	} else {
-		return ' <img src="/media/flags/' + user[property].toLowerCase() + '.png" width="16" height="11" title="' + user[property] + '" />';
+		return ' <img src="/media/flags/' + country.toLowerCase() + '.png" width="16" height="11" title="' + country + '" />';
 	}
 }
 

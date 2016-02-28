@@ -1124,6 +1124,8 @@ class ProblemController extends Controller {
                 $runs_filtered_array = array();
                 foreach ($runs_array as $run) {
                     $filtered = $run->asFilteredArray($relevant_columns);
+                    $filtered['alias'] = $r['problem']->alias;
+                    $filtered['username'] = $r['current_user']->username;
                     $filtered['time'] = strtotime($filtered['time']);
                     array_push($runs_filtered_array, $filtered);
                 }
@@ -1286,6 +1288,8 @@ class ProblemController extends Controller {
                     foreach ($runs_array as $run) {
                         $filtered = $run->asFilteredArray($relevant_columns);
                         $filtered['time'] = strtotime($filtered['time']);
+                        $filtered['username'] = $r['current_user']->username;
+                        $filtered['alias'] = $r['problem']->alias;
                         array_push($response['runs'], $filtered);
                     }
                 }

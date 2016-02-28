@@ -9,10 +9,12 @@
 		<script type="text/javascript" src="/js/jquery.tableSort.js?ver=f4ef14"></script>
 		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
+		<script type="text/javascript" src="/js/knockout-4.3.0.js?ver=059d58"></script>
+		<script type="text/javascript" src="/js/knockout-secure-binding.min.js?ver=81a2a3"></script>
 
-		<script type="text/javascript" src="/js/omegaup.js?ver=71bdbd"></script>
+		<script type="text/javascript" src="/js/omegaup.js?ver=795dcd"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=6f8b8b,e2245f,9c2261,8fd3f0"></script>
-		<script type="text/javascript" src="/ux/libarena.js?ver=b34d0a"></script>
+		<script type="text/javascript" src="/ux/libarena.js?ver=7025a7"></script>
 		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>
 		{/if}

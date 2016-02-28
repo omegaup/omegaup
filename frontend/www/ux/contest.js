@@ -17,6 +17,10 @@ $(document).ready(function() {
 
 	function onlyProblemLoaded(problem) {
 		arena.currentProblem = problem;
+		arena.myRuns.filter_problem(problem.alias);
+		if (!arena.myRuns.attached) {
+			arena.myRuns.attach($('#problem .runs'));
+		}
 
 		MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);
 
@@ -64,15 +68,7 @@ $(document).ready(function() {
 		$('#problem tbody.added').remove();
 		for (var idx in runs) {
 			if (!runs.hasOwnProperty(idx)) continue;
-			var run = runs[idx];
-
-			var r = $('#problem tbody.run-list-template')
-				.clone()
-				.removeClass('run-list-template')
-				.addClass('added')
-				.addClass('run_' + run.guid);
-			arena.displayRun(run, r);
-			$('#problem .runs').append(r);
+			arena.myRuns.trackRun(runs[idx]);
 		}
 	}
 
@@ -256,17 +252,7 @@ $(document).ready(function() {
 			run.runtime = 0;
 			run.memory = 0;
 			run.language = $('#submit select[name="language"]').val();
-			var r = $('#problem tbody.run-list-template')
-				.clone()
-				.removeClass('run-list-template')
-				.addClass('added')
-				.addClass('run_' + run.guid);
-			arena.displayRun(run, r);
-			$('#problem .runs').append(r);
-			if (!arena.currentProblem.runs) {
-				arena.currentProblem.runs = [];
-			}
-			arena.currentProblem.runs.push(run);
+			arena.trackRun(run);
 			arena.updateRunFallback(run.guid, run);
 
 			$('#submit input').removeAttr('disabled');

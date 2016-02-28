@@ -51,5 +51,5 @@
 			</div>
 		</div>
 	</div>
-	<script language="javascript" src="/js/rank.table.js?ver=22e1f6"></script>
+	<script language="javascript" src="/js/rank.table.js?ver=664e40"></script>
 </div>
