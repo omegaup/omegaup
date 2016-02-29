@@ -127,17 +127,7 @@ $(document).ready(function() {
 				run.runtime = 0;
 				run.memory = 0;
 				run.language = $('#submit select[name="language"]').val();
-				var r = $('#problem tbody.run-list-template')
-					.clone()
-					.removeClass('run-list-template')
-					.addClass('added')
-					.addClass('run_' + run.guid);
-				arena.displayRun(run, r);
-				$('#problem .runs > tbody:last').append(r);
-				if (!arena.currentProblem.runs) {
-					arena.currentProblem.runs = [];
-				}
-				arena.currentProblem.runs.push(run);
+				arena.trackRun(run);
 				arena.updateRunFallback(run.guid, run);
 
 				$('#submit input').removeAttr('disabled');
