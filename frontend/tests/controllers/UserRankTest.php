@@ -34,8 +34,8 @@ class UserRankTest extends OmegaupTestCase {
                 $this->assertEquals($entry['score'], 100);
             }
         }
-        // TODO(joe): Fix.
-        // $this->assertTrue($found);
+
+        $this->assertTrue($found);
     }
 
     /**
@@ -73,8 +73,8 @@ class UserRankTest extends OmegaupTestCase {
                 $this->fail('User with private problem solved showed in rank.');
             }
         }
-        // TODO(joe): Fix.
-        // $this->assertTrue($found);
+
+        $this->assertTrue($found);
     }
 
     /**

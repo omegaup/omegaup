@@ -1449,7 +1449,7 @@ class UserController extends Controller {
                 $response = array();
                 $response['rank'] = array();
                 try {
-                    $userRankEntries = UserRankDAO::getAll($r['offset'] + 1, $r['rowcount'], 'Rank', 'ASC');
+                    $userRankEntries = UserRankDAO::getAll($r['offset'], $r['rowcount'], 'Rank', 'ASC');
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }

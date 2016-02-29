@@ -1,5 +1,5 @@
 {if !isset($page)}
-	{$page = 0}
+	{$page = 1}
 {/if}
 
 {if !isset($length)}
@@ -14,7 +14,7 @@
 	<div class="panel-heading">
 		<h3 class="panel-title">{#rankHeaderPreCount#} {$length} {#rankHeaderPostCount#}</h3>
 		{if !$is_index}
-			{if $page > 0}
+			{if $page > 1}
 				<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
 			{/if}
 			<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
@@ -42,7 +42,7 @@
 				{if $is_index}
 				<a href='/rank/'>{#rankViewFull#}</a>
 				{else}
-					{if $page > 0}
+					{if $page > 1}
 					<a href="/rank/?page={$page-1}">{#wordsPrevPage#}</a> |
 					{/if}
 					<a href="/rank/?page={$page+1}">{#wordsNextPage#}</a>
