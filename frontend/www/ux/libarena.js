@@ -1116,6 +1116,10 @@ Arena.RunView = function() {
 	}, self).extend({ deferred: true });
 	self.sorted_runs = ko.pureComputed(function() {
 		return self.filtered_runs().sort(function (a, b) {
+			if (a.time().getTime() == b.time().getTime()) {
+				return a.guid() == b.guid() ? 0 :
+					(a.guid() < b.guid() ? -1 : 1);
+			}
 			// Newest runs appear on top.
 			return b.time().getTime() - a.time().getTime();
 		});
