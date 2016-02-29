@@ -7,12 +7,12 @@
 	<div class="col-md-8">
 		<div class="panel panel-default">
 			<div class="jumbotron no-bottom-margin">
-				<h1>{#frontPageWelcome#}</h1>
-				<p>{#frontPageDescription#}</p>
+				<h1 class="text-center">{#frontPageWelcome#}</h1>
+				<p class="top-margin">{#frontPageDescription#}</p>
 				<div class="text-center">
 					<a href="/contest/new/" class="btn btn-primary btn-lg" id="contest-create">{#frontPageCreateContestButton#}</a>
 				</div>
-				<p>{#frontPageIntroduction#}</p>
+				<p class="text-center top-margin">{#frontPageIntroduction#}</p>
 				<div class="text-center">
 					<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
 				</div>
@@ -68,8 +68,8 @@
 				<h3 class="panel-title">{#frontPageMaterial#}</h3>
 			</div>
 			<div id="recommended_material" class="panel-body">
-				<a href="https://omegaup.com/img/libropre3.pdf">Descarga en PDF aquí:
-				<img src="https://omegaup.com/img/libroluis.gif" width="75%"/>
+				<a class="text-center center" href="https://omegaup.com/img/libropre3.pdf">Descarga en PDF aquí:
+				<img class="center top-margin" src="https://omegaup.com/img/libroluis.gif" width="75%"/>
 				</a>
 			</div>
 		</div>

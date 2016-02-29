@@ -23,8 +23,6 @@
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="/css/bootstrap.min.css">
-		<!-- Optional theme -->
-		<link rel="stylesheet" href="/css/bootstrap-theme.min.css">
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="/js/bootstrap.min.js?ver=176563"></script>
 		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->

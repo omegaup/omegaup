@@ -9,7 +9,7 @@
 			function(result) {
 				var html = "";
 				for (a = 0; a < result.rank.length; a++) {
-					html += "<tr><td>" + result.rank[a].rank + "</td><td><b><a href=/profile/"+ result.rank[a].username + ">"
+					html += "<tr><td>" + result.rank[a].rank + "</td><td class=\"forcebreaks forcebreaks-top-5\"><b><a href=/profile/"+ result.rank[a].username + ">"
 					+ ""+result.rank[a].username + "</a></b>" + getFlagSrc(result.rank[a], 'country_id')
 					+ "<br/>" + (result.rank[a].name == null ? "&nbsp;" : result.rank[a].name) + "</td>"
 					+ "<td>"+result.rank[a].score + "</td>"

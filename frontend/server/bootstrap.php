@@ -200,6 +200,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=92">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=16">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_32', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=32">');
+        $smarty->assign('CURRENT_USER_GRAVATAR_URL_51', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=51">');
 
         UITools::$isAdmin = $session['is_admin'];
         $userRequest['username'] = $session['username'];

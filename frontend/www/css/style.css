@@ -502,6 +502,7 @@ padding-right: 5px;
 #footer .navbar-brand { font-size: 14px; }
 #footer .navbar-nav a {  }
 
+.top-margin { margin-top: 15px; }
 .bottom-margin { margin-bottom: 15px; }
 .no-bottom-margin { margin-bottom: 0; }
 .no-right-padding { padding-right: 0; }
@@ -622,5 +623,41 @@ con un valor distinto de 0 en el ancho provoca un error de alineación,
 También es bueno aclarar que las listas tienen el texto alineado
 al centro por lo que el texto siempre se verá en orden. */
 .nav-tabs.nav-justified > li > a {
-	padding: 14px 0;
+	padding: 12px 0;
+	height: 56px;
+}
+
+.nav-tabs.nav-justified > li {
+        vertical-align: bottom;
+}
+
+/* Hack para la clase .active de bootstrap sobre
+las pestañas del framework. */
+.nav-tabs.nav-justified > .active > a,
+.nav-tabs.nav-justified > .active > a:hover,
+.nav-tabs.nav-justified > .active > a:focus,
+.nav-tabs.nav-justified > .active > a:active {
+	cursor: pointer;
+	background-color: #428BCA;
+	color: #FFFFFF;
+	border-bottom: 1px solid #428BCA;
+}
+
+/* Clase para quitar el padding de algún contenedor o div tag */
+.no-padding {
+	padding: 0;
+}
+/* Clase para quitar el margin de algún contenedor o div tag */
+.no-margin {
+	margin: 0;
+}
+/* Estilos de uso general */
+.center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.vertical-padding {
+	padding-top: 15px;
+	padding-bottom: 15px;
 }
