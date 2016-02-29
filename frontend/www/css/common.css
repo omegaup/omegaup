@@ -1,9 +1,15 @@
 #header { border-bottom-width: 0; }
 #header .caret { border-top-color: white; border-bottom-color: white; }
 #header .active > a { background-color: #5F87D4; }
-#header #user-dropdown img { width: 20px; height: 20px; }
+#header #user-dropdown img { width: 51px; height: 51px; }
 #header .navbar-header img { height: 20px; }
 #header .navbar-header .navbar-brand { background-color: white; background-image: linear-gradient(to bottom,white 0,#ddd 100%); }
+
+/* Elimina el padding del elemento dropdown del nombre
+del usuario para la redimesion de la imagen de perfil. */
+#user-dropdown {
+	padding: 0 12px 0 0;
+}
 
 #header .navbar-text,
 #header .navbar-nav > li > a {
@@ -19,9 +25,15 @@
 	background-color: #577DC7;
 }
 
+/* Cambio de background al pasar el mouse sobre las pestañas o al
+darle focus. */
+.nav-tabs.nav-justified > li > a:hover,
+.nav-tabs.nav-justified > li > a:focus {
+        background-color: #FFFFFF;
+}
+
 #header {
 	background-color: #678DD7;
-	background-image: linear-gradient(to bottom,#678DD7 0,#86AAF0 100%);
 	border-color:transparent;
 	margin: 0;
 }
@@ -50,4 +62,20 @@
 	.container {
 		max-width: 100% !important;
 	}
+}
+
+td.forcebreaks {
+        text-overflow: ellipsis !important;
+        word-wrap: break-word;
+        overflow: hidden;
+        display: table-cell;
+}
+
+/* Evita el desborde de la tabla top 5 coders trabajando
+en conjunto con la clase ".forcebreaks" de common.css
+de tal manera que se establece overflow: hidden con un ancho mximo
+de 99px de contenido para mostrar.  */
+td.forcebreaks-top-5 {
+        word-wrap: initial !important;
+        max-width: 197px;
 }

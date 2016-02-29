@@ -640,10 +640,6 @@ th.numeric {
 	margin-right: auto;
 }
 
-td.forcebreaks {
-	text-overflow: ellipsis !important;
-	word-wrap: break-word;
-	overflow: hidden;
-	display: table-cell;
-	max-width: 250px !important;
+td.forcebreaks-arena {
+        max-width: 250px !important;
 }

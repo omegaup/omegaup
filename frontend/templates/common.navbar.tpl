@@ -47,10 +47,10 @@
 						<ul class="nav navbar-nav navbar-right">
 							{if $LOGGED_IN eq '1'}
 								<li class="dropdown">
-								<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown"><span>{$CURRENT_USER_GRAVATAR_URL_32}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
+								<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown"><span>{$CURRENT_USER_GRAVATAR_URL_51}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
 									<ul class="dropdown-menu">
-									 <li><a href='/profile/'>{#navViewProfile#}</a></li>
-									 <li><a href='/logout/'>{#navLogOut#}</a></li>
+									 <li><a href='/profile/'><span class="glyphicon glyphicon-user"></span> {#navViewProfile#}</a></li>
+									 <li><a href='/logout/'><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
 									</ul>
 								</li>
 							{else}
