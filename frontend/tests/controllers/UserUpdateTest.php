@@ -20,7 +20,10 @@ class UserUpdateTest extends OmegaupTestCase {
         // Change values
         $r['name'] = Utils::CreateRandomString();
         $r['country_id'] = 'MX';
-        $r['state_id'] = 3;
+
+        $states = StatesDAO::search(array('country_id' => $r['country_id']));
+        $r['state_id'] = $states[0]->state_id;
+
         $r['scholar_degree'] = 'Maestría';
         $r['birth_date'] = strtotime('1988-01-01');
         $r['graduation_date'] = strtotime('2016-02-02');
@@ -36,5 +39,21 @@ class UserUpdateTest extends OmegaupTestCase {
         $this->assertEquals($user_db->getScholarDegree(), $r['scholar_degree']);
         $this->assertEquals($user_db->getBirthDate(), gmdate('Y-m-d', $r['birth_date']));
         $this->assertEquals($user_db->getGraduationDate(), gmdate('Y-m-d', $r['graduation_date']));
+    }
+
+    /**
+     * @expectedException InvalidDatabaseOperationException
+     */
+    public function testBadUserUpdate() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+        $r['name'] = Utils::CreateRandomString();
+
+        // Invalid state_id
+        $r['state_id'] = -1;
+
+        UserController::apiUpdate($r);
     }
 }
