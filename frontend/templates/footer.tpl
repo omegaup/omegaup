@@ -12,7 +12,7 @@
 	<!-- #content -->
 </div>
 		{if $OMEGAUP_GA_TRACK eq 1}
-		<script type="text/javascript" src="/js/google-analytics.js"></script>
+		<script type="text/javascript" src="/js/google-analytics.js?ver=bc0b14"></script>
 		{/if}
 <!-- #wrapper -->
 </body>
