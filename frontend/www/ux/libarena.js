@@ -585,10 +585,13 @@ Arena.prototype.flashTitle = function(reset) {
 	}
 };
 
-Arena.prototype.notify = function(title, message, element, id) {
+Arena.prototype.notify = function(title, message, element, id, modificationTime) {
 	var self = this;
 
-	if (self.currentNotifications.hasOwnProperty(id)) {
+	var lastModified = parseInt(
+			(typeof(localStorage) !== 'undefined' && localStorage.getItem(id)) || '0', 10) || 0;
+
+	if (self.currentNotifications.hasOwnProperty(id) || lastModified >= modificationTime) {
 		return;
 	}
 
@@ -603,6 +606,9 @@ Arena.prototype.notify = function(title, message, element, id) {
 		text: message,
 		sticky: true,
 		before_close: function() {
+			if (localStorage) {
+				localStorage.setItem(id, modificationTime);
+			}
 			if (element) {
 				window.focus();
 				element.scrollIntoView(true);
@@ -672,7 +678,8 @@ Arena.prototype.updateClarification = function(clarification) {
 			omegaup.escape(clarification.message) +
 				(clarification.answer ? ('<hr/>' + omegaup.escape(clarification.answer)) : ''),
 			r[0],
-			'clarification-' + clarification.clarification_id
+			'clarification-' + clarification.clarification_id,
+			clarification.time.getTime()
 		);
 	}
 
