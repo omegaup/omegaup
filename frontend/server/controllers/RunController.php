@@ -531,22 +531,20 @@ class RunController extends Controller {
 
         $response = array();
 
+        // Get the error
+        $grade_dir = RunController::getGradePath($r['run']);
+        if (file_exists("$grade_dir/compile_error.log")) {
+            $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
+        }
+
         if (OMEGAUP_LOCKDOWN) {
-            // OMI hotfix
-            // @TODO @joemmanuel, hay que localizar este msg :P
-            $response['source'] = 'Ver el código ha sido temporalmente desactivado.';
+            $response['source'] = 'lockdownDetailsDisabled';
             $response['status'] = 'ok';
             return $response;
         }
 
         // Get the source
         $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-
-        // Get the error
-        $grade_dir = RunController::getGradePath($r['run']);
-        if (file_exists("$grade_dir/compile_error.log")) {
-            $response['compile_error'] = file_get_contents("$grade_dir/compile_error.log");
-        }
 
         if (Authorization::IsProblemAdmin($r['current_user_id'], $r['problem'])) {
             if (file_exists("$grade_dir/details.json")) {

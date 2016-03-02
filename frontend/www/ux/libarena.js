@@ -75,6 +75,9 @@ function Arena() {
 	this.clarifications = {};
 	this.submissionGap = 0;
 
+	// If lockdown mode is active.
+	this.lockdown = $('body').hasClass('lockdown');
+
 	// Setup any global hooks.
 	this.installLibinteractiveHooks();
 
@@ -874,7 +877,9 @@ Arena.prototype.detectShowRun = function() {
 	if (showRunMatch) {
 		$('#overlay form').hide();
 		$('#overlay').show();
-		omegaup.runDetails(showRunMatch[1], self.displayRunDetails.bind(self));
+		omegaup.runDetails(showRunMatch[1], function(data) {
+			self.displayRunDetails(showRunMatch[1], data);
+		});
 	}
 };
 
@@ -883,7 +888,7 @@ Arena.prototype.hideOverlay = function() {
 	window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
 };
 
-Arena.prototype.displayRunDetails = function(data) {
+Arena.prototype.displayRunDetails = function(guid, data) {
 	var self = this;
 
 	if (data.status == 'error') {
@@ -907,6 +912,11 @@ Arena.prototype.displayRunDetails = function(data) {
 	}
 	if (data.source.indexOf('data:') === 0) {
 		$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">' + OmegaUp.T['wordsDownload'] + '</a>');
+	} else if (data.source == 'lockdownDetailsDisabled') {
+		$('#run-details .source').html(
+				(typeof(sessionStorage) !== 'undefined' &&
+				 sessionStorage.getItem('run:' + guid)) ||
+				OmegaUp.T['lockdownDetailsDisabled']);
 	} else {
 		$('#run-details .source').html(omegaup.escape(data.source));
 	}

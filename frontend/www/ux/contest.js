@@ -240,6 +240,10 @@ $(document).ready(function() {
 				return;
 			}
 
+			if (arena.lockdown && sessionStorage) {
+				sessionStorage.setItem('run:' + run.guid, code);
+			}
+
 			if (!arena.onlyProblem) {
 				arena.problems[arena.currentProblem.alias].last_submission = omegaup.time().getTime();
 			}

@@ -176,6 +176,7 @@ libinteractiveIdlFilenameHelp = "The name of the .idl file (without extension). 
 libinteractiveLanguage = "Language"
 libinteractiveOs = "Operating System"
 locale = "en"
+lockdownDetailsDisabled = "Viewing source code has been temporarily disabled."
 loginDisabled = "Your user is too old and for your security it has been disabled. Please contact omegaup-soporte@googlegroups.com to login again."
 loginEmail = "E-mail"
 loginEmailUsername = "E-mail or user"

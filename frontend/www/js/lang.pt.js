@@ -177,6 +177,7 @@ OmegaUp.T = {
 	libinteractiveLanguage: "Idioma",
 	libinteractiveOs: "Sistema Operacional",
 	locale: "pt",
+	lockdownDetailsDisabled: "Visualizando o código-fonte foi desativada temporariamente.",
 	loginDisabled: "O usuário é muito antigo e para a sua segurança ele foi desativado. Entre em contato com omegaup-soporte@googlegroups.com para acessar novamente.",
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail ou usuário",

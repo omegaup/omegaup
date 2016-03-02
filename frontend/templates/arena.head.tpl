@@ -13,8 +13,8 @@
 		<script type="text/javascript" src="/js/knockout-secure-binding.min.js?ver=81a2a3"></script>
 
 		<script type="text/javascript" src="/js/omegaup.js?ver=795dcd"></script>
-		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=6f8b8b,e2245f,9c2261,8fd3f0"></script>
-		<script type="text/javascript" src="/ux/libarena.js?ver=450a5e"></script>
+		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=89701d,4cd8a5,f7e174,484275"></script>
+		<script type="text/javascript" src="/ux/libarena.js?ver=319596"></script>
 		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>
 		{/if}
@@ -44,7 +44,7 @@
 		<link rel="stylesheet" href="/ux/arena.css?t=5" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 	</head>
-	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}>
+	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>
 
 		<!-- Generated from http://ajaxload.info/ -->
 		{if !isset($bodyid) or $bodyid != 'only-problem'}
