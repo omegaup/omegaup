@@ -481,7 +481,9 @@ class ContestController extends Controller {
     }
 
     /**
-     * Returns details of a Contest
+     * Returns details of a Contest. Requesting the details of a contest will
+     * not start the current user into that contest. In order to participate
+     * in the contest, ContestController::apiOpen() must be used.
      *
      * @param Request $r
      * @return array

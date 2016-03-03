@@ -19,7 +19,7 @@ require_once('base/Contests_Users.vo.base.php');
   */
 class ContestsUsersDAO extends ContestsUsersDAOBase {
     public static function CheckAndSaveFirstTimeAccess($user_id, $contest_id, $grant_access = false) {
-            $contest_user = self::getByPK($user_id, $contest_id);
+        $contest_user = self::getByPK($user_id, $contest_id);
 
         if (is_null($contest_user)) {
             if (!$grant_access) {
