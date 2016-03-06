@@ -640,6 +640,90 @@ class UserController extends Controller {
             $keys = array(
                 'OMIS2016' => 800,
             );
+        } elseif ($r['contest_type'] == 'OMIPN') {
+            if ($r['current_user']->getUsername() != 'andreasantillana'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys = array(
+                'OMIP2016-AGU' => 4,
+                'OMIP2016-BCN' => 4,
+                'OMIP2016-BCS' => 4,
+                'OMIP2016-CAM' => 4,
+                'OMIP2016-CHH' => 4,
+                'OMIP2016-CHP' => 4,
+                'OMIP2016-CMX' => 4,
+                'OMIP2016-COA' => 4,
+                'OMIP2016-COL' => 4,
+                'OMIP2016-DUR' => 4,
+                'OMIP2016-GRO' => 4,
+                'OMIP2016-GUA' => 4,
+                'OMIP2016-HID' => 4,
+                'OMIP2016-JAL' => 4,
+                'OMIP2016-MEX' => 4,
+                'OMIP2016-MIC' => 4,
+                'OMIP2016-MOR' => 4,
+                'OMIP2016-NAY' => 4,
+                'OMIP2016-NLE' => 4,
+                'OMIP2016-OAX' => 4,
+                'OMIP2016-PUE' => 4,
+                'OMIP2016-QTO' => 4,
+                'OMIP2016-ROO' => 4,
+                'OMIP2016-SIN' => 4,
+                'OMIP2016-SLP' => 4,
+                'OMIP2016-SON' => 4,
+                'OMIP2016-TAB' => 4,
+                'OMIP2016-TAM' => 4,
+                'OMIP2016-TLA' => 4,
+                'OMIP2016-VER' => 4,
+                'OMIP2016-YUC' => 4,
+                'OMIP2016-ZAC' => 4,
+                'OMIP2016-INV' => 4,
+            );
+        } elseif ($r['contest_type'] == 'OMISN') {
+            if ($r['current_user']->getUsername() != 'andreasantillana'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys = array(
+                'OMIS2016-AGU' => 4,
+                'OMIS2016-BCN' => 4,
+                'OMIS2016-BCS' => 4,
+                'OMIS2016-CAM' => 4,
+                'OMIS2016-CHH' => 4,
+                'OMIS2016-CHP' => 4,
+                'OMIS2016-CMX' => 4,
+                'OMIS2016-COA' => 4,
+                'OMIS2016-COL' => 4,
+                'OMIS2016-DUR' => 4,
+                'OMIS2016-GRO' => 4,
+                'OMIS2016-GUA' => 4,
+                'OMIS2016-HID' => 4,
+                'OMIS2016-JAL' => 4,
+                'OMIS2016-MEX' => 4,
+                'OMIS2016-MIC' => 4,
+                'OMIS2016-MOR' => 4,
+                'OMIS2016-NAY' => 4,
+                'OMIS2016-NLE' => 4,
+                'OMIS2016-OAX' => 4,
+                'OMIS2016-PUE' => 4,
+                'OMIS2016-QTO' => 4,
+                'OMIS2016-ROO' => 4,
+                'OMIS2016-SIN' => 4,
+                'OMIS2016-SLP' => 4,
+                'OMIS2016-SON' => 4,
+                'OMIS2016-TAB' => 4,
+                'OMIS2016-TAM' => 4,
+                'OMIS2016-TLA' => 4,
+                'OMIS2016-VER' => 4,
+                'OMIS2016-YUC' => 4,
+                'OMIS2016-ZAC' => 4,
+                'OMIS2016-INV' => 4,
+            );
         } elseif ($r['contest_type'] == 'ORIG') {
             if ($r['current_user']->getUsername() != 'kuko.coder'
                 && !$is_system_admin
