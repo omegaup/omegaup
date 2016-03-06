@@ -56,8 +56,33 @@
 
 @media print {
 	@page { margin: 1in; }
-	.page-break	   { display: block; page-break-before: always; }
-	table {	page-break-inside: avoid;	}
+	.page-break	{
+		display: block;
+		page-break-before: always;
+		break-before: always;
+		-webkit-region-break-before: always;
+	}
+	table {
+		page-break-inside: avoid;
+		break-inside: avoid;
+		-webkit-region-break-inside: avoid;
+	}
+	body {
+		font-size: 12pt;
+	}
+	p {
+		font-family: Georgia, serif;
+	}
 	hr { display: none; }
-	h1, h2, h3 { page-break-after: avoid; }
+	h1, h2, h3 {
+		page-break-after: avoid;
+		break-after: avoid;
+		-webkit-region-break-after: avoid;
+	}
+	div.libinteractive-download {
+		display: none;
+	}
+	.statement img {
+		max-width: 100%;
+	}
 }

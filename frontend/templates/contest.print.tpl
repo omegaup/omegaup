@@ -14,7 +14,7 @@
 <body id="report">
 {foreach name=outer item=problem from=$problems}
 	<div class="title">
-		<h1 class="contest-title">{$problem.letter}. {$problem.title}</h1>
+		<h1 class="problem-title">{$problem.letter}. {$problem.title}</h2>
 		<table class="data">
 			<tr>
 				<td>{#wordsPoints#}</td>
