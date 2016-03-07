@@ -322,6 +322,7 @@ omegaup.T = {
 	navViewProfile: "Meu perfil",
 	noCoders: "Nenhum coder",
 	notRegisteredInContest: "Você não está registrado para este concurso.",
+	notificationsMarkAllAsRead: "Marcar tudo como lido",
 	oldPassword: "Senha antiga",
 	omegaupTitleAdminChangePassword: "Mudar senha",
 	omegaupTitleAdminIndex: "Admin",
