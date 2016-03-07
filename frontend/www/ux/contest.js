@@ -248,6 +248,7 @@ $(document).ready(function() {
 				arena.problems[arena.currentProblem.alias].last_submission = omegaup.time().getTime();
 			}
 
+			run.username = omegaup.username;
 			run.status = 'new';
 			run.alias = arena.currentProblem.alias;
 			run.contest_score = null;
@@ -256,8 +257,7 @@ $(document).ready(function() {
 			run.runtime = 0;
 			run.memory = 0;
 			run.language = $('#submit select[name="language"]').val();
-			arena.trackRun(run);
-			arena.updateRunFallback(run.guid, run);
+			arena.updateRun(run);
 
 			$('#submit input').removeAttr('disabled');
 			$('#submit textarea[name="code"]').val('');

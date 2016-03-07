@@ -423,6 +423,9 @@ class RunController extends Controller {
         if ($filtered['contest_score'] != null) {
             $filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
         }
+        if ($r['run']->user_id == $r['current_user_id']) {
+            $filtered['username'] = $r['current_user']->username;
+        }
 
         $response = $filtered;
 
