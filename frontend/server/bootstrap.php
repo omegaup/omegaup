@@ -37,7 +37,7 @@ if (!(defined('IS_TEST') && IS_TEST === true)) {
     }
 }
 
-define('OMEGAUP_LOCKDOWN', isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == OMEGAUP_LOCKDOWN_DOMAIN);
+define('OMEGAUP_LOCKDOWN', isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], OMEGAUP_LOCKDOWN_DOMAIN) === 0);
 define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
 
 $csp_mode = 'Content-Security-Policy';
