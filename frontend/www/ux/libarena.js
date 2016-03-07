@@ -17,8 +17,8 @@ function Arena() {
 	this.submissionDeadline = null;
 
 	// All runs in this contest/problem.
-	this.runs = new Arena.RunView();
-	this.myRuns = new Arena.RunView();
+	this.runs = new Arena.RunView(this);
+	this.myRuns = new Arena.RunView(this);
 	this.myRuns.filter_username(omegaup.username);
 
 	// The guid of any run that is pending.
@@ -271,11 +271,12 @@ Arena.prototype.updateClock = function() {
 	$('#title .clock').html(clock);
 };
 
-Arena.prototype.updateRunFallback = function(guid, orig_run) {
+Arena.prototype.updateRunFallback = function(guid) {
 	var self = this;
-	if (self.socket == null) {
-		setTimeout(function() { omegaup.runStatus(guid, self.updateRun.bind(self)); }, 5000);
-	}
+	if (self.socket != null) return;
+	setTimeout(function() {
+		omegaup.runStatus(guid, self.updateRun.bind(self));
+	}, 5000);
 }
 
 Arena.prototype.updateRun = function(run) {
@@ -283,14 +284,14 @@ Arena.prototype.updateRun = function(run) {
 
 	self.trackRun(run);
 
-	if (self.socket == null) {
-		if (run.status == 'ready') {
-			if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
-				omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
-			}
-		} else {
-			self.updateRunFallback(run.guid, run);
+	if (self.socket != null) return;
+
+	if (run.status == 'ready') {
+		if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
+			omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
 		}
+	} else {
+		self.updateRunFallback(run.guid);
 	}
 };
 
@@ -1091,9 +1092,10 @@ Arena.formatDelta = function(delta) {
 	return clock;
 };
 
-Arena.RunView = function() {
+Arena.RunView = function(arena) {
 	var self = this;
 
+	self.arena = arena;
 	self.row_count = 100;
 	self.filter_verdict = ko.observable();
 	self.filter_status = ko.observable();
@@ -1212,7 +1214,7 @@ Arena.RunView.prototype.trackRun = function(run) {
 	var self = this;
 
 	if (!self.observableRunsIndex[run.guid]) {
-		self.observableRunsIndex[run.guid] = new Arena.ObservableRun(run);
+		self.observableRunsIndex[run.guid] = new Arena.ObservableRun(self.arena, run);
 		self.runs.push(self.observableRunsIndex[run.guid]);
 	} else {
 		self.observableRunsIndex[run.guid].update(run);
@@ -1226,9 +1228,10 @@ Arena.RunView.prototype.clear = function(run) {
 	self.observableRunsIndex = {};
 };
 
-Arena.ObservableRun = function(run) {
+Arena.ObservableRun = function(arena, run) {
 	var self = this;
 
+	self.arena = arena;
 	self.guid = run.guid;
 	self.short_guid = run.guid.substring(0, 8);
 
@@ -1377,6 +1380,7 @@ Arena.ObservableRun.prototype.rejudge = function() {
 	omegaup.runRejudge(self.guid, false, function(data) {
 		if (data.status == 'ok') {
 			self.status('rejudging');
+			self.arena.updateRunFallback(self.guid);
 		}
 	});
 };
@@ -1386,6 +1390,7 @@ Arena.ObservableRun.prototype.debug_rejudge = function() {
 	omegaup.runRejudge(self.guid, true, function(data) {
 		if (data.status == 'ok') {
 			self.status('rejudging');
+			self.arena.updateRunFallback(self.guid);
 		}
 	});
 };
