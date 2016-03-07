@@ -70,8 +70,9 @@
 	body {
 		font-size: 12pt;
 	}
-	p {
+	p, li {
 		font-family: Georgia, serif;
+		line-height: 120% !important;
 	}
 	hr { display: none; }
 	h1, h2, h3 {
