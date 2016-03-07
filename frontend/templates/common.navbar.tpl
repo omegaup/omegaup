@@ -1,4 +1,4 @@
-			<div id="header" class="navbar navbar-static-top" role="navigation">
+			<div id="header" class="navbar navbar-static-top navbar-fixed-top" role="navigation">
 				<div class="navbar-inner">
 					<div class="container">
 						<div class="navbar-header">
@@ -46,6 +46,24 @@
 
 						<ul class="nav navbar-nav navbar-right">
 							{if $LOGGED_IN eq '1'}
+								{if isset($inContest)}
+								<li class="dropdown">
+        								<a href="#" id="notification-button" class="dropdown-toggle" data-toggle="dropdown">
+                								<span class="notification-icon glyphicon glyphicon-bell"></span>
+                								<span id="notification-counter" class="label label-danger">0</span>
+        								</a>
+									<ul id="notification-menu" class="dropdown-menu">
+										<div id="notification-tools">
+											<a id="clear-notifications" href="#" class="btn btn-link pull-right">
+												<span class="glyphicon glyphicon-align-right"></span> 
+												Limpiar todo
+											</a>
+										</div>
+										<div id="notification-drawer">
+										</div>
+									</ul>
+								</li>
+								{/if}
 								<li class="dropdown">
 								<a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown"><span>{$CURRENT_USER_GRAVATAR_URL_51}&nbsp;&nbsp; {$CURRENT_USER_USERNAME}<span class="caret"></span></a>
 									<ul class="dropdown-menu">

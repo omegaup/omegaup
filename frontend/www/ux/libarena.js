@@ -605,6 +605,16 @@ Arena.prototype.notify = function(title, message, element, id, modificationTime)
 
 	self.currentNotifications.count++;
 
+	$('#notification-drawer').addNotify({
+		id: id,
+		title: title,
+		text: message,
+		counter: $('#notification-counter'),
+		tools:	$('#notification-tools')
+	});
+
+	/*
+
 	var gid = $.gritter.add({
 		title: title,
 		text: message,
@@ -628,6 +638,7 @@ Arena.prototype.notify = function(title, message, element, id, modificationTime)
 	});
 
 	self.currentNotifications[id] = gid;
+	*/
 
 	var audio = document.getElementById('notification_audio');
 	if (audio != null) audio.play();
@@ -638,6 +649,34 @@ Arena.prototype.updateClarification = function(clarification) {
 	var r = null;
 	if (self.clarifications[clarification.clarification_id]) {
 		r = self.clarifications[clarification.clarification_id];
+		var $clarification = $('#clarification-' + clarification.clarification_id );
+
+		if( $clarification.length == 1 ) {
+			if( localStorage ) {
+				var notifications = parseInt( localStorage['notifications'] );
+				if( notifications == 0 ){
+					localStorage['notifications'] = notifications + 1;
+					if( $('#notification-counter').hasClass('hide') ) {
+						$('#notification-counter').removeClass('hide');
+					}
+					$('#notification-counter').text('' + localStorage['notifications'] + '');
+				}
+			}
+			$clarification.modifyNotification({
+				title: clarification.problem_alias,
+				text: omegaup.escape(clarification.message) +
+				(clarification.answer ? ('<div class="divider"></div>' + omegaup.escape(clarification.answer)) : '')
+			});
+		} else {
+			$('#notification-drawer').addNotify({
+				id: 'clarification-' + clarification.clarification_id,
+				title: clarification.problem_alias,
+				text: omegaup.escape(clarification.message) +
+				(clarification.answer ? ('<div class="divider"></div>' + omegaup.escape(clarification.answer)) : ''),
+				counter: $('#notification-counter'),
+				tools:	$('#notification-tools')
+			});
+		}
 	} else {
 		r = $('.clarifications tbody.clarification-list tr.template')
 			.clone()
@@ -680,7 +719,7 @@ Arena.prototype.updateClarification = function(clarification) {
 		self.notify(
 			(clarification.author ? clarification.author + " - " : '') + clarification.problem_alias,
 			omegaup.escape(clarification.message) +
-				(clarification.answer ? ('<hr/>' + omegaup.escape(clarification.answer)) : ''),
+				(clarification.answer ? ('<div class="divider"></div>' + omegaup.escape(clarification.answer)) : ''),
 			r[0],
 			'clarification-' + clarification.clarification_id,
 			clarification.time.getTime()

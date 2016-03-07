@@ -5,6 +5,7 @@
 		<title>{if isset($title)}{$title|escape} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="/js/jquery-1.10.2.js?ver=c5c648"></script>
 		<script type="text/javascript" src="/js/jquery.ba-hashchange.js?ver=8c26ca"></script>
+		<script type="text/javascript" src="/js/jquery.notify.js"></script>
 		<script type="text/javascript" src="/js/jquery.gritter.min.js?ver=333689"></script>
 		<script type="text/javascript" src="/js/jquery.tableSort.js?ver=f4ef14"></script>
 		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>
