@@ -1,101 +1,183 @@
-$.fn.addNotify = function( obj ) {
-	return this.each ( function() {
-		if( $('#'+obj.id).length > 0 ) {
-			return;
-		}
+function Notification ( obj ) {
 
-		var 	$this 	= $(this),
-			$notify	= $('<a href="#"></a>'),
-			$li 	= $('<li id="'+ obj.id +'" class="alert-dismissible" role="alert"></li>');
+	var self = this;
 
-		$notify.click( function () { $('#notification-menu').dropdown('toggle');  });
-		$li.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+	self.counter;
+	self.drawer;
+	self.menu;
+	self.button;
+	self.tools;
+	self.tag_counter;
 
-		if( obj.hasOwnProperty('title') ) {
-			$notify.append('<h4>'+obj.title+'</h4>');
-		}
-		if( obj.hasOwnProperty('text') ) {
-			var tmp = $('<p></p>');
-			tmp.append(obj.text);
-			$notify.append(tmp);
-		} 
-		
-		$li.append($notify);
-		$this.prepend($li);
-		
-		if( obj.hasOwnProperty('counter') ) {
+	self.__construct = function ( obj ) {
+	  self.counter = 0;
 
-			if( localStorage ) {
-				var notifications = localStorage['notifications'];
+	  if ( !obj.hasOwnProperty('element') ) {
+	  	return;
+	  }
 	
-				localStorage['notifications'] =  ( notifications == null ) ? 0 : parseInt( notifications ) + 1; 
-				
-				if( obj.counter.hasClass('hide') ) {
-					obj.counter.removeClass('hide');
-				}
-	
-				obj.counter.text( localStorage['notifications'] );
-			}
-		} 
-	});
-};
+	  if ( $('.notification-drawer', obj.element).length > 0 ) {
+	  	self.drawer = $('.notification-drawer', obj.element);
+	  }
 
-$.fn.modifyNotification = function ( obj ) {
-	var	$this	= $(this),
-		$notify = $('<a href="#"></a>');
+	  if ( $('.notification-menu', obj.element).length > 0 ) {
+	  	self.menu = $('.notification-menu', obj.element);
+	  }
 
-	$notify.click( function () { $('#notification-menu').dropdown('toggle');  });
-	$this.html('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');	
+	  if ( $('.notification-button', obj.element).length > 0 ) {
+	  	self.button = $('.notification-button', obj.element);
 
-	if( obj.hasOwnProperty('title') ) {
-		$notify.append('<h4>' + obj.title + '</h4>');
-	} 
+	  	self.button.click( function () {
+	  		self.counter = 0;
 
-	if( obj.hasOwnProperty('text') ) {
-		var tmp = $('<p></p>');
-		tmp.html(obj.text);
-		$notify.append(tmp);
-	}
-	$this.append($notify);
-};
+	  		if ( self.tag_counter ) {
+	  			self.tag_counter.addClass('hide');
+	  		}
+	  	});
+	  }
 
-$.fn.clearNotifications = function( element ) {
-	var	$element = $(element);
+	  if ( $('.notification-tools', obj.element).length > 0 ) {
+	  	self.tools = $('.notification-tools', obj.element);
+	  }
 
-	return $(this).each( function () {
-		var	$this = $(this);
-		$this.click( function(event) {
-			event.preventDefault();
-			$('#notification-menu').dropdown('toggle');
-			var	arr = $element.children(),
-				tmp = {};
+	  if ( $('.notification-counter', obj.element).length > 0 ) {
+	  	self.tag_counter = $('.notification-counter', obj.element);
+	  	self.tag_counter.addClass('hide');
+	  }
+
+	  if ( $('.clear-notifications', obj.element).length > 0 && self.menu && self.drawer ) {
+	  	$('.clear-notifications', obj.element).click( function (event) {
+	  		event.preventDefault();
 			
-			tmp.idx		= 0;
-			tmp.limit	= arr.length;
+			self.menu.dropdown('toggle');
+
+			var	arr 	= self.drawer.children(),
+				idx		= 0,
+				limit	= arr.length;
 		
 			var thread	= setInterval( function () {
-				if( tmp.idx < tmp.limit ) {
-					$( arr[ tmp.idx ] ).fadeOut(200, function() {
+				if( idx < limit ) {
+					$( arr[ idx ] ).fadeOut(200, function() {
 						$(this).remove();
 					});
 					
-					++tmp.idx;
+					++idx;
 				} else {
 					clearInterval(thread);
 				}
 			}, 200);
-		});
-	});
-}; 
-
-$(document).on('ready', function(){ 
-	$('#clear-notifications').clearNotifications('#notification-drawer');
-	if( localStorage ) {
-		localStorage['notifications'] = 0;
-		$('#notification-counter').addClass('hide');
+	  	});
+	  }
+	
 	}
-	$('#notification-button').click( function () {
-		localStorage['notifications'] = 0;
-		$('#notification-counter').addClass('hide');
+
+	self.__construct( obj );
+
+}
+
+Notification.prototype.add = function ( obj ) {
+
+	var self = this;
+
+	if ( !self.drawer ||
+		!obj.hasOwnProperty('id') ) {
+		return;
+	}
+
+	if ( $('#'+obj.id).length > 0 ) {
+	  return;
+	}
+
+  	var $notify 	= $('<a href="#"></a>'),
+	  	$li     	= $('<li id="' + obj.id + '" class="alert-dismissible" role="alert"></li>'),
+	  	$btn_close	= $('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+
+  	$notify.click( function () { self.menu.dropdown('toggle'); });  
+  	$btn_close.click( function () { self.menu.dropdown('toggle'); $(this).parent().remove() }); 
+
+  	$li.append($btn_close);
+
+  	if ( obj.hasOwnProperty('title') ) {
+		$notify.append('<h4>'+obj.title+'</h4>');
+  	}
+
+  	if ( obj.hasOwnProperty('text') ) {
+		var tmp = $('<p></p>');
+		tmp.append(obj.text);
+		$notify.append(tmp);
+  	} 
+  
+  	$li.append($notify);
+  	self.drawer.prepend($li);
+
+  	++self.counter;
+
+  	if ( self.tag_counter ) {
+
+		if ( self.tag_counter.hasClass('hide') ) {
+	  		self.tag_counter.removeClass('hide');
+		}
+		self.tag_counter.text( self.counter );
+  	}
+
+};
+
+Notification.prototype.modify = function ( obj ) {
+
+	var self = this;
+
+	if ( !obj.hasOwnProperty('id') ) {
+		return;
+	}
+
+	var $li = $('#' + obj.id);
+
+	if ( $li.length == 1 ) {
+
+		++self.counter;
+
+		if ( self.tag_counter ) {
+			
+			if ( self.tag_counter.hasClass('hide') ) {
+				self.tag_counter.removeClass('hide');
+			}
+			self.tag_counter.text( self.counter );
+		}
+
+		var $notify 	= $('<a href="#"></a>'),
+			$btn_close 	= $('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+
+		$notify.click( function () { self.menu.dropdown('toggle'); });  
+		$btn_close.click( function () { self.menu.dropdown('toggle'); $(this).parent().remove() }); 
+
+		$li.html($btn_close); 
+
+		if ( obj.hasOwnProperty('title') ) {
+			$notify.append('<h4>' + obj.title + '</h4>');
+		} 
+
+		if ( obj.hasOwnProperty('text') ) {
+			var tmp = $('<p></p>');
+			tmp.html(obj.text);
+			$notify.append(tmp);
+		}
+		  
+		$li.append($notify);
+	} else {
+
+		self.add({
+			id: obj.id,
+			title: obj.hasOwnProperty('title') ? obj.title : "",
+			text: obj.hasOwnProperty('text') ? obj.text : ""
+		});
+
+	}
+};
+
+// Declarar las notificaciones...
+var $notification = null;
+$(function () {
+	$notification = new Notification({
+		element: 	$('#my-notifications')
 	});
 });

@@ -47,19 +47,19 @@
 						<ul class="nav navbar-nav navbar-right">
 							{if $LOGGED_IN eq '1'}
 								{if isset($inContest)}
-								<li class="dropdown">
-        								<a href="#" id="notification-button" class="dropdown-toggle" data-toggle="dropdown">
+								<li id="my-notifications" class="dropdown">
+        								<a href="#" class="notification-button dropdown-toggle" data-toggle="dropdown">
                 								<span class="notification-icon glyphicon glyphicon-bell"></span>
-                								<span id="notification-counter" class="label label-danger">0</span>
+                								<span class="notification-counter label label-danger">0</span>
         								</a>
-									<ul id="notification-menu" class="dropdown-menu">
-										<div id="notification-tools">
-											<a id="clear-notifications" href="#" class="btn btn-link pull-right">
+									<ul class="notification-menu dropdown-menu">
+										<div class="notification-tools">
+											<a href="#" class="clear-notifications btn btn-link pull-right">
 												<span class="glyphicon glyphicon-align-right"></span>
 												Limpiar todo
 											</a>
 										</div>
-										<div id="notification-drawer">
+										<div class="notification-drawer">
 										</div>
 									</ul>
 								</li>

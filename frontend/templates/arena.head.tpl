@@ -5,7 +5,7 @@
 		<title>{if isset($title)}{$title|escape} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="/js/jquery-1.10.2.js?ver=c5c648"></script>
 		<script type="text/javascript" src="/js/jquery.ba-hashchange.js?ver=8c26ca"></script>
-		<script type="text/javascript" src="/js/jquery.notify.js?ver=b67538"></script>
+		<script type="text/javascript" src="/js/jquery.notify.js?ver=4e7d64"></script>
 		<script type="text/javascript" src="/js/jquery.gritter.min.js?ver=333689"></script>
 		<script type="text/javascript" src="/js/jquery.tableSort.js?ver=f4ef14"></script>
 		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>
@@ -15,7 +15,7 @@
 
 		<script type="text/javascript" src="/js/omegaup.js?ver=795dcd"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=89701d,4cd8a5,f7e174,484275"></script>
-		<script type="text/javascript" src="/ux/libarena.js?ver=0477f6"></script>
+		<script type="text/javascript" src="/ux/libarena.js?ver=0fac77"></script>
 
 		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>

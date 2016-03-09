@@ -105,14 +105,14 @@ de 99px de contenido para mostrar.  */
 }
 
 /* Botón de las notificaciones */
-#notification-button {
-	padding-top: 10px;
-	padding-right: 12px;
-	padding-left: 19px;
+.notification-button {
+	padding-top: 10px !important;
+	padding-right: 12px !important;
+	padding-left: 19px !important;
 	font-size: 22px;
 }
 
-#notification-counter {
+.notification-counter {
 	font-size: 16px;
 	padding: 2px 4px;
 	position: absolute;
@@ -120,56 +120,56 @@ de 99px de contenido para mostrar.  */
 	left: 14px;
 }
 
-#notification-drawer::-webkit-scrollbar-track {
+.notification-drawer::-webkit-scrollbar-track {
 	border-radius: 10px;
 	background-color: #F5F5F5;
 }
 
-#notification-drawer::-webkit-scrollbar {
+.notification-drawer::-webkit-scrollbar {
 	width: 8px;
 	height: 8px;
 	background-color: #F5F5F5;
 }
 
-#notification-drawer::-webkit-scrollbar-thumb {
+.notification-drawer::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	background-color: #7F7F7F;
 }
 
-#notification-drawer {
+.notification-drawer {
 	width: 320px;
 	max-width: 320px;
         max-height: 380px;
         overflow-y: scroll;
 }
 
-#notification-drawer li {
+.notification-drawer li {
 	padding: 3px 20px;
 	border-top: 1px solid #F1F1F1;
 }
 
-#notification-drawer li a {
+.notification-drawer li a {
         overflow: hidden;
         white-space: normal;
 	color: #333;
 	text-decoration: none;
 }
 
-#notification-drawer li:hover,
-#notification-drawer li:focus,
-#notification-drawer li:active {
+.notification-drawer li:hover,
+.notification-drawer li:focus,
+.notification-drawer li:active {
 	cursor: pointer;
 	background-color: #678DD7;
 	text-decoration: none;
 }
 
-#notification-drawer li:hover > a,
-#notification-drawer li:focus > a,
-#notification-drawer li:active > a {
+.notification-drawer li:hover > a,
+.notification-drawer li:focus > a,
+.notification-drawer li:active > a {
 	color: #FFF;
 }
 
-#notification-drawer li a > h4,
-#notification-drawer li a > p {
+.notification-drawer li a > h4,
+.notification-drawer li a > p {
         word-wrap: break-word;
 }
