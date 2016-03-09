@@ -731,7 +731,7 @@ Arena.prototype.updateClarification = function(clarification) {
     r = self.clarifications[clarification.clarification_id];
 
     $notification.modify({
-      id: '#clarification-' + clarification.clarification_id,
+      id: 'clarification-' + clarification.clarification_id,
       title: clarification.problem_alias,
       text: omegaup.escape(clarification.message) +
       (clarification.answer ? ('<div class="divider"></div>' + omegaup.escape(clarification.answer)) : '')
