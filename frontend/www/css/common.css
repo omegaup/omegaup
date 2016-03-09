@@ -136,7 +136,6 @@ de 99px de contenido para mostrar.  */
 	background-color: #7F7F7F;
 }
 
-
 #notification-drawer {
 	width: 320px;
 	max-width: 320px;
@@ -157,11 +156,11 @@ de 99px de contenido para mostrar.  */
 }
 
 #notification-drawer li:hover,
-#notification-drawer li:focus, 
+#notification-drawer li:focus,
 #notification-drawer li:active {
 	cursor: pointer;
 	background-color: #678DD7;
-	text-decoration: none;	
+	text-decoration: none;
 }
 
 #notification-drawer li:hover > a,

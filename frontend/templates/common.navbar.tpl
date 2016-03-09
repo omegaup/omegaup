@@ -55,7 +55,7 @@
 									<ul id="notification-menu" class="dropdown-menu">
 										<div id="notification-tools">
 											<a id="clear-notifications" href="#" class="btn btn-link pull-right">
-												<span class="glyphicon glyphicon-align-right"></span> 
+												<span class="glyphicon glyphicon-align-right"></span>
 												Limpiar todo
 											</a>
 										</div>

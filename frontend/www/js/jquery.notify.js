@@ -69,7 +69,6 @@ $.fn.clearNotifications = function( element ) {
 			$('#notification-menu').dropdown('toggle');
 			var	arr = $element.children(),
 				tmp = {};
-
 			
 			tmp.idx		= 0;
 			tmp.limit	= arr.length;
