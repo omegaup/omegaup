@@ -715,7 +715,7 @@ Arena.prototype.notify = function(title, message, element, id) {
   self.currentNotifications.count++;
 
   $notification.add({
-    id:       id, 
+    id:       id,
     title:    title,
     text:     message
   });
