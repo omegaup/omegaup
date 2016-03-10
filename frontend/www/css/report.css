@@ -1,6 +1,9 @@
 @media all {
 	.page-break	   { display: none; }
-	body               { font-family: sans-serif; font-size: 10pt; }
+	body {
+		font-size: 10pt;
+		font-family: "Arial Narrow", sans-serif;
+	}
 	tr:nth-child(even) { background-color: #eee; }
 	td.numeric         { text-align: right; }
 	table td {
@@ -52,6 +55,22 @@
 		padding: 0px;
 		margin: inherit;
 	}
+	p, li {
+		font-family: "Arial Narrow", sans-serif;
+		line-height: 100% !important;
+	}
+	hr { display: none; }
+	h1, h2, h3 {
+		page-break-after: avoid;
+		break-after: avoid;
+		-webkit-region-break-after: avoid;
+	}
+	div.libinteractive-download {
+		display: none;
+	}
+	.statement img {
+		max-width: 100%;
+	}
 }
 
 @media print {
@@ -66,24 +85,5 @@
 		page-break-inside: avoid;
 		break-inside: avoid;
 		-webkit-region-break-inside: avoid;
-	}
-	body {
-		font-size: 12pt;
-	}
-	p, li {
-		font-family: Georgia, serif;
-		line-height: 120% !important;
-	}
-	hr { display: none; }
-	h1, h2, h3 {
-		page-break-after: avoid;
-		break-after: avoid;
-		-webkit-region-break-after: avoid;
-	}
-	div.libinteractive-download {
-		display: none;
-	}
-	.statement img {
-		max-width: 100%;
 	}
 }
