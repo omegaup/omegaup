@@ -915,9 +915,9 @@ Arena.prototype.displayRunDetails = function(guid, data) {
 		$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">' + OmegaUp.T['wordsDownload'] + '</a>');
 	} else if (data.source == 'lockdownDetailsDisabled') {
 		$('#run-details .source').html(
-				(typeof(sessionStorage) !== 'undefined' &&
+				omegaup.escape((typeof(sessionStorage) !== 'undefined' &&
 				 sessionStorage.getItem('run:' + guid)) ||
-				OmegaUp.T['lockdownDetailsDisabled']);
+				OmegaUp.T['lockdownDetailsDisabled']));
 	} else {
 		$('#run-details .source').html(omegaup.escape(data.source));
 	}
