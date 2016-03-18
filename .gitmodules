@@ -19,3 +19,6 @@
 [submodule "frontend/server/libs/google-api-php-client"]
 	path = frontend/server/libs/google-api-php-client
 	url = https://github.com/google/google-api-php-client
+[submodule "frontend/www/karel.js"]
+	path = frontend/www/karel.js
+	url = https://github.com/omegaup/karel.js.git
