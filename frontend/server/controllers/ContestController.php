@@ -233,6 +233,9 @@ class ContestController extends Controller {
             if ($session['valid'] && !is_null($session['user'])) {
                 $r['current_user'] = $session['user'];
                 $r['current_user_id'] = $session['user']->user_id;
+            } else {
+                // No session, show the intro (if public), so that they can login.
+                return $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
             }
             self::canAccessContest($r);
         } catch (Exception $e) {
