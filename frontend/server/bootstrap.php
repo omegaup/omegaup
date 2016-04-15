@@ -13,23 +13,23 @@ ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . __DIR__);
 
 if (!(defined('IS_TEST') && IS_TEST === true)) {
     if (!is_file(__DIR__ . '/config.php')) {
-        ?>
-		<!doctype html>
-		<HTML>
-			<head>
-				<link rel="stylesheet" type="text/css" href="css/style.css">
-			</head>
-			<body style="padding:5px">
-				<h1>No config file.</h1>
-				<p>You are missing the config file. These are the default values:</p>
-				<pre class="code" style="margin: 3em; border: 1px solid #000; background: #ccc;">
+?>
+<!doctype html>
+<HTML>
+    <head>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    </head>
+    <body style="padding:5px">
+        <h1>No config file.</h1>
+        <p>You are missing the config file. These are the default values:</p>
+        <pre class="code" style="margin: 3em; border: 1px solid #000; background: #ccc;">
 <?php echo htmlspecialchars(file_get_contents(__DIR__ . '/config.default.php')); ?>
-				</pre>
-				<p>Create a file called <code>config.php</code> &emdash; the settings there will
-				override any of the default values.</p>
-			</body>
-		</html>
-		<?php
+        </pre>
+        <p>Create a file called <code>config.php</code> &emdash; the settings there will
+        override any of the default values.</p>
+    </body>
+</html>
+<?php
         exit;
     } else {
         require_once(__DIR__ . '/config.php');
@@ -161,7 +161,6 @@ $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
 
 if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === true)) {
-
     include('libs/smarty/Smarty.class.php');
 
     $smarty = new Smarty;
