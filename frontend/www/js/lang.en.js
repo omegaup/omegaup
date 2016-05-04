@@ -347,7 +347,7 @@ OmegaUp.T = {
 	profileUsername: "Username",
 	publicContestMustHaveProb: "Public contest must have at least 1 problem added.",
 	publish: "Publish",
-	rankHeaderPostCount: "users with the most solved problems",
+	rankHeaderPostCount: "users with the most points",
 	rankHeaderPreCount: "Top",
 	rankScore: "Score",
 	rankSolved: "Solved problems",
