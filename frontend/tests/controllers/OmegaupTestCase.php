@@ -154,6 +154,28 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Find a string into a keyed array. Should appear exactly once.
+     *
+     * @param array $array
+     * @param string $key
+     * @param string $needle
+     */
+    public function assertArrayContainsInKeyExactlyOnce($array, $key, $needle) {
+        $count = 0;
+        foreach ($array as $a) {
+            if ($a[$key] === $needle) {
+                $count++;
+            }
+        }
+        if ($count == 0) {
+            $this->fail("$needle not found in array");
+        }
+        if ($count > 1) {
+            $this->fail("$needle found multiple times in array");
+        }
+    }
+
+    /**
      * Asserts that string is not present in keyed array
      *
      * @param array $array

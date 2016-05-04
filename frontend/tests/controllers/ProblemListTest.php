@@ -26,19 +26,18 @@ class ProblemList extends OmegaupTestCase {
 
         // Check that all public problems are there
         for ($i = 0; $i < $n; $i++) {
-            $exists = false;
+            $count = 0;
             foreach ($response['results'] as $problemResponse) {
                 if ($problemResponse === 'ok') {
                     continue;
                 }
 
                 if ($problemResponse['alias'] === $problemData[$i]['request']['alias']) {
-                    $exists = true;
-                    break;
+                    $count++;
                 }
             }
-            if (!$exists) {
-                $this->fail('Problem' . $problemData[$i]['request']['alias'] . ' is not in the list.');
+            if ($count != 1) {
+                $this->fail('Problem' . $problemData[$i]['request']['alias'] . ' is not exactly once.');
             }
         }
 
@@ -165,6 +164,7 @@ class ProblemList extends OmegaupTestCase {
         $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
 
         $group = GroupsFactory::createGroup($addedAdmin);
+        GroupsFactory::addUserToGroup($group, $author);
 
         $r2 = new Request();
         $r2['auth_token'] = $this->login($author);
@@ -176,7 +176,34 @@ class ProblemList extends OmegaupTestCase {
 
         // Now it should be visible.
         $response = ProblemController::apiList($r);
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $problemDataPrivate['request']['alias']);
+    }
+
+    /**
+     * An author that belongs to an admin group should not see repeated problems.
+     */
+    public function testPublicProblemsPlusAddedAdminGroup() {
+        $author = UserFactory::createUser();
+        $helper = UserFactory::createUser();
+
+        $problemDataPrivate = ProblemsFactory::createProblem(null, null, 1 /* public */, $author);
+
+        $group = GroupsFactory::createGroup($author);
+        GroupsFactory::addUserToGroup($group, $helper);
+
+        $r2 = new Request();
+        $r2['auth_token'] = $this->login($author);
+        $r2['problem_alias'] = $problemDataPrivate['request']['alias'];
+        $r2['group'] = $group['group']->alias;
+        $response = ProblemController::apiAddGroupAdmin($r2);
+
+        $this->assertEquals('ok', $response['status']);
+
+        // This should be visible exactly once.
+        $r = new Request();
+        $r['auth_token'] = $this->login($author);
+        $response = ProblemController::apiList($r);
+        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $problemDataPrivate['request']['alias']);
     }
 
     /**
