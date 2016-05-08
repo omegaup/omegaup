@@ -347,7 +347,7 @@ OmegaUp.T = {
 	profileUsername: "Nombre de usuario",
 	publicContestMustHaveProb: "",
 	publish: "Publicar",
-	rankHeaderPostCount: "usuarios con más problemas resueltos",
+	rankHeaderPostCount: "usuarios con más puntaje",
 	rankHeaderPreCount: "Top",
 	rankScore: "Score",
 	rankSolved: "Problemas",
