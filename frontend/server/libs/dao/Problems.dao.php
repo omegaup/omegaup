@@ -48,7 +48,7 @@ class ProblemsDAO extends ProblemsDAOBase
             $args = array($user_id);
             $select = '
                 SELECT
-                    100 / LOG2(GREATEST(accepted, 1) + 1)   AS points,
+                    ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
                     accepted / GREATEST(1, submissions)     AS ratio,
                     ROUND(100 * COALESCE(ps.score, 0))      AS score,
                     p.*';
@@ -88,7 +88,7 @@ class ProblemsDAO extends ProblemsDAOBase
         } elseif ($user_type === USER_NORMAL && !is_null($user_id)) {
             $select = '
                 SELECT
-                    100 / LOG2(GREATEST(p.accepted, 1) + 1) AS points,
+                    ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions)     AS ratio,
                     ROUND(100 * COALESCE(ps.score, 0), 2)   AS score,
                     p.*';
@@ -142,7 +142,7 @@ class ProblemsDAO extends ProblemsDAOBase
             $select = '
                     SELECT
                         0 AS score,
-                        100 / LOG2(GREATEST(p.accepted, 1) + 1) AS points,
+                        ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                         accepted / GREATEST(1, p.submissions)   AS ratio,
                         p.*';
             $sql = '
