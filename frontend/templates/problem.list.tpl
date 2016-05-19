@@ -7,15 +7,14 @@
 		<thead>
 			<tr>
 				<th class="contains-long-desc">{#wordsTitle#}</th>
-				<th>{#wordsRuns#}</th>
-				<th>{#wordsAccepted#}</th>
-				<th>{#wordsRatio#}</th>
-				<th>
+				<th class="numericColumn">{#wordsRuns#}</th>
+				<th class="numericColumn">{#wordsAccepted#}</th>
+				<th class="numericColumn">{#wordsRatio#}</th>
+				<th class="numericColumn">
 					{#wordsPointsForRank#}
 					<a rel="tooltip" href="http://blog.omegaup.com/2014/06/el-nuevo-ranking-de-omegaup/" data-toggle="tooltip" title data-original-title="{#wordsPointsForRankTooltip#}"><img src="/media/question.png"></a>
 				</th>
-
-				<th>{#wordsMyScore#}</th>
+				<th class="numericColumn">{#wordsMyScore#}</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -30,11 +29,11 @@
 					</div>
 					{/if}
 				</td>
-				<td>{$problem.submissions}</td>
-				<td>{$problem.accepted}</td>
-				<td>{100 * $problem.ratio}%</td>
-				<td>{$problem.points}</td>
-				<td>{$problem.score}</td>
+				<td class="numericColumn">{$problem.submissions}</td>
+				<td class="numericColumn">{$problem.accepted}</td>
+				<td class="numericColumn">{100 * $problem.ratio}%</td>
+				<td class="numericColumn">{$problem.points}</td>
+				<td class="numericColumn">{$problem.score}</td>
 				</tr>
 			{/foreach}
 		</tbody>
