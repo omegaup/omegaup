@@ -541,7 +541,7 @@ table.problem-list td {
 }
 
 table.problem-list td.numericColumn, table.problem-list th.numericColumn {
-	text-align: right !important;
+	text-align: right;
 }
 
 .template,
