@@ -26,10 +26,10 @@
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>{#wordsUser#}</th>
-						<th>{#rankScore#}</th>
+						<th colspan="2">{#wordsUser#}</th>
+						<th class="numericColumn">{#rankScore#}</th>
 						{if !$is_index}
-						<th>{#rankSolved#}</th>
+						<th class="numericColumn">{#rankSolved#}</th>
 						{/if}
 					</tr>
 				</thead>
@@ -51,5 +51,5 @@
 			</div>
 		</div>
 	</div>
-	<script language="javascript" src="/js/rank.table.js?ver=664e40"></script>
+	<script language="javascript" src="/js/rank.table.js?ver=b955d0"></script>
 </div>

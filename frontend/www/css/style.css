@@ -540,8 +540,12 @@ table.problem-list td {
 	vertical-align: middle !important;
 }
 
-table.problem-list td.numericColumn, table.problem-list th.numericColumn {
+td.numericColumn, th.numericColumn {
 	text-align: right;
+}
+
+td.flagColumn {
+	width: 16px;
 }
 
 .template,
