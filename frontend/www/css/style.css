@@ -544,6 +544,10 @@ td.numericColumn, th.numericColumn {
 	text-align: right;
 }
 
+td.flagColumn {
+	width: 16px;
+}
+
 .template,
 .problem-list-template { display: none; }
 
