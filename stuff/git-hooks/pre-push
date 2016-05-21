@@ -1,6 +1,28 @@
-#!/bin/sh -e
+#!/bin/bash
+
+set -e
+exec < /dev/tty
+
+confirm () {
+	# call with a prompt string or use a default
+	read -r -p "${1:-Are you sure? [y/N]} " response
+	case $response in
+		[yY][eE][sS]|[yY])
+			true
+			;;
+		*)
+			false
+			;;
+	esac
+}
 
 OMEGAUP_ROOT=`/usr/bin/git rev-parse --show-toplevel`
+
+if [ "`/usr/bin/git status --porcelain | grep '^ M' | wc -l`" != "0" ]; then
+	confirm $'\e[31mYou have unstaged files.\e[0m Do you still want to push? [y/N]'
+elif [ "`/usr/bin/git status --porcelain | grep '^\?\?' | wc -l`" != "0" ]; then
+	confirm $'\e[35mYou have untracked files.\e[0m Do you still want to push? [y/N]'
+fi
 
 /usr/bin/python $OMEGAUP_ROOT/stuff/i18n.py --validate
 /usr/bin/python $OMEGAUP_ROOT/stuff/update-templates.py --validate
