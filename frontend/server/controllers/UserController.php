@@ -784,11 +784,23 @@ class UserController extends Controller {
             $keys = array (
                 'OVI15' => 200
             );
+        } elseif ($r['contest_type'] == 'PROFEST') {
+            if ($r['current_user']->getUsername() != 'Diego_Briaares'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = array (
+                'PROFEST-2016' => 18
+            );
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
-                array('bad_elements' => $r['contest_type'], 'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI')
+                array(
+                    'bad_elements' => $r['contest_type'],
+                    'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, PROFEST',
+                )
             );
         }
 
