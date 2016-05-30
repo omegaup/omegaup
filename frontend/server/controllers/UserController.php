@@ -793,13 +793,23 @@ class UserController extends Controller {
             $keys = array (
                 'PROFEST-2016' => 18
             );
+        } elseif ($r['contest_type'] == 'CCUPITSUR') {
+            if ($r['current_user']->getUsername() != 'licgerman-yahoo'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            // Arreglo de concurso
+            $keys = array(
+                'CCUPITSUR-16' => 50,
+            );
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 array(
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, PROFEST',
+                    'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR',
                 )
             );
         }
