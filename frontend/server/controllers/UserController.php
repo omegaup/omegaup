@@ -785,7 +785,7 @@ class UserController extends Controller {
                 'OVI15' => 200
             );
         } elseif ($r['contest_type'] == 'CCUPITSUR') {
-            if ($r['current_user']->getUsername() != 'licgerman'
+            if ($r['current_user']->getUsername() != 'licgerman-yahoo'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
