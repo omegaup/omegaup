@@ -579,7 +579,18 @@ class UserController extends Controller {
         $response = array();
 
         $is_system_admin = Authorization::IsSystemAdmin($r['current_user_id']);
-        if ($r['contest_type'] == 'OMI') {
+         if ($r['contest_type'] == 'CCUPITSUR') {
+            if ($r['current_user']->getUsername() != 'licgerman'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            // Arreglo de estados de MX
+            $keys = array(
+                'CCUPITSUR-16' => 50,
+            );
+        } elseif ($r['contest_type'] == 'OMI') {
             if ($r['current_user']->getUsername() != 'andreasantillana'
                 && !$is_system_admin
             ) {
@@ -788,7 +799,7 @@ class UserController extends Controller {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
-                array('bad_elements' => $r['contest_type'], 'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI')
+                array('bad_elements' => $r['contest_type'], 'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, CCUPITSUR')
             );
         }
 
