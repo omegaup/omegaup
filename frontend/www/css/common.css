@@ -74,8 +74,8 @@ td.forcebreaks {
 /* Evita el desborde de la tabla top 5 coders trabajando
 en conjunto con la clase ".forcebreaks" de common.css
 de tal manera que se establece overflow: hidden con un ancho mximo
-de 99px de contenido para mostrar.  */
+de 166px de contenido para mostrar.  */
 td.forcebreaks-top-5 {
         word-wrap: initial !important;
-        max-width: 197px;
+        max-width: 166px;
 }
