@@ -164,6 +164,12 @@ class FileHandler {
         self::$log->info("Deleting $old _old dir");
         self::DeleteDirRecursive($old.'_old');
     }
+
+    public static function FilePutContents($filename, $contents) {
+        if (file_put_contents($filename, $contents) === false) {
+            throw new RuntimeException("Not able to create file. $filename");
+        }
+    }
 }
 
 FileHandler::$log = Logger::getLogger('FileHandler');

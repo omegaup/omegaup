@@ -807,10 +807,10 @@ class ProblemDeployer {
             $localDestination = IMAGES_PATH . $filename;
             $globalDestination = IMAGES_URL_PATH . $filename;
 
-            file_put_contents("$this->tmpDir/statements/$filename", $imagedata);
+            FileHandler::FilePutContents("$this->tmpDir/statements/$filename", $imagedata);
             $this->log->info("Deploying image: to $localDestination");
             if (!file_exists($localDestination)) {
-                file_put_contents($localDestination, $imagedata);
+                FileHandler::FilePutContents($localDestination, $imagedata);
             }
 
             $replacement = $globalDestination;
