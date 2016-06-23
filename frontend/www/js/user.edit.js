@@ -139,6 +139,7 @@ $(document).ready(function() {
 		$("#scholar_degree").val(data.userinfo.scholar_degree);
 		$("#school_id").val(data.userinfo.school_id);
 		$("#school").val(data.userinfo.school);
+		$("#recruitment_optin").prop('checked', data.userinfo.recruitment_optin == 1);
 
 		original_locale = data.userinfo.locale;
 		original_school = data.userinfo.school;
@@ -169,6 +170,7 @@ $(document).ready(function() {
 			$("#school_id").val(),
 			$("#school").val(),
 			$("#locale").val(),
+			$("#recruitment_optin").prop("checked") ? 1 : 0,
 			function(response) {
 				if (response.status == "ok") {
 					if (locale_changed) {

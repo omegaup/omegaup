@@ -402,6 +402,7 @@ OmegaUp.T = {
 	userEditMiddleSchool: "Secundaria",
 	userEditName: "Nombre",
 	userEditProfileImage: "Imagen de perfil",
+	userEditRecruitmentOptin: "¿Te gustaría ser contactado por oportunidades de empleo?",
 	userEditSchool: "Escuela",
 	userEditSchoolGrade: "Grado escolar",
 	userEditState: "Estado",

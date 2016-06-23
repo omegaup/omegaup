@@ -91,6 +91,7 @@ class Users extends VO
 			if (isset($data['reset_sent_at'])) {
 				$this->reset_sent_at = $data['reset_sent_at'];
 			}
+			$this->recruitment_optin = $data['recruitment_optin'];
 		}
 	}
 
@@ -123,9 +124,10 @@ class Users extends VO
 			"verified" => $this->verified,
 			"verification_id" => $this->verification_id,
 			"reset_digest" => $this->reset_digest,
-			"reset_sent_at" => $this->reset_sent_at
+			"reset_sent_at" => $this->reset_sent_at,
+			"recruitment_optin" => $this->recruitment_optin
 		);
-	return json_encode($vec);
+		return json_encode($vec);
 	}
 
 	/**
@@ -279,5 +281,11 @@ class Users extends VO
 	  * @var DATETIME
 	  */
 	public $reset_sent_at;
-}
 
+	/**
+	  * Determina si el usuario puede ser contactado con fines de reclutamiento.
+	  * @access public
+	  * @var tinyint(1)
+	  */
+	public $recruitment_optin;
+}
