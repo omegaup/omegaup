@@ -683,12 +683,11 @@ class RunController extends Controller {
             $totals['total'] = array();
             $totals['ac'] = array();
             try {
-                $date = date('Y-m-d', strtotime('1 days'));
+                $runCounts = RunCountsDAO::getAll(1, 90, 'date', 'DESC');
 
-                for ($i = 0; $i < 30 * 3 /*about 3 months*/; $i++) {
-                    $totals['total'][$date] = RunsDAO::GetRunCountsToDate($date);
-                    $totals['ac'][$date] = RunsDAO::GetAcRunCountsToDate($date);
-                    $date = date('Y-m-d', strtotime('-'.$i.' days'));
+                foreach ($runCounts as $runCount) {
+                    $totals['total'][$runCount->date] = $runCount->total;
+                    $totals['ac'][$runCount->date] = $runCount->ac_count;
                 }
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
