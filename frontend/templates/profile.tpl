@@ -35,6 +35,10 @@
 						<div class="content">
 						</div>
 						</li>
+						<li class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix" ><span class="pls fbSettingsListItemLabel"><strong>{#profile#}</strong></span><span class="fbSettingsListItemContent fcg">{$profile.userinfo.name}</span></a>
+						<div class="content">
+						</div>
+						</li>
 						{if isset($profile.userinfo.email)}
 						<li id="user-email-wrapper" class="fbSettingsListItem clearfix uiListItem"><a class="pvm phs fbSettingsListLink clearfix"><span class="pls fbSettingsListItemLabel"><strong>{#profileEmail#}</strong></span><span class="fbSettingsListItemContent fcg">Primary: <strong id="user-email">{$profile.userinfo.email}</strong>&nbsp;</span></a>
 						<div class="content">
