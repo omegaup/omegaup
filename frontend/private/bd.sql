@@ -702,6 +702,16 @@ CREATE TABLE IF NOT EXISTS `User_Rank` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
 
 --
+-- Estructura de tabla para la tabla `User_Rank`
+--
+CREATE TABLE IF NOT EXISTS `Run_Counts` (
+	`date` DATE NOT NULL,
+	`total` int(11) NOT NULL DEFAULT 0,
+	`ac_count` int(11) NOT NULL DEFAULT 0,
+	PRIMARY KEY (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda la cantidad de runs que se han realizado hasta la fecha.';
+
+--
 -- Restricciones para tablas volcadas
 --
 
@@ -1039,6 +1049,26 @@ CREATE EVENT `Refresh_User_Rank_Event`
 ON SCHEDULE EVERY 1 HOUR STARTS NOW()
 DO BEGIN
     CALL Refresh_User_Rank();
+END$$
+DELIMITER ;
+
+--
+-- Actualiza los run counts cada dia
+--
+DELIMITER $$
+CREATE EVENT `Update_Run_Counts`
+ON SCHEDULE EVERY 1 DAY STARTS NOW()
+DO BEGIN
+   INSERT INTO
+       Run_Counts (date, total, ac_count)
+   SELECT
+       CURDATE(),
+       COUNT(*) AS total,
+       SUM(IF(verdict='AC', 1, 0))
+   FROM
+       Runs
+   WHERE
+       time <= CURDATE();
 END$$
 DELIMITER ;
 
