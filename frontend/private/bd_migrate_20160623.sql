@@ -53,3 +53,4 @@ END$$
 DELIMITER ;
 
 CALL Run_Counts_Backfill();
+DROP PROCEDURE Run_Counts_Backfill();

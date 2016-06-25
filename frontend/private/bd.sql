@@ -1053,33 +1053,6 @@ END$$
 DELIMITER ;
 
 --
--- Rellena Run_Counts
---
-DELIMITER $$
-CREATE PROCEDURE Run_Counts_Backfill()
-BEGIN
-	TRUNCATE TABLE Run_Counts;
-	SET @currDate = DATE_ADD(NOW(), INTERVAL -90 DAY);
-	WHILE @currDate < NOW() DO
-	    INSERT INTO
-	        Run_Counts (date, total, ac_count)
-      SELECT
-          @currDate,
-          COUNT(*) AS total,
-          SUM(IF(verdict='AC', 1, 0))
-      FROM
-          Runs
-      WHERE
-          time <= @currDate;
-
-      SET @currDate = DATE_ADD(@currDate, INTERVAL 1 DAY);
-  END WHILE;
-END$$
-DELIMITER ;
-
-GRANT EXECUTE ON PROCEDURE Run_Counts_Backfill TO 'omegaup'@'localhost';
-
---
 -- Actualiza los run counts cada dia
 --
 DELIMITER $$
@@ -1088,7 +1061,7 @@ ON SCHEDULE EVERY 1 DAY STARTS NOW()
 DO BEGIN
    INSERT INTO
        Run_Counts (date, total, ac_count)
-	SELECT
+   SELECT
        CURDATE(),
        COUNT(*) AS total,
        SUM(IF(verdict='AC', 1, 0))
