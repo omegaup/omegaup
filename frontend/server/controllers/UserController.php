@@ -1473,7 +1473,7 @@ class UserController extends Controller {
             }
         }
 
-        Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
+        Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', false);
 
         $valueProperties = array(
             'name',
