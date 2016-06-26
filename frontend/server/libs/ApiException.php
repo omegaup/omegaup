@@ -174,7 +174,7 @@ class NotFoundException extends ApiException {
      * @param string $message
      * @param Exception $previous
      */
-    public function __construct($message, Exception $previous = null) {
+    public function __construct($message = "notFound", Exception $previous = null) {
         parent::__construct($message, 'HTTP/1.1 404 NOT FOUND', 404, $previous);
     }
 }

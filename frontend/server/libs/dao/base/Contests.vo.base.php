@@ -107,6 +107,9 @@ class Contests extends VO
 			if (isset($data['recommended'])) {
 				$this->recommended = $data['recommended'];
 			}
+			if (isset($data['interview'])) {
+				$this->interview = $data['interview'];
+			}
 		}
 	}
 
@@ -144,7 +147,8 @@ class Contests extends VO
 			"urgent" => $this->urgent,
 			"contestant_must_register" => $this->contestant_must_register,
 			"languages" => $this->languages,
-			"recommended" => $this->recommended
+			"recommended" => $this->recommended,
+			"interview" => $this->interview
 		); 
 	return json_encode($vec); 
 	}
@@ -335,4 +339,11 @@ class Contests extends VO
 	  * @var BOOL
 	  */
 	public $recommended;
+
+	/**
+	  * 'Si este concurso es en realidad una entrevista
+	  * @access public
+	  * @var BOOL
+	  */
+	public $interview;
 }

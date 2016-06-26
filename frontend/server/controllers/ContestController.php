@@ -120,7 +120,7 @@ class ContestController extends Controller {
 
         $addedContests = array();
         foreach ($contests as $c) {
-            $c->toUnixTime();
+            $c->toUnixTime();//?
             $contestInfo = $c->asFilteredArray($relevant_columns);
             $addedContests[] = $contestInfo;
         }
@@ -144,7 +144,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
-    private static function canAccessContest(Request $r) {
+    public static function canAccessContest(Request $r) {
         if (!isset($r['contest']) || is_null($r['contest'])) {
             throw new NotFoundException('contestNotFound');
         }
@@ -700,6 +700,7 @@ class ContestController extends Controller {
         $contest->setLanguages(empty($r['languages']) ? null : $r['languages']);
         $contest->setScoreboardUrl(self::randomString(30));
         $contest->setScoreboardUrlAdmin(self::randomString(30));
+        $contest->setInterview($r["interview"]);
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->setShowScoreboardAfter($r['show_scoreboard_after']);
@@ -765,6 +766,8 @@ class ContestController extends Controller {
         // Expire contes-list cache
         Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
         Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+
+        $r["contest_id"] = $contest->getContestId();
 
         self::$log->info('New Contest Created: ' . $r['alias']);
         return array('status' => 'ok');

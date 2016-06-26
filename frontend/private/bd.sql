@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `contestant_must_register`   tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica que los participantes deben pre-registrarse antes de poder paticipar',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
   `recommended` BOOL NOT NULL DEFAULT  '0' COMMENT  'Mostrar el concurso en la lista de recomendados.',
+  `interview` BOOL NOT NULL DEFAULT  '0' COMMENT  'Si este concurso es en realidad una entrevista',
   PRIMARY KEY (`contest_id`),
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`),
@@ -700,6 +701,16 @@ CREATE TABLE IF NOT EXISTS `User_Rank` (
   PRIMARY KEY (`user_id`),
   KEY (`rank`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
+
+CREATE TABLE IF NOT EXISTS `Interview` (
+  `interview_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador del aviso',
+  `user_id` int(11) NOT NULL COMMENT 'UserID del autor de este aviso',
+  `duration` int(11) NOT NULL COMMENT 'Duration in minutes of this interview',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta entrevista',
+  `contest_id` text NOT NULL COMMENT 'Una entrevista esta implementada con un concurso',
+  PRIMARY KEY (`interview_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajería dentro del sitio.' AUTO_INCREMENT=1 ;
 
 --
 -- Restricciones para tablas volcadas

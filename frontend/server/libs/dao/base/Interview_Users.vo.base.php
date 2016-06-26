@@ -8,19 +8,19 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Value Object file for table User_Rank.
+/** Value Object file for table Interview_Users.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
   * 
   */
 
-class UserRank extends VO
+class InterviewUsers extends VO
 {
 	/**
-	  * Constructor de UserRank
+	  * Constructor de InterviewUsers
 	  * 
-	  * Para construir un objeto de tipo UserRank debera llamarse a el constructor 
+	  * Para construir un objeto de tipo InterviewUsers debera llamarse a el constructor 
 	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
@@ -35,23 +35,20 @@ class UserRank extends VO
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
 			}
-			if (isset($data['rank'])) {
-				$this->rank = $data['rank'];
+			if (isset($data['interview_id'])) {
+				$this->interview_id = $data['interview_id'];
 			}
-			if (isset($data['problems_solved_count'])) {
-				$this->problems_solved_count = $data['problems_solved_count'];
+			if (isset($data['invitation_sent'])) {
+				$this->invitation_sent = $data['invitation_sent'];
+			}
+			if (isset($data['access_time'])) {
+				$this->access_time = $data['access_time'];
 			}
 			if (isset($data['score'])) {
 				$this->score = $data['score'];
 			}
-			if (isset($data['username'])) {
-				$this->username = $data['username'];
-			}
-			if (isset($data['name'])) {
-				$this->name = $data['name'];
-			}
-			if (isset($data['country_id'])) {
-				$this->country_id = $data['country_id'];
+			if (isset($data['time'])) {
+				$this->time = $data['time'];
 			}
 		}
 	}
@@ -59,7 +56,7 @@ class UserRank extends VO
 	/**
 	  * Obtener una representacion en String
 	  * 
-	  * Este metodo permite tratar a un objeto UserRank en forma de cadena.
+	  * Este metodo permite tratar a un objeto InterviewUsers en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
 	  * @return String 
 	  */
@@ -67,12 +64,11 @@ class UserRank extends VO
 	{ 
 		$vec = array( 
 			"user_id" => $this->user_id,
-			"rank" => $this->rank,
-			"problems_solved_count" => $this->problems_solved_count,
+			"interview_id" => $this->interview_id,
+			"invitation_sent" => $this->invitation_sent,
+			"access_time" => $this->access_time,
 			"score" => $this->score,
-			"username" => $this->username,
-			"name" => $this->name,
-			"country_id" => $this->country_id
+			"time" => $this->time
 		); 
 	return json_encode($vec); 
 	}
@@ -100,40 +96,33 @@ class UserRank extends VO
 	  * @access public
 	  * @var int(11)
 	  */
-	public $rank;
+	public $interview_id;
 
 	/**
 	  *  [Campo no documentado]
+	  * @access public
+	  * @var BOOLEAN
+	  */
+	public $invitation_sent;
+
+	/**
+	  * Hora a la que entró el usuario al concurso
+	  * @access public
+	  * @var datetime
+	  */
+	public $access_time;
+
+	/**
+	  * Indica el puntaje que obtuvo el usuario en el concurso
 	  * @access public
 	  * @var int(11)
-	  */
-	public $problems_solved_count;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var double
 	  */
 	public $score;
 
 	/**
-	  *  [Campo no documentado]
+	  * Indica el tiempo que acumulo en usuario en el concurso
 	  * @access public
-	  * @var varchar(50)
+	  * @var int(11)
 	  */
-	public $username;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var varchar(256)
-	  */
-	public $name;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var char(3)
-	  */
-	public $country_id;
+	public $time;
 }

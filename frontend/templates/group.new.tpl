@@ -9,7 +9,7 @@
 {/if}
 
 <span id="form-data" data-name="groups" data-page="new"></span>
-<script src="/js/alias.generate.js?ver=68db5b"></script>
+<script src="/js/alias.generate.js?ver=827193"></script>
 <script src="/js/groups.js?ver=202dfb"></script>
 
 <div class="panel panel-primary">

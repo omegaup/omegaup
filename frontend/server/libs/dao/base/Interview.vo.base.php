@@ -8,19 +8,19 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Value Object file for table User_Rank.
+/** Value Object file for table Interview.
   * 
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
   * 
   */
 
-class UserRank extends VO
+class Interview extends VO
 {
 	/**
-	  * Constructor de UserRank
+	  * Constructor de Interview
 	  * 
-	  * Para construir un objeto de tipo UserRank debera llamarse a el constructor 
+	  * Para construir un objeto de tipo Interview debera llamarse a el constructor 
 	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
@@ -32,26 +32,23 @@ class UserRank extends VO
 				$data = self::object_to_array(json_decode($data));
 
 
+			if (isset($data['interview_id'])) {
+				$this->interview_id = $data['interview_id'];
+			}
+			if (isset($data['title'])) {
+				$this->title = $data['title'];
+			}
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
 			}
-			if (isset($data['rank'])) {
-				$this->rank = $data['rank'];
+			if (isset($data['duration'])) {
+				$this->duration = $data['duration'];
 			}
-			if (isset($data['problems_solved_count'])) {
-				$this->problems_solved_count = $data['problems_solved_count'];
+			if (isset($data['time'])) {
+				$this->time = $data['time'];
 			}
-			if (isset($data['score'])) {
-				$this->score = $data['score'];
-			}
-			if (isset($data['username'])) {
-				$this->username = $data['username'];
-			}
-			if (isset($data['name'])) {
-				$this->name = $data['name'];
-			}
-			if (isset($data['country_id'])) {
-				$this->country_id = $data['country_id'];
+			if (isset($data['contest_id'])) {
+				$this->contest_id = $data['contest_id'];
 			}
 		}
 	}
@@ -59,20 +56,19 @@ class UserRank extends VO
 	/**
 	  * Obtener una representacion en String
 	  * 
-	  * Este metodo permite tratar a un objeto UserRank en forma de cadena.
+	  * Este metodo permite tratar a un objeto Interview en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
 	  * @return String 
 	  */
 	public function __toString( )
 	{ 
 		$vec = array( 
+			"interview_id" => $this->interview_id,
+			"title" => $this->title,
 			"user_id" => $this->user_id,
-			"rank" => $this->rank,
-			"problems_solved_count" => $this->problems_solved_count,
-			"score" => $this->score,
-			"username" => $this->username,
-			"name" => $this->name,
-			"country_id" => $this->country_id
+			"duration" => $this->duration,
+			"time" => $this->time,
+			"contest_id" => $this->contest_id
 		); 
 	return json_encode($vec); 
 	}
@@ -84,56 +80,50 @@ class UserRank extends VO
 		if (count($fields) > 0)
 			parent::toUnixTime($fields);
 		else
-			parent::toUnixTime(array());
+			parent::toUnixTime(array("time"));
 	}
 
 	/**
-	  *  [Campo no documentado]
+	  * Identificador del aviso
 	  * Llave Primaria
+	  * Auto Incremento
 	  * @access public
 	  * @var int(11)
 	  */
-	public $user_id;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var int(11)
-	  */
-	public $rank;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var int(11)
-	  */
-	public $problems_solved_count;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var double
-	  */
-	public $score;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var varchar(50)
-	  */
-	public $username;
+	public $interview_id;
 
 	/**
 	  *  [Campo no documentado]
 	  * @access public
 	  * @var varchar(256)
 	  */
-	public $name;
+	public $title;
 
 	/**
-	  *  [Campo no documentado]
+	  * UserID del autor de este aviso
 	  * @access public
-	  * @var char(3)
+	  * @var int(11)
 	  */
-	public $country_id;
+	public $user_id;
+
+	/**
+	  * Duration in minutes of this interview
+	  * @access public
+	  * @var int(11)
+	  */
+	public $duration;
+
+	/**
+	  * Fecha de creacion de este aviso
+	  * @access public
+	  * @var timestamp
+	  */
+	public $time;
+
+	/**
+	  * Una entrevista esta implementada con un concurso
+	  * @access public
+	  * @var text
+	  */
+	public $contest_id;
 }

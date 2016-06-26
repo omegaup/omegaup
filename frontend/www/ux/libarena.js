@@ -57,8 +57,8 @@ function Arena() {
 	// Whether this is a scoreboard-only view.
 	this.onlyScoreboard = window.location.pathname.indexOf('/scoreboard/') !== -1;
 
-	// The alias of the contest.
-	this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+	// Whether the current contest is in interview mode.
+	this.interview = window.location.pathname.indexOf('/interviews') !== -1;
 
 	// The token for standalone scoreboards.
 	this.scoreboardToken = null;

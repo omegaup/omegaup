@@ -8,59 +8,59 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** UserRank Data Access Object (DAO) Base.
+/** Interview Data Access Object (DAO) Base.
   * 
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link UserRank }. 
+  * almacenar de forma permanente y recuperar instancias de objetos {@link Interview }. 
   * @access public
   * @abstract
   * 
   */
-abstract class UserRankDAOBase extends DAO
+abstract class InterviewDAOBase extends DAO
 {
 
 	/**
 	  *	Guardar registros. 
 	  *	
-	  *	Este metodo guarda el estado actual del objeto {@link UserRank} pasado en la base de datos. La llave 
+	  *	Este metodo guarda el estado actual del objeto {@link Interview} pasado en la base de datos. La llave 
 	  *	primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
 	  *	primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
 	  *	en ese objeto el ID recien creado.
 	  *	
 	  *	@static
 	  * @throws Exception si la operacion fallo.
-	  * @param UserRank [$User_Rank] El objeto de tipo UserRank
+	  * @param Interview [$Interview] El objeto de tipo Interview
 	  * @return Un entero mayor o igual a cero denotando las filas afectadas.
 	  **/
-	public static final function save( $User_Rank )
+	public static final function save( $Interview )
 	{
-		if (!is_null(self::getByPK( $User_Rank->getUserId() )))
+		if (!is_null(self::getByPK( $Interview->getInterviewId() )))
 		{
-			return UserRankDAOBase::update( $User_Rank);
+			return InterviewDAOBase::update( $Interview);
 		} else {
-			return UserRankDAOBase::create( $User_Rank);
+			return InterviewDAOBase::create( $Interview);
 		}
 	}
 
 
 	/**
-	  *	Obtener {@link UserRank} por llave primaria. 
+	  *	Obtener {@link Interview} por llave primaria. 
 	  *	
-	  * Este metodo cargara un objeto {@link UserRank} de la base de datos 
+	  * Este metodo cargara un objeto {@link Interview} de la base de datos 
 	  * usando sus llaves primarias. 
 	  *	
 	  *	@static
-	  * @return @link UserRank Un objeto del tipo {@link UserRank}. NULL si no hay tal registro.
+	  * @return @link Interview Un objeto del tipo {@link Interview}. NULL si no hay tal registro.
 	  **/
-	public static final function getByPK(  $user_id )
+	public static final function getByPK(  $interview_id )
 	{
-		if(  is_null( $user_id )  ){ return NULL; }
-		$sql = "SELECT * FROM User_Rank WHERE (user_id = ? ) LIMIT 1;";
-		$params = array(  $user_id );
+		if(  is_null( $interview_id )  ){ return NULL; }
+		$sql = "SELECT * FROM Interview WHERE (interview_id = ? ) LIMIT 1;";
+		$params = array(  $interview_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0) return NULL;
-		$foo = new UserRank( $rs );
+		$foo = new Interview( $rs );
 		return $foo;
 	}
 
@@ -68,7 +68,7 @@ abstract class UserRankDAOBase extends DAO
 	  *	Obtener todas las filas.
 	  *	
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
-	  * un vector que contiene objetos de tipo {@link UserRank}. Tenga en cuenta que este metodo
+	  * un vector que contiene objetos de tipo {@link Interview}. Tenga en cuenta que este metodo
 	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
 	  *	
@@ -77,11 +77,11 @@ abstract class UserRankDAOBase extends DAO
 	  * @param $columnas_por_pagina Columnas por pagina.
 	  * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $tipo_de_orden 'ASC' o 'DESC' el default es 'ASC'
-	  * @return Array Un arreglo que contiene objetos del tipo {@link UserRank}.
+	  * @return Array Un arreglo que contiene objetos del tipo {@link Interview}.
 	  **/
 	public static final function getAll( $pagina = NULL, $columnas_por_pagina = NULL, $orden = NULL, $tipo_de_orden = 'ASC' )
 	{
-		$sql = "SELECT * from User_Rank";
+		$sql = "SELECT * from Interview";
 		if( ! is_null ( $orden ) )
 		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
@@ -92,7 +92,7 @@ abstract class UserRankDAOBase extends DAO
 		$rs = $conn->Execute($sql);
 		$allData = array();
 		foreach ($rs as $foo) {
-			$bar = new UserRank($foo);
+			$bar = new Interview($foo);
     		array_push( $allData, $bar);
 		}
 		return $allData;
@@ -102,7 +102,7 @@ abstract class UserRankDAOBase extends DAO
 	/**
 	  *	Buscar registros.
 	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UserRank} de la base de datos. 
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Interview} de la base de datos. 
 	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
 	  *	
@@ -119,45 +119,41 @@ abstract class UserRankDAOBase extends DAO
 	  *	  }
 	  * </code>
 	  *	@static
-	  * @param UserRank [$User_Rank] El objeto de tipo UserRank
+	  * @param Interview [$Interview] El objeto de tipo Interview
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function search( $User_Rank , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
+	public static final function search( $Interview , $orderBy = null, $orden = 'ASC', $offset = 0, $rowcount = NULL, $likeColumns = NULL)
 	{
-		if (!($User_Rank instanceof UserRank)) {
-			return self::search(new UserRank($User_Rank));
+		if (!($Interview instanceof Interview)) {
+			return self::search(new Interview($Interview));
 		}
 
-		$sql = "SELECT * from User_Rank WHERE ("; 
+		$sql = "SELECT * from Interview WHERE ("; 
 		$val = array();
-		if (!is_null( $User_Rank->getUserId())) {
+		if (!is_null( $Interview->getInterviewId())) {
+			$sql .= " `interview_id` = ? AND";
+			array_push( $val, $Interview->getInterviewId() );
+		}
+		if (!is_null( $Interview->getTitle())) {
+			$sql .= " `title` = ? AND";
+			array_push( $val, $Interview->getTitle() );
+		}
+		if (!is_null( $Interview->getUserId())) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $User_Rank->getUserId() );
+			array_push( $val, $Interview->getUserId() );
 		}
-		if (!is_null( $User_Rank->getRank())) {
-			$sql .= " `rank` = ? AND";
-			array_push( $val, $User_Rank->getRank() );
+		if (!is_null( $Interview->getDuration())) {
+			$sql .= " `duration` = ? AND";
+			array_push( $val, $Interview->getDuration() );
 		}
-		if (!is_null( $User_Rank->getProblemsSolvedCount())) {
-			$sql .= " `problems_solved_count` = ? AND";
-			array_push( $val, $User_Rank->getProblemsSolvedCount() );
+		if (!is_null( $Interview->getTime())) {
+			$sql .= " `time` = ? AND";
+			array_push( $val, $Interview->getTime() );
 		}
-		if (!is_null( $User_Rank->getScore())) {
-			$sql .= " `score` = ? AND";
-			array_push( $val, $User_Rank->getScore() );
-		}
-		if (!is_null( $User_Rank->getUsername())) {
-			$sql .= " `username` = ? AND";
-			array_push( $val, $User_Rank->getUsername() );
-		}
-		if (!is_null( $User_Rank->getName())) {
-			$sql .= " `name` = ? AND";
-			array_push( $val, $User_Rank->getName() );
-		}
-		if (!is_null( $User_Rank->getCountryId())) {
-			$sql .= " `country_id` = ? AND";
-			array_push( $val, $User_Rank->getCountryId() );
+		if (!is_null( $Interview->getContestId())) {
+			$sql .= " `contest_id` = ? AND";
+			array_push( $val, $Interview->getContestId() );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -180,7 +176,7 @@ abstract class UserRankDAOBase extends DAO
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $foo) {
-			$bar =  new UserRank($foo);
+			$bar =  new Interview($foo);
 			array_push( $ar,$bar);
 		}
 		return $ar;
@@ -190,19 +186,18 @@ abstract class UserRankDAOBase extends DAO
 	  *	Actualizar registros.
 	  *
 	  * @return Filas afectadas
-	  * @param UserRank [$User_Rank] El objeto de tipo UserRank a actualizar.
+	  * @param Interview [$Interview] El objeto de tipo Interview a actualizar.
 	  **/
-	private static final function update($User_Rank)
+	private static final function update($Interview)
 	{
-		$sql = "UPDATE User_Rank SET  `rank` = ?, `problems_solved_count` = ?, `score` = ?, `username` = ?, `name` = ?, `country_id` = ? WHERE  `user_id` = ?;";
+		$sql = "UPDATE Interview SET  `title` = ?, `user_id` = ?, `duration` = ?, `time` = ?, `contest_id` = ? WHERE  `interview_id` = ?;";
 		$params = array( 
-			$User_Rank->getRank(), 
-			$User_Rank->getProblemsSolvedCount(), 
-			$User_Rank->getScore(), 
-			$User_Rank->getUsername(), 
-			$User_Rank->getName(), 
-			$User_Rank->getCountryId(), 
-			$User_Rank->getUserId(), );
+			$Interview->getTitle(), 
+			$Interview->getUserId(), 
+			$Interview->getDuration(), 
+			$Interview->getTime(), 
+			$Interview->getContestId(), 
+			$Interview->getInterviewId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -212,41 +207,40 @@ abstract class UserRankDAOBase extends DAO
 	  *	Crear registros.
 	  *	
 	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
-	  * contenidos del objeto UserRank suministrado. Asegurese
+	  * contenidos del objeto Interview suministrado. Asegurese
 	  * de que los valores para todas las columnas NOT NULL se ha especificado 
 	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
-	  * primaria generada en el objeto UserRank dentro de la misma transaccion.
+	  * primaria generada en el objeto Interview dentro de la misma transaccion.
 	  *	
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
-	  * @param UserRank [$User_Rank] El objeto de tipo UserRank a crear.
+	  * @param Interview [$Interview] El objeto de tipo Interview a crear.
 	  **/
-	private static final function create( $User_Rank )
+	private static final function create( $Interview )
 	{
-		if (is_null($User_Rank->problems_solved_count)) $User_Rank->problems_solved_count = 0;
-		if (is_null($User_Rank->score)) $User_Rank->score = 0;
-		$sql = "INSERT INTO User_Rank ( `user_id`, `rank`, `problems_solved_count`, `score`, `username`, `name`, `country_id` ) VALUES ( ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Interview->time)) $Interview->time = gmdate('Y-m-d H:i:s');
+		$sql = "INSERT INTO Interview ( `interview_id`, `title`, `user_id`, `duration`, `time`, `contest_id` ) VALUES ( ?, ?, ?, ?, ?, ?);";
 		$params = array( 
-			$User_Rank->user_id,
-			$User_Rank->rank,
-			$User_Rank->problems_solved_count,
-			$User_Rank->score,
-			$User_Rank->username,
-			$User_Rank->name,
-			$User_Rank->country_id,
+			$Interview->interview_id,
+			$Interview->title,
+			$Interview->user_id,
+			$Interview->duration,
+			$Interview->time,
+			$Interview->contest_id,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 
+ 		$Interview->interview_id = $conn->Insert_ID();
+
 		return $ar;
 	}
 
 	/**
 	  *	Buscar por rango.
 	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UserRank} de la base de datos siempre y cuando 
-	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link UserRank}.
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Interview} de la base de datos siempre y cuando 
+	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Interview}.
 	  * 
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
@@ -270,16 +264,38 @@ abstract class UserRankDAOBase extends DAO
 	  *	  }
 	  * </code>
 	  *	@static
-	  * @param UserRank [$User_Rank] El objeto de tipo UserRank
-	  * @param UserRank [$User_Rank] El objeto de tipo UserRank
+	  * @param Interview [$Interview] El objeto de tipo Interview
+	  * @param Interview [$Interview] El objeto de tipo Interview
 	  * @param $orderBy Debe ser una cadena con el nombre de una columna en la base de datos.
 	  * @param $orden 'ASC' o 'DESC' el default es 'ASC'
 	  **/
-	public static final function byRange( $User_RankA , $User_RankB , $orderBy = null, $orden = 'ASC')
+	public static final function byRange( $InterviewA , $InterviewB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from User_Rank WHERE ("; 
+		$sql = "SELECT * from Interview WHERE ("; 
 		$val = array();
-		if( ( !is_null (($a = $User_RankA->getUserId()) ) ) & ( ! is_null ( ($b = $User_RankB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $InterviewA->getInterviewId()) ) ) & ( ! is_null ( ($b = $InterviewB->getInterviewId()) ) ) ){
+				$sql .= " `interview_id` >= ? AND `interview_id` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `interview_id` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $InterviewA->getTitle()) ) ) & ( ! is_null ( ($b = $InterviewB->getTitle()) ) ) ){
+				$sql .= " `title` >= ? AND `title` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `title` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $InterviewA->getUserId()) ) ) & ( ! is_null ( ($b = $InterviewB->getUserId()) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
@@ -290,67 +306,34 @@ abstract class UserRankDAOBase extends DAO
 			
 		}
 
-		if( ( !is_null (($a = $User_RankA->getRank()) ) ) & ( ! is_null ( ($b = $User_RankB->getRank()) ) ) ){
-				$sql .= " `rank` >= ? AND `rank` <= ? AND";
+		if( ( !is_null (($a = $InterviewA->getDuration()) ) ) & ( ! is_null ( ($b = $InterviewB->getDuration()) ) ) ){
+				$sql .= " `duration` >= ? AND `duration` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `rank` = ? AND"; 
+			$sql .= " `duration` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( ( !is_null (($a = $User_RankA->getProblemsSolvedCount()) ) ) & ( ! is_null ( ($b = $User_RankB->getProblemsSolvedCount()) ) ) ){
-				$sql .= " `problems_solved_count` >= ? AND `problems_solved_count` <= ? AND";
+		if( ( !is_null (($a = $InterviewA->getTime()) ) ) & ( ! is_null ( ($b = $InterviewB->getTime()) ) ) ){
+				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `problems_solved_count` = ? AND"; 
+			$sql .= " `time` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
 		}
 
-		if( ( !is_null (($a = $User_RankA->getScore()) ) ) & ( ! is_null ( ($b = $User_RankB->getScore()) ) ) ){
-				$sql .= " `score` >= ? AND `score` <= ? AND";
+		if( ( !is_null (($a = $InterviewA->getContestId()) ) ) & ( ! is_null ( ($b = $InterviewB->getContestId()) ) ) ){
+				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b)); 
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `score` = ? AND"; 
-			$a = is_null ( $a ) ? $b : $a;
-			array_push( $val, $a);
-			
-		}
-
-		if( ( !is_null (($a = $User_RankA->getUsername()) ) ) & ( ! is_null ( ($b = $User_RankB->getUsername()) ) ) ){
-				$sql .= " `username` >= ? AND `username` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
-		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `username` = ? AND"; 
-			$a = is_null ( $a ) ? $b : $a;
-			array_push( $val, $a);
-			
-		}
-
-		if( ( !is_null (($a = $User_RankA->getName()) ) ) & ( ! is_null ( ($b = $User_RankB->getName()) ) ) ){
-				$sql .= " `name` >= ? AND `name` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
-		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `name` = ? AND"; 
-			$a = is_null ( $a ) ? $b : $a;
-			array_push( $val, $a);
-			
-		}
-
-		if( ( !is_null (($a = $User_RankA->getCountryId()) ) ) & ( ! is_null ( ($b = $User_RankB->getCountryId()) ) ) ){
-				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
-		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `country_id` = ? AND"; 
+			$sql .= " `contest_id` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
@@ -365,7 +348,7 @@ abstract class UserRankDAOBase extends DAO
 		$rs = $conn->Execute($sql, $val);
 		$ar = array();
 		foreach ($rs as $row) {
-			array_push( $ar, $bar = new UserRank($row));
+			array_push( $ar, $bar = new Interview($row));
 		}
 		return $ar;
 	}
@@ -374,20 +357,20 @@ abstract class UserRankDAOBase extends DAO
 	  *	Eliminar registros.
 	  *	
 	  * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-	  * en el objeto UserRank suministrado. Una vez que se ha suprimido un objeto, este no 
+	  * en el objeto Interview suministrado. Una vez que se ha suprimido un objeto, este no 
 	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila 
 	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. 
 	  * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
 	  *	
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
-	  * @param UserRank [$User_Rank] El objeto de tipo UserRank a eliminar
+	  * @param Interview [$Interview] El objeto de tipo Interview a eliminar
 	  **/
-	public static final function delete( $User_Rank )
+	public static final function delete( $Interview )
 	{
-		if( is_null( self::getByPK($User_Rank->getUserId()) ) ) throw new Exception('Campo no encontrado.');
-		$sql = "DELETE FROM User_Rank WHERE  user_id = ?;";
-		$params = array( $User_Rank->getUserId() );
+		if( is_null( self::getByPK($Interview->getInterviewId()) ) ) throw new Exception('Campo no encontrado.');
+		$sql = "DELETE FROM Interview WHERE  interview_id = ?;";
+		$params = array( $Interview->getInterviewId() );
 		global $conn;
 
 		$conn->Execute($sql, $params);

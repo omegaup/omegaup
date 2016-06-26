@@ -36,13 +36,19 @@ $(document).ready(function() {
 
 	switch (formName) {
 		case "problems":
-			existsFn= function(alias) {
+			existsFn = function(alias) {
 				omegaup.getProblem(null, alias, checkExists);
 			};
 			break;
 
 		case "groups":
-			existsFn= function(alias) {
+			existsFn = function(alias) {
+				omegaup.getGroup(alias, checkExists);
+			};
+			break;
+
+		case "interviews":
+			existsFn = function(alias) {
 				omegaup.getGroup(alias, checkExists);
 			};
 			break;

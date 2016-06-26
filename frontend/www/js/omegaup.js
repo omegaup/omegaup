@@ -2061,7 +2061,7 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	if(oldPassword !== null) toSend.oldPassword = oldPassword;
 
 	$.post(
-		'/api/controllername/user/edit/',
+		'/api/controllername/user/edit/', // controllername ?
 		toSend,
 		function (data) {
 			callback(data);
@@ -2072,6 +2072,90 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 			callback(JSON.parse(j.responseText));
 		} catch (err) {
 			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.addUserToInterview = function(interviewAlias, usernameOrEmail, callback) {
+	var self = this;
+
+	$.post(
+		'/api/interview/addUser/interview_alias/' + encodeURIComponent(interviewAlias) + '/',
+		{
+			usernameOrEmail : usernameOrEmail
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getInterview = function(alias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/interview/details/interview_alias/' + encodeURIComponent(alias) + '/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
+OmegaUp.prototype.getInterviews = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/interview/list/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
+OmegaUp.prototype.createInterview = function(s_Title, s_Duration, callback) {
+	$.post(
+		'/api/interview/create/',
+		{ title : s_Title, duration : s_Duration},
+		function (data) {
+			if (data.status !== undefined && data.status == "error") {
+				OmegaUp.ui.error(data.error);
+			} else {
+				if (callback !== undefined){ callback(data); }
+			}
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
 		}
 	});
 };

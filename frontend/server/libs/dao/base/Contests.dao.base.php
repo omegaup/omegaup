@@ -231,6 +231,10 @@ abstract class ContestsDAOBase extends DAO
 			$sql .= " `recommended` = ? AND";
 			array_push( $val, $Contests->getRecommended() );
 		}
+		if (!is_null( $Contests->getInterview())) {
+			$sql .= " `interview` = ? AND";
+			array_push( $val, $Contests->getInterview() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -266,7 +270,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	private static final function update($Contests)
 	{
-		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ? WHERE  `contest_id` = ?;";
+		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ?, `interview` = ? WHERE  `contest_id` = ?;";
 		$params = array( 
 			$Contests->getTitle(), 
 			$Contests->getDescription(), 
@@ -292,6 +296,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->getContestantMustRegister(), 
 			$Contests->getLanguages(), 
 			$Contests->getRecommended(), 
+			$Contests->getInterview(), 
 			$Contests->getContestId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -324,7 +329,8 @@ abstract class ContestsDAOBase extends DAO
 		if (is_null($Contests->urgent)) $Contests->urgent = 0;
 		if (is_null($Contests->contestant_must_register)) $Contests->contestant_must_register = '0';
 		if (is_null($Contests->recommended)) $Contests->recommended =  '0';
-		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages`, `recommended` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Contests->interview)) $Contests->interview =  '0';
+		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages`, `recommended`, `interview` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array( 
 			$Contests->contest_id,
 			$Contests->title,
@@ -351,6 +357,7 @@ abstract class ContestsDAOBase extends DAO
 			$Contests->contestant_must_register,
 			$Contests->languages,
 			$Contests->recommended,
+			$Contests->interview,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -668,6 +675,17 @@ abstract class ContestsDAOBase extends DAO
 				array_push( $val, max($a,$b)); 
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `recommended` = ? AND"; 
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+			
+		}
+
+		if( ( !is_null (($a = $ContestsA->getInterview()) ) ) & ( ! is_null ( ($b = $ContestsB->getInterview()) ) ) ){
+				$sql .= " `interview` >= ? AND `interview` <= ? AND";
+				array_push( $val, min($a,$b)); 
+				array_push( $val, max($a,$b)); 
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `interview` = ? AND"; 
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 			
