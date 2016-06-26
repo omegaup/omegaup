@@ -1036,7 +1036,7 @@ class UserController extends Controller {
         $response['userinfo']['birth_date'] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
         $response['userinfo']['graduation_date'] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
         $response['userinfo']['scholar_degree'] = $user->getScholarDegree();
-        $response['userinfo']['recruitment_optin'] = $user->getRecruitmentOptin();
+        $response['userinfo']['recruitment_optin'] = $user->getRecruitmentOptin() == 1;
 
         if (!is_null($user->getLanguageId())) {
             $query = LanguagesDAO::getByPK($user->getLanguageId());
