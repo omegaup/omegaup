@@ -87,7 +87,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $r['name'] = Utils::CreateRandomString();
 
         // Null recruitment_optin
-        $r['recruitment_optin'] = NULL;
+        $r['recruitment_optin'] = null;
         UserController::apiUpdate($r);
         $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
         $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
