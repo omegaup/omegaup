@@ -10,20 +10,20 @@ class InterviewController extends Controller {
 
         // Create the contest that will back this interview
         $r['public'] = false;
-        $r['title'] = $r["title"];
-        $r['description'] = $r["title"];
+        $r['title'] = $r['title'];
+        $r['description'] = $r['title'];
         $r['start_time'] = time();
         $r['finish_time'] = strtotime('+1 year');
-        $r['window_length'] = $r["duration"];
-        $r['alias'] = str_replace(" ", "", $r["title"]);
+        $r['window_length'] = $r['duration'];
+        $r['alias'] = str_replace(' ', '', $r['title']);
         $r['scoreboard'] = 0;
         $r['points_decay_factor'] = 0;
         $r['partial_score'] = 0;
         $r['submissions_gap'] = 0;
-        $r['feedback'] = "no";
+        $r['feedback'] = 'no';
         $r['penalty'] = 0;
-        $r['penalty_type'] = "none";
-        $r['penalty_calc_policy'] = "sum";
+        $r['penalty_type'] = 'none';
+        $r['penalty_calc_policy'] = 'sum';
         $r['languages'] = null;
         $r['interview'] = true;
         $r['contestant_must_register'] = true;
@@ -65,9 +65,9 @@ class InterviewController extends Controller {
         if (is_null($r['user'])) {
             // user does not exist, create a new user
             $newUserRequest = $r;
-            $newUserRequest['email'] = $r["usernameOrEmail"];
-            $newUserRequest['username'] = "user".time(); //$r["usernameOrEmail"];
-            $newUserRequest['password'] = "user".time();
+            $newUserRequest['email'] = $r['usernameOrEmail'];
+            $newUserRequest['username'] = 'user'.time(); //$r["usernameOrEmail"];
+            $newUserRequest['password'] = 'user'.time();
             UserController::apiCreate($newUserRequest);
         }
 
@@ -105,21 +105,21 @@ class InterviewController extends Controller {
 
         $thisResult = array();
 
-        $backingContest = InterviewDAO::getBackingContestByAlias($r["interview_alias"]);
+        $backingContest = InterviewDAO::getBackingContestByAlias($r['interview_alias']);
         if (is_null($backingContest)) {
             throw new NotFoundException();
         }
 
-        $thisResult["description"] = $backingContest->description;
-        $thisResult["contest_alias"] = $backingContest->alias;
+        $thisResult['description'] = $backingContest->description;
+        $thisResult['contest_alias'] = $backingContest->alias;
 
         // assumming interview exists ?
-        $interview = InterviewDAO::search(array("contest_id" => $backingContest->contest_id))[0];
+        $interview = InterviewDAO::search(array('contest_id' => $backingContest->contest_id))[0];
 
         // get current candidates
-        $thisResult["title"] = $interview->title;
+        $thisResult['title'] = $interview->title;
         //$thisResult["duration"] = $interview>duration;
-        $thisResult["created"] = $interview->time;
+        $thisResult['created'] = $interview->time;
 
         $candidatesQuery = new ContestsUsers();
         $candidatesQuery->setContestId($backingContest->contest_id);

@@ -700,7 +700,7 @@ class ContestController extends Controller {
         $contest->setLanguages(empty($r['languages']) ? null : $r['languages']);
         $contest->setScoreboardUrl(self::randomString(30));
         $contest->setScoreboardUrlAdmin(self::randomString(30));
-        $contest->setInterview($r["interview"]);
+        $contest->setInterview($r['interview']);
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->setShowScoreboardAfter($r['show_scoreboard_after']);
@@ -767,7 +767,7 @@ class ContestController extends Controller {
         Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
         Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
-        $r["contest_id"] = $contest->getContestId();
+        $r['contest_id'] = $contest->getContestId();
 
         self::$log->info('New Contest Created: ' . $r['alias']);
         return array('status' => 'ok');

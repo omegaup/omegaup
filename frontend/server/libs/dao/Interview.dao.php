@@ -1,7 +1,7 @@
 <?php
 
-include("base/Interview.dao.base.php");
-include("base/Interview.vo.base.php");
+include('base/Interview.dao.base.php');
+include('base/Interview.vo.base.php');
 
 /** Interview Data Access Object (DAO).
   *
