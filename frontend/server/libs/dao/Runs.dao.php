@@ -126,7 +126,7 @@ class RunsDAO extends RunsDAOBase {
         $sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, r.penalty, ' .
                 'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
                 'r.submit_delay, u.username, p.alias, u.country_id ' .
-                'FROM Runs r ' .
+                'FROM Runs r USE INDEX(PRIMARY) ' .
                 'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .
                 'INNER JOIN Users u ON u.user_id = r.user_id ';
         $where = array();
