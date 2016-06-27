@@ -45,7 +45,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * Value for the recruitment optin flag should be non-negative
-     * @expectedException InvalidParameterException
+     * @expectedException InvalidDatabaseOperationException
      */
     public function testNegativeStateUpdate() {
         $user = UserFactory::createUser();
