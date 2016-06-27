@@ -336,8 +336,7 @@
 						<span class="col-md-3 control-label">&nbsp;</span>
 						<div class="col-md-7">
 							<input type="checkbox" id="recruitment_optin" name='recruitment_optin'>
-							&nbsp;
-							<label for="recruitment_optin">{#userEditRecruitmentOptin#}</label>
+							<label for="recruitment_optin" style="display: inline;">{#userEditRecruitmentOptin#}</label>
 						</div>
 					</div>
 
