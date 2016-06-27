@@ -33,6 +33,27 @@ class ContestsDAO extends ContestsDAOBase
                                 window_length
                                 ';
 
+    final public static function getMyInterviews($user_id)
+    {
+        $sql = 'select * from Contests c
+                where
+                 (c.director_id = ?
+                or c.contest_id in (select contest_id from User_Roles where user_id = ? and role_id = 2))';
+
+        $params = array($user_id, $user_id);
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $result = array();
+
+        foreach ($rs as $r) {
+            $result[] = $r;
+        }
+
+        return $result;
+    }
+
     final public static function getByAlias($alias)
     {
         $sql = 'SELECT * FROM Contests WHERE (alias = ? ) LIMIT 1;';

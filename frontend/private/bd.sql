@@ -559,6 +559,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `birth_date` date DEFAULT NULL,
   `last_access` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `verified` BOOLEAN NOT NULL DEFAULT FALSE,
+  `interviewer` BOOLEAN NOT NULL DEFAULT FALSE,
   `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL,
   `reset_digest` VARCHAR(45) NULL DEFAULT NULL,
   `reset_sent_at` DATETIME NULL DEFAULT NULL,
@@ -701,16 +702,6 @@ CREATE TABLE IF NOT EXISTS `User_Rank` (
   PRIMARY KEY (`user_id`),
   KEY (`rank`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
-
-CREATE TABLE IF NOT EXISTS `Interview` (
-  `interview_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador del aviso',
-  `user_id` int(11) NOT NULL COMMENT 'UserID del autor de este aviso',
-  `duration` int(11) NOT NULL COMMENT 'Duration in minutes of this interview',
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta entrevista',
-  `contest_id` text NOT NULL COMMENT 'Una entrevista esta implementada con un concurso',
-  PRIMARY KEY (`interview_id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajería dentro del sitio.' AUTO_INCREMENT=1 ;
 
 --
 -- Restricciones para tablas volcadas

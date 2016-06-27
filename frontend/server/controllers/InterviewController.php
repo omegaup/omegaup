@@ -30,13 +30,6 @@ class InterviewController extends Controller {
 
         $createdContest = ContestController::apiCreate($r);
 
-        $interview = new Interview();
-        $interview->user_id = $r['current_user_id'];
-        //$interview->title = $r['title'];
-        //$interview->duration = $r['duration'];
-        $interview->contest_id = $r['contest_id'];
-        InterviewDAO::save($interview);
-
         self::$log->info('Created new interview  ' . $r['alias']);
 
         return array('status' => 'ok');
@@ -66,6 +59,7 @@ class InterviewController extends Controller {
             // user does not exist, create a new user
             $newUserRequest = $r;
             $newUserRequest['email'] = $r['usernameOrEmail'];
+            // Fix:
             $newUserRequest['username'] = 'user'.time(); //$r["usernameOrEmail"];
             $newUserRequest['password'] = 'user'.time();
             UserController::apiCreate($newUserRequest);
@@ -101,25 +95,15 @@ class InterviewController extends Controller {
             // Do nothing.
         }
 
-        //self::getCachedDetails($r, $result);
-
         $thisResult = array();
 
-        $backingContest = InterviewDAO::getBackingContestByAlias($r['interview_alias']);
+        $backingContest = ContestsDAO::getByAlias($r['interview_alias']);
         if (is_null($backingContest)) {
             throw new NotFoundException();
         }
 
         $thisResult['description'] = $backingContest->description;
         $thisResult['contest_alias'] = $backingContest->alias;
-
-        // assumming interview exists ?
-        $interview = InterviewDAO::search(array('contest_id' => $backingContest->contest_id))[0];
-
-        // get current candidates
-        $thisResult['title'] = $interview->title;
-        //$thisResult["duration"] = $interview>duration;
-        $thisResult['created'] = $interview->time;
 
         $candidatesQuery = new ContestsUsers();
         $candidatesQuery->setContestId($backingContest->contest_id);
@@ -158,7 +142,7 @@ class InterviewController extends Controller {
         $current_ses = SessionController::getCurrentSession($r);
 
         try {
-            $interviews = InterviewDAO::getMyInterviews($current_ses['id']);
+            $interviews = ContestsDAO::getMyInterviews($current_ses['id']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -219,15 +203,6 @@ class InterviewController extends Controller {
         return ContestController::SHOW_INTRO;
     }
 
-//
-//    /**
-//     * Validates add/remove user request
-//     *
-//     * @param Request $r
-//     * @throws InvalidDatabaseOperationException
-//     * @throws InvalidParameterException
-//     * @throws ForbiddenAccessException
-//     */
     private static function validateAddUser(Request $r) {
         $r['user'] = null;
 
