@@ -60,8 +60,24 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
+     * Name cannot be empty
+     * @expectedException InvalidParameterException
+     */
+    public function testInvalidStateUpdate() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+
+        // Invalid name
+        $r['name'] = '';
+
+        UserController::apiUpdate($r);
+    }
+
+    /**
      * Value for the recruitment optin flag should be non-negative
-     * @expectedException InvalidDatabaseOperationException
+     * @expectedException InvalidParameterException
      */
     public function testInvalidStateUpdate() {
         $user = UserFactory::createUser();
