@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table User_Rank.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class UserRank extends VO
 {
 	/**
 	  * Constructor de UserRank
-	  * 
-	  * Para construir un objeto de tipo UserRank debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo UserRank debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class UserRank extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
@@ -58,14 +57,14 @@ class UserRank extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto UserRank en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"user_id" => $this->user_id,
 			"rank" => $this->rank,
 			"problems_solved_count" => $this->problems_solved_count,
@@ -73,8 +72,8 @@ class UserRank extends VO
 			"username" => $this->username,
 			"name" => $this->name,
 			"country_id" => $this->country_id
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**

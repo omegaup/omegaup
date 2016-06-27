@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Interview_Users.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class InterviewUsers extends VO
 {
 	/**
 	  * Constructor de InterviewUsers
-	  * 
-	  * Para construir un objeto de tipo InterviewUsers debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo InterviewUsers debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class InterviewUsers extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
@@ -55,22 +54,22 @@ class InterviewUsers extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto InterviewUsers en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"user_id" => $this->user_id,
 			"interview_id" => $this->interview_id,
 			"invitation_sent" => $this->invitation_sent,
 			"access_time" => $this->access_time,
 			"score" => $this->score,
 			"time" => $this->time
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**

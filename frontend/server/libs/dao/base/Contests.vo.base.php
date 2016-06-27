@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Contests.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Contests extends VO
 {
 	/**
 	  * Constructor de Contests
-	  * 
-	  * Para construir un objeto de tipo Contests debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Contests debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Contests extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['contest_id'])) {
 				$this->contest_id = $data['contest_id'];
@@ -115,14 +114,14 @@ class Contests extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Contests en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"contest_id" => $this->contest_id,
 			"title" => $this->title,
 			"description" => $this->description,
@@ -149,8 +148,8 @@ class Contests extends VO
 			"languages" => $this->languages,
 			"recommended" => $this->recommended,
 			"interview" => $this->interview
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -322,7 +321,7 @@ class Contests extends VO
 	/**
 	  * Indica que los participantes deben pre-registrarse antes de poder paticipar
 	  * @access public
-	  * @var 
+	  * @var
 	  */
 	public $contestant_must_register;
 

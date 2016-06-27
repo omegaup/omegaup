@@ -9,24 +9,23 @@
   * ******************************************************************************* */
 
 /** Interview Data Access Object (DAO) Base.
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Interview }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link Interview }.
   * @access public
   * @abstract
-  * 
+  *
   */
 abstract class InterviewDAOBase extends DAO
 {
-
 	/**
-	  *	Guardar registros. 
-	  *	
-	  *	Este metodo guarda el estado actual del objeto {@link Interview} pasado en la base de datos. La llave 
+	  *	Guardar registros.
+	  *
+	  *	Este metodo guarda el estado actual del objeto {@link Interview} pasado en la base de datos. La llave
 	  *	primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
 	  *	primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
 	  *	en ese objeto el ID recien creado.
-	  *	
+	  *
 	  *	@static
 	  * @throws Exception si la operacion fallo.
 	  * @param Interview [$Interview] El objeto de tipo Interview
@@ -42,13 +41,12 @@ abstract class InterviewDAOBase extends DAO
 		}
 	}
 
-
 	/**
-	  *	Obtener {@link Interview} por llave primaria. 
-	  *	
-	  * Este metodo cargara un objeto {@link Interview} de la base de datos 
-	  * usando sus llaves primarias. 
-	  *	
+	  *	Obtener {@link Interview} por llave primaria.
+	  *
+	  * Este metodo cargara un objeto {@link Interview} de la base de datos
+	  * usando sus llaves primarias.
+	  *
 	  *	@static
 	  * @return @link Interview Un objeto del tipo {@link Interview}. NULL si no hay tal registro.
 	  **/
@@ -66,12 +64,12 @@ abstract class InterviewDAOBase extends DAO
 
 	/**
 	  *	Obtener todas las filas.
-	  *	
+	  *
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
 	  * un vector que contiene objetos de tipo {@link Interview}. Tenga en cuenta que este metodo
-	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
+	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
-	  *	
+	  *
 	  *	@static
 	  * @param $pagina Pagina a ver.
 	  * @param $columnas_por_pagina Columnas por pagina.
@@ -86,7 +84,7 @@ abstract class InterviewDAOBase extends DAO
 		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
-			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
+			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql);
@@ -98,22 +96,21 @@ abstract class InterviewDAOBase extends DAO
 		return $allData;
 	}
 
-
 	/**
 	  *	Buscar registros.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Interview} de la base de datos. 
-	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Interview} de la base de datos.
+	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-	  *	
+	  *
 	  * <code>
 	  *  /**
 	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cliente = new Cliente();
 	  *	  $cliente->setLimiteCredito("20000");
 	  *	  $resultados = ClienteDAO::search($cliente);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -129,7 +126,7 @@ abstract class InterviewDAOBase extends DAO
 			return self::search(new Interview($Interview));
 		}
 
-		$sql = "SELECT * from Interview WHERE ("; 
+		$sql = "SELECT * from Interview WHERE (";
 		$val = array();
 		if (!is_null( $Interview->getInterviewId())) {
 			$sql .= " `interview_id` = ? AND";
@@ -191,12 +188,12 @@ abstract class InterviewDAOBase extends DAO
 	private static final function update($Interview)
 	{
 		$sql = "UPDATE Interview SET  `title` = ?, `user_id` = ?, `duration` = ?, `time` = ?, `contest_id` = ? WHERE  `interview_id` = ?;";
-		$params = array( 
-			$Interview->getTitle(), 
-			$Interview->getUserId(), 
-			$Interview->getDuration(), 
-			$Interview->getTime(), 
-			$Interview->getContestId(), 
+		$params = array(
+			$Interview->getTitle(),
+			$Interview->getUserId(),
+			$Interview->getDuration(),
+			$Interview->getTime(),
+			$Interview->getContestId(),
 			$Interview->getInterviewId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -205,13 +202,13 @@ abstract class InterviewDAOBase extends DAO
 
 	/**
 	  *	Crear registros.
-	  *	
-	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
+	  *
+	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los
 	  * contenidos del objeto Interview suministrado. Asegurese
-	  * de que los valores para todas las columnas NOT NULL se ha especificado 
-	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
+	  * de que los valores para todas las columnas NOT NULL se ha especificado
+	  * correctamente. Despues del comando INSERT, este metodo asignara la clave
 	  * primaria generada en el objeto Interview dentro de la misma transaccion.
-	  *	
+	  *
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Interview [$Interview] El objeto de tipo Interview a crear.
 	  **/
@@ -219,7 +216,7 @@ abstract class InterviewDAOBase extends DAO
 	{
 		if (is_null($Interview->time)) $Interview->time = gmdate('Y-m-d H:i:s');
 		$sql = "INSERT INTO Interview ( `interview_id`, `title`, `user_id`, `duration`, `time`, `contest_id` ) VALUES ( ?, ?, ?, ?, ?, ?);";
-		$params = array( 
+		$params = array(
 			$Interview->interview_id,
 			$Interview->title,
 			$Interview->user_id,
@@ -238,27 +235,27 @@ abstract class InterviewDAOBase extends DAO
 
 	/**
 	  *	Buscar por rango.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Interview} de la base de datos siempre y cuando 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Interview} de la base de datos siempre y cuando
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Interview}.
-	  * 
+	  *
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-	  *	
+	  *
 	  * <code>
 	  *  /**
-	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito 
+	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cr1 = new Cliente();
 	  *	  $cr1->setLimiteCredito("2000");
 	  *	  $cr1->setDescuento("50");
-	  *	  
+	  *
 	  *	  $cr2 = new Cliente();
 	  *	  $cr2->setLimiteCredito("5000");
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -271,78 +268,71 @@ abstract class InterviewDAOBase extends DAO
 	  **/
 	public static final function byRange( $InterviewA , $InterviewB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Interview WHERE ("; 
+		$sql = "SELECT * from Interview WHERE (";
 		$val = array();
 		if( ( !is_null (($a = $InterviewA->getInterviewId()) ) ) & ( ! is_null ( ($b = $InterviewB->getInterviewId()) ) ) ){
 				$sql .= " `interview_id` >= ? AND `interview_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `interview_id` = ? AND"; 
+			$sql .= " `interview_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $InterviewA->getTitle()) ) ) & ( ! is_null ( ($b = $InterviewB->getTitle()) ) ) ){
 				$sql .= " `title` >= ? AND `title` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `title` = ? AND"; 
+			$sql .= " `title` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $InterviewA->getUserId()) ) ) & ( ! is_null ( ($b = $InterviewB->getUserId()) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `user_id` = ? AND"; 
+			$sql .= " `user_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $InterviewA->getDuration()) ) ) & ( ! is_null ( ($b = $InterviewB->getDuration()) ) ) ){
 				$sql .= " `duration` >= ? AND `duration` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `duration` = ? AND"; 
+			$sql .= " `duration` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $InterviewA->getTime()) ) ) & ( ! is_null ( ($b = $InterviewB->getTime()) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `time` = ? AND"; 
+			$sql .= " `time` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $InterviewA->getContestId()) ) ) & ( ! is_null ( ($b = $InterviewB->getContestId()) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `contest_id` = ? AND"; 
+			$sql .= " `contest_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -355,13 +345,13 @@ abstract class InterviewDAOBase extends DAO
 
 	/**
 	  *	Eliminar registros.
-	  *	
+	  *
 	  * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-	  * en el objeto Interview suministrado. Una vez que se ha suprimido un objeto, este no 
-	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila 
-	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. 
+	  * en el objeto Interview suministrado. Una vez que se ha suprimido un objeto, este no
+	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
+	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
 	  * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
-	  *	
+	  *
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
 	  * @param Interview [$Interview] El objeto de tipo Interview a eliminar
@@ -376,6 +366,4 @@ abstract class InterviewDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
-
 }
