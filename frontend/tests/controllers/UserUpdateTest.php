@@ -27,6 +27,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $r['scholar_degree'] = 'Maestría';
         $r['birth_date'] = strtotime('1988-01-01');
         $r['graduation_date'] = strtotime('2016-02-02');
+        $r['recruitment_optin'] = 1;
 
         // Call api
         $response = UserController::apiUpdate($r);
@@ -39,6 +40,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $this->assertEquals($user_db->getScholarDegree(), $r['scholar_degree']);
         $this->assertEquals($user_db->getBirthDate(), gmdate('Y-m-d', $r['birth_date']));
         $this->assertEquals($user_db->getGraduationDate(), gmdate('Y-m-d', $r['graduation_date']));
+        $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
     }
 
     /**
@@ -55,5 +57,51 @@ class UserUpdateTest extends OmegaupTestCase {
         $r['state_id'] = -1;
 
         UserController::apiUpdate($r);
+    }
+
+    /**
+     * Value for the recruitment optin flag should be non-negative
+     * @expectedException InvalidDatabaseOperationException
+     */
+    public function testInvalidStateUpdate() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+        $r['name'] = Utils::CreateRandomString();
+
+        // Invalid recruitment_optin
+        $r['recruitment_optin'] = -1;
+
+        UserController::apiUpdate($r);
+    }
+
+    /**
+     * Null values for the recruitment optin flag are allowed
+     */
+    public function testRecruitmentOptinUpdate() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+        $r['name'] = Utils::CreateRandomString();
+
+        // Null recruitment_optin
+        $r['recruitment_optin'] = NULL;
+        UserController::apiUpdate($r);
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
+
+        // Null recruitment_optin
+        $r['recruitment_optin'] = 1;
+        UserController::apiUpdate($r);
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
+
+        // Null recruitment_optin
+        $r['recruitment_optin'] = 0;
+        UserController::apiUpdate($r);
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
     }
 }
