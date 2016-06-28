@@ -6,6 +6,7 @@
  */
 class ContestController extends Controller {
     const SHOW_INTRO = true;
+    const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 3 weeks
 
     /**
      * Returns a list of contests
@@ -452,29 +453,29 @@ class ContestController extends Controller {
                     'languages');
                     $letter = 0;
 
-                    foreach ($problemsInContest as $problemkey) {
-                        try {
-                            // Get the data of the problem
-                            $temp_problem = ProblemsDAO::getByPK($problemkey->getProblemId());
-                        } catch (Exception $e) {
-                            // Operation failed in the data layer
-                            throw new InvalidDatabaseOperationException($e);
-                        }
+            foreach ($problemsInContest as $problemkey) {
+                try {
+                    // Get the data of the problem
+                    $temp_problem = ProblemsDAO::getByPK($problemkey->getProblemId());
+                } catch (Exception $e) {
+                    // Operation failed in the data layer
+                    throw new InvalidDatabaseOperationException($e);
+                }
 
-                        // Add the 'points' value that is stored in the ContestProblem relationship
-                        $temp_array = $temp_problem->asFilteredArray($relevant_columns);
-                        $temp_array['points'] = $problemkey->getPoints();
-                        $temp_array['letter'] = ContestController::columnName($letter++);
-                        if (!empty($result['languages'])) {
-                            $temp_array['languages'] = join(',', array_intersect(
-                                explode(',', $result['languages']),
-                                explode(',', $temp_array['languages'])
-                            ));
-                        }
+                // Add the 'points' value that is stored in the ContestProblem relationship
+                $temp_array = $temp_problem->asFilteredArray($relevant_columns);
+                $temp_array['points'] = $problemkey->getPoints();
+                $temp_array['letter'] = ContestController::columnName($letter++);
+                if (!empty($result['languages'])) {
+                    $temp_array['languages'] = join(',', array_intersect(
+                        explode(',', $result['languages']),
+                        explode(',', $temp_array['languages'])
+                    ));
+                }
 
-                        // Save our array into the response
-                        array_push($problemsResponseArray, $temp_array);
-                    }
+                // Save our array into the response
+                array_push($problemsResponseArray, $temp_array);
+            }
 
             // Add problems to response
                     $result['problems'] = $problemsResponseArray;
@@ -819,6 +820,11 @@ class ContestController extends Controller {
 
         // Calculate the actual contest length
         $contest_length = $finish_time - $start_time;
+
+        // Validate max contest length
+        if ($contest_length > ContestController::MAX_CONTEST_LENGTH_SECONDS) {
+            throw new InvalidParameterException('contestLengthTooLong');
+        }
 
         // Window_length is optional
         if (!is_null($r['window_length']) && $r['window_length'] !== 'NULL') {
