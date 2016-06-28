@@ -6,7 +6,7 @@
  */
 class ContestController extends Controller {
     const SHOW_INTRO = true;
-    const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 3 weeks
+    const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
 
     /**
      * Returns a list of contests
