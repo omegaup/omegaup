@@ -167,7 +167,6 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestController::apiSetRecommended($r);
     }
 
-
     /**
      * Contest length can't be too long
      *
@@ -186,6 +185,62 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // Update length
         $r['finish_time'] = $r['start_time'] + (60 * 60 * 24 * 32);
+
+        // Call API
+        $response = ContestController::apiUpdate($r);
+    }
+
+    /**
+     * Contest can't be updated if already contains runs
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testUpdateContestLengthWithRuns() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // STEP 1: Create a problem and add it to the contest
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // STEP 2: Get contestant ready to create a run
+        // Create our contestant
+        $contestant = UserFactory::createUser();
+
+        // Our contestant has to open the contest before sending a run
+        ContestsFactory::openContest($contestData, $contestant);
+
+        // Then we need to open the problem
+        ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
+
+        // STEP 3: Send a new run
+        // Create an empty request
+        $r = new Request();
+
+        // Log in as contestant
+        $r['auth_token'] = $this->login($contestant);
+
+        // Build request
+        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['language'] = 'c';
+        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+
+        RunController::apiCreate($r);
+
+        // STEP 4: Update the contest length, this should fail
+        // Prepare request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+
+        // Log in with contest director
+        $r['auth_token'] = $this->login($contestData['director']);
+
+        // Update length
+        $r['finish_time'] = $r['start_time'] + (60 * 60 * 24);
 
         // Call API
         $response = ContestController::apiUpdate($r);
