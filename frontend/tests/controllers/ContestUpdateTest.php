@@ -166,4 +166,28 @@ class UpdateContestTest extends OmegaupTestCase {
         // Call API
         ContestController::apiSetRecommended($r);
     }
+
+
+    /**
+     * Contest length can't be too long
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testUpdateContestLengthTooLong() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Prepare request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+
+        // Log in with contest director
+        $r['auth_token'] = $this->login($contestData['director']);
+
+        // Update length
+        $r['finish_time'] = $r['start_time'] + (60 * 60 * 24 * 32);
+
+        // Call API
+        $response = ContestController::apiUpdate($r);
+    }
 }
