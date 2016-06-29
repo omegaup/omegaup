@@ -88,6 +88,20 @@ class InterviewController extends Controller {
         return array('status' => 'ok');
     }
 
+    private static function userOpenedContest($contest_id, $user_id) {
+        // You already started the contest.
+        $contestOpened = ContestsUsersDAO::getByPK(
+            $user_id,
+            $contest_id
+        );
+
+        if (!is_null($contestOpened) && $contestOpened->access_time != '0000-00-00 00:00:00') {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function apiDetails(Request $r) {
         try {
             self::authenticateRequest($r);
@@ -119,19 +133,64 @@ class InterviewController extends Controller {
 
         // Add all users to an array
         foreach ($db_results as $result) {
+            // @TODO: Slow queries ahead
             $user_id = $result->getUserId();
             $user = UsersDAO::getByPK($user_id);
+
+            try {
+                $email = EmailsDAO::getByPK($user->getMainEmailId());
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+            $userOpenedContest = self::userOpenedContest($backingContest->contest_id, $user_id);
             $users[] = array(
                         'user_id' => $user_id,
                         'username' => $user->getUsername(),
                         'access_time' => $result->access_time,
-                        'email' => $user->getMainEmailId(),
+                        'email' => $email->getEmail(),
+                        'opened_interview' => $userOpenedContest,
                         'country' => $user->getCountryId());
         }
 
         $thisResult['users'] = $users;
 
         return $thisResult;
+    }
+
+    private static function sendVerificationEmail(Request $r) {
+        if (!OMEGAUP_EMAIL_SEND_EMAILS) {
+            return;
+        }
+
+        try {
+            $email = EmailsDAO::getByPK($r['user']->getMainEmailId());
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        self::$log->info('Sending email to user.');
+        if (self::$sendEmailOnVerify) {
+            $mail = new PHPMailer();
+            $mail->IsSMTP();
+            $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
+            $mail->SMTPAuth = true;
+            $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
+            $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
+            $mail->Port = 465;
+            $mail->SMTPSecure = 'ssl';
+            $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+
+            $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
+            $mail->AddAddress($email->getEmail());
+            $mail->isHTML(true);
+            $mail->Subject = 'Bienvenido a Omegaup!';
+            $mail->Body = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email: <a href="https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '"> https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '</a>';
+
+            if (!$mail->Send()) {
+                self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
+                throw new EmailVerificationSendException();
+            }
+        }
     }
 
     public static function apiList(Request $r) {

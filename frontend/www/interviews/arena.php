@@ -19,6 +19,5 @@ try {
 if ($show_intro) {
     $smarty->display('../../templates/interviews.arena.intro.tpl');
 } else {
-    //$smarty->assign('jsfile', '/ux/contest.js');
     $smarty->display('../../templates/interviews.arena.index.tpl');
 }

@@ -16,13 +16,12 @@ $(document).ready(function() {
 	$('form#add_user_to_interview').submit(function() {
 		var userOrEmail = $("#usernameOrEmail").val();
 		var html = "<tr>"
-			+ "<td><input type='checkbox' id='" + userOrEmail + "'/></td>"
 			+ "<td>" + omegaup.escape(userOrEmail) + "</td>"
-			+ "<td>" + "</td>"
 			+ "</tr>";
 
 		$("#invitepeople > table > tbody").append(html);
 		$("#send_invites").show();
+		$("#usernameOrEmail").val("");
 
 		return false; // Prevent page refresh on submit
 	});
@@ -43,52 +42,26 @@ $(document).ready(function() {
 	});
 
 	omegaup.getContestAdminDetails(interviewAlias, function(contest) {
-            console.log(contest);
 		$('.page-header h1 span').html(OmegaUp.T['interviewEdit'] + ' ' + contest.title);
 		$('.page-header h1 small').html('&ndash; <a href="/interviews/' + interviewAlias + '/arena">' + OmegaUp.T['interviewGoToInterview'] + '</a>');
 		$(".new_interview_form #title").val(contest.title);
-		//$(".new_interview_form #alias").val(contest.alias);
 		$(".new_interview_form #description").val(contest.description);
-		//$(".new_interview_form #start_time").val(dateToString(contest.start_time));
-		//$(".new_interview_form #finish_time").val(dateToString(contest.finish_time));
-
-		//if (contest.window_length === null) {
-		//	// Disable window length
-		//	$('#window_length_enabled').removeAttr('checked');
-		//	$('#window_length').val('');
-		//} else {
-		//	$('#window_length_enabled').attr('checked', 'checked');
-		//	$('#window_length').removeAttr('disabled');
 		$('#window_length').val(contest.window_length);
-		//}
-
-		//$(".new_contest_form #points_decay_factor").val(contest.points_decay_factor);
-		//$(".new_contest_form #submissions_gap").val(contest.submissions_gap / 60);
-		//$(".new_contest_form #feedback").val(contest.feedback);
-		//$(".new_contest_form #penalty").val(contest.penalty);
-		//$(".new_contest_form #public").val(contest.public);
-		//$(".new_contest_form #register").val(contest.contestant_must_register);
-		//$(".new_contest_form #scoreboard").val(contest.scoreboard);
-		//$(".new_contest_form #penalty_type").val(contest.penalty_type);
-		//$(".new_contest_form #show_scoreboard_after").val(contest.show_scoreboard_after);
 	});
 
 	function fillCandidatesTable() {
 		omegaup.getInterview(interviewAlias, function(interview) {
-            //console.log(interview)
 			var html = "";
 			for (var i = 0; i < interview.users.length; i++) {
 				html += "<tr>"
 					+ "<td>" + omegaup.escape(interview.users[i].username) + "</td>"
 					+ "<td>" + interview.users[i].email + "</td>"
-					+ "<td>" + "score</td>"
-					+ "<td>" + interview.users[i].access_time + "</td>"
+					+ "<td>" + interview.users[i].opened_interview + "</td>"
 					+ "<td>" + interview.users[i].access_time + "</td>"
 					+ "<td>" + "</td>"
 					+ "</tr>";
 			}
 
-			$("#candidate_list").removeClass("wait_for_ajax");
 			$("#candidate_list > table > tbody").empty().html(html);
 		});
 	}

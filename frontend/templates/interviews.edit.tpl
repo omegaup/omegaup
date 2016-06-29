@@ -1,5 +1,5 @@
 
-{assign var="htmlTitle" value="Entrevistas"}
+{assign var="htmlTitle" value="{#interviews#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
@@ -88,7 +88,6 @@
 					<thead>
 						<th>{#wordsUser#}</th>
 						<th>{#loginEmail#}</th>
-						<th>{#rankScore#}</th>
 						<th>{#wordsStartTime#}</th>
 						<th>{#wordsStartTime#}</th>
 						<th>{#wordsResult#}</th>
@@ -104,7 +103,7 @@
 				<form id="add_user_to_interview" role="form">
 					<div class="row">
 						<div class="form-group col-md-6">
-							<input id='usernameOrEmail' placeholder="{#userEmailEditEmail#}"  name='usernameOrEmail' type='text' size='30' class="form-control">
+							<input id='usernameOrEmail' placeholder="{#userOrEmail#}"  name='usernameOrEmail' type='text' size='30' class="form-control">
 						</div>
 						<div class="form-group col-md-6">
 							<button type='submit' class="btn btn-primary">{#inviteToInterview#}</button>
@@ -115,8 +114,7 @@
 			<div id="invitepeople">
 				<table class="table">
 					<thead>
-						<th></th>
-						<th>{#wordsE#}</th>
+						<th>{#userOrEmail#}</th>
 						<th></th>
 					</thead>
 					<tbody>
@@ -188,6 +186,6 @@
 
 </div>
 
-<script type="text/javascript" src="/js/interviews.edit.js?ver=2e15b4"></script>
+<script type="text/javascript" src="/js/interviews.edit.js?ver=f00618"></script>
 {include file='footer.tpl'}
 

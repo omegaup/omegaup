@@ -120,7 +120,7 @@ class ContestController extends Controller {
 
         $addedContests = array();
         foreach ($contests as $c) {
-            $c->toUnixTime();//?
+            $c->toUnixTime();
             $contestInfo = $c->asFilteredArray($relevant_columns);
             $addedContests[] = $contestInfo;
         }
