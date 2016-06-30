@@ -191,14 +191,10 @@ class UpdateContestTest extends OmegaupTestCase {
     }
 
     /**
-     * Contest can't be updated if already contains runs
+     * Submit a run into a contest helper
      *
-     * @expectedException InvalidParameterException
      */
-    public function testUpdateContestLengthWithRuns() {
-        // Get a contest
-        $contestData = ContestsFactory::createContest();
-
+    private function createRunInContest($contestData) {
         // STEP 1: Create a problem and add it to the contest
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
@@ -230,9 +226,20 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 
         RunController::apiCreate($r);
+    }
 
-        // STEP 4: Update the contest length, this should fail
-        // Prepare request
+    /**
+     * Contest start can't be updated if already contains runs
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testUpdateContestStartWithRuns() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Submit a run
+        $this->createRunInContest($contestData);
+
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
 
@@ -240,9 +247,64 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $this->login($contestData['director']);
 
         // Update length
-        $r['finish_time'] = $r['start_time'] + (60 * 60 * 24);
+        $r['start_time'] = $contestData['request']['start_time'] + 1;
 
         // Call API
         $response = ContestController::apiUpdate($r);
+    }
+
+    /**
+     * Contest lent can be updated if no runs
+     *
+     */
+    public function testUpdateContestStartNoRuns() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+
+        // Log in with contest director
+        $r['auth_token'] = $this->login($contestData['director']);
+
+        // Update length
+        $r['start_time'] = $contestData['request']['start_time'] + 1;
+
+        // Call API
+        $response = ContestController::apiUpdate($r);
+
+        // Check contest data from DB
+        $contestData['request']['start_time'] = $r['start_time'];
+        $this->assertContest($contestData['request']);
+    }
+
+    /**
+     * Contest title be updated if already contains runs and start time does not change
+     *
+     */
+    public function testUpdateContestTitleWithRuns() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Submit a run
+        $this->createRunInContest($contestData);
+
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+
+        // Log in with contest director
+        $r['auth_token'] = $this->login($contestData['director']);
+
+        // Update length
+        $r['start_time'] = $contestData['request']['start_time'];
+        $r['title'] = 'New title';
+
+        // Call API
+        $response = ContestController::apiUpdate($r);
+
+        // Check contest data from DB
+        $contestData['request']['start_time'] = $r['start_time'];
+        $contestData['request']['title'] = $r['title'];
+        $this->assertContest($contestData['request']);
     }
 }

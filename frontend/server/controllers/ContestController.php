@@ -810,8 +810,8 @@ class ContestController extends Controller {
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
-        $start_time = !is_null($r['start_time']) ? $r['start_time'] : $r['contest']->getStartTime();
-        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : $r['contest']->getFinishTime();
+        $start_time = !is_null($r['start_time']) ? $r['start_time'] : strtotime($r['contest']->getStartTime());
+        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : strtotime($r['contest']->getFinishTime());
 
         // Validate start & finish time
         if ($start_time > $finish_time) {
@@ -886,7 +886,7 @@ class ContestController extends Controller {
 
         if ($is_update) {
             // Prevent date changes if a contest already has runs
-            if (!is_null($r['start_time']) || !is_null($r['finish_time']) || !is_null($r['window_length'])) {
+            if (!is_null($r['start_time']) && $r['start_time'] != strtotime($r['contest']->start_time)) {
                 $runCount = 0;
 
                 try {
