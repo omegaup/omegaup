@@ -53,6 +53,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $r = new Request();
         $r['auth_token'] = $this->login($user);
         $r['name'] = Utils::CreateRandomString();
+        $r['recruitment_optin'] = 1;
 
         // Invalid state_id
         $r['state_id'] = -1;
@@ -102,12 +103,6 @@ class UserUpdateTest extends OmegaupTestCase {
         $r = new Request();
         $r['auth_token'] = $this->login($user);
         $r['name'] = Utils::CreateRandomString();
-
-        // Null recruitment_optin
-        $r['recruitment_optin'] = null;
-        UserController::apiUpdate($r);
-        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
 
         // Set recruitment_optin to true
         $r['recruitment_optin'] = 1;
