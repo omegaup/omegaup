@@ -311,7 +311,7 @@ abstract class UsersDAOBase extends DAO
 			$Users->verification_id,
 			$Users->reset_digest,
 			$Users->reset_sent_at,
-			NULL,
+			$Users->recruitment_optin,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
