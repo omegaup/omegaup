@@ -61,7 +61,7 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     * Name cannot be empty
+     * Request parameter name cannot be empty
      * @expectedException InvalidParameterException
      */
     public function testEmptyNameUpdate() {
@@ -72,6 +72,23 @@ class UserUpdateTest extends OmegaupTestCase {
 
         // Invalid name
         $r['name'] = '';
+
+        UserController::apiUpdate($r);
+    }
+
+    /**
+     * Request parameter recruitment_optin cannot be null
+     * @expectedException InvalidParameterException
+     */
+    public function testNullRecruitmentOptinUpdate() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+        $r['name'] = Utils::CreateRandomString();
+
+        // Null recruitment_optin
+        $r['recruitment_optin'] = null;
 
         UserController::apiUpdate($r);
     }
@@ -92,13 +109,13 @@ class UserUpdateTest extends OmegaupTestCase {
         $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
         $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
 
-        // Null recruitment_optin
+        // Set recruitment_optin to true
         $r['recruitment_optin'] = 1;
         UserController::apiUpdate($r);
         $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
         $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
 
-        // Null recruitment_optin
+        // Set recruitment_optin to false
         $r['recruitment_optin'] = 0;
         UserController::apiUpdate($r);
         $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
