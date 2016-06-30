@@ -254,7 +254,7 @@ class UpdateContestTest extends OmegaupTestCase {
     }
 
     /**
-     * Contest lent can be updated if no runs
+     * Contest length can be updated if no runs
      *
      */
     public function testUpdateContestStartNoRuns() {
@@ -279,7 +279,7 @@ class UpdateContestTest extends OmegaupTestCase {
     }
 
     /**
-     * Contest title be updated if already contains runs and start time does not change
+     * Contest title can be updated if already contains runs and start time does not change
      *
      */
     public function testUpdateContestTitleWithRuns() {
