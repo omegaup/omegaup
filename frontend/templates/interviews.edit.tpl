@@ -24,7 +24,7 @@
 			<form class="new_interview_form" role="form">
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="title">{#wordsTitle#}</label>
+						<label for="title">{#wordsAlias#}</label>
 						<input id='title' disabled="true"  name='title' value='' type='text' size='30' class="form-control">
 					</div>
 					<div class="form-group col-md-6">
@@ -36,7 +36,6 @@
 						</select>
 					</div>
 				</div>
-				<button type='submit' class="btn btn-primary">{#wordsEdit#}</button>
 			</form>
 			</div>
 		</div>
@@ -89,8 +88,7 @@
 						<th>{#wordsUser#}</th>
 						<th>{#loginEmail#}</th>
 						<th>{#wordsStartTime#}</th>
-						<th>{#wordsStartTime#}</th>
-						<th>{#wordsResult#}</th>
+						<th></th>
 					</thead>
 					<tbody>
 					</tbody>
@@ -186,6 +184,6 @@
 
 </div>
 
-<script type="text/javascript" src="/js/interviews.edit.js?ver=2f72f2"></script>
+<script type="text/javascript" src="/js/interviews.edit.js?ver=dc5c34"></script>
 {include file='footer.tpl'}
 

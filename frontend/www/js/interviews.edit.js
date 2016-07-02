@@ -1,6 +1,6 @@
 
 $(document).ready(function() {
-	var interviewAlias = /\/interviews\/([^\/]+)\/?.*/.exec(window.location.pathname)[1];
+	var interviewAlias = /\/interview\/([^\/]+)\/?.*/.exec(window.location.pathname)[1];
 
 	if(window.location.hash){
 		$('#sections').find('a[href="'+window.location.hash+'"]').tab('show');
@@ -49,7 +49,7 @@ $(document).ready(function() {
 
 	omegaup.getContestAdminDetails(interviewAlias, function(contest) {
 		$('.page-header h1 span').html(OmegaUp.T['interviewEdit'] + ' ' + contest.title);
-		$('.page-header h1 small').html('&ndash; <a href="/interviews/' + interviewAlias + '/arena">' + OmegaUp.T['interviewGoToInterview'] + '</a>');
+		$('.page-header h1 small').html('&ndash; <a href="/interview/' + interviewAlias + '/arena">' + OmegaUp.T['interviewGoToInterview'] + '</a>');
 		$(".new_interview_form #title").val(contest.title);
 		$(".new_interview_form #description").val(contest.description);
 		$('#window_length').val(contest.window_length);
@@ -62,8 +62,7 @@ $(document).ready(function() {
 				html += "<tr>"
 					+ "<td>" + omegaup.escape(interview.users[i].username) + "</td>"
 					+ "<td>" + interview.users[i].email + "</td>"
-					+ "<td>" + interview.users[i].opened_interview + "</td>"
-					+ "<td>" + interview.users[i].access_time + "</td>"
+					+ "<td>" + (interview.users[i].opened_interview ? interview.users[i].access_time : OmegaUp.T['interviewNotStarted'] ) + "</td>"
 					+ "<td>" + "</td>"
 					+ "</tr>";
 			}

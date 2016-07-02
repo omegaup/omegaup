@@ -46,12 +46,6 @@ class InterviewController extends Controller {
         return array('status' => 'ok');
     }
 
-    private static function userFromEmail($email) {
-        $newUsername = substr($email, 0, strpos($email, '@'));
-        $newUsername = str_replace('-', '_', $newUsername);
-        return $newUsername . time();
-    }
-
     private static function addUserInternal($r) {
         // Does the user exist ?
         try {
@@ -66,7 +60,7 @@ class InterviewController extends Controller {
 
             $newUserRequest = $r;
             $newUserRequest['email'] = $r['usernameOrEmail'];
-            $newUserRequest['username'] = self::userFromEmail($r['usernameOrEmail']);
+            $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
             $newUserRequest['password'] = self::randomString(8);
             $newUser = UserController::apiCreate($newUserRequest);
 
@@ -91,6 +85,8 @@ class InterviewController extends Controller {
             self::$log->error('Failed to create new ContestUser: ' . $e->getMessage());
             throw new InvalidDatabaseOperationException($e);
         }
+
+        self::sendInvitationEmail($r);
 
         self::$log->info('Added ' . $newUserRequest['username'] . ' to interview.');
 
@@ -189,39 +185,19 @@ class InterviewController extends Controller {
     }
 
     private static function sendInvitationEmail(Request $r) {
-        if (!OMEGAUP_EMAIL_SEND_EMAILS) {
-            return;
-        }
-
         try {
-            $email = EmailsDAO::getByPK($r['user']->getMainEmailId());
+            $r['email'] = EmailsDAO::getByPK($r['user']->getMainEmailId());
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::$log->info('Sending email to user.');
-        if (self::$sendEmailOnVerify) {
-            $mail = new PHPMailer();
-            $mail->IsSMTP();
-            $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
-            $mail->SMTPAuth = true;
-            $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
-            $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
-            $mail->Port = 465;
-            $mail->SMTPSecure = 'ssl';
-            $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+        global $smarty;
+        $r['mail_subject'] = $smarty->getConfigVariable('interviewInvitationEmailSubject');
+        $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+                           . ' <a href="https://omegaup.com/interview/' . $r['contest']->getAlias() . '/arena">'
+                           . ' https://omegaup.com/interview/' . $r['contest']->getAlias() . '/arena</a>';
 
-            $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
-            $mail->AddAddress($email->getEmail());
-            $mail->isHTML(true);
-            $mail->Subject = 'Bienvenido a Omegaup!';
-            $mail->Body = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email: <a href="https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '"> https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '</a>';
-
-            if (!$mail->Send()) {
-                self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
-                throw new EmailVerificationSendException();
-            }
-        }
+        UserController::sendEmail($r);
     }
 
     public static function apiList(Request $r) {
@@ -229,10 +205,8 @@ class InterviewController extends Controller {
 
         $interviews = null;
 
-        $current_ses = SessionController::getCurrentSession($r);
-
         try {
-            $interviews = ContestsDAO::getMyInterviews($current_ses['id']);
+            $interviews = ContestsDAO::getMyInterviews($r['current_user_id']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -266,7 +240,7 @@ class InterviewController extends Controller {
         }
 
         if (is_null($r['contest'])) {
-            throw new NotFoundException('contestNotFound');
+            throw new NotFoundException('interviewNotFound');
         }
 
         // Only director is allowed to create problems in contest

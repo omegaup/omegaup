@@ -26,7 +26,7 @@ $(document).ready(function() {
 			for (var i = interviews.results.length-1; i >= 0; i--) {
 				html += "<tr>"
 					+ "<td></td>"
-					+ "<td><b><a href='/interviews/" + interviews.results[i].alias  + "/edit'>" + omegaup.escape(interviews.results[i].title) + "</a></b></td>"
+					+ "<td><b><a href='/interview/" + interviews.results[i].alias  + "/edit'>" + omegaup.escape(interviews.results[i].title) + "</a></b></td>"
 					+ "<td>" + interviews.results[i].window_length + "</td>"
 					+ "<td></td>"
 					+ "</tr>";

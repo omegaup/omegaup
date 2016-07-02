@@ -51,4 +51,6 @@ class InterviewCreateTest extends OmegaupTestCase {
         // @TODO
         // you CAN'T change those properties from an interview,
     }
+
+    // you can only add up to 10 users at a time
 }

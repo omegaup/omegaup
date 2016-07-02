@@ -2061,7 +2061,7 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	if(oldPassword !== null) toSend.oldPassword = oldPassword;
 
 	$.post(
-		'/api/controllername/user/edit/', // controllername ?
+		'/api/controllername/user/edit/',
 		toSend,
 		function (data) {
 			callback(data);

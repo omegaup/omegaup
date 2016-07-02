@@ -824,7 +824,8 @@ class ContestController extends Controller {
         $contest_length = $finish_time - $start_time;
 
         // Validate max contest length
-        if ($contest_length > ContestController::MAX_CONTEST_LENGTH_SECONDS) {
+        $is_interview = (!is_null($r['interview']) && ($r['interview'] == 1 || $r['interview']));
+        if (!$is_interview && $contest_length > ContestController::MAX_CONTEST_LENGTH_SECONDS) {
             throw new InvalidParameterException('contestLengthTooLong');
         }
 

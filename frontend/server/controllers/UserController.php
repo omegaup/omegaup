@@ -267,38 +267,48 @@ class UserController extends Controller {
      * @throws EmailVerificationSendException
      */
     private static function sendVerificationEmail(Request $r) {
-        if (!OMEGAUP_EMAIL_SEND_EMAILS) {
-            return;
-        }
-
         try {
-            $email = EmailsDAO::getByPK($r['user']->getMainEmailId());
+            $r['email'] = EmailsDAO::getByPK($r['user']->getMainEmailId());
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::$log->info('Sending email to user.');
+        $r['mail_subject'] = 'Bienvenido a Omegaup!';
+        $r['mail_body'] = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email:'
+                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '">'
+                           . ' https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '</a>';
+
         if (self::$sendEmailOnVerify) {
-            $mail = new PHPMailer();
-            $mail->IsSMTP();
-            $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
-            $mail->SMTPAuth = true;
-            $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
-            $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
-            $mail->Port = 465;
-            $mail->SMTPSecure = 'ssl';
-            $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+            self::sendEmail($r);
+        }
+    }
 
-            $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
-            $mail->AddAddress($email->getEmail());
-            $mail->isHTML(true);
-            $mail->Subject = 'Bienvenido a Omegaup!';
-            $mail->Body = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email: <a href="https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '"> https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '</a>';
+    public static function sendEmail($r) {
+        if (!OMEGAUP_EMAIL_SEND_EMAILS) {
+            return;
+        }
 
-            if (!$mail->Send()) {
-                self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
-                throw new EmailVerificationSendException();
-            }
+        self::$log->info('Sending email to user.');
+
+        $mail = new PHPMailer();
+        $mail->IsSMTP();
+        $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
+        $mail->SMTPAuth = true;
+        $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
+        $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
+        $mail->Port = 465;
+        $mail->SMTPSecure = 'ssl';
+        $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+
+        $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
+        $mail->AddAddress($r['email']->getEmail());
+        $mail->isHTML(true);
+        $mail->Subject = $r['mail_subject'];
+        $mail->Body = $r['mail_body'];
+
+        if (!$mail->Send()) {
+            self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
+            throw new EmailVerificationSendException();
         }
     }
 
@@ -1720,5 +1730,11 @@ class UserController extends Controller {
         self::sendVerificationEmail($r);
 
         return array('status' => 'ok');
+    }
+
+    public static function makeUsernameFromEmail($email) {
+        $newUsername = substr($email, 0, strpos($email, '@'));
+        $newUsername = str_replace('-', '_', $newUsername);
+        return $newUsername . time();
     }
 }
