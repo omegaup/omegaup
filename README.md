@@ -11,7 +11,7 @@ Estos son los directorios que estamos usando activamente en el desarrollo:
 * [frontend/server/libs](https://github.com/omegaup/omegaup/tree/master/frontend/server/libs):
   Bibliotecas y utilerías.
 * [frontend/server/libs/dao](https://github.com/omegaup/omegaup/tree/master/frontend/server/libs/dao):
-  Los Data Access Objects [DAO].  Clases utilizadas para representar los
+  Los Data Access Objects [DAO] y Value Objects [VO].  Clases utilizadas para representar los
   esquemas de la base de datos y facilitar su consumo por los controladores.
 * [frontend/templates](https://github.com/omegaup/omegaup/tree/master/frontend/templates):
   plantillas de Smarty utilizadas para generar el HTML que se despliega a los
