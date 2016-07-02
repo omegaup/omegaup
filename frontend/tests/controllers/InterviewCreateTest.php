@@ -46,12 +46,10 @@ class InterviewCreateTest extends OmegaupTestCase {
 
         $this->assertEquals(1, $interview[0]['interview']);
         $this->assertEquals(0, $interview[0]['public']);
-        $this->assertEquals(1, $interview[0]['contestant_must_register'], 'Interviews must have the contestant_must_register property');
+        $this->assertEquals(0, $interview[0]['contestant_must_register'], 'Interviews must have the contestant_must_register property');
 
+        // @TODO
         // you CAN'T change those properties from an interview,
     }
-
-    //public function testInterviewsListing() {
-    //    //public static function apiList(Request $r) {
-    //}
 }
+

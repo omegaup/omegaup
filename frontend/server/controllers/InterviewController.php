@@ -1,6 +1,7 @@
 <?php
 
 class InterviewController extends Controller {
+
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         // Interview specific validations. Everything else is validated in ContestController::apiCreate
         $is_required = !$is_update;
@@ -37,7 +38,7 @@ class InterviewController extends Controller {
         $r['penalty_calc_policy'] = 'sum';
         $r['languages'] = null;
         $r['interview'] = true;
-        $r['contestant_must_register'] = 1;
+        $r['contestant_must_register'] = 0;
 
         $createdContest = ContestController::apiCreate($r);
 
@@ -172,6 +173,7 @@ class InterviewController extends Controller {
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
+
             $userOpenedContest = self::userOpenedContest($backingContest->contest_id, $user_id);
             $users[] = array(
                         'user_id' => $user_id,
@@ -187,7 +189,7 @@ class InterviewController extends Controller {
         return $thisResult;
     }
 
-    private static function sendVerificationEmail(Request $r) {
+    private static function sendInvitationEmail(Request $r) {
         if (!OMEGAUP_EMAIL_SEND_EMAILS) {
             return;
         }
@@ -243,50 +245,6 @@ class InterviewController extends Controller {
 
     public static function showContestIntro(Request $r) {
         return ContestController::showContestIntro($r);
-    //    try {
-    //        $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-    //    } catch (Exception $e) {
-    //        throw new NotFoundException('contestNotFound');
-    //    }
-    //    if (is_null($r['contest'])) {
-    //        throw new NotFoundException('contestNotFound');
-    //    }
-
-    //    try {
-    //        // Half-authenticate, in case there is no session in place.
-    //        $session = SessionController::apiCurrentSession($r);
-    //        if ($session['valid'] && !is_null($session['user'])) {
-    //            $r['current_user'] = $session['user'];
-    //            $r['current_user_id'] = $session['user']->user_id;
-    //        } else {
-    //            // No session, show the intro (if public), so that they can login.
-    //            return $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
-    //        }
-    //        ContestController::canAccessContest($r);
-    //    } catch (Exception $e) {
-    //        // Could not access contest. Private contests must not be leaked, so
-    //        // unless they were manually added beforehand, show them a 404 error.
-    //        if (!ContestController::isInvitedToContest($r)) {
-    //            throw $e;
-    //        }
-    //        self::$log->error('Exception while trying to verify access: ' . $e);
-    //        return ContestController::SHOW_INTRO;
-    //    }
-
-    //    $cs = SessionController::apiCurrentSession();
-
-    //    // You already started the contest.
-    //    $contestOpened = ContestsUsersDAO::getByPK(
-    //        $r['current_user_id'],
-    //        $r['contest']->getContestId()
-    //    );
-    //    if (!is_null($contestOpened) &&
-    //        $contestOpened->access_time != '0000-00-00 00:00:00') {
-    //        self::$log->debug('Not intro because you already started the contest');
-    //        return !ContestController::SHOW_INTRO;
-    //    }
-
-    //    return ContestController::SHOW_INTRO;
     }
 
     private static function validateAddUser(Request $r) {
