@@ -52,4 +52,3 @@ class InterviewCreateTest extends OmegaupTestCase {
         // you CAN'T change those properties from an interview,
     }
 }
-
