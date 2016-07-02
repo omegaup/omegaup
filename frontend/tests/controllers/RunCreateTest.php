@@ -43,7 +43,7 @@ class RunCreateTest extends OmegaupTestCase {
         // Create an empty request
         $r = new Request();
 
-        // Log in as contest director
+        // Log in as contestant
         $r['auth_token'] = $this->login($this->contestant);
 
         // Build request

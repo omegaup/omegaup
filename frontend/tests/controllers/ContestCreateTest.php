@@ -97,4 +97,25 @@ class CreateContestTest extends OmegaupTestCase {
         // Call the API for the 2nd time with same alias
         $response = ContestController::apiCreate($r);
     }
+
+    /**
+     * Tests very long contests
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testCreateVeryLongContest() {
+        // Create a valid contest Request object
+        $contestData = ContestsFactory::getRequest();
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+
+        // Longer than a month
+        $r['finish_time'] = $r['start_time'] + (60 * 60 * 24 * 32);
+
+        // Log in the user and set the auth token in the new request
+        $r['auth_token'] = $this->login($contestDirector);
+
+        // Call the API
+        $response = ContestController::apiCreate($r);
+    }
 }

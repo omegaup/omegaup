@@ -6,6 +6,7 @@
  */
 class ContestController extends Controller {
     const SHOW_INTRO = true;
+    const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
 
     /**
      * Returns a list of contests
@@ -461,10 +462,10 @@ class ContestController extends Controller {
                             throw new InvalidDatabaseOperationException($e);
                         }
 
-                        // Add the 'points' value that is stored in the ContestProblem relationship
-                        $temp_array = $temp_problem->asFilteredArray($relevant_columns);
-                        $temp_array['points'] = $problemkey->getPoints();
-                        $temp_array['letter'] = ContestController::columnName($letter++);
+                                // Add the 'points' value that is stored in the ContestProblem relationship
+                                $temp_array = $temp_problem->asFilteredArray($relevant_columns);
+                                $temp_array['points'] = $problemkey->getPoints();
+                                $temp_array['letter'] = ContestController::columnName($letter++);
                         if (!empty($result['languages'])) {
                             $temp_array['languages'] = join(',', array_intersect(
                                 explode(',', $result['languages']),
@@ -472,8 +473,8 @@ class ContestController extends Controller {
                             ));
                         }
 
-                        // Save our array into the response
-                        array_push($problemsResponseArray, $temp_array);
+                                // Save our array into the response
+                                array_push($problemsResponseArray, $temp_array);
                     }
 
             // Add problems to response
@@ -809,8 +810,8 @@ class ContestController extends Controller {
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
-        $start_time = !is_null($r['start_time']) ? $r['start_time'] : $r['contest']->getStartTime();
-        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : $r['contest']->getFinishTime();
+        $start_time = !is_null($r['start_time']) ? $r['start_time'] : strtotime($r['contest']->getStartTime());
+        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : strtotime($r['contest']->getFinishTime());
 
         // Validate start & finish time
         if ($start_time > $finish_time) {
@@ -819,6 +820,11 @@ class ContestController extends Controller {
 
         // Calculate the actual contest length
         $contest_length = $finish_time - $start_time;
+
+        // Validate max contest length
+        if ($contest_length > ContestController::MAX_CONTEST_LENGTH_SECONDS) {
+            throw new InvalidParameterException('contestLengthTooLong');
+        }
 
         // Window_length is optional
         if (!is_null($r['window_length']) && $r['window_length'] !== 'NULL') {
@@ -877,6 +883,23 @@ class ContestController extends Controller {
 
         // Show scoreboard is always optional
         Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', array('0', '1'), false);
+
+        if ($is_update) {
+            // Prevent date changes if a contest already has runs
+            if (!is_null($r['start_time']) && $r['start_time'] != strtotime($r['contest']->start_time)) {
+                $runCount = 0;
+
+                try {
+                    $runCount = RunsDAO::CountTotalRunsOfContest($r['contest']->contest_id);
+                } catch (Exception $e) {
+                    throw new InvalidDatabaseOperationException($e);
+                }
+
+                if ($runCount > 0) {
+                    throw new InvalidParameterException('contestUpdateAlreadyHasRuns');
+                }
+            }
+        }
     }
 
     /**
