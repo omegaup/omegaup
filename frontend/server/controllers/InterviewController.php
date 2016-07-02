@@ -1,7 +1,6 @@
 <?php
 
 class InterviewController extends Controller {
-
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         // Interview specific validations. Everything else is validated in ContestController::apiCreate
         $is_required = !$is_update;
