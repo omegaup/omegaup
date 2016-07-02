@@ -19,6 +19,7 @@ $(document).ready(function() {
 			+ "<td>" + omegaup.escape(userOrEmail) + "</td>"
 			+ "</tr>";
 
+		InvitedUsers.push(userOrEmail);
 		$("#invitepeople > table > tbody").append(html);
 		$("#send_invites").show();
 		$("#usernameOrEmail").val("");
@@ -26,15 +27,20 @@ $(document).ready(function() {
 		return false; // Prevent page refresh on submit
 	});
 
+	var InvitedUsers = Array();
+
 	$('form#send_invites').submit(function() {
-		omegaup.addUserToInterview(
+		omegaup.addUsersToInterview(
 			interviewAlias,
-			$("#usernameOrEmail").val(),
+			InvitedUsers.join(),
 			function(response) {
 				if (response.status == "ok") {
 					OmegaUp.ui.success(OmegaUp.T['userEditSuccess']);
+					InvitedUsers = Array();
+					fillCandidatesTable();
 				} else {
 					OmegaUp.ui.error(response.error);
+					fillCandidatesTable();
 				}
 			}
 		);

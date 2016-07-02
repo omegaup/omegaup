@@ -2076,13 +2076,13 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	});
 };
 
-OmegaUp.prototype.addUserToInterview = function(interviewAlias, usernameOrEmail, callback) {
+OmegaUp.prototype.addUsersToInterview = function(interviewAlias, usernameOrEmailsCSV, callback) {
 	var self = this;
 
 	$.post(
-		'/api/interview/addUser/interview_alias/' + encodeURIComponent(interviewAlias) + '/',
+		'/api/interview/addUsers/interview_alias/' + encodeURIComponent(interviewAlias) + '/',
 		{
-			usernameOrEmail : usernameOrEmail
+			usernameOrEmailsCSV : usernameOrEmailsCSV
 		},
 		function (data) {
 			callback(data);
@@ -2137,10 +2137,10 @@ OmegaUp.prototype.getInterviews = function(callback) {
 	});
 };
 
-OmegaUp.prototype.createInterview = function(s_Title, s_Duration, callback) {
+OmegaUp.prototype.createInterview = function(s_Alias, s_Title, s_Duration, callback) {
 	$.post(
 		'/api/interview/create/',
-		{ title : s_Title, duration : s_Duration},
+		{ alias : s_Alias, title : s_Title, duration : s_Duration},
 		function (data) {
 			if (data.status !== undefined && data.status == "error") {
 				OmegaUp.ui.error(data.error);

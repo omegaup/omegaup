@@ -2,6 +2,7 @@
 $(document).ready(function() {
 	var formSubmit = function() {
 		omegaup.createInterview(
+			$("#alias").val(),
 			$("#title").val(),
 			$("#duration").val(),
 			function(response) {

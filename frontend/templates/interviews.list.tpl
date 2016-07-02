@@ -57,6 +57,6 @@
 	</table>
 </div>
 
-<script type="text/javascript" src="/js/interviews.list.js?ver=772023"></script>
+<script type="text/javascript" src="/js/interviews.list.js?ver=1cabca"></script>
 {include file='footer.tpl'}
 

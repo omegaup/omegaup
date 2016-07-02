@@ -1,6 +1,16 @@
 <?php
 
 class InterviewController extends Controller {
+    private static function validateCreateOrUpdate(Request $r, $is_update = false) {
+        // Interview specific validations. Everything else is validated in ContestController::apiCreate
+        $is_required = !$is_update;
+
+        Validators::isStringNonEmpty($r['title'], 'title', $is_required);
+        Validators::isStringNonEmpty($r['description'], 'description', false);
+        Validators::isNumberInRange($r['duration'], 'duration', 60, 60 * 5, false);
+        Validators::isValidAlias($r['alias'], 'alias', $is_required);
+    }
+
     public static function apiCreate(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
@@ -8,14 +18,15 @@ class InterviewController extends Controller {
 
         self::authenticateRequest($r);
 
+        self::validateCreateOrUpdate($r, false);
+
         // Create the contest that will back this interview
         $r['public'] = false;
         $r['title'] = $r['title'];
-        $r['description'] = $r['title'];
+        $r['description'] = array_key_exists('description', $r) ? $r['description'] : $r['title'];
         $r['start_time'] = time();
         $r['finish_time'] = strtotime('+1 year');
         $r['window_length'] = $r['duration'];
-        $r['alias'] = str_replace(' ', '', $r['title']);
         $r['scoreboard'] = 0;
         $r['points_decay_factor'] = 0;
         $r['partial_score'] = 0;
@@ -26,28 +37,22 @@ class InterviewController extends Controller {
         $r['penalty_calc_policy'] = 'sum';
         $r['languages'] = null;
         $r['interview'] = true;
-        $r['contestant_must_register'] = true;
+        $r['contestant_must_register'] = 1;
 
         $createdContest = ContestController::apiCreate($r);
 
-        self::$log->info('Created new interview  ' . $r['alias']);
+        self::$log->info('Created new interview ' . $r['alias']);
 
         return array('status' => 'ok');
     }
 
-    /**
-     * Adds a user to a interview.
-     *
-     * @param Request $r
-     * @return array
-     * @throws InvalidDatabaseOperationException
-     * @throws ForbiddenAccessException
-     */
-    public static function apiAddUser(Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
-        }
+    private static function userFromEmail($email) {
+        $newUsername = substr($email, 0, strpos($email, '@'));
+        $newUsername = str_replace('-', '_', $newUsername);
+        return $newUsername . time();
+    }
 
+    private static function addUserInternal($r) {
         // Does the user exist ?
         try {
             $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
@@ -57,35 +62,60 @@ class InterviewController extends Controller {
 
         if (is_null($r['user'])) {
             // user does not exist, create a new user
+            self::$log->info('Could not find user, this must be a new email, register: ' . $r['usernameOrEmail']);
+
             $newUserRequest = $r;
             $newUserRequest['email'] = $r['usernameOrEmail'];
-            // Fix:
-            $newUserRequest['username'] = 'user'.time(); //$r["usernameOrEmail"];
-            $newUserRequest['password'] = 'user'.time();
-            UserController::apiCreate($newUserRequest);
+            $newUserRequest['username'] = self::userFromEmail($r['usernameOrEmail']);
+            $newUserRequest['password'] = self::randomString(8);
+            $newUser = UserController::apiCreate($newUserRequest);
+
+            $r['user'] = $newUserRequest['username'];
         }
 
-        // Authenticate logged user
-        self::authenticateRequest($r);
         self::validateAddUser($r);
 
-        $contest_user = new ContestsUsers();
-        $contest_user->setContestId($r['contest']->getContestId());
-        $contest_user->setUserId($r['user']->getUserId());
-        $contest_user->setAccessTime('0000-00-00 00:00:00');
-        $contest_user->setScore('0');
-        $contest_user->setTime('0');
+        // add the user to the interview (contest)
+        $contestUser = new ContestsUsers();
+        $contestUser->setContestId($r['contest']->getContestId());
+        $contestUser->setUserId($r['user']->getUserId());
+        $contestUser->setAccessTime('0000-00-00 00:00:00');
+        $contestUser->setScore('0');
+        $contestUser->setTime('0');
 
         // Save the contest to the DB
         try {
-            ContestsUsersDAO::save($contest_user);
+            ContestsUsersDAO::save($contestUser);
         } catch (Exception $e) {
             // Operation failed in the data layer
             self::$log->error('Failed to create new ContestUser: ' . $e->getMessage());
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return array('status' => 'ok');
+        self::$log->info('Added ' . $newUserRequest['username'] . ' to interview.');
+
+        return true;
+    }
+
+    public static function apiAddUsers(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV', true);
+        $usersToAdd = explode(',', $r['usernameOrEmailsCSV']);
+
+        foreach ($usersToAdd as $addThisUser) {
+            $requestToInternal = new Request($r);
+            $requestToInternal['usernameOrEmail'] = $addThisUser;
+
+            self::addUserInternal($requestToInternal);
+        }
+
+        return array ('status' => 'ok');
     }
 
     private static function userOpenedContest($contest_id, $user_id) {
@@ -211,55 +241,52 @@ class InterviewController extends Controller {
         return $response;
     }
 
-    /**
-     * Show the contest intro unless you are admin, or you
-     * already started this contest.
-     */
     public static function showContestIntro(Request $r) {
-        try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-        } catch (Exception $e) {
-            throw new NotFoundException('contestNotFound');
-        }
-        if (is_null($r['contest'])) {
-            throw new NotFoundException('contestNotFound');
-        }
+        return ContestController::showContestIntro($r);
+    //    try {
+    //        $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+    //    } catch (Exception $e) {
+    //        throw new NotFoundException('contestNotFound');
+    //    }
+    //    if (is_null($r['contest'])) {
+    //        throw new NotFoundException('contestNotFound');
+    //    }
 
-        try {
-            // Half-authenticate, in case there is no session in place.
-            $session = SessionController::apiCurrentSession($r);
-            if ($session['valid'] && !is_null($session['user'])) {
-                $r['current_user'] = $session['user'];
-                $r['current_user_id'] = $session['user']->user_id;
-            } else {
-                // No session, show the intro (if public), so that they can login.
-                return $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
-            }
-            ContestController::canAccessContest($r);
-        } catch (Exception $e) {
-            // Could not access contest. Private contests must not be leaked, so
-            // unless they were manually added beforehand, show them a 404 error.
-            if (!ContestController::isInvitedToContest($r)) {
-                throw $e;
-            }
-            self::$log->error('Exception while trying to verify access: ' . $e);
-            return ContestController::SHOW_INTRO;
-        }
+    //    try {
+    //        // Half-authenticate, in case there is no session in place.
+    //        $session = SessionController::apiCurrentSession($r);
+    //        if ($session['valid'] && !is_null($session['user'])) {
+    //            $r['current_user'] = $session['user'];
+    //            $r['current_user_id'] = $session['user']->user_id;
+    //        } else {
+    //            // No session, show the intro (if public), so that they can login.
+    //            return $r['contest']->public ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
+    //        }
+    //        ContestController::canAccessContest($r);
+    //    } catch (Exception $e) {
+    //        // Could not access contest. Private contests must not be leaked, so
+    //        // unless they were manually added beforehand, show them a 404 error.
+    //        if (!ContestController::isInvitedToContest($r)) {
+    //            throw $e;
+    //        }
+    //        self::$log->error('Exception while trying to verify access: ' . $e);
+    //        return ContestController::SHOW_INTRO;
+    //    }
 
-        $cs = SessionController::apiCurrentSession();
+    //    $cs = SessionController::apiCurrentSession();
 
-        // You already started the contest.
-        $contestOpened = ContestsUsersDAO::getByPK(
-            $r['current_user_id'],
-            $r['contest']->getContestId()
-        );
-        if (!is_null($contestOpened) &&
-            $contestOpened->access_time != '0000-00-00 00:00:00') {
-            self::$log->debug('Not intro because you already started the contest');
-            return !ContestController::SHOW_INTRO;
-        }
+    //    // You already started the contest.
+    //    $contestOpened = ContestsUsersDAO::getByPK(
+    //        $r['current_user_id'],
+    //        $r['contest']->getContestId()
+    //    );
+    //    if (!is_null($contestOpened) &&
+    //        $contestOpened->access_time != '0000-00-00 00:00:00') {
+    //        self::$log->debug('Not intro because you already started the contest');
+    //        return !ContestController::SHOW_INTRO;
+    //    }
 
-        return ContestController::SHOW_INTRO;
+    //    return ContestController::SHOW_INTRO;
     }
 
     private static function validateAddUser(Request $r) {

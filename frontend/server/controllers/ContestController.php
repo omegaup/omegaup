@@ -452,29 +452,29 @@ class ContestController extends Controller {
                     'languages');
                     $letter = 0;
 
-                    foreach ($problemsInContest as $problemkey) {
-                        try {
-                            // Get the data of the problem
-                            $temp_problem = ProblemsDAO::getByPK($problemkey->getProblemId());
-                        } catch (Exception $e) {
-                            // Operation failed in the data layer
-                            throw new InvalidDatabaseOperationException($e);
-                        }
+            foreach ($problemsInContest as $problemkey) {
+                try {
+                    // Get the data of the problem
+                    $temp_problem = ProblemsDAO::getByPK($problemkey->getProblemId());
+                } catch (Exception $e) {
+                    // Operation failed in the data layer
+                    throw new InvalidDatabaseOperationException($e);
+                }
 
-                        // Add the 'points' value that is stored in the ContestProblem relationship
-                        $temp_array = $temp_problem->asFilteredArray($relevant_columns);
-                        $temp_array['points'] = $problemkey->getPoints();
-                        $temp_array['letter'] = ContestController::columnName($letter++);
-                        if (!empty($result['languages'])) {
-                            $temp_array['languages'] = join(',', array_intersect(
-                                explode(',', $result['languages']),
-                                explode(',', $temp_array['languages'])
-                            ));
-                        }
+                // Add the 'points' value that is stored in the ContestProblem relationship
+                $temp_array = $temp_problem->asFilteredArray($relevant_columns);
+                $temp_array['points'] = $problemkey->getPoints();
+                $temp_array['letter'] = ContestController::columnName($letter++);
+                if (!empty($result['languages'])) {
+                    $temp_array['languages'] = join(',', array_intersect(
+                        explode(',', $result['languages']),
+                        explode(',', $temp_array['languages'])
+                    ));
+                }
 
-                        // Save our array into the response
-                        array_push($problemsResponseArray, $temp_array);
-                    }
+                // Save our array into the response
+                array_push($problemsResponseArray, $temp_array);
+            }
 
             // Add problems to response
                     $result['problems'] = $problemsResponseArray;
@@ -701,6 +701,7 @@ class ContestController extends Controller {
         $contest->setScoreboardUrl(self::randomString(30));
         $contest->setScoreboardUrlAdmin(self::randomString(30));
         $contest->setInterview($r['interview']);
+        $contest->setContestantMustRegister($r['contestant_must_register']);
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->setShowScoreboardAfter($r['show_scoreboard_after']);
@@ -766,8 +767,6 @@ class ContestController extends Controller {
         // Expire contes-list cache
         Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
         Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
-
-        $r['contest_id'] = $contest->getContestId();
 
         self::$log->info('New Contest Created: ' . $r['alias']);
         return array('status' => 'ok');
