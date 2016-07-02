@@ -148,6 +148,7 @@ class Contests extends VO
 			"languages" => $this->languages,
 			"recommended" => $this->recommended,
 			"interview" => $this->interview
+			"recommended" => $this->recommended
 		);
 	return json_encode($vec);
 	}
@@ -346,3 +347,4 @@ class Contests extends VO
 	  */
 	public $interview;
 }
+

@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Runs.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Runs extends VO
 {
 	/**
 	  * Constructor de Runs
-	  * 
-	  * Para construir un objeto de tipo Runs debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Runs debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Runs extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['run_id'])) {
 				$this->run_id = $data['run_id'];
@@ -88,14 +87,14 @@ class Runs extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Runs en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"run_id" => $this->run_id,
 			"user_id" => $this->user_id,
 			"problem_id" => $this->problem_id,
@@ -113,8 +112,8 @@ class Runs extends VO
 			"submit_delay" => $this->submit_delay,
 			"test" => $this->test,
 			"judged_by" => $this->judged_by
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -248,3 +247,4 @@ class Runs extends VO
 	  */
 	public $judged_by;
 }
+

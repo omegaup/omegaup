@@ -611,3 +611,4 @@ abstract class UsersDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
+

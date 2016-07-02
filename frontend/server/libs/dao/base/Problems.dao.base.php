@@ -9,24 +9,23 @@
   * ******************************************************************************* */
 
 /** Problems Data Access Object (DAO) Base.
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Problems }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link Problems }.
   * @access public
   * @abstract
-  * 
+  *
   */
 abstract class ProblemsDAOBase extends DAO
 {
-
 	/**
-	  *	Guardar registros. 
-	  *	
-	  *	Este metodo guarda el estado actual del objeto {@link Problems} pasado en la base de datos. La llave 
+	  *	Guardar registros.
+	  *
+	  *	Este metodo guarda el estado actual del objeto {@link Problems} pasado en la base de datos. La llave
 	  *	primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
 	  *	primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
 	  *	en ese objeto el ID recien creado.
-	  *	
+	  *
 	  *	@static
 	  * @throws Exception si la operacion fallo.
 	  * @param Problems [$Problems] El objeto de tipo Problems
@@ -42,13 +41,12 @@ abstract class ProblemsDAOBase extends DAO
 		}
 	}
 
-
 	/**
-	  *	Obtener {@link Problems} por llave primaria. 
-	  *	
-	  * Este metodo cargara un objeto {@link Problems} de la base de datos 
-	  * usando sus llaves primarias. 
-	  *	
+	  *	Obtener {@link Problems} por llave primaria.
+	  *
+	  * Este metodo cargara un objeto {@link Problems} de la base de datos
+	  * usando sus llaves primarias.
+	  *
 	  *	@static
 	  * @return @link Problems Un objeto del tipo {@link Problems}. NULL si no hay tal registro.
 	  **/
@@ -66,12 +64,12 @@ abstract class ProblemsDAOBase extends DAO
 
 	/**
 	  *	Obtener todas las filas.
-	  *	
+	  *
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
 	  * un vector que contiene objetos de tipo {@link Problems}. Tenga en cuenta que este metodo
-	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
+	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
-	  *	
+	  *
 	  *	@static
 	  * @param $pagina Pagina a ver.
 	  * @param $columnas_por_pagina Columnas por pagina.
@@ -86,7 +84,7 @@ abstract class ProblemsDAOBase extends DAO
 		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
-			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
+			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql);
@@ -98,22 +96,21 @@ abstract class ProblemsDAOBase extends DAO
 		return $allData;
 	}
 
-
 	/**
 	  *	Buscar registros.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Problems} de la base de datos. 
-	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Problems} de la base de datos.
+	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-	  *	
+	  *
 	  * <code>
 	  *  /**
 	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cliente = new Cliente();
 	  *	  $cliente->setLimiteCredito("20000");
 	  *	  $resultados = ClienteDAO::search($cliente);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -129,7 +126,7 @@ abstract class ProblemsDAOBase extends DAO
 			return self::search(new Problems($Problems));
 		}
 
-		$sql = "SELECT * from Problems WHERE ("; 
+		$sql = "SELECT * from Problems WHERE (";
 		$val = array();
 		if (!is_null( $Problems->getProblemId())) {
 			$sql .= " `problem_id` = ? AND";
@@ -275,33 +272,33 @@ abstract class ProblemsDAOBase extends DAO
 	private static final function update($Problems)
 	{
 		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `validator_time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ?, `email_clarifications` = ? WHERE  `problem_id` = ?;";
-		$params = array( 
-			$Problems->getPublic(), 
-			$Problems->getAuthorId(), 
-			$Problems->getTitle(), 
-			$Problems->getAlias(), 
-			$Problems->getValidator(), 
-			$Problems->getLanguages(), 
-			$Problems->getServer(), 
-			$Problems->getRemoteId(), 
-			$Problems->getTimeLimit(), 
-			$Problems->getValidatorTimeLimit(), 
-			$Problems->getOverallWallTimeLimit(), 
-			$Problems->getExtraWallTime(), 
-			$Problems->getMemoryLimit(), 
-			$Problems->getOutputLimit(), 
-			$Problems->getStackLimit(), 
-			$Problems->getVisits(), 
-			$Problems->getSubmissions(), 
-			$Problems->getAccepted(), 
-			$Problems->getDifficulty(), 
-			$Problems->getCreationDate(), 
-			$Problems->getSource(), 
-			$Problems->getOrder(), 
-			$Problems->getTolerance(), 
-			$Problems->getSlow(), 
-			$Problems->getDeprecated(), 
-			$Problems->getEmailClarifications(), 
+		$params = array(
+			$Problems->getPublic(),
+			$Problems->getAuthorId(),
+			$Problems->getTitle(),
+			$Problems->getAlias(),
+			$Problems->getValidator(),
+			$Problems->getLanguages(),
+			$Problems->getServer(),
+			$Problems->getRemoteId(),
+			$Problems->getTimeLimit(),
+			$Problems->getValidatorTimeLimit(),
+			$Problems->getOverallWallTimeLimit(),
+			$Problems->getExtraWallTime(),
+			$Problems->getMemoryLimit(),
+			$Problems->getOutputLimit(),
+			$Problems->getStackLimit(),
+			$Problems->getVisits(),
+			$Problems->getSubmissions(),
+			$Problems->getAccepted(),
+			$Problems->getDifficulty(),
+			$Problems->getCreationDate(),
+			$Problems->getSource(),
+			$Problems->getOrder(),
+			$Problems->getTolerance(),
+			$Problems->getSlow(),
+			$Problems->getDeprecated(),
+			$Problems->getEmailClarifications(),
 			$Problems->getProblemId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -310,13 +307,13 @@ abstract class ProblemsDAOBase extends DAO
 
 	/**
 	  *	Crear registros.
-	  *	
-	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
+	  *
+	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los
 	  * contenidos del objeto Problems suministrado. Asegurese
-	  * de que los valores para todas las columnas NOT NULL se ha especificado 
-	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
+	  * de que los valores para todas las columnas NOT NULL se ha especificado
+	  * correctamente. Despues del comando INSERT, este metodo asignara la clave
 	  * primaria generada en el objeto Problems dentro de la misma transaccion.
-	  *	
+	  *
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Problems [$Problems] El objeto de tipo Problems a crear.
 	  **/
@@ -343,7 +340,7 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->deprecated)) $Problems->deprecated = 0;
 		if (is_null($Problems->email_clarifications)) $Problems->email_clarifications = 0;
 		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated`, `email_clarifications` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-		$params = array( 
+		$params = array(
 			$Problems->problem_id,
 			$Problems->public,
 			$Problems->author_id,
@@ -383,27 +380,27 @@ abstract class ProblemsDAOBase extends DAO
 
 	/**
 	  *	Buscar por rango.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Problems} de la base de datos siempre y cuando 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Problems} de la base de datos siempre y cuando
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Problems}.
-	  * 
+	  *
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-	  *	
+	  *
 	  * <code>
 	  *  /**
-	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito 
+	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cr1 = new Cliente();
 	  *	  $cr1->setLimiteCredito("2000");
 	  *	  $cr1->setDescuento("50");
-	  *	  
+	  *
 	  *	  $cr2 = new Cliente();
 	  *	  $cr2->setLimiteCredito("5000");
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -416,309 +413,281 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	public static final function byRange( $ProblemsA , $ProblemsB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Problems WHERE ("; 
+		$sql = "SELECT * from Problems WHERE (";
 		$val = array();
 		if( ( !is_null (($a = $ProblemsA->getProblemId()) ) ) & ( ! is_null ( ($b = $ProblemsB->getProblemId()) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `problem_id` = ? AND"; 
+			$sql .= " `problem_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getPublic()) ) ) & ( ! is_null ( ($b = $ProblemsB->getPublic()) ) ) ){
 				$sql .= " `public` >= ? AND `public` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `public` = ? AND"; 
+			$sql .= " `public` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getAuthorId()) ) ) & ( ! is_null ( ($b = $ProblemsB->getAuthorId()) ) ) ){
 				$sql .= " `author_id` >= ? AND `author_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `author_id` = ? AND"; 
+			$sql .= " `author_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getTitle()) ) ) & ( ! is_null ( ($b = $ProblemsB->getTitle()) ) ) ){
 				$sql .= " `title` >= ? AND `title` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `title` = ? AND"; 
+			$sql .= " `title` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getAlias()) ) ) & ( ! is_null ( ($b = $ProblemsB->getAlias()) ) ) ){
 				$sql .= " `alias` >= ? AND `alias` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `alias` = ? AND"; 
+			$sql .= " `alias` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getValidator()) ) ) & ( ! is_null ( ($b = $ProblemsB->getValidator()) ) ) ){
 				$sql .= " `validator` >= ? AND `validator` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `validator` = ? AND"; 
+			$sql .= " `validator` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getLanguages()) ) ) & ( ! is_null ( ($b = $ProblemsB->getLanguages()) ) ) ){
 				$sql .= " `languages` >= ? AND `languages` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `languages` = ? AND"; 
+			$sql .= " `languages` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getServer()) ) ) & ( ! is_null ( ($b = $ProblemsB->getServer()) ) ) ){
 				$sql .= " `server` >= ? AND `server` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `server` = ? AND"; 
+			$sql .= " `server` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getRemoteId()) ) ) & ( ! is_null ( ($b = $ProblemsB->getRemoteId()) ) ) ){
 				$sql .= " `remote_id` >= ? AND `remote_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `remote_id` = ? AND"; 
+			$sql .= " `remote_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getTimeLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getTimeLimit()) ) ) ){
 				$sql .= " `time_limit` >= ? AND `time_limit` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `time_limit` = ? AND"; 
+			$sql .= " `time_limit` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getValidatorTimeLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getValidatorTimeLimit()) ) ) ){
 				$sql .= " `validator_time_limit` >= ? AND `validator_time_limit` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `validator_time_limit` = ? AND"; 
+			$sql .= " `validator_time_limit` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getOverallWallTimeLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getOverallWallTimeLimit()) ) ) ){
 				$sql .= " `overall_wall_time_limit` >= ? AND `overall_wall_time_limit` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `overall_wall_time_limit` = ? AND"; 
+			$sql .= " `overall_wall_time_limit` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getExtraWallTime()) ) ) & ( ! is_null ( ($b = $ProblemsB->getExtraWallTime()) ) ) ){
 				$sql .= " `extra_wall_time` >= ? AND `extra_wall_time` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `extra_wall_time` = ? AND"; 
+			$sql .= " `extra_wall_time` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getMemoryLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getMemoryLimit()) ) ) ){
 				$sql .= " `memory_limit` >= ? AND `memory_limit` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `memory_limit` = ? AND"; 
+			$sql .= " `memory_limit` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getOutputLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getOutputLimit()) ) ) ){
 				$sql .= " `output_limit` >= ? AND `output_limit` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `output_limit` = ? AND"; 
+			$sql .= " `output_limit` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getStackLimit()) ) ) & ( ! is_null ( ($b = $ProblemsB->getStackLimit()) ) ) ){
 				$sql .= " `stack_limit` >= ? AND `stack_limit` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `stack_limit` = ? AND"; 
+			$sql .= " `stack_limit` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getVisits()) ) ) & ( ! is_null ( ($b = $ProblemsB->getVisits()) ) ) ){
 				$sql .= " `visits` >= ? AND `visits` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `visits` = ? AND"; 
+			$sql .= " `visits` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getSubmissions()) ) ) & ( ! is_null ( ($b = $ProblemsB->getSubmissions()) ) ) ){
 				$sql .= " `submissions` >= ? AND `submissions` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `submissions` = ? AND"; 
+			$sql .= " `submissions` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getAccepted()) ) ) & ( ! is_null ( ($b = $ProblemsB->getAccepted()) ) ) ){
 				$sql .= " `accepted` >= ? AND `accepted` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `accepted` = ? AND"; 
+			$sql .= " `accepted` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getDifficulty()) ) ) & ( ! is_null ( ($b = $ProblemsB->getDifficulty()) ) ) ){
 				$sql .= " `difficulty` >= ? AND `difficulty` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `difficulty` = ? AND"; 
+			$sql .= " `difficulty` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getCreationDate()) ) ) & ( ! is_null ( ($b = $ProblemsB->getCreationDate()) ) ) ){
 				$sql .= " `creation_date` >= ? AND `creation_date` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `creation_date` = ? AND"; 
+			$sql .= " `creation_date` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getSource()) ) ) & ( ! is_null ( ($b = $ProblemsB->getSource()) ) ) ){
 				$sql .= " `source` >= ? AND `source` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `source` = ? AND"; 
+			$sql .= " `source` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getOrder()) ) ) & ( ! is_null ( ($b = $ProblemsB->getOrder()) ) ) ){
 				$sql .= " `order` >= ? AND `order` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `order` = ? AND"; 
+			$sql .= " `order` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getTolerance()) ) ) & ( ! is_null ( ($b = $ProblemsB->getTolerance()) ) ) ){
 				$sql .= " `tolerance` >= ? AND `tolerance` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `tolerance` = ? AND"; 
+			$sql .= " `tolerance` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getSlow()) ) ) & ( ! is_null ( ($b = $ProblemsB->getSlow()) ) ) ){
 				$sql .= " `slow` >= ? AND `slow` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `slow` = ? AND"; 
+			$sql .= " `slow` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getDeprecated()) ) ) & ( ! is_null ( ($b = $ProblemsB->getDeprecated()) ) ) ){
 				$sql .= " `deprecated` >= ? AND `deprecated` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `deprecated` = ? AND"; 
+			$sql .= " `deprecated` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ProblemsA->getEmailClarifications()) ) ) & ( ! is_null ( ($b = $ProblemsB->getEmailClarifications()) ) ) ){
 				$sql .= " `email_clarifications` >= ? AND `email_clarifications` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `email_clarifications` = ? AND"; 
+			$sql .= " `email_clarifications` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -731,13 +700,13 @@ abstract class ProblemsDAOBase extends DAO
 
 	/**
 	  *	Eliminar registros.
-	  *	
+	  *
 	  * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-	  * en el objeto Problems suministrado. Una vez que se ha suprimido un objeto, este no 
-	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila 
-	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. 
+	  * en el objeto Problems suministrado. Una vez que se ha suprimido un objeto, este no
+	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
+	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
 	  * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
-	  *	
+	  *
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
 	  * @param Problems [$Problems] El objeto de tipo Problems a eliminar
@@ -752,6 +721,5 @@ abstract class ProblemsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
-
 }
+

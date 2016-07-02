@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Messages.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Messages extends VO
 {
 	/**
 	  * Constructor de Messages
-	  * 
-	  * Para construir un objeto de tipo Messages debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Messages debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Messages extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['message_id'])) {
 				$this->message_id = $data['message_id'];
@@ -55,22 +54,22 @@ class Messages extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Messages en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"message_id" => $this->message_id,
 			"read" => $this->read,
 			"sender_id" => $this->sender_id,
 			"recipient_id" => $this->recipient_id,
 			"message" => $this->message,
 			"date" => $this->date
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -127,3 +126,4 @@ class Messages extends VO
 	  */
 	public $date;
 }
+

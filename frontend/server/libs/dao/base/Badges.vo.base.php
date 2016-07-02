@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Badges.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Badges extends VO
 {
 	/**
 	  * Constructor de Badges
-	  * 
-	  * Para construir un objeto de tipo Badges debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Badges debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Badges extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['badge_id'])) {
 				$this->badge_id = $data['badge_id'];
@@ -52,21 +51,21 @@ class Badges extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Badges en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"badge_id" => $this->badge_id,
 			"name" => $this->name,
 			"image_url" => $this->image_url,
 			"description" => $this->description,
 			"hint" => $this->hint
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -116,3 +115,4 @@ class Badges extends VO
 	  */
 	public $hint;
 }
+

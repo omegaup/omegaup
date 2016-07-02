@@ -1,6 +1,6 @@
 <?php
 
-/** ******************************************************************************* *
+/********************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
   * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
@@ -291,3 +291,4 @@ class Users extends VO
 	  */
 	public $reset_sent_at;
 }
+

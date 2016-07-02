@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Groups_Scoreboards_Contests.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class GroupsScoreboardsContests extends VO
 {
 	/**
 	  * Constructor de GroupsScoreboardsContests
-	  * 
-	  * Para construir un objeto de tipo GroupsScoreboardsContests debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo GroupsScoreboardsContests debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class GroupsScoreboardsContests extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['group_scoreboard_id'])) {
 				$this->group_scoreboard_id = $data['group_scoreboard_id'];
@@ -49,20 +48,20 @@ class GroupsScoreboardsContests extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto GroupsScoreboardsContests en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"group_scoreboard_id" => $this->group_scoreboard_id,
 			"contest_id" => $this->contest_id,
 			"only_ac" => $this->only_ac,
 			"weight" => $this->weight
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -105,3 +104,4 @@ class GroupsScoreboardsContests extends VO
 	  */
 	public $weight;
 }
+

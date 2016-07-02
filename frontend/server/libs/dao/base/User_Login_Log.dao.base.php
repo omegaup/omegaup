@@ -9,22 +9,21 @@
   * ******************************************************************************* */
 
 /** UserLoginLog Data Access Object (DAO) Base.
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link UserLoginLog }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link UserLoginLog }.
   * @access public
   * @abstract
-  * 
+  *
   */
 abstract class UserLoginLogDAOBase extends DAO
 {
-
 	/**
-	  *	Guardar registros. 
-	  *	
+	  *	Guardar registros.
+	  *
 	  *	Este metodo guarda el estado actual del objeto {@link UserLoginLog} pasado en la base de datos.
 	  *	save() siempre creara una nueva fila.
-	  *	
+	  *
 	  *	@static
 	  * @throws Exception si la operacion fallo.
 	  * @param UserLoginLog [$User_Login_Log] El objeto de tipo UserLoginLog
@@ -35,15 +34,14 @@ abstract class UserLoginLogDAOBase extends DAO
 		return UserLoginLogDAOBase::create( $User_Login_Log);
 	}
 
-
 	/**
 	  *	Obtener todas las filas.
-	  *	
+	  *
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
 	  * un vector que contiene objetos de tipo {@link UserLoginLog}. Tenga en cuenta que este metodo
-	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
+	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
-	  *	
+	  *
 	  *	@static
 	  * @param $pagina Pagina a ver.
 	  * @param $columnas_por_pagina Columnas por pagina.
@@ -58,7 +56,7 @@ abstract class UserLoginLogDAOBase extends DAO
 		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
-			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
+			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql);
@@ -70,22 +68,21 @@ abstract class UserLoginLogDAOBase extends DAO
 		return $allData;
 	}
 
-
 	/**
 	  *	Buscar registros.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UserLoginLog} de la base de datos. 
-	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UserLoginLog} de la base de datos.
+	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-	  *	
+	  *
 	  * <code>
 	  *  /**
 	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cliente = new Cliente();
 	  *	  $cliente->setLimiteCredito("20000");
 	  *	  $resultados = ClienteDAO::search($cliente);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -101,7 +98,7 @@ abstract class UserLoginLogDAOBase extends DAO
 			return self::search(new UserLoginLog($User_Login_Log));
 		}
 
-		$sql = "SELECT * from User_Login_Log WHERE ("; 
+		$sql = "SELECT * from User_Login_Log WHERE (";
 		$val = array();
 		if (!is_null( $User_Login_Log->getUserId())) {
 			$sql .= " `user_id` = ? AND";
@@ -144,13 +141,13 @@ abstract class UserLoginLogDAOBase extends DAO
 
 	/**
 	  *	Crear registros.
-	  *	
-	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
+	  *
+	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los
 	  * contenidos del objeto UserLoginLog suministrado. Asegurese
-	  * de que los valores para todas las columnas NOT NULL se ha especificado 
-	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
+	  * de que los valores para todas las columnas NOT NULL se ha especificado
+	  * correctamente. Despues del comando INSERT, este metodo asignara la clave
 	  * primaria generada en el objeto UserLoginLog dentro de la misma transaccion.
-	  *	
+	  *
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param UserLoginLog [$User_Login_Log] El objeto de tipo UserLoginLog a crear.
 	  **/
@@ -158,7 +155,7 @@ abstract class UserLoginLogDAOBase extends DAO
 	{
 		if (is_null($User_Login_Log->time)) $User_Login_Log->time = gmdate('Y-m-d H:i:s');
 		$sql = "INSERT INTO User_Login_Log ( `user_id`, `ip`, `time` ) VALUES ( ?, ?, ?);";
-		$params = array( 
+		$params = array(
 			$User_Login_Log->user_id,
 			$User_Login_Log->ip,
 			$User_Login_Log->time,
@@ -167,33 +164,33 @@ abstract class UserLoginLogDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 
+
 		return $ar;
 	}
 
 	/**
 	  *	Buscar por rango.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UserLoginLog} de la base de datos siempre y cuando 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link UserLoginLog} de la base de datos siempre y cuando
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link UserLoginLog}.
-	  * 
+	  *
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-	  *	
+	  *
 	  * <code>
 	  *  /**
-	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito 
+	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cr1 = new Cliente();
 	  *	  $cr1->setLimiteCredito("2000");
 	  *	  $cr1->setDescuento("50");
-	  *	  
+	  *
 	  *	  $cr2 = new Cliente();
 	  *	  $cr2->setLimiteCredito("5000");
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -206,45 +203,41 @@ abstract class UserLoginLogDAOBase extends DAO
 	  **/
 	public static final function byRange( $User_Login_LogA , $User_Login_LogB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from User_Login_Log WHERE ("; 
+		$sql = "SELECT * from User_Login_Log WHERE (";
 		$val = array();
 		if( ( !is_null (($a = $User_Login_LogA->getUserId()) ) ) & ( ! is_null ( ($b = $User_Login_LogB->getUserId()) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `user_id` = ? AND"; 
+			$sql .= " `user_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $User_Login_LogA->getIp()) ) ) & ( ! is_null ( ($b = $User_Login_LogB->getIp()) ) ) ){
 				$sql .= " `ip` >= ? AND `ip` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `ip` = ? AND"; 
+			$sql .= " `ip` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $User_Login_LogA->getTime()) ) ) & ( ! is_null ( ($b = $User_Login_LogB->getTime()) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `time` = ? AND"; 
+			$sql .= " `time` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -254,5 +247,5 @@ abstract class UserLoginLogDAOBase extends DAO
 		}
 		return $ar;
 	}
-
 }
+

@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Announcement.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Announcement extends VO
 {
 	/**
 	  * Constructor de Announcement
-	  * 
-	  * Para construir un objeto de tipo Announcement debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Announcement debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Announcement extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['announcement_id'])) {
 				$this->announcement_id = $data['announcement_id'];
@@ -49,20 +48,20 @@ class Announcement extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Announcement en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"announcement_id" => $this->announcement_id,
 			"user_id" => $this->user_id,
 			"time" => $this->time,
 			"description" => $this->description
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -105,3 +104,4 @@ class Announcement extends VO
 	  */
 	public $description;
 }
+
