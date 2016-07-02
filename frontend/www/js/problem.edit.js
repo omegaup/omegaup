@@ -33,7 +33,7 @@ $(document).ready(function() {
 		source: omegaup.typeaheadWrapper(omegaup.searchGroups.bind(omegaup)),
 		displayKey: 'label',
 	}).on('typeahead:selected', function(item, val, text) {
-		$('#groupalias-admin').val(val.label);
+		$('#groupalias-admin').attr('data-alias', val.value);
 	});
 
 	refreshProblemTags();
@@ -65,7 +65,7 @@ $(document).ready(function() {
 	});
 
 	$('#add-group-admin-form').submit(function() {
-		var groupalias = $('#groupalias-admin').val();
+		var groupalias = $('#groupalias-admin').attr('data-alias');
 
 		omegaup.addGroupAdminToProblem(problemAlias, groupalias, function(response) {
 			if (response.status === "ok") {

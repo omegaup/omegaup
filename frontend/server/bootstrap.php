@@ -12,13 +12,13 @@ date_default_timezone_set('UTC');
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . __DIR__);
 
 if (!(defined('IS_TEST') && IS_TEST === true)) {
-    if (!is_file(__DIR__ . '/config.php')) {
-        <!doctype html>
-        <HTML>
-        <head>
-        <link rel='stylesheet' type='text/css' href='css/style.css'>
-        </head>
-        <body style='padding:5px'>
+    if (!is_file(__DIR__ . '/config.php')) { ?>
+<!doctype html>
+<HTML>
+    <head>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    </head>
+    <body style="padding:5px">
         <h1>No config file.</h1>
         <p>You are missing the config file. These are the default values:</p>
         <pre class='code' style='margin: 3em; border: 1px solid #000; background: #ccc;'>
@@ -79,6 +79,7 @@ require_once('libs/ApiException.php');
  * @todo Print args in call (but don't reveal password in log)
  *
  * */
+$request_id = str_replace('.', '', uniqid('', true));
 Logger::configure(array(
         'rootLogger' => array(
             'appenders' => array('default'),
@@ -90,7 +91,7 @@ Logger::configure(array(
                 'layout' => array(
                     'class' => 'LoggerLayoutPattern',
                     'params' => array(
-                        'conversionPattern' => '%date [%level]: %server{REQUEST_URI} %message (%F:%L) %newline',
+                        'conversionPattern' => "%date [%level]: $request_id %server{REQUEST_URI} %message (%F:%L) %newline",
                     )
                 ),
                 'params' => array(

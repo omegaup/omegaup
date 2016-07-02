@@ -12,7 +12,8 @@ FILTERS = ['--include=*.css', '--include=*.js', '--include=*.php',
 	'--exclude-dir=Mailchimp', '--exclude-dir=base', '--exclude-dir=log4php',
 	'--exclude-dir=mathjax', '--exclude-dir=*.git', '--exclude-dir=pagedown',
 	'--exclude-dir=karel', '--exclude=jquery*', '--exclude=bootstrap*',
-	'--exclude=codemirror*']
+	'--exclude=codemirror*', '--exclude-dir=frontend/server/libs/dao/base',
+	'--exclude-dir=karel.js']
 
 class colors:
 	HEADER = '\033[95m'
