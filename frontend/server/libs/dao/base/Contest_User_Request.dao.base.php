@@ -9,24 +9,23 @@
   * ******************************************************************************* */
 
 /** ContestUserRequest Data Access Object (DAO) Base.
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link ContestUserRequest }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link ContestUserRequest }.
   * @access public
   * @abstract
-  * 
+  *
   */
 abstract class ContestUserRequestDAOBase extends DAO
 {
-
 	/**
-	  *	Guardar registros. 
-	  *	
-	  *	Este metodo guarda el estado actual del objeto {@link ContestUserRequest} pasado en la base de datos. La llave 
+	  *	Guardar registros.
+	  *
+	  *	Este metodo guarda el estado actual del objeto {@link ContestUserRequest} pasado en la base de datos. La llave
 	  *	primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
 	  *	primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
 	  *	en ese objeto el ID recien creado.
-	  *	
+	  *
 	  *	@static
 	  * @throws Exception si la operacion fallo.
 	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest
@@ -42,13 +41,12 @@ abstract class ContestUserRequestDAOBase extends DAO
 		}
 	}
 
-
 	/**
-	  *	Obtener {@link ContestUserRequest} por llave primaria. 
-	  *	
-	  * Este metodo cargara un objeto {@link ContestUserRequest} de la base de datos 
-	  * usando sus llaves primarias. 
-	  *	
+	  *	Obtener {@link ContestUserRequest} por llave primaria.
+	  *
+	  * Este metodo cargara un objeto {@link ContestUserRequest} de la base de datos
+	  * usando sus llaves primarias.
+	  *
 	  *	@static
 	  * @return @link ContestUserRequest Un objeto del tipo {@link ContestUserRequest}. NULL si no hay tal registro.
 	  **/
@@ -66,12 +64,12 @@ abstract class ContestUserRequestDAOBase extends DAO
 
 	/**
 	  *	Obtener todas las filas.
-	  *	
+	  *
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
 	  * un vector que contiene objetos de tipo {@link ContestUserRequest}. Tenga en cuenta que este metodo
-	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
+	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
-	  *	
+	  *
 	  *	@static
 	  * @param $pagina Pagina a ver.
 	  * @param $columnas_por_pagina Columnas por pagina.
@@ -86,7 +84,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
-			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
+			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql);
@@ -98,22 +96,21 @@ abstract class ContestUserRequestDAOBase extends DAO
 		return $allData;
 	}
 
-
 	/**
 	  *	Buscar registros.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestUserRequest} de la base de datos. 
-	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestUserRequest} de la base de datos.
+	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-	  *	
+	  *
 	  * <code>
 	  *  /**
 	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cliente = new Cliente();
 	  *	  $cliente->setLimiteCredito("20000");
 	  *	  $resultados = ClienteDAO::search($cliente);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -129,7 +126,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 			return self::search(new ContestUserRequest($Contest_User_Request));
 		}
 
-		$sql = "SELECT * from Contest_User_Request WHERE ("; 
+		$sql = "SELECT * from Contest_User_Request WHERE (";
 		$val = array();
 		if (!is_null( $Contest_User_Request->getUserId())) {
 			$sql .= " `user_id` = ? AND";
@@ -191,11 +188,11 @@ abstract class ContestUserRequestDAOBase extends DAO
 	private static final function update($Contest_User_Request)
 	{
 		$sql = "UPDATE Contest_User_Request SET  `request_time` = ?, `last_update` = ?, `accepted` = ?, `extra_note` = ? WHERE  `user_id` = ? AND `contest_id` = ?;";
-		$params = array( 
-			$Contest_User_Request->getRequestTime(), 
-			$Contest_User_Request->getLastUpdate(), 
-			$Contest_User_Request->getAccepted(), 
-			$Contest_User_Request->getExtraNote(), 
+		$params = array(
+			$Contest_User_Request->getRequestTime(),
+			$Contest_User_Request->getLastUpdate(),
+			$Contest_User_Request->getAccepted(),
+			$Contest_User_Request->getExtraNote(),
 			$Contest_User_Request->getUserId(),$Contest_User_Request->getContestId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -204,13 +201,13 @@ abstract class ContestUserRequestDAOBase extends DAO
 
 	/**
 	  *	Crear registros.
-	  *	
-	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
+	  *
+	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los
 	  * contenidos del objeto ContestUserRequest suministrado. Asegurese
-	  * de que los valores para todas las columnas NOT NULL se ha especificado 
-	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
+	  * de que los valores para todas las columnas NOT NULL se ha especificado
+	  * correctamente. Despues del comando INSERT, este metodo asignara la clave
 	  * primaria generada en el objeto ContestUserRequest dentro de la misma transaccion.
-	  *	
+	  *
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest a crear.
 	  **/
@@ -218,7 +215,7 @@ abstract class ContestUserRequestDAOBase extends DAO
 	{
 		if (is_null($Contest_User_Request->request_time)) $Contest_User_Request->request_time = gmdate('Y-m-d H:i:s');
 		$sql = "INSERT INTO Contest_User_Request ( `user_id`, `contest_id`, `request_time`, `last_update`, `accepted`, `extra_note` ) VALUES ( ?, ?, ?, ?, ?, ?);";
-		$params = array( 
+		$params = array(
 			$Contest_User_Request->user_id,
 			$Contest_User_Request->contest_id,
 			$Contest_User_Request->request_time,
@@ -230,33 +227,33 @@ abstract class ContestUserRequestDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 
+
 		return $ar;
 	}
 
 	/**
 	  *	Buscar por rango.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestUserRequest} de la base de datos siempre y cuando 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link ContestUserRequest} de la base de datos siempre y cuando
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link ContestUserRequest}.
-	  * 
+	  *
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-	  *	
+	  *
 	  * <code>
 	  *  /**
-	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito 
+	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cr1 = new Cliente();
 	  *	  $cr1->setLimiteCredito("2000");
 	  *	  $cr1->setDescuento("50");
-	  *	  
+	  *
 	  *	  $cr2 = new Cliente();
 	  *	  $cr2->setLimiteCredito("5000");
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -269,78 +266,71 @@ abstract class ContestUserRequestDAOBase extends DAO
 	  **/
 	public static final function byRange( $Contest_User_RequestA , $Contest_User_RequestB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Contest_User_Request WHERE ("; 
+		$sql = "SELECT * from Contest_User_Request WHERE (";
 		$val = array();
 		if( ( !is_null (($a = $Contest_User_RequestA->getUserId()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getUserId()) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `user_id` = ? AND"; 
+			$sql .= " `user_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $Contest_User_RequestA->getContestId()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getContestId()) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `contest_id` = ? AND"; 
+			$sql .= " `contest_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $Contest_User_RequestA->getRequestTime()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getRequestTime()) ) ) ){
 				$sql .= " `request_time` >= ? AND `request_time` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `request_time` = ? AND"; 
+			$sql .= " `request_time` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $Contest_User_RequestA->getLastUpdate()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getLastUpdate()) ) ) ){
 				$sql .= " `last_update` >= ? AND `last_update` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `last_update` = ? AND"; 
+			$sql .= " `last_update` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $Contest_User_RequestA->getAccepted()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getAccepted()) ) ) ){
 				$sql .= " `accepted` >= ? AND `accepted` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `accepted` = ? AND"; 
+			$sql .= " `accepted` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $Contest_User_RequestA->getExtraNote()) ) ) & ( ! is_null ( ($b = $Contest_User_RequestB->getExtraNote()) ) ) ){
 				$sql .= " `extra_note` >= ? AND `extra_note` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `extra_note` = ? AND"; 
+			$sql .= " `extra_note` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -353,13 +343,13 @@ abstract class ContestUserRequestDAOBase extends DAO
 
 	/**
 	  *	Eliminar registros.
-	  *	
+	  *
 	  * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-	  * en el objeto ContestUserRequest suministrado. Una vez que se ha suprimido un objeto, este no 
-	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila 
-	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. 
+	  * en el objeto ContestUserRequest suministrado. Una vez que se ha suprimido un objeto, este no
+	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
+	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
 	  * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
-	  *	
+	  *
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
 	  * @param ContestUserRequest [$Contest_User_Request] El objeto de tipo ContestUserRequest a eliminar
@@ -374,6 +364,5 @@ abstract class ContestUserRequestDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
-
 }
+

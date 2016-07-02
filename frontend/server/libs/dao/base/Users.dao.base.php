@@ -9,24 +9,23 @@
   * ******************************************************************************* */
 
 /** Users Data Access Object (DAO) Base.
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Users }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link Users }.
   * @access public
   * @abstract
-  * 
+  *
   */
 abstract class UsersDAOBase extends DAO
 {
-
 	/**
-	  *	Guardar registros. 
-	  *	
-	  *	Este metodo guarda el estado actual del objeto {@link Users} pasado en la base de datos. La llave 
+	  *	Guardar registros.
+	  *
+	  *	Este metodo guarda el estado actual del objeto {@link Users} pasado en la base de datos. La llave
 	  *	primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
 	  *	primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
 	  *	en ese objeto el ID recien creado.
-	  *	
+	  *
 	  *	@static
 	  * @throws Exception si la operacion fallo.
 	  * @param Users [$Users] El objeto de tipo Users
@@ -42,13 +41,12 @@ abstract class UsersDAOBase extends DAO
 		}
 	}
 
-
 	/**
-	  *	Obtener {@link Users} por llave primaria. 
-	  *	
-	  * Este metodo cargara un objeto {@link Users} de la base de datos 
-	  * usando sus llaves primarias. 
-	  *	
+	  *	Obtener {@link Users} por llave primaria.
+	  *
+	  * Este metodo cargara un objeto {@link Users} de la base de datos
+	  * usando sus llaves primarias.
+	  *
 	  *	@static
 	  * @return @link Users Un objeto del tipo {@link Users}. NULL si no hay tal registro.
 	  **/
@@ -66,12 +64,12 @@ abstract class UsersDAOBase extends DAO
 
 	/**
 	  *	Obtener todas las filas.
-	  *	
+	  *
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
 	  * un vector que contiene objetos de tipo {@link Users}. Tenga en cuenta que este metodo
-	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
+	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
-	  *	
+	  *
 	  *	@static
 	  * @param $pagina Pagina a ver.
 	  * @param $columnas_por_pagina Columnas por pagina.
@@ -86,7 +84,7 @@ abstract class UsersDAOBase extends DAO
 		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
-			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
+			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql);
@@ -98,22 +96,21 @@ abstract class UsersDAOBase extends DAO
 		return $allData;
 	}
 
-
 	/**
 	  *	Buscar registros.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Users} de la base de datos. 
-	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Users} de la base de datos.
+	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-	  *	
+	  *
 	  * <code>
 	  *  /**
 	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cliente = new Cliente();
 	  *	  $cliente->setLimiteCredito("20000");
 	  *	  $resultados = ClienteDAO::search($cliente);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -129,7 +126,7 @@ abstract class UsersDAOBase extends DAO
 			return self::search(new Users($Users));
 		}
 
-		$sql = "SELECT * from Users WHERE ("; 
+		$sql = "SELECT * from Users WHERE (";
 		$val = array();
 		if (!is_null( $Users->getUserId())) {
 			$sql .= " `user_id` = ? AND";
@@ -247,26 +244,26 @@ abstract class UsersDAOBase extends DAO
 	private static final function update($Users)
 	{
 		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ? WHERE  `user_id` = ?;";
-		$params = array( 
-			$Users->getUsername(), 
-			$Users->getFacebookUserId(), 
-			$Users->getPassword(), 
-			$Users->getMainEmailId(), 
-			$Users->getName(), 
-			$Users->getSolved(), 
-			$Users->getSubmissions(), 
-			$Users->getCountryId(), 
-			$Users->getStateId(), 
-			$Users->getSchoolId(), 
-			$Users->getScholarDegree(), 
-			$Users->getLanguageId(), 
-			$Users->getGraduationDate(), 
-			$Users->getBirthDate(), 
-			$Users->getLastAccess(), 
-			$Users->getVerified(), 
-			$Users->getVerificationId(), 
-			$Users->getResetDigest(), 
-			$Users->getResetSentAt(), 
+		$params = array(
+			$Users->getUsername(),
+			$Users->getFacebookUserId(),
+			$Users->getPassword(),
+			$Users->getMainEmailId(),
+			$Users->getName(),
+			$Users->getSolved(),
+			$Users->getSubmissions(),
+			$Users->getCountryId(),
+			$Users->getStateId(),
+			$Users->getSchoolId(),
+			$Users->getScholarDegree(),
+			$Users->getLanguageId(),
+			$Users->getGraduationDate(),
+			$Users->getBirthDate(),
+			$Users->getLastAccess(),
+			$Users->getVerified(),
+			$Users->getVerificationId(),
+			$Users->getResetDigest(),
+			$Users->getResetSentAt(),
 			$Users->getUserId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -275,13 +272,13 @@ abstract class UsersDAOBase extends DAO
 
 	/**
 	  *	Crear registros.
-	  *	
-	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
+	  *
+	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los
 	  * contenidos del objeto Users suministrado. Asegurese
-	  * de que los valores para todas las columnas NOT NULL se ha especificado 
-	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
+	  * de que los valores para todas las columnas NOT NULL se ha especificado
+	  * correctamente. Despues del comando INSERT, este metodo asignara la clave
 	  * primaria generada en el objeto Users dentro de la misma transaccion.
-	  *	
+	  *
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Users [$Users] El objeto de tipo Users a crear.
 	  **/
@@ -292,7 +289,7 @@ abstract class UsersDAOBase extends DAO
 		if (is_null($Users->last_access)) $Users->last_access = gmdate('Y-m-d H:i:s');
 		if (is_null($Users->verified)) $Users->verified = FALSE;
 		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-		$params = array( 
+		$params = array(
 			$Users->user_id,
 			$Users->username,
 			$Users->facebook_user_id,
@@ -325,27 +322,27 @@ abstract class UsersDAOBase extends DAO
 
 	/**
 	  *	Buscar por rango.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Users} de la base de datos siempre y cuando 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Users} de la base de datos siempre y cuando
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Users}.
-	  * 
+	  *
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-	  *	
+	  *
 	  * <code>
 	  *  /**
-	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito 
+	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cr1 = new Cliente();
 	  *	  $cr1->setLimiteCredito("2000");
 	  *	  $cr1->setDescuento("50");
-	  *	  
+	  *
 	  *	  $cr2 = new Cliente();
 	  *	  $cr2->setLimiteCredito("5000");
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -358,232 +355,211 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	public static final function byRange( $UsersA , $UsersB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Users WHERE ("; 
+		$sql = "SELECT * from Users WHERE (";
 		$val = array();
 		if( ( !is_null (($a = $UsersA->getUserId()) ) ) & ( ! is_null ( ($b = $UsersB->getUserId()) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `user_id` = ? AND"; 
+			$sql .= " `user_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getUsername()) ) ) & ( ! is_null ( ($b = $UsersB->getUsername()) ) ) ){
 				$sql .= " `username` >= ? AND `username` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `username` = ? AND"; 
+			$sql .= " `username` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getFacebookUserId()) ) ) & ( ! is_null ( ($b = $UsersB->getFacebookUserId()) ) ) ){
 				$sql .= " `facebook_user_id` >= ? AND `facebook_user_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `facebook_user_id` = ? AND"; 
+			$sql .= " `facebook_user_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getPassword()) ) ) & ( ! is_null ( ($b = $UsersB->getPassword()) ) ) ){
 				$sql .= " `password` >= ? AND `password` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `password` = ? AND"; 
+			$sql .= " `password` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getMainEmailId()) ) ) & ( ! is_null ( ($b = $UsersB->getMainEmailId()) ) ) ){
 				$sql .= " `main_email_id` >= ? AND `main_email_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `main_email_id` = ? AND"; 
+			$sql .= " `main_email_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getName()) ) ) & ( ! is_null ( ($b = $UsersB->getName()) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `name` = ? AND"; 
+			$sql .= " `name` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getSolved()) ) ) & ( ! is_null ( ($b = $UsersB->getSolved()) ) ) ){
 				$sql .= " `solved` >= ? AND `solved` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `solved` = ? AND"; 
+			$sql .= " `solved` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getSubmissions()) ) ) & ( ! is_null ( ($b = $UsersB->getSubmissions()) ) ) ){
 				$sql .= " `submissions` >= ? AND `submissions` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `submissions` = ? AND"; 
+			$sql .= " `submissions` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getCountryId()) ) ) & ( ! is_null ( ($b = $UsersB->getCountryId()) ) ) ){
 				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `country_id` = ? AND"; 
+			$sql .= " `country_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getStateId()) ) ) & ( ! is_null ( ($b = $UsersB->getStateId()) ) ) ){
 				$sql .= " `state_id` >= ? AND `state_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `state_id` = ? AND"; 
+			$sql .= " `state_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getSchoolId()) ) ) & ( ! is_null ( ($b = $UsersB->getSchoolId()) ) ) ){
 				$sql .= " `school_id` >= ? AND `school_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `school_id` = ? AND"; 
+			$sql .= " `school_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getScholarDegree()) ) ) & ( ! is_null ( ($b = $UsersB->getScholarDegree()) ) ) ){
 				$sql .= " `scholar_degree` >= ? AND `scholar_degree` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `scholar_degree` = ? AND"; 
+			$sql .= " `scholar_degree` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getLanguageId()) ) ) & ( ! is_null ( ($b = $UsersB->getLanguageId()) ) ) ){
 				$sql .= " `language_id` >= ? AND `language_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `language_id` = ? AND"; 
+			$sql .= " `language_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getGraduationDate()) ) ) & ( ! is_null ( ($b = $UsersB->getGraduationDate()) ) ) ){
 				$sql .= " `graduation_date` >= ? AND `graduation_date` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `graduation_date` = ? AND"; 
+			$sql .= " `graduation_date` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getBirthDate()) ) ) & ( ! is_null ( ($b = $UsersB->getBirthDate()) ) ) ){
 				$sql .= " `birth_date` >= ? AND `birth_date` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `birth_date` = ? AND"; 
+			$sql .= " `birth_date` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getLastAccess()) ) ) & ( ! is_null ( ($b = $UsersB->getLastAccess()) ) ) ){
 				$sql .= " `last_access` >= ? AND `last_access` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `last_access` = ? AND"; 
+			$sql .= " `last_access` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getVerified()) ) ) & ( ! is_null ( ($b = $UsersB->getVerified()) ) ) ){
 				$sql .= " `verified` >= ? AND `verified` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `verified` = ? AND"; 
+			$sql .= " `verified` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getVerificationId()) ) ) & ( ! is_null ( ($b = $UsersB->getVerificationId()) ) ) ){
 				$sql .= " `verification_id` >= ? AND `verification_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `verification_id` = ? AND"; 
+			$sql .= " `verification_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getResetDigest()) ) ) & ( ! is_null ( ($b = $UsersB->getResetDigest()) ) ) ){
 				$sql .= " `reset_digest` >= ? AND `reset_digest` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `reset_digest` = ? AND"; 
+			$sql .= " `reset_digest` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $UsersA->getResetSentAt()) ) ) & ( ! is_null ( ($b = $UsersB->getResetSentAt()) ) ) ){
 				$sql .= " `reset_sent_at` >= ? AND `reset_sent_at` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `reset_sent_at` = ? AND"; 
+			$sql .= " `reset_sent_at` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -596,13 +572,13 @@ abstract class UsersDAOBase extends DAO
 
 	/**
 	  *	Eliminar registros.
-	  *	
+	  *
 	  * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-	  * en el objeto Users suministrado. Una vez que se ha suprimido un objeto, este no 
-	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila 
-	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. 
+	  * en el objeto Users suministrado. Una vez que se ha suprimido un objeto, este no
+	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
+	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
 	  * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
-	  *	
+	  *
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
 	  * @param Users [$Users] El objeto de tipo Users a eliminar
@@ -617,6 +593,5 @@ abstract class UsersDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
-
 }
+

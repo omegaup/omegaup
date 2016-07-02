@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Contest_User_Request.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class ContestUserRequest extends VO
 {
 	/**
 	  * Constructor de ContestUserRequest
-	  * 
-	  * Para construir un objeto de tipo ContestUserRequest debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo ContestUserRequest debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class ContestUserRequest extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
@@ -55,22 +54,22 @@ class ContestUserRequest extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto ContestUserRequest en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"user_id" => $this->user_id,
 			"contest_id" => $this->contest_id,
 			"request_time" => $this->request_time,
 			"last_update" => $this->last_update,
 			"accepted" => $this->accepted,
 			"extra_note" => $this->extra_note
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -127,3 +126,4 @@ class ContestUserRequest extends VO
 	  */
 	public $extra_note;
 }
+

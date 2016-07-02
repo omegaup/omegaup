@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Clarifications.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Clarifications extends VO
 {
 	/**
 	  * Constructor de Clarifications
-	  * 
-	  * Para construir un objeto de tipo Clarifications debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Clarifications debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Clarifications extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['clarification_id'])) {
 				$this->clarification_id = $data['clarification_id'];
@@ -61,14 +60,14 @@ class Clarifications extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Clarifications en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"clarification_id" => $this->clarification_id,
 			"author_id" => $this->author_id,
 			"message" => $this->message,
@@ -77,8 +76,8 @@ class Clarifications extends VO
 			"problem_id" => $this->problem_id,
 			"contest_id" => $this->contest_id,
 			"public" => $this->public
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -143,9 +142,10 @@ class Clarifications extends VO
 	public $contest_id;
 
 	/**
-	  * Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. 
+	  * Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario.
 	  * @access public
 	  * @var tinyint(1)
 	  */
 	public $public;
 }
+

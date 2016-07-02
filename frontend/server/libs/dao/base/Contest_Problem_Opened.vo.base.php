@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Contest_Problem_Opened.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class ContestProblemOpened extends VO
 {
 	/**
 	  * Constructor de ContestProblemOpened
-	  * 
-	  * Para construir un objeto de tipo ContestProblemOpened debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo ContestProblemOpened debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class ContestProblemOpened extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['contest_id'])) {
 				$this->contest_id = $data['contest_id'];
@@ -49,20 +48,20 @@ class ContestProblemOpened extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto ContestProblemOpened en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"contest_id" => $this->contest_id,
 			"problem_id" => $this->problem_id,
 			"user_id" => $this->user_id,
 			"open_time" => $this->open_time
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -106,3 +105,4 @@ class ContestProblemOpened extends VO
 	  */
 	public $open_time;
 }
+

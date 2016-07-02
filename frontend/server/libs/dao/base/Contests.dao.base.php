@@ -9,24 +9,23 @@
   * ******************************************************************************* */
 
 /** Contests Data Access Object (DAO) Base.
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Contests }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link Contests }.
   * @access public
   * @abstract
-  * 
+  *
   */
 abstract class ContestsDAOBase extends DAO
 {
-
 	/**
-	  *	Guardar registros. 
-	  *	
-	  *	Este metodo guarda el estado actual del objeto {@link Contests} pasado en la base de datos. La llave 
+	  *	Guardar registros.
+	  *
+	  *	Este metodo guarda el estado actual del objeto {@link Contests} pasado en la base de datos. La llave
 	  *	primaria indicara que instancia va a ser actualizado en base de datos. Si la llave primara o combinacion de llaves
 	  *	primarias describen una fila que no se encuentra en la base de datos, entonces save() creara una nueva fila, insertando
 	  *	en ese objeto el ID recien creado.
-	  *	
+	  *
 	  *	@static
 	  * @throws Exception si la operacion fallo.
 	  * @param Contests [$Contests] El objeto de tipo Contests
@@ -42,13 +41,12 @@ abstract class ContestsDAOBase extends DAO
 		}
 	}
 
-
 	/**
-	  *	Obtener {@link Contests} por llave primaria. 
-	  *	
-	  * Este metodo cargara un objeto {@link Contests} de la base de datos 
-	  * usando sus llaves primarias. 
-	  *	
+	  *	Obtener {@link Contests} por llave primaria.
+	  *
+	  * Este metodo cargara un objeto {@link Contests} de la base de datos
+	  * usando sus llaves primarias.
+	  *
 	  *	@static
 	  * @return @link Contests Un objeto del tipo {@link Contests}. NULL si no hay tal registro.
 	  **/
@@ -66,12 +64,12 @@ abstract class ContestsDAOBase extends DAO
 
 	/**
 	  *	Obtener todas las filas.
-	  *	
+	  *
 	  * Esta funcion leera todos los contenidos de la tabla en la base de datos y construira
 	  * un vector que contiene objetos de tipo {@link Contests}. Tenga en cuenta que este metodo
-	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas. 
+	  * consumen enormes cantidades de recursos si la tabla tiene muchas filas.
 	  * Este metodo solo debe usarse cuando las tablas destino tienen solo pequenas cantidades de datos o se usan sus parametros para obtener un menor numero de filas.
-	  *	
+	  *
 	  *	@static
 	  * @param $pagina Pagina a ver.
 	  * @param $columnas_por_pagina Columnas por pagina.
@@ -86,7 +84,7 @@ abstract class ContestsDAOBase extends DAO
 		{ $sql .= " ORDER BY `" . $orden . "` " . $tipo_de_orden;	}
 		if( ! is_null ( $pagina ) )
 		{
-			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina; 
+			$sql .= " LIMIT " . (( $pagina - 1 )*$columnas_por_pagina) . "," . $columnas_por_pagina;
 		}
 		global $conn;
 		$rs = $conn->Execute($sql);
@@ -98,22 +96,21 @@ abstract class ContestsDAOBase extends DAO
 		return $allData;
 	}
 
-
 	/**
 	  *	Buscar registros.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Contests} de la base de datos. 
-	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento. 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Contests} de la base de datos.
+	  * Consiste en buscar todos los objetos que coinciden con las variables permanentes instanciadas de objeto pasado como argumento.
 	  * Aquellas variables que tienen valores NULL seran excluidos en busca de criterios.
-	  *	
+	  *
 	  * <code>
 	  *  /**
 	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito igual a 20000
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cliente = new Cliente();
 	  *	  $cliente->setLimiteCredito("20000");
 	  *	  $resultados = ClienteDAO::search($cliente);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -129,7 +126,7 @@ abstract class ContestsDAOBase extends DAO
 			return self::search(new Contests($Contests));
 		}
 
-		$sql = "SELECT * from Contests WHERE ("; 
+		$sql = "SELECT * from Contests WHERE (";
 		$val = array();
 		if (!is_null( $Contests->getContestId())) {
 			$sql .= " `contest_id` = ? AND";
@@ -267,31 +264,31 @@ abstract class ContestsDAOBase extends DAO
 	private static final function update($Contests)
 	{
 		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ? WHERE  `contest_id` = ?;";
-		$params = array( 
-			$Contests->getTitle(), 
-			$Contests->getDescription(), 
-			$Contests->getStartTime(), 
-			$Contests->getFinishTime(), 
-			$Contests->getWindowLength(), 
-			$Contests->getDirectorId(), 
-			$Contests->getRerunId(), 
-			$Contests->getPublic(), 
-			$Contests->getAlias(), 
-			$Contests->getScoreboard(), 
-			$Contests->getPointsDecayFactor(), 
-			$Contests->getPartialScore(), 
-			$Contests->getSubmissionsGap(), 
-			$Contests->getFeedback(), 
-			$Contests->getPenalty(), 
-			$Contests->getPenaltyType(), 
-			$Contests->getPenaltyCalcPolicy(), 
-			$Contests->getShowScoreboardAfter(), 
-			$Contests->getScoreboardUrl(), 
-			$Contests->getScoreboardUrlAdmin(), 
-			$Contests->getUrgent(), 
-			$Contests->getContestantMustRegister(), 
-			$Contests->getLanguages(), 
-			$Contests->getRecommended(), 
+		$params = array(
+			$Contests->getTitle(),
+			$Contests->getDescription(),
+			$Contests->getStartTime(),
+			$Contests->getFinishTime(),
+			$Contests->getWindowLength(),
+			$Contests->getDirectorId(),
+			$Contests->getRerunId(),
+			$Contests->getPublic(),
+			$Contests->getAlias(),
+			$Contests->getScoreboard(),
+			$Contests->getPointsDecayFactor(),
+			$Contests->getPartialScore(),
+			$Contests->getSubmissionsGap(),
+			$Contests->getFeedback(),
+			$Contests->getPenalty(),
+			$Contests->getPenaltyType(),
+			$Contests->getPenaltyCalcPolicy(),
+			$Contests->getShowScoreboardAfter(),
+			$Contests->getScoreboardUrl(),
+			$Contests->getScoreboardUrlAdmin(),
+			$Contests->getUrgent(),
+			$Contests->getContestantMustRegister(),
+			$Contests->getLanguages(),
+			$Contests->getRecommended(),
 			$Contests->getContestId(), );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -300,13 +297,13 @@ abstract class ContestsDAOBase extends DAO
 
 	/**
 	  *	Crear registros.
-	  *	
-	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los 
+	  *
+	  * Este metodo creara una nueva fila en la base de datos de acuerdo con los
 	  * contenidos del objeto Contests suministrado. Asegurese
-	  * de que los valores para todas las columnas NOT NULL se ha especificado 
-	  * correctamente. Despues del comando INSERT, este metodo asignara la clave 
+	  * de que los valores para todas las columnas NOT NULL se ha especificado
+	  * correctamente. Despues del comando INSERT, este metodo asignara la clave
 	  * primaria generada en el objeto Contests dentro de la misma transaccion.
-	  *	
+	  *
 	  * @return Un entero mayor o igual a cero identificando las filas afectadas, en caso de error, regresara una cadena con la descripcion del error
 	  * @param Contests [$Contests] El objeto de tipo Contests a crear.
 	  **/
@@ -325,7 +322,7 @@ abstract class ContestsDAOBase extends DAO
 		if (is_null($Contests->contestant_must_register)) $Contests->contestant_must_register = '0';
 		if (is_null($Contests->recommended)) $Contests->recommended =  '0';
 		$sql = "INSERT INTO Contests ( `contest_id`, `title`, `description`, `start_time`, `finish_time`, `window_length`, `director_id`, `rerun_id`, `public`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `scoreboard_url`, `scoreboard_url_admin`, `urgent`, `contestant_must_register`, `languages`, `recommended` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-		$params = array( 
+		$params = array(
 			$Contests->contest_id,
 			$Contests->title,
 			$Contests->description,
@@ -363,27 +360,27 @@ abstract class ContestsDAOBase extends DAO
 
 	/**
 	  *	Buscar por rango.
-	  *	
-	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Contests} de la base de datos siempre y cuando 
+	  *
+	  * Este metodo proporciona capacidad de busqueda para conseguir un juego de objetos {@link Contests} de la base de datos siempre y cuando
 	  * esten dentro del rango de atributos activos de dos objetos criterio de tipo {@link Contests}.
-	  * 
+	  *
 	  * Aquellas variables que tienen valores NULL seran excluidos en la busqueda (los valores 0 y false no son tomados como NULL) .
 	  * No es necesario ordenar los objetos criterio, asi como tambien es posible mezclar atributos.
 	  * Si algun atributo solo esta especificado en solo uno de los objetos de criterio se buscara que los resultados conicidan exactamente en ese campo.
-	  *	
+	  *
 	  * <code>
 	  *  /**
-	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito 
+	  *   * Ejemplo de uso - buscar todos los clientes que tengan limite de credito
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
-	  *   {@*} 
+	  *   {@*}
 	  *	  $cr1 = new Cliente();
 	  *	  $cr1->setLimiteCredito("2000");
 	  *	  $cr1->setDescuento("50");
-	  *	  
+	  *
 	  *	  $cr2 = new Cliente();
 	  *	  $cr2->setLimiteCredito("5000");
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
-	  *	  
+	  *
 	  *	  foreach($resultados as $c ){
 	  *	  	echo $c->getNombre() . "<br>";
 	  *	  }
@@ -396,287 +393,261 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	public static final function byRange( $ContestsA , $ContestsB , $orderBy = null, $orden = 'ASC')
 	{
-		$sql = "SELECT * from Contests WHERE ("; 
+		$sql = "SELECT * from Contests WHERE (";
 		$val = array();
 		if( ( !is_null (($a = $ContestsA->getContestId()) ) ) & ( ! is_null ( ($b = $ContestsB->getContestId()) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `contest_id` = ? AND"; 
+			$sql .= " `contest_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getTitle()) ) ) & ( ! is_null ( ($b = $ContestsB->getTitle()) ) ) ){
 				$sql .= " `title` >= ? AND `title` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `title` = ? AND"; 
+			$sql .= " `title` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getDescription()) ) ) & ( ! is_null ( ($b = $ContestsB->getDescription()) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `description` = ? AND"; 
+			$sql .= " `description` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getStartTime()) ) ) & ( ! is_null ( ($b = $ContestsB->getStartTime()) ) ) ){
 				$sql .= " `start_time` >= ? AND `start_time` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `start_time` = ? AND"; 
+			$sql .= " `start_time` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getFinishTime()) ) ) & ( ! is_null ( ($b = $ContestsB->getFinishTime()) ) ) ){
 				$sql .= " `finish_time` >= ? AND `finish_time` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `finish_time` = ? AND"; 
+			$sql .= " `finish_time` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getWindowLength()) ) ) & ( ! is_null ( ($b = $ContestsB->getWindowLength()) ) ) ){
 				$sql .= " `window_length` >= ? AND `window_length` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `window_length` = ? AND"; 
+			$sql .= " `window_length` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getDirectorId()) ) ) & ( ! is_null ( ($b = $ContestsB->getDirectorId()) ) ) ){
 				$sql .= " `director_id` >= ? AND `director_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `director_id` = ? AND"; 
+			$sql .= " `director_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getRerunId()) ) ) & ( ! is_null ( ($b = $ContestsB->getRerunId()) ) ) ){
 				$sql .= " `rerun_id` >= ? AND `rerun_id` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `rerun_id` = ? AND"; 
+			$sql .= " `rerun_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getPublic()) ) ) & ( ! is_null ( ($b = $ContestsB->getPublic()) ) ) ){
 				$sql .= " `public` >= ? AND `public` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `public` = ? AND"; 
+			$sql .= " `public` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getAlias()) ) ) & ( ! is_null ( ($b = $ContestsB->getAlias()) ) ) ){
 				$sql .= " `alias` >= ? AND `alias` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `alias` = ? AND"; 
+			$sql .= " `alias` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getScoreboard()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboard()) ) ) ){
 				$sql .= " `scoreboard` >= ? AND `scoreboard` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `scoreboard` = ? AND"; 
+			$sql .= " `scoreboard` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getPointsDecayFactor()) ) ) & ( ! is_null ( ($b = $ContestsB->getPointsDecayFactor()) ) ) ){
 				$sql .= " `points_decay_factor` >= ? AND `points_decay_factor` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `points_decay_factor` = ? AND"; 
+			$sql .= " `points_decay_factor` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getPartialScore()) ) ) & ( ! is_null ( ($b = $ContestsB->getPartialScore()) ) ) ){
 				$sql .= " `partial_score` >= ? AND `partial_score` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `partial_score` = ? AND"; 
+			$sql .= " `partial_score` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getSubmissionsGap()) ) ) & ( ! is_null ( ($b = $ContestsB->getSubmissionsGap()) ) ) ){
 				$sql .= " `submissions_gap` >= ? AND `submissions_gap` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `submissions_gap` = ? AND"; 
+			$sql .= " `submissions_gap` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getFeedback()) ) ) & ( ! is_null ( ($b = $ContestsB->getFeedback()) ) ) ){
 				$sql .= " `feedback` >= ? AND `feedback` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `feedback` = ? AND"; 
+			$sql .= " `feedback` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getPenalty()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenalty()) ) ) ){
 				$sql .= " `penalty` >= ? AND `penalty` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `penalty` = ? AND"; 
+			$sql .= " `penalty` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getPenaltyType()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenaltyType()) ) ) ){
 				$sql .= " `penalty_type` >= ? AND `penalty_type` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `penalty_type` = ? AND"; 
+			$sql .= " `penalty_type` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getPenaltyCalcPolicy()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenaltyCalcPolicy()) ) ) ){
 				$sql .= " `penalty_calc_policy` >= ? AND `penalty_calc_policy` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `penalty_calc_policy` = ? AND"; 
+			$sql .= " `penalty_calc_policy` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getShowScoreboardAfter()) ) ) & ( ! is_null ( ($b = $ContestsB->getShowScoreboardAfter()) ) ) ){
 				$sql .= " `show_scoreboard_after` >= ? AND `show_scoreboard_after` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `show_scoreboard_after` = ? AND"; 
+			$sql .= " `show_scoreboard_after` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getScoreboardUrl()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboardUrl()) ) ) ){
 				$sql .= " `scoreboard_url` >= ? AND `scoreboard_url` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `scoreboard_url` = ? AND"; 
+			$sql .= " `scoreboard_url` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getScoreboardUrlAdmin()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboardUrlAdmin()) ) ) ){
 				$sql .= " `scoreboard_url_admin` >= ? AND `scoreboard_url_admin` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `scoreboard_url_admin` = ? AND"; 
+			$sql .= " `scoreboard_url_admin` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getUrgent()) ) ) & ( ! is_null ( ($b = $ContestsB->getUrgent()) ) ) ){
 				$sql .= " `urgent` >= ? AND `urgent` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `urgent` = ? AND"; 
+			$sql .= " `urgent` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getContestantMustRegister()) ) ) & ( ! is_null ( ($b = $ContestsB->getContestantMustRegister()) ) ) ){
 				$sql .= " `contestant_must_register` >= ? AND `contestant_must_register` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `contestant_must_register` = ? AND"; 
+			$sql .= " `contestant_must_register` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getLanguages()) ) ) & ( ! is_null ( ($b = $ContestsB->getLanguages()) ) ) ){
 				$sql .= " `languages` >= ? AND `languages` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `languages` = ? AND"; 
+			$sql .= " `languages` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		if( ( !is_null (($a = $ContestsA->getRecommended()) ) ) & ( ! is_null ( ($b = $ContestsB->getRecommended()) ) ) ){
 				$sql .= " `recommended` >= ? AND `recommended` <= ? AND";
-				array_push( $val, min($a,$b)); 
-				array_push( $val, max($a,$b)); 
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `recommended` = ? AND"; 
+			$sql .= " `recommended` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-			
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -689,13 +660,13 @@ abstract class ContestsDAOBase extends DAO
 
 	/**
 	  *	Eliminar registros.
-	  *	
+	  *
 	  * Este metodo eliminara la informacion de base de datos identificados por la clave primaria
-	  * en el objeto Contests suministrado. Una vez que se ha suprimido un objeto, este no 
-	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila 
-	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado. 
+	  * en el objeto Contests suministrado. Una vez que se ha suprimido un objeto, este no
+	  * puede ser restaurado llamando a save(). save() al ver que este es un objeto vacio, creara una nueva fila
+	  * pero el objeto resultante tendra una clave primaria diferente de la que estaba en el objeto eliminado.
 	  * Si no puede encontrar eliminar fila coincidente a eliminar, Exception sera lanzada.
-	  *	
+	  *
 	  *	@throws Exception Se arroja cuando el objeto no tiene definidas sus llaves primarias.
 	  *	@return int El numero de filas afectadas.
 	  * @param Contests [$Contests] El objeto de tipo Contests a eliminar
@@ -710,6 +681,5 @@ abstract class ContestsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
-
 }
+

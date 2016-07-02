@@ -319,3 +319,4 @@ abstract class RunCountsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
+

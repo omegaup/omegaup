@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Problems.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Problems extends VO
 {
 	/**
 	  * Constructor de Problems
-	  * 
-	  * Para construir un objeto de tipo Problems debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Problems debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Problems extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['problem_id'])) {
 				$this->problem_id = $data['problem_id'];
@@ -118,14 +117,14 @@ class Problems extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Problems en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"problem_id" => $this->problem_id,
 			"public" => $this->public,
 			"author_id" => $this->author_id,
@@ -153,8 +152,8 @@ class Problems extends VO
 			"slow" => $this->slow,
 			"deprecated" => $this->deprecated,
 			"email_clarifications" => $this->email_clarifications
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -358,3 +357,4 @@ class Problems extends VO
 	  */
 	public $email_clarifications;
 }
+

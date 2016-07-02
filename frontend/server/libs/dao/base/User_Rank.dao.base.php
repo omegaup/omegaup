@@ -383,3 +383,4 @@ abstract class UserRankDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
+

@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Schools.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Schools extends VO
 {
 	/**
 	  * Constructor de Schools
-	  * 
-	  * Para construir un objeto de tipo Schools debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Schools debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Schools extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['school_id'])) {
 				$this->school_id = $data['school_id'];
@@ -49,20 +48,20 @@ class Schools extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Schools en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"school_id" => $this->school_id,
 			"state_id" => $this->state_id,
 			"country_id" => $this->country_id,
 			"name" => $this->name
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -105,3 +104,4 @@ class Schools extends VO
 	  */
 	public $name;
 }
+

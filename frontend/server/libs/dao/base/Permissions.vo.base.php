@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Permissions.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Permissions extends VO
 {
 	/**
 	  * Constructor de Permissions
-	  * 
-	  * Para construir un objeto de tipo Permissions debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Permissions debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Permissions extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['permission_id'])) {
 				$this->permission_id = $data['permission_id'];
@@ -46,19 +45,19 @@ class Permissions extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Permissions en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"permission_id" => $this->permission_id,
 			"name" => $this->name,
 			"description" => $this->description
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -94,3 +93,4 @@ class Permissions extends VO
 	  */
 	public $description;
 }
+

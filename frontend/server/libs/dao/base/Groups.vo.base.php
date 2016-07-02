@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Groups.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class Groups extends VO
 {
 	/**
 	  * Constructor de Groups
-	  * 
-	  * Para construir un objeto de tipo Groups debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo Groups debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class Groups extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['group_id'])) {
 				$this->group_id = $data['group_id'];
@@ -55,22 +54,22 @@ class Groups extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto Groups en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"group_id" => $this->group_id,
 			"owner_id" => $this->owner_id,
 			"create_time" => $this->create_time,
 			"alias" => $this->alias,
 			"name" => $this->name,
 			"description" => $this->description
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -127,3 +126,4 @@ class Groups extends VO
 	  */
 	public $description;
 }
+

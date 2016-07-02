@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Auth_Tokens.
-  * 
+  *
   * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
   * @access public
-  * 
+  *
   */
 
 class AuthTokens extends VO
 {
 	/**
 	  * Constructor de AuthTokens
-	  * 
-	  * Para construir un objeto de tipo AuthTokens debera llamarse a el constructor 
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
+	  *
+	  * Para construir un objeto de tipo AuthTokens debera llamarse a el constructor
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,7 +30,6 @@ class AuthTokens extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
-
 
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
@@ -46,19 +45,19 @@ class AuthTokens extends VO
 
 	/**
 	  * Obtener una representacion en String
-	  * 
+	  *
 	  * Este metodo permite tratar a un objeto AuthTokens en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String 
+	  * @return String
 	  */
 	public function __toString( )
-	{ 
-		$vec = array( 
+	{
+		$vec = array(
 			"user_id" => $this->user_id,
 			"token" => $this->token,
 			"create_time" => $this->create_time
-		); 
-	return json_encode($vec); 
+		);
+	return json_encode($vec);
 	}
 
 	/**
@@ -93,3 +92,4 @@ class AuthTokens extends VO
 	  */
 	public $create_time;
 }
+
