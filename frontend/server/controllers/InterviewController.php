@@ -88,7 +88,7 @@ class InterviewController extends Controller {
 
         self::sendInvitationEmail($r);
 
-        self::$log->info('Added ' . $newUserRequest['username'] . ' to interview.');
+        self::$log->info('Added ' . $r['username'] . ' to interview.');
 
         return true;
     }

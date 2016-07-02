@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/js/interviews.arena.contest.js?ver=efc2fd' inContest=false}
+{include file='arena.head.tpl' jsfile='/js/interviews.arena.contest.js?ver=d5ce5e' inContest=false}
 
 			<div id="title">
 				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>
@@ -21,13 +21,11 @@
 					<h1 class="title"></h1>
 					<p class="description"></p>
 					<table>
-						<tr><td><strong>{#arenaPracticeStartTime#}</strong></td><td class="start_time"></td></tr>
-						<tr><td><strong>{#arenaPracticeEndtime#}</strong></td><td class="finish_time"></td></tr>
-						<tr><td><strong>{#arenaPracticeScoreboardCutoff#}</strong></td><td class="scoreboard_cutoff"></td></tr>
 						<tr><td><strong>{#arenaContestWindowLength#}</strong></td><td class="window_length"></td></tr>
 						<tr><td><strong>{#arenaContestOrganizer#}</strong></td><td class="contest_organizer"></td></tr>
 					</table>
 				</div>
+
 				<div id="problem" class="main">
 					<h1 class="title"></h1>
 					<table class="data">
@@ -51,9 +49,10 @@
 					<hr />
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
-{include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
+					{include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
 				</div>
 			</div>
+
 			<div id="clarifications" class="tab">
 				<table class="clarifications">
 					<caption>
@@ -95,9 +94,11 @@
 					</tbody>
 				</table>
 			</div>
+
 		</div>
+
 		<div id="overlay">
-{include file='arena.runsubmit.tpl'}
+			{include file='arena.runsubmit.tpl'}
 			<form id="clarification" method="POST">
 				<button class="close">&times;</button>
 				{#wordsProblem#}
@@ -106,7 +107,7 @@
 				<textarea name="message"></textarea><br/>
 				<input type="submit" />
 			</form>
-{include file='arena.rundetails.tpl'}
+			{include file='arena.rundetails.tpl'}
 		</div>
 	</body>
 </html>

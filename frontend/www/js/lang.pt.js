@@ -372,6 +372,7 @@ OmegaUp.T = {
 	registerForContest: "cadastre-se para o concurso",
 	registrationPending: "seu pedido para participar deste concurso está pendente de aprovação do administrador concurso.",
 	requestDate: "Data de aplicação",
+	resendInterviewEmail: "Reenviar correo",
 	runNotEvenOpened: "Você deve abrir o problema antes de tentar apresentar uma solução.",
 	runNotFound: "Run não encontrado",
 	runNotInsideContest: "Tempo de concurso expirou ou não foi iniciado ainda.",

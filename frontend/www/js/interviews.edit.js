@@ -63,7 +63,11 @@ $(document).ready(function() {
 					+ "<td>" + omegaup.escape(interview.users[i].username) + "</td>"
 					+ "<td>" + interview.users[i].email + "</td>"
 					+ "<td>" + (interview.users[i].opened_interview ? interview.users[i].access_time : OmegaUp.T['interviewNotStarted'] ) + "</td>"
-					+ "<td>" + "</td>"
+					+ "<td>"
+						+ "<button type='submit' class='btn btn-xs'>"
+								+ OmegaUp.T['resendInterviewEmail']
+						+ "</button>"
+					+ "</td>"
 					+ "</tr>";
 			}
 

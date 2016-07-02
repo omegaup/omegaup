@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	var contestAlias = /\/interviews\/([^\/]+)\/arena?/.exec(window.location.pathname)[1];
+	var contestAlias = /\/interview\/([^\/]+)\/arena?/.exec(window.location.pathname)[1];
 	var contestObject = null;
 
 	$('#start-contest-form').submit(function() {
@@ -95,10 +95,7 @@ $(document).ready(function() {
 		} else {
 			$('.contest #title').html(omegaup.escape(contest.title));
 			$('.contest #description').html(omegaup.escape(contest.description));
-
-			$('.contest #time-until-start').html(omegaup.escape(contest.start_time));
-			$('.contest #start_time').val(dateToString(contest.start_time));
-			$('.contest #finish_time').val(dateToString(contest.finish_time));
+			$('.contest #window_length').val(contest.window_length);
 		}
 
 		// Feel free to re-write this if you have the time.

@@ -2,7 +2,7 @@ $(document).ready(function() {
 	var arena = new Arena();
 	var admin = null;
 
-	var contestAlias = /\/interviews\/([^\/]+)\/arena/.exec(window.location.pathname)[1];
+	var contestAlias = /\/interview\/([^\/]+)\/arena/.exec(window.location.pathname)[1];
 	arena.contestAlias = contestAlias;
 
 	Highcharts.setOptions({
@@ -12,7 +12,6 @@ $(document).ready(function() {
 	});
 
 	function contestLoaded(contest) {
-		console.log("contest loadedddddddddd")
 		if (contest.status == 'error') {
 			if (!omegaup.loggedIn && omegaup.login_url) {
 				window.location = omegaup.login_url + "?redirect=" + escape(window.location);
@@ -42,13 +41,7 @@ $(document).ready(function() {
 		$('#summary .title').html(omegaup.escape(contest.title));
 		$('#summary .description').html(omegaup.escape(contest.description));
 
-		$('#summary .start_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()));
-		$('#summary .finish_time').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()));
-
-		var duration = contest.finish_time.getTime() - contest.start_time.getTime();
-		$('#summary .window_length').html(Arena.formatDelta((contest.window_length * 60000) || duration));
-		$('#summary .scoreboard_cutoff').html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-			contest.start_time.getTime() + duration * contest.scoreboard / 100));
+		$('#summary .window_length').html(Arena.formatDelta((contest.window_length * 60000)));
 		$('#summary .contest_organizer').html(
 			'<a href="/profile/' + contest.director + '/">' + contest.director + '</a>');
 
@@ -74,7 +67,7 @@ $(document).ready(function() {
 		}
 
 		if (!arena.practice) {
-			//arena.setupPolls();
+			arena.setupPolls();
 		}
 
 		// Trigger the event (useful on page load).

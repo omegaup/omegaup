@@ -17,7 +17,6 @@
 </ul>
 
 <div class="tab-content">
-
 	<div class="tab-pane active" id="interview-details">
 		<div class="panel panel-primary">
 			<div class="panel-body">
@@ -184,6 +183,6 @@
 
 </div>
 
-<script type="text/javascript" src="/js/interviews.edit.js?ver=dc5c34"></script>
+<script type="text/javascript" src="/js/interviews.edit.js?ver=c478bb"></script>
 {include file='footer.tpl'}
 
