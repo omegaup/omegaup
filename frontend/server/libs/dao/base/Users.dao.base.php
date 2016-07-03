@@ -208,6 +208,10 @@ abstract class UsersDAOBase extends DAO
 			$sql .= " `reset_sent_at` = ? AND";
 			array_push( $val, $Users->getResetSentAt() );
 		}
+		if (!is_null( $Users->getRecruitmentOptin())) {
+			$sql .= " `recruitment_optin` = ? AND";
+			array_push( $val, $Users->getRecruitmentOptin() );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -555,6 +559,16 @@ abstract class UsersDAOBase extends DAO
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `reset_sent_at` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $UsersA->getRecruitmentOptin()) ) ) & ( ! is_null ( ($b = $UsersB->getRecruitmentOptin()) ) ) ){
+				$sql .= " `recruitment_optin` >= ? AND `recruitment_optin` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `recruitment_optin` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}

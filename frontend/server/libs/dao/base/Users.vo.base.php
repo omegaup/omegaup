@@ -91,7 +91,9 @@ class Users extends VO
 			if (isset($data['reset_sent_at'])) {
 				$this->reset_sent_at = $data['reset_sent_at'];
 			}
-			$this->recruitment_optin = isset($data['recruitment_optin']) ? $data['recruitment_optin'] : NULL;
+			if (isset($data['recruitment_optin'])) {
+				$this->recruitment_optin = $data['recruitment_optin'];
+			}
 		}
 	}
 
