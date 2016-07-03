@@ -505,8 +505,17 @@ class UserController extends Controller {
         self::registerToSendy($user);
 
         if (self::$redirectOnVerify) {
+            if (!is_null($r['redirecttointerview'])) {
+                die(header('Location: /login/?redirect=/interview/' . $r['redirecttointerview'] . '/arena'));
+            } else {
+                die(header('Location: /login/'));
+            }
+        }
+
+        if (self::$redirectOnVerify) {
             die(header('Location: /login/'));
         }
+
         return array('status' => 'ok');
     }
 
@@ -1229,6 +1238,20 @@ class UserController extends Controller {
         return $response;
     }
 
+    public static function userOpenedContest($contest_id, $user_id) {
+        // You already started the contest.
+        $contestOpened = ContestsUsersDAO::getByPK(
+            $user_id,
+            $contest_id
+        );
+
+        if (!is_null($contestOpened) && $contestOpened->access_time != '0000-00-00 00:00:00') {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Get Contests which a certain user has participated in
      *
@@ -1236,6 +1259,37 @@ class UserController extends Controller {
      * @return Contests array
      * @throws InvalidDatabaseOperationException
      */
+    public static function apiInterviewStats(Request $r) {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+
+        $response = array();
+
+        Validators::isStringNonEmpty($r['interview'], 'interview');
+        Validators::isStringNonEmpty($r['username'], 'username');
+
+        $user = self::resolveTargetUser($r);
+
+        $contest = ContestsDAO::getByAlias($r['interview']);
+        if (is_null($contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+
+        $openedContest = self::userOpenedContest($contest->getContestId(), $user->getUserId());
+
+        $response['user_verified'] = $user->getVerified() === '1';
+
+        if (!$user->getVerified()) {
+            $response['verify_url'] = 'https://omegaup.com/api/user/verifyemail/id/' . $user->getVerificationId() . '/backto/' . $r['interview'];
+        }
+
+        $response['interview_url'] = 'https://omegaup.com/interview/' . $r['interview'] . '/arena';
+        $response['name_or_username'] = is_null($user->getName()) ? $user->getUsername() : $user->getName();
+        $response['opened_interview'] = $openedContest;
+
+        $response['status'] = 'ok';
+        return $response;
+    }
+
     public static function apiContestStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
@@ -1747,6 +1801,7 @@ class UserController extends Controller {
     public static function makeUsernameFromEmail($email) {
         $newUsername = substr($email, 0, strpos($email, '@'));
         $newUsername = str_replace('-', '_', $newUsername);
+        $newUsername = str_replace('.', '_', $newUsername);
         return $newUsername . time();
     }
 }

@@ -22,7 +22,7 @@ if (!(defined('IS_TEST') && IS_TEST === true)) {
         <h1>No config file.</h1>
         <p>You are missing the config file. These are the default values:</p>
         <pre class="code" style="margin: 3em; border: 1px solid #000; background: #ccc;">
-        <?php echo htmlspecialchars(file_get_contents(__DIR__ . '/config.default.php')); ?>
+<?php echo htmlspecialchars(file_get_contents(__DIR__ . '/config.default.php')); ?>
         </pre>
         <p>Create a file called <code>config.php</code> &emdash; the settings there will
         override any of the default values.</p>
@@ -161,29 +161,35 @@ try {
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
 
-if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === true)) {
-    include('libs/smarty/Smarty.class.php');
+$is_test = (defined('IS_TEST') && IS_TEST === true);
 
-    $smarty = new Smarty;
-    $smarty->setTemplateDir(__DIR__ . '/../templates/');
-    $smarty->assign('CURRENT_USER_IS_ADMIN', 0);
-    if (defined('SMARTY_CACHE_DIR')) {
-        $smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
-    }
+include('libs/smarty/Smarty.class.php');
 
-    $smarty->assign('GOOGLECLIENTID', OMEGAUP_GOOGLE_CLIENTID);
+$smarty = new Smarty;
+$smarty->setTemplateDir(__DIR__ . '/../templates/');
+$smarty->assign('CURRENT_USER_IS_ADMIN', 0);
 
-    $smarty->assign('LOGGED_IN', '0');
-    UITools::$IsLoggedIn = false;
+if (defined('SMARTY_CACHE_DIR')) {
+    $smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
+}
+
+$smarty->assign('GOOGLECLIENTID', OMEGAUP_GOOGLE_CLIENTID);
+
+$smarty->assign('LOGGED_IN', '0');
+UITools::$IsLoggedIn = false;
+
+if (!$is_test) {
     $smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
+}
 
-    if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
-        $smarty->assign('OMEGAUP_GA_TRACK', 1);
-        $smarty->assign('OMEGAUP_GA_ID', OMEGAUP_GA_ID);
-    } else {
-        $smarty->assign('OMEGAUP_GA_TRACK', 0);
-    }
+if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
+    $smarty->assign('OMEGAUP_GA_TRACK', 1);
+    $smarty->assign('OMEGAUP_GA_ID', OMEGAUP_GA_ID);
+} else {
+    $smarty->assign('OMEGAUP_GA_TRACK', 0);
+}
 
+if (!$is_test) {
     $userRequest = new Request($_REQUEST);
     $session = SessionController::apiCurrentSession($userRequest);
     if ($session['valid']) {
@@ -210,14 +216,17 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
     }
 
     $lang = UserController::getPreferredLanguage($userRequest);
-
-    if (defined('OMEGAUP_DEVELOPMENT_MODE') && OMEGAUP_DEVELOPMENT_MODE) {
-        $smarty->force_compile = true;
-        $smarty->caching = 0;
-    }
-
-    $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
+} else {
+    $lang = 'es';
 }
+
+if (defined('OMEGAUP_DEVELOPMENT_MODE') && OMEGAUP_DEVELOPMENT_MODE) {
+    $smarty->force_compile = true;
+    $smarty->caching = 0;
+}
+
+$smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 
 // Load pager class
 require_once('libs/Pager.php');
+

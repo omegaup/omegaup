@@ -72,6 +72,7 @@ class InterviewController extends Controller {
 
         // Check contest_alias
         Validators::isStringNonEmpty($r['interview_alias'], 'interview_alias');
+        Validators::isStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
         // Does the interview exist ?
         try {
@@ -104,13 +105,14 @@ class InterviewController extends Controller {
             $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
             $newUserRequest['password'] = self::randomString(8);
             $newUserRequest['skip_verification_email'] = 1;
-            $newUser = UserController::apiCreate($newUserRequest);
+
+            UserController::apiCreate($newUserRequest);
 
             // Email to new OmegaUp users
             $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
                            . '<br>'
-                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUser['user']->getVerificationId() . '/backto/' . $r["contest"]->getAlias() . '">'
-                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUser['user']->getVerificationId() . '/backto/' . $r["contest"]->getAlias() . '</a>'
+                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->getVerificationId() . '/redirecttointerview/' . $r["contest"]->getAlias() . '">'
+                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->getVerificationId() . '/redirecttointerview/' . $r["contest"]->getAlias() . '</a>'
                            . '<br>';
 
             $r['mail_body'] .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
@@ -123,6 +125,9 @@ class InterviewController extends Controller {
                             . ' : '
                             . $newUserRequest['password']
                             . '<br>';
+
+            $r['user'] = $newUserRequest['user'];
+
         } else {
             // Email to current OmegaUp user
             $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
@@ -169,25 +174,12 @@ class InterviewController extends Controller {
         return true;
     }
 
-    private static function userOpenedContest($contest_id, $user_id) {
-        // You already started the contest.
-        $contestOpened = ContestsUsersDAO::getByPK(
-            $user_id,
-            $contest_id
-        );
-
-        if (!is_null($contestOpened) && $contestOpened->access_time != '0000-00-00 00:00:00') {
-            return true;
-        }
-
-        return false;
-    }
 
     public static function apiDetails(Request $r) {
         try {
             self::authenticateRequest($r);
         } catch (UnauthorizedException $e) {
-            // Do nothing.
+            // Do nothing. // Sure?
         }
 
         $thisResult = array();
@@ -224,7 +216,7 @@ class InterviewController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
 
-            $userOpenedContest = self::userOpenedContest($backingContest->contest_id, $user_id);
+            $userOpenedContest = UserController::userOpenedContest($backingContest->contest_id, $user_id);
             $users[] = array(
                         'user_id' => $user_id,
                         'username' => $user->getUsername(),

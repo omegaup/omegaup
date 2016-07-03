@@ -39,7 +39,6 @@ $(document).ready(function() {
 					InvitedUsers = Array();
 					fillCandidatesTable();
 					$("#invitepeople > table > tbody").html("");
-
 				} else {
 					OmegaUp.ui.error(response.error);
 					fillCandidatesTable();
@@ -66,7 +65,13 @@ $(document).ready(function() {
 					+ "<td>" + interview.users[i].email + "</td>"
 					+ "<td>" + (interview.users[i].opened_interview ? interview.users[i].access_time : OmegaUp.T['interviewNotStarted'] ) + "</td>"
 					+ "<td>"
-						+ "<button type='submit' class='btn btn-xs'>"
+						+ "<a href='result/"+ omegaup.escape(interview.users[i].username) +"' >"
+							+ "<button  class='btn btn-xs'>"
+									+ OmegaUp.T['wordsDetails']
+							+ "</button>"
+						+ "</a>"
+						+ "&nbsp;"
+						+ "<button  class='btn btn-xs'>"
 								+ OmegaUp.T['resendInterviewEmail']
 						+ "</button>"
 					+ "</td>"

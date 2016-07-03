@@ -1962,7 +1962,7 @@ OmegaUp.prototype.getScoreboardMerge = function(contestAliases, callback) {
 
 OmegaUp.prototype.getGraderStats = function(callback) {
 	var self = this;
-
+	return false;// DO NOT CHECK THIS IN =======================================
 	$.get(
 		'/api/grader/status/',
 		function (data) {
@@ -2113,6 +2113,24 @@ OmegaUp.prototype.getInterview = function(alias, callback) {
 			} catch (err) {
 				callback({status: 'error', error: err});
 			}
+		}
+	});
+};
+
+OmegaUp.prototype.getInterviewStatsForUser = function(interviewAlias, username, callback) {
+	var self = this;
+
+	$.get(
+		'/api/user/interviewstats/username/' + encodeURIComponent(username) + '/interview/' + encodeURIComponent(interviewAlias),
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
 		}
 	});
 };
