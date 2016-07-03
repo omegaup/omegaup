@@ -5,12 +5,6 @@ $(document).ready(function() {
 	var contestAlias = /\/interview\/([^\/]+)\/arena/.exec(window.location.pathname)[1];
 	arena.contestAlias = contestAlias;
 
-	Highcharts.setOptions({
-		global: {
-			useUTC: false
-		}
-	});
-
 	function contestLoaded(contest) {
 		if (contest.status == 'error') {
 			if (!omegaup.loggedIn && omegaup.login_url) {
@@ -77,7 +71,7 @@ $(document).ready(function() {
 		$('#root').fadeIn('slow');
 	}
 
-	//arena.connectSocket();
+	arena.connectSocket();
 	omegaup.getContest(contestAlias, contestLoaded);
 
 	$('.clarifpager .clarifpagerprev').click(function () {

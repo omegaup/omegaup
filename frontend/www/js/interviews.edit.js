@@ -38,6 +38,8 @@ $(document).ready(function() {
 					OmegaUp.ui.success(OmegaUp.T['userEditSuccess']);
 					InvitedUsers = Array();
 					fillCandidatesTable();
+					$("#invitepeople > table > tbody").html("");
+
 				} else {
 					OmegaUp.ui.error(response.error);
 					fillCandidatesTable();

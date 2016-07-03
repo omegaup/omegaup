@@ -135,7 +135,7 @@ OmegaUp.T = {
 	createSchoolFailed: "Criação da escola falhou.",
 	currentStatus: "situação atual",
 	editFieldRequired: "Um valor necessário está faltando",
-	email: "Correo electro",
+	email: "Email",
 	emailInUse: "Email já existe",
 	emailNotVerified: "Seu e-mail não é verificado ainda. Por favor veja o e-mail de verificação em sua pasta caixa de entrada e spam. Se você ainda tiver problemas, entre em contato omegaup-soporte@googlegroups.com para apoio.",
 	enterContest: "Enter contest",

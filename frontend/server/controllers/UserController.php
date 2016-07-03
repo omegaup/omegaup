@@ -132,10 +132,13 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        if (!is_null($r['skip_verification_email']) && ($r['skip_verification_email'] == 1)) {
+            UserController::$sendEmailOnVerify = false;
+        }
+
         $r['user'] = $user;
         if (!$user->verified) {
             self::$log->info('User ' . $user->getUsername() . ' created, sending verification mail');
-
             self::sendVerificationEmail($r);
         } else {
             self::$log->info('User ' . $user->getUsername() . ' created, trusting e-mail');
@@ -280,15 +283,24 @@ class UserController extends Controller {
 
         if (self::$sendEmailOnVerify) {
             self::sendEmail($r);
+        } else {
+            self::$log->info('Not sending email beacause sendEmailOnVerify = FALSE');
         }
     }
 
     public static function sendEmail($r) {
+        Validators::isStringNonEmpty($r['mail_subject'], 'mail_subject');
+        Validators::isStringNonEmpty($r['mail_body'], 'mail_body');
+
         if (!OMEGAUP_EMAIL_SEND_EMAILS) {
+            self::$log->info('Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:');
+            self::$log->info('     to = ' . $r['email']->getEmail());
+            self::$log->info('subject = ' . $r['mail_subject']);
+            self::$log->info('   body = ' . $r['mail_body']);
             return;
         }
 
-        self::$log->info('Sending email to user.');
+        self::$log->info('Really sending email to user.');
 
         $mail = new PHPMailer();
         $mail->IsSMTP();

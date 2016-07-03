@@ -46,53 +46,6 @@ class InterviewController extends Controller {
         return array('status' => 'ok');
     }
 
-    private static function addUserInternal($r) {
-        // Does the user exist ?
-        try {
-            $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
-        } catch (NotFoundException $e) {
-            // this is fine
-        }
-
-        if (is_null($r['user'])) {
-            // user does not exist, create a new user
-            self::$log->info('Could not find user, this must be a new email, register: ' . $r['usernameOrEmail']);
-
-            $newUserRequest = $r;
-            $newUserRequest['email'] = $r['usernameOrEmail'];
-            $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
-            $newUserRequest['password'] = self::randomString(8);
-            $newUser = UserController::apiCreate($newUserRequest);
-
-            $r['user'] = $newUserRequest['username'];
-        }
-
-        self::validateAddUser($r);
-
-        // add the user to the interview (contest)
-        $contestUser = new ContestsUsers();
-        $contestUser->setContestId($r['contest']->getContestId());
-        $contestUser->setUserId($r['user']->getUserId());
-        $contestUser->setAccessTime('0000-00-00 00:00:00');
-        $contestUser->setScore('0');
-        $contestUser->setTime('0');
-
-        // Save the contest to the DB
-        try {
-            ContestsUsersDAO::save($contestUser);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to create new ContestUser: ' . $e->getMessage());
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        self::sendInvitationEmail($r);
-
-        self::$log->info('Added ' . $r['username'] . ' to interview.');
-
-        return true;
-    }
-
     public static function apiAddUsers(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
@@ -112,6 +65,108 @@ class InterviewController extends Controller {
         }
 
         return array ('status' => 'ok');
+    }
+
+    private static function addUserInternal($r) {
+        $r['user'] = null;
+
+        // Check contest_alias
+        Validators::isStringNonEmpty($r['interview_alias'], 'interview_alias');
+
+        // Does the interview exist ?
+        try {
+            $r['contest'] = ContestsDAO::getByAlias($r['interview_alias']);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($r['contest'])) {
+            throw new NotFoundException('interviewNotFound');
+        }
+
+        // Does the user exist ?
+        try {
+            $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        } catch (NotFoundException $e) {
+            // this is fine, we'll create an account for this user
+        }
+
+        global $smarty;
+        $r['mail_subject'] = $smarty->getConfigVariable('interviewInvitationEmailSubject');
+
+        if (is_null($r['user'])) {
+            // create a new user
+            self::$log->info('Could not find user, this must be a new email, registering: ' . $r['usernameOrEmail']);
+
+            $newUserRequest = new Request($r);
+            $newUserRequest['email'] = $r['usernameOrEmail'];
+            $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
+            $newUserRequest['password'] = self::randomString(8);
+            $newUserRequest['skip_verification_email'] = 1;
+            $newUser = UserController::apiCreate($newUserRequest);
+
+            // Email to new OmegaUp users
+            $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+                           . '<br>'
+                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUser['user']->getVerificationId() . '/backto/' . $r["contest"]->getAlias() . '">'
+                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUser['user']->getVerificationId() . '/backto/' . $r["contest"]->getAlias() . '</a>'
+                           . '<br>';
+
+            $r['mail_body'] .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
+                            . '<br>'
+                            . $smarty->getConfigVariable('profileUsername')
+                            . ' : '
+                            . $newUserRequest['username']
+                            . '<br>'
+                            . $smarty->getConfigVariable('loginPassword')
+                            . ' : '
+                            . $newUserRequest['password']
+                            . '<br>';
+        } else {
+            // Email to current OmegaUp user
+            $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+                           . ' <a href="https://omegaup.com/interview/' . $r['contest']->getAlias() . '/arena">'
+                           . ' https://omegaup.com/interview/' . $r['contest']->getAlias() . '/arena</a>';
+        }
+
+        if (is_null($r['user'])) {
+            throw new NotFoundException('userOrMailNotFound');
+        }
+
+        // Only director is allowed to add people to interview
+        if (!Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        // add the user to the interview (contest)
+        $contestUser = new ContestsUsers();
+        $contestUser->setContestId($r['contest']->getContestId());
+        $contestUser->setUserId($r['user']->getUserId());
+        $contestUser->setAccessTime('0000-00-00 00:00:00');
+        $contestUser->setScore('0');
+        $contestUser->setTime('0');
+
+        try {
+            // Save the ContestsUsers to the DB
+            ContestsUsersDAO::save($contestUser);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            self::$log->error('Failed to create new ContestUser: ' . $e->getMessage());
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        try {
+            $r['email'] = EmailsDAO::getByPK($r['user']->getMainEmailId());
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        UserController::sendEmail($r);
+
+        self::$log->info('Added ' . $r['username'] . ' to interview.');
+
+        return true;
     }
 
     private static function userOpenedContest($contest_id, $user_id) {
@@ -184,22 +239,6 @@ class InterviewController extends Controller {
         return $thisResult;
     }
 
-    private static function sendInvitationEmail(Request $r) {
-        try {
-            $r['email'] = EmailsDAO::getByPK($r['user']->getMainEmailId());
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        global $smarty;
-        $r['mail_subject'] = $smarty->getConfigVariable('interviewInvitationEmailSubject');
-        $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
-                           . ' <a href="https://omegaup.com/interview/' . $r['contest']->getAlias() . '/arena">'
-                           . ' https://omegaup.com/interview/' . $r['contest']->getAlias() . '/arena</a>';
-
-        UserController::sendEmail($r);
-    }
-
     public static function apiList(Request $r) {
         self::authenticateRequest($r);
 
@@ -218,34 +257,5 @@ class InterviewController extends Controller {
 
     public static function showContestIntro(Request $r) {
         return ContestController::showContestIntro($r);
-    }
-
-    private static function validateAddUser(Request $r) {
-        $r['user'] = null;
-
-        // Check contest_alias
-        Validators::isStringNonEmpty($r['interview_alias'], 'interview_alias');
-
-        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
-
-        if (is_null($r['user'])) {
-            throw new NotFoundException('userOrMailNotFound');
-        }
-
-        try {
-            $r['contest'] = ContestsDAO::getByAlias($r['interview_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (is_null($r['contest'])) {
-            throw new NotFoundException('interviewNotFound');
-        }
-
-        // Only director is allowed to create problems in contest
-        if (!Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
-            throw new ForbiddenAccessException();
-        }
     }
 }

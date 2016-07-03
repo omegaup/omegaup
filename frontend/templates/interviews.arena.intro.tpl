@@ -55,6 +55,6 @@
 		</div><!-- row -->
 	</div><!-- panel panel-default -->
 
-<script src="/js/interviews.arena.intro.js?ver=c14723"></script>
+<script src="/js/interviews.arena.intro.js?ver=7fe5e7"></script>
 {include file='footer.tpl'}
 

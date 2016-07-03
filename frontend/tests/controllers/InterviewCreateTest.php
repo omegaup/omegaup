@@ -29,7 +29,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $this->assertEquals(1, count($interviews));
     }
 
-    public function testInterviewsMustBePrivateAndRegistrationRequired() {
+    public function testInterviewsMustBePrivate() {
         $r = new Request();
 
         $contestant = UserFactory::createUser();

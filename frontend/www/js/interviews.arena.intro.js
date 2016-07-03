@@ -96,24 +96,6 @@ $(document).ready(function() {
 			$('.contest #title').html(omegaup.escape(contest.title));
 			$('.contest #description').html(omegaup.escape(contest.description));
 			$('.contest #window_length').val(contest.window_length);
-		}
-
-		// Feel free to re-write this if you have the time.
-		if (contest.contestant_must_register) {
-			if (contest.user_registration_requested) {
-				if (contest.user_registration_answered) {
-					if (contest.user_registration_accepted) {
-						readyToStart(contest);
-					} else {
-						$("#registration_denied").removeClass("hidden");
-					}
-				} else {
-					$("#registration_pending").removeClass("hidden");
-				}
-			} else {
-				$("#must_register").removeClass("hidden");
-			}
-		} else {
 			readyToStart(contest);
 		}
 	}
