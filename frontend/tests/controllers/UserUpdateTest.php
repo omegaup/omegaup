@@ -95,7 +95,7 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     * Null values for the recruitment optin flag are allowed
+     * Exercising valid values for the recruitment flag while updating an user
      */
     public function testRecruitmentOptinUpdate() {
         $user = UserFactory::createUser();
