@@ -27,6 +27,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $r['scholar_degree'] = 'Maestría';
         $r['birth_date'] = strtotime('1988-01-01');
         $r['graduation_date'] = strtotime('2016-02-02');
+        $r['recruitment_optin'] = 1;
 
         // Call api
         $response = UserController::apiUpdate($r);
@@ -39,21 +40,80 @@ class UserUpdateTest extends OmegaupTestCase {
         $this->assertEquals($user_db->getScholarDegree(), $r['scholar_degree']);
         $this->assertEquals($user_db->getBirthDate(), gmdate('Y-m-d', $r['birth_date']));
         $this->assertEquals($user_db->getGraduationDate(), gmdate('Y-m-d', $r['graduation_date']));
+        $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
     }
 
     /**
+     * Value for the recruitment optin flag should be non-negative
      * @expectedException InvalidDatabaseOperationException
      */
-    public function testBadUserUpdate() {
+    public function testNegativeStateUpdate() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+        $r['name'] = Utils::CreateRandomString();
+        $r['recruitment_optin'] = 1;
+
+        // Invalid state_id
+        $r['state_id'] = -1;
+
+        UserController::apiUpdate($r);
+    }
+
+    /**
+     * Request parameter name cannot be empty
+     * @expectedException InvalidParameterException
+     */
+    public function testEmptyNameUpdate() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+
+        // Invalid name
+        $r['name'] = '';
+
+        UserController::apiUpdate($r);
+    }
+
+    /**
+     * Request parameter recruitment_optin cannot be null
+     * @expectedException InvalidParameterException
+     */
+    public function testNullRecruitmentOptinUpdate() {
         $user = UserFactory::createUser();
 
         $r = new Request();
         $r['auth_token'] = $this->login($user);
         $r['name'] = Utils::CreateRandomString();
 
-        // Invalid state_id
-        $r['state_id'] = -1;
+        // Null recruitment_optin
+        $r['recruitment_optin'] = null;
 
         UserController::apiUpdate($r);
+    }
+
+    /**
+     * Exercising valid values for the recruitment flag while updating an user
+     */
+    public function testRecruitmentOptinUpdate() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+        $r['name'] = Utils::CreateRandomString();
+
+        // Set recruitment_optin to true
+        $r['recruitment_optin'] = 1;
+        UserController::apiUpdate($r);
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
+
+        // Set recruitment_optin to false
+        $r['recruitment_optin'] = 0;
+        UserController::apiUpdate($r);
+        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $this->assertEquals($user_db->getRecruitmentOptin(), $r['recruitment_optin']);
     }
 }

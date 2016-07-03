@@ -1036,6 +1036,7 @@ class UserController extends Controller {
         $response['userinfo']['birth_date'] = is_null($user->getBirthDate()) ? null : strtotime($user->getBirthDate());
         $response['userinfo']['graduation_date'] = is_null($user->getGraduationDate()) ? null : strtotime($user->getGraduationDate());
         $response['userinfo']['scholar_degree'] = $user->getScholarDegree();
+        $response['userinfo']['recruitment_optin'] = is_null($user->getRecruitmentOptin()) ? null : $user->getRecruitmentOptin();
 
         if (!is_null($user->getLanguageId())) {
             $query = LanguagesDAO::getByPK($user->getLanguageId());
@@ -1472,6 +1473,8 @@ class UserController extends Controller {
             }
         }
 
+        Validators::isNumber($r['recruitment_optin'], 'recruitment_optin', true);
+
         $valueProperties = array(
             'name',
             'country_id',
@@ -1484,6 +1487,7 @@ class UserController extends Controller {
             'birth_date' => array('transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }),
+            'recruitment_optin',
         );
 
         self::updateValueProperties($r, $r['current_user'], $valueProperties);

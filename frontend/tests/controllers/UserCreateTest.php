@@ -29,6 +29,9 @@ class CreateUserTest extends OmegaupTestCase {
         // Verify DB
         $user = UsersDAO::FindByUsername($r['username']);
         $this->assertNotNull($user);
+
+        // Verify that users are opt'd out of the recruitment after being created
+        $this->assertNull($user->getRecruitmentOptin());
     }
 
     /**
