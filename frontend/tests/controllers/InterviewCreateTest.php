@@ -3,18 +3,17 @@
 /**
  * @author alanboy
  */
-
 class InterviewCreateTest extends OmegaupTestCase {
     public function testCreateAndListInterview() {
         $r = new Request();
 
-        $contestant = UserFactory::createUser();
+        $interviewer = UserFactory::createInterviewerUser();
 
         // Verify I started with nothing
-        $interviews = ContestsDAO::getMyInterviews($contestant->user_id);
+        $interviews = ContestsDAO::getMyInterviews($interviewer->user_id);
         $this->assertEquals(0, count($interviews));
 
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = $this->login($interviewer);
         $r['title'] = 'My second interview';
         $r['alias'] = 'my-first-interview';
         $r['duration'] = 60;
@@ -23,7 +22,7 @@ class InterviewCreateTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $interviews = ContestsDAO::getMyInterviews($contestant->user_id);
+        $interviews = ContestsDAO::getMyInterviews($interviewer->user_id);
 
         // Must have 1 interview
         $this->assertEquals(1, count($interviews));
@@ -32,7 +31,7 @@ class InterviewCreateTest extends OmegaupTestCase {
     public function testInterviewsMustBePrivate() {
         $r = new Request();
 
-        $contestant = UserFactory::createUser();
+        $contestant = UserFactory::createInterviewerUser();
 
         $r['auth_token'] = $this->login($contestant);
         $r['title'] = 'My second interview';
@@ -52,7 +51,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $r = new Request();
 
         // Create an interview
-        $interviewer = UserFactory::createUser();
+        $interviewer = UserFactory::createInterviewerUser();
 
         $r['auth_token'] = $this->login($interviewer);
         $r['title'] = 'My third interview';
@@ -81,21 +80,50 @@ class InterviewCreateTest extends OmegaupTestCase {
         $this->assertEquals($createdUser1->getVerified(), 0, 'new created users should not be email-validated');
 
         // add 2 users that are already omegaup users (using registered email)
-        $interviewee1 = UserFactory::createUser();
-        $interviewee2 = UserFactory::createUser();
+        $emailFor1 = Utils::CreateRandomString().'@mail.com';
+        $interviewee1 = UserFactory::createUser(null, null, $emailFor1);
+
+        $emailFor2 = Utils::CreateRandomString().'@mail.com';
+        $interviewee2 = UserFactory::createUser(null, null, $emailFor2);
 
         $r2 = new Request();
         $r2['auth_token'] = $this->login($interviewer);
         $r2['interview_alias'] = $r['alias'];
-        $r2['usernameOrEmailsCSV'] = $interviewee1->getUsername() . ',' . $interviewee2->getUsername();
+        $r2['usernameOrEmailsCSV'] = $emailFor1 . ',' . $emailFor2;
 
         $response = InterviewController::apiAddUsers($r2);
         $this->assertEquals('ok', $response['status']);
 
         // add 2 users that are already omegaup users (using registered username)
+        $interviewee3 = UserFactory::createUser();
+        $interviewee4 = UserFactory::createUser();
+
+        $r3 = new Request();
+        $r3['auth_token'] = $this->login($interviewer);
+        $r3['interview_alias'] = $r['alias'];
+        $r3['usernameOrEmailsCSV'] = $interviewee3->getUsername() . ',' . $interviewee4->getUsername();
+
+        $response = InterviewController::apiAddUsers($r3);
+        $this->assertEquals('ok', $response['status']);
     }
 
-    // should submissions to interview be returned by ?
-    //public static function apiContestStats(Request $r) {
-    // test  public static function apiDetails(Request $r) {
+    /**
+     *
+     * Only site-admins and interviewers can create interviews for now
+     *
+     * @expectedException ForbiddenAccessException
+     */
+    public function testOnlyInterviewersCanCreateInterviews() {
+        $r = new Request();
+
+        // Create an interview
+        $interviewer = UserFactory::createUser();
+
+        $r['auth_token'] = $this->login($interviewer);
+        $r['title'] = 'My 4th interview';
+        $r['alias'] = 'my-4-interview';
+        $r['duration'] = 60;
+
+        $response = InterviewController::apiCreate($r);
+    }
 }

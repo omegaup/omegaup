@@ -34,7 +34,6 @@ $(document).ready(function() {
 		$('#title .contest-title').html(omegaup.escape(contest.title));
 		$('#summary .title').html(omegaup.escape(contest.title));
 		$('#summary .description').html(omegaup.escape(contest.description));
-
 		$('#summary .window_length').html(Arena.formatDelta((contest.window_length * 60000)));
 		$('#summary .contest_organizer').html(
 			'<a href="/profile/' + contest.director + '/">' + contest.director + '</a>');

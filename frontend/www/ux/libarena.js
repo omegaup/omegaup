@@ -60,6 +60,10 @@ function Arena() {
 	// Whether the current contest is in interview mode.
 	this.interview = window.location.pathname.indexOf('/interviews') !== -1;
 
+	if (!this.interview) {
+		this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+	}
+
 	// The token for standalone scoreboards.
 	this.scoreboardToken = null;
 

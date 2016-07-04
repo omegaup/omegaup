@@ -1963,7 +1963,6 @@ OmegaUp.prototype.getScoreboardMerge = function(contestAliases, callback) {
 
 OmegaUp.prototype.getGraderStats = function(callback) {
 	var self = this;
-	return false;// DO NOT CHECK THIS IN =======================================
 	$.get(
 		'/api/grader/status/',
 		function (data) {

@@ -26,7 +26,7 @@ $(document).ready(function() {
 	}
 
 	function onAliasExists() {
-		OmegaUp.ui.error(omegaup.escape($('#alias').val()) + '" ya existe. Elige otro nombre');
+		OmegaUp.ui.error(omegaup.escape('"' + $('#alias').val()) + '" ya existe. Elige otro nombre');
 		$('#alias').focus();
 	}
 
@@ -49,7 +49,7 @@ $(document).ready(function() {
 
 		case "interviews":
 			existsFn = function(alias) {
-				omegaup.getGroup(alias, checkExists);
+				omegaup.getContest(alias, checkExists);
 			};
 			break;
 	}

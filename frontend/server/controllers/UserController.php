@@ -1238,12 +1238,9 @@ class UserController extends Controller {
         return $response;
     }
 
-    public static function userOpenedContest($contest_id, $user_id) {
+    public static function userOpenedContest($contestId, $userId) {
         // You already started the contest.
-        $contestOpened = ContestsUsersDAO::getByPK(
-            $user_id,
-            $contest_id
-        );
+        $contestOpened = ContestsUsersDAO::getByPK($userId, $contestId);
 
         if (!is_null($contestOpened) && $contestOpened->access_time != '0000-00-00 00:00:00') {
             return true;
@@ -1252,29 +1249,34 @@ class UserController extends Controller {
         return false;
     }
 
+    /**
+     * Get the results for this user in a given interview
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
     public static function apiInterviewStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
-
-        $response = array();
 
         Validators::isStringNonEmpty($r['interview'], 'interview');
         Validators::isStringNonEmpty($r['username'], 'username');
 
-        $user = self::resolveTargetUser($r);
-
         $contest = ContestsDAO::getByAlias($r['interview']);
         if (is_null($contest)) {
-            throw new NotFoundException('contestNotFound');
+            throw new NotFoundException('interviewNotFound');
         }
+
+        // Only admins can view interview details
+        if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = array();
+        $user = self::resolveTargetUser($r);
 
         $openedContest = self::userOpenedContest($contest->getContestId(), $user->getUserId());
 
         $response['user_verified'] = $user->getVerified() === '1';
-
-        if (!$user->getVerified()) {
-            $response['verify_url'] = 'https://omegaup.com/api/user/verifyemail/id/' . $user->getVerificationId() . '/backto/' . $r['interview'];
-        }
-
         $response['interview_url'] = 'https://omegaup.com/interview/' . $r['interview'] . '/arena';
         $response['name_or_username'] = is_null($user->getName()) ? $user->getUsername() : $user->getName();
         $response['opened_interview'] = $openedContest;

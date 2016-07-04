@@ -10,7 +10,7 @@ try {
         'contest_alias' => $_REQUEST['contest_alias'],
     ));
 
-    $show_intro = InterviewController::showContestIntro($r);
+    $show_intro = InterviewController::showIntro($r);
 } catch (Exception $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));

@@ -5,6 +5,11 @@ class InterviewController extends Controller {
         // Interview specific validations. Everything else is validated in ContestController::apiCreate
         $is_required = !$is_update;
 
+        // Only site-admins and interviewers can create interviews for now
+        if (!Authorization::IsSystemAdmin($r['current_user_id']) && $r['current_user']->getInterviewer() != '1') {
+            throw new ForbiddenAccessException();
+        }
+
         Validators::isStringNonEmpty($r['title'], 'title', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', false);
         Validators::isNumberInRange($r['duration'], 'duration', 60, 60 * 5, false);
@@ -68,9 +73,6 @@ class InterviewController extends Controller {
     }
 
     private static function addUserInternal($r) {
-        $r['user'] = null;
-
-        // Check contest_alias
         Validators::isStringNonEmpty($r['interview_alias'], 'interview_alias');
         Validators::isStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
@@ -88,6 +90,7 @@ class InterviewController extends Controller {
 
         // Does the user exist ?
         try {
+            $r['user'] = null;
             $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
         } catch (NotFoundException $e) {
             // this is fine, we'll create an account for this user
@@ -152,7 +155,6 @@ class InterviewController extends Controller {
         $contestUser->setTime('0');
 
         try {
-            // Save the ContestsUsers to the DB
             ContestsUsersDAO::save($contestUser);
         } catch (Exception $e) {
             // Operation failed in the data layer
@@ -174,17 +176,23 @@ class InterviewController extends Controller {
     }
 
     public static function apiDetails(Request $r) {
-        try {
-            self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
-            // Do nothing. // Sure?
-        }
+        self::authenticateRequest($r);
 
         $thisResult = array();
 
         $backingContest = ContestsDAO::getByAlias($r['interview_alias']);
         if (is_null($backingContest)) {
-            throw new NotFoundException();
+            throw new NotFoundException('interviewNotFound');
+        }
+
+        // Only proceed if this is indeed an interview
+        if ('1' != $backingContest->getInterview()) {
+            throw new NotFoundException('interviewNotFound');
+        }
+
+        // Only admins can view interview details
+        if (!Authorization::IsContestAdmin($r['current_user_id'], $backingContest)) {
+            throw new ForbiddenAccessException();
         }
 
         $thisResult['description'] = $backingContest->description;
@@ -245,7 +253,7 @@ class InterviewController extends Controller {
         return $response;
     }
 
-    public static function showContestIntro(Request $r) {
+    public static function showIntro(Request $r) {
         return ContestController::showContestIntro($r);
     }
 }

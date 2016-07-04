@@ -179,6 +179,7 @@ OmegaUp.T = {
 	interviewInvitationEmailBodyIntro: "Olá, você foi convidado para tomar uma entrevista em OmegaUp.",
 	interviewInvitationEmailSubject: "Você foi convidado para tomar uma entrevista em OmegaUp.",
 	interviewList: "Lista de entrevistas",
+	interviewNotFound: "Entrevista não existe",
 	interviewNotStarted: "Não começado",
 	interviewResultsFor: "Resultados ",
 	interviews: "Entrevistas",

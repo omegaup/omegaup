@@ -8,10 +8,6 @@ $(document).ready(function() {
 
 		var subtitleHtml = 'Interview url : ' + userStats.interview_url;
 
-		if (!userStats.user_verified) {
-			subtitleHtml += ' Verification url : ' + userStats.verify_url;
-		}
-
 		$('.page-header h3 small').html(subtitleHtml);
 
 		if (userStats.opened_interview) {
