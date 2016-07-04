@@ -217,7 +217,6 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
     }
 
     $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
-
 } else {
     // During testing We need smarty to load strings from *.lang files
     include('libs/smarty/Smarty.class.php');

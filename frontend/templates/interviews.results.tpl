@@ -19,6 +19,6 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/interviews.results.js?ver=cecdb8"></script>
+<script type="text/javascript" src="/js/interviews.results.js?ver=dc18d7"></script>
 {include file='footer.tpl'}
 

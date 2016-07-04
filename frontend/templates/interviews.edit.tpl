@@ -183,6 +183,6 @@
 
 </div>
 
-<script type="text/javascript" src="/js/interviews.edit.js?ver=9c1d72"></script>
+<script type="text/javascript" src="/js/interviews.edit.js?ver=881468"></script>
 {include file='footer.tpl'}
 
