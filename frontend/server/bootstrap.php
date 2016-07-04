@@ -161,35 +161,29 @@ try {
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
 
-$is_test = (defined('IS_TEST') && IS_TEST === true);
+if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === true)) {
+    include('libs/smarty/Smarty.class.php');
 
-include('libs/smarty/Smarty.class.php');
+    $smarty = new Smarty;
+    $smarty->setTemplateDir(__DIR__ . '/../templates/');
+    $smarty->assign('CURRENT_USER_IS_ADMIN', 0);
+    if (defined('SMARTY_CACHE_DIR')) {
+        $smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
+    }
 
-$smarty = new Smarty;
-$smarty->setTemplateDir(__DIR__ . '/../templates/');
-$smarty->assign('CURRENT_USER_IS_ADMIN', 0);
+    $smarty->assign('GOOGLECLIENTID', OMEGAUP_GOOGLE_CLIENTID);
 
-if (defined('SMARTY_CACHE_DIR')) {
-    $smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
-}
-
-$smarty->assign('GOOGLECLIENTID', OMEGAUP_GOOGLE_CLIENTID);
-
-$smarty->assign('LOGGED_IN', '0');
-UITools::$IsLoggedIn = false;
-
-if (!$is_test) {
+    $smarty->assign('LOGGED_IN', '0');
+    UITools::$IsLoggedIn = false;
     $smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
-}
 
-if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
-    $smarty->assign('OMEGAUP_GA_TRACK', 1);
-    $smarty->assign('OMEGAUP_GA_ID', OMEGAUP_GA_ID);
-} else {
-    $smarty->assign('OMEGAUP_GA_TRACK', 0);
-}
+    if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
+        $smarty->assign('OMEGAUP_GA_TRACK', 1);
+        $smarty->assign('OMEGAUP_GA_ID', OMEGAUP_GA_ID);
+    } else {
+        $smarty->assign('OMEGAUP_GA_TRACK', 0);
+    }
 
-if (!$is_test) {
     $userRequest = new Request($_REQUEST);
     $session = SessionController::apiCurrentSession($userRequest);
     if ($session['valid']) {
@@ -216,16 +210,22 @@ if (!$is_test) {
     }
 
     $lang = UserController::getPreferredLanguage($userRequest);
+
+    if (defined('OMEGAUP_DEVELOPMENT_MODE') && OMEGAUP_DEVELOPMENT_MODE) {
+        $smarty->force_compile = true;
+        $smarty->caching = 0;
+    }
+
+    $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
+
 } else {
-    $lang = 'es';
+    // During testing We need smarty to load strings from *.lang files
+    include('libs/smarty/Smarty.class.php');
+    $smarty = new Smarty;
+    $smarty->setTemplateDir(__DIR__ . '/../templates/');
+    $lang = 'pseudo';
+    $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 }
-
-if (defined('OMEGAUP_DEVELOPMENT_MODE') && OMEGAUP_DEVELOPMENT_MODE) {
-    $smarty->force_compile = true;
-    $smarty->caching = 0;
-}
-
-$smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 
 // Load pager class
 require_once('libs/Pager.php');

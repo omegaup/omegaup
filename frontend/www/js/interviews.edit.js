@@ -188,6 +188,7 @@ $(document).ready(function() {
 	};
 
 	userTypeahead($('#username-admin'));
+	userTypeahead($('#usernameOrEmail'));
 	groupTypeahead($('#groupalias-admin'));
 
 	$('#add-admin-form').submit(function() {

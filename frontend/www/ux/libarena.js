@@ -58,7 +58,7 @@ function Arena() {
 	this.onlyScoreboard = window.location.pathname.indexOf('/scoreboard/') !== -1;
 
 	// Whether the current contest is in interview mode.
-	this.interview = window.location.pathname.indexOf('/interviews') !== -1;
+	this.interview = window.location.pathname.indexOf('/interview') !== -1;
 
 	if (!this.interview) {
 		this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];

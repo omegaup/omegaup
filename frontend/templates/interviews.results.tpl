@@ -10,7 +10,7 @@
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
-		<h3 class="panel-title">{#interviewResultsFor#}</h3>
+		<h3 class="panel-title">{#omegaupTitleProfile#}</h3>
 	</div>
 
 {include file='profile.basicinfo.tpl'}

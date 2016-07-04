@@ -59,10 +59,6 @@ $(document).ready(function() {
 			$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
 		}
 
-		if (!arena.practice) {
-			arena.setupPolls();
-		}
-
 		// Trigger the event (useful on page load).
 		$(window).hashchange();
 
@@ -70,30 +66,7 @@ $(document).ready(function() {
 		$('#root').fadeIn('slow');
 	}
 
-	arena.connectSocket();
 	omegaup.getContest(contestAlias, contestLoaded);
-
-	$('.clarifpager .clarifpagerprev').click(function () {
-		if (arena.clarificationsOffset > 0) {
-			arena.clarificationsOffset -= arena.clarificationsRowcount;
-			if (arena.clarificationsOffset < 0) {
-				arena.clarificationsOffset = 0;
-			}
-
-			// Refresh with previous page
-			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
-		}
-	});
-
-	$('.clarifpager .clarifpagernext').click(function () {
-		arena.clarificationsOffset += arena.clarificationsRowcount;
-		if (arena.clarificationsOffset < 0) {
-			arena.clarificationsOffset = 0;
-		}
-
-		// Refresh with previous page
-		omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
-	});
 
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
@@ -207,22 +180,6 @@ $(document).ready(function() {
 		if (!code) return false;
 
 		submitRun((arena.practice || arena.onlyProblem) ? '' : contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
-
-		return false;
-	});
-
-	$('#clarification').submit(function (e) {
-		$('#clarification input').attr('disabled', 'disabled');
-		omegaup.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
-			if (run.status != 'ok') {
-				alert(run.error);
-				$('#clarification input').removeAttr('disabled');
-				return;
-			}
-			arena.hideOverlay();
-			omegaup.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
-			$('#clarification input').removeAttr('disabled');
-		});
 
 		return false;
 	});

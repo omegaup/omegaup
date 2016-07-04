@@ -1534,6 +1534,11 @@ class ContestController extends Controller {
         // If true, will override Scoreboard Pertentage to 100%
         $showAllRuns = false;
 
+        // Don't leak scoreboard to interviewees
+        if (!is_null($r['contest']->interview)  && (!is_null($r['contest']->interview))) {
+            throw new ForbiddenAccessException('invalidScoreboardUrl');
+        }
+
         if (is_null($r['token'])) {
             // Get the current user
             self::authenticateRequest($r);
