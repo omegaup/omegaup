@@ -515,7 +515,6 @@ class UserController extends Controller {
         if (self::$redirectOnVerify) {
             die(header('Location: /login/'));
         }
-
         return array('status' => 'ok');
     }
 
@@ -1253,13 +1252,6 @@ class UserController extends Controller {
         return false;
     }
 
-    /**
-     * Get Contests which a certain user has participated in
-     *
-     * @param Request $r
-     * @return Contests array
-     * @throws InvalidDatabaseOperationException
-     */
     public static function apiInterviewStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
@@ -1291,6 +1283,13 @@ class UserController extends Controller {
         return $response;
     }
 
+    /**
+     * Get Contests which a certain user has participated in
+     *
+     * @param Request $r
+     * @return Contests array
+     * @throws InvalidDatabaseOperationException
+     */
     public static function apiContestStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 

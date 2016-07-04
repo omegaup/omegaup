@@ -229,4 +229,3 @@ $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 
 // Load pager class
 require_once('libs/Pager.php');
-

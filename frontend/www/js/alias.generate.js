@@ -36,7 +36,7 @@ $(document).ready(function() {
 
 	switch (formName) {
 		case "problems":
-			existsFn = function(alias) {
+			existsFn= function(alias) {
 				omegaup.getProblem(null, alias, checkExists);
 			};
 			break;

@@ -249,4 +249,3 @@ class InterviewController extends Controller {
         return ContestController::showContestIntro($r);
     }
 }
-
