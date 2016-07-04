@@ -147,8 +147,7 @@ class Contests extends VO
 			"contestant_must_register" => $this->contestant_must_register,
 			"languages" => $this->languages,
 			"recommended" => $this->recommended,
-			"interview" => $this->interview,
-			"recommended" => $this->recommended
+			"interview" => $this->interview
 		);
 	return json_encode($vec);
 	}

@@ -111,8 +111,8 @@ class InterviewController extends Controller {
             // Email to new OmegaUp users
             $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
                            . '<br>'
-                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->getVerificationId() . '/redirecttointerview/' . $r["contest"]->getAlias() . '">'
-                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->getVerificationId() . '/redirecttointerview/' . $r["contest"]->getAlias() . '</a>'
+                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->getVerificationId() . '/redirecttointerview/' . $r['contest']->getAlias() . '">'
+                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->getVerificationId() . '/redirecttointerview/' . $r['contest']->getAlias() . '</a>'
                            . '<br>';
 
             $r['mail_body'] .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
@@ -127,7 +127,6 @@ class InterviewController extends Controller {
                             . '<br>';
 
             $r['user'] = $newUserRequest['user'];
-
         } else {
             // Email to current OmegaUp user
             $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
@@ -173,7 +172,6 @@ class InterviewController extends Controller {
 
         return true;
     }
-
 
     public static function apiDetails(Request $r) {
         try {
@@ -251,3 +249,4 @@ class InterviewController extends Controller {
         return ContestController::showContestIntro($r);
     }
 }
+
