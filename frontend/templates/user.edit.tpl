@@ -333,6 +333,14 @@
 					</div>
 
 					<div class="form-group">
+						<span class="col-md-3 control-label">&nbsp;</span>
+						<div class="col-md-7">
+							<input type="checkbox" id="recruitment_optin" name='recruitment_optin'>
+							<label for="recruitment_optin" style="display: inline;">{#userEditRecruitmentOptin#}</label>
+						</div>
+					</div>
+
+					<div class="form-group">
 						<div class="col-md-offset-3 col-md-7">
 							<button type='submit' class="btn btn-primary">{#wordsSaveChanges#}</button>
 						</div>
@@ -377,5 +385,5 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/js/user.edit.js?ver=dfb3d0"></script>
+	<script type="text/javascript" src="/js/user.edit.js?ver=32e4c0"></script>
 {/block}

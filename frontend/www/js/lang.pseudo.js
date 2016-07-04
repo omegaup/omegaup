@@ -422,6 +422,7 @@ OmegaUp.T = {
 	userEditMiddleSchool: "(Midd13 5ch001)",
 	userEditName: "(Nam3)",
 	userEditProfileImage: "(Pr0fi13 imag3)",
+	userEditRecruitmentOptin: "(W0uld y0u pr0v1d3 0m364up w17h p3rm15510n 70 5h4r3 y0ur 1nf0rm4710n w17h 7h1rd p4r7135 f0r r3cru171n6 purp0535?)",
 	userEditSchool: "(Sch001)",
 	userEditSchoolGrade: "(Sch001 grad3)",
 	userEditState: "(S7a73)",

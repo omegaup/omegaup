@@ -651,7 +651,7 @@ OmegaUp.prototype.updateProblem = function(alias, public, callback) {
 	});
 };
 
-OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, school_id, school_name, locale, callback) {
+OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_id, scholar_degree, graduation_date, school_id, school_name, locale, recruitment_optin, callback) {
 	var self = this;
 
 	$.post(
@@ -665,7 +665,8 @@ OmegaUp.prototype.updateProfile = function(name, birth_date, country_id, state_i
 			graduation_date: graduation_date,
 			school_id : school_id,
 			school_name : school_name,
-			locale : locale
+			locale : locale,
+			recruitment_optin: recruitment_optin
 		},
 		function (data) {
 			callback(data);
