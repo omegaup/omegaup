@@ -9,12 +9,12 @@ $(document).ready(function() {
 
 		$('.page-header h3 small').html(subtitleHtml);
 
-		if (userStats.opened_interview) {
-			$('.page-header h1 small').html(OmegaUp.T['interviewInProgress']);
-		} else if (userStats.finished){
+		if (userStats.finished) {
 			$('.page-header h1 small').html(OmegaUp.T['interviewFinished']);
-		} else {
+		} else if (userStats.opened_interview){
 			$('.page-header h1 small').html(OmegaUp.T['interviewInProgress']);
+		} else {
+			$('.page-header h1 small').html(OmegaUp.T['interviewNotStarted']);
 		}
 	});
 

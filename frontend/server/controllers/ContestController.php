@@ -1535,7 +1535,7 @@ class ContestController extends Controller {
         $showAllRuns = false;
 
         // Don't leak scoreboard to interviewees
-        if (!is_null($r['contest']->interview)  && (!is_null($r['contest']->interview))) {
+        if (!is_null($r['contest']->getInterview()) && $r['contest']->getInterview()) {
             throw new ForbiddenAccessException('invalidScoreboardUrl');
         }
 

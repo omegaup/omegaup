@@ -60,7 +60,9 @@ function Arena() {
 	// Whether the current contest is in interview mode.
 	this.interview = window.location.pathname.indexOf('/interview') !== -1;
 
-	if (!this.interview) {
+	if (this.interview) {
+		this.contestAlias = /\/interview\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+	} else {
 		this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
 	}
 
