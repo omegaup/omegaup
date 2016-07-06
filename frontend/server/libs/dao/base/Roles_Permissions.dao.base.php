@@ -294,4 +294,3 @@ abstract class RolesPermissionsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

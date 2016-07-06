@@ -126,4 +126,3 @@ class Groups extends VO
 	  */
 	public $description;
 }
-

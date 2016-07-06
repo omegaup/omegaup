@@ -93,4 +93,3 @@ class UsersPermissions extends VO
 	  */
 	public $contest_id;
 }
-

@@ -82,4 +82,3 @@ class RolesPermissions extends VO
 	  */
 	public $permission_id;
 }
-

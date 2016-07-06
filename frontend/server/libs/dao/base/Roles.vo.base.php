@@ -93,4 +93,3 @@ class Roles extends VO
 	  */
 	public $description;
 }
-

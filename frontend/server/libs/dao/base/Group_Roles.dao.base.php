@@ -310,4 +310,3 @@ abstract class GroupRolesDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

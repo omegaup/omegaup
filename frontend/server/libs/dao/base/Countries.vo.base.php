@@ -81,4 +81,3 @@ class Countries extends VO
 	  */
 	public $name;
 }
-

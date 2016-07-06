@@ -104,4 +104,3 @@ class Announcement extends VO
 	  */
 	public $description;
 }
-

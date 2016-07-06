@@ -115,4 +115,3 @@ class ContestsUsers extends VO
 	  */
 	public $time;
 }
-

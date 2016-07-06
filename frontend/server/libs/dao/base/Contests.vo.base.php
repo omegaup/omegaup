@@ -335,4 +335,3 @@ class Contests extends VO
 	  */
 	public $recommended;
 }
-

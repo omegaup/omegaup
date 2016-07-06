@@ -93,4 +93,3 @@ class Emails extends VO
 	  */
 	public $user_id;
 }
-

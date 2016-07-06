@@ -114,4 +114,3 @@ class SubmissionLog extends VO
 	  */
 	public $time;
 }
-

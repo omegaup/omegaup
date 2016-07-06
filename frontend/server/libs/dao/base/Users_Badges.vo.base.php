@@ -104,4 +104,3 @@ class UsersBadges extends VO
 	  */
 	public $last_problem_id;
 }
-

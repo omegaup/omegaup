@@ -94,4 +94,3 @@ class UserRoles extends VO
 	  */
 	public $contest_id;
 }
-

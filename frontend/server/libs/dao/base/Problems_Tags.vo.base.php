@@ -93,4 +93,3 @@ class ProblemsTags extends VO
 	  */
 	public $public;
 }
-

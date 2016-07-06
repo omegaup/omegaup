@@ -367,4 +367,3 @@ abstract class GroupsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

@@ -334,4 +334,3 @@ abstract class SchoolsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

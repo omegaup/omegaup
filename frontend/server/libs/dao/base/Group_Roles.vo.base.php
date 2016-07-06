@@ -94,4 +94,3 @@ class GroupRoles extends VO
 	  */
 	public $contest_id;
 }
-

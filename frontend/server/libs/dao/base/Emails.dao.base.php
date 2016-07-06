@@ -318,4 +318,3 @@ abstract class EmailsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

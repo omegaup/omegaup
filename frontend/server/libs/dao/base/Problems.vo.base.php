@@ -357,4 +357,3 @@ class Problems extends VO
 	  */
 	public $email_clarifications;
 }
-

@@ -92,4 +92,3 @@ class AuthTokens extends VO
 	  */
 	public $create_time;
 }
-

@@ -332,4 +332,3 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

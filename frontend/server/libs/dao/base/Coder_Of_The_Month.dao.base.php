@@ -351,4 +351,3 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

@@ -104,4 +104,3 @@ class States extends VO
 	  */
 	public $name;
 }
-

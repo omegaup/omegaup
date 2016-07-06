@@ -82,4 +82,3 @@ class ProblemsBadges extends VO
 	  */
 	public $problem_id;
 }
-

@@ -93,4 +93,3 @@ class Permissions extends VO
 	  */
 	public $description;
 }
-

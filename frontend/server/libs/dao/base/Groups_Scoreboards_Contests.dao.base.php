@@ -334,4 +334,3 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

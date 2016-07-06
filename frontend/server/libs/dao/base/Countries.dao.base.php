@@ -301,4 +301,3 @@ abstract class CountriesDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

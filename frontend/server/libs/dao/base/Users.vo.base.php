@@ -1,6 +1,6 @@
 <?php
 
-/********************************************************************************* *
+/** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
   * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
@@ -129,7 +129,7 @@ class Users extends VO
 			"reset_sent_at" => $this->reset_sent_at,
 			"recruitment_optin" => $this->recruitment_optin
 		);
-		return json_encode($vec);
+	return json_encode($vec);
 	}
 
 	/**

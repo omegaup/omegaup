@@ -115,4 +115,3 @@ class CoderOfTheMonth extends VO
 	  */
 	public $interview_url;
 }
-

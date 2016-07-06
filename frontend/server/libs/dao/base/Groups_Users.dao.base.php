@@ -294,4 +294,3 @@ abstract class GroupsUsersDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-
