@@ -105,4 +105,3 @@ class ContestProblemOpened extends VO
 	  */
 	public $open_time;
 }
-

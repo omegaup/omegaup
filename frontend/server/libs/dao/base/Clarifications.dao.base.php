@@ -400,4 +400,3 @@ abstract class ClarificationsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

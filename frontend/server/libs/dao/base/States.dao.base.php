@@ -334,4 +334,3 @@ abstract class StatesDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

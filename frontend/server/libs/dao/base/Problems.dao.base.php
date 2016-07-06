@@ -722,4 +722,3 @@ abstract class ProblemsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

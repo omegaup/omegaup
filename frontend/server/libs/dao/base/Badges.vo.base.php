@@ -115,4 +115,3 @@ class Badges extends VO
 	  */
 	public $hint;
 }
-

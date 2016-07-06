@@ -126,4 +126,3 @@ class Messages extends VO
 	  */
 	public $date;
 }
-

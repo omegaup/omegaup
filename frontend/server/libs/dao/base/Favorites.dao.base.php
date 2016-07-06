@@ -294,4 +294,3 @@ abstract class FavoritesDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

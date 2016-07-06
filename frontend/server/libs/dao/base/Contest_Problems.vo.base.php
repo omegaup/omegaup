@@ -104,4 +104,3 @@ class ContestProblems extends VO
 	  */
 	public $order;
 }
-

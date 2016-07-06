@@ -333,4 +333,3 @@ abstract class UsersBadgesDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

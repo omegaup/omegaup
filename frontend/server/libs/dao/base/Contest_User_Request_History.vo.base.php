@@ -126,4 +126,3 @@ class ContestUserRequestHistory extends VO
 	  */
 	public $admin_id;
 }
-

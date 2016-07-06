@@ -136,4 +136,3 @@ class UserRank extends VO
 	  */
 	public $country_id;
 }
-

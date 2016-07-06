@@ -335,4 +335,3 @@ abstract class AnnouncementDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

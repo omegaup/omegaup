@@ -247,4 +247,3 @@ class Runs extends VO
 	  */
 	public $judged_by;
 }
-

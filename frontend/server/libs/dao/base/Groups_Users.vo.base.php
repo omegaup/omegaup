@@ -82,4 +82,3 @@ class GroupsUsers extends VO
 	  */
 	public $user_id;
 }
-

@@ -550,4 +550,3 @@ abstract class RunsDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

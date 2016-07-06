@@ -318,4 +318,3 @@ abstract class AuthTokensDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

@@ -294,4 +294,3 @@ abstract class ProblemsBadgesDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

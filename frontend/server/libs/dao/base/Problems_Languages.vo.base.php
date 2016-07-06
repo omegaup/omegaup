@@ -93,4 +93,3 @@ class ProblemsLanguages extends VO
 	  */
 	public $translator_id;
 }
-

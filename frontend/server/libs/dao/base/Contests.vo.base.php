@@ -346,4 +346,3 @@ class Contests extends VO
 	  */
 	public $interview;
 }
-

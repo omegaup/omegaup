@@ -104,4 +104,3 @@ class Schools extends VO
 	  */
 	public $name;
 }
-

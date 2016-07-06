@@ -104,4 +104,3 @@ class GroupsScoreboardsContests extends VO
 	  */
 	public $weight;
 }
-

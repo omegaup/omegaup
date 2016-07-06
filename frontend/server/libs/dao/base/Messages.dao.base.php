@@ -368,4 +368,3 @@ abstract class MessagesDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

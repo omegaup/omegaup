@@ -93,4 +93,3 @@ class ProblemViewed extends VO
 	  */
 	public $view_time;
 }
-

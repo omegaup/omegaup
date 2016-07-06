@@ -82,4 +82,3 @@ class Favorites extends VO
 	  */
 	public $problem_id;
 }
-

@@ -318,4 +318,3 @@ abstract class LanguagesDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

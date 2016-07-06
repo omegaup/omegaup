@@ -148,4 +148,3 @@ class Clarifications extends VO
 	  */
 	public $public;
 }
-

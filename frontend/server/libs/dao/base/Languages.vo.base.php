@@ -93,4 +93,3 @@ class Languages extends VO
 	  */
 	public $country_id;
 }
-

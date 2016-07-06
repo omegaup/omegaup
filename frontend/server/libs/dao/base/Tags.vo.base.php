@@ -82,4 +82,3 @@ class Tags extends VO
 	  */
 	public $name;
 }
-

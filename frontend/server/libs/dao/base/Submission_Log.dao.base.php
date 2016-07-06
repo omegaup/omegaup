@@ -350,4 +350,3 @@ abstract class SubmissionLogDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

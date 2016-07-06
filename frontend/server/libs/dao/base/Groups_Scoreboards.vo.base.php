@@ -126,4 +126,3 @@ class GroupsScoreboards extends VO
 	  */
 	public $description;
 }
-

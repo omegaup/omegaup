@@ -126,4 +126,3 @@ class ContestUserRequest extends VO
 	  */
 	public $extra_note;
 }
-
