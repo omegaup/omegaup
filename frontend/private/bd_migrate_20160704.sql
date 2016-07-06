@@ -1,4 +1,6 @@
 
-ALTER TABLE Users ADD COLUMN interviewer BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE Contests ADD COLUMN interview BOOL NOT NULL DEFAULT  '0' COMMENT  'Si este concurso es en realidad una entrevista';
 
+CREATE TABLE IF NOT EXISTS `Interviews` (
+  `contest_id` int(11) NOT NULL,
+  PRIMARY KEY (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de id_concuros que se usan para entrevista';

@@ -129,7 +129,7 @@ class ContestsDAO extends ContestsDAOBase
             SELECT
                 COUNT(*)
             FROM
-                Interview
+                Interviews
             WHERE
                 contest_id = ?;';
         $params = array($contest->getContestId());
