@@ -6,7 +6,7 @@ class InterviewController extends Controller {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!Authorization::IsSystemAdmin($r['current_user_id']) && $r['current_user']->getInterviewer() != '1') {
+        if (!Authorization::IsSystemAdmin($r['current_user_id']) && !UsersDAO::IsUserInterviewer($r['current_user']->getUserId())) {
             throw new ForbiddenAccessException();
         }
 
@@ -186,7 +186,7 @@ class InterviewController extends Controller {
         }
 
         // Only proceed if this is indeed an interview
-        if ('1' != $backingContest->getInterview()) {
+        if (ContestsDAO::IsContestInterview($backingContest)) {
             throw new NotFoundException('interviewNotFound');
         }
 

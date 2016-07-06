@@ -196,10 +196,6 @@ abstract class UsersDAOBase extends DAO
 			$sql .= " `verified` = ? AND";
 			array_push( $val, $Users->getVerified() );
 		}
-		if (!is_null( $Users->getInterviewer())) {
-			$sql .= " `interviewer` = ? AND";
-			array_push( $val, $Users->getInterviewer() );
-		}
 		if (!is_null( $Users->getVerificationId())) {
 			$sql .= " `verification_id` = ? AND";
 			array_push( $val, $Users->getVerificationId() );
@@ -251,7 +247,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function update($Users)
 	{
-		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `interviewer` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `recruitment_optin` = ? WHERE  `user_id` = ?;";
+		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `recruitment_optin` = ? WHERE  `user_id` = ?;";
 		$params = array(
 			$Users->getUsername(),
 			$Users->getFacebookUserId(),
@@ -269,7 +265,6 @@ abstract class UsersDAOBase extends DAO
 			$Users->getBirthDate(),
 			$Users->getLastAccess(),
 			$Users->getVerified(),
-			$Users->getInterviewer(),
 			$Users->getVerificationId(),
 			$Users->getResetDigest(),
 			$Users->getResetSentAt(),
@@ -298,8 +293,7 @@ abstract class UsersDAOBase extends DAO
 		if (is_null($Users->submissions)) $Users->submissions = '0';
 		if (is_null($Users->last_access)) $Users->last_access = gmdate('Y-m-d H:i:s');
 		if (is_null($Users->verified)) $Users->verified = FALSE;
-		if (is_null($Users->interviewer)) $Users->interviewer = FALSE;
-		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `interviewer`, `verification_id`, `reset_digest`, `reset_sent_at`, `recruitment_optin` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `recruitment_optin` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
 			$Users->user_id,
 			$Users->username,
@@ -318,7 +312,6 @@ abstract class UsersDAOBase extends DAO
 			$Users->birth_date,
 			$Users->last_access,
 			$Users->verified,
-			$Users->interviewer,
 			$Users->verification_id,
 			$Users->reset_digest,
 			$Users->reset_sent_at,
@@ -540,16 +533,6 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getInterviewer()) ) ) & ( ! is_null ( ($b = $UsersB->getInterviewer()) ) ) ){
-				$sql .= " `interviewer` >= ? AND `interviewer` <= ? AND";
-				array_push( $val, min($a,$b));
-				array_push( $val, max($a,$b));
-		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `interviewer` = ? AND";
-			$a = is_null ( $a ) ? $b : $a;
-			array_push( $val, $a);
-		}
-
 		if( ( !is_null (($a = $UsersA->getVerificationId()) ) ) & ( ! is_null ( ($b = $UsersB->getVerificationId()) ) ) ){
 				$sql .= " `verification_id` >= ? AND `verification_id` <= ? AND";
 				array_push( $val, min($a,$b));
@@ -627,4 +610,3 @@ abstract class UsersDAOBase extends DAO
 		return $conn->Affected_Rows();
 	}
 }
-

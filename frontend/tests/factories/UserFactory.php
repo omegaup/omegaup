@@ -60,8 +60,10 @@ class UserFactory {
         }
 
         if ($interviewer) {
-            $user->interviewer = 1;
-            UsersDAO::save($user);
+            $ur = new UserRoles();
+            $ur->setUserId($user->getUserId());
+            $ur->setRoleId(4);
+            UserRolesDAO::save($ur);
         }
 
         // Password came hashed from DB. Set password in plaintext

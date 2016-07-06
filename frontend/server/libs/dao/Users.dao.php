@@ -2,12 +2,7 @@
 
 require_once('base/Users.dao.base.php');
 require_once('base/Users.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
+
 /** Users Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
@@ -41,6 +36,19 @@ class UsersDAO extends UsersDAOBase {
         }
 
         return array_pop($a_Results);
+    }
+
+    public static function IsUserInterviewer($user_id) {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                User_Roles ur
+            WHERE
+                ur.user_id = ? AND ur.role_id = 4;';
+        $params = array($user_id);
+        global $conn;
+        return $conn->GetOne($sql, $params) > 0;
     }
 
     public static function FindByUsernameOrName($usernameOrName) {

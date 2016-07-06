@@ -82,9 +82,6 @@ class Users extends VO
 			if (isset($data['verified'])) {
 				$this->verified = $data['verified'];
 			}
-			if (isset($data['interviewer'])) {
-				$this->interviewer = $data['interviewer'];
-			}
 			if (isset($data['verification_id'])) {
 				$this->verification_id = $data['verification_id'];
 			}
@@ -127,7 +124,6 @@ class Users extends VO
 			"birth_date" => $this->birth_date,
 			"last_access" => $this->last_access,
 			"verified" => $this->verified,
-			"interviewer" => $this->interviewer,
 			"verification_id" => $this->verification_id,
 			"reset_digest" => $this->reset_digest,
 			"reset_sent_at" => $this->reset_sent_at,
@@ -270,13 +266,6 @@ class Users extends VO
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var BOOLEAN
-	  */
-	public $interviewer;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
 	  * @var VARCHAR(
 	  */
 	public $verification_id;
@@ -302,4 +291,3 @@ class Users extends VO
 	  */
 	public $recruitment_optin;
 }
-

@@ -126,7 +126,6 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `contestant_must_register`   tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica que los participantes deben pre-registrarse antes de poder paticipar',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
   `recommended` BOOL NOT NULL DEFAULT  '0' COMMENT  'Mostrar el concurso en la lista de recomendados.',
-  `interview` BOOL NOT NULL DEFAULT  '0' COMMENT  'Si este concurso es en realidad una entrevista',
   PRIMARY KEY (`contest_id`),
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`),
@@ -317,6 +316,17 @@ CREATE TABLE IF NOT EXISTS `Languages` (
   UNIQUE KEY `nombre_UNIQUE` (`name`),
   KEY `country_id` (`country_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de idiomas que potencialmente se soportarían.' AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Interviews`
+--
+
+CREATE TABLE IF NOT EXISTS `Interviews` (
+  `contest_id` int(11) NOT NULL,
+  PRIMARY KEY (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de id_concuros que se usan para entrevista';
 
 -- --------------------------------------------------------
 
@@ -559,7 +569,6 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `birth_date` date DEFAULT NULL,
   `last_access` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `verified` BOOLEAN NOT NULL DEFAULT FALSE,
-  `interviewer` BOOLEAN NOT NULL DEFAULT FALSE,
   `verification_id` VARCHAR( 50 ) NULL DEFAULT NULL,
   `reset_digest` VARCHAR(45) NULL DEFAULT NULL,
   `reset_sent_at` DATETIME NULL DEFAULT NULL,
@@ -937,6 +946,7 @@ ALTER TABLE `Groups_Scoreboards_Contests`
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (1 ,  'ADMIN',  'Admin');
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (2 ,  'CONTEST_ADMIN',  'Contest admin');
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (3 ,  'PROBLEM_ADMIN',  'Problem admin');
+INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (4 ,  'INTERVIEWER',  'User can create interviews');
 
 --
 -- Update AC Count on grade

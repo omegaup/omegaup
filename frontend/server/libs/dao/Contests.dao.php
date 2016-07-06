@@ -48,6 +48,7 @@ class ContestsDAO extends ContestsDAOBase
         $result = array();
 
         foreach ($rs as $r) {
+            $r['interview'] = true;
             $result[] = $r;
         }
 
@@ -123,6 +124,19 @@ class ContestsDAO extends ContestsDAOBase
         return $ar;
     }
 
+    public static function isContestInterview(Contests $contest) {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Interview
+            WHERE
+                contest_id = ?;';
+        $params = array($contest->getContestId());
+        global $conn;
+        return $conn->GetOne($sql, $params) > 0;
+    }
+
     /**
      * Regresa todos los concursos que un usuario puede ver.
      *
@@ -163,7 +177,7 @@ class ContestsDAO extends ContestsDAOBase
                      FROM
                         Contests
                      WHERE
-                        Contests.public = 0 AND Contests.director_id = ? AND interview = 0
+                        Contests.public = 0 AND Contests.director_id = ?
                  )
 
                  UNION
@@ -259,7 +273,6 @@ class ContestsDAO extends ContestsDAOBase
                     Contests
                 WHERE
                     Public = 1
-                    and interview = 0
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
@@ -291,8 +304,6 @@ class ContestsDAO extends ContestsDAOBase
                     $columns
                 FROM
                     Contests
-                WHERE
-                    interview = 0
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
