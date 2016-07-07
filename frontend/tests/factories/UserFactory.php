@@ -16,7 +16,7 @@ class UserFactory {
     * @param string $email optional
     * @return user (DAO)
     */
-    public static function createUser($username = null, $password = null, $email = null, $verify = true, $interviewer = false) {
+    public static function createUser($username = null, $password = null, $email = null, $verify = true) {
         // If data is not provided, generate it randomly
         if (is_null($username)) {
             $username = Utils::CreateRandomString();
@@ -57,13 +57,6 @@ class UserFactory {
         } else {
             $user->verified = 0;
             UsersDAO::save($user);
-        }
-
-        if ($interviewer) {
-            $ur = new UserRoles();
-            $ur->setUserId($user->getUserId());
-            $ur->setRoleId(4);
-            UserRolesDAO::save($ur);
         }
 
         // Password came hashed from DB. Set password in plaintext
@@ -136,6 +129,13 @@ class UserFactory {
     }
 
     public static function createInterviewerUser() {
-        return self::createUser(null, null, null, null, true);
+        $user = self::createUser(null, null, null, null, true);
+
+        $ur = new UserRoles();
+        $ur->setUserId($user->getUserId());
+        $ur->setRoleId(4);
+        UserRolesDAO::save($ur);
+
+        return $user;
     }
 }

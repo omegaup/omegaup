@@ -161,11 +161,11 @@ try {
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
 
-if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === true)) {
-    include('libs/smarty/Smarty.class.php');
+include('libs/smarty/Smarty.class.php');
+$smarty = new Smarty;
+$smarty->setTemplateDir(__DIR__ . '/../templates/');
 
-    $smarty = new Smarty;
-    $smarty->setTemplateDir(__DIR__ . '/../templates/');
+if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === true)) {
     $smarty->assign('CURRENT_USER_IS_ADMIN', 0);
     if (defined('SMARTY_CACHE_DIR')) {
         $smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
@@ -215,16 +215,12 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
         $smarty->force_compile = true;
         $smarty->caching = 0;
     }
-
-    $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 } else {
     // During testing We need smarty to load strings from *.lang files
-    include('libs/smarty/Smarty.class.php');
-    $smarty = new Smarty;
-    $smarty->setTemplateDir(__DIR__ . '/../templates/');
     $lang = 'pseudo';
-    $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 }
+
+$smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 
 // Load pager class
 require_once('libs/Pager.php');

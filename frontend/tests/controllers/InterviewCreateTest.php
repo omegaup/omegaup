@@ -10,7 +10,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $interviewer = UserFactory::createInterviewerUser();
 
         // Verify I started with nothing
-        $interviews = ContestsDAO::getMyInterviews($interviewer->user_id);
+        $interviews = InterviewsDAO::getMyInterviews($interviewer->user_id);
         $this->assertEquals(0, count($interviews));
 
         $r['auth_token'] = $this->login($interviewer);
@@ -22,7 +22,7 @@ class InterviewCreateTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $interviews = ContestsDAO::getMyInterviews($interviewer->user_id);
+        $interviews = InterviewsDAO::getMyInterviews($interviewer->user_id);
 
         // Must have 1 interview
         $this->assertEquals(1, count($interviews));
@@ -40,7 +40,7 @@ class InterviewCreateTest extends OmegaupTestCase {
 
         $response = InterviewController::apiCreate($r);
 
-        $interview = ContestsDAO::getMyInterviews($contestant->user_id);
+        $interview = InterviewsDAO::getMyInterviews($contestant->user_id);
 
         $this->assertEquals(true, $interview[0]['interview']);
         $this->assertEquals(0, $interview[0]['public']);

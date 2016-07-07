@@ -701,7 +701,6 @@ class ContestController extends Controller {
         $contest->setLanguages(empty($r['languages']) ? null : $r['languages']);
         $contest->setScoreboardUrl(self::randomString(30));
         $contest->setScoreboardUrlAdmin(self::randomString(30));
-        $contest->setContestantMustRegister($r['contestant_must_register']);
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->setShowScoreboardAfter($r['show_scoreboard_after']);
@@ -1541,7 +1540,7 @@ class ContestController extends Controller {
         $showAllRuns = false;
 
         // Don't leak scoreboard to interviewees
-        if (ContestsDAO::IsContestInterview($r['contest'])) {
+        if (InterviewsDAO::IsContestInterview($r['contest'])) {
             throw new ForbiddenAccessException('invalidScoreboardUrl');
         }
 

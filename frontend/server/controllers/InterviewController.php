@@ -186,7 +186,7 @@ class InterviewController extends Controller {
         }
 
         // Only proceed if this is indeed an interview
-        if (ContestsDAO::IsContestInterview($backingContest)) {
+        if (!InterviewsDAO::IsContestInterview($backingContest)) {
             throw new NotFoundException('interviewNotFound');
         }
 
@@ -243,7 +243,7 @@ class InterviewController extends Controller {
         $interviews = null;
 
         try {
-            $interviews = ContestsDAO::getMyInterviews($r['current_user_id']);
+            $interviews = InterviewsDAO::getMyInterviews($r['current_user_id']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

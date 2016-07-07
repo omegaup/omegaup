@@ -139,6 +139,7 @@ class UserController extends Controller {
         $r['user'] = $user;
         if (!$user->verified) {
             self::$log->info('User ' . $user->getUsername() . ' created, sending verification mail');
+
             self::sendVerificationEmail($r);
         } else {
             self::$log->info('User ' . $user->getUsername() . ' created, trusting e-mail');
@@ -506,15 +507,12 @@ class UserController extends Controller {
 
         if (self::$redirectOnVerify) {
             if (!is_null($r['redirecttointerview'])) {
-                die(header('Location: /login/?redirect=/interview/' . $r['redirecttointerview'] . '/arena'));
+                die(header('Location: /login/?redirect=/interview/' . urlencode($r['redirecttointerview']) . '/arena'));
             } else {
                 die(header('Location: /login/'));
             }
         }
 
-        if (self::$redirectOnVerify) {
-            die(header('Location: /login/'));
-        }
         return array('status' => 'ok');
     }
 
@@ -1277,7 +1275,7 @@ class UserController extends Controller {
         $openedContest = self::userOpenedContest($contest->getContestId(), $user->getUserId());
 
         $response['user_verified'] = $user->getVerified() === '1';
-        $response['interview_url'] = 'https://omegaup.com/interview/' . $r['interview'] . '/arena';
+        $response['interview_url'] = 'https://omegaup.com/interview/' . $contest->alias . '/arena';
         $response['name_or_username'] = is_null($user->getName()) ? $user->getUsername() : $user->getName();
         $response['opened_interview'] = $openedContest;
         $response['finished'] = !ContestsDAO::isInsideContest($contest, $user->getUserId());
