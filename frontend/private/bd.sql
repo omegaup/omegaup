@@ -320,6 +320,17 @@ CREATE TABLE IF NOT EXISTS `Languages` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `Interviews`
+--
+
+CREATE TABLE IF NOT EXISTS `Interviews` (
+  `contest_id` int(11) NOT NULL,
+  PRIMARY KEY (`contest_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de id_concuros que se usan para entrevista';
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `Messages`
 --
 
@@ -935,6 +946,7 @@ ALTER TABLE `Groups_Scoreboards_Contests`
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (1 ,  'ADMIN',  'Admin');
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (2 ,  'CONTEST_ADMIN',  'Contest admin');
 INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (3 ,  'PROBLEM_ADMIN',  'Problem admin');
+INSERT INTO  `Roles` (`role_id` ,`name` ,`description`) VALUES (4 ,  'INTERVIEWER',  'User can create interviews');
 
 --
 -- Update AC Count on grade

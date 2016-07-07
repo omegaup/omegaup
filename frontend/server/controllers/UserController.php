@@ -132,6 +132,10 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        if (!is_null($r['skip_verification_email']) && ($r['skip_verification_email'] == 1)) {
+            UserController::$sendEmailOnVerify = false;
+        }
+
         $r['user'] = $user;
         if (!$user->verified) {
             self::$log->info('User ' . $user->getUsername() . ' created, sending verification mail');
@@ -267,38 +271,57 @@ class UserController extends Controller {
      * @throws EmailVerificationSendException
      */
     private static function sendVerificationEmail(Request $r) {
-        if (!OMEGAUP_EMAIL_SEND_EMAILS) {
-            return;
-        }
-
         try {
-            $email = EmailsDAO::getByPK($r['user']->getMainEmailId());
+            $r['email'] = EmailsDAO::getByPK($r['user']->getMainEmailId());
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::$log->info('Sending email to user.');
+        $r['mail_subject'] = 'Bienvenido a Omegaup!';
+        $r['mail_body'] = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email:'
+                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '">'
+                           . ' https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '</a>';
+
         if (self::$sendEmailOnVerify) {
-            $mail = new PHPMailer();
-            $mail->IsSMTP();
-            $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
-            $mail->SMTPAuth = true;
-            $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
-            $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
-            $mail->Port = 465;
-            $mail->SMTPSecure = 'ssl';
-            $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+            self::sendEmail($r);
+        } else {
+            self::$log->info('Not sending email beacause sendEmailOnVerify = FALSE');
+        }
+    }
 
-            $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
-            $mail->AddAddress($email->getEmail());
-            $mail->isHTML(true);
-            $mail->Subject = 'Bienvenido a Omegaup!';
-            $mail->Body = 'Bienvenido a Omegaup! Por favor ingresa a la siguiente dirección para hacer login y verificar tu email: <a href="https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '"> https://omegaup.com/api/user/verifyemail/id/' . $r['user']->getVerificationId() . '</a>';
+    public static function sendEmail($r) {
+        Validators::isStringNonEmpty($r['mail_subject'], 'mail_subject');
+        Validators::isStringNonEmpty($r['mail_body'], 'mail_body');
 
-            if (!$mail->Send()) {
-                self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
-                throw new EmailVerificationSendException();
-            }
+        if (!OMEGAUP_EMAIL_SEND_EMAILS) {
+            self::$log->info('Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:');
+            self::$log->info('     to = ' . $r['email']->getEmail());
+            self::$log->info('subject = ' . $r['mail_subject']);
+            self::$log->info('   body = ' . $r['mail_body']);
+            return;
+        }
+
+        self::$log->info('Really sending email to user.');
+
+        $mail = new PHPMailer();
+        $mail->IsSMTP();
+        $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
+        $mail->SMTPAuth = true;
+        $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
+        $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
+        $mail->Port = 465;
+        $mail->SMTPSecure = 'ssl';
+        $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+
+        $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
+        $mail->AddAddress($r['email']->getEmail());
+        $mail->isHTML(true);
+        $mail->Subject = $r['mail_subject'];
+        $mail->Body = $r['mail_body'];
+
+        if (!$mail->Send()) {
+            self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
+            throw new EmailVerificationSendException();
         }
     }
 
@@ -483,8 +506,13 @@ class UserController extends Controller {
         self::registerToSendy($user);
 
         if (self::$redirectOnVerify) {
-            die(header('Location: /login/'));
+            if (!is_null($r['redirecttointerview'])) {
+                die(header('Location: /login/?redirect=/interview/' . urlencode($r['redirecttointerview']) . '/arena'));
+            } else {
+                die(header('Location: /login/'));
+            }
         }
+
         return array('status' => 'ok');
     }
 
@@ -1208,6 +1236,53 @@ class UserController extends Controller {
         return $response;
     }
 
+    public static function userOpenedContest($contestId, $userId) {
+        // You already started the contest.
+        $contestOpened = ContestsUsersDAO::getByPK($userId, $contestId);
+
+        if (!is_null($contestOpened) && $contestOpened->access_time != '0000-00-00 00:00:00') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the results for this user in a given interview
+     *
+     * @param Request $r
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiInterviewStats(Request $r) {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+
+        Validators::isStringNonEmpty($r['interview'], 'interview');
+        Validators::isStringNonEmpty($r['username'], 'username');
+
+        $contest = ContestsDAO::getByAlias($r['interview']);
+        if (is_null($contest)) {
+            throw new NotFoundException('interviewNotFound');
+        }
+
+        // Only admins can view interview details
+        if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+            throw new ForbiddenAccessException();
+        }
+
+        $response = array();
+        $user = self::resolveTargetUser($r);
+
+        $openedContest = self::userOpenedContest($contest->getContestId(), $user->getUserId());
+
+        $response['user_verified'] = $user->getVerified() === '1';
+        $response['interview_url'] = 'https://omegaup.com/interview/' . $contest->alias . '/arena';
+        $response['name_or_username'] = is_null($user->getName()) ? $user->getUsername() : $user->getName();
+        $response['opened_interview'] = $openedContest;
+        $response['finished'] = !ContestsDAO::isInsideContest($contest, $user->getUserId());
+        $response['status'] = 'ok';
+        return $response;
+    }
+
     /**
      * Get Contests which a certain user has participated in
      *
@@ -1724,5 +1799,12 @@ class UserController extends Controller {
         self::sendVerificationEmail($r);
 
         return array('status' => 'ok');
+    }
+
+    public static function makeUsernameFromEmail($email) {
+        $newUsername = substr($email, 0, strpos($email, '@'));
+        $newUsername = str_replace('-', '_', $newUsername);
+        $newUsername = str_replace('.', '_', $newUsername);
+        return $newUsername . time();
     }
 }

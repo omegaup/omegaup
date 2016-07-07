@@ -127,4 +127,15 @@ class UserFactory {
 
         return $user;
     }
+
+    public static function createInterviewerUser() {
+        $user = self::createUser(null, null, null, null, true);
+
+        $ur = new UserRoles();
+        $ur->setUserId($user->getUserId());
+        $ur->setRoleId(4);
+        UserRolesDAO::save($ur);
+
+        return $user;
+    }
 }

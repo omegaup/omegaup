@@ -145,7 +145,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
-    private static function canAccessContest(Request $r) {
+    public static function canAccessContest(Request $r) {
         if (!isset($r['contest']) || is_null($r['contest'])) {
             throw new NotFoundException('contestNotFound');
         }
@@ -749,6 +749,13 @@ class ContestController extends Controller {
                 }
             }
 
+            if (!is_null($r['interview']) && $r['interview']) {
+                $interview = new Interviews();
+                $interview->setContestId($contest->getContestId());
+
+                InterviewsDAO::save($interview);
+            }
+
             // End transaction transaction
             ContestsDAO::transEnd();
         } catch (Exception $e) {
@@ -822,7 +829,8 @@ class ContestController extends Controller {
         $contest_length = $finish_time - $start_time;
 
         // Validate max contest length
-        if ($contest_length > ContestController::MAX_CONTEST_LENGTH_SECONDS) {
+        $is_interview = (!is_null($r['interview']) && ($r['interview'] == 1 || $r['interview']));
+        if (!$is_interview && $contest_length > ContestController::MAX_CONTEST_LENGTH_SECONDS) {
             throw new InvalidParameterException('contestLengthTooLong');
         }
 
@@ -1530,6 +1538,11 @@ class ContestController extends Controller {
 
         // If true, will override Scoreboard Pertentage to 100%
         $showAllRuns = false;
+
+        // Don't leak scoreboard to interviewees
+        if (InterviewsDAO::IsContestInterview($r['contest'])) {
+            throw new ForbiddenAccessException('invalidScoreboardUrl');
+        }
 
         if (is_null($r['token'])) {
             // Get the current user

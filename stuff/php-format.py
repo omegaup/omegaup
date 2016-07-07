@@ -11,7 +11,8 @@ IGNORE_LIST = ['frontend/server/libs/dao/base/',
 	'frontend/server/libs/facebook-php-sdk/', 'frontend/server/libs/log4php/',
 	'frontend/server/libs/Mailchimp/', 'frontend/server/libs/Markdown/',
 	'frontend/server/libs/phpmailer/', 'frontend/server/libs/smarty/',
-	'frontend/server/libs/PasswordHash.php', 'frontend/server/libs/ZipStream.php']
+	'frontend/server/libs/PasswordHash.php', 'frontend/server/libs/ZipStream.php',
+	'frontend/server/config.php', 'frontend/server/test/test_config.php']
 
 class colors:
 	HEADER = '\033[95m'

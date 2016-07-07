@@ -2077,6 +2077,108 @@ OmegaUp.prototype.UserEdit = function( username, name, email, birthDate, school,
 	});
 };
 
+OmegaUp.prototype.addUsersToInterview = function(interviewAlias, usernameOrEmailsCSV, callback) {
+	var self = this;
+
+	$.post(
+		'/api/interview/addUsers/interview_alias/' + encodeURIComponent(interviewAlias) + '/',
+		{
+			usernameOrEmailsCSV : usernameOrEmailsCSV
+		},
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getInterview = function(alias, callback) {
+	var self = this;
+
+	$.get(
+		'/api/interview/details/interview_alias/' + encodeURIComponent(alias) + '/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
+OmegaUp.prototype.getInterviewStatsForUser = function(interviewAlias, username, callback) {
+	var self = this;
+
+	$.get(
+		'/api/user/interviewstats/username/' + encodeURIComponent(username) + '/interview/' + encodeURIComponent(interviewAlias),
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function(j, status, errorThrown) {
+		try {
+			callback(JSON.parse(j.responseText));
+		} catch (err) {
+			callback({status:'error', 'error':undefined});
+		}
+	});
+};
+
+OmegaUp.prototype.getInterviews = function(callback) {
+	var self = this;
+
+	$.get(
+		'/api/interview/list/',
+		function (data) {
+			callback(data);
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
+OmegaUp.prototype.createInterview = function(s_Alias, s_Title, s_Duration, callback) {
+	$.post(
+		'/api/interview/create/',
+		{ alias : s_Alias, title : s_Title, duration : s_Duration},
+		function (data) {
+			if (data.status !== undefined && data.status == "error") {
+				OmegaUp.ui.error(data.error);
+			} else {
+				if (callback !== undefined){ callback(data); }
+			}
+		},
+		'json'
+	).fail(function (data) {
+		if (callback !== undefined) {
+			try {
+				callback(JSON.parse(data.responseText));
+			} catch (err) {
+				callback({status: 'error', error: err});
+			}
+		}
+	});
+};
+
 OmegaUp.prototype.forceVerifyEmail = function(username, callback) {
 	var self = this;
 
