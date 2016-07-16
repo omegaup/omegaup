@@ -350,12 +350,13 @@ class ContestController extends Controller {
     }
 
     public static function apiRegisterForContest(Request $r) {
+        // Authenticate request
+        self::authenticateRequest($r);
+
         self::validateBasicDetails($r);
 
-        $current_user = AuthTokensDAO::getUserByToken($r['auth_token']);
-
         $contest_req = new ContestUserRequest();
-        $contest_req->setUserId($current_user->getUserId());
+        $contest_req->setUserId($r['current_user_id']);
         $contest_req->setContestId($r['contest']->getContestId());
         $contest_req->setRequestTime(gmdate('Y-m-d H:i:s'));
 
@@ -444,43 +445,43 @@ class ContestController extends Controller {
             }
 
             // Add info of each problem to the contest
-                    $problemsResponseArray = array();
+            $problemsResponseArray = array();
 
             // Set of columns that we want to show through this API. Doesn't include the SOURCE
-                    $relevant_columns = array('title', 'alias', 'validator', 'time_limit',
-                    'overall_wall_time_limit', 'extra_wall_time', 'memory_limit',
-                    'visits', 'submissions', 'accepted', 'dificulty', 'order',
-                    'languages');
-                    $letter = 0;
+            $relevant_columns = array('title', 'alias', 'validator', 'time_limit',
+                'overall_wall_time_limit', 'extra_wall_time', 'memory_limit',
+                'visits', 'submissions', 'accepted', 'dificulty', 'order',
+                'languages');
+            $letter = 0;
 
-                    foreach ($problemsInContest as $problemkey) {
-                        try {
-                            // Get the data of the problem
-                            $temp_problem = ProblemsDAO::getByPK($problemkey->getProblemId());
-                        } catch (Exception $e) {
-                            // Operation failed in the data layer
-                            throw new InvalidDatabaseOperationException($e);
-                        }
+            foreach ($problemsInContest as $problemkey) {
+                try {
+                    // Get the data of the problem
+                    $temp_problem = ProblemsDAO::getByPK($problemkey->getProblemId());
+                } catch (Exception $e) {
+                    // Operation failed in the data layer
+                    throw new InvalidDatabaseOperationException($e);
+                }
 
-                                // Add the 'points' value that is stored in the ContestProblem relationship
-                                $temp_array = $temp_problem->asFilteredArray($relevant_columns);
-                                $temp_array['points'] = $problemkey->getPoints();
-                                $temp_array['letter'] = ContestController::columnName($letter++);
-                        if (!empty($result['languages'])) {
-                            $temp_array['languages'] = join(',', array_intersect(
-                                explode(',', $result['languages']),
-                                explode(',', $temp_array['languages'])
-                            ));
-                        }
+                // Add the 'points' value that is stored in the ContestProblem relationship
+                $temp_array = $temp_problem->asFilteredArray($relevant_columns);
+                $temp_array['points'] = $problemkey->getPoints();
+                $temp_array['letter'] = ContestController::columnName($letter++);
+                if (!empty($result['languages'])) {
+                    $temp_array['languages'] = join(',', array_intersect(
+                        explode(',', $result['languages']),
+                        explode(',', $temp_array['languages'])
+                    ));
+                }
 
-                                // Save our array into the response
-                                array_push($problemsResponseArray, $temp_array);
-                    }
+                // Save our array into the response
+                array_push($problemsResponseArray, $temp_array);
+            }
 
             // Add problems to response
-                    $result['problems'] = $problemsResponseArray;
+            $result['problems'] = $problemsResponseArray;
 
-                    return $result;
+            return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
 
