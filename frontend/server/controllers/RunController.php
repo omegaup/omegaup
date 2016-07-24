@@ -80,11 +80,11 @@ class RunController extends Controller {
             // Check for practice or public problem, there is no contest info in this scenario
             if ($r['contest_alias'] == '') {
                 if (Authorization::IsProblemAdmin($r['current_user_id'], $r['problem']) ||
-                      time() > ProblemsDAO::getPracticeDeadline($r['problem']->getProblemId()) ||
-                      $r['problem']->getPublic() == true) {
+                      time() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id) ||
+                      $r['problem']->public == true) {
                     if (!RunsDAO::IsRunInsideSubmissionGap(
                         null,
-                        $r['problem']->getProblemId(),
+                        $r['problem']->problem_id,
                         $r['current_user_id']
                     )
                             && !Authorization::IsSystemAdmin($r['current_user_id'])) {
@@ -120,8 +120,8 @@ class RunController extends Controller {
 
             // Validate that the combination contest_id problem_id is valid
             if (!ContestProblemsDAO::getByPK(
-                $r['contest']->getContestId(),
-                $r['problem']->getProblemId()
+                $r['contest']->contest_id,
+                $r['problem']->problem_id
             )) {
                 throw new InvalidParameterException('parameterNotFound', 'problem_alias');
             }
@@ -129,7 +129,7 @@ class RunController extends Controller {
             // Contest admins can skip following checks
             if (!Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
                 // Before submit something, contestant had to open the problem/contest
-                if (!ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->getContestId())) {
+                if (!ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id)) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
                 }
 
@@ -139,18 +139,18 @@ class RunController extends Controller {
                 }
 
                 // Validate if contest is private then the user should be registered
-                if ($r['contest']->getPublic() == 0
+                if ($r['contest']->public == 0
                         && is_null(ContestsUsersDAO::getByPK(
                             $r['current_user_id'],
-                            $r['contest']->getContestId()
+                            $r['contest']->contest_id
                         ))) {
                     throw new NotAllowedToSubmitException('runNotRegistered');
                 }
 
                 // Validate if the user is allowed to submit given the submissions_gap
                 if (!RunsDAO::IsRunInsideSubmissionGap(
-                    $r['contest']->getContestId(),
-                    $r['problem']->getProblemId(),
+                    $r['contest']->contest_id,
+                    $r['problem']->problem_id,
                     $r['current_user_id']
                 )) {
                     throw new NotAllowedToSubmitException('runWaitGap');
@@ -202,15 +202,15 @@ class RunController extends Controller {
                 case 'contest_start':
                     // submit_delay is calculated from the start
                     // of the contest
-                    $start = $r['contest']->getStartTime();
+                    $start = $r['contest']->start_time;
                     break;
 
                 case 'problem_open':
                     // submit delay is calculated from the
                     // time the user opened the problem
                     $opened = ContestProblemOpenedDAO::getByPK(
-                        $r['contest']->getContestId(),
-                        $r['problem']->getProblemId(),
+                        $r['contest']->contest_id,
+                        $r['problem']->problem_id,
                         $r['current_user_id']
                     );
 
@@ -221,7 +221,7 @@ class RunController extends Controller {
                         throw new NotAllowedToSubmitException('runEvenOpened');
                     }
 
-                    $start = $opened->getOpenTime();
+                    $start = $opened->open_time;
                     break;
 
                 case 'none':
@@ -246,14 +246,14 @@ class RunController extends Controller {
                 $submit_delay = 0;
             }
 
-            $contest_id = $r['contest']->getContestId();
+            $contest_id = $r['contest']->contest_id;
             $test = Authorization::IsContestAdmin($r['current_user_id'], $r['contest']) ? 1 : 0;
         }
 
         // Populate new run object
         $run = new Runs(array(
                     'user_id' => $r['current_user_id'],
-                    'problem_id' => $r['problem']->getProblemId(),
+                    'problem_id' => $r['problem']->problem_id,
                     'contest_id' => $contest_id,
                     'language' => $r['language'],
                     'source' => $r['source'],
@@ -280,8 +280,7 @@ class RunController extends Controller {
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
             )));
 
-            // Update submissions counter++
-            $r['problem']->setSubmissions($r['problem']->getSubmissions() + 1);
+            $r['problem']->submissions++;
             ProblemsDAO::save($r['problem']);
         } catch (Exception $e) {
             // Operation failed in the data layer
@@ -309,12 +308,12 @@ class RunController extends Controller {
         } else {
             // Add remaining time to the response
             try {
-                $contest_user = ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->getContestId());
+                $contest_user = ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id);
 
-                if ($r['contest']->getWindowLength() === null) {
-                    $response['submission_deadline'] = strtotime($r['contest']->getFinishTime());
+                if ($r['contest']->window_length === null) {
+                    $response['submission_deadline'] = strtotime($r['contest']->finish_time);
                 } else {
-                    $response['submission_deadline'] = min(strtotime($r['contest']->getFinishTime()), strtotime($contest_user->getAccessTime()) + $r['contest']->getWindowLength() * 60);
+                    $response['submission_deadline'] = min(strtotime($r['contest']->finish_time), strtotime($contest_user->access_time) + $r['contest']->window_length * 60);
                 }
             } catch (Exception $e) {
                 // Operation failed in the data layer
@@ -323,7 +322,7 @@ class RunController extends Controller {
         }
 
         // Happy ending
-        $response['guid'] = $run->getGuid();
+        $response['guid'] = $run->guid;
         $response['status'] = 'ok';
 
         // Expire rank cache
@@ -488,16 +487,16 @@ class RunController extends Controller {
     public static function invalidateCacheOnRejudge(Runs $run) {
         try {
             // Expire details of the run
-            Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->getRunId());
+            Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
 
-            $contest = ContestsDAO::getByPK($run->getContestId());
+            $contest = ContestsDAO::getByPK($run->contest_id);
 
             // Now we need to invalidate problem stats
-            $problem = ProblemsDAO::getByPK($run->getProblemId());
+            $problem = ProblemsDAO::getByPK($run->problem_id);
 
             if (!is_null($problem)) {
                 // Invalidar cache stats
-                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->getAlias());
+                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
             }
         } catch (Exception $e) {
             // We did our best effort to invalidate the cache...
@@ -772,9 +771,9 @@ class RunController extends Controller {
                 null,
                 $r['status'],
                 $r['verdict'],
-                !is_null($r['problem']) ? $r['problem']->getProblemId() : null,
+                !is_null($r['problem']) ? $r['problem']->problem_id : null,
                 $r['language'],
-                !is_null($r['user']) ? $r['user']->getUserId() : null,
+                !is_null($r['user']) ? $r['user']->user_id : null,
                 $r['offset'],
                 $r['rowcount']
             );

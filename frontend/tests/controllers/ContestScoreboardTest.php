@@ -59,7 +59,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Validate that we have ranking
         $this->assertEquals(3, count($response['ranking']));
-        $this->assertEquals($contestant->getUsername(), $response['ranking'][0]['username']);
+        $this->assertEquals($contestant->username, $response['ranking'][0]['username']);
 
         //Check totals
         $this->assertEquals(200, $response['ranking'][0]['total']['points']);
@@ -88,7 +88,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Validate that we have ranking
         $this->assertEquals(3, count($response['ranking']));
-        $this->assertEquals($contestant->getUsername(), $response['ranking'][0]['username']);
+        $this->assertEquals($contestant->username, $response['ranking'][0]['username']);
 
         //Check totals
         $this->assertEquals(200, $response['ranking'][0]['total']['points']);
@@ -144,7 +144,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
-        $this->assertEquals($contestant->getUsername(), $response['ranking'][0]['username']);
+        $this->assertEquals($contestant->username, $response['ranking'][0]['username']);
 
         //Check totals
         $this->assertEquals(200, $response['ranking'][0]['total']['points']);
@@ -187,7 +187,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
 
-        $this->assertEquals($contestant->getUsername(), $response['ranking'][0]['username']);
+        $this->assertEquals($contestant->username, $response['ranking'][0]['username']);
 
         //Check totals
         $this->assertEquals(0, $response['ranking'][0]['total']['points']);
@@ -235,7 +235,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
 
-        $this->assertEquals($contestant->getUsername(), $response['ranking'][0]['username']);
+        $this->assertEquals($contestant->username, $response['ranking'][0]['username']);
 
         //Check totals
         $this->assertEquals(100, $response['ranking'][0]['total']['points']);

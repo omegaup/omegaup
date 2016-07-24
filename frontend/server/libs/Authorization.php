@@ -17,7 +17,7 @@ class Authorization {
         }
 
         return (
-            $run->getUserId() === $user_id ||
+            $run->user_id === $user_id ||
             Authorization::CanEditRun($user_id, $run)
         );
     }
@@ -28,8 +28,8 @@ class Authorization {
         }
 
         try {
-            $contest = ContestsDAO::getByPK($run->getContestId());
-            $problem = ProblemsDAO::getByPK($run->getProblemId());
+            $contest = ContestsDAO::getByPK($run->contest_id);
+            $problem = ProblemsDAO::getByPK($run->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -77,8 +77,8 @@ class Authorization {
         }
 
         try {
-            $contest = ContestsDAO::getByPK($clarification->getContestId());
-            $problem = ProblemsDAO::getByPK($clarification->getProblemId());
+            $contest = ContestsDAO::getByPK($clarification->contest_id);
+            $problem = ProblemsDAO::getByPK($clarification->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -87,7 +87,7 @@ class Authorization {
             return false;
         }
 
-        return ($problem->getAuthorId() === $user_id
+        return ($problem->author_id === $user_id
                 || Authorization::IsContestAdmin($user_id, $contest));
     }
 

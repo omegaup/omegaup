@@ -135,7 +135,7 @@ class ContestsFactory {
         // Prepare our request
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['usernameOrEmail'] = $user->getUsername();
+        $r['usernameOrEmail'] = $user->username;
 
         // Log in the contest director
         $r['auth_token'] = OmegaupTestCase::login($contestData['director']);
@@ -150,7 +150,7 @@ class ContestsFactory {
         // Prepare our request
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['usernameOrEmail'] = $user->getUsername();
+        $r['usernameOrEmail'] = $user->username;
 
         // Log in the contest director
         $r['auth_token'] = OmegaupTestCase::login($contestData['director']);
@@ -163,19 +163,19 @@ class ContestsFactory {
 
     public static function makeContestWindowLength($contestData, $windowLength = 20) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->setWindowLength($windowLength);
+        $contest->window_length = $windowLength;
         ContestsDAO::save($contest);
     }
 
     public static function forcePublic($contestData) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->setPublic(1);
+        $contest->public = 1;
         ContestsDAO::save($contest);
     }
 
     public static function setScoreboardPercentage($contestData, $percentage) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->setScoreboard($percentage);
+        $contest->scoreboard = $percentage;
         ContestsDAO::save($contest);
     }
 }

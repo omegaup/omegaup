@@ -57,7 +57,7 @@ class Utils {
 
         // Delete those who belong to problem_id
         foreach ($clarifications as $c) {
-            if ($c->getProblemId() == $problem_id) {
+            if ($c->problem_id == $problem_id) {
                 try {
                     ClarificationsDAO::delete($c);
                 } catch (ApiException $e) {

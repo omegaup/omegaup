@@ -102,26 +102,26 @@ class ProblemController extends Controller {
 
         // Populate a new Problem object
         $problem = new Problems();
-        $problem->setPublic($r['public']); /* private by default */
-        $problem->setTitle($r['title']);
-        $problem->setValidator($r['validator']);
-        $problem->setTimeLimit($r['time_limit']);
-        $problem->setValidatorTimeLimit($r['validator_time_limit']);
-        $problem->setOverallWallTimeLimit($r['overall_wall_time_limit']);
-        $problem->setExtraWallTime($r['extra_wall_time']);
-        $problem->setMemoryLimit($r['memory_limit']);
-        $problem->setOutputLimit($r['output_limit']);
-        $problem->setVisits(0);
-        $problem->setSubmissions(0);
-        $problem->setAccepted(0);
-        $problem->setDifficulty(0);
-        $problem->setSource($r['source']);
-        $problem->setOrder('normal'); /* defaulting to normal */
-        $problem->setAuthorId($r['current_user_id']);
-        $problem->setAlias($r['alias']);
-        $problem->setLanguages($r['languages']);
-        $problem->setStackLimit($r['stack_limit']);
-        $problem->setEmailClarifications($r['email_clarifications']);
+        $problem->public = $r['public']; /* private by default */
+        $problem->title = $r['title'];
+        $problem->validator = $r['validator'];
+        $problem->time_limit = $r['time_limit'];
+        $problem->validator_time_limit = $r['validator_time_limit'];
+        $problem->overall_wall_time_limit = $r['overall_wall_time_limit'];
+        $problem->extra_wall_time = $r['extra_wall_time'];
+        $problem->memory_limit = $r['memory_limit'];
+        $problem->output_limit = $r['output_limit'];
+        $problem->visits = 0;
+        $problem->submissions = 0;
+        $problem->accepted = 0;
+        $problem->difficulty = 0;
+        $problem->source = $r['source'];
+        $problem->order = 'normal'; /* defaulting to normal */
+        $problem->author_id = $r['current_user_id'];
+        $problem->alias = $r['alias'];
+        $problem->languages = $r['languages'];
+        $problem->stack_limit = $r['stack_limit'];
+        $problem->email_clarifications = $r['email_clarifications'];
 
         if (file_exists(PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['alias'])) {
             throw new DuplicatedEntryInDatabaseException('problemExists');
@@ -146,7 +146,7 @@ class ProblemController extends Controller {
             $output_limit = $problemDeployer->getOutputLimit();
 
             if ($output_limit != -1) {
-                $problem->setOutputLimit($output_limit);
+                $problem->output_limit = $output_limit;
             }
 
             // Save the contest object with data sent by user to the database
@@ -245,9 +245,9 @@ class ProblemController extends Controller {
         }
 
         $user_role = new UserRoles();
-        $user_role->setContestId($r['problem']->problem_id);
-        $user_role->setUserId($user->user_id);
-        $user_role->setRoleId(PROBLEM_ADMIN_ROLE);
+        $user_role->contest_id = $r['problem']->problem_id;
+        $user_role->user_id = $user->user_id;
+        $user_role->role_id = PROBLEM_ADMIN_ROLE;
 
         // Save the contest to the DB
         try {
@@ -295,9 +295,9 @@ class ProblemController extends Controller {
         }
 
         $group_role = new GroupRoles();
-        $group_role->setContestId($r['problem']->problem_id);
-        $group_role->setGroupId($group->group_id);
-        $group_role->setRoleId(PROBLEM_ADMIN_ROLE);
+        $group_role->contest_id = $r['problem']->problem_id;
+        $group_role->group_id = $group->group_id;
+        $group_role->role_id = PROBLEM_ADMIN_ROLE;
 
         // Save the role
         try {
@@ -413,9 +413,9 @@ class ProblemController extends Controller {
         }
 
         $user_role = new UserRoles();
-        $user_role->setContestId($r['problem']->problem_id);
-        $user_role->setUserId($r['user']->user_id);
-        $user_role->setRoleId(PROBLEM_ADMIN_ROLE);
+        $user_role->contest_id = $r['problem']->problem_id;
+        $user_role->user_id = $r['user']->user_id;
+        $user_role->role_id = PROBLEM_ADMIN_ROLE;
 
         // Delete the role
         try {
@@ -461,9 +461,9 @@ class ProblemController extends Controller {
         }
 
         $group_role = new GroupRoles();
-        $group_role->setContestId($r['problem']->problem_id);
-        $group_role->setGroupId($group->group_id);
-        $group_role->setRoleId(PROBLEM_ADMIN_ROLE);
+        $group_role->contest_id = $r['problem']->problem_id;
+        $group_role->group_id = $group->group_id;
+        $group_role->role_id = PROBLEM_ADMIN_ROLE;
 
         // Delete the role
         try {
@@ -604,16 +604,16 @@ class ProblemController extends Controller {
         $runs = array();
         try {
             $runs = RunsDAO::search(new Runs(array(
-                                'problem_id' => $r['problem']->getProblemId()
+                                'problem_id' => $r['problem']->problem_id
                             )));
 
             $guids = array();
             foreach ($runs as $run) {
                 $guids[] = $run->guid;
-                $run->setStatus('new');
-                $run->setVerdict('JE');
-                $run->setScore(0);
-                $run->setContestScore(0);
+                $run->status = 'new';
+                $run->verdict = 'JE';
+                $run->score = 0;
+                $run->contest_score = 0;
                 RunsDAO::save($run);
 
                 // Expire details of the run
@@ -697,7 +697,7 @@ class ProblemController extends Controller {
                 $output_limit = $problemDeployer->getOutputLimit();
 
                 if ($output_limit != -1) {
-                    $r['problem']->setOutputLimit($output_limit);
+                    $r['problem']->output_limit = $output_limit;
                 }
 
                 $response['uploaded_files'] = $problemDeployer->filesToUnzip;
@@ -747,10 +747,10 @@ class ProblemController extends Controller {
 
         // Invalidar problem statement cache @todo invalidar todos los lenguajes
         foreach ($problemDeployer->getUpdatedLanguages() as $lang) {
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->getAlias() . '-' . $lang . 'html');
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->getAlias() . '-' . $lang . 'markdown');
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'html');
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'markdown');
         }
-        Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->getAlias() . '-sample.in');
+        Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
 
         return $response;
     }
@@ -800,9 +800,9 @@ class ProblemController extends Controller {
             $problemDeployer->commit("{$r['lang']}.markdown: {$r['message']}", $r['current_user']);
 
             // Invalidar problem statement cache
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->getAlias() . '-' . $r['lang'] . '-' . 'html');
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->getAlias() . '-' . $r['lang'] . '-' . 'markdown');
-            Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->getAlias() . '-sample.in');
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $r['lang'] . '-' . 'html');
+            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $r['lang'] . '-' . 'markdown');
+            Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -860,7 +860,7 @@ class ProblemController extends Controller {
                     throw new NotFoundException('contestNotFound');
                 }
 
-                if (is_null(ContestProblemsDAO::getByPK($r['contest']->getContestId(), $r['problem']->getProblemId()))) {
+                if (is_null(ContestProblemsDAO::getByPK($r['contest']->contest_id, $r['problem']->problem_id))) {
                     throw new NotFoundException('problemNotFoundInContest');
                 }
             } catch (ApiException $apiException) {
@@ -904,7 +904,7 @@ class ProblemController extends Controller {
      */
     public static function getProblemStatement(Request $r) {
         $statement_type = ProblemController::getStatementType($r);
-        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r['lang'] . '.' . $statement_type;
+        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r['lang'] . '.' . $statement_type;
 
         try {
             $file_content = FileHandler::ReadFile($source_path);
@@ -917,7 +917,7 @@ class ProblemController extends Controller {
 
     public static function isLanguageSupportedForProblem(Request $r) {
         $statement_type = ProblemController::getStatementType($r);
-        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->getAlias() . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r['lang'] . '.' . $statement_type;
+        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias . DIRECTORY_SEPARATOR . 'statements' . DIRECTORY_SEPARATOR . $r['lang'] . '.' . $statement_type;
 
         return file_exists($source_path);
     }
@@ -929,7 +929,7 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function getSampleInput(Request $r) {
-        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->getAlias() . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . 'sample.in';
+        $source_path = PROBLEMS_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . 'sample.in';
 
         try {
             $file_content = FileHandler::ReadFile($source_path);
@@ -1051,7 +1051,7 @@ class ProblemController extends Controller {
         $statement_type = ProblemController::getStatementType($r);
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
-            $r['problem']->getAlias() . '-' . $r['lang'] . '-' . $statement_type,
+            $r['problem']->alias . '-' . $r['lang'] . '-' . $statement_type,
             $r,
             'ProblemController::getProblemStatement',
             $file_content,
@@ -1066,7 +1066,7 @@ class ProblemController extends Controller {
         $sample_input = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_SAMPLE,
-            $r['problem']->getAlias() . '-sample.in',
+            $r['problem']->alias . '-sample.in',
             $r,
             'ProblemController::getSampleInput',
             $sample_input,
@@ -1107,8 +1107,8 @@ class ProblemController extends Controller {
 
             $keyrun = new Runs(array(
                 'user_id' => $r['current_user_id'],
-                'problem_id' => $r['problem']->getProblemId(),
-                'contest_id' => is_null($r['contest']) ? null : $r['contest']->getContestId()
+                'problem_id' => $r['problem']->problem_id,
+                'contest_id' => is_null($r['contest']) ? null : $r['contest']->contest_id
             ));
 
             // Get all the available runs done by the current_user
@@ -1150,14 +1150,14 @@ class ProblemController extends Controller {
 
             // As last step, register the problem as opened
             if (!ContestProblemOpenedDAO::getByPK(
-                $r['contest']->getContestId(),
-                $r['problem']->getProblemId(),
+                $r['contest']->contest_id,
+                $r['problem']->problem_id,
                 $r['current_user_id']
             )) {
                 //Create temp object
                 $keyContestProblemOpened = new ContestProblemOpened(array(
-                            'contest_id' => $r['contest']->getContestId(),
-                            'problem_id' => $r['problem']->getProblemId(),
+                            'contest_id' => $r['contest']->contest_id,
+                            'problem_id' => $r['problem']->problem_id,
                             'user_id' => $r['current_user_id']
                         ));
 
@@ -1269,7 +1269,7 @@ class ProblemController extends Controller {
         } else {
             $keyrun = new Runs(array(
                 'user_id' => $r['current_user_id'],
-                'problem_id' => $r['problem']->getProblemId()
+                'problem_id' => $r['problem']->problem_id
             ));
 
             // Get all the available runs
@@ -1364,21 +1364,21 @@ class ProblemController extends Controller {
 
         try {
             // Array of GUIDs of pending runs
-            $pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem($r['problem']->getProblemId());
+            $pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem($r['problem']->problem_id);
 
             // Count of pending runs (int)
-            $totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r['problem']->getProblemId());
+            $totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r['problem']->problem_id);
 
             // List of verdicts
             $verdict_counts = array();
 
             foreach (self::$verdicts as $verdict) {
-                $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfProblemByVerdict($r['problem']->getProblemId(), $verdict);
+                $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfProblemByVerdict($r['problem']->problem_id, $verdict);
             }
 
             // Array to count AC stats per case.
             // Let's try to get the last snapshot from cache.
-            $problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r['problem']->getAlias());
+            $problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r['problem']->alias);
             $cases_stats = $problemStatsCache->get();
             if (is_null($cases_stats)) {
                 // Initialize the array at counts = 0
@@ -1389,7 +1389,7 @@ class ProblemController extends Controller {
                 $cases_stats['last_id'] = 0;
 
                 // Build problem dir
-                $problem_dir = PROBLEMS_PATH . '/' . $r['problem']->getAlias() . '/cases/';
+                $problem_dir = PROBLEMS_PATH . '/' . $r['problem']->alias . '/cases/';
 
                 // Get list of cases
                 $dir = opendir($problem_dir);
@@ -1406,7 +1406,7 @@ class ProblemController extends Controller {
             }
 
             // Get all runs of this problem after the last id we had
-            $runs = RunsDAO::searchRunIdGreaterThan(new Runs(array('problem_id' => $r['problem']->getProblemId())), $cases_stats['last_id'], 'run_id');
+            $runs = RunsDAO::searchRunIdGreaterThan(new Runs(array('problem_id' => $r['problem']->problem_id)), $cases_stats['last_id'], 'run_id');
 
             // For each run we got
             foreach ($runs as $run) {
@@ -1436,7 +1436,7 @@ class ProblemController extends Controller {
 
         // Save the last id we saw in case we saw something
         if (!is_null($runs) && count($runs) > 0) {
-            $cases_stats['last_id'] = $runs[count($runs) - 1]->getRunId();
+            $cases_stats['last_id'] = $runs[count($runs) - 1]->run_id;
         }
 
         // Save in cache what we got
@@ -1624,7 +1624,7 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     private static function bestScore(Request $r, Users $user = null) {
-        $current_user_id = (is_null($user) ? $r['current_user_id'] : $user->getUserId());
+        $current_user_id = (is_null($user) ? $r['current_user_id'] : $user->user_id);
 
         if (is_null($current_user_id)) {
             return 0;
@@ -1634,10 +1634,10 @@ class ProblemController extends Controller {
         try {
             // Add best score info
             if (is_null($r['contest'])) {
-                $score = RunsDAO::GetBestScore($r['problem']->getProblemId(), $current_user_id);
+                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_user_id);
             } else {
-                $bestRun = RunsDAO::GetBestRun($r['contest']->getContestId(), $r['problem']->getProblemId(), $current_user_id, strtotime($r['contest']->getFinishTime()), false /*showAllRuns*/);
-                $score = is_null($bestRun->getContestScore()) ? 0 : $bestRun->getContestScore();
+                $bestRun = RunsDAO::GetBestRun($r['contest']->contest_id, $r['problem']->problem_id, $current_user_id, strtotime($r['contest']->finish_time), false /*showAllRuns*/);
+                $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

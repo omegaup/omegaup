@@ -115,22 +115,6 @@ class Controller {
     }
 
     /**
-     * Converts underscore property names into camel case method names:
-     * 'contest_id' => 'ContestId'
-     *
-     * @param string $name
-     */
-    protected static function toCamelCase($name) {
-        return preg_replace_callback(
-            '|_(\w)|', // Match letters following an underscore.
-            function ($matches) {
-                return ucfirst($matches[1]);  // Convert every matching letter to upper case.
-            },
-            ucfirst($name)
-        );                // Converts the first letter in the name to upper case.
-    }
-
-    /**
      * Update properties of $object based on what is provided in $request.
      * $properties can have 'simple' and 'complex' properties.
      * - A simple property is just a name using underscores, and it's getter and setter methods should
@@ -155,16 +139,16 @@ class Controller {
             if (is_int($source)) {
                 // Simple property:
                 $source = $info;
-                $info = array(Controller::toCamelCase($source));
+                $info = array($source);
             }
             if (is_null($request[$source])) {
                 continue;
             }
-            // Get the base name for the property accessors.
-            if (isset($info[0]) || isset($info['accessor'])) {
-                $accessor = isset($info[0]) ? $info[0] : $info['accessor'];
+            // Get the field name.
+            if (isset($info[0])) {
+                $field_name = $info[0];
             } else {
-                $accessor = Controller::toCamelCase($source);
+                $field_name = $source;
             }
             // Get or calculate new value.
             $value = $request[$source];
@@ -176,14 +160,12 @@ class Controller {
             if (isset($info[1]) || isset($info['important'])) {
                 $important = isset($info[1]) ? $info[1] : $info['important'];
                 if ($important) {
-                    $getter = 'get' . $accessor;
-                    if ($value != $object->$getter()) {
+                    if ($value != $object->$field_name) {
                         $importantChange = true;
                     }
                 }
             }
-            $setter = 'set' . $accessor;
-            $object->$setter($value);
+            $object->$field_name = $value;
         }
         return $importantChange;
     }

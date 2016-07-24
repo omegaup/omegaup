@@ -38,16 +38,16 @@ class ProblemEditUITest extends OmegaupUITestCase {
 
         // Verify data in DB
         $problem_mask = new Problems();
-        $problem_mask->setTitle($problemNewData['request']['title']);
+        $problem_mask->title = $problemNewData['request']['title'];
         $problems = ProblemsDAO::search($problem_mask);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
 
-        $this->assertEquals($problemNewData['request']['source'], $problems[0]->getSource());
-        $this->assertEquals(666, $problems[0]->getTimeLimit());
-        $this->assertEquals(1234, $problems[0]->getMemoryLimit());
-        $this->assertEquals('token-caseless', $problems[0]->getValidator());
-        $this->assertEquals('1', $problems[0]->getPublic());
+        $this->assertEquals($problemNewData['request']['source'], $problems[0]->source);
+        $this->assertEquals(666, $problems[0]->time_limit);
+        $this->assertEquals(1234, $problems[0]->memory_limit);
+        $this->assertEquals('token-caseless', $problems[0]->validator);
+        $this->assertEquals('1', $problems[0]->public);
     }
 }

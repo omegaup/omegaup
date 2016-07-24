@@ -27,9 +27,9 @@ class UserRankTest extends OmegaupTestCase {
 
         $found = false;
         foreach ($response['rank'] as $entry) {
-            if ($entry['username'] == $contestant->getUsername()) {
+            if ($entry['username'] == $contestant->username) {
                 $found = true;
-                $this->assertEquals($entry['name'], $contestant->getName());
+                $this->assertEquals($entry['name'], $contestant->name);
                 $this->assertEquals($entry['problems_solved'], 1);
                 $this->assertEquals($entry['score'], 100);
             }
@@ -62,14 +62,14 @@ class UserRankTest extends OmegaupTestCase {
 
         $found = false;
         foreach ($response['rank'] as $entry) {
-            if ($entry['username'] == $contestant->getUsername()) {
+            if ($entry['username'] == $contestant->username) {
                 $found = true;
-                $this->assertEquals($entry['name'], $contestant->getName());
+                $this->assertEquals($entry['name'], $contestant->name);
                 $this->assertEquals($entry['problems_solved'], 1);
                 $this->assertEquals($entry['score'], 100);
             }
 
-            if ($entry['username'] == $contestant2->getUsername()) {
+            if ($entry['username'] == $contestant2->username) {
                 $this->fail('User with private problem solved showed in rank.');
             }
         }
@@ -92,10 +92,10 @@ class UserRankTest extends OmegaupTestCase {
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request(array(
-            'username' => $contestant->getUsername()
+            'username' => $contestant->username
         )));
 
-        $this->assertEquals($response['name'], $contestant->getName());
+        $this->assertEquals($response['name'], $contestant->name);
         $this->assertEquals($response['problems_solved'], 1);
     }
 
@@ -111,10 +111,10 @@ class UserRankTest extends OmegaupTestCase {
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request(array(
-            'username' => $contestant->getUsername()
+            'username' => $contestant->username
         )));
 
-        $this->assertEquals($response['name'], $contestant->getName());
+        $this->assertEquals($response['name'], $contestant->name);
         $this->assertEquals($response['problems_solved'], 0);
         $this->assertEquals($response['rank'], 0);
     }

@@ -30,8 +30,8 @@ class ResetController extends Controller {
         $mail->isHTML(true);
 
         $user = UsersDAO::FindByEmail($email);
-        $user->setResetDigest($reset_digest);
-        $user->setResetSentAt($reset_sent_at);
+        $user->reset_digest = $reset_digest;
+        $user->reset_sent_at = $reset_sent_at;
         UsersDAO::save($user);
 
         if (IS_TEST) {
@@ -47,8 +47,8 @@ class ResetController extends Controller {
 
         if (!$mail->Send()) {
             self::$log->error('Failed to send mail:'. $mail->ErrorInfo);
-            $user->setResetDigest(null);
-            $user->setResetSentAt(null);
+            $user->reset_digest = null;
+            $user->reset_sent_at = null;
             UsersDAO::save($user);
         }
 
@@ -69,9 +69,9 @@ class ResetController extends Controller {
     public static function apiUpdate(Request $r) {
         self::ValidateUpdateRequest($r);
         $user = UsersDAO::FindByEmail($r['email']);
-        $user->setPassword(SecurityTools::hashString($r['password']));
-        $user->setResetDigest(null);
-        $user->setResetSentAt(null);
+        $user->password = SecurityTools::hashString($r['password']);
+        $user->reset_digest = null;
+        $user->reset_sent_at = null;
         UsersDAO::save($user);
 
         global $smarty;

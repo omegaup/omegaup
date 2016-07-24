@@ -117,10 +117,10 @@ class RunsFactory {
     public static function gradeRun($runData, $points = 1, $verdict = 'AC', $submitDelay = null) {
         $run = RunsDAO::getByAlias($runData['response']['guid']);
 
-        $run->setVerdict($verdict);
-        $run->setScore($points);
-        $run->setContestScore($points * 100);
-        $run->setStatus('ready');
+        $run->verdict = $verdict;
+        $run->score = $points;
+        $run->contest_score = $points * 100;
+        $run->status = 'ready';
         $run->judged_by = 'J1';
 
         if (!is_null($submitDelay)) {

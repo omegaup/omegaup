@@ -26,7 +26,7 @@ class ContestRemoveUserTest extends OmegaupTestCase {
         // Remove user
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['usernameOrEmail'] = $user->getUsername();
+        $r['usernameOrEmail'] = $user->username;
         $r['auth_token'] = $this->login($contestData['director']);
         ContestController::apiRemoveUser($r);
 

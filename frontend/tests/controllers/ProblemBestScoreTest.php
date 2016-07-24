@@ -81,7 +81,7 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         $response = ProblemController::apiBestScore(new Request(array(
             'auth_token' => $this->login($user),
             'problem_alias' => $problemData['request']['alias'],
-            'username' => $contestant->getUsername()
+            'username' => $contestant->username
         )));
 
         $this->assertEquals(100.00, $response['score']);

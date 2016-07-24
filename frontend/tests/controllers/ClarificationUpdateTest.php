@@ -48,14 +48,14 @@ class UpdateClarificationTest extends OmegaupTestCase {
         // Validate that clarification stays the same
         $this->assertEquals(
             $clarificationData['request']['message'],
-            $clarification->getMessage()
+            $clarification->message
         );
         $this->assertEquals(
             $clarificationData['request']['public'],
-            $clarification->getPublic()
+            $clarification->public
         );
 
         // Validate our update
-        $this->assertEquals($newAnswer, $clarification->getAnswer());
+        $this->assertEquals($newAnswer, $clarification->answer);
     }
 }
