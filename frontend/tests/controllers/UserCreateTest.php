@@ -144,6 +144,26 @@ class CreateUserTest extends OmegaupTestCase {
     }
 
     /**
+     * Create a user with username too long
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testMaxUserLength() {
+        UserController::$permissionKey = uniqid();
+
+        // Inflate request
+        $r = new Request(array(
+            'username' => 'ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ',
+            'password' => Utils::CreateRandomString(),
+            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'permission_key' => UserController::$permissionKey
+        ));
+
+        // Call API
+        UserController::apiCreate($r);
+    }
+
+    /**
      * Tests Create User API happy path excercising the httpEntryPoint
      */
     public function testCreateUserPositiveViahttpEntryPoint() {
