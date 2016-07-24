@@ -13,7 +13,7 @@
 		<script type="text/javascript" src="/js/knockout-secure-binding.min.js?ver=81a2a3"></script>
 
 		<script type="text/javascript" src="/js/omegaup.js?ver=e5f70d"></script>
-		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=a0e243,7073ff,450748,4ec882"></script>
+		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=12447a,944ac2,ef8404,ac13b2"></script>
 		<script type="text/javascript" src="/ux/libarena.js?ver=604c02"></script>
 
 		{if isset($jsfile)}
