@@ -1075,7 +1075,12 @@ class UserController extends Controller {
         }
 
         try {
-            $response['userinfo']['email'] = EmailsDAO::getByPK($user->getMainEmailId())->getEmail();
+            $email = EmailsDAO::getByPK($user->getMainEmailId());
+            if (is_null($email)) {
+                $response['userinfo']['email'] = null;
+            } else {
+                $response['userinfo']['email'] = $email->email;
+            }
 
             $country = CountriesDAO::getByPK($user->getCountryId());
             $response['userinfo']['country'] = is_null($country) ? null : $country->getName();
