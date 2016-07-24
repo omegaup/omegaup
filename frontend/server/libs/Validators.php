@@ -124,8 +124,7 @@ class Validators {
         }
 
         Validators::isStringOfMinLength($parameter, $parameterName, 2);
-        Validators::isStringOfMaxLength($parameter, $parameterName, 50);
-    }
+   }
 
     /**
      *
