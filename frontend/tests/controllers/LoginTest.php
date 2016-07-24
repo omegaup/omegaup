@@ -211,33 +211,6 @@ class LoginTest extends OmegaupTestCase {
         $this->assertNull($existingTokens);
     }
 
-////	/**
-////	 * @expectedException EmailNotVerifiedException
-////	 */
-////	public function testLoginUserNotVerifiedWithVerificationId() {
-////
-////		// Create an user in omegaup
-////		$user = UserFactory::createUser(null, null, null, false/* verified */);
-////
-////		$auth_token = self::login($user);
-////	}
-
-////	/**
-////	 * @expectedException EmailNotVerifiedException
-////	 */
-////	public function testLoginUserNotVerifiedWithoutVerificationId() {
-////		// Create an user in omegaup
-////		$user = UserFactory::createUser(null, null, null, false/* verified */);
-////		$plainPass = $user->getPassword();
-////		$user->setVerificationId(null);
-////		$user->setPassword(md5($plainPass));
-////		UsersDAO::save($user);
-////
-////		$user->setPassword($plainPass);
-////
-////		$auth_token = self::login($user);
-////	}
-
     /**
      * Test SessionController::apiCurrentSession private_contests_count
      * when there's 1 private contest count
