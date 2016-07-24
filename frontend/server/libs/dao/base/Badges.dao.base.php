@@ -33,7 +33,7 @@ abstract class BadgesDAOBase extends DAO
 	  **/
 	public static final function save( $Badges )
 	{
-		if (!is_null(self::getByPK( $Badges->getBadgeId() )))
+		if (!is_null(self::getByPK( $Badges->badge_id)))
 		{
 			return BadgesDAOBase::update( $Badges);
 		} else {
@@ -112,7 +112,7 @@ abstract class BadgesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,25 +128,25 @@ abstract class BadgesDAOBase extends DAO
 
 		$sql = "SELECT * from Badges WHERE (";
 		$val = array();
-		if (!is_null( $Badges->getBadgeId())) {
+		if (!is_null( $Badges->badge_id)) {
 			$sql .= " `badge_id` = ? AND";
-			array_push( $val, $Badges->getBadgeId() );
+			array_push( $val, $Badges->badge_id );
 		}
-		if (!is_null( $Badges->getName())) {
+		if (!is_null( $Badges->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $Badges->getName() );
+			array_push( $val, $Badges->name );
 		}
-		if (!is_null( $Badges->getImageUrl())) {
+		if (!is_null( $Badges->image_url)) {
 			$sql .= " `image_url` = ? AND";
-			array_push( $val, $Badges->getImageUrl() );
+			array_push( $val, $Badges->image_url );
 		}
-		if (!is_null( $Badges->getDescription())) {
+		if (!is_null( $Badges->description)) {
 			$sql .= " `description` = ? AND";
-			array_push( $val, $Badges->getDescription() );
+			array_push( $val, $Badges->description );
 		}
-		if (!is_null( $Badges->getHint())) {
+		if (!is_null( $Badges->hint)) {
 			$sql .= " `hint` = ? AND";
-			array_push( $val, $Badges->getHint() );
+			array_push( $val, $Badges->hint );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -185,11 +185,11 @@ abstract class BadgesDAOBase extends DAO
 	{
 		$sql = "UPDATE Badges SET  `name` = ?, `image_url` = ?, `description` = ?, `hint` = ? WHERE  `badge_id` = ?;";
 		$params = array(
-			$Badges->getName(),
-			$Badges->getImageUrl(),
-			$Badges->getDescription(),
-			$Badges->getHint(),
-			$Badges->getBadgeId(), );
+			$Badges->name,
+			$Badges->image_url,
+			$Badges->description,
+			$Badges->hint,
+			$Badges->badge_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -243,15 +243,15 @@ abstract class BadgesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -264,7 +264,7 @@ abstract class BadgesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Badges WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $BadgesA->getBadgeId()) ) ) & ( ! is_null ( ($b = $BadgesB->getBadgeId()) ) ) ){
+		if( ( !is_null (($a = $BadgesA->badge_id) ) ) & ( ! is_null ( ($b = $BadgesB->badge_id) ) ) ){
 				$sql .= " `badge_id` >= ? AND `badge_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -274,7 +274,7 @@ abstract class BadgesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $BadgesA->getName()) ) ) & ( ! is_null ( ($b = $BadgesB->getName()) ) ) ){
+		if( ( !is_null (($a = $BadgesA->name) ) ) & ( ! is_null ( ($b = $BadgesB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -284,7 +284,7 @@ abstract class BadgesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $BadgesA->getImageUrl()) ) ) & ( ! is_null ( ($b = $BadgesB->getImageUrl()) ) ) ){
+		if( ( !is_null (($a = $BadgesA->image_url) ) ) & ( ! is_null ( ($b = $BadgesB->image_url) ) ) ){
 				$sql .= " `image_url` >= ? AND `image_url` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -294,7 +294,7 @@ abstract class BadgesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $BadgesA->getDescription()) ) ) & ( ! is_null ( ($b = $BadgesB->getDescription()) ) ) ){
+		if( ( !is_null (($a = $BadgesA->description) ) ) & ( ! is_null ( ($b = $BadgesB->description) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -304,7 +304,7 @@ abstract class BadgesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $BadgesA->getHint()) ) ) & ( ! is_null ( ($b = $BadgesB->getHint()) ) ) ){
+		if( ( !is_null (($a = $BadgesA->hint) ) ) & ( ! is_null ( ($b = $BadgesB->hint) ) ) ){
 				$sql .= " `hint` >= ? AND `hint` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -342,9 +342,9 @@ abstract class BadgesDAOBase extends DAO
 	  **/
 	public static final function delete( $Badges )
 	{
-		if( is_null( self::getByPK($Badges->getBadgeId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Badges->badge_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Badges WHERE  badge_id = ?;";
-		$params = array( $Badges->getBadgeId() );
+		$params = array( $Badges->badge_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

@@ -33,7 +33,7 @@ abstract class UserRolesDAOBase extends DAO
 	  **/
 	public static final function save( $User_Roles )
 	{
-		if (!is_null(self::getByPK( $User_Roles->getUserId() , $User_Roles->getRoleId() , $User_Roles->getContestId() )))
+		if (!is_null(self::getByPK( $User_Roles->user_id, $User_Roles->role_id, $User_Roles->contest_id)))
 		{
 			return UserRolesDAOBase::update( $User_Roles);
 		} else {
@@ -112,7 +112,7 @@ abstract class UserRolesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class UserRolesDAOBase extends DAO
 
 		$sql = "SELECT * from User_Roles WHERE (";
 		$val = array();
-		if (!is_null( $User_Roles->getUserId())) {
+		if (!is_null( $User_Roles->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $User_Roles->getUserId() );
+			array_push( $val, $User_Roles->user_id );
 		}
-		if (!is_null( $User_Roles->getRoleId())) {
+		if (!is_null( $User_Roles->role_id)) {
 			$sql .= " `role_id` = ? AND";
-			array_push( $val, $User_Roles->getRoleId() );
+			array_push( $val, $User_Roles->role_id );
 		}
-		if (!is_null( $User_Roles->getContestId())) {
+		if (!is_null( $User_Roles->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $User_Roles->getContestId() );
+			array_push( $val, $User_Roles->contest_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -222,15 +222,15 @@ abstract class UserRolesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -243,7 +243,7 @@ abstract class UserRolesDAOBase extends DAO
 	{
 		$sql = "SELECT * from User_Roles WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $User_RolesA->getUserId()) ) ) & ( ! is_null ( ($b = $User_RolesB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $User_RolesA->user_id) ) ) & ( ! is_null ( ($b = $User_RolesB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -253,7 +253,7 @@ abstract class UserRolesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_RolesA->getRoleId()) ) ) & ( ! is_null ( ($b = $User_RolesB->getRoleId()) ) ) ){
+		if( ( !is_null (($a = $User_RolesA->role_id) ) ) & ( ! is_null ( ($b = $User_RolesB->role_id) ) ) ){
 				$sql .= " `role_id` >= ? AND `role_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -263,7 +263,7 @@ abstract class UserRolesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_RolesA->getContestId()) ) ) & ( ! is_null ( ($b = $User_RolesB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $User_RolesA->contest_id) ) ) & ( ! is_null ( ($b = $User_RolesB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -301,9 +301,9 @@ abstract class UserRolesDAOBase extends DAO
 	  **/
 	public static final function delete( $User_Roles )
 	{
-		if( is_null( self::getByPK($User_Roles->getUserId(), $User_Roles->getRoleId(), $User_Roles->getContestId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($User_Roles->user_id, $User_Roles->role_id, $User_Roles->contest_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM User_Roles WHERE  user_id = ? AND role_id = ? AND contest_id = ?;";
-		$params = array( $User_Roles->getUserId(), $User_Roles->getRoleId(), $User_Roles->getContestId() );
+		$params = array( $User_Roles->user_id, $User_Roles->role_id, $User_Roles->contest_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

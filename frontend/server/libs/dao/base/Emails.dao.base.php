@@ -33,7 +33,7 @@ abstract class EmailsDAOBase extends DAO
 	  **/
 	public static final function save( $Emails )
 	{
-		if (!is_null(self::getByPK( $Emails->getEmailId() )))
+		if (!is_null(self::getByPK( $Emails->email_id)))
 		{
 			return EmailsDAOBase::update( $Emails);
 		} else {
@@ -112,7 +112,7 @@ abstract class EmailsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class EmailsDAOBase extends DAO
 
 		$sql = "SELECT * from Emails WHERE (";
 		$val = array();
-		if (!is_null( $Emails->getEmailId())) {
+		if (!is_null( $Emails->email_id)) {
 			$sql .= " `email_id` = ? AND";
-			array_push( $val, $Emails->getEmailId() );
+			array_push( $val, $Emails->email_id );
 		}
-		if (!is_null( $Emails->getEmail())) {
+		if (!is_null( $Emails->email)) {
 			$sql .= " `email` = ? AND";
-			array_push( $val, $Emails->getEmail() );
+			array_push( $val, $Emails->email );
 		}
-		if (!is_null( $Emails->getUserId())) {
+		if (!is_null( $Emails->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Emails->getUserId() );
+			array_push( $val, $Emails->user_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -177,9 +177,9 @@ abstract class EmailsDAOBase extends DAO
 	{
 		$sql = "UPDATE Emails SET  `email` = ?, `user_id` = ? WHERE  `email_id` = ?;";
 		$params = array(
-			$Emails->getEmail(),
-			$Emails->getUserId(),
-			$Emails->getEmailId(), );
+			$Emails->email,
+			$Emails->user_id,
+			$Emails->email_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -230,15 +230,15 @@ abstract class EmailsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -251,7 +251,7 @@ abstract class EmailsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Emails WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $EmailsA->getEmailId()) ) ) & ( ! is_null ( ($b = $EmailsB->getEmailId()) ) ) ){
+		if( ( !is_null (($a = $EmailsA->email_id) ) ) & ( ! is_null ( ($b = $EmailsB->email_id) ) ) ){
 				$sql .= " `email_id` >= ? AND `email_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -261,7 +261,7 @@ abstract class EmailsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $EmailsA->getEmail()) ) ) & ( ! is_null ( ($b = $EmailsB->getEmail()) ) ) ){
+		if( ( !is_null (($a = $EmailsA->email) ) ) & ( ! is_null ( ($b = $EmailsB->email) ) ) ){
 				$sql .= " `email` >= ? AND `email` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -271,7 +271,7 @@ abstract class EmailsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $EmailsA->getUserId()) ) ) & ( ! is_null ( ($b = $EmailsB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $EmailsA->user_id) ) ) & ( ! is_null ( ($b = $EmailsB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -309,9 +309,9 @@ abstract class EmailsDAOBase extends DAO
 	  **/
 	public static final function delete( $Emails )
 	{
-		if( is_null( self::getByPK($Emails->getEmailId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Emails->email_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Emails WHERE  email_id = ?;";
-		$params = array( $Emails->getEmailId() );
+		$params = array( $Emails->email_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

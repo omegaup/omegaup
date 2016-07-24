@@ -33,7 +33,7 @@ abstract class TagsDAOBase extends DAO
 	  **/
 	public static final function save( $Tags )
 	{
-		if (!is_null(self::getByPK( $Tags->getTagId() )))
+		if (!is_null(self::getByPK( $Tags->tag_id)))
 		{
 			return TagsDAOBase::update( $Tags);
 		} else {
@@ -112,7 +112,7 @@ abstract class TagsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,13 +128,13 @@ abstract class TagsDAOBase extends DAO
 
 		$sql = "SELECT * from Tags WHERE (";
 		$val = array();
-		if (!is_null( $Tags->getTagId())) {
+		if (!is_null( $Tags->tag_id)) {
 			$sql .= " `tag_id` = ? AND";
-			array_push( $val, $Tags->getTagId() );
+			array_push( $val, $Tags->tag_id );
 		}
-		if (!is_null( $Tags->getName())) {
+		if (!is_null( $Tags->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $Tags->getName() );
+			array_push( $val, $Tags->name );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -173,8 +173,8 @@ abstract class TagsDAOBase extends DAO
 	{
 		$sql = "UPDATE Tags SET  `name` = ? WHERE  `tag_id` = ?;";
 		$params = array(
-			$Tags->getName(),
-			$Tags->getTagId(), );
+			$Tags->name,
+			$Tags->tag_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -224,15 +224,15 @@ abstract class TagsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -245,7 +245,7 @@ abstract class TagsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Tags WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $TagsA->getTagId()) ) ) & ( ! is_null ( ($b = $TagsB->getTagId()) ) ) ){
+		if( ( !is_null (($a = $TagsA->tag_id) ) ) & ( ! is_null ( ($b = $TagsB->tag_id) ) ) ){
 				$sql .= " `tag_id` >= ? AND `tag_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -255,7 +255,7 @@ abstract class TagsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $TagsA->getName()) ) ) & ( ! is_null ( ($b = $TagsB->getName()) ) ) ){
+		if( ( !is_null (($a = $TagsA->name) ) ) & ( ! is_null ( ($b = $TagsB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -293,9 +293,9 @@ abstract class TagsDAOBase extends DAO
 	  **/
 	public static final function delete( $Tags )
 	{
-		if( is_null( self::getByPK($Tags->getTagId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Tags->tag_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Tags WHERE  tag_id = ?;";
-		$params = array( $Tags->getTagId() );
+		$params = array( $Tags->tag_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

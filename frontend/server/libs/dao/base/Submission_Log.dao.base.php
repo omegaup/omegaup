@@ -33,7 +33,7 @@ abstract class SubmissionLogDAOBase extends DAO
 	  **/
 	public static final function save( $Submission_Log )
 	{
-		if (!is_null(self::getByPK( $Submission_Log->getRunId() )))
+		if (!is_null(self::getByPK( $Submission_Log->run_id)))
 		{
 			return SubmissionLogDAOBase::update( $Submission_Log);
 		} else {
@@ -112,7 +112,7 @@ abstract class SubmissionLogDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,25 +128,25 @@ abstract class SubmissionLogDAOBase extends DAO
 
 		$sql = "SELECT * from Submission_Log WHERE (";
 		$val = array();
-		if (!is_null( $Submission_Log->getContestId())) {
+		if (!is_null( $Submission_Log->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Submission_Log->getContestId() );
+			array_push( $val, $Submission_Log->contest_id );
 		}
-		if (!is_null( $Submission_Log->getRunId())) {
+		if (!is_null( $Submission_Log->run_id)) {
 			$sql .= " `run_id` = ? AND";
-			array_push( $val, $Submission_Log->getRunId() );
+			array_push( $val, $Submission_Log->run_id );
 		}
-		if (!is_null( $Submission_Log->getUserId())) {
+		if (!is_null( $Submission_Log->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Submission_Log->getUserId() );
+			array_push( $val, $Submission_Log->user_id );
 		}
-		if (!is_null( $Submission_Log->getIp())) {
+		if (!is_null( $Submission_Log->ip)) {
 			$sql .= " `ip` = ? AND";
-			array_push( $val, $Submission_Log->getIp() );
+			array_push( $val, $Submission_Log->ip );
 		}
-		if (!is_null( $Submission_Log->getTime())) {
+		if (!is_null( $Submission_Log->time)) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $Submission_Log->getTime() );
+			array_push( $val, $Submission_Log->time );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -185,11 +185,11 @@ abstract class SubmissionLogDAOBase extends DAO
 	{
 		$sql = "UPDATE Submission_Log SET  `contest_id` = ?, `user_id` = ?, `ip` = ?, `time` = ? WHERE  `run_id` = ?;";
 		$params = array(
-			$Submission_Log->getContestId(),
-			$Submission_Log->getUserId(),
-			$Submission_Log->getIp(),
-			$Submission_Log->getTime(),
-			$Submission_Log->getRunId(), );
+			$Submission_Log->contest_id,
+			$Submission_Log->user_id,
+			$Submission_Log->ip,
+			$Submission_Log->time,
+			$Submission_Log->run_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -242,15 +242,15 @@ abstract class SubmissionLogDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -263,7 +263,7 @@ abstract class SubmissionLogDAOBase extends DAO
 	{
 		$sql = "SELECT * from Submission_Log WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Submission_LogA->getContestId()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $Submission_LogA->contest_id) ) ) & ( ! is_null ( ($b = $Submission_LogB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -273,7 +273,7 @@ abstract class SubmissionLogDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Submission_LogA->getRunId()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getRunId()) ) ) ){
+		if( ( !is_null (($a = $Submission_LogA->run_id) ) ) & ( ! is_null ( ($b = $Submission_LogB->run_id) ) ) ){
 				$sql .= " `run_id` >= ? AND `run_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -283,7 +283,7 @@ abstract class SubmissionLogDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Submission_LogA->getUserId()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $Submission_LogA->user_id) ) ) & ( ! is_null ( ($b = $Submission_LogB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -293,7 +293,7 @@ abstract class SubmissionLogDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Submission_LogA->getIp()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getIp()) ) ) ){
+		if( ( !is_null (($a = $Submission_LogA->ip) ) ) & ( ! is_null ( ($b = $Submission_LogB->ip) ) ) ){
 				$sql .= " `ip` >= ? AND `ip` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -303,7 +303,7 @@ abstract class SubmissionLogDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Submission_LogA->getTime()) ) ) & ( ! is_null ( ($b = $Submission_LogB->getTime()) ) ) ){
+		if( ( !is_null (($a = $Submission_LogA->time) ) ) & ( ! is_null ( ($b = $Submission_LogB->time) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -341,9 +341,9 @@ abstract class SubmissionLogDAOBase extends DAO
 	  **/
 	public static final function delete( $Submission_Log )
 	{
-		if( is_null( self::getByPK($Submission_Log->getRunId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Submission_Log->run_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Submission_Log WHERE  run_id = ?;";
-		$params = array( $Submission_Log->getRunId() );
+		$params = array( $Submission_Log->run_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

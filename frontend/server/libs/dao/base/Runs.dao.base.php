@@ -33,7 +33,7 @@ abstract class RunsDAOBase extends DAO
 	  **/
 	public static final function save( $Runs )
 	{
-		if (!is_null(self::getByPK( $Runs->getRunId() )))
+		if (!is_null(self::getByPK( $Runs->run_id)))
 		{
 			return RunsDAOBase::update( $Runs);
 		} else {
@@ -112,7 +112,7 @@ abstract class RunsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,73 +128,73 @@ abstract class RunsDAOBase extends DAO
 
 		$sql = "SELECT * from Runs WHERE (";
 		$val = array();
-		if (!is_null( $Runs->getRunId())) {
+		if (!is_null( $Runs->run_id)) {
 			$sql .= " `run_id` = ? AND";
-			array_push( $val, $Runs->getRunId() );
+			array_push( $val, $Runs->run_id );
 		}
-		if (!is_null( $Runs->getUserId())) {
+		if (!is_null( $Runs->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Runs->getUserId() );
+			array_push( $val, $Runs->user_id );
 		}
-		if (!is_null( $Runs->getProblemId())) {
+		if (!is_null( $Runs->problem_id)) {
 			$sql .= " `problem_id` = ? AND";
-			array_push( $val, $Runs->getProblemId() );
+			array_push( $val, $Runs->problem_id );
 		}
-		if (!is_null( $Runs->getContestId())) {
+		if (!is_null( $Runs->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Runs->getContestId() );
+			array_push( $val, $Runs->contest_id );
 		}
-		if (!is_null( $Runs->getGuid())) {
+		if (!is_null( $Runs->guid)) {
 			$sql .= " `guid` = ? AND";
-			array_push( $val, $Runs->getGuid() );
+			array_push( $val, $Runs->guid );
 		}
-		if (!is_null( $Runs->getLanguage())) {
+		if (!is_null( $Runs->language)) {
 			$sql .= " `language` = ? AND";
-			array_push( $val, $Runs->getLanguage() );
+			array_push( $val, $Runs->language );
 		}
-		if (!is_null( $Runs->getStatus())) {
+		if (!is_null( $Runs->status)) {
 			$sql .= " `status` = ? AND";
-			array_push( $val, $Runs->getStatus() );
+			array_push( $val, $Runs->status );
 		}
-		if (!is_null( $Runs->getVerdict())) {
+		if (!is_null( $Runs->verdict)) {
 			$sql .= " `verdict` = ? AND";
-			array_push( $val, $Runs->getVerdict() );
+			array_push( $val, $Runs->verdict );
 		}
-		if (!is_null( $Runs->getRuntime())) {
+		if (!is_null( $Runs->runtime)) {
 			$sql .= " `runtime` = ? AND";
-			array_push( $val, $Runs->getRuntime() );
+			array_push( $val, $Runs->runtime );
 		}
-		if (!is_null( $Runs->getPenalty())) {
+		if (!is_null( $Runs->penalty)) {
 			$sql .= " `penalty` = ? AND";
-			array_push( $val, $Runs->getPenalty() );
+			array_push( $val, $Runs->penalty );
 		}
-		if (!is_null( $Runs->getMemory())) {
+		if (!is_null( $Runs->memory)) {
 			$sql .= " `memory` = ? AND";
-			array_push( $val, $Runs->getMemory() );
+			array_push( $val, $Runs->memory );
 		}
-		if (!is_null( $Runs->getScore())) {
+		if (!is_null( $Runs->score)) {
 			$sql .= " `score` = ? AND";
-			array_push( $val, $Runs->getScore() );
+			array_push( $val, $Runs->score );
 		}
-		if (!is_null( $Runs->getContestScore())) {
+		if (!is_null( $Runs->contest_score)) {
 			$sql .= " `contest_score` = ? AND";
-			array_push( $val, $Runs->getContestScore() );
+			array_push( $val, $Runs->contest_score );
 		}
-		if (!is_null( $Runs->getTime())) {
+		if (!is_null( $Runs->time)) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $Runs->getTime() );
+			array_push( $val, $Runs->time );
 		}
-		if (!is_null( $Runs->getSubmitDelay())) {
+		if (!is_null( $Runs->submit_delay)) {
 			$sql .= " `submit_delay` = ? AND";
-			array_push( $val, $Runs->getSubmitDelay() );
+			array_push( $val, $Runs->submit_delay );
 		}
-		if (!is_null( $Runs->getTest())) {
+		if (!is_null( $Runs->test)) {
 			$sql .= " `test` = ? AND";
-			array_push( $val, $Runs->getTest() );
+			array_push( $val, $Runs->test );
 		}
-		if (!is_null( $Runs->getJudgedBy())) {
+		if (!is_null( $Runs->judged_by)) {
 			$sql .= " `judged_by` = ? AND";
-			array_push( $val, $Runs->getJudgedBy() );
+			array_push( $val, $Runs->judged_by );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -233,23 +233,23 @@ abstract class RunsDAOBase extends DAO
 	{
 		$sql = "UPDATE Runs SET  `user_id` = ?, `problem_id` = ?, `contest_id` = ?, `guid` = ?, `language` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `submit_delay` = ?, `test` = ?, `judged_by` = ? WHERE  `run_id` = ?;";
 		$params = array(
-			$Runs->getUserId(),
-			$Runs->getProblemId(),
-			$Runs->getContestId(),
-			$Runs->getGuid(),
-			$Runs->getLanguage(),
-			$Runs->getStatus(),
-			$Runs->getVerdict(),
-			$Runs->getRuntime(),
-			$Runs->getPenalty(),
-			$Runs->getMemory(),
-			$Runs->getScore(),
-			$Runs->getContestScore(),
-			$Runs->getTime(),
-			$Runs->getSubmitDelay(),
-			$Runs->getTest(),
-			$Runs->getJudgedBy(),
-			$Runs->getRunId(), );
+			$Runs->user_id,
+			$Runs->problem_id,
+			$Runs->contest_id,
+			$Runs->guid,
+			$Runs->language,
+			$Runs->status,
+			$Runs->verdict,
+			$Runs->runtime,
+			$Runs->penalty,
+			$Runs->memory,
+			$Runs->score,
+			$Runs->contest_score,
+			$Runs->time,
+			$Runs->submit_delay,
+			$Runs->test,
+			$Runs->judged_by,
+			$Runs->run_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -322,15 +322,15 @@ abstract class RunsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -343,7 +343,7 @@ abstract class RunsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Runs WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $RunsA->getRunId()) ) ) & ( ! is_null ( ($b = $RunsB->getRunId()) ) ) ){
+		if( ( !is_null (($a = $RunsA->run_id) ) ) & ( ! is_null ( ($b = $RunsB->run_id) ) ) ){
 				$sql .= " `run_id` >= ? AND `run_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -353,7 +353,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getUserId()) ) ) & ( ! is_null ( ($b = $RunsB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $RunsA->user_id) ) ) & ( ! is_null ( ($b = $RunsB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -363,7 +363,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getProblemId()) ) ) & ( ! is_null ( ($b = $RunsB->getProblemId()) ) ) ){
+		if( ( !is_null (($a = $RunsA->problem_id) ) ) & ( ! is_null ( ($b = $RunsB->problem_id) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -373,7 +373,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getContestId()) ) ) & ( ! is_null ( ($b = $RunsB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $RunsA->contest_id) ) ) & ( ! is_null ( ($b = $RunsB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -383,7 +383,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getGuid()) ) ) & ( ! is_null ( ($b = $RunsB->getGuid()) ) ) ){
+		if( ( !is_null (($a = $RunsA->guid) ) ) & ( ! is_null ( ($b = $RunsB->guid) ) ) ){
 				$sql .= " `guid` >= ? AND `guid` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -393,7 +393,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getLanguage()) ) ) & ( ! is_null ( ($b = $RunsB->getLanguage()) ) ) ){
+		if( ( !is_null (($a = $RunsA->language) ) ) & ( ! is_null ( ($b = $RunsB->language) ) ) ){
 				$sql .= " `language` >= ? AND `language` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -403,7 +403,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getStatus()) ) ) & ( ! is_null ( ($b = $RunsB->getStatus()) ) ) ){
+		if( ( !is_null (($a = $RunsA->status) ) ) & ( ! is_null ( ($b = $RunsB->status) ) ) ){
 				$sql .= " `status` >= ? AND `status` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -413,7 +413,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getVerdict()) ) ) & ( ! is_null ( ($b = $RunsB->getVerdict()) ) ) ){
+		if( ( !is_null (($a = $RunsA->verdict) ) ) & ( ! is_null ( ($b = $RunsB->verdict) ) ) ){
 				$sql .= " `verdict` >= ? AND `verdict` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -423,7 +423,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getRuntime()) ) ) & ( ! is_null ( ($b = $RunsB->getRuntime()) ) ) ){
+		if( ( !is_null (($a = $RunsA->runtime) ) ) & ( ! is_null ( ($b = $RunsB->runtime) ) ) ){
 				$sql .= " `runtime` >= ? AND `runtime` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -433,7 +433,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getPenalty()) ) ) & ( ! is_null ( ($b = $RunsB->getPenalty()) ) ) ){
+		if( ( !is_null (($a = $RunsA->penalty) ) ) & ( ! is_null ( ($b = $RunsB->penalty) ) ) ){
 				$sql .= " `penalty` >= ? AND `penalty` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -443,7 +443,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getMemory()) ) ) & ( ! is_null ( ($b = $RunsB->getMemory()) ) ) ){
+		if( ( !is_null (($a = $RunsA->memory) ) ) & ( ! is_null ( ($b = $RunsB->memory) ) ) ){
 				$sql .= " `memory` >= ? AND `memory` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -453,7 +453,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getScore()) ) ) & ( ! is_null ( ($b = $RunsB->getScore()) ) ) ){
+		if( ( !is_null (($a = $RunsA->score) ) ) & ( ! is_null ( ($b = $RunsB->score) ) ) ){
 				$sql .= " `score` >= ? AND `score` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -463,7 +463,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getContestScore()) ) ) & ( ! is_null ( ($b = $RunsB->getContestScore()) ) ) ){
+		if( ( !is_null (($a = $RunsA->contest_score) ) ) & ( ! is_null ( ($b = $RunsB->contest_score) ) ) ){
 				$sql .= " `contest_score` >= ? AND `contest_score` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -473,7 +473,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getTime()) ) ) & ( ! is_null ( ($b = $RunsB->getTime()) ) ) ){
+		if( ( !is_null (($a = $RunsA->time) ) ) & ( ! is_null ( ($b = $RunsB->time) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -483,7 +483,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getSubmitDelay()) ) ) & ( ! is_null ( ($b = $RunsB->getSubmitDelay()) ) ) ){
+		if( ( !is_null (($a = $RunsA->submit_delay) ) ) & ( ! is_null ( ($b = $RunsB->submit_delay) ) ) ){
 				$sql .= " `submit_delay` >= ? AND `submit_delay` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -493,7 +493,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getTest()) ) ) & ( ! is_null ( ($b = $RunsB->getTest()) ) ) ){
+		if( ( !is_null (($a = $RunsA->test) ) ) & ( ! is_null ( ($b = $RunsB->test) ) ) ){
 				$sql .= " `test` >= ? AND `test` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -503,7 +503,7 @@ abstract class RunsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RunsA->getJudgedBy()) ) ) & ( ! is_null ( ($b = $RunsB->getJudgedBy()) ) ) ){
+		if( ( !is_null (($a = $RunsA->judged_by) ) ) & ( ! is_null ( ($b = $RunsB->judged_by) ) ) ){
 				$sql .= " `judged_by` >= ? AND `judged_by` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -541,9 +541,9 @@ abstract class RunsDAOBase extends DAO
 	  **/
 	public static final function delete( $Runs )
 	{
-		if( is_null( self::getByPK($Runs->getRunId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Runs->run_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Runs WHERE  run_id = ?;";
-		$params = array( $Runs->getRunId() );
+		$params = array( $Runs->run_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

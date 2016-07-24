@@ -33,7 +33,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 	  **/
 	public static final function save( $Contest_User_Request_History )
 	{
-		if (!is_null(self::getByPK( $Contest_User_Request_History->getHistoryId() )))
+		if (!is_null(self::getByPK( $Contest_User_Request_History->history_id)))
 		{
 			return ContestUserRequestHistoryDAOBase::update( $Contest_User_Request_History);
 		} else {
@@ -112,7 +112,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,29 +128,29 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 
 		$sql = "SELECT * from Contest_User_Request_History WHERE (";
 		$val = array();
-		if (!is_null( $Contest_User_Request_History->getHistoryId())) {
+		if (!is_null( $Contest_User_Request_History->history_id)) {
 			$sql .= " `history_id` = ? AND";
-			array_push( $val, $Contest_User_Request_History->getHistoryId() );
+			array_push( $val, $Contest_User_Request_History->history_id );
 		}
-		if (!is_null( $Contest_User_Request_History->getUserId())) {
+		if (!is_null( $Contest_User_Request_History->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Contest_User_Request_History->getUserId() );
+			array_push( $val, $Contest_User_Request_History->user_id );
 		}
-		if (!is_null( $Contest_User_Request_History->getContestId())) {
+		if (!is_null( $Contest_User_Request_History->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Contest_User_Request_History->getContestId() );
+			array_push( $val, $Contest_User_Request_History->contest_id );
 		}
-		if (!is_null( $Contest_User_Request_History->getTime())) {
+		if (!is_null( $Contest_User_Request_History->time)) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $Contest_User_Request_History->getTime() );
+			array_push( $val, $Contest_User_Request_History->time );
 		}
-		if (!is_null( $Contest_User_Request_History->getAccepted())) {
+		if (!is_null( $Contest_User_Request_History->accepted)) {
 			$sql .= " `accepted` = ? AND";
-			array_push( $val, $Contest_User_Request_History->getAccepted() );
+			array_push( $val, $Contest_User_Request_History->accepted );
 		}
-		if (!is_null( $Contest_User_Request_History->getAdminId())) {
+		if (!is_null( $Contest_User_Request_History->admin_id)) {
 			$sql .= " `admin_id` = ? AND";
-			array_push( $val, $Contest_User_Request_History->getAdminId() );
+			array_push( $val, $Contest_User_Request_History->admin_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -189,12 +189,12 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 	{
 		$sql = "UPDATE Contest_User_Request_History SET  `user_id` = ?, `contest_id` = ?, `time` = ?, `accepted` = ?, `admin_id` = ? WHERE  `history_id` = ?;";
 		$params = array(
-			$Contest_User_Request_History->getUserId(),
-			$Contest_User_Request_History->getContestId(),
-			$Contest_User_Request_History->getTime(),
-			$Contest_User_Request_History->getAccepted(),
-			$Contest_User_Request_History->getAdminId(),
-			$Contest_User_Request_History->getHistoryId(), );
+			$Contest_User_Request_History->user_id,
+			$Contest_User_Request_History->contest_id,
+			$Contest_User_Request_History->time,
+			$Contest_User_Request_History->accepted,
+			$Contest_User_Request_History->admin_id,
+			$Contest_User_Request_History->history_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -249,15 +249,15 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -270,7 +270,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contest_User_Request_History WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Contest_User_Request_HistoryA->getHistoryId()) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->getHistoryId()) ) ) ){
+		if( ( !is_null (($a = $Contest_User_Request_HistoryA->history_id) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->history_id) ) ) ){
 				$sql .= " `history_id` >= ? AND `history_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -280,7 +280,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_User_Request_HistoryA->getUserId()) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $Contest_User_Request_HistoryA->user_id) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -290,7 +290,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_User_Request_HistoryA->getContestId()) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $Contest_User_Request_HistoryA->contest_id) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -300,7 +300,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_User_Request_HistoryA->getTime()) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->getTime()) ) ) ){
+		if( ( !is_null (($a = $Contest_User_Request_HistoryA->time) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->time) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -310,7 +310,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_User_Request_HistoryA->getAccepted()) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->getAccepted()) ) ) ){
+		if( ( !is_null (($a = $Contest_User_Request_HistoryA->accepted) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->accepted) ) ) ){
 				$sql .= " `accepted` >= ? AND `accepted` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -320,7 +320,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_User_Request_HistoryA->getAdminId()) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->getAdminId()) ) ) ){
+		if( ( !is_null (($a = $Contest_User_Request_HistoryA->admin_id) ) ) & ( ! is_null ( ($b = $Contest_User_Request_HistoryB->admin_id) ) ) ){
 				$sql .= " `admin_id` >= ? AND `admin_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -358,9 +358,9 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 	  **/
 	public static final function delete( $Contest_User_Request_History )
 	{
-		if( is_null( self::getByPK($Contest_User_Request_History->getHistoryId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Contest_User_Request_History->history_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Contest_User_Request_History WHERE  history_id = ?;";
-		$params = array( $Contest_User_Request_History->getHistoryId() );
+		$params = array( $Contest_User_Request_History->history_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

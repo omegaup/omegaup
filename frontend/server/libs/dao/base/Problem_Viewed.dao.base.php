@@ -33,7 +33,7 @@ abstract class ProblemViewedDAOBase extends DAO
 	  **/
 	public static final function save( $Problem_Viewed )
 	{
-		if (!is_null(self::getByPK( $Problem_Viewed->getProblemId() , $Problem_Viewed->getUserId() )))
+		if (!is_null(self::getByPK( $Problem_Viewed->problem_id, $Problem_Viewed->user_id)))
 		{
 			return ProblemViewedDAOBase::update( $Problem_Viewed);
 		} else {
@@ -112,7 +112,7 @@ abstract class ProblemViewedDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class ProblemViewedDAOBase extends DAO
 
 		$sql = "SELECT * from Problem_Viewed WHERE (";
 		$val = array();
-		if (!is_null( $Problem_Viewed->getProblemId())) {
+		if (!is_null( $Problem_Viewed->problem_id)) {
 			$sql .= " `problem_id` = ? AND";
-			array_push( $val, $Problem_Viewed->getProblemId() );
+			array_push( $val, $Problem_Viewed->problem_id );
 		}
-		if (!is_null( $Problem_Viewed->getUserId())) {
+		if (!is_null( $Problem_Viewed->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Problem_Viewed->getUserId() );
+			array_push( $val, $Problem_Viewed->user_id );
 		}
-		if (!is_null( $Problem_Viewed->getViewTime())) {
+		if (!is_null( $Problem_Viewed->view_time)) {
 			$sql .= " `view_time` = ? AND";
-			array_push( $val, $Problem_Viewed->getViewTime() );
+			array_push( $val, $Problem_Viewed->view_time );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -177,8 +177,8 @@ abstract class ProblemViewedDAOBase extends DAO
 	{
 		$sql = "UPDATE Problem_Viewed SET  `view_time` = ? WHERE  `problem_id` = ? AND `user_id` = ?;";
 		$params = array(
-			$Problem_Viewed->getViewTime(),
-			$Problem_Viewed->getProblemId(),$Problem_Viewed->getUserId(), );
+			$Problem_Viewed->view_time,
+			$Problem_Viewed->problem_id,$Problem_Viewed->user_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -229,15 +229,15 @@ abstract class ProblemViewedDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -250,7 +250,7 @@ abstract class ProblemViewedDAOBase extends DAO
 	{
 		$sql = "SELECT * from Problem_Viewed WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Problem_ViewedA->getProblemId()) ) ) & ( ! is_null ( ($b = $Problem_ViewedB->getProblemId()) ) ) ){
+		if( ( !is_null (($a = $Problem_ViewedA->problem_id) ) ) & ( ! is_null ( ($b = $Problem_ViewedB->problem_id) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -260,7 +260,7 @@ abstract class ProblemViewedDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Problem_ViewedA->getUserId()) ) ) & ( ! is_null ( ($b = $Problem_ViewedB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $Problem_ViewedA->user_id) ) ) & ( ! is_null ( ($b = $Problem_ViewedB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -270,7 +270,7 @@ abstract class ProblemViewedDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Problem_ViewedA->getViewTime()) ) ) & ( ! is_null ( ($b = $Problem_ViewedB->getViewTime()) ) ) ){
+		if( ( !is_null (($a = $Problem_ViewedA->view_time) ) ) & ( ! is_null ( ($b = $Problem_ViewedB->view_time) ) ) ){
 				$sql .= " `view_time` >= ? AND `view_time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -308,9 +308,9 @@ abstract class ProblemViewedDAOBase extends DAO
 	  **/
 	public static final function delete( $Problem_Viewed )
 	{
-		if( is_null( self::getByPK($Problem_Viewed->getProblemId(), $Problem_Viewed->getUserId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Problem_Viewed->problem_id, $Problem_Viewed->user_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Problem_Viewed WHERE  problem_id = ? AND user_id = ?;";
-		$params = array( $Problem_Viewed->getProblemId(), $Problem_Viewed->getUserId() );
+		$params = array( $Problem_Viewed->problem_id, $Problem_Viewed->user_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

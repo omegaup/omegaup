@@ -33,7 +33,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	public static final function save( $Users )
 	{
-		if (!is_null(self::getByPK( $Users->getUserId() )))
+		if (!is_null(self::getByPK( $Users->user_id)))
 		{
 			return UsersDAOBase::update( $Users);
 		} else {
@@ -112,7 +112,7 @@ abstract class UsersDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,89 +128,89 @@ abstract class UsersDAOBase extends DAO
 
 		$sql = "SELECT * from Users WHERE (";
 		$val = array();
-		if (!is_null( $Users->getUserId())) {
+		if (!is_null( $Users->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Users->getUserId() );
+			array_push( $val, $Users->user_id );
 		}
-		if (!is_null( $Users->getUsername())) {
+		if (!is_null( $Users->username)) {
 			$sql .= " `username` = ? AND";
-			array_push( $val, $Users->getUsername() );
+			array_push( $val, $Users->username );
 		}
-		if (!is_null( $Users->getFacebookUserId())) {
+		if (!is_null( $Users->facebook_user_id)) {
 			$sql .= " `facebook_user_id` = ? AND";
-			array_push( $val, $Users->getFacebookUserId() );
+			array_push( $val, $Users->facebook_user_id );
 		}
-		if (!is_null( $Users->getPassword())) {
+		if (!is_null( $Users->password)) {
 			$sql .= " `password` = ? AND";
-			array_push( $val, $Users->getPassword() );
+			array_push( $val, $Users->password );
 		}
-		if (!is_null( $Users->getMainEmailId())) {
+		if (!is_null( $Users->main_email_id)) {
 			$sql .= " `main_email_id` = ? AND";
-			array_push( $val, $Users->getMainEmailId() );
+			array_push( $val, $Users->main_email_id );
 		}
-		if (!is_null( $Users->getName())) {
+		if (!is_null( $Users->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $Users->getName() );
+			array_push( $val, $Users->name );
 		}
-		if (!is_null( $Users->getSolved())) {
+		if (!is_null( $Users->solved)) {
 			$sql .= " `solved` = ? AND";
-			array_push( $val, $Users->getSolved() );
+			array_push( $val, $Users->solved );
 		}
-		if (!is_null( $Users->getSubmissions())) {
+		if (!is_null( $Users->submissions)) {
 			$sql .= " `submissions` = ? AND";
-			array_push( $val, $Users->getSubmissions() );
+			array_push( $val, $Users->submissions );
 		}
-		if (!is_null( $Users->getCountryId())) {
+		if (!is_null( $Users->country_id)) {
 			$sql .= " `country_id` = ? AND";
-			array_push( $val, $Users->getCountryId() );
+			array_push( $val, $Users->country_id );
 		}
-		if (!is_null( $Users->getStateId())) {
+		if (!is_null( $Users->state_id)) {
 			$sql .= " `state_id` = ? AND";
-			array_push( $val, $Users->getStateId() );
+			array_push( $val, $Users->state_id );
 		}
-		if (!is_null( $Users->getSchoolId())) {
+		if (!is_null( $Users->school_id)) {
 			$sql .= " `school_id` = ? AND";
-			array_push( $val, $Users->getSchoolId() );
+			array_push( $val, $Users->school_id );
 		}
-		if (!is_null( $Users->getScholarDegree())) {
+		if (!is_null( $Users->scholar_degree)) {
 			$sql .= " `scholar_degree` = ? AND";
-			array_push( $val, $Users->getScholarDegree() );
+			array_push( $val, $Users->scholar_degree );
 		}
-		if (!is_null( $Users->getLanguageId())) {
+		if (!is_null( $Users->language_id)) {
 			$sql .= " `language_id` = ? AND";
-			array_push( $val, $Users->getLanguageId() );
+			array_push( $val, $Users->language_id );
 		}
-		if (!is_null( $Users->getGraduationDate())) {
+		if (!is_null( $Users->graduation_date)) {
 			$sql .= " `graduation_date` = ? AND";
-			array_push( $val, $Users->getGraduationDate() );
+			array_push( $val, $Users->graduation_date );
 		}
-		if (!is_null( $Users->getBirthDate())) {
+		if (!is_null( $Users->birth_date)) {
 			$sql .= " `birth_date` = ? AND";
-			array_push( $val, $Users->getBirthDate() );
+			array_push( $val, $Users->birth_date );
 		}
-		if (!is_null( $Users->getLastAccess())) {
+		if (!is_null( $Users->last_access)) {
 			$sql .= " `last_access` = ? AND";
-			array_push( $val, $Users->getLastAccess() );
+			array_push( $val, $Users->last_access );
 		}
-		if (!is_null( $Users->getVerified())) {
+		if (!is_null( $Users->verified)) {
 			$sql .= " `verified` = ? AND";
-			array_push( $val, $Users->getVerified() );
+			array_push( $val, $Users->verified );
 		}
-		if (!is_null( $Users->getVerificationId())) {
+		if (!is_null( $Users->verification_id)) {
 			$sql .= " `verification_id` = ? AND";
-			array_push( $val, $Users->getVerificationId() );
+			array_push( $val, $Users->verification_id );
 		}
-		if (!is_null( $Users->getResetDigest())) {
+		if (!is_null( $Users->reset_digest)) {
 			$sql .= " `reset_digest` = ? AND";
-			array_push( $val, $Users->getResetDigest() );
+			array_push( $val, $Users->reset_digest );
 		}
-		if (!is_null( $Users->getResetSentAt())) {
+		if (!is_null( $Users->reset_sent_at)) {
 			$sql .= " `reset_sent_at` = ? AND";
-			array_push( $val, $Users->getResetSentAt() );
+			array_push( $val, $Users->reset_sent_at );
 		}
-		if (!is_null( $Users->getRecruitmentOptin())) {
+		if (!is_null( $Users->recruitment_optin)) {
 			$sql .= " `recruitment_optin` = ? AND";
-			array_push( $val, $Users->getRecruitmentOptin() );
+			array_push( $val, $Users->recruitment_optin );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -249,27 +249,27 @@ abstract class UsersDAOBase extends DAO
 	{
 		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `recruitment_optin` = ? WHERE  `user_id` = ?;";
 		$params = array(
-			$Users->getUsername(),
-			$Users->getFacebookUserId(),
-			$Users->getPassword(),
-			$Users->getMainEmailId(),
-			$Users->getName(),
-			$Users->getSolved(),
-			$Users->getSubmissions(),
-			$Users->getCountryId(),
-			$Users->getStateId(),
-			$Users->getSchoolId(),
-			$Users->getScholarDegree(),
-			$Users->getLanguageId(),
-			$Users->getGraduationDate(),
-			$Users->getBirthDate(),
-			$Users->getLastAccess(),
-			$Users->getVerified(),
-			$Users->getVerificationId(),
-			$Users->getResetDigest(),
-			$Users->getResetSentAt(),
-			$Users->getRecruitmentOptin(),
-			$Users->getUserId(), );
+			$Users->username,
+			$Users->facebook_user_id,
+			$Users->password,
+			$Users->main_email_id,
+			$Users->name,
+			$Users->solved,
+			$Users->submissions,
+			$Users->country_id,
+			$Users->state_id,
+			$Users->school_id,
+			$Users->scholar_degree,
+			$Users->language_id,
+			$Users->graduation_date,
+			$Users->birth_date,
+			$Users->last_access,
+			$Users->verified,
+			$Users->verification_id,
+			$Users->reset_digest,
+			$Users->reset_sent_at,
+			$Users->recruitment_optin,
+			$Users->user_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -342,15 +342,15 @@ abstract class UsersDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -363,7 +363,7 @@ abstract class UsersDAOBase extends DAO
 	{
 		$sql = "SELECT * from Users WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $UsersA->getUserId()) ) ) & ( ! is_null ( ($b = $UsersB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $UsersA->user_id) ) ) & ( ! is_null ( ($b = $UsersB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -373,7 +373,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getUsername()) ) ) & ( ! is_null ( ($b = $UsersB->getUsername()) ) ) ){
+		if( ( !is_null (($a = $UsersA->username) ) ) & ( ! is_null ( ($b = $UsersB->username) ) ) ){
 				$sql .= " `username` >= ? AND `username` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -383,7 +383,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getFacebookUserId()) ) ) & ( ! is_null ( ($b = $UsersB->getFacebookUserId()) ) ) ){
+		if( ( !is_null (($a = $UsersA->facebook_user_id) ) ) & ( ! is_null ( ($b = $UsersB->facebook_user_id) ) ) ){
 				$sql .= " `facebook_user_id` >= ? AND `facebook_user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -393,7 +393,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getPassword()) ) ) & ( ! is_null ( ($b = $UsersB->getPassword()) ) ) ){
+		if( ( !is_null (($a = $UsersA->password) ) ) & ( ! is_null ( ($b = $UsersB->password) ) ) ){
 				$sql .= " `password` >= ? AND `password` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -403,7 +403,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getMainEmailId()) ) ) & ( ! is_null ( ($b = $UsersB->getMainEmailId()) ) ) ){
+		if( ( !is_null (($a = $UsersA->main_email_id) ) ) & ( ! is_null ( ($b = $UsersB->main_email_id) ) ) ){
 				$sql .= " `main_email_id` >= ? AND `main_email_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -413,7 +413,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getName()) ) ) & ( ! is_null ( ($b = $UsersB->getName()) ) ) ){
+		if( ( !is_null (($a = $UsersA->name) ) ) & ( ! is_null ( ($b = $UsersB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -423,7 +423,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getSolved()) ) ) & ( ! is_null ( ($b = $UsersB->getSolved()) ) ) ){
+		if( ( !is_null (($a = $UsersA->solved) ) ) & ( ! is_null ( ($b = $UsersB->solved) ) ) ){
 				$sql .= " `solved` >= ? AND `solved` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -433,7 +433,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getSubmissions()) ) ) & ( ! is_null ( ($b = $UsersB->getSubmissions()) ) ) ){
+		if( ( !is_null (($a = $UsersA->submissions) ) ) & ( ! is_null ( ($b = $UsersB->submissions) ) ) ){
 				$sql .= " `submissions` >= ? AND `submissions` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -443,7 +443,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getCountryId()) ) ) & ( ! is_null ( ($b = $UsersB->getCountryId()) ) ) ){
+		if( ( !is_null (($a = $UsersA->country_id) ) ) & ( ! is_null ( ($b = $UsersB->country_id) ) ) ){
 				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -453,7 +453,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getStateId()) ) ) & ( ! is_null ( ($b = $UsersB->getStateId()) ) ) ){
+		if( ( !is_null (($a = $UsersA->state_id) ) ) & ( ! is_null ( ($b = $UsersB->state_id) ) ) ){
 				$sql .= " `state_id` >= ? AND `state_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -463,7 +463,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getSchoolId()) ) ) & ( ! is_null ( ($b = $UsersB->getSchoolId()) ) ) ){
+		if( ( !is_null (($a = $UsersA->school_id) ) ) & ( ! is_null ( ($b = $UsersB->school_id) ) ) ){
 				$sql .= " `school_id` >= ? AND `school_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -473,7 +473,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getScholarDegree()) ) ) & ( ! is_null ( ($b = $UsersB->getScholarDegree()) ) ) ){
+		if( ( !is_null (($a = $UsersA->scholar_degree) ) ) & ( ! is_null ( ($b = $UsersB->scholar_degree) ) ) ){
 				$sql .= " `scholar_degree` >= ? AND `scholar_degree` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -483,7 +483,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getLanguageId()) ) ) & ( ! is_null ( ($b = $UsersB->getLanguageId()) ) ) ){
+		if( ( !is_null (($a = $UsersA->language_id) ) ) & ( ! is_null ( ($b = $UsersB->language_id) ) ) ){
 				$sql .= " `language_id` >= ? AND `language_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -493,7 +493,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getGraduationDate()) ) ) & ( ! is_null ( ($b = $UsersB->getGraduationDate()) ) ) ){
+		if( ( !is_null (($a = $UsersA->graduation_date) ) ) & ( ! is_null ( ($b = $UsersB->graduation_date) ) ) ){
 				$sql .= " `graduation_date` >= ? AND `graduation_date` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -503,7 +503,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getBirthDate()) ) ) & ( ! is_null ( ($b = $UsersB->getBirthDate()) ) ) ){
+		if( ( !is_null (($a = $UsersA->birth_date) ) ) & ( ! is_null ( ($b = $UsersB->birth_date) ) ) ){
 				$sql .= " `birth_date` >= ? AND `birth_date` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -513,7 +513,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getLastAccess()) ) ) & ( ! is_null ( ($b = $UsersB->getLastAccess()) ) ) ){
+		if( ( !is_null (($a = $UsersA->last_access) ) ) & ( ! is_null ( ($b = $UsersB->last_access) ) ) ){
 				$sql .= " `last_access` >= ? AND `last_access` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -523,7 +523,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getVerified()) ) ) & ( ! is_null ( ($b = $UsersB->getVerified()) ) ) ){
+		if( ( !is_null (($a = $UsersA->verified) ) ) & ( ! is_null ( ($b = $UsersB->verified) ) ) ){
 				$sql .= " `verified` >= ? AND `verified` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -533,7 +533,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getVerificationId()) ) ) & ( ! is_null ( ($b = $UsersB->getVerificationId()) ) ) ){
+		if( ( !is_null (($a = $UsersA->verification_id) ) ) & ( ! is_null ( ($b = $UsersB->verification_id) ) ) ){
 				$sql .= " `verification_id` >= ? AND `verification_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -543,7 +543,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getResetDigest()) ) ) & ( ! is_null ( ($b = $UsersB->getResetDigest()) ) ) ){
+		if( ( !is_null (($a = $UsersA->reset_digest) ) ) & ( ! is_null ( ($b = $UsersB->reset_digest) ) ) ){
 				$sql .= " `reset_digest` >= ? AND `reset_digest` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -553,7 +553,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getResetSentAt()) ) ) & ( ! is_null ( ($b = $UsersB->getResetSentAt()) ) ) ){
+		if( ( !is_null (($a = $UsersA->reset_sent_at) ) ) & ( ! is_null ( ($b = $UsersB->reset_sent_at) ) ) ){
 				$sql .= " `reset_sent_at` >= ? AND `reset_sent_at` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -563,7 +563,7 @@ abstract class UsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $UsersA->getRecruitmentOptin()) ) ) & ( ! is_null ( ($b = $UsersB->getRecruitmentOptin()) ) ) ){
+		if( ( !is_null (($a = $UsersA->recruitment_optin) ) ) & ( ! is_null ( ($b = $UsersB->recruitment_optin) ) ) ){
 				$sql .= " `recruitment_optin` >= ? AND `recruitment_optin` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -601,9 +601,9 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	public static final function delete( $Users )
 	{
-		if( is_null( self::getByPK($Users->getUserId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Users->user_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Users WHERE  user_id = ?;";
-		$params = array( $Users->getUserId() );
+		$params = array( $Users->user_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

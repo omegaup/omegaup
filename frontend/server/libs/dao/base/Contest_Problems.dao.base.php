@@ -33,7 +33,7 @@ abstract class ContestProblemsDAOBase extends DAO
 	  **/
 	public static final function save( $Contest_Problems )
 	{
-		if (!is_null(self::getByPK( $Contest_Problems->getContestId() , $Contest_Problems->getProblemId() )))
+		if (!is_null(self::getByPK( $Contest_Problems->contest_id, $Contest_Problems->problem_id)))
 		{
 			return ContestProblemsDAOBase::update( $Contest_Problems);
 		} else {
@@ -112,7 +112,7 @@ abstract class ContestProblemsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,21 +128,21 @@ abstract class ContestProblemsDAOBase extends DAO
 
 		$sql = "SELECT * from Contest_Problems WHERE (";
 		$val = array();
-		if (!is_null( $Contest_Problems->getContestId())) {
+		if (!is_null( $Contest_Problems->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Contest_Problems->getContestId() );
+			array_push( $val, $Contest_Problems->contest_id );
 		}
-		if (!is_null( $Contest_Problems->getProblemId())) {
+		if (!is_null( $Contest_Problems->problem_id)) {
 			$sql .= " `problem_id` = ? AND";
-			array_push( $val, $Contest_Problems->getProblemId() );
+			array_push( $val, $Contest_Problems->problem_id );
 		}
-		if (!is_null( $Contest_Problems->getPoints())) {
+		if (!is_null( $Contest_Problems->points)) {
 			$sql .= " `points` = ? AND";
-			array_push( $val, $Contest_Problems->getPoints() );
+			array_push( $val, $Contest_Problems->points );
 		}
-		if (!is_null( $Contest_Problems->getOrder())) {
+		if (!is_null( $Contest_Problems->order)) {
 			$sql .= " `order` = ? AND";
-			array_push( $val, $Contest_Problems->getOrder() );
+			array_push( $val, $Contest_Problems->order );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -181,9 +181,9 @@ abstract class ContestProblemsDAOBase extends DAO
 	{
 		$sql = "UPDATE Contest_Problems SET  `points` = ?, `order` = ? WHERE  `contest_id` = ? AND `problem_id` = ?;";
 		$params = array(
-			$Contest_Problems->getPoints(),
-			$Contest_Problems->getOrder(),
-			$Contest_Problems->getContestId(),$Contest_Problems->getProblemId(), );
+			$Contest_Problems->points,
+			$Contest_Problems->order,
+			$Contest_Problems->contest_id,$Contest_Problems->problem_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -236,15 +236,15 @@ abstract class ContestProblemsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -257,7 +257,7 @@ abstract class ContestProblemsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contest_Problems WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Contest_ProblemsA->getContestId()) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $Contest_ProblemsA->contest_id) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -267,7 +267,7 @@ abstract class ContestProblemsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_ProblemsA->getProblemId()) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->getProblemId()) ) ) ){
+		if( ( !is_null (($a = $Contest_ProblemsA->problem_id) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->problem_id) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -277,7 +277,7 @@ abstract class ContestProblemsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_ProblemsA->getPoints()) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->getPoints()) ) ) ){
+		if( ( !is_null (($a = $Contest_ProblemsA->points) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->points) ) ) ){
 				$sql .= " `points` >= ? AND `points` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -287,7 +287,7 @@ abstract class ContestProblemsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_ProblemsA->getOrder()) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->getOrder()) ) ) ){
+		if( ( !is_null (($a = $Contest_ProblemsA->order) ) ) & ( ! is_null ( ($b = $Contest_ProblemsB->order) ) ) ){
 				$sql .= " `order` >= ? AND `order` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -325,9 +325,9 @@ abstract class ContestProblemsDAOBase extends DAO
 	  **/
 	public static final function delete( $Contest_Problems )
 	{
-		if( is_null( self::getByPK($Contest_Problems->getContestId(), $Contest_Problems->getProblemId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Contest_Problems->contest_id, $Contest_Problems->problem_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Contest_Problems WHERE  contest_id = ? AND problem_id = ?;";
-		$params = array( $Contest_Problems->getContestId(), $Contest_Problems->getProblemId() );
+		$params = array( $Contest_Problems->contest_id, $Contest_Problems->problem_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

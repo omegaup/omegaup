@@ -33,7 +33,7 @@ abstract class RolesDAOBase extends DAO
 	  **/
 	public static final function save( $Roles )
 	{
-		if (!is_null(self::getByPK( $Roles->getRoleId() )))
+		if (!is_null(self::getByPK( $Roles->role_id)))
 		{
 			return RolesDAOBase::update( $Roles);
 		} else {
@@ -112,7 +112,7 @@ abstract class RolesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class RolesDAOBase extends DAO
 
 		$sql = "SELECT * from Roles WHERE (";
 		$val = array();
-		if (!is_null( $Roles->getRoleId())) {
+		if (!is_null( $Roles->role_id)) {
 			$sql .= " `role_id` = ? AND";
-			array_push( $val, $Roles->getRoleId() );
+			array_push( $val, $Roles->role_id );
 		}
-		if (!is_null( $Roles->getName())) {
+		if (!is_null( $Roles->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $Roles->getName() );
+			array_push( $val, $Roles->name );
 		}
-		if (!is_null( $Roles->getDescription())) {
+		if (!is_null( $Roles->description)) {
 			$sql .= " `description` = ? AND";
-			array_push( $val, $Roles->getDescription() );
+			array_push( $val, $Roles->description );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -177,9 +177,9 @@ abstract class RolesDAOBase extends DAO
 	{
 		$sql = "UPDATE Roles SET  `name` = ?, `description` = ? WHERE  `role_id` = ?;";
 		$params = array(
-			$Roles->getName(),
-			$Roles->getDescription(),
-			$Roles->getRoleId(), );
+			$Roles->name,
+			$Roles->description,
+			$Roles->role_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -230,15 +230,15 @@ abstract class RolesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -251,7 +251,7 @@ abstract class RolesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Roles WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $RolesA->getRoleId()) ) ) & ( ! is_null ( ($b = $RolesB->getRoleId()) ) ) ){
+		if( ( !is_null (($a = $RolesA->role_id) ) ) & ( ! is_null ( ($b = $RolesB->role_id) ) ) ){
 				$sql .= " `role_id` >= ? AND `role_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -261,7 +261,7 @@ abstract class RolesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RolesA->getName()) ) ) & ( ! is_null ( ($b = $RolesB->getName()) ) ) ){
+		if( ( !is_null (($a = $RolesA->name) ) ) & ( ! is_null ( ($b = $RolesB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -271,7 +271,7 @@ abstract class RolesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $RolesA->getDescription()) ) ) & ( ! is_null ( ($b = $RolesB->getDescription()) ) ) ){
+		if( ( !is_null (($a = $RolesA->description) ) ) & ( ! is_null ( ($b = $RolesB->description) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -309,9 +309,9 @@ abstract class RolesDAOBase extends DAO
 	  **/
 	public static final function delete( $Roles )
 	{
-		if( is_null( self::getByPK($Roles->getRoleId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Roles->role_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Roles WHERE  role_id = ?;";
-		$params = array( $Roles->getRoleId() );
+		$params = array( $Roles->role_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

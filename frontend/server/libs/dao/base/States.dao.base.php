@@ -33,7 +33,7 @@ abstract class StatesDAOBase extends DAO
 	  **/
 	public static final function save( $States )
 	{
-		if (!is_null(self::getByPK( $States->getStateId() )))
+		if (!is_null(self::getByPK( $States->state_id)))
 		{
 			return StatesDAOBase::update( $States);
 		} else {
@@ -112,7 +112,7 @@ abstract class StatesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,21 +128,21 @@ abstract class StatesDAOBase extends DAO
 
 		$sql = "SELECT * from States WHERE (";
 		$val = array();
-		if (!is_null( $States->getStateId())) {
+		if (!is_null( $States->state_id)) {
 			$sql .= " `state_id` = ? AND";
-			array_push( $val, $States->getStateId() );
+			array_push( $val, $States->state_id );
 		}
-		if (!is_null( $States->getCountryId())) {
+		if (!is_null( $States->country_id)) {
 			$sql .= " `country_id` = ? AND";
-			array_push( $val, $States->getCountryId() );
+			array_push( $val, $States->country_id );
 		}
-		if (!is_null( $States->getStateCode())) {
+		if (!is_null( $States->state_code)) {
 			$sql .= " `state_code` = ? AND";
-			array_push( $val, $States->getStateCode() );
+			array_push( $val, $States->state_code );
 		}
-		if (!is_null( $States->getName())) {
+		if (!is_null( $States->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $States->getName() );
+			array_push( $val, $States->name );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -181,10 +181,10 @@ abstract class StatesDAOBase extends DAO
 	{
 		$sql = "UPDATE States SET  `country_id` = ?, `state_code` = ?, `name` = ? WHERE  `state_id` = ?;";
 		$params = array(
-			$States->getCountryId(),
-			$States->getStateCode(),
-			$States->getName(),
-			$States->getStateId(), );
+			$States->country_id,
+			$States->state_code,
+			$States->name,
+			$States->state_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -236,15 +236,15 @@ abstract class StatesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -257,7 +257,7 @@ abstract class StatesDAOBase extends DAO
 	{
 		$sql = "SELECT * from States WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $StatesA->getStateId()) ) ) & ( ! is_null ( ($b = $StatesB->getStateId()) ) ) ){
+		if( ( !is_null (($a = $StatesA->state_id) ) ) & ( ! is_null ( ($b = $StatesB->state_id) ) ) ){
 				$sql .= " `state_id` >= ? AND `state_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -267,7 +267,7 @@ abstract class StatesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $StatesA->getCountryId()) ) ) & ( ! is_null ( ($b = $StatesB->getCountryId()) ) ) ){
+		if( ( !is_null (($a = $StatesA->country_id) ) ) & ( ! is_null ( ($b = $StatesB->country_id) ) ) ){
 				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -277,7 +277,7 @@ abstract class StatesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $StatesA->getStateCode()) ) ) & ( ! is_null ( ($b = $StatesB->getStateCode()) ) ) ){
+		if( ( !is_null (($a = $StatesA->state_code) ) ) & ( ! is_null ( ($b = $StatesB->state_code) ) ) ){
 				$sql .= " `state_code` >= ? AND `state_code` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -287,7 +287,7 @@ abstract class StatesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $StatesA->getName()) ) ) & ( ! is_null ( ($b = $StatesB->getName()) ) ) ){
+		if( ( !is_null (($a = $StatesA->name) ) ) & ( ! is_null ( ($b = $StatesB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -325,9 +325,9 @@ abstract class StatesDAOBase extends DAO
 	  **/
 	public static final function delete( $States )
 	{
-		if( is_null( self::getByPK($States->getStateId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($States->state_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM States WHERE  state_id = ?;";
-		$params = array( $States->getStateId() );
+		$params = array( $States->state_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

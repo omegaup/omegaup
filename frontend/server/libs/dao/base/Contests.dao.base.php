@@ -33,7 +33,7 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	public static final function save( $Contests )
 	{
-		if (!is_null(self::getByPK( $Contests->getContestId() )))
+		if (!is_null(self::getByPK( $Contests->contest_id)))
 		{
 			return ContestsDAOBase::update( $Contests);
 		} else {
@@ -112,7 +112,7 @@ abstract class ContestsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,105 +128,105 @@ abstract class ContestsDAOBase extends DAO
 
 		$sql = "SELECT * from Contests WHERE (";
 		$val = array();
-		if (!is_null( $Contests->getContestId())) {
+		if (!is_null( $Contests->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Contests->getContestId() );
+			array_push( $val, $Contests->contest_id );
 		}
-		if (!is_null( $Contests->getTitle())) {
+		if (!is_null( $Contests->title)) {
 			$sql .= " `title` = ? AND";
-			array_push( $val, $Contests->getTitle() );
+			array_push( $val, $Contests->title );
 		}
-		if (!is_null( $Contests->getDescription())) {
+		if (!is_null( $Contests->description)) {
 			$sql .= " `description` = ? AND";
-			array_push( $val, $Contests->getDescription() );
+			array_push( $val, $Contests->description );
 		}
-		if (!is_null( $Contests->getStartTime())) {
+		if (!is_null( $Contests->start_time)) {
 			$sql .= " `start_time` = ? AND";
-			array_push( $val, $Contests->getStartTime() );
+			array_push( $val, $Contests->start_time );
 		}
-		if (!is_null( $Contests->getFinishTime())) {
+		if (!is_null( $Contests->finish_time)) {
 			$sql .= " `finish_time` = ? AND";
-			array_push( $val, $Contests->getFinishTime() );
+			array_push( $val, $Contests->finish_time );
 		}
-		if (!is_null( $Contests->getWindowLength())) {
+		if (!is_null( $Contests->window_length)) {
 			$sql .= " `window_length` = ? AND";
-			array_push( $val, $Contests->getWindowLength() );
+			array_push( $val, $Contests->window_length );
 		}
-		if (!is_null( $Contests->getDirectorId())) {
+		if (!is_null( $Contests->director_id)) {
 			$sql .= " `director_id` = ? AND";
-			array_push( $val, $Contests->getDirectorId() );
+			array_push( $val, $Contests->director_id );
 		}
-		if (!is_null( $Contests->getRerunId())) {
+		if (!is_null( $Contests->rerun_id)) {
 			$sql .= " `rerun_id` = ? AND";
-			array_push( $val, $Contests->getRerunId() );
+			array_push( $val, $Contests->rerun_id );
 		}
-		if (!is_null( $Contests->getPublic())) {
+		if (!is_null( $Contests->public)) {
 			$sql .= " `public` = ? AND";
-			array_push( $val, $Contests->getPublic() );
+			array_push( $val, $Contests->public );
 		}
-		if (!is_null( $Contests->getAlias())) {
+		if (!is_null( $Contests->alias)) {
 			$sql .= " `alias` = ? AND";
-			array_push( $val, $Contests->getAlias() );
+			array_push( $val, $Contests->alias );
 		}
-		if (!is_null( $Contests->getScoreboard())) {
+		if (!is_null( $Contests->scoreboard)) {
 			$sql .= " `scoreboard` = ? AND";
-			array_push( $val, $Contests->getScoreboard() );
+			array_push( $val, $Contests->scoreboard );
 		}
-		if (!is_null( $Contests->getPointsDecayFactor())) {
+		if (!is_null( $Contests->points_decay_factor)) {
 			$sql .= " `points_decay_factor` = ? AND";
-			array_push( $val, $Contests->getPointsDecayFactor() );
+			array_push( $val, $Contests->points_decay_factor );
 		}
-		if (!is_null( $Contests->getPartialScore())) {
+		if (!is_null( $Contests->partial_score)) {
 			$sql .= " `partial_score` = ? AND";
-			array_push( $val, $Contests->getPartialScore() );
+			array_push( $val, $Contests->partial_score );
 		}
-		if (!is_null( $Contests->getSubmissionsGap())) {
+		if (!is_null( $Contests->submissions_gap)) {
 			$sql .= " `submissions_gap` = ? AND";
-			array_push( $val, $Contests->getSubmissionsGap() );
+			array_push( $val, $Contests->submissions_gap );
 		}
-		if (!is_null( $Contests->getFeedback())) {
+		if (!is_null( $Contests->feedback)) {
 			$sql .= " `feedback` = ? AND";
-			array_push( $val, $Contests->getFeedback() );
+			array_push( $val, $Contests->feedback );
 		}
-		if (!is_null( $Contests->getPenalty())) {
+		if (!is_null( $Contests->penalty)) {
 			$sql .= " `penalty` = ? AND";
-			array_push( $val, $Contests->getPenalty() );
+			array_push( $val, $Contests->penalty );
 		}
-		if (!is_null( $Contests->getPenaltyType())) {
+		if (!is_null( $Contests->penalty_type)) {
 			$sql .= " `penalty_type` = ? AND";
-			array_push( $val, $Contests->getPenaltyType() );
+			array_push( $val, $Contests->penalty_type );
 		}
-		if (!is_null( $Contests->getPenaltyCalcPolicy())) {
+		if (!is_null( $Contests->penalty_calc_policy)) {
 			$sql .= " `penalty_calc_policy` = ? AND";
-			array_push( $val, $Contests->getPenaltyCalcPolicy() );
+			array_push( $val, $Contests->penalty_calc_policy );
 		}
-		if (!is_null( $Contests->getShowScoreboardAfter())) {
+		if (!is_null( $Contests->show_scoreboard_after)) {
 			$sql .= " `show_scoreboard_after` = ? AND";
-			array_push( $val, $Contests->getShowScoreboardAfter() );
+			array_push( $val, $Contests->show_scoreboard_after );
 		}
-		if (!is_null( $Contests->getScoreboardUrl())) {
+		if (!is_null( $Contests->scoreboard_url)) {
 			$sql .= " `scoreboard_url` = ? AND";
-			array_push( $val, $Contests->getScoreboardUrl() );
+			array_push( $val, $Contests->scoreboard_url );
 		}
-		if (!is_null( $Contests->getScoreboardUrlAdmin())) {
+		if (!is_null( $Contests->scoreboard_url_admin)) {
 			$sql .= " `scoreboard_url_admin` = ? AND";
-			array_push( $val, $Contests->getScoreboardUrlAdmin() );
+			array_push( $val, $Contests->scoreboard_url_admin );
 		}
-		if (!is_null( $Contests->getUrgent())) {
+		if (!is_null( $Contests->urgent)) {
 			$sql .= " `urgent` = ? AND";
-			array_push( $val, $Contests->getUrgent() );
+			array_push( $val, $Contests->urgent );
 		}
-		if (!is_null( $Contests->getContestantMustRegister())) {
+		if (!is_null( $Contests->contestant_must_register)) {
 			$sql .= " `contestant_must_register` = ? AND";
-			array_push( $val, $Contests->getContestantMustRegister() );
+			array_push( $val, $Contests->contestant_must_register );
 		}
-		if (!is_null( $Contests->getLanguages())) {
+		if (!is_null( $Contests->languages)) {
 			$sql .= " `languages` = ? AND";
-			array_push( $val, $Contests->getLanguages() );
+			array_push( $val, $Contests->languages );
 		}
-		if (!is_null( $Contests->getRecommended())) {
+		if (!is_null( $Contests->recommended)) {
 			$sql .= " `recommended` = ? AND";
-			array_push( $val, $Contests->getRecommended() );
+			array_push( $val, $Contests->recommended );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -265,31 +265,31 @@ abstract class ContestsDAOBase extends DAO
 	{
 		$sql = "UPDATE Contests SET  `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `window_length` = ?, `director_id` = ?, `rerun_id` = ?, `public` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `urgent` = ?, `contestant_must_register` = ?, `languages` = ?, `recommended` = ? WHERE  `contest_id` = ?;";
 		$params = array(
-			$Contests->getTitle(),
-			$Contests->getDescription(),
-			$Contests->getStartTime(),
-			$Contests->getFinishTime(),
-			$Contests->getWindowLength(),
-			$Contests->getDirectorId(),
-			$Contests->getRerunId(),
-			$Contests->getPublic(),
-			$Contests->getAlias(),
-			$Contests->getScoreboard(),
-			$Contests->getPointsDecayFactor(),
-			$Contests->getPartialScore(),
-			$Contests->getSubmissionsGap(),
-			$Contests->getFeedback(),
-			$Contests->getPenalty(),
-			$Contests->getPenaltyType(),
-			$Contests->getPenaltyCalcPolicy(),
-			$Contests->getShowScoreboardAfter(),
-			$Contests->getScoreboardUrl(),
-			$Contests->getScoreboardUrlAdmin(),
-			$Contests->getUrgent(),
-			$Contests->getContestantMustRegister(),
-			$Contests->getLanguages(),
-			$Contests->getRecommended(),
-			$Contests->getContestId(), );
+			$Contests->title,
+			$Contests->description,
+			$Contests->start_time,
+			$Contests->finish_time,
+			$Contests->window_length,
+			$Contests->director_id,
+			$Contests->rerun_id,
+			$Contests->public,
+			$Contests->alias,
+			$Contests->scoreboard,
+			$Contests->points_decay_factor,
+			$Contests->partial_score,
+			$Contests->submissions_gap,
+			$Contests->feedback,
+			$Contests->penalty,
+			$Contests->penalty_type,
+			$Contests->penalty_calc_policy,
+			$Contests->show_scoreboard_after,
+			$Contests->scoreboard_url,
+			$Contests->scoreboard_url_admin,
+			$Contests->urgent,
+			$Contests->contestant_must_register,
+			$Contests->languages,
+			$Contests->recommended,
+			$Contests->contest_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -374,15 +374,15 @@ abstract class ContestsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -395,7 +395,7 @@ abstract class ContestsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contests WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $ContestsA->getContestId()) ) ) & ( ! is_null ( ($b = $ContestsB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->contest_id) ) ) & ( ! is_null ( ($b = $ContestsB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -405,7 +405,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getTitle()) ) ) & ( ! is_null ( ($b = $ContestsB->getTitle()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->title) ) ) & ( ! is_null ( ($b = $ContestsB->title) ) ) ){
 				$sql .= " `title` >= ? AND `title` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -415,7 +415,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getDescription()) ) ) & ( ! is_null ( ($b = $ContestsB->getDescription()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->description) ) ) & ( ! is_null ( ($b = $ContestsB->description) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -425,7 +425,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getStartTime()) ) ) & ( ! is_null ( ($b = $ContestsB->getStartTime()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->start_time) ) ) & ( ! is_null ( ($b = $ContestsB->start_time) ) ) ){
 				$sql .= " `start_time` >= ? AND `start_time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -435,7 +435,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getFinishTime()) ) ) & ( ! is_null ( ($b = $ContestsB->getFinishTime()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->finish_time) ) ) & ( ! is_null ( ($b = $ContestsB->finish_time) ) ) ){
 				$sql .= " `finish_time` >= ? AND `finish_time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -445,7 +445,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getWindowLength()) ) ) & ( ! is_null ( ($b = $ContestsB->getWindowLength()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->window_length) ) ) & ( ! is_null ( ($b = $ContestsB->window_length) ) ) ){
 				$sql .= " `window_length` >= ? AND `window_length` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -455,7 +455,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getDirectorId()) ) ) & ( ! is_null ( ($b = $ContestsB->getDirectorId()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->director_id) ) ) & ( ! is_null ( ($b = $ContestsB->director_id) ) ) ){
 				$sql .= " `director_id` >= ? AND `director_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -465,7 +465,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getRerunId()) ) ) & ( ! is_null ( ($b = $ContestsB->getRerunId()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->rerun_id) ) ) & ( ! is_null ( ($b = $ContestsB->rerun_id) ) ) ){
 				$sql .= " `rerun_id` >= ? AND `rerun_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -475,7 +475,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getPublic()) ) ) & ( ! is_null ( ($b = $ContestsB->getPublic()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->public) ) ) & ( ! is_null ( ($b = $ContestsB->public) ) ) ){
 				$sql .= " `public` >= ? AND `public` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -485,7 +485,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getAlias()) ) ) & ( ! is_null ( ($b = $ContestsB->getAlias()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->alias) ) ) & ( ! is_null ( ($b = $ContestsB->alias) ) ) ){
 				$sql .= " `alias` >= ? AND `alias` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -495,7 +495,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getScoreboard()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboard()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->scoreboard) ) ) & ( ! is_null ( ($b = $ContestsB->scoreboard) ) ) ){
 				$sql .= " `scoreboard` >= ? AND `scoreboard` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -505,7 +505,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getPointsDecayFactor()) ) ) & ( ! is_null ( ($b = $ContestsB->getPointsDecayFactor()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->points_decay_factor) ) ) & ( ! is_null ( ($b = $ContestsB->points_decay_factor) ) ) ){
 				$sql .= " `points_decay_factor` >= ? AND `points_decay_factor` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -515,7 +515,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getPartialScore()) ) ) & ( ! is_null ( ($b = $ContestsB->getPartialScore()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->partial_score) ) ) & ( ! is_null ( ($b = $ContestsB->partial_score) ) ) ){
 				$sql .= " `partial_score` >= ? AND `partial_score` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -525,7 +525,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getSubmissionsGap()) ) ) & ( ! is_null ( ($b = $ContestsB->getSubmissionsGap()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->submissions_gap) ) ) & ( ! is_null ( ($b = $ContestsB->submissions_gap) ) ) ){
 				$sql .= " `submissions_gap` >= ? AND `submissions_gap` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -535,7 +535,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getFeedback()) ) ) & ( ! is_null ( ($b = $ContestsB->getFeedback()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->feedback) ) ) & ( ! is_null ( ($b = $ContestsB->feedback) ) ) ){
 				$sql .= " `feedback` >= ? AND `feedback` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -545,7 +545,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getPenalty()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenalty()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->penalty) ) ) & ( ! is_null ( ($b = $ContestsB->penalty) ) ) ){
 				$sql .= " `penalty` >= ? AND `penalty` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -555,7 +555,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getPenaltyType()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenaltyType()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->penalty_type) ) ) & ( ! is_null ( ($b = $ContestsB->penalty_type) ) ) ){
 				$sql .= " `penalty_type` >= ? AND `penalty_type` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -565,7 +565,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getPenaltyCalcPolicy()) ) ) & ( ! is_null ( ($b = $ContestsB->getPenaltyCalcPolicy()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->penalty_calc_policy) ) ) & ( ! is_null ( ($b = $ContestsB->penalty_calc_policy) ) ) ){
 				$sql .= " `penalty_calc_policy` >= ? AND `penalty_calc_policy` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -575,7 +575,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getShowScoreboardAfter()) ) ) & ( ! is_null ( ($b = $ContestsB->getShowScoreboardAfter()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->show_scoreboard_after) ) ) & ( ! is_null ( ($b = $ContestsB->show_scoreboard_after) ) ) ){
 				$sql .= " `show_scoreboard_after` >= ? AND `show_scoreboard_after` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -585,7 +585,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getScoreboardUrl()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboardUrl()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->scoreboard_url) ) ) & ( ! is_null ( ($b = $ContestsB->scoreboard_url) ) ) ){
 				$sql .= " `scoreboard_url` >= ? AND `scoreboard_url` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -595,7 +595,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getScoreboardUrlAdmin()) ) ) & ( ! is_null ( ($b = $ContestsB->getScoreboardUrlAdmin()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->scoreboard_url_admin) ) ) & ( ! is_null ( ($b = $ContestsB->scoreboard_url_admin) ) ) ){
 				$sql .= " `scoreboard_url_admin` >= ? AND `scoreboard_url_admin` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -605,7 +605,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getUrgent()) ) ) & ( ! is_null ( ($b = $ContestsB->getUrgent()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->urgent) ) ) & ( ! is_null ( ($b = $ContestsB->urgent) ) ) ){
 				$sql .= " `urgent` >= ? AND `urgent` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -615,7 +615,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getContestantMustRegister()) ) ) & ( ! is_null ( ($b = $ContestsB->getContestantMustRegister()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->contestant_must_register) ) ) & ( ! is_null ( ($b = $ContestsB->contestant_must_register) ) ) ){
 				$sql .= " `contestant_must_register` >= ? AND `contestant_must_register` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -625,7 +625,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getLanguages()) ) ) & ( ! is_null ( ($b = $ContestsB->getLanguages()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->languages) ) ) & ( ! is_null ( ($b = $ContestsB->languages) ) ) ){
 				$sql .= " `languages` >= ? AND `languages` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -635,7 +635,7 @@ abstract class ContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ContestsA->getRecommended()) ) ) & ( ! is_null ( ($b = $ContestsB->getRecommended()) ) ) ){
+		if( ( !is_null (($a = $ContestsA->recommended) ) ) & ( ! is_null ( ($b = $ContestsB->recommended) ) ) ){
 				$sql .= " `recommended` >= ? AND `recommended` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -673,9 +673,9 @@ abstract class ContestsDAOBase extends DAO
 	  **/
 	public static final function delete( $Contests )
 	{
-		if( is_null( self::getByPK($Contests->getContestId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Contests->contest_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Contests WHERE  contest_id = ?;";
-		$params = array( $Contests->getContestId() );
+		$params = array( $Contests->contest_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

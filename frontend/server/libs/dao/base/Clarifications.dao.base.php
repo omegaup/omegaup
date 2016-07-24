@@ -33,7 +33,7 @@ abstract class ClarificationsDAOBase extends DAO
 	  **/
 	public static final function save( $Clarifications )
 	{
-		if (!is_null(self::getByPK( $Clarifications->getClarificationId() )))
+		if (!is_null(self::getByPK( $Clarifications->clarification_id)))
 		{
 			return ClarificationsDAOBase::update( $Clarifications);
 		} else {
@@ -112,7 +112,7 @@ abstract class ClarificationsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,37 +128,37 @@ abstract class ClarificationsDAOBase extends DAO
 
 		$sql = "SELECT * from Clarifications WHERE (";
 		$val = array();
-		if (!is_null( $Clarifications->getClarificationId())) {
+		if (!is_null( $Clarifications->clarification_id)) {
 			$sql .= " `clarification_id` = ? AND";
-			array_push( $val, $Clarifications->getClarificationId() );
+			array_push( $val, $Clarifications->clarification_id );
 		}
-		if (!is_null( $Clarifications->getAuthorId())) {
+		if (!is_null( $Clarifications->author_id)) {
 			$sql .= " `author_id` = ? AND";
-			array_push( $val, $Clarifications->getAuthorId() );
+			array_push( $val, $Clarifications->author_id );
 		}
-		if (!is_null( $Clarifications->getMessage())) {
+		if (!is_null( $Clarifications->message)) {
 			$sql .= " `message` = ? AND";
-			array_push( $val, $Clarifications->getMessage() );
+			array_push( $val, $Clarifications->message );
 		}
-		if (!is_null( $Clarifications->getAnswer())) {
+		if (!is_null( $Clarifications->answer)) {
 			$sql .= " `answer` = ? AND";
-			array_push( $val, $Clarifications->getAnswer() );
+			array_push( $val, $Clarifications->answer );
 		}
-		if (!is_null( $Clarifications->getTime())) {
+		if (!is_null( $Clarifications->time)) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $Clarifications->getTime() );
+			array_push( $val, $Clarifications->time );
 		}
-		if (!is_null( $Clarifications->getProblemId())) {
+		if (!is_null( $Clarifications->problem_id)) {
 			$sql .= " `problem_id` = ? AND";
-			array_push( $val, $Clarifications->getProblemId() );
+			array_push( $val, $Clarifications->problem_id );
 		}
-		if (!is_null( $Clarifications->getContestId())) {
+		if (!is_null( $Clarifications->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Clarifications->getContestId() );
+			array_push( $val, $Clarifications->contest_id );
 		}
-		if (!is_null( $Clarifications->getPublic())) {
+		if (!is_null( $Clarifications->public)) {
 			$sql .= " `public` = ? AND";
-			array_push( $val, $Clarifications->getPublic() );
+			array_push( $val, $Clarifications->public );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -197,14 +197,14 @@ abstract class ClarificationsDAOBase extends DAO
 	{
 		$sql = "UPDATE Clarifications SET  `author_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `contest_id` = ?, `public` = ? WHERE  `clarification_id` = ?;";
 		$params = array(
-			$Clarifications->getAuthorId(),
-			$Clarifications->getMessage(),
-			$Clarifications->getAnswer(),
-			$Clarifications->getTime(),
-			$Clarifications->getProblemId(),
-			$Clarifications->getContestId(),
-			$Clarifications->getPublic(),
-			$Clarifications->getClarificationId(), );
+			$Clarifications->author_id,
+			$Clarifications->message,
+			$Clarifications->answer,
+			$Clarifications->time,
+			$Clarifications->problem_id,
+			$Clarifications->contest_id,
+			$Clarifications->public,
+			$Clarifications->clarification_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -262,15 +262,15 @@ abstract class ClarificationsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -283,7 +283,7 @@ abstract class ClarificationsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Clarifications WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $ClarificationsA->getClarificationId()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getClarificationId()) ) ) ){
+		if( ( !is_null (($a = $ClarificationsA->clarification_id) ) ) & ( ! is_null ( ($b = $ClarificationsB->clarification_id) ) ) ){
 				$sql .= " `clarification_id` >= ? AND `clarification_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -293,7 +293,7 @@ abstract class ClarificationsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ClarificationsA->getAuthorId()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getAuthorId()) ) ) ){
+		if( ( !is_null (($a = $ClarificationsA->author_id) ) ) & ( ! is_null ( ($b = $ClarificationsB->author_id) ) ) ){
 				$sql .= " `author_id` >= ? AND `author_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -303,7 +303,7 @@ abstract class ClarificationsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ClarificationsA->getMessage()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getMessage()) ) ) ){
+		if( ( !is_null (($a = $ClarificationsA->message) ) ) & ( ! is_null ( ($b = $ClarificationsB->message) ) ) ){
 				$sql .= " `message` >= ? AND `message` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -313,7 +313,7 @@ abstract class ClarificationsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ClarificationsA->getAnswer()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getAnswer()) ) ) ){
+		if( ( !is_null (($a = $ClarificationsA->answer) ) ) & ( ! is_null ( ($b = $ClarificationsB->answer) ) ) ){
 				$sql .= " `answer` >= ? AND `answer` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -323,7 +323,7 @@ abstract class ClarificationsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ClarificationsA->getTime()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getTime()) ) ) ){
+		if( ( !is_null (($a = $ClarificationsA->time) ) ) & ( ! is_null ( ($b = $ClarificationsB->time) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -333,7 +333,7 @@ abstract class ClarificationsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ClarificationsA->getProblemId()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getProblemId()) ) ) ){
+		if( ( !is_null (($a = $ClarificationsA->problem_id) ) ) & ( ! is_null ( ($b = $ClarificationsB->problem_id) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -343,7 +343,7 @@ abstract class ClarificationsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ClarificationsA->getContestId()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $ClarificationsA->contest_id) ) ) & ( ! is_null ( ($b = $ClarificationsB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -353,7 +353,7 @@ abstract class ClarificationsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $ClarificationsA->getPublic()) ) ) & ( ! is_null ( ($b = $ClarificationsB->getPublic()) ) ) ){
+		if( ( !is_null (($a = $ClarificationsA->public) ) ) & ( ! is_null ( ($b = $ClarificationsB->public) ) ) ){
 				$sql .= " `public` >= ? AND `public` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -391,9 +391,9 @@ abstract class ClarificationsDAOBase extends DAO
 	  **/
 	public static final function delete( $Clarifications )
 	{
-		if( is_null( self::getByPK($Clarifications->getClarificationId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Clarifications->clarification_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Clarifications WHERE  clarification_id = ?;";
-		$params = array( $Clarifications->getClarificationId() );
+		$params = array( $Clarifications->clarification_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

@@ -89,19 +89,6 @@
 				return $new;
 			}
 
-			function __call($method, $params) {
-				 $var = substr($method, 3);
-				 $var = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $var));
-
-				 if (strncasecmp($method, "get", 3)==0) {
-					 return $this->$var;
-				 } else if (strncasecmp($method, "set", 3)==0) {
-					 $this->$var = $params[0];
-				 } else {
-					 throw new BadMethodCallException($method);
-				 }
-			}
-
 		public function asFilteredArray($filters)
 		{
 			// Get the complete representation of the array

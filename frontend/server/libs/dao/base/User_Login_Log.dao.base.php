@@ -84,7 +84,7 @@ abstract class UserLoginLogDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -100,17 +100,17 @@ abstract class UserLoginLogDAOBase extends DAO
 
 		$sql = "SELECT * from User_Login_Log WHERE (";
 		$val = array();
-		if (!is_null( $User_Login_Log->getUserId())) {
+		if (!is_null( $User_Login_Log->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $User_Login_Log->getUserId() );
+			array_push( $val, $User_Login_Log->user_id );
 		}
-		if (!is_null( $User_Login_Log->getIp())) {
+		if (!is_null( $User_Login_Log->ip)) {
 			$sql .= " `ip` = ? AND";
-			array_push( $val, $User_Login_Log->getIp() );
+			array_push( $val, $User_Login_Log->ip );
 		}
-		if (!is_null( $User_Login_Log->getTime())) {
+		if (!is_null( $User_Login_Log->time)) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $User_Login_Log->getTime() );
+			array_push( $val, $User_Login_Log->time );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -184,15 +184,15 @@ abstract class UserLoginLogDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -205,7 +205,7 @@ abstract class UserLoginLogDAOBase extends DAO
 	{
 		$sql = "SELECT * from User_Login_Log WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $User_Login_LogA->getUserId()) ) ) & ( ! is_null ( ($b = $User_Login_LogB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $User_Login_LogA->user_id) ) ) & ( ! is_null ( ($b = $User_Login_LogB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -215,7 +215,7 @@ abstract class UserLoginLogDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_Login_LogA->getIp()) ) ) & ( ! is_null ( ($b = $User_Login_LogB->getIp()) ) ) ){
+		if( ( !is_null (($a = $User_Login_LogA->ip) ) ) & ( ! is_null ( ($b = $User_Login_LogB->ip) ) ) ){
 				$sql .= " `ip` >= ? AND `ip` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -225,7 +225,7 @@ abstract class UserLoginLogDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_Login_LogA->getTime()) ) ) & ( ! is_null ( ($b = $User_Login_LogB->getTime()) ) ) ){
+		if( ( !is_null (($a = $User_Login_LogA->time) ) ) & ( ! is_null ( ($b = $User_Login_LogB->time) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -248,4 +248,3 @@ abstract class UserLoginLogDAOBase extends DAO
 		return $ar;
 	}
 }
-

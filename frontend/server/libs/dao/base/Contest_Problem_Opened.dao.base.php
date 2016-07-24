@@ -33,7 +33,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	  **/
 	public static final function save( $Contest_Problem_Opened )
 	{
-		if (!is_null(self::getByPK( $Contest_Problem_Opened->getContestId() , $Contest_Problem_Opened->getProblemId() , $Contest_Problem_Opened->getUserId() )))
+		if (!is_null(self::getByPK( $Contest_Problem_Opened->contest_id, $Contest_Problem_Opened->problem_id, $Contest_Problem_Opened->user_id)))
 		{
 			return ContestProblemOpenedDAOBase::update( $Contest_Problem_Opened);
 		} else {
@@ -112,7 +112,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,21 +128,21 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 
 		$sql = "SELECT * from Contest_Problem_Opened WHERE (";
 		$val = array();
-		if (!is_null( $Contest_Problem_Opened->getContestId())) {
+		if (!is_null( $Contest_Problem_Opened->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Contest_Problem_Opened->getContestId() );
+			array_push( $val, $Contest_Problem_Opened->contest_id );
 		}
-		if (!is_null( $Contest_Problem_Opened->getProblemId())) {
+		if (!is_null( $Contest_Problem_Opened->problem_id)) {
 			$sql .= " `problem_id` = ? AND";
-			array_push( $val, $Contest_Problem_Opened->getProblemId() );
+			array_push( $val, $Contest_Problem_Opened->problem_id );
 		}
-		if (!is_null( $Contest_Problem_Opened->getUserId())) {
+		if (!is_null( $Contest_Problem_Opened->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Contest_Problem_Opened->getUserId() );
+			array_push( $val, $Contest_Problem_Opened->user_id );
 		}
-		if (!is_null( $Contest_Problem_Opened->getOpenTime())) {
+		if (!is_null( $Contest_Problem_Opened->open_time)) {
 			$sql .= " `open_time` = ? AND";
-			array_push( $val, $Contest_Problem_Opened->getOpenTime() );
+			array_push( $val, $Contest_Problem_Opened->open_time );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -181,8 +181,8 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	{
 		$sql = "UPDATE Contest_Problem_Opened SET  `open_time` = ? WHERE  `contest_id` = ? AND `problem_id` = ? AND `user_id` = ?;";
 		$params = array(
-			$Contest_Problem_Opened->getOpenTime(),
-			$Contest_Problem_Opened->getContestId(),$Contest_Problem_Opened->getProblemId(),$Contest_Problem_Opened->getUserId(), );
+			$Contest_Problem_Opened->open_time,
+			$Contest_Problem_Opened->contest_id,$Contest_Problem_Opened->problem_id,$Contest_Problem_Opened->user_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -234,15 +234,15 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -255,7 +255,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contest_Problem_Opened WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Contest_Problem_OpenedA->getContestId()) ) ) & ( ! is_null ( ($b = $Contest_Problem_OpenedB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $Contest_Problem_OpenedA->contest_id) ) ) & ( ! is_null ( ($b = $Contest_Problem_OpenedB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -265,7 +265,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_Problem_OpenedA->getProblemId()) ) ) & ( ! is_null ( ($b = $Contest_Problem_OpenedB->getProblemId()) ) ) ){
+		if( ( !is_null (($a = $Contest_Problem_OpenedA->problem_id) ) ) & ( ! is_null ( ($b = $Contest_Problem_OpenedB->problem_id) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -275,7 +275,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_Problem_OpenedA->getUserId()) ) ) & ( ! is_null ( ($b = $Contest_Problem_OpenedB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $Contest_Problem_OpenedA->user_id) ) ) & ( ! is_null ( ($b = $Contest_Problem_OpenedB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -285,7 +285,7 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contest_Problem_OpenedA->getOpenTime()) ) ) & ( ! is_null ( ($b = $Contest_Problem_OpenedB->getOpenTime()) ) ) ){
+		if( ( !is_null (($a = $Contest_Problem_OpenedA->open_time) ) ) & ( ! is_null ( ($b = $Contest_Problem_OpenedB->open_time) ) ) ){
 				$sql .= " `open_time` >= ? AND `open_time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -323,9 +323,9 @@ abstract class ContestProblemOpenedDAOBase extends DAO
 	  **/
 	public static final function delete( $Contest_Problem_Opened )
 	{
-		if( is_null( self::getByPK($Contest_Problem_Opened->getContestId(), $Contest_Problem_Opened->getProblemId(), $Contest_Problem_Opened->getUserId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Contest_Problem_Opened->contest_id, $Contest_Problem_Opened->problem_id, $Contest_Problem_Opened->user_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Contest_Problem_Opened WHERE  contest_id = ? AND problem_id = ? AND user_id = ?;";
-		$params = array( $Contest_Problem_Opened->getContestId(), $Contest_Problem_Opened->getProblemId(), $Contest_Problem_Opened->getUserId() );
+		$params = array( $Contest_Problem_Opened->contest_id, $Contest_Problem_Opened->problem_id, $Contest_Problem_Opened->user_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

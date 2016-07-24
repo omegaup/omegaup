@@ -10,7 +10,7 @@
 
 /** Value Object file for table Groups.
   *
-  * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
+  * VO does not have any behaviour.
   * @access public
   *
   */

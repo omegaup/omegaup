@@ -33,7 +33,7 @@ abstract class GroupRolesDAOBase extends DAO
 	  **/
 	public static final function save( $Group_Roles )
 	{
-		if (!is_null(self::getByPK( $Group_Roles->getGroupId() , $Group_Roles->getRoleId() , $Group_Roles->getContestId() )))
+		if (!is_null(self::getByPK( $Group_Roles->group_id, $Group_Roles->role_id, $Group_Roles->contest_id)))
 		{
 			return GroupRolesDAOBase::update( $Group_Roles);
 		} else {
@@ -112,7 +112,7 @@ abstract class GroupRolesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class GroupRolesDAOBase extends DAO
 
 		$sql = "SELECT * from Group_Roles WHERE (";
 		$val = array();
-		if (!is_null( $Group_Roles->getGroupId())) {
+		if (!is_null( $Group_Roles->group_id)) {
 			$sql .= " `group_id` = ? AND";
-			array_push( $val, $Group_Roles->getGroupId() );
+			array_push( $val, $Group_Roles->group_id );
 		}
-		if (!is_null( $Group_Roles->getRoleId())) {
+		if (!is_null( $Group_Roles->role_id)) {
 			$sql .= " `role_id` = ? AND";
-			array_push( $val, $Group_Roles->getRoleId() );
+			array_push( $val, $Group_Roles->role_id );
 		}
-		if (!is_null( $Group_Roles->getContestId())) {
+		if (!is_null( $Group_Roles->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Group_Roles->getContestId() );
+			array_push( $val, $Group_Roles->contest_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -222,15 +222,15 @@ abstract class GroupRolesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -243,7 +243,7 @@ abstract class GroupRolesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Group_Roles WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Group_RolesA->getGroupId()) ) ) & ( ! is_null ( ($b = $Group_RolesB->getGroupId()) ) ) ){
+		if( ( !is_null (($a = $Group_RolesA->group_id) ) ) & ( ! is_null ( ($b = $Group_RolesB->group_id) ) ) ){
 				$sql .= " `group_id` >= ? AND `group_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -253,7 +253,7 @@ abstract class GroupRolesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Group_RolesA->getRoleId()) ) ) & ( ! is_null ( ($b = $Group_RolesB->getRoleId()) ) ) ){
+		if( ( !is_null (($a = $Group_RolesA->role_id) ) ) & ( ! is_null ( ($b = $Group_RolesB->role_id) ) ) ){
 				$sql .= " `role_id` >= ? AND `role_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -263,7 +263,7 @@ abstract class GroupRolesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Group_RolesA->getContestId()) ) ) & ( ! is_null ( ($b = $Group_RolesB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $Group_RolesA->contest_id) ) ) & ( ! is_null ( ($b = $Group_RolesB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -301,9 +301,9 @@ abstract class GroupRolesDAOBase extends DAO
 	  **/
 	public static final function delete( $Group_Roles )
 	{
-		if( is_null( self::getByPK($Group_Roles->getGroupId(), $Group_Roles->getRoleId(), $Group_Roles->getContestId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Group_Roles->group_id, $Group_Roles->role_id, $Group_Roles->contest_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Group_Roles WHERE  group_id = ? AND role_id = ? AND contest_id = ?;";
-		$params = array( $Group_Roles->getGroupId(), $Group_Roles->getRoleId(), $Group_Roles->getContestId() );
+		$params = array( $Group_Roles->group_id, $Group_Roles->role_id, $Group_Roles->contest_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

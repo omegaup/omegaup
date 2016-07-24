@@ -33,7 +33,7 @@ abstract class CountriesDAOBase extends DAO
 	  **/
 	public static final function save( $Countries )
 	{
-		if (!is_null(self::getByPK( $Countries->getCountryId() )))
+		if (!is_null(self::getByPK( $Countries->country_id)))
 		{
 			return CountriesDAOBase::update( $Countries);
 		} else {
@@ -112,7 +112,7 @@ abstract class CountriesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,13 +128,13 @@ abstract class CountriesDAOBase extends DAO
 
 		$sql = "SELECT * from Countries WHERE (";
 		$val = array();
-		if (!is_null( $Countries->getCountryId())) {
+		if (!is_null( $Countries->country_id)) {
 			$sql .= " `country_id` = ? AND";
-			array_push( $val, $Countries->getCountryId() );
+			array_push( $val, $Countries->country_id );
 		}
-		if (!is_null( $Countries->getName())) {
+		if (!is_null( $Countries->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $Countries->getName() );
+			array_push( $val, $Countries->name );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -173,8 +173,8 @@ abstract class CountriesDAOBase extends DAO
 	{
 		$sql = "UPDATE Countries SET  `name` = ? WHERE  `country_id` = ?;";
 		$params = array(
-			$Countries->getName(),
-			$Countries->getCountryId(), );
+			$Countries->name,
+			$Countries->country_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -223,15 +223,15 @@ abstract class CountriesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -244,7 +244,7 @@ abstract class CountriesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Countries WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $CountriesA->getCountryId()) ) ) & ( ! is_null ( ($b = $CountriesB->getCountryId()) ) ) ){
+		if( ( !is_null (($a = $CountriesA->country_id) ) ) & ( ! is_null ( ($b = $CountriesB->country_id) ) ) ){
 				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -254,7 +254,7 @@ abstract class CountriesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $CountriesA->getName()) ) ) & ( ! is_null ( ($b = $CountriesB->getName()) ) ) ){
+		if( ( !is_null (($a = $CountriesA->name) ) ) & ( ! is_null ( ($b = $CountriesB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -292,9 +292,9 @@ abstract class CountriesDAOBase extends DAO
 	  **/
 	public static final function delete( $Countries )
 	{
-		if( is_null( self::getByPK($Countries->getCountryId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Countries->country_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Countries WHERE  country_id = ?;";
-		$params = array( $Countries->getCountryId() );
+		$params = array( $Countries->country_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

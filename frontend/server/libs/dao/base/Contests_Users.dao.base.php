@@ -33,7 +33,7 @@ abstract class ContestsUsersDAOBase extends DAO
 	  **/
 	public static final function save( $Contests_Users )
 	{
-		if (!is_null(self::getByPK( $Contests_Users->getUserId() , $Contests_Users->getContestId() )))
+		if (!is_null(self::getByPK( $Contests_Users->user_id, $Contests_Users->contest_id)))
 		{
 			return ContestsUsersDAOBase::update( $Contests_Users);
 		} else {
@@ -112,7 +112,7 @@ abstract class ContestsUsersDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,25 +128,25 @@ abstract class ContestsUsersDAOBase extends DAO
 
 		$sql = "SELECT * from Contests_Users WHERE (";
 		$val = array();
-		if (!is_null( $Contests_Users->getUserId())) {
+		if (!is_null( $Contests_Users->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Contests_Users->getUserId() );
+			array_push( $val, $Contests_Users->user_id );
 		}
-		if (!is_null( $Contests_Users->getContestId())) {
+		if (!is_null( $Contests_Users->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Contests_Users->getContestId() );
+			array_push( $val, $Contests_Users->contest_id );
 		}
-		if (!is_null( $Contests_Users->getAccessTime())) {
+		if (!is_null( $Contests_Users->access_time)) {
 			$sql .= " `access_time` = ? AND";
-			array_push( $val, $Contests_Users->getAccessTime() );
+			array_push( $val, $Contests_Users->access_time );
 		}
-		if (!is_null( $Contests_Users->getScore())) {
+		if (!is_null( $Contests_Users->score)) {
 			$sql .= " `score` = ? AND";
-			array_push( $val, $Contests_Users->getScore() );
+			array_push( $val, $Contests_Users->score );
 		}
-		if (!is_null( $Contests_Users->getTime())) {
+		if (!is_null( $Contests_Users->time)) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $Contests_Users->getTime() );
+			array_push( $val, $Contests_Users->time );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -185,10 +185,10 @@ abstract class ContestsUsersDAOBase extends DAO
 	{
 		$sql = "UPDATE Contests_Users SET  `access_time` = ?, `score` = ?, `time` = ? WHERE  `user_id` = ? AND `contest_id` = ?;";
 		$params = array(
-			$Contests_Users->getAccessTime(),
-			$Contests_Users->getScore(),
-			$Contests_Users->getTime(),
-			$Contests_Users->getUserId(),$Contests_Users->getContestId(), );
+			$Contests_Users->access_time,
+			$Contests_Users->score,
+			$Contests_Users->time,
+			$Contests_Users->user_id,$Contests_Users->contest_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -243,15 +243,15 @@ abstract class ContestsUsersDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -264,7 +264,7 @@ abstract class ContestsUsersDAOBase extends DAO
 	{
 		$sql = "SELECT * from Contests_Users WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Contests_UsersA->getUserId()) ) ) & ( ! is_null ( ($b = $Contests_UsersB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $Contests_UsersA->user_id) ) ) & ( ! is_null ( ($b = $Contests_UsersB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -274,7 +274,7 @@ abstract class ContestsUsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contests_UsersA->getContestId()) ) ) & ( ! is_null ( ($b = $Contests_UsersB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $Contests_UsersA->contest_id) ) ) & ( ! is_null ( ($b = $Contests_UsersB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -284,7 +284,7 @@ abstract class ContestsUsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contests_UsersA->getAccessTime()) ) ) & ( ! is_null ( ($b = $Contests_UsersB->getAccessTime()) ) ) ){
+		if( ( !is_null (($a = $Contests_UsersA->access_time) ) ) & ( ! is_null ( ($b = $Contests_UsersB->access_time) ) ) ){
 				$sql .= " `access_time` >= ? AND `access_time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -294,7 +294,7 @@ abstract class ContestsUsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contests_UsersA->getScore()) ) ) & ( ! is_null ( ($b = $Contests_UsersB->getScore()) ) ) ){
+		if( ( !is_null (($a = $Contests_UsersA->score) ) ) & ( ! is_null ( ($b = $Contests_UsersB->score) ) ) ){
 				$sql .= " `score` >= ? AND `score` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -304,7 +304,7 @@ abstract class ContestsUsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Contests_UsersA->getTime()) ) ) & ( ! is_null ( ($b = $Contests_UsersB->getTime()) ) ) ){
+		if( ( !is_null (($a = $Contests_UsersA->time) ) ) & ( ! is_null ( ($b = $Contests_UsersB->time) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -342,9 +342,9 @@ abstract class ContestsUsersDAOBase extends DAO
 	  **/
 	public static final function delete( $Contests_Users )
 	{
-		if( is_null( self::getByPK($Contests_Users->getUserId(), $Contests_Users->getContestId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Contests_Users->user_id, $Contests_Users->contest_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Contests_Users WHERE  user_id = ? AND contest_id = ?;";
-		$params = array( $Contests_Users->getUserId(), $Contests_Users->getContestId() );
+		$params = array( $Contests_Users->user_id, $Contests_Users->contest_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

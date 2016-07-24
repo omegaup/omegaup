@@ -33,7 +33,7 @@ abstract class RunCountsDAOBase extends DAO
 	  **/
 	public static final function save( $Run_Counts )
 	{
-		if (!is_null(self::getByPK( $Run_Counts->getDate() )))
+		if (!is_null(self::getByPK( $Run_Counts->date)))
 		{
 			return RunCountsDAOBase::update( $Run_Counts);
 		} else {
@@ -112,7 +112,7 @@ abstract class RunCountsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class RunCountsDAOBase extends DAO
 
 		$sql = "SELECT * from Run_Counts WHERE (";
 		$val = array();
-		if (!is_null( $Run_Counts->getDate())) {
+		if (!is_null( $Run_Counts->date)) {
 			$sql .= " `date` = ? AND";
-			array_push( $val, $Run_Counts->getDate() );
+			array_push( $val, $Run_Counts->date );
 		}
-		if (!is_null( $Run_Counts->getTotal())) {
+		if (!is_null( $Run_Counts->total)) {
 			$sql .= " `total` = ? AND";
-			array_push( $val, $Run_Counts->getTotal() );
+			array_push( $val, $Run_Counts->total );
 		}
-		if (!is_null( $Run_Counts->getAcCount())) {
+		if (!is_null( $Run_Counts->ac_count)) {
 			$sql .= " `ac_count` = ? AND";
-			array_push( $val, $Run_Counts->getAcCount() );
+			array_push( $val, $Run_Counts->ac_count );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -177,9 +177,9 @@ abstract class RunCountsDAOBase extends DAO
 	{
 		$sql = "UPDATE Run_Counts SET  `total` = ?, `ac_count` = ? WHERE  `date` = ?;";
 		$params = array(
-			$Run_Counts->getTotal(),
-			$Run_Counts->getAcCount(),
-			$Run_Counts->getDate(), );
+			$Run_Counts->total,
+			$Run_Counts->ac_count,
+			$Run_Counts->date, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -231,15 +231,15 @@ abstract class RunCountsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -252,7 +252,7 @@ abstract class RunCountsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Run_Counts WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Run_CountsA->getDate()) ) ) & ( ! is_null ( ($b = $Run_CountsB->getDate()) ) ) ){
+		if( ( !is_null (($a = $Run_CountsA->date) ) ) & ( ! is_null ( ($b = $Run_CountsB->date) ) ) ){
 				$sql .= " `date` >= ? AND `date` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -262,7 +262,7 @@ abstract class RunCountsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Run_CountsA->getTotal()) ) ) & ( ! is_null ( ($b = $Run_CountsB->getTotal()) ) ) ){
+		if( ( !is_null (($a = $Run_CountsA->total) ) ) & ( ! is_null ( ($b = $Run_CountsB->total) ) ) ){
 				$sql .= " `total` >= ? AND `total` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -272,7 +272,7 @@ abstract class RunCountsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Run_CountsA->getAcCount()) ) ) & ( ! is_null ( ($b = $Run_CountsB->getAcCount()) ) ) ){
+		if( ( !is_null (($a = $Run_CountsA->ac_count) ) ) & ( ! is_null ( ($b = $Run_CountsB->ac_count) ) ) ){
 				$sql .= " `ac_count` >= ? AND `ac_count` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -310,9 +310,9 @@ abstract class RunCountsDAOBase extends DAO
 	  **/
 	public static final function delete( $Run_Counts )
 	{
-		if( is_null( self::getByPK($Run_Counts->getDate()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Run_Counts->date) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Run_Counts WHERE  date = ?;";
-		$params = array( $Run_Counts->getDate() );
+		$params = array( $Run_Counts->date );
 		global $conn;
 
 		$conn->Execute($sql, $params);
