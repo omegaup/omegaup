@@ -29,6 +29,7 @@ class ClarificationController extends Controller {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
         Validators::isStringNonEmpty($r['message'], 'message');
+        Validators::isStringOfMaxLength($r['message'], 'message', 200);
 
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);

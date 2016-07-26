@@ -8,10 +8,10 @@
 
 class CreateClarificationTest extends OmegaupTestCase {
     /**
-     * Creates a valid clarification
+     * Helper function to setup environment needed to create a clarification
      */
-    public function testCreateValidClarification() {
-        // Get a problem
+    private function setupContest(&$problemData, &$contestData, &$contestant, $isGraderExpectedToBeCalled = true) {
+         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
@@ -23,8 +23,23 @@ class CreateClarificationTest extends OmegaupTestCase {
         // Create our contestant who will submit the clarification
         $contestant = UserFactory::createUser();
 
-        // Call the API
-        $this->detourBroadcasterCalls();
+        // Call the API avoiding the broadcaster logic
+        if ($isGraderExpectedToBeCalled) {
+            $this->detourBroadcasterCalls();
+        }
+    }
+
+    /**
+     * Creates a valid clarification
+     */
+    public function testCreateValidClarification() {
+        $problemData = null;
+        $contestData = null;
+        $contestant = null;
+
+        // Setup contest is required to submit a clarification
+        $this->setupContest($problemData, $contestData, $contestant);
+
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
@@ -52,5 +67,26 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         $this->assertEquals($contest->contest_id, $clarification->contest_id);
         $this->assertEquals($problem->problem_id, $clarification->problem_id);
+    }
+
+    /**
+    * Creates a clarification with message too long
+    *
+    * @expectedException InvalidParameterException
+    */
+    public function testCreateClarificationMessageTooLong() {
+        $problemData = null;
+        $contestData = null;
+        $contestant = null;
+
+        // Setup contest is required to submit a clarification
+        $this->setupContest($problemData, $contestData, $contestant, false /*isGraderExpectedToBeCalled*/);
+
+        $clarificationData = ClarificationsFactory::createClarification(
+            $problemData,
+            $contestData,
+            $contestant,
+            'Lorem ipsum dolor sit amet, mauris faucibus pede congue curae nullam, mauris maecenas tincidunt amet, nec wisi vestibulum ut cras in, velit in dolor. Elit hendrerit pede auctor tincidunt neque, lorem nunc sit a vivamus nibh. Auctor habitant, etiam ut nam'
+        );
     }
 }

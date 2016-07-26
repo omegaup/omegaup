@@ -17,7 +17,8 @@ class ClarificationsFactory {
     public static function createClarification(
         $problemData,
         $contestData,
-        $contestant
+        $contestant,
+        $message = null
     ) {
         // Our contestant has to open the contest before sending a clarification
         ContestsFactory::openContest($contestData, $contestant);
@@ -27,7 +28,7 @@ class ClarificationsFactory {
 
         // Create the request for our api
         $r = new Request();
-        $r['message'] = Utils::CreateRandomString();
+        $r['message'] = ($message === null ? Utils::CreateRandomString() : $message);
         $r['contest_alias'] = $contestData['request']['alias'];
         $r['problem_alias'] = $problemData['request']['alias'];
         $r['public'] = '0';

@@ -181,7 +181,8 @@
 				{#wordsProblem#}
 				<select name="problem">
 				</select><br/>
-				<textarea name="message"></textarea><br/>
+				<label for="message">{#arenaClarificationCreateMaxLength#}</label>
+				<textarea name="message" maxlength="200"></textarea><br/>
 				<input type="submit" />
 			</form>
 {include file='arena.rundetails.tpl'}

@@ -61,6 +61,23 @@ class UserUpdateTest extends OmegaupTestCase {
         UserController::apiUpdate($r);
     }
 
+     /**
+     * Request parameter name cannot be too long
+     * @expectedException InvalidParameterException
+     */
+    public function testNameUpdateTooLong() {
+        $user = UserFactory::createUser();
+
+        $r = new Request();
+        $r['auth_token'] = $this->login($user);
+
+        // Invalid name
+        $r['name'] = 'TThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong hisIsWayTooLong ';
+        $r['country_id'] = 'MX';
+
+        UserController::apiUpdate($r);
+    }
+
     /**
      * Request parameter name cannot be empty
      * @expectedException InvalidParameterException

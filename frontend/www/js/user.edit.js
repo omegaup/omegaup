@@ -160,6 +160,11 @@ $(document).ready(function() {
 			$('#school_id').val('');
 		}
 
+		if ($('#name').val().length > 50) {
+			OmegaUp.ui.error(OmegaUp.T['userEditNameTooLong']);
+			return false;
+		}
+
 		omegaup.updateProfile(
 			$("#name").val(),
 			birth_date.getTime() / 1000,

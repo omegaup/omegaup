@@ -385,5 +385,5 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/js/user.edit.js?ver=32e4c0"></script>
+	<script type="text/javascript" src="/js/user.edit.js?ver=1ebd59"></script>
 {/block}

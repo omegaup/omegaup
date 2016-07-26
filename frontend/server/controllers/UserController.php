@@ -1478,6 +1478,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         Validators::isStringNonEmpty($r['name'], 'name', false);
+        Validators::isStringOfMaxLength($r['name'], 'name', 50);
         Validators::isStringNonEmpty($r['country_id'], 'country_id', false);
 
         if (!is_null($r['country_id'])) {
