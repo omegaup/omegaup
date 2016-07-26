@@ -4,7 +4,7 @@ OmegaUp.T = {
 	aliasInUse: "alias already exists. Please choose a different alias.",
 	apiNotFound: "Requested API endpoint not found.",
 	arenaAdminManageProblem: "Manage problem",
-	arenaClarificationCreateMaxLength: "Clarifications can't exceed 200 characters long.",
+	arenaClarificationCreateMaxLength: "Type your clarification here (Max. 200 characteres, do not paste your entire code).",
 	arenaCommonCode: "Code",
 	arenaCommonMemoryLimit: "Memory limit",
 	arenaCommonNewClarification: "New clarification",

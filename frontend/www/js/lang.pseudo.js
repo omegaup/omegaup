@@ -4,7 +4,7 @@ OmegaUp.T = {
 	aliasInUse: "(a1ia5 a1r3ady 3xi575. P13a53 ch0053 a diff3r3n7 a1ia5.)",
 	apiNotFound: "(R3qu3573d API 3ndp0in7 n07 f0und.)",
 	arenaAdminManageProblem: "(Manag3 pr0b13m)",
-	arenaClarificationCreateMaxLength: "(C1arifica7i0n5 can'7 3xc33d 200 charac73r5 10ng.)",
+	arenaClarificationCreateMaxLength: "(Typ3 y0ur c1arifica7i0n h3r3 (Max. 200 charac73r35, d0 n07 pa573 y0ur 3n7ir3 c0d3).)",
 	arenaCommonCode: "(C0d3)",
 	arenaCommonMemoryLimit: "(M3m0ry 1imi7)",
 	arenaCommonNewClarification: "(N3w c1arifica7i0n)",
