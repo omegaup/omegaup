@@ -24,7 +24,7 @@ class RunsTotalsTest extends OmegaupTestCase {
         $runDataOld = RunsFactory::createRun($problemData, $contestData, $contestant);
 
         $run = RunsDAO::getByAlias($runDataOld['response']['guid']);
-        $run->setTime(date('Y-m-d H:i:s', strtotime('-72 hours')));
+        $run->time = date('Y-m-d H:i:s', strtotime('-72 hours'));
         RunsDAO::save($run);
 
         $response = RunController::apiCounts(new Request());

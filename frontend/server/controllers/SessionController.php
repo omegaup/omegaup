@@ -145,27 +145,27 @@ class SessionController extends Controller {
         }
 
         // Get email via his id
-        $vo_Email = EmailsDAO::getByPK($vo_CurrentUser->getMainEmailId());
+        $vo_Email = EmailsDAO::getByPK($vo_CurrentUser->main_email_id);
 
         $_SESSION['omegaup_user'] = array(
-            'name' => $vo_CurrentUser->getUsername(),
-            'email' => !is_null($vo_Email) ? $vo_Email->getEmail() : ''
+            'name' => $vo_CurrentUser->username,
+            'email' => !is_null($vo_Email) ? $vo_Email->email : ''
         );
 
         return array(
             'valid' => true,
-            'id' => $vo_CurrentUser->getUserId(),
-            'name' => $vo_CurrentUser->getName(),
-            'email' => !is_null($vo_Email) ? $vo_Email->getEmail() : '',
-            'email_md5' => !is_null($vo_Email) ? md5($vo_Email->getEmail()) : '',
+            'id' => $vo_CurrentUser->user_id,
+            'name' => $vo_CurrentUser->name,
+            'email' => !is_null($vo_Email) ? $vo_Email->email : '',
+            'email_md5' => !is_null($vo_Email) ? md5($vo_Email->email) : '',
             'user' => $vo_CurrentUser,
-            'username' => $vo_CurrentUser->getUsername(),
+            'username' => $vo_CurrentUser->username,
             'auth_token' => $authToken,
-            'is_email_verified' => $vo_CurrentUser->getVerified(),
-            'is_admin' => Authorization::IsSystemAdmin($vo_CurrentUser->getUserId()),
+            'is_email_verified' => $vo_CurrentUser->verified,
+            'is_admin' => Authorization::IsSystemAdmin($vo_CurrentUser->user_id),
             'private_contests_count' => ContestsDAO::getPrivateContestsCount($vo_CurrentUser),
             'private_problems_count' => ProblemsDAO::getPrivateCount($vo_CurrentUser),
-            'needs_basic_info' =>$vo_CurrentUser->getPassword() == null
+            'needs_basic_info' =>$vo_CurrentUser->password == null
         );
     }
 
@@ -204,23 +204,23 @@ class SessionController extends Controller {
 
         //find if this user has older sessions
         $vo_AuthT = new AuthTokens();
-        $vo_AuthT->setUserId($vo_User->getUserId());
+        $vo_AuthT->user_id = $vo_User->user_id;
 
         //erase expired tokens
         try {
-            $tokens_erased = AuthTokensDAO::expireAuthTokens($vo_User->getUserId());
+            $tokens_erased = AuthTokensDAO::expireAuthTokens($vo_User->user_id);
         } catch (Exception $e) {
             // Best effort
-            self::$log->error("Failed to delete expired tokens: $e->getMessage()");
+            self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
         }
 
         // Create the new token
         $entropy = bin2hex(mcrypt_create_iv(SessionController::AUTH_TOKEN_ENTROPY_SIZE, MCRYPT_DEV_URANDOM));
-        $s_AuthT = $entropy . '-' . $vo_User->getUserId() . '-' . hash('sha256', OMEGAUP_MD5_SALT . $vo_User->getUserId() . $entropy);
+        $s_AuthT = $entropy . '-' . $vo_User->user_id . '-' . hash('sha256', OMEGAUP_MD5_SALT . $vo_User->user_id . $entropy);
 
         $vo_AuthT = new AuthTokens();
-        $vo_AuthT->setUserId($vo_User->getUserId());
-        $vo_AuthT->setToken($s_AuthT);
+        $vo_AuthT->user_id = $vo_User->user_id;
+        $vo_AuthT->token = $s_AuthT;
 
         try {
             AuthTokensDAO::save($vo_AuthT);
@@ -454,7 +454,7 @@ class SessionController extends Controller {
 
         try {
             $vo_User = UserController::resolveUser($r['usernameOrEmail']);
-            $r['user_id'] = $vo_User->getUserId();
+            $r['user_id'] = $vo_User->user_id;
             $r['user'] = $vo_User;
         } catch (ApiException $e) {
             self::$log->warn('User ' . $r['usernameOrEmail'] . ' not found.');

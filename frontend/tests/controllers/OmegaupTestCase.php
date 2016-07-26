@@ -42,7 +42,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     public function assertLogin(Users $user, $auth_token = null) {
         // Check auth token
         $authTokenKey = new AuthTokens(array(
-                    'user_id' => $user->getUserId()
+                    'user_id' => $user->user_id
                 ));
         $auth_tokens_bd = AuthTokensDAO::search($authTokenKey);
 
@@ -50,7 +50,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         if (!is_null($auth_token)) {
             $exists = false;
             foreach ($auth_tokens_bd as $token_db) {
-                if (strcmp($token_db->getToken(), $auth_token) === 0) {
+                if (strcmp($token_db->token, $auth_token) === 0) {
                     $exists = true;
                     break;
                 }
@@ -79,8 +79,8 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->getUsername(),
-                    'password' => $user->getPassword()
+                    'usernameOrEmail' => $user->username,
+                    'password' => $user->password
                 ));
 
         // Call the API
@@ -106,35 +106,35 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     public function assertContest(Request $r) {
         // Validate that data was written to DB by getting the contest by title
         $contest = new Contests();
-        $contest->setTitle($r['title']);
+        $contest->title = $r['title'];
         $contests = ContestsDAO::search($contest);
         $contest = $contests[0];
 
         // Assert that we found our contest
         $this->assertNotNull($contest);
-        $this->assertNotNull($contest->getContestId());
+        $this->assertNotNull($contest->contest_id);
 
         // Assert data was correctly saved
-        $this->assertEquals($r['description'], $contest->getDescription());
+        $this->assertEquals($r['description'], $contest->description);
 
-        $this->assertGreaterThanOrEqual($r['start_time'] - 1, Utils::GetPhpUnixTimestamp($contest->getStartTime()));
-        $this->assertGreaterThanOrEqual($r['start_time'], Utils::GetPhpUnixTimestamp($contest->getStartTime()) + 1);
+        $this->assertGreaterThanOrEqual($r['start_time'] - 1, Utils::GetPhpUnixTimestamp($contest->start_time));
+        $this->assertGreaterThanOrEqual($r['start_time'], Utils::GetPhpUnixTimestamp($contest->start_time) + 1);
 
-        $this->assertGreaterThanOrEqual($r['finish_time'] - 1, Utils::GetPhpUnixTimestamp($contest->getFinishTime()));
-        $this->assertGreaterThanOrEqual($r['finish_time'], Utils::GetPhpUnixTimestamp($contest->getFinishTime()) + 1);
+        $this->assertGreaterThanOrEqual($r['finish_time'] - 1, Utils::GetPhpUnixTimestamp($contest->finish_time));
+        $this->assertGreaterThanOrEqual($r['finish_time'], Utils::GetPhpUnixTimestamp($contest->finish_time) + 1);
 
-        $this->assertEquals($r['window_length'], $contest->getWindowLength());
-        $this->assertEquals($r['public'], $contest->getPublic());
-        $this->assertEquals($r['alias'], $contest->getAlias());
-        $this->assertEquals($r['points_decay_factor'], $contest->getPointsDecayFactor());
-        $this->assertEquals($r['partial_score'], $contest->getPartialScore());
-        $this->assertEquals($r['submissions_gap'], $contest->getSubmissionsGap());
-        $this->assertEquals($r['feedback'], $contest->getFeedback());
-        $this->assertEquals($r['penalty'], $contest->getPenalty());
-        $this->assertEquals($r['scoreboard'], $contest->getScoreboard());
+        $this->assertEquals($r['window_length'], $contest->window_length);
+        $this->assertEquals($r['public'], $contest->public);
+        $this->assertEquals($r['alias'], $contest->alias);
+        $this->assertEquals($r['points_decay_factor'], $contest->points_decay_factor);
+        $this->assertEquals($r['partial_score'], $contest->partial_score);
+        $this->assertEquals($r['submissions_gap'], $contest->submissions_gap);
+        $this->assertEquals($r['feedback'], $contest->feedback);
+        $this->assertEquals($r['penalty'], $contest->penalty);
+        $this->assertEquals($r['scoreboard'], $contest->scoreboard);
         $this->assertEquals($r['penalty_type'], $contest->penalty_type);
-        $this->assertEquals($r['penalty_calc_policy'], $contest->getPenaltyCalcPolicy());
-        $this->assertEquals($r['recommended'], $contest->getRecommended());
+        $this->assertEquals($r['penalty_calc_policy'], $contest->penalty_calc_policy);
+        $this->assertEquals($r['recommended'], $contest->recommended);
     }
 
     /**

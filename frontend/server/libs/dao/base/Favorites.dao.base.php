@@ -33,7 +33,7 @@ abstract class FavoritesDAOBase extends DAO
 	  **/
 	public static final function save( $Favorites )
 	{
-		if (!is_null(self::getByPK( $Favorites->getUserId() , $Favorites->getProblemId() )))
+		if (!is_null(self::getByPK( $Favorites->user_id, $Favorites->problem_id)))
 		{
 			return FavoritesDAOBase::update( $Favorites);
 		} else {
@@ -112,7 +112,7 @@ abstract class FavoritesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,13 +128,13 @@ abstract class FavoritesDAOBase extends DAO
 
 		$sql = "SELECT * from Favorites WHERE (";
 		$val = array();
-		if (!is_null( $Favorites->getUserId())) {
+		if (!is_null( $Favorites->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Favorites->getUserId() );
+			array_push( $val, $Favorites->user_id );
 		}
-		if (!is_null( $Favorites->getProblemId())) {
+		if (!is_null( $Favorites->problem_id)) {
 			$sql .= " `problem_id` = ? AND";
-			array_push( $val, $Favorites->getProblemId() );
+			array_push( $val, $Favorites->problem_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -216,15 +216,15 @@ abstract class FavoritesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -237,7 +237,7 @@ abstract class FavoritesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Favorites WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $FavoritesA->getUserId()) ) ) & ( ! is_null ( ($b = $FavoritesB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $FavoritesA->user_id) ) ) & ( ! is_null ( ($b = $FavoritesB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -247,7 +247,7 @@ abstract class FavoritesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $FavoritesA->getProblemId()) ) ) & ( ! is_null ( ($b = $FavoritesB->getProblemId()) ) ) ){
+		if( ( !is_null (($a = $FavoritesA->problem_id) ) ) & ( ! is_null ( ($b = $FavoritesB->problem_id) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -285,9 +285,9 @@ abstract class FavoritesDAOBase extends DAO
 	  **/
 	public static final function delete( $Favorites )
 	{
-		if( is_null( self::getByPK($Favorites->getUserId(), $Favorites->getProblemId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Favorites->user_id, $Favorites->problem_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Favorites WHERE  user_id = ? AND problem_id = ?;";
-		$params = array( $Favorites->getUserId(), $Favorites->getProblemId() );
+		$params = array( $Favorites->user_id, $Favorites->problem_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

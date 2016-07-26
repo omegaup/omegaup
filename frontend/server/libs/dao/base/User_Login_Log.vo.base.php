@@ -10,7 +10,7 @@
 
 /** Value Object file for table User_Login_Log.
   *
-  * VO does not have any behaviour except for storage and retrieval of its own data (accessors and mutators).
+  * VO does not have any behaviour.
   * @access public
   *
   */
@@ -91,4 +91,3 @@ class UserLoginLog extends VO
 	  */
 	public $time;
 }
-

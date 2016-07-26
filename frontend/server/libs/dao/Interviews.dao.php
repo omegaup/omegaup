@@ -19,7 +19,7 @@ class InterviewsDAO extends InterviewsDAOBase
                 Interviews
             WHERE
                 contest_id = ?;';
-        $params = array($contest->getContestId());
+        $params = array($contest->contest_id);
         global $conn;
         return $conn->GetOne($sql, $params) > 0;
     }

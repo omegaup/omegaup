@@ -75,8 +75,8 @@ class ContestController extends Controller {
         foreach ($contests as $c) {
             $contestInfo = $c->asFilteredArray($relevantColumns);
 
-            $contestInfo['duration'] = (is_null($c->getWindowLength()) ?
-                                $c->getFinishTime() - $c->getStartTime() : ($c->getWindowLength() * 60));
+            $contestInfo['duration'] = (is_null($c->window_length) ?
+                                $c->finish_time - $c->start_time : ($c->window_length * 60));
 
             $addedContests[] = $contestInfo;
         }
@@ -156,7 +156,7 @@ class ContestController extends Controller {
 
         if ($r['contest']->public != 1) {
             try {
-                if (is_null(ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->getContestId()))
+                if (is_null(ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id))
                         && !Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
                     throw new ForbiddenAccessException('userNotAllowed');
                 }
@@ -210,7 +210,7 @@ class ContestController extends Controller {
         return $r['contest']->public == 1 ||
             !is_null(ContestsUsersDAO::getByPK(
                 $r['current_user_id'],
-                $r['contest']->getContestId()
+                $r['contest']->contest_id
             ));
     }
 
@@ -254,7 +254,7 @@ class ContestController extends Controller {
         // You already started the contest.
         $contestOpened = ContestsUsersDAO::getByPK(
             $r['current_user_id'],
-            $r['contest']->getContestId()
+            $r['contest']->contest_id
         );
         if (!is_null($contestOpened) &&
             $contestOpened->access_time != '0000-00-00 00:00:00') {
@@ -289,14 +289,14 @@ class ContestController extends Controller {
             $r['contest_admin'] = Authorization::IsContestAdmin($r['current_user_id'], $r['contest']);
             if (!ContestsDAO::hasStarted($r['contest']) && !$r['contest_admin']) {
                 $exception = new PreconditionFailedException('contestNotStarted');
-                $exception->addCustomMessageToArray('start_time', strtotime($r['contest']->getStartTime()));
+                $exception->addCustomMessageToArray('start_time', strtotime($r['contest']->start_time));
 
                 throw $exception;
             }
         } else {
-            if ($r['token'] === $r['contest']->getScoreboardUrlAdmin()) {
+            if ($r['token'] === $r['contest']->scoreboard_url_admin) {
                 $r['contest_admin'] = true;
-            } elseif ($r['token'] !== $r['contest']->getScoreboardUrl()) {
+            } elseif ($r['token'] !== $r['contest']->scoreboard_url) {
                 throw new ForbiddenAccessException('invalidScoreboardUrl');
             }
         }
@@ -336,8 +336,8 @@ class ContestController extends Controller {
                 $result['user_registration_accepted'] = false;
                 $result['user_registration_answered'] = false;
             } else {
-                $result['user_registration_answered'] = !is_null($registration->getAccepted());
-                $result['user_registration_accepted'] = $registration->getAccepted() == '1';
+                $result['user_registration_answered'] = !is_null($registration->accepted);
+                $result['user_registration_accepted'] = $registration->accepted == '1';
             }
         }
 
@@ -356,9 +356,9 @@ class ContestController extends Controller {
         self::validateBasicDetails($r);
 
         $contest_req = new ContestUserRequest();
-        $contest_req->setUserId($r['current_user_id']);
-        $contest_req->setContestId($r['contest']->getContestId());
-        $contest_req->setRequestTime(gmdate('Y-m-d H:i:s'));
+        $contest_req->user_id = $r['current_user_id'];
+        $contest_req->contest_id = $r['contest']->contest_id;
+        $contest_req->request_time = gmdate('Y-m-d H:i:s');
 
         try {
             ContestUserRequestDAO::save($contest_req);
@@ -433,7 +433,7 @@ class ContestController extends Controller {
             // Get problems of the contest
             $key_problemsInContest = new ContestProblems(
                 array(
-                        'contest_id' => $r['contest']->getContestId()
+                        'contest_id' => $r['contest']->contest_id
                     )
             );
 
@@ -457,7 +457,7 @@ class ContestController extends Controller {
             foreach ($problemsInContest as $problemkey) {
                 try {
                     // Get the data of the problem
-                    $temp_problem = ProblemsDAO::getByPK($problemkey->getProblemId());
+                    $temp_problem = ProblemsDAO::getByPK($problemkey->problem_id);
                 } catch (Exception $e) {
                     // Operation failed in the data layer
                     throw new InvalidDatabaseOperationException($e);
@@ -465,7 +465,7 @@ class ContestController extends Controller {
 
                 // Add the 'points' value that is stored in the ContestProblem relationship
                 $temp_array = $temp_problem->asFilteredArray($relevant_columns);
-                $temp_array['points'] = $problemkey->getPoints();
+                $temp_array['points'] = $problemkey->points;
                 $temp_array['letter'] = ContestController::columnName($letter++);
                 if (!empty($result['languages'])) {
                     $temp_array['languages'] = join(',', array_intersect(
@@ -517,12 +517,12 @@ class ContestController extends Controller {
             }
 
             // Add time left to response
-            if ($r['contest']->getWindowLength() === null) {
-                $result['submission_deadline'] = strtotime($r['contest']->getFinishTime());
+            if ($r['contest']->window_length === null) {
+                $result['submission_deadline'] = strtotime($r['contest']->finish_time);
             } else {
                 $result['submission_deadline'] = min(
-                    strtotime($r['contest']->getFinishTime()),
-                    strtotime($contest_user->access_time) + $r['contest']->getWindowLength() * 60
+                    strtotime($r['contest']->finish_time),
+                    strtotime($contest_user->access_time) + $r['contest']->window_length * 60
                 );
             }
             $result['admin'] = Authorization::IsContestAdmin($r['current_user_id'], $r['contest']);
@@ -682,31 +682,31 @@ class ContestController extends Controller {
         // Create and populate a new Contests object
         $contest = new Contests();
 
-        $contest->setPublic($r['public']);
-        $contest->setTitle($r['title']);
-        $contest->setDescription($r['description']);
-        $contest->setStartTime(gmdate('Y-m-d H:i:s', $r['start_time']));
-        $contest->setFinishTime(gmdate('Y-m-d H:i:s', $r['finish_time']));
-        $contest->setWindowLength($r['window_length'] === 'NULL' ? null : $r['window_length']);
-        $contest->setDirectorId($r['current_user_id']);
-        $contest->setRerunId(0); // NYI
-        $contest->setAlias($r['alias']);
-        $contest->setScoreboard($r['scoreboard']);
-        $contest->setPointsDecayFactor($r['points_decay_factor']);
-        $contest->setPartialScore(is_null($r['partial_score']) ? '1' : $r['partial_score']);
-        $contest->setSubmissionsGap($r['submissions_gap']);
-        $contest->setFeedback($r['feedback']);
-        $contest->setPenalty(max(0, intval($r['penalty'])));
+        $contest->public = $r['public'];
+        $contest->title = $r['title'];
+        $contest->description = $r['description'];
+        $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
+        $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
+        $contest->window_length = $r['window_length'] === 'NULL' ? null : $r['window_length'];
+        $contest->director_id = $r['current_user_id'];
+        $contest->rerun_id = 0; // NYI
+        $contest->alias = $r['alias'];
+        $contest->scoreboard = $r['scoreboard'];
+        $contest->points_decay_factor = $r['points_decay_factor'];
+        $contest->partial_score = is_null($r['partial_score']) ? '1' : $r['partial_score'];
+        $contest->submissions_gap = $r['submissions_gap'];
+        $contest->feedback = $r['feedback'];
+        $contest->penalty = max(0, intval($r['penalty']));
         $contest->penalty_type = $r['penalty_type'];
-        $contest->setPenaltyCalcPolicy(is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy']);
-        $contest->setLanguages(empty($r['languages']) ? null : $r['languages']);
-        $contest->setScoreboardUrl(self::randomString(30));
-        $contest->setScoreboardUrlAdmin(self::randomString(30));
+        $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
+        $contest->languages = empty($r['languages']) ? null : $r['languages'];
+        $contest->scoreboard_url = self::randomString(30);
+        $contest->scoreboard_url_admin = self::randomString(30);
 
         if (!is_null($r['show_scoreboard_after'])) {
-            $contest->setShowScoreboardAfter($r['show_scoreboard_after']);
+            $contest->show_scoreboard_after = $r['show_scoreboard_after'];
         } else {
-            $contest->setShowScoreboardAfter('1');
+            $contest->show_scoreboard_after = '1';
         }
 
         if ($r['public'] == 1) {
@@ -726,7 +726,7 @@ class ContestController extends Controller {
                 foreach ($r['private_users_list'] as $userkey) {
                     // Create a temp DAO for the relationship
                     $temp_user_contest = new ContestsUsers(array(
-                                'contest_id' => $contest->getContestId(),
+                                'contest_id' => $contest->contest_id,
                                 'user_id' => $userkey,
                                 'access_time' => '0000-00-00 00:00:00',
                                 'score' => 0,
@@ -741,7 +741,7 @@ class ContestController extends Controller {
             if (!is_null($r['problems'])) {
                 foreach ($r['problems'] as $problem) {
                     $contest_problem = new ContestProblems(array(
-                                'contest_id' => $contest->getContestId(),
+                                'contest_id' => $contest->contest_id,
                                 'problem_id' => $problem['id'],
                                 'points' => $problem['points']
                             ));
@@ -752,7 +752,7 @@ class ContestController extends Controller {
 
             if (!is_null($r['interview']) && $r['interview']) {
                 $interview = new Interviews();
-                $interview->setContestId($contest->getContestId());
+                $interview->contest_id = $contest->contest_id;
 
                 InterviewsDAO::save($interview);
             }
@@ -818,8 +818,8 @@ class ContestController extends Controller {
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
-        $start_time = !is_null($r['start_time']) ? $r['start_time'] : strtotime($r['contest']->getStartTime());
-        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : strtotime($r['contest']->getFinishTime());
+        $start_time = !is_null($r['start_time']) ? $r['start_time'] : strtotime($r['contest']->start_time);
+        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : strtotime($r['contest']->finish_time);
 
         // Validate start & finish time
         if ($start_time > $finish_time) {
@@ -883,7 +883,7 @@ class ContestController extends Controller {
             foreach (json_decode($r['problems']) as $problem) {
                 $p = ProblemsDAO::getByAlias($problem->problem);
                 array_push($r['problems'], array(
-                    'id' => $p->getProblemId(),
+                    'id' => $p->problem_id,
                     'alias' => $problem->problem,
                     'points' => $problem->points
                 ));
@@ -977,8 +977,8 @@ class ContestController extends Controller {
 
         try {
             $relationship = new ContestProblems(array(
-                        'contest_id' => $params['contest']->getContestId(),
-                        'problem_id' => $params['problem']->getProblemId(),
+                        'contest_id' => $params['contest']->contest_id,
+                        'problem_id' => $params['problem']->problem_id,
                         'points' => $r['points'],
                         'order' => is_null($r['order_in_contest']) ?
                                 1 : $r['order_in_contest']));
@@ -1036,7 +1036,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        if ($problem->getPublic() == '0' && !Authorization::CanEditProblem($r['current_user_id'], $problem)) {
+        if ($problem->public == '0' && !Authorization::CanEditProblem($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
 
@@ -1183,11 +1183,11 @@ class ContestController extends Controller {
         self::validateAddUser($r);
 
         $contest_user = new ContestsUsers();
-        $contest_user->setContestId($r['contest']->getContestId());
-        $contest_user->setUserId($r['user']->getUserId());
-        $contest_user->setAccessTime('0000-00-00 00:00:00');
-        $contest_user->setScore('0');
-        $contest_user->setTime('0');
+        $contest_user->contest_id = $r['contest']->contest_id;
+        $contest_user->user_id = $r['user']->user_id;
+        $contest_user->access_time = '0000-00-00 00:00:00';
+        $contest_user->score = '0';
+        $contest_user->time = '0';
 
         // Save the contest to the DB
         try {
@@ -1214,8 +1214,8 @@ class ContestController extends Controller {
         self::validateAddUser($r);
 
         $contest_user = new ContestsUsers();
-        $contest_user->setContestId($r['contest']->getContestId());
-        $contest_user->setUserId($r['user']->getUserId());
+        $contest_user->contest_id = $r['contest']->contest_id;
+        $contest_user->user_id = $r['user']->user_id;
 
         try {
             ContestsUsersDAO::delete($contest_user);
@@ -1260,9 +1260,9 @@ class ContestController extends Controller {
         }
 
         $contest_user = new UserRoles();
-        $contest_user->setContestId($r['contest']->getContestId());
-        $contest_user->setUserId($user->getUserId());
-        $contest_user->setRoleId(CONTEST_ADMIN_ROLE);
+        $contest_user->contest_id = $r['contest']->contest_id;
+        $contest_user->user_id = $user->user_id;
+        $contest_user->role_id = CONTEST_ADMIN_ROLE;
 
         // Save the contest to the DB
         try {
@@ -1305,14 +1305,14 @@ class ContestController extends Controller {
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::IsContestAdmin($r['user']->getUserId(), $r['contest'])) {
+        if (!Authorization::IsContestAdmin($r['user']->user_id, $r['contest'])) {
             throw new NotFoundException();
         }
 
         $contest_user = new UserRoles();
-        $contest_user->setContestId($r['contest']->getContestId());
-        $contest_user->setUserId($r['user']->getUserId());
-        $contest_user->setRoleId(CONTEST_ADMIN_ROLE);
+        $contest_user->contest_id = $r['contest']->contest_id;
+        $contest_user->user_id = $r['user']->user_id;
+        $contest_user->role_id = CONTEST_ADMIN_ROLE;
 
         // Delete the role
         try {
@@ -1363,9 +1363,9 @@ class ContestController extends Controller {
         }
 
         $group_role = new GroupRoles();
-        $group_role->setContestId($r['contest']->getContestId());
-        $group_role->setGroupId($group->group_id);
-        $group_role->setRoleId(CONTEST_ADMIN_ROLE);
+        $group_role->contest_id = $r['contest']->contest_id;
+        $group_role->group_id = $group->group_id;
+        $group_role->role_id = CONTEST_ADMIN_ROLE;
 
         // Save the contest to the DB
         try {
@@ -1412,9 +1412,9 @@ class ContestController extends Controller {
         }
 
         $group_role = new GroupRoles();
-        $group_role->setContestId($r['contest']->getContestId());
-        $group_role->setGroupId($group->group_id);
-        $group_role->setRoleId(CONTEST_ADMIN_ROLE);
+        $group_role->contest_id = $r['contest']->contest_id;
+        $group_role->group_id = $group->group_id;
+        $group_role->role_id = CONTEST_ADMIN_ROLE;
 
         // Delete the role
         try {
@@ -1471,7 +1471,7 @@ class ContestController extends Controller {
 
         try {
             $clarifications = ClarificationsDAO::GetContestClarifications(
-                $r['contest']->getContestId(),
+                $r['contest']->contest_id,
                 $is_contest_director,
                 $r['current_user_id'],
                 $r['offset'],
@@ -1508,7 +1508,7 @@ class ContestController extends Controller {
 
         // Create scoreboard
         $scoreboard = new Scoreboard(
-            $r['contest']->getContestId(),
+            $r['contest']->contest_id,
             Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])
         );
 
@@ -1555,9 +1555,9 @@ class ContestController extends Controller {
                 $showAllRuns = true;
             }
         } else {
-            if ($r['token'] === $r['contest']->getScoreboardUrl()) {
+            if ($r['token'] === $r['contest']->scoreboard_url) {
                 $showAllRuns = false;
-            } elseif ($r['token'] === $r['contest']->getScoreboardUrlAdmin()) {
+            } elseif ($r['token'] === $r['contest']->scoreboard_url_admin) {
                 $showAllRuns = true;
             } else {
                 throw new ForbiddenAccessException('invalidScoreboardUrl');
@@ -1566,7 +1566,7 @@ class ContestController extends Controller {
 
         // Create scoreboard
         $scoreboard = new Scoreboard(
-            $r['contest']->getContestId(),
+            $r['contest']->contest_id,
             $showAllRuns
         );
 
@@ -1672,9 +1672,9 @@ class ContestController extends Controller {
         // Normalize user["contests"] entries so all contain the same contests
         foreach ($merged_scoreboard as $username => $entry) {
             foreach ($contests as $contest) {
-                if (!isset($entry['contests'][$contest->getAlias()]['points'])) {
-                    $merged_scoreboard[$username]['contests'][$contest->getAlias()]['points'] = 0;
-                    $merged_scoreboard[$username]['contests'][$contest->getAlias()]['penalty'] = 0;
+                if (!isset($entry['contests'][$contest->alias]['points'])) {
+                    $merged_scoreboard[$username]['contests'][$contest->alias]['points'] = 0;
+                    $merged_scoreboard[$username]['contests'][$contest->alias]['penalty'] = 0;
                 }
             }
         }
@@ -1725,7 +1725,7 @@ class ContestController extends Controller {
         }
 
         try {
-            $db_results = ContestUserRequestDAO::getRequestsForContest($contest->getContestId());
+            $db_results = ContestUserRequestDAO::getRequestsForContest($contest->contest_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1752,12 +1752,12 @@ class ContestController extends Controller {
             $admin_id = $result['admin_id'];
 
             $result = new ContestUserRequest($result);
-            $user_id = $result->getUserId();
+            $user_id = $result->user_id;
             $user = UsersDAO::getByPK($user_id);
 
             // Get user profile. Email, school, etc.
             $profile_request = new Request();
-            $profile_request['username'] = $user->getUsername();
+            $profile_request['username'] = $user->username;
             $profile_request['omit_rank'] = true;
 
             $userprofile = UserController::apiProfile($profile_request);
@@ -1820,9 +1820,9 @@ class ContestController extends Controller {
             $resolution = (bool)$r['resolution'];
         }
 
-        $request->setAccepted($resolution);
-        $request->setExtraNote($r['note']);
-        $request->setLastUpdate(gmdate('Y-m-d H:i:s'));
+        $request->accepted = $resolution;
+        $request->extra_note = $r['note'];
+        $request->last_update = gmdate('Y-m-d H:i:s');
 
         ContestUserRequestDAO::save($request);
 
@@ -1867,7 +1867,7 @@ class ContestController extends Controller {
 
         // Get users from DB
         $contest_user_key = new ContestsUsers();
-        $contest_user_key->setContestId($contest->getContestId());
+        $contest_user_key->contest_id = $contest->contest_id;
 
         try {
             $db_results = ContestsUsersDAO::search($contest_user_key);
@@ -1880,9 +1880,9 @@ class ContestController extends Controller {
 
         // Add all users to an array
         foreach ($db_results as $result) {
-            $user_id = $result->getUserId();
+            $user_id = $result->user_id;
             $user = UsersDAO::getByPK($user_id);
-            $users[] = array('user_id' => $user_id, 'username' => $user->getUsername(), 'access_time' => $result->access_time, 'country' => $user->getCountryId());
+            $users[] = array('user_id' => $user_id, 'username' => $user->username, 'access_time' => $result->access_time, 'country' => $user->country_id);
         }
 
         $response = array();
@@ -1930,7 +1930,7 @@ class ContestController extends Controller {
      */
     private static function validateContestCanBePublic(Contests $contest) {
         // Check that contest has some problems at least 1 problem
-        $problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->getContestId());
+        $problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->contest_id);
         if (count($problemsInContest) < 1) {
             throw new InvalidParameterException('contestPublicRequiresProblem');
         }
@@ -1961,7 +1961,7 @@ class ContestController extends Controller {
                 self::validateContestCanBePublic($r['contest']);
             }
 
-            $r['contest']->setPublic($r['public']);
+            $r['contest']->public = $r['public'];
         }
 
         $valueProperties = array(
@@ -2002,12 +2002,12 @@ class ContestController extends Controller {
             // If the contest is private, add the list of allowed users
             if (!is_null($r['public']) && $r['public'] != 1 && $r['hasPrivateUsers']) {
                 // Get current users
-                $cu_key = new ContestsUsers(array('contest_id' => $r['contest']->getContestId()));
+                $cu_key = new ContestsUsers(array('contest_id' => $r['contest']->contest_id));
                 $current_users = ContestsUsersDAO::search($cu_key);
                 $current_users_id = array();
 
                 foreach ($current_users as $cu) {
-                    array_push($current_users_id, $current_users->getUserId());
+                    array_push($current_users_id, $current_users->user_id);
                 }
 
                 // Check who needs to be deleted and who needs to be added
@@ -2018,7 +2018,7 @@ class ContestController extends Controller {
                 foreach ($to_add as $userkey) {
                     // Create a temp DAO for the relationship
                     $temp_user_contest = new ContestsUsers(array(
-                                'contest_id' => $r['contest']->getContestId(),
+                                'contest_id' => $r['contest']->contest_id,
                                 'user_id' => $userkey,
                                 'access_time' => '0000-00-00 00:00:00',
                                 'score' => 0,
@@ -2033,7 +2033,7 @@ class ContestController extends Controller {
                 foreach ($to_delete as $userkey) {
                     // Create a temp DAO for the relationship
                     $temp_user_contest = new ContestsUsers(array(
-                                'contest_id' => $r['contest']->getContestId(),
+                                'contest_id' => $r['contest']->contest_id,
                                 'user_id' => $userkey,
                             ));
 
@@ -2044,12 +2044,12 @@ class ContestController extends Controller {
 
             if (!is_null($r['problems'])) {
                 // Get current problems
-                $p_key = new Problems(array('contest_id' => $r['contest']->getContestId()));
+                $p_key = new Problems(array('contest_id' => $r['contest']->contest_id));
                 $current_problems = ProblemsDAO::search($p_key);
                 $current_problems_id = array();
 
                 foreach ($current_problems as $p) {
-                    array_push($current_problems_id, $p->getProblemId());
+                    array_push($current_problems_id, $p->problem_id);
                 }
 
                 // Check who needs to be deleted and who needs to be added
@@ -2058,7 +2058,7 @@ class ContestController extends Controller {
 
                 foreach ($to_add as $problem) {
                     $contest_problem = new ContestProblems(array(
-                                'contest_id' => $r['contest']->getContestId(),
+                                'contest_id' => $r['contest']->contest_id,
                                 'problem_id' => $problem,
                                 'points' => $r['problems'][$problem]['points']
                             ));
@@ -2068,7 +2068,7 @@ class ContestController extends Controller {
 
                 foreach ($to_delete as $problem) {
                     $contest_problem = new ContestProblems(array(
-                                'contest_id' => $r['contest']->getContestId(),
+                                'contest_id' => $r['contest']->contest_id,
                                 'problem_id' => $problem,
                             ));
 
@@ -2089,7 +2089,7 @@ class ContestController extends Controller {
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
 
         // Expire contest scoreboard cache
-        Scoreboard::InvalidateScoreboardCache($r['contest']->getContestId());
+        Scoreboard::InvalidateScoreboardCache($r['contest']->contest_id);
 
         // Expire contes-list cache
         Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
@@ -2184,12 +2184,12 @@ class ContestController extends Controller {
         // Get our runs
         try {
             $runs = RunsDAO::GetAllRuns(
-                $r['contest']->getContestId(),
+                $r['contest']->contest_id,
                 $r['status'],
                 $r['verdict'],
-                !is_null($r['problem']) ? $r['problem']->getProblemId() : null,
+                !is_null($r['problem']) ? $r['problem']->problem_id : null,
                 $r['language'],
-                !is_null($r['user']) ? $r['user']->getUserId() : null,
+                !is_null($r['user']) ? $r['user']->user_id : null,
                 $r['offset'],
                 $r['rowcount']
             );
@@ -2253,27 +2253,27 @@ class ContestController extends Controller {
 
         try {
             // Array of GUIDs of pending runs
-            $pendingRunsGuids = RunsDAO::GetPendingRunsOfContest($r['contest']->getContestId());
+            $pendingRunsGuids = RunsDAO::GetPendingRunsOfContest($r['contest']->contest_id);
 
             // Count of pending runs (int)
-            $totalRunsCount = RunsDAO::CountTotalRunsOfContest($r['contest']->getContestId());
+            $totalRunsCount = RunsDAO::CountTotalRunsOfContest($r['contest']->contest_id);
 
             // Wait time
-            $waitTimeArray = RunsDAO::GetLargestWaitTimeOfContest($r['contest']->getContestId());
+            $waitTimeArray = RunsDAO::GetLargestWaitTimeOfContest($r['contest']->contest_id);
 
             // List of verdicts
             $verdict_counts = array();
 
             foreach (self::$verdicts as $verdict) {
-                $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfContestByVerdict($r['contest']->getContestId(), $verdict);
+                $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfContestByVerdict($r['contest']->contest_id, $verdict);
             }
 
             // Get max points posible for contest
-            $key = new ContestProblems(array('contest_id' => $r['contest']->getContestId()));
+            $key = new ContestProblems(array('contest_id' => $r['contest']->contest_id));
             $contestProblems = ContestProblemsDAO::search($key);
             $totalPoints = 0;
             foreach ($contestProblems as $cP) {
-                $totalPoints += $cP->getPoints();
+                $totalPoints += $cP->points;
             }
 
             // Get scoreboard to calculate distribution
@@ -2297,7 +2297,7 @@ class ContestController extends Controller {
             'total_runs' => $totalRunsCount,
             'pending_runs' => $pendingRunsGuids,
             'max_wait_time' => is_null($waitTimeArray) ? 0 : $waitTimeArray[1],
-            'max_wait_time_guid' => is_null($waitTimeArray) ? 0 : $waitTimeArray[0]->getGuid(),
+            'max_wait_time_guid' => is_null($waitTimeArray) ? 0 : $waitTimeArray[0]->guid,
             'verdict_counts' => $verdict_counts,
             'distribution' => $distribution,
             'size_of_bucket' => $sizeOfBucket,
@@ -2318,7 +2318,7 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         $scoreboard = new Scoreboard(
-            $r['contest']->getContestId(),
+            $r['contest']->contest_id,
             true, //Show only relevant runs
             $r['auth_token']
         );
@@ -2468,7 +2468,7 @@ class ContestController extends Controller {
             'time', 'submit_delay', 'Users.username', 'Problems.alias');
         try {
             $runs = RunsDAO::search(new Runs(array(
-                                'contest_id' => $r['contest']->getContestId()
+                                'contest_id' => $r['contest']->contest_id
                             )), 'time', 'DESC', $relevant_columns);
         } catch (Exception $e) {
             // Operation failed in the data layer
@@ -2481,7 +2481,7 @@ class ContestController extends Controller {
         $table = "guid,user,problem,verdict,points\n";
         foreach ($runs as $run) {
             $zip->add_file_from_path(
-                'runs/' . $run->getGuid(),
+                'runs/' . $run->guid,
                 RunController::getSubmissionPath($run)
             );
 
@@ -2489,16 +2489,16 @@ class ContestController extends Controller {
             $columns[1] = 'alias';
             $usernameProblemData = $run->asFilteredArray($columns);
 
-            $table .= $run->getGuid() . ',' . $usernameProblemData['username'] . ',' . $usernameProblemData['alias'] . ',' . $run->getVerdict() . ',' . $run->getContestScore();
+            $table .= $run->guid . ',' . $usernameProblemData['username'] . ',' . $usernameProblemData['alias'] . ',' . $run->verdict . ',' . $run->contest_score;
             $table .= "\n";
         }
 
         $zip->add_file('summary.csv', $table);
 
         // Add problem cases to zip
-        $contest_problems = ContestProblemsDAO::GetRelevantProblems($r['contest']->getContestId());
+        $contest_problems = ContestProblemsDAO::GetRelevantProblems($r['contest']->contest_id);
         foreach ($contest_problems as $problem) {
-            $zip->add_file_from_path($problem->getAlias() . '_cases.zip', PROBLEMS_PATH . '/' . $problem->getAlias() . '/cases.zip');
+            $zip->add_file_from_path($problem->alias . '_cases.zip', PROBLEMS_PATH . '/' . $problem->alias . '/cases.zip');
         }
 
         // Return zip

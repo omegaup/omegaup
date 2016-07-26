@@ -96,7 +96,7 @@ class Scoreboard {
                 $this->auth_token
             );
 
-            $timeout = max(0, strtotime($contest->getFinishTime()) - time());
+            $timeout = max(0, strtotime($contest->finish_time) - time());
             if ($can_use_contestant_cache) {
                 $contestantScoreboardCache->set($result, $timeout);
             } elseif ($can_use_admin_cache) {
@@ -160,7 +160,7 @@ class Scoreboard {
                 $this->showAllRuns
             );
 
-            $timeout = max(0, strtotime($contest->getFinishTime()) - time());
+            $timeout = max(0, strtotime($contest->finish_time) - time());
             if ($can_use_contestant_cache) {
                 $contestantEventsCache->set($result, $timeout);
             } elseif ($can_use_admin_cache) {
@@ -223,7 +223,7 @@ class Scoreboard {
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest);
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
-        $timeout = max(0, strtotime($contest->getFinishTime()) - time());
+        $timeout = max(0, strtotime($contest->finish_time) - time());
         $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
 
         $contestantScoreboard = Scoreboard::getScoreboardFromRuns(
@@ -305,14 +305,14 @@ class Scoreboard {
         Contests $contest,
         $showAllRuns = false
     ) {
-        if ($showAllRuns || (ContestsDAO::hasFinished($contest) && $contest->getShowScoreboardAfter())) {
+        if ($showAllRuns || (ContestsDAO::hasFinished($contest) && $contest->show_scoreboard_after)) {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
             return null;
         }
 
-        $start = strtotime($contest->getStartTime());
-        $finish = strtotime($contest->getFinishTime());
+        $start = strtotime($contest->start_time);
+        $finish = strtotime($contest->finish_time);
 
         $percentage = (double)$contest->scoreboard / 100.0;
 
@@ -366,8 +366,8 @@ class Scoreboard {
         foreach ($raw_contest_users as $contestant) {
             $user_problems = array();
 
-            $test_only[$contestant->getUserId()] = true;
-            $no_runs[$contestant->getUserId()] = true;
+            $test_only[$contestant->user_id] = true;
+            $no_runs[$contestant->user_id] = true;
             foreach ($problem_mapping as $id => $problem) {
                 array_push($user_problems, array(
                     'points' => 0,
@@ -378,14 +378,14 @@ class Scoreboard {
             }
 
             // Add the problems' information
-            $users_info[$contestant->getUserId()] = array(
+            $users_info[$contestant->user_id] = array(
                 'problems' => $user_problems,
-                'username' => $contestant->getUsername(),
-                'name' => $contestant->getName() ?
-                    $contestant->getName() :
-                    $contestant->getUsername(),
+                'username' => $contestant->username,
+                'name' => $contestant->name ?
+                    $contestant->name :
+                    $contestant->username,
                 'total' => null,
-                'country' => $contestant->getCountryId()
+                'country' => $contestant->country_id
             );
         }
 
@@ -414,7 +414,7 @@ class Scoreboard {
                     continue;
                 }
                 if (!is_null($scoreboard_time_limit) &&
-                    strtotime($run->getTime()) >= $scoreboard_time_limit) {
+                    strtotime($run->time) >= $scoreboard_time_limit) {
                     $problem['runs']++;
                     $problem['pending'] = true;
                     continue;
@@ -446,7 +446,7 @@ class Scoreboard {
 
         $result = array();
         foreach ($raw_contest_users as $contestant) {
-            $user_id = $contestant->getUserId();
+            $user_id = $contestant->user_id;
 
             // Add contestant results to scoreboard data
             if (!$showAllRuns && $test_only[$user_id] && !$no_runs[$user_id]) {
@@ -539,7 +539,7 @@ class Scoreboard {
         $contest_users = array();
 
         foreach ($raw_contest_users as $user) {
-            $contest_users[$user->getUserId()] = $user;
+            $contest_users[$user->user_id] = $user;
         }
 
         $result = array();
@@ -551,12 +551,12 @@ class Scoreboard {
 
         // Calculate score for each contestant x problem x run
         foreach ($contest_runs as $run) {
-            if (!$showAllRuns && $run->getTest() != 0) {
+            if (!$showAllRuns && $run->test != 0) {
                 continue;
             }
 
             $log = Logger::getLogger('Scoreboard');
-            $run_delay = strtotime($run->getTime());
+            $run_delay = strtotime($run->time);
             $log->debug(">>      run_delay : $run_delay");
             $log->debug(">>scoreboardLimit : $scoreboardLimit");
             $log->debug('');
@@ -565,9 +565,9 @@ class Scoreboard {
                 continue;
             }
 
-            $user_id = $run->getUserId();
-            $problem_id = $run->getProblemId();
-            $contest_score = $run->getContestScore();
+            $user_id = $run->user_id;
+            $problem_id = $run->problem_id;
+            $contest_score = $run->contest_score;
 
             if (!isset($user_problems_score[$user_id])) {
                 $user_problems_score[$user_id] = array(
@@ -594,8 +594,8 @@ class Scoreboard {
             }
 
             $data = array(
-                'name' => $user->getName() ? $user->getName() : $user->getUsername(),
-                'username' => $user->getUsername(),
+                'name' => $user->name ? $user->name : $user->username,
+                'username' => $user->username,
                 'delta' => max(0, ($run_delay - $contestStart) / 60),
                 'problem' => array(
                     'alias' => $problem_mapping[$problem_id]['alias'],
@@ -606,7 +606,7 @@ class Scoreboard {
                     'points' => 0,
                     'penalty' => 0
                 ),
-                'country' => $user->getCountryId()
+                'country' => $user->country_id
             );
 
             foreach ($user_problems_score[$user_id] as $problem) {

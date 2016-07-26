@@ -33,7 +33,7 @@ abstract class InterviewsDAOBase extends DAO
 	  **/
 	public static final function save( $Interviews )
 	{
-		if (!is_null(self::getByPK( $Interviews->getContestId() )))
+		if (!is_null(self::getByPK( $Interviews->contest_id)))
 		{
 			return InterviewsDAOBase::update( $Interviews);
 		} else {
@@ -112,7 +112,7 @@ abstract class InterviewsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,9 +128,9 @@ abstract class InterviewsDAOBase extends DAO
 
 		$sql = "SELECT * from Interviews WHERE (";
 		$val = array();
-		if (!is_null( $Interviews->getContestId())) {
+		if (!is_null( $Interviews->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Interviews->getContestId() );
+			array_push( $val, $Interviews->contest_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -211,15 +211,15 @@ abstract class InterviewsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -232,7 +232,7 @@ abstract class InterviewsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Interviews WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $InterviewsA->getContestId()) ) ) & ( ! is_null ( ($b = $InterviewsB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $InterviewsA->contest_id) ) ) & ( ! is_null ( ($b = $InterviewsB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -270,9 +270,9 @@ abstract class InterviewsDAOBase extends DAO
 	  **/
 	public static final function delete( $Interviews )
 	{
-		if( is_null( self::getByPK($Interviews->getContestId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Interviews->contest_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Interviews WHERE  contest_id = ?;";
-		$params = array( $Interviews->getContestId() );
+		$params = array( $Interviews->contest_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

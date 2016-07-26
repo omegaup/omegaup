@@ -10,8 +10,8 @@ require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
 class OmegaupUITestCase extends PHPUnit_Extensions_SeleniumTestCase {
     protected function setUp() {
-        $this->setBrowser('*firefox');
-        $this->setBrowserUrl(OMEGAUP_BASE_URL);
+        $this->browser = '*firefox';
+        $this->browser_url = OMEGAUP_BASE_URL;
     }
 
     protected function createUserAndLogin() {
@@ -28,15 +28,15 @@ class OmegaupUITestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $this->clickAndWait('link=Inicia sesion');
 
         // Type login data
-        $this->type('user', $contestant->getUsername());
-        $this->type('pass', $contestant->getPassword());
+        $this->type('user', $contestant->username);
+        $this->type('pass', $contestant->password);
 
         // Click inicia sesion
         $this->clickAndWait("//input[@value='Inicia sesion']");
 
         // Sanity check that we are logged in
         $this->waitForElementPresent('//*[@id="wrapper"]/div[1]/a');
-        $this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->getUsername());
+        $this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->username);
 
         // Back to index
         $this->open('/');
@@ -48,7 +48,7 @@ class OmegaupUITestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $contestant = $this->createUserAndLogin();
 
         $userRoles = new UserRoles(array(
-            'user_id' => $contestant->getUserId(),
+            'user_id' => $contestant->user_id,
             'role_id' => ADMIN_ROLE,
             'contest_id' => 0,
         ));

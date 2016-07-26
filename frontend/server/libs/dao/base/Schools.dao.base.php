@@ -33,7 +33,7 @@ abstract class SchoolsDAOBase extends DAO
 	  **/
 	public static final function save( $Schools )
 	{
-		if (!is_null(self::getByPK( $Schools->getSchoolId() )))
+		if (!is_null(self::getByPK( $Schools->school_id)))
 		{
 			return SchoolsDAOBase::update( $Schools);
 		} else {
@@ -112,7 +112,7 @@ abstract class SchoolsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,21 +128,21 @@ abstract class SchoolsDAOBase extends DAO
 
 		$sql = "SELECT * from Schools WHERE (";
 		$val = array();
-		if (!is_null( $Schools->getSchoolId())) {
+		if (!is_null( $Schools->school_id)) {
 			$sql .= " `school_id` = ? AND";
-			array_push( $val, $Schools->getSchoolId() );
+			array_push( $val, $Schools->school_id );
 		}
-		if (!is_null( $Schools->getStateId())) {
+		if (!is_null( $Schools->state_id)) {
 			$sql .= " `state_id` = ? AND";
-			array_push( $val, $Schools->getStateId() );
+			array_push( $val, $Schools->state_id );
 		}
-		if (!is_null( $Schools->getCountryId())) {
+		if (!is_null( $Schools->country_id)) {
 			$sql .= " `country_id` = ? AND";
-			array_push( $val, $Schools->getCountryId() );
+			array_push( $val, $Schools->country_id );
 		}
-		if (!is_null( $Schools->getName())) {
+		if (!is_null( $Schools->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $Schools->getName() );
+			array_push( $val, $Schools->name );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -181,10 +181,10 @@ abstract class SchoolsDAOBase extends DAO
 	{
 		$sql = "UPDATE Schools SET  `state_id` = ?, `country_id` = ?, `name` = ? WHERE  `school_id` = ?;";
 		$params = array(
-			$Schools->getStateId(),
-			$Schools->getCountryId(),
-			$Schools->getName(),
-			$Schools->getSchoolId(), );
+			$Schools->state_id,
+			$Schools->country_id,
+			$Schools->name,
+			$Schools->school_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -236,15 +236,15 @@ abstract class SchoolsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -257,7 +257,7 @@ abstract class SchoolsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Schools WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $SchoolsA->getSchoolId()) ) ) & ( ! is_null ( ($b = $SchoolsB->getSchoolId()) ) ) ){
+		if( ( !is_null (($a = $SchoolsA->school_id) ) ) & ( ! is_null ( ($b = $SchoolsB->school_id) ) ) ){
 				$sql .= " `school_id` >= ? AND `school_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -267,7 +267,7 @@ abstract class SchoolsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $SchoolsA->getStateId()) ) ) & ( ! is_null ( ($b = $SchoolsB->getStateId()) ) ) ){
+		if( ( !is_null (($a = $SchoolsA->state_id) ) ) & ( ! is_null ( ($b = $SchoolsB->state_id) ) ) ){
 				$sql .= " `state_id` >= ? AND `state_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -277,7 +277,7 @@ abstract class SchoolsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $SchoolsA->getCountryId()) ) ) & ( ! is_null ( ($b = $SchoolsB->getCountryId()) ) ) ){
+		if( ( !is_null (($a = $SchoolsA->country_id) ) ) & ( ! is_null ( ($b = $SchoolsB->country_id) ) ) ){
 				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -287,7 +287,7 @@ abstract class SchoolsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $SchoolsA->getName()) ) ) & ( ! is_null ( ($b = $SchoolsB->getName()) ) ) ){
+		if( ( !is_null (($a = $SchoolsA->name) ) ) & ( ! is_null ( ($b = $SchoolsB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -325,9 +325,9 @@ abstract class SchoolsDAOBase extends DAO
 	  **/
 	public static final function delete( $Schools )
 	{
-		if( is_null( self::getByPK($Schools->getSchoolId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Schools->school_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Schools WHERE  school_id = ?;";
-		$params = array( $Schools->getSchoolId() );
+		$params = array( $Schools->school_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

@@ -33,7 +33,7 @@ abstract class UserRankDAOBase extends DAO
 	  **/
 	public static final function save( $User_Rank )
 	{
-		if (!is_null(self::getByPK( $User_Rank->getUserId() )))
+		if (!is_null(self::getByPK( $User_Rank->user_id)))
 		{
 			return UserRankDAOBase::update( $User_Rank);
 		} else {
@@ -112,7 +112,7 @@ abstract class UserRankDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,33 +128,33 @@ abstract class UserRankDAOBase extends DAO
 
 		$sql = "SELECT * from User_Rank WHERE (";
 		$val = array();
-		if (!is_null( $User_Rank->getUserId())) {
+		if (!is_null( $User_Rank->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $User_Rank->getUserId() );
+			array_push( $val, $User_Rank->user_id );
 		}
-		if (!is_null( $User_Rank->getRank())) {
+		if (!is_null( $User_Rank->rank)) {
 			$sql .= " `rank` = ? AND";
-			array_push( $val, $User_Rank->getRank() );
+			array_push( $val, $User_Rank->rank );
 		}
-		if (!is_null( $User_Rank->getProblemsSolvedCount())) {
+		if (!is_null( $User_Rank->problems_solved_count)) {
 			$sql .= " `problems_solved_count` = ? AND";
-			array_push( $val, $User_Rank->getProblemsSolvedCount() );
+			array_push( $val, $User_Rank->problems_solved_count );
 		}
-		if (!is_null( $User_Rank->getScore())) {
+		if (!is_null( $User_Rank->score)) {
 			$sql .= " `score` = ? AND";
-			array_push( $val, $User_Rank->getScore() );
+			array_push( $val, $User_Rank->score );
 		}
-		if (!is_null( $User_Rank->getUsername())) {
+		if (!is_null( $User_Rank->username)) {
 			$sql .= " `username` = ? AND";
-			array_push( $val, $User_Rank->getUsername() );
+			array_push( $val, $User_Rank->username );
 		}
-		if (!is_null( $User_Rank->getName())) {
+		if (!is_null( $User_Rank->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $User_Rank->getName() );
+			array_push( $val, $User_Rank->name );
 		}
-		if (!is_null( $User_Rank->getCountryId())) {
+		if (!is_null( $User_Rank->country_id)) {
 			$sql .= " `country_id` = ? AND";
-			array_push( $val, $User_Rank->getCountryId() );
+			array_push( $val, $User_Rank->country_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -193,13 +193,13 @@ abstract class UserRankDAOBase extends DAO
 	{
 		$sql = "UPDATE User_Rank SET  `rank` = ?, `problems_solved_count` = ?, `score` = ?, `username` = ?, `name` = ?, `country_id` = ? WHERE  `user_id` = ?;";
 		$params = array(
-			$User_Rank->getRank(),
-			$User_Rank->getProblemsSolvedCount(),
-			$User_Rank->getScore(),
-			$User_Rank->getUsername(),
-			$User_Rank->getName(),
-			$User_Rank->getCountryId(),
-			$User_Rank->getUserId(), );
+			$User_Rank->rank,
+			$User_Rank->problems_solved_count,
+			$User_Rank->score,
+			$User_Rank->username,
+			$User_Rank->name,
+			$User_Rank->country_id,
+			$User_Rank->user_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -255,15 +255,15 @@ abstract class UserRankDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -276,7 +276,7 @@ abstract class UserRankDAOBase extends DAO
 	{
 		$sql = "SELECT * from User_Rank WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $User_RankA->getUserId()) ) ) & ( ! is_null ( ($b = $User_RankB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $User_RankA->user_id) ) ) & ( ! is_null ( ($b = $User_RankB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -286,7 +286,7 @@ abstract class UserRankDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_RankA->getRank()) ) ) & ( ! is_null ( ($b = $User_RankB->getRank()) ) ) ){
+		if( ( !is_null (($a = $User_RankA->rank) ) ) & ( ! is_null ( ($b = $User_RankB->rank) ) ) ){
 				$sql .= " `rank` >= ? AND `rank` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -296,7 +296,7 @@ abstract class UserRankDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_RankA->getProblemsSolvedCount()) ) ) & ( ! is_null ( ($b = $User_RankB->getProblemsSolvedCount()) ) ) ){
+		if( ( !is_null (($a = $User_RankA->problems_solved_count) ) ) & ( ! is_null ( ($b = $User_RankB->problems_solved_count) ) ) ){
 				$sql .= " `problems_solved_count` >= ? AND `problems_solved_count` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -306,7 +306,7 @@ abstract class UserRankDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_RankA->getScore()) ) ) & ( ! is_null ( ($b = $User_RankB->getScore()) ) ) ){
+		if( ( !is_null (($a = $User_RankA->score) ) ) & ( ! is_null ( ($b = $User_RankB->score) ) ) ){
 				$sql .= " `score` >= ? AND `score` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -316,7 +316,7 @@ abstract class UserRankDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_RankA->getUsername()) ) ) & ( ! is_null ( ($b = $User_RankB->getUsername()) ) ) ){
+		if( ( !is_null (($a = $User_RankA->username) ) ) & ( ! is_null ( ($b = $User_RankB->username) ) ) ){
 				$sql .= " `username` >= ? AND `username` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -326,7 +326,7 @@ abstract class UserRankDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_RankA->getName()) ) ) & ( ! is_null ( ($b = $User_RankB->getName()) ) ) ){
+		if( ( !is_null (($a = $User_RankA->name) ) ) & ( ! is_null ( ($b = $User_RankB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -336,7 +336,7 @@ abstract class UserRankDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $User_RankA->getCountryId()) ) ) & ( ! is_null ( ($b = $User_RankB->getCountryId()) ) ) ){
+		if( ( !is_null (($a = $User_RankA->country_id) ) ) & ( ! is_null ( ($b = $User_RankB->country_id) ) ) ){
 				$sql .= " `country_id` >= ? AND `country_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -374,9 +374,9 @@ abstract class UserRankDAOBase extends DAO
 	  **/
 	public static final function delete( $User_Rank )
 	{
-		if( is_null( self::getByPK($User_Rank->getUserId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($User_Rank->user_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM User_Rank WHERE  user_id = ?;";
-		$params = array( $User_Rank->getUserId() );
+		$params = array( $User_Rank->user_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

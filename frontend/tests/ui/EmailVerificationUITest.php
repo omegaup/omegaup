@@ -21,8 +21,8 @@ class EmailVerificationUITest extends OmegaupUITestCase {
         $this->clickAndWait('link=Inicia sesion');
 
         // Type login data
-        $this->type('user', $contestant->getUsername());
-        $this->type('pass', $contestant->getPassword());
+        $this->type('user', $contestant->username);
+        $this->type('pass', $contestant->password);
 
         // Click inicia sesion
         $this->clickAndWait("//input[@value='Inicia sesion']");
@@ -32,18 +32,18 @@ class EmailVerificationUITest extends OmegaupUITestCase {
         $this->assertElementContainsText('//*[@id="content"]/div[2]/div', 'Your email is not verified yet. Please check your e-mail.');
 
         // Go to verification page and wait for redirection to login page
-        $this->open('/api/user/verifyemail/id/'.$contestant->getVerificationId());
+        $this->open('/api/user/verifyemail/id/'.$contestant->verification_id);
         $this->waitForElementPresent('//*[@id="content"]/div[2]/div[1]/h1');
 
         // Type login data
-        $this->type('user', $contestant->getUsername());
-        $this->type('pass', $contestant->getPassword());
+        $this->type('user', $contestant->username);
+        $this->type('pass', $contestant->password);
 
         // Click inicia sesion
         $this->clickAndWait("//input[@value='Inicia sesion']");
 
         // Sanity check that we are logged in
         $this->waitForElementPresent('//*[@id="wrapper"]/div[1]/a');
-        $this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->getUsername());
+        $this->assertElementContainsText('//*[@id="wrapper"]/div[1]/a', $contestant->username);
     }
 }

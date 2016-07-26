@@ -60,7 +60,7 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
-        $user->setPassword($password);
+        $user->password = $password;
 
         return $user;
     }
@@ -100,11 +100,11 @@ class UserFactory {
      */
     public static function verifyUser(Users $user) {
         UserController::apiVerifyEmail(new Request(array(
-            'id' => $user->getVerificationId()
+            'id' => $user->verification_id
         )));
 
         // Get user from db again to pick up verification changes
-        return UsersDAO::FindByUsername($user->getUsername());
+        return UsersDAO::FindByUsername($user->username);
     }
 
     /**
@@ -119,7 +119,7 @@ class UserFactory {
         $user = self::createUser();
 
         $userRoles = new UserRoles(array(
-            'user_id' => $user->getUserId(),
+            'user_id' => $user->user_id,
             'role_id' => ADMIN_ROLE,
             'contest_id' => 0,
         ));
@@ -132,8 +132,8 @@ class UserFactory {
         $user = self::createUser(null, null, null, null, true);
 
         $ur = new UserRoles();
-        $ur->setUserId($user->getUserId());
-        $ur->setRoleId(4);
+        $ur->user_id = $user->user_id;
+        $ur->role_id = 4;
         UserRolesDAO::save($ur);
 
         return $user;

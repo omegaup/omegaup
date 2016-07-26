@@ -43,37 +43,37 @@ class ProblemDetailsTest extends OmegaupTestCase {
         // Get problem and contest from DB to check it
         $problemDAO = ProblemsDAO::getByAlias($problemData['request']['alias']);
         $contestDAO = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contestantsDAO = UsersDAO::search(new Users(array('username' => $contestant->getUsername())));
+        $contestantsDAO = UsersDAO::search(new Users(array('username' => $contestant->username)));
         $contestantDAO = $contestantsDAO[0];
 
         // Assert data
-        $this->assertEquals($response['title'], $problemDAO->getTitle());
-        $this->assertEquals($response['alias'], $problemDAO->getAlias());
-        $this->assertEquals($response['validator'], $problemDAO->getValidator());
-        $this->assertEquals($response['time_limit'], $problemDAO->getTimeLimit());
-        $this->assertEquals($response['memory_limit'], $problemDAO->getMemoryLimit());
+        $this->assertEquals($response['title'], $problemDAO->title);
+        $this->assertEquals($response['alias'], $problemDAO->alias);
+        $this->assertEquals($response['validator'], $problemDAO->validator);
+        $this->assertEquals($response['time_limit'], $problemDAO->time_limit);
+        $this->assertEquals($response['memory_limit'], $problemDAO->memory_limit);
         $this->assertEquals($response['problemsetter']['username'], $author->username);
         $this->assertEquals($response['problemsetter']['name'], $author->name);
-        $this->assertEquals($response['source'], $problemDAO->getSource());
+        $this->assertEquals($response['source'], $problemDAO->source);
         $this->assertContains('<h1>Entrada</h1>', $response['problem_statement']);
-        $this->assertEquals($response['order'], $problemDAO->getOrder());
+        $this->assertEquals($response['order'], $problemDAO->order);
         $this->assertEquals($response['score'], 0);
 
         // Default data
-        $this->assertEquals(0, $problemDAO->getVisits());
-        $this->assertEquals(0, $problemDAO->getSubmissions());
-        $this->assertEquals(0, $problemDAO->getAccepted());
-        $this->assertEquals(0, $problemDAO->getDifficulty());
+        $this->assertEquals(0, $problemDAO->visits);
+        $this->assertEquals(0, $problemDAO->submissions);
+        $this->assertEquals(0, $problemDAO->accepted);
+        $this->assertEquals(0, $problemDAO->difficulty);
 
         // Verify that we have an empty array of runs
         $this->assertEquals(0, count($response['runs']));
 
         // Verify that problem was marked as Opened
-        $problem_opened = ContestProblemOpenedDAO::getByPK($contestDAO->getContestId(), $problemDAO->getProblemId(), $contestantDAO->getUserId());
+        $problem_opened = ContestProblemOpenedDAO::getByPK($contestDAO->contest_id, $problemDAO->problem_id, $contestantDAO->user_id);
         $this->assertNotNull($problem_opened);
 
         // Verify open time
-        $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->getOpenTime()));
+        $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->open_time));
     }
 
     /**

@@ -33,7 +33,7 @@ abstract class GroupsUsersDAOBase extends DAO
 	  **/
 	public static final function save( $Groups_Users )
 	{
-		if (!is_null(self::getByPK( $Groups_Users->getGroupId() , $Groups_Users->getUserId() )))
+		if (!is_null(self::getByPK( $Groups_Users->group_id, $Groups_Users->user_id)))
 		{
 			return GroupsUsersDAOBase::update( $Groups_Users);
 		} else {
@@ -112,7 +112,7 @@ abstract class GroupsUsersDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,13 +128,13 @@ abstract class GroupsUsersDAOBase extends DAO
 
 		$sql = "SELECT * from Groups_Users WHERE (";
 		$val = array();
-		if (!is_null( $Groups_Users->getGroupId())) {
+		if (!is_null( $Groups_Users->group_id)) {
 			$sql .= " `group_id` = ? AND";
-			array_push( $val, $Groups_Users->getGroupId() );
+			array_push( $val, $Groups_Users->group_id );
 		}
-		if (!is_null( $Groups_Users->getUserId())) {
+		if (!is_null( $Groups_Users->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Groups_Users->getUserId() );
+			array_push( $val, $Groups_Users->user_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -216,15 +216,15 @@ abstract class GroupsUsersDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -237,7 +237,7 @@ abstract class GroupsUsersDAOBase extends DAO
 	{
 		$sql = "SELECT * from Groups_Users WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Groups_UsersA->getGroupId()) ) ) & ( ! is_null ( ($b = $Groups_UsersB->getGroupId()) ) ) ){
+		if( ( !is_null (($a = $Groups_UsersA->group_id) ) ) & ( ! is_null ( ($b = $Groups_UsersB->group_id) ) ) ){
 				$sql .= " `group_id` >= ? AND `group_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -247,7 +247,7 @@ abstract class GroupsUsersDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_UsersA->getUserId()) ) ) & ( ! is_null ( ($b = $Groups_UsersB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $Groups_UsersA->user_id) ) ) & ( ! is_null ( ($b = $Groups_UsersB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -285,9 +285,9 @@ abstract class GroupsUsersDAOBase extends DAO
 	  **/
 	public static final function delete( $Groups_Users )
 	{
-		if( is_null( self::getByPK($Groups_Users->getGroupId(), $Groups_Users->getUserId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Groups_Users->group_id, $Groups_Users->user_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Groups_Users WHERE  group_id = ? AND user_id = ?;";
-		$params = array( $Groups_Users->getGroupId(), $Groups_Users->getUserId() );
+		$params = array( $Groups_Users->group_id, $Groups_Users->user_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

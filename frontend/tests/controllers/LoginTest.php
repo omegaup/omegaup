@@ -21,8 +21,8 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->getUsername(),
-                    'password' => $user->getPassword()
+                    'usernameOrEmail' => $user->username,
+                    'password' => $user->password
                 ));
 
         // Call the API
@@ -48,7 +48,7 @@ class LoginTest extends OmegaupTestCase {
         // Inflate request with user data
         $r = new Request(array(
                     'usernameOrEmail' => $email,
-                    'password' => $user->getPassword()
+                    'password' => $user->password
                 ));
 
         $response = UserController::apiLogin($r);
@@ -68,7 +68,7 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->getUsername(),
+                    'usernameOrEmail' => $user->username,
                     'password' => 'badpasswordD:'
                 ));
 
@@ -122,8 +122,8 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Set required context
-        $_REQUEST['usernameOrEmail'] = $user->getUsername();
-        $_REQUEST['password'] = $user->getPassword();
+        $_REQUEST['usernameOrEmail'] = $user->username;
+        $_REQUEST['password'] = $user->password;
 
         // Turn on flag to return auth_token in response, just to validate it
         $_REQUEST['returnAuthToken'] = true;
@@ -150,8 +150,8 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->getUsername(),
-                    'password' => $user->getPassword()
+                    'usernameOrEmail' => $user->username,
+                    'password' => $user->password
                 ));
 
         // Call the API
@@ -176,18 +176,18 @@ class LoginTest extends OmegaupTestCase {
         // Create an user in omegaup
         $user = UserFactory::createUser();
 
-        $plainPassword = $user->getPassword();
+        $plainPassword = $user->password;
         // Set old password
-        $user->setPassword(md5($plainPassword));
+        $user->password = md5($plainPassword);
         UsersDAO::save($user);
 
         // Let's put back plain password
-        $user->setPassword($plainPassword);
+        $user->password = $plainPassword;
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->getUsername(),
-                    'password' => $user->getPassword()
+                    'usernameOrEmail' => $user->username,
+                    'password' => $user->password
                 ));
 
         // Call the API
@@ -202,7 +202,7 @@ class LoginTest extends OmegaupTestCase {
 
         // Expire token manually
         $auth_token_dao = AuthTokensDAO::getByPK($auth_token);
-        $auth_token_dao->setCreateTime(date('Y-m-d H:i:s', strtotime($auth_token_dao->getCreateTime() . ' - 9 hour')));
+        $auth_token_dao->create_time = date('Y-m-d H:i:s', strtotime($auth_token_dao->create_time . ' - 9 hour'));
         AuthTokensDAO::save($auth_token_dao);
 
         $auth_token_2 = self::login($user);
@@ -355,7 +355,7 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Force empty password
-        $user->setPassword('');
+        $user->password = '';
         UsersDAO::save($user);
 
         $this->login($user);

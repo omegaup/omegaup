@@ -27,16 +27,16 @@ class ContestsUsersDAO extends ContestsUsersDAOBase {
                 throw new ForbiddenAccessException();
             }
             $contest_user = new ContestsUsers();
-            $contest_user->setUserId($user_id);
-            $contest_user->setContestId($contest_id);
-            $contest_user->setAccessTime(date('Y-m-d H:i:s'));
-            $contest_user->setScore(0);
-            $contest_user->setTime(0);
+            $contest_user->user_id = $user_id;
+            $contest_user->contest_id = $contest_id;
+            $contest_user->access_time = date('Y-m-d H:i:s');
+            $contest_user->score = 0;
+            $contest_user->time = 0;
 
             ContestsUsersDAO::save($contest_user);
-        } elseif ($contest_user->getAccessTime() === '0000-00-00 00:00:00') {
+        } elseif ($contest_user->access_time === '0000-00-00 00:00:00') {
             // If its set to default time, update it
-            $contest_user->setAccessTime(date('Y-m-d H:i:s'));
+            $contest_user->access_time = date('Y-m-d H:i:s');
 
             ContestsUsersDAO::save($contest_user);
         }

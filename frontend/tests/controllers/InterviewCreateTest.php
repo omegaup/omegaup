@@ -77,7 +77,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $this->assertNotNull($createdUser1 = UsersDAO::FindByEmail($email1), 'user should have been created by adding email to interview');
         $this->assertNotNull(UsersDAO::FindByEmail($email2), 'user should have been created by adding email to interview');
 
-        $this->assertEquals($createdUser1->getVerified(), 0, 'new created users should not be email-validated');
+        $this->assertEquals($createdUser1->verified, 0, 'new created users should not be email-validated');
 
         // add 2 users that are already omegaup users (using registered email)
         $emailFor1 = Utils::CreateRandomString().'@mail.com';
@@ -101,7 +101,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $r3 = new Request();
         $r3['auth_token'] = $this->login($interviewer);
         $r3['interview_alias'] = $r['alias'];
-        $r3['usernameOrEmailsCSV'] = $interviewee3->getUsername() . ',' . $interviewee4->getUsername();
+        $r3['usernameOrEmailsCSV'] = $interviewee3->username . ',' . $interviewee4->username;
 
         $response = InterviewController::apiAddUsers($r3);
         $this->assertEquals('ok', $response['status']);

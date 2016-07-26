@@ -33,7 +33,7 @@ abstract class MessagesDAOBase extends DAO
 	  **/
 	public static final function save( $Messages )
 	{
-		if (!is_null(self::getByPK( $Messages->getMessageId() )))
+		if (!is_null(self::getByPK( $Messages->message_id)))
 		{
 			return MessagesDAOBase::update( $Messages);
 		} else {
@@ -112,7 +112,7 @@ abstract class MessagesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,29 +128,29 @@ abstract class MessagesDAOBase extends DAO
 
 		$sql = "SELECT * from Messages WHERE (";
 		$val = array();
-		if (!is_null( $Messages->getMessageId())) {
+		if (!is_null( $Messages->message_id)) {
 			$sql .= " `message_id` = ? AND";
-			array_push( $val, $Messages->getMessageId() );
+			array_push( $val, $Messages->message_id );
 		}
-		if (!is_null( $Messages->getRead())) {
+		if (!is_null( $Messages->read)) {
 			$sql .= " `read` = ? AND";
-			array_push( $val, $Messages->getRead() );
+			array_push( $val, $Messages->read );
 		}
-		if (!is_null( $Messages->getSenderId())) {
+		if (!is_null( $Messages->sender_id)) {
 			$sql .= " `sender_id` = ? AND";
-			array_push( $val, $Messages->getSenderId() );
+			array_push( $val, $Messages->sender_id );
 		}
-		if (!is_null( $Messages->getRecipientId())) {
+		if (!is_null( $Messages->recipient_id)) {
 			$sql .= " `recipient_id` = ? AND";
-			array_push( $val, $Messages->getRecipientId() );
+			array_push( $val, $Messages->recipient_id );
 		}
-		if (!is_null( $Messages->getMessage())) {
+		if (!is_null( $Messages->message)) {
 			$sql .= " `message` = ? AND";
-			array_push( $val, $Messages->getMessage() );
+			array_push( $val, $Messages->message );
 		}
-		if (!is_null( $Messages->getDate())) {
+		if (!is_null( $Messages->date)) {
 			$sql .= " `date` = ? AND";
-			array_push( $val, $Messages->getDate() );
+			array_push( $val, $Messages->date );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -189,12 +189,12 @@ abstract class MessagesDAOBase extends DAO
 	{
 		$sql = "UPDATE Messages SET  `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE  `message_id` = ?;";
 		$params = array(
-			$Messages->getRead(),
-			$Messages->getSenderId(),
-			$Messages->getRecipientId(),
-			$Messages->getMessage(),
-			$Messages->getDate(),
-			$Messages->getMessageId(), );
+			$Messages->read,
+			$Messages->sender_id,
+			$Messages->recipient_id,
+			$Messages->message,
+			$Messages->date,
+			$Messages->message_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -250,15 +250,15 @@ abstract class MessagesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -271,7 +271,7 @@ abstract class MessagesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Messages WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $MessagesA->getMessageId()) ) ) & ( ! is_null ( ($b = $MessagesB->getMessageId()) ) ) ){
+		if( ( !is_null (($a = $MessagesA->message_id) ) ) & ( ! is_null ( ($b = $MessagesB->message_id) ) ) ){
 				$sql .= " `message_id` >= ? AND `message_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -281,7 +281,7 @@ abstract class MessagesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $MessagesA->getRead()) ) ) & ( ! is_null ( ($b = $MessagesB->getRead()) ) ) ){
+		if( ( !is_null (($a = $MessagesA->read) ) ) & ( ! is_null ( ($b = $MessagesB->read) ) ) ){
 				$sql .= " `read` >= ? AND `read` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -291,7 +291,7 @@ abstract class MessagesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $MessagesA->getSenderId()) ) ) & ( ! is_null ( ($b = $MessagesB->getSenderId()) ) ) ){
+		if( ( !is_null (($a = $MessagesA->sender_id) ) ) & ( ! is_null ( ($b = $MessagesB->sender_id) ) ) ){
 				$sql .= " `sender_id` >= ? AND `sender_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -301,7 +301,7 @@ abstract class MessagesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $MessagesA->getRecipientId()) ) ) & ( ! is_null ( ($b = $MessagesB->getRecipientId()) ) ) ){
+		if( ( !is_null (($a = $MessagesA->recipient_id) ) ) & ( ! is_null ( ($b = $MessagesB->recipient_id) ) ) ){
 				$sql .= " `recipient_id` >= ? AND `recipient_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -311,7 +311,7 @@ abstract class MessagesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $MessagesA->getMessage()) ) ) & ( ! is_null ( ($b = $MessagesB->getMessage()) ) ) ){
+		if( ( !is_null (($a = $MessagesA->message) ) ) & ( ! is_null ( ($b = $MessagesB->message) ) ) ){
 				$sql .= " `message` >= ? AND `message` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -321,7 +321,7 @@ abstract class MessagesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $MessagesA->getDate()) ) ) & ( ! is_null ( ($b = $MessagesB->getDate()) ) ) ){
+		if( ( !is_null (($a = $MessagesA->date) ) ) & ( ! is_null ( ($b = $MessagesB->date) ) ) ){
 				$sql .= " `date` >= ? AND `date` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -359,9 +359,9 @@ abstract class MessagesDAOBase extends DAO
 	  **/
 	public static final function delete( $Messages )
 	{
-		if( is_null( self::getByPK($Messages->getMessageId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Messages->message_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Messages WHERE  message_id = ?;";
-		$params = array( $Messages->getMessageId() );
+		$params = array( $Messages->message_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

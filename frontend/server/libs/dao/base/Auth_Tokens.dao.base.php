@@ -33,7 +33,7 @@ abstract class AuthTokensDAOBase extends DAO
 	  **/
 	public static final function save( $Auth_Tokens )
 	{
-		if (!is_null(self::getByPK( $Auth_Tokens->getToken() )))
+		if (!is_null(self::getByPK( $Auth_Tokens->token)))
 		{
 			return AuthTokensDAOBase::update( $Auth_Tokens);
 		} else {
@@ -112,7 +112,7 @@ abstract class AuthTokensDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class AuthTokensDAOBase extends DAO
 
 		$sql = "SELECT * from Auth_Tokens WHERE (";
 		$val = array();
-		if (!is_null( $Auth_Tokens->getUserId())) {
+		if (!is_null( $Auth_Tokens->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Auth_Tokens->getUserId() );
+			array_push( $val, $Auth_Tokens->user_id );
 		}
-		if (!is_null( $Auth_Tokens->getToken())) {
+		if (!is_null( $Auth_Tokens->token)) {
 			$sql .= " `token` = ? AND";
-			array_push( $val, $Auth_Tokens->getToken() );
+			array_push( $val, $Auth_Tokens->token );
 		}
-		if (!is_null( $Auth_Tokens->getCreateTime())) {
+		if (!is_null( $Auth_Tokens->create_time)) {
 			$sql .= " `create_time` = ? AND";
-			array_push( $val, $Auth_Tokens->getCreateTime() );
+			array_push( $val, $Auth_Tokens->create_time );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -177,9 +177,9 @@ abstract class AuthTokensDAOBase extends DAO
 	{
 		$sql = "UPDATE Auth_Tokens SET  `user_id` = ?, `create_time` = ? WHERE  `token` = ?;";
 		$params = array(
-			$Auth_Tokens->getUserId(),
-			$Auth_Tokens->getCreateTime(),
-			$Auth_Tokens->getToken(), );
+			$Auth_Tokens->user_id,
+			$Auth_Tokens->create_time,
+			$Auth_Tokens->token, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -230,15 +230,15 @@ abstract class AuthTokensDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -251,7 +251,7 @@ abstract class AuthTokensDAOBase extends DAO
 	{
 		$sql = "SELECT * from Auth_Tokens WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Auth_TokensA->getUserId()) ) ) & ( ! is_null ( ($b = $Auth_TokensB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $Auth_TokensA->user_id) ) ) & ( ! is_null ( ($b = $Auth_TokensB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -261,7 +261,7 @@ abstract class AuthTokensDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Auth_TokensA->getToken()) ) ) & ( ! is_null ( ($b = $Auth_TokensB->getToken()) ) ) ){
+		if( ( !is_null (($a = $Auth_TokensA->token) ) ) & ( ! is_null ( ($b = $Auth_TokensB->token) ) ) ){
 				$sql .= " `token` >= ? AND `token` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -271,7 +271,7 @@ abstract class AuthTokensDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Auth_TokensA->getCreateTime()) ) ) & ( ! is_null ( ($b = $Auth_TokensB->getCreateTime()) ) ) ){
+		if( ( !is_null (($a = $Auth_TokensA->create_time) ) ) & ( ! is_null ( ($b = $Auth_TokensB->create_time) ) ) ){
 				$sql .= " `create_time` >= ? AND `create_time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -309,9 +309,9 @@ abstract class AuthTokensDAOBase extends DAO
 	  **/
 	public static final function delete( $Auth_Tokens )
 	{
-		if( is_null( self::getByPK($Auth_Tokens->getToken()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Auth_Tokens->token) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Auth_Tokens WHERE  token = ?;";
-		$params = array( $Auth_Tokens->getToken() );
+		$params = array( $Auth_Tokens->token );
 		global $conn;
 
 		$conn->Execute($sql, $params);

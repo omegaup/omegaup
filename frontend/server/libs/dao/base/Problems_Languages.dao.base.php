@@ -33,7 +33,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	  **/
 	public static final function save( $Problems_Languages )
 	{
-		if (!is_null(self::getByPK( $Problems_Languages->getProblemId() , $Problems_Languages->getLanguageId() )))
+		if (!is_null(self::getByPK( $Problems_Languages->problem_id, $Problems_Languages->language_id)))
 		{
 			return ProblemsLanguagesDAOBase::update( $Problems_Languages);
 		} else {
@@ -112,7 +112,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 
 		$sql = "SELECT * from Problems_Languages WHERE (";
 		$val = array();
-		if (!is_null( $Problems_Languages->getProblemId())) {
+		if (!is_null( $Problems_Languages->problem_id)) {
 			$sql .= " `problem_id` = ? AND";
-			array_push( $val, $Problems_Languages->getProblemId() );
+			array_push( $val, $Problems_Languages->problem_id );
 		}
-		if (!is_null( $Problems_Languages->getLanguageId())) {
+		if (!is_null( $Problems_Languages->language_id)) {
 			$sql .= " `language_id` = ? AND";
-			array_push( $val, $Problems_Languages->getLanguageId() );
+			array_push( $val, $Problems_Languages->language_id );
 		}
-		if (!is_null( $Problems_Languages->getTranslatorId())) {
+		if (!is_null( $Problems_Languages->translator_id)) {
 			$sql .= " `translator_id` = ? AND";
-			array_push( $val, $Problems_Languages->getTranslatorId() );
+			array_push( $val, $Problems_Languages->translator_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -177,8 +177,8 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	{
 		$sql = "UPDATE Problems_Languages SET  `translator_id` = ? WHERE  `problem_id` = ? AND `language_id` = ?;";
 		$params = array(
-			$Problems_Languages->getTranslatorId(),
-			$Problems_Languages->getProblemId(),$Problems_Languages->getLanguageId(), );
+			$Problems_Languages->translator_id,
+			$Problems_Languages->problem_id,$Problems_Languages->language_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -228,15 +228,15 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -249,7 +249,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Problems_Languages WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Problems_LanguagesA->getProblemId()) ) ) & ( ! is_null ( ($b = $Problems_LanguagesB->getProblemId()) ) ) ){
+		if( ( !is_null (($a = $Problems_LanguagesA->problem_id) ) ) & ( ! is_null ( ($b = $Problems_LanguagesB->problem_id) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -259,7 +259,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Problems_LanguagesA->getLanguageId()) ) ) & ( ! is_null ( ($b = $Problems_LanguagesB->getLanguageId()) ) ) ){
+		if( ( !is_null (($a = $Problems_LanguagesA->language_id) ) ) & ( ! is_null ( ($b = $Problems_LanguagesB->language_id) ) ) ){
 				$sql .= " `language_id` >= ? AND `language_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -269,7 +269,7 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Problems_LanguagesA->getTranslatorId()) ) ) & ( ! is_null ( ($b = $Problems_LanguagesB->getTranslatorId()) ) ) ){
+		if( ( !is_null (($a = $Problems_LanguagesA->translator_id) ) ) & ( ! is_null ( ($b = $Problems_LanguagesB->translator_id) ) ) ){
 				$sql .= " `translator_id` >= ? AND `translator_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -307,9 +307,9 @@ abstract class ProblemsLanguagesDAOBase extends DAO
 	  **/
 	public static final function delete( $Problems_Languages )
 	{
-		if( is_null( self::getByPK($Problems_Languages->getProblemId(), $Problems_Languages->getLanguageId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Problems_Languages->problem_id, $Problems_Languages->language_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Problems_Languages WHERE  problem_id = ? AND language_id = ?;";
-		$params = array( $Problems_Languages->getProblemId(), $Problems_Languages->getLanguageId() );
+		$params = array( $Problems_Languages->problem_id, $Problems_Languages->language_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

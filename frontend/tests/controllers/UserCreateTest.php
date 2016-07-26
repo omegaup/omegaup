@@ -31,7 +31,7 @@ class CreateUserTest extends OmegaupTestCase {
         $this->assertNotNull($user);
 
         // Verify that users are opt'd out of the recruitment after being created
-        $this->assertNull($user->getRecruitmentOptin());
+        $this->assertNull($user->recruitment_optin);
     }
 
     /**
@@ -202,13 +202,13 @@ class CreateUserTest extends OmegaupTestCase {
         // Call api using admin
         $response = UserController::apiVerifyEmail(new Request(array(
             'auth_token' => $this->login($admin),
-            'usernameOrEmail' => $user->getUsername()
+            'usernameOrEmail' => $user->username
         )));
 
         // Get user from db again to pick up verification changes
-        $userdb = UsersDAO::FindByUsername($user->getUsername());
+        $userdb = UsersDAO::FindByUsername($user->username);
 
-        $this->assertEquals(1, $userdb->getVerified());
+        $this->assertEquals(1, $userdb->verified);
         $this->assertEquals('ok', $response['status']);
     }
 
@@ -244,7 +244,7 @@ class CreateUserTest extends OmegaupTestCase {
         // Call api using admin
         $response = UserController::apiVerifyEmail(new Request(array(
             'auth_token' => $this->login($user2),
-            'usernameOrEmail' => $user->getUsername()
+            'usernameOrEmail' => $user->username
         )));
     }
 }

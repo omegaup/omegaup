@@ -292,7 +292,7 @@ class ProblemsDAO extends ProblemsDAOBase
 
     public static function getPrivateCount(Users $user) {
         $sql = 'SELECT count(*) as Total FROM Problems WHERE public = 0 and (author_id = ?);';
-        $params = array($user->getUserId());
+        $params = array($user->user_id);
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);

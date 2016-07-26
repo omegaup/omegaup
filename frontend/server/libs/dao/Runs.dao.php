@@ -329,7 +329,7 @@ class RunsDAO extends RunsDAOBase {
         }
 
         $run = new Runs($rs);
-        return array($run, time() - strtotime($run->getTime()));
+        return array($run, time() - strtotime($run->time));
     }
 
     /*
@@ -519,11 +519,11 @@ class RunsDAO extends RunsDAOBase {
         if ($contest_id != null) {
             // Get submissions gap
             $contest = ContestsDAO::getByPK($contest_id);
-            $submission_gap = (int) $contest->getSubmissionsGap();
+            $submission_gap = (int) $contest->submissions_gap;
         }
         $submission_gap = max($submission_gap, RunController::$defaultSubmissionGap);
 
-        return time() >= (strtotime($lastrun->getTime()) + $submission_gap);
+        return time() >= (strtotime($lastrun->time) + $submission_gap);
     }
 
     public static function GetRunCountsToDate($date) {
@@ -562,79 +562,79 @@ class RunsDAO extends RunsDAOBase {
         }
         $sql .= 'WHERE (';
         $val = array();
-        if ($Runs->getRunId() != null) {
+        if ($Runs->run_id != null) {
             $sql .= ' run_id = ? AND';
-            array_push($val, $Runs->getRunId());
+            array_push($val, $Runs->run_id);
         }
 
-        if ($Runs->getUserId() != null) {
+        if ($Runs->user_id != null) {
             $sql .= ' user_id = ? AND';
-            array_push($val, $Runs->getUserId());
+            array_push($val, $Runs->user_id);
         }
 
-        if ($Runs->getProblemId() != null) {
+        if ($Runs->problem_id != null) {
             $sql .= ' Runs.problem_id = ? AND';
-            array_push($val, $Runs->getProblemId());
+            array_push($val, $Runs->problem_id);
         }
 
-        if ($Runs->getContestId() != null) {
+        if ($Runs->contest_id != null) {
             $sql .= ' Runs.contest_id = ? AND';
-            array_push($val, $Runs->getContestId());
+            array_push($val, $Runs->contest_id);
         }
 
-        if ($Runs->getGuid() != null) {
+        if ($Runs->guid != null) {
             $sql .= ' guid = ? AND';
-            array_push($val, $Runs->getGuid());
+            array_push($val, $Runs->guid);
         }
 
-        if ($Runs->getLanguage() != null) {
+        if ($Runs->language != null) {
             $sql .= ' language = ? AND';
-            array_push($val, $Runs->getLanguage());
+            array_push($val, $Runs->language);
         }
 
-        if ($Runs->getStatus() != null) {
+        if ($Runs->status != null) {
             $sql .= ' status = ? AND';
-            array_push($val, $Runs->getStatus());
+            array_push($val, $Runs->status);
         }
 
-        if ($Runs->getVerdict() != null) {
-            if ($Runs->getVerdict() == 'NO-AC') {
+        if ($Runs->verdict != null) {
+            if ($Runs->verdict == 'NO-AC') {
                 $sql .= ' verdict != ? AND';
                 array_push($val, 'AC');
             } else {
                 $sql .= ' verdict = ? AND';
-                array_push($val, $Runs->getVerdict());
+                array_push($val, $Runs->verdict);
             }
         }
 
-        if ($Runs->getRuntime() != null) {
+        if ($Runs->runtime != null) {
             $sql .= ' runtime = ? AND';
-            array_push($val, $Runs->getRuntime());
+            array_push($val, $Runs->runtime);
         }
 
-        if ($Runs->getMemory() != null) {
+        if ($Runs->memory != null) {
             $sql .= ' memory = ? AND';
-            array_push($val, $Runs->getMemory());
+            array_push($val, $Runs->memory);
         }
 
-        if ($Runs->getScore() != null) {
+        if ($Runs->score != null) {
             $sql .= ' score = ? AND';
-            array_push($val, $Runs->getScore());
+            array_push($val, $Runs->score);
         }
 
-        if ($Runs->getContestScore() != null) {
+        if ($Runs->contest_score != null) {
             $sql .= ' contest_score = ? AND';
-            array_push($val, $Runs->getContestScore());
+            array_push($val, $Runs->contest_score);
         }
 
-        if ($Runs->getTime() != null) {
+        if ($Runs->time != null) {
             $sql .= ' time = ? AND';
-            array_push($val, $Runs->getTime());
+            array_push($val, $Runs->time);
         }
 
-        if ($Runs->getTest() !== null) {
+        if ($Runs->test !== null) {
             $sql .= ' test = ?  AND';
-            array_push($val, $Runs->getTest());
+            array_push($val, $Runs->test);
         }
 
         $sql .= ' run_id > ?  AND';

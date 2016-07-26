@@ -18,7 +18,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
 
         $r = new Request();
         $r['auth_token'] = $this->login($admin);
-        $r['username'] = $user->getUsername();
+        $r['username'] = $user->username;
         $r['password'] = Utils::CreateRandomString();
 
         // Call api
@@ -33,7 +33,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         }
 
         // Set new password and try again, should succeed
-        $user->setPassword($r['password']);
+        $user->password = $r['password'];
         $this->login($user);
 
         // Sanity check, admin should be able to login fine
@@ -49,9 +49,9 @@ class UserResetPasswordTest extends OmegaupTestCase {
 
         $r = new Request();
         $r['auth_token'] = $this->login($user);
-        $r['username'] = $user->getUsername();
+        $r['username'] = $user->username;
         $r['password'] = Utils::CreateRandomString();
-        $r['old_password'] = $user->getPassword();
+        $r['old_password'] = $user->password;
 
         // Call api
         UserController::apiChangePassword($r);
@@ -65,7 +65,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         }
 
         // Set new password and try again, should succeed
-        $user->setPassword($r['password']);
+        $user->password = $r['password'];
         $this->login($user);
     }
 
@@ -80,7 +80,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
 
         $r = new Request();
         $r['auth_token'] = $this->login($user);
-        $r['username'] = $user->getUsername();
+        $r['username'] = $user->username;
         $r['password'] = Utils::CreateRandomString();
         $r['old_password'] = 'bad old password';
 

@@ -42,7 +42,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         $this->assertNotNull($clarification);
         $this->assertEquals(
             $clarificationData['request']['message'],
-            $clarification->getMessage()
+            $clarification->message
         );
 
         // We need to verify that the contest and problem IDs where properly saved
@@ -50,7 +50,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         $problem = ProblemsDAO::getByAlias($problemData['request']['alias']);
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
-        $this->assertEquals($contest->getContestId(), $clarification->getContestId());
-        $this->assertEquals($problem->getProblemId(), $clarification->getProblemId());
+        $this->assertEquals($contest->contest_id, $clarification->contest_id);
+        $this->assertEquals($problem->problem_id, $clarification->problem_id);
     }
 }

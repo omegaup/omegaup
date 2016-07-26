@@ -54,7 +54,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Verify data in DB
         $problem_mask = new Problems();
-        $problem_mask->setTitle($r['title']);
+        $problem_mask->title = $r['title'];
         $problems = ProblemsDAO::search($problem_mask);
 
         // Check that we only retreived 1 element
@@ -104,12 +104,12 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Verify data in DB
         $problem_mask = new Problems();
-        $problem_mask->setAlias($r['alias']);
+        $problem_mask->alias = $r['alias'];
         $problems = ProblemsDAO::search($problem_mask);
 
         // Check that we only retrieved 1 element
         $this->assertEquals(1, count($problems));
-        $this->assertEqualSets($r['languages'], $problems[0]->getLanguages());
+        $this->assertEqualSets($r['languages'], $problems[0]->languages);
 
         // Validate response
         $this->assertEquals('ok', $response['status']);
@@ -272,7 +272,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Verify data in DB
         $problem_mask = new Problems();
-        $problem_mask->setTitle($newTitle);
+        $problem_mask->title = $newTitle;
         $problems = ProblemsDAO::search($problem_mask);
 
         $this->assertTrue(!is_null($problems));
@@ -318,7 +318,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Verify data in DB
         $problem_mask = new Problems();
-        $problem_mask->setTitle($newTitle);
+        $problem_mask->title = $newTitle;
         $problems = ProblemsDAO::search($problem_mask);
     }
 

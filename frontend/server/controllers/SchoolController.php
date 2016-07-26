@@ -31,7 +31,7 @@ class SchoolController extends Controller {
 
         $response = array();
         foreach ($schools as $school) {
-            $entry = array('label' => $school->getName(), 'value' => $school->getName(), 'id' => $school->getSchoolId());
+            $entry = array('label' => $school->name, 'value' => $school->name, 'id' => $school->school_id);
             array_push($response, $entry);
         }
 
@@ -71,11 +71,11 @@ class SchoolController extends Controller {
         try {
             $existing = SchoolsDAO::findByName($r['name']);
             if (count($existing) > 0) {
-                $school_id = $existing[0]->getSchoolId();
+                $school_id = $existing[0]->school_id;
             } else {
                 // Save in db
                 SchoolsDAO::save($school);
-                $school_id = $school->getSchoolId();
+                $school_id = $school->school_id;
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

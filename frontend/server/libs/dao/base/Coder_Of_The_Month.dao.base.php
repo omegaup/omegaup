@@ -33,7 +33,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  **/
 	public static final function save( $Coder_Of_The_Month )
 	{
-		if (!is_null(self::getByPK( $Coder_Of_The_Month->getCoderOfTheMonthId() )))
+		if (!is_null(self::getByPK( $Coder_Of_The_Month->coder_of_the_month_id)))
 		{
 			return CoderOfTheMonthDAOBase::update( $Coder_Of_The_Month);
 		} else {
@@ -112,7 +112,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,25 +128,25 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 
 		$sql = "SELECT * from Coder_Of_The_Month WHERE (";
 		$val = array();
-		if (!is_null( $Coder_Of_The_Month->getCoderOfTheMonthId())) {
+		if (!is_null( $Coder_Of_The_Month->coder_of_the_month_id)) {
 			$sql .= " `coder_of_the_month_id` = ? AND";
-			array_push( $val, $Coder_Of_The_Month->getCoderOfTheMonthId() );
+			array_push( $val, $Coder_Of_The_Month->coder_of_the_month_id );
 		}
-		if (!is_null( $Coder_Of_The_Month->getUserId())) {
+		if (!is_null( $Coder_Of_The_Month->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Coder_Of_The_Month->getUserId() );
+			array_push( $val, $Coder_Of_The_Month->user_id );
 		}
-		if (!is_null( $Coder_Of_The_Month->getDescription())) {
+		if (!is_null( $Coder_Of_The_Month->description)) {
 			$sql .= " `description` = ? AND";
-			array_push( $val, $Coder_Of_The_Month->getDescription() );
+			array_push( $val, $Coder_Of_The_Month->description );
 		}
-		if (!is_null( $Coder_Of_The_Month->getTime())) {
+		if (!is_null( $Coder_Of_The_Month->time)) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $Coder_Of_The_Month->getTime() );
+			array_push( $val, $Coder_Of_The_Month->time );
 		}
-		if (!is_null( $Coder_Of_The_Month->getInterviewUrl())) {
+		if (!is_null( $Coder_Of_The_Month->interview_url)) {
 			$sql .= " `interview_url` = ? AND";
-			array_push( $val, $Coder_Of_The_Month->getInterviewUrl() );
+			array_push( $val, $Coder_Of_The_Month->interview_url );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -185,11 +185,11 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	{
 		$sql = "UPDATE Coder_Of_The_Month SET  `user_id` = ?, `description` = ?, `time` = ?, `interview_url` = ? WHERE  `coder_of_the_month_id` = ?;";
 		$params = array(
-			$Coder_Of_The_Month->getUserId(),
-			$Coder_Of_The_Month->getDescription(),
-			$Coder_Of_The_Month->getTime(),
-			$Coder_Of_The_Month->getInterviewUrl(),
-			$Coder_Of_The_Month->getCoderOfTheMonthId(), );
+			$Coder_Of_The_Month->user_id,
+			$Coder_Of_The_Month->description,
+			$Coder_Of_The_Month->time,
+			$Coder_Of_The_Month->interview_url,
+			$Coder_Of_The_Month->coder_of_the_month_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -243,15 +243,15 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -264,7 +264,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	{
 		$sql = "SELECT * from Coder_Of_The_Month WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Coder_Of_The_MonthA->getCoderOfTheMonthId()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getCoderOfTheMonthId()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->coder_of_the_month_id) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->coder_of_the_month_id) ) ) ){
 				$sql .= " `coder_of_the_month_id` >= ? AND `coder_of_the_month_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -274,7 +274,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Coder_Of_The_MonthA->getUserId()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->user_id) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -284,7 +284,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Coder_Of_The_MonthA->getDescription()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getDescription()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->description) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->description) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -294,7 +294,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Coder_Of_The_MonthA->getTime()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getTime()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->time) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->time) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -304,7 +304,7 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Coder_Of_The_MonthA->getInterviewUrl()) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->getInterviewUrl()) ) ) ){
+		if( ( !is_null (($a = $Coder_Of_The_MonthA->interview_url) ) ) & ( ! is_null ( ($b = $Coder_Of_The_MonthB->interview_url) ) ) ){
 				$sql .= " `interview_url` >= ? AND `interview_url` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -342,9 +342,9 @@ abstract class CoderOfTheMonthDAOBase extends DAO
 	  **/
 	public static final function delete( $Coder_Of_The_Month )
 	{
-		if( is_null( self::getByPK($Coder_Of_The_Month->getCoderOfTheMonthId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Coder_Of_The_Month->coder_of_the_month_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Coder_Of_The_Month WHERE  coder_of_the_month_id = ?;";
-		$params = array( $Coder_Of_The_Month->getCoderOfTheMonthId() );
+		$params = array( $Coder_Of_The_Month->coder_of_the_month_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

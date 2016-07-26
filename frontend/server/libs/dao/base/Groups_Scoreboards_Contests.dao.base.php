@@ -33,7 +33,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  **/
 	public static final function save( $Groups_Scoreboards_Contests )
 	{
-		if (!is_null(self::getByPK( $Groups_Scoreboards_Contests->getGroupScoreboardId() , $Groups_Scoreboards_Contests->getContestId() )))
+		if (!is_null(self::getByPK( $Groups_Scoreboards_Contests->group_scoreboard_id, $Groups_Scoreboards_Contests->contest_id)))
 		{
 			return GroupsScoreboardsContestsDAOBase::update( $Groups_Scoreboards_Contests);
 		} else {
@@ -112,7 +112,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,21 +128,21 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 
 		$sql = "SELECT * from Groups_Scoreboards_Contests WHERE (";
 		$val = array();
-		if (!is_null( $Groups_Scoreboards_Contests->getGroupScoreboardId())) {
+		if (!is_null( $Groups_Scoreboards_Contests->group_scoreboard_id)) {
 			$sql .= " `group_scoreboard_id` = ? AND";
-			array_push( $val, $Groups_Scoreboards_Contests->getGroupScoreboardId() );
+			array_push( $val, $Groups_Scoreboards_Contests->group_scoreboard_id );
 		}
-		if (!is_null( $Groups_Scoreboards_Contests->getContestId())) {
+		if (!is_null( $Groups_Scoreboards_Contests->contest_id)) {
 			$sql .= " `contest_id` = ? AND";
-			array_push( $val, $Groups_Scoreboards_Contests->getContestId() );
+			array_push( $val, $Groups_Scoreboards_Contests->contest_id );
 		}
-		if (!is_null( $Groups_Scoreboards_Contests->getOnlyAc())) {
+		if (!is_null( $Groups_Scoreboards_Contests->only_ac)) {
 			$sql .= " `only_ac` = ? AND";
-			array_push( $val, $Groups_Scoreboards_Contests->getOnlyAc() );
+			array_push( $val, $Groups_Scoreboards_Contests->only_ac );
 		}
-		if (!is_null( $Groups_Scoreboards_Contests->getWeight())) {
+		if (!is_null( $Groups_Scoreboards_Contests->weight)) {
 			$sql .= " `weight` = ? AND";
-			array_push( $val, $Groups_Scoreboards_Contests->getWeight() );
+			array_push( $val, $Groups_Scoreboards_Contests->weight );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -181,9 +181,9 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	{
 		$sql = "UPDATE Groups_Scoreboards_Contests SET  `only_ac` = ?, `weight` = ? WHERE  `group_scoreboard_id` = ? AND `contest_id` = ?;";
 		$params = array(
-			$Groups_Scoreboards_Contests->getOnlyAc(),
-			$Groups_Scoreboards_Contests->getWeight(),
-			$Groups_Scoreboards_Contests->getGroupScoreboardId(),$Groups_Scoreboards_Contests->getContestId(), );
+			$Groups_Scoreboards_Contests->only_ac,
+			$Groups_Scoreboards_Contests->weight,
+			$Groups_Scoreboards_Contests->group_scoreboard_id,$Groups_Scoreboards_Contests->contest_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -236,15 +236,15 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -257,7 +257,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Groups_Scoreboards_Contests WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->getGroupScoreboardId()) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->getGroupScoreboardId()) ) ) ){
+		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->group_scoreboard_id) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->group_scoreboard_id) ) ) ){
 				$sql .= " `group_scoreboard_id` >= ? AND `group_scoreboard_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -267,7 +267,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->getContestId()) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->getContestId()) ) ) ){
+		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->contest_id) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->contest_id) ) ) ){
 				$sql .= " `contest_id` >= ? AND `contest_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -277,7 +277,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->getOnlyAc()) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->getOnlyAc()) ) ) ){
+		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->only_ac) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->only_ac) ) ) ){
 				$sql .= " `only_ac` >= ? AND `only_ac` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -287,7 +287,7 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->getWeight()) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->getWeight()) ) ) ){
+		if( ( !is_null (($a = $Groups_Scoreboards_ContestsA->weight) ) ) & ( ! is_null ( ($b = $Groups_Scoreboards_ContestsB->weight) ) ) ){
 				$sql .= " `weight` >= ? AND `weight` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -325,9 +325,9 @@ abstract class GroupsScoreboardsContestsDAOBase extends DAO
 	  **/
 	public static final function delete( $Groups_Scoreboards_Contests )
 	{
-		if( is_null( self::getByPK($Groups_Scoreboards_Contests->getGroupScoreboardId(), $Groups_Scoreboards_Contests->getContestId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Groups_Scoreboards_Contests->group_scoreboard_id, $Groups_Scoreboards_Contests->contest_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Groups_Scoreboards_Contests WHERE  group_scoreboard_id = ? AND contest_id = ?;";
-		$params = array( $Groups_Scoreboards_Contests->getGroupScoreboardId(), $Groups_Scoreboards_Contests->getContestId() );
+		$params = array( $Groups_Scoreboards_Contests->group_scoreboard_id, $Groups_Scoreboards_Contests->contest_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

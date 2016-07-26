@@ -33,7 +33,7 @@ abstract class ProblemsBadgesDAOBase extends DAO
 	  **/
 	public static final function save( $Problems_Badges )
 	{
-		if (!is_null(self::getByPK( $Problems_Badges->getBadgeId() , $Problems_Badges->getProblemId() )))
+		if (!is_null(self::getByPK( $Problems_Badges->badge_id, $Problems_Badges->problem_id)))
 		{
 			return ProblemsBadgesDAOBase::update( $Problems_Badges);
 		} else {
@@ -112,7 +112,7 @@ abstract class ProblemsBadgesDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,13 +128,13 @@ abstract class ProblemsBadgesDAOBase extends DAO
 
 		$sql = "SELECT * from Problems_Badges WHERE (";
 		$val = array();
-		if (!is_null( $Problems_Badges->getBadgeId())) {
+		if (!is_null( $Problems_Badges->badge_id)) {
 			$sql .= " `badge_id` = ? AND";
-			array_push( $val, $Problems_Badges->getBadgeId() );
+			array_push( $val, $Problems_Badges->badge_id );
 		}
-		if (!is_null( $Problems_Badges->getProblemId())) {
+		if (!is_null( $Problems_Badges->problem_id)) {
 			$sql .= " `problem_id` = ? AND";
-			array_push( $val, $Problems_Badges->getProblemId() );
+			array_push( $val, $Problems_Badges->problem_id );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -216,15 +216,15 @@ abstract class ProblemsBadgesDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -237,7 +237,7 @@ abstract class ProblemsBadgesDAOBase extends DAO
 	{
 		$sql = "SELECT * from Problems_Badges WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Problems_BadgesA->getBadgeId()) ) ) & ( ! is_null ( ($b = $Problems_BadgesB->getBadgeId()) ) ) ){
+		if( ( !is_null (($a = $Problems_BadgesA->badge_id) ) ) & ( ! is_null ( ($b = $Problems_BadgesB->badge_id) ) ) ){
 				$sql .= " `badge_id` >= ? AND `badge_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -247,7 +247,7 @@ abstract class ProblemsBadgesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Problems_BadgesA->getProblemId()) ) ) & ( ! is_null ( ($b = $Problems_BadgesB->getProblemId()) ) ) ){
+		if( ( !is_null (($a = $Problems_BadgesA->problem_id) ) ) & ( ! is_null ( ($b = $Problems_BadgesB->problem_id) ) ) ){
 				$sql .= " `problem_id` >= ? AND `problem_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -285,9 +285,9 @@ abstract class ProblemsBadgesDAOBase extends DAO
 	  **/
 	public static final function delete( $Problems_Badges )
 	{
-		if( is_null( self::getByPK($Problems_Badges->getBadgeId(), $Problems_Badges->getProblemId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Problems_Badges->badge_id, $Problems_Badges->problem_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Problems_Badges WHERE  badge_id = ? AND problem_id = ?;";
-		$params = array( $Problems_Badges->getBadgeId(), $Problems_Badges->getProblemId() );
+		$params = array( $Problems_Badges->badge_id, $Problems_Badges->problem_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

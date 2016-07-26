@@ -33,7 +33,7 @@ abstract class PermissionsDAOBase extends DAO
 	  **/
 	public static final function save( $Permissions )
 	{
-		if (!is_null(self::getByPK( $Permissions->getPermissionId() )))
+		if (!is_null(self::getByPK( $Permissions->permission_id)))
 		{
 			return PermissionsDAOBase::update( $Permissions);
 		} else {
@@ -112,7 +112,7 @@ abstract class PermissionsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,17 +128,17 @@ abstract class PermissionsDAOBase extends DAO
 
 		$sql = "SELECT * from Permissions WHERE (";
 		$val = array();
-		if (!is_null( $Permissions->getPermissionId())) {
+		if (!is_null( $Permissions->permission_id)) {
 			$sql .= " `permission_id` = ? AND";
-			array_push( $val, $Permissions->getPermissionId() );
+			array_push( $val, $Permissions->permission_id );
 		}
-		if (!is_null( $Permissions->getName())) {
+		if (!is_null( $Permissions->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $Permissions->getName() );
+			array_push( $val, $Permissions->name );
 		}
-		if (!is_null( $Permissions->getDescription())) {
+		if (!is_null( $Permissions->description)) {
 			$sql .= " `description` = ? AND";
-			array_push( $val, $Permissions->getDescription() );
+			array_push( $val, $Permissions->description );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -177,9 +177,9 @@ abstract class PermissionsDAOBase extends DAO
 	{
 		$sql = "UPDATE Permissions SET  `name` = ?, `description` = ? WHERE  `permission_id` = ?;";
 		$params = array(
-			$Permissions->getName(),
-			$Permissions->getDescription(),
-			$Permissions->getPermissionId(), );
+			$Permissions->name,
+			$Permissions->description,
+			$Permissions->permission_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -230,15 +230,15 @@ abstract class PermissionsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -251,7 +251,7 @@ abstract class PermissionsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Permissions WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $PermissionsA->getPermissionId()) ) ) & ( ! is_null ( ($b = $PermissionsB->getPermissionId()) ) ) ){
+		if( ( !is_null (($a = $PermissionsA->permission_id) ) ) & ( ! is_null ( ($b = $PermissionsB->permission_id) ) ) ){
 				$sql .= " `permission_id` >= ? AND `permission_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -261,7 +261,7 @@ abstract class PermissionsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $PermissionsA->getName()) ) ) & ( ! is_null ( ($b = $PermissionsB->getName()) ) ) ){
+		if( ( !is_null (($a = $PermissionsA->name) ) ) & ( ! is_null ( ($b = $PermissionsB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -271,7 +271,7 @@ abstract class PermissionsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $PermissionsA->getDescription()) ) ) & ( ! is_null ( ($b = $PermissionsB->getDescription()) ) ) ){
+		if( ( !is_null (($a = $PermissionsA->description) ) ) & ( ! is_null ( ($b = $PermissionsB->description) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -309,9 +309,9 @@ abstract class PermissionsDAOBase extends DAO
 	  **/
 	public static final function delete( $Permissions )
 	{
-		if( is_null( self::getByPK($Permissions->getPermissionId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Permissions->permission_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Permissions WHERE  permission_id = ?;";
-		$params = array( $Permissions->getPermissionId() );
+		$params = array( $Permissions->permission_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

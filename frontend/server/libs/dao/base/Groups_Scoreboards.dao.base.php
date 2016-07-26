@@ -33,7 +33,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 	  **/
 	public static final function save( $Groups_Scoreboards )
 	{
-		if (!is_null(self::getByPK( $Groups_Scoreboards->getGroupScoreboardId() )))
+		if (!is_null(self::getByPK( $Groups_Scoreboards->group_scoreboard_id)))
 		{
 			return GroupsScoreboardsDAOBase::update( $Groups_Scoreboards);
 		} else {
@@ -112,7 +112,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,29 +128,29 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 
 		$sql = "SELECT * from Groups_Scoreboards WHERE (";
 		$val = array();
-		if (!is_null( $Groups_Scoreboards->getGroupScoreboardId())) {
+		if (!is_null( $Groups_Scoreboards->group_scoreboard_id)) {
 			$sql .= " `group_scoreboard_id` = ? AND";
-			array_push( $val, $Groups_Scoreboards->getGroupScoreboardId() );
+			array_push( $val, $Groups_Scoreboards->group_scoreboard_id );
 		}
-		if (!is_null( $Groups_Scoreboards->getGroupId())) {
+		if (!is_null( $Groups_Scoreboards->group_id)) {
 			$sql .= " `group_id` = ? AND";
-			array_push( $val, $Groups_Scoreboards->getGroupId() );
+			array_push( $val, $Groups_Scoreboards->group_id );
 		}
-		if (!is_null( $Groups_Scoreboards->getCreateTime())) {
+		if (!is_null( $Groups_Scoreboards->create_time)) {
 			$sql .= " `create_time` = ? AND";
-			array_push( $val, $Groups_Scoreboards->getCreateTime() );
+			array_push( $val, $Groups_Scoreboards->create_time );
 		}
-		if (!is_null( $Groups_Scoreboards->getAlias())) {
+		if (!is_null( $Groups_Scoreboards->alias)) {
 			$sql .= " `alias` = ? AND";
-			array_push( $val, $Groups_Scoreboards->getAlias() );
+			array_push( $val, $Groups_Scoreboards->alias );
 		}
-		if (!is_null( $Groups_Scoreboards->getName())) {
+		if (!is_null( $Groups_Scoreboards->name)) {
 			$sql .= " `name` = ? AND";
-			array_push( $val, $Groups_Scoreboards->getName() );
+			array_push( $val, $Groups_Scoreboards->name );
 		}
-		if (!is_null( $Groups_Scoreboards->getDescription())) {
+		if (!is_null( $Groups_Scoreboards->description)) {
 			$sql .= " `description` = ? AND";
-			array_push( $val, $Groups_Scoreboards->getDescription() );
+			array_push( $val, $Groups_Scoreboards->description );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -189,12 +189,12 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 	{
 		$sql = "UPDATE Groups_Scoreboards SET  `group_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE  `group_scoreboard_id` = ?;";
 		$params = array(
-			$Groups_Scoreboards->getGroupId(),
-			$Groups_Scoreboards->getCreateTime(),
-			$Groups_Scoreboards->getAlias(),
-			$Groups_Scoreboards->getName(),
-			$Groups_Scoreboards->getDescription(),
-			$Groups_Scoreboards->getGroupScoreboardId(), );
+			$Groups_Scoreboards->group_id,
+			$Groups_Scoreboards->create_time,
+			$Groups_Scoreboards->alias,
+			$Groups_Scoreboards->name,
+			$Groups_Scoreboards->description,
+			$Groups_Scoreboards->group_scoreboard_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -249,15 +249,15 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -270,7 +270,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Groups_Scoreboards WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $Groups_ScoreboardsA->getGroupScoreboardId()) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->getGroupScoreboardId()) ) ) ){
+		if( ( !is_null (($a = $Groups_ScoreboardsA->group_scoreboard_id) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->group_scoreboard_id) ) ) ){
 				$sql .= " `group_scoreboard_id` >= ? AND `group_scoreboard_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -280,7 +280,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_ScoreboardsA->getGroupId()) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->getGroupId()) ) ) ){
+		if( ( !is_null (($a = $Groups_ScoreboardsA->group_id) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->group_id) ) ) ){
 				$sql .= " `group_id` >= ? AND `group_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -290,7 +290,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_ScoreboardsA->getCreateTime()) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->getCreateTime()) ) ) ){
+		if( ( !is_null (($a = $Groups_ScoreboardsA->create_time) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->create_time) ) ) ){
 				$sql .= " `create_time` >= ? AND `create_time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -300,7 +300,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_ScoreboardsA->getAlias()) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->getAlias()) ) ) ){
+		if( ( !is_null (($a = $Groups_ScoreboardsA->alias) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->alias) ) ) ){
 				$sql .= " `alias` >= ? AND `alias` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -310,7 +310,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_ScoreboardsA->getName()) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->getName()) ) ) ){
+		if( ( !is_null (($a = $Groups_ScoreboardsA->name) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -320,7 +320,7 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $Groups_ScoreboardsA->getDescription()) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->getDescription()) ) ) ){
+		if( ( !is_null (($a = $Groups_ScoreboardsA->description) ) ) & ( ! is_null ( ($b = $Groups_ScoreboardsB->description) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -358,9 +358,9 @@ abstract class GroupsScoreboardsDAOBase extends DAO
 	  **/
 	public static final function delete( $Groups_Scoreboards )
 	{
-		if( is_null( self::getByPK($Groups_Scoreboards->getGroupScoreboardId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Groups_Scoreboards->group_scoreboard_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Groups_Scoreboards WHERE  group_scoreboard_id = ?;";
-		$params = array( $Groups_Scoreboards->getGroupScoreboardId() );
+		$params = array( $Groups_Scoreboards->group_scoreboard_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

@@ -6,7 +6,7 @@ class InterviewController extends Controller {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!Authorization::IsSystemAdmin($r['current_user_id']) && !UsersDAO::IsUserInterviewer($r['current_user']->getUserId())) {
+        if (!Authorization::IsSystemAdmin($r['current_user_id']) && !UsersDAO::IsUserInterviewer($r['current_user']->user_id)) {
             throw new ForbiddenAccessException();
         }
 
@@ -114,8 +114,8 @@ class InterviewController extends Controller {
             // Email to new OmegaUp users
             $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
                            . '<br>'
-                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->getVerificationId() . '/redirecttointerview/' . $r['contest']->getAlias() . '">'
-                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->getVerificationId() . '/redirecttointerview/' . $r['contest']->getAlias() . '</a>'
+                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['contest']->alias . '">'
+                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['contest']->alias . '</a>'
                            . '<br>';
 
             $r['mail_body'] .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
@@ -133,8 +133,8 @@ class InterviewController extends Controller {
         } else {
             // Email to current OmegaUp user
             $r['mail_body'] = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
-                           . ' <a href="https://omegaup.com/interview/' . $r['contest']->getAlias() . '/arena">'
-                           . ' https://omegaup.com/interview/' . $r['contest']->getAlias() . '/arena</a>';
+                           . ' <a href="https://omegaup.com/interview/' . $r['contest']->alias . '/arena">'
+                           . ' https://omegaup.com/interview/' . $r['contest']->alias . '/arena</a>';
         }
 
         if (is_null($r['user'])) {
@@ -148,11 +148,11 @@ class InterviewController extends Controller {
 
         // add the user to the interview (contest)
         $contestUser = new ContestsUsers();
-        $contestUser->setContestId($r['contest']->getContestId());
-        $contestUser->setUserId($r['user']->getUserId());
-        $contestUser->setAccessTime('0000-00-00 00:00:00');
-        $contestUser->setScore('0');
-        $contestUser->setTime('0');
+        $contestUser->contest_id = $r['contest']->contest_id;
+        $contestUser->user_id = $r['user']->user_id;
+        $contestUser->access_time = '0000-00-00 00:00:00';
+        $contestUser->score = '0';
+        $contestUser->time = '0';
 
         try {
             ContestsUsersDAO::save($contestUser);
@@ -163,7 +163,7 @@ class InterviewController extends Controller {
         }
 
         try {
-            $r['email'] = EmailsDAO::getByPK($r['user']->getMainEmailId());
+            $r['email'] = EmailsDAO::getByPK($r['user']->main_email_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -199,7 +199,7 @@ class InterviewController extends Controller {
         $thisResult['contest_alias'] = $backingContest->alias;
 
         $candidatesQuery = new ContestsUsers();
-        $candidatesQuery->setContestId($backingContest->contest_id);
+        $candidatesQuery->contest_id = $backingContest->contest_id;
 
         try {
             $db_results = ContestsUsersDAO::search($candidatesQuery);
@@ -213,11 +213,11 @@ class InterviewController extends Controller {
         // Add all users to an array
         foreach ($db_results as $result) {
             // @TODO: Slow queries ahead
-            $user_id = $result->getUserId();
+            $user_id = $result->user_id;
             $user = UsersDAO::getByPK($user_id);
 
             try {
-                $email = EmailsDAO::getByPK($user->getMainEmailId());
+                $email = EmailsDAO::getByPK($user->main_email_id);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
@@ -225,11 +225,11 @@ class InterviewController extends Controller {
             $userOpenedContest = UserController::userOpenedContest($backingContest->contest_id, $user_id);
             $users[] = array(
                         'user_id' => $user_id,
-                        'username' => $user->getUsername(),
+                        'username' => $user->username,
                         'access_time' => $result->access_time,
-                        'email' => $email->getEmail(),
+                        'email' => $email->email,
                         'opened_interview' => $userOpenedContest,
-                        'country' => $user->getCountryId());
+                        'country' => $user->country_id);
         }
 
         $thisResult['users'] = $users;

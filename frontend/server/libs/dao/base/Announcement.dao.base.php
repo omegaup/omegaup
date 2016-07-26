@@ -33,7 +33,7 @@ abstract class AnnouncementDAOBase extends DAO
 	  **/
 	public static final function save( $Announcement )
 	{
-		if (!is_null(self::getByPK( $Announcement->getAnnouncementId() )))
+		if (!is_null(self::getByPK( $Announcement->announcement_id)))
 		{
 			return AnnouncementDAOBase::update( $Announcement);
 		} else {
@@ -112,7 +112,7 @@ abstract class AnnouncementDAOBase extends DAO
 	  *	  $resultados = ClienteDAO::search($cliente);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -128,21 +128,21 @@ abstract class AnnouncementDAOBase extends DAO
 
 		$sql = "SELECT * from Announcement WHERE (";
 		$val = array();
-		if (!is_null( $Announcement->getAnnouncementId())) {
+		if (!is_null( $Announcement->announcement_id)) {
 			$sql .= " `announcement_id` = ? AND";
-			array_push( $val, $Announcement->getAnnouncementId() );
+			array_push( $val, $Announcement->announcement_id );
 		}
-		if (!is_null( $Announcement->getUserId())) {
+		if (!is_null( $Announcement->user_id)) {
 			$sql .= " `user_id` = ? AND";
-			array_push( $val, $Announcement->getUserId() );
+			array_push( $val, $Announcement->user_id );
 		}
-		if (!is_null( $Announcement->getTime())) {
+		if (!is_null( $Announcement->time)) {
 			$sql .= " `time` = ? AND";
-			array_push( $val, $Announcement->getTime() );
+			array_push( $val, $Announcement->time );
 		}
-		if (!is_null( $Announcement->getDescription())) {
+		if (!is_null( $Announcement->description)) {
 			$sql .= " `description` = ? AND";
-			array_push( $val, $Announcement->getDescription() );
+			array_push( $val, $Announcement->description );
 		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
@@ -181,10 +181,10 @@ abstract class AnnouncementDAOBase extends DAO
 	{
 		$sql = "UPDATE Announcement SET  `user_id` = ?, `time` = ?, `description` = ? WHERE  `announcement_id` = ?;";
 		$params = array(
-			$Announcement->getUserId(),
-			$Announcement->getTime(),
-			$Announcement->getDescription(),
-			$Announcement->getAnnouncementId(), );
+			$Announcement->user_id,
+			$Announcement->time,
+			$Announcement->description,
+			$Announcement->announcement_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -237,15 +237,15 @@ abstract class AnnouncementDAOBase extends DAO
 	  *   * mayor a 2000 y menor a 5000. Y que tengan un descuento del 50%.
 	  *   {@*}
 	  *	  $cr1 = new Cliente();
-	  *	  $cr1->setLimiteCredito("2000");
-	  *	  $cr1->setDescuento("50");
+	  *	  $cr1->limite_credito = "2000";
+	  *	  $cr1->descuento = "50";
 	  *
 	  *	  $cr2 = new Cliente();
-	  *	  $cr2->setLimiteCredito("5000");
+	  *	  $cr2->limite_credito = "5000";
 	  *	  $resultados = ClienteDAO::byRange($cr1, $cr2);
 	  *
 	  *	  foreach($resultados as $c ){
-	  *	  	echo $c->getNombre() . "<br>";
+	  *	  	echo $c->nombre . "<br>";
 	  *	  }
 	  * </code>
 	  *	@static
@@ -258,7 +258,7 @@ abstract class AnnouncementDAOBase extends DAO
 	{
 		$sql = "SELECT * from Announcement WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $AnnouncementA->getAnnouncementId()) ) ) & ( ! is_null ( ($b = $AnnouncementB->getAnnouncementId()) ) ) ){
+		if( ( !is_null (($a = $AnnouncementA->announcement_id) ) ) & ( ! is_null ( ($b = $AnnouncementB->announcement_id) ) ) ){
 				$sql .= " `announcement_id` >= ? AND `announcement_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -268,7 +268,7 @@ abstract class AnnouncementDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $AnnouncementA->getUserId()) ) ) & ( ! is_null ( ($b = $AnnouncementB->getUserId()) ) ) ){
+		if( ( !is_null (($a = $AnnouncementA->user_id) ) ) & ( ! is_null ( ($b = $AnnouncementB->user_id) ) ) ){
 				$sql .= " `user_id` >= ? AND `user_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -278,7 +278,7 @@ abstract class AnnouncementDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $AnnouncementA->getTime()) ) ) & ( ! is_null ( ($b = $AnnouncementB->getTime()) ) ) ){
+		if( ( !is_null (($a = $AnnouncementA->time) ) ) & ( ! is_null ( ($b = $AnnouncementB->time) ) ) ){
 				$sql .= " `time` >= ? AND `time` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -288,7 +288,7 @@ abstract class AnnouncementDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $AnnouncementA->getDescription()) ) ) & ( ! is_null ( ($b = $AnnouncementB->getDescription()) ) ) ){
+		if( ( !is_null (($a = $AnnouncementA->description) ) ) & ( ! is_null ( ($b = $AnnouncementB->description) ) ) ){
 				$sql .= " `description` >= ? AND `description` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
@@ -326,9 +326,9 @@ abstract class AnnouncementDAOBase extends DAO
 	  **/
 	public static final function delete( $Announcement )
 	{
-		if( is_null( self::getByPK($Announcement->getAnnouncementId()) ) ) throw new Exception('Campo no encontrado.');
+		if( is_null( self::getByPK($Announcement->announcement_id) ) ) throw new Exception('Campo no encontrado.');
 		$sql = "DELETE FROM Announcement WHERE  announcement_id = ?;";
-		$params = array( $Announcement->getAnnouncementId() );
+		$params = array( $Announcement->announcement_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

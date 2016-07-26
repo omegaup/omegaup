@@ -74,8 +74,8 @@ class RunCreateTest extends OmegaupTestCase {
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
 
         // Validate data
-        $this->assertEquals($r['language'], $run->getLanguage());
-        $this->assertNotNull($run->getGuid());
+        $this->assertEquals($r['language'], $run->language);
+        $this->assertNotNull($run->guid);
 
         // Validate file created
         $filename = RunController::getSubmissionPath($run);
@@ -84,11 +84,11 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals($r['source'], $fileContent);
 
         // Validate defaults
-        $this->assertEquals('new', $run->getStatus());
-        $this->assertEquals(0, $run->getRuntime());
-        $this->assertEquals(0, $run->getMemory());
-        $this->assertEquals(0, $run->getScore());
-        $this->assertEquals(0, $run->getContestScore());
+        $this->assertEquals('new', $run->status);
+        $this->assertEquals(0, $run->runtime);
+        $this->assertEquals(0, $run->memory);
+        $this->assertEquals(0, $run->score);
+        $this->assertEquals(0, $run->contest_score);
 
         $logs = SubmissionLogDAO::search(array(
             'run_id' => $run->run_id
@@ -98,10 +98,10 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals(ip2long('127.0.0.1'), $logs[0]->ip);
 
         if (!is_null($contest)) {
-            $this->assertEquals((time() - intval(strtotime($contest->getStartTime()))) / 60, $run->penalty, '', 0.5);
+            $this->assertEquals((time() - intval(strtotime($contest->start_time))) / 60, $run->penalty, '', 0.5);
         }
 
-        $this->assertEquals('JE', $run->getVerdict());
+        $this->assertEquals('JE', $run->verdict);
     }
 
     /**
@@ -118,7 +118,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Check problem submissions (1)
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        $this->assertEquals(1, $problem->getSubmissions());
+        $this->assertEquals(1, $problem->submissions);
     }
 
     /**
@@ -131,7 +131,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Manually expire the contest
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->setFinishTime(Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1));
+        $contest->finish_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1);
         ContestsDAO::save($contest);
 
         // Call API
@@ -181,7 +181,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Manually expire contest
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->setStartTime(Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10));
+        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10);
         ContestsDAO::save($contest);
 
         // Call API
@@ -201,7 +201,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->setSubmissionsGap(20);
+        $contest->submissions_gap = 20;
         ContestsDAO::save($contest);
 
         // Call API
@@ -231,7 +231,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->setSubmissionsGap(20);
+        $contest->submissions_gap = 20;
         ContestsDAO::save($contest);
 
         // Call API, send a run for the first problem
@@ -313,7 +313,7 @@ class RunCreateTest extends OmegaupTestCase {
         // This means: once I started the contest, I have 20 more mins
         // to finish it.
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->setWindowLength(20);
+        $contest->window_length = 20;
         ContestsDAO::save($contest);
 
         // Call API
@@ -335,13 +335,13 @@ class RunCreateTest extends OmegaupTestCase {
         // This means: once I started the contest, I have 20 more mins
         // to finish it.
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->setWindowLength(20);
+        $contest->window_length = 20;
         ContestsDAO::save($contest);
 
          // Alter first access time of our contestant such that he started
         // 21 minutes ago, this is, window length has expired by 1 minute
-        $contest_user = ContestsUsersDAO::getByPK($this->contestant->getUserId(), $contest->getContestId());
-        $contest_user->setAccessTime(date('Y-m-d H:i:s', time() - 21 * 60)); //Window length is in minutes
+        $contest_user = ContestsUsersDAO::getByPK($this->contestant->user_id, $contest->contest_id);
+        $contest_user->access_time = date('Y-m-d H:i:s', time() - 21 * 60); //Window length is in minutes
         ContestsUsersDAO::save($contest_user);
 
         // Call API
@@ -361,7 +361,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Manually set the contest	start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->setStartTime(Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10));
+        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10);
         ContestsDAO::save($contest);
 
         // Call API
@@ -384,7 +384,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->setSubmissionsGap(20);
+        $contest->submissions_gap = 20;
         ContestsDAO::save($contest);
 
         // Call API

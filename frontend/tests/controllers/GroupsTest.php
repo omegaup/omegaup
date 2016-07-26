@@ -30,8 +30,8 @@ class GroupsTest extends OmegaupTestCase {
         )));
         $group = $groups[0];
         $this->assertNotNull($group);
-        $this->assertEquals($description, $group->getDescription());
-        $this->assertEquals($owner->getUserId(), $group->getOwnerId());
+        $this->assertEquals($description, $group->description);
+        $this->assertEquals($owner->user_id, $group->owner_id);
     }
 
     /**
@@ -196,8 +196,8 @@ class GroupsTest extends OmegaupTestCase {
 
         $groupScoreboard = $groupScoreboards[0];
         $this->assertNotNull($groupScoreboard);
-        $this->assertEquals($description, $groupScoreboard->getDescription());
-        $this->assertEquals($groupData['group']->group_id, $groupScoreboard->getGroupId());
+        $this->assertEquals($description, $groupScoreboard->description);
+        $this->assertEquals($groupData['group']->group_id, $groupScoreboard->group_id);
     }
 
     /**
