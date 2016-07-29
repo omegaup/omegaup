@@ -12,6 +12,7 @@ OmegaUp.T = {
 	arenaCommonOverallWallTimeLimit: "Time limit (total)",
 	arenaCommonPasteTheCode: "Paste the source code here:",
 	arenaCommonTimeLimit: "Time limit (case)",
+	arenaContestEndedUsePractice: "This contest has ended. To continue sending solutions please use our Practice Mode by clicking here.",
 	arenaContestOrganizer: "Organizer",
 	arenaContestWindowLength: "Time to solve all problems",
 	arenaCurrentContests: "Current contests",
