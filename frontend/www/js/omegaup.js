@@ -50,15 +50,6 @@ OmegaUp.ui = {
 			.slideDown();
 	},
 
-	warning: function(message) {
-		$('#status .message').html(message);
-		$('#status')
-			.removeClass('alert-danger')
-			.removeClass('alert-success')
-			.addClass('alert-warning')
-			.slideDown();
-	},
-
 	dismissNotifications: function() {
 		$('#status').slideUp();
 	},
