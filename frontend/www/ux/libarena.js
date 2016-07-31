@@ -270,6 +270,12 @@ Arena.prototype.updateClock = function() {
 		clock = "00:00:00";
 		clearInterval(this.clockInterval);
 		this.clockInterval = null;
+
+		// Handle practice mode warnings on contests end
+		OmegaUp.ui.warning('<a href="/arena/' + this.contestAlias + '/practice/">' + OmegaUp.T.arenaContestEndedUsePractice + '</a>');
+		$('#new-run').hide();
+		$('#new-run-practice-msg').show();
+		$('#new-run-practice-msg a').prop('href', '/arena/' + this.contestAlias + '/practice/');
 	} else {
 		clock = Arena.formatDelta(countdownTime.getTime() - (date + omegaup.deltaTime));
 	}

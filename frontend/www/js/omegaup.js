@@ -22,32 +22,30 @@ OmegaUp.prototype.escape = function(s) {
 };
 
 OmegaUp.ui = {
-	error: function(reason) {
+	displayStatus: function(message, type) {
 		if ($('#status .message').length == 0) console.error("Showing warning but there is no status div");
-		$('#status .message').html(reason);
+
+		$('#status .message').html(message);
 		$('#status')
-			.removeClass('alert-success')
-			.removeClass('alert-info')
-			.addClass('alert-danger')
+			.removeClass('alert-success alert-info alert-warning alert-danger')
+			.addClass(type)
 			.slideDown();
+	},
+
+	error: function(message) {
+		OmegaUp.ui.displayStatus(message, 'alert-danger');
 	},
 
 	info: function(message) {
-		$('#status .message').html(message);
-		$('#status')
-			.removeClass('alert-danger')
-			.removeClass('alert-info')
-			.addClass('alert-info')
-			.slideDown();
+		OmegaUp.ui.displayStatus(message, 'alert-info');
 	},
 
 	success: function(message) {
-		$('#status .message').html(message);
-		$('#status')
-			.removeClass('alert-danger')
-			.removeClass('alert-success')
-			.addClass('alert-success')
-			.slideDown();
+		OmegaUp.ui.displayStatus(message, 'alert-success');
+	},
+
+	warning: function(message) {
+		OmegaUp.ui.displayStatus(message, 'alert-warning');
 	},
 
 	dismissNotifications: function() {
