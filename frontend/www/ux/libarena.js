@@ -273,7 +273,7 @@ Arena.prototype.updateClock = function() {
 		this.clockInterval = null;
 
 		// Show go-to-practice-mode messages on contest end
-		if (date > this.finishTime) {
+		if (date > this.finishTime.getTime()) {
 			OmegaUp.ui.warning('<a href="/arena/' + this.contestAlias + '/practice/">' + OmegaUp.T.arenaContestEndedUsePractice + '</a>');
 			$('#new-run').hide();
 			$('#new-run-practice-msg').show();

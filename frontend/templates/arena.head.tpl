@@ -14,7 +14,7 @@
 
 		<script type="text/javascript" src="/js/omegaup.js?ver=0ff160"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=9f6f64,87ec3e,c924c0,4379f1"></script>
-		<script type="text/javascript" src="/ux/libarena.js?ver=b48fbf"></script>
+		<script type="text/javascript" src="/ux/libarena.js?ver=21857e"></script>
 
 		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>
