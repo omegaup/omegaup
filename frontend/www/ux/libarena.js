@@ -267,15 +267,18 @@ Arena.prototype.updateClock = function() {
 	if (date < this.startTime.getTime()) {
 		clock = "-" + Arena.formatDelta(this.startTime.getTime() - (date + omegaup.deltaTime));
 	} else if (date > countdownTime.getTime()) {
+		// Contest for this user is over
 		clock = "00:00:00";
 		clearInterval(this.clockInterval);
 		this.clockInterval = null;
 
-		// Handle practice mode warnings on contests end
-		OmegaUp.ui.warning('<a href="/arena/' + this.contestAlias + '/practice/">' + OmegaUp.T.arenaContestEndedUsePractice + '</a>');
-		$('#new-run').hide();
-		$('#new-run-practice-msg').show();
-		$('#new-run-practice-msg a').prop('href', '/arena/' + this.contestAlias + '/practice/');
+		// Show go-to-practice-mode messages on contest end
+		if (date > this.finishTime.getTime()) {
+			OmegaUp.ui.warning('<a href="/arena/' + this.contestAlias + '/practice/">' + OmegaUp.T.arenaContestEndedUsePractice + '</a>');
+			$('#new-run').hide();
+			$('#new-run-practice-msg').show();
+			$('#new-run-practice-msg a').prop('href', '/arena/' + this.contestAlias + '/practice/');
+		}
 	} else {
 		clock = Arena.formatDelta(countdownTime.getTime() - (date + omegaup.deltaTime));
 	}
