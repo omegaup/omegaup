@@ -23,6 +23,21 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * tearDown function gets executed after each test (thanks to phpunit)
+     */
+    public function tearDown() {
+        parent::tearDown();
+        self::logout();
+    }
+
+    public static function logout() {
+        $session = new SessionController();
+        if ($session->CurrentSessionAvailable()) {
+            $session->UnRegisterSession();
+        }
+    }
+
+    /**
      * Override session_start, phpunit doesn't like it, but we still validate that it is called once
      */
     public function mockSessionManager() {
