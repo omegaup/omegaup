@@ -33,8 +33,18 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     public static function logout() {
         $session = new SessionController();
         if ($session->CurrentSessionAvailable()) {
-            $session->UnRegisterSession();
+            $session->InvalidateCache();
         }
+        if (isset($_SESSION['omegaup_user'])) {
+            unset($_SESSION['omegaup_user']);
+        }
+        if (isset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
+            unset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
+        }
+        if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
+            unset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
+        }
+        $session->InvalidateLocalCache();
     }
 
     /**

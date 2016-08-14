@@ -169,9 +169,19 @@ class SessionController extends Controller {
         );
     }
 
+    /**
+     * Invalidates the current user's session cache.
+     */
     public function InvalidateCache() {
-        $a_CurrentSession = self::apiCurrentSession();
-        Cache::deleteFromCache(Cache::SESSION_PREFIX, $a_CurrentSession['auth_token']);
+        $currentSession = self::apiCurrentSession();
+        Cache::deleteFromCache(Cache::SESSION_PREFIX, $currentSession['auth_token']);
+    }
+
+    /**
+     * Invalidates the current request's session cache.
+     */
+    public function InvalidateLocalCache() {
+        self::$current_session = null;
     }
 
     public function UnRegisterSession() {
@@ -180,8 +190,7 @@ class SessionController extends Controller {
         $a_CurrentSession = self::apiCurrentSession();
         $vo_AuthT = new AuthTokens(array('token' => $a_CurrentSession['auth_token']));
 
-        // Expire the local session cache.
-        self::$current_session = null;
+        $this->InvalidateLocalCache();
 
         try {
             AuthTokensDAO::delete($vo_AuthT);
@@ -199,8 +208,7 @@ class SessionController extends Controller {
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         )));
 
-        // Expire the local session cache.
-        self::$current_session = null;
+        $this->InvalidateLocalCache();
 
         //find if this user has older sessions
         $vo_AuthT = new AuthTokens();
