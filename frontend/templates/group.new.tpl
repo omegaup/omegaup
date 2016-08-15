@@ -16,7 +16,7 @@
 	{if $IS_UPDATE neq 1}
 	<div class="panel-heading">
 		<h3 class="panel-title">
-			{#omegaupTitleContestNew#}
+			{#omegaupTitleGroupsNew#}
 		</h3>
 	</div>
 	{/if}
