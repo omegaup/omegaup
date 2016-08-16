@@ -275,7 +275,7 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      * @throws PreconditionFailedException
      */
-    private static function validateDetails(Request $r) {
+    public static function validateDetails(Request $r) {
         self::validateBasicDetails($r);
 
         $r['contest_admin'] = false;

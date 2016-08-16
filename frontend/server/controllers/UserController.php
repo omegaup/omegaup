@@ -1580,7 +1580,6 @@ class UserController extends Controller {
         }
 
         // Expire profile cache
-
         Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
         $sessionController = new SessionController();
         $sessionController->InvalidateCache();
@@ -1812,5 +1811,97 @@ class UserController extends Controller {
         $newUsername = str_replace('-', '_', $newUsername);
         $newUsername = str_replace('.', '_', $newUsername);
         return $newUsername . time();
+    }
+
+    /**
+     * Parses and validates a filter string to be used for event notification
+     * filtering.
+     *
+     * The Request must have a 'filter' key with comma-delimited URI paths
+     * representing the resources the caller is interested in receiving events
+     * for. If the caller has enough privileges to receive notifications for
+     * ALL the requested filters, the request will return successfully,
+     * otherwise an exception will be thrown.
+     *
+     * This API does not need authentication to be used. This allows to track
+     * contest updates with an access token.
+     *
+     * @param Request $r
+     */
+    public static function apiValidateFilter(Request $r) {
+        Validators::isStringNonEmpty($r['filter'], 'filter');
+
+        $response = array(
+            'status' => 'ok',
+            'user' => null,
+            'admin' => false,
+            'problem_admin' => array(),
+            'contest_admin' => array(),
+        );
+
+        $session = SessionController::apiCurrentSession($r);
+        $user = ($session['valid'] ? $session['user'] : null);
+        if (!is_null($user)) {
+            $response['user'] = $user->username;
+            $response['admin'] = $session['is_admin'];
+        }
+
+        $filters = explode(',', $r['filter']);
+        foreach ($filters as $filter) {
+            $tokens = explode('/', $filter);
+            if (count($tokens) < 2 || $tokens[0] != '') {
+                throw new InvalidParameterException('parameterInvalid', 'filter');
+            }
+            switch ($tokens[1]) {
+                case 'all-events':
+                    if (count($tokens) != 2) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    if (!$session['is_admin']) {
+                        throw new ForbiddenAccessException('userNotAllowed');
+                    }
+                    break;
+                case 'user':
+                    if (count($tokens) != 3) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    if ($tokens[2] != $user->username && !$session['is_admin']) {
+                        throw new ForbiddenAccessException('userNotAllowed');
+                    }
+                    break;
+                case 'contest':
+                    if (count($tokens) < 3) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    $r = new Request(array(
+                        'contest_alias' => $tokens[2],
+                    ));
+                    if (count($tokens) >= 4) {
+                        $r['token'] = $tokens[3];
+                    }
+                    ContestController::validateDetails($r);
+                    if ($r['contest_admin']) {
+                        $response['contest_admin'][] = $r['contest_alias'];
+                    }
+                    break;
+                case 'problem':
+                    if (count($tokens) != 3) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    $problem = ProblemsDAO::getByAlias($tokens[2]);
+                    if (is_null($problem)) {
+                        throw new NotFoundException('problemNotFound');
+                    }
+                    if (!is_null($user) && Authorization::CanEditProblem($user->user_id, $problem)) {
+                        $response['problem_admin'][] = $tokens[2];
+                    } elseif ($problem->public != '1') {
+                        throw new ForbiddenAccessException('problemIsPrivate');
+                    }
+
+                    break;
+            }
+        }
+
+        return $response;
     }
 }

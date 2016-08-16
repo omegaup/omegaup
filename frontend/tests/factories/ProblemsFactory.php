@@ -111,6 +111,7 @@ class ProblemsFactory {
         return array (
             'request' => $r,
             'author' => $problemAuthor,
-            );
+            'problem' => ProblemsDAO::getByAlias($r['alias']),
+        );
     }
 }
