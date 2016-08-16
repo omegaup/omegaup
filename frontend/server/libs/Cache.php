@@ -155,4 +155,15 @@ class Cache {
         $cache = new Cache($prefix, $id);
         $cache->delete();
     }
+
+    /**
+     * Delete all entries that begin with $prefix.
+     *
+     * @param string $prefix
+     */
+    public static function invalidateAllKeys($prefix) {
+        foreach (new APCIterator('user', '/^'.$prefix.'\.*/', APC_ITER_KEY) as $iter) {
+            apc_delete($iter['key']);
+        }
+    }
 }

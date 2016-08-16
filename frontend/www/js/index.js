@@ -59,19 +59,17 @@
 
 	  omegaup.runCounts(createChart);
 
-		omegaup.getContests(function (data) {
-			var list = data.results;
-			var now = new Date();
+        omegaup.getContests(function (data) {
+		    var list = data.results;
+		    var now = new Date();
 
 			for (var i = 0, len = list.length; i < len && i < 10; i++) {
-				var start = list[i].start_time;
-				var end = list[i].finish_time;
-
-				if (end > now) {
-					$('#next-contests-list').append('<a href="/arena/' + omegaup.escape(list[i].alias) + '" class="list-group-item">' + omegaup.escape(list[i].title) + '</a>');
-				}
+			    $('#next-contests-list').append(
+                        '<a href="/arena/' + omegaup.escape(list[i].alias) +
+                        '" class="list-group-item">' + omegaup.escape(list[i].title) +
+                        '</a>');
 			}
-		});
+		}, {'active': 1});
 	}
 
 	function createChart(series) {

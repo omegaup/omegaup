@@ -102,6 +102,26 @@ class ContestsDAO extends ContestsDAOBase
         return $ar;
     }
 
+    final private static function getContestEndCheck($activos) {
+        if ($activos < 0) {
+            return 'TRUE';
+        } else if ($activos == 0) {
+            return 'finish_time <= NOW()';
+        } else { // $activos > 0
+            return 'finish_time > NOW()';
+        }
+    }
+
+    final private static function getRecommendedCheck($recomendados) {
+        if ($recomendados < 0) {
+            return 'TRUE';
+        } else if ($recomendados == 0) {
+            return 'recommended = 0';
+        } else { // $recomendados > 0
+            return 'recommended = 1';
+        }
+    }
+
     /**
      * Regresa todos los concursos que un usuario puede ver.
      *
@@ -127,14 +147,22 @@ class ContestsDAO extends ContestsDAOBase
      * @global type $conn
      * @param int $user_id
      * @param int $pagina
-     * @param int $columnas_por_pagina
+     * @param int $renglones_por_pagina
+     * @param int $activos Si < 0, regresa todo, si 0 regresa pasados, y si > 0 regresa activos
      * @return array
      */
-    final public static function getAllContestsForUser($user_id, $pagina = 1, $renglones_por_pagina = 1000) {
+    final public static function getAllContestsForUser(
+        $user_id,
+        $pagina = 1,
+        $renglones_por_pagina = 1000,
+        $activos = -1,
+        $recomendados = -1
+    ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
-
+        $end_check = ContestsDAO::getContestEndCheck($activos);
+        $recommended_check = ContestsDAO::getRecommendedCheck($recomendados);
         $sql = "
                 (
                      SELECT
@@ -203,7 +231,7 @@ class ContestsDAO extends ContestsDAOBase
                      WHERE
                          Public = 1
                  )
-
+                 WHERE $recommended_check AND $end_check
                  ORDER BY
                      CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                      `recommended` DESC,
@@ -226,8 +254,15 @@ class ContestsDAO extends ContestsDAOBase
         return $allData;
     }
 
-    final public static function getAllPublicContests($pagina = 1, $renglones_por_pagina = 1000) {
+    final public static function getAllPublicContests(
+        $pagina = 1,
+        $renglones_por_pagina = 1000,
+        $activos = -1,
+        $recomendados = -1
+    ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
+        $end_check = ContestsDAO::getContestEndCheck($activos);
+        $recommended_check = ContestsDAO::getRecommendedCheck($recomendados);
 
         $columns = ContestsDAO::$getContestsColumns;
 
@@ -238,6 +273,8 @@ class ContestsDAO extends ContestsDAOBase
                     Contests
                 WHERE
                     Public = 1
+                AND $recommended_check
+                AND $end_check
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
@@ -259,16 +296,24 @@ class ContestsDAO extends ContestsDAOBase
         return $allData;
     }
 
-    final public static function getAllContests($pagina = 1, $renglones_por_pagina = 1000) {
+    final public static function getAllContests(
+        $pagina = 1,
+        $renglones_por_pagina = 1000,
+        $activos = -1,
+        $recomendados = -1
+    ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
+        $end_check = ContestsDAO::getContestEndCheck($activos);
+        $recommended_check = ContestsDAO::getRecommendedCheck($recomendados);
 
         $sql = "
                 SELECT
                     $columns
                 FROM
                     Contests
+                WHERE $recommended_check AND $end_check
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,

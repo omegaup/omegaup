@@ -27,14 +27,24 @@ class ContestController extends Controller {
         try {
             $contests = array();
 
+            Validators::isNumber($r['page'], 'page', false);
+            Validators::isNumber($r['page_size'], 'page_size', false);
+            Validators::isNumber($r['active'], 'active', false);
+            Validators::isNumber($r['recommended'], 'recommended', false);
+
+            $page = (isset($r['page']) ? intval($r['page']) : 1);
+            $page_size = (isset($r['page_size']) ? intval($r['page_size']) : 20);
+            $active_contests = (isset($r['active']) ? intval($r['active']) : -1);
+            $recommended = (isset($r['recommended']) ? intval($r['recommended']) : -1);
+            $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
                 Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_PUBLIC,
-                    '',
+                    $cache_key,
                     $r,
-                    function (Request $r) {
-                            return ContestsDAO::getAllPublicContests();
+                    function (Request $r) use ($page, $page_size, $active_contests, $recommended) {
+                            return ContestsDAO::getAllPublicContests($page, $page_size, $active_contests, $recommended);
                     },
                     $contests
                 );
@@ -42,16 +52,16 @@ class ContestController extends Controller {
                 // Get all contests
                 Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_SYSTEM_ADMIN,
-                    '',
+                    $cache_key,
                     $r,
-                    function (Request $r) {
-                            return ContestsDAO::getAllContests();
+                    function (Request $r) use ($page, $page_size, $active_contests, $recommended) {
+                            return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended);
                     },
                     $contests
                 );
             } else {
                 // Get all public+private contests
-                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id']);
+                $contests = ContestsDAO::getAllContestsForUser($r['current_user_id'], $page, $page_size, $active_contests, $recommended);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -771,9 +781,9 @@ class ContestController extends Controller {
             }
         }
 
-        // Expire contes-list cache
-        Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
-        Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        // Expire contest-list cache
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
         self::$log->info('New Contest Created: ' . $r['alias']);
         return array('status' => 'ok');
@@ -2091,9 +2101,9 @@ class ContestController extends Controller {
         // Expire contest scoreboard cache
         Scoreboard::InvalidateScoreboardCache($r['contest']->contest_id);
 
-        // Expire contes-list cache
-        Cache::deleteFromCache(Cache::CONTESTS_LIST_PUBLIC);
-        Cache::deleteFromCache(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        // Expire contest-list cache
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
+        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
         // Happy ending
         $response = array();

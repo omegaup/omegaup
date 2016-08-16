@@ -400,11 +400,12 @@ OmegaUp.prototype.getMyGroups = function(callback) {
 	});
 };
 
-OmegaUp.prototype.getContests = function(callback) {
+OmegaUp.prototype.getContests = function(callback, params) {
 	var self = this;
 
-	$.get(
+	return $.get(
 		'/api/contest/list/',
+        params,
 		function (data) {
 			for (var idx in data.results) {
 				var contest = data.results[idx];
