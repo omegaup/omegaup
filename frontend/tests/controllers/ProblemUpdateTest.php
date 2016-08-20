@@ -47,7 +47,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos.zip';
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($problemData['author']);
+        $r['auth_token'] = self::login($problemData['author']);
 
         // Call API
         $response = ProblemController::apiUpdate($r);
@@ -97,7 +97,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $r['message'] = 'Changed alias and languages';
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($problemData['author']);
+        $r['auth_token'] = self::login($problemData['author']);
 
         //Call API
         $response = ProblemController::apiUpdate($r);
@@ -129,7 +129,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $r['message'] = 'Changed invalid languages';
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($problemData['author']);
+        $r['auth_token'] = self::login($problemData['author']);
 
         //Call API
         $response = ProblemController::apiUpdate($r);
@@ -145,7 +145,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Update statement
         $statement = 'This is the new statement \$x\$';
         $response = ProblemController::apiUpdateStatement(new Request(array(
-            'auth_token' => $this->login($problemData['author']),
+            'auth_token' => self::login($problemData['author']),
             'problem_alias' => $problemData['request']['alias'],
             'message' => 'Statement is now more fun',
             'statement' => $statement
@@ -175,7 +175,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         $statement = "This is the new statement with an image omg ![Alt text]($imgUri \"Optional title\")";
         $response = ProblemController::apiUpdateStatement(new Request(array(
-            'auth_token' => $this->login($problemData['author']),
+            'auth_token' => self::login($problemData['author']),
             'problem_alias' => $problemData['request']['alias'],
             'message' => 'Statement now contains images',
             'statement' => $statement
@@ -220,7 +220,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'nostmt.zip';
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($problemData['author']);
+        $r['auth_token'] = self::login($problemData['author']);
 
         // Call API. Should fail
         try {
@@ -256,7 +256,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiAddAdmin(new Request(array(
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => $this->login($problemData['author'])
+            'auth_token' => self::login($problemData['author'])
         )));
 
         $this->assertEquals('ok', $response['status']);
@@ -267,7 +267,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'title' => $newTitle,
             'message' => 'Admin powers',
-            'auth_token' => $this->login($problemAdmin)
+            'auth_token' => self::login($problemAdmin)
         )));
 
         // Verify data in DB
@@ -294,7 +294,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiAddAdmin(new Request(array(
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => $this->login($problemData['author'])
+            'auth_token' => self::login($problemData['author'])
         )));
 
         $this->assertEquals('ok', $response['status']);
@@ -303,7 +303,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiRemoveAdmin(new Request(array(
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => $this->login($problemData['author'])
+            'auth_token' => self::login($problemData['author'])
         )));
         $this->assertEquals('ok', $response['status']);
 
@@ -313,7 +313,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['alias'],
             'title' => $newTitle,
             'message' => 'Non-admin powers',
-            'auth_token' => $this->login($problemAdmin)
+            'auth_token' => self::login($problemAdmin)
         )));
 
         // Verify data in DB
@@ -336,7 +336,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $response = ProblemController::apiAddAdmin(new Request(array(
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => $this->login($problemData['author'])
+            'auth_token' => self::login($problemData['author'])
         )));
 
         $this->assertEquals('ok', $response['status']);
@@ -344,7 +344,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Get the list of admins
         $response = ProblemController::apiAdmins(new Request(array(
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => $this->login($problemData['author'])
+            'auth_token' => self::login($problemData['author'])
         )));
 
         $adminFound = false;

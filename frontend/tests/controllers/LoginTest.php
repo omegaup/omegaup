@@ -223,7 +223,7 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = $this->login($user);
+        $auth_token = self::login($user, true);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
         $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
@@ -246,7 +246,7 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = $this->login($user);
+        $auth_token = self::login($user, true);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
         $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
@@ -267,7 +267,7 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = $this->login($user);
+        $auth_token = self::login($user, true);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
         $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
@@ -290,7 +290,7 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = $this->login($user);
+        $auth_token = self::login($user, true);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
         $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
@@ -313,7 +313,7 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = $this->login($user);
+        $auth_token = self::login($user, true);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
         $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
@@ -334,7 +334,7 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = $this->login($user);
+        $auth_token = self::login($user, true);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
         $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
@@ -358,6 +358,6 @@ class LoginTest extends OmegaupTestCase {
         $user->password = '';
         UsersDAO::save($user);
 
-        $this->login($user);
+        self::login($user, true);
     }
 }

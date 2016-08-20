@@ -25,8 +25,9 @@ class GroupsFactory {
             $alias = Utils::CreateRandomString();
         }
 
+        $login = OmegaupTestCase::login($owner);
         $r = new Request(array(
-            'auth_token' => OmegaupTestCase::login($owner),
+            'auth_token' => $login->auth_token,
             'name' => $name,
             'description' => $description,
             'alias' => $alias
@@ -52,8 +53,9 @@ class GroupsFactory {
      * @param Users $user
      */
     public static function addUserToGroup(array $groupData, Users $user) {
+        $login = OmegaupTestCase::login($groupData['owner']);
         GroupController::apiAddUser(new Request(array(
-            'auth_token' => OmegaupTestCase::login($groupData['owner']),
+            'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'group_alias' => $groupData['group']->alias
         )));
@@ -80,8 +82,9 @@ class GroupsFactory {
             $alias = Utils::CreateRandomString();
         }
 
+        $login = OmegaupTestCase::login($groupData['owner']);
         $request = new Request(array(
-            'auth_token' => OmegaupTestCase::login($groupData['owner']),
+            'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias,
             'name' => $name,
             'alias' => $alias,
@@ -108,8 +111,9 @@ class GroupsFactory {
      * @param array $groupData
      */
     public static function addContestToScoreboard($contestData, $scoreboardData, $groupData, $onlyAC = 0, $weight = 1) {
+        $login = OmegaupTestCase::login($groupData['owner']);
         GroupScoreboardController::apiAddContest(new Request(array(
-            'auth_token' => OmegaupTestCase::login($groupData['owner']),
+            'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
             'scoreboard_alias' => $scoreboardData['request']['alias'],
             'contest_alias' => $contestData['request']['alias'],

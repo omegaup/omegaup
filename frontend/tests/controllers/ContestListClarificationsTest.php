@@ -57,11 +57,11 @@ class ListClarificationsContest extends OmegaupTestCase {
         }
 
         // Prepare the request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with first user
-        $r['auth_token'] = $this->login($contestant1);
+        $login = self::login($contestant1);
+        $r = new Request(array(
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $login->auth_token,
+        ));
 
         // Call API
         $response = ContestController::apiClarifications($r);

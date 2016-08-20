@@ -1541,7 +1541,7 @@ class ContestController extends Controller {
         $showAllRuns = false;
 
         // Don't leak scoreboard to interviewees
-        if (InterviewsDAO::IsContestInterview($r['contest'])) {
+        if (InterviewsDAO::isContestInterview($r['contest'])) {
             throw new ForbiddenAccessException('invalidScoreboardUrl');
         }
 

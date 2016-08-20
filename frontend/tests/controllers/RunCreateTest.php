@@ -44,7 +44,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contestant
-        $r['auth_token'] = $this->login($this->contestant);
+        $r['auth_token'] = self::login($this->contestant);
 
         // Build request
         $r['contest_alias'] = $this->contestData['request']['alias'];
@@ -357,7 +357,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->detourGraderCalls();
 
         // Log as contest director
-        $r['auth_token'] = $this->login($this->contestData['director']);
+        $r['auth_token'] = self::login($this->contestData['director']);
 
         // Manually set the contest	start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -380,7 +380,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->detourGraderCalls($this->exactly(2));
 
         // Log as contest director
-        $r['auth_token'] = $this->login($this->contestData['director']);
+        $r['auth_token'] = self::login($this->contestData['director']);
 
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -422,7 +422,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($this->contestant);
+        $r['auth_token'] = self::login($this->contestant);
 
         // Build request
         $r['contest_alias'] = ''; // Not inside a contest
@@ -454,7 +454,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = self::login($contestant);
 
         // Build request
         $r['problem_alias'] = $problemData['request']['alias'];
@@ -492,7 +492,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = self::login($contestant);
 
         // Build request
         $r['contest_alias'] = $contestData['request']['alias'];
@@ -528,7 +528,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($this->contestant);
+        $r['auth_token'] = self::login($this->contestant);
 
         // Build request
         $r['contest_alias'] = ''; // Not inside a contest
@@ -559,7 +559,7 @@ class RunCreateTest extends OmegaupTestCase {
             $r = new Request();
 
             // Log in as contest director
-            $r['auth_token'] = $this->login($this->contestant);
+            $r['auth_token'] = self::login($this->contestant);
 
             // Build request
             $r['contest_alias'] = ''; // Not inside a contest

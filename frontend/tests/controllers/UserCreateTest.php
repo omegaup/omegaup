@@ -201,7 +201,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $response = UserController::apiVerifyEmail(new Request(array(
-            'auth_token' => $this->login($admin),
+            'auth_token' => self::login($admin),
             'usernameOrEmail' => $user->username
         )));
 
@@ -224,7 +224,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $response = UserController::apiVerifyEmail(new Request(array(
-            'auth_token' => $this->login($admin),
+            'auth_token' => self::login($admin),
             'usernameOrEmail' => Utils::CreateRandomString()
         )));
     }
@@ -243,7 +243,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $response = UserController::apiVerifyEmail(new Request(array(
-            'auth_token' => $this->login($user2),
+            'auth_token' => self::login($user2),
             'usernameOrEmail' => $user->username
         )));
     }

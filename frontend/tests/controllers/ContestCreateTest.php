@@ -18,7 +18,8 @@ class CreateContestTest extends OmegaupTestCase {
         $contestDirector = $contestData['director'];
 
         // Log in the user and set the auth token in the new request
-        $r['auth_token'] = $this->login($contestDirector);
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
 
         // Call the API
         $response = ContestController::apiCreate($r);
@@ -55,13 +56,13 @@ class CreateContestTest extends OmegaupTestCase {
             $r = $contestData['request'];
             $contestDirector = $contestData['director'];
 
-            $auth_token = $this->login($contestDirector);
+            $login = self::login($contestDirector);
 
             // unset the current key from request
             unset($r[$key]);
 
             // Set the valid auth token in the new request
-            $r['auth_token'] = $auth_token;
+            $r['auth_token'] = $login->auth_token;
 
             try {
                 // Call the API
@@ -88,7 +89,8 @@ class CreateContestTest extends OmegaupTestCase {
         $contestDirector = $contestData['director'];
 
         // Log in the user and set the auth token in the new request
-        $r['auth_token'] = $this->login($contestDirector);
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
 
         // Call the API
         $response = ContestController::apiCreate($r);
@@ -113,7 +115,8 @@ class CreateContestTest extends OmegaupTestCase {
         $r['finish_time'] = $r['start_time'] + (60 * 60 * 24 * 32);
 
         // Log in the user and set the auth token in the new request
-        $r['auth_token'] = $this->login($contestDirector);
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
 
         // Call the API
         $response = ContestController::apiCreate($r);
