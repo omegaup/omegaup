@@ -11,13 +11,22 @@ MYSQL_BINARY = '/usr/bin/mysql'
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
+def _quote(s):
+  if 'quote' in dir(shlex):
+    # This is unavailable in Python <3.3
+    return shlex.quote(s)
+  import pipes
+  return pipes.quote(s)
+
+
 def _mysql(args, mysql_args):
   auth = []
   if os.path.isfile(args.config_file):
-    auth.append('--defaults-extra-file=%s' % shlex.quote(args.config_file))
+    auth.append('--defaults-extra-file=%s' % _quote(args.config_file))
   else:
-    auth.extend(['--user=%s' % shlex.quote(args.username),
-                 '--password=%s' % shlex.quote(args.password)])
+    auth.append('--user=%s' % _quote(args.username))
+    if args.password:
+      auth.append('--password=%s' % _quote(args.password))
   return subprocess.check_output(
       [MYSQL_BINARY] + auth + mysql_args,
       universal_newlines=True)
@@ -70,8 +79,8 @@ def migrate(args):
       if name.startswith('test_') and not args.development_environment:
         comment = "skipped"
       else:
-        _mysql(args, ['omegaup', '-NBe', 'source %s;' % shlex.quote(path)])
-        _mysql(args, ['omegaup-test', '-NBe', 'source %s;' % shlex.quote(path)])
+        _mysql(args, ['omegaup', '-NBe', 'source %s;' % _quote(path)])
+        _mysql(args, ['omegaup-test', '-NBe', 'source %s;' % _quote(path)])
       _mysql(args, ['_omegaup_metadata', '-NBe',
         'INSERT INTO `Revision` VALUES(%d, CURRENT_TIMESTAMP, "%s");' %
         (revision, comment)])
