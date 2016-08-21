@@ -79,8 +79,8 @@ def migrate(args):
       if name.startswith('test_') and not args.development_environment:
         comment = "skipped"
       else:
-        _mysql(args, ['omegaup', '-NBe', 'source %s;' % _quote(path)])
-        _mysql(args, ['omegaup-test', '-NBe', 'source %s;' % _quote(path)])
+        for dbname in args.databases.split(','):
+          _mysql(args, [dbname, '-NBe', 'source %s;' % _quote(path)])
       _mysql(args, ['_omegaup_metadata', '-NBe',
         'INSERT INTO `Revision` VALUES(%d, CURRENT_TIMESTAMP, "%s");' %
         (revision, comment)])
@@ -136,6 +136,8 @@ def main():
                               dest='development_environment',
                               action='store_true',
                               help='Installs scripts flagged as for testing')
+  parser_migrate.add_argument('--databases', default='omegaup,omegaup-test',
+                              help='Comma-separated list of databases')
   parser_migrate.set_defaults(func=migrate)
 
   # Commands for development.
