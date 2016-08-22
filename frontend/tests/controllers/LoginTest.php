@@ -21,9 +21,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => $user->password
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -47,9 +47,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $email,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $email,
+            'password' => $user->password
+        ));
 
         $response = UserController::apiLogin($r);
 
@@ -68,9 +68,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => 'badpasswordD:'
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => 'badpasswordD:'
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -84,9 +84,9 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginByUserInvalidUsername() {
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => 'IDontExist',
-                    'password' => 'badpasswordD:'
-                ));
+            'usernameOrEmail' => 'IDontExist',
+            'password' => 'badpasswordD:'
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -150,9 +150,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => $user->password
+        ));
 
         // Call the API
         $response1 = UserController::apiLogin($r);
@@ -186,9 +186,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => $user->password
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -198,7 +198,7 @@ class LoginTest extends OmegaupTestCase {
         // Create an user in omegaup
         $user = UserFactory::createUser();
 
-        $auth_token = self::login($user);
+        $login = self::login($user);
 
         // Expire token manually
         $auth_token_dao = AuthTokensDAO::getByPK($auth_token);
@@ -223,10 +223,10 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = self::login($user, true);
+        $login = self::login($user);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $login->auth_token;
 
         // Call CurrentSession api
         $response = SessionController::apiCurrentSession();
@@ -246,10 +246,10 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = self::login($user, true);
+        $login = self::login($user);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $login->auth_token;
 
         // Call CurrentSession api
         $response = SessionController::apiCurrentSession();
@@ -267,10 +267,10 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = self::login($user, true);
+        $login = self::login($user);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $login->auth_token;
 
         // Call CurrentSession api
         $response = SessionController::apiCurrentSession();
@@ -290,10 +290,10 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = self::login($user, true);
+        $login = self::login($user);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $login->auth_token;
 
         // Call CurrentSession api
         $response = SessionController::apiCurrentSession();
@@ -313,10 +313,10 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = self::login($user, true);
+        $login = self::login($user);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $login->auth_token;
 
         // Call CurrentSession api
         $response = SessionController::apiCurrentSession();
@@ -334,10 +334,10 @@ class LoginTest extends OmegaupTestCase {
         $this->mockSessionManager();
 
         // Login
-        $auth_token = self::login($user, true);
+        $login = self::login($user);
 
         // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
+        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $login->auth_token;
 
         // Call CurrentSession api
         $response = SessionController::apiCurrentSession();
@@ -358,6 +358,6 @@ class LoginTest extends OmegaupTestCase {
         $user->password = '';
         UsersDAO::save($user);
 
-        self::login($user, true);
+        self::login($user);
     }
 }
