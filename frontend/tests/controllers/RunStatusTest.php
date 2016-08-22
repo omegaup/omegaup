@@ -29,7 +29,7 @@ class RunStatusTest extends OmegaupTestCase {
 
         // Prepare request
         $r = new Request();
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = self::login($contestant);
         $r['run_alias'] = $runData['response']['guid'];
 
         // Call API

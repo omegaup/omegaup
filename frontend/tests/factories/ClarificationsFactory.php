@@ -34,7 +34,8 @@ class ClarificationsFactory {
         $r['public'] = '0';
 
         // Log in our user and set the auth_token properly
-        $r['auth_token'] = OmegaupTestCase::login($contestant);
+        $login = OmegaupTestCase::login($contestant);
+        $r['auth_token'] = $login->auth_token;
 
         // Call the API
         $response = ClarificationController::apiCreate($r);
@@ -65,7 +66,8 @@ class ClarificationsFactory {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in the user
-        $r['auth_token'] = OmegaupTestCase::login($contestData['director']);
+        $login = OmegaupTestCase::login($contestData['director']);
+        $r['auth_token'] = $login->auth_token;
 
         // Update answer
         $r['answer'] = $message;

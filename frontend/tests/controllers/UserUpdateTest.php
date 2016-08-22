@@ -15,7 +15,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $r = new Request();
 
         // Login
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
 
         // Change values
         $r['name'] = Utils::CreateRandomString();
@@ -51,7 +51,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $r = new Request();
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
         $r['name'] = Utils::CreateRandomString();
         $r['recruitment_optin'] = 1;
 
@@ -69,7 +69,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $r = new Request();
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
 
         // Invalid name
         $r['name'] = 'TThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong hisIsWayTooLong ';
@@ -86,7 +86,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $r = new Request();
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
 
         // Invalid name
         $r['name'] = '';
@@ -102,7 +102,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $r = new Request();
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
         $r['name'] = Utils::CreateRandomString();
 
         // Null recruitment_optin
@@ -118,7 +118,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $r = new Request();
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
         $r['name'] = Utils::CreateRandomString();
 
         // Set recruitment_optin to true

@@ -17,7 +17,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $admin = UserFactory::createAdminUser();
 
         $r = new Request();
-        $r['auth_token'] = $this->login($admin);
+        $r['auth_token'] = self::login($admin);
         $r['username'] = $user->username;
         $r['password'] = Utils::CreateRandomString();
 
@@ -26,7 +26,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
 
         // Try to login with old password, should fail
         try {
-            $this->login($user);
+            self::login($user);
             $this->fail('Reset password failed');
         } catch (Exception $e) {
             // We are OK
@@ -34,10 +34,10 @@ class UserResetPasswordTest extends OmegaupTestCase {
 
         // Set new password and try again, should succeed
         $user->password = $r['password'];
-        $this->login($user);
+        self::login($user);
 
         // Sanity check, admin should be able to login fine
-        $this->login($admin);
+        self::login($admin);
     }
 
     /**
@@ -48,7 +48,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $r = new Request();
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
         $r['username'] = $user->username;
         $r['password'] = Utils::CreateRandomString();
         $r['old_password'] = $user->password;
@@ -58,7 +58,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
 
         // Try to login with old password, should fail
         try {
-            $this->login($user);
+            self::login($user);
             $this->fail('Reset password failed');
         } catch (Exception $e) {
             // We are OK
@@ -66,7 +66,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
 
         // Set new password and try again, should succeed
         $user->password = $r['password'];
-        $this->login($user);
+        self::login($user);
     }
 
     /**
@@ -79,7 +79,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $r = new Request();
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
         $r['username'] = $user->username;
         $r['password'] = Utils::CreateRandomString();
         $r['old_password'] = 'bad old password';

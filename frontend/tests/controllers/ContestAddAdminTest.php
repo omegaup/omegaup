@@ -14,10 +14,12 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Prepare request
-        $r = new Request();
-        $r['auth_token'] = $this->login($contestData['director']);
-        $r['usernameOrEmail'] = $user->username;
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'usernameOrEmail' => $user->username,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call api
         $response = ContestController::apiAddAdmin($r);
@@ -37,20 +39,24 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Prepare request
-        $r = new Request();
-        $r['auth_token'] = $this->login($contestData['director']);
-        $r['usernameOrEmail'] = $user->username;
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'usernameOrEmail' => $user->username,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call api
         ContestController::apiAddAdmin($r);
+        unset($login);
 
         // Prepare request for an update
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($user);
+        $login = self::login($user);
+        $r['auth_token'] = $login->auth_token;
 
         // Update title
         $r['title'] = Utils::CreateRandomString();
@@ -80,10 +86,12 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ContestsFactory::addAdminUser($contestData, $user2);
 
         // Prepare request for remove one admin
-        $r = new Request();
-        $r['auth_token'] = $this->login($contestData['director']);
-        $r['usernameOrEmail'] = $user->username;
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'usernameOrEmail' => $user->username,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call api
         ContestController::apiRemoveAdmin($r);
@@ -105,10 +113,12 @@ class ContestAddAdminTest extends OmegaupTestCase {
         GroupsFactory::addUserToGroup($groupData, $user);
 
         // Prepare request
-        $r = new Request();
-        $r['auth_token'] = $this->login($contestData['director']);
-        $r['group'] = $groupData['request']['alias'];
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'group' => $groupData['request']['alias'],
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call api
         $response = ContestController::apiAddGroupAdmin($r);
@@ -131,20 +141,24 @@ class ContestAddAdminTest extends OmegaupTestCase {
         GroupsFactory::addUserToGroup($groupData, $user);
 
         // Prepare request
-        $r = new Request();
-        $r['auth_token'] = $this->login($contestData['director']);
-        $r['group'] = $groupData['request']['alias'];
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'group' => $groupData['request']['alias'],
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call api
         ContestController::apiAddGroupAdmin($r);
+        unset($login);
 
         // Prepare request for an update
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($user);
+        $login = self::login($user);
+        $r['auth_token'] = $login->auth_token;
 
         // Update title
         $r['title'] = Utils::CreateRandomString();
@@ -176,22 +190,28 @@ class ContestAddAdminTest extends OmegaupTestCase {
         GroupsFactory::addUserToGroup($groupData, $user2);
 
         // Prepare request
-        $r = new Request();
-        $r['auth_token'] = $this->login($contestData['director']);
-        $r['group'] = $groupData['request']['alias'];
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'group' => $groupData['request']['alias'],
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call api
         ContestController::apiAddGroupAdmin($r);
+        unset($login);
+
         $contest = $contestData['contest'];
         $this->AssertTrue(Authorization::IsContestAdmin($user->user_id, $contest));
         $this->AssertTrue(Authorization::IsContestAdmin($user2->user_id, $contest));
 
         // Prepare request for remove the group
-        $r = new Request();
-        $r['auth_token'] = $this->login($contestData['director']);
-        $r['group'] = $groupData['request']['alias'];
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'group' => $groupData['request']['alias'],
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call api
         ContestController::apiRemoveGroupAdmin($r);

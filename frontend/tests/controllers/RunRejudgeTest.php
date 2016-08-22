@@ -35,7 +35,7 @@ class RunRejudgeTest extends OmegaupTestCase {
         // Build request
         $r = new Request();
         $r['run_alias'] = $runData['response']['guid'];
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Call API
         $response = RunController::apiRejudge($r);

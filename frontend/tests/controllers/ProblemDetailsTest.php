@@ -32,7 +32,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $r['problem_alias'] = $problemData['request']['alias'];
 
         // Log in the user
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = self::login($contestant);
 
         // Explicitly join contest
         ContestController::apiOpen($r);
@@ -97,7 +97,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $r['problem_alias'] = $problemData['request']['alias'];
 
         // Log in the user
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = self::login($contestant);
 
         // Call api
         $r['statement_type'] = $type;
@@ -140,7 +140,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $r['problem_alias'] = $problemData['request']['alias'];
 
         // Log in the user
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = self::login($contestant);
 
         // Call api
         $response = ProblemController::apiDetails($r);
@@ -165,7 +165,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $r['problem_alias'] = $problemData['request']['alias'];
 
         // Log in the user
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = self::login($contestant);
 
         // Call api
         $response = ProblemController::apiDetails($r);
@@ -189,7 +189,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         // Call API
         $response = ProblemController::apiDetails(new Request(array(
-            'auth_token' => $this->login($contestant),
+            'auth_token' => self::login($contestant),
             'problem_alias' => $problemData['request']['alias']
         )));
 
@@ -216,7 +216,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         // Call API
         $response = ProblemController::apiDetails(new Request(array(
-            'auth_token' => $this->login($contestant),
+            'auth_token' => self::login($contestant),
             'problem_alias' => $problemData['request']['alias'],
             'contest_alias' => $contestData['request']['alias']
         )));

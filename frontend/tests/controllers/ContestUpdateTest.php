@@ -18,7 +18,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Update title
         $r['title'] = Utils::CreateRandomString();
@@ -46,7 +46,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login(UserFactory::createUser());
+        $r['auth_token'] = self::login(UserFactory::createUser());
 
         // Update title
         $r['title'] = Utils::CreateRandomString();
@@ -69,7 +69,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Update public
         $r['public'] = 1;
@@ -97,7 +97,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Update public
         $r['public'] = 1;
@@ -121,7 +121,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with site admin
-        $r['auth_token'] = $this->login(UserFactory::createAdminUser());
+        $r['auth_token'] = self::login(UserFactory::createAdminUser());
 
         // Update value to TRUE
         $r['value'] = 1;
@@ -158,7 +158,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest owner
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Update value to TRUE
         $r['value'] = 1;
@@ -181,7 +181,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Update length
         $r['finish_time'] = $r['start_time'] + (60 * 60 * 24 * 32);
@@ -217,7 +217,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contestant
-        $r['auth_token'] = $this->login($contestant);
+        $r['auth_token'] = self::login($contestant);
 
         // Build request
         $r['contest_alias'] = $contestData['request']['alias'];
@@ -244,7 +244,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Update length
         $r['start_time'] = $contestData['request']['start_time'] + 1;
@@ -265,7 +265,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Update length
         $r['start_time'] = $contestData['request']['start_time'] + 1;
@@ -293,7 +293,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Update length
         $r['start_time'] = $contestData['request']['start_time'];

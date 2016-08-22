@@ -23,7 +23,7 @@ class ProblemBestScoreTest extends OmegaupTestCase {
 
         // Call API
         $response = ProblemController::apiBestScore(new Request(array(
-            'auth_token' => $this->login($contestant),
+            'auth_token' => self::login($contestant),
             'problem_alias' => $problemData['request']['alias']
         )));
 
@@ -50,7 +50,7 @@ class ProblemBestScoreTest extends OmegaupTestCase {
 
         // Call API
         $response = ProblemController::apiBestScore(new Request(array(
-            'auth_token' => $this->login($contestant),
+            'auth_token' => self::login($contestant),
             'problem_alias' => $problemData['request']['alias'],
             'contest_alias' => $contestData['request']['alias']
         )));
@@ -79,7 +79,7 @@ class ProblemBestScoreTest extends OmegaupTestCase {
 
         // Call API
         $response = ProblemController::apiBestScore(new Request(array(
-            'auth_token' => $this->login($user),
+            'auth_token' => self::login($user),
             'problem_alias' => $problemData['request']['alias'],
             'username' => $contestant->username
         )));

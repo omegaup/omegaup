@@ -40,7 +40,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Build request
         $r['contest_alias'] = $contestData['request']['alias'];
@@ -73,7 +73,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Build request
         $r['contest_alias'] = $contestData['request']['alias'];
@@ -101,7 +101,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $r = new Request();
 
         // Log in as contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Build request
         $r['contest_alias'] = 'invalid problem';
@@ -130,7 +130,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Log in as another random user
         $user = UserFactory::createUser();
-        $r['auth_token'] = $this->login($user);
+        $r['auth_token'] = self::login($user);
 
         // Build request
         $r['contest_alias'] = $contestData['request']['alias'];
@@ -149,15 +149,14 @@ class AddProblemToContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        $auth_token = $this->login($contestData['director']);
-
         for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST + 1; $i++) {
             // Get a problem
             $problemData = ProblemsFactory::createProblemWithAuthor($contestData['director']);
 
             // Build request
+            $login = self::login($contestData['director']);
             $r = new Request(array(
-                'auth_token' => $auth_token,
+                'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['alias'],
                 'points' => 100,

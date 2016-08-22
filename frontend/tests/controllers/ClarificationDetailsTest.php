@@ -55,7 +55,8 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the contest director
-        $r['auth_token'] = $this->login($contestData['director']);
+        $login = self::login($contestData['director']);
+        $r['auth_token'] = $login->auth_token;
 
         // Call API
         $response = ClarificationController::apiDetails($r);
@@ -94,7 +95,8 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $r['auth_token'] = $this->login($contestant);
+        $login = self::login($contestant);
+        $r['auth_token'] = $login->auth_token;
 
         // Call API
         $response = ClarificationController::apiDetails($r);
@@ -137,7 +139,8 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $r['auth_token'] = $this->login($contestant2);
+        $login = self::login($contestant2);
+        $r['auth_token'] = $login->auth_token;
 
         // Call API, will fail
         ClarificationController::apiDetails($r);
@@ -177,7 +180,8 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $r['auth_token'] = $this->login($contestant2);
+        $login = self::login($contestant2);
+        $r['auth_token'] = $login->auth_token;
 
         // Call API
         $response = ClarificationController::apiDetails($r);

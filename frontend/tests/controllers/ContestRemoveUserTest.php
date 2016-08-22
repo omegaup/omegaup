@@ -16,24 +16,29 @@ class ContestRemoveUserTest extends OmegaupTestCase {
         // Add user to contest
         ContestsFactory::addUser($contestData, $user);
 
+        $login = self::login($contestData['director']);
+
         // Validate 0 users
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
         $response = ContestController::apiUsers($r);
         $this->assertEquals(1, count($response['users']));
 
         // Remove user
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['usernameOrEmail'] = $user->username;
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'usernameOrEmail' => $user->username,
+        ));
         ContestController::apiRemoveUser($r);
 
         // Validate 0 users in contest
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
         $response = ContestController::apiUsers($r);
         $this->assertEquals(0, count($response['users']));
     }

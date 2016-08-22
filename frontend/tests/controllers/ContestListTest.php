@@ -58,15 +58,16 @@ class ContestListTest extends OmegaupTestCase {
      * Basic test. Check that most recent contest is at the top of the list
      */
     public function testLatestPublicContest() {
-        $r = new Request();
-
         // Create new PUBLIC contest
         $contestData = ContestsFactory::createContest();
 
         // Log as a random contestant
         $contestant = UserFactory::createUser();
-        $r['auth_token'] = $this->login($contestant);
 
+        $login = self::login($contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+        ));
         $response = ContestController::apiList($r);
 
         // Assert our contest is there.
@@ -97,8 +98,6 @@ class ContestListTest extends OmegaupTestCase {
      *
      */
     public function testPrivateContestForInvitedUser() {
-        $r = new Request();
-
         // Create new private contest
         $contestData = ContestsFactory::createContest(null, false /*private*/);
 
@@ -108,8 +107,10 @@ class ContestListTest extends OmegaupTestCase {
         // Add user to our private contest
         ContestsFactory::addUser($contestData, $contestant);
 
-        $r['auth_token'] = $this->login($contestant);
-
+        $login = self::login($contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+        ));
         $response = ContestController::apiList($r);
 
         $this->assertTitleInList($response, $contestData);
@@ -120,8 +121,6 @@ class ContestListTest extends OmegaupTestCase {
      *
      */
     public function testPrivateContestForNonInvitedUser() {
-        $r = new Request();
-
         // Create new private contest
         $contestData = ContestsFactory::createContest(null, false /*private*/);
 
@@ -131,8 +130,10 @@ class ContestListTest extends OmegaupTestCase {
         // Add user to our private contest
         ContestsFactory::addUser($contestData, $contestant);
 
-        $r['auth_token'] = $this->login(UserFactory::createUser());
-
+        $login = self::login(UserFactory::createUser());
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+        ));
         $response = ContestController::apiList($r);
 
         // Assert our contest is not there
@@ -143,13 +144,13 @@ class ContestListTest extends OmegaupTestCase {
      *
      */
     public function testPrivateContestForSystemAdmin() {
-        $r = new Request();
-
         // Create new private contest
         $contestData = ContestsFactory::createContest(null, false /*private*/);
 
-        $r['auth_token'] = $this->login(UserFactory::createAdminUser());
-
+        $login = self::login(UserFactory::createAdminUser());
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+        ));
         $response = ContestController::apiList($r);
 
         // Assert our contest is there
@@ -161,8 +162,6 @@ class ContestListTest extends OmegaupTestCase {
      *
      */
     public function testPrivateContestForContestAdmin() {
-        $r = new Request();
-
         // Create new private contest
         $contestData = ContestsFactory::createContest(null, false /*private*/);
 
@@ -172,8 +171,10 @@ class ContestListTest extends OmegaupTestCase {
         // Add user to our private contest
         ContestsFactory::addAdminUser($contestData, $contestant);
 
-        $r['auth_token'] = $this->login($contestant);
-
+        $login = self::login($contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+        ));
         $response = ContestController::apiList($r);
 
         // Assert our contest is there
@@ -200,15 +201,20 @@ class ContestListTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Turn recommended ON
-        $r = new Request();
-        $r['contest_alias'] = $recommendedContestData['request']['alias'];
-        $r['auth_token'] = $this->login(UserFactory::createAdminUser());
-        $r['value'] = 1;
+        $login = self::login(UserFactory::createAdminUser());
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $recommendedContestData['request']['alias'],
+            'value' => 1,
+        ));
         ContestController::apiSetRecommended($r);
+        unset($login);
 
         // Get list of contests
-        $r['auth_token'] = $this->login($contestant);
-
+        $login = self::login($contestant);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+        ));
         $response = ContestController::apiList($r);
 
         // Check that recommended contest is earlier in list han not-recommended
