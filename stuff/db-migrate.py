@@ -1,5 +1,23 @@
 #!/usr/bin/python3
 
+'''
+A tool that helps perform database schema migrations.
+
+This tool is used for both Puppet and developers to perform database schema
+migrations.  It performs the migrations in an idempotent way by tracking the
+last revision that was applied to the database.  In order to avoid tracking
+this metadata in the database this script will be modifying, a table called
+`Revision` will be created in a database called `_omegaup_migrations`.
+
+Developers will only need to invoke this like:
+
+  stuff/db-migrate.py migrate --development-environment
+
+every time a new script has been added to the repository.  Puppet can also use
+the 'exists', 'latest', and 'migrate' commands to perform the migrations
+automatically.
+'''
+
 import argparse
 import os.path
 import shlex
@@ -12,6 +30,9 @@ OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
 def _quote(s):
+  '''
+  Escapes the string |s| so it can be safely used in a shell command.
+  '''
   if 'quote' in dir(shlex):
     # This is unavailable in Python <3.3
     return shlex.quote(s)
@@ -20,6 +41,9 @@ def _quote(s):
 
 
 def _mysql(args, mysql_args):
+  '''
+  Runs the MySQL commandline client with |mysql_args| as arguments.
+  '''
   auth = []
   if os.path.isfile(args.config_file):
     auth.append('--defaults-extra-file=%s' % _quote(args.config_file))
@@ -33,6 +57,10 @@ def _mysql(args, mysql_args):
 
 
 def _revision(args):
+  '''
+  Returns the latest revision that has been applied to the database. Returns 0
+  if no revision has been applied.
+  '''
   ensure(args)
   return int(
       _mysql(args,
@@ -41,6 +69,10 @@ def _revision(args):
 
 
 def _scripts(args):
+  '''
+  Returns the list of scripts in the frontend/database/ directory in the
+  omegaUp checkout, ordered by revision.
+  '''
   scripts = []
   scripts_dir = os.path.join(OMEGAUP_ROOT, 'frontend', 'database')
   for filename in os.listdir(scripts_dir):
@@ -56,6 +88,10 @@ def _scripts(args):
 
 
 def exists(args):
+  '''
+  A helper command for puppet. Exits with 1 (error) if the metadata database
+  has not been installed.
+  '''
   if not _mysql(args, ['-NBe', 'SHOW DATABASES LIKE "_omegaup_metadata";']):
     sys.exit(1)
   if not _mysql(args, ['_omegaup_metadata', '-NBe', 'SHOW TABLES LIKE "Revision";']):
@@ -63,11 +99,21 @@ def exists(args):
 
 
 def latest(args):
+  '''
+  A helper command for puppet. Exits with 1 (error) if the latest script in the
+  checkout has not been applied to the database.
+  '''
   if _revision(args) != _scripts(args)[-1][0]:
     sys.exit(1)
 
 
 def migrate(args):
+  '''
+  Performs the database schema migration.  This command applies all scripts
+  that have not yet been applied in order, and records their application in the
+  metadata database.  This command is idempotent and can be run any number of
+  times.
+  '''
   latest_revision = _revision(args)
   for revision, name, path in _scripts(args):
     if latest_revision >= revision:
@@ -87,8 +133,17 @@ def migrate(args):
 
 
 def ensure(args):
+  '''
+  Creates both the metadata database and table, if they don't exist yet.
+  '''
   _mysql(args, [
     '-NBe', 'CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;'])
+  # This is the table that tracks the migrations. |id| is the revision,
+  # |applied| is the timestamp the operation was made and |comment| is a
+  # human-readable comment about the migration. It can be either 'migrate' if
+  # it was applied normally, 'skipped' if it was not applied due to not being
+  # run in a development environment, and 'manual reset' if it was added as a
+  # result of the 'reset' command.
   _mysql(args, [
     '_omegaup_metadata', '-NBe', 'CREATE TABLE IF NOT EXISTS `Revision`'
     '(`id` INTEGER NOT NULL PRIMARY KEY, '
@@ -97,6 +152,11 @@ def ensure(args):
 
 
 def reset(args):
+  '''
+  Forces the metadata table to be in a particular revision.  Note that this
+  does not apply or unapply any changes to the actual database, so use this
+  only for testing or recovering a botched migration!
+  '''
   ensure(args)
   _mysql(args, ['_omegaup_metadata', '-NBe',
                 'DELETE FROM `Revision` WHERE `id` >= %d;' % args.revision])
@@ -107,6 +167,9 @@ def reset(args):
 
 
 def print_revision(args):
+  '''
+  Prints the current revision.
+  '''
   print(_revision(args))
 
 
@@ -117,7 +180,8 @@ def main():
       help='.my.cnf file that stores credentials')
   parser.add_argument('--username', default='root', help='MySQL root username')
   parser.add_argument('--password', default='omegaup', help='MySQL password')
-  subparsers = parser.add_subparsers()
+  subparsers = parser.add_subparsers(dest='command')
+  subparsers.required = True
 
   # Commands for puppet.
   parser_exists = subparsers.add_parser(
@@ -157,7 +221,9 @@ def main():
   args = parser.parse_args()
   args.func(args)
 
+
 if __name__ == '__main__':
   main()
+
 
 # vim: expandtab shiftwidth=2 tabstop=2
