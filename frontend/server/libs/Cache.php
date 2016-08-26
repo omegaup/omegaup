@@ -34,16 +34,16 @@ class Cache {
      * @param string $key el id del cache
      */
     public function __construct($prefix, $id = '') {
-        $cache_ver = self::getVersion($prefix);
-        $this->key = $cache_ver.$prefix.$id;
         $this->enabled = (defined('APC_USER_CACHE_ENABLED') &&
                           APC_USER_CACHE_ENABLED === true);
         $this->log = Logger::getLogger('cache');
 
         if ($this->enabled) {
+            $cache_ver = self::getVersion($prefix);
+            $this->key = $cache_ver.$prefix.$id;
             $this->log->debug('Cache enabled for ' . $this->key);
         } else {
-            $this->log->debug('Cache disabled for ' . $this->key);
+            $this->log->debug('Cache disabled');
         }
     }
 
