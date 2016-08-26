@@ -34,8 +34,7 @@ class Cache {
      * @param string $key el id del cache
      */
     public function __construct($prefix, $id = '') {
-        $this->enabled = (defined('APC_USER_CACHE_ENABLED') &&
-                          APC_USER_CACHE_ENABLED === true);
+        $this->enabled = self::cacheEnabled();
         $this->log = Logger::getLogger('cache');
 
         if ($this->enabled) {
@@ -181,9 +180,16 @@ class Cache {
      * @param string $prefix
      */
     public static function invalidateAllKeys($prefix) {
-        apc_inc('v'.$prefix, 1, $success);
-        if (!$success) {
-            apc_store('v'.$prefix, 1);
+        if (self::cacheEnabled()) {
+            apc_inc('v'.$prefix, 1, $success);
+            if (!$success) {
+                apc_store('v'.$prefix, 1);
+            }
         }
+    }
+
+    private static function cacheEnabled() {
+        return defined('APC_USER_CACHE_ENABLED') &&
+               APC_USER_CACHE_ENABLED === true;
     }
 }
