@@ -164,13 +164,14 @@ class ContestsDAO extends ContestsDAOBase
         $end_check = ContestsDAO::getContestEndCheck($activos);
         $recommended_check = ContestsDAO::getRecommendedCheck($recomendados);
         $sql = "
-                (
+                 (
                      SELECT
                         $columns
                      FROM
                         Contests
                      WHERE
-                        Contests.public = 0 AND Contests.director_id = ?
+                        Contests.public = 0 AND Contests.director_id = ? AND
+                        $recommended_check AND $end_check
                  )
 
                  UNION
@@ -184,11 +185,11 @@ class ContestsDAO extends ContestsDAOBase
                      ON
                          Contests.contest_id = Contests_Users.contest_id
                      WHERE
-                         Contests.public = 0 AND Contests_Users.user_id = ?
+                         Contests.public = 0 AND Contests_Users.user_id = ? AND
+                         $recommended_check AND $end_check
                  )
 
                  UNION
-
                  (
                      SELECT
                          $columns
@@ -202,7 +203,8 @@ class ContestsDAO extends ContestsDAOBase
                      WHERE
                          Contests.public = 0 AND
                          User_Roles.user_id = ? AND
-                         (User_Roles.role_id = 2 or User_Roles.role_id = 1)
+                         (User_Roles.role_id = 2 or User_Roles.role_id = 1) AND
+                         $recommended_check AND $end_check
                  )
 
                  UNION
@@ -218,20 +220,19 @@ class ContestsDAO extends ContestsDAOBase
                      WHERE
                          Contests.public = 0 AND
                          Groups_Users.user_id = ? AND
-                         (Group_Roles.role_id = 2 or Group_Roles.role_id = 1)
+                         (Group_Roles.role_id = 2 or Group_Roles.role_id = 1) AND
+                         $recommended_check AND $end_check
                  )
 
                  UNION
-
                  (
                      SELECT
                          $columns
                      FROM
                          Contests
                      WHERE
-                         Public = 1
+                         Public = 1 AND $recommended_check AND $end_check
                  )
-                 WHERE $recommended_check AND $end_check
                  ORDER BY
                      CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                      `recommended` DESC,

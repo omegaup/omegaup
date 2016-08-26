@@ -33,9 +33,11 @@ class Cache {
      * Inicializa el cache para el key dado
      * @param string $key el id del cache
      */
-    public function __construct($prefix, $id = ''){
-        $this->key = $prefix.$id;
-        $this->enabled = (defined('APC_USER_CACHE_ENABLED') && APC_USER_CACHE_ENABLED === true);
+    public function __construct($prefix, $id = '') {
+        $cache_ver = self::getVersion($prefix);
+        $this->key = $cache_ver.$prefix.$id;
+        $this->enabled = (defined('APC_USER_CACHE_ENABLED') &&
+                          APC_USER_CACHE_ENABLED === true);
         $this->log = Logger::getLogger('cache');
 
         if ($this->enabled) {
@@ -157,13 +159,31 @@ class Cache {
     }
 
     /**
-     * Delete all entries that begin with $prefix.
+     * Gets the current cache version for all entries with prefix $prefix.
+     *
+     * @param string $prefix
+     */
+    private static function getVersion($prefix) {
+        $version = apc_fetch('v'.$prefix);
+        if ($version === false) {
+            apc_store('v'.$prefix, 0);
+            return 0;
+        }
+        return $version;
+    }
+
+    /**
+     * Invalidate all entries that begin with $prefix.
+     *
+     * It does so by changing the current version used for these entries, so
+     * old entries will never be fetched or updated again.
      *
      * @param string $prefix
      */
     public static function invalidateAllKeys($prefix) {
-        foreach (new APCIterator('user', '/^'.$prefix.'\.*/', APC_ITER_KEY) as $iter) {
-            apc_delete($iter['key']);
+        apc_inc('v'.$prefix, 1, $success);
+        if (!$success) {
+            apc_store('v'.$prefix, 1);
         }
     }
 }

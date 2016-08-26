@@ -47,7 +47,7 @@ $(document).ready(function() {
 		}
     }
 
-	var omegaup = new OmegaUp();
+    var omegaup = new OmegaUp();
 
     var contestLists = [
         // List Id, Active, Recommended.
@@ -56,15 +56,24 @@ $(document).ready(function() {
         ['#past-contests', 0, 0],
         ['#recommended-past-contests', 0, 1],
     ];
+
+    // Closure to capture the value of i in the loop over contestLists.
+    function makeCallback(i) {
+        return function (data) {
+            populateContestList($(contestLists[i][0]),
+                                data.results,
+                                contestLists[i][1]);
+        }
+    }
+
     var requests = [];
     for (var i = 0, len = contestLists.length; i < len; i++) {
-        requests.push(omegaup.getContests(function (i) { return function (data) {
-                populateContestList($(contestLists[i][0]), data.results, contestLists[i][1]);
-            }}(i),
+        requests.push(omegaup.getContests(
+            makeCallback(i),
             { 'active': contestLists[i][1],
               'recommended': contestLists[i][2],
-              'page_size': 1000})
-        );
+              'page_size': 1000 }
+        ));
     }
 
     // Wait until all of the calls above finish before showing the contents.
