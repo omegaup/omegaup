@@ -35,7 +35,39 @@ class UserProfileTest extends OmegaupTestCase {
         $response = UserController::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response['userinfo']);
+        $this->assertArrayNotHasKey('email', $response['userinfo']);
         $this->assertEquals($user2->username, $response['userinfo']['username']);
+    }
+
+    /*
+     * Test admin can see emails for all profiles
+     */
+    public function testAdminCanSeeEmails() {
+        $user = UserFactory::createUser();
+        $admin = UserFactory::createAdminUser();
+
+        $r = new Request(array(
+            'auth_token' => self::login($admin),
+            'username' => $user->username
+        ));
+        $response = UserController::apiProfile($r);
+
+        $this->assertArrayHasKey('email', $response['userinfo']);
+    }
+
+    /*
+     * User can see his own email
+     */
+    public function testUserCanSeeSelfEmail() {
+        $user = UserFactory::createUser();
+
+        $r = new Request(array(
+            'auth_token' => self::login($user),
+            'username' => $user->username
+        ));
+        $response = UserController::apiProfile($r);
+
+        $this->assertArrayHasKey('email', $response['userinfo']);
     }
 
     /*
