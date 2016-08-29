@@ -54,7 +54,7 @@ class Cache {
      * @param int $timeout
      * @return boolean
      */
-    public function set($value, $timeout = 0) {
+    public function set($value, $timeout = APC_USER_CACHE_TIMEOUT) {
         if ($this->enabled === true) {
             if (apc_store($this->key, $value, $timeout) === true) {
                 $this->log->debug('apc_stored successful for key: ' . $this->key);
