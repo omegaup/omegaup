@@ -1277,7 +1277,7 @@ Arena.ObservableRun = function(arena, run) {
 	self.penalty_text = ko.pureComputed(self.$penalty_text, self);
 	self.points = ko.pureComputed(self.$points, self);
 	self.percentage = ko.pureComputed(self.$percentage, self);
-	self.contest_alias_html = ko.pureComputed(self.$contest_alias_html, self);
+	self.contest_alias_url = ko.pureComputed(self.$contest_alias_url, self);
 };
 
 Arena.ObservableRun.prototype.update = function(run) {
@@ -1299,7 +1299,7 @@ Arena.ObservableRun.prototype.$problem_url = function() {
 	return "/arena/problem/" + self.alias() + "/";
 };
 
-Arena.ObservableRun.prototype.$contest_alias_html = function() {
+Arena.ObservableRun.prototype.$contest_alias_url = function() {
 	var self = this;
 	return (self.contest_alias() === null) ? "" : "/arena/" + self.contest_alias() + "/";
 };

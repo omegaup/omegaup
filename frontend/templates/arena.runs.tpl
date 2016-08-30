@@ -115,7 +115,7 @@
 							<td class="username" data-bind="html:user_html"></td>
 {/if}
 {if isset($show_contest)}
-							<td class="contest"><a data-bind="text: contest_alias, attr: { href: contest_alias_html }"></a></td>
+							<td class="contest"><a data-bind="text: contest_alias, attr: { href: contest_alias_url }"></a></td>
 {/if}
 {if isset($show_problem)}
 							<td class="problem"><a data-bind="text: alias, attr: { href: problem_url }"></a></td>
