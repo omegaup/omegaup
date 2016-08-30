@@ -1136,7 +1136,8 @@ class UserController extends Controller {
 
         // Do not leak plain emails in case the request is for a profile other than
         // the logged user's one. Admins can see emails.
-        if (!(Authorization::IsSystemAdmin($r['current_user_id']) || $r['user']->user_id === $r['current_user_id'])) {
+        if (!Authorization::IsSystemAdmin($r['current_user_id'])
+                && $r['user']->user_id !== $r['current_user_id']) {
             unset($response['userinfo']['email']);
         }
 
