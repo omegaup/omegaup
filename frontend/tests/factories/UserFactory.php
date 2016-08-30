@@ -116,7 +116,7 @@ class UserFactory {
      * @return User
      */
     public static function createAdminUser($username = null, $password = null, $email = null) {
-        $user = self::createUser();
+        $user = self::createUser($username, $password, $email);
 
         $userRoles = new UserRoles(array(
             'user_id' => $user->user_id,
