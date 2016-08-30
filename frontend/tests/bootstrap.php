@@ -52,6 +52,7 @@ Utils::CleanupDB();
 // Create a test default user for manual UI operations
 UserController::$sendEmailOnVerify = false;
 UserFactory::createUser('test', 'testtesttest');
+UserFactory::createAdminUser('admintest', 'testtesttest');
 UserController::$sendEmailOnVerify = true;
 
 // Globally disable run wait gap.
