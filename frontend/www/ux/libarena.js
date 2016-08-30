@@ -1251,6 +1251,7 @@ Arena.ObservableRun = function(arena, run) {
 	self.short_guid = run.guid.substring(0, 8);
 
 	self.alias = ko.observable(run.alias);
+	self.contest_alias = ko.observable(run.contest_alias);
 	self.contest_score = ko.observable(run.contest_score);
 	self.country_id = ko.observable(run.country_id);
 	self.judged_by = ko.observable(run.judged_by);
@@ -1276,6 +1277,7 @@ Arena.ObservableRun = function(arena, run) {
 	self.penalty_text = ko.pureComputed(self.$penalty_text, self);
 	self.points = ko.pureComputed(self.$points, self);
 	self.percentage = ko.pureComputed(self.$percentage, self);
+	self.contest_alias_html = ko.pureComputed(self.$contest_alias_html, self);
 };
 
 Arena.ObservableRun.prototype.update = function(run) {
@@ -1295,6 +1297,11 @@ Arena.ObservableRun.prototype.update = function(run) {
 Arena.ObservableRun.prototype.$problem_url = function() {
 	var self = this;
 	return "/arena/problem/" + self.alias() + "/";
+};
+
+Arena.ObservableRun.prototype.$contest_alias_html = function() {
+	var self = this;
+	return (self.contest_alias() === null) ? "" : "/arena/" + self.contest_alias() + "/";
 };
 
 Arena.ObservableRun.prototype.$user_html = function() {

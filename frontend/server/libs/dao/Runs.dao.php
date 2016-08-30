@@ -125,10 +125,11 @@ class RunsDAO extends RunsDAOBase {
     final public static function GetAllRuns($contest_id, $status, $verdict, $problem_id, $language, $user_id, $offset, $rowcount) {
         $sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, r.penalty, ' .
                 'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
-                'r.submit_delay, u.username, p.alias, u.country_id ' .
+                'r.submit_delay, u.username, p.alias, u.country_id, c.alias AS contest_alias ' .
                 'FROM Runs r USE INDEX(PRIMARY) ' .
                 'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .
-                'INNER JOIN Users u ON u.user_id = r.user_id ';
+                'INNER JOIN Users u ON u.user_id = r.user_id ' .
+                'LEFT JOIN Contests c ON c.contest_id = r.contest_id ';
         $where = array();
         $val = array();
 
