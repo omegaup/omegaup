@@ -9,19 +9,19 @@
   * ******************************************************************************* */
 
 /** Value Object file for table Users.
-  *
+  * 
   * VO does not have any behaviour.
   * @access public
-  *
+  * 
   */
 
 class Users extends VO
 {
 	/**
 	  * Constructor de Users
-	  *
-	  * Para construir un objeto de tipo Users debera llamarse a el constructor
-	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
+	  * 
+	  * Para construir un objeto de tipo Users debera llamarse a el constructor 
+	  * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo 
 	  * cuyos campos son iguales a las variables que constituyen a este objeto.
 	  */
 	function __construct($data = NULL)
@@ -30,6 +30,7 @@ class Users extends VO
 		{
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
+
 
 			if (isset($data['user_id'])) {
 				$this->user_id = $data['user_id'];
@@ -94,19 +95,22 @@ class Users extends VO
 			if (isset($data['recruitment_optin'])) {
 				$this->recruitment_optin = $data['recruitment_optin'];
 			}
+			if (isset($data['in_mailing_list'])) {
+				$this->in_mailing_list = $data['in_mailing_list'];
+			}
 		}
 	}
 
 	/**
 	  * Obtener una representacion en String
-	  *
+	  * 
 	  * Este metodo permite tratar a un objeto Users en forma de cadena.
 	  * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
-	  * @return String
+	  * @return String 
 	  */
 	public function __toString( )
-	{
-		$vec = array(
+	{ 
+		$vec = array( 
 			"user_id" => $this->user_id,
 			"username" => $this->username,
 			"facebook_user_id" => $this->facebook_user_id,
@@ -127,9 +131,10 @@ class Users extends VO
 			"verification_id" => $this->verification_id,
 			"reset_digest" => $this->reset_digest,
 			"reset_sent_at" => $this->reset_sent_at,
-			"recruitment_optin" => $this->recruitment_optin
-		);
-	return json_encode($vec);
+			"recruitment_optin" => $this->recruitment_optin,
+			"in_mailing_list" => $this->in_mailing_list
+		); 
+	return json_encode($vec); 
 	}
 
 	/**
@@ -290,4 +295,11 @@ class Users extends VO
 	  * @var tinyint(1)
 	  */
 	public $recruitment_optin;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var BOOLEAN
+	  */
+	public $in_mailing_list;
 }

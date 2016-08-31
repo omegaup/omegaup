@@ -32,6 +32,9 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Verify that users are opt'd out of the recruitment after being created
         $this->assertNull($user->recruitment_optin);
+
+        // Verify users are not in mailing list by default
+        $this->assertEquals(0, $user->in_mailing_list);
     }
 
     /**
