@@ -709,7 +709,7 @@ class ContestController extends Controller {
             $contest->show_scoreboard_after = '1';
         }
 
-        if ($r['public'] == 1) {
+        if ($r['public'] == 1 && is_null($r['problems'])) {
             self::validateContestCanBePublic($contest);
         }
 
@@ -878,10 +878,21 @@ class ContestController extends Controller {
 
         // Problems is optional
         if (!is_null($r['problems'])) {
+            $problems = json_decode($r['problems']);
+            if (is_null($problems)) {
+                throw new InvalidParameterException('invalidParameters', 'problems');
+            }
+
             $r['problems'] = array();
 
-            foreach (json_decode($r['problems']) as $problem) {
+            foreach ($problems as $problem) {
                 $p = ProblemsDAO::getByAlias($problem->problem);
+                if (is_null($p)) {
+                    throw new InvalidParameterException('parameterNotFound', 'problems');
+                }
+                if ($p->public == '0' && !Authorization::CanEditProblem($r['current_user_id'], $p)) {
+                    throw new ForbiddenAccessException('problemIsPrivate');
+                }
                 array_push($r['problems'], array(
                     'id' => $p->problem_id,
                     'alias' => $problem->problem,

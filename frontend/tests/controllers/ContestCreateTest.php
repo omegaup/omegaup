@@ -121,4 +121,89 @@ class CreateContestTest extends OmegaupTestCase {
         // Call the API
         $response = ContestController::apiCreate($r);
     }
+
+    /**
+     * Public contest without problems is not valid.
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testCreatePublicContest() {
+        // Create a valid contest Request object
+        $contestData = ContestsFactory::getRequest();
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+        $r['public'] = 1;
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = ContestController::apiCreate($r);
+    }
+
+    /**
+     * Public contest with problems is valid.
+     */
+    public function testCreatePublicContestWithProblems() {
+        $problem = ProblemsFactory::createProblem();
+
+        // Create a valid contest Request object
+        $contestData = ContestsFactory::getRequest();
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+        $r['public'] = 1;
+        $r['problems'] = json_encode(array(array(
+            'problem' => $problem['problem']->alias,
+            'points' => 100,
+        )));
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = ContestController::apiCreate($r);
+
+        // Assert status of new contest
+        $this->assertEquals('ok', $response['status']);
+
+        // Assert problem was added.
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
+        $response = ContestController::apiProblems($r);
+        $this->assertEquals(1, count($response['problems']));
+        $this->assertEquals(
+            $problem['problem']->alias,
+            $response['problems'][0]['alias']
+        );
+    }
+
+    /**
+     * Public contest with private problems is not valid.
+     *
+     * @expectedException ForbiddenAccessException
+     */
+    public function testCreatePublicContestWithPrivateProblems() {
+        $problem = ProblemsFactory::createProblem(null, null, 0);
+
+        // Create a valid contest Request object
+        $contestData = ContestsFactory::getRequest();
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+        $r['public'] = 1;
+        $r['problems'] = json_encode(array(array(
+            'problem' => $problem['problem']->alias,
+            'points' => 100,
+        )));
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = ContestController::apiCreate($r);
+    }
 }
