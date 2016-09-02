@@ -1,0 +1,74 @@
+[
+	{
+		"username": "omegaup",
+		"password": "omegaup",
+		"requests": [
+			{
+				"api": "/problem/create",
+				"params": {
+					"public": 1,
+					"title": "Sumas",
+					"alias": "sumas",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 33554432,
+					"output_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb",
+					"stack_limit": 33554432,
+					"email_clarifications": true
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"public": 1,
+					"title": "Triangulos",
+					"alias": "triangulos",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 33554432,
+					"output_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb",
+					"stack_limit": 33554432,
+					"email_clarifications": true
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/triangulos.zip"
+				}
+			},
+			{
+				"api": "/contest/create",
+				"params": {
+					"public": 1,
+					"title": "Prueba",
+					"alias": "prueba",
+					"description": "Concurso de prueba",
+					"start_time": "$NOW$",
+					"finish_time": "$NOW$+18000",
+					"window_length": "NULL",
+					"scoreboard": 100,
+					"points_decay_factor": 0,
+					"partial_score": 1,
+					"submissions_gap": 20,
+					"feedback": "yes",
+					"penalty_type": "contest_start",
+					"penalty_calc_policy": "sum",
+					"public": 1,
+					"problems": "[{\"problem\":\"triangulos\",\"points\":100},{\"problem\":\"sumas\",\"points\":100}]",
+					"show_scoreboard_after": 1
+				}
+			}
+		]
+	}
+]
