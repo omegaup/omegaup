@@ -878,14 +878,14 @@ class ContestController extends Controller {
 
         // Problems is optional
         if (!is_null($r['problems'])) {
-            $problems = json_decode($r['problems']);
-            if (is_null($problems)) {
+            $request_problems = json_decode($r['problems']);
+            if (is_null($request_problems)) {
                 throw new InvalidParameterException('invalidParameters', 'problems');
             }
 
-            $r['problems'] = array();
+            $problems = array();
 
-            foreach ($problems as $problem) {
+            foreach ($request_problems as $problem) {
                 $p = ProblemsDAO::getByAlias($problem->problem);
                 if (is_null($p)) {
                     throw new InvalidParameterException('parameterNotFound', 'problems');
@@ -893,12 +893,14 @@ class ContestController extends Controller {
                 if ($p->public == '0' && !Authorization::CanEditProblem($r['current_user_id'], $p)) {
                     throw new ForbiddenAccessException('problemIsPrivate');
                 }
-                array_push($r['problems'], array(
+                array_push($problems, array(
                     'id' => $p->problem_id,
                     'alias' => $problem->problem,
                     'points' => $problem->points
                 ));
             }
+
+            $r['problems'] = $problems;
         }
 
         // Show scoreboard is always optional
