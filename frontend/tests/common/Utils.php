@@ -179,12 +179,12 @@ class Utils {
 class AutoEnableFlag {
     private $flag;
 
-    function __construct(&$flag) {
+    public function __construct(&$flag) {
         $this->flag = &$flag;
         $this->flag = true;
     }
 
-    function __destruct() {
+    public function __destruct() {
         $this->flag = false;
     }
 }
