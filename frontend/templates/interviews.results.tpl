@@ -27,8 +27,8 @@
 <script type="text/javascript" src="/js/knockout-4.3.0.js?ver=059d58"></script>
 <script type="text/javascript" src="/js/knockout-secure-binding.min.js?ver=81a2a3"></script>
 
-<script type="text/javascript" src="/ux/libadmin.js?ver=4ef011"></script>
-<script type="text/javascript" src="/ux/libarena.js?ver=6857e4"></script>
+<script type="text/javascript" src="/ux/libadmin.js?ver=cbed96"></script>
+<script type="text/javascript" src="/ux/libarena.js?ver=9263da"></script>
 <script type="text/javascript" src="/ux/admin.js?ver=d65a4c"></script>
 
 <script type="text/javascript" src="/js/interviews.results.js?ver=b7b5b4"></script>

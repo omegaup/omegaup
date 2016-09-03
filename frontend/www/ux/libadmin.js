@@ -1,6 +1,6 @@
 function ArenaAdmin(arena, onlyProblemAlias) {
 	this.arena = arena;
-	this.arena.admin = true;
+	this.arena.contestAdmin = true;
 	this.onlyProblemAlias = onlyProblemAlias;
 
 	this.setUpPagers();
