@@ -11,6 +11,17 @@ class UserController extends Controller {
     public static $sendEmailOnVerify = true;
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
+    public static $enableSendyOverride = false;
+    public static $urlHelper = null;
+
+    /**
+     * Sets the UrlHelper
+     *
+     * @param UrlHelper $urlHelperObj
+     */
+    public static function setUrlHelper(UrlHelper $urlHelperObj = null) {
+        self::$urlHelper = (is_null($urlHelperObj) ? new UrlHelper() : $urlHelperObj);
+    }
 
     /**
      * Entry point for Create a User API
@@ -157,8 +168,8 @@ class UserController extends Controller {
      * @param Request $r
      */
     private static function registerToSendy(Users $user) {
-        if (!OMEGAUP_EMAIL_SENDY_ENABLE) {
-            return;
+        if (!OMEGAUP_EMAIL_SENDY_ENABLE && !self::$enableSendyOverride) {
+            return false;
         }
 
         self::$log->info('Adding user to Sendy.');
@@ -167,7 +178,8 @@ class UserController extends Controller {
         try {
             $email = EmailsDAO::getByPK($user->main_email_id);
         } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+            self::$log->warn('Email lookup failed: ' . $e->getMessage());
+            return false;
         }
 
         //Subscribe
@@ -176,7 +188,7 @@ class UserController extends Controller {
                 'name' => $user->username,
                 'email' => $email->email,
                 'list' => OMEGAUP_EMAIL_SENDY_LIST,
-                'boolean' => 'true'
+                'boolean' => 'true' /* get a plaintext response, API: https://sendy.co/api */
                 )
         );
         $opts = array(
@@ -187,15 +199,18 @@ class UserController extends Controller {
         );
 
         $context  = stream_context_create($opts);
-        $result = file_get_contents(OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL, false, $context);
+        $result = self::$urlHelper->fetchUrl(OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL, false /*use_include_path*/, $context);
 
         //check result and redirect
-        if ($result) {
+        self::$log->info('Sendy response: ' . $result);
+        if ($result == 1) {
             self::$log->info('Success adding user to Sendy.');
         } else {
             self::$log->info('Failure adding user to Sendy.');
+            return false;
         }
-        self::$log->info($result);
+
+        return true;
     }
 
     /**
@@ -503,8 +518,6 @@ class UserController extends Controller {
 
         self::$log->info('User verification complete.');
 
-        self::registerToSendy($user);
-
         if (self::$redirectOnVerify) {
             if (!is_null($r['redirecttointerview'])) {
                 die(header('Location: /login/?redirect=/interview/' . urlencode($r['redirecttointerview']) . '/arena'));
@@ -514,6 +527,48 @@ class UserController extends Controller {
         }
 
         return array('status' => 'ok');
+    }
+
+    /**
+     * Registers to the mailing list all users that have not been added before. Admin only
+     *
+     * @throws InvalidDatabaseOpertionException
+     * @throws InvalidParameterException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiMailingListBackfill(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $usersAdded = array();
+
+        try {
+            $usersMissing = UsersDAO::search(new Users(array(
+                'verified' => true,
+                'in_mailing_list' => false
+            )));
+
+            foreach ($usersMissing as $user) {
+                $registered = self::registerToSendy($user);
+
+                if ($registered) {
+                    $user->in_mailing_list = 1;
+                    UsersDAO::save($user);
+                }
+
+                $usersAdded[$user->username] = $registered;
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array(
+            'status' => 'ok',
+            'users' => $usersAdded
+        );
     }
 
     /**
@@ -1906,3 +1961,5 @@ class UserController extends Controller {
         return $response;
     }
 }
+
+UserController::setUrlHelper();

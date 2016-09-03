@@ -233,7 +233,7 @@ class CreateUserTest extends OmegaupTestCase {
     }
 
     /**
-     * Normal user trying to go the admin path
+     * Normal user trying to verify herself through the admin path
      *
      * @expectedException ForbiddenAccessException
      */
@@ -249,5 +249,68 @@ class CreateUserTest extends OmegaupTestCase {
             'auth_token' => self::login($user2),
             'usernameOrEmail' => $user->username
         )));
+    }
+
+    /**
+     * Normal user trying to backfill mailing list
+     *
+     * @expectedException ForbiddenAccessException
+     */
+    public function testMailingListBackfillNotAdmin() {
+        $enableSendyInThisScope = new AutoEnableFlag(UserController::$enableSendyOverride);
+
+        $user = UserFactory::createUser();
+
+        $response = UserController::apiMailingListBackfill(new Request(array(
+            'auth_token' => self::login($user)
+        )));
+    }
+
+    /**
+     * Test a user not in the mailing list (recently created) is backfilled
+     * into Sendy.
+     */
+    public function testMailingtListBackfill() {
+        $enableSendyInThisScope = new AutoEnableFlag(UserController::$enableSendyOverride);
+
+        $userUnregistered = UserFactory::createUser();
+
+        $urlHelperMock = $this->getMock('UrlHelper', array('fetchUrl'));
+        $urlHelperMock->expects($this->atLeastOnce())
+            ->method('fetchUrl')
+            ->will($this->returnValue('1'));
+
+        UserController::setUrlHelper($urlHelperMock);
+
+        $response = UserController::apiMailingListBackfill(new Request(array(
+            'auth_token' => self::login(UserFactory::createAdminUser())
+        )));
+
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals(true, $response['users'][$userUnregistered->username]);
+    }
+
+    /**
+     * Test only verified users are backfilled into Sendy
+     */
+    public function testMailingListBackfillOnlyVerified() {
+        $enableSendyInThisScope = new AutoEnableFlag(UserController::$enableSendyOverride);
+
+        $userNotVerified = UserFactory::createUser(null /*username*/, null /*password*/, null /*email*/, false /*verified*/);
+
+        $urlHelperMock = $this->getMock('UrlHelper', array('fetchUrl'));
+        $urlHelperMock->expects($this->atLeastOnce())
+            ->method('fetchUrl')
+            ->will($this->returnValue('1'));
+
+        UserController::setUrlHelper($urlHelperMock);
+
+        $response = UserController::apiMailingListBackfill(new Request(array(
+            'auth_token' => self::login(UserFactory::createAdminUser())
+        )));
+
+        // Check user was not added into the mailing list
+        $this->assertEquals('ok', $response['status']);
+        $this->assertArrayNotHasKey($userNotVerified->username, $response['users']);
     }
 }

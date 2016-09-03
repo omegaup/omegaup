@@ -69,6 +69,7 @@ require_once('libs/phpmailer/class.phpmailer.php');
 require_once('libs/UITools.php');
 require_once('libs/Mailchimp/Mailchimp.php');
 require_once('libs/ApiException.php');
+require_once('libs/UrlHelper.php');
 
 
 /*

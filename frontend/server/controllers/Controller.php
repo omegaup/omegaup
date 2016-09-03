@@ -171,6 +171,16 @@ class Controller {
         }
         return $importantChange;
     }
+
+    /**
+     * Wrapper of file_get_contents
+     *
+     * @return string
+     */
+    protected static function fetchUrl($filename, $use_include_path, $context)
+    {
+        return file_get_contents($filename, $use_include_path, $context);
+    }
 }
 
 Controller::$log = Logger::getLogger('controller');
