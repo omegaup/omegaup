@@ -531,9 +531,7 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $response = array(
-            'problem' => $r['problem']->alias,
-        );
+        $response = array();
 
         // Get the error
         $grade_dir = RunController::getGradePath($r['run']);
