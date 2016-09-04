@@ -55,10 +55,3 @@ try_define('SMARTY_CACHE_DIR', '/var/tmp/omegaup/');
 # PAGER CONSTANTS FOR TESTING
 # #########################
 try_define('PROBLEMS_PER_PAGE', 2);
-
-# #########################
-# MAILING LIST
-# ########################
-try_define('OMEGAUP_EMAIL_SENDY_ENABLE', false);
-try_define('OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL', 'xxx');
-try_define('OMEGAUP_EMAIL_SENDY_LIST', 'xxx');

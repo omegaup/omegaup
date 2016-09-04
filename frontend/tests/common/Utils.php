@@ -171,20 +171,3 @@ class Utils {
         }
     }
 }
-
-/**
- * Test helper to enable/disable boolean flags on scope
- *
- */
-class AutoEnableFlag {
-    private $flag;
-
-    public function __construct(&$flag) {
-        $this->flag = &$flag;
-        $this->flag = true;
-    }
-
-    public function __destruct() {
-        $this->flag = false;
-    }
-}

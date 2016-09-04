@@ -11,17 +11,9 @@ class UserController extends Controller {
     public static $sendEmailOnVerify = true;
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
-    public static $enableSendyOverride = false;
     public static $urlHelper = null;
 
-    /**
-     * Sets the UrlHelper
-     *
-     * @param UrlHelper $urlHelperObj
-     */
-    public static function setUrlHelper(UrlHelper $urlHelperObj = null) {
-        self::$urlHelper = (is_null($urlHelperObj) ? new UrlHelper() : $urlHelperObj);
-    }
+    const SENDY_SUCCESS = '1';
 
     /**
      * Entry point for Create a User API
@@ -203,7 +195,7 @@ class UserController extends Controller {
 
         //check result and redirect
         self::$log->info('Sendy response: ' . $result);
-        if ($result == 1) {
+        if ($result === UserController::SENDY_SUCCESS) {
             self::$log->info('Success adding user to Sendy.');
         } else {
             self::$log->info('Failure adding user to Sendy.');
@@ -1962,4 +1954,4 @@ class UserController extends Controller {
     }
 }
 
-UserController::setUrlHelper();
+UserController::$urlHelper = new UrlHelper();

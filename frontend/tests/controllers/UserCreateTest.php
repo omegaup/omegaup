@@ -257,8 +257,6 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException ForbiddenAccessException
      */
     public function testMailingListBackfillNotAdmin() {
-        $enableSendyInThisScope = new AutoEnableFlag(UserController::$enableSendyOverride);
-
         $user = UserFactory::createUser();
 
         $response = UserController::apiMailingListBackfill(new Request(array(
@@ -271,8 +269,6 @@ class CreateUserTest extends OmegaupTestCase {
      * into Sendy.
      */
     public function testMailingtListBackfill() {
-        $enableSendyInThisScope = new AutoEnableFlag(UserController::$enableSendyOverride);
-
         $userUnregistered = UserFactory::createUser();
 
         $urlHelperMock = $this->getMock('UrlHelper', array('fetchUrl'));
@@ -280,7 +276,7 @@ class CreateUserTest extends OmegaupTestCase {
             ->method('fetchUrl')
             ->will($this->returnValue('1'));
 
-        UserController::setUrlHelper($urlHelperMock);
+        UserController::$urlHelper = $urlHelperMock;
 
         $response = UserController::apiMailingListBackfill(new Request(array(
             'auth_token' => self::login(UserFactory::createAdminUser())
@@ -294,8 +290,6 @@ class CreateUserTest extends OmegaupTestCase {
      * Test only verified users are backfilled into Sendy
      */
     public function testMailingListBackfillOnlyVerified() {
-        $enableSendyInThisScope = new AutoEnableFlag(UserController::$enableSendyOverride);
-
         $userNotVerified = UserFactory::createUser(null /*username*/, null /*password*/, null /*email*/, false /*verified*/);
 
         $urlHelperMock = $this->getMock('UrlHelper', array('fetchUrl'));
@@ -303,7 +297,7 @@ class CreateUserTest extends OmegaupTestCase {
             ->method('fetchUrl')
             ->will($this->returnValue('1'));
 
-        UserController::setUrlHelper($urlHelperMock);
+        UserController::$urlHelper = $urlHelperMock;
 
         $response = UserController::apiMailingListBackfill(new Request(array(
             'auth_token' => self::login(UserFactory::createAdminUser())
