@@ -1,0 +1,25 @@
+# Force all text to use UNIX-style eof.
+*.cpp text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.in text eol=lf
+*.jison text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.lang text eol=lf
+*.map text eol=lf
+*.md text eol=lf
+*.php text eol=lf
+*.phps text eol=lf
+*.py text eol=lf
+*.rewrites text eol=lf
+*.sbt text eol=lf
+*.scala text eol=lf
+*.service text eol=lf
+*.sh text eol=lf
+*.sql text eol=lf
+*.text text eol=lf
+*.tpl text eol=lf
+*.txt text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
