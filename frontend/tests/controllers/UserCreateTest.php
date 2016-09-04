@@ -274,7 +274,7 @@ class CreateUserTest extends OmegaupTestCase {
         $urlHelperMock = $this->getMock('UrlHelper', array('fetchUrl'));
         $urlHelperMock->expects($this->atLeastOnce())
             ->method('fetchUrl')
-            ->will($this->returnValue('1'));
+            ->will($this->returnValue(UserController::SENDY_SUCCESS));
 
         UserController::$urlHelper = $urlHelperMock;
 
@@ -295,7 +295,7 @@ class CreateUserTest extends OmegaupTestCase {
         $urlHelperMock = $this->getMock('UrlHelper', array('fetchUrl'));
         $urlHelperMock->expects($this->atLeastOnce())
             ->method('fetchUrl')
-            ->will($this->returnValue('1'));
+            ->will($this->returnValue(UserController::SENDY_SUCCESS));
 
         UserController::$urlHelper = $urlHelperMock;
 

@@ -191,7 +191,7 @@ class UserController extends Controller {
         );
 
         $context  = stream_context_create($opts);
-        $result = self::$urlHelper->fetchUrl(OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL, false /*use_include_path*/, $context);
+        $result = self::$urlHelper->fetchUrl(OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL, $context);
 
         //check result and redirect
         self::$log->info('Sendy response: ' . $result);
