@@ -160,7 +160,7 @@ class UserController extends Controller {
      * @param Request $r
      */
     private static function registerToSendy(Users $user) {
-        if (!OMEGAUP_EMAIL_SENDY_ENABLE && !self::$enableSendyOverride) {
+        if (!OMEGAUP_EMAIL_SENDY_ENABLE) {
             return false;
         }
 
