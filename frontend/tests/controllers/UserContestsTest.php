@@ -58,4 +58,37 @@ class UserContestsTest extends OmegaupTestCase {
         $this->assertEquals($contestAdminData[1]['request']['alias'], $response['contests'][2]['alias']);
         $this->assertEquals($contestAdminData[0]['request']['alias'], $response['contests'][3]['alias']);
     }
+
+    /**
+     * Test ContestsDAO::getPrivateContestsCount when there's 1 private contest
+     * count
+     */
+    public function testPrivateContestsCount() {
+        // Create private contest
+        $contestData = ContestsFactory::createContest(null, 0 /*public*/);
+        $user = $contestData['director'];
+
+        $this->assertEquals(1, ContestsDAO::getPrivateContestsCount($user));
+    }
+
+    /**
+     * Test ContestsDAO::getPrivateContestsCount when there's 1 public contest
+     */
+    public function testPrivateContestsCountWithPublicContest() {
+        // Create private contest
+        $contestData = ContestsFactory::createContest(null, 1 /*public*/);
+        $user = $contestData['director'];
+
+        $this->assertEquals(0, ContestsDAO::getPrivateContestsCount($user));
+    }
+
+    /**
+     * Test ContestsDAO::getPrivateContestsCount when there's 0 contests
+     * created
+     */
+    public function testPrivateContestsCountWithNoContests() {
+        $user = UserFactory::createUser();
+
+        $this->assertEquals(0, ContestsDAO::getPrivateContestsCount($user));
+    }
 }

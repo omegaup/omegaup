@@ -154,7 +154,7 @@ class ApiCaller{
         }
 
         // Get the auth_token and user data from cookies
-        $cs = SessionController::apiCurrentSession();
+        $cs = SessionController::apiCurrentSession()['session'];
 
         // If we got an auth_token from cookies, replace it
         if (!is_null($cs['auth_token'])) {

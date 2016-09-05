@@ -94,8 +94,8 @@ $(document).ready(function() {
 
 		if (arena.activeTab == 'problems') {
 			if (window.location.hash.indexOf('/new-run') !== -1) {
-				if (!omegaup.loggedIn && omegaup.login_url) {
-					window.location = omegaup.login_url + "?redirect=" + escape(window.location);
+				if (!omegaup.loggedIn) {
+					window.location = "/login/?redirect=" + escape(window.location);
 					return;
 				}
 				$('#overlay form').hide();
@@ -122,8 +122,8 @@ $(document).ready(function() {
 
 	function contestLoaded(contest) {
 		if (contest.status == 'error') {
-			if (!omegaup.loggedIn && omegaup.login_url) {
-				window.location = omegaup.login_url + "?redirect=" + escape(window.location);
+			if (!omegaup.loggedIn) {
+				window.location = "/login/?redirect=" + escape(window.location);
 			} else if (contest.start_time) {
 				var f = (function(x, y) {
 					return function() {

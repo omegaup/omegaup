@@ -35,9 +35,6 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         if ($session->CurrentSessionAvailable()) {
             $session->InvalidateCache();
         }
-        if (isset($_SESSION['omegaup_user'])) {
-            unset($_SESSION['omegaup_user']);
-        }
         if (isset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
             unset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
         }

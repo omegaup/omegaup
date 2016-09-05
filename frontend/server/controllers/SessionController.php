@@ -50,8 +50,7 @@ class SessionController extends Controller {
     }
 
     public static function CurrentSessionAvailable() {
-        $a_CurrentSession = self::apiCurrentSession();
-        return $a_CurrentSession['valid'];
+        return self::apiCurrentSession()['session']['valid'];
     }
 
     /**
@@ -62,7 +61,11 @@ class SessionController extends Controller {
         if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null(self::$current_session)) {
-            return self::$current_session;
+            return array(
+                'status' => 'ok',
+                'session' => self::$current_session,
+                'time' => time(),
+            );
         }
         if (is_null($r)) {
             $r = new Request();
@@ -86,7 +89,11 @@ class SessionController extends Controller {
         } else {
             self::$current_session = SessionController::getCurrentSession($r);
         }
-        return self::$current_session;
+        return array(
+            'status' => 'ok',
+            'session' => self::$current_session,
+            'time' => time(),
+        );
     }
 
     private static function getAuthToken(Request $r = null) {
@@ -114,58 +121,35 @@ class SessionController extends Controller {
         if (is_null($authToken)) {
             return array(
                 'valid' => false,
-                'id' => null,
-                'name' => null,
-                'username' => null,
                 'email' => null,
-                'email_md5' => null,
+                'user' => null,
                 'auth_token' => null,
                 'is_admin' => false,
-                'login_url' => '/login/'
             );
         }
 
-        $vo_CurrentUser = AuthTokensDAO::getUserByToken($authToken);
+        $currentUser = AuthTokensDAO::getUserByToken($authToken);
 
-        if (is_null($vo_CurrentUser)) {
-            // Means user has auth token, but at
-            // does not exist in DB
-
+        if (is_null($currentUser)) {
+            // Means user has auth token, but does not exist in DB
             return array(
                 'valid' => false,
-                'id' => null,
-                'name' => null,
-                'username' => null,
                 'email' => null,
-                'email_md5' => null,
+                'user' => null,
                 'auth_token' => null,
                 'is_admin' => false,
-                'login_url' => '/login/'
             );
         }
 
         // Get email via his id
-        $vo_Email = EmailsDAO::getByPK($vo_CurrentUser->main_email_id);
-
-        $_SESSION['omegaup_user'] = array(
-            'name' => $vo_CurrentUser->username,
-            'email' => !is_null($vo_Email) ? $vo_Email->email : ''
-        );
+        $email = EmailsDAO::getByPK($currentUser->main_email_id);
 
         return array(
             'valid' => true,
-            'id' => $vo_CurrentUser->user_id,
-            'name' => $vo_CurrentUser->name,
-            'email' => !is_null($vo_Email) ? $vo_Email->email : '',
-            'email_md5' => !is_null($vo_Email) ? md5($vo_Email->email) : '',
-            'user' => $vo_CurrentUser,
-            'username' => $vo_CurrentUser->username,
+            'email' => !is_null($email) ? $email->email : '',
+            'user' => $currentUser,
             'auth_token' => $authToken,
-            'is_email_verified' => $vo_CurrentUser->verified,
-            'is_admin' => Authorization::IsSystemAdmin($vo_CurrentUser->user_id),
-            'private_contests_count' => ContestsDAO::getPrivateContestsCount($vo_CurrentUser),
-            'private_problems_count' => ProblemsDAO::getPrivateCount($vo_CurrentUser),
-            'needs_basic_info' =>$vo_CurrentUser->password == null
+            'is_admin' => Authorization::IsSystemAdmin($currentUser->user_id),
         );
     }
 
@@ -173,7 +157,7 @@ class SessionController extends Controller {
      * Invalidates the current user's session cache.
      */
     public function InvalidateCache() {
-        $currentSession = self::apiCurrentSession();
+        $currentSession = self::apiCurrentSession()['session'];
         Cache::deleteFromCache(Cache::SESSION_PREFIX, $currentSession['auth_token']);
     }
 
@@ -187,8 +171,8 @@ class SessionController extends Controller {
     public function UnRegisterSession() {
         $this->InvalidateCache();
 
-        $a_CurrentSession = self::apiCurrentSession();
-        $vo_AuthT = new AuthTokens(array('token' => $a_CurrentSession['auth_token']));
+        $currentSession = self::apiCurrentSession()['session'];
+        $vo_AuthT = new AuthTokens(array('token' => $currentSession['auth_token']));
 
         $this->InvalidateLocalCache();
 
@@ -197,7 +181,6 @@ class SessionController extends Controller {
         } catch (Exception $e) {
         }
 
-        unset($_SESSION['omegaup_user']);
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
