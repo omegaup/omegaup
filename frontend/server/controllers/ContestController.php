@@ -34,8 +34,12 @@ class ContestController extends Controller {
 
             $page = (isset($r['page']) ? intval($r['page']) : 1);
             $page_size = (isset($r['page_size']) ? intval($r['page_size']) : 20);
-            $active_contests = (isset($r['active']) ? intval($r['active']) : -1);
-            $recommended = (isset($r['recommended']) ? intval($r['recommended']) : -1);
+            $active_contests = isset($r['active'])
+                ? new ActiveStatus($r['active'])
+                : new ActiveStatus();
+            $recommended = isset($r['recommended'])
+                ? new RecommendedStatus($r['recommended'])
+                : new RecommendedStatus();
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests

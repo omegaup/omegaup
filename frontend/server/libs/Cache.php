@@ -163,10 +163,13 @@ class Cache {
      * @param string $prefix
      */
     private static function getVersion($prefix) {
-        $version = apc_fetch('v'.$prefix);
-        if ($version === false) {
-            apc_store('v'.$prefix, 0);
-            return 0;
+        $version = false;
+        $key = 'v'.$prefix;
+        while (($version = apc_fetch($key)) === false) {
+            if (apc_add($key, 0)) {
+                $version = 0;
+                break;
+            }
         }
         return $version;
     }
@@ -180,12 +183,16 @@ class Cache {
      * @param string $prefix
      */
     public static function invalidateAllKeys($prefix) {
-        if (self::cacheEnabled()) {
-            apc_inc('v'.$prefix, 1, $success);
-            if (!$success) {
-                apc_store('v'.$prefix, 1);
-            }
+        if (!self::cacheEnabled()) {
+            return;
         }
+        $key = 'v'.$prefix;
+        // Must do this in a loop to avoid race condition when two threads try
+        // to invalidate the cache simultaneously.
+        do {
+            // Ensure the version key exists.
+            $version = self::getVersion($prefix);
+        } while (!apc_cas($key, $version, $version + 1));
     }
 
     private static function cacheEnabled() {

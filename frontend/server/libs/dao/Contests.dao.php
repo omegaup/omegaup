@@ -8,6 +8,34 @@ require_once('base/Contests.vo.base.php');
   * @package docs
   *
   */
+
+class ActiveStatus extends SplEnum {
+    const __default = self::ALL;
+            
+    const ALL = 0;
+    const ACTIVE = 1;
+    const PAST = 2;
+
+    public $sql = array(
+        'TRUE',
+        'finish_time > NOW()',
+        'finish_time <= NOW()',
+    );
+}
+
+class RecommendedStatus extends SplEnum {
+    const __default = self::ALL;
+    const ALL = 0;
+    const RECOMMENDED = 1;
+    const NOT_RECOMMENDED = 2;
+
+    public $sql = array(
+        'TRUE',
+        'recommended = 1',
+        'recommended = 0',
+    );
+ }
+
 /** Contests Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
@@ -102,26 +130,6 @@ class ContestsDAO extends ContestsDAOBase
         return $ar;
     }
 
-    final private static function getContestEndCheck($activos) {
-        if ($activos < 0) {
-            return 'TRUE';
-        } else if ($activos == 0) {
-            return 'finish_time <= NOW()';
-        } else { // $activos > 0
-            return 'finish_time > NOW()';
-        }
-    }
-
-    final private static function getRecommendedCheck($recomendados) {
-        if ($recomendados < 0) {
-            return 'TRUE';
-        } else if ($recomendados == 0) {
-            return 'recommended = 0';
-        } else { // $recomendados > 0
-            return 'recommended = 1';
-        }
-    }
-
     /**
      * Regresa todos los concursos que un usuario puede ver.
      *
@@ -148,21 +156,22 @@ class ContestsDAO extends ContestsDAOBase
      * @param int $user_id
      * @param int $pagina
      * @param int $renglones_por_pagina
-     * @param int $activos Si < 0, regresa todo, si 0 regresa pasados, y si > 0 regresa activos
+     * @param ActiveStatus $activos
+     * @param RecommendedStatus $recomendados
      * @return array
      */
     final public static function getAllContestsForUser(
         $user_id,
         $pagina = 1,
         $renglones_por_pagina = 1000,
-        $activos = -1,
-        $recomendados = -1
+        $activos = ActiveStatus::ALL,
+        $recomendados = RecommendedStatus::ALL
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
-        $end_check = ContestsDAO::getContestEndCheck($activos);
-        $recommended_check = ContestsDAO::getRecommendedCheck($recomendados);
+        $end_check = ActiveStatus::$sql[$activos];
+        $recommended_check = RecommendedStatus::$sql[$recomendados];
         $sql = "
                  (
                      SELECT
@@ -258,12 +267,12 @@ class ContestsDAO extends ContestsDAOBase
     final public static function getAllPublicContests(
         $pagina = 1,
         $renglones_por_pagina = 1000,
-        $activos = -1,
-        $recomendados = -1
+        $activos = ActiveStatus::ALL,
+        $recomendados = RecommendedStatus::ALL
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
-        $end_check = ContestsDAO::getContestEndCheck($activos);
-        $recommended_check = ContestsDAO::getRecommendedCheck($recomendados);
+        $end_check = ActiveStatus::$sql[$activos];
+        $recommended_check = RecommendedStatus::$sql[$recomendados];
 
         $columns = ContestsDAO::$getContestsColumns;
 
@@ -300,14 +309,14 @@ class ContestsDAO extends ContestsDAOBase
     final public static function getAllContests(
         $pagina = 1,
         $renglones_por_pagina = 1000,
-        $activos = -1,
-        $recomendados = -1
+        $activos = ActiveStatus::ALL,
+        $recomendados = RecommendedStatus::ALL
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
-        $end_check = ContestsDAO::getContestEndCheck($activos);
-        $recommended_check = ContestsDAO::getRecommendedCheck($recomendados);
+        $end_check = ActiveStatus::$sql[$activos];
+        $recommended_check = RecommendedStatus::$sql[$recomendados];
 
         $sql = "
                 SELECT
