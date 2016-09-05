@@ -52,9 +52,9 @@
 	<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 {/if}
 {if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
-	<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ver=bbca63"></script>
+	<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ver=e445ec"></script>
 	<script type="text/javascript" src="/js/pagedown/Markdown.Sanitizer.js?ver=25306e"></script>
-	<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ver=1bf05c"></script>
+	<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ver=e0132d"></script>
 	<link rel="stylesheet" type="text/css" href="/js/pagedown/demo/browser/demo.css" />
 {/if}
 		<script type="text/javascript" src="/js/head.sugar_locale.js?ver=0cb37f"></script>
