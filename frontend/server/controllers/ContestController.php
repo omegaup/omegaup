@@ -700,8 +700,8 @@ class ContestController extends Controller {
         $contest->penalty_type = $r['penalty_type'];
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
         $contest->languages = empty($r['languages']) ? null : $r['languages'];
-        $contest->scoreboard_url = self::randomString(30);
-        $contest->scoreboard_url_admin = self::randomString(30);
+        $contest->scoreboard_url = SecurityTools::randomString(30);
+        $contest->scoreboard_url_admin = SecurityTools::randomString(30);
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->show_scoreboard_after = $r['show_scoreboard_after'];
