@@ -573,6 +573,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `reset_digest` VARCHAR(45) NULL DEFAULT NULL,
   `reset_sent_at` DATETIME NULL DEFAULT NULL,
   `recruitment_optin` tinyint(1) NULL DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
+  `in_mailing_list` BOOLEAN NOT NULL DEFAULT FALSE
   PRIMARY KEY (`user_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),

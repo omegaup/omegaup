@@ -95,8 +95,8 @@ try_define('OMEGAUP_EMAIL_SMTP_USER', 'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_PASSWORD', 'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_PORT', 'xxxx');
 try_define('OMEGAUP_EMAIL_SMTP_FROM', 'xxxx');
-try_define('OMEGAUP_EMAIL_SENDY_ENABLE', false);
-try_define('OMEGAUP_EMAIL_SENDY_SUSCRIBE_URL', 'xxx');
+try_define('OMEGAUP_EMAIL_SENDY_ENABLE', true);
+try_define('OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL', 'xxx');
 try_define('OMEGAUP_EMAIL_SENDY_LIST', 'xxx');
 
 # #########################
