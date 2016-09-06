@@ -38,4 +38,35 @@ class UserProblemsTest extends OmegaupTestCase {
 
         $this->assertEquals(0, count($response['problems']));
     }
+
+    /**
+     * Test ProblemsDAO::getPrivateCount when there's 1 private problem
+     */
+    public function testPrivateProblemsCount() {
+        // Create private problem
+        $problemData = ProblemsFactory::createProblem(null, null, 0 /*public*/);
+        $user = $problemData['author'];
+
+        $this->assertEquals(1, ProblemsDAO::getPrivateCount($user));
+    }
+
+    /**
+     * Test ProblemsDAO::getPrivateCount when there's 1 public problem
+     */
+    public function testPrivateProblemsCountWithPublicProblem() {
+        // Create public problem
+        $problemData = ProblemsFactory::createProblem(null, null, 1 /*public*/);
+        $user = $problemData['author'];
+
+        $this->assertEquals(0, ProblemsDAO::getPrivateCount($user));
+    }
+
+    /**
+     * Test ProblemsDAO::getPrivateCount when there's 0 problems
+     */
+    public function testPrivateProblemsCountWithNoProblems() {
+        $user = UserFactory::createUser();
+
+        $this->assertEquals(0, ProblemsDAO::getPrivateCount($user));
+    }
 }

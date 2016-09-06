@@ -1887,8 +1887,8 @@ class UserController extends Controller {
             'contest_admin' => array(),
         );
 
-        $session = SessionController::apiCurrentSession($r);
-        $user = ($session['valid'] ? $session['user'] : null);
+        $session = SessionController::apiCurrentSession($r)['session'];
+        $user = $session['user'];
         if (!is_null($user)) {
             $response['user'] = $user->username;
             $response['admin'] = $session['is_admin'];

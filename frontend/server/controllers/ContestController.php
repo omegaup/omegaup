@@ -230,7 +230,7 @@ class ContestController extends Controller {
 
         try {
             // Half-authenticate, in case there is no session in place.
-            $session = SessionController::apiCurrentSession($r);
+            $session = SessionController::apiCurrentSession($r)['session'];
             if ($session['valid'] && !is_null($session['user'])) {
                 $r['current_user'] = $session['user'];
                 $r['current_user_id'] = $session['user']->user_id;
@@ -249,7 +249,7 @@ class ContestController extends Controller {
             return ContestController::SHOW_INTRO;
         }
 
-        $cs = SessionController::apiCurrentSession();
+        $cs = SessionController::apiCurrentSession()['session'];
 
         // You already started the contest.
         $contestOpened = ContestsUsersDAO::getByPK(
@@ -1844,7 +1844,7 @@ class ContestController extends Controller {
         $history->user_id = $request->user_id;
         $history->contest_id = $request->user_id;
         $history->time = $request->last_update;
-        $history->admin_id = $current_ses['id'];
+        $history->admin_id = $current_ses['user']->user_id;
         $history->accepted = $request->accepted;
 
         ContestUserRequestHistoryDAO::save($history);

@@ -26,8 +26,8 @@ class Controller {
      * @throws UnauthorizedException
      */
     protected static function authenticateRequest(Request $r) {
-        $session = SessionController::apiCurrentSession($r);
-        if (!$session['valid'] || $session['user'] == null) {
+        $session = SessionController::apiCurrentSession($r)['session'];
+        if (is_null($session['user'])) {
             $r['current_user'] = null;
             $r['current_user_id'] = null;
             throw new UnauthorizedException();

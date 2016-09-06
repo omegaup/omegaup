@@ -2,11 +2,15 @@
 
 require_once('../server/bootstrap.php');
 
-if ($session['valid'] && $session['private_contests_count'] > 0 && !isset($_SESSION['private_problems_alert'])) {
-    $_SESSION['private_problems_alert'] = 1;
-    $smarty->assign('PRIVATE_PROBLEMS_ALERT', 1);
-} else {
-    $smarty->assign('PRIVATE_PROBLEMS_ALERT', 0);
+$private_problems_alert = 0;
+
+if ($session['valid'] && !isset($_SESSION['private_problems_alert'])) {
+    if (ProblemsDAO::getPrivateCount($session['user']) > 0) {
+        $_SESSION['private_problems_alert'] = 1;
+        $private_problems_alert = 1;
+    }
 }
+
+$smarty->assign('PRIVATE_PROBLEMS_ALERT', $private_problems_alert);
 
 $smarty->display('../templates/problem.mine.tpl');
