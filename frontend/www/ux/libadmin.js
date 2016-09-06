@@ -1,12 +1,13 @@
 omegaup.arena = omegaup.arena || {};
 
-omegaup.arena.ArenaAdmin = function(arena, onlyProblemAlias) {
-	this.arena = arena;
-	this.arena.contestAdmin = true;
-	this.onlyProblemAlias = onlyProblemAlias;
+omegaup.arena.ArenaAdmin = function(arena) {
+	var self = this;
 
-	this.setUpPagers();
-	this.arena.runs.attach($('#runs table.runs'));
+	self.arena = arena;
+	self.arena.contestAdmin = true;
+
+	self.setUpPagers();
+	self.arena.runs.attach($('#runs table.runs'));
 };
 
 omegaup.arena.ArenaAdmin.prototype.setUpPagers = function() {
@@ -42,7 +43,7 @@ omegaup.arena.ArenaAdmin.prototype.setUpPagers = function() {
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
 		omegaup.API.newClarification(
-			self.arena.contestAlias,
+			self.arena.options.contestAlias,
 			$('#clarification select[name="problem"]').val(),
 			$('#clarification textarea[name="message"]').val(),
 			function (run) {
@@ -74,30 +75,38 @@ omegaup.arena.ArenaAdmin.prototype.refreshRuns = function() {
 		status: self.arena.runs.filter_status() || undefined
 	};
 
-	if (self.onlyProblemAlias) {
+	if (self.arena.options.onlyProblemAlias) {
 		options.show_all = true;
-		options.problem_alias = self.onlyProblemAlias;
-		omegaup.API.getProblemRuns(self.onlyProblemAlias, options, self.runsChanged.bind(self));
-	} else if (self.arena.contestAlias === "admin") {
+		options.problem_alias = self.arena.options.onlyProblemAlias;
+		omegaup.API.getProblemRuns(
+			self.arena.options.onlyProblemAlias,
+			options,
+			self.runsChanged.bind(self)
+		);
+	} else if (self.arena.options.contestAlias === "admin") {
 		omegaup.API.getRuns(options, self.runsChanged.bind(self));
 	} else {
-		omegaup.API.getContestRuns(self.arena.contestAlias, options, self.runsChanged.bind(self));
+		omegaup.API.getContestRuns(
+			self.arena.options.contestAlias,
+			options,
+			self.runsChanged.bind(self)
+		);
 	}
 };
 
 omegaup.arena.ArenaAdmin.prototype.refreshClarifications = function() {
 	var self = this;
 
-	if (self.onlyProblemAlias) {
+	if (self.arena.options.onlyProblemAlias) {
 		omegaup.API.getProblemClarifications(
-			self.onlyProblemAlias,
+			self.arena.options.onlyProblemAlias,
 			self.arena.clarificationsOffset,
 			self.arena.clarificationsRowcount,
 			self.arena.clarificationsChange.bind(self.arena)
 		);
 	} else {
 		omegaup.API.getClarifications(
-			self.arena.contestAlias,
+			self.arena.options.contestAlias,
 			self.arena.clarificationsOffset,
 			self.arena.clarificationsRowcount,
 			self.arena.clarificationsChange.bind(self.arena)

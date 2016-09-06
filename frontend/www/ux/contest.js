@@ -1,13 +1,7 @@
 $(document).ready(function() {
-	var arena = new omegaup.arena.Arena();
+	var arena = new omegaup.arena.Arena(
+			omegaup.arena.GetOptionsFromLocation(window.location));
 	var admin = null;
-
-	if (arena.onlyProblem) {
-		var onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(window.location.pathname)[1];
-	}
-	else {
-		var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
-	}
 
 	Highcharts.setOptions({
 		global: {
@@ -51,7 +45,7 @@ $(document).ready(function() {
 		}
 
 		if (problem.user.admin) {
-			admin = new omegaup.arena.ArenaAdmin(arena, onlyProblemAlias);
+			admin = new omegaup.arena.ArenaAdmin(arena, arena.options.onlyProblemAlias);
 			admin.refreshRuns();
 			admin.refreshClarifications();
 			setInterval(function() {
@@ -135,13 +129,13 @@ $(document).ready(function() {
 							omegaup.API.getContest(x, contestLoaded);
 						}
 					}
-				})(contestAlias, omegaup.OmegaUp.time(contest.start_time * 1000));
+				})(arena.options.contestAlias, omegaup.OmegaUp.time(contest.start_time * 1000));
 				setTimeout(f, 1000);
 			} else {
 				$('#loading').html('404');
 			}
 			return;
-		} else if (arena.practice && contest.finish_time && omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
+		} else if (arena.options.isPractice && contest.finish_time && omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
 			window.location = window.location.pathname.replace(/\/practice.*/, '/');
 			return;
 		}
@@ -181,7 +175,7 @@ $(document).ready(function() {
 			$('#clarification select').append('<option value="' + problem.alias + '">' + problemName + '</option>');
 		}
 
-		if (!arena.practice) {
+		if (!arena.options.isPractice) {
 			arena.setupPolls();
 		}
 
@@ -192,11 +186,11 @@ $(document).ready(function() {
 		$('#root').fadeIn('slow');
 	}
 
-	if (arena.onlyProblem) {
+	if (arena.options.isOnlyProblem) {
 		onlyProblemLoaded(JSON.parse(document.getElementById('problem-json').firstChild.nodeValue));
 	} else {
 		arena.connectSocket();
-		omegaup.API.getContest(contestAlias, contestLoaded);
+		omegaup.API.getContest(arena.options.contestAlias, contestLoaded);
 
 		$('.clarifpager .clarifpagerprev').click(function () {
 			if (arena.clarificationsOffset > 0) {
@@ -206,7 +200,7 @@ $(document).ready(function() {
 				}
 
 				// Refresh with previous page
-				omegaup.API.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
+				omegaup.API.getClarifications(arena.options.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
 			}
 		});
 
@@ -217,7 +211,7 @@ $(document).ready(function() {
 			}
 
 			// Refresh with previous page
-			omegaup.API.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
+			omegaup.API.getClarifications(arena.options.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
 		});
 	}
 
@@ -240,11 +234,11 @@ $(document).ready(function() {
 				return;
 			}
 
-			if (arena.lockdown && sessionStorage) {
+			if (arena.options.isLockdownMode && sessionStorage) {
 				sessionStorage.setItem('run:' + run.guid, code);
 			}
 
-			if (!arena.onlyProblem) {
+			if (!arena.options.isOnlyProblem) {
 				arena.problems[arena.currentProblem.alias].last_submission = omegaup.OmegaUp.time().getTime();
 			}
 
@@ -279,7 +273,7 @@ $(document).ready(function() {
 	});
 
 	$('#submit').submit(function(e) {
-		if (!arena.onlyProblem && (arena.problems[arena.currentProblem.alias].last_submission + arena.submissionGap * 1000 > omegaup.OmegaUp.time().getTime())) {
+		if (!arena.options.isOnlyProblem && (arena.problems[arena.currentProblem.alias].last_submission + arena.submissionGap * 1000 > omegaup.OmegaUp.time().getTime())) {
 			alert('Deben pasar ' + arena.submissionGap + ' segundos entre envios de un mismo problema');
 			return false;
 		}
@@ -296,7 +290,7 @@ $(document).ready(function() {
 			var reader = new FileReader();
 
 			reader.onload = function(e) {
-				submitRun((arena.practice || arena.onlyProblem)? '' : contestAlias,
+				submitRun((arena.options.isPractice || arena.options.isOnlyProblem)? '' : arena.options.contestAlias,
 					  arena.currentProblem.alias,
 					  $('#submit select[name="language"]').val(),
 					  e.target.result);
@@ -332,21 +326,21 @@ $(document).ready(function() {
 
 		if (!code) return false;
 
-		submitRun((arena.practice || arena.onlyProblem) ? '' : contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
+		submitRun((arena.options.isPractice || arena.options.isOnlyProblem) ? '' : arena.options.contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
 
 		return false;
 	});
 
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
-		omegaup.API.newClarification(contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
+		omegaup.API.newClarification(arena.options.contestAlias, $('#clarification select[name="problem"]').val(), $('#clarification textarea[name="message"]').val(), function (run) {
 			if (run.status != 'ok') {
 				alert(run.error);
 				$('#clarification input').removeAttr('disabled');
 				return;
 			}
 			arena.hideOverlay();
-			omegaup.API.getClarifications(contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
+			omegaup.API.getClarifications(arena.options.contestAlias, arena.clarificationsOffset, arena.clarificationsRowcount, arena.clarificationsChange.bind(arena));
 			$('#clarification input').removeAttr('disabled');
 		});
 
@@ -354,7 +348,7 @@ $(document).ready(function() {
 	});
 
 	$(window).hashchange(function(e) {
-		if (arena.onlyProblem) {
+		if (arena.options.isOnlyProblem) {
 			onlyProblemHashChanged(e);
 		} else {
 			arena.onHashChanged();

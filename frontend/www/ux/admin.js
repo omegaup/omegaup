@@ -1,5 +1,6 @@
 omegaup.OmegaUp.on('ready', function() {
-	var arena = new omegaup.arena.Arena();
+	var arena = new omegaup.arena.Arena(
+			omegaup.arena.GetOptionsFromLocation(window.location));
 	var admin = new omegaup.arena.ArenaAdmin(arena);
 
 	$(window).hashchange(arena.onHashChanged.bind(arena));
@@ -10,7 +11,7 @@ omegaup.OmegaUp.on('ready', function() {
 		}
 	});
 
-	if (arena.contestAlias === "admin") {
+	if (arena.options.contestAlias === "admin") {
 		$('#runs').show();
 		admin.refreshRuns();
 		setInterval(function() {
@@ -25,7 +26,7 @@ omegaup.OmegaUp.on('ready', function() {
 		$('#root').fadeIn('slow');
 	} else {
 		arena.connectSocket();
-		omegaup.API.getContest(arena.contestAlias, function(contest) {
+		omegaup.API.getContest(arena.options.contestAlias, function(contest) {
 			if (contest.status == 'error' || !contest.admin) {
 				if (!omegaup.OmegaUp.loggedIn) {
 					window.location = "/login/?redirect=" + escape(window.location);
@@ -33,7 +34,7 @@ omegaup.OmegaUp.on('ready', function() {
 					$('#loading').html('404');
 				}
 				return;
-			} else if (arena.practice && contest.finish_time && omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
+			} else if (arena.options.isPractice && contest.finish_time && omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
 				window.location = window.location.pathname.replace(/\/practice\/.*/, '/');
 				return;
 			}
@@ -109,7 +110,7 @@ omegaup.OmegaUp.on('ready', function() {
 
 		$('#submit input').attr('disabled', 'disabled');
 		omegaup.API.submit(
-			arena.contestAlias,
+			arena.options.contestAlias,
 			arena.currentProblem.alias,
 			$('#submit select[name="language"]').val(),
 			$('#submit textarea[name="code"]').val(),

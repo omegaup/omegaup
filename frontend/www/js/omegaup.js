@@ -2068,6 +2068,10 @@ omegaup.API = {
 };
 
 omegaup.UI = {
+	navigateTo: function(url) {
+		window.location = url;
+	},
+
 	escape: function(s) {
 		if (typeof s !== 'string') return '';
 		return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

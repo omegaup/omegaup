@@ -37,94 +37,104 @@ omegaup.arena.ScoreboardColors = [
 	'#CD35D3',
 ];
 
-omegaup.arena.Arena = function() {
-	var self = this;
+omegaup.arena.GetOptionsFromLocation = function(arenaLocation) {
+	var options = {
+		isLockdownMode: false,
+		isPractice: false,
+		isOnlyProblem: false,
+		disableClarifications: false,
+		disableSockets: false,
+		contestAlias: null,
+		scoreboardToken: null
+	};
 
-	// The current contest.
-	this.currentContest = null;
-
-	// The interval for clock updates.
-	this.clockInterval = null;
-
-	// The start time of the contest.
-	this.startTime = null;
-
-	// The finish time of the contest.
-	this.finishTime = null;
-
-	// The deadline for submissions. This might be different from the end time.
-	this.submissionDeadline = null;
-
-	// All runs in this contest/problem.
-	this.runs = new omegaup.arena.RunView(this);
-	this.myRuns = new omegaup.arena.RunView(this);
-	this.myRuns.filter_username(omegaup.API.username);
-
-	// The guid of any run that is pending.
-	this.pendingRuns = {};
-
-	// The set of problems in this contest.
-	this.problems = {};
-
-	// WebSocket for real-time updates.
-	this.socket = null;
-
-	// The offset of each user into the ranking table.
-	this.currentRanking = {};
-
-	// The previous ranking information. Useful to show diffs.
-	this.prevRankingState = null;
-
-	// Every time a recent event is shown, have this interval clear it after 30s.
-	this.removeRecentEventClassTimeout = null;
-
-	// The last known scoreboard event stream.
-	this.currentEvents = null;
-
-	// Currently opened notifications.
-	this.currentNotifications = {count: 0, timer: null};
-
-	// Currently opened problem.
-	this.currentProblem = null;
-
-	// Whether the current contest is in practice mode.
-	this.practice = window.location.pathname.indexOf('/practice') !== -1;
-
-	// Whether this is a full contest or only a problem.
-	this.onlyProblem = window.location.pathname.indexOf('/problem/') !== -1;
-
-	// Whether this is a scoreboard-only view.
-	this.onlyScoreboard = window.location.pathname.indexOf('/scoreboard/') !== -1;
-
-	// Whether the current contest is in interview mode.
-	this.interview = window.location.pathname.indexOf('/interview') !== -1;
-
-	if (this.interview) {
-		this.contestAlias = /\/interview\/([^\/]+)\/?/.exec(window.location.pathname)[1];
-	} else {
-		this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+	if ($('body').hasClass('lockdown')) {
+		options.isLockdownMode = true;
 	}
 
-	// The token for standalone scoreboards.
-	this.scoreboardToken = null;
+	if (arenaLocation.pathname.indexOf('/practice') !== -1) {
+		options.isPractice = true;
+	}
 
-	// If websockets are enabled.
-	this.enableSockets = window.location.search.indexOf('ws=off') === -1;
+	if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
+		options.isOnlyProblem = true;
+		options.onlyProblemAlias =
+			/\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
+	} else {
+		options.contestAlias =
+			/\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
+	}
 
-	// If we have admin powers in this contest.
-	this.contestAdmin = false;
-	this.answeredClarifications = 0;
-	this.clarificationsOffset = 0;
-	this.clarificationsRowcount = 20;
-	this.activeTab = 'problems';
-	this.clarifications = {};
-	this.submissionGap = 0;
+	if (arenaLocation.search.indexOf('ws=off') !== -1) {
+		options.disableSockets = true;
+	}
 
-	// If lockdown mode is active.
-	this.lockdown = $('body').hasClass('lockdown');
+	return options;
+};
+
+omegaup.arena.Arena = function(options) {
+	var self = this;
+
+	self.options = options;
+
+	// The current contest.
+	self.currentContest = null;
+
+	// The interval for clock updates.
+	self.clockInterval = null;
+
+	// The start time of the contest.
+	self.startTime = null;
+
+	// The finish time of the contest.
+	self.finishTime = null;
+
+	// The deadline for submissions. self might be different from the end time.
+	self.submissionDeadline = null;
+
+	// All runs in self contest/problem.
+	self.runs = new omegaup.arena.RunView(self);
+	self.myRuns = new omegaup.arena.RunView(self);
+	self.myRuns.filter_username(omegaup.API.username);
+
+	// The guid of any run that is pending.
+	self.pendingRuns = {};
+
+	// The set of problems in self contest.
+	self.problems = {};
+
+	// WebSocket for real-time updates.
+	self.socket = null;
+
+	// The offset of each user into the ranking table.
+	self.currentRanking = {};
+
+	// The previous ranking information. Useful to show diffs.
+	self.prevRankingState = null;
+
+	// Every time a recent event is shown, have self interval clear it after 30s.
+	self.removeRecentEventClassTimeout = null;
+
+	// The last known scoreboard event stream.
+	self.currentEvents = null;
+
+	// Currently opened notifications.
+	self.currentNotifications = {count: 0, timer: null};
+
+	// Currently opened problem.
+	self.currentProblem = null;
+
+	// If we have admin powers in self contest.
+	self.contestAdmin = false;
+	self.answeredClarifications = 0;
+	self.clarificationsOffset = 0;
+	self.clarificationsRowcount = 20;
+	self.activeTab = 'problems';
+	self.clarifications = {};
+	self.submissionGap = 0;
 
 	// Setup any global hooks.
-	this.installLibinteractiveHooks();
+	self.installLibinteractiveHooks();
 
 	var options = {
 		attribute: "data-bind"        // default "data-sbind"
@@ -133,6 +143,7 @@ omegaup.arena.Arena = function() {
 };
 
 omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
+	var self = this;
 	$('#libinteractive-download').submit(function(e) {
 		var form = $(e.target);
 		var alias = e.target.attributes['data-alias'].value;
@@ -140,10 +151,9 @@ omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
 		var lang = form.find('.download-lang').val();
 		var extension = (os == 'unix' ? '.tar.bz2' : '.zip');
 
-		var new_location = (
+		omegaup.UI.navigateTo(
 			window.location.protocol + '//' + window.location.host + '/templates/' +
 			alias + '/' + alias + '_' + os + '_' + lang + extension);
-		window.location = new_location;
 
 		return false;
 	});
@@ -156,7 +166,7 @@ omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
 
 omegaup.arena.Arena.prototype.connectSocket = function() {
 	var self = this;
-	if (self.practice || !self.enableSockets || self.contestAlias == 'admin') {
+	if (self.options.isPractice || self.options.disableSockets || self.options.contestAlias == 'admin') {
 		return false;
 	}
 
@@ -166,9 +176,9 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
 	} else {
 		uri = "ws:";
 	}
-	uri += "//" + window.location.host + "/api/contest/events/" + self.contestAlias + "/";
-	if (self.scoreboardToken) {
-		uri += "?token=" + self.scoreboardToken;
+	uri += "//" + window.location.host + "/api/contest/events/" + self.options.contestAlias + "/";
+	if (self.options.scoreboardToken) {
+		uri += "?token=" + self.options.scoreboardToken;
 	}
 
 	try {
@@ -182,7 +192,7 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
 				data.run.time = omegaup.OmegaUp.time(data.run.time * 1000);
 				self.updateRun(data.run);
 			} else if (data.message == "/clarification/update/") {
-				if (!self.onlyScoreboard) {
+				if (self.options.disableClarifications) {
 					data.clarification.time = omegaup.OmegaUp.time(data.clarification.time * 1000);
 					self.updateClarification(data.clarification);
 				}
@@ -222,11 +232,11 @@ omegaup.arena.Arena.prototype.setupPolls = function() {
 	var self = this;
 
 	omegaup.API.getRanking(
-		self.contestAlias,
+		self.options.contestAlias,
 		self.rankingChange.bind(self)
 	);
 	omegaup.API.getClarifications(
-		self.contestAlias,
+		self.options.contestAlias,
 		self.clarificationsOffset,
 		self.clarificationsRowcount,
 		self.clarificationsChange.bind(self)
@@ -236,29 +246,31 @@ omegaup.arena.Arena.prototype.setupPolls = function() {
 		self.clarificationInterval = setInterval(function() {
 			self.clarificationsOffset = 0; // Return pagination to start on refresh
 			omegaup.API.getClarifications(
-				self.contestAlias,
+				self.options.contestAlias,
 				self.clarificationsOffset,
 				self.clarificationsRowcount,
 				self.clarificationsChange.bind(self));
 		}, 5 * 60 * 1000);
 
 		self.rankingInterval = setInterval(function() {
-			omegaup.API.getRanking(self.contestAlias, self.rankingChange.bind(self));
+			omegaup.API.getRanking(self.options.contestAlias, self.rankingChange.bind(self));
 		}, 5 * 60 * 1000);
 	}
 };
 
 omegaup.arena.Arena.prototype.initClock = function(start, finish, deadline) {
-	this.startTime = start;
-	this.finishTime = finish;
-	if (this.practice) {
+	var self = this;
+
+	self.startTime = start;
+	self.finishTime = finish;
+	if (self.options.isPractice) {
 		$('#title .clock').html('&infin;');
 		return;
 	}
-	if (deadline) this.submissionDeadline = deadline;
-	if (!this.clockInterval) {
-		this.updateClock();
-		this.clockInterval = setInterval(this.updateClock.bind(this), 1000);
+	if (deadline) self.submissionDeadline = deadline;
+	if (!self.clockInterval) {
+		self.updateClock();
+		self.clockInterval = setInterval(self.updateClock.bind(self), 1000);
 	}
 };
 
@@ -282,28 +294,29 @@ omegaup.arena.Arena.prototype.initProblems = function(contest) {
 };
 
 omegaup.arena.Arena.prototype.updateClock = function() {
-	var countdownTime = this.submissionDeadline || this.finishTime;
-	if (this.startTime === null || countdownTime === null) {
+	var self = this;
+	var countdownTime = self.submissionDeadline || self.finishTime;
+	if (self.startTime === null || countdownTime === null) {
 		return;
 	}
 
 	var date = omegaup.OmegaUp.time().getTime();
 	var clock = "";
 
-	if (date < this.startTime.getTime()) {
-		clock = "-" + omegaup.arena.FormatDelta(this.startTime.getTime() - (date + omegaup.OmegaUp._deltaTime));
+	if (date < self.startTime.getTime()) {
+		clock = "-" + omegaup.arena.FormatDelta(self.startTime.getTime() - (date + omegaup.OmegaUp._deltaTime));
 	} else if (date > countdownTime.getTime()) {
-		// Contest for this user is over
+		// Contest for self user is over
 		clock = "00:00:00";
-		clearInterval(this.clockInterval);
-		this.clockInterval = null;
+		clearInterval(self.clockInterval);
+		self.clockInterval = null;
 
 		// Show go-to-practice-mode messages on contest end
-		if (date > this.finishTime.getTime()) {
-			omegaup.UI.warning('<a href="/arena/' + this.contestAlias + '/practice/">' + omegaup.T.arenaContestEndedUsePractice + '</a>');
+		if (date > self.finishTime.getTime()) {
+			omegaup.UI.warning('<a href="/arena/' + self.options.contestAlias + '/practice/">' + omegaup.T.arenaContestEndedUsePractice + '</a>');
 			$('#new-run').hide();
 			$('#new-run-practice-msg').show();
-			$('#new-run-practice-msg a').prop('href', '/arena/' + this.contestAlias + '/practice/');
+			$('#new-run-practice-msg a').prop('href', '/arena/' + self.options.contestAlias + '/practice/');
 		}
 	} else {
 		clock = omegaup.arena.FormatDelta(countdownTime.getTime() - (date + omegaup.OmegaUp._deltaTime));
@@ -328,8 +341,8 @@ omegaup.arena.Arena.prototype.updateRun = function(run) {
 	if (self.socket != null) return;
 
 	if (run.status == 'ready') {
-		if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
-			omegaup.API.getRanking(self.contestAlias, self.rankingChange.bind(self));
+		if (!self.options.isPractice && !self.options.isOnlyProblem && self.options.contestAlias != 'admin') {
+			omegaup.API.getRanking(self.options.contestAlias, self.rankingChange.bind(self));
 		}
 	} else {
 		self.updateRunFallback(run.guid);
@@ -339,10 +352,10 @@ omegaup.arena.Arena.prototype.updateRun = function(run) {
 omegaup.arena.Arena.prototype.rankingChange = function(data) {
 	var self = this;
 	self.onRankingChanged(data);
-	if (self.scoreboardToken) {
-		omegaup.API.getRankingEventsByToken(self.contestAlias, self.scoreboardToken, self.onRankingEvents.bind(self));
+	if (self.options.scoreboardToken) {
+		omegaup.API.getRankingEventsByToken(self.options.contestAlias, self.options.scoreboardToken, self.onRankingEvents.bind(self));
 	} else {
-		omegaup.API.getRankingEvents(self.contestAlias, self.onRankingEvents.bind(self));
+		omegaup.API.getRankingEvents(self.options.contestAlias, self.onRankingEvents.bind(self));
 	}
 }
 
@@ -851,7 +864,7 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
 				self.myRuns.filter_problem(problem.alias);
 			}
 
-			if (self.practice || self.onlyProblem) {
+			if (self.options.isPractice || self.options.isOnlyProblem) {
 				omegaup.API.getProblemRuns(problem.alias, {}, function(data) {
 					updateRuns(data.runs);
 				});
@@ -865,7 +878,7 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
 		if (problem.problem_statement) {
 			update(problem);
 		} else {
-			omegaup.API.getProblem(self.contestAlias, problem.alias, function (problem_ext) {
+			omegaup.API.getProblem(self.options.contestAlias, problem.alias, function (problem_ext) {
 				problem.source = problem_ext.source;
 				problem.problemsetter = problem_ext.problemsetter;
 				problem.problem_statement = problem_ext.problem_statement;

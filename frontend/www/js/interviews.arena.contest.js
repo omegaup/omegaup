@@ -1,9 +1,8 @@
 $(document).ready(function() {
-	var arena = new omegaup.omegaup.Arena();
+	var arena = new omegaup.omegaup.Arena({
+		contestAlias: /\/interview\/([^\/]+)\/arena/.exec(window.location.pathname)[1]
+	});
 	var admin = null;
-
-	var contestAlias = /\/interview\/([^\/]+)\/arena/.exec(window.location.pathname)[1];
-	arena.contestAlias = contestAlias;
 
 	function contestLoaded(contest) {
 		if (contest.status == 'error') {
@@ -20,13 +19,13 @@ $(document).ready(function() {
 							omegaup.API.getContest(x, contestLoaded);
 						}
 					}
-				})(contestAlias, omegaup.OmegaUp.time(contest.start_time * 1000));
+				})(arena.options.contestAlias, omegaup.OmegaUp.time(contest.start_time * 1000));
 				setTimeout(f, 1000);
 			} else {
 				$('#loading').html('404');
 			}
 			return;
-		} else if (arena.practice && contest.finish_time && omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
+		} else if (arena.options.isPractice && contest.finish_time && omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
 			window.location = window.location.pathname.replace(/\/practice.*/, '/');
 			return;
 		}
@@ -66,7 +65,7 @@ $(document).ready(function() {
 		$('#root').fadeIn('slow');
 	}
 
-	omegaup.API.getContest(contestAlias, contestLoaded);
+	omegaup.API.getContest(arena.options.contestAlias, contestLoaded);
 
 	$('#overlay, .close').click(function(e) {
 		if (e.target.id === 'overlay' || e.target.className === 'close') {
@@ -87,11 +86,11 @@ $(document).ready(function() {
 				return;
 			}
 
-			if (arena.lockdown && sessionStorage) {
+			if (arena.options.isLockdownMode && sessionStorage) {
 				sessionStorage.setItem('run:' + run.guid, code);
 			}
 
-			if (!arena.onlyProblem) {
+			if (!arena.options.isOnlyProblem) {
 				arena.problems[arena.currentProblem.alias].last_submission = omegaup.OmegaUp.time().getTime();
 			}
 
@@ -126,7 +125,7 @@ $(document).ready(function() {
 	});
 
 	$('#submit').submit(function(e) {
-		if (!arena.onlyProblem && (arena.problems[arena.currentProblem.alias].last_submission + arena.submissionGap * 1000 > omegaup.OmegaUp.time().getTime())) {
+		if (!arena.options.isOnlyProblem && (arena.problems[arena.currentProblem.alias].last_submission + arena.submissionGap * 1000 > omegaup.OmegaUp.time().getTime())) {
 			alert('Deben pasar ' + arena.submissionGap + ' segundos entre envios de un mismo problema');
 			return false;
 		}
@@ -143,7 +142,7 @@ $(document).ready(function() {
 			var reader = new FileReader();
 
 			reader.onload = function(e) {
-				submitRun((arena.practice || arena.onlyProblem)? '' : contestAlias,
+				submitRun((arena.options.isPractice || arena.options.isOnlyProblem)? '' : arena.options.contestAlias,
 					  arena.currentProblem.alias,
 					  $('#submit select[name="language"]').val(),
 					  e.target.result);
@@ -179,13 +178,13 @@ $(document).ready(function() {
 
 		if (!code) return false;
 
-		submitRun((arena.practice || arena.onlyProblem) ? '' : contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
+		submitRun((arena.options.isPractice || arena.options.isOnlyProblem) ? '' : arena.options.contestAlias, arena.currentProblem.alias, $('#submit select[name="language"]').val(), code);
 
 		return false;
 	});
 
 	$(window).hashchange(function(e) {
-		if (arena.onlyProblem) {
+		if (arena.options.isOnlyProblem) {
 			onlyProblemHashChanged(e);
 		} else {
 			arena.onHashChanged();
