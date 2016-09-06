@@ -53,8 +53,6 @@ frontend/log/omegaup.log
 frontend/server/api/tests/problems/
 frontend/server/api/tests/submissions/
 frontend/tests/controllers/img/
-frontend/www/img/
-frontend/www/templates/
 omegaup_test.log
 
 # Ignore runtime and test stuff
@@ -70,6 +68,9 @@ frontend/.DS_Store
 
 # Ignore stuff in www
 frontend/www/apc.php
-frontend/www/preguntas/
+frontend/www/coverage/
+frontend/www/img/
 frontend/www/js/google-analytics.js
 frontend/www/pmamini.php
+frontend/www/preguntas/
+frontend/www/templates/
