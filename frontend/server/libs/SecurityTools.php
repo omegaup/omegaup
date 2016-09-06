@@ -72,17 +72,10 @@ class SecurityTools {
     public static function randomString($length) {
         $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         $str = '';
-        $size = strlen($chars);
+        $max = strlen($chars) - 1;
+        $rng = function_exists('random_int') ? 'random_int' : 'mt_rand';
         for ($i = 0; $i < $length; $i++) {
-            $index = 0;
-
-            if (function_exists('random_int')) {
-                $index = random_int(0, $size - 1);
-            } else {
-                $index = mt_rand(0, $size - 1);
-            }
-
-            $str .= $chars[$index];
+            $str .= $chars[$rng(0, $max)];
         }
 
         return $str;
