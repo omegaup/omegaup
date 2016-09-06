@@ -1,8 +1,7 @@
 <?php
 
-require_once('SecurityTools.php');
-require_once('Controller.php');
+require_once(__DIR__ . '/SecurityTools.php');
 
-$password = Controller::randomString(8);
+$password = SecurityTools::randomString(8);
 echo "$password\n";
 echo SecurityTools::hashString($password) . "\n";

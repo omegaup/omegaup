@@ -59,7 +59,7 @@ class UserController extends Controller {
             'solved' => 0,
             'submissions' => 0,
             'verified' => 0,
-            'verification_id' => self::randomString(50),
+            'verification_id' => SecurityTools::randomString(50),
         );
         if (isset($r['name'])) {
             $user_data['name'] = $r['name'];
@@ -348,7 +348,7 @@ class UserController extends Controller {
                     self::$log->info('User does not have verification id. Generating.');
 
                     try {
-                        $r['user']->verification_id = self::randomString(50);
+                        $r['user']->verification_id = SecurityTools::randomString(50);
                         UsersDAO::save($r['user']);
                     } catch (Exception $e) {
                         // best effort, eat exception
@@ -889,13 +889,13 @@ class UserController extends Controller {
             );
         }
 
-        self::$permissionKey = $r['permission_key'] = self::randomString(32);
+        self::$permissionKey = $r['permission_key'] = SecurityTools::randomString(32);
 
         foreach ($keys as $k => $n) {
             $digits = floor(log10($n) + 1);
             for ($i = 1; $i <= $n; $i++) {
                 $username = $k . '-' . str_pad($i, $digits, '0', STR_PAD_LEFT);
-                $password = self::randomString(8);
+                $password = SecurityTools::randomString(8);
 
                 if (self::omiPrepareUser($r, $username, $password)) {
                     $response[$username] = $password;
@@ -1828,7 +1828,7 @@ class UserController extends Controller {
                     self::$log->info('User does not have verification id. Generating.');
 
                     try {
-                        $r['current_user']->verification_id = self::randomString(50);
+                        $r['current_user']->verification_id = SecurityTools::randomString(50);
                         UsersDAO::save($r['current_user']);
                     } catch (Exception $e) {
                         // best effort, eat exception

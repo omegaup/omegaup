@@ -92,31 +92,6 @@ class Controller {
     }
 
     /**
-     * Retunrs a random string of size $length
-     *
-     * @param string $length
-     * @return string
-     */
-    public static function randomString($length) {
-        $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        $str = '';
-        $size = strlen($chars);
-        for ($i = 0; $i < $length; $i++) {
-            $index = 0;
-
-            if (function_exists('random_int')) {
-                $index = random_int(0, $size - 1);
-            } else {
-                $index = mt_rand(0, $size - 1);
-            }
-
-            $str .= $chars[$index];
-        }
-
-        return $str;
-    }
-
-    /**
      * Update properties of $object based on what is provided in $request.
      * $properties can have 'simple' and 'complex' properties.
      * - A simple property is just a name using underscores, and it's getter and setter methods should
