@@ -1,5 +1,5 @@
 $('document').ready(function() {
-	omegaup.getProfile(null, function(data) {
+	omegaup.API.getProfile(null, function(data) {
 		$("#username").val(data.userinfo.username);
 		$("#name").val(data.userinfo.name);
 	});
@@ -8,11 +8,11 @@ $('document').ready(function() {
 		var newPassword = $('#new-password-1').val();
 		var newPassword2 = $('#new-password-2').val();
 		if (newPassword != newPassword2) {
-			OmegaUp.ui.error("Los passwords nuevos deben ser iguales.");
+			omegaup.UI.error("Los passwords nuevos deben ser iguales.");
 			return false;
 		}
 
-		omegaup.updateBasicProfile($("#username").val(),
+		omegaup.API.updateBasicProfile($("#username").val(),
 				$("#name").val(),
 				$("#new-password-1").val(),
 				function(response){
@@ -21,7 +21,7 @@ $('document').ready(function() {
 						return false;
 					}
 					else if(response.error !== undefined){
-						OmegaUp.ui.error(response.error);
+						omegaup.UI.error(response.error);
 					}
 				});
 		return false; // Prevent page refresh on submit

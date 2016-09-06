@@ -4,13 +4,13 @@ $(document).ready(function() {
 		var errors = false;
 
 		if ($('#source').val() == '') {
-			OmegaUp.ui.error(OmegaUp.T['editFieldRequired']);
+			omegaup.UI.error(omegaup.T['editFieldRequired']);
 			$('#source-group').addClass('has-error');
 			errors = true;
 		}
 		if (window.location.pathname.indexOf('/problem/new') !== 0 &&
 				$('#update-message').val() == '') {
-			OmegaUp.ui.error(OmegaUp.T['editFieldRequired']);
+			omegaup.UI.error(omegaup.T['editFieldRequired']);
 			$('#update-message-group').addClass('has-error');
 			errors = true;
 		}

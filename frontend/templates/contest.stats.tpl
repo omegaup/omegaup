@@ -14,6 +14,6 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/contest.stats.js?ver=ec0e2c"></script>
+<script type="text/javascript" src="/js/contest.stats.js?ver=18e75a"></script>
 
 {include file='footer.tpl'}

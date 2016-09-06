@@ -9,9 +9,9 @@ $('document').ready(function() {
 		// Defaults for start_time and end_time
 		var defaultDate = Date.create(Date.now());
 		defaultDate.set({ seconds: 0 });
-		$('#start_time').val(dateToString(defaultDate));
+		$('#start_time').val(omegaup.UI.formatDateTime(defaultDate));
 		defaultDate.setHours(defaultDate.getHours() + 5);
-		$('#finish_time').val(dateToString(defaultDate));
+		$('#finish_time').val(omegaup.UI.formatDateTime(defaultDate));
 	}
 
 	$("#window_length_enabled").change(function () {

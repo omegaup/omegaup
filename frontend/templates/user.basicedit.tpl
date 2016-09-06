@@ -45,5 +45,5 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/js/user.basicedit.js?ver=ce00f9"></script>
+	<script type="text/javascript" src="/js/user.basicedit.js?ver=fdfcb5"></script>
 {/block}

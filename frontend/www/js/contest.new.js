@@ -4,7 +4,7 @@ $('document').ready(function() {
 			$('#window_length').val() :
 			'NULL';
 
-		omegaup.createContest(
+		omegaup.API.createContest(
 				$(".new_contest_form #title").val(),
 				$(".new_contest_form #description").val(),
 				(new Date($(".new_contest_form #start_time").val()).getTime()) / 1000,
@@ -23,7 +23,7 @@ $('document').ready(function() {
 					if(data.status == "ok") {
 						window.location.replace('/contest/'+ $('.new_contest_form #alias').val() + '/edit/#problems');
 					} else {
-						OmegaUp.ui.error(data.error || 'error');
+						omegaup.UI.error(data.error || 'error');
 					}
 				}
 		);

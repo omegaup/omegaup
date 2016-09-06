@@ -19,6 +19,6 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/scoreboardmerge.js?ver=1936d0"></script>
+<script type="text/javascript" src="/js/scoreboardmerge.js?ver=ab9ab9"></script>
 
 {include file='footer.tpl'}

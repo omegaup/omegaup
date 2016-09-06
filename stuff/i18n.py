@@ -121,8 +121,7 @@ for lang in languages:
 			lang_file.write('%s = %s\n' % (key, strings[key][lang]))
 	js_lang_path = os.path.join(js_templates_dir, 'lang.%s.js' % lang)
 	with codecs.open(js_lang_path, 'w', 'utf-8') as lang_file:
-		lang_file.write('OmegaUp.T = {\n')
+		lang_file.write('omegaup.T = {\n')
 		for key in sorted(strings.keys()):
 			lang_file.write('\t%s: %s,\n' % (key, strings[key][lang]))
 		lang_file.write('};\n')
-

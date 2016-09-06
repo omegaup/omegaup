@@ -90,6 +90,6 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/index.js?ver=0e00f0"></script>
+<script type="text/javascript" src="/js/index.js?ver=d1f0a3"></script>
 
 {include file='footer.tpl'}

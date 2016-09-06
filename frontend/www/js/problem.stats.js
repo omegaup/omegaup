@@ -13,7 +13,7 @@ $('document').ready(function() {
 	var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
 	function getStats() {
-		omegaup.getProblemStats(problemAlias, function (s) { if( s.status == "ok" ) { stats = s; drawCharts(); } });
+		omegaup.API.getProblemStats(problemAlias, function (s) { if( s.status == "ok" ) { stats = s; drawCharts(); } });
 		updateStats();
 	}
 

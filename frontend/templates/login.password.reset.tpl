@@ -24,5 +24,5 @@
 		</div>
 	</div>
 </div>
-<script type='text/javascript' src='/js/reset.js?ver=2ed897' ></script>
+<script type='text/javascript' src='/js/reset.js?ver=463d69' ></script>
 {include file='footer.tpl'}

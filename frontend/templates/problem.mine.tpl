@@ -64,5 +64,5 @@
 		</div>
 	</div>
 </div>
-<script type="text/javascript" src="/js/problem.mine.js?ver=c46c26"></script>
+<script type="text/javascript" src="/js/problem.mine.js?ver=89e176"></script>
 {include file='footer.tpl'}

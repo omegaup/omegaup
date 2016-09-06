@@ -1,13 +1,15 @@
-function ArenaAdmin(arena, onlyProblemAlias) {
+omegaup.arena = omegaup.arena || {};
+
+omegaup.arena.ArenaAdmin = function(arena, onlyProblemAlias) {
 	this.arena = arena;
 	this.arena.contestAdmin = true;
 	this.onlyProblemAlias = onlyProblemAlias;
 
 	this.setUpPagers();
 	this.arena.runs.attach($('#runs table.runs'));
-}
+};
 
-ArenaAdmin.prototype.setUpPagers = function() {
+omegaup.arena.ArenaAdmin.prototype.setUpPagers = function() {
 	var self = this;
 
 	self.arena.runs.filter_verdict.subscribe(self.refreshRuns.bind(self));
@@ -39,7 +41,7 @@ ArenaAdmin.prototype.setUpPagers = function() {
 
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
-		omegaup.newClarification(
+		omegaup.API.newClarification(
 			self.arena.contestAlias,
 			$('#clarification select[name="problem"]').val(),
 			$('#clarification textarea[name="message"]').val(),
@@ -59,7 +61,7 @@ ArenaAdmin.prototype.setUpPagers = function() {
 	});
 };
 
-ArenaAdmin.prototype.refreshRuns = function() {
+omegaup.arena.ArenaAdmin.prototype.refreshRuns = function() {
 	var self = this;
 
 	var options = {
@@ -75,26 +77,26 @@ ArenaAdmin.prototype.refreshRuns = function() {
 	if (self.onlyProblemAlias) {
 		options.show_all = true;
 		options.problem_alias = self.onlyProblemAlias;
-		omegaup.getProblemRuns(self.onlyProblemAlias, options, self.runsChanged.bind(self));
+		omegaup.API.getProblemRuns(self.onlyProblemAlias, options, self.runsChanged.bind(self));
 	} else if (self.arena.contestAlias === "admin") {
-		omegaup.getRuns(options, self.runsChanged.bind(self));
+		omegaup.API.getRuns(options, self.runsChanged.bind(self));
 	} else {
-		omegaup.getContestRuns(self.arena.contestAlias, options, self.runsChanged.bind(self));
+		omegaup.API.getContestRuns(self.arena.contestAlias, options, self.runsChanged.bind(self));
 	}
 };
 
-ArenaAdmin.prototype.refreshClarifications = function() {
+omegaup.arena.ArenaAdmin.prototype.refreshClarifications = function() {
 	var self = this;
 
 	if (self.onlyProblemAlias) {
-		omegaup.getProblemClarifications(
+		omegaup.API.getProblemClarifications(
 			self.onlyProblemAlias,
 			self.arena.clarificationsOffset,
 			self.arena.clarificationsRowcount,
 			self.arena.clarificationsChange.bind(self.arena)
 		);
 	} else {
-		omegaup.getClarifications(
+		omegaup.API.getClarifications(
 			self.arena.contestAlias,
 			self.arena.clarificationsOffset,
 			self.arena.clarificationsRowcount,
@@ -103,7 +105,7 @@ ArenaAdmin.prototype.refreshClarifications = function() {
 	}
 };
 
-ArenaAdmin.prototype.runsChanged = function(data) {
+omegaup.arena.ArenaAdmin.prototype.runsChanged = function(data) {
 	var self = this;
 
 	if (data.status != 'ok') return;

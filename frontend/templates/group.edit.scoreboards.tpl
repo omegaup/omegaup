@@ -1,4 +1,4 @@
-<script src="/js/alias.generate.js?ver=9ea0b4"></script>
+<script src="/js/alias.generate.js?ver=ca96ff"></script>
 
 <div class="panel panel-primary">
 	<div class="panel-body">
