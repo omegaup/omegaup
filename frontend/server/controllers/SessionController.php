@@ -54,8 +54,10 @@ class SessionController extends Controller {
     }
 
     /**
-     * Returns associative array with information about current session.
-     *
+     * Returns information about current session. In order to avoid one full
+     * server roundtrip (about ~100msec on each pageload), it also returns the
+     * current time to be able to calculate the time delta between the
+     * contestant's machine and the server.
      * */
     public static function apiCurrentSession(Request $r = null) {
         if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
