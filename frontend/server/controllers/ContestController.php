@@ -240,7 +240,7 @@ class ContestController extends Controller {
 
         try {
             // Half-authenticate, in case there is no session in place.
-            $session = SessionController::apiCurrentSession($r);
+            $session = SessionController::apiCurrentSession($r)['session'];
             if ($session['valid'] && !is_null($session['user'])) {
                 $r['current_user'] = $session['user'];
                 $r['current_user_id'] = $session['user']->user_id;
@@ -259,7 +259,7 @@ class ContestController extends Controller {
             return ContestController::SHOW_INTRO;
         }
 
-        $cs = SessionController::apiCurrentSession();
+        $cs = SessionController::apiCurrentSession()['session'];
 
         // You already started the contest.
         $contestOpened = ContestsUsersDAO::getByPK(
@@ -285,7 +285,7 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      * @throws PreconditionFailedException
      */
-    private static function validateDetails(Request $r) {
+    public static function validateDetails(Request $r) {
         self::validateBasicDetails($r);
 
         $r['contest_admin'] = false;
@@ -710,8 +710,8 @@ class ContestController extends Controller {
         $contest->penalty_type = $r['penalty_type'];
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
         $contest->languages = empty($r['languages']) ? null : $r['languages'];
-        $contest->scoreboard_url = self::randomString(30);
-        $contest->scoreboard_url_admin = self::randomString(30);
+        $contest->scoreboard_url = SecurityTools::randomString(30);
+        $contest->scoreboard_url_admin = SecurityTools::randomString(30);
 
         if (!is_null($r['show_scoreboard_after'])) {
             $contest->show_scoreboard_after = $r['show_scoreboard_after'];
@@ -719,7 +719,7 @@ class ContestController extends Controller {
             $contest->show_scoreboard_after = '1';
         }
 
-        if ($r['public'] == 1) {
+        if ($r['public'] == 1 && is_null($r['problems'])) {
             self::validateContestCanBePublic($contest);
         }
 
@@ -888,16 +888,29 @@ class ContestController extends Controller {
 
         // Problems is optional
         if (!is_null($r['problems'])) {
-            $r['problems'] = array();
+            $request_problems = json_decode($r['problems']);
+            if (is_null($request_problems)) {
+                throw new InvalidParameterException('invalidParameters', 'problems');
+            }
 
-            foreach (json_decode($r['problems']) as $problem) {
+            $problems = array();
+
+            foreach ($request_problems as $problem) {
                 $p = ProblemsDAO::getByAlias($problem->problem);
-                array_push($r['problems'], array(
+                if (is_null($p)) {
+                    throw new InvalidParameterException('parameterNotFound', 'problems');
+                }
+                if ($p->public == '0' && !Authorization::CanEditProblem($r['current_user_id'], $p)) {
+                    throw new ForbiddenAccessException('problemIsPrivate');
+                }
+                array_push($problems, array(
                     'id' => $p->problem_id,
                     'alias' => $problem->problem,
                     'points' => $problem->points
                 ));
             }
+
+            $r['problems'] = $problems;
         }
 
         // Show scoreboard is always optional
@@ -1551,7 +1564,7 @@ class ContestController extends Controller {
         $showAllRuns = false;
 
         // Don't leak scoreboard to interviewees
-        if (InterviewsDAO::IsContestInterview($r['contest'])) {
+        if (InterviewsDAO::isContestInterview($r['contest'])) {
             throw new ForbiddenAccessException('invalidScoreboardUrl');
         }
 
@@ -1841,7 +1854,7 @@ class ContestController extends Controller {
         $history->user_id = $request->user_id;
         $history->contest_id = $request->user_id;
         $history->time = $request->last_update;
-        $history->admin_id = $current_ses['id'];
+        $history->admin_id = $current_ses['user']->user_id;
         $history->accepted = $request->accepted;
 
         ContestUserRequestHistoryDAO::save($history);

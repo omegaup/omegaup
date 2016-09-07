@@ -27,8 +27,8 @@ $(document).ready(function() {
 		arena.connectSocket();
 		omegaup.getContest(arena.contestAlias, function(contest) {
 			if (contest.status == 'error' || !contest.admin) {
-				if (!omegaup.loggedIn && omegaup.login_url) {
-					window.location = omegaup.login_url + "?redirect=" + escape(window.location);
+				if (!omegaup.loggedIn) {
+					window.location = "/login/?redirect=" + escape(window.location);
 				} else {
 					$('#loading').html('404');
 				}

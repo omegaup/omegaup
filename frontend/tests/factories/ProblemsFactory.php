@@ -97,7 +97,8 @@ class ProblemsFactory {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = OmegaupTestCase::login($problemAuthor);
+        $login = OmegaupTestCase::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader(new FileUploaderMock());
@@ -111,6 +112,7 @@ class ProblemsFactory {
         return array (
             'request' => $r,
             'author' => $problemAuthor,
-            );
+            'problem' => ProblemsDAO::getByAlias($r['alias']),
+        );
     }
 }

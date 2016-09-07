@@ -2,7 +2,7 @@
 require_once('../../server/bootstrap.php');
 
 $r = new Request($_REQUEST);
-$session = SessionController::apiCurrentSession($r);
+$session = SessionController::apiCurrentSession($r)['session'];
 $r['statement_type'] = 'html';
 $r['show_solvers'] = true;
 try {
@@ -37,7 +37,7 @@ if (isset($result['sample_input'])) {
 
 $result['user'] = array(
     'logged_in' => $session['valid'],
-    'admin' => Authorization::CanEditProblem($session['id'], $problem)
+    'admin' => Authorization::CanEditProblem($session['user']->user_id, $problem)
 );
 $smarty->assign('problem_admin', $result['user']['admin']);
 

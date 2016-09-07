@@ -547,8 +547,9 @@ class RunController extends Controller {
 
         // Get the source
         $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
+        $response['admin'] = Authorization::IsProblemAdmin($r['current_user_id'], $r['problem']);
 
-        if (Authorization::IsProblemAdmin($r['current_user_id'], $r['problem'])) {
+        if ($response['admin']) {
             if (file_exists("$grade_dir/details.json")) {
                 $response['groups'] = json_decode(file_get_contents("$grade_dir/details.json"), true);
             }

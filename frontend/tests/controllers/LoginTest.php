@@ -21,9 +21,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => $user->password
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -47,9 +47,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $email,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $email,
+            'password' => $user->password
+        ));
 
         $response = UserController::apiLogin($r);
 
@@ -68,9 +68,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => 'badpasswordD:'
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => 'badpasswordD:'
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -84,9 +84,9 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginByUserInvalidUsername() {
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => 'IDontExist',
-                    'password' => 'badpasswordD:'
-                ));
+            'usernameOrEmail' => 'IDontExist',
+            'password' => 'badpasswordD:'
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -150,9 +150,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => $user->password
+        ));
 
         // Call the API
         $response1 = UserController::apiLogin($r);
@@ -186,9 +186,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => $user->password
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -198,151 +198,17 @@ class LoginTest extends OmegaupTestCase {
         // Create an user in omegaup
         $user = UserFactory::createUser();
 
-        $auth_token = self::login($user);
+        $login = self::login($user);
 
         // Expire token manually
-        $auth_token_dao = AuthTokensDAO::getByPK($auth_token);
+        $auth_token_dao = AuthTokensDAO::getByPK($login->auth_token);
         $auth_token_dao->create_time = date('Y-m-d H:i:s', strtotime($auth_token_dao->create_time . ' - 9 hour'));
         AuthTokensDAO::save($auth_token_dao);
 
         $auth_token_2 = self::login($user);
 
-        $existingTokens = AuthTokensDAO::getByPK($auth_token);
+        $existingTokens = AuthTokensDAO::getByPK($login->auth_token);
         $this->assertNull($existingTokens);
-    }
-
-    /**
-     * Test SessionController::apiCurrentSession private_contests_count
-     * when there's 1 private contest count
-     */
-    public function testSessionControlerPrivateContestsCount() {
-        // Create private contest
-        $contestData = ContestsFactory::createContest(null, 0 /*public*/);
-        $user = $contestData['director'];
-
-        $this->mockSessionManager();
-
-        // Login
-        $auth_token = $this->login($user);
-
-        // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
-
-        // Call CurrentSession api
-        $response = SessionController::apiCurrentSession();
-
-        $this->assertEquals(1, $response['private_contests_count']);
-    }
-
-    /**
-     * Test SessionController::apiCurrentSession private_contests_count
-     * when there's 1 public contest
-     */
-    public function testSessionControlerPrivateContestsCountWithPublicContest() {
-        // Create private contest
-        $contestData = ContestsFactory::createContest(null, 1 /*public*/);
-        $user = $contestData['director'];
-
-        $this->mockSessionManager();
-
-        // Login
-        $auth_token = $this->login($user);
-
-        // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
-
-        // Call CurrentSession api
-        $response = SessionController::apiCurrentSession();
-
-        $this->assertEquals(0, $response['private_contests_count']);
-    }
-
-    /**
-     * Test SessionController::apiCurrentSession private_contests_count
-     * when there's 0 contests created
-     */
-    public function testSessionControlerPrivateContestsCountWithNoContests() {
-        $user = UserFactory::createUser();
-
-        $this->mockSessionManager();
-
-        // Login
-        $auth_token = $this->login($user);
-
-        // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
-
-        // Call CurrentSession api
-        $response = SessionController::apiCurrentSession();
-
-        $this->assertEquals(0, $response['private_contests_count']);
-    }
-
-    /**
-     * Test SessionController::apiCurrentSession private_problems_count
-     * when there's 1 private problem
-     */
-    public function testSessionControlerPrivateProblemsCount() {
-        // Create private problem
-        $problemData = ProblemsFactory::createProblem(null, null, 0 /*public*/);
-        $user = $problemData['author'];
-
-        $this->mockSessionManager();
-
-        // Login
-        $auth_token = $this->login($user);
-
-        // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
-
-        // Call CurrentSession api
-        $response = SessionController::apiCurrentSession();
-
-        $this->assertEquals(1, $response['private_problems_count']);
-    }
-
-    /**
-     * Test SessionController::apiCurrentSession private_problems_count
-     * when there's 1 public problem
-     */
-    public function testSessionControlerPrivateProblemsCountWithPublicProblem() {
-        // Create public problem
-        $problemData = ProblemsFactory::createProblem(null, null, 1 /*public*/);
-        $user = $problemData['author'];
-
-        $this->mockSessionManager();
-
-        // Login
-        $auth_token = $this->login($user);
-
-        // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
-
-        // Call CurrentSession api
-        $response = SessionController::apiCurrentSession();
-
-        $this->assertEquals(0, $response['private_problems_count']);
-    }
-
-    /**
-     * Test SessionController::apiCurrentSession private_problems_count
-     * when there's 0 problems
-     */
-    public function testSessionControlerPrivateProblemsCountWithNoProblems() {
-        $user = UserFactory::createUser();
-
-        $this->mockSessionManager();
-
-        // Login
-        $auth_token = $this->login($user);
-
-        // Prepare COOKIE as SessionMannager->getCookie expects
-        $_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME] = $auth_token;
-
-        // Call CurrentSession api
-        $response = SessionController::apiCurrentSession();
-
-        $this->assertEquals(0, $response['private_problems_count']);
     }
 
     /**
@@ -358,6 +224,6 @@ class LoginTest extends OmegaupTestCase {
         $user->password = '';
         UsersDAO::save($user);
 
-        $this->login($user);
+        self::login($user);
     }
 }

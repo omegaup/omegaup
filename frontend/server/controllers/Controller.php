@@ -26,8 +26,10 @@ class Controller {
      * @throws UnauthorizedException
      */
     protected static function authenticateRequest(Request $r) {
-        $session = SessionController::apiCurrentSession($r);
-        if (!$session['valid'] || $session['user'] == null) {
+        $session = SessionController::apiCurrentSession($r)['session'];
+        if (is_null($session['user'])) {
+            $r['current_user'] = null;
+            $r['current_user_id'] = null;
             throw new UnauthorizedException();
         }
 
@@ -87,31 +89,6 @@ class Controller {
         }
 
         return $user;
-    }
-
-    /**
-     * Retunrs a random string of size $length
-     *
-     * @param string $length
-     * @return string
-     */
-    public static function randomString($length) {
-        $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        $str = '';
-        $size = strlen($chars);
-        for ($i = 0; $i < $length; $i++) {
-            $index = 0;
-
-            if (function_exists('random_int')) {
-                $index = random_int(0, $size - 1);
-            } else {
-                $index = mt_rand(0, $size - 1);
-            }
-
-            $str .= $chars[$index];
-        }
-
-        return $str;
     }
 
     /**

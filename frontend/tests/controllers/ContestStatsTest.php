@@ -52,9 +52,11 @@ class ContestStatsTest extends OmegaupTestCase {
         }
 
         // Create request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['auth_token'] = $this->login($contestData['director']);
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call API
         $response = ContestController::apiStats($r);
@@ -96,9 +98,11 @@ class ContestStatsTest extends OmegaupTestCase {
         }
 
         // Create request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['auth_token'] = $this->login($contestData['director']);
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
 
         // Call API
         $response = ContestController::apiStats($r);

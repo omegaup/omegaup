@@ -1,0 +1,32 @@
+<phpunit 
+	backupGlobals="false"
+	bootstrap="bootstrap.php"
+	backupStaticAttributes="true"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	stopOnFailure="false"
+	syntaxCheck="false">
+	<filter>
+		<whitelist processUncoveredFilesFromWhitelist="true">
+			<directory suffix=".php">../server/</directory>
+			<exclude>
+				<file>../server/config.php</file>
+				<file>../server/libs/PasswordHashCmd.php</file>
+				<directory>../server/libs/Mailchimp/</directory>
+				<directory>../server/libs/Markdown/</directory>
+				<directory>../server/libs/adodb/</directory>
+				<directory>../server/libs/dao/base/</directory>
+				<directory>../server/libs/facebook-php-sdk/</directory>
+				<directory>../server/libs/google-api-php-client/</directory>
+				<directory>../server/libs/log4php/</directory>
+				<directory>../server/libs/phpmailer/</directory>
+				<directory>../server/libs/smarty/</directory>
+			</exclude>
+		</whitelist>
+	</filter>
+	<logging>
+		<log type="coverage-html" target="../www/coverage" showUncoveredFiles="true"/>
+	</logging>
+</phpunit>

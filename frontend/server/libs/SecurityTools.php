@@ -45,18 +45,6 @@ class SecurityTools {
     }
 
     /**
-     * Basic test to determine if a given password is acceptable without throwing exception.
-     * @return boolean
-     */
-    public static function IsValidPassword($password) {
-        if (is_null($password) || !is_string($password)) {
-            return false;
-        }
-
-        return strlen($password) >= 8 && strlen($password) <= 72;
-    }
-
-    /**
      * Given a plain string, returns its hash using phpass library
      *
      * @param string $string
@@ -73,5 +61,23 @@ class SecurityTools {
         }
 
         return $hash;
+    }
+
+    /**
+     * Returns a random string of size $length
+     *
+     * @param string $length
+     * @return string
+     */
+    public static function randomString($length) {
+        $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $str = '';
+        $max = strlen($chars) - 1;
+        $rng = function_exists('random_int') ? 'random_int' : 'mt_rand';
+        for ($i = 0; $i < $length; $i++) {
+            $str .= $chars[$rng(0, $max)];
+        }
+
+        return $str;
     }
 }

@@ -5,9 +5,9 @@ require_once('../server/bootstrap.php');
 UITools::redirectToLoginIfNotLoggedIn();
 UITools::setProfile($smarty);
 
-$ses = SessionController::apiCurrentSession();
+$ses = SessionController::apiCurrentSession()['session'];
 
-if (isset($ses['needs_basic_info']) && $ses['needs_basic_info']) {
+if (is_null($ses['user']->password)) {
     $smarty->display('../templates/user.basicedit.tpl');
 } else {
     $smarty->display('../templates/user.edit.tpl');

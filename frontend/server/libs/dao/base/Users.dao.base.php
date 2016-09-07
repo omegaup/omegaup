@@ -212,6 +212,10 @@ abstract class UsersDAOBase extends DAO
 			$sql .= " `recruitment_optin` = ? AND";
 			array_push( $val, $Users->recruitment_optin );
 		}
+		if (!is_null( $Users->in_mailing_list)) {
+			$sql .= " `in_mailing_list` = ? AND";
+			array_push( $val, $Users->in_mailing_list );
+		}
 		if (!is_null($likeColumns)) {
 			foreach ($likeColumns as $column => $value) {
 				$escapedValue = mysql_real_escape_string($value);
@@ -247,7 +251,7 @@ abstract class UsersDAOBase extends DAO
 	  **/
 	private static final function update($Users)
 	{
-		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `recruitment_optin` = ? WHERE  `user_id` = ?;";
+		$sql = "UPDATE Users SET  `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `name` = ?, `solved` = ?, `submissions` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `last_access` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `recruitment_optin` = ?, `in_mailing_list` = ? WHERE  `user_id` = ?;";
 		$params = array(
 			$Users->username,
 			$Users->facebook_user_id,
@@ -269,6 +273,7 @@ abstract class UsersDAOBase extends DAO
 			$Users->reset_digest,
 			$Users->reset_sent_at,
 			$Users->recruitment_optin,
+			$Users->in_mailing_list,
 			$Users->user_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -293,7 +298,8 @@ abstract class UsersDAOBase extends DAO
 		if (is_null($Users->submissions)) $Users->submissions = '0';
 		if (is_null($Users->last_access)) $Users->last_access = gmdate('Y-m-d H:i:s');
 		if (is_null($Users->verified)) $Users->verified = FALSE;
-		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `recruitment_optin` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		if (is_null($Users->in_mailing_list)) $Users->in_mailing_list = FALSE;
+		$sql = "INSERT INTO Users ( `user_id`, `username`, `facebook_user_id`, `password`, `main_email_id`, `name`, `solved`, `submissions`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `last_access`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `recruitment_optin`, `in_mailing_list` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
 			$Users->user_id,
 			$Users->username,
@@ -316,6 +322,7 @@ abstract class UsersDAOBase extends DAO
 			$Users->reset_digest,
 			$Users->reset_sent_at,
 			$Users->recruitment_optin,
+			$Users->in_mailing_list,
 		 );
 		global $conn;
 		$conn->Execute($sql, $params);
@@ -569,6 +576,16 @@ abstract class UsersDAOBase extends DAO
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `recruitment_optin` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
+		if( ( !is_null (($a = $UsersA->in_mailing_list) ) ) & ( ! is_null ( ($b = $UsersB->in_mailing_list) ) ) ){
+				$sql .= " `in_mailing_list` >= ? AND `in_mailing_list` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `in_mailing_list` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}

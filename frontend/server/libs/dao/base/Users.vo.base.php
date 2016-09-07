@@ -94,6 +94,9 @@ class Users extends VO
 			if (isset($data['recruitment_optin'])) {
 				$this->recruitment_optin = $data['recruitment_optin'];
 			}
+			if (isset($data['in_mailing_list'])) {
+				$this->in_mailing_list = $data['in_mailing_list'];
+			}
 		}
 	}
 
@@ -127,7 +130,8 @@ class Users extends VO
 			"verification_id" => $this->verification_id,
 			"reset_digest" => $this->reset_digest,
 			"reset_sent_at" => $this->reset_sent_at,
-			"recruitment_optin" => $this->recruitment_optin
+			"recruitment_optin" => $this->recruitment_optin,
+			"in_mailing_list" => $this->in_mailing_list
 		);
 	return json_encode($vec);
 	}
@@ -290,4 +294,11 @@ class Users extends VO
 	  * @var tinyint(1)
 	  */
 	public $recruitment_optin;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var BOOLEAN
+	  */
+	public $in_mailing_list;
 }

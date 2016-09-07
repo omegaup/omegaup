@@ -30,9 +30,11 @@ class ContestRunsTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         // Create request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['auth_token'] = $this->login($contestData['director']);
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $login->auth_token,
+        ));
 
         // Call API
         $response = ContestController::apiRuns($r);

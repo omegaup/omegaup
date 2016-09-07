@@ -1,18 +1,19 @@
 function OmegaUp() {
 	var self = this;
-	this.username = null;
 
-	this.deltaTime = 0;
-	this.authenticated(function(data) {
-		if (data.valid) {
+	self.username = null;
+	self.deltaTime = 0;
+	self.session = null;
+
+	var t0 = new Date().getTime();
+	self.authenticated(function(data) {
+		if (data.session.valid) {
 			self.loggedIn = true;
-			self.syncTime();
-			self.username = data.username;
-			self.email = data.email;
-			self.email_md5 = data.email_md5;
+			self.deltaTime = data.time * 1000 - t0;
+			self.username = data.session.user.username;
+			self.email = data.session.email;
 		} else {
 			self.loggedIn = false;
-			self.login_url = data.login_url;
 		}
 	});
 }

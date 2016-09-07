@@ -103,6 +103,6 @@ class ResetUpdateTest extends OmegaupTestCase {
         $user = UsersDAO::FindByEmail($user_data['email']);
         ResetController::apiUpdate($r);
         $user->password = $new_password;
-        $this->login($user);
+        self::login($user);
     }
 }

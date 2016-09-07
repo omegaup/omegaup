@@ -69,7 +69,7 @@ require_once('libs/phpmailer/class.phpmailer.php');
 require_once('libs/UITools.php');
 require_once('libs/Mailchimp/Mailchimp.php');
 require_once('libs/ApiException.php');
-
+require_once('libs/UrlHelper.php');
 
 /*
  * Configurar log4php
@@ -185,17 +185,15 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
     }
 
     $userRequest = new Request($_REQUEST);
-    $session = SessionController::apiCurrentSession($userRequest);
+    $session = SessionController::apiCurrentSession($userRequest)['session'];
     if ($session['valid']) {
         $smarty->assign('LOGGED_IN', '1');
         UITools::$IsLoggedIn = true;
 
         $smarty->assign('CURRENT_USER_USERNAME', $session['username']);
         $smarty->assign('CURRENT_USER_EMAIL', $session['email']);
-        $smarty->assign('CURRENT_USER_IS_EMAIL_VERIFIED', $session['is_email_verified']);
+        $smarty->assign('CURRENT_USER_IS_EMAIL_VERIFIED', $session['user']->verified);
         $smarty->assign('CURRENT_USER_IS_ADMIN', $session['is_admin']);
-        $smarty->assign('CURRENT_USER_PRIVATE_CONTESTS_COUNT', $session['private_contests_count']);
-        $smarty->assign('CURRENT_USER_PRIVATE_PROBLEMS_COUNT', $session['private_problems_count']);
         $smarty->assign('CURRENT_USER_AUTH_TOKEN', $session['auth_token']);
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=92">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=16">');

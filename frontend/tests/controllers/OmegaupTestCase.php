@@ -23,6 +23,28 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * tearDown function gets executed after each test (thanks to phpunit)
+     */
+    public function tearDown() {
+        parent::tearDown();
+        self::logout();
+    }
+
+    public static function logout() {
+        $session = new SessionController();
+        if ($session->CurrentSessionAvailable()) {
+            $session->InvalidateCache();
+        }
+        if (isset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
+            unset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
+        }
+        if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
+            unset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
+        }
+        $session->InvalidateLocalCache();
+    }
+
+    /**
      * Override session_start, phpunit doesn't like it, but we still validate that it is called once
      */
     public function mockSessionManager() {
@@ -67,7 +89,8 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
     /**
      * Logs in a user an returns the auth_token
      *
-     * @param Users $user
+     * @param Users $user the user to be logged in
+     *
      * @return string auth_token
      */
     public static function login(Users $user) {
@@ -79,9 +102,9 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 
         // Inflate request with user data
         $r = new Request(array(
-                    'usernameOrEmail' => $user->username,
-                    'password' => $user->password
-                ));
+            'usernameOrEmail' => $user->username,
+            'password' => $user->password,
+        ));
 
         // Call the API
         $response = UserController::apiLogin($r);
@@ -95,7 +118,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         // Set cookie setting as it was before the login
         SessionController::$setCookieOnRegisterSession = $oldCookieSetting;
 
-        return $response['auth_token'];
+        return new ScopedLoginToken($response['auth_token']);
     }
 
     /**
@@ -315,5 +338,27 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         }
 
         self::$logObj->info('[INFO] ' . $message);
+    }
+}
+
+/**
+ * Simple RAII class that logs out as soon as it goes out of scope.
+ */
+class ScopedLoginToken {
+    public $auth_token = null;
+
+    public function __construct($auth_token) {
+        $this->auth_token = $auth_token;
+    }
+
+    public function __destruct() {
+        OmegaUpTestCase::logout();
+    }
+
+    // TODO: Delete this function. The existence of this allows for sessions to
+    // be stored longer than intended since they will be added to Request
+    // objects and then still maybe not cleaned up.
+    public function __toString() {
+        return $this->auth_token;
     }
 }

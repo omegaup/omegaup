@@ -33,7 +33,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with the admin of the contest
-        $r['auth_token'] = $this->login($contestData['director']);
+        $r['auth_token'] = self::login($contestData['director']);
 
         // Call API
         $response = ContestController::apiUsers($r);
@@ -51,13 +51,13 @@ class ContestUsersTest extends OmegaupTestCase {
 
         ContestController::apiDetails(new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $this->login($user),
+            'auth_token' => self::login($user),
         )));
 
         // Call API
         $response = ContestController::apiActivityReport(new Request(array(
             'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $this->login($contestData['director']),
+            'auth_token' => self::login($contestData['director']),
         )));
 
         // Check that we have entries in the log.

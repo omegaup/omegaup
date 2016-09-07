@@ -9,7 +9,7 @@
 
 		<script type="text/javascript" src="/js/jquery.js?ver=198b3f"></script>
 
-		<script type="text/javascript" src="/js/omegaup.js?ver=4b8b7d"></script>
+		<script type="text/javascript" src="/js/omegaup.js?ver=b8b56e"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=9f6f64,87ec3e,c924c0,4379f1"></script>
 
 		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
@@ -52,9 +52,9 @@
 	<script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 {/if}
 {if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
-	<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ver=bbca63"></script>
+	<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ver=e445ec"></script>
 	<script type="text/javascript" src="/js/pagedown/Markdown.Sanitizer.js?ver=25306e"></script>
-	<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ver=1bf05c"></script>
+	<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ver=e0132d"></script>
 	<link rel="stylesheet" type="text/css" href="/js/pagedown/demo/browser/demo.css" />
 {/if}
 		<script type="text/javascript" src="/js/head.sugar_locale.js?ver=0cb37f"></script>

@@ -39,7 +39,8 @@ class RunsFactory {
         $r = new Request();
 
         // Log in as contestant
-        $r['auth_token'] = OmegaupTestCase::login($contestant);
+        $login = OmegaupTestCase::login($contestant);
+        $r['auth_token'] = $login->auth_token;
 
         // Build request
         if (!is_null($contestData)) {

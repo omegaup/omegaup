@@ -73,7 +73,7 @@ function Arena() {
 	this.enableSockets = window.location.search.indexOf('ws=off') === -1;
 
 	// If we have admin powers in this contest.
-	this.admin = false;
+	this.contestAdmin = false;
 	this.answeredClarifications = 0;
 	this.clarificationsOffset = 0;
 	this.clarificationsRowcount = 20;
@@ -239,7 +239,7 @@ Arena.prototype.initClock = function(start, finish, deadline) {
 Arena.prototype.initProblems = function(contest) {
 	var self = this;
 	self.currentContest = contest;
-	self.admin = contest.admin;
+	self.contestAdmin = contest.admin;
 	var problems = contest.problems;
 	for (var i = 0; i < problems.length; i++) {
 		var problem = problems[i];
@@ -659,7 +659,7 @@ Arena.prototype.updateClarification = function(clarification) {
 			.removeClass('template')
 			.addClass('inserted');
 
-		if (self.admin) {
+		if (self.contestAdmin) {
 			(function(id, answerNode) {
 				var responseFormNode = $('#create-response-form', answerNode).removeClass('template');
 				if (clarification.public == 1) {
@@ -683,7 +683,7 @@ Arena.prototype.updateClarification = function(clarification) {
 
 	$('.contest', r).html(clarification.contest_alias);
 	$('.problem', r).html(clarification.problem_alias);
-	if (self.admin) $('.author', r).html(clarification.author);
+	if (self.contestAdmin) $('.author', r).html(clarification.author);
 	$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', clarification.time.getTime()));
 	$('.message', r).html(omegaup.escape(clarification.message));
 	$('.answer pre', r).html(omegaup.escape(clarification.answer));
@@ -691,7 +691,7 @@ Arena.prototype.updateClarification = function(clarification) {
 		self.answeredClarifications++;
 	}
 
-	if (self.admin != !!clarification.answer) {
+	if (self.contestAdmin != !!clarification.answer) {
 		self.notify(
 			(clarification.author ? clarification.author + " - " : '') + clarification.problem_alias,
 			omegaup.escape(clarification.message) +
@@ -906,6 +906,7 @@ Arena.prototype.hideOverlay = function() {
 
 Arena.prototype.displayRunDetails = function(guid, data) {
 	var self = this;
+	var problemAdmin = data.admin;
 
 	if (data.status == 'error') {
 		self.hideOverlay();
@@ -947,7 +948,7 @@ Arena.prototype.displayRunDetails = function(guid, data) {
 
 	$('#run-details .cases div').remove();
 	$('#run-details .cases table').remove();
-	if (self.admin) {
+	if (problemAdmin) {
 		$('#run-details .download a').attr('href', '/api/run/download/run_alias/' + data.guid + '/');
 		$('#run-details .download a.details').attr('href', '/api/run/download/run_alias/' + data.guid + '/complete/true/');
 		$('#run-details .download').show();
@@ -1044,7 +1045,7 @@ Arena.prototype.displayRunDetails = function(guid, data) {
 					.append('<td class="center" width="10">' + (c.max_score !== undefined ? '/' : '') + '</td>')
 					.append('<td>' + (c.max_score !== undefined ? c.max_score : '') + '</td>')
 				cases.append(caseRow);
-				if (self.admin && c.meta) {
+				if (problemAdmin && c.meta) {
 					var metaRow = $('<tr class="meta"></tr>')
 						.append('<td colspan="6"><pre>' + JSON.stringify(c.meta, null, 2) + '</pre></td>')
 						.hide();
@@ -1251,6 +1252,7 @@ Arena.ObservableRun = function(arena, run) {
 	self.short_guid = run.guid.substring(0, 8);
 
 	self.alias = ko.observable(run.alias);
+	self.contest_alias = ko.observable(run.contest_alias);
 	self.contest_score = ko.observable(run.contest_score);
 	self.country_id = ko.observable(run.country_id);
 	self.judged_by = ko.observable(run.judged_by);
@@ -1276,6 +1278,7 @@ Arena.ObservableRun = function(arena, run) {
 	self.penalty_text = ko.pureComputed(self.$penalty_text, self);
 	self.points = ko.pureComputed(self.$points, self);
 	self.percentage = ko.pureComputed(self.$percentage, self);
+	self.contest_alias_url = ko.pureComputed(self.$contest_alias_url, self);
 };
 
 Arena.ObservableRun.prototype.update = function(run) {
@@ -1295,6 +1298,11 @@ Arena.ObservableRun.prototype.update = function(run) {
 Arena.ObservableRun.prototype.$problem_url = function() {
 	var self = this;
 	return "/arena/problem/" + self.alias() + "/";
+};
+
+Arena.ObservableRun.prototype.$contest_alias_url = function() {
+	var self = this;
+	return (self.contest_alias() === null) ? "" : "/arena/" + self.contest_alias() + "/";
 };
 
 Arena.ObservableRun.prototype.$user_html = function() {

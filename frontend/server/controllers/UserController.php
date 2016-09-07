@@ -11,6 +11,9 @@ class UserController extends Controller {
     public static $sendEmailOnVerify = true;
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
+    public static $urlHelper = null;
+
+    const SENDY_SUCCESS = '1';
 
     /**
      * Entry point for Create a User API
@@ -56,7 +59,7 @@ class UserController extends Controller {
             'solved' => 0,
             'submissions' => 0,
             'verified' => 0,
-            'verification_id' => self::randomString(50),
+            'verification_id' => SecurityTools::randomString(50),
         );
         if (isset($r['name'])) {
             $user_data['name'] = $r['name'];
@@ -158,7 +161,7 @@ class UserController extends Controller {
      */
     private static function registerToSendy(Users $user) {
         if (!OMEGAUP_EMAIL_SENDY_ENABLE) {
-            return;
+            return false;
         }
 
         self::$log->info('Adding user to Sendy.');
@@ -167,7 +170,8 @@ class UserController extends Controller {
         try {
             $email = EmailsDAO::getByPK($user->main_email_id);
         } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+            self::$log->warn('Email lookup failed: ' . $e->getMessage());
+            return false;
         }
 
         //Subscribe
@@ -176,7 +180,7 @@ class UserController extends Controller {
                 'name' => $user->username,
                 'email' => $email->email,
                 'list' => OMEGAUP_EMAIL_SENDY_LIST,
-                'boolean' => 'true'
+                'boolean' => 'true' /* get a plaintext response, API: https://sendy.co/api */
                 )
         );
         $opts = array(
@@ -187,15 +191,18 @@ class UserController extends Controller {
         );
 
         $context  = stream_context_create($opts);
-        $result = file_get_contents(OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL, false, $context);
+        $result = self::$urlHelper->fetchUrl(OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL, $context);
 
         //check result and redirect
-        if ($result) {
+        self::$log->info('Sendy response: ' . $result);
+        if ($result === UserController::SENDY_SUCCESS) {
             self::$log->info('Success adding user to Sendy.');
         } else {
             self::$log->info('Failure adding user to Sendy.');
+            return false;
         }
-        self::$log->info($result);
+
+        return true;
     }
 
     /**
@@ -341,7 +348,7 @@ class UserController extends Controller {
                     self::$log->info('User does not have verification id. Generating.');
 
                     try {
-                        $r['user']->verification_id = self::randomString(50);
+                        $r['user']->verification_id = SecurityTools::randomString(50);
                         UsersDAO::save($r['user']);
                     } catch (Exception $e) {
                         // best effort, eat exception
@@ -503,8 +510,6 @@ class UserController extends Controller {
 
         self::$log->info('User verification complete.');
 
-        self::registerToSendy($user);
-
         if (self::$redirectOnVerify) {
             if (!is_null($r['redirecttointerview'])) {
                 die(header('Location: /login/?redirect=/interview/' . urlencode($r['redirecttointerview']) . '/arena'));
@@ -514,6 +519,48 @@ class UserController extends Controller {
         }
 
         return array('status' => 'ok');
+    }
+
+    /**
+     * Registers to the mailing list all users that have not been added before. Admin only
+     *
+     * @throws InvalidDatabaseOpertionException
+     * @throws InvalidParameterException
+     * @throws ForbiddenAccessException
+     */
+    public static function apiMailingListBackfill(Request $r) {
+        self::authenticateRequest($r);
+
+        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $usersAdded = array();
+
+        try {
+            $usersMissing = UsersDAO::search(new Users(array(
+                'verified' => true,
+                'in_mailing_list' => false
+            )));
+
+            foreach ($usersMissing as $user) {
+                $registered = self::registerToSendy($user);
+
+                if ($registered) {
+                    $user->in_mailing_list = 1;
+                    UsersDAO::save($user);
+                }
+
+                $usersAdded[$user->username] = $registered;
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array(
+            'status' => 'ok',
+            'users' => $usersAdded
+        );
     }
 
     /**
@@ -842,13 +889,13 @@ class UserController extends Controller {
             );
         }
 
-        self::$permissionKey = $r['permission_key'] = self::randomString(32);
+        self::$permissionKey = $r['permission_key'] = SecurityTools::randomString(32);
 
         foreach ($keys as $k => $n) {
             $digits = floor(log10($n) + 1);
             for ($i = 1; $i <= $n; $i++) {
                 $username = $k . '-' . str_pad($i, $digits, '0', STR_PAD_LEFT);
-                $password = self::randomString(8);
+                $password = SecurityTools::randomString(8);
 
                 if (self::omiPrepareUser($r, $username, $password)) {
                     $response[$username] = $password;
@@ -1135,8 +1182,9 @@ class UserController extends Controller {
         }
 
         // Do not leak plain emails in case the request is for a profile other than
-        // the logged user's one
-        if ($r['user']->user_id !== $r['current_user_id']) {
+        // the logged user's one. Admins can see emails.
+        if (!Authorization::IsSystemAdmin($r['current_user_id'])
+                && $r['user']->user_id !== $r['current_user_id']) {
             unset($response['userinfo']['email']);
         }
 
@@ -1580,7 +1628,6 @@ class UserController extends Controller {
         }
 
         // Expire profile cache
-
         Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
         $sessionController = new SessionController();
         $sessionController->InvalidateCache();
@@ -1781,7 +1828,7 @@ class UserController extends Controller {
                     self::$log->info('User does not have verification id. Generating.');
 
                     try {
-                        $r['current_user']->verification_id = self::randomString(50);
+                        $r['current_user']->verification_id = SecurityTools::randomString(50);
                         UsersDAO::save($r['current_user']);
                     } catch (Exception $e) {
                         // best effort, eat exception
@@ -1813,4 +1860,98 @@ class UserController extends Controller {
         $newUsername = str_replace('.', '_', $newUsername);
         return $newUsername . time();
     }
+
+    /**
+     * Parses and validates a filter string to be used for event notification
+     * filtering.
+     *
+     * The Request must have a 'filter' key with comma-delimited URI paths
+     * representing the resources the caller is interested in receiving events
+     * for. If the caller has enough privileges to receive notifications for
+     * ALL the requested filters, the request will return successfully,
+     * otherwise an exception will be thrown.
+     *
+     * This API does not need authentication to be used. This allows to track
+     * contest updates with an access token.
+     *
+     * @param Request $r
+     */
+    public static function apiValidateFilter(Request $r) {
+        Validators::isStringNonEmpty($r['filter'], 'filter');
+
+        $response = array(
+            'status' => 'ok',
+            'user' => null,
+            'admin' => false,
+            'problem_admin' => array(),
+            'contest_admin' => array(),
+        );
+
+        $session = SessionController::apiCurrentSession($r)['session'];
+        $user = $session['user'];
+        if (!is_null($user)) {
+            $response['user'] = $user->username;
+            $response['admin'] = $session['is_admin'];
+        }
+
+        $filters = explode(',', $r['filter']);
+        foreach ($filters as $filter) {
+            $tokens = explode('/', $filter);
+            if (count($tokens) < 2 || $tokens[0] != '') {
+                throw new InvalidParameterException('parameterInvalid', 'filter');
+            }
+            switch ($tokens[1]) {
+                case 'all-events':
+                    if (count($tokens) != 2) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    if (!$session['is_admin']) {
+                        throw new ForbiddenAccessException('userNotAllowed');
+                    }
+                    break;
+                case 'user':
+                    if (count($tokens) != 3) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    if ($tokens[2] != $user->username && !$session['is_admin']) {
+                        throw new ForbiddenAccessException('userNotAllowed');
+                    }
+                    break;
+                case 'contest':
+                    if (count($tokens) < 3) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    $r = new Request(array(
+                        'contest_alias' => $tokens[2],
+                    ));
+                    if (count($tokens) >= 4) {
+                        $r['token'] = $tokens[3];
+                    }
+                    ContestController::validateDetails($r);
+                    if ($r['contest_admin']) {
+                        $response['contest_admin'][] = $r['contest_alias'];
+                    }
+                    break;
+                case 'problem':
+                    if (count($tokens) != 3) {
+                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                    }
+                    $problem = ProblemsDAO::getByAlias($tokens[2]);
+                    if (is_null($problem)) {
+                        throw new NotFoundException('problemNotFound');
+                    }
+                    if (!is_null($user) && Authorization::CanEditProblem($user->user_id, $problem)) {
+                        $response['problem_admin'][] = $tokens[2];
+                    } elseif ($problem->public != '1') {
+                        throw new ForbiddenAccessException('problemIsPrivate');
+                    }
+
+                    break;
+            }
+        }
+
+        return $response;
+    }
 }
+
+UserController::$urlHelper = new UrlHelper();
