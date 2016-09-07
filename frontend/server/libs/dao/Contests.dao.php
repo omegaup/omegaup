@@ -9,32 +9,39 @@ require_once('base/Contests.vo.base.php');
   *
   */
 
-class ActiveStatus extends SplEnum {
-    const __default = self::ALL;
-            
+class ActiveStatus {
     const ALL = 0;
     const ACTIVE = 1;
     const PAST = 2;
 
-    public $sql = array(
+    public static function sql($status) {
+        $status = max(0, min(2, $status));
+        return self::$sqlForStatus[$status];
+    }
+
+    public static $sqlForStatus = array(
         'TRUE',
         'finish_time > NOW()',
         'finish_time <= NOW()',
     );
 }
 
-class RecommendedStatus extends SplEnum {
-    const __default = self::ALL;
+class RecommendedStatus {
     const ALL = 0;
     const RECOMMENDED = 1;
     const NOT_RECOMMENDED = 2;
 
-    public $sql = array(
+    public static function sql($status) {
+        $status = max(0, min(2, $status));
+        return self::$sqlForStatus[$status];
+    }
+
+    public static $sqlForStatus = array(
         'TRUE',
         'recommended = 1',
         'recommended = 0',
     );
- }
+}
 
 /** Contests Data Access Object (DAO).
   *
@@ -170,8 +177,8 @@ class ContestsDAO extends ContestsDAOBase
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
-        $end_check = ActiveStatus::$sql[$activos];
-        $recommended_check = RecommendedStatus::$sql[$recomendados];
+        $end_check = ActiveStatus::sql($activos);
+        $recommended_check = RecommendedStatus::sql($recomendados);
         $sql = "
                  (
                      SELECT
@@ -271,8 +278,8 @@ class ContestsDAO extends ContestsDAOBase
         $recomendados = RecommendedStatus::ALL
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
-        $end_check = ActiveStatus::$sql[$activos];
-        $recommended_check = RecommendedStatus::$sql[$recomendados];
+        $end_check = ActiveStatus::sql($activos);
+        $recommended_check = RecommendedStatus::sql($recomendados);
 
         $columns = ContestsDAO::$getContestsColumns;
 
@@ -315,8 +322,8 @@ class ContestsDAO extends ContestsDAOBase
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
-        $end_check = ActiveStatus::$sql[$activos];
-        $recommended_check = RecommendedStatus::$sql[$recomendados];
+        $end_check = ActiveStatus::sql($activos);
+        $recommended_check = RecommendedStatus::sql($recomendados);
 
         $sql = "
                 SELECT

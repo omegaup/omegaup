@@ -29,17 +29,13 @@ class ContestController extends Controller {
 
             Validators::isNumber($r['page'], 'page', false);
             Validators::isNumber($r['page_size'], 'page_size', false);
-            Validators::isNumber($r['active'], 'active', false);
-            Validators::isNumber($r['recommended'], 'recommended', false);
+            Validators::isNumberInRange($r['active'], 'active', 0, 2, false);
+            Validators::isNumberInRange($r['recommended'], 'recommended', 0, 2, false);
 
             $page = (isset($r['page']) ? intval($r['page']) : 1);
             $page_size = (isset($r['page_size']) ? intval($r['page_size']) : 20);
-            $active_contests = isset($r['active'])
-                ? new ActiveStatus($r['active'])
-                : new ActiveStatus();
-            $recommended = isset($r['recommended'])
-                ? new RecommendedStatus($r['recommended'])
-                : new RecommendedStatus();
+            $active_contests = isset($r['active']) ? intval($r['active']) : 0;
+            $recommended = isset($r['recommended']) ? intval($r['recommended']) : 0;
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
