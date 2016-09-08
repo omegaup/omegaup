@@ -33,15 +33,16 @@ class Cache {
      * Inicializa el cache para el key dado
      * @param string $key el id del cache
      */
-    public function __construct($prefix, $id = ''){
-        $this->key = $prefix.$id;
-        $this->enabled = (defined('APC_USER_CACHE_ENABLED') && APC_USER_CACHE_ENABLED === true);
+    public function __construct($prefix, $id = '') {
+        $this->enabled = self::cacheEnabled();
         $this->log = Logger::getLogger('cache');
 
         if ($this->enabled) {
+            $cache_ver = self::getVersion($prefix);
+            $this->key = $cache_ver.$prefix.$id;
             $this->log->debug('Cache enabled for ' . $this->key);
         } else {
-            $this->log->debug('Cache disabled for ' . $this->key);
+            $this->log->debug('Cache disabled');
         }
     }
 
@@ -154,5 +155,48 @@ class Cache {
     public static function deleteFromCache($prefix, $id = '') {
         $cache = new Cache($prefix, $id);
         $cache->delete();
+    }
+
+    /**
+     * Gets the current cache version for all entries with prefix $prefix.
+     *
+     * @param string $prefix
+     */
+    private static function getVersion($prefix) {
+        $version = false;
+        $key = 'v'.$prefix;
+        while (($version = apc_fetch($key)) === false) {
+            if (apc_add($key, 0)) {
+                $version = 0;
+                break;
+            }
+        }
+        return $version;
+    }
+
+    /**
+     * Invalidate all entries that begin with $prefix.
+     *
+     * It does so by changing the current version used for these entries, so
+     * old entries will never be fetched or updated again.
+     *
+     * @param string $prefix
+     */
+    public static function invalidateAllKeys($prefix) {
+        if (!self::cacheEnabled()) {
+            return;
+        }
+        $key = 'v'.$prefix;
+        // Must do this in a loop to avoid race condition when two threads try
+        // to invalidate the cache simultaneously.
+        do {
+            // Ensure the version key exists.
+            $version = self::getVersion($prefix);
+        } while (!apc_cas($key, $version, $version + 1));
+    }
+
+    private static function cacheEnabled() {
+        return defined('APC_USER_CACHE_ENABLED') &&
+               APC_USER_CACHE_ENABLED === true;
     }
 }

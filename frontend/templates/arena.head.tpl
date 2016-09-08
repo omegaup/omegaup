@@ -12,7 +12,7 @@
 		<script type="text/javascript" src="/js/knockout-4.3.0.js?ver=059d58"></script>
 		<script type="text/javascript" src="/js/knockout-secure-binding.min.js?ver=81a2a3"></script>
 
-		<script type="text/javascript" src="/js/omegaup.js?ver=0d3e90"></script>
+		<script type="text/javascript" src="/js/omegaup.js?ver=b8b56e"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=9f6f64,87ec3e,c924c0,4379f1"></script>
 		<script type="text/javascript" src="/ux/libarena.js?ver=9263da"></script>
 

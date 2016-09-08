@@ -8,6 +8,91 @@ require_once('base/Contests.vo.base.php');
   * @package docs
   *
   */
+
+/**
+ * Base class for the ActiveStatus and RecommendedStatus enums below.
+ *
+ * It handles validation of input values, constants by name or by value,
+ * and getting the corresponding SQL snippet for them.
+ */
+class StatusBase {
+    /**
+     * @param mixed $status Numeric or named constant.
+     * @return int value on success, null otherwise.
+     */
+    public static function getIntValue($status) {
+        $cache = self::getConstCache(get_called_class());
+        if (is_numeric($status)) {
+            // $status may be a string, force it to an int.
+            $status = intval($status);
+            if ($cache['min'] <= $status && $status <= $cache['max']) {
+                return $status;
+            }
+        } else if (is_string($status)) {
+            if (in_array($status, $cache['constants'])) {
+                return $cache['constants'][$status];
+            }
+        }
+        return;
+    }
+
+    /**
+     * @param int $status
+     * @return string SQL snippet.
+     */
+    public static function sql($status) {
+        $class = get_called_class();
+        $cache = self::getConstCache($class);
+        // This should've been validated before, but lets be paranoid anyway.
+        $status = max($cache['min'], min($cache['max'], $status));
+        return $class::$SQL_FOR_STATUS[$status];
+    }
+
+    /**
+     * @param string $className The derived class name.
+     * @return array with 'constants', 'min' and 'max' fields.
+     */
+    private static function getConstCache($className) {
+        if (!isset(self::$constCache[$className])) {
+            $reflection = new ReflectionClass($className);
+            $constants = $reflection->getConstants();
+            $values = array_values($constants);
+            self::$constCache[$className] = array(
+                'constants' => $constants,
+                'min' => min($values),
+                'max' => max($values),
+            );
+        }
+        return self::$constCache[$className];
+    }
+
+    private static $constCache = array();
+}
+
+class ActiveStatus extends StatusBase {
+    const ALL = 0;
+    const ACTIVE = 1;
+    const PAST = 2;
+
+    public static $SQL_FOR_STATUS = array(
+        'TRUE',
+        'finish_time > NOW()',
+        'finish_time <= NOW()',
+    );
+}
+
+class RecommendedStatus extends StatusBase {
+    const ALL = 0;
+    const RECOMMENDED = 1;
+    const NOT_RECOMMENDED = 2;
+
+    public static $SQL_FOR_STATUS = array(
+        'TRUE',
+        'recommended = 1',
+        'recommended = 0',
+    );
+}
+
 /** Contests Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
@@ -127,22 +212,32 @@ class ContestsDAO extends ContestsDAOBase
      * @global type $conn
      * @param int $user_id
      * @param int $pagina
-     * @param int $columnas_por_pagina
+     * @param int $renglones_por_pagina
+     * @param ActiveStatus $activos
+     * @param RecommendedStatus $recomendados
      * @return array
      */
-    final public static function getAllContestsForUser($user_id, $pagina = 1, $renglones_por_pagina = 1000) {
+    final public static function getAllContestsForUser(
+        $user_id,
+        $pagina = 1,
+        $renglones_por_pagina = 1000,
+        $activos = ActiveStatus::ALL,
+        $recomendados = RecommendedStatus::ALL
+    ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
-
+        $end_check = ActiveStatus::sql($activos);
+        $recommended_check = RecommendedStatus::sql($recomendados);
         $sql = "
-                (
+                 (
                      SELECT
                         $columns
                      FROM
                         Contests
                      WHERE
-                        Contests.public = 0 AND Contests.director_id = ?
+                        Contests.public = 0 AND Contests.director_id = ? AND
+                        $recommended_check AND $end_check
                  )
 
                  UNION
@@ -156,11 +251,11 @@ class ContestsDAO extends ContestsDAOBase
                      ON
                          Contests.contest_id = Contests_Users.contest_id
                      WHERE
-                         Contests.public = 0 AND Contests_Users.user_id = ?
+                         Contests.public = 0 AND Contests_Users.user_id = ? AND
+                         $recommended_check AND $end_check
                  )
 
                  UNION
-
                  (
                      SELECT
                          $columns
@@ -174,7 +269,8 @@ class ContestsDAO extends ContestsDAOBase
                      WHERE
                          Contests.public = 0 AND
                          User_Roles.user_id = ? AND
-                         (User_Roles.role_id = 2 or User_Roles.role_id = 1)
+                         (User_Roles.role_id = 2 or User_Roles.role_id = 1) AND
+                         $recommended_check AND $end_check
                  )
 
                  UNION
@@ -190,20 +286,19 @@ class ContestsDAO extends ContestsDAOBase
                      WHERE
                          Contests.public = 0 AND
                          Groups_Users.user_id = ? AND
-                         (Group_Roles.role_id = 2 or Group_Roles.role_id = 1)
+                         (Group_Roles.role_id = 2 or Group_Roles.role_id = 1) AND
+                         $recommended_check AND $end_check
                  )
 
                  UNION
-
                  (
                      SELECT
                          $columns
                      FROM
                          Contests
                      WHERE
-                         Public = 1
+                         Public = 1 AND $recommended_check AND $end_check
                  )
-
                  ORDER BY
                      CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                      `recommended` DESC,
@@ -226,8 +321,15 @@ class ContestsDAO extends ContestsDAOBase
         return $allData;
     }
 
-    final public static function getAllPublicContests($pagina = 1, $renglones_por_pagina = 1000) {
+    final public static function getAllPublicContests(
+        $pagina = 1,
+        $renglones_por_pagina = 1000,
+        $activos = ActiveStatus::ALL,
+        $recomendados = RecommendedStatus::ALL
+    ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
+        $end_check = ActiveStatus::sql($activos);
+        $recommended_check = RecommendedStatus::sql($recomendados);
 
         $columns = ContestsDAO::$getContestsColumns;
 
@@ -238,6 +340,8 @@ class ContestsDAO extends ContestsDAOBase
                     Contests
                 WHERE
                     Public = 1
+                AND $recommended_check
+                AND $end_check
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
@@ -259,16 +363,24 @@ class ContestsDAO extends ContestsDAOBase
         return $allData;
     }
 
-    final public static function getAllContests($pagina = 1, $renglones_por_pagina = 1000) {
+    final public static function getAllContests(
+        $pagina = 1,
+        $renglones_por_pagina = 1000,
+        $activos = ActiveStatus::ALL,
+        $recomendados = RecommendedStatus::ALL
+    ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = ContestsDAO::$getContestsColumns;
+        $end_check = ActiveStatus::sql($activos);
+        $recommended_check = RecommendedStatus::sql($recomendados);
 
         $sql = "
                 SELECT
                     $columns
                 FROM
                     Contests
+                WHERE $recommended_check AND $end_check
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
