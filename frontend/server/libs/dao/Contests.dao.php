@@ -9,34 +9,84 @@ require_once('base/Contests.vo.base.php');
   *
   */
 
-class ActiveStatus {
+/**
+ * Base class for the ActiveStatus and RecommendedStatus enums below.
+ *
+ * It handles validation of input values, constants by name or by value,
+ * and getting the corresponding SQL snippet for them.
+ */
+class StatusBase {
+    /**
+     * @param mixed $status Numeric or named constant.
+     * @return int value on success, null otherwise.
+     */
+    public static function getIntValue($status) {
+        $cache = self::getConstCache(get_called_class());
+        if (is_numeric($status)) {
+            // $status may be a string, force it to an int.
+            $status = intval($status);
+            if ($cache['min'] <= $status && $status <= $cache['max']) {
+                return $status;
+            }
+        } else if (is_string($status)) {
+            if (in_array($status, $cache['constants'])) {
+                return $cache['constants'][$status];
+            }
+        }
+        return;
+    }
+
+    /**
+     * @param int $status
+     * @return string SQL snippet.
+     */
+    public static function sql($status) {
+        $class = get_called_class();
+        $cache = self::getConstCache($class);
+        // This should've been validated before, but lets be paranoid anyway.
+        $status = max($cache['min'], min($cache['max'], $status));
+        return $class::$SQL_FOR_STATUS[$status];
+    }
+
+    /**
+     * @param string $className The derived class name.
+     * @return array with 'constants', 'min' and 'max' fields.
+     */
+    private static function getConstCache($className) {
+        if (!isset(self::$constCache[$className])) {
+            $reflection = new ReflectionClass($className);
+            $constants = $reflection->getConstants();
+            $values = array_values($constants);
+            self::$constCache[$className] = array(
+                'constants' => $constants,
+                'min' => min($values),
+                'max' => max($values),
+            );
+        }
+        return self::$constCache[$className];
+    }
+
+    private static $constCache = array();
+}
+
+class ActiveStatus extends StatusBase {
     const ALL = 0;
     const ACTIVE = 1;
     const PAST = 2;
 
-    public static function sql($status) {
-        $status = max(0, min(2, $status));
-        return self::$sqlForStatus[$status];
-    }
-
-    public static $sqlForStatus = array(
+    public static $SQL_FOR_STATUS = array(
         'TRUE',
         'finish_time > NOW()',
         'finish_time <= NOW()',
     );
 }
 
-class RecommendedStatus {
+class RecommendedStatus extends StatusBase {
     const ALL = 0;
     const RECOMMENDED = 1;
     const NOT_RECOMMENDED = 2;
 
-    public static function sql($status) {
-        $status = max(0, min(2, $status));
-        return self::$sqlForStatus[$status];
-    }
-
-    public static $sqlForStatus = array(
+    public static $SQL_FOR_STATUS = array(
         'TRUE',
         'recommended = 1',
         'recommended = 0',

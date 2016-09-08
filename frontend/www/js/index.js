@@ -69,7 +69,7 @@
                         '" class="list-group-item">' + omegaup.escape(list[i].title) +
                         '</a>');
 			}
-		}, {'active': 1});
+		}, {'active': 'ACTIVE'});
 	}
 
 	function createChart(series) {

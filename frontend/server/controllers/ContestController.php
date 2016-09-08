@@ -1,5 +1,7 @@
 <?php
 
+require_once('libs/dao/Contests.dao.php');
+
 /**
  * ContestController
  *
@@ -29,13 +31,20 @@ class ContestController extends Controller {
 
             Validators::isNumber($r['page'], 'page', false);
             Validators::isNumber($r['page_size'], 'page_size', false);
-            Validators::isNumberInRange($r['active'], 'active', 0, 2, false);
-            Validators::isNumberInRange($r['recommended'], 'recommended', 0, 2, false);
 
             $page = (isset($r['page']) ? intval($r['page']) : 1);
             $page_size = (isset($r['page_size']) ? intval($r['page_size']) : 20);
-            $active_contests = isset($r['active']) ? intval($r['active']) : 0;
-            $recommended = isset($r['recommended']) ? intval($r['recommended']) : 0;
+            $active_contests = isset($r['active'])
+                ? ActiveStatus::getIntValue($r['active'])
+                : ActiveStatus::ALL;
+            // If the parameter was not set, the default should be ALL which is
+            // a number and should pass this check.
+            Validators::isNumber($active_contests, 'active', true /* required */);
+            $recommended = isset($r['recommended'])
+                ? RecommendedStatus::getIntValue($r['recommended'])
+                : RecommendedStatus::ALL;
+            // Same as above.
+            Validators::isNumber($recommended, 'recommended', true /* required */);
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests

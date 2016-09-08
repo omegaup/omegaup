@@ -51,25 +51,22 @@ $(document).ready(function() {
 
     var contestLists = [
         // List Id, Active, Recommended.
-        ['#current-contests', 1, 0],
-        ['#recommended-current-contests', 1, 1],
-        ['#past-contests', 0, 0],
-        ['#recommended-past-contests', 0, 1],
+        ['#current-contests', 'ACTIVE', 'NOT_RECOMMENDED'],
+        ['#recommended-current-contests', 'ACTIVE', 'RECOMMENDED'],
+        ['#past-contests', 'PAST', 'NOT_RECOMMENDED'],
+        ['#recommended-past-contests', 'PAST', 'RECOMMENDED'],
     ];
-
-    // Closure to capture the value of i in the loop over contestLists.
-    function makeCallback(i) {
-        return function (data) {
-            populateContestList($(contestLists[i][0]),
-                                data.results,
-                                contestLists[i][1]);
-        }
-    }
 
     var requests = [];
     for (var i = 0, len = contestLists.length; i < len; i++) {
         requests.push(omegaup.getContests(
-            makeCallback(i),
+            (function(i) {
+                return function (data) {
+                    populateContestList($(contestLists[i][0]),
+                                        data.results,
+                                        contestLists[i][1]);
+                };
+            })(i),
             { 'active': contestLists[i][1],
               'recommended': contestLists[i][2],
               'page_size': 1000 }
