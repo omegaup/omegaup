@@ -3,18 +3,20 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title>{if isset($title)}{$title|escape} &ndash; {/if}omegaUp</title>
-		<script type="text/javascript" src="/js/jquery-1.10.2.js?ver=c5c648"></script>
-		<script type="text/javascript" src="/js/jquery.ba-hashchange.js?ver=8c26ca"></script>
-		<script type="text/javascript" src="/js/jquery.gritter.min.js?ver=333689"></script>
-		<script type="text/javascript" src="/js/jquery.tableSort.js?ver=f4ef14"></script>
-		<script type="text/javascript" src="/js/highstock.js?ver=6e7575"></script>
-		<script type="text/javascript" src="/js/sugar.js?ver=171bac"></script>
-		<script type="text/javascript" src="/js/knockout-4.3.0.js?ver=059d58"></script>
-		<script type="text/javascript" src="/js/knockout-secure-binding.min.js?ver=81a2a3"></script>
+		<script type="text/javascript" src="/js/third_party/jquery-1.10.2.js?ver=c5c648"></script>
+		<script type="text/javascript" src="/js/third_party/jquery.ba-hashchange.js?ver=8c26ca"></script>
+		<script type="text/javascript" src="/js/third_party/jquery.gritter.min.js?ver=333689"></script>
+		<script type="text/javascript" src="/js/third_party/jquery.tableSort.js?ver=f4ef14"></script>
+		<script type="text/javascript" src="/js/third_party/highstock.js?ver=6e7575"></script>
+		<script type="text/javascript" src="/js/third_party/sugar.js?ver=171bac"></script>
+		<script type="text/javascript" src="/js/third_party/knockout-4.3.0.js?ver=059d58"></script>
+		<script type="text/javascript" src="/js/third_party/knockout-secure-binding.min.js?ver=81a2a3"></script>
 
-		<script type="text/javascript" src="/js/omegaup.js?ver=1d3896"></script>
-		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=f0fb05,396746,75317a,a6cdb8"></script>
-		<script type="text/javascript" src="/ux/libarena.js?ver=94f0eb"></script>
+		<script type="text/javascript" src="/js/omegaup/omegaup.js?ver=5c773b"></script>
+		<script type="text/javascript" src="/js/omegaup/api.js?ver=9101ec"></script>
+		<script type="text/javascript" src="/js/omegaup/ui.js?ver=7f4a99"></script>
+		<script type="text/javascript" src="/js/omegaup/lang.{#locale#}.js?ver=f0fb05,396746,75317a,a6cdb8"></script>
+		<script type="text/javascript" src="/js/omegaup/arena/arena.js?ver=94f0eb"></script>
 
 		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>
@@ -27,18 +29,18 @@
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
-		<script src="/js/bootstrap.min.js?ver=176563"></script>
+		<script src="/js/third_party/bootstrap.min.js?ver=176563"></script>
 		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
 		<link rel="stylesheet" href="/css/bootstrap-select.min.css">
-		<script type="text/javascript" src="/js/bootstrap-select.min.js?ver=cf5db5"></script>
+		<script type="text/javascript" src="/js/third_party/bootstrap-select.min.js?ver=cf5db5"></script>
 		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
 		<link rel="stylesheet" href="/css/bootstrap-datepicker.css">
-		<script type="text/javascript" src="/js/bootstrap-datepicker.js?ver=bf3a56"></script>
+		<script type="text/javascript" src="/js/third_party/bootstrap-datepicker.js?ver=bf3a56"></script>
 		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
-		<script type="text/javascript" src="/js/typeahead.jquery.js?ver=2e4977"></script>
+		<script type="text/javascript" src="/js/third_party/typeahead.jquery.js?ver=2e4977"></script>
 		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
 		<link rel="stylesheet" href="/css/bootstrap-datetimepicker.css">
-		<script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js?ver=a0cafb"></script>
+		<script type="text/javascript" src="/js/third_party/bootstrap-datetimepicker.min.js?ver=a0cafb"></script>
 
 		<link rel="stylesheet" href="/css/jquery.gritter.css" />
 		<link rel="stylesheet" href="/css/common.css" />
