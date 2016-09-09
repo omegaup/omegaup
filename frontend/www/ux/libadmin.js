@@ -52,7 +52,7 @@ omegaup.arena.ArenaAdmin.prototype.setUpPagers = function() {
 					$('#clarification input').removeAttr('disabled');
 					return;
 				}
-				arena.hideOverlay();
+				self.arena.hideOverlay();
 				self.refreshClarifications();
 				$('#clarification input').removeAttr('disabled');
 			}

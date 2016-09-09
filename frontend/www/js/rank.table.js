@@ -11,7 +11,7 @@
 				for (a = 0; a < result.rank.length; a++) {
 					html += "<tr>"
 					+ "<td>" + result.rank[a].rank + "</td>"
-					+ "<td class=\"flagColumn\">" + getFlag(result.rank[a]['country_id']) + "</td>"
+					+ "<td class=\"flagColumn\">" + omegaup.UI.getFlag(result.rank[a]['country_id']) + "</td>"
 					+ "<td class=\"forcebreaks forcebreaks-top-5\">"
 					+ "<b><a href=/profile/" + result.rank[a].username + ">" + result.rank[a].username + "</a></b>"
 					+ "<br/>" + (result.rank[a].name == null ? "&nbsp;" : result.rank[a].name) + "</td>"

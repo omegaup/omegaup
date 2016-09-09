@@ -2210,6 +2210,13 @@ omegaup.UI = {
 			return time;
 	},
 
+	getFlag: function(country) {
+		if (!country) {
+			return '';
+		}
+		return ' <img src="/media/flags/' + country.toLowerCase() + '.png" width="16" height="11" title="' + country + '" />';
+	},
+
 	formatDateTime: function(date) {
 		return date.format("{MM}/{dd}/{yyyy} {HH}:{mm}");
 	},

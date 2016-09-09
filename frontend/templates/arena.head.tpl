@@ -12,9 +12,9 @@
 		<script type="text/javascript" src="/js/knockout-4.3.0.js?ver=059d58"></script>
 		<script type="text/javascript" src="/js/knockout-secure-binding.min.js?ver=81a2a3"></script>
 
-		<script type="text/javascript" src="/js/omegaup.js?ver=55f1b7"></script>
+		<script type="text/javascript" src="/js/omegaup.js?ver=1d3896"></script>
 		<script type="text/javascript" src="/js/lang.{#locale#}.js?ver=f0fb05,396746,75317a,a6cdb8"></script>
-		<script type="text/javascript" src="/ux/libarena.js?ver=a09dbc"></script>
+		<script type="text/javascript" src="/ux/libarena.js?ver=94f0eb"></script>
 
 		{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>

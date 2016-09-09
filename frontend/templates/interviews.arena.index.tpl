@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/js/interviews.arena.contest.js?ver=93b35c' inContest=false}
+{include file='arena.head.tpl' jsfile='/js/interviews.arena.contest.js?ver=5b55df' inContest=false}
 
 			<div id="title">
 				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>

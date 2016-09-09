@@ -95,7 +95,7 @@ omegaup.arena.Arena = function(options) {
 	// All runs in self contest/problem.
 	self.runs = new omegaup.arena.RunView(self);
 	self.myRuns = new omegaup.arena.RunView(self);
-	self.myRuns.filter_username(omegaup.API.username);
+	self.myRuns.filter_username(omegaup.OmegaUp.username);
 
 	// The guid of any run that is pending.
 	self.pendingRuns = {};
@@ -392,7 +392,7 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
 		var username = rank.username +
 			((rank.name == rank.username) ? '' : (' (' + omegaup.UI.escape(rank.name) + ')'));
 
-		$('.user', r).html(username + getFlag(rank['country']));
+		$('.user', r).html(username + omegaup.UI.getFlag(rank['country']));
 
 		currentRankingState[username] = {
 			place: rank.place,
@@ -440,7 +440,7 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
 			}
 
 			if (self.problems[alias]) {
-				if (rank.username == omegaup.API.username) {
+				if (rank.username == omegaup.OmegaUp.username) {
 					$('#problems .problem_' + alias + ' .solved')
 						.html("(" + problem.points + " / " + self.problems[alias].points + ")");
 				}
@@ -478,7 +478,7 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
 				.addClass('inserted');
 
 			$('.position', r).html(rank.place);
-			$('.user', r).html('<span title="' + username + '">' + rank.username + getFlag(rank['country']) +'</span>');
+			$('.user', r).html('<span title="' + username + '">' + rank.username + omegaup.UI.getFlag(rank['country']) +'</span>');
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
 
@@ -1118,7 +1118,7 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
 omegaup.arena.Arena.prototype.trackRun = function(run) {
 	var self = this;
 	self.runs.trackRun(run);
-	if (run.username == omegaup.API.username) {
+	if (run.username == omegaup.OmegaUp.username) {
 		self.myRuns.trackRun(run);
 	}
 };
@@ -1322,7 +1322,7 @@ omegaup.arena.ObservableRun.prototype.$contest_alias_url = function() {
 
 omegaup.arena.ObservableRun.prototype.$user_html = function() {
 	var self = this;
-	return omegaup.UI.getProfileLink(self.username()) + getFlag(self.country_id());
+	return omegaup.UI.getProfileLink(self.username()) + omegaup.UI.getFlag(self.country_id());
 };
 
 omegaup.arena.ObservableRun.prototype.$time_text = function() {

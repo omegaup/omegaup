@@ -94,7 +94,7 @@ $(document).ready(function() {
 				arena.problems[arena.currentProblem.alias].last_submission = omegaup.OmegaUp.time().getTime();
 			}
 
-			run.username = omegaup.API.username;
+			run.username = omegaup.OmegaUp.username;
 			run.status = 'new';
 			run.alias = arena.currentProblem.alias;
 			run.contest_score = null;

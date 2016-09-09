@@ -292,7 +292,7 @@ $('document').ready(function() {
 						.append($('<td></td>').append(
 							$('<a></a>')
 								.attr('href', '/profile/' + user.username + '/')
-								.text(user.username).append(getFlag(user['country_id']))
+								.text(user.username).append(omegaup.UI.getFlag(user['country_id']))
 						))
 						.append($('<td></td>').text(user.access_time))
 						.append($('<td><button type="button" class="close">&times;</button></td>')
