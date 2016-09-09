@@ -86,9 +86,12 @@ omegaup.OmegaUp = {
 };
 
 omegaup.API = {
-	_wrapDeferred: function(jqXHR) {
+	_wrapDeferred: function(jqXHR, transform) {
 		var dfd = $.Deferred();
 		jqXHR.done(function(data) {
+			if (transform) {
+				data = transform(data);
+			}
 			dfd.resolve(data);
 		}).fail(function(jqXHR) {
 			var errorData;
@@ -103,17 +106,17 @@ omegaup.API = {
 	},
 
 	currentSession: function() {
-		return omegaup.API._wrapDeferred($.get(
-			'/api/session/currentsession/',
-			'json'
-		));
+		return omegaup.API._wrapDeferred($.ajax({
+			url: '/api/session/currentsession/',
+			dataType: 'json'
+		}));
 	},
 
 	time: function() {
-		return omegaup.API._wrapDeferred($.get(
-			'/api/time/get/',
-			'json'
-		));
+		return omegaup.API._wrapDeferred($.ajax({
+			url: '/api/time/get/',
+			dataType: 'json'
+		}));
 	},
 
 	createUser: function(s_Email, s_Username, s_PlainPassword, s_ReCaptchaToken, callback) {
@@ -353,27 +356,18 @@ omegaup.API = {
 		});
 	},
 
-	getContests: function(callback, params) {
-		return $.get(
-			'/api/contest/list/',
-			params,
-			function (data) {
-				for (var idx in data.results) {
-					var contest = data.results[idx];
-					contest.start_time = omegaup.OmegaUp.time(contest.start_time * 1000);
-					contest.finish_time = omegaup.OmegaUp.time(contest.finish_time * 1000);
-				}
-				callback(data);
-			},
-			'json'
-		).fail(function (data) {
-			if (callback !== undefined) {
-				try {
-					callback(JSON.parse(data.responseText));
-				} catch (err) {
-					callback({status: 'error', error: err});
-				}
+	getContests: function(params) {
+		return omegaup.API._wrapDeferred($.ajax({
+			url: '/api/contest/list/',
+			data: params,
+			dataType: 'json',
+		}), function (result) {
+			for (var idx in result.results) {
+				var contest = result.results[idx];
+				contest.start_time = omegaup.OmegaUp.time(contest.start_time * 1000);
+				contest.finish_time = omegaup.OmegaUp.time(contest.finish_time * 1000);
 			}
+			return result;
 		});
 	},
 

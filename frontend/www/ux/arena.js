@@ -35,14 +35,14 @@ $(document).ready(function() {
 		for (var i = 0, len = list.length; i < len; i++) {
 			var contest = list[i];
 			target.append($(
-						'<tr>' +
-						'<td><a href="/arena/' + contest.alias + '">' +
-						omegaup.UI.escape(contest.title) + renderRecommended(contest)  + '</a></td>' +
-						'<td class="forcebreaks forcebreaks-arena">' +
-						omegaup.UI.escape(contest.description) + '</td>' +
-						renderTimes(contest, output_times) + '<td>' +
-						(!output_times ? '<a href="/arena/' + contest.alias + '/practice/">' + omegaup.T.wordsPractice + '</a>' : '') + '</td>' +
-						'</tr>'
+				'<tr>' +
+				'<td><a href="/arena/' + contest.alias + '">' +
+				omegaup.UI.escape(contest.title) + renderRecommended(contest)  + '</a></td>' +
+				'<td class="forcebreaks forcebreaks-arena">' +
+				omegaup.UI.escape(contest.description) + '</td>' +
+				renderTimes(contest, output_times) + '<td>' +
+				(!output_times ? '<a href="/arena/' + contest.alias + '/practice/">' + omegaup.T.wordsPractice + '</a>' : '') + '</td>' +
+				'</tr>'
 			));
 		}
 	}
@@ -57,20 +57,17 @@ $(document).ready(function() {
 
 	var requests = [];
 	for (var i = 0, len = contestLists.length; i < len; i++) {
-		requests.push(omegaup.API.getContests(
-			(function(i) {
-				return function (data) {
-					populateContestList($(contestLists[i][0]),
-							data.results,
-							contestLists[i][1]);
-				};
-			})(i),
-			{
-				'active': contestLists[i][1],
-				'recommended': contestLists[i][2],
-				'page_size': 1000
-			}
-		));
+		requests.push(omegaup.API.getContests({
+			active: contestLists[i][1],
+			recommended: contestLists[i][2],
+			page_size: 1000
+		}).then((function(i) {
+			return function (data) {
+				populateContestList($(contestLists[i][0]),
+						data.results,
+						contestLists[i][1]);
+			};
+		})(i)));
 	}
 
 	// Wait until all of the calls above finish before showing the contents.

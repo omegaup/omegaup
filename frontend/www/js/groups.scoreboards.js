@@ -8,7 +8,7 @@ $(function() {
 	var groupAlias = formData.attr('data-group-alias');
 
 	if (formPage === "edit") {
-		omegaup.API.getContests(function(contests) {
+		omegaup.API.getContests().then(function(contests) {
 			for (var i = 0; i < contests.results.length; i++) {
 				contest = contests.results[i];
 				$('#contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
