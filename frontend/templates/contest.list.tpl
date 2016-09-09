@@ -35,4 +35,4 @@
 		</tbody>
 	</table>
 </div>
-<script src="/js/contest.list.js?ver=f64013" type="text/javascript"></script>
+<script src="/js/contest.list.js?ver=416075" type="text/javascript"></script>

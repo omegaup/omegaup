@@ -1,15 +1,19 @@
 $('document').ready(function() {
-	omegaup.getContests(function(contests) {
+	omegaup.API.getContests().then(function(contests) {
 		// Got the contests, lets populate the dropdown with them
 		for (var i = 0; i < contests.results.length; i++) {
 			contest = contests.results[i];
-			$('select.contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
+			$('select.contests').append(
+				$('<option></option>')
+					.attr('value', contest.alias)
+					.text(contest.title)
+			);
 		}
 	});
 
 	$('#get-merged-scoreboard').click(function() {
 		contestAliases = $('select.contests option:selected').map(function(){ return this.value }).get();
-		omegaup.getScoreboardMerge(contestAliases, function(scoreboard) {
+		omegaup.API.getScoreboardMerge(contestAliases, function(scoreboard) {
 			var html = "<table class=\"merged-scoreboard\"><tr><td></td><td><b>Username</b></td>";
 
 			var contests = [];
@@ -18,7 +22,7 @@ $('document').ready(function() {
 				contests.push(alias);
 			}
 
-			html += '<td colspan="2"><b>' + OmegaUp.T['wordsTotal'] + '</b></td>';
+			html += '<td colspan="2"><b>' + omegaup.T['wordsTotal'] + '</b></td>';
 			html += "</tr>"
 
 				ranking = scoreboard["ranking"];

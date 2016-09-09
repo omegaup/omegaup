@@ -1,4 +1,4 @@
-OmegaUp.T = {
+omegaup.T = {
 	aboutToStart: "(Y0u ar3 ab0u7 70 57ar7 7h3 c0n7357. Onc3 y0u c1ick S7ar7 C0n7357 y0ur 7im3 wi11 b3gin.)",
 	adminAdded: "(Admin 5ucc355fu11y add3d.)",
 	aliasInUse: "(a1ia5 a1r3ady 3xi575. P13a53 ch0053 a diff3r3n7 a1ia5.)",

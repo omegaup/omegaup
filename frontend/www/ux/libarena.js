@@ -1,99 +1,30 @@
-function Arena() {
-	var self = this;
+omegaup.arena = omegaup.arena || {};
 
-	// The current contest.
-	this.currentContest = null;
+omegaup.arena.FormatDelta = function(delta) {
+	var days = Math.floor(delta / (24 * 60 * 60 * 1000));
+	delta -= days * (24 * 60 * 60 * 1000);
+	var hours = Math.floor(delta / (60 * 60 * 1000));
+	delta -= hours * (60 * 60 * 1000);
+	var minutes = Math.floor(delta / (60 * 1000));
+	delta -= minutes * (60 * 1000);
+	var seconds = Math.floor(delta / 1000);
 
-	// The interval for clock updates.
-	this.clockInterval = null;
+	var clock = "";
 
-	// The start time of the contest.
-	this.startTime = null;
-
-	// The finish time of the contest.
-	this.finishTime = null;
-
-	// The deadline for submissions. This might be different from the end time.
-	this.submissionDeadline = null;
-
-	// All runs in this contest/problem.
-	this.runs = new Arena.RunView(this);
-	this.myRuns = new Arena.RunView(this);
-	this.myRuns.filter_username(omegaup.username);
-
-	// The guid of any run that is pending.
-	this.pendingRuns = {};
-
-	// The set of problems in this contest.
-	this.problems = {};
-
-	// WebSocket for real-time updates.
-	this.socket = null;
-
-	// The offset of each user into the ranking table.
-	this.currentRanking = {};
-
-	// The previous ranking information. Useful to show diffs.
-	this.prevRankingState = null;
-
-	// Every time a recent event is shown, have this interval clear it after 30s.
-	this.removeRecentEventClassTimeout = null;
-
-	// The last known scoreboard event stream.
-	this.currentEvents = null;
-
-	// Currently opened notifications.
-	this.currentNotifications = {count: 0, timer: null};
-
-	// Currently opened problem.
-	this.currentProblem = null;
-
-	// Whether the current contest is in practice mode.
-	this.practice = window.location.pathname.indexOf('/practice') !== -1;
-
-	// Whether this is a full contest or only a problem.
-	this.onlyProblem = window.location.pathname.indexOf('/problem/') !== -1;
-
-	// Whether this is a scoreboard-only view.
-	this.onlyScoreboard = window.location.pathname.indexOf('/scoreboard/') !== -1;
-
-	// Whether the current contest is in interview mode.
-	this.interview = window.location.pathname.indexOf('/interview') !== -1;
-
-	if (this.interview) {
-		this.contestAlias = /\/interview\/([^\/]+)\/?/.exec(window.location.pathname)[1];
-	} else {
-		this.contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+	if (days > 0) {
+		clock += days + ":";
 	}
+	if (hours < 10) clock += "0";
+	clock += hours + ":";
+	if (minutes < 10) clock += "0";
+	clock += minutes + ":";
+	if (seconds < 10) clock += "0";
+	clock += seconds;
 
-	// The token for standalone scoreboards.
-	this.scoreboardToken = null;
-
-	// If websockets are enabled.
-	this.enableSockets = window.location.search.indexOf('ws=off') === -1;
-
-	// If we have admin powers in this contest.
-	this.contestAdmin = false;
-	this.answeredClarifications = 0;
-	this.clarificationsOffset = 0;
-	this.clarificationsRowcount = 20;
-	this.activeTab = 'problems';
-	this.clarifications = {};
-	this.submissionGap = 0;
-
-	// If lockdown mode is active.
-	this.lockdown = $('body').hasClass('lockdown');
-
-	// Setup any global hooks.
-	this.installLibinteractiveHooks();
-
-	var options = {
-		attribute: "data-bind"        // default "data-sbind"
-	};
-	ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
+	return clock;
 };
 
-Arena.scoreboardColors = [
+omegaup.arena.ScoreboardColors = [
 	'#FB3F51',
 	'#FF5D40',
 	'#FFA240',
@@ -106,7 +37,113 @@ Arena.scoreboardColors = [
 	'#CD35D3',
 ];
 
-Arena.prototype.installLibinteractiveHooks = function() {
+omegaup.arena.GetOptionsFromLocation = function(arenaLocation) {
+	var options = {
+		isLockdownMode: false,
+		isPractice: false,
+		isOnlyProblem: false,
+		disableClarifications: false,
+		disableSockets: false,
+		contestAlias: null,
+		scoreboardToken: null
+	};
+
+	if ($('body').hasClass('lockdown')) {
+		options.isLockdownMode = true;
+	}
+
+	if (arenaLocation.pathname.indexOf('/practice') !== -1) {
+		options.isPractice = true;
+	}
+
+	if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
+		options.isOnlyProblem = true;
+		options.onlyProblemAlias =
+			/\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
+	} else {
+		options.contestAlias =
+			/\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname)[1];
+	}
+
+	if (arenaLocation.search.indexOf('ws=off') !== -1) {
+		options.disableSockets = true;
+	}
+
+	return options;
+};
+
+omegaup.arena.Arena = function(options) {
+	var self = this;
+
+	self.options = options;
+
+	// The current contest.
+	self.currentContest = null;
+
+	// The interval for clock updates.
+	self.clockInterval = null;
+
+	// The start time of the contest.
+	self.startTime = null;
+
+	// The finish time of the contest.
+	self.finishTime = null;
+
+	// The deadline for submissions. self might be different from the end time.
+	self.submissionDeadline = null;
+
+	// All runs in self contest/problem.
+	self.runs = new omegaup.arena.RunView(self);
+	self.myRuns = new omegaup.arena.RunView(self);
+	self.myRuns.filter_username(omegaup.OmegaUp.username);
+
+	// The guid of any run that is pending.
+	self.pendingRuns = {};
+
+	// The set of problems in self contest.
+	self.problems = {};
+
+	// WebSocket for real-time updates.
+	self.socket = null;
+
+	// The offset of each user into the ranking table.
+	self.currentRanking = {};
+
+	// The previous ranking information. Useful to show diffs.
+	self.prevRankingState = null;
+
+	// Every time a recent event is shown, have self interval clear it after 30s.
+	self.removeRecentEventClassTimeout = null;
+
+	// The last known scoreboard event stream.
+	self.currentEvents = null;
+
+	// Currently opened notifications.
+	self.currentNotifications = {count: 0, timer: null};
+
+	// Currently opened problem.
+	self.currentProblem = null;
+
+	// If we have admin powers in self contest.
+	self.contestAdmin = false;
+	self.answeredClarifications = 0;
+	self.clarificationsOffset = 0;
+	self.clarificationsRowcount = 20;
+	self.activeTab = 'problems';
+	self.clarifications = {};
+	self.submissionGap = 0;
+
+	// Setup any global hooks.
+	self.installLibinteractiveHooks();
+
+	var options = {
+		attribute: "data-bind"        // default "data-sbind"
+	};
+	ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
+};
+
+omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
+	var self = this;
 	$('#libinteractive-download').submit(function(e) {
 		var form = $(e.target);
 		var alias = e.target.attributes['data-alias'].value;
@@ -114,10 +151,9 @@ Arena.prototype.installLibinteractiveHooks = function() {
 		var lang = form.find('.download-lang').val();
 		var extension = (os == 'unix' ? '.tar.bz2' : '.zip');
 
-		var new_location = (
+		omegaup.UI.navigateTo(
 			window.location.protocol + '//' + window.location.host + '/templates/' +
 			alias + '/' + alias + '_' + os + '_' + lang + extension);
-		window.location = new_location;
 
 		return false;
 	});
@@ -128,9 +164,9 @@ Arena.prototype.installLibinteractiveHooks = function() {
 	});
 }
 
-Arena.prototype.connectSocket = function() {
+omegaup.arena.Arena.prototype.connectSocket = function() {
 	var self = this;
-	if (self.practice || !self.enableSockets || self.contestAlias == 'admin') {
+	if (self.options.isPractice || self.options.disableSockets || self.options.contestAlias == 'admin') {
 		return false;
 	}
 
@@ -140,9 +176,9 @@ Arena.prototype.connectSocket = function() {
 	} else {
 		uri = "ws:";
 	}
-	uri += "//" + window.location.host + "/api/contest/events/" + self.contestAlias + "/";
-	if (self.scoreboardToken) {
-		uri += "?token=" + self.scoreboardToken;
+	uri += "//" + window.location.host + "/api/contest/events/" + self.options.contestAlias + "/";
+	if (self.options.scoreboardToken) {
+		uri += "?token=" + self.options.scoreboardToken;
 	}
 
 	try {
@@ -153,11 +189,11 @@ Arena.prototype.connectSocket = function() {
 			var data = JSON.parse(message.data);
 
 			if (data.message == "/run/update/") {
-				data.run.time = omegaup.time(data.run.time * 1000);
+				data.run.time = omegaup.OmegaUp.time(data.run.time * 1000);
 				self.updateRun(data.run);
 			} else if (data.message == "/clarification/update/") {
-				if (!self.onlyScoreboard) {
-					data.clarification.time = omegaup.time(data.clarification.time * 1000);
+				if (self.options.disableClarifications) {
+					data.clarification.time = omegaup.OmegaUp.time(data.clarification.time * 1000);
 					self.updateClarification(data.clarification);
 				}
 			} else if (data.message == '/scoreboard/update/') {
@@ -192,15 +228,15 @@ Arena.prototype.connectSocket = function() {
 	}
 };
 
-Arena.prototype.setupPolls = function() {
+omegaup.arena.Arena.prototype.setupPolls = function() {
 	var self = this;
 
-	omegaup.getRanking(
-		self.contestAlias,
+	omegaup.API.getRanking(
+		self.options.contestAlias,
 		self.rankingChange.bind(self)
 	);
-	omegaup.getClarifications(
-		self.contestAlias,
+	omegaup.API.getClarifications(
+		self.options.contestAlias,
 		self.clarificationsOffset,
 		self.clarificationsRowcount,
 		self.clarificationsChange.bind(self)
@@ -209,34 +245,36 @@ Arena.prototype.setupPolls = function() {
 	if (!self.socket) {
 		self.clarificationInterval = setInterval(function() {
 			self.clarificationsOffset = 0; // Return pagination to start on refresh
-			omegaup.getClarifications(
-				self.contestAlias,
+			omegaup.API.getClarifications(
+				self.options.contestAlias,
 				self.clarificationsOffset,
 				self.clarificationsRowcount,
 				self.clarificationsChange.bind(self));
 		}, 5 * 60 * 1000);
 
 		self.rankingInterval = setInterval(function() {
-			omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
+			omegaup.API.getRanking(self.options.contestAlias, self.rankingChange.bind(self));
 		}, 5 * 60 * 1000);
 	}
 };
 
-Arena.prototype.initClock = function(start, finish, deadline) {
-	this.startTime = start;
-	this.finishTime = finish;
-	if (this.practice) {
+omegaup.arena.Arena.prototype.initClock = function(start, finish, deadline) {
+	var self = this;
+
+	self.startTime = start;
+	self.finishTime = finish;
+	if (self.options.isPractice) {
 		$('#title .clock').html('&infin;');
 		return;
 	}
-	if (deadline) this.submissionDeadline = deadline;
-	if (!this.clockInterval) {
-		this.updateClock();
-		this.clockInterval = setInterval(this.updateClock.bind(this), 1000);
+	if (deadline) self.submissionDeadline = deadline;
+	if (!self.clockInterval) {
+		self.updateClock();
+		self.clockInterval = setInterval(self.updateClock.bind(self), 1000);
 	}
 };
 
-Arena.prototype.initProblems = function(contest) {
+omegaup.arena.Arena.prototype.initProblems = function(contest) {
 	var self = this;
 	self.currentContest = contest;
 	self.contestAdmin = contest.admin;
@@ -255,46 +293,47 @@ Arena.prototype.initProblems = function(contest) {
 	$('#ranking-table tbody.user-list-template .penalty').remove();
 };
 
-Arena.prototype.updateClock = function() {
-	var countdownTime = this.submissionDeadline || this.finishTime;
-	if (this.startTime === null || countdownTime === null) {
+omegaup.arena.Arena.prototype.updateClock = function() {
+	var self = this;
+	var countdownTime = self.submissionDeadline || self.finishTime;
+	if (self.startTime === null || countdownTime === null) {
 		return;
 	}
 
-	var date = omegaup.time().getTime();
+	var date = omegaup.OmegaUp.time().getTime();
 	var clock = "";
 
-	if (date < this.startTime.getTime()) {
-		clock = "-" + Arena.formatDelta(this.startTime.getTime() - (date + omegaup.deltaTime));
+	if (date < self.startTime.getTime()) {
+		clock = "-" + omegaup.arena.FormatDelta(self.startTime.getTime() - (date + omegaup.OmegaUp._deltaTime));
 	} else if (date > countdownTime.getTime()) {
-		// Contest for this user is over
+		// Contest for self user is over
 		clock = "00:00:00";
-		clearInterval(this.clockInterval);
-		this.clockInterval = null;
+		clearInterval(self.clockInterval);
+		self.clockInterval = null;
 
 		// Show go-to-practice-mode messages on contest end
-		if (date > this.finishTime.getTime()) {
-			OmegaUp.ui.warning('<a href="/arena/' + this.contestAlias + '/practice/">' + OmegaUp.T.arenaContestEndedUsePractice + '</a>');
+		if (date > self.finishTime.getTime()) {
+			omegaup.UI.warning('<a href="/arena/' + self.options.contestAlias + '/practice/">' + omegaup.T.arenaContestEndedUsePractice + '</a>');
 			$('#new-run').hide();
 			$('#new-run-practice-msg').show();
-			$('#new-run-practice-msg a').prop('href', '/arena/' + this.contestAlias + '/practice/');
+			$('#new-run-practice-msg a').prop('href', '/arena/' + self.options.contestAlias + '/practice/');
 		}
 	} else {
-		clock = Arena.formatDelta(countdownTime.getTime() - (date + omegaup.deltaTime));
+		clock = omegaup.arena.FormatDelta(countdownTime.getTime() - (date + omegaup.OmegaUp._deltaTime));
 	}
 
 	$('#title .clock').html(clock);
 };
 
-Arena.prototype.updateRunFallback = function(guid) {
+omegaup.arena.Arena.prototype.updateRunFallback = function(guid) {
 	var self = this;
 	if (self.socket != null) return;
 	setTimeout(function() {
-		omegaup.runStatus(guid, self.updateRun.bind(self));
+		omegaup.API.runStatus(guid, self.updateRun.bind(self));
 	}, 5000);
 }
 
-Arena.prototype.updateRun = function(run) {
+omegaup.arena.Arena.prototype.updateRun = function(run) {
 	var self = this;
 
 	self.trackRun(run);
@@ -302,25 +341,25 @@ Arena.prototype.updateRun = function(run) {
 	if (self.socket != null) return;
 
 	if (run.status == 'ready') {
-		if (!self.practice && !self.onlyProblem && self.contestAlias != 'admin') {
-			omegaup.getRanking(self.contestAlias, self.rankingChange.bind(self));
+		if (!self.options.isPractice && !self.options.isOnlyProblem && self.options.contestAlias != 'admin') {
+			omegaup.API.getRanking(self.options.contestAlias, self.rankingChange.bind(self));
 		}
 	} else {
 		self.updateRunFallback(run.guid);
 	}
 };
 
-Arena.prototype.rankingChange = function(data) {
+omegaup.arena.Arena.prototype.rankingChange = function(data) {
 	var self = this;
 	self.onRankingChanged(data);
-	if (self.scoreboardToken) {
-		omegaup.getRankingEventsByToken(self.contestAlias, self.scoreboardToken, self.onRankingEvents.bind(self));
+	if (self.options.scoreboardToken) {
+		omegaup.API.getRankingEventsByToken(self.options.contestAlias, self.options.scoreboardToken, self.onRankingEvents.bind(self));
 	} else {
-		omegaup.getRankingEvents(self.contestAlias, self.onRankingEvents.bind(self));
+		omegaup.API.getRankingEvents(self.options.contestAlias, self.onRankingEvents.bind(self));
 	}
 }
 
-Arena.prototype.onRankingChanged = function(data) {
+omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
 	var self = this;
 	$('#mini-ranking tbody.inserted').remove();
 	$('#ranking-table tbody.inserted').remove();
@@ -351,9 +390,9 @@ Arena.prototype.onRankingChanged = function(data) {
 			.addClass('rank-new');
 
 		var username = rank.username +
-			((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
+			((rank.name == rank.username) ? '' : (' (' + omegaup.UI.escape(rank.name) + ')'));
 
-		$('.user', r).html(username + getFlag(rank['country']));
+		$('.user', r).html(username + omegaup.UI.getFlag(rank['country']));
 
 		currentRankingState[username] = {
 			place: rank.place,
@@ -401,7 +440,7 @@ Arena.prototype.onRankingChanged = function(data) {
 			}
 
 			if (self.problems[alias]) {
-				if (rank.username == omegaup.username) {
+				if (rank.username == omegaup.OmegaUp.username) {
 					$('#problems .problem_' + alias + ' .solved')
 						.html("(" + problem.points + " / " + self.problems[alias].points + ")");
 				}
@@ -439,7 +478,7 @@ Arena.prototype.onRankingChanged = function(data) {
 				.addClass('inserted');
 
 			$('.position', r).html(rank.place);
-			$('.user', r).html('<span title="' + username + '">' + rank.username + getFlag(rank['country']) +'</span>');
+			$('.user', r).html('<span title="' + username + '">' + rank.username + omegaup.UI.getFlag(rank['country']) +'</span>');
 			$('.points', r).html(rank.total.points);
 			$('.penalty', r).html(rank.total.penalty);
 
@@ -448,7 +487,7 @@ Arena.prototype.onRankingChanged = function(data) {
 	}
 
 	if (data.time) {
-		$('#ranking .footer').html(omegaup.time(data.time));
+		$('#ranking .footer').html(omegaup.OmegaUp.time(data.time));
 	}
 
 	this.currentRanking = newRanking;
@@ -458,7 +497,7 @@ Arena.prototype.onRankingChanged = function(data) {
 	}, 30000);
 };
 
-Arena.prototype.onRankingEvents = function(data) {
+omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
 	var dataInSeries = {};
 	var navigatorData = [[this.startTime.getTime(), 0]];
 	var series = [];
@@ -470,7 +509,7 @@ Arena.prototype.onRankingEvents = function(data) {
 		var curr = data.events[i];
 
 		// limit chart to top n users
-		if (this.currentRanking[curr.username] > Arena.scoreboardColors.length - 1) continue;
+		if (this.currentRanking[curr.username] > omegaup.arena.ScoreboardColors.length - 1) continue;
 
 		if (!dataInSeries[curr.name]) {
 				dataInSeries[curr.name] = [[this.startTime.getTime(), 0]];
@@ -517,11 +556,11 @@ Arena.prototype.onRankingEvents = function(data) {
 	this.createChart(series, navigatorData);
 };
 
-Arena.prototype.createChart = function(series, navigatorSeries) {
+omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
 	if (series.length == 0) return;
 
 	Highcharts.setOptions({
-		colors: Arena.scoreboardColors
+		colors: omegaup.arena.ScoreboardColors
 	});
 
 	window.chart = new Highcharts.StockChart({
@@ -589,14 +628,14 @@ Arena.prototype.createChart = function(series, navigatorSeries) {
 	var rows = $('#ranking-table tbody.inserted tr');
 	for (var r = 0; r < rows.length; r++) {
 		$('.legend', rows[r]).css({
-			'background-color': (r < Arena.scoreboardColors.length) ?
-				Arena.scoreboardColors[r] :
+			'background-color': (r < omegaup.arena.ScoreboardColors.length) ?
+				omegaup.arena.ScoreboardColors[r] :
 				'transparent'
 		});
 	}
 };
 
-Arena.prototype.flashTitle = function(reset) {
+omegaup.arena.Arena.prototype.flashTitle = function(reset) {
 	if (document.title.indexOf("!") === 0) {
 		document.title = document.title.substring(2);
 	} else if (!reset) {
@@ -604,7 +643,7 @@ Arena.prototype.flashTitle = function(reset) {
 	}
 };
 
-Arena.prototype.notify = function(title, message, element, id, modificationTime) {
+omegaup.arena.Arena.prototype.notify = function(title, message, element, id, modificationTime) {
 	var self = this;
 
 	var lastModified = parseInt(
@@ -648,7 +687,7 @@ Arena.prototype.notify = function(title, message, element, id, modificationTime)
 	if (audio != null) audio.play();
 };
 
-Arena.prototype.updateClarification = function(clarification) {
+omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
 	var self = this;
 	var r = null;
 	if (self.clarifications[clarification.clarification_id]) {
@@ -666,7 +705,7 @@ Arena.prototype.updateClarification = function(clarification) {
 					$('#create-response-is-public', responseFormNode).attr('checked', 'checked');
 				}
 				responseFormNode.submit(function () {
-					omegaup.updateClarification(
+					omegaup.API.updateClarification(
 						id,
 						$('#create-response-text', this).val(),
 						$('#create-response-is-public', this)[0].checked,
@@ -685,8 +724,8 @@ Arena.prototype.updateClarification = function(clarification) {
 	$('.problem', r).html(clarification.problem_alias);
 	if (self.contestAdmin) $('.author', r).html(clarification.author);
 	$('.time', r).html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', clarification.time.getTime()));
-	$('.message', r).html(omegaup.escape(clarification.message));
-	$('.answer pre', r).html(omegaup.escape(clarification.answer));
+	$('.message', r).html(omegaup.UI.escape(clarification.message));
+	$('.answer pre', r).html(omegaup.UI.escape(clarification.answer));
 	if (clarification.answer) {
 		self.answeredClarifications++;
 	}
@@ -694,8 +733,8 @@ Arena.prototype.updateClarification = function(clarification) {
 	if (self.contestAdmin != !!clarification.answer) {
 		self.notify(
 			(clarification.author ? clarification.author + " - " : '') + clarification.problem_alias,
-			omegaup.escape(clarification.message) +
-				(clarification.answer ? ('<hr/>' + omegaup.escape(clarification.answer)) : ''),
+			omegaup.UI.escape(clarification.message) +
+				(clarification.answer ? ('<hr/>' + omegaup.UI.escape(clarification.answer)) : ''),
 			r[0],
 			'clarification-' + clarification.clarification_id,
 			clarification.time.getTime()
@@ -708,7 +747,7 @@ Arena.prototype.updateClarification = function(clarification) {
 	}
 };
 
-Arena.prototype.clarificationsChange = function(data) {
+omegaup.arena.Arena.prototype.clarificationsChange = function(data) {
 	var self = this;
 	$('.clarifications tr.inserted').remove();
 	if (data.clarifications.length > 0 && data.clarifications.length < self.clarificationsRowcount) {
@@ -730,7 +769,7 @@ Arena.prototype.clarificationsChange = function(data) {
 	}
 };
 
-Arena.prototype.onHashChanged = function() {
+omegaup.arena.Arena.prototype.onHashChanged = function() {
 	var self = this;
 	var tabChanged = false;
 	var foundHash = false;
@@ -762,7 +801,7 @@ Arena.prototype.onHashChanged = function() {
 		function update(problem) {
 			$('#summary').hide();
 			$('#problem').show();
-			$('#problem > .title').html(problem.letter + '. ' + omegaup.escape(problem.title));
+			$('#problem > .title').html(problem.letter + '. ' + omegaup.UI.escape(problem.title));
 			$('#problem .data .points').html(problem.points);
 			$('#problem .memory_limit').html(problem.memory_limit / 1024 + "MB");
 			$('#problem .time_limit').html(problem.time_limit / 1000 + "s");
@@ -790,14 +829,14 @@ Arena.prototype.onHashChanged = function() {
 				$('#problem .karel-js-link').addClass('hide');
 			}
 			if (problem.source) {
-				$('#problem .source span').html(omegaup.escape(problem.source));
+				$('#problem .source span').html(omegaup.UI.escape(problem.source));
 				$('#problem .source').show();
 			} else {
 				$('#problem .source').hide();
 			}
 			if (problem.problemsetter) {
 				$('#problem .problemsetter a')
-					.html(omegaup.escape(problem.problemsetter.name))
+					.html(omegaup.UI.escape(problem.problemsetter.name))
 					.attr('href', '/profile/' + problem.problemsetter.username + '/');
 				$('#problem .problemsetter').show();
 			} else {
@@ -825,8 +864,8 @@ Arena.prototype.onHashChanged = function() {
 				self.myRuns.filter_problem(problem.alias);
 			}
 
-			if (self.practice || self.onlyProblem) {
-				omegaup.getProblemRuns(problem.alias, {}, function(data) {
+			if (self.options.isPractice || self.options.isOnlyProblem) {
+				omegaup.API.getProblemRuns(problem.alias, {}, function(data) {
 					updateRuns(data.runs);
 				});
 			} else {
@@ -839,7 +878,7 @@ Arena.prototype.onHashChanged = function() {
 		if (problem.problem_statement) {
 			update(problem);
 		} else {
-			omegaup.getProblem(self.contestAlias, problem.alias, function (problem_ext) {
+			omegaup.API.getProblem(self.options.contestAlias, problem.alias, function (problem_ext) {
 				problem.source = problem_ext.source;
 				problem.problemsetter = problem_ext.problemsetter;
 				problem.problem_statement = problem_ext.problem_statement;
@@ -886,25 +925,25 @@ Arena.prototype.onHashChanged = function() {
 	}
 };
 
-Arena.prototype.detectShowRun = function() {
+omegaup.arena.Arena.prototype.detectShowRun = function() {
 	var self = this;
 	var showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
 	var showRunMatch = window.location.hash.match(showRunRegex);
 	if (showRunMatch) {
 		$('#overlay form').hide();
 		$('#overlay').show();
-		omegaup.runDetails(showRunMatch[1], function(data) {
+		omegaup.API.runDetails(showRunMatch[1], function(data) {
 			self.displayRunDetails(showRunMatch[1], data);
 		});
 	}
 };
 
-Arena.prototype.hideOverlay = function() {
+omegaup.arena.Arena.prototype.hideOverlay = function() {
 	$('#overlay').hide();
 	window.location.hash = window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
 };
 
-Arena.prototype.displayRunDetails = function(guid, data) {
+omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
 	var self = this;
 	var problemAdmin = data.admin;
 
@@ -914,32 +953,32 @@ Arena.prototype.displayRunDetails = function(guid, data) {
 	}
 
 	if (data.compile_error) {
-		$('#run-details .compile_error pre').html(omegaup.escape(data.compile_error));
+		$('#run-details .compile_error pre').html(omegaup.UI.escape(data.compile_error));
 		$('#run-details .compile_error').show();
 	} else {
 		$('#run-details .compile_error').hide();
 		$('#run-details .compile_error pre').html('');
 	}
 	if (data.logs) {
-		$('#run-details .logs pre').html(omegaup.escape(data.logs));
+		$('#run-details .logs pre').html(omegaup.UI.escape(data.logs));
 		$('#run-details .logs').show();
 	} else {
 		$('#run-details .logs').hide();
 		$('#run-details .logs pre').html('');
 	}
 	if (data.source.indexOf('data:') === 0) {
-		$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">' + OmegaUp.T['wordsDownload'] + '</a>');
+		$('#run-details .source').html('<a href="' + data.source + '" download="data.zip">' + omegaup.T['wordsDownload'] + '</a>');
 	} else if (data.source == 'lockdownDetailsDisabled') {
 		$('#run-details .source').html(
-				omegaup.escape((typeof(sessionStorage) !== 'undefined' &&
+				omegaup.UI.escape((typeof(sessionStorage) !== 'undefined' &&
 				 sessionStorage.getItem('run:' + guid)) ||
-				OmegaUp.T['lockdownDetailsDisabled']));
+				omegaup.T['lockdownDetailsDisabled']));
 	} else {
-		$('#run-details .source').html(omegaup.escape(data.source));
+		$('#run-details .source').html(omegaup.UI.escape(data.source));
 	}
 
 	if (data.judged_by) {
-		$('#run-details .judged_by pre').html(omegaup.escape(data.judged_by));
+		$('#run-details .judged_by pre').html(omegaup.UI.escape(data.judged_by));
 		$('#run-details .judged_by').show();
 	} else {
 		$('#run-details .judged_by').hide();
@@ -993,10 +1032,10 @@ Arena.prototype.displayRunDetails = function(guid, data) {
 				$('<thead></thead>')
 					.append(
 						$('<tr></tr>')
-							.append('<th>' + OmegaUp.T['wordsGroup'] + '</th>')
-							.append('<th>' + OmegaUp.T['wordsCase'] + '</th>')
-							.append('<th>' + OmegaUp.T['wordsVerdict'] + '</th>')
-							.append('<th colspan="3">' + OmegaUp.T['rankScore'] + '</th>')
+							.append('<th>' + omegaup.T['wordsGroup'] + '</th>')
+							.append('<th>' + omegaup.T['wordsCase'] + '</th>')
+							.append('<th>' + omegaup.T['wordsVerdict'] + '</th>')
+							.append('<th colspan="3">' + omegaup.T['rankScore'] + '</th>')
 							.append('<th width="1"></th>')
 					)
 			);
@@ -1008,7 +1047,7 @@ Arena.prototype.displayRunDetails = function(guid, data) {
 				$('<tbody></tbody>')
 					.append(
 						$('<tr class="group"></tr>')
-							.append('<th class="center">' + omegaup.escape(g.group) + '</th>')
+							.append('<th class="center">' + omegaup.UI.escape(g.group) + '</th>')
 							.append('<th colspan="2"></th>')
 							.append('<th class="score">' + g.score + '</th>')
 							.append('<th class="center" width="10">' + (g.max_score !== undefined ? '/' : '') + '</th>')
@@ -1040,7 +1079,7 @@ Arena.prototype.displayRunDetails = function(guid, data) {
 				var caseRow = $('<tr></tr>')
 					.append('<td></td>')
 					.append('<td class="center">' + c.name + '</td>')
-					.append('<td class="center">' + OmegaUp.T['verdict' + c.verdict] + '</td>')
+					.append('<td class="center">' + omegaup.T['verdict' + c.verdict] + '</td>')
 					.append('<td class="score">' + c.score + '</td>')
 					.append('<td class="center" width="10">' + (c.max_score !== undefined ? '/' : '') + '</td>')
 					.append('<td>' + (c.max_score !== undefined ? c.max_score : '') + '</td>')
@@ -1076,39 +1115,15 @@ Arena.prototype.displayRunDetails = function(guid, data) {
 	$('#run-details').show();
 };
 
-Arena.prototype.trackRun = function(run) {
+omegaup.arena.Arena.prototype.trackRun = function(run) {
 	var self = this;
 	self.runs.trackRun(run);
-	if (run.username == omegaup.username) {
+	if (run.username == omegaup.OmegaUp.username) {
 		self.myRuns.trackRun(run);
 	}
 };
 
-Arena.formatDelta = function(delta) {
-	var days = Math.floor(delta / (24 * 60 * 60 * 1000));
-	delta -= days * (24 * 60 * 60 * 1000);
-	var hours = Math.floor(delta / (60 * 60 * 1000));
-	delta -= hours * (60 * 60 * 1000);
-	var minutes = Math.floor(delta / (60 * 1000));
-	delta -= minutes * (60 * 1000);
-	var seconds = Math.floor(delta / 1000);
-
-	var clock = "";
-
-	if (days > 0) {
-		clock += days + ":";
-	}
-	if (hours < 10) clock += "0";
-	clock += hours + ":";
-	if (minutes < 10) clock += "0";
-	clock += minutes + ":";
-	if (seconds < 10) clock += "0";
-	clock += seconds;
-
-	return clock;
-};
-
-Arena.RunView = function(arena) {
+omegaup.arena.RunView = function(arena) {
 	var self = this;
 
 	self.arena = arena;
@@ -1168,7 +1183,7 @@ Arena.RunView = function(arena) {
 	self.attached = false;
 };
 
-Arena.RunView.prototype.attach = function(elm) {
+omegaup.arena.RunView.prototype.attach = function(elm) {
 	var self = this;
 
 	$('.runspager .runspagerprev', elm).click(function () {
@@ -1187,7 +1202,7 @@ Arena.RunView.prototype.attach = function(elm) {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.typeaheadWrapper(omegaup.searchUsers.bind(omegaup)),
+		source: omegaup.UI.typeaheadWrapper(omegaup.API.searchUsers),
 		displayKey: 'label',
 	}).on('typeahead:selected', function(elm, item) {
 		self.filter_username(item.value);
@@ -1202,8 +1217,8 @@ Arena.RunView.prototype.attach = function(elm) {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.typeaheadWrapper(function (query, cb) {
-			omegaup.searchProblems(query, function (data) {
+		source: omegaup.UI.typeaheadWrapper(function (query, cb) {
+			omegaup.API.searchProblems(query, function (data) {
 				cb(data.results);
 			});
 		}),
@@ -1226,25 +1241,25 @@ Arena.RunView.prototype.attach = function(elm) {
 	self.attached = true;
 };
 
-Arena.RunView.prototype.trackRun = function(run) {
+omegaup.arena.RunView.prototype.trackRun = function(run) {
 	var self = this;
 
 	if (!self.observableRunsIndex[run.guid]) {
-		self.observableRunsIndex[run.guid] = new Arena.ObservableRun(self.arena, run);
+		self.observableRunsIndex[run.guid] = new omegaup.arena.ObservableRun(self.arena, run);
 		self.runs.push(self.observableRunsIndex[run.guid]);
 	} else {
 		self.observableRunsIndex[run.guid].update(run);
 	}
 };
 
-Arena.RunView.prototype.clear = function(run) {
+omegaup.arena.RunView.prototype.clear = function(run) {
 	var self = this;
 
 	self.runs.removeAll();
 	self.observableRunsIndex = {};
 };
 
-Arena.ObservableRun = function(arena, run) {
+omegaup.arena.ObservableRun = function(arena, run) {
 	var self = this;
 
 	self.arena = arena;
@@ -1281,7 +1296,7 @@ Arena.ObservableRun = function(arena, run) {
 	self.contest_alias_url = ko.pureComputed(self.$contest_alias_url, self);
 };
 
-Arena.ObservableRun.prototype.update = function(run) {
+omegaup.arena.ObservableRun.prototype.update = function(run) {
 	var self = this;
 	for (var p in run) {
 		if (!run.hasOwnProperty(p) ||
@@ -1295,27 +1310,27 @@ Arena.ObservableRun.prototype.update = function(run) {
 	}
 };
 
-Arena.ObservableRun.prototype.$problem_url = function() {
+omegaup.arena.ObservableRun.prototype.$problem_url = function() {
 	var self = this;
 	return "/arena/problem/" + self.alias() + "/";
 };
 
-Arena.ObservableRun.prototype.$contest_alias_url = function() {
+omegaup.arena.ObservableRun.prototype.$contest_alias_url = function() {
 	var self = this;
 	return (self.contest_alias() === null) ? "" : "/arena/" + self.contest_alias() + "/";
 };
 
-Arena.ObservableRun.prototype.$user_html = function() {
+omegaup.arena.ObservableRun.prototype.$user_html = function() {
 	var self = this;
-	return getProfileLink(self.username()) + getFlag(self.country_id());
+	return omegaup.UI.getProfileLink(self.username()) + omegaup.UI.getFlag(self.country_id());
 };
 
-Arena.ObservableRun.prototype.$time_text = function() {
+omegaup.arena.ObservableRun.prototype.$time_text = function() {
 	var self = this;
 	return Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', self.time().getTime());
 };
 
-Arena.ObservableRun.prototype.$runtime_text = function() {
+omegaup.arena.ObservableRun.prototype.$runtime_text = function() {
 	var self = this;
 	if (self.status() == 'ready' && self.verdict() != "JE" && self.verdict() != "CE") {
 		var prefix = "";
@@ -1328,7 +1343,7 @@ Arena.ObservableRun.prototype.$runtime_text = function() {
 	}
 };
 
-Arena.ObservableRun.prototype.$memory_text = function() {
+omegaup.arena.ObservableRun.prototype.$memory_text = function() {
 	var self = this;
 	if (self.status() == 'ready' && self.verdict() != "JE" && self.verdict() != "CE") {
 		var prefix = "";
@@ -1341,7 +1356,7 @@ Arena.ObservableRun.prototype.$memory_text = function() {
 	}
 };
 
-Arena.ObservableRun.prototype.$penalty_text = function() {
+omegaup.arena.ObservableRun.prototype.$penalty_text = function() {
 	var self = this;
 
 	if (self.status() == 'ready' && self.verdict() != "JE" && self.verdict() != "CE") {
@@ -1351,15 +1366,15 @@ Arena.ObservableRun.prototype.$penalty_text = function() {
 	}
 };
 
-Arena.ObservableRun.prototype.$status_text = function() {
+omegaup.arena.ObservableRun.prototype.$status_text = function() {
 	var self = this;
 
 	return self.status() == 'ready' ?
-		OmegaUp.T['verdict' + self.verdict()] :
+		omegaup.T['verdict' + self.verdict()] :
 		self.status();
 };
 
-Arena.ObservableRun.prototype.$status_color = function() {
+omegaup.arena.ObservableRun.prototype.$status_color = function() {
 	var self = this;
 
 	if (self.status() != 'ready') return '';
@@ -1375,7 +1390,7 @@ Arena.ObservableRun.prototype.$status_color = function() {
 	}
 };
 
-Arena.ObservableRun.prototype.$points = function() {
+omegaup.arena.ObservableRun.prototype.$points = function() {
 	var self = this;
 	if (self.contest_score() != null && self.status() == 'ready' && self.verdict() != "JE" && self.verdict() != "CE") {
 		return parseFloat(self.contest_score() || "0").toFixed(2);
@@ -1384,7 +1399,7 @@ Arena.ObservableRun.prototype.$points = function() {
 	}
 };
 
-Arena.ObservableRun.prototype.$percentage = function() {
+omegaup.arena.ObservableRun.prototype.$percentage = function() {
 	var self = this;
 	if (self.status() == 'ready' && self.verdict() != "JE" && self.verdict() != "CE") {
 		return (parseFloat(self.score() || "0") * 100).toFixed(2) + '%';
@@ -1393,14 +1408,14 @@ Arena.ObservableRun.prototype.$percentage = function() {
 	}
 };
 
-Arena.ObservableRun.prototype.details = function() {
+omegaup.arena.ObservableRun.prototype.details = function() {
 	var self = this;
 	window.location.hash += '/show-run:' + self.guid;
 };
 
-Arena.ObservableRun.prototype.rejudge = function() {
+omegaup.arena.ObservableRun.prototype.rejudge = function() {
 	var self = this;
-	omegaup.runRejudge(self.guid, false, function(data) {
+	omegaup.API.runRejudge(self.guid, false, function(data) {
 		if (data.status == 'ok') {
 			self.status('rejudging');
 			self.arena.updateRunFallback(self.guid);
@@ -1408,9 +1423,9 @@ Arena.ObservableRun.prototype.rejudge = function() {
 	});
 };
 
-Arena.ObservableRun.prototype.debug_rejudge = function() {
+omegaup.arena.ObservableRun.prototype.debug_rejudge = function() {
 	var self = this;
-	omegaup.runRejudge(self.guid, true, function(data) {
+	omegaup.API.runRejudge(self.guid, true, function(data) {
 		if (data.status == 'ok') {
 			self.status('rejudging');
 			self.arena.updateRunFallback(self.guid);

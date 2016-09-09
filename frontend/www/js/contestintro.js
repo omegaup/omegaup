@@ -7,11 +7,11 @@ $(document).ready(function() {
 		$('#start-contest-submit').prop('disabled', true);
 
 		// Explicitly join the contest.
-		omegaup.openContest(
+		omegaup.API.openContest(
 			contestAlias,
 			function(result) {
 				if (result.status == "error") {
-					OmegaUp.ui.error(result.error);
+					omegaup.UI.error(result.error);
 					$("#start-contest-form").show();
 				} else {
 					window.location.reload();
@@ -24,11 +24,11 @@ $(document).ready(function() {
 	$('#request-access-form').submit(function() {
 		$("#request-access-form").hide();
 		$('#request-access-submit').prop('disabled', true);
-		omegaup.registerForContest(
+		omegaup.API.registerForContest(
 			contestAlias,
 			function(result) {
 				if (result.status == "error") {
-					OmegaUp.ui.error(result.error);
+					omegaup.UI.error(result.error);
 					$("#request-access-form").show();
 					$('#start-contest-submit').prop('disabled', false);
 				} else {
@@ -93,12 +93,12 @@ $(document).ready(function() {
 			$('#contest-details').hide();
 			$('#contest-details').parent().removeClass('col-md-6').addClass('col-md-2');
 		} else {
-			$('.contest #title').html(omegaup.escape(contest.title));
-			$('.contest #description').html(omegaup.escape(contest.description));
+			$('.contest #title').html(omegaup.UI.escape(contest.title));
+			$('.contest #description').html(omegaup.UI.escape(contest.description));
 
-			$('.contest #time-until-start').html(omegaup.escape(contest.start_time));
-			$('.contest #start_time').val(dateToString(contest.start_time));
-			$('.contest #finish_time').val(dateToString(contest.finish_time));
+			$('.contest #time-until-start').html(omegaup.UI.escape(contest.start_time));
+			$('.contest #start_time').val(omegaup.UI.formatDateTime(contest.start_time));
+			$('.contest #finish_time').val(omegaup.UI.formatDateTime(contest.finish_time));
 		}
 
 		// Feel free to re-write this if you have the time.
@@ -121,5 +121,5 @@ $(document).ready(function() {
 		}
 	}
 
-	omegaup.getContestPublicDetails(contestAlias, contestLoaded);
+	omegaup.API.getContestPublicDetails(contestAlias, contestLoaded);
 });

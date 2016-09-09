@@ -1,21 +1,21 @@
 $(document).ready(function() {
 	function registerAndLogin(){
 		if ($('#reg_pass').val() != $('#reg_pass2').val()) {
-			OmegaUp.ui.error(OmegaUp.T.loginPasswordNotEqual);
+			omegaup.UI.error(omegaup.T.loginPasswordNotEqual);
 			return false;
 		}
 
 		if ($('#reg_pass').val().length < 8) {
-			OmegaUp.ui.error(OmegaUp.T.loginPasswordTooShort);
+			omegaup.UI.error(omegaup.T.loginPasswordTooShort);
 			return false;
 		}
 
 		if (grecaptcha.getResponse().length == 0) {
-			OmegaUp.ui.error(OmegaUp.T.unableToVerifyCaptcha);
+			omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
 			return false;
 		}
 
-		omegaup.createUser(
+		omegaup.API.createUser(
 			$('#reg_email').val(),
 			$('#reg_username').val(),
 			$('#reg_pass').val(),
@@ -23,7 +23,7 @@ $(document).ready(function() {
 			function (data) {
 				//registration callback
 				if (data.status != 'ok') {
-					OmegaUp.ui.error(data.error);
+					omegaup.UI.error(data.error);
 				} else {
 					$("#user").val($('#reg_email').val());
 					$("#pass").val($('#reg_pass').val());
@@ -45,18 +45,18 @@ function signInCallback(authResult) {
 		gapi.auth.signOut();
 		logmeoutOnce = false;
 	} else if (authResult['code']) {
-		omegaup.googleLogin(
+		omegaup.API.googleLogin(
 				authResult['code'],
 				function (data) {
 					if (data.status == 'ok') {
 						window.location.reload();
 					} else {
-						OmegaUp.ui.error(data.error);
+						omegaup.UI.error(data.error);
 					}
 				});
 	} else if (authResult['error']) {
 		// Esto se hace en cada refresh a la pagina de login.
-		//OmegaUp.ui.error('There was an error: ' + authResult['error']);
+		//omegaup.UI.error('There was an error: ' + authResult['error']);
 	}
 }
 

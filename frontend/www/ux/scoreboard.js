@@ -1,26 +1,30 @@
-$(document).ready(function() {
-	var arena = new Arena();
+omegaup.OmegaUp.on('ready', function() {
 	var params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(window.location.pathname);
-	arena.contestAlias = params[1];
-	arena.scoreboardToken = params[2];
+	var options = {
+		// There is no UI to show clarifications with scoreboard-only views.
+		disableClarifications: true,
+		contestAlias: params[1],
+		scoreboardToken: params[2],
+	};
+	var arena = new omegaup.arena.Arena(options);
 	var getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
 
 	arena.connectSocket();
-	omegaup.getContestByToken(arena.contestAlias, arena.scoreboardToken, function(contest) {
+	omegaup.API.getContestByToken(arena.options.contestAlias, arena.options.scoreboardToken, function(contest) {
 		arena.initProblems(contest);
 		arena.initClock(contest.start_time, contest.finish_time);
 		$('#title .contest-title').html(contest.title);
 
-		omegaup.getRankingByToken(
-			arena.contestAlias,
-			arena.scoreboardToken,
+		omegaup.API.getRankingByToken(
+			arena.options.contestAlias,
+			arena.options.scoreboardToken,
 			arena.rankingChange.bind(arena)
 		);
-		if (omegaup.time() < contest.finish_time && !arena.socket) {
+		if (omegaup.OmegaUp.time() < contest.finish_time && !arena.socket) {
 			setInterval(function() {
-				omegaup.getRankingByToken(
-					arena.contestAlias,
-					arena.scoreboardToken,
+				omegaup.API.getRankingByToken(
+					arena.options.contestAlias,
+					arena.options.scoreboardToken,
 					arena.rankingChange.bind(arena)
 				);
 			}, getRankingByTokenRefresh);

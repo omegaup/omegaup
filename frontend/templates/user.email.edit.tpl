@@ -27,5 +27,5 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/js/user.email.edit.js?ver=4e55cf"></script>
+	<script type="text/javascript" src="/js/user.email.edit.js?ver=158b4f"></script>
 {/block}

@@ -8,7 +8,7 @@ $(function() {
 	var groupAlias = formData.attr('data-group-alias');
 
 	if (formPage === "edit") {
-		omegaup.getContests(function(contests) {
+		omegaup.API.getContests().then(function(contests) {
 			for (var i = 0; i < contests.results.length; i++) {
 				contest = contests.results[i];
 				$('#contests').append($('<option></option>').attr('value', contest.alias).text(contest.title));
@@ -16,7 +16,7 @@ $(function() {
 		});
 
 		$('#scoreboard-add-contest-form').submit(function() {
-			omegaup.addContestToScoreboard(
+			omegaup.API.addContestToScoreboard(
 				groupAlias,
 				scoreboardAlias,
 				$("#contests").val(),
@@ -24,10 +24,10 @@ $(function() {
 				$('#weight').val(),
 				function(data) {
 					if(data.status === "ok") {
-						OmegaUp.ui.success("Contest successfully added!");
+						omegaup.UI.success("Contest successfully added!");
 						refreshScoreboardContests();
 					} else {
-						OmegaUp.ui.error(data.error || 'error');
+						omegaup.UI.error(data.error || 'error');
 					}
 				}
 			);
@@ -38,7 +38,7 @@ $(function() {
 		refreshScoreboardContests();
 
 		function refreshScoreboardContests() {
-			omegaup.getGroupScoreboard(groupAlias, scoreboardAlias, function(gScoreboard){
+			omegaup.API.getGroupScoreboard(groupAlias, scoreboardAlias, function(gScoreboard){
 				$('#scoreboard-contests').empty();
 
 				for (var i = 0; i < gScoreboard.contests.length; i++) {
@@ -48,21 +48,21 @@ $(function() {
 								.append($('<td></td>').append(
 									$('<a></a>')
 										.attr('href', '/arena/' + contest.alias + '/')
-										.text(omegaup.escape(contest.title))
+										.text(omegaup.UI.escape(contest.title))
 								))
-								.append($('<td></td>').append(contest.only_ac ? OmegaUp.T.wordsYes : OmegaUp.T.wordsNo))
+								.append($('<td></td>').append(contest.only_ac ? omegaup.T.wordsYes : omegaup.T.wordsNo))
 								.append($('<td></td>').append(contest.weight))
 								.append($('<td><button type="button" class="close">&times;</button></td>')
 									.click((function(contestAlias) {
 										return function(e) {
-											omegaup.removeContestFromScoreboard(groupAlias, scoreboardAlias, contestAlias, function(response) {
+											omegaup.API.removeContestFromScoreboard(groupAlias, scoreboardAlias, contestAlias, function(response) {
 												if (response.status === "ok") {
-													OmegaUp.ui.success("Contest successfully removed!");
+													omegaup.UI.success("Contest successfully removed!");
 
 													var tr = e.target.parentElement.parentElement;
 													$(tr).remove();
 												} else {
-													OmegaUp.ui.error(response.error || 'error');
+													omegaup.UI.error(response.error || 'error');
 												}
 											});
 										};
@@ -73,7 +73,7 @@ $(function() {
 			});
 		}
 	} else if (formPage === "details") {
-		omegaup.getGroupScoreboard(groupAlias, scoreboardAlias, function(scoreboard){
+		omegaup.API.getGroupScoreboard(groupAlias, scoreboardAlias, function(scoreboard){
 			var ranking = scoreboard["ranking"];
 			$("#scoreboard-title").html(scoreboard.scoreboard.name);
 
@@ -106,7 +106,7 @@ $(function() {
 					.addClass('rank-new');
 
 				var username = rank.username +
-					((rank.name == rank.username) ? '' : (' (' + omegaup.escape(rank.name) + ')'));
+					((rank.name == rank.username) ? '' : (' (' + omegaup.UI.escape(rank.name) + ')'));
 				$('.user', r).html(username);
 
 				// For each contest in the scoreboard

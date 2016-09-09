@@ -1,13 +1,16 @@
-function ArenaAdmin(arena, onlyProblemAlias) {
-	this.arena = arena;
-	this.arena.contestAdmin = true;
-	this.onlyProblemAlias = onlyProblemAlias;
+omegaup.arena = omegaup.arena || {};
 
-	this.setUpPagers();
-	this.arena.runs.attach($('#runs table.runs'));
-}
+omegaup.arena.ArenaAdmin = function(arena) {
+	var self = this;
 
-ArenaAdmin.prototype.setUpPagers = function() {
+	self.arena = arena;
+	self.arena.contestAdmin = true;
+
+	self.setUpPagers();
+	self.arena.runs.attach($('#runs table.runs'));
+};
+
+omegaup.arena.ArenaAdmin.prototype.setUpPagers = function() {
 	var self = this;
 
 	self.arena.runs.filter_verdict.subscribe(self.refreshRuns.bind(self));
@@ -39,8 +42,8 @@ ArenaAdmin.prototype.setUpPagers = function() {
 
 	$('#clarification').submit(function (e) {
 		$('#clarification input').attr('disabled', 'disabled');
-		omegaup.newClarification(
-			self.arena.contestAlias,
+		omegaup.API.newClarification(
+			self.arena.options.contestAlias,
 			$('#clarification select[name="problem"]').val(),
 			$('#clarification textarea[name="message"]').val(),
 			function (run) {
@@ -49,7 +52,7 @@ ArenaAdmin.prototype.setUpPagers = function() {
 					$('#clarification input').removeAttr('disabled');
 					return;
 				}
-				arena.hideOverlay();
+				self.arena.hideOverlay();
 				self.refreshClarifications();
 				$('#clarification input').removeAttr('disabled');
 			}
@@ -59,7 +62,7 @@ ArenaAdmin.prototype.setUpPagers = function() {
 	});
 };
 
-ArenaAdmin.prototype.refreshRuns = function() {
+omegaup.arena.ArenaAdmin.prototype.refreshRuns = function() {
 	var self = this;
 
 	var options = {
@@ -72,30 +75,38 @@ ArenaAdmin.prototype.refreshRuns = function() {
 		status: self.arena.runs.filter_status() || undefined
 	};
 
-	if (self.onlyProblemAlias) {
+	if (self.arena.options.onlyProblemAlias) {
 		options.show_all = true;
-		options.problem_alias = self.onlyProblemAlias;
-		omegaup.getProblemRuns(self.onlyProblemAlias, options, self.runsChanged.bind(self));
-	} else if (self.arena.contestAlias === "admin") {
-		omegaup.getRuns(options, self.runsChanged.bind(self));
+		options.problem_alias = self.arena.options.onlyProblemAlias;
+		omegaup.API.getProblemRuns(
+			self.arena.options.onlyProblemAlias,
+			options,
+			self.runsChanged.bind(self)
+		);
+	} else if (self.arena.options.contestAlias === "admin") {
+		omegaup.API.getRuns(options, self.runsChanged.bind(self));
 	} else {
-		omegaup.getContestRuns(self.arena.contestAlias, options, self.runsChanged.bind(self));
+		omegaup.API.getContestRuns(
+			self.arena.options.contestAlias,
+			options,
+			self.runsChanged.bind(self)
+		);
 	}
 };
 
-ArenaAdmin.prototype.refreshClarifications = function() {
+omegaup.arena.ArenaAdmin.prototype.refreshClarifications = function() {
 	var self = this;
 
-	if (self.onlyProblemAlias) {
-		omegaup.getProblemClarifications(
-			self.onlyProblemAlias,
+	if (self.arena.options.onlyProblemAlias) {
+		omegaup.API.getProblemClarifications(
+			self.arena.options.onlyProblemAlias,
 			self.arena.clarificationsOffset,
 			self.arena.clarificationsRowcount,
 			self.arena.clarificationsChange.bind(self.arena)
 		);
 	} else {
-		omegaup.getClarifications(
-			self.arena.contestAlias,
+		omegaup.API.getClarifications(
+			self.arena.options.contestAlias,
 			self.arena.clarificationsOffset,
 			self.arena.clarificationsRowcount,
 			self.arena.clarificationsChange.bind(self.arena)
@@ -103,7 +114,7 @@ ArenaAdmin.prototype.refreshClarifications = function() {
 	}
 };
 
-ArenaAdmin.prototype.runsChanged = function(data) {
+omegaup.arena.ArenaAdmin.prototype.runsChanged = function(data) {
 	var self = this;
 
 	if (data.status != 'ok') return;

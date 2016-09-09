@@ -21,7 +21,7 @@ $(document).ready(function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.typeaheadWrapper(omegaup.searchUsers.bind(omegaup)),
+		source: omegaup.UI.typeaheadWrapper(omegaup.API.searchUsers),
 		displayKey: 'label',
 	}).on('typeahead:selected', function(item, val, text) {
 		$("#username-admin").val(val.label);
@@ -30,7 +30,7 @@ $(document).ready(function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.typeaheadWrapper(omegaup.searchGroups.bind(omegaup)),
+		source: omegaup.UI.typeaheadWrapper(omegaup.API.searchGroups),
 		displayKey: 'label',
 	}).on('typeahead:selected', function(item, val, text) {
 		$('#groupalias-admin').attr('data-alias', val.value);
@@ -41,7 +41,7 @@ $(document).ready(function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.typeaheadWrapper(omegaup.searchTags.bind(omegaup)),
+		source: omegaup.UI.typeaheadWrapper(omegaup.API.searchTags),
 		displayKey: 'name',
 	}).on('typeahead:selected', function(item, val, text) {
 		$("#tag-name").val(val.name);
@@ -50,14 +50,14 @@ $(document).ready(function() {
 	$('#add-admin-form').submit(function() {
 		var username = $('#username-admin').val();
 
-		omegaup.addAdminToProblem(problemAlias, username, function(response) {
+		omegaup.API.addAdminToProblem(problemAlias, username, function(response) {
 			if (response.status === "ok") {
-				OmegaUp.ui.success(OmegaUp.T.adminAdded);
+				omegaup.UI.success(omegaup.T.adminAdded);
 				$('div.post.footer').show();
 
 				refreshProblemAdmins();
 			} else {
-				OmegaUp.ui.error(response.error || 'error');
+				omegaup.UI.error(response.error || 'error');
 			}
 		});
 
@@ -67,14 +67,14 @@ $(document).ready(function() {
 	$('#add-group-admin-form').submit(function() {
 		var groupalias = $('#groupalias-admin').attr('data-alias');
 
-		omegaup.addGroupAdminToProblem(problemAlias, groupalias, function(response) {
+		omegaup.API.addGroupAdminToProblem(problemAlias, groupalias, function(response) {
 			if (response.status === "ok") {
-				OmegaUp.ui.success(OmegaUp.T.adminAdded);
+				omegaup.UI.success(omegaup.T.adminAdded);
 				$('div.post.footer').show();
 
 				refreshProblemAdmins();
 			} else {
-				OmegaUp.ui.error(response.error || 'error');
+				omegaup.UI.error(response.error || 'error');
 			}
 		});
 
@@ -82,21 +82,21 @@ $(document).ready(function() {
 	});
 
 	$('#download form').submit(function() {
-		window.location = '/api/problem/download/problem_alias/' + omegaup.escape(problemAlias) + '/';
+		window.location = '/api/problem/download/problem_alias/' + omegaup.UI.escape(problemAlias) + '/';
 		return false;
 	});
 
 	$('#markdown form').submit(function() {
 		$('.has-error').removeClass('has-error');
 		if ($('#markdown-message').val() == '') {
-			OmegaUp.ui.error(OmegaUp.T['editFieldRequired']);
+			omegaup.UI.error(omegaup.T['editFieldRequired']);
 			$('#markdown-message-group').addClass('has-error');
 			return false;
 		}
 	});
 
 	function refreshProblemAdmins() {
-		omegaup.getProblemAdmins(problemAlias, function(admins) {
+		omegaup.API.getProblemAdmins(problemAlias, function(admins) {
 			$('#problem-admins').empty();
 			// Got the contests, lets populate the dropdown with them
 			for (var i = 0; i < admins.admins.length; i++) {
@@ -112,14 +112,14 @@ $(document).ready(function() {
 						.append((admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
 							.click((function(username) {
 								return function(e) {
-									omegaup.removeAdminFromProblem(problemAlias, username, function(response) {
+									omegaup.API.removeAdminFromProblem(problemAlias, username, function(response) {
 										if (response.status == "ok") {
-											OmegaUp.ui.success(OmegaUp.T.adminAdded);
+											omegaup.UI.success(omegaup.T.adminAdded);
 											$('div.post.footer').show();
 											var tr = e.target.parentElement.parentElement;
 											$(tr).remove();
 										} else {
-											OmegaUp.ui.error(response.error || 'error');
+											omegaup.UI.error(response.error || 'error');
 										}
 									});
 								};
@@ -142,14 +142,14 @@ $(document).ready(function() {
 						.append((group_admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
 							.click((function(alias) {
 								return function(e) {
-									omegaup.removeGroupAdminFromProblem(problemAlias, alias, function(response) {
+									omegaup.API.removeGroupAdminFromProblem(problemAlias, alias, function(response) {
 										if (response.status == "ok") {
-											OmegaUp.ui.success(OmegaUp.T.adminAdded);
+											omegaup.UI.success(omegaup.T.adminAdded);
 											$('div.post.footer').show();
 											var tr = e.target.parentElement.parentElement;
 											$(tr).remove();
 										} else {
-											OmegaUp.ui.error(response.error || 'error');
+											omegaup.UI.error(response.error || 'error');
 										}
 									});
 								};
@@ -164,14 +164,14 @@ $(document).ready(function() {
 		var tagname = $('#tag-name').val();
 		var public = $('#tag-public').val();
 
-		omegaup.addTagToProblem(problemAlias, tagname, public, function(response) {
+		omegaup.API.addTagToProblem(problemAlias, tagname, public, function(response) {
 			if (response.status === "ok") {
-				OmegaUp.ui.success("Tag successfully added!");
+				omegaup.UI.success("Tag successfully added!");
 				$('div.post.footer').show();
 
 				refreshProblemTags();
 			} else {
-				OmegaUp.ui.error(response.error || 'error');
+				omegaup.UI.error(response.error || 'error');
 			}
 		});
 
@@ -179,7 +179,7 @@ $(document).ready(function() {
 	});
 
 	function refreshProblemTags() {
-		omegaup.getProblemTags(problemAlias, function(result) {
+		omegaup.API.getProblemTags(problemAlias, function(result) {
 			$('#problem-tags').empty();
 			// Got the contests, lets populate the dropdown with them
 			for (var i = 0; i < result.tags.length; i++) {
@@ -195,14 +195,14 @@ $(document).ready(function() {
 						.append($('<td><button type="button" class="close">&times;</button></td>')
 							.click((function(tagname) {
 								return function(e) {
-									omegaup.removeTagFromProblem(problemAlias, tagname, function(response) {
+									omegaup.API.removeTagFromProblem(problemAlias, tagname, function(response) {
 										if (response.status == "ok") {
-											OmegaUp.ui.success("Tag successfully removed!");
+											omegaup.UI.success("Tag successfully removed!");
 											$('div.post.footer').show();
 											var tr = e.target.parentElement.parentElement;
 											$(tr).remove();
 										} else {
-											OmegaUp.ui.error(response.error || 'error');
+											omegaup.UI.error(response.error || 'error');
 										}
 									});
 								};
@@ -231,14 +231,14 @@ $(document).ready(function() {
 			return;
 		}
 
-		omegaup.getProblem(null, problemAlias, problemCallback, "markdown");
+		omegaup.API.getProblem(null, problemAlias, problemCallback, "markdown");
 	}
 
 	function problemCallback(problem) {
-		$('.page-header h1 span').html(OmegaUp.T.problemEditEditProblem + ' ' + problem.title);
-		$('.page-header h1 small').html('&ndash; <a href="/arena/problem/' + problemAlias + '/">' + OmegaUp.T.problemEditGoToProblem + '</a>');
+		$('.page-header h1 span').html(omegaup.T.problemEditEditProblem + ' ' + problem.title);
+		$('.page-header h1 small').html('&ndash; <a href="/arena/problem/' + problemAlias + '/">' + omegaup.T.problemEditGoToProblem + '</a>');
 		$('input[name=title]').val(problem.title);
-		$('#statement-preview .title').html(omegaup.escape(problem.title));
+		$('#statement-preview .title').html(omegaup.UI.escape(problem.title));
 		$('input[name=time_limit]').val(problem.time_limit);
 		$('input[name=validator_time_limit]').val(problem.validator_time_limit);
 		$('input[name=overall_wall_time_limit]').val(problem.overall_wall_time_limit);
@@ -247,10 +247,10 @@ $(document).ready(function() {
 		$('input[name=output_limit]').val(problem.output_limit);
 		$('input[name=stack_limit]').val(problem.stack_limit);
 		$('input[name=source]').val(problem.source);
-		$('#statement-preview .source').html(omegaup.escape(problem.source));
+		$('#statement-preview .source').html(omegaup.UI.escape(problem.source));
 		$('#statement-preview .problemsetter')
 			.attr('href', '/profile/' + problem.problemsetter.username + '/')
-			.html(omegaup.escape(problem.problemsetter.name));
+			.html(omegaup.UI.escape(problem.problemsetter.name));
 		$('select[name=email_clarifications]').val(problem.email_clarifications);
 		$('select[name=validator]').val(problem.validator);
 		$('select[name=public]').val(problem.public);
@@ -275,7 +275,7 @@ $(document).ready(function() {
 
 	$('#statement-language').on('change', function(e) {
 		chosenLanguage = $('#statement-language').val();
-		omegaup.getProblem(null, problemAlias, problemCallback, "markdown",
+		omegaup.API.getProblem(null, problemAlias, problemCallback, "markdown",
 			false, chosenLanguage);
 	});
 });

@@ -4,7 +4,7 @@
 {include file='status.tpl'}
 
 <span id="form-data" data-name="interviews" data-page="new"></span>
-<script src="/js/alias.generate.js?ver=9ea0b4"></script>
+<script src="/js/alias.generate.js?ver=ca96ff"></script>
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
@@ -57,6 +57,6 @@
 	</table>
 </div>
 
-<script type="text/javascript" src="/js/interviews.list.js?ver=a11f90"></script>
+<script type="text/javascript" src="/js/interviews.list.js?ver=00a77f"></script>
 {include file='footer.tpl'}
 

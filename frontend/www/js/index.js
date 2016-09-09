@@ -57,19 +57,20 @@
 	  // Calling load sends the request off.  It requires a callback function.
 	  feed.load(feedLoaded);
 
-	  omegaup.runCounts(createChart);
+	  omegaup.API.runCounts(createChart);
 
-        omegaup.getContests(function (data) {
-		    var list = data.results;
-		    var now = new Date();
+		omegaup.API.getContests({active: 'ACTIVE'}).then(function (data) {
+			var list = data.results;
+			var now = omegaup.OmegaUp.time();
 
 			for (var i = 0, len = list.length; i < len && i < 10; i++) {
-			    $('#next-contests-list').append(
-                        '<a href="/arena/' + omegaup.escape(list[i].alias) +
-                        '" class="list-group-item">' + omegaup.escape(list[i].title) +
-                        '</a>');
+				$('#next-contests-list').append(
+					'<a href="/arena/' + omegaup.UI.escape(list[i].alias) +
+					'" class="list-group-item">' + omegaup.UI.escape(list[i].title) +
+					'</a>'
+				);
 			}
-		}, {'active': 'ACTIVE'});
+		});
 	}
 
 	function createChart(series) {
@@ -86,7 +87,7 @@
 			}
 		}
 
-		var minDate = new Date(Date.now());
+		var minDate = omegaup.OmegaUp.time();
 		minDate.setDate(minDate.getDate()-(30*3));
 
 		var minY = dataInSeries[0] - (dataInSeries[0] * 0.50);

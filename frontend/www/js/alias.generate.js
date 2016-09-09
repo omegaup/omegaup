@@ -26,30 +26,30 @@ $(document).ready(function() {
 	}
 
 	function onAliasExists() {
-		OmegaUp.ui.error('"' + omegaup.escape($('#alias').val()) + '" ya existe. Elige otro nombre');
+		omegaup.UI.error('"' + omegaup.UI.escape($('#alias').val()) + '" ya existe. Elige otro nombre');
 		$('#alias').focus();
 	}
 
 	function onAliasNew() {
-		OmegaUp.ui.dismissNotifications();
+		omegaup.UI.dismissNotifications();
 	}
 
 	switch (formName) {
 		case "problems":
 			existsFn= function(alias) {
-				omegaup.getProblem(null, alias, checkExists);
+				omegaup.API.getProblem(null, alias, checkExists);
 			};
 			break;
 
 		case "groups":
 			existsFn = function(alias) {
-				omegaup.getGroup(alias, checkExists);
+				omegaup.API.getGroup(alias, checkExists);
 			};
 			break;
 
 		case "interviews":
 			existsFn = function(alias) {
-				omegaup.getContest(alias, checkExists);
+				omegaup.API.getContest(alias, checkExists);
 			};
 			break;
 	}

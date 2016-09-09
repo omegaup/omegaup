@@ -3,8 +3,8 @@ $('document').ready(function() {
 		minLength: 3,
 		highlight: true,
 	}, {
-		source: omegaup.typeaheadWrapper(function (query, cb) {
-			omegaup.searchProblems(query, function (data) {
+		source: omegaup.UI.typeaheadWrapper(function (query, cb) {
+			omegaup.API.searchProblems(query, function (data) {
 				cb(data.results);
 			});
 		}),

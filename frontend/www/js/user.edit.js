@@ -10,10 +10,10 @@ $(document).ready(function() {
 		minLength: 2,
 		highlight: true,
 	}, {
-		source: omegaup.typeaheadWrapper(omegaup.searchSchools.bind(omegaup)),
+		source: omegaup.UI.typeaheadWrapper(omegaup.API.searchSchools),
 		displayKey: 'label',
 		templates: {
-			empty: OmegaUp.T.schoolToBeAdded,
+			empty: omegaup.T.schoolToBeAdded,
 		}
 	}).on('typeahead:selected', function(item, val, text) {
 		$("#school_id").val(val.id);
@@ -124,11 +124,11 @@ $(document).ready(function() {
 		}
 	});
 
-	omegaup.getProfile(null, function(data) {
+	omegaup.API.getProfile(null, function(data) {
 		$("#username").html(data.userinfo.username);
 		$("#name").val(data.userinfo.name);
-		$("#birth_date").val(onlyDateToString(data.userinfo.birth_date));
-		$("#graduation_date").val(onlyDateToString(data.userinfo.graduation_date));
+		$("#birth_date").val(omegaup.UI.formatDate(data.userinfo.birth_date));
+		$("#graduation_date").val(omegaup.UI.formatDate(data.userinfo.graduation_date));
 		$("#country_id").val(data.userinfo.country_id);
 		$("#locale").val(data.userinfo.locale);
 
@@ -161,11 +161,11 @@ $(document).ready(function() {
 		}
 
 		if ($('#name').val().length > 50) {
-			OmegaUp.ui.error(OmegaUp.T['userEditNameTooLong']);
+			omegaup.UI.error(omegaup.T['userEditNameTooLong']);
 			return false;
 		}
 
-		omegaup.updateProfile(
+		omegaup.API.updateProfile(
 			$("#name").val(),
 			birth_date.getTime() / 1000,
 			$("#country_id").val(),
@@ -181,10 +181,10 @@ $(document).ready(function() {
 					if (locale_changed) {
 						window.location.reload();
 					} else {
-						OmegaUp.ui.success(OmegaUp.T['userEditSuccess']);
+						omegaup.UI.success(omegaup.T['userEditSuccess']);
 					}
 				} else {
-					OmegaUp.ui.error(response.error);
+					omegaup.UI.error(response.error);
 				}
 			}
 		);
@@ -198,17 +198,17 @@ $(document).ready(function() {
 		var newPassword = $('#new-password-1').val();
 		var newPassword2 = $('#new-password-2').val();
 		if (newPassword != newPassword2) {
-			OmegaUp.ui.error(OmegaUp.T['loginPasswordNotEqual']);
+			omegaup.UI.error(omegaup.T['loginPasswordNotEqual']);
 			return false;
 		}
 
 		var oldPassword = $('#old-password').val();
 
-		omegaup.changePassword(oldPassword, newPassword, function(data) {
+		omegaup.API.changePassword(oldPassword, newPassword, function(data) {
 			if (data.status == "ok") {
-				OmegaUp.ui.success(OmegaUp.T['passwordResetResetSuccess']);
+				omegaup.UI.success(omegaup.T['passwordResetResetSuccess']);
 			} else {
-				OmegaUp.ui.error(data.error);
+				omegaup.UI.error(data.error);
 			}
 		});
 

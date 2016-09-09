@@ -170,5 +170,5 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/contest.edit.js?ver=a77116"></script>
+<script type="text/javascript" src="/js/contest.edit.js?ver=a39683"></script>
 {include file='footer.tpl'}

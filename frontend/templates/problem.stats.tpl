@@ -15,7 +15,7 @@
 </div>
 
 {if isset($smarty.get.problem)}
-<script type="text/javascript" src="/js/problem.stats.js?ver=caa326"></script>
+<script type="text/javascript" src="/js/problem.stats.js?ver=5f939b"></script>
 {/if}
 
 {include file='footer.tpl'}

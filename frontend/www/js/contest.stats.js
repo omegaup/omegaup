@@ -13,7 +13,7 @@ $('document').ready(function() {
 	var updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
 	function getStats() {
-		omegaup.getContestStats(contestAlias, function (s) {
+		omegaup.API.getContestStats(contestAlias, function (s) {
 			if( s.status == "ok" ) {
 				stats = s;
 				drawCharts();

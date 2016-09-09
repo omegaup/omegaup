@@ -1,7 +1,7 @@
 {include file='arena.head.tpl' jsfile=$jsfile inContest=!$practice}
 
 {if $admin}
-			<script type="text/javascript" src="/ux/libadmin.js?ver=cbed96"></script>
+			<script type="text/javascript" src="/ux/libadmin.js?ver=0f3950"></script>
 			<audio id="notification_audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
 			</audio>

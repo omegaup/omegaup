@@ -8,12 +8,12 @@ var formAlias = formData.attr('data-alias');
 $(function() {
 	if (formPage === "list") {
 		function fillGroupsList() {
-			omegaup.getMyGroups(function(groups) {
+			omegaup.API.getMyGroups(function(groups) {
 				var html = "";
 
 				for (var i = 0; i < groups.groups.length; i++) {
 					html += "<tr>"
-						+ "<td><b><a href='/group/" + groups.groups[i].alias  + "/edit/#scoreboards'>" + omegaup.escape(groups.groups[i].name) + "</a></b></td>"
+						+ "<td><b><a href='/group/" + groups.groups[i].alias  + "/edit/#scoreboards'>" + omegaup.UI.escape(groups.groups[i].name) + "</a></b></td>"
 						+ '<td><a class="glyphicon glyphicon-edit" href="/group/' + groups.groups[i].alias  + '/edit#edit" title="{#wordsEdit#}"></a></td>'
 						+ "</tr>";
 				}
@@ -26,7 +26,7 @@ $(function() {
 		fillGroupsList();
 	} else if (formPage === "new") {
 		$('.new_group_form').submit(function() {
-			omegaup.createGroup(
+			omegaup.API.createGroup(
 				$(".new_group_form #alias").val(),
 				$(".new_group_form #title").val(),
 				$(".new_group_form #description").val(),
@@ -34,7 +34,7 @@ $(function() {
 					if(data.status === "ok") {
 						window.location.replace('/group/'+ $('.new_group_form #alias').val() + '/edit/#members');
 					} else {
-						OmegaUp.ui.error(data.error || 'error');
+						omegaup.UI.error(data.error || 'error');
 					}
 				}
 			);
@@ -62,7 +62,7 @@ $(function() {
 			minLength: 2,
 			highlight: true,
 		}, {
-			source: omegaup.typeaheadWrapper(omegaup.searchUsers.bind(omegaup)),
+			source: omegaup.UI.typeaheadWrapper(omegaup.API.searchUsers),
 			displayKey: 'label',
 		}).on('typeahead:selected', function(item, val, text) {
 			$('#member-username').val(val.label);
@@ -71,14 +71,14 @@ $(function() {
 		$('#add-member-form').submit(function() {
 			var username = $('#member-username').val();
 
-			omegaup.addUserToGroup(groupAlias, username, function(response) {
+			omegaup.API.addUserToGroup(groupAlias, username, function(response) {
 				if (response.status === "ok") {
-					OmegaUp.ui.success("Member successfully added!");
+					omegaup.UI.success("Member successfully added!");
 					$('div.post.footer').show();
 
 					refreshGroupMembers();
 				} else {
-					OmegaUp.ui.error(response.error || 'error');
+					omegaup.UI.error(response.error || 'error');
 				}
 			});
 
@@ -86,7 +86,7 @@ $(function() {
 		});
 
 		function refreshGroupMembers() {
-			omegaup.getGroupMembers(groupAlias, function(group){
+			omegaup.API.getGroupMembers(groupAlias, function(group){
 				$('#group-members').empty();
 
 				for (var i = 0; i < group.users.length; i++) {
@@ -96,19 +96,19 @@ $(function() {
 							.append($('<td></td>').append(
 								$('<a></a>')
 									.attr('href', '/profile/' + user.username + '/')
-									.text(omegaup.escape(user.username))
+									.text(omegaup.UI.escape(user.username))
 							))
 							.append($('<td><button type="button" class="close">&times;</button></td>')
 								.click((function(username) {
 									return function(e) {
-										omegaup.removeUserFromGroup(groupAlias, username, function(response) {
+										omegaup.API.removeUserFromGroup(groupAlias, username, function(response) {
 											if (response.status === "ok") {
-												OmegaUp.ui.success("Member successfully removed!");
+												omegaup.UI.success("Member successfully removed!");
 												$('div.post.footer').show();
 												var tr = e.target.parentElement.parentElement;
 												$(tr).remove();
 											} else {
-												OmegaUp.ui.error(response.error || 'error');
+												omegaup.UI.error(response.error || 'error');
 											}
 										});
 									};
@@ -124,14 +124,14 @@ $(function() {
 			var alias = $('#alias').val();
 			var description = $('#description').val();
 
-			omegaup.addScoreboardToGroup(groupAlias, alias, name, description, function(response) {
+			omegaup.API.addScoreboardToGroup(groupAlias, alias, name, description, function(response) {
 				if (response.status === "ok") {
-					OmegaUp.ui.success("Scoreboard successfully added!");
+					omegaup.UI.success("Scoreboard successfully added!");
 					$('div.post.footer').show();
 
 					refreshGroupScoreboards();
 				} else {
-					OmegaUp.ui.error(response.error || 'error');
+					omegaup.UI.error(response.error || 'error');
 				}
 			});
 
@@ -139,7 +139,7 @@ $(function() {
 		});
 
 		function refreshGroupScoreboards() {
-			omegaup.getGroup(groupAlias, function(group){
+			omegaup.API.getGroup(groupAlias, function(group){
 				$('#group-scoreboards').empty();
 
 				for (var i = 0; i < group.scoreboards.length; i++) {
@@ -149,7 +149,7 @@ $(function() {
 							.append($('<td></td>').append(
 								$('<a></a>')
 									.attr('href', '/group/' + groupAlias + '/scoreboard/' + scoreboard.alias + '/')
-									.text(omegaup.escape(scoreboard.name))
+									.text(omegaup.UI.escape(scoreboard.name))
 							))
 							.append($('<td><a class="glyphicon glyphicon-edit" href="/group/' + groupAlias + '/scoreboard/' + scoreboard.alias  + '/edit/" title="Edit"></a></td>'))
 					);

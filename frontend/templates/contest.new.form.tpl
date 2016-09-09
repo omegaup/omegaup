@@ -160,4 +160,4 @@
 		</form>
 	</div>
 </div>
-<script type="text/javascript" src="/js/contest.new.form.js?ver=b3bf7f"></script>
+<script type="text/javascript" src="/js/contest.new.form.js?ver=6cd7dc"></script>

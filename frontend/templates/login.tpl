@@ -114,7 +114,7 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/login.js?ver=35b529"></script>
+<script type="text/javascript" src="/js/login.js?ver=95b75e"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" defer></script>
 <script src='https://www.google.com/recaptcha/api.js'></script>
 {include file='footer.tpl'}

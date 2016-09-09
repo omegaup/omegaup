@@ -9,8 +9,8 @@
 {/if}
 
 <span id="form-data" data-name="groups" data-page="new"></span>
-<script src="/js/alias.generate.js?ver=9ea0b4"></script>
-<script src="/js/groups.js?ver=202dfb"></script>
+<script src="/js/alias.generate.js?ver=ca96ff"></script>
+<script src="/js/groups.js?ver=e5adc8"></script>
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE neq 1}
