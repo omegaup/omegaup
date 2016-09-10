@@ -10,7 +10,7 @@ import subprocess
 import sys
 
 TEMPLATES_PATH = 'frontend/templates'
-JS_TEMPLATES_PATH = 'frontend/www/js'
+JS_TEMPLATES_PATH = 'frontend/www/js/omegaup'
 PSEUDOLOC = 'pseudo'
 LINE_RE = re.compile(r'\s+=\s+')
 VALUE_RE = re.compile('^"([^"]|\\")*"$')
