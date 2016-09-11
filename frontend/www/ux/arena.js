@@ -65,7 +65,7 @@ $(document).ready(function() {
 			return function (data) {
 				populateContestList($(contestLists[i][0]),
 						data.results,
-						contestLists[i][1]);
+						contestLists[i][1] == 'ACTIVE');
 			};
 		})(i)));
 	}
