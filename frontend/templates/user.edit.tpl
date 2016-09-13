@@ -22,7 +22,7 @@
 					</div>
 
 					<div class="form-group">
-						<label for="country_id" class="col-md-3 control-label">País</label>
+						<label for="country_id" class="col-md-3 control-label">{#userEditCountry#}</label>
 						<div class="col-md-7">
 							<select name='country_id' id='country_id' class="form-control">
 								<option value=""></option>
@@ -311,7 +311,7 @@
 								<option value='{#userEditMiddleSchool#}'>{#userEditMiddleSchool#}</option>
 								<option value='{#userEditHighSchool#}'>{#userEditHighSchool#}</option>
 								<option value='{#userEditBachelors#}'>{#userEditBachelors#}</option>
-								<option value='Maestría'>Maestría</option>
+								<option value='Maestría'>{#userEditMasters#}</option>
 								<option value='{#userEditDoctorate#}'>{#userEditDoctorate#}</option>
 								<option value='Post-doc'>Post-doc</option>
 							</select>
@@ -319,7 +319,7 @@
 					</div>
 
 					<div class="form-group">
-						<label for="graduation_date" class="col-md-3 control-label">Fecha de graduación</label>
+						<label for="graduation_date" class="col-md-3 control-label">{#userEditGraduationDate#}</label>
 						<div class="col-md-7">
 							<input id='graduation_date' name='graduation_date' value='' type='text' size ='10' class="form-control">
 						</div>
@@ -328,7 +328,7 @@
 					<div class="form-group">
 						<label class="col-md-3 control-label">{#userEditProfileImage#}</label>
 						<div class="col-md-7">
-							<a href="http://www.gravatar.com" target="_blank" class="btn btn-link">Súbela en Gravatar.com usando tu email: {$CURRENT_USER_EMAIL}</a>
+							<a href="http://www.gravatar.com" target="_blank" class="btn btn-link">{#userEditGravatar#} {$CURRENT_USER_EMAIL}</a>
 						</div>
 					</div>
 

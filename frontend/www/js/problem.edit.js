@@ -251,9 +251,9 @@ $(document).ready(function() {
 		$('#statement-preview .problemsetter')
 			.attr('href', '/profile/' + problem.problemsetter.username + '/')
 			.html(omegaup.UI.escape(problem.problemsetter.name));
-		$('select[name=email_clarifications]').val(problem.email_clarifications);
+		$("input[name=email_clarifications][value=" + problem.email_clarifications + "]").attr("checked", 1);
 		$('select[name=validator]').val(problem.validator);
-		$('select[name=public]').val(problem.public);
+		$("input[name=public][value=" + problem.public + "]").attr("checked", 1);
 		$('#languages').val(problem.languages);
 		$('input[name=alias]').val(problemAlias);
 		if (chosenLanguage == null || chosenLanguage == problem.problem_statement_language) {
