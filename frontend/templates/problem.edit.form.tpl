@@ -2,7 +2,7 @@
 	{assign "IS_UPDATE" 0}
 {/if}
 
-<script src="/js/problem.edit.form.js?ver=9d910b" type="text/javascript"></script>
+<script src="/js/problem.edit.form.js?ver=7b7f84" type="text/javascript"></script>
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE neq 1}

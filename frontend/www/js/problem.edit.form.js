@@ -22,13 +22,13 @@ $(document).ready(function() {
 		}
 
 		if ($('#title').val() == '') {
-			OmegaUp.ui.error(OmegaUp.T['editFieldRequired']);
+			omegaup.UI.error(omegaup.T['editFieldRequired']);
 			$('#title-group').addClass('has-error');
 			errors = true;
 		}
 
 		if($('#problem_contents').val() == ''){
-			OmegaUp.ui.error(OmegaUp.T['editFieldRequired']);
+			omegaup.UI.error(omegaup.T['editFieldRequired']);
 			$('#problem-contents-group').addClass('has-error');
 			errors = true;
 		}
