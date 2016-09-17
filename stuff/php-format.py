@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import argparse
+import git_tools
 import os.path
 import subprocess
 import sys
@@ -12,7 +13,8 @@ IGNORE_LIST = ['frontend/server/libs/dao/base/',
 	'frontend/server/libs/Mailchimp/', 'frontend/server/libs/Markdown/',
 	'frontend/server/libs/phpmailer/', 'frontend/server/libs/smarty/',
 	'frontend/server/libs/PasswordHash.php', 'frontend/server/libs/ZipStream.php',
-	'frontend/server/config.php', 'frontend/server/test/test_config.php']
+	'frontend/server/config.php', 'frontend/server/test/test_config.php',
+	'frontend/tests/templates_c']
 
 class colors:
 	HEADER = '\033[95m'
@@ -29,26 +31,15 @@ def which(program):
 
 def main():
 	parser = argparse.ArgumentParser(description='PHP linter')
-	parser.add_argument('remote', nargs='?', default='origin',
-			help='The remote that will be pushed to')
-	parser.add_argument('--pre-push', dest='pre_push', action='store_true',
-			default=False, help='Only include files to be pushed')
+	parser.add_argument('--from-commit', dest='from_commit', type=str,
+			help='Only include files changed from a certain commit')
 	parser.add_argument('--validate', dest='validate', action='store_true',
 			default=False, help='Only validates, does not make changes')
 
 	args = parser.parse_args()
 
-	root_dir = subprocess.check_output(['/usr/bin/git', 'rev-parse',
-		'--show-toplevel']).strip()
-	if args.pre_push:
-		changed_files = filter(
-			lambda x: 'frontend' in x and x.endswith('.php') and os.path.exists(x),
-			[os.path.join(root_dir, x) for x in subprocess.check_output(
-				['/usr/bin/git', 'diff', '--name-only', args.remote, '--']
-			).strip().split('\n')]
-		)
-	else:
-		changed_files = [os.path.join(root_dir, 'frontend')]
+	root_dir = git_tools.root_dir()
+	changed_files = git_tools.changed_files(args.from_commit)
 
 	if not changed_files:
 		return 0
@@ -72,11 +63,11 @@ def main():
 
 	if errors:
 		if args.validate:
-			if args.pre_push:
-				pre_push_args = ' --pre-push'
+			if args.from_commit:
+				extra_args = ' --from-commit=%s' % args.from_commit
 			else:
-				pre_push_args = ''
-			print >> sys.stderr, '%sPHP validation errors.%s Please run `%s%s` to fix them.' % (colors.FAIL, colors.NORMAL, sys.argv[0], pre_push_args)
+				extra_args = ''
+			print >> sys.stderr, '%sPHP validation errors.%s Please run `%s%s` to fix them.' % (colors.FAIL, colors.NORMAL, sys.argv[0], extra_args)
 		return 1
 	return 0
 
