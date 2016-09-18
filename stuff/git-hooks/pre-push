@@ -1,5 +1,7 @@
 #!/bin/bash
 
+read LOCAL_REF LOCAL_HASH REMOTE_REF REMOTE_HASH
+
 set -e
 exec < /dev/tty
 
@@ -26,5 +28,5 @@ fi
 
 /usr/bin/python $OMEGAUP_ROOT/stuff/i18n.py --validate
 /usr/bin/python $OMEGAUP_ROOT/stuff/update-templates.py --validate
-/usr/bin/python $OMEGAUP_ROOT/stuff/whitespace-purge.py --validate --pre-push $1
-/usr/bin/python $OMEGAUP_ROOT/stuff/php-format.py --validate --pre-push $1
+/usr/bin/python $OMEGAUP_ROOT/stuff/whitespace-purge.py --validate --from-commit=$REMOTE_HASH
+/usr/bin/python $OMEGAUP_ROOT/stuff/php-format.py --validate --from-commit=$REMOTE_HASH
