@@ -22,3 +22,6 @@
 [submodule "frontend/www/karel.js"]
 	path = frontend/www/karel.js
 	url = https://github.com/omegaup/karel.js.git
+[submodule "frontend/server/libs/smarty"]
+	path = frontend/server/libs/smarty
+	url = https://github.com/smarty-php/smarty.git
