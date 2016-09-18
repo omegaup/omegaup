@@ -25,3 +25,6 @@
 [submodule "frontend/server/libs/smarty"]
 	path = frontend/server/libs/smarty
 	url = https://github.com/smarty-php/smarty.git
+[submodule "frontend/server/libs/facebook-php-sdk"]
+	path = frontend/server/libs/facebook-php-sdk
+	url = https://github.com/facebookarchive/facebook-php-sdk.git
