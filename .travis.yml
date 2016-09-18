@@ -24,7 +24,7 @@ git:
   submodules: false
 
 before_install:
-  - git submodule update --init frontend/server/libs/smarty frontend/server/libs/log4php frontend/server/libs/adodb frontend/server/libs/facebook-php-sdk frontend/server/libs/google-api-php-client
+  - git submodule update --init frontend/server/libs/smarty frontend/server/libs/phpmailer frontend/server/libs/log4php frontend/server/libs/adodb frontend/server/libs/facebook-php-sdk frontend/server/libs/google-api-php-client
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'

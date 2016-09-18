@@ -28,3 +28,6 @@
 [submodule "frontend/server/libs/facebook-php-sdk"]
 	path = frontend/server/libs/facebook-php-sdk
 	url = https://github.com/facebookarchive/facebook-php-sdk.git
+[submodule "frontend/server/libs/phpmailer"]
+	path = frontend/server/libs/phpmailer
+	url = https://github.com/PHPMailer/PHPMailer.git
