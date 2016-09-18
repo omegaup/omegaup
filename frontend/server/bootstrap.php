@@ -127,7 +127,7 @@ require_once('controllers/ResetController.php');
 require_once('libs/adodb/adodb.inc.php');
 require_once('libs/adodb/adodb-exceptions.inc.php');
 
-require_once('libs/facebook-php-sdk/facebook.php');
+require_once('libs/facebook-php-sdk/src/facebook.php');
 require_once('libs/google-api-php-client/src/Google/autoload.php');
 
 global $conn;
