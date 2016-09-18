@@ -161,8 +161,8 @@ try {
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
 
-include('libs/smarty/Smarty.class.php');
-$smarty = new Smarty;
+include('libs/smarty/libs/Smarty.class.php');
+$smarty = new Smarty();
 $smarty->setTemplateDir(__DIR__ . '/../templates/');
 
 if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === true)) {
@@ -201,7 +201,7 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_51', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=51">');
 
         UITools::$isAdmin = $session['is_admin'];
-        $userRequest['username'] = $session['username'];
+        $userRequest['username'] = $session['user']->username;
     } else {
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="/media/avatar_92.png">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="/media/avatar_16.png">');
