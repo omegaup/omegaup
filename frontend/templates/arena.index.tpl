@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/arena.js?ver=3ea0f6'}
+{include file='arena.head.tpl' jsfile='/ux/arena.js?ver=621136'}
 {include file='arena.contest_list.tpl' jsfile='/omegaup/arena/contest_list.js?ver=62c67a'}
 			<div class="container" id="main">
 				<div class="panel panel-default">
