@@ -22,7 +22,7 @@
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
 
-		<link rel="stylesheet" href="/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/css/third_party/bootstrap.min.css">
 
 		<!-- Latest compiled and minified JavaScript -->
 
@@ -30,18 +30,18 @@
 
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
 		<script src="/js/third_party/bootstrap-table.min.js?ver=711245"></script>
-		<link rel="stylesheet" href="/css/bootstrap-table.min.css">
+		<link rel="stylesheet" href="/css/third_party/bootstrap-table.min.css">
 
 		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
-		<link rel="stylesheet" href="/css/bootstrap-select.min.css">
+		<link rel="stylesheet" href="/css/third_party/bootstrap-select.min.css">
 		<script type="text/javascript" src="/js/third_party/bootstrap-select.min.js?ver=cf5db5"></script>
 		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
-		<link rel="stylesheet" href="/css/bootstrap-datepicker.css">
+		<link rel="stylesheet" href="/css/third_party/bootstrap-datepicker.css">
 		<script type="text/javascript" src="/js/third_party/bootstrap-datepicker.js?ver=bf3a56"></script>
 		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
 		<script type="text/javascript" src="/js/third_party/typeahead.jquery.js?ver=2e4977"></script>
 		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
-		<link rel="stylesheet" href="/css/bootstrap-datetimepicker.css">
+		<link rel="stylesheet" href="/css/third_party/bootstrap-datetimepicker.css">
 		<script type="text/javascript" src="/js/third_party/bootstrap-datetimepicker.min.js?ver=a0cafb"></script>
 
 		<!-- from arena -->

@@ -7,7 +7,7 @@
  * @author Joe Ponce joe@omegaup.com
  */
 
-require_once 'PasswordHash.php';
+require_once 'third_party/PasswordHash.php';
 
 class SecurityTools {
     // Base-2 logarithm of the iteration count used for password stretching

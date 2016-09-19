@@ -51,7 +51,7 @@ header('X-Frame-Options: DENY');
  * Load libraries
  *
  * */
-require_once('libs/log4php/src/main/php/Logger.php');
+require_once('libs/third_party/log4php/src/main/php/Logger.php');
 require_once('libs/dao/model.inc.php');
 require_once('libs/SessionManager.php');
 require_once('libs/Request.php');
@@ -63,11 +63,11 @@ require_once('libs/Git.php');
 require_once('libs/Grader.php');
 require_once('libs/Broadcaster.php');
 require_once('libs/Scoreboard.php');
-require_once('libs/ZipStream.php');
+require_once('libs/third_party/ZipStream.php');
 require_once('libs/ProblemDeployer.php');
-require_once('libs/phpmailer/class.phpmailer.php');
+require_once('libs/third_party/phpmailer/class.phpmailer.php');
 require_once('libs/UITools.php');
-require_once('libs/Mailchimp/Mailchimp.php');
+require_once('libs/third_party/Mailchimp/Mailchimp.php');
 require_once('libs/ApiException.php');
 require_once('libs/UrlHelper.php');
 
@@ -124,11 +124,11 @@ require_once('controllers/GroupController.php');
 require_once('controllers/GroupScoreboardController.php');
 require_once('controllers/ResetController.php');
 
-require_once('libs/adodb/adodb.inc.php');
-require_once('libs/adodb/adodb-exceptions.inc.php');
+require_once('libs/third_party/adodb/adodb.inc.php');
+require_once('libs/third_party/adodb/adodb-exceptions.inc.php');
 
-require_once('libs/facebook-php-sdk/src/facebook.php');
-require_once('libs/google-api-php-client/src/Google/autoload.php');
+require_once('libs/third_party/facebook-php-sdk/src/facebook.php');
+require_once('libs/third_party/google-api-php-client/src/Google/autoload.php');
 
 global $conn;
 $conn = null;
@@ -161,7 +161,7 @@ try {
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');
 
-include('libs/smarty/libs/Smarty.class.php');
+include('libs/third_party/smarty/libs/Smarty.class.php');
 $smarty = new Smarty();
 $smarty->setTemplateDir(__DIR__ . '/../templates/');
 

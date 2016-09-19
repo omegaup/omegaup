@@ -2,10 +2,10 @@
 	path = frontend/www/js/mathjax
 	url = https://github.com/mathjax/MathJax.git
 [submodule "frontend/server/libs/log4php"]
-	path = frontend/server/libs/log4php
+	path = frontend/server/libs/third_party/log4php
 	url = https://github.com/omegaup/logging-log4php.git
 [submodule "frontend/server/libs/adodb"]
-	path = frontend/server/libs/adodb
+	path = frontend/server/libs/third_party/adodb
 	url = https://github.com/ADOdb/ADOdb.git
 [submodule "frontend/www/js/pagedown"]
 	path = frontend/www/js/pagedown
@@ -17,17 +17,17 @@
 	path = libinteractive
 	url = https://github.com/omegaup/libinteractive.git
 [submodule "frontend/server/libs/google-api-php-client"]
-	path = frontend/server/libs/google-api-php-client
+	path = frontend/server/libs/third_party/google-api-php-client
 	url = https://github.com/google/google-api-php-client
 [submodule "frontend/www/karel.js"]
 	path = frontend/www/karel.js
 	url = https://github.com/omegaup/karel.js.git
 [submodule "frontend/server/libs/smarty"]
-	path = frontend/server/libs/smarty
+	path = frontend/server/libs/third_party/smarty
 	url = https://github.com/smarty-php/smarty.git
 [submodule "frontend/server/libs/facebook-php-sdk"]
-	path = frontend/server/libs/facebook-php-sdk
+	path = frontend/server/libs/third_party/facebook-php-sdk
 	url = https://github.com/facebookarchive/facebook-php-sdk.git
 [submodule "frontend/server/libs/phpmailer"]
-	path = frontend/server/libs/phpmailer
+	path = frontend/server/libs/third_party/phpmailer
 	url = https://github.com/PHPMailer/PHPMailer.git
