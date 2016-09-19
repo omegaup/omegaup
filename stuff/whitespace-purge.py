@@ -69,7 +69,7 @@ def main():
       type=str, help='Only include files changed between commits')
 
   fix_parser = subparsers.add_parser('fix',
-      help='Only validates, does not make changes')
+      help='Fixes all violations and leaves the results in the working tree.')
   fix_parser.add_argument('commits', metavar='commit', nargs='*',
       type=str, help='Only include files changed between commits')
 
