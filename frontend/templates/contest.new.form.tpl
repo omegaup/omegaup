@@ -3,7 +3,7 @@
 {/if}
 
 <div class="panel panel-primary">
-	{if $IS_UPDATE neq 1}
+	{if $IS_UPDATE != 1}
 	<div class="panel-heading">
 		<h3 class="panel-title">
 			{#contestNew#}
@@ -11,7 +11,7 @@
 	</div>
 	{/if}
 	<div class="panel-body">
-		{if $IS_UPDATE neq 1}
+		{if $IS_UPDATE != 1}
 		<div class="btn-group bottom-margin">
 			<button class="btn btn-default" id='omi' name='omi'>Estilo OMI - IOI</button>
 			<button class="btn btn-default" id='preioi' name='preioi'>{#contestNewForm#}</button>
