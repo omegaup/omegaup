@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+'''
+Runs the PHP Code Beautifier against files that will be uploaded through git.
+'''
+
 import argparse
 import git_tools
 import io
@@ -10,6 +14,7 @@ import sys
 from git_tools import COLORS
 
 def which(program):
+  '''Looks for |program| in $PATH. Similar to UNIX's `which` command.'''
   for path in os.environ["PATH"].split(os.pathsep):
     exe_file = os.path.join(path.strip('"'), program)
     if os.path.isfile(exe_file) and os.access(exe_file, os.X_OK):
@@ -56,6 +61,8 @@ def main():
         cwd=root) as p:
       replaced = p.communicate(contents)[0]
       if p.returncode != 0 and not replaced:
+        # phpcbf returns 1 if there was no change to the file. If there was an
+        # actual error, there won't be anything in stdout.
         validation_passed = False
         print('Execution of "%s" %sfailed with return code %d%s.' % (
               ' '.join(cmd), COLORS.FAIL, COLORS.NORMAL), file=sys.stderr)

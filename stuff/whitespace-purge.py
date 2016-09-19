@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+'''
+Removes annoying superfluous whitespace.
+'''
+
 import argparse
 import git_tools
 import os

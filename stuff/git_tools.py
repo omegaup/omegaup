@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+'''
+Tools used to write git hooks.
+'''
+
 import os.path
 import re
 import subprocess
@@ -31,6 +35,7 @@ def validate_args(args):
   return True
 
 def file_at_commit(commit, filename):
+  '''Returns the contents of |filename| at git commit |commit|.'''
   return subprocess.check_output(['/usr/bin/git', 'show',
     '%s:%s' % (commit, filename)])
 
