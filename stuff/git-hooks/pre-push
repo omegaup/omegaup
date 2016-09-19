@@ -28,5 +28,5 @@ fi
 
 /usr/bin/python $OMEGAUP_ROOT/stuff/i18n.py --validate
 /usr/bin/python $OMEGAUP_ROOT/stuff/update-templates.py --validate
-/usr/bin/python $OMEGAUP_ROOT/stuff/whitespace-purge.py --validate --from-commit=$REMOTE_HASH
-/usr/bin/python $OMEGAUP_ROOT/stuff/php-format.py --validate --from-commit=$REMOTE_HASH
+/usr/bin/python3 $OMEGAUP_ROOT/stuff/whitespace-purge.py validate $REMOTE_HASH $LOCAL_HASH
+/usr/bin/python3 $OMEGAUP_ROOT/stuff/php-format.py validate $REMOTE_HASH $LOCAL_HASH

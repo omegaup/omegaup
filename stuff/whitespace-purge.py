@@ -1,95 +1,100 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import argparse
 import git_tools
 import os
+import re
 import subprocess
 import sys
 
-FILTERS = ['--include=*.css', '--include=*.js', '--include=*.php',
-	'--include=*.sql', '--include=*.tpl', '--exclude-dir=facebook-php-sdk',
-	'--exclude-dir=Markdown', '--exclude-dir=google-api-php-client',
-	'--exclude-dir=smarty', '--exclude-dir=adodb', '--exclude-dir=phpmailer',
-	'--exclude-dir=Mailchimp', '--exclude-dir=base', '--exclude-dir=log4php',
-	'--exclude-dir=mathjax', '--exclude-dir=*.git', '--exclude-dir=pagedown',
-	'--exclude-dir=karel', '--exclude=jquery*', '--exclude=bootstrap*',
-	'--exclude=codemirror*', '--exclude-dir=frontend/server/libs/dao/base',
-	'--exclude-dir=karel.js', '--exclude-dir=templates_c']
+from git_tools import COLORS
 
-class colors:
-	HEADER = '\033[95m'
-	OKGREEN = '\033[92m'
-	FAIL = '\033[91m'
-	NORMAL = '\033[0m'
+VALIDATIONS = [
+  ('Windows-style EOF', re.compile(br'\r'), br'\n'),
+  ('trailing whitespace', re.compile(br'[ \t]+\n'), br'\n'),
+  ('consecutive empty lines', re.compile(br'\n\n\n+'), br'\n\n'),
+  ('empty lines after an opening brace', re.compile(br'{\n\n+'), br'{\n'),
+  ('empty lines before a closing brace',
+   re.compile(br'\n+\n(\s*})'), br'\n\1'),
+]
 
-def which(program):
-	for path in os.environ["PATH"].split(os.pathsep):
-		exe_file = os.path.join(path.strip('"'), program)
-		if os.path.isfile(exe_file) and os.access(exe_file, os.X_OK):
-			return exe_file
-	raise Exception('`%s` not found' % program)
+def run_validations(commit, files, validate_only):
+  '''Runs all validations against |files| in |commit|.
 
-def run_validation(grep_flags, detect_regex, error_string, fix_command, files,
-		validate_only):
-	violations = []
-	try:
-		violations += subprocess.check_output([which('grep'), grep_flags] + FILTERS +
-			[detect_regex] + files).strip().split('\n')
-	except subprocess.CalledProcessError:
-		# If the command failed, that means that nothing matched.
-		return False
-	if violations:
-		if validate_only:
-			print >> sys.stderr, '%s%s: %s%s' % (colors.FAIL, error_string, colors.NORMAL,
-					' '.join(violations))
-		else:
-			subprocess.check_call(fix_command + violations)
-		return True
-	return False
+  A validation consists of performing regex substitution against the contents
+  of each file in |files|, at the git commit |commit|.  Validation fails if the
+  resulting content is not identical to the original.  The contents of the
+  files will be presented as a single string, allowing for multi-line matches.
+  '''
+  root = git_tools.root_dir()
+  validation_passed = True
+  for filename in files:
+    filename = str(filename, encoding='utf-8')
+    contents = git_tools.file_at_commit(commit, filename)
+    violations = []
+
+    # Run all validations sequentially, so all violations can be fixed
+    # together.
+    for error_string, search, replace in VALIDATIONS:
+      replaced = search.sub(replace, contents)
+      if replaced != contents:
+        violations.append(error_string)
+        contents = replaced
+
+    if violations:
+      validation_passed = False
+      violations_message = ', '.join('%s%s%s' % (COLORS.FAIL, violation,
+        COLORS.NORMAL) for violation in violations)
+      if validate_only:
+        print('File %s%s%s has %s.' % (COLORS.HEADER, filename, COLORS.NORMAL,
+          violations_message), file=sys.stderr)
+      else:
+        print('Fixing %s%s%s for %s.' % (COLORS.HEADER, filename, COLORS.NORMAL,
+          violations_message), file=sys.stderr)
+        with open(os.path.join(root, filename), 'wb') as f:
+          f.write(replaced)
+  return validation_passed
 
 def main():
-	parser = argparse.ArgumentParser(description='purge whitespace')
-	parser.add_argument('--from-commit', dest='from_commit', type=str,
-			help='Only include files changed from a certain commit')
-	parser.add_argument('--validate', dest='validate', action='store_true',
-			default=False, help='Only validates, does not make changes')
+  parser = argparse.ArgumentParser(description='purge whitespace')
+  subparsers = parser.add_subparsers(dest='tool')
 
-	args = parser.parse_args()
+  validate_parser = subparsers.add_parser('validate',
+      help='Only validates, does not make changes')
+  validate_parser.add_argument('commits', metavar='commit', nargs='*',
+      type=str, help='Only include files changed between commits')
 
-	changed_files = git_tools.changed_files(args.from_commit)
-	if not changed_files:
-		return 0
+  fix_parser = subparsers.add_parser('fix',
+      help='Only validates, does not make changes')
+  fix_parser.add_argument('commits', metavar='commit', nargs='*',
+      type=str, help='Only include files changed between commits')
 
-	errors = False
+  args = parser.parse_args()
+  if not git_tools.validate_args(args):
+    return 1
 
-	errors |= run_validation('-Rl', r'\s\+$',
-			'Files have trailing whitespace',
-			[which('sed'), '-i', '-e', r's/\s*$//'],
-			changed_files, args.validate)
-	errors |= run_validation('-PRzl', r'(?s)\n\n\n',
-			'Files have consecutive empty lines',
-			['/usr/bin/perl', '-i', '-0pe', r's/\n\n\n+/\n\n/g'],
-			changed_files, args.validate)
-	errors |= run_validation('-PRzl', r'(?s){\n\n',
-			'Files have an empty line after an opening brace',
-			['/usr/bin/perl', '-i', '-0pe', r's/{\n\n+/{\n/g'],
-			changed_files, args.validate)
-	errors |= run_validation('-PRzl', r'(?s)\n\n\s*}',
-			'Files have an empty line before a closing brace',
-			['/usr/bin/perl', '-i', '-0pe', r's/\n\n+(\s*})/\n\1/g'],
-			changed_files, args.validate)
+  changed_files = git_tools.changed_files(args.commits,
+      whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
+      blacklist=[br'.*third_party.*', br'.*dao/base.*'])
+  if not changed_files:
+    return 0
 
-	if errors:
-		if args.validate:
-			if args.from_commit:
-				extra_args = ' --from-commit=%s' % args.from_commit
-			else:
-				extra_args = ''
-			print >> sys.stderr, '%sWhitespace validation errors.%s Please run `%s%s` to fix them.' % (colors.FAIL, colors.NORMAL, sys.argv[0], extra_args)
-		return 1
-	return 0
+  validate_only = args.tool == 'validate'
+
+  if not run_validations(args.commits[1], changed_files, validate_only):
+    if validate_only:
+      print('%sWhitespace validation errors.%s '
+            'Please run `%s fix %s` to fix them.' % (COLORS.FAIL,
+            COLORS.NORMAL, sys.argv[0], ' '.join(args.commits)),
+            file=sys.stderr)
+    else:
+      print('Files written to working directory. '
+          '%sPlease commit them before pushing.%s' % (COLORS.HEADER,
+          COLORS.NORMAL), file=sys.stderr)
+    return 1
+  return 0
 
 if __name__ == '__main__':
-	sys.exit(main())
+  sys.exit(main())
 
-# vim: noexpandtab shiftwidth=2 tabstop=2
+# vim: expandtab shiftwidth=2 tabstop=2

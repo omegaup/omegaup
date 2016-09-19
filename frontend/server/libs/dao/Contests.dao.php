@@ -28,7 +28,7 @@ class StatusBase {
             if ($cache['min'] <= $status && $status <= $cache['max']) {
                 return $status;
             }
-        } else if (is_string($status)) {
+        } elseif (is_string($status)) {
             if (in_array($status, $cache['constants'])) {
                 return $cache['constants'][$status];
             }
