@@ -1,5 +1,5 @@
 [submodule "frontend/www/js/mathjax"]
-	path = frontend/www/js/mathjax
+	path = frontend/www/third_party/js/mathjax
 	url = https://github.com/mathjax/MathJax.git
 [submodule "frontend/server/libs/log4php"]
 	path = frontend/server/libs/third_party/log4php
@@ -8,7 +8,7 @@
 	path = frontend/server/libs/third_party/adodb
 	url = https://github.com/ADOdb/ADOdb.git
 [submodule "frontend/www/js/pagedown"]
-	path = frontend/www/js/pagedown
+	path = frontend/www/third_party/js/pagedown
 	url = https://github.com/omegaup/pagedown.git
 [submodule "backend"]
 	path = backend
