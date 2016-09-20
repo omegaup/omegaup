@@ -7,12 +7,7 @@ import subprocess
 import sys
 
 IGNORE_LIST = ['frontend/server/libs/dao/base/',
-	'frontend/server/libs/dao/Estructura.php', 'frontend/server/libs/adodb/',
-	'frontend/server/libs/log4php/', 'frontend/server/libs/google-api-php-client/',
-	'frontend/server/libs/facebook-php-sdk/', 'frontend/server/libs/log4php/',
-	'frontend/server/libs/Mailchimp/', 'frontend/server/libs/Markdown/',
-	'frontend/server/libs/phpmailer/', 'frontend/server/libs/smarty/',
-	'frontend/server/libs/PasswordHash.php', 'frontend/server/libs/ZipStream.php',
+	'frontend/server/libs/dao/Estructura.php', 'frontend/server/libs/third_party/',
 	'frontend/server/config.php', 'frontend/server/test/test_config.php',
 	'frontend/tests/templates_c']
 

@@ -1,10 +1,10 @@
 {assign var="htmlTitle" value="{#omegaupTitleRedaccion#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
-<script type="text/javascript" src="/js/pagedown/Markdown.Converter.js?ver=e445ec"></script>
-<script type="text/javascript" src="/js/pagedown/Markdown.Sanitizer.js?ver=25306e"></script>
-<script type="text/javascript" src="/js/pagedown/Markdown.Editor.js?ver=e0132d"></script>
-<link rel="stylesheet" type="text/css" href="/js/pagedown/demo/browser/demo.css" />
+<script type="text/javascript" src="/third_party/js/pagedown/Markdown.Converter.js?ver=e445ec"></script>
+<script type="text/javascript" src="/third_party/js/pagedown/Markdown.Sanitizer.js?ver=25306e"></script>
+<script type="text/javascript" src="/third_party/js/pagedown/Markdown.Editor.js?ver=e0132d"></script>
+<link rel="stylesheet" type="text/css" href="/third_party/js/pagedown/demo/browser/demo.css" />
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 
 <div class="post">
