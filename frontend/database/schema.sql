@@ -104,7 +104,6 @@ CREATE TABLE IF NOT EXISTS `Problemsets` (
   `problemset_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de problemas',
   `director_id` int(11) NOT NULL COMMENT 'el identificador del usuario que creó este conjunto de problemas',
   `access_mode` enum('private', 'public', 'registration') NOT NULL DEFAULT 'public' COMMENT 'La modalidad de acceso a este conjunto de problemas',
-  `feedback` enum('no','yes') NOT NULL DEFAULT 'no' COMMENT 'Si se permite que los usuarios vean la retroalimentación detallada.',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
   PRIMARY KEY (`problemset_id`),
   KEY `director_id` (`director_id`)
