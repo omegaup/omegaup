@@ -332,8 +332,11 @@ CREATE TABLE IF NOT EXISTS `Languages` (
 --
 
 CREATE TABLE IF NOT EXISTS `Interviews` (
-	`interview_id` int(11) NOT NULL AUTO_INCREMENT,
+  `interview_id` int(11) NOT NULL AUTO_INCREMENT,
   `problemset_id` int(11) NOT NULL,
+  `title` varchar(256) NOT NULL COMMENT 'El titulo de la entrevista.',
+  `description` tinytext NOT NULL COMMENT 'Una breve descripcion de la entrevista.',
+  `window_length` int(11) DEFAULT NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar soluciones.',
   PRIMARY KEY (`interview_id`)
   KEY `problemset_id` (`problemset_id`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Entrevistas';
