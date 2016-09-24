@@ -1,5 +1,5 @@
 {include file='arena.head.tpl' jsfile='/ux/arena.js?ver=621136'}
-{include file='arena.contest_list.tpl' jsfile='/omegaup/arena/contest_list.js?ver=62c67a'}
+{include file='arena.contest_list.tpl'}
 			<div class="container" id="main">
 				<div class="panel panel-default">
 					<div class="panel-body">
