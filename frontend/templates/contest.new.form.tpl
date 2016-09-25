@@ -56,7 +56,7 @@
 						<label for="window_length_enabled">{#contestNewFormDifferentStarts#}</label>
 						<div class="checkbox">
 							<label>
-								<input type='checkbox' id='window_length_enabled' name='window_length_enabled'>	{#contestNewFormDifferentStartsCheckBoxLabel#}
+								<input type='checkbox' id='window_length_enabled' name='window_length_enabled'>	{#wordsEnable#}
 							</label>
 						</div>
 						<input id='window_length' name='window_length' value='' type='text' disabled="true" size='3' class="form-control">
