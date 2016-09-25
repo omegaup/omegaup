@@ -1,3 +1,5 @@
+var omegaup = omegaup || {};
+
 omegaup.T = {
 	aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
 	adminAdded: "Admin successfully added.",
@@ -116,6 +118,9 @@ omegaup.T = {
 	contestNewFormStartDateDesc: "The time and date (in local time) in which the contest will begin",
 	contestNewFormSubmissionsSeparation: "Submission time window",
 	contestNewFormSubmissionsSeparationDesc: "Time in minutes that must pass before a contestant can send a new submission for the same problem after sending one.",
+	contestNewFormTitlePlaceholderConacupStyle: "**CONACUP Style applied. Set your title here**",
+	contestNewFormTitlePlaceholderIoiStyle: "**IOI Style applied. Set your title here**",
+	contestNewFormTitlePlaceholderOmiStyle: "**OMI Style applied. Set your title here**",
 	contestNewFormUpdateContest: "Update contest",
 	contestNewInvalidStartTime: "The start time must be before the end time.",
 	contestNewPublicInfoNotice: "To make a public contest, add a problem first and then mark it as public in Edit Contest.",

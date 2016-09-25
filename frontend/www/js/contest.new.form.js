@@ -24,7 +24,7 @@ $('document').ready(function() {
 
 	// Defaults for OMI
 	$('#omi').click(function() {
-		$(".new_contest_form #title").val('**Estilo OMI aplicado. Pon tu título aquí**');
+		$(".new_contest_form #title").val(omegaup.T.contestNewFormTitlePlaceholderOmiStyle);
 		$('#window_length_enabled').removeAttr('checked');
 		$('#window_length').attr('disabled','disabled');
 		$('#window_length').val('');
@@ -40,7 +40,7 @@ $('document').ready(function() {
 
 	// Defaults for preselectivos IOI
 	$('#preioi').click(function() {
-		$(".new_contest_form #title").val('**Estilo Preselectivo aplicado. Pon tu título aquí**');
+		$(".new_contest_form #title").val(omegaup.T.contestNewFormTitlePlaceholderIoiStyle);
 		$('#window_length_enabled').attr('checked', 'checked');
 		$('#window_length').removeAttr('disabled');
 		$('#window_length').val('180');
@@ -56,7 +56,7 @@ $('document').ready(function() {
 
 	// Defaults for CONACUP
 	$('#conacup').click(function() {
-		$(".new_contest_form #title").val('**Estilo CONCACUP aplicado. Tu título aquí**');
+		$(".new_contest_form #title").val(omegaup.T.contestNewFormTitlePlaceholderConacupStyle);
 		$('#window_length_enabled').removeAttr('checked');
 		$('#window_length').attr('disabled','disabled');
 		$('#window_length').val('');

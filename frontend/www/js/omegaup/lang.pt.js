@@ -1,3 +1,5 @@
+var omegaup = omegaup || {};
+
 omegaup.T = {
 	aboutToStart: "Você está prestes a iniciar a competição. Depois de clicar em, seu tempo começou.",
 	adminAdded: "administrador adicionado com sucesso",
@@ -116,6 +118,9 @@ omegaup.T = {
 	contestNewFormStartDateDesc: "A data (no horário local), no qual a competição começará",
 	contestNewFormSubmissionsSeparation: "Separação das submissões",
 	contestNewFormSubmissionsSeparationDesc: "Tempo mínimo em minutos que deve esperar un competidor depois de realizar na submissão para fazer outro.",
+	contestNewFormTitlePlaceholderConacupStyle: "**Estilo CONACUP usado. Colocar o seu título aqui**",
+	contestNewFormTitlePlaceholderIoiStyle: "**Estilo IOI usado. Colocar o seu título aqui**",
+	contestNewFormTitlePlaceholderOmiStyle: "**Estilo OMI usado. Colocar o seu título aqui**",
 	contestNewFormUpdateContest: "Atualizar concurso",
 	contestNewInvalidStartTime: "O tempo de início deve ser antes do tempo do fim",
 	contestNewPublicInfoNotice: "Para fazer um concurso público, adicione um problema em primeiro lugar e, em seguida, marcá-la como pública em Editar Concurso.",

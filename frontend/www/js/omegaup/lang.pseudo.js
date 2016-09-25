@@ -1,3 +1,5 @@
+var omegaup = omegaup || {};
+
 omegaup.T = {
 	aboutToStart: "(Y0u ar3 ab0u7 70 57ar7 7h3 c0n7357. Onc3 y0u c1ick S7ar7 C0n7357 y0ur 7im3 wi11 b3gin.)",
 	adminAdded: "(Admin 5ucc355fu11y add3d.)",
@@ -116,6 +118,9 @@ omegaup.T = {
 	contestNewFormStartDateDesc: "(Th3 7im3 and da73 (in 10ca1 7im3) in which 7h3 c0n7357 wi11 b3gin)",
 	contestNewFormSubmissionsSeparation: "(Submi55i0n 7im3 wind0w)",
 	contestNewFormSubmissionsSeparationDesc: "(Tim3 in minu735 7ha7 mu57 pa55 b3f0r3 a c0n7357an7 can 53nd a n3w 5ubmi55i0n f0r 7h3 5am3 pr0b13m af73r 53nding 0n3.)",
+	contestNewFormTitlePlaceholderConacupStyle: "**CONACUP St7l3 4ppl13d. S3t your t1tl3 h3r3**",
+	contestNewFormTitlePlaceholderIoiStyle: "**IOI St7l3 4ppl13d. S3t your t1tl3 h3r3**",
+	contestNewFormTitlePlaceholderOmiStyle: "**OMI St7l3 4ppl13d. S3t your t1tl3 h3r3**",
 	contestNewFormUpdateContest: "(Upda73 c0n7357)",
 	contestNewInvalidStartTime: "(Th3 57ar7 7im3 mu57 b3 b3f0r3 7h3 3nd 7im3.)",
 	contestNewPublicInfoNotice: "(T0 mak3 a pub1ic c0n7357, add a pr0b13m fir57 and 7h3n mark i7 a5 pub1ic in Edi7 C0n7357.)",
