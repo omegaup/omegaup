@@ -30,7 +30,7 @@
 
 					<div class="row">
 						<div class="form-group col-md-6">
-							<label title="{#contestNewFormScoreboardAtEndDesc#}" for="show_scoreboard_after">Scoreboard al finalizar el concurso</label>
+							<label title="{#contestNewFormScoreboardAtEndDesc#}" for="show_scoreboard_after">{#contestNewFormScoreboardAtEnd#}</label>
 							<select disabled id='show_scoreboard_after' name='show_scoreboard_after' class="form-control">
 								<option value='1'>{#wordsYes#}</option>
 								<option value='0'>{#wordsNo#}</option>
@@ -41,7 +41,7 @@
 							<label title="{#contestNewFormDifferentStartsDesc#}" for="window_length_enabled">{#contestNewFormDifferentStarts#}</label>
 							<div class="checkbox">
 								<label>
-									<input disabled type='checkbox' id='window_length_enabled' name='window_length_enabled'>	Habilitar
+									<input disabled type='checkbox' id='window_length_enabled' name='window_length_enabled'> {#wordsEnable#}
 								</label>
 							</div>
 						</div>

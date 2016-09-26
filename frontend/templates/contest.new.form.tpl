@@ -13,7 +13,7 @@
 	<div class="panel-body">
 		{if $IS_UPDATE != 1}
 		<div class="btn-group bottom-margin">
-			<button class="btn btn-default" id='omi' name='omi'>Estilo OMI - IOI</button>
+			<button class="btn btn-default" id='omi' name='omi'>{#contestNewFormOmiStyle#}</button>
 			<button class="btn btn-default" id='preioi' name='preioi'>{#contestNewForm#}</button>
 			<button class="btn btn-default" id='conacup' name='conacup'>{#contestNewFormConacupStyle#}</button>
 		</div>
@@ -56,7 +56,7 @@
 						<label for="window_length_enabled">{#contestNewFormDifferentStarts#}</label>
 						<div class="checkbox">
 							<label>
-								<input type='checkbox' id='window_length_enabled' name='window_length_enabled'>	Habilitar
+								<input type='checkbox' id='window_length_enabled' name='window_length_enabled'>	{#wordsEnable#}
 							</label>
 						</div>
 						<input id='window_length' name='window_length' value='' type='text' disabled="true" size='3' class="form-control">
@@ -117,7 +117,7 @@
 
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="show_scoreboard_after">Scoreboard al finalizar el concurso</label>
+						<label for="show_scoreboard_after">{#contestNewFormScoreboardAtEnd#}</label>
 						<select id='show_scoreboard_after' name='show_scoreboard_after' class="form-control">
 							<option value='1'>{#wordsYes#}</option>
 							<option value='0'>{#wordsNo#}</option>
@@ -160,4 +160,4 @@
 		</form>
 	</div>
 </div>
-<script type="text/javascript" src="/js/contest.new.form.js?ver=6cd7dc"></script>
+<script type="text/javascript" src="/js/contest.new.form.js?ver=fc1b67"></script>
