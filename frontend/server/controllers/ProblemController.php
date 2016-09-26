@@ -2,7 +2,7 @@
 
 require_once 'libs/FileHandler.php';
 require_once 'libs/ZipHandler.php';
-require_once 'libs/Markdown/markdown.php';
+require_once 'libs/third_party/Markdown/markdown.php';
 /**
  * ProblemsController
  */
