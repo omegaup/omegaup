@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/js/omegaup/arena/contest_list.js?ver=e23fa8"></script>
+<script type="text/javascript" src="/js/omegaup/arena/contest_list.js?ver=950c55"></script>
 <script type="text/html" id="contest-list">
 <div class="panel-heading">
     <h2 class="panel-title" data-bind="text: header"></h2>
@@ -12,8 +12,7 @@
         <th data-bind="visible: showTimes"></th>
         <th data-bind="visible: showPractice">{#wordsPractice#}</th>
     </tr></thead>
-    <tbody>
-        <!-- ko foreach: page -->
+    <tbody data-bind="foreach: page">
         <tr>
             <td><a data-bind="attr: { href: contestLink }">
                 <span data-bind="text: title"</span>
@@ -36,15 +35,12 @@
                 </a>
             </td>
         </tr>
-        <!-- /ko -->
     </tbody>
     <tfoot>
         <tr data-bind="visible: hasNext || hasPrevious" align="center">
-            <td data-bind="attr: { colspan: pagerColumns }">
+            <td class="no-wrap" data-bind="attr: { colspan: pagerColumns }">
                 <a data-bind="visible: hasPrevious, click: previous">{#wordsPrevPage#}</a>
-                &nbsp;
-                <span data-bind="text: pageNumber"></span>
-                &nbsp;
+                <span class="page-num" data-bind="text: pageNumber"></span>
                 <a data-bind="visible: hasNext, click: next">{#wordsNextPage#}</a>
             </td>
         </tr>

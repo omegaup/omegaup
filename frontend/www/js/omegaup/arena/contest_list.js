@@ -50,11 +50,13 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
   });
   // Click handlers.
   self.next = function() {
+    // TODO: Update history so the back button works correctly.
     if(self.pageNumber() < self.totalPages()) {
       self.pageNumber(self.pageNumber() + 1);
     }
   };
   self.previous = function() {
+    // TODO: Update history so the back button works correctly.
     if(self.pageNumber() != 0) {
       self.pageNumber(self.pageNumber() - 1);
     }
