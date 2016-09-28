@@ -107,7 +107,7 @@
 				<div class="form-group  col-md-6">
 					<label for="email_clarifications">{#problemEditEmailClarifications#}</label>
 					<div class="form-control">
-						<label class="radio-inline"><input type="radio" id="er2" name="email_clarifications" value="1" {if $IS_UPDATE eq 0 && $EMAIL_CLARIFICATIONS eq 0}checked="checked"{/if}>{#wordsYes#}</label>
+						<label class="radio-inline"><input type="radio" id="er2" name="email_clarifications" value="1" {if $IS_UPDATE eq 0 && $EMAIL_CLARIFICATIONS eq 1}checked="checked"{/if}>{#wordsYes#}</label>
 						<label class="radio-inline"><input type="radio" id="er1" name="email_clarifications" value="0" {if $IS_UPDATE eq 0 && $EMAIL_CLARIFICATIONS eq 0}checked="checked"{/if}>{#wordsNo#}</label>
 					</div>
 				</div>
