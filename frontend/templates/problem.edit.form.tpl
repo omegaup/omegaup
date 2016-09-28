@@ -131,7 +131,7 @@
 			<div class="row">
 				<div class="form-group col-md-6" id="problem-contents-group">
 					<label for="problem_contents" class="control-label">{#problemEditFormFile#}</label>
-					<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup" target="_blank"><span>How to create the file.</span></a>
+					<a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup" target="_blank"><span>{#problemEditFormHowToWriteProblems#}</span></a>
 					<input name="problem_contents" id="problem_contents" type="file" class="form-control" />
 				</div>
 			</div>
