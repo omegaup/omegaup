@@ -2,7 +2,7 @@
 	{assign "IS_UPDATE" 0}
 {/if}
 
-<script src="/js/problem.edit.form.js?ver=7b7f84" type="text/javascript"></script>
+<script src="/js/problem.edit.form.js?ver=939ed0" type="text/javascript"></script>
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE neq 1}
@@ -25,7 +25,7 @@
 				</div>
 
 				<div class="form-group  col-md-6">
-					<label for="alias">{#wordsAlias#}</label>
+					<label class="control-label" for="alias">{#wordsAlias#}</label>
 					<input id='alias' name='alias' value='{if $IS_UPDATE eq 0}{$ALIAS|htmlspecialchars}{/if}' type='text' class="form-control"{if $IS_UPDATE eq 1} disabled="disabled"{/if}/>
 				</div>
 

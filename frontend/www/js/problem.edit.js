@@ -17,14 +17,14 @@ $(document).ready(function() {
 
 	// Add typeaheads
 	refreshProblemAdmins();
-	$("#username-admin").typeahead({
+	$('#username-admin').typeahead({
 		minLength: 2,
 		highlight: true,
 	}, {
 		source: omegaup.UI.typeaheadWrapper(omegaup.API.searchUsers),
 		displayKey: 'label',
 	}).on('typeahead:selected', function(item, val, text) {
-		$("#username-admin").val(val.label);
+		$('#username-admin').val(val.label);
 	});
 	$('#groupalias-admin').typeahead({
 		minLength: 2,
@@ -37,21 +37,21 @@ $(document).ready(function() {
 	});
 
 	refreshProblemTags();
-	$("#tag-name").typeahead({
+	$('#tag-name').typeahead({
 		minLength: 2,
 		highlight: true,
 	}, {
 		source: omegaup.UI.typeaheadWrapper(omegaup.API.searchTags),
 		displayKey: 'name',
 	}).on('typeahead:selected', function(item, val, text) {
-		$("#tag-name").val(val.name);
+		$('#tag-name').val(val.name);
 	});
 
 	$('#add-admin-form').submit(function() {
 		var username = $('#username-admin').val();
 
 		omegaup.API.addAdminToProblem(problemAlias, username, function(response) {
-			if (response.status === "ok") {
+			if (response.status === 'ok') {
 				omegaup.UI.success(omegaup.T.adminAdded);
 				$('div.post.footer').show();
 
@@ -68,7 +68,7 @@ $(document).ready(function() {
 		var groupalias = $('#groupalias-admin').attr('data-alias');
 
 		omegaup.API.addGroupAdminToProblem(problemAlias, groupalias, function(response) {
-			if (response.status === "ok") {
+			if (response.status === 'ok') {
 				omegaup.UI.success(omegaup.T.adminAdded);
 				$('div.post.footer').show();
 
@@ -109,11 +109,11 @@ $(document).ready(function() {
 								.text(admin.username)
 						))
 						.append($('<td></td>').text(admin.role))
-						.append((admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
+						.append((admin.role != 'admin') ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
 							.click((function(username) {
 								return function(e) {
 									omegaup.API.removeAdminFromProblem(problemAlias, username, function(response) {
-										if (response.status == "ok") {
+										if (response.status == 'ok') {
 											omegaup.UI.success(omegaup.T.adminAdded);
 											$('div.post.footer').show();
 											var tr = e.target.parentElement.parentElement;
@@ -139,11 +139,11 @@ $(document).ready(function() {
 								.text(group_admin.name)
 						))
 						.append($('<td></td>').text(group_admin.role))
-						.append((group_admin.role != "admin") ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
+						.append((group_admin.role != 'admin') ? $('<td></td>') : $('<td><button type="button" class="close">&times;</button></td>')
 							.click((function(alias) {
 								return function(e) {
 									omegaup.API.removeGroupAdminFromProblem(problemAlias, alias, function(response) {
-										if (response.status == "ok") {
+										if (response.status == 'ok') {
 											omegaup.UI.success(omegaup.T.adminAdded);
 											$('div.post.footer').show();
 											var tr = e.target.parentElement.parentElement;
@@ -165,8 +165,8 @@ $(document).ready(function() {
 		var public = $('#tag-public').val();
 
 		omegaup.API.addTagToProblem(problemAlias, tagname, public, function(response) {
-			if (response.status === "ok") {
-				omegaup.UI.success("Tag successfully added!");
+			if (response.status === 'ok') {
+				omegaup.UI.success('Tag successfully added!');
 				$('div.post.footer').show();
 
 				refreshProblemTags();
@@ -196,8 +196,8 @@ $(document).ready(function() {
 							.click((function(tagname) {
 								return function(e) {
 									omegaup.API.removeTagFromProblem(problemAlias, tagname, function(response) {
-										if (response.status == "ok") {
-											omegaup.UI.success("Tag successfully removed!");
+										if (response.status == 'ok') {
+											omegaup.UI.success('Tag successfully removed!');
 											$('div.post.footer').show();
 											var tr = e.target.parentElement.parentElement;
 											$(tr).remove();
@@ -218,7 +218,7 @@ $(document).ready(function() {
 	md_editor.run();
 
 	function refreshEditForm(problemAlias) {
-		if (problemAlias === "") {
+		if (problemAlias === '') {
 			$('input[name=title]').val('');
 			$('input[name=time_limit]').val('');
 			$('input[name=validator_time_limit]').val('');
@@ -231,7 +231,7 @@ $(document).ready(function() {
 			return;
 		}
 
-		omegaup.API.getProblem(null, problemAlias, problemCallback, "markdown");
+		omegaup.API.getProblem(null, problemAlias, problemCallback, 'markdown');
 	}
 
 	function problemCallback(problem) {
@@ -251,9 +251,9 @@ $(document).ready(function() {
 		$('#statement-preview .problemsetter')
 			.attr('href', '/profile/' + problem.problemsetter.username + '/')
 			.html(omegaup.UI.escape(problem.problemsetter.name));
-		$("input[name=email_clarifications][value=" + problem.email_clarifications + "]").attr("checked", 1);
+		$('input[name=email_clarifications][value=' + problem.email_clarifications + ']').attr('checked', 1);
 		$('select[name=validator]').val(problem.validator);
-		$("input[name=public][value=" + problem.public + "]").attr("checked", 1);
+		$('input[name=public][value=' + problem.public + ']').attr('checked', 1);
 		$('#languages').val(problem.languages);
 		$('input[name=alias]').val(problemAlias);
 		if (chosenLanguage == null || chosenLanguage == problem.problem_statement_language) {
@@ -270,12 +270,12 @@ $(document).ready(function() {
 	}
 
 	$('#statement-preview-link').on('show.bs.tab', function(e) {
-		MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#wmd-preview').get(0)]);
+		MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#wmd-preview').get(0)]);
 	});
 
 	$('#statement-language').on('change', function(e) {
 		chosenLanguage = $('#statement-language').val();
-		omegaup.API.getProblem(null, problemAlias, problemCallback, "markdown",
+		omegaup.API.getProblem(null, problemAlias, problemCallback, 'markdown',
 			false, chosenLanguage);
 	});
 });
