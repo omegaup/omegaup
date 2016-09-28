@@ -173,6 +173,16 @@ def print_revision(args):
   print(_revision(args))
 
 
+def purge(args):
+  '''
+  Use purge to start from scratch - Drops & re-creates databases including the
+  metadata. Note that purge will not re-apply the schema.
+  '''
+  for dbname in args.databases.split(','):
+    _mysql(args, ['-NBe', 'DROP DATABASE IF EXISTS `%s`;' % dbname])
+    _mysql(args, ['-NBe', 'CREATE DATABASE `%s`;' % dbname])
+
+
 def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('--config-file', dest='config_file',
@@ -217,6 +227,12 @@ def main():
   parser_revision = subparsers.add_parser(
       'revision', help='Gets the current revision')
   parser_revision.set_defaults(func=print_revision)
+
+  parser_purge = subparsers.add_parser(
+      'purge', help='Start from scratch - Drop & Create empty databases')
+  parser_purge.add_argument('--databases', default='omegaup,omegaup-test,_omegaup_metadata',
+                            help='Comma-separated list of databases')
+  parser_purge.set_defaults(func=purge)
 
   args = parser.parse_args()
   args.func(args)

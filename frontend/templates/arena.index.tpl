@@ -1,4 +1,5 @@
-{include file='arena.head.tpl' jsfile='/ux/arena.js?ver=176633'}
+{include file='arena.head.tpl' jsfile='/ux/arena.js?ver=621136'}
+{include file='arena.contest_list.tpl'}
 			<div class="container" id="main">
 				<div class="panel panel-default">
 					<div class="panel-body">
@@ -13,71 +14,14 @@
 					</div>
 				</div>
 
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h2 class="panel-title">{#arenaRecommendedCurrentContests#}</h2>
-					</div>
-					<table class="contest-list table table-striped table-hover">
-						<thead><tr>
-							<th>{#wordsContest#}</th>
-							<th>{#wordsDescription#}</th>
-							<th class="time">{#wordsStartTime#}</th>
-							<th class="time">{#wordsEndTime#}</th>
-							<th></th>
-							<th></th>
-						</tr></thead>
-						<tbody id="recommended-current-contests">
-						</tbody>
-					</table>
-				</div>
-
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h2 class="panel-title">{#arenaCurrentContests#}</h2>
-					</div>
-					<table class="contest-list table table-striped table-hover">
-						<thead><tr>
-							<th>{#wordsContest#}</th>
-							<th>{#wordsDescription#}</th>
-							<th class="time">{#wordsStartTime#}</th>
-							<th class="time">{#wordsEndTime#}</th>
-							<th></th>
-							<th></th>
-						</tr></thead>
-						<tbody id="current-contests">
-						</tbody>
-					</table>
-				</div>
-
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h2 class="panel-title">{#arenaRecommendedOldContests#}</h2>
-					</div>
-					<table class="contest-list table table-striped table-hover">
-						<thead><tr>
-							<th>{#wordsContest#}</th>
-							<th>{#wordsDescription#}</th>
-							<th>{#wordsPractice#}</th>
-						</tr></thead>
-						<tbody id="recommended-past-contests">
-						</tbody>
-					</table>
-				</div>
-
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h2 class="panel-title">{#arenaOldContests#}</h2>
-					</div>
-					<table class="contest-list table table-striped table-hover">
-						<thead><tr>
-							<th>{#wordsContest#}</th>
-							<th>{#wordsDescription#}</th>
-							<th>{#wordsPractice#}</th>
-						</tr></thead>
-						<tbody id="past-contests">
-						</tbody>
-					</table>
-				</div>
+				<div class="panel panel-primary" id="recommended-current-contests"
+				     data-bind="template: 'contest-list'"></div>
+				<div class="panel panel-primary" id="current-contests"
+				     data-bind="template: 'contest-list'"></div>
+				<div class="panel panel-primary" id="recommended-past-contests"
+				     data-bind="template: 'contest-list'"></div>
+				<div class="panel panel-primary" id="past-contests"
+				     data-bind="template: 'contest-list'"></div>
 			</div>
 		</div>
 		{if $OMEGAUP_GA_TRACK eq 1}

@@ -5,7 +5,7 @@
 <script src="/js/problem.edit.form.js?ver=939ed0" type="text/javascript"></script>
 
 <div class="panel panel-primary">
-	{if $IS_UPDATE neq 1}
+	{if $IS_UPDATE != 1}
 	<div class="panel-heading">
 		<h3 class="panel-title">
 			{#problemNew#}

@@ -8,6 +8,7 @@ bin/mysql-connector-java-5.1.29.jar
 # Ignore temporary files
 *~
 *.swp
+*.pyc
 tags
 nohup.out
 tags
