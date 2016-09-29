@@ -188,9 +188,6 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
-
-        // Call API
-        $response = ContestController::apiRemoveProblem($r);
     }
 
     /**
