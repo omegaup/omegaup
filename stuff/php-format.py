@@ -42,7 +42,8 @@ def main():
   changed_files = git_tools.changed_files(args.commits,
       whitelist=[br'^frontend.*\.php$'],
       blacklist=[br'.*third_party.*', br'.*dao/base.*',
-                 br'frontend/server/libs/dao/Estructura.php'])
+                 br'frontend/server/libs/dao/Estructura.php',
+                 br'frontend/server/libs/dao/model.inc.php'])
   if not changed_files:
     return 0
 
