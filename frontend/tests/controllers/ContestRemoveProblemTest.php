@@ -51,25 +51,14 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
 
-        // Get two problema
+        // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
-        // Add the problems to the contest
+        // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        // Create an empty request
-        $r = new Request();
-
-        // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
-        $r['auth_token'] = $login->auth_token;
-
-        // Build request
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
-
-        // Call API
-        $response = ContestController::apiRemoveProblem($r);
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -86,10 +75,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
 
-        // Get two problema
+        // Get a problems
         $problemData = ProblemsFactory::createProblem();
 
-        // Add the problems to the contest
+        // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create an empty request
@@ -107,6 +96,21 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $response = ContestController::apiRemoveProblem($r);
     }
 
+    private function makeContestPublic($contestData) {
+        // Prepare request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+
+        // Log in with contest director
+        $r['auth_token'] = self::login($contestData['director']);
+
+        // Update public
+        $r['public'] = 1;
+
+        // Call API
+        $response = ContestController::apiUpdate($r);
+    }
+
     /**
      * Removes the oldest problem from a contest made public with two problems.
      * Should not fail and contest should have a single problem.
@@ -115,7 +119,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
 
-        // Get two problema
+        // Get two problems
         $problemData1 = ProblemsFactory::createProblem();
         $problemData2 = ProblemsFactory::createProblem();
 
@@ -123,19 +127,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData1, $contestData);
         ContestsFactory::addProblemToContest($problemData2, $contestData);
 
-        // Create an empty request
-        $r = new Request();
+        // make the contest public
+        this->makeContestPublic($contestData);
 
-        // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
-        $r['auth_token'] = $login->auth_token;
-
-        // Build request
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData1['request']['alias'];
-
-        // Call API
-        $response = ContestController::apiRemoveProblem($r);
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData1, $contestData);
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -152,7 +148,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
 
-        // Get two problema
+        // Get two problems
         $problemData1 = ProblemsFactory::createProblem();
         $problemData2 = ProblemsFactory::createProblem();
 
@@ -160,19 +156,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData1, $contestData);
         ContestsFactory::addProblemToContest($problemData2, $contestData);
 
-        // Create an empty request
-        $r = new Request();
+        // make the contest public
+        this->makeContestPublic($contestData);
 
-        // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
-        $r['auth_token'] = $login->auth_token;
-
-        // Build request
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData2['request']['alias'];
-
-        // Call API
-        $response = ContestController::apiRemoveProblem($r);
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData2, $contestData);
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -195,16 +183,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        // Create an empty request
-        $r = new Request();
+        // make the contest public
+        this->makeContestPublic($contestData);
 
-        // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
-        $r['auth_token'] = $login->auth_token;
-
-        // Build request
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
 
         // Call API
         $response = ContestController::apiRemoveProblem($r);
@@ -226,36 +209,12 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData1, $contestData);
         ContestsFactory::addProblemToContest($problemData2, $contestData);
 
-        // Create an empty request
-        $r = new Request();
+        // make the contest public
+        this->makeContestPublic($contestData);
 
-        // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
-        $r['auth_token'] = $login->auth_token;
-
-        // Build request
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData1['request']['alias'];
-
-        // Call API
-        $response = ContestController::apiRemoveProblem($r);
-
-        // Validate
-        $this->assertEquals('ok', $response['status']);
-
-        // Create an empty request
-        $r2 = new Request();
-
-        // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
-        $r2['auth_token'] = $login->auth_token;
-
-        // Build request
-        $r2['contest_alias'] = $contestData['request']['alias'];
-        $r2['problem_alias'] = $problemData2['request']['alias'];
-
-        // Call API
-        $response = ContestController::apiRemoveProblem($r2);
+        // remove the problems from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData1, $contestData);
+        $response = ContestsFactory::removeProblemFromContest($problemData2, $contestData);
     }
 
 }
