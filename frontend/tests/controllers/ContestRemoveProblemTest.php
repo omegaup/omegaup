@@ -214,4 +214,28 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $response = ContestsFactory::removeProblemFromContest($problemData2, $contestData);
     }
 
+    /**
+     * Removes a problem wit runs from a private contest.
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testRemoveProblemWithRunsFromPrivateContest() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Get a contestan
+        $contestant = UserFactory::createUser();
+
+        // Add a run to the problem
+        RunsFactory::createRun($problemData, $contestData, $contestant);
+
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
+    }
 }
