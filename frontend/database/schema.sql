@@ -102,12 +102,10 @@ CREATE TABLE IF NOT EXISTS `Coder_Of_The_Month` (
 
 CREATE TABLE IF NOT EXISTS `Problemsets` (
   `problemset_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de problemas',
-  `director_id` int(11) NOT NULL COMMENT 'el identificador del usuario que creó este conjunto de problemas',
   `access_mode` enum('private', 'public', 'registration') NOT NULL DEFAULT 'public' COMMENT 'La modalidad de acceso a este conjunto de problemas',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
-  PRIMARY KEY (`problemset_id`),
-  KEY `director_id` (`director_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Conjunto de problemas.' AUTO_INCREMENT=1 ;
+  PRIMARY KEY (`problemset_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Conjunto de problemas.';
 
 -- --------------------------------------------------------
 
@@ -117,6 +115,7 @@ CREATE TABLE IF NOT EXISTS `Problemsets` (
 
 CREATE TABLE IF NOT EXISTS `Contests` (
   `contest_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador unico para cada concurso',
+  `acl_id` int(11) NOT NULL COMMENT 'el identificador de la lista de control de acceso para este conjunto de problemas',
   `problemset_id` int(11) NOT NULL COMMENT 'La lista de problemas de este concurso',
   `title` varchar(256) NOT NULL COMMENT 'El titulo que aparecera en cada concurso',
   `description` tinytext NOT NULL COMMENT 'Una breve descripcion de cada concurso.',
@@ -137,6 +136,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `scoreboard_url_admin` VARCHAR( 30 ) NULL DEFAULT NULL,
   `recommended` BOOL NOT NULL DEFAULT  '0' COMMENT  'Mostrar el concurso en la lista de recomendados.',
   PRIMARY KEY (`contest_id`),
+  KEY `acl_id` (`acl_id`),
   KEY `rerun_id` (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursos que se llevan a cabo en el juez.' AUTO_INCREMENT=1 ;
@@ -335,9 +335,9 @@ CREATE TABLE IF NOT EXISTS `Interviews` (
   `problemset_id` int(11) NOT NULL,
   `title` varchar(256) NOT NULL COMMENT 'El titulo de la entrevista.',
   `description` tinytext NOT NULL COMMENT 'Una breve descripcion de la entrevista.',
-  `window_length` int(11) DEFAULT NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar soluciones.',
-  PRIMARY KEY (`interview_id`)
-  KEY `problemset_id` (`problemset_id`),
+  `window_length` int(11) NOT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar soluciones.',
+  PRIMARY KEY (`interview_id`),
+  KEY `problemset_id` (`problemset_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Entrevistas';
 
 -- --------------------------------------------------------
@@ -380,7 +380,7 @@ CREATE TABLE IF NOT EXISTS `Permissions` (
 CREATE TABLE IF NOT EXISTS `Problems` (
   `problem_id` int(11) NOT NULL AUTO_INCREMENT,
   `public` tinyint(1) NOT NULL DEFAULT '1',
-  `author_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL,
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
   `validator` enum('token','token-caseless','token-numeric','custom','literal') NOT NULL DEFAULT 'token-numeric',
@@ -406,7 +406,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `deprecated` tinyint(1) NOT NULL DEFAULT 0,
   `email_clarifications` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`problem_id`),
-  KEY `author_id` (`author_id`),
+  KEY `acl_id` (`acl_id`),
   UNIQUE KEY `problems_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.' AUTO_INCREMENT=1 ;
 
@@ -511,9 +511,8 @@ CREATE TABLE IF NOT EXISTS `Submissions` (
   `language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`submission_id`),
-  KEY `user_id` (`user_id`),
   KEY `problemset_id` (`problemset_id`),
-  KEY `problem_id` (`problem_id`),
+  KEY `user_problem_id` (`user_id`, `problem_id`),
   UNIQUE KEY `submissions_guid` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla de envíos.';
 
@@ -533,7 +532,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   `score` double NOT NULL DEFAULT '0',
   `judged_by` char(32) NULL DEFAULT NULL,
   PRIMARY KEY (`run_id`),
-  KEY `submission_id` (`submission_id`),
+  KEY `submission_id` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones. Inmutable una vez el estado es "ready".';
 
 -- --------------------------------------------------------
@@ -549,9 +548,9 @@ CREATE TABLE IF NOT EXISTS `Contest_Submissions` (
   `submit_delay` int(11) NOT NULL DEFAULT '0',
   `penalty` int(11) NOT NULL DEFAULT '0',
   `contest_score` double NOT NULL DEFAULT '0',
-  PRIMARY KEY (`run_id`),
+  PRIMARY KEY (`contest_submission_id`),
   KEY `contest_id` (`contest_id`),
-  KEY `submission_id` (`submission_id`),
+  KEY `submission_id` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Envíos a un concurso.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -613,7 +612,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `reset_digest` VARCHAR(45) NULL DEFAULT NULL,
   `reset_sent_at` DATETIME NULL DEFAULT NULL,
   `recruitment_optin` tinyint(1) NULL DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
-  `in_mailing_list` BOOLEAN NOT NULL DEFAULT FALSE
+  `in_mailing_list` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`user_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),
@@ -641,14 +640,26 @@ CREATE TABLE IF NOT EXISTS `Users_Badges` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `ACLs`
+--
+
+CREATE TABLE IF NOT EXISTS `ACLs` (
+  `acl_id` int(11) NOT NULL AUTO_INCREMENT,
+  `owner_id` int(11) NOT NULL COMMENT 'El usuario que creó el objeto y que tiene un rol de administrador implícito',
+  PRIMARY KEY (`acl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de control de acceso.';
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `User_Roles`
 --
 
 CREATE TABLE IF NOT EXISTS `User_Roles` (
   `user_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
-  `id` int(11) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`user_id`,`role_id`,`id`),
+  `acl_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`role_id`,`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.';
 
 -- --------------------------------------------------------
@@ -659,13 +670,13 @@ CREATE TABLE IF NOT EXISTS `User_Roles` (
 
 CREATE TABLE IF NOT EXISTS `Groups` (
   `group_id` int(11) AUTO_INCREMENT NOT NULL,
-  `owner_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `alias` varchar(50) NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`group_id`),
-  KEY `owner_id` (`owner_id`),
+  KEY `acl_id` (`acl_id`),
   UNIQUE KEY `groups_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
@@ -716,8 +727,8 @@ CREATE TABLE IF NOT EXISTS `Groups_Scoreboards_Contests` (
 CREATE TABLE IF NOT EXISTS `Group_Roles` (
   `group_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
-  `id` int(11) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`group_id`,`role_id`,`id`),
+  `acl_id` int(11) NOT NULL,
+  PRIMARY KEY (`group_id`,`role_id`,`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los grupos.';
 
 --
@@ -776,16 +787,11 @@ ALTER TABLE `Coder_Of_The_Month`
   ADD CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Filtros para la tabla `Problemsets`
---
-ALTER TABLE `Problemsets`
-  ADD CONSTRAINT `fk_pu_director_id` FOREIGN KEY (`director_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
 -- Filtros para la tabla `Contests`
 --
 ALTER TABLE `Contests`
-  ADD CONSTRAINT `fk_cp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_cop_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Interviews`
@@ -794,9 +800,9 @@ ALTER TABLE `Interviews`
   ADD CONSTRAINT `fk_ip_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Filtros para la tabla `Problemsets_Users`
+-- Filtros para la tabla `Problemset_Users`
 --
-ALTER TABLE `Problemsets_Users`
+ALTER TABLE `Problemset_Users`
   ADD CONSTRAINT `fk_pup_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_puu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
@@ -887,7 +893,7 @@ ALTER TABLE `Messages`
 -- Filtros para la tabla `Problems`
 --
 ALTER TABLE `Problems`
-  ADD CONSTRAINT `author_id` FOREIGN KEY (`author_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problems_Badges`
@@ -964,21 +970,20 @@ ALTER TABLE `Users_Badges`
   ADD CONSTRAINT `fk_ub_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
+-- Filtros para la tabla `ACLs`
+--
+ALTER TABLE `ACLs`
+  ADD CONSTRAINT `fk_au_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
 -- Filtros para la tabla `User_Roles`
 --
 ALTER TABLE `User_Roles`
   ADD CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
---
--- Filtros para la tabla `Users_Permissions`
---
-ALTER TABLE `Users_Permissions`
-  ADD CONSTRAINT `fk_up_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `Permissions` (`permission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_up_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
 ALTER TABLE `Groups`
-  ADD CONSTRAINT `fk_g_user_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_ga_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `Groups_Users`
   ADD CONSTRAINT `fk_gu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -995,23 +1000,39 @@ ALTER TABLE `Groups_Scoreboards_Contests`
 -- Update AC Count on grade
 --
 DELIMITER $$
-CREATE TRIGGER `ACUpdate` AFTER UPDATE ON  `Runs`
+CREATE TRIGGER `ACUpdate` AFTER UPDATE ON `Runs`
 FOR EACH ROW BEGIN
-	IF (OLD.verdict = 'AC' OR NEW.verdict = 'AC') THEN
-		UPDATE  `Problems` SET  `Problems`.`accepted` = (
-			SELECT COUNT( DISTINCT user_id )
-				FROM  `Runs`
-				WHERE  `Runs`.`verdict` =  'AC'
-				AND NEW.`problem_id` =  `Runs`.`problem_id`
-			)
-		WHERE NEW.problem_id =  `Problems`.`problem_id`;
-	END IF;
+  DECLARE problem_id INT;
+
+  IF (OLD.verdict = 'AC' OR NEW.verdict = 'AC') THEN
+    SET problem_id = (
+      SELECT
+        `s`.`problem_id`
+      FROM
+        `Submissions` `s`
+      WHERE
+        `s`.`run_id` = NEW.`run_id`
+      LIMIT
+        1
+    );
+
+    UPDATE `Problems` SET `Problems`.`accepted` = (
+      SELECT
+        COUNT(DISTINCT user_id)
+      FROM
+        `Submissions` `s`
+      INNER JOIN
+        `Runs` `r`
+      ON
+        `s`.`run_id` = `r`.`run_id`
+      WHERE
+        `r`.`verdict` = 'AC' AND `s`.`problem_id` = problem_id
+      )
+    WHERE `Problems`.`problem_id` = problem_id;
+  END IF;
 END$$
 DELIMITER ;
 
-CREATE INDEX idx_contest_public ON Problemsets (`public`);
-CREATE INDEX idx_user_roles_contest ON User_Roles (contest_id);
-CREATE INDEX idx_contest_director_id ON Problemsets (director_id);
 CREATE INDEX idx_problems_public ON Problems (`public`);
 
 --
