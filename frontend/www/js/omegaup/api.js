@@ -88,6 +88,45 @@ omegaup.API = {
 		});
 	},
 
+	createCourse: function(
+						title,
+						description,
+						start_time,
+						finish_time,
+						alias,
+						public,
+						show_scoreboard,
+						callback
+					) {
+		$.post(
+			'/api/course/create/' ,
+			{
+				title				: title,
+				description			: description,
+				start_time			: start_time,
+				finish_time			: finish_time,
+				public				: public,
+				alias				: alias,
+				show_scoreboard			: show_scoreboard,
+			},
+			function(data) {
+				if (data.status !== undefined && data.status == "error") {
+					omegaup.UI.error(data.error);
+				}
+				if (callback !== undefined) { callback(data); }
+			},
+			'json'
+		).fail(function (data) {
+			if (callback !== undefined) {
+				try {
+					callback(JSON.parse(data.responseText));
+				} catch (err) {
+					callback({status: 'error', error: err});
+				}
+			}
+		});
+	},
+
 	createContest: function(
 						title,
 						description,
