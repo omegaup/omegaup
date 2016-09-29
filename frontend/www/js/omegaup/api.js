@@ -89,7 +89,7 @@ omegaup.API = {
 	},
 
 	createCourse: function(
-						title,
+						name,
 						description,
 						start_time,
 						finish_time,
@@ -101,7 +101,7 @@ omegaup.API = {
 		$.post(
 			'/api/course/create/' ,
 			{
-				title				: title,
+				name				: name,
 				description			: description,
 				start_time			: start_time,
 				finish_time			: finish_time,
