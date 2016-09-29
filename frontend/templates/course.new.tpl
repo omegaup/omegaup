@@ -6,6 +6,6 @@
 
 {include file='course.new.form.tpl'}
 
-<script type="text/javascript" src="/js/course.new.js?ver=7117ad"></script>
+<script type="text/javascript" src="/js/course.new.js?ver=8e1737"></script>
 
 {include file='footer.tpl'}

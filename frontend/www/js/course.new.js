@@ -6,7 +6,7 @@ $('document').ready(function() {
 				(new Date($(".new_course_form #start_time").val()).getTime()) / 1000,
 				(new Date($(".new_course_form #finish_time").val()).getTime()) / 1000,
 				$(".new_course_form #alias").val(),
-				$(".new_course_form #public").val(),
+				0 /*public*/,
 				$(".new_course_form #show_scoreboard").val(),
 				function(data) {
 					if(data.status == "ok") {
