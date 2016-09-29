@@ -353,7 +353,7 @@ abstract class ContestsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Contests->contest_id = $conn->Insert_ID();
+		$Contests->contest_id = $conn->Insert_ID();
 
 		return $ar;
 	}
