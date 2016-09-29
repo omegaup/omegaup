@@ -31,7 +31,6 @@ class ACLs extends VO
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
 
-
 			if (isset($data['acl_id'])) {
 				$this->acl_id = $data['acl_id'];
 			}

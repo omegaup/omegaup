@@ -9,7 +9,7 @@ class CourseController extends Controller {
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         $is_required = true;
 
-        Validators::isStringNonEmpty($r['name'], 'title', $is_required);
+        Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
 
         Validators::isNumber($r['start_time'], 'start_time', $is_required);
@@ -51,7 +51,7 @@ class CourseController extends Controller {
 
         $course_id = -1;
         try {
-            $existing = SchoolsDAO::findByName($r['name']);
+            $existing = CoursesDAO::findByName($r['name']);
             if (count($existing) > 0) {
                 $course_id = $existing[0]->course_id;
             } else {

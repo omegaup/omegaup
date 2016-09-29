@@ -31,7 +31,6 @@ class Problemsets extends VO
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
 
-
 			if (isset($data['problemset_id'])) {
 				$this->problemset_id = $data['problemset_id'];
 			}

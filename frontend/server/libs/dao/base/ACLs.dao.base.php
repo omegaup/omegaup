@@ -18,7 +18,6 @@
   */
 abstract class ACLsDAOBase extends DAO
 {
-
 	/**
 	  *	Guardar registros.
 	  *
@@ -41,7 +40,6 @@ abstract class ACLsDAOBase extends DAO
 			return ACLsDAOBase::create( $ACLs);
 		}
 	}
-
 
 	/**
 	  *	Obtener {@link ACLs} por llave primaria.
@@ -97,7 +95,6 @@ abstract class ACLsDAOBase extends DAO
 		}
 		return $allData;
 	}
-
 
 	/**
 	  *	Buscar registros.
@@ -255,7 +252,6 @@ abstract class ACLsDAOBase extends DAO
 			$sql .= " `acl_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		if( ( !is_null (($a = $ACLsA->owner_id) ) ) & ( ! is_null ( ($b = $ACLsB->owner_id) ) ) ){
@@ -266,13 +262,11 @@ abstract class ACLsDAOBase extends DAO
 			$sql .= " `owner_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -306,6 +300,4 @@ abstract class ACLsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
-
 }

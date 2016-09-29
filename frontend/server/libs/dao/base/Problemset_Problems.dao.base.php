@@ -18,7 +18,6 @@
   */
 abstract class ProblemsetProblemsDAOBase extends DAO
 {
-
 	/**
 	  *	Guardar registros.
 	  *
@@ -41,7 +40,6 @@ abstract class ProblemsetProblemsDAOBase extends DAO
 			return ProblemsetProblemsDAOBase::create( $Problemset_Problems);
 		}
 	}
-
 
 	/**
 	  *	Obtener {@link ProblemsetProblems} por llave primaria.
@@ -97,7 +95,6 @@ abstract class ProblemsetProblemsDAOBase extends DAO
 		}
 		return $allData;
 	}
-
 
 	/**
 	  *	Buscar registros.
@@ -268,7 +265,6 @@ abstract class ProblemsetProblemsDAOBase extends DAO
 			$sql .= " `problemset_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		if( ( !is_null (($a = $Problemset_ProblemsA->problem_id) ) ) & ( ! is_null ( ($b = $Problemset_ProblemsB->problem_id) ) ) ){
@@ -279,7 +275,6 @@ abstract class ProblemsetProblemsDAOBase extends DAO
 			$sql .= " `problem_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		if( ( !is_null (($a = $Problemset_ProblemsA->points) ) ) & ( ! is_null ( ($b = $Problemset_ProblemsB->points) ) ) ){
@@ -290,7 +285,6 @@ abstract class ProblemsetProblemsDAOBase extends DAO
 			$sql .= " `points` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		if( ( !is_null (($a = $Problemset_ProblemsA->order) ) ) & ( ! is_null ( ($b = $Problemset_ProblemsB->order) ) ) ){
@@ -301,13 +295,11 @@ abstract class ProblemsetProblemsDAOBase extends DAO
 			$sql .= " `order` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -341,6 +333,4 @@ abstract class ProblemsetProblemsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
-
 }
