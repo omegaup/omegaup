@@ -142,7 +142,7 @@ class Clarifications extends VO
 	public $contest_id;
 
 	/**
-	  * Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario.
+	  * Sólo las clarificaciones que el problemsetter marque como publicacbles apareceran en la lista que toda la banda puede ver. Sino, solo al usuario. 
 	  * @access public
 	  * @var tinyint(1)
 	  */

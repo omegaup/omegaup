@@ -317,7 +317,7 @@ class Contests extends VO
 	/**
 	  * Indica que los participantes deben pre-registrarse antes de poder paticipar
 	  * @access public
-	  * @var
+	  * @var 
 	  */
 	public $contestant_must_register;
 

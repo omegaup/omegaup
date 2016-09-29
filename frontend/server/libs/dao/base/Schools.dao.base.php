@@ -215,7 +215,7 @@ abstract class SchoolsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Schools->school_id = $conn->Insert_ID();
+		$Schools->school_id = $conn->Insert_ID();
 
 		return $ar;
 	}

@@ -209,7 +209,7 @@ abstract class LanguagesDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Languages->language_id = $conn->Insert_ID();
+		$Languages->language_id = $conn->Insert_ID();
 
 		return $ar;
 	}

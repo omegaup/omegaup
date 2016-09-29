@@ -203,7 +203,7 @@ abstract class TagsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Tags->tag_id = $conn->Insert_ID();
+		$Tags->tag_id = $conn->Insert_ID();
 
 		return $ar;
 	}

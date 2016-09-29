@@ -222,7 +222,7 @@ abstract class BadgesDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Badges->badge_id = $conn->Insert_ID();
+		$Badges->badge_id = $conn->Insert_ID();
 
 		return $ar;
 	}

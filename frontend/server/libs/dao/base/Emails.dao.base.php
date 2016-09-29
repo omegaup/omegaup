@@ -209,7 +209,7 @@ abstract class EmailsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Emails->email_id = $conn->Insert_ID();
+		$Emails->email_id = $conn->Insert_ID();
 
 		return $ar;
 	}

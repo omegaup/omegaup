@@ -301,7 +301,7 @@ abstract class RunsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Runs->run_id = $conn->Insert_ID();
+		$Runs->run_id = $conn->Insert_ID();
 
 		return $ar;
 	}

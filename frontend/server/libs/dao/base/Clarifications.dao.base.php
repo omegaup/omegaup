@@ -241,7 +241,7 @@ abstract class ClarificationsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Clarifications->clarification_id = $conn->Insert_ID();
+		$Clarifications->clarification_id = $conn->Insert_ID();
 
 		return $ar;
 	}
