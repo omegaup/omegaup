@@ -43,8 +43,8 @@
 					<div class="form-group col-md-6">
 						<label for="show_scoreboard">{#courseNewFormShowScoreboard#}</label>
 						<select name='show_scoreboard' id='show_scoreboard' class="form-control">
-							<option value='yes'>{#wordsYes#}</option>
-							<option value='no'>{#wordsNo#}</option>
+							<option value='1'>{#wordsYes#}</option>
+							<option value='0'>{#wordsNo#}</option>
 						</select>
 						<p class="help-block">{#courseNewFormShowScoreboardDesc#}</p>
 					</div>
