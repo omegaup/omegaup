@@ -128,7 +128,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData2, $contestData);
 
         // make the contest public
-        this->makeContestPublic($contestData);
+        $this->makeContestPublic($contestData);
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData1, $contestData);
@@ -157,7 +157,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData2, $contestData);
 
         // make the contest public
-        this->makeContestPublic($contestData);
+        $this->makeContestPublic($contestData);
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData2, $contestData);
@@ -184,7 +184,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // make the contest public
-        this->makeContestPublic($contestData);
+        $this->makeContestPublic($contestData);
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
@@ -210,7 +210,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData2, $contestData);
 
         // make the contest public
-        this->makeContestPublic($contestData);
+        $this->makeContestPublic($contestData);
 
         // remove the problems from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData1, $contestData);
