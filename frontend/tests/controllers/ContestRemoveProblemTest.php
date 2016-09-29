@@ -215,7 +215,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      * @expectedException InvalidParameterException
      */
-    public function testRemoveAllProblemsFromPublicContestWithtwoProblems() {
+    public function testRemoveAllProblemsFromPublicContestWithTwoProblems() {
         // Get a contest
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
 
@@ -224,7 +224,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $problemData2 = ProblemsFactory::createProblem();
 
         ContestsFactory::addProblemToContest($problemData1, $contestData);
-        ContestsFactory::addProblemToContest($problemData1, $contestData);
+        ContestsFactory::addProblemToContest($problemData2, $contestData);
 
         // Create an empty request
         $r = new Request();
@@ -243,8 +243,19 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Validate
         $this->assertEquals('ok', $response['status']);
 
-        $r['problem_alias'] = $problemData2['request']['alias'];
-        $response = ContestController::apiRemoveProblem($r);
+        // Create an empty request
+        $r2 = new Request();
+
+        // Log in as contest director
+        $login = OmegaupTestCase::login($contestData['director']);
+        $r2['auth_token'] = $login->auth_token;
+
+        // Build request
+        $r2['contest_alias'] = $contestData['request']['alias'];
+        $r2['problem_alias'] = $problemData2['request']['alias'];
+
+        // Call API
+        $response = ContestController::apiRemoveProblem($r2);
     }
 
 }
