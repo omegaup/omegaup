@@ -190,6 +190,24 @@ CREATE TABLE IF NOT EXISTS `Contests_Users` (
   KEY `contest_id` (`contest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden participar en concurso cerrado.';
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Contest_Users`
+--
+
+CREATE TABLE IF NOT EXISTS `Courses` (
+  `course_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `description` tinytext NOT NULL,
+  `alias` varchar(32) NOT NULL,
+  `id_owner` int(11) NOT NULL,
+  `id_admingroup` int(11),
+  `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
+  `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
+  PRIMARY KEY (`course_id`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+
 --
 -- Estructura de tabla para la tabla `User_Login_Log`
 --
@@ -614,7 +632,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `reset_digest` VARCHAR(45) NULL DEFAULT NULL,
   `reset_sent_at` DATETIME NULL DEFAULT NULL,
   `recruitment_optin` tinyint(1) NULL DEFAULT NULL COMMENT 'Determina si el usuario puede ser contactado con fines de reclutamiento.',
-  `in_mailing_list` BOOLEAN NOT NULL DEFAULT FALSE
+  `in_mailing_list` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`user_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),
@@ -997,6 +1015,10 @@ ALTER TABLE `Groups_Scoreboards`
 ALTER TABLE `Groups_Scoreboards_Contests`
   ADD CONSTRAINT `fk_gsc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `Courses`
+  ADD CONSTRAINT `fk_cu_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cg_group_id` FOREIGN KEY (`id_admingroup`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Update AC Count on grade
