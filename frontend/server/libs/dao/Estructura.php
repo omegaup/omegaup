@@ -32,10 +32,8 @@
 			global $conn;
 			$conn->StartTrans();
 			self::$isTrans = true;
-
 		}
 		public static function transEnd (  ){
-			
 			if(!self::$isTrans){
 				self::log("Transaccion commit pero no hay transaccion activa !!.");
 				return;
@@ -57,7 +55,7 @@
 				self::log("Transaccion rollback pero no hay transaccion activa !!.");
 				return;
 			}
-			
+
 			self::$transCount = 0;
 			global $conn;
 			$conn->FailTrans();
@@ -74,7 +72,6 @@
 		  */
 		abstract class VO
 		{
-
 			function asArray(){
 				return get_object_vars($this);
 			}

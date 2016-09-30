@@ -1,6 +1,13 @@
 <?php
 
 class CourseController extends Controller {
+
+    /**
+     * Validates request for Assignment on Course operations
+     *
+     * @throws InvalidDatabaseOperationException
+     * @throws InvalidParameterException
+     */
     private static function validateCreateOrUpdateAssignment(Request $r, $is_update = false) {
         $is_required = true;
 
@@ -10,6 +17,7 @@ class CourseController extends Controller {
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
         Validators::isStringNonEmpty($r['course_alias'], 'course_alias', $is_required);
+        self::validateCourseExists($r);
 
         Validators::isNumber($r['start_time'], 'start_time', $is_required);
         Validators::isNumber($r['finish_time'], 'finish_time', $is_required);
@@ -30,8 +38,6 @@ class CourseController extends Controller {
         $r['id_course'] = $parent_course[0]->course_id;
 
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
-        Validators::isValidAlias($r['course_alias'], 'course_alias', $is_required);
-
         Validators::isInEnum($r['assignment_type'], 'assignment_type', array('test', 'homework'), true /*is_required*/);
     }
 
@@ -68,6 +74,29 @@ class CourseController extends Controller {
     }
 
     /**
+     * Validates course exists. Expects $r['course_alias'], returns
+     * course found on $r['course']. Throws if not found.
+     *
+     * @throws InvalidParameterException
+     */
+    private static function validateCourseExists(Request $r) {
+        $courses = null;
+        try {
+            $courses = CoursesDAO::search(new Courses(array(
+                'alias' => $r['course_alias']
+            )));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($courses) || !is_array($courses) || count($courses) !== 1) {
+            throw new InvalidParameterException('invalidParamater', 'course_alias');
+        }
+
+        $r['course'] = $courses[0];
+    }
+
+    /**
      * Create new course
      *
      * @throws InvalidDatabaseOperationException
@@ -99,6 +128,10 @@ class CourseController extends Controller {
         return array('status' => 'ok');
     }
 
+    /**
+     * Create assignment
+     *
+     */
     public static function apiCreateAssignment(Request $r) {
         self::authenticateRequest($r);
 
@@ -122,5 +155,40 @@ class CourseController extends Controller {
         }
 
         return array('status' => 'ok');
+    }
+
+    /**
+     * List course assignments
+     *
+     * @throws InvalidParameterException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListAssignments(Request $r) {
+        self::authenticateRequest($r);
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+        self::validateCourseExists($r);
+
+        $assignments = array();
+        try {
+            $assignments = AssignmentsDAO::search(new Assignments(array(
+                'id_course' => $r['course']->course_id
+            )));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $response = array();
+        foreach ($assignments as $a) {
+            $response['assignments'][] = array(
+                'name' => $a->name,
+                'description' => $a->description,
+                'start_time' => $a->start_time,
+                'finish_time' => $a->finish_time,
+                'assignment_type' => $a->assignment_type
+            );
+        }
+
+        $response['status'] = 'ok';
+        return $response;
     }
 }

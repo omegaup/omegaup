@@ -3,11 +3,11 @@
 include("base/Courses.dao.base.php");
 include("base/Courses.vo.base.php");
 /** Courses Data Access Object (DAO).
-  * 
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para 
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Courses }. 
+  *
+  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+  * almacenar de forma permanente y recuperar instancias de objetos {@link Courses }.
   * @access public
-  * 
+  *
   */
 class CoursesDAO extends CoursesDAOBase
 {

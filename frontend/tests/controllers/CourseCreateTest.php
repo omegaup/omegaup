@@ -1,6 +1,46 @@
 <?php
 
 class CourseCreateTest extends OmegaupTestCase {
+
+    /**
+     * Create course helper
+     */
+    private function createCourse($user, $name = null, $alias = null, $description = null, $start_time = null, $finish_time = null) {
+        $data = array();
+        $data['request'] = new Request(array(
+            'auth_token' => self::login($user),
+            'name' => is_null($name) ? Utils::CreateRandomString() : $name,
+            'alias' => is_null($alias) ? Utils::CreateRandomString() : $alias,
+            'description' => is_null($description) ? Utils::CreateRandomString() : $description,
+            'start_time' => is_null($start_time) ? (Utils::GetPhpUnixTimestamp() + 60) : $start_time,
+            'finish_time' => is_null($finish_time) ? (Utils::GetPhpUnixTimestamp() + 120) : $finish_time
+        ));
+
+        // Call api
+        $data['response'] = CourseController::apiCreate($data['request']);
+        return $data;
+    }
+
+    /**
+     * Create an assignment inside a course.
+     */
+    private function createAssignment($user, $courseAlias, $name = null, $alias = null, $description = null, $start_time = null, $finish_time = null, $assignment_type = null) {
+        $data = array();
+        $data['request'] = new Request(array(
+            'auth_token' => self::login($user),
+            'course_alias' => $courseAlias,
+            'name' => is_null($name) ? Utils::CreateRandomString() : $name,
+            'alias' => is_null($alias) ? Utils::CreateRandomString() : $alias,
+            'description' => is_null($description) ? Utils::CreateRandomString() : $description,
+            'start_time' => is_null($start_time) ? (Utils::GetPhpUnixTimestamp() + 60) : $start_time,
+            'finish_time' => is_null($finish_time) ? (Utils::GetPhpUnixTimestamp() + 120) : $finish_time,
+            'assignment_type' => is_null($assignment_type) ? 'homework' : $assignment_type
+        ));
+
+        $data['response'] = CourseController::apiCreateAssignment($data['request']);
+        return $data;
+    }
+
     /**
      * Create course happy path
      */
@@ -86,5 +126,26 @@ class CourseCreateTest extends OmegaupTestCase {
         $this->assertEquals(1, count(AssignmentsDAO::search(
             array('alias' => $r['alias'])
         )));
+    }
+
+    /**
+     * Tests course/apiListAssignments returns valid results.
+     */
+    public function testListCourseAssignments() {
+        // Create a course with 2 assignments
+        $courseAdmin = UserFactory::createUser();
+        $courseData = $this->createCourse($courseAdmin);
+        $courseAlias = $courseData['request']['alias'];
+        $assignmentData = array();
+        $assignmentData[0] = $this->createAssignment($courseAdmin, $courseAlias);
+        $assignmentData[1] = $this->createAssignment($courseAdmin, $courseAlias);
+
+        // Call API
+        $response = CourseController::apiListAssignments(new Request(array(
+            'auth_token' => self::login($courseAdmin),
+            'course_alias' => $courseAlias
+        )));
+
+        $this->assertEquals(2, count($response['assignments']));
     }
 }
