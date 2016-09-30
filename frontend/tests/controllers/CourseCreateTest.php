@@ -1,7 +1,6 @@
 <?php
 
 class CourseCreateTest extends OmegaupTestCase {
-
     /**
      * Create course hot path
      */
@@ -92,7 +91,6 @@ class CourseCreateTest extends OmegaupTestCase {
      * Tests course/apiListAssignments
      */
     public function testListCourseAssignments() {
-
         // Create 1 course with 1 assignment
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 

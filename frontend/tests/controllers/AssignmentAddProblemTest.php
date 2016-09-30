@@ -1,9 +1,7 @@
 <?php
 
 class AssignmentAddProblemTest extends OmegaupTestCase {
-
     public function testAddProbemToAssignment() {
-
         $user = UserFactory::createUser();
 
         $courseData = CoursesFactory::createCourseWithOneAssignment($user);

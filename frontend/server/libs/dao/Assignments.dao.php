@@ -25,6 +25,5 @@ class AssignmentsDAO extends AssignmentsDAOBase
         }
 
         return new Problemsets($rs);
-
     }
 }
