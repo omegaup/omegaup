@@ -21,4 +21,3 @@ class AssignmentAddProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
     }
 }
-

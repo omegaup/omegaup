@@ -1,9 +1,7 @@
 <?php
 
 class CoursesFactory {
-
     public static function createCourse(Users $user = null) {
-
         if (is_null($user)) {
             $user = UserFactory::createUser();
         }
@@ -29,7 +27,6 @@ class CoursesFactory {
     }
 
     public static function createCourseWithOneAssignment(Users $user = null) {
-
         if (is_null($user)) {
             $user = UserFactory::createUser();
         }
@@ -62,7 +59,6 @@ class CoursesFactory {
     }
 
     public static function createCourseWithAssignments($nAssignments) {
-
         $courseFactoryResult = self::createCourse();
         $courseAlias = $courseFactoryResult['course_alias'];
 

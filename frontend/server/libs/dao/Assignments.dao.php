@@ -14,7 +14,7 @@ class AssignmentsDAO extends AssignmentsDAOBase
 {
     public static function GetProblemset($assignmentAlias)
     {
-        $sql = "select p.* from Assignments a, Problemsets p where a.id_problemset = p.problemset_id and a.alias = ?;";
+        $sql = 'select p.* from Assignments a, Problemsets p where a.id_problemset = p.problemset_id and a.alias = ?;';
         $params = array($assignmentAlias);
 
         global $conn;
@@ -28,4 +28,3 @@ class AssignmentsDAO extends AssignmentsDAOBase
 
     }
 }
-

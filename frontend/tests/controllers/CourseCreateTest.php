@@ -114,4 +114,3 @@ class CourseCreateTest extends OmegaupTestCase {
         $this->assertEquals(5, count($response['assignments']));
     }
 }
-

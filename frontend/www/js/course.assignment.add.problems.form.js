@@ -7,6 +7,8 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 
 		// Fill assignments
 		omegaup.API.getCourseAssignments(courseAlias, function(data) {
+			$('.assignment-add-problem #assignments-list').empty();
+
 			$.each(data.assignments, function (index, item) {
 				$('.assignment-add-problem #assignments-list').append($("<option/>", {
 					value: item.alias,

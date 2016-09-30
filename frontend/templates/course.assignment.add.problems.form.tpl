@@ -1,13 +1,15 @@
 <div class="panel panel-primary">
 	<div class="panel-body">
 		<form class="assignment-add-problem">
+	
 			<div class="row">
 				<div class="form-group">
 					<label for="assignments-dropdown">{#wordsAssignments#}</label>
-					<select name="assignments-list" id='assignments-list' class="form-control"/>
+					<select name="assignments-list" id='assignments-list' class="form-control"></select>
 					<p class="help-block">{#courseAddProblemsAssignmentsDesc#}</p>
 				</div>
 			</div>
+
 			<div class="row">
 				<div class="form-group">
 					<label for="problems-dropdown">{#wordsProblems#}</label>
@@ -20,7 +22,7 @@
 			</div>
 		</form>
 	</div>
-<div>
+</div>
 
-<script type="text/javascript" src="/js/course.assignment.add.problems.form.js?ver=ad1d57"></script>
+<script type="text/javascript" src="/js/course.assignment.add.problems.form.js?ver=ac0d8b"></script>
 
