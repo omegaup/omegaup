@@ -166,6 +166,56 @@ omegaup.API = {
 		});
 	},
 
+	addCourseAssignmentProblem: function(
+						course_alias,
+						assignment_alias,
+						problem_alias,
+						callback
+					) {
+		$.post(
+			'/api/course/addProblem/',
+			{
+				course_alias: course_alias,
+				assignment_alias: assignment_alias,
+				problem_alias: problem_alias
+			},
+			function(data) {
+				if (data.status !== undefined && data.status == "error") {
+					omegaup.UI.error(data.error);
+				}
+				if (callback !== undefined) { callback(data); }
+			},
+			'json'
+		).fail(function (data) {
+			if (callback !== undefined) {
+				try {
+					callback(JSON.parse(data.responseText));
+				} catch (err) {
+					callback({status: 'error', error: err});
+				}
+			}
+		});
+	},
+
+	getCourseAssignments: function(course_alias, callback) {
+		$.get(
+			'/api/course/listAssignments/',
+			{
+				course_alias : course_alias
+			},
+			function (data) {
+				callback(data);
+			},
+			'json'
+		).fail(function(j, status, errorThrown) {
+			try {
+				callback(JSON.parse(j.responseText));
+			} catch (err) {
+				callback({status:'error', 'error':undefined});
+			}
+		});
+	},
+
 	createContest: function(
 						title,
 						description,

@@ -209,6 +209,7 @@ class CourseController extends Controller {
         foreach ($assignments as $a) {
             $response['assignments'][] = array(
                 'name' => $a->name,
+                'alias' => $a->alias,
                 'description' => $a->description,
                 'start_time' => $a->start_time,
                 'finish_time' => $a->finish_time,
