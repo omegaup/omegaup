@@ -1,7 +1,7 @@
 <?php
 
-include("base/Courses.dao.base.php");
-include("base/Courses.vo.base.php");
+include('base/Courses.dao.base.php');
+include('base/Courses.vo.base.php');
 /** Courses Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
@@ -19,8 +19,9 @@ class CoursesDAO extends CoursesDAOBase
         $resultRows = $conn->Execute($sql, array($name));
         $finalResult = array();
 
-        foreach ($resultRows as $row)
+        foreach ($resultRows as $row) {
             array_push($finalResult, new Courses($row));
+        }
 
         return $finalResult;
     }
