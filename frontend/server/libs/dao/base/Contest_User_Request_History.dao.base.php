@@ -228,7 +228,7 @@ abstract class ContestUserRequestHistoryDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Contest_User_Request_History->history_id = $conn->Insert_ID();
+		$Contest_User_Request_History->history_id = $conn->Insert_ID();
 
 		return $ar;
 	}

@@ -247,4 +247,5 @@ abstract class UserLoginLogDAOBase extends DAO
 		}
 		return $ar;
 	}
+
 }

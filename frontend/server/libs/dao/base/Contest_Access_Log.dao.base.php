@@ -262,4 +262,5 @@ abstract class ContestAccessLogDAOBase extends DAO
 		}
 		return $ar;
 	}
+
 }
