@@ -1,11 +1,10 @@
 <?php
 
 class CourseController extends Controller {
-
     private static function validateCreateOrUpdateAssignment(Request $r, $is_update = false) {
         $is_required = true;
 
-        // Does this assignment need to be within the time constraints of 
+        // Does this assignment need to be within the time constraints of
         // the course it belongs to?
 
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
@@ -118,10 +117,8 @@ class CourseController extends Controller {
             $assignment->id_problemset = $problemSet->problemset_id;
 
             AssignmentsDAO::save($assignment);
-
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
-
         }
 
         return array('status' => 'ok');
