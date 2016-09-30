@@ -136,6 +136,10 @@ abstract class AssignmentsDAOBase extends DAO
 			$sql .= " `id_course` = ? AND";
 			array_push( $val, $Assignments->id_course );
 		}
+		if (!is_null( $Assignments->id_problemset)) {
+			$sql .= " `id_problemset` = ? AND";
+			array_push( $val, $Assignments->id_problemset );
+		}
 		if (!is_null( $Assignments->name)) {
 			$sql .= " `name` = ? AND";
 			array_push( $val, $Assignments->name );
@@ -148,13 +152,13 @@ abstract class AssignmentsDAOBase extends DAO
 			$sql .= " `alias` = ? AND";
 			array_push( $val, $Assignments->alias );
 		}
-		if (!is_null( $Assignments->id_problemset)) {
-			$sql .= " `id_problemset` = ? AND";
-			array_push( $val, $Assignments->id_problemset );
+		if (!is_null( $Assignments->publish_time_delay)) {
+			$sql .= " `publish_time_delay` = ? AND";
+			array_push( $val, $Assignments->publish_time_delay );
 		}
-		if (!is_null( $Assignments->PublishTimeDelay)) {
-			$sql .= " `PublishTimeDelay` = ? AND";
-			array_push( $val, $Assignments->PublishTimeDelay );
+		if (!is_null( $Assignments->assignment_type)) {
+			$sql .= " `assignment_type` = ? AND";
+			array_push( $val, $Assignments->assignment_type );
 		}
 		if (!is_null( $Assignments->start_time)) {
 			$sql .= " `start_time` = ? AND";
@@ -199,14 +203,15 @@ abstract class AssignmentsDAOBase extends DAO
 	  **/
 	private static final function update($Assignments)
 	{
-		$sql = "UPDATE Assignments SET  `id_course` = ?, `name` = ?, `description` = ?, `alias` = ?, `id_problemset` = ?, `PublishTimeDelay` = ?, `start_time` = ?, `finish_time` = ? WHERE  `assignement_id` = ?;";
+		$sql = "UPDATE Assignments SET  `id_course` = ?, `id_problemset` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ? WHERE  `assignement_id` = ?;";
 		$params = array(
 			$Assignments->id_course,
+			$Assignments->id_problemset,
 			$Assignments->name,
 			$Assignments->description,
 			$Assignments->alias,
-			$Assignments->id_problemset,
-			$Assignments->PublishTimeDelay,
+			$Assignments->publish_time_delay,
+			$Assignments->assignment_type,
 			$Assignments->start_time,
 			$Assignments->finish_time,
 			$Assignments->assignement_id, );
@@ -231,15 +236,16 @@ abstract class AssignmentsDAOBase extends DAO
 	{
 		if (is_null($Assignments->start_time)) $Assignments->start_time = '2000-01-01 06:00:00';
 		if (is_null($Assignments->finish_time)) $Assignments->finish_time = '2000-01-01 06:00:00';
-		$sql = "INSERT INTO Assignments ( `assignement_id`, `id_course`, `name`, `description`, `alias`, `id_problemset`, `PublishTimeDelay`, `start_time`, `finish_time` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Assignments ( `assignement_id`, `id_course`, `id_problemset`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
 			$Assignments->assignement_id,
 			$Assignments->id_course,
+			$Assignments->id_problemset,
 			$Assignments->name,
 			$Assignments->description,
 			$Assignments->alias,
-			$Assignments->id_problemset,
-			$Assignments->PublishTimeDelay,
+			$Assignments->publish_time_delay,
+			$Assignments->assignment_type,
 			$Assignments->start_time,
 			$Assignments->finish_time,
 		 );
@@ -309,6 +315,16 @@ abstract class AssignmentsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
+		if( ( !is_null (($a = $AssignmentsA->id_problemset) ) ) & ( ! is_null ( ($b = $AssignmentsB->id_problemset) ) ) ){
+				$sql .= " `id_problemset` >= ? AND `id_problemset` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `id_problemset` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
 		if( ( !is_null (($a = $AssignmentsA->name) ) ) & ( ! is_null ( ($b = $AssignmentsB->name) ) ) ){
 				$sql .= " `name` >= ? AND `name` <= ? AND";
 				array_push( $val, min($a,$b));
@@ -339,22 +355,22 @@ abstract class AssignmentsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $AssignmentsA->id_problemset) ) ) & ( ! is_null ( ($b = $AssignmentsB->id_problemset) ) ) ){
-				$sql .= " `id_problemset` >= ? AND `id_problemset` <= ? AND";
+		if( ( !is_null (($a = $AssignmentsA->publish_time_delay) ) ) & ( ! is_null ( ($b = $AssignmentsB->publish_time_delay) ) ) ){
+				$sql .= " `publish_time_delay` >= ? AND `publish_time_delay` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `id_problemset` = ? AND";
+			$sql .= " `publish_time_delay` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $AssignmentsA->PublishTimeDelay) ) ) & ( ! is_null ( ($b = $AssignmentsB->PublishTimeDelay) ) ) ){
-				$sql .= " `PublishTimeDelay` >= ? AND `PublishTimeDelay` <= ? AND";
+		if( ( !is_null (($a = $AssignmentsA->assignment_type) ) ) & ( ! is_null ( ($b = $AssignmentsB->assignment_type) ) ) ){
+				$sql .= " `assignment_type` >= ? AND `assignment_type` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `PublishTimeDelay` = ? AND";
+			$sql .= " `assignment_type` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}

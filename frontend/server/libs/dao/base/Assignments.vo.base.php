@@ -37,6 +37,9 @@ class Assignments extends VO
 			if (isset($data['id_course'])) {
 				$this->id_course = $data['id_course'];
 			}
+			if (isset($data['id_problemset'])) {
+				$this->id_problemset = $data['id_problemset'];
+			}
 			if (isset($data['name'])) {
 				$this->name = $data['name'];
 			}
@@ -46,11 +49,11 @@ class Assignments extends VO
 			if (isset($data['alias'])) {
 				$this->alias = $data['alias'];
 			}
-			if (isset($data['id_problemset'])) {
-				$this->id_problemset = $data['id_problemset'];
+			if (isset($data['publish_time_delay'])) {
+				$this->publish_time_delay = $data['publish_time_delay'];
 			}
-			if (isset($data['PublishTimeDelay'])) {
-				$this->PublishTimeDelay = $data['PublishTimeDelay'];
+			if (isset($data['assignment_type'])) {
+				$this->assignment_type = $data['assignment_type'];
 			}
 			if (isset($data['start_time'])) {
 				$this->start_time = $data['start_time'];
@@ -73,11 +76,12 @@ class Assignments extends VO
 		$vec = array(
 			"assignement_id" => $this->assignement_id,
 			"id_course" => $this->id_course,
+			"id_problemset" => $this->id_problemset,
 			"name" => $this->name,
 			"description" => $this->description,
 			"alias" => $this->alias,
-			"id_problemset" => $this->id_problemset,
-			"PublishTimeDelay" => $this->PublishTimeDelay,
+			"publish_time_delay" => $this->publish_time_delay,
+			"assignment_type" => $this->assignment_type,
 			"start_time" => $this->start_time,
 			"finish_time" => $this->finish_time
 		);
@@ -113,6 +117,13 @@ class Assignments extends VO
 	/**
 	  *  [Campo no documentado]
 	  * @access public
+	  * @var int(11),
+	  */
+	public $id_problemset;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
 	  * @var varchar(100)
 	  */
 	public $name;
@@ -136,24 +147,24 @@ class Assignments extends VO
 	  * @access public
 	  * @var int(11),
 	  */
-	public $id_problemset;
+	public $publish_time_delay;
 
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var int(11),
+	  * @var enum('homework',
 	  */
-	public $PublishTimeDelay;
+	public $assignment_type;
 
 	/**
-	  * Hora de inicio de este curso
+	  *  [Campo no documentado]
 	  * @access public
 	  * @var timestamp
 	  */
 	public $start_time;
 
 	/**
-	  * Hora de finalizacion de este curso
+	  *  [Campo no documentado]
 	  * @access public
 	  * @var timestamp
 	  */

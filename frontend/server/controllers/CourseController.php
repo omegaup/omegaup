@@ -33,7 +33,7 @@ class CourseController extends Controller {
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
         Validators::isValidAlias($r['course_alias'], 'course_alias', $is_required);
 
-        Validators::isInEnum($r['assignment_type '], 'assignment_type', array('test', 'homework'), false /*is_required*/);
+        Validators::isInEnum($r['assignment_type'], 'assignment_type', array('test', 'homework'), true /*is_required*/);
     }
 
     /**
@@ -105,11 +105,18 @@ class CourseController extends Controller {
 
         self::validateCreateOrUpdateAssignment($r);
 
+        $problemSet = new Problemsets();
+
         $assignment = new Assignments($r);
         $assignment->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $assignment->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
 
         try {
+            // Create the backing problemset
+            ProblemsetsDAO::save($problemSet);
+
+            $assignment->id_problemset = $problemSet->problemset_id;
+
             AssignmentsDAO::save($assignment);
 
         } catch (Exception $e) {
