@@ -22,5 +22,5 @@
 	</div>
 <div>
 
-<script type="text/javascript" src="/js/course.assignment.add.problems.form.js?ver=a39683"></script>
+<script type="text/javascript" src="/js/course.assignment.add.problems.form.js?ver=ad1d57"></script>
 
