@@ -97,8 +97,37 @@ $(document).ready(function() {
 			$('.contest #description').html(omegaup.UI.escape(contest.description));
 
 			$('.contest #time-until-start').html(omegaup.UI.escape(contest.start_time));
-			$('.contest #start_time').val(omegaup.UI.formatDateTime(contest.start_time));
-			$('.contest #finish_time').val(omegaup.UI.formatDateTime(contest.finish_time));
+			$('.contest #start_time').text(contest.start_time.long());
+			$('.contest #finish_time').text(contest.finish_time.long());
+			if (contest.show_scoreboard_after == 1){
+				$(".contest #show_scoreboard_after").text(omegaup.T.contestNewFormScoreboardAtEnd);
+			}else{
+				$(".contest #show_scoreboard_after").hide();
+			}
+			if (contest.window_length != null ){
+				$('.contest #window_length_enabled').text(omegaup.T.contestNewFormDifferentStarts + ' ' + contest.window_length + ' minutes');
+			}else{
+				$('.contest #window_length_enabled').hide();
+			}
+			$('.contest #scoreboard').text(omegaup.T.contestNewFormScoreboardTimePercent + ' ' + contest.scoreboard + '%');
+			$('.contest #submissions_gap').text(omegaup.T.contestNewFormSubmissionsSeparationDesc + contest.submissions_gap / 60 + ' minute');
+			penalty_types = {none: omegaup.T.contestNewFormNoPenalty,
+							problem_open: omegaup.T.contestNewFormByProblem,
+							constest_start: omegaup.T.contestNewFormByContests,
+							runtime: omegaup.T.contestNewFormByRuntime};
+			$('.contest #penalty_type').text(penalty_types[contest.penalty_type]);
+			if(contest.penalty != 0){
+				$('.contest #penalty').text(omegaup.T.contestNewFormPenaltyDesc + ' ' + contest.penalty + ' minutes');
+			}else{
+				$('.contest #penalty').hide();
+			}
+			feedback_types = {yes: omegaup.T.contestNewFormImmediateFeedbackDesc, no:'', partial: omegaup.T.contestNewFormImmediateFeedbackDesc + ' ' + omegaup.T.wordsPartial}
+			$('.contest #feedback').text(feedback_types[contest.feedback]);
+			if(contest.points_decay_factor != 0 ){
+				$('.contest #points_decay_factor').text(omegaup.T.contestNewFormPintDecrementFactor + contest.points_decay_factor);
+			}else{
+				$('.contest #points_decay_factor').hide();
+			}
 		}
 
 		// Feel free to re-write this if you have the time.
