@@ -1,47 +1,9 @@
 <?php
 
 class CourseCreateTest extends OmegaupTestCase {
-    /**
-     * Create course helper
-     */
-    private function createCourse($user, $name = null, $alias = null, $description = null, $start_time = null, $finish_time = null) {
-        $data = array();
-        $data['request'] = new Request(array(
-            'auth_token' => self::login($user),
-            'name' => is_null($name) ? Utils::CreateRandomString() : $name,
-            'alias' => is_null($alias) ? Utils::CreateRandomString() : $alias,
-            'description' => is_null($description) ? Utils::CreateRandomString() : $description,
-            'start_time' => is_null($start_time) ? (Utils::GetPhpUnixTimestamp() + 60) : $start_time,
-            'finish_time' => is_null($finish_time) ? (Utils::GetPhpUnixTimestamp() + 120) : $finish_time
-        ));
-
-        // Call api
-        $data['response'] = CourseController::apiCreate($data['request']);
-        return $data;
-    }
 
     /**
-     * Create an assignment inside a course.
-     */
-    private function createAssignment($user, $courseAlias, $name = null, $alias = null, $description = null, $start_time = null, $finish_time = null, $assignment_type = null) {
-        $data = array();
-        $data['request'] = new Request(array(
-            'auth_token' => self::login($user),
-            'course_alias' => $courseAlias,
-            'name' => is_null($name) ? Utils::CreateRandomString() : $name,
-            'alias' => is_null($alias) ? Utils::CreateRandomString() : $alias,
-            'description' => is_null($description) ? Utils::CreateRandomString() : $description,
-            'start_time' => is_null($start_time) ? (Utils::GetPhpUnixTimestamp() + 60) : $start_time,
-            'finish_time' => is_null($finish_time) ? (Utils::GetPhpUnixTimestamp() + 120) : $finish_time,
-            'assignment_type' => is_null($assignment_type) ? 'homework' : $assignment_type
-        ));
-
-        $data['response'] = CourseController::apiCreateAssignment($data['request']);
-        return $data;
-    }
-
-    /**
-     * Create course happy path
+     * Create course hot path
      */
     public function testCreateSchoolCourse() {
         $user = UserFactory::createUser();
@@ -55,7 +17,6 @@ class CourseCreateTest extends OmegaupTestCase {
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
         ));
 
-        // Call api
         $response = CourseController::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
@@ -128,23 +89,29 @@ class CourseCreateTest extends OmegaupTestCase {
     }
 
     /**
-     * Tests course/apiListAssignments returns valid results.
+     * Tests course/apiListAssignments
      */
     public function testListCourseAssignments() {
-        // Create a course with 2 assignments
-        $courseAdmin = UserFactory::createUser();
-        $courseData = $this->createCourse($courseAdmin);
-        $courseAlias = $courseData['request']['alias'];
-        $assignmentData = array();
-        $assignmentData[0] = $this->createAssignment($courseAdmin, $courseAlias);
-        $assignmentData[1] = $this->createAssignment($courseAdmin, $courseAlias);
 
-        // Call API
+        // Create 1 course with 1 assignment
+        $courseData = CoursesFactory::createCourseWithOneAssignment();
+
         $response = CourseController::apiListAssignments(new Request(array(
-            'auth_token' => self::login($courseAdmin),
-            'course_alias' => $courseAlias
+            'auth_token' => self::login($courseData['user']),
+            'course_alias' => $courseData['course_alias']
         )));
 
-        $this->assertEquals(2, count($response['assignments']));
+        $this->assertEquals(1, count($response['assignments']));
+
+        // Create another course with 5 assignment and list them
+        $courseData = CoursesFactory::createCourseWithAssignments(5);
+
+        $response = CourseController::apiListAssignments(new Request(array(
+            'auth_token' => self::login($courseData['user']),
+            'course_alias' => $courseData['course_alias']
+        )));
+
+        $this->assertEquals(5, count($response['assignments']));
     }
 }
+

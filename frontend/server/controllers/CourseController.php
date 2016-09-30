@@ -157,6 +157,35 @@ class CourseController extends Controller {
     }
 
     /**
+     * Adds a problem to an assignment 
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiAddProblem(Request $r) {
+        self::authenticateRequest($r);
+
+        // Get the associated problemset with this assignment
+        $problemSet = AssignmentsDAO::GetProblemset($r['assignment_alias']);
+
+        if (is_null($problemSet)) {
+            throw new InvalidDatabaseOperationException();
+        }
+
+        // Get this problem
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+
+        $problemSetProblem = new ProblemsetProblems();
+        $problemSetProblem->problemset_id = $problemSet->problemset_id;
+        $problemSetProblem->problem_id = $problem->problem_id;
+
+        ProblemsetProblemsDAO::save($problemSetProblem);
+
+        return array('status' => 'ok');
+    }
+
+    /**
      * List course assignments
      *
      * @throws InvalidParameterException
