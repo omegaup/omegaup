@@ -106,10 +106,25 @@ class CourseController extends Controller {
 
         self::validateCreateOrUpdate($r);
 
+        if (!is_null(CoursesDAO::findByAlias($r['alias']))) {
+            throw new DuplicatedEntryInDatabaseException('alias');
+        }
+
+        // Create the associated group
+        $groupRequest = new Request(array(
+            'alias' => $r['alias'],
+            'name' => 'for-' . $r['alias']
+        ));
+
+        GroupController::apiCreate($groupRequest);
+        $group = GroupsDAO::FindByAlias($groupRequest['alias']);
+
+        // Create the actual course
         $course = new Courses($r);
         $course->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $course->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
         $course->id_owner = $r['current_user_id'];
+        $course->id_admingroup = $group->group_id;
 
         $course_id = -1;
         try {

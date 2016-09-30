@@ -22,31 +22,44 @@ class CourseCreateTest extends OmegaupTestCase {
         $this->assertEquals(1, count(CoursesDAO::findByName($r['name'])));
     }
 
+    /**
+     * Two courses cannot have the same alias
+     *
+     * @expectedException DuplicatedEntryInDatabaseException
+     */
     public function testCreateCourseDuplicatedName() {
+        $sameAlias = Utils::CreateRandomString();
+        $sameName = Utils::CreateRandomString();
+
         $user = UserFactory::createUser();
 
         $r = new Request(array(
             'auth_token' => self::login($user),
-            'name' => Utils::CreateRandomString(),
-            'alias' => Utils::CreateRandomString(),
+            'name' => $sameName,
+            'alias' => $sameAlias,
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
         ));
 
-        // Call api
         $response = CourseController::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(1, count(CoursesDAO::findByName($r['name'])));
 
-        // unset course_id otherwise this would be an update
-        $r['course_id'] = null;
+        // Create a new Course with different alias and name
+        $user = UserFactory::createUser();
 
-        // Call api again
-        $response = CourseController::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, count(CoursesDAO::findByName($r['name'])));
+        $r = new Request(array(
+            'auth_token' => self::login($user),
+            'name' => $sameName,
+            'alias' => $sameAlias,
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+        ));
+
+        CourseController::apiCreate($r);
     }
 
     public function testCreateSchoolAssignment() {

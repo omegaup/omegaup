@@ -7,7 +7,8 @@ CREATE TABLE `Courses` (
   `id_admingroup` int(11),
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
-  PRIMARY KEY (`course_id`)
+  PRIMARY KEY (`course_id`),
+  UNIQUE KEY `course_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un curso/clase que un maestro da.';
 
 CREATE TABLE `Assignments` (

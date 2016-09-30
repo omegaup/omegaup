@@ -25,4 +25,17 @@ class CoursesDAO extends CoursesDAOBase
 
         return $finalResult;
     }
+
+    public static function findByAlias($alias) {
+        global  $conn;
+
+        $sql = "select DISTINCT c.* from Courses c where c.alias LIKE  CONCAT('%', ?, '%') LIMIT 10";
+
+        $rs = $conn->GetRow($sql, array($alias));
+        if (count($rs) == 0) {
+            return null;
+        }
+
+        return new Courses($rs);
+    }
 }
