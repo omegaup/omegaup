@@ -157,7 +157,7 @@ class CourseController extends Controller {
     }
 
     /**
-     * Adds a problem to an assignment 
+     * Adds a problem to an assignment
      *
      * @param Request $r
      * @return array
