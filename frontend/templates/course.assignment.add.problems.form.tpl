@@ -1,12 +1,11 @@
 <div class="panel panel-primary">
 	<div class="panel-body">
 		<form class="assignment-add-problem">
-	
+			<p class="help-block">{#courseAddProblemsAssignmentsDesc#}</p>
 			<div class="row">
 				<div class="form-group">
 					<label for="assignments-dropdown">{#wordsAssignments#}</label>
 					<select name="assignments-list" id='assignments-list' class="form-control"></select>
-					<p class="help-block">{#courseAddProblemsAssignmentsDesc#}</p>
 				</div>
 			</div>
 
