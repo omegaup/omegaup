@@ -1,7 +1,6 @@
 <?php
 
 class CourseCreateTest extends OmegaupTestCase {
-
     /**
      * Create course helper
      */

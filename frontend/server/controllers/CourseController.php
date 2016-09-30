@@ -1,7 +1,6 @@
 <?php
 
 class CourseController extends Controller {
-
     /**
      * Validates request for Assignment on Course operations
      *
