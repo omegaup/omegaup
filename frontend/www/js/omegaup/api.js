@@ -134,7 +134,8 @@ omegaup.API = {
 						start_time,
 						finish_time,
 						alias,
-						assignment_type
+						assignment_type,
+						callback
 					) {
 		$.post(
 			'/api/course/createAssignment/',
@@ -145,7 +146,7 @@ omegaup.API = {
 				start_time: start_time,
 				finish_time: finish_time,
 				alias: alias,
-				assignment_type: assignment_type
+				assignment_type: assignment_type,
 			},
 			function(data) {
 				if (data.status !== undefined && data.status == "error") {
