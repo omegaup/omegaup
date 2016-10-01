@@ -220,7 +220,7 @@ omegaup.API = {
 
 	getCourseDetails: function(alias, callback) {
 		$.get(
-			'/api/course/details/course_alias/' + encodeURIComponent(alias) + '/',
+			'/api/course/details/alias/' + encodeURIComponent(alias) + '/',
 			function (data) {
 				if (data.status !== undefined && data.status == "error") {
 					omegaup.UI.error(data.error);

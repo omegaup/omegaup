@@ -58,6 +58,6 @@
 		</div><!-- row -->
 	</div><!-- panel panel-default -->
 
-<script src="/js/courseintro.js?ver=b12012"></script>
+<script src="/js/courseintro.js?ver=1b969a"></script>
 {include file='footer.tpl'}
 
