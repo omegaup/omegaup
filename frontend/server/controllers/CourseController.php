@@ -235,4 +235,29 @@ class CourseController extends Controller {
         $response['status'] = 'ok';
         return $response;
     }
+
+    public static function apiDetails(Request $r) {
+
+        Validators::isStringNonEmpty($r['alias'], 'alias', true /*is_required*/);
+
+        $result = array();
+
+        // @TODO(alan): cache?
+
+        $course = CoursesDAO::findByAlias($r['alias']);
+        if (is_null($course)) {
+            throw new NotFoundException('courseNotFound');
+        }
+
+        $result['status'] = 'ok';
+        $result['assignments'] = CoursesDAO::getAllAssignments($r['alias']);
+
+        $result['name']         = $course->name;
+        $result['description']  = $course->description;
+        $result['alias']        = $course->alias;
+        $result['start_time']   = $course->start_time;
+        $result['finish_time']  = $course->finish_time;
+
+        return $result;
+    }
 }

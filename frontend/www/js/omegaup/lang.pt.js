@@ -171,6 +171,7 @@ omegaup.T = {
 	courseNewFormStartDate: "Data de início",
 	courseNewFormStartDateDesc: "Data e hora (hora local), em que o curso começa.",
 	courseNewFormUpdateCourse: "Curso atualização",
+	courseNotFound: "Curso não encontrado",
 	createSchoolFailed: "Criação da escola falhou.",
 	currentStatus: "situação atual",
 	editFieldRequired: "Um valor necessário está faltando",
