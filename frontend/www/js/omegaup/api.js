@@ -199,12 +199,14 @@ omegaup.API = {
 
 	getCourseAssignments: function(course_alias, callback) {
 		$.get(
-			'/api/course/listAssignments/',
-			{
+			'/api/course/listAssignments/',	{
 				course_alias : course_alias
 			},
 			function (data) {
-				callback(data);
+				if (data.status !== undefined && data.status == "error") {
+					omegaup.UI.error(data.error);
+				}
+				if (callback !== undefined) { callback(data); }
 			},
 			'json'
 		).fail(function(j, status, errorThrown) {
@@ -212,6 +214,31 @@ omegaup.API = {
 				callback(JSON.parse(j.responseText));
 			} catch (err) {
 				callback({status:'error', 'error':undefined});
+			}
+		});
+	},
+
+	getCourseDetails: function(alias, callback) {
+		$.get(
+			'/api/course/details/course_alias/' + encodeURIComponent(alias) + '/',
+			function (data) {
+				if (data.status !== undefined && data.status == "error") {
+					omegaup.UI.error(data.error);
+				}
+				if (data.status == 'ok') {
+					data.start_time = omegaup.OmegaUp.time(data.start_time * 1000);
+					data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000);
+				}
+				if (callback !== undefined) {
+					callback(data);
+				}
+			},
+			'json'
+		).fail(function(j, status, errorThrown) {
+			try {
+				callback(JSON.parse(j.responseText));
+			} catch (err) {
+				callback({status:'error', 'error': undefined});
 			}
 		});
 	},
