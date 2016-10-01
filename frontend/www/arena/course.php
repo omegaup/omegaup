@@ -1,7 +1,7 @@
 <?php
 require_once('../../server/bootstrap.php');
 
-$show_intro = true;
+$show_intro = false;
 
 try {
     /*
@@ -15,5 +15,5 @@ try {
 if ($show_intro) {
     $smarty->display('../../templates/arena.course.intro.tpl');
 } else {
-    /* @TODO show course contents here */
+    $smarty->display('../../templates/arena.course.tpl');
 }
