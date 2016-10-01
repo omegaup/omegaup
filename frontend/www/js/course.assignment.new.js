@@ -12,7 +12,7 @@ $('document').ready(function() {
 				$(".new_course_assignment_form #assignment_type").val(),
 				function(data) {
 					if(data.status == "ok") {
-						omegaup.UI.success(omegaup.T['courseAssignmentProblemAdded']);
+						omegaup.UI.success(omegaup.T['courseAssignmentAdded']);
 					} else {
 						omegaup.UI.error(data.error || 'error');
 					}

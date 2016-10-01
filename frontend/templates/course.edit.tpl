@@ -28,6 +28,6 @@
 </div>
 
 <script type="text/javascript" src="/js/course.edit.js?ver=5f4f36"></script>
-<script type="text/javascript" src="/js/course.assignment.new.js?ver=2e2a19"></script>
+<script type="text/javascript" src="/js/course.assignment.new.js?ver=33c32a"></script>
 <script type="text/javascript" src="/js/course.assignment.add.problems.js?ver=95d473"></script>
 {include file='footer.tpl'}
