@@ -5,8 +5,8 @@ $(document).ready(function() {
 		if (course.status == 'ok') {
 			$('.course #title').html(omegaup.UI.escape(course.name));
 			$('.course #description').html(omegaup.UI.escape(course.description));
-			$('.course #start_time').html(omegaup.UI.formatDateTime(course.start_time));
-			$('.course #finish_time').html(omegaup.UI.formatDateTime(course.finish_time));
+			$('.course #start_time').val(omegaup.UI.formatDateTime(course.start_time));
+			$('.course #finish_time').val(omegaup.UI.formatDateTime(course.finish_time));
 		}
 	}
 
