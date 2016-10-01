@@ -252,12 +252,13 @@ class CourseController extends Controller {
         $result['status'] = 'ok';
         $result['assignments'] = CoursesDAO::getAllAssignments($r['alias']);
 
-        $result['name']         = $course->name;
-        $result['description']  = $course->description;
-        $result['alias']        = $course->alias;
-        $result['start_time']   = $course->start_time;
-        $result['finish_time']  = $course->finish_time;
+        $result['name'] = $course->name;
+        $result['description'] = $course->description;
+        $result['alias'] = $course->alias;
+        $result['start_time'] = strtotime($course->start_time);
+        $result['finish_time'] = strtotime($course->finish_time);
 
         return $result;
     }
 }
+

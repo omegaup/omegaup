@@ -57,6 +57,8 @@ class CoursesDAO extends CoursesDAOBase
             unset($row['assignement_id']);
             unset($row['id_course']);
             unset($row['id_problemset']);
+            $row['start_time'] =  strtotime($row['start_time']);
+            $row['finish_time'] = strtotime($row['finish_time']);
             array_push($ar, $row);
         }
 

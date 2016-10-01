@@ -20,6 +20,8 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
+        Validators::isNumber($response['start_time'], 'start_time', true);
+        Validators::isNumber($response['finish_time'], 'finish_time', true);
 
         // 1 assignment
         $this->assertEquals(1, count($response['assignments']));
@@ -31,6 +33,9 @@ class CourseDetailsTest extends OmegaupTestCase {
             $this->assertNotNull($assignment['assignment_type']);
             $this->assertNotNull($assignment['start_time']);
             $this->assertNotNull($assignment['finish_time']);
+
+            Validators::isNumber($assignment['start_time'], 'start_time', true);
+            Validators::isNumber($assignment['finish_time'], 'finish_time', true);
         }
     }
 }
