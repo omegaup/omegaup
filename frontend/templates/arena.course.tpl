@@ -11,7 +11,7 @@
 		<div class="panel-heading">
 			<h2 class="panel-title" >{#courseContents#}</h2>
 		</div>
-		
+
 		<div class="panel-body table-responsive">
 				<div id="course-contents">
 					<h2 id="title" data-bind="text: header"></h2>
