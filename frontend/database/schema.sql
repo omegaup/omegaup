@@ -130,10 +130,10 @@ CREATE TABLE IF NOT EXISTS `Problemset_Problems` (
 --
 
 CREATE TABLE IF NOT EXISTS `ACLs` (
-  `acl_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL AUTO_INCREMENT,
   `owner_id` int(11) NOT NULL COMMENT 'El usuario que creó el objeto y que tiene un rol de administrador implícito',
   PRIMARY KEY (`acl_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de control de acceso.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de control de acceso.' AUTO_INCREMENT = 65536;
 
 -- --------------------------------------------------------
 
@@ -143,12 +143,12 @@ CREATE TABLE IF NOT EXISTS `ACLs` (
 
 CREATE TABLE IF NOT EXISTS `Contests` (
   `contest_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador unico para cada concurso',
+  `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso del concurso',
   `title` varchar(256) NOT NULL COMMENT 'El titulo que aparecera en cada concurso',
   `description` tinytext NOT NULL COMMENT 'Una breve descripcion de cada concurso.',
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este concurso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este concurso',
   `window_length` int(11) DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso',
-  `director_id` int(11) NOT NULL COMMENT 'el userID del usuario que creo este concurso',
   `rerun_id` int(11) NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso',
   `public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'False implica concurso cerrado, ver la tabla ConcursantesConcurso',
   `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
   `recommended` BOOL NOT NULL DEFAULT  '0' COMMENT  'Mostrar el concurso en la lista de recomendados.',
   PRIMARY KEY (`contest_id`),
-  KEY `director_id` (`director_id`),
+  KEY `acl_id` (`acl_id`),
   KEY `rerun_id` (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursos que se llevan a cabo en el juez.' AUTO_INCREMENT=1 ;
@@ -408,8 +408,8 @@ CREATE TABLE IF NOT EXISTS `Permissions` (
 
 CREATE TABLE IF NOT EXISTS `Problems` (
   `problem_id` int(11) NOT NULL AUTO_INCREMENT,
+  `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso del problema',
   `public` tinyint(1) NOT NULL DEFAULT '1',
-  `author_id` int(11) NOT NULL,
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
   `validator` enum('token','token-caseless','token-numeric','custom','literal') NOT NULL DEFAULT 'token-numeric',
@@ -435,6 +435,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   `deprecated` tinyint(1) NOT NULL DEFAULT 0,
   `email_clarifications` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`problem_id`),
+  KEY `acl_id` (`acl_id`),
   KEY `author_id` (`author_id`),
   UNIQUE KEY `problems_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.' AUTO_INCREMENT=1 ;
@@ -648,11 +649,11 @@ CREATE TABLE IF NOT EXISTS `Users_Badges` (
 CREATE TABLE IF NOT EXISTS `User_Roles` (
   `user_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
-  `contest_id` int(11) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`user_id`,`role_id`,`contest_id`),
+  `acl_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`role_id`,`acl_id`),
   KEY `user_id` (`user_id`),
   KEY `role_id` (`role_id`),
-  KEY `contest_id` (`contest_id`)
+  KEY `acl_id` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.';
 
 -- --------------------------------------------------------
@@ -733,11 +734,11 @@ CREATE TABLE IF NOT EXISTS `Groups_Scoreboards_Contests` (
 CREATE TABLE IF NOT EXISTS `Group_Roles` (
   `group_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
-  `contest_id` int(11) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`group_id`,`role_id`,`contest_id`),
+  `acl_id` int(11) NOT NULL,
+  PRIMARY KEY (`group_id`,`role_id`,`acl_id`),
   KEY `group_id` (`group_id`),
   KEY `role_id` (`role_id`),
-  KEY `contest_id` (`contest_id`)
+  KEY `acl_id` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los grupos.';
 
 --
@@ -812,7 +813,7 @@ ALTER TABLE `ACLs`
 -- Filtros para la tabla `Contests`
 --
 ALTER TABLE `Contests`
-  ADD CONSTRAINT `fk_cu_director_id` FOREIGN KEY (`director_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Contests_Users`
@@ -889,7 +890,8 @@ ALTER TABLE `Favorites`
 --
 ALTER TABLE `Group_Roles`
   ADD CONSTRAINT `fk_gr_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_gr_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_gr_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_gra_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Languages`
@@ -908,7 +910,7 @@ ALTER TABLE `Messages`
 -- Filtros para la tabla `Problems`
 --
 ALTER TABLE `Problems`
-  ADD CONSTRAINT `author_id` FOREIGN KEY (`author_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Problems_Badges`
@@ -975,7 +977,8 @@ ALTER TABLE `Users_Badges`
 --
 ALTER TABLE `User_Roles`
   ADD CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ura_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `Users_Permissions`
@@ -1018,8 +1021,6 @@ DELIMITER ;
 
 CREATE INDEX idx_contest_public ON Contests (`public`);
 CREATE INDEX idx_user_roles_contest ON User_Roles (contest_id);
-CREATE INDEX idx_contest_director_id ON Contests (director_id);
-CREATE INDEX idx_contest_public_director_id ON Contests (`public`, director_id);
 CREATE INDEX idx_problems_public ON Problems (`public`);
 
 --
@@ -1136,3 +1137,5 @@ END$$
 DELIMITER ;
 
 COMMIT;
+
+-- vim: set expandtab:ts=2:sw=2

@@ -118,6 +118,8 @@ def migrate(args):
   for revision, name, path in _scripts(args):
     if latest_revision >= revision:
       continue
+    if args.limit and revision > args.limit:
+      break
     if args.noop:
       sys.stderr.write('Installing %s\n' % path)
     else:
@@ -212,6 +214,8 @@ def main():
                               help='Installs scripts flagged as for testing')
   parser_migrate.add_argument('--databases', default='omegaup,omegaup-test',
                               help='Comma-separated list of databases')
+  parser_migrate.add_argument('--limit', type=int,
+                              help='Last revision to include')
   parser_migrate.set_defaults(func=migrate)
 
   # Commands for development.
