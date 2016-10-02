@@ -13,7 +13,7 @@ $(document).ready(function() {
 		arena.currentProblem = problem;
 		arena.myRuns.filter_problem(problem.alias);
 		if (!arena.myRuns.attached) {
-			arena.myRuns.attach($('#problem .runs'));
+			arena.myRuns.attach($('#problem runs-table.runs'));
 		}
 
 		MathJax.Hub.Queue(["Typeset", MathJax.Hub, $('#problem .statement').get(0)]);

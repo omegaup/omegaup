@@ -7,7 +7,9 @@ omegaup.arena.ArenaAdmin = function(arena) {
 	self.arena.contestAdmin = true;
 
 	self.setUpPagers();
-	self.arena.runs.attach($('#runs table.runs'));
+	if (!self.arena.runs.attached) {
+		self.arena.runs.attach($('#runs runs-table'));
+	}
 };
 
 omegaup.arena.ArenaAdmin.prototype.setUpPagers = function() {
