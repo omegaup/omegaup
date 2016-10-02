@@ -11,7 +11,9 @@ if (!function_exists('try_define')) {
 # ####################################
 try_define('OMEGAUP_DB_NAME', 'omegaup-test');
 try_define('OMEGAUP_DB_USER', 'root');
-try_define('OMEGAUP_DB_PASS', '');
+try_define('OMEGAUP_DB_PASS', 'omegaup');
+try_define('OMEGAUP_DB_HOST', '127.0.0.1');
+try_define('OMEGAUP_DB_DRIVER', 'mysql');
 
 # ####################################
 # TEST CONFIG

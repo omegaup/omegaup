@@ -35,7 +35,7 @@ class SchoolsDAO extends SchoolsDAOBase
         $rs = $conn->Execute($sql, $args);
         $ar = array();
         foreach ($rs as $foo) {
-            $bar =  new Users($foo);
+            $bar =  new Users($foo); // wtf?
             array_push($ar, $bar);
         }
         return $ar;
