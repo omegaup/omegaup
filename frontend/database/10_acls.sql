@@ -4,11 +4,13 @@ ALTER TABLE `ACLs`
   AUTO_INCREMENT = 65536,
   CHANGE COLUMN `acl_id` `acl_id` int(11) NOT NULL AUTO_INCREMENT;
 
--- ACL ID 1 represents the whole system.
+-- User 1 is reserved for omegaUp.
 INSERT IGNORE INTO
   Users (user_id, username, name)
 VALUES
   (1, "omegaup", "omegaUp admin");
+
+-- ACL ID 1 represents the whole system.
 INSERT INTO ACLs (`acl_id`, `owner_id`) VALUES (1, 1);
 
 -- Contests
@@ -42,16 +44,16 @@ BEGIN
       `User_Roles`
     SET
       `contest_id` = acl,
-      `role_id` = 1
+      `role_id` = 1  -- new ROLE_ADMIN
     WHERE
-      `contest_id` = contest AND `role_id` = 2;
+      `contest_id` = contest AND `role_id` = 2;  -- old contest admin
     UPDATE
       `Group_Roles`
     SET
       `contest_id` = acl,
-      `role_id` = 1
+      `role_id` = 1  -- new ROLE_ADMIN
     WHERE
-      `contest_id` = contest AND `role_id` = 2;
+      `contest_id` = contest AND `role_id` = 2  -- old contest admin;
   END LOOP;
 
   CLOSE cur;
@@ -103,16 +105,16 @@ BEGIN
       `User_Roles`
     SET
       `contest_id` = acl,
-      `role_id` = 1
+      `role_id` = 1  -- new ROLE_ADMIN
     WHERE
-      `contest_id` = problem AND `role_id` = 3;
+      `contest_id` = problem AND `role_id` = 3;  -- old problem admin
     UPDATE
       `Group_Roles`
     SET
       `contest_id` = acl,
-      `role_id` = 1
+      `role_id` = 1  -- new ROLE_ADMIN
     WHERE
-      `contest_id` = problem AND `role_id` = 3;
+      `contest_id` = problem AND `role_id` = 3;  -- old problem admin
   END LOOP;
 
   CLOSE cur;
@@ -135,16 +137,16 @@ ALTER TABLE `Problems`
 UPDATE
   `User_Roles`
 SET
-  `contest_id` = 1
+  `contest_id` = 1  -- new SYSTEM_ACL
 WHERE
-  `contest_id` = 0 AND `role_id` IN (1, 4);
+  `contest_id` = 0 AND `role_id` IN (1, 4);  -- old "system-wide" "contest"
 
 UPDATE
   `Group_Roles`
 SET
-  `contest_id` = 1
+  `contest_id` = 1  -- new SYSTEM_ACL
 WHERE
-  `contest_id` = 0 AND `role_id` IN (1, 4);
+  `contest_id` = 0 AND `role_id` IN (1, 4);  -- old "system-wide" "contest"
 
 -- Roles update.
 ALTER TABLE `User_Roles`
