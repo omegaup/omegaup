@@ -132,13 +132,13 @@ abstract class ProblemsDAOBase extends DAO
 			$sql .= " `problem_id` = ? AND";
 			array_push( $val, $Problems->problem_id );
 		}
+		if (!is_null( $Problems->acl_id)) {
+			$sql .= " `acl_id` = ? AND";
+			array_push( $val, $Problems->acl_id );
+		}
 		if (!is_null( $Problems->public)) {
 			$sql .= " `public` = ? AND";
 			array_push( $val, $Problems->public );
-		}
-		if (!is_null( $Problems->author_id)) {
-			$sql .= " `author_id` = ? AND";
-			array_push( $val, $Problems->author_id );
 		}
 		if (!is_null( $Problems->title)) {
 			$sql .= " `title` = ? AND";
@@ -271,10 +271,10 @@ abstract class ProblemsDAOBase extends DAO
 	  **/
 	private static final function update($Problems)
 	{
-		$sql = "UPDATE Problems SET  `public` = ?, `author_id` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `validator_time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ?, `email_clarifications` = ? WHERE  `problem_id` = ?;";
+		$sql = "UPDATE Problems SET  `acl_id` = ?, `public` = ?, `title` = ?, `alias` = ?, `validator` = ?, `languages` = ?, `server` = ?, `remote_id` = ?, `time_limit` = ?, `validator_time_limit` = ?, `overall_wall_time_limit` = ?, `extra_wall_time` = ?, `memory_limit` = ?, `output_limit` = ?, `stack_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `tolerance` = ?, `slow` = ?, `deprecated` = ?, `email_clarifications` = ? WHERE  `problem_id` = ?;";
 		$params = array(
+			$Problems->acl_id,
 			$Problems->public,
-			$Problems->author_id,
 			$Problems->title,
 			$Problems->alias,
 			$Problems->validator,
@@ -339,11 +339,11 @@ abstract class ProblemsDAOBase extends DAO
 		if (is_null($Problems->slow)) $Problems->slow = 0;
 		if (is_null($Problems->deprecated)) $Problems->deprecated = 0;
 		if (is_null($Problems->email_clarifications)) $Problems->email_clarifications = 0;
-		$sql = "INSERT INTO Problems ( `problem_id`, `public`, `author_id`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated`, `email_clarifications` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Problems ( `problem_id`, `acl_id`, `public`, `title`, `alias`, `validator`, `languages`, `server`, `remote_id`, `time_limit`, `validator_time_limit`, `overall_wall_time_limit`, `extra_wall_time`, `memory_limit`, `output_limit`, `stack_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `tolerance`, `slow`, `deprecated`, `email_clarifications` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
 			$Problems->problem_id,
+			$Problems->acl_id,
 			$Problems->public,
-			$Problems->author_id,
 			$Problems->title,
 			$Problems->alias,
 			$Problems->validator,
@@ -425,22 +425,22 @@ abstract class ProblemsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
+		if( ( !is_null (($a = $ProblemsA->acl_id) ) ) & ( ! is_null ( ($b = $ProblemsB->acl_id) ) ) ){
+				$sql .= " `acl_id` >= ? AND `acl_id` <= ? AND";
+				array_push( $val, min($a,$b));
+				array_push( $val, max($a,$b));
+		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
+			$sql .= " `acl_id` = ? AND";
+			$a = is_null ( $a ) ? $b : $a;
+			array_push( $val, $a);
+		}
+
 		if( ( !is_null (($a = $ProblemsA->public) ) ) & ( ! is_null ( ($b = $ProblemsB->public) ) ) ){
 				$sql .= " `public` >= ? AND `public` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
 			$sql .= " `public` = ? AND";
-			$a = is_null ( $a ) ? $b : $a;
-			array_push( $val, $a);
-		}
-
-		if( ( !is_null (($a = $ProblemsA->author_id) ) ) & ( ! is_null ( ($b = $ProblemsB->author_id) ) ) ){
-				$sql .= " `author_id` >= ? AND `author_id` <= ? AND";
-				array_push( $val, min($a,$b));
-				array_push( $val, max($a,$b));
-		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `author_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}

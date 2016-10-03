@@ -66,7 +66,7 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        if (!Authorization::IsGroupAdmin($r['current_user_id'], $r['group'])) {
+        if (!Authorization::isGroupAdmin($r['current_user_id'], $r['group'])) {
             throw new ForbiddenAccessException();
         }
     }

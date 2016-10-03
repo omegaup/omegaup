@@ -18,7 +18,6 @@
   */
 abstract class ProblemsetsDAOBase extends DAO
 {
-
 	/**
 	  *	Guardar registros.
 	  *
@@ -41,7 +40,6 @@ abstract class ProblemsetsDAOBase extends DAO
 			return ProblemsetsDAOBase::create( $Problemsets);
 		}
 	}
-
 
 	/**
 	  *	Obtener {@link Problemsets} por llave primaria.
@@ -97,7 +95,6 @@ abstract class ProblemsetsDAOBase extends DAO
 		}
 		return $allData;
 	}
-
 
 	/**
 	  *	Buscar registros.
@@ -213,7 +210,7 @@ abstract class ProblemsetsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
- 		$Problemsets->problemset_id = $conn->Insert_ID();
+		$Problemsets->problemset_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -263,7 +260,6 @@ abstract class ProblemsetsDAOBase extends DAO
 			$sql .= " `problemset_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		if( ( !is_null (($a = $ProblemsetsA->access_mode) ) ) & ( ! is_null ( ($b = $ProblemsetsB->access_mode) ) ) ){
@@ -274,7 +270,6 @@ abstract class ProblemsetsDAOBase extends DAO
 			$sql .= " `access_mode` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		if( ( !is_null (($a = $ProblemsetsA->languages) ) ) & ( ! is_null ( ($b = $ProblemsetsB->languages) ) ) ){
@@ -285,13 +280,11 @@ abstract class ProblemsetsDAOBase extends DAO
 			$sql .= " `languages` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
-
 		}
 
 		$sql = substr($sql, 0, -3) . " )";
 		if( !is_null ( $orderBy ) ){
 		    $sql .= " order by `" . $orderBy . "` " . $orden ;
-
 		}
 		global $conn;
 		$rs = $conn->Execute($sql, $val);
@@ -325,6 +318,4 @@ abstract class ProblemsetsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
 	}
-
-
 }

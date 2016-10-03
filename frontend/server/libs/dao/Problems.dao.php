@@ -95,6 +95,10 @@ class ProblemsDAO extends ProblemsDAOBase
             $sql = '
                 FROM
                     Problems p
+                INNER JOIN
+                    ACLs a
+                ON
+                    a.acl_id = p.acl_id
                 LEFT JOIN (
                     SELECT
                         pi.problem_id,
@@ -107,19 +111,21 @@ class ProblemsDAO extends ProblemsDAOBase
                         pi.problem_id
                 ) ps ON ps.problem_id = p.problem_id
                 LEFT JOIN
-                    User_Roles ur ON ur.user_id = ? AND p.problem_id = ur.contest_id AND ur.role_id = 3
+                    User_Roles ur ON ur.user_id = ? AND p.acl_id = ur.acl_id AND ur.role_id = ?
                 LEFT JOIN (
                     SELECT DISTINCT
-                        gr.contest_id, gr.role_id
+                        gr.acl_id
                     FROM
                         Groups_Users gu
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gu.group_id
-                    WHERE gu.user_id = ? AND gr.role_id = 3
-                ) gr ON p.problem_id = gr.contest_id';
+                    WHERE gu.user_id = ? AND gr.role_id = ?
+                ) gr ON p.acl_id = gr.acl_id';
             $args[] = $user_id;
             $args[] = $user_id;
+            $args[] = Authorization::ADMIN_ROLE;
             $args[] = $user_id;
+            $args[] = Authorization::ADMIN_ROLE;
 
             if (!is_null($tag)) {
                 $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
@@ -131,7 +137,7 @@ class ProblemsDAO extends ProblemsDAOBase
             }
 
             $sql .= '
-                (p.public = 1 OR p.author_id = ? OR ur.role_id = 3 OR gr.role_id = 3) ';
+                (p.public = 1 OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
             $args[] = $user_id;
 
             if (!is_null($query)) {
@@ -291,7 +297,16 @@ class ProblemsDAO extends ProblemsDAOBase
     }
 
     public static function getPrivateCount(Users $user) {
-        $sql = 'SELECT count(*) as Total FROM Problems WHERE public = 0 and (author_id = ?);';
+        $sql = 'SELECT
+            COUNT(*) as Total
+        FROM
+            Problems AS p
+        INNER JOIN
+            ACLs AS a
+        ON
+            a.acl_id = p.acl_id
+        WHERE
+            p.public = 0 and a.owner_id = ?;';
         $params = array($user->user_id);
 
         global $conn;
@@ -312,9 +327,13 @@ class ProblemsDAO extends ProblemsDAOBase
             FROM
                 (
                     SELECT
-                        p.problem_id, p.author_id AS user_id
+                        p.problem_id, a.owner_id AS user_id
                     FROM
                         Problems AS p
+                    INNER JOIN
+                        ACLs AS a
+                    ON
+                        a.acl_id = p.acl_id
                     WHERE p.problem_id = ?
                     UNION
                     SELECT

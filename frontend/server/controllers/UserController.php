@@ -410,7 +410,7 @@ class UserController extends Controller {
         $hashedPassword = null;
         if (isset($r['username']) &&
             ((!is_null(self::$permissionKey) && self::$permissionKey == $r['permission_key']) ||
-            Authorization::IsSystemAdmin($r['current_user_id']))) {
+            Authorization::isSystemAdmin($r['current_user_id']))) {
             // System admin can force reset passwords for any user
             Validators::isStringNonEmpty($r['username'], 'username');
 
@@ -471,7 +471,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+            if (!Authorization::isSystemAdmin($r['current_user_id'])) {
                 throw new ForbiddenAccessException();
             }
 
@@ -531,7 +531,7 @@ class UserController extends Controller {
     public static function apiMailingListBackfill(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -653,7 +653,7 @@ class UserController extends Controller {
 
         $response = array();
 
-        $is_system_admin = Authorization::IsSystemAdmin($r['current_user_id']);
+        $is_system_admin = Authorization::isSystemAdmin($r['current_user_id']);
         if ($r['contest_type'] == 'OMI') {
             if ($r['current_user']->username != 'andreasantillana'
                 && !$is_system_admin
@@ -1183,7 +1183,7 @@ class UserController extends Controller {
 
         // Do not leak plain emails in case the request is for a profile other than
         // the logged user's one. Admins can see emails.
-        if (!Authorization::IsSystemAdmin($r['current_user_id'])
+        if (!Authorization::isSystemAdmin($r['current_user_id'])
                 && $r['user']->user_id !== $r['current_user_id']) {
             unset($response['userinfo']['email']);
         }
@@ -1318,7 +1318,7 @@ class UserController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1787,7 +1787,7 @@ class UserController extends Controller {
     public static function apiRefreshUserRank(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
             throw new UnauthorizedException();
         }
 
@@ -1940,7 +1940,7 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new NotFoundException('problemNotFound');
                     }
-                    if (!is_null($user) && Authorization::CanEditProblem($user->user_id, $problem)) {
+                    if (!is_null($user) && Authorization::canEditProblem($user->user_id, $problem)) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif ($problem->public != '1') {
                         throw new ForbiddenAccessException('problemIsPrivate');
