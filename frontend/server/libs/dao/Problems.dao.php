@@ -382,7 +382,9 @@ class ProblemsDAO extends ProblemsDAOBase
                 p.problem_id DESC';
         $params = array($user_id);
         if ($offset != null && $rowcount != null) {
-            $sql .= " LIMIT $offset, $rowcount";
+            $sql .= ' LIMIT ?, ?';
+            $params[] = $offset;
+            $params[] = $rowcount;
         }
         $sql .= ';';
 
