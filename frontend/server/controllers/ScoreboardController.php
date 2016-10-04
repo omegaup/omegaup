@@ -25,9 +25,8 @@ class ScoreboardController extends Controller {
         if ($contest === null) {
             throw new NotFoundException();
         }
-        $id = $contest->contest_id;
 
-        Scoreboard::RefreshScoreboardCache($id);
+        Scoreboard::refreshScoreboardCache($contest);
 
         return array(
             'status' => 'ok'

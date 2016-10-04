@@ -916,7 +916,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Get list of contests where the user has admin priviledges
+     * Get list of contests owned by the user
      *
      * @param Request $r
      * @return string
@@ -929,35 +929,11 @@ class UserController extends Controller {
         $response['contests'] = array();
 
         try {
-            $contest_director_key = new Contests(array(
-                        'director_id' => $r['current_user_id']
-                    ));
-            $contests_director = ContestsDAO::search($contest_director_key);
+            $owned_contests = ContestsDAO::getAllContestsOwnedByUser($r['current_user_id']);
 
-            foreach ($contests_director as $contest) {
+            foreach ($owned_contests as $contest) {
                 $response['contests'][] = $contest->asArray();
             }
-
-            $contest_admin_key = new UserRoles(array(
-                        'user_id' => $r['current_user_id'],
-                        'role_id' => CONTEST_ADMIN_ROLE,
-                    ));
-            $contests_admin = UserRolesDAO::search($contest_admin_key);
-
-            foreach ($contests_admin as $contest_key) {
-                $contest = ContestsDAO::getByPK($contest_key->contest_id);
-
-                if (is_null($contest)) {
-                    self::$log->error("UserRoles has a invalid contest: {$contest->contest_id}");
-                    continue;
-                }
-
-                $response['contests'][] = $contest->asArray();
-            }
-
-            usort($response['contests'], function ($a, $b) {
-                        return ($a['contest_id'] > $b['contest_id']) ? -1 : 1;
-            });
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -980,19 +956,11 @@ class UserController extends Controller {
         $response['problems'] = array();
 
         try {
-            $problems_key = new Problems(array(
-                        'author_id' => $r['current_user_id']
-                    ));
-
-            $problems = ProblemsDAO::search($problems_key);
+            $problems = ProblemsDAO::getAllProblemsOwnedByUser($r['current_user_id']);
 
             foreach ($problems as $problem) {
                 $response['problems'][] = $problem->asArray();
             }
-
-            usort($response['problems'], function ($a, $b) {
-                        return ($a['problem_id'] > $b['problem_id']) ? -1 : 1;
-            });
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

@@ -365,4 +365,35 @@ class ProblemsDAO extends ProblemsDAOBase
 
         return $result;
     }
+
+    final public static function getAllProblemsOwnedByUser($user_id, $offset = null, $rowcount = null) {
+        $sql = '
+            SELECT
+                p.*
+            FROM
+                Problems AS p
+            INNER JOIN
+                ACLs AS a
+            ON
+                a.acl_id = p.acl_id
+            WHERE
+                a.owner_id = ?
+            ORDER BY
+                p.problem_id DESC';
+        $params = array($user_id);
+        if ($offset != null && $rowcount != null) {
+            $sql .= " LIMIT $offset, $rowcount";
+        }
+        $sql .= ';';
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $result = array();
+        foreach ($rs as $row) {
+            array_push($result, new Problems($row));
+        }
+
+        return $result;
+    }
 }

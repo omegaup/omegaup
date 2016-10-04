@@ -238,20 +238,24 @@ class ProblemController extends Controller {
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
         $user_role = new UserRoles();
-        $user_role->contest_id = $r['problem']->problem_id;
+        $user_role->acl_id = $problem->acl_id;
         $user_role->user_id = $user->user_id;
-        $user_role->role_id = PROBLEM_ADMIN_ROLE;
+        $user_role->role_id = Authorization::ADMIN_ROLE;
 
         // Save the contest to the DB
         try {
@@ -288,20 +292,20 @@ class ProblemController extends Controller {
         }
 
         try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
         $group_role = new GroupRoles();
-        $group_role->contest_id = $r['problem']->problem_id;
+        $group_role->acl_id = $problem->acl_id;
         $group_role->group_id = $group->group_id;
-        $group_role->role_id = PROBLEM_ADMIN_ROLE;
+        $group_role->role_id = Authorization::ADMIN_ROLE;
 
         // Save the role
         try {
@@ -398,28 +402,28 @@ class ProblemController extends Controller {
         // Check whether problem exists
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        $user = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isProblemAdmin($r['user']->user_id, $r['problem'])) {
+        if (!Authorization::isProblemAdmin($user->user_id, $problem)) {
             throw new NotFoundException();
         }
 
         $user_role = new UserRoles();
-        $user_role->contest_id = $r['problem']->problem_id;
-        $user_role->user_id = $r['user']->user_id;
-        $user_role->role_id = PROBLEM_ADMIN_ROLE;
+        $user_role->acl_id = $problem->acl_id;
+        $user_role->user_id = $user->user_id;
+        $user_role->role_id = Authorization::ADMIN_ROLE;
 
         // Delete the role
         try {
@@ -454,20 +458,20 @@ class ProblemController extends Controller {
         }
 
         try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
+        if (!Authorization::isProblemAdmin($r['current_user_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
 
         $group_role = new GroupRoles();
-        $group_role->contest_id = $r['problem']->problem_id;
+        $group_role->acl_id = $problem->acl_id;
         $group_role->group_id = $group->group_id;
-        $group_role->role_id = PROBLEM_ADMIN_ROLE;
+        $group_role->role_id = Authorization::ADMIN_ROLE;
 
         // Delete the role
         try {
@@ -1087,15 +1091,14 @@ class ProblemController extends Controller {
         // problem source and alias of owner.
         if ($r['problem']->public ||
             Authorization::isProblemAdmin($r['current_user_id'], $r['problem'])) {
-            $problemsetter = UsersDAO::getByPK($r['problem']->author_id);
-            if (!is_null($problemsetter)) {
-                $response['problemsetter'] = array(
-                    'username' => $problemsetter->username,
-                    'name' => is_null($problemsetter->name) ?
-                              $problemsetter->username :
-                              $problemsetter->name
-                );
-            }
+            $acl = ACLsDAO::getByPK($r['problem']->acl_id);
+            $problemsetter = UsersDAO::getByPK($acl->owner_id);
+            $response['problemsetter'] = array(
+                'username' => $problemsetter->username,
+                'name' => is_null($problemsetter->name) ?
+                          $problemsetter->username :
+                          $problemsetter->name
+            );
         } else {
             unset($response['source']);
         }
@@ -1576,10 +1579,7 @@ class ProblemController extends Controller {
             if (Authorization::isSystemAdmin($r['current_user_id'])) {
                 $problems = ProblemsDAO::getAll(null, null, 'problem_id', 'DESC');
             } else {
-                $problem_mask = new Problems(array(
-                    'author_id' => $r['current_user_id']
-                ));
-                $problems = ProblemsDAO::search($problem_mask, 'problem_id', 'DESC', $r['offset'], $r['rowcount']);
+                $problems = ProblemsDAO::getAllProblemsOwnedByUser($r['current_user_id'], $r['offset'], $r['rowcount']);
             }
 
             foreach ($problems as $problem) {

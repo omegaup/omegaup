@@ -979,9 +979,7 @@ class ContestController extends Controller {
         }
 
         try {
-            $problems = ContestProblemsDAO::GetContestProblems(
-                $contest->contest_id
-            );
+            $problems = ContestProblemsDAO::getContestProblems($contest);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1007,7 +1005,7 @@ class ContestController extends Controller {
         // Validate the request and get the problem and the contest in an array
         $params = self::validateAddToContestRequest($r);
 
-        if (ContestProblemsDAO::CountContestProblems($params['contest']->contest_id)
+        if (ContestProblemsDAO::countContestProblems($params['contest'])
                 >= MAX_PROBLEMS_IN_CONTEST) {
             throw new PreconditionFailedException('contestAddproblemTooManyProblems');
         }
@@ -1027,7 +1025,7 @@ class ContestController extends Controller {
 
         // Invalidar cache
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
-        Scoreboard::InvalidateScoreboardCache($params['contest']->contest_id);
+        Scoreboard::invalidateScoreboardCache($params['contest']);
 
         return array('status' => 'ok');
     }
@@ -1112,7 +1110,7 @@ class ContestController extends Controller {
 
         // Invalidar cache
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
-        Scoreboard::InvalidateScoreboardCache($params['contest']->contest_id);
+        Scoreboard::invalidateScoreboardCache($params['contest']);
 
         return array('status' => 'ok');
     }
@@ -1296,14 +1294,14 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $contest_user = new UserRoles();
-        $contest_user->contest_id = $r['contest']->contest_id;
-        $contest_user->user_id = $user->user_id;
-        $contest_user->role_id = CONTEST_ADMIN_ROLE;
+        $user_role = new UserRoles();
+        $user_role->acl_id = $r['contest']->acl_id;
+        $user_role->user_id = $user->user_id;
+        $user_role->role_id = Authorization::ADMIN_ROLE;
 
         // Save the contest to the DB
         try {
-            UserRolesDAO::save($contest_user);
+            UserRolesDAO::save($user_role);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -1327,7 +1325,7 @@ class ContestController extends Controller {
         // Check contest_alias
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        $user = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
@@ -1342,18 +1340,18 @@ class ContestController extends Controller {
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isContestAdmin($r['user']->user_id, $r['contest'])) {
+        if (!Authorization::isContestAdmin($user->user_id, $r['contest'])) {
             throw new NotFoundException();
         }
 
-        $contest_user = new UserRoles();
-        $contest_user->contest_id = $r['contest']->contest_id;
-        $contest_user->user_id = $r['user']->user_id;
-        $contest_user->role_id = CONTEST_ADMIN_ROLE;
+        $user_role = new UserRoles();
+        $user_role->acl_id = $r['contest']->acl_id;
+        $user_role->user_id = $user->user_id;
+        $user_role->role_id = Authorization::ADMIN_ROLE;
 
         // Delete the role
         try {
-            UserRolesDAO::delete($contest_user);
+            UserRolesDAO::delete($user_role);
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -1400,9 +1398,9 @@ class ContestController extends Controller {
         }
 
         $group_role = new GroupRoles();
-        $group_role->contest_id = $r['contest']->contest_id;
+        $group_role->acl_id = $r['contest']->acl_id;
         $group_role->group_id = $group->group_id;
-        $group_role->role_id = CONTEST_ADMIN_ROLE;
+        $group_role->role_id = Authorization::ADMIN_ROLE;
 
         // Save the contest to the DB
         try {
@@ -1449,9 +1447,9 @@ class ContestController extends Controller {
         }
 
         $group_role = new GroupRoles();
-        $group_role->contest_id = $r['contest']->contest_id;
+        $group_role->acl_id = $r['contest']->acl_id;
         $group_role->group_id = $group->group_id;
-        $group_role->role_id = CONTEST_ADMIN_ROLE;
+        $group_role->role_id = Authorization::ADMIN_ROLE;
 
         // Delete the role
         try {
@@ -1545,7 +1543,7 @@ class ContestController extends Controller {
 
         // Create scoreboard
         $scoreboard = new Scoreboard(
-            $r['contest']->contest_id,
+            $r['contest'],
             Authorization::isContestAdmin($r['current_user_id'], $r['contest'])
         );
 
@@ -1603,7 +1601,7 @@ class ContestController extends Controller {
 
         // Create scoreboard
         $scoreboard = new Scoreboard(
-            $r['contest']->contest_id,
+            $r['contest'],
             $showAllRuns
         );
 
@@ -1666,7 +1664,7 @@ class ContestController extends Controller {
             }
 
             $s = new Scoreboard(
-                $contest->contest_id,
+                $contest,
                 false, /*showAllRuns*/
                 null, /*auth_token*/
                 $r['contest_params'][$contest->alias]['only_ac']
@@ -1967,7 +1965,7 @@ class ContestController extends Controller {
      */
     private static function validateContestCanBePublic(Contests $contest) {
         // Check that contest has some problems at least 1 problem
-        $problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->contest_id);
+        $problemsInContest = ContestProblemsDAO::getRelevantProblems($contest);
         if (count($problemsInContest) < 1) {
             throw new InvalidParameterException('contestPublicRequiresProblem');
         }
@@ -2126,7 +2124,7 @@ class ContestController extends Controller {
         Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
 
         // Expire contest scoreboard cache
-        Scoreboard::InvalidateScoreboardCache($r['contest']->contest_id);
+        Scoreboard::invalidateScoreboardCache($r['contest']);
 
         // Expire contest-list cache
         Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
@@ -2355,7 +2353,7 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         $scoreboard = new Scoreboard(
-            $r['contest']->contest_id,
+            $r['contest'],
             true, //Show only relevant runs
             $r['auth_token']
         );

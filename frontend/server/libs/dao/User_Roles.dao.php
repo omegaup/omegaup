@@ -45,16 +45,16 @@ class UserRolesDAO extends UserRolesDAOBase {
             INNER JOIN
                 Users u ON u.user_id = a.owner_id
             WHERE
-                c.acl_id = ?;';
+                a.acl_id = ?;';
         $params = array($acl_id);
-        $director = $conn->GetOne($sql, $params);
+        $owner = $conn->GetOne($sql, $params);
 
         $found = false;
         for ($i = 0; $i < count($admins); $i++) {
             if ($admins[$i]['acl'] == Authorization::SYSTEM_ACL) {
                 $admins[$i]['role'] = 'site-admin';
-            } elseif ($admins[$i]['username'] == $director) {
-                $admins[$i]['role'] = 'director';
+            } elseif ($admins[$i]['username'] == $owner) {
+                $admins[$i]['role'] = 'owner';
                 $found = true;
             } else {
                 $admins[$i]['role'] = 'admin';
@@ -62,8 +62,8 @@ class UserRolesDAO extends UserRolesDAOBase {
             unset($admins[$i]['acl']);
         }
 
-        if ($found) {
-            array_push($admins, array('username' => $director, 'role' => 'director'));
+        if (!$found) {
+            array_push($admins, array('username' => $owner, 'role' => 'owner'));
         }
 
         return $admins;
@@ -100,7 +100,7 @@ class UserRolesDAO extends UserRolesDAOBase {
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {
-        return self::isAdmin($user_id, $problem->problem_id);
+        return self::isAdmin($user_id, $problem->acl_id);
     }
 
     public static function isSystemAdmin($user_id) {

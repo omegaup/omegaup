@@ -26,7 +26,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Get the role
         $contest = $contestData['contest'];
-        $ur = UserRolesDAO::getByPK($user->user_id, CONTEST_ADMIN_ROLE, $contest->contest_id);
+        $ur = UserRolesDAO::getByPK($user->user_id, Authorization::ADMIN_ROLE, $contest->acl_id);
 
         $this->assertNotNull($ur);
     }
@@ -124,7 +124,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $response = ContestController::apiAddGroupAdmin($r);
 
         // Get the role
-        $ur = GroupRolesDAO::getByPK($groupData['group']->group_id, CONTEST_ADMIN_ROLE, $contestData['contest']->contest_id);
+        $ur = GroupRolesDAO::getByPK($groupData['group']->group_id, Authorization::ADMIN_ROLE, $contestData['contest']->acl_id);
 
         $this->assertNotNull($ur);
     }
