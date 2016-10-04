@@ -53,8 +53,8 @@ BEGIN
       `contest_id` = acl,
       `role_id` = 1  -- new ROLE_ADMIN
     WHERE
-      `contest_id` = contest AND `role_id` = 2  -- old contest admin;
-  END LOOP;
+      `contest_id` = contest AND `role_id` = 2;  -- old contest admin;
+  END LOOP read_loop;
 
   CLOSE cur;
   COMMIT;
@@ -115,7 +115,7 @@ BEGIN
       `role_id` = 1  -- new ROLE_ADMIN
     WHERE
       `contest_id` = problem AND `role_id` = 3;  -- old problem admin
-  END LOOP;
+  END LOOP read_loop;
 
   CLOSE cur;
   COMMIT;
