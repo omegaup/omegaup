@@ -14,7 +14,7 @@ $('document').ready(function() {
 
 	omegaup.API.getCourseAdminDetails(courseAlias, function(course) {
 		$('.page-header h1 span').html(omegaup.T.courseEdit + ' ' + course.name);
-		$('.page-header h1 small').html('&ndash; <a href="/arena/' + courseAlias + '/">' + omegaup.T.courseEditGoToCourse + '</a>');
+		$('.page-header h1 small').html('&ndash; <a href="/course/' + courseAlias + '/">' + omegaup.T.courseEditGoToCourse + '</a>');
 		$(".new_course_form #title").val(course.name);
 		$(".new_course_form #alias").val(course.alias);
 		$(".new_course_form #description").val(course.description);
@@ -56,7 +56,7 @@ $('document').ready(function() {
 			$(".new_course_form #show_scoreboard").val(),
 			function(data) {
 				if(data.status == "ok") {
-					omegaup.UI.success('Tu curso ha sido editado! <a href="/arena/' +
+					omegaup.UI.success('Tu curso ha sido editado! <a href="/course/' +
                             $('.new_course_form #alias').val() + '">' +
                             omegaup.T.courseEditGoToCourse + '</a>');
 					$('div.post.footer').show();

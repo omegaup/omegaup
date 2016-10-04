@@ -315,7 +315,7 @@ class CourseController extends Controller {
             }),
             'show_scoreboard',
         );
-        self::updateValueProperties($r, $r['contest'], $valueProperties);
+        self::updateValueProperties($r, $r['course'], $valueProperties);
 
         // Push changes
         try {
