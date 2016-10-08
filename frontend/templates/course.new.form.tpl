@@ -2,7 +2,7 @@
 	{assign "IS_UPDATE" 0}
 {/if}
 
-<div class="panel panel-primary">
+<div class="panel">
 	{if $IS_UPDATE != 1}
 	<div class="panel-heading">
 		<h3 class="panel-title">
@@ -19,51 +19,39 @@
 					</div>
 
 					<div class="form-group col-md-6">
-						<label for="alias">{#courseNewFormShortTitle_alias_#}</label>
-						<input id='alias' name='alias' value='' type='text' class="form-control" {IF $IS_UPDATE eq 1} disabled="true" {/if}>
+						<label for="alias" >{#courseNewFormShortTitle_alias_#}</label>
+						<input id='alias' name='alias' value='' type='text' class="form-control" {IF $IS_UPDATE eq 1} disabled="true" {/if} >
 						<p class="help-block">{#courseNewFormShortTitle_alias_Desc#}</p>
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="start_time">{#courseNewFormStartDate#}</label>
-						<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
-						<p class="help-block">{#courseNewFormStartDateDesc#}</p>
+						<div class="form-group col-md-6">
+							<label for="start_time">{#courseNewFormStartDate#}</label>
+							<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
+						</div>
+						<div class="form-group col-md-6">
+							<label for="finish_time">{#courseNewFormEndDate#}</label>
+							<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
+						</div>
+					<p class="help-block">{#courseNewFormEndDateDesc#}</p>
 					</div>
-
 					<div class="form-group col-md-6">
-						<label for="finish_time">{#courseNewFormEndDate#}</label>
-						<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
-						<p class="help-block">{#courseNewFormEndDateDesc#}</p>
+						<label for="show_scoreboard">{#courseNewFormShowScoreboard#}</label>
+						<div class="form-control container">
+							<label class="radio-inline"><input type="radio" id="show_scoreboard_2" name="show_scoreboard" value="1" checked=checked>{#wordsYes#}</label>
+							<label class="radio-inline"><input type="radio" id="show_scoreboard_1" name="show_scoreboard" value="0">{#wordsNo#}</label>
+						</div>
 					</div>
+					<p class="help-block">{#courseNewFormShowScoreboardDesc#}</p>
 				</div>
 
 				<div class="row">
-					<div class="form-group col-md-6">
-						<label for="show_scoreboard">{#courseNewFormShowScoreboard#}</label>
-						<select name='show_scoreboard' id='show_scoreboard' class="form-control">
-							<option value='1'>{#wordsYes#}</option>
-							<option value='0'>{#wordsNo#}</option>
-						</select>
-						<p class="help-block">{#courseNewFormShowScoreboardDesc#}</p>
-					</div>
-
-					<div class="form-group col-md-6">
+					<div class="form-group container">
 						<label for="description">{#courseNewFormDescription#}</label>
-						<textarea id='description' name='description' cols="30" rows="10" class="form-control"></textarea>
+						<textarea id='description' name='description' cols="30" rows="5" class="form-control"></textarea>
 					</div>
-
-					{if $IS_UPDATE eq 1}
-					<div class="form-group col-md-6">
-						<label for="public">{#courseNewFormPublic#}</label>
-						<select name='public' id='public' class="form-control">
-							<option value='0' selected="selected">{#wordsNo#}</option>
-							<option value='1'>{#wordsYes#}</option>
-						</select>
-						<p class="help-block">{#courseNewFormPublicDesc#}</p>
-					</div>
-					{/if}
 				</div>
 
 				<div class="form-group">
@@ -76,4 +64,4 @@
 		</form>
 	</div>
 </div>
-<script type="text/javascript" src="/js/course.new.form.js?ver=734311"></script>
+<script type="text/javascript" src="/js/course.new.form.js?ver=da958d"></script>

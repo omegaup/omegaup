@@ -13,8 +13,9 @@ $('document').ready(function() {
 	var courseAlias = /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
 	omegaup.API.getCourseAdminDetails(courseAlias, function(course) {
-		$('.page-header h1 span').html(omegaup.T.courseEdit + ' ' + course.name);
-		$('.page-header h1 small').html('&ndash; <a href="/course/' + courseAlias + '/">' + omegaup.T.courseEditGoToCourse + '</a>');
+		//$('.page-header h1 span').html(omegaup.T.courseEdit + ' ' + course.name);
+		//$('.page-header h1 small').html('&ndash; <a href="/course/' + courseAlias + '/">' + omegaup.T.courseEditGoToCourse + '</a>');
+		$('.page-header h1 span').html('<a href="/course/' + courseAlias + '/">' + course.name + '</a>');
 		$(".new_course_form #title").val(course.name);
 		$(".new_course_form #alias").val(course.alias);
 		$(".new_course_form #description").val(course.description);

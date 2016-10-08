@@ -9,6 +9,7 @@
 		<div class="panel-heading">
 			<h2 class="panel-title" >{#courseDetails#}</h2>
 		</div>
+		Hola mundo
 
 		<div class="row" >
 			<div class="col-md-6 col-md-offset-1" >

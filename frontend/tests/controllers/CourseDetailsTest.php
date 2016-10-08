@@ -6,9 +6,7 @@
  */
 
 class CourseDetailsTest extends OmegaupTestCase {
-
     public function testGetcourseDetailsValid() {
-
         // Create 1 course with 1 assignment
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 
@@ -39,4 +37,3 @@ class CourseDetailsTest extends OmegaupTestCase {
         }
     }
 }
-

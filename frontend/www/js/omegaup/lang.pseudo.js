@@ -158,6 +158,7 @@ omegaup.T = {
 	courseEdit: "(Edi7 c0ur53)",
 	courseEditAddAssignment: "(Add a55ignm3n7)",
 	courseEditAddProblems: "(Add pr0b13m)",
+	courseEditAddStudents: "(Add 57ud3n75)",
 	courseEditGoToCourse: "(G0 70 c0ur53)",
 	courseNew: "(N3w c0ur53)",
 	courseNewFormDescription: "(D35crip7i0n)",
