@@ -15,6 +15,7 @@ rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /conteststats.php?contest=$1 last;
 rewrite ^/course/new/?$ /coursenew.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/edit/?$ /courseedit.php?course=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /arena/course.php?course_alias=$1 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /arena/course.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/group/?$ /grouplist.php last;
 rewrite ^/group/new/?$ /groupnew.php last;
 rewrite ^/group/([a-zA-Z0-9_+-]+)/edit/?$ /groupedit.php?group=$1 last;

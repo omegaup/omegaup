@@ -2,9 +2,9 @@ $(function() {
     ko.bindingProvider.instance = new ko.secureBindingsProvider({attribute: 'data-bind'});
     var courseAlias = /\/course\/([^\/]+)/.exec(window.location.pathname)[1];
     omegaup.API.getCourseDetails(courseAlias, function(course) {
-        console.log(course);
         var assignments = {};
         for (var i = 0; i < course.assignments.length; ++i) {
+            // TODO(pablo): Agregar $progress$ al viewModel.
             var type = course.assignments[i].assignment_type;
             if (!assignments.hasOwnProperty(type)) {
                 assignments[type] = [];
