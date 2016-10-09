@@ -2,6 +2,7 @@ $(function() {
     ko.bindingProvider.instance = new ko.secureBindingsProvider({attribute: 'data-bind'});
     var courseAlias = /\/course\/([^\/]+)/.exec(window.location.pathname)[1];
     omegaup.API.getCourseDetails(courseAlias, function(course) {
+        // Assignment lists by type.
         var assignments = {};
         for (var i = 0; i < course.assignments.length; ++i) {
             // TODO(pablo): Agregar $progress$ al viewModel.
@@ -10,11 +11,16 @@ $(function() {
                 assignments[type] = [];
             }
             assignments[type].push(course.assignments[i]);
+            course.assignments[i].assignmentUrl = '/course/' + courseAlias + '/assignment/' +
+                course.assignments[i].name;
             course.assignments[i].startTime = omegaup.UI.formatDateTime(
                     new Date(1000*course.assignments[i].start_time));
             course.assignments[i].finishTime = omegaup.UI.formatDateTime(
                     new Date(1000*course.assignments[i].finish_time));
+            course.isAdmin = true; //course.is_admin;
+            course.addAssignmentUrl = '/course/' + courseAlias + '/edit#add-assignment';
         }
+        // Put assignment lists back in a separate field per type.
         for (var type in assignments) {
             course[type] = assignments[type];
         }
