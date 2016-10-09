@@ -30,16 +30,13 @@
 
 <script type="text/html" id="course-info-template">
 <div id="intro-page" class="course">
-	<div class="panel panel-default">
-
-		<div class="panel-heading">
-			<h2 class="panel-title" >{#courseContents#}</h2>
+	<div class="panel">
+		<div class="page-header">
+			<a style="text-decoration:none"><h1 id="title" data-bind="text: name"></h1></a>
+			<p id="description" data-bind="text: description" class='container'></p>
 		</div>
-
 		<div class="panel-body table-responsive">
 			<div id="course-contents">
-				<h2 id="title" data-bind="text: name"></h2>
-				<p id="description" data-bind="text: description"></p>
                 <span data-bind="template: { name: 'assignments-list',
                                              data: { header: '{#wordsHomework#}',
                                                      assignment: homework } } "></span>

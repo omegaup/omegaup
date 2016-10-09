@@ -1,4 +1,4 @@
-<div class="panel panel-primary">
+<div class="panel">
 	<div class="panel-body">
 		<form class="assignment-add-problem">
 			<div class="row">

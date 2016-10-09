@@ -2,13 +2,13 @@
 	{assign "IS_ASSIGNMENT_UPDATE" 0}
 {/if}
 
-<div class="panel panel-primary">
+<div class="panel">
 	{if $IS_ASSIGNMENT_UPDATE != 1}
-	<div class="panel-heading">
+	<!-- <div class="panel-heading">
 		<h3 class="panel-title">
 			{#courseAssignmentNew#}
 		</h3>
-	</div>
+	</div> -->
 	{/if}
 	<div class="panel-body">
 		<form class="new_course_assignment_form">
