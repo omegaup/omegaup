@@ -7,17 +7,17 @@
 
 		<title>{$htmlTitle} &ndash; omegaUp</title>
 
-		<script type="text/javascript" src="/third_party/js/jquery.js?ver=198b3f"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.js"}"></script>
 
-		<script type="text/javascript" src="/js/omegaup/omegaup.js?ver=5c773b"></script>
-		<script type="text/javascript" src="/js/omegaup/api.js?ver=9101ec"></script>
-		<script type="text/javascript" src="/js/omegaup/ui.js?ver=7f4a99"></script>
-		<script type="text/javascript" src="/js/omegaup/lang.{#locale#}.js?ver=f0fb05,396746,75317a,a6cdb8"></script>
+		<script type="text/javascript" src="{version_hash src="/js/omegaup/omegaup.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/omegaup/api.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/omegaup/ui.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
 
-		<script type="text/javascript" src="/third_party/js/sugar.js?ver=171bac"></script>
-		<script type="text/javascript" src="/third_party/js/highstock.js?ver=6e7575"></script>
-		<script type="text/javascript" src="/js/omegaup-graph.js?ver=12891c"></script>
-		<script type="text/javascript" src="/js/langtools.js?ver=adeec4"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/omegaup-graph.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}"></script>
 
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
@@ -26,23 +26,23 @@
 
 		<!-- Latest compiled and minified JavaScript -->
 
-		<script src="/third_party/js/bootstrap.min.js?ver=176563"></script>
+		<script src="{version_hash src="/third_party/js/bootstrap.min.js"}"></script>
 
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
-		<script src="/third_party/js/bootstrap-table.min.js?ver=711245"></script>
+		<script src="{version_hash src="/third_party/js/bootstrap-table.min.js"}"></script>
 		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
 
 		<!-- Bootstrap select plugin from https://github.com/silviomoreto/bootstrap-select -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap-select.min.css">
-		<script type="text/javascript" src="/third_party/js/bootstrap-select.min.js?ver=cf5db5"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-select.min.js"}"></script>
 		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datepicker.css">
-		<script type="text/javascript" src="/third_party/js/bootstrap-datepicker.js?ver=bf3a56"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datepicker.js"}"></script>
 		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
-		<script type="text/javascript" src="/third_party/js/typeahead.jquery.js?ver=2e4977"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/typeahead.jquery.js"}"></script>
 		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datetimepicker.css">
-		<script type="text/javascript" src="/third_party/js/bootstrap-datetimepicker.min.js?ver=a0cafb"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datetimepicker.min.js"}"></script>
 
 		<!-- from arena -->
 		<link rel="shortcut icon" href="/favicon.ico" />
@@ -50,16 +50,16 @@
 		<link rel="stylesheet" type="text/css" href="/css/common.css">
 
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
-	<script type="text/javascript" src="/js/mathjax-config.js?ver=37494e"></script>
+	<script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
 	<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 {/if}
 {if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
-	<script type="text/javascript" src="/third_party/js/pagedown/Markdown.Converter.js?ver=e445ec"></script>
-	<script type="text/javascript" src="/third_party/js/pagedown/Markdown.Sanitizer.js?ver=25306e"></script>
-	<script type="text/javascript" src="/third_party/js/pagedown/Markdown.Editor.js?ver=e0132d"></script>
+	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
+	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
+	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}"></script>
 	<link rel="stylesheet" type="text/css" href="/third_party/js/pagedown/demo/browser/demo.css" />
 {/if}
-		<script type="text/javascript" src="/js/head.sugar_locale.js?ver=0cb37f"></script>
+		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
 	</head>
 	<body>
 

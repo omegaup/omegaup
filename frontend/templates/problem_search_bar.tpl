@@ -39,5 +39,5 @@
 		</div>
 	</form>
 
-	<script src='/js/search.js?ver=94c459'></script>
+	<script src="{version_hash src="/js/search.js"}"></script>
 </div>
