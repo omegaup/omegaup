@@ -215,9 +215,44 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Removes a problem wit runs from a private contest.
+     * Removes a problem with runs from a private contest with a user that is sysadmin
      *
-     * @expectedException InvalidParameterException
+     */
+    public function testRemoveProblemWithRunsFromPrivateContestBeingSysAdmin() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Get a contestant
+        $contestant = UserFactory::createUser();
+
+        // Contestant opens the contest
+        ContestsFactory::addUser($contestData, $contestant);
+        //ContestsFactory::openContest($contestData, $contestant);
+
+        // Add a run to the problem
+        RunsFactory::createRun($problemData, $contestData, $contestant);
+
+        $userRoles = new UserRoles(array(
+            'user_id' => $contestData['director']->user_id,
+            'role_id' => ADMIN_ROLE,
+            'contest_id' => 0,
+        ));
+        UserRolesDAO::save($userRoles);
+
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
+    }
+
+    /**
+     * Removes a problem with runs from a private contest with a user that is not sysadmin
+     *
+     * @expectedException ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsFromPrivateContest() {
         // Get a contest
@@ -229,8 +264,12 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        // Get a contestan
+        // Get a contestant
         $contestant = UserFactory::createUser();
+
+        // Contestant opens the contest
+        ContestsFactory::addUser($contestData, $contestant);
+        //ContestsFactory::openContest($contestData, $contestant);
 
         // Add a run to the problem
         RunsFactory::createRun($problemData, $contestData, $contestant);

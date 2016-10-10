@@ -1123,7 +1123,6 @@ class ContestController extends Controller {
     private static function validateRemoveFromContestRequest(Request $r) {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        // Only director is allowed to remove problems in contest
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
@@ -1151,6 +1150,10 @@ class ContestController extends Controller {
 
         if (is_null($problem)) {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
+        }
+
+        if(RunsDAO::CountTotalRunsOfProblem($problem->problem_id) > 0 && !Authorization::IsSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException('cannotRemoveProb');
         }
 
         if($contest->public == 1) {
