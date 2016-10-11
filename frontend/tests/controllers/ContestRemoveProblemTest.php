@@ -233,7 +233,6 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // Contestant opens the contest
         ContestsFactory::addUser($contestData, $contestant);
-        //ContestsFactory::openContest($contestData, $contestant);
 
         // Add a run to the problem
         RunsFactory::createRun($problemData, $contestData, $contestant);
@@ -244,6 +243,42 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             'contest_id' => 0,
         ));
         UserRolesDAO::save($userRoles);
+
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
+    }
+
+    /**
+     * Removes a problem with runs only from admins from a private contest with a user that is not sysadmin
+     *
+     */
+    public function testRemoveProblemWithAdminRunsFromPrivateContestBeingSysAdmin() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Get a contestant
+        $secondaryAdmin = UserFactory::createUser();
+
+        // Prepare request
+        $login = self::login($contestData['director']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'usernameOrEmail' => $secondaryAdmin->username,
+            'contest_alias' => $contestData['request']['alias'],
+        ));
+
+        // Add secondary admin
+        $response = ContestController::apiAddAdmin($r);
+
+        // Add runs to the problem created by the contest admins
+        RunsFactory::createRun($problemData, $contestData, $contestData['director']);
+        RunsFactory::createRun($problemData, $contestData, $secondaryAdmin);
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
@@ -269,10 +304,73 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // Contestant opens the contest
         ContestsFactory::addUser($contestData, $contestant);
-        //ContestsFactory::openContest($contestData, $contestant);
 
         // Add a run to the problem
         RunsFactory::createRun($problemData, $contestData, $contestant);
+
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
+    }
+
+    /**
+     * Removes a problem with runs only from admins from a private contest with a user that is not sysadmin
+     *
+     * @expectedException ForbiddenAccessException
+     */
+    public function testRemoveProblemWithMixedRunsFromPrivateContestNotBeingSysAdmin() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Get a contestant
+        $contestant = UserFactory::createUser();
+
+        // Contestant opens the contest
+        ContestsFactory::addUser($contestData, $contestant);
+
+        // Add a run to the problem created by the contest admin
+        RunsFactory::createRun($problemData, $contestData, $contestData['director']);
+        RunsFactory::createRun($problemData, $contestData, $contestant);
+
+        // remove the problem from the contest
+        $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
+    }
+
+    /**
+     * Removes a problem with runs only from admins from a private contest with a user that is not sysadmin
+     *
+     */
+    public function testRemoveProblemWithMixedRunsFromPrivateContestBeingSysAdmin() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Get a contestant
+        $contestant = UserFactory::createUser();
+
+        // Contestant opens the contest
+        ContestsFactory::addUser($contestData, $contestant);
+
+        // Add a run to the problem created by the contest admin
+        RunsFactory::createRun($problemData, $contestData, $contestData['director']);
+        RunsFactory::createRun($problemData, $contestData, $contestant);
+
+         $userRoles = new UserRoles(array(
+            'user_id' => $contestData['director']->user_id,
+            'role_id' => ADMIN_ROLE,
+            'contest_id' => 0,
+        ));
+        UserRolesDAO::save($userRoles);
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
