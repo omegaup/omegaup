@@ -1152,11 +1152,11 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        if(RunsDAO::CountTotalRunsOfProblem($problem->problem_id) > 0 && !Authorization::IsSystemAdmin($r['current_user_id'])) {
+        if (RunsDAO::CountTotalRunsOfProblem($problem->problem_id) > 0 && !Authorization::IsSystemAdmin($r['current_user_id'])) {
             throw new ForbiddenAccessException('cannotRemoveProb');
         }
 
-        if($contest->public == 1) {
+        if ($contest->public == 1) {
             // Check that contest has at least 2 problems
             $problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->contest_id);
             if (count($problemsInContest) < 2) {
