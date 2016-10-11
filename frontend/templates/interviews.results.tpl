@@ -28,7 +28,7 @@
 <script type="text/javascript" src="/js/third_party/knockout-secure-binding.min.js?ver=81a2a3"></script>
 
 <script type="text/javascript" src="/js/omegaup/arena/admin_arena.js?ver=f4347c"></script>
-<script type="text/javascript" src="/js/omegaup/arena/arena.js?ver=bc66ce"></script>
+<script type="text/javascript" src="/js/omegaup/arena/arena.js?ver=fd08ea"></script>
 <script type="text/javascript" src="/ux/admin.js?ver=c9161a"></script>
 
 <script type="text/javascript" src="/js/interviews.results.js?ver=758257"></script>

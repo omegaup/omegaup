@@ -11,7 +11,7 @@
 
 		<script type="text/javascript" src="/js/omegaup/omegaup.js?ver=5c773b"></script>
 		<script type="text/javascript" src="/js/omegaup/api.js?ver=9101ec"></script>
-		<script type="text/javascript" src="/js/omegaup/ui.js?ver=7f4a99"></script>
+		<script type="text/javascript" src="/js/omegaup/ui.js?ver=67528f"></script>
 		<script type="text/javascript" src="/js/omegaup/lang.{#locale#}.js?ver=f0fb05,396746,75317a,a6cdb8"></script>
 
 		<script type="text/javascript" src="/third_party/js/sugar.js?ver=171bac"></script>

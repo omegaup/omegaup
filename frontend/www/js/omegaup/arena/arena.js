@@ -37,23 +37,6 @@ omegaup.arena.ScoreboardColors = [
 	'#CD35D3',
 ];
 
-ko.components.register('runs-table', {
-    viewModel: { createViewModel: function(params) {
-      var runView = params.view;
-      var defaultOptions = {
-          showContest: false,
-          showDetails: false,
-          showPoints: false,
-          showProblems: false,
-          showRejudge: false,
-          showSubmit: false,
-          showUser: false,
-      };
-      return $.extend(runView, defaultOptions, params.options);
-    }},
-    template: { element: 'runs-table' }
-});
-
 omegaup.arena.GetOptionsFromLocation = function(arenaLocation) {
 	var options = {
 		isLockdownMode: false,
@@ -825,7 +808,7 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
 			$('#problem .overall_wall_time_limit').html(problem.overall_wall_time_limit / 1000 + "s");
 			$('#problem .statement').html(problem.problem_statement);
 			if (!self.myRuns.attached) {
-				self.myRuns.attach($('#problem runs-table.runs'));
+				self.myRuns.attach($('#user-runs'));
 			}
 			var karel_langs = ['kp', 'kj'];
 			var language_array = problem.languages.split(',');

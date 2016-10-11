@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=f73a36' bodyid='only-problem'}
+{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=2ea01a' bodyid='only-problem'}
 {include file='arena.runs.tpl'}
 			{if $problem_admin}
 			<script type="text/javascript" src="/js/omegaup/arena/admin_arena.js?ver=f4347c"></script>
@@ -43,7 +43,7 @@
 {if $problemsetter}
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
 {/if}
-                    <runs-table class="runs"
+                    <runs-table id="user-runs"
                                 params="view: view,
                                         options: { showSubmit: true, showDetails: true }">
                     </runs-table>
