@@ -75,3 +75,6 @@ frontend/www/js/google-analytics.js
 frontend/www/pmamini.php
 frontend/www/preguntas/
 frontend/www/templates/
+
+#ignore sublime sftp config
+sftp-config.json
