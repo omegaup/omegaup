@@ -18,5 +18,5 @@
 		</div>
 	</div>
 </div>
-<script type='text/javascript' src='/js/reset.js?ver=463d69' ></script>
+<script type='text/javascript' src="{version_hash src="/js/reset.js"}" ></script>
 {include file='footer.tpl'}

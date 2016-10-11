@@ -3,12 +3,12 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title>omegaUp &mdash; {$contestName}</title>
-<script type="text/javascript" src="/js/mathjax-config.js?ver=37494e"></script>
+<script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
 <script type="text/javascript" src="/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
 <link rel="stylesheet" href="/css/reset.css" />
 <link rel="stylesheet" href="/css/common.css" />
-<link rel="stylesheet" href="/ux/arena.css?t=2" />
+<link rel="stylesheet" href="{version_hash src="/ux/arena.css"}" />
 <link rel="stylesheet" href="/css/report.css" />
 </head>
 <body id="report">
