@@ -1,5 +1,5 @@
 {assign var="htmlTitle" value="{#enterContest#}"}
-{include file="head.tpl" jsfile="/js/contestintro.js?ver=9b4940"}
+{include file="head.tpl" jsfile={version_hash src="/js/contestintro.js"}}
 {include file="mainmenu.tpl"}
 {include file="status.tpl"}
 
@@ -69,6 +69,6 @@
 		</div>
 	</div><!-- panel-->
 </div>
-<hr>
+
 {include file='footer.tpl'}
 

@@ -6,6 +6,6 @@
 
 {include file='contest.new.form.tpl'}
 
-<script type="text/javascript" src="/js/contest.new.js?ver=b807cc"></script>
+<script type="text/javascript" src="{version_hash src="/js/contest.new.js"}"></script>
 
 {include file='footer.tpl'}

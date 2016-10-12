@@ -19,4 +19,4 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/admin.verifyuser.js?ver=7a4a71"></script>
+<script type="text/javascript" src="{version_hash src="/js/admin.verifyuser.js"}"></script>

@@ -160,4 +160,4 @@
 		</form>
 	</div>
 </div>
-<script type="text/javascript" src="/js/contest.new.form.js?ver=fc1b67"></script>
+<script type="text/javascript" src="{version_hash src="/js/contest.new.form.js"}"></script>
