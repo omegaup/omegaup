@@ -60,6 +60,9 @@
 	<link rel="stylesheet" type="text/css" href="/third_party/js/pagedown/demo/browser/demo.css" />
 {/if}
 		<script type="text/javascript" src="/js/head.sugar_locale.js?ver=0cb37f"></script>
+		{if isset($jsfile)}
+			<script type="text/javascript" src="{$jsfile}"></script>
+		{/if}
 	</head>
 	<body>
 

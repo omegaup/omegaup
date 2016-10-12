@@ -389,6 +389,7 @@ omegaup.T = {
 	rankViewFull: "Ver rank completo",
 	registerForContest: "Registrarse en el concurso",
 	registerForContestChallenges: "Reto",
+	registrationDenied: "Su solicitud de registro ha sido negada",
 	registrationPending: "Su solicitud de unirse al concurso esta siendo aprobada por el administrador del concurso.",
 	requestDate: "Fecha de solicitud",
 	resendInterviewEmail: "Reenviar correo",

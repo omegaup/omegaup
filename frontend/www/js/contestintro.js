@@ -99,14 +99,14 @@ $(document).ready(function() {
 			$('.contest #time-until-start').html(omegaup.UI.escape(contest.start_time));
 			$('.contest #start_time').text(contest.start_time.long());
 			$('.contest #finish_time').text(contest.finish_time.long());
-			if (contest.show_scoreboard_after == 1){
+			if (contest.show_scoreboard_after == 1) {
 				$(".contest #show_scoreboard_after").text(omegaup.T.contestNewFormScoreboardAtEnd);
-			}else{
+			} else {
 				$(".contest #show_scoreboard_after").hide();
 			}
-			if (contest.window_length != null ){
+			if (contest.window_length != null ) {
 				$('.contest #window_length_enabled').text(omegaup.T.contestNewFormDifferentStarts + ' ' + contest.window_length + ' minutes');
-			}else{
+			} else {
 				$('.contest #window_length_enabled').hide();
 			}
 			$('.contest #scoreboard').text(omegaup.T.contestNewFormScoreboardTimePercent + ' ' + contest.scoreboard + '%');
@@ -116,16 +116,16 @@ $(document).ready(function() {
 							constest_start: omegaup.T.contestNewFormByContests,
 							runtime: omegaup.T.contestNewFormByRuntime};
 			$('.contest #penalty_type').text(penalty_types[contest.penalty_type]);
-			if(contest.penalty != 0){
+			if (contest.penalty != 0) {
 				$('.contest #penalty').text(omegaup.T.contestNewFormPenaltyDesc + ' ' + contest.penalty + ' minutes');
-			}else{
+			} else {
 				$('.contest #penalty').hide();
 			}
 			feedback_types = {yes: omegaup.T.contestNewFormImmediateFeedbackDesc, no:'', partial: omegaup.T.contestNewFormImmediateFeedbackDesc + ' ' + omegaup.T.wordsPartial}
 			$('.contest #feedback').text(feedback_types[contest.feedback]);
-			if(contest.points_decay_factor != 0 ){
+			if (contest.points_decay_factor != 0 ) {
 				$('.contest #points_decay_factor').text(omegaup.T.contestNewFormPintDecrementFactor + contest.points_decay_factor);
-			}else{
+			} else {
 				$('.contest #points_decay_factor').hide();
 			}
 		}
