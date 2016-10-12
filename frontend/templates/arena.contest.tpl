@@ -2,7 +2,7 @@
 {include file='arena.runs.tpl'}
 
 {if $admin}
-			<script type="text/javascript" src="/js/omegaup/arena/admin_arena.js?ver=f4347c"></script>
+			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 			<audio id="notification_audio">
 				<source src="/media/notification.mp3" type="audio/mpeg" />
 			</audio>

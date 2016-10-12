@@ -14,6 +14,6 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/contest.stats.js?ver=18e75a"></script>
+<script type="text/javascript" src="{version_hash src="/js/contest.stats.js"}"></script>
 
 {include file='footer.tpl'}

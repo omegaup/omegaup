@@ -10,6 +10,15 @@ omegaup.UI = {
 		return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	},
 
+	formatString: function(template, values) {
+		for (var key in values) {
+			if (!values.hasOwnProperty(key)) continue;
+			template = template.replace(new RegExp('%\\(' + key + '\\)', 'g'),
+			                            values[key]);
+		}
+		return template;
+	},
+
 	displayStatus: function(message, type) {
 		if ($('#status .message').length == 0) {
 			console.error("Showing warning but there is no status div");

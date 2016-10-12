@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/js/omegaup/arena/contest_list.js?ver=950c55"></script>
+<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/contest_list.js"}"></script>
 <script type="text/html" id="contest-list">
 <div class="panel-heading">
     <h2 class="panel-title" data-bind="text: header"></h2>

@@ -1,7 +1,6 @@
-{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=2ea01a' bodyid='only-problem'}
-{include file='arena.runs.tpl'}
+{include file='arena.head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem'}
 			{if $problem_admin}
-			<script type="text/javascript" src="/js/omegaup/arena/admin_arena.js?ver=f4347c"></script>
+			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 			<ul class="tabs">
 				<li><a href="#problems" class="active">{#wordsProblem#}</a></li>
 				<li><a href="#runs">{#wordsRuns#}</a></li>

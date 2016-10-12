@@ -1,4 +1,4 @@
-<script src="/js/alias.generate.js?ver=ca96ff"></script>
+<script src="{version_hash src="/js/alias.generate.js"}"></script>
 
 <div class="panel panel-primary">
 	<div class="panel-body">

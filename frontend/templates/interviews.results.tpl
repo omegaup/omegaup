@@ -23,14 +23,14 @@
 {include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true}
 </div>
 
-<script type="text/javascript" src="/js/third_party/jquery.ba-hashchange.js?ver=8c26ca"></script>
-<script type="text/javascript" src="/js/third_party/knockout-4.3.0.js?ver=059d58"></script>
-<script type="text/javascript" src="/js/third_party/knockout-secure-binding.min.js?ver=81a2a3"></script>
+<script type="text/javascript" src="{version_hash src="/js/third_party/jquery.ba-hashchange.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/third_party/knockout-4.3.0.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/third_party/knockout-secure-binding.min.js"}"></script>
 
-<script type="text/javascript" src="/js/omegaup/arena/admin_arena.js?ver=f4347c"></script>
-<script type="text/javascript" src="/js/omegaup/arena/arena.js?ver=fd08ea"></script>
-<script type="text/javascript" src="/ux/admin.js?ver=c9161a"></script>
+<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/ux/admin.js"}"></script>
 
-<script type="text/javascript" src="/js/interviews.results.js?ver=758257"></script>
+<script type="text/javascript" src="{version_hash src="/js/interviews.results.js"}"></script>
 {include file='footer.tpl'}
 
