@@ -43,10 +43,10 @@
 {if $problemsetter}
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
 {/if}
-                    <runs-table id="user-runs"
-                                params="view: view,
-                                        options: { showSubmit: true, showDetails: true }">
-                    </runs-table>
+					<runs-table id="user-runs"
+								params="view: view,
+										options: { showSubmit: true, showDetails: true }">
+					</runs-table>
 					<table class="best-solvers">
 						<caption>{#wordsBestSolvers#}</caption>
 						<thead>
@@ -72,13 +72,13 @@
 			</div>
 			{if $problem_admin}
 			<div id="runs" class="tab">
-                <runs-table params="view: view,
-                                    options: {
-                                        showPager: true,
-                                        showUser: true,
-                                        showRejudge: true,
-                                        showDetails: true }">
-                </runs-table>
+				<runs-table params="view: view,
+									options: {
+										showPager: true,
+										showUser: true,
+										showRejudge: true,
+										showDetails: true }">
+				</runs-table>
 			</div>
 			<div id="clarifications" class="tab">
 				<table class="clarifications">

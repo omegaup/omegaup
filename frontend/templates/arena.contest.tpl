@@ -99,30 +99,30 @@
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
 {if $practice}
-                    <runs-table class="runs"
-                                params="view: view,
-                                        options: { showSubmit: true, showDetails: true}">
-                    </runs-table>
+					<runs-table class="runs"
+								params="view: view,
+										options: { showSubmit: true, showDetails: true}">
+					</runs-table>
 {else}
-                    <runs-table class="runs"
-                                params="view: view,
-                                        options: { showPoints: true,
-                                                   showSubmit: true,
-                                                   showDetails: true }">
-                    </runs-table>
+					<runs-table class="runs"
+								params="view: view,
+										options: { showPoints: true,
+												   showSubmit: true,
+												   showDetails: true }">
+					</runs-table>
 {/if}
 				</div>
 			</div>
 {if $admin}
 			<div id="runs" class="tab">
-                <runs-table params="view: view,
-                                    options: { showPager: true,
-                                               showPoints: true,
-                                               showUser: true,
-                                               showProblem: true,
-                                               showRejudge: true,
-                                               showDetails: true }">
-                </runs-table>
+				<runs-table params="view: view,
+									options: { showPager: true,
+											   showPoints: true,
+											   showUser: true,
+											   showProblem: true,
+											   showRejudge: true,
+											   showDetails: true }">
+				</runs-table>
 			</div>
 {/if}
 			<div id="ranking" class="tab">
