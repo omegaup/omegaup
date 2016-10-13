@@ -19,6 +19,8 @@ $(function() {
                     new Date(1000*course.assignments[i].finish_time));
             course.isAdmin = true; //course.is_admin;
             course.addAssignmentUrl = '/course/' + courseAlias + '/edit#add-assignment';
+			course.editUrl = '/course/' + courseAlias + '/edit';
+			course.addStudentsUrl = '/course/' + courseAlias + '/edit#add-students';
         }
         // Put assignment lists back in a separate field per type.
         for (var type in assignments) {

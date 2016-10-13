@@ -37,11 +37,23 @@
 <script type="text/html" id="course-info-template">
 <div id="intro-page" class="course">
 	<div class="panel">
-		<div class="page-header">
-			<a style="text-decoration:none"><h1 id="title" data-bind="text: name"></h1></a>
-			<p id="description" data-bind="text: description" class='container'></p>
+		<div class="panel-header">
+			<div class="pull-right">
+				<a class="btn btn-primary" data-bind="attr: { href: editUrl }">{#wordsEditCourse#}</a>
+			</div>
+			<div class="">
+				<a style="text-decoration:none"><h1 id="title" data-bind="text: name"></h1></a>
+				<p id="description" data-bind="text: description" class='container'></p>
+			</div>
 		</div>
 		<div class="panel-body table-responsive">
+			<div>
+				<span>Students</span>
+				<div class="pull-right">
+					<a class="btn btn-primary" data-bind="attr: { href: scoreboardUrl }">{#wordsScoreboard#}</a>
+					<a class="btn btn-primary" data-bind="attr: { href: addStudentsUrl }">{#wordsAddStudent#}</a>
+				</div>
+			</div>
 			<div id="course-contents">
                 <span data-bind="template: { name: 'assignments-list',
                                              data: { header: '{#wordsHomework#}',

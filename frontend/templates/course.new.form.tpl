@@ -20,8 +20,8 @@
 
 					<div class="form-group col-md-6">
 						<label for="alias" >{#courseNewFormShortTitle_alias_#}</label>
+						<span data-toggle="tooltip" data-placement="top" title="{#courseNewFormShortTitle_alias_Desc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 						<input id='alias' name='alias' value='' type='text' class="form-control" {IF $IS_UPDATE eq 1} disabled="true" {/if} >
-						<p class="help-block">{#courseNewFormShortTitle_alias_Desc#}</p>
 					</div>
 				</div>
 
@@ -29,22 +29,23 @@
 					<div class="form-group col-md-6">
 						<div class="form-group col-md-6">
 							<label for="start_time">{#courseNewFormStartDate#}</label>
+							<span data-toggle="tooltip" data-placement="top" title="{#courseNewFormEndDateDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 							<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="finish_time">{#courseNewFormEndDate#}</label>
+							<span data-toggle="tooltip" data-placement="top" title="{#courseNewFormEndDateDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 							<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
 						</div>
-					<p class="help-block">{#courseNewFormEndDateDesc#}</p>
 					</div>
 					<div class="form-group col-md-6">
 						<label for="show_scoreboard">{#courseNewFormShowScoreboard#}</label>
+						<span data-toggle="tooltip" data-placement="top" title="{#courseNewFormShowScoreboardDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 						<div class="form-control container">
 							<label class="radio-inline"><input type="radio" id="show_scoreboard_2" name="show_scoreboard" value="1" checked=checked>{#wordsYes#}</label>
 							<label class="radio-inline"><input type="radio" id="show_scoreboard_1" name="show_scoreboard" value="0">{#wordsNo#}</label>
 						</div>
 					</div>
-					<p class="help-block">{#courseNewFormShowScoreboardDesc#}</p>
 				</div>
 
 				<div class="row">

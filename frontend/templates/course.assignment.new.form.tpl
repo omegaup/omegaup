@@ -20,38 +20,39 @@
 
 					<div class="form-group col-md-6">
 						<label for="alias">{#courseNewFormShortTitle_alias_#}</label>
+						<span data-toggle="tooltip" data-placement="top" title="{#courseAssignmentNewFormShortTitle_alias_Desc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 						<input id='alias' name='alias' value='' type='text' class="form-control" {IF $IS_ASSIGNMENT_UPDATE eq 1} disabled="true" {/if}>
-						<p class="help-block">{#courseAssignmentNewFormShortTitle_alias_Desc#}</p>
 					</div>
 				</div>
 
 				<div class="row">
-					<div class="form-group col-md-6">
-						<label for="start_time">{#courseNewFormStartDate#}</label>
-						<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
-						<p class="help-block">{#courseAssignmentNewFormStartDateDesc#}</p>
-					</div>
+					<div class="col-md-6">
+						<div class="form-group col-md-6">
+							<label for="start_time">{#courseNewFormStartDate#}</label>
+							<span data-toggle="tooltip" data-placement="top" title="{#courseAssignmentNewFormStartDateDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+							<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
+						</div>
 
-					<div class="form-group col-md-6">
-						<label for="finish_time">{#courseNewFormEndDate#}</label>
-						<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
-						<p class="help-block">{#courseAssignmentNewFormEndDateDesc#}</p>
+						<div class="form-group col-md-6">
+							<label for="finish_time">{#courseNewFormEndDate#}</label>
+							<span data-toggle="tooltip" data-placement="top" title="{#courseAssignmentNewFormEndDateDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+							<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
+						</div>
 					</div>
-				</div>
-
-				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="assignment_type">{#courseAssignmentNewFormType#}</label>
+						<span data-toggle="tooltip" data-placement="top" title="{#courseAssignmentNewFormTypeDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 						<select name='assignment_type' id='assignment_type' class="form-control">
 							<option value='homework'>{#wordsHomework#}</option>
 							<option value='test'>{#wordsTest#}</option>
 						</select>
-						<p class="help-block">{#courseAssignmentNewFormTypeDesc#}</p>
 					</div>
+				</div>
 
-					<div class="form-group col-md-6">
+				<div class="row">
+					<div class="form-group container">
 						<label for="description">{#courseNewFormDescription#}</label>
-						<textarea id='description' name='description' cols="30" rows="10" class="form-control"></textarea>
+						<textarea id='description' name='description' cols="30" rows="5" class="form-control"></textarea>
 					</div>
 				</div>
 

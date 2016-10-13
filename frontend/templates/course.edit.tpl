@@ -9,7 +9,7 @@
 		<h1><span>{#frontPageLoading#}</span> <small></small></h1>
 	</div>
 
-	<ul class="nav nav-tabs nav-justified" id="sections">
+	<ul class="nav nav-tabs" id="sections">
 		<li class="active"><a href="#edit" data-toggle="tab">{#courseEdit#}</a></li>
 		<li><a href="#add-assignment" data-toggle="tab">{#courseEditAddAssignment#}</a></li>
 		<li><a href="#add-problems" data-toggle="tab">{#courseEditAddProblems#}</a></li>
@@ -19,13 +19,14 @@
 		<div class="tab-pane active" id="edit">
 			{include file='course.new.form.tpl'}
 		</div>
-
 		<div class="tab-pane" id="add-assignment">
 			{include file='course.assignment.new.form.tpl'}
 		</div>
-
 		<div class="tab-pane" id="add-problems">
 			{include file='course.assignment.add.problems.form.tpl'}
+		</div>
+		<div class="tab-pane" id="add-students">
+			{include file='course.assignment.add.students.form.tpl'}
 		</div>
 	</div>
 </div>
