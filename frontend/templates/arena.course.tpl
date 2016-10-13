@@ -3,7 +3,7 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<script src="/js/course.js?ver=989549"></script>
+<script src="/js/course.js?ver=ecfc15"></script>
 <script type="text/javascript" src="/third_party/js/knockout-4.3.0.js?ver=059d58"></script>
 <script type="text/javascript" src="/third_party/js/knockout-secure-binding.min.js"></script>
 
