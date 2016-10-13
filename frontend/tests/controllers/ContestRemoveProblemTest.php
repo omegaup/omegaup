@@ -365,7 +365,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         RunsFactory::createRun($problemData, $contestData, $contestData['director']);
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
-         $userRoles = new UserRoles(array(
+        $userRoles = new UserRoles(array(
             'user_id' => $contestData['director']->user_id,
             'role_id' => ADMIN_ROLE,
             'contest_id' => 0,
