@@ -44,7 +44,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Removes a problem from a private contest.
+     * Removes a problem without runs from a private contest.
      * Should not fail and problem should have been removed.
      */
     public function testRemoveProblemFromPrivateContest() {
@@ -67,7 +67,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Removes a problem from a private contest.
+     * Removes an inexistent problem from a private contest.
      *
      * @expectedException InvalidParameterException
      */
@@ -96,6 +96,73 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $response = ContestController::apiRemoveProblem($r);
     }
 
+    /**
+     * Removes a problem from an inexistent contest.
+     *
+     * @expectedException InvalidParameterException
+     */
+    public function testRemoveProblemFromInvalidContest() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+        // Get a problems
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Create an empty request
+        $r = new Request();
+
+        // Log in as contest director
+        $login = OmegaupTestCase::login($contestData['director']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Build request
+        $r['contest_alias'] = 'this contest doesnt exists';
+        $r['problem_alias'] = $problemData['request']['alias'];
+
+        // Call API
+        $response = ContestController::apiRemoveProblem($r);
+    }
+
+    /**
+     * Removes a problem from contest while loged in with a user that
+     * is not a contest admin.
+     *
+     * @expectedException ForbiddenAccessException
+     */
+    public function testRemoveProblemPrivateContestNotBeingContestAdmin() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+
+        // Get a problems
+        $problemData = ProblemsFactory::createProblem();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Get a contestant
+        $contestant = UserFactory::createUser();
+
+        // Create an empty request
+        $r = new Request();
+
+        // Log in as contest director
+        $login = OmegaupTestCase::login($contestant);
+        $r['auth_token'] = $login->auth_token;
+
+        // Build request
+        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['problem_alias'] = $problemData['request']['alias'];
+
+        // Call API
+        $response = ContestController::apiRemoveProblem($r);
+    }
+
+    /**
+     * Converts a private contest into a public contest
+     */
     private function makeContestPublic($contestData) {
         // Prepare request
         $r = new Request();
@@ -170,7 +237,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Remove a single problem from a public contest.
+     * Removes a single problem from a public contest.
      *
      * @expectedException InvalidParameterException
      */
@@ -215,7 +282,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Removes a problem with runs from a private contest with a user that is sysadmin
+     * Removes a problem with runs from a private contest while loged in
+     * with a user that is sysadmin.
      *
      */
     public function testRemoveProblemWithRunsFromPrivateContestBeingSysAdmin() {
@@ -237,6 +305,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Add a run to the problem
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
+        // Add the sysadmin role to the contest director
         $userRoles = new UserRoles(array(
             'user_id' => $contestData['director']->user_id,
             'role_id' => ADMIN_ROLE,
@@ -246,11 +315,15 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
+
+        // Validate
+        $this->assertEquals('ok', $response['status']);
+        $this->assertProblemRemovedFromContest($problemData, $contestData);
     }
 
     /**
-     * Removes a problem with runs only from admins from a private contest with a user that is not sysadmin
-     *
+     * Removes a problem with runs only from admins from a private contest while loged in
+     * with a user that is sysadmin.
      */
     public function testRemoveProblemWithAdminRunsFromPrivateContestBeingSysAdmin() {
         // Get a contest
@@ -282,10 +355,15 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest($problemData, $contestData);
+
+        // Validate
+        $this->assertEquals('ok', $response['status']);
+        $this->assertProblemRemovedFromContest($problemData, $contestData);
     }
 
     /**
-     * Removes a problem with runs from a private contest with a user that is not sysadmin
+     * Removes a problem with runs from a private contest while loged in
+     * with a user that is not sysadmin.
      *
      * @expectedException ForbiddenAccessException
      */
@@ -313,7 +391,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Removes a problem with runs only from admins from a private contest with a user that is not sysadmin
+     * Removes a problem with runs only from admins from a private contest while loged in
+     * with a user that is not sysadmin.
      *
      * @expectedException ForbiddenAccessException
      */
@@ -342,8 +421,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Removes a problem with runs only from admins from a private contest with a user that is not sysadmin
-     *
+     * Removes a problem with runs only from admins from a private contest while loged in
+     * with a user that is not sysadmin.
      */
     public function testRemoveProblemWithMixedRunsFromPrivateContestBeingSysAdmin() {
         // Get a contest
