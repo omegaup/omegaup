@@ -104,7 +104,7 @@ $(document).ready(function() {
 			} else {
 				$(".contest #show_scoreboard_after").hide();
 			}
-			if (contest.window_length != null ) {
+			if (contest.window_length != null) {
 				$('.contest #window_length_enabled').text(omegaup.UI.formatString(omegaup.T.contestNewFormDifferentStarts, {window_length: contest.window_length}));
 			} else {
 				$('.contest #window_length_enabled').hide();
@@ -123,7 +123,7 @@ $(document).ready(function() {
 			}
 			feedback_types = {yes: omegaup.T.contestNewFormImmediateFeedbackDesc, no:'', partial: omegaup.T.contestNewFormImmediateFeedbackDesc + ' ' + omegaup.T.wordsPartial}
 			$('.contest #feedback').text(feedback_types[contest.feedback]);
-			if (contest.points_decay_factor != 0 ) {
+			if (contest.points_decay_factor != 0) {
 				$('.contest #points_decay_factor').text(omegaup.T.contestNewFormPintDecrementFactor + contest.points_decay_factor);
 			} else {
 				$('.contest #points_decay_factor').hide();
