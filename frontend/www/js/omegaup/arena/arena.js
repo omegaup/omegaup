@@ -808,7 +808,7 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
 			$('#problem .overall_wall_time_limit').html(problem.overall_wall_time_limit / 1000 + "s");
 			$('#problem .statement').html(problem.problem_statement);
 			if (!self.myRuns.attached) {
-				self.myRuns.attach($('#problem .runs'));
+				self.myRuns.attach($('#user-runs'));
 			}
 			var karel_langs = ['kp', 'kj'];
 			var language_array = problem.languages.split(',');
@@ -1237,7 +1237,7 @@ omegaup.arena.RunView.prototype.attach = function(elm) {
 		self.filter_problem('');
 	});
 
-	ko.applyBindings(self, elm[0]);
+	ko.applyBindings({view: self}, elm[0]);
 	self.attached = true;
 };
 
