@@ -106,7 +106,12 @@ def pseudoloc(s):
 	healthy = u'elsot'
 	yummy = u'31507'
 	table = dict([(ord(healthy[i]), yummy[i]) for i in xrange(len(healthy))] + [(ord(u'"'), u'')])
-	return u'"(%s)"' % s.translate(table)
+	tokens = re.split('(%\([a-zA-Z0-9_-]+\))', s)
+	for i in xrange(len(tokens)):
+	    if tokens[i].startswith('%(') and tokens[i].endswith(')'):
+		continue
+	    tokens[i] = tokens[i].translate(table)
+	return u'"(%s)"' % ''.join(tokens)
 
 for key, values in strings.iteritems():
 	if key == 'locale':
@@ -127,3 +132,5 @@ for lang in languages:
 		for key in sorted(strings.keys()):
 			lang_file.write('\t%s: %s,\n' % (key, strings[key][lang]))
 		lang_file.write('};\n')
+
+# vim: noexpandtab
