@@ -10,7 +10,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
     active: 'ALL',
     recommended: 'ALL',
     // TODO: Make this match uiParams.pageSize and do smaller requests.
-    pageSize: 1000,
+    page_size: 1000,
   }, apiParams);
   var actualUiParams = $.extend({
     header: omegaup.T.wordsContests,
