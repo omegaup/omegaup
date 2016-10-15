@@ -43,7 +43,7 @@
 			</div>
 {else}
 			<!------------------- Must login to do anything -------------------------->
-			<div class="panel'>
+			<div class="panel">
 				<p>{#mustLoginToJoinContest#}</p>
 				<a href='/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}' class='btn btn-primary'>{#loginHeader#}</a>
 			</div>

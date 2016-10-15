@@ -100,31 +100,55 @@ $(document).ready(function() {
 			$('.contest #start_time').text(contest.start_time.long());
 			$('.contest #finish_time').text(contest.finish_time.long());
 			if (contest.show_scoreboard_after == 1) {
-				$(".contest #show_scoreboard_after").text(omegaup.T.contestNewFormScoreboardAtEnd);
+				$(".contest #show_scoreboard_after").text(
+					omegaup.T.contestNewFormScoreboardAtEnd
+				);
 			} else {
 				$(".contest #show_scoreboard_after").hide();
 			}
 			if (contest.window_length != null) {
-				$('.contest #window_length_enabled').text(omegaup.UI.formatString(omegaup.T.contestNewFormDifferentStarts, {window_length: contest.window_length}));
+				$('.contest #window_length_enabled').text(omegaup.UI.formatString(
+					omegaup.T.contestNewFormDifferentStarts,
+					{window_length: contest.window_length}
+				));
 			} else {
 				$('.contest #window_length_enabled').hide();
 			}
-			$('.contest #scoreboard').text(omegaup.UI.formatString(omegaup.T.contestNewFormScoreboardTimePercent, {window_length: contest.scoreboard}));
-			$('.contest #submissions_gap').text(omegaup.UI.formatString(omegaup.T.contestNewFormSubmissionsSeparationDesc, {window_length: contest.submissions_gap / 60 }));
-			penalty_types = {none: omegaup.T.contestNewFormNoPenalty,
-							problem_open: omegaup.T.contestNewFormByProblem,
-							constest_start: omegaup.T.contestNewFormByContests,
-							runtime: omegaup.T.contestNewFormByRuntime};
-			$('.contest #penalty_type').text(penalty_types[contest.penalty_type]);
+			$('.contest #scoreboard').text(omegaup.UI.formatString(
+				omegaup.T.contestNewFormScoreboardTimePercent,
+				{window_length: contest.scoreboard}
+			));
+			$('.contest #submissions_gap').text(omegaup.UI.formatString(
+				omegaup.T.contestNewFormSubmissionsSeparationDesc,
+				{window_length: contest.submissions_gap / 60 }
+			));
+			var penaltyTypes = {
+				none: omegaup.T.contestNewFormNoPenalty,
+				problem_open: omegaup.T.contestNewFormByProblem,
+				constest_start: omegaup.T.contestNewFormByContests,
+				runtime: omegaup.T.contestNewFormByRuntime
+			};
+			$('.contest #penalty_type').text(penaltyTypes[contest.penalty_type]);
 			if (contest.penalty != 0) {
-				$('.contest #penalty').text(omegaup.UI.formatString(omegaup.T.contestNewFormPenaltyDesc, {window_length: contest.penalty}));
+				$('.contest #penalty').text(omegaup.UI.formatString(
+					omegaup.T.contestNewFormPenaltyDesc,
+					{window_length: contest.penalty}
+				));
 			} else {
 				$('.contest #penalty').hide();
 			}
-			feedback_types = {yes: omegaup.T.contestNewFormImmediateFeedbackDesc, no:'', partial: omegaup.T.contestNewFormImmediateFeedbackDesc + ' ' + omegaup.T.wordsPartial}
-			$('.contest #feedback').text(feedback_types[contest.feedback]);
+			var feedbackTypes = {
+				yes: omegaup.T.contestNewFormImmediateFeedbackDesc,
+				no:'',
+				partial: omegaup.T.contestNewFormImmediateFeedbackDesc
+					+ ' ' + omegaup.T.wordsPartial
+			};
+			$('.contest #feedback').text(feedbackTypes[contest.feedback]);
 			if (contest.points_decay_factor != 0) {
-				$('.contest #points_decay_factor').text(omegaup.T.contestNewFormPintDecrementFactor + contest.points_decay_factor);
+				$('.contest #points_decay_factor').text(
+					omegaup.T.contestNewFormPintDecrementFactor
+						+ contest.points_decay_factor
+				);
 			} else {
 				$('.contest #points_decay_factor').hide();
 			}
