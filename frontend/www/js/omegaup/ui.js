@@ -171,37 +171,7 @@ omegaup.UI = {
 
 	formatDate: function(date) {
 		return date.format("{MM}/{dd}/{yyyy}");
-	},
-
-    registerKnockoutComponents: function() {
-		ko.components.register('runs-table', {
-			template: { element: 'runs-table' },
-			viewModel: { createViewModel: function(params) {
-				var runView = params.view;
-				var defaultOptions = {
-					showContest: false,
-					showDetails: false,
-					showPoints: false,
-					showProblems: false,
-					showRejudge: false,
-					showSubmit: false,
-					showUser: false,
-				};
-				$.extend(runView, defaultOptions, params.options);
-
-				runView.numColumns = 7;
-				runView.numColumns += runView.showContest && 1;
-				runView.numColumns += runView.showDetails && 1;
-				// This really adds two columns but removes one.
-				runView.numColumns += runView.showPoints && 1;
-				runView.numColumns += runView.showProblems && 1;
-				runView.numColumns += runView.showRejudge && 1;
-				runView.numColumns += runView.showUser && 1;
-
-				return runView;
-			}},
-		});
-	},
+	}
 };
 
 $(document).ajaxError(function(e, xhr, settings, exception) {

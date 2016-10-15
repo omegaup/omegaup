@@ -1,5 +1,4 @@
 {include file='arena.head.tpl' jsfile=$jsfile inContest=!$practice}
-{include file='arena.runs.tpl'}
 
 {if $admin}
 			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
@@ -99,30 +98,15 @@
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
 {if $practice}
-					<runs-table class="runs"
-								params="view: view,
-										options: { showSubmit: true, showDetails: true}">
-					</runs-table>
+{include file='arena.runs.tpl' show_submit=true show_details=true}
 {else}
-					<runs-table class="runs"
-								params="view: view,
-										options: { showPoints: true,
-												   showSubmit: true,
-												   showDetails: true }">
-					</runs-table>
+{include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
 {/if}
 				</div>
 			</div>
 {if $admin}
 			<div id="runs" class="tab">
-				<runs-table params="view: view,
-									options: { showPager: true,
-											   showPoints: true,
-											   showUser: true,
-											   showProblem: true,
-											   showRejudge: true,
-											   showDetails: true }">
-				</runs-table>
+{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true}
 			</div>
 {/if}
 			<div id="ranking" class="tab">
