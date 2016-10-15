@@ -35,4 +35,4 @@
 		</tbody>
 	</table>
 </div>
-<script src="/js/contest.list.js?ver=416075" type="text/javascript"></script>
+<script src="{version_hash src="/js/contest.list.js"}" type="text/javascript"></script>
