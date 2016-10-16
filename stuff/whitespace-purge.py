@@ -22,11 +22,11 @@ VALIDATIONS = [
    re.compile(br'\n+\n(\s*})'), br'\n\1'),
 ]
 
-def run_validations(commit, files, validate_only):
-  '''Runs all validations against |files| in |commit|.
+def run_validations(commits, files, validate_only):
+  '''Runs all validations against |files| in |commits|.
 
   A validation consists of performing regex substitution against the contents
-  of each file in |files|, at the git commit |commit|.  Validation fails if the
+  of each file in |files|, at the git commit |commits|.  Validation fails if the
   resulting content is not identical to the original.  The contents of the
   files will be presented as a single string, allowing for multi-line matches.
   '''
@@ -34,7 +34,7 @@ def run_validations(commit, files, validate_only):
   validation_passed = True
   for filename in files:
     filename = str(filename, encoding='utf-8')
-    contents = git_tools.file_at_commit(commit, filename)
+    contents = git_tools.file_at_commit(commits, filename)
     violations = []
 
     # Run all validations sequentially, so all violations can be fixed

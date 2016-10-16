@@ -51,11 +51,14 @@ $(document)
         if (days > 0) {
           clock += days + ':';
         }
-        if (hours < 10) clock += '0';
+        if (hours < 10)
+          clock += '0';
         clock += hours + ':';
-        if (minutes < 10) clock += '0';
+        if (minutes < 10)
+          clock += '0';
         clock += minutes + ':';
-        if (seconds < 10) clock += '0';
+        if (seconds < 10)
+          clock += '0';
         clock += seconds;
 
         return clock;
@@ -75,11 +78,11 @@ $(document)
         var date = new Date().getTime();
         var clock = '';
 
-        if (date > contest.finish_time.getTime()) {  // Ended
+        if (date > contest.finish_time.getTime()) { // Ended
           $('#click_to_proceed').removeClass('hidden');
-        } else if (date > contest.start_time.getTime()) {  // Started
+        } else if (date > contest.start_time.getTime()) { // Started
           $('#click_to_proceed').removeClass('hidden');
-        } else {  // Not started
+        } else { // Not started
           $('#ready_to_start').removeClass('hidden');
           contestObject = contest;
           setInterval(showCountdown.bind(), 1000);
@@ -98,62 +101,62 @@ $(document)
           $('.contest #description')
               .html(omegaup.UI.escape(contest.description));
 
-			$('.contest #time-until-start').html(omegaup.UI.escape(contest.start_time));
-			$('.contest #start_time').text(contest.start_time.long());
-			$('.contest #finish_time').text(contest.finish_time.long());
-			if (contest.show_scoreboard_after == 1) {
-				$(".contest #show_scoreboard_after").text(
-					omegaup.T.contestNewFormScoreboardAtEnd
-				);
-			} else {
-				$(".contest #show_scoreboard_after").hide();
-			}
-			if (contest.window_length != null) {
-				$('.contest #window_length_enabled').text(omegaup.UI.formatString(
-					omegaup.T.contestNewFormDifferentStarts,
-					{window_length: contest.window_length}
-				));
-			} else {
-				$('.contest #window_length_enabled').hide();
-			}
-			$('.contest #scoreboard').text(omegaup.UI.formatString(
-				omegaup.T.contestNewFormScoreboardTimePercent,
-				{window_length: contest.scoreboard}
-			));
-			$('.contest #submissions_gap').text(omegaup.UI.formatString(
-				omegaup.T.contestNewFormSubmissionsSeparationDesc,
-				{window_length: contest.submissions_gap / 60 }
-			));
-			var penaltyTypes = {
-				none: omegaup.T.contestNewFormNoPenalty,
-				problem_open: omegaup.T.contestNewFormByProblem,
-				constest_start: omegaup.T.contestNewFormByContests,
-				runtime: omegaup.T.contestNewFormByRuntime
-			};
-			$('.contest #penalty_type').text(penaltyTypes[contest.penalty_type]);
-			if (contest.penalty != 0) {
-				$('.contest #penalty').text(omegaup.UI.formatString(
-					omegaup.T.contestNewFormPenaltyDesc,
-					{window_length: contest.penalty}
-				));
-			} else {
-				$('.contest #penalty').hide();
-			}
-			var feedbackTypes = {
-				yes: omegaup.T.contestNewFormImmediateFeedbackDesc,
-				no:'',
-				partial: omegaup.T.contestNewFormImmediatePartialFeedbackDesc
-			};
-			$('.contest #feedback').text(feedbackTypes[contest.feedback]);
-			if (contest.points_decay_factor != 0) {
-				$('.contest #points_decay_factor').text(omegaup.UI.formatString(
-					omegaup.T.contestNewFormDecrementFactor,
-					{window_length: contest.points_decay_factor}
-				));
-			} else {
-				$('.contest #points_decay_factor').hide();
-			}
-		}
+          $('.contest #time-until-start')
+              .html(omegaup.UI.escape(contest.start_time));
+          $('.contest #start_time').text(contest.start_time.long());
+          $('.contest #finish_time').text(contest.finish_time.long());
+          if (contest.show_scoreboard_after == 1) {
+            $('.contest #show_scoreboard_after')
+                .text(omegaup.T.contestNewFormScoreboardAtEnd);
+          } else {
+            $('.contest #show_scoreboard_after').hide();
+          }
+          if (contest.window_length != null) {
+            $('.contest #window_length_enabled')
+                .text(omegaup.UI.formatString(
+                    omegaup.T.contestNewFormDifferentStarts,
+                    {window_length: contest.window_length}));
+          } else {
+            $('.contest #window_length_enabled').hide();
+          }
+          $('.contest #scoreboard')
+              .text(omegaup.UI.formatString(
+                  omegaup.T.contestNewFormScoreboardTimePercent,
+                  {window_length: contest.scoreboard}));
+          $('.contest #submissions_gap')
+              .text(omegaup.UI.formatString(
+                  omegaup.T.contestNewFormSubmissionsSeparationDesc,
+                  {window_length: contest.submissions_gap / 60}));
+          var penaltyTypes = {
+            none: omegaup.T.contestNewFormNoPenalty,
+            problem_open: omegaup.T.contestNewFormByProblem,
+            constest_start: omegaup.T.contestNewFormByContests,
+            runtime: omegaup.T.contestNewFormByRuntime
+          };
+          $('.contest #penalty_type').text(penaltyTypes[contest.penalty_type]);
+          if (contest.penalty != 0) {
+            $('.contest #penalty')
+                .text(
+                    omegaup.UI.formatString(omegaup.T.contestNewFormPenaltyDesc,
+                                            {window_length: contest.penalty}));
+          } else {
+            $('.contest #penalty').hide();
+          }
+          var feedbackTypes = {
+            yes: omegaup.T.contestNewFormImmediateFeedbackDesc,
+            no: '',
+            partial: omegaup.T.contestNewFormImmediatePartialFeedbackDesc
+          };
+          $('.contest #feedback').text(feedbackTypes[contest.feedback]);
+          if (contest.points_decay_factor != 0) {
+            $('.contest #points_decay_factor')
+                .text(omegaup.UI.formatString(
+                    omegaup.T.contestNewFormDecrementFactor,
+                    {window_length: contest.points_decay_factor}));
+          } else {
+            $('.contest #points_decay_factor').hide();
+          }
+        }
 
         // Feel free to re-write this if you have the time.
         if (contest.contestant_must_register) {
