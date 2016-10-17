@@ -848,7 +848,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = array (
-                'UNAMFC16' => 35
+                'UNAMFC16' => 65
             );
         } elseif ($r['contest_type'] == 'OVI') {
             if ($r['current_user']->username != 'covi.academico'

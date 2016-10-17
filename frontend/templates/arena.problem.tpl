@@ -1,5 +1,4 @@
 {include file='arena.head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem'}
-{include file='arena.runs.tpl'}
 			{if $problem_admin}
 			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 			<ul class="tabs">
@@ -43,10 +42,7 @@
 {if $problemsetter}
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
 {/if}
-					<runs-table id="user-runs"
-								params="view: view,
-										options: { showSubmit: true, showDetails: true }">
-					</runs-table>
+{include file='arena.runs.tpl' show_submit=true show_details=true}
 					<table class="best-solvers">
 						<caption>{#wordsBestSolvers#}</caption>
 						<thead>
@@ -72,13 +68,7 @@
 			</div>
 			{if $problem_admin}
 			<div id="runs" class="tab">
-				<runs-table params="view: view,
-									options: {
-										showPager: true,
-										showUser: true,
-										showRejudge: true,
-										showDetails: true }">
-				</runs-table>
+{include file='arena.runs.tpl' show_pager=true show_user=true show_rejudge=true show_details=true}
 			</div>
 			<div id="clarifications" class="tab">
 				<table class="clarifications">
