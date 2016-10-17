@@ -24,7 +24,8 @@
                     .html(omegaup.UI.escape(problem.tags[j])));
           }
         }
-        if (problem.public != '1') $('.private', row).removeClass('hidden');
+        if (problem.public != '1')
+          $('.private', row).removeClass('hidden');
         $('.edit', row).attr('href', '/problem/' + problem.alias + '/edit/');
         $('.stats', row).attr('href', '/problem/' + problem.alias + '/stats/');
         $('#problem-list').append(row);

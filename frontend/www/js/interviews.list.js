@@ -13,7 +13,7 @@ $(document)
               }
             });
 
-        return false;  // Prevent page refresh on submit
+        return false; // Prevent page refresh on submit
       };
 
       $('form#new_interview_form').submit(formSubmit);

@@ -48,7 +48,8 @@ $(document)
                   contest.director + '</a>');
 
         arena.submissionGap = parseInt(contest.submission_gap);
-        if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
+        if (!(arena.submissionGap > 0))
+          arena.submissionGap = 0;
 
         arena.initClock(contest.start_time, contest.finish_time,
                         contest.submission_deadline);
@@ -202,14 +203,14 @@ $(document)
               return false;
             }
 
-            if (!code) return false;
+            if (!code)
+              return false;
 
-            submitRun(
-                (arena.options.isPractice || arena.options.isOnlyProblem) ?
-                    '' :
-                    arena.options.contestAlias,
-                arena.currentProblem.alias,
-                $('#submit select[name="language"]').val(), code);
+            submitRun((arena.options.isPractice || arena.options.isOnlyProblem) ?
+                          '' :
+                          arena.options.contestAlias,
+                      arena.currentProblem.alias,
+                      $('#submit select[name="language"]').val(), code);
 
             return false;
           });

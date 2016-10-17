@@ -14,11 +14,14 @@ omegaup.arena.FormatDelta = function(delta) {
   if (days > 0) {
     clock += days + ':';
   }
-  if (hours < 10) clock += '0';
+  if (hours < 10)
+    clock += '0';
   clock += hours + ':';
-  if (minutes < 10) clock += '0';
+  if (minutes < 10)
+    clock += '0';
   clock += minutes + ':';
-  if (seconds < 10) clock += '0';
+  if (seconds < 10)
+    clock += '0';
   clock += seconds;
 
   return clock;
@@ -137,7 +140,7 @@ omegaup.arena.Arena = function(options) {
   self.installLibinteractiveHooks();
 
   var options = {
-    attribute: 'data-bind'  // default "data-sbind"
+    attribute: 'data-bind' // default "data-sbind"
   };
   ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
 };
@@ -245,7 +248,7 @@ omegaup.arena.Arena.prototype.setupPolls = function() {
 
   if (!self.socket) {
     self.clarificationInterval = setInterval(function() {
-      self.clarificationsOffset = 0;  // Return pagination to start on refresh
+      self.clarificationsOffset = 0; // Return pagination to start on refresh
       omegaup.API.getClarifications(
           self.options.contestAlias, self.clarificationsOffset,
           self.clarificationsRowcount, self.clarificationsChange.bind(self));
@@ -267,7 +270,8 @@ omegaup.arena.Arena.prototype.initClock = function(start, finish, deadline) {
     $('#title .clock').html('&infin;');
     return;
   }
-  if (deadline) self.submissionDeadline = deadline;
+  if (deadline)
+    self.submissionDeadline = deadline;
   if (!self.clockInterval) {
     self.updateClock();
     self.clockInterval = setInterval(self.updateClock.bind(self), 1000);
@@ -334,7 +338,8 @@ omegaup.arena.Arena.prototype.updateClock = function() {
 
 omegaup.arena.Arena.prototype.updateRunFallback = function(guid) {
   var self = this;
-  if (self.socket != null) return;
+  if (self.socket != null)
+    return;
   setTimeout(function() {
     omegaup.API.runStatus(guid, self.updateRun.bind(self));
   }, 5000);
@@ -345,7 +350,8 @@ omegaup.arena.Arena.prototype.updateRun = function(run) {
 
   self.trackRun(run);
 
-  if (self.socket != null) return;
+  if (self.socket != null)
+    return;
 
   if (run.status == 'ready') {
     if (!self.options.isPractice && !self.options.isOnlyProblem &&
@@ -413,7 +419,8 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
     // Update problem scores.
     var totalRuns = 0;
     for (var alias in order) {
-      if (!order.hasOwnProperty(alias)) continue;
+      if (!order.hasOwnProperty(alias))
+        continue;
       var problem = rank.problems[order[alias]];
       totalRuns += problem.runs;
 
@@ -528,8 +535,10 @@ omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
       dataInSeries[curr.name] = [[this.startTime.getTime(), 0]];
       usernames[curr.name] = curr.username;
     }
-    dataInSeries[curr.name].push(
-        [this.startTime.getTime() + curr.delta * 60 * 1000, curr.total.points]);
+    dataInSeries[curr.name].push([
+      this.startTime.getTime() + curr.delta * 60 * 1000,
+      curr.total.points
+    ]);
 
     // check if to add to navigator
     if (curr.total.points > navigatorData[navigatorData.length - 1][1]) {
@@ -566,7 +575,8 @@ omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
 };
 
 omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
-  if (series.length == 0) return;
+  if (series.length == 0)
+    return;
 
   Highcharts.setOptions({colors: omegaup.arena.ScoreboardColors});
 
@@ -586,7 +596,8 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
       max: (function(problems) {
         var total = 0;
         for (var prob in problems) {
-          if (!problems.hasOwnProperty(prob)) continue;
+          if (!problems.hasOwnProperty(prob))
+            continue;
           total += parseInt(problems[prob].points, 10);
         }
         return total;
@@ -622,7 +633,7 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
   for (var r = 0; r < rows.length; r++) {
     $('.legend', rows[r])
         .css({
-          'background-color': (r < omegaup.arena.ScoreboardColors.length) ?
+          'background-color' : (r < omegaup.arena.ScoreboardColors.length) ?
               omegaup.arena.ScoreboardColors[r] :
               'transparent'
         });
@@ -683,7 +694,8 @@ omegaup.arena.Arena.prototype.notify = function(title, message, element, id,
   self.currentNotifications[id] = gid;
 
   var audio = document.getElementById('notification_audio');
-  if (audio != null) audio.play();
+  if (audio != null)
+    audio.play();
 };
 
 omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
@@ -721,7 +733,8 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
 
   $('.contest', r).html(clarification.contest_alias);
   $('.problem', r).html(clarification.problem_alias);
-  if (self.contestAdmin) $('.author', r).html(clarification.author);
+  if (self.contestAdmin)
+    $('.author', r).html(clarification.author);
   $('.time', r)
       .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
                                   clarification.time.getTime()));
@@ -1027,7 +1040,8 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
             ny = (ny * 10) + parseInt(y[key][j++]);
           i--;
           j--;
-          if (nx != ny) return nx - ny;
+          if (nx != ny)
+            return nx - ny;
         } else if (x[key][i] < y[key][j]) {
           return -1;
         } else if (x[key][i] > y[key][j]) {
@@ -1416,13 +1430,14 @@ omegaup.arena.ObservableRun.prototype.$status_text = function() {
   var self = this;
 
   return self.status() == 'ready' ? omegaup.T['verdict' + self.verdict()] :
-                                    self.status();
+      self.status();
 };
 
 omegaup.arena.ObservableRun.prototype.$status_color = function() {
   var self = this;
 
-  if (self.status() != 'ready') return '';
+  if (self.status() != 'ready')
+    return '';
 
   if (self.verdict() == 'AC') {
     return '#CF6';

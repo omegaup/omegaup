@@ -108,7 +108,8 @@ omegaup.arena.ArenaAdmin.prototype.refreshClarifications = function() {
 omegaup.arena.ArenaAdmin.prototype.runsChanged = function(data) {
   var self = this;
 
-  if (data.status != 'ok') return;
+  if (data.status != 'ok')
+    return;
 
   for (var i = 0; i < data.runs.length; i++) {
     self.arena.trackRun(data.runs[i]);

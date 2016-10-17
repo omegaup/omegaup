@@ -53,32 +53,10 @@ def run_linter(commits, files, validate_only):
   return validation_passed
 
 def main():
-  parser = argparse.ArgumentParser(description='lints javascript')
-  subparsers = parser.add_subparsers(dest='tool')
+  args = git_tools.parse_arguments(tool_description='lints javascript')
 
-  validate_parser = subparsers.add_parser('validate',
-      help='Only validates, does not make changes')
-  validate_parser.add_argument('commits', metavar='commit', nargs='*',
-  validate_parser.add_argument('ignored', metavar='--', nargs='?')
-  validate_parser.add_argument('ignored', metavar='file', nargs='*',
-      help='If specified, only consider these files')
-      type=str, help='Only include files changed between commits')
-
-  fix_parser = subparsers.add_parser('fix',
-      help='Fixes all violations and leaves the results in the working tree.')
-  fix_parser.add_argument('commits', metavar='commit', nargs='*',
-      type=str, help='Only include files changed between commits')
-  fix_parser.add_argument('ignored', metavar='--', nargs='?')
-  fix_parser.add_argument('ignored', metavar='file', nargs='*',
-      help='If specified, only consider these files')
-
-  files = git_tools.get_explicit_file_list(sys.argv)
-  args = parser.parse_args()
-  if not git_tools.validate_args(args):
-    return 1
-
-  if files:
-    changed_files = files
+  if args.files:
+    changed_files = args.files
   else:
     changed_files = git_tools.changed_files(args.commits,
         whitelist=[br'^frontend/www/(js|ux)/.*\.js$'],
@@ -90,13 +68,9 @@ def main():
 
   if not run_linter(args.commits, changed_files, validate_only):
     if validate_only:
-      params = args.commits[::]
-      if files:
-        params.append('--')
-        params.extend(files)
       print('%sValidation errors.%s '
-            'Please run `%s fix %s` to fix them.' % (COLORS.FAIL,
-            COLORS.NORMAL, sys.argv[0], ' '.join(params))),
+            'Please run `%s` to fix them.' % (COLORS.FAIL,
+            COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),
             file=sys.stderr)
     else:
       print('Files written to working directory. '

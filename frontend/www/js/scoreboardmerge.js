@@ -34,13 +34,15 @@ $('document')
                ranking = scoreboard['ranking'];
                var showPenalty = false;
                for (var entry in ranking) {
-                 if (!ranking.hasOwnProperty(entry)) continue;
+                 if (!ranking.hasOwnProperty(entry))
+                   continue;
                  data = ranking[entry];
                  showPenalty |= !!data['total']['penalty'];
                }
 
                for (var entry in ranking) {
-                 if (!ranking.hasOwnProperty(entry)) continue;
+                 if (!ranking.hasOwnProperty(entry))
+                   continue;
                  data = ranking[entry];
                  place = parseInt(entry) + 1;
 

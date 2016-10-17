@@ -4,7 +4,9 @@
 Tools used to write git hooks.
 '''
 
+import argparse
 import os.path
+import pipes
 import re
 import subprocess
 import sys
@@ -88,7 +90,7 @@ def changed_files(commits, whitelist=(), blacklist=()):
     modified = set()
     for line in subprocess.check_output(['/usr/bin/git', 'diff-tree', '-r',
                                          '--diff-filter=d'] +
-                                         commits[0], cwd=root).splitlines():
+                                         commits, cwd=root).splitlines():
       m = GIT_DIFF_TREE_PATTERN.match(line)
       src, dest = m.groups()
       if dest:
@@ -108,5 +110,40 @@ def changed_files(commits, whitelist=(), blacklist=()):
     for r in blacklist)]
 
   return [str(filename, encoding='utf-8') for filename in result]
+
+def parse_arguments(tool_description=None):
+  parser = argparse.ArgumentParser(description=tool_description)
+  subparsers = parser.add_subparsers(dest='tool')
+
+  validate_parser = subparsers.add_parser('validate',
+      help='Only validates, does not make changes')
+  validate_parser.add_argument('commits', metavar='commit', nargs='*',
+      type=str, help='Only include files changed between commits')
+  validate_parser.add_argument('ignored', metavar='--', nargs='?')
+  validate_parser.add_argument('ignored', metavar='file', nargs='*',
+      help='If specified, only consider these files')
+
+  fix_parser = subparsers.add_parser('fix',
+      help='Fixes all violations and leaves the results in the working tree.')
+  fix_parser.add_argument('commits', metavar='commit', nargs='*',
+      type=str, help='Only include files changed between commits')
+  fix_parser.add_argument('ignored', metavar='--', nargs='?')
+  fix_parser.add_argument('ignored', metavar='file', nargs='*',
+      help='If specified, only consider these files')
+
+  files = get_explicit_file_list(sys.argv)
+  args = parser.parse_args()
+  if not validate_args(args):
+    sys.exit(1)
+  args.files = files
+  return args
+
+def get_fix_commandline(progname, args):
+  params = [progname, 'fix']
+  params.extend(args.commits)
+  if args.files:
+    params.append('--')
+    params.extend(args.files)
+  return ' '.join(pipes.quote(p) for p in params)
 
 # vim: expandtab shiftwidth=2 tabstop=2

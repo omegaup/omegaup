@@ -28,7 +28,7 @@ $(document)
                                    $('#login_form').submit();
                                  }
                                });
-        return false;  // Prevent form submission
+        return false; // Prevent form submission
       }
 
       $('#register-form').submit(registerAndLogin);
@@ -58,10 +58,10 @@ function signInCallback(authResult) {
 // https://developers.google.com/+/web/signin/server-side-flow
 function renderButton() {
   gapi.signin2.render('google-signin', {
-    'scope': 'email',
-    'width': 200,
-    'height': 50,
-    'longtitle': false,
-    'redirect_uri': 'postmessage',
+    'scope' : 'email',
+    'width' : 200,
+    'height' : 50,
+    'longtitle' : false,
+    'redirect_uri' : 'postmessage',
   });
 }

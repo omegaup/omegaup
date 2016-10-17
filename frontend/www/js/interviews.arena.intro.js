@@ -51,11 +51,14 @@ $(document)
         if (days > 0) {
           clock += days + ':';
         }
-        if (hours < 10) clock += '0';
+        if (hours < 10)
+          clock += '0';
         clock += hours + ':';
-        if (minutes < 10) clock += '0';
+        if (minutes < 10)
+          clock += '0';
         clock += minutes + ':';
-        if (seconds < 10) clock += '0';
+        if (seconds < 10)
+          clock += '0';
         clock += seconds;
 
         return clock;
@@ -75,11 +78,11 @@ $(document)
         var date = new Date().getTime();
         var clock = '';
 
-        if (date > contest.finish_time.getTime()) {  // Ended
+        if (date > contest.finish_time.getTime()) { // Ended
           $('#click_to_proceed').removeClass('hidden');
-        } else if (date > contest.start_time.getTime()) {  // Started
+        } else if (date > contest.start_time.getTime()) { // Started
           $('#click_to_proceed').removeClass('hidden');
-        } else {  // Not started
+        } else { // Not started
           $('#ready_to_start').removeClass('hidden');
           contestObject = contest;
           setInterval(showCountdown.bind(), 1000);
