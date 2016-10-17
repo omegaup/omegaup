@@ -111,7 +111,8 @@ class ContestsFactory {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['alias']
-            ));
+            )
+        );
 
         // Call API
         $response = ContestController::apiRemoveProblem($r);

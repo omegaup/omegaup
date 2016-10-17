@@ -19,8 +19,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
         // Get problem-contest and verify it does not exist
-        $contest_problems = ContestProblemsDAO::getByPK($contest->contest_id,
-            $problem->problem_id);
+        $contest_problems = ContestProblemsDAO::getByPK(
+            $contest->contest_id,
+            $problem->problem_id
+        );
 
         self::assertNull($contest_problems);
     }
@@ -36,8 +38,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $problem = ProblemsDAO::getByAlias($problemData['request']['alias']);
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
 
-        $contest_problems = ContestProblemsDAO::getByPK($contest->contest_id,
-            $problem->problem_id);
+        $contest_problems = ContestProblemsDAO::getByPK(
+            $contest->contest_id,
+            $problem->problem_id
+        );
 
         self::assertNotNull($contest_problems);
     }
@@ -51,8 +55,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -79,7 +85,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => 'this problem doesnt exists'
-            ));
+            )
+        );
 
         $response = ContestController::apiRemoveProblem($r);
     }
@@ -102,7 +109,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => 'this contest doesnt exists',
                 'problem_alias' => $problemData['request']['alias']
-            ));
+            )
+        );
 
         $response = ContestController::apiRemoveProblem($r);
     }
@@ -126,7 +134,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['alias']
-            ));
+            )
+        );
 
         $response = ContestController::apiRemoveProblem($r);
     }
@@ -137,12 +146,13 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     private function makeContestPublic($contestData) {
         $login = OmegaupTestCase::login($contestData['director']);
 
-         $r = new Request(
+        $r = new Request(
             array(
                 'auth_token' =>  $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'public' => 1 // Update public
-            ));
+            )
+        );
 
         // Call API
         $response = ContestController::apiUpdate($r);
@@ -163,8 +173,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         $this->makeContestPublic($contestData);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData1,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData1,
+            $contestData
+        );
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -188,8 +200,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         $this->makeContestPublic($contestData);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData2,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData2,
+            $contestData
+        );
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -210,8 +224,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         $this->makeContestPublic($contestData);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
     }
 
     /**
@@ -230,14 +246,18 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         $this->makeContestPublic($contestData);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData1,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData1,
+            $contestData
+        );
 
         // Validate
         $this->assertEquals('ok', $response['status']);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData2,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData2,
+            $contestData
+        );
     }
 
     /**
@@ -263,8 +283,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ));
         UserRolesDAO::save($userRoles);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -299,8 +321,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         RunsFactory::createRun($problemData, $contestData, $secondaryAdmin);
 
         // remove the problem from the contest
-        $response = ContestsFactory::removeProblemFromContest($problemData,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -323,8 +347,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
     }
 
     /**
@@ -345,8 +371,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             $contestData['director']);
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
     }
 
     /**
@@ -372,7 +400,9 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ));
         UserRolesDAO::save($userRoles);
 
-        $response = ContestsFactory::removeProblemFromContest($problemData,
-            $contestData);
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
     }
 }
