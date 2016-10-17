@@ -29,7 +29,7 @@ git:
   submodules: false
 
 before_install:
-  - pip install --user --root ~/.local https://github.com/google/closure-linter/zipball/master
+  - pip install --user https://github.com/google/closure-linter/zipball/master
   - git submodule update --init frontend/server/libs/third_party/smarty frontend/server/libs/third_party/phpmailer frontend/server/libs/third_party/log4php frontend/server/libs/third_party/adodb frontend/server/libs/third_party/facebook-php-sdk frontend/server/libs/third_party/google-api-php-client
 
 before_script:

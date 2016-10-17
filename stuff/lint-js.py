@@ -39,7 +39,7 @@ def run_linter(commits, files, validate_only):
           output = subprocess.check_output([
             GJSLINT_PATH, '--nojsdoc', '--quiet',
             f.name])
-        except subprocess.SubprocessError as e:
+        except subprocess.CalledProcessError as e:
           print('File %s%s%s:\n%s' % (COLORS.HEADER, filename, COLORS.NORMAL,
             str(b'\n'.join(e.output.split(b'\n')[1:]),
               encoding='utf-8')), file=sys.stderr)
