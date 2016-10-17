@@ -114,6 +114,7 @@ def changed_files(commits, whitelist=(), blacklist=()):
 def parse_arguments(tool_description=None):
   parser = argparse.ArgumentParser(description=tool_description)
   subparsers = parser.add_subparsers(dest='tool')
+  subparsers.required = True
 
   validate_parser = subparsers.add_parser('validate',
       help='Only validates, does not make changes')

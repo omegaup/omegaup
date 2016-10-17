@@ -21,6 +21,10 @@ def run_linter(commits, files, validate_only):
   '''
   root = git_tools.root_dir()
   validation_passed = True
+  clang_format_path = '/usr/bin/clang-format-3.7'
+  if not os.path.exists(clang_format_path):
+    clang_format_path = os.path.join(os.environ['HOME'],
+        '.local/bin/clang-format-3.7')
   for filename in files:
     contents = git_tools.file_at_commit(commits, filename)
 
@@ -39,17 +43,19 @@ def run_linter(commits, files, validate_only):
               encoding='utf-8')), file=sys.stderr)
           validation_passed = False
       else:
-        subprocess.check_call(['/usr/bin/clang-format-3.7', '-i', f.name])
-        subprocess.check_call([
+        subprocess.check_call([clang_format_path, '-i', f.name])
+        subprocess.check_output([
           os.path.join(os.environ['HOME'],
             '.local/bin/fixjsstyle'), '--strict',
           f.name])
         with open(f.name, 'rb') as f2:
           new_contents = f2.read()
         if contents != new_contents:
-          validation_passed = False
+          print('Fixing %s%s%s%s' % (COLORS.HEADER, filename,
+            COLORS.NORMAL), file=sys.stderr)
           with open(os.path.join(root, filename), 'wb') as o:
             o.write(new_contents)
+          validation_passed = False
   return validation_passed
 
 def main():
