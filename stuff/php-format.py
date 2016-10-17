@@ -22,28 +22,16 @@ def which(program):
   raise Exception('`%s` not found' % program)
 
 def main():
-  parser = argparse.ArgumentParser(description='PHP linter')
-  subparsers = parser.add_subparsers(dest='tool')
+  args = git_tools.parse_arguments(tool_description='PHP linter')
 
-  validate_parser = subparsers.add_parser('validate',
-      help='Only validates, does not make changes')
-  validate_parser.add_argument('commits', metavar='commit', nargs='*',
-      type=str, help='Only include files changed between commits')
-
-  fix_parser = subparsers.add_parser('fix',
-      help='Fixes all violations and leaves the results in the working tree.')
-  fix_parser.add_argument('commits', metavar='commit', nargs='*',
-      type=str, help='Only include files changed between commits')
-
-  args = parser.parse_args()
-  if not git_tools.validate_args(args):
-    return 1
-
-  changed_files = git_tools.changed_files(args.commits,
-      whitelist=[br'^frontend.*\.php$'],
-      blacklist=[br'.*third_party.*', br'.*dao/base.*',
-                 br'frontend/server/libs/dao/Estructura.php',
-                 br'frontend/server/libs/dao/model.inc.php'])
+  if args.files:
+    changed_files = args.files
+  else:
+    changed_files = git_tools.changed_files(args.commits,
+        whitelist=[br'^frontend.*\.php$'],
+        blacklist=[br'.*third_party.*', br'.*dao/base.*',
+                   br'frontend/server/libs/dao/Estructura.php',
+                   br'frontend/server/libs/dao/model.inc.php'])
   if not changed_files:
     return 0
 
@@ -55,8 +43,7 @@ def main():
   validation_passed = True
 
   for filename in changed_files:
-    filename = str(filename, encoding='utf-8')
-    contents = git_tools.file_at_commit(args.commits[1], filename)
+    contents = git_tools.file_at_commit(args.commits, filename)
     cmd = phpcs_args + ['--stdin-path=%s' % filename]
     with subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         cwd=root) as p:
@@ -81,8 +68,8 @@ def main():
   if not validation_passed:
     if validate_only:
       print('%sPHP validation errors.%s '
-            'Please run `%s fix %s` to fix them.' % (git_tools.COLORS.FAIL,
-              git_tools.COLORS.NORMAL, sys.argv[0], ' '.join(args.commits)),
+            'Please run `%s` to fix them.' % (git_tools.COLORS.FAIL,
+              git_tools.COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args.commits)),
               file=sys.stderr)
     else:
       print('Files written to working directory. '
