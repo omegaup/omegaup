@@ -15,9 +15,13 @@ env:
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.7
     packages:
       - python3
       - python-pip
+      - clang-format-3.7
 
 # Disables default git submodules.
 # This is done to only download the modules required for testing.
@@ -27,9 +31,6 @@ git:
 before_install:
   - git submodule update --init frontend/server/libs/third_party/smarty frontend/server/libs/third_party/phpmailer frontend/server/libs/third_party/log4php frontend/server/libs/third_party/adodb frontend/server/libs/third_party/facebook-php-sdk frontend/server/libs/third_party/google-api-php-client
   - pip install https://github.com/google/closure-linter/zipball/master
-  - mkdir ~/.local/bin/
-  - wget https://omegaup.com/toolchain/clang-format-3.7 -o ~/bin/clang-format-3.7
-  - chmod +x ~/.local/bin/clang-format-3.7
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'

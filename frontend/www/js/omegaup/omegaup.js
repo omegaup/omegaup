@@ -14,7 +14,7 @@ omegaup.OmegaUp = {
   _deltaTime: undefined,
 
   _listeners: {
-    'ready' : [],
+    'ready': [],
   },
 
   _onDocumentReady: function() {
@@ -51,13 +51,11 @@ omegaup.OmegaUp = {
   },
 
   on: function(events, handler) {
-    if (omegaup.OmegaUp._initialized)
-      return;
+    if (omegaup.OmegaUp._initialized) return;
     omegaup.OmegaUp._initialize();
     var splitNames = events.split(' ');
     for (var i = 0; i < splitNames.length; i++) {
-      if (!omegaup.OmegaUp._listeners.hasOwnProperty(splitNames[i]))
-        continue;
+      if (!omegaup.OmegaUp._listeners.hasOwnProperty(splitNames[i])) continue;
 
       if (splitNames[i] == 'ready' && omegaup.OmegaUp.ready) {
         handler();
@@ -71,8 +69,7 @@ omegaup.OmegaUp = {
   syncTime: function() {
     var t0 = new Date().getTime();
     omegaup.API.time().then(function(data) {
-      if (data.status != 'ok')
-        return;
+      if (data.status != 'ok') return;
       omegaup.OmegaUp._deltaTime = data.time * 1000 - t0;
     });
   },

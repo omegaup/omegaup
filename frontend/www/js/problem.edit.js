@@ -79,7 +79,7 @@ $(document)
                   }
                 });
 
-            return false; // Prevent refresh
+            return false;  // Prevent refresh
           });
 
       $('#add-group-admin-form')
@@ -98,7 +98,7 @@ $(document)
                   }
                 });
 
-            return false; // Prevent refresh
+            return false;  // Prevent refresh
           });
 
       $('#download form')
@@ -138,28 +138,26 @@ $(document)
                             (admin.role != 'admin') ?
                                 $('<td></td>') :
                                 $('<td><button type="button" class="close">' +
-                                    '&times;</button></td>')
-                                      .click((function(username) {
-                                        return function(e) {
-                                          omegaup.API.removeAdminFromProblem(
-                                              problemAlias, username,
-                                              function(response) {
-                                                if (response.status == 'ok') {
-                                                  omegaup.UI.success(
-                                                      omegaup.T.adminAdded);
-                                                  $('div.post.footer').show();
-                                                  var tr =
-                                                      e.target.parentElement
-                                                          .parentElement;
-                                                  $(tr).remove();
-                                                } else {
-                                                  omegaup.UI.error(
-                                                      response.error ||
-                                                      'error');
-                                                }
-                                              });
-                                        };
-                                      })(admin.username))));
+                                  '&times;</button></td>')
+                                    .click((function(username) {
+                                      return function(e) {
+                                        omegaup.API.removeAdminFromProblem(
+                                            problemAlias, username,
+                                            function(response) {
+                                              if (response.status == 'ok') {
+                                                omegaup.UI.success(
+                                                    omegaup.T.adminAdded);
+                                                $('div.post.footer').show();
+                                                var tr = e.target.parentElement
+                                                             .parentElement;
+                                                $(tr).remove();
+                                              } else {
+                                                omegaup.UI.error(
+                                                    response.error || 'error');
+                                              }
+                                            });
+                                      };
+                                    })(admin.username))));
           }
           $('#problem-group-admins').empty();
           // Got the contests, lets populate the dropdown with them
@@ -180,31 +178,26 @@ $(document)
                             (group_admin.role != 'admin') ?
                                 $('<td></td>') :
                                 $('<td><button type="button" class="close">' +
-                                    '&times;</button></td>')
-                                      .click((function(alias) {
-                                        return function(e) {
-                                          omegaup.API
-                                              .removeGroupAdminFromProblem(
-                                                  problemAlias, alias,
-                                                  function(response) {
-                                                    if (response.status ==
-                                                        'ok') {
-                                                      omegaup.UI.success(
-                                                          omegaup.T.adminAdded);
-                                                      $('div.post.footer')
-                                                          .show();
-                                                      var tr =
-                                                          e.target.parentElement
-                                                              .parentElement;
-                                                      $(tr).remove();
-                                                    } else {
-                                                      omegaup.UI.error(
-                                                          response.error ||
-                                                          'error');
-                                                    }
-                                                  });
-                                        };
-                                      })(group_admin.alias))));
+                                  '&times;</button></td>')
+                                    .click((function(alias) {
+                                      return function(e) {
+                                        omegaup.API.removeGroupAdminFromProblem(
+                                            problemAlias, alias,
+                                            function(response) {
+                                              if (response.status == 'ok') {
+                                                omegaup.UI.success(
+                                                    omegaup.T.adminAdded);
+                                                $('div.post.footer').show();
+                                                var tr = e.target.parentElement
+                                                             .parentElement;
+                                                $(tr).remove();
+                                              } else {
+                                                omegaup.UI.error(
+                                                    response.error || 'error');
+                                              }
+                                            });
+                                      };
+                                    })(group_admin.alias))));
           }
         });
       }
@@ -226,7 +219,7 @@ $(document)
                   }
                 });
 
-            return false; // Prevent refresh
+            return false;  // Prevent refresh
           });
 
       function refreshProblemTags() {
@@ -241,7 +234,7 @@ $(document)
                         .append($('<td></td>')
                                     .append($('<a></a>')
                                                 .attr('href', '/problem/?tag=' +
-                tag.name)
+                                                                  tag.name)
                                                 .text(tag.name)))
                         .append($('<td></td>').text(tag.public))
                         .append(
@@ -271,7 +264,7 @@ $(document)
       }
 
       var md_converter = Markdown.getSanitizingConverter();
-      md_editor = new Markdown.Editor(md_converter, '-statement'); // Global.
+      md_editor = new Markdown.Editor(md_converter, '-statement');  // Global.
       md_editor.run();
 
       function refreshEditForm(problemAlias) {

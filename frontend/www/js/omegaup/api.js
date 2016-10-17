@@ -4,11 +4,11 @@ omegaup.API = {
   _wrapDeferred: function(jqXHR, transform) {
     var dfd = $.Deferred();
     jqXHR.done(function(data) {
-      if (transform) {
-        data = transform(data);
-      }
-      dfd.resolve(data);
-    })
+           if (transform) {
+             data = transform(data);
+           }
+           dfd.resolve(data);
+         })
         .fail(function(jqXHR) {
           var errorData;
           try {
@@ -32,7 +32,7 @@ omegaup.API = {
   },
 
   createUser: function(s_Email, s_Username, s_PlainPassword, s_ReCaptchaToken,
-                        callback) {
+                       callback) {
     $.post('/api/user/create/',
            {
              email: s_Email,
@@ -174,8 +174,7 @@ omegaup.API = {
   },
 
   login: function(username, password, callback) {
-    $.post('/api/user/login/',
-           {usernameOrEmail: username, password: password},
+    $.post('/api/user/login/', {usernameOrEmail: username, password: password},
            function(data) { callback(data); }, 'json')
         .fail(function(data) {
           if (callback !== undefined) {
@@ -211,7 +210,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -255,7 +254,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -281,7 +280,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -307,7 +306,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -333,7 +332,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -357,14 +356,14 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   getProfile: function(username, callback) {
     $.get(username == null ? '/api/user/profile/' :
-        '/api/user/profile/username/' +
+                             '/api/user/profile/username/' +
                                  encodeURIComponent(username) + '/',
           function(data) {
             if (data.status == 'ok') {
@@ -381,7 +380,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -403,13 +402,13 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   arbitrateContestUserRequest: function(contest_alias, username, resolution,
-                                         notes, callback) {
+                                        notes, callback) {
     $.post('/api/contest/arbitraterequest/',
            {
              contest_alias: contest_alias,
@@ -422,7 +421,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -437,7 +436,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -454,14 +453,14 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   updateProfile: function(name, birth_date, country_id, state_id,
-                           scholar_degree, graduation_date, school_id,
-                           school_name, locale, recruitment_optin, callback) {
+                          scholar_degree, graduation_date, school_id,
+                          school_name, locale, recruitment_optin, callback) {
     $.post('/api/user/update/',
            {
              name: name,
@@ -480,7 +479,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -493,7 +492,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -505,27 +504,24 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   addProblemToContest: function(contestAlias, order, problemAlias, points,
-                                 callback) {
-    $.post('/api/contest/addProblem/contest_alias/' +
-               encodeURIComponent(contestAlias) + '/problem_alias/' +
-               encodeURIComponent(problemAlias) + '/',
-           {
-             problem_alias: problemAlias,
-             points: points,
-             order_in_contest: order
-           },
-           function(data) { callback(data); }, 'json')
+                                callback) {
+    $.post(
+         '/api/contest/addProblem/contest_alias/' +
+             encodeURIComponent(contestAlias) + '/problem_alias/' +
+             encodeURIComponent(problemAlias) + '/',
+         {problem_alias: problemAlias, points: points, order_in_contest: order},
+         function(data) { callback(data); }, 'json')
         .fail(function(j, status, errorThrown) {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -539,7 +535,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -552,7 +548,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -566,7 +562,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -580,7 +576,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -594,7 +590,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -608,7 +604,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -621,7 +617,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -634,7 +630,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -647,7 +643,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -660,7 +656,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -668,13 +664,13 @@ omegaup.API = {
   addTagToProblem: function(problemAlias, tagname, public, callback) {
     $.post('/api/problem/addTag/problem_alias/' +
                encodeURIComponent(problemAlias) + '/',
-           {name: tagname, public: public},
-           function(data) { callback(data); }, 'json')
+           {name: tagname, public: public}, function(data) { callback(data); },
+           'json')
         .fail(function(j, status, errorThrown) {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -687,7 +683,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -701,7 +697,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -715,13 +711,13 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   addScoreboardToGroup: function(groupAlias, alias, name, description,
-                                  callback) {
+                                 callback) {
     $.post('/api/group/createScoreboard/group_alias/' +
                encodeURIComponent(groupAlias) + '/',
            {alias: alias, name: name, description: description},
@@ -730,13 +726,13 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   addContestToScoreboard: function(groupAlias, scoreboardAlias, contestAlias,
-                                    onlyAC, weight, callback) {
+                                   onlyAC, weight, callback) {
     $.post('/api/groupScoreboard/addContest/group_alias/' +
                encodeURIComponent(groupAlias) + '/',
            {
@@ -750,13 +746,13 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   removeContestFromScoreboard: function(groupAlias, scoreboardAlias,
-                                         contestAlias, callback) {
+                                        contestAlias, callback) {
     $.post('/api/groupScoreboard/removeContest/group_alias/' +
                encodeURIComponent(groupAlias) + '/',
            {scoreboard_alias: scoreboardAlias, contest_alias: contestAlias},
@@ -765,7 +761,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -779,7 +775,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -793,7 +789,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -804,7 +800,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -816,19 +812,19 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   searchTags: function(query, callback) {
-    $.post('/api/tag/list/', {query: query},
-           function(data) { callback(data); }, 'json')
+    $.post('/api/tag/list/', {query: query}, function(data) { callback(data); },
+           'json')
         .fail(function(j, status, errorThrown) {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -840,7 +836,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -852,7 +848,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -864,7 +860,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -875,7 +871,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -897,29 +893,26 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   getProblem: function(contestAlias, problemAlias, callback, statement_type,
-                        show_solvers, language) {
+                       show_solvers, language) {
     if (statement_type === undefined) {
       statement_type = 'html';
     }
-    var params = {
-      statement_type: statement_type,
-      show_solvers: !!show_solvers
-    };
+    var params = {statement_type: statement_type, show_solvers: !!show_solvers};
     if (language) {
       params.lang = language;
     }
     $.post(contestAlias === null ?
                '/api/problem/details/problem_alias/' +
-                     encodeURIComponent(problemAlias) + '/' :
+                   encodeURIComponent(problemAlias) + '/' :
                '/api/problem/details/contest_alias/' +
-                     encodeURIComponent(contestAlias) + '/problem_alias/' +
-                     encodeURIComponent(problemAlias) + '/',
+                   encodeURIComponent(contestAlias) + '/problem_alias/' +
+                   encodeURIComponent(problemAlias) + '/',
            params,
            function(problem) {
              if (problem.runs) {
@@ -935,7 +928,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -948,7 +941,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -961,7 +954,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -975,7 +968,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1006,7 +999,7 @@ omegaup.API = {
   },
 
   createProblem: function(contestAlias, problemAlias, callback) {
-    $.post('/api/problem/create/', {'author_username' : 0},
+    $.post('/api/problem/create/', {'author_username': 0},
            function(problem) {
              if (problem.runs) {
                for (var i = 0; i < problem.runs.length; i++) {
@@ -1059,7 +1052,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1072,7 +1065,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1085,7 +1078,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1098,7 +1091,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1111,7 +1104,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1124,7 +1117,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1137,13 +1130,12 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
-  getProblemClarifications: function(problemAlias, offset, rowcount,
-                                      callback) {
+  getProblemClarifications: function(problemAlias, offset, rowcount, callback) {
     $.get('/api/problem/clarifications/problem_alias/' +
               encodeURIComponent(problemAlias) + '/offset/' + offset +
               '/rowcount/' + rowcount + '/',
@@ -1160,7 +1152,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1173,35 +1165,35 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   getContestStatsForUser: function(username, callback) {
     $.get(username == null ? '/api/user/conteststats/' :
-        '/api/user/conteststats/username/' +
+                             '/api/user/conteststats/username/' +
                                  encodeURIComponent(username) + '/',
           function(data) { callback(data); }, 'json')
         .fail(function(j, status, errorThrown) {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   getProblemsSolved: function(username, callback) {
     $.get(username == null ? '/api/user/problemssolved/' :
-        '/api/user/problemssolved/username/' +
+                             '/api/user/problemssolved/username/' +
                                  encodeURIComponent(username) + '/',
           function(data) { callback(data); }, 'json')
         .fail(function(j, status, errorThrown) {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1220,7 +1212,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1238,7 +1230,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1436,7 +1428,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'ok', 'error' : undefined});
+            callback({status: 'ok', 'error': undefined});
           }
         });
   },
@@ -1478,7 +1470,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'ok', 'error' : undefined});
+            callback({status: 'ok', 'error': undefined});
           }
         });
   },
@@ -1494,29 +1486,22 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
   UserEdit: function(username, name, email, birthDate, school, password,
-                      oldPassword, callback) {
+                     oldPassword, callback) {
     var toSend = {};
 
-    if (username !== null)
-      toSend.username = username;
-    if (name !== null)
-      toSend.name = name;
-    if (email !== null)
-      toSend.email = email;
-    if (birthDate !== null)
-      toSend.birthDate = birthDate;
-    if (school !== null)
-      toSend.school = school;
-    if (password !== null)
-      toSend.password = password;
-    if (oldPassword !== null)
-      toSend.oldPassword = oldPassword;
+    if (username !== null) toSend.username = username;
+    if (name !== null) toSend.name = name;
+    if (email !== null) toSend.email = email;
+    if (birthDate !== null) toSend.birthDate = birthDate;
+    if (school !== null) toSend.school = school;
+    if (password !== null) toSend.password = password;
+    if (oldPassword !== null) toSend.oldPassword = oldPassword;
 
     $.post('/api/controllername/user/edit/', toSend,
            function(data) { callback(data); }, 'json')
@@ -1524,13 +1509,12 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
 
-  addUsersToInterview: function(interviewAlias, usernameOrEmailsCSV,
-                                 callback) {
+  addUsersToInterview: function(interviewAlias, usernameOrEmailsCSV, callback) {
     $.post('/api/interview/addUsers/interview_alias/' +
                encodeURIComponent(interviewAlias) + '/',
            {usernameOrEmailsCSV: usernameOrEmailsCSV},
@@ -1539,7 +1523,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1567,7 +1551,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1619,7 +1603,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1632,7 +1616,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1645,7 +1629,7 @@ omegaup.API = {
           try {
             callback(JSON.parse(j.responseText));
           } catch (err) {
-            callback({status: 'error', 'error' : undefined});
+            callback({status: 'error', 'error': undefined});
           }
         });
   },
@@ -1665,7 +1649,7 @@ omegaup.API = {
   },
 
   resetUpdate: function(email, resetToken, password, passwordConfirmation,
-                         callback) {
+                        callback) {
     omegaup.UI.dismissNotifications();
     $.post('/api/reset/update',
            {

@@ -92,7 +92,7 @@ $(function() {
             }
           });
 
-          return false; // Prevent refresh
+          return false;  // Prevent refresh
         });
 
     function refreshGroupMembers() {
@@ -154,7 +154,7 @@ $(function() {
                 }
               });
 
-          return false; // Prevent refresh
+          return false;  // Prevent refresh
         });
 
     function refreshGroupScoreboards() {

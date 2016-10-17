@@ -79,8 +79,7 @@
   }
 
   function createChart(series) {
-    if (series.total.length == 0)
-      return;
+    if (series.total.length == 0) return;
 
     var dataInSeries = [];
     var acInSeries = [];
@@ -98,12 +97,8 @@
 
     var minY = dataInSeries[0] - (dataInSeries[0] * 0.50);
     window.chart = new Highcharts.Chart({
-      chart: {
-        type: 'area',
-        renderTo: 'runs-chart',
-        height: 300,
-        spacingTop: 20
-      },
+      chart:
+          {type: 'area', renderTo: 'runs-chart', height: 300, spacingTop: 20},
       title: {text: 'Envíos totales'},
       xAxis: {type: 'datetime', title: {text: null}},
       yAxis: {title: {text: 'Envíos'}, min: minY},

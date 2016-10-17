@@ -4,15 +4,13 @@ omegaup.UI = {
   navigateTo: function(url) { window.location = url; },
 
   escape: function(s) {
-    if (typeof s !== 'string')
-      return '';
+    if (typeof s !== 'string') return '';
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   },
 
   formatString: function(template, values) {
     for (var key in values) {
-      if (!values.hasOwnProperty(key))
-        continue;
+      if (!values.hasOwnProperty(key)) continue;
       template =
           template.replace(new RegExp('%\\(' + key + '\\)', 'g'), values[key]);
     }
@@ -46,7 +44,7 @@ omegaup.UI = {
   },
 
   dismissNotifications: function() { $('#status')
-        .slideUp(); },
+                                         .slideUp(); },
 
   bulkOperation: function(operation, onOperationFinished) {
     var isStopExecuted = false;

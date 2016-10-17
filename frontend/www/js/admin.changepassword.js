@@ -28,6 +28,6 @@ $('document')
                     omegaup.UI.error(response.error || 'error');
                   }
                 });
-            return false; // Prevent refresh
+            return false;  // Prevent refresh
           });
     });

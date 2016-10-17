@@ -30,7 +30,7 @@ $(document)
             // Clear select
             $('#state_id option')
                 .each(function(index, option) { $(option)
-               .remove(); });
+                                                    .remove(); });
 
             if ($('#country_id').val() == 'MX') {
               // Enable
@@ -432,7 +432,7 @@ $(document)
               }
             });
 
-        return false; // Prevent page refresh on submit
+        return false;  // Prevent page refresh on submit
       };
 
       $('form#user_profile_form').submit(formSubmit);

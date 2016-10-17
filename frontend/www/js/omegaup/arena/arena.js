@@ -14,14 +14,11 @@ omegaup.arena.FormatDelta = function(delta) {
   if (days > 0) {
     clock += days + ':';
   }
-  if (hours < 10)
-    clock += '0';
+  if (hours < 10) clock += '0';
   clock += hours + ':';
-  if (minutes < 10)
-    clock += '0';
+  if (minutes < 10) clock += '0';
   clock += minutes + ':';
-  if (seconds < 10)
-    clock += '0';
+  if (seconds < 10) clock += '0';
   clock += seconds;
 
   return clock;
@@ -140,7 +137,7 @@ omegaup.arena.Arena = function(options) {
   self.installLibinteractiveHooks();
 
   var options = {
-    attribute: 'data-bind' // default "data-sbind"
+    attribute: 'data-bind'  // default "data-sbind"
   };
   ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
 };
@@ -213,9 +210,9 @@ omegaup.arena.Arena.prototype.connectSocket = function() {
       $('#title .socket-status').html('&bull;').css('color', '#080');
       self.socket_keepalive =
           setInterval((function(socket) {
-            return function() { socket.send('"ping"'); };
-          })(self.socket),
-          30000);
+                        return function() { socket.send('"ping"'); };
+                      })(self.socket),
+                      30000);
     };
     self.socket.onclose = function(e) {
       $('#title .socket-status').html('&cross;').css('color', '#800');
@@ -248,7 +245,7 @@ omegaup.arena.Arena.prototype.setupPolls = function() {
 
   if (!self.socket) {
     self.clarificationInterval = setInterval(function() {
-      self.clarificationsOffset = 0; // Return pagination to start on refresh
+      self.clarificationsOffset = 0;  // Return pagination to start on refresh
       omegaup.API.getClarifications(
           self.options.contestAlias, self.clarificationsOffset,
           self.clarificationsRowcount, self.clarificationsChange.bind(self));
@@ -270,8 +267,7 @@ omegaup.arena.Arena.prototype.initClock = function(start, finish, deadline) {
     $('#title .clock').html('&infin;');
     return;
   }
-  if (deadline)
-    self.submissionDeadline = deadline;
+  if (deadline) self.submissionDeadline = deadline;
   if (!self.clockInterval) {
     self.updateClock();
     self.clockInterval = setInterval(self.updateClock.bind(self), 1000);
@@ -338,8 +334,7 @@ omegaup.arena.Arena.prototype.updateClock = function() {
 
 omegaup.arena.Arena.prototype.updateRunFallback = function(guid) {
   var self = this;
-  if (self.socket != null)
-    return;
+  if (self.socket != null) return;
   setTimeout(function() {
     omegaup.API.runStatus(guid, self.updateRun.bind(self));
   }, 5000);
@@ -350,8 +345,7 @@ omegaup.arena.Arena.prototype.updateRun = function(run) {
 
   self.trackRun(run);
 
-  if (self.socket != null)
-    return;
+  if (self.socket != null) return;
 
   if (run.status == 'ready') {
     if (!self.options.isPractice && !self.options.isOnlyProblem &&
@@ -419,8 +413,7 @@ omegaup.arena.Arena.prototype.onRankingChanged = function(data) {
     // Update problem scores.
     var totalRuns = 0;
     for (var alias in order) {
-      if (!order.hasOwnProperty(alias))
-        continue;
+      if (!order.hasOwnProperty(alias)) continue;
       var problem = rank.problems[order[alias]];
       totalRuns += problem.runs;
 
@@ -535,10 +528,8 @@ omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
       dataInSeries[curr.name] = [[this.startTime.getTime(), 0]];
       usernames[curr.name] = curr.username;
     }
-    dataInSeries[curr.name].push([
-      this.startTime.getTime() + curr.delta * 60 * 1000,
-      curr.total.points
-    ]);
+    dataInSeries[curr.name].push(
+        [this.startTime.getTime() + curr.delta * 60 * 1000, curr.total.points]);
 
     // check if to add to navigator
     if (curr.total.points > navigatorData[navigatorData.length - 1][1]) {
@@ -575,8 +566,7 @@ omegaup.arena.Arena.prototype.onRankingEvents = function(data) {
 };
 
 omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
-  if (series.length == 0)
-    return;
+  if (series.length == 0) return;
 
   Highcharts.setOptions({colors: omegaup.arena.ScoreboardColors});
 
@@ -596,8 +586,7 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
       max: (function(problems) {
         var total = 0;
         for (var prob in problems) {
-          if (!problems.hasOwnProperty(prob))
-            continue;
+          if (!problems.hasOwnProperty(prob)) continue;
           total += parseInt(problems[prob].points, 10);
         }
         return total;
@@ -633,9 +622,9 @@ omegaup.arena.Arena.prototype.createChart = function(series, navigatorSeries) {
   for (var r = 0; r < rows.length; r++) {
     $('.legend', rows[r])
         .css({
-          'background-color' : (r < omegaup.arena.ScoreboardColors.length) ?
-              omegaup.arena.ScoreboardColors[r] :
-              'transparent'
+          'background-color': (r < omegaup.arena.ScoreboardColors.length) ?
+                                  omegaup.arena.ScoreboardColors[r] :
+                                  'transparent'
         });
   }
 };
@@ -694,8 +683,7 @@ omegaup.arena.Arena.prototype.notify = function(title, message, element, id,
   self.currentNotifications[id] = gid;
 
   var audio = document.getElementById('notification_audio');
-  if (audio != null)
-    audio.play();
+  if (audio != null) audio.play();
 };
 
 omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
@@ -733,8 +721,7 @@ omegaup.arena.Arena.prototype.updateClarification = function(clarification) {
 
   $('.contest', r).html(clarification.contest_alias);
   $('.problem', r).html(clarification.problem_alias);
-  if (self.contestAdmin)
-    $('.author', r).html(clarification.author);
+  if (self.contestAdmin) $('.author', r).html(clarification.author);
   $('.time', r)
       .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
                                   clarification.time.getTime()));
@@ -831,8 +818,8 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
       var karel_langs = ['kp', 'kj'];
       var language_array = problem.languages.split(',');
       if (karel_langs.every(function(x) {
-        return language_array.indexOf(x) != -1;
-      })) {
+            return language_array.indexOf(x) != -1;
+          })) {
         var original_href = $('#problem .karel-js-link a').attr('href');
         var hash_index = original_href.indexOf('#');
         if (hash_index != -1) {
@@ -841,7 +828,7 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
         if (problem.sample_input) {
           $('#problem .karel-js-link a')
               .attr('href', original_href + '#mundo:' +
-              encodeURIComponent(problem.sample_input));
+                                encodeURIComponent(problem.sample_input));
         } else {
           $('#problem .karel-js-link a').attr('href', original_href);
         }
@@ -1040,8 +1027,7 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
             ny = (ny * 10) + parseInt(y[key][j++]);
           i--;
           j--;
-          if (nx != ny)
-            return nx - ny;
+          if (nx != ny) return nx - ny;
         } else if (x[key][i] < y[key][j]) {
           return -1;
         } else if (x[key][i] > y[key][j]) {
@@ -1180,49 +1166,49 @@ omegaup.arena.RunView = function(arena) {
   self.runs = ko.observableArray().extend({deferred: true});
   self.filtered_runs =
       ko.pureComputed(function() {
-        var cached_verdict = self.filter_verdict();
-        var cached_status = self.filter_status();
-        var cached_language = self.filter_language();
-        var cached_problem = self.filter_problem();
-        var cached_username = self.filter_username();
-        if (!cached_verdict && !cached_status && !cached_language &&
-            !cached_problem && !cached_username) {
-          return self.runs();
-        }
-        return self.runs().filter(function(val) {
-          if (cached_verdict && cached_verdict != val.verdict()) {
-            return false;
+          var cached_verdict = self.filter_verdict();
+          var cached_status = self.filter_status();
+          var cached_language = self.filter_language();
+          var cached_problem = self.filter_problem();
+          var cached_username = self.filter_username();
+          if (!cached_verdict && !cached_status && !cached_language &&
+              !cached_problem && !cached_username) {
+            return self.runs();
           }
-          if (cached_status && cached_status != val.status()) {
-            return false;
-          }
-          if (cached_language && cached_language != val.language()) {
-            return false;
-          }
-          if (cached_problem && cached_problem != val.alias()) {
-            return false;
-          }
-          if (cached_username && cached_username != val.username()) {
-            return false;
-          }
-          return true;
-        });
-      }, self).extend({deferred: true});
+          return self.runs().filter(function(val) {
+            if (cached_verdict && cached_verdict != val.verdict()) {
+              return false;
+            }
+            if (cached_status && cached_status != val.status()) {
+              return false;
+            }
+            if (cached_language && cached_language != val.language()) {
+              return false;
+            }
+            if (cached_problem && cached_problem != val.alias()) {
+              return false;
+            }
+            if (cached_username && cached_username != val.username()) {
+              return false;
+            }
+            return true;
+          });
+        }, self).extend({deferred: true});
   self.sorted_runs =
       ko.pureComputed(function() {
-        return self.filtered_runs().sort(function(a, b) {
-          if (a.time().getTime() == b.time().getTime()) {
-            return a.guid() == b.guid() ? 0 : (a.guid() < b.guid() ? -1 : 1);
-          }
-          // Newest runs appear on top.
-          return b.time().getTime() - a.time().getTime();
-        });
-      }, self).extend({deferred: true});
+          return self.filtered_runs().sort(function(a, b) {
+            if (a.time().getTime() == b.time().getTime()) {
+              return a.guid() == b.guid() ? 0 : (a.guid() < b.guid() ? -1 : 1);
+            }
+            // Newest runs appear on top.
+            return b.time().getTime() - a.time().getTime();
+          });
+        }, self).extend({deferred: true});
   self.display_runs =
       ko.pureComputed(function() {
-        var offset = self.filter_offset();
-        return self.sorted_runs().slice(offset, offset + self.row_count);
-      }, self).extend({deferred: true});
+          var offset = self.filter_offset();
+          return self.sorted_runs().slice(offset, offset + self.row_count);
+        }, self).extend({deferred: true});
   self.observableRunsIndex = {};
   self.attached = false;
 };
@@ -1371,7 +1357,7 @@ omegaup.arena.ObservableRun.prototype.$problem_url = function() {
 omegaup.arena.ObservableRun.prototype.$contest_alias_url = function() {
   var self = this;
   return (self.contest_alias() === null) ? '' : '/arena/' +
-      self.contest_alias() + '/';
+                                                    self.contest_alias() + '/';
 };
 
 omegaup.arena.ObservableRun.prototype.$user_html = function() {
@@ -1430,14 +1416,13 @@ omegaup.arena.ObservableRun.prototype.$status_text = function() {
   var self = this;
 
   return self.status() == 'ready' ? omegaup.T['verdict' + self.verdict()] :
-      self.status();
+                                    self.status();
 };
 
 omegaup.arena.ObservableRun.prototype.$status_color = function() {
   var self = this;
 
-  if (self.status() != 'ready')
-    return '';
+  if (self.status() != 'ready') return '';
 
   if (self.verdict() == 'AC') {
     return '#CF6';

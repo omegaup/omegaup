@@ -1,5 +1,7 @@
 
-function OmegaupGraph() { var self = this; }
+function OmegaupGraph() {
+  var self = this;
+}
 
 OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
   return new Highcharts.Chart({
@@ -64,7 +66,7 @@ OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
   return new Highcharts.Chart({
     chart: {
       type: 'spline',
-      animation: Highcharts.svg, // don't animate in old IE
+      animation: Highcharts.svg,  // don't animate in old IE
       marginRight: 10,
       renderTo: 'pending-runs-chart',
       events: {
@@ -72,7 +74,7 @@ OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
           // set up the updating of the chart each second
           var series = this.series[0];
           setInterval(function() {
-            var x = (new Date()).getTime(), // current time
+            var x = (new Date()).getTime(),  // current time
                 y = updateStatsFn();
             series.addPoint([x, y], true, true);
           }, refreshRate);
@@ -148,9 +150,8 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
     yAxis: {min: 0, title: {text: '# Concursantes'}},
     tooltip: {},
     plotOptions: {column: {pointPadding: 0.2, borderWidth: 0}},
-    series: [
-      {name: 'Número de concursantes', data: this.getDistribution(stats)}
-    ]
+    series:
+        [{name: 'Número de concursantes', data: this.getDistribution(stats)}]
   });
 };
 

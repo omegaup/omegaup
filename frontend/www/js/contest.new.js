@@ -2,9 +2,10 @@ $('document')
     .ready(function() {
       $('.new_contest_form')
           .submit(function() {
-            var window_length_value = $('#window_length_enabled').is(':checked') ?
-                                          $('#window_length').val() :
-                                          'NULL';
+            var window_length_value =
+                $('#window_length_enabled').is(':checked') ?
+                    $('#window_length').val() :
+                    'NULL';
 
             omegaup.API.createContest(
                 $('.new_contest_form #title').val(),

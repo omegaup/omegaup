@@ -23,7 +23,7 @@ $('document')
                 omegaup.UI.error(response.error);
               }
             });
-        return false; // Prevent page refresh on submit
+        return false;  // Prevent page refresh on submit
       };
 
       $('form#user_profile_form').submit(formSubmit);

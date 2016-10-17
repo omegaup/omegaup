@@ -16,42 +16,48 @@ import tempfile
 
 from git_tools import COLORS
 
+CLANG_FORMAT_PATH = '/usr/bin/clang-format-3.7'
+FIXJSSTYLE_PATH = os.path.join(os.environ['HOME'],
+                               '.local/bin/fixjsstyle')
+GJSLINT_PATH = os.path.join(os.environ['HOME'], '.local/bin/gjslint')
+
 def run_linter(commits, files, validate_only):
   '''Runs the Google Closure Compiler linter against |files| in |commits|.
   '''
   root = git_tools.root_dir()
   validation_passed = True
-  clang_format_path = '/usr/bin/clang-format-3.7'
-  if not os.path.exists(clang_format_path):
-    clang_format_path = os.path.join(os.environ['HOME'],
-        '.local/bin/clang-format-3.7')
   for filename in files:
     contents = git_tools.file_at_commit(commits, filename)
 
     with tempfile.NamedTemporaryFile(suffix='.js') as f:
       f.write(contents)
       f.flush()
+      f.seek(0, 0)
 
       if validate_only:
         try:
           output = subprocess.check_output([
-            os.path.join(os.environ['HOME'], '.local/bin/gjslint'),
-            '--nojsdoc', '--strict', '--quiet', f.name])
+            GJSLINT_PATH, '--nojsdoc', '--quiet',
+            f.name])
         except subprocess.SubprocessError as e:
           print('File %s%s%s:\n%s' % (COLORS.HEADER, filename, COLORS.NORMAL,
             str(b'\n'.join(e.output.split(b'\n')[1:]),
               encoding='utf-8')), file=sys.stderr)
           validation_passed = False
       else:
-        subprocess.check_call([clang_format_path, '-i', f.name])
-        subprocess.check_output([
-          os.path.join(os.environ['HOME'],
-            '.local/bin/fixjsstyle'), '--strict',
-          f.name])
+        previous_outputs = set("")
+        while True:
+          output = subprocess.check_output([FIXJSSTYLE_PATH, '--strict', f.name])
+          if output in previous_outputs:
+            break
+          previous_outputs.add(output)
+        subprocess.check_call([CLANG_FORMAT_PATH, '-style=Google',
+                               '-assume-filename=%s' % filename,
+                               '-i', f.name])
         with open(f.name, 'rb') as f2:
           new_contents = f2.read()
         if contents != new_contents:
-          print('Fixing %s%s%s%s' % (COLORS.HEADER, filename,
+          print('Fixing %s%s%s' % (COLORS.HEADER, filename,
             COLORS.NORMAL), file=sys.stderr)
           with open(os.path.join(root, filename), 'wb') as o:
             o.write(new_contents)

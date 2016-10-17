@@ -45,10 +45,8 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
       ko.computed(function() { return self.pageNumber() < self.totalPages(); });
   self.pagerColumns = ko.computed(function() {
     var cols = 2;
-    if (self.showPractice)
-      cols += 1;
-    if (self.showTimes)
-      cols += 3;
+    if (self.showPractice) cols += 1;
+    if (self.showTimes) cols += 3;
     return cols;
   });
   // Click handlers.

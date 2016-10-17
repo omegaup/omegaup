@@ -11,7 +11,7 @@ omegaup.OmegaUp.on('ready', function() {
     $('#runs').show();
     admin.refreshRuns();
     setInterval(function() {
-      runsOffset = 0; // Return pagination to start on refresh
+      runsOffset = 0;  // Return pagination to start on refresh
       admin.refreshRuns();
     }, 5 * 60 * 1000);
 
@@ -51,8 +51,7 @@ omegaup.OmegaUp.on('ready', function() {
       $('#summary .window_length').html(contest.window_length);
 
       arena.submissionGap = parseInt(contest.submission_gap);
-      if (!(arena.submissionGap > 0))
-        arena.submissionGap = 0;
+      if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
 
       arena.initClock(contest.start_time, contest.finish_time);
       arena.initProblems(contest);
@@ -85,7 +84,7 @@ omegaup.OmegaUp.on('ready', function() {
       admin.refreshRuns();
       if (!arena.socket) {
         setInterval(function() {
-          runsOffset = 0; // Return pagination to start on refresh
+          runsOffset = 0;  // Return pagination to start on refresh
           admin.refreshRuns();
         }, 5 * 60 * 1000);
       }
@@ -123,8 +122,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#submit')
       .submit(function(e) {
-        if (!$('#submit textarea[name="code"]').val())
-          return false;
+        if (!$('#submit textarea[name="code"]').val()) return false;
 
         $('#submit input').attr('disabled', 'disabled');
         omegaup.API.submit(
