@@ -1136,7 +1136,7 @@ class ContestController extends Controller {
 
         // Only contest admin is allowed to remove problems in contest
         if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
-            throw new ForbiddenAccessException('cannotRemoveProb');
+            throw new ForbiddenAccessException('cannotRemoveProblem');
         }
 
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
@@ -1152,8 +1152,9 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        if (RunsDAO::CountTotalRunsOfProblem($problem->problem_id) > 0 && !Authorization::IsSystemAdmin($r['current_user_id'])) {
-            throw new ForbiddenAccessException('cannotRemoveProb');
+        if (RunsDAO::CountTotalRunsOfProblem($problem->problem_id) > 0 &&
+            !Authorization::IsSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException('cannotRemoveProblem');
         }
 
         if ($contest->public == 1) {
