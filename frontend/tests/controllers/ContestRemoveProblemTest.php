@@ -316,8 +316,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $response = ContestController::apiAddAdmin($r);
 
         // Add runs to the problem created by the contest admins
-        RunsFactory::createRun($problemData, $contestData,
-            $contestData['director']);
+        RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestData['director']
+        );
         RunsFactory::createRun($problemData, $contestData, $secondaryAdmin);
 
         // remove the problem from the contest
@@ -367,8 +370,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         ContestsFactory::addUser($contestData, $contestant);
 
-        RunsFactory::createRun($problemData, $contestData,
-            $contestData['director']);
+        RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestData['director']
+        );
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
         $response = ContestsFactory::removeProblemFromContest(
@@ -389,8 +395,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         ContestsFactory::addUser($contestData, $contestant);
 
-        RunsFactory::createRun($problemData, $contestData,
-            $contestData['director']);
+        RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestData['director']
+        );
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
         $userRoles = new UserRoles(array(
