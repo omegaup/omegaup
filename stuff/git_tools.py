@@ -147,4 +147,14 @@ def get_fix_commandline(progname, args):
     params.extend(args.files)
   return ' '.join(pipes.quote(p) for p in params)
 
+def verify_toolchain(binaries):
+  success = True
+  for path, install_cmd in binaries.items():
+    if not os.path.isfile(path):
+      print('%s%s not found.%s ' 'Please run `%s` to install.' %
+          (git_tools.COLORS.FAIL, path, git_tools.COLORS.NORMAL,
+           install_cmd), file=sys.stderr)
+      success = False
+  return success
+
 # vim: expandtab shiftwidth=2 tabstop=2

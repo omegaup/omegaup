@@ -16,6 +16,7 @@ import tempfile
 
 from git_tools import COLORS
 
+PIP_PATH = '/usr/bin/pip'
 CLANG_FORMAT_PATH = '/usr/bin/clang-format-3.7'
 FIXJSSTYLE_PATH = os.path.join(os.environ['HOME'],
                                '.local/bin/fixjsstyle')
@@ -65,6 +66,12 @@ def run_linter(commits, files, validate_only):
   return validation_passed
 
 def main():
+  if not git_tools.verify_toolchain({
+    PIP_PATH: 'sudo apt-get install python-pip',
+    CLANG_FORMAT_PATH: 'sudo apt-get install clang-format-3.7',
+    GJSLINT_PATH: 'pip install --user https://github.com/google/closure-linter/zipball/master'
+  }):
+    sys.exit(1)
   args = git_tools.parse_arguments(tool_description='lints javascript')
 
   if args.files:
