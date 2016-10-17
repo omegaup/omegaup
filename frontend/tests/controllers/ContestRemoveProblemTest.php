@@ -73,7 +73,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Log in as contest director
         $login = OmegaupTestCase::login($contestData['director']);
 
-        // Create an empty request
+        // Create a new request
         $r = new Request(
             array(
                 'auth_token' => $login->auth_token,
@@ -263,7 +263,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ));
         UserRolesDAO::save($userRoles);
 
-|       $response = ContestsFactory::removeProblemFromContest($problemData,
+        $response = ContestsFactory::removeProblemFromContest($problemData,
             $contestData);
 
         // Validate
