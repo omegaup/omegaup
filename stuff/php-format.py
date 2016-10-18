@@ -22,17 +22,12 @@ def which(program):
   raise Exception('`%s` not found' % program)
 
 def main():
-  args = git_tools.parse_arguments(tool_description='PHP linter')
-
-  if args.files:
-    changed_files = args.files
-  else:
-    changed_files = git_tools.changed_files(args.commits,
-        whitelist=[br'^frontend.*\.php$'],
-        blacklist=[br'.*third_party.*', br'.*dao/base.*',
-                   br'frontend/server/libs/dao/Estructura.php',
-                   br'frontend/server/libs/dao/model.inc.php'])
-  if not changed_files:
+  args = git_tools.parse_arguments(tool_description='PHP linter',
+        file_whitelist=[br'^frontend.*\.php$'],
+        file_blacklist=[br'.*third_party.*', br'.*dao/base.*',
+                        br'frontend/server/libs/dao/Estructura.php',
+                        br'frontend/server/libs/dao/model.inc.php'])
+  if not args.files:
     return 0
 
   root = git_tools.root_dir()
@@ -42,8 +37,9 @@ def main():
   validate_only = args.tool == 'validate'
   validation_passed = True
 
-  for filename in changed_files:
-    contents = git_tools.file_at_commit(args.commits, filename)
+  for filename in args.files:
+    contents = git_tools.file_at_commit(args.commits, root,
+        filename)
     cmd = phpcs_args + ['--stdin-path=%s' % filename]
     with subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         cwd=root) as p:

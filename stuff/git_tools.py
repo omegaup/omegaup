@@ -46,10 +46,10 @@ def validate_args(args):
     return False
   return True
 
-def file_at_commit(commits, filename):
+def file_at_commit(commits, root, filename):
   '''Returns the contents of |filename| at git commit |commit|.'''
   if len(commits) == 0:
-    with open(filename, 'rb') as f:
+    with open(os.path.join(root, filename), 'rb') as f:
       return f.read()
   else:
     return subprocess.check_output(['/usr/bin/git', 'show',
@@ -60,7 +60,7 @@ def root_dir():
   return subprocess.check_output(['/usr/bin/git', 'rev-parse',
     '--show-toplevel'], universal_newlines=True).strip()
 
-def changed_files(commits, whitelist=(), blacklist=()):
+def _changed_files(commits, whitelist=(), blacklist=()):
   '''Returns the list of changed files between commits.
 
   If the first commit is the null hash, all files present in the second commit
@@ -86,11 +86,15 @@ def changed_files(commits, whitelist=(), blacklist=()):
     result.add(m.groups()[0])
 
   # Only keep files that were modified in the specified range.
-  if len(commits) == 2:
+  if len(commits) != 1:
     modified = set()
-    for line in subprocess.check_output(['/usr/bin/git', 'diff-tree', '-r',
-                                         '--diff-filter=d'] +
-                                         commits, cwd=root).splitlines():
+    if len(commits) == 0:
+      cmd = ['/usr/bin/git', 'diff-index', '--diff-filter=d',
+             'HEAD']
+    else:
+      cmd = ['/usr/bin/git', 'diff-tree', '-r',
+             '--diff-filter=d'] + commits
+    for line in subprocess.check_output(cmd, cwd=root).splitlines():
       m = GIT_DIFF_TREE_PATTERN.match(line)
       src, dest = m.groups()
       if dest:
@@ -111,8 +115,11 @@ def changed_files(commits, whitelist=(), blacklist=()):
 
   return [str(filename, encoding='utf-8') for filename in result]
 
-def parse_arguments(tool_description=None):
+def parse_arguments(tool_description=None, file_whitelist=(),
+    file_blacklist=()):
   parser = argparse.ArgumentParser(description=tool_description)
+  parser.add_argument('--verbose', action='store_true',
+      help='Prints verbose information')
   subparsers = parser.add_subparsers(dest='tool')
   subparsers.required = True
 
@@ -136,7 +143,14 @@ def parse_arguments(tool_description=None):
   args = parser.parse_args()
   if not validate_args(args):
     sys.exit(1)
-  args.files = files
+  if files:
+    args.files = files
+  else:
+    args.files = _changed_files(args.commits,
+        whitelist=file_whitelist, blacklist=file_blacklist)
+  if args.verbose:
+    print('Files to consider: %s' % ' '.join(args.files),
+          file=sys.stderr)
   return args
 
 def get_fix_commandline(progname, args):

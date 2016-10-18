@@ -33,7 +33,7 @@ def run_validations(commits, files, validate_only):
   root = git_tools.root_dir()
   validation_passed = True
   for filename in files:
-    contents = git_tools.file_at_commit(commits, filename)
+    contents = git_tools.file_at_commit(commits, root, filename)
     violations = []
 
     # Run all validations sequentially, so all violations can be fixed
@@ -59,20 +59,15 @@ def run_validations(commits, files, validate_only):
   return validation_passed
 
 def main():
-  args = git_tools.parse_arguments(tool_description='purges whitespace')
-
-  if args.files:
-    changed_files = args.files
-  else:
-    changed_files = git_tools.changed_files(args.commits,
-        whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
-        blacklist=[br'.*third_party.*', br'.*dao/base.*'])
-  if not changed_files:
+  args = git_tools.parse_arguments(tool_description='purges whitespace',
+        file_whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
+        file_blacklist=[br'.*third_party.*', br'.*dao/base.*'])
+  if not args.files:
     return 0
 
   validate_only = args.tool == 'validate'
 
-  if not run_validations(args.commits, changed_files, validate_only):
+  if not run_validations(args.commits, args.files, validate_only):
     if validate_only:
       print('%sWhitespace validation errors.%s '
             'Please run `%s` to fix them.' % (COLORS.FAIL,
