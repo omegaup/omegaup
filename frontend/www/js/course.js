@@ -17,7 +17,7 @@ $(function() {
                     new Date(1000*course.assignments[i].start_time));
             course.assignments[i].finishTime = omegaup.UI.formatDateTime(
                     new Date(1000*course.assignments[i].finish_time));
-            course.isAdmin = true; //course.is_admin;
+            course.isAdmin = course.is_admin;
             course.addAssignmentUrl = '/course/' + courseAlias + '/edit#add-assignment';
 			course.editUrl = '/course/' + courseAlias + '/edit';
 			course.addStudentsUrl = '/course/' + courseAlias + '/edit#add-students';

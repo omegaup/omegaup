@@ -245,6 +245,7 @@ class CourseController extends Controller {
      *
      */
     public static function apiAdminDetails(Request $r) {
+        self::authenticateRequest($r);
         Validators::isStringNonEmpty($r['alias'], 'alias', true /*is_required*/);
 
         $result = array();
@@ -267,7 +268,19 @@ class CourseController extends Controller {
         return $result;
     }
 
+    /**
+     * An admin is either the group owner or a member of the admin group.
+     */
+    public static function isCourseAdmin($user_id, $course) {
+        if ($course->id_owner == $user_id) {
+            return true;
+        }
+        // TODO(pablo): Do group-based check once we're in the new ACL world.
+        return false;
+    }
+
     public static function apiDetails(Request $r) {
+        self::authenticateRequest($r);
         Validators::isStringNonEmpty($r['alias'], 'alias', true /*is_required*/);
 
         $result = array();
@@ -287,7 +300,18 @@ class CourseController extends Controller {
         $result['alias'] = $course->alias;
         $result['start_time'] = strtotime($course->start_time);
         $result['finish_time'] = strtotime($course->finish_time);
-
+        $result['is_admin'] = CourseController::isCourseAdmin(
+            $r['current_user_id'],
+            $course
+        );
+        if ($result['is_admin']) {
+            try {
+                $group = GroupsDAO::findByAlias($r['alias']);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+            $result['student_count'] = GroupsUsersDAO::GetMemberCountById($group->group_id);
+        }
         return $result;
     }
 

@@ -34,4 +34,17 @@ class GroupsUsersDAO extends GroupsUsersDAOBase
         $params = array($group->group_id);
         return $conn->GetAll($sql, $params);
     }
+
+    public static function GetMemberCountById($group_id) {
+        global  $conn;
+        $sql = '
+            SELECT
+                count(*) as count
+            FROM
+                Groups_Users gu
+            WHERE
+                gu.group_id = ?;';
+        $params = array($group_id);
+        return $conn->GetOne($sql, $params);
+    }
 }
