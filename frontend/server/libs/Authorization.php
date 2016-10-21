@@ -145,4 +145,15 @@ class Authorization {
 
         return Authorization::IsSystemAdmin($user_id);
     }
+
+    /**
+     * An admin is either the group owner or a member of the admin group.
+     */
+    public static function IsCourseAdmin($user_id, $course) {
+        if ($course->id_owner == $user_id) {
+            return true;
+        }
+        // TODO(pablo): Do group-based check once we're in the new ACL world.
+        return false;
+    }
 }
