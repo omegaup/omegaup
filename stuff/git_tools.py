@@ -4,9 +4,12 @@
 Tools used to write git hooks.
 '''
 
+import argparse
 import os.path
+import pipes
 import re
 import subprocess
+import sys
 
 GIT_DIFF_TREE_PATTERN = re.compile(
     br'^:\d+ \d+ [0-9a-f]+ [0-9a-f]+ [ACDMRTUX]\d*\t([^\t]+)(?:\t([^\t]+))?$')
@@ -19,25 +22,38 @@ class COLORS:
   FAIL = '\033[91m'
   NORMAL = '\033[0m'
 
-def validate_args(args):
-  '''Validates whether args.commits is valid.
+def get_explicit_file_list(args):
+  try:
+    idx = args.index('--')
+    files = args[idx+1:]
+    args[idx:] = []
+    return files
+  except:
+    return []
 
-  args.commits is valid if it has no commits (shorthand for diffing from the
-  creation of the repository until HEAD), or two commits.
+def validate_args(args):
+  '''Validates whether args is valid.
+
+  args.commits is valid if it has no commits (which operates
+  against the working tree), one commit (shorthand for diffing
+  from the creation of the repository until that commit), or two
+  commits.
   '''
-  if len(args.commits) not in (0, 2):
-    print('%sCan only specify zero or two commits.%s' %
+  if len(args.commits) not in (0, 1, 2):
+    print('%sCan only specify zero, one, or two commits.%s' %
           (COLORS.FAIL, COLORS.NORMAL),
           file=sys.stderr)
     return False
-  if not args.commits:
-    args.commits = [NULL_HASH, 'HEAD']
   return True
 
-def file_at_commit(commit, filename):
+def file_at_commit(commits, filename):
   '''Returns the contents of |filename| at git commit |commit|.'''
-  return subprocess.check_output(['/usr/bin/git', 'show',
-    '%s:%s' % (commit, filename)])
+  if len(commits) == 0:
+    with open(filename, 'rb') as f:
+      return f.read()
+  else:
+    return subprocess.check_output(['/usr/bin/git', 'show',
+      '%s:%s' % (commits[-1], filename)])
 
 def root_dir():
   '''Returns the top-level directory of the project.'''
@@ -58,15 +74,19 @@ def changed_files(commits, whitelist=(), blacklist=()):
 
   # Get all files in the latter commit.
   result = set()
+  if not commits:
+    final_commit = 'HEAD'
+  else:
+    final_commit = commits[-1]
   for line in subprocess.check_output(['/usr/bin/git', 'ls-tree', '-r',
-                                       commits[1]], cwd=root).splitlines():
+                                       final_commit], cwd=root).splitlines():
     m = GIT_LS_TREE_PATTERN.match(line)
     if not m:
       continue
     result.add(m.groups()[0])
 
   # Only keep files that were modified in the specified range.
-  if commits[0] != NULL_HASH:
+  if len(commits) == 2:
     modified = set()
     for line in subprocess.check_output(['/usr/bin/git', 'diff-tree', '-r',
                                          '--diff-filter=d'] +
@@ -89,6 +109,52 @@ def changed_files(commits, whitelist=(), blacklist=()):
   result = [filename for filename in result if all(not r.match(filename)
     for r in blacklist)]
 
-  return result
+  return [str(filename, encoding='utf-8') for filename in result]
+
+def parse_arguments(tool_description=None):
+  parser = argparse.ArgumentParser(description=tool_description)
+  subparsers = parser.add_subparsers(dest='tool')
+  subparsers.required = True
+
+  validate_parser = subparsers.add_parser('validate',
+      help='Only validates, does not make changes')
+  validate_parser.add_argument('commits', metavar='commit', nargs='*',
+      type=str, help='Only include files changed between commits')
+  validate_parser.add_argument('ignored', metavar='--', nargs='?')
+  validate_parser.add_argument('ignored', metavar='file', nargs='*',
+      help='If specified, only consider these files')
+
+  fix_parser = subparsers.add_parser('fix',
+      help='Fixes all violations and leaves the results in the working tree.')
+  fix_parser.add_argument('commits', metavar='commit', nargs='*',
+      type=str, help='Only include files changed between commits')
+  fix_parser.add_argument('ignored', metavar='--', nargs='?')
+  fix_parser.add_argument('ignored', metavar='file', nargs='*',
+      help='If specified, only consider these files')
+
+  files = get_explicit_file_list(sys.argv)
+  args = parser.parse_args()
+  if not validate_args(args):
+    sys.exit(1)
+  args.files = files
+  return args
+
+def get_fix_commandline(progname, args):
+  params = [progname, 'fix']
+  params.extend(args.commits)
+  if args.files:
+    params.append('--')
+    params.extend(args.files)
+  return ' '.join(pipes.quote(p) for p in params)
+
+def verify_toolchain(binaries):
+  success = True
+  for path, install_cmd in binaries.items():
+    if not os.path.isfile(path):
+      print('%s%s not found.%s ' 'Please run `%s` to install.' %
+          (git_tools.COLORS.FAIL, path, git_tools.COLORS.NORMAL,
+           install_cmd), file=sys.stderr)
+      success = False
+  return success
 
 # vim: expandtab shiftwidth=2 tabstop=2

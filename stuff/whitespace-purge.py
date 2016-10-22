@@ -22,19 +22,18 @@ VALIDATIONS = [
    re.compile(br'\n+\n(\s*})'), br'\n\1'),
 ]
 
-def run_validations(commit, files, validate_only):
-  '''Runs all validations against |files| in |commit|.
+def run_validations(commits, files, validate_only):
+  '''Runs all validations against |files| in |commits|.
 
   A validation consists of performing regex substitution against the contents
-  of each file in |files|, at the git commit |commit|.  Validation fails if the
+  of each file in |files|, at the git commit |commits|.  Validation fails if the
   resulting content is not identical to the original.  The contents of the
   files will be presented as a single string, allowing for multi-line matches.
   '''
   root = git_tools.root_dir()
   validation_passed = True
   for filename in files:
-    filename = str(filename, encoding='utf-8')
-    contents = git_tools.file_at_commit(commit, filename)
+    contents = git_tools.file_at_commit(commits, filename)
     violations = []
 
     # Run all validations sequentially, so all violations can be fixed
@@ -60,36 +59,24 @@ def run_validations(commit, files, validate_only):
   return validation_passed
 
 def main():
-  parser = argparse.ArgumentParser(description='purge whitespace')
-  subparsers = parser.add_subparsers(dest='tool')
+  args = git_tools.parse_arguments(tool_description='purges whitespace')
 
-  validate_parser = subparsers.add_parser('validate',
-      help='Only validates, does not make changes')
-  validate_parser.add_argument('commits', metavar='commit', nargs='*',
-      type=str, help='Only include files changed between commits')
-
-  fix_parser = subparsers.add_parser('fix',
-      help='Fixes all violations and leaves the results in the working tree.')
-  fix_parser.add_argument('commits', metavar='commit', nargs='*',
-      type=str, help='Only include files changed between commits')
-
-  args = parser.parse_args()
-  if not git_tools.validate_args(args):
-    return 1
-
-  changed_files = git_tools.changed_files(args.commits,
-      whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
-      blacklist=[br'.*third_party.*', br'.*dao/base.*'])
+  if args.files:
+    changed_files = args.files
+  else:
+    changed_files = git_tools.changed_files(args.commits,
+        whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
+        blacklist=[br'.*third_party.*', br'.*dao/base.*'])
   if not changed_files:
     return 0
 
   validate_only = args.tool == 'validate'
 
-  if not run_validations(args.commits[1], changed_files, validate_only):
+  if not run_validations(args.commits, changed_files, validate_only):
     if validate_only:
       print('%sWhitespace validation errors.%s '
-            'Please run `%s fix %s` to fix them.' % (COLORS.FAIL,
-            COLORS.NORMAL, sys.argv[0], ' '.join(args.commits)),
+            'Please run `%s` to fix them.' % (COLORS.FAIL,
+            COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),
             file=sys.stderr)
     else:
       print('Files written to working directory. '
