@@ -159,6 +159,7 @@ omegaup.T = {
 	courseEditAddProblems: "Adicionar problema",
 	courseEditAddStudents: "Adicionar alunos",
 	courseEditGoToCourse: "Ir para curso",
+	courseGroupNotFound: "Grupo do curso não encontrado",
 	courseNew: "Novo curso",
 	courseNewFormDescription: "Descrição",
 	courseNewFormEndDate: "Data de finalização",

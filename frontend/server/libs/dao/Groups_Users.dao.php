@@ -39,7 +39,7 @@ class GroupsUsersDAO extends GroupsUsersDAOBase
         global  $conn;
         $sql = '
             SELECT
-                count(*) as count
+                COUNT(*) AS count
             FROM
                 Groups_Users gu
             WHERE
