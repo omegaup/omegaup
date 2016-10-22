@@ -6,9 +6,7 @@
  */
 
 class CourseDetailsTest extends OmegaupTestCase {
-
-    public function testGetcourseDetailsValid() {
-
+    public function testGetCourseDetailsValid() {
         // Create 1 course with 1 assignment
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 
@@ -25,6 +23,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         // 1 assignment
         $this->assertEquals(1, count($response['assignments']));
+        $this->assertEquals(true, $response['is_admin']);
 
         foreach ($response['assignments'] as $assignment) {
             $this->assertNotNull($assignment['name']);
@@ -38,5 +37,14 @@ class CourseDetailsTest extends OmegaupTestCase {
             Validators::isNumber($assignment['finish_time'], 'finish_time', true);
         }
     }
-}
 
+    public function testGetCourseDetailsNormalUser() {
+        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $user = UserFactory::createUser();
+        $response = CourseController::apiDetails(new Request(array(
+            'auth_token' => self::login($user),
+            'alias' => $courseData['course_alias']
+        )));
+        $this->assertEquals(false, $response['is_admin']);
+    }
+}

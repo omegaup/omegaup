@@ -3,7 +3,7 @@
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
 
-<script src="/js/course.js?ver=ecfc15"></script>
+<script src="/js/course.js?ver=bc94e6"></script>
 <script type="text/javascript" src="/third_party/js/knockout-4.3.0.js?ver=059d58"></script>
 <script type="text/javascript" src="/third_party/js/knockout-secure-binding.min.js"></script>
 
@@ -48,7 +48,7 @@
 		</div>
 		<div class="panel-body table-responsive">
 			<div>
-				<span>Students</span>
+				<span>Students: <span data-bind="text: student_count"></span>
 				<div class="pull-right">
 					<a class="btn btn-primary" data-bind="attr: { href: scoreboardUrl }">{#wordsScoreboard#}</a>
 					<a class="btn btn-primary" data-bind="attr: { href: addStudentsUrl }">{#wordsAddStudent#}</a>
