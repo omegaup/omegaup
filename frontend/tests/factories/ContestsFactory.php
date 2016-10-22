@@ -102,6 +102,27 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
+    public static function removeProblemFromContest($problemData, $contestData) {
+        // Log in as contest director
+        $login = OmegaupTestCase::login($contestData['director']);
+
+        $r = new Request(
+            array(
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['alias']
+            )
+        );
+
+        // Call API
+        $response = ContestController::apiRemoveProblem($r);
+
+        // Clean up
+        unset($_REQUEST);
+
+        return $response;
+    }
+
     public static function openContest($contestData, $user) {
         // Create an empty request
         $r = new Request();
