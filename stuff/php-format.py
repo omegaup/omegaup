@@ -38,8 +38,7 @@ def main():
   validation_passed = True
 
   for filename in args.files:
-    contents = git_tools.file_at_commit(args.commits, root,
-        filename)
+    contents = git_tools.file_at_commit(args.commits, root, filename)
     cmd = phpcs_args + ['--stdin-path=%s' % filename]
     with subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         cwd=root) as p:
