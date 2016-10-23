@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
-OMEGAUP_ROOT=`/usr/bin/git rev-parse --show-toplevel`
-REF=`git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || true`
+OMEGAUP_ROOT=$(/usr/bin/git rev-parse --show-toplevel)
+REF=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || true)
 
 if [ "$REF" = "" ]; then
 	echo "This branch has no remote set, running against working directory." >&2

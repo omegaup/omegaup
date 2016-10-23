@@ -35,12 +35,12 @@ confirm () {
 	esac
 }
 
-OMEGAUP_ROOT=`/usr/bin/git rev-parse --show-toplevel`
+OMEGAUP_ROOT=$(/usr/bin/git rev-parse --show-toplevel)
 
 if [ $GIT_PUSH -eq 1 ]; then
-	if [ "`/usr/bin/git status --porcelain | grep '^ M' | wc -l`" != "0" ]; then
+	if [ "$(/usr/bin/git status --porcelain | grep '^ M' | wc -l)" != "0" ]; then
 		confirm $'\e[31mYou have unstaged files.\e[0m Do you still want to push? [y/N]'
-	elif [ "`/usr/bin/git status --porcelain | grep '^\?\?' | wc -l`" != "0" ]; then
+	elif [ "$(/usr/bin/git status --porcelain | grep '^\?\?' | wc -l)" != "0" ]; then
 		confirm $'\e[35mYou have untracked files.\e[0m Do you still want to push? [y/N]'
 	fi
 fi

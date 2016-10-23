@@ -49,7 +49,9 @@ def _validate_args(args, files):
             (COLORS.FAIL, COLORS.NORMAL),
             file=sys.stderr)
       return False
-  if len(args.commits) not in (0, 1, 2):
+  if len(args.commits) not in (1, 2):
+    # args.commits can never be empty since its default value is ['HEAD'], but
+    # the user can specify zero commits.
     print('%sCan only specify zero, one or two commits.%s' %
           (COLORS.FAIL, COLORS.NORMAL),
           file=sys.stderr)
@@ -107,6 +109,8 @@ def _files_to_consider(args, whitelist=(), blacklist=()):
 def file_contents(args, root, filename):
   '''Returns the contents of |filename| At the revision specified by |args|.'''
   if len(args.commits) == 1:
+    # Zero or one commits (where the former is a shorthand for 'HEAD') always
+    # diff against the current contents of the file in the filesystem.
     with open(os.path.join(root, filename), 'rb') as f:
       return f.read()
   else:
