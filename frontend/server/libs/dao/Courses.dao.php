@@ -29,7 +29,7 @@ class CoursesDAO extends CoursesDAOBase
     public static function findByAlias($alias) {
         global  $conn;
 
-        $sql = "select c.* from Courses c where c.alias  = ?";
+        $sql = 'select c.* from Courses c where c.alias  = ?';
 
         $rs = $conn->GetRow($sql, array($alias));
         if (count($rs) == 0) {
@@ -46,9 +46,9 @@ class CoursesDAO extends CoursesDAOBase
     public static function getAllAssignments($alias) {
         global  $conn;
 
-        $sql = "select a.* from Courses c, Assignments a "
-                . " where c.alias = ? and a.id_course = c.course_id"
-                . " order by start_time;";
+        $sql = 'select a.* from Courses c, Assignments a '
+                . ' where c.alias = ? and a.id_course = c.course_id'
+                . ' order by start_time;';
 
         $rs = $conn->Execute($sql, array($alias));
 
@@ -63,5 +63,25 @@ class CoursesDAO extends CoursesDAOBase
         }
 
         return $ar;
+    }
+
+    public static function getCoursesForStudent($user) {
+        global  $conn;
+        $sql = 'SELECT c.*
+                FROM Courses c
+                INNER JOIN (
+                    SELECT alias
+                    FROM Groups_Users gu
+                    INNER JOIN Groups g ON g.group_id = gu.group_id
+                    WHERE gu.user_id = ?
+                ) gg
+                ON c.alias = gg.alias;
+               ';
+        $rs = $conn->Execute($sql, $user);
+        $courses = array();
+        foreach ($rs as $row) {
+            array_push($courses, $row);
+        }
+        return $courses;
     }
 }

@@ -241,6 +241,64 @@ class CourseController extends Controller {
         return $response;
     }
 
+    public static function convertCourseToArray($course) {
+        $course->toUnixTime();
+        $relevant_columns = array('alias', 'name', 'finish_time');
+        $arr = $course->asFilteredArray($relevant_columns);
+
+        $counts = AssignmentsDAO::getAssignmentCountsForCourse($course->course_id);
+        foreach ($counts as $type => $count) {
+            $arr['num_'.$type] = $count;
+        }
+        return $arr;
+    }
+
+    /**
+     * Lists all the courses this user is associated with.
+     *
+     * Returns courses for which the current user is an admin and
+     * for in which the user is a student.
+     *
+     * @throws InvalidParameterException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiListCourses(Request $r) {
+        self::authenticateRequest($r);
+
+        // TODO(pablo): Cache
+        // Courses the user is an admin for.
+        $admin_courses = array();
+        try {
+            $admin_courses = CoursesDAO::search(new Courses(array(
+                'id_owner' => $r['current_user_id']
+            )));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        // Courses the user is a student in.
+        $student_courses = array();
+        try {
+            $student_courses = CoursesDAO::getCoursesForStudent($r['current_user_id']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $response = array(
+            'admin' => array(),
+            'student' => array(),
+            'status' => 'ok'
+        );
+        foreach ($admin_courses as $course) {
+            $response['admin'][] = CourseController::convertCourseToArray($course);
+        }
+        foreach ($student_courses as $course_array) {
+            $course = new Courses($course_array);
+            $response['student'][] = CourseController::convertCourseToArray($course);
+        }
+        return $response;
+    }
+
     /**
      *
      */
