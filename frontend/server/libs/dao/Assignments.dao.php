@@ -30,10 +30,10 @@ class AssignmentsDAO extends AssignmentsDAOBase
     public static function getAssignmentCountsForCourse($id_course) {
         global $conn;
 
-        $sql = 'SELECT assignment_type, COUNT(*) as count
-                FROM Assignments
-                WHERE id_course = ?
-                GROUP BY assignment_type;';
+        $sql = 'SELECT a.assignment_type, COUNT(*) AS count
+                FROM Assignments a
+                WHERE a.id_course = ?
+                GROUP BY a.assignment_type;';
         $rs = $conn->Execute($sql, $id_course);
         $counts = array();
         foreach ($rs as $row) {

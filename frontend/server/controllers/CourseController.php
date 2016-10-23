@@ -247,9 +247,7 @@ class CourseController extends Controller {
         $arr = $course->asFilteredArray($relevant_columns);
 
         $counts = AssignmentsDAO::getAssignmentCountsForCourse($course->course_id);
-        foreach ($counts as $type => $count) {
-            $arr['num_'.$type] = $count;
-        }
+        $arr['counts'] = $counts;
         return $arr;
     }
 
@@ -266,6 +264,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // TODO(pablo): Cache
+        // TODO(pablo): Proper ACLs
         // Courses the user is an admin for.
         $admin_courses = array();
         try {

@@ -29,7 +29,7 @@ class CoursesDAO extends CoursesDAOBase
     public static function findByAlias($alias) {
         global  $conn;
 
-        $sql = 'select c.* from Courses c where c.alias  = ?';
+        $sql = 'SELECT c.* FROM Courses c WHERE c.alias  = ?';
 
         $rs = $conn->GetRow($sql, array($alias));
         if (count($rs) == 0) {

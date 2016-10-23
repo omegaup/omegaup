@@ -6,8 +6,8 @@ $('document').ready(function() {
             var course = data[section][i];
             course.courseURL = '/course/' + course.alias;
             course.endDate = omegaup.UI.formatDate(course.finish_time);
-            course.numHomeworks = course.num_homework;
-            course.numTests = course.num_test;
+            course.numHomeworks = course.counts.homework;
+            course.numTests = course.counts.test;
             if (course.finish_time > Date.now()) {
                 current.push(course);
             } else {
