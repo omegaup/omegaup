@@ -1,10 +1,22 @@
 #!/bin/bash
 
-if [ $# = 1 ]; then
+GIT_PUSH=0
+
+if [ $# = 0 ]; then
+	ARGS="HEAD"
+elif [ $# = 1 ]; then
 	ARGS="$1"
 else
 	read LOCAL_REF LOCAL_HASH REMOTE_REF REMOTE_HASH
-	ARGS="$REMOTE_HASH" "$LOCAL_HASH"
+	ARGS="$REMOTE_HASH $LOCAL_HASH"
+	GIT_PUSH=1
+
+	# Fetch the remote in case we don't know the remote ref (e.g. when rebasing
+	# from the UI).
+	if ! git cat-file -e $REMOTE_HASH; then
+		echo "Unknown remote hash. Did you run \`git pull\`?" >&2
+		exit 1
+	fi
 fi
 
 set -e
@@ -25,10 +37,12 @@ confirm () {
 
 OMEGAUP_ROOT=`/usr/bin/git rev-parse --show-toplevel`
 
-if [ "`/usr/bin/git status --porcelain | grep '^ M' | wc -l`" != "0" ]; then
-	confirm $'\e[31mYou have unstaged files.\e[0m Do you still want to push? [y/N]'
-elif [ "`/usr/bin/git status --porcelain | grep '^\?\?' | wc -l`" != "0" ]; then
-	confirm $'\e[35mYou have untracked files.\e[0m Do you still want to push? [y/N]'
+if [ $GIT_PUSH -eq 1 ]; then
+	if [ "`/usr/bin/git status --porcelain | grep '^ M' | wc -l`" != "0" ]; then
+		confirm $'\e[31mYou have unstaged files.\e[0m Do you still want to push? [y/N]'
+	elif [ "`/usr/bin/git status --porcelain | grep '^\?\?' | wc -l`" != "0" ]; then
+		confirm $'\e[35mYou have untracked files.\e[0m Do you still want to push? [y/N]'
+	fi
 fi
 
 /usr/bin/python $OMEGAUP_ROOT/stuff/i18n.py --validate
