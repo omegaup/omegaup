@@ -38,7 +38,7 @@ def main():
   validation_passed = True
 
   for filename in args.files:
-    contents = git_tools.file_at_commit(args.commits, root, filename)
+    contents = git_tools.file_contents(args, root, filename)
     cmd = phpcs_args + ['--stdin-path=%s' % filename]
     with subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         cwd=root) as p:
@@ -64,7 +64,7 @@ def main():
     if validate_only:
       print('%sPHP validation errors.%s '
             'Please run `%s` to fix them.' % (git_tools.COLORS.FAIL,
-              git_tools.COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args.commits)),
+              git_tools.COLORS.NORMAL, git_tools.get_fix_commandline(sys.argv[0], args)),
               file=sys.stderr)
     else:
       print('Files written to working directory. '

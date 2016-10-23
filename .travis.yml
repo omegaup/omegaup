@@ -41,9 +41,9 @@ before_script:
 script:
   - phpunit --bootstrap frontend/tests/bootstrap.php --configuration frontend/tests/phpunit.xml frontend/tests/controllers
   - python stuff/i18n.py --validate
-  - python3 stuff/whitespace-purge.py validate HEAD
-  - python3 stuff/js-lint.py validate HEAD
-  - if [ $TRAVIS_PHP_VERSION != "hhvm" ]; then python3 stuff/php-format.py validate HEAD; fi
+  - python3 stuff/whitespace-purge.py validate --all-files
+  - python3 stuff/js-lint.py validate --all-files
+  - if [ $TRAVIS_PHP_VERSION != "hhvm" ]; then python3 stuff/php-format.py validate --all-files; fi
 
 notifications:
   slack:

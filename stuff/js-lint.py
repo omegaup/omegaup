@@ -22,13 +22,12 @@ FIXJSSTYLE_PATH = os.path.join(os.environ['HOME'],
                                '.local/bin/fixjsstyle')
 GJSLINT_PATH = os.path.join(os.environ['HOME'], '.local/bin/gjslint')
 
-def run_linter(commits, files, validate_only):
-  '''Runs the Google Closure Compiler linter against |files| in |commits|.
-  '''
+def run_linter(args, files, validate_only):
+  '''Runs the Google Closure Compiler linter against |files|.'''
   root = git_tools.root_dir()
   validation_passed = True
   for filename in files:
-    contents = git_tools.file_at_commit(commits, root, filename)
+    contents = git_tools.file_contents(args, root, filename)
 
     with tempfile.NamedTemporaryFile(suffix='.js') as f:
       f.write(contents)
@@ -81,7 +80,7 @@ def main():
 
   validate_only = args.tool == 'validate'
 
-  if not run_linter(args.commits, args.files, validate_only):
+  if not run_linter(args, args.files, validate_only):
     if validate_only:
       print('%sValidation errors.%s '
             'Please run `%s` to fix them.' % (COLORS.FAIL,
