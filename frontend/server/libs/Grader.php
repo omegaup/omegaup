@@ -1,7 +1,7 @@
 <?php
 
 class Grader {
-    public function Grader() {
+    public function __construct() {
     }
 
     /**
