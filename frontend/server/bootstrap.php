@@ -53,23 +53,26 @@ header('X-Frame-Options: DENY');
  * */
 require_once('libs/third_party/log4php/src/main/php/Logger.php');
 require_once('libs/dao/model.inc.php');
-require_once('libs/SessionManager.php');
-require_once('libs/Request.php');
-require_once('libs/Validators.php');
-require_once('libs/SecurityTools.php');
-require_once('libs/Cache.php');
+
+require_once('libs/ApiException.php');
 require_once('libs/Authorization.php');
+require_once('libs/Broadcaster.php');
+require_once('libs/Cache.php');
+require_once('libs/Experiments.php');
 require_once('libs/Git.php');
 require_once('libs/Grader.php');
-require_once('libs/Broadcaster.php');
-require_once('libs/Scoreboard.php');
-require_once('libs/third_party/ZipStream.php');
+require_once('libs/Pager.php');
 require_once('libs/ProblemDeployer.php');
-require_once('libs/third_party/phpmailer/class.phpmailer.php');
+require_once('libs/Request.php');
+require_once('libs/Scoreboard.php');
+require_once('libs/SecurityTools.php');
+require_once('libs/SessionManager.php');
 require_once('libs/UITools.php');
-require_once('libs/third_party/Mailchimp/Mailchimp.php');
-require_once('libs/ApiException.php');
 require_once('libs/UrlHelper.php');
+require_once('libs/Validators.php');
+require_once('libs/third_party/Mailchimp/Mailchimp.php');
+require_once('libs/third_party/ZipStream.php');
+require_once('libs/third_party/phpmailer/class.phpmailer.php');
 
 /*
  * Configurar log4php
@@ -222,5 +225,4 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
 $smarty->addPluginsDir(__DIR__ . '/../smarty_plugins/');
 
-// Load pager class
-require_once('libs/Pager.php');
+$experiments = new Experiments($_REQUEST);

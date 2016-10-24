@@ -33,6 +33,11 @@ try_define('OMEGAUP_SLAVE_DB_NAME', 'omegaup');
 try_define('OMEGAUP_SLAVE_DB_DRIVER', 'mysqlt');
 
 # ####################################
+# EXPERIMENTS
+# ####################################
+try_define('OMEGAUP_EXPERIMENT_SECRET', 'omegaup');
+
+# ####################################
 # LOG CONFIG
 # ####################################
 try_define('OMEGAUP_LOG_TO_FILE', true);
