@@ -1126,7 +1126,6 @@ class ContestController extends Controller {
     private static function validateRemoveFromContestRequest(Request $r) {
         Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        // Only director is allowed to create problems in contest
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
@@ -1138,9 +1137,9 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        // Only contest admin is allowed to create problems in contest
-        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
-            throw new ForbiddenAccessException('cannotAddProb');
+        // Only contest admin is allowed to remove problems in contest
+        if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+            throw new ForbiddenAccessException('cannotRemoveProblem');
         }
 
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
@@ -1154,6 +1153,19 @@ class ContestController extends Controller {
 
         if (is_null($problem)) {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
+        }
+
+        if (RunsDAO::CountTotalRunsOfProblem($problem->problem_id) > 0 &&
+            !Authorization::IsSystemAdmin($r['current_user_id'])) {
+            throw new ForbiddenAccessException('cannotRemoveProblem');
+        }
+
+        if ($contest->public == 1) {
+            // Check that contest has at least 2 problems
+            $problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->contest_id);
+            if (count($problemsInContest) < 2) {
+                throw new InvalidParameterException('contestPublicRequiresProblem');
+            }
         }
 
         return array(

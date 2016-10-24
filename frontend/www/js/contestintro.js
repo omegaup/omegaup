@@ -1,125 +1,179 @@
-$(document).ready(function() {
-	var contestAlias = /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
-	var contestObject = null;
+$(document)
+    .ready(function() {
+      var contestAlias =
+          /\/arena\/([^\/]+)\/?/.exec(window.location.pathname)[1];
+      var contestObject = null;
 
-	$('#start-contest-form').submit(function() {
-		$("#request-access-form").hide();
-		$('#start-contest-submit').prop('disabled', true);
+      $('#start-contest-form')
+          .submit(function() {
+            $('#request-access-form').hide();
+            $('#start-contest-submit').prop('disabled', true);
 
-		// Explicitly join the contest.
-		omegaup.API.openContest(
-			contestAlias,
-			function(result) {
-				if (result.status == "error") {
-					omegaup.UI.error(result.error);
-					$("#start-contest-form").show();
-				} else {
-					window.location.reload();
-				}
-			}
-		);
-		return false;
-	});
+            // Explicitly join the contest.
+            omegaup.API.openContest(contestAlias, function(result) {
+              if (result.status == 'error') {
+                omegaup.UI.error(result.error);
+                $('#start-contest-form').show();
+              } else {
+                window.location.reload();
+              }
+            });
+            return false;
+          });
 
-	$('#request-access-form').submit(function() {
-		$("#request-access-form").hide();
-		$('#request-access-submit').prop('disabled', true);
-		omegaup.API.registerForContest(
-			contestAlias,
-			function(result) {
-				if (result.status == "error") {
-					omegaup.UI.error(result.error);
-					$("#request-access-form").show();
-					$('#start-contest-submit').prop('disabled', false);
-				} else {
-					$("#registration_pending").removeClass("hidden");
-				}
-			}
-		);
-		return false;
-	});
+      $('#request-access-form')
+          .submit(function() {
+            $('#request-access-form').hide();
+            $('#request-access-submit').prop('disabled', true);
+            omegaup.API.registerForContest(contestAlias, function(result) {
+              if (result.status == 'error') {
+                omegaup.UI.error(result.error);
+                $('#request-access-form').show();
+                $('#start-contest-submit').prop('disabled', false);
+              } else {
+                $('#registration_pending').removeClass('hidden');
+              }
+            });
+            return false;
+          });
 
-	function formatDelta(delta) {
-		var days = Math.floor(delta / (24 * 60 * 60 * 1000));
-		delta -= days * (24 * 60 * 60 * 1000);
-		var hours = Math.floor(delta / (60 * 60 * 1000));
-		delta -= hours * (60 * 60 * 1000);
-		var minutes = Math.floor(delta / (60 * 1000));
-		delta -= minutes * (60 * 1000);
-		var seconds = Math.floor(delta / 1000);
+      function formatDelta(delta) {
+        var days = Math.floor(delta / (24 * 60 * 60 * 1000));
+        delta -= days * (24 * 60 * 60 * 1000);
+        var hours = Math.floor(delta / (60 * 60 * 1000));
+        delta -= hours * (60 * 60 * 1000);
+        var minutes = Math.floor(delta / (60 * 1000));
+        delta -= minutes * (60 * 1000);
+        var seconds = Math.floor(delta / 1000);
 
-		var clock = "";
+        var clock = '';
 
-		if (days > 0) {
-			clock += days + ":";
-		}
-		if (hours < 10) clock += "0";
-		clock += hours + ":";
-		if (minutes < 10) clock += "0";
-		clock += minutes + ":";
-		if (seconds < 10) clock += "0";
-		clock += seconds;
+        if (days > 0) {
+          clock += days + ':';
+        }
+        if (hours < 10) clock += '0';
+        clock += hours + ':';
+        if (minutes < 10) clock += '0';
+        clock += minutes + ':';
+        if (seconds < 10) clock += '0';
+        clock += seconds;
 
-		return clock;
-	}
+        return clock;
+      }
 
-	function showCountdown() {
-		var starttime = contestObject.start_time;
-		var date = new Date().getTime();
+      function showCountdown() {
+        var starttime = contestObject.start_time;
+        var date = new Date().getTime();
 
-		// we already know that date < starttime
-		$('#countdown_clock').html(formatDelta(starttime.getTime() - (date)));
-	}
+        // we already know that date < starttime
+        $('#countdown_clock').html(formatDelta(starttime.getTime() - (date)));
+      }
 
-	function readyToStart(contest) {
-		// User is ready enter contest. If contest started,
-		// show button, otherwise show countdown.
-		var date = new Date().getTime();
-		var clock = "";
+      function readyToStart(contest) {
+        // User is ready enter contest. If contest started,
+        // show button, otherwise show countdown.
+        var date = new Date().getTime();
+        var clock = '';
 
-		if (date > contest.finish_time.getTime()) { // Ended
-			$('#click_to_proceed').removeClass('hidden');
-		} else if (date > contest.start_time.getTime()) { // Started
-			$('#click_to_proceed').removeClass('hidden');
-		} else { // Not started
-			$("#ready_to_start").removeClass("hidden");
-			contestObject = contest;
-			setInterval(showCountdown.bind(), 1000);
-		}
-	}
+        if (date > contest.finish_time.getTime()) {  // Ended
+          $('#click_to_proceed').removeClass('hidden');
+        } else if (date > contest.start_time.getTime()) {  // Started
+          $('#click_to_proceed').removeClass('hidden');
+        } else {  // Not started
+          $('#ready_to_start').removeClass('hidden');
+          contestObject = contest;
+          setInterval(showCountdown.bind(), 1000);
+        }
+      }
 
-	function contestLoaded(contest) {
-		if (contest.status != "ok" ) {
-			$('#contest-details').hide();
-			$('#contest-details').parent().removeClass('col-md-6').addClass('col-md-2');
-		} else {
-			$('.contest #title').html(omegaup.UI.escape(contest.title));
-			$('.contest #description').html(omegaup.UI.escape(contest.description));
+      function contestLoaded(contest) {
+        if (contest.status != 'ok') {
+          $('#contest-details').hide();
+          $('#contest-details')
+              .parent()
+              .removeClass('col-md-6')
+              .addClass('col-md-2');
+        } else {
+          $('.contest #title').html(omegaup.UI.escape(contest.title));
+          $('.contest #description')
+              .html(omegaup.UI.escape(contest.description));
 
-			$('.contest #time-until-start').html(omegaup.UI.escape(contest.start_time));
-			$('.contest #start_time').val(omegaup.UI.formatDateTime(contest.start_time));
-			$('.contest #finish_time').val(omegaup.UI.formatDateTime(contest.finish_time));
-		}
+          $('.contest #time-until-start')
+              .html(omegaup.UI.escape(contest.start_time));
+          $('.contest #start_time').text(contest.start_time.long());
+          $('.contest #finish_time').text(contest.finish_time.long());
+          if (contest.show_scoreboard_after == 1) {
+            $('.contest #show_scoreboard_after')
+                .text(omegaup.T.contestNewFormScoreboardAtEnd);
+          } else {
+            $('.contest #show_scoreboard_after').hide();
+          }
+          if (contest.window_length != null) {
+            $('.contest #window_length_enabled')
+                .text(omegaup.UI.formatString(
+                    omegaup.T.contestNewFormDifferentStarts,
+                    {window_length: contest.window_length}));
+          } else {
+            $('.contest #window_length_enabled').hide();
+          }
+          $('.contest #scoreboard')
+              .text(omegaup.UI.formatString(
+                  omegaup.T.contestNewFormScoreboardTimePercent,
+                  {window_length: contest.scoreboard}));
+          $('.contest #submissions_gap')
+              .text(omegaup.UI.formatString(
+                  omegaup.T.contestNewFormSubmissionsSeparationDesc,
+                  {window_length: contest.submissions_gap / 60}));
+          var penaltyTypes = {
+            none: omegaup.T.contestNewFormNoPenalty,
+            problem_open: omegaup.T.contestNewFormByProblem,
+            constest_start: omegaup.T.contestNewFormByContests,
+            runtime: omegaup.T.contestNewFormByRuntime
+          };
+          $('.contest #penalty_type').text(penaltyTypes[contest.penalty_type]);
+          if (contest.penalty != 0) {
+            $('.contest #penalty')
+                .text(
+                    omegaup.UI.formatString(omegaup.T.contestNewFormPenaltyDesc,
+                                            {window_length: contest.penalty}));
+          } else {
+            $('.contest #penalty').hide();
+          }
+          var feedbackTypes = {
+            yes: omegaup.T.contestNewFormImmediateFeedbackDesc,
+            no: '',
+            partial: omegaup.T.contestNewFormImmediatePartialFeedbackDesc
+          };
+          $('.contest #feedback').text(feedbackTypes[contest.feedback]);
+          if (contest.points_decay_factor != 0) {
+            $('.contest #points_decay_factor')
+                .text(omegaup.UI.formatString(
+                    omegaup.T.contestNewFormDecrementFactor,
+                    {window_length: contest.points_decay_factor}));
+          } else {
+            $('.contest #points_decay_factor').hide();
+          }
+        }
 
-		// Feel free to re-write this if you have the time.
-		if (contest.contestant_must_register) {
-			if (contest.user_registration_requested) {
-				if (contest.user_registration_answered) {
-					if (contest.user_registration_accepted) {
-						readyToStart(contest);
-					} else {
-						$("#registration_denied").removeClass("hidden");
-					}
-				} else {
-					$("#registration_pending").removeClass("hidden");
-				}
-			} else {
-				$("#must_register").removeClass("hidden");
-			}
-		} else {
-			readyToStart(contest);
-		}
-	}
+        // Feel free to re-write this if you have the time.
+        if (contest.contestant_must_register) {
+          if (contest.user_registration_requested) {
+            if (contest.user_registration_answered) {
+              if (contest.user_registration_accepted) {
+                readyToStart(contest);
+              } else {
+                $('#registration_denied').removeClass('hidden');
+              }
+            } else {
+              $('#registration_pending').removeClass('hidden');
+            }
+          } else {
+            $('#must_register').removeClass('hidden');
+          }
+        } else {
+          readyToStart(contest);
+        }
+      }
 
-	omegaup.API.getContestPublicDetails(contestAlias, contestLoaded);
-});
+      omegaup.API.getContestPublicDetails(contestAlias, contestLoaded);
+    });
