@@ -237,35 +237,21 @@ omegaup.API = {
 	},
 
 	getCourseList: function(callback) {
-		return omegaup.API._wrapDeferred($.get(
-			'/api/course/listCourses/',{},
-			function (data) {
-				if (data.status !== undefined && data.status == "error") {
-					omegaup.UI.error(data.error);
-				}
-				if (data.status == 'ok') {
-					for (var i = 0; i < data.admin.length; ++i) {
-						data.admin[i].finish_time = omegaup.OmegaUp.time(
-							data.admin[i].finish_time * 1000
-						);
-					}
-					for (var i = 0; i < data.student.length; ++i) {
-						data.student[i].finish_time = omegaup.OmegaUp.time(
-							data.student[i].finish_time * 1000
-						);
-					}
-				}
-
-				if (callback !== undefined) { callback(data); }
-			},
-			'json'
-		).fail(function(j, status, errorThrown) {
-			try {
-				callback(JSON.parse(j.responseText));
-			} catch (err) {
-				callback({status:'error', 'error':undefined});
+		return omegaup.API._wrapDeferred($.ajax({
+			url: '/api/course/listCourses/',
+			dataType: 'json',
+		}),
+		function(result) {
+			for (var i = 0; i < result.admin.length; ++i) {
+				result.admin[i].finish_time =
+                    omegaup.OmegaUp.time(result.admin[i].finish_time * 1000);
 			}
-		}));
+			for (var i = 0; i < result.student.length; ++i) {
+				result.student[i].finish_time =
+                    omegaup.OmegaUp.time(result.student[i].finish_time * 1000);
+			}
+			return result;
+		});
 	},
 
 	getCourseAssignments: function(course_alias, callback) {

@@ -17,7 +17,11 @@ $('document').ready(function() {
     }
     ko.bindingProvider.instance =
         new ko.secureBindingsProvider({attribute: 'data-bind'});
-    omegaup.API.getCourseList(function(data) {
+    omegaup.API.getCourseList().then(function(data) {
+        if (data.status != 'ok') {
+            omegaup.UI.error(data.error);
+            return;
+        }
         var viewModel = {
             adminCoursesCurrent: ko.observableArray(),
             adminCoursesPast: ko.observableArray(),

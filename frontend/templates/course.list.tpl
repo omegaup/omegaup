@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{assign var="htmlTitle" value="My courses"}
+{assign var='htmlTitle' value='My courses'}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
 {include file='status.tpl'}
