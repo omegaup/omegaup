@@ -67,6 +67,7 @@ class CoursesDAO extends CoursesDAOBase
 
     public static function getCoursesForStudent($user) {
         global  $conn;
+        // TODO(pablo): El link entre curso y grupo deberia ser por id y no alias.
         $sql = 'SELECT c.*
                 FROM Courses c
                 INNER JOIN (

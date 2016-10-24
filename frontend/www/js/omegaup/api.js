@@ -237,7 +237,7 @@ omegaup.API = {
 	},
 
 	getCourseList: function(callback) {
-		$.get(
+		return omegaup.API._wrapDeferred($.get(
 			'/api/course/listCourses/',{},
 			function (data) {
 				if (data.status !== undefined && data.status == "error") {
@@ -265,7 +265,7 @@ omegaup.API = {
 			} catch (err) {
 				callback({status:'error', 'error':undefined});
 			}
-		});
+		}));
 	},
 
 	getCourseAssignments: function(course_alias, callback) {
