@@ -1162,7 +1162,7 @@ class ContestController extends Controller {
 
         if ($contest->public == 1) {
             // Check that contest has at least 2 problems
-            $problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest->contest_id);
+            $problemsInContest = ContestProblemsDAO::GetRelevantProblems($contest);
             if (count($problemsInContest) < 2) {
                 throw new InvalidParameterException('contestPublicRequiresProblem');
             }
@@ -2543,7 +2543,7 @@ class ContestController extends Controller {
         $zip->add_file('summary.csv', $table);
 
         // Add problem cases to zip
-        $contest_problems = ContestProblemsDAO::GetRelevantProblems($r['contest']->contest_id);
+        $contest_problems = ContestProblemsDAO::GetRelevantProblems($r['contest']);
         foreach ($contest_problems as $problem) {
             $zip->add_file_from_path($problem->alias . '_cases.zip', PROBLEMS_PATH . '/' . $problem->alias . '/cases.zip');
         }
