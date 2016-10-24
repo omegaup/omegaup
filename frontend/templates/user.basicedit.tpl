@@ -45,5 +45,5 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/js/user.basicedit.js?ver=fdfcb5"></script>
+	<script type="text/javascript" src="{version_hash src="/js/user.basicedit.js"}"></script>
 {/block}

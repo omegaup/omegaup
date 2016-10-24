@@ -216,7 +216,7 @@ class Markdown_Parser {
 	var $templates = array(
 	);
 
-	function Markdown_Parser($image_callback, $translation_callback) {
+	function __construct($image_callback, $translation_callback) {
 		#
 		# Constructor function. Initialize appropriate member variables.
 		#

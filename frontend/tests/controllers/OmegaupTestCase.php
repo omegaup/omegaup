@@ -48,7 +48,8 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
      * Override session_start, phpunit doesn't like it, but we still validate that it is called once
      */
     public function mockSessionManager() {
-        $sessionManagerMock = $this->getMock('SessionManager', array('sessionStart'));
+        $sessionManagerMock =
+            $this->getMockBuilder('SessionManager')->getMock();
         $sessionManagerMock->expects($this->once())
                 ->method('sessionStart')
                 ->will($this->returnValue(''));
@@ -240,7 +241,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
      */
     public function createFileUploaderMock() {
         // Create fileUploader mock
-        $fileUploaderMock = $this->getMock('FileUploader', array('IsUploadedFile', 'MoveUploadedFile'));
+        $fileUploaderMock = $this->getMockBuilder('FileUploader')->getMock();
 
         // Detour IsUploadedFile function inside FileUploader to our own IsUploadedFile
         $fileUploaderMock->expects($this->any())
@@ -297,7 +298,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
 
         // Create a fake Grader object which will always return true (see
         // next line)
-        $graderMock = $this->getMock('Grader', array('Grade'));
+        $graderMock = $this->getMockBuilder('Grader')->getMock();
 
         // Set expectations:
         $graderMock->expects($times)
@@ -314,10 +315,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
             $times = $this->once();
         }
 
-        $broadcasterMock = $this->getMock(
-            'Broadcaster',
-            array('broadcastClarification')
-        );
+        $broadcasterMock = $this->getMockBuilder('Broadcaster')->getMock();
         $broadcasterMock->expects($times)
             ->method('broadcastClarification');
         ClarificationController::$broadcaster = $broadcasterMock;

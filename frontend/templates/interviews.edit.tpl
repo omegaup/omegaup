@@ -183,6 +183,6 @@
 
 </div>
 
-<script type="text/javascript" src="/js/interviews.edit.js?ver=9f24eb"></script>
+<script type="text/javascript" src="{version_hash src="/js/interviews.edit.js"}"></script>
 {include file='footer.tpl'}
 
