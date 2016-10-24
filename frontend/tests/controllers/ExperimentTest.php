@@ -3,7 +3,7 @@
 class ExperimentsTest extends PHPUnit_Framework_TestCase {
     const TEST = 'experiment_test';
 
-    private static array $kKnownExperiments = array(
+    private static $kKnownExperiments = array(
         self::TEST,
     );
 
