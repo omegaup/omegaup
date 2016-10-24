@@ -7,7 +7,7 @@ branches:
     - master
 
 php:
-  - 5.7
+  - 7.0
   - hhvm
 
 env:
