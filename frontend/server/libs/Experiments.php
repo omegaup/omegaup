@@ -43,7 +43,7 @@ class Experiments {
     /**
      * An array with all the known experiments.
      */
-    private static array $kKnownExperiments = array(
+    private static $kKnownExperiments = array(
         self::SCHOOLS,
     );
 
