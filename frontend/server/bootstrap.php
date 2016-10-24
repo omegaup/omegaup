@@ -53,23 +53,26 @@ header('X-Frame-Options: DENY');
  * */
 require_once('libs/third_party/log4php/src/main/php/Logger.php');
 require_once('libs/dao/model.inc.php');
-require_once('libs/SessionManager.php');
-require_once('libs/Request.php');
-require_once('libs/Validators.php');
-require_once('libs/SecurityTools.php');
-require_once('libs/Cache.php');
+
+require_once('libs/ApiException.php');
 require_once('libs/Authorization.php');
+require_once('libs/Broadcaster.php');
+require_once('libs/Cache.php');
+require_once('libs/Experiments.php');
 require_once('libs/Git.php');
 require_once('libs/Grader.php');
-require_once('libs/Broadcaster.php');
-require_once('libs/Scoreboard.php');
-require_once('libs/third_party/ZipStream.php');
+require_once('libs/Pager.php');
 require_once('libs/ProblemDeployer.php');
-require_once('libs/third_party/phpmailer/class.phpmailer.php');
+require_once('libs/Request.php');
+require_once('libs/Scoreboard.php');
+require_once('libs/SecurityTools.php');
+require_once('libs/SessionManager.php');
 require_once('libs/UITools.php');
-require_once('libs/third_party/Mailchimp/Mailchimp.php');
-require_once('libs/ApiException.php');
 require_once('libs/UrlHelper.php');
+require_once('libs/Validators.php');
+require_once('libs/third_party/Mailchimp/Mailchimp.php');
+require_once('libs/third_party/ZipStream.php');
+require_once('libs/third_party/phpmailer/class.phpmailer.php');
 
 /*
  * Configurar log4php
@@ -166,7 +169,7 @@ include('libs/third_party/smarty/libs/Smarty.class.php');
 $smarty = new Smarty();
 $smarty->setTemplateDir(__DIR__ . '/../templates/');
 
-if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === true)) {
+if (!defined('IS_TEST') || IS_TEST !== true) {
     $smarty->assign('CURRENT_USER_IS_ADMIN', 0);
     if (defined('SMARTY_CACHE_DIR')) {
         $smarty->setCacheDir(SMARTY_CACHE_DIR)->setCompileDir(SMARTY_CACHE_DIR);
@@ -212,7 +215,8 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 
     if (defined('OMEGAUP_DEVELOPMENT_MODE') && OMEGAUP_DEVELOPMENT_MODE) {
         $smarty->force_compile = true;
-        $smarty->caching = 0;
+    } else {
+        $smarty->compile_check = false;
     }
 } else {
     // During testing We need smarty to load strings from *.lang files
@@ -220,6 +224,6 @@ if (/* do we need smarty to load? */true && !(defined('IS_TEST') && IS_TEST === 
 }
 
 $smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
+$smarty->addPluginsDir(__DIR__ . '/../smarty_plugins/');
 
-// Load pager class
-require_once('libs/Pager.php');
+$experiments = new Experiments($_REQUEST);

@@ -27,5 +27,5 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/js/user.email.edit.js?ver=158b4f"></script>
+	<script type="text/javascript" src="{version_hash src="/js/user.email.edit.js"}"></script>
 {/block}

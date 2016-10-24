@@ -4,7 +4,7 @@ class Broadcaster {
     // Logging.
     private $log = null;
 
-    public function Broadcaster() {
+    public function __construct() {
         $this->log = Logger::getLogger('broadcaster');
     }
 

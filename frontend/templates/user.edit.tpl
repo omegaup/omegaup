@@ -385,5 +385,5 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="/js/user.edit.js?ver=a8c2d7"></script>
+	<script type="text/javascript" src="{version_hash src="/js/user.edit.js"}"></script>
 {/block}

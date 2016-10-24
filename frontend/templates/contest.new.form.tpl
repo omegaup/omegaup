@@ -109,9 +109,9 @@
 					</div>
 
 					<div class="form-group col-md-6">
-						<label for="points_decay_factor">{#contestNewFormPintDecrementFactor#}</label>
+						<label for="points_decay_factor">{#contestNewFormPointDecrementFactor#}</label>
 						<input id='points_decay_factor' name='points_decay_factor' value='0.0' type='text' size='4' class="form-control">
-						<p class="help-block">{#contestNewFormPintDecrementFactorDesc#}</p>
+						<p class="help-block">{#contestNewFormPointDecrementFactorDesc#}</p>
 					</div>
 				</div>
 
@@ -160,4 +160,4 @@
 		</form>
 	</div>
 </div>
-<script type="text/javascript" src="/js/contest.new.form.js?ver=fc1b67"></script>
+<script type="text/javascript" src="{version_hash src="/js/contest.new.form.js"}"></script>
