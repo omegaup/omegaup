@@ -54,7 +54,7 @@ class Experiments {
 
     const EXPERIMENT_REQUEST_NAME = 'experiments';
 
-    private array $enabledExperiments = array();
+    private $enabledExperiments = array();
 
     /**
      * Creates an instance of Experiments.
