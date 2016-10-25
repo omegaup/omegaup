@@ -1111,7 +1111,8 @@ omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
                         (c.max_score !== undefined ? '/' : '') + '</td>')
                 .append('<td>' +
                         (c.max_score !== undefined ? c.max_score : '') +
-                        '</td>') cases.append(caseRow);
+                        '</td>');
+        cases.append(caseRow);
         if (problemAdmin && c.meta) {
           var metaRow =
               $('<tr class="meta"></tr>')

@@ -22,18 +22,18 @@ VALIDATIONS = [
    re.compile(br'\n+\n(\s*})'), br'\n\1'),
 ]
 
-def run_validations(commits, files, validate_only):
-  '''Runs all validations against |files| in |commits|.
+def run_validations(args, files, validate_only):
+  '''Runs all validations against |files|.
 
   A validation consists of performing regex substitution against the contents
-  of each file in |files|, at the git commit |commits|.  Validation fails if the
-  resulting content is not identical to the original.  The contents of the
-  files will be presented as a single string, allowing for multi-line matches.
+  of each file in |files|.  Validation fails if the resulting content is not
+  identical to the original.  The contents of the files will be presented as a
+  single string, allowing for multi-line matches.
   '''
   root = git_tools.root_dir()
   validation_passed = True
   for filename in files:
-    contents = git_tools.file_at_commit(commits, filename)
+    contents = git_tools.file_contents(args, root, filename)
     violations = []
 
     # Run all validations sequentially, so all violations can be fixed
@@ -59,20 +59,15 @@ def run_validations(commits, files, validate_only):
   return validation_passed
 
 def main():
-  args = git_tools.parse_arguments(tool_description='purges whitespace')
-
-  if args.files:
-    changed_files = args.files
-  else:
-    changed_files = git_tools.changed_files(args.commits,
-        whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
-        blacklist=[br'.*third_party.*', br'.*dao/base.*'])
-  if not changed_files:
+  args = git_tools.parse_arguments(tool_description='purges whitespace',
+        file_whitelist=[br'^frontend.*\.(php|css|js|sql|tpl|py)$'],
+        file_blacklist=[br'.*third_party.*', br'.*dao/base.*'])
+  if not args.files:
     return 0
 
   validate_only = args.tool == 'validate'
 
-  if not run_validations(args.commits, changed_files, validate_only):
+  if not run_validations(args, args.files, validate_only):
     if validate_only:
       print('%sWhitespace validation errors.%s '
             'Please run `%s` to fix them.' % (COLORS.FAIL,
