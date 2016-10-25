@@ -6,14 +6,18 @@ A tool to run an import script to populate the database with objects.
 
 
 import argparse
+import grp
 import json
 import logging
 import os
 import requests
+import shutil
+import subprocess
 import time
 
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
+OMEGAUP_RUNTIME_ROOT = '/var/lib/omegaup'
 
 
 class ScopedFiles:
@@ -76,19 +80,9 @@ class Session:
     return result
 
 
-def main():
-  parser = argparse.ArgumentParser()
-  parser.add_argument('--host', type=str, default='http://localhost')
-  parser.add_argument('--verbose', action='store_true')
-  parser.add_argument('script', type=str,
-      help='The JSON script with requests to pre-populate the database')
-  args = parser.parse_args()
-  now = time.time()
-
-  if args.verbose:
-    logging.getLogger().setLevel('DEBUG')
-
-  with open(args.script, 'r') as f:
+def _run_script(path, args, now):
+  '''Runs a single script specified in |path|'''
+  with open(path, 'r') as f:
     script = json.load(f)
 
   for session in script:
@@ -121,8 +115,45 @@ def main():
         result = s.request(
             request['api'], data=request['params'],
             files=(request['files'] if 'files' in request else None))
-        assert result['status'] == 'ok'
+        assert result['status'] == 'ok', request
 
+
+def main():
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--host', type=str, default='http://localhost')
+  parser.add_argument('--verbose', action='store_true')
+  parser.add_argument('--purge', action='store_true',
+      help='Also purges and re-creates the database')
+  parser.add_argument('scripts', metavar='SCRIPT', type=str, nargs='*',
+      default=[os.path.join(OMEGAUP_ROOT, 'stuff/bootstrap.json')],
+      help='The JSON script with requests to pre-populate the database')
+  args = parser.parse_args()
+  now = time.time()
+
+  if args.verbose:
+    logging.getLogger().setLevel('DEBUG')
+
+  if args.purge:
+    logging.info('Purging old problems')
+    # Removing directories requires the user to be in the 'www-data' group.
+    can_delete = 'www-data' in (grp.getgrgid(grid).gr_name for grid in
+                                os.getgroups())
+    for subdir in ('problems.git', 'problems'):
+      for alias in os.listdir(os.path.join(OMEGAUP_RUNTIME_ROOT,
+                                           subdir)):
+        path = os.path.join(OMEGAUP_RUNTIME_ROOT, subdir, alias)
+        logging.debug('Removing %s', path)
+        if can_delete:
+          shutil.rmtree(path)
+        else:
+          subprocess.check_call(['/usr/bin/sudo', '/bin/rm', '-rf', path])
+    logging.info('Purging database')
+    db_migrate = os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')
+    subprocess.check_call([db_migrate, 'purge'])
+    subprocess.check_call([db_migrate, 'migrate', '--development-environment'])
+
+  for path in args.scripts:
+    _run_script(path, args, now)
 
 if __name__ == '__main__':
   main()
