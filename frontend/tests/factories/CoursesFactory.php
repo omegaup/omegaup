@@ -59,28 +59,35 @@ class CoursesFactory {
     }
 
     public static function createCourseWithAssignments($nAssignments) {
+        return self::createCourseWithNAssignmentsPerType(array(
+            'homework' => $nAssignments
+        ));
+    }
+
+    public static function createCourseWithNAssignmentsPerType($assignmentsPerType) {
         $courseFactoryResult = self::createCourse();
         $courseAlias = $courseFactoryResult['course_alias'];
+        $user = $courseFactoryResult['user'];
 
-        for ($i = 0; $i < $nAssignments; $i++) {
-            $assignmentAlias = Utils::CreateRandomString();
+        foreach ($assignmentsPerType as $assignmentType => $count) {
+            for ($i = 0; $i < $count; $i++) {
+                $r = new Request(array(
+                    'auth_token' => OmegaupTestCase::login($user),
+                    'name' => Utils::CreateRandomString(),
+                    'alias' => Utils::CreateRandomString(),
+                    'description' => Utils::CreateRandomString(),
+                    'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+                    'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+                    'course_alias' => $courseAlias,
+                    'assignment_type' => $assignmentType
+                ));
 
-            $r = new Request(array(
-                'auth_token' => OmegaupTestCase::login($courseFactoryResult['user']),
-                'name' => Utils::CreateRandomString(),
-                'alias' => $assignmentAlias,
-                'description' => Utils::CreateRandomString(),
-                'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-                'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
-                'course_alias' => $courseAlias,
-                'assignment_type' => 'homework'
-            ));
-
-            CourseController::apiCreateAssignment($r);
+                CourseController::apiCreateAssignment($r);
+            }
         }
 
         return array(
-            'user' => $courseFactoryResult['user'],
+            'user' => $user,
             'course_alias' => $courseAlias
         );
     }
