@@ -26,4 +26,19 @@ class AssignmentsDAO extends AssignmentsDAOBase
 
         return new Problemsets($rs);
     }
+
+    public static function getAssignmentCountsForCourse($id_course) {
+        global $conn;
+
+        $sql = 'SELECT a.assignment_type, COUNT(*) AS count
+                FROM Assignments a
+                WHERE a.id_course = ?
+                GROUP BY a.assignment_type;';
+        $rs = $conn->Execute($sql, $id_course);
+        $counts = array();
+        foreach ($rs as $row) {
+            $counts[$row['assignment_type']] = $row['count'];
+        }
+        return $counts;
+    }
 }

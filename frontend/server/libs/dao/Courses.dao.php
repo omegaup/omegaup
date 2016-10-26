@@ -14,7 +14,10 @@ class CoursesDAO extends CoursesDAOBase
     public static function findByName($name) {
         global  $conn;
 
-        $sql = "select DISTINCT c.* from Courses c where c.name LIKE  CONCAT('%', ?, '%') LIMIT 10";
+        $sql = 'SELECT DISTINCT c.*
+                FROM Courses c
+                WHERE c.name
+                LIKE CONCAT('%', ?, '%') LIMIT 10';
 
         $resultRows = $conn->Execute($sql, array($name));
         $finalResult = array();
@@ -29,7 +32,7 @@ class CoursesDAO extends CoursesDAOBase
     public static function findByAlias($alias) {
         global  $conn;
 
-        $sql = 'select c.* from Courses c where c.alias  = ?';
+        $sql = 'SELECT c.* FROM Courses c WHERE c.alias  = ?';
 
         $rs = $conn->GetRow($sql, array($alias));
         if (count($rs) == 0) {
@@ -63,5 +66,26 @@ class CoursesDAO extends CoursesDAOBase
         }
 
         return $ar;
+    }
+
+    public static function getCoursesForStudent($user) {
+        global  $conn;
+        // TODO(pablo): El link entre curso y grupo deberia ser por id y no alias.
+        $sql = 'SELECT c.*
+                FROM Courses c
+                INNER JOIN (
+                    SELECT alias
+                    FROM Groups_Users gu
+                    INNER JOIN Groups g ON g.group_id = gu.group_id
+                    WHERE gu.user_id = ?
+                ) gg
+                ON c.alias = gg.alias;
+               ';
+        $rs = $conn->Execute($sql, $user);
+        $courses = array();
+        foreach ($rs as $row) {
+            array_push($courses, $row);
+        }
+        return $courses;
     }
 }
