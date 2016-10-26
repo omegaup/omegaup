@@ -111,18 +111,18 @@ $(document)
           if (contest.window_length != null) {
             $('.contest #window_length_enabled')
                 .text(omegaup.UI.formatString(
-                    omegaup.T.contestNewFormDifferentStarts,
+                    omegaup.T.contestIntroDifferentStarts,
                     {window_length: contest.window_length}));
           } else {
             $('.contest #window_length_enabled').hide();
           }
           $('.contest #scoreboard')
               .text(omegaup.UI.formatString(
-                  omegaup.T.contestNewFormScoreboardTimePercent,
+                  omegaup.T.contestIntroScoreboardTimePercent,
                   {window_length: contest.scoreboard}));
           $('.contest #submissions_gap')
               .text(omegaup.UI.formatString(
-                  omegaup.T.contestNewFormSubmissionsSeparationDesc,
+                  omegaup.T.contestIntroSubmissionsSeparationDesc,
                   {window_length: contest.submissions_gap / 60}));
           var penaltyTypes = {
             none: omegaup.T.contestNewFormNoPenalty,
@@ -134,7 +134,7 @@ $(document)
           if (contest.penalty != 0) {
             $('.contest #penalty')
                 .text(
-                    omegaup.UI.formatString(omegaup.T.contestNewFormPenaltyDesc,
+                    omegaup.UI.formatString(omegaup.T.contestIntroPenaltyDesc,
                                             {window_length: contest.penalty}));
           } else {
             $('.contest #penalty').hide();
