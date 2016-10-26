@@ -14,10 +14,10 @@ class CoursesDAO extends CoursesDAOBase
     public static function findByName($name) {
         global  $conn;
 
-        $sql = 'SELECT DISTINCT c.*
+        $sql = "SELECT DISTINCT c.*
                 FROM Courses c
                 WHERE c.name
-                LIKE CONCAT('%', ?, '%') LIMIT 10';
+                LIKE CONCAT('%', ?, '%') LIMIT 10";
 
         $resultRows = $conn->Execute($sql, array($name));
         $finalResult = array();

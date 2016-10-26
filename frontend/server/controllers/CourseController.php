@@ -105,6 +105,7 @@ class CourseController extends Controller {
      *
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
+     * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
