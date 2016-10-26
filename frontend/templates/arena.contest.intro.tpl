@@ -8,18 +8,18 @@
 		<div id="contest-details" class="text-center">
 			<h2 id="title"></h2>
 			<div class="">
-				<span id="start_time" name="start_time"></span>
+				<span id="start-time" name="start_time"></span>
 				<span>-</span>
-				<span id="finish_time" name="finish_time"></span>
+				<span id="finish-time" name="finish_time"></span>
 			</div>
 {if $LOGGED_IN eq '1'}
 			<!------------------- Wait for contest start -------------------------->
-			<div id="ready_to_start" class="hidden" >
+			<div id="ready-to-start" class="hidden" >
 				<p>{#contestWillBeginIn#} <span id="countdown_clock"></span></p>
 			</div>
 
 			<!------------------- Click to proceed -------------------------->
-			<div id="click_to_proceed" class="hidden" >
+			<div id="click-to-proceed" class="hidden" >
 				<form id="start-contest-form" method="POST" action="/">
 					<p>{#aboutToStart#}</p>
 					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg">{#startContest#}</button>
@@ -57,14 +57,14 @@
 		<div id="contest-rules" class="">
 			<h1>{#RegisterForContestRules#}</h1>
 			<ul>
-				<li id="show_scoreboard_after" name="show_scoreboard_after"></li>
-				<li id="window_length_enabled" name="window_length_enabled"></li>
+				<li id="show-scoreboard-after" name="show_scoreboard_after"></li>
+				<li id="window-length-enabled" name="window_length_enabled"></li>
 				<li id="scoreboard" name="scoreboard"></li>
-				<li id="submissions_gap" name="submissions_gap"> 1 minute</li>
-				<li id="penalty_type"></li>
+				<li id="submissions-gap" name="submissions_gap"> 1 minute</li>
+				<li id="penalty-type"></li>
 				<li id="penalty" name="penalty"></li>
 				<li id="feedback" name="feedback"></li>
-				<li id="points_decay_factor" name="points_decay_factor"></li>
+				<li id="points-decay-factor" name="points_decay_factor"></li>
 			</ul>
 		</div>
 	</div><!-- panel-->
