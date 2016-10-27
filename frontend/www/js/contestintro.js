@@ -76,11 +76,11 @@ $(document)
         var clock = '';
 
         if (date > contest.finish_time.getTime()) {  // Ended
-          $('#click_to_proceed').removeClass('hidden');
+          $('#click-to-proceed').removeClass('hidden');
         } else if (date > contest.start_time.getTime()) {  // Started
-          $('#click_to_proceed').removeClass('hidden');
+          $('#click-to-proceed').removeClass('hidden');
         } else {  // Not started
-          $('#ready_to_start').removeClass('hidden');
+          $('#ready-to-start').removeClass('hidden');
           contestObject = contest;
           setInterval(showCountdown.bind(), 1000);
         }
@@ -100,27 +100,27 @@ $(document)
 
           $('.contest #time-until-start')
               .html(omegaup.UI.escape(contest.start_time));
-          $('.contest #start_time').text(contest.start_time.long());
-          $('.contest #finish_time').text(contest.finish_time.long());
+          $('.contest #start-time').text(contest.start_time.long());
+          $('.contest #finish-time').text(contest.finish_time.long());
           if (contest.show_scoreboard_after == 1) {
-            $('.contest #show_scoreboard_after')
+            $('.contest #show-scoreboard-after')
                 .text(omegaup.T.contestNewFormScoreboardAtEnd);
           } else {
-            $('.contest #show_scoreboard_after').hide();
+            $('.contest #show-scoreboard-after').hide();
           }
           if (contest.window_length != null) {
-            $('.contest #window_length_enabled')
+            $('.contest #window-length-enabled')
                 .text(omegaup.UI.formatString(
                     omegaup.T.contestIntroDifferentStarts,
                     {window_length: contest.window_length}));
           } else {
-            $('.contest #window_length_enabled').hide();
+            $('.contest #window-length-enabled').hide();
           }
           $('.contest #scoreboard')
               .text(omegaup.UI.formatString(
                   omegaup.T.contestIntroScoreboardTimePercent,
                   {window_length: contest.scoreboard}));
-          $('.contest #submissions_gap')
+          $('.contest #submissions-gap')
               .text(omegaup.UI.formatString(
                   omegaup.T.contestIntroSubmissionsSeparationDesc,
                   {window_length: contest.submissions_gap / 60}));
@@ -130,7 +130,7 @@ $(document)
             constest_start: omegaup.T.contestNewFormByContests,
             runtime: omegaup.T.contestNewFormByRuntime
           };
-          $('.contest #penalty_type').text(penaltyTypes[contest.penalty_type]);
+          $('.contest #penalty-type').text(penaltyTypes[contest.penalty_type]);
           if (contest.penalty != 0) {
             $('.contest #penalty')
                 .text(
@@ -146,12 +146,12 @@ $(document)
           };
           $('.contest #feedback').text(feedbackTypes[contest.feedback]);
           if (contest.points_decay_factor != 0) {
-            $('.contest #points_decay_factor')
+            $('.contest #points-decay-factor')
                 .text(omegaup.UI.formatString(
                     omegaup.T.contestNewFormDecrementFactor,
                     {window_length: contest.points_decay_factor}));
           } else {
-            $('.contest #points_decay_factor').hide();
+            $('.contest #points-decay-factor').hide();
           }
         }
 
