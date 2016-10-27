@@ -33,7 +33,7 @@ abstract class AssignmentsDAOBase extends DAO
 	  **/
 	public static final function save( $Assignments )
 	{
-		if (!is_null(self::getByPK( $Assignments->assignement_id)))
+		if (!is_null(self::getByPK( $Assignments->assignment_id)))
 		{
 			return AssignmentsDAOBase::update( $Assignments);
 		} else {
@@ -50,11 +50,11 @@ abstract class AssignmentsDAOBase extends DAO
 	  *	@static
 	  * @return @link Assignments Un objeto del tipo {@link Assignments}. NULL si no hay tal registro.
 	  **/
-	public static final function getByPK(  $assignement_id )
+	public static final function getByPK(  $assignment_id )
 	{
-		if(  is_null( $assignement_id )  ){ return NULL; }
-		$sql = "SELECT * FROM Assignments WHERE (assignement_id = ? ) LIMIT 1;";
-		$params = array(  $assignement_id );
+		if(  is_null( $assignment_id )  ){ return NULL; }
+		$sql = "SELECT * FROM Assignments WHERE (assignment_id = ? ) LIMIT 1;";
+		$params = array(  $assignment_id );
 		global $conn;
 		$rs = $conn->GetRow($sql, $params);
 		if(count($rs)==0) return NULL;
@@ -128,9 +128,9 @@ abstract class AssignmentsDAOBase extends DAO
 
 		$sql = "SELECT * from Assignments WHERE (";
 		$val = array();
-		if (!is_null( $Assignments->assignement_id)) {
-			$sql .= " `assignement_id` = ? AND";
-			array_push( $val, $Assignments->assignement_id );
+		if (!is_null( $Assignments->assignment_id)) {
+			$sql .= " `assignment_id` = ? AND";
+			array_push( $val, $Assignments->assignment_id );
 		}
 		if (!is_null( $Assignments->id_course)) {
 			$sql .= " `id_course` = ? AND";
@@ -203,7 +203,7 @@ abstract class AssignmentsDAOBase extends DAO
 	  **/
 	private static final function update($Assignments)
 	{
-		$sql = "UPDATE Assignments SET  `id_course` = ?, `id_problemset` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ? WHERE  `assignement_id` = ?;";
+		$sql = "UPDATE Assignments SET  `id_course` = ?, `id_problemset` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ? WHERE  `assignment_id` = ?;";
 		$params = array(
 			$Assignments->id_course,
 			$Assignments->id_problemset,
@@ -214,7 +214,7 @@ abstract class AssignmentsDAOBase extends DAO
 			$Assignments->assignment_type,
 			$Assignments->start_time,
 			$Assignments->finish_time,
-			$Assignments->assignement_id, );
+			$Assignments->assignment_id, );
 		global $conn;
 		$conn->Execute($sql, $params);
 		return $conn->Affected_Rows();
@@ -236,9 +236,9 @@ abstract class AssignmentsDAOBase extends DAO
 	{
 		if (is_null($Assignments->start_time)) $Assignments->start_time = '2000-01-01 06:00:00';
 		if (is_null($Assignments->finish_time)) $Assignments->finish_time = '2000-01-01 06:00:00';
-		$sql = "INSERT INTO Assignments ( `assignement_id`, `id_course`, `id_problemset`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Assignments ( `assignment_id`, `id_course`, `id_problemset`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
-			$Assignments->assignement_id,
+			$Assignments->assignment_id,
 			$Assignments->id_course,
 			$Assignments->id_problemset,
 			$Assignments->name,
@@ -253,7 +253,7 @@ abstract class AssignmentsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
-		$Assignments->assignement_id = $conn->Insert_ID();
+		$Assignments->assignment_id = $conn->Insert_ID();
 
 		return $ar;
 	}
@@ -295,12 +295,12 @@ abstract class AssignmentsDAOBase extends DAO
 	{
 		$sql = "SELECT * from Assignments WHERE (";
 		$val = array();
-		if( ( !is_null (($a = $AssignmentsA->assignement_id) ) ) & ( ! is_null ( ($b = $AssignmentsB->assignement_id) ) ) ){
-				$sql .= " `assignement_id` >= ? AND `assignement_id` <= ? AND";
+		if( ( !is_null (($a = $AssignmentsA->assignment_id) ) ) & ( ! is_null ( ($b = $AssignmentsB->assignment_id) ) ) ){
+				$sql .= " `assignment_id` >= ? AND `assignment_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `assignement_id` = ? AND";
+			$sql .= " `assignment_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}
@@ -423,9 +423,9 @@ abstract class AssignmentsDAOBase extends DAO
 	  **/
 	public static final function delete( $Assignments )
 	{
-		if( is_null( self::getByPK($Assignments->assignement_id) ) ) throw new Exception('Campo no encontrado.');
-		$sql = "DELETE FROM Assignments WHERE  assignement_id = ?;";
-		$params = array( $Assignments->assignement_id );
+		if( is_null( self::getByPK($Assignments->assignment_id) ) ) throw new Exception('Campo no encontrado.');
+		$sql = "DELETE FROM Assignments WHERE  assignment_id = ?;";
+		$params = array( $Assignments->assignment_id );
 		global $conn;
 
 		$conn->Execute($sql, $params);

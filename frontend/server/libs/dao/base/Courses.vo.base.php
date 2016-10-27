@@ -46,6 +46,9 @@ class Courses extends VO
 			if (isset($data['id_owner'])) {
 				$this->id_owner = $data['id_owner'];
 			}
+			if (isset($data['id_group'])) {
+				$this->id_group = $data['id_group'];
+			}
 			if (isset($data['id_admingroup'])) {
 				$this->id_admingroup = $data['id_admingroup'];
 			}
@@ -73,6 +76,7 @@ class Courses extends VO
 			"description" => $this->description,
 			"alias" => $this->alias,
 			"id_owner" => $this->id_owner,
+			"id_group" => $this->id_group,
 			"id_admingroup" => $this->id_admingroup,
 			"start_time" => $this->start_time,
 			"finish_time" => $this->finish_time
@@ -126,6 +130,13 @@ class Courses extends VO
 	  * @var int(11)
 	  */
 	public $id_owner;
+
+	/**
+	  *  [Campo no documentado]
+	  * @access public
+	  * @var int(11),
+	  */
+	public $id_group;
 
 	/**
 	  *  [Campo no documentado]
