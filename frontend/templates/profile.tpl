@@ -76,11 +76,10 @@
 	{/block}
 
 </div>
-{/if}
-
-<div id="username" style="display:none" data-username="{IF isset($smarty.get.username)}{$smarty.get.username|replace:"\\":""}{ELSE}{$CURRENT_USER_USERNAME}{/IF}">
-</div>
+<div id="username" style="display:none" data-username="{$profile.userinfo.username|replace:"\\":""}"></div>
 
 <script src="{version_hash src="/js/profile.js"}"></script>
+
+{/if}
 
 {include file='footer.tpl'}
