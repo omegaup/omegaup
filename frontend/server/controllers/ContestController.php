@@ -347,7 +347,7 @@ class ContestController extends Controller {
         $result['contestant_must_register'] = ($result['contestant_must_register'] == '1');
 
         if ($current_ses['valid'] && $result['contestant_must_register']) {
-            $registration = ContestUserRequestDAO::getByPK($current_ses['id'], $r['contest']->contest_id);
+            $registration = ContestUserRequestDAO::getByPK($current_ses['user']->user_id, $r['contest']->contest_id);
 
             $result['user_registration_requested'] = !is_null($registration);
 
