@@ -1,49 +1,56 @@
 <script type="text/javascript" src="{version_hash src="/js/omegaup/arena/contest_list.js"}"></script>
 <script type="text/html" id="contest-list">
-<div class="panel-heading">
-    <h2 class="panel-title" data-bind="text: header"></h2>
-</div>
-<table class="contest-list table table-striped table-hover">
-    <thead><tr>
-        <th>{#wordsContest#}</th>
-        <th>{#wordsDescription#}</th>
-        <th class="time" data-bind="visible: showTimes">{#wordsStartTime#}</th>
-        <th class="time" data-bind="visible: showTimes">{#wordsEndTime#}</th>
-        <th data-bind="visible: showTimes"></th>
-        <th data-bind="visible: showPractice">{#wordsPractice#}</th>
-    </tr></thead>
-    <tbody data-bind="foreach: page">
-        <tr>
-            <td><a data-bind="attr: { href: contestLink }">
-                <span data-bind="text: title"</span>
-                <span class="glyphicon glyphicon-ok" aria-hidden="true"
-                      data-bind="visible: recommended !== '0'"></span>
-            </a></td>
-            <td class="forcebreaks forcebreaks-arena"
-                data-bind="text: description"></td>
-            <td class="no-wrap" data-bind="visible: $parent.showTimes">
-                <a data-bind="attr: { href: startLink }, text: startText"></a>
-            </td>
-            <td class="no-wrap" data-bind="visible: $parent.showTimes">
-                <a data-bind="attr: { href: finishLink }, text: finishText"></a>
-            </td>
-            <td class="no-wrap" data-bind="visible: $parent.showTimes, text: duration"></td>
-            </td>
-            <td data-bind="visible: $parent.showPractice">
-                <a data-bind="attr: { href: '/arena/' + alias + '/practice/' }">
-                    <span>{#wordsPractice#}</span>
-                </a>
-            </td>
-        </tr>
-    </tbody>
-    <tfoot>
-        <tr data-bind="visible: hasNext || hasPrevious" align="center">
-            <td class="no-wrap" data-bind="attr: { colspan: pagerColumns }">
-                <a data-bind="visible: hasPrevious, click: previous">{#wordsPrevPage#}</a>
-                <span class="page-num" data-bind="text: pageNumber"></span>
-                <a data-bind="visible: hasNext, click: next">{#wordsNextPage#}</a>
-            </td>
-        </tr>
-    </tfoot>
-</table>
+<div class="panel">
+	<h4 data-bind="visible: recommended">{#arenaPageRecommendedContestsText#}</h4>
+	<div class="panel-body">
+		<table class="contest-list table table-striped table-hover">
+			<thead><tr>
+				<th class="col-md-6">{#wordsContest#}</th>
+				<th class="time col-md-2" data-bind="visible: showTimes">{#wordsStartTime#}</th>
+				<th class="time col-md-2" data-bind="visible: showTimes">{#wordsEndTime#}</th>
+				<th class="col-md-2" data-bind="visible: showTimes">{#wordsDuration#}</th>
+			</tr></thead>
+			<tbody data-bind="foreach: page">
+				<tr>
+					<td colspan="4">
+						<table class="contest-list table">
+							<tr>
+								<td class="col-md-6"><a data-bind="attr: { href: contestLink }">
+									<span data-bind="text: title"></span>
+									<span class="glyphicon glyphicon-ok" aria-hidden="true"
+										  data-bind="visible: recommended !== '0'"></span>
+								</a></td>
+								<td class="no-wrap col-md-2" data-bind="visible: $parent.showTimes">
+									<a data-bind="attr: { href: startLink }, text: startText"></a>
+								</td>
+								<td class="no-wrap col-md-2" data-bind="visible: $parent.showTimes">
+									<a data-bind="attr: { href: finishLink }, text: finishText"></a>
+								</td>
+								<td class="no-wrap col-md-2" data-bind="visible: $parent.showTimes, text: duration"></td>
+								<td class="col-md-2" data-bind="visible: $parent.showPractice">
+									<a data-bind="attr: { href: '/arena/' + alias + '/practice/' }">
+										<span>{#wordsPractice#}</span>
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="5" class="forcebreaks forcebreaks-arena"
+									data-bind="text: description"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr data-bind="visible: hasNext || hasPrevious" align="center">
+					<td class="no-wrap" data-bind="attr: { colspan: pagerColumns }">
+						<a data-bind="visible: hasPrevious, click: previous">{#wordsPrevPage#}</a>
+						<span class="page-num" data-bind="text: pageNumber"></span>
+						<a data-bind="visible: hasNext, click: next">{#wordsNextPage#}</a>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div> <!-- penl-body -->
+</div> <!-- panel -->
 </script>

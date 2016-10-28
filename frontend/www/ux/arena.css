@@ -647,3 +647,16 @@ td.forcebreaks-arena {
   margin-left: 1em;
   margin-right: 1em;
 }
+
+.contest-list tr:nth-child(2n+1) table{
+  background: #f9f9f9;
+  margin-bottom: 0;
+}
+
+.contest-list tr table tr td{
+  border: none;
+}
+
+.contest-list tr td table:hover{
+  background: #f5f5f5;
+}
