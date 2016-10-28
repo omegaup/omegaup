@@ -1764,6 +1764,10 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        if (is_null($contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+
         if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
@@ -1830,38 +1834,40 @@ class ContestController extends Controller {
     }
 
     public static function apiArbitrateRequest(Request $r) {
-        $result = array('status' => 'ok');
+        self::authenticateRequest($r);
+
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         if (is_null($r['resolution'])) {
             throw new InvalidParameterException('invalidParameters');
         }
 
-        // user must be admin of contest to arbitrate security
-        $current_ses = SessionController::getCurrentSession($r);
-
         try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
             throw new NotFoundException($e);
         }
 
-        if (is_null($r['contest'])) {
+        if (is_null($contest)) {
             throw new NotFoundException('contestNotFound');
         }
 
-        $r['target_user'] = UsersDAO::FindByUsername($r['username']);
+        if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+            throw new ForbiddenAccessException();
+        }
 
-        $request = ContestUserRequestDAO::getByPK($r['target_user']->user_id, $r['contest']->contest_id);
+        $targetUser = UsersDAO::FindByUsername($r['username']);
+
+        $request = ContestUserRequestDAO::getByPK($targetUser->user_id, $contest->contest_id);
 
         if (is_null($request)) {
             throw new InvalidParameterException('userNotInListOfRequests');
         }
 
-        if ($r['resolution'] === 'false') {
-            // "false" casts to true.
-            $resolution = false;
+        if (is_bool($r['resolution'])) {
+            $resolution = $r['resolution'];
         } else {
-            $resolution = (bool)$r['resolution'];
+            $resolution = $r['resolution'] === 'true';
         }
 
         $request->accepted = $resolution;
@@ -1875,15 +1881,15 @@ class ContestController extends Controller {
         $history->user_id = $request->user_id;
         $history->contest_id = $request->user_id;
         $history->time = $request->last_update;
-        $history->admin_id = $current_ses['user']->user_id;
+        $history->admin_id = $r['current_user_id'];
         $history->accepted = $request->accepted;
 
         ContestUserRequestHistoryDAO::save($history);
 
         self::$log->info('Arbitrated contest for user, new accepted user_id='
-                                . $r['target_user']->user_id . ', state=' . $resolution);
+                                . $targetUser->user_id . ', state=' . $resolution);
 
-        return $result;
+        return array('status' => 'ok');
     }
 
     /**
