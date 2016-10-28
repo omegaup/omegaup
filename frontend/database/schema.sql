@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `Problemset_Problems` (
 --
 
 CREATE TABLE IF NOT EXISTS `ACLs` (
-  `acl_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL AUTO_INCREMENT,
   `owner_id` int(11) NOT NULL COMMENT 'El usuario que creó el objeto y que tiene un rol de administrador implícito',
   PRIMARY KEY (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de control de acceso.';
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `Courses` (
   `alias` varchar(32) NOT NULL,
   `id_owner` int(11) NOT NULL,
   `id_group` int(11),
-  `id_admingroup` int(11),
+  `id_acl` int(11),
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
   PRIMARY KEY (`course_id`),
@@ -1041,7 +1041,8 @@ ALTER TABLE `Groups_Scoreboards_Contests`
 
 ALTER TABLE `Courses`
   ADD CONSTRAINT `fk_cu_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cg_group_id` FOREIGN KEY (`id_admingroup`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ca_id_acl` FOREIGN KEY (`id_acl`)
+    REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_cg_id_student_group` FOREIGN KEY (`id_group`)                               REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --

@@ -203,6 +203,7 @@ abstract class ACLsDAOBase extends DAO
 		$conn->Execute($sql, $params);
 		$ar = $conn->Affected_Rows();
 		if($ar == 0) return 0;
+		$ACLs->acl_id = $conn->Insert_ID();
 
 		return $ar;
 	}

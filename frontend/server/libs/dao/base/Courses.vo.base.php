@@ -49,8 +49,8 @@ class Courses extends VO
 			if (isset($data['id_group'])) {
 				$this->id_group = $data['id_group'];
 			}
-			if (isset($data['id_admingroup'])) {
-				$this->id_admingroup = $data['id_admingroup'];
+			if (isset($data['id_acl'])) {
+				$this->id_acl = $data['id_acl'];
 			}
 			if (isset($data['start_time'])) {
 				$this->start_time = $data['start_time'];
@@ -77,7 +77,7 @@ class Courses extends VO
 			"alias" => $this->alias,
 			"id_owner" => $this->id_owner,
 			"id_group" => $this->id_group,
-			"id_admingroup" => $this->id_admingroup,
+			"id_acl" => $this->id_acl,
 			"start_time" => $this->start_time,
 			"finish_time" => $this->finish_time
 		);
@@ -143,7 +143,7 @@ class Courses extends VO
 	  * @access public
 	  * @var int(11),
 	  */
-	public $id_admingroup;
+	public $id_acl;
 
 	/**
 	  * Hora de inicio de este curso

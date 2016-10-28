@@ -125,12 +125,16 @@ class CourseController extends Controller {
         GroupController::apiCreate($groupRequest);
         $group = GroupsDAO::FindByAlias($groupRequest['alias']);
 
+        $acl = new ACLs(array('owner_id' => $r['current_user_id']));
+        ACLsDAO::save($acl);
+
         // Create the actual course
         $course = new Courses($r);
         $course->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $course->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
         $course->id_owner = $r['current_user_id'];
-        $course->id_admingroup = $group->group_id;
+        $course->id_group = $group->group_id;
+        $course->id_acl = $acl->acl_id;
 
         $course_id = -1;
         try {
