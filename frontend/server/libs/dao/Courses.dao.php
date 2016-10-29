@@ -98,7 +98,7 @@ class CoursesDAO extends CoursesDAOBase
     public static function getStudentsForCourseWithProgress($courseAlias, $courseId) {
         global  $conn;
 
-        $sql = 'SELECT u.user_id, u.username, u.name, u.country_id
+        $sql = 'SELECT u.username, u.name, u.country_id
                 FROM Groups g
                 INNER JOIN Groups_Users gu
                 ON g.alias = ? AND g.group_id = gu.group_id

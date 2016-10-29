@@ -19,7 +19,7 @@ class CourseStudentListTest extends OmegaupTestCase {
             $students[$i] = CoursesFactory::addStudentToCourse($courseData);
         }
 
-        // Call apiStudentList from admin
+        // Call apiStudentList by an admin
         $response = CourseController::apiListStudents(new Request(array(
             'auth_token' => self::login($courseData['user'] /*admin*/),
             'course_alias' => $courseData['course_alias']
@@ -32,13 +32,13 @@ class CourseStudentListTest extends OmegaupTestCase {
     }
 
     /**
-     * List can only be retreived from admin
+     * List can only be retreived by an admin
      * @expectedException ForbiddenAccessException
      */
     public function testCourseStudentListNonAdmin() {
         $courseData = CoursesFactory::createCourse();
 
-        // Call apiStudentList from other random user
+        // Call apiStudentList by another random user
         $response = CourseController::apiListStudents(new Request(array(
             'auth_token' => self::login(UserFactory::createUser()),
             'course_alias' => $courseData['course_alias']
@@ -50,9 +50,7 @@ class CourseStudentListTest extends OmegaupTestCase {
      * @expectedException InvalidParameterException
      */
     public function testCourseStudentListInvalidCourse() {
-        $courseData = CoursesFactory::createCourse();
-
-        // Call apiStudentList from other random user
+        // Call apiStudentList by another random user
         $response = CourseController::apiListStudents(new Request(array(
             'auth_token' => self::login(UserFactory::createUser()),
             'course_alias' => 'foo'
