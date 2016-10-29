@@ -262,6 +262,26 @@ class RunsDAO extends RunsDAOBase {
         return $conn->GetOne($sql, $val);
     }
 
+    /**
+     * Get the count of runs of a problem in a given contest
+     *
+     * @param string  $problem_id
+     * @param string  $contest_id
+     * @param boolean $showAllRuns [TRUE to include test runs]
+     */
+    final public static function CountTotalRunsOfProblemInContest($problem_id, $contest_id, $showAllRuns = false) {
+        // Build SQL statement.
+        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND contest_id = ?';
+        $val = array($problem_id, $contest_id);
+
+        if (!$showAllRuns) {
+            $sql .= ' AND test = 0';
+        }
+
+        global $conn;
+        return $conn->GetOne($sql, $val);
+    }
+
     /*
 	 * Gets the count of total runs sent to a given contest by verdict
 	 */
