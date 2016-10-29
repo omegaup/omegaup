@@ -130,10 +130,10 @@ CREATE TABLE IF NOT EXISTS `Problemset_Problems` (
 --
 
 CREATE TABLE IF NOT EXISTS `ACLs` (
-  `acl_id` int(11) NOT NULL,
+  `acl_id` int(11) NOT NULL AUTO_INCREMENT,
   `owner_id` int(11) NOT NULL COMMENT 'El usuario que creó el objeto y que tiene un rol de administrador implícito',
   PRIMARY KEY (`acl_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de control de acceso.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de control de acceso.' AUTO_INCREMENT = 65536;
 
 -- --------------------------------------------------------
 
@@ -202,7 +202,8 @@ CREATE TABLE IF NOT EXISTS `Courses` (
   `description` tinytext NOT NULL,
   `alias` varchar(32) NOT NULL,
   `id_owner` int(11) NOT NULL,
-  `id_admingroup` int(11),
+  `id_group` int(11),
+  `id_acl` int(11),
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
   PRIMARY KEY (`course_id`),
@@ -785,7 +786,7 @@ CREATE TABLE IF NOT EXISTS `Run_Counts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda la cantidad de runs que se han realizado hasta la fecha.';
 
 CREATE TABLE `Assignments` (
-  `assignement_id` int(11) NOT NULL AUTO_INCREMENT,
+  `assignment_id` int(11) NOT NULL AUTO_INCREMENT,
   `id_course` int(11) NOT NULL,
   `id_problemset` int(11),
   `name` varchar(100) NOT NULL,
@@ -795,7 +796,8 @@ CREATE TABLE `Assignments` (
   `assignment_type` enum('homework', 'test') NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' ,
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
-  PRIMARY KEY (`assignement_id`)
+  PRIMARY KEY (`assignment_id`),
+  UNIQUE KEY `assignment_alias` (`id_course`, `alias`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un alumno resuelve assignments durante su curso, por ahora pueden ser examenes o tareas';
 
 --
@@ -1039,7 +1041,9 @@ ALTER TABLE `Groups_Scoreboards_Contests`
 
 ALTER TABLE `Courses`
   ADD CONSTRAINT `fk_cu_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_cg_group_id` FOREIGN KEY (`id_admingroup`) REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_ca_id_acl` FOREIGN KEY (`id_acl`)
+    REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_cg_id_student_group` FOREIGN KEY (`id_group`)                               REFERENCES `Groups` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Update AC Count on grade

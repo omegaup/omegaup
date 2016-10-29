@@ -69,6 +69,7 @@ class ACLs extends VO
 	/**
 	  *  [Campo no documentado]
 	  * Llave Primaria
+	  * Auto Incremento
 	  * @access public
 	  * @var int(11)
 	  */

@@ -31,8 +31,8 @@ class Assignments extends VO
 			if (is_string($data))
 				$data = self::object_to_array(json_decode($data));
 
-			if (isset($data['assignement_id'])) {
-				$this->assignement_id = $data['assignement_id'];
+			if (isset($data['assignment_id'])) {
+				$this->assignment_id = $data['assignment_id'];
 			}
 			if (isset($data['id_course'])) {
 				$this->id_course = $data['id_course'];
@@ -74,7 +74,7 @@ class Assignments extends VO
 	public function __toString( )
 	{
 		$vec = array(
-			"assignement_id" => $this->assignement_id,
+			"assignment_id" => $this->assignment_id,
 			"id_course" => $this->id_course,
 			"id_problemset" => $this->id_problemset,
 			"name" => $this->name,
@@ -105,7 +105,7 @@ class Assignments extends VO
 	  * @access public
 	  * @var int(11)
 	  */
-	public $assignement_id;
+	public $assignment_id;
 
 	/**
 	  *  [Campo no documentado]
