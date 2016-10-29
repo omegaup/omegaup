@@ -1,5 +1,6 @@
 ALTER TABLE `ACLs`
-  CHANGE COLUMN `acl_id` `acl_id` int(11) NOT NULL AUTO_INCREMENT;
+  AUTO_INCREMENT = 65536,
+  CHANGE COLUMN `acl_id` `acl_id` int(11) NOT NULL;
 
 ALTER TABLE `Courses`
   ADD COLUMN `id_group` int(11);

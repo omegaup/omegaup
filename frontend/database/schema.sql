@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `ACLs` (
   `acl_id` int(11) NOT NULL AUTO_INCREMENT,
   `owner_id` int(11) NOT NULL COMMENT 'El usuario que creó el objeto y que tiene un rol de administrador implícito',
   PRIMARY KEY (`acl_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de control de acceso.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de control de acceso.' AUTO_INCREMENT = 65536;
 
 -- --------------------------------------------------------
 
