@@ -312,7 +312,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $students = array();
+        $students = null;
         try {
             $students = CoursesDAO::getStudentsForCourseWithProgress($r['course']->alias, $r['course']->course_id);
         } catch (Exception $e) {
