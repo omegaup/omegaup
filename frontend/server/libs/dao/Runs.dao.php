@@ -267,7 +267,6 @@ class RunsDAO extends RunsDAOBase {
      *
      * @param string  $problem_id
      * @param string  $contest_id
-     * @param boolean $showAllRuns [TRUE to include test runs]
      */
     final public static function CountTotalRunsOfProblemInContest($problem_id, $contest_id) {
         // Build SQL statement.
