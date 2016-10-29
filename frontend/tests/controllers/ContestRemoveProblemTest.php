@@ -295,7 +295,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
     /**
      * Removes a problem with runs only from admins from a private contest
-     * while loged in with a user that is sysadmin.
+     * while logged in with a user that is sysadmin.
      */
     public function testRemoveProblemWithAdminRunsFromContestBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
