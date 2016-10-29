@@ -89,6 +89,12 @@ class CoursesDAO extends CoursesDAOBase
         return $courses;
     }
 
+    /**
+     * Returns a list of students within a course
+     * @param  string $courseAlias
+     * @param  int $courseId
+     * @return Array              Students data
+     */
     public static function getStudentsForCourseWithProgress($courseAlias, $courseId) {
         global  $conn;
 
