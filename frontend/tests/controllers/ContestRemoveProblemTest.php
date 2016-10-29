@@ -410,7 +410,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
     /**
      * Removes a problem with runs made outside and inside the contest from a private contest
-     * while loged in as Contest Admin. Should fail.
+     * while logged in as Contest Admin. Should fail.
      *
      * @expectedException ForbiddenAccessException
      */
@@ -433,7 +433,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
     /**
      * Removes a problem with runs only from admins from a private contest
-     * while loged in with a user that is not sysadmin.
+     * while logged in with a user that is not sysadmin.
      */
     public function testRemoveProblemWithMixedRunsFromContestBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(null, 0 /* private */);

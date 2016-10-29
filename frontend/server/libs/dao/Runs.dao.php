@@ -269,14 +269,10 @@ class RunsDAO extends RunsDAOBase {
      * @param string  $contest_id
      * @param boolean $showAllRuns [TRUE to include test runs]
      */
-    final public static function CountTotalRunsOfProblemInContest($problem_id, $contest_id, $showAllRuns = false) {
+    final public static function CountTotalRunsOfProblemInContest($problem_id, $contest_id) {
         // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND contest_id = ?';
+        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND contest_id = ? AND test = 0';
         $val = array($problem_id, $contest_id);
-
-        if (!$showAllRuns) {
-            $sql .= ' AND test = 0';
-        }
 
         global $conn;
         return $conn->GetOne($sql, $val);
