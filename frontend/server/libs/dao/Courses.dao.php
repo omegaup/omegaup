@@ -88,4 +88,39 @@ class CoursesDAO extends CoursesDAOBase
         }
         return $courses;
     }
+
+    public static function getStudentsForCourseWithProgress($courseAlias, $courseId) {
+        global  $conn;
+
+        $sql = 'SELECT u.user_id, u.username, u.name, u.country_id
+                FROM Groups g
+                INNER JOIN Groups_Users gu
+                ON g.alias = ? AND g.group_id = gu.group_id
+                INNER JOIN Users u
+                ON u.user_id = gu.user_id
+               ';
+
+                /*
+                @TODO: Jalar el progreso del estudiante con esta hermosa consulta y pasar $courseId como parametro.
+                        Runs necesita soportar Problemsets.
+                INNER JOIN (
+                    SELECT a.assignment_id, a.name, p.problem_id, p.alias, p.name, max(r.score) as best_score
+                    FROM Courses c
+                    INNER JOIN Assignments a ON c.course_id = ? AND c.course_id = a.id_course
+                    INNER JOIN Problemsets ps ON a.id_problemset = ps.problemset_id
+                    INNER JOIN Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+                    INNER JOIN Problems p ON p.problem_id = psp.problemset_id
+                    INNER JOIN Runs r ON r.problem_id = p.problem_id AND r.contest_id (!!!)
+                    GROUP BY a.assignment_id, a.name, p.problem_id, p.alias, p.name
+                ) pr
+                ON pr.user_id = u.user_id
+                */
+
+        $rs = $conn->Execute($sql, $courseAlias);
+        $users = array();
+        foreach ($rs as $row) {
+            array_push($users, $row);
+        }
+        return $users;
+    }
 }

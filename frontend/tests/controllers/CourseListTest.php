@@ -13,14 +13,9 @@ class CourseListTest extends OmegaupTestCase {
         );
         $this->admin_user = $courseData['user'];
         $this->course_alias = $courseData['course_alias'];
-
         $this->other_user = UserFactory::createUser();
-        // TODO(pablo): Fix this when course and groups are related by an id.
-        GroupController::apiAddUser(new Request(array(
-            'auth_token' => self::login($this->admin_user),
-            'usernameOrEmail' => $this->other_user->username,
-            'group_alias' => $this->course_alias
-        )));
+
+        CoursesFactory::addStudentToCourse($courseData, $this->other_user);
     }
 
     protected $admin_user;
