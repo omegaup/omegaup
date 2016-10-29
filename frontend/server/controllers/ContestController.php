@@ -1152,7 +1152,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        // Can't remove problem from contest if it already has runs within the contest
+        // Disallow removing problem from contest if it already has runs within the contest
         if (RunsDAO::CountTotalRunsOfProblemInContest($problem->problem_id, $contest->contest_id) > 0 &&
             !Authorization::IsSystemAdmin($r['current_user_id'])) {
             throw new ForbiddenAccessException('cannotRemoveProblem');
