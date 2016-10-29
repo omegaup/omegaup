@@ -182,8 +182,7 @@ def verify_toolchain(binaries):
   for path, install_cmd in binaries.items():
     if not os.path.isfile(path):
       print('%s%s not found.%s ' 'Please run `%s` to install.' %
-          (git_tools.COLORS.FAIL, path, git_tools.COLORS.NORMAL,
-           install_cmd), file=sys.stderr)
+          (COLORS.FAIL, path, COLORS.NORMAL, install_cmd), file=sys.stderr)
       success = False
   return success
 
