@@ -28,6 +28,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
   self.showTimes = actualUiParams.showTimes;
   self.showPractice = actualUiParams.showPractice;
   self.contests = ko.observableArray([]);
+  self.recommended = (actualApiParams.recommended != 'NOT_RECOMMENDED');
 
   // Pagination.
   self.pageNumber = ko.observable(1);
