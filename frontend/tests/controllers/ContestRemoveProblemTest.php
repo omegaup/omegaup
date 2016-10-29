@@ -385,7 +385,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
     /**
      * Removes a problem with runs made outside the contest from a private contest
-     * while loged in as Contest Admin
+     * while logged in as Contest Admin
      *
      */
     public function testRemoveProblemWithRunsOutsideContestFromPrivateContest() {
