@@ -20,8 +20,11 @@
 
 					<div class="form-group col-md-6">
 						<label for="alias">{#courseNewFormShortTitle_alias_#}</label>
-						<span data-toggle="tooltip" data-placement="top" title="{#courseAssignmentNewFormShortTitle_alias_Desc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-						<input id='alias' name='alias' value='' type='text' class="form-control" {IF $IS_ASSIGNMENT_UPDATE eq 1} disabled="true" {/if}>
+						<span data-toggle="tooltip" data-placement="top"
+							  title="{#courseAssignmentNewFormShortTitle_alias_Desc#}"
+							  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+						<input id='alias' name='alias' value='' type='text' class="form-control"
+							{IF $IS_ASSIGNMENT_UPDATE eq 1} disabled="true" {/IF}>
 					</div>
 				</div>
 
@@ -29,19 +32,26 @@
 					<div class="col-md-6">
 						<div class="form-group col-md-6">
 							<label for="start_time">{#courseNewFormStartDate#}</label>
-							<span data-toggle="tooltip" data-placement="top" title="{#courseAssignmentNewFormStartDateDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+							<span data-toggle="tooltip" data-placement="top"
+								  title="{#courseAssignmentNewFormStartDateDesc#}"
+								  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 							<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
 						</div>
 
 						<div class="form-group col-md-6">
 							<label for="finish_time">{#courseNewFormEndDate#}</label>
-							<span data-toggle="tooltip" data-placement="top" title="{#courseAssignmentNewFormEndDateDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+							<span data-toggle="tooltip" data-placement="top"
+								  title="{#courseAssignmentNewFormEndDateDesc#}"
+								  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 							<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
 						</div>
 					</div>
+
 					<div class="form-group col-md-6">
 						<label for="assignment_type">{#courseAssignmentNewFormType#}</label>
-						<span data-toggle="tooltip" data-placement="top" title="{#courseAssignmentNewFormTypeDesc#}"  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+						<span data-toggle="tooltip" data-placement="top"
+							  title="{#courseAssignmentNewFormTypeDesc#}"
+							  class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
 						<select name='assignment_type' id='assignment_type' class="form-control">
 							<option value='homework'>{#wordsHomework#}</option>
 							<option value='test'>{#wordsTest#}</option>
@@ -60,7 +70,7 @@
 				{if $IS_ASSIGNMENT_UPDATE eq 1}
 					<button type='submit' class="btn btn-primary">{#courseAssignmentNewFormUpdate#}</button>
 				{else}
-					<button type='submit' class="btn btn-primary">{#courseAssignmentNewFormSchedule#}</button>
+					<button id="schedule-new-assigment" type='submit' class="btn btn-primary">{#courseAssignmentNewFormSchedule#}</button>
 				{/if}
 				</div>
 		</form>
