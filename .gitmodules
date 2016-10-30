@@ -39,3 +39,6 @@
 	path = frontend/server/libs/third_party/phpmailer
 	url = https://github.com/PHPMailer/PHPMailer.git
 	shallow = true
+[submodule "q2a"]
+	path = frontend/www/preguntas
+	url = https://github.com/omegaup/question2answer.git

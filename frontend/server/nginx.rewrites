@@ -2,6 +2,15 @@ location /api/ {
     rewrite ^/api/(.*)$ /api/ApiEntryPoint.php last;
 }
 
+location /preguntas/ {
+    index index.php
+    autoindex off;
+    rewrite ^(.*)//(.*)$ /$1/$2 redirect;
+    if (!-e $request_filename) {
+        rewrite ^/preguntas/(.+)$ /preguntas/?qa-rewrite=$1&$query_string last;
+    }
+}
+
 rewrite ^/login/?$ /login.php last;
 rewrite ^/login/password/reset/?$ /loginpasswordreset.php last;
 rewrite ^/login/password/recover/?$ /loginpasswordrecover.php last;
