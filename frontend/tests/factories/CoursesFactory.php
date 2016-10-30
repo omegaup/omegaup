@@ -91,4 +91,25 @@ class CoursesFactory {
             'course_alias' => $courseAlias
         );
     }
+
+    /**
+     * Add a Student to a course
+     * @param Array $courseData [from self::createCourse]
+     * @param Users $student
+     */
+    public static function addStudentToCourse($courseData, $student = null) {
+        // TODO(pablo & joe): Fix this when course and groups are related by an id.
+        if (is_null($student)) {
+            $student = UserFactory::createUser();
+        }
+
+        $userLogin = OmegaupTestCase::login($courseData['user']);
+        GroupController::apiAddUser(new Request(array(
+            'auth_token' => $userLogin->auth_token,
+            'usernameOrEmail' => $student->username,
+            'group_alias' => $courseData['course_alias']
+        )));
+
+        return $student;
+    }
 }

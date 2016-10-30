@@ -15,7 +15,6 @@ class CourseController extends Controller {
 
         Validators::isStringNonEmpty($r['name'], 'name', $is_required);
         Validators::isStringNonEmpty($r['description'], 'description', $is_required);
-        Validators::isStringNonEmpty($r['course_alias'], 'course_alias', $is_required);
         self::validateCourseExists($r);
 
         Validators::isNumber($r['start_time'], 'start_time', $is_required);
@@ -84,6 +83,7 @@ class CourseController extends Controller {
      * @throws InvalidParameterException
      */
     private static function validateCourseExists(Request $r) {
+        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
         $courses = null;
         try {
             $courses = CoursesDAO::search(new Courses(array(
@@ -218,7 +218,6 @@ class CourseController extends Controller {
      */
     public static function apiListAssignments(Request $r) {
         self::authenticateRequest($r);
-        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
         self::validateCourseExists($r);
 
         $assignments = array();
@@ -301,6 +300,33 @@ class CourseController extends Controller {
             $response['student'][] = CourseController::convertCourseToArray($course);
         }
         return $response;
+    }
+
+    /**
+     * List students in a course
+     *
+     * @param  Request $r
+     * @return Array response
+     */
+    public static function apiListStudents(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCourseExists($r);
+
+        if (!Authorization::IsCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $students = null;
+        try {
+            $students = CoursesDAO::getStudentsForCourseWithProgress($r['course']->alias, $r['course']->course_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array(
+            'students' => $students,
+            'status' => 'ok'
+            );
     }
 
     /**
