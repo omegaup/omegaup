@@ -30,6 +30,7 @@
 			<th></th>
 			<th></th>
 			<th></th>
+			<th></th>
 		</thead>
 		<tbody>
 		</tbody>
