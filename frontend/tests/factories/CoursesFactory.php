@@ -103,8 +103,9 @@ class CoursesFactory {
             $student = UserFactory::createUser();
         }
 
+        $userLogin = OmegaupTestCase::login($courseData['user']);
         GroupController::apiAddUser(new Request(array(
-            'auth_token' => OmegaupTestCase::login($courseData['user']),
+            'auth_token' => $userLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'group_alias' => $courseData['course_alias']
         )));
