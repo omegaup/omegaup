@@ -54,6 +54,9 @@
                 '<td><a class="glyphicon glyphicon-stats" href="/contest/' +
                 contests.results[i].alias + '/stats/" title="' +
                 omegaup.T['profileStatistics'] + '"></a></td>' +
+                '<td><a class="glyphicon glyphicon-time" href="/contest/' +
+                contests.results[i].alias + '/activity/" title="' +
+                omegaup.T['contestActivityReport'] + '"></a></td>' +
                 '<td><a class="glyphicon glyphicon-print" href="/arena/' +
                 contests.results[i].alias + '/print/" title="' +
                 omegaup.T['contestPrintableVersion'] + '"></a></td>' +

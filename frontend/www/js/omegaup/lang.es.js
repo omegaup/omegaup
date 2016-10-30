@@ -41,6 +41,7 @@ omegaup.T = {
 	codersOfTheMonth: "Coders del Mes",
 	codersOfTheMonthDate: "Fecha",
 	codersOfTheMonthUser: "Usuario",
+	contestActivityReport: "Reporte de actividades",
 	contestAddgroupAddGroup: "Agregar grupo",
 	contestAddproblemContestOrder: "Orden en el concurso",
 	contestAddproblemProblemName: "Problema",

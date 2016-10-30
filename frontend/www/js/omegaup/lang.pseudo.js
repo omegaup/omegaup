@@ -41,6 +41,7 @@ omegaup.T = {
 	codersOfTheMonth: "(C0d3r5 0f 7h3 M0n7h)",
 	codersOfTheMonthDate: "(Da73)",
 	codersOfTheMonthUser: "(U53rnam3)",
+	contestActivityReport: "(Ac7ivi7y r3p0r7)",
 	contestAddgroupAddGroup: "(Add gr0up)",
 	contestAddproblemContestOrder: "(C0n7357 0rd3r)",
 	contestAddproblemProblemName: "(Pr0b13m)",

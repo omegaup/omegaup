@@ -337,6 +337,23 @@ omegaup.API = {
         });
   },
 
+  getContestActivityReport: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/contest/activityReport/',
+      data: params,
+      dataType: 'json',
+    }),
+    function(result) {
+      for (var idx in result.events) {
+        if (!result.events.isOwnProperty(idx))
+          continue;
+        var ev = result.events[idx];
+        ev.time = omegaup.OmegaUp.time(time * 1000);
+      }
+      return result;
+    });
+  },
+
   getContestByToken: function(alias, token, callback) {
     $.get('/api/contest/details/contest_alias/' + encodeURIComponent(alias) +
               '/token/' + encodeURIComponent(token) + '/',
