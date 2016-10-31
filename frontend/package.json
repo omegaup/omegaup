@@ -1,0 +1,13 @@
+{
+  "name": "omegaup_frontend",
+  "version": "1.0.0",
+  "description": "omegaup frontend",
+  "license": "BSD",
+  "private": true,
+  "devDependencies": {
+    "jasmine": "^2.5.2"
+  },
+  "scripts": {
+    "test": "jasmine"
+  }
+}
