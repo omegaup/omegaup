@@ -1,3 +1,5 @@
+require('./ui.js');
+
 describe('omegaup.ui', function() {
   describe('formatString', function() {
     it('Should handle strings without replacements', function() {
