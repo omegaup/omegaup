@@ -1,3 +1,7 @@
+'use strict';
+require('../omegaup.js')
+require('./arena.js')
+
 describe('omegaup.arena', function() {
   describe('FormatDelta', function() {
     it('Should handle zeroes', function() {

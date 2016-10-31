@@ -1,3 +1,8 @@
+'use strict';
+require('../omegaup.js')
+require('./arena.js')
+require('./admin_arena.js')
+
 describe('omegaup.arena', function() {
   describe('ArenaAdmin', function() {
     beforeAll(function() {
