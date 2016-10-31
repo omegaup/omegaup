@@ -1,6 +1,6 @@
-var omegaup = typeof global === 'undefined'
-  ? window.omegaup = window.omegaup || {}
-  : global.omegaup = global.omegaup || {};
+var omegaup = typeof global === 'undefined' ?
+  window.omegaup = window.omegaup || {} :
+  global.omegaup = global.omegaup || {};
   
 omegaup.UI = {
   navigateTo: function(url) { window.location = url; },
