@@ -8,6 +8,6 @@
     "jasmine": "^2.5.2"
   },
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine JASMINE_CONFIG_PATH=www/tests/jasmine.json"
   }
 }
