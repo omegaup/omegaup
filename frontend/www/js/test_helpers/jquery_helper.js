@@ -8,5 +8,6 @@
 
     var jQuery = require('jquery')(window);
     global.jQuery = global.$ = jQuery;
+    global.omegaup = global.omegaup || {};
   }
 })();
