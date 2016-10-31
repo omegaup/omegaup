@@ -4,10 +4,12 @@ var omegaup = typeof global === 'undefined' ?
 
 omegaup.UI = {
   navigateTo: function(url) { window.location = url; },
+
   escape: function(s) {
     if (typeof s !== 'string') return '';
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   },
+
   formatString: function(template, values) {
     for (var key in values) {
       if (!values.hasOwnProperty(key)) continue;
@@ -16,32 +18,41 @@ omegaup.UI = {
     }
     return template;
   },
+
   displayStatus: function(message, type) {
     if ($('#status .message').length == 0) {
       console.error('Showing warning but there is no status div');
     }
+
     $('#status .message').html(message);
     $('#status')
         .removeClass('alert-success alert-info alert-warning alert-danger')
         .addClass(type)
         .slideDown();
   },
+
   error: function(message) {
     omegaup.UI.displayStatus(message, 'alert-danger');
   },
+
   info: function(message) { omegaup.UI.displayStatus(message, 'alert-info'); },
+
   success: function(message) {
     omegaup.UI.displayStatus(message, 'alert-success');
   },
+
   warning: function(message) {
     omegaup.UI.displayStatus(message, 'alert-warning');
   },
+
   dismissNotifications: function() { $('#status')
-                                        .slideUp(); },
+                                         .slideUp(); },
+
   bulkOperation: function(operation, onOperationFinished) {
     var isStopExecuted = false;
     var success = true;
     var error = null;
+
     handleResponseCallback = function(data) {
       if (data.status !== 'ok') {
         success = false;
@@ -54,6 +65,7 @@ omegaup.UI = {
             operation(this.id, handleResponseCallback);
           }
         });
+
     // Wait for all
     $(document)
         .ajaxStop(function() {
@@ -63,7 +75,9 @@ omegaup.UI = {
             // async calls that would fire ajaxStop event
             isStopExecuted = true;
             $(document).off('ajaxStop');
+
             onOperationFinished();
+
             if (success === false) {
               omegaup.UI.error('Error actualizando items: ' + error);
             } else {
@@ -72,9 +86,11 @@ omegaup.UI = {
           }
         });
   },
+
   prettyPrintJSON: function(json) {
     return omegaup.UI.syntaxHighlight(JSON.stringify(json, undefined, 4) || '');
   },
+
   syntaxHighlight: function(json) {
     var jsonRE =
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g;
@@ -96,6 +112,7 @@ omegaup.UI = {
       return '<span class="' + cls + '">' + match + '</span>';
     });
   },
+
   typeaheadWrapper: function(f) {
     var lastRequest = null;
     var pending = false;
@@ -124,9 +141,11 @@ omegaup.UI = {
     }
     return wrappedCall;
   },
+
   getProfileLink: function(username) {
     return '<a href="/profile/' + username + '" >' + username + '</a>';
   },
+
   // From
   // http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
   toHHMM: function(duration) {
@@ -134,33 +153,39 @@ omegaup.UI = {
     var hours = Math.floor(sec_num / 3600);
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
     if (minutes < 10) {
       minutes = '0' + minutes;
     }
     if (seconds < 10) {
       seconds = '0' + seconds;
     }
+
     var time = hours + 'h ' + minutes + 'm';
     return time;
   },
+
   getFlag: function(country) {
     if (!country) {
       return '';
     }
     return ' <img src="/media/flags/' + country.toLowerCase() +
-          '.png" width="16" height="11" title="' + country + '" />';
+           '.png" width="16" height="11" title="' + country + '" />';
   },
+
   formatDateTime: function(date) {
     return date.format('{MM}/{dd}/{yyyy} {HH}:{mm}');
   },
+
   formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); }
 };
+
 $(document)
-  .ajaxError(function(e, xhr, settings, exception) {
-    try {
-      var response = jQuery.parseJSON(xhr.responseText);
-      console.error(settings.url, xhr.status, response.error, response);
-    } catch (e) {
-      console.error(settings.url, xhr.status, xhr.responseText);
-    }
-  });
+    .ajaxError(function(e, xhr, settings, exception) {
+      try {
+        var response = jQuery.parseJSON(xhr.responseText);
+        console.error(settings.url, xhr.status, response.error, response);
+      } catch (e) {
+        console.error(settings.url, xhr.status, xhr.responseText);
+      }
+    });
