@@ -1,3 +1,7 @@
+var omegaup = typeof window === 'undefined'
+  ? global.omegaup = global.omegaup || {}
+  : window.omegaup = window.omegaup || {};
+
 omegaup.arena = omegaup.arena || {};
 
 omegaup.arena.FormatDelta = function(delta) {

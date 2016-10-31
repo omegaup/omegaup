@@ -1,4 +1,6 @@
-var omegaup = omegaup || {};
+var omegaup = typeof window === 'undefined'
+  ? global.omegaup = global.omegaup || {}
+  : window.omegaup = window.omegaup || {};
 
 omegaup.OmegaUp = {
   loggedIn: false,
