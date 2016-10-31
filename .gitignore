@@ -77,3 +77,6 @@ frontend/www/templates/
 
 #ignore sublime sftp config
 sftp-config.json
+
+#ignore node modules folder
+node_modules
