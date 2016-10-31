@@ -1,6 +1,6 @@
 'use strict';
-require('../omegaup.js')
-require('./arena.js')
+require('../omegaup.js');
+require('./arena.js');
 
 describe('omegaup.arena', function() {
   describe('FormatDelta', function() {
@@ -17,7 +17,7 @@ describe('omegaup.arena', function() {
   describe('GetOptionsFromLocation', function() {
     it('Should detect normal contests', function() {
       var options = omegaup.arena.GetOptionsFromLocation(
-          new URL('http://localhost/arena/test/'));
+          new window.URL('http://localhost/arena/test/'));
       expect(options.contestAlias).toEqual('test');
       expect(options.isPractice).toEqual(false);
       expect(options.isOnlyProblem).toEqual(false);
@@ -28,14 +28,14 @@ describe('omegaup.arena', function() {
 
     it('Should detect practice mode', function() {
       var options = omegaup.arena.GetOptionsFromLocation(
-          new URL('http://localhost/arena/test/practice'));
+          new window.URL('http://localhost/arena/test/practice'));
       expect(options.contestAlias).toEqual('test');
       expect(options.isPractice).toEqual(true);
     });
 
     it('Should detect only problems', function() {
       var options = omegaup.arena.GetOptionsFromLocation(
-          new URL('http://localhost/arena/problem/test/'));
+          new window.URL('http://localhost/arena/problem/test/'));
       expect(options.contestAlias).toEqual(null);
       expect(options.onlyProblemAlias).toEqual('test');
       expect(options.isOnlyProblem).toEqual(true);
@@ -43,7 +43,7 @@ describe('omegaup.arena', function() {
 
     it('Should detect ws=off', function() {
       var options = omegaup.arena.GetOptionsFromLocation(
-          new URL('http://localhost/arena/test/?ws=off'));
+          new window.URL('http://localhost/arena/test/?ws=off'));
       expect(options.disableSockets).toEqual(true);
     });
   });

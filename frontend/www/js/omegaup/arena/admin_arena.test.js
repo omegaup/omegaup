@@ -1,7 +1,8 @@
 'use strict';
-require('../omegaup.js')
-require('./arena.js')
-require('./admin_arena.js')
+require('../omegaup.js');
+require('../api.js');
+require('./arena.js');
+require('./admin_arena.js');
 
 describe('omegaup.arena', function() {
   describe('ArenaAdmin', function() {
