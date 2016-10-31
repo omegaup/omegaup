@@ -26,7 +26,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
 }
 
 if (isset($_GET['state'])) {
-    $c_Session->LoginViaFacebook();
+    $response = $c_Session->LoginViaFacebook();
     $triedToLogin = true;
 }
 
