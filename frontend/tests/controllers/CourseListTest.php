@@ -11,7 +11,7 @@ class CourseListTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
             ['homework' => 3, 'test' => 2]
         );
-        $this->admin_user = $courseData['user'];
+        $this->admin_user = $courseData['admin'];
         $this->course_alias = $courseData['course_alias'];
         $this->other_user = UserFactory::createUser();
 
@@ -25,8 +25,9 @@ class CourseListTest extends OmegaupTestCase {
 
     public function testGetCourseForAdminUser() {
         // Call the details API
+        $adminLogin = self::login($this->admin_user);
         $response = CourseController::apiListCourses(new Request(array(
-            'auth_token' => self::login($this->admin_user),
+            'auth_token' => $adminLogin->auth_token,
         )));
 
         $this->assertEquals('ok', $response['status']);
@@ -45,8 +46,9 @@ class CourseListTest extends OmegaupTestCase {
     }
 
     public function testGetCourseListForNormalUser() {
+        $otherUserLogin = self::login($this->other_user);
         $response = CourseController::apiListCourses(new Request(array(
-            'auth_token' => self::login($this->other_user),
+            'auth_token' => $otherUserLogin->auth_token,
         )));
 
         $this->assertEquals('ok', $response['status']);

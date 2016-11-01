@@ -20,8 +20,9 @@ class CourseStudentListTest extends OmegaupTestCase {
         }
 
         // Call apiStudentList by an admin
+        $adminLogin = self::login($courseData['admin']);
         $response = CourseController::apiListStudents(new Request(array(
-            'auth_token' => self::login($courseData['user'] /*admin*/),
+            'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         )));
 

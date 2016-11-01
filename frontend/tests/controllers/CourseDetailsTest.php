@@ -11,8 +11,9 @@ class CourseDetailsTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 
         // Call the details API
+        $adminLogin = self::login($courseData['admin']);
         $response = CourseController::apiDetails(new Request(array(
-            'auth_token' => self::login($courseData['user']),
+            'auth_token' => $adminLogin->auth_token,
             'alias' => $courseData['course_alias']
         )));
 
@@ -41,8 +42,9 @@ class CourseDetailsTest extends OmegaupTestCase {
     public function testGetCourseDetailsNormalUser() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
         $user = UserFactory::createUser();
+        $userLogin = self::login($user);
         $response = CourseController::apiDetails(new Request(array(
-            'auth_token' => self::login($user),
+            'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         )));
         $this->assertEquals(false, $response['is_admin']);

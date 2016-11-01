@@ -107,8 +107,9 @@ class CourseCreateTest extends OmegaupTestCase {
         // Create 1 course with 1 assignment
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 
+        $adminLogin = self::login($courseData['admin']);
         $response = CourseController::apiListAssignments(new Request(array(
-            'auth_token' => self::login($courseData['user']),
+            'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         )));
 
@@ -117,8 +118,9 @@ class CourseCreateTest extends OmegaupTestCase {
         // Create another course with 5 assignment and list them
         $courseData = CoursesFactory::createCourseWithAssignments(5);
 
+        $adminLogin = self::login($courseData['admin']);
         $response = CourseController::apiListAssignments(new Request(array(
-            'auth_token' => self::login($courseData['user']),
+            'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         )));
 
