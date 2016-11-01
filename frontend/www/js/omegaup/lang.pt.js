@@ -42,6 +42,8 @@ omegaup.T = {
 	codersOfTheMonthDate: "Data",
 	codersOfTheMonthUser: "Usuário",
 	contestActivityReport: "Relatório de atividade",
+	contestActivityReportDuplicatesForOriginsDescription: "Origens com mais do que um usuário",
+	contestActivityReportDuplicatesForUsersDescription: "Usuários com mais de uma origem",
 	contestActivityReportEvent: "Evento",
 	contestActivityReportNoDuplicatesForOrigins: "Não há origens com mais do que um usuário",
 	contestActivityReportNoDuplicatesForUsers: "Não há usuários com mais de uma origem",

@@ -42,6 +42,8 @@ omegaup.T = {
 	codersOfTheMonthDate: "Date",
 	codersOfTheMonthUser: "Username",
 	contestActivityReport: "Activity report",
+	contestActivityReportDuplicatesForOriginsDescription: "Addresses with more than one user",
+	contestActivityReportDuplicatesForUsersDescription: "Users with more than one address",
 	contestActivityReportEvent: "Event",
 	contestActivityReportNoDuplicatesForOrigins: "There are no addresses with more than one user",
 	contestActivityReportNoDuplicatesForUsers: "There are no users with more than one address",

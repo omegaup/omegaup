@@ -55,10 +55,11 @@
         <p data-bind="visible: users.length == 0"
             >{#contestActivityReportNoDuplicatesForUsers#}</p>
         <table class="table" data-bind="visible: users.length > 0">
+          <caption>{#contestActivityReportDuplicatesForUsersDescription#}</caption>
           <thead>
             <tr>
-              <th>{#contestActivityReportOrigin#}</th>
               <th>{#profileUsername#}</th>
+              <th>{#contestActivityReportOrigin#}</th>
             </tr>
           </thead>
           <tbody data-bind="foreach: users">
@@ -74,6 +75,7 @@
         <p data-bind="visible: origins.length == 0"
             >{#contestActivityReportNoDuplicatesForOrigins#}</p>
         <table class="table" data-bind="visible: origins.length > 0">
+          <caption>{#contestActivityReportDuplicatesForOriginsDescription#}</caption>
           <thead>
             <tr>
               <th>{#contestActivityReportOrigin#}</th>
