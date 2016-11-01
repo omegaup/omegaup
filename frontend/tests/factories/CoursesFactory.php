@@ -1,15 +1,16 @@
 <?php
 
 class CoursesFactory {
-    public static function createCourse(Users $user = null) {
-        if (is_null($user)) {
-            $user = UserFactory::createUser();
+    public static function createCourse(Users $admin = null) {
+        if (is_null($admin)) {
+            $admin = UserFactory::createUser();
         }
 
         $courseAlias = Utils::CreateRandomString();
 
+        $adminLogin = OmegaupTestCase::login($admin);
         $r = new Request(array(
-            'auth_token' => OmegaupTestCase::login($user),
+            'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
             'description' => Utils::CreateRandomString(),
@@ -21,25 +22,26 @@ class CoursesFactory {
 
         return array(
             'request' => $r,
-            'user' => $user,
+            'admin' => $admin,
             'course_alias' => $courseAlias,
         );
     }
 
-    public static function createCourseWithOneAssignment(Users $user = null) {
-        if (is_null($user)) {
-            $user = UserFactory::createUser();
+    public static function createCourseWithOneAssignment(Users $admin = null) {
+        if (is_null($admin)) {
+            $admin = UserFactory::createUser();
         }
 
         // Create the course
-        $courseFactoryResult = self::createCourse($user);
+        $courseFactoryResult = self::createCourse($admin);
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment
         $assignmentAlias = Utils::CreateRandomString();
 
+        $adminLogin = OmegaupTestCase::login($admin);
         $r = new Request(array(
-            'auth_token' => OmegaupTestCase::login($user),
+            'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
@@ -54,7 +56,7 @@ class CoursesFactory {
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
             'request' => $r,
-            'user' => $user
+            'admin' => $admin
         );
     }
 
@@ -67,12 +69,13 @@ class CoursesFactory {
     public static function createCourseWithNAssignmentsPerType($assignmentsPerType) {
         $courseFactoryResult = self::createCourse();
         $courseAlias = $courseFactoryResult['course_alias'];
-        $user = $courseFactoryResult['user'];
+        $admin = $courseFactoryResult['admin'];
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
+                $adminLogin = OmegaupTestCase::login($admin);
                 $r = new Request(array(
-                    'auth_token' => OmegaupTestCase::login($user),
+                    'auth_token' => $adminLogin->auth_token,
                     'name' => Utils::CreateRandomString(),
                     'alias' => Utils::CreateRandomString(),
                     'description' => Utils::CreateRandomString(),
@@ -87,7 +90,7 @@ class CoursesFactory {
         }
 
         return array(
-            'user' => $user,
+            'admin' => $admin,
             'course_alias' => $courseAlias
         );
     }
@@ -103,9 +106,9 @@ class CoursesFactory {
             $student = UserFactory::createUser();
         }
 
-        $userLogin = OmegaupTestCase::login($courseData['user']);
+        $adminLogin = OmegaupTestCase::login($courseData['admin']);
         GroupController::apiAddUser(new Request(array(
-            'auth_token' => $userLogin->auth_token,
+            'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'group_alias' => $courseData['course_alias']
         )));
