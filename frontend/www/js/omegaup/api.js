@@ -1,6 +1,6 @@
 var omegaup = typeof global === 'undefined' ?
-  window.omegaup = window.omegaup || {} :
-  global.omegaup = global.omegaup || {};
+  (window.omegaup = window.omegaup || {}) :
+  (global.omegaup = global.omegaup || {});
 
 omegaup.API = {
   _wrapDeferred: function(jqXHR, transform) {
