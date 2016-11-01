@@ -42,6 +42,8 @@ omegaup.T = {
 	codersOfTheMonthDate: "(Da73)",
 	codersOfTheMonthUser: "(U53rnam3)",
 	contestActivityReport: "(Ac7ivi7y r3p0r7)",
+	contestActivityReportDuplicatesForOriginsDescription: "(Addr35535 wi7h m0r3 7han 0n3 u53r)",
+	contestActivityReportDuplicatesForUsersDescription: "(U53r5 wi7h m0r3 7han 0n3 addr355)",
 	contestActivityReportEvent: "(Ev3n7)",
 	contestActivityReportNoDuplicatesForOrigins: "(Th3r3 ar3 n0 addr35535 wi7h m0r3 7han 0n3 u53r)",
 	contestActivityReportNoDuplicatesForUsers: "(Th3r3 ar3 n0 u53r5 wi7h m0r3 7han 0n3 addr355)",
