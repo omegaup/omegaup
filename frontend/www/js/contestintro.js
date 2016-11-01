@@ -104,7 +104,7 @@ $(document)
           $('.contest #finish-time').text(contest.finish_time.long());
           if (contest.show_scoreboard_after == 1) {
             $('.contest #show-scoreboard-after')
-                .text(omegaup.T.contestNewFormScoreboardAtEnd);
+                .text(omegaup.T.contestNewFormScoreboardAtContestEnd);
           } else {
             $('.contest #show-scoreboard-after').hide();
           }
