@@ -4,7 +4,7 @@
     "**/*.test.js"
   ],
   "helpers": [
-    "test_helpers/**/*.js"
+    "../tests/test_helpers/**/*.js"
   ],
   "stopSpecOnExpectationFailure": false,
   "random": false
