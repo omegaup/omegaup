@@ -164,7 +164,7 @@ omegaup.T = {
 	courseEditAddStudents: "(Add 57ud3n75)",
 	courseEditGoToCourse: "(G0 70 c0ur53)",
 	courseGroupNotFound: "(C0ur53 gr0up n07 f0und)",
-	courseList: "(Li57 0f c0ur535)",
+	courseList: "(C0ur535 1i57)",
 	courseListAdminCurrentCourses: "(Curr3n7 c0ur535 (I 73ach))",
 	courseListAdminPastCourses: "(Pa57 c0ur535 (I 7augh7))",
 	courseListStudentCurrentCourses: "(Curr3n7 c0ur535)",

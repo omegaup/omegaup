@@ -164,7 +164,7 @@ omegaup.T = {
 	courseEditAddStudents: "Add students",
 	courseEditGoToCourse: "Go to course",
 	courseGroupNotFound: "Course group not found",
-	courseList: "List of courses",
+	courseList: "Courses list",
 	courseListAdminCurrentCourses: "Current courses (I teach)",
 	courseListAdminPastCourses: "Past courses (I taught)",
 	courseListStudentCurrentCourses: "Current courses",

@@ -39,18 +39,22 @@
     </div>
     <div class="panel-body">
         <ul class="nav nav-tabs">
-            <li id="tab-admin-courses-current" class="nav-item active hidden" >
-                <a class="nav-link active" href="#tab-admin-courses-current" data-toggle="tab">
-                    {#courseListAdminCurrentCourses#}</a></li>
-            <li id="tab-admin-courses-past" class="nav-item hidden">
-                <a class="nav-link" href="#tab-admin-courses-past" data-toggle="tab">
-                    {#courseListAdminPastCourses#}</a></li>
-            <li id="tab-student-courses-current" class="nav-item hidden">
-                <a class="nav-link" href="#tab-student-courses-current" data-toggle="tab">
-                    {#courseListStudentCurrentCourses#}</a></li>
-            <li id="tab-student-courses-past" class="nav-item hidden">
-                <a class="nav-link" href="#tab-student-courses-past" data-toggle="tab">
-                    {#courseListStudentPastCourses#}</a></li>
+            <li class="nav-item active"
+                data-bind="if: adminCoursesCurrent().length > 0">
+                <a class="nav-link active" href="#tab-admin-courses-current"
+                   data-toggle="tab">{#courseListAdminCurrentCourses#}</a></li>
+            <li class="nav-item"
+                data-bind="if: adminCoursesPast().length > 0">
+                <a class="nav-link" href="#tab-admin-courses-past"
+                   data-toggle="tab">{#courseListAdminPastCourses#}</a></li>
+            <li class="nav-item"
+                data-bind="if: studentCoursesCurrent().length > 0">
+                <a class="nav-link" href="#tab-student-courses-current"
+                   data-toggle="tab">{#courseListStudentCurrentCourses#}</a></li>
+            <li class="nav-item"
+                data-bind="if: studentCoursesPast().length > 0">
+                <a class="nav-link" href="#tab-student-courses-past"
+                   data-toggle="tab">{#courseListStudentPastCourses#}</a></li>
         </ul>
 
         <div class="tab-content">
