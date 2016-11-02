@@ -70,16 +70,15 @@ class CoursesDAO extends CoursesDAOBase
 
     public static function getCoursesForStudent($user) {
         global  $conn;
-        // TODO(pablo): El link entre curso y grupo deberia ser por id y no alias.
         $sql = 'SELECT c.*
                 FROM Courses c
                 INNER JOIN (
-                    SELECT alias
+                    SELECT g.group_id
                     FROM Groups_Users gu
                     INNER JOIN Groups g ON g.group_id = gu.group_id
                     WHERE gu.user_id = ?
                 ) gg
-                ON c.alias = gg.alias;
+                ON c.id_group = gg.group_id;
                ';
         $rs = $conn->Execute($sql, $user);
         $courses = array();
