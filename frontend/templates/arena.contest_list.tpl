@@ -1,7 +1,7 @@
 <script type="text/javascript" src="{version_hash src="/js/omegaup/arena/contest_list.js"}"></script>
 <script type="text/html" id="contest-list">
 <div class="panel">
-	<h4 data-bind="visible: recommended">{#arenaPageRecommendedContestsText#}</h4>
+	<h5 data-bind="visible: recommended">{#arenaPageRecommendedContestsText#}</h5>
 	<div class="panel-body">
 		<table class="contest-list table">
 			<thead><tr>
@@ -39,9 +39,9 @@
 			<tfoot>
 				<tr data-bind="visible: hasNext || hasPrevious" align="center">
 					<td class="no-wrap" data-bind="attr: { colspan: pagerColumns }">
-						<a data-bind="visible: hasPrevious, click: previous">{#wordsPrevPage#}</a>
+						<a data-bind="visible: hasPrevious, click: previous" href="#">{#wordsPrevPage#}</a>
 						<span class="page-num" data-bind="text: pageNumber"></span>
-						<a data-bind="visible: hasNext, click: next">{#wordsNextPage#}</a>
+						<a data-bind="visible: hasNext, click: next" href="#">{#wordsNextPage#}</a>
 					</td>
 				</tr>
 			</tfoot>
