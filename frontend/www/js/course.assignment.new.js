@@ -19,6 +19,7 @@ $('document')
                 function(data) {
                   if (data.status == 'ok') {
                     omegaup.UI.success(omegaup.T['courseAssignmentAdded']);
+                    $('.new_course_assignment_form')[0].reset();
                   } else {
                     omegaup.UI.error(data.error || 'error');
                   }
