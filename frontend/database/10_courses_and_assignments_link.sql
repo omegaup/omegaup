@@ -15,6 +15,8 @@ ALTER TABLE `Courses`
 
 ALTER TABLE `Assignments`
   ADD UNIQUE KEY `assignment_alias` (`id_course`, `alias`),
-  CHANGE COLUMN `assignement_id` `assignment_id` int(11) NOT NULL,
+  CHANGE COLUMN `assignement_id` `assignment_id` int(11) NOT NULL;
+
+ALTER TABLE `Assignments`
   CHANGE COLUMN `assignment_id` `assignment_id` int(11) NOT NULL AUTO_INCREMENT;
 
