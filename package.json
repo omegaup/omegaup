@@ -10,6 +10,6 @@
     "jsdom": "^9.8.3"
   },
   "scripts": {
-    "test": "jasmine JASMINE_CONFIG_PATH=www/tests/jasmine.json"
+    "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json"
   }
 }
