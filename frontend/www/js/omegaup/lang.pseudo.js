@@ -126,7 +126,7 @@ omegaup.T = {
 	contestNewFormRegistration: "(R3gi57ra7i0n)",
 	contestNewFormRegistrationDesc: "(U53r5 n33d 70 r3gi573r 70 par7icipa73 in 7hi5 c0n7357.)",
 	contestNewFormScheduleContest: "(Sch3du13 c0n7357)",
-	contestNewFormScoreboardAtContestEnd: "(Sh0w 5c0r3b0ard a7 7h3 3nd 0f 7h3 c0n7357)",
+	contestNewFormScoreboardAtContestEnd: "(Th3 5c0r3b0ard wi11 b3 5h0wn a7 7h3 3nd 0f 7h3 c0n7357.)",
 	contestNewFormScoreboardAtEnd: "(Sh0w 5c0r3b0ard a7 7h3 3nd 0f 7h3 c0n7357)",
 	contestNewFormScoreboardAtEndDesc: "(Sh0w 7h3 c0mp1373 5c0r3b0ard a7 7h3 3nd 0f 7h3 c0n7357.)",
 	contestNewFormScoreboardTimePercent: "(Vi5ib13 5c0r3b0ard 7im3 (%))",

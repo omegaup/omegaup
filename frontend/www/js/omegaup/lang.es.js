@@ -126,7 +126,7 @@ omegaup.T = {
 	contestNewFormRegistration: "Registro",
 	contestNewFormRegistrationDesc: "Los usuarios necesitan registrarse al concurso, y posteriormente ser aceptados por el administrador del concurso.",
 	contestNewFormScheduleContest: "Agendar concurso",
-	contestNewFormScoreboardAtContestEnd: "Scoreboard at the end of the contest",
+	contestNewFormScoreboardAtContestEnd: "El scoreboard se mostrará al finalizar el concurso.",
 	contestNewFormScoreboardAtEnd: "Scoreboard al finalizar el concurso",
 	contestNewFormScoreboardAtEndDesc: "Mostrar autom&aacute;ticamente el scoreboard completo al finalizar el concurso.",
 	contestNewFormScoreboardTimePercent: "&iquest;Cu&aacute;nto tiempo se mostrar&aacute; el Scoreboard? (%)",
