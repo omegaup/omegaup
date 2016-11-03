@@ -32,6 +32,12 @@ before_install:
   - pip install --user six
   - pip install --user https://github.com/google/closure-linter/zipball/master
   - git submodule update --init frontend/server/libs/third_party/smarty frontend/server/libs/third_party/phpmailer frontend/server/libs/third_party/log4php frontend/server/libs/third_party/adodb frontend/server/libs/third_party/facebook-php-sdk frontend/server/libs/third_party/google-api-php-client
+  - nvm install 6.9.1
+  - npm install -g yarn
+
+cache:
+  directories:
+  - $HOME/.yarn-cache
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
@@ -41,6 +47,7 @@ before_script:
 
 script:
   - phpunit --bootstrap frontend/tests/bootstrap.php --configuration frontend/tests/phpunit.xml frontend/tests/controllers
+  - yarn install && yarn test
   - python stuff/i18n.py --validate
   - python3 stuff/whitespace-purge.py validate --all-files
   - python3 stuff/js-lint.py validate --all-files
