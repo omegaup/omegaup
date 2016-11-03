@@ -127,7 +127,7 @@ $(document)
           var penaltyTypes = {
             none: omegaup.T.contestNewFormNoPenalty,
             problem_open: omegaup.T.contestNewFormByProblem,
-            constest_start: omegaup.T.contestNewFormByContests,
+            contest_start: omegaup.T.contestNewFormByContests,
             runtime: omegaup.T.contestNewFormByRuntime
           };
           $('.contest #penalty-type').text(penaltyTypes[contest.penalty_type]);
@@ -173,6 +173,7 @@ $(document)
         } else {
           readyToStart(contest);
         }
+        $('#intro-page').removeClass('hidden');
       }
 
       omegaup.API.getContestPublicDetails(contestAlias, contestLoaded);
