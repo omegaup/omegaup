@@ -228,6 +228,7 @@ omegaup.T = {
 	loginDisabled: "O usuário é muito antigo e para a sua segurança ele foi desativado. Entre em contato com omegaup-soporte@googlegroups.com para acessar novamente.",
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail ou usuário",
+	loginFacebookEmptyEmailError: "Um endereço de e-mail é necessário para utilizar omegaUp. Por favor, conceda acesso de e-mail de Facebook para continuar",
 	loginFederated: "Conta em outros sites",
 	loginFederatedFailed: "Entrar usando a parte externa falhou.",
 	loginHeader: "Entrar em OmegaUp",

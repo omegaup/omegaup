@@ -1,11 +1,11 @@
 <?php
-    define('OMEGAUP_BYPASS_CSP_INSECURE_NEVER_USE_THIS', true);
-    require_once('../server/bootstrap.php');
-    require_once('api/ApiCaller.php');
+define('OMEGAUP_BYPASS_CSP_INSECURE_NEVER_USE_THIS', true);
+require_once('../server/bootstrap.php');
+require_once('api/ApiCaller.php');
 
-    $triedToLogin = false;
-    $emailVerified = true;
-    $c_Session = new SessionController;
+$triedToLogin = false;
+$emailVerified = true;
+$c_Session = new SessionController;
 
 if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     // user wants to login natively
@@ -26,7 +26,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
 }
 
 if (isset($_GET['state'])) {
-    $c_Session->LoginViaFacebook();
+    $response = $c_Session->LoginViaFacebook();
     $triedToLogin = true;
 }
 
@@ -50,4 +50,4 @@ if ($c_Session->CurrentSessionAvailable()) {
     }
 }
 
-    $smarty->display('../templates/login.tpl');
+$smarty->display('../templates/login.tpl');
