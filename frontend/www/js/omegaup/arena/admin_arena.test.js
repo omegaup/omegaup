@@ -1,6 +1,7 @@
 'use strict';
 require('../omegaup.js');
 require('../api.js');
+require('../api.fake.js');
 require('./arena.js');
 require('./admin_arena.js');
 
