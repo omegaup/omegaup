@@ -226,7 +226,7 @@ omegaup.T = {
 	loginDisabled: "Tu usuario es muy viejo y por tu seguridad ha sido deshabilitado. Para logguearte de nuevo contacta a omegaup-soporte@googlegroups.com",
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail o usuario",
-	loginFacebookEmptyEmailError: "Se necesita acceso a tu dirección de correo para utilizar omegaUp. Por favor permite el acceso a tu correo para continuar.",
+	loginFacebookEmptyEmailError: "Se necesita acceso a tu dirección de correo para utilizar omegaUp. Por favor permite el acceso a tu correo de Facebook para continuar.",
 	loginFederated: "Cuenta en otros sitios",
 	loginFederatedFailed: "El inicio de sesion con el sitio externo fallo.",
 	loginHeader: "Inicia sesi&oacute;n en omegaUp",

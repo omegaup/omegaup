@@ -226,7 +226,7 @@ omegaup.T = {
 	loginDisabled: "(Y0ur u53r i5 700 01d and f0r y0ur 53curi7y i7 ha5 b33n di5ab13d. P13a53 c0n7ac7 0m3gaup-50p0r73@g00g13gr0up5.c0m 70 10gin again.)",
 	loginEmail: "(E-mai1)",
 	loginEmailUsername: "(E-mai1 0r u53r)",
-	loginFacebookEmptyEmailError: "(An 3mai1 addr355 i5 n33d3d 70 u53 0m3gaUp. P13a53 gran7 3mai1 acc355 70 c0n7inu3)",
+	loginFacebookEmptyEmailError: "(An 3mai1 addr355 i5 n33d3d 70 u53 0m3gaUp. P13a53 gran7 acc355 70 Fac3b00k'5 3mai1 70 c0n7inu3)",
 	loginFederated: "(L0gin u5ing 7h353 5i735)",
 	loginFederatedFailed: "(L0gin u5ing 7h3 3x73rna1 par7y fai13d. Did y0u r3j3c7 acc355?)",
 	loginHeader: "(L0gin 70 Om3gaUp)",

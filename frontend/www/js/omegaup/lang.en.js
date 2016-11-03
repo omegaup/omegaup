@@ -226,7 +226,7 @@ omegaup.T = {
 	loginDisabled: "Your user is too old and for your security it has been disabled. Please contact omegaup-soporte@googlegroups.com to login again.",
 	loginEmail: "E-mail",
 	loginEmailUsername: "E-mail or user",
-	loginFacebookEmptyEmailError: "An email address is needed to use omegaUp. Please grant email access to continue",
+	loginFacebookEmptyEmailError: "An email address is needed to use omegaUp. Please grant access to Facebook's email to continue",
 	loginFederated: "Login using these sites",
 	loginFederatedFailed: "Login using the external party failed. Did you reject access?",
 	loginHeader: "Login to OmegaUp",
