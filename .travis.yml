@@ -47,6 +47,7 @@ before_script:
 
 script:
   - phpunit --bootstrap frontend/tests/bootstrap.php --configuration frontend/tests/phpunit.xml frontend/tests/controllers
+  - yarn install && yarn test
   - python stuff/i18n.py --validate
   - python3 stuff/whitespace-purge.py validate --all-files
   - python3 stuff/js-lint.py validate --all-files
