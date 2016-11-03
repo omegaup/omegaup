@@ -55,12 +55,14 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
     // TODO: Update history so the back button works correctly.
     if (self.pageNumber() < self.totalPages()) {
       self.pageNumber(self.pageNumber() + 1);
+      $('li.nav-item.active')[0].scrollIntoView();
     }
   };
   self.previous = function() {
     // TODO: Update history so the back button works correctly.
     if (self.pageNumber() != 0) {
       self.pageNumber(self.pageNumber() - 1);
+      $('li.nav-item.active')[0].scrollIntoView();
     }
   };
   self.deferred =

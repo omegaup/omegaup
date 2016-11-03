@@ -3,7 +3,7 @@
 {include file="mainmenu.tpl"}
 {include file="status.tpl"}
 
-<div id="intro-page" class="contest panel">
+<div id="intro-page" class="contest panel hidden">
 	<div class="panel-body">
 		<div id="contest-details" class="text-center">
 			<h2 id="title"></h2>
