@@ -9,7 +9,7 @@
     var jQuery = require('jquery')(window);
     global.jQuery = global.$ = jQuery;
 
-    var ko = require('../../third_party/js/knockout-4.3.0.js');
+    var ko = require('../third_party/js/knockout-4.3.0.js');
     global.ko = ko;
 
     // window and navigator objects are required by typeahead.jquery.js
@@ -18,7 +18,7 @@
     global.window.navigator = global.navigator = navigator;
     navigator.platform = 'Linux i686';
 
-    require('../../third_party/js/knockout-secure-binding.min.js');
-    require('../../third_party/js/typeahead.jquery.js');
+    require('../third_party/js/knockout-secure-binding.min.js');
+    require('../third_party/js/typeahead.jquery.js');
   }
 })();
