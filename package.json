@@ -1,0 +1,15 @@
+{
+  "name": "omegaup_frontend",
+  "version": "1.0.0",
+  "description": "omegaup frontend",
+  "license": "BSD",
+  "private": true,
+  "devDependencies": {
+    "jasmine": "^2.5.2",
+    "jquery": "1.11.3",
+    "jsdom": "^9.8.3"
+  },
+  "scripts": {
+    "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json"
+  }
+}

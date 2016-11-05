@@ -26,32 +26,32 @@ $('document')
         $('.new_contest_form #title').val(contest.title);
         $('.new_contest_form #alias').val(contest.alias);
         $('.new_contest_form #description').val(contest.description);
-        $('.new_contest_form #start_time')
+        $('.new_contest_form #start-time')
             .val(omegaup.UI.formatDateTime(contest.start_time));
-        $('.new_contest_form #finish_time')
+        $('.new_contest_form #finish-time')
             .val(omegaup.UI.formatDateTime(contest.finish_time));
 
         if (contest.window_length === null) {
           // Disable window length
-          $('#window_length_enabled').removeAttr('checked');
-          $('#window_length').val('');
+          $('#window-length-enabled').removeAttr('checked');
+          $('#window-length').val('');
         } else {
-          $('#window_length_enabled').attr('checked', 'checked');
-          $('#window_length').removeAttr('disabled');
-          $('#window_length').val(contest.window_length);
+          $('#window-length-enabled').attr('checked', 'checked');
+          $('#window-length').removeAttr('disabled');
+          $('#window-length').val(contest.window_length);
         }
 
-        $('.new_contest_form #points_decay_factor')
+        $('.new_contest_form #points-decay-factor')
             .val(contest.points_decay_factor);
-        $('.new_contest_form #submissions_gap')
+        $('.new_contest_form #submissions-gap')
             .val(contest.submissions_gap / 60);
         $('.new_contest_form #feedback').val(contest.feedback);
         $('.new_contest_form #penalty').val(contest.penalty);
         $('.new_contest_form #public').val(contest.public);
         $('.new_contest_form #register').val(contest.contestant_must_register);
         $('.new_contest_form #scoreboard').val(contest.scoreboard);
-        $('.new_contest_form #penalty_type').val(contest.penalty_type);
-        $('.new_contest_form #show_scoreboard_after')
+        $('.new_contest_form #penalty-type').val(contest.penalty_type);
+        $('.new_contest_form #show-scoreboard-after')
             .val(contest.show_scoreboard_after);
 
         $('.contest-publish-form #public').val(contest.public);
@@ -92,25 +92,25 @@ $('document')
 
       // Update contest
       function updateContest(public) {
-        var window_length_value = $('#window_length_enabled').is(':checked') ?
-                                      $('#window_length').val() :
+        var window_length_value = $('#window-length-enabled').is(':checked') ?
+                                      $('#window-length').val() :
                                       'NULL';
 
         omegaup.API.updateContest(
             contestAlias, $('.new_contest_form #title').val(),
             $('.new_contest_form #description').val(),
-            (new Date($('.new_contest_form #start_time').val()).getTime()) /
+            (new Date($('.new_contest_form #start-time').val()).getTime()) /
                 1000,
-            (new Date($('.new_contest_form #finish_time').val()).getTime()) /
+            (new Date($('.new_contest_form #finish-time').val()).getTime()) /
                 1000,
             window_length_value, $('.new_contest_form #alias').val(),
-            $('.new_contest_form #points_decay_factor').val(),
-            $('.new_contest_form #submissions_gap').val() * 60,
+            $('.new_contest_form #points-decay-factor').val(),
+            $('.new_contest_form #submissions-gap').val() * 60,
             $('.new_contest_form #feedback').val(),
             $('.new_contest_form #penalty').val(), public,
             $('.new_contest_form #scoreboard').val(),
-            $('.new_contest_form #penalty_type').val(),
-            $('.new_contest_form #show_scoreboard_after').val(),
+            $('.new_contest_form #penalty-type').val(),
+            $('.new_contest_form #show-scoreboard-after').val(),
             $('.new_contest_form #register').val(), function(data) {
               if (data.status == 'ok') {
                 omegaup.UI.success(

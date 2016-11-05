@@ -1,8 +1,10 @@
 $(document)
     .ready(function() {
-      var requiredFields = ['#source', '#title', '#problem_contents'];
+      var requiredFields = ['#source', '#title'];
       if (window.location.pathname.indexOf('/problem/new') !== 0) {
         requiredFields.push('#update-message');
+      } else {
+        requiredFields.push('#problem_contents');
       }
       requiredFields.each(addRemoveErrorClass);
 

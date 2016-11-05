@@ -338,6 +338,13 @@ class SessionController extends Controller {
         }
     }
 
+    /**
+     * Logs in via Facebook API.
+     *
+     * @return array An associative array with a 'status' field that has 'ok'
+     *               on success or 'error' on error. An 'error' field with an
+     *               i18n string may also appear on the response.
+     */
     public function LoginViaFacebook() {
         //ok, the user does not have any auth token
         //if he wants to test facebook login
@@ -346,7 +353,7 @@ class SessionController extends Controller {
         //facebook sessions on every single petition
         //made from the front-end
         if (!isset($_GET['state'])) {
-            return false;
+            return array('status' => 'error');
         }
 
         //if that is not true, may still be logged with
@@ -358,7 +365,7 @@ class SessionController extends Controller {
 
         if ($fb_user == 0) {
             self::$log->info('FB session unavailable.');
-            return false;
+            return array('status' => 'error');
         }
 
         // We may or may not have this data based on whether the user is logged in.
@@ -372,7 +379,7 @@ class SessionController extends Controller {
         } catch (FacebookApiException $e) {
             $fb_user = null;
             self::$log->error('FacebookException:' . $e);
-            return false;
+            return array('status' => 'error');
         }
 
         //ok we know the user is logged in,
@@ -380,6 +387,17 @@ class SessionController extends Controller {
         //if there is none, it means that its the first
         //time the user has been here, lets register his info
         self::$log->info('User is logged in via facebook !!');
+
+        if (!isset($fb_user_profile['email'])) {
+            $fb_user = null;
+            self::$log->error('Facebook email empty');
+            return array(
+                'status' => 'error',
+                'error' => $smarty->getConfigVariable(
+                    'loginFacebookEmptyEmailError'
+                ),
+            );
+        }
 
         $results = UsersDAO::FindByEmail($fb_user_profile['email']);
 
@@ -411,7 +429,7 @@ class SessionController extends Controller {
                 $res = UserController::apiCreate($r);
             } catch (ApiException $e) {
                 self::$log->error('Unable to login via Facebook ' . $e);
-                return false;
+                return array('status' => 'error');
             }
             $vo_User = UsersDAO::getByPK($res['user_id']);
         }
@@ -422,6 +440,7 @@ class SessionController extends Controller {
         //if he is still logged in, and he can call
         //the api
         $this->RegisterSession($vo_User);
+        return array('status' => 'ok');
     }
 
     /**

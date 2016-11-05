@@ -22,13 +22,12 @@ FIXJSSTYLE_PATH = os.path.join(os.environ['HOME'],
                                '.local/bin/fixjsstyle')
 GJSLINT_PATH = os.path.join(os.environ['HOME'], '.local/bin/gjslint')
 
-def run_linter(commits, files, validate_only):
-  '''Runs the Google Closure Compiler linter against |files| in |commits|.
-  '''
+def run_linter(args, files, validate_only):
+  '''Runs the Google Closure Compiler linter against |files|.'''
   root = git_tools.root_dir()
   validation_passed = True
   for filename in files:
-    contents = git_tools.file_at_commit(commits, filename)
+    contents = git_tools.file_contents(args, root, filename)
 
     with tempfile.NamedTemporaryFile(suffix='.js') as f:
       f.write(contents)
@@ -72,20 +71,16 @@ def main():
     GJSLINT_PATH: 'pip install --user https://github.com/google/closure-linter/zipball/master'
   }):
     sys.exit(1)
-  args = git_tools.parse_arguments(tool_description='lints javascript')
+  args = git_tools.parse_arguments(tool_description='lints javascript',
+        file_whitelist=[br'^frontend/www/(js|ux)/.*\.js$'],
+        file_blacklist=[br'.*third_party.*', br'.*js/omegaup/lang\..*'])
 
-  if args.files:
-    changed_files = args.files
-  else:
-    changed_files = git_tools.changed_files(args.commits,
-        whitelist=[br'^frontend/www/(js|ux)/.*\.js$'],
-        blacklist=[br'.*third_party.*', br'.*js/omegaup/lang\..*'])
-  if not changed_files:
+  if not args.files:
     return 0
 
   validate_only = args.tool == 'validate'
 
-  if not run_linter(args.commits, changed_files, validate_only):
+  if not run_linter(args, args.files, validate_only):
     if validate_only:
       print('%sValidation errors.%s '
             'Please run `%s` to fix them.' % (COLORS.FAIL,

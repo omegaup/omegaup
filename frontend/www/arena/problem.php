@@ -37,7 +37,9 @@ if (isset($result['sample_input'])) {
 
 $result['user'] = array(
     'logged_in' => $session['valid'],
-    'admin' => Authorization::canEditProblem($session['user']->user_id, $problem)
+    'admin' => $session['valid'] ?
+        Authorization::canEditProblem($session['user']->user_id, $problem) :
+        false
 );
 $smarty->assign('problem_admin', $result['user']['admin']);
 
