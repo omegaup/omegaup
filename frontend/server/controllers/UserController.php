@@ -878,7 +878,7 @@ class UserController extends Controller {
             $keys = array(
                 'CCUPITSUR-16' => 50,
             );
-        }elseif ($r['contest_type'] == 'CONALEP') {
+        } elseif ($r['contest_type'] == 'CONALEP') {
             if ($r['current_user']->username != 'reyes811'
                 && !$is_system_admin
             ) {
