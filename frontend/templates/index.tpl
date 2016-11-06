@@ -1,6 +1,7 @@
 {assign var="htmlTitle" value="{#omegaupTitleIndex#}"}
 {include file='head.tpl'}
 {include file='mainmenu.tpl'}
+{include file='status.tpl'}
 
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 <div class="row">

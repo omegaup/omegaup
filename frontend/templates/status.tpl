@@ -14,5 +14,10 @@
 		<span class="message"></span>
 	</div>
 {/if}
+{if $smarty.const.OMEGAUP_MAINTENANCE}
+	<div id="announcement" class="alert alert-info">
+		{$smarty.const.OMEGAUP_MAINTENANCE}
+	</div>
+{/if}
 
 <script type="text/javascript" src="{version_hash src="/js/status.dismiss.js"}"></script>
