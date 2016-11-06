@@ -1138,7 +1138,7 @@ class ContestController extends Controller {
         }
 
         // Only contest admin is allowed to remove problems in contest
-        if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException('cannotRemoveProblem');
         }
 
@@ -1157,7 +1157,7 @@ class ContestController extends Controller {
 
         // Disallow removing problem from contest if it already has runs within the contest
         if (RunsDAO::CountTotalRunsOfProblemInContest($problem->problem_id, $contest->contest_id) > 0 &&
-            !Authorization::IsSystemAdmin($r['current_user_id'])) {
+            !Authorization::isSystemAdmin($r['current_user_id'])) {
             throw new ForbiddenAccessException('cannotRemoveProblem');
         }
 
@@ -1856,7 +1856,7 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
 
-        if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
