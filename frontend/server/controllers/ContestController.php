@@ -106,32 +106,39 @@ class ContestController extends Controller {
     }
 
     /**
-     * Returls a list of contests where current user is the director
+     * Returns a list of contests where current user has admin rights (or is
+     * the director).
      *
      * @param Request $r
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiMyList(Request $r) {
+    public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
+
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         // Create array of relevant columns
         $relevant_columns = array('title', 'alias', 'start_time', 'finish_time', 'public', 'scoreboard_url', 'scoreboard_url_admin');
         $contests = null;
         try {
-            $contests = ContestsDAO::getAll(null, null, 'contest_id', 'DESC');
-
-            // If current user is not sys admin, then we need to filter out the contests where
-            // the current user is not contest admin
-            if (!Authorization::isSystemAdmin($r['current_user_id'])) {
-                $contests_all = $contests;
-                $contests = array();
-
-                foreach ($contests_all as $c) {
-                    if (Authorization::isContestAdmin($r['current_user_id'], $c)) {
-                        $contests[] = $c;
-                    }
-                }
+            if (Authorization::isSystemAdmin($r['current_user_id'])) {
+                $contests = ContestsDAO::getAll(
+                    $page,
+                    $pageSize,
+                    'contest_id',
+                    'DESC'
+                );
+            } else {
+                $contests = ContestsDAO::getAllContestsAdminedByUser(
+                    $r['current_user_id'],
+                    $page,
+                    $pageSize
+                );
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -144,9 +151,52 @@ class ContestController extends Controller {
             $addedContests[] = $contestInfo;
         }
 
-        $response['results'] = $addedContests;
-        $response['status'] = 'ok';
-        return $response;
+        return array(
+            'status' => 'ok',
+            'contests' => $addedContests,
+        );
+    }
+
+    /**
+     * Returns a list of contests where current user is the director
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyList(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
+        // Create array of relevant columns
+        $relevant_columns = array('title', 'alias', 'start_time', 'finish_time', 'public', 'scoreboard_url', 'scoreboard_url_admin');
+        $contests = null;
+        try {
+            $contests = ContestsDAO::getAllContestsOwnedByUser(
+                $r['current_user_id'],
+                $page,
+                $pageSize
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $addedContests = array();
+        foreach ($contests as $c) {
+            $c->toUnixTime();
+            $contestInfo = $c->asFilteredArray($relevant_columns);
+            $addedContests[] = $contestInfo;
+        }
+
+        return array(
+            'status' => 'ok',
+            'contests' => $addedContests,
+        );
     }
 
     /**

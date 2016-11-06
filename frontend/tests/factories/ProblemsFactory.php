@@ -115,4 +115,35 @@ class ProblemsFactory {
             'problem' => ProblemsDAO::getByAlias($r['alias']),
         );
     }
+
+    public static function addAdminUser($problemData, $user) {
+        // Prepare our request
+        $r = new Request();
+        $r['problem_alias'] = $problemData['request']['alias'];
+        $r['usernameOrEmail'] = $user->username;
+
+        // Log in the problem author
+        $login = OmegaupTestCase::login($problemData['author']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call api
+        ProblemController::apiAddAdmin($r);
+
+        unset($_REQUEST);
+    }
+
+    public static function addGroupAdmin($problemData, Groups $group) {
+        // Prepare our request
+        $r = new Request(array(
+            'problem_alias' => $problemData['request']['alias'],
+            'group' => $group->alias,
+        ));
+
+        // Log in the problem author
+        $login = OmegaupTestCase::login($problemData['author']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call api
+        ProblemController::apiAddGroupAdmin($r);
+    }
 }

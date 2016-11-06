@@ -366,36 +366,91 @@ class ProblemsDAO extends ProblemsDAOBase
         return $result;
     }
 
-    final public static function getAllProblemsOwnedByUser($user_id, $offset = null, $rowcount = null) {
+    /**
+     * Returns all problems that a user can manage.
+     */
+    final public static function getAllProblemsAdminedByUser(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
                 p.*
             FROM
                 Problems AS p
             INNER JOIN
-                ACLs AS a
-            ON
-                a.acl_id = p.acl_id
+                ACLs AS a ON a.acl_id = p.acl_id
+            LEFT JOIN
+                User_Roles ur ON ur.acl_id = p.acl_id
+            LEFT JOIN
+                Group_Roles gr ON gr.acl_id = p.acl_id
+            LEFT JOIN
+                Groups_Users gu ON gu.group_id = gr.group_id
             WHERE
-                a.owner_id = ?
+                a.owner_id = ? OR
+                (ur.role_id = ? AND ur.user_id = ?) OR
+                (gr.role_id = ? AND gu.user_id = ?)
             ORDER BY
-                p.problem_id DESC';
-        $params = array($user_id);
-        if ($offset != null && $rowcount != null) {
-            $sql .= ' LIMIT ?, ?';
-            $params[] = $offset;
-            $params[] = $rowcount;
-        }
-        $sql .= ';';
+                p.problem_id DESC
+            LIMIT
+                ?, ?';
+        $params = array(
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            $offset,
+            $pageSize,
+        );
 
         global $conn;
         $rs = $conn->Execute($sql, $params);
 
-        $result = array();
+        $problems = array();
         foreach ($rs as $row) {
-            array_push($result, new Problems($row));
+            array_push($problems, new Problems($row));
         }
+        return $problems;
+    }
 
-        return $result;
+    /**
+     * Returns all problems owned by a user.
+     */
+    final public static function getAllProblemsOwnedByUser(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $offset = ($page - 1) * $pageSize;
+        $sql = '
+            SELECT
+                p.*
+            FROM
+                Problems AS p
+            INNER JOIN
+                ACLs AS a ON a.acl_id = p.acl_id
+            WHERE
+                a.owner_id = ?
+            ORDER BY
+                p.problem_id DESC
+            LIMIT
+                ?, ?';
+        $params = array(
+            $user_id,
+            $offset,
+            $pageSize,
+        );
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $problems = array();
+        foreach ($rs as $row) {
+            array_push($problems, new Problems($row));
+        }
+        return $problems;
     }
 }

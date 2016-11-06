@@ -1562,7 +1562,55 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Returns a list of problems where current user has admin rights (or is
+     * the owner).
      *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiAdminList(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
+        try {
+            if (Authorization::isSystemAdmin($r['current_user_id'])) {
+                $problems = ProblemsDAO::getAll(
+                    $page,
+                    $pageSize,
+                    'problem_id',
+                    'DESC'
+                );
+            } else {
+                $problems = ProblemsDAO::getAllProblemsAdminedByUser(
+                    $r['current_user_id'],
+                    $page,
+                    $pageSize
+                );
+            }
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $addedProblems = array();
+        foreach ($problems as $problem) {
+            $problemArray = $problem->asArray();
+            $problemArray['tags'] = ProblemsDAO::getTagsForProblem($problem, false);
+            $addedProblems[] = $problemArray;
+        }
+
+        return array(
+            'status' => 'ok',
+            'problems' => $addedProblems,
+        );
+    }
+
+    /**
      * Gets a list of problems where current user is the owner
      *
      * @param Request $r
@@ -1571,28 +1619,33 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateList($r);
 
-        $response = array();
-        $response['results'] = array();
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         try {
-            $problems = null;
-            if (Authorization::isSystemAdmin($r['current_user_id'])) {
-                $problems = ProblemsDAO::getAll(null, null, 'problem_id', 'DESC');
-            } else {
-                $problems = ProblemsDAO::getAllProblemsOwnedByUser($r['current_user_id'], $r['offset'], $r['rowcount']);
-            }
-
-            foreach ($problems as $problem) {
-                $problemArray = $problem->asArray();
-                $problemArray['tags'] = ProblemsDAO::getTagsForProblem($problem, false);
-                array_push($response['results'], $problemArray);
-            }
+            $problems = ProblemsDAO::getAllProblemsOwnedByUser(
+                $r['current_user_id'],
+                $page,
+                $pageSize
+            );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $response['status'] = 'ok';
-        return $response;
+        $addedProblems = array();
+        foreach ($problems as $problem) {
+            $problemArray = $problem->asArray();
+            $problemArray['tags'] = ProblemsDAO::getTagsForProblem($problem, false);
+            $addedProblems[] = $problemArray;
+        }
+
+        return array(
+            'status' => 'ok',
+            'problems' => $addedProblems,
+        );
     }
 
     /**

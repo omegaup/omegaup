@@ -196,6 +196,93 @@ class ContestsDAO extends ContestsDAOBase
     }
 
     /**
+     * Returns all contests that a user can manage.
+     */
+    final public static function getAllContestsAdminedByUser(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $offset = ($page - 1) * $pageSize;
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Contests c
+            INNER JOIN
+                ACLs a ON a.acl_id = c.acl_id
+            LEFT JOIN
+                User_Roles ur ON ur.acl_id = c.acl_id
+            LEFT JOIN
+                Group_Roles gr ON gr.acl_id = c.acl_id
+            LEFT JOIN
+                Groups_Users gu ON gu.group_id = gr.group_id
+            WHERE
+                a.owner_id = ? OR
+                (ur.role_id = ? AND ur.user_id = ?) OR
+                (gr.role_id = ? AND gu.user_id = ?)
+            ORDER BY
+                c.contest_id DESC
+            LIMIT ?, ?;';
+
+        $params = array(
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            $offset,
+            $pageSize,
+        );
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $contests = array();
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
+    /**
+     * Returns all contests owned by a user.
+     */
+    final public static function getAllContestsOwnedByUser(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $offset = ($page - 1) * $pageSize;
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Contests c
+            INNER JOIN
+                ACLs a ON a.acl_id = c.acl_id
+            WHERE
+                a.owner_id = ?
+            ORDER BY
+                c.contest_id DESC
+            LIMIT ?, ?;';
+        $params = array(
+            $user_id,
+            $offset,
+            $pageSize,
+        );
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $contests = array();
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
+    /**
      * Regresa todos los concursos que un usuario puede ver.
      *
      * Explicación:
@@ -415,32 +502,5 @@ class ContestsDAO extends ContestsDAOBase
         }
 
         return $allData;
-    }
-
-    final public static function getAllContestsOwnedByUser($user_id) {
-        $sql = '
-            SELECT
-                c.*
-            FROM
-                Contests AS c
-            INNER JOIN
-                ACLs AS a
-            ON
-                a.acl_id = c.acl_id
-            WHERE
-                a.owner_id = ?
-            ORDER BY
-                c.contest_id DESC;';
-        $params = array($user_id);
-
-        global $conn;
-        $rs = $conn->Execute($sql, $params);
-
-        $result = array();
-        foreach ($rs as $row) {
-            array_push($result, new Contests($row));
-        }
-
-        return $result;
     }
 }
