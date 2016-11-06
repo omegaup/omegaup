@@ -20,7 +20,7 @@ class UserContestsTest extends OmegaupTestCase {
         $r = new Request(array(
             'auth_token' => self::login($director)
         ));
-        $response = UserController::apiContests($r);
+        $response = ContestController::apiMyList($r);
 
         // Contests should come ordered by contest id desc
         $this->assertEquals(count($contestData), count($response['contests']));

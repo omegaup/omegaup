@@ -925,60 +925,6 @@ class UserController extends Controller {
     }
 
     /**
-     * Get list of contests owned by the user
-     *
-     * @param Request $r
-     * @return string
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiContests(Request $r) {
-        self::authenticateRequest($r);
-
-        $response = array();
-        $response['contests'] = array();
-
-        try {
-            $owned_contests = ContestsDAO::getAllContestsOwnedByUser($r['current_user_id']);
-
-            foreach ($owned_contests as $contest) {
-                $response['contests'][] = $contest->asArray();
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $response['status'] = 'ok';
-        return $response;
-    }
-
-    /**
-     * Get list of my editable problems
-     *
-     * @param Request $r
-     * @return string
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiProblems(Request $r) {
-        self::authenticateRequest($r);
-
-        $response = array();
-        $response['problems'] = array();
-
-        try {
-            $problems = ProblemsDAO::getAllProblemsOwnedByUser($r['current_user_id']);
-
-            foreach ($problems as $problem) {
-                $response['problems'][] = $problem->asArray();
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $response['status'] = 'ok';
-        return $response;
-    }
-
-    /**
      * Returns the prefered language as a string (en,es,fra) of the user given
      * If no user is give, language is retrived from the browser.
      *

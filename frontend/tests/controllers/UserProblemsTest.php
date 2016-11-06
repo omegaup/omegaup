@@ -18,7 +18,7 @@ class UserProblemsTest extends OmegaupTestCase {
         $r = new Request(array(
             'auth_token' => self::login($author)
         ));
-        $response = UserController::apiProblems($r);
+        $response = ProblemController::apiMyList($r);
 
         $this->assertEquals(count($problemData), count($response['problems']));
         $this->assertEquals($problemData[2]['request']['alias'], $response['problems'][0]['alias']);
@@ -34,7 +34,7 @@ class UserProblemsTest extends OmegaupTestCase {
         $r = new Request(array(
             'auth_token' => self::login($author)
         ));
-        $response = UserController::apiProblems($r);
+        $response = ProblemController::apiMyList($r);
 
         $this->assertEquals(0, count($response['problems']));
     }
