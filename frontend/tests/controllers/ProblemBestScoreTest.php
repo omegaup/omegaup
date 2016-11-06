@@ -22,10 +22,11 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
-        $response = ProblemController::apiBestScore(new Request(array(
-            'auth_token' => self::login($contestant),
+        $login = self::login($contestant);
+        $response = ProblemController::apiBestScore(new Request([
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias']
-        )));
+        ]));
 
         $this->assertEquals(100.00, $response['score']);
     }
@@ -49,11 +50,12 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
 
         // Call API
-        $response = ProblemController::apiBestScore(new Request(array(
-            'auth_token' => self::login($contestant),
+        $login = self::login($contestant);
+        $response = ProblemController::apiBestScore(new Request([
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'contest_alias' => $contestData['request']['alias']
-        )));
+        ]));
 
         $this->assertEquals(50.00, $response['score']);
     }
@@ -78,11 +80,12 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
-        $response = ProblemController::apiBestScore(new Request(array(
-            'auth_token' => self::login($user),
+        $login = self::login($user);
+        $response = ProblemController::apiBestScore(new Request([
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'username' => $contestant->username
-        )));
+        ]));
 
         $this->assertEquals(100.00, $response['score']);
     }

@@ -12,22 +12,18 @@ class UserUpdateTest extends OmegaupTestCase {
         // Create the user to edit
         $user = UserFactory::createUser();
 
-        $r = new Request();
-
-        // Login
-        $r['auth_token'] = self::login($user);
-
-        // Change values
-        $r['name'] = Utils::CreateRandomString();
-        $r['country_id'] = 'MX';
-
-        $states = StatesDAO::search(array('country_id' => $r['country_id']));
-        $r['state_id'] = $states[0]->state_id;
-
-        $r['scholar_degree'] = 'Maestría';
-        $r['birth_date'] = strtotime('1988-01-01');
-        $r['graduation_date'] = strtotime('2016-02-02');
-        $r['recruitment_optin'] = 1;
+        $states = StatesDAO::search(array('country_id' => 'MX'));
+        $login = self::login($user);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'country_id' => 'MX',
+            'state_id' => $states[0]->state_id,
+            'scholar_degree' => 'Maestría',
+            'birth_date' => strtotime('1988-01-01'),
+            'graduation_date' => strtotime('2016-02-02'),
+            'recruitment_optin' => 1,
+        ));
 
         // Call api
         $response = UserController::apiUpdate($r);
@@ -50,13 +46,14 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testNegativeStateUpdate() {
         $user = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-        $r['name'] = Utils::CreateRandomString();
-        $r['recruitment_optin'] = 1;
-
-        // Invalid state_id
-        $r['state_id'] = -1;
+        $login = self::login($user);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'recruitment_optin' => 1,
+            // Invalid state_id
+            'state_id' => -1,
+        ));
 
         UserController::apiUpdate($r);
     }
@@ -68,12 +65,13 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testNameUpdateTooLong() {
         $user = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-
-        // Invalid name
-        $r['name'] = 'TThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong hisIsWayTooLong ';
-        $r['country_id'] = 'MX';
+        $login = self::login($user);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            // Invalid name
+            'name' => 'TThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong hisIsWayTooLong ',
+            'country_id' => 'MX',
+        ));
 
         UserController::apiUpdate($r);
     }
@@ -85,11 +83,12 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testEmptyNameUpdate() {
         $user = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-
-        // Invalid name
-        $r['name'] = '';
+        $login = self::login($user);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            // Invalid name
+            'name' => '',
+        ));
 
         UserController::apiUpdate($r);
     }
@@ -101,12 +100,13 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testNullRecruitmentOptinUpdate() {
         $user = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-        $r['name'] = Utils::CreateRandomString();
-
-        // Null recruitment_optin
-        $r['recruitment_optin'] = null;
+        $login = self::login($user);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+            // Null recruitment_optin
+            'recruitment_optin' => null,
+        ));
 
         UserController::apiUpdate($r);
     }
@@ -117,9 +117,11 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testRecruitmentOptinUpdate() {
         $user = UserFactory::createUser();
 
-        $r = new Request();
-        $r['auth_token'] = self::login($user);
-        $r['name'] = Utils::CreateRandomString();
+        $login = self::login($user);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+        ));
 
         // Set recruitment_optin to true
         $r['recruitment_optin'] = 1;

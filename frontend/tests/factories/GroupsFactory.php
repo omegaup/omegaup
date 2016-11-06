@@ -8,7 +8,7 @@ class GroupsFactory {
      * @param type $name
      * @param type $description
      */
-    public static function createGroup($owner = null, $name = null, $description = null, $alias = null) {
+    public static function createGroup(Users $owner = null, $name = null, $description = null, $alias = null, ScopedLoginToken $login = null) {
         if (is_null($owner)) {
             $owner = UserFactory::createUser();
         }
@@ -25,7 +25,9 @@ class GroupsFactory {
             $alias = Utils::CreateRandomString();
         }
 
-        $login = OmegaupTestCase::login($owner);
+        if (is_null($login)) {
+            $login = OmegaupTestCase::login($owner);
+        }
         $r = new Request(array(
             'auth_token' => $login->auth_token,
             'name' => $name,
@@ -52,8 +54,10 @@ class GroupsFactory {
      * @param array $groupData
      * @param Users $user
      */
-    public static function addUserToGroup(array $groupData, Users $user) {
-        $login = OmegaupTestCase::login($groupData['owner']);
+    public static function addUserToGroup(array $groupData, Users $user, ScopedLoginToken $login = null) {
+        if (is_null($login)) {
+            $login = OmegaupTestCase::login($groupData['owner']);
+        }
         GroupController::apiAddUser(new Request(array(
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,

@@ -100,8 +100,8 @@ class UserFilterTest extends OmegaupTestCase {
 
         $login = self::login($user);
         $r = new Request(array(
-            'filter' => '/contest/' . $contest->alias,
             'auth_token' => $login->auth_token,
+            'filter' => '/contest/' . $contest->alias,
         ));
         UserController::apiValidateFilter($r);
     }

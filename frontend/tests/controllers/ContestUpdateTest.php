@@ -13,15 +13,13 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        // Prepare request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest director
-        $r['auth_token'] = self::login($contestData['director']);
-
-        // Update title
-        $r['title'] = Utils::CreateRandomString();
+        // Update title.
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'title' => Utils::CreateRandomString(),
+        ]);
 
         // Call API
         $response = ContestController::apiUpdate($r);
@@ -40,16 +38,13 @@ class UpdateContestTest extends OmegaupTestCase {
     public function testUpdateContestNonDirector() {
         // Get a contest
         $contestData = ContestsFactory::createContest();
-
-        // Prepare request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest director
-        $r['auth_token'] = self::login(UserFactory::createUser());
-
         // Update title
-        $r['title'] = Utils::CreateRandomString();
+        $login = self::login(UserFactory::createUser());
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'title' => Utils::CreateRandomString(),
+        ]);
 
         // Call API
         ContestController::apiUpdate($r);
@@ -64,15 +59,13 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
 
-        // Prepare request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest director
-        $r['auth_token'] = self::login($contestData['director']);
-
         // Update public
-        $r['public'] = 1;
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'public' => 1,
+        ]);
 
         // Call API
         $response = ContestController::apiUpdate($r);
@@ -92,15 +85,13 @@ class UpdateContestTest extends OmegaupTestCase {
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        // Prepare request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest director
-        $r['auth_token'] = self::login($contestData['director']);
-
         // Update public
-        $r['public'] = 1;
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'public' => 1,
+        ]);
 
         // Call API
         $response = ContestController::apiUpdate($r);
@@ -116,15 +107,13 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        // Prepare request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with site admin
-        $r['auth_token'] = self::login(UserFactory::createAdminUser());
-
-        // Update value to TRUE
-        $r['value'] = 1;
+        // Update value
+        $login = self::login(UserFactory::createAdminUser());
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'value' => 1,
+        ]);
 
         // Call API
         ContestController::apiSetRecommended($r);
@@ -153,15 +142,13 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        // Prepare request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest owner
-        $r['auth_token'] = self::login($contestData['director']);
-
-        // Update value to TRUE
-        $r['value'] = 1;
+        // Update value
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'value' => 1,
+        ]);
 
         // Call API
         ContestController::apiSetRecommended($r);
@@ -176,15 +163,14 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        // Prepare request
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest director
-        $r['auth_token'] = self::login($contestData['director']);
-
         // Update length
-        $r['finish_time'] = $r['start_time'] + (60 * 60 * 24 * 32);
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'start_time' => 0,
+            'finish_time' => 60 * 60 * 24 * 32,
+        ]);
 
         // Call API
         $response = ContestController::apiUpdate($r);
@@ -213,17 +199,14 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
 
         // STEP 3: Send a new run
-        // Create an empty request
-        $r = new Request();
-
-        // Log in as contestant
-        $r['auth_token'] = self::login($contestant);
-
-        // Build request
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['language'] = 'c';
-        $r['source'] = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        $login = self::login($contestant);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ]);
 
         RunController::apiCreate($r);
     }
@@ -240,14 +223,13 @@ class UpdateContestTest extends OmegaupTestCase {
         // Submit a run
         $this->createRunInContest($contestData);
 
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest director
-        $r['auth_token'] = self::login($contestData['director']);
-
         // Update length
-        $r['start_time'] = $contestData['request']['start_time'] + 1;
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'start_time' => $contestData['request']['start_time'] + 1,
+        ]);
 
         // Call API
         $response = ContestController::apiUpdate($r);
@@ -261,14 +243,13 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest director
-        $r['auth_token'] = self::login($contestData['director']);
-
         // Update length
-        $r['start_time'] = $contestData['request']['start_time'] + 1;
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'start_time' => $contestData['request']['start_time'] + 1,
+        ]);
 
         // Call API
         $response = ContestController::apiUpdate($r);
@@ -289,15 +270,14 @@ class UpdateContestTest extends OmegaupTestCase {
         // Submit a run
         $this->createRunInContest($contestData);
 
-        $r = new Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Log in with contest director
-        $r['auth_token'] = self::login($contestData['director']);
-
-        // Update length
-        $r['start_time'] = $contestData['request']['start_time'];
-        $r['title'] = 'New title';
+        // Update title
+        $login = self::login($contestData['director']);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'start_time' => $contestData['request']['start_time'],
+            'title' => 'New title',
+        ]);
 
         // Call API
         $response = ContestController::apiUpdate($r);

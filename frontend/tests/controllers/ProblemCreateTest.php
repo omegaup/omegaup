@@ -18,7 +18,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -87,7 +88,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -128,7 +130,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -167,7 +170,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -215,7 +219,8 @@ class CreateProblemTest extends OmegaupTestCase {
             $problemAuthor = $problemData['author'];
 
             // Login user
-            $r['auth_token'] = self::login($problemAuthor);
+            $login = self::login($problemAuthor);
+            $r['auth_token'] = $login->auth_token;
 
             // Unset key
             unset($r[$key]);
@@ -247,7 +252,8 @@ class CreateProblemTest extends OmegaupTestCase {
             $problemAuthor = $problemData['author'];
 
             // Login user
-            $r['auth_token'] = self::login($problemAuthor);
+            $login = self::login($problemAuthor);
+            $r['auth_token'] = $login->auth_token;
             $r['languages'] = $languages;
             try {
                 // Call the API
@@ -271,7 +277,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -334,7 +341,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -384,7 +392,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -433,7 +442,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['title'] = 'Lá Venganza Del Malvado Dr. Liraaa';
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -482,7 +492,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -503,7 +514,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $problemAuthor = $problemData['author'];
 
         // Login user
-        $r['auth_token'] = self::login($problemAuthor);
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());

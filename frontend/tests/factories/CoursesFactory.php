@@ -1,14 +1,14 @@
 <?php
 
 class CoursesFactory {
-    public static function createCourse(Users $admin = null) {
+    public static function createCourse(Users $admin = null, ScopedLoginToken $adminLogin = null) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
+            $adminLogin = OmegaupTestCase::login($admin);
         }
 
         $courseAlias = Utils::CreateRandomString();
 
-        $adminLogin = OmegaupTestCase::login($admin);
         $r = new Request(array(
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -27,19 +27,19 @@ class CoursesFactory {
         );
     }
 
-    public static function createCourseWithOneAssignment(Users $admin = null) {
+    public static function createCourseWithOneAssignment(Users $admin = null, ScopedLoginToken $adminLogin = null) {
         if (is_null($admin)) {
             $admin = UserFactory::createUser();
+            $adminLogin = OmegaupTestCase::login($admin);
         }
 
         // Create the course
-        $courseFactoryResult = self::createCourse($admin);
+        $courseFactoryResult = self::createCourse($admin, $adminLogin);
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment
         $assignmentAlias = Utils::CreateRandomString();
 
-        $adminLogin = OmegaupTestCase::login($admin);
         $r = new Request(array(
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -70,10 +70,10 @@ class CoursesFactory {
         $courseFactoryResult = self::createCourse();
         $courseAlias = $courseFactoryResult['course_alias'];
         $admin = $courseFactoryResult['admin'];
+        $adminLogin = OmegaupTestCase::login($admin);
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
-                $adminLogin = OmegaupTestCase::login($admin);
                 $r = new Request(array(
                     'auth_token' => $adminLogin->auth_token,
                     'name' => Utils::CreateRandomString(),

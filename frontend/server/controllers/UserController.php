@@ -1873,15 +1873,18 @@ class UserController extends Controller {
                     if (count($tokens) < 3) {
                         throw new InvalidParameterException('parameterInvalid', 'filter');
                     }
-                    $r = new Request(array(
+                    $r2 = new Request(array(
                         'contest_alias' => $tokens[2],
                     ));
-                    if (count($tokens) >= 4) {
-                        $r['token'] = $tokens[3];
+                    if (isset($r['auth_token'])) {
+                        $r2['auth_token'] = $r['auth_token'];
                     }
-                    ContestController::validateDetails($r);
-                    if ($r['contest_admin']) {
-                        $response['contest_admin'][] = $r['contest_alias'];
+                    if (count($tokens) >= 4) {
+                        $r2['token'] = $tokens[3];
+                    }
+                    ContestController::validateDetails($r2);
+                    if ($r2['contest_admin']) {
+                        $response['contest_admin'][] = $r2['contest_alias'];
                     }
                     break;
                 case 'problem':

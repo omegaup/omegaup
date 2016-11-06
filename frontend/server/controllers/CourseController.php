@@ -173,10 +173,11 @@ class CourseController extends Controller {
         }
 
         // Create the associated group
-        $groupRequest = new Request(array(
+        $groupRequest = new Request([
+            'auth_token' => $r['auth_token'],
             'alias' => $r['alias'],
             'name' => 'for-' . $r['alias']
-        ));
+        ]);
 
         GroupController::apiCreate($groupRequest);
         $group = GroupsDAO::FindByAlias($groupRequest['alias']);

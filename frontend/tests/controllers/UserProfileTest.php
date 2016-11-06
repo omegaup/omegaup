@@ -12,8 +12,9 @@ class UserProfileTest extends OmegaupTestCase {
     public function testUserData() {
         $user = UserFactory::createUser('testuser1');
 
+        $login = self::login($user);
         $r = new Request(array(
-            'auth_token' => self::login($user)
+            'auth_token' => $login->auth_token,
         ));
         $response = UserController::apiProfile($r);
 
@@ -28,8 +29,9 @@ class UserProfileTest extends OmegaupTestCase {
         $user = UserFactory::createUser('testuser3');
         $user2 = UserFactory::createUser('testuser4');
 
+        $login = self::login($user);
         $r = new Request(array(
-            'auth_token' => self::login($user),
+            'auth_token' => $login->auth_token,
             'username' => $user2->username
         ));
         $response = UserController::apiProfile($r);
@@ -46,8 +48,9 @@ class UserProfileTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $admin = UserFactory::createAdminUser();
 
+        $login = self::login($user);
         $r = new Request(array(
-            'auth_token' => self::login($admin),
+            'auth_token' => $login->auth_token,
             'username' => $user->username
         ));
         $response = UserController::apiProfile($r);
@@ -61,8 +64,9 @@ class UserProfileTest extends OmegaupTestCase {
     public function testUserCanSeeSelfEmail() {
         $user = UserFactory::createUser();
 
+        $login = self::login($user);
         $r = new Request(array(
-            'auth_token' => self::login($user),
+            'auth_token' => $login->auth_token,
             'username' => $user->username
         ));
         $response = UserController::apiProfile($r);
@@ -90,9 +94,10 @@ class UserProfileTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         // Get ContestStats
+        $login = self::login($contestant);
         $response = UserController::apiContestStats(new Request(
             array(
-                    'auth_token' => self::login($contestant)
+                    'auth_token' => $login->auth_token,
                 )
         ));
 
@@ -122,10 +127,11 @@ class UserProfileTest extends OmegaupTestCase {
 
         $externalUser = UserFactory::createUser();
 
+        $login = self::login($externalUser);
         // Get ContestStats
         $response = UserController::apiContestStats(new Request(
             array(
-                    'auth_token' => self::login($externalUser),
+                    'auth_token' => $login->auth_token,
                     'username' => $contestant->username
                 )
         ));
@@ -159,8 +165,9 @@ class UserProfileTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runs[1]);
         RunsFactory::gradeRun($runs[2]);
 
+        $login = self::login($user);
         $r = new Request(array(
-            'auth_token' => self::login($user)
+            'auth_token' => $login->auth_token,
         ));
 
         $response = UserController::apiProblemsSolved($r);
@@ -174,8 +181,9 @@ class UserProfileTest extends OmegaupTestCase {
     public function testUpdateMainEmail() {
         $user = UserFactory::createUser();
 
+        $login = self::login($user);
         $r = new Request(array(
-            'auth_token' => self::login($user),
+            'auth_token' => $login->auth_token,
             'email' => 'new@email.com'
         ));
         $response = UserController::apiUpdateMainEmail($r);

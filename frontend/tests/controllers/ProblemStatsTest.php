@@ -49,9 +49,11 @@ class ProblemStatsTest extends OmegaupTestCase {
         }
 
         // Create request
-        $r = new Request();
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['auth_token'] = self::login($problemData['author']);
+        $login = self::login($problemData['author']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['alias'],
+        ));
 
         // Call API
         $response = ProblemController::apiStats($r);

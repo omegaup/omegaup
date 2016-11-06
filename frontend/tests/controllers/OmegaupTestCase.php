@@ -352,11 +352,4 @@ class ScopedLoginToken {
     public function __destruct() {
         OmegaUpTestCase::logout();
     }
-
-    // TODO: Delete this function. The existence of this allows for sessions to
-    // be stored longer than intended since they will be added to Request
-    // objects and then still maybe not cleaned up.
-    public function __toString() {
-        return $this->auth_token;
-    }
 }

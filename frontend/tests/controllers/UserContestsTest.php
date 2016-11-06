@@ -17,8 +17,9 @@ class UserContestsTest extends OmegaupTestCase {
         $contestData[1] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
 
         // Call api
+        $login = self::login($director);
         $r = new Request(array(
-            'auth_token' => self::login($director)
+            'auth_token' => $login->auth_token,
         ));
         $response = ContestController::apiMyList($r);
 

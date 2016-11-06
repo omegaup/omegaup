@@ -2,10 +2,12 @@
 
 class UserRankTest extends OmegaupTestCase {
     private function refreshUserRank() {
-        $r = new Request();
         $admin = UserFactory::createAdminUser();
 
-        $r['auth_token'] = self::login($admin);
+        $adminLogin = self::login($admin);
+        $r = new Request(array(
+            'auth_token' => $adminLogin->auth_token,
+        ));
         UserController::apiRefreshUserRank($r);
     }
 

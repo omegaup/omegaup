@@ -584,10 +584,10 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request(array(
+        $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ));
+        ]);
 
         // Call api. This should fail.
         try {
@@ -600,12 +600,11 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Get details from a problem in that contest. This should also fail.
         try {
-            $login2 = self::login($contestant);
-            $problem_request = new Request(array(
-                'auth_token' => $login2->auth_token,
+            $problem_request = new Request([
+                'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'problem_alias' => $problems[0]['request']['alias']
-            ));
+                'problem_alias' => $problems[0]['request']['alias'],
+            ]);
 
             ProblemController::apiDetails($problem_request);
             $this->assertTrue(false, 'User with no access could see the problem');

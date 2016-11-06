@@ -35,19 +35,18 @@ class UpdateProblemTest extends OmegaupTestCase {
         // We will submit 2 runs to the problem, a call to grader to rejudge them
         $this->detourGraderCalls($this->exactly(1));
 
-        // Prepare request
-        $r = new Request();
-        $r['title'] = 'new title';
-        $r['time_limit'] = 12345;
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['stack_limit'] = 12345;
-        $r['message'] = 'Changed some properties';
+        $login = self::login($problemData['author']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'title' => 'new title',
+            'time_limit' => 12345,
+            'problem_alias' => $problemData['request']['alias'],
+            'stack_limit' => 12345,
+            'message' => 'Changed some properties',
+        ));
 
         // Set file upload context
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'triangulos.zip';
-
-        // Log in as contest director
-        $r['auth_token'] = self::login($problemData['author']);
 
         // Call API
         $response = ProblemController::apiUpdate($r);
@@ -90,14 +89,13 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Get a problem
         $problemData = ProblemsFactory::createProblem(null, 'valid-languages');
 
-        // Prepare request
-        $r = new Request();
-        $r['languages'] = 'hs,java,pl';
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['message'] = 'Changed alias and languages';
-
-        // Log in as contest director
-        $r['auth_token'] = self::login($problemData['author']);
+        $login = self::login($problemData['author']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'languages' => 'hs,java,pl',
+            'problem_alias' => $problemData['request']['alias'],
+            'message' => 'Changed alias and languages',
+        ));
 
         //Call API
         $response = ProblemController::apiUpdate($r);
@@ -122,14 +120,15 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
-        // Prepare request
-        $r = new Request();
-        $r['languages'] = 'cows,hs,java,pl';
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['message'] = 'Changed invalid languages';
+        $login = self::login($problemData['author']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'languages' => 'cows,hs,java,pl',
+            'problem_alias' => $problemData['request']['alias'],
+            'message' => 'Changed invalid languages',
+        ));
 
         // Log in as contest director
-        $r['auth_token'] = self::login($problemData['author']);
 
         //Call API
         $response = ProblemController::apiUpdate($r);
@@ -144,8 +143,9 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Update statement
         $statement = 'This is the new statement \$x\$';
+        $login = self::login($problemData['author']);
         $response = ProblemController::apiUpdateStatement(new Request(array(
-            'auth_token' => self::login($problemData['author']),
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'message' => 'Statement is now more fun',
             'statement' => $statement
@@ -174,8 +174,9 @@ class UpdateProblemTest extends OmegaupTestCase {
         $imgFilename = 'af6a4603e039cca2f6823d287f6c87e561aa6e68.png';
 
         $statement = "This is the new statement with an image omg ![Alt text]($imgUri \"Optional title\")";
+        $login = self::login($problemData['author']);
         $response = ProblemController::apiUpdateStatement(new Request(array(
-            'auth_token' => self::login($problemData['author']),
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'message' => 'Statement now contains images',
             'statement' => $statement
@@ -210,17 +211,17 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->detourGraderCalls($this->exactly(0));
 
         // Prepare request
-        $r = new Request();
-        $r['title'] = 'new title';
-        $r['time_limit'] = 12345;
-        $r['problem_alias'] = $problemData['request']['alias'];
-        $r['message'] = 'This shoudl fail';
+        $login = self::login($problemData['author']);
+        $r = new Request(array(
+            'auth_token' => $login->auth_token,
+            'title' => 'new title',
+            'time_limit' => 12345,
+            'problem_alias' => $problemData['request']['alias'],
+            'message' => 'This shoudl fail',
+        ));
 
         // Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'nostmt.zip';
-
-        // Log in as contest director
-        $r['auth_token'] = self::login($problemData['author']);
 
         // Call API. Should fail
         try {
@@ -253,21 +254,23 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemAdmin = UserFactory::createUser();
 
         // Add admin to the problem
+        $adminLogin = self::login($problemData['author']);
         $response = ProblemController::apiAddAdmin(new Request(array(
+            'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => self::login($problemData['author'])
         )));
 
         $this->assertEquals('ok', $response['status']);
 
         //Call API
         $newTitle = 'new title coadmin';
+        $login = self::login($problemAdmin);
         $response = ProblemController::apiUpdate(new Request(array(
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'title' => $newTitle,
             'message' => 'Admin powers',
-            'auth_token' => self::login($problemAdmin)
         )));
 
         // Verify data in DB
@@ -291,29 +294,31 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemAdmin = UserFactory::createUser();
 
         // Add admin to the problem
+        $adminLogin = self::login($problemData['author']);
         $response = ProblemController::apiAddAdmin(new Request(array(
+            'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => self::login($problemData['author'])
         )));
 
         $this->assertEquals('ok', $response['status']);
 
         // Then remove the user
         $response = ProblemController::apiRemoveAdmin(new Request(array(
+            'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => self::login($problemData['author'])
         )));
         $this->assertEquals('ok', $response['status']);
 
         //Call API
         $newTitle = 'new title coadmin';
+        $login = self::login($problemAdmin);
         $response = ProblemController::apiUpdate(new Request(array(
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['alias'],
             'title' => $newTitle,
             'message' => 'Non-admin powers',
-            'auth_token' => self::login($problemAdmin)
         )));
 
         // Verify data in DB
@@ -333,10 +338,11 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemAdmin = UserFactory::createUser();
 
         // Add admin to the problem
+        $login = self::login($problemData['author']);
         $response = ProblemController::apiAddAdmin(new Request(array(
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => self::login($problemData['author'])
+            'auth_token' => $login->auth_token,
         )));
 
         $this->assertEquals('ok', $response['status']);
@@ -344,7 +350,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Get the list of admins
         $response = ProblemController::apiAdmins(new Request(array(
             'problem_alias' => $problemData['request']['alias'],
-            'auth_token' => self::login($problemData['author'])
+            'auth_token' => $login->auth_token,
         )));
 
         $adminFound = false;
