@@ -29,29 +29,62 @@ git:
   submodules: false
 
 before_install:
-  - pip install --user six
-  - pip install --user https://github.com/google/closure-linter/zipball/master
-  - git submodule update --init frontend/server/libs/third_party/smarty frontend/server/libs/third_party/phpmailer frontend/server/libs/third_party/log4php frontend/server/libs/third_party/adodb frontend/server/libs/third_party/facebook-php-sdk frontend/server/libs/third_party/google-api-php-client
-  - nvm install 6.9.1
-  - npm install -g yarn
+  - |
+      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || git submodule update --init \
+          frontend/server/libs/third_party/smarty \
+          frontend/server/libs/third_party/phpmailer \
+          frontend/server/libs/third_party/log4php \
+          frontend/server/libs/third_party/adodb \
+          frontend/server/libs/third_party/facebook-php-sdk \
+          frontend/server/libs/third_party/google-api-php-client
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || pip install --user six
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || pip install --user \
+         https://github.com/google/closure-linter/zipball/master
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || nvm install 6.9.1
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || npm install -g yarn
 
 cache:
   directories:
   - $HOME/.yarn-cache
 
 before_script:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
-  - mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
-  - python3 stuff/db-migrate.py --username=travis --password= migrate --databases=omegaup-test
-  - if [ $TRAVIS_PHP_VERSION != "hhvm" ]; then pear install pear/PHP_CodeSniffer-2.6.2 && phpenv rehash; fi
+  - |
+      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || \
+          mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`'
+  - |
+      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || \
+          mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
+  - |
+      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || \
+          python3 stuff/db-migrate.py --username=travis --password= \
+          migrate --databases=omegaup-test
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
+          (pear install pear/PHP_CodeSniffer-2.6.2 && phpenv rehash)
 
 script:
-  - phpunit --bootstrap frontend/tests/bootstrap.php --configuration frontend/tests/phpunit.xml frontend/tests/controllers
-  - yarn install && yarn test
-  - python stuff/i18n.py --validate
-  - python3 stuff/whitespace-purge.py validate --all-files
-  - python3 stuff/js-lint.py validate --all-files
-  - if [ $TRAVIS_PHP_VERSION != "hhvm" ]; then python3 stuff/php-format.py validate --all-files; fi
+  - |
+      ! [ $TRAVIS_PHP_VERSION == "hhvm" ] || \
+          phpunit --bootstrap frontend/tests/bootstrap.php --configuration \
+          frontend/tests/phpunit.xml frontend/tests/controllers
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || (yarn install && yarn test)
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
+          python stuff/i18n.py --validate
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
+          python3 stuff/whitespace-purge.py validate --all-files
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
+          python3 stuff/js-lint.py validate --all-files
+  - |
+      ! [ $TRAVIS_PHP_VERSION != "hhvm" ] || \
+          python3 stuff/php-format.py validate --all-files
 
 notifications:
   slack:
