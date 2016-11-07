@@ -68,9 +68,10 @@ DROP PROCEDURE `Contests_ACLs_Migrate`;
 ALTER TABLE `Contests`
   CHANGE COLUMN `acl_id` `acl_id` int(11) NOT NULL,
   ADD KEY `acl_id` (`acl_id`),
-  ADD CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `Contests`
   DROP FOREIGN KEY `fk_cu_director_id`,
-  DROP INDEX `idx_contest_director_id`,
   DROP INDEX `idx_contest_public_director_id`,
   DROP COLUMN `director_id`;
 
@@ -129,7 +130,9 @@ DROP PROCEDURE `Problems_ACLs_Migrate`;
 ALTER TABLE `Problems`
   CHANGE COLUMN `acl_id` `acl_id` int(11) NOT NULL,
   ADD KEY `acl_id` (`acl_id`),
-  ADD CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `Problems`
   DROP FOREIGN KEY `author_id`,
   DROP COLUMN `author_id`;
 
@@ -150,7 +153,7 @@ WHERE
 
 -- Roles update.
 ALTER TABLE `User_Roles`
-  DROP KEY `contest_id`,
+  DROP KEY `idx_user_roles_contest`,
   ADD KEY `acl_id` (`acl_id`),
   CHANGE COLUMN `contest_id` `acl_id` INT(11) NOT NULL,
   ADD CONSTRAINT `fk_ura_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
