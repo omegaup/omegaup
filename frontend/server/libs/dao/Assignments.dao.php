@@ -14,7 +14,7 @@ class AssignmentsDAO extends AssignmentsDAOBase
 {
     public static function GetProblemset($assignmentAlias)
     {
-        $sql = 'select p.* from Assignments a, Problemsets p where a.id_problemset = p.problemset_id and a.alias = ?;';
+        $sql = 'select p.* from Assignments a, Problemsets p where a.problemset_id = p.problemset_id and a.alias = ?;';
         $params = array($assignmentAlias);
 
         global $conn;
@@ -27,14 +27,14 @@ class AssignmentsDAO extends AssignmentsDAOBase
         return new Problemsets($rs);
     }
 
-    public static function getAssignmentCountsForCourse($id_course) {
+    public static function getAssignmentCountsForCourse($course_id) {
         global $conn;
 
         $sql = 'SELECT a.assignment_type, COUNT(*) AS count
                 FROM Assignments a
-                WHERE a.id_course = ?
+                WHERE a.course_id = ?
                 GROUP BY a.assignment_type;';
-        $rs = $conn->Execute($sql, $id_course);
+        $rs = $conn->Execute($sql, $course_id);
         $counts = array();
         foreach ($rs as $row) {
             $counts[$row['assignment_type']] = $row['count'];

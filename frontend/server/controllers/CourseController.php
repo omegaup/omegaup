@@ -33,7 +33,7 @@ class CourseController extends Controller {
             throw new InvalidParameterException('parameterInvalid');
         }
 
-        $r['id_course'] = $parent_course[0]->course_id;
+        $r['course'] = $parent_course[0];
 
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
         Validators::isInEnum($r['assignment_type'], 'assignment_type', array('test', 'homework'), true /*is_required*/);
@@ -132,9 +132,8 @@ class CourseController extends Controller {
         $course = new Courses($r);
         $course->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
         $course->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
-        $course->id_owner = $r['current_user_id'];
-        $course->id_group = $group->group_id;
-        $course->id_acl = $acl->acl_id;
+        $course->group_id = $group->group_id;
+        $course->acl_id = $acl->acl_id;
 
         $course_id = -1;
         try {
@@ -171,7 +170,8 @@ class CourseController extends Controller {
             // Create the backing problemset
             ProblemsetsDAO::save($problemSet);
 
-            $assignment->id_problemset = $problemSet->problemset_id;
+            $assignment->problemset_id = $problemSet->problemset_id;
+            $assignment->course_id = $r['course']->course_id;
 
             AssignmentsDAO::save($assignment);
         } catch (Exception $e) {
@@ -223,7 +223,7 @@ class CourseController extends Controller {
         $assignments = array();
         try {
             $assignments = AssignmentsDAO::search(new Assignments(array(
-                'id_course' => $r['course']->course_id
+                'course_id' => $r['course']->course_id
             )));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -267,14 +267,30 @@ class CourseController extends Controller {
     public static function apiListCourses(Request $r) {
         self::authenticateRequest($r);
 
+        Validators::isNumber($r['page'], 'page', false);
+        Validators::isNumber($r['page_size'], 'page_size', false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
         // TODO(pablo): Cache
-        // TODO(pablo): Proper ACLs
         // Courses the user is an admin for.
         $admin_courses = array();
         try {
-            $admin_courses = CoursesDAO::search(new Courses(array(
-                'id_owner' => $r['current_user_id']
-            )));
+            if (Authorization::isSystemAdmin($r['current_user_id'])) {
+                $admin_courses = CoursesDAO::getAll(
+                    $page,
+                    $pageSize,
+                    'course_id',
+                    'DESC'
+                );
+            } else {
+                $admin_courses = CoursesDAO::getAllCoursesAdminedByUser(
+                    $r['current_user_id'],
+                    $page,
+                    $pageSize
+                );
+            }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -295,8 +311,7 @@ class CourseController extends Controller {
         foreach ($admin_courses as $course) {
             $response['admin'][] = CourseController::convertCourseToArray($course);
         }
-        foreach ($student_courses as $course_array) {
-            $course = new Courses($course_array);
+        foreach ($student_courses as $course) {
             $response['student'][] = CourseController::convertCourseToArray($course);
         }
         return $response;

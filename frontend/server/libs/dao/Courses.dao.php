@@ -50,16 +50,16 @@ class CoursesDAO extends CoursesDAOBase
         global  $conn;
 
         $sql = 'select a.* from Courses c, Assignments a '
-                . ' where c.alias = ? and a.id_course = c.course_id'
+                . ' where c.alias = ? and a.course_id = c.course_id'
                 . ' order by start_time;';
 
         $rs = $conn->Execute($sql, array($alias));
 
         $ar = array();
         foreach ($rs as $row) {
-            unset($row['assignement_id']);
-            unset($row['id_course']);
-            unset($row['id_problemset']);
+            unset($row['assignment_id']);
+            unset($row['course_id']);
+            unset($row['problemset_id']);
             $row['start_time'] =  strtotime($row['start_time']);
             $row['finish_time'] = strtotime($row['finish_time']);
             array_push($ar, $row);
@@ -78,12 +78,12 @@ class CoursesDAO extends CoursesDAOBase
                     INNER JOIN Groups g ON g.group_id = gu.group_id
                     WHERE gu.user_id = ?
                 ) gg
-                ON c.id_group = gg.group_id;
+                ON c.group_id = gg.group_id;
                ';
         $rs = $conn->Execute($sql, $user);
         $courses = array();
         foreach ($rs as $row) {
-            array_push($courses, $row);
+            array_push($courses, new Courses($row));
         }
         return $courses;
     }
@@ -111,8 +111,8 @@ class CoursesDAO extends CoursesDAOBase
                 INNER JOIN (
                     SELECT a.assignment_id, a.name, p.problem_id, p.alias, p.name, max(r.score) as best_score
                     FROM Courses c
-                    INNER JOIN Assignments a ON c.course_id = ? AND c.course_id = a.id_course
-                    INNER JOIN Problemsets ps ON a.id_problemset = ps.problemset_id
+                    INNER JOIN Assignments a ON c.course_id = ? AND c.course_id = a.course_id
+                    INNER JOIN Problemsets ps ON a.problemset_id = ps.problemset_id
                     INNER JOIN Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
                     INNER JOIN Problems p ON p.problem_id = psp.problemset_id
                     INNER JOIN Runs r ON r.problem_id = p.problem_id AND r.contest_id (!!!)
@@ -127,5 +127,93 @@ class CoursesDAO extends CoursesDAOBase
             array_push($users, $row);
         }
         return $users;
+    }
+
+    /**
+     * Returns all courses that a user can manage.
+     */
+    final public static function getAllCoursesAdminedByUser(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $offset = ($page - 1) * $pageSize;
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Courses AS c
+            INNER JOIN
+                ACLs AS a ON a.acl_id = c.acl_id
+            LEFT JOIN
+                User_Roles ur ON ur.acl_id = c.acl_id
+            LEFT JOIN
+                Group_Roles gr ON gr.acl_id = c.acl_id
+            LEFT JOIN
+                Groups_Users gu ON gu.group_id = gr.group_id
+            WHERE
+                a.owner_id = ? OR
+                (ur.role_id = ? AND ur.user_id = ?) OR
+                (gr.role_id = ? AND gu.user_id = ?)
+            ORDER BY
+                c.course_id DESC
+            LIMIT
+                ?, ?';
+        $params = array(
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            $offset,
+            $pageSize,
+        );
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $courses = array();
+        foreach ($rs as $row) {
+            array_push($courses, new Courses($row));
+        }
+        return $courses;
+    }
+
+    /**
+     * Returns all courses owned by a user.
+     */
+    final public static function getAllCoursesOwnedByUser(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $offset = ($page - 1) * $pageSize;
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Courses AS c
+            INNER JOIN
+                ACLs AS a ON a.acl_id = c.acl_id
+            WHERE
+                a.owner_id = ?
+            ORDER BY
+                c.course_id DESC
+            LIMIT
+                ?, ?';
+        $params = array(
+            $user_id,
+            $offset,
+            $pageSize,
+        );
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $courses = array();
+        foreach ($rs as $row) {
+            array_push($courses, new Courses($row));
+        }
+        return $courses;
     }
 }

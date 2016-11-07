@@ -113,7 +113,6 @@ class ContestsDAO extends ContestsDAOBase
                                 UNIX_TIMESTAMP (finish_time) as finish_time,
                                 public,
                                 alias,
-                                director_id,
                                 recommended,
                                 window_length
                                 ';
@@ -135,17 +134,26 @@ class ContestsDAO extends ContestsDAOBase
     }
 
     public static function getPrivateContestsCount(Users $user) {
-        $sql = 'SELECT count(*) as Total FROM Contests WHERE public = 0 and (director_id = ?);';
+        $sql = 'SELECT
+           COUNT(c.contest_id) as total
+        FROM
+            Contests AS c
+        INNER JOIN
+            ACLs AS a
+        ON
+            a.acl_id = c.acl_id
+        WHERE
+            public = 0 and a.owner_id = ?;';
         $params = array($user->user_id);
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
 
-        if (!array_key_exists('Total', $rs)) {
+        if (!array_key_exists('total', $rs)) {
             return 0;
         }
 
-        return $rs['Total'];
+        return $rs['total'];
     }
 
     public static function hasStarted(Contests $contest) {
@@ -188,17 +196,103 @@ class ContestsDAO extends ContestsDAOBase
     }
 
     /**
+     * Returns all contests that a user can manage.
+     */
+    final public static function getAllContestsAdminedByUser(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $offset = ($page - 1) * $pageSize;
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Contests c
+            INNER JOIN
+                ACLs a ON a.acl_id = c.acl_id
+            LEFT JOIN
+                User_Roles ur ON ur.acl_id = c.acl_id
+            LEFT JOIN
+                Group_Roles gr ON gr.acl_id = c.acl_id
+            LEFT JOIN
+                Groups_Users gu ON gu.group_id = gr.group_id
+            WHERE
+                a.owner_id = ? OR
+                (ur.role_id = ? AND ur.user_id = ?) OR
+                (gr.role_id = ? AND gu.user_id = ?)
+            ORDER BY
+                c.contest_id DESC
+            LIMIT ?, ?;';
+
+        $params = array(
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            $offset,
+            $pageSize,
+        );
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $contests = array();
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
+    /**
+     * Returns all contests owned by a user.
+     */
+    final public static function getAllContestsOwnedByUser(
+        $user_id,
+        $page = 1,
+        $pageSize = 1000
+    ) {
+        $offset = ($page - 1) * $pageSize;
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Contests c
+            INNER JOIN
+                ACLs a ON a.acl_id = c.acl_id
+            WHERE
+                a.owner_id = ?
+            ORDER BY
+                c.contest_id DESC
+            LIMIT ?, ?;';
+        $params = array(
+            $user_id,
+            $offset,
+            $pageSize,
+        );
+
+        global $conn;
+        $rs = $conn->Execute($sql, $params);
+
+        $contests = array();
+        foreach ($rs as $row) {
+            array_push($contests, new Contests($row));
+        }
+        return $contests;
+    }
+
+    /**
      * Regresa todos los concursos que un usuario puede ver.
      *
      * Explicación:
      *
-     * La estructura de este query optimiza el uso de indíces en mysql, en particular idx_contest_public_director_id
-     * y idx_contest_public.
+     * La estructura de este query optimiza el uso de indíces en mysql.
      *
      * El primer SELECT transforma las columnas a como las espera la API.
      * Luego:
      *
-     * Todos los concursos privados donde el usuadio fue el creador (director_id)
+     * Todos los concursos privados donde el usuario fue el creador
      * UNION
      * Todos los concursos privados a los que el usuario ha sido invitado
      * UNION
@@ -231,30 +325,32 @@ class ContestsDAO extends ContestsDAOBase
         $recommended_check = RecommendedStatus::sql($recomendados);
         $sql = "
                  (
-                     SELECT
+                    SELECT
                         $columns
-                     FROM
+                    FROM
                         Contests
-                     WHERE
-                        Contests.public = 0 AND Contests.director_id = ? AND
+                    INNER JOIN
+                        ACLs
+                    ON
+                        ACLs.acl_id = Contests.acl_id
+                    WHERE
+                        Contests.public = 0 AND ACLs.owner_id = ? AND
                         $recommended_check AND $end_check
                  )
-
                  UNION
                  (
-                     SELECT
+                    SELECT
                         $columns
-                     FROM
-                         Contests
-                     JOIN
-                         Contests_Users
-                     ON
-                         Contests.contest_id = Contests_Users.contest_id
-                     WHERE
-                         Contests.public = 0 AND Contests_Users.user_id = ? AND
-                         $recommended_check AND $end_check
+                    FROM
+                        Contests
+                    JOIN
+                        Contests_Users
+                    ON
+                        Contests.contest_id = Contests_Users.contest_id
+                    WHERE
+                        Contests.public = 0 AND Contests_Users.user_id = ? AND
+                        $recommended_check AND $end_check
                  )
-
                  UNION
                  (
                      SELECT
@@ -264,15 +360,13 @@ class ContestsDAO extends ContestsDAOBase
                      JOIN
                          User_Roles
                      ON
-                         User_Roles.contest_id = Contests.contest_id
-
+                         User_Roles.acl_id = Contests.acl_id
                      WHERE
                          Contests.public = 0 AND
                          User_Roles.user_id = ? AND
-                         (User_Roles.role_id = 2 or User_Roles.role_id = 1) AND
+                         User_Roles.role_id = ? AND
                          $recommended_check AND $end_check
                  )
-
                  UNION
                  (
                      SELECT
@@ -280,16 +374,15 @@ class ContestsDAO extends ContestsDAOBase
                      FROM
                          Contests
                      JOIN
-                         Group_Roles ON Contests.contest_id = Group_Roles.contest_id
+                         Group_Roles ON Contests.acl_id = Group_Roles.acl_id
                      JOIN
                          Groups_Users ON Groups_Users.group_id = Group_Roles.group_id
                      WHERE
                          Contests.public = 0 AND
                          Groups_Users.user_id = ? AND
-                         (Group_Roles.role_id = 2 or Group_Roles.role_id = 1) AND
+                         Group_Roles.role_id = ? AND
                          $recommended_check AND $end_check
                  )
-
                  UNION
                  (
                      SELECT
@@ -297,7 +390,7 @@ class ContestsDAO extends ContestsDAOBase
                      FROM
                          Contests
                      WHERE
-                         Public = 1 AND $recommended_check AND $end_check
+                         public = 1 AND $recommended_check AND $end_check
                  )
                  ORDER BY
                      CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
@@ -306,7 +399,16 @@ class ContestsDAO extends ContestsDAOBase
                  LIMIT ?, ?
                 ";
 
-        $params = array($user_id, $user_id, $user_id, $user_id, $offset, $renglones_por_pagina);
+        $params = array(
+            $user_id,
+            $user_id,
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            $offset,
+            $renglones_por_pagina,
+        );
 
         global $conn;
         $rs = $conn->Execute($sql, $params);

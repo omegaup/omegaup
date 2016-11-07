@@ -126,6 +126,7 @@ class Utils {
 
         // Tables to truncate
         $tables = array(
+            'ACLs',
             'Auth_Tokens',
             'Assignments',
             'Clarifications',
@@ -161,14 +162,12 @@ class Utils {
                 $sql = 'TRUNCATE TABLE `' . $t . '`; ';
                 $conn->Execute($sql);
             }
-
-            // Enabling them again
-            $conn->Execute('SET foreign_key_checks = 1;');
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($sql);
             var_dump($e->getMessage());
-
+        } finally {
+            // Enabling them again
             $conn->Execute('SET foreign_key_checks = 1;');
         }
     }

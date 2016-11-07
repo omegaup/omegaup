@@ -20,7 +20,7 @@ class UserContestsTest extends OmegaupTestCase {
         $r = new Request(array(
             'auth_token' => self::login($director)
         ));
-        $response = UserController::apiContests($r);
+        $response = ContestController::apiMyList($r);
 
         // Contests should come ordered by contest id desc
         $this->assertEquals(count($contestData), count($response['contests']));
@@ -34,22 +34,29 @@ class UserContestsTest extends OmegaupTestCase {
     public function testAdminList() {
         // Our director
         $director = UserFactory::createUser();
+        $contestAdminData = array();
 
-        // Get two contests with another director, add $director to their admin list
+        // Get two contests with another director, add $director to their
+        // admin list
         $contestAdminData[0] = ContestsFactory::createContest();
         ContestsFactory::addAdminUser($contestAdminData[0], $director);
 
+        // Get two contests with another director, add $director to their
+        // group admin list
         $contestAdminData[1] = ContestsFactory::createContest();
-        ContestsFactory::addAdminUser($contestAdminData[1], $director);
+        $group = GroupsFactory::createGroup($contestAdminData[1]['director']);
+        GroupsFactory::addUserToGroup($group, $director);
+        ContestsFactory::addGroupAdmin($contestAdminData[1], $group['group']);
 
         $contestDirectorData[0] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
-        $contestDirectorData[1] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
+        $contestDirectorData[1] = ContestsFactory::createContest(null /*title*/, 0 /*public*/, $director);
 
         // Call api
+        $login = self::login($director);
         $r = new Request(array(
-            'auth_token' => self::login($director)
+            'auth_token' => $login->auth_token,
         ));
-        $response = UserController::apiContests($r);
+        $response = ContestController::apiAdminList($r);
 
         // Contests should come ordered by contest id desc
         $this->assertEquals(count($contestDirectorData) + count($contestAdminData), count($response['contests']));

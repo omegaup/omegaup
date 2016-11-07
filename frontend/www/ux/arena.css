@@ -647,3 +647,12 @@ td.forcebreaks-arena {
   margin-left: 1em;
   margin-right: 1em;
 }
+
+.contest-list tr:nth-child(4n+3), .contest-list tr:nth-child(4n+4) {
+  background: #f9f9f9;
+  margin-bottom: 0;
+}
+
+.contest-list tr:nth-child(4n+2) td, .contest-list tr:nth-child(4n+4) td {
+   border: none;
+}

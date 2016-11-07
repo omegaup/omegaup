@@ -26,7 +26,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Get the role
         $contest = $contestData['contest'];
-        $ur = UserRolesDAO::getByPK($user->user_id, CONTEST_ADMIN_ROLE, $contest->contest_id);
+        $ur = UserRolesDAO::getByPK($user->user_id, Authorization::ADMIN_ROLE, $contest->acl_id);
 
         $this->assertNotNull($ur);
     }
@@ -97,8 +97,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ContestController::apiRemoveAdmin($r);
 
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $this->AssertFalse(Authorization::IsContestAdmin($user->user_id, $contest));
-        $this->AssertTrue(Authorization::IsContestAdmin($user2->user_id, $contest));
+        $this->AssertFalse(Authorization::isContestAdmin($user->user_id, $contest));
+        $this->AssertTrue(Authorization::isContestAdmin($user2->user_id, $contest));
     }
 
     public function testAddContestGroupAdmin() {
@@ -124,7 +124,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $response = ContestController::apiAddGroupAdmin($r);
 
         // Get the role
-        $ur = GroupRolesDAO::getByPK($groupData['group']->group_id, CONTEST_ADMIN_ROLE, $contestData['contest']->contest_id);
+        $ur = GroupRolesDAO::getByPK($groupData['group']->group_id, Authorization::ADMIN_ROLE, $contestData['contest']->acl_id);
 
         $this->assertNotNull($ur);
     }
@@ -202,8 +202,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
         unset($login);
 
         $contest = $contestData['contest'];
-        $this->AssertTrue(Authorization::IsContestAdmin($user->user_id, $contest));
-        $this->AssertTrue(Authorization::IsContestAdmin($user2->user_id, $contest));
+        $this->AssertTrue(Authorization::isContestAdmin($user->user_id, $contest));
+        $this->AssertTrue(Authorization::isContestAdmin($user2->user_id, $contest));
 
         // Prepare request for remove the group
         $login = self::login($contestData['director']);
@@ -216,7 +216,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         // Call api
         ContestController::apiRemoveGroupAdmin($r);
 
-        $this->AssertFalse(Authorization::IsContestAdmin($user->user_id, $contest));
-        $this->AssertFalse(Authorization::IsContestAdmin($user2->user_id, $contest));
+        $this->AssertFalse(Authorization::isContestAdmin($user->user_id, $contest));
+        $this->AssertFalse(Authorization::isContestAdmin($user2->user_id, $contest));
     }
 }

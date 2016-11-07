@@ -188,6 +188,21 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
+    public static function addGroupAdmin($contestData, Groups $group) {
+        // Prepare our request
+        $r = new Request(array(
+            'contest_alias' => $contestData['request']['alias'],
+            'group' => $group->alias,
+        ));
+
+        // Log in the contest director
+        $login = OmegaupTestCase::login($contestData['director']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call api
+        ContestController::apiAddGroupAdmin($r);
+    }
+
     public static function makeContestWindowLength($contestData, $windowLength = 20) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->window_length = $windowLength;
