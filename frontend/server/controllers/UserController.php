@@ -410,7 +410,7 @@ class UserController extends Controller {
         $hashedPassword = null;
         if (isset($r['username']) &&
             ((!is_null(self::$permissionKey) && self::$permissionKey == $r['permission_key']) ||
-            Authorization::IsSystemAdmin($r['current_user_id']))) {
+            Authorization::isSystemAdmin($r['current_user_id']))) {
             // System admin can force reset passwords for any user
             Validators::isStringNonEmpty($r['username'], 'username');
 
@@ -471,7 +471,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+            if (!Authorization::isSystemAdmin($r['current_user_id'])) {
                 throw new ForbiddenAccessException();
             }
 
@@ -531,7 +531,7 @@ class UserController extends Controller {
     public static function apiMailingListBackfill(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -653,7 +653,7 @@ class UserController extends Controller {
 
         $response = array();
 
-        $is_system_admin = Authorization::IsSystemAdmin($r['current_user_id']);
+        $is_system_admin = Authorization::isSystemAdmin($r['current_user_id']);
         if ($r['contest_type'] == 'OMI') {
             if ($r['current_user']->username != 'andreasantillana'
                 && !$is_system_admin
@@ -878,13 +878,22 @@ class UserController extends Controller {
             $keys = array(
                 'CCUPITSUR-16' => 50,
             );
+        } elseif ($r['contest_type'] == 'CONALEP') {
+            if ($r['current_user']->username != 'reyes811'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = array (
+                'OIC-16' => 225
+            );
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 array(
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR',
+                    'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP',
                 )
             );
         }
@@ -912,92 +921,6 @@ class UserController extends Controller {
             }
         }
 
-        return $response;
-    }
-
-    /**
-     * Get list of contests where the user has admin priviledges
-     *
-     * @param Request $r
-     * @return string
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiContests(Request $r) {
-        self::authenticateRequest($r);
-
-        $response = array();
-        $response['contests'] = array();
-
-        try {
-            $contest_director_key = new Contests(array(
-                        'director_id' => $r['current_user_id']
-                    ));
-            $contests_director = ContestsDAO::search($contest_director_key);
-
-            foreach ($contests_director as $contest) {
-                $response['contests'][] = $contest->asArray();
-            }
-
-            $contest_admin_key = new UserRoles(array(
-                        'user_id' => $r['current_user_id'],
-                        'role_id' => CONTEST_ADMIN_ROLE,
-                    ));
-            $contests_admin = UserRolesDAO::search($contest_admin_key);
-
-            foreach ($contests_admin as $contest_key) {
-                $contest = ContestsDAO::getByPK($contest_key->contest_id);
-
-                if (is_null($contest)) {
-                    self::$log->error("UserRoles has a invalid contest: {$contest->contest_id}");
-                    continue;
-                }
-
-                $response['contests'][] = $contest->asArray();
-            }
-
-            usort($response['contests'], function ($a, $b) {
-                        return ($a['contest_id'] > $b['contest_id']) ? -1 : 1;
-            });
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $response['status'] = 'ok';
-        return $response;
-    }
-
-    /**
-     * Get list of my editable problems
-     *
-     * @param Request $r
-     * @return string
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiProblems(Request $r) {
-        self::authenticateRequest($r);
-
-        $response = array();
-        $response['problems'] = array();
-
-        try {
-            $problems_key = new Problems(array(
-                        'author_id' => $r['current_user_id']
-                    ));
-
-            $problems = ProblemsDAO::search($problems_key);
-
-            foreach ($problems as $problem) {
-                $response['problems'][] = $problem->asArray();
-            }
-
-            usort($response['problems'], function ($a, $b) {
-                        return ($a['problem_id'] > $b['problem_id']) ? -1 : 1;
-            });
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $response['status'] = 'ok';
         return $response;
     }
 
@@ -1183,7 +1106,7 @@ class UserController extends Controller {
 
         // Do not leak plain emails in case the request is for a profile other than
         // the logged user's one. Admins can see emails.
-        if (!Authorization::IsSystemAdmin($r['current_user_id'])
+        if (!Authorization::isSystemAdmin($r['current_user_id'])
                 && $r['user']->user_id !== $r['current_user_id']) {
             unset($response['userinfo']['email']);
         }
@@ -1318,7 +1241,7 @@ class UserController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::IsContestAdmin($r['current_user_id'], $contest)) {
+        if (!Authorization::isContestAdmin($r['current_user_id'], $contest)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1787,7 +1710,7 @@ class UserController extends Controller {
     public static function apiRefreshUserRank(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
             throw new UnauthorizedException();
         }
 
@@ -1940,7 +1863,7 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new NotFoundException('problemNotFound');
                     }
-                    if (!is_null($user) && Authorization::CanEditProblem($user->user_id, $problem)) {
+                    if (!is_null($user) && Authorization::canEditProblem($user->user_id, $problem)) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif ($problem->public != '1') {
                         throw new ForbiddenAccessException('problemIsPrivate');

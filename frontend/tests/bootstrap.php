@@ -52,8 +52,17 @@ Utils::CleanupDB();
 
 // Create a test default user for manual UI operations
 UserController::$sendEmailOnVerify = false;
+$admin = UserFactory::createUser('admintest', 'testtesttest');
+ACLsDAO::save(new ACLs(array(
+    'acl_id' => Authorization::SYSTEM_ACL,
+    'owner_id' => $admin->user_id,
+)));
+UserRolesDAO::save(new UserRoles(array(
+    'user_id' => $admin->user_id,
+    'role_id' => Authorization::ADMIN_ROLE,
+    'acl_id' => Authorization::SYSTEM_ACL,
+)));
 UserFactory::createUser('test', 'testtesttest');
-UserFactory::createAdminUser('admintest', 'testtesttest');
 UserController::$sendEmailOnVerify = true;
 
 // Globally disable run wait gap.

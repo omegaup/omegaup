@@ -22,12 +22,12 @@ class ContestProblemsDAO extends ContestProblemsDAOBase
     /*
 	 * Get number of problems in contest.
 	 */
-    final public static function CountContestProblems($contest_id) {
+    final public static function countContestProblems(Contests $contest) {
         // Build SQL statement
         $sql = 'SELECT COUNT(cp.problem_id) ' .
                'FROM Contest_Problems cp ' .
                'WHERE cp.contest_id = ?';
-        $val = array($contest_id);
+        $val = array($contest->contest_id);
 
         global $conn;
         return $conn->GetOne($sql, $val);
@@ -36,14 +36,14 @@ class ContestProblemsDAO extends ContestProblemsDAOBase
     /*
 	 * Get contest problems including contest alias, points, and order
 	 */
-    final public static function GetContestProblems($contest_id) {
+    final public static function getContestProblems(Contests $contest) {
         // Build SQL statement
         $sql = 'SELECT p.problem_id, p.alias, cp.points, cp.order ' .
                'FROM Problems p ' .
                'INNER JOIN Contest_Problems cp ON cp.problem_id = p.problem_id ' .
                'WHERE cp.contest_id = ? ' .
                'ORDER BY cp.`order` ASC;';
-        $val = array($contest_id);
+        $val = array($contest->contest_id);
 
         global $conn;
         return $conn->GetAll($sql, $val);
@@ -53,7 +53,7 @@ class ContestProblemsDAO extends ContestProblemsDAOBase
 	 *
 	 * Get relevant problems including contest alias
 	 */
-    final public static function GetRelevantProblems($contest_id)
+    final public static function getRelevantProblems(Contests $contest)
     {
         // Build SQL statement
         $sql = '
@@ -66,7 +66,7 @@ class ContestProblemsDAO extends ContestProblemsDAOBase
             WHERE
                 cp.contest_id = ?
             ORDER BY cp.`order` ASC;';
-        $val = array($contest_id);
+        $val = array($contest->contest_id);
 
         global $conn;
         $rs = $conn->Execute($sql, $val);

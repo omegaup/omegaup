@@ -43,14 +43,11 @@ class Courses extends VO
 			if (isset($data['alias'])) {
 				$this->alias = $data['alias'];
 			}
-			if (isset($data['id_owner'])) {
-				$this->id_owner = $data['id_owner'];
+			if (isset($data['group_id'])) {
+				$this->group_id = $data['group_id'];
 			}
-			if (isset($data['id_group'])) {
-				$this->id_group = $data['id_group'];
-			}
-			if (isset($data['id_acl'])) {
-				$this->id_acl = $data['id_acl'];
+			if (isset($data['acl_id'])) {
+				$this->acl_id = $data['acl_id'];
 			}
 			if (isset($data['start_time'])) {
 				$this->start_time = $data['start_time'];
@@ -75,9 +72,8 @@ class Courses extends VO
 			"name" => $this->name,
 			"description" => $this->description,
 			"alias" => $this->alias,
-			"id_owner" => $this->id_owner,
-			"id_group" => $this->id_group,
-			"id_acl" => $this->id_acl,
+			"group_id" => $this->group_id,
+			"acl_id" => $this->acl_id,
 			"start_time" => $this->start_time,
 			"finish_time" => $this->finish_time
 		);
@@ -129,21 +125,14 @@ class Courses extends VO
 	  * @access public
 	  * @var int(11)
 	  */
-	public $id_owner;
+	public $group_id;
 
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var int(11),
+	  * @var int(11)
 	  */
-	public $id_group;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var int(11),
-	  */
-	public $id_acl;
+	public $acl_id;
 
 	/**
 	  * Hora de inicio de este curso

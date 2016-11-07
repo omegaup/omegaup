@@ -16,13 +16,16 @@
 								<li id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
-										<li><a href='/contest/'>{#navMyContests#}</a></li>
-										<li><a href='/group/'>{#navMyGroups#}</a></li>
+										<li><a href="/contest/new/">{#contestsCreateNew#}</a></li>
+										<li><a href="/contest/mine/">{#navMyContests#}</a></li>
+										<li><a href="/group/">{#navMyGroups#}</a></li>
+										<li><a href="/scoreboardmerge.php">{#contestsJoinScoreboards#}</a></li>
 									</ul>
 								</li>
 								<li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}>
 									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
 									<ul class="dropdown-menu">
+										<li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
 										<li><a href="/problem/mine/">{#navMyProblems#}</a></li>
 										<li><a href="/problem/">{#wordsProblems#}</a></li>
 									</ul>

@@ -144,17 +144,13 @@ abstract class CoursesDAOBase extends DAO
 			$sql .= " `alias` = ? AND";
 			array_push( $val, $Courses->alias );
 		}
-		if (!is_null( $Courses->id_owner)) {
-			$sql .= " `id_owner` = ? AND";
-			array_push( $val, $Courses->id_owner );
+		if (!is_null( $Courses->group_id)) {
+			$sql .= " `group_id` = ? AND";
+			array_push( $val, $Courses->group_id );
 		}
-		if (!is_null( $Courses->id_group)) {
-			$sql .= " `id_group` = ? AND";
-			array_push( $val, $Courses->id_group );
-		}
-		if (!is_null( $Courses->id_acl)) {
-			$sql .= " `id_acl` = ? AND";
-			array_push( $val, $Courses->id_acl );
+		if (!is_null( $Courses->acl_id)) {
+			$sql .= " `acl_id` = ? AND";
+			array_push( $val, $Courses->acl_id );
 		}
 		if (!is_null( $Courses->start_time)) {
 			$sql .= " `start_time` = ? AND";
@@ -199,14 +195,13 @@ abstract class CoursesDAOBase extends DAO
 	  **/
 	private static final function update($Courses)
 	{
-		$sql = "UPDATE Courses SET  `name` = ?, `description` = ?, `alias` = ?, `id_owner` = ?, `id_group` = ?, `id_acl` = ?, `start_time` = ?, `finish_time` = ? WHERE  `course_id` = ?;";
+		$sql = "UPDATE Courses SET  `name` = ?, `description` = ?, `alias` = ?, `group_id` = ?, `acl_id` = ?, `start_time` = ?, `finish_time` = ? WHERE  `course_id` = ?;";
 		$params = array(
 			$Courses->name,
 			$Courses->description,
 			$Courses->alias,
-			$Courses->id_owner,
-			$Courses->id_group,
-			$Courses->id_acl,
+			$Courses->group_id,
+			$Courses->acl_id,
 			$Courses->start_time,
 			$Courses->finish_time,
 			$Courses->course_id, );
@@ -231,15 +226,14 @@ abstract class CoursesDAOBase extends DAO
 	{
 		if (is_null($Courses->start_time)) $Courses->start_time = '2000-01-01 06:00:00';
 		if (is_null($Courses->finish_time)) $Courses->finish_time = '2000-01-01 06:00:00';
-		$sql = "INSERT INTO Courses ( `course_id`, `name`, `description`, `alias`, `id_owner`, `id_group`, `id_acl`, `start_time`, `finish_time` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Courses ( `course_id`, `name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
 			$Courses->course_id,
 			$Courses->name,
 			$Courses->description,
 			$Courses->alias,
-			$Courses->id_owner,
-			$Courses->id_group,
-			$Courses->id_acl,
+			$Courses->group_id,
+			$Courses->acl_id,
 			$Courses->start_time,
 			$Courses->finish_time,
 		 );
@@ -329,32 +323,22 @@ abstract class CoursesDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $CoursesA->id_owner) ) ) & ( ! is_null ( ($b = $CoursesB->id_owner) ) ) ){
-				$sql .= " `id_owner` >= ? AND `id_owner` <= ? AND";
+		if( ( !is_null (($a = $CoursesA->group_id) ) ) & ( ! is_null ( ($b = $CoursesB->group_id) ) ) ){
+				$sql .= " `group_id` >= ? AND `group_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `id_owner` = ? AND";
+			$sql .= " `group_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $CoursesA->id_group) ) ) & ( ! is_null ( ($b = $CoursesB->id_group) ) ) ){
-				$sql .= " `id_group` >= ? AND `id_group` <= ? AND";
+		if( ( !is_null (($a = $CoursesA->acl_id) ) ) & ( ! is_null ( ($b = $CoursesB->acl_id) ) ) ){
+				$sql .= " `acl_id` >= ? AND `acl_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `id_group` = ? AND";
-			$a = is_null ( $a ) ? $b : $a;
-			array_push( $val, $a);
-		}
-
-		if( ( !is_null (($a = $CoursesA->id_acl) ) ) & ( ! is_null ( ($b = $CoursesB->id_acl) ) ) ){
-				$sql .= " `id_acl` >= ? AND `id_acl` <= ? AND";
-				array_push( $val, min($a,$b));
-				array_push( $val, max($a,$b));
-		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `id_acl` = ? AND";
+			$sql .= " `acl_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}

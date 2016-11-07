@@ -120,8 +120,8 @@ class UserFactory {
 
         $userRoles = new UserRoles(array(
             'user_id' => $user->user_id,
-            'role_id' => ADMIN_ROLE,
-            'contest_id' => 0,
+            'role_id' => Authorization::ADMIN_ROLE,
+            'acl_id' => Authorization::SYSTEM_ACL,
         ));
         UserRolesDAO::save($userRoles);
 
@@ -131,9 +131,11 @@ class UserFactory {
     public static function createInterviewerUser() {
         $user = self::createUser(null, null, null, null, true);
 
-        $ur = new UserRoles();
-        $ur->user_id = $user->user_id;
-        $ur->role_id = 4;
+        $ur = new UserRoles(array(
+            'user_id' => $user->user_id,
+            'role_id' => Authorization::INTERVIEWER_ROLE,
+            'acl_id' => Authorization::SYSTEM_ACL,
+        ));
         UserRolesDAO::save($ur);
 
         return $user;

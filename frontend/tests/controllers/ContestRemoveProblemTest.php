@@ -278,8 +278,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Add the sysadmin role to the contest director
         $userRoles = new UserRoles(array(
             'user_id' => $contestData['director']->user_id,
-            'role_id' => ADMIN_ROLE,
-            'contest_id' => 0,
+            'role_id' => Authorization::ADMIN_ROLE,
+            'acl_id' => Authorization::SYSTEM_ACL,
         ));
         UserRolesDAO::save($userRoles);
 
@@ -295,7 +295,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
     /**
      * Removes a problem with runs only from admins from a private contest
-     * while loged in with a user that is sysadmin.
+     * while logged in with a user that is sysadmin.
      */
     public function testRemoveProblemWithAdminRunsFromContestBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
@@ -384,8 +384,56 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
+     * Removes a problem with runs made outside the contest from a private contest
+     * while logged in as Contest Admin
+     *
+     */
+    public function testRemoveProblemWithRunsOutsideContestFromPrivateContest() {
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $problemData = ProblemsFactory::createProblem();
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestant = UserFactory::createUser();
+
+        ContestsFactory::addUser($contestData, $contestant);
+
+        // Create a run not related to the contest
+        RunsFactory::createRunToProblem($problemData, $contestant);
+
+        // Remove problem, should succeed.
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
+
+        $this->assertEquals('ok', $response['status']);
+    }
+
+    /**
+     * Removes a problem with runs made outside and inside the contest from a private contest
+     * while logged in as Contest Admin. Should fail.
+     *
+     * @expectedException ForbiddenAccessException
+     */
+    public function testRemoveProblemWithRunsOutsideAndInsideContestFromPrivateContest() {
+        $contestData = ContestsFactory::createContest(null, 0 /* private */);
+        $problemData = ProblemsFactory::createProblem();
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestant = UserFactory::createUser();
+
+        ContestsFactory::addUser($contestData, $contestant);
+
+        RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::createRun($problemData, $contestData, $contestant);
+
+        $response = ContestsFactory::removeProblemFromContest(
+            $problemData,
+            $contestData
+        );
+    }
+
+    /**
      * Removes a problem with runs only from admins from a private contest
-     * while loged in with a user that is not sysadmin.
+     * while logged in with a user that is not sysadmin.
      */
     public function testRemoveProblemWithMixedRunsFromContestBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(null, 0 /* private */);
@@ -404,8 +452,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         $userRoles = new UserRoles(array(
             'user_id' => $contestData['director']->user_id,
-            'role_id' => ADMIN_ROLE,
-            'contest_id' => 0,
+            'role_id' => Authorization::ADMIN_ROLE,
+            'acl_id' => Authorization::SYSTEM_ACL,
         ));
         UserRolesDAO::save($userRoles);
 

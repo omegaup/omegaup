@@ -336,7 +336,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Look for our contest from the list and save the scoreboard tokens
         $scoreboard_url = null;
         $scoreboard_admin_url = null;
-        foreach ($response['results'] as $c) {
+        foreach ($response['contests'] as $c) {
             if ($c['alias'] === $contestData['request']['alias']) {
                 $scoreboard_url = $c['scoreboard_url'];
                 $scoreboard_admin_url = $c['scoreboard_url_admin'];
@@ -421,7 +421,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Look for our contest from the list and save the scoreboard tokens
         $scoreboard_url = null;
         $scoreboard_admin_url = null;
-        foreach ($response['results'] as $c) {
+        foreach ($response['contests'] as $c) {
             if ($c['alias'] === $contestData['request']['alias']) {
                 $scoreboard_url = $c['scoreboard_url'];
                 $scoreboard_admin_url = $c['scoreboard_url_admin'];

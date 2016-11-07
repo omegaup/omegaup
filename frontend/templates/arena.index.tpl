@@ -1,29 +1,58 @@
 {include file='arena.head.tpl' jsfile={version_hash src='/ux/arena.js'}}
 {include file='arena.contest_list.tpl'}
 			<div class="container" id="main">
-				<div class="panel panel-default">
-					<div class="panel-body">
+				<div class="panel">
+					<div class="panel-heading panel-default">
 						<h1>{#arenaPageTitle#}</h1>
 						<p>{#arenaPageIntroduction#}</p>
-						<p>{#arenaPageRecommendedContestsText#}</p>
-
-						<p>{#frontPageIntroduction#}</p>
-						<div class="text-center">
-							<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" class="btn btn-primary btn-lg">{#frontPageIntroductionButton#}</a>
-						</div>
+						<p>{#frontPageIntroduction#}
+							<a href="http://blog.omegaup.com/category/omegaup/omegaup-101/" target="_blank">
+								<small><u>{#frontPageIntroductionButton#}</u></small></a></p>
 					</div>
-				</div>
+					<div class="panel-body">
 
-				<div class="panel panel-primary" id="recommended-current-contests"
-				     data-bind="template: 'contest-list'"></div>
-				<div class="panel panel-primary" id="current-contests"
-				     data-bind="template: 'contest-list'"></div>
-				<div class="panel panel-primary" id="recommended-past-contests"
-				     data-bind="template: 'contest-list'"></div>
-				<div class="panel panel-primary" id="past-contests"
-				     data-bind="template: 'contest-list'"></div>
-			</div>
-		</div>
+						<ul class="nav nav-pills">
+							<li class="nav-item active">
+								<a class="nav-link" href="#list-recommended-current-contest" data-toggle="tab">
+									{#arenaRecommendedCurrentContests#}</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#list-current-contest" data-toggle="tab">
+									{#arenaCurrentContests#}</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#list-recommended-past-contest" data-toggle="tab">
+									{#arenaRecommendedOldContests#}</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#list-past-contest" data-toggle="tab">
+									{#arenaOldContests#}</a>
+							</li>
+						</ul>
+
+						<div class="tab-content">
+							<div class="tab-pane active" id="list-recommended-current-contest">
+								<div class="panel panel-primary" id="recommended-current-contests"
+									 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
+							</div>
+							<div class="tab-pane" id="list-current-contest">
+								<div class="panel panel-primary" id="current-contests"
+									 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
+							</div>
+							<div class="tab-pane" id="list-recommended-past-contest">
+								<div class="panel panel-primary" id="recommended-past-contests"
+									 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
+							</div>
+							<div class="tab-pane" id="list-past-contest">
+								<div class="panel panel-primary" id="past-contests"
+									 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
+							</div>
+						</div>
+
+					</div> <!-- panel-body -->
+				</div> <!-- panel -->
+			</div> <!-- panel-default -->
+		</div> <!-- container -->
 		{if $OMEGAUP_GA_TRACK eq 1}
 		<script type="text/javascript" src="{version_hash src="/js/google-analytics.js"}"></script>
 		{/if}

@@ -34,14 +34,14 @@
 
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="start_time">{#contestNewFormStartDate#}</label>
-						<input id='start_time' name='start_time' value='' class="form-control" type='text' size ='16'>
+						<label for="start-time">{#contestNewFormStartDate#}</label>
+						<input id='start-time' name='start_time' value='' class="form-control" type='text' size ='16'>
 						<p class="help-block">{#contestNewFormStartDateDesc#}</p>
 					</div>
 
 					<div class="form-group col-md-6">
-						<label for="finish_time">{#contestNewFormEndDate#}</label>
-						<input id='finish_time' name='finish_time' value='' class="form-control" type='text' size='16'>
+						<label for="finish-time">{#contestNewFormEndDate#}</label>
+						<input id='finish-time' name='finish_time' value='' class="form-control" type='text' size='16'>
 						<p class="help-block">{#contestNewFormEndDateDesc#}</p>
 					</div>
 				</div>
@@ -53,13 +53,13 @@
 					</div>
 
 					<div class="form-group col-md-6">
-						<label for="window_length_enabled">{#contestNewFormDifferentStarts#}</label>
+						<label for="window-length-enabled">{#contestNewFormDifferentStarts#}</label>
 						<div class="checkbox">
 							<label>
-								<input type='checkbox' id='window_length_enabled' name='window_length_enabled'>	{#wordsEnable#}
+								<input type='checkbox' id='window-length-enabled' name='window_length_enabled'>	{#wordsEnable#}
 							</label>
 						</div>
-						<input id='window_length' name='window_length' value='' type='text' disabled="true" size='3' class="form-control">
+						<input id='window-length' name='window_length' value='' type='text' disabled="true" size='3' class="form-control">
 						<p class="help-block">{#contestNewFormDifferentStartsDesc#}</p>
 					</div>
 				</div>
@@ -72,16 +72,16 @@
 					</div>
 
 					<div class="form-group col-md-6">
-						<label for="submissions_gap">{#contestNewFormSubmissionsSeparation#}</label>
-						<input id='submissions_gap' name='submissions_gap' value='1' type='text' size='2' class="form-control">
+						<label for="submissions-gap">{#contestNewFormSubmissionsSeparation#}</label>
+						<input id='submissions-gap' name='submissions_gap' value='1' type='text' size='2' class="form-control">
 						<p class="help-block">{#contestNewFormSubmissionsSeparationDesc#}</p>
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="penalty_type">{#contestNewFormPenaltyType#}</label>
-						<select name='penalty_type' id='penalty_type' class="form-control">
+						<label for="penalty-type">{#contestNewFormPenaltyType#}</label>
+						<select name='penalty_type' id='penalty-type' class="form-control">
 							<option value='none'>{#contestNewFormNoPenalty#}</option>
 							<option value='problem_open'>{#contestNewFormByProblem#}</option>
 							<option value='contest_start'>{#contestNewFormByContests#}</option>
@@ -109,16 +109,16 @@
 					</div>
 
 					<div class="form-group col-md-6">
-						<label for="points_decay_factor">{#contestNewFormPointDecrementFactor#}</label>
-						<input id='points_decay_factor' name='points_decay_factor' value='0.0' type='text' size='4' class="form-control">
+						<label for="points-decay-factor">{#contestNewFormPointDecrementFactor#}</label>
+						<input id='points-decay-factor' name='points_decay_factor' value='0.0' type='text' size='4' class="form-control">
 						<p class="help-block">{#contestNewFormPointDecrementFactorDesc#}</p>
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="form-group col-md-6">
-						<label for="show_scoreboard_after">{#contestNewFormScoreboardAtEnd#}</label>
-						<select id='show_scoreboard_after' name='show_scoreboard_after' class="form-control">
+						<label for="show-scoreboard-after">{#contestNewFormScoreboardAtEnd#}</label>
+						<select id='show-scoreboard-after' name='show_scoreboard_after' class="form-control">
 							<option value='1'>{#wordsYes#}</option>
 							<option value='0'>{#wordsNo#}</option>
 						</select>

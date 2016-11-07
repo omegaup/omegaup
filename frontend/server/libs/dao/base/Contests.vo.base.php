@@ -34,6 +34,9 @@ class Contests extends VO
 			if (isset($data['contest_id'])) {
 				$this->contest_id = $data['contest_id'];
 			}
+			if (isset($data['acl_id'])) {
+				$this->acl_id = $data['acl_id'];
+			}
 			if (isset($data['title'])) {
 				$this->title = $data['title'];
 			}
@@ -48,9 +51,6 @@ class Contests extends VO
 			}
 			if (isset($data['window_length'])) {
 				$this->window_length = $data['window_length'];
-			}
-			if (isset($data['director_id'])) {
-				$this->director_id = $data['director_id'];
 			}
 			if (isset($data['rerun_id'])) {
 				$this->rerun_id = $data['rerun_id'];
@@ -120,12 +120,12 @@ class Contests extends VO
 	{
 		$vec = array(
 			"contest_id" => $this->contest_id,
+			"acl_id" => $this->acl_id,
 			"title" => $this->title,
 			"description" => $this->description,
 			"start_time" => $this->start_time,
 			"finish_time" => $this->finish_time,
 			"window_length" => $this->window_length,
-			"director_id" => $this->director_id,
 			"rerun_id" => $this->rerun_id,
 			"public" => $this->public,
 			"alias" => $this->alias,
@@ -168,6 +168,13 @@ class Contests extends VO
 	public $contest_id;
 
 	/**
+	  * La lista de control de acceso del concurso
+	  * @access public
+	  * @var int(11)
+	  */
+	public $acl_id;
+
+	/**
 	  * El titulo que aparecera en cada concurso
 	  * @access public
 	  * @var varchar(256)
@@ -201,13 +208,6 @@ class Contests extends VO
 	  * @var int(11)
 	  */
 	public $window_length;
-
-	/**
-	  * el userID del usuario que creo este concurso
-	  * @access public
-	  * @var int(11)
-	  */
-	public $director_id;
 
 	/**
 	  * Este campo es para las repeticiones de algún concurso

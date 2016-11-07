@@ -1,0 +1,11 @@
+{
+  "spec_dir": "frontend/www/js",
+  "spec_files": [
+    "**/*.test.js"
+  ],
+  "helpers": [
+    "**/*.test_helper.js"
+  ],
+  "stopSpecOnExpectationFailure": false,
+  "random": false
+}

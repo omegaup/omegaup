@@ -34,11 +34,11 @@ class Assignments extends VO
 			if (isset($data['assignment_id'])) {
 				$this->assignment_id = $data['assignment_id'];
 			}
-			if (isset($data['id_course'])) {
-				$this->id_course = $data['id_course'];
+			if (isset($data['course_id'])) {
+				$this->course_id = $data['course_id'];
 			}
-			if (isset($data['id_problemset'])) {
-				$this->id_problemset = $data['id_problemset'];
+			if (isset($data['problemset_id'])) {
+				$this->problemset_id = $data['problemset_id'];
 			}
 			if (isset($data['name'])) {
 				$this->name = $data['name'];
@@ -75,8 +75,8 @@ class Assignments extends VO
 	{
 		$vec = array(
 			"assignment_id" => $this->assignment_id,
-			"id_course" => $this->id_course,
-			"id_problemset" => $this->id_problemset,
+			"course_id" => $this->course_id,
+			"problemset_id" => $this->problemset_id,
 			"name" => $this->name,
 			"description" => $this->description,
 			"alias" => $this->alias,
@@ -112,14 +112,14 @@ class Assignments extends VO
 	  * @access public
 	  * @var int(11)
 	  */
-	public $id_course;
+	public $course_id;
 
 	/**
 	  *  [Campo no documentado]
 	  * @access public
-	  * @var int(11),
+	  * @var int(11)
 	  */
-	public $id_problemset;
+	public $problemset_id;
 
 	/**
 	  *  [Campo no documentado]

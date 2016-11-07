@@ -132,13 +132,13 @@ abstract class AssignmentsDAOBase extends DAO
 			$sql .= " `assignment_id` = ? AND";
 			array_push( $val, $Assignments->assignment_id );
 		}
-		if (!is_null( $Assignments->id_course)) {
-			$sql .= " `id_course` = ? AND";
-			array_push( $val, $Assignments->id_course );
+		if (!is_null( $Assignments->course_id)) {
+			$sql .= " `course_id` = ? AND";
+			array_push( $val, $Assignments->course_id );
 		}
-		if (!is_null( $Assignments->id_problemset)) {
-			$sql .= " `id_problemset` = ? AND";
-			array_push( $val, $Assignments->id_problemset );
+		if (!is_null( $Assignments->problemset_id)) {
+			$sql .= " `problemset_id` = ? AND";
+			array_push( $val, $Assignments->problemset_id );
 		}
 		if (!is_null( $Assignments->name)) {
 			$sql .= " `name` = ? AND";
@@ -203,10 +203,10 @@ abstract class AssignmentsDAOBase extends DAO
 	  **/
 	private static final function update($Assignments)
 	{
-		$sql = "UPDATE Assignments SET  `id_course` = ?, `id_problemset` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ? WHERE  `assignment_id` = ?;";
+		$sql = "UPDATE Assignments SET  `course_id` = ?, `problemset_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ? WHERE  `assignment_id` = ?;";
 		$params = array(
-			$Assignments->id_course,
-			$Assignments->id_problemset,
+			$Assignments->course_id,
+			$Assignments->problemset_id,
 			$Assignments->name,
 			$Assignments->description,
 			$Assignments->alias,
@@ -236,11 +236,11 @@ abstract class AssignmentsDAOBase extends DAO
 	{
 		if (is_null($Assignments->start_time)) $Assignments->start_time = '2000-01-01 06:00:00';
 		if (is_null($Assignments->finish_time)) $Assignments->finish_time = '2000-01-01 06:00:00';
-		$sql = "INSERT INTO Assignments ( `assignment_id`, `id_course`, `id_problemset`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		$sql = "INSERT INTO Assignments ( `assignment_id`, `course_id`, `problemset_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time` ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		$params = array(
 			$Assignments->assignment_id,
-			$Assignments->id_course,
-			$Assignments->id_problemset,
+			$Assignments->course_id,
+			$Assignments->problemset_id,
 			$Assignments->name,
 			$Assignments->description,
 			$Assignments->alias,
@@ -305,22 +305,22 @@ abstract class AssignmentsDAOBase extends DAO
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $AssignmentsA->id_course) ) ) & ( ! is_null ( ($b = $AssignmentsB->id_course) ) ) ){
-				$sql .= " `id_course` >= ? AND `id_course` <= ? AND";
+		if( ( !is_null (($a = $AssignmentsA->course_id) ) ) & ( ! is_null ( ($b = $AssignmentsB->course_id) ) ) ){
+				$sql .= " `course_id` >= ? AND `course_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `id_course` = ? AND";
+			$sql .= " `course_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}
 
-		if( ( !is_null (($a = $AssignmentsA->id_problemset) ) ) & ( ! is_null ( ($b = $AssignmentsB->id_problemset) ) ) ){
-				$sql .= " `id_problemset` >= ? AND `id_problemset` <= ? AND";
+		if( ( !is_null (($a = $AssignmentsA->problemset_id) ) ) & ( ! is_null ( ($b = $AssignmentsB->problemset_id) ) ) ){
+				$sql .= " `problemset_id` >= ? AND `problemset_id` <= ? AND";
 				array_push( $val, min($a,$b));
 				array_push( $val, max($a,$b));
 		}elseif( !is_null ( $a ) || !is_null ( $b ) ){
-			$sql .= " `id_problemset` = ? AND";
+			$sql .= " `problemset_id` = ? AND";
 			$a = is_null ( $a ) ? $b : $a;
 			array_push( $val, $a);
 		}

@@ -34,11 +34,11 @@ class Problems extends VO
 			if (isset($data['problem_id'])) {
 				$this->problem_id = $data['problem_id'];
 			}
+			if (isset($data['acl_id'])) {
+				$this->acl_id = $data['acl_id'];
+			}
 			if (isset($data['public'])) {
 				$this->public = $data['public'];
-			}
-			if (isset($data['author_id'])) {
-				$this->author_id = $data['author_id'];
 			}
 			if (isset($data['title'])) {
 				$this->title = $data['title'];
@@ -126,8 +126,8 @@ class Problems extends VO
 	{
 		$vec = array(
 			"problem_id" => $this->problem_id,
+			"acl_id" => $this->acl_id,
 			"public" => $this->public,
-			"author_id" => $this->author_id,
 			"title" => $this->title,
 			"alias" => $this->alias,
 			"validator" => $this->validator,
@@ -176,18 +176,18 @@ class Problems extends VO
 	public $problem_id;
 
 	/**
+	  * La lista de control de acceso del problema
+	  * @access public
+	  * @var int(11)
+	  */
+	public $acl_id;
+
+	/**
 	  *  [Campo no documentado]
 	  * @access public
 	  * @var tinyint(1)
 	  */
 	public $public;
-
-	/**
-	  *  [Campo no documentado]
-	  * @access public
-	  * @var int(11)
-	  */
-	public $author_id;
 
 	/**
 	  *  [Campo no documentado]
