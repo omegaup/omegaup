@@ -151,7 +151,7 @@ class SessionController extends Controller {
             'email' => !is_null($email) ? $email->email : '',
             'user' => $currentUser,
             'auth_token' => $authToken,
-            'is_admin' => Authorization::IsSystemAdmin($currentUser->user_id),
+            'is_admin' => Authorization::isSystemAdmin($currentUser->user_id),
         );
     }
 

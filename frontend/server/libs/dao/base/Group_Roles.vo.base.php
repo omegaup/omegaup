@@ -37,8 +37,8 @@ class GroupRoles extends VO
 			if (isset($data['role_id'])) {
 				$this->role_id = $data['role_id'];
 			}
-			if (isset($data['contest_id'])) {
-				$this->contest_id = $data['contest_id'];
+			if (isset($data['acl_id'])) {
+				$this->acl_id = $data['acl_id'];
 			}
 		}
 	}
@@ -55,7 +55,7 @@ class GroupRoles extends VO
 		$vec = array(
 			"group_id" => $this->group_id,
 			"role_id" => $this->role_id,
-			"contest_id" => $this->contest_id
+			"acl_id" => $this->acl_id
 		);
 	return json_encode($vec);
 	}
@@ -92,5 +92,5 @@ class GroupRoles extends VO
 	  * @access public
 	  * @var int(11)
 	  */
-	public $contest_id;
+	public $acl_id;
 }

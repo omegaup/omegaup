@@ -17,4 +17,4 @@ if ($session['valid'] && !isset($_SESSION['private_contests_alert'])) {
 
 $smarty->assign('PRIVATE_CONTESTS_ALERT', $private_contests_alert);
 
-$smarty->display('../templates/contest.tpl');
+$smarty->display('../templates/contest.mine.tpl');

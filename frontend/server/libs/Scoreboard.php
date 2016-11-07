@@ -10,14 +10,14 @@ class Scoreboard {
     const TOTAL_COLUMN = 'total';
 
     // Contest's data
-    private $contest_id;
+    private $contest;
     private $showAllRuns;
     private $auth_token;
     private $onlyAC;
     public $log;
 
-    public function __construct($contest_id, $showAllRuns = false, $auth_token = null, $onlyAC = false) {
-        $this->contest_id = $contest_id;
+    public function __construct(Contests $contest, $showAllRuns = false, $auth_token = null, $onlyAC = false) {
+        $this->contest = $contest;
         $this->showAllRuns = $showAllRuns;
         $this->auth_token = $auth_token;
         $this->log = Logger::getLogger('Scoreboard');
@@ -27,8 +27,8 @@ class Scoreboard {
     public function generate($withRunDetails = false, $sortByName = false, $filterUsersBy = null) {
         $result = null;
 
-        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $this->contest_id);
-        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $this->contest_id);
+        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $this->contest->contest_id);
+        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $this->contest->contest_id);
 
         $can_use_contestant_cache = !$this->showAllRuns &&
             !$sortByName &&
@@ -49,21 +49,19 @@ class Scoreboard {
 
         if (is_null($result)) {
             try {
-                $contest = ContestsDAO::getByPK($this->contest_id);
-
-                // Get all distinct contestants participating in the contest given contest_id
-                $raw_contest_users = RunsDAO::GetAllRelevantUsers(
-                    $this->contest_id,
+                // Get all distinct contestants participating in the given contest
+                $raw_contest_users = RunsDAO::getAllRelevantUsers(
+                    $this->contest,
                     true /* show all runs */,
                     $filterUsersBy
                 );
 
-                // Get all problems given contest_id
+                // Get all problems given contest
                 $raw_contest_problems =
-                    ContestProblemsDAO::GetRelevantProblems($this->contest_id);
+                    ContestProblemsDAO::getRelevantProblems($this->contest);
 
-                $contest_runs = RunsDAO::GetContestRuns(
-                    $this->contest_id,
+                $contest_runs = RunsDAO::getContestRuns(
+                    $this->contest,
                     $this->onlyAC
                 );
             } catch (Exception $e) {
@@ -80,23 +78,23 @@ class Scoreboard {
                 );
             }
 
-            $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, $this->showAllRuns);
+            $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($this->contest, $this->showAllRuns);
 
             $result = Scoreboard::getScoreboardFromRuns(
                 $contest_runs,
                 $raw_contest_users,
                 $problem_mapping,
-                $contest->penalty,
-                $contest->penalty_calc_policy,
+                $this->contest->penalty,
+                $this->contest->penalty_calc_policy,
                 $scoreboardLimit,
-                $contest,
+                $this->contest,
                 $this->showAllRuns,
                 $sortByName,
                 $withRunDetails,
                 $this->auth_token
             );
 
-            $timeout = max(0, strtotime($contest->finish_time) - time());
+            $timeout = max(0, strtotime($this->contest->finish_time) - time());
             if ($can_use_contestant_cache) {
                 $contestantScoreboardCache->set($result, $timeout);
             } elseif ($can_use_admin_cache) {
@@ -110,8 +108,8 @@ class Scoreboard {
     public function events() {
         $result = null;
 
-        $contestantEventsCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
-        $adminEventsCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->contest_id);
+        $contestantEventsCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->contest->contest_id);
+        $adminEventsCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->contest->contest_id);
 
         $can_use_contestant_cache = !$this->showAllRuns;
         $can_use_admin_cache = $this->showAllRuns;
@@ -125,19 +123,17 @@ class Scoreboard {
 
         if (is_null($result)) {
             try {
-                $contest = ContestsDAO::getByPK($this->contest_id);
-
-                // Get all distinct contestants participating in the contest given contest_id
-                $raw_contest_users = RunsDAO::GetAllRelevantUsers(
-                    $this->contest_id,
+                // Get all distinct contestants participating in the given contest
+                $raw_contest_users = RunsDAO::getAllRelevantUsers(
+                    $this->contest,
                     $this->showAllRuns
                 );
 
-                // Get all problems given contest_id
+                // Get all problems given contest
                 $raw_contest_problems =
-                    ContestProblemsDAO::GetRelevantProblems($this->contest_id);
+                    ContestProblemsDAO::getRelevantProblems($this->contest);
 
-                $contest_runs = RunsDAO::GetContestRuns($this->contest_id);
+                $contest_runs = RunsDAO::getContestRuns($this->contest);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
@@ -153,14 +149,14 @@ class Scoreboard {
             }
 
             $result = Scoreboard::calculateEvents(
-                $contest,
+                $this->contest,
                 $contest_runs,
                 $raw_contest_users,
                 $problem_mapping,
                 $this->showAllRuns
             );
 
-            $timeout = max(0, strtotime($contest->finish_time) - time());
+            $timeout = max(0, strtotime($this->contest->finish_time) - time());
             if ($can_use_contestant_cache) {
                 $contestantEventsCache->set($result, $timeout);
             } elseif ($can_use_admin_cache) {
@@ -175,37 +171,35 @@ class Scoreboard {
      * New runs trigger a scoreboard update asynchronously, only invalidate
      * scoreboard when contest details have changed.
      *
-     * @param int $contest_id
+     * @param Contests $contest
      */
-    public static function InvalidateScoreboardCache($contest_id) {
+    public static function invalidateScoreboardCache($contest) {
         $log = Logger::getLogger('Scoreboard');
         $log->info('Invalidating scoreboard cache.');
 
         // Invalidar cache del contestant
-        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
-        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest_id);
+        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest->contest_id);
+        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest->contest_id);
 
         // Invalidar cache del admin
-        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
-        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest_id);
+        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest->contest_id);
+        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest->contest_id);
     }
 
-    public static function RefreshScoreboardCache($contest_id) {
+    public static function refreshScoreboardCache($contest) {
         try {
-            $contest = ContestsDAO::getByPK($contest_id);
+            $contest_runs = RunsDAO::getContestRuns($contest);
 
-            $contest_runs = RunsDAO::GetContestRuns($contest_id);
-
-            // Get all distinct contestants participating in the contest given contest_id
-            $raw_contest_users = RunsDAO::GetAllRelevantUsers(
-                $contest_id,
+            // Get all distinct contestants participating in the contest
+            $raw_contest_users = RunsDAO::getAllRelevantUsers(
+                $contest,
                 true /* show all runs */,
                 null
             );
 
-            // Get all problems given contest_id
+            // Get all problems given contest
             $raw_contest_problems =
-                ContestProblemsDAO::GetRelevantProblems($contest_id);
+                ContestProblemsDAO::getRelevantProblems($contest);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -224,7 +218,7 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         $timeout = max(0, strtotime($contest->finish_time) - time());
-        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest_id);
+        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $contest->contest_id);
 
         $contestantScoreboard = Scoreboard::getScoreboardFromRuns(
             $contest_runs,
@@ -238,7 +232,7 @@ class Scoreboard {
             false  /* sortByName */
         );
         $contestantScoreboardCache->set($contestantScoreboard, $timeout);
-        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest_id);
+        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $contest->contest_id);
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($contest, true);
         $adminScoreboard = Scoreboard::getScoreboardFromRuns(
             $contest_runs,
@@ -253,7 +247,7 @@ class Scoreboard {
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
 
-        $contestantEventCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest_id);
+        $contestantEventCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $contest->contest_id);
         $contestantEventCache->set(Scoreboard::calculateEvents(
             $contest,
             $contest_runs,
@@ -262,7 +256,7 @@ class Scoreboard {
             false /* showAllRuns */
         ), $timeout);
 
-        $adminEventCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest_id);
+        $adminEventCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $contest->contest_id);
         $adminEventCache->set(Scoreboard::calculateEvents(
             $contest,
             $contest_runs,
@@ -402,7 +396,7 @@ class Scoreboard {
             if (!array_key_exists($user_id, $test_only)) {
                 //
                 // Hay un usuario en la lista de Runs,
-                // que no fue regresado por RunsDAO::GetAllRelevantUsers()
+                // que no fue regresado por RunsDAO::getAllRelevantUsers()
                 //
                 continue;
             }

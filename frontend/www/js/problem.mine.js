@@ -2,14 +2,17 @@
   $('.navbar #nav-problems').addClass('active');
 
   function fillProblemsTable() {
-    omegaup.API.getMyProblems(function(problems) {
+    var deferred = $('#show-admin-problems').prop('checked') ?
+                       omegaup.API.getAdminProblems() :
+                       omegaup.API.getMyProblems();
+    deferred.then(function(result) {
       $('#problem-list .added').remove();
-      for (var i = 0; i < problems.results.length; i++) {
+      for (var i = 0; i < result.problems.length; i++) {
         var row = $('#problem-list .problem-list-template')
                       .clone()
                       .removeClass('problem-list-template')
                       .addClass('added');
-        var problem = problems.results[i];
+        var problem = result.problems[i];
         $('input[type="checkbox"]', row).attr('id', problem.alias);
         $('.title', row)
             .attr('href', '/arena/problem/' + problem.alias + '/')
@@ -33,6 +36,8 @@
     });
   }
   fillProblemsTable();
+
+  $('#show-admin-problems').click(fillProblemsTable);
 
   $('#bulk-make-public')
       .click(function() {

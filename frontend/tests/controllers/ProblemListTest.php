@@ -221,8 +221,8 @@ class ProblemList extends OmegaupTestCase {
         $r['auth_token'] = self::login($author);
 
         $response = ProblemController::apiMyList($r);
-        $this->assertEquals(3, count($response['results']));
-        $this->assertEquals($problemData[2]['request']['alias'], $response['results'][0]['alias']);
+        $this->assertEquals(3, count($response['problems']));
+        $this->assertEquals($problemData[2]['request']['alias'], $response['problems'][0]['alias']);
     }
 
     /**

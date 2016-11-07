@@ -349,11 +349,11 @@ class RunsDAO extends RunsDAOBase {
     }
 
     /*
-	 *  GetAllRelevantUsers
+	 *  getAllRelevantUsers
 	 *
 	 */
 
-    final public static function GetAllRelevantUsers($contest_id, $showAllRuns = false, $filterUsersBy = null) {
+    final public static function getAllRelevantUsers(Contests $contest, $showAllRuns = false, $filterUsersBy = null) {
         // Build SQL statement
         if (!$showAllRuns) {
             $sql = 'SELECT Users.user_id, username, Users.name, Users.country_id from Users INNER JOIN ( '
@@ -362,17 +362,21 @@ class RunsDAO extends RunsDAOBase {
                 . 'RunsContests ON Users.user_id = RunsContests.user_id ' . (!is_null($filterUsersBy) ? 'WHERE Users.username LIKE ?' : '');
 
             if (is_null($filterUsersBy)) {
-                $val = array($contest_id);
+                $val = array($contest->contest_id);
             } else {
-                $val = array($contest_id, $filterUsersBy . '%');
+                $val = array($contest->contest_id, $filterUsersBy . '%');
             }
         } else {
             $sql = 'SELECT Users.user_id, username, Users.name, Users.country_id from Users '
                     . 'INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id '
                     . 'WHERE contest_id = ? AND Users.user_id NOT IN'
                         . ' (SELECT user_id FROM User_Roles WHERE contest_id = ? OR contest_id = 0)'
-                    . 'AND Users.user_id != (SELECT director_id FROM Contests where contest_id = ?)';
-            $val = array($contest_id, $contest_id, $contest_id);
+                    . 'AND Users.user_id != (SELECT owner_id FROM ACLs WHERE acl_id = ?)';
+            $val = array(
+                $contest->contest_id,
+                $contest->contest_id,
+                $contest->acl_id,
+            );
         }
 
         global $conn;
@@ -387,7 +391,7 @@ class RunsDAO extends RunsDAOBase {
         return $ar;
     }
 
-    final public static function GetContestRuns($contest_id, $onlyAC = false) {
+    final public static function getContestRuns(Contests $contest, $onlyAC = false) {
         $sql =    'SELECT '
                     . 'r.score, r.penalty, r.contest_score, r.problem_id, r.user_id, r.test, r.time, r.submit_delay, r.guid '
                 . 'FROM '
@@ -406,7 +410,7 @@ class RunsDAO extends RunsDAOBase {
                         "AND r.verdict IN ('AC') ")
                 . 'ORDER BY r.run_id;';
 
-        $val = array($contest_id);
+        $val = array($contest->contest_id);
 
         global $conn;
         $rs = $conn->Execute($sql, $val);

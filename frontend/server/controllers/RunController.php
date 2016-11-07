@@ -79,7 +79,7 @@ class RunController extends Controller {
 
             // Check for practice or public problem, there is no contest info in this scenario
             if ($r['contest_alias'] == '') {
-                if (Authorization::IsProblemAdmin($r['current_user_id'], $r['problem']) ||
+                if (Authorization::isProblemAdmin($r['current_user_id'], $r['problem']) ||
                       time() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id) ||
                       $r['problem']->public == true) {
                     if (!RunsDAO::IsRunInsideSubmissionGap(
@@ -87,7 +87,7 @@ class RunController extends Controller {
                         $r['problem']->problem_id,
                         $r['current_user_id']
                     )
-                            && !Authorization::IsSystemAdmin($r['current_user_id'])) {
+                            && !Authorization::isSystemAdmin($r['current_user_id'])) {
                             throw new NotAllowedToSubmitException('runWaitGap');
                     }
 
@@ -127,7 +127,7 @@ class RunController extends Controller {
             }
 
             // Contest admins can skip following checks
-            if (!Authorization::IsContestAdmin($r['current_user_id'], $r['contest'])) {
+            if (!Authorization::isContestAdmin($r['current_user_id'], $r['contest'])) {
                 // Before submit something, contestant had to open the problem/contest
                 if (!ContestsUsersDAO::getByPK($r['current_user_id'], $r['contest']->contest_id)) {
                     throw new NotAllowedToSubmitException('runNotEvenOpened');
@@ -247,7 +247,7 @@ class RunController extends Controller {
             }
 
             $contest_id = $r['contest']->contest_id;
-            $test = Authorization::IsContestAdmin($r['current_user_id'], $r['contest']) ? 1 : 0;
+            $test = Authorization::isContestAdmin($r['current_user_id'], $r['contest']) ? 1 : 0;
         }
 
         // Populate new run object
@@ -386,7 +386,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::IsProblemAdmin($r['current_user_id'], $r['problem']))) {
+        if (!(Authorization::isProblemAdmin($r['current_user_id'], $r['problem']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
     }
@@ -404,7 +404,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::CanViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -446,7 +446,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::CanEditRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canEditRun($r['current_user_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -527,7 +527,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::CanViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -547,7 +547,7 @@ class RunController extends Controller {
 
         // Get the source
         $response['source'] = file_get_contents(RunController::getSubmissionPath($r['run']));
-        $response['admin'] = Authorization::IsProblemAdmin($r['current_user_id'], $r['problem']);
+        $response['admin'] = Authorization::isProblemAdmin($r['current_user_id'], $r['problem']);
 
         if ($response['admin']) {
             if (file_exists("$grade_dir/details.json")) {
@@ -618,7 +618,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::CanViewRun($r['current_user_id'], $r['run']))) {
+        if (!(Authorization::canViewRun($r['current_user_id'], $r['run']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -716,7 +716,7 @@ class RunController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        if (!Authorization::IsSystemAdmin($r['current_user_id'])) {
+        if (!Authorization::isSystemAdmin($r['current_user_id'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 

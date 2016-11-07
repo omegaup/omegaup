@@ -57,7 +57,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals(10000, $problem->stack_limit);
 
         // Verify author username -> author id conversion
-        $user = UsersDAO::getByPK($problem->author_id);
+        $acl = ACLsDAO::getByPK($problem->acl_id);
+        $user = UsersDAO::getByPK($acl->owner_id);
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem contents were copied
@@ -306,7 +307,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($r['source'], $problem->source);
 
         // Verify author username -> author id conversion
-        $user = UsersDAO::getByPK($problem->author_id);
+        $acl = ACLsDAO::getByPK($problem->acl_id);
+        $user = UsersDAO::getByPK($acl->owner_id);
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem contents were copied

@@ -18,136 +18,92 @@ require_once('base/User_Roles.vo.base.php');
   *
   */
 class UserRolesDAO extends UserRolesDAOBase {
-    public static function getContestAdmins(Contests $contest) {
+    private static function getAdmins($acl_id) {
         $sql = '
-			SELECT
-				u.username, ur.role_id AS role
-			FROM
-				User_Roles ur
-			INNER JOIN
-				Users u ON u.user_id = ur.user_id
-			WHERE
-				ur.role_id = 1 OR ur.role_id = 2 AND ur.contest_id = ?;';
-        $params = array($contest->contest_id);
+            SELECT
+                u.username, ur.acl_id AS acl
+            FROM
+                User_Roles ur
+            INNER JOIN
+                Users u ON u.user_id = ur.user_id
+            WHERE
+                ur.role_id = ? AND ur.acl_id IN (?, ?);';
+        $params = array(
+            Authorization::ADMIN_ROLE,
+            Authorization::SYSTEM_ACL,
+            $acl_id,
+        );
 
         global $conn;
         $admins = $conn->GetAll($sql, $params);
 
         $sql = '
-			SELECT
-				u.username
-			FROM
-				Contests c
-			INNER JOIN
-				Users u ON u.user_id = c.director_id
-			WHERE
-			c.contest_id = ?;';
-        $params = array($contest->contest_id);
-        $director = $conn->GetOne($sql, $params);
+            SELECT
+                u.username
+            FROM
+                ACLs a
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            WHERE
+                a.acl_id = ?;';
+        $params = array($acl_id);
+        $owner = $conn->GetOne($sql, $params);
 
         $found = false;
         for ($i = 0; $i < count($admins); $i++) {
-            if ($admins[$i]['role'] == ADMIN_ROLE) {
+            if ($admins[$i]['acl'] == Authorization::SYSTEM_ACL) {
                 $admins[$i]['role'] = 'site-admin';
-            } elseif ($admins[$i]['username'] == $director) {
-                $admins[$i]['role'] = 'director';
+            } elseif ($admins[$i]['username'] == $owner) {
+                $admins[$i]['role'] = 'owner';
                 $found = true;
             } else {
                 $admins[$i]['role'] = 'admin';
             }
-        }
-
-        if ($found) {
-            array_push($admins, array('username' => $director, 'role' => 'director'));
-        }
-
-        return $admins;
-    }
-
-    public static function getProblemAdmins(Problems $problem) {
-        $sql = '
-			SELECT
-				u.username, ur.role_id AS role
-			FROM
-				User_Roles ur
-			INNER JOIN
-				Users u ON u.user_id = ur.user_id
-			WHERE
-				ur.role_id = 1 OR ur.role_id = 3 AND ur.contest_id = ?;';
-        $params = array($problem->problem_id);
-
-        global $conn;
-        $admins = $conn->GetAll($sql, $params);
-
-        $sql = '
-			SELECT
-				u.username
-			FROM
-				Problems p
-			INNER JOIN
-				Users u ON u.user_id = p.author_id
-			WHERE
-			p.problem_id = ?;';
-        $params = array($problem->problem_id);
-        $author = $conn->GetOne($sql, $params);
-
-        $found = false;
-        for ($i = 0; $i < count($admins); $i++) {
-            if ($admins[$i]['role'] == ADMIN_ROLE) {
-                $admins[$i]['role'] = 'site-admin';
-            } elseif ($admins[$i]['username'] == $author) {
-                $admins[$i]['role'] = 'author';
-                $found = true;
-            } else {
-                $admins[$i]['role'] = 'admin';
-            }
+            unset($admins[$i]['acl']);
         }
 
         if (!$found) {
-            array_push($admins, array('username' => $author, 'role' => 'author'));
+            array_push($admins, array('username' => $owner, 'role' => 'owner'));
         }
 
         return $admins;
     }
 
-    public static function IsContestAdmin($user_id, Contests $contest) {
+    private static function isAdmin($user_id, $acl_id) {
         $sql = '
-			SELECT
-				COUNT(*)
-			FROM
-				User_Roles ur
-			WHERE
-				ur.user_id = ? AND
-				(ur.role_id = 1 OR ur.role_id = 2 AND ur.contest_id = ?);';
-        $params = array($user_id, $contest->contest_id);
+            SELECT
+                COUNT(*)
+            FROM
+                User_Roles ur
+            WHERE
+                ur.user_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
+        $params = array(
+            $user_id,
+            Authorization::ADMIN_ROLE,
+            Authorization::SYSTEM_ACL,
+            $acl_id,
+        );
         global $conn;
         return $conn->GetOne($sql, $params) > 0;
     }
 
-    public static function IsProblemAdmin($user_id, Problems $problem) {
-        $sql = '
-			SELECT
-				COUNT(*)
-			FROM
-				User_Roles ur
-			WHERE
-				ur.user_id = ? AND
-				(ur.role_id = 1 OR ur.role_id = 3 AND ur.contest_id = ?);';
-        $params = array($user_id, $problem->problem_id);
-        global $conn;
-        return $conn->GetOne($sql, $params) > 0;
+    public static function getContestAdmins(Contests $contest) {
+        return self::getAdmins($contest->acl_id);
     }
 
-    public static function IsSystemAdmin($user_id) {
-        $sql = '
-			SELECT
-				COUNT(*)
-			FROM
-				User_Roles ur
-			WHERE
-				ur.user_id = ? AND ur.role_id = 1;';
-        $params = array($user_id);
-        global $conn;
-        return $conn->GetOne($sql, $params) > 0;
+    public static function getProblemAdmins(Problems $problem) {
+        return self::getAdmins($problem->acl_id);
+    }
+
+    public static function isContestAdmin($user_id, Contests $contest) {
+        return self::isAdmin($user_id, $contest->acl_id);
+    }
+
+    public static function isProblemAdmin($user_id, Problems $problem) {
+        return self::isAdmin($user_id, $problem->acl_id);
+    }
+
+    public static function isSystemAdmin($user_id) {
+        return self::isAdmin($user_id, Authorization::SYSTEM_ACL);
     }
 }

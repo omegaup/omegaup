@@ -348,17 +348,17 @@ class UpdateProblemTest extends OmegaupTestCase {
         )));
 
         $adminFound = false;
-        $authorFound = false;
+        $ownerFound = false;
         foreach ($response['admins'] as $adminEntry) {
             if ($adminEntry['username'] == $problemAdmin->username) {
                 $adminFound = true;
             }
 
             if ($adminEntry['username'] == $problemData['author']->username) {
-                $authorFound = true;
+                $ownerFound = true;
             }
         }
         $this->assertTrue($adminFound);
-        $this->assertTrue($authorFound);
+        $this->assertTrue($ownerFound);
     }
 }

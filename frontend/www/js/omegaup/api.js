@@ -1,6 +1,6 @@
 var omegaup = typeof global === 'undefined' ?
-  (window.omegaup = window.omegaup || {}) :
-  (global.omegaup = global.omegaup || {});
+                  (window.omegaup = window.omegaup || {}) :
+                  (global.omegaup = global.omegaup || {});
 
 omegaup.API = {
   _wrapDeferred: function(jqXHR, transform) {
@@ -884,36 +884,57 @@ omegaup.API = {
         });
   },
 
-  getMyProblems: function(callback) {
-    $.get('/api/problem/mylist/', function(data) { callback(data); }, 'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
+  getMyProblems: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/problem/mylist/',
+      data: params,
+      dataType: 'json',
+    }));
+  },
+
+  getMyContests: function(params) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({
+          url: '/api/contest/mylist/',
+          data: params,
+          dataType: 'json',
+        }),
+        function(result) {
+          for (var idx in result.contests) {
+            var contest = result.contests[idx];
+            contest.start_time =
+                omegaup.OmegaUp.time(contest.start_time * 1000);
+            contest.finish_time =
+                omegaup.OmegaUp.time(contest.finish_time * 1000);
           }
+          return result;
         });
   },
 
-  getMyContests: function(callback) {
-    $.get('/api/contest/mylist/',
-          function(data) {
-            for (var idx in data.results) {
-              var contest = data.results[idx];
-              contest.start_time =
-                  omegaup.OmegaUp.time(contest.start_time * 1000);
-              contest.finish_time =
-                  omegaup.OmegaUp.time(contest.finish_time * 1000);
-            }
-            callback(data);
-          },
-          'json')
-        .fail(function(j, status, errorThrown) {
-          try {
-            callback(JSON.parse(j.responseText));
-          } catch (err) {
-            callback({status: 'error', 'error': undefined});
+  getAdminProblems: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/problem/adminlist/',
+      data: params,
+      dataType: 'json',
+    }));
+  },
+
+  getAdminContests: function(params) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({
+          url: '/api/contest/adminlist/',
+          data: params,
+          dataType: 'json',
+        }),
+        function(result) {
+          for (var idx in result.contests) {
+            var contest = result.contests[idx];
+            contest.start_time =
+                omegaup.OmegaUp.time(contest.start_time * 1000);
+            contest.finish_time =
+                omegaup.OmegaUp.time(contest.finish_time * 1000);
           }
+          return result;
         });
   },
 

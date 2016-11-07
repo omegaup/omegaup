@@ -49,8 +49,8 @@ class OmegaupUITestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
         $userRoles = new UserRoles(array(
             'user_id' => $contestant->user_id,
-            'role_id' => ADMIN_ROLE,
-            'contest_id' => 0,
+            'role_id' => Authorization::ADMIN_ROLE,
+            'acl_id' => Authorization::SYSTEM_ACL,
         ));
         UserRolesDAO::save($userRoles);
 
