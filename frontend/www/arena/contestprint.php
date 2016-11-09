@@ -20,7 +20,7 @@ try {
 $problems = $contest['problems'];
 foreach ($problems as &$problem) {
     $r = new Request(array(
-        'contest_alias' => $_REQUEST['contest'],
+        'contest_alias' => $_REQUEST['alias'],
         'problem_alias' => $problem['alias'],
         'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
     ));

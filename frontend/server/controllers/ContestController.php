@@ -1635,6 +1635,10 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        if (is_null($contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+
         // If true, will override Scoreboard Pertentage to 100%
         $showAllRuns = false;
 
