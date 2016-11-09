@@ -1635,7 +1635,7 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($contest)) {
+        if (is_null($r['contest'])) {
             throw new NotFoundException('contestNotFound');
         }
 
