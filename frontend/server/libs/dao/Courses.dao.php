@@ -124,6 +124,9 @@ class CoursesDAO extends CoursesDAOBase
         $rs = $conn->Execute($sql, $courseAlias);
         $users = array();
         foreach ($rs as $row) {
+            /* @TODO: Remover count_homeworks_done, count_assignments_done y sacarlos del query anterior */
+            $row['count_homeworks_done'] = 1;
+            $row['count_tests_done'] = 1;
             array_push($users, $row);
         }
         return $users;

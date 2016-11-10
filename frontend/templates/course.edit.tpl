@@ -14,6 +14,7 @@
 		<li><a href="#add-assignment" data-toggle="tab">{#courseEditAddAssignment#}</a></li>
 		<li><a href="#add-problems" data-toggle="tab">{#courseEditAddProblems#}</a></li>
 		<li><a href="#add-students" data-toggle="tab">{#courseEditAddStudents#}</a></li>
+		<li><a href="#view-progress" data-toggle="tab">{#courseViewProgress#}</a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" id="edit">
@@ -27,6 +28,9 @@
 		</div>
 		<div class="tab-pane" id="add-students">
 			{include file='course.assignment.add.students.form.tpl'}
+		</div>
+		<div class="tab-pane" id="view-progress">
+			{include file='course.view.progress.tpl'}
 		</div>
 	</div>
 </div>
