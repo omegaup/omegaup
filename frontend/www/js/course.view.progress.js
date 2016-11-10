@@ -8,7 +8,7 @@ $('document').ready(function() {
         if (data.status != 'ok') {
             omegaup.UI.error(data.error);
             return;
-        }        
+        }
 
         var koStudentsList = {
             getStudentsList: ko.observableArray()
@@ -16,7 +16,7 @@ $('document').ready(function() {
         for (var i = 0; i < data['students'].length; ++i) {
             var student = data['students'][i];
             student.profileURL = '/profile/' + student.username,
-            
+
             totalHomeworks = (data['counts']['homework'] != null) ? data['counts']['homework'] : 0;
             totalTests = (data['counts']['test'] != null) ? data['counts']['test'] : 0;
             student.totalHomeworks = student.count_homeworks_done + '/' + totalHomeworks;
@@ -24,7 +24,7 @@ $('document').ready(function() {
 
             koStudentsList['getStudentsList'].push(student);
         }
-        
+
         ko.applyBindings(koStudentsList);
     });
 });

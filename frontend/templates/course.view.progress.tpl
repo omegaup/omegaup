@@ -29,13 +29,13 @@
     <div class="page-header">
         <h2><span>{#courseStudentsProgress#}</span> <small></small></h2>
     </div>
-    <div class="panel-body">                
-	    <div 
+    <div class="panel-body">
+	    <div
 	    	id="students-list-table"
 			data-bind="template: { name: 'student-list',
 	                    data: { listName: '{#courseListAdminCurrentCourses#}',
 	                            student: getStudentsList() }  }">
-		</div>        
+		</div>
     </div> <!-- panel-body -->
 </div> <!-- panel -->
 
