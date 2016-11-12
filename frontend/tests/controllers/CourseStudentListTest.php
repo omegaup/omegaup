@@ -59,4 +59,25 @@ class CourseStudentListTest extends OmegaupTestCase {
             'course_alias' => 'foo'
         )));
     }
+
+    /**
+     * API returns correct counts of assignments by type
+     */
+    public function testCounts() {
+        $homeworkCount = 3;
+        $testCount = 2;
+        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
+            ['homework' => $homeworkCount, 'test' => $testCount]
+        );
+
+        $adminLogin = self::login($courseData['admin']);
+        $response = CourseController::apiListStudents(new Request(array(
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias']
+        )));
+
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($homeworkCount, $response['counts']['homework']);
+        $this->assertEquals($testCount, $response['counts']['test']);
+    }
 }
