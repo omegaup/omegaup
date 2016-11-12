@@ -236,9 +236,10 @@ omegaup.API = {
 
   getCourseStudentList: function(params) {
     return omegaup.API._wrapDeferred($.ajax({
-      url: '/api/course/listStudents/course_alias/' + params.course_alias
-    }),
-                                     function(result) { return result; });
+      url: '/api/course/listStudents/course_alias/' +
+               encodeURIComponent(params.course_alias) + '/',
+      dataType: 'json',
+    }));
   },
 
   getCourseAssignments: function(course_alias, callback) {

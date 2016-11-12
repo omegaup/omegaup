@@ -1,12 +1,12 @@
 $('document')
     .ready(function() {
-      var course_alias =
+      var courseAlias =
           /\/course\/([^\/]+)\/edit\/?.*/.exec(window.location.pathname)[1];
 
       ko.bindingProvider.instance =
           new ko.secureBindingsProvider({attribute: 'data-bind'});
 
-      omegaup.API.getCourseStudentList({course_alias: course_alias})
+      omegaup.API.getCourseStudentList({course_alias: courseAlias})
           .then(function(data) {
             if (data.status != 'ok') {
               omegaup.UI.error(data.error);
@@ -18,10 +18,10 @@ $('document')
               var student = data['students'][i];
               student.profileURL = '/profile/' + student.username;
 
-              totalHomeworks = (data['counts']['homework'] != null) ?
-                                   data['counts']['homework'] :
-                                   0;
-              totalTests =
+              var totalHomeworks = (data['counts']['homework'] != null) ?
+                                       data['counts']['homework'] :
+                                       0;
+              var totalTests =
                   (data['counts']['test'] != null) ? data['counts']['test'] : 0;
               student.totalHomeworks =
                   student.count_homeworks_done + '/' + totalHomeworks;
