@@ -114,8 +114,8 @@ class Authorization {
             return true;
         }
 
-        return GroupRolesDAO::isContestAdmin($user_id, $contest) ||
-               UserRolesDAO::isContestAdmin($user_id, $contest);
+        return GroupRolesDAO::isAdmin($user_id, $contest->acl_id) ||
+               UserRolesDAO::isAdmin($user_id, $contest->acl_id);
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {
@@ -127,8 +127,8 @@ class Authorization {
             return true;
         }
 
-        return GroupRolesDAO::isProblemAdmin($user_id, $problem) ||
-               UserRolesDAO::isProblemAdmin($user_id, $problem);
+        return GroupRolesDAO::isAdmin($user_id, $problem->acl_id) ||
+               UserRolesDAO::isAdmin($user_id, $problem->acl_id);
     }
 
     public static function isSystemAdmin($user_id) {
