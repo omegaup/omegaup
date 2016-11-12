@@ -355,37 +355,55 @@ class RunsDAO extends RunsDAOBase {
 
     final public static function getAllRelevantUsers(Contests $contest, $showAllRuns = false, $filterUsersBy = null) {
         // Build SQL statement
-        if (!$showAllRuns) {
-            $sql = 'SELECT Users.user_id, username, Users.name, Users.country_id from Users INNER JOIN ( '
-                    . 'SELECT DISTINCT Runs.user_id from Runs '
-                    . "WHERE ( Runs.verdict NOT IN ('CE', 'JE') AND Runs.contest_id = ? AND Runs.status = 'ready' " . ($showAllRuns ? '' : ' AND Runs.test = 0') . ' ) ) '
-                . 'RunsContests ON Users.user_id = RunsContests.user_id ' . (!is_null($filterUsersBy) ? 'WHERE Users.username LIKE ?' : '');
-
-            if (is_null($filterUsersBy)) {
-                $val = array($contest->contest_id);
-            } else {
-                $val = array($contest->contest_id, $filterUsersBy . '%');
-            }
-        } else {
-            $sql = 'SELECT Users.user_id, username, Users.name, Users.country_id from Users '
-                    . 'INNER JOIN Contests_Users ON Users.user_id = Contests_Users.user_id '
-                    . 'WHERE contest_id = ? AND Users.user_id NOT IN'
-                        . ' (SELECT user_id FROM User_Roles WHERE contest_id = ? OR contest_id = 0)'
-                    . 'AND Users.user_id != (SELECT owner_id FROM ACLs WHERE acl_id = ?)';
+        if ($showAllRuns) {
+            $sql = '
+                SELECT
+                    u.user_id, u.username, u.name, u.country_id
+                FROM
+                    Users u
+                INNER JOIN
+                    Contests_Users cu ON u.user_id = cu.user_id
+                WHERE
+                    cu.contest_id = ? AND
+                    u.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
+                    u.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
             $val = array(
                 $contest->contest_id,
-                $contest->contest_id,
                 $contest->acl_id,
+                $contest->acl_id,
+                Authorization::SYSTEM_ACL,
+                Authorization::ADMIN_ROLE,
             );
+        } else {
+            $sql = '
+                SELECT
+                    u.user_id, u.username, u.name, u.country_id
+                FROM
+                    Users u
+                INNER JOIN
+                    (SELECT DISTINCT
+                        r.user_id
+                    FROM
+                        Runs r
+                    WHERE
+                        r.verdict NOT IN (\'CE\', \'JE\') AND
+                        r.contest_id = ? AND
+                        r.status = \'ready\' AND
+                        r.test = 0) rc ON u.user_id = rc.user_id';
+            $val = array($contest->contest_id);
+            if (!is_null($filterUsersBy)) {
+                $sql .= ' WHERE u.username LIKE ?';
+                $val[] = $filterUsersBy . '%';
+            }
+            $sql .= ';';
         }
 
         global $conn;
         $rs = $conn->Execute($sql, $val);
 
         $ar = array();
-        foreach ($rs as $foo) {
-            $bar = new Users($foo);
-            array_push($ar, $bar);
+        foreach ($rs as $row) {
+            array_push($ar, new Users($row));
         }
 
         return $ar;
