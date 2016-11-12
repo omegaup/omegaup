@@ -160,7 +160,7 @@ class Authorization {
     /**
      * An admin is either the group owner or a member of the admin group.
      */
-    public static function IsCourseAdmin($user_id, Courses $course) {
+    public static function isCourseAdmin($user_id, Courses $course) {
         if (is_null($course)) {
             return false;
         }
