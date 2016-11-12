@@ -1,6 +1,6 @@
-<script type="text/javascript" src="/third_party/js/knockout-4.3.0.js?ver=059d58"></script>
-<script type="text/javascript" src="/third_party/js/knockout-secure-binding.min.js?ver=81a2a3"></script>
-<script type="text/javascript" src="/js/course.view.progress.js?ver=d656aa"></script>
+<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-4.3.0.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/course.view.progress.js"}"></script>
 
 <template id="student-list">
 <div class="panel">
