@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile='/ux/contest.js?ver=1e5f1e' inContest=false}
+{include file='arena.head.tpl' jsfile='{version_hash src='/ux/contest.js'}' inContest=false}
 
 <div>
 TODO: Lista de problemas

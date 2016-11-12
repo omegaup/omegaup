@@ -6,6 +6,6 @@
 
 {include file='course.new.form.tpl'}
 
-<script type="text/javascript" src="/js/course.new.js?ver=8e1737"></script>
+<script type="text/javascript" src="{version_hash src="/js/course.new.js"}"></script>
 
 {include file='footer.tpl'}
