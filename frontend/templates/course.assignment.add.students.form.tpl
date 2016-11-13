@@ -22,4 +22,4 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/course.assignment.add.problems.form.js?ver=ac0d8b"></script>
+<script type="text/javascript" src="{version_hash src="/js/course.assignment.add.problems.form.js"}"></script>
