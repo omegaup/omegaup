@@ -85,8 +85,9 @@ omegaup.OmegaUp = {
 
   time: function(timestamp, options) {
     options = options ||  {};
-    options.server_sync =
-        (options.server_sync === 'undefined') ? true : options.server_sync;
+    options.server_sync = (typeof(options.server_sync) === 'undefined') ?
+                              true :
+                              options.server_sync;
     return new Date(
         omegaup.OmegaUp._realTime(timestamp) +
         (options.server_sync ? (omegaup.OmegaUp._deltaTime || 0) : 0));
