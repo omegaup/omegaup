@@ -165,8 +165,7 @@ class Authorization {
             return false;
         }
 
-        if (self::isOwner($user_id, $course->acl_id) ||
-            Authorization::isSystemAdmin($user_id)) {
+        if (self::isOwner($user_id, $course->acl_id)) {
             return true;
         }
 
