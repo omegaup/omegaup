@@ -327,7 +327,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCourseExists($r);
 
-        if (!Authorization::IsCourseAdmin($r['current_user_id'], $r['course'])) {
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -395,7 +395,7 @@ class CourseController extends Controller {
         $result['alias'] = $course->alias;
         $result['start_time'] = strtotime($course->start_time);
         $result['finish_time'] = strtotime($course->finish_time);
-        $result['is_admin'] = Authorization::IsCourseAdmin(
+        $result['is_admin'] = Authorization::isCourseAdmin(
             $r['current_user_id'],
             $course
         );

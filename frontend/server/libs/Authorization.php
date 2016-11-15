@@ -114,8 +114,8 @@ class Authorization {
             return true;
         }
 
-        return GroupRolesDAO::isContestAdmin($user_id, $contest) ||
-               UserRolesDAO::isContestAdmin($user_id, $contest);
+        return GroupRolesDAO::isAdmin($user_id, $contest->acl_id) ||
+               UserRolesDAO::isAdmin($user_id, $contest->acl_id);
     }
 
     public static function isProblemAdmin($user_id, Problems $problem) {
@@ -127,8 +127,8 @@ class Authorization {
             return true;
         }
 
-        return GroupRolesDAO::isProblemAdmin($user_id, $problem) ||
-               UserRolesDAO::isProblemAdmin($user_id, $problem);
+        return GroupRolesDAO::isAdmin($user_id, $problem->acl_id) ||
+               UserRolesDAO::isAdmin($user_id, $problem->acl_id);
     }
 
     public static function isSystemAdmin($user_id) {
@@ -160,7 +160,7 @@ class Authorization {
     /**
      * An admin is either the group owner or a member of the admin group.
      */
-    public static function IsCourseAdmin($user_id, Courses $course) {
+    public static function isCourseAdmin($user_id, Courses $course) {
         if (is_null($course)) {
             return false;
         }
@@ -170,7 +170,7 @@ class Authorization {
             return true;
         }
 
-        // TODO(pablo): Do group-based check once we're in the new ACL world.
-        return false;
+        return GroupRolesDAO::isAdmin($user_id, $course->acl_id) ||
+               UserRolesDAO::isAdmin($user_id, $course->acl_id);
     }
 }

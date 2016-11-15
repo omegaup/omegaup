@@ -69,7 +69,7 @@ class UserRolesDAO extends UserRolesDAOBase {
         return $admins;
     }
 
-    private static function isAdmin($user_id, $acl_id) {
+    public static function isAdmin($user_id, $acl_id) {
         $sql = '
             SELECT
                 COUNT(*)
@@ -93,14 +93,6 @@ class UserRolesDAO extends UserRolesDAOBase {
 
     public static function getProblemAdmins(Problems $problem) {
         return self::getAdmins($problem->acl_id);
-    }
-
-    public static function isContestAdmin($user_id, Contests $contest) {
-        return self::isAdmin($user_id, $contest->acl_id);
-    }
-
-    public static function isProblemAdmin($user_id, Problems $problem) {
-        return self::isAdmin($user_id, $problem->acl_id);
     }
 
     public static function isSystemAdmin($user_id) {

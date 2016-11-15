@@ -35,7 +35,7 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="/js/course.edit.js?ver=96e7cf"></script>
-<script type="text/javascript" src="/js/course.assignment.new.js?ver=33c32a"></script>
-<script type="text/javascript" src="/js/course.assignment.add.problems.js?ver=95d473"></script>
+<script type="text/javascript" src="{version_hash src="/js/course.edit.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/course.assignment.new.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/course.assignment.add.problems.js"}"></script>
 {include file='footer.tpl'}
