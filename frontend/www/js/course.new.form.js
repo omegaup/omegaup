@@ -12,7 +12,7 @@ $('document')
         var defaultDate = Date.create(Date.now());
         defaultDate.set({seconds: 0});
         $('#start_time').val(omegaup.UI.formatDate(defaultDate));
-        defaultDate.setHours(defaultDate.getHours() + 5);
+        defaultDate.setDate(defaultDate.getDate() + 30);
         $('#finish_time').val(omegaup.UI.formatDate(defaultDate));
       }
     });

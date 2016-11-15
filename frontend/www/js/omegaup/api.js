@@ -269,8 +269,10 @@ omegaup.API = {
               omegaup.UI.error(data.error);
             }
             if (data.status == 'ok') {
-              data.start_time = omegaup.OmegaUp.time(data.start_time * 1000);
-              data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000);
+              data.start_time = omegaup.OmegaUp.time(data.start_time * 1000,
+                                                     {server_sync: false});
+              data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000,
+                                                      {server_sync: false});
             }
             if (callback !== undefined) {
               callback(data);
