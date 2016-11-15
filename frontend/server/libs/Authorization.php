@@ -172,4 +172,22 @@ class Authorization {
         return GroupRolesDAO::isAdmin($user_id, $course->acl_id) ||
                UserRolesDAO::isAdmin($user_id, $course->acl_id);
     }
+
+    public static function isGroupMember($user_id, Groups $group) {
+        if (is_null($group)) {
+            return false;
+        }
+
+        $groupUsers = GroupsUsersDAO::search(new GroupsUsers(
+            array(
+                'user_id' => $user_id,
+            'group_id' => $group->group_id)
+        ));
+
+        if (!is_null($groupUsers) && count($groupUsers) > 0) {
+            return true;
+        }
+
+            return Authorization::isSystemAdmin($user_id);
+    }
 }

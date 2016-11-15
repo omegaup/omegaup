@@ -39,14 +39,32 @@ class CourseDetailsTest extends OmegaupTestCase {
         }
     }
 
+    /**
+     * Get details with user not registerd to the Course. Should fail.
+     * @expectedException ForbiddenAccessException
+     */
     public function testGetCourseDetailsNormalUser() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
         $user = UserFactory::createUser();
         $userLogin = self::login($user);
+
         $response = CourseController::apiDetails(new Request(array(
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         )));
+    }
+
+    public function testGetCourseDetailsCourseMember() {
+        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $user = CoursesFactory::addStudentToCourse($courseData);
+        $userLogin = self::login($user);
+
+        $response = CourseController::apiDetails(new Request(array(
+            'auth_token' => $userLogin->auth_token,
+            'alias' => $courseData['course_alias']
+        )));
+
+        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['is_admin']);
     }
 }
