@@ -188,6 +188,6 @@ class Authorization {
             return true;
         }
 
-            return Authorization::isSystemAdmin($user_id);
+        return Authorization::isSystemAdmin($user_id);
     }
 }
