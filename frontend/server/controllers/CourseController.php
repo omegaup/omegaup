@@ -1,6 +1,6 @@
 <?php
 /**
- *  GroupController
+ *  CourseController
  *
  * @author alanboy
  * @author pablo.aguilar
