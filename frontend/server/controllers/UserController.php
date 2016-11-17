@@ -887,13 +887,22 @@ class UserController extends Controller {
             $keys = array (
                 'OIC-16' => 225
             );
+        }  elseif ($r['contest_type'] == 'OMIQROO') {
+            if ($r['current_user']->username != 'pablobatun'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = array (
+                'ROO-17' => 160
+            );
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 array(
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP',
+                    'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP, OMIQROO',
                 )
             );
         }
