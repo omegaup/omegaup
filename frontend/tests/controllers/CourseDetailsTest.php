@@ -59,10 +59,10 @@ class CourseDetailsTest extends OmegaupTestCase {
         $user = CoursesFactory::addStudentToCourse($courseData);
         $userLogin = self::login($user);
 
-        $response = CourseController::apiDetails(new Request(array(
+        $response = CourseController::apiDetails(new Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
-        )));
+        ]));
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['is_admin']);

@@ -105,6 +105,15 @@ class Authorization {
         return Authorization::isProblemAdmin($user_id, $problem);
     }
 
+    public static function canViewCourse($user_id, Courses $course, Groups $group) {
+        if (!Authorization::isCourseAdmin($user_id, $course) &&
+            !Authorization::isGroupMember($user_id, $group)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public static function isContestAdmin($user_id, Contests $contest) {
         if (is_null($contest) || !is_a($contest, 'Contests')) {
             return false;
@@ -178,16 +187,15 @@ class Authorization {
             return false;
         }
 
-        $groupUsers = GroupsUsersDAO::search(new GroupsUsers(
-            array(
-                'user_id' => $user_id,
-            'group_id' => $group->group_id)
-        ));
-
-        if (!is_null($groupUsers) && count($groupUsers) > 0) {
+        if (Authorization::isSystemAdmin($user_id)) {
             return true;
         }
 
-        return Authorization::isSystemAdmin($user_id);
+        $groupUsers = GroupsUsersDAO::search(new GroupsUsers([
+            'user_id' => $user_id,
+            'group_id' => $group->group_id
+        ]));
+
+        return !is_null($groupUsers) && count($groupUsers) > 0;
     }
 }

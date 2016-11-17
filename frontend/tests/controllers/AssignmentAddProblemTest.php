@@ -10,6 +10,7 @@ class AssignmentAddProblemTest extends OmegaupTestCase {
         $probData = ProblemsFactory::createProblem(null, null, 1, $user);
 
         $r = new Request(array(
+            'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $assignmentAlias,
             'problem_alias' => $probData['problem']->alias,
             'auth_token' => self::login($user)

@@ -133,19 +133,21 @@ class CourseController extends Controller {
      * @param  Request $r
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
+     * @throws NotFoundException
      */
     private static function resolveGroup(Request $r) {
         if (!is_a($r['course'], 'Courses')) {
-            throw new InvalidParameterException;
+            throw new InvalidParameterException('parameterNotFound', 'course');
         }
 
         try {
-            $groups = GroupsDAO::search(new Groups(
-                array('group_id' => $r['course']->group_id)
-            ));
-            $r['group'] = $groups[0];
+            $r['group'] = GroupsDAO::getByPK($r['course']->group_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($r['group'])) {
+            throw new NotFoundException();
         }
     }
 
@@ -157,8 +159,11 @@ class CourseController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
-        self::authenticateRequest($r);
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
 
+        self::authenticateRequest($r);
         self::validateCreateOrUpdate($r);
 
         if (!is_null(CoursesDAO::findByAlias($r['alias']))) {
@@ -208,6 +213,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCreateAssignment(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         self::authenticateRequest($r);
         self::validateCreateOrUpdateAssignment($r);
 
@@ -244,7 +253,12 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiAddProblem(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         self::authenticateRequest($r);
+        self::validateCourseExists($r);
 
         if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
             throw new ForbiddenAccessException();
@@ -276,13 +290,16 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListAssignments(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         self::authenticateRequest($r);
         self::validateCourseExists($r);
         self::resolveGroup($r);
 
         // Only Course Admins or Group Members (students) can see these results
-        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course']) &&
-            !Authorization::isGroupMember($r['current_user_id'], $r['group'])) {
+        if (!Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -336,6 +353,10 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListCourses(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         self::authenticateRequest($r);
 
         Validators::isNumber($r['page'], 'page', false);
@@ -395,6 +416,10 @@ class CourseController extends Controller {
      * @return Array response
      */
     public static function apiListStudents(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
         self::authenticateRequest($r);
         self::validateCourseExists($r);
 
@@ -419,48 +444,11 @@ class CourseController extends Controller {
     }
 
     /**
-     * Returns all details of a given Course
+     * Returns course details common between admin & non-admin
      * @param  Request $r
      * @return array
      */
-    public static function apiAdminDetails(Request $r) {
-        self::authenticateRequest($r);
-        self::validateCourseDetails($r);
-        self::resolveGroup($r);
-
-        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
-            throw new ForbiddenAccessException();
-        }
-
-        $result = array();
-        $result['status'] = 'ok';
-        $result['assignments'] = CoursesDAO::getAllAssignments($r['alias']);
-
-        $result['name'] = $r['course']->name;
-        $result['description'] = $r['course']->description;
-        $result['alias'] = $r['course']->alias;
-        $result['start_time'] = strtotime($r['course']->start_time);
-        $result['finish_time'] = strtotime($r['course']->finish_time);
-
-        return $result;
-    }
-
-    /**
-     * Returns details of a given contest
-     * @param  Request $r
-     * @return array
-     */
-    public static function apiDetails(Request $r) {
-        self::authenticateRequest($r);
-        self::validateCourseDetails($r);
-        self::resolveGroup($r);
-
-        // Only Course Admins or Group Members (students) can see these results
-        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course']) &&
-            !Authorization::isGroupMember($r['current_user_id'], $r['group'])) {
-            throw new ForbiddenAccessException();
-        }
-
+    private static function getCommonCourseDetails(Request $r) {
         $result = array();
         $result['status'] = 'ok';
         $result['assignments'] = CoursesDAO::getAllAssignments($r['alias']);
@@ -474,6 +462,7 @@ class CourseController extends Controller {
             $r['current_user_id'],
             $r['course']
         );
+
         if ($result['is_admin']) {
             try {
                 $group = GroupsDAO::findByAlias($r['alias']);
@@ -485,7 +474,51 @@ class CourseController extends Controller {
             }
             $result['student_count'] = GroupsUsersDAO::GetMemberCountById($group->group_id);
         }
+
         return $result;
+    }
+
+    /**
+     * Returns all details of a given Course
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiAdminDetails(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateCourseDetails($r);
+        self::resolveGroup($r);
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        return self::getCommonCourseDetails($r);
+    }
+
+    /**
+     * Returns details of a given contest
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiDetails(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateCourseDetails($r);
+        self::resolveGroup($r);
+
+        // Only Course Admins or Group Members (students) can see these results
+        if (!Authorization::canViewCourse($r['current_user_id'], $r['course'], $r['group'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        return self::getCommonCourseDetails($r);
     }
 
     /**
