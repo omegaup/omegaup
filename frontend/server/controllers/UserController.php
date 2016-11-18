@@ -829,30 +829,28 @@ class UserController extends Controller {
 
             $keys = array (
                 'OMIAGS' => 35
-            );            
+            );
         } elseif ($r['contest_type'] == 'OMIP-AGS') {
             if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
-            
+
             $keys = array (
                 'OMIP-AGS' => 30
             );
-        }
         } elseif ($r['contest_type'] == 'OMIS-AGS') {
             if ($r['current_user']->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
             }
-            
+
             $keys = array (
                 'OMIS-AGS' => 30
             );
-        }        
-        elseif ($r['contest_type'] == 'OSI') {
+        } elseif ($r['contest_type'] == 'OSI') {
             if ($r['current_user']->username != 'cope_quintana'
                 && !$is_system_admin
             ) {
