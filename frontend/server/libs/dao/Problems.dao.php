@@ -50,7 +50,7 @@ class ProblemsDAO extends ProblemsDAOBase
                     HAVING
                         (COUNT(pt.tag_id) = ?)
                 ) ptp ON ptp.problem_id = p.problem_id WHERE";
-            array_push($args, ...$tag);
+            $args = array_merge($args, $tag);
             $args[] = count($tag);
         } else {
             $sql .= ' WHERE';
