@@ -19,6 +19,44 @@ require_once('base/Problems.vo.base.php');
   */
 class ProblemsDAO extends ProblemsDAOBase
 {
+    final private static function addTagFilter($user_type, $tag, &$sql, &$args) {
+        $public_check = 'AND pt.public = 1';
+        if ($user_type === USER_ADMIN) {
+            $public_check = '';
+        }
+
+        if (is_string($tag)) {
+            $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
+            $sql .= ' INNER JOIN Tags t ON pt.tag_id = t.tag_id';
+            $sql .= " WHERE t.name = ? $public_check AND";
+            $args[] = $tag;
+        } elseif (is_array($tag)) {
+            // Look for problems matching ALL tags.
+            $placeholders = array_fill(0, count($tag), '?');
+            $placeholders = join(',', $placeholders);
+            $sql .= "
+                INNER JOIN (
+                    SELECT
+                        pt.problem_id
+                    FROM
+                        Problems_Tags pt
+                    WHERE pt.tag_id IN (
+                        SELECT t.tag_id
+                        FROM Tags t
+                        WHERE t.name in ($placeholders)
+                    ) $public_check
+                    GROUP BY
+                        pt.problem_id
+                    HAVING
+                        (COUNT(pt.tag_id) = ?)
+                ) ptp ON ptp.problem_id = p.problem_id WHERE";
+            $args = array_merge($args, $tag);
+            $args[] = count($tag);
+        } else {
+            $sql .= ' WHERE';
+        }
+    }
+
     final public static function byUserType(
         $user_type,
         $order,
@@ -67,23 +105,13 @@ class ProblemsDAO extends ProblemsDAOBase
                         Problems.problem_id
                     ) ps ON ps.problem_id = p.problem_id';
 
-            $added_where = false;
-            if (!is_null($tag)) {
-                $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
-                $sql .= ' INNER JOIN Tags t ON pt.tag_id = t.tag_id';
-                $sql .= ' WHERE t.name = ?';
-                $args[] = $tag;
-                $added_where = true;
-            }
-
+            self::addTagFilter($user_type, $tag, $sql, $args);
             if (!is_null($query)) {
-                if (!$added_where) {
-                    $sql .= ' WHERE';
-                } else {
-                    $sql .= ' AND';
-                }
                 $sql .= " title LIKE CONCAT('%', ?, '%') ";
                 $args[] = $query;
+            } else {
+                // Finish the WHERE clause opened by addTagFilter
+                $sql .= ' TRUE';
             }
         } elseif ($user_type === USER_NORMAL && !is_null($user_id)) {
             $select = '
@@ -127,15 +155,7 @@ class ProblemsDAO extends ProblemsDAOBase
             $args[] = $user_id;
             $args[] = Authorization::ADMIN_ROLE;
 
-            if (!is_null($tag)) {
-                $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
-                $sql .= ' INNER JOIN Tags t ON pt.tag_id = t.tag_id';
-                $sql .= ' WHERE t.name = ? AND pt.public = 1 AND';
-                $args[] = $tag;
-            } else {
-                $sql .= ' WHERE';
-            }
-
+            self::addTagFilter($user_type, $tag, $sql, $args);
             $sql .= '
                 (p.public = 1 OR a.owner_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) ';
             $args[] = $user_id;
@@ -155,15 +175,7 @@ class ProblemsDAO extends ProblemsDAOBase
                     FROM
                         Problems p';
 
-            if (!is_null($tag)) {
-                $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
-                $sql .= ' INNER JOIN Tags t ON pt.tag_id = t.tag_id';
-                $sql .= ' WHERE t.name = ? AND pt.public = 1 AND';
-                $args[] = $tag;
-            } else {
-                $sql .= ' WHERE';
-            }
-
+            self::addTagFilter($user_type, $tag, $sql, $args);
             $sql .= ' p.public = 1 ';
 
             if (!is_null($query)) {

@@ -56,6 +56,56 @@ class ProblemList extends OmegaupTestCase {
     }
 
     /**
+     * Test getting a list of problems while filtering by tag.
+     */
+    public function testProblemListWithTags() {
+        // Get 3 problems
+        $n = 3;
+        for ($i = 0; $i < $n; $i++) {
+            $problemData[$i] = ProblemsFactory::createProblem(null, null, 1 /* public */);
+            for ($j = 0; $j <= $i; $j++) {
+                ProblemsFactory::addTag($problemData[$i], "tag-$j");
+            }
+        }
+
+        // Get 1 problem private, should not appear
+        $privateProblemData = ProblemsFactory::createProblem(null, null, 0 /* public */);
+        for ($j = 0; $j < $n; $j++) {
+            ProblemsFactory::addTag($privateProblemData, "tag-$j");
+        }
+
+        $login = self::login(UserFactory::createUser());
+
+        // Test one tag at a time
+        for ($j = 0; $j < $n; $j++) {
+            $r = new Request();
+            $r['auth_token'] = $login;
+            $r['tag'] = "tag-$j";
+
+            $response = ProblemController::apiList($r);
+            $this->assertEquals($response['status'], 'ok');
+            // $n public problems but not the private problem that has all tags.
+            // But only problems $j or later have tag $j.
+            $this->assertCount($n - $j, $response['results']);
+        }
+
+        // Test multiple tags at a time
+        $tags = array();
+        for ($j = 0; $j < $n; $j++) {
+            $r = new Request();
+            $r['auth_token'] = self::login(UserFactory::createUser());
+            $tags[] = "tag-$j";
+            $r['tag'] = $tags;
+
+            $response = ProblemController::apiList($r);
+            $this->assertEquals($response['status'], 'ok');
+            // $n public problems but not the private problem that has all tags.
+            // But only problems $j or later have tags 0 through $j.
+            $this->assertCount($n - $j, $response['results']);
+        }
+    }
+
+    /**
      * Limit the output to one problem we know
      */
     public function testLimitOffset() {
