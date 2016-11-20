@@ -11,8 +11,13 @@ if [ "$REF" = "" ]; then
 	echo >&2
 fi
 
+FILTER_ARG=""
+if [ -n "$1" ]; then
+	FILTER_ARG="--filter $1"
+fi
+
 $OMEGAUP_ROOT/stuff/git-hooks/pre-push $REF
 hhvm /usr/bin/phpunit \
 	--bootstrap $OMEGAUP_ROOT/frontend/tests/bootstrap.php \
 	--configuration $OMEGAUP_ROOT/frontend/tests/phpunit.xml \
-	$OMEGAUP_ROOT/frontend/tests/controllers
+	$FILTER_ARG $OMEGAUP_ROOT/frontend/tests/controllers
