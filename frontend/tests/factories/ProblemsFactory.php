@@ -146,4 +146,20 @@ class ProblemsFactory {
         // Call api
         ProblemController::apiAddGroupAdmin($r);
     }
+
+    public static function addTag($problemData, $tag) {
+        // Prepare our request
+        $r = new Request(array(
+            'problem_alias' => $problemData['request']['alias'],
+            'name' => $tag,
+            'public' => 1
+        ));
+
+        // Log in the problem author
+        $login = OmegaupTestCase::login($problemData['author']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call api
+        ProblemController::apiAddTag($r);
+    }
 }
