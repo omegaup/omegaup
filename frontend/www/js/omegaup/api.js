@@ -1046,6 +1046,18 @@ omegaup.API = {
         });
   },
 
+  getProblemsWithTags: function(tags, callback) {
+    $.get('/api/problem/list/', {tag: tags}, function(data) { callback(data); },
+          'json')
+        .fail(function(j, status, errorThrown) {
+          try {
+            callback(JSON.parse(j.responseText));
+          } catch (err) {
+            callback({status: 'error', 'error': undefined});
+          }
+        });
+  },
+
   searchProblems: function(query, callback) {
     $.post('/api/problem/list/', {query: query},
            function(data) { callback(data); }, 'json')

@@ -68,12 +68,34 @@ class ProblemsDAO extends ProblemsDAOBase
                     ) ps ON ps.problem_id = p.problem_id';
 
             $added_where = false;
-            if (!is_null($tag)) {
+            if (is_string($tag)) {
                 $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
                 $sql .= ' INNER JOIN Tags t ON pt.tag_id = t.tag_id';
                 $sql .= ' WHERE t.name = ?';
                 $args[] = $tag;
                 $added_where = true;
+            } elseif (is_array($tag)) {
+                // Look for problems matching ALL tags.
+                $placeholders = array_fill(0, count($tag), '?');
+                $placeholders = join(',', $placeholders);
+                $sql .= "
+                    INNER JOIN (
+                        SELECT
+                            pt.problem_id
+                        FROM
+                            Problems_Tags pt
+                        WHERE pt.tag_id IN (
+                            SELECT t.tag_id
+                            FROM Tags t
+                            WHERE t.name in ($placeholders)
+                        )
+                        GROUP BY
+                            pt.problem_id
+                        HAVING
+                            (COUNT(pt.tag_id) = ?)
+                    ) ptp ON ptp.problem_id = p.problem_id";
+                array_push($args, ...$tag);
+                $args[] = count($tag);
             }
 
             if (!is_null($query)) {
@@ -127,11 +149,35 @@ class ProblemsDAO extends ProblemsDAOBase
             $args[] = $user_id;
             $args[] = Authorization::ADMIN_ROLE;
 
-            if (!is_null($tag)) {
+            if (is_string($tag)) {
                 $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
                 $sql .= ' INNER JOIN Tags t ON pt.tag_id = t.tag_id';
                 $sql .= ' WHERE t.name = ? AND pt.public = 1 AND';
                 $args[] = $tag;
+            } elseif (is_array($tag)) {
+                // Look for problems matching ALL tags.
+                $placeholders = array_fill(0, count($tag), '?');
+                $placeholders = join(',', $placeholders);
+                $sql .= "
+                    INNER JOIN (
+                        SELECT
+                            pt.problem_id
+                        FROM
+                            Problems_Tags pt
+                        WHERE pt.tag_id IN (
+                            SELECT t.tag_id
+                            FROM Tags t
+                            WHERE t.name in ($placeholders)
+                        )
+                        AND
+                            pt.public = 1
+                        GROUP BY
+                            pt.problem_id
+                        HAVING
+                            (COUNT(pt.tag_id) = ?)
+                    ) ptp ON ptp.problem_id = p.problem_id WHERE";
+                array_push($args, ...$tag);
+                $args[] = count($tag);
             } else {
                 $sql .= ' WHERE';
             }
@@ -155,11 +201,35 @@ class ProblemsDAO extends ProblemsDAOBase
                     FROM
                         Problems p';
 
-            if (!is_null($tag)) {
+            if (is_string($tag)) {
                 $sql .= ' INNER JOIN Problems_Tags pt ON pt.problem_id = p.problem_id';
                 $sql .= ' INNER JOIN Tags t ON pt.tag_id = t.tag_id';
                 $sql .= ' WHERE t.name = ? AND pt.public = 1 AND';
                 $args[] = $tag;
+            } elseif (is_array($tag)) {
+                // Look for problems matching ALL tags.
+                $placeholders = array_fill(0, count($tag), '?');
+                $placeholders = join(',', $placeholders);
+                $sql .= "
+                    INNER JOIN (
+                        SELECT
+                            pt.problem_id
+                        FROM
+                            Problems_Tags pt
+                        WHERE pt.tag_id IN (
+                            SELECT t.tag_id
+                            FROM Tags t
+                            WHERE t.name in ($placeholders)
+                        )
+                        AND
+                            pt.public = 1
+                        GROUP BY
+                            pt.problem_id
+                        HAVING
+                            (COUNT(pt.tag_id) = ?)
+                    ) ptp ON ptp.problem_id = p.problem_id WHERE";
+                array_push($args, ...$tag);
+                $args[] = count($tag);
             } else {
                 $sql .= ' WHERE';
             }
