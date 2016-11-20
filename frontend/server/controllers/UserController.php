@@ -830,6 +830,26 @@ class UserController extends Controller {
             $keys = array (
                 'OMIAGS' => 35
             );
+        } elseif ($r['contest_type'] == 'OMIP-AGS') {
+            if ($r['current_user']->username != 'EfrenGonzalez'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys = array (
+                'OMIP-AGS' => 30
+            );
+        } elseif ($r['contest_type'] == 'OMIS-AGS') {
+            if ($r['current_user']->username != 'EfrenGonzalez'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys = array (
+                'OMIS-AGS' => 30
+            );
         } elseif ($r['contest_type'] == 'OSI') {
             if ($r['current_user']->username != 'cope_quintana'
                 && !$is_system_admin
@@ -887,13 +907,22 @@ class UserController extends Controller {
             $keys = array (
                 'OIC-16' => 225
             );
+        } elseif ($r['contest_type'] == 'OMIQROO') {
+            if ($r['current_user']->username != 'pablobatun'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+            $keys = array (
+                'ROO-17' => 160
+            );
         } else {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 array(
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, PROFEST, CCUPITSUR, CONALEP, OMIQROO',
                 )
             );
         }
