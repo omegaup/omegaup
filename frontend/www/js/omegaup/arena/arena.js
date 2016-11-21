@@ -144,6 +144,7 @@ omegaup.arena.Arena = function(options) {
     attribute: 'data-bind'  // default "data-sbind"
   };
   ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
+  self.bindGlobalHandlers();
 };
 
 omegaup.arena.Arena.prototype.installLibinteractiveHooks = function() {
@@ -957,6 +958,22 @@ omegaup.arena.Arena.prototype.hideOverlay = function() {
   $('#overlay').hide();
   window.location.hash =
       window.location.hash.substring(0, window.location.hash.lastIndexOf('/'));
+};
+
+omegaup.arena.Arena.prototype.bindGlobalHandlers = function() {
+  var self = this;
+  $('#overlay, .close').click(self.onCloseSubmit.bind(self));
+};
+
+omegaup.arena.Arena.prototype.onCloseSubmit = function(e) {
+  var self = this;
+  if (e.target.id === 'overlay' || e.target.className === 'close') {
+    $('#submit #clarification').hide();
+    self.hideOverlay();
+    var code_file = $('#submit-code-file');
+    code_file.replaceWith(code_file = code_file.clone(true));
+    return false;
+  }
 };
 
 omegaup.arena.Arena.prototype.displayRunDetails = function(guid, data) {
