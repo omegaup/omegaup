@@ -82,17 +82,6 @@ $(document)
 
       omegaup.API.getContest(arena.options.contestAlias, contestLoaded);
 
-      $('#overlay, .close')
-          .click(function(e) {
-            if (e.target.id === 'overlay' || e.target.className === 'close') {
-              $('#submit #clarification').hide();
-              arena.hideOverlay();
-              var code_file = $('#submit-code-file');
-              code_file.replaceWith(code_file = code_file.clone(true));
-              return false;
-            }
-          });
-
       function submitRun(contestAlias, problemAlias, lang, code) {
         $('#submit input').attr('disabled', 'disabled');
         omegaup.API.submit(
