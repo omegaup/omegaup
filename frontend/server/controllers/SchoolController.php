@@ -12,8 +12,6 @@ class SchoolController extends Controller {
      * @param Request $r
      */
     public static function apiList(Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
 
         $param = '';
@@ -49,8 +47,6 @@ class SchoolController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiCreate(Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(Experiments::SCHOOLS);
         self::authenticateRequest($r);
 
         Validators::isStringNonEmpty($r['name'], 'name');
