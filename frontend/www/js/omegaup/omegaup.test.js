@@ -14,4 +14,3 @@ describe('omegaup', function() {
     });
   });
 });
-

@@ -6,8 +6,7 @@ var omegaup = typeof global === 'undefined' ?
 omegaup.Experiments = function(experimentList) {
   var self = this;
   self.enabledExperiments = {};
-  if (!experimentList)
-    return;
+  if (!experimentList) return;
   for (var i = 0; i < experimentList.length; i++)
     self.enabledExperiments[experimentList[i]] = true;
 };
@@ -46,9 +45,11 @@ omegaup.OmegaUp = {
   _deltaTime: undefined,
 
   _listeners: {
-    'ready': [function() {
-      omegaup.OmegaUp.experiments = omegaup.Experiments.loadGlobal();
-    }],
+    'ready': [
+      function() {
+        omegaup.OmegaUp.experiments = omegaup.Experiments.loadGlobal();
+      }
+    ],
   },
 
   _onDocumentReady: function() {
