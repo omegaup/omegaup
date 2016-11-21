@@ -2,12 +2,42 @@ var omegaup = typeof global === 'undefined' ?
                   (window.omegaup = window.omegaup || {}) :
                   (global.omegaup = global.omegaup || {});
 
+// This is the JavaScript version of the frontend's Experiments class.
+omegaup.Experiments = function(experimentList) {
+  var self = this;
+  self.enabledExperiments = {};
+  if (!experimentList)
+    return;
+  for (var i = 0; i < experimentList.length; i++)
+    self.enabledExperiments[experimentList[i]] = true;
+};
+
+// Current frontend-available experiments:
+omegaup.Experiments.SCHOOLS = 'schools';
+
+// The list of all enabled experiments for a particular request should have
+// been injected into the DOM by Smarty.
+omegaup.Experiments.loadGlobal = function() {
+  var experimentsNode = $('#omegaup-enabled-experiments');
+  var experimentsList = null;
+  if (experimentsNode.length == 1)
+    experimentsList = experimentsNode[0].innerText.split(',');
+  return new omegaup.Experiments(experimentsList);
+};
+
+omegaup.Experiments.prototype.isEnabled = function(name) {
+  var self = this;
+  return self.enabledExperiments.hasOwnProperty(name);
+};
+
 omegaup.OmegaUp = {
   loggedIn: false,
 
   username: null,
 
   ready: false,
+
+  experiments: null,
 
   _documentReady: false,
 
@@ -16,7 +46,9 @@ omegaup.OmegaUp = {
   _deltaTime: undefined,
 
   _listeners: {
-    'ready': [],
+    'ready': [function() {
+      omegaup.OmegaUp.experiments = omegaup.Experiments.loadGlobal();
+    }],
   },
 
   _onDocumentReady: function() {

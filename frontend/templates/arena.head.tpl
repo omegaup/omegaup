@@ -46,6 +46,9 @@
 		<link rel="stylesheet" href="/css/common.css" />
 		<link rel="stylesheet" href="{version_hash src="/ux/arena.css"}" />
 		<link rel="shortcut icon" href="/favicon.ico" />
+{if !empty($ENABLED_EXPERIMENTS)}
+		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
+{/if}
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>
 
