@@ -1,5 +1,9 @@
 <?php
 require_once('../../server/bootstrap.php');
+if (!$experiments->isEnabled(Experiments::SCHOOLS)) {
+    header('HTTP/1.1 404 Not Found');
+    die();
+}
 
 $show_intro = false;
 
@@ -12,7 +16,7 @@ try {
     }
 } catch (Exception $e) {
     header('HTTP/1.1 404 Not Found');
-    die(file_get_contents('../404.html'));
+    die();
 }
 
 if ($show_intro) {
