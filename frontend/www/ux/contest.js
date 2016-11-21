@@ -35,14 +35,7 @@ $(document)
         }
 
         var language_array = problem.languages.split(',');
-        $('#lang-select option')
-            .each(function(index, item) {
-              if (language_array.indexOf($(item).val()) >= 0) {
-                $(item).show();
-              } else {
-                $(item).hide();
-              }
-            });
+        arena.updateAllowedLanguages(language_array);
 
         if (problem.user.logged_in) {
           omegaup.API.getProblemRuns(problem.alias, {}, function(data) {
@@ -154,29 +147,7 @@ $(document)
         }
 
         $('#title .contest-title').html(omegaup.UI.escape(contest.title));
-        $('#summary .title').html(omegaup.UI.escape(contest.title));
-        $('#summary .description').html(omegaup.UI.escape(contest.description));
-
-        $('#summary .start_time')
-            .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                        contest.start_time.getTime()));
-        $('#summary .finish_time')
-            .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
-                                        contest.finish_time.getTime()));
-
-        var duration =
-            contest.finish_time.getTime() - contest.start_time.getTime();
-        $('#summary .window_length')
-            .html(omegaup.arena.FormatDelta((contest.window_length * 60000) ||
-                                            duration));
-        $('#summary .scoreboard_cutoff')
-            .html(Highcharts.dateFormat(
-                '%Y-%m-%d %H:%M:%S', contest.start_time.getTime() +
-                                         duration * contest.scoreboard / 100));
-        $('#summary .contest_organizer')
-            .html('<a href="/profile/' + contest.director + '/">' +
-                  contest.director + '</a>');
-
+        arena.updateSummary(contest, true /* showTimes */);
         arena.submissionGap = parseInt(contest.submission_gap);
         if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
 

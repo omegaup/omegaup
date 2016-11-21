@@ -777,6 +777,13 @@ omegaup.arena.Arena.prototype.clarificationsChange = function(data) {
   }
 };
 
+omegaup.arena.Arena.prototype.updateAllowedLanguages = function(lang_array) {
+  $('#lang-select option')
+      .each(function(index, item) {
+        $(item).toggle(lang_array.indexOf($(item).val()) >= 0);
+      });
+};
+
 omegaup.arena.Arena.prototype.onHashChanged = function() {
   var self = this;
   var tabChanged = false;
@@ -861,14 +868,7 @@ omegaup.arena.Arena.prototype.onHashChanged = function() {
 
       $('#problem tbody.added').remove();
 
-      $('#lang-select option')
-          .each(function(index, item) {
-            if (language_array.indexOf($(item).val()) >= 0) {
-              $(item).show();
-            } else {
-              $(item).hide();
-            }
-          });
+      self.updateAllowedLanguages(language_array);
 
       function updateRuns(runs) {
         if (runs) {
@@ -973,6 +973,32 @@ omegaup.arena.Arena.prototype.onCloseSubmit = function(e) {
     var code_file = $('#submit-code-file');
     code_file.replaceWith(code_file = code_file.clone(true));
     return false;
+  }
+};
+
+omegaup.arena.Arena.prototype.updateSummary = function(contest, showTimes) {
+  var summary = $('#summary');
+  $('.title', summary).html(omegaup.UI.escape(contest.title));
+  $('.description', summary).html(omegaup.UI.escape(contest.description));
+  var duration = contest.finish_time.getTime() - contest.start_time.getTime();
+  $('.window_length', summary)
+      .html(omegaup.arena.FormatDelta((contest.window_length * 60000) ||
+                                      duration));
+  $('.contest_organizer', summary)
+      .html('<a href="/profile/' + contest.director + '/">' + contest.director +
+            '</a>');
+
+  if (showTimes) {
+    $('.start_time', summary)
+        .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
+                                    contest.start_time.getTime()));
+    $('.finish_time', summary)
+        .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
+                                    contest.finish_time.getTime()));
+    $('.scoreboard_cutoff', summary)
+        .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
+                                    contest.start_time.getTime() +
+                                        duration * contest.scoreboard / 100));
   }
 };
 
