@@ -209,25 +209,40 @@ class ContestsDAO extends ContestsDAOBase
                 c.*
             FROM
                 Contests c
-            INNER JOIN
-                ACLs a ON a.acl_id = c.acl_id
-            LEFT JOIN
-                User_Roles ur ON ur.acl_id = c.acl_id
-            LEFT JOIN
-                Group_Roles gr ON gr.acl_id = c.acl_id
-            LEFT JOIN
-                Groups_Users gu ON gu.group_id = gr.group_id
             WHERE
-                a.owner_id = ? OR
-                (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gu.user_id = ?)
+                c.acl_id IN (
+                    SELECT
+                        ur.acl_id
+                    FROM
+                        User_Roles ur
+                    WHERE
+                        ur.role_id = ? AND ur.user_id = ?
+                UNION DISTINCT
+                    SELECT
+                        a.acl_id
+                    FROM
+                        ACLs a
+                    WHERE
+                        a.owner_id = ?
+                UNION DISTINCT
+                    SELECT
+                        gr.acl_id
+                    FROM
+                        Group_Roles gr
+                    INNER JOIN
+                        Groups_Users gu
+                    ON
+                        gu.group_id = gr.group_id
+                    WHERE
+                        gr.role_id = ? AND gu.user_id = ?
+                )
             ORDER BY
                 c.contest_id DESC
             LIMIT ?, ?;';
 
         $params = array(
-            $user_id,
             Authorization::ADMIN_ROLE,
+            $user_id,
             $user_id,
             Authorization::ADMIN_ROLE,
             $user_id,
