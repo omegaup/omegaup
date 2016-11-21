@@ -36,20 +36,30 @@ class UserContestsTest extends OmegaupTestCase {
         $director = UserFactory::createUser();
         $contestAdminData = array();
 
+        // Create a group with two arbitrary users.
+        $helperGroup = GroupsFactory::createGroup($director);
+        GroupsFactory::addUserToGroup($helperGroup, UserFactory::createUser());
+        GroupsFactory::addUserToGroup($helperGroup, UserFactory::createUser());
+
         // Get two contests with another director, add $director to their
         // admin list
         $contestAdminData[0] = ContestsFactory::createContest();
         ContestsFactory::addAdminUser($contestAdminData[0], $director);
+        ContestsFactory::addGroupAdmin($contestAdminData[0], $helperGroup['group']);
 
         // Get two contests with another director, add $director to their
         // group admin list
         $contestAdminData[1] = ContestsFactory::createContest();
         $group = GroupsFactory::createGroup($contestAdminData[1]['director']);
         GroupsFactory::addUserToGroup($group, $director);
+        GroupsFactory::addUserToGroup($group, UserFactory::createUser());
         ContestsFactory::addGroupAdmin($contestAdminData[1], $group['group']);
+        ContestsFactory::addGroupAdmin($contestAdminData[1], $helperGroup['group']);
 
         $contestDirectorData[0] = ContestsFactory::createContest(null /*title*/, 1 /*public*/, $director);
+        ContestsFactory::addGroupAdmin($contestDirectorData[0], $helperGroup['group']);
         $contestDirectorData[1] = ContestsFactory::createContest(null /*title*/, 0 /*public*/, $director);
+        ContestsFactory::addGroupAdmin($contestDirectorData[1], $helperGroup['group']);
 
         // Call api
         $login = self::login($director);
