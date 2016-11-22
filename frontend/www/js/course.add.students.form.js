@@ -19,6 +19,6 @@ $('a[data-toggle="tab"]')
 				         displayKey: 'label',
 				       })
 				    .on('typeahead:selected',
-				        function(item, val, text) { $('#member-username').val(val.label); });			
+				        function(item, val, text) { $('#member-username').val(val.label); });
         }
 	});

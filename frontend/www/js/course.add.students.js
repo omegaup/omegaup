@@ -7,7 +7,7 @@ $('document')
 
             omegaup.API.addUserToGroup(
                 courseAlias,
-                $('#member-username').val(),                
+                $('#member-username').val(),
                 function(data) {
                   if (data.status == 'ok') {
                     omegaup.UI.success(
@@ -15,7 +15,7 @@ $('document')
                   } else {
                     omegaup.UI.error(data.error || 'error');
                   }
-                });            
+                });
             refreshStudentList();
             return false;
           });
