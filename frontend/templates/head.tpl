@@ -63,6 +63,9 @@
 {if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>
 {/if}
+{if !empty($ENABLED_EXPERIMENTS)}
+		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
+{/if}
 	</head>
 	<body>
 
