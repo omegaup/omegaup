@@ -114,83 +114,13 @@ $(document)
         }
       }
 
-      function contestLoaded(contest) {
-        if (contest.status == 'error') {
-          if (!omegaup.OmegaUp.loggedIn) {
-            window.location = '/login/?redirect=' + escape(window.location);
-          } else if (contest.start_time) {
-            var f = (function(x, y) {
-              return function() {
-                var t = omegaup.OmegaUp.time();
-                $('#loading')
-                    .html(x + ' ' +
-                          omegaup.arena.FormatDelta(y.getTime() - t.getTime()));
-                if (t.getTime() < y.getTime()) {
-                  setTimeout(f, 1000);
-                } else {
-                  omegaup.API.getContest(x, contestLoaded);
-                }
-              }
-            })(arena.options.contestAlias,
-               omegaup.OmegaUp.time(contest.start_time * 1000));
-            setTimeout(f, 1000);
-          } else {
-            $('#loading').html('404');
-          }
-          return;
-        } else if (arena.options.isPractice && contest.finish_time &&
-                   omegaup.OmegaUp.time().getTime() <
-                       contest.finish_time.getTime()) {
-          window.location =
-              window.location.pathname.replace(/\/practice.*/, '/');
-          return;
-        }
-
-        $('#title .contest-title').html(omegaup.UI.escape(contest.title));
-        arena.updateSummary(contest, true /* showTimes */);
-        arena.submissionGap = parseInt(contest.submission_gap);
-        if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
-
-        arena.initClock(contest.start_time, contest.finish_time,
-                        contest.submission_deadline);
-        arena.initProblems(contest);
-
-        for (var idx in contest.problems) {
-          var problem = contest.problems[idx];
-          var problemName =
-              problem.letter + '. ' + omegaup.UI.escape(problem.title);
-
-          var prob = $('#problem-list .template')
-                         .clone()
-                         .removeClass('template')
-                         .addClass('problem_' + problem.alias);
-          $('.name', prob)
-              .attr('href', '#problems/' + problem.alias)
-              .html(problemName);
-          $('#problem-list').append(prob);
-
-          $('#clarification select')
-              .append('<option value="' + problem.alias + '">' + problemName +
-                      '</option>');
-        }
-
-        if (!arena.options.isPractice) {
-          arena.setupPolls();
-        }
-
-        // Trigger the event (useful on page load).
-        $(window).hashchange();
-
-        $('#loading').fadeOut('slow');
-        $('#root').fadeIn('slow');
-      }
-
       if (arena.options.isOnlyProblem) {
         onlyProblemLoaded(JSON.parse(
             document.getElementById('problem-json').firstChild.nodeValue));
       } else {
         arena.connectSocket();
-        omegaup.API.getContest(arena.options.contestAlias, contestLoaded);
+        omegaup.API.getContest(arena.options.contestAlias,
+                               arena.contestLoaded.bind(arena));
 
         $('.clarifpager .clarifpagerprev')
             .click(function() {
