@@ -39,14 +39,7 @@ $(document)
         }
 
         $('#title .contest-title').html(omegaup.UI.escape(contest.title));
-        $('#summary .title').html(omegaup.UI.escape(contest.title));
-        $('#summary .description').html(omegaup.UI.escape(contest.description));
-        $('#summary .window_length')
-            .html(omegaup.arena.FormatDelta((contest.window_length * 60000)));
-        $('#summary .contest_organizer')
-            .html('<a href="/profile/' + contest.director + '/">' +
-                  contest.director + '</a>');
-
+        arena.updateSummary(contest, false /* showTimes */);
         arena.submissionGap = parseInt(contest.submission_gap);
         if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
 
@@ -81,17 +74,6 @@ $(document)
       }
 
       omegaup.API.getContest(arena.options.contestAlias, contestLoaded);
-
-      $('#overlay, .close')
-          .click(function(e) {
-            if (e.target.id === 'overlay' || e.target.className === 'close') {
-              $('#submit #clarification').hide();
-              arena.hideOverlay();
-              var code_file = $('#submit-code-file');
-              code_file.replaceWith(code_file = code_file.clone(true));
-              return false;
-            }
-          });
 
       function submitRun(contestAlias, problemAlias, lang, code) {
         $('#submit input').attr('disabled', 'disabled');

@@ -60,9 +60,9 @@
 	<link rel="stylesheet" type="text/css" href="/third_party/js/pagedown/demo/browser/demo.css" />
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
-		{if isset($jsfile)}
-			<script type="text/javascript" src="{$jsfile}"></script>
-		{/if}
+{if isset($jsfile)}
+		<script type="text/javascript" src="{$jsfile}"></script>
+{/if}
 {if !empty($ENABLED_EXPERIMENTS)}
 		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
 {/if}
