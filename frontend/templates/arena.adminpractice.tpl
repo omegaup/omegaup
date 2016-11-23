@@ -1,4 +1,4 @@
-{include file='arena.head.tpl' jsfile={version_hash src='/ux/admin.js'}}
+{include file='head.tpl' jsfile={version_hash src='/ux/admin.js'} inArena=true}
 			<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/admin_arena.js"}"></script>
 			<div id="title">
 				<h1 class="contest-title">Envíos globales</h1>
