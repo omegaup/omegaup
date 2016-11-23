@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<title>{if isset($title)}{$title|escape} &ndash; {/if}omegaUp</title>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-1.10.2.js"}"></script>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+	<head data-locale="{#locale#}">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-1.10.2.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.ba-hashchange.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.gritter.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
@@ -18,12 +18,14 @@
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}"></script>
 
-		{if isset($jsfile)}
+{if isset($jsfile)}
 		<script type="text/javascript" src="{$jsfile}"></script>
-		{/if}
+{/if}
 		<script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
 		<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 		<link rel="stylesheet" href="/third_party/css/reset.css" />
+		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
 
 		<!-- Bootstrap from CDN -->
 		<!-- Latest compiled and minified CSS -->
@@ -42,16 +44,21 @@
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datetimepicker.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datetimepicker.min.js"}"></script>
 
-		<link rel="stylesheet" href="/third_party/css/jquery.gritter.css" />
-		<link rel="stylesheet" href="/css/common.css" />
-		<link rel="stylesheet" href="{version_hash src="/ux/arena.css"}" />
+		<link rel="stylesheet" type="text/css" href="/third_party/css/jquery.gritter.css" />
+		<link rel="stylesheet" type="text/css" href="/css/common.css" />
+		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
 		<link rel="shortcut icon" href="/favicon.ico" />
+{if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
+	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
+	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
+	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}"></script>
+	<link rel="stylesheet" type="text/css" href="/third_party/js/pagedown/demo/browser/demo.css" />
+{/if}
 {if !empty($ENABLED_EXPERIMENTS)}
 		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
 {/if}
 	</head>
 	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>
-
 		<!-- Generated from http://ajaxload.info/ -->
 		{if !isset($bodyid) or $bodyid != 'only-problem'}
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
