@@ -90,6 +90,228 @@ omegaup.API = {
         });
   },
 
+  createCourse: function(name, description, start_time, finish_time, alias,
+                         public, show_scoreboard, callback) {
+    $.post('/api/course/create/',
+           {
+             name: name,
+             description: description,
+             start_time: start_time,
+             finish_time: finish_time, public: public,
+             alias: alias,
+             show_scoreboard: show_scoreboard,
+           },
+           function(data) {
+             if (data.status !== undefined && data.status == 'error') {
+               omegaup.UI.error(data.error);
+             }
+             if (callback !== undefined) {
+               callback(data);
+             }
+           },
+           'json')
+        .fail(function(data) {
+          if (callback !== undefined) {
+            try {
+              callback(JSON.parse(data.responseText));
+            } catch (err) {
+              callback({status: 'error', error: err});
+            }
+          }
+        });
+  },
+
+  updateCourse: function(course_alias, name, description, start_time,
+                         finish_time, alias, show_scoreboard, callback) {
+    $.post('/api/course/update/course_alias/' +
+               encodeURIComponent(course_alias) + '/',
+           {
+             course_alias: course_alias,
+             name: name,
+             description: description,
+             start_time: start_time,
+             finish_time: finish_time,
+             alias: alias,
+             show_scoreboard: show_scoreboard,
+           },
+           function(data) {
+             if (data.status !== undefined && data.status == 'error') {
+               omegaup.UI.error(data.error);
+             } else {
+               if (callback !== undefined) {
+                 callback(data);
+               }
+             }
+           },
+           'json')
+        .fail(function(data) {
+          if (callback !== undefined) {
+            try {
+              callback(JSON.parse(data.responseText));
+            } catch (err) {
+              callback({status: 'error', error: err});
+            }
+          }
+        });
+  },
+  createCourseAssignment: function(course_alias, name, description, start_time,
+                                   finish_time, alias, assignment_type,
+                                   callback) {
+    $.post('/api/course/createAssignment/',
+           {
+             course_alias: course_alias,
+             name: name,
+             description: description,
+             start_time: start_time,
+             finish_time: finish_time,
+             alias: alias,
+             assignment_type: assignment_type,
+           },
+           function(data) {
+             if (data.status !== undefined && data.status == 'error') {
+               omegaup.UI.error(data.error);
+             }
+             if (callback !== undefined) {
+               callback(data);
+             }
+           },
+           'json')
+        .fail(function(data) {
+          if (callback !== undefined) {
+            try {
+              callback(JSON.parse(data.responseText));
+            } catch (err) {
+              callback({status: 'error', error: err});
+            }
+          }
+        });
+  },
+
+  addCourseAssignmentProblem: function(course_alias, assignment_alias,
+                                       problem_alias, callback) {
+    $.post('/api/course/addProblem/',
+           {
+             course_alias: course_alias,
+             assignment_alias: assignment_alias,
+             problem_alias: problem_alias
+           },
+           function(data) {
+             if (data.status !== undefined && data.status == 'error') {
+               omegaup.UI.error(data.error);
+             }
+             if (callback !== undefined) {
+               callback(data);
+             }
+           },
+           'json')
+        .fail(function(data) {
+          if (callback !== undefined) {
+            try {
+              callback(JSON.parse(data.responseText));
+            } catch (err) {
+              callback({status: 'error', error: err});
+            }
+          }
+        });
+  },
+
+  getCourseList: function(callback) {
+    return omegaup.API._wrapDeferred(
+        $.ajax({
+          url: '/api/course/listCourses/',
+          dataType: 'json',
+        }),
+        function(result) {
+          for (var i = 0; i < result.admin.length; ++i) {
+            result.admin[i].finish_time =
+                omegaup.OmegaUp.time(result.admin[i].finish_time * 1000);
+          }
+          for (var i = 0; i < result.student.length; ++i) {
+            result.student[i].finish_time =
+                omegaup.OmegaUp.time(result.student[i].finish_time * 1000);
+          }
+          return result;
+        });
+  },
+
+  getCourseStudentList: function(params) {
+    return omegaup.API._wrapDeferred($.ajax({
+      url: '/api/course/listStudents/course_alias/' +
+               encodeURIComponent(params.course_alias) + '/',
+      dataType: 'json',
+    }));
+  },
+
+  getCourseAssignments: function(course_alias, callback) {
+    $.get('/api/course/listAssignments/', {course_alias: course_alias},
+          function(data) {
+            if (data.status !== undefined && data.status == 'error') {
+              omegaup.UI.error(data.error);
+            }
+            if (callback !== undefined) {
+              callback(data);
+            }
+          },
+          'json')
+        .fail(function(j, status, errorThrown) {
+          try {
+            callback(JSON.parse(j.responseText));
+          } catch (err) {
+            callback({status: 'error', 'error': undefined});
+          }
+        });
+  },
+
+  getCourseAdminDetails: function(alias, callback) {
+    $.get('/api/course/admindetails/alias/' + encodeURIComponent(alias) + '/',
+          function(data) {
+            if (data.status == 'error') {
+              omegaup.UI.error(data.error);
+            }
+            if (data.status == 'ok') {
+              data.start_time = omegaup.OmegaUp.time(data.start_time * 1000,
+                                                     {server_sync: false});
+              data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000,
+                                                      {server_sync: false});
+            }
+            if (callback !== undefined) {
+              callback(data);
+            }
+          },
+          'json')
+        .fail(function(j, status, errorThrown) {
+          try {
+            callback(JSON.parse(j.responseText));
+          } catch (err) {
+            callback({status: 'error', 'error': undefined});
+          }
+        });
+  },
+
+  getCourseDetails: function(alias, callback) {
+    $.get('/api/course/details/alias/' + encodeURIComponent(alias) + '/',
+          function(data) {
+            if (data.status !== undefined && data.status == 'error') {
+              omegaup.UI.error(data.error);
+            }
+            if (data.status == 'ok') {
+              data.start_time = omegaup.OmegaUp.time(data.start_time * 1000);
+              data.finish_time = omegaup.OmegaUp.time(data.finish_time * 1000);
+            }
+            if (callback !== undefined) {
+              callback(data);
+            }
+          },
+          'json')
+        .fail(function(j, status, errorThrown) {
+          try {
+            callback(JSON.parse(j.responseText));
+          } catch (err) {
+            callback({status: 'error', 'error': undefined});
+          }
+        });
+  },
+
   createContest: function(
       title, description, start_time, finish_time, window_length, alias,
       points_decay_factor, submissions_gap, feedback, penalty, public,

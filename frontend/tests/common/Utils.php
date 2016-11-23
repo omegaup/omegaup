@@ -128,6 +128,7 @@ class Utils {
         $tables = array(
             'ACLs',
             'Auth_Tokens',
+            'Assignments',
             'Clarifications',
             'Coder_Of_The_Month',
             'Contest_Access_Log',
@@ -137,6 +138,7 @@ class Utils {
             'Contest_User_Request_History',
             'Contests',
             'Contests_Users',
+            'Courses',
             'Emails',
             'Group_Roles',
             'Groups',

@@ -116,9 +116,14 @@ omegaup.OmegaUp = {
     return new Date(timestamp).getTime();
   },
 
-  time: function(timestamp) {
-    return new Date(omegaup.OmegaUp._realTime(timestamp) +
-                    (omegaup.OmegaUp._deltaTime || 0));
+  time: function(timestamp, options) {
+    options = options ||  {};
+    options.server_sync = (typeof(options.server_sync) === 'undefined') ?
+                              true :
+                              options.server_sync;
+    return new Date(
+        omegaup.OmegaUp._realTime(timestamp) +
+        (options.server_sync ? (omegaup.OmegaUp._deltaTime || 0) : 0));
   }
 };
 

@@ -123,6 +123,7 @@ require_once('controllers/ClarificationController.php');
 require_once('controllers/TimeController.php');
 require_once('controllers/GraderController.php');
 require_once('controllers/SchoolController.php');
+require_once('controllers/CourseController.php');
 require_once('controllers/GroupController.php');
 require_once('controllers/GroupScoreboardController.php');
 require_once('controllers/ResetController.php');
