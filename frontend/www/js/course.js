@@ -1,6 +1,4 @@
 $(function() {
-  ko.bindingProvider.instance =
-      new ko.secureBindingsProvider({attribute: 'data-bind'});
   var courseAlias = /\/course\/([^\/]+)/.exec(window.location.pathname)[1];
   omegaup.API.getCourseDetails(courseAlias, function(course) {
     // Assignment lists by type.

@@ -140,11 +140,6 @@ omegaup.arena.Arena = function(options) {
 
   // Setup any global hooks.
   self.installLibinteractiveHooks();
-
-  var options = {
-    attribute: 'data-bind'  // default "data-sbind"
-  };
-  ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
   self.bindGlobalHandlers();
 };
 

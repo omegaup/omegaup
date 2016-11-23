@@ -4,8 +4,6 @@
 {include file='status.tpl'}
 
 <script src="{version_hash src="/js/course.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-4.3.0.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 
 <script type="text/html" id="assignments-list">
 <h3 data-bind="text: header"></h3>
