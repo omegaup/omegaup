@@ -444,6 +444,41 @@ class CourseController extends Controller {
     }
 
     /**
+     * Add Student to Course
+     *
+     * @param  Request $r
+     * @return array
+     */
+    public static function apiAddStudent(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        self::validateCourseExists($r);
+
+        if (!Authorization::isCourseAdmin($r['current_user_id'], $r['course'])) {
+            throw new ForbiddenAccessException();
+        }
+
+        $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+        if (is_null($r['user'])) {
+            throw new NotFoundException('userOrMailNotFound');
+        }
+
+        try {
+            GroupsUsersDAO::save(new GroupsUsers([
+                'group_id' => $r['course']->group_id,
+                'user_id' => $r['user']->user_id
+            ]));
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    /**
      * Returns course details common between admin & non-admin
      * @param  Request $r
      * @return array
