@@ -305,8 +305,9 @@ omegaup.arena.Arena.prototype.contestLoaded = function(contest) {
       $('#loading').html('404');
     }
     return;
-  } else if (self.options.isPractice && contest.finish_time &&
-             omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
+  }
+  if (self.options.isPractice && contest.finish_time &&
+      omegaup.OmegaUp.time().getTime() < contest.finish_time.getTime()) {
     window.location = window.location.pathname.replace(/\/practice.*/, '/');
     return;
   }
